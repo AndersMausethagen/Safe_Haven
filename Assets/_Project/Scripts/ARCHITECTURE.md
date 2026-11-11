@@ -1814,10 +1814,20 @@ is voiced the same way, and a builder that rewrites a story keeps its voices as 
 
 How a line is said, first that applies: what the Voice Lines window set for it (`dialogue_direction.json`), the
 `DIRECTION` table in the script (written by reading the scenes: a mood, sometimes with its own mix of feelings), the
-kind of line (a bark in a fight is shouted, the portal's whispers are calm), then plainly. The voices are designed
-once in LocalSpawn (Qwen3-TTS, from the descriptions in the cast) and kept in `Tools/Audio/Voices/<name>/`; the lines
-are spoken by LocalSpawn's acting model (IndexTTS-2.5), which takes the speaker from that clip and plays the feeling as
-it speaks. Its licence is bilibili's own: read `D:\ComfyUI\agent\integrations\index-tts\README-WINDOWS.md` before
+kind of line (a bark in a fight is shouted, the portal's whispers are calm), then plainly.
+
+**The voices** are designed in LocalSpawn (Qwen3-TTS's voice designer) from the descriptions in the cast at the top of
+`Tools/Audio/dialogue_voices.py`, and kept in `Tools/Audio/Voices/<name>/`. Each reference clip is long (15 to 25 s,
+written in the character's manner with a question, an exclamation and a quiet close): every line is cloned from it,
+and the first one- or two-sentence clips gave flatter lines. `Tools/Audio/redesign_voices.py` designs a voice again
+with several seeds and keeps the one most like the voice it replaces (a speaker-recognition model), of the right sex
+and saying all its words.
+
+**Who speaks the lines** (the user's choice by ear, 2026-11-10): the characters by LocalSpawn's acting model
+(IndexTTS-2.5), which plays the feeling as it speaks; the portal by Qwen3-TTS, plainly (better for her longer, quieter
+reads; her sentences are put on lines of their own, which gives a pause between them). **Nobody is slowed**: slowed
+lines sounded "drunk and slow in the head". And Qwen's moods made afterwards on the sound are not used: they sounded
+bad. IndexTTS's licence is bilibili's own: read `D:\ComfyUI\agent\integrations\index-tts\README-WINDOWS.md` before
 shipping these recordings.
 
 Traps: a script run from the command line once wrote its clips beside the wrong folder (relative paths are now always

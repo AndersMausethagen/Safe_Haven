@@ -1,12 +1,12 @@
 {
   "name": "sigrid",
   "description": "A woman in her forties who leads an expedition. A low, firm, steady voice with calm authority, a little rough from years outdoors, measured and sure.",
-  "reference_text": "Hold together! Nobody gets left behind. We will find each other, whatever this forest does.",
+  "reference_text": "Listen to me, all of you. We keep to the road, we keep together, and we keep our torches high. Did anyone see where the path turned? No? Then we wait for Runa. Steady now! Nobody goes into those trees alone. Not tonight.",
   "language": "English",
   "seed": 3201,
   "source": "designed",
   "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "created": "2026-11-10 19:35:39",
-  "seconds": 8.24,
+  "created": "2026-11-11 00:21:39",
+  "seconds": 18.56,
   "sample_rate": 24000
 }

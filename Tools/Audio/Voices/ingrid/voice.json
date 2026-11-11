@@ -1,12 +1,12 @@
 {
   "name": "ingrid",
   "description": "A woman in her fifties, an alchemist. A dry, precise, thoughtful voice, medium-low, careful with words, a little tired.",
-  "reference_text": "The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding them.",
+  "reference_text": "Hold still, this will sting. Willow bark, a little honey, and something I would rather not name. There. Does that feel any better? I thought not. I have been awake for three nights, and the roots out there are still warm. Something is feeding them.",
   "language": "English",
-  "seed": 3104,
+  "seed": 3604,
   "source": "designed",
   "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "created": "2026-11-10 19:36:58",
-  "seconds": 8.0,
+  "created": "2026-11-11 00:21:39",
+  "seconds": 18.88,
   "sample_rate": 24000
 }

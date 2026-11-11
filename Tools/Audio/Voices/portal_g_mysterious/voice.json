@@ -1,0 +1,12 @@
+{
+  "name": "portal_g_mysterious",
+  "description": "An old woman's voice, low and dry, warm, slightly hoarse, slow and calm, telling a folktale to a child by a fire. Soft northern English accent, from rural Yorkshire. Mysterious and hushed, as if she speaks from somewhere very old and far away, with long thoughtful pauses, gentle and a little sad.",
+  "reference_text": "Listen, little one. Do you hear the wind in the stones? It remembers. Long ago, people kept a fire beside me, and I kept the night from their door. Then the fire went out. Come closer. There is more to tell, and not much time to tell it.",
+  "language": "English",
+  "seed": 1601,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-11 00:21:39",
+  "seconds": 22.48,
+  "sample_rate": 24000
+}

@@ -1,12 +1,12 @@
 {
   "name": "bjarne",
   "description": "A big man in his forties, a blacksmith. A deep, warm, rumbling bass voice, slow, kind and plain-spoken.",
-  "reference_text": "I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight.",
+  "reference_text": "Good iron doesn't lie to you. You heat it, you strike it, and it tells you what it wants to be. Hand me that hammer, would you? Careful, it's heavier than it looks! There. Now we make something that will still be here when we're gone.",
   "language": "English",
-  "seed": 3105,
+  "seed": 4105,
   "source": "designed",
   "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "created": "2026-11-10 19:37:39",
-  "seconds": 7.6,
+  "created": "2026-11-11 00:21:39",
+  "seconds": 14.88,
   "sample_rate": 24000
 }

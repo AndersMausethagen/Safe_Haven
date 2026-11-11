@@ -1,12 +1,12 @@
 {
   "name": "gunnar",
   "description": "A man in his fifties, a hunter who lives alone. A low, quiet, gruff voice of few words, slow and wary.",
-  "reference_text": "You've been frightening my deer. Least you can do is give me a roof. I'll earn it.",
+  "reference_text": "Tracks are fresh. A day, no more. You see where the moss is torn? That's a boar, a big one, and it's not alone. Keep the wind in your face. If it charges, step aside, don't run! Let it pass, and strike behind the shoulder. Simple.",
   "language": "English",
-  "seed": 3109,
+  "seed": 5609,
   "source": "designed",
   "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "created": "2026-11-10 19:39:27",
-  "seconds": 5.76,
+  "created": "2026-11-11 00:29:32",
+  "seconds": 21.28,
   "sample_rate": 24000
 }

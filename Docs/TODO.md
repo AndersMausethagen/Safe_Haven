@@ -9,8 +9,11 @@ Every line a named character says has a recording: 412 lines, twelve voices (see
 Checked in Play from the CLI: a recorded line is found and heard on the Voice volume, a subtitle waits for its recording,
 an unrecorded line is only read. Every clip was written down again by a speech recogniser and says its words. **Nobody
 has listened to a single line yet.**
-- [ ] Listen. The voices themselves (their reference clips are in `Tools/Audio/Voices/<name>/`), then lines in the game.
-      Yrsa's reference measured very high (308 Hz) for "an older woman, medium-low": the likeliest to want redesigning.
+- [ ] Listen to the redesigned voices (2026-11-11: long reference clips, the old one-sentence ones are in
+      `Tools/Audio/Voices/raw/previous/`, every candidate in `raw/candidates/`). Eirik came out lighter than before (120
+      Hz against 92, the closest of nine designs); pick another candidate in `choices.json` or redesign him if he is
+      wrong. Yrsa is still high (286 Hz) for "an older woman, medium-low". The portal is a new voice,
+      `portal_g_mysterious`: the opening cinematic is still the old one, `portal_f_british_northern`.
 - [ ] The direction (`DIRECTION` in `Tools/Audio/dialogue_voices.py`) was written by reading the scenes, and the moods'
       strengths were set by measurement. Change a line in Safe Haven › Voice Lines (Mood, Feeling, Take, Speak again).
 - [ ] The Voice Lines window compiles, opens and runs without errors, and its speaking path was run from the command

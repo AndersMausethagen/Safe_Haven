@@ -1,12 +1,12 @@
 {
   "name": "eirik",
   "description": "A man in his late forties, an old soldier. A gruff, weathered baritone voice, slightly gravelly, with dry humour, unhurried.",
-  "reference_text": "A soldier's choice. It is old iron, but it holds an edge. Guard well, and it will see you home.",
+  "reference_text": "Twenty winters I have carried a shield, and I have never once had a proper breakfast. Is that porridge? Gods help us. Stand behind me and keep your blade low. Here they come! Hold! Good. Now we eat, and nobody complains about the salt.",
   "language": "English",
-  "seed": 3102,
+  "seed": 7602,
   "source": "designed",
   "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
-  "created": "2026-11-10 19:36:06",
-  "seconds": 7.44,
+  "created": "2026-11-11 00:29:32",
+  "seconds": 18.4,
   "sample_rate": 24000
 }

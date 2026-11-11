@@ -53,49 +53,86 @@ OLLAMA = "http://127.0.0.1:11434/api/chat"
 OLLAMA_MODEL = "qwen3:4b-instruct"
 
 # Who speaks in which voice: the name the dialogue box shows -> the voice, whether it is a woman's (checked by its
-# pitch when it is designed), the dials every line of theirs gets, and the description it is designed from.
-# The pace is each voice's own, measured on long lines with the acting model (2026-11-10: Liv and Sigrid read at
-# 180 words a minute, Tor at 120), then set so talk lands near 150 to 165 and the portal, who is very old, near 135.
+# pitch when it is designed), the model that speaks their lines, and what the voice is designed from.
+# Nobody is slowed down: every line is said at the voice model's own pace. Slowing them (to 0.84-0.94) made the
+# whole cast sound "drunk and slow in the head" in the game (playtest, 2026-11-10).
+#
+# A voice's reference clip is what its lines are cloned from, so it is long (about 15 seconds, all of it that the
+# acting model reads) and says something in the character's own manner with some range in it: a question, an
+# exclamation, a quiet close. The first designs said one or two sentences, and their lines came out flatter than the
+# clips. Each voice is designed from its description with three seeds (`seeds`), and the one most like the voice the
+# user first chose by ear, of the right sex and saying all its words, is kept (Tools/Audio/redesign_voices.py).
+#
+# The portal is spoken by Qwen3-TTS (better for its longer, quieter reads); everyone else by the acting model.
 CAST = {
-    "The Portal": dict(voice="portal_f_british_northern", woman=True, dials={"speed": 0.88}, description=None),
-    "Sigrid": dict(voice="sigrid", woman=True, dials={"speed": 0.9}, seed=3101, description=(
+    "The Portal": dict(voice="portal_g_mysterious", woman=True, engine="shaped", seeds=(1101, 1601, 2101), description=(
+        "An old woman's voice, low and dry, warm, slightly hoarse, slow and calm, telling a folktale to a child by a "
+        "fire. Soft northern English accent, from rural Yorkshire. Mysterious and hushed, as if she speaks from "
+        "somewhere very old and far away, with long thoughtful pauses, gentle and a little sad."),
+        reference=("Listen, little one. Do you hear the wind in the stones? It remembers. Long ago, people kept a fire "
+                   "beside me, and I kept the night from their door. Then the fire went out. Come closer. There is "
+                   "more to tell, and not much time to tell it."),
+        was="portal_f_british_northern"),
+    "Sigrid": dict(voice="sigrid", woman=True, seeds=(3201, 3701, 4201), description=(
         "A woman in her forties who leads an expedition. A low, firm, steady voice with calm authority, a little "
         "rough from years outdoors, measured and sure."),
-        reference="Hold together! Nobody gets left behind. We will find each other, whatever this forest does."),
-    "Eirik": dict(voice="eirik", woman=False, dials={"speed": 0.94}, seed=3102, description=(
+        reference=("Listen to me, all of you. We keep to the road, we keep together, and we keep our torches high. Did "
+                   "anyone see where the path turned? No? Then we wait for Runa. Steady now! Nobody goes into those "
+                   "trees alone. Not tonight.")),
+    "Eirik": dict(voice="eirik", woman=False, seeds=(3102, 3602, 4102, 5102, 5602, 6102, 6602, 7102, 7602), description=(
         "A man in his late forties, an old soldier. A gruff, weathered baritone voice, slightly gravelly, with dry "
         "humour, unhurried."),
-        reference="A soldier's choice. It is old iron, but it holds an edge. Guard well, and it will see you home."),
-    "Runa": dict(voice="runa", woman=True, dials={"speed": 0.93}, seed=3103, description=(
+        reference=("Twenty winters I have carried a shield, and I have never once had a proper breakfast. Is that "
+                   "porridge? Gods help us. Stand behind me and keep your blade low. Here they come! Hold! Good. Now we "
+                   "eat, and nobody complains about the salt.")),
+    "Runa": dict(voice="runa", woman=True, seeds=(3103, 3603, 4103), description=(
         "A young woman in her twenties, a tracker and hunter. A quiet, alert, light and clear voice, soft-spoken "
         "but sure, quick."),
-        reference="Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Nothing sleeps."),
-    "Ingrid": dict(voice="ingrid", woman=True, dials={"speed": 0.98}, seed=3104, description=(
+        reference=("Quiet. Do you hear that? Something heavy, moving through the ferns to the east. Wolves don't walk "
+                   "like that. Stay low and follow my steps, exactly my steps. There! Behind the birch! Don't run. "
+                   "Never run. Just breathe, and let me take the shot.")),
+    "Ingrid": dict(voice="ingrid", woman=True, seeds=(3104, 3604, 4104), description=(
         "A woman in her fifties, an alchemist. A dry, precise, thoughtful voice, medium-low, careful with words, "
         "a little tired."),
-        reference="The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding them."),
-    "Bjarne": dict(voice="bjarne", woman=False, dials={"speed": 0.93}, seed=3105, description=(
+        reference=("Hold still, this will sting. Willow bark, a little honey, and something I would rather not name. "
+                   "There. Does that feel any better? I thought not. I have been awake for three nights, and the roots "
+                   "out there are still warm. Something is feeding them.")),
+    "Bjarne": dict(voice="bjarne", woman=False, seeds=(3105, 3605, 4105), description=(
         "A big man in his forties, a blacksmith. A deep, warm, rumbling bass voice, slow, kind and plain-spoken."),
-        reference="I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight."),
-    "Tor": dict(voice="tor", woman=False, dials={"speed": 1.0}, seed=3106, description=(
+        reference=("Good iron doesn't lie to you. You heat it, you strike it, and it tells you what it wants to be. "
+                   "Hand me that hammer, would you? Careful, it's heavier than it looks! There. Now we make something "
+                   "that will still be here when we're gone.")),
+    "Tor": dict(voice="tor", woman=False, seeds=(3106, 3606, 4106), description=(
         "An older man in his sixties, a carpenter. A gentle, soft, slow voice, patient and warm, with a craftsman's calm."),
-        reference="This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying."),
-    "Liv": dict(voice="liv", woman=True, dials={"speed": 0.92}, seed=3107, description=(
+        reference=("Measure twice, cut once. My father said that every morning, and I never listened. Now look at me, "
+                   "eighty planks and not one of them crooked. Could you hold this end? Mind your fingers! Good. A roof "
+                   "is only a promise, but it's a good one to keep.")),
+    "Liv": dict(voice="liv", woman=True, seeds=(3107, 3607, 4107), description=(
         "A young woman in her late twenties, a scholar of runes. A bright, sharp, confident voice, quick and precise, "
         "a little impatient."),
-        reference="There are old paths here, older than the villages. My teacher said the waystones connected places of shelter."),
-    "Asa": dict(voice="asa", woman=True, dials={"speed": 0.94}, seed=3108, description=(
+        reference=("Look at this mark. No, closer. See how the line breaks and turns back on itself? That is not wear, "
+                   "that is writing! Somebody cut this on purpose, a long time ago. Why does nobody ever listen to me? "
+                   "Bring the lantern. We are not leaving yet.")),
+    "Asa": dict(voice="asa", woman=True, seeds=(3108, 3608, 4108), description=(
         "A woman in her thirties, a farmer. A plain, sturdy, warm voice, practical and down to earth."),
-        reference="There's good dirt under all this moss. Who's been using it? I brought seed, and little else."),
-    "Gunnar": dict(voice="gunnar", woman=False, dials={"speed": 0.93}, seed=3109, description=(
+        reference=("Good black soil, under all this moss. Who left it to go wild like this? A shame, that's what it is. "
+                   "Give me a spade and one dry summer, and I'll have barley standing taller than you. Don't laugh! "
+                   "I've done it before, and I'll do it again.")),
+    "Gunnar": dict(voice="gunnar", woman=False, seeds=(3109, 3609, 4109, 5109, 5609, 6109, 6609, 7109, 7609), description=(
         "A man in his fifties, a hunter who lives alone. A low, quiet, gruff voice of few words, slow and wary."),
-        reference="You've been frightening my deer. Least you can do is give me a roof. I'll earn it."),
-    "Hild": dict(voice="hild", woman=True, dials={"speed": 0.9}, seed=3110, description=(
+        reference=("Tracks are fresh. A day, no more. You see where the moss is torn? That's a boar, a big one, and "
+                   "it's not alone. Keep the wind in your face. If it charges, step aside, don't run! Let it pass, and "
+                   "strike behind the shoulder. Simple.")),
+    "Hild": dict(voice="hild", woman=True, seeds=(3110, 3610, 4110), description=(
         "A woman in her forties, a stonemason. A strong, blunt, dry voice, full of opinions, medium pitch."),
-        reference="Whoever laid this hearth had never met a level. I'll stay. Mind the coping, it's the only level thing for a mile."),
-    "Yrsa": dict(voice="yrsa", woman=True, dials={"speed": 0.94}, seed=3111, description=(
+        reference=("Whoever built this wall should be ashamed of themselves. Look at it! Not one stone sits true. You "
+                   "want it to stand through a winter? Then you set the big ones at the bottom, you fill the gaps, and "
+                   "you never, ever hurry. Hand me the level. Thank you.")),
+    "Yrsa": dict(voice="yrsa", woman=True, seeds=(3111, 3611, 4111), description=(
         "An older woman in her sixties, a proud cook. A warm, full, lively voice, bossy and fond, medium-low."),
-        reference="Show me your kitchen. No, on second thought, show me what you eat. I cooked for a jarl once."),
+        reference=("Out of my kitchen, all of you! No, not you, you can stay and stir. Slowly! It's a stew, not a "
+                   "battle. A pinch of salt, a little thyme, and patience. Do you smell that? That is what a home "
+                   "smells like. Now taste it, and tell me I'm wrong.")),
 }
 # A voice below this is a man's, above it a woman's (median pitch, Hz). A design that comes out wrong is made again.
 SPLIT_HZ = 150.0
@@ -301,14 +338,16 @@ def design_voices(only=None):
         kept = os.path.join(VOICES, name)
         if only and name not in only:
             continue
-        if not only and (os.path.isfile(os.path.join(kept, "voice.json")) or role["description"] is None):
+        if not only and os.path.isfile(os.path.join(kept, "voice.json")):
             # Already made: LocalSpawn gets its copy back if it lost it.
             if os.path.isfile(os.path.join(kept, "voice.json")) and not (gv.voice_dir(name) / "voice.json").is_file():
                 shutil.copytree(kept, gv.voice_dir(name), dirs_exist_ok=True)
                 print(f"{name}: copied into LocalSpawn")
             continue
         for attempt in range(TRIES):
-            voice = gv.design(name, role["description"], role["reference"], seed=role["seed"] + 100 * attempt, replace=True)
+            # A new voice with no likeness to keep: its first seed, then others until it is of the right sex. To
+            # redesign voices that exist, closest to how they sound now, use redesign_voices.py.
+            voice = gv.design(name, role["description"], role["reference"], seed=role["seeds"][0] + 100 * attempt, replace=True)
             pitch = pitch_of(voice["reference"])
             right = pitch > 0 and (pitch >= SPLIT_HZ) == role["woman"]
             print(f"{name}: seed {voice['seed']}, {pitch:.0f} Hz, {'a woman' if role['woman'] else 'a man'} wanted: "
@@ -414,14 +453,21 @@ def write_script():
             nobody[line["speaker"]] = nobody.get(line["speaker"], 0) + 1
             continue
         how = moods.get(line["id"], {})
-        entry = {"id": line["id"], "voice": role["voice"], "text": spoken(line["text"]), "engine": ENGINE,
-                 "mood": how.get("mood", "Neutral"), "effects": character_dials(role, how.get("mood")),
+        engine = role.get("engine", ENGINE)
+        entry = {"id": line["id"], "voice": role["voice"], "text": spoken(line["text"]), "engine": engine,
+                 "mood": how.get("mood", "Neutral"), "effects": character_dials(role, how.get("mood"), engine),
                  "output": os.path.join(CLIPS, folder(line["speaker"]), line["id"] + ".wav").replace("\\", "/")}
+        if engine == "shaped":
+            # Qwen3-TTS reads plainly: its moods are made afterwards on the sound, which "sounds bad" (the user,
+            # 2026-11-10), so none is applied; the line's delivery is the reference clip's. It also runs one sentence
+            # into the next: a sentence on a line of its own gave the clearest pause (0.70 s against 0.45).
+            entry.update(mood="Neutral", effects={}, direction=how.get("mood", "Neutral"),
+                         text=re.sub(r"(?<=[.!?])\s+(?=\S)", "\n", entry["text"]))
         # A line's own feeling in dialogue_moods.json is played instead of its mood's: "emotion" (weights), "feeling"
         # (words: "bitter, holding back tears") or "emotion_audio" (a recording beside the script whose way of
         # speaking is borrowed); "strength" turns any of them up or down.
         entry.update({key: how[key] for key in ("emotion", "feeling", "emotion_audio", "strength")
-                      if how.get(key) is not None and ENGINE == "acted"})
+                      if how.get(key) is not None and engine == "acted"})
         if how.get("take"):  # another reading of the same line: 2, 3...
             entry["take"] = how["take"]
         script.append(entry)
@@ -432,11 +478,11 @@ def write_script():
         print("No voice for: " + ", ".join(f"{name} ({count})" for name, count in nobody.items()) + ". They stay text only.")
 
 
-def character_dials(role, mood):
+def character_dials(role, mood, engine=None):
     """A character's own dials laid over a mood's: their pace multiplies the mood's, the rest the mood keeps."""
     sys.path.insert(0, AGENT)
     import generate_voice as gv
-    table = gv.ACTED_MOODS if ENGINE == "acted" else gv.MOODS
+    table = gv.ACTED_MOODS if (engine or ENGINE) == "acted" else gv.MOODS
     dials = {key: value for key, value in table.get(gv.mood_name(mood) or "Neutral", {}).items() if key != "emotion"}
     own = dict(role.get("dials") or {})
     if "speed" in own:
@@ -466,9 +512,9 @@ def tidy_raw():
     return moved
 
 
-def speak(only=None):
-    """Has LocalSpawn speak the script's lines that have no clip yet, or the lines named (again, over their clips).
-    This is the Voice tab's "Speak a script", run from here so that Unity's Voice Lines window can start it."""
+def speak(only=None, every=False):
+    """Has LocalSpawn speak the script's lines that have no clip yet, or the lines named, or every line (both over the
+    clips they have). This is the Voice tab's "Speak a script", run from here so Unity's Voice Lines window can start it."""
     sys.path.insert(0, AGENT)
     import generate_voice as gv
     design_voices()  # nothing is designed that exists; LocalSpawn gets back a voice it has lost
@@ -478,6 +524,8 @@ def speak(only=None):
         unknown = sorted(set(only) - {entry["id"] for entry in chosen})
         if unknown:
             print("Not in the script (no voice for the speaker, or the line is gone): " + ", ".join(unknown))
+    elif every:
+        chosen = list(entries)
     else:
         chosen = [entry for entry in entries if not os.path.isfile(entry["output"])]
     if not chosen:
@@ -499,14 +547,17 @@ if __name__ == "__main__":
     named = [a for a in sys.argv[2:] if not a.startswith("--")]
     if step in ("voices", "all"):
         design_voices(named or None)
-    if step in ("moods", "all", "new", "again"):
+    if step in ("moods", "all", "new", "again", "redo"):
         decide_moods("--llm" in sys.argv)
-    if step in ("script", "all", "new", "again"):
+    if step in ("script", "all", "new", "again", "redo"):
         write_script()
-    # new: every line without a clip. again: the lines named by id, spoken over their clips.
+    # new: every line without a clip. again: the lines named by id, spoken over their clips. redo: every line, over
+    # its clip (after a change to how all of them are said: a voice, the pace).
     if step == "tidy":
         print(f"{tidy_raw()} untouched recordings moved out of Assets.")
     if step in ("speak", "new"):
         sys.exit(speak())
     if step == "again":
         sys.exit(speak(named))
+    if step == "redo":
+        sys.exit(speak(every=True))

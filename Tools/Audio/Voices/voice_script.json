@@ -5,9 +5,7 @@
   "text": "There's good dirt under all this moss. Who's been using it?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/a1e44e6f1d57.wav"
  },
  {
@@ -16,9 +14,7 @@
   "text": "I can't go on... come back for me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.912
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/acba48946a3c.wav"
  },
  {
@@ -27,9 +23,7 @@
   "text": "You're not from the village. Doesn't matter. Help me with this sack.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/asa/bbfa99a3a8b6.wav"
  },
  {
@@ -39,8 +33,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/feb2e590d94e.wav"
  },
@@ -51,8 +44,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/adf3f3a0af4a.wav"
  },
@@ -62,9 +54,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/5a88d37568e0.wav"
  },
  {
@@ -73,9 +63,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/ae359110044c.wav"
  },
  {
@@ -84,9 +72,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/c1ec9e49018d.wav"
  },
  {
@@ -95,9 +81,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/10fbffecf4d7.wav"
  },
  {
@@ -106,9 +90,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/26e24ac05c56.wav"
  },
  {
@@ -117,9 +99,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/4f8ad24ff846.wav"
  },
  {
@@ -128,9 +108,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/eb99880dd98a.wav"
  },
  {
@@ -139,9 +117,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/d1969253b611.wav"
  },
  {
@@ -150,9 +126,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/9ba192078d22.wav"
  },
  {
@@ -161,9 +135,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/15c43796b7f0.wav"
  },
  {
@@ -173,8 +145,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/5df601393266.wav"
  },
@@ -185,8 +156,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/63314f39ce6b.wav"
  },
@@ -196,9 +166,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/73cafab3e9aa.wav"
  },
  {
@@ -207,9 +175,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/201a6ff6658e.wav"
  },
  {
@@ -218,9 +184,7 @@
   "text": "I came to examine the old iron markers. Whatever protects the road has cracked. Steel will help tonight, but steel alone will not mend this.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/96e028137023.wav"
  },
  {
@@ -229,9 +193,7 @@
   "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/a493a54c5148.wav"
  },
  {
@@ -240,9 +202,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/6937b456273a.wav"
  },
  {
@@ -251,9 +211,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/4ee8aec2b5a0.wav"
  },
  {
@@ -262,9 +220,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/83cf1d54bf23.wav"
  },
  {
@@ -273,9 +229,7 @@
   "text": "Stay near the stones. We can still get out of this together.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/70d6b5d71c5c.wav"
  },
  {
@@ -284,9 +238,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/cef0a0574320.wav"
  },
  {
@@ -295,9 +247,7 @@
   "text": "Where's the anvil? No, don't tell me. I'll find it.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/8e380ffa97a7.wav"
  },
  {
@@ -306,9 +256,7 @@
   "text": "Tell Sigrid I kept it lit.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/28b3e35db35c.wav"
  },
  {
@@ -317,9 +265,7 @@
   "text": "You took your time. Mind the hammer.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/2036e6375a75.wav"
  },
  {
@@ -328,9 +274,7 @@
   "text": "I blazed the trees going in, a cut every twenty paces. Coming back, my marks were on the wrong side of them. The road hadn't moved. The roots had moved it, under us, in the night. Tor was thrown further in than me, with a bad leg. Listen for a saw where nobody saws.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/bjarne/8a4f5935addb.wav",
   "emotion": {
    "afraid": 0.25,
@@ -344,8 +288,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/29785ea6db14.wav"
  },
@@ -356,8 +299,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e943a5d69c50.wav"
  },
@@ -367,9 +309,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/f4bb15837e28.wav"
  },
  {
@@ -378,9 +318,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2c208d6c9a4f.wav"
  },
  {
@@ -389,9 +327,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/7b44fb41a6db.wav"
  },
  {
@@ -400,9 +336,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/45a96e8c622c.wav"
  },
  {
@@ -411,9 +345,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/d7d6543bf2f6.wav"
  },
  {
@@ -422,9 +354,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/8abede55a1d0.wav"
  },
  {
@@ -433,9 +363,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e07e6f7dbf35.wav"
  },
  {
@@ -444,9 +372,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/c04da0bacbb6.wav"
  },
  {
@@ -455,9 +381,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/bbdd75f7cb3a.wav"
  },
  {
@@ -466,9 +390,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/d1b9a304eddd.wav"
  },
  {
@@ -478,8 +400,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ff0c7c66e917.wav"
  },
@@ -490,8 +411,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/0f0752e9d8b4.wav"
  },
@@ -501,9 +421,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/37f4e3c9bfcf.wav"
  },
  {
@@ -512,9 +430,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/776e1b923a5d.wav"
  },
  {
@@ -523,9 +439,7 @@
   "text": "I trust that she wants to get out of here alive. That is enough for tonight. But watch her hands when she talks about the stones. She knows more than she says.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ecf931abe27e.wav"
  },
  {
@@ -534,9 +448,7 @@
   "text": "My sister's farm is two valleys from here. Her dogs ran into these woods last month and never came back. Someone has to walk in front. Better me than you.",
   "engine": "acted",
   "mood": "Sad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/b0793a604c63.wav",
   "emotion": {
    "sad": 0.35
@@ -548,9 +460,7 @@
   "text": "Once, as a boy, with my sister. Spruce, moss, the quiet you get in old woods. Nothing in it frightened me but the dark. I would like that to still be true.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2be6d1c7fb78.wav",
   "emotion": {
    "melancholic": 0.3,
@@ -563,9 +473,7 @@
   "text": "Twenty winters in the shield wall at Granheim. I stopped counting the fights a long time ago. I still count the friends.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ee09dd20e0e2.wav",
   "emotion": {
    "melancholic": 0.35
@@ -577,9 +485,7 @@
   "text": "Wolves, probably. Perhaps a witch, perhaps a sick troll. It is usually less than the stories and more than you packed for. Four friends, if we are lucky. Byarna owes me money.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/4cc1b4c6dd1f.wav"
  },
  {
@@ -588,9 +494,7 @@
   "text": "Eat something, even if you are not hungry. I have buried enough friends who thought they could fight on an empty stomach.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/49035598e0ba.wav"
  },
  {
@@ -599,9 +503,7 @@
   "text": "Stay between me and the trees. If anything comes out of the dark, it meets my shield first.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/508dfc1d9aef.wav"
  },
  {
@@ -610,9 +512,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/bee95266131e.wav"
  },
  {
@@ -621,9 +521,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/86df8075c7bf.wav"
  },
  {
@@ -632,9 +530,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/907dcf3eb497.wav"
  },
  {
@@ -643,9 +539,7 @@
   "text": "Eat something. It is a long road, and the porridge is not getting any better.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2f26f0679d18.wav"
  },
  {
@@ -655,8 +549,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2a01eb5d9ef5.wav"
  },
@@ -666,9 +559,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/7a112b27feae.wav"
  },
  {
@@ -677,9 +568,7 @@
   "text": "Come back when it's done.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/f9398ee8d258.wav"
  },
  {
@@ -688,9 +577,7 @@
   "text": "Before we set out? Gladly. Take this practice sword; it bruises, it doesn't cut. Hit the dummy by the fire until your arm knows the way, then come and try it on me.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/b3f411f0c08b.wav"
  },
  {
@@ -699,9 +586,7 @@
   "text": "Dry bread, unless you fancy a walk. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot. Be quick about it. I do not like how quiet it is.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/767a22ae60af.wav"
  },
  {
@@ -710,9 +595,7 @@
   "text": "Now that is a fine idea. Anything but this porridge. Here is a rod and a handful of grubs, and the lake is just south of the road. Two fish, and I'll owe you.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/c28e92c08877.wav"
  },
  {
@@ -721,9 +604,7 @@
   "text": "We always need firewood. Take this hatchet; there are good trees on the slope north of the road. Six logs will do us.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/865f6003701b.wav"
  },
  {
@@ -732,9 +613,7 @@
   "text": "Breakfast! You may be the best person on this expedition. Keep the rod; there is bound to be water in those woods.",
   "engine": "acted",
   "mood": "Joyful",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/3dae44864cb6.wav"
  },
  {
@@ -743,9 +622,7 @@
   "text": "Hot food. You have just made three friends for life. Take these, in case the night is not done with us.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/58c732b675e8.wav"
  },
  {
@@ -754,9 +631,7 @@
   "text": "That will keep us warm. Keep the hatchet.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/66a26e4cddf1.wav"
  },
  {
@@ -765,9 +640,7 @@
   "text": "You'll do. Better than most I have trained, worse than you will be. Take these; you will want them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/aa06518f4d6a.wav"
  },
  {
@@ -776,9 +649,7 @@
   "text": "Dummy first, then me. Watch my shoulders: the blow is coming when they drop.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/204532e77379.wav"
  },
  {
@@ -787,9 +658,7 @@
   "text": "Five berries from the clearing to the west, then the pot. My waterskin is in your pack.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/237db04c75f3.wav"
  },
  {
@@ -798,9 +667,7 @@
   "text": "Six logs from the slope north of the road. Walk up to a tree and get chopping.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/7d57bc6e0d58.wav"
  },
  {
@@ -809,9 +676,7 @@
   "text": "Two fish from the lake. Hold attack to swing back, let go to cast, and strike when the float goes under.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/a06343cbeb7e.wav"
  },
  {
@@ -820,9 +685,7 @@
   "text": "Show me the wall. Then show me where it's weakest.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/409a4177aa8b.wav"
  },
  {
@@ -832,8 +695,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/5cd65fb6b333.wav"
  },
@@ -843,9 +705,7 @@
   "text": "Go. I've held worse.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.912
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/fea15bc6d989.wav"
  },
  {
@@ -854,9 +714,7 @@
   "text": "Still got one more swing in me, then.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/234d8569fee7.wav"
  },
  {
@@ -865,9 +723,7 @@
   "text": "Ugh. Took your time.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e582a314648a.wav"
  },
  {
@@ -876,9 +732,7 @@
   "text": "Twenty winters, and it still hurts.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/642add613889.wav"
  },
  {
@@ -887,9 +741,7 @@
   "text": "Don't look at me like that. I was resting. ...Thank you.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.912
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/026f1f260873.wav"
  },
  {
@@ -898,9 +750,7 @@
   "text": "My knees are too old to run from a closing portal. Next time leave earlier.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.912
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ca4d6075a674.wav"
  },
  {
@@ -909,9 +759,7 @@
   "text": "That many, and I'm still here. Don't tell the young ones. They'll want to try it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1f29819f666c.wav"
  },
  {
@@ -920,9 +768,7 @@
   "text": "Twenty winters I've been telling that kind of story. First time it's been true.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/42963c424b5a.wav"
  },
  {
@@ -931,9 +777,7 @@
   "text": "Took you long enough. How many are behind you?",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/96cb0594d562.wav"
  },
  {
@@ -943,8 +787,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/8be05c10a12e.wav"
  },
@@ -955,8 +798,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.94
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/bce3accf463e.wav"
  },
@@ -966,9 +808,7 @@
   "text": "Clean your blade. It's a bad habit to forget.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/60556e38b6f5.wav"
  },
  {
@@ -977,9 +817,7 @@
   "text": "Is that all? I was only warming up.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/63fa83d0ac03.wav"
  },
  {
@@ -988,9 +826,7 @@
   "text": "A soldier's choice. It is old iron, but it holds an edge. Guard well and let them come to you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/2cfa0e55e972.wav"
  },
  {
@@ -999,9 +835,7 @@
   "text": "Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/0806b86eec93.wav"
  },
  {
@@ -1010,9 +844,7 @@
   "text": "Long reach, and it wants both hands. If you ever need a light instead, press L to swap them.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/259bff6f5a51.wav"
  },
  {
@@ -1021,9 +853,7 @@
   "text": "The axe. Good. It splits wolves and firewood alike, and it leaves you a hand free.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e253fe508b50.wav"
  },
  {
@@ -1032,9 +862,7 @@
   "text": "Then we are after the same thing. We will find them.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/eece7650fb22.wav"
  },
  {
@@ -1043,9 +871,7 @@
   "text": "A bewitched forest. My grandmother called any forest that ate her goats bewitched.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e60cc7b39128.wav"
  },
  {
@@ -1054,9 +880,7 @@
   "text": "A whole day gone in a morning's walk. I don't like this, and I have liked very few things.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/ca4cbe04a50b.wav",
   "emotion": {
    "afraid": 0.3
@@ -1068,9 +892,7 @@
   "text": "And the kindling you cut this morning is dry in your pack. We only need stones.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1d8417ed6712.wav"
  },
  {
@@ -1079,9 +901,7 @@
   "text": "And there is only dry bread, unless someone fancies a walk. Ask me if you do.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/7117ba9e1974.wav"
  },
  {
@@ -1090,9 +910,7 @@
   "text": "Down you go. Catch your breath; we go again when you're ready.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1c84061a496c.wav"
  },
  {
@@ -1101,9 +919,7 @@
   "text": "Enough, enough! I yield. You'll do.",
   "engine": "acted",
   "mood": "Joyful",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/d50f787957ae.wav"
  },
  {
@@ -1112,9 +928,7 @@
   "text": "Good. Now me. When I wind up, raise your guard just before the blow, or roll through it.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/8778acb3c599.wav"
  },
  {
@@ -1123,9 +937,7 @@
   "text": "I salted what was left of your fish, so we need fewer berries. Two handfuls will do.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/236c80028a4c.wav"
  },
  {
@@ -1134,9 +946,7 @@
   "text": "Is it past noon already? We have not been walking an hour.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/421f24f8ee2b.wav",
   "emotion": {
    "surprised": 0.25
@@ -1148,9 +958,7 @@
   "text": "It is this place. At the tree line I had to think for my own sister's name. I did not like to say.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1e77282ea3ce.wav",
   "emotion": {
    "afraid": 0.3,
@@ -1163,9 +971,7 @@
   "text": "Nothing gets worse than this porridge.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/b7949786e4d1.wav"
  },
  {
@@ -1174,9 +980,7 @@
   "text": "Sigrid. The sun is going down. It was morning.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/3610b36553f1.wav",
   "emotion": {
    "afraid": 0.4
@@ -1188,9 +992,7 @@
   "text": "Steady now. It is a fine morning to walk into something stupid.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/4d163872b0ec.wav"
  },
  {
@@ -1199,9 +1001,7 @@
   "text": "That trout this morning. I keep thinking about that trout.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/1fd66a7f37f5.wav"
  },
  {
@@ -1210,9 +1010,7 @@
   "text": "Twenty years a soldier, and I have never seen the sun simply leave.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/fdd9aacb46e5.wav",
   "emotion": {
    "afraid": 0.35
@@ -1224,9 +1022,7 @@
   "text": "Whoever you came for: we have not stopped looking. Remember that.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.893
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/35cf24431724.wav"
  },
  {
@@ -1235,9 +1031,7 @@
   "text": "You've been frightening my deer. Least you can do is give me a roof.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/4fce6c3e4d95.wav"
  },
  {
@@ -1246,9 +1040,7 @@
   "text": "I can't go on... come back for me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/baff5d14427f.wav"
  },
  {
@@ -1257,9 +1049,7 @@
   "text": "Took you long enough. That boar's been lying on me since yesterday.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/gunnar/4e8a945d6f2f.wav"
  },
  {
@@ -1268,9 +1058,7 @@
   "text": "Whoever laid this hearth had never met a level. I'll stay.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/c76619189511.wav"
  },
  {
@@ -1279,9 +1067,7 @@
   "text": "I can't go on... come back for me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.873
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/668e374da7f3.wav"
  },
  {
@@ -1290,9 +1076,7 @@
   "text": "Mind the coping. It's the only level thing for a mile.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/hild/42fc5176f1e2.wav"
  },
  {
@@ -1302,8 +1086,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.98
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/413107a4ebca.wav"
  },
@@ -1314,8 +1097,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.98
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/4e787ffc807c.wav"
  },
@@ -1325,9 +1107,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/72ec23e5d325.wav"
  },
  {
@@ -1336,9 +1116,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/03f43a605375.wav"
  },
  {
@@ -1347,9 +1125,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/8d07deaf4e3e.wav"
  },
  {
@@ -1358,9 +1134,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/ed15b636c600.wav"
  },
  {
@@ -1369,9 +1143,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/28e63a11fe8f.wav"
  },
  {
@@ -1380,9 +1152,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/41bcb1d1d38a.wav"
  },
  {
@@ -1391,9 +1161,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/2c7c46cfe240.wav"
  },
  {
@@ -1402,9 +1170,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/7b1ba29498df.wav"
  },
  {
@@ -1413,9 +1179,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/67d23e22c07b.wav"
  },
  {
@@ -1424,9 +1188,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/2434b274aa32.wav"
  },
  {
@@ -1436,8 +1198,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.98
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/a014e5985f4a.wav"
  },
@@ -1448,8 +1209,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.98
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/c22445c06a4a.wav"
  },
@@ -1459,9 +1219,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/87194276e014.wav"
  },
  {
@@ -1470,9 +1228,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/8b42edab358e.wav"
  },
  {
@@ -1481,9 +1237,7 @@
   "text": "The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding the enchantment. Stay close; I brought a little medicine.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/1c8f76456f8f.wav",
   "emotion": {
    "afraid": 0.3
@@ -1495,9 +1249,7 @@
   "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/b681b610162a.wav"
  },
  {
@@ -1506,9 +1258,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/1f3fd4dd0dba.wav"
  },
  {
@@ -1517,9 +1267,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/439cbf682099.wav"
  },
  {
@@ -1528,9 +1276,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/6ecb8f1c00a3.wav"
  },
  {
@@ -1539,9 +1285,7 @@
   "text": "Stay near the stones. We can still get out of this together.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/33c08208b361.wav"
  },
  {
@@ -1550,9 +1294,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/9a43f5e57993.wav"
  },
  {
@@ -1561,9 +1303,7 @@
   "text": "I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yours.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.951
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/58a94203429e.wav",
   "emotion": {
    "melancholic": 0.3,
@@ -1576,9 +1316,7 @@
   "text": "I can't... go on. I'll hide here. Come back for me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.951
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/a746957e8f6d.wav"
  },
  {
@@ -1587,9 +1325,7 @@
   "text": "It's you! I saw a light through the trees and thought the forest had finally taken my wits. Get me out of here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.98
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/18ca34a3c2a4.wav",
   "emotion": {
    "happy": 0.4,
@@ -1602,9 +1338,7 @@
   "text": "I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn't come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik's. I called to it. It turned, and it didn't know its name. When the stones broke I heard Byarna's hammer start up, somewhere deep in the woods, slow, like he's working one-handed. Let me be of use until we find them.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.951
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/cd9cdccb02ea.wav",
   "emotion": {
    "melancholic": 0.3,
@@ -1618,8 +1352,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.92
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/1fbcff1954ea.wav"
  },
@@ -1630,8 +1363,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.92
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/01993f80c9d2.wav"
  },
@@ -1641,9 +1373,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/4c9eb0ccffcd.wav"
  },
  {
@@ -1652,9 +1382,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/bbc3327e66fe.wav"
  },
  {
@@ -1663,9 +1391,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/80dc0f32cc9d.wav"
  },
  {
@@ -1674,9 +1400,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/dc8be3b09db6.wav"
  },
  {
@@ -1685,9 +1409,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/02a927c71499.wav"
  },
  {
@@ -1696,9 +1418,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c9d2bc0f9a2d.wav"
  },
  {
@@ -1707,9 +1427,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/1dd15646b8fd.wav"
  },
  {
@@ -1718,9 +1436,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/b49ef4e8075b.wav"
  },
  {
@@ -1729,9 +1445,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/f4b559d46ef8.wav"
  },
  {
@@ -1740,9 +1454,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/6d2f2cd1e3d8.wav"
  },
  {
@@ -1752,8 +1464,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.92
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/380714219996.wav"
  },
@@ -1764,8 +1475,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.92
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/4ac8f8870521.wav"
  },
@@ -1775,9 +1485,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/caeb9ea32148.wav"
  },
  {
@@ -1786,9 +1494,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/8f8a2aeb8c2e.wav"
  },
  {
@@ -1797,9 +1503,7 @@
   "text": "There are old paths here, older than the villages. My teacher said the waystones connected places of shelter. I thought that was only a story.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/8e4d98588b80.wav"
  },
  {
@@ -1808,9 +1512,7 @@
   "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/475a6b7d8d80.wav"
  },
  {
@@ -1819,9 +1521,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/18c0112c208b.wav"
  },
  {
@@ -1830,9 +1530,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/5e443a9d9793.wav"
  },
  {
@@ -1841,9 +1539,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/e5ad4da1b109.wav"
  },
  {
@@ -1852,9 +1548,7 @@
   "text": "The stones are answering you. Stay close. I will try to keep the passage open.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/78a80ac74fe4.wav"
  },
  {
@@ -1863,9 +1557,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/09f8f3147553.wav"
  },
  {
@@ -1874,9 +1566,7 @@
   "text": "Your ward is a promise too. Did anyone tell you?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/c31f49e71de1.wav"
  },
  {
@@ -1885,9 +1575,7 @@
   "text": "Write it down. Somebody has to write it down.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.892
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/68c7bc7eddb7.wav"
  },
  {
@@ -1896,9 +1584,7 @@
   "text": "The stones broke along a line. A line! Do you understand what that means?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.92
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/1541b0517f14.wav",
   "emotion": {
    "surprised": 0.35,
@@ -1912,8 +1598,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/2594ae66254b.wav"
  },
@@ -1924,8 +1609,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/9f4bad61ca3c.wav"
  },
@@ -1935,9 +1619,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/cd8e4b911f96.wav"
  },
  {
@@ -1946,9 +1628,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/ede041b14d72.wav"
  },
  {
@@ -1957,9 +1637,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/a69d67c10a70.wav"
  },
  {
@@ -1968,9 +1646,7 @@
   "text": "I'm bleeding!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/91299b28b316.wav"
  },
  {
@@ -1979,9 +1655,7 @@
   "text": "They're too close, I need room!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/71421b87e14d.wav"
  },
  {
@@ -1990,9 +1664,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/fd523a609744.wav"
  },
  {
@@ -2001,9 +1673,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/eeb193236763.wav"
  },
  {
@@ -2012,9 +1682,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/9ddfaf8a7306.wav"
  },
  {
@@ -2023,9 +1691,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/5e2f37f34a49.wav"
  },
  {
@@ -2034,9 +1700,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/9ff984e0284f.wav"
  },
  {
@@ -2046,8 +1710,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8c3ea4543b32.wav"
  },
@@ -2058,8 +1721,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/f0c49388c196.wav"
  },
@@ -2069,9 +1731,7 @@
   "text": "All clear.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/aa90de8076a5.wav"
  },
  {
@@ -2080,9 +1740,7 @@
   "text": "Nothing else moving.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/48290a9d96af.wav"
  },
  {
@@ -2091,9 +1749,7 @@
   "text": "Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Nothing sleeps in the open unless it is afraid to sleep at home.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/7dcdf070c8ed.wav"
  },
  {
@@ -2102,9 +1758,7 @@
   "text": "Poaching on the jarl's land. You learn to hit with the first arrow when the second one brings the wardens.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/16b7baffeed3.wav"
  },
  {
@@ -2113,9 +1767,7 @@
   "text": "Someone is paying. And I would rather know what is coming out of there than wait for it to find me.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/6ce65a9922ba.wav"
  },
  {
@@ -2124,9 +1776,7 @@
   "text": "Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushing everything out of the high woods, and it is big.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/76c565135e42.wav",
   "emotion": {
    "afraid": 0.25
@@ -2138,9 +1788,7 @@
   "text": "Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.883
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/1074ba01f75e.wav"
  },
  {
@@ -2149,9 +1797,7 @@
   "text": "I counted three wolves circling and one shape that was not a wolf. Keep your voice down. I would rather see them before they see us.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.883
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/eba413013aa1.wav",
   "emotion": {
    "afraid": 0.3,
@@ -2164,9 +1810,7 @@
   "text": "Tracks everywhere, all running the same way. Whatever they are fleeing, we are walking towards it. Lovely.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/07aa6906d1c5.wav"
  },
  {
@@ -2175,9 +1819,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/ee6768de6d61.wav"
  },
  {
@@ -2186,9 +1828,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/13bf2677757e.wav"
  },
  {
@@ -2197,9 +1837,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d09702cb66c8.wav"
  },
  {
@@ -2208,9 +1846,7 @@
   "text": "Nice morning. That is usually how it starts.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/f24d01247188.wav"
  },
  {
@@ -2219,9 +1855,7 @@
   "text": "I will take the ones on the stones. You just keep breathing.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8c705e2c6bd4.wav"
  },
  {
@@ -2230,9 +1864,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/7ee09e478af5.wav"
  },
  {
@@ -2242,8 +1874,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/7dcf8ab9db2b.wav"
  },
@@ -2254,8 +1885,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/c12e96614ee4.wav"
  },
@@ -2265,9 +1895,7 @@
   "text": "Come back when it's done.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d89caf7801af.wav"
  },
  {
@@ -2276,9 +1904,7 @@
   "text": "As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/21df7a00a9af.wav"
  },
  {
@@ -2287,9 +1913,7 @@
   "text": "Clean enough. Keep the bow; you've earned it, and I was tired of carrying it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/eeb952b8fed5.wav"
  },
  {
@@ -2298,9 +1922,7 @@
   "text": "Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/64ff1b055945.wav"
  },
  {
@@ -2309,9 +1931,7 @@
   "text": "This place can be found. Good. So can everything else, by the same road.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/786ca2a1ec9d.wav"
  },
  {
@@ -2321,8 +1941,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/00393675d940.wav"
  },
@@ -2332,9 +1951,7 @@
   "text": "I know the way. Go on. I'll catch you up.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/f64ff77036a6.wav"
  },
  {
@@ -2343,9 +1960,7 @@
   "text": "Bow's still good. So am I.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/a9ab3bf298fc.wav"
  },
  {
@@ -2354,9 +1969,7 @@
   "text": "Move. I've got your back.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/3f4dcea20386.wav"
  },
  {
@@ -2365,9 +1978,7 @@
   "text": "Too close, too close!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/bc1cd1f6f652.wav"
  },
  {
@@ -2376,9 +1987,7 @@
   "text": "I counted our steps to the exit. I'd rather not count that close again.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.902
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/4be15bcea6e9.wav"
  },
  {
@@ -2387,9 +1996,7 @@
   "text": "I've tracked things my whole life, and never one that big. It left nothing behind but quiet. I don't trust the quiet.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/22bb3b638e13.wav",
   "emotion": {
    "afraid": 0.3
@@ -2401,9 +2008,7 @@
   "text": "The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/4ecbbe66d0c6.wav",
   "emotion": {
    "melancholic": 0.3
@@ -2415,9 +2020,7 @@
   "text": "You crossed open ground to reach me. Stupid. Don't stop.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/ac8498391449.wav"
  },
  {
@@ -2426,9 +2029,7 @@
   "text": "I've watched you for two days. You leave a trail like a cart.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/82f25a4f97a4.wav"
  },
  {
@@ -2438,8 +2039,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/83ddfdab46db.wav"
  },
@@ -2450,8 +2050,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/da46190badca.wav"
  },
@@ -2461,9 +2060,7 @@
   "text": "Nothing else on the wind.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/22573aadb98e.wav"
  },
  {
@@ -2472,9 +2069,7 @@
   "text": "That's all of them. I think.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/2e7baa813e90.wav"
  },
  {
@@ -2483,9 +2078,7 @@
   "text": "A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/54116c754e87.wav"
  },
  {
@@ -2494,9 +2087,7 @@
   "text": "An honest answer. I like you already.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/fc45b90fe661.wav"
  },
  {
@@ -2506,8 +2097,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/58db53990606.wav"
  },
@@ -2517,9 +2107,7 @@
   "text": "It followed us! The old one, coming through the trees, right for the stones!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/17f7d42bc191.wav",
   "emotion": {
    "afraid": 0.5,
@@ -2532,9 +2120,7 @@
   "text": "It hasn't seen us yet. It will smell the smoke soon enough.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.883
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8a27c131194d.wav",
   "emotion": {
    "afraid": 0.3,
@@ -2547,9 +2133,7 @@
   "text": "Liv.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.883
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/1bfebe52b185.wav"
  },
  {
@@ -2559,8 +2143,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/328df4ed422f.wav"
  },
@@ -2570,9 +2153,7 @@
   "text": "Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/b00d7059f538.wav"
  },
  {
@@ -2581,9 +2162,7 @@
   "text": "Simple. I respect that. Hit it until it stops, and it leaves you a hand free.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/be8e32bc3a0b.wav"
  },
  {
@@ -2592,9 +2171,7 @@
   "text": "Small ones never come alone and never come this far down. Something up in the high woods is scaring them. Finish the berries and get back to the fire.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/887555d0ecff.wav"
  },
  {
@@ -2603,9 +2180,7 @@
   "text": "A shepherd told me his dogs won't go past the tree line any more. Dogs. I have seen those dogs go after a bear.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/c31becc1faf5.wav",
   "emotion": {
    "afraid": 0.2
@@ -2618,8 +2193,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/6220934ca767.wav"
  },
@@ -2629,9 +2203,7 @@
   "text": "Hold up. That's Byarna's handcart, tipped off the road. Have a look; I'll watch the trees.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/03b14bc0c556.wav"
  },
  {
@@ -2640,9 +2212,7 @@
   "text": "No birds. Have you noticed? Not one for a while now.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.883
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/bcb862eb293e.wav",
   "emotion": {
    "afraid": 0.3,
@@ -2655,9 +2225,7 @@
   "text": "Sigrid. Look behind us. Where is the road? It was right there, and now there's only mist.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/dcf1a7e7f7bc.wav"
  },
  {
@@ -2666,9 +2234,7 @@
   "text": "Still think the coin is worth it?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/79762cc1733a.wav"
  },
  {
@@ -2677,9 +2243,7 @@
   "text": "The shadows are wrong. They were behind us when we crossed the stream.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/81fe60ce0409.wav",
   "emotion": {
    "afraid": 0.35
@@ -2691,9 +2255,7 @@
   "text": "There. Feel that? The wind turned, and there is mist coming up off the moss.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/f079ef1436aa.wav",
   "emotion": {
    "afraid": 0.3
@@ -2706,8 +2268,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.93
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/cc5dc71a6d5b.wav"
  },
@@ -2717,9 +2278,7 @@
   "text": "You shot straight this morning. It may matter before the night is out.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/e7adde700087.wav"
  },
  {
@@ -2728,9 +2287,7 @@
   "text": "Your grandmother never saw wolves walk into a lit camp.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.93
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/416711decc01.wav"
  },
  {
@@ -2740,8 +2297,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/534359605b4e.wav"
  },
@@ -2752,8 +2308,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1445bbf884a9.wav"
  },
@@ -2763,9 +2318,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/4c3a786d0b11.wav"
  },
  {
@@ -2774,9 +2327,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/7743400ecfaf.wav"
  },
  {
@@ -2785,9 +2336,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/7ab773db310c.wav"
  },
  {
@@ -2796,9 +2345,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1435ba85f835.wav"
  },
  {
@@ -2807,9 +2354,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/33c1a5e3abf1.wav"
  },
  {
@@ -2818,9 +2363,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/d9572a64fe0e.wav"
  },
  {
@@ -2829,9 +2372,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9df3125f8491.wav"
  },
  {
@@ -2840,9 +2381,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8025809c9a81.wav"
  },
  {
@@ -2851,9 +2390,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/127c73ed974c.wav"
  },
  {
@@ -2862,9 +2399,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/71e2b614d154.wav"
  },
  {
@@ -2874,8 +2409,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/471cf2035963.wav"
  },
@@ -2886,8 +2420,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/29e1def52759.wav"
  },
@@ -2897,9 +2430,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/c1fe8d6ca29c.wav"
  },
  {
@@ -2908,9 +2439,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/d221ef2d0fb7.wav"
  },
  {
@@ -2919,9 +2448,7 @@
   "text": "Because the only old things out there are stones and roots, and the marks on them are older than any village. Whatever is wrong, I expect to find it written down.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/053ff52b89af.wav"
  },
  {
@@ -2930,9 +2457,7 @@
   "text": "Eirik sees a great deal for a man who pretends not to. Yes. I have seen stones like these before, and I know what they do. Ask me again when you have to touch one.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/0418ea8f8156.wav"
  },
  {
@@ -2941,9 +2466,7 @@
   "text": "I know what it feels like: a door left open in winter. Someone opened it on purpose. Whether they meant to let something in or out... that is what we came to find.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.855
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8793c7c39e0b.wav",
   "emotion": {
    "melancholic": 0.25,
@@ -2956,9 +2479,7 @@
   "text": "Ingrid, Byarna, Tor and Liv. An alchemist, a smith, a carpenter and a scholar: the ones who can make sense of what they find. I sent them on two days ago to look over the old road. It was a short job.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/52c2d1d575e7.wav"
  },
  {
@@ -2967,9 +2488,7 @@
   "text": "The cause. Trolls do not leave their crags for no reason, and wolves do not forget fire. Something in that forest has changed, and the villages want it named before it reaches their doors.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/53cd9f2912e6.wav"
  },
  {
@@ -2978,9 +2497,7 @@
   "text": "They did not send me. They asked for someone who could read the old marks, and I was the only one who answered. Draw your own conclusions. Everyone else does.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/44633b210fe7.wav"
  },
  {
@@ -2989,9 +2506,7 @@
   "text": "Words for things your tongue has no names for. Most of them mean wait. One of them means open. Pray we only need the first kind.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.855
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/c53623d73d20.wav"
  },
  {
@@ -3000,9 +2515,7 @@
   "text": "The villages think we came for wolves and witches. Let them. The stones out here are older than any village, and someone has been waking them.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/fd961fae27d8.wav"
  },
  {
@@ -3011,9 +2524,7 @@
   "text": "Keep the torch high and the road under your feet. The forest is listening tonight. Let it hear only footsteps.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.855
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/76203d72bee1.wav"
  },
  {
@@ -3022,9 +2533,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/543ad19d15bb.wav"
  },
  {
@@ -3033,9 +2542,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/f132afa2d9df.wav"
  },
  {
@@ -3044,9 +2551,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/f751debd61d7.wav"
  },
  {
@@ -3055,9 +2560,7 @@
   "text": "Take what time you need, but not too much. It is a long walk, and I want to be at the forest by noon.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/2e44675fdddf.wav"
  },
  {
@@ -3066,9 +2569,7 @@
   "text": "Stand inside the ring. Whatever you see, do not let go of the stone until I say.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/ec9cbef506e6.wav"
  },
  {
@@ -3077,9 +2578,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/391fef0a2269.wav"
  },
  {
@@ -3088,9 +2587,7 @@
   "text": "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/59bb2faac379.wav"
  },
  {
@@ -3099,9 +2596,7 @@
   "text": "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Byarna, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/37b5ff1bb70c.wav"
  },
  {
@@ -3110,9 +2605,7 @@
   "text": "The packs are tied and the fire is nearly out. Ingrid's party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/6ec4a4d98c7d.wav"
  },
  {
@@ -3122,8 +2615,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/4c2744958650.wav"
  },
@@ -3133,9 +2625,7 @@
   "text": "There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1c36832f26b2.wav",
   "emotion": {
    "happy": 0.25
@@ -3147,9 +2637,7 @@
   "text": "Come back when it's done.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/a089025e2ba8.wav"
  },
  {
@@ -3159,8 +2647,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/0879fdb649d0.wav"
  },
@@ -3170,9 +2657,7 @@
   "text": "Finish your porridge and listen. This is the only quiet you will get today.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/f7d6413d0e2a.wav"
  },
  {
@@ -3181,9 +2666,7 @@
   "text": "Stay on the road. We keep a steady pace, and the others will wait if you fall behind.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/b940fd324d01.wav"
  },
  {
@@ -3192,9 +2675,7 @@
   "text": "Seven went in. Tell me who's home.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1d4032fe69b3.wav"
  },
  {
@@ -3204,8 +2685,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1510e2502705.wav"
  },
@@ -3215,9 +2695,7 @@
   "text": "Don't you stop for me. That's an order.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.873
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/6f337bd93c06.wav"
  },
  {
@@ -3226,9 +2704,7 @@
   "text": "Back in line. Thank you.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/220a9c1c0714.wav"
  },
  {
@@ -3237,9 +2713,7 @@
   "text": "Good. On your feet. I mean, on mine.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/44a6dc3f243c.wav"
  },
  {
@@ -3248,9 +2722,7 @@
   "text": "Still standing. Barely.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/c83427a9275f.wav"
  },
  {
@@ -3259,9 +2731,7 @@
   "text": "A retreat is only a defeat if you learn nothing. What did we learn?",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/7ee8dc1bcfc1.wav"
  },
  {
@@ -3270,9 +2740,7 @@
   "text": "I gave you an order once to leave me if it came to that. You didn't. We'll talk about discipline. Later.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9528ca031d18.wav"
  },
  {
@@ -3281,9 +2749,7 @@
   "text": "I've buried good people on less than what we just did. Write it down somewhere. It should outlast us.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.855
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/394e637562bc.wav",
   "emotion": {
    "melancholic": 0.35
@@ -3295,9 +2761,7 @@
   "text": "I've served under worse than you. Don't let it go to your head.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/52d7287f9b34.wav"
  },
  {
@@ -3306,9 +2770,7 @@
   "text": "You came back. I told them you would.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/b706dbb4a24b.wav"
  },
  {
@@ -3318,8 +2780,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/a40d26166e98.wav"
  },
@@ -3330,8 +2791,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9368d894ea64.wav"
  },
@@ -3341,9 +2801,7 @@
   "text": "Count heads. Everyone still here?",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/32c71e3f29a8.wav"
  },
  {
@@ -3352,9 +2810,7 @@
   "text": "Good. Move before more come.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/2c8bbea96460.wav"
  },
  {
@@ -3363,9 +2819,7 @@
   "text": "...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/869a001ac1cc.wav",
   "emotion": {
    "afraid": 0.35,
@@ -3378,9 +2832,7 @@
   "text": "A fire. Sit down, all of you, and get your breath back. Whatever is out there will still be there when we are done.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.873
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/efd49b01c1b8.wav"
  },
  {
@@ -3390,8 +2842,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/e51b80c5623c.wav"
  },
@@ -3401,9 +2852,7 @@
   "text": "At first light we find the four who went ahead. Ingrid. Byarna. Tor. And...",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/5144aa4ce4f3.wav",
   "emotion": {
    "afraid": 0.2,
@@ -3417,9 +2866,7 @@
   "text": "Careful. The ones who go looking for the truth of it are the ones who find it.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/d2ef296b3fd8.wav"
  },
  {
@@ -3428,9 +2875,7 @@
   "text": "For anyone who slept through last night's talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Byarna, Tor and Liv ahead to look. They should have been back yesterday.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/7761ac604c16.wav"
  },
  {
@@ -3439,9 +2884,7 @@
   "text": "It will not wake for me. It never has. You, then. Put your hand on the centre stone.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8f8c51a7519c.wav"
  },
  {
@@ -3451,8 +2894,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 0.9
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/097d5b4eb70a.wav"
  },
@@ -3462,9 +2904,7 @@
   "text": "Liv. Of course. Eleven years I have known her, and for a moment there was a hole where her name should be.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/52d4678c991e.wav",
   "emotion": {
    "afraid": 0.35,
@@ -3477,9 +2917,7 @@
   "text": "Roots do not set ambushes on a road. Something taught them to. Keep moving. We need walls around us before more of them wake.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bcc9a3c2faa5.wav"
  },
  {
@@ -3488,9 +2926,7 @@
   "text": "That is no thunder. An old one, a mountain troll, and it is walking towards our fire.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db2f97f49a82.wav",
   "emotion": {
    "afraid": 0.35,
@@ -3503,9 +2939,7 @@
   "text": "We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/18434bb5a0bd.wav"
  },
  {
@@ -3514,9 +2948,7 @@
   "text": "Whatever you see, do not let go of the stone. There are things I should have told you, and there is no time left to tell them.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/b62bef3ca79f.wav",
   "emotion": {
    "afraid": 0.3,
@@ -3529,9 +2961,7 @@
   "text": "You asked me by the fire, so here it is. I have seen stones like these wake once. It took everyone who stood too near, and it put them somewhere else. Ingrid knew that when she came. Now you do.",
   "engine": "acted",
   "mood": "Calm",
-  "effects": {
-   "speed": 0.855
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/3f5aecab3990.wav",
   "emotion": {
    "melancholic": 0.3
@@ -3543,9 +2973,7 @@
   "text": "I can see that. Light your torches, and take this one.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/0dea2076e3a3.wav"
  },
  {
@@ -3554,9 +2982,7 @@
   "text": "Keep walking.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/e1ef4f263cca.wav"
  },
  {
@@ -3565,9 +2991,7 @@
   "text": "Not alone, and not before we are ready. Come back to the others.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/1b12cd47c900.wav"
  },
  {
@@ -3576,9 +3000,7 @@
   "text": "Rumours grow in the telling. That is why we go and look, instead of sitting in a longhouse and listening.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/3f96ad6608ec.wav"
  },
  {
@@ -3587,9 +3009,7 @@
   "text": "Save it for the road. We have until the porridge gets worse.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/42e6f20d62cf.wav"
  },
  {
@@ -3598,9 +3018,7 @@
   "text": "Wolves that hunt by day and do not fear four armed people. Whatever happened to this cart was quick, and it did not end here. We go on.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/3e8d9f9c4e28.wav"
  },
  {
@@ -3609,9 +3027,7 @@
   "text": "You wanted to know if the stories were true. How are you finding it?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/11473473c565.wav"
  },
  {
@@ -3620,9 +3036,7 @@
   "text": "And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/f73ec731c30d.wav"
  },
  {
@@ -3631,792 +3045,668 @@
   "text": "Then one thing first. Nobody walks that road unarmed. We carry spare arms in the packs. They are old and they are plain, but they will do. Take what suits you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.9
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9c66c89507e9.wav"
  },
  {
   "id": "342d4e0a9589",
-  "voice": "portal_f_british_northern",
-  "text": "A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu and light it inside my ward. The sooner it burns, the sooner they can see it.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/342d4e0a9589.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A fire first, little one.\nFallen branches and loose stones lie all around me: pick them up, open the build menu and light it inside my ward.\nThe sooner it burns, the sooner they can see it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/342d4e0a9589.wav",
+  "direction": "Calm"
  },
  {
   "id": "698d38946570",
-  "voice": "portal_f_british_northern",
-  "text": "A horn at dusk, the expedition's signal. She is the last of them. Bring her home, little one.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/698d38946570.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A horn at dusk, the expedition's signal.\nShe is the last of them.\nBring her home, little one.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/698d38946570.wav",
+  "direction": "Calm"
  },
  {
   "id": "515e3120225e",
-  "voice": "portal_f_british_northern",
-  "text": "A saw, out where nobody saws. Your carpenter is hurt, but he is still measuring.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/515e3120225e.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A saw, out where nobody saws.\nYour carpenter is hurt, but he is still measuring.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/515e3120225e.wav",
+  "direction": "Calm"
  },
  {
   "id": "1206d3441d9f",
-  "voice": "portal_f_british_northern",
+  "voice": "portal_g_mysterious",
   "text": "A snare line, a mile of it, and at the end a man who did not mean to be caught.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/1206d3441d9f.wav"
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/1206d3441d9f.wav",
+  "direction": "Calm"
  },
  {
   "id": "bdceca42e955",
-  "voice": "portal_f_british_northern",
-  "text": "A wall went up overnight out there, round nothing. Whoever built it will want to build a better one here.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/bdceca42e955.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A wall went up overnight out there, round nothing.\nWhoever built it will want to build a better one here.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/bdceca42e955.wav",
+  "direction": "Calm"
  },
  {
   "id": "b9dfae488539",
-  "voice": "portal_f_british_northern",
-  "text": "Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b9dfae488539.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Bare hands bring little home, little one.\nA hatchet in your belt and a pick beside it bring wood and ore.\nSticks and sharp stones: make them in your bag.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b9dfae488539.wav",
+  "direction": "Calm"
  },
  {
   "id": "88f636b3e644",
-  "voice": "portal_f_british_northern",
-  "text": "Come and sit by me, little one. There is something I should have told you before you went to that hollow.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/88f636b3e644.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Come and sit by me, little one.\nThere is something I should have told you before you went to that hollow.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/88f636b3e644.wav",
+  "direction": "Calm"
  },
  {
   "id": "652f2a5af07f",
-  "voice": "portal_f_british_northern",
-  "text": "Go, little one. She is just beyond me, off the path. Come back through one of my doors before I close. What you wear I can always bring home. What you carry I cannot.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/652f2a5af07f.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Go, little one.\nShe is just beyond me, off the path.\nCome back through one of my doors before I close.\nWhat you wear I can always bring home.\nWhat you carry I cannot.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/652f2a5af07f.wav",
+  "direction": "Calm"
  },
  {
   "id": "ce1a588e9f04",
-  "voice": "portal_f_british_northern",
-  "text": "Listen, little one. Rest your hand on the stone.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ce1a588e9f04.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Listen, little one.\nRest your hand on the stone.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ce1a588e9f04.wav",
+  "direction": "Calm"
  },
  {
   "id": "7f599ca3175b",
-  "voice": "portal_f_british_northern",
-  "text": "Listen. A hammer, far off in the deep woods, slow and uneven. One of yours. Ask me what the woods hold before you go, and I will tell you where.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7f599ca3175b.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Listen.\nA hammer, far off in the deep woods, slow and uneven.\nOne of yours.\nAsk me what the woods hold before you go, and I will tell you where.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7f599ca3175b.wav",
+  "direction": "Calm"
  },
  {
   "id": "a2b1086258fd",
-  "voice": "portal_f_british_northern",
-  "text": "Marks on the trees that only the dark shows. Go through at night.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a2b1086258fd.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Marks on the trees that only the dark shows.\nGo through at night.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a2b1086258fd.wav",
+  "direction": "Calm"
  },
  {
   "id": "394d03077fdf",
-  "voice": "portal_f_british_northern",
-  "text": "My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/394d03077fdf.wav"
+  "voice": "portal_g_mysterious",
+  "text": "My ward keeps out the worst of the forest, not all of it.\nPut a wall between your fire and the trees.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/394d03077fdf.wav",
+  "direction": "Calm"
  },
  {
   "id": "40b357728cac",
-  "voice": "portal_f_british_northern",
-  "text": "Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/40b357728cac.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Now bring me what you freed.\nFeed me that light and I will open for you, as I did in the dark.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/40b357728cac.wav",
+  "direction": "Calm"
  },
  {
   "id": "addba548796c",
-  "voice": "portal_f_british_northern",
-  "text": "Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/addba548796c.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Now feed yourself.\nBerries, water from the stream, a stew over your fire.\nYou will be walking people home.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/addba548796c.wav",
+  "direction": "Calm"
  },
  {
   "id": "d18846585484",
-  "voice": "portal_f_british_northern",
-  "text": "Now the woods have told me. Something breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones. It will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d18846585484.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Now the woods have told me.\nSomething breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones.\nIt will not wake for steel.\nTake an ember from your own fire to it.\nThat, it cannot ignore.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d18846585484.wav",
+  "direction": "Calm"
  },
  {
   "id": "9ccca3aac0dc",
-  "voice": "portal_f_british_northern",
-  "text": "Old stones are humming in the deep woods. Someone is inside the ring, writing.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/9ccca3aac0dc.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Old stones are humming in the deep woods.\nSomeone is inside the ring, writing.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/9ccca3aac0dc.wav",
+  "direction": "Calm"
  },
  {
   "id": "a1758afc4fa4",
-  "voice": "portal_f_british_northern",
-  "text": "One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a1758afc4fa4.wav"
+  "voice": "portal_g_mysterious",
+  "text": "One fire brought Ingrid home.\nThe others will want more than a fire: a bench, a furnace, a dry place to set down what they carry.\nBuild what they will need.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a1758afc4fa4.wav",
+  "direction": "Calm"
  },
  {
   "id": "66a3dfca329a",
-  "voice": "portal_f_british_northern",
-  "text": "One weapon is one answer, and it will not last for ever. Make a second at your workshop: a club stuns what a blade only cuts.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/66a3dfca329a.wav"
+  "voice": "portal_g_mysterious",
+  "text": "One weapon is one answer, and it will not last for ever.\nMake a second at your workshop: a club stuns what a blade only cuts.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/66a3dfca329a.wav",
+  "direction": "Calm"
  },
  {
   "id": "122c522e5992",
-  "voice": "portal_f_british_northern",
-  "text": "She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/122c522e5992.wav"
+  "voice": "portal_g_mysterious",
+  "text": "She is close, little one.\nJust beyond me, off the path, hiding.\nFind her, keep her near you, and bring her through.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/122c522e5992.wav",
+  "direction": "Calm"
  },
  {
   "id": "a5d9d0d5cbee",
-  "voice": "portal_f_british_northern",
-  "text": "Smoke from a farmstead that burned long ago. Someone kept the seed.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a5d9d0d5cbee.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Smoke from a farmstead that burned long ago.\nSomeone kept the seed.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a5d9d0d5cbee.wav",
+  "direction": "Calm"
  },
  {
   "id": "d9092e30c218",
-  "voice": "portal_f_british_northern",
-  "text": "Someone is cooking out there. The wolves can smell it. So can I.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d9092e30c218.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Someone is cooking out there.\nThe wolves can smell it.\nSo can I.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d9092e30c218.wav",
+  "direction": "Calm"
  },
  {
   "id": "a9b1d2be041a",
-  "voice": "portal_f_british_northern",
-  "text": "Something tests my ward. Out there, someone else is holding a clearing against the wolves. Bring him to hold mine.",
-  "engine": "acted",
-  "mood": "Stern",
-  "effects": {
-   "speed": 0.88
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a9b1d2be041a.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Something tests my ward.\nOut there, someone else is holding a clearing against the wolves.\nBring him to hold mine.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/a9b1d2be041a.wav",
+  "direction": "Stern"
  },
  {
   "id": "4dd665e2fe43",
-  "voice": "portal_f_british_northern",
-  "text": "The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/4dd665e2fe43.wav"
+  "voice": "portal_g_mysterious",
+  "text": "The brighter this place burns, the further it can be seen.\nBuild.\nClear the old growth.\nGive them something worth walking towards.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/4dd665e2fe43.wav",
+  "direction": "Calm"
  },
  {
   "id": "3491cd345f3f",
-  "voice": "portal_f_british_northern",
-  "text": "The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3491cd345f3f.wav"
+  "voice": "portal_g_mysterious",
+  "text": "The forest has put its roots in even here.\nThree stones around the clearing still hold my light, choked and cold.\nFree them, and bring the Life Orbs back.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3491cd345f3f.wav",
+  "direction": "Calm"
  },
  {
   "id": "e6d4b67488c1",
-  "voice": "portal_f_british_northern",
-  "text": "The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e6d4b67488c1.wav"
+  "voice": "portal_g_mysterious",
+  "text": "The light that reached her reached other things as well.\nThey are on the old path now, testing me.\nPrepare yourself.\nWhen you are ready, tell me, and I will let them come.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e6d4b67488c1.wav",
+  "direction": "Calm"
  },
  {
   "id": "15c83058c241",
-  "voice": "portal_f_british_northern",
-  "text": "What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop, and put in it what you cannot bear to lose.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/15c83058c241.wav"
+  "voice": "portal_g_mysterious",
+  "text": "What you carry through me, the woods can take from you.\nWhat you leave here, I keep.\nBuild a chest beside your workshop, and put in it what you cannot bear to lose.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/15c83058c241.wav",
+  "direction": "Calm"
  },
  {
   "id": "3bba3ed63fe0",
-  "voice": "portal_f_british_northern",
-  "text": "You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3bba3ed63fe0.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You brought the woods home on your back.\nNow make something of them: a lodge by the trees, a saw that turns logs into planks.\nThe smithy and the walls start with a plank.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3bba3ed63fe0.wav",
+  "direction": "Calm"
  },
  {
   "id": "bacebf0efa04",
-  "voice": "portal_f_british_northern",
-  "text": "You have a fire. Now a roof to work under: a workshop beside it. What the woods break, it mends.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/bacebf0efa04.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You have a fire.\nNow a roof to work under: a workshop beside it.\nWhat the woods break, it mends.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/bacebf0efa04.wav",
+  "direction": "Calm"
  },
  {
   "id": "d0af44ce40a0",
-  "voice": "portal_f_british_northern",
-  "text": "A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d0af44ce40a0.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A hundred winters I kept this clearing alone.\nI had forgotten how loud a home is.\nDo not stop.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d0af44ce40a0.wav",
+  "direction": "Calm"
  },
  {
   "id": "9a3cd8bc2f03",
-  "voice": "portal_f_british_northern",
+  "voice": "portal_g_mysterious",
   "text": "Every hearth in my light is a little more of the old pact kept.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/9a3cd8bc2f03.wav"
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/9a3cd8bc2f03.wav",
+  "direction": "Calm"
  },
  {
   "id": "32b2576fdab2",
-  "voice": "portal_f_british_northern",
-  "text": "I listen for your people every night. Some nights I hear them.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/32b2576fdab2.wav"
+  "voice": "portal_g_mysterious",
+  "text": "I listen for your people every night.\nSome nights I hear them.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/32b2576fdab2.wav",
+  "direction": "Calm"
  },
  {
   "id": "3ce82e61c862",
-  "voice": "portal_f_british_northern",
+  "voice": "portal_g_mysterious",
   "text": "The forest cannot forget a place that someone tends.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3ce82e61c862.wav"
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3ce82e61c862.wav",
+  "direction": "Calm"
  },
  {
   "id": "183dd09c3cfb",
-  "voice": "portal_f_british_northern",
-  "text": "A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/183dd09c3cfb.wav"
+  "voice": "portal_g_mysterious",
+  "text": "A fire first.\nThen a home worth coming back to.\nThen we go and fetch them.\nAnd one day, little one, you will tell me why these old stones woke for your hand.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/183dd09c3cfb.wav",
+  "direction": "Calm"
  },
  {
   "id": "f7d7b9fe43be",
-  "voice": "portal_f_british_northern",
-  "text": "Did you see what grew out of them as they fell? Root. The same root that choked my stones, and closed the road behind your people.",
-  "engine": "acted",
-  "mood": "Sad",
-  "effects": {
-   "speed": 0.88
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/f7d7b9fe43be.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Did you see what grew out of them as they fell?\nRoot.\nThe same root that choked my stones, and closed the road behind your people.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/f7d7b9fe43be.wav",
+  "direction": "Sad"
  },
  {
   "id": "19e2bc5ec533",
-  "voice": "portal_f_british_northern",
-  "text": "Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Do you feel that?\nThe ward has remembered what it is for.\nAnd far out in the mist, little one, someone has stopped walking and turned to look.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/19e2bc5ec533.wav",
-  "emotion": {
-   "happy": 0.3,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "1a74552f73ab",
-  "voice": "portal_f_british_northern",
-  "text": "I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "I am a door, little one, and I have gone to sleep.\nI am too thin to wake myself.\nLong ago people kept a hearth beside these stones, and I kept the night from their door.\nThat was the pact.\nNo fire has burned here in a hundred winters.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/1a74552f73ab.wav",
-  "emotion": {
-   "melancholic": 0.35,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "e35518fff3a7",
-  "voice": "portal_f_british_northern",
-  "text": "I have not told you everything. The Heartroot was no monster. It was the forest's guardian: its half of the pact. Your kind let the hearth beside me go cold a hundred winters ago. It kept its half for ninety winters after that, alone, until the hunger got into its roots.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "I have not told you everything.\nThe Heartroot was no monster.\nIt was the forest's guardian: its half of the pact.\nYour kind let the hearth beside me go cold a hundred winters ago.\nIt kept its half for ninety winters after that, alone, until the hunger got into its roots.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e35518fff3a7.wav",
-  "emotion": {
-   "sad": 0.3,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "e8c1f6b40c78",
-  "voice": "portal_f_british_northern",
-  "text": "It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e8c1f6b40c78.wav"
+  "voice": "portal_g_mysterious",
+  "text": "It is all one thing, little one.\nSomething old is pushing those roots, from somewhere deep in the woods.\nWhen the woods tell me where, I will tell you.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e8c1f6b40c78.wav",
+  "direction": "Calm"
  },
  {
   "id": "245194b18d05",
-  "voice": "portal_f_british_northern",
-  "text": "Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/245194b18d05.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Its last word was for you.\nHearth-keeper.\nNobody has called anyone that in a hundred winters, and I did not teach it to you.\nOne day you will tell me why these stones woke for your hand.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/245194b18d05.wav",
+  "direction": "Calm"
  },
  {
   "id": "4fbd6788bc22",
-  "voice": "portal_f_british_northern",
-  "text": "Listen. Far off, at dusk, a horn: three long notes and a rest, over and over. The expedition's signal. Someone out there has seen your light and is answering it.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Listen.\nFar off, at dusk, a horn: three long notes and a rest, over and over.\nThe expedition's signal.\nSomeone out there has seen your light and is answering it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/4fbd6788bc22.wav",
-  "emotion": {
-   "happy": 0.2,
-   "surprised": 0.15,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "c0a6b1358ea0",
-  "voice": "portal_f_british_northern",
-  "text": "Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c0a6b1358ea0.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Look, now that there is light to see by.\nThree of my stones, choked in roots.\nAnd the roots are moving, little one.\nSlowly.\nTowards me.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c0a6b1358ea0.wav",
+  "direction": "Calm"
  },
  {
   "id": "c600954f71c6",
-  "voice": "portal_f_british_northern",
-  "text": "My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c600954f71c6.wav"
+  "voice": "portal_g_mysterious",
+  "text": "My stones have gone quiet, but she is right.\nOne spark burns close, just beyond me, hiding from the wolves.\nMake yourself tools, and go.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c600954f71c6.wav",
+  "direction": "Calm"
  },
  {
   "id": "39e704df982c",
-  "voice": "portal_f_british_northern",
-  "text": "Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Seven sparks, scattered through the Misty Woods.\nThey are alive.\nI hear them when the wind is right.\nBut the forest does not kill the lost, little one.\nIt forgets them.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/39e704df982c.wav",
-  "emotion": {
-   "sad": 0.25,
-   "calm": 0.25
-  }
+  "direction": "Calm"
  },
  {
   "id": "7b8cc4a0c9eb",
-  "voice": "portal_f_british_northern",
-  "text": "So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7b8cc4a0c9eb.wav"
+  "voice": "portal_g_mysterious",
+  "text": "So light one.\nThe forest cannot forget a hearth that someone tends.\nIt will feed my ward, and out in the mist your people will see it and know which way is home.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7b8cc4a0c9eb.wav",
+  "direction": "Calm"
  },
  {
   "id": "5024f67bc4a4",
-  "voice": "portal_f_british_northern",
-  "text": "The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/5024f67bc4a4.wav"
+  "voice": "portal_g_mysterious",
+  "text": "The last of an old promise.\nI keep the dark from this clearing.\nBut that is not what you need to know.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/5024f67bc4a4.wav",
+  "direction": "Calm"
  },
  {
   "id": "804efcbaab27",
-  "voice": "portal_f_british_northern",
-  "text": "Then she is still herself, and she is holding on. She will want the others home before her. Bring them, little one, and keep this fire high.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Then she is still herself, and she is holding on.\nShe will want the others home before her.\nBring them, little one, and keep this fire high.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/804efcbaab27.wav",
-  "emotion": {
-   "happy": 0.2,
-   "calm": 0.3
-  }
+  "direction": "Calm"
  },
  {
   "id": "b6587a578789",
-  "voice": "portal_f_british_northern",
-  "text": "There. A hearth beside my stones, after a hundred winters.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "There.\nA hearth beside my stones, after a hundred winters.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b6587a578789.wav",
-  "emotion": {
-   "happy": 0.3,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "668df3fce100",
-  "voice": "portal_f_british_northern",
-  "text": "With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/668df3fce100.wav"
+  "voice": "portal_g_mysterious",
+  "text": "With its roots gone quiet I can reach further.\nNorth, past the troll country, the road is open.\nThe old one that broke my stones the night you fell walks that road.\nIt came for the door then.\nGo carefully.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/668df3fce100.wav",
+  "direction": "Calm"
  },
  {
   "id": "e873704df046",
-  "voice": "portal_f_british_northern",
-  "text": "With what? You have nothing but your hands, and I cannot open.",
-  "engine": "acted",
-  "mood": "Stern",
-  "effects": {
-   "speed": 0.88
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e873704df046.wav"
+  "voice": "portal_g_mysterious",
+  "text": "With what?\nYou have nothing but your hands, and I cannot open.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e873704df046.wav",
+  "direction": "Stern"
  },
  {
   "id": "98f67f63063d",
-  "voice": "portal_f_british_northern",
-  "text": "Would you have woken it, knowing? It could not be saved, only stopped. Better by the hand of someone who keeps a hearth.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Would you have woken it, knowing?\nIt could not be saved, only stopped.\nBetter by the hand of someone who keeps a hearth.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/98f67f63063d.wav",
-  "emotion": {
-   "sad": 0.25,
-   "calm": 0.25
-  }
+  "direction": "Calm"
  },
  {
   "id": "b4a5825c9db0",
-  "voice": "portal_f_british_northern",
-  "text": "You brought it down. Lay what you carried out of the hollow by the fire, little one, where it can feel the warmth. It is owed that much.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "You brought it down.\nLay what you carried out of the hollow by the fire, little one, where it can feel the warmth.\nIt is owed that much.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b4a5825c9db0.wav",
-  "emotion": {
-   "sad": 0.3,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "4f0b009136c5",
-  "voice": "portal_f_british_northern",
-  "text": "You came for coin. There is none here. Stay anyway. They need you to.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/4f0b009136c5.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You came for coin.\nThere is none here.\nStay anyway.\nThey need you to.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/4f0b009136c5.wav",
+  "direction": "Calm"
  },
  {
   "id": "3958201de7f0",
-  "voice": "portal_f_british_northern",
-  "text": "You came for coin. There is none in this. But there is a debt now, and you have begun to pay it.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3958201de7f0.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You came for coin.\nThere is none in this.\nBut there is a debt now, and you have begun to pay it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3958201de7f0.wav",
+  "direction": "Calm"
  },
  {
   "id": "3e3f78e0e359",
-  "voice": "portal_f_british_northern",
-  "text": "You came for someone. Every one of your people is out there because of what was let go cold. Bring them home, and the debt grows smaller.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3e3f78e0e359.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You came for someone.\nEvery one of your people is out there because of what was let go cold.\nBring them home, and the debt grows smaller.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3e3f78e0e359.wav",
+  "direction": "Calm"
  },
  {
   "id": "5985c4c61e7d",
-  "voice": "portal_f_british_northern",
-  "text": "You came looking for someone. Now there are others looking for you. Let them find a light.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/5985c4c61e7d.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You came looking for someone.\nNow there are others looking for you.\nLet them find a light.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/5985c4c61e7d.wav",
+  "direction": "Calm"
  },
  {
   "id": "e87ac2ecf9e2",
-  "voice": "portal_f_british_northern",
-  "text": "You came to see if the stories were true. Here is the one nobody tells: we broke the pact first.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "You came to see if the stories were true.\nHere is the one nobody tells: we broke the pact first.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e87ac2ecf9e2.wav",
-  "emotion": {
-   "sad": 0.3,
-   "calm": 0.2
-  }
+  "direction": "Calm"
  },
  {
   "id": "679f652f07a6",
-  "voice": "portal_f_british_northern",
-  "text": "You came to see whether the stories were true. Now you are one of them.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/679f652f07a6.wav"
+  "voice": "portal_g_mysterious",
+  "text": "You came to see whether the stories were true.\nNow you are one of them.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/679f652f07a6.wav",
+  "direction": "Calm"
  },
  {
   "id": "928f98baf858",
-  "voice": "portal_f_british_northern",
-  "text": "Your people did, long before you were born. You are mending it. Every fire kept here is a payment on that debt.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/928f98baf858.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Your people did, long before you were born.\nYou are mending it.\nEvery fire kept here is a payment on that debt.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/928f98baf858.wav",
+  "direction": "Calm"
  },
  {
   "id": "2eb7e0dea082",
-  "voice": "portal_f_british_northern",
-  "text": "And the guardian under the roots, who kept the forest's half. Where is it now?",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/2eb7e0dea082.wav"
+  "voice": "portal_g_mysterious",
+  "text": "And the guardian under the roots, who kept the forest's half.\nWhere is it now?",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/2eb7e0dea082.wav",
+  "direction": "Calm"
  },
  {
   "id": "e864cb232902",
-  "voice": "portal_f_british_northern",
-  "text": "And this. Their door, and the night kept from it, for as long as the fire burned.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e864cb232902.wav"
+  "voice": "portal_g_mysterious",
+  "text": "And this.\nTheir door, and the night kept from it, for as long as the fire burned.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e864cb232902.wav",
+  "direction": "Calm"
  },
  {
   "id": "b846d5abd39c",
-  "voice": "portal_f_british_northern",
-  "text": "I remember this. A fire beside my stones, and someone to keep it.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "I remember this.\nA fire beside my stones, and someone to keep it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b846d5abd39c.wav",
-  "emotion": {
-   "happy": 0.25,
-   "calm": 0.25
-  }
+  "direction": "Calm"
  },
  {
   "id": "c386892a6dc1",
-  "voice": "portal_f_british_northern",
-  "text": "Little one, behind you! My ward is too thin yet. They are coming up through it.",
-  "engine": "acted",
-  "mood": "Scared",
-  "effects": {
-   "speed": 0.88
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Little one, behind you!\nMy ward is too thin yet.\nThey are coming up through it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c386892a6dc1.wav",
-  "emotion": {
-   "afraid": 0.5,
-   "surprised": 0.15
-  }
+  "direction": "Scared"
  },
  {
   "id": "ae616ce24bf2",
-  "voice": "portal_f_british_northern",
-  "text": "Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.",
-  "engine": "acted",
-  "mood": "Stern",
-  "effects": {
-   "speed": 0.88
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ae616ce24bf2.wav"
+  "voice": "portal_g_mysterious",
+  "text": "Rootlings, in my clearing.\nFeed me those orbs, and they will not get in so easily again.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ae616ce24bf2.wav",
+  "direction": "Stern"
  },
  {
   "id": "10fcb367d4d5",
-  "voice": "portal_f_british_northern",
-  "text": "First the way home. Then their names. Then there is no one left to find.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/10fcb367d4d5.wav"
+  "voice": "portal_g_mysterious",
+  "text": "First the way home.\nThen their names.\nThen there is no one left to find.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/10fcb367d4d5.wav",
+  "direction": "Calm"
  },
  {
   "id": "f3110aac1411",
-  "voice": "portal_f_british_northern",
-  "text": "That is what you killed. I am sorry. Someone had to.",
-  "engine": "acted",
-  "mood": "Sad",
-  "effects": {
-   "speed": 0.88
-  },
+  "voice": "portal_g_mysterious",
+  "text": "That is what you killed.\nI am sorry.\nSomeone had to.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/f3110aac1411.wav",
-  "emotion": {
-   "sad": 0.4
-  }
+  "direction": "Sad"
  },
  {
   "id": "81282749735d",
-  "voice": "portal_f_british_northern",
-  "text": "Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {
-   "speed": 0.836
-  },
+  "voice": "portal_g_mysterious",
+  "text": "Little one.\nYou fell out of the dark with the whole forest at your heels, and I caught you.\nI could only catch one.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/81282749735d.wav",
-  "emotion": {
-   "sad": 0.3,
-   "calm": 0.25
-  }
+  "direction": "Calm"
  },
  {
   "id": "767246a502c1",
@@ -4425,8 +3715,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 1.0
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/767246a502c1.wav"
  },
@@ -4437,8 +3726,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 1.0
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/8f6bcce22e65.wav"
  },
@@ -4448,9 +3736,7 @@
   "text": "I owe you one.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/8fb10eae6846.wav"
  },
  {
@@ -4459,9 +3745,7 @@
   "text": "Still here. Still here.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/e51b7497f811.wav"
  },
  {
@@ -4470,9 +3754,7 @@
   "text": "Thank you. I thought that was it.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/632c23f8863b.wav"
  },
  {
@@ -4481,9 +3763,7 @@
   "text": "I can't take much more of this.",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/b1d5c4ed4660.wav"
  },
  {
@@ -4492,9 +3772,7 @@
   "text": "I'm hurt!",
   "engine": "acted",
   "mood": "Scared",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/1e78a85a8bf5.wav"
  },
  {
@@ -4503,9 +3781,7 @@
   "text": "I'll hold this spot.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/c7346545ab5e.wav"
  },
  {
@@ -4514,9 +3790,7 @@
   "text": "I'll keep back.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/cc5007a5209b.wav"
  },
  {
@@ -4525,9 +3799,7 @@
   "text": "Nothing gets to you without going through me.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/5367a35600a7.wav"
  },
  {
@@ -4536,9 +3808,7 @@
   "text": "Point the way.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/8bbb9f70511b.wav"
  },
  {
@@ -4547,9 +3817,7 @@
   "text": "Right behind you.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/02da70cd5cfe.wav"
  },
  {
@@ -4559,8 +3827,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 1.0
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/1882efe7a557.wav"
  },
@@ -4571,8 +3838,7 @@
   "engine": "acted",
   "mood": "Yelling",
   "effects": {
-   "gain": 3.0,
-   "speed": 1.0
+   "gain": 3.0
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/26671639a8fd.wav"
  },
@@ -4582,9 +3848,7 @@
   "text": "Clear. Get your breath.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/e1e4fc5f01a3.wav"
  },
  {
@@ -4593,9 +3857,7 @@
   "text": "That's the last of them.",
   "engine": "acted",
   "mood": "Glad",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/e0683435e9d8.wav"
  },
  {
@@ -4604,9 +3866,7 @@
   "text": "This stone is dry enough. Give me sound timber and a little daylight, and I could make somewhere worth staying. For now, this fire will do.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/73d0a3581264.wav"
  },
  {
@@ -4615,9 +3875,7 @@
   "text": "We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/d5e0f61c0bde.wav"
  },
  {
@@ -4626,9 +3884,7 @@
   "text": "Hold still. Drink this.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/c538debbdac0.wav"
  },
  {
@@ -4637,9 +3893,7 @@
   "text": "Not yet, you don't. Drink.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/34f54bc231d0.wav"
  },
  {
@@ -4648,9 +3902,7 @@
   "text": "You're bleeding. Here.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/96eec5185117.wav"
  },
  {
@@ -4659,9 +3911,7 @@
   "text": "Stay near the stones. We can still get out of this together.",
   "engine": "acted",
   "mood": "Stern",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/8c7ae76a3e04.wav"
  },
  {
@@ -4670,9 +3920,7 @@
   "text": "Anything else?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/97d4e5dedbe4.wav"
  },
  {
@@ -4681,9 +3929,7 @@
   "text": "It's built crooked, you know. All of it. Give me a week.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/97287dc8882b.wav"
  },
  {
@@ -4692,9 +3938,7 @@
   "text": "My tools. Leave them, if you have to. Not me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.97
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/266b9cf5a88a.wav"
  },
  {
@@ -4703,9 +3947,7 @@
   "text": "Still measuring. I knew someone would come, and I wanted something to show for it.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.97
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/3c10de8801a3.wav",
   "emotion": {
    "melancholic": 0.2,
@@ -4718,9 +3960,7 @@
   "text": "There's a hollow in the deep woods where nothing grows, and the ground breathes there. In, out, slow as a sleeper. I lay three nights on this leg listening to it. Whatever is down there is old, and it's what moves the roots. Now, where do you want your planks?",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 1.0
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/tor/9ce02ecc08f5.wav",
   "emotion": {
    "afraid": 0.3,
@@ -4733,9 +3973,7 @@
   "text": "Show me your kitchen. No, on second thought, show me what you eat.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/4fb7976a0979.wav"
  },
  {
@@ -4744,9 +3982,7 @@
   "text": "I can't go on... come back for me.",
   "engine": "acted",
   "mood": "Tired",
-  "effects": {
-   "speed": 0.912
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/5283bcdeb24a.wav"
  },
  {
@@ -4755,9 +3991,7 @@
   "text": "Mind the pot. If you've come to eat, you'll carry.",
   "engine": "acted",
   "mood": "Neutral",
-  "effects": {
-   "speed": 0.94
-  },
+  "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/yrsa/4fbeb1dbec14.wav"
  }
 ]

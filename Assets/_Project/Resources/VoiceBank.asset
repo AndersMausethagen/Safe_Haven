@@ -1280,267 +1280,267 @@ MonoBehaviour:
   - speaker: The Portal
     text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu (G) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
     clip: {fileID: 8300000, guid: a2b574d661a62a44f9bea6d4d4460fad, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A fire first. Then a home worth coming back to. Then we go and fetch them. And one day, little one, you will tell me why these old stones woke for your hand.</i>
     clip: {fileID: 8300000, guid: cca676c07eff5dc49a15f06adc57887e, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A horn at dusk, the expedition's signal. She is the last of them. Bring her home, little one.</i>
     clip: {fileID: 8300000, guid: 21e15a690a561354e8b4963a043bd75e, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A hundred winters I kept this clearing alone. I had forgotten how loud a home is. Do not stop.</i>
     clip: {fileID: 8300000, guid: bab4b77253f1c4945a68aedb5c8bc20d, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A saw, out where nobody saws. Your carpenter is hurt, but he is still measuring.</i>
     clip: {fileID: 8300000, guid: 28860f3391c68914082d49a4ff1be6cc, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A snare line, a mile of it, and at the end a man who did not mean to be caught.</i>
     clip: {fileID: 8300000, guid: 85f9ddfa3dcc5c243a394677c0750660, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>A wall went up overnight out there, round nothing. Whoever built it will want to build a better one here.</i>
     clip: {fileID: 8300000, guid: 6e2ca1faa93ad6d4b861fbbe9627f104, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>And the guardian under the roots, who kept the forest's half. Where is it now?</i>
     clip: {fileID: 8300000, guid: ee453819a19976a4694774c6c50a1c97, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>And this. Their door, and the night kept from it, for as long as the fire burned.</i>
     clip: {fileID: 8300000, guid: 95776a46879c4f74ea3405b97c68b607, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag (B).</i>'
     clip: {fileID: 8300000, guid: 2740700c16cdd924ca535772bad8580a, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Come and sit by me, little one. There is something I should have told you before you went to that hollow.</i>
     clip: {fileID: 8300000, guid: 24ca25d4fdee33145bf03360ebddb3c3, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Did you see what grew out of them as they fell? Root. The same root that choked my stones, and closed the road behind your people.</i>
     clip: {fileID: 8300000, guid: d602fe8f0331c8143baf195c965f6738, type: 3}
-    mood: Sad
+    mood: Neutral
   - speaker: The Portal
     text: <i>Do you feel that? The ward has remembered what it is for. And far out in the mist, little one, someone has stopped walking and turned to look.</i>
     clip: {fileID: 8300000, guid: cd3edd3b7a6b7844d8be72fba32725d0, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Every hearth in my light is a little more of the old pact kept.</i>
     clip: {fileID: 8300000, guid: e8f71124c610a8a4e92f5554ea88ac6b, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>First the way home. Then their names. Then there is no one left to find.</i>
     clip: {fileID: 8300000, guid: eb02ba9be387bf642949bf2227fd3c38, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Go, little one. She is just beyond me, off the path. Come back through one of my doors before I close. What you wear I can always bring home. What you carry I cannot.</i>
     clip: {fileID: 8300000, guid: ae0bad5cc79769544bdfec39591871a8, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>I am a door, little one, and I have gone to sleep. I am too thin to wake myself. Long ago people kept a hearth beside these stones, and I kept the night from their door. That was the pact. No fire has burned here in a hundred winters.</i>
     clip: {fileID: 8300000, guid: e876171ee9e610f46a9fbb62bc2bfdaa, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>I have not told you everything. The Heartroot was no monster. It was the forest''s guardian: its half of the pact. Your kind let the hearth beside me go cold a hundred winters ago. It kept its half for ninety winters after that, alone, until the hunger got into its roots.</i>'
     clip: {fileID: 8300000, guid: 3fd5cc9260f173e4584b73dc9293c118, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>I listen for your people every night. Some nights I hear them.</i>
     clip: {fileID: 8300000, guid: 28994191dbd3af94f8f15c29e4cb191b, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>I remember this. A fire beside my stones, and someone to keep it.</i>
     clip: {fileID: 8300000, guid: 70aaab431ff8bcb45aa064a14f628865, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.</i>
     clip: {fileID: 8300000, guid: 20183a6ba2a5c2d448b6a84741a03f1b, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.</i>
     clip: {fileID: 8300000, guid: 099669a60861b47458c1d3c6209f2a32, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Listen, little one. Rest your hand on the stone.</i>
     clip: {fileID: 8300000, guid: 47f021c2af1bec44fbd0f1cfc03ecdaa, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Listen. A hammer, far off in the deep woods, slow and uneven. One of yours. Ask me what the woods hold before you go, and I will tell you where.</i>
     clip: {fileID: 8300000, guid: feb837e2b9c472a4d8626a71c0b2f091, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>Listen. Far off, at dusk, a horn: three long notes and a rest, over and over. The expedition''s signal. Someone out there has seen your light and is answering it.</i>'
     clip: {fileID: 8300000, guid: bf7aad7fc17f7d441bb210eac14b2e4c, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Little one, behind you! My ward is too thin yet. They are coming up through it.</i>
     clip: {fileID: 8300000, guid: 65c84ba33797e2248b2d9ed85fa509ba, type: 3}
-    mood: Scared
+    mood: Neutral
   - speaker: The Portal
     text: <i>Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.</i>
     clip: {fileID: 8300000, guid: bb62719f007704640b29f67420bcfe93, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Marks on the trees that only the dark shows. Go through at night.</i>
     clip: {fileID: 8300000, guid: 6329a2be4ad8eed48a418423664d3240, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>My stones have gone quiet, but she is right. One spark burns close, just beyond me, hiding from the wolves. Make yourself tools, and go.</i>
     clip: {fileID: 8300000, guid: bfbe03507f7aeef43886c2ab5bb32825, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>My ward keeps out the worst of the forest, not all of it. Put a wall between your fire and the trees.</i>
     clip: {fileID: 8300000, guid: ae64ba3b9fa96564296c2d643e889132, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Now bring me what you freed. Feed me that light and I will open for you, as I did in the dark.</i>
     clip: {fileID: 8300000, guid: d56983cd10ed7a6428a760b7cf596c1c, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Now feed yourself. Berries, water from the stream, a stew over your fire. You will be walking people home.</i>
     clip: {fileID: 8300000, guid: 877935895dc76eb48b1120c4ead9f018, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>Now the woods have told me. Something breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones. It will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore.</i>'
     clip: {fileID: 8300000, guid: 98db259428deace43880f12a215bb382, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Old stones are humming in the deep woods. Someone is inside the ring, writing.</i>
     clip: {fileID: 8300000, guid: ddb3e92b41d99d043994c3a303242256, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>One fire brought Ingrid home. The others will want more than a fire: a bench, a furnace, a dry place to set down what they carry. Build what they will need.</i>'
     clip: {fileID: 8300000, guid: 21e8cdb925678224a8f1046b169be691, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>One weapon is one answer, and it will not last for ever. Make a second at your workshop: a club stuns what a blade only cuts.</i>'
     clip: {fileID: 8300000, guid: 4a679f47d0d179e47b828af65dcf0861, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.</i>
     clip: {fileID: 8300000, guid: c7373c4ea4249d049a2aef50bbac72c9, type: 3}
-    mood: Stern
+    mood: Neutral
   - speaker: The Portal
     text: <i>Seven sparks, scattered through the Misty Woods. They are alive. I hear them when the wind is right. But the forest does not kill the lost, little one. It forgets them.</i>
     clip: {fileID: 8300000, guid: 06112ce3b2b803847aa8b156a6f98efc, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>
     clip: {fileID: 8300000, guid: 46887ac32c53b0345bdcaea3106e1dd0, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Smoke from a farmstead that burned long ago. Someone kept the seed.</i>
     clip: {fileID: 8300000, guid: 8c488a7f1beb348489f7da2956d9d3ee, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.</i>
     clip: {fileID: 8300000, guid: 78ffc9810abe0fa47881e46768436703, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Someone is cooking out there. The wolves can smell it. So can I.</i>
     clip: {fileID: 8300000, guid: af8543cfb04620148a31d97d340309e9, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Something tests my ward. Out there, someone else is holding a clearing against the wolves. Bring him to hold mine.</i>
     clip: {fileID: 8300000, guid: 86e4d95f0e519d84ab5886faa3602f86, type: 3}
-    mood: Stern
+    mood: Neutral
   - speaker: The Portal
     text: <i>That is what you killed. I am sorry. Someone had to.</i>
     clip: {fileID: 8300000, guid: 6d446fac584bfe740aeb4399331d5c98, type: 3}
-    mood: Sad
+    mood: Neutral
   - speaker: The Portal
     text: <i>The brighter this place burns, the further it can be seen. Build. Clear the old growth. Give them something worth walking towards.</i>
     clip: {fileID: 8300000, guid: e1e05aa8507ec6e4496f18c6ccac3643, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>The forest cannot forget a place that someone tends.</i>
     clip: {fileID: 8300000, guid: 2724747ca5f838a4098d1f3e3c7544b8, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>The forest has put its roots in even here. Three stones around the clearing still hold my light, choked and cold. Free them, and bring the Life Orbs back.</i>
     clip: {fileID: 8300000, guid: 4e55fd80a005fbb4b83707ecf565a258, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>The last of an old promise. I keep the dark from this clearing. But that is not what you need to know.</i>
     clip: {fileID: 8300000, guid: 495056b8518576c46bc75fc2e6d14fd8, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
     clip: {fileID: 8300000, guid: e29c3bcb4b9dee646bdab9d4eee22e01, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Then she is still herself, and she is holding on. She will want the others home before her. Bring them, little one, and keep this fire high.</i>
     clip: {fileID: 8300000, guid: edfaddb961b50a64b817d20fed6eff4a, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>There. A hearth beside my stones, after a hundred winters.</i>
     clip: {fileID: 8300000, guid: 92501bcf7ce226941abbadd2eba70c0d, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>
     clip: {fileID: 8300000, guid: 67dfff8ced5006a47ac8e185cb37edbf, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>
     clip: {fileID: 8300000, guid: 4e877300c3b743f4b80579f413f7d503, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>With what? You have nothing but your hands, and I cannot open.</i>
     clip: {fileID: 8300000, guid: 08ad8f258c3cd6c4e991b543e09aecf7, type: 3}
-    mood: Stern
+    mood: Neutral
   - speaker: The Portal
     text: <i>Would you have woken it, knowing? It could not be saved, only stopped. Better by the hand of someone who keeps a hearth.</i>
     clip: {fileID: 8300000, guid: b8815cd1550a606419bb597f2f0190a0, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You brought it down. Lay what you carried out of the hollow by the fire, little one, where it can feel the warmth. It is owed that much.</i>
     clip: {fileID: 8300000, guid: 3edca4d7723e4f943b009bce0bf73f03, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>You brought the woods home on your back. Now make something of them: a lodge by the trees, a saw that turns logs into planks. The smithy and the walls start with a plank.</i>'
     clip: {fileID: 8300000, guid: f44e9644898c76746a77e9e003a9ad44, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You came for coin. There is none here. Stay anyway. They need you to.</i>
     clip: {fileID: 8300000, guid: 97bed2bd255ce06429306d728c819b38, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You came for coin. There is none in this. But there is a debt now, and you have begun to pay it.</i>
     clip: {fileID: 8300000, guid: ae145b9e211476d479631238064a59a0, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You came for someone. Every one of your people is out there because of what was let go cold. Bring them home, and the debt grows smaller.</i>
     clip: {fileID: 8300000, guid: d85174a3bbba2be49856c90b52a3ad2e, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You came looking for someone. Now there are others looking for you. Let them find a light.</i>
     clip: {fileID: 8300000, guid: fd3d0786a14d3114290a9cc050c68f54, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>You came to see if the stories were true. Here is the one nobody tells: we broke the pact first.</i>'
     clip: {fileID: 8300000, guid: ad95d5e6432ac6f40b6a333fe91d4c89, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>You came to see whether the stories were true. Now you are one of them.</i>
     clip: {fileID: 8300000, guid: 1ed23c52d4c657448b67201578f40c43, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: '<i>You have a fire. Now a roof to work under: a workshop beside it (G). What the woods break, it mends.</i>'
     clip: {fileID: 8300000, guid: 64b42d68b6d472e45991c36cbef2ac45, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: <i>Your people did, long before you were born. You are mending it. Every fire kept here is a payment on that debt.</i>
     clip: {fileID: 8300000, guid: d2be176329f44fd429ca06b72bf413a9, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: The Portal
     text: Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
     clip: {fileID: 8300000, guid: 5e908dad5b84b034aa1c89605501007c, type: 3}
-    mood: Calm
+    mood: Neutral
   - speaker: Tor
     text: Anything else?
     clip: {fileID: 8300000, guid: 72de23cfcb9ce3748950e6605d30ee71, type: 3}
