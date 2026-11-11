@@ -157,6 +157,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField] private bool lasso;
     [Tooltip("Makes this item a saddle: on a tamed horse its bags hold this many stacks, as much as the horse can carry. 0 for other items.")]
     [SerializeField, Min(0)] private int saddleSlots;
+    [Tooltip("Makes this item horse armour (barding): the armour a tamed horse wearing it gains, 0 to 1 of a blow kept off. 0 for other items.")]
+    [SerializeField, Range(0f, 0.8f)] private float horseArmour;
+    [Tooltip("Which of the barding's looks it wears (the pack's four colourings, 0-3).")]
+    [SerializeField, Range(0, 3)] private int bardingLook;
+    [Tooltip("Food a horse eats from the hand: the bond it gives (barley, apples). 0 for other items.")]
+    [SerializeField, Min(0f)] private float horseTreat;
 
     [Header("Raid")]
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
@@ -202,6 +208,11 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsLasso => lasso;
     public int SaddleSlots => saddleSlots;
     public bool IsSaddle => saddleSlots > 0;
+    public float HorseArmour => horseArmour;
+    public bool IsBarding => horseArmour > 0f;
+    public int BardingLook => bardingLook;
+    public float HorseTreat => horseTreat;
+    public bool IsHorseTreat => horseTreat > 0f;
 
     /// <summary>Each stack keeps its own condition: durability for gear, the water level for a water container, the light
     /// left in a lantern.</summary>

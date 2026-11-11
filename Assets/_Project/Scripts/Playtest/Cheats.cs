@@ -154,10 +154,43 @@ public static class Cheats
     }
 
     /// <summary>A wild horse a little way ahead, out of its fright distance, to try the lasso on.</summary>
-    public static string WildHorse()
+    public static string WildHorse() => WildHorse(HorseSettings.Current.WildHorse);
+
+    /// <summary>The bog's toxic horse a little way ahead, whatever the hour.</summary>
+    public static string ToxicHorse()
+    {
+        foreach (HorseDefinition kind in HorseSettings.Current.SpecialHorses)
+        {
+            if (kind != null && kind.Home == HorseHome.Bog)
+            {
+                return WildHorse(kind);
+            }
+        }
+
+        return "No bog horse in this game.";
+    }
+
+    /// <summary>Every horse of yours nearby is as fond of you as a horse can be: it comes to the whistle and may foal.</summary>
+    public static string BondHorses()
+    {
+        int count = 0;
+        Player player = Player.Current;
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsTamed && player != null && (horse.transform.position - player.transform.position).sqrMagnitude < 60f * 60f)
+            {
+                horse.Befriend(HorseBondRules.Most * 2f);
+                count++;
+            }
+        }
+
+        return count > 0 ? Did("Horse bond", $"{count} horse(s) at full bond.") : "No horse of yours within 60 m.";
+    }
+
+    private static string WildHorse(HorseDefinition kind)
     {
         Player player = Player.Current;
-        if (player == null || HorseSettings.Current.WildHorse == null)
+        if (player == null || kind == null)
         {
             return "No horse to bring.";
         }
@@ -168,8 +201,8 @@ public static class Cheats
             return "No ground for a horse ahead.";
         }
 
-        HorseHerd.SpawnAt(hit.position);
-        return Did("Wild horse", "A wild horse grazes ahead. Sneak closer and use the lasso.");
+        HorseHerd.SpawnAt(kind, hit.position);
+        return Did(kind.DisplayName, $"A {kind.DisplayName.ToLowerInvariant()} grazes ahead. Sneak closer and use the lasso.");
     }
 
     /// <summary>What taming and keeping a horse takes: a lasso, barley and a hide saddle, into the bag.</summary>

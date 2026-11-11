@@ -281,7 +281,7 @@ public sealed class ProgressionTests
         CollectionAssert.AreEquivalent(new[]
         {
             "woodcutting", "mining", "foraging", "fishing", "weaponcrafting", "armorcrafting", "cooking", "alchemy", "construction",
-            "melee", "archery", "runecraft", "sneaking",
+            "melee", "archery", "runecraft", "sneaking", "horsemanship",
         }, ids);
         Assert.AreSame(settings.FindSkill("foraging"), settings.SkillFor(ToolType.None), "picking by hand trains Foraging");
         Assert.AreSame(settings.FindSkill("foraging"), settings.SkillFor(ToolType.Sickle));

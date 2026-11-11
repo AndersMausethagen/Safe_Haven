@@ -397,6 +397,14 @@ public sealed partial class PlayerCombat
         // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
         // counter) holds at every level; a perk can add to a blow from the shadows.
         damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target);
+        // From the saddle: Horsemanship's Mounted Damage, and the gallop's weight behind it.
+        float mounted = PlayerRiding.MountedScale(gameObject);
+        damage *= mounted;
+        if (mounted != 1f)
+        {
+            PlayerHorsemanship.Practise(HorseWork.MountedHit);
+        }
+
         damage = SilentTakedown(target, pending, damage);
         technique |= HitTechnique.Melee;
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,

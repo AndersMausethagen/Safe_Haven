@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4349ebd0de959014aad2995652b37022, type: 3}
+  m_Name: Toxic Horse
+  m_EditorClassIdentifier: SafeHaven::HorseDefinition
+  displayName: Toxic Horse
+  description: A horse of the bog, its hide grown through with something green that glows, its breath a fog. It comes out at dusk, and it is stronger and faster than any other.
+  prefab: {fileID: 794972146565323221, guid: 723b6c9c97b51af40bab476852d65df4, type: 3}
+  coats: []
+  manes:
+  - {fileID: 2100000, guid: 79fee6b5b76e151448a333b1fd3d5f9b, type: 2}
+  coatManes: []
+  health: {x: 220, y: 300}
+  stamina: {x: 120, y: 160}
+  gallopSpeed: {x: 11.5, y: 13.5}
+  carryWeight: {x: 70, y: 100}
+  walkSpeed: 1.6
+  trotSpeed: 6
+  gallopCost: 9
+  staminaRegen: 6
+  turnSpeed: 220
+  shyDistance: 4.5
+  perHeardMetre: 1.3
+  wanderRadius: 14
+  fleeSeconds: 7
+  whinny: {fileID: 11400000, guid: 0dda84f9f376d364ea01afb97d26b742, type: 2}
+  neigh: {fileID: 11400000, guid: 44b0901d9eb17974fa47cd3259e7e712, type: 2}
+  snort: {fileID: 11400000, guid: 3dc78a64afec622409d3d9fbda77d3ec, type: 2}
+  breathing: {fileID: 11400000, guid: 4165c15bbe81992468191170332b9a1e, type: 2}
+  hooves: {fileID: 11400000, guid: 78e7a7a6cede57d4084a082dd1b1477d, type: 2}
+  lasso: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
+  lassoRange: 9
+  struggleStamina: 140
+  tapDrain: 3
+  pullStrain: 0.42
+  tapHold: 0.1
+  lungeSeconds: {x: 1.2, y: 2.6}
+  mountSeconds: 8
+  barley: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+  feedsNeeded: {x: 4, y: 6}
+  feedInterval: {x: 10, y: 30}
+  feedWindow: 6
+  home: 1
+  special: 1
+  alwaysArmoured: 1
+  spawnChancePerHour: 0.05
+  mostWild: 1
+  spawnRing: {x: 70, y: 150}
+  homeAt: {x: 195, y: 345}
+  homeRadius: 95
+  activeHours: {x: 18, y: 7}
+  strikeDamage: 26

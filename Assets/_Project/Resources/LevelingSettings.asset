@@ -15,6 +15,8 @@ MonoBehaviour:
   maxLevel: 50
   firstLevelExperience: 50
   levelGrowth: 1.105
+  earlySlowdown: 1.6
+  earlyLevels: 5
   baselineLevel: 10
   beginnerEase: 2.5
   levelUpSound: {fileID: 11400000, guid: d822f0272ab32e24f95aa198883df3f0, type: 2}
@@ -88,3 +90,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
   - {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
   - {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+  - {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}

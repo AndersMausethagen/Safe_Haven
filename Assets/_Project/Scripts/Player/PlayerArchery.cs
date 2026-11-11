@@ -439,7 +439,7 @@ public sealed class PlayerArchery : MonoBehaviour
         {
             Techniques.Used(PerkTechnique.DeadlyDraw);
         }
-        float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier * skill * deadly;
+        float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier * skill * deadly * PlayerRiding.MountedScale(gameObject);
         HitTechnique technique = HitTechnique.Shot | (counter ? HitTechnique.Counter : HitTechnique.None);
         projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, technique, perfect, recoverable: true);
 

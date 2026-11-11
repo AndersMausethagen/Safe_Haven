@@ -28,6 +28,7 @@ public static class BuildProficiencies
             Weaponcrafting(), Armorcrafting(), Cooking(), Alchemy(), Construction(),
             Melee(), Archery(), Runecraft(),
             Sneaking(),
+            Horsemanship(),
         };
         string techniques = TeachTechniques(skills);
         string settings = Settings(skills);
@@ -393,6 +394,35 @@ public static class BuildProficiencies
             Perk("sneak_nightstalker", "Nightstalker", "The dark is yours, and everything in it.", Bonus(StatType.AmbushDamage, 30 * Pct), Bonus(StatType.MoveSpeed, 3 * Pct)),
             Perk("sneak_cutpurse", "Cutpurse", "The forest's curses come away in your hand.", Bonus(StatType.EssenceFind, 20 * Pct))));
 
+    // ----- Riding -----
+
+    private static ProficiencyDefinition Horsemanship() => Skill("horsemanship", "Horsemanship",
+        "Horses: a rope held against a wild one, a seat kept on a bucking back, a whistle it answers, and blows struck from the saddle.",
+        "horses tamed, fed, groomed and ridden, foals born, and blows struck from the saddle", ProficiencyGroup.Riding,
+        ProficiencyTraining.Horsemanship, ToolType.None,
+        new[]
+        {
+            Level(StatType.TamingHold, -15 * Pct, 40 * Pct),
+            Level(StatType.GallopStaminaCost, 15 * Pct, -30 * Pct),
+            Level(StatType.HorseBond, -10 * Pct, 40 * Pct),
+            Level(StatType.MountedDamage, -10 * Pct, 20 * Pct),
+        },
+        Milestone(10,
+            Perk("ride_strong_grip", "Strong Grip", "The rope bites your palms and you let it.", Bonus(StatType.TamingHold, 15 * Pct)),
+            Perk("ride_gentle_hand", "Gentle Hand", "A horse knows a kind hand before it knows a name.", Bonus(StatType.HorseBond, 20 * Pct))),
+        Milestone(20,
+            Perk("ride_light_seat", "Light Seat", "Rise with the stride and the horse runs further.", Bonus(StatType.GallopStaminaCost, -12 * Pct)),
+            null),  // taught a technique: TechniquePerks
+        Milestone(30,
+            Perk("ride_horse_whisperer", "Horse Whisperer", "Wild ones stand a moment longer to hear what you say.", Bonus(StatType.TamingHold, 20 * Pct)),
+            Perk("ride_long_road", "Long Road", "Hours in the saddle, and both of you are better for it.", Bonus(StatType.HorseBond, 25 * Pct))),
+        Milestone(40,
+            Perk("ride_lancer", "Lancer", "At a gallop the blow is the horse's as much as yours.", Bonus(StatType.MountedDamage, 18 * Pct)),
+            null),  // taught a technique: TechniquePerks
+        Milestone(50,
+            Perk("ride_horselord", "Horselord", "No horse born is too wild for you.", Bonus(StatType.TamingHold, 25 * Pct), Bonus(StatType.HorseBond, 15 * Pct)),
+            Perk("ride_rider_of_the_north", "Rider of the North", "Horse and rider, one beast in the fight.", Bonus(StatType.MountedDamage, 20 * Pct), Bonus(StatType.GallopStaminaCost, -10 * Pct))));
+
     // ----- Settings -----
 
     private static string Settings(List<ProficiencyDefinition> skills)
@@ -508,6 +538,8 @@ public static class BuildProficiencies
         ("runecraft", 40, "rune_soul_siphon", "Soul Siphon", "A kill with a spell heals a tenth of your health.", PerkTechnique.SoulSiphon),
         ("sneaking", 20, "sneak_silent_takedown", "Silent Takedown", "A blow from the shadows finishes an ordinary creature it has nearly done for.", PerkTechnique.SilentTakedown),
         ("sneaking", 40, "sneak_shadowstep", "Shadowstep", "You sneak a third faster.", PerkTechnique.Shadowstep),
+        ("horsemanship", 20, "ride_sure_seat", "Sure Seat", "No blow throws you from the saddle, and a horse being broken in bucks you half as hard.", PerkTechnique.SureSeat),
+        ("horsemanship", 40, "ride_trample", "Trample", "At a gallop your horse runs down a creature in its path and knocks it off its feet.", PerkTechnique.Trample),
     };
 
     private static string TeachTechniques(List<ProficiencyDefinition> skills)
@@ -591,7 +623,7 @@ public static class BuildProficiencies
     {
         { "woodcutting", "Sawbench" }, { "mining", "Forge" }, { "foraging", "FarmPlot" }, { "weaponcrafting", "Forge" },
         { "armorcrafting", "Loom" }, { "cooking", "Kitchen" }, { "alchemy", "Cauldron" }, { "construction", "ConstructionTable" },
-        { "archery", "TanningRack" }, { "runecraft", "PurificationAltar" }, { "fishing", "Dock" },
+        { "archery", "TanningRack" }, { "runecraft", "PurificationAltar" }, { "fishing", "Dock" }, { "horsemanship", "Stable" },
     };
 
     private static string Mentors(List<ProficiencyDefinition> skills)

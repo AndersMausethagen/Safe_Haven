@@ -3,39 +3,38 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// What the player needs to see of a horse, low in the middle of the screen, frameless in the Hearthline way (type and
-/// thin bars): in the struggle, the strain on the rope and the strength the horse has left, and what to press; worn out,
-/// how long it will stand; on the breaking ride, how often it has been fed and, while it asks, its patience; riding a
-/// tamed horse, its stamina. Built in code the first time a horse needs it; reads HorseTaming.Active and PlayerRiding.
+/// What the player needs to see of a horse, kept small and over the horse itself rather than across the screen: two thin
+/// bars above its head and, while taming, one short line of what to press. In the struggle, the strain on the rope and
+/// the strength it has left; worn out, how long it will stand; on the breaking ride, the rider's balance and, while it asks
+/// for barley, its patience; riding a horse of your own, its stamina and its health. Frameless in the Hearthline way.
+/// Built in code the first time a horse needs it; reads HorseTaming.Active and PlayerRiding.
 /// </summary>
 public sealed class HorseHud : MonoBehaviour
 {
-    private const float Width = 460f;
-    private const float BarHeight = 6f;
+    private const float Width = 96f;
+    private const float BarHeight = 5f;
+    private const float Gap = 4f;
+    // Metres above the horse's feet the bars float: over its head.
+    private const float Above = 2.7f;
 
     private static HorseHud current;
 
+    private RectTransform canvasRect;
+    private RectTransform holder;
     private CanvasGroup group;
-    private TMP_Text title;
     private TMP_Text hint;
     private Bar first;
     private Bar second;
 
     private sealed class Bar
     {
-        public TMP_Text Label;
         public RectTransform Track;
         public Image Fill;
 
-        public void Show(bool shown)
-        {
-            Label.gameObject.SetActive(shown);
-            Track.gameObject.SetActive(shown);
-        }
+        public void Show(bool shown) => Track.gameObject.SetActive(shown);
 
-        public void Set(string label, float fraction, Color colour)
+        public void Set(float fraction, Color colour)
         {
-            Label.text = label;
             Fill.color = colour;
             Fill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(fraction), 1f);
         }
@@ -58,6 +57,7 @@ public sealed class HorseHud : MonoBehaviour
         canvas.sortingOrder = 72;
         UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         current = root.AddComponent<HorseHud>();
+        current.canvasRect = (RectTransform)root.transform;
         current.group = root.AddComponent<CanvasGroup>();
         current.group.blocksRaycasts = false;
         current.group.alpha = 0f;
@@ -67,21 +67,18 @@ public sealed class HorseHud : MonoBehaviour
     private void Build(Transform root)
     {
         UIStyle style = UIStyle.Current;
-        // Above the noise meter and the skill bar.
-        RectTransform panel = CodeUI.Box("Panel", root, new Vector2(0.5f, 0f), new Vector2(Width, 150f), new Vector2(0f, 340f));
-        title = CodeUI.Label("Title", panel, 0f, 0f, Width, 30f, 24f, style.Text, TextAlignmentOptions.Center);
-        title.font = style.BodyFont;
-        first = MakeBar(panel, 40f, style);
-        second = MakeBar(panel, 82f, style);
-        hint = CodeUI.Label("Hint", panel, 0f, 122f, Width, 26f, 19f, style.Accent, TextAlignmentOptions.Center);
+        // Placed each frame over the horse; the bars hang from its top middle.
+        holder = CodeUI.Box("Over the horse", root, Vector2.zero, new Vector2(Width, BarHeight * 2f + Gap), Vector2.zero);
+        holder.pivot = new Vector2(0.5f, 0f);
+        first = MakeBar(holder, 0f, style);
+        second = MakeBar(holder, BarHeight + Gap, style);
+        hint = CodeUI.Label("Hint", holder, -77f, -24f, Width + 154f, 20f, 15f, style.Accent, TextAlignmentOptions.Center);
         hint.font = style.BodyFont;
     }
 
-    private static Bar MakeBar(RectTransform panel, float y, UIStyle style)
+    private static Bar MakeBar(RectTransform holder, float y, UIStyle style)
     {
-        var bar = new Bar { Label = CodeUI.Label("Label", panel, 0f, y, Width, 22f, 17f, style.Muted) };
-        bar.Label.font = style.BodyFont;
-        bar.Track = CodeUI.At("Track", panel, 0f, y + 26f, Width, BarHeight);
+        var bar = new Bar { Track = CodeUI.At("Track", holder, 0f, y, Width, BarHeight) };
         bar.Track.gameObject.AddComponent<Image>().color = style.Track;
         RectTransform fill = CodeUI.Stretch("Fill", bar.Track);
         bar.Fill = fill.gameObject.AddComponent<Image>();
@@ -91,7 +88,7 @@ public sealed class HorseHud : MonoBehaviour
         return bar;
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         UIStyle style = UIStyle.Current;
         HorseTaming taming = HorseTaming.Active;
@@ -99,52 +96,70 @@ public sealed class HorseHud : MonoBehaviour
         PlayerRiding riding = player != null && player.TryGetComponent(out PlayerRiding found) ? found : null;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         string key = GameInput.KeyLabel(GameInput.Interact);
-        bool shown = !windows && !GamePause.IsPaused;
+        Horse horse = null;
         if (taming != null && taming.Current == HorseTaming.Phase.Struggle)
         {
-            title.text = "Hold it!";
+            horse = taming.Horse;
             first.Show(true);
             second.Show(true);
-            first.Set("The rope", taming.Strain, taming.Strain > 0.75f ? style.Danger : style.Warning);
-            second.Set("Its strength", taming.Strength, style.Accent);
-            hint.text = $"Tap {key} or left click";
+            first.Set(taming.Strain, taming.Strain > 0.75f ? style.Danger : style.Warning);
+            second.Set(taming.Strength, style.Accent);
+            hint.text = taming.Lean > 0.05f ? $"Tap {key}" : $"Tap {key}, lean away";
         }
         else if (taming != null && taming.Current == HorseTaming.Phase.GivenIn)
         {
-            title.text = "It is spent";
+            horse = taming.Horse;
             first.Show(true);
             second.Show(false);
-            first.Set("Before it fights again", taming.MountLeft / Mathf.Max(1f, taming.Horse.Definition.MountSeconds), style.Good);
-            hint.text = $"{key}: get on its back";
+            first.Set(taming.MountLeft / Mathf.Max(1f, taming.Horse.Definition.MountSeconds), style.Good);
+            hint.text = $"{key}: get on";
         }
         else if (taming != null && taming.Current == HorseTaming.Phase.Breaking)
         {
-            title.text = $"Breaking it in: fed {taming.Fed} of {taming.Needed}";
-            first.Show(taming.IsAsking);
-            second.Show(false);
+            horse = taming.Horse;
+            first.Show(true);
+            second.Show(taming.IsAsking);
+            first.Set(taming.Balance, taming.Balance < 0.35f ? style.Danger : style.Good);
             if (taming.IsAsking)
             {
-                first.Set("Its patience", taming.PatienceLeft, taming.PatienceLeft < 0.35f ? style.Danger : style.Warning);
+                second.Set(taming.PatienceLeft, taming.PatienceLeft < 0.35f ? style.Danger : style.Warning);
             }
 
             ItemDefinition barley = taming.Horse.Definition.Barley;
-            hint.text = taming.IsAsking ? $"{key}: give it {(barley != null ? barley.DisplayName.ToLowerInvariant() : "food")}" : "Stay on";
+            hint.text = taming.IsAsking ? $"{key}: {(barley != null ? barley.DisplayName.ToLowerInvariant() : "food")} ({taming.Fed}/{taming.Needed})"
+                : taming.Veer.sqrMagnitude > 0.01f ? "Steer against it!" : "";
         }
         else if (riding != null && riding.IsRiding)
         {
-            Horse horse = riding.Riding;
-            title.text = horse.HorseName;
+            horse = riding.Riding;
             first.Show(true);
-            second.Show(false);
-            float stamina = horse.Stats.maxStamina > 0f ? horse.Stamina / horse.Stats.maxStamina : 0f;
-            first.Set("Stamina", stamina, stamina < 0.2f ? style.Warning : style.Good);
+            second.Show(true);
+            float stamina = horse.MaxStamina > 0f ? horse.Stamina / horse.MaxStamina : 0f;
+            first.Set(stamina, stamina < 0.2f ? style.Warning : style.Good);
+            second.Set(horse.Health.HealthFraction, horse.Health.HealthFraction < 0.3f ? style.Danger : style.Text);
             hint.text = "";
         }
-        else
+
+        bool shown = horse != null && !windows && !GamePause.IsPaused && Place(horse);
+        group.alpha = shown ? 1f : 0f;
+    }
+
+    // Over the horse's head, where the camera sees it; hidden when it is behind the camera.
+    private bool Place(Horse horse)
+    {
+        Camera view = Camera.main;
+        if (view == null)
         {
-            shown = false;
+            return false;
         }
 
-        group.alpha = shown ? 1f : 0f;
+        Vector3 screen = view.WorldToScreenPoint(horse.transform.position + Vector3.up * Above);
+        if (screen.z <= 0f || !RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local))
+        {
+            return false;
+        }
+
+        holder.anchoredPosition = local + canvasRect.rect.size * canvasRect.pivot;
+        return true;
     }
 }

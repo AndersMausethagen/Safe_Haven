@@ -992,6 +992,32 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 0}
     art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
     summary: Cursed Essence comes from the forest. Purified at the altar, it makes your gear and skills stronger.
+  - group: Getting about
+    title: Horses
+    line: A rope, barley, and a seat kept
+    body: 'Wild horses graze in the land round the Haven. Come close crouched: a walk is heard ten metres off. With a lasso in hand, throw it from within its reach (the attack button).
+
+
+      On the rope it fights: tap E or left click, and lean away from it with the movement keys (that costs your breath). Tire it before the rope slips, then get on its back.
+
+
+      Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley (E). Fed enough, it is yours.
+
+
+      Each horse has its nature: calm, skittish, stubborn or bold. Feed it, groom it once a day and ride it, and it grows fond of you: more stamina, less panic, and it comes when you whistle (X). Saddles carry its bags; barding keeps blows off.
+
+
+      A Stable keeps horses safe at night and mends them. A mare and a stallion stabled together, both fond of you, may foal. Deep water it swims, on its stamina.
+
+
+      Something else lives in the bog, and comes out at dusk.'
+    unlockedByQuest: {fileID: 11400000, guid: e9a34a9ca91ab4946b93ffe90aebd8c1, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
+    art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
+    summary: Taming, keeping and riding horses.
   creatures:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
   - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}

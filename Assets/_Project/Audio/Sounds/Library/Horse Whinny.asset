@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Horse Whinny
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Horse Whinny
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 86543bc639a8f7f44a1a6a5223ce3339, type: 3}
+  - {fileID: 8300000, guid: 768786c0d3c67a24686088fca6047717, type: 3}
+  - {fileID: 8300000, guid: 0b12c7e4ff3ebc34e80ef36ccb6bbdab, type: 3}
+  channel: 2
+  volume: 0.8
+  volumeVariation: 0.1
+  pitchRange: {x: 0.93, y: 1.07}
+  positional: 1
+  fullVolumeDistance: 6
+  audibleDistance: 55
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 1
+  takesTheMix: 0

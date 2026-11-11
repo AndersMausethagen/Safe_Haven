@@ -21,6 +21,18 @@ MonoBehaviour:
   - {r: 0.66, g: 0.55, b: 0.38, a: 1}
   - {r: 0.6, g: 0.6, b: 0.58, a: 1}
   - {r: 0.16, g: 0.14, b: 0.13, a: 1}
+  manes:
+  - {fileID: 2100000, guid: 8f04ebe416921664ead215e8d5a11ee3, type: 2}
+  - {fileID: 2100000, guid: e97e988bc5704c64f9475614939aad24, type: 2}
+  - {fileID: 2100000, guid: 569cb1dbb6168a84ba8f7de4fe07814e, type: 2}
+  - {fileID: 2100000, guid: 334ad2324e5cf4e4db30d7d25a974633, type: 2}
+  - {fileID: 2100000, guid: ef777e3e50000324a8b7fd05161ac9d2, type: 2}
+  coatManes:
+  - 0,1
+  - 1,2
+  - 0,1,2
+  - 3,4
+  - 0
   health: {x: 140, y: 200}
   stamina: {x: 80, y: 120}
   gallopSpeed: {x: 10, y: 12.5}
@@ -34,7 +46,11 @@ MonoBehaviour:
   perHeardMetre: 1.3
   wanderRadius: 14
   fleeSeconds: 7
-  whinny: {fileID: 0}
+  whinny: {fileID: 11400000, guid: 0dda84f9f376d364ea01afb97d26b742, type: 2}
+  neigh: {fileID: 11400000, guid: 44b0901d9eb17974fa47cd3259e7e712, type: 2}
+  snort: {fileID: 11400000, guid: 3dc78a64afec622409d3d9fbda77d3ec, type: 2}
+  breathing: {fileID: 11400000, guid: 4165c15bbe81992468191170332b9a1e, type: 2}
+  hooves: {fileID: 11400000, guid: 78e7a7a6cede57d4084a082dd1b1477d, type: 2}
   lasso: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
   lassoRange: 9
   struggleStamina: 100
@@ -47,6 +63,13 @@ MonoBehaviour:
   feedsNeeded: {x: 3, y: 5}
   feedInterval: {x: 10, y: 30}
   feedWindow: 6
+  home: 0
+  special: 0
+  alwaysArmoured: 0
   spawnChancePerHour: 0.06
   mostWild: 1
   spawnRing: {x: 70, y: 150}
+  homeAt: {x: 195, y: 345}
+  homeRadius: 95
+  activeHours: {x: 0, y: 0}
+  strikeDamage: 16

@@ -60,6 +60,10 @@ public enum PerkTechnique
     SilentTakedown = 25,
     /// <summary>Sneaking: sneaking is faster.</summary>
     Shadowstep = 26,
+    /// <summary>Horsemanship: a blow never throws you from the saddle, and a horse being broken in bucks you half as hard.</summary>
+    SureSeat = 27,
+    /// <summary>Horsemanship: at a gallop, your horse runs down a creature in its path and knocks it off its feet.</summary>
+    Trample = 28,
 }
 
 /// <summary>

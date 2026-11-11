@@ -126,5 +126,145 @@ public sealed class HorseTests
         Assert.AreEqual("Rough Hide", recipe.ItemCost[0].Item.DisplayName);
         var lasso = AssetDatabase.LoadAssetAtPath<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/Lasso.asset");
         Assert.AreEqual(kind.Lasso, lasso.Output);
+        foreach ((string file, int slots) in new[] { ("LeatherSaddle", 12), ("ReinforcedSaddle", 16) })
+        {
+            var bigger = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/{file}.asset");
+            Assert.AreEqual(slots, bigger.SaddleSlots, file);
+            Assert.IsNotNull(AssetDatabase.LoadAssetAtPath<RecipeDefinition>($"Assets/_Project/Data/Crafting/Recipes/{file}.asset"), file + " can be made");
+        }
+
+        foreach (string file in new[] { "PaintedBarding", "BlackenedBarding", "SilveredBarding" })
+        {
+            var barding = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/{file}.asset");
+            Assert.IsTrue(barding.IsBarding, file);
+            Assert.That(barding.HorseArmour, Is.InRange(0.15f, 0.4f), file);
+            Assert.IsNotNull(AssetDatabase.LoadAssetAtPath<RecipeDefinition>($"Assets/_Project/Data/Crafting/Recipes/{file}.asset"), file + " can be made");
+        }
+
+        Assert.IsTrue(kind.Barley.IsHorseTreat, "barley is what it eats from the hand");
+    }
+
+    [Test]
+    public void Temperaments_AreRolled_AndChangeTheTaming()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        var seen = new System.Collections.Generic.HashSet<HorseTemperament>();
+        var sexes = new System.Collections.Generic.HashSet<HorseSex>();
+        var random = new System.Random(5);
+        for (int i = 0; i < 200; i++)
+        {
+            HorseStats stats = HorseStats.Roll(Wild, random);
+            seen.Add(stats.temperament);
+            sexes.Add(stats.sex);
+            Assert.IsTrue(stats.IsGrown, "a horse met wild is grown");
+            Assert.That(stats.mane, Is.InRange(0, Wild.Manes.Length - 1), "it wears one of its kind's manes");
+        }
+
+        Assert.AreEqual(4, seen.Count, "calm, skittish, stubborn and bold all turn up");
+        Assert.AreEqual(2, sexes.Count, "mares and stallions");
+        Assert.Less(settings.Temperament(HorseTemperament.Calm).shyness, settings.Temperament(HorseTemperament.Skittish).shyness, "a calm horse lets you nearer");
+        Assert.Greater(settings.Temperament(HorseTemperament.Stubborn).fight, settings.Temperament(HorseTemperament.Calm).fight, "a stubborn one fights longer");
+        Assert.Greater(HorseTamingRules.TapsToHold(0.5f, Wild, settings.Temperament(HorseTemperament.Stubborn).pull),
+            HorseTamingRules.TapsToHold(0.5f, Wild, settings.Temperament(HorseTemperament.Calm).pull), "and pulls harder");
+        Assert.Less(HorseTamingRules.TapsToHold(0.5f, Wild, 1f, 1.4f), HorseTamingRules.TapsToHold(0.5f, Wild), "Horsemanship's hold makes each tap count for more");
+        var stubborn = new HorseStats { feedsNeeded = 4 };
+        Assert.AreEqual(5, HorseTamingRules.FeedsNeeded(stubborn, settings.Temperament(HorseTemperament.Stubborn).feeds));
+        Assert.AreEqual(3, HorseTamingRules.FeedsNeeded(stubborn, settings.Temperament(HorseTemperament.Calm).feeds));
+    }
+
+    [Test]
+    public void LeaningAway_HoldsTheRope_AndSteering_KeepsTheSeat()
+    {
+        Vector3 fromHorse = Vector3.back;
+        Assert.AreEqual(1f, HorseTamingRules.Lean(Vector3.back, fromHorse), 0.001f, "straight away from it counts in full");
+        Assert.AreEqual(0f, HorseTamingRules.Lean(Vector3.forward, fromHorse), "toward it, not at all");
+        Assert.AreEqual(0f, HorseTamingRules.Lean(Vector3.right, fromHorse), "nor across");
+        float strain = 0.5f, stamina = 100f;
+        HorseTamingRules.Struggle(ref strain, ref stamina, 0f, 1f, 0.5f, Wild);
+        float alone = strain;
+        strain = 0.5f;
+        HorseTamingRules.Struggle(ref strain, ref stamina, 3f, 1f, 0.5f, Wild);
+        Assert.Less(strain, alone, "a second of leaning (three taps' worth) takes strain off");
+
+        Vector3 veer = Vector3.right;
+        Assert.Greater(HorseTamingRules.Balance(0.5f, veer, Vector3.left, 1f, 0.3f, 0.35f, 1f), 0.5f, "steering against the veer wins balance back");
+        Assert.Less(HorseTamingRules.Balance(0.5f, veer, Vector3.zero, 1f, 0.3f, 0.35f, 1f), 0.5f, "letting it be loses it");
+        Assert.Less(HorseTamingRules.Balance(0.5f, veer, Vector3.zero, 1f, 0.3f, 0.35f, 1.3f),
+            HorseTamingRules.Balance(0.5f, veer, Vector3.zero, 1f, 0.3f, 0.35f, 0.7f), "a hard bucker throws you sooner");
+        Assert.AreEqual(0, HorseMotion.HitSide(Vector3.forward, new Vector3(-1f, 0f, 2f)), "struck at the front left");
+        Assert.AreEqual(3, HorseMotion.HitSide(Vector3.forward, Vector3.right), "on its right");
+        Assert.AreEqual(5, HorseMotion.HitSide(Vector3.forward, new Vector3(1f, 0f, -2f)), "at the back right");
+    }
+
+    [Test]
+    public void Bond_GrowsWithCare_WearsDownWithout_AndGivesWhatItSays()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        Assert.AreEqual(100f, HorseBondRules.Add(95f, 20f), "never more than full");
+        Assert.AreEqual(10f - 2f * settings.BondLostPerIdleDay, HorseBondRules.AfterIdle(10f, 2.6f, settings), 0.001f, "whole idle days wear it down");
+        Assert.Greater(HorseBondRules.StaminaScale(100f, settings), HorseBondRules.StaminaScale(0f, settings), "more stamina at full bond");
+        Assert.Less(HorseBondRules.PanicScale(100f, settings), HorseBondRules.PanicScale(0f, settings), "and less panic");
+        Assert.IsFalse(HorseBondRules.HearsWhistle(settings.WhistleBond - 1f, 5f, settings), "a horse that hardly knows you won't come");
+        Assert.IsTrue(HorseBondRules.HearsWhistle(100f, settings.WhistleReach.y - 1f, settings), "a fond one hears from far");
+        Assert.IsFalse(HorseBondRules.HearsWhistle(settings.WhistleBond, settings.WhistleReach.y - 1f, settings), "a new one only from near");
+        Assert.IsFalse(HorseBondRules.Throws(settings.ThrowsBelowBond, HorseTemperament.Skittish, settings, 0f), "a fond horse never throws you");
+        Assert.IsTrue(HorseBondRules.Throws(0f, HorseTemperament.Skittish, settings, 0.1f), "a new skittish one may");
+        Assert.Greater(settings.ExperienceFor(HorseWork.Tame), settings.ExperienceFor(HorseWork.Feed), "taming trains Horsemanship most");
+    }
+
+    [Test]
+    public void Foals_TakeAfterTheirParents_AndGrowUp()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        var random = new System.Random(11);
+        HorseStats mare = HorseStats.Roll(Wild, random);
+        mare.sex = HorseSex.Mare;
+        HorseStats stallion = HorseStats.Roll(Wild, random);
+        stallion.sex = HorseSex.Stallion;
+        Assert.IsTrue(HorseBreeding.CanBreed(mare, stallion));
+        Assert.IsFalse(HorseBreeding.CanBreed(mare, mare), "two mares don't");
+        HorseStats young = mare;
+        young.growth = 0.6f;
+        Assert.IsFalse(HorseBreeding.CanBreed(young, stallion), "nor a foal");
+        for (int i = 0; i < 50; i++)
+        {
+            HorseStats foal = HorseBreeding.Foal(mare, stallion, Wild, settings, random);
+            float average = (mare.gallopSpeed + stallion.gallopSpeed) * 0.5f;
+            Assert.That(foal.gallopSpeed, Is.InRange(average * (1f - settings.FoalSpread) - 0.1f, average * (1f + settings.FoalSpread) + 0.1f), "its parents' speed, give or take");
+            Assert.That(foal.coat, Is.EqualTo(mare.coat).Or.EqualTo(stallion.coat), "one parent's coat");
+            Assert.AreEqual(1, foal.generation);
+            Assert.IsFalse(foal.IsGrown, "born a foal");
+        }
+
+        Assert.AreEqual(settings.FoalSize, HorseBreeding.GrowthAfter(settings.FoalSize, 0f, settings), 0.001f);
+        Assert.AreEqual(1f, HorseBreeding.GrowthAfter(settings.FoalSize, settings.DaysToGrow, settings), 0.001f, "grown after Days To Grow");
+    }
+
+    [Test]
+    public void TheToxicHorse_LivesInTheBog_AndTheStable_IsBuilt()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        HorseDefinition toxic = System.Linq.Enumerable.FirstOrDefault(settings.SpecialHorses, k => k != null && k.Home == HorseHome.Bog);
+        Assert.IsNotNull(toxic, "a special horse of the bog");
+        Assert.IsTrue(toxic.IsSpecial && toxic.AlwaysArmoured);
+        Assert.IsNotNull(toxic.Prefab);
+        Assert.Greater(toxic.GallopSpeed.x, Wild.GallopSpeed.x, "faster than the common horse");
+        Assert.IsTrue(toxic.IsAbroadAt(22f) && !toxic.IsAbroadAt(12f), "out at night, not at noon");
+        Assert.Greater(toxic.HomeOffset.magnitude, 100f, "the bog lies well out from the Haven");
+        Assert.IsNotNull(toxic.Prefab.GetComponentInChildren<ParticleSystem>(true), "its breath is a fog");
+        var armour = new SerializedObject(toxic.Prefab).FindProperty("armourModel").objectReferenceValue as Renderer;
+        Assert.IsTrue(armour != null && armour.gameObject.activeSelf, "it wears its barding");
+        Assert.AreEqual(5, Wild.Manes.Length, "five manes for the common horse");
+        foreach (SoundDefinition sound in new[] { Wild.Whinny, Wild.Neigh, Wild.Snort, Wild.Breathing, Wild.Hooves, settings.Whistle })
+        {
+            Assert.IsNotNull(sound, "the pack's horse sounds");
+        }
+
+        var stable = AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/Stable.asset");
+        Assert.IsNotNull(stable);
+        HorseStable keep = stable.Prefab.GetComponent<HorseStable>();
+        Assert.IsNotNull(keep, "the stable keeps horses");
+        Assert.AreEqual(4, keep.Stalls);
+        Assert.IsNotNull(stable.Prefab.GetComponent<Interactable>(), "and has a menu");
     }
 }

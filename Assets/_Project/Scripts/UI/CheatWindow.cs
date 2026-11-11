@@ -275,6 +275,9 @@ public sealed class CheatWindow : MonoBehaviour
         y += RowStep;
         Action(page, "A wild horse nearby", Margin, y, wide, Cheats.WildHorse);
         Action(page, "Lasso, barley and a saddle", right, y, wide, Cheats.HorseKit);
+        y += RowStep;
+        Action(page, "The bog's toxic horse nearby", Margin, y, wide, Cheats.ToxicHorse);
+        Action(page, "Your horses: full bond", right, y, wide, Cheats.BondHorses);
         y += RowStep + 8f;
 
         Title("99 of every material, to the stash", page, y, style);

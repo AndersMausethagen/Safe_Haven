@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4697c359aaa5cdb4488f83b78b07b731, type: 3}
+  m_Name: LightSeat
+  m_EditorClassIdentifier: SafeHaven::PerkDefinition
+  id: ride_light_seat
+  displayName: Light Seat
+  description: Rise with the stride and the horse runs further.
+  icon: {fileID: 21300000, guid: 5cfc6e6e9d771e949a5c1c3f23e37ec5, type: 3}
+  technique: 0
+  bonuses:
+  - stat: 53
+    op: 0
+    value: -0.12

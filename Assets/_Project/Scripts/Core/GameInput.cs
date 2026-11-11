@@ -48,6 +48,8 @@ public static class GameInput
     public static InputAction QuickItems => Find("Player/QuickItems");
     /// <summary>Co-op: mark what is under the crosshair for friends (CoopPings).</summary>
     public static InputAction Ping => Find("Player/Ping");
+    /// <summary>Whistle for a horse of yours (HorseWhistle).</summary>
+    public static InputAction Whistle => Find("Player/Whistle");
 
     /// <summary>The action that casts skill bar slot <paramref name="slot"/> (0-based).</summary>
     public static InputAction Skill(int slot) => Find(SkillPaths[slot]);

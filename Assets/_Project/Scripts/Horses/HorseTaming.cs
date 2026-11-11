@@ -4,13 +4,18 @@ using UnityEngine;
 /// Taming a wild horse, after the lasso has caught it (HorseLasso):
 /// <list type="number">
 /// <item>The struggle. It whinnies and pulls this way and that on the rope; the player, feet planted, taps E or left click
-/// to hold it. Strain on the rope builds while it pulls and every tap takes some off and tires it (HorseTamingRules); at
-/// full strain the rope slips and it is gone, worn out it stands, head low, for a few seconds to be mounted (E).</item>
-/// <item>The breaking ride. With the player on its back it asks for barley every 10-30 seconds (E feeds it from the bag);
-/// left unfed past its patience, or got off of, it throws the rider and bolts. Fed as often as it needs (3-5 times, its
-/// own number), it is tamed: a saved copy of the horse takes its place under the rider, and it is given a name.</item>
+/// and leans away from it with the movement keys (which spends their stamina) to hold it. Strain on the rope builds while
+/// it pulls and every tap and every moment of leaning takes some off and tires it (HorseTamingRules); at full strain the
+/// rope slips and it is gone, worn out it stands, head low, for a few seconds to be mounted (E).</item>
+/// <item>The breaking ride. With the player on its back it veers off and bucks every few seconds, and the player steers
+/// against it to keep their balance (lost, they are thrown); and it asks for barley every 10-30 seconds (E feeds it from
+/// the bag); left unfed past its patience, or got off of, it throws the rider and bolts. Fed as often as it needs (3-5
+/// times, its own number, more or fewer by its temperament), it is tamed: a saved copy of the horse takes its place under
+/// the rider, and it is given a name.</item>
 /// </list>
-/// The HUD (HorseHud) shows the rope's strain and the horse's strength, and the feeding.
+/// Its temperament (HorseSettings › Temperament) sets how hard it pulls, how much fight it has and how hard it bucks;
+/// Horsemanship's Hold on the Rope makes each tap and lean count for more. The HUD (HorseHud) shows the rope's strain and
+/// the horse's strength, the rider's balance and the feeding.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Horse))]
@@ -34,6 +39,10 @@ public sealed class HorseTaming : MonoBehaviour
     private bool asking;
     private System.Random random;
     private LineRenderer rope;
+    private float balance = 1f;
+    private Vector3 veer;
+    private float veerUntil;
+    private float nextVeer;
 
     /// <summary>The horse the local player is taming, for the HUD; null when none.</summary>
     public static HorseTaming Active { get; private set; }
@@ -47,10 +56,17 @@ public sealed class HorseTaming : MonoBehaviour
     public bool IsBreaking => phase == Phase.Breaking;
     public float Strain => strain;
     /// <summary>What strength it has left to fight with, 0-1.</summary>
-    public float Strength => horse.Definition.StruggleStamina > 0f ? struggle / horse.Definition.StruggleStamina : 0f;
+    public float Strength => FullStruggle > 0f ? struggle / FullStruggle : 0f;
+    private float FullStruggle => horse.Definition.StruggleStamina * horse.Temperament.fight;
+    /// <summary>How hard the player leans on the rope now, 0-1 (for the HUD).</summary>
+    public float Lean { get; private set; }
+    /// <summary>The rider's balance on the breaking ride, 0-1: at 0 they are thrown.</summary>
+    public float Balance => balance;
+    /// <summary>Where it is veering off to now (its length is how hard), zero between veers; HorseMotion adds it to the rider's steering.</summary>
+    public Vector3 Veer => phase == Phase.Breaking && Time.time < veerUntil ? veer : Vector3.zero;
     public float MountLeft => Mathf.Max(0f, mountUntil - Time.time);
     public int Fed => fed;
-    public int Needed => Mathf.Max(1, horse.Stats.feedsNeeded);
+    public int Needed => HorseTamingRules.FeedsNeeded(horse.Stats, horse.Temperament.feeds);
     public bool IsAsking => asking;
     /// <summary>How much of its patience is left while it asks for barley, 0-1.</summary>
     public float PatienceLeft => asking ? Mathf.Clamp01((askUntil - Time.time) / horse.Definition.FeedWindow) : 0f;
@@ -75,7 +91,7 @@ public sealed class HorseTaming : MonoBehaviour
         handler = player;
         phase = Phase.Struggle;
         strain = 0.25f;
-        struggle = horse.Definition.StruggleStamina;
+        struggle = FullStruggle;
         horse.SetTamingState(Horse.Mode.Lassoed);
         horse.Motion.Hold(true);
         PlayerRiding.For(player.gameObject).HoldRope(this);
@@ -84,7 +100,7 @@ public sealed class HorseTaming : MonoBehaviour
         ShowRope(true);
         NextLunge();
         Whinny();
-        GameMessages.Post($"It fights the rope! Tap {GameInput.KeyLabel(GameInput.Interact)} or left click to hold it.", MessageKind.Info);
+        GameMessages.Post($"It fights the rope! Tap {GameInput.KeyLabel(GameInput.Interact)} or left click, and lean away from it with the movement keys.", MessageKind.Info);
     }
 
     private void Update()
@@ -110,7 +126,7 @@ public sealed class HorseTaming : MonoBehaviour
                 if (Time.time > mountUntil)
                 {
                     phase = Phase.Struggle;
-                    struggle = horse.Definition.StruggleStamina * 0.4f;
+                    struggle = FullStruggle * 0.4f;
                     strain = Mathf.Max(strain, 0.3f);
                     NextLunge();
                     Whinny();
@@ -128,15 +144,30 @@ public sealed class HorseTaming : MonoBehaviour
 
     private void UpdateStruggle()
     {
-        int taps = 0;
+        float taps = 0f;
+        Lean = 0f;
         if (!GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen))
         {
             if (GameInput.Interact != null && GameInput.Interact.WasPressedThisFrame()) taps++;
             if (GameInput.Attack != null && GameInput.Attack.WasPressedThisFrame()) taps++;
+            // Leaning away from it holds as a few taps a second would, while the player has the stamina for it.
+            PlayerMovement feet = handler.GetComponent<PlayerMovement>();
+            PlayerStamina breath = handler.Stamina;
+            if (feet != null && breath != null && breath.Current > 0.5f)
+            {
+                HorseSettings settings = HorseSettings.Current;
+                Lean = HorseTamingRules.Lean(feet.MovementInput, handler.transform.position - transform.position);
+                if (Lean > 0f)
+                {
+                    taps += Lean * settings.LeanTapsPerSecond * Time.deltaTime;
+                    breath.Drain(Lean * settings.LeanStaminaPerSecond * Time.deltaTime);
+                }
+            }
         }
 
         float quality = horse.Stats.Quality(horse.Definition);
-        HorseTamingRules.Struggle(ref strain, ref struggle, taps, Time.deltaTime, quality, horse.Definition);
+        HorseTamingRules.Struggle(ref strain, ref struggle, taps, Time.deltaTime, quality, horse.Definition, horse.Temperament.pull,
+            1f + PlayerHorsemanship.TamingHold());
         if (HorseTamingRules.Slipped(strain))
         {
             Escape("It tears the rope from your hands and is gone.");
@@ -183,6 +214,12 @@ public sealed class HorseTaming : MonoBehaviour
 
     private void UpdateBreaking()
     {
+        UpdateBalance();
+        if (phase != Phase.Breaking)
+        {
+            return;
+        }
+
         if (!asking && Time.time >= nextAsk)
         {
             asking = true;
@@ -222,9 +259,49 @@ public sealed class HorseTaming : MonoBehaviour
         }
     }
 
+    // Every few seconds it veers off to one side, or bucks and veers; the rider steers against it to keep their seat.
+    private void UpdateBalance()
+    {
+        HorseSettings settings = HorseSettings.Current;
+        float bucking = horse.Temperament.bucking;
+        if (Time.time >= nextVeer)
+        {
+            Vector2 seconds = settings.BuckSeconds;
+            nextVeer = Time.time + Mathf.Lerp(seconds.x, seconds.y, (float)random.NextDouble()) / Mathf.Max(0.3f, bucking);
+            veerUntil = Time.time + Mathf.Lerp(1f, 1.7f, (float)random.NextDouble());
+            Vector3 side = transform.right * (random.NextDouble() < 0.5 ? -1f : 1f);
+            veer = (side * 0.85f + transform.forward * 0.25f) * Mathf.Clamp(bucking, 0.4f, 1.2f);
+            if (random.NextDouble() < 0.4)
+            {
+                horse.Motion.PlayBuck();
+                bool sure = Techniques.Has(PerkTechnique.SureSeat);
+                if (sure)
+                {
+                    Techniques.Used(PerkTechnique.SureSeat);
+                }
+
+                balance = Mathf.Max(0f, balance - settings.BuckBalance * 0.5f * bucking * (sure ? 0.5f : 1f));
+                Whinny();
+            }
+        }
+
+        PlayerMovement feet = handler.GetComponent<PlayerMovement>();
+        bool free = UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen;
+        Vector3 input = feet != null && free ? feet.MovementInput : Vector3.zero;
+        float loss = settings.BuckBalance * (Techniques.Has(PerkTechnique.SureSeat) ? 0.5f : 1f);
+        balance = HorseTamingRules.Balance(balance, Veer, input, Time.deltaTime, loss, settings.SteadyPerSecond, bucking);
+        if (balance <= 0f)
+        {
+            Escape("It bucks you clean off and bolts.");
+        }
+    }
+
     private void Mount()
     {
         ShowRope(false);
+        balance = 1f;
+        veer = Vector3.zero;
+        nextVeer = Time.time + 2f;
         phase = Phase.Breaking;
         horse.SetTamingState(Horse.Mode.Breaking);
         fed = 0;
@@ -236,7 +313,7 @@ public sealed class HorseTaming : MonoBehaviour
         ItemInventory items = handler.GetComponent<ItemInventory>();
         ItemDefinition barley = horse.Definition.Barley;
         int carried = items != null && barley != null ? items.CountCarried(barley) : 0;
-        GameMessages.Post($"Stay on! It will want {(barley != null ? barley.DisplayName.ToLowerInvariant() : "food")} now and then" +
+        GameMessages.Post($"Stay on! Steer against it when it veers. It will want {(barley != null ? barley.DisplayName.ToLowerInvariant() : "food")} now and then" +
                           (carried < Needed ? $", and you carry {carried}." : "."), carried < Needed ? MessageKind.Warning : MessageKind.Info);
     }
 
@@ -257,7 +334,7 @@ public sealed class HorseTaming : MonoBehaviour
 
         fed++;
         asking = false;
-        if (HorseTamingRules.IsBroken(fed, horse.Stats))
+        if (HorseTamingRules.IsBroken(fed, horse.Stats, horse.Temperament.feeds))
         {
             Tame();
             return;
@@ -314,7 +391,9 @@ public sealed class HorseTaming : MonoBehaviour
         }
 
         Destroy(gameObject);
-        GameMessages.Post("It stands quiet under you. It is yours: give it a name.", MessageKind.Gain);
+        tamed.Motion.PlayRear();
+        PlayerHorsemanship.Practise(HorseWork.Tame);
+        GameMessages.Post($"It stands quiet under you. It is yours, a {HorseTemperamentRules.NameOf(tamed.Stats.temperament)} {tamed.Stats.SexName}: give it a name.", MessageKind.Gain);
         HorseNameWindow.Ask(tamed);
     }
 

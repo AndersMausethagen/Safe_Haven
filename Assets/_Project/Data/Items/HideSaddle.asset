@@ -60,4 +60,7 @@ MonoBehaviour:
   lantern: {fileID: 0}
   lasso: 0
   saddleSlots: 8
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
   raidModifier: {fileID: 0}

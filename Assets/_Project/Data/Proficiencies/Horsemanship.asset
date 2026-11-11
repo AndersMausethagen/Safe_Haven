@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d75b22f30f824f747ae6ca96317ac240, type: 3}
+  m_Name: Horsemanship
+  m_EditorClassIdentifier: SafeHaven::ProficiencyDefinition
+  id: horsemanship
+  displayName: Horsemanship
+  description: 'Horses: a rope held against a wild one, a seat kept on a bucking back, a whistle it answers, and blows struck from the saddle.'
+  trainedBy: horses tamed, fed, groomed and ridden, foals born, and blows struck from the saddle
+  icon: {fileID: 21300000, guid: a671479db8ba1034789e3cc5b0631e25, type: 3}
+  group: 4
+  training: 8
+  crafts: 0
+  gatherTool: 0
+  gathersByHand: 0
+  mentor: {fileID: 11400000, guid: 08a3177177c32de4fa1bcd278a16ee86, type: 2}
+  levelBonuses:
+  - stat: 52
+    atFirstLevel: -0.14999999
+    atLastLevel: 0.39999998
+  - stat: 53
+    atFirstLevel: 0.14999999
+    atLastLevel: -0.29999998
+  - stat: 54
+    atFirstLevel: -0.099999994
+    atLastLevel: 0.39999998
+  - stat: 55
+    atFirstLevel: -0.099999994
+    atLastLevel: 0.19999999
+  milestones:
+  - level: 10
+    first: {fileID: 11400000, guid: d3eb4cffd1795794b9a342bece865be3, type: 2}
+    second: {fileID: 11400000, guid: d5fe56aa6ac10fb40b170e30d05cf0ae, type: 2}
+  - level: 20
+    first: {fileID: 11400000, guid: 04af416002ef2e1459a770b4324406fb, type: 2}
+    second: {fileID: 11400000, guid: 7e6555b38b6f28d4bb05da90609a5243, type: 2}
+  - level: 30
+    first: {fileID: 11400000, guid: a142dcd59d8e21743b6ea584df303c42, type: 2}
+    second: {fileID: 11400000, guid: b31aee01b53c9a34cb827c7c823a6cd0, type: 2}
+  - level: 40
+    first: {fileID: 11400000, guid: 6aa6c130bb952704283c22d15e15d0a7, type: 2}
+    second: {fileID: 11400000, guid: 32f25badedf2fe648a8ac4929c72536d, type: 2}
+  - level: 50
+    first: {fileID: 11400000, guid: bfb8d51b511a209468576f52593bb0d7, type: 2}
+    second: {fileID: 11400000, guid: 60a2e56e1a8b36c4b99d173c248532c0, type: 2}

@@ -220,6 +220,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
   - {fileID: 11400000, guid: c6a7729fd9f90ed4b8dacc42b9900c04, type: 2}
   - {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
+  - {fileID: 11400000, guid: 3f950e6fa86a6c14d8e1581ceac6b8d6, type: 2}
+  - {fileID: 11400000, guid: f3923c2cb5574404884e97a3d01173f6, type: 2}
+  - {fileID: 11400000, guid: 511a30132e62d4841b52c35b90981e16, type: 2}
+  - {fileID: 11400000, guid: fb83138bc06ecda40a96a6168f0d6a05, type: 2}
+  - {fileID: 11400000, guid: ada0c42a71e7bfc4d88c5c729fdfd49b, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -299,6 +304,7 @@ MonoBehaviour:
   - {fileID: 8240163907587623572, guid: 03169009b2a502142b5738f9649f15be, type: 3}
   - {fileID: 1411413029359702487, guid: 16de969be02def24faf332b37dfa353e, type: 3}
   - {fileID: 3982002636359741346, guid: 4b3d14bbe504c444fa9e9a12da035871, type: 3}
+  - {fileID: 376105309229740385, guid: d1ce19c252b6abf46ab4009c8b46075c, type: 3}
   - {fileID: 5995521089143354328, guid: ffc81db44bfa3ea4cabad56e209a5c89, type: 3}
   - {fileID: 8240163907587623572, guid: 9d024b95ef7f523459132197e6bb60ca, type: 3}
   - {fileID: 5158497520559363507, guid: 8657147f0778d1a44aa4437fbadd3a63, type: 3}
@@ -310,6 +316,7 @@ MonoBehaviour:
   - {fileID: 7050874655337320512, guid: 2726ae87dafb9d44284cbce448a87eea, type: 3}
   - {fileID: 4981802393601269089, guid: 90dc7b563332e1149a4ba290241efa49, type: 3}
   - {fileID: 8358629271383303412, guid: d7b2b0e38359eb344ad18712fb6f33db, type: 3}
+  - {fileID: 7151286237535332337, guid: 723b6c9c97b51af40bab476852d65df4, type: 3}
   - {fileID: 5328339517679984002, guid: 641fe335760a6644f847cf14288887f7, type: 3}
   quests:
   - {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}

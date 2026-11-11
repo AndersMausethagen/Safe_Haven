@@ -17,6 +17,12 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>At the oars (PlayerTransport): like swimming, no fighting; interacting means getting out.</summary>
     public bool IsAboard { get; private set; }
     private bool HandsTaken => IsSwimming || IsAboard;
+    // In the saddle of a horse of their own the player may still swing a weapon and draw a bow (PlayerRiding); at the oars,
+    // the cart's handles or a horse being broken in, not.
+    private bool ArmsTaken => IsSwimming || IsAboard && !CanFightAboard;
+
+    /// <summary>Set by PlayerRiding while the player rides a horse of their own: attacks and the bow's aim are let through.</summary>
+    public bool CanFightAboard { get; set; }
 
     /// <summary>Raised when Interact is pressed at the oars.</summary>
     public event Action AboardInteraction;
@@ -92,7 +98,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Attacks can't start while the player is busy with an interaction; the press goes to WorkPressed instead.</summary>
     public void RequestAttack()
     {
-        if (HandsTaken)
+        if (ArmsTaken)
         {
             return;
         }
@@ -115,7 +121,7 @@ public sealed class PlayerStateMachine : MonoBehaviour
     /// <summary>Raising the guard is refused while busy with an interaction; lowering it always goes through.</summary>
     public void RequestGuard(bool raised)
     {
-        if (!raised || CurrentState != PlayerState.Interacting && !HandsTaken)
+        if (!raised || CurrentState != PlayerState.Interacting && !ArmsTaken)
         {
             GuardRequested?.Invoke(raised);
         }

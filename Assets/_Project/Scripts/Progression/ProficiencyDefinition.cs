@@ -9,6 +9,7 @@ public enum ProficiencyGroup
     Crafting = 1,
     Combat = 2,
     Stealth = 3,
+    Riding = 4,
 }
 
 /// <summary>What the player does to train a skill. ExperienceTracker hands each kind of practice to the skill trained by it.</summary>
@@ -25,6 +26,8 @@ public enum ProficiencyTraining
     Fishing = 5,
     Construction = 6,
     Crafting = 7,
+    /// <summary>Horses tamed, fed, groomed and ridden, and blows struck from the saddle.</summary>
+    Horsemanship = 8,
 }
 
 /// <summary>

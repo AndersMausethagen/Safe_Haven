@@ -298,6 +298,10 @@ public static class StatNames
             case StatType.SpellDamage: return "Spell Damage";
             case StatType.SpellStaminaCost: return "Spell Stamina Cost";
             case StatType.ExperienceGain: return "Experience Gain";
+            case StatType.TamingHold: return "Hold on the Rope";
+            case StatType.GallopStaminaCost: return "Gallop Stamina Cost";
+            case StatType.HorseBond: return "Bond Gained";
+            case StatType.MountedDamage: return "Mounted Damage";
             default: return stat.ToString();
         }
     }
@@ -305,7 +309,7 @@ public static class StatNames
     /// <summary>Stats where more is worse for whoever has them (a cost, noise, being seen): a positive value is a penalty.</summary>
     public static bool LowerIsBetter(StatType stat) =>
         stat == StatType.MeleeStaminaCost || stat == StatType.BlockStaminaCost || stat == StatType.SneakNoise || stat == StatType.SneakVisibility
-        || stat == StatType.SpellStaminaCost;
+        || stat == StatType.SpellStaminaCost || stat == StatType.GallopStaminaCost;
 
     /// <summary>Whether this bonus makes its owner worse off (a beginner's penalty).</summary>
     public static bool IsPenalty(StatType stat, float value) => LowerIsBetter(stat) ? value > 0f : value < 0f;

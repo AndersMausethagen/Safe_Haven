@@ -13,3 +13,78 @@ MonoBehaviour:
   m_Name: HorseSettings
   m_EditorClassIdentifier: SafeHaven::HorseSettings
   wildHorse: {fileID: 11400000, guid: cee20077792319a4c829118da70cbd9f, type: 2}
+  specialHorses:
+  - {fileID: 11400000, guid: befa1949d6878e34ab59df39bad4a936, type: 2}
+  temperaments:
+  - temperament: 0
+    weight: 3
+    shyness: 0.75
+    pull: 0.8
+    fight: 0.8
+    feeds: -1
+    bucking: 0.65
+    panic: 0.7
+    description: Lets you near, gives in sooner and runs less far.
+  - temperament: 1
+    weight: 2
+    shyness: 1.4
+    pull: 0.9
+    fight: 0.85
+    feeds: 0
+    bucking: 1.25
+    panic: 1.5
+    description: Bolts at a sound, bucks hard and runs far; but tires soon on the rope.
+  - temperament: 2
+    weight: 2
+    shyness: 1
+    pull: 1.25
+    fight: 1.35
+    feeds: 1
+    bucking: 1
+    panic: 0.9
+    description: Pulls hard, fights long and takes more feeding to break.
+  - temperament: 3
+    weight: 1.5
+    shyness: 0.8
+    pull: 1.1
+    fight: 1.1
+    feeds: 0
+    bucking: 0.9
+    panic: 0.45
+    description: 'Stands its ground: hurt, it strikes back instead of running.'
+  firstHorseByDay: 3
+  firstHorseRing: {x: 45, y: 70}
+  firstHorseTeller: Sigrid
+  firstHorseLine: There's a horse grazing out past the yard. A quiet one. Take a lasso and some barley, and keep low.
+  whistle: {fileID: 11400000, guid: b8bda9bf83b3b9640a00ac9c8dd85eb2, type: 2}
+  whistleReach: {x: 45, y: 160}
+  whistleBond: 15
+  bondPerFeed: 4
+  bondPerGroom: 8
+  bondPerKilometre: 6
+  bondLostPerIdleDay: 2
+  bondWhenTamed: 10
+  staminaAtFullBond: 0.2
+  calmerAtFullBond: 0.7
+  throwsBelowBond: 20
+  experiencePerTame: 40
+  experiencePerFeed: 2
+  experiencePerGroom: 5
+  experiencePerKilometre: 12
+  experiencePerMountedHit: 1.5
+  experiencePerFoal: 30
+  leanTapsPerSecond: 3
+  leanStaminaPerSecond: 9
+  buckSeconds: {x: 2.5, y: 5}
+  buckBalance: 0.28
+  steadyPerSecond: 0.35
+  stableHealPerHour: 0.08
+  swimSpeed: 2.6
+  swimCost: 3
+  swimDepth: 1.25
+  breedingBond: 50
+  daysToFoal: 2
+  daysBetweenFoals: 5
+  daysToGrow: 3
+  foalSize: 0.55
+  foalSpread: 0.08

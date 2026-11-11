@@ -1,5 +1,12 @@
 using UnityEngine;
 
+/// <summary>Where a kind of horse is met.</summary>
+public enum HorseHome
+{
+    HavenRing = 0,
+    Bog = 1,
+}
+
 /// <summary>
 /// A kind of horse: its body, the ranges its stats are rolled from (so one wild horse is worth more taming than another),
 /// how it behaves wild, and the taming: the lasso, the struggle against the rope and the breaking ride fed with barley.
@@ -14,6 +21,10 @@ public sealed class HorseDefinition : ScriptableObject
     [SerializeField] private Horse prefab;
     [Tooltip("Coats a horse can have (each tints the body's Main materials). Empty: the model's own.")]
     [SerializeField] private Color[] coats = System.Array.Empty<Color>();
+    [Tooltip("Manes and tails a horse can have (materials for the Hair parts). Empty: the model's own.")]
+    [SerializeField] private Material[] manes = System.Array.Empty<Material>();
+    [Tooltip("For each coat, the manes it goes with (indices into Manes, comma-separated, e.g. \"0,2\"). Empty: any mane.")]
+    [SerializeField] private string[] coatManes = System.Array.Empty<string>();
 
     [Header("Stats (each horse rolls its own)")]
     [SerializeField] private Vector2 health = new Vector2(140f, 200f);
@@ -41,6 +52,14 @@ public sealed class HorseDefinition : ScriptableObject
     [Tooltip("Seconds it runs from what frightened or hurt it.")]
     [SerializeField, Min(1f)] private float fleeSeconds = 7f;
     [SerializeField] private SoundDefinition whinny;
+    [Tooltip("A long neigh: answering a whistle, rearing on the rope, being tamed.")]
+    [SerializeField] private SoundDefinition neigh;
+    [Tooltip("A snort and a shake of the head, while it stands.")]
+    [SerializeField] private SoundDefinition snort;
+    [Tooltip("Hard breathing after a gallop.")]
+    [SerializeField] private SoundDefinition breathing;
+    [Tooltip("A hoofbeat, every beat of its gait.")]
+    [SerializeField] private SoundDefinition hooves;
 
     [Header("Lasso and struggle")]
     [SerializeField] private ItemDefinition lasso;
@@ -67,11 +86,24 @@ public sealed class HorseDefinition : ScriptableObject
     [SerializeField, Min(1f)] private float feedWindow = 6f;
 
     [Header("In the world")]
+    [Tooltip("Where it is met: the ring of land round the Haven, or the bog.")]
+    [SerializeField] private HorseHome home = HorseHome.HavenRing;
+    [Tooltip("A special horse: rare, never the first one promised; its foals are of its kind when the mare is.")]
+    [SerializeField] private bool special;
+    [Tooltip("It wears its own barding from birth (the bog's toxic horse); barding put on it only changes the look and the protection.")]
+    [SerializeField] private bool alwaysArmoured;
     [Tooltip("Chance an in-game hour brings a wild horse to the land round the Haven (while there is none).")]
     [SerializeField, Range(0f, 1f)] private float spawnChancePerHour = 0.06f;
     [SerializeField, Min(0)] private int mostWild = 1;
-    [Tooltip("Metres from the Haven's heart a wild horse grazes, nearest and farthest.")]
+    [Tooltip("Metres from the Haven's heart a wild horse grazes, nearest and farthest (Home: Haven Ring).")]
     [SerializeField] private Vector2 spawnRing = new Vector2(70f, 150f);
+    [Tooltip("Home: Bog. Where the bog lies from the Haven's heart (degrees from north, metres) and how wide it is; BuildHorses copies it from the world's recipe.")]
+    [SerializeField] private Vector2 homeAt = new Vector2(195f, 345f);
+    [SerializeField, Min(1f)] private float homeRadius = 95f;
+    [Tooltip("Hours of the day it is met (from, to; e.g. 20 to 5 for the night). Both 0: any hour.")]
+    [SerializeField] private Vector2 activeHours = Vector2.zero;
+    [Tooltip("Kick damage of its forelegs (a bold horse turns on what hurt it).")]
+    [SerializeField, Min(0f)] private float strikeDamage = 16f;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
@@ -91,6 +123,35 @@ public sealed class HorseDefinition : ScriptableObject
     public float WanderRadius => wanderRadius;
     public float FleeSeconds => fleeSeconds;
     public SoundDefinition Whinny => whinny;
+    public SoundDefinition Neigh => neigh != null ? neigh : whinny;
+    public SoundDefinition Snort => snort;
+    public SoundDefinition Breathing => breathing;
+    public SoundDefinition Hooves => hooves;
+    public Material[] Manes => manes;
+    public HorseHome Home => home;
+    public bool IsSpecial => special;
+    public bool AlwaysArmoured => alwaysArmoured;
+
+    /// <summary>A mane for this coat: one of those listed for it, any when none are.</summary>
+    public int ManeFor(int coat, System.Random random)
+    {
+        if (manes.Length == 0)
+        {
+            return -1;
+        }
+
+        string listed = coat >= 0 && coat < coatManes.Length ? coatManes[coat] : "";
+        var choices = new System.Collections.Generic.List<int>();
+        foreach (string part in listed.Split(','))
+        {
+            if (int.TryParse(part.Trim(), out int index) && index >= 0 && index < manes.Length)
+            {
+                choices.Add(index);
+            }
+        }
+
+        return choices.Count > 0 ? choices[random.Next(choices.Count)] : random.Next(manes.Length);
+    }
     public ItemDefinition Lasso => lasso;
     public float LassoRange => lassoRange;
     public float StruggleStamina => struggleStamina;
@@ -106,4 +167,20 @@ public sealed class HorseDefinition : ScriptableObject
     public float SpawnChancePerHour => spawnChancePerHour;
     public int MostWild => mostWild;
     public Vector2 SpawnRing => spawnRing;
+    public float StrikeDamage => strikeDamage;
+    public float HomeRadius => homeRadius;
+
+    /// <summary>Where its home lies from the Haven's heart, on the ground (x, z).</summary>
+    public Vector3 HomeOffset => new Vector3(Mathf.Sin(homeAt.x * Mathf.Deg2Rad), 0f, Mathf.Cos(homeAt.x * Mathf.Deg2Rad)) * homeAt.y;
+
+    /// <summary>Whether it may be met at this hour of the day.</summary>
+    public bool IsAbroadAt(float hour)
+    {
+        if (Mathf.Approximately(activeHours.x, activeHours.y))
+        {
+            return true;
+        }
+
+        return activeHours.x < activeHours.y ? hour >= activeHours.x && hour < activeHours.y : hour >= activeHours.x || hour < activeHours.y;
+    }
 }

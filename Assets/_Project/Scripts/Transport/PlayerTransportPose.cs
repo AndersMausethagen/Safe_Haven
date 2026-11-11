@@ -17,7 +17,8 @@ public sealed class PlayerTransportPose : MonoBehaviour
     private const float RowReach = 24f;
     private const float SeatThigh = -82f;
     private const float SeatShin = 78f;
-    // Astride a horse (PlayerRiding): thighs forward and apart round its back, shins down its sides, hands on the reins.
+    // Astride a horse (PlayerRiding) when the Animator has no Riding layer: thighs forward and apart round its back, shins
+    // down its sides, hands on the reins.
     private const float RideThigh = -48f;
     private const float RideSpread = 24f;
     private const float RideShin = 58f;
@@ -35,6 +36,7 @@ public sealed class PlayerTransportPose : MonoBehaviour
     private float armAngle;
     private float rideWeight;
     private PlayerRiding riding;
+    private PlayerRidingAnimation ridingBody;
 
     private void Awake()
     {
@@ -62,9 +64,11 @@ public sealed class PlayerTransportPose : MonoBehaviour
         if (riding == null)
         {
             TryGetComponent(out riding);
+            TryGetComponent(out ridingBody);
         }
 
-        bool astride = riding != null && riding.IsRiding;
+        // The pack's rider clips (PlayerRidingAnimation) sit the body on a horse; the bend is for an Animator without them.
+        bool astride = riding != null && riding.IsRiding && (ridingBody == null || !ridingBody.HasLayer);
         rideWeight = Mathf.MoveTowards(rideWeight, astride ? 1f : 0f, BlendSpeed * Time.deltaTime);
         armWeight = Mathf.MoveTowards(armWeight, used != null ? 1f : 0f, BlendSpeed * Time.deltaTime);
         legWeight = Mathf.MoveTowards(legWeight, boat != null ? 1f : 0f, BlendSpeed * Time.deltaTime);

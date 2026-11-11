@@ -58,4 +58,9 @@ MonoBehaviour:
   transport: {fileID: 0}
   sapling: {fileID: 0}
   lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 3
   raidModifier: {fileID: 0}

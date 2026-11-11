@@ -266,6 +266,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Whistle",
+                    "type": "Button",
+                    "id": "b2c4915f-6b5b-40a0-a295-d2e75ce64c6f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -926,6 +935,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Ping",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ca9b3b4d-f913-4cd4-adaa-50525e2b6774",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Whistle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

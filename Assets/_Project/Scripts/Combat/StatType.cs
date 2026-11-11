@@ -105,4 +105,12 @@ public enum StatType
     SpellStaminaCost = 50,
     /// <summary>Share more experience from all practice. 0.2 means 20% more: being rested, a warm sauna.</summary>
     ExperienceGain = 51,
+    /// <summary>Share more hold on a lassoed horse: each tap and each moment of leaning against its pull counts for more.</summary>
+    TamingHold = 52,
+    /// <summary>Share more stamina a gallop costs the horse the player rides. Negative is cheaper.</summary>
+    GallopStaminaCost = 53,
+    /// <summary>Share more bond from feeding, grooming and riding a horse.</summary>
+    HorseBond = 54,
+    /// <summary>Share more damage dealt from the saddle.</summary>
+    MountedDamage = 55,
 }

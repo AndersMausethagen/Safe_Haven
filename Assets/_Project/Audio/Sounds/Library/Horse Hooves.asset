@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Horse Hooves
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Horse Hooves
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 47e7b6f7e3e27e942b73e1d3efa55647, type: 3}
+  - {fileID: 8300000, guid: fd6e32d600847d3448093a32714562eb, type: 3}
+  - {fileID: 8300000, guid: 754d506e013701644ad768a4c1c56209, type: 3}
+  - {fileID: 8300000, guid: 9e1ca9c6ecd54a74cbbcbb87a68b1716, type: 3}
+  - {fileID: 8300000, guid: 2d5d45f6f851e8f4cbcce33a1ee9f8fb, type: 3}
+  channel: 2
+  volume: 0.32
+  volumeVariation: 0.1
+  pitchRange: {x: 0.93, y: 1.07}
+  positional: 1
+  fullVolumeDistance: 4
+  audibleDistance: 30
+  maxAtOnce: 6
+  minimumGap: 0.03
+  priority: 0
+  takesTheMix: 0

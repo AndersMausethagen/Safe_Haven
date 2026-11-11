@@ -206,5 +206,10 @@
   "whistling_arrow": "An arrow with a hollow carved bone head with holes in it, diagonal",
   "pact_rune": "A flat palm-sized grey stone carved with a deep Norse rune of the old pact, the rune glowing warm gold from inside, a thin leather thong through a hole at its top",
   "lasso": "A coiled lasso of twisted green-brown nettle cord, a sliding noose loop at one end, bound with a strip of rough brown hide",
-  "hide_saddle": "A simple saddle of stitched rough brown hides over a wooden frame, with a leather saddle bag hanging on either side, buckled straps"
+  "hide_saddle": "A simple saddle of stitched rough brown hides over a wooden frame, with a leather saddle bag hanging on either side, buckled straps",
+  "leather_saddle": "A sturdy saddle of dark cured leather over a bent wooden frame, deep leather saddle bags either side with brass buckles",
+  "reinforced_saddle": "A heavy saddle of thick hide over dark leather with iron buckles and studs, big panniers hanging either side",
+  "painted_barding": "A horse's armoured chest plate of iron plates painted dark red with pale old signs, over a quilted blue cloth",
+  "blackened_barding": "A horse's armoured chest plate of fire-blackened iron riveted over a skirt of chain mail",
+  "silvered_barding": "A horse's armoured chest plate of bright frost-white moonsilver plates over steel, with blue gems"
 }
