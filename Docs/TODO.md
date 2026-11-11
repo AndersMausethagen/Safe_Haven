@@ -23,7 +23,7 @@ on a removed Drinking Spot; the Road North finished before its conversation; wro
 systems: four co-op leaks (a guest's extraction, the Huldra's respect, a struck breach source, the host's lost led home)
 went to the guest's copy of the host's settlement and were undone; Wait For Quiet could wait for ever.
 - [x] Haven quests without rewards: the job or building is the pay (the user, 2026-11-11; GDD 17.1 says so).
-- [x] DefaultVolumeProfile's 9 orphan volume components and PC_Renderer's 7 dead probe-debug references cleared (2026-11-12).
+- [x] DefaultVolumeProfile's 9 orphan volume components and PC_Renderer's 7 dead probe-debug references cleared (2026-11-11).
 - [ ] The Waking Stone (chain Story Demo) is given only in the StoryDemo scene: keep it as the story graph's example, or
       take it out of the ContentDatabase.
 - [x] Story builders keep what saves remember (StoryBuilder: BuildFirstAct, BuildHavensReach, BuildPrologueMeadow). The

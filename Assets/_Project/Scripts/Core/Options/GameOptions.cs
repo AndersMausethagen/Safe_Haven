@@ -102,7 +102,7 @@ public static class GameOptions
     // ----- Display -----
 
     public static readonly GameOption VSync = GameOption.Toggle("VSync", "VSync", "Keeps the picture from tearing. Adds a little input delay.", false);
-    public static readonly GameOption FrameLimit = GameOption.Choice("FrameLimit", "Frame Rate Limit", "The most frames per second. Lower runs cooler and quieter.", 2,
+    public static readonly GameOption FrameLimit = GameOption.Choice("FrameLimit", "Frame Rate Limit", "The most frames per second. Lower runs cooler and quieter. With VSync on, it is kept by showing every second, third or fourth refresh of the screen.", 2,
         "Unlimited", "30", "60", "90", "120", "144", "165", "240");
 
     /// <summary>Frames per second for each FrameLimit choice; -1 is no limit.</summary>

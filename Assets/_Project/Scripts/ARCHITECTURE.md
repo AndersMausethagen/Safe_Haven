@@ -471,7 +471,7 @@ A new system that changes the settlement from something a guest can do needs one
 ways out (`SettlementState.IsBorrowed`, `CoopHomeTests`), and `CoopLiveTests` plays a host and a friend over 127.0.0.1.
 A changed co-op message fails `CoopWireTests` until `MultiplayerSettings.WireFormat` is raised and its fingerprint noted.
 
-### Safeguards against loose ends (2026-11-12)
+### Safeguards against loose ends (2026-11-11)
 
 - **Audits as tests, and before every build.** `QuestAuditTests` (quests, stories, gates, portal moments, rescues) and
   `ContentAuditTests` (`ContentAudit`: references to deleted assets or objects, recipes and buildings nobody can learn, items

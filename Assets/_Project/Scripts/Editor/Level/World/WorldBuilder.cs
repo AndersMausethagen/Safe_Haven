@@ -607,7 +607,7 @@ public static class WorldBuilder
 
             RecordBuilt(all, terrains, areas);
             // The heights, paint and ground stash live in assets beside the scene, which saving the scene doesn't write: left
-            // unsaved, every Editor start loaded the old heights, found them changed and rebuilt the world (2026-11-12).
+            // unsaved, every Editor start loaded the old heights, found them changed and rebuilt the world (2026-11-11).
             foreach (Terrain terrain in terrains)
             {
                 if (terrain == null) continue;

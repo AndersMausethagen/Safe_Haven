@@ -56,11 +56,48 @@ public static class DisplayOptions
         return sizes;
     }
 
+    /// <summary>
+    /// How the frame limit is kept. Without VSync, by the frame rate alone. With VSync, Unity ignores a target frame rate, so
+    /// before 2026-11-11 the limit did nothing and the game drew as fast as the screen refreshes (240 a second on a 240 Hz
+    /// screen, whatever was chosen: a player's GPU ran flat out at "30"). Now it presents every Nth refresh (VSync count, up to
+    /// 4) and, past that, draws every Nth frame, never above the limit. When no whole fraction of the refresh rate comes within
+    /// a tenth of the limit (60 on a 144 Hz screen would be 48), the limit is kept without VSync instead.
+    /// </summary>
+    public static (int vSyncCount, int renderEvery, int targetFrameRate) Pacing(bool vSync, int limit, double refreshRate)
+    {
+        if (!vSync)
+        {
+            return (0, 1, limit);
+        }
+
+        if (limit <= 0 || refreshRate <= 0 || refreshRate <= limit * 1.02)
+        {
+            return (1, 1, -1);
+        }
+
+        int every = Mathf.CeilToInt((float)(refreshRate / limit) - 0.01f);
+        if (refreshRate / every < limit * 0.9)
+        {
+            return (0, 1, limit);
+        }
+
+        // Every Nth refresh exactly: the most refreshes VSync can wait (up to 4) that divide N, the rest by drawing every Mth frame.
+        int count = Mathf.Min(4, every);
+        while (every % count != 0)
+        {
+            count--;
+        }
+
+        return (count, every / count, -1);
+    }
+
     /// <summary>Carries out the window, VSync and frame limit. The Editor's Game view keeps its own size.</summary>
     public static void Apply()
     {
-        QualitySettings.vSyncCount = GameOptions.VSync.On ? 1 : 0;
-        Application.targetFrameRate = GameOptions.VSync.On ? -1 : GameOptions.FrameRate;
+        (int vSyncCount, int renderEvery, int targetFrameRate) = Pacing(GameOptions.VSync.On, GameOptions.FrameRate, Screen.currentResolution.refreshRateRatio.value);
+        QualitySettings.vSyncCount = vSyncCount;
+        UnityEngine.Rendering.OnDemandRendering.renderFrameInterval = renderEvery;
+        Application.targetFrameRate = targetFrameRate;
         if (Application.isEditor)
         {
             return;
