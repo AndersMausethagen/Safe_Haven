@@ -15,9 +15,36 @@ MonoBehaviour:
   transitionTime: 0.6
   zoomSmoothTime: 0.15
   lookAheadSmoothTime: 0.25
+  dialogueBlendTime: 1.6
+  dialogueHoldTime: 1.2
+  dialogueTargetSmoothTime: 0.9
+  dialogueMaxLean: 4
+  focusBlendTime: 1.5
+  closeUpBlendTime: 1.1
+  closeUpPitch: 34
+  closeUpDistance: 9
+  closeUpMargin: 3
   zoomStep: 0.1
   initialZoom: 0.5
   orbitSensitivity: 0.12
+  orbitSmoothTime: 0.2
+  styleTransitionTime: 0.35
+  actionStartPitch: 12
+  actionMinPitch: -35
+  actionMaxPitch: 70
+  actionMinDistance: 2.5
+  actionMaxDistance: 7
+  actionFieldOfView: 55
+  actionShoulderOffset: 0.7
+  actionLookHeight: 0.6
+  actionLookSensitivity: 0.12
+  actionInvertY: 0
+  actionPositionDamping: {x: 0, y: 0, z: 0}
+  actionObstructionLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  actionCollisionRadius: 0.25
+  actionPointerReach: 14
   profiles:
   - state: 0
     pitch: 50

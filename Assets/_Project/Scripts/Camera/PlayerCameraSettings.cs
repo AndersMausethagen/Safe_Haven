@@ -58,6 +58,8 @@ public sealed class PlayerCameraSettings : ScriptableObject
     [SerializeField, Range(0.01f, 0.5f)] private float zoomStep = 0.1f;
     [SerializeField, Range(0f, 1f)] private float initialZoom = 0.5f;
     [SerializeField, Min(0f)] private float orbitSensitivity = 0.12f;
+    [Tooltip("Seconds the view takes to catch up with a turn of the right-mouse orbit: smooths the mouse's steps. 0 turns at once.")]
+    [SerializeField, Range(0f, 0.5f)] private float orbitSmoothTime = 0.2f;
 
     [Header("Action camera (Enshrouded style)")]
     [Tooltip("Seconds to settle when switching between the top-down and action styles.")]
@@ -120,6 +122,7 @@ public sealed class PlayerCameraSettings : ScriptableObject
     public float ZoomStep => zoomStep;
     public float InitialZoom => initialZoom;
     public float OrbitSensitivity => orbitSensitivity;
+    public float OrbitSmoothTime => orbitSmoothTime;
 
     public float StyleTransitionTime => styleTransitionTime;
     public float ActionStartPitch => actionStartPitch;

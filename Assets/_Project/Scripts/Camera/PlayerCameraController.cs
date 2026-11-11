@@ -61,6 +61,9 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float zoomTarget;
     private float zoom;
     private float yaw;
+    // Where the orbit is turning to, and how fast the view follows (SmoothDampAngle).
+    private float yawTarget;
+    private float yawVelocity;
     private Vector3 lookAheadOffset;
     private Vector3 lookAheadVelocity;
 
@@ -282,6 +285,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
         UpdateStyle();
         ReadInput();
+        UpdateYaw();
         BlendTowardProfile();
         // It stays framed through the short gaps between one line and the next, rather than pulling out and back in each time.
         bool framing = dialogueTarget != null || Time.unscaledTime < dialogueHoldUntil;
@@ -416,14 +420,29 @@ public sealed class PlayerCameraController : MonoBehaviour
 
             Vector2 delta = lookAction.ReadValue<Vector2>() * (settings.ActionLookSensitivity * GameOptions.LookSensitivity.Value);
             yaw += delta.x;
+            yawTarget = yaw;
+            yawVelocity = 0f;
             actionPitch += settings.ActionInvertY != GameOptions.InvertY.On ? delta.y : -delta.y;
             actionPitch = Mathf.Clamp(actionPitch, settings.ActionMinPitch, settings.ActionMaxPitch);
         }
         // Aiming a bow holds the same right button, so the view must not turn under the aim.
         else if (profile.allowOrbit && !aiming && orbitAction.IsPressed())
         {
-            yaw += lookAction.ReadValue<Vector2>().x * (settings.OrbitSensitivity * GameOptions.LookSensitivity.Value);
+            yawTarget += lookAction.ReadValue<Vector2>().x * (settings.OrbitSensitivity * GameOptions.LookSensitivity.Value);
         }
+    }
+
+    // The orbit follows the mouse a moment behind: raw deltas turned the view in steps, one per frame's mouse report.
+    private void UpdateYaw()
+    {
+        if (style == CameraStyle.Action || settings.OrbitSmoothTime <= 0f)
+        {
+            yaw = yawTarget;
+            yawVelocity = 0f;
+            return;
+        }
+
+        yaw = Mathf.SmoothDampAngle(yaw, yawTarget, ref yawVelocity, settings.OrbitSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
     }
 
     private void BlendTowardProfile()
@@ -613,12 +632,15 @@ public sealed class PlayerCameraController : MonoBehaviour
         follow.FollowOffset = lift + back * distance;
 
         var trackerSettings = follow.TrackerSettings;
-        trackerSettings.PositionDamping = Vector3.Lerp(positionDamping, settings.ActionPositionDamping, w);
+        // The follow's damping is for the player's steps: on a turn of the orbit it made the camera's place trail its
+        // aim, so the picture swam while turning. While the view turns, the damping gives way (back as it settles).
+        float turning = Mathf.Clamp01(Mathf.Abs(yawVelocity) / 40f);
+        trackerSettings.PositionDamping = Vector3.Lerp(Vector3.Lerp(positionDamping, settings.ActionPositionDamping, w), Vector3.zero, turning);
         follow.TrackerSettings = trackerSettings;
 
         if (composer != null)
         {
-            composer.Damping = Vector2.Lerp(composerDamping, Vector2.zero, w);
+            composer.Damping = Vector2.Lerp(Vector2.Lerp(composerDamping, Vector2.zero, w), Vector2.zero, turning);
         }
 
         LensSettings lens = cinemachineCamera.Lens;
