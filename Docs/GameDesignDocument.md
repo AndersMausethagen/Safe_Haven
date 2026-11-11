@@ -571,6 +571,16 @@ Every horse rolls its own **health, stamina, gallop speed and carry weight** (an
 - **The Toxic Horse** is a special horse of the **bog**, met there only from dusk to dawn, and rarely. Its hide is grown through with something green that glows, it wears its own bone barding, and its breath is a fog. It is stronger and faster than the common horse, and harder to break.
 - What a horse needs to show is two thin bars over its head, and while taming one short line of what to press.
 
+**Horses, deeper (November 12, 2026).**
+- **Taming as a skill.** Before each pull the horse throws its head the way it will go; a lean against the pull caught just as it starts holds it hard, leaning with it gives it rope. Barley left on the ground lures a wild horse, and one that trusts the player a little comes to eat from a crouched, still player's hand (trust 0-3: nearer, less fight). Each nature breaks differently: skittish horses spin, stubborn ones balk until pushed on, bold ones rear (lean forward). A horse that gets away is warier for good, a slipped rope may snap the lasso, and a thrown rider is hurt.
+- **Riding.** A tap of Space picks a free canter, a hold gallops on stamina; standing, it rears. It jumps logs, fences, ditches and narrow streams at a trot or faster. Paths are quicker, mud and bog slower, rock and forest floor a little slower, uphill slower. It follows the player, stays, or is led on a rope behind the horse they ride (a pack horse). R: it rears and strikes out (bond 40, or a bold horse). At a gallop a blow is a charge that knocks down.
+- **Useful.** Put to work beside the farm plots (ploughing, +35%), the sawbench (hauling, +30%) or the wainwright's yard (+25%). The stable's feed trough feeds stabled horses: fed, they mend twice as fast and grow fonder. Horses learn by living: sure-footed, brave, a swimmer, enduring, and pass it on to foals half the time. Rare coats (palomino, silver dapple, pinto, cremello) come down by breeding. The Trading Post's caravan buys horses and brings one of its own each visit.
+- **Breeds.** The toxic horse strides through mud, shrugs off poison and glows at night.
+- **Monsters.** Wolves go for horses first; draugr, the barrow shieldbearer, the Old Moss Troll and the undead knights frighten them (unless brave, very fond, or barded).
+- **Raids.** The horse ridden (or following) goes through the portal with its load; it comes home ridden or near at an extraction, or always if tied at the portal; otherwise it is lost.
+- **The undead knights** (Fire, Ice, Toxic): the pack's knight on an undead horse, a rare elite of the raids from tier 2: a slash from the saddle and a charge, blows of its element, weak to its opposite; it drops a barding now and then.
+- **Polish.** Hoofbeats by the ground (earth, stone, wood, water), the rider's hands on the reins and feet in the stirrups, the camera drawn back at a gallop, and a horse panel with its live picture, numbers, traits and gear.
+
 ## 11. Survival, cooking, drinking, and farming
 
 ### 11.1 Design purpose

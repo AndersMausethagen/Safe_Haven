@@ -5,7 +5,9 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 
 ## Queued by the user (2026-11-11), in this order
 
-1. **Horse improvements** (all approved): rope tells to lean against; luring and calming a wild horse; each temperament
+1. ~~**Horse improvements**~~ (done 2026-11-12 but co-op, which is 4; GDD §10.9). Not yet seen in Play: a horse at work
+   beside a farm plot (none in the test Haven), the trader's offer at a placed Trading Post, a horse arriving home from a raid,
+   a knight met in a raid spawn. (All approved: rope tells to lean against; luring and calming a wild horse; each temperament
    breaks differently; failing costs (warier horse, a lasso that can snap, a thrown rider hurt); jumping; gaits you pick
    (a free canter, a gallop burst); ground speed (paths, bog, slopes); follow, stay and a pack horse on a lead; horse work
    at the Haven (ploughing, hauling); the stable's feed trough; special-breed abilities (the toxic horse in the bog);
