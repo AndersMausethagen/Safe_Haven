@@ -44,4 +44,6 @@ public enum UIWindowId
     Tutorial = 18,
     /// <summary>Naming a horse once it is tamed, or again from its menu.</summary>
     HorseName = 19,
+    /// <summary>A horse's panel: its picture, its numbers, what it has learned and wears (HorsePanelWindow).</summary>
+    HorsePanel = 20,
 }

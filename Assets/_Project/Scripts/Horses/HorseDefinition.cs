@@ -92,8 +92,11 @@ public sealed class HorseDefinition : ScriptableObject
     [SerializeField] private SoundDefinition snort;
     [Tooltip("Hard breathing after a gallop.")]
     [SerializeField] private SoundDefinition breathing;
-    [Tooltip("A hoofbeat, every beat of its gait.")]
+    [Tooltip("A hoofbeat, every beat of its gait: on earth and grass, and on stone, wood and in shallow water.")]
     [SerializeField] private SoundDefinition hooves;
+    [SerializeField] private SoundDefinition hoovesStone;
+    [SerializeField] private SoundDefinition hoovesWood;
+    [SerializeField] private SoundDefinition hoovesWater;
 
     [Header("Lasso and struggle")]
     [SerializeField] private ItemDefinition lasso;
@@ -162,6 +165,14 @@ public sealed class HorseDefinition : ScriptableObject
     public SoundDefinition Snort => snort;
     public SoundDefinition Breathing => breathing;
     public SoundDefinition Hooves => hooves;
+
+    /// <summary>The hoofbeat for the ground it is on (the earth's when there is none of its own).</summary>
+    public SoundDefinition HoovesOn(HorseGround.Surface surface)
+    {
+        SoundDefinition own = surface == HorseGround.Surface.Stone ? hoovesStone : surface == HorseGround.Surface.Wood ? hoovesWood
+            : surface == HorseGround.Surface.Water ? hoovesWater : null;
+        return own != null ? own : hooves;
+    }
     public Material[] Manes => manes;
     public RareCoat[] RareCoats => rareCoats;
     public HorseAbility Abilities => abilities;

@@ -80,6 +80,8 @@ public sealed class HorseMotion : MonoBehaviour
     private int rideGait;
     private bool swimming;
     private float nextHoof;
+    private HorseGround.Surface underfoot;
+    private float nextSurface;
     private float nextBreath;
     private float nextFidget;
     private bool drinking;
@@ -1456,13 +1458,19 @@ public sealed class HorseMotion : MonoBehaviour
         }
 
         HorseDefinition kind = horse.Definition;
-        if (Gait > 0 && !swimming && kind.Hooves != null)
+        if (Gait > 0 && !swimming && !jumping && kind.Hooves != null)
         {
+            if (Time.time >= nextSurface)
+            {
+                nextSurface = Time.time + 0.3f;
+                underfoot = HorseGround.SurfaceAt(transform.position);
+            }
+
             nextHoof -= Time.deltaTime * (animator != null ? animator.speed : 1f);
             if (nextHoof <= 0f)
             {
                 nextHoof = HoofBeats[Mathf.Clamp(Gait - 1, 0, HoofBeats.Length - 1)];
-                AudioManager.Play(kind.Hooves, transform.position);
+                AudioManager.Play(kind.HoovesOn(underfoot), transform.position);
             }
         }
 

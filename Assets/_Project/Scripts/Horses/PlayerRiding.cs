@@ -406,6 +406,11 @@ public sealed class PlayerRiding : MonoBehaviour
         Riding = null;
         horse.Rider = null;
         LeftSaddleFrame = Time.frameCount;
+        if (PlayerCameraController.Current != null)
+        {
+            PlayerCameraController.Current.SetCloseness(this, 1f);
+        }
+
         stateMachine.CanFightAboard = false;
         CountRidden(horse, force: true);
         horse.Motion.EndRidden();
@@ -513,6 +518,12 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         CountRidden(Riding);
+        // The view draws back a little at a gallop, for the ground ahead.
+        if (PlayerCameraController.Current != null)
+        {
+            PlayerCameraController.Current.SetCloseness(this, Riding.Motion.IsGalloping ? 1.15f : 1f);
+        }
+
         // From the saddle with a weapon only: bare fists can't reach anything from up there.
         bool armed = combat != null && combat.Weapon != null && combat.Weapon.Stance != WeaponStance.Unarmed;
         stateMachine.CanFightAboard = armed && Riding.IsTamed && !Riding.Motion.IsSwimming && holding == null && !IsMounting;

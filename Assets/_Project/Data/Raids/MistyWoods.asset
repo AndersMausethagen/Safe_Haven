@@ -284,6 +284,24 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 2
       toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+      weight: 1
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
+      weight: 1
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
+      weight: 1
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
   - name: Resources
     category: 1
     pointGroups:
@@ -570,6 +588,24 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 1
       toTier: 2
+    - prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
   - name: Collapse Hunters
     category: 3
     pointGroups:

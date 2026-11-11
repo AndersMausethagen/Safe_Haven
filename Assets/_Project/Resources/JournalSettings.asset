@@ -1038,6 +1038,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
   - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
   - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+  - {fileID: 11400000, guid: bf4568e2018a87644b6336e2cc9f41a9, type: 2}
+  - {fileID: 11400000, guid: e9b28d70ec1cc3b458b7d5e48846e1f9, type: 2}
+  - {fileID: 11400000, guid: 60953acbfa1a5314c84fedf2be42cf9d, type: 2}
   residentNotes:
   - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}

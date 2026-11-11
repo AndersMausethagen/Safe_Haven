@@ -133,8 +133,9 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float closenessNow = 1f;
     private float closenessVelocity;
 
-    /// <summary>Brings the view in a little while <paramref name="source"/> asks (taming a horse): its distance times
-    /// <paramref name="scale"/>, eased in and out; 1 lets it go. With several asking, the nearest wins.</summary>
+    /// <summary>Brings the view in (or out) a little while <paramref name="source"/> asks (in for taming a horse, out at a
+    /// gallop): its distance times <paramref name="scale"/>, eased in and out; 1 lets it go. With several asking, the nearest
+    /// and the farthest of them meet.</summary>
     public void SetCloseness(object source, float scale)
     {
         if (source == null)
@@ -148,7 +149,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
         else
         {
-            closeness[source] = Mathf.Clamp(scale, 0.3f, 1f);
+            closeness[source] = Mathf.Clamp(scale, 0.3f, 1.5f);
         }
     }
 
@@ -631,19 +632,22 @@ public sealed class PlayerCameraController : MonoBehaviour
         float viewPitch = Mathf.Lerp(pitch, actionPitch, w);
         dialogueDistanceNow = Mathf.SmoothDamp(dialogueDistanceNow, dialogueDistance, ref dialogueDistanceVelocity, settings.DialogueTargetSmoothTime, Mathf.Infinity, Time.unscaledDeltaTime);
         distance *= Mathf.Lerp(1f, dialogueDistanceNow, Mathf.SmoothStep(0f, 1f, dialogueWeight));
-        float wantedCloseness = 1f;
+        float nearest = 1f, farthest = 1f;
         object gone = null;
         foreach (var asked in closeness)
         {
-            // Whatever asked and is gone (destroyed) no longer holds the view in.
+            // Whatever asked and is gone (destroyed) no longer holds the view.
             if (asked.Key is Object thing && thing == null)
             {
                 gone = asked.Key;
                 continue;
             }
 
-            wantedCloseness = Mathf.Min(wantedCloseness, asked.Value);
+            nearest = Mathf.Min(nearest, asked.Value);
+            farthest = Mathf.Max(farthest, asked.Value);
         }
+
+        float wantedCloseness = nearest * farthest;
 
         if (gone != null)
         {

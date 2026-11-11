@@ -35,6 +35,11 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
 
     /// <summary>True when the player's Animator has the Riding layer: then the bones aren't bent by hand (PlayerTransportPose).</summary>
     public bool HasLayer => layer >= 0;
+    /// <summary>The Riding layer's index in the Animator (-1 without one), for RiderIK's pass.</summary>
+    public int LayerIndex => layer;
+    /// <summary>True while a weapon or the horse's own act (a rear, a buck) plays: the hands are busy (RiderIK lets go).</summary>
+    public bool IsActing => Time.time < acting;
+
     /// <summary>The player's size against the clips' (a humanoid's), for the mount path.</summary>
     public float HumanScale => animator != null && animator.isHuman ? animator.humanScale : 1f;
 
@@ -45,6 +50,11 @@ public sealed class PlayerRidingAnimation : MonoBehaviour
         combat = GetComponent<PlayerCombat>();
         archery = GetComponent<PlayerArchery>();
         layer = animator != null && animator.runtimeAnimatorController != null ? animator.GetLayerIndex(LayerName) : -1;
+        // Hands on the reins, feet in the stirrups (an IK pass on the Riding layer).
+        if (layer >= 0 && animator.isHuman && !animator.TryGetComponent(out RiderIK _))
+        {
+            animator.gameObject.AddComponent<RiderIK>();
+        }
     }
 
     private void OnDisable() => Listen(null);

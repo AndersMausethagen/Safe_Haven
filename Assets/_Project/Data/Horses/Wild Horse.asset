@@ -71,6 +71,9 @@ MonoBehaviour:
   snort: {fileID: 11400000, guid: 3dc78a64afec622409d3d9fbda77d3ec, type: 2}
   breathing: {fileID: 11400000, guid: 4165c15bbe81992468191170332b9a1e, type: 2}
   hooves: {fileID: 11400000, guid: 78e7a7a6cede57d4084a082dd1b1477d, type: 2}
+  hoovesStone: {fileID: 11400000, guid: 4ffc3d5c466818c4488b22c447fd645d, type: 2}
+  hoovesWood: {fileID: 11400000, guid: 54f0bff726f85e544b484d8fbc3be0ee, type: 2}
+  hoovesWater: {fileID: 11400000, guid: 50bca8b651294fd4fb654e2b6e8e0566, type: 2}
   lasso: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
   lassoRange: 9
   struggleStamina: 100

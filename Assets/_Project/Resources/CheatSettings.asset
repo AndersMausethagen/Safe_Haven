@@ -16,10 +16,15 @@ MonoBehaviour:
   creatures:
   - {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
   - {fileID: 11400000, guid: e646ff37405b36e43a4fa710a23060e2, type: 2}
+  - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
   - {fileID: 11400000, guid: 780dd3de177d4ca41b12a65f95fa709b, type: 2}
+  - {fileID: 11400000, guid: 1d702ae3d8ee6e442a576d496cbec3d4, type: 2}
   - {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+  - {fileID: 11400000, guid: bf4568e2018a87644b6336e2cc9f41a9, type: 2}
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
+  - {fileID: 11400000, guid: 73e1e95ef9042da4bab4b30a2b0d157f, type: 2}
   - {fileID: 11400000, guid: 489a951193635d0419115cdcc5775d51, type: 2}
+  - {fileID: 11400000, guid: e9b28d70ec1cc3b458b7d5e48846e1f9, type: 2}
   - {fileID: 11400000, guid: e1b3879bd0caf9a43892f7b5aff2bfee, type: 2}
   - {fileID: 11400000, guid: abf292b6af701c64eb533aad22ee47c6, type: 2}
   - {fileID: 11400000, guid: 26c3027c5ca1de044a5a8f75d3b93dcb, type: 2}
@@ -27,8 +32,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
   - {fileID: 11400000, guid: 20c7f11cbb9bb214f95fc0f2a51db9d9, type: 2}
   - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
+  - {fileID: 11400000, guid: f728b8ea230e9154b865d39c8e5d49be, type: 2}
   - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
-  - {fileID: 11400000, guid: b22c293353a041944aa0e1f4eb3bcb99, type: 2}
+  - {fileID: 11400000, guid: 60953acbfa1a5314c84fedf2be42cf9d, type: 2}
+  - {fileID: 11400000, guid: 87ebac26be444f642bbd6de5b4fa2766, type: 2}
   raids:
   - {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
   - {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}

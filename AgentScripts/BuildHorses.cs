@@ -255,8 +255,41 @@ public static class BuildHorses
 
     private static AnimatorController Controller()
     {
-        AssetDatabase.DeleteAsset(ControllerPath);
-        AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+        // Rebuilt in place, never deleted: the knights' steeds and the horse prefabs keep their reference to it.
+        AnimatorController controller = Load<AnimatorController>(ControllerPath);
+        if (controller == null)
+        {
+            controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
+        }
+        else
+        {
+            while (controller.parameters.Length > 0)
+            {
+                controller.RemoveParameter(0);
+            }
+
+            for (int i = controller.layers.Length - 1; i > 0; i--)
+            {
+                controller.RemoveLayer(i);
+            }
+
+            AnimatorStateMachine old = controller.layers[0].stateMachine;
+            foreach (ChildAnimatorState state in old.states)
+            {
+                old.RemoveState(state.state);
+            }
+
+            foreach (AnimatorStateTransition transition in old.anyStateTransitions)
+            {
+                old.RemoveAnyStateTransition(transition);
+            }
+
+            foreach (BlendTree orphan in AssetDatabase.LoadAllAssetsAtPath(ControllerPath).OfType<BlendTree>())
+            {
+                AssetDatabase.RemoveObjectFromAsset(orphan);
+            }
+        }
+
         controller.AddParameter("Gait", AnimatorControllerParameterType.Float);
         controller.AddParameter("Turn", AnimatorControllerParameterType.Float);
         foreach (string flag in new[] { "Eating", "Drinking", "Sleeping", "Swimming", "Dead" })
@@ -529,6 +562,8 @@ public static class BuildHorses
         AnimatorControllerLayer layer = layers[index];
         layer.defaultWeight = 0f;
         layer.blendingMode = AnimatorLayerBlendingMode.Override;
+        // RiderIK's pass: hands on the reins, feet in the stirrups.
+        layer.iKPass = true;
         layers[index] = layer;
         // The emotes stay on top.
         int emote = System.Array.FindIndex(layers, l => l.name == CharacterEmotes.LayerName);
@@ -792,7 +827,7 @@ public static class BuildHorses
 
     private sealed class HorseSounds
     {
-        public SoundDefinition Whinny, Neigh, Snort, Breathing, Hooves, Whistle;
+        public SoundDefinition Whinny, Neigh, Snort, Breathing, Hooves, Whistle, HoovesStone, HoovesWood, HoovesWater;
     }
 
     private static HorseSounds MakeSounds() => new HorseSounds
@@ -803,7 +838,14 @@ public static class BuildHorses
         Breathing = Sound("Horse Breathing", 0.5f, SoundPriority.Background, 3f, 18f, 2, "Horse Breathing", "Horse Breathing_01", "Horse Breathing_02"),
         Hooves = Sound("Horse Hooves", 0.32f, SoundPriority.Background, 4f, 30f, 6, "Horse Step_01", "Horse Step_02", "Horse Step_03", "Horse Step_04", "Horse Step_05"),
         Whistle = Sound("Horse Whistle", 0.7f, SoundPriority.Normal, 10f, 60f, 1, "Whistle"),
+        // On other ground: made from the pack's steps by Tools/Audio/horse_hooves.py.
+        HoovesStone = Sound("Horse Hooves Stone", 0.55f, SoundPriority.Background, 4f, 30f, 6, OwnHooves("Stone")),
+        HoovesWood = Sound("Horse Hooves Wood", 0.3f, SoundPriority.Background, 4f, 30f, 6, OwnHooves("Wood")),
+        HoovesWater = Sound("Horse Hooves Water", 0.32f, SoundPriority.Background, 4f, 28f, 6, OwnHooves("Water")),
     };
+
+    // "#" marks a clip of the game's own sound folder (Audio/SFX/Horse) rather than the pack's.
+    private static string[] OwnHooves(string kind) => Enumerable.Range(1, 4).Select(i => $"#Horse Hoof {kind} {i}").ToArray();
 
     private static SoundDefinition Sound(string name, float volume, SoundPriority priority, float full, float audible, int atOnce, params string[] clips)
     {
@@ -818,7 +860,8 @@ public static class BuildHorses
         var so = new SerializedObject(sound);
         so.FindProperty("displayName").stringValue = name;
         SerializedProperty list = so.FindProperty("clips");
-        var found = clips.Select(c => Load<AudioClip>(Audio + c + ".wav")).Where(c => c != null).ToList();
+        var found = clips.Select(c => Load<AudioClip>(c.StartsWith("#") ? "Assets/_Project/Audio/SFX/Horse/" + c.Substring(1) + ".wav" : Audio + c + ".wav"))
+            .Where(c => c != null).ToList();
         if (found.Count < clips.Length)
         {
             report += $"; {name}: {clips.Length - found.Count} clips missing";
@@ -889,6 +932,9 @@ public static class BuildHorses
         so.FindProperty("snort").objectReferenceValue = sounds.Snort;
         so.FindProperty("breathing").objectReferenceValue = sounds.Breathing;
         so.FindProperty("hooves").objectReferenceValue = sounds.Hooves;
+        so.FindProperty("hoovesStone").objectReferenceValue = sounds.HoovesStone;
+        so.FindProperty("hoovesWood").objectReferenceValue = sounds.HoovesWood;
+        so.FindProperty("hoovesWater").objectReferenceValue = sounds.HoovesWater;
         // A quiet player may come within 4 m; walking (5 m footsteps) it bolts at about 10 m, sneaking at about 6 m, so the
         // lasso (9 m) is thrown from a crouch.
         so.FindProperty("shyDistance").floatValue = toxic ? 4.5f : 4f;
