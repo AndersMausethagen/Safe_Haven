@@ -19,7 +19,8 @@ MonoBehaviour:
   tier: 0
   rarity: 0
   value: 1
-  icon: {fileID: 2369705469474248773, guid: 4d98e48f124872b4cbb453d35f7acb83, type: 3}
+  gearScoreOverride: 0
+  icon: {fileID: 21300000, guid: 4d98e48f124872b4cbb453d35f7acb83, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
   heldPosition: {x: 0, y: 0, z: 0}
@@ -35,11 +36,26 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 6
   thirstRestore: 0
+  waterCapacity: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
+  wornLook: {fileID: 0}
   statBonuses: []
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  learnedAtHome: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
   raidModifier: {fileID: 0}

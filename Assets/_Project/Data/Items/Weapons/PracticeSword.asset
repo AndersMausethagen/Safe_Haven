@@ -20,7 +20,7 @@ MonoBehaviour:
   rarity: 0
   value: 26
   gearScoreOverride: 0
-  icon: {fileID: 21300000, guid: 9d60df69d699f2a47b2e183f14f05af4, type: 3}
+  icon: {fileID: 21300000, guid: 4a1071c83d6b0134aa6229e0f86a68ca, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 2063108355000073893, guid: f508bc721b5b3eb4385b679aa2ddb8c9, type: 3}
   heldPosition: {x: 0, y: 0, z: 0}

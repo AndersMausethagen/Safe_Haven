@@ -20,7 +20,7 @@ MonoBehaviour:
   rarity: 1
   value: 45
   gearScoreOverride: 0
-  icon: {fileID: 21300000, guid: 29cc86bc424e2e64ea39158c7a49cafc, type: 3}
+  icon: {fileID: 21300000, guid: 6d393de15fe53ef468df27f1e7e97a51, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
   heldPosition: {x: 0, y: 0, z: 0}
@@ -36,6 +36,7 @@ MonoBehaviour:
   healAmount: 15
   hungerRestore: 70
   thirstRestore: 10
+  waterCapacity: 0
   boonBonuses:
   - stat: 0
     op: 1
@@ -47,6 +48,9 @@ MonoBehaviour:
   placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
   wornLook: {fileID: 0}
   statBonuses: []
@@ -55,4 +59,6 @@ MonoBehaviour:
   experience: 0
   learnedAtHome: 0
   transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
   raidModifier: {fileID: 0}

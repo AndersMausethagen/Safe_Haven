@@ -3,6 +3,17 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Item icons (2026-11-11)
+
+All 204 items have icons painted with LocalSpawn (Qwen-Image draft, the "Safe Haven - Item icon" style), in place of the
+painted shapes and the small 3D renders. Checked by eye on contact sheets and by `ItemIconTests`; not yet seen in the
+game's inventory.
+- [ ] Look at them in the inventory, the crafting windows and the Haven pages. Repaint any that read badly: change its
+      line in `Tools/LocalSpawn/item_icons.json`, `generate_item_icons.py all <id> --force`, then BuildItemIcons.Apply.
+- [ ] Grave Iron's bar took a gold sheen from its prompt ("shaped like a gold bar"); a pair item (gloves, boots) often
+      shows one of the pair.
+- [ ] Building, skill and perk icons are still placeholders or renders: the same pipeline would do them.
+
 ## Spoken dialogue (2026-11-10)
 
 Every line a named character says has a recording: 412 lines, twelve voices (see ARCHITECTURE.md › Spoken dialogue).
