@@ -311,7 +311,7 @@
   {"id": "18434bb5a0bd", "speaker": "Sigrid", "text": "We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.", "kind": "story", "where": "Prologue_MistyWoods"},
   {"id": "b62bef3ca79f", "speaker": "Sigrid", "text": "Whatever you see, do not let go of the stone. There are things I should have told you, and there is no time left to tell them.", "kind": "story", "where": "Prologue_MistyWoods"},
   {"id": "3f5aecab3990", "speaker": "Sigrid", "text": "You asked me by the fire, so here it is. I have seen stones like these wake once. It took everyone who stood too near, and it put them somewhere else. Ingrid knew that when she came. Now you do.", "kind": "story", "where": "Prologue_MistyWoods"},
-  {"id": "b60cc7da801d", "speaker": "Sigrid", "text": "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.", "kind": "story aside", "where": "Prologue_MistyWoods"},
+  {"id": "0dea2076e3a3", "speaker": "Sigrid", "text": "I can see that. Light your torches, and take this one.", "kind": "story aside", "where": "Prologue_MistyWoods"},
   {"id": "e1ef4f263cca", "speaker": "Sigrid", "text": "Keep walking.", "kind": "story aside", "where": "Prologue_MistyWoods"},
   {"id": "1b12cd47c900", "speaker": "Sigrid", "text": "Not alone, and not before we are ready. Come back to the others.", "kind": "story aside", "where": "Prologue_MistyWoods"},
   {"id": "3f96ad6608ec", "speaker": "Sigrid", "text": "Rumours grow in the telling. That is why we go and look, instead of sitting in a longhouse and listening.", "kind": "story aside", "where": "Prologue_MistyWoods"},

@@ -2199,8 +2199,8 @@ public static class BuildPrologueMeadow
         Link(walkStory, (moveOn, 0, toBirds), (toBirds, 0, quiet));
 
         var toTorches = new WaitForWalkNode { reaches = 0.55f };
-        // The player is given a firefly lantern, not a torch (the user, 2026-11-11): no flame for the mist, both hands free.
-        var lightUp = Aside(S(), "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.");
+        // The player is given a firefly lantern, not a torch (the user, 2026-11-11); her line stays as it was.
+        var lightUp = Aside(S(), "I can see that. Light your torches, and take this one.");
         var torchesOnce = new HasHappenedNode { questEvent = Ev("TorchesLit") };
         var giveTorch = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("PrimitiveFireflyLantern"), 1) } };
         var torchesNow = new RaiseQuestEventNode { questEvent = Ev("TorchesLit") };
