@@ -2582,6 +2582,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/391fef0a2269.wav"
  },
  {
+  "id": "db123fc78aab",
+  "voice": "sigrid",
+  "text": "The woods have names again. That is a start.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db123fc78aab.wav"
+ },
+ {
   "id": "59bb2faac379",
   "voice": "sigrid",
   "text": "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter.",
@@ -3059,6 +3068,16 @@
   "direction": "Calm"
  },
  {
+  "id": "cae03a071ef3",
+  "voice": "portal_g_mysterious",
+  "text": "A held land asks something of you now and then, and its stone will tell you what.\nA Pact Rune laid in the stone holds it better still.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/cae03a071ef3.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "698d38946570",
   "voice": "portal_g_mysterious",
   "text": "A horn at dusk, the expedition's signal.\nShe is the last of them.\nBring her home, little one.",
@@ -3116,6 +3135,16 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/88f636b3e644.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "7b352a5682ab",
+  "voice": "portal_g_mysterious",
+  "text": "Find a place that a stone remembers, then lay your hand on the stone.\nThe nearest stands not far past the meadows.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7b352a5682ab.wav",
   "direction": "Calm"
  },
  {
@@ -3289,6 +3318,16 @@
   "direction": "Calm"
  },
  {
+  "id": "19191137afd0",
+  "voice": "portal_g_mysterious",
+  "text": "The forest is gathering against your stone, little one.\nStand watch beside it, or burn the rot's heart on a raid.\nIt will not wait for you.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/19191137afd0.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "e6d4b67488c1",
   "voice": "portal_g_mysterious",
   "text": "The light that reached her reached other things as well.\nThey are on the old path now, testing me.\nPrepare yourself.\nWhen you are ready, tell me, and I will let them come.",
@@ -3379,6 +3418,16 @@
   "direction": "Calm"
  },
  {
+  "id": "7ce49dc3981b",
+  "voice": "portal_g_mysterious",
+  "text": "A lit stone said: this much of the forest remembers a hearth.\nInside that ring nobody lost the way home, and nobody lost their name.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7ce49dc3981b.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "f7d7b9fe43be",
   "voice": "portal_g_mysterious",
   "text": "Did you see what grew out of them as they fell?\nRoot.\nThe same root that choked my stones, and closed the road behind your people.",
@@ -3396,6 +3445,36 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/19e2bc5ec533.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "deea603ba5c1",
+  "voice": "portal_g_mysterious",
+  "text": "Every land you hold is a road home for whoever is still out there, and a door shut on what comes at night.\nBegin with the nearest stone.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/deea603ba5c1.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "308885cfe7e0",
+  "voice": "portal_g_mysterious",
+  "text": "Find one of the places a stone remembers, so that it knows you, then lay your hand on it.\nThe first will answer to my fire alone.\nThe rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/308885cfe7e0.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "640c27776009",
+  "voice": "portal_g_mysterious",
+  "text": "Good.\nNot all of them, and not all at once: only what you can hold.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/640c27776009.wav",
   "direction": "Calm"
  },
  {
@@ -3426,6 +3505,16 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e8c1f6b40c78.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "d924f0d05b41",
+  "voice": "portal_g_mysterious",
+  "text": "It will.\nThe pact gave the forest its room as well, and that is the one thing it has not forgotten.\nIt will push against every stone you light.\nHold what you take, and in time it leaves it be.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d924f0d05b41.wav",
   "direction": "Calm"
  },
  {
@@ -3516,6 +3605,26 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b6587a578789.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "0eb265fed6ea",
+  "voice": "portal_g_mysterious",
+  "text": "When the hearth went cold, the stones went cold, one by one.\nThe forest took back what they held, and every road and every name in it.\nThat is where your people are now: out in the land that forgot us.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/0eb265fed6ea.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "da1f11bfa554",
+  "voice": "portal_g_mysterious",
+  "text": "When the pact was kept, your people did not only tend a hearth beside me.\nThey walked the land the pact gave them, and where it ended they set stones, and lit them from this fire.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/da1f11bfa554.wav",
   "direction": "Calm"
  },
  {
@@ -3619,6 +3728,16 @@
   "direction": "Calm"
  },
  {
+  "id": "090569d270c1",
+  "voice": "portal_g_mysterious",
+  "text": "Your fire reaches further than it did, little one.\nFar enough that I can feel what lies at the end of it: stones, cold ones, out past the meadows.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/090569d270c1.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "928f98baf858",
   "voice": "portal_g_mysterious",
   "text": "Your people did, long before you were born.\nYou are mending it.\nEvery fire kept here is a payment on that debt.",
@@ -3649,6 +3768,26 @@
   "direction": "Calm"
  },
  {
+  "id": "cce8fe42cc70",
+  "voice": "portal_g_mysterious",
+  "text": "Hold a ring of them round me, little one, and the forest will remember us for good.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/cce8fe42cc70.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "58df648b5188",
+  "voice": "portal_g_mysterious",
+  "text": "I felt that.\nOut past the meadows, a stone remembers me again.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/58df648b5188.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "b846d5abd39c",
   "voice": "portal_g_mysterious",
   "text": "I remember this.\nA fire beside my stones, and someone to keep it.",
@@ -3656,6 +3795,16 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b846d5abd39c.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "d7adf4eff099",
+  "voice": "portal_g_mysterious",
+  "text": "It broke against you.\nIt will try again, somewhere else.\nLet it find you ready.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/d7adf4eff099.wav",
   "direction": "Calm"
  },
  {
@@ -3669,6 +3818,36 @@
   "direction": "Scared"
  },
  {
+  "id": "353a6d8506de",
+  "voice": "portal_g_mysterious",
+  "text": "Little one, do you feel it?\nThe forest is gathering against one of your stones.\nIt means to push in.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/353a6d8506de.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "1608860bb50d",
+  "voice": "portal_g_mysterious",
+  "text": "Little one.\nThree times through me, and three times home.\nYour fire reaches further than it did.\nCome and sit by me when you can: there is something out past my meadows you should know of.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/1608860bb50d.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "203f5239cda9",
+  "voice": "portal_g_mysterious",
+  "text": "Now it must be held, little one.\nA lit stone is a promise, and the forest will test it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/203f5239cda9.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "ae616ce24bf2",
   "voice": "portal_g_mysterious",
   "text": "Rootlings, in my clearing.\nFeed me those orbs, and they will not get in so easily again.",
@@ -3677,6 +3856,16 @@
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/ae616ce24bf2.wav",
   "direction": "Stern"
+ },
+ {
+  "id": "3df31482e4d5",
+  "voice": "portal_g_mysterious",
+  "text": "Secure.\nFeel how still it is out there now.\nA land held that firmly sends home what it grows at every dawn, and the night's bands will not come through it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3df31482e4d5.wav",
+  "direction": "Calm"
  },
  {
   "id": "10fcb367d4d5",
@@ -3697,6 +3886,16 @@
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/f3110aac1411.wav",
   "direction": "Sad"
+ },
+ {
+  "id": "2d08263367c1",
+  "voice": "portal_g_mysterious",
+  "text": "The stones are still out there.\nThey only want a hand that keeps a fire.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/2d08263367c1.wav",
+  "direction": "Calm"
  },
  {
   "id": "81282749735d",

@@ -20,6 +20,8 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
     private Renderer[] renderers;
     private Light glow;
     private MaterialPropertyBlock block;
+    // While the quest that opens the stones asks for one to be lit, every unlit stone is a waypoint: the tracker points at the nearest.
+    private QuestWaypoint waypoint;
 
     public string Region => region;
     public string InteractionName => $"Boundary Stone of {region}";
@@ -27,6 +29,13 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
     public void Configure(string regionName)
     {
         region = regionName;
+        TerritorySettings settings = TerritorySettings.Current;
+        if (settings.UnlockedBy != null && settings.StonesObjective > 0)
+        {
+            waypoint = TryGetComponent(out QuestWaypoint existing) ? existing : gameObject.AddComponent<QuestWaypoint>();
+            waypoint.Configure(settings.UnlockedBy, settings.StonesObjective, InteractionName);
+        }
+
         if (block != null)
         {
             Show();
@@ -68,6 +77,12 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
     private void Show()
     {
         bool claimed = GameSession.Settlement.Territory.IsClaimed(region);
+        // A visitor's quest wants their own stones lit, not the host's.
+        if (waypoint != null)
+        {
+            waypoint.enabled = !claimed && !HavenVisit.IsVisiting;
+        }
+
         Color colour = IsPushed ? PushedColour : claimed ? LitColour : Color.black;
         foreach (Renderer part in renderers)
         {

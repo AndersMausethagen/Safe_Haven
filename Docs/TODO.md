@@ -25,6 +25,10 @@ by hand, and the balance is a first guess.
 - [ ] The boundary stone is the Runic Ward Totem's model: a stone of its own (a Blender kit piece, or LocalSpawn) would read
       better from the top-down camera, and it is easy to miss in the outer woods' mist: a beam or a mark at night?
 - [ ] Next steps (Docs/Territory.md › Not yet): residents working held regions, blight on the map, region weather.
+- [ ] The quest line that opens it (The Cold Stones, What the Land Asks, The Forest Answers; AgentScripts/BuildHavensReach.cs):
+      played from the CLI only. Hear the portal's call after a real third raid: does it land at a quiet moment, after the
+      results and any homecoming? Is the conversation (8 lines and a choice) too long for the portal's voice?
+- [ ] Three Pact Runes from the quest line, one each: with the free first claim that is four regions early. Too generous?
 
 ## Map regions and more paintings (2026-11-11)
 

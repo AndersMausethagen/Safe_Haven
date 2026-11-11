@@ -1075,6 +1075,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | Make a quest ask the player to talk to someone, reach a place or use a thing | **Talk To** (choose the person), **Reach Place** / **Use Object** (choose or make a Quest Target with **New**). The quest's **Make It Work** list then offers to put a Quest Zone or Inspect Point for it at the Scene view, or to make the selected object it. No Quest Event is needed |
 | Start a quest when the player does something | **Start** › **When Player Does**, then **Start When**: any objective, e.g. Reach Place: the Wilds Echo |
 | Start a story when the player talks to someone or reaches a place | Story Graph › **When Player: …** with the deed; **Count As Done** in a story counts a deed done (e.g. the talk once its lines are said) |
+| Start a story after the player's Nth raid | Story Graph › **When N Raids Are Done** (`WhenRaidsDone`): checked as the story wakes (home from a raid, a game loaded), any way the raids ended; the portal's call about the boundary stones uses it (`BuildHavensReach`) |
 | Add or change an enchantment | Create > Safe Haven > Essence > Enchantment, then add it to `Resources/EssenceSettings` › **Enchantments** (Systems Editor › Essence). A Cursed one must state its drawback as a negative bonus (`EssenceTests`) |
 | Change what empowering or skill ranks cost and give | `Resources/EssenceSettings` (Systems Editor › Essence) |
 | Add a kind of cart or boat | A `TransportDefinition` in `Data/Transport`, a prefab with `Transport`, `SaveableEntity`, an `Interactable` and a driver (`Haulable` or `Rowboat`) with every collider on Ignore Raycast, and a kit item whose Transport points back at it. See `AgentScripts/BuildTransport.cs`, and call `SaveableEntity.RefreshPrefabId` on a new prefab or it can't be recreated from a save |
@@ -1897,7 +1898,12 @@ Bodies come from CC0 models in `Art/Enemies/Downloaded` (`CREDITS.md` says whose
   (`HavenSync.ApplySettlement`, then `Territory.MirrorArrived` redraws the stones), no turn passes in a guest's game, and what a
   guest does for them (a rune offered, task work, a place found, a heart burned) goes to the host's game (`Territory.ForHost`,
   `CoopLands`, `Territory.FromFriend`); a heart counts once a run, however many players burn it. Lighting stones and standing watch
-  are the host's (`Territory.CanClaim`, `CanStandWatch`); the watch's creatures are shared as any of the host's are. `TerritoryTests`.
+  are the host's (`Territory.CanClaim`, `CanStandWatch`); the watch's creatures are shared as any of the host's are. The stones stay
+  cold until the quest line opens them (`TerritorySettings` › Unlocked By, `Territory.Unlocked`): after the third raid the portal calls
+  (`Story - The Cold Stones`, `WhenRaidsDone`) and starts **The Cold Stones** (hear it out, light a stone; every unlit stone is a
+  `QuestWaypoint` for it), then **What the Land Asks** (a task, a rune, Secure) and **The Forest Answers** (started by the first
+  push's warning); the land tells them through quest events on `TerritorySettings` › The story. `AgentScripts/BuildHavensReach.cs`
+  makes the quests, events and the portal's stories and whispers in SafeHaven. `TerritoryTests`.
 
 ## Sound
 

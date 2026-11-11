@@ -119,9 +119,38 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Tooltip("Insight for each named place found.")]
     [SerializeField, Min(0)] private int findInsight = 25;
 
+    [Header("The story (the portal's word after the third raid: Docs/Territory.md)")]
+    [Tooltip("The quest that opens the stones: until it starts, every stone is cold. Empty: open from the start.")]
+    [SerializeField] private QuestDefinition unlockedBy;
+    [Tooltip("Optional: the stones stay cold until this has happened too (the portal has told of them), not only once the quest starts.")]
+    [SerializeField] private GameEventDefinition unlockedWhen;
+    [Tooltip("The objective of that quest (1 is the first) the unlit stones show the way for, as quest waypoints. 0: none.")]
+    [SerializeField, Min(0)] private int stonesObjective = 2;
+    [Tooltip("Raised when a boundary stone is lit: a region claimed.")]
+    [SerializeField] private GameEventDefinition stoneLit;
+    [Tooltip("Raised when a held region's task is done.")]
+    [SerializeField] private GameEventDefinition taskDone;
+    [Tooltip("Raised when a Pact Rune is offered at a lit stone.")]
+    [SerializeField] private GameEventDefinition runeOffered;
+    [Tooltip("Raised when the forest gathers against a held region (the warning).")]
+    [SerializeField] private GameEventDefinition forestGathers;
+    [Tooltip("Raised when a push is answered: a watch held, or a rot's heart burned.")]
+    [SerializeField] private GameEventDefinition pushAnswered;
+    [Tooltip("Raised when a held region becomes Secure.")]
+    [SerializeField] private GameEventDefinition landSecure;
+
     [Header("Regions")]
     [SerializeField] private List<RegionInfo> regions = new List<RegionInfo>();
 
+    public QuestDefinition UnlockedBy => unlockedBy;
+    public GameEventDefinition UnlockedWhen => unlockedWhen;
+    public int StonesObjective => stonesObjective;
+    public GameEventDefinition StoneLit => stoneLit;
+    public GameEventDefinition TaskDone => taskDone;
+    public GameEventDefinition RuneOffered => runeOffered;
+    public GameEventDefinition ForestGathers => forestGathers;
+    public GameEventDefinition PushAnswered => pushAnswered;
+    public GameEventDefinition LandSecure => landSecure;
     public GameObject StonePrefab => stonePrefab;
     public ItemDefinition PactRune => pactRune;
     public bool FirstClaimFree => firstClaimFree;

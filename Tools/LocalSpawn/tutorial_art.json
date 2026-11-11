@@ -27,5 +27,6 @@
   "Nights and Breaches": {"style": "raid", "prompt": "A Norse village of log cabins at night, torches and a palisade of sharpened stakes, dark shapes of cursed wolves and trolls gathering at the edge of the firelight in the forest."},
   "Hunger and Thirst": {"style": "home", "prompt": "A hearty Norse meal on a wooden table: a bowl of steaming stew, dark bread, grilled fish, berries and a horn of water by a warm fire."},
   "Skills and Perks": {"style": "home", "prompt": "A Norse craftsman's workbench seen at golden hour with well-worn tools of many crafts laid out: an axe, a pickaxe, a fishing rod, a bow, a hammer, a ladle and a carving knife."},
-  "Essence": {"style": "raid", "prompt": "A stone altar carved with runes in a dark grove, a wisp of purple cursed essence flowing into a stone bowl and rising out of it as pure white-gold light."}
+  "Essence": {"style": "raid", "prompt": "A stone altar carved with runes in a dark grove, a wisp of purple cursed essence flowing into a stone bowl and rising out of it as pure white-gold light."},
+  "The Haven's Reach": {"style": "home", "prompt": "A tall carved standing stone at the edge of a misty pine forest, its runes glowing warm amber, and beside it a lone traveller standing upright, seen from behind and small in the frame, one hand resting flat on the stone; a winding path behind leads back across meadows to a distant clearing where a faint glow and hearth smoke rise, evening light."}
 }

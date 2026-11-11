@@ -20,5 +20,6 @@
   "Barrow Inscription": {"style": "raid", "prompt": "A stone lintel over a dark barrow door with old Norse letters carved deep across it, and smaller scratched letters below added much later, mist and moonlight."},
   "The Hearth Law": {"style": "home", "prompt": "An old page of house rules written in careful letters, lying on a wooden table in front of a warm stone hearth fire, a bowl of bread and a candle beside it."},
   "A Tally on Bark": {"style": "home", "prompt": "A long strip of birch bark cut with neat rows of tally notches that become crooked further along, the word FIRE cut deep at the very end, lying on a mossy log."},
-  "Something Runa Left": {"style": "raid", "prompt": "A small scrap of parchment tied to a pine branch with a bit of red cord at night, faint glowing moss marks on the bark around it, a fork in a misty forest path beyond."}
+  "Something Runa Left": {"style": "raid", "prompt": "A small scrap of parchment tied to a pine branch with a bit of red cord at night, faint glowing moss marks on the bark around it, a fork in a misty forest path beyond."},
+  "The Boundary Stones": {"style": "home", "prompt": "An ancient painted scene like an old tapestry: Norse villagers carrying a torch from a hearth beside a dark stone archway, walking out across meadows and forest edges to set tall carved standing stones in a great ring around their valley, a small flame burning on each stone, the dark forest held back beyond the ring."}
 }

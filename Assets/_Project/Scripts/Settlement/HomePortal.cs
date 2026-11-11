@@ -172,6 +172,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
     private void RaiseTalked(GameObject user)
     {
+        // A friend's portal: what this player's own portal has to tell them (a quest's Talk To) waits for their own Haven.
+        if (HavenVisit.InHostsHaven)
+        {
+            return;
+        }
+
         QuestDeeds.Raise(GameEventKind.Talked, questTarget, user);
         if (talkedEvent != null)
         {
@@ -179,9 +185,15 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         }
     }
 
-    /// <summary>The story moment waiting for the player to use the portal, or null. It plays once.</summary>
+    /// <summary>The story moment waiting for the player to use the portal, or null. It plays once, and only in the player's own
+    /// Haven: a visitor's stories don't play in a friend's (StoryScript), so there it would be spent with nothing said.</summary>
     private GameEventDefinition PendingMoment()
     {
+        if (HavenVisit.InHostsHaven)
+        {
+            return null;
+        }
+
         for (int i = questWhispers.Length - 1; i >= 0; i--)
         {
             QuestWhisper whisper = questWhispers[i];

@@ -49,6 +49,15 @@ MonoBehaviour:
   heldRenown: 6
   secureRenown: 12
   findInsight: 25
+  unlockedBy: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+  unlockedWhen: {fileID: 11400000, guid: c2d9213512795eb438f011f5cbb433ab, type: 2}
+  stonesObjective: 2
+  stoneLit: {fileID: 11400000, guid: 1d525beb0b604de47bac31c4149bd601, type: 2}
+  taskDone: {fileID: 11400000, guid: aa9f7b7bbfd61864ca812c47c2bd3085, type: 2}
+  runeOffered: {fileID: 11400000, guid: 11aa23aabf519604b9655151d51ca86b, type: 2}
+  forestGathers: {fileID: 11400000, guid: f2dc6382232f25947b9d3c13845c0387, type: 2}
+  pushAnswered: {fileID: 11400000, guid: 1840dfe1597054f4f8d648d3350f91aa, type: 2}
+  landSecure: {fileID: 11400000, guid: 7e73cc20a5766c94c863d2d839a2b935, type: 2}
   regions:
   - region: Ravenwood
     description: Old pines north of the meadows, where the ravens sit and watch the road. The tarn lies at its edge.

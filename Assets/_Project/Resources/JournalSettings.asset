@@ -120,6 +120,23 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 0}
     art: {fileID: 21300000, guid: 549b1d6c09f61624db2b6d1ca1e75e16, type: 3}
     summary: 
+  - group: The old world
+    title: The Boundary Stones
+    line: Where the pact's land ended
+    body: 'When the pact was kept, people did not only tend a hearth beside the portal. They walked the land the pact gave them, and where it ended they set tall stones and lit them from that fire.
+
+
+      A lit stone said that this much of the forest remembered a hearth. Inside the ring nobody lost the way home, and nobody lost their name.
+
+
+      When the hearth went cold the stones went cold one by one, and the forest took back what they had held: the roads, the villages and everyone on them. The stones are still out there past the meadows, waiting for a hand that keeps a fire.'
+    unlockedByQuest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: e44f24c818bfcfc4c9063f56bf4b521a, type: 3}
+    summary: 
   - group: The forest's own
     title: The Guardians
     line: What was set to keep the woods
@@ -898,6 +915,32 @@ MonoBehaviour:
     unlockedBySkill: {fileID: 0}
     art: {fileID: 21300000, guid: 69ad07a97c5115840a66eae67d0d706a, type: 3}
     summary: Night brings creatures to the edge of the light, and now and then something tests the ward.
+  - group: Safe Haven
+    title: The Haven's Reach
+    line: Light the stones, then hold the land
+    body: 'Claiming. Find one of a region''s named places (walk up to it and it goes on your map (M)), then use its boundary stone [E]. The first stone answers to your fire alone; every one after wants a Pact Rune. Runes turn up in supply caches on raids, and at the rot''s heart.
+
+
+      Holding. A held region has a hold from 0 to 100. It starts at 40 and wears a little at every turn (each dawn at home, and the end of each raid), faster under blight. Below 25 it is slipping, from 70 it is Secure, and at nothing the forest takes it back.
+
+
+      What firms it: what the region asks now and then (hunting, gathering or fishing there: its stone says which), a Pact Rune offered at its stone (+25), and each of its places you find (+5).
+
+
+      The forest pushes back. Now and then it gathers against the weakest of your lands, and two turns later pushes in and takes about 30 hold. Stand watch at that region''s stone (what the forest sends comes for it: beat it all without straying) to break the push, or burn the rot''s heart on a raid: each heart halves it. Or let it come.
+
+
+      What it gives. Every held region adds renown. A Secure one sends its goods to the stash at every dawn, and the corrupted nights never come from it.
+
+
+      The Haven window''s Lands tab (H) shows every region, how firmly it is held and what it asks. With friends, the lands are the host''s: a friend can lay runes in the host''s stones, help with what a land asks, and fight beside the host''s watch.'
+    unlockedByQuest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+    unlockedByCreature: {fileID: 0}
+    unlockedByResident: {fileID: 0}
+    foundInRaids: 0
+    unlockedBySkill: {fileID: 0}
+    art: {fileID: 21300000, guid: 61a07dc305b888543bfb5d0879a80e08, type: 3}
+    summary: Beyond the meadows the land is split into regions, each with a boundary stone. Light a stone and its region is the Haven's; hold it against the forest and it gives back.
   - group: Keeping going
     title: Hunger and Thirst
     line: They won't kill you

@@ -2676,5 +2676,125 @@
   "text": "Mind the pot. If you've come to eat, you'll carry.",
   "mood": "Neutral",
   "by": "direction"
+ },
+ "db123fc78aab": {
+  "speaker": "Sigrid",
+  "text": "The woods have names again. That is a start.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cae03a071ef3": {
+  "speaker": "The Portal",
+  "text": "A held land asks something of you now and then, and its stone will tell you what. A Pact R",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "7b352a5682ab": {
+  "speaker": "The Portal",
+  "text": "Find a place that a stone remembers, then lay your hand on the stone. The nearest stands n",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "19191137afd0": {
+  "speaker": "The Portal",
+  "text": "The forest is gathering against your stone, little one. Stand watch beside it, or burn the",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "7ce49dc3981b": {
+  "speaker": "The Portal",
+  "text": "A lit stone said: this much of the forest remembers a hearth. Inside that ring nobody lost",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "deea603ba5c1": {
+  "speaker": "The Portal",
+  "text": "Every land you hold is a road home for whoever is still out there, and a door shut on what",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "308885cfe7e0": {
+  "speaker": "The Portal",
+  "text": "Find one of the places a stone remembers, so that it knows you, then lay your hand on it. ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "640c27776009": {
+  "speaker": "The Portal",
+  "text": "Good. Not all of them, and not all at once: only what you can hold.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d924f0d05b41": {
+  "speaker": "The Portal",
+  "text": "It will. The pact gave the forest its room as well, and that is the one thing it has not f",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "0eb265fed6ea": {
+  "speaker": "The Portal",
+  "text": "When the hearth went cold, the stones went cold, one by one. The forest took back what the",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "da1f11bfa554": {
+  "speaker": "The Portal",
+  "text": "When the pact was kept, your people did not only tend a hearth beside me. They walked the ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "090569d270c1": {
+  "speaker": "The Portal",
+  "text": "Your fire reaches further than it did, little one. Far enough that I can feel what lies at",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "cce8fe42cc70": {
+  "speaker": "The Portal",
+  "text": "Hold a ring of them round me, little one, and the forest will remember us for good.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "58df648b5188": {
+  "speaker": "The Portal",
+  "text": "I felt that. Out past the meadows, a stone remembers me again.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "d7adf4eff099": {
+  "speaker": "The Portal",
+  "text": "It broke against you. It will try again, somewhere else. Let it find you ready.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "353a6d8506de": {
+  "speaker": "The Portal",
+  "text": "Little one, do you feel it? The forest is gathering against one of your stones. It means t",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "1608860bb50d": {
+  "speaker": "The Portal",
+  "text": "Little one. Three times through me, and three times home. Your fire reaches further than i",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "203f5239cda9": {
+  "speaker": "The Portal",
+  "text": "Now it must be held, little one. A lit stone is a promise, and the forest will test it.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "3df31482e4d5": {
+  "speaker": "The Portal",
+  "text": "Secure. Feel how still it is out there now. A land held that firmly sends home what it gro",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "2d08263367c1": {
+  "speaker": "The Portal",
+  "text": "The stones are still out there. They only want a hand that keeps a fire.",
+  "mood": "Calm",
+  "by": "kind"
  }
 }

@@ -324,6 +324,54 @@ public sealed class WhenZoneCleared : StoryTrigger
 }
 
 /// <summary>
+/// Starts a story once the player has been through the portal a number of times, however each raid ended (the journal's
+/// record, which remembers the last 60): the portal's word about the boundary stones after the third raid. Checked as the
+/// story wakes (home from a raid, or a game loaded), a frame late so saved progress is in, and whenever a raid ends.
+/// </summary>
+[Serializable]
+public sealed class WhenRaidsDone : StoryTrigger
+{
+    [Tooltip("How many raids, any way they ended (up to 60).")]
+    [Min(1)] public int raids = 3;
+
+    public override string Title => $"When {raids} Raid{(raids == 1 ? "" : "s")} Are Done";
+
+    /// <summary>True once the player has finished this many raids.</summary>
+    public static bool Done(int raids) => GameSession.Progress.Journal.Raids.Count >= raids;
+
+    public override Action Listen(StoryScript script, Action fire)
+    {
+        int wanted = raids;
+        Coroutine waiting = script.StartCoroutine(Check(wanted, fire));
+        Action<GameEvent> heard = raised =>
+        {
+            if (raised.Kind == GameEventKind.RaidFinished && Done(wanted))
+            {
+                fire();
+            }
+        };
+        GameEvents.Raised += heard;
+        return () =>
+        {
+            GameEvents.Raised -= heard;
+            if (waiting != null && script != null)
+            {
+                script.StopCoroutine(waiting);
+            }
+        };
+    }
+
+    private static IEnumerator Check(int wanted, Action fire)
+    {
+        yield return null;
+        if (Done(wanted))
+        {
+            fire();
+        }
+    }
+}
+
+/// <summary>
 /// Starts a story when the player does something, said the way a quest objective says it: Talk To Sigrid, Reach the
 /// Western Beacon, Use the Lake Stone, Find Ingrid, Kill a Troll. One trigger for every person, place and thing: no Quest
 /// Event made for each.

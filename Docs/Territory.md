@@ -57,7 +57,37 @@ All are in `Resources/TerritorySettings` (written by `AgentScripts/BuildTerritor
 | Renown | 6 held, 12 Secure | All eleven Secure is 132 renown: a large share of the 300 for the top rank, never all of it. |
 | Find | 25 Insight | The 27 places are worth about four extracted raids in all. |
 
+## The quest line: how it opens
+
+Until the portal has told of them, every stone is cold: it can be found and read, but not lit, and the Lands tab says
+the portal knows what the stones are. Three raids in, the player knows the portal, the clearing and the woods, and
+has seen how far a raid goes. That is when the portal calls.
+
+| Quest (Haven, green) | Starts | Asks | Pays |
+|---|---|---|---|
+| **The Cold Stones** | The portal's call on coming home after the third raid, however the raids ended | Hear the portal out (a conversation at the portal, the next time it is used; only that conversation counts, not opening its menu), then light a boundary stone. The stones open once it has been heard. Every unlit stone is a waypoint, so the tracker points at the nearest; a stone that doesn't know you yet says which way its nearest place lies | A Pact Rune |
+| **What the Land Asks** | Right after | Do what a held land asks, offer a Pact Rune at a lit stone, make a land Secure (any order) | A Pact Rune |
+| **The Forest Answers** | The first time the forest gathers against a held land | Answer that push: stand watch, or burn the rot's heart (an answer in the seconds before the quest is announced counts too). If it lands first, the next one counts | A Pact Rune |
+
+**Why, in the lore** (the portal's words). When the pact was kept, people did not only tend the hearth beside the portal.
+They walked the land the pact gave them, and where it ended they set stones and lit them from that fire. A lit stone
+said that this much of the forest remembers a hearth: inside the ring nobody lost the way home, or their name. When the
+hearth went cold the stones went cold, and the forest took back the roads and every name on them. That is where the
+lost expedition is now. So every land held is a road home for whoever is still out there, and a door shut on the
+night (Secure land keeps the corrupted nights out). The forest pushes back because the pact gave it room too, "and that
+is the one thing it has not forgotten". The portal never says who broke the pact: that is the Road North's twist.
+
+The portal speaks once more at each step: a stone lit ("Now it must be held"), the first push ("It means to push in"),
+a land Secure (the long goal: "Hold a ring of them round me"), a push broken. Its words live in
+`AgentScripts/BuildHavensReach.cs`, which builds the quests and the stories. The journal opens **The Haven's Reach**
+(Mechanics, with the tutorial notice) and **The Boundary Stones** (Backstory) when the first quest starts.
+
 ## In co-op
+
+The quest line is each player's own, as all quests are. A friend's work in the host's lands (a rune, a task's work,
+a heart burned on the host's run) moves the host's quests on too, as it moves the land. A visitor's own portal
+conversations wait for their own Haven: a friend's portal doesn't spend them, and talking to it doesn't count as
+talking to theirs. Their own stones' waypoints stay dark in a friend's Haven.
 
 The lands are the host's. Friends visiting see them as the host holds them (they come with the settlement), and no turn
 passes in a friend's game.

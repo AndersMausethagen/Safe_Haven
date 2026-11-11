@@ -65,6 +65,77 @@ public static class Territory
 
     private static void SendToHost(LandWork work, string region, int detail) => ForHost?.Invoke(work, region, detail);
 
+    /// <summary>
+    /// False until the portal has spoken of the stones (TerritorySettings › Unlocked By, after the third raid, and Unlocked When,
+    /// the conversation's end): every stone is cold. A Haven that has lit one already stays open.
+    /// </summary>
+    public static bool Unlocked
+    {
+        get
+        {
+            QuestDefinition quest = Settings.UnlockedBy;
+            if (quest == null || State.FreeClaimUsed || State.ClaimedCount > 0)
+            {
+                return true;
+            }
+
+            QuestStatus status = GameSession.Quests.StatusOf(quest);
+            return status == QuestStatus.Completed
+                || status != QuestStatus.NotStarted && (Settings.UnlockedWhen == null || GameSession.Quests.HasHappened(Settings.UnlockedWhen));
+        }
+    }
+
+    // What the quests hear of the land (TerritorySettings › The story).
+    private static void Tell(GameEventDefinition happened)
+    {
+        if (happened != null)
+        {
+            GameEvents.Raise(happened, Player.Current != null ? Player.Current.gameObject : null);
+        }
+    }
+
+    // A firmer hold, and word to the quests when it has made the region Secure.
+    private static void RaiseHold(string region, float amount)
+    {
+        bool wasSecure = StandingOf(region) == RegionStanding.Secure;
+        State.Raise(region, amount);
+        NoteSecure(region, wasSecure);
+    }
+
+    private static void NoteSecure(string region, bool wasSecure)
+    {
+        if (!wasSecure && StandingOf(region) == RegionStanding.Secure)
+        {
+            Tell(Settings.LandSecure);
+        }
+    }
+
+    // "the nearest lies about 120 m to the north-west": where to look for a place the region's stone remembers.
+    private static string NearestUnfound(string region, Vector3 from)
+    {
+        var here = new Vector2(from.x, from.z);
+        WorldAtlas.Place best = null;
+        float bestDistance = float.MaxValue;
+        foreach (WorldAtlas.Place place in PlacesIn(region))
+        {
+            float distance = (place.at - here).magnitude;
+            if (distance < bestDistance && !GameSession.Progress.Journal.HasDiscovered(place.id))
+            {
+                bestDistance = distance;
+                best = place;
+            }
+        }
+
+        if (best == null)
+        {
+            return null;
+        }
+
+        string[] ways = { "north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west" };
+        float bearing = Mathf.Repeat(HavenWorldPlan.BearingOf(best.at - here), 360f);
+        return $"the nearest lies about {Mathf.Max(10, Mathf.RoundToInt(bestDistance / 10f) * 10)} m to the {ways[Mathf.RoundToInt(bearing / 45f) % 8]}";
+    }
+
     private static TerritoryState State => GameSession.Settlement.Territory;
     private static TerritorySettings Settings => TerritorySettings.Current;
 
@@ -151,10 +222,20 @@ public static class Territory
             return false;
         }
 
+        if (!Unlocked)
+        {
+            bool called = Settings.UnlockedBy != null && GameSession.Quests.StatusOf(Settings.UnlockedBy) != QuestStatus.NotStarted;
+            reason = called
+                ? "The stone is cold under your hand, and doesn't know you. The portal wants a word with you about these stones first."
+                : "The stone is cold under your hand, and doesn't know you. The portal knows what these stones are: it will speak of them once you have been through it a few times.";
+            return false;
+        }
+
         int needed = Math.Min(settings.PlacesToClaim, PlacesIn(region).Count);
         if (PlacesFound(region) < needed)
         {
-            reason = $"The stone doesn't know you. Find {needed} of {region}'s places first ({PlacesFound(region)} found).";
+            string hint = user != null ? NearestUnfound(region, user.transform.position) : null;
+            reason = $"The stone doesn't know you. Find {needed} of {region}'s places first ({PlacesFound(region)} found){(hint != null ? ": " + hint : "")}.";
             return false;
         }
 
@@ -182,6 +263,7 @@ public static class Territory
 
         State.Claim(region, Settings);
         GameMessages.Post($"The boundary stone of {region} burns again. {region} is the Haven's: hold it, and it will give back.", MessageKind.Gain);
+        Tell(Settings.StoneLit);
         Changed?.Invoke();
     }
 
@@ -222,6 +304,8 @@ public static class Territory
             return;
         }
 
+        // The offering is the player's own deed, wherever the stone stands.
+        Tell(Settings.RuneOffered);
         if (HavenVisit.IsVisiting)
         {
             SendToHost(LandWork.Rune, region, 0);
@@ -229,7 +313,7 @@ public static class Territory
             return;
         }
 
-        State.Raise(region, Settings.RuneHold);
+        RaiseHold(region, Settings.RuneHold);
         GameMessages.Post($"The rune sinks into the stone. {region}: {Describe(region)}.", MessageKind.Gain);
         Changed?.Invoke();
     }
@@ -252,10 +336,13 @@ public static class Territory
     /// <summary>A watch held at a stone (StoneDefence).</summary>
     public static void Defended(string region)
     {
+        bool wasSecure = StandingOf(region) == RegionStanding.Secure;
         if (!HavenVisit.IsVisiting && State.Defended(region, Settings))
         {
             ExperienceTracker.GrantInsight(Settings.DefenceInsight);
             GameMessages.Post($"The push on {region} is broken. {region}: {Describe(region)}.", MessageKind.Gain);
+            Tell(Settings.PushAnswered);
+            NoteSecure(region, wasSecure);
             Changed?.Invoke();
         }
     }
@@ -297,6 +384,7 @@ public static class Territory
         GameMessages.Post(push.Weakened >= 0.999f
             ? $"{who} The forest's push on {push.Region} has nothing left behind it."
             : $"{who} The forest's push on {push.Region} falters.", MessageKind.Gain);
+        Tell(Settings.PushAnswered);
         Changed?.Invoke();
     }
 
@@ -316,7 +404,7 @@ public static class Territory
             return;
         }
 
-        State.Raise(region, Settings.FindHold);
+        RaiseHold(region, Settings.FindHold);
         Changed?.Invoke();
     }
 
@@ -341,8 +429,10 @@ public static class Territory
                     return;
                 }
 
-                State.Raise(region, Settings.RuneHold);
+                RaiseHold(region, Settings.RuneHold);
                 GameMessages.Post($"{friend} offered a Pact Rune at the stone of {region}. {region}: {Describe(region)}.", MessageKind.Gain);
+                // As a friend's task work does, it counts for the host's quests about the land.
+                Tell(Settings.RuneOffered);
                 Changed?.Invoke();
                 break;
             case LandWork.Task:
@@ -351,7 +441,7 @@ public static class Territory
             case LandWork.Find:
                 if (State.IsClaimed(region))
                 {
-                    State.Raise(region, Settings.FindHold);
+                    RaiseHold(region, Settings.FindHold);
                     Changed?.Invoke();
                 }
 
@@ -373,7 +463,13 @@ public static class Territory
         }
 
         SettlementState settlement = GameSession.Settlement;
+        bool pushComing = State.Incursion != null;
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread);
+        if (!pushComing && State.Incursion != null)
+        {
+            Tell(Settings.ForestGathers);
+        }
+
         if (spread > 0f)
         {
             settlement.ChangeBlight(spread);
@@ -497,10 +593,13 @@ public static class Territory
             return;
         }
 
+        bool wasSecure = StandingOf(region) == RegionStanding.Secure;
         if (State.CountTask(region, info.taskCount, Settings))
         {
             ExperienceTracker.GrantInsight(Settings.TaskInsight);
             GameMessages.Post($"{region} has what it needed. {region}: {Describe(region)}.", MessageKind.Gain);
+            Tell(Settings.TaskDone);
+            NoteSecure(region, wasSecure);
         }
 
         Changed?.Invoke();

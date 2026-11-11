@@ -48,6 +48,9 @@ public static class BuildJournal
         ("The expedition", "Ingrid's Word", "The first to come home",
             "She lay under a root for three nights watching your fire and saying the word so the forest couldn't have it. Fire. Fire. Fire.\n\nIngrid knows more about the curse than she lets on. She saw Bjarne thrown north when the stones broke, towards the troll country. The rest she couldn't see.",
             "AStrangerInTheMist", null),
+        ("The old world", "The Boundary Stones", "Where the pact's land ended",
+            "When the pact was kept, people did not only tend a hearth beside the portal. They walked the land the pact gave them, and where it ended they set tall stones and lit them from that fire.\n\nA lit stone said that this much of the forest remembered a hearth. Inside the ring nobody lost the way home, and nobody lost their name.\n\nWhen the hearth went cold the stones went cold one by one, and the forest took back what they had held: the roads, the villages and everyone on them. The stones are still out there past the meadows, waiting for a hand that keeps a fire.",
+            "TheColdStones", null),
         ("The forest's own", "The Guardians", "What was set to keep the woods",
             "The Root Guardians were not always hostile. They were set to keep the forest, on the forest's side of the old promise, and they are still doing it. Whatever twisted them did not tell them to stop.\n\nThat is the uncomfortable part. Nothing you meet on the root paths thinks it has done anything wrong.",
             null, "RootGuardian"),
@@ -177,6 +180,7 @@ public static class BuildJournal
         ["Stations and Work"] = "FirstCamp",
         ["Nights and Breaches"] = "TheWeakeningWard",
         ["Essence"] = "TheAlchemist",
+        ["The Haven's Reach"] = "TheColdStones",
     };
 
     // ----- Which skill, tried for the first time, opens a mechanics page (by the skill's id). -----
@@ -279,6 +283,9 @@ public static class BuildJournal
         ("Safe Haven", "Nights and Breaches", "Safe, but not perfectly",
             "Night brings creatures to the edge of the light, and now and then something tests the ward.",
             "After the first breach is won, weak creatures prowl just outside the light at night, so keep your fires lit. Cursed Essence is richer after dark too, if you want to go looking.\n\nNow and then something tests the ward. A breach is always announced ahead of time: you get a warning, time to prepare, the defence itself and a chance to recover. It only happens while you are there, and it can't wipe out the home you have built. Damaged buildings can be repaired."),
+        ("Safe Haven", "The Haven's Reach", "Light the stones, then hold the land",
+            "Beyond the meadows the land is split into regions, each with a boundary stone. Light a stone and its region is the Haven's; hold it against the forest and it gives back.",
+            "Claiming. Find one of a region's named places (walk up to it and it goes on your map (M)), then use its boundary stone [E]. The first stone answers to your fire alone; every one after wants a Pact Rune. Runes turn up in supply caches on raids, and at the rot's heart.\n\nHolding. A held region has a hold from 0 to 100. It starts at 40 and wears a little at every turn (each dawn at home, and the end of each raid), faster under blight. Below 25 it is slipping, from 70 it is Secure, and at nothing the forest takes it back.\n\nWhat firms it: what the region asks now and then (hunting, gathering or fishing there: its stone says which), a Pact Rune offered at its stone (+25), and each of its places you find (+5).\n\nThe forest pushes back. Now and then it gathers against the weakest of your lands, and two turns later pushes in and takes about 30 hold. Stand watch at that region's stone (what the forest sends comes for it: beat it all without straying) to break the push, or burn the rot's heart on a raid: each heart halves it. Or let it come.\n\nWhat it gives. Every held region adds renown. A Secure one sends its goods to the stash at every dawn, and the corrupted nights never come from it.\n\nThe Haven window's Lands tab (H) shows every region, how firmly it is held and what it asks. With friends, the lands are the host's: a friend can lay runes in the host's stones, help with what a land asks, and fight beside the host's watch."),
         ("Keeping going", "Hunger and Thirst", "They won't kill you",
             "You need to eat and drink to stay at your best, and a good meal does more than fill you.",
             "Hunger and thirst wear down what you can do, but they never kill you. Berries and a stream will do to start with.\n\nCooked meals give timed bonuses on top of what they restore. You can have two at once, and a third pushes out the one closest to ending. Tonics from the Cauldron take no meal slot. Both go through the portal with you, so the meal before a raid counts, but a failed raid loses them.\n\nEating stops you for a moment, and a hit that gets through interrupts it, though the food is kept. Its healing arrives over several seconds."),

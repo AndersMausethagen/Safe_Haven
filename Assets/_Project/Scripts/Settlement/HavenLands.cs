@@ -30,6 +30,14 @@ public static class HavenLands
     {
         TerritoryState state = GameSession.Settlement.Territory;
         int all = Territory.Claimable.Count();
+        if (!Territory.Unlocked)
+        {
+            QuestDefinition opener = TerritorySettings.Current.UnlockedBy;
+            bool called = opener != null && GameSession.Quests.StatusOf(opener) != QuestStatus.NotStarted;
+            return $"{all} regions beyond the meadows, each with a cold boundary stone · " +
+                (called ? "the portal wants a word with you about them" : "the portal will speak of them once you have been through it a few times");
+        }
+
         string summary = $"{state.ClaimedCount} of {all} regions held · {Territory.Renown} renown from them";
         if (state.Incursion != null)
         {
@@ -85,8 +93,9 @@ public static class HavenLands
 
         if (standing == RegionStanding.Wild)
         {
-            entry.Details.Add(new HavenDetail("To claim it",
-                $"Find one of its places, then light its boundary stone{(state.ClaimNeedsRune(settings) ? " with a Pact Rune" : " (the first is free)")}."));
+            entry.Details.Add(new HavenDetail("To claim it", !Territory.Unlocked
+                ? "Not yet: its boundary stone is cold. The portal knows what the stones are."
+                : $"Find one of its places, then light its boundary stone{(state.ClaimNeedsRune(settings) ? " with a Pact Rune" : " (the first is free)")}."));
         }
 
         return entry;

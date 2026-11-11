@@ -324,6 +324,261 @@ public sealed class TerritoryTests
         Assert.IsTrue(WorldAtlas.For("SafeHaven").Regions.All(r => System.Text.Encoding.UTF8.GetByteCount(r.name) < 60), "Region names fit the message.");
     }
 
+    // ----- The quest line: the portal's word after the third raid opens the stones (BuildHavensReach) -----
+
+    // The portal has told of the stones (the conversation's end).
+    private static void Told() => GameSession.Quests.RestoreHappened(Settings.UnlockedWhen.Id);
+
+    private static QuestDefinition QuestAt(string file) => AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{file}.asset");
+
+    [Test]
+    public void TheStones_AreCold_UntilThePortalSpeaks()
+    {
+        GameSession.StartNewGame();
+        try
+        {
+            Assert.IsNotNull(Settings.UnlockedBy, "Run AgentScripts/BuildHavensReach.cs.");
+            Assert.IsFalse(Territory.Unlocked);
+            Assert.IsFalse(Territory.CanClaim(Region, null, out string why));
+            StringAssert.Contains("cold", why);
+            StringAssert.Contains("cold", HavenLands.Summary(), "the Lands tab says so too");
+
+            Assert.IsTrue(GameSession.Quests.TryStart(Settings.UnlockedBy));
+            Assert.IsFalse(Territory.Unlocked, "called, but not yet told");
+            Assert.IsFalse(Territory.CanClaim(Region, null, out why));
+            StringAssert.Contains("wants a word", why);
+            Told();
+            Assert.IsTrue(Territory.Unlocked);
+            Assert.IsFalse(Territory.CanClaim(Region, null, out why));
+            StringAssert.Contains("places first", why, "open now: it only wants one of its places found");
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void AStoneThatDoesntKnowYou_SaysWhichWayToLook()
+    {
+        GameSession.StartNewGame();
+        var user = new GameObject("Player at the stone");
+        try
+        {
+            GameSession.Quests.TryStart(Settings.UnlockedBy);
+            Told();
+            WorldAtlas.Region region = WorldAtlas.For("SafeHaven").Regions.First(r => r.name == Region);
+            user.transform.position = new Vector3(region.stoneAt.x, 0f, region.stoneAt.y);
+            Assert.IsFalse(Territory.CanClaim(Region, user, out string why));
+            StringAssert.IsMatch(@"the nearest lies about \d+ m to the (north|south|east|west)", why);
+        }
+        finally
+        {
+            Object.DestroyImmediate(user);
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void TheLand_TellsTheQuests()
+    {
+        GameSession.StartNewGame();
+        ForgetBurnedHearts();
+        var heard = new System.Collections.Generic.List<GameEventDefinition>();
+        System.Action<GameEvent> listen = e =>
+        {
+            if (e.Kind == GameEventKind.Custom && e.Subject is GameEventDefinition said)
+            {
+                heard.Add(said);
+            }
+        };
+        var user = new GameObject("Player");
+        GameEvents.Raised += listen;
+        try
+        {
+            GameSession.Quests.TryStart(Settings.UnlockedBy);
+            Told();
+            foreach (WorldAtlas.Place place in Territory.PlacesIn(Region))
+            {
+                GameSession.Progress.Journal.NoteDiscovered(place.id);
+            }
+
+            Territory.Claim(Region, user);
+            CollectionAssert.Contains(heard, Settings.StoneLit);
+
+            user.AddComponent<ItemInventory>().Container.SetSlot(0, new ItemStack(Settings.PactRune, 1));
+            Territory.Offer(Region, user);
+            CollectionAssert.Contains(heard, Settings.RuneOffered);
+            CollectionAssert.DoesNotContain(heard, Settings.LandSecure, "65 is not Secure yet");
+
+            RegionTaskKind kind = Settings.Info(Region).task;
+            for (int i = 0; i < Settings.Info(Region).taskCount; i++)
+            {
+                CountTask(Region, kind);
+            }
+
+            CollectionAssert.Contains(heard, Settings.TaskDone);
+            Assert.AreEqual(RegionStanding.Secure, Territory.StandingOf(Region));
+            Assert.AreEqual(1, heard.Count(e => e == Settings.LandSecure), "Secure is told once, as it is reached");
+
+            for (int turn = 0; turn < 300 && GameSession.Settlement.Territory.Incursion == null; turn++)
+            {
+                Territory.Turn(false);
+            }
+
+            Assert.IsNotNull(GameSession.Settlement.Territory.Incursion);
+            Assert.AreEqual(1, heard.Count(e => e == Settings.ForestGathers), "the warning is told once");
+            Territory.Defended(Region);
+            CollectionAssert.Contains(heard, Settings.PushAnswered);
+        }
+        finally
+        {
+            GameEvents.Raised -= listen;
+            Object.DestroyImmediate(user);
+            ForgetBurnedHearts();
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void TheQuestLine_IsWired()
+    {
+        QuestDefinition cold = QuestAt("TheColdStones"), asks = QuestAt("WhatTheLandAsks"), forest = QuestAt("TheForestAnswers");
+        Assert.IsNotNull(cold, "Run AgentScripts/BuildHavensReach.cs.");
+        Assert.AreEqual(cold, Settings.UnlockedBy, "the first quest opens the stones");
+        foreach (QuestDefinition quest in new[] { cold, asks, forest })
+        {
+            Assert.AreEqual(QuestRank.Haven, quest.Rank, quest.name + ": beside the story, never in its way");
+            Assert.AreEqual("The Haven's Reach", quest.Chain);
+            Assert.IsNotEmpty(quest.JournalNotes, quest.name);
+            Assert.IsTrue(quest.RewardItems.Any(r => r.Item == Settings.PactRune), quest.name + " pays with what the next stone wants");
+        }
+
+        Assert.AreEqual(QuestStart.ByQuestGiver, cold.Start, "the portal starts it (Story - The Cold Stones)");
+        Assert.AreEqual(Settings.UnlockedWhen, cold.Objectives[0].QuestEvent, "heard only from the stones conversation: any other talk with the portal (its menu) must not tick it");
+        Assert.IsTrue(cold.ObjectivesInOrder);
+        Assert.AreEqual(Settings.StoneLit, cold.Objectives[Settings.StonesObjective - 1].QuestEvent, "the stones point the way for the objective that lights one");
+        CollectionAssert.AreEqual(new[] { cold }, asks.Prerequisites);
+        CollectionAssert.AreEqual(new[] { Settings.TaskDone, Settings.RuneOffered, Settings.LandSecure }, asks.Objectives.Select(o => o.QuestEvent).ToArray());
+        Assert.AreEqual(QuestStart.OnQuestEvent, forest.Start);
+        Assert.AreEqual(Settings.ForestGathers, forest.StartEvent, "it starts when the forest first gathers");
+        Assert.AreEqual(Settings.PushAnswered, forest.Objectives[0].QuestEvent);
+        Assert.IsTrue(forest.Objectives[0].CountAlreadyOwned, "an answer in the seconds before it is announced counts (a friend's heart, live 2026-11-11)");
+    }
+
+    [Test]
+    public void ThePortalSpeaks_AfterTheThirdRaid()
+    {
+        GameSession.StartNewGame();
+        try
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Assert.IsFalse(WhenRaidsDone.Done(3), $"not after {i} raids");
+                GameSession.Progress.Journal.AddRaid(new RaidRecord { Raid = "Misty Woods", Outcome = i == 1 ? "Fallen" : "Extracted" });
+            }
+
+            Assert.IsTrue(WhenRaidsDone.Done(3), "three raids, however they ended");
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void EveryUnlitStone_ShowsTheWay_WhileTheQuestAsks()
+    {
+        var stone = (GameObject)PrefabUtility.InstantiatePrefab(Settings.StonePrefab);
+        try
+        {
+            stone.GetComponent<BoundaryStone>().Configure(Region);
+            var waypoint = stone.GetComponent<QuestWaypoint>();
+            Assert.IsNotNull(waypoint);
+            Assert.AreEqual(Settings.UnlockedBy, waypoint.Quest);
+            StringAssert.Contains(Region, waypoint.Label);
+        }
+        finally
+        {
+            Object.DestroyImmediate(stone);
+        }
+    }
+
+    [Test]
+    public void AVisitor_KeepsTheirStoryForTheirOwnPortal_AndIsntPointedAtTheHostsStones()
+    {
+        GameSession.StartNewGame();
+        QuestDefinition cold = Settings.UnlockedBy;
+        var moment = AssetDatabase.LoadAssetAtPath<GameEventDefinition>("Assets/_Project/Data/Quests/Events/ColdStonesMoment.asset");
+        var portalObject = new GameObject("Portal");
+        var stone = (GameObject)PrefabUtility.InstantiatePrefab(Settings.StonePrefab);
+        try
+        {
+            var portal = portalObject.AddComponent<HomePortal>();
+            var so = new SerializedObject(portal);
+            SerializedProperty whispers = so.FindProperty("questWhispers");
+            whispers.arraySize = 1;
+            whispers.GetArrayElementAtIndex(0).FindPropertyRelative("quest").objectReferenceValue = cold;
+            whispers.GetArrayElementAtIndex(0).FindPropertyRelative("moment").objectReferenceValue = moment;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            GameSession.Quests.TryStart(cold);
+            MethodInfo pending = typeof(HomePortal).GetMethod("PendingMoment", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.AreEqual(moment, pending.Invoke(portal, null), "at home the portal has its conversation to give");
+
+            var boundary = stone.GetComponent<BoundaryStone>();
+            typeof(BoundaryStone).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(boundary, null);
+            boundary.Configure(Region);
+            Assert.IsTrue(stone.GetComponent<QuestWaypoint>().enabled, "an unlit stone of one's own shows the way");
+
+            Visiting(true);
+            Assert.IsNull(pending.Invoke(portal, null), "a friend's portal doesn't spend it: their stories don't play there");
+            boundary.Configure(Region);
+            Assert.IsFalse(stone.GetComponent<QuestWaypoint>().enabled, "the host's stones aren't the visitor's to light");
+        }
+        finally
+        {
+            Visiting(false);
+            HavenVisit.Forget();
+            Object.DestroyImmediate(portalObject);
+            Object.DestroyImmediate(stone);
+            GameSession.StartNewGame();
+        }
+    }
+
+    [Test]
+    public void AFriendsWork_CountsForTheHostsQuests()
+    {
+        GameSession.StartNewGame();
+        var heard = new System.Collections.Generic.List<GameEventDefinition>();
+        System.Action<GameEvent> listen = e =>
+        {
+            if (e.Kind == GameEventKind.Custom && e.Subject is GameEventDefinition said)
+            {
+                heard.Add(said);
+            }
+        };
+        GameEvents.Raised += listen;
+        try
+        {
+            GameSession.Settlement.Territory.Claim(Region, Settings);
+            Territory.FromFriend(LandWork.Rune, Region, 0, "Ingrid");
+            CollectionAssert.Contains(heard, Settings.RuneOffered);
+            TerritorySettings.RegionInfo info = Settings.Info(Region);
+            for (int i = 0; i < info.taskCount; i++)
+            {
+                Territory.FromFriend(LandWork.Task, Region, (int)info.task, "Ingrid");
+            }
+
+            CollectionAssert.Contains(heard, Settings.TaskDone);
+            CollectionAssert.Contains(heard, Settings.LandSecure, "40 + 25 + 10: a friend's work made it Secure");
+        }
+        finally
+        {
+            GameEvents.Raised -= listen;
+            GameSession.StartNewGame();
+        }
+    }
+
     [Test]
     public void ThePushHasARaidAnswer_AndTheRuneTurnsUp()
     {
