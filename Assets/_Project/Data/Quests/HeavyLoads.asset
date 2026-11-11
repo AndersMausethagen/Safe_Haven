@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Heavy Loads
   description: 'Copper ore and planks weigh more than any pack can take home. Tor knows carts: raise his Woodcutter''s Lodge to Tier II and he plans a Wainwright''s Yard, where barrows, handcarts and a rowboat are built.'
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: Carts carry what a pack can't. The Wainwright's Yard wants Tor's lodge at Tier II first; he will tell you so, more than once.
   rank: 4
   availableObjective: 
   announceStart: 1

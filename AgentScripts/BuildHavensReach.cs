@@ -233,6 +233,7 @@ public static class BuildHavensReach
         Link(broken, (answered, 0, calm), (calm, 0, ready));
 
         Whispers(portal, cold, asks, forest, moment);
+        foreach (StoryScript built in new[] { call, told, lit, gathering, secured, broken }) KeepTriggerIds(built);
         SaveableEntityTools.AssignSceneIds(scene);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -270,15 +271,43 @@ public static class BuildHavensReach
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    // A story of this builder's own, made again from nothing each run.
+    // A story of this builder's own, made again each run on the same object: its save id and its triggers' ids are kept (by
+    // order, KeepTriggerIds), so a saved game still knows which have fired. Made from nothing, every one would play again.
+    private static readonly Dictionary<StoryScript, List<string>> oldTriggers = new Dictionary<StoryScript, List<string>>();
+
     private static StoryScript Fresh(Transform root, string name)
     {
         Transform old = root.Find(name);
-        if (old != null) Object.DestroyImmediate(old.gameObject);
-        var go = new GameObject(name);
-        go.transform.SetParent(root, false);
-        go.AddComponent<SaveableEntity>();
-        return go.AddComponent<StoryScript>();
+        GameObject go;
+        var ids = new List<string>();
+        if (old != null)
+        {
+            go = old.gameObject;
+            if (go.TryGetComponent(out StoryScript previous))
+            {
+                ids.AddRange(previous.Nodes.OfType<StoryTrigger>().Select(t => t.id));
+                Object.DestroyImmediate(previous);
+            }
+        }
+        else
+        {
+            go = new GameObject(name);
+            go.transform.SetParent(root, false);
+            go.AddComponent<SaveableEntity>();
+        }
+
+        StoryScript story = go.AddComponent<StoryScript>();
+        oldTriggers[story] = ids;
+        return story;
+    }
+
+    // After the links: each trigger takes back the id its place had last run.
+    private static void KeepTriggerIds(StoryScript story)
+    {
+        if (!oldTriggers.TryGetValue(story, out List<string> ids)) return;
+        List<StoryTrigger> triggers = story.Nodes.OfType<StoryTrigger>().ToList();
+        for (int i = 0; i < triggers.Count && i < ids.Count; i++) triggers[i].id = ids[i];
+        oldTriggers.Remove(story);
     }
 
     // Adds the nodes (in order of first appearance, laid out left to right) and the links.

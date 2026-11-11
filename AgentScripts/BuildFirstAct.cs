@@ -35,8 +35,10 @@ public static class BuildFirstAct
 
         ItemDefinition ember = Ember();
         GameEventDefinition moment = Event("RoadNorthMoment", "home.road_north", "The Road North (the portal speaks)");
+        // The quest waits for the conversation's end (FixQuestAudit, 2026-11-11): a Talk To the portal counted every talk before it.
+        GameEventDefinition told = Event("RoadNorthHeard", "home.road_north_heard", "The portal told of the Heartroot");
         QuestDefinition hunt = WhatBreathes(ember);
-        QuestDefinition road = RoadNorth(hunt);
+        QuestDefinition road = RoadNorth(hunt, told);
         TheHeartroot(ember);
         People();
 
@@ -46,8 +48,9 @@ public static class BuildFirstAct
         AssetDatabase.SaveAssets();
         // Loaded again from disk: made in this same run, the scene's portal kept it as an empty reference (2026-11-10).
         moment = Load<GameEventDefinition>(Quests + "Events/RoadNorthMoment.asset");
+        told = Load<GameEventDefinition>(Quests + "Events/RoadNorthHeard.asset");
 
-        string home = Home(hunt, road, moment);
+        string home = Home(hunt, road, moment, told);
         string problems = string.Join("; ", new[] { hunt, road }.SelectMany(q => q.FindProblems().Select(p => q.name + ": " + p)));
         return $"{ember.DisplayName}; {hunt.DisplayName}; {road.DisplayName}; {home}; problems: {(problems.Length > 0 ? problems : "none")}";
     }
@@ -99,15 +102,19 @@ public static class BuildFirstAct
         return quest;
     }
 
-    private static QuestDefinition RoadNorth(QuestDefinition after)
+    private static QuestDefinition RoadNorth(QuestDefinition after, GameEventDefinition told)
     {
         QuestDefinition quest = Quest("TheRoadNorth");
-        var portal = Load<QuestTargetDefinition>(Quests + "Targets/The Portal.asset");
         Basics(quest, "theroadnorth", "The Road North", after,
             "The Heartroot is still, and the roots have gone quiet. The portal has something to tell you about what you brought down, and about what lies north of it.",
             "Whatever the portal says, the road north to Troll Valley is open now: choose it in the raid planner.",
-            (QuestObjective.Deed(ObjectiveType.TalkTo, portal), "Speak to the portal"));
-        Edit(quest, so => so.FindProperty("startDelay").floatValue = 4f);
+            (QuestObjective.Create(ObjectiveType.QuestEvent, 1, told), "Speak to the portal"));
+        Edit(quest, so =>
+        {
+            so.FindProperty("startDelay").floatValue = 4f;
+            // Only this conversation counts, not one from before the quest.
+            so.FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("countAlreadyOwned").boolValue = false;
+        });
         return quest;
     }
 
@@ -209,7 +216,7 @@ public static class BuildFirstAct
 
     // ----- Home: the stories -----
 
-    private static string Home(QuestDefinition hunt, QuestDefinition road, GameEventDefinition moment)
+    private static string Home(QuestDefinition hunt, QuestDefinition road, GameEventDefinition moment, GameEventDefinition roadNorthHeard)
     {
         Scene scene = EditorSceneManager.OpenScene(HomeScene);
         Transform root = GameObject.Find(Moments)?.transform ?? throw new InvalidOperationException("No " + Moments + " in " + HomeScene);
@@ -289,7 +296,7 @@ public static class BuildFirstAct
         var forTruth = Say("<i>You came to see if the stories were true. Here is the one nobody tells: we broke the pact first.</i>");
         var title = Say("<i>Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.</i>");
         var north = Say("<i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>");
-        var done = new CountAsDoneNode { deed = QuestObjective.Deed(ObjectiveType.TalkTo, portal.QuestTarget) };
+        var done = new RaiseQuestEventNode { questEvent = roadNorthHeard };
         Link(twist, (told, 0, bringIt), (bringIt, 0, truth), (truth, 0, answer), (answer, 0, broke), (answer, 1, whyNot),
             (broke, 0, coin), (whyNot, 0, coin), (coin, 0, forCoin), (coin, 1, kin), (kin, 0, forKin), (kin, 1, why), (why, 0, forTruth), (why, 1, title),
             (forCoin, 0, title), (forKin, 0, title), (forTruth, 0, title), (title, 0, north), (north, 0, done));

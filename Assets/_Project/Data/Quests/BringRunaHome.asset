@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Marks in the Dark
   description: 'Every raid is a guess: you go through and take what the woods give. Runa, the expedition''s tracker, would know where to look. Marks cut on the trees and seen only at night may be hers.'
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: Runa marks a trail so that only those who know her can read it, and only at night. Go after dark. She was the one who said the forest had moved since the others came through; she will want to hear she was right.
   rank: 3
   availableObjective: 
   announceStart: 1

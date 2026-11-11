@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Hides and Hooks
   description: 'Gunnar cures hides into leather. Give him the Hunter''s work and build him a Hunter''s Lodge (G). He knows the water as well as the woods: as a Fisher he runs a Dock.'
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: Gunnar cures hides into leather while you raid. As a Fisher instead, he works the Dock.
   rank: 4
   availableObjective: 
   announceStart: 1

@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: A Pact Rune offered
   objectiveText: Offer a Pact Rune at a lit stone
   notes: 
+  homeOnly: 1

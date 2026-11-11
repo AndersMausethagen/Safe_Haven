@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: The Cold Stones (the portal speaks)
   objectiveText: Hear the portal out
   notes: 
+  homeOnly: 0

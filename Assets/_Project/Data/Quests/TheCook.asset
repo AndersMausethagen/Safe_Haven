@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Show Me Your Kitchen
   description: 'Yrsa cooked for a jarl once, and tells you so. Give her the Cook''s work and build a Kitchen (G): her meals last, and send you out stronger.'
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: The Kitchen wants Bjarne's Smithy standing first. Yrsa's meals give their bonuses for longer than a stew from the campfire, and she will tell you which jarl she cooked them for.
   rank: 4
   availableObjective: 
   announceStart: 1
@@ -74,7 +74,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 1
   - type: 7
-    description: 'Build a Kitchen (build menu: G)'
+    description: 'Build a Kitchen (build menu: G): it wants Bjarne''s Smithy standing'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

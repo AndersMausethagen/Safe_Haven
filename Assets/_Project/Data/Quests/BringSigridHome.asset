@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Horn at Dusk
   description: Everyone else is home. Only Sigrid, who led the expedition and whose voice you heard in the stones, is still out there. A horn has been heard at dusk, calling the expedition's signal.
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: 'Sigrid led the expedition, and it was her voice in the stones the day they broke. She has been out there longest of all. The horn is the expedition''s old signal: answer it at dusk.'
   rank: 3
   availableObjective: 
   announceStart: 1

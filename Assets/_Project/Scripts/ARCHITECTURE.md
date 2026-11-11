@@ -425,7 +425,35 @@ For designers (Content Editor › Quests):
   place or thing in the scenes (`QuestSceneIndex.MarkedAs`, the `[QuestIdentity]` fields), how it is handed in, its
   rewards; each missing piece has buttons: give it to someone in the open scenes (or the selected object, or a new giver),
   create a Quest Zone or Inspect Point for the target at the Scene view, make the selected object the target, add a first
-  objective. A Quest Target field has **New** beside it (`QuestTargetTools`).
+  objective. A Quest Target field has **New** beside it (`QuestTargetTools`). It also flags (2026-11-11 audit): a Talk To,
+  Reach or Use that counts deeds done before the quest when an earlier quest asks the same (it is done the moment it
+  starts: fix, **Count Only After It Starts**; for a conversation raise a Story Event at its end), someone talked to or given
+  work before the rescue that brings them home, a building nothing teaches, an item no recipe makes.
+- **The whole game's loose ends** (`QuestAudit`, `QuestAuditTests`): a quest that can never start or waits for one that
+  can't, something a story or gate waits for that nothing raises (`WaitForEventNode` counts as waiting, not raising), a
+  portal whisper's moment no story plays (the click is swallowed), a rescue no raid places, and every quest's Make It Work.
+  Reads saved files only. Run it after any quest, story or scene change.
+- **Story builders and saves.** A story's save id and its triggers' ids are random (`SaveableEntity.AssignNewId`,
+  `StoryNode.id`): a builder that destroys and remakes a story makes every saved game play it again. Keep the object and
+  the trigger ids (`BuildHavensReach.Fresh`/`KeepTriggerIds`), or patch a story in place (`FixQuestAudit`).
+
+### Quests in co-op: decided in one place
+
+A quest needs no multiplayer code. Quests are each player's own (the character's part of the save), and while a player
+visits a friend's Haven (`HavenVisit.InHostsHaven`) one rule decides what moves their quests on, per objective type
+(`QuestObjective.InAFriendsHaven`, applied in `Progress` and `Owned` and to what the log remembers, `QuestLog.Handle`):
+
+| Counts in a friend's Haven | Only in one's own Haven |
+|---|---|
+| Collect, Gather, Kill, Craft, Raids, Fish, Rescue (the traveller goes to their own Haven), Reach Place, Repair | Build, Upgrade, Destroy, Store, Assign Job, Haven Rank, Defend Breach, Talk To (the friend's people and portal), Use Object (the friend's things) |
+
+A Story Event decides for itself (Quest Event › **Home Only**: the boundary stones' events, the portal repaired). A Home
+Only event raised in a friend's Haven is not remembered either, so it can't count once home, and starts no quest. A
+friend's people and notice board offer a visitor nothing and take nothing in (`QuestGiver.StateFor`); stories don't play
+for visitors (`StoryScript`); the portal keeps its story moments and Talk To for the player's own (`HomePortal`). On a raid
+followed with the host everything counts. Arriving anywhere recounts Count Already Owned objectives (`QuestManager.RecountOwned`,
+only ever adding), so a quest begun on a raid or in a friend's Haven sees the player's own buildings once home. A new
+objective type must be given a rule (`QuestCoopTests`).
 
 ### Who raises which game event
 

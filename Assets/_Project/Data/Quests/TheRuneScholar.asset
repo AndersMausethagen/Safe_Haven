@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Runes for the Road
   description: Liv knows runes nobody else does. Give her the Rune Scholar's work, and she teaches you to cut them at the Cauldron.
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: Runes cut at the Cauldron go with you on a raid. Liv will explain what each one does, at length, whether you ask or not.
   rank: 4
   availableObjective: 
   announceStart: 1

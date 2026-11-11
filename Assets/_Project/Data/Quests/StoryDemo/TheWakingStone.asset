@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Waking Stone
   description: A standing stone hums with something old. Whatever is inside wants out.
   chain: Story Demo
-  journalNotes: 
+  journalNotes: Whatever is in the stone has been there a long time, and it has noticed you.
   rank: 1
   availableObjective: 
   announceStart: 1

@@ -173,12 +173,15 @@ public sealed class QuestLog
     /// <summary>Counts an event against every active quest. Quests whose objectives are all met are completed. Quest Events are remembered.</summary>
     public void Handle(in GameEvent gameEvent)
     {
-        if (gameEvent.Kind == GameEventKind.Custom && gameEvent.Subject is GameEventDefinition custom)
+        // Co-op: in a friend's Haven, what belongs to a Haven isn't remembered either, or it would count once home
+        // (QuestObjective.CountsInAFriendsHaven; a Story Event's Home Only).
+        bool friends = HavenVisit.InHostsHaven;
+        if (gameEvent.Kind == GameEventKind.Custom && gameEvent.Subject is GameEventDefinition custom && !(friends && custom.HomeOnly))
         {
             happenedEvents.Add(custom.Id);
         }
 
-        string deed = gameEvent.ForPlayerSide ? QuestDeeds.KeyOf(gameEvent) : null;
+        string deed = gameEvent.ForPlayerSide && (!friends || QuestDeeds.CountsInAFriendsHaven(gameEvent.Kind)) ? QuestDeeds.KeyOf(gameEvent) : null;
         if (deed != null)
         {
             happenedEvents.Add(deed);

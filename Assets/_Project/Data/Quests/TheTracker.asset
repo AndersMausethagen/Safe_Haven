@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Eyes in the Woods
   description: Runa reads the woods before you go. Give her the Tracker's work, and every briefing names one more thing that's out there.
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: With Runa as Tracker, every raid's briefing names one more thing that is out there before you go.
   rank: 4
   availableObjective: 
   announceStart: 1

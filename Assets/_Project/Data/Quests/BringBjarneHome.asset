@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Smith in the Woods
   description: 'Every raid sends your club and tools home more broken, and the Workshop can only patch them. Ingrid heard a hammer in the deep woods at dusk: Bjarne, the expedition''s smith. Look for him in the portal''s briefing, find him and bring him home.'
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: Ingrid heard him working one-handed, so he is hurt and slower than he will admit. Clear the way before you lead him out. Once home he mends what the woods break, at half the cost.
   rank: 3
   availableObjective: 
   announceStart: 1

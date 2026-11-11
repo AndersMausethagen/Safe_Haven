@@ -167715,7 +167715,7 @@ GameObject:
   m_Component:
   - component: {fileID: 657213620}
   - component: {fileID: 657213622}
-  - component: {fileID: 657213621}
+  - component: {fileID: 657213623}
   m_Layer: 0
   m_Name: Story - What the Stones Were
   m_TagString: Untagged
@@ -167738,219 +167738,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &657213621
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 657213619}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615429
-  - rid: 2623126038171615430
-  - rid: 2623126038171615431
-  - rid: 2623126038171615432
-  - rid: 2623126038171615433
-  - rid: 2623126038171615434
-  - rid: 2623126038171615435
-  - rid: 2623126038171615436
-  - rid: 2623126038171615437
-  - rid: 2623126038171615438
-  - rid: 2623126038171615439
-  links:
-  - from: 8f00299259f544a1acec9917d34d9885
-    output: 0
-    to: 5e263e65240045d48a7a5c51e97c4ee6
-  - from: 5e263e65240045d48a7a5c51e97c4ee6
-    output: 0
-    to: d5a985c5ac0b4dc990be3c57168f86a5
-  - from: d5a985c5ac0b4dc990be3c57168f86a5
-    output: 0
-    to: 37fa1166f65f46dfb5a338db66ea4cdd
-  - from: 37fa1166f65f46dfb5a338db66ea4cdd
-    output: 0
-    to: cd26c61b4321492d95eb3925594db7e4
-  - from: cd26c61b4321492d95eb3925594db7e4
-    output: 0
-    to: 0c173097dfcb4a44879993c514ec938f
-  - from: 0c173097dfcb4a44879993c514ec938f
-    output: 0
-    to: 9bd3a574fb9e4013ab5a0dea5910a3ba
-  - from: 0c173097dfcb4a44879993c514ec938f
-    output: 1
-    to: 543a476ef1b14293b44dcd6e448912fa
-  - from: 9bd3a574fb9e4013ab5a0dea5910a3ba
-    output: 0
-    to: 24b71fb1030749cd913e7fed3f072421
-  - from: 543a476ef1b14293b44dcd6e448912fa
-    output: 0
-    to: 24b71fb1030749cd913e7fed3f072421
-  - from: 24b71fb1030749cd913e7fed3f072421
-    output: 0
-    to: c91bdd845e464cc0b2f841512a781f9a
-  - from: c91bdd845e464cc0b2f841512a781f9a
-    output: 0
-    to: 955bf56ab5944f048bc91e1cab76c9fb
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615429
-      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
-      data:
-        id: 8f00299259f544a1acec9917d34d9885
-        position: {x: 40, y: 60}
-        once: 1
-        questEvent: {fileID: 11400000, guid: a7afe977d216ff04db89c5ac4f5eec2c, type: 2}
-    - rid: 2623126038171615430
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 5e263e65240045d48a7a5c51e97c4ee6
-        position: {x: 340, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Your fire reaches further than it did, little one. Far enough that I can feel what lies at the end of it: stones, cold ones, out past the meadows.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615431
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: d5a985c5ac0b4dc990be3c57168f86a5
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>When the pact was kept, your people did not only tend a hearth beside me. They walked the land the pact gave them, and where it ended they set stones, and lit them from this fire.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615432
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 37fa1166f65f46dfb5a338db66ea4cdd
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>A lit stone said: this much of the forest remembers a hearth. Inside that ring nobody lost the way home, and nobody lost their name.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615433
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: cd26c61b4321492d95eb3925594db7e4
-        position: {x: 1240, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>When the hearth went cold, the stones went cold, one by one. The forest took back what they held, and every road and every name in it. That is where your people are now: out in the land that forgot us.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615434
-      type: {class: ChoiceNode, ns: , asm: SafeHaven}
-      data:
-        id: 0c173097dfcb4a44879993c514ec938f
-        position: {x: 1540, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>The stones are still out there. They only want a hand that keeps a fire.</i>
-        answers:
-        - Then I'll light them again.
-        - Won't the forest want the land back?
-        mustAnswer: 1
-        afterFightPause: 1
-    - rid: 2623126038171615435
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 9bd3a574fb9e4013ab5a0dea5910a3ba
-        position: {x: 1840, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Good. Not all of them, and not all at once: only what you can hold.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615436
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 543a476ef1b14293b44dcd6e448912fa
-        position: {x: 1840, y: 230}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>It will. The pact gave the forest its room as well, and that is the one thing it has not forgotten. It will push against every stone you light. Hold what you take, and in time it leaves it be.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615437
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 24b71fb1030749cd913e7fed3f072421
-        position: {x: 2140, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Find one of the places a stone remembers, so that it knows you, then lay your hand on it. The first will answer to my fire alone. The rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615438
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: c91bdd845e464cc0b2f841512a781f9a
-        position: {x: 2440, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Every land you hold is a road home for whoever is still out there, and a door shut on what comes at night. Begin with the nearest stone.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126038171615439
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 955bf56ab5944f048bc91e1cab76c9fb
-        position: {x: 2740, y: 60}
-        questEvent: {fileID: 11400000, guid: c2d9213512795eb438f011f5cbb433ab, type: 2}
 --- !u!114 &657213622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167969,6 +167756,219 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &657213623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657213619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615460
+  - rid: 2623126038171615461
+  - rid: 2623126038171615462
+  - rid: 2623126038171615463
+  - rid: 2623126038171615464
+  - rid: 2623126038171615465
+  - rid: 2623126038171615466
+  - rid: 2623126038171615467
+  - rid: 2623126038171615468
+  - rid: 2623126038171615469
+  - rid: 2623126038171615470
+  links:
+  - from: 8cd206ef95da46ed963aeb45b9e6261f
+    output: 0
+    to: 6673c2a340154773b863d252a989f9b2
+  - from: 6673c2a340154773b863d252a989f9b2
+    output: 0
+    to: d58f26b1366b4dbb889b0da8c0949030
+  - from: d58f26b1366b4dbb889b0da8c0949030
+    output: 0
+    to: 95c5b3566a4643b894ebbac4f579cd88
+  - from: 95c5b3566a4643b894ebbac4f579cd88
+    output: 0
+    to: 9e15328494a3415e86143e5eb9b00de8
+  - from: 9e15328494a3415e86143e5eb9b00de8
+    output: 0
+    to: 267ec2a69bdd48e09c1bc48622f28673
+  - from: 267ec2a69bdd48e09c1bc48622f28673
+    output: 0
+    to: e80ee0b114b8467984f03f11174810a4
+  - from: 267ec2a69bdd48e09c1bc48622f28673
+    output: 1
+    to: 5e9036fde5df4bd4b182b021357598ce
+  - from: e80ee0b114b8467984f03f11174810a4
+    output: 0
+    to: d91b1e67b36b4c938b44f81af8095ec3
+  - from: 5e9036fde5df4bd4b182b021357598ce
+    output: 0
+    to: d91b1e67b36b4c938b44f81af8095ec3
+  - from: d91b1e67b36b4c938b44f81af8095ec3
+    output: 0
+    to: 166b1b61e22040ca80a7b942d415b187
+  - from: 166b1b61e22040ca80a7b942d415b187
+    output: 0
+    to: 9eb1c69692e44d0b9d1a85651fcc4940
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615460
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 8f00299259f544a1acec9917d34d9885
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: a7afe977d216ff04db89c5ac4f5eec2c, type: 2}
+    - rid: 2623126038171615461
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 6673c2a340154773b863d252a989f9b2
+        position: {x: 340, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Your fire reaches further than it did, little one. Far enough that I can feel what lies at the end of it: stones, cold ones, out past the meadows.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615462
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d58f26b1366b4dbb889b0da8c0949030
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>When the pact was kept, your people did not only tend a hearth beside me. They walked the land the pact gave them, and where it ended they set stones, and lit them from this fire.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615463
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 95c5b3566a4643b894ebbac4f579cd88
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>A lit stone said: this much of the forest remembers a hearth. Inside that ring nobody lost the way home, and nobody lost their name.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615464
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 9e15328494a3415e86143e5eb9b00de8
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>When the hearth went cold, the stones went cold, one by one. The forest took back what they held, and every road and every name in it. That is where your people are now: out in the land that forgot us.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615465
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: 267ec2a69bdd48e09c1bc48622f28673
+        position: {x: 1540, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>The stones are still out there. They only want a hand that keeps a fire.</i>
+        answers:
+        - Then I'll light them again.
+        - Won't the forest want the land back?
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 2623126038171615466
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: e80ee0b114b8467984f03f11174810a4
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Good. Not all of them, and not all at once: only what you can hold.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615467
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5e9036fde5df4bd4b182b021357598ce
+        position: {x: 1840, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>It will. The pact gave the forest its room as well, and that is the one thing it has not forgotten. It will push against every stone you light. Hold what you take, and in time it leaves it be.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615468
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d91b1e67b36b4c938b44f81af8095ec3
+        position: {x: 2140, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Find one of the places a stone remembers, so that it knows you, then lay your hand on it. The first will answer to my fire alone. The rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615469
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 166b1b61e22040ca80a7b942d415b187
+        position: {x: 2440, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Every land you hold is a road home for whoever is still out there, and a door shut on what comes at night. Begin with the nearest stone.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615470
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 9eb1c69692e44d0b9d1a85651fcc4940
+        position: {x: 2740, y: 60}
+        questEvent: {fileID: 11400000, guid: c2d9213512795eb438f011f5cbb433ab, type: 2}
 --- !u!1001 &657454109
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -209493,7 +209493,7 @@ GameObject:
   m_Component:
   - component: {fileID: 824025185}
   - component: {fileID: 824025187}
-  - component: {fileID: 824025186}
+  - component: {fileID: 824025188}
   m_Layer: 0
   m_Name: Story - A Stone Burns Again
   m_TagString: Untagged
@@ -209516,82 +209516,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &824025186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 824025184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615425
-  - rid: 2623126038171615426
-  - rid: 2623126038171615427
-  - rid: 2623126038171615428
-  links:
-  - from: 2cc0762791094099881f7cb66ba4ed03
-    output: 0
-    to: daa78dddb9ea40d79a1530bf198161f2
-  - from: daa78dddb9ea40d79a1530bf198161f2
-    output: 0
-    to: 9cadbd78e98246d7b5cde8078e5f7d4e
-  - from: 9cadbd78e98246d7b5cde8078e5f7d4e
-    output: 0
-    to: dbb84ae343d84d438fbe71af3a09d157
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615425
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 2cc0762791094099881f7cb66ba4ed03
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
-        when: 1
-        alsoAfterLoading: 0
-    - rid: 2623126038171615426
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: daa78dddb9ea40d79a1530bf198161f2
-        position: {x: 340, y: 60}
-        seconds: 2
-    - rid: 2623126038171615427
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 9cadbd78e98246d7b5cde8078e5f7d4e
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>I felt that. Out past the meadows, a stone remembers me again.</i>
-        afterFightPause: 0
-        aside: 1
-    - rid: 2623126038171615428
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: dbb84ae343d84d438fbe71af3a09d157
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Now it must be held, little one. A lit stone is a promise, and the forest will test it.</i>
-        afterFightPause: 0
-        aside: 1
 --- !u!114 &824025187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -209610,6 +209534,82 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &824025188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 824025184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: 42ad2310c3dd45909d415f0e2a8a0f43
+    output: 0
+    to: 5747ec895d2540c48ce493a0e4adede5
+  - from: 5747ec895d2540c48ce493a0e4adede5
+    output: 0
+    to: 96d879d7174748e0bd1d120934d77f43
+  - from: 96d879d7174748e0bd1d120934d77f43
+    output: 0
+    to: 5e05f86b5de54ec2b0c72ba8488cb0a9
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 2cc0762791094099881f7cb66ba4ed03
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 5747ec895d2540c48ce493a0e4adede5
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 96d879d7174748e0bd1d120934d77f43
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>I felt that. Out past the meadows, a stone remembers me again.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5e05f86b5de54ec2b0c72ba8488cb0a9
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Now it must be held, little one. A lit stone is a promise, and the forest will test it.</i>
+        afterFightPause: 0
+        aside: 1
 --- !u!1001 &824391939
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -280854,7 +280854,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1118470586}
   - component: {fileID: 1118470588}
-  - component: {fileID: 1118470587}
+  - component: {fileID: 1118470589}
   m_Layer: 0
   m_Name: Story - The Push Broken
   m_TagString: Untagged
@@ -280877,62 +280877,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1118470587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1118470585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615415
-  - rid: 2623126038171615416
-  - rid: 2623126038171615417
-  links:
-  - from: dc4bdf0af0ad467fa19dfbe28bc1d49d
-    output: 0
-    to: 120fa828d51b481189f64e296cf67211
-  - from: 120fa828d51b481189f64e296cf67211
-    output: 0
-    to: 40941037ebca40ae83b3f105b9f6428a
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615415
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: dc4bdf0af0ad467fa19dfbe28bc1d49d
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: 1c7d13324b2d62e439e3f962ee7f050a, type: 2}
-        when: 1
-        alsoAfterLoading: 1
-    - rid: 2623126038171615416
-      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
-      data:
-        id: 120fa828d51b481189f64e296cf67211
-        position: {x: 340, y: 60}
-    - rid: 2623126038171615417
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 40941037ebca40ae83b3f105b9f6428a
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>It broke against you. It will try again, somewhere else. Let it find you ready.</i>
-        afterFightPause: 0
-        aside: 1
 --- !u!114 &1118470588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280951,6 +280895,62 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &1118470589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118470585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615446
+  - rid: 2623126038171615447
+  - rid: 2623126038171615448
+  links:
+  - from: 297867741cc54655a7e55e19f03aad3d
+    output: 0
+    to: 397e89674b9f422ab2cd539114ba755e
+  - from: 397e89674b9f422ab2cd539114ba755e
+    output: 0
+    to: 33d560315f15484d831f1e9ed351d8dd
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615446
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: dc4bdf0af0ad467fa19dfbe28bc1d49d
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 1c7d13324b2d62e439e3f962ee7f050a, type: 2}
+        when: 1
+        alsoAfterLoading: 1
+    - rid: 2623126038171615447
+      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
+      data:
+        id: 397e89674b9f422ab2cd539114ba755e
+        position: {x: 340, y: 60}
+    - rid: 2623126038171615448
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 33d560315f15484d831f1e9ed351d8dd
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>It broke against you. It will try again, somewhere else. Let it find you ready.</i>
+        afterFightPause: 0
+        aside: 1
 --- !u!1 &1119692446
 GameObject:
   m_ObjectHideFlags: 0
@@ -281851,7 +281851,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1124115837}
   - component: {fileID: 1124115839}
-  - component: {fileID: 1124115838}
+  - component: {fileID: 1124115840}
   m_Layer: 0
   m_Name: Story - Secure Ground
   m_TagString: Untagged
@@ -281874,82 +281874,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1124115838
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1124115836}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615418
-  - rid: 2623126038171615419
-  - rid: 2623126038171615420
-  - rid: 2623126038171615421
-  links:
-  - from: 13d02ff7e87a43eaa25189c997e4021d
-    output: 0
-    to: 1d61fea15597452dab819ebfe0c35d28
-  - from: 1d61fea15597452dab819ebfe0c35d28
-    output: 0
-    to: e939be2f10734b47be765f2a8b061235
-  - from: e939be2f10734b47be765f2a8b061235
-    output: 0
-    to: dc3f00b5961f40738d704d1cb69fa919
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615418
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 13d02ff7e87a43eaa25189c997e4021d
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: eebb289a3dca56448b8f1e8823cc1ca8, type: 2}
-        when: 1
-        alsoAfterLoading: 1
-    - rid: 2623126038171615419
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 1d61fea15597452dab819ebfe0c35d28
-        position: {x: 340, y: 60}
-        seconds: 2
-    - rid: 2623126038171615420
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: e939be2f10734b47be765f2a8b061235
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Secure. Feel how still it is out there now. A land held that firmly sends home what it grows at every dawn, and the night's bands will not come through it.</i>
-        afterFightPause: 0
-        aside: 1
-    - rid: 2623126038171615421
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: dc3f00b5961f40738d704d1cb69fa919
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Hold a ring of them round me, little one, and the forest will remember us for good.</i>
-        afterFightPause: 0
-        aside: 1
 --- !u!114 &1124115839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -281968,6 +281892,82 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &1124115840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124115836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615449
+  - rid: 2623126038171615450
+  - rid: 2623126038171615451
+  - rid: 2623126038171615452
+  links:
+  - from: 0d96cddb19ad4f2a886881d5b36f804f
+    output: 0
+    to: fe699a731343464fb68bf40173ecacb8
+  - from: fe699a731343464fb68bf40173ecacb8
+    output: 0
+    to: c0f48ac2fe1b4bc3a4986fe8d9972599
+  - from: c0f48ac2fe1b4bc3a4986fe8d9972599
+    output: 0
+    to: 0bf97a0451ea435e87b55bc01ac6b03f
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615449
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 13d02ff7e87a43eaa25189c997e4021d
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: eebb289a3dca56448b8f1e8823cc1ca8, type: 2}
+        when: 1
+        alsoAfterLoading: 1
+    - rid: 2623126038171615450
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: fe699a731343464fb68bf40173ecacb8
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615451
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c0f48ac2fe1b4bc3a4986fe8d9972599
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Secure. Feel how still it is out there now. A land held that firmly sends home what it grows at every dawn, and the night's bands will not come through it.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615452
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 0bf97a0451ea435e87b55bc01ac6b03f
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Hold a ring of them round me, little one, and the forest will remember us for good.</i>
+        afterFightPause: 0
+        aside: 1
 --- !u!1 &1124591715
 GameObject:
   m_ObjectHideFlags: 0
@@ -369352,7 +369352,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1478649909}
   - component: {fileID: 1478649911}
-  - component: {fileID: 1478649910}
+  - component: {fileID: 1478649912}
   m_Layer: 0
   m_Name: Story - The Forest Gathers
   m_TagString: Untagged
@@ -369375,62 +369375,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1478649910
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1478649908}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615422
-  - rid: 2623126038171615423
-  - rid: 2623126038171615424
-  links:
-  - from: 4aff068265c2400e8ed1024d8e0aa98c
-    output: 0
-    to: 4d401cfe1aae4ba5aeab9f3d94ca61fe
-  - from: 4d401cfe1aae4ba5aeab9f3d94ca61fe
-    output: 0
-    to: 99726d5c7c3e4adda4780fc1a2bf78ba
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615422
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 4aff068265c2400e8ed1024d8e0aa98c
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: 1c7d13324b2d62e439e3f962ee7f050a, type: 2}
-        when: 0
-        alsoAfterLoading: 1
-    - rid: 2623126038171615423
-      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
-      data:
-        id: 4d401cfe1aae4ba5aeab9f3d94ca61fe
-        position: {x: 340, y: 60}
-    - rid: 2623126038171615424
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 99726d5c7c3e4adda4780fc1a2bf78ba
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Little one, do you feel it? The forest is gathering against one of your stones. It means to push in.</i>
-        afterFightPause: 0
-        aside: 1
 --- !u!114 &1478649911
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369449,6 +369393,62 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &1478649912
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1478649908}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615453
+  - rid: 2623126038171615454
+  - rid: 2623126038171615455
+  links:
+  - from: 3625fbfd1d8f469eb0601bda8af37429
+    output: 0
+    to: fb389ff88e9d4fa5896ee742ae2570b4
+  - from: fb389ff88e9d4fa5896ee742ae2570b4
+    output: 0
+    to: 430f5676f91c4bde9237d89d44dcb8c1
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615453
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 4aff068265c2400e8ed1024d8e0aa98c
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 1c7d13324b2d62e439e3f962ee7f050a, type: 2}
+        when: 0
+        alsoAfterLoading: 1
+    - rid: 2623126038171615454
+      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
+      data:
+        id: fb389ff88e9d4fa5896ee742ae2570b4
+        position: {x: 340, y: 60}
+    - rid: 2623126038171615455
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 430f5676f91c4bde9237d89d44dcb8c1
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Little one, do you feel it? The forest is gathering against one of your stones. It means to push in.</i>
+        afterFightPause: 0
+        aside: 1
 --- !u!1001 &1478927775
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -387732,7 +387732,7 @@ MonoBehaviour:
   - rid: 2623126018147484420
   - rid: 2623126018147484421
   - rid: 2623126018147484422
-  - rid: 2623126018147484423
+  - rid: 2623126038171615445
   links:
   - from: 4c14a74fce334c9fa536f2540f560938
     output: 0
@@ -387787,7 +387787,7 @@ MonoBehaviour:
     to: ca71dc088408441e8b0475e397e46504
   - from: ca71dc088408441e8b0475e397e46504
     output: 0
-    to: 8a0280ccc3784659a962763436ea3dce
+    to: 529e8a4a9a834bdebcc297b073742eae
   logSteps: 0
   references:
     version: 2
@@ -387970,32 +387970,12 @@ MonoBehaviour:
         line: <i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>
         afterFightPause: 1
         aside: 0
-    - rid: 2623126018147484423
-      type: {class: CountAsDoneNode, ns: , asm: SafeHaven}
+    - rid: 2623126038171615445
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
       data:
-        id: 8a0280ccc3784659a962763436ea3dce
+        id: 529e8a4a9a834bdebcc297b073742eae
         position: {x: 3040, y: 60}
-        deed:
-          type: 9
-          description: 
-          amount: 1
-          item: {fileID: 0}
-          resource: {fileID: 0}
-          monster: {fileID: 0}
-          faction: 1
-          building: {fileID: 0}
-          raid: {fileID: 0}
-          mustExtract: 1
-          withinMinutes: 0
-          questEvent: {fileID: 0}
-          person: {fileID: 0}
-          target: {fileID: 11400000, guid: e835c314791108c43b5172c1cc4a57fd, type: 2}
-          job: {fileID: 0}
-          breach: {fileID: 0}
-          rank: 1
-          tier: 2
-          bringHome: 0
-          countAlreadyOwned: 0
+        questEvent: {fileID: 11400000, guid: 0ed9c93a1e761a74abc40f52616bfb57, type: 2}
 --- !u!114 &1551441793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410839,7 +410819,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1640051312}
   - component: {fileID: 1640051314}
-  - component: {fileID: 1640051313}
+  - component: {fileID: 1640051315}
   m_Layer: 0
   m_Name: Story - The Cold Stones
   m_TagString: Untagged
@@ -410862,80 +410842,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1640051313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1640051311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126038171615440
-  - rid: 2623126038171615441
-  - rid: 2623126038171615442
-  - rid: 2623126038171615443
-  - rid: 2623126038171615444
-  links:
-  - from: afce4d96955543cdaea4db17101ba398
-    output: 0
-    to: 2ddba8a75cf646b59efa5e57c4403cd2
-  - from: 2ddba8a75cf646b59efa5e57c4403cd2
-    output: 0
-    to: 406cd6e392a44ddfa1a8dbca2f74a24d
-  - from: 406cd6e392a44ddfa1a8dbca2f74a24d
-    output: 0
-    to: ea11f9575ad7466a9462e021b4bc0549
-  - from: ea11f9575ad7466a9462e021b4bc0549
-    output: 0
-    to: 1a9b058bec9a4bf79bd0d5289eff04b0
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126038171615440
-      type: {class: WhenRaidsDone, ns: , asm: SafeHaven}
-      data:
-        id: afce4d96955543cdaea4db17101ba398
-        position: {x: 40, y: 60}
-        once: 1
-        raids: 3
-    - rid: 2623126038171615441
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 2ddba8a75cf646b59efa5e57c4403cd2
-        position: {x: 340, y: 60}
-        seconds: 8
-    - rid: 2623126038171615442
-      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
-      data:
-        id: 406cd6e392a44ddfa1a8dbca2f74a24d
-        position: {x: 640, y: 60}
-    - rid: 2623126038171615443
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: ea11f9575ad7466a9462e021b4bc0549
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Little one. Three times through me, and three times home. Your fire reaches further than it did. Come and sit by me when you can: there is something out past my meadows you should know of.</i>'
-        afterFightPause: 0
-        aside: 1
-    - rid: 2623126038171615444
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 1a9b058bec9a4bf79bd0d5289eff04b0
-        position: {x: 1240, y: 60}
-        quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
 --- !u!114 &1640051314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410954,6 +410860,80 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &1640051315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1640051311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615471
+  - rid: 2623126038171615472
+  - rid: 2623126038171615473
+  - rid: 2623126038171615474
+  - rid: 2623126038171615475
+  links:
+  - from: 9547a4da24c0432b826ea1160e8e5a0e
+    output: 0
+    to: 7652550cb95340a0bf77dc8dcde54379
+  - from: 7652550cb95340a0bf77dc8dcde54379
+    output: 0
+    to: 18adcd2543574fd0a18bdea6827c469a
+  - from: 18adcd2543574fd0a18bdea6827c469a
+    output: 0
+    to: 20a262ac06a84ebcb4348ecad2b1a97b
+  - from: 20a262ac06a84ebcb4348ecad2b1a97b
+    output: 0
+    to: 32c572d8cbec49288de78d4a83164496
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615471
+      type: {class: WhenRaidsDone, ns: , asm: SafeHaven}
+      data:
+        id: afce4d96955543cdaea4db17101ba398
+        position: {x: 40, y: 60}
+        once: 1
+        raids: 3
+    - rid: 2623126038171615472
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 7652550cb95340a0bf77dc8dcde54379
+        position: {x: 340, y: 60}
+        seconds: 8
+    - rid: 2623126038171615473
+      type: {class: WaitForQuietNode, ns: , asm: SafeHaven}
+      data:
+        id: 18adcd2543574fd0a18bdea6827c469a
+        position: {x: 640, y: 60}
+    - rid: 2623126038171615474
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 20a262ac06a84ebcb4348ecad2b1a97b
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Little one. Three times through me, and three times home. Your fire reaches further than it did. Come and sit by me when you can: there is something out past my meadows you should know of.</i>'
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615475
+      type: {class: StartQuestNode, ns: , asm: SafeHaven}
+      data:
+        id: 32c572d8cbec49288de78d4a83164496
+        position: {x: 1240, y: 60}
+        quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
 --- !u!1001 &1641501343
 PrefabInstance:
   m_ObjectHideFlags: 0

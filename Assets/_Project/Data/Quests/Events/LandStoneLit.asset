@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: A boundary stone lit
   objectiveText: Light a boundary stone
   notes: 
+  homeOnly: 1

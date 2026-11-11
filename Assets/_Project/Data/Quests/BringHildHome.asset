@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: A Wall Round Nothing
   description: 'Palisades burn and huts are cramped: the haven has outgrown wood. A mason has been seen in the deep woods, building walls round nothing at all. Bring her home.'
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: Nobody knows what Hild was walling in, or out. She is a mason, not one of the expedition, and she builds in stone while everyone else builds in wood.
   rank: 3
   availableObjective: 
   announceStart: 1

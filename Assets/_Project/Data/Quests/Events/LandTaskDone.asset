@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: A held land's task done
   objectiveText: Do what a held land asks
   notes: 
+  homeOnly: 1

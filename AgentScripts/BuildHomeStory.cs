@@ -54,7 +54,7 @@ public static class BuildHomeStory
         Text("ThroughThePortal", null, "Your people are past the door, and the Misty Woods won't wait. Craft stone tools by hand from your bag (B), then step through. Bring home hardwood and iron ore for the haven, and get back to an extraction point before the portal closes. Carried things are lost if you fall; your tools and weapon come back damaged.");
         Text("KnowYourEnemy", null, "Forest-Bitten Wolves hunt the Misty Woods, on the same paths your people must walk home. Thin their numbers before they grow bolder.");
         Text("AGrowingHome", null, "Ingrid, Bjarne and Tor are home, and more will come through that door. They need beds, and somewhere dry to set down what they carry. Build them.");
-        Text("TheWeakeningWard", null, "The light that called Ingrid home was seen by other things too. Something is testing the ward. Prepare, then speak to the portal when you are ready.");
+        Text("TheWeakeningWard", null, "Ingrid wasn't the only one watching your fire. Something is testing the ward. Prepare, then speak to the portal when you are ready.");
         Text("SmithsRequest", null, "An old note on the board, in the last smith's hand: this hearth wants copper, and proof you can work it.");
     }
 
@@ -104,7 +104,7 @@ public static class BuildHomeStory
         var so = new SerializedObject(quest);
         so.FindProperty("id").stringValue = "a_light_they_can_see";
         so.FindProperty("displayName").stringValue = "A Light They Can See";
-        so.FindProperty("description").stringValue = "The brighter Safe Haven burns, the further its light carries through the mist, and six of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.";
+        so.FindProperty("description").stringValue = "The brighter Safe Haven burns, the further its light carries through the mist, and the rest of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.";
         so.FindProperty("chain").stringValue = TheLostExpedition;
         so.FindProperty("start").intValue = (int)QuestStart.Automatically;
         SerializedProperty prerequisites = so.FindProperty("prerequisites");

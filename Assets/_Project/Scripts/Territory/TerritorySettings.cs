@@ -127,17 +127,17 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Tooltip("The objective of that quest (1 is the first) the unlit stones show the way for, as quest waypoints. 0: none.")]
     [SerializeField, Min(0)] private int stonesObjective = 2;
     [Tooltip("Raised when a boundary stone is lit: a region claimed.")]
-    [SerializeField] private GameEventDefinition stoneLit;
+    [SerializeField, RaisedByGame] private GameEventDefinition stoneLit;
     [Tooltip("Raised when a held region's task is done.")]
-    [SerializeField] private GameEventDefinition taskDone;
+    [SerializeField, RaisedByGame] private GameEventDefinition taskDone;
     [Tooltip("Raised when a Pact Rune is offered at a lit stone.")]
-    [SerializeField] private GameEventDefinition runeOffered;
+    [SerializeField, RaisedByGame] private GameEventDefinition runeOffered;
     [Tooltip("Raised when the forest gathers against a held region (the warning).")]
-    [SerializeField] private GameEventDefinition forestGathers;
+    [SerializeField, RaisedByGame] private GameEventDefinition forestGathers;
     [Tooltip("Raised when a push is answered: a watch held, or a rot's heart burned.")]
-    [SerializeField] private GameEventDefinition pushAnswered;
+    [SerializeField, RaisedByGame] private GameEventDefinition pushAnswered;
     [Tooltip("Raised when a held region becomes Secure.")]
-    [SerializeField] private GameEventDefinition landSecure;
+    [SerializeField, RaisedByGame] private GameEventDefinition landSecure;
 
     [Header("Regions")]
     [SerializeField] private List<RegionInfo> regions = new List<RegionInfo>();

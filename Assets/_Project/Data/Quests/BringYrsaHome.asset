@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: A Fire in the Woods
   description: Berries and a stew over the campfire keep you alive, and that is all they do. Someone has been cooking in the deep woods, well enough that the wolves come for the smell. Find the cook and bring her home.
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: 'Anyone who cooks well enough to draw wolves can cook for a haven. Mind the wolves: they found her first. Her meals keep their bonuses for longer than anything off a campfire.'
   rank: 3
   availableObjective: 
   announceStart: 1

@@ -15,6 +15,19 @@ game's inventory.
 - [x] Building, skill and perk icons are still placeholders or renders: the same pipeline would do them. (Done 2026-11-11:
       34 buildings, 7 abilities, 13 skills, 130 perks, 6 essences, 3 status effects, 7 boon icons.)
 
+## Quest audit (2026-11-11)
+
+QuestAudit and QuestAuditTests now check every quest, story, gate and portal moment. Fixed: Strength for the Road waited
+on a removed Drinking Spot; the Road North finished before its conversation; wrong counts and names in two descriptions;
+21 quests without journal notes. Co-op: one rule per objective type (ARCHITECTURE.md › Quests in co-op).
+- [ ] Haven quests are meant to pay "with something the next raid needs" (GDD §17.1), but 15 of them pay nothing (the jobs
+      and buildings, Safe Keeping, Raise the Walls, Heavy Loads...). Choose rewards, or say in the GDD that the job is the pay.
+- [ ] The Waking Stone (chain Story Demo) is given only in the StoryDemo scene: keep it as the story graph's example, or
+      take it out of the ContentDatabase.
+- [ ] BuildFirstAct and the other story builders remake their stories from nothing: run again, every saved game plays
+      them again. Port BuildHavensReach's Fresh/KeepTriggerIds before running one on a game someone has played.
+- [ ] Saves that already finished the Road North the old way never heard the Heartroot's truth (nobody had, by hand).
+
 ## Holding the land (2026-11-11)
 
 Regions are claimed at boundary stones and held against the forest (Docs/Territory.md). Built and tested by rules

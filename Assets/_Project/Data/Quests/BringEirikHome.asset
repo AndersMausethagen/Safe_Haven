@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Someone Holding the Line
   description: 'Something has started testing the ward, and walls alone won''t hold it. Someone has been holding a clearing against wolves for days: it can only be Eirik, who taught you to fight. Bring him home.'
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: Ingrid saw something walk past her root in Granheim mail that didn't know its name. If it was Eirik, the forest has been at him longer than at anyone. He will fight beside you on the way out, and be too proud to say he is tired.
   rank: 3
   availableObjective: 
   announceStart: 1

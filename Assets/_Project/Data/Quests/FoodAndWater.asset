@@ -73,8 +73,8 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
-  - type: 11
-    description: Drink or fill a waterskin at the stream
+  - type: 6
+    description: Drink, or fill a waterskin, at the river or a lake
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -84,9 +84,9 @@ MonoBehaviour:
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 0}
+    questEvent: {fileID: 11400000, guid: bb15b74aea6e5ba48a6c5fff9cafe3ca, type: 2}
     person: {fileID: 0}
-    target: {fileID: 11400000, guid: 9e2fb41aa2b99cc4c925d72cc101ae5c, type: 2}
+    target: {fileID: 0}
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1

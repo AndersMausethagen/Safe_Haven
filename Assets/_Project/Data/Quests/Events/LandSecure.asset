@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: A held land made Secure
   objectiveText: Make a land Secure
   notes: 
+  homeOnly: 1

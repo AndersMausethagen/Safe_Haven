@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: A Safe Place
   description: 'What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: G), and before every raid leave in it whatever you can''t afford to lose.'
   chain: The First Days
-  journalNotes: 
+  journalNotes: A chest at home is the one place nothing can take from you. Before every raid, ask what you could stand to lose, and leave the rest here.
   rank: 4
   availableObjective: 
   announceStart: 1

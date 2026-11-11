@@ -53,7 +53,7 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 9
+  - type: 6
     description: Speak to the portal
     amount: 1
     item: {fileID: 0}
@@ -64,15 +64,15 @@ MonoBehaviour:
     raid: {fileID: 0}
     mustExtract: 1
     withinMinutes: 0
-    questEvent: {fileID: 0}
+    questEvent: {fileID: 11400000, guid: 0ed9c93a1e761a74abc40f52616bfb57, type: 2}
     person: {fileID: 0}
-    target: {fileID: 11400000, guid: e835c314791108c43b5172c1cc4a57fd, type: 2}
+    target: {fileID: 0}
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
     tier: 2
     bringHome: 0
-    countAlreadyOwned: 1
+    countAlreadyOwned: 0
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

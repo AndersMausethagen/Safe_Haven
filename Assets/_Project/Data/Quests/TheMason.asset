@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Stone on Stone
   description: 'Hild builds in stone. Give her the Mason''s work: she shows you a Cottage, four beds and a proper hearth (Workshop Tier II), and Stone Walls at Tier III.'
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: Hild's Cottage sleeps four and has a proper hearth. Stone walls come later, at Tier III of her work.
   rank: 4
   availableObjective: 
   announceStart: 1

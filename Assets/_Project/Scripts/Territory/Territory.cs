@@ -304,7 +304,7 @@ public static class Territory
             return;
         }
 
-        // The offering is the player's own deed, wherever the stone stands.
+        // Home Only: a rune laid in a friend's stone moves the friend's quests (FromFriend), not this player's own.
         Tell(Settings.RuneOffered);
         if (HavenVisit.IsVisiting)
         {

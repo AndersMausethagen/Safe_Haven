@@ -248,9 +248,54 @@ public sealed class QuestObjective
     }
 
     /// <summary>How much the event advances this objective; 0 when it doesn't count.</summary>
+    // ---- Co-op: where an objective counts, decided here once for every type, so no quest needs a multiplayer check.
+
+    /// <summary>
+    /// Whether each type moves on while the player visits a friend's Haven. What the player does with their own hands counts
+    /// anywhere: kills, gathering, crafting, fish, raids, a rescue (the traveller goes to their own Haven), reaching a place,
+    /// mending their own gear. What belongs to a Haven counts only in their own: its buildings, stash, jobs, rank and breaches,
+    /// and talking to or using what is the friend's (their people, their portal, their things), which a quest at home means.
+    /// A Story Event says so itself (Quest Event › Home Only). On a raid followed with the host everything counts as usual.
+    /// A new objective type must be added here (QuestCoopTests checks every type is).
+    /// </summary>
+    private static readonly System.Collections.Generic.Dictionary<ObjectiveType, bool> InAFriendsHaven = new System.Collections.Generic.Dictionary<ObjectiveType, bool>
+    {
+        [ObjectiveType.CollectItem] = true,
+        [ObjectiveType.GatherResource] = true,
+        [ObjectiveType.KillMonster] = true,
+        [ObjectiveType.DestroyBuilding] = false,
+        [ObjectiveType.CraftItem] = true,
+        [ObjectiveType.CompleteRaids] = true,
+        [ObjectiveType.QuestEvent] = true,
+        [ObjectiveType.BuildStructure] = false,
+        [ObjectiveType.CatchFish] = true,
+        [ObjectiveType.TalkTo] = false,
+        [ObjectiveType.ReachPlace] = true,
+        [ObjectiveType.UseObject] = false,
+        [ObjectiveType.RescuePerson] = true,
+        [ObjectiveType.AssignJob] = false,
+        [ObjectiveType.DefendBreach] = false,
+        [ObjectiveType.ReachHavenRank] = false,
+        [ObjectiveType.StoreItem] = false,
+        [ObjectiveType.RepairItem] = true,
+        [ObjectiveType.UpgradeBuilding] = false,
+    };
+
+    /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
+    public static System.Collections.Generic.IEnumerable<ObjectiveType> TypesWithACoopRule => InAFriendsHaven.Keys;
+
+    /// <summary>Whether objectives of this type count while visiting a friend's Haven (Story Events: by their own Home Only).</summary>
+    public static bool CountsInAFriendsHaven(ObjectiveType type) => InAFriendsHaven.TryGetValue(type, out bool counts) && counts;
+
+    /// <summary>Whether this objective counts while visiting a friend's Haven.</summary>
+    public bool CountsInAFriendsHavenNow => type == ObjectiveType.QuestEvent ? questEvent == null || !questEvent.HomeOnly : CountsInAFriendsHaven(type);
+
+    /// <summary>Whether this objective can move on where the player is now: anywhere but a friend's Haven, or there if it counts there.</summary>
+    public bool CountsHere => !HavenVisit.InHostsHaven || CountsInAFriendsHavenNow;
+
     public int Progress(in GameEvent gameEvent)
     {
-        if (!gameEvent.ForPlayerSide || gameEvent.Amount <= 0)
+        if (!gameEvent.ForPlayerSide || gameEvent.Amount <= 0 || !CountsHere)
         {
             return 0;
         }
@@ -317,7 +362,8 @@ public sealed class QuestObjective
     /// or their essences), the structures standing, or a Quest Event that already happened (once). 0 otherwise.</summary>
     public int Owned(Player player, QuestLog log)
     {
-        if (!CountAlreadyOwned)
+        // In a friend's Haven what stands, is stored or has its rank there is theirs (CountsHere); it is counted on coming home.
+        if (!CountAlreadyOwned || !CountsHere)
         {
             return 0;
         }
@@ -331,8 +377,7 @@ public sealed class QuestObjective
             case ObjectiveType.CraftItem: // made before the quest (an older save, a found tool): having it is enough
                 return item == null || player == null ? 0 : player.Bag.Container.Count(item) + (player.Equipment != null ? player.Equipment.Gear.Slots.Count(item) : 0);
             case ObjectiveType.BuildStructure:
-                // A friend's Haven (co-op) is theirs: what stands there isn't this player's to count; what they build there is.
-                return HavenVisit.IsVisiting ? 0 : BuildingObject.Count(building);
+                return BuildingObject.Count(building);
             case ObjectiveType.GatherResource:
                 return player == null ? 0 : item != null ? player.Bag.Container.Count(item) : player.Resources.Storage.GetAmount(resource);
             case ObjectiveType.TalkTo:
@@ -351,7 +396,7 @@ public sealed class QuestObjective
                 StashStorage stash = GameSession.Stash;
                 return stash == null ? 0 : item != null ? stash.Items.Count(item) : stash.Items.CountItems();
             case ObjectiveType.UpgradeBuilding:
-                return HavenVisit.IsVisiting ? 0 : StandingAtTier();
+                return StandingAtTier();
             case ObjectiveType.KillMonster:
                 // A boss beaten before the quest (an older save, or the player got there first) counts: it won't come again.
                 return BossBeaten() ? Amount : 0;

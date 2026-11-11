@@ -19,6 +19,20 @@ public static class QuestDeeds
         return verb != null && subject is IQuestTarget target && !string.IsNullOrEmpty(target.QuestId) ? verb + target.QuestId : null;
     }
 
+    /// <summary>Whether a deed of this kind counts while visiting a friend's Haven: the rule of the objective type it is for.</summary>
+    public static bool CountsInAFriendsHaven(GameEventKind kind)
+    {
+        switch (kind)
+        {
+            case GameEventKind.Talked: return QuestObjective.CountsInAFriendsHaven(ObjectiveType.TalkTo);
+            case GameEventKind.Reached: return QuestObjective.CountsInAFriendsHaven(ObjectiveType.ReachPlace);
+            case GameEventKind.Used: return QuestObjective.CountsInAFriendsHaven(ObjectiveType.UseObject);
+            case GameEventKind.PersonFreed:
+            case GameEventKind.PersonRescued: return QuestObjective.CountsInAFriendsHaven(ObjectiveType.RescuePerson);
+            default: return true;
+        }
+    }
+
     private static string Verb(GameEventKind kind)
     {
         switch (kind)

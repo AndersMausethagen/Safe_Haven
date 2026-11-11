@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: The forest gathers against a held land
   objectiveText: The forest gathers
   notes: 
+  homeOnly: 1

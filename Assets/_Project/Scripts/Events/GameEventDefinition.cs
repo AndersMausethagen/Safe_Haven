@@ -15,8 +15,12 @@ public sealed class GameEventDefinition : ScriptableObject
     [Tooltip("How an objective using this event reads, e.g. \"Reach the Old Tower\". Empty uses the display name.")]
     [SerializeField] private string objectiveText;
     [SerializeField, TextArea] private string notes;
+    [Tooltip("Co-op: counts for quests only in the player's own Haven and out on raids, not while visiting a friend's Haven, " +
+             "because what it marks belongs to a Haven (a boundary stone lit, the portal repaired) and there it is the friend's.")]
+    [SerializeField] private bool homeOnly;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    public bool HomeOnly => homeOnly;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string ObjectiveText => string.IsNullOrWhiteSpace(objectiveText) ? DisplayName : objectiveText;
 

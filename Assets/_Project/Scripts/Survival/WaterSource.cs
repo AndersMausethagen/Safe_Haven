@@ -105,6 +105,14 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         if (!drank && filled == 0)
         {
             GameMessages.Post("You've had your fill, and your water containers are full.");
+            return;
+        }
+
+        // Any water will do, so quests about drinking ask for this rather than a place (the Haven's stream is gone).
+        GameEventDefinition told = SurvivalSettings.Current.DrankAtWater;
+        if (told != null)
+        {
+            GameEvents.Raise(told, user);
         }
     }
 

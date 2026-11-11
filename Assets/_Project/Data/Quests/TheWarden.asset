@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Watch
   description: 'Eirik keeps the ward: in a breach it holds half as long again. Give him the Warden''s work, and build a Watch Post where he can see the old path (G).'
   chain: Hands at Home
-  journalNotes: 
+  journalNotes: With Eirik as Warden the ward holds half as long again in a breach. The Watch Post wants the Woodcutter's Lodge standing first.
   rank: 4
   availableObjective: 
   announceStart: 1
@@ -74,7 +74,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 1
   - type: 7
-    description: 'Build a Watch Post (build menu: G)'
+    description: 'Build a Watch Post (build menu: G): it wants the Woodcutter''s Lodge standing'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

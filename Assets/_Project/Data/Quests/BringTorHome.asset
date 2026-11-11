@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Planks, Not Logs
   description: 'Logs are heavy and good for little: shields, walls and a dry shed all want planks, and a hatchet won''t make them. Bjarne says Tor, the expedition''s carpenter, was thrown into the deep woods with a broken leg. Listen for a saw where nobody saws, and bring him home.'
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: 'Bjarne blazed the trees on the way in and found his marks on the wrong side of them coming out: the roots move the road at night. Tor''s leg is broken, so he is slow. Planks start with him: palisades, the shed and the watch post all want them.'
   rank: 3
   availableObjective: 
   announceStart: 1

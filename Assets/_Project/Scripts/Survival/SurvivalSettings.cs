@@ -42,6 +42,11 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     [Tooltip("How many cooked meals can give their bonuses at once (GDD §11.4). Another meal pushes out the one closest to ending. Tonics don't count.")]
     [SerializeField, Min(1)] private int mealSlots = 2;
 
+    [Header("Quests")]
+    [Tooltip("Raised when the player drinks from or fills a container at open water (any lake, river or stream), for quests that ask it (Strength for the Road).")]
+    [SerializeField, RaisedByGame] private GameEventDefinition drankAtWater;
+
+    public GameEventDefinition DrankAtWater => drankAtWater;
     public float MaxHunger => maxHunger;
     public float MaxThirst => maxThirst;
     public float StartingHunger => startingHunger;

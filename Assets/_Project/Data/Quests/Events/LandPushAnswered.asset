@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: The forest's push answered
   objectiveText: Answer the forest's push
   notes: 
+  homeOnly: 1

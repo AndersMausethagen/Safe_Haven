@@ -195,6 +195,26 @@ public static class QuestChecklist
             {
                 checks.Add(EventFixes(objective.QuestEvent, new QuestCheck(QuestCheck.State.Missing, $"{line} — nothing raises \"{objective.QuestEvent.DisplayName}\" yet.")));
             }
+            else if (AskedBefore(quest, objective, all) is QuestDefinition earlier)
+            {
+                int index = i;
+                checks.Add(new QuestCheck(QuestCheck.State.Missing, $"{line} — counts what was done before the quest began (Count Already Owned), and {earlier.DisplayName} " +
+                        "already asks it, so it is done the moment this quest starts. For a conversation, raise a Story Event at its end instead.")
+                    .Fix("Count Only After It Starts", "Turns off Count Already Owned for this objective.", () => SetCountOwned(quest, index, false)));
+            }
+            else if (HomeOnlyIn(quest, objective, all) is QuestDefinition rescue)
+            {
+                checks.Add(new QuestCheck(QuestCheck.State.Missing, $"{line} — {objective.Person.DisplayName} only comes home in {rescue.DisplayName}, " +
+                    "which doesn't come before this quest, so they may not be there. Add it (or a quest after it) to Prerequisites."));
+            }
+            else if (objective.Type == ObjectiveType.BuildStructure && objective.Building != null && !CanBeLearned(objective.Building))
+            {
+                checks.Add(new QuestCheck(QuestCheck.State.Missing, $"{line} — {objective.Building.DisplayName} isn't known from the start, and no job or item teaches it."));
+            }
+            else if (objective.Type == ObjectiveType.CraftItem && objective.Item != null && !ResourceCatalogTools.LoadAll<RecipeDefinition>().Exists(r => r != null && r.Output == objective.Item))
+            {
+                checks.Add(new QuestCheck(QuestCheck.State.Missing, $"{line} — no recipe makes {objective.Item.DisplayName}."));
+            }
             else if (objective.DeedKind.HasValue)
             {
                 checks.Add(TargetCheck(objective, line + "."));
@@ -204,6 +224,63 @@ public static class QuestChecklist
                 checks.Add(new QuestCheck(QuestCheck.State.Done, line + "."));
             }
         }
+    }
+
+    // Every quest that comes before this one (its prerequisites and theirs, and what must have started first).
+    private static HashSet<QuestDefinition> Before(QuestDefinition quest)
+    {
+        var before = new HashSet<QuestDefinition>();
+        var open = new Stack<QuestDefinition>(quest.Prerequisites.Concat(quest.StartedFirst));
+        while (open.Count > 0)
+        {
+            QuestDefinition next = open.Pop();
+            if (next != null && before.Add(next))
+            {
+                foreach (QuestDefinition earlier in next.Prerequisites.Concat(next.StartedFirst)) open.Push(earlier);
+            }
+        }
+
+        return before;
+    }
+
+    // A Talk To, Reach or Use that counts what was done before the quest began, which an earlier quest already asks: the
+    // Road North counted every talk with the portal since the first morning (2026-11-11). The earlier quest, or null.
+    private static QuestDefinition AskedBefore(QuestDefinition quest, QuestObjective objective, List<QuestDefinition> all)
+    {
+        if (!objective.CountAlreadyOwned || objective.DeedTarget == null
+            || objective.Type != ObjectiveType.TalkTo && objective.Type != ObjectiveType.ReachPlace && objective.Type != ObjectiveType.UseObject)
+        {
+            return null;
+        }
+
+        return Before(quest).FirstOrDefault(earlier => earlier.Objectives.Any(o => o != null && o.Type == objective.Type && o.DeedTarget == objective.DeedTarget)
+            || earlier.Start == QuestStart.WhenPlayerDoes && earlier.StartWhen != null && earlier.StartWhen.Type == objective.Type && earlier.StartWhen.DeedTarget == objective.DeedTarget);
+    }
+
+    // Talking to or giving work to someone who only comes home in a rescue that isn't before this quest: the rescue, or null.
+    private static QuestDefinition HomeOnlyIn(QuestDefinition quest, QuestObjective objective, List<QuestDefinition> all)
+    {
+        if (objective.Person == null || objective.Type != ObjectiveType.TalkTo && objective.Type != ObjectiveType.AssignJob)
+        {
+            return null;
+        }
+
+        QuestDefinition rescue = all.FirstOrDefault(q => q != null && q.Objectives.Any(o => o != null && o.Type == ObjectiveType.RescuePerson && o.Person == objective.Person));
+        return rescue == null || rescue == quest || Before(quest).Contains(rescue) ? null : rescue;
+    }
+
+    // Known from the start, or taught by a job or an item (blueprints).
+    private static bool CanBeLearned(BuildingDefinition building) =>
+        building.KnownFromStart
+        || ResourceCatalogTools.LoadAll<JobDefinition>().Exists(job => job != null && job.TeachesBuildings.Contains(building))
+        || ResourceCatalogTools.LoadAll<ItemDefinition>().Exists(item => item != null && item.TeachesBuildings.Contains(building));
+
+    private static void SetCountOwned(QuestDefinition quest, int objective, bool count)
+    {
+        var so = new SerializedObject(quest);
+        so.FindProperty("objectives").GetArrayElementAtIndex(objective).FindPropertyRelative("countAlreadyOwned").boolValue = count;
+        so.ApplyModifiedProperties();
+        EditorUtility.SetDirty(quest);
     }
 
     // A deed's person, place or thing: is anything in a scene it? If not, what can be put there.

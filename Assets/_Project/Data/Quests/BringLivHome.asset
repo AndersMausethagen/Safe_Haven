@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Humming Stones
   description: The deep woods take more than steel. Liv, the expedition's rune scholar, could cut runes for a raid, and a ring of old stones is said to be humming with someone inside it.
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: Liv went ahead with the first four, to read the stones. If a ring of them is humming with someone inside, it is her, and she has probably been taking notes. She cuts runes nobody else at home can.
   rank: 3
   availableObjective: 
   announceStart: 1

@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Hunter's Pit
   description: Hides pile up in the stash and rot there, and copper is the last armour you can make without leather to line it. A hunter has been setting snares in the deep woods, alone by choice. Find him, and bring him home.
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: 'Gunnar isn''t one of the expedition. He has lived in the woods by choice for longer than he will say, and he may not think he needs rescuing. Leather comes home with him: copper armour wants it for lining, and the Dock is his too.'
   rank: 3
   availableObjective: 
   announceStart: 1

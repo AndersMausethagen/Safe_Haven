@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Portal repaired
   objectiveText: Repair the portal
   notes: Raised by RaidPortal when it is repaired.
+  homeOnly: 1

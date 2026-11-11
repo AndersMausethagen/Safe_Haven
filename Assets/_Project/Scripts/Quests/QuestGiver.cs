@@ -154,7 +154,8 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>What a giver for this quest offers, given the player's progress.</summary>
     public static QuestGiverState StateFor(QuestDefinition quest, QuestLog log)
     {
-        if (quest == null || log == null)
+        // Co-op: a friend's people (and their notice board) ask things of the friend; a visitor's own quests wait for home.
+        if (quest == null || log == null || HavenVisit.InHostsHaven)
         {
             return QuestGiverState.None;
         }

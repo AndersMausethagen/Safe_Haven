@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: The portal told of the stones
   objectiveText: Hear what the portal has to say of the stones
   notes: 
+  homeOnly: 0

@@ -273,9 +273,41 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             pendingRewards.Clear();
             StartAvailableQuests();
             StartQuestsWhoseEventHappened();
+            RecountOwned();
         }
 
         RaiseChanged();
+    }
+
+    /// <summary>
+    /// Counts again, on arriving anywhere, what Count Already Owned objectives can see now and couldn't when they started: a
+    /// quest begun on a raid (a rescue finished there) or in a friend's Haven saw none of the player's own buildings, stash or
+    /// rank. Only ever adds, up to what is there.
+    /// </summary>
+    internal void RecountOwned()
+    {
+        foreach (QuestDefinition quest in Quests)
+        {
+            QuestLog.Entry entry = quest != null ? Log.Get(quest) : null;
+            if (entry == null || entry.Status != QuestStatus.Active)
+            {
+                continue;
+            }
+
+            for (int i = 0; i < quest.Objectives.Count && i < entry.Counts.Length; i++)
+            {
+                if (!entry.IsObjectiveOpen(i) || entry.IsObjectiveDone(i))
+                {
+                    continue;
+                }
+
+                int more = Mathf.Min(quest.Objectives[i].Owned(Player.Current, Log), quest.Objectives[i].Amount) - entry.Counts[i];
+                if (more > 0)
+                {
+                    Log.AddProgress(quest, i, more);
+                }
+            }
+        }
     }
 
     private void OnGameEvent(GameEvent gameEvent)
@@ -288,8 +320,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
                 continue;
             }
 
+            // Co-op: in a friend's Haven a Home Only event starts nothing (Start When's deed has its type's rule in Matches).
             bool starts = quest.Start == QuestStart.OnQuestEvent
-                ? gameEvent.Kind == GameEventKind.Custom && quest.StartEvent == gameEvent.Subject
+                ? gameEvent.Kind == GameEventKind.Custom && quest.StartEvent == gameEvent.Subject && !(HavenVisit.InHostsHaven && quest.StartEvent.HomeOnly)
                 : quest.Start == QuestStart.WhenPlayerDoes && quest.StartWhen != null && gameEvent.ForPlayerSide && quest.StartWhen.Matches(gameEvent);
             if (starts)
             {

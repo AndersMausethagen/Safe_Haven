@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Seed from the Ashes
   description: Berries and game don't stretch to a haven full of people, and long raids leave you hungry. A farmer was seen at a burned farmstead in the deep woods, still guarding her seed. Bring her home.
   chain: The Lost Expedition
-  journalNotes: 
+  journalNotes: 'Asa stayed with her seed while the farmstead burned around her. She is stubborn, and she is right: a haven full of people can''t live on berries and game. With her home the Farm Plot opens.'
   rank: 3
   availableObjective: 
   announceStart: 1

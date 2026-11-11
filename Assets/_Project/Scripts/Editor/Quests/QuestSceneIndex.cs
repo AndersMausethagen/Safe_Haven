@@ -421,6 +421,8 @@ public static class QuestSceneIndex
             case nameof(WhenQuestEvent):
             case nameof(CheckQuestNode):
             case nameof(HasHappenedNode):
+            // Waits for the event: it raises nothing, so it must not make an event look raised.
+            case nameof(WaitForEventNode):
                 return QuestSceneRole.Listens;
             default:
                 return QuestSceneRole.Other;
