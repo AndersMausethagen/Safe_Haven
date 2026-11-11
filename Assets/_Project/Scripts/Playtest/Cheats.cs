@@ -153,6 +153,41 @@ public static class Cheats
         return Did("Heal", "Health, stamina, hunger and thirst filled.");
     }
 
+    /// <summary>A wild horse a little way ahead, out of its fright distance, to try the lasso on.</summary>
+    public static string WildHorse()
+    {
+        Player player = Player.Current;
+        if (player == null || HorseSettings.Current.WildHorse == null)
+        {
+            return "No horse to bring.";
+        }
+
+        Vector3 at = player.transform.position + player.transform.forward * 8f;
+        if (!UnityEngine.AI.NavMesh.SamplePosition(at, out UnityEngine.AI.NavMeshHit hit, 8f, UnityEngine.AI.NavMesh.AllAreas))
+        {
+            return "No ground for a horse ahead.";
+        }
+
+        HorseHerd.SpawnAt(hit.position);
+        return Did("Wild horse", "A wild horse grazes ahead. Sneak closer and use the lasso.");
+    }
+
+    /// <summary>What taming and keeping a horse takes: a lasso, barley and a hide saddle, into the bag.</summary>
+    public static string HorseKit()
+    {
+        HorseDefinition horse = HorseSettings.Current.WildHorse;
+        if (horse == null)
+        {
+            return "No horses in this game.";
+        }
+
+        Give(horse.Lasso, 1, false);
+        Give(horse.Barley, 8, false);
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        Give(content != null ? content.FindItem("hide_saddle") : null, 1, false);
+        return Did("Horse kit", "A lasso, 8 barley and a hide saddle.");
+    }
+
     public static string GrantExperience(int amount)
     {
         ExperienceTracker.GrantInsight(amount);

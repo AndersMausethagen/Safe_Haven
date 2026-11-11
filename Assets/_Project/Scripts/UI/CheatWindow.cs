@@ -272,6 +272,9 @@ public sealed class CheatWindow : MonoBehaviour
         y += RowStep;
         Action(page, "500 Insight", Margin, y, wide, () => Cheats.GrantExperience(500));
         Action(page, "50 of every essence", right, y, wide, () => Cheats.GiveEssences(50));
+        y += RowStep;
+        Action(page, "A wild horse nearby", Margin, y, wide, Cheats.WildHorse);
+        Action(page, "Lasso, barley and a saddle", right, y, wide, Cheats.HorseKit);
         y += RowStep + 8f;
 
         Title("99 of every material, to the stash", page, y, style);
