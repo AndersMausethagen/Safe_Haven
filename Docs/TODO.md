@@ -3,6 +3,25 @@
 Open work and ideas. Tick items off (`[x]`) or delete them when done. Architecture notes for each system live in
 [ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md).
 
+## Queued by the user (2026-11-11), in this order
+
+1. **Horse improvements** (all approved): rope tells to lean against; luring and calming a wild horse; each temperament
+   breaks differently; failing costs (warier horse, a lasso that can snap, a thrown rider hurt); jumping; gaits you pick
+   (a free canter, a gallop burst); ground speed (paths, bog, slopes); follow, stay and a pack horse on a lead; horse work
+   at the Haven (ploughing, hauling); the stable's feed trough; special-breed abilities (the toxic horse in the bog);
+   traits from use; breeding goals (rare coats, inherited traits, a horse trader); a mounted charge and a kick on
+   command; monsters that hunt or frighten horses; horses through the portal into raids (and tied at the portal); the
+   undead knight rider elite (Fire, Ice, Toxic); polish (hooves by surface, hands on the reins and feet in the stirrups,
+   the camera out at a gallop, a horse panel with its picture and traits).
+2. The tutorial popup fades in fast, fades out slowly when not opened, and leaves a small "unread tutorial" hint.
+3. Every key named in journals, tutorials, dialogue and messages comes from the action it names (rebinding changes the text).
+4. Horses in co-op: taming, owning and riding synchronised.
+5. Research ways to make new systems work in co-op by default, without per-system networking.
+6. The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.
+7. The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.
+8. Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait
+   easier; the size on the fish item (looks only), and the biggest catch in the journal.
+
 ## Horses and the playtest list (2026-11-11)
 
 Built and checked in Play (see GDD §10.9); none of it played by hand yet.
