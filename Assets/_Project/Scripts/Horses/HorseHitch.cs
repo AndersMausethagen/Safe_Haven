@@ -10,7 +10,7 @@ using UnityEngine;
 [RequireComponent(typeof(Horse))]
 public sealed class HorseHitch : MonoBehaviour, IHauler
 {
-    private const float HorsePull = 6f;
+    private const float HorsePull = 8f;
     private const float BehindTheHorse = 1.5f;
 
     private Horse horse;
@@ -59,11 +59,19 @@ public sealed class HorseHitch : MonoBehaviour, IHauler
         }
     }
 
-    /// <summary>What a hitched cart's strain leaves of the horse's speed.</summary>
+    /// <summary>What a hitched cart leaves of the horse's speed: its strain holds the horse back as it holds back a player
+    /// at the shafts (Haulable.StrainScale), so the cart keeps up instead of being torn loose.</summary>
     public static float SpeedScaleFor(Horse horse)
     {
-        Haulable cart = Pulling(horse);
-        return cart != null ? Mathf.Lerp(1f, 0.75f, cart.Strain) : 1f;
+        return horse != null && horse.TryGetComponent(out HorseHitch hitch) && hitch.Cart != null ? hitch.held : 1f;
+    }
+
+    // Eased: the strain's own swing (the cart catching up, the horse surging on) made both lurch.
+    private float held = 1f;
+
+    private void Update()
+    {
+        held = Mathf.MoveTowards(held, Cart != null ? Cart.StrainScale : 1f, Time.deltaTime * 0.8f);
     }
 
     private void OnDisable() => Unhitch(horse);
