@@ -51,9 +51,11 @@ public sealed class VoiceBank : GameSettings<VoiceBank>
     public float SubtitleTail => subtitleTail;
 
     /// <summary>The words of a line as they are compared: without rich-text tags, key hints, case or extra spaces.
-    /// A key hint ("(G)", "[E]") is left out because the player can rebind it, and the line is still the same line.</summary>
+    /// A key hint ("(G)", "[E]") is left out because the player can rebind it, and the line is still the same line. A key
+    /// named by its action ("({key:Build})", "press {key:ToggleTorch}") counts as the key the game ships with, as it was
+    /// spoken: so the hint is left out, and "press L" is still "press L" after the torch is rebound.</summary>
     public static string Plain(string text) =>
-        Spaces.Replace(KeyHints.Replace(Tags.Replace(text ?? "", ""), " "), " ").Trim().ToLowerInvariant();
+        Spaces.Replace(KeyHints.Replace(GameInput.DefaultKeys(Tags.Replace(text ?? "", "")), " "), " ").Trim().ToLowerInvariant();
 
     /// <summary>What a line is found by: the speaker and the plain words.</summary>
     public static string Key(string speaker, string text) => (speaker ?? "").Trim().ToLowerInvariant() + "|" + Plain(text);

@@ -74,7 +74,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 0
   - type: 6
-    description: Dodge (Space)
+    description: Dodge ({key:Dodge})
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

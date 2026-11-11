@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.cook
   displayName: Show Me Your Kitchen
-  description: 'Yrsa cooked for a jarl once, and tells you so. Give her the Cook''s work and build a Kitchen (G): her meals last, and send you out stronger.'
+  description: 'Yrsa cooked for a jarl once, and tells you so. Give her the Cook''s work and build a Kitchen ({key:Build}): her meals last, and send you out stronger.'
   chain: Hands at Home
   journalNotes: The Kitchen wants Bjarne's Smithy standing first. Yrsa's meals give their bonuses for longer than a stew from the campfire, and she will tell you which jarl she cooked them for.
   rank: 4

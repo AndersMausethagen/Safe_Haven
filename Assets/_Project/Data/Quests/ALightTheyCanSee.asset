@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: a_light_they_can_see
   displayName: A Light They Can See
-  description: The brighter Safe Haven burns, the further its light carries through the mist, and the rest of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page (H) shows what counts.
+  description: The brighter Safe Haven burns, the further its light carries through the mist, and the rest of your people are still out there. Build, clear the overgrowth and raise the haven to a Hamlet. The Haven page ({key:Haven}) shows what counts.
   chain: Hands at Home
   journalNotes: Everyone left out there is looking for the same thing Ingrid saw. Each rank of the Haven carries the light further, and that may be the difference between someone finding their way and someone forgetting there was a way to find.
   rank: 4

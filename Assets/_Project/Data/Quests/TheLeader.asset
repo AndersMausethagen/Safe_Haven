@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.leader
   displayName: Under One Banner
-  description: 'Sigrid keeps the portal''s watch: with her as Leader every raid has more time. Raise a Haven Banner where everyone can see it (G).'
+  description: 'Sigrid keeps the portal''s watch: with her as Leader every raid has more time. Raise a Haven Banner where everyone can see it ({key:Build}).'
   chain: Hands at Home
   journalNotes: 'With Sigrid as Leader every raid has more time on its clock. The banner is for the rest of you: people work better under one.'
   rank: 4

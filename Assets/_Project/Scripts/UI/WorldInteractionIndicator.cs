@@ -180,7 +180,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
             }
             else if (IsReady)
             {
-                SetText(status, GameInput.WithRebinds(Target.TryGetComponent(out IInteractionVerb verb) ? "[E] " + verb.Verb : "[E] Interact"));
+                SetText(status, GameInput.WithRebinds(Target.TryGetComponent(out IInteractionVerb verb) ? "[{key:Interact}] " + verb.Verb : "[{key:Interact}] Interact"));
             }
             else
             {

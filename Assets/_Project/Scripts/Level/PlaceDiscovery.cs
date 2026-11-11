@@ -67,7 +67,7 @@ public sealed class PlaceDiscovery : MonoBehaviour
             {
                 WorldAtlas.Region region = atlas.RegionAt(new Vector3(place.at.x, 0f, place.at.y));
                 string where = region != null ? $", {region.name}" : "";
-                GameMessages.Post(GameInput.WithRebinds($"Found: {place.name}{where}. It is on your map now (M)."));
+                GameMessages.Post(GameInput.WithRebinds($"Found: {place.name}{where}. It is on your map now ({{key:WorldMap}})."));
                 Territory.PlaceFound(place);
                 UIMotion.Sound(AudioManager.Sounds != null ? AudioManager.Sounds.QuestStarted : null);
             }

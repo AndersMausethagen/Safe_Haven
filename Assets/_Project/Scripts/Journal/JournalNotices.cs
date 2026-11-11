@@ -58,11 +58,11 @@ public static class JournalNotices
 
         if (fresh.Count == 1)
         {
-            Post($"New in your journal: {fresh[0]} (J)");
+            Post($"New in your journal: {fresh[0]} ({{key:Journal}})");
         }
         else if (fresh.Count > 1)
         {
-            Post($"{fresh.Count} new pages in your journal (J)");
+            Post($"{fresh.Count} new pages in your journal ({{key:Journal}})");
         }
     }
 
@@ -82,7 +82,7 @@ public static class JournalNotices
     {
         // "The Heartroot" has its article already.
         string name = creature.DisplayName.StartsWith("The ", System.StringComparison.Ordinal) ? creature.DisplayName : "the " + creature.DisplayName;
-        Post(firstTime ? $"New in your journal: {creature.DisplayName} (J)" : $"You understand {name} better (J)");
+        Post(firstTime ? $"New in your journal: {creature.DisplayName} ({{key:Journal}})" : $"You understand {name} better ({{key:Journal}})");
         CheckPages();
     }
 
@@ -102,7 +102,7 @@ public static class JournalNotices
             {
                 record.NoteFound(page.title);
                 record.Announce(page.title);
-                Post($"Among the rest, something written: {page.title} (J)");
+                Post($"Among the rest, something written: {page.title} ({{key:Journal}})");
                 return;
             }
         }

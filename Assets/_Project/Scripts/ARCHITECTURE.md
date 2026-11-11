@@ -1860,7 +1860,9 @@ is voiced the same way, and a builder that rewrites a story keeps its voices as 
   a recording it plays on the **Voice** volume, one voice at a time, heard while the game is held still. Without one
   the speaker's own sound plays as before, and `DialogueBox.Unvoiced` is raised.
 - **Finding a line.** `VoiceBank.Key` is the speaker's name and `VoiceBank.Plain(text)`: no rich-text tags, no key hints
-  (`(G)`, `[E]`: the player can rebind them and it is still the same line), no case, single spaces. `VoiceBank.Id` is a
+  (`(G)`, `[E]`: the player can rebind them and it is still the same line), no case, single spaces. A key token counts as
+  the key the game ships with (`GameInput.DefaultKeys`: "press {key:ToggleTorch}" is "press l"), which is also how the harvest
+  hands it to the voices, so `DialogueBox` looks a line up as written and resolves keys only where it shows them. `VoiceBank.Id` is a
   short hash of that, and the recording's file name: `Audio/Voice/Dialogue/<speaker>/<id>.wav`.
 - **A subtitle waits for its recording**: an aside stays up until the clip ends plus `VoiceBank.SubtitleTail`.
 - **Hand Placed** on the bank holds recordings put on a line by hand (an actor's take). They win over generated ones
@@ -2006,8 +2008,15 @@ menu. Tabs: Gameplay, Graphics, Audio, Controls, Accessibility. It only draws se
   The Editor's Game view keeps its own size, so none of that shows there.
 - **Controls** (`InputRebinds`): `Rows` lists what can be rebound; overrides go on the Input Actions asset and into PlayerPrefs,
   so `GameInput.KeyLabel` follows them. A key in use swaps with the other row. Escape is the game's own. While waiting for a
-  key every map but UI is off. Text is written with the default keys ("[E]", "(N)", quests' "(B)"), and `GameInput.WithRebinds` puts in the
-  new key wherever it is shown (quest tracker, dialogue, messages, prompts). It costs nothing without a rebind.
+  key every map but UI is off.
+- **Keys in text are named by their action**, never written as letters: "open the build menu ({key:Build})", "{key:Dismount} gets
+  you down", "[{key:Interact}] Talk". `GameInput.Keys` (inside `WithRebinds`) turns each token into the key bound now, so a
+  rebind, or moving a thing to another action (dismount went from E to X), changes no journal page, quest or line. A token is
+  an action's name ("Interact", "UI/Advance") or a verb from `GameInput.Verbs` ("Dismount" -> Whistle, "Feed" -> Interact,
+  "Gallop" -> Dodge); add a verb there rather than naming the wrong action. In a C# interpolated string write `{{key:Talents}}`.
+  Every text that is shown goes through `GameInput.WithRebinds` (quest tracker, journal, dialogue, menus, messages, prompts).
+  `AccessibilityTests` fails on a token that names nothing. `AgentScripts/KeyTokens.cs` converted the old "(G)"/"hold E" texts
+  and can be run again on new data. Old bracketed default keys ("(B)") still follow a rebind, as before.
 - **Accessibility:** Sound Captions (`SoundCaptions`, a persistent system: `SoundDefinition` › Caption, with the side it came from), Rarity
   Letters on item slots, Damage Taken and Parry and Dodge Timing (`GameOptions.DamageTakenShare`, `TimingShare`). An assist in use is written to
   the playtest log as an `Assist` row, so a helped run can be told from another.

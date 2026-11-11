@@ -45,7 +45,7 @@ public sealed class PrologueInteraction : MonoBehaviour, IInteractionCondition
         }
         if (kind == PrologueInteractionKind.Campfire)
         {
-            GameMessages.Post("Build a campfire through the build menu (G).", MessageKind.Info);
+            GameMessages.Post("Build a campfire through the build menu ({key:Build}).", MessageKind.Info);
         }
         else if (director.Step == PrologueStep.ActivatePortal)
             GameEvents.Raise(director.Definition.PortalActivatedEvent, interactable.Interactor);

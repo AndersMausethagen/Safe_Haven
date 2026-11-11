@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.farmer
   displayName: Good Dirt
-  description: 'Asa grows what you can''t gather. Give her the Farmer''s work and lay out a Farm Plot (G). She weaves too: as a Weaver she runs a Tailor''s Shop, and iron gear will want its linen.'
+  description: 'Asa grows what you can''t gather. Give her the Farmer''s work and lay out a Farm Plot ({key:Build}). She weaves too: as a Weaver she runs a Tailor''s Shop, and iron gear will want its linen.'
   chain: Hands at Home
   journalNotes: 'Crops grow while you are away, like everything else your people tend. Asa weaves too: give her the Weaver''s work instead and she runs the Tailor''s Shop.'
   rank: 4

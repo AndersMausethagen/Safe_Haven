@@ -600,8 +600,8 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         }
 
         revive.SetAvailable(true);
-        GameMessages.Post(bleedsOut ? $"{DisplayName} is down! Hold E beside them within {definition.BleedOutSeconds:0} seconds, or they are lost."
-            : $"{DisplayName} is down! Hold E beside them to help them up.", MessageKind.Warning);
+        GameMessages.Post(bleedsOut ? $"{DisplayName} is down! Hold {{key:Interact}} beside them within {definition.BleedOutSeconds:0} seconds, or they are lost."
+            : $"{DisplayName} is down! Hold {{key:Interact}} beside them to help them up.", MessageKind.Warning);
     }
 
     private void Lose()

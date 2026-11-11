@@ -196,7 +196,7 @@ public sealed class ExperienceHud : MonoBehaviour
     {
         bannerTitle.text = $"{skill.DisplayName.ToUpperInvariant()}  {reached}";
         bannerLine.text = milestone
-            ? GameInput.WithRebinds($"A milestone: <color={UIStyle.Current.GoodHex}>a perk to choose (N)</color>")
+            ? GameInput.WithRebinds($"A milestone: <color={UIStyle.Current.GoodHex}>a perk to choose ({{key:Talents}})</color>")
             : NextMilestone(skill, reached) is int next ? $"Next milestone at {next}" : "Mastered";
         bannerAt = Time.unscaledTime;
         bannerFor = milestone ? MilestoneBannerSeconds : BannerSeconds;
@@ -340,7 +340,7 @@ public sealed class ExperienceHud : MonoBehaviour
                 name += $"  <color={muted}>+{held} if you get out</color>";
             }
 
-            level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>(N)</color>") : name;
+            level.text = points > 0 ? GameInput.WithRebinds($"{name}  <color={UIStyle.Current.GoodHex}>({{key:Talents}})</color>") : name;
         }
 
         // A perk waiting to be chosen keeps calling softly.

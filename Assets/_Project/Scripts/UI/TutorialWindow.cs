@@ -88,7 +88,7 @@ public sealed class TutorialWindow : MonoBehaviour
         }
         else
         {
-            GameMessages.Post(GameInput.WithRebinds("Nothing new to learn just now. Everything you have learned is in the journal (J), under Mechanics."));
+            GameMessages.Post(GameInput.WithRebinds("Nothing new to learn just now. Everything you have learned is in the journal ({key:Journal}), under Mechanics."));
         }
     }
 

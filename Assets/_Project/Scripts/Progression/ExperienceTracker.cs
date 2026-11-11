@@ -435,7 +435,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
 
         GameMessages.Post(milestone
-            ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose (N).")
+            ? GameInput.WithRebinds($"{skill.DisplayName} {after}! A perk to choose ({{key:Talents}}).")
             : $"{skill.DisplayName} {after}!", MessageKind.Gain);
         LevelReached?.Invoke(skill, after, milestone);
         int flourish = TechniqueSettings.Current.FlourishLevel;

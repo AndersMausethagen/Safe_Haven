@@ -212,8 +212,8 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         thumb.sprite = newest.art;
         thumb.enabled = newest.art != null;
         thumbGlyph.text = newest.art == null && !string.IsNullOrEmpty(newest.title) ? newest.title.Substring(0, 1) : "";
-        hint.text = GameInput.WithRebinds("Press (T) or click to read");
-        lineText.text = GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  (T)" : "1 unread tutorial  ·  (T)");
+        hint.text = GameInput.WithRebinds("Press ({key:Tutorial}) or click to read");
+        lineText.text = GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  ({{key:Tutorial}})" : "1 unread tutorial  ·  ({key:Tutorial})");
         // A new one brings the card back, quickly, for a while.
         if (count > shownCount)
         {

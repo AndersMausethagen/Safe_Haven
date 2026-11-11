@@ -19,10 +19,10 @@ MonoBehaviour:
   journalNotes: 'The portal has felt how far your fire reaches. Out past the meadows each of the old lands has a boundary stone that once burned from this hearth.
 
 
-    A stone doesn''t know you until you have found one of the places in its land: walk up to one and it goes on your map (M). The stone tells you which way the nearest lies. The first stone you light needs nothing but your hand; the rest want a Pact Rune.
+    A stone doesn''t know you until you have found one of the places in its land: walk up to one and it goes on your map ({key:WorldMap}). The stone tells you which way the nearest lies. The first stone you light needs nothing but your hand; the rest want a Pact Rune.
 
 
-    The Haven window''s Lands tab (H) lists every region, what it is like and what it would give.'
+    The Haven window''s Lands tab ({key:Haven}) lists every region, what it is like and what it would give.'
   rank: 4
   availableObjective: 
   announceStart: 1

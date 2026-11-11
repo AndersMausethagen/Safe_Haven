@@ -18,8 +18,8 @@ public static class ConstructionUpgradeOffer
 
         if (construction.IsBuilding)
         {
-            GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold E at its scaffold."
-                : $"Walk up to the {building.Definition.DisplayName} and hold E to repair it.");
+            GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold {{key:Hammer}} at its scaffold."
+                : $"Walk up to the {building.Definition.DisplayName} and hold {{key:Hammer}} to repair it.");
             return;
         }
 

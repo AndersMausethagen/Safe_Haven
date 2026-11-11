@@ -36,7 +36,7 @@ public static class VoiceLinesWanted
         }
 
         // One row a line: a line break in the words is written as \n, which the harvest turns back.
-        string row = speaker.Trim() + "\t" + line.Trim().Replace("\r", "").Replace("\n", "\\n");
+        string row = speaker.Trim() + "\t" + GameInput.DefaultKeys(line).Trim().Replace("\r", "").Replace("\n", "\\n");
         if (known.Add(row))
         {
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Path));

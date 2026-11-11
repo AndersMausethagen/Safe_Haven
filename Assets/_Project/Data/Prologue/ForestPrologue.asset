@@ -54,8 +54,8 @@ MonoBehaviour:
     nextWaveText: 
   - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
     behaviour: 2
-    arrivalText: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).'
-    statusText: Build a Campfire beside the shelter (G)
+    arrivalText: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter ({key:Build}).'
+    statusText: Build a Campfire beside the shelter ({key:Build})
     duration: 0
     initialEnemies: 0
     enemies: []

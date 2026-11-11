@@ -412,7 +412,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
 
         if (placed.TryGetComponent(out Construction construction) && construction.IsBuilding)
         {
-            GameMessages.Post($"The scaffold for the {building.DisplayName} is up. Hold E at it to build.");
+            GameMessages.Post($"The scaffold for the {building.DisplayName} is up. Hold {{key:Hammer}} at it to build.");
         }
         else
         {

@@ -25,9 +25,9 @@ public sealed class ActionRowView : MonoBehaviour
     public void Bind(MenuAction shown)
     {
         action = shown;
-        label.text = shown.Label;
+        label.text = GameInput.WithRebinds(shown.Label);
         label.color = shown.Enabled ? enabledText : disabledText;
-        detail.text = shown.Detail ?? "";
+        detail.text = GameInput.WithRebinds(shown.Detail ?? "");
         detail.gameObject.SetActive(!string.IsNullOrEmpty(shown.Detail));
         button.interactable = shown.Enabled;
     }

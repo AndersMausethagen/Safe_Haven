@@ -15,8 +15,10 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
    command; monsters that hunt or frighten horses; horses through the portal into raids (and tied at the portal); the
    undead knight rider elite (Fire, Ice, Toxic); polish (hooves by surface, hands on the reins and feet in the stirrups,
    the camera out at a gallop, a horse panel with its picture and traits).
-2. The tutorial popup fades in fast, fades out slowly when not opened, and leaves a small "unread tutorial" hint.
-3. Every key named in journals, tutorials, dialogue and messages comes from the action it names (rebinding changes the text).
+2. ~~The tutorial popup fades in fast, fades out slowly when not opened, and leaves a small "unread tutorial" hint.~~ (done 2026-11-12)
+3. ~~Every key named in journals, tutorials, dialogue and messages comes from the action it names (rebinding changes the text).~~
+   (done 2026-11-12: `{key:Action}` tokens, ARCHITECTURE "Keys in text are named by their action"; 42 data texts and the code's
+   prompts converted; voice lines keep their recordings.)
 4. Horses in co-op: taming, owning and riding synchronised.
 5. Research ways to make new systems work in co-op by default, without per-system networking.
 6. The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.

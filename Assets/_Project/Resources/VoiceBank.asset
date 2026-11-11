@@ -290,7 +290,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 74b7a60713ceb95408be796aca66d42d, type: 3}
     mood: Neutral
   - speaker: Eirik
-    text: Long reach, and it wants both hands. If you ever need a light instead, press L to swap them.
+    text: Long reach, and it wants both hands. If you ever need a light instead, press {key:ToggleTorch} to swap them.
     clip: {fileID: 8300000, guid: 66f291ca0d56c844581fafbd4c919ccb, type: 3}
     mood: Neutral
   - speaker: Eirik
@@ -682,7 +682,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2811366d1e044d44aa5cf44521b6c5e2, type: 3}
     mood: Stern
   - speaker: Runa
-    text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them.'
+    text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press {key:ToggleTorch} to swap them.'
     clip: {fileID: 8300000, guid: e10a06dcf9691e348ad0d7a0d4993041, type: 3}
     mood: Glad
   - speaker: Runa
@@ -1030,7 +1030,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: f08432fac0d2bd04bbee093a9ab05ac2, type: 3}
     mood: Tired
   - speaker: Sigrid
-    text: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).'
+    text: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter ({key:Build}).'
     clip: {fileID: 8300000, guid: ccd248fd8a2be19479a6a510320b4aa3, type: 3}
     mood: Neutral
   - speaker: Sigrid
@@ -1282,7 +1282,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 4457d8f362d59914390905af27a78f06, type: 3}
     mood: Stern
   - speaker: The Portal
-    text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu (G) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
+    text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu ({key:Build}) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
     clip: {fileID: 8300000, guid: a2b574d661a62a44f9bea6d4d4460fad, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1326,7 +1326,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 95776a46879c4f74ea3405b97c68b607, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag (B).</i>'
+    text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag ({key:Items}).</i>'
     clip: {fileID: 8300000, guid: 2740700c16cdd924ca535772bad8580a, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1550,7 +1550,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 92501bcf7ce226941abbadd2eba70c0d, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>
+    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop ({key:Build}), and put in it what you cannot bear to lose.</i>
     clip: {fileID: 8300000, guid: 67dfff8ced5006a47ac8e185cb37edbf, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1606,7 +1606,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1ed23c52d4c657448b67201578f40c43, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: '<i>You have a fire. Now a roof to work under: a workshop beside it (G). What the woods break, it mends.</i>'
+    text: '<i>You have a fire. Now a roof to work under: a workshop beside it ({key:Build}). What the woods break, it mends.</i>'
     clip: {fileID: 8300000, guid: 64b42d68b6d472e45991c36cbef2ac45, type: 3}
     mood: Neutral
   - speaker: The Portal

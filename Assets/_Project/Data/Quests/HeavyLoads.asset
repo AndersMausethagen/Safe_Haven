@@ -54,7 +54,7 @@ MonoBehaviour:
   objectivesInOrder: 1
   objectives:
   - type: 18
-    description: Raise the Woodcutter's Lodge to Tier II (H)
+    description: Raise the Woodcutter's Lodge to Tier II ({key:Haven})
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstweapon
   displayName: Something to Fight With
-  description: 'The weapon you came through with won''t last for ever, and it is one way to fight. Make a Knotted Club at the Workshop, from oak and nettle fibre: it stuns what it hits. Wear it in your weapon slot (C), or keep it in the chest for the day yours breaks.'
+  description: 'The weapon you came through with won''t last for ever, and it is one way to fight. Make a Knotted Club at the Workshop, from oak and nettle fibre: it stuns what it hits. Wear it in your weapon slot ({key:Character}), or keep it in the chest for the day yours breaks.'
   chain: The First Days
   journalNotes: 'Nettles grow at the clearing''s edge: pick them by hand for the fibre. Z swaps between the weapon in your hand and the one you held before it.'
   rank: 4

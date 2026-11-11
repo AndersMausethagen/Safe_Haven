@@ -224,7 +224,7 @@ public static class Cheats
     public static string GrantExperience(int amount)
     {
         ExperienceTracker.GrantInsight(amount);
-        return Did("Insight", $"{amount} Insight to put into a skill (N).");
+        return Did("Insight", $"{amount} Insight to put into a skill ({{key:Talents}}).");
     }
 
     /// <summary>Gives items, to the bag or the stash. What doesn't fit the bag (weight, slots) goes to the stash. Gear isn't equipped.</summary>

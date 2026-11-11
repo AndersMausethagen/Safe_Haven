@@ -103,7 +103,7 @@ public sealed class RaidHudView : MonoBehaviour
             for (int i = 0; i < entry.Counts.Length; i++)
                 if (entry.IsObjectiveOpen(i))
                 {
-                    objective = quest.Objectives[i].Describe();
+                    objective = GameInput.WithRebinds(quest.Objectives[i].Describe());
                     break;
                 }
             extractionLabel.text = objective;

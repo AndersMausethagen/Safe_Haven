@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: woodcutterslodge
   displayName: The Woodcutter's Lodge
-  description: Tor turns logs into planks while you are away. Give him the Carpenter's work and build the Woodcutter's Lodge he showed you, near the trees (G). Palisades, a storage shed and a watch post all start with a plank, and at Tier II his lodge plans a Wainwright's Yard.
+  description: Tor turns logs into planks while you are away. Give him the Carpenter's work and build the Woodcutter's Lodge he showed you, near the trees ({key:Build}). Palisades, a storage shed and a watch post all start with a plank, and at Tier II his lodge plans a Wainwright's Yard.
   chain: Hands at Home
   journalNotes: Planks, not logs. That is the difference between a camp and a place people stay.
   rank: 4

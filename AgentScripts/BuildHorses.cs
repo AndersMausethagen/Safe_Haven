@@ -1699,6 +1699,14 @@ public static class BuildHorses
 
     // ----- The journal -----
 
+    /// <summary>Only the journal's Horses page (`--entry BuildHorses.Journal`): for a change to its words.</summary>
+    public static string Journal()
+    {
+        string done = JournalPage();
+        AssetDatabase.SaveAssets();
+        return done;
+    }
+
     private static string JournalPage()
     {
         var settings = Load<JournalSettings>("Assets/_Project/Resources/JournalSettings.asset");
@@ -1730,13 +1738,13 @@ public static class BuildHorses
         page.FindPropertyRelative("line").stringValue = "A rope, barley, and a seat kept";
         page.FindPropertyRelative("body").stringValue =
             "Wild horses graze in the land round the Haven. Come close crouched: a walk is heard ten metres off. With a lasso in hand, " +
-            "throw it from within its reach (the attack button).\n\n" +
-            "On the rope it fights: tap E or left click, and lean away from it with the movement keys (that costs your breath). Tire it " +
+            "throw it from within its reach ({key:Lasso}).\n\n" +
+            "On the rope it fights: tap {key:Interact} or left click, and lean away from it with the movement keys (that costs your breath). Tire it " +
             "before the rope slips, then get on its back.\n\n" +
-            "Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley (E). Fed " +
-            "enough, it is yours. In the saddle, X gets you down (E never does, so feeding can't throw you off).\n\n" +
+            "Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley ({key:Feed}). Fed " +
+            "enough, it is yours. In the saddle, {key:Dismount} gets you down ({key:Feed} never does, so feeding can't throw you off).\n\n" +
             "Each horse has its nature: calm, skittish, stubborn or bold. Feed it, groom it once a day and ride it, and it grows fond of " +
-            "you: more stamina, less panic, and it comes when you whistle (X). Saddles carry its bags; barding keeps blows off.\n\n" +
+            "you: more stamina, less panic, and it comes when you whistle ({key:Whistle}). Saddles carry its bags; barding keeps blows off.\n\n" +
             "A Stable keeps horses safe at night and mends them. A mare and a stallion stabled together, both fond of you, may foal. " +
             "Deep water it swims, on its stamina.\n\n" +
             "Something else lives in the bog, and comes out at dusk.";

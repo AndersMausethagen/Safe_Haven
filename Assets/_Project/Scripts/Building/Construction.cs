@@ -151,7 +151,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Work = 0f;
         Paid = true;
         Refresh();
-        GameMessages.Post($"The scaffold is up. Hold E at the {Definition.DisplayName} to build.");
+        GameMessages.Post($"The scaffold is up. Hold {{key:Hammer}} at the {Definition.DisplayName} to build.");
         return true;
     }
 

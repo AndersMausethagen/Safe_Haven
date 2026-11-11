@@ -19,7 +19,7 @@ MonoBehaviour:
   journalNotes: 'This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
 
 
-    Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs.'
+    Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up ({key:Interact}). The build menu ({key:Build}) shows what the fire costs.'
   rank: 0
   availableObjective: 
   announceStart: 1

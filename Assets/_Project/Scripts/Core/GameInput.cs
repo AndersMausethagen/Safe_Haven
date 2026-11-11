@@ -124,12 +124,101 @@ public static class GameInput
     /// <summary>Where the pointer (mouse, pen, touch) is on the screen.</summary>
     public static Vector2 PointerPosition => Point.ReadValue<Vector2>();
 
+    // What a line of text may name a key by, besides an action's own name ({key:Interact}): the thing it does. Text says
+    // "{key:Dismount}", and which action gets the rider down is decided here, once, not in every journal page and line.
+    private static readonly Dictionary<string, string> Verbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    {
+        { "Dismount", "Whistle" }, { "GetDown", "Whistle" }, { "Gallop", "Dodge" }, { "Canter", "Dodge" }, { "Rear", "Dodge" },
+        { "Walk", "Sneak" }, { "Crouch", "Sneak" }, { "Feed", "Interact" }, { "Mount", "Interact" }, { "Use", "Interact" },
+        { "Hammer", "Interact" }, { "PickUp", "Interact" }, { "Talk", "Interact" }, { "Kick", "HorseKick" }, { "Bag", "Items" },
+        { "BuildMenu", "Build" }, { "Map", "WorldMap" }, { "Perks", "Talents" }, { "Abilities", "Skills" }, { "Light", "ToggleTorch" },
+        { "Lasso", "Attack" }, { "Roll", "Dodge" }, { "Dodge", "Dodge" }, { "Guard", "Guard" }, { "Attack", "Attack" },
+    };
+
+    private static readonly System.Text.RegularExpressions.Regex KeyToken = new System.Text.RegularExpressions.Regex(@"\{key:([A-Za-z0-9/]+)\}");
+
     /// <summary>
-    /// Text with a key written in it ("Open your bag (B)", "[E] Interact") as it is for this player: a key they have rebound shows
-    /// as the new one. Text and quests are written with the default keys, so nothing has to mark them. Costs nothing without a rebind.
+    /// Text that names keys by what they do ("Open your bag ({key:Items})", "{key:Dismount} gets you down"): each token becomes the
+    /// key bound to that action now ("B", "X"), so a rebinding, or a change of which action does a thing, never needs the text
+    /// changed. An action is named as in the Input Actions ("Interact", "Player/Whistle") or by a verb (Verbs: "Dismount").
+    /// </summary>
+    public static string Keys(string text) => Resolve(text, asShipped: false);
+
+    /// <summary>
+    /// The same text with each token as the key the game ships with, whatever the player has rebound: how the words were
+    /// spoken for a voice line ("press L to swap them"), so a line keeps its recording after a rebind.
+    /// </summary>
+    public static string DefaultKeys(string text) => Resolve(text, asShipped: true);
+
+    private static string Resolve(string text, bool asShipped)
+    {
+        if (string.IsNullOrEmpty(text) || text.IndexOf("{key:", System.StringComparison.Ordinal) < 0)
+        {
+            return text;
+        }
+
+        return KeyToken.Replace(text, match =>
+        {
+            string name = match.Groups[1].Value;
+            InputAction action = ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name);
+            string label = action != null ? KeyLabel(action, asShipped) : "";
+            return label.Length > 0 ? label : name;
+        });
+    }
+
+    /// <summary>The first key token in the text that names no action or verb (a typo), or null when they all do.</summary>
+    public static string UnknownKey(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return null;
+        }
+
+        foreach (System.Text.RegularExpressions.Match match in KeyToken.Matches(text))
+        {
+            string name = match.Groups[1].Value;
+            if (ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name) == null)
+            {
+                return name;
+            }
+        }
+
+        return null;
+    }
+
+    private static InputAction ActionNamed(string name)
+    {
+        if (name.IndexOf('/') >= 0)
+        {
+            return Find(name, quiet: true);
+        }
+
+        InputAction action = Find("Player/" + name, quiet: true);
+        if (action != null)
+        {
+            return action;
+        }
+
+        foreach (string map in new[] { "Camera", "Build", "System", "UI" })
+        {
+            action = Find(map + "/" + name, quiet: true);
+            if (action != null)
+            {
+                return action;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Text with keys in it as they are for this player: tokens ({key:Interact}, see <see cref="Keys"/>) become the bound key, and a
+    /// key written out the old way ("Open your bag (B)", "[E] Interact") shows as the new one when it has been rebound. Costs
+    /// nothing without either.
     /// </summary>
     public static string WithRebinds(string text)
     {
+        text = Keys(text);
         if (string.IsNullOrEmpty(text) || (text.IndexOf('(') < 0 && text.IndexOf('[') < 0))
         {
             return text;
@@ -158,7 +247,9 @@ public static class GameInput
 
     /// <summary>The key or button that triggers <paramref name="action"/> for keyboard and mouse, as shown to the player
     /// ("Q", "MMB"): its first binding in that scheme, so it follows a rebinding. Empty when there is none.</summary>
-    public static string KeyLabel(InputAction action)
+    public static string KeyLabel(InputAction action) => KeyLabel(action, asShipped: false);
+
+    private static string KeyLabel(InputAction action, bool asShipped)
     {
         if (action == null)
         {
@@ -171,7 +262,8 @@ public static class GameInput
             InputBinding binding = action.bindings[i];
             if (!binding.isComposite && !binding.isPartOfComposite && group.Matches(binding))
             {
-                return action.GetBindingDisplayString(i, InputBinding.DisplayStringOptions.DontIncludeInteractions);
+                return action.GetBindingDisplayString(i, InputBinding.DisplayStringOptions.DontIncludeInteractions
+                                                          | (asShipped ? InputBinding.DisplayStringOptions.IgnoreBindingOverrides : 0));
             }
         }
 
@@ -190,7 +282,8 @@ public static class GameInput
         Suspended.Clear();
     }
 
-    private static InputAction Find(string path)
+    // Quiet when only looking: a key token's action is searched for in each map in turn.
+    private static InputAction Find(string path, bool quiet = false)
     {
         InputActionAsset asset = InputSystem.actions;
         if (asset != foundIn)
@@ -207,6 +300,11 @@ public static class GameInput
         InputAction action = asset != null ? asset.FindAction(path) : null;
         if (action == null)
         {
+            if (quiet)
+            {
+                return null;
+            }
+
             Debug.LogError($"Input action \"{path}\" is missing: check the project-wide Input Actions asset (Project Settings › Input System Package).");
             return null;
         }

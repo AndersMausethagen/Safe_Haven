@@ -149,8 +149,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
         picture.sprite = page.Picture;
         picture.gameObject.SetActive(page.Picture != null);
-        titleLabel.text = page.Title;
-        bodyLabel.text = page.Body;
+        // Keys named by their actions ({key:Interact}) become the keys bound now.
+        titleLabel.text = GameInput.WithRebinds(page.Title);
+        bodyLabel.text = GameInput.WithRebinds(page.Body);
         bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(page.Body));
         while (rows.Count < page.Actions.Count)
         {

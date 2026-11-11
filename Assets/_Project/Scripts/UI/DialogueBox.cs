@@ -216,7 +216,8 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>Shows a line; <paramref name="done"/> runs when the player moves on. Without a follow-up the box closes.</summary>
     public void Say(DialogueSpeaker speaker, string line, Action done = null, float subtitleTimeMultiplier = 1f)
     {
-        line = GameInput.WithRebinds(line);
+        // The line stays as written until it is shown (keys named by their actions resolve there): its recording is found by
+        // the words as written, so a rebound key doesn't lose it.
         this.subtitleTimeMultiplier = Mathf.Clamp(subtitleTimeMultiplier, 1f, 2f);
         if (!IsOpen && MonsterAI.AnyHuntingPlayerSide())
         {
@@ -308,7 +309,7 @@ public sealed class DialogueBox : MonoBehaviour
         choices = answers;
         answered = false;
         nameLabel.text = speaker.Name ?? "";
-        lineLabel.text = line ?? "";
+        lineLabel.text = GameInput.WithRebinds(line ?? "");
         shownOver = Over(speaker);
         bool bubbled = shownOver != null;
         if (bubbled)
@@ -381,7 +382,7 @@ public sealed class DialogueBox : MonoBehaviour
                 buttons[i].interactable = choice.Enabled;
                 buttons[i].image.color = choice.Enabled ? ButtonColour : ButtonOff;
                 string tag = choice.QuestTag();
-                buttonLabels[i].text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {choice.Label}" +
+                buttonLabels[i].text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {GameInput.WithRebinds(choice.Label)}" +
                                        (tag != null ? $"\n<size=75%>{tag}</size>" :
                                        string.IsNullOrWhiteSpace(choice.Detail) ? "" : $"  <size=75%><alpha=#99>{choice.Detail}</size>");
             }
@@ -562,10 +563,19 @@ public sealed class DialogueBox : MonoBehaviour
         }
     }
 
+    private int hintShown = -1;
+
     private void UpdateHint()
     {
         bool asking = choices != null && choices.Count > 0;
-        activeHint.text = !Revealed ? "<alpha=#88>E ›" : asking ? "" : "E / Space  ›";
+        int hint = !Revealed ? 0 : asking ? 1 : 2;
+        if (hint == hintShown)
+        {
+            return;
+        }
+
+        hintShown = hint;
+        activeHint.text = hint == 0 ? GameInput.WithRebinds("<alpha=#88>{key:Advance} ›") : hint == 1 ? "" : GameInput.WithRebinds("{key:Advance} / Space  ›");
     }
 
     private void Frame(Transform speaker, float distance = 0f)
@@ -624,6 +634,7 @@ public sealed class DialogueBox : MonoBehaviour
     private void Subtitle(string speakerName, string line, Action done, Transform over = null)
     {
         subtitleDone = done;
+        line = GameInput.WithRebinds(line);
         if (over != null)
         {
             // Over whoever says it, read in its own time like a subtitle, nothing to press.

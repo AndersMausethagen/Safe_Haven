@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.warden
   displayName: The Watch
-  description: 'Eirik keeps the ward: in a breach it holds half as long again. Give him the Warden''s work, and build a Watch Post where he can see the old path (G).'
+  description: 'Eirik keeps the ward: in a breach it holds half as long again. Give him the Warden''s work, and build a Watch Post where he can see the old path ({key:Build}).'
   chain: Hands at Home
   journalNotes: With Eirik as Warden the ward holds half as long again in a breach. The Watch Post wants the Woodcutter's Lodge standing first.
   rank: 4

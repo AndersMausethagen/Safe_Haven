@@ -487,25 +487,25 @@ MonoBehaviour:
   - group: Getting about
     title: Your Windows
     line: What each key opens
-    body: '(B) your bag and what you can make by hand
+    body: '({key:Items}) your bag and what you can make by hand
 
-      (C) your character and what you wear
+      ({key:Character}) your character and what you wear
 
-      (K) your abilities and the skill bar
+      ({key:Skills}) your abilities and the skill bar
 
-      (N) your skills and perks
+      ({key:Talents}) your skills and perks
 
-      (H) the Haven, from anywhere in it
+      ({key:Haven}) the Haven, from anywhere in it
 
-      (G) the build menu
+      ({key:Build}) the build menu
 
-      (M) the map
+      ({key:WorldMap}) the map
 
-      (J) this journal
+      ({key:Journal}) this journal
 
-      (T) the newest tutorial
+      ({key:Tutorial}) the newest tutorial
 
-      [E] use whatever is in front of you
+      [{key:Interact}] use whatever is in front of you
 
 
       Any of these can be changed under Options, Controls, and this page will follow.'
@@ -553,7 +553,7 @@ MonoBehaviour:
   - group: Gathering
     title: Woodcutting
     line: Fell it, then work it where it lies
-    body: 'Walk up to a tree with an axe and hold the attack button, or [E], to raise it. Let go to swing. A glint at the top of the backswing is the perfect moment: let go then for a critical blow. Inside the yellow zone is a sound blow. Too early or too late is a glancing blow, and wears the axe.
+    body: 'Walk up to a tree with an axe and hold the attack button, or [{key:Interact}], to raise it. Let go to swing. A glint at the top of the backswing is the perfect moment: let go then for a critical blow. Inside the yellow zone is a sound blow. Too early or too late is a glancing blow, and wears the axe.
 
 
       Criticals in a row build a combo that widens the perfect moment, and each one adds a log when the tree comes down.
@@ -573,7 +573,7 @@ MonoBehaviour:
   - group: Gathering
     title: Mining
     line: Read the rock and strike true
-    body: 'Hold the attack button, or [E], at a rock to raise your pickaxe, and let go to strike. Let go at the glint for a critical blow, inside the yellow zone for a sound one. Glancing blows wear the pick.
+    body: 'Hold the attack button, or [{key:Interact}], at a rock to raise your pickaxe, and let go to strike. Let go at the glint for a critical blow, inside the yellow zone for a sound one. Glancing blows wear the pick.
 
 
       Criticals in a row widen the perfect moment, and every critical adds ore when the rock breaks.
@@ -593,7 +593,7 @@ MonoBehaviour:
   - group: Gathering
     title: Foraging
     line: Berries, herbs, fibre and mushrooms
-    body: 'Press [E] at a plant to pick it by hand. It takes a moment, and a better Foraging skill makes it quicker.
+    body: 'Press [{key:Interact}] at a plant to pick it by hand. It takes a moment, and a better Foraging skill makes it quicker.
 
 
       Some plants are cut with a sickle instead, with the same swing as an axe: hold to raise, let go at the glint.
@@ -766,7 +766,7 @@ MonoBehaviour:
   - group: Combat
     title: Abilities
     line: What Focus is for
-    body: 'Your abilities are in the skill book (K). Drag one onto the bar to use it, and press (1) to (5) to use what is in each slot.
+    body: 'Your abilities are in the skill book ({key:Skills}). Drag one onto the bar to use it, and press (1) to (5) to use what is in each slot.
 
 
       An ability costs Focus, the gold bar you earn by fighting well, and stamina, and then has to cool down before it can be used again.
@@ -806,7 +806,7 @@ MonoBehaviour:
       To leave you have to reach an exit, light it and hold it until it opens. Holding takes time and can draw attention, so light one with time to spare.
 
 
-      The map (M) and the way line show you where to go.'
+      The map ({key:WorldMap}) and the way line show you where to go.'
     unlockedByQuest: {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
@@ -865,7 +865,7 @@ MonoBehaviour:
     body: 'The portal''s ward is what keeps the clearing peaceful. Everything you build and clear adds renown, and renown raises the Haven''s rank, which widens the ward and lights the way a little further for anyone still out there.
 
 
-      The Haven window (H) shows what counts, what to do next and how far along you are.'
+      The Haven window ({key:Haven}) shows what counts, what to do next and how far along you are.'
     unlockedByQuest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
@@ -876,7 +876,7 @@ MonoBehaviour:
   - group: Safe Haven
     title: Building
     line: Each thing opens the next
-    body: 'Press (G) to build inside the ward. Most buildings go up as a scaffold you hammer with [E]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.
+    body: 'Press ({key:Build}) to build inside the ward. Most buildings go up as a scaffold you hammer with [{key:Interact}]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.
 
 
       Recipes you can''t make yet still show at the station, with what they need, so you can see what to aim for.'
@@ -918,7 +918,7 @@ MonoBehaviour:
   - group: Safe Haven
     title: The Haven's Reach
     line: Light the stones, then hold the land
-    body: 'Claiming. Find one of a region''s named places (walk up to it and it goes on your map (M)), then use its boundary stone [E]. The first stone answers to your fire alone; every one after wants a Pact Rune. Runes turn up in supply caches on raids, and at the rot''s heart.
+    body: 'Claiming. Find one of a region''s named places (walk up to it and it goes on your map ({key:WorldMap})), then use its boundary stone [{key:Interact}]. The first stone answers to your fire alone; every one after wants a Pact Rune. Runes turn up in supply caches on raids, and at the rot''s heart.
 
 
       Holding. A held region has a hold from 0 to 100. It starts at 40 and wears a little at every turn (each dawn at home, and the end of each raid), faster under blight. Below 25 it is slipping, from 70 it is Secure, and at nothing the forest takes it back.
@@ -933,7 +933,7 @@ MonoBehaviour:
       What it gives. Every held region adds renown. A Secure one sends its goods to the stash at every dawn, and the corrupted nights never come from it.
 
 
-      The Haven window''s Lands tab (H) shows every region, how firmly it is held and what it asks. With friends, the lands are the host''s: a friend can lay runes in the host''s stones, help with what a land asks, and fight beside the host''s watch.'
+      The Haven window''s Lands tab ({key:Haven}) shows every region, how firmly it is held and what it asks. With friends, the lands are the host''s: a friend can lay runes in the host''s stones, help with what a land asks, and fight beside the host''s watch.'
     unlockedByQuest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
@@ -967,7 +967,7 @@ MonoBehaviour:
       Every ten levels a skill reaches a milestone and you choose one of two perks. You can choose again at home, beside the portal.
 
 
-      Quests, raids, first crafts, catches and new places give Insight instead. Put it into any skill you like at (N).
+      Quests, raids, first crafts, catches and new places give Insight instead. Put it into any skill you like at ({key:Talents}).
 
 
       A skill grows faster once its mentor building at home is upgraded, and after a good night''s sleep.'
@@ -995,16 +995,16 @@ MonoBehaviour:
   - group: Getting about
     title: Horses
     line: A rope, barley, and a seat kept
-    body: 'Wild horses graze in the land round the Haven. Come close crouched: a walk is heard ten metres off. With a lasso in hand, throw it from within its reach (the attack button).
+    body: 'Wild horses graze in the land round the Haven. Come close crouched: a walk is heard ten metres off. With a lasso in hand, throw it from within its reach ({key:Lasso}).
 
 
-      On the rope it fights: tap E or left click, and lean away from it with the movement keys (that costs your breath). Tire it before the rope slips, then get on its back.
+      On the rope it fights: tap {key:Interact} or left click, and lean away from it with the movement keys (that costs your breath). Tire it before the rope slips, then get on its back.
 
 
-      Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley (E). Fed enough, it is yours. In the saddle, X gets you down (E never does, so feeding can''t throw you off).
+      Breaking it in, it veers and bucks: steer against it to keep your seat. When it tosses its head, give it barley ({key:Feed}). Fed enough, it is yours. In the saddle, {key:Dismount} gets you down ({key:Feed} never does, so feeding can''t throw you off).
 
 
-      Each horse has its nature: calm, skittish, stubborn or bold. Feed it, groom it once a day and ride it, and it grows fond of you: more stamina, less panic, and it comes when you whistle (X). Saddles carry its bags; barding keeps blows off.
+      Each horse has its nature: calm, skittish, stubborn or bold. Feed it, groom it once a day and ride it, and it grows fond of you: more stamina, less panic, and it comes when you whistle ({key:Whistle}). Saddles carry its bags; barding keeps blows off.
 
 
       A Stable keeps horses safe at night and mends them. A mare and a stallion stabled together, both fond of you, may foal. Deep water it swims, on its stamina.

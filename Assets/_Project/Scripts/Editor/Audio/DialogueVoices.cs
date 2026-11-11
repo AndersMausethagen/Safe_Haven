@@ -283,6 +283,8 @@ public static class DialogueVoices
             text = called.Groups[2].Value;
         }
 
+        // A key named by its action is spoken as the key the game ships with ("press L"), never as the token.
+        text = GameInput.DefaultKeys(text);
         string plain = VoiceBank.Plain(text);
         // Something said has words in it: an id or a single token is a setting that slipped through.
         if (plain.Length < 3 || (!plain.Contains(" ") && !".!?".Contains(plain[plain.Length - 1].ToString())) || text.Contains("{"))

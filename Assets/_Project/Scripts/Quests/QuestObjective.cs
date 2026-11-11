@@ -481,7 +481,7 @@ public sealed class QuestObjective
             case ObjectiveType.DefendBreach:
                 return breach != null ? $"Defend Safe Haven: {breach.DisplayName}" : "Defend Safe Haven from a ward breach";
             case ObjectiveType.ReachHavenRank:
-                return $"Raise Safe Haven to {HavenRankName(Rank)} (H)";
+                return $"Raise Safe Haven to {HavenRankName(Rank)} ({{key:Haven}})";
             case ObjectiveType.StoreItem:
                 return item != null ? $"Put {count} {Name(item)} in a chest" : Amount == 1 ? "Put something in a chest" : $"Put {count} things in a chest";
             case ObjectiveType.RepairItem:
@@ -489,7 +489,7 @@ public sealed class QuestObjective
                 return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
             case ObjectiveType.UpgradeBuilding:
                 string which = building != null ? $"the {building.DisplayName}" : "a building";
-                return Amount == 1 ? $"Raise {which} to Tier {Tiers.ToRoman(Tier)} (H)" : $"Raise {count} of {which} to Tier {Tiers.ToRoman(Tier)} (H)";
+                return Amount == 1 ? $"Raise {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})" : $"Raise {count} of {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})";
             default:
                 return type.ToString();
         }
