@@ -137,6 +137,12 @@ public sealed class HavenProgress : MonoBehaviour
     // current, and creates it, so its worker can start.
     private static void KeepTrackOfBuildings()
     {
+        // A friend's buildings are noted in their game (co-op).
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
         foreach (CraftingStation station in CraftingStation.Active)
         {

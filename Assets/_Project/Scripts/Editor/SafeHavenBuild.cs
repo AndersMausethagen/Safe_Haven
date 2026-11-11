@@ -1,13 +1,43 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 public static class SafeHavenBuild
 {
+    /// <summary>
+    /// Builds anyway when the audits find something (QuestAudit, ContentAudit): set it, or the environment variable
+    /// SAFEHAVEN_SKIP_AUDITS=1, only to get a build out in a hurry. Off by default.
+    /// </summary>
+    public static bool SkipAudits;
+
+    /// <summary>
+    /// What would ship broken: a quest that can never start or be done, a story waiting for nothing, a portal moment no story
+    /// plays, a rescue nobody places, a reference to something deleted, a recipe or building nobody can learn, an item asked
+    /// for that nothing gives, a monster nothing spawns. Empty when all is well.
+    /// </summary>
+    public static List<string> Audits()
+    {
+        QuestSceneIndex.Invalidate();
+        ContentAudit.Invalidate();
+        return QuestAudit.CantStart().Select(pair => $"quest {pair.Key.name} can't start: {pair.Value}")
+            .Concat(QuestAudit.Missing()).Concat(QuestAudit.WaitsForNothing()).Concat(QuestAudit.MissedInAnotherScene())
+            .Concat(QuestAudit.SilentPortalMoments()).Concat(QuestAudit.UnplacedRescues()).Concat(ContentAudit.All()).ToList();
+    }
+
     public static void BuildWindows()
     {
+        // Loose ends stop the build: they would ship as a quest nobody can finish or an item nobody can find.
+        List<string> problems = Audits();
+        if (problems.Count > 0 && !SkipAudits && Environment.GetEnvironmentVariable("SAFEHAVEN_SKIP_AUDITS") != "1")
+        {
+            throw new InvalidOperationException($"The build is stopped: the audits found {problems.Count} loose end(s) (QuestAuditTests, ContentAuditTests):\n- "
+                + string.Join("\n- ", problems));
+        }
+
         EditorBuildSettingsScene[] enabledScenes = Array.FindAll(
             EditorBuildSettings.scenes, scene => scene.enabled);
         string[] scenes = Array.ConvertAll(enabledScenes, scene => scene.path);

@@ -1,5 +1,7 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
+using UnityEngine.TestTools;
 using UnityEditor;
 using UnityEngine;
 
@@ -122,6 +124,29 @@ public sealed class CoopHomeTests
         HavenHelp.FromFriend(HavenHelpKind.FoundAgain, tor.Id, 0f, 0f, 0, "Ingrid", content);
         Assert.IsNotNull(GameSession.Settlement.Find(tor), "home in the host's Haven");
         Leave();
+    }
+
+    [Test]
+    public void ABorrowedSettlement_SaysSoWhenChanged()
+    {
+        GameSession.StartNewGame();
+        typeof(SettlementState).GetMethod("ForgetTold", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+        try
+        {
+            Visit(new SettlementState());
+            Assert.IsTrue(GameSession.Settlement.IsBorrowed);
+            LogAssert.Expect(LogType.Error, new Regex("Co-op: ChangeBlight changed the copy of the host's settlement"));
+            GameSession.Settlement.ChangeBlight(0.1f);
+            // Its own Haven, read and written by ChangeHome, is the guest's to change: no word.
+            Assert.IsTrue(HavenVisit.ChangeHome(own => own.ChangeBlight(0.1f)));
+            LogAssert.NoUnexpectedReceived();
+        }
+        finally
+        {
+            Leave();
+        }
+
+        Assert.IsFalse(GameSession.Settlement.IsBorrowed, "at home the settlement is the player's own");
     }
 
     [Test]

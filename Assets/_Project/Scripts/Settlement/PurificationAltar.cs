@@ -41,7 +41,8 @@ public sealed class PurificationAltar : MonoBehaviour
 
     private void TellSpeed()
     {
-        if (TryGetComponent(out Construction construction))
+        // A friend's altar is told of in their game (co-op).
+        if (!HavenVisit.IsVisiting && TryGetComponent(out Construction construction))
         {
             GameSession.Settlement.SetPurificationBonus(construction.Sum(level => level.craftSpeed));
             GameSession.Settlement.SetPurificationYield(construction.Sum(level => level.purifyYield));

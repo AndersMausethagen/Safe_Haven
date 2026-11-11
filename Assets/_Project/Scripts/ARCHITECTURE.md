@@ -466,7 +466,26 @@ earns or does must go where it belongs (2026-11-11 sweep, `CoopHomeTests`):
   `CoopLands`, once a run where every player has the same rumour.
 - **Neither: refused** (`HavenVisit.LeftToHost`): jobs, trades, the portal and ward, lighting stones.
 
-A new system that changes the settlement from something a guest can do needs one of the three.
+A new system that changes the settlement from something a guest can do needs one of the three. If one is missed, the change says so: every
+`SettlementState` and `TerritoryState` change made to a guest's borrowed copy logs an error naming the change and the three
+ways out (`SettlementState.IsBorrowed`, `CoopHomeTests`), and `CoopLiveTests` plays a host and a friend over 127.0.0.1.
+A changed co-op message fails `CoopWireTests` until `MultiplayerSettings.WireFormat` is raised and its fingerprint noted.
+
+### Safeguards against loose ends (2026-11-12)
+
+- **Audits as tests, and before every build.** `QuestAuditTests` (quests, stories, gates, portal moments, rescues) and
+  `ContentAuditTests` (`ContentAudit`: references to deleted assets or objects, recipes and buildings nobody can learn, items
+  asked for that nothing gives, monsters nothing spawns). `SafeHavenBuild.BuildWindows` runs both and refuses to build on any
+  finding (`SafeHavenBuild.SkipAudits` or `SAFEHAVEN_SKIP_AUDITS=1` for an emergency). A new field pointing at items,
+  recipes, buildings or monsters fails `EveryContentField_IsSorted` until ContentAudit is told whether it gives, uses or teaches.
+- **Story builders share `StoryBuilder`** (Editor/Story): `Remember` before clearing, `Fresh`, `Link`, `Finish` before saving.
+  A story rebuilt keeps its save id and its triggers' ids, so saved games don't play it again; new ones get ids from their name.
+- **Builds that remove quest targets say so** (`QuestTargetGuard`, in the World Builder and the Haven World Generator).
+- **No story step waits for ever**: each gives up (`IStoryWait`), waits for the player (`[WaitsForThePlayer]`) or doesn't wait
+  (`StoryWaitTests`).
+- **The World Builder saves the terrain's assets after a build** (heights, paint, ground stash) and remembers the heights it
+  built (`WorldTerrain.BuiltHeights`): unsaved, every Editor start loaded old heights and rebuilt the Haven; a heightmap
+  "change" that leaves the heights as built no longer rebuilds.
 
 ### Who raises which game event
 

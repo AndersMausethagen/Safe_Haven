@@ -166,7 +166,7 @@ public sealed class BossEncounter : MonoBehaviour
         bool first;
         if (definition != null && HavenVisit.IsVisiting)
         {
-            GameSession.Settlement.MarkBossDefeated(definition.Id);
+            // The host's game marks its own boss; this player's copy of it hears so with the settlement.
             first = HavenVisit.BossBeatenHome(definition.Id);
         }
         else

@@ -107,6 +107,7 @@ public sealed class SettlementState
     /// <summary>A day has passed (dawn has come round). The blight eases a little each day.</summary>
     public void PassDay()
     {
+        Borrowed();
         DaysPassed++;
         Blight = Math.Max(0f, Blight - BlightEasedPerDay);
     }
@@ -123,7 +124,11 @@ public sealed class SettlementState
     public TerritoryState Territory { get; private set; } = new TerritoryState();
 
     /// <summary>Spreads (positive) or eases (negative) the blight.</summary>
-    public void ChangeBlight(float by) => Blight = Math.Min(1f, Math.Max(0f, Blight + by));
+    public void ChangeBlight(float by)
+    {
+        Borrowed();
+        Blight = Math.Min(1f, Math.Max(0f, Blight + by));
+    }
 
     public void RestoreBlight(float blight) => Blight = Math.Min(1f, Math.Max(0f, blight));
 
@@ -134,6 +139,7 @@ public sealed class SettlementState
 
     public void AddRequest(string id)
     {
+        Borrowed();
         if (!string.IsNullOrEmpty(id) && !requests.Contains(id))
         {
             requests.Add(id);
@@ -150,6 +156,7 @@ public sealed class SettlementState
 
     public void RecordRequestAnswered(int renown = 0)
     {
+        Borrowed();
         RequestsAnswered++;
         OrderRenown += Math.Max(0, renown);
     }
@@ -178,6 +185,7 @@ public sealed class SettlementState
 
     public void GiveSpiritGift(string id)
     {
+        Borrowed();
         if (!string.IsNullOrEmpty(id))
         {
             spiritGifts.Add(id);
@@ -192,6 +200,7 @@ public sealed class SettlementState
 
     public void SetHuldra(int respect, int awayUntil)
     {
+        Borrowed();
         HuldraRespect = Math.Max(0, respect);
         HuldraAwayUntil = Math.Max(0, awayUntil);
     }
@@ -289,6 +298,7 @@ public sealed class SettlementState
     /// <summary>Remembers what stands at home, since a raid can't look. Read again by HavenProgress; not saved, as loading a game lands at home.</summary>
     public void NoteBuildings(IEnumerable<BuildingObject> standing)
     {
+        Borrowed();
         builtTiers.Clear();
         int beds = 0;
         foreach (BuildingObject building in standing)
@@ -308,11 +318,13 @@ public sealed class SettlementState
 
     public void NoteBuilt(BuildingDefinition building, int tier)
     {
+        Borrowed();
         builtTiers[building] = UnityEngine.Mathf.Max(BuiltTier(building), tier);
     }
 
     public void NoteMadeByWorker(IStackDefinition made, int amount)
     {
+        Borrowed();
         MadeByWorkers.TryGetValue(made, out int known);
         MadeByWorkers[made] = known + amount;
     }
@@ -337,6 +349,31 @@ public sealed class SettlementState
     /// keeping this object, so everything listening to <see cref="Changed"/> stays subscribed; then raises it. Every field
     /// is copied by reflection so new ones are never missed; <paramref name="other"/> must not be used afterwards.
     /// </summary>
+    // ---- Co-op: a guest's settlement is borrowed
+
+    private static readonly HashSet<string> told = new HashSet<string>();
+
+    [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ForgetTold() => told.Clear();
+
+    /// <summary>
+    /// True while this is the copy of the host's settlement a guest plays in (co-op): it is taken on every couple of seconds
+    /// (<see cref="TakeOn"/>), so a change made to it is undone at the host's next word.
+    /// </summary>
+    public bool IsBorrowed => HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Settlement);
+
+    // Called by every change: says loudly, once a change, when it is made to a borrowed copy, so a new leak shows the first
+    // time co-op is played (five were found by reading the code, 2026-11-11). Send it home (HavenVisit.ChangeHome), to the
+    // host (HavenHelp, Territory.ForHost) or refuse it (HavenVisit.LeftToHost): ARCHITECTURE.md › Beyond quests.
+    private void Borrowed([System.Runtime.CompilerServices.CallerMemberName] string change = null)
+    {
+        if (IsBorrowed && told.Add(change))
+        {
+            UnityEngine.Debug.LogError($"Co-op: {change} changed the copy of the host's settlement in a guest's game, and the host's next word undoes it. " +
+                "Send it to the guest's own Haven (HavenVisit.ChangeHome), to the host (HavenHelp, Territory.ForHost), or refuse it (HavenVisit.LeftToHost).\n" + Environment.StackTrace);
+        }
+    }
+
     public void TakeOn(SettlementState other)
     {
         if (other == null || other == this)
@@ -358,6 +395,7 @@ public sealed class SettlementState
 
     public void RepairPortal()
     {
+        Borrowed();
         if (!PortalRepaired)
         {
             PortalRepaired = true;
@@ -367,12 +405,14 @@ public sealed class SettlementState
 
     public void RaiseWardLevel()
     {
+        Borrowed();
         WardLevel++;
         Changed?.Invoke();
     }
 
     public void ImprovePortal()
     {
+        Borrowed();
         PortalLevel++;
         Changed?.Invoke();
     }
@@ -382,6 +422,7 @@ public sealed class SettlementState
 
     public void RecordExtraction()
     {
+        Borrowed();
         SuccessfulExtractions++;
         WardStrain = Math.Max(0, WardStrain - 1);
         tradeBought.Clear();
@@ -395,6 +436,7 @@ public sealed class SettlementState
 
     public void SetBreach(BreachStatus status)
     {
+        Borrowed();
         if (Breach != status)
         {
             Breach = status;
@@ -405,6 +447,7 @@ public sealed class SettlementState
     /// <summary>The next breach is announced: it waits for the player, and is put off from now.</summary>
     public void WarnOfBreach()
     {
+        Borrowed();
         Breach = BreachStatus.Pending;
         BreachPendingSince = SuccessfulExtractions;
         Changed?.Invoke();
@@ -413,6 +456,7 @@ public sealed class SettlementState
     /// <summary>A breach was beaten back: the next comes after this many more successful raids.</summary>
     public void WinBreach(int raidsUntilNext)
     {
+        Borrowed();
         Breach = BreachStatus.Won;
         BreachesWon++;
         BreachWeakening = 0f;
@@ -423,6 +467,7 @@ public sealed class SettlementState
     /// <summary>Something was done in a raid to the source of the next breach. Blows add up, to at most <paramref name="most"/>.</summary>
     public void WeakenBreach(float share, float most)
     {
+        Borrowed();
         BreachWeakening = Math.Min(most, BreachWeakening + Math.Max(0f, share));
         Changed?.Invoke();
     }
@@ -430,6 +475,7 @@ public sealed class SettlementState
     /// <summary>The ward fell: it stays strained for a while, and the same breach waits to be tried again.</summary>
     public void LoseBreach(int strainRaids)
     {
+        Borrowed();
         WardStrain = Math.Max(WardStrain, strainRaids);
         BreachPendingSince = SuccessfulExtractions;
         Changed?.Invoke();
@@ -472,6 +518,7 @@ public sealed class SettlementState
     /// <summary>A boss has fallen. False when it had already been beaten before, so what it gives is given once.</summary>
     public bool MarkBossDefeated(string id)
     {
+        Borrowed();
         if (string.IsNullOrEmpty(id) || !defeatedBosses.Add(id))
         {
             return false;
@@ -536,6 +583,7 @@ public sealed class SettlementState
     /// <summary>They came home from a raid with the player: the bond grows, and it leaves them something to say. True when they rose in rank.</summary>
     public bool RecordRaidAlong(ResidentDefinition resident, IReadOnlyList<CompanionBondRank> ranks, bool extracted, int bossesBeaten, int timesHelpedUp, float secondsLeft, int kills, int memoryReturnsEvery = 0)
     {
+        Borrowed();
         ResidentRecord record = Find(resident);
         if (record == null)
         {
@@ -572,6 +620,7 @@ public sealed class SettlementState
     /// <summary>Someone went along on a raid and the forest has them. They can be found again, on a later raid, with all of it gone.</summary>
     public void LoseResident(ResidentDefinition resident, string where)
     {
+        Borrowed();
         ResidentRecord record = Find(resident);
         if (record == null)
         {
@@ -594,6 +643,7 @@ public sealed class SettlementState
     /// </summary>
     public bool FindAgain(ResidentDefinition resident)
     {
+        Borrowed();
         FallenRecord lost = fallen.Find(record => record.Resident == resident);
         if (resident == null || lost == null)
         {
@@ -642,6 +692,7 @@ public sealed class SettlementState
     /// <summary>Moves someone into Safe Haven. Returns false when they already live here.</summary>
     public bool AddResident(ResidentDefinition resident, JobDefinition job = null)
     {
+        Borrowed();
         if (resident == null || HasResident(resident))
         {
             return false;
@@ -654,6 +705,7 @@ public sealed class SettlementState
 
     public void AssignJob(ResidentDefinition resident, JobDefinition job)
     {
+        Borrowed();
         ResidentRecord record = Find(resident);
         if (record != null && record.Job != job)
         {
@@ -708,11 +760,13 @@ public sealed class SettlementState
 
     public void SetPurificationBonus(float bonus)
     {
+        Borrowed();
         PurificationBonus = Math.Max(0f, bonus);
     }
 
     public void SetPurificationYield(float share)
     {
+        Borrowed();
         PurificationYield = Math.Max(0f, share);
     }
 
@@ -731,6 +785,7 @@ public sealed class SettlementState
 
     public void NoteBought(string offer)
     {
+        Borrowed();
         tradeBought[offer] = BoughtSinceLastRaid(offer) + 1;
         Changed?.Invoke();
     }
@@ -773,6 +828,7 @@ public sealed class SettlementState
     /// <summary>Records a Haven rank reached; lower ranks than the best so far are ignored.</summary>
     public bool ReachHavenRank(int rank)
     {
+        Borrowed();
         if (rank <= HavenRank)
         {
             return false;

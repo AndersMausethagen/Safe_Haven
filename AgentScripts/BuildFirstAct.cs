@@ -233,15 +233,15 @@ public static class BuildFirstAct
         Transform nearest = stones.OrderBy(s => (s.transform.position - portal.transform.position).sqrMagnitude).First().transform;
 
         // ----- The first light shows the roots -----
-        StoryScript seen = Fresh(root, "Story - The Roots Move");
+        StoryScript seen = StoryBuilder.Fresh(root, "Story - The Roots Move");
         var freeThem = new WhenQuest { quest = Q("RootboundStones"), when = WhenQuest.Moment.Starts };
         var afterFire = new WaitNode { seconds = 6f };
         var look = new FocusCameraNode { target = nearest, seconds = 4f, revealRadius = 10f };
         var roots = Say("<i>Look, now that there is light to see by. Three of my stones, choked in roots. And the roots are moving, little one. Slowly. Towards me.</i>");
-        Link(seen, (freeThem, 0, afterFire), (afterFire, 0, look), (afterFire, 0, roots));
+        StoryBuilder.Link(seen, (freeThem, 0, afterFire), (afterFire, 0, look), (afterFire, 0, roots));
 
         // ----- Each stone remembers a piece of the pact -----
-        StoryScript remember = Fresh(root, "Story - The Stones Remember");
+        StoryScript remember = StoryBuilder.Fresh(root, "Story - The Stones Remember");
         string[] pieces =
         {
             "<i>I remember this. A fire beside my stones, and someone to keep it.</i>",
@@ -251,31 +251,31 @@ public static class BuildFirstAct
         for (int i = 0; i < stones.Length; i++)
         {
             var freed = new WhenUsed { target = stones[i] };
-            Link(remember, (freed, 0, new WaitNode { seconds = 0.8f }));
-            Link(remember, (freed, 0, Aside(pieces[i])));
+            StoryBuilder.Link(remember, (freed, 0, new WaitNode { seconds = 0.8f }));
+            StoryBuilder.Link(remember, (freed, 0, Aside(pieces[i])));
         }
 
         // ----- Something comes up through the thin ward -----
         MobSpawnZone zone = Zone(root, "Rootlings Under the Ward", Centre(stones) * 0.5f + portal.transform.position * 0.5f);
-        StoryScript upThrough = Fresh(root, "Story - Up Through the Ward");
+        StoryScript upThrough = StoryBuilder.Fresh(root, "Story - Up Through the Ward");
         var allFree = new WhenQuest { quest = Q("RootboundStones"), when = WhenQuest.Moment.IsCompleted };
         var rumble = new ShakeCameraNode { strength = 0.4f };
         var crack = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Tree Crack.asset"), at = zone.transform };
         var warn = Aside("<i>Little one, behind you! My ward is too thin yet. They are coming up through it.</i>");
         var spawn = new SpawnEnemiesNode { zone = zone, waitUntilDefeated = true };
         var after = Aside("<i>Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.</i>");
-        Link(upThrough, (allFree, 0, rumble), (allFree, 0, crack), (allFree, 0, warn), (allFree, 0, spawn), (spawn, 0, after));
+        StoryBuilder.Link(upThrough, (allFree, 0, rumble), (allFree, 0, crack), (allFree, 0, warn), (allFree, 0, spawn), (spawn, 0, after));
 
         // ----- After the first breach: the root in them -----
-        StoryScript rootIn = Fresh(root, "Story - The Root in Them");
+        StoryScript rootIn = StoryBuilder.Fresh(root, "Story - The Root in Them");
         var held = new WhenQuest { quest = Q("TheWeakeningWard"), when = WhenQuest.Moment.IsCompleted };
         var breathe = new WaitNode { seconds = 3f };
         var sawIt = Say("<i>Did you see what grew out of them as they fell? Root. The same root that choked my stones, and closed the road behind your people.</i>");
         var oneThing = Say("<i>It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.</i>");
-        Link(rootIn, (held, 0, breathe), (breathe, 0, sawIt), (sawIt, 0, oneThing));
+        StoryBuilder.Link(rootIn, (held, 0, breathe), (breathe, 0, sawIt), (sawIt, 0, oneThing));
 
         // ----- The road north: what the Heartroot was -----
-        StoryScript twist = Fresh(root, "Story - The Road North");
+        StoryScript twist = StoryBuilder.Fresh(root, "Story - The Road North");
         var told = new WhenQuestEvent { questEvent = moment };
         var bringIt = Say("<i>You brought it down. Lay what you carried out of the hollow by the fire, little one, where it can feel the warmth. It is owed that much.</i>");
         var truth = Say("<i>I have not told you everything. The Heartroot was no monster. It was the forest's guardian: its half of the pact. Your kind let the hearth beside me go cold a hundred winters ago. It kept its half for ninety winters after that, alone, until the hunger got into its roots.</i>");
@@ -297,12 +297,12 @@ public static class BuildFirstAct
         var title = Say("<i>Its last word was for you. Hearth-keeper. Nobody has called anyone that in a hundred winters, and I did not teach it to you. One day you will tell me why these stones woke for your hand.</i>");
         var north = Say("<i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>");
         var done = new RaiseQuestEventNode { questEvent = roadNorthHeard };
-        Link(twist, (told, 0, bringIt), (bringIt, 0, truth), (truth, 0, answer), (answer, 0, broke), (answer, 1, whyNot),
+        StoryBuilder.Link(twist, (told, 0, bringIt), (bringIt, 0, truth), (truth, 0, answer), (answer, 0, broke), (answer, 1, whyNot),
             (broke, 0, coin), (whyNot, 0, coin), (coin, 0, forCoin), (coin, 1, kin), (kin, 0, forKin), (kin, 1, why), (why, 0, forTruth), (why, 1, title),
             (forCoin, 0, title), (forKin, 0, title), (forTruth, 0, title), (title, 0, north), (north, 0, done));
 
         Whispers(portal, hunt, road, moment);
-        foreach (StoryScript built in new[] { seen, remember, upThrough, rootIn, twist }) KeepTriggerIds(built);
+        StoryBuilder.Finish();
         SaveableEntityTools.AssignSceneIds(scene);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -368,68 +368,6 @@ public static class BuildFirstAct
     }
 
     private static Vector3 Centre(Interactable[] stones) => stones.Aggregate(Vector3.zero, (sum, s) => sum + s.transform.position) / stones.Length;
-
-    // A story of this builder's own, made again each run on the same object: its save id and its triggers' ids are kept (by
-    // order, KeepTriggerIds), so a saved game still knows which have fired (2026-11-11). Made from nothing, all would play again.
-    private static readonly Dictionary<StoryScript, List<string>> oldTriggers = new Dictionary<StoryScript, List<string>>();
-
-    private static StoryScript Fresh(Transform root, string name)
-    {
-        Transform old = root.Find(name);
-        GameObject go;
-        var ids = new List<string>();
-        if (old != null)
-        {
-            go = old.gameObject;
-            if (go.TryGetComponent(out StoryScript previous))
-            {
-                ids.AddRange(previous.Nodes.OfType<StoryTrigger>().Select(t => t.id));
-                Object.DestroyImmediate(previous);
-            }
-        }
-        else
-        {
-            go = new GameObject(name);
-            go.transform.SetParent(root, false);
-            go.AddComponent<SaveableEntity>();
-        }
-
-        StoryScript story = go.AddComponent<StoryScript>();
-        oldTriggers[story] = ids;
-        return story;
-    }
-
-    // After the links: each trigger takes back the id its place had last run.
-    private static void KeepTriggerIds(StoryScript story)
-    {
-        if (!oldTriggers.TryGetValue(story, out List<string> ids)) return;
-        List<StoryTrigger> triggers = story.Nodes.OfType<StoryTrigger>().ToList();
-        for (int i = 0; i < triggers.Count && i < ids.Count; i++) triggers[i].id = ids[i];
-        oldTriggers.Remove(story);
-    }
-
-    // Adds the nodes (in order of first appearance, laid out left to right) and the links.
-    private static void Link(StoryScript story, params (StoryNode from, int output, StoryNode to)[] links)
-    {
-        var added = new List<StoryNode>(story.Nodes);
-        var depth = new Dictionary<StoryNode, int>();
-        foreach (StoryNode node in added) depth[node] = Mathf.RoundToInt((node.position.x - 40f) / 300f);
-        foreach (var (from, output, to) in links)
-        {
-            foreach (StoryNode node in new[] { from, to })
-            {
-                if (added.Contains(node)) continue;
-                int column = node == from ? 0 : depth.TryGetValue(from, out int d) ? d + 1 : 1;
-                depth[node] = column;
-                int row = depth.Values.Count(v => v == column) - 1;
-                node.position = new Vector2(40f + column * 300f, 60f + row * 170f);
-                story.AddNode(node);
-                added.Add(node);
-            }
-
-            story.Connect(from, output, to);
-        }
-    }
 
     // ----- Helpers -----
 

@@ -51,7 +51,15 @@ public static class HavenWorldGenerator
         Debug.Log(Generate(recipe));
     }
 
-    public static string Generate(HavenWorldRecipe recipe) => Prepare(recipe) + "\n" + Build() + "\n" + Finish(recipe);
+    public static string Generate(HavenWorldRecipe recipe)
+    {
+        // What quests know by name in the Haven: a generation that loses one says so (QuestTargetGuard).
+        UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        Dictionary<UnityEngine.Object, string> questTargets = QuestTargetGuard.Snapshot(scene);
+        string done = Prepare(recipe) + "\n" + Build() + "\n" + Finish(recipe);
+        List<string> lost = QuestTargetGuard.Report(questTargets, scene, "The Haven World Generator");
+        return lost.Count > 0 ? done + "\nREMOVED QUEST TARGETS: " + string.Join(", ", lost) : done;
+    }
 
     // ----- Step 1 -----
 

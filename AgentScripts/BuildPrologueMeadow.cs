@@ -1188,6 +1188,8 @@ public static class BuildPrologueMeadow
         Transform sigrid = Person("Sigrid"), eirik = Person("Eirik"), runa = Person("Runa");
 
         GameObject oldRoot = GameObject.Find("Prologue Meadow");
+        // What saved games remember of its stories goes to the ones made again (StoryBuilder).
+        if (oldRoot != null) StoryBuilder.Remember(oldRoot.transform);
         if (oldRoot != null) Object.DestroyImmediate(oldRoot);
         var root = new GameObject("Prologue Meadow").transform;
         Transform moments = new GameObject("Morning Moments").transform;
@@ -1195,6 +1197,7 @@ public static class BuildPrologueMeadow
 
         Transform intro = GameObject.Find("Intro Moments").transform;
         Transform oldChoice = intro.Find("Story - Bow or Axe");
+        StoryBuilder.Remember(intro);
         if (oldChoice != null) Object.DestroyImmediate(oldChoice.gameObject);
 
         Vector3 fireAt = Ground(Camp.x, Camp.y);
@@ -1247,6 +1250,7 @@ public static class BuildPrologueMeadow
         surface.navMeshData = Load<NavMeshData>(NavMeshAsset);
         EditorUtility.SetDirty(surface);
 
+        StoryBuilder.Finish();
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
@@ -2455,13 +2459,8 @@ public static class BuildPrologueMeadow
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static StoryScript Story(Transform root, string name)
-    {
-        var go = new GameObject(name);
-        go.transform.SetParent(root, false);
-        go.AddComponent<SaveableEntity>();
-        return go.AddComponent<StoryScript>();
-    }
+    // Keeps what saved games remember of each story (its save id and triggers): StoryBuilder, 2026-11-11.
+    private static StoryScript Story(Transform root, string name) => StoryBuilder.Fresh(root, name);
 
     // Adds the nodes (in order of first appearance, laid out left to right) and the links.
     private static void Link(StoryScript story, params (StoryNode from, int output, StoryNode to)[] links)

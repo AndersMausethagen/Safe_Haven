@@ -254,6 +254,15 @@ public static class WorldBuilder
                 world = Undo.AddComponent<WorldTerrain>(terrain.gameObject);
             }
 
+            // Unity tells of a heightmap change as a terrain loads too: that rebuilt the world on every Editor start, and left the
+            // scene asking to be saved. A "hand edit" that leaves the heights as they were built is not one.
+            if (handEdited.Contains(terrain) && !everything && !string.IsNullOrEmpty(world.BuiltHeights) && world.BuiltHeights == HeightsFingerprint(terrain))
+            {
+                handEdited.Remove(terrain);
+                Rect untouched = FlatRect(terrain);
+                changedAreas.RemoveAll(area => area.Overlaps(untouched));
+            }
+
             if (!everything && !world.BuildAutomatically && !handEdited.Contains(terrain))
             {
                 continue;
@@ -325,6 +334,32 @@ public static class WorldBuilder
 
         Build(terrainsToBuild, areasToBuild.ToList(), features);
         return terrainsToBuild.Count;
+    }
+
+    /// <summary>A fingerprint of a terrain's heights: the same heights, the same text.</summary>
+    public static string HeightsFingerprint(Terrain terrain)
+    {
+        TerrainData data = terrain != null ? terrain.terrainData : null;
+        if (data == null)
+        {
+            return "";
+        }
+
+        int size = data.heightmapResolution;
+        float[,] heights = data.GetHeights(0, 0, size, size);
+        unchecked
+        {
+            long hash = 1469598103934665603L;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    hash = (hash ^ BitConverter.SingleToInt32Bits(heights[y, x])) * 1099511628211L;
+                }
+            }
+
+            return size + ":" + hash.ToString("x16");
+        }
     }
 
     /// <summary>Rebuilds one terrain with all its features and the areas on it (after Auto-Paint, for instance).</summary>
@@ -447,6 +482,9 @@ public static class WorldBuilder
         Building = true;
         LastObjects.Clear();
         WorldGround.Scope = terrains.Count > 0 ? terrains[0].gameObject.scene : areas.Count > 0 ? areas[0].gameObject.scene : default;
+        UnityEngine.SceneManagement.Scene builtScene = WorldGround.Scope;
+        // What quests know by name in the scene: a rebuild that loses one says so (QuestTargetGuard).
+        Dictionary<Object, string> questTargets = QuestTargetGuard.Snapshot(builtScene);
         int group = triggerGroup;
         triggerGroup = -1;
         if (group < 0)
@@ -568,6 +606,15 @@ public static class WorldBuilder
             }
 
             RecordBuilt(all, terrains, areas);
+            // The heights, paint and ground stash live in assets beside the scene, which saving the scene doesn't write: left
+            // unsaved, every Editor start loaded the old heights, found them changed and rebuilt the world (2026-11-12).
+            foreach (Terrain terrain in terrains)
+            {
+                if (terrain == null) continue;
+                AssetDatabase.SaveAssetIfDirty(terrain.terrainData);
+                WorldTerrain world = terrain.GetComponent<WorldTerrain>();
+                if (world != null && world.Stash != null) AssetDatabase.SaveAssetIfDirty(world.Stash);
+            }
             Lap("saveable ids + record");
             foreach (Terrain terrain in terrains)
             {
@@ -604,6 +651,12 @@ public static class WorldBuilder
             Building = false;
             Undo.CollapseUndoOperations(group);
             ignoreTerrainUntil = EditorApplication.timeSinceStartup + 0.5;
+        }
+
+        List<string> lost = QuestTargetGuard.Report(questTargets, builtScene, "The World Builder");
+        if (lost.Count > 0)
+        {
+            report.Add("REMOVED QUEST TARGETS: " + string.Join(", ", lost));
         }
 
         LastReport = string.Join("; ", report);
@@ -654,6 +707,9 @@ public static class WorldBuilder
             {
                 world.BuiltFeatures.Clear();
             }
+
+            // The heights as built, so a load that only says they changed doesn't rebuild (BuildChangedIn).
+            world.BuiltHeights = HeightsFingerprint(terrain);
 
             foreach (WorldFeature feature in all.Where(f => FlatRect(f.WorldBounds()).Overlaps(rect)))
             {

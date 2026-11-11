@@ -172,16 +172,16 @@ public static class BuildHavensReach
         SayNode Aside(string line) => new SayNode { speaker = Portal(), line = line, aside = true, afterFightPause = false };
 
         // ----- After the third raid: the call -----
-        StoryScript call = Fresh(root, "Story - The Cold Stones");
+        StoryScript call = StoryBuilder.Fresh(root, "Story - The Cold Stones");
         var thrice = new WhenRaidsDone { raids = RaidsBefore };
         var settle = new WaitNode { seconds = 8f };
         var quiet = new WaitForQuietNode();
         var calling = Aside(Call);
         var begin = new StartQuestNode { quest = cold };
-        Link(call, (thrice, 0, settle), (settle, 0, quiet), (quiet, 0, calling), (calling, 0, begin));
+        StoryBuilder.Link(call, (thrice, 0, settle), (settle, 0, quiet), (quiet, 0, calling), (calling, 0, begin));
 
         // ----- What the stones were: the conversation at the portal -----
-        StoryScript told = Fresh(root, "Story - What the Stones Were");
+        StoryScript told = StoryBuilder.Fresh(root, "Story - What the Stones Were");
         var sat = new WhenQuestEvent { questEvent = moment };
         var reach = Say("<i>Your fire reaches further than it did, little one. Far enough that I can feel what lies at the end of it: stones, cold ones, out past the meadows.</i>");
         var walked = Say("<i>When the pact was kept, your people did not only tend a hearth beside me. They walked the land the pact gave them, and where it ended they set stones, and lit them from this fire.</i>");
@@ -199,41 +199,41 @@ public static class BuildHavensReach
         var how = Say("<i>Find one of the places a stone remembers, so that it knows you, then lay your hand on it. The first will answer to my fire alone. The rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.</i>");
         var why = Say("<i>Every land you hold is a road home for whoever is still out there, and a door shut on what comes at night. Begin with the nearest stone.</i>");
         var heard = new RaiseQuestEventNode { questEvent = toldOfStones };
-        Link(told, (sat, 0, reach), (reach, 0, walked), (walked, 0, remembers), (remembers, 0, cold_), (cold_, 0, answer),
+        StoryBuilder.Link(told, (sat, 0, reach), (reach, 0, walked), (walked, 0, remembers), (remembers, 0, cold_), (cold_, 0, answer),
             (answer, 0, light), (answer, 1, back), (light, 0, how), (back, 0, how), (how, 0, why), (why, 0, heard));
 
         // ----- A stone burns again -----
-        StoryScript lit = Fresh(root, "Story - A Stone Burns Again");
+        StoryScript lit = StoryBuilder.Fresh(root, "Story - A Stone Burns Again");
         var first = new WhenQuest { quest = cold, when = WhenQuest.Moment.IsCompleted };
         var beat = new WaitNode { seconds = 2f };
         var felt = Aside("<i>I felt that. Out past the meadows, a stone remembers me again.</i>");
         var held = Aside("<i>Now it must be held, little one. A lit stone is a promise, and the forest will test it.</i>");
-        Link(lit, (first, 0, beat), (beat, 0, felt), (felt, 0, held));
+        StoryBuilder.Link(lit, (first, 0, beat), (beat, 0, felt), (felt, 0, held));
 
         // ----- The forest gathers for the first time (it may be told on a raid: heard on coming home) -----
-        StoryScript gathering = Fresh(root, "Story - The Forest Gathers");
+        StoryScript gathering = StoryBuilder.Fresh(root, "Story - The Forest Gathers");
         var gathers = new WhenQuest { quest = forest, when = WhenQuest.Moment.Starts, alsoAfterLoading = true };
         var still = new WaitForQuietNode();
         var feel = Aside("<i>Little one, do you feel it? The forest is gathering against one of your stones. It means to push in.</i>");
-        Link(gathering, (gathers, 0, still), (still, 0, feel));
+        StoryBuilder.Link(gathering, (gathers, 0, still), (still, 0, feel));
 
         // ----- A land made Secure: the long goal -----
-        StoryScript secured = Fresh(root, "Story - Secure Ground");
+        StoryScript secured = StoryBuilder.Fresh(root, "Story - Secure Ground");
         var done = new WhenQuest { quest = asks, when = WhenQuest.Moment.IsCompleted, alsoAfterLoading = true };
         var pause = new WaitNode { seconds = 2f };
         var stillNow = Aside("<i>Secure. Feel how still it is out there now. A land held that firmly sends home what it grows at every dawn, and the night's bands will not come through it.</i>");
         var ring = Aside("<i>Hold a ring of them round me, little one, and the forest will remember us for good.</i>");
-        Link(secured, (done, 0, pause), (pause, 0, stillNow), (stillNow, 0, ring));
+        StoryBuilder.Link(secured, (done, 0, pause), (pause, 0, stillNow), (stillNow, 0, ring));
 
         // ----- A push broken (by a watch at home, or a heart burned on a raid: heard on coming home) -----
-        StoryScript broken = Fresh(root, "Story - The Push Broken");
+        StoryScript broken = StoryBuilder.Fresh(root, "Story - The Push Broken");
         var answered = new WhenQuest { quest = forest, when = WhenQuest.Moment.IsCompleted, alsoAfterLoading = true };
         var calm = new WaitForQuietNode();
         var ready = Aside("<i>It broke against you. It will try again, somewhere else. Let it find you ready.</i>");
-        Link(broken, (answered, 0, calm), (calm, 0, ready));
+        StoryBuilder.Link(broken, (answered, 0, calm), (calm, 0, ready));
 
         Whispers(portal, cold, asks, forest, moment);
-        foreach (StoryScript built in new[] { call, told, lit, gathering, secured, broken }) KeepTriggerIds(built);
+        StoryBuilder.Finish();
         SaveableEntityTools.AssignSceneIds(scene);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -269,68 +269,6 @@ public static class BuildHavensReach
         }
 
         so.ApplyModifiedPropertiesWithoutUndo();
-    }
-
-    // A story of this builder's own, made again each run on the same object: its save id and its triggers' ids are kept (by
-    // order, KeepTriggerIds), so a saved game still knows which have fired. Made from nothing, every one would play again.
-    private static readonly Dictionary<StoryScript, List<string>> oldTriggers = new Dictionary<StoryScript, List<string>>();
-
-    private static StoryScript Fresh(Transform root, string name)
-    {
-        Transform old = root.Find(name);
-        GameObject go;
-        var ids = new List<string>();
-        if (old != null)
-        {
-            go = old.gameObject;
-            if (go.TryGetComponent(out StoryScript previous))
-            {
-                ids.AddRange(previous.Nodes.OfType<StoryTrigger>().Select(t => t.id));
-                Object.DestroyImmediate(previous);
-            }
-        }
-        else
-        {
-            go = new GameObject(name);
-            go.transform.SetParent(root, false);
-            go.AddComponent<SaveableEntity>();
-        }
-
-        StoryScript story = go.AddComponent<StoryScript>();
-        oldTriggers[story] = ids;
-        return story;
-    }
-
-    // After the links: each trigger takes back the id its place had last run.
-    private static void KeepTriggerIds(StoryScript story)
-    {
-        if (!oldTriggers.TryGetValue(story, out List<string> ids)) return;
-        List<StoryTrigger> triggers = story.Nodes.OfType<StoryTrigger>().ToList();
-        for (int i = 0; i < triggers.Count && i < ids.Count; i++) triggers[i].id = ids[i];
-        oldTriggers.Remove(story);
-    }
-
-    // Adds the nodes (in order of first appearance, laid out left to right) and the links.
-    private static void Link(StoryScript story, params (StoryNode from, int output, StoryNode to)[] links)
-    {
-        var added = new List<StoryNode>(story.Nodes);
-        var depth = new Dictionary<StoryNode, int>();
-        foreach (StoryNode node in added) depth[node] = Mathf.RoundToInt((node.position.x - 40f) / 300f);
-        foreach (var (from, output, to) in links)
-        {
-            foreach (StoryNode node in new[] { from, to })
-            {
-                if (added.Contains(node)) continue;
-                int column = node == from ? 0 : depth.TryGetValue(from, out int d) ? d + 1 : 1;
-                depth[node] = column;
-                int row = depth.Values.Count(v => v == column) - 1;
-                node.position = new Vector2(40f + column * 300f, 60f + row * 170f);
-                story.AddNode(node);
-                added.Add(node);
-            }
-
-            story.Connect(from, output, to);
-        }
     }
 
     // ----- Helpers -----

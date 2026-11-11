@@ -10,12 +10,16 @@ using UnityEngine.Events;
 // StoryNode.
 
 [Serializable]
-public sealed class SpawnEnemiesNode : StoryNode
+public sealed class SpawnEnemiesNode : StoryNode, IStoryWait
 {
     [Tooltip("The zone fills itself now. Create one with the + button and draw its area in the scene.")]
     public MobSpawnZone zone;
     [Tooltip("Carry on only once everything it spawned is dead.")]
     public bool waitUntilDefeated;
+    [Tooltip("With Wait Until Defeated: or after this many seconds, so a creature nobody can reach can't hold the story for good.")]
+    [Min(1f)] public float orAfterSeconds = 300f;
+
+    public float MostSeconds => waitUntilDefeated ? orAfterSeconds : 0f;
 
     public override bool IsFight => true;
 
@@ -31,7 +35,8 @@ public sealed class SpawnEnemiesNode : StoryNode
 
         // Nothing made (no room for them, or another game makes the creatures): no fight to wait out.
         int made = zone.Spawn();
-        while (waitUntilDefeated && made > 0 && !zone.IsCleared)
+        float giveUpAt = Time.time + orAfterSeconds;
+        while (waitUntilDefeated && made > 0 && !zone.IsCleared && Time.time < giveUpAt)
         {
             yield return null;
         }
@@ -385,6 +390,7 @@ public sealed class ChangeWeatherNode : StoryNode
 }
 
 [Serializable]
+[WaitsForThePlayer]
 public sealed class ChangeTimeOfDayNode : StoryNode
 {
     [Tooltip("The hour the clock moves forward to (7.5 is early morning, 19 sunset, 23 night).")]
@@ -460,6 +466,7 @@ public sealed class ChangeLookNode : StoryNode
 }
 
 [Serializable]
+[WaitsForThePlayer]
 public sealed class WalkPartyNode : StoryNode
 {
     private const float RefreshSeconds = 0.25f;

@@ -91,7 +91,8 @@ public sealed class Seasons : MonoBehaviour
     {
         float hour = AtmosphereConditions.Hour;
         // Dawn coming round: the hour passing 6 going forward (not a jump back from a loaded or skipped time).
-        if (lastHour >= 0f && lastHour < 6f && hour >= 6f && hour - lastHour < 2f)
+        // In a friend's Haven the day is theirs: it comes with their settlement (co-op).
+        if (lastHour >= 0f && lastHour < 6f && hour >= 6f && hour - lastHour < 2f && !HavenVisit.IsVisiting)
         {
             GameSession.Settlement.PassDay();
             global::Territory.Turn(true);

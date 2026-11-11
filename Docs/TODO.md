@@ -23,13 +23,13 @@ on a removed Drinking Spot; the Road North finished before its conversation; wro
 systems: four co-op leaks (a guest's extraction, the Huldra's respect, a struck breach source, the host's lost led home)
 went to the guest's copy of the host's settlement and were undone; Wait For Quiet could wait for ever.
 - [x] Haven quests without rewards: the job or building is the pay (the user, 2026-11-11; GDD 17.1 says so).
-- [ ] DefaultVolumeProfile and PC_Renderer reference four volume scripts and URP debug shaders this Unity no longer has
-      (found by the reference scan, 2026-11-11): harmless, but the Console may warn.
+- [x] DefaultVolumeProfile's 9 orphan volume components and PC_Renderer's 7 dead probe-debug references cleared (2026-11-12).
 - [ ] The Waking Stone (chain Story Demo) is given only in the StoryDemo scene: keep it as the story graph's example, or
       take it out of the ContentDatabase.
-- [ ] Story builders that remake their stories reset what saves remember of them. BuildFirstAct and BuildHavensReach keep
-      the ids now (Fresh/KeepTriggerIds); BuildPrologueMeadow, BuildIntroPart3 and BuildHomeStory still don't (the last two
-      are retired).
+- [x] Story builders keep what saves remember (StoryBuilder: BuildFirstAct, BuildHavensReach, BuildPrologueMeadow). The
+      retired BuildIntroPart3 and BuildHomeStory don't; never run them.
+- [ ] The Haven no longer rebuilds on Editor start (terrain assets saved after builds, heights remembered): checked with a
+      no-change heightmap event, not yet across a real restart after the fix.
 - [ ] Saves that already finished the Road North the old way never heard the Heartroot's truth (nobody had, by hand).
 
 ## Holding the land (2026-11-11)

@@ -33,6 +33,8 @@ public sealed class WorldTerrain : MonoBehaviour
     [Tooltip("Rules for Auto-Paint: which layer goes on steep, flat, high, low, hollow and ridged ground.")]
     [SerializeField] private TerrainPaintRules paintRules;
     [SerializeField, HideInInspector] private List<Built> built = new List<Built>();
+    [Tooltip("The heights as last built (WorldBuilder.HeightsFingerprint): a heightmap change that leaves them so is no hand edit.")]
+    [SerializeField, HideInInspector] private string builtHeights;
 
     public WorldTerrainStash Stash
     {
@@ -51,4 +53,10 @@ public sealed class WorldTerrain : MonoBehaviour
     }
 
     public List<Built> BuiltFeatures => built;
+
+    public string BuiltHeights
+    {
+        get => builtHeights;
+        set => builtHeights = value;
+    }
 }

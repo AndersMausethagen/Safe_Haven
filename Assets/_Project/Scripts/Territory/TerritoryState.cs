@@ -89,8 +89,20 @@ public sealed class TerritoryState
     public bool ClaimNeedsRune(TerritorySettings settings) => !settings.FirstClaimFree || FreeClaimUsed;
 
     /// <summary>Lights a region's stone: it is the Haven's at the starting hold.</summary>
+
+    // Co-op: in a guest's game the lands are the host's copy (SettlementState.IsBorrowed): a change there is undone at the
+    // host's next word. Territory sends a guest's work to the host instead; this says so loudly if something doesn't.
+    private void Borrowed([System.Runtime.CompilerServices.CallerMemberName] string change = null)
+    {
+        if (HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Settlement.Territory))
+        {
+            UnityEngine.Debug.LogError($"Co-op: TerritoryState.{change} changed the copy of the host's lands in a guest's game; send it with Territory.ForHost.\n" + System.Environment.StackTrace);
+        }
+    }
+
     public void Claim(string region, TerritorySettings settings)
     {
+        Borrowed();
         Hold hold = Of(region);
         if (hold.Claimed)
         {
@@ -113,6 +125,7 @@ public sealed class TerritoryState
     /// <summary>Strengthens a held region's hold (a rune, a task, a find, a watch held), never past 100.</summary>
     public void Raise(string region, float by)
     {
+        Borrowed();
         if (IsClaimed(region))
         {
             Hold hold = Of(region);
@@ -124,6 +137,7 @@ public sealed class TerritoryState
     /// happened, in words, and how much the blight spread (the caller spreads it).</summary>
     public List<string> AdvanceTurn(TerritorySettings settings, float blight, Func<float> roll, out float blightSpread)
     {
+        Borrowed();
         Turn++;
         blightSpread = 0f;
         var news = new List<string>();
@@ -194,6 +208,7 @@ public sealed class TerritoryState
     /// <summary>A rot's heart burned on a raid: the push loses a share. Returns false when no push is coming.</summary>
     public bool Weaken(TerritorySettings settings)
     {
+        Borrowed();
         if (Incursion == null)
         {
             return false;
@@ -206,6 +221,7 @@ public sealed class TerritoryState
     /// <summary>The watch at the stone was held: the push on that region is broken and the hold grows.</summary>
     public bool Defended(string region, TerritorySettings settings)
     {
+        Borrowed();
         if (Incursion == null || Incursion.Region != region)
         {
             return false;
@@ -223,6 +239,7 @@ public sealed class TerritoryState
     /// <summary>Counts one more towards a region's task. Returns true when that finished it (the caller rewards it).</summary>
     public bool CountTask(string region, int needed, TerritorySettings settings)
     {
+        Borrowed();
         if (!TaskOpen(region))
         {
             return false;

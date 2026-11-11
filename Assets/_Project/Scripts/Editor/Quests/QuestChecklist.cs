@@ -45,6 +45,7 @@ public static class QuestChecklist
         CheckStart(quest, checks);
         CheckObjectives(quest, checks);
         CheckFinish(quest, checks);
+        CheckNamesEarly(quest, checks);
         CheckRewards(quest, checks);
         return checks;
     }
@@ -356,6 +357,30 @@ public static class QuestChecklist
         else
         {
             checks.Add(GiverFixes(quest, new QuestCheck(QuestCheck.State.Missing, "Is handed in to a Quest Giver, but no one has it, so it can never finish. Give it to someone:")));
+        }
+    }
+
+    // People the quest's words name who only come home later: often fine ("Sigrid's voice came through the stones"), but a line
+    // that has them at home before their rescue reads wrong ("six of your people" was, 2026-11-11). A note, not a fault.
+    private static void CheckNamesEarly(QuestDefinition quest, List<QuestCheck> checks)
+    {
+        if (quest.Chain != null && quest.Chain.StartsWith("Prologue", System.StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        List<QuestDefinition> all = ResourceCatalogTools.LoadAll<QuestDefinition>();
+        HashSet<QuestDefinition> before = Before(quest);
+        string words = quest.Description + " " + quest.JournalNotes + " " + string.Join(" ", quest.Objectives.Where(o => o != null).Select(o => o.Describe()));
+        foreach (QuestDefinition rescue in all.Where(q => q != null && q != quest && !before.Contains(q)))
+        {
+            foreach (ResidentDefinition person in rescue.Objectives.Where(o => o != null && o.Type == ObjectiveType.RescuePerson && o.Person != null).Select(o => o.Person).Distinct())
+            {
+                if (System.Text.RegularExpressions.Regex.IsMatch(words, @"\b" + System.Text.RegularExpressions.Regex.Escape(person.DisplayName) + @"\b"))
+                {
+                    checks.Add(new QuestCheck(QuestCheck.State.Note, $"Names {person.DisplayName}, who only comes home in {rescue.DisplayName}, which needn't come first: check the words don't have them home already."));
+                }
+            }
         }
     }
 

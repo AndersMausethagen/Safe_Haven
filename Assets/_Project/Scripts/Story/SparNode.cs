@@ -7,6 +7,7 @@ using UnityEngine;
 /// Outputs: the player won, the companion won (both are healed either way). For lessons like Eirik's at the morning camp.
 /// </summary>
 [Serializable]
+[WaitsForThePlayer]
 public sealed class SparNode : StoryNode
 {
     [Tooltip("Who duels the player: a companion with a melee attack.")]

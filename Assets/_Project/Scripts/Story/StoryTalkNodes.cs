@@ -31,6 +31,7 @@ public sealed class StorySpeaker
 }
 
 [Serializable]
+[WaitsForThePlayer]
 public sealed class SayNode : StoryNode
 {
     public StorySpeaker speaker = new StorySpeaker();
@@ -90,6 +91,7 @@ public sealed class SayNode : StoryNode
 }
 
 [Serializable]
+[WaitsForThePlayer]
 public sealed class ChoiceNode : StoryNode
 {
     public StorySpeaker speaker = new StorySpeaker();

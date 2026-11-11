@@ -186,6 +186,12 @@ public sealed class WardBreachDirector : MonoBehaviour
                 return;
             }
 
+            // The host's game warns of its own breaches; a guest's copy hears of it with the settlement.
+            if (HavenVisit.IsVisiting)
+            {
+                return;
+            }
+
             settlement.WarnOfBreach();
             GameMessages.Post(next.WarningText, MessageKind.Warning);
             AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
