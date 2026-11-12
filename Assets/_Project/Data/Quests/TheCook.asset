@@ -74,7 +74,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 1
   - type: 7
-    description: 'Build a Kitchen (build menu: G): it wants Bjarne''s Smithy standing'
+    description: 'Build a Kitchen (build menu: {key:Build}): it wants Bjarne''s Smithy standing'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

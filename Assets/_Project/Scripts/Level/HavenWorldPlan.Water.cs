@@ -241,6 +241,7 @@ public sealed partial class HavenWorldPlan
         RiverDepths.Add(depth);
         riverJoins.Add(joins);
         riverStarts.Add(startLevel);
+        riverPonds.Add(null);
     }
 
     // True when a river's line runs through a mere or the bog.
@@ -263,7 +264,11 @@ public sealed partial class HavenWorldPlan
     }
 
     // A stream from a point (in a mere, a spring's pool or the bog) down to the nearest river or the lake.
-    private bool StreamFrom(Vector2 from, RaidLayoutPond water, float level)
+    private bool StreamFrom(Vector2 from, RaidLayoutPond water, float level) => StreamFrom(from, water, level, Recipe.buildable + RiverFromHome * 0.6f, 40f);
+
+    // ...keeping at least keepOut metres from the portal (the Haven's own stream runs through the meadows, round the yard), and
+    // running at least shortest metres (a mere's stream is a stream; the fishing pond's may be a short run to a river beside it).
+    private bool StreamFrom(Vector2 from, RaidLayoutPond water, float level, float keepOut, float shortest)
     {
         const float longest = 320f;
         Vector2 target = default;
@@ -289,7 +294,7 @@ public sealed partial class HavenWorldPlan
             }
         }
 
-        if (best >= longest || best < 40f)
+        if (best >= longest || best < shortest)
         {
             return false;
         }
@@ -304,7 +309,7 @@ public sealed partial class HavenWorldPlan
             for (int k = 1; k + 1 < line.Count && clear; k++)
             {
                 Vector2 point = line[k];
-                clear = point.magnitude > Recipe.buildable + RiverFromHome * 0.6f && (k + 3 >= line.Count || !Near(Rivers, point, 14f))
+                clear = point.magnitude > keepOut && (k + 3 >= line.Count || !Near(Rivers, point, 14f))
                         && !Meres.Exists(mere => mere != water && mere.Edge(point) < 10f) && !Ponds.Exists(pond => pond != water && pond.Edge(point) < 6f)
                         && (fromBog || BogWeight(point) <= 0.05f) && (joins < 0 || Lake.Edge(point) > 8f);
             }
@@ -335,6 +340,7 @@ public sealed partial class HavenWorldPlan
                     Depth = Mathf.Lerp(0.8f, 1.8f, Mathf.InverseLerp(Recipe.pondRadius.x, Recipe.pondRadius.y, radius)),
                 };
                 if (Near(Paths, pond.Position, pond.Reach + 6f) || Near(Rivers, pond.Position, pond.Reach + 12f) || Lake.Edge(pond.Position) < pond.Reach + 12f
+                    || Knolls.Exists(knoll => Vector2.Distance(knoll.At, pond.Position) < knoll.Radius + pond.Reach + 6f)
                     || !OneBench(pond.Position, pond.Reach + 5f)
                     || Ponds.Exists(other => Vector2.Distance(other.Position, pond.Position) < other.Reach + pond.Reach + 25f))
                 {
@@ -468,7 +474,8 @@ public sealed partial class HavenWorldPlan
         for (int r = 0; r < Rivers.Count; r++)
         {
             List<Vector2> river = Rivers[r];
-            float floor = riverJoins[r] >= 0 ? RiverLevelNear(riverJoins[r], river[river.Count - 1]) : Lake.Level + 0.2f;
+            float floor = riverPonds[r] != null ? riverPonds[r].Level + 0.05f
+                : riverJoins[r] >= 0 ? RiverLevelNear(riverJoins[r], river[river.Count - 1]) : Lake.Level + 0.2f;
             var levels = new float[river.Count];
             float level = riverStarts[r];
             for (int i = 0; i < river.Count; i++)

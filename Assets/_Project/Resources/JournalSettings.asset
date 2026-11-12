@@ -876,7 +876,7 @@ MonoBehaviour:
   - group: Safe Haven
     title: Building
     line: Each thing opens the next
-    body: 'Press ({key:Build}) to build inside the ward. Most buildings go up as a scaffold you hammer with [{key:Interact}]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.
+    body: 'Press ({key:Build}) to build anywhere in the Haven''s meadows (inside the ward is safe at night). Most buildings go up as a scaffold you hammer with [{key:Interact}]. Each one opens the next, and every tier of a building opens something new to make, takes a chore off your hands or answers a problem you will meet in the woods.
 
 
       Recipes you can''t make yet still show at the station, with what they need, so you can see what to aim for.'
@@ -886,7 +886,7 @@ MonoBehaviour:
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
     art: {fileID: 21300000, guid: b8881e57aaf87664791862c7672142d4, type: 3}
-    summary: Raise new buildings inside the ward. Each one opens new things to make and do.
+    summary: Raise new buildings anywhere in the Haven's meadows. Each one opens new things to make and do.
   - group: Safe Haven
     title: Stations and Work
     line: It goes on without you

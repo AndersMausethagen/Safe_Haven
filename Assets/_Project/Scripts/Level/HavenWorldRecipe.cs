@@ -104,6 +104,28 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Tooltip("From here out it is the Misty Woods: dark cedars, more relief, more ravines.")]
     [Min(40f)] public float forest = 330f;
 
+    [Header("The Haven itself (building is open over all its meadows)")]
+    [Tooltip("Kept as level as ever round the portal, where saved buildings and the hand-placed props stand (the ward reaches 49 m at most).")]
+    [Min(10f)] public float yard = 55f;
+    [Tooltip("Metres the meadows' low shelves stand above the rest beyond the yard (their hollows sink six tenths of it): flat tops to build on, " +
+             "a few metres of slope to walk up. 0: none.")]
+    [Min(0f)] public float havenShelves = 3.6f;
+    [Tooltip("Metres across one swell of the shelves: smaller is more of them, closer together.")]
+    [Min(15f)] public float shelfScale = 85f;
+    [Tooltip("Knolls in the outer meadows, least and most: a flat top over the Haven to build a lookout on, with gentle sides.")]
+    public Vector2Int havenKnolls = new Vector2Int(2, 2);
+    [Tooltip("A knoll's height and its radius, in metres. Its sides stay under about 18 degrees, so they stay grass: steeper, the " +
+             "Haven's paint goes to bare ground, and from above a ring of it reads as a pit.")]
+    public Vector2 knollHeight = new Vector2(4f, 5f);
+    public Vector2 knollRadius = new Vector2(34f, 40f);
+    [Tooltip("A stream through the meadows from a spring at their edge into a fishing pond, and on out of it to the lake.")]
+    public bool havenStream = true;
+    [Tooltip("The fishing pond's distance from the portal, least and most, and its radius.")]
+    public Vector2 havenPondDistance = new Vector2(72f, 95f);
+    public Vector2 havenPondRadius = new Vector2(10f, 13f);
+    [Tooltip("Bearings (degrees clockwise from north; it may wrap past north) the Haven's stream and pond keep to: clear of the props south of the portal.")]
+    public Vector2 havenWaterBearings = new Vector2(285f, 100f);
+
     [Header("Terrain")]
     [Min(100f)] public float size = 1000f;
     [Tooltip("Metres the terrain reaches below the portal's ground (for lake beds and river cuts) and its whole height.")]

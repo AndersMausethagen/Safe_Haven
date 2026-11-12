@@ -51,6 +51,15 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     [SerializeField, Min(8)] private int ringSegments = 96;
     [Tooltip("The menu closes when the player walks further than this, in meters.")]
     [SerializeField, Min(1f)] private float menuRange = 7f;
+    [Tooltip("How far from the portal building is open in a scene whose map has no Haven region (no World Atlas).")]
+    [SerializeField, Min(10f)] private float buildReach = 165f;
+    [Tooltip("The most the ground may rise or fall across a building's footprint, in metres: more is too uneven to build on.")]
+    [SerializeField, Min(0.05f)] private float buildUnevenness = 0.5f;
+
+    private WorldAtlas atlas;
+    private WorldAtlas.Region homeRegion;
+    private bool atlasRead;
+    private Terrain ground;
 
     private Interactable interactable;
     private RaidPortal raid;
@@ -81,10 +90,56 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 
     bool IArea.Contains(Vector3 position) => Contains(position);
 
-    // ----- Building (IBuildArea): the ward is where the player builds what they know -----
+    // ----- Building (IBuildArea): anywhere in the Haven's own land (its region on the map), on the ground as it lies -----
+
+    /// <summary>
+    /// True where the player may build: anywhere in the Haven's own region on the map (its meadows, the region the portal stands
+    /// in), and always inside the ward. Without a map, within Build Reach of the portal.
+    /// </summary>
+    public bool InBuildLand(Vector3 position)
+    {
+        if (Contains(position))
+        {
+            return true;
+        }
+
+        ReadAtlas();
+        if (homeRegion != null)
+        {
+            return atlas.RegionAt(position) == homeRegion;
+        }
+
+        Vector3 offset = position - transform.position;
+        offset.y = 0f;
+        return offset.magnitude <= buildReach;
+    }
+
+    /// <summary>What the land the player builds on is called (Haven Meadows).</summary>
+    public string BuildLandName
+    {
+        get
+        {
+            ReadAtlas();
+            return homeRegion != null && !string.IsNullOrEmpty(homeRegion.name) ? homeRegion.name : "the Haven's meadows";
+        }
+    }
+
+    private void ReadAtlas()
+    {
+        if (atlasRead)
+        {
+            return;
+        }
+
+        atlasRead = true;
+        atlas = WorldAtlas.For(gameObject.scene.name);
+        homeRegion = atlas != null ? atlas.RegionAt(transform.position) : null;
+    }
+
+    private Terrain Ground => ground != null ? ground : ground = Terrain.activeTerrain;
 
     string IBuildArea.WhyClosed => null;
-    string IBuildArea.Guidance => $"Build inside the portal's ward ({WardRadius:0} m). ";
+    string IBuildArea.Guidance => $"Build anywhere in {BuildLandName}. Inside the portal's ward ({WardRadius:0} m) it is safe at night. ";
     bool IBuildArea.AllowsChanges => true;
     float IBuildArea.GroundHeight => transform.position.y;
 
@@ -99,14 +154,60 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         }
     }
 
-    bool IBuildArea.TryGetGroundPoint(Camera view, out Vector3 point) =>
-        CameraPointer.TryGetPointOnPlane(view, new Plane(Vector3.up, transform.position), out point);
+    // The ground under the pointer: the terrain as it lies (the meadows rise and fall), else the portal's level.
+    bool IBuildArea.TryGetGroundPoint(Camera view, out Vector3 point)
+    {
+        Terrain terrain = Ground;
+        if (terrain != null && CameraPointer.TryGetRay(view, out Ray ray) && terrain.TryGetComponent(out TerrainCollider collider)
+            && collider.Raycast(ray, out RaycastHit hit, 600f))
+        {
+            point = hit.point;
+            return true;
+        }
 
-    Vector3 IBuildArea.OnGround(Vector3 point) => point;
+        return CameraPointer.TryGetPointOnPlane(view, new Plane(Vector3.up, transform.position), out point);
+    }
 
-    string IBuildArea.CheckSpot(FootprintRect footprint, Vector3 point) =>
-        Contains(footprint.WorldCenter(point.y), Mathf.Max(footprint.HalfSize.x, footprint.HalfSize.y))
-            ? null : "Outside the portal's ward. Build closer to it.";
+    Vector3 IBuildArea.OnGround(Vector3 point) => OnGround(point);
+
+    private Vector3 OnGround(Vector3 point)
+    {
+        Terrain terrain = Ground;
+        if (terrain != null)
+        {
+            point.y = terrain.SampleHeight(point) + terrain.transform.position.y;
+        }
+
+        return point;
+    }
+
+    // In the Haven's land, out of the water, and on ground level enough for the footprint (its corners and middle).
+    string IBuildArea.CheckSpot(FootprintRect footprint, Vector3 point)
+    {
+        Vector2 x = footprint.AxisX * footprint.HalfSize.x;
+        Vector2 z = footprint.AxisZ * footprint.HalfSize.y;
+        float highest = float.MinValue, lowest = float.MaxValue;
+        for (int corner = 0; corner < 5; corner++)
+        {
+            Vector2 at = corner == 4 ? footprint.Center : footprint.Center + ((corner & 1) == 0 ? x : -x) + ((corner & 2) == 0 ? z : -z);
+            Vector3 spot = OnGround(new Vector3(at.x, point.y, at.y));
+            if (!InBuildLand(spot))
+            {
+                return $"Outside {BuildLandName}. Build nearer home.";
+            }
+
+            // Looked for from a little over the ground, so a deep pond's bed is under its water too.
+            if (WaterSurface.At(spot + Vector3.up * 1.5f, 3.5f, out float surface) != null && surface > spot.y + 0.05f)
+            {
+                return "Not in the water.";
+            }
+
+            highest = Mathf.Max(highest, spot.y);
+            lowest = Mathf.Min(lowest, spot.y);
+        }
+
+        return highest - lowest > buildUnevenness ? "The ground is too uneven here: find flatter ground." : null;
+    }
 
     string IBuildArea.CheckBuilding(BuildingDefinition building) => null;
 

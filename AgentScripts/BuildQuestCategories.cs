@@ -74,7 +74,7 @@ public static class BuildQuestCategories
 
         Edit(Quest("FirstCamp"), so =>
         {
-            so.FindProperty("description").stringValue = "The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: G). Your people will see it through the mist.";
+            so.FindProperty("description").stringValue = "The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: {key:Build}). Your people will see it through the mist.";
             so.FindProperty("journalNotes").stringValue = "This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.\n\nSticks and small rocks lie on the ground around the portal: walk up to them and pick them up (E). The build menu (G) shows what the fire costs.";
             After(so, Quest("Awakening"));
             SerializedProperty objectives = so.FindProperty("objectives");
@@ -84,7 +84,7 @@ public static class BuildQuestCategories
                 Object built = objective.FindPropertyRelative("building").objectReferenceValue;
                 bool theFire = objective.FindPropertyRelative("type").intValue == (int)ObjectiveType.BuildStructure && built != null && built.name == "Campfire";
                 if (!theFire) objectives.DeleteArrayElementAtIndex(i);
-                else objective.FindPropertyRelative("description").stringValue = "Light a Campfire inside the ward (build menu: G)";
+                else objective.FindPropertyRelative("description").stringValue = "Light a Campfire inside the ward (build menu: {key:Build})";
             }
 
             so.FindProperty("objectivesInOrder").boolValue = false;
@@ -180,7 +180,7 @@ public static class BuildQuestCategories
         {
             so.FindProperty("id").stringValue = "aroofforthework";
             so.FindProperty("displayName").stringValue = "A Roof for the Work";
-            so.FindProperty("description").stringValue = "What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: G). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.";
+            so.FindProperty("description").stringValue = "What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: {key:Build}). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.";
             so.FindProperty("journalNotes").stringValue = "The Workshop wants oak, grey stone and sticks: fell the oaks at the clearing's edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.";
             so.FindProperty("chain").stringValue = FirstDays;
             so.FindProperty("start").intValue = (int)QuestStart.Automatically;
@@ -190,7 +190,7 @@ public static class BuildQuestCategories
             objectives.arraySize = 1;
             SerializedProperty build = objectives.GetArrayElementAtIndex(0);
             build.boxedValue = QuestObjective.Create(ObjectiveType.BuildStructure, 1, Find<BuildingDefinition>("ConstructionTable"));
-            build.FindPropertyRelative("description").stringValue = "Build a Workshop (build menu: G)";
+            build.FindPropertyRelative("description").stringValue = "Build a Workshop (build menu: {key:Build})";
             build.FindPropertyRelative("countAlreadyOwned").boolValue = true;
             so.FindProperty("objectivesInOrder").boolValue = false;
             so.FindProperty("rewardItems").arraySize = 0;

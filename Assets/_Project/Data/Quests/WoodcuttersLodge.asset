@@ -74,7 +74,7 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 1
   - type: 7
-    description: 'Build a Woodcutter''s Lodge (build menu: G)'
+    description: 'Build a Woodcutter''s Lodge (build menu: {key:Build})'
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

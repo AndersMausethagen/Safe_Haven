@@ -59,9 +59,9 @@ public static class BuildOpeningOrder
     // ----- Quests -----
 
     private static QuestDefinition SafePlace() => Made("SafeKeeping", "safekeeping", "A Safe Place",
-        "What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: G), and before every raid leave in it whatever you can't afford to lose.",
+        "What you carry through the portal is lost if you fall out there. What you leave in a chest at home stays safe. Build a Small Chest beside the workshop (build menu: {key:Build}), and before every raid leave in it whatever you can't afford to lose.",
         Quest("FirstCamp"),
-        (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("SmallChest")), "Build a Small Chest (build menu: G)"),
+        (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("SmallChest")), "Build a Small Chest (build menu: {key:Build})"),
         (QuestObjective.Create(ObjectiveType.StoreItem, 1), "Put something you can't afford to lose in the chest"));
 
     // A First Days quest, made once and kept up to date, its objectives in order. Copied from FirstCamp, so it is set up like its neighbours.

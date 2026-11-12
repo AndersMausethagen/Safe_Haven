@@ -235,6 +235,8 @@ the dark back: this is how the home grows into the night (see Docs/Atmosphere.md
 
 The player may expand buildable space through runes, Portal upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
 
+**The whole of Haven Meadows is the player's to build on (November 12, 2026).** Building is open over the Haven's region on the map, its meadows out to about 170 m, on the ground as it lies: anywhere level enough for the building, out of the water. The ward is no longer the edge of building but of safety: inside it the night keeps away, and raising it (and renown) widens the safe ground round the portal. The meadows have their own shape: a yard round the portal as level as ever (where the first buildings go), low shelves and hollows beyond it, two grassy knolls with flat crowns (a lookout's place), and a small stream from a spring at the meadows' edge into a fishing pond and on to the lake.
+
 ### 6.4.1 Base progression (November 2, 2026)
 
 The Construction Table, Sawbench, Furnace and Forge are replaced by whole buildings with five tiers that match resource tiers: the Workshop, the Woodcutter's Lodge and the Smithy. Each building opens the next, and what the base gives feeds raids through time, Well Rested and knowledge. See [base progression](BaseProgression.md); it overrides older station names in this document.

@@ -164,8 +164,9 @@ public sealed partial class HavenWorldPlan
     /// <summary>Each river's width and depth in metres, by index: the rivers first, then the streams.</summary>
     public readonly List<float> RiverWidths = new List<float>();
     public readonly List<float> RiverDepths = new List<float>();
-    // The river each one runs into (-1: the lake), and the level it starts from (the water it rises in).
+    // The river each one runs into (-1: the lake, or the pond in riverPonds), and the level it starts from (the water it rises in).
     private readonly List<int> riverJoins = new List<int>();
+    private readonly List<RaidLayoutPond> riverPonds = new List<RaidLayoutPond>();
     private readonly List<float> riverStarts = new List<float>();
     public readonly List<Poi> Pois = new List<Poi>();
     public readonly List<Outcrop> Outcrops = new List<Outcrop>();
@@ -214,6 +215,8 @@ public sealed partial class HavenWorldPlan
         plan.PlacePaths();
         plan.PlaceMeres();
         plan.PlaceRivers();
+        plan.PlaceKnolls();
+        plan.PlaceHavenWater();
         plan.PlacePonds();
         plan.PlacePois();
         plan.PlaceOutcrops();

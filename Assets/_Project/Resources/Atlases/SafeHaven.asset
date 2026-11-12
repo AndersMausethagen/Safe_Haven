@@ -24,19 +24,19 @@ MonoBehaviour:
   - name: The Wolfwood
     label: {x: -282.22656, y: -375.97656}
     share: 0.0845108
-    stoneAt: {x: -276.45752, y: -393.4331}
+    stoneAt: {x: -282.86646, y: -348.17596}
   - name: The Hollow Pines
     label: {x: 190.42969, y: -293.9453}
     share: 0.20786667
-    stoneAt: {x: 164.02275, y: -301.1773}
+    stoneAt: {x: 195.96304, y: -314.87753}
   - name: Westwood
     label: {x: -383.78906, y: -227.53906}
     share: 0.12405014
-    stoneAt: {x: -400.21478, y: -228.49724}
+    stoneAt: {x: -383.73538, y: -228.08247}
   - name: The Drowning Fen
     label: {x: -90.82031, y: -331.0547}
     share: 0.021175385
-    stoneAt: {x: -81.87588, y: -321.68207}
+    stoneAt: {x: -90.47962, y: -330.74908}
   - name: Alder Mere
     label: {x: -282.22656, y: -108.39844}
     share: 0.012901306
@@ -48,27 +48,27 @@ MonoBehaviour:
   - name: Stillwater
     label: {x: 276.3672, y: -55.664062}
     share: 0.03832245
-    stoneAt: {x: 224.53, y: 22.328371}
+    stoneAt: {x: 194.3903, y: -78.212166}
   - name: Eastwood
     label: {x: 352.53906, y: 168.94531}
     share: 0.10410309
-    stoneAt: {x: 331.0178, y: 163.36444}
+    stoneAt: {x: 335.50623, y: 174.97697}
   - name: The Grey Pines
     label: {x: -198.24219, y: 180.66406}
     share: 0.028713226
-    stoneAt: {x: -178.69492, y: 163.0617}
+    stoneAt: {x: -194.02498, y: 177.8874}
   - name: Greyfell
     label: {x: -329.10156, y: 329.10156}
     share: 0.121315
-    stoneAt: {x: -312.58405, y: 333.4543}
+    stoneAt: {x: -262.3664, y: 339.30872}
   - name: Ravenwood
     label: {x: -36.132812, y: 290.03906}
     share: 0.1587677
-    stoneAt: {x: -59.291847, y: 226.61649}
+    stoneAt: {x: -15.184963, y: 287.4026}
   - name: Hightarn
     label: {x: 133.78906, y: 309.5703}
     share: 0.0076293945
-    stoneAt: {x: 90.99568, y: 306.13354}
+    stoneAt: {x: 108.39844, y: 323.2422}
   places:
   - id: haven.wayfarer_s_stones.0
     name: Wayfarer's Stones
@@ -98,110 +98,110 @@ MonoBehaviour:
   - id: haven.drowned_stones.0
     name: Drowned Stones
     kind: Drowned Stones
-    at: {x: -116.15328, y: -298.76407}
+    at: {x: -117.76796, y: -339.69067}
     radius: 20
   - id: haven.fisher_s_rest.0
     name: Fisher's Rest
     kind: Fisher's Rest
-    at: {x: 95.99941, y: 308.12286}
+    at: {x: 237.89368, y: 30.90689}
     radius: 18
   - id: haven.fisher_s_rest.1
     name: Netmender's Rest
     kind: Fisher's Rest
-    at: {x: 237.55873, y: 30.788101}
+    at: {x: 201.03607, y: -91.43742}
     radius: 18
   - id: haven.mother_maple.0
     name: Mother Maple
     kind: Mother Maple
-    at: {x: 105.484184, y: 60.138077}
+    at: {x: 112.57057, y: 38.20382}
     radius: 20
   - id: haven.shepherd_s_fold.0
     name: Shepherd's Fold
     kind: Shepherd's Fold
-    at: {x: 5.999261, y: -162.06047}
+    at: {x: -115.09177, y: 88.36484}
     radius: 18
   - id: haven.shepherd_s_fold.1
     name: Ewe Fold
     kind: Shepherd's Fold
-    at: {x: -42.00916, y: 153.53983}
+    at: {x: -64.91977, y: 98.97369}
     radius: 18
   - id: haven.ruined_watchtower.0
     name: Ruined Watchtower
     kind: Ruined Watchtower
-    at: {x: -327.07465, y: -359.3701}
+    at: {x: -282.8047, y: -356.97913}
     radius: 22
   - id: haven.ruined_watchtower.1
     name: Broken Tower
     kind: Ruined Watchtower
-    at: {x: -325.5928, y: -235.70222}
+    at: {x: -371.70706, y: -336.04715}
     radius: 22
   - id: haven.standing_stones.0
     name: Standing Stones
     kind: Standing Stones
-    at: {x: -189.69363, y: -293.58438}
+    at: {x: 288.5702, y: 186.46103}
     radius: 22
   - id: haven.lookout_cairn.0
     name: Lookout Cairn
     kind: Lookout Cairn
-    at: {x: -388.98798, y: -324.34076}
+    at: {x: -379.0923, y: -263.67755}
     radius: 18
   - id: haven.lookout_cairn.1
     name: Raven Cairn
     kind: Lookout Cairn
-    at: {x: -409.82593, y: -258.005}
+    at: {x: -387.62042, y: -197.41476}
     radius: 18
   - id: haven.lookout_cairn.2
     name: Windy Cairn
     kind: Lookout Cairn
-    at: {x: -315.4093, y: 337.57837}
+    at: {x: -427.9775, y: 196.26381}
     radius: 18
   - id: haven.old_barrow.0
     name: Old Barrow
     kind: Old Barrow
-    at: {x: -303.1375, y: -414.6816}
+    at: {x: -377.20694, y: -396.52054}
     radius: 22
   - id: haven.burnt_farmstead.0
     name: Burnt Farmstead
     kind: Burnt Farmstead
-    at: {x: 279.8073, y: 179.49995}
+    at: {x: -2.8314013, y: -266.67294}
     radius: 24
   - id: haven.wolf_den.0
     name: Wolf Den
     kind: Wolf Den
-    at: {x: -379.0863, y: -403.5008}
+    at: {x: -224.5768, y: -309.75815}
     radius: 22
   - id: haven.old_quarry.0
     name: Old Quarry
     kind: Old Quarry
-    at: {x: 307.82257, y: 391.63593}
+    at: {x: 28.033806, y: 288.74243}
     radius: 20
   - id: haven.old_quarry.1
     name: Grey Quarry
     kind: Old Quarry
-    at: {x: 278.75824, y: 345.28995}
+    at: {x: 400.1837, y: 272.3473}
     radius: 20
   - id: haven.elder_cedar.0
     name: Elder Cedar
     kind: Elder Cedar
-    at: {x: -430.12234, y: -434.68982}
+    at: {x: 340.0233, y: 168.5637}
     radius: 20
   - id: haven.elder_cedar.1
     name: Grandmother Cedar
     kind: Elder Cedar
-    at: {x: -390.98932, y: -192.26059}
+    at: {x: -428.24246, y: -384.228}
     radius: 20
   - id: haven.woodland_camp.0
     name: Woodland Camp
     kind: Woodland Camp
-    at: {x: 200.44466, y: 292.26685}
+    at: {x: 331.32446, y: 232.51376}
     radius: 19
   - id: haven.woodland_camp.1
     name: Trapper's Camp
     kind: Woodland Camp
-    at: {x: 251.9643, y: 101.09269}
+    at: {x: -164.64142, y: 104.19481}
     radius: 19
   - id: haven.woodland_camp.2
     name: Charcoal Camp
     kind: Woodland Camp
-    at: {x: -269.09, y: 28.268581}
+    at: {x: -136.21404, y: 168.73196}
     radius: 19

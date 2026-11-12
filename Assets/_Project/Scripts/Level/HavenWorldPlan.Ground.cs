@@ -216,7 +216,8 @@ public sealed partial class HavenWorldPlan
         float near = (Perlin(point, 25f, 13f) - 0.5f) * 0.8f * Ease(10f, 40f, r);
         float benches = Ease(Recipe.haven - 30f, Recipe.haven + 60f, r);
         float roll = (Perlin(point, Recipe.hillScale, 0f) - 0.5f) * 2f * Recipe.havenHills * Mathf.Lerp(1f, Recipe.benchRoll, benches);
-        float detail = near * (1f - open) + roll * open;
+        // A knoll rises out of the shelves, never on top of one: its crown stays flat to build on.
+        float detail = near * (1f - open) + roll * open + Mathf.Max(Shelf(point) * Recipe.havenShelves, KnollAt(point));
         float bog = BogWeight(point);
         if (bog <= 0f)
         {

@@ -66,8 +66,8 @@ public static class FixQuestAudit
         // ----- Words -----
         Replace(Q("ALightTheyCanSee"), "description", "and six of your people are still out there", "and the rest of your people are still out there");
         Replace(Q("TheWeakeningWard"), "description", "The light that called Ingrid home was seen by other things too.", BuildHomeStory_WeakeningWardOpening);
-        Edit(Q("TheCook"), so => Objective(so, "Build a Kitchen", null).FindPropertyRelative("description").stringValue = "Build a Kitchen (build menu: G): it wants Bjarne's Smithy standing");
-        Edit(Q("TheWarden"), so => Objective(so, "Build a Watch Post", null).FindPropertyRelative("description").stringValue = "Build a Watch Post (build menu: G): it wants the Woodcutter's Lodge standing");
+        Edit(Q("TheCook"), so => Objective(so, "Build a Kitchen", null).FindPropertyRelative("description").stringValue = "Build a Kitchen (build menu: {key:Build}): it wants Bjarne's Smithy standing");
+        Edit(Q("TheWarden"), so => Objective(so, "Build a Watch Post", null).FindPropertyRelative("description").stringValue = "Build a Watch Post (build menu: {key:Build}): it wants the Woodcutter's Lodge standing");
 
         // ----- Co-op: what belongs to a Haven -----
         foreach (string file in new[] { "LandStoneLit", "LandTaskDone", "LandRuneOffered", "LandForestGathers", "LandPushAnswered", "LandSecure", "PortalRepaired", "PortalBloomed" })

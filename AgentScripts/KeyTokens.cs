@@ -22,6 +22,8 @@ public static class KeyTokens
         string letters = string.Join("|", keys.Keys.OrderByDescending(k => k.Length).Select(Regex.Escape));
         var bracketed = new Regex($@"([\(\[])({letters})([\)\]])");
         var spoken = new Regex($@"\b(press|tap|hold|Press|Tap|Hold)( the)? ({letters})\b(?! key)");
+        // "(build menu: G)": a key named after a colon in brackets.
+        var named = new Regex($@"(menu: |key: )({letters})([\)\]])");
         int changed = 0, assets = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", Folders))
         {
@@ -45,6 +47,7 @@ public static class KeyTokens
                 string text = property.stringValue;
                 string done = bracketed.Replace(text, m => $"{m.Groups[1].Value}{{key:{keys[m.Groups[2].Value]}}}{m.Groups[3].Value}");
                 done = spoken.Replace(done, m => $"{m.Groups[1].Value}{m.Groups[2].Value} {{key:{keys[m.Groups[3].Value]}}}");
+                done = named.Replace(done, m => $"{m.Groups[1].Value}{{key:{keys[m.Groups[2].Value]}}}{m.Groups[3].Value}");
                 if (done != text)
                 {
                     property.stringValue = done;

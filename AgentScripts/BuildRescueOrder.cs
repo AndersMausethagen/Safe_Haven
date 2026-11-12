@@ -507,7 +507,7 @@ public static class BuildRescueOrder
             if (person.Workplace != null)
             {
                 BuildingDefinition place = Building(person.Workplace);
-                work.Add((QuestObjective.Create(ObjectiveType.BuildStructure, 1, place), $"Build a {place.DisplayName} (build menu: G)"));
+                work.Add((QuestObjective.Create(ObjectiveType.BuildStructure, 1, place), $"Build a {place.DisplayName} (build menu: {{key:Build}})"));
             }
 
             // The smith's point is the mending: once is enough to see it costs half now.
@@ -534,15 +534,15 @@ public static class BuildRescueOrder
             so.FindProperty("description").stringValue = "Ingrid, Bjarne and Tor are home, and more will come through that door. They need beds, and somewhere dry to set down what they carry. Build them.";
             SerializedProperty objectives = so.FindProperty("objectives");
             objectives.arraySize = 2;
-            Set(objectives.GetArrayElementAtIndex(0), QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("StorageShed")), "Build a Storage Shed (build menu: G)");
-            Set(objectives.GetArrayElementAtIndex(1), QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("Hut")), "Build a Hut (build menu: G)");
+            Set(objectives.GetArrayElementAtIndex(0), QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("StorageShed")), "Build a Storage Shed (build menu: {key:Build})");
+            Set(objectives.GetArrayElementAtIndex(1), QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("Hut")), "Build a Hut (build menu: {key:Build})");
         });
         After("AGrowingHome", Quest("WoodcuttersLodge"));
         Made("HeavyLoads", "work.heavy_loads", "Heavy Loads", Work,
             "Copper ore and planks weigh more than any pack can take home. Tor knows carts: raise his Woodcutter's Lodge to Tier II and he plans a Wainwright's Yard, where barrows, handcarts and a rowboat are built.",
             Quest("WoodcuttersLodge"), true,
             (QuestObjective.Upgrade(Building("Sawbench"), 2), "Raise the Woodcutter's Lodge to Tier II (H)"),
-            (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("WainwrightsYard")), "Build a Wainwright's Yard (build menu: G)"),
+            (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("WainwrightsYard")), "Build a Wainwright's Yard (build menu: {key:Build})"),
             (QuestObjective.Create(ObjectiveType.CraftItem, 1, Find<ItemDefinition>("Wheelbarrow")), "Make a Wheelbarrow at the Wainwright's Yard"));
         return made + 1 + " quests in order";
     }

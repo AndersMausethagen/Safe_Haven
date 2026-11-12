@@ -43,6 +43,24 @@ designers on elevation, and what top-down and isometric games do (V Rising, Diab
 | Water that makes sense | The lake is the low point: two rivers of different widths and five or six streams (out of the meres, the bog and springs) run to it, **falling** wherever they come down to a lower bench, fording at every path, and fanning into the lake over a gravel fan. | Water and Rock |
 | Life | **Game** (deer, stag, fox, wild boar: neutral and timid, to hunt and later tame) in the meadows and the open glades, back by day; what hunts you in lairs and the deep woods, back only by night and never near the ward. | creature bands (Peaceful) |
 
+## The Haven itself (November 12, 2026)
+
+The player builds anywhere in **Haven Meadows** (the map's home region, about 170 m round the portal), so the meadows have a
+shape of their own instead of one flat lawn:
+- **The yard** (Recipe › Yard, 55 m) stays as level as ever: saved buildings and the hand-placed maples, spruces and boulders
+  south of the portal stand there, and the generator doesn't re-ground kept objects.
+- **Shelves and hollows** beyond it (Haven Shelves 3.6 m, Shelf Scale 85 m): flat tops to build on, a few metres of slope to
+  walk up, easing in from 75 m so nothing kept moves.
+- **Knolls** (Haven Knolls, Knoll Height 4-5 m, Knoll Radius 34-40 m): grassy swells with flat crowns. Their sides stay under
+  about 18 degrees: steeper, the Haven's paint turns to bare ground and from above a ring of it reads as a pit.
+- **A stream and a fishing pond** (Haven Stream, Haven Pond Distance and Radius, Haven Water Bearings): the pond lies out in the
+  meadows past the yard, on the side away from the props (bearings 285-100), chosen among the spots that will do for the
+  shortest way on to the lake or a lower river; a stream from a spring runs round the yard into it, and one runs out of it.
+  A stream may end in a pond (`riverPonds`): it levels down to the pond's water. Some seeds' ponds can't reach water lower
+  than themselves without crossing a river: they lie still, fed by the stream in.
+- `RiverBuilder` now gives each end of a stream the level of the still water it lies in. It used to take one level for both,
+  so a stream from a pond to the lake was dug down to the lake's level all the way (a canyon by the pond).
+
 ## Numbers worth knowing
 
 Measured by the planner on the shipped recipe (seeds 1-7): 27 places every time, 30-35 glades, about 20 falls, 80-100

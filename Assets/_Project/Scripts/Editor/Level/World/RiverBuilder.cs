@@ -20,6 +20,10 @@ public sealed class RiverBuilder : FeatureBuilder
     private float[] surface;
     private float maxHalfWidth;
     private readonly System.Collections.Generic.List<(WaterSurface water, Bounds local)> ponds = new System.Collections.Generic.List<(WaterSurface, Bounds)>();
+    // The level of the still water each end lies in (NaN: none). A stream out of a pond and into the lake has two, and its
+    // water near each end goes to that end's own: one level for both dug the pond's stream down to the lake all the way.
+    private float startLevel = float.NaN;
+    private float endLevel = float.NaN;
     private float[] toPond;
     private float mouthLength;
 
@@ -49,7 +53,7 @@ public sealed class RiverBuilder : FeatureBuilder
         depth = new float[n];
         var raw = new float[n];
         maxHalfWidth = 0f;
-        float level = FindPonds();
+        FindPonds();
         mouthLength = Mathf.Max(10f, river.Width * 2f);
         toPond = new float[n];
         for (int i = 0; i < n; i++)
@@ -62,16 +66,21 @@ public sealed class RiverBuilder : FeatureBuilder
             raw[i] = river.Surface == RiverFeature.SurfaceMode.SplineHeight
                 ? Line.Points[i].y
                 : ground.Height(SplineLine.Flat(Line.Points[i])) - river.SurfaceBelowGround;
-            raw[i] = Mathf.Lerp(raw[i], level, mouth);
+            // Near an end in still water, the water goes to that water's level: the nearer end's, by the way along.
+            float level = i < n / 2 ? (float.IsNaN(startLevel) ? endLevel : startLevel) : (float.IsNaN(endLevel) ? startLevel : endLevel);
+            if (!float.IsNaN(level))
+            {
+                raw[i] = Mathf.Lerp(raw[i], level, mouth);
+            }
         }
 
         surface = Downhill(raw);
         // Running into a pond, it never lies below the pond.
-        if (ponds.Count > 0 && toPond[n - 1] < 0f)
+        if (!float.IsNaN(endLevel) && toPond[n - 1] < 0f)
         {
             for (int i = 0; i < n; i++)
             {
-                surface[i] = Mathf.Max(surface[i], level);
+                surface[i] = Mathf.Max(surface[i], endLevel);
             }
         }
     }
@@ -81,14 +90,14 @@ public sealed class RiverBuilder : FeatureBuilder
     public static float MouthShare(float shore, float length) =>
         float.IsPositiveInfinity(shore) ? 0f : 1f - Mathf.SmoothStep(0f, 1f, shore / Mathf.Max(length, 0.01f));
 
-    // The still water this river's ends lie in. Returns its level (the last, should it have one at each end).
-    private float FindPonds()
+    // The still water this river's ends lie in, and the level of each end's (startLevel, endLevel).
+    private void FindPonds()
     {
         ponds.Clear();
-        float level = 0f;
+        startLevel = endLevel = float.NaN;
         if (Line.Count == 0)
         {
-            return level;
+            return;
         }
 
         Vector2 first = SplineLine.Flat(Line.Points[0]), last = SplineLine.Flat(Line.Points[Line.Count - 1]);
@@ -101,14 +110,15 @@ public sealed class RiverBuilder : FeatureBuilder
             }
 
             Bounds local = filter.sharedMesh.bounds;
-            if (Shore(water, local, first) < 0f || Shore(water, local, last) < 0f)
+            bool atStart = Shore(water, local, first) < 0f, atEnd = Shore(water, local, last) < 0f;
+            if (atStart || atEnd)
             {
                 ponds.Add((water, local));
-                level = water.transform.TransformPoint(new Vector3(local.center.x, local.max.y, local.center.z)).y;
+                float level = water.transform.TransformPoint(new Vector3(local.center.x, local.max.y, local.center.z)).y;
+                startLevel = atStart ? level : startLevel;
+                endLevel = atEnd ? level : endLevel;
             }
         }
-
-        return level;
     }
 
     // Metres from the shore of the pond it joins (negative in the water); infinity where it joins none.

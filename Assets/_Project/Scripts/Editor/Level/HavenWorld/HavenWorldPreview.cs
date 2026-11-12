@@ -300,7 +300,9 @@ public static class HavenWorldPreview
         text.AppendLine($"Glades {plan.Glades.Count}: " + string.Join(", ", plan.Glades.GroupBy(glade => glade.Kind).OrderBy(group => group.Key).Select(group => $"{group.Count()} {group.Key}")));
         text.AppendLine($"Water: lake with {plan.Islands.Count(island => island.Water == plan.Lake)} islands, {plan.Meres.Count} of {recipe.meres.Count} meres with " +
                         $"{plan.Islands.Count(island => island.Water != plan.Lake)} islands, {rivers} rivers, {plan.Rivers.Count - rivers} streams, {plan.Falls.Count} falls, " +
-                        $"{plan.Ponds.Count} ponds ({plan.Springs.Count} springs), {plan.Fords.Count} fords" + (plan.HasBog ? ", a bog" : ""));
+                        $"{plan.Ponds.Count} ponds ({plan.Springs.Count} springs), {plan.Fords.Count} fords" + (plan.HasBog ? ", a bog" : "")
+                        + (plan.HavenPond != null ? $"; in the Haven a fishing pond {plan.HavenPond.Position.magnitude:0} m out and {plan.HavenStreams.Count} streams" : "; no fishing pond in the Haven")
+                        + $", {plan.Knolls.Count} knolls");
         text.AppendLine($"Cliffs {plan.CliffMetres:0} m, {plan.DressedCliffMetres:0} m with rock stood along them in {plan.Cliffs.Count} lines; {plan.Scrambles.Count} scrambles");
         text.AppendLine($"Paths {plan.PathMetres:0} m in {plan.Paths.Count}: " + string.Join(", ", plan.PathKinds.GroupBy(kind => kind).OrderBy(group => group.Key).Select(group => $"{group.Count()} {group.Key}")));
         text.AppendLine($"Along the way: {plan.TrailScenes.Count} scenes, {plan.Junctions.Count} junction markers, {plan.GladeProps.Count} glade props, {plan.Rocks.Count} mountain rocks");

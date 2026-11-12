@@ -255,7 +255,7 @@ public static class HavenBuildings
             Badge = $"{level + 1}/{most + 1}",
             State = HavenEntryState.Good,
             Status = $"The ward reaches {radius}.",
-            Description = "Everything in Safe Haven is built inside the portal's ward. Renown and strengthening it at the portal both widen it.",
+            Description = "Build anywhere in the Haven's meadows. The portal's ward keeps the ground nearest it safe at night: renown and strengthening it at the portal both widen it.",
         };
         if (HomePortal.Current != null)
         {

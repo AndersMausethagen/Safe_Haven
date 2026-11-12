@@ -25,7 +25,9 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
    ARCHITECTURE "Co-op by default": what is saved is shared (HavenSync), what moves has one runner (CoopHorses' keeper
    model, Valheim's ownership), Haven decisions go where the Haven is kept (`HavenDecisions` + `CoopDecisions`, five made
    so). Left: trades, workshop queues, portal repair; lift CoopHorses' runner core into a base when a second thing moves.)
-6. The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.
+6. ~~The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.~~
+   (done 2026-11-12: HavenWorldDesign "The Haven itself"; `HomePortal` builds over Haven Meadows. Checked in the Editor and
+   in Play: 64% of the meadows can be built on, 23% too uneven, 13% water. Not yet walked by hand.)
 7. The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.
 8. Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait
    easier; the size on the fish item (looks only), and the biggest catch in the journal.

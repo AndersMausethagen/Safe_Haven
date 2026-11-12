@@ -366,4 +366,77 @@ public sealed class HavenWorldPlanTests
         Vector2 out_ = at + HavenWorldPlan.Dir(bearing) * 8f;
         Assert.That(plan.Lake.Edge(out_), Is.LessThan(plan.Lake.Edge(at)), "The landing does not run out over the water.");
     }
+
+    [Test]
+    public void TheHaven_HasAFishingPond_FedByAStreamThroughItsMeadows([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        Assert.That(plan.HavenPond, Is.Not.Null, "No fishing pond in the Haven.");
+        Assert.That(plan.HavenPond.Position.magnitude - plan.HavenPond.Reach, Is.GreaterThan(recipe.yard), "The pond lies in the yard.");
+        Assert.That(plan.HavenPond.Position.magnitude, Is.LessThan(recipe.haven), "The pond is outside the Haven's meadows.");
+        // Always a stream in; a stream out where the lake or a lower river can be reached without crossing another river (the
+        // shipped world's seed has both; some seeds' ponds lie still).
+        Assert.That(plan.HavenStreams.Count, Is.InRange(1, 2), "The pond wants a stream in (and one out where it can).");
+        foreach (int stream in plan.HavenStreams)
+        {
+            foreach (Vector2 point in plan.Rivers[stream])
+            {
+                Assert.That(point.magnitude, Is.GreaterThan(recipe.yard), "A Haven stream runs through the yard.");
+            }
+
+            float[] levels = Enumerable.Range(0, plan.Rivers[stream].Count).Select(knot => plan.RiverLevel(stream, knot)).ToArray();
+            for (int k = 1; k < levels.Length; k++)
+            {
+                Assert.That(levels[k], Is.LessThanOrEqualTo(levels[k - 1] + 0.001f), "A Haven stream runs uphill.");
+            }
+        }
+
+        // The stream in comes down to the pond's level; the one out leaves at it.
+        int into = plan.HavenStreams[0];
+        Assert.That(plan.HavenPond.Edge(plan.Rivers[into][plan.Rivers[into].Count - 1]), Is.LessThan(0f), "The first Haven stream doesn't end in the pond.");
+        Assert.That(plan.RiverLevel(into, plan.Rivers[into].Count - 1), Is.EqualTo(plan.HavenPond.Level + 0.05f).Within(0.01f));
+        if (plan.HavenStreams.Count == 2)
+        {
+            int outOf = plan.HavenStreams[1];
+            Assert.That(plan.HavenPond.Edge(plan.Rivers[outOf][0]), Is.LessThan(0f), "The second Haven stream doesn't leave the pond.");
+            Assert.That(plan.RiverLevel(outOf, 0), Is.LessThanOrEqualTo(plan.HavenPond.Level + 0.01f));
+        }
+
+        if (seed == recipe.seed)
+        {
+            Assert.That(plan.HavenStreams.Count, Is.EqualTo(2), "The shipped world's pond has a stream in and one out.");
+        }
+    }
+
+    [Test]
+    public void TheYard_StaysAsLevelAsEver_WhereSavedBuildingsStand([Values(1, 7)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        for (float r = 0f; r <= recipe.yard; r += 5f)
+        {
+            for (float bearing = 0f; bearing < 360f; bearing += 15f)
+            {
+                Vector2 point = HavenWorldPlan.Dir(bearing) * r;
+                Assert.That(plan.Shelf(point), Is.EqualTo(0f), $"A shelf in the yard at {point}.");
+                Assert.That(plan.KnollAt(point), Is.EqualTo(0f), $"A knoll in the yard at {point}.");
+            }
+        }
+    }
+
+    [Test]
+    public void AKnoll_HasAFlatCrown_ToBuildOn([Values(1, 7, 23)] int seed)
+    {
+        HavenWorldPlan plan = HavenWorldPlan.Make(recipe, seed);
+        // As many as the recipe asks where they fit (some seeds' meadows are too crowded with paths and water for the second).
+        Assert.That(plan.Knolls.Count, Is.GreaterThanOrEqualTo(seed == recipe.seed ? recipe.havenKnolls.x : 1));
+        foreach (HavenWorldPlan.Knoll knoll in plan.Knolls)
+        {
+            float crown = plan.Ground(knoll.At);
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 point = knoll.At + HavenWorldPlan.Dir(i * 45f) * 3.5f;
+                Assert.That(Mathf.Abs(plan.Ground(point) - crown), Is.LessThan(0.5f), $"The knoll at {knoll.At} has an uneven crown.");
+            }
+        }
+    }
 }

@@ -145,7 +145,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
 
         if (!HasBuildArea)
         {
-            GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven, inside the portal's ward.", MessageKind.Warning);
+            GameMessages.Post(Area != null ? Area.WhyClosed : "You can only build in Safe Haven.", MessageKind.Warning);
             return;
         }
 
@@ -427,7 +427,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
     // be paid for.
     private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
     {
-        string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven, inside the portal's ward.";
+        string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven.";
         if (refused != null)
         {
             GameMessages.Post(refused, MessageKind.Warning);

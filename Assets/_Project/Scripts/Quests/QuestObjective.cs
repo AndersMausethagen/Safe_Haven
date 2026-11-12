@@ -455,7 +455,7 @@ public sealed class QuestObjective
             case ObjectiveType.CraftItem:
                 return $"Craft {count} {(item != null ? Name(item) : Name(resource))}";
             case ObjectiveType.BuildStructure:
-                return $"Build {(Amount == 1 ? "a" : count)} {(building != null ? building.DisplayName : Amount == 1 ? "structure" : "structures")} (build menu: G)";
+                return $"Build {(Amount == 1 ? "a" : count)} {(building != null ? building.DisplayName : Amount == 1 ? "structure" : "structures")} (build menu: {{key:Build}})";
             case ObjectiveType.CompleteRaids:
                 string verb = mustExtract ? "Extract from" : "Complete";
                 string where = raid != null ? $" in {raid.DisplayName}" : "";
