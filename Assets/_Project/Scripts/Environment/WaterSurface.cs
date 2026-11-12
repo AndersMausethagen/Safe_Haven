@@ -183,7 +183,7 @@ public sealed class WaterSurface : MonoBehaviour
     }
 
     // The terrain's height under a point; far below when no terrain is there (open water then).
-    private static float GroundBelow(Vector3 point)
+    public static float GroundBelow(Vector3 point)
     {
         foreach (Terrain terrain in Terrain.activeTerrains)
         {

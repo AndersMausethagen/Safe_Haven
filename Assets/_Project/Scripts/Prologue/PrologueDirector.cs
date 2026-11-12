@@ -418,6 +418,8 @@ public sealed class PrologueDirector : MonoBehaviour
 
     private IEnumerator EndSequence(bool overwhelmed)
     {
+        // The ending takes the camera and the controls: a story cinematic still playing gives them up first.
+        InGameCinematic.StopAll();
         health.AddInvulnerability(this);
         ClearEnemies();
         portalVisual.SetActive(true);

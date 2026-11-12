@@ -76,6 +76,9 @@ Shader "Safe Haven/Tree Wind"
         #define TREE_MAX_PUSHERS 8
         float4 _GrassInteractors[TREE_MAX_PUSHERS]; // world position, radius (GrassInteractor, shared with the grass)
         float _GrassInteractorCount;
+        #define TREE_MAX_BENDERS 4
+        float4 _TreeBenders[TREE_MAX_BENDERS]; // x, z, radius, lean in radians (TreeBender: a giant shoving through)
+        float _TreeBenderCount;
         float _SafeHavenTreeWind; // tree strength (WindZone Main), 0 = still; time is real seconds like the preview
         float4 _SafeHavenSeason; // Seasons: x autumn colour, y leaf fall, z frost (all 0 outside a season cycle)
 
@@ -170,6 +173,45 @@ Shader "Safe Haven/Tree Wind"
             return TransformWorldToObjectDir(float3(aside.x, -dot(aside, aside) * 0.3, aside.y), false);
         }
 
+        // A whole tree leaning away from a giant shoving past (TreeBender), in object space: the trunk is pushed from its
+        // base, so the crown (sway 1) moves most and the foot (sway 0) not at all, bowing on a curve and dipping a little
+        // as it leans so it doesn't stretch. It trembles while shoved.
+        float3 BendOS(float sway)
+        {
+            int count = (int)min(_TreeBenderCount, TREE_MAX_BENDERS);
+            if (count <= 0 || sway <= 0.0)
+            {
+                return float3(0.0, 0.0, 0.0);
+            }
+
+            float3 baseWS = TransformObjectToWorld(float3(0.0, 0.0, 0.0));
+            float2 lean = float2(0.0, 0.0);
+            for (int i = 0; i < count; i++)
+            {
+                float4 bender = _TreeBenders[i];
+                float2 away = baseWS.xz - bender.xy;
+                float distance = length(away);
+                float reach = saturate(1.0 - distance / max(bender.z, 1e-3));
+                reach = reach * reach * (3.0 - 2.0 * reach);
+                lean += (distance > 1e-3 ? away / distance : float2(1.0, 0.0)) * reach * bender.w;
+            }
+
+            float angle = length(lean);
+            if (angle < 1e-4)
+            {
+                return float3(0.0, 0.0, 0.0);
+            }
+
+            float scaleY = length(float3(UNITY_MATRIX_M._m01, UNITY_MATRIX_M._m11, UNITY_MATRIX_M._m21));
+            float height = max(_TreeHeight * scaleY, 1.0);
+            angle = min(angle, 0.75) * (1.0 + 0.12 * sin(_Time.y * 8.0 + SeasonTreeHash() * 6.2831853));
+            float2 direction = lean / length(lean);
+            float bow = sway * sway;
+            float2 aside = direction * sin(angle) * height * bow;
+            float dip = (1.0 - cos(angle)) * height * bow;
+            return TransformWorldToObjectDir(float3(aside.x, -dip, aside.y), false);
+        }
+
         // Where the wind has the vertex at a moment, in object space.
         float3 WindPositionOS(Attributes input, float time)
         {
@@ -179,7 +221,7 @@ Shader "Safe Haven/Tree Wind"
             float3 moved;
             TreeWind_float(input.positionOS.xyz, input.normalOS, input.wind, input.windPhase,
                 time, _WindStrength * _SafeHavenTreeWind, _TreeHeight, dirOS, moved);
-            return moved + PushOS(moved, input.wind.y);
+            return moved + PushOS(moved, input.wind.y) + BendOS(input.wind.x);
         }
 
         float3 WindPositionWS(Attributes input)

@@ -79,8 +79,10 @@ The morning in the meadow (`Prologue_MistyWoods`, under **Prologue Meadow › Mo
   (When Object Is Hit, When Player Does) towards the bronze quest. **A Moment of Warmth** ends the rest 9 s after the player talks to
   someone (or after 45 s) with Start Quest, so the wolves cut the conversation short. **They Remember** has the companions mention the
   errands and why the player came, and shortens later quests. **What Sigrid Knows** answers at the stones what was asked by the fire.
-  **The Old Troll Returns** walks it to the stones during the portal hold, its blow landing as the minute ends (40 s wait, 19 s walk, 0.8 s swing). Change its Waits with the
-  hold's length.
+  **The Old Troll Returns** (built by `BuildPrologueMeadow.Troll`) brings it at 36 s of the portal hold with Play Cinematic (it
+  breaks out of the trees, roars), walks it down the low ground east of the crag (Move Object with Follow Ground, two legs) and
+  lands its blow as the minute ends (36 + 3 + 2.4 roar + 9.7 + 7.9, then 0.8 s swing); a Focus Camera with Even In A Fight shows
+  the fist coming down. Change its Waits and walks with the hold's length (`PrologueMeadowTests` checks they add up).
 - **The Forest Closes In:** When Quest Event (Entered the Forest) › Lightning, Shake Camera, Play Sound, Say Aside. What stays
   changed (the look, the mist and rain, the night, the torches, the open way in) is not here but in the event's **Scene
   Reaction**, so it comes back at once after loading.
@@ -97,10 +99,11 @@ The intro in the forest (under **Intro Moments**, built by `AgentScripts/BuildIn
 - **Troll Ambush:** When Player Comes Near (the berry clearing, every time) › Has It Happened? (Troll Ambush) › No ›
   Check Quest (Berries for the Pot) › Active › Raise Quest Event (Troll Ambush) › Wait › Say (Runa) + Spawn Enemies.
   When Enemies Are Defeated › Say (Runa).
-- **The Old Troll:** When Quest Starts (Something Is Coming) › Show Object (the troll) › Shake Camera + Play Sound +
-  Lightning + Start Glowing + Move Object (it walks towards the fire) + Focus Camera › Say (Sigrid, Runa, Sigrid);
-  its `CreatureFootfalls` produces sound and smaller shakes as it actually walks. Move Object's Animation Speed slows its
-  gait, and the disabled AI's animation driver does not overwrite the story movement.
+- **The Old Troll** (now built by `BuildPrologueMeadow.Troll`, 2026-11-12): When Quest Starts (Something Is Coming) › Move
+  Object (to its start) › Show Object › Play Cinematic (*The Old Troll Comes*: out of the trees, the roar, beside it as it goes
+  for the fire) + Lightning, Glow, Shake, Play Sound + Move Object › Play Animation (Roar) + roar sound › Move Object; after the
+  cinematic Creature Hunts (to the fire, slow); Say Aside (Sigrid, Runa, Sigrid) › Focus Camera (Even In A Fight) on the old
+  path north. Its `CreatureFootfalls` produces sound and shakes as it walks, `TreeBender` leans the trees away.
 
 The home quest line (`SafeHaven`, under **Home Moments**, built by `AgentScripts/BuildHomeStory.cs`):
 

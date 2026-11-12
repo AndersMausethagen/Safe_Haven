@@ -32,6 +32,28 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
         public Color colour = new Color(0.55f, 0.6f, 0.5f, 1f);
     }
 
+    /// <summary>How the fish you can see swim (FishInTheWater): deep and unhurried, now and then up to sip a fly.</summary>
+    [Serializable]
+    public sealed class SwimTuning
+    {
+        [Tooltip("Metres a second when cruising, slow to brisk (each fish picks its own, big ones a little faster).")]
+        public Vector2 cruiseSpeed = new Vector2(0.22f, 0.55f);
+        [Tooltip("Metres a second when it bolts (someone wading in, a float landing on it).")]
+        public Vector2 boltSpeed = new Vector2(1.8f, 2.6f);
+        [Tooltip("How deep it likes to swim, as a share of the water's depth under it.")]
+        public Vector2 depthShare = new Vector2(0.5f, 0.85f);
+        [Tooltip("Metres: the shallowest and the deepest it cruises at, however deep the water (deeper, it can't be seen).")]
+        public Vector2 depthRange = new Vector2(0.35f, 1.4f);
+        [Tooltip("Seconds between one fish's rises to the surface to take a fly, least and most.")]
+        public Vector2 riseEvery = new Vector2(16f, 50f);
+        [Tooltip("Degrees a second a fish of 30 cm turns at most; small ones turn quicker, big ones slower.")]
+        [Min(10f)] public float turnRate = 120f;
+        [Tooltip("Tail beats a second at cruising speed; they quicken when it bolts and slow when it glides.")]
+        [Min(0.2f)] public float tailBeats = 2.4f;
+        [Tooltip("Played where a fish takes a fly at the surface (quiet: a sip, a bubble or two).")]
+        public SoundDefinition riseSound;
+    }
+
     /// <summary>The fight with a hooked fish (FishFight). Seconds and metres; pairs run from a lazy fish to a fighter.</summary>
     [Serializable]
     public sealed class FightTuning
@@ -99,6 +121,8 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     [SerializeField] private GameObject splashEffect;
     [Tooltip("What the landed fish is drawn with (its shape is made in code; Fish › Colour tints it).")]
     [SerializeField] private Material fishMaterial;
+    [Tooltip("How the fish in the water swim.")]
+    [SerializeField] private SwimTuning swimming = new SwimTuning();
 
     [Header("Animation (shares of the clips)")]
     [Tooltip("Where the throw (Fish Cast) stops at the top of the backswing while a cast is being charged.")]
@@ -166,6 +190,7 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
     public float HaulKilograms => haulKilograms;
     public GameObject SplashEffect => splashEffect;
     public Material FishMaterial => fishMaterial;
+    public SwimTuning Swimming => swimming ??= new SwimTuning();
     public float CastHoldPoint => castHoldPoint;
     public float CastReleasePoint => Mathf.Max(castHoldPoint, castReleasePoint);
     public float LandLiftPoint => landLiftPoint;

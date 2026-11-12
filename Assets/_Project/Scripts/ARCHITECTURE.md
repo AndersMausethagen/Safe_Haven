@@ -260,7 +260,9 @@ These are shared quest-system features, not prologue rules:
   and starts the next. Reading, closing or replaying an obsolete choice cannot accept another quest.
 - **Available Objective** is optional tracker text shown once prerequisites are complete, before acceptance. Use it
   for instructions such as "Speak to the Smith". `QuestWaypoint` can point to an **Available**, **Active** or
-  **Ready To Turn In** quest, so task locations and return-to-giver locations are separate authored waypoints.
+  **Ready To Turn In** quest, so task locations and return-to-giver locations are separate authored waypoints. Waypoints
+  show on the minimap and the world map (M) too; one with **Until Gathered** goes once its gathering spot is used, though the
+  quest goes on: each of the Haven's three rootbound stones has one for The Rootbound Stones (`BuildFirstAct.Marks`).
 - **Announce Start** and **Announce Completion** control messages and quest sounds. Intermediate chain stages can
   be silent while preserving their progress, rewards, lifecycle events, scene reactions and story pacing.
 - `QuestTimers.Set/Clear` raises `Changed`, so registering a clock after a quest starts updates the tracker immediately.
@@ -546,8 +548,14 @@ anchor ("Catch Firefly") that gives a Firefly. Content: `AgentScripts/BuildFiref
 
 **Fish you can see, and their sizes (2026-11-12).** `FishInTheWater` (made by itself in every scene) keeps a few fish of the
 kinds that bite there swimming under the open water round the player (`FishingSettings.PickFish`, about one to 60 square
-metres, two to eight a water, 22 in all, gone past 55 m): they wander, rest, and scatter from a player wading in or a float
-landing on them; drawn with the landed fish's shape (`FishingLine.SharedFishMesh`) and Fish Material tinted by kind. A cast
+metres, two to eight a water, 22 in all, gone past 55 m). How they swim is `FishingSettings` › Swimming (`SwimTuning`): deep
+(a share of the water under them, 0.35-1.4 m), cruising in a few tail beats and a glide, turning in curves at a rate set by
+size, now and then hanging still; every 16-50 s one rises a little way ahead to sip a fly at the top (a `WaterRipples` stamp,
+the quiet Fish Rise sound from `Tools/Audio/fishing.py rise`) and dives again; a wader or a float landing on one makes it bolt
+deeper. Each has its own copy of the landed fish's shape (`FishingLine.SharedFishMesh`), bent every frame in a wave running
+from head to tail and curving into turns (only when seen and within 45 m), with Fish Material tinted by kind. The shape once
+had NaN corners at the mouth (a fractional power of a sin(pi) a hair below zero), drawn as a black head on a pale body: the
+"tadpoles"; `FishSizeTests.TheFishShape_HasNoBrokenCorners` guards it. A cast
 `Attract`s one of those near the float, chosen by `FishSizes.BiteWillingness` (big fish are wary, less so on good bait), and
 at the strike `PlayerFishing` takes that fish (`TakeBiter`) as the hooked one; with none it rolls one of the water's unseen fish.
 `FishSizes` (plain rules): a length in cm from a log-normal curve (median 33 cm times the kind's Length Scale, spread 0.45:
@@ -1863,6 +1871,34 @@ It is made like the opening, from `AgentScripts/BuildPrologueEndCinematic.cs` (a
 voicePrefix)` names the cinematic's files and sets their import settings, then `Shot`, `Painting`, `Glow`, `Specks`,
 `Mist`, `Snow`, `Vignette`, `Bed`, `Keys` and `Save`. A builder script is then only what is in each shot. Where a glow
 sits (u, v from the painting's bottom left) is read off the painting; both scripts keep those numbers together.
+
+## In-game cinematics: epic moments in the game's own camera (2026-11-12)
+
+For a moment the player should *see* (the old troll breaking out of the trees), not the painted 2D cinematics above:
+`InGameCinematic` (a scene component, GameObject › Safe Haven › In-Game Cinematic) holds a list of `CameraShot`s. A shot frames
+a subject (empty: the player): the camera's start and end offsets in the subject's facing (x right, y up, z ahead) or in the
+world, a look offset or another Look At, a field of view from start to end, an ease, a glide in from the last shot or a cut,
+and whether the camera rides with the subject or stays where it was and only turns to keep looking. `CameraShot.Evaluate` is
+plain maths (tested in `InGameCinematicTests`); the inspector looks through each shot's start and end in the Scene view.
+While one plays, `CinematicView` has its own Cinemachine camera above the player's (the brain glides in and out over Blend
+In/Out), black bars, every HUD canvas switched off (the Dialogue Box stays: lines are subtitles over the bars; a pause shows the
+HUD again), the fog of war faded out (`AtmosphereFeature.WarScale`: it is laid on the player's ground and showed as black bands
+from a camera elsewhere), the player held and unhurt, and a hold-Space (pad A) skip. Its shake is `CinematicShake`, the game's
+trauma played as a slow sway: the game's own 22 Hz shake, meant for the high camera, juddered close up. The subject is
+followed eased (its height and turning over Steadiness, so a giant on rough ground doesn't bump the shot), and is read at the
+end of the frame a shot starts, after the story's other branches have turned it. Time is game time, so it keeps step with
+the story's Waits. Only the camera is the cinematic's: what happens is the story graph's other branches (**Play Cinematic**,
+which plays in a fight too, unlike Focus Camera; **Play Animation** by state name; Move Object's **Follow Ground**; Focus
+Camera's **Even In A Fight** for a glance the player keeps control through). `PrologueDirector.EndSequence` ends any playing
+first (`InGameCinematic.StopAll`).
+
+**The old troll** has two: at the night camp (`Cinematic - The Old Troll Comes`, under Intro Moments) it breaks out of the
+trees, roars and goes for the fire; at the stones (`Cinematic - The Old Troll Returns`, Morning Moments) it comes down the low
+ground east of the crag, roars, and its fist still lands as the minute runs out. Both stories are built by
+`BuildPrologueMeadow` (`--entry BuildPrologueMeadow.Troll` for these alone; Moments makes the same). Trees lean away from it:
+`TreeBender` (on the troll; radius, lean in degrees, a creak for each tall tree it reaches) sends up to four shovers to
+`Shaders/TreeWind.shader` (`_TreeBenders`), which bows a whole tree from its foot by its sway channel, trembling; small plants
+are already pushed by `GrassInteractor`, which it also has. A changed `.shader` needs a reimport: `unity recompile` doesn't.
 
 ## Spoken dialogue: a recording for a line, found by who says it and what they say
 

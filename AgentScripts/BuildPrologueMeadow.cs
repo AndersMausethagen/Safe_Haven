@@ -1279,6 +1279,8 @@ public static class BuildPrologueMeadow
         troll.localScale = Vector3.one * 1.3f;
         foreach (SkinnedMeshRenderer skin in troll.GetComponentsInChildren<SkinnedMeshRenderer>(true))
             skin.sharedMaterial = Load<Material>("Assets/_Project/Art/Enemies/MossTroll.mat");
+        TrollBody(troll);
+        FirstTroll(intro, troll, sigrid, runa);
         Transform[] runners = Runners(root);
         Transform behind = RoadBehind(root);
         Secrets(root);
@@ -2438,15 +2440,192 @@ public static class BuildPrologueMeadow
         Link(stones, (touching, 0, pause), (pause, 0, herHand), (herHand, 0, notForMe), (notForMe, 0, asked), (asked, 0, owns), (asked, 1, silent),
             (owns, 0, sawOne), (silent, 0, sawOne), (sawOne, 0, same));
 
-        // ----- The old troll comes for the stones -----
+        // ----- The old troll comes for the stones (its cinematic and story: TrollReturns) -----
+        TrollReturns(moments, troll, sigrid, runa);
+    }
+
+    // ===== The old troll: shown as it comes (the user, 2026-11-12) =====
+    // Both of its stories are fights (a Creature Hunts in each), and Focus Camera stays with the player in a fight, so the
+    // troll was never shown. Each appearance is now an In-Game Cinematic: it breaks out of the trees (TreeBender leans
+    // them away), roars, and is seen heading for the fire or the stones.
+
+    /// <summary>Only the troll's two stories and their cinematics (`--entry BuildPrologueMeadow.Troll`); Moments makes the same.</summary>
+    public static string Troll()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+
+        PrologueCompanion[] companions = Object.FindObjectsByType<PrologueCompanion>(FindObjectsInactive.Include);
+        Transform Person(string name) => companions.First(c => c.Resident != null && c.Resident.DisplayName == name).transform;
+        Transform sigrid = Person("Sigrid"), runa = Person("Runa");
+        Transform intro = GameObject.Find("Intro Moments").transform;
+        Transform moments = GameObject.Find("Prologue Meadow/Morning Moments").transform;
+        Transform troll = intro.Find("The Old Troll (story)");
+        TrollBody(troll);
+        FirstTroll(intro, troll, sigrid, runa);
+        TrollReturns(moments, troll, sigrid, runa);
+        StoryBuilder.Finish();
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        string problems = string.Join("; ", new[] { intro.Find("Story - The Old Troll"), moments.Find("Story - The Old Troll Returns") }
+            .Select(t => t.GetComponent<StoryScript>()).SelectMany(s => s.FindProblems().Select(p => s.name + ": " + p)));
+        return $"troll stories rebuilt; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
+    }
+
+    // It shoves the trees aside (creaking) and flattens the grass where it treads.
+    private static void TrollBody(Transform troll)
+    {
+        TreeBender bender = troll.GetComponent<TreeBender>();
+        if (bender == null) bender = troll.gameObject.AddComponent<TreeBender>();
+        var data = new SerializedObject(bender);
+        data.FindProperty("radius").floatValue = 6.5f;
+        data.FindProperty("lean").floatValue = 20f;
+        data.FindProperty("creak").objectReferenceValue = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Tree Creak.asset");
+        data.FindProperty("creakGap").floatValue = 0.8f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        GrassInteractor grass = troll.GetComponent<GrassInteractor>();
+        if (grass == null) grass = troll.gameObject.AddComponent<GrassInteractor>();
+        grass.Radius = 1.6f;
+        EditorUtility.SetDirty(grass);
+    }
+
+    // A place in the story, made once and moved on each run (so a run of Troll alone doesn't pile them up).
+    private static Transform Spot(Transform root, string name, float x, float z)
+    {
+        Transform spot = root.Find(name);
+        if (spot == null)
+        {
+            spot = new GameObject(name).transform;
+            spot.SetParent(root, false);
+        }
+
+        spot.position = Ground(x, z);
+        return spot;
+    }
+
+    private static InGameCinematic Cinematic(Transform root, string name, float blendIn, float blendOut, params CameraShot[] shots)
+    {
+        Transform old = root.Find(name);
+        if (old != null) Object.DestroyImmediate(old.gameObject);
+        var go = new GameObject(name);
+        go.transform.SetParent(root, false);
+        var cinematic = go.AddComponent<InGameCinematic>();
+        var data = new SerializedObject(cinematic);
+        data.FindProperty("blendIn").floatValue = blendIn;
+        data.FindProperty("blendOut").floatValue = blendOut;
+        data.FindProperty("revealRadius").floatValue = 22f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        // The list is set on the object itself, then marked dirty, rather than field by field through SerializedProperty.
+        typeof(InGameCinematic).GetField("shots", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .SetValue(cinematic, shots.ToList());
+        EditorUtility.SetDirty(cinematic);
+        return cinematic;
+    }
+
+    // It breaks out of the trees towards the camera, which stands where it will pass.
+    private static CameraShot Emerges(Transform troll, float seconds) => new CameraShot
+    {
+        name = "Out of the trees", seconds = seconds, subject = troll, lookOffset = new Vector3(0f, 3.2f, 0f),
+        startOffset = new Vector3(-3.5f, 1.4f, 12f), endOffset = new Vector3(-2.8f, 1.3f, 10.5f), followSubject = false,
+        startFieldOfView = 46f, endFieldOfView = 42f, ease = CameraShot.Ease.EaseOut,
+    };
+
+    // Low and close as it throws its head back.
+    private static CameraShot Roars(Transform troll, float seconds) => new CameraShot
+    {
+        name = "The roar", seconds = seconds, subject = troll, lookOffset = new Vector3(0f, 4.3f, 0.6f),
+        startOffset = new Vector3(3f, 2.6f, 8.5f), endOffset = new Vector3(2.2f, 2.4f, 7f),
+        startFieldOfView = 46f, endFieldOfView = 36f, ease = CameraShot.Ease.EaseOut,
+    };
+
+    // ----- At the night camp: it comes for the fire -----
+    private static void FirstTroll(Transform intro, Transform troll, Transform sigrid, Transform runa)
+    {
+        StorySpeaker S() => Speaker(sigrid, "Sigrid");
+        StorySpeaker R() => Speaker(runa, "Runa");
+        SayNode Aside(StorySpeaker who, string line) => new SayNode { speaker = who, line = line, aside = true, afterFightPause = false };
+        SoundDefinition stomp = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/TrollStep.asset");
+        Transform shelter = GameObject.Find("Rock Shelter").transform;
+        Transform oldPath = intro.Find("Story - The Old Troll/Old Path North (camera)");
+        Transform home = Spot(intro, "Old Troll Starts (camp)", 30f, -65f);
+        Vector3 toFire = Vector3.ProjectOnPlane(shelter.position - home.position, Vector3.up).normalized;
+        Transform roarAt = Spot(intro, "Old Troll Roars (camp)", home.position.x + toFire.x * 5f, home.position.z + toFire.z * 5f);
+        troll.SetPositionAndRotation(home.position, Quaternion.LookRotation(toFire));
+
+        InGameCinematic comes = Cinematic(intro, "Cinematic - The Old Troll Comes", 0.9f, 1.4f,
+            Emerges(troll, 3.4f),
+            Roars(troll, 3f),
+            // Beside it as it strides on for the fire, the trees leaning out of its way. (Over its shoulder towards the fire
+            // the camera saw rock and the dark of the unexplored wood, not the troll: 2026-11-12.)
+            new CameraShot
+            {
+                name = "It goes for the fire", seconds = 3.2f, subject = troll, lookOffset = new Vector3(0f, 3.4f, 2f),
+                startOffset = new Vector3(-10f, 4.5f, 3f), endOffset = new Vector3(-9.5f, 4.8f, 5f),
+                startFieldOfView = 46f, endFieldOfView = 44f, ease = CameraShot.Ease.Linear,
+            });
+
+        StoryScript story = Story(intro, "Story - The Old Troll");
+        var leaving = new WhenQuest { quest = Existing("ReachPortal"), when = WhenQuest.Moment.Starts };
+        var place = new MoveObjectNode { target = troll, destination = home, seconds = 0f, waitUntilArrived = true, followGround = true };
+        var show = new SetActiveNode { target = troll.gameObject, active = true };
+        var play = new PlayCinematicNode { cinematic = comes };
+        var flash = new LightningNode();
+        var moonlit = new GlowNode { target = troll, colour = new Color(0.55f, 0.65f, 0.85f), intensity = 9f, range = 22f, fadeSeconds = 0.6f };
+        var shake = new ShakeCameraNode { strength = 0.75f };
+        var step = new PlaySoundNode { sound = stomp, at = troll };
+        var flashAgain = new WaitNode { seconds = 1.6f };
+        var secondFlash = new LightningNode();
+        var thunder = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset"), at = troll };
+        // Out of the trees, then it stops and roars.
+        var walk = new MoveObjectNode { target = troll, destination = roarAt, seconds = 3.4f, animationSpeed = 0.7f, waitUntilArrived = true, followGround = true };
+        var roar = new PlayAnimationNode { target = troll, state = "Roar", crossFade = 0.2f, waitSeconds = 2.6f };
+        var roarSound = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Creatures/Old Troll Call.asset"), at = troll };
+        var roarShake = new ShakeCameraNode { strength = 0.9f };
+        // On a few strides while the camera walks beside it.
+        Transform strideTo = Spot(intro, "Old Troll Strides On (camp)", roarAt.position.x + toFire.x * 4.5f, roarAt.position.z + toFire.z * 4.5f);
+        var strides = new MoveObjectNode { target = troll, destination = strideTo, seconds = 3.2f, animationSpeed = 0.7f, waitUntilArrived = true, followGround = true };
+        // Then it goes for the fire on its own feet (a puppet until now), and the camera comes back to the player.
+        var hunts = new CreatureHuntsNode { creature = troll.GetComponent<MonsterAI>(), hunt = true, towards = shelter, walkSpeed = 0.35f, stayWithin = 10f };
+        var seen = new WaitNode { seconds = 6.6f };
+        var sigridSees = Aside(S(), "That is no thunder. An old one, a mountain troll, and it is walking towards our fire.");
+        var runaSees = Aside(R(), "It hasn't seen us yet. It will smell the smoke soon enough.");
+        var go = Aside(S(), "Leave the fire! Take the old path north, to the standing stones. Now!");
+        var showTheWay = new FocusCameraNode { target = oldPath, seconds = 3.5f, revealRadius = 18f, evenInAFight = true };
+        Link(story, (leaving, 0, place), (place, 0, show), (show, 0, play), (show, 0, flash), (show, 0, moonlit), (show, 0, shake), (show, 0, step),
+            (show, 0, flashAgain), (flashAgain, 0, secondFlash), (flashAgain, 0, thunder),
+            (show, 0, walk), (walk, 0, roar), (walk, 0, roarSound), (walk, 0, roarShake), (roar, 0, strides),
+            (play, 0, hunts), (show, 0, seen), (seen, 0, sigridSees), (sigridSees, 0, runaSees), (runaSees, 0, go), (go, 0, showTheWay));
+        if (oldPath == null) Debug.LogWarning("No 'Old Path North (camera)' under the old troll's story: the last look has nothing to look at.");
+    }
+
+    // ----- At the stones: it followed them -----
+    private static void TrollReturns(Transform moments, Transform troll, Transform sigrid, Transform runa)
+    {
+        StorySpeaker S() => Speaker(sigrid, "Sigrid");
+        StorySpeaker R() => Speaker(runa, "Runa");
         var returns = Story(moments, "Story - The Old Troll Returns");
         var hold = new WhenQuest { quest = Existing("HoldPortal"), when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
-        var coming = new WaitNode { seconds = 40f };
-        Transform trollFrom = Mark(moments, "Old Troll Comes From", 3f, 46f);
-        Transform trollTo = Mark(moments, "Old Troll Reaches the Stones", 2.5f, 15f);
+        // The minute: it comes at 36 s, the cinematic takes about 6, it roars at 39 and its fist comes down at 59
+        // (36 + 3 + 2.4 + 9.7 + 7.9), as the minute runs out. Change these with the hold's length.
+        var coming = new WaitNode { seconds = 36f };
+        // Down the low ground east of the crag by the stones (2026-11-12), not over it: walking on the ground now, the
+        // straight way from the north climbed 7 m of rock and fell off it.
+        Transform trollFrom = Spot(moments, "Old Troll Comes From", 16f, 50f);
+        Transform trollRoars = Spot(moments, "Old Troll Roars at the Stones", 16.3f, 45f);
+        Transform trollPasses = Spot(moments, "Old Troll Passes the Crag", 15.5f, 25f);
+        Transform trollTo = Spot(moments, "Old Troll Reaches the Stones", 2.5f, 15f);
+        InGameCinematic returnsShot = Cinematic(moments, "Cinematic - The Old Troll Returns", 0.7f, 1.1f,
+            Emerges(troll, 3f),
+            Roars(troll, 2.8f));
         var appear = new SetActiveNode { target = troll.gameObject, active = true };
-        var place = new MoveObjectNode { target = troll, destination = trollFrom, seconds = 0f, waitUntilArrived = true };
-        var advance = new MoveObjectNode { target = troll, destination = trollTo, seconds = 19f, animationSpeed = 0.7f, waitUntilArrived = true };
+        var place = new MoveObjectNode { target = troll, destination = trollFrom, seconds = 0f, waitUntilArrived = true, followGround = true };
+        var play = new PlayCinematicNode { cinematic = returnsShot };
+        var walk = new MoveObjectNode { target = troll, destination = trollRoars, seconds = 3f, animationSpeed = 0.7f, waitUntilArrived = true, followGround = true };
+        var roar = new PlayAnimationNode { target = troll, state = "Roar", crossFade = 0.2f, waitSeconds = 2.4f };
+        var roarSound = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Creatures/Old Troll Call.asset"), at = troll };
+        var roarShake = new ShakeCameraNode { strength = 0.9f };
+        var pastCrag = new MoveObjectNode { target = troll, destination = trollPasses, seconds = 9.7f, animationSpeed = 0.7f, waitUntilArrived = true, followGround = true };
+        var advance = new MoveObjectNode { target = troll, destination = trollTo, seconds = 7.9f, animationSpeed = 0.7f, waitUntilArrived = true, followGround = true };
         var lit = new GlowNode { target = troll, colour = new Color(0.55f, 0.65f, 0.85f), intensity = 9f, range = 22f, fadeSeconds = 2f };
         var spotted = new SayNode { speaker = R(), line = "It followed us! The old one, coming through the trees, right for the stones!", afterFightPause = false };
         var tremble = new ShakeCameraNode { strength = 0.5f };
@@ -2456,10 +2635,9 @@ public static class BuildPrologueMeadow
         // A puppet while it is walked to the stones: its own mind would turn it on whoever is nearest instead (it was set
         // in the scene by hand once, and a rebuild lost it; it lives here now).
         var puppet = new CreatureHuntsNode { creature = troll.GetComponent<MonsterAI>(), hunt = false };
-        Link(returns, (hold, 0, coming), (coming, 0, appear), (appear, 0, puppet), (puppet, 0, place), (place, 0, advance), (puppet, 0, lit), (puppet, 0, spotted), (puppet, 0, tremble), (puppet, 0, step), (puppet, 0, hurry), (hurry, 0, nearly));
-        var look = new FocusCameraNode { target = Mark(moments, "Between the Troll and the Stones", 2f, 12f), seconds = 4.5f, revealRadius = 22f };
-        // The camera turns while it is still walking; the arm comes down as the minute runs out (40 + 19 + 0.8 + a moment).
-        var turnToLook = new WaitNode { seconds = 15.5f };
+        // The player keeps fighting as it swings; the camera turns to show the fist coming down (55.5 s, for 4.5).
+        var look = new FocusCameraNode { target = Spot(moments, "Between the Troll and the Stones", 2f, 12f), seconds = 4.5f, revealRadius = 22f, evenInAFight = true };
+        var turnToLook = new WaitNode { seconds = 19.5f };
         var swing = new InvokeEventNode();
         Animator trollBody = troll.GetComponentInChildren<Animator>(true);
         if (trollBody != null) UnityEditor.Events.UnityEventTools.AddStringPersistentListener(swing.response, trollBody.SetTrigger, "Attack");
@@ -2467,7 +2645,10 @@ public static class BuildPrologueMeadow
         var crash = new ShakeCameraNode { strength = 1f };
         var flash = new LightningNode();
         var boom = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset"), at = troll };
-        Link(returns, (puppet, 0, turnToLook), (turnToLook, 0, look), (advance, 0, swing), (advance, 0, blow), (blow, 0, crash), (blow, 0, flash), (blow, 0, boom));
+        Link(returns, (hold, 0, coming), (coming, 0, appear), (appear, 0, puppet), (puppet, 0, place), (place, 0, play), (place, 0, walk),
+            (walk, 0, roar), (walk, 0, roarSound), (walk, 0, roarShake), (roar, 0, pastCrag), (pastCrag, 0, advance),
+            (puppet, 0, lit), (puppet, 0, tremble), (puppet, 0, step), (play, 0, spotted), (spotted, 0, hurry), (hurry, 0, nearly),
+            (puppet, 0, turnToLook), (turnToLook, 0, look), (advance, 0, swing), (advance, 0, blow), (blow, 0, crash), (blow, 0, flash), (blow, 0, boom));
     }
 
     /// <summary>The portal remembers why the player came (`--entry BuildPrologueMeadow.HomeEcho`). In SafeHaven, under Home Moments: it speaks once the Waking is over.</summary>

@@ -292,7 +292,9 @@ public sealed class FishingLine
             float t = r / (float)rings;
             float z = Mathf.Lerp(-0.4f, 0.5f, t);
             // Fullest a little ahead of the middle, narrow at the wrist before the tail.
-            float radius = 0.13f * Mathf.Pow(Mathf.Sin(Mathf.Lerp(0.12f, 1f, t) * Mathf.PI), 0.8f) + 0.012f;
+            // Max: sin(pi) comes out a hair below zero, and a fractional power of that is NaN, which drew the head as a
+            // black blob (the "tadpole" fish, 2026-11-12).
+            float radius = 0.13f * Mathf.Pow(Mathf.Max(0f, Mathf.Sin(Mathf.Lerp(0.12f, 1f, t) * Mathf.PI)), 0.8f) + 0.012f;
             for (int a = 0; a < around; a++)
             {
                 float angle = a / (float)around * Mathf.PI * 2f;
@@ -324,17 +326,29 @@ public sealed class FishingLine
             triangles.AddRange(new[] { (a + 1) % around, wrist, a });
         }
 
-        // The tail and the back fin are thin blades, drawn from both sides.
-        int tail = vertices.Count;
-        vertices.Add(new Vector3(0f, 0.17f, -0.62f));
-        vertices.Add(new Vector3(0f, 0f, -0.52f));
-        vertices.Add(new Vector3(0f, -0.15f, -0.6f));
-        triangles.AddRange(new[] { wrist, tail, tail + 1, wrist, tail + 1, tail, wrist, tail + 1, tail + 2, wrist, tail + 2, tail + 1 });
-        int fin = vertices.Count;
-        vertices.Add(new Vector3(0f, 0.13f, 0.12f));
-        vertices.Add(new Vector3(0f, 0.21f, -0.05f));
-        vertices.Add(new Vector3(0f, 0.11f, -0.16f));
-        triangles.AddRange(new[] { fin, fin + 1, fin + 2, fin, fin + 2, fin + 1 });
+        // The tail and the back fin are thin blades, drawn from both sides. Each side has its own corners: shared ones got
+        // normals from both faces that cancelled to zero, and the NaN that made rendered as black blocks (the "tadpole"
+        // head and streak, 2026-11-12).
+        Vector3[] tailBlade = { new Vector3(0f, 0f, -0.42f), new Vector3(0f, 0.17f, -0.62f), new Vector3(0f, 0f, -0.52f), new Vector3(0f, -0.15f, -0.6f) };
+        int[] tailFaces = { 0, 1, 2, 0, 2, 3 };
+        Vector3[] finBlade = { new Vector3(0f, 0.13f, 0.12f), new Vector3(0f, 0.21f, -0.05f), new Vector3(0f, 0.11f, -0.16f) };
+        int[] finFaces = { 0, 1, 2 };
+        foreach ((Vector3[] blade, int[] faces) in new[] { (tailBlade, tailFaces), (finBlade, finFaces) })
+        {
+            foreach (bool back in new[] { false, true })
+            {
+                int first = vertices.Count;
+                // A hair apart, so the two sides never fight over the same pixels.
+                Vector3 side = new Vector3(back ? -0.002f : 0.002f, 0f, 0f);
+                foreach (Vector3 corner in blade) vertices.Add(corner + side);
+                for (int i = 0; i < faces.Length; i += 3)
+                {
+                    triangles.AddRange(back
+                        ? new[] { first + faces[i], first + faces[i + 2], first + faces[i + 1] }
+                        : new[] { first + faces[i], first + faces[i + 1], first + faces[i + 2] });
+                }
+            }
+        }
 
         fishMesh = new Mesh { name = "Hooked Fish" };
         fishMesh.SetVertices(vertices);

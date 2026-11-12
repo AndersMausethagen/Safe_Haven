@@ -29,6 +29,9 @@ public sealed class FocusCameraNode : StoryNode
     [Min(0f)] public float seconds = 3f;
     [Tooltip("Lifts the dark (the night and unexplored ground) this many metres around it while the camera looks, so it can be seen. 0: off.")]
     [Min(0f)] public float revealRadius = 14f;
+    [Tooltip("Turn even when the story is a fight (it has Spawn Enemies or Creature Hunts): the player keeps control, so it " +
+             "suits a glance at what matters (the troll's fist coming down). Off: in a fight the camera stays with the player.")]
+    public bool evenInAFight;
 
     public override string Title => "Focus Camera";
     public override string Category => "Camera & Sound";
@@ -36,7 +39,7 @@ public sealed class FocusCameraNode : StoryNode
     public override IEnumerator Run(StoryContext context)
     {
         // Around a fight the camera stays with the player.
-        if (context.InFight)
+        if (context.InFight && !evenInAFight)
         {
             yield break;
         }
@@ -65,6 +68,44 @@ public sealed class FocusCameraNode : StoryNode
     }
 
     public override string FindProblem() => target == null ? "choose what to look at" : null;
+}
+
+/// <summary>Plays an <see cref="InGameCinematic"/> placed in the scene: its shots take the camera (black bars, the player
+/// held) while the story's other branches make things happen. Unlike Focus Camera it plays in a fight too.</summary>
+[Serializable]
+public sealed class PlayCinematicNode : StoryNode, IStoryWait
+{
+    [Tooltip("The In-Game Cinematic in the scene (GameObject › Safe Haven › In-Game Cinematic, or add the component).")]
+    public InGameCinematic cinematic;
+    [Tooltip("Carry on only once the camera is back with the player. Off: carry on at once, beside it.")]
+    public bool waitUntilFinished = true;
+
+    public float MostSeconds => (cinematic != null ? cinematic.Seconds : 0f) + 2f;
+
+    public override string Title => "Play Cinematic";
+    public override string Category => "Camera & Sound";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        if (cinematic == null)
+        {
+            yield break;
+        }
+
+        cinematic.Play();
+        float giveUpAt = Time.time + MostSeconds;
+        while (waitUntilFinished && cinematic != null && cinematic.IsRunning && Time.time < giveUpAt)
+        {
+            yield return null;
+        }
+    }
+
+    public override string FindProblem()
+    {
+        if (cinematic == null) return "choose the cinematic";
+        foreach (string problem in cinematic.FindProblems()) return problem;
+        return null;
+    }
 }
 
 [Serializable]

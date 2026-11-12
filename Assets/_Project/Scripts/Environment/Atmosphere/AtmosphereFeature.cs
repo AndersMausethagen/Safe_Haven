@@ -35,6 +35,10 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
     /// <summary>Share of Fog Resolution the fog is drawn at: the player's Volumetric Fog setting. 1 is as authored.</summary>
     public static float QualityScale { get; set; } = 1f;
 
+    /// <summary>How much of the fog of war is drawn, 0..1: an in-game cinematic (CinematicView) fades it out while its
+    /// camera is away from the player, where the veil laid on the player's ground would show as black bands.</summary>
+    public static float WarScale { get; set; } = 1f;
+
     private Material material;
     private AtmospherePass pass;
 
@@ -75,7 +79,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         // Fog areas show even in a scene without base fog.
         bool fogOn = fog != null && fog.active && (fog.IsActive() || FogArea.Active.Count > 0
             || TerrainMist.Active.Count > 0 || MistVolume.Active.Count > 0);
-        bool warOn = fogOfWar != null && fogOfWar.IsActive();
+        bool warOn = fogOfWar != null && fogOfWar.IsActive() && WarScale > 0.001f;
         if (!fogOn && !warOn)
         {
             AtmosphereConditions.FogDensity = 0f;
@@ -575,10 +579,11 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
 
             // The fog of war is laid on the ground the player stands on (or well below the camera without a player).
             material.SetFloat(WarGround, Player.Current != null ? Player.Current.transform.position.y : cameraPosition.y - 20f);
-            float unexplored = explore ? fogOfWar.unexplored.value : 0f;
-            float veil = warOn ? fogOfWar.nightVeil.value : 0f;
+            float war = Mathf.Clamp01(WarScale);
+            float unexplored = explore ? fogOfWar.unexplored.value * war : 0f;
+            float veil = warOn ? fogOfWar.nightVeil.value * war : 0f;
             material.SetVector(WarParams, new Vector4(unexplored, veil,
-                warOn ? fogOfWar.veilDesaturation.value : 0f, warOn ? fogOfWar.veilDarkening.value : 0f));
+                warOn ? fogOfWar.veilDesaturation.value * war : 0f, warOn ? fogOfWar.veilDarkening.value * war : 0f));
             if (warOn)
             {
                 material.SetColor(UnexploredColor, fogOfWar.unexploredColor.value.linear);

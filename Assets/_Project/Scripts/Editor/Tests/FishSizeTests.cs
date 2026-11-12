@@ -92,4 +92,15 @@ public sealed class FishSizeTests
         Assert.That(journal.BiggestFish["perch"], Is.EqualTo(41f));
         Assert.That(journal.BiggestFish.Count, Is.EqualTo(2));
     }
+
+    // The fish's shape had NaN corners at the mouth (Pow of a sin(pi) a hair below zero), drawn as a black head on a pale
+    // body: the "tadpoles" the user saw (2026-11-12). Every corner and normal must be a real number, every normal a length.
+    [Test]
+    public void TheFishShape_HasNoBrokenCorners()
+    {
+        Mesh mesh = FishingLine.SharedFishMesh;
+        foreach (Vector3 v in mesh.vertices) Assert.IsFalse(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z), "a corner is NaN");
+        foreach (Vector3 n in mesh.normals) Assert.That(n.magnitude, Is.EqualTo(1f).Within(0.01f), "a normal is NaN or cancelled out");
+        Assert.Greater(mesh.bounds.size.x, 0.05f, "the body has width");
+    }
 }

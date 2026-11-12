@@ -8389,6 +8389,7 @@ MonoBehaviour:
   objective: 0
   label: The trees
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &171047174
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10104,6 +10105,7 @@ MonoBehaviour:
   objective: 0
   label: Eirik
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1001 &219005253
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12255,6 +12257,7 @@ MonoBehaviour:
   objective: 0
   label: Eirik
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1001 &265458139
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14492,6 +14495,87 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4312437267004581866, guid: 79e5700236bb6024eb0da41cc302ed71, type: 3}
   m_PrefabInstance: {fileID: 293984373}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &297102726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 297102727}
+  - component: {fileID: 297102728}
+  m_Layer: 0
+  m_Name: Cinematic - The Old Troll Returns
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &297102727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 297102726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2045702582}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &297102728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 297102726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d7b27f2a187c5d4c8316e42d6301421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::InGameCinematic
+  shots:
+  - name: Out of the trees
+    seconds: 3
+    subject: {fileID: 1803281364}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 3.2, z: 0}
+    space: 0
+    startOffset: {x: -3.5, y: 1.4, z: 12}
+    endOffset: {x: -2.8, y: 1.3, z: 10.5}
+    followSubject: 0
+    startFieldOfView: 46
+    endFieldOfView: 42
+    ease: 2
+    blendIn: 0
+    rumble: 0
+  - name: The roar
+    seconds: 2.8
+    subject: {fileID: 1803281364}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 4.3, z: 0.6}
+    space: 0
+    startOffset: {x: 3, y: 2.6, z: 8.5}
+    endOffset: {x: 2.2, y: 2.4, z: 7}
+    followSubject: 1
+    startFieldOfView: 46
+    endFieldOfView: 36
+    ease: 2
+    blendIn: 0
+    rumble: 0
+  blendIn: 0.7
+  blendOut: 1.1
+  letterbox: 1
+  hideHud: 1
+  holdPlayer: 1
+  skippable: 1
+  revealRadius: 22
+  steadiness: 0.35
 --- !u!1001 &297768015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18238,6 +18322,7 @@ MonoBehaviour:
   objective: 1
   label: Shelter
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &353124754
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23044,7 +23129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 449971399}
   - component: {fileID: 449971401}
-  - component: {fileID: 449971400}
+  - component: {fileID: 449971402}
   m_Layer: 0
   m_Name: Story - The Old Troll Returns
   m_TagString: Untagged
@@ -23067,267 +23152,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2045702582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &449971400
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 449971398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126046329274799
-  - rid: 2623126046329274800
-  - rid: 2623126046329274801
-  - rid: 2623126046329274802
-  - rid: 2623126046329274803
-  - rid: 2623126046329274804
-  - rid: 2623126046329274805
-  - rid: 2623126046329274806
-  - rid: 2623126046329274807
-  - rid: 2623126046329274808
-  - rid: 2623126046329274809
-  - rid: 2623126046329274810
-  - rid: 2623126046329274811
-  - rid: 2623126046329274812
-  - rid: 2623126046329274813
-  - rid: 2623126046329274814
-  - rid: 2623126046329274815
-  - rid: 2623126046329274816
-  - rid: 2623126046329274817
-  links:
-  - from: c3b00ee43d764ffbb82de157f8ec5ca4
-    output: 0
-    to: 7b77c54699c54c47baac93a9e8eab6d8
-  - from: 7b77c54699c54c47baac93a9e8eab6d8
-    output: 0
-    to: 528455e267654df4926ca79b79a1d695
-  - from: 528455e267654df4926ca79b79a1d695
-    output: 0
-    to: b4f136f22ddb413fbe6623381bef46e1
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: a16b1388c5de4bd4ac37d3d7c0f227e0
-  - from: a16b1388c5de4bd4ac37d3d7c0f227e0
-    output: 0
-    to: 6c8ddd073c42410abc2045f00e3589fc
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: 7af11f89712c41cfbb24e4c2c676d7f3
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: ed1accd6e5084732928b37383d78bb5a
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: dd5a9b11d6c24f31a0f086bb3d191fcb
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: 8dd2bd14510443b281b3fd135a896940
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: f8d265cc063e4f03ab567f429b801dc7
-  - from: f8d265cc063e4f03ab567f429b801dc7
-    output: 0
-    to: 780a0ccba4ac4adf98e35bbfc4e7354b
-  - from: b4f136f22ddb413fbe6623381bef46e1
-    output: 0
-    to: 34eedd91dd4a4b0db90401e6725bf3c8
-  - from: 34eedd91dd4a4b0db90401e6725bf3c8
-    output: 0
-    to: 5e3ba5632c4042b19ed1f220fba00818
-  - from: 6c8ddd073c42410abc2045f00e3589fc
-    output: 0
-    to: 54ec45dd1a4a4ecea7af35b43e2cdb6f
-  - from: 6c8ddd073c42410abc2045f00e3589fc
-    output: 0
-    to: bf64633af8694c8f8a0b98c9226738de
-  - from: bf64633af8694c8f8a0b98c9226738de
-    output: 0
-    to: 5ab4bd77a3ce4e7c995245c9c0979788
-  - from: bf64633af8694c8f8a0b98c9226738de
-    output: 0
-    to: e634d2dffedc4adb8a288b5f7e0bff09
-  - from: bf64633af8694c8f8a0b98c9226738de
-    output: 0
-    to: d9b78be7121449f593154f33f9d5ff84
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126046329274799
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: c3b00ee43d764ffbb82de157f8ec5ca4
-        position: {x: 40, y: 60}
-        once: 0
-        quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
-        when: 0
-        alsoAfterLoading: 1
-    - rid: 2623126046329274800
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 7b77c54699c54c47baac93a9e8eab6d8
-        position: {x: 340, y: 60}
-        seconds: 40
-    - rid: 2623126046329274801
-      type: {class: SetActiveNode, ns: , asm: SafeHaven}
-      data:
-        id: 528455e267654df4926ca79b79a1d695
-        position: {x: 640, y: 60}
-        target: {fileID: 1803281363}
-        active: 1
-    - rid: 2623126046329274802
-      type: {class: CreatureHuntsNode, ns: , asm: SafeHaven}
-      data:
-        id: b4f136f22ddb413fbe6623381bef46e1
-        position: {x: 940, y: 60}
-        creature: {fileID: 1803281365}
-        hunt: 0
-        towards: {fileID: 0}
-        walkSpeed: 1
-        stayWithin: 0
-    - rid: 2623126046329274803
-      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
-      data:
-        id: a16b1388c5de4bd4ac37d3d7c0f227e0
-        position: {x: 1240, y: 60}
-        target: {fileID: 1803281364}
-        destination: {fileID: 634338677}
-        seconds: 0
-        animationSpeed: 1
-        waitUntilArrived: 1
-    - rid: 2623126046329274804
-      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
-      data:
-        id: 6c8ddd073c42410abc2045f00e3589fc
-        position: {x: 1540, y: 60}
-        target: {fileID: 1803281364}
-        destination: {fileID: 400382182}
-        seconds: 19
-        animationSpeed: 0.7
-        waitUntilArrived: 1
-    - rid: 2623126046329274805
-      type: {class: GlowNode, ns: , asm: SafeHaven}
-      data:
-        id: 7af11f89712c41cfbb24e4c2c676d7f3
-        position: {x: 1240, y: 230}
-        target: {fileID: 1803281364}
-        glow: 1
-        colour: {r: 0.55, g: 0.65, b: 0.85, a: 1}
-        intensity: 9
-        range: 22
-        fadeSeconds: 2
-    - rid: 2623126046329274806
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: ed1accd6e5084732928b37383d78bb5a
-        position: {x: 1240, y: 400}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: It followed us! The old one, coming through the trees, right for the stones!
-        afterFightPause: 0
-        aside: 0
-    - rid: 2623126046329274807
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: dd5a9b11d6c24f31a0f086bb3d191fcb
-        position: {x: 1240, y: 570}
-        strength: 0.5
-    - rid: 2623126046329274808
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: 8dd2bd14510443b281b3fd135a896940
-        position: {x: 1240, y: 740}
-        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
-        at: {fileID: 1803281364}
-    - rid: 2623126046329274809
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: f8d265cc063e4f03ab567f429b801dc7
-        position: {x: 1240, y: 910}
-        seconds: 7
-    - rid: 2623126046329274810
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 780a0ccba4ac4adf98e35bbfc4e7354b
-        position: {x: 1540, y: 230}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Almost! Hold it off, just a little longer!
-        afterFightPause: 0
-        aside: 0
-    - rid: 2623126046329274811
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 34eedd91dd4a4b0db90401e6725bf3c8
-        position: {x: 1240, y: 1080}
-        seconds: 15.5
-    - rid: 2623126046329274812
-      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: 5e3ba5632c4042b19ed1f220fba00818
-        position: {x: 1540, y: 400}
-        target: {fileID: 229964287}
-        seconds: 4.5
-        revealRadius: 22
-    - rid: 2623126046329274813
-      type: {class: InvokeEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 54ec45dd1a4a4ecea7af35b43e2cdb6f
-        position: {x: 1840, y: 60}
-        response:
-          m_PersistentCalls:
-            m_Calls:
-            - m_Target: {fileID: 1803281366}
-              m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
-              m_MethodName: SetTrigger
-              m_Mode: 5
-              m_Arguments:
-                m_ObjectArgument: {fileID: 0}
-                m_ObjectArgumentAssemblyTypeName: 
-                m_IntArgument: 0
-                m_FloatArgument: 0
-                m_StringArgument: Attack
-                m_BoolArgument: 0
-              m_CallState: 2
-    - rid: 2623126046329274814
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: bf64633af8694c8f8a0b98c9226738de
-        position: {x: 1840, y: 230}
-        seconds: 0.8
-    - rid: 2623126046329274815
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: 5ab4bd77a3ce4e7c995245c9c0979788
-        position: {x: 2140, y: 60}
-        strength: 1
-    - rid: 2623126046329274816
-      type: {class: LightningNode, ns: , asm: SafeHaven}
-      data:
-        id: e634d2dffedc4adb8a288b5f7e0bff09
-        position: {x: 2140, y: 230}
-    - rid: 2623126046329274817
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: d9b78be7121449f593154f33f9d5ff84
-        position: {x: 2140, y: 400}
-        sound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
-        at: {fileID: 1803281364}
 --- !u!114 &449971401
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23346,6 +23170,345 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &449971402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 449971398}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126046329275248
+  - rid: 2623126046329275249
+  - rid: 2623126046329275250
+  - rid: 2623126046329275251
+  - rid: 2623126046329275252
+  - rid: 2623126046329275253
+  - rid: 2623126046329275254
+  - rid: 2623126046329275255
+  - rid: 2623126046329275256
+  - rid: 2623126046329275257
+  - rid: 2623126046329275258
+  - rid: 2623126046329275259
+  - rid: 2623126046329275260
+  - rid: 2623126046329275261
+  - rid: 2623126046329275262
+  - rid: 2623126046329275263
+  - rid: 2623126046329275264
+  - rid: 2623126046329275265
+  - rid: 2623126046329275266
+  - rid: 2623126046329275267
+  - rid: 2623126046329275268
+  - rid: 2623126046329275269
+  - rid: 2623126046329275270
+  - rid: 2623126046329275271
+  - rid: 2623126046329275272
+  links:
+  - from: c3b00ee43d764ffbb82de157f8ec5ca4
+    output: 0
+    to: 5f333fdc59b94676829afc3caad0d916
+  - from: 5f333fdc59b94676829afc3caad0d916
+    output: 0
+    to: ace1abfcfdc74e0dbd7ecc2bb5c8ecb3
+  - from: ace1abfcfdc74e0dbd7ecc2bb5c8ecb3
+    output: 0
+    to: d53ce476bb694316a04d03921a276a35
+  - from: d53ce476bb694316a04d03921a276a35
+    output: 0
+    to: 1b65ef7fe7334fbd87e3bd750dcfeac0
+  - from: 1b65ef7fe7334fbd87e3bd750dcfeac0
+    output: 0
+    to: 3d861dad1ea44a76801c4d7b394fc25d
+  - from: 1b65ef7fe7334fbd87e3bd750dcfeac0
+    output: 0
+    to: c4e7187caab341d8b18cc05b5e650015
+  - from: c4e7187caab341d8b18cc05b5e650015
+    output: 0
+    to: ba13126db1e045528d103d69b9700745
+  - from: c4e7187caab341d8b18cc05b5e650015
+    output: 0
+    to: 1b0b907da7ee4c5688540a56059ff9e1
+  - from: c4e7187caab341d8b18cc05b5e650015
+    output: 0
+    to: aa4eb301394e4dc9a17bfb0589897114
+  - from: ba13126db1e045528d103d69b9700745
+    output: 0
+    to: f7b5305e02104c6d92598cbb05abe5f1
+  - from: f7b5305e02104c6d92598cbb05abe5f1
+    output: 0
+    to: 0147146d10cb4868b649461ed442f81d
+  - from: d53ce476bb694316a04d03921a276a35
+    output: 0
+    to: e6e2f0a238a344478b66b5f7fd350b95
+  - from: d53ce476bb694316a04d03921a276a35
+    output: 0
+    to: f13a92df0b844a91b3ada47e0b78c018
+  - from: d53ce476bb694316a04d03921a276a35
+    output: 0
+    to: 4afc8c37600448d6b129081a56c8521b
+  - from: 3d861dad1ea44a76801c4d7b394fc25d
+    output: 0
+    to: 74c315cc1e2d45d38233e84cadcac4c7
+  - from: 74c315cc1e2d45d38233e84cadcac4c7
+    output: 0
+    to: d6a9387c219f4fe6a9c350739eef3572
+  - from: d6a9387c219f4fe6a9c350739eef3572
+    output: 0
+    to: e603fba3810f4f55b64aba53e76b33e4
+  - from: d53ce476bb694316a04d03921a276a35
+    output: 0
+    to: 394cff7f19f845ddbf3d83b933fed452
+  - from: 394cff7f19f845ddbf3d83b933fed452
+    output: 0
+    to: 94a408fe5bc74d459f4ea48e67e74ed9
+  - from: 0147146d10cb4868b649461ed442f81d
+    output: 0
+    to: 5eec2e28f46340c3ac975a07a1c76df3
+  - from: 0147146d10cb4868b649461ed442f81d
+    output: 0
+    to: f4f9aecd693c49b8abf2b9a35d944ee5
+  - from: f4f9aecd693c49b8abf2b9a35d944ee5
+    output: 0
+    to: af96d7ada49e451f8c03137ee7aece25
+  - from: f4f9aecd693c49b8abf2b9a35d944ee5
+    output: 0
+    to: 16c72af253a54873980d848f79b2f791
+  - from: f4f9aecd693c49b8abf2b9a35d944ee5
+    output: 0
+    to: 2450cf71f0014a2f8ff02312bd362e1a
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126046329275248
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: c3b00ee43d764ffbb82de157f8ec5ca4
+        position: {x: 40, y: 60}
+        once: 0
+        quest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+        when: 0
+        alsoAfterLoading: 1
+    - rid: 2623126046329275249
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 5f333fdc59b94676829afc3caad0d916
+        position: {x: 340, y: 60}
+        seconds: 36
+    - rid: 2623126046329275250
+      type: {class: SetActiveNode, ns: , asm: SafeHaven}
+      data:
+        id: ace1abfcfdc74e0dbd7ecc2bb5c8ecb3
+        position: {x: 640, y: 60}
+        target: {fileID: 1803281363}
+        active: 1
+    - rid: 2623126046329275251
+      type: {class: CreatureHuntsNode, ns: , asm: SafeHaven}
+      data:
+        id: d53ce476bb694316a04d03921a276a35
+        position: {x: 940, y: 60}
+        creature: {fileID: 1803281365}
+        hunt: 0
+        towards: {fileID: 0}
+        walkSpeed: 1
+        stayWithin: 0
+    - rid: 2623126046329275252
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: 1b65ef7fe7334fbd87e3bd750dcfeac0
+        position: {x: 1240, y: 60}
+        target: {fileID: 1803281364}
+        destination: {fileID: 634338677}
+        seconds: 0
+        animationSpeed: 1
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275253
+      type: {class: PlayCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 3d861dad1ea44a76801c4d7b394fc25d
+        position: {x: 1540, y: 60}
+        cinematic: {fileID: 297102728}
+        waitUntilFinished: 1
+    - rid: 2623126046329275254
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: c4e7187caab341d8b18cc05b5e650015
+        position: {x: 1540, y: 230}
+        target: {fileID: 1803281364}
+        destination: {fileID: 1476170800}
+        seconds: 3
+        animationSpeed: 0.7
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275255
+      type: {class: PlayAnimationNode, ns: , asm: SafeHaven}
+      data:
+        id: ba13126db1e045528d103d69b9700745
+        position: {x: 1840, y: 60}
+        target: {fileID: 1803281364}
+        state: Roar
+        crossFade: 0.2
+        waitSeconds: 2.4
+    - rid: 2623126046329275256
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 1b0b907da7ee4c5688540a56059ff9e1
+        position: {x: 1840, y: 230}
+        sound: {fileID: 11400000, guid: ca60a941079fed04bad550318182d713, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 2623126046329275257
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: aa4eb301394e4dc9a17bfb0589897114
+        position: {x: 1840, y: 400}
+        strength: 0.9
+    - rid: 2623126046329275258
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: f7b5305e02104c6d92598cbb05abe5f1
+        position: {x: 2140, y: 60}
+        target: {fileID: 1803281364}
+        destination: {fileID: 1861288124}
+        seconds: 9.7
+        animationSpeed: 0.7
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275259
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: 0147146d10cb4868b649461ed442f81d
+        position: {x: 2440, y: 60}
+        target: {fileID: 1803281364}
+        destination: {fileID: 400382182}
+        seconds: 7.9
+        animationSpeed: 0.7
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275260
+      type: {class: GlowNode, ns: , asm: SafeHaven}
+      data:
+        id: e6e2f0a238a344478b66b5f7fd350b95
+        position: {x: 1240, y: 230}
+        target: {fileID: 1803281364}
+        glow: 1
+        colour: {r: 0.55, g: 0.65, b: 0.85, a: 1}
+        intensity: 9
+        range: 22
+        fadeSeconds: 2
+    - rid: 2623126046329275261
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: f13a92df0b844a91b3ada47e0b78c018
+        position: {x: 1240, y: 400}
+        strength: 0.5
+    - rid: 2623126046329275262
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 4afc8c37600448d6b129081a56c8521b
+        position: {x: 1240, y: 570}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 2623126046329275263
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 74c315cc1e2d45d38233e84cadcac4c7
+        position: {x: 1840, y: 570}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: It followed us! The old one, coming through the trees, right for the stones!
+        afterFightPause: 0
+        aside: 0
+    - rid: 2623126046329275264
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: d6a9387c219f4fe6a9c350739eef3572
+        position: {x: 2140, y: 230}
+        seconds: 7
+    - rid: 2623126046329275265
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: e603fba3810f4f55b64aba53e76b33e4
+        position: {x: 2440, y: 230}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Almost! Hold it off, just a little longer!
+        afterFightPause: 0
+        aside: 0
+    - rid: 2623126046329275266
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 394cff7f19f845ddbf3d83b933fed452
+        position: {x: 1240, y: 740}
+        seconds: 19.5
+    - rid: 2623126046329275267
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 94a408fe5bc74d459f4ea48e67e74ed9
+        position: {x: 1540, y: 400}
+        target: {fileID: 229964287}
+        seconds: 4.5
+        revealRadius: 22
+        evenInAFight: 1
+    - rid: 2623126046329275268
+      type: {class: InvokeEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 5eec2e28f46340c3ac975a07a1c76df3
+        position: {x: 2740, y: 60}
+        response:
+          m_PersistentCalls:
+            m_Calls:
+            - m_Target: {fileID: 1803281366}
+              m_TargetAssemblyTypeName: UnityEngine.Animator, UnityEngine
+              m_MethodName: SetTrigger
+              m_Mode: 5
+              m_Arguments:
+                m_ObjectArgument: {fileID: 0}
+                m_ObjectArgumentAssemblyTypeName: 
+                m_IntArgument: 0
+                m_FloatArgument: 0
+                m_StringArgument: Attack
+                m_BoolArgument: 0
+              m_CallState: 2
+    - rid: 2623126046329275269
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: f4f9aecd693c49b8abf2b9a35d944ee5
+        position: {x: 2740, y: 230}
+        seconds: 0.8
+    - rid: 2623126046329275270
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: af96d7ada49e451f8c03137ee7aece25
+        position: {x: 3040, y: 60}
+        strength: 1
+    - rid: 2623126046329275271
+      type: {class: LightningNode, ns: , asm: SafeHaven}
+      data:
+        id: 16c72af253a54873980d848f79b2f791
+        position: {x: 3040, y: 230}
+    - rid: 2623126046329275272
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 2450cf71f0014a2f8ff02312bd362e1a
+        position: {x: 3040, y: 400}
+        sound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+        at: {fileID: 1803281364}
 --- !u!1001 &450934796
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29780,6 +29943,7 @@ MonoBehaviour:
   objective: 0
   label: The dummy
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &553995190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -34676,7 +34840,7 @@ Transform:
   m_GameObject: {fileID: 634338676}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3, y: 5.9639597, z: 46}
+  m_LocalPosition: {x: 16, y: 4.1152983, z: 50}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38777,7 +38941,7 @@ GameObject:
   m_Component:
   - component: {fileID: 716558346}
   - component: {fileID: 716558348}
-  - component: {fileID: 716558347}
+  - component: {fileID: 716558349}
   m_Layer: 0
   m_Name: Story - The Old Troll
   m_TagString: Untagged
@@ -38801,215 +38965,6 @@ Transform:
   - {fileID: 1206460637}
   m_Father: {fileID: 981106771}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &716558347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 716558345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 287758218191175966
-  - rid: 287758218191175967
-  - rid: 287758218191175968
-  - rid: 287758218191175969
-  - rid: 2623125911485546597
-  - rid: 287758218191175971
-  - rid: 287758218191175972
-  - rid: 287758218191175973
-  - rid: 287758218191175974
-  - rid: 287758218191175975
-  - rid: 287758218191175976
-  - rid: 287758218191175977
-  - rid: 287758218191175978
-  - rid: 287758218191175979
-  - rid: 2623125911485546599
-  links:
-  - from: df8fdfbec14f4fdbbcaa0be43bc4b643
-    output: 0
-    to: a3928e6e723549a6b6585d96cf82b930
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 55eee2e3611d4ab89e42597708b38004
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 5f847cde442b4c32888fcffd18597f5a
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 06060c90b70e4fcc83156684399e7f27
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 80342dbc4365452bb5459d14ebb62f89
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 1e9ebb84aba94e3ea065761659dcf7d8
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: b621e51164154b23acd6dfac271a9441
-  - from: a3928e6e723549a6b6585d96cf82b930
-    output: 0
-    to: 57b4167c2b5a48daa0ef5944aa0bf2d4
-  - from: 57b4167c2b5a48daa0ef5944aa0bf2d4
-    output: 0
-    to: 38b2f01a8c574580a1745821b950f9c8
-  - from: 57b4167c2b5a48daa0ef5944aa0bf2d4
-    output: 0
-    to: d6bcc57bc4344e1d87b8a5b5ad350246
-  - from: 80342dbc4365452bb5459d14ebb62f89
-    output: 0
-    to: 32966d984aa043dda40cd20b0046d1e0
-  - from: 32966d984aa043dda40cd20b0046d1e0
-    output: 0
-    to: d846e196665147669e5fb0466ecd4dc2
-  - from: d846e196665147669e5fb0466ecd4dc2
-    output: 0
-    to: 5637c00fa3e64e4eb5619bd0817c537c
-  - from: 5637c00fa3e64e4eb5619bd0817c537c
-    output: 0
-    to: b4d6ee5fa954491d9c333589743623b6
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 287758218191175966
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: df8fdfbec14f4fdbbcaa0be43bc4b643
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
-        when: 0
-        alsoAfterLoading: 0
-    - rid: 287758218191175967
-      type: {class: SetActiveNode, ns: , asm: SafeHaven}
-      data:
-        id: a3928e6e723549a6b6585d96cf82b930
-        position: {x: 340, y: 60}
-        target: {fileID: 1803281363}
-        active: 1
-    - rid: 287758218191175968
-      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: 55eee2e3611d4ab89e42597708b38004
-        position: {x: 640, y: 60}
-        strength: 0.75
-    - rid: 287758218191175969
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: 5f847cde442b4c32888fcffd18597f5a
-        position: {x: 640, y: 230}
-        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
-        at: {fileID: 1803281364}
-    - rid: 287758218191175971
-      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: 80342dbc4365452bb5459d14ebb62f89
-        position: {x: 640, y: 570}
-        target: {fileID: 1803281364}
-        seconds: 4
-        revealRadius: 14
-    - rid: 287758218191175972
-      type: {class: LightningNode, ns: , asm: SafeHaven}
-      data:
-        id: 1e9ebb84aba94e3ea065761659dcf7d8
-        position: {x: 640, y: 740}
-    - rid: 287758218191175973
-      type: {class: GlowNode, ns: , asm: SafeHaven}
-      data:
-        id: b621e51164154b23acd6dfac271a9441
-        position: {x: 640, y: 910}
-        target: {fileID: 1803281364}
-        glow: 1
-        colour: {r: 0.55, g: 0.65, b: 0.85, a: 1}
-        intensity: 9
-        range: 22
-        fadeSeconds: 0.6
-    - rid: 287758218191175974
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 57b4167c2b5a48daa0ef5944aa0bf2d4
-        position: {x: 640, y: 1080}
-        seconds: 1.6
-    - rid: 287758218191175975
-      type: {class: LightningNode, ns: , asm: SafeHaven}
-      data:
-        id: 38b2f01a8c574580a1745821b950f9c8
-        position: {x: 940, y: 60}
-    - rid: 287758218191175976
-      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
-      data:
-        id: d6bcc57bc4344e1d87b8a5b5ad350246
-        position: {x: 940, y: 230}
-        sound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
-        at: {fileID: 1803281364}
-    - rid: 287758218191175977
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 32966d984aa043dda40cd20b0046d1e0
-        position: {x: 940, y: 400}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: That is no thunder. An old one, a mountain troll, and it is walking towards our fire.
-        afterFightPause: 1
-        aside: 0
-    - rid: 287758218191175978
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: d846e196665147669e5fb0466ecd4dc2
-        position: {x: 1240, y: 60}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: It hasn't seen us yet. It will smell the smoke soon enough.
-        afterFightPause: 1
-        aside: 0
-    - rid: 287758218191175979
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 5637c00fa3e64e4eb5619bd0817c537c
-        position: {x: 1540, y: 60}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Leave the fire! Take the old path north, to the standing stones. Now!
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623125911485546597
-      type: {class: CreatureHuntsNode, ns: , asm: SafeHaven}
-      data:
-        id: 06060c90b70e4fcc83156684399e7f27
-        position: {x: 0, y: 0}
-        creature: {fileID: 1803281365}
-        hunt: 1
-        towards: {fileID: 913407437}
-        walkSpeed: 0.35
-        stayWithin: 10
-    - rid: 2623125911485546599
-      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
-      data:
-        id: b4d6ee5fa954491d9c333589743623b6
-        position: {x: 0, y: 0}
-        target: {fileID: 1206460637}
-        seconds: 3.5
-        revealRadius: 18
 --- !u!114 &716558348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -39028,6 +38983,304 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &716558349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 716558345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126046329275226
+  - rid: 2623126046329275227
+  - rid: 2623126046329275228
+  - rid: 2623126046329275229
+  - rid: 2623126046329275230
+  - rid: 2623126046329275231
+  - rid: 2623126046329275232
+  - rid: 2623126046329275233
+  - rid: 2623126046329275234
+  - rid: 2623126046329275235
+  - rid: 2623126046329275236
+  - rid: 2623126046329275237
+  - rid: 2623126046329275238
+  - rid: 2623126046329275239
+  - rid: 2623126046329275240
+  - rid: 2623126046329275241
+  - rid: 2623126046329275242
+  - rid: 2623126046329275243
+  - rid: 2623126046329275244
+  - rid: 2623126046329275245
+  - rid: 2623126046329275246
+  - rid: 2623126046329275247
+  links:
+  - from: df8fdfbec14f4fdbbcaa0be43bc4b643
+    output: 0
+    to: 9ae6250c6c0546399f6ad1fbd05d2d43
+  - from: 9ae6250c6c0546399f6ad1fbd05d2d43
+    output: 0
+    to: 5de7a0a069d8447da1bc4b015f78252d
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: 7b5356ac65ae4fb8adb7758ce1d28ee8
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: afb2c2a7352a4d22bdea8cbd23b3f967
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: e3223e9381d1432f84232078c4201ff8
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: fb764e032de3417696f51ffd5750c97a
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: c147a3f4a862495aaf2476ac68ef977b
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: 04a34bce550143cf8603e958a3a019e5
+  - from: 04a34bce550143cf8603e958a3a019e5
+    output: 0
+    to: 9c5f041496c24dcb857a859614eb42e7
+  - from: 04a34bce550143cf8603e958a3a019e5
+    output: 0
+    to: 08df7e805fb348ffb60681f6ad2fe3d4
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: af66e230de63401cadec67187602e41d
+  - from: af66e230de63401cadec67187602e41d
+    output: 0
+    to: a4ebadb16cd849ebb97c3db48729f05f
+  - from: af66e230de63401cadec67187602e41d
+    output: 0
+    to: a34e418ee920424b86533f56a8189179
+  - from: af66e230de63401cadec67187602e41d
+    output: 0
+    to: a1dfdfcb34b34531a1aaf2add135cee5
+  - from: a4ebadb16cd849ebb97c3db48729f05f
+    output: 0
+    to: afed588c43c448999ca81378795357cf
+  - from: 7b5356ac65ae4fb8adb7758ce1d28ee8
+    output: 0
+    to: 3b1bcc8994e54602bf62bcc7092ff852
+  - from: 5de7a0a069d8447da1bc4b015f78252d
+    output: 0
+    to: d82f41f801574281bc6c867fe128d5c7
+  - from: d82f41f801574281bc6c867fe128d5c7
+    output: 0
+    to: 7e6d2e78701b4494a9d1d9d5c0ba0469
+  - from: 7e6d2e78701b4494a9d1d9d5c0ba0469
+    output: 0
+    to: 0709815a87524bb09a9ca6718849867f
+  - from: 0709815a87524bb09a9ca6718849867f
+    output: 0
+    to: 5f9bef05139b40028b6f49bebafbba3b
+  - from: 5f9bef05139b40028b6f49bebafbba3b
+    output: 0
+    to: 98d9016bd68f430b8d61741f9844ab07
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126046329275226
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: df8fdfbec14f4fdbbcaa0be43bc4b643
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: cd536373f8f639f4db60c8810e546ebf, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126046329275227
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: 9ae6250c6c0546399f6ad1fbd05d2d43
+        position: {x: 340, y: 60}
+        target: {fileID: 1803281364}
+        destination: {fileID: 1055868894}
+        seconds: 0
+        animationSpeed: 1
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275228
+      type: {class: SetActiveNode, ns: , asm: SafeHaven}
+      data:
+        id: 5de7a0a069d8447da1bc4b015f78252d
+        position: {x: 640, y: 60}
+        target: {fileID: 1803281363}
+        active: 1
+    - rid: 2623126046329275229
+      type: {class: PlayCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 7b5356ac65ae4fb8adb7758ce1d28ee8
+        position: {x: 940, y: 60}
+        cinematic: {fileID: 1737896401}
+        waitUntilFinished: 1
+    - rid: 2623126046329275230
+      type: {class: LightningNode, ns: , asm: SafeHaven}
+      data:
+        id: afb2c2a7352a4d22bdea8cbd23b3f967
+        position: {x: 940, y: 230}
+    - rid: 2623126046329275231
+      type: {class: GlowNode, ns: , asm: SafeHaven}
+      data:
+        id: e3223e9381d1432f84232078c4201ff8
+        position: {x: 940, y: 400}
+        target: {fileID: 1803281364}
+        glow: 1
+        colour: {r: 0.55, g: 0.65, b: 0.85, a: 1}
+        intensity: 9
+        range: 22
+        fadeSeconds: 0.6
+    - rid: 2623126046329275232
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: fb764e032de3417696f51ffd5750c97a
+        position: {x: 940, y: 570}
+        strength: 0.75
+    - rid: 2623126046329275233
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: c147a3f4a862495aaf2476ac68ef977b
+        position: {x: 940, y: 740}
+        sound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 2623126046329275234
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 04a34bce550143cf8603e958a3a019e5
+        position: {x: 940, y: 910}
+        seconds: 1.6
+    - rid: 2623126046329275235
+      type: {class: LightningNode, ns: , asm: SafeHaven}
+      data:
+        id: 9c5f041496c24dcb857a859614eb42e7
+        position: {x: 1240, y: 60}
+    - rid: 2623126046329275236
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: 08df7e805fb348ffb60681f6ad2fe3d4
+        position: {x: 1240, y: 230}
+        sound: {fileID: 11400000, guid: 6510718f5af764e4aa78349c4b3f7cdf, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 2623126046329275237
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: af66e230de63401cadec67187602e41d
+        position: {x: 940, y: 1080}
+        target: {fileID: 1803281364}
+        destination: {fileID: 1274210083}
+        seconds: 3.4
+        animationSpeed: 0.7
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275238
+      type: {class: PlayAnimationNode, ns: , asm: SafeHaven}
+      data:
+        id: a4ebadb16cd849ebb97c3db48729f05f
+        position: {x: 1240, y: 400}
+        target: {fileID: 1803281364}
+        state: Roar
+        crossFade: 0.2
+        waitSeconds: 2.6
+    - rid: 2623126046329275239
+      type: {class: PlaySoundNode, ns: , asm: SafeHaven}
+      data:
+        id: a34e418ee920424b86533f56a8189179
+        position: {x: 1240, y: 570}
+        sound: {fileID: 11400000, guid: ca60a941079fed04bad550318182d713, type: 2}
+        at: {fileID: 1803281364}
+    - rid: 2623126046329275240
+      type: {class: ShakeCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: a1dfdfcb34b34531a1aaf2add135cee5
+        position: {x: 1240, y: 740}
+        strength: 0.9
+    - rid: 2623126046329275241
+      type: {class: MoveObjectNode, ns: , asm: SafeHaven}
+      data:
+        id: afed588c43c448999ca81378795357cf
+        position: {x: 1540, y: 60}
+        target: {fileID: 1803281364}
+        destination: {fileID: 1614094191}
+        seconds: 3.2
+        animationSpeed: 0.7
+        waitUntilArrived: 1
+        followGround: 1
+    - rid: 2623126046329275242
+      type: {class: CreatureHuntsNode, ns: , asm: SafeHaven}
+      data:
+        id: 3b1bcc8994e54602bf62bcc7092ff852
+        position: {x: 1240, y: 910}
+        creature: {fileID: 1803281365}
+        hunt: 1
+        towards: {fileID: 913407437}
+        walkSpeed: 0.35
+        stayWithin: 10
+    - rid: 2623126046329275243
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: d82f41f801574281bc6c867fe128d5c7
+        position: {x: 940, y: 1250}
+        seconds: 6.6
+    - rid: 2623126046329275244
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 7e6d2e78701b4494a9d1d9d5c0ba0469
+        position: {x: 1240, y: 1080}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: That is no thunder. An old one, a mountain troll, and it is walking towards our fire.
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126046329275245
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 0709815a87524bb09a9ca6718849867f
+        position: {x: 1540, y: 230}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: It hasn't seen us yet. It will smell the smoke soon enough.
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126046329275246
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5f9bef05139b40028b6f49bebafbba3b
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Leave the fire! Take the old path north, to the standing stones. Now!
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126046329275247
+      type: {class: FocusCameraNode, ns: , asm: SafeHaven}
+      data:
+        id: 98d9016bd68f430b8d61741f9844ab07
+        position: {x: 2140, y: 60}
+        target: {fileID: 1206460637}
+        seconds: 3.5
+        revealRadius: 18
+        evenInAFight: 1
 --- !u!1 &721401212
 GameObject:
   m_ObjectHideFlags: 0
@@ -53842,6 +54095,10 @@ Transform:
   - {fileID: 1803281364}
   - {fileID: 864501000}
   - {fileID: 716558346}
+  - {fileID: 1055868894}
+  - {fileID: 1274210083}
+  - {fileID: 1614094191}
+  - {fileID: 1737896400}
   m_Father: {fileID: 1589078814}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &982717824
@@ -58993,6 +59250,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5618993876670350347, guid: 8c77f9772bf5c4d428ffde22612e5d28, type: 3}
   m_PrefabInstance: {fileID: 1055508419}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1055868893
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1055868894}
+  m_Layer: 0
+  m_Name: Old Troll Starts (camp)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1055868894
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055868893}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 30, y: 5.3598776, z: -65}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1058429072
 GameObject:
   m_ObjectHideFlags: 0
@@ -61667,6 +61955,7 @@ MonoBehaviour:
   objective: 0
   label: The boar
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1089159333
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -64210,7 +64499,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.x
@@ -64218,11 +64507,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 420
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.y
@@ -64230,7 +64519,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 210
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -65386,6 +65675,7 @@ MonoBehaviour:
   objective: 1
   label: The standing stones
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1 &1164879820
 GameObject:
   m_ObjectHideFlags: 0
@@ -68127,6 +68417,7 @@ MonoBehaviour:
   objective: 0
   label: The forest
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1 &1225374284
 GameObject:
   m_ObjectHideFlags: 0
@@ -68580,6 +68871,7 @@ MonoBehaviour:
   objective: 0
   label: Sigrid
   when: 2
+  untilGathered: {fileID: 0}
 --- !u!1001 &1234680343
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69169,7 +69461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69177,23 +69469,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -155.23
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -69201,7 +69493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69209,23 +69501,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 468
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 15.61
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -39.415
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -69233,7 +69525,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69241,23 +69533,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -98.619995
       objectReference: {fileID: 0}
     - target: {fileID: 3847741542274230673, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -69269,7 +69561,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69277,23 +69569,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -27.61
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -69301,7 +69593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69309,11 +69601,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
@@ -69321,11 +69613,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -61.01
       objectReference: {fileID: 0}
     - target: {fileID: 4921377116238533035, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -69333,7 +69625,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5509936923344327392, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 192.23
       objectReference: {fileID: 0}
     - target: {fileID: 6062876433978463432, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -69357,7 +69649,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69365,23 +69657,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 468
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 21.61
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -18.805
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -69389,7 +69681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -69397,23 +69689,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 33.01
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -34.504997
       objectReference: {fileID: 0}
     - target: {fileID: 7197497295595193339, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -73385,6 +73677,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3725052705444956954, guid: 30f3bb3fbf95cf641bfdb06b4a167fd0, type: 3}
   m_PrefabInstance: {fileID: 1273267781}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1274210082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1274210083}
+  m_Layer: 0
+  m_Name: Old Troll Roars (camp)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1274210083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1274210082}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 26.817432, y: 3.7646542, z: -61.044956}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1274477410
 Mesh:
   m_ObjectHideFlags: 0
@@ -76255,6 +76578,7 @@ MonoBehaviour:
   objective: 1
   label: Berries
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1308365959
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79059,6 +79383,7 @@ MonoBehaviour:
   objective: 0
   label: Sigrid
   when: 2
+  untilGathered: {fileID: 0}
 --- !u!1001 &1350833562
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83311,6 +83636,7 @@ MonoBehaviour:
   objective: 0
   label: Eirik
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1001 &1427747225
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83507,6 +83833,7 @@ MonoBehaviour:
   objective: 2
   label: The centre stone
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1433838223
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -84878,7 +85205,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3758003653884108139, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 52.81
       objectReference: {fileID: 0}
     - target: {fileID: 4177751721841493657, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -84978,7 +85305,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AnchorMin.x
@@ -84986,23 +85313,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 740
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 40.81
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 380
       objectReference: {fileID: 0}
     - target: {fileID: 7454519229081948534, guid: 307a8db55c34d34428751a9b42bebc4b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -26.405
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -85284,6 +85611,7 @@ MonoBehaviour:
   objective: 4
   label: Build the fire here
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1465186574
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85802,6 +86130,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6711260535271253737, guid: 69e4bbaf9cc54504595bee4572a21fa0, type: 3}
   m_PrefabInstance: {fileID: 1476024722}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1476170799
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1476170800}
+  m_Layer: 0
+  m_Name: Old Troll Roars at the Stones
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1476170800
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1476170799}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 16.3, y: 4.3999033, z: 45}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2045702582}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1476986119
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -87689,6 +88048,7 @@ MonoBehaviour:
   objective: 0
   label: Sigrid
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1001 &1502456771
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -88495,6 +88855,7 @@ MonoBehaviour:
   objective: 0
   label: Eirik
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1 &1516829656
 GameObject:
   m_ObjectHideFlags: 0
@@ -91026,6 +91387,7 @@ MonoBehaviour:
   objective: 0
   label: Runa
   when: 1
+  untilGathered: {fileID: 0}
 --- !u!1001 &1546513546
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94472,6 +94834,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7120512167931277737, guid: a8c9a0c3839f3c6408611ef97c44012d, type: 3}
   m_PrefabInstance: {fileID: 1610596402}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1614094190
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1614094191}
+  m_Layer: 0
+  m_Name: Old Troll Strides On (camp)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1614094191
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614094190}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 24.029034, y: 3.2200441, z: -57.512985}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1615362200
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -100152,6 +100545,101 @@ Transform:
   - {fileID: 554951538}
   m_Father: {fileID: 1500380933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1737896399
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1737896400}
+  - component: {fileID: 1737896401}
+  m_Layer: 0
+  m_Name: Cinematic - The Old Troll Comes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1737896400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737896399}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981106771}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1737896401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737896399}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d7b27f2a187c5d4c8316e42d6301421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::InGameCinematic
+  shots:
+  - name: Out of the trees
+    seconds: 3.4
+    subject: {fileID: 1803281364}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 3.2, z: 0}
+    space: 0
+    startOffset: {x: -3.5, y: 1.4, z: 12}
+    endOffset: {x: -2.8, y: 1.3, z: 10.5}
+    followSubject: 0
+    startFieldOfView: 46
+    endFieldOfView: 42
+    ease: 2
+    blendIn: 0
+    rumble: 0
+  - name: The roar
+    seconds: 3
+    subject: {fileID: 1803281364}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 4.3, z: 0.6}
+    space: 0
+    startOffset: {x: 3, y: 2.6, z: 8.5}
+    endOffset: {x: 2.2, y: 2.4, z: 7}
+    followSubject: 1
+    startFieldOfView: 46
+    endFieldOfView: 36
+    ease: 2
+    blendIn: 0
+    rumble: 0
+  - name: It goes for the fire
+    seconds: 3.2
+    subject: {fileID: 1803281364}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 3.4, z: 2}
+    space: 0
+    startOffset: {x: -10, y: 4.5, z: 3}
+    endOffset: {x: -9.5, y: 4.8, z: 5}
+    followSubject: 1
+    startFieldOfView: 46
+    endFieldOfView: 44
+    ease: 0
+    blendIn: 0
+    rumble: 0
+  blendIn: 0.9
+  blendOut: 1.4
+  letterbox: 1
+  hideHud: 1
+  holdPlayer: 1
+  skippable: 1
+  revealRadius: 22
+  steadiness: 0.35
 --- !u!1001 &1739898442
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -103016,7 +103504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 5.5508585
+      value: 5.3598776
       objectReference: {fileID: 0}
     - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -103032,7 +103520,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.3279613
+      value: -0.32796133
       objectReference: {fileID: 0}
     - target: {fileID: 758846370938356049, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
       propertyPath: m_LocalRotation.z
@@ -103097,7 +103585,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1803281368}
+    - targetCorrespondingSourceObject: {fileID: 9066855856663566298, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1803281367}
   m_SourcePrefab: {fileID: 100100000, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
 --- !u!1 &1803281363 stripped
 GameObject:
@@ -103125,6 +103619,36 @@ Animator:
   m_CorrespondingSourceObject: {fileID: 297188517582210254, guid: c62686ef298686e40ae6736dc586a03f, type: 3}
   m_PrefabInstance: {fileID: 1803281362}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1803281367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803281363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3dd31011736fe24695fdc1f1a976a83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::GrassInteractor
+  radius: 1.6
+  offset: {x: 0, y: 0, z: 0}
+--- !u!114 &1803281368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803281363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12c314db51d949940b657330c561edde, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TreeBender
+  radius: 6.5
+  lean: 20
+  creak: {fileID: 11400000, guid: b80d2d6aace12554aabbf3945cecd2ab, type: 2}
+  creakGap: 0.8
 --- !u!1001 &1803616107
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -106341,6 +106865,37 @@ Transform:
   - {fileID: 787164408}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1861288123
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1861288124}
+  m_Layer: 0
+  m_Name: Old Troll Passes the Crag
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1861288124
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1861288123}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.5, y: 5.44034, z: 25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2045702582}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1865125219
 GameObject:
   m_ObjectHideFlags: 0
@@ -108071,6 +108626,7 @@ MonoBehaviour:
   objective: 2
   label: Campfire
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1902100784
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117713,6 +118269,7 @@ MonoBehaviour:
   objective: 0
   label: The lake
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1 &2043648903
 GameObject:
   m_ObjectHideFlags: 0
@@ -117986,6 +118543,9 @@ Transform:
   - {fileID: 634338677}
   - {fileID: 400382182}
   - {fileID: 229964287}
+  - {fileID: 1476170800}
+  - {fileID: 1861288124}
+  - {fileID: 297102727}
   m_Father: {fileID: 1493203355}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2045856191
@@ -119027,6 +119587,7 @@ MonoBehaviour:
         seconds: 8
         animationSpeed: 1.6
         waitUntilArrived: 1
+        followGround: 0
     - rid: 2623126046329274948
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -119051,6 +119612,7 @@ MonoBehaviour:
         seconds: 8
         animationSpeed: 1.6
         waitUntilArrived: 1
+        followGround: 0
     - rid: 2623126046329274951
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -119075,6 +119637,7 @@ MonoBehaviour:
         seconds: 8
         animationSpeed: 1.6
         waitUntilArrived: 1
+        followGround: 0
     - rid: 2623126046329274954
       type: {class: SetActiveNode, ns: , asm: SafeHaven}
       data:
@@ -127977,15 +128540,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 560
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.y
@@ -127993,11 +128556,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 2386778156208336249, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_Name
@@ -128009,23 +128572,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 620
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 310
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -260
       objectReference: {fileID: 0}
     - target: {fileID: 3689815146712298107, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_Pivot.x

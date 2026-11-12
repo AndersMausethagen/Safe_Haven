@@ -448,6 +448,44 @@ public sealed class PrologueMeadowTests
     }
 
     [Test]
+    public void SavedScene_TheOldTroll_IsShownAsItComes()
+    {
+        // The user (2026-11-12): show the troll when it appears; it roars and tramples, trees bend away. Both of its stories
+        // are fights, where Focus Camera stays with the player, so each appearance plays an In-Game Cinematic instead.
+        var scene = EditorSceneManager.OpenPreviewScene(ScenePath);
+        try
+        {
+            var stories = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
+            foreach (string name in new[] { "Story - The Old Troll", "Story - The Old Troll Returns" })
+            {
+                StoryScript story = stories.Single(s => s.name == name);
+                Assert.IsEmpty(story.FindProblems(), name);
+                PlayCinematicNode play = story.Nodes.OfType<PlayCinematicNode>().Single();
+                Assert.NotNull(play.cinematic, name);
+                Assert.IsEmpty(play.cinematic.FindProblems(), name);
+                MonsterAI creature = story.Nodes.OfType<CreatureHuntsNode>().First().creature;
+                Assert.IsTrue(play.cinematic.Shots.All(shot => shot.subject == creature.transform), name + ": every shot is of the troll");
+                Assert.IsTrue(story.Nodes.OfType<PlayAnimationNode>().Any(n => n.state == "Roar" && n.target == creature.transform), name + ": it roars");
+                Assert.IsTrue(story.Nodes.OfType<MoveObjectNode>().Where(n => n.seconds > 0f).All(n => n.followGround), name + ": it walks on the ground");
+                Assert.IsTrue(story.Nodes.OfType<FocusCameraNode>().All(n => n.evenInAFight), name + ": a look in a fight has to be allowed to turn");
+                var bender = creature.GetComponent<TreeBender>();
+                Assert.NotNull(bender, "the trees lean away from it");
+                Assert.Greater(bender.Lean, 10f);
+            }
+
+            // Its fist still comes down as the minute runs out: the waits and walks before the swing add up to the hold.
+            StoryScript returns = stories.Single(s => s.name == "Story - The Old Troll Returns");
+            float toSwing = returns.Nodes.OfType<WaitNode>().First(n => n.seconds > 30f).seconds
+                + returns.Nodes.OfType<MoveObjectNode>().Sum(n => n.seconds) + returns.Nodes.OfType<PlayAnimationNode>().Sum(n => n.waitSeconds);
+            Assert.AreEqual(59f, toSwing, 0.25f, "the swing lands a moment before the 60 s hold ends");
+        }
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(scene);
+        }
+    }
+
+    [Test]
     public void SavedScene_HasTheNewBeats()
     {
         var scene = EditorSceneManager.OpenPreviewScene(ScenePath);

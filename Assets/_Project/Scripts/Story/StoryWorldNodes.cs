@@ -165,6 +165,8 @@ public sealed class MoveObjectNode : StoryNode
     [Min(0.05f)] public float animationSpeed = 1f;
     [Tooltip("Carry on only once it has arrived.")]
     public bool waitUntilArrived;
+    [Tooltip("Keeps it on the ground over hills and hollows (a creature walking). Off: a straight line between the two points (something flying).")]
+    public bool followGround;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
 
@@ -178,7 +180,7 @@ public sealed class MoveObjectNode : StoryNode
             yield break;
         }
 
-        IEnumerator moving = Move(target, destination.position, seconds, animationSpeed);
+        IEnumerator moving = Move(target, destination.position, seconds, animationSpeed, followGround);
         if (waitUntilArrived)
         {
             yield return moving;
@@ -189,7 +191,7 @@ public sealed class MoveObjectNode : StoryNode
         }
     }
 
-    private static IEnumerator Move(Transform mover, Vector3 to, float seconds, float animationSpeed)
+    private static IEnumerator Move(Transform mover, Vector3 to, float seconds, float animationSpeed, bool followGround)
     {
         Vector3 from = mover.position;
         Vector3 flat = new Vector3(to.x - from.x, 0f, to.z - from.z);
@@ -207,12 +209,12 @@ public sealed class MoveObjectNode : StoryNode
             if (walks) animator.speed = previousSpeed * animationSpeed;
             for (float t = 0f; t < seconds && mover != null; t += Time.deltaTime)
             {
-                mover.position = Vector3.Lerp(from, to, t / seconds);
+                mover.position = OnGround(Vector3.Lerp(from, to, t / seconds), followGround);
                 if (walks) animator.SetFloat(Speed, speed);
 
                 yield return null;
             }
-            if (mover != null) mover.position = to;
+            if (mover != null) mover.position = OnGround(to, followGround);
         }
         finally
         {
@@ -222,6 +224,28 @@ public sealed class MoveObjectNode : StoryNode
                 animator.speed = previousSpeed;
             }
         }
+    }
+
+    // The terrain's height under the point, when it stands over one.
+    private static Vector3 OnGround(Vector3 point, bool followGround)
+    {
+        if (!followGround)
+        {
+            return point;
+        }
+
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            Vector3 local = point - terrain.transform.position;
+            Vector3 size = terrain.terrainData.size;
+            if (local.x >= 0f && local.z >= 0f && local.x <= size.x && local.z <= size.z)
+            {
+                point.y = terrain.SampleHeight(point) + terrain.transform.position.y;
+                return point;
+            }
+        }
+
+        return point;
     }
 
     private static bool HasSpeed(Animator animator)
@@ -239,6 +263,50 @@ public sealed class MoveObjectNode : StoryNode
 
     public override string FindProblem() => target == null ? "choose what moves" : destination == null ? "choose where it goes" :
         animationSpeed <= 0f ? "animation speed must be positive" : null;
+}
+
+/// <summary>Plays one of a creature's or person's animations by its state's name in their Animator (the troll's Roar, a
+/// creature's Hop), cross-fading into it; the Animator's own transitions take it back. For a cinematic beat.</summary>
+[Serializable]
+public sealed class PlayAnimationNode : StoryNode, IStoryWait
+{
+    [Tooltip("Who plays it: the object with the Animator, or its parent.")]
+    public Transform target;
+    [Tooltip("The state's name in the Animator's base layer, e.g. Roar.")]
+    public string state = "Roar";
+    [Tooltip("Seconds of blending into it.")]
+    [Min(0f)] public float crossFade = 0.2f;
+    [Tooltip("Carry on after this many seconds (how long it plays, for what comes after). 0: at once.")]
+    [Min(0f)] public float waitSeconds;
+
+    public float MostSeconds => Mathf.Max(0.1f, waitSeconds);
+
+    public override string Title => "Play Animation";
+    public override string Category => "World";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        Animator animator = target != null ? target.GetComponentInChildren<Animator>() : null;
+        if (animator == null || string.IsNullOrEmpty(state))
+        {
+            yield break;
+        }
+
+        int hash = Animator.StringToHash(state);
+        if (!animator.HasState(0, hash))
+        {
+            Debug.LogWarning($"Play Animation: {animator.name} has no state \"{state}\" in its base layer.", context.Script);
+            yield break;
+        }
+
+        animator.CrossFadeInFixedTime(hash, crossFade, 0);
+        if (waitSeconds > 0f)
+        {
+            yield return new WaitForSeconds(waitSeconds);
+        }
+    }
+
+    public override string FindProblem() => target == null ? "choose who plays it" : string.IsNullOrEmpty(state) ? "name the animation state" : null;
 }
 
 [Serializable]

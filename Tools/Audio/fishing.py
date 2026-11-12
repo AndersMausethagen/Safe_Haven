@@ -7,6 +7,8 @@ line, a pike breaking the water in a cold lake.
 - Line Snap: a sharp crack, the freed line's twang and a little whip of air.
 - Fish Splash: the slap of a tail on the water, the bubbles it drags under (they ring and rise in pitch as they shrink,
   as real bubbles do), and droplets falling back.
+- Fish Rise: a fish sipping a fly off the top of a still pond: a soft suck of lips at the film, two or three small bubbles
+  ringing up, a drop falling back. Quiet and close, heard only near the water (`python Tools/Audio/fishing.py rise`).
 - Nokken Startle: the stinger when the Nokken takes the player. A cluster of fiddle strings a semitone apart, bowed hard at
   the bridge (sul ponticello: the glassy, scraping top of the string, little of its body), bending up as the bow digs in;
   a breathy, inhuman shriek gliding up over them; the water bursting underneath. Sudden, high and wrong, then gone.
@@ -93,6 +95,18 @@ def fish_splash(rng, size):
     return fade_end(darken(out, -3.0))
 
 
+def fish_rise(rng, size):
+    """A sip at the surface: no slap, a short suck as the lips break the film, then bubbles and one drop."""
+    seconds = 0.7
+    t = times(seconds)
+    suck = band(pink(len(t), rng), 500 + 200 * size, 2600) * bump(t, 0.0, 0.012, 0.035 + 0.02 * size) * 0.55
+    out = suck
+    for _ in range(rng.integers(2, 4)):
+        place(out, bubble(rng, rng.uniform(2.0, 4.5)) * 0.5, rng.uniform(0.01, 0.06), 0.2)
+    place(out, bubble(rng, rng.uniform(1.0, 1.8)) * 0.35, rng.uniform(0.16, 0.26), 0.2)
+    return fade_end(darken(out, -4.0))
+
+
 def screech(frequency, seconds, rng, bend=1.06):
     """A string bowed hard at the bridge: the saw's upper partials and the bow's scrape, little of the string's body."""
     t = times(seconds)
@@ -127,7 +141,14 @@ def nokken_startle(rng):
     return fade_end(drive(out, 1.4), 0.3)
 
 
+def rises():
+    for i in range(1, 4):
+        name = f"Fish Rise {i}"
+        save(OUT, name, space(fish_rise(seeded(name), 0.3 + 0.3 * i), FOREST, 0.1), mono=True)
+
+
 def main():
+    rises()
     for i in range(1, 4):
         name = f"Reel Turn {i}"
         save(OUT, name, space(reel_turn(seeded(name)), FOREST, 0.08), mono=True)
@@ -146,4 +167,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1 and sys.argv[1] == "rise":
+        rises()
+    else:
+        main()

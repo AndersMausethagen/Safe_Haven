@@ -4,12 +4,15 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Fish you can see. In the open water round the player (ponds, lakes, rivers: the Haven's, the prologue's, a raid's) a few
-/// fish of the kinds that bite there swim under the surface, each its own length (FishSizes), wandering and resting, and
-/// scattering from someone wading in or a float landing on them. When a line goes out, one of those near the float comes to
-/// it, and the bite is that fish (PlayerFishing takes it with <see cref="TakeBiter"/>): the big one you saw is the one you
-/// hook, if it comes at all (a big fish is wary; good bait helps, FishSizes.BiteWillingness). Drawn with the landed fish's
-/// shape and material (FishingLine.SharedFishMesh, FishingSettings › Fish Material, tinted by its kind's colour). Each game
-/// shows its own: friends see their own fish. Made by itself in every scene.
+/// fish of the kinds that bite there swim under the surface, each its own length (FishSizes). They keep to the deep part
+/// of the water and cruise there unhurried, a few tail beats and a glide, turning in curves and now and then hanging still;
+/// every so often one comes up to sip a fly off the top, rings spreading where it took it (WaterRipples), and goes back
+/// down. Someone wading in or a float landing on one sends it bolting deeper. When a line goes out, one of those near the
+/// float comes to it, and the bite is that fish (PlayerFishing takes it with <see cref="TakeBiter"/>): the big one you saw
+/// is the one you hook, if it comes at all (a big fish is wary; good bait helps, FishSizes.BiteWillingness).
+/// Drawn with the landed fish's shape and material (FishingLine.SharedFishMesh, FishingSettings › Fish Material, tinted by
+/// its kind's colour), its body bending in a travelling wave from head to tail as it swims. How they swim is
+/// FishingSettings › Swimming. Each game shows its own: friends see their own fish. Made by itself in every scene.
 /// </summary>
 public sealed class FishInTheWater : MonoBehaviour
 {
@@ -18,21 +21,51 @@ public sealed class FishInTheWater : MonoBehaviour
     private const int Most = 22;
     private const float AttractReach = 14f;
     private const float WaterDepth = 0.55f;
+    private const float AnimateWithin = 45f;
+    // The mesh runs from the tail fin (z -0.62) to the mouth (z 0.52).
+    private const float MeshHead = 0.52f;
+    private const float MeshLength = 1.14f;
+
+    private enum Mood
+    {
+        Cruise,
+        Hover,
+        Rise,
+        Bolt,
+        Coming,
+    }
 
     private sealed class Swimmer
     {
         public Transform Body;
         public MeshRenderer Renderer;
+        public Mesh Mesh;
+        public Vector3[] Bent;
         public WaterSurface Water;
         public FishingSettings.Fish Kind;
         public float Length;
+        public Mood Mood;
+        public float MoodUntil;
         public Vector3 Target;
         public float Speed;
-        public float RestUntil;
+        public float Cruise;
+        public float Yaw;
+        public float YawRate;
+        public float Pitch;
         public float Depth;
-        public float Phase;
-        public bool Coming;
+        public float WantDepth;
+        public float DepthShare;
+        public bool Kicking;
+        public float StrokeUntil;
+        public float Beat;
+        public float BeatRate;
+        public float Swing;
+        public float NextRise;
+
+        public bool Coming => Mood == Mood.Coming;
     }
+
+    private static Vector3[] baseShape;
 
     private readonly List<Swimmer> swimmers = new List<Swimmer>();
     private MaterialPropertyBlock block;
@@ -43,6 +76,9 @@ public sealed class FishInTheWater : MonoBehaviour
 
     /// <summary>How many swim here now (tests, probes).</summary>
     public int Count => swimmers.Count;
+
+    /// <summary>How many have come up to take a fly since the scene began (probes).</summary>
+    public int Rises { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
@@ -75,11 +111,18 @@ public sealed class FishInTheWater : MonoBehaviour
 
     private void OnDestroy()
     {
+        for (int i = swimmers.Count - 1; i >= 0; i--)
+        {
+            Remove(swimmers[i]);
+        }
+
         if (Current == this)
         {
             Current = null;
         }
     }
+
+    private static FishingSettings.SwimTuning Tuning => FishingSettings.Current.Swimming;
 
     /// <summary>
     /// A line has landed at <paramref name="landing"/>: what swims right under it scatters, and one fish near it (by how
@@ -94,7 +137,7 @@ public sealed class FishInTheWater : MonoBehaviour
             float apart = Flat(swimmer.Body.position - landing).magnitude;
             if (apart < 2.2f)
             {
-                Scatter(swimmer, landing);
+                Bolt(swimmer, landing);
             }
             else if (apart < AttractReach)
             {
@@ -115,10 +158,10 @@ public sealed class FishInTheWater : MonoBehaviour
             roll -= FishSizes.BiteWillingness(swimmer.Length, baitEase);
             if (roll <= 0f)
             {
-                swimmer.Coming = true;
+                swimmer.Mood = Mood.Coming;
                 swimmer.Target = new Vector3(landing.x, swimmer.Body.position.y, landing.z);
-                swimmer.Speed = Mathf.Clamp(0.45f + swimmer.Length / 120f, 0.45f, 1.1f);
-                swimmer.RestUntil = 0f;
+                // Up from the deep towards the float, so it is seen coming.
+                swimmer.WantDepth = Mathf.Min(swimmer.Depth, 0.3f + swimmer.Length / 400f);
                 return;
             }
         }
@@ -129,7 +172,10 @@ public sealed class FishInTheWater : MonoBehaviour
     {
         foreach (Swimmer swimmer in swimmers)
         {
-            swimmer.Coming = false;
+            if (swimmer.Coming)
+            {
+                Wander(swimmer);
+            }
         }
     }
 
@@ -193,9 +239,20 @@ public sealed class FishInTheWater : MonoBehaviour
             Populate(standing);
         }
 
+        float step = Time.deltaTime;
+        if (step <= 0f)
+        {
+            return;
+        }
+
+        Camera eye = Camera.main;
         foreach (Swimmer swimmer in swimmers)
         {
-            Swim(swimmer, standing);
+            Swim(swimmer, standing, step);
+            if (swimmer.Renderer.isVisible && (eye == null || (swimmer.Body.position - eye.transform.position).sqrMagnitude < AnimateWithin * AnimateWithin))
+            {
+                Bend(swimmer);
+            }
         }
     }
 
@@ -243,9 +300,19 @@ public sealed class FishInTheWater : MonoBehaviour
 
     private void Spawn(WaterSurface water, FishingSettings.Fish kind, float centimetres, Vector3 surface)
     {
+        FishingSettings.SwimTuning tuning = Tuning;
         var body = new GameObject($"{(kind.item != null ? kind.item.DisplayName : "Fish")} ({centimetres:0} cm)");
         body.transform.SetParent(transform, false);
-        body.AddComponent<MeshFilter>().sharedMesh = FishingLine.SharedFishMesh;
+        Mesh shape = FishingLine.SharedFishMesh;
+        baseShape ??= shape.vertices;
+        var mesh = Instantiate(shape);
+        mesh.name = "Swimming Fish";
+        mesh.MarkDynamic();
+        // Room for the tail's swing, so it isn't culled at the edge of the view.
+        Bounds room = mesh.bounds;
+        room.Expand(new Vector3(0.3f, 0.05f, 0.05f));
+        mesh.bounds = room;
+        body.AddComponent<MeshFilter>().sharedMesh = mesh;
         var drawn = body.AddComponent<MeshRenderer>();
         drawn.sharedMaterial = FishingSettings.Current.FishMaterial;
         drawn.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -254,20 +321,28 @@ public sealed class FishInTheWater : MonoBehaviour
         block.SetColor("_BaseColor", kind.colour * 0.85f);
         drawn.SetPropertyBlock(block);
         body.transform.localScale = Vector3.one * (centimetres / 100f);
+        float size = Mathf.InverseLerp(10f, 120f, centimetres);
         var swimmer = new Swimmer
         {
             Body = body.transform,
             Renderer = drawn,
+            Mesh = mesh,
+            Bent = new Vector3[baseShape.Length],
             Water = water,
             Kind = kind,
             Length = centimetres,
-            Depth = Mathf.Lerp(0.1f, 0.26f, Random.value) + centimetres / 500f,
-            Phase = Random.value * 10f,
-            Speed = Mathf.Lerp(0.25f, 0.7f, Random.value),
+            Cruise = Mathf.Lerp(tuning.cruiseSpeed.x, tuning.cruiseSpeed.y, Random.value * 0.7f + size * 0.3f),
+            Yaw = Random.value * 360f,
+            Beat = Random.value * Mathf.PI * 2f,
+            // Big fish keep deeper.
+            DepthShare = Mathf.Lerp(tuning.depthShare.x, tuning.depthShare.y, Random.value * 0.6f + size * 0.4f),
+            NextRise = Time.time + Random.Range(0.2f, 1f) * tuning.riseEvery.y,
         };
-        body.transform.SetPositionAndRotation(new Vector3(surface.x, surface.y - swimmer.Depth, surface.z), Quaternion.Euler(0f, Random.value * 360f, 0f));
-        swimmer.Target = NewTarget(swimmer);
+        swimmer.Depth = swimmer.WantDepth = PreferredDepth(swimmer, surface);
+        swimmer.Speed = swimmer.Cruise * 0.5f;
+        body.transform.SetPositionAndRotation(new Vector3(surface.x, surface.y - swimmer.Depth, surface.z), Quaternion.Euler(0f, swimmer.Yaw, 0f));
         swimmers.Add(swimmer);
+        Wander(swimmer);
     }
 
     private void Remove(Swimmer swimmer)
@@ -277,9 +352,28 @@ public sealed class FishInTheWater : MonoBehaviour
         {
             Destroy(swimmer.Body.gameObject);
         }
+
+        if (swimmer.Mesh != null)
+        {
+            Destroy(swimmer.Mesh);
+        }
     }
 
-    private void Swim(Swimmer swimmer, Vector3 player)
+    // How deep it likes to be here: its share of the water under it, within the tuning's range and off the bottom.
+    private static float PreferredDepth(Swimmer swimmer, Vector3 surface)
+    {
+        FishingSettings.SwimTuning tuning = Tuning;
+        float water = Mathf.Max(0.2f, surface.y - WaterSurface.GroundBelow(surface));
+        if (float.IsInfinity(water))
+        {
+            water = tuning.depthRange.y;
+        }
+
+        float depth = Mathf.Clamp(water * swimmer.DepthShare, tuning.depthRange.x, tuning.depthRange.y);
+        return Mathf.Min(depth, water - 0.12f - swimmer.Length / 600f);
+    }
+
+    private void Swim(Swimmer swimmer, Vector3 player, float step)
     {
         Transform body = swimmer.Body;
         if (body == null)
@@ -287,73 +381,259 @@ public sealed class FishInTheWater : MonoBehaviour
             return;
         }
 
+        FishingSettings.SwimTuning tuning = Tuning;
         Vector3 at = body.position;
+        float now = Time.time;
+
         // Someone wading in sends it off.
-        if (!swimmer.Coming && Flat(at - player).sqrMagnitude < 9f && swimmer.Speed < 1.5f)
+        if (swimmer.Mood != Mood.Bolt && !swimmer.Coming && Flat(at - player).sqrMagnitude < 9f)
         {
-            Scatter(swimmer, player);
+            Bolt(swimmer, player);
         }
 
-        float tail = Mathf.Sin((Time.time + swimmer.Phase) * Mathf.Lerp(4f, 14f, swimmer.Speed / 2f)) * Mathf.Lerp(4f, 12f, swimmer.Speed / 2f);
+        Decide(swimmer, at, player, now, tuning);
+
+        // Speed: a few tail beats, then a glide (burst and coast, as fish cruise); a bolt is all beat.
+        float wanted;
+        switch (swimmer.Mood)
+        {
+            case Mood.Hover: wanted = 0.03f; break;
+            case Mood.Bolt: wanted = Mathf.Lerp(tuning.boltSpeed.x, tuning.boltSpeed.y, Mathf.InverseLerp(10f, 120f, swimmer.Length)); break;
+            case Mood.Rise: wanted = swimmer.Cruise * 1.3f; break;
+            case Mood.Coming: wanted = Mathf.Clamp(0.45f + swimmer.Length / 120f, 0.45f, 1.1f); break;
+            default:
+                if (now >= swimmer.StrokeUntil)
+                {
+                    swimmer.Kicking = !swimmer.Kicking;
+                    swimmer.StrokeUntil = now + (swimmer.Kicking ? Random.Range(0.5f, 1.3f) : Random.Range(0.6f, 1.8f));
+                }
+
+                wanted = swimmer.Cruise * (swimmer.Kicking ? 1.3f : 0.45f);
+                break;
+        }
+
+        float speedUp = swimmer.Mood == Mood.Bolt ? 7f : 0.9f;
+        float slowDown = swimmer.Mood == Mood.Hover ? 0.6f : 0.35f;
+        swimmer.Speed = Mathf.MoveTowards(swimmer.Speed, wanted, (wanted > swimmer.Speed ? speedUp : slowDown) * step);
+
+        // Turning: towards the target, as fast as its size allows, smoothly so the path curves.
         Vector3 toward = Flat(swimmer.Target - at);
-        bool resting = Time.time < swimmer.RestUntil || toward.magnitude < 0.4f;
-        if (resting)
+        float maxTurn = tuning.turnRate * Mathf.Clamp(Mathf.Sqrt(30f / Mathf.Max(5f, swimmer.Length)), 0.45f, 1.6f)
+            * (swimmer.Mood == Mood.Bolt ? 2.2f : swimmer.Mood == Mood.Hover ? 0.35f : 1f);
+        float wantedRate = 0f;
+        if (toward.sqrMagnitude > 0.01f)
         {
-            if (!swimmer.Coming && Time.time >= swimmer.RestUntil)
+            float off = Mathf.DeltaAngle(swimmer.Yaw, Mathf.Atan2(toward.x, toward.z) * Mathf.Rad2Deg);
+            wantedRate = Mathf.Clamp(off * 2.5f, -maxTurn, maxTurn);
+        }
+
+        swimmer.YawRate = Mathf.MoveTowards(swimmer.YawRate, wantedRate, maxTurn * 4f * step);
+        swimmer.Yaw += swimmer.YawRate * step;
+
+        // Depth: towards what it wants, never through the top or into the bed.
+        if (!WaterSurface.At(at, 3f, out float surface))
+        {
+            surface = at.y + swimmer.Depth;
+        }
+
+        float bed = WaterSurface.GroundBelow(at);
+        float floor = float.IsInfinity(bed) ? 5f : Mathf.Max(0.05f, surface - bed - 0.1f - swimmer.Length / 600f);
+        float wantDepth = Mathf.Clamp(swimmer.WantDepth, 0.02f, floor);
+        float vertical = swimmer.Mood == Mood.Rise || swimmer.Mood == Mood.Bolt ? 0.6f : 0.22f;
+        float before = swimmer.Depth;
+        swimmer.Depth = Mathf.MoveTowards(swimmer.Depth, wantDepth, vertical * step);
+        float climb = (before - swimmer.Depth) / step;
+        float pitch = -Mathf.Atan2(climb, Mathf.Max(0.15f, swimmer.Speed)) * Mathf.Rad2Deg;
+        swimmer.Pitch = Mathf.Lerp(swimmer.Pitch, Mathf.Clamp(pitch, -35f, 35f), 1f - Mathf.Exp(-5f * step));
+
+        // Forward, staying in its own open water: at the shore it turns away instead.
+        Vector3 forward = Quaternion.Euler(0f, swimmer.Yaw, 0f) * Vector3.forward;
+        Vector3 next = at + forward * (swimmer.Speed * step);
+        if (WaterSurface.OpenAt(next, 3f, out float nextSurface, WaterDepth * 0.7f) != swimmer.Water)
+        {
+            next = at;
+            nextSurface = surface;
+            swimmer.Speed *= 0.5f;
+            if (swimmer.Mood == Mood.Rise || swimmer.Mood == Mood.Coming)
             {
-                swimmer.RestUntil = Time.time + Random.Range(0.6f, 3.5f);
-                swimmer.Target = NewTarget(swimmer);
-                swimmer.Speed = Mathf.Lerp(0.25f, 0.7f, Random.value);
+                Wander(swimmer);
             }
-
-            body.rotation = Quaternion.Euler(0f, body.eulerAngles.y + tail * Time.deltaTime * 0.5f, 0f);
-            return;
+            else
+            {
+                swimmer.Target = NewTarget(swimmer, at - forward * 4f);
+            }
         }
 
-        Quaternion facing = Quaternion.LookRotation(toward.normalized);
-        float turned = Mathf.MoveTowardsAngle(body.eulerAngles.y, facing.eulerAngles.y, 140f * Time.deltaTime);
-        Vector3 forward = Quaternion.Euler(0f, turned, 0f) * Vector3.forward;
-        Vector3 next = at + forward * swimmer.Speed * Time.deltaTime;
-        // Never out of its own water, nor into the shallows.
-        if (WaterSurface.OpenAt(next, 3f, out float surface, WaterDepth * 0.7f) != swimmer.Water)
-        {
-            swimmer.Target = NewTarget(swimmer);
-            swimmer.Speed = Mathf.Min(swimmer.Speed, 0.7f);
-            return;
-        }
+        // It leans into a turn a little, and the tail's beat sets how the body bends (Bend).
+        float roll = Mathf.Clamp(-swimmer.YawRate * 0.12f, -18f, 18f);
+        body.SetPositionAndRotation(new Vector3(next.x, nextSurface - swimmer.Depth, next.z), Quaternion.Euler(swimmer.Pitch, swimmer.Yaw, roll));
 
-        body.SetPositionAndRotation(new Vector3(next.x, surface - swimmer.Depth, next.z), Quaternion.Euler(0f, turned + tail, 0f));
-        if (swimmer.Speed > 0.9f && !swimmer.Coming)
+        float effort = swimmer.Mood == Mood.Hover ? 0.25f : swimmer.Mood == Mood.Cruise && !swimmer.Kicking ? 0.15f
+            : Mathf.Clamp(swimmer.Speed / Mathf.Max(0.1f, swimmer.Cruise), 0.6f, 3.2f);
+        float beatRate = tuning.tailBeats * (swimmer.Mood == Mood.Bolt ? 2.6f : effort) * Mathf.Sqrt(30f / Mathf.Max(8f, swimmer.Length));
+        swimmer.BeatRate = Mathf.Lerp(swimmer.BeatRate, beatRate, 1f - Mathf.Exp(-4f * step));
+        swimmer.Beat += swimmer.BeatRate * Mathf.PI * 2f * step;
+        float swing = swimmer.Mood == Mood.Bolt ? 0.11f : swimmer.Mood == Mood.Hover ? 0.025f : swimmer.Mood == Mood.Cruise && !swimmer.Kicking ? 0.02f : 0.07f;
+        swimmer.Swing = Mathf.Lerp(swimmer.Swing, swing, 1f - Mathf.Exp(-3f * step));
+    }
+
+    // What it does next: wander, hang still, rise for a fly, come back from a bolt.
+    private void Decide(Swimmer swimmer, Vector3 at, Vector3 player, float now, FishingSettings.SwimTuning tuning)
+    {
+        float left = Flat(swimmer.Target - at).magnitude;
+        switch (swimmer.Mood)
         {
-            swimmer.Speed = Mathf.MoveTowards(swimmer.Speed, 0.6f, 0.5f * Time.deltaTime);
+            case Mood.Cruise:
+                if (now >= swimmer.NextRise && Flat(at - player).sqrMagnitude > 25f)
+                {
+                    StartRise(swimmer, at);
+                }
+                else if (left < 0.6f)
+                {
+                    if (Random.value < 0.4f)
+                    {
+                        swimmer.Mood = Mood.Hover;
+                        swimmer.MoodUntil = now + Random.Range(1.5f, 4.5f);
+                    }
+                    else
+                    {
+                        Wander(swimmer);
+                    }
+                }
+
+                break;
+            case Mood.Hover:
+                if (now >= swimmer.MoodUntil)
+                {
+                    Wander(swimmer);
+                }
+
+                break;
+            case Mood.Rise:
+                if (swimmer.Depth <= 0.08f)
+                {
+                    TakeFly(swimmer, at, tuning);
+                }
+                else if (now >= swimmer.MoodUntil)
+                {
+                    Wander(swimmer);
+                }
+
+                break;
+            case Mood.Bolt:
+                if (left < 0.8f || now >= swimmer.MoodUntil)
+                {
+                    Wander(swimmer);
+                }
+
+                break;
         }
     }
 
-    private static void Scatter(Swimmer swimmer, Vector3 from)
+    // Up to the top, a little way ahead, to take a fly.
+    private static void StartRise(Swimmer swimmer, Vector3 at)
+    {
+        Vector3 ahead = Quaternion.Euler(0f, swimmer.Yaw + Random.Range(-40f, 40f), 0f) * Vector3.forward * Random.Range(1.5f, 3f);
+        swimmer.Mood = Mood.Rise;
+        swimmer.MoodUntil = Time.time + 8f;
+        swimmer.Target = at + ahead;
+        swimmer.WantDepth = 0.04f;
+    }
+
+    // The take: rings spread from where its lips broke the film, a sip of sound, and down it goes.
+    private void TakeFly(Swimmer swimmer, Vector3 at, FishingSettings.SwimTuning tuning)
+    {
+        Rises++;
+        float size = swimmer.Length / 100f;
+        if (swimmer.Water != null && swimmer.Water.TakesRipples)
+        {
+            Vector3 mouth = at + Quaternion.Euler(0f, swimmer.Yaw, 0f) * Vector3.forward * (size * 0.45f);
+            WaterRipples.AddStamp(mouth, 0.1f + size * 0.25f, 0.1f + size * 0.12f);
+        }
+
+        if (tuning.riseSound != null)
+        {
+            AudioManager.Play(tuning.riseSound, at);
+        }
+
+        swimmer.NextRise = Time.time + Random.Range(tuning.riseEvery.x, tuning.riseEvery.y);
+        Wander(swimmer);
+        // A flick of the tail on the way down.
+        swimmer.Speed = Mathf.Max(swimmer.Speed, swimmer.Cruise * 1.5f);
+        swimmer.Kicking = true;
+        swimmer.StrokeUntil = Time.time + 0.6f;
+    }
+
+    private static void Bolt(Swimmer swimmer, Vector3 from)
     {
         Vector3 away = Flat(swimmer.Body.position - from);
-        away = away.sqrMagnitude > 0.01f ? away.normalized : Random.insideUnitSphere;
-        swimmer.Target = swimmer.Body.position + Flat(away) * Random.Range(5f, 9f);
-        swimmer.Speed = Random.Range(1.8f, 2.6f);
-        swimmer.RestUntil = 0f;
-        swimmer.Coming = false;
+        away = away.sqrMagnitude > 0.01f ? away.normalized : Quaternion.Euler(0f, Random.value * 360f, 0f) * Vector3.forward;
+        swimmer.Mood = Mood.Bolt;
+        swimmer.MoodUntil = Time.time + 3f;
+        swimmer.Target = NewTarget(swimmer, swimmer.Body.position + away * Random.Range(5f, 9f));
+        // Down, out of sight.
+        swimmer.WantDepth = swimmer.Depth + 0.5f;
     }
 
-    // Somewhere else in its own open water, a few metres off.
-    private static Vector3 NewTarget(Swimmer swimmer)
+    // Back to cruising, towards somewhere else in its own water and at the depth it likes there.
+    private static void Wander(Swimmer swimmer)
+    {
+        swimmer.Mood = Mood.Cruise;
+        swimmer.Target = NewTarget(swimmer, null);
+        if (WaterSurface.At(swimmer.Target, 25f, out float surface))
+        {
+            swimmer.WantDepth = PreferredDepth(swimmer, new Vector3(swimmer.Target.x, surface, swimmer.Target.z));
+        }
+    }
+
+    // Somewhere in its own open water: near <paramref name="wanted"/> when given, else a few metres off, mostly ahead so
+    // the path flows on rather than doubling back.
+    private static Vector3 NewTarget(Swimmer swimmer, Vector3? wanted)
     {
         Vector3 at = swimmer.Body.position;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 8; i++)
         {
-            Vector2 step = Random.insideUnitCircle.normalized * Random.Range(3f, 10f);
-            var candidate = new Vector3(at.x + step.x, at.y, at.z + step.y);
+            Vector3 candidate;
+            if (wanted.HasValue && i < 4)
+            {
+                Vector2 jitter = Random.insideUnitCircle * (1f + i);
+                candidate = wanted.Value + new Vector3(jitter.x, 0f, jitter.y);
+            }
+            else
+            {
+                float turn = Random.Range(-100f, 100f) * (i < 5 ? 1f : 1.8f);
+                candidate = at + Quaternion.Euler(0f, swimmer.Yaw + turn, 0f) * Vector3.forward * Random.Range(3f, 10f);
+            }
+
+            candidate.y = at.y;
             if (WaterSurface.OpenAt(candidate, 3f, out _, WaterDepth) == swimmer.Water)
             {
                 return candidate;
             }
         }
 
-        return at;
+        // Boxed in: turn round.
+        return at - Quaternion.Euler(0f, swimmer.Yaw, 0f) * Vector3.forward * 3f;
+    }
+
+    // The body bends in a wave running back from the head, growing to the tail, and curves into a turn.
+    private static void Bend(Swimmer swimmer)
+    {
+        Vector3[] shape = baseShape;
+        Vector3[] bent = swimmer.Bent;
+        float curve = Mathf.Clamp(swimmer.YawRate / 180f, -1f, 1f) * 0.12f;
+        for (int i = 0; i < shape.Length; i++)
+        {
+            Vector3 v = shape[i];
+            float along = Mathf.Clamp01((MeshHead - v.z) / MeshLength);
+            float weight = along * along;
+            // A little sway of the head against the tail, so the fish doesn't pivot on its nose.
+            float wave = Mathf.Sin(swimmer.Beat - along * 3.2f) * (weight + 0.06f * (1f - along));
+            v.x += swimmer.Swing * wave + curve * weight;
+            bent[i] = v;
+        }
+
+        swimmer.Mesh.vertices = bent;
     }
 
     private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);

@@ -29,6 +29,9 @@ public sealed class QuestWaypoint : MonoBehaviour
     [Tooltip("Shown under the arrow, e.g. \"Shelter\". Empty: the quest's name.")]
     [SerializeField] private string label;
     [SerializeField] private QuestWaypointWhen when;
+    [Tooltip("Optional: shown only while this gathering spot still stands (one of the rootbound stones to free): once it is " +
+             "gathered the mark goes, though the quest goes on.")]
+    [SerializeField] private ResourceNode untilGathered;
 
     public static IReadOnlyList<QuestWaypoint> Active => active;
 
@@ -36,13 +39,17 @@ public sealed class QuestWaypoint : MonoBehaviour
     public string Label => string.IsNullOrWhiteSpace(label) && quest != null ? quest.DisplayName : label;
 
     /// <summary>Sets the waypoint up (editor tools).</summary>
-    public void Configure(QuestDefinition target, int objectiveNumber, string text, QuestWaypointWhen showWhen = QuestWaypointWhen.Active)
+    public void Configure(QuestDefinition target, int objectiveNumber, string text, QuestWaypointWhen showWhen = QuestWaypointWhen.Active,
+        ResourceNode gathered = null)
     {
         quest = target;
         objective = objectiveNumber;
         label = text;
         when = showWhen;
+        untilGathered = gathered;
     }
+
+    public ResourceNode UntilGathered => untilGathered;
 
     private void OnEnable() => active.Add(this);
 
@@ -51,7 +58,7 @@ public sealed class QuestWaypoint : MonoBehaviour
     /// <summary>True while the player should be shown the way here.</summary>
     public bool IsWanted(QuestLog log)
     {
-        if (quest == null || log == null)
+        if (quest == null || log == null || (untilGathered != null && untilGathered.IsDepleted))
         {
             return false;
         }

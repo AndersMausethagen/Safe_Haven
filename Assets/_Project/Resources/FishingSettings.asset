@@ -40,6 +40,15 @@ MonoBehaviour:
   haulKilograms: 2.5
   splashEffect: {fileID: 427604759136440720, guid: d500fd09614e25f46b5c5f1fa49f7033, type: 3}
   fishMaterial: {fileID: 2100000, guid: ae2471e6d098cef49b287680735522dc, type: 2}
+  swimming:
+    cruiseSpeed: {x: 0.22, y: 0.55}
+    boltSpeed: {x: 1.8, y: 2.6}
+    depthShare: {x: 0.5, y: 0.85}
+    depthRange: {x: 0.35, y: 1.4}
+    riseEvery: {x: 16, y: 50}
+    turnRate: 120
+    tailBeats: 2.4
+    riseSound: {fileID: 11400000, guid: 61a1baf304ecd954f9976451e8ecf264, type: 2}
   castHoldPoint: 0.27
   castReleasePoint: 0.4
   landLiftPoint: 0.4

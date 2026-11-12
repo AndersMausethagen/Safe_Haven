@@ -35618,6 +35618,7 @@ MonoBehaviour:
         target: {fileID: 582269261}
         seconds: 4
         revealRadius: 10
+        evenInAFight: 0
     - rid: 2623126018147484446
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -105434,7 +105435,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1685233681}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3297963709419939464, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       insertIndex: -1
@@ -105456,6 +105460,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactable
+--- !u!114 &389930461 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6345556893868452515, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 389930458}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7832ee47638141c46941c6f60e75da8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
 --- !u!1001 &390163135
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -154616,7 +154631,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1128244005}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3297963709419939464, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       insertIndex: -1
@@ -154638,6 +154656,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactable
+--- !u!114 &582269263 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6345556893868452515, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 582269260}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7832ee47638141c46941c6f60e75da8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
 --- !u!1001 &582552227
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -274105,6 +274134,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4240788022518785689, guid: 4c9c9f757a967c94886f0660215672dd, type: 3}
   m_PrefabInstance: {fileID: 1071008890}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1071369408
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1071369409}
+  - component: {fileID: 1071369410}
+  m_Layer: 0
+  m_Name: Quest Mark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1071369409
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071369408}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1085129303}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1071369410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1071369408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+  objective: 1
+  label: Rootbound stone
+  when: 0
+  untilGathered: {fileID: 1085129305}
 --- !u!1001 &1071895769
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -276296,7 +276374,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 459348204992816425, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1071369409}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3297963709419939464, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
       insertIndex: -1
@@ -276318,6 +276399,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f655434a56283ac419a02d53bb587f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interactable
+--- !u!114 &1085129305 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6345556893868452515, guid: 0fe564bf746ab6a4981ab527c459bf3a, type: 3}
+  m_PrefabInstance: {fileID: 1085129302}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7832ee47638141c46941c6f60e75da8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ResourceNode
 --- !u!1001 &1085202800
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -288024,6 +288116,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8434051794706093583, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
   m_PrefabInstance: {fileID: 1127606717}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1128244004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1128244005}
+  - component: {fileID: 1128244006}
+  m_Layer: 0
+  m_Name: Quest Mark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1128244005
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128244004}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 582269261}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1128244006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128244004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+  objective: 1
+  label: Rootbound stone
+  when: 0
+  untilGathered: {fileID: 582269263}
 --- !u!1001 &1129212628
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -363677,6 +363818,7 @@ MonoBehaviour:
   objective: 0
   label: The Portal
   when: 0
+  untilGathered: {fileID: 0}
 --- !u!1001 &1433792638
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -400119,6 +400261,7 @@ MonoBehaviour:
         target: {fileID: 1038728947}
         seconds: 7
         revealRadius: 14
+        evenInAFight: 0
     - rid: 287758281410609315
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -427211,6 +427354,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8114418102593340693, guid: 631beea1e2961684c883da68383c599f, type: 3}
   m_PrefabInstance: {fileID: 1684317157}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1685233680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1685233681}
+  - component: {fileID: 1685233682}
+  m_Layer: 0
+  m_Name: Quest Mark
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1685233681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685233680}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 389930459}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1685233682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685233680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+  objective: 1
+  label: Rootbound stone
+  when: 0
+  untilGathered: {fileID: 389930461}
 --- !u!1001 &1685427000
 PrefabInstance:
   m_ObjectHideFlags: 0

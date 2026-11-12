@@ -17,7 +17,15 @@ public sealed class CameraShake : CinemachineExtension
     private static float lastDecayTime;
 
     /// <summary>Current shake strength, 0-1.</summary>
-    public static float Trauma => trauma;
+    public static float Trauma
+    {
+        get
+        {
+            // Faded to now: the camera reading it may not be the one that fades it (an in-game cinematic's).
+            Decay();
+            return trauma;
+        }
+    }
 
     /// <summary>Adds shake. Amounts add up to at most 1.</summary>
     public static void Add(float amount)

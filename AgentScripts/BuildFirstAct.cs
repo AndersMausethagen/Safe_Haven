@@ -231,6 +231,7 @@ public static class BuildFirstAct
             .Where(g => g.name == "RootboundStone" && g.transform.parent != null && g.transform.parent.name == "Rootbound Stones (Life Orbs)").OrderBy(g => g.transform.position.x).Select(g => g.GetComponent<Interactable>()).ToArray();
         if (stones.Length != 3) throw new InvalidOperationException($"Expected three rootbound stones, found {stones.Length}");
         Transform nearest = stones.OrderBy(s => (s.transform.position - portal.transform.position).sqrMagnitude).First().transform;
+        StoneMarks(stones);
 
         // ----- The first light shows the roots -----
         StoryScript seen = StoryBuilder.Fresh(root, "Story - The Roots Move");
@@ -308,6 +309,45 @@ public static class BuildFirstAct
         EditorSceneManager.SaveScene(scene);
         string problems = string.Join("; ", new[] { seen, remember, upThrough, rootIn, twist }.SelectMany(s => s.FindProblems().Select(p => s.name + ": " + p)));
         return $"home: 5 stories, rootlings at {zone.transform.position:F0}, story problems: {(problems.Length > 0 ? problems : "none")}, dirty={scene.isDirty}";
+    }
+
+    /// <summary>Only the three stones' marks on the maps (`--entry BuildFirstAct.Marks`): the user asked to see them (2026-11-12).</summary>
+    public static string Marks()
+    {
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            if (SceneManager.GetSceneAt(i).isDirty) return "the open scene " + SceneManager.GetSceneAt(i).name + " has unsaved changes";
+        }
+
+        Scene scene = EditorSceneManager.OpenScene(HomeScene);
+        Interactable[] stones = Object.FindObjectsByType<QuestGate>(FindObjectsInactive.Include)
+            .Where(g => g.name == "RootboundStone" && g.transform.parent != null && g.transform.parent.name == "Rootbound Stones (Life Orbs)").OrderBy(g => g.transform.position.x).Select(g => g.GetComponent<Interactable>()).ToArray();
+        if (stones.Length != 3) return $"expected three rootbound stones, found {stones.Length}";
+        string marks = StoneMarks(stones);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        return $"{marks}; dirty={scene.isDirty}";
+    }
+
+    // Each stone shows on the minimap and the world map (and the tracker points to it) while The Rootbound Stones is open,
+    // until its own orb is freed.
+    private static string StoneMarks(Interactable[] stones)
+    {
+        QuestDefinition quest = Q("RootboundStones");
+        var placed = new List<string>();
+        foreach (Interactable stone in stones)
+        {
+            Transform old = stone.transform.Find("Quest Mark");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
+            var mark = new GameObject("Quest Mark");
+            mark.transform.SetParent(stone.transform, false);
+            var waypoint = mark.AddComponent<QuestWaypoint>();
+            waypoint.Configure(quest, 1, "Rootbound stone", QuestWaypointWhen.Active, stone.GetComponent<ResourceNode>());
+            EditorUtility.SetDirty(waypoint);
+            placed.Add($"{stone.transform.position:F0}{(waypoint.UntilGathered != null ? "" : " (no node!)")}");
+        }
+
+        return "stone marks at " + string.Join(", ", placed);
     }
 
     // What the portal says while each new quest is open. The story's own steps go last in the list, so they speak first.
