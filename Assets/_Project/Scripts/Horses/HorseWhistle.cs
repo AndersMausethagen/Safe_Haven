@@ -26,7 +26,7 @@ public sealed class HorseWhistle : MonoBehaviour
 
     private void Update()
     {
-        if (GameInput.Whistle == null || !GameInput.Whistle.WasPressedThisFrame() || Time.time < ready || GamePause.IsPaused
+        if (GameInput.Whistle == null || !GameInput.WasPressed(GameInput.Whistle) || Time.time < ready || GamePause.IsPaused
             || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || DialogueBox.IsOpen)
         {
             return;

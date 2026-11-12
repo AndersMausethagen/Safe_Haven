@@ -88,6 +88,15 @@ public sealed partial class BuildPlacer : MonoBehaviour
     /// <summary>True while any player is placing, moving or picking a building: mouse buttons and wheel belong to building.</summary>
     public static bool IsBusy { get; private set; }
 
+    /// <summary>True while a controller's right stick moves the building's spot (top-down view): the camera leaves it alone.</summary>
+    public static bool UsesPadSpot { get; private set; }
+
+    // On a controller in the top-down view: where the spot is from the player, who carries it along while walking.
+    private Vector3 padOffset;
+    private bool padSpotPlaced;
+    // Where the spot is while picking a building on a controller (no ghost shows then): a flat disc on the ground.
+    private GameObject padMarker;
+
     private BuildingDefinition Kind => placing != null ? placing : moving != null ? moving.Definition : null;
     private static IBuildArea Area => BuildArea.Current;
     /// <summary>True inside an open build area (Safe Haven's ward), where the build menu works.</summary>
@@ -227,8 +236,21 @@ public sealed partial class BuildPlacer : MonoBehaviour
         yaw = building.YardDepth > 0f && building.YardSide == YardSide.Front ? FacingCamera() : 0f;
         CreateGhost(building.Prefab.transform);
 
-        var hint = new StringBuilder($"Place the {building.DisplayName}: left-click to build");
-        hint.Append(building.PlaceInLines ? ", or drag to build a line (scroll while dragging to bend it round the portal)." : ".");
+        var hint = new StringBuilder();
+        if (InputDevices.UsingGamepad)
+        {
+            PadFamily pad = InputDevices.Family;
+            hint.Append($"Place the {building.DisplayName}: {GameInput.KeyLabel(GameInput.BuildPlace)} to build");
+            hint.Append(building.PlaceInLines ? ", or hold it and walk to build a line" : "");
+            hint.Append(CameraPointer.UsesScreenCenter ? ". Aim with the camera" : ". The right stick moves the spot");
+            hint.Append($", {ControllerGlyphs.For("<Gamepad>/leftShoulder", pad)} {ControllerGlyphs.For("<Gamepad>/rightShoulder", pad)} turn it");
+            hint.Append($" (hold {GameInput.KeyLabel(GameInput.BuildFineRotate)} for small turns, {GameInput.KeyLabel(GameInput.BuildFreePlace)} to place freely), {GameInput.KeyLabel(GameInput.Back)} cancels.");
+        }
+        else
+        {
+            hint.Append($"Place the {building.DisplayName}: left-click to build");
+            hint.Append(building.PlaceInLines ? ", or drag to build a line (scroll while dragging to bend it round the portal)." : ".");
+        }
         if (building.YardDepth > 0f)
         {
             hint.Append(" Keep the marked ground in front of it clear.");
@@ -243,6 +265,13 @@ public sealed partial class BuildPlacer : MonoBehaviour
         picking = true;
         upgrading = toUpgrade;
         IsBusy = true;
+        if (InputDevices.UsingGamepad)
+        {
+            string choose = $"{(CameraPointer.UsesScreenCenter ? "Aim at" : "Move the spot onto")} a building and press {GameInput.KeyLabel(GameInput.BuildPlace)}";
+            GameMessages.Post($"{choose} to {(toUpgrade ? "upgrade or repair it" : "move it")}. {GameInput.KeyLabel(GameInput.Back)} cancels.");
+            return;
+        }
+
         GameMessages.Post(toUpgrade ? "Click a building to upgrade or repair it. Right-click to cancel." : "Click a building to move it. Right-click to cancel.");
     }
 
@@ -281,6 +310,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
             return;
         }
 
+        UpdatePadSpot();
         if (picking)
         {
             UpdatePicking();
@@ -290,6 +320,11 @@ public sealed partial class BuildPlacer : MonoBehaviour
         bool free = GameInput.BuildFreePlace.IsPressed();
         bool fine = GameInput.BuildFineRotate.IsPressed();
         float scroll = GameInput.BuildRotate.ReadValue<float>();
+        // The wheel turns a notch per frame it moves; a bumper is held, so it turns once per press.
+        if (InputDevices.UsingGamepad && !GameInput.BuildRotate.WasPressedThisFrame())
+        {
+            scroll = 0f;
+        }
         if (!drawingLine && Mathf.Abs(scroll) > 0.01f)
         {
             yaw = Mathf.Repeat(yaw + Mathf.Sign(scroll) * (fine ? fineRotationStep : rotationStep), 360f);
@@ -354,6 +389,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
 
     private void UpdatePicking()
     {
+        MarkPadSpot();
         if (!GameInput.BuildPlace.WasPressedThisFrame() || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()))
         {
             return;
@@ -449,8 +485,86 @@ public sealed partial class BuildPlacer : MonoBehaviour
         return placed;
     }
 
+    // A controller in the top-down view has no pointer on the ground: the spot starts ahead of the player, away from the
+    // camera, the right stick moves it (within reach), and walking carries it along. In the action view the crosshair aims.
+    private void UpdatePadSpot()
+    {
+        bool use = InputDevices.UsingGamepad && !CameraPointer.UsesScreenCenter;
+        UsesPadSpot = use;
+        if (!use)
+        {
+            CameraPointer.PadTarget = null;
+            padSpotPlaced = false;
+            return;
+        }
+
+        ControllerSettings settings = ControllerSettings.Current;
+        Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up).normalized;
+        Vector3 right = Vector3.ProjectOnPlane(view.transform.right, Vector3.up).normalized;
+        if (!padSpotPlaced)
+        {
+            padOffset = forward * settings.BuildStartDistance;
+            padSpotPlaced = true;
+        }
+
+        Vector2 stick = GameInput.CameraLookStick != null ? GameInput.CameraLookStick.ReadValue<Vector2>() : Vector2.zero;
+        padOffset += (right * stick.x + forward * stick.y) * (settings.BuildSpotSpeed * Time.unscaledDeltaTime);
+        padOffset = Vector3.ClampMagnitude(padOffset, settings.BuildReach);
+        CameraPointer.PadTarget = transform.position + padOffset;
+    }
+
+    private void MarkPadSpot()
+    {
+        RaycastHit hit = default;
+        bool show = UsesPadSpot && CameraPointer.TryGetRay(view, out Ray ray)
+                    && Physics.Raycast(ray, out hit, 200f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        if (!show)
+        {
+            if (padMarker != null)
+            {
+                padMarker.SetActive(false);
+            }
+
+            return;
+        }
+
+        if (padMarker == null)
+        {
+            padMarker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            padMarker.name = "Pad Build Spot";
+            Destroy(padMarker.GetComponent<Collider>());
+            padMarker.transform.localScale = new Vector3(0.8f, 0.02f, 0.8f);
+            var renderer = padMarker.GetComponent<Renderer>();
+            renderer.sharedMaterial = ghostMaterial;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var block = new MaterialPropertyBlock();
+            block.SetColor("_BaseColor", validColor);
+            block.SetColor("_Color", validColor);
+            renderer.SetPropertyBlock(block);
+        }
+
+        padMarker.SetActive(true);
+        padMarker.transform.position = hit.point + Vector3.up * 0.03f;
+    }
+
+    private void OnDestroy()
+    {
+        if (padMarker != null)
+        {
+            Destroy(padMarker);
+        }
+    }
+
     private void Cancel()
     {
+        if (padMarker != null)
+        {
+            padMarker.SetActive(false);
+        }
+
+        CameraPointer.PadTarget = null;
+        UsesPadSpot = false;
+        padSpotPlaced = false;
         if (moving != null)
         {
             moving.gameObject.SetActive(true);

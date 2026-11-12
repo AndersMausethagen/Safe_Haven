@@ -315,6 +315,16 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "WindowsWheel",
+                    "type": "Button",
+                    "id": "f472b2c0-35dc-4f6e-bfbd-3e4f813a3726",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -551,17 +561,6 @@
                 },
                 {
                     "name": "",
-                    "id": "afbbbc29-e723-45c3-9714-e3134aa67224",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Sneak",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "7eaea143-4194-41b5-8db8-cbfc432c85ec",
                     "path": "<Keyboard>/tab",
                     "interactions": "",
@@ -575,7 +574,7 @@
                     "name": "",
                     "id": "f4bdbaa3-ccd3-43ea-bd09-7458a7ae5b14",
                     "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
+                    "interactions": "tap(duration=0.3)",
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "ToggleCombat",
@@ -795,7 +794,7 @@
                     "name": "",
                     "id": "a125e037-76a4-49e0-8b1b-eb6ee63e5447",
                     "path": "<Gamepad>/select",
-                    "interactions": "",
+                    "interactions": "tap(duration=0.3)",
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Inventory",
@@ -826,17 +825,6 @@
                 },
                 {
                     "name": "",
-                    "id": "faad5769-0506-4a30-aebe-b33c6cc39253",
-                    "path": "<Gamepad>/leftStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Skills",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "67b21289-824c-4429-b5ad-02f5faf2984e",
                     "path": "<Keyboard>/c",
                     "interactions": "",
@@ -853,17 +841,6 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
-                    "action": "Build",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "83efb140-feef-4e92-869d-c293b1846775",
-                    "path": "<Gamepad>/rightStickPress",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Gamepad",
                     "action": "Build",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -986,6 +963,72 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Whistle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "626eddf3-3699-45e9-9732-be9ad2629e13",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Sneak",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a6f8d3cc-4ddc-4e05-899e-4dd3812c2fed",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CycleArrows",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f10352c7-dd03-4d4b-8670-7cf170e93d63",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "hold(duration=0.3)",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "QuickItems",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9a1f7d5b-a5c1-40cf-8141-52fedbe1601a",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "tap(duration=0.3)",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SwapWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9eb9dba6-720d-4825-b8a4-90e2f08cfca9",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "hold(duration=0.3)",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "CommandWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8cacf886-90eb-4b02-bf03-591d0e4750f7",
+                    "path": "<Gamepad>/select",
+                    "interactions": "hold(duration=0.3)",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "WindowsWheel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -1214,6 +1257,72 @@
                     "action": "FreePlace",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "745ab1c6-5fd0-42e6-9ee1-caaafd9f3ebd",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Place",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "fc48910e-73ee-459d-8bbb-9dfaf40988e4",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FineRotate",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e2b56070-a61e-4b96-9b41-3f3fb9558c7e",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "FreePlace",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "1DAxis",
+                    "id": "2f6c4914-ff63-4267-8be7-fbd2d8abb67e",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Rotate",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Negative",
+                    "id": "174a05db-6cb0-4bd5-882b-012338976b7a",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Positive",
+                    "id": "a749f686-8925-49c2-a8f3-7dfa8fc7990d",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Rotate",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         },
@@ -2246,6 +2355,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Advance",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a79513e5-5bdb-4618-8c00-b0fac493fcfe",
+                    "path": "<Gamepad>/leftTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SplitModifier",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10d288db-6e07-40d3-83ef-2f23c8fee1f2",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "DiscardModifier",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

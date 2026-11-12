@@ -85,7 +85,7 @@ public sealed class CoopPings : ICoopPart
         }
 
         InputAction ping = GameInput.Ping;
-        if (network == null || ping == null || !ping.WasPressedThisFrame() || Time.unscaledTime < nextPing || Player.Current == null
+        if (network == null || ping == null || !GameInput.WasPressed(ping) || Time.unscaledTime < nextPing || Player.Current == null
             || GamePause.IsPaused || !TryAim(out Vector3 at, out bool enemy))
         {
             return;

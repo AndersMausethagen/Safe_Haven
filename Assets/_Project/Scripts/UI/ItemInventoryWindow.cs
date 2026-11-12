@@ -60,6 +60,12 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
     private RectTransform characterPanel;
     private readonly Vector3[] corners = new Vector3[4];
 
+    // The prefab's hints say what the mouse does; on a controller they say what its buttons do (the pointer is PadCursor's).
+    private TMP_Text bagHint;
+    private TMP_Text closeHint;
+    private string bagHintForMouse;
+    private string closeHintForMouse;
+
     private void OnEnable()
     {
         inventory = inventory != null ? inventory : Player.Current != null ? Player.Current.Bag : null;
@@ -108,10 +114,46 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         RefreshGathering();
         dragIcon.gameObject.SetActive(false);
         tooltip.Hide();
+        GameInput.KeysChanged += OnKeysChanged;
+        WriteHints();
+    }
+
+    private void OnKeysChanged()
+    {
+        WriteHints();
+        RebuildRecipes();
+    }
+
+    private void WriteHints()
+    {
+        if (bagHint == null && transform.Find("Bag Hint") is Transform bag && bag.TryGetComponent(out bagHint))
+        {
+            bagHintForMouse = bagHint.text;
+        }
+
+        if (closeHint == null && transform.Find("Close Hint") is Transform close && close.TryGetComponent(out closeHint))
+        {
+            closeHintForMouse = closeHint.text;
+        }
+
+        bool pad = InputDevices.UsingGamepad;
+        PadFamily family = InputDevices.Family;
+        string a = ControllerGlyphs.For("<Gamepad>/buttonSouth", family), x = ControllerGlyphs.For("<Gamepad>/buttonWest", family);
+        if (bagHint != null)
+        {
+            bagHint.text = !pad ? bagHintForMouse
+                : $"hold {a} and move to drag  ·  {GameInput.KeyLabel(GameInput.SplitModifier)} + {a} split  ·  {x} use  ·  {GameInput.KeyLabel(GameInput.DiscardModifier)} + {x} drop";
+        }
+
+        if (closeHint != null)
+        {
+            closeHint.text = !pad ? closeHintForMouse : $"{GameInput.KeyLabel(GameInput.Inventory)} or {GameInput.KeyLabel(GameInput.Back)} to close";
+        }
     }
 
     private void OnDisable()
     {
+        GameInput.KeysChanged -= OnKeysChanged;
         if (container != null)
         {
             container.SlotChanged -= OnSlotChanged;
@@ -644,7 +686,15 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         byHand.Sort(RecipeBook.CompareForDisplay);
         atStations.Sort(RecipeBook.CompareForDisplay);
         recipes.Show(new HandMaker(crafting), byHand, atStations);
-        SetFooter($"Double-click or right-click a recipe to craft one. Buildings: build menu ({GameInput.KeyLabel(GameInput.Build)}).");
+        if (InputDevices.UsingGamepad)
+        {
+            PadFamily family = InputDevices.Family;
+            SetFooter($"{ControllerGlyphs.For("<Gamepad>/buttonSouth", family)} twice or {ControllerGlyphs.For("<Gamepad>/buttonWest", family)} crafts a recipe. Buildings: hold {GameInput.KeyLabel(GameInput.WindowsWheel)}, Build.");
+        }
+        else
+        {
+            SetFooter($"Double-click or right-click a recipe to craft one. Buildings: build menu ({GameInput.KeyLabel(GameInput.Build)}).");
+        }
         recipesDirty = true;
     }
 

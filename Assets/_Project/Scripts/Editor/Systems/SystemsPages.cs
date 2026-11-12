@@ -995,3 +995,29 @@ public sealed class MultiplayerPage : SystemsPage
         EndDerived();
     }
 }
+
+/// <summary>Controller: the pointer in windows, rumble, the wheels' stick and placing buildings with the sticks.</summary>
+public sealed class ControllerPage : SystemsPage
+{
+    public override string Title => "Controller";
+    public override string Group => "Settings";
+    public override string Help => "How the game feels on a controller. The buttons are in the Input Actions asset's Gamepad scheme; this is " +
+                                   "the pointer the left stick moves in windows, how hard the pad rumbles (camera shake becomes rumble), and " +
+                                   "the spot the right stick moves when placing a building top-down.";
+
+    public override void Draw()
+    {
+        var settings = Settings<ControllerSettings>(ControllerSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "Controller", "Resources/ControllerSettings");
+        BeginDerived();
+        Derived("Pointer across a 1080p screen", $"{1920f / settings.CursorSpeed:0.0} s, the stick fully over");
+        Derived("A full camera shake", $"rumbles at {Mathf.Min(settings.RumbleMax, settings.RumblePerShake):P0}, gone in {1f / settings.RumbleFade:0.00} s");
+        Derived("Building spot", $"starts {settings.BuildStartDistance:0.#} m ahead, reaches {settings.BuildReach:0.#} m");
+        EndDerived();
+    }
+}

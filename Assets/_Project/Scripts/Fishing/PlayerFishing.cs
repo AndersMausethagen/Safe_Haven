@@ -353,6 +353,7 @@ public sealed class PlayerFishing : MonoBehaviour
         AudioManager.Play(settings.BiteSound, cast.Landing);
         look.Splash(cast.Landing);
         CameraShake.Add(0.08f);
+        ControllerRumble.Pulse(ControllerSettings.Current.BitePulse);
     }
 
     private void Strike()

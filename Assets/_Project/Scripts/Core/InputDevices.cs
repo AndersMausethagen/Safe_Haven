@@ -30,6 +30,9 @@ public static class InputDevices
     private static float mouseTravelled;
     private static bool listening;
 
+    /// <summary>The controller last used, or null (ControllerRumble shakes this one).</summary>
+    public static Gamepad LastPad => lastPad;
+
     /// <summary>True while the player is on a controller.</summary>
     public static bool UsingGamepad { get; private set; }
 
@@ -95,6 +98,12 @@ public static class InputDevices
     public static void Noticed(InputControl control)
     {
         InputDevice device = control?.device;
+        // The window pointer is a mouse device fed by the controller (PadCursor): its moves are the controller's.
+        if (PadCursor.IsPointer(device))
+        {
+            return;
+        }
+
         if (device is Gamepad pad)
         {
             if (!UsingGamepad || pad != lastPad)

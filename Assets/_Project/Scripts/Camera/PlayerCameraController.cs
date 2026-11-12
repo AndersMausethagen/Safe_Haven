@@ -352,7 +352,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void UpdateStyle()
     {
-        if (toggleAction.WasPressedThisFrame())
+        if (GameInput.WasPressed(toggleAction))
         {
             ToggleStyle();
         }
@@ -462,7 +462,8 @@ public sealed class PlayerCameraController : MonoBehaviour
     // action camera it looks around; top-down it turns the view where orbiting is allowed, and up and down zoom.
     private void ReadStick()
     {
-        if (lookStickAction == null || GamePause.IsPaused)
+        // Placing a building top-down on a controller, the stick moves the spot instead (BuildPlacer).
+        if (lookStickAction == null || GamePause.IsPaused || (BuildPlacer.UsesPadSpot && style != CameraStyle.Action))
         {
             return;
         }

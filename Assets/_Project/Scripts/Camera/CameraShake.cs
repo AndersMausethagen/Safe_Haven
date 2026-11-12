@@ -29,6 +29,8 @@ public sealed class CameraShake : CinemachineExtension
 
         Decay();
         trauma = Mathf.Clamp01(trauma + amount * GameOptions.ScreenShake.Value);
+        // Felt in the hands too, on its own option (Controller Vibration), whatever Screen Shake is set to.
+        ControllerRumble.FromShake(amount);
     }
 
     /// <summary>Keeps the shake at least this strong (0-1) while called each frame: a rumble that lasts, such as being

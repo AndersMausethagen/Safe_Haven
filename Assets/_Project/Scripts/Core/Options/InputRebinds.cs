@@ -68,6 +68,7 @@ public static class InputRebinds
         new RebindRow("Windows", "Command Wheel", "Player/CommandWheel"),
         new RebindRow("Windows", "Quickbar (hold; in the bag: add or remove)", "Player/QuickItems"),
         new RebindRow("Windows", "Mark for Friends (co-op)", "Player/Ping"),
+        new RebindRow("Windows", "Windows Wheel (controller, hold)", "Player/WindowsWheel"),
 
         new RebindRow("Camera and Building", "Camera Style", "Camera/ToggleStyle"),
         new RebindRow("Camera and Building", "Turn Camera", "Camera/Orbit"),
@@ -171,6 +172,10 @@ public static class InputRebinds
     /// <summary>The other row in this scheme that uses the same key, if any.</summary>
     public static bool TryFindConflict(RebindRow row, string scheme, string effectivePath, out RebindRow other)
     {
+        // A controller button can be tapped for one thing and held for another (LB: swap weapons, or the action wheel).
+        InputAction own = InputSystem.actions.FindAction(row.ActionPath);
+        int ownIndex = BindingIndex(own, row.Part, scheme);
+        string ownInteractions = ownIndex >= 0 ? own.bindings[ownIndex].interactions ?? "" : "";
         foreach (RebindRow candidate in Rows)
         {
             // Build mode's keys only count while building, so they may repeat the others.
@@ -181,7 +186,8 @@ public static class InputRebinds
 
             InputAction action = InputSystem.actions.FindAction(candidate.ActionPath);
             int index = BindingIndex(action, candidate.Part, scheme);
-            if (index >= 0 && SamePath(action.bindings[index].effectivePath, effectivePath))
+            if (index >= 0 && SamePath(action.bindings[index].effectivePath, effectivePath)
+                && string.Equals(action.bindings[index].interactions ?? "", ownInteractions, StringComparison.Ordinal))
             {
                 other = candidate;
                 return true;

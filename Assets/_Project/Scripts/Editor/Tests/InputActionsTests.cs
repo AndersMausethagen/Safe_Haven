@@ -164,7 +164,7 @@ public sealed class InputActionsTests : InputTestFixture
         {
             (gamepad.rightTrigger, GameInput.Attack), (gamepad.leftTrigger, GameInput.Guard), (gamepad.buttonSouth, GameInput.Dodge),
             (gamepad.buttonWest, GameInput.Interact), (gamepad.buttonEast, GameInput.CancelInteraction),
-            (gamepad.leftShoulder, GameInput.Sneak), (gamepad.buttonNorth, GameInput.Skill(0)),
+            (gamepad.leftStickButton, GameInput.Sneak), (gamepad.rightStickButton, GameInput.CycleArrows), (gamepad.buttonNorth, GameInput.Skill(0)),
             (gamepad.dpad.down, GameInput.Skill(3)), (gamepad.selectButton, GameInput.Inventory), (gamepad.buttonSouth, GameInput.Submit),
             // Start is the Escape menu, B goes back, A moves a conversation on (2026-11-12).
             (gamepad.startButton, GameInput.Pause), (gamepad.buttonEast, GameInput.Back), (gamepad.buttonSouth, GameInput.Advance),
@@ -186,6 +186,77 @@ public sealed class InputActionsTests : InputTestFixture
         Set(gamepad.rightStick, new Vector2(1f, 0f));
         Assert.Greater(GameInput.CameraLookStick.ReadValue<Vector2>().x, 0.5f);
         Set(gamepad.rightStick, Vector2.zero);
+    }
+
+    [Test]
+    public void Bumpers_TapForOneThing_HoldForAWheel()
+    {
+        var gamepad = InputSystem.AddDevice<Gamepad>();
+        (UnityEngine.InputSystem.Controls.ButtonControl button, InputAction tap, InputAction hold)[] cases =
+        {
+            (gamepad.leftShoulder, GameInput.SwapWeapon, GameInput.CommandWheel),
+            (gamepad.rightShoulder, GameInput.ToggleCombat, GameInput.QuickItems),
+            (gamepad.selectButton, GameInput.Inventory, GameInput.WindowsWheel),
+        };
+
+        foreach ((var button, InputAction tap, InputAction hold) in cases)
+        {
+            bool tapped = false, held = false;
+            System.Action<InputAction.CallbackContext> onTap = _ => tapped = true, onHold = _ => held = true;
+            tap.performed += onTap;
+            hold.performed += onHold;
+            try
+            {
+                Press(button, currentTime);
+                Release(button, currentTime + 0.1);
+                Assert.IsTrue(tapped, $"a tap of {button.name} does {tap.name}");
+                Assert.IsFalse(held, $"a tap of {button.name} opens no {hold.name}");
+
+                tapped = false;
+                Press(button, currentTime + 0.2);
+                currentTime += 0.6;
+                InputSystem.Update();
+                Assert.IsTrue(held, $"holding {button.name} opens {hold.name}");
+                Release(button, currentTime);
+                Assert.IsFalse(tapped, $"letting go after a hold of {button.name} does no {tap.name}");
+            }
+            finally
+            {
+                tap.performed -= onTap;
+                hold.performed -= onHold;
+            }
+        }
+    }
+
+    [Test]
+    public void Gamepad_BuildsAndWorksTheWindows()
+    {
+        var gamepad = InputSystem.AddDevice<Gamepad>();
+        (UnityEngine.InputSystem.Controls.ButtonControl button, InputAction action)[] cases =
+        {
+            (gamepad.rightTrigger, GameInput.BuildPlace), (gamepad.leftTrigger, GameInput.BuildFineRotate), (gamepad.buttonNorth, GameInput.BuildFreePlace),
+            (gamepad.leftTrigger, GameInput.SplitModifier), (gamepad.rightTrigger, GameInput.DiscardModifier),
+        };
+
+        foreach ((var button, InputAction action) in cases)
+        {
+            Press(button);
+            Assert.IsTrue(action.IsPressed(), $"{button.name} holds {action.actionMap.name}/{action.name}");
+            Release(button);
+        }
+
+        Press(gamepad.rightShoulder);
+        Assert.IsTrue(GameInput.BuildRotate.WasPressedThisFrame());
+        Assert.Greater(GameInput.BuildRotate.ReadValue<float>(), 0f, "RB turns a building one way");
+        Release(gamepad.rightShoulder);
+        Press(gamepad.leftShoulder);
+        Assert.Less(GameInput.BuildRotate.ReadValue<float>(), 0f, "LB the other");
+        Release(gamepad.leftShoulder);
+
+        // A wheel's choice counts as a press for the code that polls (the whistle, the horse's kick, ping, camera style).
+        Assert.IsFalse(GameInput.WasPressed(GameInput.Whistle));
+        GameInput.Press(GameInput.Whistle);
+        Assert.IsTrue(GameInput.WasPressed(GameInput.Whistle));
     }
 
     [Test]
@@ -257,12 +328,17 @@ public sealed class InputActionsTests : InputTestFixture
         // A voice line says the keyboard's key whatever is in the player's hands.
         Assert.AreEqual("press E", GameInput.DefaultKeys("press {key:Interact}"));
 
+        // In the saddle B gets you down on a controller; the keyboard keeps its key for it.
+        string down = GameInput.Keys("{key:Dismount}");
+        Assert.IsTrue(down.Contains("xbox_buttonEast") || down == "B", down);
+
         InputDevices.Use(true, PadFamily.PlayStation);
         string square = GameInput.KeyLabel(GameInput.Interact);
         Assert.IsTrue(square.Contains("playstation_buttonWest") || square == "Square", square);
 
         InputDevices.Use(false, PadFamily.PlayStation);
         Assert.AreEqual("E", GameInput.KeyLabel(GameInput.Interact));
+        Assert.AreEqual("X", GameInput.Keys("{key:Dismount}"));
     }
 
     [Test]

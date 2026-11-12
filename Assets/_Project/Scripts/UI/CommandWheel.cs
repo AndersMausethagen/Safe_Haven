@@ -5,7 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>Hold Alt to issue one shared order to the companions, use a carried consumable, or (hovering Emotes) make a
-/// gesture. Hold F for the quickbar: the favourites picked in the bag, each in its own place.</summary>
+/// gesture. Hold F for the quickbar: the favourites picked in the bag, each in its own place.
+/// <para>
+/// On a controller the right stick picks (and the last pick stays when it springs back), and the wheels carry what has no
+/// button of its own: hold LB for the actions (light, whistle, companions, emotes, the horse's kick, ping, camera), hold View
+/// for the windows. Consumables are the quickbar's there (hold RB).
+/// </para></summary>
 [DisallowMultipleComponent]
 public sealed class CommandWheel : MonoBehaviour
 {
@@ -55,6 +60,9 @@ public sealed class CommandWheel : MonoBehaviour
 
     public bool IsOpen => group != null && group.alpha > 0f;
 
+    // Picked by the stick: kept when it springs back to the middle, so letting go of the button chooses it.
+    private bool pickedByStick;
+
     /// <summary>True while any wheel is held open: the camera lets go of the cursor, so the mouse can pick a choice.</summary>
     public static bool IsHeld { get; private set; }
 
@@ -90,8 +98,91 @@ public sealed class CommandWheel : MonoBehaviour
             return;
         }
 
+        if (InputDevices.UsingGamepad)
+        {
+            BuildPadActions();
+            ShowPage("Actions");
+            return;
+        }
+
         BuildChoices();
         ShowPage("Choose");
+    }
+
+    /// <summary>A controller's wheel of the game's windows (hold View): each has a key of its own on the keyboard.</summary>
+    public void OpenWindows()
+    {
+        if (GamePause.IsPaused || BuildPlacer.IsBusy || DialogueBox.IsSpeaking ||
+            (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen))
+        {
+            return;
+        }
+
+        choices.Clear();
+        choices.Add(new Choice("Character", () => Request(UIWindowId.Character)));
+        choices.Add(new Choice("Abilities", () => Request(UIWindowId.Skills)));
+        choices.Add(new Choice("Skills", () => Request(UIWindowId.Proficiencies)));
+        choices.Add(new Choice("Journal", () => Request(UIWindowId.Journal)));
+        choices.Add(new Choice("Map", WorldMapHud.Toggle));
+        choices.Add(new Choice("Haven", () => Request(UIWindowId.Haven)));
+        if (TryGetComponent(out BuildPlacer builder))
+        {
+            choices.Add(new Choice("Build", builder.ToggleMenu));
+        }
+
+        choices.Add(new Choice("Tutorial", TutorialWindow.Toggle));
+        ShowPage("Windows");
+    }
+
+    private static void Request(UIWindowId window) => UIStateManager.Current?.RequestToggle(window);
+
+    // What a controller has no button for. The consumables are on the quickbar (hold RB), the windows on View.
+    private void BuildPadActions()
+    {
+        choices.Clear();
+        Player player = Player.Current;
+        PlayerRiding riding = player != null && player.TryGetComponent(out PlayerRiding found) ? found : null;
+        bool mounted = riding != null && riding.IsRiding;
+        choices.Add(new Choice("Light", () => GetComponent<PlayerInputHandler>()?.ToggleLight()));
+        choices.Add(new Choice(mounted ? "Get down" : "Whistle", () => GameInput.Press(GameInput.Whistle)));
+        if (mounted)
+        {
+            choices.Add(new Choice("Rear and strike", () => GameInput.Press(GameInput.HorseKick)));
+        }
+
+        var companions = new List<Companion>();
+        foreach (Companion companion in Companion.Active)
+        {
+            if (companion != null && companion.isActiveAndEnabled && !companion.IsDowned && companion.Definition != null)
+            {
+                companions.Add(companion);
+            }
+        }
+
+        if (companions.Count > 0)
+        {
+            choices.Add(new Choice("Companions", null, OpenOrders));
+        }
+
+        if (player != null && player.TryGetComponent(out CharacterEmotes emotes) && WheelEmotes().Count > 0)
+        {
+            choices.Add(new Choice("Emotes", null, () => OpenEmotes(emotes)));
+        }
+
+        if (CoopSession.Current != null && CoopSession.Current.IsActive)
+        {
+            choices.Add(new Choice("Mark for friends", () => GameInput.Press(GameInput.Ping)));
+        }
+
+        choices.Add(new Choice("Camera style", () => GameInput.Press(GameInput.CameraToggleStyle)));
+    }
+
+    private void OpenOrders()
+    {
+        BuildChoices();
+        // Only the orders: the rest of the keyboard's page is on this wheel or the quickbar already.
+        choices.RemoveAll(choice => choice.Opens != null || choice.Label.Contains(" x"));
+        ShowPage("Companions");
     }
 
     /// <summary>Opens the quickbar: the bag's favourites in their own places, with how many are carried. One with none left
@@ -138,6 +229,7 @@ public sealed class CommandWheel : MonoBehaviour
 
         EnsureSlots();
         selected = -1;
+        pickedByStick = false;
         title = pageTitle;
         root.SetActive(true);
         group.alpha = 1f;
@@ -164,6 +256,7 @@ public sealed class CommandWheel : MonoBehaviour
 
         choices.Clear();
         selected = -1;
+        pickedByStick = false;
     }
 
     private void Update()
@@ -359,13 +452,35 @@ public sealed class CommandWheel : MonoBehaviour
 
     private void UpdateSelection()
     {
-        RectTransform canvasRect = (RectTransform)root.transform;
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, GameInput.PointerPosition, null, out Vector2 pointer))
+        int previous = selected;
+        Vector2 pointer;
+        if (InputDevices.UsingGamepad)
         {
-            return;
+            // The right stick points at a choice (the left one still walks); back in the middle, the pick stays.
+            Vector2 stick = GameInput.CameraLookStick != null ? GameInput.CameraLookStick.ReadValue<Vector2>() : Vector2.zero;
+            if (stick.magnitude < ControllerSettings.Current.WheelDeadZone)
+            {
+                if (!pickedByStick)
+                {
+                    selected = -1;
+                }
+
+                Paint(previous);
+                return;
+            }
+
+            pickedByStick = true;
+            pointer = stick.normalized * WheelRadius;
+        }
+        else
+        {
+            RectTransform canvasRect = (RectTransform)root.transform;
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, GameInput.PointerPosition, null, out pointer))
+            {
+                return;
+            }
         }
 
-        int previous = selected;
         selected = -1;
         if (pointer.magnitude >= CentreDeadZone)
         {
@@ -378,6 +493,11 @@ public sealed class CommandWheel : MonoBehaviour
             selected = Mathf.RoundToInt(angle / 360f * choices.Count) % choices.Count;
         }
 
+        Paint(previous);
+    }
+
+    private void Paint(int previous)
+    {
         if (selected != previous)
         {
             hoveredSince = Time.unscaledTime;
@@ -393,7 +513,8 @@ public sealed class CommandWheel : MonoBehaviour
             slots[i].transform.localScale = Vector3.one * (active ? 1.12f : 1f);
         }
 
-        centreLabel.text = selected >= 0 ? choices[selected].Label : title;
+        centreLabel.text = selected >= 0 ? choices[selected].Label
+            : InputDevices.UsingGamepad ? $"{title}\n<size=60%><alpha=#99>{GameInput.KeyLabel(GameInput.CameraLookStick)} to pick, let go to choose" : title;
     }
 
     private static string OrderLabel(CompanionOrder order)

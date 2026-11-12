@@ -30,6 +30,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     public static string SkillKeyLabel(int slot) => slot >= 0 && slot < SkillLoadout.SlotCount ? GameInput.KeyLabel(GameInput.Skill(slot)) : "";
 
     private Vector2 moveInput;
+    // The wheel open now, so letting go of another wheel's button (a tap, on a controller) doesn't close it.
+    private InputAction wheelOpenedBy;
     private bool mouseAttackPending;
     private bool mouseGuardPending;
     private bool mouseAttackReleasePending;
@@ -66,7 +68,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             int slot = i;
-            skillCallbacks[i] = _ => stateMachine.RequestSkill(slot);
+            skillCallbacks[i] = context =>
+            {
+                // In a conversation the number keys and the d-pad pick answers; they cast nothing meanwhile.
+                if (!IsListening && !PadBusy(context))
+                {
+                    stateMachine.RequestSkill(slot);
+                }
+            };
         }
     }
 
@@ -149,7 +158,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
         Vector3 cameraForward = Vector3.ProjectOnPlane(movementCamera.transform.forward, Vector3.up).normalized;
         Vector3 cameraRight = Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
-        Vector2 walk = IsListening ? Vector2.zero : moveInput;
+        // On a controller the left stick is the pointer while a window is up (PadCursor), so the feet stay still.
+        Vector2 walk = IsListening || (InputDevices.UsingGamepad && PadCursor.IsActive) ? Vector2.zero : moveInput;
         Vector3 direction = cameraRight * walk.x + cameraForward * walk.y;
         movement.SetMovementInput(Vector3.ClampMagnitude(direction, 1f));
         movement.SetMoveKeys(walk);
@@ -242,6 +252,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.CommandWheel, OnCommandWheelReleased, on, performed: false, canceled: true);
         Hook(GameInput.QuickItems, OnQuickItems, on);
         Hook(GameInput.QuickItems, OnCommandWheelReleased, on, performed: false, canceled: true);
+        Hook(GameInput.WindowsWheel, OnWindowsWheel, on);
+        Hook(GameInput.WindowsWheel, OnCommandWheelReleased, on, performed: false, canceled: true);
         for (int i = 0; i < skillCallbacks.Length; i++)
         {
             Hook(GameInput.Skill(i), skillCallbacks[i], on);
@@ -280,7 +292,14 @@ public sealed class PlayerInputHandler : MonoBehaviour
             JournalNotices.Tried(ProficiencyTraining.Sneaking);
         }
 
-        if (!GameOptions.ToggleSneak.On)
+        if (context.performed && PadInWindow(context))
+        {
+            return;
+        }
+
+        // A stick click is pressed, not held: on a controller sneaking always toggles.
+        bool toggles = GameOptions.ToggleSneak.On || context.control?.device is Gamepad;
+        if (!toggles)
         {
             stealth.SetSneaking(context.performed);
         }
@@ -290,10 +309,18 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
     }
 
-    private void OnCycleArrows(InputAction.CallbackContext context) => stateMachine.RequestArrowCycle();
+    private void OnCycleArrows(InputAction.CallbackContext context)
+    {
+        if (!PadBusy(context))
+        {
+            stateMachine.RequestArrowCycle();
+        }
+    }
 
-    // The light key: the lantern on the belt when one is worn, else the torch in the off hand.
-    private void OnToggleTorch(InputAction.CallbackContext context)
+    private void OnToggleTorch(InputAction.CallbackContext context) => ToggleLight();
+
+    /// <summary>The light key: the lantern on the belt when one is worn, else the torch in the off hand. Also on a controller's action wheel.</summary>
+    public void ToggleLight()
     {
         if (lantern != null && lantern.Toggle())
         {
@@ -308,7 +335,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnSwapWeapon(InputAction.CallbackContext context)
     {
-        if (equipment != null)
+        if (equipment != null && !PadBusy(context))
         {
             equipment.SwapWeapon();
         }
@@ -326,15 +353,38 @@ public sealed class PlayerInputHandler : MonoBehaviour
         WorldMapHud.Toggle();
     }
 
-    private void OnCommandWheel(InputAction.CallbackContext context) => commandWheel?.Open();
+    private void OnCommandWheel(InputAction.CallbackContext context) => OpenWheel(context, wheel => wheel.Open());
 
-    private void OnQuickItems(InputAction.CallbackContext context) => commandWheel?.OpenQuickItems();
+    private void OnQuickItems(InputAction.CallbackContext context) => OpenWheel(context, wheel => wheel.OpenQuickItems());
 
-    private void OnCommandWheelReleased(InputAction.CallbackContext context) => commandWheel?.CloseAndExecute();
+    private void OnWindowsWheel(InputAction.CallbackContext context) => OpenWheel(context, wheel => wheel.OpenWindows());
+
+    private void OpenWheel(InputAction.CallbackContext context, System.Action<CommandWheel> open)
+    {
+        if (commandWheel == null || PadBusy(context) || commandWheel.IsOpen)
+        {
+            return;
+        }
+
+        open(commandWheel);
+        wheelOpenedBy = commandWheel.IsOpen ? context.action : null;
+    }
+
+    private void OnCommandWheelReleased(InputAction.CallbackContext context)
+    {
+        // A controller's tap on the same button (LB swaps weapons) cancels the hold that would have opened a wheel.
+        if (commandWheel == null || context.action != wheelOpenedBy)
+        {
+            return;
+        }
+
+        wheelOpenedBy = null;
+        commandWheel.CloseAndExecute();
+    }
 
     private void OnDodge(InputAction.CallbackContext context)
     {
-        if (IsListening)
+        if (IsListening || PadInWindow(context))
         {
             return;
         }
@@ -357,7 +407,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnCombatToggle(InputAction.CallbackContext context)
     {
-        if (stateMachine.CurrentState == PlayerState.Interacting)
+        if (stateMachine.CurrentState == PlayerState.Interacting || PadBusy(context))
         {
             return;
         }
@@ -374,6 +424,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnInteract(InputAction.CallbackContext context)
     {
+        if (PadInWindow(context))
+        {
+            return;
+        }
+
         stateMachine.RequestInteraction();
     }
 
@@ -382,6 +437,12 @@ public sealed class PlayerInputHandler : MonoBehaviour
         if (IsMouseClick(context))
         {
             mouseAttackPending = true;
+            return;
+        }
+
+        // The mouse's clicks wait for the UI to be asked; a controller's triggers place buildings and modify in windows.
+        if (PadBusy(context))
+        {
             return;
         }
 
@@ -405,6 +466,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
         if (IsMouseClick(context))
         {
             mouseGuardPending = true;
+            return;
+        }
+
+        if (PadBusy(context))
+        {
             return;
         }
 
@@ -462,6 +528,15 @@ public sealed class PlayerInputHandler : MonoBehaviour
     {
         return context.control.device is Mouse;
     }
+
+    private static bool FromPad(InputAction.CallbackContext context) => context.control?.device is Gamepad;
+
+    // A controller's buttons mean something else while its pointer is up in a window (PadCursor): A clicks, X right-clicks.
+    private static bool PadInWindow(InputAction.CallbackContext context) => FromPad(context) && PadCursor.IsActive;
+
+    // ...and while placing a building its triggers and bumpers place and turn it (BuildPlacer), so they don't fight or
+    // open wheels. The keyboard and mouse are unchanged: their clicks are sorted out in ProcessPendingMouseClicks.
+    private static bool PadBusy(InputAction.CallbackContext context) => FromPad(context) && (PadCursor.IsActive || BuildPlacer.IsBusy);
 
     // The UI can't be queried from inside an input callback (it reports last frame's state), so mouse clicks are
     // recorded there and checked here. Clicks on UI (resource tabs, scrollbar) must not also swing the weapon.

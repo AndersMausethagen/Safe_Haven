@@ -14,6 +14,12 @@ public static class CameraPointer
     /// <summary>How far along the view a crosshair pick reaches; set by PlayerCameraController from its settings.</summary>
     public static float Reach { get; set; } = 14f;
 
+    /// <summary>
+    /// A spot in the world that stands in for the mouse in the top-down view while the player is on a controller: the place
+    /// a building goes, moved with the right stick (BuildPlacer). Null when nothing sets one.
+    /// </summary>
+    public static Vector3? PadTarget { get; set; }
+
     public static bool TryGetPointOnPlane(Camera camera, Plane plane, out Vector3 point)
     {
         return TryGetPointOnPlane(camera, plane, Reach, out point);
@@ -24,6 +30,13 @@ public static class CameraPointer
         if (camera != null && UsesScreenCenter)
         {
             ray = camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            return true;
+        }
+
+        if (camera != null && PadTarget.HasValue && InputDevices.UsingGamepad)
+        {
+            Vector3 from = camera.transform.position;
+            ray = new Ray(from, (PadTarget.Value - from).normalized);
             return true;
         }
 

@@ -123,7 +123,10 @@ public static class GameOptions
         "Which buttons the prompts show while you play with a controller. Automatic matches the controller in your hands; pick one if it shows the wrong kind (Steam Input can make every controller look like an Xbox pad).",
         0, "Automatic", "Xbox", "PlayStation", "Switch");
 
-    public static readonly IReadOnlyList<GameOption> Controls = new[] { LookSensitivity, InvertY, ControllerButtons };
+    public static readonly GameOption Vibration = GameOption.Slider("Vibration", "Controller Vibration",
+        "How strongly the controller rumbles when you hit, are hit, parry, or a fish takes the bait. Off at 0%.", 1f, 0f, 1f, 0.05f);
+
+    public static readonly IReadOnlyList<GameOption> Controls = new[] { LookSensitivity, InvertY, ControllerButtons, Vibration };
 
     // ----- Accessibility -----
 

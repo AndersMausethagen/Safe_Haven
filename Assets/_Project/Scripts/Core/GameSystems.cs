@@ -76,6 +76,8 @@ public sealed class GameSystems : MonoBehaviour
         Add<CheatSystem>(cheats => cheats.Initialise());
         Add<SteamPlatform>(steam => steam.Initialise(MultiplayerSettings.Current));
         Add<CoopSession>(coop => coop.Initialise(MultiplayerSettings.Current, SteamPlatform.Current));
+        Add<ControllerRumble>(rumble => rumble.Initialise());
+        Add<PadCursor>(cursor => cursor.Initialise());
 
         SceneManager.sceneLoaded += OnSceneLoaded;
     }

@@ -52,6 +52,8 @@ public static class GameInput
     public static InputAction Whistle => Find("Player/Whistle");
     /// <summary>In the saddle: the horse rears and strikes out ahead (PlayerRiding).</summary>
     public static InputAction HorseKick => Find("Player/HorseKick");
+    /// <summary>A controller only (hold View): the wheel of the game's windows. The keyboard has a key for each.</summary>
+    public static InputAction WindowsWheel => Find("Player/WindowsWheel");
 
     /// <summary>The action that casts skill bar slot <paramref name="slot"/> (0-based).</summary>
     public static InputAction Skill(int slot) => Find(SkillPaths[slot]);
@@ -99,6 +101,24 @@ public static class GameInput
 
     private static readonly List<InputActionMap> Suspended = new List<InputActionMap>();
 
+    // Actions a wheel chose this frame (a controller reaches the whistle, the horse's kick and the ping through one).
+    private static readonly Dictionary<InputAction, int> PressedBy = new Dictionary<InputAction, int>();
+
+    /// <summary>Counts as a press of <paramref name="action"/> this frame, for code that asks <see cref="WasPressed"/>.</summary>
+    public static void Press(InputAction action)
+    {
+        if (action != null)
+        {
+            PressedBy[action] = Time.frameCount;
+        }
+    }
+
+    /// <summary>The action's key or button went down this frame, or a wheel chose it (<see cref="Press"/>).</summary>
+    public static bool WasPressed(InputAction action)
+    {
+        return action != null && (action.WasPressedThisFrame() || (PressedBy.TryGetValue(action, out int frame) && frame == Time.frameCount));
+    }
+
     /// <summary>
     /// Turns off every map but UI until <see cref="ResumeGameplay"/>, for when a key means something else for a moment:
     /// choosing a new key, typing a name. The screen stays alive; everything that plays the game waits.
@@ -137,6 +157,12 @@ public static class GameInput
         { "Hammer", "Interact" }, { "PickUp", "Interact" }, { "Talk", "Interact" }, { "Kick", "HorseKick" }, { "Bag", "Items" },
         { "BuildMenu", "Build" }, { "Map", "WorldMap" }, { "Perks", "Talents" }, { "Abilities", "Skills" }, { "Light", "ToggleTorch" },
         { "Lasso", "Attack" }, { "Roll", "Dodge" }, { "Dodge", "Dodge" }, { "Guard", "Guard" }, { "Attack", "Attack" },
+    };
+
+    // A verb that is another button on a controller: in the saddle, B gets you down (PlayerRiding).
+    private static readonly Dictionary<string, string> PadVerbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    {
+        { "Dismount", "System/Back" }, { "GetDown", "System/Back" },
     };
 
     private static readonly System.Text.RegularExpressions.Regex KeyToken = new System.Text.RegularExpressions.Regex(@"\{key:([A-Za-z0-9/]+)\}");
@@ -200,6 +226,11 @@ public static class GameInput
         if (string.Equals(name, BackToken, System.StringComparison.OrdinalIgnoreCase))
         {
             return scheme == Gamepad ? KeyLabel(Back, asShipped, scheme) : "Esc";
+        }
+
+        if (scheme == Gamepad && PadVerbs.TryGetValue(name, out string padAction))
+        {
+            return KeyLabel(Find(padAction, quiet: true), asShipped, scheme);
         }
 
         InputAction action = ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name);
@@ -371,6 +402,7 @@ public static class GameInput
         Found.Clear();
         foundIn = null;
         Suspended.Clear();
+        PressedBy.Clear();
     }
 
     // Quiet when only looking: a key token's action is searched for in each map in turn.

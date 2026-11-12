@@ -2041,9 +2041,27 @@ menu. Tabs: Gameplay, Graphics, Audio, Controls, Accessibility. It only draws se
   `GameInput.KeysChanged` or compares `GameInput.KeysVersion`. The glyphs: `Tools/UI/controller_glyphs.py` draws
   `Art/UI/Controller Glyphs.png`, Safe Haven › Setup › UI › Build Controller Glyphs makes `Resources/Controller Glyphs`
   (TMP Settings' default sprite asset) and an always-on-top copy for prompts in the world. A label must have rich text on.
-  On the pad: Start is the Escape menu, View the bag, B (`System/Back`) closes what Escape closes but never opens the menu,
-  A moves a conversation on and the first answer is selected for the stick, the right stick (`Camera/LookStick`, speeds in
-  `PlayerCameraSettings` › Controller) turns the view, and top-down the player faces where they walk, not the idle cursor.
+  The pad's layout (the keyboard and mouse are unchanged): LS move / L3 sneak (always toggles), RS camera / R3 weapon
+  art and next arrow, RT attack, LT guard and aim, A dodge, B back (in the saddle: get down), X interact, Y and the d-pad
+  the five abilities, Start the Escape menu. Tap or hold (`tap`/`hold` interactions, 0.3 s, on the pad bindings only):
+  RB draws the weapon or opens the quickbar wheel, LB swaps weapons or opens the action wheel, View opens the bag or the
+  windows wheel (`Player/WindowsWheel`). On a pad `CommandWheel` picks with the right stick and keeps the last pick when it
+  springs back; its pad pages hold what has no button: actions (light, whistle or get down, rear and strike, companions,
+  emotes, ping, camera style) and windows (character, abilities, skills, journal, map, Haven, build, tutorial). A wheel's
+  choice of a polled action goes through `GameInput.Press`/`WasPressed`. `PlayerInputHandler` leaves the pad's gameplay
+  buttons alone while `PadCursor` is up or a building is being placed; skills never cast in a conversation.
+  Top-down the player faces where they walk, not the idle cursor.
+- **PadCursor** (a game system): in windows, the Escape menu, the map and menu scenes the left stick moves a virtual
+  `Mouse` device (A left button, X right, right stick wheel; triggers are the split and discard modifiers), so every
+  mouse-made window works unchanged; navigation events are off meanwhile, and it starts on the selected button. Not in a
+  conversation, a wheel or a rebinding. On a pad the system pointer hides. `InputDevices` ignores its device.
+- **Building on a pad** (`BuildPlacer`): RT places (hold and walk for a line), LB/RB turn a step, LT held fine-turns, Y
+  held places freely, B cancels. Top-down the spot (`CameraPointer.PadTarget`) starts ahead of the player and the right
+  stick moves it within reach (the camera leaves the stick alone, `BuildPlacer.UsesPadSpot`); a disc marks it while
+  picking a building. In the action view the crosshair aims.
+- **Rumble** (`ControllerRumble`, a game system): `CameraShake.Add` rumbles too, plus pulses for the player's parry and a
+  bite; Controller Vibration option; stops when paused or unfocused. Numbers for all of this: `ControllerSettings`
+  (Resources, Systems Editor › Controller).
 - **Accessibility:** Sound Captions (`SoundCaptions`, a persistent system: `SoundDefinition` › Caption, with the side it came from), Rarity
   Letters on item slots, Damage Taken and Parry and Dodge Timing (`GameOptions.DamageTakenShare`, `TimingShare`). An assist in use is written to
   the playtest log as an `Assist` row, so a helped run can be told from another.

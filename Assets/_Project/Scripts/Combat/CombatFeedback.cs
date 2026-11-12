@@ -334,6 +334,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 CameraShake.Add(feel.ShakeOnHit);
                 break;
             case GuardOutcome.Parried:
+                if (Player.Current != null && victim == Player.Current.Health)
+                {
+                    ControllerRumble.Pulse(ControllerSettings.Current.ParryPulse);
+                }
+
                 Spawn(feel.ParryEffect, point, -damage.Direction);
                 AudioManager.Play(Sounds != null ? Sounds.Parry : null, point);
                 CombatTechniqueSettings rules = CombatTechniqueSettings.Current;

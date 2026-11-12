@@ -243,7 +243,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (!taught && horse.IsTamed)
         {
             taught = true;
-            GameMessages.Post($"Steer with the movement keys. Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop on its breath; {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.KeyLabel(GameInput.Whistle)} gets you down.");
+            GameMessages.Post($"Steer with {(GameInput.UsingGamepad ? "the left stick" : "the movement keys")}. Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop on its breath; {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.Keys("{key:Dismount}")} gets you down.");
         }
     }
 
@@ -445,7 +445,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (Riding != null && !IsMounting && Time.time >= nextReminder)
         {
             nextReminder = Time.time + 6f;
-            GameMessages.Post($"{GameInput.KeyLabel(GameInput.Whistle)} gets you down.", MessageKind.Info);
+            GameMessages.Post(GameInput.Keys("{key:Dismount} gets you down."), MessageKind.Info);
         }
     }
 
@@ -546,7 +546,8 @@ public sealed class PlayerRiding : MonoBehaviour
         }
 
         bool free = !GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen) && !DialogueBox.IsOpen;
-        if (free && GameInput.Whistle != null && GameInput.Whistle.WasPressedThisFrame())
+        // On a controller B gets you down too, as getting off is going back (the wheel's whistle does as well).
+        if (free && (GameInput.WasPressed(GameInput.Whistle) || (InputDevices.UsingGamepad && GameInput.Back != null && GameInput.Back.WasPressedThisFrame())))
         {
             TryGetDown();
             if (Riding == null || IsMounting)
@@ -566,7 +567,7 @@ public sealed class PlayerRiding : MonoBehaviour
 
         bool moving = steer.sqrMagnitude > 0.01f;
         // R: the horse rears and strikes out ahead with its forelegs (bond 40, or a bold horse).
-        if (free && Riding.IsTamed && GameInput.HorseKick != null && GameInput.HorseKick.WasPressedThisFrame() && Time.time >= nextKick)
+        if (free && Riding.IsTamed && GameInput.WasPressed(GameInput.HorseKick) && Time.time >= nextKick)
         {
             if (Riding.Motion.KickOnCommand())
             {
