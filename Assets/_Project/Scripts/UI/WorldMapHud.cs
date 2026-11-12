@@ -10,7 +10,11 @@ using UnityEngine.UI;
 public sealed class WorldMapHud : MonoBehaviour
 {
     private static readonly int ExploredId = Shader.PropertyToID("_Explored");
-    private static readonly int FogId = Shader.PropertyToID("_Fog");
+    private static readonly int PaperId = Shader.PropertyToID("_Paper");
+    private static readonly int GrainId = Shader.PropertyToID("_Grain");
+    private static readonly int BordersId = Shader.PropertyToID("_Borders");
+    private static readonly int BordersRectId = Shader.PropertyToID("_BordersRect");
+    private static readonly int AspectId = Shader.PropertyToID("_Aspect");
     private const float LabelCrowd = 60f;
     private const float LabelWide = 300f;
 
@@ -44,9 +48,11 @@ public sealed class WorldMapHud : MonoBehaviour
     private readonly System.Collections.Generic.List<TMP_Text> regionLabels = new System.Collections.Generic.List<TMP_Text>();
     private readonly System.Collections.Generic.List<(WorldAtlas.Place place, RectTransform root)> placeMarks =
         new System.Collections.Generic.List<(WorldAtlas.Place, RectTransform)>();
-    private static readonly Color BorderColour = new Color(0.94f, 0.86f, 0.64f, 0.7f);
-    private static readonly Color RegionColour = new Color(0.94f, 0.88f, 0.72f, 0.62f);
-    private static readonly Color PlaceColour = new Color(0.96f, 0.92f, 0.8f, 1f);
+    // The map is a parchment sheet now (World Map shader): names and marks are written on it in charcoal and ink.
+    private static readonly Color BorderColour = new Color(1f, 1f, 1f, 1f);
+    private static readonly Color RegionColour = new Color(0.19f, 0.15f, 0.115f, 0.82f);
+    private static readonly Color PlaceColour = new Color(0.30f, 0.17f, 0.09f, 1f);
+    private static readonly Color PlayerColour = new Color(0.62f, 0.14f, 0.09f, 1f);
     private const float PlaceLabelWide = 150f;
     private const float PlaceLabelHigh = 17f;
     private readonly System.Collections.Generic.List<Vector2> placed = new System.Collections.Generic.List<Vector2>();
@@ -121,7 +127,7 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  Stars: places you have found  •  Hearths: boundary stones  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + GameInput.Keys("{key:Back} to return");
+        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  Stars: places you have found  •  Hearths: boundary stones  •  ") + "Where you have been, the map is in colour  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + GameInput.Keys("{key:Back} to return");
     }
 
     private void OnDestroy()
@@ -204,7 +210,9 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         material = new Material(shader);
-        material.SetColor(FogId, UIStyle.Current.Panel);
+        material.SetTexture(PaperId, settings.WorldMapPaper != null ? settings.WorldMapPaper : Texture2D.whiteTexture);
+        material.SetTexture(GrainId, settings.WorldMapGrain != null ? settings.WorldMapGrain : Texture2D.grayTexture);
+        material.SetTexture(BordersId, Texture2D.blackTexture);
         mapImage.material = material;
 
         BuildAtlas();
@@ -214,7 +222,8 @@ public sealed class WorldMapHud : MonoBehaviour
         playerMarker.text = "▲";
         playerMarker.fontSize = 26f;
         playerMarker.alignment = TextAlignmentOptions.Center;
-        playerMarker.color = UIStyle.Current.Accent;
+        // Red ink: it is the one mark that moves, and amber is lost on the parchment.
+        playerMarker.color = PlayerColour;
         playerMarker.raycastTarget = false;
 
         // The minimap has already painted this scene's ground: showing it is instant. Painting again only without one.
@@ -285,6 +294,7 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         mapRect.sizeDelta = new Vector2(width, height);
+        material.SetFloat(AspectId, width / Mathf.Max(1f, height));
         // The raid doesn't stop for the map, and the map covers the clock.
         if (RaidDirector.Current != null)
         {
@@ -488,20 +498,20 @@ public sealed class WorldMapHud : MonoBehaviour
 
         borders.SetPixels32(pixels);
         borders.Apply();
-        RectTransform overlay = Rect("Region Borders", mapRect, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
-        var image = overlay.gameObject.AddComponent<RawImage>();
-        image.texture = borders;
-        image.raycastTarget = false;
-        // The map shows the scene's area; the atlas covers its own (the same terrain): the part of it under the map.
+        // Drawn by the map's shader, in charcoal. The map shows the scene's area; the atlas covers its own (the same
+        // terrain): the part of it under the map.
         Rect covered = atlas.Area;
-        image.uvRect = new Rect((area.xMin - covered.xMin) / covered.width, (area.yMin - covered.yMin) / covered.height,
-            area.width / covered.width, area.height / covered.height);
+        material.SetTexture(BordersId, borders);
+        material.SetVector(BordersRectId, new Vector4((area.xMin - covered.xMin) / covered.width, (area.yMin - covered.yMin) / covered.height,
+            area.width / covered.width, area.height / covered.height));
 
         foreach (WorldAtlas.Region region in atlas.Regions)
         {
             RectTransform words = Rect("Region " + region.name, mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(360f, 40f), Vector2.zero);
             var text = words.gameObject.AddComponent<TextMeshProUGUI>();
             UIStyle.Current.OnWorld(text, true);
+            // Charcoal on paper: the font's own material, without the light-on-dark shadow labels in the world have.
+            text.fontSharedMaterial = text.font.material;
             text.text = region.name.ToUpperInvariant();
             // Small regions get smaller names, so the tarn's name doesn't drown the woods around it.
             text.fontSize = Mathf.Lerp(13f, 21f, Mathf.InverseLerp(0.01f, 0.2f, region.share));
@@ -539,12 +549,10 @@ public sealed class WorldMapHud : MonoBehaviour
             icon.sprite = UIStyle.Current.EventMark;
             icon.color = PlaceColour;
             icon.raycastTarget = false;
-            var outline = shape.gameObject.AddComponent<Outline>();
-            outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
-            outline.effectDistance = new Vector2(1f, -1f);
             RectTransform words = Rect("Label", root, Vector2.one * 0.5f, Vector2.one * 0.5f, new Vector2(260f, 24f), new Vector2(0f, -18f));
             var text = words.gameObject.AddComponent<TextMeshProUGUI>();
             UIStyle.Current.OnWorld(text);
+            text.fontSharedMaterial = text.font.material;
             text.text = place.name;
             text.fontSize = 15f;
             text.fontStyle = FontStyles.Italic;
@@ -592,7 +600,7 @@ public sealed class WorldMapHud : MonoBehaviour
 
                 root.anchoredPosition = OnMap(at.stoneAt, width, height);
                 root.GetComponent<Image>().color = lands.Incursion != null && lands.Incursion.Region == region ? style.Warning
-                    : lands.IsClaimed(region) ? style.Accent : style.Muted;
+                    : lands.IsClaimed(region) ? style.Accent : RegionColour;
             }
         }
 

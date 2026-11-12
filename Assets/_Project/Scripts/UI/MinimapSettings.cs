@@ -9,6 +9,10 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
     [Tooltip("Safe Haven/UI/World Map, which draws the M map. Referenced here so builds keep it (Shader.Find alone lets " +
              "the build strip it).")]
     [SerializeField] private Shader worldMapShader;
+    [Tooltip("The M map's parchment (Art/UI/Map/Map Parchment, tileable; Tools/UI/map_parchment.py).")]
+    [SerializeField] private Texture2D worldMapPaper;
+    [Tooltip("The M map's charcoal grain, linear data (Art/UI/Map/Map Grain: R tooth, G smudge, B slow, A fibres).")]
+    [SerializeField] private Texture2D worldMapGrain;
     [Tooltip("Pixels of the painted map, per side. It is painted once per scene.")]
     [SerializeField, Range(128, 1024)] private int mapSize = 512;
     [Tooltip("The map's size on screen, in UI units.")]
@@ -23,6 +27,8 @@ public sealed class MinimapSettings : GameSettings<MinimapSettings>
 
     public Material Material => material;
     public Shader WorldMapShader => worldMapShader;
+    public Texture2D WorldMapPaper => worldMapPaper;
+    public Texture2D WorldMapGrain => worldMapGrain;
     public int MapSize => mapSize;
     public float Size => size;
     public float BlockedShade => blockedShade;

@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::MinimapSettings
   material: {fileID: 2100000, guid: 48b04bbd30f08d240943d61ebb8579f0, type: 2}
   worldMapShader: {fileID: 4800000, guid: b324d54a322951e43935a543c705ee16, type: 3}
+  worldMapPaper: {fileID: 2800000, guid: e2c82b71c5447ff41a68d81d723cdb0e, type: 3}
+  worldMapGrain: {fileID: 2800000, guid: 564f0f4c944ee024d808266d68a99374, type: 3}
   mapSize: 512
   size: 236
-  nearReach: 28
-  farReach: 105
   creatureSight: 24
   creatureSightAtNight: 11
   blockedShade: 0.62
