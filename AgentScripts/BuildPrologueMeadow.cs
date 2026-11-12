@@ -925,6 +925,12 @@ public static class BuildPrologueMeadow
                 5f, 30f, false, false),
             ("The Wolves' Rock", new[] { new Vector2(-190f, 34f), new Vector2(-178f, 31f), new Vector2(-168f, 37f), new Vector2(-170f, 47f), new Vector2(-182f, 50f),
                 new Vector2(-192f, 43f) }, 6f, 16f, true, true),
+            // In the forest: a rock ridge along the road's north side from the pass towards the stones (the road reads as the way
+            // through), and a crag behind the waystones, so the place the story leads to stands out against rock.
+            ("The Ridge North of the Road", new[] { new Vector2(-84f, 24f), new Vector2(-68f, 27f), new Vector2(-52f, 25f), new Vector2(-38f, 28f),
+                new Vector2(-26f, 34f) }, 6f, 18f, true, false),
+            ("The Crag behind the Waystones", new[] { new Vector2(-9f, 29f), new Vector2(0f, 26f), new Vector2(9f, 29f), new Vector2(11f, 38f), new Vector2(2f, 43f),
+                new Vector2(-8f, 39f) }, 7f, 14f, true, true),
         };
         foreach ((string name, Vector2[] points, float height, float plateau, bool highLeft, bool closed) in crags)
         {

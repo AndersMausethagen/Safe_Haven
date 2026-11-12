@@ -28,7 +28,12 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 6. ~~The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.~~
    (done 2026-11-12: HavenWorldDesign "The Haven itself"; `HomePortal` builds over Haven Meadows. Checked in the Editor and
    in Play: 64% of the meadows can be built on, 23% too uneven, 13% water. Not yet walked by hand.)
-7. The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.
+7. ~~The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.~~
+   (first pass 2026-11-12, in `BuildPrologueMeadow.Land`: escarpments north and south of the meadow, the north stream falling
+   over the northern one beside the camp, the river winding, the Wolves' Rock above the road; in the forest a rock ridge along
+   the road from the pass and a crag behind the waystones. The story's places keep their ground. Not done: the forest's own
+   lumpy ground and walls (made by an older builder that must not run again) and a stream or pool by the stones; nobody has
+   played the prologue through on the new ground by hand.)
 8. Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait
    easier; the size on the fish item (looks only), and the biggest catch in the journal.
 
