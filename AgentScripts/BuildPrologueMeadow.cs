@@ -1254,6 +1254,7 @@ public static class BuildPrologueMeadow
 
         Vector3 fireAt = Ground(Camp.x, Camp.y);
         Fire(root, fireAt);
+        FireCamera(root, fireAt);
         string places = Places(director, root, fireAt, sigrid, eirik, runa);
         GiverData(companions, eirik, runa);
         SigridOffers(sigrid);
@@ -1313,6 +1314,41 @@ public static class BuildPrologueMeadow
     }
 
     // A fire to stand around: the campfire's model and light, without what makes it a building the player owns.
+    private const string CameraZonePrefab = "Assets/_Project/Prefabs/Camera/Camera Zone.prefab";
+
+    /// <summary>Only the camera zone at the morning fire (`--entry BuildPrologueMeadow.CameraAtFire`); Moments makes the same.</summary>
+    public static string CameraAtFire()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+        Transform root = GameObject.Find("Prologue Meadow").transform;
+        CameraZone zone = FireCamera(root, root.Find("Morning Fire").position);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        return $"camera zone at {zone.transform.position:F0}, {zone.Size:F0}; dirty {scene.isDirty}";
+    }
+
+    // The user (2026-11-13): round the starting fire the camera comes slowly down, a few metres closer than usual, so the
+    // party is near when they introduce themselves.
+    private static CameraZone FireCamera(Transform root, Vector3 fireAt)
+    {
+        Transform old = root.Find("Camera Zone - The Morning Fire");
+        if (old != null) Object.DestroyImmediate(old.gameObject);
+        var instance = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>(CameraZonePrefab));
+        instance.name = "Camera Zone - The Morning Fire";
+        instance.transform.SetParent(root, false);
+        instance.transform.position = fireAt + Vector3.up * 2f;
+        CameraZone zone = instance.GetComponent<CameraZone>();
+        var data = new SerializedObject(zone);
+        data.FindProperty("size").vector3Value = new Vector3(24f, 14f, 24f);
+        data.FindProperty("softEdge").floatValue = 5f;
+        data.FindProperty("distance").floatValue = 0.7f;
+        data.FindProperty("tilt").floatValue = -8f;
+        data.FindProperty("blendSeconds").floatValue = 3f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return zone;
+    }
+
     private static void Fire(Transform root, Vector3 at)
     {
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>("Assets/_Project/Prefabs/Structures/Campfire.prefab"));

@@ -87556,6 +87556,7 @@ Transform:
   - {fileID: 136393473}
   - {fileID: 1387748454}
   - {fileID: 775197182}
+  - {fileID: 1931713453}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1494561252
@@ -110634,6 +110635,92 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: 5775944500359952596, guid: 9252d88aee4260542a1d60e374da2d23, type: 3}
   m_PrefabInstance: {fileID: 1930961562}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1931713452
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1493203355}
+    m_Modifications:
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -362
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 19.999603
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 48
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 644747598913296037, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: m_Name
+      value: Camera Zone - The Morning Fire
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: size.x
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: size.y
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: size.z
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: distance
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: softEdge
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4752234065039233873, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+      propertyPath: blendSeconds
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+--- !u!4 &1931713453 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 644740249868162081, guid: 4d77e102a2217284c89d016db06d8dc2, type: 3}
+  m_PrefabInstance: {fileID: 1931713452}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1932047266
 PrefabInstance:

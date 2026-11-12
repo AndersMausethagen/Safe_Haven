@@ -1900,6 +1900,16 @@ ground east of the crag, roars, and its fist still lands as the minute runs out.
 `Shaders/TreeWind.shader` (`_TreeBenders`), which bows a whole tree from its foot by its sway channel, trembling; small plants
 are already pushed by `GrassInteractor`, which it also has. A changed `.shader` needs a reimport: `unity recompile` doesn't.
 
+## Camera zones: places that frame the player differently (2026-11-13)
+
+`CameraZone` (`Prefabs/Camera/Camera Zone`, GameObject › Safe Haven › Camera Zone) is a box placed in the world (Size, with
+drag handles in the Scene view, turned with the object) and a Soft Edge: while the player is in it the top-down camera comes
+closer or goes out (Distance, a share of the usual) and tilts (degrees on its pitch), easing over Blend Seconds as they walk
+in and out. It asks the camera through `PlayerCameraController.SetCloseness` / `SetTilt` (several zones combine), so the
+player's own zoom, style and dialogue framing stay as they are. The prologue's morning fire has one (0.7 of the distance,
+8 degrees flatter, over 3 s: the party close while they introduce themselves), made by `BuildPrologueMeadow`
+(`--entry BuildPrologueMeadow.CameraAtFire`; Moments makes the same). `CameraZoneTests`.
+
 ## Spoken dialogue: a recording for a line, found by who says it and what they say
 
 Characters speak their lines aloud. Nothing in the dialogue data points at a recording: whoever shows a line asks the

@@ -133,6 +133,28 @@ public sealed class PlayerCameraController : MonoBehaviour
     private readonly System.Collections.Generic.Dictionary<object, float> closeness = new System.Collections.Generic.Dictionary<object, float>();
     private float closenessNow = 1f;
     private float closenessVelocity;
+    private readonly System.Collections.Generic.Dictionary<object, float> tilts = new System.Collections.Generic.Dictionary<object, float>();
+    private float tiltNow;
+    private float tiltVelocity;
+
+    /// <summary>Tilts the view while <paramref name="source"/> asks (a CameraZone): degrees added to its pitch, negative
+    /// looking flatter across the ground, positive more from above; 0 lets it go. Several add up, within 30 degrees.</summary>
+    public void SetTilt(object source, float degrees)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        if (Mathf.Abs(degrees) < 0.01f)
+        {
+            tilts.Remove(source);
+        }
+        else
+        {
+            tilts[source] = degrees;
+        }
+    }
 
     /// <summary>Brings the view in (or out) a little while <paramref name="source"/> asks (in for taming a horse, out at a
     /// gallop): its distance times <paramref name="scale"/>, eased in and out; 1 lets it go. With several asking, the nearest
@@ -710,6 +732,18 @@ public sealed class PlayerCameraController : MonoBehaviour
 
         closenessNow = Mathf.SmoothDamp(closenessNow, wantedCloseness, ref closenessVelocity, 0.6f, Mathf.Infinity, Time.unscaledDeltaTime);
         distance *= closenessNow;
+        float wantedTilt = 0f;
+        foreach (var asked in tilts)
+        {
+            if (!(asked.Key is Object thing) || thing != null)
+            {
+                wantedTilt += asked.Value;
+            }
+        }
+
+        tiltNow = Mathf.SmoothDamp(tiltNow, Mathf.Clamp(wantedTilt, -30f, 30f), ref tiltVelocity, 0.6f, Mathf.Infinity, Time.unscaledDeltaTime);
+        // Only the top-down view: the action camera's pitch is the player's own.
+        viewPitch = Mathf.Clamp(viewPitch + tiltNow * (1f - w), 5f, 89f);
         float close = Mathf.SmoothStep(0f, 1f, Mathf.Min(closeUpWeight, closeUpNearWeight)) * (1f - w);
         float viewYaw = yaw;
         if (close > 0f)
