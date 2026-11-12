@@ -61,9 +61,11 @@ public static class BuildPrologueMeadow
     private static readonly Vector2[] RoadToStones = { new Vector2(-6f, -18f), new Vector2(-4f, -8f), new Vector2(-1f, 1f), new Vector2(0f, 5f) };
     private static readonly Vector2[] NorthStream = { new Vector2(-341f, 99f), new Vector2(-338f, 76f), new Vector2(-335f, 58f), new Vector2(-338f, 34f),
         new Vector2(-340f, 16f), new Vector2(-345f, 2f) };
-    // x, surface height, z: from the lake to the forest's waterfall, on through the basin and out through its south wall.
-    private static readonly Vector3[] EastRiver = { new Vector3(-325f, 12.7f, -22f), new Vector3(-300f, 12.65f, -24f), new Vector3(-256f, 12.55f, -26f),
-        new Vector3(-205f, 12.45f, -27f), new Vector3(-150f, 12.35f, -24f), new Vector3(-112f, 12.25f, -24f), new Vector3(-100f, 12.15f, -24.5f),
+    // x, surface height, z: from the lake to the forest's waterfall, on through the basin and out through its south wall. Across
+    // the meadow it winds a little, under the south escarpment, never nearer the road than 15 m.
+    private static readonly Vector3[] EastRiver = { new Vector3(-325f, 12.7f, -22f), new Vector3(-300f, 12.66f, -27f), new Vector3(-275f, 12.62f, -32f),
+        new Vector3(-250f, 12.58f, -29f), new Vector3(-228f, 12.54f, -34f), new Vector3(-205f, 12.47f, -30f), new Vector3(-178f, 12.42f, -33f),
+        new Vector3(-150f, 12.35f, -27f), new Vector3(-125f, 12.29f, -25f), new Vector3(-112f, 12.25f, -24f), new Vector3(-100f, 12.15f, -24.5f),
         new Vector3(-93f, 8f, -26f), new Vector3(-86f, 5.2f, -29f), new Vector3(-70f, 4.4f, -40f), new Vector3(-58f, 3.8f, -52f), new Vector3(-40f, 3.2f, -70f),
         new Vector3(-12f, 2.6f, -86f), new Vector3(12f, 2.2f, -99f) };
 
@@ -722,6 +724,9 @@ public static class BuildPrologueMeadow
         surface.navMeshData = Load<NavMeshData>(NavMeshAsset);
         EditorUtility.SetDirty(surface);
 
+        // Displacement.Apply above resets the forest's: back to the Haven's footprints and ground shape (as Footprints does).
+        foreach (Terrain terrain in new[] { meadow, forest }) TerrainDisplacementEditor.UseStandardFootprints(terrain);
+
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
@@ -904,6 +909,44 @@ public static class BuildPrologueMeadow
         riverData.FindProperty("depth").floatValue = 1f;
         riverData.FindProperty("bankWidth").floatValue = 5f;
         riverData.ApplyModifiedPropertiesWithoutUndo();
+
+        // Height where the story walks beside it, never where it stands (the camp, the lake shore, the boar meadow, the cart, the
+        // road): an escarpment behind the camp that the north stream falls over into the lake's valley, a lower one beyond the river
+        // to the south, and a rock above the road near the forest, where the wolves wait. The Haven's rock kit and paint.
+        WorldLook haven = WorldLook.ForestLake;
+        TerrainLayer rock = TerrainRock.CliffRock != null ? TerrainRock.CliffRock : haven.RiverBed;
+        (string name, Vector2[] points, float height, float plateau, bool highLeft, bool closed)[] crags =
+        {
+            ("The North Escarpment", new[] { new Vector2(-399f, 80f), new Vector2(-380f, 77f), new Vector2(-360f, 73f), new Vector2(-340f, 72f), new Vector2(-318f, 68f),
+                new Vector2(-290f, 64f), new Vector2(-262f, 61f), new Vector2(-232f, 62f), new Vector2(-205f, 66f), new Vector2(-178f, 72f), new Vector2(-158f, 84f),
+                new Vector2(-150f, 99f) }, 7f, 40f, true, false),
+            ("The South Escarpment", new[] { new Vector2(-399f, -63f), new Vector2(-372f, -55f), new Vector2(-345f, -52f), new Vector2(-318f, -56f), new Vector2(-285f, -60f),
+                new Vector2(-255f, -58f), new Vector2(-225f, -62f), new Vector2(-195f, -60f), new Vector2(-168f, -64f), new Vector2(-150f, -74f), new Vector2(-142f, -99f) },
+                5f, 30f, false, false),
+            ("The Wolves' Rock", new[] { new Vector2(-190f, 34f), new Vector2(-178f, 31f), new Vector2(-168f, 37f), new Vector2(-170f, 47f), new Vector2(-182f, 50f),
+                new Vector2(-192f, 43f) }, 6f, 16f, true, true),
+        };
+        foreach ((string name, Vector2[] points, float height, float plateau, bool highLeft, bool closed) in crags)
+        {
+            var cliff = Feature<CliffFeature>(world, name, Flat(points));
+            cliff.Spline.Closed = closed;
+            cliff.Configure(haven.Crags, haven.Palette("Rubble"), rock);
+            Set(cliff, "height", height);
+            Set(cliff, "plateau", plateau);
+            Set(cliff, "faceDepth", 2f);
+            Set(cliff, "raggedness", 0.6f);
+            Set(cliff, "ledgeStrength", 0.45f);
+            Set(cliff, "faceNoise", 0.4f);
+            Set(cliff, "overlap", 0.32f);
+            Set(cliff, "inset", 0.3f);
+            Set(cliff, "rubblePer10m", 1.5f);
+            var crag = new SerializedObject(cliff);
+            crag.FindProperty("highSide").enumValueIndex = (int)(highLeft ? CliffFeature.HighSide.Left : CliffFeature.HighSide.Right);
+            crag.FindProperty("shaping").enumValueIndex = (int)CliffFeature.Shaping.Raise;
+            crag.FindProperty("ledges").intValue = closed ? 0 : 2;
+            crag.FindProperty("sizeVariation").vector2Value = new Vector2(0.95f, 1.25f);
+            crag.ApplyModifiedPropertiesWithoutUndo();
+        }
 
         // Oaks on the slopes north and south, thickening into dark spruce along the forest's edge. The road and the river keep a gap.
         (string name, Vector2[] points)[] groves =

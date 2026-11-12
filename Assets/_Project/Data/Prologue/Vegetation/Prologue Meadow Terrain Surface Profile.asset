@@ -17,7 +17,7 @@ MonoBehaviour:
   - terrainLayer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 0.47663546
+    amplitude: 0.6
     midpoint: 0.33598477
     contrast: 1
     footprintResponse: 1
@@ -25,7 +25,7 @@ MonoBehaviour:
   - terrainLayer: {fileID: 8574412962073106934, guid: 5effec8d888e03644876d67aaa777011, type: 2}
     heightMap: {fileID: 0}
     channel: 0
-    amplitude: 0.47663546
+    amplitude: 0.6
     midpoint: 0.3487135
     contrast: 1
     footprintResponse: 1

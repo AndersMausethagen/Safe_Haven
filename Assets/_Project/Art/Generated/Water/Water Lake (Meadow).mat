@@ -40,6 +40,7 @@ Material:
     - _Caustics: 0.6
     - _CausticsTiling: 2.5
     - _Clarity: 1.6
+    - _CloudReflection: 1
     - _Cull: 2
     - _DepthDistance: 1.27
     - _FallFoam: 0.85
@@ -56,7 +57,11 @@ Material:
     - _Reflection: 0.8
     - _Refraction: 0.03
     - _RippleStrength: 1
+    - _ScreenReflection: 1
     - _ShoreFoam: 0.25
+    - _SkyReflectionFloor: 0.08
+    - _SkySaturation: 0.5
+    - _SkyTilt: 0.5
     - _Smoothness: 0.93
     - _SpeedFoam: 0.5
     - _SteepFaces: 0

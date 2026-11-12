@@ -42,15 +42,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl0:
-        m_Texture: {fileID: -2521052924930947106, guid: 3baf45675025e624da846e3db178b88b, type: 2}
+        m_Texture: {fileID: 3458734090441207929, guid: 3baf45675025e624da846e3db178b88b, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl1:
-        m_Texture: {fileID: 4076970588936306222, guid: 3baf45675025e624da846e3db178b88b, type: 2}
+        m_Texture: {fileID: -3956296196952867102, guid: 3baf45675025e624da846e3db178b88b, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl2:
-        m_Texture: {fileID: 3794611668012412238, guid: 3baf45675025e624da846e3db178b88b, type: 2}
+        m_Texture: {fileID: -4861080863314556837, guid: 3baf45675025e624da846e3db178b88b, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DisplacementControl3:
@@ -141,34 +141,34 @@ Material:
     m_Floats:
     - _AntiTiling: 0.85
     - _AntiTilingScale: 0.57
-    - _CliffBreakup: 0.6
+    - _CliffBreakup: 0.65
     - _CliffDisplacement: 0.32210526
     - _CliffHeightMidpoint: 0.46464366
-    - _CliffNormalStrength: 1
-    - _CliffSlopeEnd: 56
-    - _CliffSlopeStart: 40
-    - _CliffStrength: 1
+    - _CliffNormalStrength: 0.568
+    - _CliffSlopeEnd: 54
+    - _CliffSlopeStart: 42
+    - _CliffStrength: 0.759
     - _CliffTiling: 4
     - _DetailFocusFar: 25
     - _DetailFocusNear: 15
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
-    - _DisplacementLayerCount: 12
+    - _DisplacementLayerCount: 11
     - _DisplacementMip: 0
     - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0.3
+    - _DisplacementStrength: 0.247
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0
-    - _HeightBlendSharpness: 0
-    - _HeightTransition: 0.8
+    - _HeightBlendSharpness: 1.76
+    - _HeightTransition: 0.763
     - _MacroVariation: 0.15
     - _Metallic0: 0
     - _Metallic1: 0
     - _Metallic2: 0
     - _Metallic3: 0
-    - _NormalMapStrength: 1
+    - _NormalMapStrength: 0.63
     - _NumLayersCount: 1
     - _RockAlwaysFrom: 50
     - _RockAntiTiling: 1

@@ -182,6 +182,14 @@ MonoBehaviour:
     contrast: 1
     footprintResponse: 1
     rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 41b8a24d3605c4d4391595396ff1716e, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.49038455
+    midpoint: 0.3309674
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
   footprints: 1
   footprintLifetime: 30
   footprintDepth: 0.035

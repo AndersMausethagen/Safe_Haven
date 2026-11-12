@@ -153,11 +153,11 @@ Material:
     - _DetailFocusNear: 15
     - _DisplacementDataVersion: 2
     - _DisplacementFar: 35
-    - _DisplacementLayerCount: 14
+    - _DisplacementLayerCount: 16
     - _DisplacementMip: 0
     - _DisplacementNear: 30.4
     - _DisplacementNormalStrength: 1
-    - _DisplacementStrength: 0.3
+    - _DisplacementStrength: 0.247
     - _EnableHeightBlend: 1
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0
