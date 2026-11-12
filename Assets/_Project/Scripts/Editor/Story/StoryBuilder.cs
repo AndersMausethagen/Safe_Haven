@@ -82,7 +82,9 @@ public static class StoryBuilder
             List<StoryTrigger> triggers = made.Key.Nodes.OfType<StoryTrigger>().ToList();
             for (int i = 0; i < triggers.Count; i++)
             {
-                triggers[i].id = i < made.Value.Count && !string.IsNullOrEmpty(made.Value[i]) ? made.Value[i] : StableId($"trigger:{made.Key.name}#{i}");
+                // Through the script, so the links out of the trigger follow it (setting the id alone left every story
+                // stopped at its trigger).
+                made.Key.SetId(triggers[i], i < made.Value.Count && !string.IsNullOrEmpty(made.Value[i]) ? made.Value[i] : StableId($"trigger:{made.Key.name}#{i}"));
             }
 
             EditorUtility.SetDirty(made.Key);

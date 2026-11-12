@@ -36,6 +36,50 @@ public sealed class StoryTests
         Assert.IsTrue(kinds.Select(k => (StoryNode)Activator.CreateInstance(k)).Count(n => n.IsTrigger) >= 5, "several ways to start a story");
     }
 
+    // The builders give triggers the ids saved games know after linking them (StoryBuilder.Finish). Setting the id alone
+    // once left 27 stories stopped at their trigger: Eirik never gave the hatchet, and Sigrid never opened the prologue.
+    [Test]
+    public void BuilderGivesTriggersTheirIdsAndKeepsTheirLinks()
+    {
+        holder = new GameObject("Stories");
+        StoryScript story = StoryBuilder.Fresh(holder.transform, "Story - Test");
+        var start = new WhenSceneStarts();
+        var wait = new WaitNode();
+        StoryBuilder.Link(story, (start, 0, wait));
+        StoryBuilder.Finish();
+
+        Assert.AreEqual(StoryBuilder.StableId("trigger:Story - Test#0"), start.id);
+        Assert.AreEqual(start.id, story.Links.Single().from);
+        Assert.AreEqual(wait.id, story.Links.Single().to);
+        Assert.IsEmpty(story.FindProblems());
+    }
+
+    [Test]
+    public void EveryStoryInTheGameFollowsItsLinks()
+    {
+        int checkedStories = 0;
+        foreach (EditorBuildSettingsScene entry in EditorBuildSettings.scenes.Where(s => s.enabled))
+        {
+            var scene = EditorSceneManager.OpenPreviewScene(entry.path);
+            try
+            {
+                foreach (StoryScript story in scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)))
+                {
+                    checkedStories++;
+                    var ids = story.Nodes.Where(n => n != null).Select(n => n.id).ToHashSet();
+                    Assert.IsTrue(story.Links.All(l => ids.Contains(l.from) && ids.Contains(l.to)), $"{entry.path}: {story.name} has a link to or from a node it doesn't have");
+                    Assert.IsTrue(story.Nodes.Where(n => n != null && n.IsTrigger).All(t => story.Links.Any(l => l.from == t.id)), $"{entry.path}: {story.name} has a trigger that leads nowhere");
+                }
+            }
+            finally
+            {
+                EditorSceneManager.ClosePreviewScene(scene);
+            }
+        }
+
+        Assert.Greater(checkedStories, 30, "the prologue's and the Haven's stories");
+    }
+
     [Test]
     public void LinksFollowTheirNodesAndNeverLeadIntoATrigger()
     {

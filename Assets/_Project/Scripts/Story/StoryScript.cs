@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -94,6 +95,23 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
         links.RemoveAll(link => link.from == from.id && link.output == output && link.to == to.id);
     }
 
+    /// <summary>Gives a node another id and moves its links with it (builders give triggers back the ids saved games know).</summary>
+    public void SetId(StoryNode node, string id)
+    {
+        if (node == null || string.IsNullOrEmpty(id) || node.id == id)
+        {
+            return;
+        }
+
+        foreach (StoryLink link in links)
+        {
+            if (link.from == node.id) link.from = id;
+            if (link.to == node.id) link.to = id;
+        }
+
+        node.id = id;
+    }
+
     public StoryNode Find(string id)
     {
         foreach (StoryNode node in nodes)
@@ -131,6 +149,19 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
         if (nodes.Count > 0 && !anyTrigger)
         {
             problems.Add("No trigger, so the story never starts.");
+        }
+
+        // A link to or from a node that isn't there is never followed: the story stops at it, with no error.
+        var ids = new HashSet<string>();
+        foreach (StoryNode node in nodes)
+        {
+            if (node != null) ids.Add(node.id);
+        }
+
+        int loose = links.Count(link => !ids.Contains(link.from) || !ids.Contains(link.to));
+        if (loose > 0)
+        {
+            problems.Add($"{loose} link(s) lead from or to a node that isn't in the graph, so the story stops there.");
         }
 
         return problems;
