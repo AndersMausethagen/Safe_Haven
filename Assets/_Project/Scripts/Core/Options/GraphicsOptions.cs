@@ -25,7 +25,22 @@ public static class GraphicsOptions
     private static readonly float[] LodShare = { 0.6f, 0.8f, 1f };
     private static readonly int[] MipLimit = { 2, 1, 0 };
     private static readonly UpscalingFilterSelection[] Upscalers =
-        { UpscalingFilterSelection.Linear, UpscalingFilterSelection.FSR, UpscalingFilterSelection.STP };
+        { UpscalingFilterSelection.Linear, UpscalingFilterSelection.FSR, UpscalingFilterSelection.STP, UpscalingFilterSelection.STP, UpscalingFilterSelection.STP };
+    public const int DlssChoice = 3;
+    public const int Fsr2Choice = 4;
+#if ENABLE_UPSCALER_FRAMEWORK
+    // URP's upscalers by name (the Upscaling choices in order); DLSS 4 and FSR 2 come with the NVIDIA and AMD modules.
+    private static readonly string[] UpscalerNames =
+        { "Bilinear", "FidelityFX Super Resolution 1.0", "Spatial-Temporal Post-Processing", "Deep Learning Super Sampling 4", "FidelityFX Super Resolution 2" };
+    private const string StpName = "Spatial-Temporal Post-Processing";
+    private static DLSSOptions dlssOptions;
+    private static FSR2Options fsr2Options;
+    private static bool? dlssAvailable;
+    private static bool? fsr2Available;
+#endif
+
+    /// <summary>The upscaler in use after the last Apply (Options shows when DLSS or FSR 2 can't run here).</summary>
+    public static string ActiveUpscaler { get; private set; } = "";
 
     private static readonly Dictionary<Camera, AntialiasingMode> AuthoredCameras = new Dictionary<Camera, AntialiasingMode>();
     private static readonly Dictionary<Terrain, (float density, float distance)> AuthoredTerrains = new Dictionary<Terrain, (float, float)>();
@@ -93,7 +108,7 @@ public static class GraphicsOptions
         }
 
         runtime.renderScale = Mathf.Min(GameOptions.RenderScale.Value, authored.renderScale);
-        runtime.upscalingFilter = GameOptions.RenderScale.Value < 0.999f ? Upscalers[GameOptions.Upscaling.Index] : authored.upscalingFilter;
+        ApplyUpscaler();
         runtime.msaaSampleCount = MsaaSamples[GameOptions.AntiAliasing.Index];
 
         int shadows = GameOptions.Shadows.Index;
@@ -113,6 +128,97 @@ public static class GraphicsOptions
         QualitySettings.globalTextureMipmapLimit = Mathf.Max(authoredMipLimit, MipLimit[GameOptions.TextureQuality.Index]);
         ApplyToScene();
     }
+
+    // Below 100% Render Scale the chosen upscaler brings the picture up. DLSS and FSR 2 rebuild it from several frames, and
+    // the Render Scale picks their quality mode (they set the resolution themselves): 100% is DLAA for DLSS (native, only
+    // its anti-aliasing) and Quality for FSR 2, 75% Quality, 60% Balanced, 50% Performance, below that Ultra Performance.
+    // On a card or graphics API that can't run them they fall back to STP.
+    private static void ApplyUpscaler()
+    {
+        int choice = Mathf.Clamp(GameOptions.Upscaling.Index, 0, Upscalers.Length - 1);
+        bool scaled = GameOptions.RenderScale.Value < 0.999f;
+#if ENABLE_UPSCALER_FRAMEWORK
+        float scale = GameOptions.RenderScale.Value;
+        if (choice == DlssChoice && DlssAvailable())
+        {
+            dlssOptions ??= NewOptions<DLSSOptions>(UpscalerNames[DlssChoice]);
+            dlssOptions.dlssQualityMode = scale >= 0.999f ? UnityEngine.NVIDIA.DLSSQuality.DLAA
+                : scale >= 0.7f ? UnityEngine.NVIDIA.DLSSQuality.MaximumQuality
+                : scale >= 0.55f ? UnityEngine.NVIDIA.DLSSQuality.Balanced
+                : scale >= 0.45f ? UnityEngine.NVIDIA.DLSSQuality.MaximumPerformance
+                : UnityEngine.NVIDIA.DLSSQuality.UltraPerformance;
+            Use(dlssOptions);
+            runtime.renderScale = 1f;
+            runtime.upscalerName = UpscalerNames[DlssChoice];
+        }
+        else if (choice == Fsr2Choice && Fsr2Available())
+        {
+            fsr2Options ??= NewOptions<FSR2Options>(UpscalerNames[Fsr2Choice]);
+            fsr2Options.fsr2QualityMode = scale >= 0.7f ? UnityEngine.AMD.FSR2Quality.Quality
+                : scale >= 0.55f ? UnityEngine.AMD.FSR2Quality.Balanced
+                : scale >= 0.45f ? UnityEngine.AMD.FSR2Quality.Performance
+                : UnityEngine.AMD.FSR2Quality.UltraPerformance;
+            Use(fsr2Options);
+            runtime.renderScale = 1f;
+            runtime.upscalerName = UpscalerNames[Fsr2Choice];
+        }
+        else
+        {
+            string wanted = choice >= DlssChoice ? StpName : UpscalerNames[choice];
+            runtime.upscalerName = scaled ? wanted : authored.upscalerName;
+        }
+
+        ActiveUpscaler = runtime.upscalerName;
+#else
+        runtime.upscalingFilter = scaled ? Upscalers[choice] : authored.upscalingFilter;
+        ActiveUpscaler = runtime.upscalingFilter.ToString();
+#endif
+    }
+
+#if ENABLE_UPSCALER_FRAMEWORK
+    // The working copy's own options: the pipeline asset's sub-assets are shared with the project and must not change.
+    private static T NewOptions<T>(string upscaler) where T : UpscalerOptions
+    {
+        var options = ScriptableObject.CreateInstance<T>();
+        options.hideFlags = HideFlags.HideAndDontSave;
+        options.upscalerName = upscaler;
+        return options;
+    }
+
+    private static void Use(UpscalerOptions options)
+    {
+        List<UpscalerOptions> list = runtime.upscalerOptions;
+        list.RemoveAll(o => o == null || o.upscalerName == options.upscalerName);
+        list.Add(options);
+    }
+
+    /// <summary>True when this card and graphics API can run DLSS (an NVIDIA RTX card).</summary>
+    public static bool DlssAvailable() => dlssAvailable ??= Check(typeof(DLSSIUpscaler), "CheckDLSSFeatureAvailable");
+
+    /// <summary>True when the AMD plugin runs here: most cards, but only on DirectX 12 or Vulkan. On DirectX 11 URP's own
+    /// check says yes, and the plugin then throws inside ffxFsr2GetRenderResolutionFromQualityMode and takes the whole
+    /// game down (it crashed the Editor, 2026-11-12).</summary>
+    public static bool Fsr2Available() => fsr2Available ??=
+        (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12 || SystemInfo.graphicsDeviceType == GraphicsDeviceType.Vulkan)
+        && Check(typeof(FSR2IUpscaler), "CheckFSR2FeatureAvailable");
+
+    // URP's own check for each, which is private to it.
+    private static bool Check(System.Type upscaler, string method)
+    {
+        System.Reflection.MethodInfo check = upscaler.GetMethod(method, System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+        try
+        {
+            return check != null && (bool)check.Invoke(null, null);
+        }
+        catch (System.Exception)
+        {
+            return false;
+        }
+    }
+#else
+    public static bool DlssAvailable() => false;
+    public static bool Fsr2Available() => false;
+#endif
 
     /// <summary>The terrains of the loaded scene: their surface detail, grass and small plants.</summary>
     public static void ApplyToScene()

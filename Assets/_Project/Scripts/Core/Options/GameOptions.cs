@@ -34,7 +34,13 @@ public static class GameOptions
         "Sets everything below at once. Ultra is the game as it was made.", PresetUltra, "Low", "Medium", "High", "Ultra", "Custom");
     public static readonly GameOption RenderScale = GameOption.Slider("RenderScale", "Render Scale",
         "How many pixels are drawn, as a share of the screen. Lowering it is the biggest gain on a slow graphics card.", 1f, 0.5f, 1f, 0.05f);
-    public static readonly GameOption Upscaling = GameOption.Choice("Upscaling", "Upscaling", "How a Render Scale below 100% is brought up to the screen.", 1, "Bilinear", "FSR", "STP");
+    // DLSS and FSR 2 (2026-11-12, the user asked for NVIDIA's and AMD's): URP's own, with the NVIDIA and AMD modules and the
+    // ENABLE_UPSCALER_FRAMEWORK define. New choices go last, so a saved index keeps its meaning.
+    public static readonly GameOption Upscaling = GameOption.Choice("Upscaling", "Upscaling",
+        "How the picture is brought up to the screen. Bilinear, FSR and STP work below 100% Render Scale. DLSS (NVIDIA RTX cards) " +
+        "and FSR 2 (AMD, most cards, DirectX 12 or Vulkan only) rebuild a sharp picture from several frames, often a big gain in " +
+        "frame rate; with them Render Scale picks the quality: 100% DLAA (DLSS) or Quality, 75% Quality, 60% Balanced, 50% " +
+        "Performance. Where they can't run, STP is used.", 1, "Bilinear", "FSR", "STP", "DLSS", "FSR 2");
     public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher MSAA costs more; TAA also smooths shimmering grass, leaves and fine detail, a little softer in motion.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA", "TAA");
     // Ultra (2026-11-09): an 8K sun shadow map. At the usual top-down zoom a 4K map was too coarse for the ground's own
     // relief (stones, roots, clumps a few centimetres high): its shadows only showed when zoomed in.
