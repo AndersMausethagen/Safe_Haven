@@ -18,6 +18,8 @@ public sealed class CoopWireTests
     private static readonly Dictionary<int, string> Fingerprints = new Dictionary<int, string>
     {
         [21] = "c8d2be2d283c800d221e1ecebbb69670",
+        // 22 (horses, CoopHorses) went out without one; 23 adds the Haven's decisions (CoopDecisions).
+        [23] = "54295e6eb7f1a2795b8bbf713d654006",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

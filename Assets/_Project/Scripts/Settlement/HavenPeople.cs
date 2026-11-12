@@ -137,14 +137,36 @@ public static class HavenPeople
         }
 
         entry.Details.Add(new HavenDetail("Keeps making, from the stash", string.Join("\n", orders)));
-        entry.Actions.Add(new HavenAction(record.WorkPaused ? "Back to work" : "Pause their work", () =>
+        // Made where the Haven is kept: a visitor's word goes to their friend's game (HavenDecisions).
+        entry.Actions.Add(new HavenAction(record.WorkPaused ? "Back to work" : "Pause their work",
+            () => HavenDecisions.Do("resident.pause", record.Resident.Id), closesWindow: false, primary: false));
+    }
+
+    [HavenDecision("resident.pause")]
+    private static HavenDecisions.Outcome TogglePause(string residentId)
+    {
+        ResidentRecord record = RecordOf(residentId);
+        if (record == null || record.Job == null)
         {
-            // A friend's residents work as they decide; a copy changed here would be undone by their next word.
-            if (!HavenVisit.LeftToHost())
+            return HavenDecisions.Outcome.Refused("They have no work to pause now.");
+        }
+
+        record.WorkPaused = !record.WorkPaused;
+        return HavenDecisions.Outcome.Made(record.WorkPaused ? $"{record.Resident.DisplayName} rests from their work." : $"{record.Resident.DisplayName} goes back to work.");
+    }
+
+    /// <summary>A resident of this Haven by their id, or null (what a friend's decision names them by).</summary>
+    public static ResidentRecord RecordOf(string residentId)
+    {
+        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        {
+            if (record != null && record.Resident != null && record.Resident.Id == residentId)
             {
-                record.WorkPaused = !record.WorkPaused;
+                return record;
             }
-        }, closesWindow: false, primary: false));
+        }
+
+        return null;
     }
 
     private static HavenEntry AwayEntry(ResidentDefinition person)

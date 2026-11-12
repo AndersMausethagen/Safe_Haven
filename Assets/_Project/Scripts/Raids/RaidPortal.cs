@@ -183,13 +183,9 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         page.Add(new MenuAction($"Improve the portal: {next.title}", $"{next.description}\n{cost}" + (affordable ? "" : $"   <color={UIStyle.Current.DangerHex}>{missing}</color>"), affordable, () => Improve(user)));
     }
 
+    // Paid from what the player has at hand: a visitor helps improve their friend's portal (HavenDecisions).
     private static void Improve(GameObject user)
     {
-        if (HavenVisit.LeftToHost())
-        {
-            return;
-        }
-
         SettlementSettings settings = SettlementSettings.Current;
         int level = GameSession.Settlement.PortalLevel;
         if (level >= settings.PortalLevels.Count || !MaterialPool.For(user).TrySpend(settings.PortalLevels[level].cost, settings.PortalLevels[level].items))
@@ -197,13 +193,28 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
             return;
         }
 
+        HavenDecisions.Do("portal.improve", level.ToString(System.Globalization.CultureInfo.InvariantCulture), settings.PortalLevels[level].cost, settings.PortalLevels[level].items);
+    }
+
+    // The portal improved from the level the player saw (another may have improved it meanwhile).
+    [HavenDecision("portal.improve")]
+    private static HavenDecisions.Outcome ImprovePortal(string fromLevel)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        int level = GameSession.Settlement.PortalLevel;
+        if (!int.TryParse(fromLevel, out int seen) || seen != level || level >= settings.PortalLevels.Count)
+        {
+            return HavenDecisions.Outcome.Refused("The portal was improved meanwhile: what you gave is back in your bag.");
+        }
+
         GameSession.Settlement.ImprovePortal();
-        if (user.TryGetComponent(out ItemInventory inventory))
+        // The safe pocket grows with the portal (the Haven's own player's).
+        if (Player.Current != null && Player.Current.TryGetComponent(out ItemInventory inventory))
         {
             inventory.RefreshPocket();
         }
 
-        GameMessages.Post($"The stones settle: {settings.PortalLevels[level].description}", MessageKind.Gain);
+        return HavenDecisions.Outcome.Made($"The stones settle: {settings.PortalLevels[level].description}");
     }
 
     private void OpenPlanner(GameObject user)

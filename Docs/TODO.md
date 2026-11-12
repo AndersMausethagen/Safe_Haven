@@ -21,7 +21,10 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
    prompts converted; voice lines keep their recordings.)
 4. ~~Horses in co-op: taming, owning and riding synchronised.~~ (done 2026-11-12: `CoopHorses`, GDD §10.9 "Horses together",
    ARCHITECTURE "Horses together". Checked in one Editor with a second NetworkManager, not between two machines.)
-5. Research ways to make new systems work in co-op by default, without per-system networking.
+5. ~~Research ways to make new systems work in co-op by default, without per-system networking.~~ (done 2026-11-12:
+   ARCHITECTURE "Co-op by default": what is saved is shared (HavenSync), what moves has one runner (CoopHorses' keeper
+   model, Valheim's ownership), Haven decisions go where the Haven is kept (`HavenDecisions` + `CoopDecisions`, five made
+   so). Left: trades, workshop queues, portal repair; lift CoopHorses' runner core into a base when a second thing moves.)
 6. The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.
 7. The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.
 8. Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait

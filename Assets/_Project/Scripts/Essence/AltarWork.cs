@@ -62,11 +62,6 @@ public static class AltarWork
     /// <summary>Queues batches at the altar, paying their Cursed Essence now. Returns false when it can't.</summary>
     public static bool Purify(GameObject user, int batches)
     {
-        if (HavenVisit.LeftToHost())
-        {
-            return false;
-        }
-
         SettlementSettings settings = SettlementSettings.Current;
         int room = settings.MaxQueuedBatches - GameSession.Settlement.PurificationQueued;
         batches = Mathf.Min(batches, room);
@@ -77,9 +72,22 @@ public static class AltarWork
             return false;
         }
 
+        // A visitor's essence goes on their friend's altar (HavenDecisions).
+        return HavenDecisions.Do("altar.purify", batches.ToString(System.Globalization.CultureInfo.InvariantCulture), price);
+    }
+
+    [HavenDecision("altar.purify")]
+    private static HavenDecisions.Outcome QueueAtAltar(string count)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        int room = settings.MaxQueuedBatches - GameSession.Settlement.PurificationQueued;
+        if (!int.TryParse(count, out int batches) || batches <= 0 || batches > room)
+        {
+            return HavenDecisions.Outcome.Refused("The altar has no room for that much now: your essence is back in your bag.");
+        }
+
         GameSession.Settlement.QueuePurification(batches, settings.MaxQueuedBatches);
-        GameMessages.Post($"The altar takes {cost} {settings.CursedEssence.DisplayName}.");
-        return true;
+        return HavenDecisions.Outcome.Made($"The altar takes {batches * settings.CursedPerBatch} {settings.CursedEssence.DisplayName}.");
     }
 
     // ----- Empowering -----

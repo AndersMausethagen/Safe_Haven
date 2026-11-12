@@ -201,6 +201,37 @@ public sealed class MaterialPool
         return added;
     }
 
+    /// <summary>
+    /// Gives back what a payment took (a decision the host's game turned down, HavenDecisions): resources as <see cref="Add"/>
+    /// puts them, items into the bag; what no longer fits is dropped at <paramref name="dropAt"/>.
+    /// </summary>
+    public void GiveBack(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items, Transform dropAt)
+    {
+        if (Cheats.FreeCosts)
+        {
+            return;
+        }
+
+        foreach (ResourceAmount amount in resources ?? System.Array.Empty<ResourceAmount>())
+        {
+            Add(amount.Resource, amount.Amount);
+        }
+
+        foreach (ItemAmount amount in items ?? System.Array.Empty<ItemAmount>())
+        {
+            if (amount.Item == null || amount.Amount <= 0)
+            {
+                continue;
+            }
+
+            int added = bag != null ? bag.Add(amount.Item, amount.Amount) : 0;
+            if (added < amount.Amount && dropAt != null)
+            {
+                DroppedItem.Drop(dropAt, new ItemStack(amount.Item, amount.Amount - added));
+            }
+        }
+    }
+
     /// <summary>How many of a resource can still be added by Add.</summary>
     public int FreeSpaceFor(ResourceDefinition resource)
     {

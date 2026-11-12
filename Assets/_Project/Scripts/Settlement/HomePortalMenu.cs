@@ -157,14 +157,9 @@ public sealed class HomePortalMenu
         return page;
     }
 
-    // The ward's next level, paid from what the player has at hand. A friend's ward is theirs to raise.
+    // The ward's next level, paid from what the player has at hand: a visitor helps raise their friend's (HavenDecisions).
     private void StrengthenWard(GameObject user)
     {
-        if (HavenVisit.LeftToHost())
-        {
-            return;
-        }
-
         SettlementSettings settings = SettlementSettings.Current;
         int level = GameSession.Settlement.WardLevel;
         if (level >= settings.WardLevels.Count || !MaterialPool.For(user).TrySpend(settings.WardLevels[level].cost))
@@ -172,9 +167,24 @@ public sealed class HomePortalMenu
             return;
         }
 
+        HavenDecisions.Do("ward.raise", level.ToString(System.Globalization.CultureInfo.InvariantCulture), settings.WardLevels[level].cost);
+    }
+
+    // The ward raised from the level the player saw (another may have raised it meanwhile).
+    [HavenDecision("ward.raise")]
+    private static HavenDecisions.Outcome RaiseWard(string fromLevel)
+    {
+        SettlementSettings settings = SettlementSettings.Current;
+        int level = GameSession.Settlement.WardLevel;
+        if (!int.TryParse(fromLevel, out int seen) || seen != level || level >= settings.WardLevels.Count)
+        {
+            return HavenDecisions.Outcome.Refused("The ward was raised meanwhile: what you gave is back in your bag.");
+        }
+
         GameSession.Settlement.RaiseWardLevel();
         string opens = settings.WardLevels[level].opens;
-        GameMessages.Post($"The portal glows brighter. The ward now reaches {portal.WardRadius:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}", MessageKind.Gain);
+        float reach = settings.WardRadiusAt(GameSession.Settlement.WardLevel);
+        return HavenDecisions.Outcome.Made($"The portal glows brighter. The ward now reaches {reach:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}");
     }
 
     private static void OpenHaven()

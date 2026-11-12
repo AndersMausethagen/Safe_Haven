@@ -331,12 +331,14 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     /// <summary>Gives someone a job, in conversation or from the Haven window: records it and teaches the player what the job knows.</summary>
     public static void GiveJob(ResidentDefinition resident, JobDefinition job, GameObject user)
     {
-        if (HavenVisit.LeftToHost())
+        // The job is the Haven's to give, made where it is kept (HavenDecisions): a visitor's word goes to their friend's game.
+        // What the job teaches, and the quests it counts for, are the player's own, and only in their own Haven.
+        HavenDecisions.Do("resident.job", resident.Id + "|" + (job != null ? job.Id : ""));
+        if (HavenVisit.IsVisiting || job == null)
         {
             return;
         }
 
-        GameSession.Settlement.AssignJob(resident, job);
         var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;
         if (crafting != null)
         {
@@ -349,5 +351,28 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         {
             GameEvents.Raise(job.AssignedEvent, user);
         }
+    }
+
+    [HavenDecision("resident.job")]
+    private static HavenDecisions.Outcome AssignJob(string args)
+    {
+        // By id, among the Haven's own residents and the work each can do.
+        string[] parts = (args ?? "").Split('|');
+        ResidentRecord record = HavenPeople.RecordOf(parts[0]);
+        ResidentDefinition resident = record != null ? record.Resident : null;
+        JobDefinition job = null;
+        foreach (JobDefinition can in resident != null ? resident.Jobs : System.Array.Empty<JobDefinition>())
+        {
+            job = can != null && parts.Length > 1 && can.Id == parts[1] ? can : job;
+        }
+
+        if (resident == null || (job == null && parts.Length > 1 && parts[1].Length > 0))
+        {
+            return HavenDecisions.Outcome.Refused("They don't live here now, or can't do that work.");
+        }
+
+        // Quietly, as ever: the Haven window shows it (and a visitor sees it there when the mirror comes).
+        GameSession.Settlement.AssignJob(resident, job);
+        return HavenDecisions.Outcome.Made();
     }
 }
