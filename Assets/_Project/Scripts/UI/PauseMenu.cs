@@ -74,6 +74,7 @@ public sealed class PauseMenu : MonoBehaviour
 
         // System › Pause of the project-wide actions (GameInput), shared: subscribed while enabled.
         if (GameInput.Pause != null) GameInput.Pause.performed += OnEscape;
+        if (GameInput.Back != null) GameInput.Back.performed += OnBack;
         window.OpenChanged += OnOpenChanged;
         continueButton.onClick.AddListener(Close);
         saveButton.onClick.AddListener(Save);
@@ -101,6 +102,7 @@ public sealed class PauseMenu : MonoBehaviour
 
         bound = false;
         if (GameInput.Pause != null) GameInput.Pause.performed -= OnEscape;
+        if (GameInput.Back != null) GameInput.Back.performed -= OnBack;
         window.OpenChanged -= OnOpenChanged;
         continueButton.onClick.RemoveListener(Close);
         saveButton.onClick.RemoveListener(Save);
@@ -143,6 +145,24 @@ public sealed class PauseMenu : MonoBehaviour
         {
             Open();
         }
+    }
+
+    // A controller's B (System › Back): what Escape does, a page back or a window closed, but in play it never opens this
+    // menu (B is also stop working and dodge's neighbour). Start opens it.
+    private void OnBack(InputAction.CallbackContext context)
+    {
+        if (leaving || SceneTransition.IsBusy || OptionsScreen.HasEscape || SavesScreen.HasEscape)
+        {
+            return;
+        }
+
+        if (IsOpen)
+        {
+            Back();
+            return;
+        }
+
+        BackHandlers.TryHandle();
     }
 
     private void Back()

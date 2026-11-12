@@ -113,13 +113,24 @@ public sealed class TutorialWindow : MonoBehaviour
     private void OnEnable()
     {
         Current = this;
+        GameInput.KeysChanged += OnKeysChanged;
     }
 
     private void OnDisable()
     {
+        GameInput.KeysChanged -= OnKeysChanged;
         if (Current == this)
         {
             Current = null;
+        }
+    }
+
+    // A page names keys: picking up a controller while reading shows its buttons.
+    private void OnKeysChanged()
+    {
+        if (window != null && window.IsOpen)
+        {
+            Draw();
         }
     }
 

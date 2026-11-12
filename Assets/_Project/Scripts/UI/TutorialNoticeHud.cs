@@ -78,11 +78,13 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private void OnEnable()
     {
         Tutorials.Changed += Refresh;
+        GameInput.KeysChanged += Refresh;
     }
 
     private void OnDisable()
     {
         Tutorials.Changed -= Refresh;
+        GameInput.KeysChanged -= Refresh;
     }
 
     private void OnDestroy()

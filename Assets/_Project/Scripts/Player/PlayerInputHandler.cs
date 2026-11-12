@@ -166,7 +166,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
-        if (!CameraPointer.TryGetRay(movementCamera, out Ray ray))
+        // On a controller the mouse lies where it was left; facing it would turn every swing towards that spot. The player
+        // faces where they walk instead (and the enemy fought, with Focus on Enemy).
+        if (InputDevices.UsingGamepad || !CameraPointer.TryGetRay(movementCamera, out Ray ray))
         {
             movement.ClearAimDirection();
             return;

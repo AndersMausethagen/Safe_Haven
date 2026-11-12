@@ -14,6 +14,7 @@ public sealed class InputActionsTests : InputTestFixture
     private const string ActionsPath = "Assets/_Project/Input/InputSystem_Actions.inputactions";
     private InputActionAsset actions;
     private bool wasEnabled;
+    private float controllerButtons;
 
     // The asset itself (the project-wide one must live on disk); only enabled for the test, as in play.
     public override void Setup()
@@ -27,6 +28,10 @@ public sealed class InputActionsTests : InputTestFixture
 
         wasEnabled = actions.enabled;
         actions.Enable();
+        // Prompts start from the keyboard, with the pad's kind followed rather than pinned.
+        controllerButtons = GameOptions.ControllerButtons.Value;
+        GameOptions.ControllerButtons.Value = 0f;
+        InputDevices.Use(false, PadFamily.Xbox);
     }
 
     public override void TearDown()
@@ -36,6 +41,8 @@ public sealed class InputActionsTests : InputTestFixture
             actions.Disable();
         }
 
+        InputDevices.Use(false, PadFamily.Xbox);
+        GameOptions.ControllerButtons.Value = controllerButtons;
         base.TearDown();
         // The fixture's teardown puts the input system back without the project-wide actions, and nothing sets them again
         // until the next domain reload: every GameInput lookup in the Editor would come back empty until then.
@@ -159,6 +166,8 @@ public sealed class InputActionsTests : InputTestFixture
             (gamepad.buttonWest, GameInput.Interact), (gamepad.buttonEast, GameInput.CancelInteraction),
             (gamepad.leftShoulder, GameInput.Sneak), (gamepad.buttonNorth, GameInput.Skill(0)),
             (gamepad.dpad.down, GameInput.Skill(3)), (gamepad.selectButton, GameInput.Inventory), (gamepad.buttonSouth, GameInput.Submit),
+            // Start is the Escape menu, B goes back, A moves a conversation on (2026-11-12).
+            (gamepad.startButton, GameInput.Pause), (gamepad.buttonEast, GameInput.Back), (gamepad.buttonSouth, GameInput.Advance),
         };
 
         foreach ((var button, InputAction action) in cases)
@@ -167,6 +176,93 @@ public sealed class InputActionsTests : InputTestFixture
             Assert.IsTrue(action.WasPressedThisFrame(), $"{button.name} should press {action.actionMap.name}/{action.name}");
             Release(button);
         }
+
+        // The bag is on View alone: Start opening it as well as the menu would open both at once.
+        Press(gamepad.startButton);
+        Assert.IsFalse(GameInput.Items.WasPressedThisFrame(), "Start no longer opens the bag");
+        Release(gamepad.startButton);
+
+        // The right stick turns the camera, at a rate (PlayerCameraController.ReadStick).
+        Set(gamepad.rightStick, new Vector2(1f, 0f));
+        Assert.Greater(GameInput.CameraLookStick.ReadValue<Vector2>().x, 0.5f);
+        Set(gamepad.rightStick, Vector2.zero);
+    }
+
+    [Test]
+    public void TheDeviceInUse_IsTheLastOneThatDidSomething()
+    {
+        var keyboard = InputSystem.AddDevice<Keyboard>();
+        var mouse = InputSystem.AddDevice<Mouse>();
+        var xbox = InputSystem.AddDevice<Gamepad>();
+        var playstation = InputSystem.AddDevice<UnityEngine.InputSystem.DualShock.DualShock4GamepadHID>();
+
+        Assert.AreEqual(PadFamily.Xbox, InputDevices.FamilyOf(xbox));
+        Assert.AreEqual(PadFamily.PlayStation, InputDevices.FamilyOf(playstation));
+
+        int changes = GameInput.KeysVersion;
+        InputDevices.Noticed(playstation.buttonSouth);
+        Assert.IsTrue(InputDevices.UsingGamepad);
+        Assert.AreEqual(GameInput.Gamepad, InputDevices.Scheme);
+        Assert.AreEqual(PadFamily.PlayStation, InputDevices.Family);
+        Assert.Greater(GameInput.KeysVersion, changes, "text that names keys looks again");
+
+        InputDevices.Noticed(xbox.leftStick);
+        Assert.AreEqual(PadFamily.Xbox, InputDevices.Family, "the pad last used decides");
+
+        // A nudge of the mouse is not enough to take over; a real move, a key or a click is.
+        Set(mouse.delta, new Vector2(4f, 0f));
+        InputDevices.Noticed(mouse.position);
+        Assert.IsTrue(InputDevices.UsingGamepad);
+        Set(mouse.delta, new Vector2(30f, 0f));
+        InputDevices.Noticed(mouse.position);
+        Assert.IsFalse(InputDevices.UsingGamepad);
+
+        InputDevices.Noticed(xbox.buttonWest);
+        InputDevices.Noticed(keyboard.eKey);
+        Assert.IsFalse(InputDevices.UsingGamepad);
+
+        // Pinned in the options, the pad's kind no longer follows the device.
+        InputDevices.Noticed(xbox.buttonWest);
+        GameOptions.ControllerButtons.Value = 2f;
+        Assert.AreEqual(PadFamily.PlayStation, InputDevices.Family);
+    }
+
+    [Test]
+    public void KeyLabels_FollowTheDeviceInUse()
+    {
+        Assert.AreEqual("buttonSouth", ControllerGlyphs.ControlOf("*/{Submit}"));
+        Assert.AreEqual("dpadUp", ControllerGlyphs.ControlOf("<Gamepad>/dpad/up"));
+        Assert.AreEqual("leftStick", ControllerGlyphs.ControlOf("<Gamepad>/leftStick/up"));
+        Assert.IsNull(ControllerGlyphs.ControlOf("<Keyboard>/e"));
+        Assert.AreEqual("ZL", ControllerGlyphs.NameOf("leftTrigger", PadFamily.Switch));
+        Assert.AreEqual("B", ControllerGlyphs.NameOf("buttonSouth", PadFamily.Switch), "Nintendo's bottom button is B");
+
+        Assert.AreEqual("[E] Talk", GameInput.Keys("[{key:Interact}] Talk"));
+        Assert.AreEqual("Esc to return", GameInput.Keys("{key:Back} to return"));
+
+        InputDevices.Use(true, PadFamily.Xbox);
+        string interact = GameInput.KeyLabel(GameInput.Interact);
+        Assert.IsTrue(interact.Contains("xbox_buttonWest") || interact == "X", interact);
+        if (ControllerGlyphs.IsGlyph(interact))
+        {
+            // A glyph stands without the brackets a key name needs.
+            Assert.AreEqual(interact + " Talk", GameInput.Keys("[{key:Interact}] Talk"));
+            Assert.AreEqual("Open it " + interact, GameInput.Keys("Open it ({key:Interact})"));
+        }
+
+        string back = GameInput.Keys("{key:Back}");
+        Assert.IsTrue(back.Contains("xbox_buttonEast") || back == "B", back);
+        Assert.AreEqual("J", GameInput.KeyLabel(GameInput.Journal), "no button reaches the journal yet: its key is shown");
+        Assert.AreEqual("E", GameInput.KeyLabel(GameInput.Interact, GameInput.KeyboardMouse));
+        // A voice line says the keyboard's key whatever is in the player's hands.
+        Assert.AreEqual("press E", GameInput.DefaultKeys("press {key:Interact}"));
+
+        InputDevices.Use(true, PadFamily.PlayStation);
+        string square = GameInput.KeyLabel(GameInput.Interact);
+        Assert.IsTrue(square.Contains("playstation_buttonWest") || square == "Square", square);
+
+        InputDevices.Use(false, PadFamily.PlayStation);
+        Assert.AreEqual("E", GameInput.KeyLabel(GameInput.Interact));
     }
 
     [Test]
@@ -174,6 +270,7 @@ public sealed class InputActionsTests : InputTestFixture
     {
         InputSystem.AddDevice<Keyboard>();
         InputSystem.AddDevice<Mouse>();
+        InputDevices.Use(false, PadFamily.Xbox);
 
         // The skill bar is on the number keys (2026-11-09); F is the quickbar's.
         Assert.AreEqual("1", PlayerInputHandler.SkillKeyLabel(0));

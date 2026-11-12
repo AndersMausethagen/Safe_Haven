@@ -99,6 +99,7 @@ public static class InputRebinds
         }
 
         Changes++;
+        GameInput.NotifyKeysChanged();
     }
 
     /// <summary>Back to the keys the game came with.</summary>
@@ -111,11 +112,13 @@ public static class InputRebinds
 
         PlayerPrefs.DeleteKey(Key);
         Changes++;
+        GameInput.NotifyKeysChanged();
     }
 
     private static void Save()
     {
         Changes++;
+        GameInput.NotifyKeysChanged();
         PlayerPrefs.SetString(Key, InputSystem.actions.SaveBindingOverridesAsJson());
     }
 
@@ -154,7 +157,15 @@ public static class InputRebinds
     {
         InputAction action = InputSystem.actions != null ? InputSystem.actions.FindAction(row.ActionPath) : null;
         int index = BindingIndex(action, row.Part, scheme);
-        return index >= 0 ? action.GetBindingDisplayString(index, InputBinding.DisplayStringOptions.DontIncludeInteractions) : "–";
+        if (index < 0)
+        {
+            return "–";
+        }
+
+        // The controller column shows the button as it looks on the pad in use (or pinned in Controller Buttons).
+        return scheme == GameInput.Gamepad
+            ? GameInput.PadLabel(action, index)
+            : action.GetBindingDisplayString(index, InputBinding.DisplayStringOptions.DontIncludeInteractions);
     }
 
     /// <summary>The other row in this scheme that uses the same key, if any.</summary>

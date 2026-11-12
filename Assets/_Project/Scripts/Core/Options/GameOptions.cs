@@ -116,9 +116,14 @@ public static class GameOptions
     // ----- Controls -----
 
     public static readonly GameOption LookSensitivity = GameOption.Slider("LookSensitivity", "Camera Sensitivity", "How fast the camera turns with the mouse or the right stick.", 1f, 0.2f, 3f, 0.05f);
-    public static readonly GameOption InvertY = GameOption.Toggle("InvertY", "Invert Camera Y", "Mouse up looks down, in the action camera.", false);
+    public static readonly GameOption InvertY = GameOption.Toggle("InvertY", "Invert Camera Y", "Mouse or right stick up looks down, in the action camera.", false);
 
-    public static readonly IReadOnlyList<GameOption> Controls = new[] { LookSensitivity, InvertY };
+    /// <summary>0 follows the controller in use; otherwise the PadFamily + 1 whose buttons are drawn.</summary>
+    public static readonly GameOption ControllerButtons = GameOption.Choice("ControllerButtons", "Controller Buttons",
+        "Which buttons the prompts show while you play with a controller. Automatic matches the controller in your hands; pick one if it shows the wrong kind (Steam Input can make every controller look like an Xbox pad).",
+        0, "Automatic", "Xbox", "PlayStation", "Switch");
+
+    public static readonly IReadOnlyList<GameOption> Controls = new[] { LookSensitivity, InvertY, ControllerButtons };
 
     // ----- Accessibility -----
 

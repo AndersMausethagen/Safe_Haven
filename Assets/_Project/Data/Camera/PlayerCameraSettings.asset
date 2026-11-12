@@ -28,6 +28,10 @@ MonoBehaviour:
   initialZoom: 0.5
   orbitSensitivity: 0.12
   orbitSmoothTime: 0.2
+  stickOrbitSpeed: 150
+  stickZoomSpeed: 0.9
+  stickLookSpeed: {x: 200, y: 120}
+  stickResponse: 1.8
   styleTransitionTime: 0.35
   actionStartPitch: 12
   actionMinPitch: -35

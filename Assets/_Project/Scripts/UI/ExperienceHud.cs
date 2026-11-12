@@ -320,13 +320,13 @@ public sealed class ExperienceHud : MonoBehaviour
         // Something to do in the skills window: a perk to choose, or Insight to put into a skill.
         int points = progress.PendingChoices(settings) + (progress.Insight > 0 ? 1 : 0);
         int held = ExperienceTracker.HeldBonus;
-        if (shownSkill != writtenSkill || skillLevel != writtenLevel || points != writtenPoints || InputRebinds.Changes != writtenKeys
+        if (shownSkill != writtenSkill || skillLevel != writtenLevel || points != writtenPoints || GameInput.KeysVersion != writtenKeys
             || held != writtenHeld)
         {
             writtenSkill = shownSkill;
             writtenLevel = skillLevel;
             writtenPoints = points;
-            writtenKeys = InputRebinds.Changes;
+            writtenKeys = GameInput.KeysVersion;
             writtenHeld = held;
             string muted = UIStyle.Current.MutedHex;
             string name = shownSkill != null ? $"{shownSkill.DisplayName} {skillLevel}" : "Skills";

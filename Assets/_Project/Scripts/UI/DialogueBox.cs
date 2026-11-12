@@ -486,8 +486,9 @@ public sealed class DialogueBox : MonoBehaviour
         {
             float shown = (Time.unscaledTime - revealStarted) * GameOptions.DialogueLettersPerSecond(LettersPerSecond);
             activeLine.maxVisibleCharacters = float.IsInfinity(shown) || shown >= letters ? letters : Mathf.FloorToInt(shown);
-            UpdateHint();
         }
+
+        UpdateHint();
 
         if (anchor != null && global::Player.Current != null &&
             (anchor.position - global::Player.Current.transform.position).sqrMagnitude > WalkAwayDistance * WalkAwayDistance)
@@ -512,6 +513,7 @@ public sealed class DialogueBox : MonoBehaviour
 
         if (choices != null && choices.Count > 0)
         {
+            SelectAnswerForPad();
             // UI › Answer1-9: the number keys pick an answer.
             for (int i = 0; i < Mathf.Min(GameInput.AnswerCount, choices.Count); i++)
             {
@@ -564,18 +566,55 @@ public sealed class DialogueBox : MonoBehaviour
     }
 
     private int hintShown = -1;
+    private int hintKeys = -1;
 
     private void UpdateHint()
     {
         bool asking = choices != null && choices.Count > 0;
         int hint = !Revealed ? 0 : asking ? 1 : 2;
-        if (hint == hintShown)
+        // Picking up a controller mid-line swaps the key for its button.
+        if (hint == hintShown && hintKeys == GameInput.KeysVersion)
         {
             return;
         }
 
         hintShown = hint;
-        activeHint.text = hint == 0 ? GameInput.WithRebinds("<alpha=#88>{key:Advance} ›") : hint == 1 ? "" : GameInput.WithRebinds("{key:Advance} / Space  ›");
+        hintKeys = GameInput.KeysVersion;
+        string next = GameInput.UsingGamepad ? "{key:Advance}  ›" : "{key:Advance} / Space  ›";
+        activeHint.text = hint == 0 ? GameInput.WithRebinds("<alpha=#88>{key:Advance} ›") : hint == 1 ? "" : GameInput.WithRebinds(next);
+    }
+
+    // On a controller the answers are picked with the stick or d-pad and A (UI › Submit on the selected button): something
+    // has to be selected for that. The mouse needs nothing, and a highlighted answer would only look chosen.
+    private void SelectAnswerForPad()
+    {
+        EventSystem events = EventSystem.current;
+        if (!GameInput.UsingGamepad || events == null)
+        {
+            return;
+        }
+
+        GameObject selected = events.currentSelectedGameObject;
+        int first = -1;
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            if (!buttons[i].gameObject.activeInHierarchy || !buttons[i].interactable)
+            {
+                continue;
+            }
+
+            if (selected == buttons[i].gameObject)
+            {
+                return;
+            }
+
+            first = first < 0 ? i : first;
+        }
+
+        if (first >= 0)
+        {
+            events.SetSelectedGameObject(buttons[first].gameObject);
+        }
     }
 
     private void Frame(Transform speaker, float distance = 0f)

@@ -61,6 +61,8 @@ public static class GameInput
     public static InputAction CameraLook => Find("Camera/Look");
     public static InputAction CameraOrbit => Find("Camera/Orbit");
     public static InputAction CameraToggleStyle => Find("Camera/ToggleStyle");
+    /// <summary>The right stick: turns the camera at a rate, where Look is the mouse's movement since the last frame.</summary>
+    public static InputAction CameraLookStick => Find("Camera/LookStick");
 
     // Build
     public static InputAction BuildPlace => Find("Build/Place");
@@ -74,6 +76,8 @@ public static class GameInput
     public static InputAction QuickSave => Find("System/QuickSave");
     public static InputAction QuickLoad => Find("System/QuickLoad");
     public static InputAction CheatMenu => Find("System/CheatMenu");
+    /// <summary>A controller's back button (B): closes what Escape closes, but never opens the Escape menu.</summary>
+    public static InputAction Back => Find("System/Back");
 
     // UI
     public static InputAction Point => Find("UI/Point");
@@ -136,6 +140,23 @@ public static class GameInput
     };
 
     private static readonly System.Text.RegularExpressions.Regex KeyToken = new System.Text.RegularExpressions.Regex(@"\{key:([A-Za-z0-9/]+)\}");
+    // A token with the brackets round it, if any: "[{key:Interact}] Talk" shows a controller's button without them.
+    private static readonly System.Text.RegularExpressions.Regex BracketedKeyToken =
+        new System.Text.RegularExpressions.Regex(@"([\[(]?)\{key:([A-Za-z0-9/]+)\}([\])]?)");
+
+    // "{key:Back}": what goes back or closes, Esc on the keyboard and B on a controller (System › Back).
+    private const string BackToken = "Back";
+
+    /// <summary>Raised when the keys shown change: a rebinding, or the player switching between keyboard and controller.</summary>
+    public static event System.Action KeysChanged;
+
+    /// <summary>Goes up whenever the keys shown change, for text that checks rather than listens.</summary>
+    public static int KeysVersion => InputRebinds.Changes + InputDevices.Changes;
+
+    /// <summary>True while the player is on a controller (see <see cref="InputDevices"/>).</summary>
+    public static bool UsingGamepad => InputDevices.UsingGamepad;
+
+    internal static void NotifyKeysChanged() => KeysChanged?.Invoke();
 
     /// <summary>
     /// Text that names keys by what they do ("Open your bag ({key:Items})", "{key:Dismount} gets you down"): each token becomes the
@@ -157,13 +178,32 @@ public static class GameInput
             return text;
         }
 
-        return KeyToken.Replace(text, match =>
+        // A voice line was recorded saying the keyboard's keys, so the shipped keys are always the keyboard's.
+        string scheme = asShipped ? KeyboardMouse : InputDevices.Scheme;
+        return BracketedKeyToken.Replace(text, match =>
         {
-            string name = match.Groups[1].Value;
-            InputAction action = ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name);
-            string label = action != null ? KeyLabel(action, asShipped) : "";
-            return label.Length > 0 ? label : name;
+            string name = match.Groups[2].Value;
+            string label = LabelForToken(name, asShipped, scheme);
+            if (label.Length == 0)
+            {
+                label = name;
+            }
+
+            string open = match.Groups[1].Value, close = match.Groups[3].Value;
+            bool paired = (open == "[" && close == "]") || (open == "(" && close == ")");
+            return paired && ControllerGlyphs.IsGlyph(label) ? label : open + label + close;
         });
+    }
+
+    private static string LabelForToken(string name, bool asShipped, string scheme)
+    {
+        if (string.Equals(name, BackToken, System.StringComparison.OrdinalIgnoreCase))
+        {
+            return scheme == Gamepad ? KeyLabel(Back, asShipped, scheme) : "Esc";
+        }
+
+        InputAction action = ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name);
+        return action != null ? KeyLabel(action, asShipped, scheme) : "";
     }
 
     /// <summary>The first key token in the text that names no action or verb (a typo), or null when they all do.</summary>
@@ -177,7 +217,7 @@ public static class GameInput
         foreach (System.Text.RegularExpressions.Match match in KeyToken.Matches(text))
         {
             string name = match.Groups[1].Value;
-            if (ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name) == null)
+            if (!string.Equals(name, BackToken, System.StringComparison.OrdinalIgnoreCase) && ActionNamed(Verbs.TryGetValue(name, out string verb) ? verb : name) == null)
             {
                 return name;
             }
@@ -219,7 +259,8 @@ public static class GameInput
     public static string WithRebinds(string text)
     {
         text = Keys(text);
-        if (string.IsNullOrEmpty(text) || (text.IndexOf('(') < 0 && text.IndexOf('[') < 0))
+        // Keys written out the old way are keyboard keys: on a controller they stay as written.
+        if (string.IsNullOrEmpty(text) || InputDevices.UsingGamepad || (text.IndexOf('(') < 0 && text.IndexOf('[') < 0))
         {
             return text;
         }
@@ -245,15 +286,31 @@ public static class GameInput
         return text.Replace("\u0001", "");
     }
 
-    /// <summary>The key or button that triggers <paramref name="action"/> for keyboard and mouse, as shown to the player
-    /// ("Q", "MMB"): its first binding in that scheme, so it follows a rebinding. Empty when there is none.</summary>
-    public static string KeyLabel(InputAction action) => KeyLabel(action, asShipped: false);
+    /// <summary>
+    /// The key or button that triggers <paramref name="action"/> on what the player is using now (<see cref="InputDevices"/>):
+    /// a key for keyboard and mouse ("Q", "MMB"), a button glyph for a controller, of the kind in their hands. Its first
+    /// binding in that scheme, so it follows a rebinding. An action no controller button reaches shows its key. Empty when
+    /// there is none.
+    /// </summary>
+    public static string KeyLabel(InputAction action) => KeyLabel(action, asShipped: false, InputDevices.Scheme);
 
-    private static string KeyLabel(InputAction action, bool asShipped)
+    /// <summary>The label in a given control scheme (GameInput.KeyboardMouse or GameInput.Gamepad), whatever is in use.</summary>
+    public static string KeyLabel(InputAction action, string scheme) => KeyLabel(action, asShipped: false, scheme);
+
+    private static string KeyLabel(InputAction action, bool asShipped, string scheme)
     {
         if (action == null)
         {
             return "";
+        }
+
+        if (scheme == Gamepad)
+        {
+            string button = PadLabel(action, asShipped);
+            if (button.Length > 0)
+            {
+                return button;
+            }
         }
 
         InputBinding group = InputBinding.MaskByGroup(KeyboardMouse);
@@ -264,6 +321,40 @@ public static class GameInput
             {
                 return action.GetBindingDisplayString(i, InputBinding.DisplayStringOptions.DontIncludeInteractions
                                                           | (asShipped ? InputBinding.DisplayStringOptions.IgnoreBindingOverrides : 0));
+            }
+        }
+
+        return "";
+    }
+
+    /// <summary>A controller button's label for one binding (see <see cref="ControllerGlyphs"/>): the glyph, or the button's name.</summary>
+    public static string PadLabel(InputAction action, int bindingIndex)
+    {
+        if (action == null || bindingIndex < 0 || bindingIndex >= action.bindings.Count)
+        {
+            return "";
+        }
+
+        InputBinding binding = action.bindings[bindingIndex];
+        return ControllerGlyphs.For(binding.effectivePath, InputDevices.Family)
+               ?? action.GetBindingDisplayString(bindingIndex, InputBinding.DisplayStringOptions.DontIncludeInteractions);
+    }
+
+    private static string PadLabel(InputAction action, bool asShipped)
+    {
+        InputBinding group = InputBinding.MaskByGroup(Gamepad);
+        for (int i = 0; i < action.bindings.Count; i++)
+        {
+            InputBinding binding = action.bindings[i];
+            if (binding.isComposite || !group.Matches(binding))
+            {
+                continue;
+            }
+
+            string glyph = ControllerGlyphs.For(asShipped ? binding.path : binding.effectivePath, InputDevices.Family);
+            if (glyph != null)
+            {
+                return glyph;
             }
         }
 

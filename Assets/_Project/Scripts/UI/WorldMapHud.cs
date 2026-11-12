@@ -25,6 +25,7 @@ public sealed class WorldMapHud : MonoBehaviour
     private bool ownsMap;
     private TMP_Text playerMarker;
     private TMP_Text titleLabel;
+    private TMP_Text help;
     private RectTransform titleMark;
     private bool suspendedGameplay;
     private int writtenSeconds = -1;
@@ -102,11 +103,25 @@ public sealed class WorldMapHud : MonoBehaviour
     {
         Current = this;
         GameInput.Cancel.performed += OnCancel;
+        GameInput.KeysChanged += WriteHelp;
     }
 
     private void OnDisable()
     {
         GameInput.Cancel.performed -= OnCancel;
+        GameInput.KeysChanged -= WriteHelp;
+    }
+
+    // The line along the bottom names the keys that close the map, so it follows the device in use.
+    private void WriteHelp()
+    {
+        if (help == null)
+        {
+            return;
+        }
+
+        string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
+        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  Stars: places you have found  •  Hearths: boundary stones  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + GameInput.Keys("{key:Back} to return");
     }
 
     private void OnDestroy()
@@ -168,9 +183,8 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         RectTransform helpRect = Rect("Help", transform, new Vector2(0.5f, 0f), new Vector2(0.5f, 0f), new Vector2(1100f, 34f), new Vector2(0f, 34f));
-        TMP_Text help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
-        string mapKey = GameInput.KeyLabel(GameInput.WorldMap);
-        help.text = (RaidDirector.Current != null ? "Doorways: exits  •  Rings: rough rumours  •  Stars: open events  •  " : "Quest names include their rank  •  Stars: places you have found  •  Hearths: boundary stones  •  ") + "Unexplored areas remain hidden  •  " + (string.IsNullOrEmpty(mapKey) ? "" : mapKey + " or ") + "Esc to return";
+        help = helpRect.gameObject.AddComponent<TextMeshProUGUI>();
+        WriteHelp();
         help.fontSize = 18f;
         help.alignment = TextAlignmentOptions.Center;
         help.color = UIStyle.Current.Muted;
@@ -219,6 +233,7 @@ public sealed class WorldMapHud : MonoBehaviour
     private void Open()
     {
         gameObject.SetActive(true);
+        WriteHelp();
         if (RaidDirector.Current != null)
         {
             try

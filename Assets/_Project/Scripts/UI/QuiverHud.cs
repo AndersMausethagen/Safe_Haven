@@ -22,6 +22,7 @@ public sealed class QuiverHud : MonoBehaviour
     private RectTransform bar;
     private Image fill;
     private ItemDefinition shownArrow;
+    private int shownKeys = -1;
     private int shownCount = -1;
 
     public static QuiverHud Create(PlayerArchery archery)
@@ -98,8 +99,9 @@ public sealed class QuiverHud : MonoBehaviour
 
         ItemDefinition arrow = archery.NextArrow;
         int count = archery.Count(arrow);
-        if (arrow != shownArrow || count != shownCount)
+        if (arrow != shownArrow || count != shownCount || shownKeys != GameInput.KeysVersion)
         {
+            shownKeys = GameInput.KeysVersion;
             shownArrow = arrow;
             shownCount = count;
             // The key from the Input Actions asset (Player › CycleArrows), so the hint follows a rebinding.

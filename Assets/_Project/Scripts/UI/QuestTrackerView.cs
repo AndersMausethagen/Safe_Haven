@@ -27,6 +27,7 @@ public sealed class QuestTrackerView : MonoBehaviour
     {
         QuestManager.Changed += Refresh;
         QuestTimers.Changed += Refresh;
+        GameInput.KeysChanged += Refresh;
         Refresh();
         if (waypoints == null && Application.isPlaying)
         {
@@ -38,6 +39,7 @@ public sealed class QuestTrackerView : MonoBehaviour
     {
         QuestManager.Changed -= Refresh;
         QuestTimers.Changed -= Refresh;
+        GameInput.KeysChanged -= Refresh;
     }
 
     private float nextTick;

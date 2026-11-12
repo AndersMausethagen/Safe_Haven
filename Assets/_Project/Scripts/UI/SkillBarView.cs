@@ -46,6 +46,7 @@ public sealed class SkillBarView : MonoBehaviour
     private void OnEnable()
     {
         Player.Spawned += Bind;
+        GameInput.KeysChanged += OnKeysChanged;
         SetVisible(false);
         foreach (Slot slot in slots)
         {
@@ -57,7 +58,22 @@ public sealed class SkillBarView : MonoBehaviour
     private void OnDisable()
     {
         Player.Spawned -= Bind;
+        GameInput.KeysChanged -= OnKeysChanged;
         Unbind();
+    }
+
+    // Each slot shows the key or button that casts it.
+    private void OnKeysChanged()
+    {
+        if (skills == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            OnSlotChanged(i);
+        }
     }
 
     private void Bind(Player player)

@@ -48,6 +48,7 @@ public sealed class PlayerCameraController : MonoBehaviour
     private InputAction zoomAction;
     private InputAction toggleAction;
     private InputAction lookAction;
+    private InputAction lookStickAction;
 
     private PlayerCameraSettings.Profile profile;
     private float pitch;
@@ -226,6 +227,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         zoomAction = GameInput.CameraZoom;
         toggleAction = GameInput.CameraToggleStyle;
         lookAction = GameInput.CameraLook;
+        lookStickAction = GameInput.CameraLookStick;
     }
 
     private void Start()
@@ -429,6 +431,7 @@ public sealed class PlayerCameraController : MonoBehaviour
             zoomTarget = Mathf.Clamp01(zoomTarget - Mathf.Sign(scroll) * settings.ZoomStep);
         }
 
+        ReadStick();
         if (Mouse.current == null)
         {
             return;
@@ -452,6 +455,46 @@ public sealed class PlayerCameraController : MonoBehaviour
         else if (profile.allowOrbit && !aiming && orbitAction.IsPressed())
         {
             yawTarget += lookAction.ReadValue<Vector2>().x * (settings.OrbitSensitivity * GameOptions.LookSensitivity.Value);
+        }
+    }
+
+    // The right stick turns the view at a rate (degrees a second), where the mouse moves it by how far it travelled. In the
+    // action camera it looks around; top-down it turns the view where orbiting is allowed, and up and down zoom.
+    private void ReadStick()
+    {
+        if (lookStickAction == null || GamePause.IsPaused)
+        {
+            return;
+        }
+
+        Vector2 stick = lookStickAction.ReadValue<Vector2>();
+        if (stick.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        float dt = Time.unscaledDeltaTime;
+        stick = stick.normalized * Mathf.Pow(Mathf.Clamp01(stick.magnitude), settings.StickResponse);
+        float sensitivity = GameOptions.LookSensitivity.Value;
+        if (style == CameraStyle.Action)
+        {
+            yaw += stick.x * settings.StickLookSpeed.x * sensitivity * dt;
+            yawTarget = yaw;
+            yawVelocity = 0f;
+            float tilt = stick.y * settings.StickLookSpeed.y * sensitivity * dt;
+            actionPitch += settings.ActionInvertY != GameOptions.InvertY.On ? tilt : -tilt;
+            actionPitch = Mathf.Clamp(actionPitch, settings.ActionMinPitch, settings.ActionMaxPitch);
+            return;
+        }
+
+        if (profile.allowOrbit && !aiming)
+        {
+            yawTarget += stick.x * settings.StickOrbitSpeed * sensitivity * dt;
+        }
+
+        if (!BuildPlacer.IsBusy)
+        {
+            zoomTarget = Mathf.Clamp01(zoomTarget - stick.y * settings.StickZoomSpeed * dt);
         }
     }
 
@@ -542,7 +585,8 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private Vector3 GetCursorOffset()
     {
-        if (Mouse.current == null)
+        // On a controller the mouse lies where it was left: leaning towards it would pull the view to one side for good.
+        if (Mouse.current == null || InputDevices.UsingGamepad)
         {
             return Vector3.zero;
         }

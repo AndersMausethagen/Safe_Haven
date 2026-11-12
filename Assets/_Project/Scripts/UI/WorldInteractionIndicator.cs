@@ -47,6 +47,14 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
         interactor = GetComponentInParent<PlayerInteractor>();
         stateMachine = GetComponentInParent<PlayerStateMachine>();
         health = GetComponentInParent<Damageable>();
+        // A controller's button in the prompt is a sprite with a material of its own: the on-top copy, so trees don't hide it either.
+        TMPro.TMP_SpriteAsset onTop = Resources.Load<TMPro.TMP_SpriteAsset>(ControllerGlyphs.SpriteAssetName + " On Top");
+        if (onTop != null && status != null)
+        {
+            status.spriteAsset = onTop;
+            // The glyph is a rich-text tag; the prefab's label had rich text off.
+            status.richText = true;
+        }
     }
 
     private void OnEnable()

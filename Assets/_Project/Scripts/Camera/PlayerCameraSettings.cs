@@ -61,6 +61,16 @@ public sealed class PlayerCameraSettings : ScriptableObject
     [Tooltip("Seconds the view takes to catch up with a turn of the right-mouse orbit: smooths the mouse's steps. 0 turns at once.")]
     [SerializeField, Range(0f, 0.5f)] private float orbitSmoothTime = 0.2f;
 
+    [Header("Controller (right stick)")]
+    [Tooltip("Degrees per second the top-down view turns with the stick fully over.")]
+    [SerializeField, Min(0f)] private float stickOrbitSpeed = 150f;
+    [Tooltip("Share of the zoom range per second, the stick held up (closer) or down (further), in the top-down view.")]
+    [SerializeField, Min(0f)] private float stickZoomSpeed = 0.9f;
+    [Tooltip("Degrees per second the action camera turns (x) and tilts (y) with the stick fully over.")]
+    [SerializeField] private Vector2 stickLookSpeed = new Vector2(200f, 120f);
+    [Tooltip("Response curve: the stick's tilt raised to this power, so a small tilt aims finely and a full one turns fast. 1 is linear.")]
+    [SerializeField, Range(1f, 3f)] private float stickResponse = 1.8f;
+
     [Header("Action camera (Enshrouded style)")]
     [Tooltip("Seconds to settle when switching between the top-down and action styles.")]
     [SerializeField, Min(0.01f)] private float styleTransitionTime = 0.35f;
@@ -123,6 +133,11 @@ public sealed class PlayerCameraSettings : ScriptableObject
     public float InitialZoom => initialZoom;
     public float OrbitSensitivity => orbitSensitivity;
     public float OrbitSmoothTime => orbitSmoothTime;
+
+    public float StickOrbitSpeed => stickOrbitSpeed;
+    public float StickZoomSpeed => stickZoomSpeed;
+    public Vector2 StickLookSpeed => stickLookSpeed;
+    public float StickResponse => stickResponse;
 
     public float StyleTransitionTime => styleTransitionTime;
     public float ActionStartPitch => actionStartPitch;
