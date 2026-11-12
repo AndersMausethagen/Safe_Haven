@@ -20,6 +20,7 @@ public sealed class FishFight
     private readonly FishingSettings.FightTuning tuning;
     private readonly float fight;
     private readonly float tireSeconds;
+    private readonly float pullScale = 1f;
     private readonly float strainSeconds;
     private readonly float slackSeconds;
     private readonly System.Random random;
@@ -30,12 +31,16 @@ public sealed class FishFight
     /// <param name="control">The angler's line control (1 = plain; the Fishing skill and perks raise it): the line holds
     /// longer at full strain and slack, and fish tire sooner.</param>
     /// <param name="distance">Metres of line out when it bites.</param>
-    public FishFight(FishingSettings.FightTuning tuning, float fight, float size, float control, float distance, int seed)
+    /// <param name="heft">How much harder its length makes it than a 40 cm fish (FishSizes.Difficulty, eased by the bait): it
+    /// tires that much slower and pulls a little harder on its runs.</param>
+    public FishFight(FishingSettings.FightTuning tuning, float fight, float size, float control, float distance, int seed, float heft = 1f)
     {
         this.tuning = tuning;
         this.fight = Mathf.Clamp01(fight);
         control = Mathf.Max(0.2f, control);
-        tireSeconds = Mathf.Lerp(tuning.tireSeconds.x, tuning.tireSeconds.y, this.fight) * Mathf.Lerp(0.85f, 1.3f, Mathf.Clamp01(size)) / control;
+        heft = Mathf.Max(0.3f, heft);
+        pullScale = Mathf.Clamp(1f + 0.3f * (heft - 1f), 0.8f, 1.6f);
+        tireSeconds = Mathf.Lerp(tuning.tireSeconds.x, tuning.tireSeconds.y, this.fight) * Mathf.Lerp(0.85f, 1.3f, Mathf.Clamp01(size)) * heft / control;
         strainSeconds = tuning.strainSeconds * control;
         slackSeconds = tuning.slackSeconds * control;
         random = new System.Random(seed);
@@ -171,7 +176,7 @@ public sealed class FishFight
         switch (now)
         {
             case Mood.Running:
-                return Mathf.Lerp(tuning.runPull.x, tuning.runPull.y, fight) * (0.5f + 0.5f * Stamina);
+                return Mathf.Lerp(tuning.runPull.x, tuning.runPull.y, fight) * pullScale * (0.5f + 0.5f * Stamina);
             case Mood.Warning:
                 return 0.25f * Stamina;
             case Mood.Spent:

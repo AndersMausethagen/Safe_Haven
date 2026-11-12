@@ -50,30 +50,36 @@ MonoBehaviour:
     water: 1
     fight: 0.35
     size: {x: 0.3, y: 1.4}
+    lengthScale: 1
     colour: {r: 0.46, g: 0.43, b: 0.3, a: 1}
   - item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
     weight: 4
     water: 0
     fight: 0.2
     size: {x: 0.2, y: 0.8}
+    lengthScale: 0.75
     colour: {r: 0.52, g: 0.56, b: 0.3, a: 1}
   - item: {fileID: 11400000, guid: 389ceb339c3db65489b99ee795eac79c, type: 2}
     weight: 1.5
     water: 2
     fight: 0.75
     size: {x: 1.5, y: 6}
+    lengthScale: 1.5
     colour: {r: 0.33, g: 0.41, b: 0.25, a: 1}
   - item: {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
     weight: 0.8
     water: 2
     fight: 0.55
     size: {x: 0.5, y: 2.5}
+    lengthScale: 1.1
     colour: {r: 0.55, g: 0.36, b: 0.3, a: 1}
   bait:
   - item: {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
     lure: 1.4
+    ease: 0.35
   - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
     lure: 0.8
+    ease: 0
   nokkenChance: 0.06
   nokkenPresses: 14
   nokkenSeconds: 7

@@ -273,6 +273,9 @@ public sealed class FishingLine
 
     // A plain fish one metre long along +z (mouth at +z, tail at -z), deeper than it is wide, with a forked tail and a
     // fin on its back. Made once and shared.
+    /// <summary>The fish shape (one metre long along +z, mouth forward), shared with the fish swimming in the water (FishInTheWater).</summary>
+    public static Mesh SharedFishMesh => FishMesh();
+
     private static Mesh FishMesh()
     {
         if (fishMesh != null)

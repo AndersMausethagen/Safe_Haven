@@ -221,11 +221,14 @@ public static class BuildFishing
             AssetDatabase.CreateAsset(settings, path);
         }
 
-        settings.Configure(fish.Select(f => new FishingSettings.Fish { item = f.item, water = f.water, weight = f.weight, fight = f.fight, size = f.size }),
+        // How long each kind runs (FishSizes: 10-200 cm, most 20-60): a perch small, a pike big.
+        float LengthOf(ItemDefinition item) => item == null ? 1f : item.name == "Perch" ? 0.75f : item.name == "Pike" ? 1.5f : item.name == "ArcticChar" ? 1.1f : 1f;
+        settings.Configure(fish.Select(f => new FishingSettings.Fish { item = f.item, water = f.water, weight = f.weight, fight = f.fight, size = f.size, lengthScale = LengthOf(f.item) }),
             new[]
             {
-                new FishingSettings.Bait { item = grubs, lure = 1.4f },
-                new FishingSettings.Bait { item = Mat("Berries"), lure = 0.8f },
+                // Grubs bring the big ones on and take some of their fight; berries only pass the time.
+                new FishingSettings.Bait { item = grubs, lure = 1.4f, ease = 0.35f },
+                new FishingSettings.Bait { item = Mat("Berries"), lure = 0.8f, ease = 0f },
             }, 0.06f);
 
         const string eventPath = "Assets/_Project/Data/Fishing/MetTheNokken.asset";

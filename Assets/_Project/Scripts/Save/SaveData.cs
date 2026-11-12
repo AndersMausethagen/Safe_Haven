@@ -215,6 +215,8 @@ public sealed class JournalSaveData
     public List<string> tried = new List<string>();
     /// <summary>Named places found on the map. Missing in older saves.</summary>
     public List<string> discovered = new List<string>();
+    /// <summary>The biggest of each kind of fish caught, in cm (id, amount as cm x 10). Missing in older saves.</summary>
+    public List<AmountSaveData> biggestFish = new List<AmountSaveData>();
 }
 
 [Serializable]
@@ -317,6 +319,8 @@ public sealed class SlotSaveData
     public int quality;
     /// <summary>Who made a Fine or Masterwork piece. Missing in older saves.</summary>
     public string maker;
+    /// <summary>A caught fish's length in cm (the biggest of the stack). Missing in older saves, and 0 for everything else.</summary>
+    public float size;
 }
 
 [Serializable]

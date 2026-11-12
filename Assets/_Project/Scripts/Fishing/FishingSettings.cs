@@ -24,8 +24,10 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
         public FishWater water = FishWater.Anywhere;
         [Tooltip("0: a lazy fish that hardly runs; 1: a fighter that runs hard and often.")]
         [Range(0f, 1f)] public float fight = 0.3f;
-        [Tooltip("Kilograms, shown when caught. Heavier ones last longer on the line and hang bigger from it.")]
+        [Tooltip("Kilograms of a typical one (the middle of this range is one of middling length, FishSizes); a longer fish weighs more by the cube of its length.")]
         public Vector2 size = new Vector2(0.3f, 1.2f);
+        [Tooltip("How long this kind runs against the others: 1 is a fish of 33 cm in the middle of the curve, 0.75 a perch's, 1.5 a pike's (FishSizes: 10-200 cm whatever the kind).")]
+        [Min(0.2f)] public float lengthScale = 1f;
         [Tooltip("Its colour when it hangs from the line at the landing.")]
         public Color colour = new Color(0.55f, 0.6f, 0.5f, 1f);
     }
@@ -73,6 +75,8 @@ public sealed class FishingSettings : GameSettings<FishingSettings>
         public ItemDefinition item;
         [Tooltip("How much sooner fish bite with it: 1 is normal, 1.5 is a third less waiting.")]
         [Min(0.1f)] public float lure = 1f;
+        [Tooltip("How much easier a big fish is on it: it bites more readily and its extra fight is cut by this share (0 none, 0.5 halved).")]
+        [Range(0f, 0.8f)] public float ease;
     }
 
     [Header("Casting")]

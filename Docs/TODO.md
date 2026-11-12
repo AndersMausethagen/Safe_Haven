@@ -34,8 +34,9 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
    the road from the pass and a crag behind the waystones. The story's places keep their ground. Not done: the forest's own
    lumpy ground and walls (made by an older builder that must not run again) and a stream or pool by the stones; nobody has
    played the prologue through on the new ground by hand.)
-8. Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait
-   easier; the size on the fish item (looks only), and the biggest catch in the journal.
+8. ~~Fish that swim in the water, of every size (10-200 cm, mostly 20-60, a sharp fall after); bigger is harder, better bait
+   easier; the size on the fish item (looks only), and the biggest catch in the journal.~~ (done 2026-11-12: FishInTheWater,
+   FishSizes, ARCHITECTURE "Fish you can see". Checked in Play at the Haven pond; a whole catch not played by hand.)
 
 ## Horses and the playtest list (2026-11-11)
 

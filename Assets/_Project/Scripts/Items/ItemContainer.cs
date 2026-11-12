@@ -264,7 +264,10 @@ public sealed class ItemContainer
     /// Adds as many as fit in the unlocked slots and the weight budget, topping up existing stacks before using empty
     /// slots. Returns how many were added.
     /// </summary>
-    public int Add(ItemDefinition item, int amount)
+    public int Add(ItemDefinition item, int amount) => Add(item, amount, 0f);
+
+    /// <summary>The same, for fish of a length (centimetres): a stack keeps the biggest one's (ItemStack.Size).</summary>
+    public int Add(ItemDefinition item, int amount, float size)
     {
         amount = item != null ? Mathf.Min(amount, FitsByWeight(item)) : 0;
         if (item == null || amount <= 0)
@@ -278,7 +281,7 @@ public sealed class ItemContainer
             if (slots[i].Item == item && slots[i].SpaceLeft > 0)
             {
                 int added = Mathf.Min(slots[i].SpaceLeft, remaining);
-                Set(i, new ItemStack(item, slots[i].Count + added));
+                Set(i, new ItemStack(item, slots[i].Count + added).WithSize(Mathf.Max(slots[i].Size, size)));
                 remaining -= added;
             }
         }
@@ -288,7 +291,7 @@ public sealed class ItemContainer
             if (slots[i].IsEmpty && CanHold(i, item))
             {
                 int added = Mathf.Min(item.MaximumStack, remaining);
-                Set(i, new ItemStack(item, added));
+                Set(i, new ItemStack(item, added).WithSize(size));
                 remaining -= added;
             }
         }
@@ -344,7 +347,7 @@ public sealed class ItemContainer
             return;
         }
 
-        Set(index, stack.IsEmpty ? ItemStack.Empty : new ItemStack(stack.Item, Mathf.Min(stack.Count, stack.Item.MaximumStack), stack.Durability, stack.Empower, stack.Enchantment, stack.Quality, stack.Maker));
+        Set(index, stack.IsEmpty ? ItemStack.Empty : stack.WithCount(Mathf.Min(stack.Count, stack.Item.MaximumStack)));
     }
 
     /// <summary>How many items are in the container, of every kind.</summary>
@@ -381,7 +384,7 @@ public sealed class ItemContainer
 
         if (!stack.Item.KeepsCondition)
         {
-            return Add(stack.Item, stack.Count);
+            return Add(stack.Item, stack.Count, stack.Size);
         }
 
         int empty = FirstEmptySlotFor(stack.Item);
@@ -406,7 +409,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        int moved = stack.Item.KeepsCondition ? target.AddStack(stack) : target.Add(stack.Item, stack.Count);
+        int moved = stack.Item.KeepsCondition ? target.AddStack(stack) : target.Add(stack.Item, stack.Count, stack.Size);
         if (moved > 0)
         {
             RemoveAt(index, moved);
@@ -466,7 +469,7 @@ public sealed class ItemContainer
                 return false;
             }
 
-            target.Set(to, new ItemStack(destination.Item, destination.Count + moved));
+            target.Set(to, new ItemStack(destination.Item, destination.Count + moved).WithSize(Mathf.Max(destination.Size, source.Size)));
             Set(from, new ItemStack(source.Item, source.Count - moved));
             StackMoved?.Invoke(from, target, to);
             return true;
@@ -503,7 +506,7 @@ public sealed class ItemContainer
         ItemStack stack = slots[index];
         int half = stack.Count / 2;
         Set(index, new ItemStack(stack.Item, stack.Count - half));
-        Set(empty, new ItemStack(stack.Item, half));
+        Set(empty, new ItemStack(stack.Item, half).WithSize(stack.Size));
         return true;
     }
 
@@ -578,6 +581,12 @@ public sealed class ItemContainer
 
     private void Set(int index, ItemStack stack)
     {
+        // A stack made again of the same item without a size (some taken away, more added) keeps the fish length it had.
+        if (stack.Size <= 0f && !stack.IsEmpty && slots[index].Size > 0f && slots[index].Item == stack.Item)
+        {
+            stack = stack.WithSize(slots[index].Size);
+        }
+
         float change = WeightOf(stack) - WeightOf(slots[index]);
         slots[index] = stack;
         if (change != 0f)

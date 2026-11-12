@@ -42,6 +42,9 @@ public sealed class PlayerFishing : MonoBehaviour
     private bool still;
     private FishingSettings.Fish hooked;
     private float kilograms;
+    // The hooked fish's length, and how much the bait on the line eases a big one (FishSizes).
+    private float centimetres;
+    private float baitEase;
     private float startDistance;
     private float rodSide;
     private Vector3 fishAt;
@@ -166,7 +169,7 @@ public sealed class PlayerFishing : MonoBehaviour
                     return;
                 }
 
-                if (FindBait(out _) < 0)
+                if (FindBait(out _, out _) < 0)
                 {
                     GameMessages.Post("You need bait: grubs from rotten wood, or berries.", MessageKind.Warning);
                     return;
@@ -311,7 +314,7 @@ public sealed class PlayerFishing : MonoBehaviour
         Vector3 direction = Flat(transform.forward).normalized;
         float distance = Mathf.Lerp(settings.MinimumCast, settings.MaximumCast, castCharge);
         WaterAlong(direction, distance, out Vector3 target, out float height, out WaterSurface water);
-        int slot = FindBait(out float lure);
+        int slot = FindBait(out float lure, out baitEase);
         if (water == null || slot < 0)
         {
             GameMessages.Post(water == null ? "Cast into the water." : "You need bait.", MessageKind.Warning);
@@ -333,6 +336,8 @@ public sealed class PlayerFishing : MonoBehaviour
 
         biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour * quick);
         State = Phase.Waiting;
+        // A fish in sight near the float comes to it (and what is right under it scatters).
+        FishInTheWater.Current?.Attract(new Vector3(target.x, height, target.z), baitEase);
         look.Show();
         look.Tick(cast, State, 0f);
         // The float stays in the picture while it is out, so a bite is seen wherever the line was cast.
@@ -366,19 +371,32 @@ public sealed class PlayerFishing : MonoBehaviour
             return;
         }
 
-        hooked = settings.PickFish(still, Random.value);
+        // The fish that came to the float when there was one in sight (FishInTheWater); else one of the water's, sized now.
+        if (FishInTheWater.Current != null && FishInTheWater.Current.TakeBiter(cast.Landing, out FishingSettings.Fish biter, out float biterLength))
+        {
+            hooked = biter;
+            centimetres = biterLength;
+        }
+        else
+        {
+            hooked = settings.PickFish(still, Random.value);
+            centimetres = hooked != null ? FishSizes.Roll(Random.value, Random.value, hooked.lengthScale) : 0f;
+        }
+
         if (hooked == null)
         {
             EndLine("Nothing worth keeping bites here.");
             return;
         }
 
-        kilograms = Random.Range(hooked.size.x, hooked.size.y);
+        kilograms = FishSizes.Kilograms(hooked, centimetres);
         float size = Mathf.InverseLerp(hooked.size.x, hooked.size.y, kilograms);
+        // The bigger it is the harder it fights; good bait takes some of that out of it.
+        float heft = FishSizes.Eased(FishSizes.Difficulty(centimetres), baitEase);
         // The Fishing skill (and its perks) is line control: the line holds longer and fish tire sooner.
         float control = TryGetComponent(out Combatant self) ? Mathf.Max(0.2f, 1f + self.Stats.Get(StatType.ReelZone)) : 1f;
         startDistance = Flat(cast.Landing - transform.position).magnitude;
-        Fight = new FishFight(settings.Fight, hooked.fight, size, control, startDistance, Random.Range(0, int.MaxValue));
+        Fight = new FishFight(settings.Fight, hooked.fight, size, control, startDistance, Random.Range(0, int.MaxValue), heft);
         fishAt = cast.Landing;
         rodSide = 0f;
         lastMood = Fight.Current;
@@ -568,7 +586,7 @@ public sealed class PlayerFishing : MonoBehaviour
             lift = 1f;
         }
 
-        look.Landing(lift, Length(kilograms), hooked.colour);
+        look.Landing(lift, centimetres / 100f, hooked.colour);
         if (!landed && lift >= 0.6f)
         {
             landed = true;
@@ -611,19 +629,22 @@ public sealed class PlayerFishing : MonoBehaviour
         ItemDefinition fish = hooked.item;
         // Double Catch: now and then a second one comes up on the line.
         int caught = Techniques.Has(PerkTechnique.DoubleCatch) && Random.value < TechniqueSettings.Current.DoubleCatchChance ? 2 : 1;
-        if (caught > 1 && items.Give(fish, 1) > 0)
+        if (caught > 1 && items.Give(fish, 1, FishSizes.Roll(Random.value, Random.value, hooked.lengthScale)) > 0)
         {
             GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
             Techniques.Used(PerkTechnique.DoubleCatch);
         }
 
-        if (items.Give(fish, 1) < 1)
+        // Its length goes with it (the bag shows it), and the journal keeps the biggest of each kind.
+        if (items.Give(fish, 1, centimetres) < 1)
         {
             GameMessages.Post($"No room for the {fish.DisplayName}. You let it go.", MessageKind.Warning);
         }
         else
         {
-            GameMessages.Post($"Caught a {fish.DisplayName}! ({kilograms:0.0} kg)", MessageKind.Gain);
+            bool record = GameSession.Progress.Journal.NoteCatch(fish.Id, centimetres, out float before);
+            GameMessages.Post($"Caught a {FishSizes.Describe(centimetres)} {fish.DisplayName}! ({kilograms:0.0} kg)"
+                              + (record && before > 0f ? $" Your biggest yet (the last was {FishSizes.Describe(before)})." : ""), MessageKind.Gain);
             GameEvents.Raise(new GameEvent(GameEventKind.FishCaught, fish, 1, gameObject));
             int tier = Mathf.Max(1, fish.Tier);
             ExperienceTracker.Practise(ProficiencyTraining.Fishing, tier, LevelingSettings.Current.TierExperience(tier) * LevelingSettings.Current.CatchWork);
@@ -639,6 +660,7 @@ public sealed class PlayerFishing : MonoBehaviour
     public void EndLine(string message)
     {
         look?.Hide();
+        FishInTheWater.Current?.Release();
         Fight = null;
         hooked = null;
         if (closeUp != null)
@@ -665,10 +687,11 @@ public sealed class PlayerFishing : MonoBehaviour
         }
     }
 
-    // The first bait in the bag that FishingSettings knows, and how well it lures. -1 when there is none.
-    private int FindBait(out float lure)
+    // The first bait in the bag that FishingSettings knows, how well it lures and how much it eases a big fish. -1 when there is none.
+    private int FindBait(out float lure, out float ease)
     {
         lure = 1f;
+        ease = 0f;
         ItemContainer bag = items.Container;
         foreach (FishingSettings.Bait bait in FishingSettings.Current.BaitList)
         {
@@ -678,6 +701,7 @@ public sealed class PlayerFishing : MonoBehaviour
                 if (!stack.IsEmpty && stack.Item == bait.item)
                 {
                     lure = bait.lure;
+                    ease = bait.ease;
                     return i;
                 }
             }

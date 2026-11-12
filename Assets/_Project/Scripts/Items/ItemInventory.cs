@@ -104,9 +104,12 @@ public sealed class ItemInventory : MonoBehaviour
     }
 
     /// <summary>Adds as many as fit and returns how many arrived.</summary>
-    public int Give(ItemDefinition item, int amount)
+    public int Give(ItemDefinition item, int amount) => Give(item, amount, 0f);
+
+    /// <summary>The same, for a fish of a length (centimetres), which the bag shows (ItemStack.Size).</summary>
+    public int Give(ItemDefinition item, int amount, float size)
     {
-        int added = Container.Add(item, amount);
+        int added = Container.Add(item, amount, size);
         if (added > 0)
         {
             Received?.Invoke(item, added);

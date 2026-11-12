@@ -169,6 +169,7 @@ public static class SaveMapper
             enchantment = stack.Enchantment != null ? stack.Enchantment.Id : "",
             quality = (int)stack.Quality,
             maker = stack.Maker,
+            size = stack.Size,
         };
     }
 
@@ -680,6 +681,10 @@ public static class SaveMapper
         into.journal.killedBy.AddRange(journal.KilledBy);
         into.journal.tried.AddRange(journal.Tried);
         into.journal.discovered.AddRange(journal.Discovered);
+        foreach (KeyValuePair<string, float> fish in journal.BiggestFish)
+        {
+            into.journal.biggestFish.Add(new AmountSaveData { id = fish.Key, amount = (int)Math.Round(fish.Value * 10f) });
+        }
         foreach (RaidRecord raid in journal.Raids)
         {
             into.journal.raids.Add(new RaidRecordSaveData { raid = raid.Raid, outcome = raid.Outcome, seconds = raid.Seconds, value = raid.Value, broughtDownBy = raid.BroughtDownBy ?? "", lines = new List<string>(raid.Lines) });
@@ -746,6 +751,11 @@ public static class SaveMapper
 
         progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned,
             journal.tried ?? new List<string>(), journal.discovered ?? new List<string>());
+        foreach (AmountSaveData fish in journal.biggestFish ?? new List<AmountSaveData>())
+        {
+            progress.Journal.NoteCatch(fish.id, fish.amount / 10f, out _);
+        }
+
         return progress;
     }
 
@@ -804,7 +814,7 @@ public static class SaveMapper
 
             EnchantmentDefinition enchantment = string.IsNullOrEmpty(slot.enchantment) ? null
                 : Resolve(EssenceSettings.Current.FindEnchantment(slot.enchantment), "enchantment", slot.enchantment, missing);
-            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment, (ItemQuality)Math.Max(0, Math.Min(slot.quality, 2)), slot.maker);
+            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment, (ItemQuality)Math.Max(0, Math.Min(slot.quality, 2)), slot.maker, slot.size);
             if (into.IsValid(slot.slot) && into.GetSlot(slot.slot).IsEmpty)
             {
                 into.SetSlot(slot.slot, stack);

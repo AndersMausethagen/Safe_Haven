@@ -280,6 +280,26 @@ public static class JournalContent
         return entry;
     }
 
+    // The fishing page keeps the biggest of each kind caught.
+    private static string FishRecords(CharacterProgress progress)
+    {
+        IReadOnlyDictionary<string, float> biggest = progress.Journal.BiggestFish;
+        if (biggest.Count == 0)
+        {
+            return "\n\n<b>Biggest catches</b>\nNone yet. Every fish is measured as it comes out of the water.";
+        }
+
+        var content = UnityEngine.Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        var lines = new StringBuilder("\n\n<b>Biggest catches</b>");
+        foreach (KeyValuePair<string, float> record in biggest.OrderByDescending(pair => pair.Value))
+        {
+            ItemDefinition fish = content != null ? content.FindItem(record.Key) : null;
+            lines.Append($"\n{(fish != null ? fish.DisplayName : record.Key)}: {FishSizes.Describe(record.Value)}");
+        }
+
+        return lines.ToString();
+    }
+
     private static HavenEntry EntryOf(JournalPage page, CharacterProgress progress)
     {
         var entry = new HavenEntry
@@ -289,7 +309,7 @@ public static class JournalContent
             Line = page.line,
             Status = page.line,
             State = HavenEntryState.Good,
-            Description = GameInput.WithRebinds(page.body),
+            Description = GameInput.WithRebinds(page.body) + (page.unlockedBySkill != null && page.unlockedBySkill == LevelingSettings.Current.SkillTrainedBy(ProficiencyTraining.Fishing) ? FishRecords(progress) : ""),
         };
         MarkUnread(entry, progress, "page:" + page.title);
         entry.Status = page.line;

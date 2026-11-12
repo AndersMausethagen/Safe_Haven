@@ -464,6 +464,13 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<i><color={UIStyle.Current.MutedHex}>Made by {stack.Maker}.</color></i>");
         }
 
+        // A caught fish's length (for show: it feeds the same whatever it measures).
+        if (stack.Size > 0f)
+        {
+            string length = FishSizes.Describe(stack.Size);
+            builder.Append($"\n<i><color={UIStyle.Current.MutedHex}>{(stack.Count > 1 ? $"The biggest of these: {length}." : $"{length} long.")}</color></i>");
+        }
+
         foreach (StatBonus bonus in GearPower.EmpowerBonuses(stack.Item, stack.Empower, EssenceSettings.Current))
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>").Append(bonus.Describe()).Append(" (empowered)</color>");

@@ -544,6 +544,21 @@ anchor ("Catch Firefly") that gives a Firefly. Content: `AgentScripts/BuildFiref
 
 ### Fishing and the Nøkken
 
+**Fish you can see, and their sizes (2026-11-12).** `FishInTheWater` (made by itself in every scene) keeps a few fish of the
+kinds that bite there swimming under the open water round the player (`FishingSettings.PickFish`, about one to 60 square
+metres, two to eight a water, 22 in all, gone past 55 m): they wander, rest, and scatter from a player wading in or a float
+landing on them; drawn with the landed fish's shape (`FishingLine.SharedFishMesh`) and Fish Material tinted by kind. A cast
+`Attract`s one of those near the float, chosen by `FishSizes.BiteWillingness` (big fish are wary, less so on good bait), and
+at the strike `PlayerFishing` takes that fish (`TakeBiter`) as the hooked one; with none it rolls one of the water's unseen fish.
+`FishSizes` (plain rules): a length in cm from a log-normal curve (median 33 cm times the kind's Length Scale, spread 0.45:
+about 80% are 20-60 cm, 1% over a metre, clamped 10-200), its weight by the cube of the length from the kind's typical
+weight, and `Difficulty` (a 40 cm fish is 1; `FishFight` gets it as heft: it tires that much slower and pulls a little harder)
+eased by the bait's Ease (`FishingSettings.Bait`: Grubs 0.35, Berries 0). The length goes with the fish into the bag
+(`ItemStack.Size`: a stack shows its biggest, the container keeps it through every top-up, move, split and save, `SlotSaveData.size`;
+the tooltip says it) and the journal keeps the biggest of each kind (`JournalRecord.NoteCatch`, `JournalSaveData.biggestFish`),
+listed on the fishing page. Size is for show and the fight only: a fish feeds the same whatever it measures. Each game shows
+its own fish (not shared in co-op). Tests: `FishSizeTests`.
+
 A Fishing Rod is a weapon of kind Fishing Rod (`WeaponDefinition.TakesAttackInput`, like the bow), so `PlayerFishing`
 owns the attack and guard buttons while it is held: hold to raise the rod and swing it back, let go to cast at the
 cursor (the float leaves at the throw's flick; one bait from the bag, best first: Grubs from rotten logs and stumps, or

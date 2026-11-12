@@ -27,6 +27,7 @@ public sealed class JournalRecord
     private readonly HashSet<string> tried = new HashSet<string>();
     private readonly HashSet<string> discovered = new HashSet<string>();
     private readonly List<RaidRecord> raids = new List<RaidRecord>();
+    private readonly Dictionary<string, float> biggestFish = new Dictionary<string, float>();
 
     public string PinnedQuest { get; set; }
     public IEnumerable<string> Read => read;
@@ -38,6 +39,28 @@ public sealed class JournalRecord
     /// <summary>The named places found on the map (WorldAtlas.Place ids).</summary>
     public IEnumerable<string> Discovered => discovered;
     public IReadOnlyList<RaidRecord> Raids => raids;
+
+    /// <summary>The biggest of each kind of fish caught (item id to centimetres), for the journal's fishing page.</summary>
+    public IReadOnlyDictionary<string, float> BiggestFish => biggestFish;
+
+    /// <summary>Notes a catch's length: true when it is the biggest of its kind yet (<paramref name="before"/>: the last
+    /// record, 0 for the first of its kind).</summary>
+    public bool NoteCatch(string fishId, float centimetres, out float before)
+    {
+        before = 0f;
+        if (string.IsNullOrEmpty(fishId) || centimetres <= 0f)
+        {
+            return false;
+        }
+
+        if (biggestFish.TryGetValue(fishId, out before) && before >= centimetres)
+        {
+            return false;
+        }
+
+        biggestFish[fishId] = centimetres;
+        return true;
+    }
 
     public bool HasRead(string key) => read.Contains(key);
     public void MarkRead(string key) => read.Add(key);
@@ -68,6 +91,7 @@ public sealed class JournalRecord
         IEnumerable<string> savedTried = null, IEnumerable<string> savedDiscovered = null)
     {
         read.Clear();
+        biggestFish.Clear();
         tried.Clear();
         tried.UnionWith(savedTried ?? new string[0]);
         discovered.Clear();
