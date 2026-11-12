@@ -34,6 +34,10 @@ public sealed class ControllerSettings : GameSettings<ControllerSettings>
     [Tooltip("How far the right stick must lean to pick a choice on a wheel; letting go keeps the last one picked.")]
     [SerializeField, Range(0.1f, 0.9f)] private float wheelDeadZone = 0.45f;
 
+    [Header("Aiming (top-down view)")]
+    [Tooltip("How far the right stick must lean to aim, in a fight or drawing a bow; under it the player faces where they walk.")]
+    [SerializeField, Range(0.1f, 0.9f)] private float aimDeadZone = 0.3f;
+
     [Header("Placing buildings (top-down view)")]
     [Tooltip("Where the spot starts, metres ahead of the player (away from the camera).")]
     [SerializeField, Min(0.5f)] private float buildStartDistance = 5f;
@@ -52,6 +56,7 @@ public sealed class ControllerSettings : GameSettings<ControllerSettings>
     public Vector3 ParryPulse => parryPulse;
     public Vector3 BitePulse => bitePulse;
     public float WheelDeadZone => wheelDeadZone;
+    public float AimDeadZone => aimDeadZone;
     public float BuildStartDistance => buildStartDistance;
     public float BuildReach => buildReach;
     public float BuildSpotSpeed => buildSpotSpeed;

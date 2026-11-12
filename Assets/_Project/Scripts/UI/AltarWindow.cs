@@ -212,10 +212,16 @@ public sealed class AltarWindow : MonoBehaviour
 
     public void Close() => window.Close();
 
-    private void OnEnable() => Current = this;
+    private void OnEnable()
+    {
+        Current = this;
+        PadTabs.Register(this, () => window != null && window.IsOpen, direction => Show((Page)PadTabs.Next((int)page, PageNames.Length, direction)),
+            () => System.Array.ConvertAll(tabs, tab => tab != null ? tab.rectTransform : null));
+    }
 
     private void OnDisable()
     {
+        PadTabs.Unregister(this);
         if (Current == this)
         {
             Current = null;

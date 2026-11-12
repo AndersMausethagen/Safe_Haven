@@ -323,6 +323,12 @@ public sealed class PlayerCameraController : MonoBehaviour
         ApplyToCinemachine();
     }
 
+    /// <summary>
+    /// True while the right stick aims rather than turns the view, on a controller in the top-down style: in a fight (its
+    /// framing doesn't orbit) and while aiming a bow. PlayerInputHandler then aims with it, twin-stick style.
+    /// </summary>
+    public bool StickAims => style != CameraStyle.Action && (!profile.allowOrbit || aiming);
+
     private bool IsUIOpen => (uiState != null && uiState.IsAnyWindowOpen) || CommandWheel.IsHeld;
 
     private CameraSituation CurrentSituation()
@@ -488,10 +494,13 @@ public sealed class PlayerCameraController : MonoBehaviour
             return;
         }
 
-        if (profile.allowOrbit && !aiming)
+        // In a fight, or aiming, the stick is the aim instead (StickAims).
+        if (StickAims)
         {
-            yawTarget += stick.x * settings.StickOrbitSpeed * sensitivity * dt;
+            return;
         }
+
+        yawTarget += stick.x * settings.StickOrbitSpeed * sensitivity * dt;
 
         if (!BuildPlacer.IsBusy)
         {

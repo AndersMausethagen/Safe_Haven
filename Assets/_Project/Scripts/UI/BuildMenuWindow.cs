@@ -115,10 +115,28 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
     public void Close() => window.Close();
 
-    private void OnEnable() => Current = this;
+    private void OnEnable()
+    {
+        Current = this;
+        PadTabs.Register(this, () => IsOpen, StepTab, () => tabs.ConvertAll(tab => (RectTransform)tab.Root.transform));
+    }
+
+    // LB and RB on a controller (PadTabs): the categories shown, in order, round from the last to the first.
+    private void StepTab(int direction)
+    {
+        var showing = tabs.FindAll(tab => tab.Root != null && tab.Root.activeSelf);
+        if (showing.Count == 0)
+        {
+            return;
+        }
+
+        int at = showing.FindIndex(tab => tab.Category == shown);
+        ShowTab(showing[PadTabs.Next(Mathf.Max(0, at), showing.Count, direction)].Category);
+    }
 
     private void OnDisable()
     {
+        PadTabs.Unregister(this);
         if (Current == this)
         {
             Current = null;

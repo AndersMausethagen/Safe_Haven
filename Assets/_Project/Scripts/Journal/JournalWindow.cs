@@ -78,11 +78,24 @@ public sealed class JournalWindow : MonoBehaviour
     {
         Current = this;
         GameInput.KeysChanged += OnKeysChanged;
+        PadTabs.Register(this, () => window != null && window.IsOpen, StepTab,
+            () => tabViews.ConvertAll(view => (RectTransform)view.Button.transform));
+    }
+
+    // LB and RB on a controller (PadTabs).
+    private void StepTab(int direction)
+    {
+        int at = tabViews.FindIndex(view => view.Tab == shown);
+        if (tabViews.Count > 0)
+        {
+            Show(tabViews[PadTabs.Next(Mathf.Max(0, at), tabViews.Count, direction)].Tab);
+        }
     }
 
     private void OnDisable()
     {
         GameInput.KeysChanged -= OnKeysChanged;
+        PadTabs.Unregister(this);
         if (Current == this)
         {
             Current = null;

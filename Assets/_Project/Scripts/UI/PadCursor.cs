@@ -27,6 +27,11 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
     private InputAction click;
     private InputAction context;
     private InputAction scroll;
+    private InputAction previousTab;
+    private InputAction nextTab;
+    // The bumpers' glyphs, at either end of the front window's tabs.
+    private TMPro.TMP_Text tabLeft;
+    private TMPro.TMP_Text tabRight;
     private Mouse device;
     private Canvas canvas;
     private RectTransform pointer;
@@ -49,6 +54,9 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         click = new InputAction("Pad Click", InputActionType.Button, "<Gamepad>/buttonSouth");
         context = new InputAction("Pad Right Click", InputActionType.Button, "<Gamepad>/buttonWest");
         scroll = new InputAction("Pad Scroll", InputActionType.Value, "<Gamepad>/rightStick", processors: "stickDeadzone", expectedControlType: "Vector2");
+        // The bumpers turn the front window's tabs (PadTabs).
+        previousTab = new InputAction("Pad Previous Tab", InputActionType.Button, "<Gamepad>/leftShoulder");
+        nextTab = new InputAction("Pad Next Tab", InputActionType.Button, "<Gamepad>/rightShoulder");
         BuildView();
     }
 
@@ -121,6 +129,8 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         click.Enable();
         context.Enable();
         scroll.Enable();
+        previousTab.Enable();
+        nextTab.Enable();
         pointer.gameObject.SetActive(true);
         Write(Vector2.zero, Vector2.zero);
     }
@@ -132,7 +142,11 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         click.Disable();
         context.Disable();
         scroll.Disable();
+        previousTab.Disable();
+        nextTab.Disable();
         pointer.gameObject.SetActive(false);
+        tabLeft.gameObject.SetActive(false);
+        tabRight.gameObject.SetActive(false);
         if (device != null && device.added)
         {
             // Buttons up first, so nothing stays held in the UI; then the device goes, and the UI forgets its pointer.
@@ -162,6 +176,29 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         // A mouse wheel notch is 120; the stick turns it smoothly.
         Vector2 wheel = scroll.ReadValue<Vector2>();
         Write(delta, new Vector2(0f, wheel.y * settings.ScrollSpeed * 120f * dt));
+
+        if (previousTab.WasPressedThisFrame())
+        {
+            PadTabs.Step(-1);
+        }
+        else if (nextTab.WasPressedThisFrame())
+        {
+            PadTabs.Step(1);
+        }
+
+        bool tabbed = PadTabs.TryGetFrontRow(out Rect row);
+        tabLeft.gameObject.SetActive(tabbed);
+        tabRight.gameObject.SetActive(tabbed);
+        if (tabbed)
+        {
+            PadFamily family = InputDevices.Family;
+            float glyph = 26f * scale * GameOptions.UiScale.Value;
+            tabLeft.text = ControllerGlyphs.For("<Gamepad>/leftShoulder", family);
+            tabRight.text = ControllerGlyphs.For("<Gamepad>/rightShoulder", family);
+            tabLeft.fontSize = tabRight.fontSize = glyph;
+            tabLeft.rectTransform.anchoredPosition = new Vector2(row.xMin - glyph * 0.4f, row.center.y);
+            tabRight.rectTransform.anchoredPosition = new Vector2(row.xMax + glyph * 0.4f, row.center.y);
+        }
 
         float size = settings.CursorSize * scale * GameOptions.UiScale.Value;
         pointer.sizeDelta = new Vector2(size, size);
@@ -221,6 +258,25 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         }
 
         go.SetActive(false);
+
+        tabLeft = TabGlyph(root.transform, "LB", new Vector2(1f, 0.5f), TMPro.TextAlignmentOptions.Right);
+        tabRight = TabGlyph(root.transform, "RB", new Vector2(0f, 0.5f), TMPro.TextAlignmentOptions.Left);
+    }
+
+    private static TMPro.TMP_Text TabGlyph(Transform parent, string name, Vector2 pivot, TMPro.TextAlignmentOptions alignment)
+    {
+        var go = new GameObject("Tab " + name, typeof(RectTransform));
+        go.transform.SetParent(parent, false);
+        var rect = (RectTransform)go.transform;
+        rect.anchorMin = rect.anchorMax = Vector2.zero;
+        rect.pivot = pivot;
+        rect.sizeDelta = new Vector2(120f, 60f);
+        TMPro.TMP_Text text = go.AddComponent<TMPro.TextMeshProUGUI>();
+        text.alignment = alignment;
+        text.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+        text.raycastTarget = false;
+        go.SetActive(false);
+        return text;
     }
 
     private void OnDisable()
@@ -244,6 +300,8 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         click?.Dispose();
         context?.Dispose();
         scroll?.Dispose();
+        previousTab?.Dispose();
+        nextTab?.Dispose();
         if (sprite != null)
         {
             Destroy(sprite);

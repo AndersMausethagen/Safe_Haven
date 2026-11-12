@@ -260,6 +260,34 @@ public sealed class InputActionsTests : InputTestFixture
     }
 
     [Test]
+    public void Bumpers_TurnTheTabsOfTheWindowInFront()
+    {
+        int under = 0, over = 0;
+        bool overShowing = true;
+        object back = new object(), front = new object();
+        PadTabs.Register(back, () => true, direction => under += direction);
+        PadTabs.Register(front, () => overShowing, direction => over += direction);
+        try
+        {
+            Assert.IsTrue(PadTabs.Step(1));
+            Assert.AreEqual(1, over, "the window opened last turns its tabs");
+            Assert.AreEqual(0, under);
+            overShowing = false;
+            PadTabs.Step(-1);
+            Assert.AreEqual(-1, under, "once it closes, the one under it does");
+            Assert.AreEqual(0, PadTabs.Next(2, 3, 1), "round from the last tab to the first");
+            Assert.AreEqual(2, PadTabs.Next(0, 3, -1), "and back");
+        }
+        finally
+        {
+            PadTabs.Unregister(back);
+            PadTabs.Unregister(front);
+        }
+
+        Assert.IsFalse(PadTabs.Step(1), "with no window up, the bumpers turn nothing");
+    }
+
+    [Test]
     public void TheDeviceInUse_IsTheLastOneThatDidSomething()
     {
         var keyboard = InputSystem.AddDevice<Keyboard>();

@@ -22,6 +22,7 @@ MonoBehaviour:
   parryPulse: {x: 0.25, y: 0.9, z: 0.12}
   bitePulse: {x: 0.55, y: 0.35, z: 0.22}
   wheelDeadZone: 0.45
+  aimDeadZone: 0.3
   buildStartDistance: 5
   buildReach: 14
   buildSpotSpeed: 9

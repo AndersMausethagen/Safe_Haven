@@ -176,9 +176,22 @@ public sealed class PlayerInputHandler : MonoBehaviour
             return;
         }
 
-        // On a controller the mouse lies where it was left; facing it would turn every swing towards that spot. The player
-        // faces where they walk instead (and the enemy fought, with Focus on Enemy).
-        if (InputDevices.UsingGamepad || !CameraPointer.TryGetRay(movementCamera, out Ray ray))
+        // On a controller the mouse lies where it was left; facing it would turn every swing towards that spot. In a fight
+        // or aiming a bow the right stick aims instead, twin-stick style; let go, and the player faces where they walk (and
+        // the enemy fought, with Focus on Enemy).
+        if (InputDevices.UsingGamepad)
+        {
+            if (!TryStickAim(out Vector3 aim))
+            {
+                movement.ClearAimDirection();
+                return;
+            }
+
+            movement.SetAimDirection(aim);
+            return;
+        }
+
+        if (!CameraPointer.TryGetRay(movementCamera, out Ray ray))
         {
             movement.ClearAimDirection();
             return;
@@ -200,6 +213,28 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         movement.SetAimDirection(toCursor);
+    }
+
+    // The right stick's lean, turned into the world the way the camera faces, while it aims (PlayerCameraController.StickAims).
+    private bool TryStickAim(out Vector3 aim)
+    {
+        aim = Vector3.zero;
+        PlayerCameraController view = PlayerCameraController.Current;
+        if (view == null || !view.StickAims || PadCursor.IsActive || BuildPlacer.IsBusy || CommandWheel.IsHeld || GameInput.CameraLookStick == null)
+        {
+            return false;
+        }
+
+        Vector2 stick = GameInput.CameraLookStick.ReadValue<Vector2>();
+        if (stick.magnitude < ControllerSettings.Current.AimDeadZone)
+        {
+            return false;
+        }
+
+        Vector3 forward = Vector3.ProjectOnPlane(movementCamera.transform.forward, Vector3.up).normalized;
+        Vector3 right = Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
+        aim = right * stick.x + forward * stick.y;
+        return aim.sqrMagnitude > 0.0001f;
     }
 
     // The crosshair ray starts behind the player, so the cast begins level with the player to skip the player's own

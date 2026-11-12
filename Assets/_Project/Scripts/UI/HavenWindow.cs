@@ -147,10 +147,25 @@ public sealed class HavenWindow : MonoBehaviour
 
     public void Open() => window.Open();
 
-    private void OnEnable() => Current = this;
+    private void OnEnable()
+    {
+        Current = this;
+        PadTabs.Register(this, () => window != null && window.IsOpen, StepTab, () => tabViews.ConvertAll(view => view.Label.rectTransform));
+    }
+
+    // LB and RB on a controller (PadTabs).
+    private void StepTab(int direction)
+    {
+        int at = tabViews.FindIndex(view => view.Tab == shown);
+        if (tabViews.Count > 0)
+        {
+            Show(tabViews[PadTabs.Next(Mathf.Max(0, at), tabViews.Count, direction)].Tab);
+        }
+    }
 
     private void OnDisable()
     {
+        PadTabs.Unregister(this);
         if (Current == this)
         {
             Current = null;

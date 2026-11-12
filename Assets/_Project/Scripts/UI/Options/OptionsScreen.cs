@@ -73,12 +73,15 @@ public sealed class OptionsScreen : MonoBehaviour
     {
         if (GameInput.Pause != null) GameInput.Pause.performed += OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed += OnBackPressed;
+        PadTabs.Register(this, () => window != null && window.activeSelf, direction => ShowTab(PadTabs.Next(tab, tabs.Count, direction)),
+            () => tabs.ConvertAll(entry => (RectTransform)entry.button.transform));
     }
 
     private void OnDisable()
     {
         if (GameInput.Pause != null) GameInput.Pause.performed -= OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed -= OnBackPressed;
+        PadTabs.Unregister(this);
     }
 
     private void OnDestroy()

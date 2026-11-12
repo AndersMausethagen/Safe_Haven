@@ -2050,7 +2050,12 @@ menu. Tabs: Gameplay, Graphics, Audio, Controls, Accessibility. It only draws se
   emotes, ping, camera style) and windows (character, abilities, skills, journal, map, Haven, build, tutorial). A wheel's
   choice of a polled action goes through `GameInput.Press`/`WasPressed`. `PlayerInputHandler` leaves the pad's gameplay
   buttons alone while `PadCursor` is up or a building is being placed; skills never cast in a conversation.
-  Top-down the player faces where they walk, not the idle cursor.
+  Top-down the player faces where they walk, not the idle cursor; in a fight or aiming a bow the right stick aims instead,
+  twin-stick style (`PlayerCameraController.StickAims`: when that framing doesn't orbit), and turns the view again when exploring.
+- **Tabs on a pad** (`PadTabs`): a window with tabs registers how to step them and where they are; while the pad cursor is up,
+  LB and RB turn the front window's tabs (journal, Haven, build menu, altar, options, the bag's and stations' recipe
+  categories), with the bumpers' glyphs drawn at either end of its tab row. A new tabbed window: `PadTabs.Register` in
+  OnEnable, `Unregister` in OnDisable.
 - **PadCursor** (a game system): in windows, the Escape menu, the map and menu scenes the left stick moves a virtual
   `Mouse` device (A left button, X right, right stick wheel; triggers are the split and discard modifiers), so every
   mouse-made window works unchanged; navigation events are off meanwhile, and it starts on the selected button. Not in a

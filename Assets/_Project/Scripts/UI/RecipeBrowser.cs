@@ -203,6 +203,13 @@ public sealed class RecipeBrowser : MonoBehaviour
         PaintTabs();
     }
 
+    // LB and RB on a controller (PadTabs) turn the categories, in the bag and at a station.
+    private void OnEnable() => PadTabs.Register(this, () => isActiveAndEnabled && tabs.Count > 1,
+        direction => SelectTab(PadTabs.Next(Mathf.Max(0, tabs.FindIndex(tab => tab.Label == activeTab)), tabs.Count, direction)),
+        () => tabButtons.ConvertAll(button => (RectTransform)button.transform));
+
+    private void OnDisable() => PadTabs.Unregister(this);
+
     private void SelectTab(int index)
     {
         if (index >= 0 && index < tabs.Count)
