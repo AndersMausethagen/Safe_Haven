@@ -51,6 +51,8 @@ public sealed class CameraShot
 
     [Tooltip("Seconds of gliding over from the previous shot. 0: a cut. (The first shot glides from the game's camera by the cinematic's own Blend In.)")]
     [Min(0f)] public float blendIn;
+    [Tooltip("Holds its end until the story moves on (a Cinematic Shot node): for lines read at the player's own pace.")]
+    public bool holdUntilCued;
     [Tooltip("Keeps the camera shaking at least this much through the shot (0-1): the ground trembling under a giant.")]
     [Range(0f, 1f)] public float rumble;
 

@@ -15,7 +15,7 @@ public sealed class StoryWaitTests
         nameof(HasHappenedNode), nameof(CheckQuestNode), nameof(RaiseQuestEventNode), nameof(StartQuestNode), nameof(QuestProgressNode),
         nameof(GiveItemsNode), nameof(CountAsDoneNode), "ShakeCameraNode", "FocusCameraNode", "LightningNode", "PlaySoundNode", "MusicNode",
         "DespawnEnemiesNode", "SetActiveNode", "CreatureHuntsNode", "MoveObjectNode", "SetUsableNode", "GlowNode", "WitherGroundNode",
-        "ChangeWeatherNode", "ChangeLookNode", "RevealGroundNode", "InvokeEventNode",
+        "ChangeWeatherNode", "ChangeLookNode", "RevealGroundNode", "InvokeEventNode", "CueCinematicNode", "StopCinematicNode",
     };
 
     [Test]

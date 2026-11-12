@@ -14553,6 +14553,7 @@ MonoBehaviour:
     endFieldOfView: 42
     ease: 2
     blendIn: 0
+    holdUntilCued: 0
     rumble: 0
   - name: The roar
     seconds: 2.8
@@ -14567,6 +14568,7 @@ MonoBehaviour:
     endFieldOfView: 36
     ease: 2
     blendIn: 0
+    holdUntilCued: 0
     rumble: 0
   blendIn: 0.7
   blendOut: 1.1
@@ -100604,6 +100606,7 @@ MonoBehaviour:
     endFieldOfView: 42
     ease: 2
     blendIn: 0
+    holdUntilCued: 0
     rumble: 0
   - name: The roar
     seconds: 3
@@ -100618,6 +100621,7 @@ MonoBehaviour:
     endFieldOfView: 36
     ease: 2
     blendIn: 0
+    holdUntilCued: 0
     rumble: 0
   - name: It goes for the fire
     seconds: 3.2
@@ -100632,6 +100636,7 @@ MonoBehaviour:
     endFieldOfView: 44
     ease: 0
     blendIn: 0
+    holdUntilCued: 0
     rumble: 0
   blendIn: 0.9
   blendOut: 1.4
@@ -118633,6 +118638,7 @@ Transform:
   - {fileID: 1476170800}
   - {fileID: 1861288124}
   - {fileID: 297102727}
+  - {fileID: 2053094682}
   m_Father: {fileID: 1493203355}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2045856191
@@ -120215,6 +120221,119 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2856402992722419505, guid: 4c161aa370b351143b38c52fe75000e4, type: 3}
   m_PrefabInstance: {fileID: 2050305973}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2053094681
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2053094682}
+  - component: {fileID: 2053094683}
+  m_Layer: 0
+  m_Name: Cinematic - The Morning Fire
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2053094682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053094681}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2045702582}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2053094683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2053094681}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d7b27f2a187c5d4c8316e42d6301421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::InGameCinematic
+  shots:
+  - name: Sigrid
+    seconds: 3
+    subject: {fileID: 983162859}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 1.55, z: 0}
+    space: 0
+    startOffset: {x: 0.9, y: 1.8, z: 3.4}
+    endOffset: {x: 0.71999997, y: 1.7, z: 2.8}
+    followSubject: 1
+    startFieldOfView: 34
+    endFieldOfView: 30
+    ease: 2
+    blendIn: 0.9
+    holdUntilCued: 1
+    rumble: 0
+  - name: Eirik
+    seconds: 3
+    subject: {fileID: 810501267}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 1.55, z: 0}
+    space: 0
+    startOffset: {x: -0.9, y: 1.8, z: 3.4}
+    endOffset: {x: -0.71999997, y: 1.7, z: 2.8}
+    followSubject: 1
+    startFieldOfView: 34
+    endFieldOfView: 30
+    ease: 2
+    blendIn: 0.9
+    holdUntilCued: 1
+    rumble: 0
+  - name: Runa
+    seconds: 3
+    subject: {fileID: 334759803}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 1.55, z: 0}
+    space: 0
+    startOffset: {x: 0.9, y: 1.8, z: 3.4}
+    endOffset: {x: 0.71999997, y: 1.7, z: 2.8}
+    followSubject: 1
+    startFieldOfView: 34
+    endFieldOfView: 30
+    ease: 2
+    blendIn: 0.9
+    holdUntilCued: 1
+    rumble: 0
+  - name: Sigrid asks
+    seconds: 3
+    subject: {fileID: 983162859}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 1.55, z: 0}
+    space: 0
+    startOffset: {x: -1.1, y: 1.8, z: 3.4}
+    endOffset: {x: -0.88000005, y: 1.7, z: 2.8}
+    followSubject: 1
+    startFieldOfView: 34
+    endFieldOfView: 30
+    ease: 2
+    blendIn: 0.9
+    holdUntilCued: 1
+    rumble: 0
+  blendIn: 1.2
+  blendOut: 1.4
+  letterbox: 1
+  hideHud: 1
+  holdPlayer: 0
+  skippable: 0
+  revealRadius: 0
+  steadiness: 0.35
 --- !u!1001 &2054447313
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -123842,7 +123961,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2126686157}
   - component: {fileID: 2126686159}
-  - component: {fileID: 2126686158}
+  - component: {fileID: 2126686160}
   m_Layer: 0
   m_Name: Story - The Morning Fire
   m_TagString: Untagged
@@ -123865,256 +123984,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2045702582}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2126686158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2126686156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126046329275049
-  - rid: 2623126046329275050
-  - rid: 2623126046329275051
-  - rid: 2623126046329275052
-  - rid: 2623126046329275053
-  - rid: 2623126046329275054
-  - rid: 2623126046329275055
-  - rid: 2623126046329275056
-  - rid: 2623126046329275057
-  - rid: 2623126046329275058
-  - rid: 2623126046329275059
-  - rid: 2623126046329275060
-  - rid: 2623126046329275061
-  - rid: 2623126046329275062
-  - rid: 2623126046329275063
-  links:
-  - from: 77173c14c76a41aeb12704da0e6353f9
-    output: 0
-    to: 4f6acef40b7247a88f749d605cc17426
-  - from: 4f6acef40b7247a88f749d605cc17426
-    output: 1
-    to: 8fd3271ec23c4253af71fc403e8351ac
-  - from: 8fd3271ec23c4253af71fc403e8351ac
-    output: 0
-    to: 25e58c45bd454259a1cacb2f4ccdaa22
-  - from: 25e58c45bd454259a1cacb2f4ccdaa22
-    output: 0
-    to: 85a9137fca7349b7a6faf73e3ad9f014
-  - from: 85a9137fca7349b7a6faf73e3ad9f014
-    output: 0
-    to: 893a2f985d504b11a1cbbbbde08ade29
-  - from: 893a2f985d504b11a1cbbbbde08ade29
-    output: 0
-    to: 2e62dff070644e7481557320450c5068
-  - from: 2e62dff070644e7481557320450c5068
-    output: 0
-    to: 547bdc3af7db4342b62e717461a8b57f
-  - from: 2e62dff070644e7481557320450c5068
-    output: 1
-    to: 4e3d06b4637544f5b6e6b165aff69ffd
-  - from: 2e62dff070644e7481557320450c5068
-    output: 2
-    to: 86f5caf12e98441eb885c2c6c2b9efb3
-  - from: 547bdc3af7db4342b62e717461a8b57f
-    output: 0
-    to: 70527e11212f49c497d3fd2194c51af7
-  - from: 4e3d06b4637544f5b6e6b165aff69ffd
-    output: 0
-    to: ba66ccd56cce4d7796b149639cdb73b9
-  - from: 86f5caf12e98441eb885c2c6c2b9efb3
-    output: 0
-    to: 9ac664d5e2f34f39aae64a0c2a8b5bd3
-  - from: 70527e11212f49c497d3fd2194c51af7
-    output: 0
-    to: 1dac48c63a194c5aba1163af82300be4
-  - from: ba66ccd56cce4d7796b149639cdb73b9
-    output: 0
-    to: 1dac48c63a194c5aba1163af82300be4
-  - from: 9ac664d5e2f34f39aae64a0c2a8b5bd3
-    output: 0
-    to: 1dac48c63a194c5aba1163af82300be4
-  - from: 1dac48c63a194c5aba1163af82300be4
-    output: 0
-    to: abcb368047a3419bbdbc54e7537de840
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126046329275049
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 77173c14c76a41aeb12704da0e6353f9
-        position: {x: 40, y: 60}
-        once: 0
-        quest: {fileID: 11400000, guid: 3514f440e604ac048bb77179757dee9b, type: 2}
-        when: 0
-        alsoAfterLoading: 1
-    - rid: 2623126046329275050
-      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
-      data:
-        id: 4f6acef40b7247a88f749d605cc17426
-        position: {x: 340, y: 60}
-        questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
-    - rid: 2623126046329275051
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 8fd3271ec23c4253af71fc403e8351ac
-        position: {x: 640, y: 60}
-        seconds: 0.4
-    - rid: 2623126046329275052
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 25e58c45bd454259a1cacb2f4ccdaa22
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: 'For anyone who slept through last night''s talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Bjarne, Tor and Liv ahead to look. They should have been back yesterday.'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275053
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 85a9137fca7349b7a6faf73e3ad9f014
-        position: {x: 1240, y: 60}
-        speaker:
-          player: 0
-          name: Eirik
-          model: {fileID: 810501267}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275054
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 893a2f985d504b11a1cbbbbde08ade29
-        position: {x: 1540, y: 60}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275055
-      type: {class: ChoiceNode, ns: , asm: SafeHaven}
-      data:
-        id: 2e62dff070644e7481557320450c5068
-        position: {x: 1840, y: 60}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?
-        answers:
-        - For the coin.
-        - Someone I know went in there.
-        - To see if the stories are true.
-        mustAnswer: 1
-        afterFightPause: 1
-    - rid: 2623126046329275056
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 547bdc3af7db4342b62e717461a8b57f
-        position: {x: 2140, y: 60}
-        questEvent: {fileID: 11400000, guid: 052e1548b0a161348bb7cf591b4333f7, type: 2}
-    - rid: 2623126046329275057
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 4e3d06b4637544f5b6e6b165aff69ffd
-        position: {x: 2140, y: 230}
-        questEvent: {fileID: 11400000, guid: f1a0301acf429304ba7ad3d189da48bb, type: 2}
-    - rid: 2623126046329275058
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 86f5caf12e98441eb885c2c6c2b9efb3
-        position: {x: 2140, y: 400}
-        questEvent: {fileID: 11400000, guid: 1426971087cd5fb408c55293cb5e4e12, type: 2}
-    - rid: 2623126046329275059
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 70527e11212f49c497d3fd2194c51af7
-        position: {x: 2440, y: 60}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: An honest answer. I like you already.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275060
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: ba66ccd56cce4d7796b149639cdb73b9
-        position: {x: 2440, y: 230}
-        speaker:
-          player: 0
-          name: Eirik
-          model: {fileID: 810501267}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Then we are after the same thing. We will find them.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275061
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 9ac664d5e2f34f39aae64a0c2a8b5bd3
-        position: {x: 2440, y: 400}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Careful. The ones who go looking for the truth of it are the ones who find it.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275062
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 1dac48c63a194c5aba1163af82300be4
-        position: {x: 2740, y: 60}
-        speaker:
-          player: 0
-          name: Sigrid
-          model: {fileID: 983162859}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126046329275063
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: abcb368047a3419bbdbc54e7537de840
-        position: {x: 3040, y: 60}
-        questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
 --- !u!114 &2126686159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124133,6 +124002,343 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &2126686160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2126686156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126075160133740
+  - rid: 2623126075160133741
+  - rid: 2623126075160133742
+  - rid: 2623126075160133743
+  - rid: 2623126075160133744
+  - rid: 2623126075160133745
+  - rid: 2623126075160133746
+  - rid: 2623126075160133747
+  - rid: 2623126075160133748
+  - rid: 2623126075160133749
+  - rid: 2623126075160133750
+  - rid: 2623126075160133751
+  - rid: 2623126075160133752
+  - rid: 2623126075160133753
+  - rid: 2623126075160133754
+  - rid: 2623126075160133755
+  - rid: 2623126075160133756
+  - rid: 2623126075160133757
+  - rid: 2623126075160133758
+  - rid: 2623126075160133759
+  - rid: 2623126075160133760
+  - rid: 2623126075160133761
+  - rid: 2623126075160133762
+  links:
+  - from: 77173c14c76a41aeb12704da0e6353f9
+    output: 0
+    to: a2667ede00cd427497ed219e38507c01
+  - from: a2667ede00cd427497ed219e38507c01
+    output: 1
+    to: f08277381cb441428df5a588dc865536
+  - from: f08277381cb441428df5a588dc865536
+    output: 0
+    to: 310d030448974ff6825a12863147414f
+  - from: 310d030448974ff6825a12863147414f
+    output: 0
+    to: d913a9da91d9445ea7e056bffebb2c22
+  - from: d913a9da91d9445ea7e056bffebb2c22
+    output: 0
+    to: 06ea5094b6f64c448858a07765203e96
+  - from: 06ea5094b6f64c448858a07765203e96
+    output: 0
+    to: 4025d3b64e56493390800ee82df92460
+  - from: 4025d3b64e56493390800ee82df92460
+    output: 0
+    to: dc41b9ee20584a6994ae4a336a3d7088
+  - from: dc41b9ee20584a6994ae4a336a3d7088
+    output: 0
+    to: a099e25fcf0c464cb7c99a686bb74176
+  - from: a099e25fcf0c464cb7c99a686bb74176
+    output: 0
+    to: 4f19259c65694908bcb40a1900e93e01
+  - from: 4f19259c65694908bcb40a1900e93e01
+    output: 0
+    to: 1177c3a5330c42808a263844493131bf
+  - from: 1177c3a5330c42808a263844493131bf
+    output: 0
+    to: 0f7cfa3212144bdb9f4c1492bb941972
+  - from: 1177c3a5330c42808a263844493131bf
+    output: 1
+    to: 484c66b4316f4645817ddaecfd2e3573
+  - from: 1177c3a5330c42808a263844493131bf
+    output: 2
+    to: df466fec83c54f46a7da68abe0601cc5
+  - from: 0f7cfa3212144bdb9f4c1492bb941972
+    output: 0
+    to: 179fcf098add4f1588a2520c5f914f3b
+  - from: 179fcf098add4f1588a2520c5f914f3b
+    output: 0
+    to: b48d5158b8374a86b90ef386be523f99
+  - from: 484c66b4316f4645817ddaecfd2e3573
+    output: 0
+    to: 665a0e002f684b87b1b7c5c0445b6afe
+  - from: 665a0e002f684b87b1b7c5c0445b6afe
+    output: 0
+    to: a6b653672dfe462cabad5db727cfa8b1
+  - from: df466fec83c54f46a7da68abe0601cc5
+    output: 0
+    to: da16e1f81d6b4153b2498ace22e436b0
+  - from: b48d5158b8374a86b90ef386be523f99
+    output: 0
+    to: c32690a4200042e0ba952ca8450511b1
+  - from: a6b653672dfe462cabad5db727cfa8b1
+    output: 0
+    to: c32690a4200042e0ba952ca8450511b1
+  - from: da16e1f81d6b4153b2498ace22e436b0
+    output: 0
+    to: c32690a4200042e0ba952ca8450511b1
+  - from: c32690a4200042e0ba952ca8450511b1
+    output: 0
+    to: 6b3f41d9e757452c85eb8c4aabc3d84c
+  - from: 6b3f41d9e757452c85eb8c4aabc3d84c
+    output: 0
+    to: 699bdba5491c421f8e80f84bfa8b8ec5
+  - from: 6b3f41d9e757452c85eb8c4aabc3d84c
+    output: 0
+    to: b3e175296c1d40859b131873913f32eb
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126075160133740
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 77173c14c76a41aeb12704da0e6353f9
+        position: {x: 40, y: 60}
+        once: 0
+        quest: {fileID: 11400000, guid: 3514f440e604ac048bb77179757dee9b, type: 2}
+        when: 0
+        alsoAfterLoading: 1
+    - rid: 2623126075160133741
+      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
+      data:
+        id: a2667ede00cd427497ed219e38507c01
+        position: {x: 340, y: 60}
+        questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
+    - rid: 2623126075160133742
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: f08277381cb441428df5a588dc865536
+        position: {x: 640, y: 60}
+        seconds: 0.4
+    - rid: 2623126075160133743
+      type: {class: PlayCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 310d030448974ff6825a12863147414f
+        position: {x: 940, y: 60}
+        cinematic: {fileID: 2053094683}
+        waitUntilFinished: 0
+    - rid: 2623126075160133744
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d913a9da91d9445ea7e056bffebb2c22
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: 'For anyone who slept through last night''s talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Bjarne, Tor and Liv ahead to look. They should have been back yesterday.'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133745
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 06ea5094b6f64c448858a07765203e96
+        position: {x: 1540, y: 60}
+        cinematic: {fileID: 2053094683}
+        shot: 2
+    - rid: 2623126075160133746
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 4025d3b64e56493390800ee82df92460
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 810501267}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133747
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: dc41b9ee20584a6994ae4a336a3d7088
+        position: {x: 2140, y: 60}
+        cinematic: {fileID: 2053094683}
+        shot: 3
+    - rid: 2623126075160133748
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a099e25fcf0c464cb7c99a686bb74176
+        position: {x: 2440, y: 60}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133749
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 4f19259c65694908bcb40a1900e93e01
+        position: {x: 2740, y: 60}
+        cinematic: {fileID: 2053094683}
+        shot: 4
+    - rid: 2623126075160133750
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: 1177c3a5330c42808a263844493131bf
+        position: {x: 3040, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?
+        answers:
+        - For the coin.
+        - Someone I know went in there.
+        - To see if the stories are true.
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 2623126075160133751
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 0f7cfa3212144bdb9f4c1492bb941972
+        position: {x: 3340, y: 60}
+        questEvent: {fileID: 11400000, guid: 052e1548b0a161348bb7cf591b4333f7, type: 2}
+    - rid: 2623126075160133752
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 484c66b4316f4645817ddaecfd2e3573
+        position: {x: 3340, y: 230}
+        questEvent: {fileID: 11400000, guid: f1a0301acf429304ba7ad3d189da48bb, type: 2}
+    - rid: 2623126075160133753
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: df466fec83c54f46a7da68abe0601cc5
+        position: {x: 3340, y: 400}
+        questEvent: {fileID: 11400000, guid: 1426971087cd5fb408c55293cb5e4e12, type: 2}
+    - rid: 2623126075160133754
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 179fcf098add4f1588a2520c5f914f3b
+        position: {x: 3640, y: 60}
+        cinematic: {fileID: 2053094683}
+        shot: 3
+    - rid: 2623126075160133755
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: b48d5158b8374a86b90ef386be523f99
+        position: {x: 3940, y: 60}
+        speaker:
+          player: 0
+          name: Runa
+          model: {fileID: 334759803}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: An honest answer. I like you already.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133756
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 665a0e002f684b87b1b7c5c0445b6afe
+        position: {x: 3640, y: 230}
+        cinematic: {fileID: 2053094683}
+        shot: 2
+    - rid: 2623126075160133757
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a6b653672dfe462cabad5db727cfa8b1
+        position: {x: 3940, y: 230}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 810501267}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Then we are after the same thing. We will find them.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133758
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: da16e1f81d6b4153b2498ace22e436b0
+        position: {x: 3640, y: 400}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Careful. The ones who go looking for the truth of it are the ones who find it.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133759
+      type: {class: CueCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: c32690a4200042e0ba952ca8450511b1
+        position: {x: 4240, y: 60}
+        cinematic: {fileID: 2053094683}
+        shot: 1
+    - rid: 2623126075160133760
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 6b3f41d9e757452c85eb8c4aabc3d84c
+        position: {x: 4540, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 983162859}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126075160133761
+      type: {class: StopCinematicNode, ns: , asm: SafeHaven}
+      data:
+        id: 699bdba5491c421f8e80f84bfa8b8ec5
+        position: {x: 4840, y: 60}
+        cinematic: {fileID: 2053094683}
+    - rid: 2623126075160133762
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: b3e175296c1d40859b131873913f32eb
+        position: {x: 4840, y: 230}
+        questEvent: {fileID: 11400000, guid: 367a938ebe0a9f847806fbc01218a5e2, type: 2}
 --- !u!1 &2128139744
 GameObject:
   m_ObjectHideFlags: 0

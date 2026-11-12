@@ -108,6 +108,53 @@ public sealed class PlayCinematicNode : StoryNode, IStoryWait
     }
 }
 
+/// <summary>Moves a playing In-Game Cinematic on: to its next shot, or to a given one. With shots that Hold Until Cued, the
+/// camera follows a conversation line by line (the morning introductions: whoever speaks is framed).</summary>
+[Serializable]
+public sealed class CueCinematicNode : StoryNode
+{
+    public InGameCinematic cinematic;
+    [Tooltip("The shot to go to (1 is the first). 0: the next one.")]
+    [Min(0)] public int shot;
+
+    public override string Title => shot > 0 ? $"Cinematic Shot {shot}" : "Cinematic: Next Shot";
+    public override string Category => "Camera & Sound";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        if (cinematic != null)
+        {
+            cinematic.Cue(shot);
+        }
+
+        yield break;
+    }
+
+    public override string FindProblem() => cinematic == null ? "choose the cinematic" : shot > cinematic.Shots.Count ? $"it has only {cinematic.Shots.Count} shots" : null;
+}
+
+/// <summary>Ends a playing In-Game Cinematic, gliding back to the game's camera.</summary>
+[Serializable]
+public sealed class StopCinematicNode : StoryNode
+{
+    public InGameCinematic cinematic;
+
+    public override string Title => "Stop Cinematic";
+    public override string Category => "Camera & Sound";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        if (cinematic != null)
+        {
+            cinematic.Finish();
+        }
+
+        yield break;
+    }
+
+    public override string FindProblem() => cinematic == null ? "choose the cinematic" : null;
+}
+
 [Serializable]
 public sealed class LightningNode : StoryNode
 {

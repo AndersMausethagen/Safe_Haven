@@ -67,7 +67,9 @@ The morning in the meadow (`Prologue_MistyWoods`, under **Prologue Meadow › Mo
 `AgentScripts/BuildPrologueMeadow.cs`):
 
 - **The Morning Fire:** the player takes the quest from Sigrid, then When Quest Starts (A Morning by the Fire, Also After Loading) › Has It Happened? (Met the Expedition)
-  › No › Wait › Say (Sigrid, Eirik, Runa, Sigrid) › Raise Quest Event (Met the Expedition). Everyone says who they are.
+  › No › Wait › Play Cinematic (The Morning Fire, not waiting) › Say (Sigrid) › Cinematic Shot 2 › Say (Eirik) › Cinematic Shot 3 ›
+  Say (Runa) › Cinematic Shot 4 › Choice (Sigrid) › the reply, framed on whoever gives it › Cinematic Shot 1 › Say (Sigrid) ›
+  Stop Cinematic + Raise Quest Event (Met the Expedition). Everyone says who they are, and is shown saying it.
 - **Talk by the Fire:** When Quest Event (Met the Expedition) › Wait › Say Aside, four times.
 - **The Road East:** When Quest Starts (The Road East, Also After Loading) › side by side: Walk The Party to the handcart; the day
   going by (Wait Until The Walk Reaches › Change Time of Day with Fade Straight There, so shadows don't race over the ground); talk

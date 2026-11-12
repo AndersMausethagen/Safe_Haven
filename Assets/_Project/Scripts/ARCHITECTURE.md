@@ -1890,7 +1890,11 @@ end of the frame a shot starts, after the story's other branches have turned it.
 the story's Waits. Only the camera is the cinematic's: what happens is the story graph's other branches (**Play Cinematic**,
 which plays in a fight too, unlike Focus Camera; **Play Animation** by state name; Move Object's **Follow Ground**; Focus
 Camera's **Even In A Fight** for a glance the player keeps control through). `PrologueDirector.EndSequence` ends any playing
-first (`InGameCinematic.StopAll`).
+first (`InGameCinematic.StopAll`). A shot with **Hold Until Cued** stays on its end until the story moves on (**Cinematic Shot**:
+the next or a given shot; **Stop Cinematic** glides home), so a conversation read at the player's pace can frame whoever
+speaks: the morning introductions (`Cinematic - The Morning Fire`, under Morning Moments; `--entry
+BuildPrologueMeadow.MorningIntroductions`) hold a shot of Sigrid, Eirik and Runa in turn, without holding the player or taking
+the skip key (the conversation does both).
 
 **The old troll** has two: at the night camp (`Cinematic - The Old Troll Comes`, under Intro Moments) it breaks out of the
 trees, roars and goes for the fire; at the stones (`Cinematic - The Old Troll Returns`, Morning Moments) it comes down the low

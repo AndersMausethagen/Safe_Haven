@@ -90,6 +90,30 @@ public sealed class InGameCinematic : MonoBehaviour
         running = StartCoroutine(Run());
     }
 
+    /// <summary>Moves on from the shot playing (or a held one) to the next, or to shot <paramref name="number"/> (1 is the
+    /// first). Past the last shot it ends, gliding back to the game's camera.</summary>
+    public void Cue(int number = 0)
+    {
+        if (running == null)
+        {
+            return;
+        }
+
+        cueTo = number > 0 ? Mathf.Clamp(number - 1, 0, shots.Count) : -1;
+        cued = true;
+    }
+
+    /// <summary>Ends it now, gliding back to the game's camera over Blend Out.</summary>
+    public void Finish()
+    {
+        if (running != null)
+        {
+            StopCoroutine(running);
+            running = null;
+            Release(blendOut);
+        }
+    }
+
     public void Stop()
     {
         if (running != null)
@@ -111,6 +135,8 @@ public sealed class InGameCinematic : MonoBehaviour
     private Transform shotSubject;
     private CameraShot.Anchor shotStand;
     private bool shotStandPending;
+    private bool cued;
+    private int cueTo = -1;
     private CameraShot.Pose? glideFrom;
     private CameraShot.Pose? lastPose;
     // The subject as the camera follows it: eased, its height and turning more than its going.
@@ -130,6 +156,7 @@ public sealed class InGameCinematic : MonoBehaviour
         Reveal();
         lastPose = null;
 
+        cueTo = -1;
         for (int i = 0; i < shots.Count; i++)
         {
             CameraShot shot = shots[i];
@@ -139,6 +166,7 @@ public sealed class InGameCinematic : MonoBehaviour
             }
 
             shotIndex = i;
+            cued = false;
             shotTime = 0f;
             shotSubject = SubjectOf(shot);
             // Read where the subject stands at this frame's end, not now: the story's other branches (a Move Object
@@ -147,15 +175,22 @@ public sealed class InGameCinematic : MonoBehaviour
             steadySet = false;
             glideFrom = i > 0 && shot.blendIn > 0f ? lastPose : null;
             shotCut = lastPose.HasValue && !glideFrom.HasValue;
-            while (shotTime < shot.seconds)
+            // A held shot stays on its end until the story moves on (Cinematic Shot); a cue ends any shot at once.
+            while (!cued && (shotTime < shot.seconds || shot.holdUntilCued))
             {
                 yield return null;
-                shotTime += Time.deltaTime;
+                shotTime = Mathf.Min(shotTime + Time.deltaTime, shot.seconds);
                 if (skippable && view != null && view.ReadSkip(skip, SkipHoldSeconds))
                 {
                     i = shots.Count;
                     break;
                 }
+            }
+
+            if (cueTo >= 0)
+            {
+                i = cueTo - 1;
+                cueTo = -1;
             }
         }
 

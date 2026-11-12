@@ -1902,31 +1902,7 @@ public static class BuildPrologueMeadow
         PlaylistOf(music, playForest, Load<AudioClip>(ForestMusic));
 
         // ----- Everyone says who they are -----
-        var intro = Story(moments, "Story - The Morning Fire");
-        var joined = new WhenQuest { quest = morning, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
-        var told = new HasHappenedNode { questEvent = met };
-        var beat = new WaitNode { seconds = 0.4f };
-        var hello = new SayNode { speaker = S(), line = "For anyone who slept through last night's talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Bjarne, Tor and Liv ahead to look. They should have been back yesterday." };
-        var soldier = new SayNode { speaker = E(), line = "Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad." };
-        var tracker = new SayNode { speaker = R(), line = "Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it." };
-        var why = new ChoiceNode
-        {
-            speaker = S(),
-            line = "And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?",
-            answers = new List<string> { "For the coin.", "Someone I know went in there.", "To see if the stories are true." },
-            mustAnswer = true,
-        };
-        var coin = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForCoin.asset") };
-        var kin = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForKin.asset") };
-        var truth = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForTruth.asset") };
-        var coinReply = new SayNode { speaker = R(), line = "An honest answer. I like you already." };
-        var kinReply = new SayNode { speaker = E(), line = "Then we are after the same thing. We will find them." };
-        var truthReply = new SayNode { speaker = S(), line = "Careful. The ones who go looking for the truth of it are the ones who find it." };
-        var welcome = new SayNode { speaker = S(), line = "We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something." };
-        var heard = new RaiseQuestEventNode { questEvent = met };
-        Link(intro, (joined, 0, told), (told, 1, beat), (beat, 0, hello), (hello, 0, soldier), (soldier, 0, tracker), (tracker, 0, why),
-            (why, 0, coin), (why, 1, kin), (why, 2, truth), (coin, 0, coinReply), (kin, 0, kinReply), (truth, 0, truthReply),
-            (coinReply, 0, welcome), (kinReply, 0, welcome), (truthReply, 0, welcome), (welcome, 0, heard));
+        MorningFire(moments, sigrid, eirik, runa);
 
         // ----- They talk by the fire while the player is free -----
         var chat = Story(moments, "Story - Talk by the Fire");
@@ -2559,6 +2535,86 @@ public static class BuildPrologueMeadow
             .SetValue(cinematic, shots.ToList());
         EditorUtility.SetDirty(cinematic);
         return cinematic;
+    }
+
+    /// <summary>Only the morning introductions and their cinematic (`--entry BuildPrologueMeadow.MorningIntroductions`); Moments makes the same.</summary>
+    public static string MorningIntroductions()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+        PrologueCompanion[] companions = Object.FindObjectsByType<PrologueCompanion>(FindObjectsInactive.Include);
+        Transform Person(string name) => companions.First(c => c.Resident != null && c.Resident.DisplayName == name).transform;
+        Transform moments = GameObject.Find("Prologue Meadow/Morning Moments").transform;
+        StoryScript story = MorningFire(moments, Person("Sigrid"), Person("Eirik"), Person("Runa"));
+        StoryBuilder.Finish();
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        string problems = string.Join("; ", story.FindProblems());
+        return $"introductions rebuilt; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
+    }
+
+    // ----- Everyone says who they are -----
+    private static StoryScript MorningFire(Transform moments, Transform sigrid, Transform eirik, Transform runa)
+    {
+        QuestDefinition morning = Existing("MorningCamp");
+        GameEventDefinition met = Load<GameEventDefinition>(Prologue + "Events/MetTheExpedition.asset");
+        StorySpeaker S() => Speaker(sigrid, "Sigrid");
+        StorySpeaker E() => Speaker(eirik, "Eirik");
+        StorySpeaker R() => Speaker(runa, "Runa");
+        var intro = Story(moments, "Story - The Morning Fire");
+        var joined = new WhenQuest { quest = morning, when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
+        var told = new HasHappenedNode { questEvent = met };
+        var beat = new WaitNode { seconds = 0.4f };
+        var hello = new SayNode { speaker = S(), line = "For anyone who slept through last night's talk, and I know who you are: I am Sigrid, and we walk east today. The villages asked what is wrong in that forest. Two days ago I sent Ingrid, Bjarne, Tor and Liv ahead to look. They should have been back yesterday." };
+        var soldier = new SayNode { speaker = E(), line = "Eirik. Twenty winters in the shield wall at Granheim. I walk in front, I carry the heavy things and I make sure everyone eats. There is porridge. It is bad." };
+        var tracker = new SayNode { speaker = R(), line = "Runa. I find the tracks, and I shoot what makes them. Trolls off their crags, witches on the roads, wolves that don't run from fire. I want to see it for myself before I believe any of it." };
+        var why = new ChoiceNode
+        {
+            speaker = S(),
+            line = "And you. You came to us with a strong back and few questions. Nobody walks towards that forest by accident. Why are you here?",
+            answers = new List<string> { "For the coin.", "Someone I know went in there.", "To see if the stories are true." },
+            mustAnswer = true,
+        };
+        var coin = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForCoin.asset") };
+        var kin = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForKin.asset") };
+        var truth = new RaiseQuestEventNode { questEvent = Load<GameEventDefinition>(Prologue + "Events/CameForTruth.asset") };
+        var coinReply = new SayNode { speaker = R(), line = "An honest answer. I like you already." };
+        var kinReply = new SayNode { speaker = E(), line = "Then we are after the same thing. We will find them." };
+        var truthReply = new SayNode { speaker = S(), line = "Careful. The ones who go looking for the truth of it are the ones who find it." };
+        var welcome = new SayNode { speaker = S(), line = "We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something." };
+        var heard = new RaiseQuestEventNode { questEvent = met };
+        // The user (2026-11-13): show who is talking as they introduce themselves. A held shot for each, moved on line by line.
+        InGameCinematic faces = Introductions(moments, sigrid, eirik, runa);
+        var meet = new PlayCinematicNode { cinematic = faces, waitUntilFinished = false };
+        CueCinematicNode Frame(int shot) => new CueCinematicNode { cinematic = faces, shot = shot };
+        CueCinematicNode toEirik = Frame(2), toRuna = Frame(3), toAsk = Frame(4), toRunaReply = Frame(3), toEirikReply = Frame(2), toSigrid = Frame(1);
+        var done = new StopCinematicNode { cinematic = faces };
+        Link(intro, (joined, 0, told), (told, 1, beat), (beat, 0, meet), (meet, 0, hello), (hello, 0, toEirik), (toEirik, 0, soldier),
+            (soldier, 0, toRuna), (toRuna, 0, tracker), (tracker, 0, toAsk), (toAsk, 0, why),
+            (why, 0, coin), (why, 1, kin), (why, 2, truth), (coin, 0, toRunaReply), (toRunaReply, 0, coinReply), (kin, 0, toEirikReply),
+            (toEirikReply, 0, kinReply), (truth, 0, truthReply),
+            (coinReply, 0, toSigrid), (kinReply, 0, toSigrid), (truthReply, 0, toSigrid), (toSigrid, 0, welcome), (welcome, 0, done), (welcome, 0, heard));
+        return intro;
+    }
+
+    // Each speaker by the fire, from in front, a little to one side, the camera easing in; held until the next line.
+    private static InGameCinematic Introductions(Transform moments, Transform sigrid, Transform eirik, Transform runa)
+    {
+        CameraShot Face(string name, Transform who, float side) => new CameraShot
+        {
+            name = name, seconds = 3f, subject = who, lookOffset = new Vector3(0f, 1.55f, 0f),
+            startOffset = new Vector3(side, 1.8f, 3.4f), endOffset = new Vector3(side * 0.8f, 1.7f, 2.8f),
+            startFieldOfView = 34f, endFieldOfView = 30f, ease = CameraShot.Ease.EaseOut, blendIn = 0.9f, holdUntilCued = true,
+        };
+        InGameCinematic faces = Cinematic(moments, "Cinematic - The Morning Fire", 1.2f, 1.4f,
+            Face("Sigrid", sigrid, 0.9f), Face("Eirik", eirik, -0.9f), Face("Runa", runa, 0.9f), Face("Sigrid asks", sigrid, -1.1f));
+        var data = new SerializedObject(faces);
+        // A conversation already holds the player, and its lines move on with the keys a skip would take.
+        data.FindProperty("holdPlayer").boolValue = false;
+        data.FindProperty("skippable").boolValue = false;
+        data.FindProperty("revealRadius").floatValue = 0f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return faces;
     }
 
     // It breaks out of the trees towards the camera, which stands where it will pass.
