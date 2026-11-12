@@ -336,6 +336,52 @@ public static class WorldBuilder
         return terrainsToBuild.Count;
     }
 
+    /// <summary>
+    /// Takes the scene's terrains as they stand now as built: their heights and every feature on them as recorded, without
+    /// building. For a builder that changes a terrain after its build (BuildPrologueMeadow.Land digs the lake and stitches the
+    /// seam): otherwise the next "heightmap changed" Unity sends as a terrain loads looked like a hand edit, and a stale record
+    /// rebuilt the whole world (2026-11-13, after an Editor restart: 212k scene lines and new terrain data). Returns how many
+    /// records changed.
+    /// </summary>
+    public static int Settle(UnityEngine.SceneManagement.Scene scene)
+    {
+        int changed = 0;
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            var world = terrain != null && terrain.gameObject.scene == scene ? terrain.GetComponent<WorldTerrain>() : null;
+            if (world == null || terrain.terrainData == null)
+            {
+                continue;
+            }
+
+            string heights = HeightsFingerprint(terrain);
+            if (world.BuiltHeights != heights)
+            {
+                world.BuiltHeights = heights;
+                changed++;
+            }
+
+            List<WorldTerrain.Built> built = world.BuiltFeatures;
+            for (int i = 0; i < built.Count; i++)
+            {
+                WorldTerrain.Built entry = built[i];
+                string hash = entry.feature != null ? Hash(entry.feature) : entry.hash;
+                if (entry.hash != hash)
+                {
+                    entry.hash = hash;
+                    built[i] = entry;
+                    changed++;
+                }
+            }
+
+            handEdited.Remove(terrain);
+            EditorUtility.SetDirty(world);
+        }
+
+        handEditedAreas.RemoveAll(edit => edit.scene == scene);
+        return changed;
+    }
+
     /// <summary>A fingerprint of a terrain's heights: the same heights, the same text.</summary>
     public static string HeightsFingerprint(Terrain terrain)
     {
@@ -419,14 +465,28 @@ public static class WorldBuilder
             text.Append(';');
         }
 
-        text.Append(EditorJsonUtility.ToJson(feature.Container)).Append(feature.transform.localToWorldMatrix);
+        text.Append(Rounded(EditorJsonUtility.ToJson(feature.Container))).Append(feature.transform.localToWorldMatrix);
         if (feature is BiomeArea area && area.Biome != null)
         {
-            text.Append(EditorJsonUtility.ToJson(area.Biome)); // editing the preset regrows the areas painted with it
+            text.Append(Rounded(EditorJsonUtility.ToJson(area.Biome))); // editing the preset regrows the areas painted with it
         }
 
         return Hash128.Compute(text.ToString()).ToString();
     }
+
+    private static readonly System.Text.RegularExpressions.Regex Number =
+        new System.Text.RegularExpressions.Regex(@"-?\d+\.\d+(?:[eE][-+]?\d+)?", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    // Every decimal number to three places. The Splines package works out an auto-smooth knot's tangents and rotation again
+    // as a scene loads, and the last digits come out differently from one Editor session to the next (a rotation of
+    // 0.0000474...): written as they were, every feature's fingerprint changed after a restart and the whole world was
+    // rebuilt (2026-11-13: 212k scene lines in the prologue, 23k in the Haven).
+    public static string Rounded(string json) => Number.Replace(json, match =>
+    {
+        double value = double.Parse(match.Value, System.Globalization.CultureInfo.InvariantCulture);
+        double rounded = System.Math.Round(value, 3);
+        return (rounded == 0d ? 0d : rounded).ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+    });
 
     private static readonly Dictionary<System.Type, SerializedObject> Defaults = new Dictionary<System.Type, SerializedObject>();
 

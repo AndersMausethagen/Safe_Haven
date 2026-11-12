@@ -726,6 +726,9 @@ public static class BuildPrologueMeadow
 
         // Displacement.Apply above resets the forest's: back to the Haven's footprints and ground shape (as Footprints does).
         foreach (Terrain terrain in new[] { meadow, forest }) TerrainDisplacementEditor.UseStandardFootprints(terrain);
+        // The lake and the seam changed the heights after the World Builder's build: take them as built, or the next load
+        // rebuilds the whole world over them (2026-11-13).
+        WorldBuilder.Settle(scene);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);

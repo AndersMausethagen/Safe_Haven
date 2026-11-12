@@ -339,4 +339,15 @@ public sealed class WorldBuilderTests
         Assert.IsFalse(WorldBuilder.SharesEdge(forest, new Rect(100f, 100f, 200f, 200f)), "only a corner");
         Assert.IsFalse(WorldBuilder.SharesEdge(forest, new Rect(101f, -100f, 200f, 200f)), "a gap between");
     }
+
+    // The Splines package works auto-smooth knots out again as a scene loads, the last digits differing between Editor
+    // sessions; the fingerprint must not see that, or every restart rebuilds the world (2026-11-13).
+    [Test]
+    public void TheFingerprint_IgnoresTheLastDigits()
+    {
+        Assert.AreEqual(WorldBuilder.Rounded("{'x':0.00004747106140712276,'y':0.9046624302864075}"),
+            WorldBuilder.Rounded("{'x':0.00004751,'y':0.90466251}"));
+        Assert.AreEqual("{'x':0,'y':-1.18,'z':12}", WorldBuilder.Rounded("{'x':-0.0000001,'y':-1.1804713010787964,'z':12.0}"));
+        Assert.AreNotEqual(WorldBuilder.Rounded("{'x':1.25}"), WorldBuilder.Rounded("{'x':1.35}"), "a real move still counts");
+    }
 }
