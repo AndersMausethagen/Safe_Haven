@@ -112,6 +112,7 @@ public sealed class HorseMotion : MonoBehaviour
     // A kick on command from the saddle: when its forelegs land.
     private float kickLands = -1f;
     private LineRenderer lead;
+    private bool puppet;
     private float nextLure;
     private float nextHand;
     private static readonly Collider[] trampled = new Collider[16];
@@ -129,6 +130,8 @@ public sealed class HorseMotion : MonoBehaviour
     public Animator Animator => animator;
     /// <summary>Raised with what it did and which one (a fidget's or a flinch's number), for its rider.</summary>
     public event Action<HorseAct, int> Acted;
+    /// <summary>Co-op: drawn for a friend's game that runs it (<see cref="SetPuppet"/>).</summary>
+    public bool IsPuppet => puppet;
 
     private void Awake()
     {
@@ -386,6 +389,63 @@ public sealed class HorseMotion : MonoBehaviour
         Neigh();
     }
 
+    /// <summary>
+    /// Co-op (Horse.SetPuppet): drawn for the friend's game that runs it: no thinking and no agent here, it is put where that
+    /// game has it and its Animator is mirrored (CoopHorses); only its hoofbeats are its own, by how fast it is put along.
+    /// Run here again, it grazes where it stands.
+    /// </summary>
+    public void SetPuppet(bool on)
+    {
+        puppet = on;
+        lastPlace = transform.position;
+        if (on)
+        {
+            if (agent.enabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+            }
+
+            agent.enabled = false;
+            galloping = false;
+            jumping = false;
+            swimming = false;
+            kickLands = -1f;
+            strikeAt = null;
+            lure = null;
+            if (lead != null)
+            {
+                lead.enabled = false;
+            }
+
+            if (mode != Idle.Dead)
+            {
+                mode = Idle.Graze;
+            }
+
+            return;
+        }
+
+        if (mode == Idle.Dead)
+        {
+            return;
+        }
+
+        agent.enabled = true;
+        if (agent.isOnNavMesh)
+        {
+            agent.Warp(transform.position);
+        }
+
+        agent.updateRotation = true;
+        if (animator != null)
+        {
+            animator.speed = 1f;
+        }
+
+        home = transform.position;
+        Graze();
+    }
+
     /// <summary>A rider on its back: from now on it goes where <see cref="Ride"/> says.</summary>
     public void BeginRidden()
     {
@@ -448,6 +508,19 @@ public sealed class HorseMotion : MonoBehaviour
     {
         if (mode == Idle.Dead)
         {
+            return;
+        }
+
+        if (puppet)
+        {
+            // Put along by a friend's game: its gait and hoofbeats from how fast.
+            Vector3 at = transform.position;
+            Vector3 step = at - lastPlace;
+            step.y = 0f;
+            lastPlace = at;
+            Velocity = Vector3.Lerp(Velocity, step / Mathf.Max(Time.deltaTime, 0.0001f), 0.25f);
+            Gait = GaitFor(Velocity.magnitude, gaitSpeeds);
+            Sound(Velocity.magnitude);
             return;
         }
 

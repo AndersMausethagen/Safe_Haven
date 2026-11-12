@@ -63,6 +63,13 @@ public sealed class SaveableEntity : MonoBehaviour
     /// <summary>True once it is gone for good (died, picked up, taken down), even before Unity has removed it.</summary>
     public bool IsGone => destroyed;
 
+    /// <summary>
+    /// Co-op: kept in step by a part of its own (a horse: CoopHorses, by whoever has it in hand), so HavenSync shares only
+    /// that it was made, switched on or off, or is gone; never where it is or what its components hold, which the part sends
+    /// live and which a copy lagging behind would otherwise send back.
+    /// </summary>
+    public bool SyncedElsewhere { get; set; }
+
     /// <summary>Raised when play creates a saveable object (a building placed, an item dropped), not when a load recreates one.</summary>
     public static event Action<SaveableEntity> Created;
 
@@ -279,6 +286,11 @@ public sealed class SaveableEntity : MonoBehaviour
         unchecked
         {
             int mark = destroyed ? 7 : gameObject.activeSelf ? 1 : 2;
+            if (SyncedElsewhere)
+            {
+                return mark;
+            }
+
             if ((saveTransform && withMovement) || spawned)
             {
                 // Things that walk by themselves (a wolf about the Haven) walk in each game too: only where they roam to counts.
@@ -346,6 +358,16 @@ public sealed class SaveableEntity : MonoBehaviour
             destroyed = true;
             gameObject.SetActive(false);
             Destroy(gameObject);
+            return;
+        }
+
+        if (SyncedElsewhere)
+        {
+            if (saveActiveState && gameObject.activeSelf != incoming.Active)
+            {
+                gameObject.SetActive(incoming.Active);
+            }
+
             return;
         }
 

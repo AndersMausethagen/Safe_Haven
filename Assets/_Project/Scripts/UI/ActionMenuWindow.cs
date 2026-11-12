@@ -87,6 +87,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
     public bool IsOpen => window != null && window.IsOpen;
 
+    /// <summary>True while it is open on what stands at <paramref name="near"/> (a horse's menu: CoopHorses).</summary>
+    public bool IsOpenAt(Transform near) => IsOpen && near != null && anchor == near;
+
     private void Awake()
     {
         Current = this;

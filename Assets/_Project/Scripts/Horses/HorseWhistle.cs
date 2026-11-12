@@ -58,7 +58,9 @@ public sealed class HorseWhistle : MonoBehaviour
         float comingDistance = float.MaxValue;
         foreach (Horse horse in Horse.All)
         {
-            if (horse == null || !horse.IsTamed || !horse.IsAlive || horse.IsStabled || horse.Rider != null)
+            // Only the player's own come to their whistle; one a friend has in hand stays with them.
+            if (horse == null || !horse.IsTamed || !horse.IsAlive || horse.IsStabled || horse.Rider != null || !horse.IsMine
+                || CoopHorses.HeldByFriend(horse) != null)
             {
                 continue;
             }
@@ -77,7 +79,7 @@ public sealed class HorseWhistle : MonoBehaviour
             }
         }
 
-        if (coming != null && coming.Motion.Come(from))
+        if (coming != null && CoopHorses.TakeInHand(coming) && coming.Motion.Come(from))
         {
             GameMessages.Post($"{coming.HorseName} lifts its head and comes.", MessageKind.Info);
             return coming;

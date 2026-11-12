@@ -130,8 +130,8 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
 
         foreach (Horse horse in Horse.All)
         {
-            if (horse != null && horse.IsAlive && horse.IsTamed && !horse.IsStabled && horse.Rider == null
-                && (horse.transform.position - transform.position).sqrMagnitude < LeadReach * LeadReach)
+            if (horse != null && horse.IsAlive && horse.IsTamed && !horse.IsStabled && horse.Rider == null && horse.IsMine
+                && CoopHorses.HeldByFriend(horse) == null && (horse.transform.position - transform.position).sqrMagnitude < LeadReach * LeadReach)
             {
                 Horse chosen = horse;
                 page.Add(new MenuAction($"Stable {horse.HorseName}", HasRoom ? "Into a free stall" : "Every stall is taken", !visiting && HasRoom,

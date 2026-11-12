@@ -179,6 +179,13 @@ public sealed class PlayerRiding : MonoBehaviour
             return false;
         }
 
+        string holder = CoopHorses.HeldByFriend(horse);
+        if (holder != null)
+        {
+            why = $"{holder} has {horse.HorseName} in hand.";
+            return false;
+        }
+
         Vector3 to = transform.position - horse.transform.position;
         to.y = 0f;
         if (to.magnitude > HorseSettings.Current.MountReach)
@@ -207,7 +214,7 @@ public sealed class PlayerRiding : MonoBehaviour
             return;
         }
 
-        if (horse == null || !horse.IsAlive || horse.Rider != null)
+        if (horse == null || !horse.IsAlive || horse.Rider != null || !CoopHorses.TakeInHand(horse))
         {
             return;
         }

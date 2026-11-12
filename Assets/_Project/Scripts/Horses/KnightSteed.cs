@@ -28,6 +28,8 @@ public sealed class KnightSteed : MonoBehaviour
     private Damageable health;
     private float lastYaw;
     private float turnRate;
+    private Vector3 lastPlace;
+    private float measured;
     private float nextHoof;
 
     private void Awake()
@@ -35,6 +37,7 @@ public sealed class KnightSteed : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         health = GetComponent<Damageable>();
         lastYaw = transform.eulerAngles.y;
+        lastPlace = transform.position;
     }
 
     private void OnEnable()
@@ -62,7 +65,14 @@ public sealed class KnightSteed : MonoBehaviour
             return;
         }
 
-        float speed = agent != null && agent.enabled ? agent.velocity.magnitude : 0f;
+        // By how fast it really goes: a knight in a friend's game is a puppet with no agent driving it (CoopCreatures).
+        Vector3 place = transform.position;
+        Vector3 step = place - lastPlace;
+        step.y = 0f;
+        lastPlace = place;
+        float went = Time.deltaTime > 0f && step.sqrMagnitude < 25f ? step.magnitude / Time.deltaTime : measured;
+        measured = Mathf.Lerp(measured, went, 1f - Mathf.Exp(-10f * Time.deltaTime));
+        float speed = agent != null && agent.enabled && agent.updatePosition ? Mathf.Max(agent.velocity.magnitude, measured) : measured;
         int gait = HorseMotion.GaitFor(speed, gaitSpeeds);
         float yaw = transform.eulerAngles.y;
         float rate = Time.deltaTime > 0f ? Mathf.DeltaAngle(lastYaw, yaw) / Time.deltaTime : 0f;

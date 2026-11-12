@@ -581,6 +581,13 @@ Every horse rolls its own **health, stamina, gallop speed and carry weight** (an
 - **The undead knights** (Fire, Ice, Toxic): the pack's knight on an undead horse, a rare elite of the raids from tier 2: a slash from the saddle and a charge, blows of its element, weak to its opposite; it drops a barding now and then.
 - **Polish.** Hoofbeats by the ground (earth, stone, wood, water), the rider's hands on the reins and feet in the stirrups, the camera drawn back at a gallop, and a horse panel with its live picture, numbers, traits and gear.
 
+**Horses together (co-op, November 12, 2026).** Friends see the same horses doing the same things: the host's grazing herd, a wild horse fighting a friend's rope (the rope too), a friend in the saddle at a gallop.
+- **Whose a horse is.** Every tamed horse has an owner: whoever tamed it, or whose stable bore it. Its owner names it, saddles and bards it, uses its bags, stables it, puts it to work, hitches it and sells it; its bond is with its owner alone.
+- **Borrowing.** A friend may ride any horse nobody else has in hand, feed it, groom it and have it follow or stay. The host's horses' bags open to a visitor with the host's yes to the stores, as the stash does. Stabling and jobs stay the Haven owner's decisions.
+- **One hand at a time.** Riding a horse, roping it, opening its menu or whistling it takes it in hand: nobody else can mount, rope or order it until it is let go ("Ingrid has Sleet in hand.").
+- **Taming as a visitor.** The host's Haven has its wild horses for everyone; a visitor who tames one owns it, and it goes home with them when they leave (it is in their own Haven's save from their first save after taming it), grazing near their portal.
+- **Raids.** The host's horse comes along as before and friends on the run see it and may ride it; a visitor's horse (or one they borrow) stays in the host's Haven.
+
 ## 11. Survival, cooking, drinking, and farming
 
 ### 11.1 Design purpose

@@ -19,7 +19,8 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
 3. ~~Every key named in journals, tutorials, dialogue and messages comes from the action it names (rebinding changes the text).~~
    (done 2026-11-12: `{key:Action}` tokens, ARCHITECTURE "Keys in text are named by their action"; 42 data texts and the code's
    prompts converted; voice lines keep their recordings.)
-4. Horses in co-op: taming, owning and riding synchronised.
+4. ~~Horses in co-op: taming, owning and riding synchronised.~~ (done 2026-11-12: `CoopHorses`, GDD §10.9 "Horses together",
+   ARCHITECTURE "Horses together". Checked in one Editor with a second NetworkManager, not between two machines.)
 5. Research ways to make new systems work in co-op by default, without per-system networking.
 6. The Haven: more varied (a small stream, a fishing pond, more height), and building allowed over the whole Haven region.
 7. The prologue map remade with the Haven's tricks: readable, more height, rivers and waterfalls, where the story happens.

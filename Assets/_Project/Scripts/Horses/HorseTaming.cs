@@ -580,6 +580,8 @@ public sealed class HorseTaming : MonoBehaviour
         Horse tamed = copy.GetComponent<Horse>();
         tamed.BecomeTamed(wild.Stats, wild.Health.HealthFraction);
         tamed.Stamina = wild.Stamina;
+        // In co-op the wild horse's copies go from friends' games, and the tamed one is in this player's hand.
+        CoopHorses.Replaced(wild, tamed);
         if (rider != null)
         {
             rider.SwapTo(tamed);

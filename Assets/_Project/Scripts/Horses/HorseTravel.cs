@@ -108,6 +108,13 @@ public sealed class HorseTravel : MonoBehaviour
     /// <summary>Setting out: the horse goes through with the player, and leaves the Haven meanwhile.</summary>
     public static void LeaveForRaid(GameObject player)
     {
+        // A visitor's horse (or the host's they borrowed) stays in the host's Haven: off it before the portal.
+        if (HavenVisit.IsVisiting && player != null && player.TryGetComponent(out PlayerRiding visitor) && visitor.Riding != null)
+        {
+            visitor.Dismount(thrown: true);
+            return;
+        }
+
         Horse horse = Coming(player);
         if (horse == null || !horse.TryGetComponent(out SaveableEntity entity) || string.IsNullOrEmpty(entity.PrefabId))
         {

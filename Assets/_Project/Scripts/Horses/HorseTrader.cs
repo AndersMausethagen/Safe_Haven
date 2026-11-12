@@ -38,8 +38,8 @@ public static class HorseTrader
         string coin = trade.Coin.DisplayName;
         foreach (Horse horse in Horse.All)
         {
-            if (horse == null || !horse.IsAlive || !horse.IsTamed || horse.Rider != null || horse.IsStabled
-                || (horse.transform.position - post.position).sqrMagnitude > Reach * Reach)
+            if (horse == null || !horse.IsAlive || !horse.IsTamed || horse.Rider != null || horse.IsStabled || !horse.IsMine
+                || CoopHorses.HeldByFriend(horse) != null || (horse.transform.position - post.position).sqrMagnitude > Reach * Reach)
             {
                 continue;
             }

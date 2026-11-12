@@ -19,12 +19,6 @@ public static class HorseLasso
             return false;
         }
 
-        if (HavenVisit.IsVisiting)
-        {
-            GameMessages.Post("The horses here are your friend's to catch.", MessageKind.Warning);
-            return false;
-        }
-
         Horse best = null;
         float bestScore = float.MaxValue;
         bool anyNear = false;
@@ -64,6 +58,12 @@ public static class HorseLasso
         if (best.Motion.IsFleeing)
         {
             GameMessages.Post("It is running. Wait for it to settle, and come at it quietly.", MessageKind.Warning);
+            return false;
+        }
+
+        // In co-op the roped horse is run by this game from now on (CoopHorses), unless a friend has it already.
+        if (!CoopHorses.TakeInHand(best))
+        {
             return false;
         }
 

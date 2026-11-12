@@ -15,6 +15,12 @@ using UnityEngine.AI;
 /// Movement and the Animator are HorseMotion's, the lasso struggle and the breaking ride HorseTaming's, the rider's side
 /// PlayerRiding's, the stable's keeping and breeding HorseStable's. Interacting with a tamed horse opens its menu.
 /// </para>
+/// <para>
+/// A tamed horse has an owner (whoever tamed it, or whose stable bore it): theirs to name, saddle, stable and put to work;
+/// a friend may borrow it to ride, feed and lead. In co-op one game runs each horse (CoopHorses: the host's, or the player
+/// who has it in hand) and the others draw it as a puppet (<see cref="IsPuppet"/>): no thinking, no hurt, put where the
+/// runner's game has it.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Damageable), typeof(Combatant))]
@@ -45,6 +51,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     [SerializeField] private Transform body;
 
     private static readonly List<Horse> all = new List<Horse>();
+    // What keeps a puppet unhurt here (the stable keeps its own hold).
+    private static readonly object PuppetHold = new object();
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
     private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
     private float roughMetres;
@@ -59,6 +67,9 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     private ItemDefinition armour;
     private string horseName = "";
     private bool restored;
+    private string ownerId = "";
+    private string ownerName = "";
+    private bool arriving;
     private Vector3 bodyScale = Vector3.one;
     private float lastFed = -999f;
 
@@ -72,7 +83,27 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public Mode State { get; private set; } = Mode.Wild;
     public bool IsTamed => State == Mode.Tamed;
     public bool IsWild => State == Mode.Wild;
-    public string HorseName => !string.IsNullOrWhiteSpace(horseName) ? horseName : IsTamed ? "Your horse" : definition != null ? definition.DisplayName : "Horse";
+    public string HorseName => !string.IsNullOrWhiteSpace(horseName) ? horseName
+        : IsTamed ? (IsMine ? "Your horse" : $"{(string.IsNullOrWhiteSpace(ownerName) ? "A friend" : ownerName)}'s horse")
+        : definition != null ? definition.DisplayName : "Horse";
+
+    /// <summary>Who it belongs to: the journey that tamed it or bred it (GameSession.Playtest's id), and their name. Empty for
+    /// horses from before owners: the Haven's own.</summary>
+    public string OwnerId => ownerId;
+    public string OwnerName => ownerName;
+
+    /// <summary>
+    /// True when it is this player's: theirs by its owner, or, with none, a horse of the Haven they are in when it is their
+    /// own (not a friend's they are visiting). Its owner names it, saddles it, stables it and puts it to work; a friend
+    /// borrows it.
+    /// </summary>
+    public bool IsMine => string.IsNullOrEmpty(ownerId) ? !HavenVisit.IsVisiting : ownerId == GameSession.Playtest.Id;
+
+    /// <summary>Co-op: drawn here for a friend's game that runs it (CoopHorses): it neither thinks nor is hurt here.</summary>
+    public bool IsPuppet { get; private set; }
+
+    /// <summary>Co-op: how friends' games name it in their messages (CoopHorses); 0 until it is shared.</summary>
+    public uint CoopKey { get; set; }
     public bool HasName => !string.IsNullOrWhiteSpace(horseName);
     public float Stamina { get; set; }
     /// <summary>Its stamina with what its bond adds.</summary>
@@ -138,6 +169,12 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         interactable = GetComponent<Interactable>();
         Motion = GetComponent<HorseMotion>();
         Taming = GetComponent<HorseTaming>();
+        // Where it is and what it holds go to friends live, from whichever game runs it (CoopHorses), not through HavenSync.
+        if (TryGetComponent(out SaveableEntity entity))
+        {
+            entity.SyncedElsewhere = true;
+        }
+
         if (body != null)
         {
             bodyScale = body.localScale;
@@ -174,6 +211,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
 
     private void Update()
     {
+        if (arriving && restored)
+        {
+            ArriveHome();
+        }
+
         // A foal grows over its first days.
         if (BornOn < 0f || Stats.IsGrown)
         {
@@ -218,6 +260,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public void BecomeTamed(HorseStats stats, float healthFraction)
     {
         State = Mode.Tamed;
+        BelongTo(GameSession.Playtest.Id, GameSession.Appearance != null ? GameSession.Appearance.DisplayName : "");
         Bond = Mathf.Max(Bond, HorseSettings.Current.BondWhenTamed);
         LastCared = PlantedTrees.Today;
         Give(stats);
@@ -229,6 +272,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public void BeBorn(HorseStats stats, string stable)
     {
         State = Mode.Tamed;
+        BelongTo(GameSession.Playtest.Id, GameSession.Appearance != null ? GameSession.Appearance.DisplayName : "");
         BornOn = PlantedTrees.Today;
         Bond = 30f;
         LastCared = BornOn;
@@ -249,6 +293,183 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         {
             State = mode;
         }
+    }
+
+    private void BelongTo(string id, string name)
+    {
+        ownerId = id ?? "";
+        ownerName = name ?? "";
+    }
+
+    /// <summary>
+    /// Co-op: drawn for a friend's game that runs it (on), or run here again (off). A puppet doesn't think, move by itself,
+    /// fight the rope or take hurt; CoopHorses puts it where the runner's game has it and mirrors its animation.
+    /// </summary>
+    public void SetPuppet(bool puppet)
+    {
+        if (IsPuppet == puppet)
+        {
+            return;
+        }
+
+        IsPuppet = puppet;
+        if (puppet)
+        {
+            if (Taming != null)
+            {
+                Taming.Abandon();
+            }
+
+            health.AddInvulnerability(PuppetHold);
+        }
+        else
+        {
+            health.RemoveInvulnerability(PuppetHold);
+        }
+
+        Motion.SetPuppet(puppet);
+    }
+
+    /// <summary>Co-op: it died in the game that runs it. Here it only falls (its gear dropped there).</summary>
+    public void DieAsPuppet()
+    {
+        if (IsPuppet && health.IsAlive)
+        {
+            health.Finish(null);
+        }
+    }
+
+    /// <summary>
+    /// Co-op: the game that keeps it lets go of an order that was about them (follow me): it grazes where it is, quietly.
+    /// </summary>
+    public void ForgetFollowing()
+    {
+        if (Order == Orders.Follow)
+        {
+            Order = Orders.Graze;
+        }
+    }
+
+    // Brought home from a friend's Haven (HavenVisit): it comes to graze near the portal, wherever the save had it.
+    private void ArriveHome()
+    {
+        arriving = false;
+        Vector3 centre = HomePortal.Current != null ? HomePortal.Current.transform.position : transform.position;
+        for (int attempt = 0; attempt < 12; attempt++)
+        {
+            Vector2 step = UnityEngine.Random.insideUnitCircle.normalized * UnityEngine.Random.Range(9f, 16f);
+            if (NavMesh.SamplePosition(centre + new Vector3(step.x, 0f, step.y), out NavMeshHit hit, 4f, NavMesh.AllAreas))
+            {
+                if (TryGetComponent(out NavMeshAgent agent) && agent.enabled)
+                {
+                    agent.Warp(hit.position);
+                }
+                else
+                {
+                    transform.position = hit.position;
+                }
+
+                break;
+            }
+        }
+
+        Order = Orders.Graze;
+        GameMessages.Post($"{HorseName} came home with you from your friend's Haven.", MessageKind.Gain);
+    }
+
+    // ----- Co-op: what friends' games need of it -----
+
+    [Serializable]
+    private sealed class Shared
+    {
+        public int mode;
+        public int trust;
+        public int wariness;
+        public HorseStats stats;
+        public string saved;
+    }
+
+    /// <summary>Co-op: everything a friend's copy needs to be this horse (wild or tamed), as text.</summary>
+    public string CaptureShared() => JsonUtility.ToJson(new Shared
+    {
+        mode = (int)State, trust = Trust, wariness = Wariness, stats = Stats, saved = IsTamed ? CaptureState() : null,
+    });
+
+    /// <summary>Co-op: becomes the horse a friend's game described (<see cref="CaptureShared"/>).</summary>
+    public void RestoreShared(string text)
+    {
+        Shared shared = string.IsNullOrEmpty(text) ? null : JsonUtility.FromJson<Shared>(text);
+        if (shared == null)
+        {
+            return;
+        }
+
+        if (shared.mode == (int)Mode.Tamed && !string.IsNullOrEmpty(shared.saved))
+        {
+            RestoreState(shared.saved);
+            return;
+        }
+
+        if (shared.stats.IsRolled && !shared.stats.Equals(Stats))
+        {
+            Give(shared.stats);
+        }
+
+        State = (Mode)Mathf.Clamp(shared.mode, 0, 2);
+        Trust = Mathf.Clamp(shared.trust, 0, MostTrust);
+        Wariness = Mathf.Max(0, shared.wariness);
+    }
+
+    /// <summary>
+    /// Co-op: a number that changes whenever a friend would see it differently: its state, name, owner, coat and size, gear
+    /// and load, orders, stable, and bond and trust in whole steps. Stamina, health and the metres it has gone are left out
+    /// (they change all the time, and travel with its every pose).
+    /// </summary>
+    public int ShareMark()
+    {
+        unchecked
+        {
+            int mark = (int)State * 31 + Trust * 7 + Wariness;
+            mark = mark * 31 + (horseName ?? "").GetHashCode();
+            mark = mark * 31 + ownerId.GetHashCode();
+            mark = mark * 31 + Stats.coat * 97 + Stats.mane * 13 + Stats.rareCoat * 7 + (int)Stats.traits + (int)Stats.temperament * 3;
+            mark = mark * 31 + Mathf.RoundToInt(Stats.growth * 50f);
+            mark = mark * 31 + (saddle != null ? saddle.Id.GetHashCode() : 0);
+            mark = mark * 31 + (armour != null ? armour.Id.GetHashCode() : 0);
+            mark = mark * 31 + Mathf.FloorToInt(Bond);
+            mark = mark * 31 + (StabledIn ?? "").GetHashCode();
+            mark = mark * 31 + (int)Order * 5 + Job;
+            for (int i = 0; Cargo != null && i < Cargo.SlotCount; i++)
+            {
+                ItemStack stack = Cargo.GetSlot(i);
+                mark = mark * 31 + (stack.IsEmpty ? 0 : stack.Item.Id.GetHashCode() + stack.Count * 7919);
+            }
+
+            return mark;
+        }
+    }
+
+    /// <summary>Co-op, pure: whose a saved horse's state (its "horse" component) says it is. Empty for none.</summary>
+    public static string OwnerIn(string state)
+    {
+        Saved saved = string.IsNullOrEmpty(state) ? null : JsonUtility.FromJson<Saved>(state);
+        return saved != null ? saved.owner ?? "" : "";
+    }
+
+    /// <summary>Co-op, pure: the same saved state, marked to come home (it grazes near the portal when next loaded).</summary>
+    public static string ComingHome(string state)
+    {
+        Saved saved = string.IsNullOrEmpty(state) ? null : JsonUtility.FromJson<Saved>(state);
+        if (saved == null)
+        {
+            return state;
+        }
+
+        saved.arriving = true;
+        saved.stabledIn = "";
+        saved.order = (int)Orders.Graze;
+        saved.job = -1;
+        return JsonUtility.ToJson(saved);
     }
 
     public void Rename(string name)
@@ -429,6 +650,12 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     /// <summary>The bond grows (feeding, grooming, riding), and it counts as cared for today.</summary>
     public void Befriend(float amount)
     {
+        // Its bond is with its owner: a friend who borrows it feeds and rides it, but it isn't theirs to win.
+        if (IsTamed && !IsMine && amount > 0f)
+        {
+            return;
+        }
+
         if (!IsTamed)
         {
             return;
@@ -738,7 +965,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             return;
         }
 
-        if (ActionMenuWindow.Current != null)
+        // In co-op, whoever has it in hand runs it: asking for its menu takes it in hand (or says who has it).
+        if (ActionMenuWindow.Current != null && CoopHorses.TakeInHand(this))
         {
             ActionMenuWindow.Current.Open(() => Page(user), user, transform, MenuRange);
         }
@@ -749,33 +977,45 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         var page = new MenuPage { Title = HorseName, Body = StatsText() };
         var riding = PlayerRiding.For(user);
         ItemInventory items = user.GetComponent<ItemInventory>();
+        // A visitor rides, feeds, grooms and leads a friend's horse; its owner names, saddles, stables and puts it to work, and
+        // stabling and jobs are the Haven's (the host's) to decide.
         bool visiting = HavenVisit.IsVisiting;
+        bool mine = IsMine;
+        bool ownersOnly = !visiting && mine;
+        string theirs = $"{(string.IsNullOrWhiteSpace(ownerName) ? "Its owner" : ownerName)}'s to decide";
+        if (!mine)
+        {
+            page.Title = $"{HorseName} <size=70%>({(string.IsNullOrWhiteSpace(ownerName) ? "a friend" : ownerName)}'s)</size>";
+        }
+
         page.Add(new MenuAction($"About {HorseName}", "Its picture, its numbers, what it has learned", true, () => HorsePanelWindow.Show(this), closesMenu: true));
         page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
-            riding != null && Rider == null && !visiting && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
-        page.Add(new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null && !visiting, () => Feed(items)));
-        page.Add(new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", !visiting, Groom));
-        page.Add(new MenuAction("Saddle bags", saddle != null ? $"{Weight:0} / {Capacity:0} weight" : "It needs a saddle", saddle != null && !visiting,
-            () => CargoWindow.Create().Open(this, user), closesMenu: true));
+            riding != null && Rider == null && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
+        page.Add(new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null, () => Feed(items)));
+        page.Add(new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", true, Groom));
+        // A friend's bags are theirs; a visitor uses the host's horses' bags as they would the stash, with the host's yes.
+        bool bags = mine || (visiting && HavenVisit.StashAllowed);
+        page.Add(new MenuAction("Saddle bags", saddle == null ? "It needs a saddle" : bags ? $"{Weight:0} / {Capacity:0} weight" : visiting ? "Ask to use the stores first" : theirs,
+            saddle != null && (bags || visiting), () => { if (bags || !HavenVisit.StoresNeedAsking()) CargoWindow.Create().Open(this, user); }, closesMenu: true));
         if (items != null)
         {
             foreach (ItemDefinition carried in GearIn(items))
             {
                 ItemDefinition chosen = carried;
                 string detail = chosen.IsSaddle ? $"{chosen.SaddleSlots} places" : $"Keeps {chosen.HorseArmour * 100f:0}% of a blow off";
-                page.Add(new MenuAction($"Put on the {chosen.DisplayName.ToLowerInvariant()}", IsGrown ? detail : "Too young for it", !visiting && IsGrown,
+                page.Add(new MenuAction($"Put on the {chosen.DisplayName.ToLowerInvariant()}", !mine ? theirs : IsGrown ? detail : "Too young for it", mine && IsGrown,
                     () => { if (chosen.IsSaddle) PutOnSaddle(chosen, items); else PutOnArmour(chosen, items); }));
             }
 
             if (saddle != null)
             {
-                page.Add(new MenuAction("Take off the saddle", Cargo != null && Cargo.CountItems() > 0 ? "Empty its bags first" : "Into your bag",
-                    !visiting && (Cargo == null || Cargo.CountItems() == 0), () => TakeOffSaddle(items)));
+                page.Add(new MenuAction("Take off the saddle", !mine ? theirs : Cargo != null && Cargo.CountItems() > 0 ? "Empty its bags first" : "Into your bag",
+                    mine && (Cargo == null || Cargo.CountItems() == 0), () => TakeOffSaddle(items)));
             }
 
             if (armour != null)
             {
-                page.Add(new MenuAction("Take off the barding", "Into your bag", !visiting, () => TakeOffArmour(items)));
+                page.Add(new MenuAction("Take off the barding", mine ? "Into your bag" : theirs, mine, () => TakeOffArmour(items)));
             }
         }
 
@@ -789,15 +1029,15 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         }
         else if (IsStabled)
         {
-            page.Add(new MenuAction("Lead it out of the stable", "It waits by the door", !visiting, () => HorseStable.LeadOut(this), closesMenu: true));
+            page.Add(new MenuAction("Lead it out of the stable", ownersOnly ? "It waits by the door" : theirs, ownersOnly, () => HorseStable.LeadOut(this), closesMenu: true));
         }
         else
         {
             HorseStable stable = HorseStable.Nearest(transform.position, HorseStable.LeadReach);
             if (stable != null)
             {
-                page.Add(new MenuAction($"Stable it ({stable.Occupants} of {stable.Stalls} stalls)", stable.HasRoom ? "Safe at night, healing; a mare and a stallion may foal" : "The stable is full",
-                    !visiting && stable.HasRoom && Rider == null, () => stable.Keep(this), closesMenu: true));
+                page.Add(new MenuAction($"Stable it ({stable.Occupants} of {stable.Stalls} stalls)", !ownersOnly ? theirs : stable.HasRoom ? "Safe at night, healing; a mare and a stallion may foal" : "The stable is full",
+                    ownersOnly && stable.HasRoom && Rider == null, () => stable.Keep(this), closesMenu: true));
             }
         }
 
@@ -806,7 +1046,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             var jobs = HorseSettings.Current.Jobs;
             if (Order == Orders.Work)
             {
-                page.Add(new MenuAction("Stop working", Job >= 0 && Job < jobs.Count ? jobs[Job].name : null, !visiting, () => Command(Orders.Graze), closesMenu: true));
+                page.Add(new MenuAction("Stop working", !ownersOnly ? theirs : Job >= 0 && Job < jobs.Count ? jobs[Job].name : null, ownersOnly, () => Command(Orders.Graze), closesMenu: true));
             }
             else
             {
@@ -816,7 +1056,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
                     CraftingStation station = HorseJobs.NearestStation(jobs[i].station, transform.position, 30f);
                     if (station != null)
                     {
-                        page.Add(new MenuAction(jobs[i].name, $"{jobs[i].description} (+{jobs[i].bonus * 100f:0}%)", !visiting,
+                        page.Add(new MenuAction(jobs[i].name, ownersOnly ? $"{jobs[i].description} (+{jobs[i].bonus * 100f:0}%)" : theirs, ownersOnly,
                             () => PutToWork(chosen, station.transform.position), closesMenu: true));
                     }
                 }
@@ -826,13 +1066,13 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         if (!IsStabled)
         {
             page.Add(new MenuAction(Order == Orders.Follow ? "Stop following" : "Follow me",
-                Order == Orders.Follow ? "It grazes where it is" : "Behind you on foot; on a lead behind the horse you ride", !visiting && IsGrown,
+                Order == Orders.Follow ? "It grazes where it is" : "Behind you on foot; on a lead behind the horse you ride", IsGrown,
                 () => Command(Order == Orders.Follow ? Orders.Graze : Orders.Follow), closesMenu: true));
             page.Add(new MenuAction(Order == Orders.Stay ? "Let it graze" : "Stay here", Order == Orders.Stay ? "It wanders a little" : "It waits right here",
-                !visiting, () => Command(Order == Orders.Stay ? Orders.Graze : Orders.Stay), closesMenu: true));
+                true, () => Command(Order == Orders.Stay ? Orders.Graze : Orders.Stay), closesMenu: true));
         }
 
-        page.Add(new MenuAction("Give it a name", HasName ? $"It is called {horseName}" : "It has none yet", !visiting, () => HorseNameWindow.Ask(this), closesMenu: true));
+        page.Add(new MenuAction("Give it a name", !mine ? theirs : HasName ? $"It is called {horseName}" : "It has none yet", mine, () => HorseNameWindow.Ask(this), closesMenu: true));
         Haulable cart = Haulable.NearestFree(transform.position, 6f);
         if (HorseHitch.Pulling(this) != null)
         {
@@ -840,7 +1080,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         }
         else if (cart != null && IsGrown && !IsStabled)
         {
-            page.Add(new MenuAction("Hitch the cart to it", "It pulls the cart while you ride", !visiting, () => HorseHitch.Hitch(this, cart), closesMenu: true));
+            page.Add(new MenuAction("Hitch the cart to it", ownersOnly ? "It pulls the cart while you ride" : theirs, ownersOnly, () => HorseHitch.Hitch(this, cart), closesMenu: true));
         }
 
         return page;
@@ -921,6 +1161,14 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
 
     private void OnDied(Damageable victim, DamageInfo killingBlow)
     {
+        // A friend's game runs it: its gear fell there (and comes to this game as the dropped items it left).
+        if (IsPuppet)
+        {
+            Motion?.Die();
+            Changed?.Invoke(this);
+            return;
+        }
+
         if (Rider != null)
         {
             Rider.Dismount(thrown: true);
@@ -1064,6 +1312,9 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         public int hurtRidden;
         public int job = -1;
         public Vector3 workAt;
+        public string owner = "";
+        public string ownerName = "";
+        public bool arriving;
     }
 
     string ISaveable.SaveKey => "horse";
@@ -1076,6 +1327,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             armour = armour != null ? armour.Id : "", bond = Bond, lastCared = LastCared, lastGroomed = LastGroomed, stabledIn = StabledIn,
             bornOn = BornOn, withFoalSince = WithFoalSince, foalSire = FoalSire, lastFoaled = LastFoaled,
             order = (int)Order, job = Job, workAt = WorkAt, roughMetres = roughMetres, swumMetres = swumMetres, rodeMetres = rodeMetres, hurtRidden = hurtRidden,
+            owner = ownerId, ownerName = ownerName, arriving = arriving,
         };
         if (Cargo != null)
         {
@@ -1120,6 +1372,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         {
             Order = Orders.Graze;
         }
+        BelongTo(saved.owner, saved.ownerName);
+        arriving = saved.arriving;
         roughMetres = saved.roughMetres;
         swumMetres = saved.swumMetres;
         rodeMetres = saved.rodeMetres;

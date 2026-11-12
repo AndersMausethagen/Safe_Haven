@@ -429,6 +429,12 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             return true;
         }
 
+        // A horse this game runs (ridden, roped or kept by this player): its kicks and charges are theirs too.
+        if (source.TryGetComponent(out Horse horse) && !horse.IsPuppet)
+        {
+            return true;
+        }
+
         RaidDirector raid = RaidDirector.Current;
         Companion mine = raid != null && raid.Companions != null ? raid.Companions.Companion : null;
         return mine != null && source.gameObject == mine.gameObject;

@@ -317,6 +317,13 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
             body.Mirror.Apply(animation, settings.AnimationBlend);
         }
 
+        // In the saddle of a horse drawn here (CoopHorses): on its seat, as their own game sits them, so the two never part.
+        Horse mount = CoopHorses.SeatOf(OwnerClientId);
+        if (mount != null)
+        {
+            body.transform.SetPositionAndRotation(mount.Seat.TransformPoint(mount.SeatOffset), mount.Seat.rotation);
+        }
+
         remoteFishing ??= new RemoteFishing(body.transform);
         remoteFishing.Show(fishing.Value, NetworkManager.ServerTime.Time, Time.time, Time.deltaTime);
 

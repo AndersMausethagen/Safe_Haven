@@ -28,6 +28,9 @@ public sealed class HorseNameWindow : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => current = null;
 
+    /// <summary>True while it asks for this horse's name.</summary>
+    public static bool IsNaming(Horse horse) => current != null && horse != null && current.horse == horse && current.window != null && current.window.IsOpen;
+
     /// <summary>Asks for this horse's name.</summary>
     public static void Ask(Horse horse)
     {

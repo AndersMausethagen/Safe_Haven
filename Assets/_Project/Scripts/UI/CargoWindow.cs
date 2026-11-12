@@ -134,6 +134,9 @@ public sealed class CargoWindow : MonoBehaviour
 
     public static CargoWindow Current { get; private set; }
 
+    /// <summary>True while it shows this hold's cargo.</summary>
+    public bool IsShowing(ICargoHold hold) => window != null && window.IsOpen && hold != null && ReferenceEquals(transport, hold);
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 

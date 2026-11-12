@@ -92,8 +92,50 @@ public static class HavenVisit
     public static SaveData KeepHome(SaveData homeGame, SaveData now)
     {
         SaveData kept = Clone(homeGame);
-        CopyCharacter(Clone(now), kept);
+        SaveData current = Clone(now);
+        CopyCharacter(current, kept);
+        TakeHorsesHome(current, kept);
         return kept;
+    }
+
+    // The horses this player tamed in the host's Haven are theirs (Horse.OwnerIn: their journey's id) and go home with them,
+    // into their own Haven, to graze near its portal when it is next loaded (Horse.ComingHome). One taken home by an earlier
+    // save on this visit is replaced, never doubled; the host's game lets go of them when this player leaves (CoopHorses).
+    private static void TakeHorsesHome(SaveData now, SaveData kept)
+    {
+        string owner = now.playtest != null ? now.playtest.runId : null;
+        SceneSaveData there = string.IsNullOrEmpty(owner) || now.world == null ? null : now.world.Find(scene => scene.scene == HavenScene);
+        if (there == null)
+        {
+            return;
+        }
+
+        SceneSaveData home = null;
+        foreach (EntitySaveData entity in there.entities)
+        {
+            ComponentSaveData horse = entity.destroyed || entity.components == null ? null : entity.components.Find(component => component.key == "horse");
+            if (horse == null || Horse.OwnerIn(horse.state) != owner)
+            {
+                continue;
+            }
+
+            kept.world ??= new System.Collections.Generic.List<SceneSaveData>();
+            if (home == null)
+            {
+                home = kept.world.Find(scene => scene.scene == HavenScene);
+                if (home == null)
+                {
+                    home = new SceneSaveData { scene = HavenScene };
+                    kept.world.Add(home);
+                }
+            }
+
+            EntitySaveData copy = JsonUtility.FromJson<EntitySaveData>(JsonUtility.ToJson(entity));
+            copy.spawned = true;
+            copy.components.Find(component => component.key == "horse").state = Horse.ComingHome(horse.state);
+            home.entities.RemoveAll(other => other.id == copy.id);
+            home.entities.Add(copy);
+        }
     }
 
     private static void CopyCharacter(SaveData from, SaveData to)
