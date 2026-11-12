@@ -108,16 +108,18 @@ public sealed class DialogueBox : MonoBehaviour
     // Ignores the key press that opened the conversation (E is also "use").
     private const float InputDelay = 0.2f;
     private const float WalkAwayDistance = 6f;
-    private const float PanelWidth = 1060f;
+    // About 15% smaller and see-through since 2026-11-13 (the user: too big, in the way while playing and talking).
+    private const float PanelWidth = 912f;
     // The portrait's share of the box, which a voice with no face speaks into.
-    private const float FaceWidth = 226f;
-    private const float NameX = 530f;
-    private const float LineX = 510f;
-    private const float LineWidth = 480f;
-    private const float PanelHeight = 250f;
-    private const float BubbleAnswersWidth = 380f;
-    private const float AnswerRowHeight = 46f;
-    private const float AnswerRowStep = 52f;
+    private const float FaceWidth = 194f;
+    private const float NameX = 456f;
+    private const float LineX = 440f;
+    private const float LineWidth = 414f;
+    private const float PanelHeight = 212f;
+    private const float PanelAlpha = 0.78f;
+    private const float BubbleAnswersWidth = 330f;
+    private const float AnswerRowHeight = 40f;
+    private const float AnswerRowStep = 45f;
     // A subtitle stays for its reading time: a second plus letters at this pace, within these bounds.
     private const float SubtitleLettersPerSecond = 14f;
     private const float SubtitleMinSeconds = 4f;
@@ -766,34 +768,34 @@ public sealed class DialogueBox : MonoBehaviour
         panel.pivot = new Vector2(0.5f, 0f);
         box.content = panel.gameObject;
         var background = panel.gameObject.AddComponent<Image>();
-        background.color = Panel;
+        background.color = new Color(Panel.r, Panel.g, Panel.b, Panel.a * PanelAlpha);
         var rim = panel.gameObject.AddComponent<Outline>();
-        rim.effectColor = Rim;
+        rim.effectColor = new Color(Rim.r, Rim.g, Rim.b, Rim.a * 0.6f);
         rim.effectDistance = new Vector2(2f, -2f);
         box.panelBackground = background;
         box.panelRim = rim;
 
-        RectTransform frame = Rect("Portrait Frame", panel, new Vector2(0f, 0.5f), new Vector2(206f, 206f), new Vector2(125f, 0f));
+        RectTransform frame = Rect("Portrait Frame", panel, new Vector2(0f, 0.5f), new Vector2(176f, 176f), new Vector2(106f, 0f));
         frame.gameObject.AddComponent<Image>().color = Rim;
         box.portraitFrame = frame.gameObject;
-        RectTransform face = Rect("Portrait", frame, new Vector2(0.5f, 0.5f), new Vector2(198f, 198f), Vector2.zero);
+        RectTransform face = Rect("Portrait", frame, new Vector2(0.5f, 0.5f), new Vector2(169f, 169f), Vector2.zero);
         box.portraitCamera = DialoguePortrait.Create();
         box.portrait = face.gameObject.AddComponent<RawImage>();
         box.portrait.texture = box.portraitCamera.Texture;
-        RectTransform still = Rect("Picture", frame, new Vector2(0.5f, 0.5f), new Vector2(198f, 198f), Vector2.zero);
+        RectTransform still = Rect("Picture", frame, new Vector2(0.5f, 0.5f), new Vector2(169f, 169f), Vector2.zero);
         box.picture = still.gameObject.AddComponent<Image>();
         box.picture.preserveAspect = true;
 
-        box.nameLabel = Text("Name", panel, 28f, Title, new Vector2(0f, 1f), new Vector2(560f, 40f), new Vector2(NameX, -36f), TextAlignmentOptions.Left);
+        box.nameLabel = Text("Name", panel, 24f, Title, new Vector2(0f, 1f), new Vector2(482f, 34f), new Vector2(NameX, -30f), TextAlignmentOptions.Left);
         box.nameLabel.fontStyle = FontStyles.Bold;
-        box.lineLabel = Text("Line", panel, 24f, Body, new Vector2(0f, 1f), new Vector2(LineWidth, 175f), new Vector2(LineX, -140f), TextAlignmentOptions.TopLeft);
+        box.lineLabel = Text("Line", panel, 21f, Body, new Vector2(0f, 1f), new Vector2(LineWidth, 150f), new Vector2(LineX, -120f), TextAlignmentOptions.TopLeft);
         // Long lines (a leader's briefing) shrink to fit rather than run out of the box.
         box.lineLabel.enableAutoSizing = true;
-        box.lineLabel.fontSizeMin = 15f;
-        box.lineLabel.fontSizeMax = 24f;
-        box.hint = Text("Hint", panel, 18f, Title, new Vector2(1f, 0f), new Vector2(200f, 30f), new Vector2(-110f, 22f), TextAlignmentOptions.Right);
+        box.lineLabel.fontSizeMin = 14f;
+        box.lineLabel.fontSizeMax = 21f;
+        box.hint = Text("Hint", panel, 16f, Title, new Vector2(1f, 0f), new Vector2(200f, 30f), new Vector2(-110f, 22f), TextAlignmentOptions.Right);
 
-        box.answerColumn = Rect("Answers", panel, new Vector2(1f, 0.5f), new Vector2(300f, PanelHeight - 30f), new Vector2(-160f, 0f));
+        box.answerColumn = Rect("Answers", panel, new Vector2(1f, 0.5f), new Vector2(258f, PanelHeight - 26f), new Vector2(-138f, 0f));
         var column = box.answerColumn.gameObject.AddComponent<VerticalLayoutGroup>();
         column.spacing = AnswerRowStep - AnswerRowHeight;
         column.childForceExpandHeight = false;
@@ -808,12 +810,12 @@ public sealed class DialogueBox : MonoBehaviour
         // Above the HUD, and never in the way of a click: the fight goes on beneath it.
         RectTransform strip = Rect("Subtitle", root.transform, new Vector2(0.5f, 0f), new Vector2(PanelWidth, 64f), new Vector2(0f, 330f));
         Image stripBackground = strip.gameObject.AddComponent<Image>();
-        stripBackground.color = new Color(Panel.r, Panel.g, Panel.b, 0.78f);
+        stripBackground.color = new Color(Panel.r, Panel.g, Panel.b, 0.55f);
         stripBackground.raycastTarget = false;
-        box.subtitle = Text("Line", strip, 24f, Body, new Vector2(0.5f, 0.5f), new Vector2(PanelWidth - 40f, 56f), Vector2.zero, TextAlignmentOptions.Center);
+        box.subtitle = Text("Line", strip, 21f, Body, new Vector2(0.5f, 0.5f), new Vector2(PanelWidth - 40f, 56f), Vector2.zero, TextAlignmentOptions.Center);
         box.subtitle.enableAutoSizing = true;
         box.subtitle.fontSizeMin = 16f;
-        box.subtitle.fontSizeMax = 24f;
+        box.subtitle.fontSizeMax = 21f;
         box.subtitleStrip = strip.gameObject;
         strip.gameObject.SetActive(false);
         box.bubble = SpeechBubble.Create(root.transform);
@@ -838,7 +840,7 @@ public sealed class DialogueBox : MonoBehaviour
         var button = row.AddComponent<Button>();
         button.targetGraphic = image;
         button.onClick.AddListener(() => Choose(index));
-        TMP_Text label = Text("Label", row.transform, 20f, Body, new Vector2(0.5f, 0.5f), new Vector2(284f, 44f), Vector2.zero, TextAlignmentOptions.Left);
+        TMP_Text label = Text("Label", row.transform, 18f, Body, new Vector2(0.5f, 0.5f), new Vector2(244f, 38f), Vector2.zero, TextAlignmentOptions.Left);
         row.SetActive(false);
         buttons.Add(button);
         buttonLabels.Add(label);

@@ -10,16 +10,18 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class SpeechBubble : MonoBehaviour
 {
-    private const float MaxLineWidth = 460f;
-    private const float MinWidth = 160f;
-    private const float PaddingX = 22f;
-    private const float PaddingTop = 12f;
-    private const float PaddingBottom = 16f;
-    private const float NameHeight = 26f;
-    private const float HintHeight = 18f;
+    // Smaller and see-through since 2026-11-13: the user found the lines too big and in the way while playing.
+    private const float MaxLineWidth = 380f;
+    private const float MinWidth = 140f;
+    private const float PaddingX = 16f;
+    private const float PaddingTop = 9f;
+    private const float PaddingBottom = 12f;
+    private const float NameHeight = 22f;
+    private const float HintHeight = 16f;
+    private const float BackAlpha = 0.62f;
     private const float ScreenMargin = 16f;
     private const float AboveHead = 0.45f;
-    private const float TailSize = 18f;
+    private const float TailSize = 14f;
 
     private RectTransform area;
     private RectTransform bubble;
@@ -194,24 +196,27 @@ public sealed class SpeechBubble : MonoBehaviour
         bubble = Rect("Bubble", self, new Vector2(0.5f, 0.5f), new Vector2(300f, 100f));
         bubble.pivot = new Vector2(0.5f, 0f);
         Image back = bubble.gameObject.AddComponent<Image>();
-        back.color = style.Panel;
+        back.color = SeeThrough(style.Panel, BackAlpha);
         var rim = bubble.gameObject.AddComponent<Outline>();
-        rim.effectColor = style.Rim;
+        rim.effectColor = SeeThrough(style.Rim, 0.55f);
         rim.effectDistance = new Vector2(2f, -2f);
 
         // The tail: a square turned on its corner, half of it hanging below the bubble, the same colour and rim.
         tail = Rect("Tail", bubble, new Vector2(0.5f, 0f), new Vector2(TailSize, TailSize));
         tail.localRotation = Quaternion.Euler(0f, 0f, 45f);
         tail.SetAsFirstSibling();
-        tail.gameObject.AddComponent<Image>().color = style.Panel;
+        tail.gameObject.AddComponent<Image>().color = SeeThrough(style.Panel, BackAlpha);
         var tailRim = tail.gameObject.AddComponent<Outline>();
-        tailRim.effectColor = style.Rim;
+        tailRim.effectColor = SeeThrough(style.Rim, 0.55f);
         tailRim.effectDistance = new Vector2(2f, -2f);
 
-        nameLabel = Text("Name", bubble, 20f, style.Accent, TextAlignmentOptions.TopLeft);
+        nameLabel = Text("Name", bubble, 17f, style.Accent, TextAlignmentOptions.TopLeft);
         nameLabel.fontStyle = FontStyles.Bold;
-        lineLabel = Text("Line", bubble, 21f, style.Text, TextAlignmentOptions.TopLeft);
-        hintLabel = Text("Hint", bubble, 15f, style.Accent, TextAlignmentOptions.BottomRight);
+        lineLabel = Text("Line", bubble, 18f, style.Text, TextAlignmentOptions.TopLeft);
+        hintLabel = Text("Hint", bubble, 13f, style.Accent, TextAlignmentOptions.BottomRight);
+        // Words on a see-through back stay readable with the shadowed face made for text on the world.
+        style.OnWorld(nameLabel);
+        style.OnWorld(lineLabel);
         RectTransform hint = hintLabel.rectTransform;
         hint.anchorMin = hint.anchorMax = new Vector2(1f, 0f);
         hint.pivot = new Vector2(1f, 0f);
@@ -222,6 +227,8 @@ public sealed class SpeechBubble : MonoBehaviour
             graphic.raycastTarget = false;
         }
     }
+
+    private static Color SeeThrough(Color colour, float alpha) => new Color(colour.r, colour.g, colour.b, colour.a * alpha);
 
     private static RectTransform Rect(string name, Transform parent, Vector2 anchorAt, Vector2 size)
     {
