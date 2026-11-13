@@ -149,6 +149,9 @@ def play(name):
     arm = next(o for o in bpy.data.objects if o.type == 'ARMATURE' and o.animation_data
                and o.animation_data.action and o.animation_data.action.name.startswith(PREFIX))
     arm.animation_data.action = act
+    # Blender 4.4+ plays an action only through an assigned slot; picking an action by hand can leave it empty.
+    if arm.animation_data.action_slot is None and len(act.slots):
+        arm.animation_data.action_slot = act.slots[0]
     sc = bpy.context.scene
     sc.frame_start, sc.frame_end = int(act.frame_range[0]), int(act.frame_range[1])
     sc.frame_set(sc.frame_start)
@@ -169,7 +172,60 @@ def load(json_path, armature_name=None, replace=True):
     sc = bpy.context.scene
     sc.render.fps = int(round(data["fps"]))
     play(made[0])
+    if not bpy.app.background:
+        register_panel()
     return dict(armature=arm.name, fit=fit, actions=made)
+
+
+class SH_OT_play_clip(bpy.types.Operator):
+    """Show this clip on the rig, fit the timeline to it and play it"""
+    bl_idname = "safehaven.play_clip"
+    bl_label = "Play Unity Clip"
+    name: bpy.props.StringProperty()
+
+    def execute(self, context):
+        play(self.name)
+        if not context.screen.is_animation_playing:
+            bpy.ops.screen.animation_play()
+        return {'FINISHED'}
+
+
+class SH_PT_unity_clips(bpy.types.Panel):
+    """3D viewport sidebar (N) > Unity Clips: one button per loaded clip."""
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Unity Clips"
+    bl_label = "Unity Clips"
+
+    def draw(self, context):
+        layout = self.layout
+        clips = sorted(a for a in bpy.data.actions if a.name.startswith(PREFIX))
+        if not clips:
+            layout.label(text="No clips loaded")
+            return
+        arm = next((o for o in bpy.data.objects if o.type == 'ARMATURE' and o.animation_data
+                    and o.animation_data.action in clips), None)
+        current = arm.animation_data.action if arm else None
+        col = layout.column(align=True)
+        for a in clips:
+            op = col.operator(SH_OT_play_clip.bl_idname, text=a.name[len(PREFIX):].split("/")[-1], depress=a == current)
+            op.name = a.name
+        row = layout.row(align=True)
+        if context.screen.is_animation_playing:
+            row.operator("screen.animation_cancel", text="Pause", icon='PAUSE').restore_frame = False
+        else:
+            row.operator("screen.animation_play", text="Play", icon='PLAY')
+        if arm:
+            layout.prop(arm.data, "pose_position", expand=True)
+
+
+def register_panel():
+    for cls in (SH_OT_play_clip, SH_PT_unity_clips):
+        try:
+            bpy.utils.unregister_class(getattr(bpy.types, cls.__name__))
+        except (AttributeError, RuntimeError):
+            pass
+        bpy.utils.register_class(cls)
 
 
 if __name__ == "__main__" and "--" in sys.argv:
