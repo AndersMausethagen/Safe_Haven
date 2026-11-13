@@ -40,9 +40,16 @@ public sealed class RaidResultsScreen : MonoBehaviour
     private string destination;
     private bool extracted;
     private ScrollRect reportScroll;
+    // Hearthline 3: the haul as pictures between the subtitle and the report (RaidReportCards), which gives up the room.
+    private const float CardSize = 72f;
+    private KitHaul first;
+    private KitHaul second;
+    private RectTransform reportRect;
+    private float reportTop;
 
     private void Awake()
     {
+        Dress();
         continueButton.onClick.AddListener(Continue);
         reportScroll = bodyLabel.GetComponentInParent<ScrollRect>();
         if (reportScroll != null && reportScroll.verticalScrollbar == null)
@@ -51,6 +58,30 @@ public sealed class RaidResultsScreen : MonoBehaviour
             reportScroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
         }
     }
+
+    // Hearthline 3: the report's panel in the kit's look, as every window: the leather ground and scroll corners, the title
+    // carved in the display face with its rule, the subtitle in the title face, and the gold button.
+    private void Dress()
+    {
+        UIStyle style = UIStyle.Current;
+        // One line, never broken in a word ("Extracte / d!"): the carved face is wide. Not past 64 either, where the
+        // face's atlas shows specks of the letters beside each one.
+        titleLabel.textWrappingMode = TextWrappingModes.NoWrap;
+        titleLabel.fontSizeMax = Mathf.Min(titleLabel.fontSize, 64f);
+        titleLabel.fontSizeMin = 36f;
+        titleLabel.enableAutoSizing = true;
+        // Not bold: the carved face is thickened by widening its letters' field, which with its shadow reaches past the
+        // atlas's padding and picks up bits of the next letters there.
+        titleLabel.fontStyle = FontStyles.Normal;
+        content.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
+        style.Title(subtitleLabel);
+        subtitleLabel.fontStyle = FontStyles.Normal;
+        subtitleLabel.color = style.Muted;
+        continueButton.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.PrimaryButton);
+    }
+
+    // The carved title takes its colour as a tint over the face's own gold: a hint of green for a way home, red for a fall.
+    private Color TitleColour(bool home) => home ? Color.Lerp(Color.white, successColor, 0.3f) : failureColor;
 
     // A thin bar beside the report: a long one (a rescue, a haul and what held the player back) runs past the panel, and
     // without it nothing says so. Built here, from the UI style, like the Options screen's.
@@ -109,14 +140,47 @@ public sealed class RaidResultsScreen : MonoBehaviour
     {
         extracted = report.Extracted;
         titleLabel.text = RaidReportText.Title(report);
-        titleLabel.color = extracted ? successColor : failureColor;
+        titleLabel.color = TitleColour(extracted);
         subtitleLabel.text = RaidReportText.Subtitle(report);
-        bodyLabel.text = RaidReportText.Describe(report);
+        if (MakeHaul())
+        {
+            float haul = RaidReportCards.Show(report, first, second, 0f) + 12f;
+            reportRect.offsetMax = new Vector2(reportRect.offsetMax.x, -(reportTop + haul));
+            bodyLabel.text = RaidReportText.Describe(report, true);
+        }
+        else
+        {
+            bodyLabel.text = RaidReportText.Describe(report);
+        }
+
         ToTop();
         Sprite own = report.Definition != null ? report.Definition.ResultArtwork(extracted) : null;
         SetArtwork(own != null ? own : extracted ? extractedArtwork : failedArtwork);
         destination = CanLoad(report.ReturnScene) ? report.ReturnScene : fallbackScene;
         continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the portal";
+    }
+
+    // Under the subtitle, as wide as the report; false where the screen has no scrolling report to make room in.
+    private bool MakeHaul()
+    {
+        if (first != null)
+        {
+            return true;
+        }
+
+        if (reportScroll == null)
+        {
+            return false;
+        }
+
+        reportRect = (RectTransform)reportScroll.transform;
+        reportTop = -reportRect.offsetMax.y;
+        RectTransform area = CodeUI.At("Haul", reportRect.parent, reportRect.offsetMin.x, reportTop - 8f, 0f, 0f);
+        area.anchorMax = new Vector2(1f, 1f);
+        area.sizeDelta = new Vector2(reportRect.offsetMax.x - reportRect.offsetMin.x, 0f);
+        first = new KitHaul(area, "First", 0f, CardSize);
+        second = new KitHaul(area, "Second", 0f, CardSize);
+        return true;
     }
 
     // The report opens at its start, with the bar sized to the new text.
@@ -136,7 +200,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
     {
         extracted = true;
         titleLabel.text = "No Raid to Report";
-        titleLabel.color = successColor;
+        titleLabel.color = TitleColour(true);
         subtitleLabel.text = "This screen is shown after a raid ends.";
         bodyLabel.text = $"<color={RaidReportText.Muted}>Enter a raid through the portal in Safe Haven and extract or fall to see its results here.</color>";
         SetArtwork(extractedArtwork);
@@ -173,6 +237,10 @@ public sealed class RaidResultsScreen : MonoBehaviour
 
     private IEnumerator FadeInContent()
     {
+        // The window's dress (UIRole) sets the carved face's own colour as it starts, which may be after the report was
+        // shown: the tint goes on a frame later, while the content is still unseen.
+        yield return null;
+        titleLabel.color = TitleColour(extracted);
         for (float t = 0f; t < 1f && contentFadeSeconds > 0f; t += Time.unscaledDeltaTime / contentFadeSeconds)
         {
             content.alpha = Mathf.SmoothStep(0f, 1f, t);

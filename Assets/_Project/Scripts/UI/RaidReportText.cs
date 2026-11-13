@@ -21,7 +21,11 @@ public static class RaidReportText
         return $"{report.RaidName}  ·  {RaidStats.FormatTime(report.TimeSpent)} in the raid";
     }
 
-    public static string Describe(RaidReport report)
+    public static string Describe(RaidReport report) => Describe(report, false);
+
+    /// <param name="listsShownApart">The haul is shown as pictures beside the words (RaidReportCards): what came home,
+    /// was used up, lost or saved, and what it was worth, are left out.</param>
+    public static string Describe(RaidReport report, bool listsShownApart)
     {
         var builder = new StringBuilder();
         if (!string.IsNullOrEmpty(report.BroughtDownBy))
@@ -56,6 +60,11 @@ public static class RaidReportText
         if (!string.IsNullOrEmpty(report.TransportLine))
         {
             builder.Append($"<b><color={(report.TransportHome ? Gain : Loss)}>{report.TransportLine}</color></b>\n\n");
+        }
+
+        if (listsShownApart)
+        {
+            return WithoutLists(builder, report);
         }
 
         bool gainedAny = report.ItemsGained.Count > 0 || report.ResourcesGained.Count > 0;
@@ -127,6 +136,58 @@ public static class RaidReportText
         }
 
         return builder.ToString().TrimEnd();
+    }
+
+    // The rest of the report when its haul is shown as pictures: what held the player back, the gear worn on a fall, and
+    // how the raid went.
+    private static string WithoutLists(StringBuilder builder, RaidReport report)
+    {
+        if (report.Extracted)
+        {
+            Paragraph(builder, Problems(report));
+        }
+        else
+        {
+            if (report.EquipmentDamaged.Count > 0)
+            {
+                var gear = new StringBuilder("<b>Gear kept, but damaged</b>");
+                foreach (EquipmentWear wear in report.EquipmentDamaged)
+                {
+                    string state = wear.After <= 0.0001f ? $"<color={Loss}>broken</color>" : $"{wear.After:P0}";
+                    gear.Append($"\n{Rarity.Rich(wear.Item.DisplayName, wear.Item.Rarity)}  {wear.Before:P0} → {state}");
+                }
+
+                gear.Append($"\n<color={Muted}>{RepairAdvice(report)}</color>");
+                Paragraph(builder, gear.ToString());
+            }
+
+            Paragraph(builder, $"<color={Muted}>You woke at the portal. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
+        }
+
+        Paragraph(builder, Details(report));
+        return builder.ToString().Trim();
+    }
+
+    // Adds a paragraph a blank line under what is there.
+    private static void Paragraph(StringBuilder builder, string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        int trailing = 0;
+        while (trailing < builder.Length && builder[builder.Length - 1 - trailing] == '\n')
+        {
+            trailing++;
+        }
+
+        if (builder.Length > 0)
+        {
+            builder.Append('\n', System.Math.Max(0, 2 - trailing));
+        }
+
+        builder.Append(text);
     }
 
     // Lessons, the way there, how the gathering went, and the modifiers and sparks spent.
