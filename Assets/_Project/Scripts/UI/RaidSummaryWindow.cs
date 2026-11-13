@@ -20,6 +20,10 @@ public sealed class RaidSummaryWindow : MonoBehaviour
 
     // Hearthline 3: the haul as pictures between the subtitle and the words (RaidReportCards); the panel grows to hold them.
     private const float CardSize = 64f;
+    // The raid's own results painting across the top, the title and subtitle on it (LocalSpawn art, as every window).
+    private const float BannerHeight = 196f;
+    private const float BannerKeep = 100f;
+    private KitBanner banner;
     private const float Inset = 32f;
     private KitHaul first;
     private KitHaul second;
@@ -51,6 +55,21 @@ public sealed class RaidSummaryWindow : MonoBehaviour
         second = new KitHaul(area, "Second", 0f, CardSize);
     }
 
+    // After the haul's area is made, so that it moves down under the painting with the divider.
+    private float ShowBanner(RaidReport report)
+    {
+        Sprite art = report.Definition != null ? report.Definition.ResultArtwork(report.Extracted) : null;
+        banner = KitBanner.Show(panel, art, BannerHeight, BannerKeep);
+        if (banner == null)
+        {
+            return 0f;
+        }
+
+        // The title is centred over it: an even veil, not the left-hand shade alone.
+        banner.Darken(0.35f);
+        return banner.Growth;
+    }
+
     private void Start()
     {
         RaidReport report = GameSession.TakeReport();
@@ -66,14 +85,15 @@ public sealed class RaidSummaryWindow : MonoBehaviour
         titleLabel.color = report.Extracted ? successColor : failureColor;
         subtitleLabel.text = RaidReportText.Subtitle(report);
         MakeHaul();
+        float painting = ShowBanner(report);
         float haul = RaidReportCards.Show(report, first, second, 0f) + 10f;
         string words = RaidReportText.Describe(report, true);
         bodyLabel.text = words;
         // The words take what they need, no more: a short report leaves no field of empty leather under the pictures.
         float need = words.Length > 0 ? bodyLabel.GetPreferredValues(words, bodyLabel.rectTransform.rect.width, 0f).y + 8f : 0f;
         float spare = Mathf.Max(0f, bodyHeight - need);
-        panel.sizeDelta = new Vector2(panel.sizeDelta.x, panelHeight + haul - spare);
-        bodyLabel.rectTransform.offsetMax = new Vector2(bodyLabel.rectTransform.offsetMax.x, -(bodyTop + haul));
+        panel.sizeDelta = new Vector2(panel.sizeDelta.x, panelHeight + painting + haul - spare);
+        bodyLabel.rectTransform.offsetMax = new Vector2(bodyLabel.rectTransform.offsetMax.x, -(bodyTop + painting + haul));
         window.Open();
     }
 }

@@ -474,6 +474,9 @@ public sealed class AltarWindow : MonoBehaviour
         pageLine.color = style.Muted;
 
         // Left of the close button.
+        // LocalSpawn art behind the header (title, essences), the band no taller than it, so nothing below moves.
+        // Ending above the page line, which would otherwise sit on its gold rule; veiled so the essences read over candles.
+        KitBanner.Show(panel, "Altar", 112f, 112f).Darken(0.45f);
         cursedValue = Figure("Cursed", "Skull", 880f, style.Danger, style);
         purifiedValue = Figure("Purified", "Spark", 1020f, style.Good, style);
 

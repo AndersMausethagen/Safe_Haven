@@ -86,6 +86,7 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
     public float Capacity => definition.Capacity;
     public string CargoTitle => definition.DisplayName;
     public string CargoDescription => definition.Description;
+    public string CargoArt => definition.WindowArt;
     public bool IsOverfilled => definition.IsOverfilled(Weight);
     /// <summary>The share of normal speed its load leaves.</summary>
     public float SpeedScale => definition.SpeedScale(Weight);

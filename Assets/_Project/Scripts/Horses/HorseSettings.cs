@@ -122,6 +122,12 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField] private Vector4[] mountPath = System.Array.Empty<Vector4>();
     [SerializeField, Min(0.1f)] private float mountSeconds = 1.67f;
 
+    [Header("Cargo Window")]
+    [Tooltip("The painting across the top of a horse's saddle bags (Resources/WindowArt; LocalSpawn: window_art.json).")]
+    [SerializeField] private string saddlebagsArt = "Saddlebags";
+    [Tooltip("The painting across the top of the stable's feed trough.")]
+    [SerializeField] private string troughArt = "Stable";
+
     [Header("Stable")]
     [Tooltip("Share of its health a stabled horse gets back each in-game hour.")]
     [SerializeField, Range(0f, 1f)] private float stableHealPerHour = 0.08f;
@@ -158,6 +164,8 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float MountReach => mountReach;
     public IReadOnlyList<HorseJob> Jobs => jobs;
     public float TroughMealHours => troughMealHours;
+    public string SaddlebagsArt => saddlebagsArt;
+    public string TroughArt => troughArt;
     public float TroughBondPerHour => troughBondPerHour;
     public float TradeBase => tradeBase;
     public float TradePerQuality => tradePerQuality;

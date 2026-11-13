@@ -344,6 +344,7 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     // ICargoHold: the trough in the cargo window.
     public ItemContainer Cargo => trough;
     public string CargoTitle => "Feed trough";
+    public string CargoArt => HorseSettings.Current.TroughArt;
     public string CargoDescription => $"Barley, turnips or bread. Every {HorseSettings.Current.TroughMealHours:0} hours each stabled horse eats a meal, and while fed it mends twice as fast and grows fonder.";
     public float Weight => trough.CurrentWeight;
     public float Capacity => 1000f;

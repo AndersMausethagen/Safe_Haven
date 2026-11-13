@@ -70,5 +70,30 @@
     "width": 1344,
     "height": 1024,
     "prompt": "A sunlit forest meadow at golden hour seen as a soft painted backdrop with shallow depth of field: tall grass and wildflowers, white birch trunks and dark pines behind, distant blue hills, warm low sunlight and soft haze, gently blurred, painterly illustration, rich colour, no people, no animals, nothing in the middle foreground, no text."
+  },
+  "Altar": {
+    "width": 1536,
+    "height": 512,
+    "prompt": "An ancient purification altar of carved grey stone in a dim Norse shrine of dark timber: a wide stone basin in the middle with pale silver-blue essence swirling and glowing in it, a bowl of dark red cursed crystals beside it giving off a faint smoky glow, runes carved round the basin glowing softly, tallow candles, bundles of dried herbs and a woven hanging, warm candlelight against the cool glow, painterly illustration, rich colour, no people, no text."
+  },
+  "Saddlebags": {
+    "width": 1536,
+    "height": 512,
+    "prompt": "A sturdy dun Nordic horse stands saddled in the middle of a forest clearing by a log cabin at golden hour, seen from the side, heavy leather saddlebags packed full and strapped behind the saddle, a rolled blanket and a bundle of firewood tied on, pines and birches behind, warm low sunlight, painterly illustration, rich colour, no rider, no text."
+  },
+  "Handcart": {
+    "width": 1536,
+    "height": 512,
+    "prompt": "A wooden two-wheeled Norse handcart heaped with split logs, stone blocks, sacks and a basket of berries stands in the middle of a forest track near a log cabin at golden hour, pines and birches behind, warm low sunlight, painterly illustration, rich colour, no people, no text."
+  },
+  "Rowboat": {
+    "width": 1536,
+    "height": 512,
+    "prompt": "A wooden Norse rowboat drawn up on a reedy lake shore in the middle of the picture, loaded with crates, coiled nets and sacks, oars across it, a misty pine forest and still water beyond, golden morning light, painterly illustration, rich colour, no people, no text."
+  },
+  "Stable": {
+    "width": 1536,
+    "height": 512,
+    "prompt": "Inside a warm Norse log stable at evening: a long wooden feed trough in the middle filled with barley, turnips and a loaf of bread, hay piled in the stalls, a brown horse's head looking over a stall door, harness and a lantern hung on the timber wall, warm lantern light, painterly illustration, rich colour, no people, no text."
   }
 }

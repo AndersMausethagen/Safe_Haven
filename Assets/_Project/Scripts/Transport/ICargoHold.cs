@@ -16,6 +16,9 @@ public interface ICargoHold
 
     string CargoDescription { get; }
 
+    /// <summary>The painting across the top of its cargo window (Resources/WindowArt/&lt;name&gt;), or null for none.</summary>
+    string CargoArt { get; }
+
     float Weight { get; }
 
     float Capacity { get; }

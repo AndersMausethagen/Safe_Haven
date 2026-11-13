@@ -91,3 +91,6 @@ __pycache__/
 
 # LocalSpawn's untouched voice recordings (the clips the game uses are in Assets/_Project/Audio/Voice)
 Tools/Audio/Voices/raw/
+
+# Raw LocalSpawn video takes (result_motion.py make): only the processed loops in Assets are kept.
+Tools/LocalSpawn/ResultMotion/

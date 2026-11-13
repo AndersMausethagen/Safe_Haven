@@ -926,6 +926,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     // ICargoHold: the saddle bags in the cargo window.
     public string CargoTitle => $"{HorseName}'s saddle bags";
     public string CargoDescription => $"Gallops at {Stats.gallopSpeed:0.0} m/s and carries {Stats.carryWeight:0} weight easily; more slows it.";
+    public string CargoArt => HorseSettings.Current.SaddlebagsArt;
     public float Weight => Cargo != null ? Cargo.CurrentWeight : 0f;
     public float Capacity => Stats.carryWeight;
     public bool IsOverfilled => Weight > Capacity + 0.001f;

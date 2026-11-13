@@ -17,6 +17,7 @@ MonoBehaviour:
   description: One wheel and two handles. Goes where you point it, on any path you can walk.
   prefab: {fileID: 8358629271383303412, guid: d7b2b0e38359eb344ad18712fb6f33db, type: 3}
   kit: {fileID: 11400000, guid: 6293cfd862fa2f24ba9aef6d4208d8b6, type: 2}
+  windowArt: Handcart
   columns: 6
   rows: 3
   capacity: 100

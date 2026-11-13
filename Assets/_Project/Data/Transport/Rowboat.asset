@@ -17,6 +17,7 @@ MonoBehaviour:
   description: Oak planks and a pair of oars. Water carries what your back can't.
   prefab: {fileID: 4981802393601269089, guid: 90dc7b563332e1149a4ba290241efa49, type: 3}
   kit: {fileID: 11400000, guid: 95d0f3e7cce90c84ba940eaf257eb2db, type: 2}
+  windowArt: Rowboat
   columns: 8
   rows: 3
   capacity: 160

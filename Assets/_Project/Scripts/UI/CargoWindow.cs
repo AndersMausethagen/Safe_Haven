@@ -26,6 +26,7 @@ public sealed class CargoWindow : MonoBehaviour
     private const float ScreenMargin = 24f;
     // Where the cargo column starts: an eight-column cart (the widest) ends on the right margin.
     private const float CargoX = Width - Margin - 8f * (Cell + Gap) + Gap;
+    private const float HeaderHeight = 148f;
     private const float Reach = 6f;
 
     // One grid of slots showing one container. Clicking a stack sends it to the other grid.
@@ -215,6 +216,8 @@ public sealed class CargoWindow : MonoBehaviour
         cargo.Show(shown.Cargo);
         titleLabel.text = shown.CargoTitle;
         descriptionLabel.text = shown.CargoDescription;
+        // LocalSpawn art behind the header (as the Haven window's): the band covers the header only, so nothing moves.
+        KitBanner.Show(panel, shown.CargoArt, HeaderHeight, HeaderHeight);
         shownWeight = shownCapacity = shownSpeed = shownCarried = -1f;
         Describe(ItemStack.Empty);
         window.Open();

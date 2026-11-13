@@ -45,9 +45,31 @@ public sealed class KitBanner : MonoBehaviour
             banner.Build(panel, bandHeight, keepTop);
         }
 
-        banner.Set(art);
+        banner.Set(art, string.IsNullOrEmpty(art) ? null : Resources.Load<Sprite>("WindowArt/" + art));
         return banner;
     }
+
+    /// <summary>As Show with a name, for a painting held elsewhere (a raid's own results artwork); null hides the band.</summary>
+    public static KitBanner Show(RectTransform panel, Sprite art, float bandHeight, float keepTop)
+    {
+        if (panel == null)
+        {
+            return null;
+        }
+
+        KitBanner banner = panel.GetComponent<KitBanner>();
+        if (banner == null)
+        {
+            banner = panel.gameObject.AddComponent<KitBanner>();
+            banner.Build(panel, bandHeight, keepTop);
+        }
+
+        banner.Set(art != null ? "sprite:" + art.name : null, art);
+        return banner;
+    }
+
+    /// <summary>How much taller it makes the panel now (0 when it shows no painting).</summary>
+    public float Growth => shownHeight;
 
     private void Build(RectTransform panel, float bandHeight, float keepTop)
     {
@@ -105,7 +127,7 @@ public sealed class KitBanner : MonoBehaviour
         rule.raycastTarget = false;
     }
 
-    private void Set(string art)
+    private void Set(string art, Sprite sprite)
     {
         if (art == key && picture.sprite != null)
         {
@@ -113,7 +135,6 @@ public sealed class KitBanner : MonoBehaviour
         }
 
         key = art;
-        Sprite sprite = string.IsNullOrEmpty(art) ? null : Resources.Load<Sprite>("WindowArt/" + art);
         picture.sprite = sprite;
         if (sprite != null)
         {

@@ -18,6 +18,9 @@ public sealed class TransportDefinition : ScriptableObject
     [SerializeField] private SaveableEntity prefab;
     [Tooltip("The item it packs into. Using the item sets it down.")]
     [SerializeField] private ItemDefinition kit;
+    [Tooltip("The painting across the top of its cargo window: a name in Resources/WindowArt (LocalSpawn: " +
+             "Tools/LocalSpawn/window_art.json). Empty: none.")]
+    [SerializeField] private string windowArt;
 
     [Header("Cargo")]
     [SerializeField, Min(1)] private int columns = 6;
@@ -46,6 +49,7 @@ public sealed class TransportDefinition : ScriptableObject
     public string Description => description;
     public SaveableEntity Prefab => prefab;
     public ItemDefinition Kit => kit;
+    public string WindowArt => windowArt;
     public int Columns => columns;
     public int Rows => rows;
     public float Capacity => capacity;
