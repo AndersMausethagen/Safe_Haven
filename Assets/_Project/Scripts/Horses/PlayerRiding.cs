@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -30,8 +31,9 @@ public sealed class PlayerRiding : MonoBehaviour
     private bool feetFree;
     private float nextReminder;
     private float nextRear;
-    // Space: a tap toggles the canter (free), a hold gallops (on its stamina).
-    private float spacePressedAt = -10f;
+    // Shift (HorseGallop): a tap toggles the canter (free), a hold gallops (on its stamina). Space jumps (the user,
+    // 2026-11-13: the horse jumped by itself when it ran into stones).
+    private float gallopPressedAt = -10f;
     private bool cruising;
     private const float TapSeconds = 0.22f;
     private float nextKick;
@@ -243,7 +245,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (!taught && horse.IsTamed)
         {
             taught = true;
-            GameMessages.Post($"Steer with {(GameInput.UsingGamepad ? "the left stick" : "the movement keys")}. Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop on its breath; {GameInput.KeyLabel(GameInput.Sneak)} walks it, {GameInput.Keys("{key:Dismount}")} gets you down.");
+            GameMessages.Post($"Steer with {(GameInput.UsingGamepad ? "the left stick" : "the movement keys")}. Tap {GameInput.KeyLabel(GameInput.HorseGallop)} to canter, hold it to gallop on its breath; {GameInput.KeyLabel(GameInput.Dodge)} jumps; {(GameInput.UsingGamepad ? "a light push on the stick" : GameInput.KeyLabel(GameInput.Sneak))} walks it, {GameInput.Keys("{key:Dismount}")} gets you down.");
         }
     }
 
@@ -416,6 +418,7 @@ public sealed class PlayerRiding : MonoBehaviour
         if (PlayerCameraController.Current != null)
         {
             PlayerCameraController.Current.SetCloseness(this, 1f);
+            PlayerCameraController.Current.SetLead(this, Vector3.zero);
         }
 
         stateMachine.CanFightAboard = false;
@@ -529,6 +532,10 @@ public sealed class PlayerRiding : MonoBehaviour
         if (PlayerCameraController.Current != null)
         {
             PlayerCameraController.Current.SetCloseness(this, Riding.Motion.IsGalloping ? 1.15f : 1f);
+            // At a gallop it leads the view the way it runs, for more of what is coming in sight.
+            Vector3 run = Riding.Motion.Velocity;
+            run.y = 0f;
+            PlayerCameraController.Current.SetLead(this, Riding.Motion.IsGalloping && run.sqrMagnitude > 1f ? run.normalized * 3f : Vector3.zero);
         }
 
         // From the saddle with a weapon only: bare fists can't reach anything from up there.
@@ -580,14 +587,21 @@ public sealed class PlayerRiding : MonoBehaviour
             }
         }
 
-        if (free && GameInput.Dodge != null)
+        // Space while moving: it jumps what is ahead, or as far as the ground lets it.
+        if (free && GameInput.Dodge != null && GameInput.Dodge.WasPressedThisFrame() && moving)
         {
-            if (GameInput.Dodge.WasPressedThisFrame())
+            Riding.Motion.RequestJump();
+        }
+
+        InputAction gallopKey = GameInput.HorseGallop;
+        if (free && gallopKey != null)
+        {
+            if (gallopKey.WasPressedThisFrame())
             {
-                spacePressedAt = Time.time;
+                gallopPressedAt = Time.time;
             }
 
-            if (GameInput.Dodge.WasReleasedThisFrame() && Time.time - spacePressedAt <= TapSeconds && moving)
+            if (gallopKey.WasReleasedThisFrame() && Time.time - gallopPressedAt <= TapSeconds && moving)
             {
                 cruising = !cruising;
             }
@@ -599,8 +613,11 @@ public sealed class PlayerRiding : MonoBehaviour
             cruising = false;
         }
 
-        bool burst = free && GameInput.Dodge != null && GameInput.Dodge.IsPressed() && Time.time - spacePressedAt > TapSeconds;
-        bool walk = free && GameInput.Sneak != null && GameInput.Sneak.IsPressed();
+        bool burst = free && gallopKey != null && gallopKey.IsPressed() && Time.time - gallopPressedAt > TapSeconds;
+        // On a pad the stick is the gait's throttle: a light push walks (its click is the gallop, not sneaking).
+        bool walk = free && (InputDevices.UsingGamepad
+            ? moving && steer.magnitude < 0.55f && !burst && !cruising
+            : GameInput.Sneak != null && GameInput.Sneak.IsPressed());
         int gait = walk ? -1 : burst ? 1 : cruising ? 2 : 0;
         Riding.Motion.Ride(steer, gait);
     }

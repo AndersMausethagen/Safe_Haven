@@ -99,6 +99,26 @@ public sealed class HorseNameWindow : MonoBehaviour
 
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.HorseName, content.gameObject);
+        // While a name is typed its letters are letters: no key opens a window, sneaks or whistles behind it.
+        window.OpenChanged += open =>
+        {
+            if (open)
+            {
+                GameInput.SuspendGameplay();
+            }
+            else
+            {
+                GameInput.ResumeGameplay();
+            }
+        };
+    }
+
+    private void OnDestroy()
+    {
+        if (window != null && window.IsOpen)
+        {
+            GameInput.ResumeGameplay();
+        }
     }
 
     private static void Fill(RectTransform rect)

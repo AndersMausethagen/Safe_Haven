@@ -26,6 +26,10 @@ public sealed class MenuAction
     /// <summary>The quest this answer is about, when spoken in a conversation (DialogueBox shows it in its rank's colour).</summary>
     public QuestDefinition Quest { get; }
     public QuestAnswer Does { get; }
+    /// <summary>Where a window that sorts its choices puts this one (HorsePanelWindow: Main, Care, Gear, Name); empty for none.</summary>
+    public string Group { get; set; } = "";
+    /// <summary>The name of its icon, for a window that shows one (HorsePanelArt); empty for none.</summary>
+    public string Icon { get; set; } = "";
 }
 
 /// <summary>What an ActionMenuWindow shows: a title, a rich-text body and a list of choices.</summary>

@@ -50,6 +50,8 @@ public static class GameInput
     public static InputAction Ping => Find("Player/Ping");
     /// <summary>Whistle for a horse of yours (HorseWhistle).</summary>
     public static InputAction Whistle => Find("Player/Whistle");
+    /// <summary>In the saddle: a tap canters, a hold gallops (Shift, or the left stick's click). Space (Dodge) jumps.</summary>
+    public static InputAction HorseGallop => Find("Player/HorseGallop");
     /// <summary>In the saddle: the horse rears and strikes out ahead (PlayerRiding).</summary>
     public static InputAction HorseKick => Find("Player/HorseKick");
     /// <summary>A controller only (hold View): the wheel of the game's windows. The keyboard has a key for each.</summary>

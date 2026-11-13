@@ -90781,7 +90781,7 @@ MonoBehaviour:
         - item: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
           amount: 1
         - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
-          amount: 30
+          amount: 99
         equip: 1
     - rid: 2623126046329275003
       type: {class: SayNode, ns: , asm: SafeHaven}
@@ -122972,7 +122972,7 @@ MonoBehaviour:
         - item: {fileID: 11400000, guid: 99887c135c70abc40aae37cfc66809b9, type: 2}
           amount: 1
         - item: {fileID: 11400000, guid: 14b1c5230b317074b8251810d5264494, type: 2}
-          amount: 30
+          amount: 99
         equip: 1
     - rid: 2623126046329275036
       type: {class: WhenQuest, ns: , asm: SafeHaven}

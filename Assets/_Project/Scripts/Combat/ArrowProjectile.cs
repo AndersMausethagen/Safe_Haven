@@ -261,10 +261,12 @@ public sealed class ArrowProjectile : MonoBehaviour
             struckBody = victim.Category == TargetCategory.Creature;
             bodyPart = struckBody ? NearestBodyPart(victim, hit.point) : null;
 
-            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, critical ? DamageCalculator.SureCrit : Random.value);
-            if (technique != HitTechnique.None || critical)
+            // A perfect release, or a sneak attack (always a critical, as with a blade).
+            bool sure = critical || PlayerProficiencies.CaughtUnaware(victim);
+            DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, sure ? DamageCalculator.SureCrit : Random.value);
+            if (technique != HitTechnique.None || sure)
             {
-                info = info.Scaled(1f, 1f, technique, critical && attack.CanCrit);
+                info = info.Scaled(1f, 1f, technique, sure && attack.CanCrit);
             }
 
             info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point)

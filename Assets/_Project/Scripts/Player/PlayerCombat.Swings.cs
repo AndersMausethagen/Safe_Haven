@@ -384,7 +384,8 @@ public sealed partial class PlayerCombat
 
         float damage = pending.Damage;
         HitTechnique technique = pending.Technique;
-        bool critical = pending.Critical;
+        // A sneak attack is always a critical.
+        bool critical = pending.Critical || PlayerProficiencies.CaughtUnaware(target);
         bool backstab = IsBackstab(target, out MonsterAI backstabbed);
         if (backstab)
         {

@@ -966,13 +966,15 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         }
 
         // In co-op, whoever has it in hand runs it: asking for its menu takes it in hand (or says who has it).
-        if (ActionMenuWindow.Current != null && CoopHorses.TakeInHand(this))
+        if (CoopHorses.TakeInHand(this))
         {
-            ActionMenuWindow.Current.Open(() => Page(user), user, transform, MenuRange);
+            HorsePanelWindow.Show(this, user, MenuRange);
         }
     }
 
-    private MenuPage Page(GameObject user)
+    /// <summary>What can be done with it, by <paramref name="user"/>: its window's buttons (HorsePanelWindow), each tagged
+    /// with where it goes (MenuAction.Group: Main, Care, Gear, Name) and its icon.</summary>
+    public MenuPage MenuFor(GameObject user)
     {
         var page = new MenuPage { Title = HorseName, Body = StatsText() };
         var riding = PlayerRiding.For(user);
@@ -988,14 +990,20 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             page.Title = $"{HorseName} <size=70%>({(string.IsNullOrWhiteSpace(ownerName) ? "a friend" : ownerName)}'s)</size>";
         }
 
-        page.Add(new MenuAction($"About {HorseName}", "Its picture, its numbers, what it has learned", true, () => HorsePanelWindow.Show(this), closesMenu: true));
-        page.Add(new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.Dodge)} to canter, hold it to gallop. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
+        void Add(string group, string icon, MenuAction action)
+        {
+            action.Group = group;
+            action.Icon = icon;
+            page.Add(action);
+        }
+
+        Add("Main", "HorseHead", new MenuAction("Ride", !IsGrown ? "Too young to ride" : IsStabled ? "Lead it out first" : $"Tap {GameInput.KeyLabel(GameInput.HorseGallop)} to canter, hold it to gallop; {GameInput.KeyLabel(GameInput.Dodge)} jumps. {GameInput.KeyLabel(GameInput.Whistle)} gets you down.",
             riding != null && Rider == null && IsGrown && !IsStabled, () => riding.Mount(this), closesMenu: true));
-        page.Add(new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null, () => Feed(items)));
-        page.Add(new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", true, Groom));
+        Add("Care", "Wheat", new MenuAction("Feed it", "Barley, a turnip or bread from your bag", items != null, () => Feed(items)));
+        Add("Care", "Brush", new MenuAction("Groom it", PlantedTrees.Today - LastGroomed < 1f ? "Groomed today" : "Once a day, for its bond", true, Groom));
         // A friend's bags are theirs; a visitor uses the host's horses' bags as they would the stash, with the host's yes.
         bool bags = mine || (visiting && HavenVisit.StashAllowed);
-        page.Add(new MenuAction("Saddle bags", saddle == null ? "It needs a saddle" : bags ? $"{Weight:0} / {Capacity:0} weight" : visiting ? "Ask to use the stores first" : theirs,
+        Add("Gear", "Bags", new MenuAction("Saddle bags", saddle == null ? "It needs a saddle" : bags ? $"{Weight:0} / {Capacity:0} weight" : visiting ? "Ask to use the stores first" : theirs,
             saddle != null && (bags || visiting), () => { if (bags || !HavenVisit.StoresNeedAsking()) CargoWindow.Create().Open(this, user); }, closesMenu: true));
         if (items != null)
         {
@@ -1003,40 +1011,40 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             {
                 ItemDefinition chosen = carried;
                 string detail = chosen.IsSaddle ? $"{chosen.SaddleSlots} places" : $"Keeps {chosen.HorseArmour * 100f:0}% of a blow off";
-                page.Add(new MenuAction($"Put on the {chosen.DisplayName.ToLowerInvariant()}", !mine ? theirs : IsGrown ? detail : "Too young for it", mine && IsGrown,
+                Add("Gear", chosen.IsSaddle ? "Saddle" : "Barding", new MenuAction($"Put on the {chosen.DisplayName.ToLowerInvariant()}", !mine ? theirs : IsGrown ? detail : "Too young for it", mine && IsGrown,
                     () => { if (chosen.IsSaddle) PutOnSaddle(chosen, items); else PutOnArmour(chosen, items); }));
             }
 
             if (saddle != null)
             {
-                page.Add(new MenuAction("Take off the saddle", !mine ? theirs : Cargo != null && Cargo.CountItems() > 0 ? "Empty its bags first" : "Into your bag",
+                Add("Gear", "Saddle", new MenuAction("Take off the saddle", !mine ? theirs : Cargo != null && Cargo.CountItems() > 0 ? "Empty its bags first" : "Into your bag",
                     mine && (Cargo == null || Cargo.CountItems() == 0), () => TakeOffSaddle(items)));
             }
 
             if (armour != null)
             {
-                page.Add(new MenuAction("Take off the barding", mine ? "Into your bag" : theirs, mine, () => TakeOffArmour(items)));
+                Add("Gear", "Barding", new MenuAction("Take off the barding", mine ? "Into your bag" : theirs, mine, () => TakeOffArmour(items)));
             }
         }
 
         if (HorseTravel.InRaid == this)
         {
             // In a raid: tied at the portal it came through, it is safe and comes home whatever happens.
-            page.Add(HorseTravel.IsTied
+            Add("Main", "Stay", HorseTravel.IsTied
                 ? new MenuAction("Untie it", "It can be hurt again, and must be near you when you extract", true, () => HorseTravel.Tie(this, false), closesMenu: true)
                 : new MenuAction("Tie it at the portal", HorseTravel.CanTieHere(this) ? "Safe here, and home whatever happens" : "Lead it back to the portal first",
                     HorseTravel.CanTieHere(this) && Rider == null, () => HorseTravel.Tie(this, true), closesMenu: true));
         }
         else if (IsStabled)
         {
-            page.Add(new MenuAction("Lead it out of the stable", ownersOnly ? "It waits by the door" : theirs, ownersOnly, () => HorseStable.LeadOut(this), closesMenu: true));
+            Add("Main", "Stable", new MenuAction("Lead it out", ownersOnly ? "It waits by the stable door" : theirs, ownersOnly, () => HorseStable.LeadOut(this), closesMenu: true));
         }
         else
         {
             HorseStable stable = HorseStable.Nearest(transform.position, HorseStable.LeadReach);
             if (stable != null)
             {
-                page.Add(new MenuAction($"Stable it ({stable.Occupants} of {stable.Stalls} stalls)", !ownersOnly ? theirs : stable.HasRoom ? "Safe at night, healing; a mare and a stallion may foal" : "The stable is full",
+                Add("Main", "Stable", new MenuAction("Stable it", !ownersOnly ? theirs : stable.HasRoom ? $"Safe at night, healing; a mare and a stallion may foal ({stable.Occupants} of {stable.Stalls} stalls)" : "The stable is full",
                     ownersOnly && stable.HasRoom && Rider == null, () => stable.Keep(this), closesMenu: true));
             }
         }
@@ -1046,7 +1054,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             var jobs = HorseSettings.Current.Jobs;
             if (Order == Orders.Work)
             {
-                page.Add(new MenuAction("Stop working", !ownersOnly ? theirs : Job >= 0 && Job < jobs.Count ? jobs[Job].name : null, ownersOnly, () => Command(Orders.Graze), closesMenu: true));
+                Add("Care", "Gear", new MenuAction("Stop working", !ownersOnly ? theirs : Job >= 0 && Job < jobs.Count ? jobs[Job].name : null, ownersOnly, () => Command(Orders.Graze), closesMenu: true));
             }
             else
             {
@@ -1056,7 +1064,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
                     CraftingStation station = HorseJobs.NearestStation(jobs[i].station, transform.position, 30f);
                     if (station != null)
                     {
-                        page.Add(new MenuAction(jobs[i].name, ownersOnly ? $"{jobs[i].description} (+{jobs[i].bonus * 100f:0}%)" : theirs, ownersOnly,
+                        Add("Care", "Gear", new MenuAction(jobs[i].name, ownersOnly ? $"{jobs[i].description} (+{jobs[i].bonus * 100f:0}%)" : theirs, ownersOnly,
                             () => PutToWork(chosen, station.transform.position), closesMenu: true));
                     }
                 }
@@ -1065,26 +1073,49 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
 
         if (!IsStabled)
         {
-            page.Add(new MenuAction(Order == Orders.Follow ? "Stop following" : "Follow me",
+            Add("Main", "Lead", new MenuAction(Order == Orders.Follow ? "Stop following" : "Follow me",
                 Order == Orders.Follow ? "It grazes where it is" : "Behind you on foot; on a lead behind the horse you ride", IsGrown,
                 () => Command(Order == Orders.Follow ? Orders.Graze : Orders.Follow), closesMenu: true));
-            page.Add(new MenuAction(Order == Orders.Stay ? "Let it graze" : "Stay here", Order == Orders.Stay ? "It wanders a little" : "It waits right here",
+            Add("Main", Order == Orders.Stay ? "Graze" : "Stay", new MenuAction(Order == Orders.Stay ? "Let it graze" : "Stay here", Order == Orders.Stay ? "It wanders a little" : "It waits right here",
                 true, () => Command(Order == Orders.Stay ? Orders.Graze : Orders.Stay), closesMenu: true));
         }
 
-        page.Add(new MenuAction("Give it a name", !mine ? theirs : HasName ? $"It is called {horseName}" : "It has none yet", mine, () => HorseNameWindow.Ask(this), closesMenu: true));
+        Add("Name", "Pencil", new MenuAction("Give it a name", !mine ? theirs : HasName ? $"It is called {horseName}" : "It has none yet", mine, () => HorseNameWindow.Ask(this), closesMenu: true));
         Haulable cart = Haulable.NearestFree(transform.position, 6f);
         if (HorseHitch.Pulling(this) != null)
         {
-            page.Add(new MenuAction("Unhitch the cart", null, true, () => HorseHitch.Unhitch(this), closesMenu: true));
+            Add("Gear", "Wheel", new MenuAction("Unhitch the cart", "It stops pulling", true, () => HorseHitch.Unhitch(this), closesMenu: true));
         }
         else if (cart != null && IsGrown && !IsStabled)
         {
-            page.Add(new MenuAction("Hitch the cart to it", ownersOnly ? "It pulls the cart while you ride" : theirs, ownersOnly, () => HorseHitch.Hitch(this, cart), closesMenu: true));
+            Add("Gear", "Wheel", new MenuAction("Hitch the cart to it", ownersOnly ? "It pulls the cart while you ride" : theirs, ownersOnly, () => HorseHitch.Hitch(this, cart), closesMenu: true));
         }
 
         return page;
     }
+
+    /// <summary>How far it has come towards learning a trait (0 to 1; 1 once learned): rough ground for Sure-footed, swims
+    /// for Swimmer, the road for Enduring, blows taken under a rider for Brave.</summary>
+    public float TraitProgress(HorseTrait trait)
+    {
+        if (Stats.Has(trait))
+        {
+            return 1f;
+        }
+
+        HorseSettings settings = HorseSettings.Current;
+        switch (trait)
+        {
+            case HorseTrait.SureFooted: return Mathf.Clamp01(roughMetres / Mathf.Max(1f, settings.SureFootedMetres));
+            case HorseTrait.Swimmer: return Mathf.Clamp01(swumMetres / Mathf.Max(1f, settings.SwimmerMetres));
+            case HorseTrait.Enduring: return Mathf.Clamp01(rodeMetres / Mathf.Max(1f, settings.EnduringMetres));
+            case HorseTrait.Brave: return Mathf.Clamp01(hurtRidden / (float)Mathf.Max(1, settings.BraveHits));
+            default: return 0f;
+        }
+    }
+
+    /// <summary>How far it has been ridden and led since it was tamed (metres).</summary>
+    public float RiddenMetres => rodeMetres;
 
     private static IEnumerable<ItemDefinition> GearIn(ItemInventory items)
     {

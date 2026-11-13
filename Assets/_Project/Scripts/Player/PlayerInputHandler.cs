@@ -159,7 +159,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Vector3 cameraForward = Vector3.ProjectOnPlane(movementCamera.transform.forward, Vector3.up).normalized;
         Vector3 cameraRight = Vector3.ProjectOnPlane(movementCamera.transform.right, Vector3.up).normalized;
         // On a controller the left stick is the pointer while a window is up (PadCursor), so the feet stay still.
-        Vector2 walk = IsListening || (InputDevices.UsingGamepad && PadCursor.IsActive) ? Vector2.zero : moveInput;
+        // Studying a window that holds the player (a horse's), the feet stay put too.
+        Vector2 walk = IsListening || PlayerHold.Active || (InputDevices.UsingGamepad && PadCursor.IsActive) ? Vector2.zero : moveInput;
         Vector3 direction = cameraRight * walk.x + cameraForward * walk.y;
         movement.SetMovementInput(Vector3.ClampMagnitude(direction, 1f));
         movement.SetMoveKeys(walk);

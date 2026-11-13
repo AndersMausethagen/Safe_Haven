@@ -510,11 +510,25 @@ public static class WorldAssets
         material = new Material(set.River) { name = "Water River (World)" };
         material.SetFloat("_VertexAlpha", 1f);
         material.SetFloat("_FlowFromMesh", 1f);
-        material.SetFloat("_FlowSpeed", 1f);
         material.SetFloat("_SteepFaces", 1f);
         material.SetFloat("_FallFoam", 0.85f);
         material.SetFloat("_ShoreFoam", 0.3f);
         material.SetFloat("_FoamTrail", 1.4f);
+        // A river, not glass (the user, 2026-11-13: "a bit too much like liquid glass"): green-brown and only clear near
+        // the bank, small ripples, little caustic light, more flow foam.
+        material.SetFloat("_Clarity", 1.05f);
+        material.SetFloat("_DepthDistance", 1.8f);
+        material.SetFloat("_Caustics", 0.28f);
+        material.SetFloat("_Refraction", 0.016f);
+        material.SetFloat("_NormalStrength", 0.55f);
+        material.SetFloat("_NormalTiling", 2f);
+        material.SetFloat("_Smoothness", 0.9f);
+        material.SetFloat("_Reflection", 0.68f);
+        material.SetFloat("_Murk", 0.8f);
+        material.SetFloat("_SpeedFoam", 0.65f);
+        material.SetFloat("_FlowSpeed", 1.4f);
+        material.SetColor("_ShallowColor", new Color(0.13f, 0.27f, 0.2f, 1f));
+        material.SetColor("_DeepColor", new Color(0.02f, 0.06f, 0.05f, 1f));
         AssetDatabase.CreateAsset(material, path);
         return material;
     }

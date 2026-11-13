@@ -50,6 +50,11 @@ public sealed class HorseMotion : MonoBehaviour
     private static readonly int HitSideId = Animator.StringToHash("HitSide");
     private static readonly int FidgetId = Animator.StringToHash("Fidget");
     private static readonly int FidgetingId = Animator.StringToHash("Fidgeting");
+    // Its controller's states (BuildHorses): the clips that play in place.
+    private static readonly int MoveState = Animator.StringToHash("Move");
+    private static readonly int[] FidgetStates = { Animator.StringToHash("Fidget 0"), Animator.StringToHash("Fidget 1"),
+        Animator.StringToHash("Fidget 2"), Animator.StringToHash("Fidget 3"), Animator.StringToHash("Fidget 4") };
+    private static readonly int[] RootedStates = { Animator.StringToHash("Rear"), Animator.StringToHash("Buck"), Animator.StringToHash("Strike") };
     private static readonly int JumpId = Animator.StringToHash("Jump");
 
     // Seconds between hoofbeats at each gait's own speed, walk to sprint: four beats to a walk's stride, two to a trot's,
@@ -133,9 +138,48 @@ public sealed class HorseMotion : MonoBehaviour
     /// <summary>Co-op: drawn for a friend's game that runs it (<see cref="SetPuppet"/>).</summary>
     public bool IsPuppet => puppet;
 
+    // Held still while its window is open (HorsePanelWindow), until something hurts it.
+    private object inspectedBy;
+    private float hurtAt = -99f;
+    private bool heldStill;
+    private Damageable body;
+
+    /// <summary>The player studies it (its window is open): it stands still, unless something hurts it.</summary>
+    public void SetInspected(object by, bool inspected)
+    {
+        if (inspected)
+        {
+            inspectedBy = by;
+            hurtAt = -99f;
+        }
+        else if (inspectedBy == by)
+        {
+            inspectedBy = null;
+        }
+    }
+
+    /// <summary>True while it stands still for the player studying it; false once it has been hurt meanwhile.</summary>
+    public bool HeldForInspection => inspectedBy != null && !(inspectedBy is UnityEngine.Object gone && gone == null) && Time.time - hurtAt > 8f;
+
+    private void OnHurt(DamageInfo damage, DamageResult result) => hurtAt = Time.time;
+
+    private void OnDestroy()
+    {
+        if (body != null)
+        {
+            body.Damaged -= OnHurt;
+        }
+    }
+
     private void Awake()
     {
         horse = GetComponent<Horse>();
+        body = GetComponent<Damageable>();
+        if (body != null)
+        {
+            body.Damaged += OnHurt;
+        }
+
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         home = transform.position;
@@ -549,8 +593,29 @@ public sealed class HorseMotion : MonoBehaviour
         {
             UpdateRidden();
         }
+        else if (HeldForInspection)
+        {
+            // Stood still for the player to look it over: no grazing steps, no wandering off.
+            if (agent.enabled && agent.isOnNavMesh)
+            {
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+            }
+
+            heldStill = true;
+            Velocity = Vector3.zero;
+        }
         else
         {
+            if (heldStill)
+            {
+                heldStill = false;
+                if (agent.enabled && agent.isOnNavMesh)
+                {
+                    agent.isStopped = false;
+                }
+            }
+
             UpdateOnFoot();
             Velocity = agent.enabled ? agent.velocity : Vector3.zero;
         }
@@ -578,6 +643,15 @@ public sealed class HorseMotion : MonoBehaviour
 
     private void UpdateRidden()
     {
+        // Up on its hind legs, bucking or striking out, it goes nowhere until it is down again: moving under a clip that
+        // plays in place, it glided.
+        if (Rooted())
+        {
+            pace = 0f;
+            Velocity = Vector3.zero;
+            return;
+        }
+
         HorseDefinition kind = horse.Definition;
         Vector3 wish = rideDirection;
         // Under a rider it doesn't know yet, it veers off this way and that (HorseTaming); the rider steers against it.
@@ -610,17 +684,8 @@ public sealed class HorseMotion : MonoBehaviour
             return;
         }
 
-        // Something low in the way, a ditch or a narrow stream, at a trot or faster: it jumps it.
-        if (wanted > 0.1f && this.pace >= kind.TrotSpeed * 0.8f && Time.time >= nextJumpLook && HorseHitch.Pulling(horse) == null)
-        {
-            nextJumpLook = Time.time + 0.1f;
-            if (FindJump(out Vector3 landing, out float over))
-            {
-                BeginJump(landing, over);
-                return;
-            }
-        }
-
+        // It jumps only when its rider asks (RequestJump, Space): jumping by itself whenever it met a stone or the edge of
+        // the NavMesh, it leapt where the player hadn't meant to go.
         // Deep water ahead: it wades in and swims. Otherwise Move keeps it on the NavMesh, stopping at walls as anything
         // walking does.
         if (wanted > 0.1f && WaterAhead(out float surface))
@@ -747,8 +812,57 @@ public sealed class HorseMotion : MonoBehaviour
 
     // ----- Jumping -----
 
-    // Low enough to clear and ground to land on beyond: a log, a fence, a ditch, a stream. Creatures it runs down
-    // (Trample) or turns from; walls it stops at.
+    private static readonly RaycastHit[] JumpHits = new RaycastHit[16];
+
+    /// <summary>Its rider asks it to jump (Space, moving): over what is low ahead (a log, a fence, a ditch, a stream),
+    /// or across open ground as far as its pace carries it. False when it can't: too slow, something too high ahead, or
+    /// nowhere straight ahead to land.</summary>
+    public bool RequestJump()
+    {
+        if (mode != Idle.Ridden || jumping || swimming || kickLands > 0f || !agent.enabled || !agent.isOnNavMesh
+            || HorseHitch.Pulling(horse) != null || pace < 1f || Time.time < nextJumpLook)
+        {
+            return false;
+        }
+
+        nextJumpLook = Time.time + 0.4f;
+        if (!FindJump(out Vector3 landing, out float over))
+        {
+            return false;
+        }
+
+        BeginJump(landing, over);
+        return true;
+    }
+
+    // Whether anything but the horse, its rider and the ground stands between two points.
+    private bool JumpBlocked(Vector3 from, Vector3 to, bool groundToo)
+    {
+        Vector3 line = to - from;
+        float length = line.magnitude;
+        if (length < 0.01f)
+        {
+            return false;
+        }
+
+        int count = Physics.RaycastNonAlloc(from, line / length, JumpHits, length, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            Collider hit = JumpHits[i].collider;
+            if (hit.transform.IsChildOf(transform) || hit.GetComponentInParent<Player>() != null || (!groundToo && hit is TerrainCollider))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    // Where a jump straight ahead lands, and how high it must clear. The landing is on the NavMesh, straight ahead (never
+    // snapped to the side, which looked like a teleport), not much higher or lower, out of deep water, and with nothing
+    // in the way along the arc; low things on the way (a log, a fence) are cleared, high ones refuse it.
     private bool FindJump(out Vector3 landing, out float over)
     {
         HorseSettings settings = HorseSettings.Current;
@@ -756,43 +870,45 @@ public sealed class HorseMotion : MonoBehaviour
         over = 0f;
         Vector3 at = transform.position;
         Vector3 ahead = transform.forward;
-        float look = Mathf.Clamp(pace * 0.3f, 1.6f, 3.2f);
-        bool blocked = false;
-        if (Physics.Raycast(at + Vector3.up * 0.45f, ahead, out RaycastHit low, look, ~0, QueryTriggerInteraction.Ignore)
-            && !low.collider.transform.IsChildOf(transform) && !(low.collider is TerrainCollider) && low.collider.GetComponentInParent<Combatant>() == null
-            && low.collider.GetComponentInParent<Player>() == null)
+        ahead.y = 0f;
+        ahead.Normalize();
+        float reach = Mathf.Clamp(pace * 0.55f + 1.5f, settings.JumpLength.x * 0.6f, settings.JumpLength.y);
+        // What it has to clear on the way: the highest thing standing along the line (the ground itself isn't).
+        if (Physics.Raycast(at + Vector3.up * 0.45f, ahead, out RaycastHit low, reach, ~0, QueryTriggerInteraction.Ignore)
+            && !low.collider.transform.IsChildOf(transform) && !(low.collider is TerrainCollider) && low.collider.GetComponentInParent<Player>() == null)
         {
             Vector3 above = low.point + ahead * 0.2f + Vector3.up * (settings.JumpHeight + 0.6f);
             over = Physics.Raycast(above, Vector3.down, out RaycastHit top, settings.JumpHeight + 1.2f, ~0, QueryTriggerInteraction.Ignore)
-                ? top.point.y - at.y : settings.JumpHeight;
-            if (over > settings.JumpHeight || Physics.Raycast(at + Vector3.up * (settings.JumpHeight + 0.5f), ahead, look + 1.5f, ~0, QueryTriggerInteraction.Ignore))
+                ? top.point.y - at.y : settings.JumpHeight + 1f;
+            if (over > settings.JumpHeight)
             {
                 return false;
             }
 
-            blocked = true;
-        }
-        else if (NavMesh.Raycast(at, at + ahead * look, out NavMeshHit _, NavMesh.AllAreas))
-        {
-            // The ground runs out ahead (a ditch, a stream): a low jump across.
-            blocked = true;
-            over = 0.2f;
+            reach = Mathf.Max(reach, low.distance + 2.2f);
         }
 
-        if (!blocked)
-        {
-            return false;
-        }
-
-        for (float distance = Mathf.Max(settings.JumpLength.x, look + 1.2f); distance <= settings.JumpLength.y; distance += 0.75f)
+        float clear = over + 0.6f + 0.9f;
+        for (float distance = reach; distance >= settings.JumpLength.x * 0.6f; distance -= 0.5f)
         {
             Vector3 target = at + ahead * distance;
-            if (NavMesh.SamplePosition(target, out NavMeshHit hit, 1f, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - at.y) < 1.6f
-                && WaterSurface.OpenAt(hit.position + Vector3.up, 2f, out _, 0.4f) == null)
+            if (!NavMesh.SamplePosition(target, out NavMeshHit hit, 0.8f, NavMesh.AllAreas))
             {
-                landing = hit.position;
-                return true;
+                continue;
             }
+
+            Vector3 flat = hit.position - target;
+            flat.y = 0f;
+            if (flat.magnitude > 0.35f || Mathf.Abs(hit.position.y - at.y) > 1.2f
+                || WaterSurface.OpenAt(hit.position + Vector3.up, 2f, out _, 0.4f) != null
+                || JumpBlocked(at + Vector3.up * clear, hit.position + Vector3.up * clear, true)
+                || JumpBlocked(hit.position + Vector3.up * clear, hit.position + Vector3.up * 0.3f, false))
+            {
+                continue;
+            }
+
+            landing = hit.position;
+            return true;
         }
 
         return false;
@@ -1484,6 +1600,23 @@ public sealed class HorseMotion : MonoBehaviour
         return gait;
     }
 
+    private static bool Playing(AnimatorStateInfo state, int[] states, float before)
+    {
+        return System.Array.IndexOf(states, state.shortNameHash) >= 0 && state.normalizedTime < before;
+    }
+
+    // In a rear, a buck or a strike that hasn't finished (or is just beginning).
+    private bool Rooted()
+    {
+        if (animator == null)
+        {
+            return false;
+        }
+
+        return Playing(animator.GetCurrentAnimatorStateInfo(0), RootedStates, 0.8f)
+            || animator.IsInTransition(0) && Playing(animator.GetNextAnimatorStateInfo(0), RootedStates, 0.8f);
+    }
+
     private void Animate(float speed)
     {
         Gait = swimming ? (speed > 0.3f ? 1 : 0) : GaitFor(speed, gaitSpeeds);
@@ -1495,6 +1628,12 @@ public sealed class HorseMotion : MonoBehaviour
         if (animator == null)
         {
             return;
+        }
+
+        // A shake of the head or a look round gives way at once when it moves off, rather than playing on as it goes.
+        if (speed > 0.25f && !animator.IsInTransition(0) && Playing(animator.GetCurrentAnimatorStateInfo(0), FidgetStates, 2f))
+        {
+            animator.CrossFadeInFixedTime(MoveState, 0.2f);
         }
 
         animator.SetBool(SwimmingId, swimming);

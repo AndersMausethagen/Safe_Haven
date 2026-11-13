@@ -71,7 +71,7 @@ public static class BuildIntroPart3
             answers = new List<string> { "The bow.", "The axe." },
             mustAnswer = true,
         };
-        var giveBow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 30) } };
+        var giveBow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 99) } };
         var giveAxe = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("WoodsmansAxe"), 1) } };
         var bowChosen = new RaiseQuestEventNode { questEvent = weaponChosen };
         var axeChosen = new RaiseQuestEventNode { questEvent = weaponChosen };

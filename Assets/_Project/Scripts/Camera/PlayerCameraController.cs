@@ -131,6 +131,9 @@ public sealed class PlayerCameraController : MonoBehaviour
     private bool closeUpNear;
     private float closeUpNearWeight;
     private readonly System.Collections.Generic.Dictionary<object, float> closeness = new System.Collections.Generic.Dictionary<object, float>();
+    private readonly System.Collections.Generic.Dictionary<object, Vector3> leads = new System.Collections.Generic.Dictionary<object, Vector3>();
+    private Vector3 leadNow;
+    private Vector3 leadVelocity;
     private float closenessNow = 1f;
     private float closenessVelocity;
     private readonly System.Collections.Generic.Dictionary<object, float> tilts = new System.Collections.Generic.Dictionary<object, float>();
@@ -174,6 +177,49 @@ public sealed class PlayerCameraController : MonoBehaviour
         {
             closeness[source] = Mathf.Clamp(scale, 0.3f, 1.5f);
         }
+    }
+
+    /// <summary>Leads the view ahead of the player while <paramref name="source"/> asks (a gallop: more of the way ahead in
+    /// view), by <paramref name="offset"/> on the ground, eased; zero lets it go. Several leads add up.</summary>
+    public void SetLead(object source, Vector3 offset)
+    {
+        if (source == null)
+        {
+            return;
+        }
+
+        offset.y = 0f;
+        if (offset.sqrMagnitude < 0.0001f)
+        {
+            leads.Remove(source);
+        }
+        else
+        {
+            leads[source] = Vector3.ClampMagnitude(offset, 6f);
+        }
+    }
+
+    private Vector3 WantedLead()
+    {
+        Vector3 total = Vector3.zero;
+        object gone = null;
+        foreach (var asked in leads)
+        {
+            if (asked.Key is Object thing && thing == null)
+            {
+                gone = asked.Key;
+                continue;
+            }
+
+            total += asked.Value;
+        }
+
+        if (gone != null)
+        {
+            leads.Remove(gone);
+        }
+
+        return total;
     }
 
     /// <summary>Brings the view down and in on the player and <paramref name="subject"/> together (a fish on the line): it
@@ -575,7 +621,9 @@ public sealed class PlayerCameraController : MonoBehaviour
 
         Vector3 shoulder = Quaternion.Euler(0f, yaw, 0f) * Vector3.right * settings.ActionShoulderOffset;
         Vector3 actionOffset = (shoulder + Vector3.up * settings.ActionLookHeight) * actionWeight;
-        focus.position = target.position + lookAheadOffset + actionOffset;
+        // Slow to lean out and to come back, so a gallop's lead doesn't jerk the view at each change of pace.
+        leadNow = Vector3.SmoothDamp(leadNow, WantedLead(), ref leadVelocity, 0.9f, Mathf.Infinity, Time.unscaledDeltaTime);
+        focus.position = target.position + lookAheadOffset + actionOffset + leadNow;
         // Glides from one speaker to the next rather than jumping when the speaker changes, and only leans a little way
         // towards someone far off, so a shout from across the meadow doesn't throw the view after them.
         if (dialogueTarget != null)

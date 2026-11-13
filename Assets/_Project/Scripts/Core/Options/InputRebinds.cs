@@ -48,6 +48,7 @@ public static class InputRebinds
         new RebindRow("Combat", "Light (lantern or torch)", "Player/ToggleTorch"),
         new RebindRow("Combat", "Whistle for Your Horse / Get Down", "Player/Whistle"),
         new RebindRow("Combat", "Horse: Rear and Strike", "Player/HorseKick"),
+        new RebindRow("Combat", "Horse: Canter (tap) / Gallop (hold)", "Player/HorseGallop"),
         new RebindRow("Combat", "Weapon Art / Next Arrow", "Player/CycleArrows"),
         new RebindRow("Combat", "Ability 1", "Player/Skill1"),
         new RebindRow("Combat", "Ability 2", "Player/Skill2"),

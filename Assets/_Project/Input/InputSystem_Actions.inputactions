@@ -307,6 +307,16 @@
                     "priority": 0
                 },
                 {
+                    "name": "HorseGallop",
+                    "type": "Button",
+                    "id": "b530149b-2c39-4b0a-9786-4ec6a8085548",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
                     "name": "Whistle",
                     "type": "Button",
                     "id": "b2c4915f-6b5b-40a0-a295-d2e75ce64c6f",
@@ -952,6 +962,28 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "HorseKick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e4850971-c9b4-44a8-9587-2857f34c49a6",
+                    "path": "<Keyboard>/leftShift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "HorseGallop",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "dd9370f4-189b-4cc5-a8fe-11664559ac73",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "HorseGallop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

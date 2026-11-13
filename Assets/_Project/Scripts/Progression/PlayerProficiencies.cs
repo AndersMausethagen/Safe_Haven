@@ -126,6 +126,11 @@ public sealed class PlayerProficiencies : MonoBehaviour
         }
     }
 
+    /// <summary>A sneak attack: the target is a monster that doesn't know the attacker is there. Always a critical, from a
+    /// blade or a bow (the user, 2026-11-13).</summary>
+    public static bool CaughtUnaware(IDamageable target) =>
+        target is Component body && body != null && body.TryGetComponent(out MonsterAI monster) && monster.IsUnaware;
+
     /// <summary>Extra damage from the attacker's Ambush Damage when the target is an unaware monster; 1 otherwise.</summary>
     public static float AmbushScale(StatSheet attacker, IDamageable target)
     {

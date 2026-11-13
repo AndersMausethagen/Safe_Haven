@@ -2007,7 +2007,7 @@ public static class BuildPrologueMeadow
         // ----- What the errands hand over -----
         var bow = Story(moments, "Story - Runa's Spare Bow");
         var hunt = new WhenQuest { quest = Existing("HuntForThePot"), when = WhenQuest.Moment.Starts };
-        var giveBow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 30) } };
+        var giveBow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 99) } };
         Link(bow, (hunt, 0, giveBow));
         // The boar are out on open grass, where the player can see them, for as long as the hunt is on.
         var huntOn = new WhenQuest { quest = Existing("HuntForThePot"), when = WhenQuest.Moment.Starts, once = false, alsoAfterLoading = true };
@@ -2078,7 +2078,7 @@ public static class BuildPrologueMeadow
         var giveAxeNow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("WoodsmansAxe"), 1) } };
         var giveSpear = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("Weapons/FireHardenedSpear"), 1) } };
         var giveClub = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("Weapons/KnottedClub"), 1) } };
-        var giveBowNow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 30) } };
+        var giveBowNow = new GiveItemsNode { equip = true, items = { new ItemAmount(Item("CrudeWoodenBow"), 1), new ItemAmount(Item("CrudeStoneArrow"), 99) } };
         Link(pick, (stop, 0, hasOne), (hasOne, 1, gather), (gather, 0, choice),
             (choice, 0, giveSword), (choice, 1, giveAxeNow), (choice, 2, giveSpear), (choice, 3, giveClub), (choice, 4, giveBowNow));
         (GiveItemsNode give, StorySpeaker who, string line)[] after =

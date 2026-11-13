@@ -330,4 +330,20 @@ public sealed class HorseTests
         Assert.AreEqual(4, keep.Stalls);
         Assert.IsNotNull(stable.Prefab.GetComponent<Interactable>(), "and has a menu");
     }
+
+    [Test]
+    public void TheHorseWindow_HasItsArt_AndEveryIconItsButtonsAskFor()
+    {
+        HorsePanelArt art = HorsePanelArt.Current;
+        Assert.IsNotNull(art, "Resources/HorsePanelArt: BuildHorses --entry BuildHorses.PanelArt");
+        Assert.IsNotNull(art.Corner);
+        Assert.IsNotNull(art.Card);
+        Assert.IsNotNull(art.CardRim);
+        Assert.AreNotEqual(Vector4.zero, art.Card.border, "the card is 9-sliced");
+        foreach (string icon in new[] { "Heart", "Bolt", "Weight", "Horseshoe", "Bond", "Info", "Stats", "Star", "Wheat", "Brush", "Gear",
+                     "HorseHead", "Lead", "Stable", "Saddle", "Hourglass", "Pencil", "Barding", "Bags", "Wheel", "Stay", "Graze" })
+        {
+            Assert.IsNotNull(art.Icon(icon), icon);
+        }
+    }
 }
