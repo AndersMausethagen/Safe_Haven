@@ -244,12 +244,20 @@ public sealed partial class RaidPreparationWindow
     {
         UIStyle style = UIStyle.Current;
         const float width = 168f;
-        RectTransform rect = At($"Destination {index}", panel, 0f, 44f, width, 46f);
-        rect.gameObject.AddComponent<Image>().color = Color.clear;
-        rect.gameObject.AddComponent<Button>().onClick.AddListener(() => Change(() => plan.PickDestination(index)));
-        TMP_Text label = Label("Label", rect, 0f, 0f, width, 44f, 20f, style.Muted, TextAlignmentOptions.Center);
-        RectTransform mark = At("Mark", rect, 0f, 44f, width, 2f);
-        mark.gameObject.AddComponent<Image>().color = style.Accent;
+        // Hearthline 3: a framed tab as everywhere else (KitTabs), a little see-through over the painting; the one shown in
+        // its bright rim.
+        RectTransform rect = At($"Destination {index}", panel, 0f, 48f, width - 8f, 40f);
+        Image fill = HearthKit.Sliced(rect.gameObject.AddComponent<Image>(), style.Card, 1.4f);
+        fill.color = HearthKit.Faded(style.Inset, 0.9f);
+        var button = rect.gameObject.AddComponent<Button>();
+        button.targetGraphic = fill;
+        HearthKit.Tint(button);
+        UIHighlight.On(rect.gameObject);
+        button.onClick.AddListener(() => Change(() => plan.PickDestination(index)));
+        HearthKit.Rim(rect, 0.3f, 1.4f);
+        TMP_Text label = Label("Label", rect, 0f, 0f, width - 8f, 40f, 19f, style.Text, TextAlignmentOptions.Center);
+        style.Title(label);
+        Image mark = HearthKit.Rim(rect, 1f, 1.4f);
         return new Tab { Rect = rect, Label = label, Mark = mark.gameObject };
     }
 

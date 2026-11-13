@@ -394,7 +394,8 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
             bool shown = i == plan.DestinationIndex;
             tab.Rect.anchoredPosition = new Vector2(Width - Margin - (count - i) * width, tab.Rect.anchoredPosition.y);
             tab.Label.text = raid.IsLocked ? $"{raid.DisplayName} <size=70%>locked</size>" : raid.DisplayName;
-            tab.Label.color = shown ? style.Text : style.Muted;
+            tab.Label.color = shown ? style.AccentBright : raid.IsLocked ? style.Inactive : style.Text;
+            tab.Label.fontStyle = shown ? FontStyles.Bold : FontStyles.Normal;
             tab.Mark.SetActive(shown);
         }
     }
