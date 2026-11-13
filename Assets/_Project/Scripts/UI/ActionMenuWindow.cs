@@ -158,7 +158,8 @@ public sealed class ActionMenuWindow : MonoBehaviour
         picture.gameObject.SetActive(page.Picture != null);
         // Keys named by their actions ({key:Interact}) become the keys bound now.
         titleLabel.text = GameInput.WithRebinds(page.Title);
-        bodyLabel.text = GameInput.WithRebinds(page.Body);
+        // Hearthline 3: its numbers stand out (HearthKit.ToneNumbers).
+        bodyLabel.text = HearthKit.ToneNumbers(GameInput.WithRebinds(page.Body));
         bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(page.Body));
         while (rows.Count < page.Actions.Count)
         {

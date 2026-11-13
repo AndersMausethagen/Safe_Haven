@@ -105,6 +105,55 @@ public static class HearthKit
         return $"<color=#{ColorUtility.ToHtmlStringRGBA(tint)}><sprite name=\"{name}\" tint=1></color>";
     }
 
+    // A number standing alone: 16, 2.5, 40%, x1.5 (or with the times sign), 3/8, 12:30; not inside a word.
+    private static readonly System.Text.RegularExpressions.Regex Numbers = new System.Text.RegularExpressions.Regex(
+        @"(?<![\p{L}\d#])(?:\u00d7|x)?\d+(?:[.,:]\d+)?(?:\s?/\s?\d+(?:[.,]\d+)?)?%?(?![\p{L}\d])",
+        System.Text.RegularExpressions.RegexOptions.Compiled);
+
+    /// <summary>
+    /// The numbers in a line made to stand out (Hearthline 3: "more colour on the important words and numbers"): each
+    /// lone number gold and bold. Text already coloured (a cost in red, a bonus in green) is left as it is, and so are
+    /// tags; safe to run twice.
+    /// </summary>
+    public static string ToneNumbers(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        string gold = ColorUtility.ToHtmlStringRGB(UIStyle.Current.AccentBright);
+        var result = new System.Text.StringBuilder(text.Length + 32);
+        int coloured = 0;
+        int i = 0;
+        while (i < text.Length)
+        {
+            if (text[i] == '<')
+            {
+                int end = text.IndexOf('>', i);
+                if (end < 0)
+                {
+                    result.Append(text, i, text.Length - i);
+                    break;
+                }
+
+                string tag = text.Substring(i, end - i + 1);
+                if (tag.StartsWith("<color", StringComparison.OrdinalIgnoreCase)) coloured++;
+                else if (tag.StartsWith("</color", StringComparison.OrdinalIgnoreCase)) coloured = Mathf.Max(0, coloured - 1);
+                result.Append(tag);
+                i = end + 1;
+                continue;
+            }
+
+            int next = text.IndexOf('<', i);
+            string plain = next < 0 ? text.Substring(i) : text.Substring(i, next - i);
+            result.Append(coloured > 0 ? plain : Numbers.Replace(plain, match => $"<color=#{gold}><b>{match.Value}</b></color>"));
+            i = next < 0 ? text.Length : next;
+        }
+
+        return result.ToString();
+    }
+
     /// <summary>Puts an icon before an existing label's text (a prefab window's heading), once.</summary>
     public static void DecorateHeading(TMP_Text label, string icon)
     {
@@ -192,7 +241,7 @@ public static class HearthKit
         foreach (TMP_Text label in root.GetComponentsInChildren<TMP_Text>(true))
         {
             string icon = IconForHeading(label.text);
-            if (icon != null && label.GetComponentInParent<Selectable>(true) == null)
+            if (icon != null && label.GetComponentInParent<Selectable>(true) == null && !label.name.EndsWith(SectionSuffix))
             {
                 DecorateHeading(label, icon);
             }
@@ -222,6 +271,8 @@ public static class HearthKit
         }
     }
 
+    private const string SectionSuffix = " Section";
+
     /// <summary>A section's heading: its icon, then its name in the title face, bold.</summary>
     public static TMP_Text Section(Transform parent, string text, string icon, float x, float y, float width = 400f)
     {
@@ -232,7 +283,8 @@ public static class HearthKit
             Icon(parent, icon, x, y + 3f, 24f);
         }
 
-        TMP_Text heading = CodeUI.Label(text + " Heading", parent, hasIcon ? x + 34f : x, y - 2f, width, 32f, 23f, style.Text);
+        // Named a section, so DecorateHeadings leaves it: its icon is beside it already.
+        TMP_Text heading = CodeUI.Label(text + SectionSuffix, parent, hasIcon ? x + 34f : x, y - 2f, width, 32f, 23f, style.Text);
         style.Title(heading);
         heading.fontStyle = FontStyles.Bold;
         heading.text = text;
@@ -289,8 +341,8 @@ public static class HearthKit
 
     private const string GroundName = "Hearthline Ground";
 
-    /// <summary>A window's ground under its contents: the faint tiled pattern and a vignette dark round the edges; once.
-    /// Behind everything on the panel, and outside its layout.</summary>
+    /// <summary>A window's ground under its contents: rugged brown leather, tiled (its own colours, over the panel colour),
+    /// and a vignette dark round the edges; once. Behind everything on the panel, and outside its layout.</summary>
     public static void Ground(RectTransform panel)
     {
         UIStyle style = UIStyle.Current;
@@ -305,8 +357,8 @@ public static class HearthKit
         var pattern = CodeUI.Stretch("Pattern", ground).gameObject.AddComponent<Image>();
         pattern.sprite = style.Pattern;
         pattern.type = Image.Type.Tiled;
-        pattern.pixelsPerUnitMultiplier = 1.4f;
-        pattern.color = Faded(style.Accent, 0.07f);
+        pattern.pixelsPerUnitMultiplier = 1f;
+        pattern.color = new Color(1f, 1f, 1f, style.PatternStrength);
         pattern.raycastTarget = false;
         if (style.Vignette != null)
         {

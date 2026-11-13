@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: f78e0f02237a1e543850a09fed58c7ca
+guid: 993c4811c3b4d3841961637329446e2d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3681542151070176677
-    second: Hearthline Pattern_0
+      213: -1815809479510076529
+    second: Hearthline Leather_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -102,13 +102,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hearthline Pattern_0
+      name: Hearthline Leather_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 256
-        height: 256
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -117,8 +117,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b5aa5d35be888ecc0800000000000000
-      internalID: -3681542151070176677
+      spriteID: f83d30226e2fcc6e0800000000000000
+      internalID: -1815809479510076529
       vertices: []
       indices: 
       edges: []

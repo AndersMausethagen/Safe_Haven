@@ -30,11 +30,11 @@ public static class HearthKitArtInstaller
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             string name = Path.GetFileNameWithoutExtension(path);
-            Sprite sprite = Import(path, name.StartsWith("Hearthline Card") ? 20f : name == "Hearthline Sheen" ? 24f : 0f, name == "Hearthline Pattern");
+            Sprite sprite = Import(path, name.StartsWith("Hearthline Card") ? 20f : name == "Hearthline Sheen" ? 24f : 0f, name == "Hearthline Leather");
             if (name == "Hearthline Scroll Corner") corner = sprite;
             else if (name == "Hearthline Card") card = sprite;
             else if (name == "Hearthline Card Rim") rim = sprite;
-            else if (name == "Hearthline Pattern") pattern = sprite;
+            else if (name == "Hearthline Leather") pattern = sprite;
             else if (name == "Hearthline Vignette") vignette = sprite;
             else if (name == "Hearthline Sheen") sheen = sprite;
             else if (sprite != null && !name.StartsWith("Hearthline")) icons.Add(sprite);

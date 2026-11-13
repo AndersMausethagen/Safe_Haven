@@ -99,8 +99,10 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Sprite cardRim;
     [Tooltip("White glyphs, tinted where they are used: Heart, Bolt, Weight, Star, Gear and the rest, by name.")]
     [SerializeField] private Sprite[] icons = System.Array.Empty<Sprite>();
-    [Tooltip("A window's ground, tiled faint under its contents.")]
+    [Tooltip("A window's ground, tiled under its contents: rugged brown leather, in its own colours.")]
     [SerializeField] private Sprite pattern;
+    [Tooltip("How much of the leather shows over the panel colour.")]
+    [SerializeField, Range(0f, 1f)] private float patternStrength = 0.85f;
     [Tooltip("Dark round a window's edges, clear in the middle.")]
     [SerializeField] private Sprite vignette;
     [Tooltip("A control's hover light (UIHighlight), 9-sliced.")]
@@ -145,6 +147,7 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Sprite CardRim => cardRim;
     public Material BarMaterial => barMaterial;
     public Sprite Pattern => pattern;
+    public float PatternStrength => patternStrength;
     public Sprite Vignette => vignette;
     public Sprite Sheen => sheen;
 

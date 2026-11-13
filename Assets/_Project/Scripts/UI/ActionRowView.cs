@@ -35,7 +35,7 @@ public sealed class ActionRowView : MonoBehaviour
         action = shown;
         label.text = GameInput.WithRebinds(shown.Label);
         label.color = shown.Enabled ? enabledText : disabledText;
-        detail.text = GameInput.WithRebinds(shown.Detail ?? "");
+        detail.text = HearthKit.ToneNumbers(GameInput.WithRebinds(shown.Detail ?? ""));
         detail.gameObject.SetActive(!string.IsNullOrEmpty(shown.Detail));
         button.interactable = shown.Enabled;
         Dress(shown);

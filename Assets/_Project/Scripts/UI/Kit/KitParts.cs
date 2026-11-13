@@ -41,7 +41,7 @@ public sealed class KitStatRow
     /// <summary>Shows <paramref name="shown"/>; the bar at <paramref name="fraction"/>, in <paramref name="low"/> under a quarter.</summary>
     public void Set(string shown, float fraction, Color colour, Color low)
     {
-        value.text = shown;
+        value.text = HearthKit.ToneNumbers(shown);
         if (hasBar)
         {
             KitBar.Set(fill, fillImage, fraction, fraction < 0.25f ? low : colour);
@@ -406,7 +406,7 @@ public sealed class KitFactRow
     public void Set(string name, string shown)
     {
         label.text = name;
-        value.text = shown;
+        value.text = HearthKit.ToneNumbers(shown);
     }
 }
 

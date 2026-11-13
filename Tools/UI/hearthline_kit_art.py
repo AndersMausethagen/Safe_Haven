@@ -3,7 +3,8 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 
 - Hearthline Scroll Corner: the window's gilded corner, scrollwork curling out of the corner along both edges, a leaf
   and a bead at its heart. Placed at the four corners, mirrored.
-- Hearthline Pattern (a window's tiled ground), Vignette (dark round the edges) and Sheen (a control's hover light).
+- Hearthline Leather (a window's tiled ground: rugged brown leather), Vignette (dark round the edges) and Sheen (a
+  control's hover light).
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
@@ -534,37 +535,80 @@ def eye():
     save(img, 'Eye', ICON)
 
 
-def pattern():
-    """A window's ground, tiled: a lattice of diamonds in thin double lines, a knot where they cross and a dot in each
-    diamond, over a fine grain. Seamless at 256 px; white, shown faint (UIRole)."""
-    import random
-    size = 256
-    img = Image.new('RGBA', (size * SS, size * SS), CLEAR)
-    d = ImageDraw.Draw(img)
-    step = size * SS // 4
-    w = int(1.2 * SS)
-    for k in range(-8, 9):
-        for off in (-3 * SS, 3 * SS):
-            d.line([(k * step + off, 0), (k * step + off + size * SS, size * SS)], fill=(255, 255, 255, 150), width=w)
-            d.line([(k * step + off, size * SS), (k * step + off + size * SS, 0)], fill=(255, 255, 255, 150), width=w)
-    for i in range(0, 5):
-        for j in range(0, 5):
-            cx, cy = i * step, j * step
-            r = 6 * SS
-            d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255, 190), width=int(1.5 * SS))
-            cx2, cy2 = cx + step // 2, cy + step // 2
-            r2 = 2.2 * SS
-            d.ellipse([cx2 - r2, cy2 - r2, cx2 + r2, cy2 + r2], fill=(255, 255, 255, 160))
-    img = img.resize((size, size), Image.LANCZOS)
-    rng = random.Random(7)
-    px = img.load()
-    for y in range(size):
-        for x in range(size):
-            r_, g_, b_, a_ = px[x, y]
-            grain = rng.randint(0, 38)
-            px[x, y] = (255, 255, 255, min(255, a_ + grain))
+def _periodic_noise(size, cutoff, rng):
+    """Smooth noise that tiles: white noise low-passed in the frequency domain (an FFT wraps), scaled to 0..1."""
+    import numpy as np
+    white = rng.standard_normal((size, size))
+    fx = np.fft.fftfreq(size)[:, None]
+    fy = np.fft.fftfreq(size)[None, :]
+    radius = np.sqrt(fx * fx + fy * fy)
+    field = np.real(np.fft.ifft2(np.fft.fft2(white) * np.exp(-(radius / cutoff) ** 2)))
+    field -= field.min()
+    return field / max(field.max(), 1e-9)
+
+
+def _pebbles(size, count, rng):
+    """One layer of leather pebbles that tiles (periodic Worley noise): how far into its pebble each pixel is (0 at the
+    middle, 1 at the edge) and how close it is to the valley between two."""
+    import numpy as np
+    from scipy.spatial import cKDTree
+    points = rng.uniform(0, size, (count, 2))
+    tree = cKDTree(points, boxsize=size)
+    ys, xs = np.mgrid[0:size, 0:size]
+    grid = np.stack([xs.ravel() + 0.5, ys.ravel() + 0.5], axis=1)
+    dist, _ = tree.query(grid, k=2)
+    d1 = dist[:, 0].reshape(size, size)
+    d2 = dist[:, 1].reshape(size, size)
+    inside = d1 / np.maximum(d1 + (d2 - d1) * 0.5, 1e-6)
+    return np.clip(inside, 0, 1)
+
+
+def leather():
+    """A window's ground, tiled: rugged brown leather (the user, 2026-11-13: "a rugged leather look. Brown, with somewhat
+    varied colours. Granular, but not too strong"; the earlier lattice "looked like an old great-grandmother's
+    kitchen"). A pebbled grain of soft rounded bumps of two sizes with soft valleys between (periodic Worley noise,
+    shaded as relief lit from above), a few pores, mottled browns from warm to olive with worn lighter patches, a few
+    faint folds, a fine grain over all. Seamless at 512 px; dark, so text reads on it."""
+    import numpy as np
+    size = 512
+    rng = np.random.default_rng(11)
+    # Relief: rounded bumps (high in the middle, low at the edges), two sizes so it isn't a regular mosaic.
+    small = 1 - _pebbles(size, 3600, rng) ** 2
+    large = 1 - _pebbles(size, 900, rng) ** 2
+    mix = _periodic_noise(size, 0.02, rng)
+    height = small * (0.55 + 0.25 * mix) + large * (0.45 - 0.25 * mix)
+    # Smoothed a touch, then lit from above: the upper side of each bump lighter, the lower darker.
+    height = 0.5 * height + 0.125 * (np.roll(height, 1, 0) + np.roll(height, -1, 0) + np.roll(height, 1, 1) + np.roll(height, -1, 1))
+    slope = np.roll(height, 1, axis=0) - np.roll(height, -1, axis=0)
+    relief = 0.16 * (height - 0.5) + 0.55 * slope
+    # A few pores: small dark pits here and there.
+    pores = (rng.random((size, size)) > 0.9975).astype(float)
+    pores = 0.5 * pores + 0.125 * (np.roll(pores, 1, 0) + np.roll(pores, -1, 0) + np.roll(pores, 1, 1) + np.roll(pores, -1, 1))
+    # Colour: mottled from dark to light brown, warm red-brown to olive, and worn lighter patches.
+    mottle = _periodic_noise(size, 0.012, rng)
+    patch = _periodic_noise(size, 0.03, rng)
+    hue = _periodic_noise(size, 0.008, rng)
+    wear = np.clip((_periodic_noise(size, 0.01, rng) - 0.62) * 3.5, 0, 1)
+    tone = np.clip(0.55 * mottle + 0.45 * patch + 0.25 * wear, 0, 1)
+    dark = np.array([22, 15, 10], float)
+    mid = np.array([46, 31, 20], float)
+    light = np.array([74, 51, 33], float)
+    t = tone[..., None]
+    colour = np.where(t < 0.5, dark + (mid - dark) * (t / 0.5), mid + (light - mid) * ((t - 0.5) / 0.5))
+    warm = np.array([1.07, 0.97, 0.88])
+    olive = np.array([0.94, 1.0, 0.93])
+    colour *= warm + (olive - warm) * hue[..., None]
+    # A few faint folds: soft darker lines where a slow field crosses its middle, only in places.
+    fold_field = _periodic_noise(size, 0.006, rng)
+    fold_mask = np.clip((_periodic_noise(size, 0.01, rng) - 0.55) * 4, 0, 1)
+    folds = np.exp(-((fold_field - 0.5) / 0.018) ** 2) * fold_mask
+    grain = rng.standard_normal((size, size)) * 0.02
+    light_factor = 1 + relief - 0.35 * pores - 0.16 * folds + grain
+    colour *= light_factor[..., None]
+    rgb = np.clip(colour, 0, 255).astype(np.uint8)
+    alpha = np.full((size, size, 1), 255, np.uint8)
     os.makedirs(OUT, exist_ok=True)
-    img.save(os.path.join(OUT, 'Hearthline Pattern.png'))
+    Image.fromarray(np.concatenate([rgb, alpha], axis=2), 'RGBA').save(os.path.join(OUT, 'Hearthline Leather.png'))
 
 
 def vignette():
@@ -617,7 +661,7 @@ def atlas():
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
-                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card, pattern, vignette, sheen):
+                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card, leather, vignette, sheen):
         make()
     atlas()
     print('kit art ->', os.path.abspath(OUT))
