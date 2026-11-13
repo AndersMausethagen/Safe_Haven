@@ -171,14 +171,6 @@ public sealed class SkillBarView : MonoBehaviour
 
     private void Update()
     {
-        // It gives way while a window is open: drawn over the HUD, it covered the foot of every window (the skill window
-        // has its own bar to arrange it in).
-        if (group != null && bound != null)
-        {
-            bool windowOpen = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-            group.alpha = Mathf.MoveTowards(group.alpha, windowOpen ? 0f : 1f, Time.unscaledDeltaTime * 8f);
-        }
-
         if (bound == null)
         {
             if (Player.Current != null)

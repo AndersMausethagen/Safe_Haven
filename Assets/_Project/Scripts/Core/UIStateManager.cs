@@ -103,6 +103,20 @@ public sealed class UIStateManager : MonoBehaviour
         return windows.TryGetValue(id, out UIWindow window) && window != null ? window.GetComponentInChildren<T>(true) : null;
     }
 
+    /// <summary>True when the only windows open are this one (a conversation alone: the HUD stays, HudGivesWay).</summary>
+    public bool OnlyOpen(UIWindowId id)
+    {
+        foreach (UIWindow window in openWindows)
+        {
+            if (window.Id != id)
+            {
+                return false;
+            }
+        }
+
+        return openWindows.Count > 0;
+    }
+
     public bool IsOpen(UIWindowId id)
     {
         foreach (UIWindow window in openWindows)
