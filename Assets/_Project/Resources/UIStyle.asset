@@ -92,4 +92,5 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 37bce4ba7c3bb6c449b422e8e8372594, type: 3}
   - {fileID: 21300000, guid: 7d117cde97eca6e4eb4bdfa3fa24697b, type: 3}
   - {fileID: 21300000, guid: 61f1341d63a89c8448963b919b96e7d8, type: 3}
+  barMaterial: {fileID: 2100000, guid: b352b21adc8de2946a0d8d3a66a1ec45, type: 2}
   windowFadeSeconds: 0.12

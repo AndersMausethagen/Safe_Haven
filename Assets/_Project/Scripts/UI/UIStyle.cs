@@ -99,6 +99,8 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Sprite cardRim;
     [Tooltip("White glyphs, tinted where they are used: Heart, Bolt, Weight, Star, Gear and the rest, by name.")]
     [SerializeField] private Sprite[] icons = System.Array.Empty<Sprite>();
+    [Tooltip("The bars' material (Safe Haven/UI Kit Bar): gradient, shine, glow. KitBarFill makes one of its own from it.")]
+    [SerializeField] private Material barMaterial;
 
     [Header("Motion")]
     [Tooltip("Seconds a window takes to fade in when it opens. 0: it appears at once. Closing is always immediate.")]
@@ -135,6 +137,7 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Sprite ScrollCorner => scrollCorner;
     public Sprite Card => card;
     public Sprite CardRim => cardRim;
+    public Material BarMaterial => barMaterial;
 
     /// <summary>The kit icon of this name (a white glyph), or null.</summary>
     public Sprite Icon(string name)

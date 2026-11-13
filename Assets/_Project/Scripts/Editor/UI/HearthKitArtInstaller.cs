@@ -49,11 +49,28 @@ public static class HearthKitArtInstaller
             list.GetArrayElementAtIndex(i).objectReferenceValue = sorted[i];
         }
 
+        values.FindProperty("barMaterial").objectReferenceValue = BarMaterial();
         values.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(style);
         AssetDatabase.SaveAssetIfDirty(style);
         string inline = InstallInline();
         return $"kit art: {sorted.Length} icons, corner {corner != null}, card {card != null}, rim {rim != null}; {inline}";
+    }
+
+    private const string BarMaterialPath = "Assets/_Project/Art/UI/Kit Bar.mat";
+
+    // The bars' material, on the bar shader; made once, its values kept after that.
+    private static Material BarMaterial()
+    {
+        var material = AssetDatabase.LoadAssetAtPath<Material>(BarMaterialPath);
+        Shader shader = Shader.Find("Safe Haven/UI Kit Bar");
+        if (material == null && shader != null)
+        {
+            material = new Material(shader) { name = "Kit Bar" };
+            AssetDatabase.CreateAsset(material, BarMaterialPath);
+        }
+
+        return material;
     }
 
     public const string InlineAsset = "Kit Icons";

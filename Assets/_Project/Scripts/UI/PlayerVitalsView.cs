@@ -93,6 +93,15 @@ public sealed class PlayerVitalsView : MonoBehaviour
             frameColor = staminaFrame.color;
         }
 
+        // Hearthline 3: the fills drawn as the kit's bars (gradient, shine, a glowing edge); this view still moves them.
+        foreach (Bar bar in new[] { health, stamina, focus, hunger, thirst })
+        {
+            if (bar.fill != null && bar.fill.TryGetComponent(out Image image))
+            {
+                KitBarFill.Look(image);
+            }
+        }
+
         BuildDodgeGlow();
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas != null)

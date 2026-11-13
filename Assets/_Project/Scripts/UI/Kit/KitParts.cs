@@ -63,11 +63,25 @@ public static class KitBar
         RectTransform fill = CodeUI.Stretch("Fill", track);
         fillImage = HearthKit.Sliced(fill.gameObject.AddComponent<Image>(), style.Card, corners);
         fillImage.raycastTarget = false;
+        // Hearthline 3: the fill glows, shines and glides (the bar shader), where the style has it.
+        if (style.BarMaterial != null)
+        {
+            KitBarFill.On(fillImage);
+        }
+
         return fill;
     }
 
+    /// <summary>Sets a bar: through its KitBarFill (gliding, pulsing, the bar shader) where it has one.</summary>
     public static void Set(RectTransform fill, Image fillImage, float fraction, Color colour)
     {
+        KitBarFill alive = fillImage.GetComponent<KitBarFill>();
+        if (alive != null)
+        {
+            alive.Show(fraction, colour);
+            return;
+        }
+
         fill.anchorMax = new Vector2(Mathf.Clamp01(fraction), 1f);
         fillImage.color = colour;
     }
