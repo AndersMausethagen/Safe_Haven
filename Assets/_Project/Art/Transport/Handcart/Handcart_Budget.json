@@ -1,0 +1,44 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Handcart A": {
+   "source": 18779,
+   "view": 3285,
+   "triangles": 3285,
+   "shape_limited": false,
+   "check": "(deviation 0.1%, silhouette 0.998)",
+   "holes_generated": 2,
+   "holes_filled": 0,
+   "holes": 2,
+   "largest_hole": 0.091,
+   "non_manifold_edges": 0,
+   "unwrap": "regions"
+  },
+  "Handcart A Wheel 1": {
+   "source": 5602,
+   "view": 543,
+   "triangles": 543,
+   "shape_limited": false,
+   "check": "(deviation 0.6%, silhouette 0.986)",
+   "holes_generated": 1,
+   "holes_filled": 0,
+   "holes": 1,
+   "largest_hole": 0.222,
+   "non_manifold_edges": 0,
+   "unwrap": "regions"
+  },
+  "Handcart A Wheel 2": {
+   "source": 5569,
+   "view": 544,
+   "triangles": 544,
+   "shape_limited": false,
+   "check": "(deviation 0.6%, silhouette 0.986)",
+   "holes_generated": 1,
+   "holes_filled": 0,
+   "holes": 1,
+   "largest_hole": 0.224,
+   "non_manifold_edges": 0,
+   "unwrap": "regions"
+  }
+ }
+}

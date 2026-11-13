@@ -1328,6 +1328,49 @@ public static class BuildPrologueMeadow
         return placed + $"; dirty {scene.isDirty}";
     }
 
+    /// <summary>
+    /// Only the abandoned handcart's look (`--entry BuildPrologueMeadow.CartLook`), after the Handcart prefab got its
+    /// generated look (BuildTransport.DressLooks): the cart in the scene is an unpacked copy, so its parts are swapped for
+    /// the prefab's in place, keeping the object the story points at. Moments builds it from the prefab anyway.
+    /// </summary>
+    public static string CartLook()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+        GameObject cart = Object.FindObjectsByType<Transform>(FindObjectsInactive.Include).First(t => t.name == "Abandoned Handcart").gameObject;
+        for (int i = cart.transform.childCount - 1; i >= 0; i--)
+        {
+            Object.DestroyImmediate(cart.transform.GetChild(i).gameObject);
+        }
+
+        var fresh = (GameObject)PrefabUtility.InstantiatePrefab(Load<GameObject>("Assets/_Project/Prefabs/Transport/Handcart.prefab"));
+        PrefabUtility.UnpackPrefabInstance(fresh, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+        Strip(fresh, true, part => part is MeshFilter || part is MeshRenderer || part is LODGroup);
+        LOD[] lods = fresh.TryGetComponent(out LODGroup group) ? group.GetLODs() : null;
+        while (fresh.transform.childCount > 0)
+        {
+            fresh.transform.GetChild(0).SetParent(cart.transform, false);
+        }
+
+        Object.DestroyImmediate(fresh);
+        if (lods != null)
+        {
+            LODGroup kept = cart.TryGetComponent(out LODGroup existing) ? existing : cart.AddComponent<LODGroup>();
+            kept.SetLODs(lods);
+            kept.fadeMode = LODFadeMode.None;
+            kept.RecalculateBounds();
+        }
+
+        Bounds bounds = new Bounds(cart.transform.position, Vector3.one);
+        foreach (Renderer renderer in cart.GetComponentsInChildren<Renderer>(true)) bounds.Encapsulate(renderer.bounds);
+        var box = cart.GetComponent<BoxCollider>();
+        box.center = cart.transform.InverseTransformPoint(bounds.center);
+        box.size = bounds.size * 0.8f;
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        return $"{cart.name}: {cart.GetComponentsInChildren<Renderer>(true).Length} renderers; dirty {scene.isDirty}";
+    }
+
     // The user (2026-11-13): unique things around the world, rune stones with blue glowing runes. LocalSpawn's props
     // (BuildWorldProps) along the party's walk, each well off the road and clear of the story's places.
     private static string WorldProps(Transform root)

@@ -1,0 +1,92 @@
+{
+  "_notes": [
+    "The carts' looks (the user, 2026-11-13: 'go ahead, start with the carts'): the Handcart and Wheelbarrow were built from Unity primitives by AgentScripts/BuildTransport.cs; these replace them, with the cargo that fills them (CargoPile).",
+    "Made like the world props: concept image, Hunyuan3D shape + UltraTex texture, Tools/Blender/ingest_generated.py (atlas, LODs, collider, height/moss masks), then BuildTransport.DressLooks in Unity.",
+    "wheels: the generated wheels are cut out of the model (ingest_generated.py, 'wheels'), each into its own look '<Asset> A Wheel N' centred on its hub, so Haulable can spin it; their hubs and radii go to <Asset>_Wheels.json for the prefab.",
+    "Run: D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_gathering.py --group transport [images|3d|ingest|all] [asset ...] (Unity closed for 3d).",
+    "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+  ],
+  "art": "Assets/_Project/Art/Transport",
+  "common": "Seen from the side and a little from the front and above, the whole object visible and centred, isolated on a plain light grey background. Empty, nothing in it or on it. Matte, softly lit, no glow, no fog.",
+  "assets": [
+    {
+      "asset": "Handcart",
+      "width": 3.1,
+      "texture_size": 2048,
+      "lod0_triangles": 9000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8121,
+          "prompt": "A Viking age wooden hand-pulled cart balanced on a single pair of big wheels, like a rickshaw: just two wheels in total, one on the left and one on the right, under the middle of the bed. An open rectangular bed of weathered pale oak planks with low plank sides, two long straight wooden shafts reaching forward from it, joined at their ends by a crossbar to pull it by, and resting at the front on one short upright wooden leg. The two wheels are big, with eight thick wooden spokes and dark iron tyres. Sturdy, worn, hand-made.",
+          "note": "'cart' alone drew a four-wheeled wagon at every seed (8101, 8111-8113); 'like a rickshaw' gave two. No leg was drawn: at rest it tips onto its shafts.",
+          "turn": 180
+        }
+      ],
+      "wheels": [
+        {
+          "hub": [
+            -0.79,
+            0.464,
+            0.5
+          ],
+          "radius": 0.51,
+          "width": 0.24
+        },
+        {
+          "hub": [
+            0.79,
+            0.464,
+            0.5
+          ],
+          "radius": 0.51,
+          "width": 0.24
+        }
+      ]
+    },
+    {
+      "asset": "Wheelbarrow",
+      "width": 1.6,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8214,
+          "prompt": "A classic Viking age wooden wheelbarrow seen from the side: one wheel at the front end, two long straight wooden handles running back from the tray to where a person holds them, and two short legs under the back of the tray. The wheel turns in the direction the handles point, held between the front ends of the two handle shafts on an iron pin. A narrow deep open tray of weathered pale oak planks with sloping sides sits on the shafts. The wheel has six wooden spokes and a dark iron tyre. Sturdy, worn, hand-made, iron nails and straps.",
+          "note": "Seed 8201 made a wheel turned sideways against the tray's front board (Hunyuan3D read the three-quarter wheel wrong); 8211-8213 put the wheel at the handles, two wheels, or on the side."
+        }
+      ]
+    },
+    {
+      "asset": "Cargo",
+      "width": 0.6,
+      "texture_size": 2048,
+      "lod0_triangles": 1500,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8301,
+          "prompt": "One full sack of coarse undyed hemp cloth lying on its side, plump with grain, its neck tied off with rough rope, soft folds and a patched corner. Only the sack, no ground under it."
+        },
+        {
+          "key": "B",
+          "seed": 8312,
+          "prompt": "One small closed wooden crate, a cube of rough pale planks with a flat plank lid nailed shut on top so nothing inside can be seen, dark iron bands across the corners. Only the crate, no ground under it."
+        },
+        {
+          "key": "C",
+          "seed": 8303,
+          "prompt": "One small standing wooden keg of dark oak staves with three dark iron hoops and a round wooden lid. Only the keg, no ground under it."
+        },
+        {
+          "key": "D",
+          "seed": 8304,
+          "prompt": "A bundle of four split birch firewood logs lying side by side, tied around the middle with rough rope, white bark on their round sides and pale split wood on the others. Only the bundle, no ground under it."
+        }
+      ]
+    }
+  ]
+}

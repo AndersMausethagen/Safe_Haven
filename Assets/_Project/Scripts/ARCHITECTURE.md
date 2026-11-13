@@ -1822,6 +1822,7 @@ Carts, barrows and boats (GDD §8.5). They are real rigidbodies; the rules read 
 - **Rivers:** `WaterSurface.CurrentAt` gives the flow at a point, and `Rowboat` takes its drag relative to that water, so a boat left alone drifts downstream.
 - **Hauling is work:** rowing, climbing and pulling an overfilled load cost stamina, and costs paid through `MaterialPool` can draw on the cargo of a transport standing near the player.
 - **Colliders are on Ignore Raycast** so a wheel's ground ray doesn't find its own cart; `Transport.GroundMask` also skips water.
+- **Looks (2026-11-13):** the Handcart and the cargo (sack, crate, keg, birch bundle) are LocalSpawn models (`Tools/LocalSpawn/transport_manifest.json`, `generate_gathering.py --group transport`). `ingest_generated.py` cuts each generated wheel out by the manifest's `wheels` into its own look centred on its hub, so it spins; `BuildTransport.DressLooks` (also run by `BuildCart`/`BuildBarrow`) puts the body under `Frame`, each wheel under its pivot's `Spin` at the model's hub, refits the colliders and handle from the `Look` table, and lays the load from the generated cargo (the Rowboat's too). The handcart has no leg: it rests tipped onto its shaft tips and rides level in the hands. The painted item icons stay. `BuildPrologueMeadow.CartLook` swaps the abandoned cart's look in place. The Wheelbarrow still wears primitives: the generators give a barrow two wheels or a sideways one.
 
 ## Ward breaches
 

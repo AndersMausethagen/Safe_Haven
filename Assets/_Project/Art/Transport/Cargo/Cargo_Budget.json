@@ -1,0 +1,57 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Cargo A": {
+   "source": 9992,
+   "view": 300,
+   "triangles": 546,
+   "shape_limited": true,
+   "check": "(deviation 1.4%, silhouette 0.965)",
+   "holes_generated": 0,
+   "holes_filled": 0,
+   "holes": 0,
+   "largest_hole": 0.0,
+   "non_manifold_edges": 3,
+   "unwrap": "regions"
+  },
+  "Cargo B": {
+   "source": 9787,
+   "view": 300,
+   "triangles": 405,
+   "shape_limited": true,
+   "check": "(deviation 1.1%, silhouette 0.983)",
+   "holes_generated": 2,
+   "holes_filled": 1,
+   "holes": 1,
+   "largest_hole": 0.056,
+   "non_manifold_edges": 1,
+   "unwrap": "regions"
+  },
+  "Cargo C": {
+   "source": 9988,
+   "view": 368,
+   "triangles": 368,
+   "shape_limited": false,
+   "check": "(deviation 0.9%, silhouette 0.987)",
+   "holes_generated": 0,
+   "holes_filled": 0,
+   "holes": 0,
+   "largest_hole": 0.0,
+   "non_manifold_edges": 0,
+   "unwrap": "regions"
+  },
+  "Cargo D": {
+   "source": 9976,
+   "view": 300,
+   "triangles": 994,
+   "shape_limited": true,
+   "check": "(deviation 1.1%, silhouette 0.977)",
+   "holes_generated": 0,
+   "holes_filled": 0,
+   "holes": 0,
+   "largest_hole": 0.0,
+   "non_manifold_edges": 2,
+   "unwrap": "regions"
+  }
+ }
+}

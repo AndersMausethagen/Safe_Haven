@@ -14,6 +14,12 @@ top (see the asset principles), so AgentScripts/BuildGatheringModels.cs takes th
 Writes Assets/_Project/Art/Gathering/<Asset>/ (<Asset>.fbx, _Albedo, _Normal, _ORM, _Height, _BlendMask and, with
 --glow, _Emission) and a preview render beside the GLBs.
 
+Wheeled things (the carts, transport_manifest.json): the manifest's "wheels" mark where each generated wheel is
+([{"hub": [x, y, z], "radius": r, "width": w}], the axle along x, in the look's own ground coordinates). Each is cut out
+of the generated mesh before anything else into its own look "<look> Wheel N", baked into the same atlas in place (so
+nothing of the body shades it: it turns), then centred on its hub, the hub found from the cut wheel itself, and put
+there: Unity reads the hub from the model's node and the radius from the mesh.
+
 Glowing things (moonsilver, deepstone, the Life Orbs) glow where their albedo is close to a colour or bright
 (--glow-json '{"mode": "hue"|"bright", "colour": [r,g,b], "tint": [r,g,b], "threshold": 0-1}'): the generated
 textures carry no emission, so it is made from the albedo after the bake.
@@ -251,6 +257,54 @@ def import_look(path, key, turn, coll):
     for poly in obj.data.polygons:
         poly.use_smooth = True
     return obj
+
+
+WHEELS = manifest_value("wheels") or []
+HUBS = {}  # wheel look -> its hub, found from the cut wheel
+
+
+def cut_wheels(obj):
+    """obj and, for each of the manifest's wheels, the faces inside its drum (radius, width about the hub, the axle
+    along x) cut away into their own object '<obj> Wheel N'. A face goes by its centre; the cut is where the hub meets
+    the axle, inside the wheel, where neither part shows it."""
+    parts = [obj]
+    for k, wheel in enumerate(WHEELS):
+        hub, radius, width = Vector(wheel["hub"]), wheel["radius"], wheel["width"]
+
+        def inside(c):
+            return abs(c.x - hub.x) <= width / 2 and math.hypot(c.y - hub.y, c.z - hub.z) <= radius
+
+        part = obj.copy()
+        part.data = obj.data.copy()
+        part.name = part.data.name = f"{obj.name} Wheel {k + 1}"
+        for c in obj.users_collection:
+            c.objects.link(part)
+        for target, keep in ((part, True), (obj, False)):
+            bm = bmesh.new()
+            bm.from_mesh(target.data)
+            bmesh.ops.delete(bm, geom=[f for f in bm.faces if inside(f.calc_center_median()) != keep], context='FACES')
+            bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+            bm.to_mesh(target.data)
+            bm.free()
+        co = numpy.empty(len(part.data.vertices) * 3, dtype=numpy.float32)
+        part.data.vertices.foreach_get("co", co)
+        co = co.reshape(-1, 3)
+        lo, hi = co.min(axis=0), co.max(axis=0)
+        # The tyre is round: the middle of its extent is the hub, half its height the radius the game rolls on.
+        HUBS[part.name] = Vector(((lo + hi) / 2).tolist())
+        print("WHEEL", part.name, "hub", tuple(round(v, 3) for v in HUBS[part.name]), "radius", round(float(hi[2] - lo[2]) / 2, 3),
+              "across", round(float(hi[1] - lo[1]) / 2, 3), "width", round(float(hi[0] - lo[0]), 3), len(part.data.polygons), "faces")
+        parts.append(part)
+    return parts
+
+
+def onto_hubs(variants):
+    """After the bake: each wheel's mesh centred on its hub and the object put there, so it spins about its own axle."""
+    for obj in variants:
+        hub = HUBS.get(obj.name)
+        if hub is not None:
+            obj.data.transform(Matrix.Translation(-hub))
+            obj.location = hub
 
 
 def set_roughness(tree, bsdf, metal_out):
@@ -560,6 +614,7 @@ def main():
 
     def builder(c, from_high=True):
         highs = [import_look(path, chr(65 + k), TURNS[k] if k < len(TURNS) else 0.0, c) for k, path in enumerate(GLBS)]
+        highs = [part for high in highs for part in cut_wheels(high)]
         lows = [budget(high) for high in highs]
         if from_high:
             return lows, highs
@@ -567,7 +622,8 @@ def main():
             bpy.data.objects.remove(high)
         return lows
 
-    looks = make_asset(NAME, builder, TEXTURE_SIZE, coll, cavity_distance=0.15, collider=True, lods=(0.35, 0.1), unwrap='regions')
+    looks = make_asset(NAME, builder, TEXTURE_SIZE, coll, cavity_distance=0.15, collider=True, lods=(0.35, 0.1), unwrap='regions',
+                       after_bake=onto_hubs)
     if albedo_is_black():
         # Thin double-sided shells (the mushroom patch's caps) send the high-to-low rays nowhere: every colour bake came
         # out black. The decimated copy keeps the generated texture coordinates, so it bakes from its own material.
@@ -575,7 +631,7 @@ def main():
         bpy.ops.wm.read_factory_settings(use_empty=True)
         coll = collection(NAME)
         looks = make_asset(NAME, lambda c: builder(c, from_high=False), TEXTURE_SIZE, coll, cavity_distance=0.15, collider=True,
-                           lods=(0.35, 0.1), unwrap='regions')
+                           lods=(0.35, 0.1), unwrap='regions', after_bake=onto_hubs)
     save_budgets()
     if GLOW:
         emission_from_albedo(GLOW)

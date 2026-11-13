@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -243,6 +244,7 @@ public static class BuildTransport
         Transform handle = Empty("Handle", root.transform, new Vector3(0f, 0.4f, -1f));
         Haulable(root, handle, new[] { wheel }, 0.25f, true, new Vector3(0f, 0.42f, 0.12f), 0.74f, 0.42f);
         Pile(root, new Vector3(0f, 0.5f, 0.1f), new Vector3(0.42f, 0.13f, 0.68f), 0.62f, 5, 3);
+        Dress(root, BarrowLook);
         return Save(root, definition, 2.2f, new Vector3(0f, 0.5f, 0f), new Vector3(1f, 1f, 2.2f));
     }
 
@@ -269,7 +271,328 @@ public static class BuildTransport
         Transform handle = Empty("Handle", root.transform, new Vector3(0f, 0.58f, 1.85f));
         Haulable(root, handle, new[] { left, right }, 0.43f, false, new Vector3(0f, 0.5f, -0.15f), 0.76f, 0.5f);
         Pile(root, new Vector3(0f, 0.7f, -0.3f), new Vector3(0.9f, 0.17f, 1.5f), 1f, 10, 5);
+        Dress(root, CartLook);
         return Save(root, definition, 2.6f, new Vector3(0f, 0.7f, 0f), new Vector3(1.6f, 1.2f, 3.2f));
+    }
+
+    // ----- The generated looks -----
+
+    // The carts' looks made by LocalSpawn (Tools/LocalSpawn/transport_manifest.json, `generate_gathering.py --group
+    // transport all`): Tools/Blender/ingest_generated.py bakes each into Art/Transport/<Asset>/<Asset>.fbx with its body
+    // ("<Asset> A", LOD1, LOD2) and its wheels cut out of the generated model ("<Asset> A Wheel N", each centred on its
+    // hub, the node standing on it). A transport with a look keeps its physics parts (wheel pivots, handle, solids, the
+    // load) and wears the look: the body under Frame, each wheel under its pivot's Spin, the pivot on the model's hub, its
+    // collider the model's radius. Until the look is baked the primitives stay.
+    private const string Looks = "Assets/_Project/Art/Transport/";
+    private const string CargoModel = Looks + "Cargo/Cargo.fbx";
+    private const string FieldStone = "Assets/_Project/Models/PolyHaven/stone_01/stone_01.fbx";
+
+    private sealed class Look
+    {
+        public string Asset;
+        // The prefab's wheel pivots, from left (-x) to right.
+        public string[] Wheels;
+        public Vector3 Handle;
+        public Vector3 CentreOfMass;
+        // What it stands on and what the player bumps into besides the wheels: (name, centre, size).
+        public (string Name, Vector3 Centre, Vector3 Size)[] Solids;
+        // The load (Pile): the bed's floor, its inside, the rim's height.
+        public Vector3 LoadFloor, LoadSize;
+        public float Rim;
+        public int Full, Heap;
+    }
+
+    // Measured on the look: the bed z -1.2..0.45, 1.4 wide, rim 1.27; the shafts reach z 1.55 at 0.68; the hubs at
+    // z -0.46. No leg was generated: its weight a little ahead of the axle, it rests tipped onto its shaft tips (Prop)
+    // and comes level in the hands.
+    private static readonly Look CartLook = new Look
+    {
+        Asset = "Handcart",
+        Wheels = new[] { "Wheel Left", "Wheel Right" },
+        Handle = new Vector3(0f, 0.68f, 1.5f),
+        CentreOfMass = new Vector3(0f, 0.7f, -0.2f),
+        Solids = new[]
+        {
+            ("Bed", new Vector3(0f, 0.95f, -0.38f), new Vector3(1.4f, 0.66f, 1.66f)),
+            ("Prop", new Vector3(0f, 0.68f, 1.48f), new Vector3(1.1f, 0.1f, 0.14f)),
+        },
+        LoadFloor = new Vector3(0f, 0.8f, -0.38f), LoadSize = new Vector3(1.1f, 0.17f, 1.4f), Rim = 1.25f, Full = 10, Heap = 5,
+    };
+
+    private static readonly Look BarrowLook = new Look
+    {
+        Asset = "Wheelbarrow",
+        Wheels = new[] { "Wheel" },
+        Handle = new Vector3(0f, 0.4f, -1f),
+        CentreOfMass = new Vector3(0f, 0.42f, 0.12f),
+        Solids = new[]
+        {
+            ("Leg", new Vector3(-0.24f, 0.2f, -0.45f), new Vector3(0.08f, 0.4f, 0.08f)),
+            ("Leg", new Vector3(0.24f, 0.2f, -0.45f), new Vector3(0.08f, 0.4f, 0.08f)),
+            ("Tray", new Vector3(0f, 0.53f, 0.1f), new Vector3(0.66f, 0.26f, 0.94f)),
+        },
+        LoadFloor = new Vector3(0f, 0.5f, 0.1f), LoadSize = new Vector3(0.42f, 0.13f, 0.68f), Rim = 0.62f, Full = 5, Heap = 3,
+    };
+
+    /// <summary>
+    /// Puts the generated looks on the Handcart and Wheelbarrow prefabs, and the generated cargo in the Rowboat, and nothing
+    /// else (`--entry BuildTransport.DressLooks`). The icons are painted (item_icons.json) and stay. Safe to rerun.
+    /// </summary>
+    public static string DressLooks()
+    {
+        slick = Slick();
+        var report = new List<string>();
+        foreach (Look look in new[] { CartLook, BarrowLook })
+        {
+            string path = Prefabs + look.Asset + ".prefab";
+            GameObject root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                report.Add(Dress(root, look));
+                foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+                {
+                    child.gameObject.layer = IgnoreRaycast;
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(root, path);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
+            }
+        }
+
+        GameObject boat = PrefabUtility.LoadPrefabContents(Prefabs + "Rowboat.prefab");
+        try
+        {
+            BoatPile(boat);
+            foreach (Transform child in boat.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = IgnoreRaycast;
+            PrefabUtility.SaveAsPrefabAsset(boat, Prefabs + "Rowboat.prefab");
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(boat);
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join("; ", report);
+    }
+
+    // The look on a transport being built (BuildCart, BuildBarrow) or loaded (DressLooks). False-y report: not baked yet.
+    private static string Dress(GameObject root, Look look)
+    {
+        string fbx = Looks + look.Asset + "/" + look.Asset + ".fbx";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(fbx) == null)
+        {
+            return $"{look.Asset}: no look baked yet, primitives kept";
+        }
+
+        Material material = LookMaterial(look.Asset);
+        GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(fbx);
+        Mesh[] body = Levels(fbx, look.Asset + " A");
+        var lods = new List<Renderer>[body.Length];
+        for (int i = 0; i < lods.Length; i++) lods[i] = new List<Renderer>();
+
+        Transform frame = root.transform.Find("Frame");
+        Clear(frame);
+        for (int i = 0; i < body.Length; i++)
+        {
+            lods[i].Add(Part(frame, $"LOD{i}", body[i], material, i < body.Length - 1));
+        }
+
+        // The wheels, left to right, each pivot on its hub.
+        var wheels = new List<(Transform Node, Mesh[] Levels)>();
+        for (int k = 1; ; k++)
+        {
+            string name = $"{look.Asset} A Wheel {k}";
+            Transform node = model.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name);
+            if (node == null) break;
+            wheels.Add((node, Levels(fbx, name)));
+        }
+
+        wheels.Sort((a, b) => Hub(model, a.Node).x.CompareTo(Hub(model, b.Node).x));
+        if (wheels.Count != look.Wheels.Length)
+        {
+            throw new Exception($"{look.Asset}: the model has {wheels.Count} wheels, the prefab {look.Wheels.Length}");
+        }
+
+        float radius = 0f;
+        for (int k = 0; k < wheels.Count; k++)
+        {
+            Transform pivot = root.transform.Find(look.Wheels[k]);
+            pivot.localPosition = Hub(model, wheels[k].Node);
+            pivot.localRotation = Quaternion.identity;
+            Mesh mesh = wheels[k].Levels[0];
+            float r = Mathf.Max(mesh.bounds.extents.y, mesh.bounds.extents.z);
+            radius += r / wheels.Count;
+            var collider = pivot.GetComponent<SphereCollider>();
+            collider.center = Vector3.zero;
+            collider.radius = r;
+            collider.sharedMaterial = slick;
+            Transform spin = pivot.Find("Spin");
+            Clear(spin);
+            for (int i = 0; i < wheels[k].Levels.Length && i < lods.Length; i++)
+            {
+                lods[i].Add(Part(spin, $"LOD{i}", wheels[k].Levels[i], material, i < lods.Length - 1));
+            }
+        }
+
+        LODGroup group = root.TryGetComponent(out LODGroup found) ? found : root.AddComponent<LODGroup>();
+        float[] heights = ScreenBudget.LodHeights(body[0].bounds, body.Select(Triangles).ToArray());
+        group.SetLODs(lods.Select((renderers, i) => new LOD(heights[Mathf.Min(i, heights.Length - 1)], renderers.ToArray())).ToArray());
+        group.fadeMode = LODFadeMode.None;
+        group.RecalculateBounds();
+
+        // Its solids and the handle, measured on the look.
+        foreach (BoxCollider box in root.GetComponentsInChildren<BoxCollider>(true).Where(box => box.transform != root.transform))
+        {
+            Object.DestroyImmediate(box.gameObject);
+        }
+
+        foreach ((string name, Vector3 centre, Vector3 size) in look.Solids)
+        {
+            Solid(root.transform, name, centre, size, false);
+        }
+
+        root.transform.Find("Handle").localPosition = look.Handle;
+        var haul = new SerializedObject(root.GetComponent<Haulable>());
+        haul.FindProperty("wheelRadius").floatValue = radius;
+        haul.FindProperty("centreOfMass").vector3Value = look.CentreOfMass;
+        haul.ApplyModifiedPropertiesWithoutUndo();
+        Pile(root, look.LoadFloor, look.LoadSize, look.Rim, look.Full, look.Heap);
+        return $"{look.Asset}: {string.Join("/", body.Select(Triangles))} body triangles, {wheels.Count} wheels r {radius:0.00} at " +
+               string.Join(" ", wheels.Select(w => Hub(model, w.Node).ToString("F2"))) + $", body {body[0].bounds.center:F2} {body[0].bounds.size:F2}";
+    }
+
+    // Where a node of the model stands, in the model's space (the hub of a wheel).
+    private static Vector3 Hub(GameObject model, Transform node) => model.transform.InverseTransformPoint(node.position);
+
+    private static void Clear(Transform parent)
+    {
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Object.DestroyImmediate(parent.GetChild(i).gameObject);
+        }
+    }
+
+    private static Renderer Part(Transform parent, string name, Mesh mesh, Material material, bool shadows)
+    {
+        var part = new GameObject(name);
+        part.transform.SetParent(parent, false);
+        part.layer = IgnoreRaycast;
+        part.AddComponent<MeshFilter>().sharedMesh = mesh;
+        var renderer = part.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = shadows ? UnityEngine.Rendering.ShadowCastingMode.On : UnityEngine.Rendering.ShadowCastingMode.Off;
+        return renderer;
+    }
+
+    private static Mesh[] Levels(string fbx, string look)
+    {
+        Mesh[] meshes = AssetDatabase.LoadAllAssetsAtPath(fbx).OfType<Mesh>().ToArray();
+        return new[] { look, look + " LOD1", look + " LOD2" }
+            .Select(name => meshes.FirstOrDefault(mesh => mesh.name == name))
+            .Where(mesh => mesh != null).ToArray();
+    }
+
+    private static int Triangles(Mesh mesh)
+    {
+        long indices = 0;
+        for (int i = 0; i < mesh.subMeshCount; i++) indices += mesh.GetIndexCount(i);
+        return (int)(indices / 3);
+    }
+
+    // Layered Lit with every baked map, like the world props (BuildWorldProps): parallax, moss from the baked coverage,
+    // snow and rain. One per look, beside its FBX.
+    private static Material LookMaterial(string asset)
+    {
+        string prefix = Looks + asset + "/" + asset;
+        if (AssetDatabase.LoadAssetAtPath<Material>(prefix + ".mat") is Material done && done.GetTexture("_BaseMap") != null && importedLooks.Contains(asset))
+        {
+            return done;
+        }
+
+        LookTexture(prefix + "_Albedo.png", TextureImporterType.Default, true, 2048);
+        LookTexture(prefix + "_Normal.png", TextureImporterType.NormalMap, false, 2048);
+        LookTexture(prefix + "_ORM.png", TextureImporterType.Default, false, 1024);
+        LookTexture(prefix + "_Height.png", TextureImporterType.Default, false, 1024);
+        LookTexture(prefix + "_BlendMask.png", TextureImporterType.Default, false, 1024);
+        var model = (ModelImporter)AssetImporter.GetAtPath(prefix + ".fbx");
+        model.materialImportMode = ModelImporterMaterialImportMode.None;
+        model.importAnimation = false;
+        model.animationType = ModelImporterAnimationType.None;
+        model.importCameras = false;
+        model.importLights = false;
+        model.isReadable = false;
+        model.SaveAndReimport();
+
+        Material scan = AssetDatabase.LoadAllAssetsAtPath(FieldStone).OfType<Material>().First();
+        var material = AssetDatabase.LoadAssetAtPath<Material>(prefix + ".mat");
+        if (material == null)
+        {
+            material = new Material(scan);
+            AssetDatabase.CreateAsset(material, prefix + ".mat");
+        }
+        else
+        {
+            material.shader = scan.shader;
+            material.CopyPropertiesFromMaterial(scan);
+        }
+
+        material.name = asset;
+        material.SetTextureScale("_BaseMap", Vector2.one);
+        material.SetTextureOffset("_BaseMap", Vector2.zero);
+        material.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_Albedo.png"));
+        material.SetColor("_BaseColor", Color.white);
+        material.SetTexture("_BumpMap", AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_Normal.png"));
+        material.SetFloat("_BumpScale", 1f);
+        material.SetTexture("_ORMMap", AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_ORM.png"));
+        material.EnableKeyword("_ORMMAP");
+        material.SetFloat("_Roughness", 1f);
+        material.SetFloat("_Metallic", 1f); // the ORM's blue is the metallic itself
+        material.SetFloat("_OcclusionStrength", 1f);
+        material.SetFloat("_L2Amount", 0f);
+        var height = AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_Height.png");
+        material.SetTexture("_ParallaxMap", height);
+        material.SetFloat("_Parallax", height != null ? 0.006f : 0f);
+        if (height != null) material.EnableKeyword("_PARALLAXMAP");
+        else material.DisableKeyword("_PARALLAXMAP");
+        // A little moss in the cracks of old wood; a cart is used, not left to grow over.
+        var mask = AssetDatabase.LoadAssetAtPath<Texture2D>(prefix + "_BlendMask.png");
+        material.SetTexture("_BlendMask", mask);
+        material.SetFloat("_L1Amount", 0.08f);
+        material.SetFloat("_L1Source", mask != null ? 3f : 4f);
+        material.SetFloat("_L1Upward", 0.3f);
+        material.SetFloat("_L1Patchiness", 0.5f);
+        material.SetFloat("_L1PatchScale", 3f);
+        material.SetFloat("_SeasonSnow", 1f);
+        material.EnableKeyword("_SEASON_SNOW");
+        material.SetTexture("_EmissionMap", null);
+        material.SetColor("_EmissionColor", Color.black);
+        material.DisableKeyword("_EMISSION");
+        material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+        importedLooks.Add(asset);
+        return material;
+    }
+
+    // Looks whose import settings were set this run (the cargo's is used by three prefabs).
+    private static readonly HashSet<string> importedLooks = new HashSet<string>();
+
+    private static void LookTexture(string path, TextureImporterType type, bool colour, int size)
+    {
+        if (!(AssetImporter.GetAtPath(path) is TextureImporter importer))
+        {
+            return;
+        }
+
+        importer.textureType = type;
+        importer.sRGBTexture = colour;
+        importer.maxTextureSize = size;
+        importer.mipmapEnabled = true;
+        importer.streamingMipmaps = true;
+        importer.SaveAndReimport();
     }
 
     private static GameObject BuildBoat(TransportDefinition definition)
@@ -314,7 +637,7 @@ public static class BuildTransport
         body.mass = definition.EmptyMass;
         root.AddComponent<Interactable>();
         root.AddComponent<Transport>();
-        Pile(root, new Vector3(0f, -0.08f, -0.68f), new Vector3(0.62f, 0.13f, 0.62f), 0.3f, 6, 3);
+        BoatPile(root);
         var rowboat = root.AddComponent<Rowboat>();
         var so = new SerializedObject(rowboat);
         SetList(so.FindProperty("floats"), floats.ToArray());
@@ -332,8 +655,16 @@ public static class BuildTransport
     }
 
     // Sacks, crates and logs, bottom layer first; the last ones are the heap over the rim. Seeded, so a rebuild changes nothing.
+    private static void BoatPile(GameObject root) => Pile(root, new Vector3(0f, -0.08f, -0.68f), new Vector3(0.62f, 0.13f, 0.62f), 0.3f, 6, 3);
+
     private static void Pile(GameObject root, Vector3 floor, Vector3 size, float rim, int full, int heap)
     {
+        Transform old = root.transform.Find("Load");
+        if (old != null)
+        {
+            Object.DestroyImmediate(old.gameObject);
+        }
+
         Transform load = Empty("Load", root.transform, Vector3.zero);
         var random = new System.Random(root.name.GetHashCode() == 0 ? 7 : root.name.Length * 31 + 7);
         float Spread(double span) => (float)((random.NextDouble() - 0.5) * span);
@@ -350,14 +681,35 @@ public static class BuildTransport
             pieces.Add(Cargo(load, i, at, size.y * 2f, Spread(60.0)));
         }
 
-        var so = new SerializedObject(root.AddComponent<CargoPile>());
+        var so = new SerializedObject(root.TryGetComponent(out CargoPile existing) ? existing : root.AddComponent<CargoPile>());
         SetList(so.FindProperty("pieces"), pieces.ToArray());
         so.FindProperty("fullPieces").intValue = full;
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // The generated cargo (Art/Transport/Cargo: a sack, a crate, a keg, a bundle of birch logs), each as wide as the
+    // primitive it replaces, standing on the layer's floor (their pivots are underneath; a primitive's is its middle).
+    private static readonly float[] CargoWidths = { 1.5f, 1.05f, 0.95f, 1.35f };
+
     private static Transform Cargo(Transform parent, int index, Vector3 at, float size, float turn)
     {
+        Mesh[] cargo = AssetDatabase.LoadAssetAtPath<GameObject>(CargoModel) == null ? null
+            : "ABCD".Select(key => Levels(CargoModel, "Cargo " + key).FirstOrDefault()).ToArray();
+        if (cargo != null && cargo.All(mesh => mesh != null))
+        {
+            int kind = index % cargo.Length;
+            Mesh mesh = cargo[kind];
+            Vector3 extent = mesh.bounds.size;
+            float scale = size * CargoWidths[kind] / Mathf.Max(extent.x, extent.z);
+            var piece = new GameObject($"Cargo {index + 1}");
+            piece.transform.SetParent(parent, false);
+            piece.transform.localPosition = at - Vector3.up * (extent.y * scale * 0.5f);
+            piece.transform.localRotation = Quaternion.Euler(0f, turn + (kind == 3 ? 90f : 0f), 0f);
+            piece.transform.localScale = Vector3.one * scale;
+            Part(piece.transform, "Look", mesh, LookMaterial("Cargo"), true);
+            return piece.transform;
+        }
+
         switch (index % 3)
         {
             case 0:

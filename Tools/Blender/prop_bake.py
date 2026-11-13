@@ -953,14 +953,16 @@ def export(objects, name):
 
 
 def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05, masks=True, lods=(0.5, 0.22),
-               lod_mode='decimate', collider=False, alpha=False, solid_region=(0.0, 0.0, 1.0, 1.0), unwrap='smart'):
+               lod_mode='decimate', collider=False, alpha=False, solid_region=(0.0, 0.0, 1.0, 1.0), unwrap='smart',
+               after_bake=None):
     """Build an asset's variants, bake them into one atlas and export them, each with its levels of detail
     ("<variant> LOD1", "LOD2", at the ratios in lods) and, with collider, a convex "<variant> Collider".
 
     builder(coll) returns the variants (lows), or (lows, highs) to bake sculpted highs onto them, or a dict with
     "lows", "highs", "cards" (one card object per variant, already UV'd onto the sprite sheet, joined to its variant
     after the bake) and "sheet" (the flat sprite sheet baked with the lows, then dropped). solid_region is where the
-    lows' own islands go, so the sheet can have the rest."""
+    lows' own islands go, so the sheet can have the rest. after_bake(variants) runs on the baked variants before their
+    levels of detail are made (a cart's wheels are moved onto their hubs there)."""
     built = builder(coll)
     if isinstance(built, dict):
         lows, highs = built["lows"], built.get("highs", [])
@@ -994,6 +996,8 @@ def make_asset(name, builder, size, coll, glow=False, cavity_distance=0.05, mask
         variants.append(low)
     material = baked_material(name, images)
     finish(variants, material)
+    if after_bake:
+        after_bake(variants)
     exported = []
     rng = random.Random(7)
     for variant in variants:
