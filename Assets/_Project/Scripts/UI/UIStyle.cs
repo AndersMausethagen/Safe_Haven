@@ -99,6 +99,12 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Sprite cardRim;
     [Tooltip("White glyphs, tinted where they are used: Heart, Bolt, Weight, Star, Gear and the rest, by name.")]
     [SerializeField] private Sprite[] icons = System.Array.Empty<Sprite>();
+    [Tooltip("A window's ground, tiled faint under its contents.")]
+    [SerializeField] private Sprite pattern;
+    [Tooltip("Dark round a window's edges, clear in the middle.")]
+    [SerializeField] private Sprite vignette;
+    [Tooltip("A control's hover light (UIHighlight), 9-sliced.")]
+    [SerializeField] private Sprite sheen;
     [Tooltip("The bars' material (Safe Haven/UI Kit Bar): gradient, shine, glow. KitBarFill makes one of its own from it.")]
     [SerializeField] private Material barMaterial;
 
@@ -138,6 +144,9 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Sprite Card => card;
     public Sprite CardRim => cardRim;
     public Material BarMaterial => barMaterial;
+    public Sprite Pattern => pattern;
+    public Sprite Vignette => vignette;
+    public Sprite Sheen => sheen;
 
     /// <summary>The kit icon of this name (a white glyph), or null.</summary>
     public Sprite Icon(string name)

@@ -92,5 +92,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 37bce4ba7c3bb6c449b422e8e8372594, type: 3}
   - {fileID: 21300000, guid: 7d117cde97eca6e4eb4bdfa3fa24697b, type: 3}
   - {fileID: 21300000, guid: 61f1341d63a89c8448963b919b96e7d8, type: 3}
+  pattern: {fileID: 21300000, guid: f78e0f02237a1e543850a09fed58c7ca, type: 3}
+  vignette: {fileID: 21300000, guid: 452b010ad960282439b097f808f3ff5d, type: 3}
+  sheen: {fileID: 21300000, guid: e10e61ee15536e3429040364a9ab7ce0, type: 3}
   barMaterial: {fileID: 2100000, guid: b352b21adc8de2946a0d8d3a66a1ec45, type: 2}
   windowFadeSeconds: 0.12

@@ -104,6 +104,7 @@ public sealed class KitTabs
             var button = rect.gameObject.AddComponent<Button>();
             button.targetGraphic = fill;
             HearthKit.Tint(button);
+            UIHighlight.On(rect.gameObject);
             button.onClick.AddListener(() => chosen(index));
             TMP_Text label = CodeUI.Label("Label", rect, 0f, 0f, tabWidth, height, 21f, style.Text, TextAlignmentOptions.Center);
             style.Title(label);
@@ -219,6 +220,7 @@ public sealed class KitButton
         button = root.AddComponent<Button>();
         button.targetGraphic = fill;
         HearthKit.Tint(button);
+        UIHighlight.On(root);
         button.onClick.AddListener(() => chosen(action));
         switch (shape)
         {
@@ -355,6 +357,7 @@ public sealed class KitSlotGrid
             var button = rect.gameObject.AddComponent<Button>();
             button.targetGraphic = fill;
             HearthKit.Tint(button);
+            UIHighlight.On(rect.gameObject);
             button.onClick.AddListener(() => open?.Invoke());
             Image icon = CodeUI.At("Icon", rect, 7f, 7f, cell - 14f, cell - 14f).gameObject.AddComponent<Image>();
             icon.preserveAspect = true;

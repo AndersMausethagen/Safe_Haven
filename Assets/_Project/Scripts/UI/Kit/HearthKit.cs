@@ -284,6 +284,37 @@ public static class HearthKit
         rim.effectColor = Faded(style.Accent, 0.55f);
         rim.effectDistance = new Vector2(1.5f, -1.5f);
         Corners(panel);
+        Ground(panel);
+    }
+
+    private const string GroundName = "Hearthline Ground";
+
+    /// <summary>A window's ground under its contents: the faint tiled pattern and a vignette dark round the edges; once.
+    /// Behind everything on the panel, and outside its layout.</summary>
+    public static void Ground(RectTransform panel)
+    {
+        UIStyle style = UIStyle.Current;
+        if (panel == null || style.Pattern == null || panel.Find(GroundName) != null)
+        {
+            return;
+        }
+
+        RectTransform ground = CodeUI.Stretch(GroundName, panel);
+        ground.SetAsFirstSibling();
+        ground.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        var pattern = CodeUI.Stretch("Pattern", ground).gameObject.AddComponent<Image>();
+        pattern.sprite = style.Pattern;
+        pattern.type = Image.Type.Tiled;
+        pattern.pixelsPerUnitMultiplier = 1.4f;
+        pattern.color = Faded(style.Accent, 0.07f);
+        pattern.raycastTarget = false;
+        if (style.Vignette != null)
+        {
+            var vignette = CodeUI.Stretch("Vignette", ground).gameObject.AddComponent<Image>();
+            vignette.sprite = style.Vignette;
+            vignette.color = new Color(1f, 1f, 1f, 0.6f);
+            vignette.raycastTarget = false;
+        }
     }
 
     private const string CornersName = "Scroll Corners";
@@ -326,6 +357,7 @@ public static class HearthKit
         var button = rect.gameObject.AddComponent<Button>();
         button.targetGraphic = fill;
         Tint(button);
+        UIHighlight.On(rect.gameObject);
         button.onClick.AddListener(() => close());
         TMP_Text cross = CodeUI.Label("X", rect, 0f, -2f, 46f, 46f, 30f, style.Text, TextAlignmentOptions.Center);
         cross.text = "×";

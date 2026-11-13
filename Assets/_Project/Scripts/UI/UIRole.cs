@@ -125,8 +125,9 @@ public sealed class UIRole : MonoBehaviour
             frame = HearthlineArt.AddFrame(panel, style, onRaid);
             Paint(GetComponent<Outline>(), style.RimFor(onRaid));
             Dress(panel, style);
-            // Hearthline 3: its headings carry the kit's icons.
+            // Hearthline 3: its headings carry the kit's icons, and its ground a faint pattern under a vignette.
             HearthKit.DecorateHeadings(panel);
+            HearthKit.Ground(panel);
         }
         else if (kind == Kind.PrimaryButton && transform is RectTransform press)
         {
@@ -135,6 +136,7 @@ public sealed class UIRole : MonoBehaviour
             warm.a = 0.32f;
             HearthlineArt.AddGlow(press, style, warm, 26f);
             Round(press, style);
+            UIHighlight.On(gameObject);
         }
         else if (frame != null)
         {
@@ -145,6 +147,11 @@ public sealed class UIRole : MonoBehaviour
         {
             UIStyle style = UIStyle.Current;
             Round(part, style);
+            if (kind == Kind.Button)
+            {
+                UIHighlight.On(gameObject);
+            }
+
             // Hearthline 3: an ordinary button gets a faint gold edge, as the kit's do.
             if (kind == Kind.Button && GetComponent<Image>() != null && GetComponent<Outline>() == null)
             {

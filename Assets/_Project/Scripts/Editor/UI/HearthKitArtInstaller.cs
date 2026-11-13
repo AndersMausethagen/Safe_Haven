@@ -25,16 +25,19 @@ public static class HearthKitArtInstaller
         }
 
         var icons = new List<Sprite>();
-        Sprite corner = null, card = null, rim = null;
+        Sprite corner = null, card = null, rim = null, pattern = null, vignette = null, sheen = null;
         foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { Folder }))
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             string name = Path.GetFileNameWithoutExtension(path);
-            Sprite sprite = Import(path, name.StartsWith("Hearthline Card"));
+            Sprite sprite = Import(path, name.StartsWith("Hearthline Card") ? 20f : name == "Hearthline Sheen" ? 24f : 0f, name == "Hearthline Pattern");
             if (name == "Hearthline Scroll Corner") corner = sprite;
             else if (name == "Hearthline Card") card = sprite;
             else if (name == "Hearthline Card Rim") rim = sprite;
-            else if (sprite != null) icons.Add(sprite);
+            else if (name == "Hearthline Pattern") pattern = sprite;
+            else if (name == "Hearthline Vignette") vignette = sprite;
+            else if (name == "Hearthline Sheen") sheen = sprite;
+            else if (sprite != null && !name.StartsWith("Hearthline")) icons.Add(sprite);
         }
 
         var values = new SerializedObject(style);
@@ -50,6 +53,9 @@ public static class HearthKitArtInstaller
         }
 
         values.FindProperty("barMaterial").objectReferenceValue = BarMaterial();
+        values.FindProperty("pattern").objectReferenceValue = pattern;
+        values.FindProperty("vignette").objectReferenceValue = vignette;
+        values.FindProperty("sheen").objectReferenceValue = sheen;
         values.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(style);
         AssetDatabase.SaveAssetIfDirty(style);
@@ -108,20 +114,21 @@ public static class HearthKitArtInstaller
 
     // A sprite, no mips (it is drawn at its size), uncompressed (thin gold lines band otherwise); the card and its rim
     // 9-sliced at 20 px.
-    private static Sprite Import(string path, bool sliced)
+    private static Sprite Import(string path, float slice, bool tiled = false)
     {
         var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-        Vector4 border = sliced ? new Vector4(20f, 20f, 20f, 20f) : Vector4.zero;
+        Vector4 border = slice > 0f ? new Vector4(slice, slice, slice, slice) : Vector4.zero;
+        TextureWrapMode wrap = tiled ? TextureWrapMode.Repeat : TextureWrapMode.Clamp;
         if (importer.textureType != TextureImporterType.Sprite || importer.mipmapEnabled || !importer.alphaIsTransparency
             || importer.spriteBorder != border || importer.spriteImportMode != SpriteImportMode.Single
-            || importer.textureCompression != TextureImporterCompression.Uncompressed)
+            || importer.textureCompression != TextureImporterCompression.Uncompressed || importer.wrapMode != wrap)
         {
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.mipmapEnabled = false;
             importer.alphaIsTransparency = true;
             importer.spriteBorder = border;
-            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.wrapMode = wrap;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.SaveAndReimport();
         }

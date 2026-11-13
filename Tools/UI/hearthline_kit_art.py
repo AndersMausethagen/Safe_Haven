@@ -3,6 +3,7 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 
 - Hearthline Scroll Corner: the window's gilded corner, scrollwork curling out of the corner along both edges, a leaf
   and a bead at its heart. Placed at the four corners, mirrored.
+- Hearthline Pattern (a window's tiled ground), Vignette (dark round the edges) and Sheen (a control's hover light).
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
@@ -533,6 +534,69 @@ def eye():
     save(img, 'Eye', ICON)
 
 
+def pattern():
+    """A window's ground, tiled: a lattice of diamonds in thin double lines, a knot where they cross and a dot in each
+    diamond, over a fine grain. Seamless at 256 px; white, shown faint (UIRole)."""
+    import random
+    size = 256
+    img = Image.new('RGBA', (size * SS, size * SS), CLEAR)
+    d = ImageDraw.Draw(img)
+    step = size * SS // 4
+    w = int(1.2 * SS)
+    for k in range(-8, 9):
+        for off in (-3 * SS, 3 * SS):
+            d.line([(k * step + off, 0), (k * step + off + size * SS, size * SS)], fill=(255, 255, 255, 150), width=w)
+            d.line([(k * step + off, size * SS), (k * step + off + size * SS, 0)], fill=(255, 255, 255, 150), width=w)
+    for i in range(0, 5):
+        for j in range(0, 5):
+            cx, cy = i * step, j * step
+            r = 6 * SS
+            d.ellipse([cx - r, cy - r, cx + r, cy + r], outline=(255, 255, 255, 190), width=int(1.5 * SS))
+            cx2, cy2 = cx + step // 2, cy + step // 2
+            r2 = 2.2 * SS
+            d.ellipse([cx2 - r2, cy2 - r2, cx2 + r2, cy2 + r2], fill=(255, 255, 255, 160))
+    img = img.resize((size, size), Image.LANCZOS)
+    rng = random.Random(7)
+    px = img.load()
+    for y in range(size):
+        for x in range(size):
+            r_, g_, b_, a_ = px[x, y]
+            grain = rng.randint(0, 38)
+            px[x, y] = (255, 255, 255, min(255, a_ + grain))
+    os.makedirs(OUT, exist_ok=True)
+    img.save(os.path.join(OUT, 'Hearthline Pattern.png'))
+
+
+def vignette():
+    """Dark round the edges, clear in the middle, a little more at the foot: a window seems lit from above."""
+    size = 256
+    img = Image.new('RGBA', (size, size), CLEAR)
+    px = img.load()
+    for y in range(size):
+        for x in range(size):
+            u, v = (x + 0.5) / size * 2 - 1, (y + 0.5) / size * 2 - 1
+            r = math.sqrt((u * 0.9) ** 2 + (v * 1.0) ** 2)
+            a_ = max(0.0, min(1.0, (r - 0.55) / 0.75)) ** 1.6
+            a_ = min(1.0, a_ + max(0.0, v - 0.2) * 0.25)
+            px[x, y] = (0, 0, 0, int(a_ * 255))
+    img.save(os.path.join(OUT, 'Hearthline Vignette.png'))
+
+
+def sheen():
+    """A control's hover light: warm from the left, fading out to the right, a bright line along its top. 9-sliced."""
+    w_, h_ = 256, 64
+    img = Image.new('RGBA', (w_, h_), CLEAR)
+    px = img.load()
+    for y in range(h_):
+        for x in range(w_):
+            t = x / (w_ - 1)
+            a_ = 0.55 * (1 - t) ** 1.4 + 0.12
+            top = max(0.0, 1 - abs(y - 3) / 2.5) * 0.9
+            a_ = min(1.0, a_ * (0.6 + 0.4 * (1 - y / h_)) + top)
+            px[x, y] = (255, 255, 255, int(a_ * 255))
+    img.save(os.path.join(OUT, 'Hearthline Sheen.png'))
+
+
 def atlas():
     """Every icon in one atlas for TextMesh Pro (Art/UI/Kit Icons.png and .json), so text can carry them:
     <sprite name="Bags" tint=1>. HearthKitArtInstaller builds the sprite asset from it."""
@@ -553,7 +617,7 @@ def atlas():
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
-                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card):
+                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card, pattern, vignette, sheen):
         make()
     atlas()
     print('kit art ->', os.path.abspath(OUT))
