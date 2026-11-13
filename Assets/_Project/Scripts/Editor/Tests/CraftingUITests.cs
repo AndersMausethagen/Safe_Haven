@@ -185,4 +185,22 @@ public sealed class CraftingUITests
         created.Add(asset);
         return asset;
     }
+
+    [Test]
+    public void SortingTheBag_JoinsLikeStacks_AndPutsLikeWithLike()
+    {
+        var arrow = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeStoneArrow.asset");
+        var bow = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/CrudeWoodenBow.asset");
+        var bandage = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Bandage.asset");
+        var sorted = ItemInventoryWindow.Arranged(new[] { new ItemStack(arrow, 13), new ItemStack(bandage, 1), new ItemStack(bow, 1), new ItemStack(arrow, 13) });
+        Assert.AreEqual(3, sorted.Count, "the two part stacks of arrows are joined");
+        Assert.AreEqual(26, sorted.Find(s => s.Item == arrow).Count);
+        for (int i = 1; i < sorted.Count; i++)
+        {
+            Assert.LessOrEqual((int)sorted[i - 1].Item.Category, (int)sorted[i].Item.Category, "by kind");
+        }
+
+        var full = ItemInventoryWindow.Arranged(new[] { new ItemStack(arrow, arrow.MaximumStack), new ItemStack(arrow, 5) });
+        Assert.AreEqual(2, full.Count, "a full stack takes no more");
+    }
 }

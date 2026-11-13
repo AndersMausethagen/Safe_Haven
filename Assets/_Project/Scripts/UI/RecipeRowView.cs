@@ -26,6 +26,40 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
     /// <summary>Raised when the row is clicked.</summary>
     public event Action<RecipeRowView, PointerEventData> Clicked;
 
+    /// <summary>Raised when its star is clicked: the recipe made a favourite, or no longer one.</summary>
+    public event Action<RecipeRowView> Starred;
+
+    private Image star;
+    private Outline rim;
+    private bool favourite;
+
+    /// <summary>Shows whether it is a favourite (a gold star; a faint one to click otherwise).</summary>
+    public void ShowFavourite(bool isFavourite)
+    {
+        favourite = isFavourite;
+        UIStyle style = UIStyle.Current;
+        if (star == null && style.Icon("Star") != null)
+        {
+            // On the name's line, beside the tier: the line under it is the recipe's needs, which run long.
+            var rect = CodeUI.Box("Star", transform, new Vector2(1f, 1f), new Vector2(20f, 20f), new Vector2(-40f, -17f));
+            star = rect.gameObject.AddComponent<Image>();
+            star.sprite = style.Icon("Star");
+            star.preserveAspect = true;
+            var button = rect.gameObject.AddComponent<Button>();
+            button.targetGraphic = star;
+            button.transition = Selectable.Transition.None;
+            button.onClick.AddListener(() => Starred?.Invoke(this));
+            // The name gives way to it, so a long one ends before the star rather than under it.
+            RectTransform name = nameLabel.rectTransform;
+            name.offsetMax = new Vector2(name.offsetMax.x - 30f, name.offsetMax.y);
+        }
+
+        if (star != null)
+        {
+            star.color = favourite ? style.AccentBright : HearthKit.Faded(style.Inactive, hovered ? 0.8f : 0.3f);
+        }
+    }
+
     public RecipeDefinition Recipe { get; private set; }
 
     public void OnPointerClick(PointerEventData eventData) => Clicked?.Invoke(this, eventData);
@@ -70,5 +104,17 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         UIStyle style = UIStyle.Current;
         background.color = isSelected ? style.ControlLit : hovered ? style.Control : style.Inset;
         selectedLine.enabled = isSelected;
+        // Hearthline 3: the chosen recipe framed in gold.
+        if (rim == null)
+        {
+            rim = background.gameObject.GetComponent<Outline>() ?? background.gameObject.AddComponent<Outline>();
+            rim.effectDistance = new Vector2(1.2f, -1.2f);
+        }
+
+        rim.effectColor = isSelected ? HearthKit.Faded(style.AccentBright, 0.85f) : new Color(0f, 0f, 0f, 0f);
+        if (star != null)
+        {
+            ShowFavourite(favourite);
+        }
     }
 }

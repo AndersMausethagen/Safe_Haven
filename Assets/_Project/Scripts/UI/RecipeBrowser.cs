@@ -14,7 +14,7 @@ using TMPro;
 /// PlayerCrafting and StationCrafting.
 /// Built by Safe Haven › Setup › UI › Build Recipe Browsers.
 /// </summary>
-public sealed class RecipeBrowser : MonoBehaviour
+public sealed partial class RecipeBrowser : MonoBehaviour
 {
     [Header("List")]
     [Tooltip("Parent for the tab buttons. Should have a horizontal layout group.")]
@@ -112,6 +112,7 @@ public sealed class RecipeBrowser : MonoBehaviour
         RefreshFilter();
         RefreshList();
         RefreshSelected();
+        RefreshKit();
     }
 
     // Children of a closed window wake late, after their window has already filled them.
@@ -131,7 +132,8 @@ public sealed class RecipeBrowser : MonoBehaviour
             onlyMakeable = !onlyMakeable;
             Refresh();
         });
-        makeButton.onClick.AddListener(() => Make(selected, 1));
+        makeButton.onClick.AddListener(() => Make(selected, AmountToMake));
+        BuildKit();
         makeAllButton.onClick.AddListener(() => Make(selected, maker.HowMany(selected)));
     }
 
@@ -254,7 +256,7 @@ public sealed class RecipeBrowser : MonoBehaviour
     {
         RecipeTabs.Tab tab = TabNamed(activeTab);
         List<RecipeDefinition> open = tab != null ? tab.Recipes : new List<RecipeDefinition>();
-        shown = onlyMakeable ? RecipeTabs.OnlyMakeable(open, CanMake) : open;
+        shown = Arrange(onlyMakeable ? RecipeTabs.OnlyMakeable(open, CanMake) : open);
         if (!shown.Contains(selected))
         {
             RecipeDefinition first = shown.Find(CanMake);
@@ -265,6 +267,7 @@ public sealed class RecipeBrowser : MonoBehaviour
         {
             RecipeRowView row = Instantiate(rowPrefab, list);
             row.Clicked += OnRowClicked;
+            row.Starred += starred => ToggleFavourite(starred.Recipe);
             rows.Add(row);
         }
 
@@ -281,6 +284,7 @@ public sealed class RecipeBrowser : MonoBehaviour
                 string problem = away ? recipe.Station.DisplayName() : count > 0 ? null : RecipeMaking.Problem(maker, recipe, out materials);
                 rows[i].name = recipe.DisplayName;
                 rows[i].Show(recipe, count, problem, recipe == selected, away || materials, away ? 0 : maker.Waiting(recipe));
+                rows[i].ShowFavourite(IsFavourite(recipe));
             }
         }
 

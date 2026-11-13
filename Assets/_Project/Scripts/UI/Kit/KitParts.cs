@@ -514,3 +514,74 @@ public sealed class KitProgressRow
         KitBar.Set(fill, fillImage, progress, done ? style.Good : style.Info);
     }
 }
+
+/// <summary>A search box: a rounded field with a magnifier mark and a hint, raising Changed as the player types. Typing in
+/// it suspends the gameplay keys (GameInput.SuspendGameplay), so letters don't open windows behind it.</summary>
+public sealed class KitSearch
+{
+    public readonly TMP_InputField Field;
+    public event Action<string> Changed;
+
+    public KitSearch(RectTransform box, string hint)
+    {
+        UIStyle style = UIStyle.Current;
+        Image fill = HearthKit.Sliced(box.gameObject.AddComponent<Image>(), style.Card, 1.6f);
+        fill.color = Color.Lerp(style.Panel, Color.black, 0.25f);
+        HearthKit.Rim(box, 0.4f, 1.6f);
+        HearthKit.Icon(box, "Eye", 10f, (box.rect.height - 20f) * 0.5f, 20f, style.Muted);
+        RectTransform area = CodeUI.Stretch("Text Area", box);
+        area.offsetMin = new Vector2(38f, 2f);
+        area.offsetMax = new Vector2(-10f, -2f);
+        area.gameObject.AddComponent<RectMask2D>();
+        TMP_Text text = CodeUI.Label("Text", area, 0f, 0f, 100f, 30f, 17f, style.Text, TextAlignmentOptions.MidlineLeft);
+        Fill((RectTransform)text.transform);
+        TMP_Text placeholder = CodeUI.Label("Hint", area, 0f, 0f, 100f, 30f, 17f, style.Inactive, TextAlignmentOptions.MidlineLeft);
+        Fill((RectTransform)placeholder.transform);
+        placeholder.text = hint;
+        placeholder.fontStyle = FontStyles.Italic;
+        Field = box.gameObject.AddComponent<TMP_InputField>();
+        Field.textViewport = area;
+        Field.textComponent = text;
+        Field.placeholder = placeholder;
+        Field.targetGraphic = fill;
+        Field.lineType = TMP_InputField.LineType.SingleLine;
+        Field.onValueChanged.AddListener(value => Changed?.Invoke(value));
+        var guard = box.gameObject.AddComponent<KitSearchGuard>();
+        Field.onSelect.AddListener(_ => guard.Typing(true));
+        Field.onDeselect.AddListener(_ => guard.Typing(false));
+    }
+
+    private static void Fill(RectTransform rect)
+    {
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+    }
+}
+
+/// <summary>Suspends the gameplay keys while a search box is typed in, and gives them back however it stops: deselected,
+/// or hidden with its window (a hidden field sends no deselect).</summary>
+public sealed class KitSearchGuard : MonoBehaviour
+{
+    private bool suspended;
+
+    public void Typing(bool typing)
+    {
+        if (typing == suspended)
+        {
+            return;
+        }
+
+        suspended = typing;
+        if (typing)
+        {
+            GameInput.SuspendGameplay();
+        }
+        else
+        {
+            GameInput.ResumeGameplay();
+        }
+    }
+
+    private void OnDisable() => Typing(false);
+}

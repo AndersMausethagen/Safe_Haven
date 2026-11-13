@@ -14,7 +14,7 @@ using TMPro;
 /// carried backpack unlocks) are shown dark. The browser makes what can be made by hand, and lists the recipes made at
 /// stations to plan with. Everything shown comes from the player's ItemInventory, ResourceInventory and PlayerCrafting.
 /// </summary>
-public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
+public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
 {
     private const float RecipeRefreshInterval = 0.4f;
 
@@ -569,6 +569,9 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             ItemStack stack = source.GetSlot(i);
             views[i].Show(stack, !source.IsUnlocked(i), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
         }
+
+        Compact(source, views);
+        BuildKit();
     }
 
     // Tool tiers come from the tool belt.
@@ -590,6 +593,7 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         {
             ItemStack stack = source.GetSlot(index);
             views[index].Show(stack, !source.IsUnlocked(index), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
+            Compact(source, views);
             if (hovered == views[index] && dragFrom < 0)
             {
                 tooltip.Show(stack, QuickHint(stack));
