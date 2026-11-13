@@ -42,8 +42,14 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         ItemDefinition item = stack.Item;
-        string text = Describe(item, stack);
-        Show(stack.DisplayName, Rarity.ColorOf(item.Rarity), string.IsNullOrEmpty(footer) ? text : text + "\n" + footer);
+        var hints = new StringBuilder();
+        string text = Describe(item, stack, hints);
+        if (!string.IsNullOrEmpty(footer))
+        {
+            hints.Append(hints.Length > 0 ? "\n" : "").Append(footer);
+        }
+
+        Show(stack.DisplayName, NameColour(item.Rarity), text, item.Icon, hints.ToString());
         Header(item.Rarity, stack.Quality);
     }
 
@@ -52,12 +58,12 @@ public sealed class ItemTooltipView : MonoBehaviour
     {
         if (definition is ItemDefinition item)
         {
-            Show(item.DisplayName, Rarity.ColorOf(item.Rarity), Describe(item, null));
+            Show(item.DisplayName, NameColour(item.Rarity), Describe(item, null), item.Icon);
             Header(item.Rarity, ItemQuality.Plain);
         }
         else if (definition is ResourceDefinition resource)
         {
-            Show(resource.DisplayName, new Color(0.91f, 0.77f, 0.42f, 1f), DescribeResource(resource));
+            Show(resource.DisplayName, new Color(0.91f, 0.77f, 0.42f, 1f), DescribeResource(resource), resource.Icon);
         }
         else
         {
@@ -80,8 +86,9 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         string amount = recipe.OutputAmount > 1 ? $"  ×{recipe.OutputAmount}" : "";
-        Color color = recipe.Output != null ? Rarity.ColorOf(recipe.Output.Rarity) : new Color(0.91f, 0.77f, 0.42f, 1f);
-        Show(recipe.DisplayName + amount, color, DescribeRecipe(recipe, crafting, problem));
+        Color color = recipe.Output != null ? NameColour(recipe.Output.Rarity) : new Color(0.91f, 0.77f, 0.42f, 1f);
+        Sprite icon = recipe.Output != null ? recipe.Output.Icon : recipe.OutputResource != null ? recipe.OutputResource.Icon : null;
+        Show(recipe.DisplayName + amount, color, DescribeRecipe(recipe, crafting, problem), icon);
     }
 
     /// <summary>What the Show tooltip says about a held stack, for windows that show it in place.</summary>
@@ -169,20 +176,156 @@ public sealed class ItemTooltipView : MonoBehaviour
     }
 
     /// <summary>Shows any title and rich-text body, for things that aren't items (skills).</summary>
-    public void Show(string title, Color titleColor, string body)
+    public void Show(string title, Color titleColor, string body) => Show(title, titleColor, body, null);
+
+    /// <summary>
+    /// Shows a title and rich-text body. With an <paramref name="icon"/> the body is an item's or resource's description:
+    /// its first line (rarity, tier, kind) goes beside the icon, under the name. <paramref name="hints"/> (how to use it,
+    /// which keys) go in small type at the foot, under a rule.
+    /// </summary>
+    public void Show(string title, Color titleColor, string body, Sprite icon, string hints = null)
     {
+        Kit();
+        string sub = null;
+        if (icon != null && subLabel != null && !string.IsNullOrEmpty(body))
+        {
+            int line = body.IndexOf('\n');
+            sub = line < 0 ? body : body.Substring(0, line);
+            body = line < 0 ? "" : body.Substring(line + 1).TrimStart('\n');
+        }
+
         titleLabel.text = title;
         titleLabel.color = titleColor;
-        bodyLabel.text = body;
+        bodyLabel.text = HearthKit.ToneNumbers(body);
+        bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(body));
+        if (subLabel != null)
+        {
+            bool framed = icon != null;
+            subLabel.text = sub;
+            subLabel.gameObject.SetActive(!string.IsNullOrEmpty(sub));
+            iconFrame.gameObject.SetActive(framed);
+            iconImage.sprite = icon;
+            float indent = framed ? IconFrameSize + 12f : 0f;
+            titleLabel.margin = new Vector4(indent, 0f, 0f, 0f);
+            subLabel.margin = new Vector4(indent, 0f, 0f, 0f);
+            // Name and kind together are at least as tall as the framed icon beside them.
+            titleSize.minHeight = framed ? 30f : -1f;
+            subSize.minHeight = framed ? IconFrameSize - 26f : -1f;
+            hintRule.gameObject.SetActive(!string.IsNullOrEmpty(hints));
+            hintLabel.text = hints;
+            hintLabel.gameObject.SetActive(!string.IsNullOrEmpty(hints));
+        }
+        else if (!string.IsNullOrEmpty(hints))
+        {
+            bodyLabel.text += "\n" + hints;
+        }
+
         panel.gameObject.SetActive(true);
         Header(ItemRarity.Common, ItemQuality.Plain);
         LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
     }
 
+    // Common things are named in the kit's warm text colour, not a cold white; the rest keep their rarity's colour.
+    private static Color NameColour(ItemRarity rarity) => rarity == ItemRarity.Common ? UIStyle.Current.Text : Rarity.ColorOf(rarity);
+
+    private const float IconFrameSize = 52f;
+    private bool kitted;
+    private TMP_Text subLabel;
+    private TMP_Text hintLabel;
+    private Image hintRule;
+    private RectTransform iconFrame;
+    private Image iconImage;
+    private LayoutElement titleSize;
+    private LayoutElement subSize;
+
+    // Hearthline 3: the name in the title face; an item's icon in a gold-framed slot beside its name, its kind under it and
+    // a gold rule below; the hints at the foot; a gold rim round it all, so it stands off the window it is over. Only a
+    // tooltip laid out in a column (title and body straight under the panel) gets the parts; any other keeps its look.
+    private void Kit()
+    {
+        if (kitted)
+        {
+            return;
+        }
+
+        kitted = true;
+        UIStyle style = UIStyle.Current;
+        if (style.TitleFont != null)
+        {
+            titleLabel.font = style.TitleFont;
+        }
+
+        var column = panel.GetComponent<VerticalLayoutGroup>();
+        if (column == null || titleLabel.transform.parent != panel || bodyLabel.transform.parent != panel)
+        {
+            return;
+        }
+
+        float bodySize = bodyLabel.fontSize;
+        subLabel = Line("Kind", titleLabel.transform.GetSiblingIndex() + 1, bodySize - 1f, style.Muted, FontStyles.Normal);
+        Image headerRule = Rule("Header Rule", subLabel.transform.GetSiblingIndex() + 1);
+        hintRule = Rule("Hint Rule", bodyLabel.transform.GetSiblingIndex() + 1);
+        hintLabel = Line("Hints", hintRule.transform.GetSiblingIndex() + 1, bodySize - 1f, style.Muted, FontStyles.Normal);
+        titleSize = Sized(titleLabel.gameObject);
+        subSize = Sized(subLabel.gameObject);
+        headerRule.color = HearthKit.Faded(style.Accent, 0.5f);
+
+        iconFrame = HearthKit.Card(panel, "Icon Frame", column.padding.left, column.padding.top + 1f, IconFrameSize, IconFrameSize, 0.7f);
+        iconFrame.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        RectTransform inner = CodeUI.Stretch("Icon", iconFrame);
+        inner.offsetMin = new Vector2(6f, 6f);
+        inner.offsetMax = new Vector2(-6f, -6f);
+        iconImage = inner.gameObject.AddComponent<Image>();
+        iconImage.preserveAspect = true;
+        iconImage.raycastTarget = false;
+        iconFrame.gameObject.SetActive(false);
+
+        Image rim = HearthKit.Rim(panel, 0.6f, 1.2f);
+        rim.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        rim.transform.SetAsLastSibling();
+    }
+
+    private TMP_Text Line(string name, int index, float size, Color colour, FontStyles fontStyle)
+    {
+        var rect = (RectTransform)new GameObject(name, typeof(RectTransform)).transform;
+        rect.SetParent(panel, false);
+        rect.SetSiblingIndex(index);
+        var label = rect.gameObject.AddComponent<TextMeshProUGUI>();
+        label.font = bodyLabel.font;
+        label.fontSize = size;
+        label.color = colour;
+        label.fontStyle = fontStyle;
+        label.richText = true;
+        label.textWrappingMode = TextWrappingModes.Normal;
+        label.raycastTarget = false;
+        rect.gameObject.SetActive(false);
+        return label;
+    }
+
+    private Image Rule(string name, int index)
+    {
+        var rect = (RectTransform)new GameObject(name, typeof(RectTransform)).transform;
+        rect.SetParent(panel, false);
+        rect.SetSiblingIndex(index);
+        var size = rect.gameObject.AddComponent<LayoutElement>();
+        size.minHeight = size.preferredHeight = 2f;
+        var line = rect.gameObject.AddComponent<Image>();
+        line.color = HearthKit.Faded(UIStyle.Current.Accent, 0.3f);
+        line.raycastTarget = false;
+        return line;
+    }
+
+    private static LayoutElement Sized(GameObject part)
+    {
+        var size = part.GetComponent<LayoutElement>();
+        return size != null ? size : part.AddComponent<LayoutElement>();
+    }
+
     private Image band;
     private Material plainTitle;
-    private static readonly System.Collections.Generic.Dictionary<ItemRarity, Material> Glowing =
-        new System.Collections.Generic.Dictionary<ItemRarity, Material>();
+    // Per face and rarity: a glow made from one font's material would draw another font's text from the wrong atlas.
+    private static readonly System.Collections.Generic.Dictionary<(Material, ItemRarity), Material> Glowing =
+        new System.Collections.Generic.Dictionary<(Material, ItemRarity), Material>();
 
     // Hearthline 2: the top of the tooltip takes on the item's rarity (a solid mix, not a see-through wash), and a rare
     // name glows faintly in its colour.
@@ -212,7 +355,9 @@ public sealed class ItemTooltipView : MonoBehaviour
             band.color = Color.Lerp(style.Panel, colour, 0.2f);
             Canvas.ForceUpdateCanvases();
             float top = panel.rect.yMax;
-            float below = titleLabel.rectTransform.TransformPoint(new Vector3(0f, titleLabel.rectTransform.rect.yMin, 0f)).y;
+            // Down to the foot of the name, or of the kind line under it.
+            RectTransform last = subLabel != null && subLabel.gameObject.activeSelf ? subLabel.rectTransform : titleLabel.rectTransform;
+            float below = last.TransformPoint(new Vector3(0f, last.rect.yMin, 0f)).y;
             float height = Mathf.Max(24f, top - panel.InverseTransformPoint(new Vector3(0f, below, 0f)).y + 8f);
             band.rectTransform.sizeDelta = new Vector2(0f, height);
             band.rectTransform.anchoredPosition = Vector2.zero;
@@ -229,7 +374,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             return plainTitle;
         }
 
-        if (!Glowing.TryGetValue(rarity, out Material material) || material == null)
+        if (!Glowing.TryGetValue((plainTitle, rarity), out Material material) || material == null)
         {
             material = new Material(plainTitle) { name = plainTitle.name + " Glow " + rarity, hideFlags = HideFlags.DontSave };
             material.EnableKeyword("GLOW_ON");
@@ -239,7 +384,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             material.SetFloat("_GlowOuter", 0.35f);
             material.SetFloat("_GlowInner", 0.05f);
             material.SetFloat("_GlowPower", 0.6f);
-            Glowing[rarity] = material;
+            Glowing[(plainTitle, rarity)] = material;
         }
 
         return material;
@@ -296,7 +441,8 @@ public sealed class ItemTooltipView : MonoBehaviour
 
     // Without a stack (a recipe's output) it describes the item as it comes out new, for someone deciding whether to make
     // it: what it is for comes before its numbers, and there is no wear, stack size, price or use hint.
-    private static string Describe(ItemDefinition item, ItemStack? stack)
+    // With hints, how to use it (which keys, which clicks) goes there instead, for the tooltip's foot.
+    private static string Describe(ItemDefinition item, ItemStack? stack, StringBuilder hints = null)
     {
         bool held = stack.HasValue;
         int count = held ? stack.Value.Count : 1;
@@ -345,7 +491,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             string colour = hours < 1f ? UIStyle.Current.DangerHex : UIStyle.Current.GoodHex;
             string refill = item.Lantern.Refill != null ? item.Lantern.Refill.DisplayName.ToLowerInvariant() : "refill";
             builder.Append($"\n<color={colour}>Light {Mathf.CeilToInt(hours)} of {Mathf.RoundToInt(item.Lantern.Hours)} hours</color>");
-            builder.Append($"\nWorn in the Light slot; L lights it. Right-click with a {refill} in the bag to refill it.");
+            Hint(builder, hints, $"Worn in the Light slot; L lights it. Right-click with a {refill} in the bag to refill it.");
         }
 
         if (item.HoldsWater)
@@ -372,7 +518,15 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.IsWeapon)
         {
-            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage.</color>");
+            // A bow hits as hard as its arrow: its own damage is nought, and "0 damage" read as a useless bow.
+            if (item.Weapon.IsBow)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Bow: hits with the arrow's damage, {item.Weapon.DrawSeconds:0.#} s to a full draw.</color>");
+            }
+            else if (item.Weapon.Damage > 0f)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage.</color>");
+            }
         }
 
         if (item.IsConsumable)
@@ -430,7 +584,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.IsEquippable && held)
         {
-            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Right-click to equip or unequip (C opens the character screen).</color>");
+            Hint(builder, hints, "Right-click to equip or unequip (C opens the character screen).");
         }
 
         if (held && !string.IsNullOrWhiteSpace(item.Description))
@@ -450,6 +604,18 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         return builder.ToString();
+    }
+
+    private static void Hint(StringBuilder builder, StringBuilder hints, string line)
+    {
+        if (hints != null)
+        {
+            hints.Append(hints.Length > 0 ? "\n" : "").Append(line);
+        }
+        else
+        {
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>").Append(line).Append("</color>");
+        }
     }
 
     private static void AppendEssenceWork(StringBuilder builder, ItemStack stack)
