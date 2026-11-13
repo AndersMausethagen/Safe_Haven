@@ -10,7 +10,9 @@ using static CodeUI;
 /// The Purification Altar (GDD §13.5): four pages over the same pair of essences. Purify queues batches; Empower, Enchant and
 /// Skills share one flow, a subject on the left, what can be done to it in the middle and the chosen offer with its cost on
 /// the right. All the rules are in AltarWork; this only draws them, read again twice a second while open. Built in code the
-/// first time an altar is used, and closes when the player walks away.
+/// first time an altar is used, and closes when the player walks away. Hearthline 3: framed tabs, the kit's close button,
+/// rows as rounded cards with a gold rim on the chosen one, the chosen offer in a card of its own, the queue as an animated
+/// bar, and what each essence buys in a card with its sign.
 /// </summary>
 public sealed class AltarWindow : MonoBehaviour
 {
@@ -23,13 +25,16 @@ public sealed class AltarWindow : MonoBehaviour
     }
 
     private const float Width = 1240f;
-    private const float Height = 776f;
+    private const float Height = 730f;
     private const float Margin = 44f;
     private const float BodyTop = 210f;
     private const float BodyBottom = 690f;
     private const float RowHeight = 62f;
     private const float ReadSeconds = 0.5f;
     private const float ScreenMargin = 24f;
+    // The chosen offer's column, inside its card.
+    private const float OfferX = 864f;
+    private const float OfferWidth = Width - Margin - 16f - OfferX;
 
     private static readonly string[] PageNames = { "Purify", "Empower", "Enchant", "Abilities" };
 
@@ -91,7 +96,8 @@ public sealed class AltarWindow : MonoBehaviour
         public readonly GameObject Root;
         private readonly Button button;
         private readonly Image icon;
-        private readonly Image mark;
+        private readonly Image fill;
+        private readonly Image rim;
         private readonly TMP_Text title;
         private readonly TMP_Text detail;
 
@@ -100,12 +106,13 @@ public sealed class AltarWindow : MonoBehaviour
             UIStyle style = UIStyle.Current;
             RectTransform rect = At($"Row {index}", parent, 0f, index * RowHeight, width, RowHeight - 4f);
             Root = rect.gameObject;
-            var image = Root.AddComponent<Image>();
+            fill = HearthKit.Sliced(Root.AddComponent<Image>(), style.Card, 1.5f);
             button = Root.AddComponent<Button>();
-            button.targetGraphic = image;
+            button.targetGraphic = fill;
+            HearthKit.Tint(button);
             button.onClick.AddListener(() => clicked(index));
-            mark = At("Mark", rect, 0f, 0f, 3f, RowHeight - 4f).gameObject.AddComponent<Image>();
-            mark.color = style.Accent;
+            UIHighlight.On(Root);
+            rim = HearthKit.Rim(rect, 0.2f, 1.5f);
             icon = At("Icon", rect, 12f, 8f, 42f, 42f).gameObject.AddComponent<Image>();
             icon.raycastTarget = false;
             title = Label("Title", rect, 66f, 6f, width - 76f, 28f, 20f, style.Text);
@@ -123,13 +130,9 @@ public sealed class AltarWindow : MonoBehaviour
             detail.text = shownDetail;
             icon.gameObject.SetActive(picture != null);
             icon.sprite = picture;
-            mark.gameObject.SetActive(selected);
-            ColorBlock colors = button.colors;
-            colors.normalColor = colors.selectedColor = selected ? style.Filled : style.Panel;
-            colors.highlightedColor = style.Filled;
-            colors.pressedColor = style.ControlLit;
-            colors.colorMultiplier = 1f;
-            button.colors = colors;
+            // The chosen row lit and rimmed in gold, the rest dark leather with a faint rim.
+            fill.color = selected ? Color.Lerp(style.Inset, style.AccentDeep, 0.4f) : style.Inset;
+            rim.color = selected ? style.Accent : HearthKit.Faded(style.Accent, 0.2f);
         }
     }
 
@@ -139,13 +142,13 @@ public sealed class AltarWindow : MonoBehaviour
     private TMP_Text pageLine;
     private TMP_Text cursedValue;
     private TMP_Text purifiedValue;
-    private readonly TMP_Text[] tabs = new TMP_Text[PageNames.Length];
-    private readonly GameObject[] tabMarks = new GameObject[PageNames.Length];
+    private KitTabs tabs;
 
     private GameObject purifyPage;
     private TMP_Text rateLine;
     private TMP_Text queueLine;
     private RectTransform queueFill;
+    private Image queueFillImage;
     private TMP_Text warningLine;
     private TMP_Text speedLine;
     private Button purifyOne;
@@ -159,6 +162,8 @@ public sealed class AltarWindow : MonoBehaviour
     private RowList offerRows;
     private TMP_Text emptyLine;
     private TMP_Text offerEffect;
+    private RectTransform offerIconFrame;
+    private Image offerIcon;
     private TMP_Text costHeading;
     private TMP_Text offerCost;
     private TMP_Text offerProblem;
@@ -216,7 +221,7 @@ public sealed class AltarWindow : MonoBehaviour
     {
         Current = this;
         PadTabs.Register(this, () => window != null && window.IsOpen, direction => Show((Page)PadTabs.Next((int)page, PageNames.Length, direction)),
-            () => System.Array.ConvertAll(tabs, tab => tab != null ? tab.rectTransform : null));
+            () => tabs != null ? tabs.Rects : new List<RectTransform>());
     }
 
     private void OnDisable()
@@ -251,7 +256,7 @@ public sealed class AltarWindow : MonoBehaviour
             SettlementState settlement = GameSession.Settlement;
             SettlementSettings settings = SettlementSettings.Current;
             float share = settlement.PurificationQueued > 0 ? settlement.PurificationProgress / settings.SecondsPerBatch : 0f;
-            queueFill.anchorMax = new Vector2(Mathf.Clamp01(share), 1f);
+            KitBar.Set(queueFill, queueFillImage, Mathf.Clamp01(share), UIStyle.Current.Accent);
         }
     }
 
@@ -302,12 +307,7 @@ public sealed class AltarWindow : MonoBehaviour
         purifiedValue.text = (settings.PurifiedEssence != null ? pool.Have(settings.PurifiedEssence) : 0).ToString();
         pageTitle.text = PageNames[(int)page];
         pageLine.text = PageLines[(int)page];
-        for (int i = 0; i < tabs.Length; i++)
-        {
-            bool here = i == (int)page;
-            tabs[i].color = here ? style.Accent : style.Muted;
-            tabMarks[i].SetActive(here);
-        }
+        tabs.Show((int)page);
     }
 
     private void DrawPurify()
@@ -324,7 +324,7 @@ public sealed class AltarWindow : MonoBehaviour
         }
 
         float seconds = settings.SecondsPerBatch / (1f + settlement.PurificationBonus);
-        rateLine.text = $"{settings.CursedPerBatch} Cursed become {settings.PurifiedPerBatch} Purified every {seconds:0.#} seconds.";
+        rateLine.text = HearthKit.ToneNumbers($"{settings.CursedPerBatch} Cursed become {settings.PurifiedPerBatch} Purified every {seconds:0.#} seconds.");
         speedLine.text = settlement.PurificationYield > 0f ? $"Upgrades give {settlement.PurificationYield * 100f:0}% more Purified, {settlement.PurificationBonus * 100f:0}% faster." : "Upgrading the altar gives more Purified for the same Cursed.";
         speedLine.color = settlement.PurificationYield > 0f ? style.Good : style.Muted;
         int queued = settlement.PurificationQueued;
@@ -355,13 +355,19 @@ public sealed class AltarWindow : MonoBehaviour
         List<AltarOffer> offers = subjects.Count > 0 ? subjects[subjectIndex].Offers : new List<AltarOffer>();
         offerIndex = Mathf.Clamp(offerIndex, 0, Mathf.Max(0, offers.Count - 1));
         offerRows.Show(offers.Count, (row, i) => row.Bind(offers[i].Done ? $"{offers[i].Title}  <size=75%>Done</size>" : offers[i].Title, offers[i].Detail, null, i == offerIndex, offers[i].Done));
-        DrawOffer(offers.Count > 0 ? offers[offerIndex] : null);
+        DrawOffer(offers.Count > 0 ? offers[offerIndex] : null, subjects.Count > 0 ? subjects[subjectIndex].Icon : null);
     }
 
-    private void DrawOffer(AltarOffer offer)
+    // The chosen offer, under the picture of what it is worked on (none for a skill without one).
+    private void DrawOffer(AltarOffer offer, Sprite picture)
     {
         shownOffer = offer;
         bool any = offer != null;
+        bool framed = any && picture != null;
+        offerIconFrame.gameObject.SetActive(framed);
+        offerIcon.sprite = picture;
+        offerEffect.rectTransform.anchoredPosition = new Vector2(framed ? OfferX + 66f : OfferX, -(BodyTop + 8f));
+        offerEffect.rectTransform.sizeDelta = new Vector2(framed ? OfferWidth - 66f : OfferWidth, offerEffect.rectTransform.sizeDelta.y);
         offerEffect.gameObject.SetActive(any);
         costHeading.gameObject.SetActive(any);
         offerCost.gameObject.SetActive(any);
@@ -448,7 +454,7 @@ public sealed class AltarWindow : MonoBehaviour
         BuildHeader(style);
         BuildPurifyPage(style);
         BuildWorkPage(style);
-        AddButton("Close", panel, Width - Margin - 170f, 708f, 170f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
+        HearthKit.CloseButton(panel, Width - 66f, 18f, () => window.Close());
 
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.Altar, content.gameObject);
@@ -462,35 +468,24 @@ public sealed class AltarWindow : MonoBehaviour
         kicker.characterSpacing = 12f;
         pageTitle = Label("Title", panel, Margin, 52f, 620f, 56f, 42f, style.Text);
         style.Title(pageTitle);
-        pageLine = Label("Line", panel, Margin, 108f, 860f, 30f, 20f, style.Muted);
+        // Under the carved title, clear of the rule beneath its letters.
+        pageLine = Label("Line", panel, Margin, 116f, 860f, 30f, 20f, style.Muted);
         style.Title(pageLine);
         pageLine.color = style.Muted;
 
-        cursedValue = Figure("Cursed", 936f, style.Danger, style);
-        purifiedValue = Figure("Purified", 1066f, style.Good, style);
+        // Left of the close button.
+        cursedValue = Figure("Cursed", "Skull", 880f, style.Danger, style);
+        purifiedValue = Figure("Purified", "Spark", 1020f, style.Good, style);
 
-        Hairline(panel, Margin, 194f, Width - Margin * 2f, 1f, style);
-        for (int i = 0; i < PageNames.Length; i++)
-        {
-            int shown = i;
-            float x = Margin + i * 136f;
-            RectTransform tab = At(PageNames[i], panel, x, 148f, 128f, 46f);
-            var image = tab.gameObject.AddComponent<Image>();
-            image.color = Color.clear;
-            tab.gameObject.AddComponent<Button>().onClick.AddListener(() => Show((Page)shown));
-            tabs[i] = Label("Label", tab, 0f, 0f, 128f, 44f, 21f, style.Muted, TextAlignmentOptions.Center);
-            tabs[i].text = PageNames[i];
-            RectTransform mark = At("Mark", tab, 0f, 44f, 128f, 2f);
-            mark.gameObject.AddComponent<Image>().color = style.Accent;
-            tabMarks[i] = mark.gameObject;
-        }
+        Hairline(panel, Margin, 198f, Width - Margin * 2f, 1f, style);
+        tabs = new KitTabs(panel, Margin, 148f, 150f, 42f, PageNames, shown => Show((Page)shown));
     }
 
-    private TMP_Text Figure(string label, float x, Color colour, UIStyle style)
+    private TMP_Text Figure(string label, string icon, float x, Color colour, UIStyle style)
     {
         Hairline(panel, x - 20f, 40f, 1f, 76f, style);
         TMP_Text value = Label(label + " Value", panel, x, 34f, 110f, 50f, 36f, colour);
-        Label(label + " Label", panel, x, 86f, 110f, 24f, 17f, style.Muted).text = label;
+        Label(label + " Label", panel, x, 86f, 120f, 24f, 17f, style.Muted).text = HearthKit.InlineIcon(icon, colour) + " " + label;
         return value;
     }
 
@@ -502,23 +497,34 @@ public sealed class AltarWindow : MonoBehaviour
         rateLine = Label("Rate", page, Margin, BodyTop + 36f, 560f, 30f, 21f, style.Text);
         speedLine = Label("Speed", page, Margin, BodyTop + 66f, 560f, 26f, 18f, style.Muted);
         queueLine = Label("Queue", page, Margin, BodyTop + 112f, 560f, 28f, 19f, style.Text);
-        RectTransform bar = At("Progress", page, Margin, BodyTop + 144f, 560f, 3f);
-        bar.gameObject.AddComponent<Image>().color = style.ControlLit;
-        queueFill = Stretch("Fill", bar);
-        queueFill.anchorMax = new Vector2(0f, 1f);
-        queueFill.gameObject.AddComponent<Image>().color = style.Accent;
+        queueFill = KitBar.Make(page, Margin, BodyTop + 144f, 560f, 10f, out queueFillImage);
+        KitBar.Set(queueFill, queueFillImage, 0f, style.Accent);
         AddButton("Purify One", page, Margin, BodyTop + 170f, 180f, UIRole.Kind.Button, () => Purify(1), out purifyOne).text = "Purify one";
         purifyAllLabel = AddButton("Purify All", page, Margin + 192f, BodyTop + 170f, 240f, UIRole.Kind.PrimaryButton, () => Purify(SettlementSettings.Current.MaxQueuedBatches), out purifyAll);
         warningLine = Paragraph("Warning", page, Margin, BodyTop + 232f, 560f, 56f, 19f, style.Warning);
 
         Hairline(page, 624f, BodyTop, 1f, BodyBottom - BodyTop, style);
         Heading("What essence buys", page, 644f, BodyTop, 552f, style);
-        Paragraph("Purified", page, 644f, BodyTop + 36f, 552f, 190f, 19f, style.Text).text =
-            "<b>Purified Essence</b>\nEmpowers gear and deepens skills. Works enchantments with no drawback, strengthens the portal's ward, " +
-            "raises the greatest building tiers and brews the Purified Draught at a Cauldron. Stored at home, it is safe.";
-        Paragraph("Cursed", page, 644f, BodyTop + 236f, 552f, 190f, 19f, style.Text).text =
-            "<b>Cursed Essence</b>\nUsed raw, it works stronger enchantments, each with a stated price, and brews the Cursed Draught. " +
-            "It works at once, with no queue, and a raid's worth comes home only if you do.";
+        EssenceCard(page, "Purified Essence", "Spark", style.Good, BodyTop + 36f, 176f,
+            "Empowers gear and deepens skills. Works enchantments with no drawback, strengthens the portal's ward, " +
+            "raises the greatest building tiers and brews the Purified Draught at a Cauldron. Stored at home, it is safe.");
+        EssenceCard(page, "Cursed Essence", "Skull", style.Danger, BodyTop + 228f, 152f,
+            "Used raw, it works stronger enchantments, each with a stated price, and brews the Cursed Draught. " +
+            "It works at once, with no queue, and a raid's worth comes home only if you do.");
+    }
+
+    // One essence's card: its sign and name in its colour, what it does under them.
+    private static void EssenceCard(Transform page, string name, string icon, Color colour, float y, float height, string text)
+    {
+        UIStyle style = UIStyle.Current;
+        RectTransform card = HearthKit.Card(page, name + " Card", 644f, y, 552f, height, 0.4f);
+        HearthKit.Icon(card, icon, 18f, 16f, 28f, colour);
+        TMP_Text title = Label("Name", card, 56f, 14f, 470f, 32f, 21f, colour);
+        style.Title(title);
+        title.color = colour;
+        title.fontStyle = FontStyles.Bold;
+        title.text = name;
+        Paragraph("Text", card, 18f, 54f, 516f, height - 64f, 18f, style.Text).text = text;
     }
 
     private void Purify(int batches)
@@ -546,11 +552,19 @@ public sealed class AltarWindow : MonoBehaviour
             Read();
         });
         Hairline(page, 838f, BodyTop, 1f, BodyBottom - BodyTop, style);
-        offerEffect = Paragraph("Effect", page, 856f, BodyTop, 340f, 250f, 19f, style.Text);
-        costHeading = Heading("Cost", page, 856f, BodyTop + 258f, 340f, style);
-        offerCost = Paragraph("Costs", page, 856f, BodyTop + 288f, 340f, 104f, 19f, style.Text);
-        offerProblem = Label("Problem", page, 856f, BodyTop + 394f, 340f, 28f, 18f, style.Warning);
-        applyLabel = AddButton("Apply", page, 856f, BodyBottom - 48f, 340f, UIRole.Kind.PrimaryButton, Apply, out applyButton);
+        HearthKit.Card(page, "Offer Card", 848f, BodyTop - 6f, Width - Margin - 848f, BodyBottom - 60f - (BodyTop - 6f), 0.4f);
+        offerIconFrame = HearthKit.Card(page, "Offer Icon", OfferX, BodyTop + 8f, 54f, 54f, 0.7f);
+        RectTransform inner = Stretch("Icon", offerIconFrame);
+        inner.offsetMin = new Vector2(6f, 6f);
+        inner.offsetMax = new Vector2(-6f, -6f);
+        offerIcon = inner.gameObject.AddComponent<Image>();
+        offerIcon.preserveAspect = true;
+        offerIcon.raycastTarget = false;
+        offerEffect = Paragraph("Effect", page, OfferX, BodyTop + 8f, OfferWidth, 240f, 19f, style.Text);
+        costHeading = Heading("Cost", page, 864f, BodyTop + 258f, 316f, style);
+        offerCost = Paragraph("Costs", page, 864f, BodyTop + 288f, 316f, 84f, 19f, style.Text);
+        offerProblem = Paragraph("Problem", page, 864f, BodyTop + 374f, 316f, 42f, 17f, style.Warning);
+        applyLabel = AddButton("Apply", page, 848f, BodyBottom - 48f, Width - Margin - 848f, UIRole.Kind.PrimaryButton, Apply, out applyButton);
     }
 
     private static float HorizontalDistance(Vector3 a, Vector3 b)
