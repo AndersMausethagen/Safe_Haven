@@ -28,7 +28,7 @@ public sealed class MenuAction
     public QuestAnswer Does { get; }
     /// <summary>Where a window that sorts its choices puts this one (HorsePanelWindow: Main, Care, Gear, Name); empty for none.</summary>
     public string Group { get; set; } = "";
-    /// <summary>The name of its icon, for a window that shows one (HorsePanelArt); empty for none.</summary>
+    /// <summary>The name of its icon, for a window that shows one (UIStyle.Icon, the UI kit); empty for none.</summary>
     public string Icon { get; set; } = "";
 }
 

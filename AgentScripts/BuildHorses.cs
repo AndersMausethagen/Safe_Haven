@@ -65,7 +65,6 @@ public static class BuildHorses
     public static string Apply()
     {
         report = "";
-        report += " " + PanelArt();
         Folder(Data);
         GameObject model = Import();
         AnimatorController controller = Controller();
@@ -1121,60 +1120,9 @@ public static class BuildHorses
     /// Only the two horses' prefabs and looks (`--entry BuildHorses.Breeds`): the wild horse on the pony, the toxic horse on
     /// the pack's undead model. Leaves the controller, items, stable, journal and the rest as Apply made them.
     /// </summary>
-    // The horse window's art (Tools/UI/hearthline_horse_art.py): sprites, the card and its rim sliced, gathered in
-    // Resources/HorsePanelArt for the window built in code to find.
-    private const string PanelArtFolder = "Assets/_Project/Art/UI/Horse";
-
-    /// <summary>Only the horse window's art (`--entry BuildHorses.PanelArt`).</summary>
-    public static string PanelArt()
-    {
-        var sprites = new List<Sprite>();
-        Sprite corner = null, card = null, rim = null;
-        foreach (string guid in AssetDatabase.FindAssets("t:Texture2D", new[] { PanelArtFolder }))
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
-            string name = System.IO.Path.GetFileNameWithoutExtension(path);
-            bool sliced = name.StartsWith("Hearthline Card");
-            Vector4 border = sliced ? new Vector4(20f, 20f, 20f, 20f) : Vector4.zero;
-            if (importer.textureType != TextureImporterType.Sprite || importer.mipmapEnabled || !importer.alphaIsTransparency || importer.spriteBorder != border
-                || importer.spriteImportMode != SpriteImportMode.Single)
-            {
-                importer.textureType = TextureImporterType.Sprite;
-                importer.spriteImportMode = SpriteImportMode.Single;
-                importer.mipmapEnabled = false;
-                importer.alphaIsTransparency = true;
-                importer.spriteBorder = border;
-                importer.wrapMode = TextureWrapMode.Clamp;
-                importer.textureCompression = TextureImporterCompression.Uncompressed;
-                importer.SaveAndReimport();
-            }
-
-            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
-            if (name == "Hearthline Scroll Corner") corner = sprite;
-            else if (name == "Hearthline Card") card = sprite;
-            else if (name == "Hearthline Card Rim") rim = sprite;
-            else if (sprite != null) sprites.Add(sprite);
-        }
-
-        const string assetPath = "Assets/_Project/Resources/HorsePanelArt.asset";
-        var art = AssetDatabase.LoadAssetAtPath<HorsePanelArt>(assetPath);
-        if (art == null)
-        {
-            art = ScriptableObject.CreateInstance<HorsePanelArt>();
-            AssetDatabase.CreateAsset(art, assetPath);
-        }
-
-        art.Set(corner, card, rim, sprites.OrderBy(sprite => sprite.name).ToArray());
-        EditorUtility.SetDirty(art);
-        AssetDatabase.SaveAssetIfDirty(art);
-        return $"horse window art: {sprites.Count} icons, corner {(corner != null)}, card {(card != null)}, rim {(rim != null)}";
-    }
-
     public static string Breeds()
     {
         report = "";
-        report += " " + PanelArt();
         GameObject model = Import();
         GameObject pony = ImportPony();
         AnimatorController controller = Load<AnimatorController>(ControllerPath);

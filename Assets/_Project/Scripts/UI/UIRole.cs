@@ -132,11 +132,42 @@ public sealed class UIRole : MonoBehaviour
             Color warm = style.AccentBright;
             warm.a = 0.32f;
             HearthlineArt.AddGlow(press, style, warm, 26f);
+            Round(press, style);
         }
         else if (frame != null)
         {
             frame.SetActive(false);
         }
+
+        if (kind != Kind.Window && kind != Kind.PrimaryButton && transform is RectTransform part)
+        {
+            UIStyle style = UIStyle.Current;
+            Round(part, style);
+            // Hearthline 3: an ordinary button gets a faint gold edge, as the kit's do.
+            if (kind == Kind.Button && GetComponent<Image>() != null && GetComponent<Outline>() == null)
+            {
+                var edge = gameObject.AddComponent<Outline>();
+                edge.effectColor = HearthKit.Faded(style.Accent, 0.28f);
+                edge.effectDistance = new Vector2(1f, -1f);
+            }
+        }
+    }
+
+    // Hearthline 3: insets, slots and buttons drawn as the kit's rounded card (9-sliced), its corners in proportion to the
+    // part's height. Only a plain image (no art of its own), and only in play: prefabs and scenes keep their own images.
+    private static void Round(RectTransform part, UIStyle style)
+    {
+        var image = part.GetComponent<Image>();
+        if (image == null || style.Card == null || (image.sprite != null && image.sprite != style.Card) || image.type == Image.Type.Filled)
+        {
+            return;
+        }
+
+        float height = part.rect.height > 1f ? part.rect.height : 46f;
+        float radius = Mathf.Clamp(height / 2.4f, 4f, 13f);
+        image.sprite = style.Card;
+        image.type = Image.Type.Sliced;
+        image.pixelsPerUnitMultiplier = 20f / radius;
     }
 
     // Hearthline 2: a window's surface has depth (the panel material) and its title is carved, with a rule beneath it.

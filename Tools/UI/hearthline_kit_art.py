@@ -1,4 +1,4 @@
-"""Hearthline art for the horse window (Assets/_Project/Art/UI/Horse), drawn like hearthline_art.py: at four times the
+"""Hearthline 3, the UI kit's art (Assets/_Project/Art/UI/Kit; first made for the horse window), drawn like hearthline_art.py: at four times the
 size and scaled down so every edge is smooth, white so UIStyle tints it.
 
 - Hearthline Scroll Corner: the window's gilded corner, scrollwork curling out of the corner along both edges, a leaf
@@ -8,14 +8,14 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
   Graze.
 
-Run from the project root: python Tools/UI/hearthline_horse_art.py
+Run from the project root: python Tools/UI/hearthline_kit_art.py
 """
 import math
 import os
 
 from PIL import Image, ImageDraw
 
-OUT = os.path.join(os.path.dirname(__file__), '..', '..', 'Assets', '_Project', 'Art', 'UI', 'Horse')
+OUT = os.path.join(os.path.dirname(__file__), '..', '..', 'Assets', '_Project', 'Art', 'UI', 'Kit')
 SS = 4
 ICON = 128
 W = (255, 255, 255, 255)
@@ -368,4 +368,4 @@ if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, scroll_corner, card):
         make()
-    print('horse art ->', os.path.abspath(OUT))
+    print('kit art ->', os.path.abspath(OUT))

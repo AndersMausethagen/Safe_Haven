@@ -90,6 +90,16 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [Tooltip("The pointer.")]
     [SerializeField] private Texture2D cursor;
 
+    [Header("Hearthline 3 (the kit: Tools/UI/hearthline_kit_art.py, Safe Haven › Setup › UI › Install Hearthline Kit Art)")]
+    [Tooltip("The gilded scrollwork for a window's corners (top left; mirrored for the others).")]
+    [SerializeField] private Sprite scrollCorner;
+    [Tooltip("A rounded card, 9-sliced: cards, tabs, bars, chips, buttons.")]
+    [SerializeField] private Sprite card;
+    [Tooltip("The same card's rim alone, 9-sliced.")]
+    [SerializeField] private Sprite cardRim;
+    [Tooltip("White glyphs, tinted where they are used: Heart, Bolt, Weight, Star, Gear and the rest, by name.")]
+    [SerializeField] private Sprite[] icons = System.Array.Empty<Sprite>();
+
     [Header("Motion")]
     [Tooltip("Seconds a window takes to fade in when it opens. 0: it appears at once. Closing is always immediate.")]
     [SerializeField, Range(0f, 0.5f)] private float windowFadeSeconds = 0.12f;
@@ -122,6 +132,28 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Material DisplayMaterial => displayMaterial;
     public Material PanelMaterial => panelMaterial;
     public Sprite Divider => divider;
+    public Sprite ScrollCorner => scrollCorner;
+    public Sprite Card => card;
+    public Sprite CardRim => cardRim;
+
+    /// <summary>The kit icon of this name (a white glyph), or null.</summary>
+    public Sprite Icon(string name)
+    {
+        if (string.IsNullOrEmpty(name) || icons == null)
+        {
+            return null;
+        }
+
+        foreach (Sprite icon in icons)
+        {
+            if (icon != null && icon.name == name)
+            {
+                return icon;
+            }
+        }
+
+        return null;
+    }
     public Sprite Glow => glow;
     public Texture2D Cursor => cursor;
     public string InfoHex => infoHex ??= Hex(info);

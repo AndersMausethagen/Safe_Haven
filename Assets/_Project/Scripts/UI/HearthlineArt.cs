@@ -12,7 +12,7 @@ public static class HearthlineArt
     {
         Transform existing = panel.Find(FrameName);
         Color ink = style.AccentFor(onRaid);
-        ink.a = 0.55f;
+        ink.a = style.ScrollCorner != null ? 0.85f : 0.55f;
         if (existing != null)
         {
             existing.gameObject.SetActive(true);
@@ -24,25 +24,45 @@ public static class HearthlineArt
             return existing.gameObject;
         }
 
-        if (style.CarvedCorner == null)
+        if (style.CarvedCorner == null && style.ScrollCorner == null)
         {
-            Debug.LogError("UI Style needs its Hearthline carved corner artwork.", panel);
+            Debug.LogError("UI Style needs its Hearthline corner artwork.", panel);
             return null;
+        }
+
+        // Hearthline 3: the kit's gilded scrollwork, in proportion to the window (a tooltip's small, a big window's large),
+        // a little brighter than the carved corners it replaces; the carved ones where the kit art isn't installed.
+        Sprite art = style.ScrollCorner != null ? style.ScrollCorner : style.CarvedCorner;
+        float size = CornerSize;
+        if (style.ScrollCorner != null)
+        {
+            Rect box = panel.rect;
+            float shortest = Mathf.Min(box.width, box.height);
+            // Smaller than the kit's own windows' (their layouts leave room for 150), and over the edge: windows laid out
+            // for the carved corners have tight margins, and a corner over a title reads as clutter.
+            size = shortest > 1f ? Mathf.Clamp(shortest * 0.13f, 40f, 104f) : 80f;
+            ink.a = 0.85f;
         }
 
         RectTransform frame = CodeUI.Stretch(FrameName, panel);
         frame.SetAsFirstSibling();
         frame.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        float inset = style.ScrollCorner != null ? -Mathf.Round(size * 0.12f) : 0f;
         for (int x = 0; x <= 1; x++)
         {
             for (int y = 0; y <= 1; y++)
             {
                 var anchor = new Vector2(x, y);
-                var position = new Vector2(x == 0 ? CornerSize * 0.5f : -CornerSize * 0.5f,
-                    y == 0 ? CornerSize * 0.5f : -CornerSize * 0.5f);
-                Image corner = AddIcon(frame, "Corner", style.CarvedCorner, anchor, Vector2.one * CornerSize, position, ink);
+                var position = new Vector2(x == 0 ? size * 0.5f + inset : -size * 0.5f - inset,
+                    y == 0 ? size * 0.5f + inset : -size * 0.5f - inset);
+                Image corner = AddIcon(frame, "Corner", art, anchor, Vector2.one * size, position, ink);
                 corner.rectTransform.localScale = new Vector3(x == 0 ? 1f : -1f, y == 1 ? 1f : -1f, 1f);
             }
+        }
+
+        foreach (Image image in frame.GetComponentsInChildren<Image>(true))
+        {
+            image.color = ink;
         }
 
         return frame.gameObject;

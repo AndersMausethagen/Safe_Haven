@@ -112,7 +112,9 @@ public sealed class HearthlineTests
             Assert.IsTrue(frame.GetComponent<LayoutElement>().ignoreLayout);
             Image[] corners = frame.GetComponentsInChildren<Image>();
             Assert.AreEqual(4, corners.Length);
-            Assert.IsTrue(corners.All(corner => !corner.raycastTarget && corner.sprite == style.CarvedCorner));
+            // Hearthline 3's scroll corners where the kit art is installed, the carved ones otherwise.
+            Sprite expected = style.ScrollCorner != null ? style.ScrollCorner : style.CarvedCorner;
+            Assert.IsTrue(corners.All(corner => !corner.raycastTarget && corner.sprite == expected));
             Assert.IsTrue(corners.All(corner => Mathf.Approximately(corner.color.r, style.RaidAccent.r)));
         }
         finally
