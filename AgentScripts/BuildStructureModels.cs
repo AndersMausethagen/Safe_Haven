@@ -309,6 +309,181 @@ public static class BuildStructureModels
         return materials;
     }
 
+    // ----- Marks: what sets a special place apart from the woods -----
+
+    // The user (2026-11-13): "make these sites and special stones emit some light or make it stand out ... they are a bit
+    // hard to read from normal world dressing vs special places". Every raid event site and world prop gets a "Mark": a
+    // glowing ring on the ground round it (a decal, Tools/LocalSpawn/site_rings.py), a few slow motes rising from it and
+    // a soft light. Gold for the event sites (the colour of their beacons), the runes' blue for the props. A site's mark
+    // goes out with its beacon once it is done (RaidEventSite.mark); a prop's stays.
+    private static readonly Color SiteGold = new Color(1f, 0.8f, 0.45f);
+    private static readonly Color RuneBlue = new Color(0.5f, 0.78f, 1f);
+
+    /// <summary>Puts a Mark on every raid event site and world prop (`--entry BuildStructureModels.Marks`). Safe to rerun.</summary>
+    public static string Marks()
+    {
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Material gold = RingMaterial("Site Ring"), blue = RingMaterial("Rune Ring");
+        Material motes = MoteMaterial();
+        var report = new List<string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { SitePrefabs.TrimEnd('/') }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (Load<GameObject>(path).GetComponent<RaidEventSite>() == null) continue;
+            report.Add(Mark(path, gold, motes, SiteGold, 1f, true));
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs/World/Props" }))
+        {
+            report.Add(Mark(AssetDatabase.GUIDToAssetPath(guid), blue, motes, RuneBlue, 0.6f, false));
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    private static string Mark(string path, Material ring, Material motes, Color colour, float strength, bool site)
+    {
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            Transform old = root.transform.Find("Mark");
+            if (old != null) Object.DestroyImmediate(old.gameObject);
+
+            // How wide the place is: its model's renderers, not the beacon's pillar or the trigger.
+            Transform model = root.transform.Find("Model");
+            if (model == null) model = root.transform;
+            Renderer[] renderers = model.GetComponentsInChildren<Renderer>(true).Where(r => !(r is ParticleSystemRenderer)).ToArray();
+            Bounds bounds = renderers.Length > 0 ? renderers[0].bounds : new Bounds(root.transform.position, Vector3.one * 2f);
+            foreach (Renderer part in renderers) bounds.Encapsulate(part.bounds);
+            Vector3 centre = root.transform.InverseTransformPoint(bounds.center);
+            float across = Mathf.Clamp(Mathf.Max(bounds.size.x, bounds.size.z) * 1.35f + 1f, 3f, 16f);
+
+            var mark = new GameObject("Mark").transform;
+            mark.SetParent(root.transform, false);
+            mark.localPosition = new Vector3(centre.x, 0f, centre.z);
+
+            // The ring, pressed onto the ground from above (a decal lands on whatever is in its box).
+            var decal = new GameObject("Ring").AddComponent<UnityEngine.Rendering.Universal.DecalProjector>();
+            decal.transform.SetParent(mark, false);
+            decal.transform.localPosition = new Vector3(0f, 1f, 0f);
+            decal.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            decal.material = ring;
+            decal.size = new Vector3(across, across, 3f);
+            decal.pivot = Vector3.zero;
+            decal.fadeFactor = 0.9f;
+
+            // A soft light low over it: the ring and the place glow at night, little by day.
+            var light = new GameObject("Glow").AddComponent<Light>();
+            light.transform.SetParent(mark, false);
+            light.transform.localPosition = new Vector3(0f, 1.6f, 0f);
+            light.type = LightType.Point;
+            light.color = colour;
+            light.intensity = 2.2f * strength;
+            light.range = across * 0.75f;
+            light.shadows = LightShadows.None;
+
+            // Motes rising slowly off the ring.
+            var motesObject = new GameObject("Motes");
+            motesObject.transform.SetParent(mark, false);
+            motesObject.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            var particles = motesObject.AddComponent<ParticleSystem>();
+            ParticleSystem.MainModule main = particles.main;
+            main.loop = true;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(3f, 5f);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(0.15f, 0.4f);
+            main.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.16f);
+            main.startColor = new Color(colour.r, colour.g, colour.b, 0.9f);
+            main.maxParticles = 40;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+            main.scalingMode = ParticleSystemScalingMode.Hierarchy;
+            ParticleSystem.EmissionModule emission = particles.emission;
+            emission.rateOverTime = Mathf.Lerp(3f, 8f, Mathf.InverseLerp(3f, 16f, across)) * strength;
+            ParticleSystem.ShapeModule shape = particles.shape;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = across * 0.42f;
+            shape.radiusThickness = 0.25f;
+            ParticleSystem.ColorOverLifetimeModule fade = particles.colorOverLifetime;
+            fade.enabled = true;
+            var gradient = new Gradient();
+            gradient.SetKeys(new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
+                new[] { new GradientAlphaKey(0f, 0f), new GradientAlphaKey(1f, 0.2f), new GradientAlphaKey(0.8f, 0.7f), new GradientAlphaKey(0f, 1f) });
+            fade.color = gradient;
+            ParticleSystem.NoiseModule noise = particles.noise;
+            noise.enabled = true;
+            noise.strength = 0.25f;
+            noise.frequency = 0.4f;
+            var renderer = motesObject.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = motes;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+
+            if (site && root.TryGetComponent(out RaidEventSite eventSite))
+            {
+                var data = new SerializedObject(eventSite);
+                data.FindProperty("mark").objectReferenceValue = mark.gameObject;
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+            return $"{root.name}: ring {across:0.0} m";
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
+    private static Material RingMaterial(string name)
+    {
+        string texturePath = "Assets/_Project/Art/Decals/" + name + ".png";
+        var importer = (TextureImporter)AssetImporter.GetAtPath(texturePath);
+        importer.textureType = TextureImporterType.Default;
+        importer.sRGBTexture = true;
+        importer.alphaIsTransparency = true;
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.mipmapEnabled = true;
+        importer.SaveAndReimport();
+        string path = "Assets/_Project/Art/Decals/Materials/" + name + ".mat";
+        var material = Load<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Shader Graphs/Decal"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.SetTexture("Base_Map", Load<Texture2D>(texturePath));
+        material.SetFloat("Normal_Blend", 0f);
+        material.SetFloat("_DrawOrder", 2f);
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+        return material;
+    }
+
+    // Soft additive motes (as the gear's essence motes, BuildEssence): the particles carry the colour.
+    private static Material MoteMaterial()
+    {
+        string path = SiteArt + "Site Motes.mat";
+        var material = Load<Material>(path);
+        if (material == null)
+        {
+            material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.SetFloat("_Surface", 1f);
+        material.SetFloat("_Blend", 2f);
+        material.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.One);
+        material.SetFloat("_ZWrite", 0f);
+        material.SetOverrideTag("RenderType", "Transparent");
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        material.SetTexture("_BaseMap", AssetDatabase.GetBuiltinExtraResource<Texture2D>("Default-Particle.psd"));
+        EditorUtility.SetDirty(material);
+        return material;
+    }
+
     // ----- Raid event sites -----
 
     private const string SiteArt = "Assets/_Project/Art/Raids/Sites/";

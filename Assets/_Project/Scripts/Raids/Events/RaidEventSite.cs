@@ -11,6 +11,9 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
 {
     [Tooltip("What marks the site while it waits: a pillar of light, a glow. Hidden once it is done.")]
     [SerializeField] private GameObject beacon;
+    [Tooltip("What sets it apart from the woods around it, close to: a glowing ring on the ground, slow motes and a soft " +
+             "light. Unlike the beacon it shows from the start (it is only seen once the place is in view), and goes out once done.")]
+    [SerializeField] private GameObject mark;
     [Tooltip("Metres from the site at which a site without choices counts as found.")]
     [SerializeField, Min(1f)] private float findRadius = 8f;
 
@@ -171,6 +174,11 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
         if (beacon != null)
         {
             beacon.SetActive(false);
+        }
+
+        if (mark != null)
+        {
+            mark.SetActive(false);
         }
 
         if (interactable != null)
