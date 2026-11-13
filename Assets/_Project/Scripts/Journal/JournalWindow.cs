@@ -195,7 +195,9 @@ public sealed class JournalWindow : MonoBehaviour
         foreach (TabView view in tabViews)
         {
             bool on = view.Tab == tab;
-            view.Label.color = on ? style.Text : style.Muted;
+            // Framed tabs (CodeUI.AddTab): the one shown in bright gold, bold, in its gold rim.
+            view.Label.color = on ? style.AccentBright : style.Text;
+            view.Label.fontStyle = on ? FontStyles.Bold : FontStyles.Normal;
             view.Underline.enabled = on;
             view.Page.SetVisible(on);
         }

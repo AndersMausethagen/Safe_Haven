@@ -171,14 +171,15 @@ public sealed class TutorialWindow : MonoBehaviour
         style.Title(title);
         Hairline(panel, Margin, Top - 12f, Width - Margin * 2f, 1f, style);
 
-        // The painting, in a frame of the inset colour so a page without one still has its place.
-        RectTransform frame = At("Art Frame", panel, Margin, Top, ArtWidth, ArtHeight);
-        frame.gameObject.AddComponent<Image>().color = style.Inset;
-        frame.gameObject.AddComponent<Outline>().effectColor = style.Hairline;
+        // The painting in a gold-rimmed card (Hearthline 3, as the portraits), of the inset colour so a page without one
+        // still has its place. Hidden until a page is drawn: an empty image is a white box.
+        RectTransform frame = HearthKit.Card(panel, "Art Frame", Margin, Top, ArtWidth, ArtHeight, 0f, style.Inset, 1.5f);
         artGlyph = Label("Glyph", frame, 0f, 0f, ArtWidth, ArtHeight, 120f, style.Faint, TextAlignmentOptions.Center);
-        art = At("Art", frame, 0f, 0f, ArtWidth, ArtHeight).gameObject.AddComponent<Image>();
+        art = At("Art", frame, 5f, 5f, ArtWidth - 10f, ArtHeight - 10f).gameObject.AddComponent<Image>();
         art.preserveAspect = true;
         art.raycastTarget = false;
+        art.enabled = false;
+        HearthKit.Rim(frame, 0.85f, 1.5f).transform.SetAsLastSibling();
 
         float underArt = Top + ArtHeight + 22f;
         Heading("What it is", panel, Margin, underArt, ArtWidth, style);
@@ -242,7 +243,7 @@ public sealed class TutorialWindow : MonoBehaviour
         artGlyph.text = page.art == null && !string.IsNullOrEmpty(page.title) ? page.title.Substring(0, 1) : "";
         summary.text = GameInput.WithRebinds(string.IsNullOrWhiteSpace(page.summary) ? page.line : page.summary);
         body.text = GameInput.WithRebinds(page.body);
-        counter.text = pages.Count > 1 ? $"{index + 1} of {pages.Count}" : "";
+        counter.text = pages.Count > 1 ? HearthKit.ToneNumbers($"{index + 1} of {pages.Count}") : "";
         previous.gameObject.SetActive(pages.Count > 1);
         previous.interactable = index > 0;
         nextLabel.text = index < pages.Count - 1 ? "Next" : "Got It";

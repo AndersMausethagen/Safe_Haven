@@ -74,23 +74,24 @@ public static class CodeUI
     }
 
     /// <summary>A tab: words on nothing that light up when pointed at, with an underline to switch on for the one shown.</summary>
+    /// <summary>
+    /// A framed tab (Hearthline 3, as KitTabs): a rounded card with a faint gold rim, its name in the title face.
+    /// <paramref name="underline"/> is the bright gold rim of the tab shown: enable it on the one shown (and tint the label).
+    /// </summary>
     public static Button AddTab(string name, Transform parent, float x, float y, float width, float height, UIStyle style, out TMP_Text label, out Image underline)
     {
-        RectTransform rect = At(name + " Tab", parent, x, y, width, height);
-        var image = rect.gameObject.AddComponent<Image>();
-        image.color = new Color(1f, 1f, 1f, 0f);
+        RectTransform rect = At(name + " Tab", parent, x, y + 2f, width, height - 4f);
+        Image image = HearthKit.Sliced(rect.gameObject.AddComponent<Image>(), style.Card, 1.4f);
+        image.color = style.Inset;
         var button = rect.gameObject.AddComponent<Button>();
         button.targetGraphic = image;
-        ColorBlock colors = button.colors;
-        colors.normalColor = new Color(1f, 1f, 1f, 0f);
-        colors.highlightedColor = new Color(1f, 1f, 1f, 0.08f);
-        colors.selectedColor = new Color(1f, 1f, 1f, 0.04f);
-        colors.pressedColor = new Color(1f, 1f, 1f, 0.12f);
-        button.colors = colors;
-        label = Label("Label", rect, 0f, 0f, width, height, 19f, style.Text, TextAlignmentOptions.Center);
-        underline = At("Underline", rect, 24f, height - 4f, width - 48f, 3f).gameObject.AddComponent<Image>();
-        underline.color = style.Accent;
-        underline.raycastTarget = false;
+        HearthKit.Tint(button);
+        UIHighlight.On(rect.gameObject);
+        HearthKit.Rim(rect, 0.3f, 1.4f);
+        label = Label("Label", rect, 0f, 0f, width, height - 4f, 19f, style.Text, TextAlignmentOptions.Center);
+        style.Title(label);
+        underline = HearthKit.Rim(rect, 1f, 1.4f);
+        underline.name = "Shown";
         return button;
     }
 

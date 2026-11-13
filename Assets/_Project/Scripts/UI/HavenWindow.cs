@@ -300,7 +300,9 @@ public sealed class HavenWindow : MonoBehaviour
             int wanted = view.Tab == Tab.Buildings ? WantingAttention(buildings) : view.Tab == Tab.People ? WantingAttention(residents)
                 : view.Tab == Tab.Lands ? WantingAttention(lands) : 0;
             view.Label.text = wanted > 0 ? $"{view.Tab}  <color={UIStyle.Hex(style.Warning)}>{wanted}</color>" : view.Tab.ToString();
-            view.Label.color = on ? style.Accent : style.Text;
+            // Framed tabs (CodeUI.AddTab): the one shown in bright gold, bold, in its gold rim.
+            view.Label.color = on ? style.AccentBright : style.Text;
+            view.Label.fontStyle = on ? FontStyles.Bold : FontStyles.Normal;
             view.Underline.enabled = on;
         }
     }
