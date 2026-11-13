@@ -12,7 +12,7 @@ using TMPro;
 /// failed raid can't take it. The bag side shows the player's ItemInventory and ResourceInventory, the stash side the
 /// GameSession's stash. It closes when the player walks away from the chest.
 /// </summary>
-public sealed class StashWindow : MonoBehaviour
+public sealed partial class StashWindow : MonoBehaviour
 {
     // One grid of slots showing one container. Clicking a stack sends it to the other grid.
     private sealed class Grid : IItemSlotHandler
@@ -68,6 +68,8 @@ public sealed class StashWindow : MonoBehaviour
             {
                 views[i].Show(Container.GetSlot(i), !Container.IsUnlocked(i));
             }
+
+            owner.Compacted(Container, views, root);
         }
 
         public void Hide()
@@ -85,6 +87,7 @@ public sealed class StashWindow : MonoBehaviour
             if (index >= 0 && index < views.Count)
             {
                 views[index].Show(Container.GetSlot(index), !Container.IsUnlocked(index));
+                owner.Compacted(Container, views, root);
             }
 
             owner.OnSlotChanged(this, index);
@@ -188,6 +191,8 @@ public sealed class StashWindow : MonoBehaviour
         player = user;
         bag.Show(items.Container);
         stash.Show(GameSession.Stash.Items);
+        BuildKit();
+        bag.Show(items.Container);
 
         ResourceInventory resources = items.GetComponent<ResourceInventory>();
         carried = resources != null ? resources.Storage : null;
@@ -308,7 +313,7 @@ public sealed class StashWindow : MonoBehaviour
 
     private void RefreshResources()
     {
-        resourcesLabel.text = $"<b>In storage:</b>  {Describe(GameSession.Stash.Resources)}\n<b>Carried:</b>  {Describe(carried)}";
+        resourcesLabel.text = HearthKit.ToneNumbers($"<b>In storage:</b>  {Describe(GameSession.Stash.Resources)}\n<b>Carried:</b>  {Describe(carried)}");
     }
 
     private static string Describe(ResourceStorage storage)
