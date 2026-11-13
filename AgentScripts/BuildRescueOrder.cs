@@ -403,6 +403,12 @@ public static class BuildRescueOrder
             if (!AssetDatabase.CopyAsset(AssetDatabase.GetAssetPath(tor.SitePrefab), path)) throw new InvalidOperationException("Could not copy a site to " + path);
         }
 
+        // A site kit-built by Tools/Blender/raid_sites.py (BuildStructureModels.RaidSites) keeps its look.
+        if (AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Project/Art/Raids/Sites/{name}/{name}.fbx") != null)
+        {
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
         GameObject root = PrefabUtility.LoadPrefabContents(path);
         try
         {

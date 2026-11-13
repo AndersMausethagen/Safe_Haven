@@ -615,9 +615,10 @@ def materials():
 
 # ----- Building it -----------------------------------------------------------------------------------------------------
 
-def build(name, shape, tiers=None, script="building"):
+def build(name, shape, tiers=None, script="building", folder=None, keep_blend=True):
     """Makes the building: shape(bm, level, rng) draws it once per level of detail, tiers {2: part(bm, level, rng), ...}
-    draw what each tier adds. Exports the FBX, renders previews (skipped with --no-preview) and saves the .blend."""
+    draw what each tier adds. Exports the FBX (to folder/<name>, Art/Haven/Structures by default), renders previews
+    (skipped with --no-preview) and saves the .blend (unless keep_blend is off: many small pieces from one script)."""
     bpy.ops.wm.read_factory_settings(use_empty=True)
     made = materials()
     coll = collection(name)
@@ -637,7 +638,7 @@ def build(name, shape, tiers=None, script="building"):
 
     levels = [make(name if i == 0 else f"{name} LOD{i}", shape, LEVELS[i]) for i in range(3)]
     parts = [make(f"{name} Tier {tier}", draw, LEVELS[0]) for tier, draw in sorted((tiers or {}).items())]
-    folder = os.path.join(STRUCTURES, name)
+    folder = os.path.join(folder or STRUCTURES, name)
     os.makedirs(folder, exist_ok=True)
     select_only(levels + parts)
     bpy.ops.export_scene.fbx(filepath=os.path.join(folder, f"{name}.fbx"), use_selection=True,
@@ -661,6 +662,7 @@ def build(name, shape, tiers=None, script="building"):
         camera((x - 4.5, -9.0, 2.6), (x + 0.3, 0.0, 1.3), lens=30)  # standing at the front, as in the concept
         render(preview.replace(".png", "_front.png"), 1600, 900)
         levels[1].hide_render = levels[2].hide_render = False
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(blender, f"{script}.blend"))
+    if keep_blend:
+        bpy.ops.wm.save_as_mainfile(filepath=os.path.join(blender, f"{script}.blend"))
     print(name.upper(), "DONE")
     return levels, parts

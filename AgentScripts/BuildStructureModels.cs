@@ -277,9 +277,9 @@ public static class BuildStructureModels
 
     // ----- Kit-built buildings -----
 
-    private static string KitBuilding(string name, int cap, string modelPrefab, string building)
+    // The game's material for each of the kit's slots (the FBX's material names).
+    private static Dictionary<string, Material> KitSlots()
     {
-        string fbx = Art + name + "/" + name + ".fbx";
         var materials = new Dictionary<string, Material>();
         foreach ((string slot, string tint, Color make) in TierTints)
         {
@@ -306,6 +306,71 @@ public static class BuildStructureModels
         materials["Kit Turf"] = Turf();
         materials["Kit Soil"] = Soil();
         materials["Kit Ember"] = Load<Material>("Assets/_Project/Materials/Haven/Base Ember.mat");
+        return materials;
+    }
+
+    // ----- Raid event sites -----
+
+    private const string SiteArt = "Assets/_Project/Art/Raids/Sites/";
+    private const string SitePrefabs = "Assets/_Project/Prefabs/Raids/Events/Sites/";
+
+    /// <summary>
+    /// The raid event sites kit-built by Tools/Blender/raid_sites.py (`--entry BuildStructureModels.RaidSites`): each
+    /// site's look (its levels of detail, the kit's materials) becomes Art/Raids/Sites/&lt;Site&gt;/&lt;Site&gt;.prefab and takes
+    /// the place of the primitive shapes under the site prefab's "Model". The site's trigger, beacon and event stay.
+    /// </summary>
+    public static string RaidSites()
+    {
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Dictionary<string, Material> materials = KitSlots();
+        var report = new List<string>();
+        foreach (string folder in AssetDatabase.GetSubFolders(SiteArt.TrimEnd('/')))
+        {
+            string name = System.IO.Path.GetFileName(folder);
+            string fbx = folder + "/" + name + ".fbx", sitePath = SitePrefabs + name + ".prefab";
+            if (Load<GameObject>(fbx) == null || Load<GameObject>(sitePath) == null)
+            {
+                report.Add($"{name}: no model or no site");
+                continue;
+            }
+
+            Model(fbx, materials);
+            var model = Load<GameObject>(fbx);
+            var levels = new List<Mesh>();
+            var slots = new List<Material[]>();
+            foreach (string suffix in new[] { "", " LOD1", " LOD2" })
+            {
+                Transform part = model.transform.Find(name + suffix);
+                if (part == null) continue;
+                levels.Add(part.GetComponent<MeshFilter>().sharedMesh);
+                slots.Add(part.GetComponent<MeshRenderer>().sharedMaterials);
+            }
+
+            GameObject look = LookPrefab(folder + "/" + name + ".prefab", name, levels.ToArray(), slots.ToArray());
+            GameObject site = PrefabUtility.LoadPrefabContents(sitePath);
+            try
+            {
+                Transform holder = site.transform.Find("Model");
+                for (int i = holder.childCount - 1; i >= 0; i--) Object.DestroyImmediate(holder.GetChild(i).gameObject);
+                PrefabUtility.InstantiatePrefab(look, holder);
+                PrefabUtility.SaveAsPrefabAsset(site, sitePath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(site);
+            }
+
+            report.Add($"{name}: {string.Join("/", levels.Select(TriangleCount))} triangles, {levels[0].bounds.size:F1}");
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    private static string KitBuilding(string name, int cap, string modelPrefab, string building)
+    {
+        string fbx = Art + name + "/" + name + ".fbx";
+        Dictionary<string, Material> materials = KitSlots();
 
         // The FBX's faces carry the kit's material names; the import maps each to the kit's own material.
         Model(fbx, materials);
