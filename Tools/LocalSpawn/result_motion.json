@@ -1,0 +1,15 @@
+{
+  "_about": "The raid results paintings made to move (the user, 2026-11-13: 'animate them with one of the video models on localspawn, simple movement and sound, trees swaying, eyes blinking'; 'use MiniMax H3, we are prototyping so the licence is fine'). MiniMax H3 is not licensed in the EU: remake these with a licensed model before a release. Each clip starts and ends on its painting (--end-image), so it loops; Tools/LocalSpawn/result_motion.py blends its last frames into its first, drops the sound into a loopable WAV and writes both where the raid's RaidDefinition points (ResultMotion, ResultSound).",
+  "MistyWoods_extracted": {
+    "image": "Assets/_Project/Art/UI/Raids/MistyWoods_extracted.png",
+    "seconds": 7,
+    "seed": 11,
+    "prompt": "A calm, still dusk scene in an ancient pine forest. The tall pines sway gently in a soft wind, their needles and branches moving slowly. Thin mist drifts low between the old rune stones. The warm golden light of the portal between the stones breathes and flickers softly, glints dancing over the carved runes, a few motes of light floating up. The traveler with the big backpack stands still before the portal, only the cloak and straps stirring a little in the breeze. The camera does not move. Sound: a steady soft wind hissing through the pine needles, branches rustling, the faint warm hum of the portal, a few small birds calling in the distance at dusk. Quiet and peaceful, no music, no voices."
+  },
+  "MistyWoods_failed": {
+    "image": "Assets/_Project/Art/UI/Raids/MistyWoods_failed.png",
+    "seconds": 7,
+    "seed": 11,
+    "prompt": "A dark, misty night forest. Pairs of glowing eyes in the darkness between the trees blink slowly and shift a little, some fading out and back in. Thin cold blue mist drifts slowly and low along the ground; the fallen traveler's pack and spear stay clearly visible and lie still. The tall pine branches sway in a cold wind, ferns and moss stir. The camera does not move. Sound: a cold wind hissing through the pine needles, branches creaking, a deep low ominous drone, a faint distant growl in the dark. No music, no voices."
+  }
+}

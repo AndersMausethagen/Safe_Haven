@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 /// <summary>What a large raid is, on a raid with generated maps: a wider map with as much on every square metre, and more time to cross it.</summary>
 [System.Serializable]
@@ -113,12 +114,27 @@ public sealed class RaidDefinition : ScriptableObject
     [SerializeField] private Sprite extractedArtwork;
     [Tooltip("Optional artwork behind the report after dying or the raid collapsing. Empty uses the default.")]
     [SerializeField] private Sprite failedArtwork;
+    [Tooltip("Optional: the extracted artwork moving, a short loop that ends on its first frame (LocalSpawn video). " +
+             "It fades in over the still once it plays.")]
+    [SerializeField] private VideoClip extractedMotion;
+    [Tooltip("Optional: the failed artwork moving, a loop that ends on its first frame.")]
+    [SerializeField] private VideoClip failedMotion;
+    [Tooltip("Optional: the sound of the extracted artwork's place, looped under the report (ambience channel).")]
+    [SerializeField] private AudioClip extractedSound;
+    [Tooltip("Optional: the sound of the failed artwork's place, looped under the report.")]
+    [SerializeField] private AudioClip failedSound;
 
     [Tooltip("A painting of the place, shown in the raid planner when it is chosen (LocalSpawn: Tools/LocalSpawn/raid_art.json).")]
     [SerializeField] private Sprite placeArtwork;
 
     /// <summary>This raid's own results artwork for the outcome, or null to use the default.</summary>
     public Sprite ResultArtwork(bool extracted) => extracted ? extractedArtwork : failedArtwork;
+
+    /// <summary>The results artwork moving (a loop), or null.</summary>
+    public VideoClip ResultMotion(bool extracted) => extracted ? extractedMotion : failedMotion;
+
+    /// <summary>The sound of the results artwork's place (a loop), or null.</summary>
+    public AudioClip ResultSound(bool extracted) => extracted ? extractedSound : failedSound;
 
     /// <summary>A painting of the place for the raid planner, or null.</summary>
     public Sprite PlaceArtwork => placeArtwork;

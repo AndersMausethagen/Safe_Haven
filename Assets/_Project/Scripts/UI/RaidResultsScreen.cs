@@ -10,7 +10,7 @@ using TMPro;
 /// (SceneTransition.Preload), so continuing is quick. Its own scene keeps the raid's objects out of memory and keeps the
 /// screen free of the HUD and the world. Opened without a report (played from the editor), it shows a sample message.
 /// </summary>
-public sealed class RaidResultsScreen : MonoBehaviour
+public sealed partial class RaidResultsScreen : MonoBehaviour
 {
     [SerializeField] private Image artwork;
     [Tooltip("Scales the artwork to cover the screen, cropping what doesn't fit.")]
@@ -133,6 +133,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
 
     private void OnDestroy()
     {
+        ReleaseMotion();
         SceneTransition.CancelWhenReady(OnReady);
     }
 
@@ -156,6 +157,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
         ToTop();
         Sprite own = report.Definition != null ? report.Definition.ResultArtwork(extracted) : null;
         SetArtwork(own != null ? own : extracted ? extractedArtwork : failedArtwork);
+        PlayScene(report.Definition, extracted);
         destination = CanLoad(report.ReturnScene) ? report.ReturnScene : fallbackScene;
         continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the portal";
     }
@@ -241,6 +243,7 @@ public sealed class RaidResultsScreen : MonoBehaviour
         // shown: the tint goes on a frame later, while the content is still unseen.
         yield return null;
         titleLabel.color = TitleColour(extracted);
+        SeeThrough();
         for (float t = 0f; t < 1f && contentFadeSeconds > 0f; t += Time.unscaledDeltaTime / contentFadeSeconds)
         {
             content.alpha = Mathf.SmoothStep(0f, 1f, t);
