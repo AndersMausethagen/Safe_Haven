@@ -62,8 +62,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.775, y: 1.645, z: 2.5500002}
-  m_Center: {x: 0.087500095, y: 0.8225, z: -0.07500005}
+  m_Size: {x: 5.7224584, y: 4.003354, z: 4.2742085}
+  m_Center: {x: 0.13622856, y: 1.9497042, z: 0.08117652}
 --- !u!114 &2501270353842943012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 1.895
+  height: 4.201381
   spread: 0.4
 --- !u!208 &2539794507066641874
 NavMeshObstacle:
@@ -139,11 +139,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.8875, y: 0.8225, z: 1.2750001}
+  m_Extents: {x: 2.8612292, y: 2.001677, z: 2.1371043}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.087500095, y: 0.8225, z: -0.07500005}
+  m_Center: {x: 0.13622856, y: 1.9497042, z: 0.08117652}
   m_TimeToStationary: 0.5
 --- !u!114 &3697652591141356283
 MonoBehaviour:
@@ -173,6 +173,7 @@ MonoBehaviour:
   type: 13
   stationId: 
   menuRange: 6
+  opensWhenUsed: 1
 --- !u!114 &7279463419526463592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,7 +365,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 2.095
+      value: 4.401381
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

@@ -235,3 +235,82 @@ def antlers(bm, x, y, z, level, rng):
         log(bm, (x, y, z), (x + sign * 0.3, y + 0.25, z - 0.12), 0.025, level, rng, material=BIRCH, wobble=0.0, sides=4)
         log(bm, (x + sign * 0.3, y + 0.25, z - 0.12), (x + sign * 0.42, y + 0.55, z - 0.1), 0.02, level, rng, material=BIRCH, wobble=0.0, sides=4)
         log(bm, (x + sign * 0.2, y + 0.17, z - 0.08), (x + sign * 0.2, y + 0.42, z - 0.16), 0.017, level, rng, material=BIRCH, wobble=0.0, sides=4)
+
+
+def lifted(bm, by, draw, *args, **kwargs):
+    """Draws a part with draw(bm, ...) and raises what it made by `by` (a barrel or a crate standing on a deck:
+    the kit's parts stand on the ground)."""
+    before = len(bm.verts)
+    draw(bm, *args, **kwargs)
+    bm.verts.ensure_lookup_table()
+    for v in bm.verts[before:]:
+        v.co.z += by  # Blender's Z is the design's y
+
+
+def net(bm, x0, x1, y, z, drop, level, rng, material=None, rows=5):
+    """A fishing net hung over a pole along x at height y: a lattice of thin cords (the kit has no see-through
+    material), sagging deepest in the middle, a little ragged at its hem."""
+    from building_kit import LINEN
+    material = LINEN if material is None else material
+    if not level["small"]:
+        return
+    cols = 9
+
+    def point(u, t):
+        sag = drop * (0.55 + 0.45 * math.sin(math.pi * u)) * t
+        return (x0 + (x1 - x0) * u, y - sag, z + 0.04 * math.sin(u * 7.0 + t * 3.0) * t)
+
+    cord = dict(level=level, rng=rng, material=material, wobble=0.0, uneven=0.0, cap=0.0, sides=3)
+    for j in range(1, rows + 1):
+        t = j / rows
+        for i in range(cols):
+            log(bm, point(i / cols, t), point((i + 1) / cols, t), 0.008, **cord)
+    for i in range(cols + 1):
+        u = i / cols
+        hem = 1.0 - rng.uniform(0.0, 0.12)
+        for j in range(rows):
+            log(bm, point(u, j / rows), point(u, min(hem, (j + 1) / rows)), 0.008, **cord)
+
+
+def coil(bm, x, y, z, level, rng, radius=0.26, turns=3, thick=0.035, material=None):
+    """A coil of rope lying flat: rings of thin rope, each a little smaller and higher."""
+    from building_kit import LINEN
+    material = LINEN if material is None else material
+    segments = 12 if level["small"] else 6
+    for k in range(turns):
+        r = radius * (1.0 - 0.13 * k)
+        h = y + thick * (0.9 + 1.4 * k)
+        for s in range(segments):
+            a0, a1 = math.tau * s / segments, math.tau * (s + 1.05) / segments
+            log(bm, (x + r * math.cos(a0), h, z + r * math.sin(a0)), (x + r * math.cos(a1), h, z + r * math.sin(a1)), thick, level, rng,
+                material=material, wobble=0.0, uneven=0.0, cap=0.0, sides=5 if level["small"] else 3)
+
+
+def cart_wheel(bm, centre, radius, level, rng, axis=(1.0, 0.0, 0.0), spokes=8):
+    """A spoked wooden wheel with an iron tyre, its axle along `axis` (x, y, z in the design's axes, a unit vector):
+    a rim of short logs, the tyre a band round it, the hub and the spokes."""
+    from mathutils import Vector
+    from building_kit import IRON, PLANKS
+    a = Vector(axis).normalized()
+    u = a.orthogonal().normalized()
+    v = a.cross(u)
+    c = Vector(centre)
+    segments = 14 if level["small"] else 8
+
+    def point(angle, r, out=0.0):
+        p = c + (u * math.cos(angle) + v * math.sin(angle)) * r + a * out
+        return tuple(p)
+
+    for s in range(segments):
+        a0, a1 = math.tau * s / segments, math.tau * (s + 1) / segments
+        log(bm, point(a0, radius - 0.035), point(a1, radius - 0.035), 0.045, level, rng, material=PLANKS, wobble=0.0, uneven=0.0, cap=0.0,
+            sides=6 if level["small"] else 4)
+        log(bm, point(a0, radius + 0.005), point(a1, radius + 0.005), 0.022, level, rng, material=IRON, wobble=0.0, uneven=0.0, cap=0.0,
+            sides=4)
+    log(bm, tuple(c - a * 0.12), tuple(c + a * 0.12), radius * 0.16, level, rng, material=PLANKS, wobble=0.0, uneven=0.0, cap=0.02,
+        sides=8 if level["small"] else 5)
+    if level["small"]:
+        for k in range(spokes):
+            angle = math.tau * k / spokes
+            log(bm, point(angle, radius * 0.14), point(angle, radius - 0.07), 0.024, level, rng, material=PLANKS, wobble=0.0,
+                uneven=0.0, cap=0.0, sides=4)

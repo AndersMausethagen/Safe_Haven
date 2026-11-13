@@ -140,6 +140,39 @@
      "prompt": "A small old Norse village bathhouse, a log sauna, one low building seen from outside, a little wider than it is tall: walls of dark weathered horizontal logs with notched corners on a foundation of rounded grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss growing on it, a peeled log along each eave holding the earth, pale birch bark showing under the roof's edges, and weathered bargeboards on the gables; a low plank door in the long front side, a stubby chimney of grey stones rising through the roof; a bench beside the door with a wooden bucket and a bundle of leafy birch twigs on it, and a water barrel at the corner. No people, no fire, no smoke."
     }
    ]
+  },
+  {
+   "asset": "Dock",
+   "kit": "Tools/Blender/dock.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6603,
+     "prompt": "A small old Norse wooden jetty at a lake shore, seen from outside: a narrow deck of weathered grey-brown oak planks laid across two long log beams, standing on thick round log posts driven into the ground, about four metres long and two wide, with a low rail on one side. On the deck a wooden fish-drying rack of two posts and a pole with a fishing net hung over it, a coil of thick rope, a small wooden barrel, and at the far end a tall post with an iron lantern hanging from an arm. No water, no boat, no people."
+    }
+   ]
+  },
+  {
+   "asset": "Stable",
+   "kit": "Tools/Blender/stable.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6612,
+     "prompt": "A small old Norse village stable, one long low building about three times as wide as it is tall, seen from outside: a back wall and two end walls of dark weathered horizontal logs with notched corners on grey field stones; a low-pitched gable roof covered with a thick, lumpy layer of bare dark brown peat earth, with no grass, no plants and no moss, a peeled log along each eave holding the earth, pale birch bark under the roof's edges; the whole long front side open under the eave, held by four timber posts with diagonal braces, divided inside into four stalls by low log partitions, each stall with a wooden hay rack on the back wall full of golden hay and a log water trough, straw on the floor. No horses, no people."
+    }
+   ]
+  },
+  {
+   "asset": "Wainwrights Yard",
+   "kit": "Tools/Blender/wainwrights_yard.py",
+   "looks": [
+    {
+     "key": "A",
+     "seed": 6622,
+     "prompt": "A small old Norse cartwright's workshop yard, seen from outside: a low open timber shelter on four posts with diagonal braces under a low-pitched roof of bare dark brown peat earth, with no grass and no plants, a peeled log along each eave; under it a heavy wooden workbench with tools; around it a half-built wooden cart frame standing on two trestles, two big spoked wooden cart wheels with iron tyres leaning against a post, a stack of planks, a chopping block with an axe, and a wooden tub. No people."
+    }
+   ]
   }
  ]
 }

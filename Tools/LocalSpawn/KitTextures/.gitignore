@@ -1,0 +1,3 @@
+# The image model's source images: kit_textures.py remakes them from their seeds; the game reads the maps in Art/Haven/Kit/Textures.
+*
+!.gitignore

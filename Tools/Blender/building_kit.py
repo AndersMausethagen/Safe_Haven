@@ -37,13 +37,13 @@ STRUCTURES = os.path.join(ROOT, "Assets", "_Project", "Art", "Haven", "Structure
 # Material slots, and how many metres one repeat of each texture covers (the scans' real size). Those after the
 # birch are the plain tinted materials small things and tier parts are made of (the game's "Base ..." tints).
 (WOOD, PLANKS, STONE, IRON, TURF, EMBER, BOULDER, SOIL, BIRCH,
- COPPER, MOONSILVER, TROLLSTONE, CLOTH, WATER, LINEN, HIDE, DYE_BLUE, DYE_OCHRE) = range(18)
+ COPPER, MOONSILVER, TROLLSTONE, CLOTH, WATER, LINEN, HIDE, DYE_BLUE, DYE_OCHRE, HAY) = range(19)
 SLOTS = ["Kit Wood", "Kit Planks", "Kit Stone", "Kit Iron", "Kit Turf", "Kit Ember", "Kit Boulder", "Kit Soil", "Kit Birch",
          "Kit Copper", "Kit Moonsilver", "Kit Trollstone", "Kit Cloth", "Kit Water", "Kit Linen", "Kit Hide",
-         "Kit Dye Blue", "Kit Dye Ochre"]
+         "Kit Dye Blue", "Kit Dye Ochre", "Kit Hay"]
 TILE = {WOOD: 0.5, PLANKS: 2.0, STONE: 1.8, IRON: 2.2, TURF: 4.0, EMBER: 1.0, BOULDER: 1.6, SOIL: 3.0, BIRCH: 2.0,
         COPPER: 1.0, MOONSILVER: 1.0, TROLLSTONE: 1.0, CLOTH: 1.0, WATER: 1.0, LINEN: 1.0, HIDE: 1.0, DYE_BLUE: 1.0,
-        DYE_OCHRE: 1.0}
+        DYE_OCHRE: 1.0, HAY: 1.0}
 
 LOG = 0.15       # a wall log's radius
 COURSE = LOG * 1.8
@@ -609,7 +609,8 @@ def materials():
             plain("Kit Linen", (0.62, 0.56, 0.44)),
             plain("Kit Hide", (0.4, 0.27, 0.16)),
             plain("Kit Dye Blue", (0.16, 0.24, 0.36)),
-            plain("Kit Dye Ochre", (0.6, 0.42, 0.14))]
+            plain("Kit Dye Ochre", (0.6, 0.42, 0.14)),
+            scanned("Kit Hay", "hay")]  # made by Tools/LocalSpawn/kit_textures.py (Poly Haven has no hay)
 
 
 # ----- Building it -----------------------------------------------------------------------------------------------------

@@ -59,6 +59,21 @@ public static class BuildStructureModels
         ("Cottage", "Cottage Model", "Cottage", 12000),
         ("Hut", "Hut Model", "Hut", 10000),
         ("Sauna", "Sauna Model", "Sauna", 10000),
+        ("Dock", "Dock Model", "Dock", 10000),
+        ("Stable", "Stable Model", "Stable", 16000),
+        ("Wainwrights Yard", "WainwrightsYard Model", "WainwrightsYard", 10000),
+    };
+
+    // What a kit building's model prefab holds besides the kit model, put back after ModelWithTiers clears it: the
+    // Stable's paddock of the Haven's own skigard fence before its open front (BuildHorses keeps its horses at
+    // stall points under the roof and a door point at z 5.2, inside the paddock's 2.3 m gate).
+    private static readonly Dictionary<string, (Vector3 at, float yaw)[]> Fences = new Dictionary<string, (Vector3, float)[]>
+    {
+        ["Stable"] = new[]
+        {
+            (new Vector3(-5.3f, 0f, 4.2f), 90f), (new Vector3(5.3f, 0f, 4.2f), 90f),
+            (new Vector3(-3.2f, 0f, 6.25f), 0f), (new Vector3(3.2f, 0f, 6.25f), 0f),
+        },
     };
 
     // Where a lived-in building's smoke rises (its chimney's top) and where its window glows at night, in the
@@ -114,6 +129,8 @@ public static class BuildStructureModels
         new KitMaterial { Slot = "Kit Boulder", Scan = "rock_boulder_dry", Tint = new Color(0.64f, 0.66f, 0.7f), Parallax = 0.012f },
         // Birch bark under the sod, white along the eaves and gables: the plank scan, bleached.
         new KitMaterial { Slot = "Kit Birch", Scan = "weathered_planks", Tint = new Color(2.1f, 2.0f, 1.82f) },
+        // Hay and straw (stalls, racks, heaps): no scan exists; Tools/LocalSpawn/kit_textures.py makes the set.
+        new KitMaterial { Slot = "Kit Hay", Scan = "hay", Tint = new Color(0.95f, 0.9f, 0.82f), Parallax = 0.008f },
     };
 
     public static string Apply()
@@ -160,16 +177,38 @@ public static class BuildStructureModels
             }
         }
 
+        report.AddRange(Kits(KitBuildings.Select(kit => kit.name)));
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    /// <summary>Only the Dock, the Stable and the Wainwright's Yard (`--entry BuildStructureModels.DockStableYard`),
+    /// kit-built 2026-11-13, without touching the other buildings.</summary>
+    public static string DockStableYard()
+    {
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        List<string> report = Kits(new[] { "Dock", "Stable", "Wainwrights Yard" });
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    private static List<string> Kits(IEnumerable<string> names)
+    {
+        var report = new List<string>();
+        var wanted = new HashSet<string>(names);
         foreach ((string name, string model, string building, int cap) in KitBuildings)
         {
-            if (Load<GameObject>(Art + name + "/" + name + ".fbx") != null)
+            if (wanted.Contains(name) && Load<GameObject>(Art + name + "/" + name + ".fbx") != null)
             {
                 report.Add(KitBuilding(name, cap, Models + model + ".prefab", building));
+                if (Fences.TryGetValue(name, out (Vector3 at, float yaw)[] fences))
+                {
+                    report.Add(Fence(Models + model + ".prefab", fences));
+                }
             }
         }
 
-        AssetDatabase.SaveAssets();
-        return string.Join("\n", report);
+        return report;
     }
 
     // ----- Generated models -----
@@ -375,6 +414,32 @@ public static class BuildStructureModels
 
         return Budget(name, levels.ToArray(), cap, 1024) + GrassLine(grass) + placed +
                $" | {slots[0].Length} materials: {string.Join(", ", slots[0].Select(m => m != null ? m.name : "none"))}";
+    }
+
+    // Skigard pieces in a model prefab (the fence's own model and collider, as the Skigard prefab has them).
+    private static string Fence(string modelPrefab, (Vector3 at, float yaw)[] fences)
+    {
+        Transform fence = Load<GameObject>("Assets/_Project/Prefabs/Structures/Skigard.prefab").transform.Find("Model");
+        GameObject root = PrefabUtility.LoadPrefabContents(modelPrefab);
+        try
+        {
+            foreach ((Vector3 at, float yaw) in fences)
+            {
+                var made = Object.Instantiate(fence.gameObject, root.transform);
+                made.name = "Skigard";
+                made.transform.localPosition = at;
+                made.transform.localRotation = Quaternion.Euler(0f, yaw, 0f);
+                made.transform.localScale = fence.localScale;
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(root, modelPrefab);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+
+        return $"{System.IO.Path.GetFileNameWithoutExtension(modelPrefab)}: {fences.Length} skigard pieces";
     }
 
     /// <summary>The model prefab a building's prefab holds, remade as the kit model's look and one switched-off

@@ -80,6 +80,7 @@ GameObject:
   - component: {fileID: 3375949912460398566}
   - component: {fileID: 7618185371473872604}
   - component: {fileID: 7186121695966020021}
+  - component: {fileID: 1655935160067107826}
   m_Layer: 0
   m_Name: Stable
   m_TagString: Untagged
@@ -172,7 +173,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 2.881607
+  height: 4.825812
   spread: 0.4
 --- !u!208 &2506591635572612199
 NavMeshObstacle:
@@ -184,11 +185,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 5.1306367, y: 1.3910074, z: 3.194505}
+  m_Extents: {x: 6.025, y: 2.322875, z: 2.8118618}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.0014634132, y: 1.2405998, z: 0.037594557}
+  m_Center: {x: 0, y: 2.2529368, z: 0.005510807}
   m_TimeToStationary: 0.5
 --- !u!114 &1676447460113230374
 MonoBehaviour:
@@ -260,6 +261,27 @@ MonoBehaviour:
   cancelled:
     m_PersistentCalls:
       m_Calls: []
+--- !u!65 &1655935160067107826
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1473797701493158158}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 12.05, y: 4.64575, z: 5.6237235}
+  m_Center: {x: 0, y: 2.2529368, z: 0.005510807}
 --- !u!1 &6139771082399887893
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,7 +465,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 3.081607
+      value: 5.0258117
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

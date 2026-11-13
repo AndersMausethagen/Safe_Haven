@@ -1541,7 +1541,7 @@ public static class BuildHorses
     private const string StableModelPath = "Assets/_Project/Art/Haven/Models/Stable Model.prefab";
 
     // A Skigard-fenced paddock with three sheds along its back for shelter, four stalls inside facing the gap at the front.
-    // Made of the Haven's own models until it has one from a concept (Art/Haven/Models).
+    // The model is kit-built from its concept (Tools/Blender/stable.py); the stand-in below only until that exists.
     private static string Stable()
     {
         string path = "Assets/_Project/Data/Buildings/Stable.asset";
@@ -1639,6 +1639,12 @@ public static class BuildHorses
 
     private static GameObject StableModel()
     {
+        // Kit-built from its concept (Tools/Blender/stable.py, BuildStructureModels): kept, not remade from stand-ins.
+        if (Load<GameObject>("Assets/_Project/Art/Haven/Structures/Stable/Stable.fbx") != null && Load<GameObject>(StableModelPath) != null)
+        {
+            return Load<GameObject>(StableModelPath);
+        }
+
         var root = new GameObject("Stable Model");
         try
         {
