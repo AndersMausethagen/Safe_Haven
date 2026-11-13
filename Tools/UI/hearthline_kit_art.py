@@ -6,7 +6,7 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
-  Graze.
+  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle.
 
 Run from the project root: python Tools/UI/hearthline_kit_art.py
 """
@@ -353,6 +353,110 @@ def scroll_corner():
     save(img, 'Hearthline Scroll Corner', size)
 
 
+def sword():
+    img, d = canvas(ICON)
+    blade = Image.new('RGBA', img.size, CLEAR)
+    b = ImageDraw.Draw(blade)
+    b.polygon(P([(44, 70), (44, 14), (50, 2), (56, 14), (56, 70)]), fill=W)
+    b.rounded_rectangle([R(26), R(68), R(74), R(76)], radius=R(3), fill=W)
+    b.rounded_rectangle([R(46), R(76), R(54), R(92)], radius=R(2), fill=W)
+    b.ellipse([R(44), R(90), R(56), R(100)], fill=W)
+    blade = blade.rotate(-45, center=(R(50), R(50)), resample=Image.BICUBIC)
+    img.alpha_composite(blade)
+    save(img, 'Sword', ICON)
+
+
+def flame():
+    img, d = canvas(ICON)
+
+    def teardrop(cx, cy, w, h, m=1.6, steps=160):
+        pts = []
+        for i in range(steps):
+            t = math.tau * i / steps
+            x = math.sin(t) * math.sin(t / 2) ** m
+            y = math.cos(t)
+            pts.append((cx + x * w, cy - y * h))
+        return pts
+
+    d.polygon(P(teardrop(50, 56, 44, 44)), fill=W)
+    d.polygon(P(teardrop(50, 70, 20, 24)), fill=CLEAR)
+    d.polygon(P(teardrop(50, 76, 10, 14)), fill=W)
+    save(img, 'Flame', ICON)
+
+
+def snowflake():
+    img, d = canvas(ICON)
+    for k in range(6):
+        t = math.tau * k / 6
+        ex, ey = 50 + 44 * math.cos(t), 50 + 44 * math.sin(t)
+        line(d, [(50, 50), (ex, ey)], 7)
+        for f in (0.55, 0.8):
+            bx, by = 50 + 44 * f * math.cos(t), 50 + 44 * f * math.sin(t)
+            for side in (-1, 1):
+                u = t + side * math.radians(45)
+                line(d, [(bx, by), (bx + 12 * math.cos(u), by + 12 * math.sin(u))], 5)
+    save(img, 'Snowflake', ICON)
+
+
+def sun():
+    img, d = canvas(ICON)
+    circle(d, 50, 50, 20)
+    for k in range(12):
+        t = math.tau * k / 12
+        r1, r2 = 28, 44 if k % 2 == 0 else 38
+        line(d, [(50 + r1 * math.cos(t), 50 + r1 * math.sin(t)), (50 + r2 * math.cos(t), 50 + r2 * math.sin(t))], 6)
+    save(img, 'Sun', ICON)
+
+
+def crit():
+    img, d = canvas(ICON)
+    d.polygon(P(star_points(50, 50, 48, 16, n=8, rot=-90)), fill=W)
+    circle(d, 50, 50, 9, fill=CLEAR)
+    save(img, 'Crit', ICON)
+
+
+def spark():
+    img, d = canvas(ICON)
+    d.polygon(P(star_points(50, 50, 46, 9, n=4, rot=-90)), fill=W)
+    d.polygon(P(star_points(78, 22, 14, 4, n=4, rot=-90)), fill=W)
+    d.polygon(P(star_points(22, 78, 11, 3, n=4, rot=-90)), fill=W)
+    save(img, 'Spark', ICON)
+
+
+def axe():
+    img, d = canvas(ICON)
+    tool = Image.new('RGBA', img.size, CLEAR)
+    t = ImageDraw.Draw(tool)
+    t.rounded_rectangle([R(52), R(6), R(60), R(96)], radius=R(3), fill=W)
+    t.polygon(P([(54, 12), (30, 4), (18, 18), (16, 34), (24, 48), (54, 38)]), fill=W)
+    tool = tool.rotate(-25, center=(R(50), R(50)), resample=Image.BICUBIC)
+    img.alpha_composite(tool)
+    save(img, 'Axe', ICON)
+
+
+def pickaxe():
+    img, d = canvas(ICON)
+    tool = Image.new('RGBA', img.size, CLEAR)
+    t = ImageDraw.Draw(tool)
+    t.rounded_rectangle([R(46), R(18), R(54), R(96)], radius=R(3), fill=W)
+    t.arc([R(8), R(10), R(92), R(60)], start=200, end=340, fill=W, width=int(R(9)))
+    tool = tool.rotate(-35, center=(R(50), R(50)), resample=Image.BICUBIC)
+    img.alpha_composite(tool)
+    save(img, 'Pickaxe', ICON)
+
+
+def sickle():
+    img, d = canvas(ICON)
+    blade = Image.new('RGBA', img.size, CLEAR)
+    b = ImageDraw.Draw(blade)
+    b.ellipse([R(18), R(4), R(90), R(76)], fill=W)
+    b.ellipse([R(30), R(0), R(98), R(64)], fill=CLEAR)
+    img.alpha_composite(blade)
+    d = ImageDraw.Draw(img)
+    d.polygon(P([(26, 64), (34, 70), (18, 98), (10, 94)]), fill=W)
+    save(img, 'Sickle', ICON)
+
+
 def card():
     """A rounded card, filled, and its rim alone: 9-sliced (border 20 px), for cards, tabs, bars and chips."""
     size = 64
@@ -366,6 +470,7 @@ def card():
 
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
-                 saddle, hourglass, pencil, barding, bags, wheel, stay, graze, scroll_corner, card):
+                 saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
+                 pickaxe, sickle, scroll_corner, card):
         make()
     print('kit art ->', os.path.abspath(OUT))

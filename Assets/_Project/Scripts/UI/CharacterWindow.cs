@@ -13,7 +13,7 @@ using TMPro;
 /// Everything shown comes from the player's PlayerEquipment, Combatant stats and Damageable health; the window only
 /// displays them and forwards input.
 /// </summary>
-public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
+public sealed partial class CharacterWindow : MonoBehaviour, IItemSlotHandler
 {
     // Slot order in each column, top to bottom (left to right for the bottom row).
     // Armor down the left, jewellery and the belt down the right (see GearSlots for the retired slots).
@@ -75,6 +75,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         }
 
         BuildSlots();
+        BuildSheet();
         for (int i = 0; i < GearSlots.Count; i++)
         {
             ShowSlot((GearSlot)i);
@@ -87,6 +88,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
 
     private void OnDisable()
     {
+        HidePortrait();
         if (gear != null)
         {
             gear.SlotChanged -= OnGearSlotChanged;
@@ -363,6 +365,7 @@ public sealed class CharacterWindow : MonoBehaviour, IItemSlotHandler
         }
 
         statsLabel.text = text.ToString();
+        RefreshSheet(stats, rules, armor);
     }
 
     private static string Line(string name, string value) => $"{name}<pos=52%>{value}\n";
