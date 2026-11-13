@@ -110,7 +110,11 @@ public sealed class HorseTests
         Assert.IsNotNull(prefab.GetComponentInChildren<Animator>().runtimeAnimatorController);
         // A prefab asset is in no scene, so nothing in it is active in a hierarchy: what is switched on is what shows.
         Renderer[] shown = System.Array.FindAll(prefab.GetComponentsInChildren<Renderer>(true), r => r.gameObject.activeSelf);
-        Assert.AreEqual(4, shown.Length, "a living horse: body, mane, tail and eyes; no armour or reins");
+        // The pony (the wild horse's breed since 2026-11-13): its eyes are in its body, its mane and tail are one hair mesh.
+        Assert.AreEqual(2, shown.Length, "a living pony: body and hair; no armour or reins");
+        var sway = prefab.GetComponentInChildren<HairSway>();
+        Assert.IsNotNull(sway, "its mane and tail swing");
+        Assert.AreEqual(7, sway.ChainCount, "six mane bones and the tail");
         var saddleModel = new SerializedObject(prefab).FindProperty("saddleModel").objectReferenceValue as GameObject;
         Assert.IsNotNull(saddleModel, "the saddle it wears once saddled");
         Assert.IsFalse(saddleModel.activeSelf, "and not before");

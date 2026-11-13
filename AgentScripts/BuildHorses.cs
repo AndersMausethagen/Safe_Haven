@@ -22,6 +22,10 @@ public static class BuildHorses
     private const string Model = "Assets/Malbers Animations/Horse AnimSet Pro/Undead Horse/Models/Undead_Horse_Re.fbx";
     private const string ControllerPath = Art + "/Horse.controller";
     private const string PrefabPath = "Assets/_Project/Prefabs/World/Living/Wild Horse.prefab";
+    // The wild horse's breed since 2026-11-13: the user's pony from LocalSpawn, fitted to the pack's skeleton with its own
+    // mane and tail cards (Tools/Blender/horse_hair.py) and HairSway. The toxic horse keeps the pack's undead model.
+    private const string Pony = Art + "/Pony/Pony.fbx";
+    private const string HairCard = Art + "/Hair/Hair Card";
     private const string ToxicPrefabPath = "Assets/_Project/Prefabs/World/Living/Toxic Horse.prefab";
     private const string Data = "Assets/_Project/Data/Horses";
     private const string Items = "Assets/_Project/Data/Items";
@@ -78,7 +82,8 @@ public static class BuildHorses
 
         HorseDefinition wild = Definition("Wild Horse", lasso, sounds, looks, toxic: false);
         HorseDefinition toxic = Definition("Toxic Horse", lasso, sounds, looks, toxic: true);
-        Horse wildPrefab = Prefab(model, controller, stats, wild, looks, PrefabPath, toxic: false);
+        PonyLooks(wild, looks);
+        Horse wildPrefab = Prefab(ImportPony(), controller, stats, wild, looks, PrefabPath, toxic: false, pony: true);
         Horse toxicPrefab = Prefab(model, controller, toxicStats, toxic, looks, ToxicPrefabPath, toxic: true);
         Link(wild, wildPrefab);
         Link(toxic, toxicPrefab);
@@ -670,6 +675,8 @@ public static class BuildHorses
         public Material Coat, Hair, Eyes, Saddle, ToxicBody, ToxicHair, ToxicEyes, Gas;
         public Material[] Manes;
         public Material[] Barding;
+        public Material PonyCoat;
+        public Material[] PonyManes;
     }
 
     // The pack's mane colours (its Horse_Mane_D materials), on the mane texture that fits this horse.
@@ -715,6 +722,12 @@ public static class BuildHorses
         made.ToxicHair = Material("Toxic Mane", Tex(body + "Undead_Horse_Mane_AlbedoTransparency.png"), new Color(0.2f, 0.28f, 0.14f), 0.3f,
             Tex(body + "Undead_Horse_Mane_Normal.png"), cutout: true);
         made.ToxicEyes = Material("Toxic Eye", null, new Color(0.3f, 0.9f, 0.2f), 0.9f);
+        // The pony: its generated texture made neutral (Tools/Horses/make_coats.py Pony) for the coat tints, matte (it read
+        // far too shiny with the generator's own roughness), and manes of the same five colours on the hair cards.
+        made.PonyCoat = Material("Pony Main", Tex(Art + "/Pony/PonyCoat.png"), Color.white, 0.18f, Tex(Art + "/Pony/Pony_Normal.png"));
+        // Matte: at the pack mane's 0.3-0.5 smoothness the cards caught the sky and a black mane read pale blue-grey.
+        made.PonyManes = ManeColours.Select(m => Material("Pony Mane " + m.name, Tex(HairCard + "_Albedo.png"), m.colour, 0.12f,
+            Tex(HairCard + "_Normal.png"), cutout: true)).ToArray();
         Emission(made.ToxicEyes, null, new Color(0.4f, 1f, 0.25f) * 4f);
         made.Gas = Gas();
         return made;
@@ -1048,6 +1061,75 @@ public static class BuildHorses
         }
     }
 
+    // The wild horse's looks as a pony: its manes on the hair cards, its dapple and pinto from its own coat.
+    private static void PonyLooks(HorseDefinition wild, Materials looks)
+    {
+        var so = new SerializedObject(wild);
+        SetMaterials(so.FindProperty("manes"), looks.PonyManes);
+        SerializedProperty rare = so.FindProperty("rareCoats");
+        for (int i = 0; i < rare.arraySize; i++)
+        {
+            SerializedProperty coat = rare.GetArrayElementAtIndex(i);
+            var pattern = coat.FindPropertyRelative("pattern").objectReferenceValue as Texture2D;
+            if (pattern != null)
+            {
+                string kind = pattern.name.Replace("HorseCoat ", "").Replace("PonyCoat ", "");
+                coat.FindPropertyRelative("pattern").objectReferenceValue = Load<Texture2D>($"{Art}/Pony/PonyCoat {kind}.png");
+            }
+        }
+
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(wild);
+    }
+
+    private static GameObject ImportPony()
+    {
+        var importer = (ModelImporter)AssetImporter.GetAtPath(Pony);
+        var pack = (ModelImporter)AssetImporter.GetAtPath(Model);
+        importer.animationType = ModelImporterAnimationType.Generic;
+        importer.materialImportMode = ModelImporterMaterialImportMode.None;
+        importer.importAnimation = false;
+        importer.globalScale = pack.globalScale;
+        importer.useFileScale = pack.useFileScale;
+        importer.SaveAndReimport();
+        foreach (string coat in new[] { "PonyCoat", "PonyCoat Dapple", "PonyCoat Pinto" }) Texture($"{Art}/Pony/{coat}.png", 2048);
+        Texture(Art + "/Pony/Pony_Normal.png", 2048, normal: true);
+        Texture(HairCard + "_Albedo.png", 1024);
+        Texture(HairCard + "_Normal.png", 1024, normal: true);
+        var albedo = (TextureImporter)AssetImporter.GetAtPath(HairCard + "_Albedo.png");
+        if (albedo != null && !albedo.alphaIsTransparency)
+        {
+            albedo.alphaIsTransparency = true;
+            albedo.SaveAndReimport();
+        }
+
+        return Load<GameObject>(Pony);
+    }
+
+    /// <summary>
+    /// Only the two horses' prefabs and looks (`--entry BuildHorses.Breeds`): the wild horse on the pony, the toxic horse on
+    /// the pack's undead model. Leaves the controller, items, stable, journal and the rest as Apply made them.
+    /// </summary>
+    public static string Breeds()
+    {
+        report = "";
+        GameObject model = Import();
+        GameObject pony = ImportPony();
+        AnimatorController controller = Load<AnimatorController>(ControllerPath);
+        CombatStatsDefinition stats = Load<CombatStatsDefinition>($"{Data}/Horse Combat Stats.asset");
+        CombatStatsDefinition toxicStats = Load<CombatStatsDefinition>($"{Data}/Toxic Horse Combat Stats.asset");
+        Materials looks = MakeMaterials();
+        HorseDefinition wild = Load<HorseDefinition>($"{Data}/Wild Horse.asset");
+        HorseDefinition toxic = Load<HorseDefinition>($"{Data}/Toxic Horse.asset");
+        PonyLooks(wild, looks);
+        Horse wildPrefab = Prefab(pony, controller, stats, wild, looks, PrefabPath, toxic: false, pony: true);
+        Horse toxicPrefab = Prefab(model, controller, toxicStats, toxic, looks, ToxicPrefabPath, toxic: true);
+        Link(wild, wildPrefab);
+        Link(toxic, toxicPrefab);
+        AssetDatabase.SaveAssets();
+        return $"horses {wildPrefab.name} (pony, sway {wildPrefab.GetComponentInChildren<HairSway>()?.ChainCount}) + {toxicPrefab.name}, gaits {lastGaits} m/s{report}";
+    }
+
     private static void Link(HorseDefinition definition, Horse prefab)
     {
         var data = new SerializedObject(definition);
@@ -1278,7 +1360,7 @@ public static class BuildHorses
     // ----- The prefabs -----
 
     private static Horse Prefab(GameObject model, AnimatorController controller, CombatStatsDefinition stats, HorseDefinition definition, Materials looks,
-        string prefabPath, bool toxic)
+        string prefabPath, bool toxic, bool pony = false)
     {
         var root = new GameObject(definition.DisplayName);
         try
@@ -1297,10 +1379,32 @@ public static class BuildHorses
                 }
             }
 
-            Wear("Horse_Undead_Body_Re", toxic ? looks.ToxicBody : looks.Coat);
-            Wear("Horse_Undead_Mane_Re", toxic ? looks.ToxicHair : looks.Hair);
-            Wear("Horse_Undead_Tail_Re", toxic ? looks.ToxicHair : looks.Hair);
-            Wear("Horse_Undead_Eyes_Re", toxic ? looks.ToxicEyes : looks.Eyes);
+            if (pony)
+            {
+                Wear("Pony", looks.PonyCoat);
+                Wear("Pony Hair", looks.PonyManes[1]);
+                if (Drawn("Pony Hair") != null) Drawn("Pony Hair").shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                // The pack's clips set bones from its own model's defaults (the walk keys no Pelvis position): the pony's
+                // skeleton takes the pack model's default pose, bone for bone (its bind poses are the same).
+                var pack = Load<GameObject>(Model).GetComponentsInChildren<Transform>(true).ToDictionary(t => t.name, t => t);
+                foreach (Transform bone in body.GetComponentsInChildren<Transform>(true))
+                {
+                    if (bone != body.transform && bone.GetComponent<Renderer>() == null && pack.TryGetValue(bone.name, out Transform from))
+                    {
+                        bone.localPosition = from.localPosition;
+                        bone.localRotation = from.localRotation;
+                        bone.localScale = from.localScale;
+                    }
+                }
+            }
+            else
+            {
+                Wear("Horse_Undead_Body_Re", toxic ? looks.ToxicBody : looks.Coat);
+                Wear("Horse_Undead_Mane_Re", toxic ? looks.ToxicHair : looks.Hair);
+                Wear("Horse_Undead_Tail_Re", toxic ? looks.ToxicHair : looks.Hair);
+                Wear("Horse_Undead_Eyes_Re", toxic ? looks.ToxicEyes : looks.Eyes);
+            }
+
             Wear("Horse_Undead_Saddle_Re", looks.Saddle);
             Wear("Horse_Undead_Reins_Re", looks.Saddle);
             Wear("Horse_Undead_ReinsHead_Re", looks.Saddle);
@@ -1415,7 +1519,7 @@ public static class BuildHorses
 
             data.FindProperty("armourModel").objectReferenceValue = armour;
             SetMaterials(data.FindProperty("armourLooks"), looks.Barding);
-            Renderer[] hair = new[] { "Horse_Undead_Mane_Re", "Horse_Undead_Tail_Re" }.Select(Drawn).Where(r => r != null).ToArray();
+            Renderer[] hair = (pony ? new[] { "Pony Hair" } : new[] { "Horse_Undead_Mane_Re", "Horse_Undead_Tail_Re" }).Select(Drawn).Where(r => r != null).ToArray();
             SerializedProperty hairList = data.FindProperty("hairParts");
             hairList.arraySize = hair.Length;
             for (int i = 0; i < hair.Length; i++)
@@ -1425,6 +1529,22 @@ public static class BuildHorses
 
             data.FindProperty("body").objectReferenceValue = body.transform;
             data.ApplyModifiedPropertiesWithoutUndo();
+            if (pony)
+            {
+                // The mane and tail swing (HairSway): each mane bone on its own, the tail as one chain.
+                Transform[] all = body.GetComponentsInChildren<Transform>(true);
+                Transform Bone(string name) => all.FirstOrDefault(t => t.name == name);
+                var chains = all.Where(t => t.name.StartsWith("Mane ") && !t.name.EndsWith(" End"))
+                    .Select(t => new HairSway.Chain { bones = new[] { t }, end = Bone(t.name + " End") })
+                    .Where(c => c.end != null).ToList();
+                Transform[] tail = new[] { "Tail01", "Tail02", "Tail03", "Tail04", "Tail05" }.Select(Bone).Where(t => t != null).ToArray();
+                if (tail.Length == 5 && Bone("Tail05 End") != null)
+                {
+                    chains.Add(new HairSway.Chain { bones = tail, end = Bone("Tail05 End") });
+                }
+
+                Ensure<HairSway>(body).Configure(chains.ToArray());
+            }
             var moving = new SerializedObject(motion);
             float[] speeds = GaitSpeeds(scale);
             SerializedProperty gaits = moving.FindProperty("gaitSpeeds");

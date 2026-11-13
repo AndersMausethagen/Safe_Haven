@@ -3,7 +3,12 @@
   HorseCoat Dapple.png  The coat with dapples: lighter rings in a darker net, luminance only (tinted grey in the game).
   HorseCoat Pinto.png   Bay with large white patches, coloured in (the game's tint for it is white).
 
-Run with any Python that has Pillow and numpy:  python Tools/Horses/make_coats.py
+Run with any Python that has Pillow and numpy:  python Tools/Horses/make_coats.py [breed]
+
+With a breed (e.g. Pony), the breed's own coat is made first from its generated texture (Art/Wildlife/Horse/<Breed>/
+<Breed>_Albedo.png): its colour taken out, its shading kept, about as bright as HorseCoat.png, so the game's coat tints
+(HorseDefinition > Coats) colour it the same way; then its dapple and pinto from that:
+  <Breed>/<Breed>Coat.png, <Breed>Coat Dapple.png, <Breed>Coat Pinto.png
 """
 import os
 import sys
@@ -40,8 +45,26 @@ def dapples(size, count, seed):
     return np.asarray(image, dtype=np.float32) / 255.0
 
 
+def neutral_coat(breed):
+    """The breed's generated texture with its colour taken out: luminance, a little warmth, about as bright as the
+    common coat (mean 0.66), so a tint colours it the way HorseCoat.png is coloured."""
+    folder = os.path.join(ART, breed)
+    albedo = np.asarray(Image.open(os.path.join(folder, f"{breed}_Albedo.png")).convert("RGB"), dtype=np.float32) / 255.0
+    lum = albedo @ np.array([0.3, 0.59, 0.11], dtype=np.float32)
+    # Stretch it to the common coat's brightness, keeping its own shading (dark hooves, muzzle, eyes stay dark).
+    lum = np.clip(lum * (0.66 / max(1e-3, float(lum.mean()))), 0.0, 1.0)
+    coat = lum[..., None] * np.array([1.0, 0.975, 0.94], dtype=np.float32)
+    path = os.path.join(folder, f"{breed}Coat.png")
+    Image.fromarray(np.clip(coat * 255, 0, 255).astype(np.uint8)).save(path)
+    return path, folder, breed + "Coat"
+
+
 def main():
-    coat_path = os.path.join(ART, "HorseCoat.png")
+    breed = sys.argv[1] if len(sys.argv) > 1 else None
+    if breed:
+        coat_path, out, stem = neutral_coat(breed)
+    else:
+        coat_path, out, stem = os.path.join(ART, "HorseCoat.png"), ART, "HorseCoat"
     if not os.path.exists(coat_path):
         sys.exit(f"no {coat_path}")
     coat = np.asarray(Image.open(coat_path).convert("RGB").resize((SIZE, SIZE)), dtype=np.float32) / 255.0
@@ -51,15 +74,15 @@ def main():
     spots = dapples(SIZE, 480, seed=7)[..., None]
     cloud = smooth_noise(SIZE, 12, seed=3)[..., None]
     dapple = coat * (0.66 + 0.34 * spots) * (0.9 + 0.2 * cloud)
-    Image.fromarray(np.clip(dapple * 255, 0, 255).astype(np.uint8)).save(os.path.join(ART, "HorseCoat Dapple.png"))
+    Image.fromarray(np.clip(dapple * 255, 0, 255).astype(np.uint8)).save(os.path.join(out, stem + " Dapple.png"))
 
     # Pinto: bay, and large white patches where a slow noise is high.
     bay = np.array([0.42, 0.25, 0.14], dtype=np.float32)
     patches = smooth_noise(SIZE, 7, seed=11)
     white = np.clip((patches - 0.52) / 0.06, 0.0, 1.0)[..., None]
     pinto = luminance * (bay * 1.3) * (1.0 - white) + coat * 1.02 * white
-    Image.fromarray(np.clip(pinto * 255, 0, 255).astype(np.uint8)).save(os.path.join(ART, "HorseCoat Pinto.png"))
-    print("dapple and pinto coats written to", ART)
+    Image.fromarray(np.clip(pinto * 255, 0, 255).astype(np.uint8)).save(os.path.join(out, stem + " Pinto.png"))
+    print("coat, dapple and pinto written to", out)
 
 
 if __name__ == "__main__":

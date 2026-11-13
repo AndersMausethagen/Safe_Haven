@@ -22,11 +22,11 @@ MonoBehaviour:
   - {r: 0.6, g: 0.6, b: 0.58, a: 1}
   - {r: 0.16, g: 0.14, b: 0.13, a: 1}
   manes:
-  - {fileID: 2100000, guid: 8f04ebe416921664ead215e8d5a11ee3, type: 2}
-  - {fileID: 2100000, guid: e97e988bc5704c64f9475614939aad24, type: 2}
-  - {fileID: 2100000, guid: 569cb1dbb6168a84ba8f7de4fe07814e, type: 2}
-  - {fileID: 2100000, guid: 334ad2324e5cf4e4db30d7d25a974633, type: 2}
-  - {fileID: 2100000, guid: ef777e3e50000324a8b7fd05161ac9d2, type: 2}
+  - {fileID: 2100000, guid: bfe5bb40fd9c6c946b59873afddc34af, type: 2}
+  - {fileID: 2100000, guid: e4b320922dc94324a886bcc200d00a5c, type: 2}
+  - {fileID: 2100000, guid: 46c17b99293a3fd419c7e67841e1e894, type: 2}
+  - {fileID: 2100000, guid: 535fda9a7950e3e418c0a5363b4c37ec, type: 2}
+  - {fileID: 2100000, guid: 8899fa5ba33e68c459ab15aacf61c2b4, type: 2}
   coatManes:
   - 0,1
   - 1,2
@@ -40,11 +40,11 @@ MonoBehaviour:
     mane: 4
   - name: Silver Dapple
     tint: {r: 0.66, g: 0.66, b: 0.68, a: 1}
-    pattern: {fileID: 2800000, guid: 619ebbc38df91c3409ed80b7d87f15e8, type: 3}
+    pattern: {fileID: 2800000, guid: 07b6e7c1c0ecc4f468d6abf39c0e0831, type: 3}
     mane: 4
   - name: Pinto
     tint: {r: 1, g: 1, b: 1, a: 1}
-    pattern: {fileID: 2800000, guid: 87a3f44d98912044db8128fd021dbe5e, type: 3}
+    pattern: {fileID: 2800000, guid: bd17178335d898e438e9e1cc920d64cb, type: 3}
     mane: -1
   - name: Cremello
     tint: {r: 0.95, g: 0.9, b: 0.78, a: 1}
