@@ -117,6 +117,43 @@ public static class HearthKit
         label.text = InlineIcon(icon) + "  " + label.text;
     }
 
+    // Every window's headings and the icon each carries, in one place so the same words always get the same picture.
+    private static readonly System.Collections.Generic.Dictionary<string, string> HeadingIcons =
+        new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Bag", "Bags" }, { "Your bag", "Bags" }, { "Cargo", "Bags" }, { "Likely finds", "Bags" }, { "Safe Pocket", "Lock" },
+            { "Essences", "Spark" }, { "What essence buys", "Spark" }, { "Crafting", "Hammer" }, { "The queue", "Hourglass" },
+            { "Needs", "Wheat" }, { "Cost", "Coin" }, { "Size", "Weight" }, { "Gear", "Sword" }, { "Companion", "Heart" },
+            { "What next", "Star" }, { "Renown", "Star" }, { "Milestones", "Star" }, { "Levels", "Stats" }, { "Expedition", "Lead" },
+            { "Raid modifiers", "Crit" }, { "Difficulty", "Crit" }, { "Known dangers", "Skull" }, { "This run", "Hourglass" },
+            { "Extra time", "Hourglass" }, { "What it is", "Info" }, { "How it works", "Gear" }, { "Gathering", "Axe" },
+            { "Combat", "Sword" }, { "Stealth", "Eye" }, { "Riding", "HorseHead" }, { "Skill Bar", "Spark" }, { "Known Skills", "Book" },
+            { "Attributes", "Star" }, { "Offense", "Sword" }, { "Resistances", "Barding" },
+        };
+
+    /// <summary>The icon a heading with these words carries, or null.</summary>
+    public static string IconForHeading(string text) =>
+        text != null && HeadingIcons.TryGetValue(text.Trim(), out string icon) && UIStyle.Current.Icon(icon) != null ? icon : null;
+
+    /// <summary>Puts each heading's icon before it, for every label under <paramref name="root"/> that says one of the
+    /// headings the kit knows (IconForHeading). Labels on buttons and tabs are left alone, and each is done once.</summary>
+    public static void DecorateHeadings(Transform root)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        foreach (TMP_Text label in root.GetComponentsInChildren<TMP_Text>(true))
+        {
+            string icon = IconForHeading(label.text);
+            if (icon != null && label.GetComponentInParent<Selectable>(true) == null)
+            {
+                DecorateHeading(label, icon);
+            }
+        }
+    }
+
     /// <summary>Puts icons before a window's headings, found by their text (a prefab's labels): "Bag" gets Bags, and so
     /// on. Each once; labels that say something else are left alone.</summary>
     public static void DecorateHeadings(Transform root, params (string text, string icon)[] headings)

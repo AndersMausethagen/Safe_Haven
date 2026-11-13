@@ -6,7 +6,7 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
-  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book.
+  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book, Skull, Coin, Eye.
 - Kit Icons.png and .json (next to the folder): the icons in one atlas, for TextMesh Pro's <sprite name=...>.
 
 Run from the project root: python Tools/UI/hearthline_kit_art.py
@@ -502,6 +502,37 @@ def book():
     save(img, 'Book', ICON)
 
 
+def skull():
+    img, d = canvas(ICON)
+    d.ellipse([R(14), R(6), R(86), R(74)], fill=W)
+    d.rounded_rectangle([R(30), R(58), R(70), R(92)], radius=R(6), fill=W)
+    circle(d, 35, 42, 11, fill=CLEAR)
+    circle(d, 65, 42, 11, fill=CLEAR)
+    d.polygon(P([(50, 54), (44, 66), (56, 66)]), fill=CLEAR)
+    for x in (40, 50, 60):
+        d.rectangle([R(x - 1.5), R(78), R(x + 1.5), R(92)], fill=CLEAR)
+    save(img, 'Skull', ICON)
+
+
+def coin():
+    img, d = canvas(ICON)
+    circle(d, 50, 50, 44)
+    circle(d, 50, 50, 34, fill=CLEAR)
+    circle(d, 50, 50, 28)
+    d.polygon(P([(50, 30), (60, 50), (50, 70), (40, 50)]), fill=CLEAR)
+    save(img, 'Coin', ICON)
+
+
+def eye():
+    img, d = canvas(ICON)
+    top = [(6 + 88 * t, 50 - 34 * math.sin(math.pi * t)) for t in [i / 40 for i in range(41)]]
+    bottom = [(94 - 88 * t, 50 + 34 * math.sin(math.pi * t)) for t in [i / 40 for i in range(41)]]
+    d.polygon(P(top + bottom), fill=W)
+    circle(d, 50, 50, 20, fill=CLEAR)
+    circle(d, 50, 50, 12)
+    save(img, 'Eye', ICON)
+
+
 def atlas():
     """Every icon in one atlas for TextMesh Pro (Art/UI/Kit Icons.png and .json), so text can carry them:
     <sprite name="Bags" tint=1>. HearthKitArtInstaller builds the sprite asset from it."""
@@ -522,7 +553,7 @@ def atlas():
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
-                 pickaxe, sickle, lock, hammer, book, scroll_corner, card):
+                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card):
         make()
     atlas()
     print('kit art ->', os.path.abspath(OUT))

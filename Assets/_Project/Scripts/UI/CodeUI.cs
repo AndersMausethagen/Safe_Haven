@@ -62,6 +62,13 @@ public static class CodeUI
     {
         TMP_Text heading = Label(text + " Heading", parent, x, y, width, 26f, 17f, style.Accent);
         heading.text = text.ToUpperInvariant();
+        // Hearthline 3: the kit's icon for these words, before them (after the capitals, which would break the tag).
+        string icon = HearthKit.IconForHeading(text);
+        if (icon != null)
+        {
+            heading.richText = true;
+            heading.text = HearthKit.InlineIcon(icon) + "  " + heading.text;
+        }
         heading.characterSpacing = 8f;
         return heading;
     }

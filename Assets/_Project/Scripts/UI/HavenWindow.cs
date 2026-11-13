@@ -686,7 +686,8 @@ public sealed class HavenWindow : MonoBehaviour
         const float x = 974f;
         const float width = 222f;
         Heading("Expedition", overviewPage, x, ColumnsTop, width, style);
-        peopleHome = Label("Home", overviewPage, x, ColumnsTop, width, 26f, 17f, style.Muted, TextAlignmentOptions.Right);
+        // Under the heading, not beside it: with its icon the heading fills the narrow column.
+        peopleHome = Label("Home", overviewPage, x, ColumnsTop + 19f, width, 18f, 14f, style.Muted, TextAlignmentOptions.Left);
         for (int i = 0; i < MostPeople; i++)
         {
             var row = new PersonRow { Root = At($"Person {i}", overviewPage, x, ColumnsTop + 36f + i * PersonHeight, width, PersonHeight).gameObject };

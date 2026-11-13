@@ -125,6 +125,8 @@ public sealed class UIRole : MonoBehaviour
             frame = HearthlineArt.AddFrame(panel, style, onRaid);
             Paint(GetComponent<Outline>(), style.RimFor(onRaid));
             Dress(panel, style);
+            // Hearthline 3: its headings carry the kit's icons.
+            HearthKit.DecorateHeadings(panel);
         }
         else if (kind == Kind.PrimaryButton && transform is RectTransform press)
         {
