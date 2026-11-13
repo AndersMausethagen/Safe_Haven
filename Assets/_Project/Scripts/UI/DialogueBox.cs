@@ -116,7 +116,8 @@ public sealed class DialogueBox : MonoBehaviour
     private const float LineX = 440f;
     private const float LineWidth = 414f;
     private const float PanelHeight = 212f;
-    private const float PanelAlpha = 0.78f;
+    // Hearthline 3: nearly solid (see-through, the walnut went muddy over the sunlit meadow).
+    private const float PanelAlpha = 0.94f;
     private const float BubbleAnswersWidth = 330f;
     private const float AnswerRowHeight = 40f;
     private const float AnswerRowStep = 45f;
@@ -382,7 +383,9 @@ public sealed class DialogueBox : MonoBehaviour
             {
                 DialogueChoice choice = answers[i];
                 buttons[i].interactable = choice.Enabled;
-                buttons[i].image.color = choice.Enabled ? ButtonColour : ButtonOff;
+                // Hearthline 3: dark leather, grey when it can't be said.
+                buttons[i].image.color = choice.Enabled ? UIStyle.Current.Inset : UIStyle.Current.Disabled;
+                buttonLabels[i].color = choice.Enabled ? Body : UIStyle.Current.Inactive;
                 string tag = choice.QuestTag();
                 buttonLabels[i].text = $"<color={UIStyle.Current.AccentHex}>{i + 1}.</color> {GameInput.WithRebinds(choice.Label)}" +
                                        (tag != null ? $"\n<size=75%>{tag}</size>" :
@@ -767,16 +770,18 @@ public sealed class DialogueBox : MonoBehaviour
         RectTransform panel = Rect("Panel", root.transform, new Vector2(0.5f, 0f), new Vector2(PanelWidth, PanelHeight), new Vector2(0f, 45f));
         panel.pivot = new Vector2(0.5f, 0f);
         box.content = panel.gameObject;
-        var background = panel.gameObject.AddComponent<Image>();
+        var background = HearthKit.Sliced(panel.gameObject.AddComponent<Image>(), UIStyle.Current.Card, 0.9f);
         background.color = new Color(Panel.r, Panel.g, Panel.b, Panel.a * PanelAlpha);
         var rim = panel.gameObject.AddComponent<Outline>();
-        rim.effectColor = new Color(Rim.r, Rim.g, Rim.b, Rim.a * 0.6f);
-        rim.effectDistance = new Vector2(2f, -2f);
+        rim.effectColor = new Color(0f, 0f, 0f, 0f);
+        HearthKit.Rim(panel, 0.75f, 0.9f).transform.SetAsFirstSibling();
+        HearthKit.Ground(panel);
+        HearthKit.Corners(panel, 84f);
         box.panelBackground = background;
         box.panelRim = rim;
 
         RectTransform frame = Rect("Portrait Frame", panel, new Vector2(0f, 0.5f), new Vector2(176f, 176f), new Vector2(106f, 0f));
-        frame.gameObject.AddComponent<Image>().color = Rim;
+        HearthKit.Sliced(frame.gameObject.AddComponent<Image>(), UIStyle.Current.Card, 1.5f).color = UIStyle.Current.Accent;
         box.portraitFrame = frame.gameObject;
         RectTransform face = Rect("Portrait", frame, new Vector2(0.5f, 0.5f), new Vector2(169f, 169f), Vector2.zero);
         box.portraitCamera = DialoguePortrait.Create();
@@ -786,7 +791,9 @@ public sealed class DialogueBox : MonoBehaviour
         box.picture = still.gameObject.AddComponent<Image>();
         box.picture.preserveAspect = true;
 
-        box.nameLabel = Text("Name", panel, 24f, Title, new Vector2(0f, 1f), new Vector2(482f, 34f), new Vector2(NameX, -30f), TextAlignmentOptions.Left);
+        box.nameLabel = Text("Name", panel, 26f, Title, new Vector2(0f, 1f), new Vector2(482f, 36f), new Vector2(NameX, -30f), TextAlignmentOptions.Left);
+        UIStyle.Current.Title(box.nameLabel);
+        box.nameLabel.color = Title;
         box.nameLabel.fontStyle = FontStyles.Bold;
         box.lineLabel = Text("Line", panel, 21f, Body, new Vector2(0f, 1f), new Vector2(LineWidth, 150f), new Vector2(LineX, -120f), TextAlignmentOptions.TopLeft);
         // Long lines (a leader's briefing) shrink to fit rather than run out of the box.
@@ -809,8 +816,8 @@ public sealed class DialogueBox : MonoBehaviour
 
         // Above the HUD, and never in the way of a click: the fight goes on beneath it.
         RectTransform strip = Rect("Subtitle", root.transform, new Vector2(0.5f, 0f), new Vector2(PanelWidth, 64f), new Vector2(0f, 330f));
-        Image stripBackground = strip.gameObject.AddComponent<Image>();
-        stripBackground.color = new Color(Panel.r, Panel.g, Panel.b, 0.55f);
+        Image stripBackground = HearthKit.Sliced(strip.gameObject.AddComponent<Image>(), UIStyle.Current.Card, 1.2f);
+        stripBackground.color = new Color(Panel.r, Panel.g, Panel.b, 0.82f);
         stripBackground.raycastTarget = false;
         box.subtitle = Text("Line", strip, 21f, Body, new Vector2(0.5f, 0.5f), new Vector2(PanelWidth - 40f, 56f), Vector2.zero, TextAlignmentOptions.Center);
         box.subtitle.enableAutoSizing = true;
@@ -836,10 +843,13 @@ public sealed class DialogueBox : MonoBehaviour
         row.transform.SetParent(answerColumn, false);
         var element = row.AddComponent<LayoutElement>();
         element.preferredHeight = AnswerRowHeight;
-        var image = row.AddComponent<Image>();
+        var image = HearthKit.Sliced(row.AddComponent<Image>(), UIStyle.Current.Card, 1.6f);
         var button = row.AddComponent<Button>();
         button.targetGraphic = image;
+        HearthKit.Tint(button);
         button.onClick.AddListener(() => Choose(index));
+        HearthKit.Rim((RectTransform)row.transform, 0.35f, 1.6f);
+        UIHighlight.On(row);
         TMP_Text label = Text("Label", row.transform, 18f, Body, new Vector2(0.5f, 0.5f), new Vector2(244f, 38f), Vector2.zero, TextAlignmentOptions.Left);
         row.SetActive(false);
         buttons.Add(button);

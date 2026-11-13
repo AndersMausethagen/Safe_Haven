@@ -18,7 +18,8 @@ public sealed class SpeechBubble : MonoBehaviour
     private const float PaddingBottom = 12f;
     private const float NameHeight = 22f;
     private const float HintHeight = 16f;
-    private const float BackAlpha = 0.62f;
+    // Hearthline 3: nearly solid; see-through, the walnut went muddy over the sunlit meadow.
+    private const float BackAlpha = 0.93f;
     private const float ScreenMargin = 16f;
     private const float AboveHead = 0.45f;
     private const float TailSize = 14f;
@@ -195,11 +196,9 @@ public sealed class SpeechBubble : MonoBehaviour
 
         bubble = Rect("Bubble", self, new Vector2(0.5f, 0.5f), new Vector2(300f, 100f));
         bubble.pivot = new Vector2(0.5f, 0f);
-        Image back = bubble.gameObject.AddComponent<Image>();
+        Image back = HearthKit.Sliced(bubble.gameObject.AddComponent<Image>(), style.Card, 1.3f);
         back.color = SeeThrough(style.Panel, BackAlpha);
-        var rim = bubble.gameObject.AddComponent<Outline>();
-        rim.effectColor = SeeThrough(style.Rim, 0.55f);
-        rim.effectDistance = new Vector2(2f, -2f);
+        HearthKit.Rim(bubble, 0.8f, 1.3f);
 
         // The tail: a square turned on its corner, half of it hanging below the bubble, the same colour and rim.
         tail = Rect("Tail", bubble, new Vector2(0.5f, 0f), new Vector2(TailSize, TailSize));
@@ -207,15 +206,17 @@ public sealed class SpeechBubble : MonoBehaviour
         tail.SetAsFirstSibling();
         tail.gameObject.AddComponent<Image>().color = SeeThrough(style.Panel, BackAlpha);
         var tailRim = tail.gameObject.AddComponent<Outline>();
-        tailRim.effectColor = SeeThrough(style.Rim, 0.55f);
-        tailRim.effectDistance = new Vector2(2f, -2f);
+        tailRim.effectColor = HearthKit.Faded(style.Accent, 0.8f);
+        tailRim.effectDistance = new Vector2(1.5f, -1.5f);
 
-        nameLabel = Text("Name", bubble, 17f, style.Accent, TextAlignmentOptions.TopLeft);
+        nameLabel = Text("Name", bubble, 18f, style.Accent, TextAlignmentOptions.TopLeft);
+        style.Title(nameLabel);
+        nameLabel.color = style.Accent;
         nameLabel.fontStyle = FontStyles.Bold;
         lineLabel = Text("Line", bubble, 18f, style.Text, TextAlignmentOptions.TopLeft);
         hintLabel = Text("Hint", bubble, 13f, style.Accent, TextAlignmentOptions.BottomRight);
         // Words on a see-through back stay readable with the shadowed face made for text on the world.
-        style.OnWorld(nameLabel);
+        // The name keeps the title face on the now solid back; the line keeps the shadowed face made for text on the world.
         style.OnWorld(lineLabel);
         RectTransform hint = hintLabel.rectTransform;
         hint.anchorMin = hint.anchorMax = new Vector2(1f, 0f);
