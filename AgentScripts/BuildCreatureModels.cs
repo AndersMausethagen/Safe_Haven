@@ -33,6 +33,10 @@ public static class BuildCreatureModels
         ["Bartender"] = Map("Hips", "Spine", "Spine1", null, "Neck", "Head", "Shoulder_{0}", "Arm_{0}", "ForeArm_{0}", "Hand_{0}", "UpLeg_{0}", "Leg_{0}", "Foot_{0}", "ToeBase_{0}", "L", "R"),
         ["Treant1"] = Treant(),
         ["Treant2"] = Treant(),
+        // The user's forest troll (Hunyuan3D, rigged with Mixamo's skeleton in LocalSpawn), 2026-11-13.
+        ["ForestTroll"] = Map("mixamorig:Hips", "mixamorig:Spine", "mixamorig:Spine1", "mixamorig:Spine2", "mixamorig:Neck", "mixamorig:Head",
+            "mixamorig:{0}Shoulder", "mixamorig:{0}Arm", "mixamorig:{0}ForeArm", "mixamorig:{0}Hand", "mixamorig:{0}UpLeg", "mixamorig:{0}Leg",
+            "mixamorig:{0}Foot", "mixamorig:{0}ToeBase", "Left", "Right"),
         ["Boneman"] = Map("LowerSpine", "UpperSpine", null, null, "LowerNek", "Head", "{0}Clavicle", "{0}Humerus", "{0}Radius", "{0}Hand", "{0}Femur", "IK{0}Leg", "{0}Foot", null, "Left", "Right"),
     };
 
@@ -133,6 +137,16 @@ public static class BuildCreatureModels
         new Skin { Slot = "Eyes", Tint = eyes, Eye = true },
     };
 
+    // One texture painted with everything, eyes included.
+    private static Skin[] ForestTrollSkin(Color tint) => new[]
+    {
+        new Skin { Slot = "Material_0", Base = "ForestTroll_BaseColor.png", Normal = "ForestTroll_Normal.png", Tint = tint, Smooth = 0.22f },
+    };
+
+    // Unity makes the coarser levels at import (Mesh LOD), keeping the texture's seams: Blender's collapse tore them.
+    // Level 5 (1.2k) smeared the face, so it stops at level 4 (2.4k).
+    private static readonly Dictionary<string, int> MeshLods = new Dictionary<string, int> { ["ForestTroll"] = 4 };
+
     private static Skin[] WolfSkin() => new[]
     {
         new Skin { Slot = "Main", Tint = new Color(0.27f, 0.25f, 0.24f), Smooth = 0.05f },
@@ -168,9 +182,10 @@ public static class BuildCreatureModels
         Idle = "Bat_Flying", Walk = "Bat_Flying", Attack = "Bat_Attack", Death = "Bat_Die",
     };
 
+    // The user's own forest troll since 2026-11-13 (it was the Kelgar goblin, still the Shaman's): the same Humanoid clips.
     private static Body SmallTroll(string creature, string folder) => new Body
     {
-        Creature = creature, Folder = folder, Model = "Goblin", Label = "Small Troll", Height = 1.6f, Radius = 0.45f, AgentRadius = 0.45f, SizeVariation = 0.08f, ShadeVariation = 0.12f, Skins = GoblinSkin(Moss, Ember), Hide = new[] { "Ear", "Neck" },
+        Creature = creature, Folder = folder, Model = "ForestTroll", Label = "Small Troll", Height = 1.6f, Radius = 0.45f, AgentRadius = 0.45f, SizeVariation = 0.08f, ShadeVariation = 0.12f, Skins = ForestTrollSkin(Moss),
     };
 
     private static Body Rootling(string creature, string folder) => new Body
@@ -237,6 +252,22 @@ public static class BuildCreatureModels
 
         AssetDatabase.SaveAssets();
         return RefitBodies(log);
+    }
+
+    /// <summary>Only the forest troll's import and the bodies made of it (`--entry BuildCreatureModels.ForestTrolls`).</summary>
+    public static string ForestTrolls()
+    {
+        var log = new List<string>();
+        AssetDatabase.Refresh();
+        Import("ForestTroll", log);
+        foreach (Body body in Bodies.Where(b => b.Model == "ForestTroll"))
+        {
+            Swap(body, log);
+            Definition(body);
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join(" ", log);
     }
 
     /// <summary>Only what goes on the prefabs, for tuning eyes and gear without importing the models again.</summary>
@@ -316,6 +347,12 @@ public static class BuildCreatureModels
         importer.importCameras = false;
         importer.importLights = false;
         importer.importBlendShapes = false;
+        importer.generateMeshLods = MeshLods.TryGetValue(model, out int coarsest);
+        if (importer.generateMeshLods)
+        {
+            importer.maximumMeshLod = coarsest;
+        }
+
         if (Rigs.TryGetValue(model, out Dictionary<string, string> rig))
         {
             importer.animationType = ModelImporterAnimationType.Human;
