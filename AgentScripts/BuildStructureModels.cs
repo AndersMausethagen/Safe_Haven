@@ -346,13 +346,36 @@ public static class BuildStructureModels
                 slots.Add(part.GetComponent<MeshRenderer>().sharedMaterials);
             }
 
-            GameObject look = LookPrefab(folder + "/" + name + ".prefab", name, levels.ToArray(), slots.ToArray());
+            // Grass on what is made of turf (a barrow's mound), as on the kit roofs.
+            Material[] first = slots[0];
+            bool turf = first.Any(m => m != null && m.name == "Kit Turf");
+            (Mesh grass, Material grassMaterial) = turf
+                ? RoofGrass(folder + "/", name, levels[0], (sub, centre, uv) => sub < first.Length && first[sub] != null && first[sub].name == "Kit Turf")
+                : (null, null);
+            if (grassMaterial != null) grassMaterial = MoundGrass(grassMaterial);
+            if (turf)
+            {
+                // The mound itself dark earth under its grass, not the Haven's sunlit sod (the woods' pale floor
+                // texture read tan without the terrain's tint: tried and dropped).
+                Material floor = Soil();
+                foreach (Material[] level in slots)
+                {
+                    for (int i = 0; i < level.Length; i++)
+                    {
+                        if (level[i] != null && level[i].name == "Kit Turf") level[i] = floor;
+                    }
+                }
+            }
+            GameObject look = LookPrefab(folder + "/" + name + ".prefab", name, levels.ToArray(), slots.ToArray(), grass, grassMaterial);
             GameObject site = PrefabUtility.LoadPrefabContents(sitePath);
             try
             {
                 Transform holder = site.transform.Find("Model");
                 for (int i = holder.childCount - 1; i >= 0; i--) Object.DestroyImmediate(holder.GetChild(i).gameObject);
                 PrefabUtility.InstantiatePrefab(look, holder);
+                // The Heartroot's stand-in stump stood beside its Model (BuildFirstBoss.DressStump): the look replaces it too.
+                Transform stump = site.transform.Find("Stump");
+                if (stump != null) Object.DestroyImmediate(stump.gameObject);
                 PrefabUtility.SaveAsPrefabAsset(site, sitePath);
             }
             finally
@@ -365,6 +388,30 @@ public static class BuildStructureModels
 
         AssetDatabase.SaveAssets();
         return string.Join("\n", report);
+    }
+
+    // The roof grass made for the raids' woods: the Haven's sunny meadow green glowed yellow on a barrow in the dark
+    // undergrowth (seen in a launched Misty Woods raid), so the mounds' grass is a deep forest green, with few dry patches.
+    private static Material MoundGrass(Material roofGrass)
+    {
+        string path = SiteArt + "Mound Grass.mat";
+        var material = Load<Material>(path);
+        if (material == null)
+        {
+            material = new Material(roofGrass) { name = "Mound Grass" };
+            AssetDatabase.CreateAsset(material, path);
+        }
+        else
+        {
+            material.CopyPropertiesFromMaterial(roofGrass);
+        }
+
+        material.SetColor("_BottomColor", new Color(0.05f, 0.1f, 0.03f));
+        material.SetColor("_TopColor", new Color(0.2f, 0.32f, 0.1f));
+        material.SetColor("_DryColor", new Color(0.3f, 0.3f, 0.14f));
+        material.SetFloat("_DryAmount", 0.05f);
+        EditorUtility.SetDirty(material);
+        return material;
     }
 
     private static string KitBuilding(string name, int cap, string modelPrefab, string building)

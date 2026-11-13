@@ -447,6 +447,13 @@ public static class BuildFoundation
     {
         // Tor's shelter with another model: an event site also needs its collider, beacon, site and Interactable.
         string path = Sites + "Bjarnes Forge.prefab";
+        // Kit-built by Tools/Blender/raid_sites.py (BuildStructureModels.RaidSites): kept as it is.
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null &&
+            AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Art/Raids/Sites/Bjarnes Forge/Bjarnes Forge.fbx") != null)
+        {
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
         if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
         {
             AssetDatabase.DeleteAsset(path);

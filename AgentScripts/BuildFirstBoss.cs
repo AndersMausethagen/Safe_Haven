@@ -213,7 +213,11 @@ public static class BuildFirstBoss
             AssetDatabase.CopyAsset(Sites + "Old Beacon.prefab", sitePath);
         }
 
-        DressStump(sitePath);
+        // Kit-built by Tools/Blender/raid_sites.py (BuildStructureModels.RaidSites): its look is kept.
+        if (Load<GameObject>("Assets/_Project/Art/Raids/Sites/Heartroot Stump/Heartroot Stump.fbx") == null)
+        {
+            DressStump(sitePath);
+        }
         RaidEventDefinition site = Copy<RaidEventDefinition>(null, "Assets/_Project/Data/Raids/Rumours/Events/TheHeartroot.asset");
         Edit(site, so =>
         {
