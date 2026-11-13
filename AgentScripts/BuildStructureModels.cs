@@ -319,6 +319,66 @@ public static class BuildStructureModels
     private static readonly Color SiteGold = new Color(1f, 0.8f, 0.45f);
     private static readonly Color RuneBlue = new Color(0.5f, 0.78f, 1f);
 
+    // What the player thinks on coming upon each place (CuriousPlace): how it looks, and what it might be, or be for. The
+    // first is said on noticing it; a stone's later ones on each closer look.
+    private static readonly Dictionary<string, string[]> Thoughts = new Dictionary<string, string[]>
+    {
+        ["Asas Farmstead"] = new[] { "Burned down to the posts. The hearth's still standing, and someone saved a bundle from the fire. They meant to come back for it." },
+        ["Barrow Hoard"] = new[] { "A barrow, and the door stone's been moved. Not long ago, either. Whoever's in there has been left alone a long time. Until now." },
+        ["Bjarnes Forge"] = new[] { "A forge, out here in the woods? The anvil's still good. Someone worked iron here, and didn't want to be found doing it." },
+        ["Blighted Tree"] = new[] { "Everything round it is green, and it's dead. Black to the root, and the ground under it too. Something drank the life out of this one." },
+        ["Crossroads Stranger"] = new[] { "Paths shouldn't cross like that, out here. And there's someone standing where they meet. I don't like how still they are." },
+        ["Deep Patch"] = new[] { "Berries this deep in the woods, and nobody's picked them. Either nobody comes here, or nobody comes back." },
+        ["Eiriks Stand"] = new[] { "Stakes, sharpened and driven in all round. Someone held this ring against something. Wolves, by the marks. They did it well." },
+        ["Fog Bank"] = new[] { "The fog's gathering here and nowhere else. And there are lights in it. I should keep my wits about me." },
+        ["Gathering Place"] = new[] { "Bones hung on a post, and a ring of stones round it. Not a grave. A meeting place. For whatever wears those bones as warnings." },
+        ["Gunnars Pit"] = new[] { "A hunter's pit, stakes pointing in. The cover's fallen through. Did it catch something? Or someone?" },
+        ["Heartroot Stump"] = new[] { "A stump as wide as a house, split down the middle. And the wood is breathing. Where a heart would be, it's black, as if a fire once burned there." },
+        ["Hilds Wall"] = new[] { "A wall in a ring, waist high, and nothing inside it. Who builds a wall round nothing? Unless it was built to keep something in." },
+        ["Living Stones"] = new[] { "Three runestones across the path. They weren't here before. I'd swear one of them has moved since I looked." },
+        ["Livs Circle"] = new[] { "Standing stones in a ring, and they hum. Old folk said the hidden people dance in circles like this. I can almost hear the music." },
+        ["Night Cairn"] = new[] { "A cairn, piled tall with care. Antlers at its foot like an offering. Cairns mark graves, or ways. I wonder which this is." },
+        ["Old Bathhouse"] = new[] { "A bathhouse, fallen in. The stove stones are still there. Odd thing to build this far out. Someone wanted to be warm and alone." },
+        ["Old Beacon"] = new[] { "A beacon, still laid with dry wood. Lit, it'd be seen for miles. That's the trouble with beacons: everything sees them." },
+        ["Open Barrow"] = new[] { "The barrow's slipped open. There's a glint of silver in the dark. Grave goods. The dead don't like to share." },
+        ["Overturned Wagon"] = new[] { "A trader's wagon on its side, a wheel in splinters, parcels in the mud. Those claw marks on the boards are fresh." },
+        ["Runas Marks"] = new[] { "Marks cut into the bark, pale and careful. Not claw marks. Someone left these on purpose, for someone else to follow." },
+        ["Sigrids Horn"] = new[] { "A horn hung on a pole, inside a ring of stakes. Someone meant to call for help from here. Did anybody answer?" },
+        ["Silversmiths Rest"] = new[] { "A small grave by an old work bench. His tools are still here, rusting. And there's silver in the grass. Whoever he was, he was good." },
+        ["The Elder"] = new[] { "An elder, standing on its own in the clearing like it owns it. The old ones say an elder has a mother living in it. Best to ask before taking." },
+        ["Toll Troll"] = new[] { "Footprints the size of a door, and they stop right here. Somewhere close, something is laughing to itself." },
+        ["Tors Shelter"] = new[] { "A shelter, and a good one. Too good for out here. Cut wood, a bed of hides, a saw by the trestle. Whoever built it means to stay." },
+        ["Trapped Pedlar"] = new[] { "A spruce has come down across the ditch. That's a pack, just under it. And was that a voice?" },
+        ["Wainwrights Camp"] = new[] { "A wainwright's camp, gone cold. A wheel against the crates, a book left on the table. He didn't pack up. He left." },
+        ["Wild Swarm"] = new[] { "That dark lump on the branch is moving. Bees, a whole swarm of them, hanging in a knot. A skep could take them home." },
+        ["Yrsas Fire"] = new[] { "A cookfire with the embers still warm. A pot on the tripod, a bedroll. Someone was here an hour ago. Where did they go?" },
+        ["God Post"] = new[]
+        {
+            "A carved post, an old god's face worn soft by the rain. Somebody still keeps it: there's no moss where hands touch it.",
+            "Which god is it? The eyes are deep set, and it looks out at the road. A watcher, then. Or a warning.",
+        },
+        ["Offering Stone"] = new[]
+        {
+            "A flat stone with a bowl cut into the top, and someone's left berries and an antler in it. Fresh. Gifts for whoever lives near.",
+            "The old folk left the first of every harvest out like this. Leave nothing, and the hidden ones take what they're owed.",
+        },
+        ["Rune Cairn"] = new[]
+        {
+            "Stones piled up, and runes on them that glow blue in the shade. Not paint. They're giving off their own light.",
+            "The runes are the same on every stone. A name, maybe. Or a warding. Whoever piled these meant them to last.",
+        },
+        ["Rune Stone"] = new[]
+        {
+            "A rune stone, taller than me. The runes run round it like a serpent, and they glow. Somebody wanted this remembered.",
+            "Raised in memory, the old stones usually say. But I can't read whose. The glow is warm when I stand close.",
+        },
+        ["Sleeping Troll Rock"] = new[]
+        {
+            "That rock has a face. A nose, a closed eye, a mouth in the moss. The old stories say trolls turn to stone in the sun.",
+            "If it's a troll, it's sleeping. I'll be quiet. Just in case it's only waiting for the dark.",
+        },
+    };
+
     /// <summary>Puts a Mark on every raid event site and world prop (`--entry BuildStructureModels.Marks`). Safe to rerun.</summary>
     public static string Marks()
     {
@@ -372,6 +432,7 @@ public static class BuildStructureModels
             decal.size = new Vector3(across, across, 3f);
             decal.pivot = Vector3.zero;
             decal.fadeFactor = 0.9f;
+            decal.gameObject.AddComponent<GroundRing>(); // its box fitted to the ground where it is put down, so it paints no one
 
             // A soft light low over it: the ring and the place glow at night, little by day.
             var light = new GameObject("Glow").AddComponent<Light>();
@@ -418,6 +479,32 @@ public static class BuildStructureModels
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             renderer.receiveShadows = false;
 
+            // What the player thinks of it on coming near (CuriousPlace). A site has its own use, so its thoughts sit on the
+            // Mark; a stone takes "Look closer" for more.
+            string key = root.name;
+            if (Thoughts.TryGetValue(key, out string[] lines))
+            {
+                foreach (CuriousPlace old2 in root.GetComponentsInChildren<CuriousPlace>(true)) Object.DestroyImmediate(old2);
+                GameObject holder = site ? mark.gameObject : root;
+                var curious = new SerializedObject(holder.AddComponent<CuriousPlace>());
+                curious.FindProperty("placeName").stringValue = PlaceName(key);
+                SerializedProperty list = curious.FindProperty("thoughts");
+                list.arraySize = lines.Length;
+                for (int i = 0; i < lines.Length; i++) list.GetArrayElementAtIndex(i).stringValue = lines[i];
+                curious.FindProperty("noticeRadius").floatValue = Mathf.Max(6f, across * 0.5f + 3f);
+                curious.ApplyModifiedPropertiesWithoutUndo();
+                if (!site)
+                {
+                    Interactable look = root.TryGetComponent(out Interactable found) ? found : root.AddComponent<Interactable>();
+                    var use = new SerializedObject(look);
+                    use.FindProperty("kind").intValue = (int)InteractionKind.Use;
+                    use.FindProperty("duration").floatValue = 0f;
+                    use.FindProperty("range").floatValue = Mathf.Max(2.5f, across * 0.4f);
+                    use.FindProperty("deactivateOnComplete").boolValue = false;
+                    use.ApplyModifiedPropertiesWithoutUndo();
+                }
+            }
+
             if (site && root.TryGetComponent(out RaidEventSite eventSite))
             {
                 var data = new SerializedObject(eventSite);
@@ -432,6 +519,17 @@ public static class BuildStructureModels
         {
             PrefabUtility.UnloadPrefabContents(root);
         }
+    }
+
+    // "Eiriks Stand" -> "Eirik's Stand" for the prompt.
+    private static string PlaceName(string key)
+    {
+        foreach (string owner in new[] { "Asas", "Bjarnes", "Eiriks", "Gunnars", "Hilds", "Livs", "Runas", "Sigrids", "Silversmiths", "Tors", "Wainwrights", "Yrsas" })
+        {
+            if (key.StartsWith(owner + " ")) return owner.Substring(0, owner.Length - 1) + "'s" + key.Substring(owner.Length);
+        }
+
+        return key;
     }
 
     private static Material RingMaterial(string name)
