@@ -50,6 +50,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
     }
 
     private static readonly string[] FigureNames = { "Time limit", "To extract", "Cache loot", "Enemy health", "Enemy power", "Elites" };
+    private static readonly string[] FigureIcons = { "Hourglass", "Lead", "Bags", "Heart", "Sword", "Skull" };
 
     private sealed class Tab
     {

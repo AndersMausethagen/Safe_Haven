@@ -171,7 +171,10 @@ public sealed partial class RaidPreparationWindow
         {
             float x = Margin + i * width;
             figures[i] = Label(FigureNames[i] + " Value", part, x, StatsTop + 6f, width, 40f, 28f, style.Text);
-            Label(FigureNames[i] + " Label", part, x, StatsTop + 44f, width, 24f, 16f, style.Muted).text = FigureNames[i];
+            // Hearthline 3: each figure's name with its icon.
+            TMP_Text name = Label(FigureNames[i] + " Label", part, x, StatsTop + 44f, width, 24f, 16f, style.Muted);
+            name.richText = true;
+            name.text = HearthKit.InlineIcon(FigureIcons[i]) + " " + FigureNames[i];
         }
 
         Hairline(part, Margin, FooterTop - 8f, Width - Margin * 2f, 1f, style);
