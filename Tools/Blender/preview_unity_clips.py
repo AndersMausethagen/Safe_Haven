@@ -199,7 +199,7 @@ class SH_PT_unity_clips(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        clips = sorted(a for a in bpy.data.actions if a.name.startswith(PREFIX))
+        clips = sorted((a for a in bpy.data.actions if a.name.startswith(PREFIX)), key=lambda a: a.name)
         if not clips:
             layout.label(text="No clips loaded")
             return
