@@ -377,7 +377,7 @@ public static class BuildTransport
         GameObject boat = PrefabUtility.LoadPrefabContents(Prefabs + "Rowboat.prefab");
         try
         {
-            BoatPile(boat);
+            report.Add(DressBoat(boat));
             foreach (Transform child in boat.GetComponentsInChildren<Transform>(true)) child.gameObject.layer = IgnoreRaycast;
             PrefabUtility.SaveAsPrefabAsset(boat, Prefabs + "Rowboat.prefab");
         }
@@ -674,7 +674,129 @@ public static class BuildTransport
         water.FindProperty("radius").floatValue = 1.1f;
         water.FindProperty("foam").floatValue = 0.4f;
         water.ApplyModifiedPropertiesWithoutUndo();
+        DressBoat(root);
         return Save(root, definition, 2.4f, Vector3.zero, new Vector3(1.2f, 0.6f, 3.2f));
+    }
+
+    // ----- The boat's look -----
+
+    // The Rowboat's look (transport_manifest.json: a clinker-built faering made without oars, and the Oar on its own, so
+    // the oars still swing with the stroke). Rowboat sets its centre of mass from the origin, so the origin stays where
+    // the lofted hull had it: the hull hangs with its keel 0.28 below, and its convex collider goes on the Hull with it.
+    // Measured on the look (keel 0): floorboards 0.09, thwarts 0.5 (at z -1.0, -0.2, 0.4, 1.05), the rim 0.63 amidships,
+    // the posts 0.93; 1.27 wide. The floats keep their place over the keel, so it floats as deep as before.
+    private const float Keel = -0.28f;
+    private static readonly Vector3 BoatSeat = new Vector3(0f, 0.25f, -0.2f);
+    private const float OarHeight = 0.38f, OarSide = 0.6f, OarZ = -0.15f, OarInboard = 0.55f;
+
+    private static string DressBoat(GameObject root)
+    {
+        string fbx = Looks + "Rowboat/Rowboat.fbx", oarFbx = Looks + "Oar/Oar.fbx";
+        if (AssetDatabase.LoadAssetAtPath<GameObject>(fbx) == null || AssetDatabase.LoadAssetAtPath<GameObject>(oarFbx) == null)
+        {
+            BoatPile(root);
+            return "Rowboat: no look baked yet, primitives kept";
+        }
+
+        Material material = LookMaterial("Rowboat"), oarMaterial = LookMaterial("Oar");
+        Mesh[] hull = Levels(fbx, "Rowboat A");
+        Mesh collision = AssetDatabase.LoadAllAssetsAtPath(fbx).OfType<Mesh>().First(mesh => mesh.name == "Rowboat A Collider");
+        Mesh oar = Levels(oarFbx, "Oar A")[0];
+
+        Transform shell = root.transform.Find("Hull");
+        foreach (Component part in shell.GetComponents<Component>().Where(c => !(c is Transform)).ToArray()) Object.DestroyImmediate(part);
+        Clear(shell);
+        shell.localPosition = new Vector3(0f, Keel, 0f);
+        var lods = new List<Renderer>[hull.Length];
+        for (int i = 0; i < hull.Length; i++)
+        {
+            lods[i] = new List<Renderer> { Part(shell, $"LOD{i}", hull[i], material, i < hull.Length - 1) };
+        }
+
+        if (root.TryGetComponent(out MeshCollider rootCollider)) Object.DestroyImmediate(rootCollider);
+        var collider = shell.gameObject.AddComponent<MeshCollider>();
+        collider.sharedMesh = collision;
+        collider.convex = true;
+
+        Clear(root.transform.Find("Frame")); // the thwarts are in the look
+        root.transform.Find("Seat").localPosition = BoatSeat;
+        foreach ((string name, float side) in new[] { ("Oar Left", -1f), ("Oar Right", 1f) })
+        {
+            Transform pivot = root.transform.Find(name);
+            pivot.localPosition = new Vector3(side * OarSide, OarHeight, OarZ);
+            pivot.localRotation = Quaternion.Euler(0f, 0f, side * -18f);
+            Clear(pivot);
+            // The Oar lies along x: the grip end inboard, the blade out, the shaft in the thole OarInboard from the grip.
+            Renderer blade = Part(pivot, "Oar", oar, oarMaterial, true);
+            blade.transform.localPosition = new Vector3(side * (oar.bounds.extents.x - OarInboard), -oar.bounds.center.y, 0f);
+            blade.transform.localRotation = Quaternion.Euler(0f, side > 0f ? 180f : 0f, 0f); // the export mirrors x: the blade comes in at -x
+            for (int i = 0; i < lods.Length - 1; i++) lods[i].Add(blade);
+        }
+
+        LODGroup group = root.TryGetComponent(out LODGroup found) ? found : root.AddComponent<LODGroup>();
+        float[] heights = ScreenBudget.LodHeights(hull[0].bounds, hull.Select(Triangles).ToArray());
+        group.SetLODs(lods.Select((renderers, i) => new LOD(heights[Mathf.Min(i, heights.Length - 1)], renderers.ToArray())).ToArray());
+        group.fadeMode = LODFadeMode.None;
+        group.RecalculateBounds();
+
+        root.transform.Find("Water Mask").GetComponent<MeshFilter>().sharedMesh = BoatMask(fbx);
+        Pile(root, new Vector3(0f, -0.12f, -0.65f), new Vector3(0.62f, 0.13f, 0.62f), 0.33f, 6, 3);
+        return $"Rowboat: {string.Join("/", hull.Select(Triangles))} hull triangles, oar {Triangles(oar)} ({oar.bounds.size:F2}), keel {Keel}";
+    }
+
+    // The water mask (Water Mask.shader) across the look's opening, just under its rim: per slice along the boat, the rim's
+    // height and half its beam, measured on the look's mesh (read once, the importer made readable for it).
+    private static Mesh BoatMask(string fbx)
+    {
+        var importer = (ModelImporter)AssetImporter.GetAtPath(fbx);
+        importer.isReadable = true;
+        importer.SaveAndReimport();
+        Vector3[] points = AssetDatabase.LoadAllAssetsAtPath(fbx).OfType<Mesh>().First(mesh => mesh.name == "Rowboat A").vertices;
+        importer.isReadable = false;
+        importer.SaveAndReimport();
+
+        float front = points.Max(p => p.z), back = points.Min(p => p.z);
+        const int slices = 24;
+        var rim = new List<Vector3>();
+        for (int i = 0; i <= slices; i++)
+        {
+            float z = Mathf.Lerp(back + 0.08f, front - 0.08f, i / (float)slices);
+            Vector3[] near = points.Where(p => Mathf.Abs(p.z - z) < 0.05f).ToArray();
+            if (near.Length == 0) continue;
+            float half = near.Max(p => Mathf.Abs(p.x));
+            // The rim is the top of the sides, not the posts on the middle line.
+            float top = near.Where(p => Mathf.Abs(p.x) > half * 0.6f).Select(p => p.y).DefaultIfEmpty(near.Max(p => p.y)).Max();
+            rim.Add(new Vector3(Mathf.Max(0f, half - 0.045f), top - 0.04f + Keel, z));
+        }
+
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+        foreach (Vector3 point in rim)
+        {
+            vertices.Add(new Vector3(-point.x, point.y, point.z));
+            vertices.Add(point);
+        }
+
+        for (int i = 0; i < rim.Count - 1; i++)
+        {
+            int a = i * 2;
+            triangles.AddRange(new[] { a, a + 2, a + 1, a + 1, a + 2, a + 3 });
+        }
+
+        string path = Looks + "Rowboat/Rowboat Water Mask.asset";
+        var mask = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        if (mask == null)
+        {
+            mask = new Mesh { name = "Rowboat Water Mask" };
+            AssetDatabase.CreateAsset(mask, path);
+        }
+
+        mask.Clear();
+        mask.SetVertices(vertices);
+        mask.SetTriangles(triangles, 0);
+        mask.RecalculateBounds();
+        EditorUtility.SetDirty(mask);
+        return mask;
     }
 
     // Sacks, crates and logs, bottom layer first; the last ones are the heap over the rim. Seeded, so a rebuild changes nothing.

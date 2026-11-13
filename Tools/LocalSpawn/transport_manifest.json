@@ -97,6 +97,34 @@
           "prompt": "A bundle of four split birch firewood logs lying side by side, tied around the middle with rough rope, white bark on their round sides and pale split wood on the others. Only the bundle, no ground under it."
         }
       ]
+    },
+    {
+      "asset": "Rowboat",
+      "width": 3.25,
+      "texture_size": 2048,
+      "lod0_triangles": 7000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8401,
+          "prompt": "A small Norse rowing boat, a faering, standing upright: a clinker-built hull of overlapping weathered oak planks fastened with dark iron rivets, pointed at both ends with a gently rising curved stem and stern, one plank seat across the middle, two short wooden pegs on each side of the rim for oars, plank floor boards inside. No oars, no mast, no sail."
+        }
+      ]
+    },
+    {
+      "asset": "Oar",
+      "width": 2.2,
+      "texture_size": 1024,
+      "lod0_triangles": 800,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8501,
+          "prompt": "A single long wooden oar for a small Norse rowing boat lying flat: a straight round shaft of pale ash wood with a worn hand grip at one end and a long narrow flat blade at the other end. Only the oar."
+        }
+      ],
+      "lay_flat": true
     }
   ]
 }

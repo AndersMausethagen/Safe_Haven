@@ -144,6 +144,8 @@ def import_look(path, key, turn, coll):
     obj.name = obj.data.name = f"{NAME} {key}"
     select_only([obj])
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    if manifest_value("lay_flat"):
+        lay_flat(obj)
     obj.data.transform(Matrix.Rotation(math.radians(turn), 4, 'Z'))
     xs = [v.co.x for v in obj.data.vertices]
     ys = [v.co.y for v in obj.data.vertices]
@@ -317,6 +319,30 @@ def onto_hubs(variants):
         if hub is not None:
             obj.data.transform(Matrix.Translation(-hub))
             obj.location = hub
+
+
+def lay_flat(obj):
+    """manifest lay_flat: a long thin thing the shape model stood on a slant (the oar came out diagonal, 2 m up) laid
+    down: its longest axis along x, its flattest up, the wider end (an oar's blade) at +x."""
+    co = numpy.empty(len(obj.data.vertices) * 3, dtype=numpy.float64)
+    obj.data.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    centre = co.mean(axis=0)
+    _, _, axes = numpy.linalg.svd(co - centre, full_matrices=False)
+    long, broad = axes[0], axes[1]
+    up = numpy.cross(long, broad)
+    rotation = Matrix((tuple(long), tuple(broad), tuple(up)))
+    obj.data.transform(Matrix.Translation(-Vector(centre.tolist())))
+    obj.data.transform(rotation.to_4x4())
+    co = numpy.empty(len(obj.data.vertices) * 3, dtype=numpy.float64)
+    obj.data.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    length = co[:, 0].max() - co[:, 0].min()
+    ends = [co[co[:, 0] < co[:, 0].min() + length * 0.2], co[co[:, 0] > co[:, 0].max() - length * 0.2]]
+    spans = [e[:, 1].max() - e[:, 1].min() for e in ends]
+    if spans[0] > spans[1]:
+        obj.data.transform(Matrix.Rotation(math.pi, 4, 'Z'))
+    print("LAY FLAT", obj.name, "length", round(float(length), 3), "end spans", [round(float(x), 3) for x in spans])
 
 
 def set_roughness(tree, bsdf, metal_out):
