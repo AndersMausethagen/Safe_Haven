@@ -125,6 +125,26 @@ public sealed class KitBanner : MonoBehaviour
         band.gameObject.SetActive(sprite != null);
     }
 
+    private Image dark;
+
+    /// <summary>An even dark veil over the whole painting (for a title centred on it, where the left-hand shade is not).</summary>
+    public void Darken(float alpha)
+    {
+        if (band == null)
+        {
+            return;
+        }
+
+        if (dark == null)
+        {
+            dark = CodeUI.Stretch("Veil", band).gameObject.AddComponent<Image>();
+            dark.raycastTarget = false;
+            dark.transform.SetSiblingIndex(picture.transform.GetSiblingIndex() + 1);
+        }
+
+        dark.color = new Color(0f, 0f, 0f, alpha);
+    }
+
     // The panel grows by the band (both edges, staying centred) and what is under the band moves down by it.
     private void Grow(float to)
     {

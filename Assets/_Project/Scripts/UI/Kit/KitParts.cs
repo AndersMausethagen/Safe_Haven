@@ -502,13 +502,14 @@ public sealed class KitProgressRow
         fill = KitBar.Make(card, width - 320f, 44f, 300f, 9f, out fillImage);
     }
 
-    public void Set(string title, string what, bool done, float progress, string doneText = "Learned")
+    /// <summary>Shows it; <paramref name="stateText"/> in place of "n% of the way" when given.</summary>
+    public void Set(string title, string what, bool done, float progress, string doneText = "Learned", string stateText = null)
     {
         UIStyle style = UIStyle.Current;
         name.text = title;
         name.color = done ? style.AccentBright : style.Text;
         line.text = what;
-        state.text = done ? doneText : $"{progress * 100f:0}% of the way";
+        state.text = done ? doneText : stateText ?? $"{progress * 100f:0}% of the way";
         state.color = done ? style.Good : style.Muted;
         icon.color = done ? style.Accent : HearthKit.Faded(style.Muted, 0.6f);
         KitBar.Set(fill, fillImage, progress, done ? style.Good : style.Info);

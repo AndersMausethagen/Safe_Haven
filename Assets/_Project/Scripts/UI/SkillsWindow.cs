@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// changing one, or choosing all again, only at home beside the portal. Built in code for every scene with a player
 /// (ExperienceTracker); it only reads and changes GameSession.Progress. Once the talent screen; the script keeps its GUID.
 /// </summary>
-public sealed class SkillsWindow : MonoBehaviour
+public sealed partial class SkillsWindow : MonoBehaviour
 {
     private const float Width = 1380f;
     private const float Height = 820f;
@@ -147,14 +147,19 @@ public sealed class SkillsWindow : MonoBehaviour
         style.Title(title);
         header = CodeUI.Label("Header", panel, 0f, 70f, Width, 36f, 21f, style.Text, TextAlignmentOptions.Center);
 
+        int firstOfSkills = panel.childCount;
         BuildList(style);
         BuildDetail(style);
+        MakeSkillsPage(firstOfSkills);
 
-        CodeUI.AddButton("Choose Again", panel, Width * 0.5f - 230f, Height - 63f, 220f, UIRole.Kind.Button, ResetPerks, out resetButton).text = "Choose Perks Again";
-        CodeUI.AddButton("Close", panel, Width * 0.5f + 10f, Height - 63f, 220f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
+        // Under the detail column, clear of the list (centred, Choose Perks Again sat over the last skill rows).
+        float buttonsY = PanelHeight - 63f;
+        CodeUI.AddButton("Choose Again", panel, Width - ListX - 460f, buttonsY, 220f, UIRole.Kind.Button, ResetPerks, out resetButton).text = "Choose Perks Again";
+        CodeUI.AddButton("Close", panel, Width - ListX - 230f, buttonsY, 230f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
 
         window = root.gameObject.AddComponent<UIWindow>();
         window.Configure(UIWindowId.Proficiencies, panel.gameObject);
+        BuildOverview(style);
         window.OpenChanged += open =>
         {
             if (open)
@@ -260,7 +265,7 @@ public sealed class SkillsWindow : MonoBehaviour
 
         if (nextPanel == null)
         {
-            nextPanel = CodeUI.At("Next Milestone", panel, 0f, 0f, 380f, 82f);
+            nextPanel = CodeUI.At("Next Milestone", skillsPage != null ? skillsPage : panel, 0f, 0f, 380f, 82f);
             nextPanel.gameObject.AddComponent<Image>().color = style.Panel;
             nextPanel.gameObject.AddComponent<Outline>().effectColor = style.Accent;
             nextText = CodeUI.Paragraph("Text", nextPanel, 12f, 8f, 356f, 70f, 16f, style.Text);
@@ -457,7 +462,7 @@ public sealed class SkillsWindow : MonoBehaviour
         }
 
         Rect screen = ((RectTransform)transform).rect;
-        panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / Height);
+        panel.localScale = Vector3.one * Mathf.Min(1f, (screen.width - ScreenMargin) / Width, (screen.height - ScreenMargin) / PanelHeight);
 
         UIStyle style = UIStyle.Current;
         LevelingSettings settings = LevelingSettings.Current;
@@ -485,6 +490,7 @@ public sealed class SkillsWindow : MonoBehaviour
 
         RefreshDetail(style, settings, progress);
         resetButton.interactable = AtHome && progress.PerkCount > 0;
+        RefreshOverview(style, settings, progress);
     }
 
     // Melee's Weapon Art flourishes, waiting or won.
