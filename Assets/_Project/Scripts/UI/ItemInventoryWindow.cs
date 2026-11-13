@@ -76,6 +76,10 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             return;
         }
 
+        // Hearthline 3: the sections' headings carry their icons.
+        HearthKit.DecorateHeadings(transform, ("Bag", "Bags"), ("Safe Pocket", "Lock"), ("Essences", "Spark"), ("Crafting", "Hammer"),
+            ("Needs", "Wheat"));
+
         container = inventory.Container;
         pocket = pocketGrid != null ? inventory.SafePocket : null;
         crafting = inventory.GetComponent<PlayerCrafting>();
@@ -614,12 +618,13 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
             return;
         }
 
-        var builder = new StringBuilder("Gathering:  ");
+        // Hearthline 3: each tool, the bag and the weight with its kit icon (HearthKit.InlineIcon) rather than a word.
+        var builder = new StringBuilder();
         ToolType[] tools = { ToolType.Axe, ToolType.Pickaxe, ToolType.Sickle };
         for (int i = 0; i < tools.Length; i++)
         {
             int tier = ItemInventory.GatheringTier(inventory.gameObject, tools[i]);
-            builder.Append(i > 0 ? "   " : "").Append(tools[i]).Append(' ')
+            builder.Append(i > 0 ? "    " : "").Append(HearthKit.InlineIcon(tools[i].ToString())).Append(' ').Append(tools[i]).Append(' ')
                 .Append($"<color=#{ColorUtility.ToHtmlStringRGB(Tiers.ColorOf(tier))}>{Tiers.ToRoman(tier)}</color>");
         }
 
@@ -633,13 +638,13 @@ public sealed class ItemInventoryWindow : MonoBehaviour, IItemSlotHandler
         }
 
         string bagColor = used >= container.UnlockedSlots ? UIStyle.Current.DangerHex : UIStyle.Current.MutedHex;
-        builder.Append($"     <color={bagColor}>Bag {used}/{container.UnlockedSlots}</color>");
+        builder.Append($"      {HearthKit.InlineIcon("Bags")} <color={bagColor}>Bag {used}/{container.UnlockedSlots}</color>");
         if (container.HasWeightLimit)
         {
             float weight = container.CurrentWeight;
             float budget = container.WeightCapacity;
             string weightColor = weight >= budget - 0.01f ? UIStyle.Current.DangerHex : weight >= budget * 0.8f ? UIStyle.Current.WarningHex : UIStyle.Current.MutedHex;
-            builder.Append($"     <color={weightColor}>Weight {weight:0.#}/{budget:0}</color>");
+            builder.Append($"      {HearthKit.InlineIcon("Weight")} <color={weightColor}>Weight {weight:0.#}/{budget:0}</color>");
             if (Player.Current != null && Player.Current.TryGetComponent(out PlayerBurden burden) && burden.IsHeavy)
             {
                 builder.Append($"  <color={UIStyle.Current.WarningHex}>Heavy: slower, tires faster</color>");

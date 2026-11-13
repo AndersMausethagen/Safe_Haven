@@ -28,7 +28,7 @@ public static class ControllerGlyphsBuilder
     private const float AboveBaseline = 0.81f;
 
     [Serializable]
-    private sealed class Layout
+    internal sealed class Layout
     {
         public int cell;
         public int columns;
@@ -43,7 +43,7 @@ public static class ControllerGlyphsBuilder
             throw new FileNotFoundException("Run python Tools/UI/controller_glyphs.py first.", AtlasPath);
         }
 
-        Texture2D atlas = ImportAtlas();
+        Texture2D atlas = ImportAtlas(AtlasPath);
         Layout layout = JsonUtility.FromJson<Layout>(File.ReadAllText(NamesPath));
         TMP_SpriteAsset glyphs = Make(AssetPath, atlas, layout, Shader.Find("TextMeshPro/Sprite"));
         TMP_SpriteAsset onTop = Make(OnTopPath, atlas, layout, Shader.Find(OnTopShader));
@@ -63,9 +63,10 @@ public static class ControllerGlyphsBuilder
         Debug.Log($"Controller glyphs: {layout.names.Length} buttons in {AssetPath} (TMP Settings' default sprite asset) and {OnTopPath}.");
     }
 
-    private static Texture2D ImportAtlas()
+    /// <summary>Sets an atlas of glyphs up for TextMesh Pro (also the UI kit's icons, HearthKitArtInstaller).</summary>
+    internal static Texture2D ImportAtlas(string atlasPath)
     {
-        var importer = (TextureImporter)AssetImporter.GetAtPath(AtlasPath);
+        var importer = (TextureImporter)AssetImporter.GetAtPath(atlasPath);
         importer.textureType = TextureImporterType.Default;
         importer.sRGBTexture = true;
         importer.alphaIsTransparency = true;
@@ -77,10 +78,11 @@ public static class ControllerGlyphsBuilder
         importer.filterMode = FilterMode.Trilinear;
         importer.textureCompression = TextureImporterCompression.Uncompressed;
         importer.SaveAndReimport();
-        return AssetDatabase.LoadAssetAtPath<Texture2D>(AtlasPath);
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(atlasPath);
     }
 
-    private static TMP_SpriteAsset Make(string path, Texture2D atlas, Layout layout, Shader shader)
+    /// <summary>A sprite asset over an atlas of square cells, made or updated in place.</summary>
+    internal static TMP_SpriteAsset Make(string path, Texture2D atlas, Layout layout, Shader shader)
     {
         if (shader == null)
         {

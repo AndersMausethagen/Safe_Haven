@@ -52,7 +52,41 @@ public static class HearthKitArtInstaller
         values.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(style);
         AssetDatabase.SaveAssetIfDirty(style);
-        return $"kit art: {sorted.Length} icons, corner {corner != null}, card {card != null}, rim {rim != null}";
+        string inline = InstallInline();
+        return $"kit art: {sorted.Length} icons, corner {corner != null}, card {card != null}, rim {rim != null}; {inline}";
+    }
+
+    public const string InlineAsset = "Kit Icons";
+    private const string AtlasPath = "Assets/_Project/Art/UI/Kit Icons.png";
+    private const string NamesPath = "Assets/_Project/Art/UI/Kit Icons.json";
+    private const string InlinePath = "Assets/_Project/Resources/" + InlineAsset + ".asset";
+
+    // The icons in text: a TextMesh Pro sprite asset over the atlas, a fallback of the default one (the controller
+    // glyphs), so any label can carry <sprite name="Bags" tint=1> (HearthKit.InlineIcon).
+    private static string InstallInline()
+    {
+        if (!File.Exists(AtlasPath) || !File.Exists(NamesPath))
+        {
+            return "no inline atlas (run Tools/UI/hearthline_kit_art.py)";
+        }
+
+        Texture2D atlas = ControllerGlyphsBuilder.ImportAtlas(AtlasPath);
+        var layout = JsonUtility.FromJson<ControllerGlyphsBuilder.Layout>(File.ReadAllText(NamesPath));
+        TMPro.TMP_SpriteAsset icons = ControllerGlyphsBuilder.Make(InlinePath, atlas, layout, Shader.Find("TextMeshPro/Sprite"));
+        TMPro.TMP_SpriteAsset main = TMPro.TMP_Settings.defaultSpriteAsset;
+        if (main != null && !main.fallbackSpriteAssets.Contains(icons))
+        {
+            main.fallbackSpriteAssets.Add(icons);
+            EditorUtility.SetDirty(main);
+        }
+
+        AssetDatabase.SaveAssetIfDirty(icons);
+        if (main != null)
+        {
+            AssetDatabase.SaveAssetIfDirty(main);
+        }
+
+        return $"{layout.names.Length} inline icons" + (main != null ? $" (fallback of {main.name})" : " (no default sprite asset)");
     }
 
     // A sprite, no mips (it is drawn at its size), uncompressed (thin gold lines band otherwise); the card and its rim

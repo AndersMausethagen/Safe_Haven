@@ -6,7 +6,8 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
-  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle.
+  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book.
+- Kit Icons.png and .json (next to the folder): the icons in one atlas, for TextMesh Pro's <sprite name=...>.
 
 Run from the project root: python Tools/UI/hearthline_kit_art.py
 """
@@ -468,9 +469,60 @@ def card():
     save(img, 'Hearthline Card Rim', size)
 
 
+def lock():
+    img, d = canvas(ICON)
+    d.arc([R(26), R(6), R(74), R(56)], start=180, end=360, fill=W, width=int(R(9)))
+    d.rectangle([R(26), R(30), R(35), R(46)], fill=W)
+    d.rectangle([R(65), R(30), R(74), R(46)], fill=W)
+    d.rounded_rectangle([R(14), R(42), R(86), R(96)], radius=R(8), fill=W)
+    circle(d, 50, 64, 7, fill=CLEAR)
+    d.rectangle([R(47), R(66), R(53), R(82)], fill=CLEAR)
+    save(img, 'Lock', ICON)
+
+
+def hammer():
+    img, d = canvas(ICON)
+    tool = Image.new('RGBA', img.size, CLEAR)
+    t = ImageDraw.Draw(tool)
+    t.rounded_rectangle([R(45), R(26), R(55), R(98)], radius=R(3), fill=W)
+    t.rounded_rectangle([R(18), R(8), R(82), R(32)], radius=R(4), fill=W)
+    tool = tool.rotate(35, center=(R(50), R(50)), resample=Image.BICUBIC)
+    img.alpha_composite(tool)
+    save(img, 'Hammer', ICON)
+
+
+def book():
+    img, d = canvas(ICON)
+    d.polygon(P([(50, 20), (8, 10), (8, 84), (50, 94)]), fill=W)
+    d.polygon(P([(50, 20), (92, 10), (92, 84), (50, 94)]), fill=W)
+    d.line(P([(50, 22), (50, 92)]), fill=CLEAR, width=int(R(3)))
+    for y in (32, 46, 60):
+        d.line(P([(16, y - 6), (42, y)]), fill=CLEAR, width=int(R(3)))
+        d.line(P([(84, y - 6), (58, y)]), fill=CLEAR, width=int(R(3)))
+    save(img, 'Book', ICON)
+
+
+def atlas():
+    """Every icon in one atlas for TextMesh Pro (Art/UI/Kit Icons.png and .json), so text can carry them:
+    <sprite name="Bags" tint=1>. HearthKitArtInstaller builds the sprite asset from it."""
+    import json
+    names = sorted(n[:-4] for n in os.listdir(OUT) if n.endswith('.png') and not n.startswith('Hearthline'))
+    cell, columns = 128, 8
+    rows = (len(names) + columns - 1) // columns
+    sheet = Image.new('RGBA', (cell * columns, cell * rows), CLEAR)
+    for i, name in enumerate(names):
+        icon = Image.open(os.path.join(OUT, name + '.png')).convert('RGBA').resize((cell - 16, cell - 16), Image.LANCZOS)
+        sheet.alpha_composite(icon, ((i % columns) * cell + 8, (i // columns) * cell + 8))
+    parent = os.path.dirname(OUT)
+    sheet.save(os.path.join(parent, 'Kit Icons.png'))
+    with open(os.path.join(parent, 'Kit Icons.json'), 'w') as f:
+        json.dump({'cell': cell, 'columns': columns, 'names': names}, f)
+
+
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
-                 pickaxe, sickle, scroll_corner, card):
+                 pickaxe, sickle, lock, hammer, book, scroll_corner, card):
         make()
+    atlas()
     print('kit art ->', os.path.abspath(OUT))

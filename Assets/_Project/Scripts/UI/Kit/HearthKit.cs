@@ -97,6 +97,49 @@ public static class HearthKit
         }
     }
 
+    /// <summary>An icon inside text (TextMesh Pro's sprite tag over the kit's icon atlas), tinted <paramref name="colour"/>
+    /// (the accent by default, or by its meaning: IconColour).</summary>
+    public static string InlineIcon(string name, Color? colour = null)
+    {
+        Color tint = colour ?? IconColour(name);
+        return $"<color=#{ColorUtility.ToHtmlStringRGBA(tint)}><sprite name=\"{name}\" tint=1></color>";
+    }
+
+    /// <summary>Puts an icon before an existing label's text (a prefab window's heading), once.</summary>
+    public static void DecorateHeading(TMP_Text label, string icon)
+    {
+        if (label == null || string.IsNullOrEmpty(label.text) || label.text.Contains("<sprite"))
+        {
+            return;
+        }
+
+        label.richText = true;
+        label.text = InlineIcon(icon) + "  " + label.text;
+    }
+
+    /// <summary>Puts icons before a window's headings, found by their text (a prefab's labels): "Bag" gets Bags, and so
+    /// on. Each once; labels that say something else are left alone.</summary>
+    public static void DecorateHeadings(Transform root, params (string text, string icon)[] headings)
+    {
+        if (root == null)
+        {
+            return;
+        }
+
+        foreach (TMP_Text label in root.GetComponentsInChildren<TMP_Text>(true))
+        {
+            string text = label.text != null ? label.text.Trim() : "";
+            foreach ((string heading, string icon) in headings)
+            {
+                if (string.Equals(text, heading, StringComparison.OrdinalIgnoreCase))
+                {
+                    DecorateHeading(label, icon);
+                    break;
+                }
+            }
+        }
+    }
+
     /// <summary>A section's heading: its icon, then its name in the title face, bold.</summary>
     public static TMP_Text Section(Transform parent, string text, string icon, float x, float y, float width = 400f)
     {
