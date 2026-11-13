@@ -606,6 +606,9 @@ public sealed class HorsePanelWindow : MonoBehaviour
             portrait.farClipPlane = 150f;
         }
 
+        // Hearthline 3: the horse before a painted meadow, not the world behind it (PortraitStage).
+        PortraitStage.On(portrait, "HorseBackdrop", horse.transform);
+
         portrait.enabled = true;
         Transform body = horse.transform;
         Vector3 look = body.position + Vector3.up * 1.45f + body.forward * 0.35f;

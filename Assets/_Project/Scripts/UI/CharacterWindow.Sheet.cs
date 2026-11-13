@@ -172,6 +172,9 @@ public sealed partial class CharacterWindow
             portraitCamera.farClipPlane = 80f;
         }
 
+        // Hearthline 3: the player before a painted backdrop, not the world behind them (PortraitStage).
+        PortraitStage.On(portraitCamera, "CharacterBackdrop", equipment.transform);
+
         portraitCamera.enabled = true;
         Transform body = equipment.transform;
         Vector3 look = body.position + Vector3.up * 1.05f;
