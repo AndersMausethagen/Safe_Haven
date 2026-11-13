@@ -72,6 +72,14 @@ public sealed class UIWindow : MonoBehaviour
         float seconds = UIStyle.Current.WindowFadeSeconds;
         fadeShown = seconds > 0f ? Mathf.Min(1f, fadeShown + Mathf.Min(Time.unscaledDeltaTime, LongestFadeStep) / seconds) : 1f;
         fade.alpha = fadeShown;
+        // Hearthline 3: it settles in as it fades in, from a touch smaller and lower.
+        float eased = 1f - (1f - fadeShown) * (1f - fadeShown);
+        content.transform.localScale = Vector3.one * Mathf.Lerp(0.965f, 1f, eased);
+        if (content.transform is RectTransform rect)
+        {
+            rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, Mathf.Lerp(-14f, 0f, eased) + settledY);
+        }
+
         if (fadeShown >= 1f)
         {
             fadeShown = -1f;
@@ -140,13 +148,22 @@ public sealed class UIWindow : MonoBehaviour
 
         fade.alpha = 0f;
         fadeShown = 0f;
+        settledY = content.transform is RectTransform rect ? rect.anchoredPosition.y : 0f;
     }
+
+    // Where its content rests (it rises into place as it opens).
+    private float settledY;
 
     private void EndFade()
     {
         if (fadeShown >= 0f && fade != null)
         {
             fade.alpha = 1f;
+            content.transform.localScale = Vector3.one;
+            if (content.transform is RectTransform rect)
+            {
+                rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, settledY);
+            }
         }
 
         fadeShown = -1f;

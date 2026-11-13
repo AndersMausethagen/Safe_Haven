@@ -71,7 +71,9 @@ public sealed class CraftFeedback : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         card = CodeUI.Box("Card", root, new Vector2(1f, 0f), new Vector2(400f, 84f), new Vector2(-216f, 470f));
-        card.gameObject.AddComponent<Image>().color = style.Panel;
+        // Hearthline 3: a rounded card with a gold rim, as in the user's picture ("Crafting Complete!").
+        HearthKit.Sliced(card.gameObject.AddComponent<Image>(), style.Card, 1.3f).color = style.Panel;
+        HearthKit.Rim(card, 0.8f, 1.3f);
         group = card.gameObject.AddComponent<CanvasGroup>();
         group.alpha = 0f;
         group.blocksRaycasts = false;
@@ -93,9 +95,11 @@ public sealed class CraftFeedback : MonoBehaviour
         shineImage.sprite = UISprites.Glow;
         shineImage.color = new Color(1f, 1f, 1f, 0f);
         shineImage.raycastTarget = false;
-        title = CodeUI.Label("Title", card, 94f, 12f, 296f, 32f, 20f, style.Text);
+        title = CodeUI.Label("Title", card, 94f, 10f, 296f, 32f, 21f, style.Text);
         title.richText = true;
-        line = CodeUI.Label("Line", card, 94f, 46f, 296f, 26f, 16f, style.Muted);
+        style.Title(title);
+        title.fontStyle = FontStyles.Bold;
+        line = CodeUI.Label("Line", card, 94f, 44f, 296f, 30f, 17f, style.Text);
         line.richText = true;
         CraftedWork.Made += OnMade;
         ExperienceTracker.Gained += OnGained;
@@ -139,10 +143,11 @@ public sealed class CraftFeedback : MonoBehaviour
             shineAt = Time.unscaledTime + 0.15f;
             shineFor = quality == ItemQuality.Masterwork ? 0.9f : 0.6f;
         }
-        string times = shownCount > 1 ? $"  <color={style.MutedHex}>x{shownCount}</color>" : "";
-        title.text = $"<color={UIStyle.Hex(colour)}>{name}</color>{times}";
-        line.text = queued ? "Queued at the station" : quality == ItemQuality.Masterwork ? "Masterwork: your finest work"
-            : quality == ItemQuality.Fine ? "Fine work" : "Made";
+        string times = shownCount > 1 ? $"  <color={style.MutedHex}>\u00d7{shownCount}</color>" : "";
+        string heading = queued ? "Queued at the Station" : quality == ItemQuality.Masterwork ? "Masterwork!"
+            : quality == ItemQuality.Fine ? "Fine Work!" : "Crafting Complete!";
+        title.text = $"<color={UIStyle.Hex(colour)}>{heading}</color>";
+        line.text = $"{name}{times}";
 
         if (!same || quality != ItemQuality.Plain)
         {

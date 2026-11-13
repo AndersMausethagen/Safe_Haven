@@ -99,4 +99,4 @@ MonoBehaviour:
   vignette: {fileID: 21300000, guid: 452b010ad960282439b097f808f3ff5d, type: 3}
   sheen: {fileID: 21300000, guid: e10e61ee15536e3429040364a9ab7ce0, type: 3}
   barMaterial: {fileID: 2100000, guid: b352b21adc8de2946a0d8d3a66a1ec45, type: 2}
-  windowFadeSeconds: 0.12
+  windowFadeSeconds: 0.2
