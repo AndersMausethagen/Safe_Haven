@@ -98,6 +98,15 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool timid;
     [Tooltip("Seconds it runs before it settles again, wherever it has got to.")]
     [SerializeField, Min(1f)] private float boltSeconds = 7f;
+    [Tooltip("A thief (the tusse): it sneaks up to the player, or a cart near them, snatches one stack and runs. It fights only " +
+             "when cornered. Killed, it drops what it took; once it gets far enough away, it is gone with it (MonsterAI.Thief).")]
+    [SerializeField] private bool thief;
+    [Tooltip("Metres from the player (or a cart) at which it grabs.")]
+    [SerializeField, Min(0.5f)] private float stealReach = 1.5f;
+    [Tooltip("Metres from the player at which a thief with something is away, and gone.")]
+    [SerializeField, Min(5f)] private float escapeDistance = 40f;
+    [Tooltip("Seconds it fights back when cornered (the player beside it and nowhere to run), before it tries to run again.")]
+    [SerializeField, Min(0.5f)] private float corneredSeconds = 4f;
 
     [Header("In a Fight")]
     [Tooltip("A person-shaped creature, whom a finishing blow can line up with: a press close behind it while it staggers locks the two together for the stab.")]
@@ -172,6 +181,11 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     /// <summary>Game: it runs instead of fighting (MonsterAI.Timid).</summary>
     public bool Timid => timid;
     public float BoltSeconds => boltSeconds;
+    /// <summary>A thief: snatches a stack from the player or a cart and runs (MonsterAI.Thief).</summary>
+    public bool Thief => thief;
+    public float StealReach => stealReach;
+    public float EscapeDistance => escapeDistance;
+    public float CorneredSeconds => corneredSeconds;
     public float DetectionRange => detectionRange;
     public float ChaseRange => Mathf.Max(chaseRange, detectionRange);
     public float LeashRange => leashRange;

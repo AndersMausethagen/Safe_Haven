@@ -443,6 +443,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             return;
         }
 
+        // A thief steals and runs, and fights only when cornered (MonsterAI.Thief).
+        if (UpdateThief())
+        {
+            return;
+        }
+
         if (Time.time < parryUntil && CanTarget(target))
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.LookRotation(FlatToTarget()),

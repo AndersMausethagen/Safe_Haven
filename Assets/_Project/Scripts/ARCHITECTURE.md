@@ -1585,6 +1585,17 @@ their hand-placed points remain unchanged by map baking (`Site=None`). Visuals a
 Edit Mode regression tests: `Editor/Tests/MonsterBehaviorTests.cs`. `AgentScripts/VerifyEnemyEncounters.cs` additionally
 checks saved assets and runs isolated live combat probes without loading a player save.
 
+## The tusse: a thief (2026-11-13)
+
+`MonsterDefinition` › Game › **Thief** (`MonsterAI.Thief`, beside Timid): on noticing the player it runs in, to them or to a
+cart near them with cargo (`Transport.Cargo`), takes one stack at random (Steal Reach) and runs, as game bolts. It runs when
+struck too. It fights only when cornered (the player within 2.6 m and it getting nowhere for a second), for Cornered Seconds,
+through the ordinary fighting (`Engage`); otherwise any target it takes on is let go. Killed, it drops what it took
+(`DroppedItem.Drop`); at Escape Distance with it, it is gone with the stack. Its faction must be one that would fight the player.
+The **Tusse** (`Data/Monsters/Tusse`, `Prefabs/Enemies/Tusse`, `AgentScripts/BuildTusse.cs`) roams the Misty Woods alone; its body
+is the user's forest troll, smaller and paler (`BuildCreatureModels.ForestTrolls`, which also gives the small moss trolls that
+model: a Mixamo-rigged Humanoid on MonsterHumanoid's clips, with Unity's Mesh LODs to level 4).
+
 ## The living world: how creatures and people behave
 
 Rules are plain C# and tested in `Editor/Tests/LivingWorldTests.cs`; every number and gesture is on a data asset. Not behaviour trees: `MonsterAI` stays the one state machine and these are parts it asks. `AgentScripts/BuildBetterAI.cs` set the first values.

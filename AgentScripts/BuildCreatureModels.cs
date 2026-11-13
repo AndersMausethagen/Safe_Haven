@@ -212,6 +212,9 @@ public static class BuildCreatureModels
             Eyes = Eyes.Level("spine.005", 0.1f, 0.35f, 0.55f, 0.06f, CurseGreen) },
         Rootling("Rootling", Enemies),
         SmallTroll("SmallMossTroll", Enemies),
+        // The thief (BuildTusse): the same forest troll, smaller and paler, the colour of old roots.
+        new Body { Creature = "Tusse", Model = "ForestTroll", Label = "Tusse", Height = 1.15f, Radius = 0.35f, AgentRadius = 0.35f, SizeVariation = 0.1f, ShadeVariation = 0.1f,
+            Skins = ForestTrollSkin(new Color(0.78f, 0.82f, 0.74f)) },
         new Body { Creature = "MossShaman", Model = "Goblin", Label = "Shaman", Height = 2f, Radius = 0.5f, AgentRadius = 0.5f, SizeVariation = 0.05f, ShadeVariation = 0.08f, Skins = GoblinSkin(new Color(0.62f, 0.76f, 0.58f), CurseGreen), Hide = new[] { "Ear", "Neck" } },
         new Body { Creature = "Draug", Model = "Boneman", Label = "Draug", Height = 2.1f, Radius = 0.38f, AgentRadius = 0.4f, SizeVariation = 0.05f, ShadeVariation = 0.08f, Shambles = true, Skins = new[] { new Skin { Slot = "Skeli", Base = "SkeliCL.png", Normal = "skin_n.png", Tint = Grave } },
             Eyes = new Eyes { Bone = "Head", One = new Vector3(0.042f, 0.055f, 0.09f), Other = new Vector3(-0.03f, 0.055f, 0.09f), Size = 0.02f, Colour = GraveLight } },
