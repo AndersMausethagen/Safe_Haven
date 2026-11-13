@@ -281,9 +281,20 @@ public sealed class KitButton
 
         icon.sprite = style.Icon(shown.Icon);
         icon.enabled = icon.sprite != null;
-        icon.color = shown.Enabled ? style.Accent : HearthKit.Faded(style.Muted, 0.7f);
-        fill.color = shape == KitButtonShape.Row ? style.Panel : Color.Lerp(style.Inset, style.Control, 0.6f);
-        rim.color = HearthKit.Faded(style.Accent, shown.Enabled ? (shape == KitButtonShape.Row ? 0.3f : 0.6f) : 0.18f);
+        icon.color = shown.Enabled ? style.Accent : style.Inactive;
+        // What can't be chosen goes grey (Hearthline 3: grey is kept for that); the rest is dark leather.
+        Color face = shape == KitButtonShape.Row ? style.Inset : style.Control;
+        fill.color = shown.Enabled ? face : style.Disabled;
+        rim.color = shown.Enabled ? HearthKit.Faded(style.Accent, shape == KitButtonShape.Row ? 0.3f : 0.6f) : HearthKit.Faded(style.Inactive, 0.35f);
+        label.color = shown.Enabled ? style.Text : style.Inactive;
+        if (detail != null)
+        {
+            detail.color = shown.Enabled ? style.Muted : style.Inactive;
+        }
+
+        ColorBlock colors = button.colors;
+        colors.disabledColor = Color.white;
+        button.colors = colors;
     }
 }
 

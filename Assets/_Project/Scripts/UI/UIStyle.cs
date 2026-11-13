@@ -25,18 +25,25 @@ public sealed class UIStyle : GameSettings<UIStyle>
     [SerializeField] private Material titleOnWorld;
 
     [Header("Surfaces")]
-    [SerializeField] private Color panel = new Color(0.075f, 0.066f, 0.055f, 1f);
+    // Hearthline 3's warm browns (the user, 2026-11-13: dark walnut for windows, dark leather for lists, worn leather for
+    // what is chosen; grey only for what can't be used): panel #211810, inset #302317, filled and control #403020,
+    // controlLit #59432B.
+    [SerializeField] private Color panel = new Color(0.129f, 0.094f, 0.063f, 1f);
     [Tooltip("The thin line around a window.")]
     [SerializeField] private Color rim = new Color(0.85f, 0.65f, 0.35f, 0.5f);
     [Tooltip("Thin lines inside a window and around a slot.")]
     [SerializeField] private Color hairline = new Color(0.925f, 0.894f, 0.827f, 0.09f);
     [Tooltip("A sunken area inside a window: a list, an empty slot. Keep window colours solid: this project blends in Linear, where a faint overlay on a dark panel comes out far brighter than its alpha.")]
-    [SerializeField] private Color inset = new Color(0.112f, 0.1f, 0.085f, 1f);
+    [SerializeField] private Color inset = new Color(0.188f, 0.137f, 0.09f, 1f);
     [Tooltip("A slot with something in it.")]
-    [SerializeField] private Color filled = new Color(0.15f, 0.133f, 0.11f, 1f);
+    [SerializeField] private Color filled = new Color(0.251f, 0.188f, 0.125f, 1f);
     [Tooltip("An ordinary button at rest. Pointing at it lifts it to Control Lit.")]
-    [SerializeField] private Color control = new Color(0.165f, 0.145f, 0.118f, 1f);
-    [SerializeField] private Color controlLit = new Color(0.25f, 0.215f, 0.17f, 1f);
+    [SerializeField] private Color control = new Color(0.251f, 0.188f, 0.125f, 1f);
+    [SerializeField] private Color controlLit = new Color(0.349f, 0.263f, 0.169f, 1f);
+    [Tooltip("What can't be used just now (a disabled button's face): grey, apart from the browns.")]
+    [SerializeField] private Color disabled = new Color(0.165f, 0.157f, 0.149f, 1f);
+    [Tooltip("Text and icons of what can't be used, and of what is put aside: a neutral grey.")]
+    [SerializeField] private Color inactive = new Color(0.47f, 0.455f, 0.43f, 1f);
     [Tooltip("A button or tab that is switched on.")]
     [SerializeField] private Color controlOn = new Color(0.42f, 0.32f, 0.17f, 1f);
     [Tooltip("The empty part of a bar.")]
@@ -123,6 +130,8 @@ public sealed class UIStyle : GameSettings<UIStyle>
     public Color Filled => filled;
     public Color Control => control;
     public Color ControlLit => controlLit;
+    public Color Disabled => disabled;
+    public Color Inactive => inactive;
     public Color ControlOn => controlOn;
     public Color Track => track;
     public Color Text => text;

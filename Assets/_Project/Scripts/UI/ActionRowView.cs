@@ -34,7 +34,7 @@ public sealed class ActionRowView : MonoBehaviour
     {
         action = shown;
         label.text = GameInput.WithRebinds(shown.Label);
-        label.color = shown.Enabled ? enabledText : disabledText;
+        label.color = shown.Enabled ? enabledText : UIStyle.Current.Inactive;
         detail.text = HearthKit.ToneNumbers(GameInput.WithRebinds(shown.Detail ?? ""));
         detail.gameObject.SetActive(!string.IsNullOrEmpty(shown.Detail));
         button.interactable = shown.Enabled;
@@ -72,14 +72,15 @@ public sealed class ActionRowView : MonoBehaviour
         // Disabled sinks darker than at rest, and opaque (a faint row let the lighter panel show through). Each time: the
         // row's UIRole paints its colours after the first bind.
         ColorBlock colors = button.colors;
-        Color rest = colors.normalColor;
-        colors.disabledColor = new Color(rest.r * 0.72f, rest.g * 0.72f, rest.b * 0.72f, 1f);
+        Graphic face = button.targetGraphic;
+        colors.disabledColor = face != null ? HearthKit.GreyTint(face.color) : new Color(0.7f, 0.7f, 0.7f, 1f);
         button.colors = colors;
 
         string name = !string.IsNullOrEmpty(shown.Icon) ? shown.Icon : HearthKit.IconForAction(shown.Label);
         icon.sprite = style.Icon(name);
         icon.enabled = icon.sprite != null;
-        icon.color = shown.Enabled ? HearthKit.IconColour(name) : HearthKit.Faded(style.Muted, 0.6f);
+        icon.color = shown.Enabled ? HearthKit.IconColour(name) : style.Inactive;
+        detail.color = shown.Enabled ? style.Muted : style.Inactive;
     }
 
     // The words move right to make room for the icon (whatever their anchors: only the left edge moves).

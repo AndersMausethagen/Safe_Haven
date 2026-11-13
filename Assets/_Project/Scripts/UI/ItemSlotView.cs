@@ -53,6 +53,26 @@ public sealed class ItemSlotView : MonoBehaviour,
     {
         owner = handler;
         Index = index;
+        TakeStyle();
+    }
+
+    private bool styled;
+
+    // Hearthline 3: the slot's colours from the style's browns (the prefab kept the ones it was made with): empty a darker
+    // walnut, filled dark leather, pointed at the worn leather of what is chosen, locked grey (it can't be used).
+    private void TakeStyle()
+    {
+        if (styled || !Application.isPlaying)
+        {
+            return;
+        }
+
+        styled = true;
+        UIStyle style = UIStyle.Current;
+        emptyColor = Color.Lerp(style.Panel, Color.black, 0.18f);
+        filledColor = style.Inset;
+        hoverColor = style.Filled;
+        lockedColor = style.Disabled;
     }
 
     /// <param name="isLocked">Shows the slot as locked: it keeps its item but can take no new ones.</param>

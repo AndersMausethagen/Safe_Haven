@@ -69,7 +69,7 @@ public sealed class UIRole : MonoBehaviour
         if (dim != labelsDimmed)
         {
             labelsDimmed = dim;
-            PaintLabels(dim ? UIStyle.Current.Muted : labelColor);
+            PaintLabels(dim ? UIStyle.Current.Inactive : labelColor);
         }
     }
 
@@ -253,8 +253,8 @@ public sealed class UIRole : MonoBehaviour
             colors.highlightedColor = Color.white;
             colors.selectedColor = Color.white;
             colors.pressedColor = new Color(0.8f, 0.8f, 0.8f, 1f);
-            float sunk = disabled.HasValue && lit.grayscale > 0f ? Mathf.Clamp01(disabled.Value.grayscale / lit.grayscale) : share;
-            colors.disabledColor = new Color(sunk, sunk, sunk, disabled.HasValue ? 1f : 0.45f);
+            // Hearthline 3: a button that can't be pressed goes grey (UIStyle.Disabled), not a fainter brown.
+            colors.disabledColor = HearthKit.GreyTint(lit);
             colors.colorMultiplier = 1f;
             button.colors = colors;
             enabled = true;

@@ -35,6 +35,15 @@ public static class HearthKit
         return image;
     }
 
+    /// <summary>The tint that turns a control drawn in <paramref name="face"/> to the style's grey when it can't be used
+    /// (a tint multiplies, channel by channel, so brown becomes grey only by a tint of its own).</summary>
+    public static Color GreyTint(Color face)
+    {
+        Color grey = UIStyle.Current.Disabled;
+        return new Color(Mathf.Clamp01(grey.r / Mathf.Max(face.r, 0.001f)), Mathf.Clamp01(grey.g / Mathf.Max(face.g, 0.001f)),
+            Mathf.Clamp01(grey.b / Mathf.Max(face.b, 0.001f)), 1f);
+    }
+
     /// <summary>A button's tint over its own coloured graphic: brighter pointed at, darker pressed, dim disabled.</summary>
     public static void Tint(Button button)
     {

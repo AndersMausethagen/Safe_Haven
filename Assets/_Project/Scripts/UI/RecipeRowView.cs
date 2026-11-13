@@ -56,7 +56,7 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         icon.enabled = icon.sprite != null;
         icon.color = canMake ? Color.white : DimIcon;
         nameLabel.text = recipe.OutputAmount > 1 ? $"{recipe.DisplayName} ×{recipe.OutputAmount}" : recipe.DisplayName;
-        nameLabel.color = canMake ? style.Text : style.Muted;
+        nameLabel.color = canMake ? style.Text : style.Inactive;
         tierLabel.text = Tiers.ToRoman(recipe.Tier);
         tierLabel.color = Tiers.ColorOf(recipe.Tier);
         string status = canMake ? $"Can make {count}" : problem;

@@ -16,13 +16,15 @@ MonoBehaviour:
   titleFont: {fileID: 11400000, guid: 8579b3dc74ca4a64290753d5efddd637, type: 2}
   bodyOnWorld: {fileID: 2100000, guid: 88ff5f3f7d60065468a90fd950118760, type: 2}
   titleOnWorld: {fileID: 2100000, guid: 8970dea510bfc75408b7da10eee05b5c, type: 2}
-  panel: {r: 0.075, g: 0.066, b: 0.055, a: 1}
+  panel: {r: 0.12941177, g: 0.09411765, b: 0.0627451, a: 1}
   rim: {r: 0.85, g: 0.65, b: 0.35, a: 0.5}
   hairline: {r: 0.925, g: 0.894, b: 0.827, a: 0.09}
-  inset: {r: 0.112, g: 0.1, b: 0.085, a: 1}
-  filled: {r: 0.15, g: 0.133, b: 0.11, a: 1}
-  control: {r: 0.165, g: 0.145, b: 0.118, a: 1}
-  controlLit: {r: 0.25, g: 0.215, b: 0.17, a: 1}
+  inset: {r: 0.1882353, g: 0.13725491, b: 0.09019608, a: 1}
+  filled: {r: 0.2509804, g: 0.1882353, b: 0.1254902, a: 1}
+  control: {r: 0.2509804, g: 0.1882353, b: 0.1254902, a: 1}
+  controlLit: {r: 0.34901962, g: 0.2627451, b: 0.16862746, a: 1}
+  disabled: {r: 0.16470589, g: 0.15686275, b: 0.14901961, a: 1}
+  inactive: {r: 0.47058824, g: 0.45490196, b: 0.43137255, a: 1}
   controlOn: {r: 0.42, g: 0.32, b: 0.17, a: 1}
   track: {r: 0.925, g: 0.894, b: 0.827, a: 0.24}
   text: {r: 0.925, g: 0.894, b: 0.827, a: 1}
