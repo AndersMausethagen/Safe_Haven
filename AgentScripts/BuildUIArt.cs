@@ -21,7 +21,27 @@ public static class BuildUIArt
     private const string BoonArt = "Assets/_Project/Art/Icons/Boons/";
     private const string ConditionIcons = "Assets/_Project/Resources/ConditionIconSettings.asset";
 
-    public static string All() => string.Join("\n", Residents(), Raids(), Boons(), Events(), Haven(), Surfaces());
+    public static string All() => string.Join("\n", Residents(), Raids(), Boons(), Events(), Haven(), Surfaces(), Windows());
+
+    /// <summary>The windows' paintings (Tools/LocalSpawn/window_art.json): into Resources/WindowArt, where KitBanner and
+    /// the portal's window find them by key.</summary>
+    public static string Windows()
+    {
+        const string from = "Tools/LocalSpawn/WindowArt/";
+        if (!Directory.Exists(from))
+        {
+            return "No window art painted yet (generate_ui_art.py windows).";
+        }
+
+        int done = 0;
+        foreach (string source in Directory.GetFiles(from, "*.png"))
+        {
+            CopyIn(source.Replace('\\', '/'), "Assets/_Project/Resources/WindowArt/" + Path.GetFileName(source), 2048, false);
+            done++;
+        }
+
+        return $"{done} window paintings in Resources/WindowArt.";
+    }
 
     /// <summary>
     /// Painted surfaces in the world (Tools/LocalSpawn/surface_art.json): the Haven Banner's cloth (its own material, used by nothing

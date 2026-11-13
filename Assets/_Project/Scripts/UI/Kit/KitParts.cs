@@ -205,13 +205,19 @@ public sealed class KitButton
     private readonly Image icon;
     private readonly TMP_Text label;
     private readonly TMP_Text detail;
+    private readonly TMP_Text status;
     private readonly KitButtonShape shape;
+    private readonly float width;
     private MenuAction action;
+
+    /// <summary>Where it is, for windows that lay their buttons out as they refresh.</summary>
+    public RectTransform Rect => (RectTransform)root.transform;
 
     public KitButton(Transform parent, float x, float y, float width, float height, Action<MenuAction> chosen, KitButtonShape shape = KitButtonShape.Tile)
     {
         UIStyle style = UIStyle.Current;
         this.shape = shape;
+        this.width = width;
         float corners = shape == KitButtonShape.Compact ? 1.6f : 1.3f;
         RectTransform rect = CodeUI.At("Action", parent, x, y, width, height);
         root = rect.gameObject;
@@ -228,6 +234,7 @@ public sealed class KitButton
                 icon = CodeUI.At("Icon", rect, 18f, (height - 34f) * 0.5f, 34f, 34f).gameObject.AddComponent<Image>();
                 label = CodeUI.Label("Label", rect, 68f, 8f, width - 90f, 28f, 20f, style.Text);
                 detail = CodeUI.Label("Detail", rect, 68f, 36f, width - 90f, 24f, 16f, style.Muted);
+                status = CodeUI.Label("Status", rect, width - 190f, 0f, 172f, height, 16f, style.Accent, TextAlignmentOptions.MidlineRight);
                 break;
             case KitButtonShape.Compact:
                 icon = CodeUI.At("Icon", rect, 12f, (height - 22f) * 0.5f, 22f, 22f).gameObject.AddComponent<Image>();
@@ -259,7 +266,17 @@ public sealed class KitButton
         label.color = shown.Enabled ? style.Text : style.Muted;
         if (detail != null)
         {
-            detail.text = shown.Detail ?? "";
+            detail.text = HearthKit.ToneNumbers(GameInput.WithRebinds(shown.Detail ?? ""));
+        }
+
+        if (status != null)
+        {
+            bool hasStatus = !string.IsNullOrEmpty(shown.Status);
+            status.text = shown.Status ?? "";
+            status.color = shown.Enabled ? style.AccentBright : style.Danger;
+            float room = width - 90f - (hasStatus ? 180f : 0f);
+            label.rectTransform.sizeDelta = new Vector2(room, label.rectTransform.sizeDelta.y);
+            detail.rectTransform.sizeDelta = new Vector2(room, detail.rectTransform.sizeDelta.y);
         }
 
         icon.sprite = style.Icon(shown.Icon);

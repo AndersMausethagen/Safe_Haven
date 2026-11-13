@@ -257,18 +257,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             return;
         }
 
-        if (ActionMenuWindow.Current == null)
-        {
-            Debug.LogError("The portal found no ActionMenuWindow in the scene.", this);
-            RaiseTalked(user);
-            return;
-        }
-
         questLineIndex = 0;
         Speak();
         // Raised when the conversation ends, so the next quest doesn't appear while the portal is still speaking.
         menu ??= new HomePortalMenu(this, raid, station);
-        ActionMenuWindow.Current.Open(() => menu.Build(user), user, transform, menuRange, () => RaiseTalked(user));
+        // Its own window (PortalWindow: its painting, its words, what it offers), not the plain menu.
+        PortalWindow.Show(() => menu.Build(user), user, transform, menuRange, () => RaiseTalked(user));
     }
 
     private void RaiseTalked(GameObject user)

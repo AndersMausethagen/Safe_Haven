@@ -30,12 +30,16 @@ public sealed class MenuAction
     public string Group { get; set; } = "";
     /// <summary>The name of its icon, for a window that shows one (UIStyle.Icon, the UI kit); empty for none.</summary>
     public string Icon { get; set; } = "";
+    /// <summary>A short state shown at its right by windows that have room ("Not enough", "Ready"); empty for none.</summary>
+    public string Status { get; set; } = "";
 }
 
 /// <summary>What an ActionMenuWindow shows: a title, a rich-text body and a list of choices.</summary>
 public sealed class MenuPage
 {
     public string Title = "";
+    /// <summary>What is said, the story's voice (the portal's words): shown apart from the rest, in italics.</summary>
+    public string Story = "";
     public string Body = "";
     /// <summary>A painting above the title (a raid event's scene), or null for none.</summary>
     public Sprite Picture;
@@ -159,7 +163,8 @@ public sealed class ActionMenuWindow : MonoBehaviour
         // Keys named by their actions ({key:Interact}) become the keys bound now.
         titleLabel.text = GameInput.WithRebinds(page.Title);
         // Hearthline 3: its numbers stand out (HearthKit.ToneNumbers).
-        bodyLabel.text = HearthKit.ToneNumbers(GameInput.WithRebinds(page.Body));
+        string story = string.IsNullOrWhiteSpace(page.Story) ? "" : $"<i>{page.Story}</i>\n\n";
+        bodyLabel.text = story + HearthKit.ToneNumbers(GameInput.WithRebinds(page.Body));
         bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(page.Body));
         while (rows.Count < page.Actions.Count)
         {

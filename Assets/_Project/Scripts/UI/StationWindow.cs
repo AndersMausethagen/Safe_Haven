@@ -189,12 +189,36 @@ public sealed class StationWindow : MonoBehaviour
         hoveredGrid = null;
         tooltip.Hide();
         window.Open();
+        ShowBanner(source.Type);
         Refresh();
     }
 
     public void Close()
     {
         window.Close();
+    }
+
+    // Hearthline 3: the station's painting across the window's top (KitBanner, Resources/WindowArt/<type>), the title
+    // and the station's buttons on it; the window shrinks to fit where the screen is short.
+    private const float BannerHeight = 170f;
+
+    private void ShowBanner(CraftingStationType type)
+    {
+        var panel = titleLabel.transform.parent as RectTransform;
+        Canvas canvas = titleLabel.canvas != null ? titleLabel.canvas.rootCanvas : null;
+        if (panel == null || canvas == null)
+        {
+            return;
+        }
+
+        KitBanner.Show(panel, type.ToString(), BannerHeight, 40f);
+        // Its name large on the painting.
+        titleLabel.fontSize = 44f;
+        titleLabel.overflowMode = TMPro.TextOverflowModes.Overflow;
+        titleLabel.rectTransform.anchoredPosition = new Vector2(30f, -22f);
+        titleLabel.rectTransform.sizeDelta = new Vector2(600f, 60f);
+        Vector2 size = panel.rect.size;
+        HearthKit.FitToScreen(panel, (RectTransform)canvas.transform, size.x, size.y, 30f);
     }
 
     private void OnOpenChanged(bool open)

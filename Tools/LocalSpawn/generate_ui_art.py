@@ -11,6 +11,7 @@ folder the finished paintings go to, which the Unity builders read:
   journal     journal_art.json         1280x720   -> JournalArt/<slug>.png          AgentScripts/BuildJournal.cs (Apply)
   haven       haven_art.json           1920x1088  -> HavenArt/<rank>.png            AgentScripts/BuildUIArt.cs (Haven)
   surfaces    surface_art.json         per entry  -> SurfaceArt/<key>.png           AgentScripts/BuildUIArt.cs (Surfaces)
+  windows     window_art.json          1536x512   -> WindowArt/<key>.png            AgentScripts/BuildUIArt.cs (Windows)
 
 An entry may give its own "width" and "height" (multiples of 16).
 
@@ -46,6 +47,7 @@ SETS = {
     "journal": ("journal_art.json", "JournalArt", 1280, 720, "home", None, True),
     "haven": ("haven_art.json", "HavenArt", 1920, 1088, "home", None, False),
     "surfaces": ("surface_art.json", "SurfaceArt", 1024, 1024, "none", None, False),
+    "windows": ("window_art.json", "WindowArt", 1536, 512, "home", None, False),
 }
 
 

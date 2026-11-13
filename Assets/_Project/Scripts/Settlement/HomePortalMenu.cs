@@ -27,12 +27,8 @@ public sealed class HomePortalMenu
         SettlementState settlement = GameSession.Settlement;
         UIStyle style = UIStyle.Current;
         var body = new StringBuilder();
+        // What it says is its own (MenuPage.Story: PortalWindow shows it apart, in italics); the rest is what it tells.
         string line = portal.SpokenLine();
-        if (line != null)
-        {
-            body.Append(line).Append("\n\n");
-        }
-
         body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {portal.WardRadius:0} m around the portal. You can build inside it.</color>");
         WardBreachDirector breach = WardBreachDirector.Current;
         if (breach != null && breach.IsPending)
@@ -52,22 +48,34 @@ public sealed class HomePortalMenu
             body.Append("\n\n").Append(raid.RuinText);
         }
 
-        var page = new MenuPage { Title = sleeping ? "The Sleeping Portal" : "The Portal", Body = body.ToString() };
+        var page = new MenuPage { Title = sleeping ? "The Sleeping Portal" : "The Portal", Story = line ?? "", Body = body.ToString() };
         // What most visits are for comes first: going through it.
         if (raid != null)
         {
             raid.AddActions(page, user);
+            foreach (MenuAction action in page.Actions)
+            {
+                if (action.Label.StartsWith("Plan a raid") || action.Label.StartsWith("Follow"))
+                {
+                    action.Icon = "Lead";
+                }
+                else if (action.Label.StartsWith("Improve") || action.Label.StartsWith("Repair") || action.Label.StartsWith("Wake"))
+                {
+                    action.Icon = "Hammer";
+                    action.Status = action.Enabled ? "" : "Not enough";
+                }
+            }
         }
 
         AddOtherHavens(page, user);
         if (station != null && station.Usable)
         {
-            page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true));
+            page.Add(new MenuAction("Make Portal Sparks", "Queue them at the portal's own fire", true, () => station.OpenMenu(user), closesMenu: true) { Icon = "Spark" });
         }
 
         if (portal.HasMoreToSay)
         {
-            page.Add(new MenuAction("Listen", null, true, portal.SayNext));
+            page.Add(new MenuAction("Listen", "It has more to tell", true, portal.SayNext) { Icon = "Book" });
         }
 
         int level = settlement.WardLevel;
@@ -76,13 +84,14 @@ public sealed class HomePortalMenu
             SettlementSettings.WardLevel next = settings.WardLevels[level];
             bool affordable = MaterialPool.For(user).CanAfford(next.cost, null, out string missing);
             string opens = string.IsNullOrEmpty(next.opens) ? "" : $". {next.opens}";
-            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}" + (affordable ? "" : $"   <color={UIStyle.Hex(style.Danger)}>{missing}</color>");
-            page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => StrengthenWard(user)));
+            // What is missing shows as its state on the right ("Not enough"), so the line keeps to what it costs and gives.
+            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}";
+            page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => StrengthenWard(user)) { Icon = "Barding", Status = affordable ? "" : "Not enough" });
         }
 
         if (breach != null && breach.IsPending)
         {
-            page.Add(new MenuAction("Begin the defense", breach.Hint, true, breach.Begin, closesMenu: true));
+            page.Add(new MenuAction("Begin the defense", breach.Hint, true, breach.Begin, closesMenu: true) { Icon = "Sword", Status = "Now" });
         }
 
         MenuAction mend = BuildingRepairs.MendAction(user);
@@ -91,7 +100,7 @@ public sealed class HomePortalMenu
             page.Add(mend);
         }
 
-        page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven));
+        page.Add(new MenuAction("How is Safe Haven doing?", $"Rank, renown and what to do next ({GameInput.KeyLabel(GameInput.Haven)})", true, OpenHaven) { Group = "Haven" });
         return page;
     }
 
@@ -112,7 +121,7 @@ public sealed class HomePortalMenu
                 page.Add(new MenuAction("Call friends to Safe Haven", coop.SteamReady ? "I'll open my way and call to them" : noSteam, coop.SteamReady,
                     () => CallFriends(coop), closesMenu: true));
                 page.Add(new MenuAction("Walk to a friend's Haven", coop.SteamReady ? "I hear other doors. Name one, and I'll carry you" : noSteam, coop.SteamReady,
-                    () => ActionMenuWindow.Current.Open(() => FriendsPage(user, coop), user, portal.transform)));
+                    () => ActionMenuWindow.Current.Open(() => FriendsPage(user, coop), user, portal.transform), closesMenu: true) { Icon = "Lead" });
                 break;
             case CoopState.Hosting:
                 page.Add(new MenuAction("Call another friend", $"My way stands open ({coop.PlayerCount} here)", coop.ViaSteam, () => coop.InviteFriends()));
@@ -153,7 +162,7 @@ public sealed class HomePortalMenu
             page.Add(new MenuAction($"{friend.Name}'s Haven", "Walk through to them", true, () => coop.Visit(lobby), closesMenu: true));
         }
 
-        page.Add(new MenuAction("Back", null, true, () => ActionMenuWindow.Current.Open(() => Build(user), user, portal.transform)));
+        page.Add(new MenuAction("Back", null, true, () => { ActionMenuWindow.Current.Close(); PortalWindow.Show(() => Build(user), user, portal.transform, 6f); }));
         return page;
     }
 
