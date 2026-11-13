@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,12 +32,23 @@ public sealed class BuildMenuWindow : MonoBehaviour
     private static readonly BuildCategory[] Tabs = { BuildCategory.Stations, BuildCategory.Walls, BuildCategory.Structures, BuildCategory.Manage };
     private static BuildCategory lastTab = BuildCategory.Stations;
 
+    // Hearthline 3: framed tabs as KitTabs draws them, with the count of what is in each.
     private sealed class Tab
     {
         public BuildCategory Category;
         public GameObject Root;
         public TMP_Text Label;
-        public Image Underline;
+        public Image Fill;
+        public Image Rim;
+    }
+
+    // One cost in the details: what it is, its picture, and what the player has of it.
+    private sealed class CostRow
+    {
+        public GameObject Root;
+        public Image Icon;
+        public TMP_Text Name;
+        public TMP_Text Amount;
     }
 
     private sealed class Card
@@ -48,8 +58,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
         public string Title;
         public string Line;
         public Image Frame;
-        public Outline Rim;
+        public Image Rim;
         public Image Icon;
+        public TMP_Text Name;
         public TMP_Text Cost;
         public bool Affordable = true;
         public string Missing;
@@ -67,7 +78,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
     private TMP_Text detailTags;
     private TMP_Text detailText;
     private TMP_Text costHeading;
-    private TMP_Text costLines;
+    private TMP_Text costNone;
+    private readonly List<CostRow> costRows = new List<CostRow>();
+    private RectTransform detailFrame;
     private TMP_Text buildLabel;
     private Button buildButton;
     private TMP_Text hint;
@@ -272,14 +285,14 @@ public sealed class BuildMenuWindow : MonoBehaviour
         int index = cards.Count;
         var go = new GameObject(card.Title, typeof(RectTransform));
         go.transform.SetParent(grid, false);
-        card.Frame = go.AddComponent<Image>();
-        card.Rim = go.AddComponent<Outline>();
-        card.Rim.effectDistance = new Vector2(1f, -1f);
-        go.AddComponent<UIRole>().Set(UIRole.Kind.Slot);
+        // Hearthline 3: a rounded card with a gold rim (bright on the one chosen), lifting under the pointer.
+        card.Frame = HearthKit.Sliced(go.AddComponent<Image>(), style.Card, 1.3f);
         var button = go.AddComponent<Button>();
         button.targetGraphic = card.Frame;
-        button.transition = Selectable.Transition.None;
+        HearthKit.Tint(button);
         button.onClick.AddListener(() => Choose(index));
+        UIHighlight.On(go);
+        card.Rim = HearthKit.Rim((RectTransform)go.transform, 0.25f, 1.3f);
         var focus = go.AddComponent<BuildMenuCard>();
         focus.Index = index;
         focus.Focused += c => Select(c.Index);
@@ -297,12 +310,13 @@ public sealed class BuildMenuWindow : MonoBehaviour
             glyph.text = card.Building != null ? Initials(card.Title) : card.ToUpgrade ? "\u25B2" : "\u21C4";
         }
 
-        TMP_Text name = Label("Name", go.transform, 6f, 108f, CardSize - 12f, 22f, 17f, style.Text, TextAlignmentOptions.Center);
-        name.text = card.Title;
-        Shrink(name, 12f);
-        card.Cost = Label("Cost", go.transform, 6f, 128f, CardSize - 12f, 18f, 13f, style.Muted, TextAlignmentOptions.Center);
-        card.Cost.text = card.Building != null ? ShortCost(card.Building) : "";
-        Shrink(card.Cost, 10f);
+        card.Name = Label("Name", go.transform, 6f, 106f, CardSize - 12f, 24f, 17f, style.Text, TextAlignmentOptions.Center);
+        card.Name.text = card.Title;
+        Shrink(card.Name, 12f);
+        // Whether it can be built now, and if not the first thing short; every cost is in the details beside.
+        card.Cost = Label("State", go.transform, 6f, 128f, CardSize - 12f, 20f, 14f, style.Muted, TextAlignmentOptions.Center);
+        card.Cost.text = "";
+        Shrink(card.Cost, 11f);
         cards.Add(card);
     }
 
@@ -326,10 +340,12 @@ public sealed class BuildMenuWindow : MonoBehaviour
             int count = Count(tab.Category);
             bool on = tab.Category == shown;
             tab.Root.SetActive(tab.Category != BuildCategory.Manage || builder.AllowsChanges);
-            tab.Label.text = count > 0 ? $"{BuildCategories.Name(tab.Category)}  <color=#{ColorUtility.ToHtmlStringRGB(style.Muted)}>{count}</color>"
+            tab.Label.text = count > 0 ? $"{BuildCategories.Name(tab.Category)}  <color=#{ColorUtility.ToHtmlStringRGB(on ? style.Accent : style.Muted)}><size=85%>{count}</size></color>"
                 : BuildCategories.Name(tab.Category);
-            tab.Label.color = on ? style.Accent : count > 0 ? style.Text : style.Muted;
-            tab.Underline.enabled = on;
+            tab.Label.color = on ? style.AccentBright : count > 0 ? style.Text : style.Inactive;
+            tab.Label.fontStyle = on ? FontStyles.Bold : FontStyles.Normal;
+            tab.Fill.color = on ? Color.Lerp(style.Inset, style.AccentDeep, 0.55f) : style.Inset;
+            tab.Rim.color = on ? style.Accent : HearthKit.Faded(style.Accent, 0.3f);
         }
 
         for (int i = 0; i < cards.Count; i++)
@@ -345,7 +361,10 @@ public sealed class BuildMenuWindow : MonoBehaviour
                 card.Icon.color = card.Affordable ? Color.white : new Color(1f, 1f, 1f, 0.4f);
             }
 
-            card.Cost.color = card.Affordable ? style.Muted : style.Danger;
+            // What can't be built yet goes grey; what it is short of in red under it.
+            card.Name.color = card.Affordable ? style.Text : style.Inactive;
+            card.Cost.text = card.Building == null ? "" : card.Affordable ? "Can build" : Short(card.Building, pool);
+            card.Cost.color = card.Affordable ? style.Good : style.Danger;
             Paint(card, i == selected);
         }
 
@@ -355,9 +374,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
     private void Paint(Card card, bool on)
     {
         UIStyle style = UIStyle.Current;
-        card.Frame.color = on ? style.ControlLit : style.Inset;
-        card.Rim.effectColor = on ? style.Accent : style.Hairline;
-        card.Rim.effectDistance = on ? new Vector2(2f, -2f) : new Vector2(1f, -1f);
+        // Only a little lit, the rim carries it: a grey name (what can't be built yet) must still read on it.
+        card.Frame.color = on ? Color.Lerp(style.Inset, style.AccentDeep, 0.2f) : style.Inset;
+        card.Rim.color = on ? style.Accent : HearthKit.Faded(style.Accent, 0.25f);
     }
 
     private void Select(int index)
@@ -386,8 +405,13 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailTags.gameObject.SetActive(any);
         detailText.gameObject.SetActive(any);
         costHeading.gameObject.SetActive(any && card.Building != null);
-        costLines.gameObject.SetActive(any && card.Building != null);
+        if (!any || card.Building == null)
+        {
+            ShowCosts(null, pool);
+        }
+
         buildButton.gameObject.SetActive(any);
+        detailFrame.gameObject.SetActive(any);
         detailIcon.gameObject.SetActive(any && card.Building != null && card.Building.Icon != null);
         detailGlyph.gameObject.SetActive(any && !detailIcon.gameObject.activeSelf);
         if (!any)
@@ -416,7 +440,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailTags.text = Tags(building, style);
         detailText.text = string.IsNullOrWhiteSpace(building.Description) ? "" : building.Description;
         costHeading.text = building.PlaceInLines ? "COST, EACH PIECE" : "COST";
-        costLines.text = CostLines(building, pool, style);
+        ShowCosts(building, pool);
         buildButton.interactable = card.Affordable;
         buildLabel.text = card.Affordable ? "Build" : "Not enough materials";
     }
@@ -431,44 +455,112 @@ public sealed class BuildMenuWindow : MonoBehaviour
         return string.Join("   \u2022   ", tags);
     }
 
-    private static string CostLines(BuildingDefinition building, MaterialPool pool, UIStyle style)
+    // Each cost as a row with its picture, what the player has against what it takes (green when enough, red when not);
+    // past three they go in two columns.
+    private void ShowCosts(BuildingDefinition building, MaterialPool pool)
     {
-        var text = new StringBuilder();
+        UIStyle style = UIStyle.Current;
+        var shownCosts = new List<(string name, Sprite icon, int need, int have)>();
+        if (building != null)
+        {
+            foreach (ResourceAmount cost in building.ConstructionCost)
+            {
+                if (cost.Resource != null && cost.Amount > 0)
+                {
+                    shownCosts.Add((cost.Resource.DisplayName, cost.Resource.Icon, cost.Amount, pool != null ? pool.Have(cost.Resource) : 0));
+                }
+            }
+
+            foreach (ItemAmount cost in building.ConstructionItems)
+            {
+                if (cost.Item != null && cost.Amount > 0)
+                {
+                    shownCosts.Add((cost.Item.DisplayName, cost.Item.Icon, cost.Amount, pool != null ? pool.Have(cost.Item) : 0));
+                }
+            }
+        }
+
+        costNone.gameObject.SetActive(building != null && shownCosts.Count == 0);
+        bool twoColumns = shownCosts.Count > 3;
+        float columnWidth = twoColumns ? (DetailWidth - 16f) * 0.5f : DetailWidth;
+        for (int i = 0; i < Mathf.Max(costRows.Count, shownCosts.Count); i++)
+        {
+            if (i >= costRows.Count)
+            {
+                costRows.Add(MakeCostRow(i));
+            }
+
+            CostRow row = costRows[i];
+            bool used = i < shownCosts.Count && i < CostRowsShown;
+            row.Root.SetActive(used);
+            if (!used)
+            {
+                continue;
+            }
+
+            var (name, icon, need, have) = shownCosts[i];
+            int column = twoColumns ? i / 3 : 0;
+            int line = twoColumns ? i % 3 : i;
+            var rect = (RectTransform)row.Root.transform;
+            rect.anchoredPosition = new Vector2(DetailLeft + column * (columnWidth + 16f), -(CostTop + line * CostRowHeight));
+            rect.sizeDelta = new Vector2(columnWidth, CostRowHeight);
+            row.Amount.rectTransform.anchoredPosition = new Vector2(columnWidth - 90f, 0f);
+            row.Name.rectTransform.sizeDelta = new Vector2(columnWidth - 30f - 92f, CostRowHeight);
+            row.Icon.sprite = icon;
+            row.Icon.enabled = icon != null;
+            row.Name.text = name;
+            row.Name.color = have >= need ? style.Text : style.Muted;
+            string colour = ColorUtility.ToHtmlStringRGB(have >= need ? style.Good : style.Danger);
+            row.Amount.text = $"<color=#{colour}>{have}</color><color=#{ColorUtility.ToHtmlStringRGB(style.Muted)}> / {need}</color>";
+        }
+    }
+
+    private const float CostRowHeight = 24f;
+    private const int CostRowsShown = 6;
+    private float CostTop => GridTop + 10f + 120f + 106f;
+
+    private CostRow MakeCostRow(int index)
+    {
+        UIStyle style = UIStyle.Current;
+        RectTransform rect = At("Cost " + index, panel, DetailLeft, CostTop, DetailWidth, CostRowHeight);
+        var row = new CostRow { Root = rect.gameObject };
+        row.Icon = At("Icon", rect, 0f, 1f, 22f, 22f).gameObject.AddComponent<Image>();
+        row.Icon.preserveAspect = true;
+        row.Icon.raycastTarget = false;
+        row.Name = Label("Name", rect, 30f, 0f, DetailWidth - 122f, CostRowHeight, 17f, style.Text);
+        row.Amount = Label("Amount", rect, DetailWidth - 90f, 0f, 90f, CostRowHeight, 17f, style.Text, TextAlignmentOptions.Right);
+        return row;
+    }
+
+    // "Needs 8 Sticks", and "+2" when two more things are short as well.
+    private static string Short(BuildingDefinition building, MaterialPool pool)
+    {
+        if (pool == null)
+        {
+            return "";
+        }
+
+        string first = null;
+        int more = 0;
         foreach (ResourceAmount cost in building.ConstructionCost)
         {
-            if (cost.Resource != null && cost.Amount > 0)
+            if (cost.Resource != null && pool.Have(cost.Resource) < cost.Amount)
             {
-                AppendCost(text, cost.Resource.DisplayName, cost.Amount, pool != null ? pool.Have(cost.Resource) : 0, style);
+                if (first == null) first = $"Needs {cost.Amount - pool.Have(cost.Resource)} {cost.Resource.DisplayName}";
+                else more++;
             }
         }
 
         foreach (ItemAmount cost in building.ConstructionItems)
         {
-            if (cost.Item != null && cost.Amount > 0)
+            if (cost.Item != null && pool.Have(cost.Item) < cost.Amount)
             {
-                AppendCost(text, cost.Item.DisplayName, cost.Amount, pool != null ? pool.Have(cost.Item) : 0, style);
+                if (first == null) first = $"Needs {cost.Amount - pool.Have(cost.Item)} {cost.Item.DisplayName}";
+                else more++;
             }
         }
 
-        return text.Length > 0 ? text.ToString() : "Free";
-    }
-
-    private static void AppendCost(StringBuilder text, string name, int need, int have, UIStyle style)
-    {
-        string colour = ColorUtility.ToHtmlStringRGB(have >= need ? style.Good : style.Danger);
-        text.Append(name).Append("<pos=62%><color=#").Append(colour).Append('>').Append(have).Append("</color>")
-            .Append("<color=#").Append(ColorUtility.ToHtmlStringRGB(style.Muted)).Append("> / ").Append(need).Append("</color>\n");
-    }
-
-    private static string ShortCost(BuildingDefinition building)
-    {
-        var text = new StringBuilder(AmountText.Describe(building.ConstructionCost));
-        if (building.ConstructionItems.Count > 0)
-        {
-            text.Append(text.Length > 0 ? ", " : "").Append(AmountText.Describe(building.ConstructionItems));
-        }
-
-        return text.Length > 0 ? text.ToString() : "Free";
+        return first == null ? "" : more > 0 ? $"{first} +{more}" : first;
     }
 
     private void Choose(int index)
@@ -529,9 +621,17 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
     private void BuildTab(BuildCategory category, float x, UIStyle style)
     {
-        Button button = AddTab(category.ToString(), panel, x, 12f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
+        RectTransform rect = At(category + " Tab", panel, x, 14f, TabWidth, 40f);
+        Image fill = HearthKit.Sliced(rect.gameObject.AddComponent<Image>(), style.Card, 1.4f);
+        Image rim = HearthKit.Rim(rect, 0.3f, 1.4f);
+        var button = rect.gameObject.AddComponent<Button>();
+        button.targetGraphic = fill;
+        HearthKit.Tint(button);
+        UIHighlight.On(rect.gameObject);
         button.onClick.AddListener(() => ShowTab(category));
-        tabs.Add(new Tab { Category = category, Root = button.gameObject, Label = label, Underline = underline });
+        TMP_Text label = Label("Label", rect, 0f, 0f, TabWidth, 40f, 19f, style.Text, TextAlignmentOptions.Center);
+        style.Title(label);
+        tabs.Add(new Tab { Category = category, Root = rect.gameObject, Label = label, Fill = fill, Rim = rim });
     }
 
     private void BuildGrid(UIStyle style)
@@ -564,7 +664,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
     {
         const float icon = 120f;
         float top = GridTop + 10f;
-        detailIcon = At("Icon", panel, DetailLeft, top, icon, icon).gameObject.AddComponent<Image>();
+        // The picture in a gold-framed card, as the tooltip's.
+        detailFrame = HearthKit.Card(panel, "Icon Frame", DetailLeft, top, icon, icon, 0.7f);
+        detailIcon = At("Icon", panel, DetailLeft + 8f, top + 8f, icon - 16f, icon - 16f).gameObject.AddComponent<Image>();
         detailIcon.preserveAspect = true;
         detailIcon.raycastTarget = false;
         detailGlyph = Label("Glyph", panel, DetailLeft, top, icon, icon, 64f, style.Accent, TextAlignmentOptions.Center);
@@ -577,7 +679,8 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailText = Paragraph("Description", panel, DetailLeft, top + icon + 12f, DetailWidth, 70f, 17f, style.Text);
         costHeading = Label("Cost Heading", panel, DetailLeft, top + icon + 86f, DetailWidth, 22f, 15f, style.Accent);
         costHeading.characterSpacing = 6f;
-        costLines = Paragraph("Cost", panel, DetailLeft, top + icon + 108f, DetailWidth, 64f, 17f, style.Text);
+        costNone = Label("Free", panel, DetailLeft, CostTop, DetailWidth, CostRowHeight, 17f, style.Good);
+        costNone.text = "Free";
         buildLabel = AddButton("Build", panel, DetailLeft, Height - 66f, DetailWidth, UIRole.Kind.PrimaryButton,
             () => Choose(selected), out buildButton);
     }
