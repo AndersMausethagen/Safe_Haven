@@ -27,7 +27,7 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private const float LineHeight = 30f;
 
     private RectTransform card;
-    private Outline rim;
+    private Image rim;
     private Image thumb;
     private TMP_Text thumbGlyph;
     private TMP_Text heading;
@@ -99,11 +99,9 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         card = Box("Card", root, new Vector2(1f, 0.5f), new Vector2(CardWidth, CardHeight), new Vector2(-EdgeGap - CardWidth * 0.5f, RaisedBy));
-        var background = card.gameObject.AddComponent<Image>();
+        // Hearthline 3: a rounded card in the kit's look, its gold rim breathing while it waits.
+        Image background = HearthKit.Sliced(card.gameObject.AddComponent<Image>(), style.Card, 1.2f);
         background.color = style.Panel;
-        rim = card.gameObject.AddComponent<Outline>();
-        rim.effectColor = style.Accent;
-        rim.effectDistance = new Vector2(1.5f, -1.5f);
         var button = card.gameObject.AddComponent<Button>();
         button.targetGraphic = background;
         button.onClick.AddListener(TutorialWindow.ShowPending);
@@ -111,18 +109,19 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         card.gameObject.AddComponent<UIHover>();
 
         float thumbTop = (CardHeight - ThumbHeight) * 0.5f;
-        RectTransform frame = At("Thumb Frame", card, 10f, thumbTop, ThumbWidth, ThumbHeight);
-        frame.gameObject.AddComponent<Image>().color = style.Inset;
+        RectTransform frame = HearthKit.Card(card, "Thumb Frame", 10f, thumbTop, ThumbWidth, ThumbHeight, 0f, style.Inset, 2f);
         thumbGlyph = Label("Glyph", frame, 0f, 0f, ThumbWidth, ThumbHeight, 34f, style.Accent, TextAlignmentOptions.Center);
-        thumb = At("Thumb", frame, 0f, 0f, ThumbWidth, ThumbHeight).gameObject.AddComponent<Image>();
+        thumb = At("Thumb", frame, 3f, 3f, ThumbWidth - 6f, ThumbHeight - 6f).gameObject.AddComponent<Image>();
         thumb.preserveAspect = true;
         thumb.raycastTarget = false;
+        HearthKit.Rim(frame, 0.7f, 2f).transform.SetAsLastSibling();
 
         float textX = ThumbWidth + 22f;
         float textWidth = CardWidth - textX - 10f;
         heading = Label("Heading", card, textX, 10f, textWidth, 20f, 13f, style.Accent);
         heading.characterSpacing = 4f;
         title = Label("Name", card, textX, 30f, textWidth, 30f, 20f, style.Text);
+        style.Title(title);
         title.fontStyle = FontStyles.Bold;
         title.enableAutoSizing = true;
         title.fontSizeMin = 14f;
@@ -134,14 +133,16 @@ public sealed class TutorialNoticeHud : MonoBehaviour
             text.raycastTarget = false;
         }
 
+        rim = HearthKit.Rim(card, 1f, 1.2f);
         cardFade = card.gameObject.AddComponent<CanvasGroup>();
         cardFade.alpha = 0f;
         card.gameObject.SetActive(false);
 
         // The small line left at the edge once the card has faded: how many wait, and the key.
         line = Box("Unread", root, new Vector2(1f, 0.5f), new Vector2(LineWidth, LineHeight), new Vector2(-EdgeGap - LineWidth * 0.5f, RaisedBy - CardHeight * 0.5f + LineHeight * 0.5f));
-        var lineBackground = line.gameObject.AddComponent<Image>();
-        lineBackground.color = new Color(style.Panel.r, style.Panel.g, style.Panel.b, 0.8f);
+        Image lineBackground = HearthKit.Sliced(line.gameObject.AddComponent<Image>(), style.Card, 2f);
+        lineBackground.color = HearthKit.Faded(style.Panel, 0.88f);
+        HearthKit.Rim(line, 0.45f, 2f);
         var lineButton = line.gameObject.AddComponent<Button>();
         lineButton.targetGraphic = lineBackground;
         lineButton.onClick.AddListener(TutorialWindow.ShowPending);
@@ -189,8 +190,7 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
         if (cardUp)
         {
-            Color accent = UIStyle.Current.Accent;
-            rim.effectColor = new Color(accent.r, accent.g, accent.b, Mathf.Lerp(0.35f, 1f, UIMotion.Breath(0.6f)));
+            rim.color = HearthKit.Faded(UIStyle.Current.Accent, Mathf.Lerp(0.35f, 1f, UIMotion.Breath(0.6f)));
         }
     }
 
@@ -215,7 +215,7 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         thumb.enabled = newest.art != null;
         thumbGlyph.text = newest.art == null && !string.IsNullOrEmpty(newest.title) ? newest.title.Substring(0, 1) : "";
         hint.text = GameInput.WithRebinds("Press ({key:Tutorial}) or click to read");
-        lineText.text = GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  ({{key:Tutorial}})" : "1 unread tutorial  ·  ({key:Tutorial})");
+        lineText.text = HearthKit.InlineIcon("Book") + "  " + GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  ({{key:Tutorial}})" : "1 unread tutorial  ·  ({key:Tutorial})");
         // A new one brings the card back, quickly, for a while.
         if (count > shownCount)
         {
