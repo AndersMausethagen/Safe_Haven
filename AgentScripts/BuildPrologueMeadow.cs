@@ -1255,6 +1255,7 @@ public static class BuildPrologueMeadow
         Vector3 fireAt = Ground(Camp.x, Camp.y);
         Fire(root, fireAt);
         FireCamera(root, fireAt);
+        WorldProps(root);
         string places = Places(director, root, fireAt, sigrid, eirik, runa);
         GiverData(companions, eirik, runa);
         SigridOffers(sigrid);
@@ -1315,6 +1316,51 @@ public static class BuildPrologueMeadow
 
     // A fire to stand around: the campfire's model and light, without what makes it a building the player owns.
     private const string CameraZonePrefab = "Assets/_Project/Prefabs/Camera/Camera Zone.prefab";
+
+    /// <summary>Only the world props along the way (`--entry BuildPrologueMeadow.PlaceProps`); Moments places the same.</summary>
+    public static string PlaceProps()
+    {
+        Scene scene = OpenPrologue(out string refused);
+        if (refused != null) return refused;
+        string placed = WorldProps(GameObject.Find("Prologue Meadow").transform);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        return placed + $"; dirty {scene.isDirty}";
+    }
+
+    // The user (2026-11-13): unique things around the world, rune stones with blue glowing runes. LocalSpawn's props
+    // (BuildWorldProps) along the party's walk, each well off the road and clear of the story's places.
+    private static string WorldProps(Transform root)
+    {
+        Transform old = root.Find("World Props");
+        if (old != null) Object.DestroyImmediate(old.gameObject);
+        var holder = new GameObject("World Props").transform;
+        holder.SetParent(root, false);
+        var placed = new List<string>();
+        foreach ((string prop, float x, float z, float turn) in new[]
+        {
+            ("God Post", -352f, 59f, 200f),          // at the edge of the morning camp, looking over it
+            ("Rune Cairn", -322f, 21f, 160f),        // beside the road out of camp
+            ("Rune Stone", -232f, 10f, 190f),        // where the road crosses the open meadow
+            ("Offering Stone", -112f, -37f, 30f),    // just inside the trees, across the river from the road (dry ground)
+            ("Sleeping Troll Rock", -77f, -26f, 120f), // deeper in, on the bank, where the story says trolls sleep
+        })
+        {
+            var prefab = Load<GameObject>($"Assets/_Project/Prefabs/World/Props/{prop}.prefab");
+            if (prefab == null)
+            {
+                placed.Add(prop + " (not built)");
+                continue;
+            }
+
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            instance.transform.SetParent(holder, false);
+            instance.transform.SetPositionAndRotation(Ground(x, z) + Vector3.down * 0.08f, Quaternion.Euler(0f, turn, 0f));
+            placed.Add(prop);
+        }
+
+        return "props: " + string.Join(", ", placed);
+    }
 
     /// <summary>Only the camera zone at the morning fire (`--entry BuildPrologueMeadow.CameraAtFire`); Moments makes the same.</summary>
     public static string CameraAtFire()

@@ -34,11 +34,18 @@ public static class BuildCreatureModels
         ["Treant1"] = Treant(),
         ["Treant2"] = Treant(),
         // The user's forest troll (Hunyuan3D, rigged with Mixamo's skeleton in LocalSpawn), 2026-11-13.
-        ["ForestTroll"] = Map("mixamorig:Hips", "mixamorig:Spine", "mixamorig:Spine1", "mixamorig:Spine2", "mixamorig:Neck", "mixamorig:Head",
-            "mixamorig:{0}Shoulder", "mixamorig:{0}Arm", "mixamorig:{0}ForeArm", "mixamorig:{0}Hand", "mixamorig:{0}UpLeg", "mixamorig:{0}Leg",
-            "mixamorig:{0}Foot", "mixamorig:{0}ToeBase", "Left", "Right"),
+        ["ForestTroll"] = Mixamo(),
+        // The folk-tale creatures (BuildFolkCreatures), rigged by Make-It-Animatable with the same skeleton.
+        ["Fossegrim"] = Mixamo(),
+        ["Trollkjerring"] = Mixamo(),
+        ["Bergjutul"] = Mixamo(),
         ["Boneman"] = Map("LowerSpine", "UpperSpine", null, null, "LowerNek", "Head", "{0}Clavicle", "{0}Humerus", "{0}Radius", "{0}Hand", "{0}Femur", "IK{0}Leg", "{0}Foot", null, "Left", "Right"),
     };
+
+    // Mixamo's 52 bones (LocalSpawn's rigger gives every humanoid these).
+    private static Dictionary<string, string> Mixamo() => Map("mixamorig:Hips", "mixamorig:Spine", "mixamorig:Spine1", "mixamorig:Spine2",
+        "mixamorig:Neck", "mixamorig:Head", "mixamorig:{0}Shoulder", "mixamorig:{0}Arm", "mixamorig:{0}ForeArm", "mixamorig:{0}Hand",
+        "mixamorig:{0}UpLeg", "mixamorig:{0}Leg", "mixamorig:{0}Foot", "mixamorig:{0}ToeBase", "Left", "Right");
 
     // Both treants share one rig, with the head on the upper spine.
     private static Dictionary<string, string> Treant() => Map("spine", "spine.001", "spine.002", "spine.003", "spine.004", "spine.005", "shoulder.{0}", "upper_arm.{0}", "forearm.{0}", "hand.{0}", "thigh.{0}", "shin.{0}", "foot.{0}", "toe.{0}", "L", "R");
@@ -145,7 +152,13 @@ public static class BuildCreatureModels
 
     // Unity makes the coarser levels at import (Mesh LOD), keeping the texture's seams: Blender's collapse tore them.
     // Level 5 (1.2k) smeared the face, so it stops at level 4 (2.4k).
-    private static readonly Dictionary<string, int> MeshLods = new Dictionary<string, int> { ["ForestTroll"] = 4 };
+    private static readonly Dictionary<string, int> MeshLods = new Dictionary<string, int> { ["ForestTroll"] = 4, ["Fossegrim"] = 3, ["Trollkjerring"] = 3, ["Bergjutul"] = 3 };
+
+    // A generated creature's one painted texture, matched by the mesh's name.
+    private static Skin[] FolkSkin(string name, Color tint, float smooth = 0.2f) => new[]
+    {
+        new Skin { Slot = name, Base = name + "_BaseColor.png", Normal = name + "_Normal.png", Tint = tint, Smooth = smooth },
+    };
 
     private static Skin[] WolfSkin() => new[]
     {
@@ -212,6 +225,13 @@ public static class BuildCreatureModels
             Eyes = Eyes.Level("spine.005", 0.1f, 0.35f, 0.55f, 0.06f, CurseGreen) },
         Rootling("Rootling", Enemies),
         SmallTroll("SmallMossTroll", Enemies),
+        // Folk-tale creatures (BuildFolkCreatures), 2026-11-13.
+        new Body { Creature = "Fossegrim", Model = "Fossegrim", Label = "Fossegrim", Height = 2.1f, Radius = 0.4f, AgentRadius = 0.4f, SizeVariation = 0.05f, ShadeVariation = 0.08f,
+            Skins = FolkSkin("Fossegrim", Color.white, 0.45f) },
+        new Body { Creature = "Trollkjerring", Model = "Trollkjerring", Label = "Trollkjerring", Height = 1.9f, Radius = 0.5f, AgentRadius = 0.5f, SizeVariation = 0.06f, ShadeVariation = 0.1f,
+            Skins = FolkSkin("Trollkjerring", Color.white) },
+        new Body { Creature = "Bergjutul", Model = "Bergjutul", Label = "Berg-jutul", Height = 3.6f, Radius = 0.95f, AgentRadius = 0.85f, SizeVariation = 0.08f, ShadeVariation = 0.08f,
+            Skins = FolkSkin("Bergjutul", Color.white, 0.1f) },
         // The thief (BuildTusse): the same forest troll, smaller and paler, the colour of old roots.
         new Body { Creature = "Tusse", Model = "ForestTroll", Label = "Tusse", Height = 1.15f, Radius = 0.35f, AgentRadius = 0.35f, SizeVariation = 0.1f, ShadeVariation = 0.1f,
             Skins = ForestTrollSkin(new Color(0.78f, 0.82f, 0.74f)) },
@@ -264,6 +284,27 @@ public static class BuildCreatureModels
         AssetDatabase.Refresh();
         Import("ForestTroll", log);
         foreach (Body body in Bodies.Where(b => b.Model == "ForestTroll"))
+        {
+            Swap(body, log);
+            Definition(body);
+        }
+
+        AssetDatabase.SaveAssets();
+        return string.Join(" ", log);
+    }
+
+    /// <summary>Only the folk-tale creatures' imports and bodies (`--entry BuildCreatureModels.FolkBodies`), after BuildFolkCreatures.</summary>
+    public static string FolkBodies()
+    {
+        var log = new List<string>();
+        AssetDatabase.Refresh();
+        string[] folk = { "Fossegrim", "Trollkjerring", "Bergjutul" };
+        foreach (string model in folk.Where(m => AssetDatabase.LoadAssetAtPath<GameObject>($"{Root}{m}/{m}.fbx") != null))
+        {
+            Import(model, log);
+        }
+
+        foreach (Body body in Bodies.Where(b => folk.Contains(b.Model) && AssetDatabase.LoadAssetAtPath<GameObject>($"{Root}{b.Model}/{b.Model}.fbx") != null))
         {
             Swap(body, log);
             Definition(body);

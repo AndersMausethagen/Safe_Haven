@@ -1,0 +1,236 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: Fossegrim
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: Fossegrim
+  displayName: Fossegrim
+  description: The spirit of the falls. It keeps its distance and plays.
+  combatStats: {fileID: 11400000, guid: 84c5ec628c931df489b5d1fdfee34933, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.5
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 3
+      maxQuantity: 4
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 3643037256157110189, guid: 19eccf1f7288cf14cba8e4fbb26eb7f8, type: 3}
+  experience: 0
+  neverElite: 0
+  attack: {fileID: 11400000, guid: 179f087bb370b614b981d8f3013bab0b, type: 2}
+  attackDamage: 9.6
+  attackCooldown: 0.6
+  moveSpeed: 3.4
+  detectionRange: 13
+  chaseRange: 20
+  leashRange: 28
+  sightAngle: 130
+  closeSenseRange: 3
+  hearing: 1.1
+  alertness: 1
+  huntsHorses: 1
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: 56b15306e2a60ba49a035492beb9146e, type: 2}
+    kind: 0
+    damage: 5.8
+    minimumRange: 0
+    maximumRange: 2
+    priority: 30
+    cooldown: 2
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 5b93413ae1d36cb469ab2a4f7b8d2422, type: 2}
+    kind: 3
+    damage: 0
+    minimumRange: 0
+    maximumRange: 12
+    priority: 20
+    cooldown: 18
+    interruptible: 1
+    sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 12
+    buffSeconds: 8
+    damageBonus: 0.1
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 179f087bb370b614b981d8f3013bab0b, type: 2}
+    kind: 1
+    damage: 6.8
+    minimumRange: 2.2
+    maximumRange: 14
+    priority: 10
+    cooldown: 2.4
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0.3
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: 179f087bb370b614b981d8f3013bab0b, type: 2}
+    kind: 1
+    damage: 5.8
+    minimumRange: 2.2
+    maximumRange: 14
+    priority: 15
+    cooldown: 10
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0.3
+    fromTier: 3
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    burstCount: 3
+    burstInterval: 0.28
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 3
+  preferredDistance: 10
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.3
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 5
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 0
+  poise: 60
+  openWhileStriking: 1
+  parriesBackstabs: 1
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.14, g: 0.18, b: 0.05, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  sizeVariation: 0.05
+  shadeVariation: 0.08
+  portrait: {fileID: 21300000, guid: 828491a09d5d2d242a9344ac7a58b638, type: 3}
+  journalLore: 'Every waterfall has one, the old folk say: a grey man sitting in the spray with a fiddle, playing a tune that makes the trees dance. Bring him a fat ram and he will teach you to play. Bring him nothing and you will hear the tune anyway, and follow it into the water.'
+  journalAdvice: 'It keeps away and flings the cold spray of the falls, and its tune stirs the creatures near it. It is all bone and wet hair: close in and it breaks easily.'
+  journalHabitat: Waterfalls, rivers and still meres
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: 201034bce08e01645af54626573919a2, type: 2}
+  hurtSound: {fileID: 11400000, guid: edf9a8b417ec32e4e913f2aa6f79111a, type: 2}
+  attackSound: {fileID: 11400000, guid: 5b105067691d27646b16ebcebf7e5ba4, type: 2}

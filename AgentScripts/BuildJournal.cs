@@ -394,6 +394,15 @@ public static class BuildJournal
             "Never follow her into the trees. She is only ever open to a backstab while staggered, so wear her down and watch for the claws."),
         ("OldMossTroll", "A troll as old as the hills, walking its round through Troll Valley with moss on its back and a tree on its shoulders. Its eyes are weak, but it smells you long before it sees you and hears every step.",
             "Best avoided. You can feel it coming through the ground, so step off its round and let it pass. If you must fight, expect wide sweeps and a stomp that reaches all around it, and only hit it from behind once it is staggered. Being heard calling its kin is a good reason to leave."),
+        // The tusse (BuildTusse) and the folk-tale creatures (BuildFolkCreatures), 2026-11-13: the same words as those builders.
+        ("Tusse", "The tusser live under the hills and in the roots of old trees, and they have always taken what was left out. Grandmothers set out porridge to keep them sweet. Nobody sets out porridge now, so they come for the rest.",
+            "It runs for your bag or a cart, snatches one thing and is off. Kill it and it drops what it took; let it get far enough and that is gone. It only fights when it has nowhere to run, and then not for long: corner it against rock or water."),
+        ("Fossegrim", "Every waterfall has one, the old folk say: a grey man sitting in the spray with a fiddle, playing a tune that makes the trees dance. Bring him a fat ram and he will teach you to play. Bring him nothing and you will hear the tune anyway, and follow it into the water.",
+            "It keeps away and flings the cold spray of the falls, and its tune stirs the creatures near it. It is all bone and wet hair: close in and it breaks easily."),
+        ("Trollkjerring", "Where the trolls go, an old one goes with them: the trollkjerring, who brews in a pot under the hill and remembers every slight. The small trolls fear her more than they fear you.",
+            "She hangs back behind the others, throwing stones, rallying them and calling rootlings out of the ground. Reach her first: without her the rest scatter."),
+        ("Bergjutul", "The jutuls were here before the trees. They sleep for a hundred years at a time and wake up cross, with moss on their shoulders, and walk until they find whatever woke them.",
+            "Slow, and stone all over: blades skid off it. Stay out of its stamp and sweep and hit it as it recovers. Blunt weapons and fire do better than edges."),
         ("TheHeartroot", "The first of the guardians, grown old and vast under its hollow. It was set here to keep the forest. Nobody has told it the forest is gone.",
             "It wakes slowly, and the fight changes as it goes on: it learns new things at each stage. Roots rise at its call, so don't stand still, and bring food. What it gives when it falls is knowledge, and you keep that even if you die on the way home."),
     };

@@ -3,23 +3,42 @@
   "BarrowShieldbearer": "Portrait of a skeletal undead Norse warrior, a draug, in a rusted iron helmet and torn mail, holding up a big round wooden shield painted faded orange and a long spear, standing at the dark stone doorway of an ancient burial mound, cold blue mist.",
   "Draug": "Portrait of a skeletal undead Norse warrior, a draug, gaunt grey bones in a rusted helmet and torn chain mail, holding a notched old sword, cold blue light in its empty eye sockets, burial mounds and mist behind.",
   "BlightBoar": "Portrait of a cursed wild boar with dark bristling fur, long yellowed tusks and sickly glowing green eyes, rotten moss on its back, in a blighted thicket of dead brambles.",
-  "Boar": {"style": "home", "prompt": "Portrait of a wild boar with coarse brown-grey fur, small tusks and a long snout, rooting in the leaves of a sunny Nordic birch forest."},
-  "WildBoar": {"style": "home", "prompt": "Portrait of a big old wild boar with shaggy dark brown fur, long curved tusks and a scarred snout, standing alert in a pine forest at dusk."},
-  "Deer": {"style": "home", "prompt": "Portrait of a roe deer doe with a soft reddish-brown coat and large dark ears, looking up alert in a sunlit meadow at the edge of a birch forest."},
-  "Stag": {"style": "home", "prompt": "Portrait of a proud red deer stag with a great spread of antlers and a thick neck mane, standing in morning mist in a Nordic pine forest."},
-  "Fox": {"style": "home", "prompt": "Portrait of a red fox with a bushy white-tipped tail and bright amber eyes, sitting among ferns and mossy stones in a Nordic forest."},
+  "Boar": {
+    "style": "home",
+    "prompt": "Portrait of a wild boar with coarse brown-grey fur, small tusks and a long snout, rooting in the leaves of a sunny Nordic birch forest."
+  },
+  "WildBoar": {
+    "style": "home",
+    "prompt": "Portrait of a big old wild boar with shaggy dark brown fur, long curved tusks and a scarred snout, standing alert in a pine forest at dusk."
+  },
+  "Deer": {
+    "style": "home",
+    "prompt": "Portrait of a roe deer doe with a soft reddish-brown coat and large dark ears, looking up alert in a sunlit meadow at the edge of a birch forest."
+  },
+  "Stag": {
+    "style": "home",
+    "prompt": "Portrait of a proud red deer stag with a great spread of antlers and a thick neck mane, standing in morning mist in a Nordic pine forest."
+  },
+  "Fox": {
+    "style": "home",
+    "prompt": "Portrait of a red fox with a bushy white-tipped tail and bright amber eyes, sitting among ferns and mossy stones in a Nordic forest."
+  },
   "BogSpitter": "Portrait of a huge bloated toad-like swamp creature with no legs to speak of, a squat round body of pale mottled skin with green and yellow blotches and warts, a wide lipless mouth dripping green venom, small black eyes, half sunk in a dark bog with reeds and mist.",
   "ForestBittenWolf": "Portrait of a cursed grey wolf with matted fur, a lean scarred face and glowing green eyes, teeth bared, in a dark misty pine forest.",
   "Huldra": "Portrait of the huldra, a beautiful forest spirit woman with long flaxen hair crowned with flowers, a pale green blouse and dark skirt, looking back over her shoulder so that her back shows hollow like a rotten tree trunk, smiling faintly at the edge of a dark forest, an uncanny glow.",
   "MarshLight": "Portrait of a will-o'-the-wisp: a pale floating orb of soft blue-white light hovering over black marsh water among reeds and dead trees at night, its glow reflected in the water, faint mist.",
   "Mistwing": "Portrait of a large leathery flying creature like a giant bat with pale violet wings spread wide, a narrow snout and small hungry eyes, gliding low through thick grey mist between pine trunks.",
   "MossShaman": "Portrait of an old green-skinned troll shaman, hunched and wiry, with long ears and a wrinkled face, holding a twisted staff of living wood topped with a glowing pale orb, moss and leaves hanging from its shoulders, in a dark grove.",
-  "SmallMossTroll": "Portrait of a small young troll with mossy green-yellow skin, big pointed ears, a wide grin and a stone held ready to throw, crouching on a mossy boulder in a forest.",
+  "SmallMossTroll": "Portrait of a small scrawny forest troll with mossy brown-green skin, huge pointed ears, a big drooping nose, small sly eyes and a crooked grin, a stone held ready to throw, crouching on a mossy boulder in a dark forest.",
   "OldMossTroll": "Portrait of a huge ancient troll with a broad mossy back that has a small tree growing out of it, a great heavy face with weak little eyes and a long nose sniffing the air, walking through a misty valley of boulders.",
   "RootGuardian": "Portrait of a tall forest guardian made of twisted reddish-brown roots and bark in the shape of a gaunt man, with moss in its joints, a crown of short branches and faint amber light in its eyes, in a dark old forest.",
   "Rootling": "Portrait of a knee-high little creature of tangled roots and moss that has learned to walk, with a round body, twig arms and two tiny glowing amber eyes, standing among ferns and mushrooms.",
   "TheHeartroot": "Portrait of the Heartroot, a vast ancient guardian of twisted reddish-brown roots and bark grown into the shape of a towering figure, glowing amber heart-light deep in its hollow chest, vines and moss hanging from it, in a huge dark hollow under an enormous tree.",
   "UndeadKnightFire": "Portrait of an undead Norse knight in blackened spiked plate armour with glowing orange ember cracks, riding a skeletal undead horse whose hide smoulders with red-hot fissures, a long grave blade raised, embers and smoke drifting, a burnt dark forest at night behind.",
   "UndeadKnightIce": "Portrait of an undead Norse knight in frost-rimed pale plate armour with glowing icy blue light, riding a skeletal undead horse of white bone and blue ice crystals, a long grave blade raised, cold mist and snowflakes, a frozen dark forest behind.",
-  "UndeadKnightToxic": "Portrait of an undead Norse knight in dark bone-trimmed plate armour glowing sickly green, riding a rotting undead horse grown through with luminous green rot, a long grave blade raised, green poisonous fog curling, a dark bog at night behind."
+  "UndeadKnightToxic": "Portrait of an undead Norse knight in dark bone-trimmed plate armour glowing sickly green, riding a rotting undead horse grown through with luminous green rot, a long grave blade raised, green poisonous fog curling, a dark bog at night behind.",
+  "Tusse": "Portrait of a tusse, a small pale grey-green troll of the hidden folk with huge pointed ears, a long nose and a sly grin, clutching a stolen leather pouch to its chest and glancing back over its shoulder as it slinks away between the roots of an old tree.",
+  "Fossegrim": "Portrait of the Fossegrim, a gaunt grey-blue water spirit man with long wet tangled grey-green hair full of water weed, dark melancholy eyes, playing a thin old wooden fiddle while sitting on a wet black rock in the spray of a roaring waterfall in a dark forest gorge.",
+  "Trollkjerring": "Portrait of a trollkjerring, an old troll hag with grey-green warty skin, a huge crooked nose, two crooked tusks and white braided hair, wearing a ragged brown wool dress and a grey shawl hung with dried herbs and little bones, stirring a black pot over a fire in a cave under a hill.",
+  "Bergjutul": "Portrait of a berg-jutul, a huge mountain giant made of cracked grey granite boulders with thick moss and ferns growing on its shoulders, a craggy face with deep shadowed eyes, standing up from a mountainside of scree in grey mist."
 }

@@ -1596,6 +1596,25 @@ The **Tusse** (`Data/Monsters/Tusse`, `Prefabs/Enemies/Tusse`, `AgentScripts/Bui
 is the user's forest troll, smaller and paler (`BuildCreatureModels.ForestTrolls`, which also gives the small moss trolls that
 model: a Mixamo-rigged Humanoid on MonsterHumanoid's clips, with Unity's Mesh LODs to level 4).
 
+## Folk-tale creatures and world props from LocalSpawn (2026-11-13)
+
+**Creatures** (`Tools/LocalSpawn/creatures_manifest.json`): a concept image and a Hunyuan3D + UltraTex model
+(`generate_gathering.py --group creatures images|3d`), rigged by Make-It-Animatable (`D:/ComfyUI/rigging/rig_mia.py`, 52
+Mixamo bones, T-pose rest), cleaned in Blender (`Tools/Blender/folk_creatures.py`: seams welded, every vertex weighted, 4
+weights, height and ground pivot; keep leaf bones, the head and toes are leaves), then Humanoid bodies on MonsterHumanoid's
+clips (`BuildCreatureModels.FolkBodies`, Mesh LODs to level 3) and their definitions, stats, traits and spawning
+(`AgentScripts/BuildFolkCreatures.cs`): the **Fossegrim** (waterfall fiddler, from the Moss Shaman's kit without the summon:
+keeps away, cold spray, a rallying tune; frail), the **Trollkjerring** (troll hag: stones, rally, rootlings; tougher) and the
+**Berg-jutul** (stone giant, from the Old Troll: slow, armour 70). They roam the Misty Woods (tables Roamers and Trolls).
+Journal portraits: `creature_portraits.json` (`generate_ui_art.py creatures`), then `BuildJournal.PaintedPortraits`.
+`BuildJournal.Apply` rebuilds the journal's creature list from its own table and writes its notes over quests: run only
+`PaintedPortraits`, or add every creature to its table first (the undead knights aren't in it).
+
+**World props** (`Tools/LocalSpawn/props_manifest.json`, `generate_gathering.py --group props all`, baked to `Art/World/Props`):
+Rune Stone and Rune Cairn (blue runes glowing from the baked emission), Offering Stone, God Post, Sleeping Troll Rock.
+`AgentScripts/BuildWorldProps.cs` makes `Prefabs/World/Props/<Name>`: Layered Lit with every map, moss, snow and rain, a LODGroup
+and a convex hull. Five stand along the prologue's walk (`BuildPrologueMeadow.PlaceProps`; Moments places the same).
+
 ## The living world: how creatures and people behave
 
 Rules are plain C# and tested in `Editor/Tests/LivingWorldTests.cs`; every number and gesture is on a data asset. Not behaviour trees: `MonsterAI` stays the one state machine and these are parts it asks. `AgentScripts/BuildBetterAI.cs` set the first values.

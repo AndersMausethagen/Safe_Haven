@@ -1,0 +1,45 @@
+{
+  "_notes": [
+    "New monsters from Nordic folk tales the user asked for (2026-11-13): 'give them textures, skeleton and animations. Refine them in Blender. Make them fit into the Safe Haven world setting and give them traits that fit their look.'",
+    "Concept image and Hunyuan3D + UltraTex model here (generate_gathering.py --group creatures images|3d); then the rig (Make-It-Animatable, D:/ComfyUI/agent/integrations/rigging/rig_mia.py: the 52 Mixamo bones, so they are Humanoids that play MonsterHumanoid's clips), Tools/Blender/folk_creatures.py (height, pivot, check), AgentScripts/BuildCreatureModels.cs (bodies) and AgentScripts/BuildFolkCreatures.cs (definitions, traits).",
+    "Front view, full body, T-pose with straight arms and legs a little apart: what the rigger reads best. Dark Nordic folk-tale look, painted and grounded, never cute.",
+    "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+  ],
+  "art": "Assets/_Project/Art/Enemies/Downloaded",
+  "common": "Full body, seen straight from the front, standing upright in a T-pose with both arms held straight out to the sides at shoulder height, palms down, legs straight and a little apart, the whole figure visible and centred, isolated on a plain light grey background. Dark Nordic folk-tale style, realistic and grounded, not cute. Matte, softly lit, no glow, no shadows on the ground.",
+  "assets": [
+    {
+      "asset": "Fossegrim",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8101,
+          "prompt": "The Fossegrim of Norwegian folklore, the spirit of a waterfall: a tall gaunt man with long wet tangled grey-green hair down to his waist, pale grey-blue skin glistening as if wet, a lean bony body, a short tattered loincloth woven of river weed and reeds, strands of water weed and small shells caught in his hair, bare feet with long toes, a thin wooden fiddle tied to his back with a cord. A melancholy, unsettling face with dark eyes."
+        }
+      ]
+    },
+    {
+      "asset": "Trollkjerring",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8202,
+          "prompt": "A Trollkjerring, an old troll hag of Norwegian folk tales: a hunched heavy old troll woman with grey-green warty skin, a huge long crooked nose, small sharp eyes, a wide thin-lipped mouth with two crooked tusks, lank white hair in two thick braids, wearing a long ragged dark brown wool dress with a patched grey shawl, a belt hung with small bundles of dried herbs, little bones and a leather pouch, big bare troll feet. Stout and strong, not frail."
+        }
+      ]
+    },
+    {
+      "asset": "Bergjutul",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8303,
+          "prompt": "A Berg-jutul, a mountain giant of Norwegian folklore made of stone: a huge broad humanoid body built of rough grey granite slabs and boulders, cracked and weathered, with thick moss and small ferns growing on its shoulders and back, a heavy hunched head with a craggy face, a jutting brow of rock and deep shadowed eye sockets, massive long arms ending in big stone hands, thick short legs like pillars. A creature of the mountain, ancient and slow."
+        }
+      ]
+    }
+  ]
+}

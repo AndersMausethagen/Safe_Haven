@@ -1,0 +1,86 @@
+{
+  "_notes": [
+    "World props the user asked for (2026-11-13): interesting, unique things to place around the world, 'for example magical stones with blue, glowing runes'.",
+    "Made like the gathering nodes: concept image, Hunyuan3D shape + UltraTex texture, Tools/Blender/ingest_generated.py (atlas, LODs, collider, height/moss masks, glow), then AgentScripts/BuildWorldProps.cs.",
+    "Run: D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_gathering.py --group props [images|3d|ingest|all] [asset ...] (Unity closed for 3d).",
+    "width: metres across the widest side in the game; max_height caps a tall look. glow: emission from the albedo ('hue' near a colour), tinted.",
+    "The runes are painted pale blue and matte in the concept (a glowing concept makes UltraTex paint flat colour); the game makes them glow from the emission map.",
+    "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+  ],
+  "art": "Assets/_Project/Art/World/Props",
+  "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
+  "assets": [
+    {
+      "asset": "Rune Stone",
+      "width": 1.1,
+      "max_height": 2.6,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "glow": {"mode": "hue", "colour": [0.35, 0.65, 1.0], "tint": [0.45, 0.75, 1.0], "threshold": 0.55, "min_brightness": 0.4, "min_saturation": 0.25},
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7101,
+          "prompt": "A single tall Viking age rune stone standing upright in the ground: one slab of pale grey granite, about two and a half metres tall and a metre wide, weathered and slightly leaning, its edges rounded by centuries, patches of grey-green lichen near the base. A long band of Norse runes carved deep into its face follows the edge in a curving serpent-shaped ribbon, and a simple knot carving in the middle; the carved grooves of the runes are filled with bright pale blue paint that stands out clearly against the grey stone. One solid stone, nothing loose."
+        }
+      ]
+    },
+    {
+      "asset": "Rune Cairn",
+      "width": 1.6,
+      "max_height": 1.5,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "glow": {"mode": "hue", "colour": [0.35, 0.65, 1.0], "tint": [0.45, 0.75, 1.0], "threshold": 0.55, "min_brightness": 0.4, "min_saturation": 0.25},
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7202,
+          "prompt": "A single old wayside cairn from Norse folklore: a waist-high rounded pile of flat grey field stones stacked tightly into one solid mound, a little moss in the gaps, and on its top one upright flat stone carved with three large Norse runes whose grooves are filled with bright pale blue paint, clearly visible. Everything grown into one solid piece, nothing loose or floating."
+        }
+      ]
+    },
+    {
+      "asset": "Offering Stone",
+      "width": 1.5,
+      "max_height": 0.8,
+      "texture_size": 2048,
+      "lod0_triangles": 4000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7303,
+          "prompt": "A single low Norse offering stone in a forest clearing: a broad, flat-topped grey boulder about knee high, its top worn smooth, with a round bowl hollowed into it holding a little dark water, a few carved spiral lines around the bowl, and on the top beside the bowl a small offering of a deer antler and a handful of red berries, all lying flat and grown into the stone. Moss on the shaded side. One solid object."
+        }
+      ]
+    },
+    {
+      "asset": "God Post",
+      "width": 0.7,
+      "max_height": 2.4,
+      "texture_size": 2048,
+      "lod0_triangles": 5000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7404,
+          "prompt": "A single old Norse wooden idol post standing in the ground: one thick weathered tree trunk about two metres tall, grey and cracked with age, carved at the top into a stern bearded face with deep-set eyes and a pointed helmet, the carving softened by rain, and below the face a few bands of carved knotwork; strips of faded red cloth tied around its middle. One solid object, nothing floating."
+        }
+      ]
+    },
+    {
+      "asset": "Sleeping Troll Rock",
+      "width": 3.4,
+      "max_height": 1.9,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7505,
+          "prompt": "A single large mossy grey boulder in a Nordic forest that looks just like a huge troll curled up asleep and turned to stone: a hunched rounded back, a big lumpy head resting on its folded arms with a long drooping nose and closed heavy eyelids, a few stone knuckles at the front, thick green moss and small ferns on the back like hair. Clearly a rock, but you can see the sleeping troll in it. One solid stone."
+        }
+      ]
+    }
+  ]
+}

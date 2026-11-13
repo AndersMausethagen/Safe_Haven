@@ -79,3 +79,15 @@ MonoBehaviour:
     minPerGroup: 0
     fromTier: 0
     toTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: 19eccf1f7288cf14cba8e4fbb26eb7f8, type: 3}
+    weight: 0.5
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 9066855856663566298, guid: 9bb9b3bba4b4e0541b99c1424291cef6, type: 3}
+    weight: 0.25
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0

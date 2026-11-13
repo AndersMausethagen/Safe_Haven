@@ -117,7 +117,7 @@ MonoBehaviour:
   fallsByAnimation: 0
   sizeVariation: 0.1
   shadeVariation: 0.1
-  portrait: {fileID: 21300000, guid: b469bb8adb03a544b88f658abbf73281, type: 3}
+  portrait: {fileID: 21300000, guid: ae0884888d62e5b43925b5ef29b00599, type: 3}
   journalLore: The tusser live under the hills and in the roots of old trees, and they have always taken what was left out. Grandmothers set out porridge to keep them sweet. Nobody sets out porridge now, so they come for the rest.
   journalAdvice: 'It runs for your bag or a cart, snatches one thing and is off. Kill it and it drops what it took; let it get far enough and that is gone. It only fights when it has nowhere to run, and then not for long: corner it against rock or water.'
   journalHabitat: Roots, hollows and old stone, wherever travellers stop
