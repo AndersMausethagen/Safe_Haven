@@ -512,9 +512,14 @@ public static class WorldBuilder
         SerializedProperty walk = property.Copy();
         SerializedProperty end = property.GetEndProperty();
         bool first = true;
-        while (first || (walk.Next(true) && !SerializedProperty.EqualContents(walk, end)))
+        bool enter = true;
+        // Never into a reference's own children (m_FileID, m_PathID): those hold its in-memory instance id, new every Editor
+        // session, so after each restart every feature with a rock kit or a layer looked changed and the world was rebuilt
+        // (2026-11-13). Its asset path and name say which it is.
+        while (first || (walk.Next(enter) && !SerializedProperty.EqualContents(walk, end)))
         {
             first = false;
+            enter = walk.propertyType != SerializedPropertyType.ObjectReference;
             switch (walk.propertyType)
             {
                 case SerializedPropertyType.ObjectReference:
