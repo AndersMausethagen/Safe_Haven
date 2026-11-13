@@ -142,6 +142,7 @@ public sealed class HorseMotion : MonoBehaviour
         lastYaw = transform.eulerAngles.y;
         lastPlace = transform.position;
         nextFidget = Time.time + Random.Range(6f, 20f);
+        HoofPrints.AddTo(gameObject);
     }
 
     private void Start()

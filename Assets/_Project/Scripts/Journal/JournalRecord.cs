@@ -26,6 +26,7 @@ public sealed class JournalRecord
     private readonly HashSet<string> killedBy = new HashSet<string>();
     private readonly HashSet<string> tried = new HashSet<string>();
     private readonly HashSet<string> discovered = new HashSet<string>();
+    private readonly HashSet<string> noticed = new HashSet<string>();
     private readonly List<RaidRecord> raids = new List<RaidRecord>();
     private readonly Dictionary<string, float> biggestFish = new Dictionary<string, float>();
 
@@ -38,6 +39,9 @@ public sealed class JournalRecord
     public IEnumerable<string> Tried => tried;
     /// <summary>The named places found on the map (WorldAtlas.Place ids).</summary>
     public IEnumerable<string> Discovered => discovered;
+    /// <summary>The world's curious places the player has stopped to think about (CuriousPlace keys), so a thought isn't
+    /// thought again after a load.</summary>
+    public IEnumerable<string> Noticed => noticed;
     public IReadOnlyList<RaidRecord> Raids => raids;
 
     /// <summary>The biggest of each kind of fish caught (item id to centimetres), for the journal's fishing page.</summary>
@@ -74,6 +78,15 @@ public sealed class JournalRecord
     public bool HasDiscovered(string placeId) => placeId != null && discovered.Contains(placeId);
     /// <summary>True the first time a place is found.</summary>
     public bool NoteDiscovered(string placeId) => placeId != null && discovered.Add(placeId);
+    public bool HasNoticed(string placeKey) => placeKey != null && noticed.Contains(placeKey);
+    /// <summary>True the first time a curious place is noticed.</summary>
+    public bool NoteNoticed(string placeKey) => placeKey != null && noticed.Add(placeKey);
+
+    public void RestoreNoticed(IEnumerable<string> saved)
+    {
+        noticed.Clear();
+        noticed.UnionWith(saved ?? new string[0]);
+    }
 
     /// <summary>True the first time a page is told about.</summary>
     public bool Announce(string page) => announced.Add(page);

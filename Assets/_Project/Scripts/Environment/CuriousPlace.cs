@@ -7,7 +7,8 @@ using UnityEngine;
 /// and the camera to them (DialogueBox.Aside). Not in a fight, not over a conversation. With an Interactable beside it (the
 /// world's stones) the player can stop and look again ("Look closer"), which brings the next thought. A raid site has its
 /// own use (its choices), so its CuriousPlace sits on its Mark, with no Interactable.
-/// Which places have been noticed is kept for the session: a raid's sites are new each raid, the world's stones stay put.
+/// Which places have been noticed: the world's stones (those with an Interactable) in the character's journal, so they keep
+/// it across loads (JournalRecord.Noticed); a raid's sites, new each raid, only for the session.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteractionVerb
@@ -59,10 +60,10 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
     private void Update()
     {
         Player player = Player.Current;
-        if (player != null && thoughts.Length > 0 && !Noticed.Contains(Key) && MayThink()
+        if (player != null && thoughts.Length > 0 && !WasNoticed() && MayThink()
             && (player.transform.position - transform.position).sqrMagnitude <= noticeRadius * noticeRadius)
         {
-            Noticed.Add(Key);
+            NoteNoticed();
             Muse();
         }
 
@@ -89,6 +90,23 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
         if (view != null)
         {
             view.SetCloseness(this, 1f);
+        }
+    }
+
+    // The world's stones are the character's to remember; a raid site only this session.
+    private bool Remembered => interactable != null && GameSession.Progress != null;
+
+    private bool WasNoticed() => Remembered ? GameSession.Progress.Journal.HasNoticed(Key) : Noticed.Contains(Key);
+
+    private void NoteNoticed()
+    {
+        if (Remembered)
+        {
+            GameSession.Progress.Journal.NoteNoticed(Key);
+        }
+        else
+        {
+            Noticed.Add(Key);
         }
     }
 

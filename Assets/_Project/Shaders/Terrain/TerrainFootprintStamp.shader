@@ -17,7 +17,7 @@ Shader "Hidden/Safe Haven/Terrain/Footprint Stamp"
             #include "UnityCG.cginc"
             sampler2D _MainTex, _SoleTex;
             float2 _Shift;
-            float _Decay, _Stamp, _UseSoleTexture;
+            float _Decay, _Stamp, _UseSoleTexture, _Hoof;
             float4 _Boot; // centre UV, inverse width/length in field UV
             float2 _Direction;
 
@@ -33,7 +33,20 @@ Shader "Hidden/Safe Haven/Terrain/Footprint Stamp"
                 float sole = 0;
                 if (all(soleUV >= 0) && all(soleUV <= 1))
                 {
-                    if (_UseSoleTexture > 0.5)
+                    if (_Hoof > 0.5)
+                    {
+                        // A shod hoof: a round print a little flat at the heel, the shoe's rim pressed deepest and open
+                        // between the heels, the sole shallower, and the frog's V pointing from the heel to the toe.
+                        float d = length(float2(local.x / 0.48, (local.y - 0.02) / 0.47));
+                        // Shallower than a boot's and soft at its edge: pressed to full depth with steep walls, a hoof's
+                        // print read as a black pit.
+                        float body = 1 - smoothstep(0.55, 1, d);
+                        body *= 1 - smoothstep(-0.36, -0.44, local.y) * 0.85;
+                        float shoe = smoothstep(0.5, 0.72, d) * (1 - smoothstep(0.78, 0.98, d)) * (1 - (1 - smoothstep(0.1, 0.16, abs(local.x))) * smoothstep(-0.2, -0.3, local.y));
+                        float frog = (1 - smoothstep(0.0, 0.06, abs(local.x) - (local.y + 0.42) * 0.3)) * (1 - smoothstep(-0.05, 0.08, local.y)) * body;
+                        sole = max(max(body * 0.3, shoe * 0.55), frog * 0.45);
+                    }
+                    else if (_UseSoleTexture > 0.5)
                         sole = tex2D(_SoleTex, soleUV).r;
                     else
                     {

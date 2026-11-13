@@ -1,3 +1,4 @@
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -115,6 +116,12 @@ public sealed class HorseTests
         var sway = prefab.GetComponentInChildren<HairSway>();
         Assert.IsNotNull(sway, "its mane and tail swing");
         Assert.AreEqual(7, sway.ChainCount, "six mane bones and the tail");
+        var saddleName = new SerializedObject(prefab).FindProperty("saddleModel").objectReferenceValue as GameObject;
+        Assert.AreEqual("Pony Saddle", saddleName != null ? saddleName.name : null, "the pony wears its own saddle, fitted to its back");
+        foreach (string hoof in new[] { "L Finger0", "R Finger0", "L Toe0", "R Toe0" })
+        {
+            Assert.IsTrue(prefab.GetComponentsInChildren<Transform>(true).Any(t => t.name == hoof), $"{hoof}: HoofPrints presses a print where it lands");
+        }
         var saddleModel = new SerializedObject(prefab).FindProperty("saddleModel").objectReferenceValue as GameObject;
         Assert.IsNotNull(saddleModel, "the saddle it wears once saddled");
         Assert.IsFalse(saddleModel.activeSelf, "and not before");

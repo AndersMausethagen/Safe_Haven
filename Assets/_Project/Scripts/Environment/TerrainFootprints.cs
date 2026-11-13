@@ -76,7 +76,9 @@ public sealed class TerrainFootprints : MonoBehaviour
         return kept / (1f + Mathf.Clamp01(snowfall) * (kept * 2f - 1f));
     }
 
-    public void Stamp(Vector3 worldPosition, Vector3 forward)
+    public void Stamp(Vector3 worldPosition, Vector3 forward) => Stamp(worldPosition, forward, FootprintShape.Boot);
+
+    public void Stamp(Vector3 worldPosition, Vector3 forward, FootprintShape shape)
     {
         if (!isActiveAndEnabled) return;
         if (terrain == null) Awake();
@@ -100,7 +102,7 @@ public sealed class TerrainFootprints : MonoBehaviour
         }
         Vector2 direction = new Vector2(forward.x, forward.z);
         if (direction.sqrMagnitude < 0.0001f) direction = Vector2.up;
-        Render(shift, 0, true, uv, direction.normalized);
+        Render(shift, 0, true, uv, direction.normalized, shape);
         remaining = 1;
         Bind();
     }
@@ -110,7 +112,9 @@ public sealed class TerrainFootprints : MonoBehaviour
     /// keep, and never moving it, so a walker far off cannot drag the window away and wipe the player's trail. Prints
     /// outside it are not kept; nobody is near enough to see them.
     /// </summary>
-    public void StampInWindow(Vector3 worldPosition, Vector3 forward)
+    public void StampInWindow(Vector3 worldPosition, Vector3 forward) => StampInWindow(worldPosition, forward, FootprintShape.Boot);
+
+    public void StampInWindow(Vector3 worldPosition, Vector3 forward, FootprintShape shape)
     {
         if (!isActiveAndEnabled || field == null || Profile == null || !Profile.footprints)
         {
@@ -125,7 +129,7 @@ public sealed class TerrainFootprints : MonoBehaviour
 
         Vector2 direction = new Vector2(forward.x, forward.z);
         if (direction.sqrMagnitude < 0.0001f) direction = Vector2.up;
-        Render(Vector2.zero, 0, true, uv, direction.normalized);
+        Render(Vector2.zero, 0, true, uv, direction.normalized, shape);
         remaining = 1;
         Bind();
     }
@@ -175,13 +179,20 @@ public sealed class TerrainFootprints : MonoBehaviour
         return target;
     }
 
-    private void Render(Vector2 shift, float decay, bool stamp, Vector2 uv, Vector2 direction)
+    private void Render(Vector2 shift, float decay, bool stamp, Vector2 uv, Vector2 direction) =>
+        Render(shift, decay, stamp, uv, direction, FootprintShape.Boot);
+
+    private void Render(Vector2 shift, float decay, bool stamp, Vector2 uv, Vector2 direction, FootprintShape shape)
     {
+        bool hoof = shape.Hoof;
+        float width = shape.Width > 0f ? shape.Width : Profile.bootWidth;
+        float length = shape.Length > 0f ? shape.Length : Profile.bootLength;
         stampMaterial.SetVector("_Shift", new Vector4(shift.x, shift.y, 0, 0));
         stampMaterial.SetFloat("_Decay", decay);
         stampMaterial.SetFloat("_Stamp", stamp ? 1 : 0);
         stampMaterial.SetVector("_Boot", new Vector4(uv.x, uv.y,
-            area / Mathf.Max(0.05f, Profile.bootWidth), area / Mathf.Max(0.1f, Profile.bootLength)));
+            area / Mathf.Max(0.05f, width), area / Mathf.Max(0.05f, length)));
+        stampMaterial.SetFloat("_Hoof", hoof ? 1 : 0);
         stampMaterial.SetVector("_Direction", new Vector4(direction.x, direction.y, 0, 0));
         stampMaterial.SetFloat("_UseSoleTexture", Profile.bootMask != null ? 1 : 0);
         stampMaterial.SetTexture("_SoleTex", Profile.bootMask != null ? Profile.bootMask : Texture2D.whiteTexture);
@@ -275,4 +286,24 @@ public sealed class TerrainFootprints : MonoBehaviour
         if (Application.isPlaying) Destroy(resource);
         else DestroyImmediate(resource);
     }
+}
+
+/// <summary>What presses a print: a boot (the terrain profile's size and sole) or a hoof of a given size.</summary>
+public readonly struct FootprintShape
+{
+    public static readonly FootprintShape Boot = default;
+
+    public readonly float Width;
+    public readonly float Length;
+    public readonly bool Hoof;
+
+    private FootprintShape(float width, float length, bool hoof)
+    {
+        Width = width;
+        Length = length;
+        Hoof = hoof;
+    }
+
+    /// <summary>A shod hoof <paramref name="size"/> metres across.</summary>
+    public static FootprintShape HoofOf(float size) => new FootprintShape(size, size * 1.05f, true);
 }

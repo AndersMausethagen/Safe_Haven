@@ -676,6 +676,7 @@ public static class BuildHorses
         public Material[] Manes;
         public Material[] Barding;
         public Material PonyCoat;
+        public Material PonySaddle;
         public Material[] PonyManes;
     }
 
@@ -724,6 +725,8 @@ public static class BuildHorses
         made.ToxicEyes = Material("Toxic Eye", null, new Color(0.3f, 0.9f, 0.2f), 0.9f);
         // The pony: its generated texture made neutral (Tools/Horses/make_coats.py Pony) for the coat tints, matte (it read
         // far too shiny with the generator's own roughness), and manes of the same five colours on the hair cards.
+        // The pony's own saddle (a LocalSpawn western saddle fitted in Blender): leather, matte.
+        made.PonySaddle = Material("Pony Saddle", Tex(Art + "/Pony/Pony Saddle_Albedo.png"), Color.white, 0.3f, Tex(Art + "/Pony/Pony Saddle_Normal.png"));
         made.PonyCoat = Material("Pony Main", Tex(Art + "/Pony/PonyCoat.png"), Color.white, 0.18f, Tex(Art + "/Pony/Pony_Normal.png"));
         // Matte: at the pack mane's 0.3-0.5 smoothness the cards caught the sky and a black mane read pale blue-grey.
         made.PonyManes = ManeColours.Select(m => Material("Pony Mane " + m.name, Tex(HairCard + "_Albedo.png"), m.colour, 0.12f,
@@ -1097,11 +1100,18 @@ public static class BuildHorses
         Texture(HairCard + "_Albedo.png", 1024);
         Texture(HairCard + "_Normal.png", 1024, normal: true);
         var albedo = (TextureImporter)AssetImporter.GetAtPath(HairCard + "_Albedo.png");
-        if (albedo != null && !albedo.alphaIsTransparency)
+        // The cards are cut out at the material's 0.45: without coverage-preserving mips the smaller mips average the
+        // strands away and a mane thins to a few strands at a distance.
+        if (albedo != null && (!albedo.alphaIsTransparency || !albedo.mipMapsPreserveCoverage || !Mathf.Approximately(albedo.alphaTestReferenceValue, 0.45f)))
         {
             albedo.alphaIsTransparency = true;
+            albedo.mipMapsPreserveCoverage = true;
+            albedo.alphaTestReferenceValue = 0.45f;
             albedo.SaveAndReimport();
         }
+
+        Texture(Art + "/Pony/Pony Saddle_Albedo.png", 2048);
+        Texture(Art + "/Pony/Pony Saddle_Normal.png", 2048, normal: true);
 
         return Load<GameObject>(Pony);
     }
@@ -1405,13 +1415,15 @@ public static class BuildHorses
                 Wear("Horse_Undead_Eyes_Re", toxic ? looks.ToxicEyes : looks.Eyes);
             }
 
-            Wear("Horse_Undead_Saddle_Re", looks.Saddle);
+            // The pony wears its own saddle (fitted to its back); the toxic horse the pack's.
+            string saddleName = pony ? "Pony Saddle" : "Horse_Undead_Saddle_Re";
+            Wear(saddleName, pony ? looks.PonySaddle : looks.Saddle);
             Wear("Horse_Undead_Reins_Re", looks.Saddle);
             Wear("Horse_Undead_ReinsHead_Re", looks.Saddle);
             Wear("Horse_Undead_Armor_Re", toxic ? looks.Barding[3] : looks.Barding[0]);
 
             // Measured with the armour and tack off, as a living horse stands.
-            Transform saddleModel = Part("Horse_Undead_Saddle_Re");
+            Transform saddleModel = Part(saddleName);
             GameObject[] tack = new[] { "Horse_Undead_Reins_Re", "Horse_Undead_ReinsHead_Re" }.Select(Part).Where(t => t != null).Select(t => t.gameObject).ToArray();
             Renderer armour = Drawn("Horse_Undead_Armor_Re");
             foreach (GameObject part in tack.Append(armour != null ? armour.gameObject : null).Where(p => p != null))

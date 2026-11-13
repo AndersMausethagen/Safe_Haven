@@ -38,6 +38,7 @@ public sealed class KnightSteed : MonoBehaviour
         health = GetComponent<Damageable>();
         lastYaw = transform.eulerAngles.y;
         lastPlace = transform.position;
+        HoofPrints.AddTo(gameObject);
     }
 
     private void OnEnable()
