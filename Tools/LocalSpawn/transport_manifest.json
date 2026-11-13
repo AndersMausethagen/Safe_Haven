@@ -47,17 +47,27 @@
     },
     {
       "asset": "Wheelbarrow",
-      "width": 1.6,
+      "width": 1.7,
       "texture_size": 2048,
       "lod0_triangles": 6000,
       "quality": "hero",
       "looks": [
         {
           "key": "A",
-          "seed": 8214,
-          "prompt": "A classic Viking age wooden wheelbarrow seen from the side: one wheel at the front end, two long straight wooden handles running back from the tray to where a person holds them, and two short legs under the back of the tray. The wheel turns in the direction the handles point, held between the front ends of the two handle shafts on an iron pin. A narrow deep open tray of weathered pale oak planks with sloping sides sits on the shafts. The wheel has six wooden spokes and a dark iron tyre. Sturdy, worn, hand-made, iron nails and straps.",
-          "note": "Seed 8201 made a wheel turned sideways against the tray's front board (Hunyuan3D read the three-quarter wheel wrong); 8211-8213 put the wheel at the handles, two wheels, or on the side."
+          "seed": 8223,
+          "prompt": "The wooden body of a Viking age wheelbarrow with its wheel taken off, standing on its two legs: a narrow deep open tray of weathered pale oak planks with sloping sides, resting on two long straight wooden shafts. Behind the tray the shafts run back as two handles; at the front they reach past the tray and end in two empty forked ends with iron-ringed holes for an axle, with nothing between them. Two short straight legs under the back of the tray. No wheel anywhere.",
+          "note": "Made WITHOUT its wheel: no generated barrow had one usable wheel (8201 sideways and fused to the tray, 8211-8214 at the handles, two wheels, or fused to the tray's sides). The game mounts the Handcart's generated wheel, scaled, between the fork (BuildTransport BarrowLook)."
         }
+      ],
+      "remove": [
+        [
+          -0.05,
+          0.05,
+          -0.81,
+          -0.73,
+          0.2,
+          0.34
+        ]
       ]
     },
     {

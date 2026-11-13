@@ -300,6 +300,11 @@ public static class BuildTransport
         public Vector3 LoadFloor, LoadSize;
         public float Rim;
         public int Full, Heap;
+        // A look made without usable wheels borrows another look's ("<WheelFrom> A Wheel 1"), scaled per axis, its hubs
+        // given here (the prefab's space, left to right).
+        public string WheelFrom;
+        public Vector3 WheelScale = Vector3.one;
+        public Vector3[] WheelHubs;
     }
 
     // Measured on the look: the bed z -1.2..0.45, 1.4 wide, rim 1.27; the shafts reach z 1.55 at 0.68; the hubs at
@@ -319,19 +324,26 @@ public static class BuildTransport
         LoadFloor = new Vector3(0f, 0.8f, -0.38f), LoadSize = new Vector3(1.1f, 0.17f, 1.4f), Rim = 1.25f, Full = 10, Heap = 5,
     };
 
+    // No generated barrow had one usable wheel (transport_manifest.json): the body was made without one, its fork's
+    // crossbar cut away, and the Handcart's wheel turns between the fork ends, scaled to the fork (radius 0.27, 9 cm
+    // wide). Measured on the look: the tray z -0.55..0.5 at 0.21..0.49, two A-frame legs at z -0.3 and 0.3, the grips at
+    // z -0.78, 0.55 up. It stands on its legs and its wheel; lifted by the grips it rolls on the wheel alone.
     private static readonly Look BarrowLook = new Look
     {
         Asset = "Wheelbarrow",
         Wheels = new[] { "Wheel" },
-        Handle = new Vector3(0f, 0.4f, -1f),
-        CentreOfMass = new Vector3(0f, 0.42f, 0.12f),
+        WheelFrom = "Handcart",
+        WheelScale = new Vector3(0.4f, 0.53f, 0.53f),
+        WheelHubs = new[] { new Vector3(0f, 0.27f, 0.81f) },
+        Handle = new Vector3(0f, 0.55f, -0.78f),
+        CentreOfMass = new Vector3(0f, 0.3f, 0.12f),
         Solids = new[]
         {
-            ("Leg", new Vector3(-0.24f, 0.2f, -0.45f), new Vector3(0.08f, 0.4f, 0.08f)),
-            ("Leg", new Vector3(0.24f, 0.2f, -0.45f), new Vector3(0.08f, 0.4f, 0.08f)),
-            ("Tray", new Vector3(0f, 0.53f, 0.1f), new Vector3(0.66f, 0.26f, 0.94f)),
+            ("Leg", new Vector3(0f, 0.12f, -0.3f), new Vector3(0.5f, 0.24f, 0.07f)),
+            ("Leg", new Vector3(0f, 0.12f, 0.3f), new Vector3(0.5f, 0.24f, 0.07f)),
+            ("Tray", new Vector3(0f, 0.35f, -0.02f), new Vector3(0.6f, 0.28f, 1.05f)),
         },
-        LoadFloor = new Vector3(0f, 0.5f, 0.1f), LoadSize = new Vector3(0.42f, 0.13f, 0.68f), Rim = 0.62f, Full = 5, Heap = 3,
+        LoadFloor = new Vector3(0f, 0.3f, -0.02f), LoadSize = new Vector3(0.44f, 0.12f, 0.8f), Rim = 0.49f, Full = 5, Heap = 3,
     };
 
     /// <summary>
@@ -400,18 +412,27 @@ public static class BuildTransport
             lods[i].Add(Part(frame, $"LOD{i}", body[i], material, i < body.Length - 1));
         }
 
-        // The wheels, left to right, each pivot on its hub.
-        var wheels = new List<(Transform Node, Mesh[] Levels)>();
-        for (int k = 1; ; k++)
+        // The wheels, left to right, each pivot on its hub: the look's own, or borrowed (WheelFrom).
+        var wheels = new List<(Vector3 Hub, Mesh[] Levels, Material Material)>();
+        if (look.WheelFrom != null)
         {
-            string name = $"{look.Asset} A Wheel {k}";
-            Transform node = model.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name);
-            if (node == null) break;
-            wheels.Add((node, Levels(fbx, name)));
+            string from = Looks + look.WheelFrom + "/" + look.WheelFrom + ".fbx";
+            Material borrowed = LookMaterial(look.WheelFrom);
+            wheels.AddRange(look.WheelHubs.Select(hub => (hub, Levels(from, look.WheelFrom + " A Wheel 1"), borrowed)));
+        }
+        else
+        {
+            for (int k = 1; ; k++)
+            {
+                string name = $"{look.Asset} A Wheel {k}";
+                Transform node = model.GetComponentsInChildren<Transform>(true).FirstOrDefault(t => t.name == name);
+                if (node == null) break;
+                wheels.Add((Hub(model, node), Levels(fbx, name), material));
+            }
         }
 
-        wheels.Sort((a, b) => Hub(model, a.Node).x.CompareTo(Hub(model, b.Node).x));
-        if (wheels.Count != look.Wheels.Length)
+        wheels.Sort((a, b) => a.Hub.x.CompareTo(b.Hub.x));
+        if (wheels.Count != look.Wheels.Length || wheels.Any(w => w.Levels.Length == 0))
         {
             throw new Exception($"{look.Asset}: the model has {wheels.Count} wheels, the prefab {look.Wheels.Length}");
         }
@@ -420,10 +441,10 @@ public static class BuildTransport
         for (int k = 0; k < wheels.Count; k++)
         {
             Transform pivot = root.transform.Find(look.Wheels[k]);
-            pivot.localPosition = Hub(model, wheels[k].Node);
+            pivot.localPosition = wheels[k].Hub;
             pivot.localRotation = Quaternion.identity;
             Mesh mesh = wheels[k].Levels[0];
-            float r = Mathf.Max(mesh.bounds.extents.y, mesh.bounds.extents.z);
+            float r = Mathf.Max(mesh.bounds.extents.y * look.WheelScale.y, mesh.bounds.extents.z * look.WheelScale.z);
             radius += r / wheels.Count;
             var collider = pivot.GetComponent<SphereCollider>();
             collider.center = Vector3.zero;
@@ -433,7 +454,9 @@ public static class BuildTransport
             Clear(spin);
             for (int i = 0; i < wheels[k].Levels.Length && i < lods.Length; i++)
             {
-                lods[i].Add(Part(spin, $"LOD{i}", wheels[k].Levels[i], material, i < lods.Length - 1));
+                Renderer part = Part(spin, $"LOD{i}", wheels[k].Levels[i], wheels[k].Material, i < lods.Length - 1);
+                part.transform.localScale = look.WheelScale;
+                lods[i].Add(part);
             }
         }
 
@@ -461,7 +484,7 @@ public static class BuildTransport
         haul.ApplyModifiedPropertiesWithoutUndo();
         Pile(root, look.LoadFloor, look.LoadSize, look.Rim, look.Full, look.Heap);
         return $"{look.Asset}: {string.Join("/", body.Select(Triangles))} body triangles, {wheels.Count} wheels r {radius:0.00} at " +
-               string.Join(" ", wheels.Select(w => Hub(model, w.Node).ToString("F2"))) + $", body {body[0].bounds.center:F2} {body[0].bounds.size:F2}";
+               string.Join(" ", wheels.Select(w => w.Hub.ToString("F2"))) + $", body {body[0].bounds.center:F2} {body[0].bounds.size:F2}";
     }
 
     // Where a node of the model stands, in the model's space (the hub of a wheel).

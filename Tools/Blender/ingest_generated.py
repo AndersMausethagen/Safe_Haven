@@ -14,7 +14,8 @@ top (see the asset principles), so AgentScripts/BuildGatheringModels.cs takes th
 Writes Assets/_Project/Art/Gathering/<Asset>/ (<Asset>.fbx, _Albedo, _Normal, _ORM, _Height, _BlendMask and, with
 --glow, _Emission) and a preview render beside the GLBs.
 
-Wheeled things (the carts, transport_manifest.json): the manifest's "wheels" mark where each generated wheel is
+A manifest "remove" ([[x0, x1, y0, y1, z0, z1], ...]) cuts the faces in those boxes away first (the barrow's crossbar,
+where the game mounts its wheel). Wheeled things (the carts, transport_manifest.json): the manifest's "wheels" mark where each generated wheel is
 ([{"hub": [x, y, z], "radius": r, "width": w}], the axle along x, in the look's own ground coordinates). Each is cut out
 of the generated mesh before anything else into its own look "<look> Wheel N", baked into the same atlas in place (so
 nothing of the body shades it: it turns), then centred on its hub, the hub found from the cut wheel itself, and put
@@ -268,6 +269,17 @@ def cut_wheels(obj):
     along x) cut away into their own object '<obj> Wheel N'. A face goes by its centre; the cut is where the hub meets
     the axle, inside the wheel, where neither part shows it."""
     parts = [obj]
+    # "remove": boxes [x0, x1, y0, y1, z0, z1] cut out of the model (the barrow's crossbar, where its wheel goes).
+    for box in manifest_value("remove") or []:
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        gone = [f for f in bm.faces if box[0] <= f.calc_center_median().x <= box[1] and box[2] <= f.calc_center_median().y <= box[3]
+                and box[4] <= f.calc_center_median().z <= box[5]]
+        bmesh.ops.delete(bm, geom=gone, context='FACES')
+        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
+        bm.to_mesh(obj.data)
+        bm.free()
+        print("REMOVED", len(gone), "faces in", box)
     for k, wheel in enumerate(WHEELS):
         hub, radius, width = Vector(wheel["hub"]), wheel["radius"], wheel["width"]
 
