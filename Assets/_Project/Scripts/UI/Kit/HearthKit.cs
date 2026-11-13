@@ -131,6 +131,51 @@ public static class HearthKit
             { "Attributes", "Star" }, { "Offense", "Sword" }, { "Resistances", "Barding" },
         };
 
+    // What an action's first word suggests, for menus whose actions don't name an icon (ActionRowView).
+    private static readonly (string word, string icon)[] ActionIcons =
+    {
+        ("enter", "Lead"), ("travel", "Lead"), ("go", "Lead"), ("leave", "Lead"), ("follow", "Lead"), ("lead", "Lead"),
+        ("repair", "Hammer"), ("build", "Hammer"), ("fix", "Hammer"), ("craft", "Hammer"), ("make", "Hammer"), ("upgrade", "Star"),
+        ("trade", "Coin"), ("buy", "Coin"), ("sell", "Coin"), ("pay", "Coin"), ("offer", "Coin"),
+        ("listen", "Book"), ("talk", "Book"), ("ask", "Book"), ("read", "Book"), ("learn", "Book"), ("study", "Book"),
+        ("purify", "Sun"), ("bless", "Sun"), ("pray", "Sun"), ("light", "Flame"), ("burn", "Flame"),
+        ("rest", "Hourglass"), ("sleep", "Hourglass"), ("wait", "Hourglass"),
+        ("open", "Bags"), ("store", "Bags"), ("take", "Bags"), ("put", "Bags"), ("loot", "Bags"), ("load", "Bags"), ("unload", "Bags"),
+        ("ride", "HorseHead"), ("mount", "HorseHead"), ("stable", "Stable"), ("tie", "Stay"), ("untie", "Stay"), ("stay", "Stay"),
+        ("feed", "Wheat"), ("eat", "Wheat"), ("cook", "Wheat"), ("harvest", "Wheat"), ("plant", "Graze"),
+        ("fight", "Sword"), ("attack", "Sword"), ("challenge", "Sword"), ("hunt", "Sword"),
+        ("hitch", "Wheel"), ("unhitch", "Wheel"), ("push", "Wheel"), ("pull", "Wheel"),
+        ("rename", "Pencil"), ("name", "Pencil"), ("give", "Heart"), ("heal", "Heart"), ("mend", "Heart"),
+        ("look", "Eye"), ("search", "Eye"), ("inspect", "Eye"), ("claim", "Star"), ("raise", "Star"),
+    };
+
+    /// <summary>The icon an action's label suggests by its first word ("Repair a stone": Hammer), or null.</summary>
+    public static string IconForAction(string label)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+        {
+            return null;
+        }
+
+        string text = label.TrimStart();
+        int end = 0;
+        while (end < text.Length && char.IsLetter(text[end]))
+        {
+            end++;
+        }
+
+        string first = text.Substring(0, end);
+        foreach ((string word, string icon) in ActionIcons)
+        {
+            if (string.Equals(first, word, StringComparison.OrdinalIgnoreCase))
+            {
+                return UIStyle.Current.Icon(icon) != null ? icon : null;
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>The icon a heading with these words carries, or null.</summary>
     public static string IconForHeading(string text) =>
         text != null && HeadingIcons.TryGetValue(text.Trim(), out string icon) && UIStyle.Current.Icon(icon) != null ? icon : null;
