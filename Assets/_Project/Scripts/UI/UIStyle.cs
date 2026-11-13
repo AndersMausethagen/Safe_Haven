@@ -264,6 +264,19 @@ public sealed class UIStyle : GameSettings<UIStyle>
         }
 
         label.characterSpacing = 5f;
+        // The display face's line is taller than the body face's: in a box sized for that, a one-line label that drops what
+        // doesn't fit (Ellipsis, Truncate) would draw nothing at all. Such a box grows to the line.
+        RectTransform box = label.rectTransform;
+        if (label.textWrappingMode == TextWrappingModes.NoWrap && label.overflowMode != TextOverflowModes.Overflow
+            && Mathf.Approximately(box.anchorMin.y, box.anchorMax.y))
+        {
+            float line = label.GetPreferredValues("Ag").y;
+            if (box.rect.height < line)
+            {
+                box.sizeDelta = new Vector2(box.sizeDelta.x, line);
+            }
+        }
+
         label.color = Color.white;
         label.enableVertexGradient = true;
         Color foot = Color.Lerp(text, accentBright, 0.45f);

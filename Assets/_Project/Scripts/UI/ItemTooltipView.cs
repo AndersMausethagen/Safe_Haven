@@ -529,6 +529,17 @@ public sealed class ItemTooltipView : MonoBehaviour
             }
         }
 
+        // What a bow's tooltip points to: the arrow's own damage, and the fire it sets.
+        if (item.IsArrow)
+        {
+            ArrowDefinition arrow = item.Arrow;
+            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Arrow: {Mathf.RoundToInt(arrow.Damage)} damage at a full draw.</color>");
+            if (arrow.Burns)
+            {
+                builder.Append($"\n<color={UIStyle.Current.WarningHex}>Sets what it hits alight: {arrow.BurnDamagePerSecond:0.#} damage a second for {arrow.BurnSeconds:0.#} s.</color>");
+            }
+        }
+
         if (item.IsConsumable)
         {
             builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore))
