@@ -54,8 +54,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
     private MenuPage page;
     private Tab tab;
 
-    private RenderTexture texture;
-    private Camera portrait;
+    private KitPortrait portrait;
 
     private TMP_Text nameLabel;
     private RectTransform pencil;
@@ -168,7 +167,7 @@ public sealed class HorsePanelWindow : MonoBehaviour
 
             if (!open && portrait != null)
             {
-                portrait.enabled = false;
+                portrait.Hide();
             }
         };
         PadTabs.Register(this, () => window != null && window.IsOpen, step => ShowTab((Tab)PadTabs.Next((int)tab, TabNames.Length, step)),
@@ -178,17 +177,8 @@ public sealed class HorsePanelWindow : MonoBehaviour
     private void BuildHeader()
     {
         UIStyle style = UIStyle.Current;
-        // The picture, live, in a gold-rimmed frame.
-        RectTransform frame = HearthKit.Card(panel, "Picture", Margin + 8f, Margin + 8f, 330f, 250f, 0f, null, 1.5f);
-        RectTransform inner = CodeUI.Stretch("Image", frame);
-        inner.offsetMin = new Vector2(5f, 5f);
-        inner.offsetMax = new Vector2(-5f, -5f);
-        inner.gameObject.AddComponent<RectMask2D>();
-        var picture = CodeUI.Stretch("Render", inner).gameObject.AddComponent<RawImage>();
-        texture = new RenderTexture(660, 500, 24) { name = "Horse Portrait" };
-        picture.texture = texture;
-        picture.raycastTarget = false;
-        HearthKit.Rim(frame, 0.85f, 1.5f).transform.SetAsLastSibling();
+        // The picture, live, in a gold-rimmed frame: the horse before a painted meadow (PortraitStage).
+        portrait = KitPortrait.Make(panel, "Picture", Margin + 8f, Margin + 8f, 330f, 250f, "HorseBackdrop");
 
         float x = Margin + 372f;
         nameLabel = HearthKit.DisplayName(panel, x, Margin - 6f, 420f);
@@ -595,35 +585,19 @@ public sealed class HorsePanelWindow : MonoBehaviour
             return;
         }
 
-        if (portrait == null)
-        {
-            var holder = new GameObject("Horse Portrait Camera");
-            holder.transform.SetParent(transform, false);
-            portrait = holder.AddComponent<Camera>();
-            portrait.targetTexture = texture;
-            portrait.fieldOfView = 30f;
-            portrait.nearClipPlane = 0.2f;
-            portrait.farClipPlane = 150f;
-        }
+        portrait.Show(horse.transform, Shot);
+    }
 
-        // Hearthline 3: the horse before a painted meadow, not the world behind it (PortraitStage).
-        PortraitStage.On(portrait, "HorseBackdrop", horse.transform);
-
-        portrait.enabled = true;
-        Transform body = horse.transform;
+    /// <summary>A horse's portrait: from its right and a little ahead, at the height of its neck.</summary>
+    public static (Vector3 eye, Vector3 look) Shot(Transform body)
+    {
         Vector3 look = body.position + Vector3.up * 1.45f + body.forward * 0.35f;
-        portrait.transform.position = look + body.right * 3.4f + body.forward * 2.6f + Vector3.up * 0.25f;
-        portrait.transform.LookAt(look);
+        return (look + body.right * 3.4f + body.forward * 2.6f + Vector3.up * 0.25f, look);
     }
 
     private void OnDestroy()
     {
         PlayerHold.Set(this, false);
         PadTabs.Unregister(this);
-        if (texture != null)
-        {
-            texture.Release();
-            Destroy(texture);
-        }
     }
 }

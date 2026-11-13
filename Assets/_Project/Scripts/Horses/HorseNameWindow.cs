@@ -4,13 +4,18 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Naming a horse: asked once it is tamed, and again from its menu. A name typed, or one from the dice (old northern
-/// horse names); left empty it keeps "Horse". Built in code the first time it is asked for.
+/// horse names); left empty it keeps "Horse". Built in code the first time it is asked for. Hearthline 3: the horse itself
+/// beside the question, live before the painted meadow, as in its own window.
 /// </summary>
 public sealed class HorseNameWindow : MonoBehaviour
 {
-    private const float Width = 620f;
+    private const float Width = 880f;
     private const float Height = 290f;
     private const float Margin = 40f;
+    private const float PictureWidth = 250f;
+    // The words start right of the picture.
+    private const float Left = Margin + PictureWidth + 28f;
+    private const float Column = Width - Left - Margin;
 
     private static readonly string[] Names =
     {
@@ -23,6 +28,7 @@ public sealed class HorseNameWindow : MonoBehaviour
     private UIWindow window;
     private TMP_InputField field;
     private TMP_Text question;
+    private KitPortrait picture;
     private Horse horse;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -56,6 +62,7 @@ public sealed class HorseNameWindow : MonoBehaviour
         current.horse = horse;
         current.question.text = horse.HasName ? $"A new name for {horse.HorseName}?" : "What will you call it?";
         current.field.text = horse.HasName ? horse.HorseName : "";
+        current.picture.Show(horse.transform, HorsePanelWindow.Shot);
         current.window.Open();
         current.field.ActivateInputField();
     }
@@ -68,13 +75,14 @@ public sealed class HorseNameWindow : MonoBehaviour
         RectTransform panel = CodeUI.Box("Panel", content, new Vector2(0.5f, 0.5f), new Vector2(Width, Height), Vector2.zero);
         panel.gameObject.AddComponent<Image>();
         panel.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Window);
-        TMP_Text kicker = CodeUI.Label("Kicker", panel, Margin, 30f, 400f, 24f, 17f, style.Accent);
+        picture = KitPortrait.Make(panel, "Picture", Margin - 6f, Margin - 6f, PictureWidth, Height - (Margin - 6f) * 2f, "HorseBackdrop");
+        TMP_Text kicker = CodeUI.Label("Kicker", panel, Left, 30f, 400f, 24f, 17f, style.Accent);
         kicker.text = "A HORSE OF YOUR OWN";
         kicker.characterSpacing = 12f;
-        question = CodeUI.Label("Question", panel, Margin, 56f, Width - Margin * 2f, 46f, 32f, style.Text);
+        question = CodeUI.Label("Question", panel, Left, 56f, Column, 46f, 32f, style.Text);
         style.Title(question);
 
-        RectTransform box = CodeUI.At("Name", panel, Margin, 120f, Width - Margin * 2f - 150f, 52f);
+        RectTransform box = CodeUI.At("Name", panel, Left, 120f, Column - 150f, 52f);
         box.gameObject.AddComponent<Image>();
         box.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Slot);
         RectTransform area = CodeUI.Stretch("Text Area", box);
@@ -91,6 +99,10 @@ public sealed class HorseNameWindow : MonoBehaviour
         field.textComponent = text;
         field.placeholder = hint;
         field.lineType = TMP_InputField.LineType.SingleLine;
+        // The kit's gold, not the default blue, under a selected name and in the caret.
+        field.selectionColor = HearthKit.Faded(style.Accent, 0.45f);
+        field.customCaretColor = true;
+        field.caretColor = style.AccentBright;
         field.characterLimit = CharacterAppearance.MaximumNameLength;
         field.onSubmit.AddListener(_ => Done());
 
@@ -109,6 +121,7 @@ public sealed class HorseNameWindow : MonoBehaviour
             else
             {
                 GameInput.ResumeGameplay();
+                picture.Hide();
             }
         };
     }
