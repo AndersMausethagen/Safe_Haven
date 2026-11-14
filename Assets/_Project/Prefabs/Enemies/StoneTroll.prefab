@@ -346,23 +346,56 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8879528566716807029, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9990445
+      objectReference: {fileID: 0}
+    - target: {fileID: 8879528566716807029, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.03770292
+      value: -0.03780688
+      objectReference: {fileID: 0}
+    - target: {fileID: 8879528566716807029, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.019448593
       objectReference: {fileID: 0}
     - target: {fileID: 8879528566716807029, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.010099791
+      value: 0.0101276385
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5537101659835289287}
   m_SourcePrefab: {fileID: 100100000, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
 --- !u!4 &3966081093321772572 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
   m_PrefabInstance: {fileID: 3495040429356427767}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4341902222530319526 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 40d9ece43d2cdce4db58849c7e656d28, type: 3}
+  m_PrefabInstance: {fileID: 3495040429356427767}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5537101659835289287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4341902222530319526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afface28c299eb458371e2c5a0db511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FootGrounding
+  leftSole: 0.33918747
+  rightSole: 0.3135949
+  mostShift: 1
+  settle: 12
+  measuredScale: 0.8269254
 --- !u!1001 &6157787521317093363
 PrefabInstance:
   m_ObjectHideFlags: 0

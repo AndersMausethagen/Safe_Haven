@@ -454,8 +454,33 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 86a126cdeb4de4f4ea9ba5c49affc2bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7913006938134829816}
   m_SourcePrefab: {fileID: 100100000, guid: 86a126cdeb4de4f4ea9ba5c49affc2bd, type: 3}
+--- !u!1 &6186776004255688445 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 86a126cdeb4de4f4ea9ba5c49affc2bd, type: 3}
+  m_PrefabInstance: {fileID: 6420653327081479084}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7913006938134829816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6186776004255688445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afface28c299eb458371e2c5a0db511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FootGrounding
+  leftSole: -0.28
+  rightSole: -0.28
+  mostShift: 1
+  settle: 12
+  measuredScale: 0.47439048
 --- !u!4 &6813954292163181639 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 86a126cdeb4de4f4ea9ba5c49affc2bd, type: 3}

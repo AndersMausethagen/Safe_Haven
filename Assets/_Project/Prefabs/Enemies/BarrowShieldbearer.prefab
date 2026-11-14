@@ -176,6 +176,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3710070978727052554}
+    - targetCorrespondingSourceObject: {fileID: 7495105107611729524, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8761167655992357366}
   m_SourcePrefab: {fileID: 100100000, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
 --- !u!4 &1825916656309993635 stripped
 Transform:
@@ -201,3 +204,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::MonsterShieldPose
   shield: {fileID: 152420336014933026}
   handFromShoulder: {x: 0.36, y: -0.02, z: -0.12}
+--- !u!1 &8603509183960289323 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7495105107611729524, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+  m_PrefabInstance: {fileID: 2262557875931590239}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8761167655992357366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8603509183960289323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3afface28c299eb458371e2c5a0db511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::FootGrounding
+  leftSole: 0.043303207
+  rightSole: 0.043302998
+  mostShift: 1
+  settle: 12
+  measuredScale: 0.11059974
