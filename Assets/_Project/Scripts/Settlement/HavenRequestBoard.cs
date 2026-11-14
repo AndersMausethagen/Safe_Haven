@@ -132,7 +132,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
         if (request.Experience > 0)
         {
             ExperienceTracker.GrantInsight(request.Experience);
-            given.Add($"{request.Experience} experience");
+            given.Add($"{ExperienceTracker.InsightWorth(request.Experience)} Insight");
         }
 
         // An order's asker shows how they would have done it: a lesson in the craft, and the Haven is known for the work.

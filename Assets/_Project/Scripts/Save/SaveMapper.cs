@@ -877,12 +877,12 @@ public static class SaveMapper
         return becameItems;
     }
 
-    // The skill book and bar, when the save has them (a whole bar of SkillLoadout.SlotCount slots: JsonUtility writes a list
-    // it wasn't given as an empty one). Skills are looked up in the ContentDatabase only, not through IContentLookup, so a
+    // The skill book and bar, when the save has them (a bar of up to SkillLoadout.SlotCount slots: JsonUtility writes a list
+    // it wasn't given as an empty one; saves from before 2026-11-14 hold five, the rest of the bar starts empty). Skills are looked up in the ContentDatabase only, not through IContentLookup, so a
     // lookup without skills (tests) leaves the starting skills alone, and so does a save none of whose skills can be found.
     private static void ReadSkills(PlayerSaveData player, ContentDatabase database, LoadedGame loaded)
     {
-        if (database == null || player.skillBar == null || player.skillBar.Count != SkillLoadout.SlotCount)
+        if (database == null || player.skillBar == null || player.skillBar.Count == 0 || player.skillBar.Count > SkillLoadout.SlotCount)
         {
             return;
         }
@@ -905,7 +905,7 @@ public static class SaveMapper
         var bar = new SkillDefinition[SkillLoadout.SlotCount];
         for (int i = 0; i < bar.Length; i++)
         {
-            string id = player.skillBar[i];
+            string id = i < player.skillBar.Count ? player.skillBar[i] : null;
             bar[i] = string.IsNullOrEmpty(id) ? null : Resolve(database.FindSkill(id), "skill", id, loaded.MissingContent);
         }
 

@@ -73,10 +73,14 @@ public sealed class PlayerStamina : MonoBehaviour
         }
     }
 
+    /// <summary>What an action's listed cost really takes: the burden's scale times the settings' Action Cost Scale.
+    /// Compare this, not the listed cost, against <see cref="Current"/>.</summary>
+    public float Scaled(float cost) => cost * CostScale * (settings != null ? settings.ActionCostScale : 1f);
+
     /// <summary>Pays the full action cost. Returns false when stamina is insufficient, and the action must not happen.</summary>
     public bool TrySpend(float cost)
     {
-        cost *= CostScale;
+        cost = Scaled(cost);
         if (!pool.TrySpend(cost))
         {
             SpendRefused?.Invoke();
@@ -96,12 +100,25 @@ public sealed class PlayerStamina : MonoBehaviour
     /// like any spend.</summary>
     public void Drain(float amount)
     {
-        if (pool.Drain(amount))
+        if (pool.Drain(amount * (settings != null ? settings.ActionCostScale : 1f)))
         {
             regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
             StaminaChanged?.Invoke(pool.Current, pool.Max);
         }
     }
+
+    /// <summary>Empties the pool whatever the scales say (a broken guard).</summary>
+    public void Exhaust()
+    {
+        if (pool.Drain(pool.Current))
+        {
+            regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
+            StaminaChanged?.Invoke(pool.Current, pool.Max);
+        }
+    }
+
+    /// <summary>What a parry gives back: Parry Return's share of the base pool (Max Stamina).</summary>
+    public float ParryReturn => settings != null ? settings.MaxStamina * settings.ParryReturn : 0f;
 
     /// <summary>Gives stamina back at once, such as from a relic. It doesn't change when regeneration resumes.</summary>
     public void Restore(float amount)

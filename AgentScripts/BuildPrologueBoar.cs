@@ -8,8 +8,9 @@ using UnityEngine;
 /// - Data/Monsters/Boar: an ordinary boar, the Blight Boar's body and habits at about half its strength (BoarStats: 70
 ///   health, 2 armour; 6 damage, 40 poise), plain dark eyes (Eye Boar Plain) instead of the blight's green.
 /// - The prologue's boar prefab (ExpeditionBoar: the meadow's and the road's running boars) is that boar.
-/// - Meadow Boars spawns one, and Hunt for the Pot asks for one.
 /// Listed in the journal and the cheat menu like the others. Re-runnable.
+/// Since 2026-11-14 the hunt itself (Meadow Boars spawning one, Hunt for the Pot asking for one, Runa's lines) belongs to
+/// BuildPrologueMeadow (Data and Moments): two builders writing the same quest let a Data run put the blight boar back.
 /// </summary>
 public static class BuildPrologueBoar
 {
@@ -28,8 +29,6 @@ public static class BuildPrologueBoar
         MonsterDefinition boar = Definition(report);
         Material eyes = Eyes();
         Prefabs(boar, eyes, report);
-        Meadow(report);
-        Hunt(boar, report);
         List(boar, "Assets/_Project/Resources/JournalSettings.asset", report);
         List(boar, "Assets/_Project/Resources/CheatSettings.asset", report);
         AssetDatabase.SaveAssets();
@@ -126,41 +125,7 @@ public static class BuildPrologueBoar
         }
     }
 
-    private static void Meadow(System.Collections.Generic.List<string> report)
-    {
-        MobSpawnZone zone = null;
-        foreach (MobSpawnZone candidate in Object.FindObjectsByType<MobSpawnZone>(FindObjectsInactive.Include))
-        {
-            zone = candidate.name == "Meadow Boars" ? candidate : zone;
-        }
 
-        if (zone == null)
-        {
-            report.Add("no Meadow Boars in the open scene (open Prologue_MistyWoods)");
-            return;
-        }
-
-        var so = new SerializedObject(zone);
-        so.FindProperty("count").vector2IntValue = new Vector2Int(1, 1);
-        so.ApplyModifiedProperties();
-        EditorSceneManager.MarkSceneDirty(zone.gameObject.scene);
-        EditorSceneManager.SaveScene(zone.gameObject.scene);
-        report.Add("Meadow Boars spawns one");
-    }
-
-    private static void Hunt(MonsterDefinition boar, System.Collections.Generic.List<string> report)
-    {
-        var quest = AssetDatabase.LoadAssetAtPath<ScriptableObject>(Quest);
-        var so = new SerializedObject(quest);
-        SerializedProperty objective = so.FindProperty("objectives").GetArrayElementAtIndex(0);
-        objective.FindPropertyRelative("amount").intValue = 1;
-        objective.FindPropertyRelative("description").stringValue = "Bring down a boar on the grass north of the road";
-        objective.FindPropertyRelative("monster").objectReferenceValue = boar;
-        so.FindProperty("journalNotes").stringValue = "Runa doesn't like it. Boar don't come this far onto open grass. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.";
-        so.ApplyModifiedPropertiesWithoutUndo();
-        EditorUtility.SetDirty(quest);
-        report.Add("Hunt for the Pot: one boar");
-    }
 
     // Adds the boar next to the Blight Boar in any list of creatures on a settings asset.
     private static void List(MonsterDefinition boar, string path, System.Collections.Generic.List<string> report)

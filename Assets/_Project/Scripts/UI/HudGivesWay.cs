@@ -18,10 +18,11 @@ public sealed class HudGivesWay : MonoBehaviour
     private const float FadeSpeed = 7f;
     private const float ScanSeconds = 1f;
 
-    // What is HUD. Messages (MessageFeedView) and the player's own item bar are left out on purpose.
+    // What is HUD. Messages (MessageFeedView) and the player's own item bar are left out on purpose, and so is the skill bar,
+    // which stays up beside the bag and the character sheet so the player sees what they put on it (SkillBarView fades itself).
     private static readonly Type[] HudParts =
     {
-        typeof(PlayerVitalsView), typeof(QuestTrackerView), typeof(NoiseMeterView), typeof(EnvironmentHudView), typeof(SkillBarView),
+        typeof(PlayerVitalsView), typeof(QuestTrackerView), typeof(NoiseMeterView), typeof(EnvironmentHudView),
         typeof(MinimapHud), typeof(HavenHud), typeof(TutorialNoticeHud), typeof(ExperienceHud), typeof(QuiverHud), typeof(RegionTitleHud),
         typeof(FishingHud), typeof(QuestWaypointHud), typeof(PartyHud), typeof(RaidHudView), typeof(TransportHud),
     };

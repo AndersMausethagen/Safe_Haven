@@ -80,7 +80,7 @@ public sealed class ResidentAsides : MonoBehaviour
         nextAside = Time.time + settings.AsideEvery * Random.Range(0.8f, 1.3f);
         lastSpokenAt = Time.time;
         string who = npc.Resident != null ? npc.Resident.DisplayName : name;
-        box.Aside(new DialogueSpeaker(who, transform, null, 0f, null, transform), line);
+        box.Bark(new DialogueSpeaker(who, transform, null, 0f, null, transform), line);
     }
 
     // Entering Play doesn't reload scripts in this project, and Time.time starts again at 0: an old moment would silence residents.

@@ -139,6 +139,8 @@ public sealed class DialogueBox : MonoBehaviour
     private readonly List<Button> buttons = new List<Button>();
     private readonly List<TMP_Text> buttonLabels = new List<TMP_Text>();
     private UIWindow window;
+    // Hides the whole box while another window (the bag, the journal) is open over it: windows sort lower than this canvas.
+    private CanvasGroup cover;
     private GameObject content;
     private RectTransform answerColumn;
     private GameObject portraitFrame;
@@ -162,6 +164,11 @@ public sealed class DialogueBox : MonoBehaviour
     private GameObject subtitleStrip;
     private TMP_Text subtitle;
     private Action subtitleDone;
+    // Callbacks of subtitles another line replaced before they were read out: run when the line on screen is done, so a story
+    // waiting on one goes on instead of stalling (they used to be dropped).
+    private readonly List<Action> displaced = new List<Action>();
+    // The subtitle up now is a bark (fight talk, a heal, a passing thought): any line with more weight may cut it short.
+    private bool barking;
     private float subtitleEnds = -1f;
     private float nextFightCheck;
     private float subtitleTimeMultiplier = 1f;
@@ -196,6 +203,14 @@ public sealed class DialogueBox : MonoBehaviour
 
     /// <summary>True while anyone is talking: a line in the box or a subtitle.</summary>
     public static bool IsSpeaking => IsOpen || (current != null && current.IsSubtitling);
+
+    /// <summary>True while a line that matters is up: a conversation, a quest or story line. A bark doesn't count: those
+    /// give way (the story waits on this, not on <see cref="IsSpeaking"/>).</summary>
+    public static bool IsSpeakingImportantly => IsOpen || (current != null && current.IsSubtitling && !current.barking);
+
+    /// <summary>True while a bark would be out of place: anything said or heard, or a cinematic playing.</summary>
+    public static bool BarkWouldInterrupt =>
+        IsSpeaking || VoicePlayer.IsSpeaking || CinematicScreen.IsPlaying || InGameCinematic.IsPlaying;
 
     /// <summary>Whether this character is speaking in the conversation window, rather than a combat subtitle.</summary>
     public static bool IsTalkingTo(Transform speaker) => speaker != null && IsOpen && current.framed == speaker;
@@ -240,6 +255,24 @@ public sealed class DialogueBox : MonoBehaviour
         subtitleTimeMultiplier = 1f;
         Speak(speaker, line);
         Subtitle(speaker.Name, line, done, Over(speaker));
+    }
+
+    /// <summary>
+    /// The least of lines (the user, 2026-11-14: "mute combat dialogue while more important dialogue, like quest dialogue, is
+    /// playing"): fight talk, a companion's heal, a resident's or the player's passing word. Said only when nothing else is
+    /// (no conversation, subtitle, voice or cinematic), and any story or quest line said meanwhile cuts it short. Returns
+    /// whether it was said; a bark that would interrupt is dropped, not queued.
+    /// </summary>
+    public bool Bark(DialogueSpeaker speaker, string line, Action done = null)
+    {
+        if (BarkWouldInterrupt)
+        {
+            return false;
+        }
+
+        Aside(speaker, line, done);
+        barking = true;
+        return true;
     }
 
     /// <summary>True while a subtitle is shown.</summary>
@@ -466,7 +499,16 @@ public sealed class DialogueBox : MonoBehaviour
             }
         }
 
-        if (!window.IsOpen)
+        // A window opened mid-conversation goes over the box: hide it (and take no clicks meant for the window) until it closes.
+        bool covered = window.IsOpen && HudGivesWay.Covered;
+        if (cover != null && cover.blocksRaycasts == covered)
+        {
+            cover.alpha = covered ? 0f : 1f;
+            cover.blocksRaycasts = !covered;
+            cover.interactable = !covered;
+        }
+
+        if (!window.IsOpen || covered)
         {
             return;
         }
@@ -677,6 +719,12 @@ public sealed class DialogueBox : MonoBehaviour
 
     private void Subtitle(string speakerName, string line, Action done, Transform over = null)
     {
+        if (IsSubtitling && subtitleDone != null)
+        {
+            displaced.Add(subtitleDone);
+        }
+
+        barking = false;
         subtitleDone = done;
         line = GameInput.WithRebinds(line);
         if (over != null)
@@ -718,6 +766,17 @@ public sealed class DialogueBox : MonoBehaviour
         Action done = subtitleDone;
         subtitleDone = null;
         subtitleEnds = -1f;
+        barking = false;
+        if (displaced.Count > 0)
+        {
+            Action[] waiting = displaced.ToArray();
+            displaced.Clear();
+            foreach (Action other in waiting)
+            {
+                other?.Invoke();
+            }
+        }
+
         done?.Invoke();
         if (!IsSubtitling && !window.IsOpen)
         {
@@ -829,6 +888,7 @@ public sealed class DialogueBox : MonoBehaviour
         box.activeLine = box.lineLabel;
         box.activeHint = box.hint;
 
+        box.cover = root.AddComponent<CanvasGroup>();
         box.window = root.AddComponent<UIWindow>();
         box.window.Configure(UIWindowId.Dialogue, panel.gameObject);
         box.window.OpenChanged += box.OnOpenChanged;

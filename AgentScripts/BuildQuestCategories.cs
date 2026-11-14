@@ -163,6 +163,8 @@ public static class BuildQuestCategories
         Edit(Quest("KnowYourEnemy"), so => so.FindProperty("chain").stringValue = "Errands");
         Edit(Quest("SmithsRequest"), so => so.FindProperty("chain").stringValue = "Errands");
         Edit(Quest("EchoesInTheWilds"), so => so.FindProperty("chain").stringValue = "Tales");
+        // The order and the breathers between them (2026-11-14) win over the prerequisites set above.
+        HavenPacing();
     }
 
     // The workshop used to be half of A Light in the Wood. Now it is its own Haven quest, open once the door is awake.
@@ -352,13 +354,76 @@ public static class BuildQuestCategories
         return problems.Count == 0 ? "no quest problems" : string.Join("; ", problems);
     }
 
+    // ----- The Haven's first hour, one beat at a time -----
+
+    /// <summary>
+    /// Only the Haven's early pacing (`--entry BuildQuestCategories.HavenPacing`; Haven runs it too). The user, 2026-11-14:
+    /// "When we get to the safe haven, we get overwhelmed with quests ... move some to later, maybe until after we awaken
+    /// the portal". The playtest started three quests at once after the fire and four after the door woke, with the
+    /// Smith's note on the board from the first minute. Now:
+    /// <list type="bullet">
+    /// <item>Arrival to the door: the story alone (the fire, the three stones, the door).</item>
+    /// <item>The door wakes: Into the Misty Woods and Bring Ingrid Home (one beat), Tools of the Clearing half a minute
+    /// later, Strength for the Road once the tools are made.</item>
+    /// <item>Home from the first raid: A Roof for the Work (it wants the tools' oak and stone), then A Safe Place, and
+    /// Something to Fight With a minute after; Know Your Enemy after a breather; the Smith's note once the workshop stands.</item>
+    /// </list>
+    /// A Haven quest never stands before the story (QuestCategoryTests); HomeStoryTests checks this order.
+    /// </summary>
+    public static string HavenPacing()
+    {
+        QuestDefinition door = Quest("AwakeningThePortal"), firstRaid = Quest("ThroughThePortal"), tools = Quest("PrimitiveTools");
+        QuestDefinition workshop = Quest("ARoofForTheWork");
+        Edit(tools, so => { After(so, door); Delay(so, 30f); });
+        Edit(Quest("FoodAndWater"), so => { After(so, tools); Delay(so, 0f); });
+        Edit(workshop, so => { After(so, firstRaid, tools); Delay(so, 0f); });
+        Edit(Quest("SafeKeeping"), so => { After(so, workshop); Delay(so, 0f); });
+        Edit(Quest("FirstWeapon"), so => { After(so, workshop); Delay(so, 60f); });
+        Edit(Quest("KnowYourEnemy"), so => { After(so, firstRaid); Delay(so, 90f); });
+        Edit(Quest("SmithsRequest"), so => After(so, workshop));
+        AssetDatabase.SaveAssets();
+        return "Haven pacing: door -> raid + Ingrid, tools (+30 s) -> food; first raid + tools -> workshop -> chest, club (+60 s); first raid -> wolves (+90 s); workshop -> smith's note";
+    }
+
+    private static void Delay(SerializedObject so, float seconds) => so.FindProperty("startDelay").floatValue = seconds;
+
+    /// <summary>
+    /// Strength for the Road's way to water (`--entry BuildQuestCategories.WaterMark`, with SafeHaven open and saved): a
+    /// waypoint on its drinking step that keeps itself at the water nearest the player (NearestWaterMark), so no world
+    /// rebuild can take its spot away. The user, 2026-11-14: "put a mark at the closest river or water source".
+    /// </summary>
+    public static string WaterMark()
+    {
+        UnityEngine.SceneManagement.Scene scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (scene.path != "Assets/_Project/Scenes/SafeHaven.unity") return "open SafeHaven first";
+        if (scene.isDirty) return "SafeHaven has unsaved changes";
+        const string name = "Quest Waypoint - Strength for the Road (nearest water)";
+        GameObject mark = GameObject.Find(name) ?? new GameObject(name);
+        QuestWaypoint waypoint = mark.GetComponent<QuestWaypoint>() ?? mark.AddComponent<QuestWaypoint>();
+        // Objective 2 (counted from 1): the drink at open water.
+        waypoint.Configure(Quest("FoodAndWater"), 2, "Water");
+        if (mark.GetComponent<NearestWaterMark>() == null) mark.AddComponent<NearestWaterMark>();
+        RaidPortal portal = Object.FindAnyObjectByType<RaidPortal>(FindObjectsInactive.Include);
+        Vector3 from = portal != null ? portal.transform.position : Vector3.zero;
+        string found = NearestWaterMark.TryNearest(from, 2000f, Object.FindObjectsByType<WaterSource>(), out Vector3 at)
+            ? $"nearest water to the portal at {at:F0}, {Vector3.Distance(from, at):F0} m" : "no water found (it looks again in Play)";
+        if (found.StartsWith("nearest")) mark.transform.position = at;
+        EditorUtility.SetDirty(waypoint);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+        return $"{name}: {found}";
+    }
+
     // ----- Helpers -----
 
-    private static void After(SerializedObject so, QuestDefinition before)
+    private static void After(SerializedObject so, params QuestDefinition[] before)
     {
         SerializedProperty prerequisites = so.FindProperty("prerequisites");
-        prerequisites.arraySize = 1;
-        prerequisites.GetArrayElementAtIndex(0).objectReferenceValue = before;
+        prerequisites.arraySize = before.Length;
+        for (int i = 0; i < before.Length; i++)
+        {
+            prerequisites.GetArrayElementAtIndex(i).objectReferenceValue = before[i];
+        }
     }
 
     private static QuestDefinition Quest(string file)

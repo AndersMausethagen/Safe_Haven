@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Met the Expedition
   objectiveText: Hear the others out by the fire
   notes: 
+  homeOnly: 0

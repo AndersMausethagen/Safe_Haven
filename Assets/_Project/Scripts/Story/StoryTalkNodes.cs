@@ -61,7 +61,8 @@ public sealed class SayNode : StoryNode
         // Around a fight a conversation box stops the play: a word from someone is enough.
         if (aside || context.InFight)
         {
-            while (DialogueBox.IsSpeaking)
+            // Barks give way: the story waits only for lines that matter.
+            while (DialogueBox.IsSpeakingImportantly)
             {
                 yield return null;
             }

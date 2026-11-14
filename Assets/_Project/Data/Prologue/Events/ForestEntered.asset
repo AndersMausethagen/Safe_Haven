@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Entered the Forest
   objectiveText: Walk with the expedition to the forest
   notes: 
+  homeOnly: 0

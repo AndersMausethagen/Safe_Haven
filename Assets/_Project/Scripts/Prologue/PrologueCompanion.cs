@@ -120,7 +120,8 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
         health.Heal(health.MaxHealth * healShare);
         if (healLines.Length > 0 && DialogueBox.Current != null && !DialogueBox.IsOpen && TryGetComponent(out Talkable talkable))
         {
-            DialogueBox.Current.Aside(talkable.Speaker, healLines[UnityEngine.Random.Range(0, healLines.Length)]);
+            // A bark: never over a quest or story line, a conversation or a cinematic (it used to cut them off).
+            DialogueBox.Current.Bark(talkable.Speaker, healLines[UnityEngine.Random.Range(0, healLines.Length)]);
         }
     }
 

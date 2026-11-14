@@ -97,7 +97,8 @@ public static class GameInput
     public const int AnswerCount = 9;
 
     // Built once: dialogue reads the answers every frame.
-    private static readonly string[] SkillPaths = { "Player/Skill1", "Player/Skill2", "Player/Skill3", "Player/Skill4", "Player/Skill5" };
+    private static readonly string[] SkillPaths =
+        { "Player/Skill1", "Player/Skill2", "Player/Skill3", "Player/Skill4", "Player/Skill5", "Player/Skill6", "Player/Skill7", "Player/Skill8", "Player/Skill9" };
     private static readonly string[] AnswerPaths =
         { "UI/Answer1", "UI/Answer2", "UI/Answer3", "UI/Answer4", "UI/Answer5", "UI/Answer6", "UI/Answer7", "UI/Answer8", "UI/Answer9" };
 

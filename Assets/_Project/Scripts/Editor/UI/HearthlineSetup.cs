@@ -492,29 +492,107 @@ public static class HearthlineSetup
         }
     }
 
+    /// <summary>Only the skill bar's step, on the SkillHUD prefab (`--entry HearthlineSetup.ApplySkillBar`).</summary>
+    public static string ApplySkillBar()
+    {
+        string path = AssetDatabase.FindAssets("SkillHUD t:Prefab", new[] { PrefabFolder }).Select(AssetDatabase.GUIDToAssetPath)
+            .FirstOrDefault(p => System.IO.Path.GetFileNameWithoutExtension(p) == "SkillHUD");
+        if (path == null)
+        {
+            return "no SkillHUD prefab";
+        }
+
+        GameObject root = PrefabUtility.LoadPrefabContents(path);
+        try
+        {
+            SkillBar(root);
+            PrefabUtility.SaveAsPrefabAsset(root, path);
+            return $"{path}: {root.GetComponentInChildren<SkillBarView>(true).transform.Find("Skill Bar")?.childCount} children on the bar";
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(root);
+        }
+    }
+
+    // The bar of SkillLoadout.SlotCount slots (keys 1-9), each slot drawn at SlotScale of its 64 px design (2026-11-14: 40%
+    // smaller, nine slots where there were five). Slots past the prefab's own are copies of the first, wired into
+    // SkillBarView's list the same way the first is. Scaled, not resized, so its texts and cooldown shrink with it.
+    private const float SlotScale = 0.6f;
+    private const float SlotSize = 64f;
+    private const float SlotStep = 74f;
+
     private static void SkillBar(GameObject root)
     {
         var bar = (RectTransform)root.transform.Find("Skill Bar");
-        bar.sizeDelta = new Vector2(362f, 66f);
-        bar.anchoredPosition = new Vector2(0f, 34f);
+        int count = SkillLoadout.SlotCount;
+        float step = SlotStep * SlotScale;
+        bar.sizeDelta = new Vector2(step * (count - 1) + SlotSize * SlotScale + 2f, SlotSize * SlotScale + 2f);
+        bar.anchoredPosition = new Vector2(0f, 24f);
         foreach (string frame in new[] { "Rim", "Backing", "Inner Rule", "Inner Backing", "Crest", "Crest Inset" })
         {
             Hide(bar, frame);
         }
 
+        var view = root.GetComponentInChildren<SkillBarView>(true);
+        var data = new SerializedObject(view);
+        SerializedProperty list = data.FindProperty("slots");
+        var first = (RectTransform)bar.Find("Skill Slot 1");
+        list.arraySize = Mathf.Max(list.arraySize, count);
+        SerializedProperty model = list.GetArrayElementAtIndex(0);
         UIStyle style = UIStyle.Current;
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < count; i++)
         {
             var slot = (RectTransform)bar.Find($"Skill Slot {i + 1}");
-            slot.anchoredPosition = new Vector2(1f + i * 74f, 0f);
-            slot.sizeDelta = new Vector2(64f, 64f);
+            if (slot == null)
+            {
+                slot = Object.Instantiate(first, bar);
+                slot.name = $"Skill Slot {i + 1}";
+            }
+
+            slot.localScale = new Vector3(SlotScale, SlotScale, 1f);
+            slot.anchoredPosition = new Vector2(1f + i * step, 0f);
+            slot.sizeDelta = new Vector2(SlotSize, SlotSize);
             ((RectTransform)slot.Find("Icon")).sizeDelta = new Vector2(-4f, -4f);
             ((RectTransform)slot.Find("Cooldown")).sizeDelta = new Vector2(-4f, -4f);
             foreach (TMP_Text text in slot.GetComponentsInChildren<TMP_Text>(true))
             {
                 style.OnWorld(text);
             }
+
+            SerializedProperty entry = list.GetArrayElementAtIndex(i);
+            foreach (string field in new[] { "view", "cooldown", "timer", "flash" })
+            {
+                // The same part of this slot as the first slot's entry points at in the first slot.
+                Object like = model.FindPropertyRelative(field).objectReferenceValue;
+                if (like is Component part)
+                {
+                    string relative = RelativePath(first, part.transform);
+                    Transform same = relative == null ? null : relative.Length == 0 ? slot : slot.Find(relative);
+                    entry.FindPropertyRelative(field).objectReferenceValue = same != null ? same.GetComponent(part.GetType()) : null;
+                }
+            }
         }
+
+        list.arraySize = count;
+        data.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static string RelativePath(Transform root, Transform part)
+    {
+        var names = new List<string>();
+        for (Transform at = part; at != null; at = at.parent)
+        {
+            if (at == root)
+            {
+                names.Reverse();
+                return string.Join("/", names);
+            }
+
+            names.Add(at.name);
+        }
+
+        return null;
     }
 
     private static void QuestTracker(GameObject root)

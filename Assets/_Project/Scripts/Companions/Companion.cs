@@ -272,7 +272,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         }
 
         weapon.LandDue();
-        if (Paused || leader.Player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        // Companions wait out an in-game cinematic where they stand (2026-11-14: they had run off to the stones before the
+        // old troll's cinematic was over), then go on with what they were doing.
+        if (Paused || InGameCinematic.HoldsTheWorld || leader.Player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
         {
             Halt();
             body.SetSpeed(0f);
@@ -497,8 +499,10 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
             return;
         }
 
-        CompanionBarks.Spoke(moment, Time.time);
-        DialogueBox.Current.Aside(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), lines[UnityEngine.Random.Range(0, lines.Length)]);
+        if (DialogueBox.Current.Bark(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), lines[UnityEngine.Random.Range(0, lines.Length)]))
+        {
+            CompanionBarks.Spoke(moment, Time.time);
+        }
     }
 
     private bool BlowFromBehindTheLeader()
@@ -636,7 +640,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         string[] thanks = resident != null && resident.FightLines.helpedUp.Length > 0 ? resident.FightLines.helpedUp : definition.FightLines?.helpedUp;
         if (thanks != null && thanks.Length > 0 && DialogueBox.Current != null)
         {
-            DialogueBox.Current.Aside(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), thanks[UnityEngine.Random.Range(0, thanks.Length)]);
+            DialogueBox.Current.Bark(talkable != null ? talkable.Speaker : new DialogueSpeaker(DisplayName, transform), thanks[UnityEngine.Random.Range(0, thanks.Length)]);
         }
     }
 

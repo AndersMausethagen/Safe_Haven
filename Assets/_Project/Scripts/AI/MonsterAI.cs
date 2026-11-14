@@ -437,6 +437,14 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             return;
         }
 
+        // Nothing starts a move or a blow while an in-game cinematic has the camera (the user, 2026-11-14: "have enemies stop
+        // attacking during cinematic"): a swing or stagger already under way finishes above, then it stands and waits.
+        if (InGameCinematic.HoldsTheWorld)
+        {
+            movement.Stop();
+            return;
+        }
+
         // Game runs instead of fighting (MonsterAI.Timid).
         if (UpdateTimid())
         {

@@ -223,7 +223,7 @@ public static class Cheats
 
     public static string GrantExperience(int amount)
     {
-        ExperienceTracker.GrantInsight(amount);
+        ExperienceTracker.GrantInsightExactly(amount);
         return Did("Insight", $"{amount} Insight to put into a skill ({{key:Talents}}).");
     }
 

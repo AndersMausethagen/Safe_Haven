@@ -1899,13 +1899,13 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d89caf7801af.wav"
  },
  {
-  "id": "21df7a00a9af",
+  "id": "f891827d0a5e",
   "voice": "runa",
-  "text": "As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.",
+  "text": "As it happens. There is a boar out on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring it down.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/21df7a00a9af.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/f891827d0a5e.wav"
  },
  {
   "id": "eeb952b8fed5",
@@ -1917,13 +1917,13 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/eeb952b8fed5.wav"
  },
  {
-  "id": "64ff1b055945",
+  "id": "d968fc4473b3",
   "voice": "runa",
-  "text": "Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
+  "text": "The boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
   "engine": "acted",
   "mood": "Neutral",
   "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/64ff1b055945.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/d968fc4473b3.wav"
  },
  {
   "id": "786ca2a1ec9d",
@@ -2115,19 +2115,6 @@
   }
  },
  {
-  "id": "8a27c131194d",
-  "voice": "runa",
-  "text": "It hasn't seen us yet. It will smell the smoke soon enough.",
-  "engine": "acted",
-  "mood": "Calm",
-  "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8a27c131194d.wav",
-  "emotion": {
-   "afraid": 0.3,
-   "calm": 0.2
-  }
- },
- {
   "id": "1bfebe52b185",
   "voice": "runa",
   "text": "Liv.",
@@ -2205,6 +2192,19 @@
   "mood": "Stern",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/03b14bc0c556.wav"
+ },
+ {
+  "id": "8a27c131194d",
+  "voice": "runa",
+  "text": "It hasn't seen us yet. It will smell the smoke soon enough.",
+  "engine": "acted",
+  "mood": "Calm",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/runa/8a27c131194d.wav",
+  "emotion": {
+   "afraid": 0.3,
+   "calm": 0.2
+  }
  },
  {
   "id": "bcb862eb293e",
@@ -2582,6 +2582,15 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/391fef0a2269.wav"
  },
  {
+  "id": "94054449dce8",
+  "voice": "sigrid",
+  "text": "The road east is clear as far as the cart. Keep your eyes on the tree line, and stay close to the fire tonight.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/94054449dce8.wav"
+ },
+ {
   "id": "db123fc78aab",
   "voice": "sigrid",
   "text": "The woods have names again. That is a start.",
@@ -2589,6 +2598,24 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db123fc78aab.wav"
+ },
+ {
+  "id": "58ea14aa65ff",
+  "voice": "sigrid",
+  "text": "We set out at first light. Before that, is there anything you want to know about where we are going?",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/58ea14aa65ff.wav"
+ },
+ {
+  "id": "2b9edcedb588",
+  "voice": "sigrid",
+  "text": "You're up. Good. The fire needs wood, and the stones need waking. Sit with me a while first.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/2b9edcedb588.wav"
  },
  {
   "id": "59bb2faac379",
@@ -2600,15 +2627,6 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/59bb2faac379.wav"
  },
  {
-  "id": "37b5ff1bb70c",
-  "voice": "sigrid",
-  "text": "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Byarna, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.",
-  "engine": "acted",
-  "mood": "Stern",
-  "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/37b5ff1bb70c.wav"
- },
- {
   "id": "6ec4a4d98c7d",
   "voice": "sigrid",
   "text": "The packs are tied and the fire is nearly out. Ingrid's party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?",
@@ -2616,6 +2634,15 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/6ec4a4d98c7d.wav"
+ },
+ {
+  "id": "65f136b2b6e6",
+  "voice": "sigrid",
+  "text": "The rock shelter is along the old road, not far in. Go on, we are right behind you.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/65f136b2b6e6.wav"
  },
  {
   "id": "4c2744958650",
@@ -2897,17 +2924,6 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8f8c51a7519c.wav"
  },
  {
-  "id": "097d5b4eb70a",
-  "voice": "sigrid",
-  "text": "Leave the fire! Take the old path north, to the standing stones. Now!",
-  "engine": "acted",
-  "mood": "Yelling",
-  "effects": {
-   "gain": 3.0
-  },
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/097d5b4eb70a.wav"
- },
- {
   "id": "52d4678c991e",
   "voice": "sigrid",
   "text": "Liv. Of course. Eleven years I have known her, and for a moment there was a hole where her name should be.",
@@ -2928,19 +2944,6 @@
   "mood": "Stern",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bcc9a3c2faa5.wav"
- },
- {
-  "id": "db2f97f49a82",
-  "voice": "sigrid",
-  "text": "That is no thunder. An old one, a mountain troll, and it is walking towards our fire.",
-  "engine": "acted",
-  "mood": "Stern",
-  "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db2f97f49a82.wav",
-  "emotion": {
-   "afraid": 0.35,
-   "angry": 0.15
-  }
  },
  {
   "id": "18434bb5a0bd",
@@ -2977,13 +2980,13 @@
   }
  },
  {
-  "id": "b60cc7da801d",
+  "id": "0dea2076e3a3",
   "voice": "sigrid",
-  "text": "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the rain to put out.",
+  "text": "I can see that. Light your torches, and take this one.",
   "engine": "acted",
   "mood": "Stern",
   "effects": {},
-  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/b60cc7da801d.wav"
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/0dea2076e3a3.wav"
  },
  {
   "id": "e1ef4f263cca",
@@ -2993,6 +2996,17 @@
   "mood": "Stern",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/e1ef4f263cca.wav"
+ },
+ {
+  "id": "097d5b4eb70a",
+  "voice": "sigrid",
+  "text": "Leave the fire! Take the old path north, to the standing stones. Now!",
+  "engine": "acted",
+  "mood": "Yelling",
+  "effects": {
+   "gain": 3.0
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/097d5b4eb70a.wav"
  },
  {
   "id": "1b12cd47c900",
@@ -3020,6 +3034,28 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/42e6f20d62cf.wav"
+ },
+ {
+  "id": "db2f97f49a82",
+  "voice": "sigrid",
+  "text": "That is no thunder. An old one, a mountain troll, and it is walking towards our fire.",
+  "engine": "acted",
+  "mood": "Stern",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/db2f97f49a82.wav",
+  "emotion": {
+   "afraid": 0.35,
+   "angry": 0.15
+  }
+ },
+ {
+  "id": "37b5ff1bb70c",
+  "voice": "sigrid",
+  "text": "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Byarna, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.",
+  "engine": "acted",
+  "mood": "Stern",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/37b5ff1bb70c.wav"
  },
  {
   "id": "3e8d9f9c4e28",
@@ -3056,6 +3092,16 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9c66c89507e9.wav"
+ },
+ {
+  "id": "03b12203310a",
+  "voice": "portal_g_mysterious",
+  "text": "Warmth stirs in the old stone.\nLittle one.\nYou fell out of the dark with the whole forest at your heels, and I caught you.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/03b12203310a.wav",
+  "direction": "Calm"
  },
  {
   "id": "342d4e0a9589",

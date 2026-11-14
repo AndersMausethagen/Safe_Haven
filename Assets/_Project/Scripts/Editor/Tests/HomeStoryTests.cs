@@ -107,9 +107,15 @@ public sealed class HomeStoryTests
     [Test]
     public void TheFirstDays_AreHavenQuests_BesideTheStory()
     {
-        CollectionAssert.AreEqual(new[] { Quest("FirstCamp") }, Quest("PrimitiveTools").Prerequisites, "tools once the fire burns");
-        CollectionAssert.AreEqual(new[] { Quest("FirstCamp") }, Quest("FoodAndWater").Prerequisites, "food once the fire burns");
-        CollectionAssert.AreEqual(new[] { Quest("AwakeningThePortal") }, Quest("ARoofForTheWork").Prerequisites, "the workshop once the door is awake");
+        // One beat at a time (the user, 2026-11-14: "we get overwhelmed with quests"): nothing beside the story before the door
+        // wakes, the tools half a minute after it, food after the tools, the workshop home from the first raid.
+        CollectionAssert.AreEqual(new[] { Quest("AwakeningThePortal") }, Quest("PrimitiveTools").Prerequisites, "tools once the door is awake");
+        Assert.Greater(Quest("PrimitiveTools").StartDelay, 0f, "a breather after the door");
+        CollectionAssert.AreEqual(new[] { Quest("PrimitiveTools") }, Quest("FoodAndWater").Prerequisites, "food after the tools");
+        CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal"), Quest("PrimitiveTools") }, Quest("ARoofForTheWork").Prerequisites, "the workshop home from the first raid, with tools for its oak and stone");
+        CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal") }, Quest("KnowYourEnemy").Prerequisites);
+        CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("SmithsRequest").Prerequisites, "the smith's note once there is a workshop");
+        Assert.Greater(Quest("FirstWeapon").StartDelay, 0f, "the club a while after the chest");
         CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("SafeKeeping").Prerequisites);
         CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("FirstWeapon").Prerequisites);
         foreach (string file in new[] { "PrimitiveTools", "FoodAndWater", "ARoofForTheWork", "SafeKeeping", "FirstWeapon" })

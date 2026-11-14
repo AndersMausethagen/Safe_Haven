@@ -86,7 +86,7 @@ public sealed partial class PlayerCombat
     // Focus pays for the art; short of it, stamina does (Combat Technique Settings › Art Stamina Without Focus). It used to
     // be Focus alone, and guard-then-attack turned into a plain swing most of the time.
     private bool CanAffordArt => weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
-        && (focus == null || focus.CanSpend(weapon.WeaponArtFocus) || stamina == null || stamina.Current >= CostOfArtOnStamina());
+        && (focus == null || focus.CanSpend(weapon.WeaponArtFocus) || stamina == null || stamina.Current >= stamina.Scaled(CostOfArtOnStamina()));
 
     private float CostOfArtOnStamina() => Rules.ArtStaminaWithoutFocus * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
 
@@ -134,7 +134,7 @@ public sealed partial class PlayerCombat
         {
             float credit = CostOf(SwingKind.Light, activeAttack);
             float extra = Mathf.Max(0f, CostOf(SwingKind.Heavy, weapon.HeavyAttack) - credit);
-            if (stamina != null && stamina.Current < extra)
+            if (stamina != null && stamina.Current < stamina.Scaled(extra))
             {
                 return;
             }

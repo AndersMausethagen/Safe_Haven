@@ -19,3 +19,5 @@ MonoBehaviour:
   shieldBashCost: 18
   dodgeCost: 25
   swimCostPerSecond: 7
+  actionCostScale: 0.85
+  parryReturn: 0.2

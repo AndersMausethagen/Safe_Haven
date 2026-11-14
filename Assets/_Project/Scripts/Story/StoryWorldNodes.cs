@@ -640,8 +640,9 @@ public sealed class WalkPartyNode : StoryNode
             return true;
         }
 
+        // A cinematic holding the player (a shot of the party walking) is not the player falling behind: they walk on.
         Vector3 here = walk.Position;
-        if (waitForPlayer > 0f && player != null && Flat(player.transform.position - here) > waitForPlayer && Behind(walk, player))
+        if (waitForPlayer > 0f && player != null && !InGameCinematic.IsPlaying && Flat(player.transform.position - here) > waitForPlayer && Behind(walk, player))
         {
             return true;
         }

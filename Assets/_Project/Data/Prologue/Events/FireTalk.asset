@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Talk by the Morning Fire
   objectiveText: 
   notes: 
+  homeOnly: 0

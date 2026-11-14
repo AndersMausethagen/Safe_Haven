@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Took a Blow Well in the Lesson
   objectiveText: 
   notes: 
+  homeOnly: 0

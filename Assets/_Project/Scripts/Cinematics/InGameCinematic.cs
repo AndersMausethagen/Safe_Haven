@@ -28,6 +28,9 @@ public sealed class InGameCinematic : MonoBehaviour
     [SerializeField] private bool hideHud = true;
     [Tooltip("The player can't move or be hurt while it plays.")]
     [SerializeField] private bool holdPlayer = true;
+    [Tooltip("Enemies start no move or blow and companions stand where they are while it plays (a swing already under way " +
+             "finishes). Off for a shot of the party walking.")]
+    [SerializeField] private bool holdTheWorld = true;
     [Tooltip("Holding Space (or the pad's A) ends it early. The story goes on as written; only the camera comes home.")]
     [SerializeField] private bool skippable = true;
     [Tooltip("Lifts the dark (night, unexplored ground) this many metres round each shot's subject so it can be seen. 0: off.")]
@@ -52,6 +55,9 @@ public sealed class InGameCinematic : MonoBehaviour
 
     /// <summary>True while any in-game cinematic has the camera.</summary>
     public static bool IsPlaying => playing != null;
+
+    /// <summary>True while the cinematic playing holds enemies and companions still (Hold The World).</summary>
+    public static bool HoldsTheWorld => playing != null && playing.holdTheWorld;
 
     public bool IsRunning => running != null;
 

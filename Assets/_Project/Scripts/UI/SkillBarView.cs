@@ -65,6 +65,7 @@ public sealed class SkillBarView : MonoBehaviour
     // Each slot shows the key or button that casts it.
     private void OnKeysChanged()
     {
+        FadeForWindows();
         if (skills == null)
         {
             return;
@@ -183,6 +184,7 @@ public sealed class SkillBarView : MonoBehaviour
             }
         }
 
+        FadeForWindows();
         if (skills == null)
         {
             return;
@@ -237,6 +239,25 @@ public sealed class SkillBarView : MonoBehaviour
             {
                 slot.flashUntil = -1f;
             }
+        }
+    }
+
+    // Out of the way while a window covers the screen (as the rest of the HUD, HudGivesWay), except the bag and the character
+    // sheet: putting things on the bar from the bag (hover, then a number key) shows where they went.
+    private void FadeForWindows()
+    {
+        if (group == null || bound == null)
+        {
+            return;
+        }
+
+        UIStateManager ui = UIStateManager.Current;
+        bool hide = HudGivesWay.Covered && !(ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character));
+        float target = hide ? 0f : 1f;
+        if (group.alpha != target)
+        {
+            group.alpha = Mathf.MoveTowards(group.alpha, target, Time.unscaledDeltaTime * 7f);
+            group.blocksRaycasts = group.alpha > 0.5f;
         }
     }
 

@@ -117,7 +117,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             {
                 waiting.RemoveAt(i);
             }
-            else if (Pacing.CanStart(entry.ReadyAt, now, rules))
+            else if (entry.Quest.StartsInAFight ? now >= entry.ReadyAt : Pacing.CanStart(entry.ReadyAt, now, rules))
             {
                 waiting.RemoveAt(i);
                 Log.TryStart(entry.Quest);
@@ -137,7 +137,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         StoryPacingSettings rules = StoryPacingSettings.Current;
         float readyAt = Pacing.ReadyAt(quest.StartDelay, Time.time, rules);
-        if (Pacing.CanStart(readyAt, Time.time, rules))
+        if (quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules))
         {
             Log.TryStart(quest);
         }

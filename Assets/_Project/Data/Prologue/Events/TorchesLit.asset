@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Torches Lit
   objectiveText: 
   notes: 
+  homeOnly: 0

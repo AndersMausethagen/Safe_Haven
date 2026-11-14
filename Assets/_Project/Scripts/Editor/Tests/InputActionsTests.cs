@@ -92,7 +92,7 @@ public sealed class InputActionsTests : InputTestFixture
             (Key.Tab, GameInput.ToggleCombat), (Key.Z, GameInput.SwapWeapon), (Key.L, GameInput.ToggleTorch),
             (Key.Digit1, GameInput.Skill(0)), (Key.Digit2, GameInput.Skill(1)), (Key.Digit3, GameInput.Skill(2)),
             (Key.Digit4, GameInput.Skill(3)), (Key.Digit5, GameInput.Skill(4)), (Key.Numpad1, GameInput.Skill(0)),
-            (Key.Numpad5, GameInput.Skill(4)), (Key.F, GameInput.QuickItems), (Key.LeftAlt, GameInput.CommandWheel),
+            (Key.Numpad5, GameInput.Skill(4)), (Key.Digit6, GameInput.Skill(5)), (Key.Digit9, GameInput.Skill(8)), (Key.Numpad9, GameInput.Skill(8)), (Key.F, GameInput.QuickItems), (Key.LeftAlt, GameInput.CommandWheel),
             (Key.I, GameInput.Inventory), (Key.B, GameInput.Items), (Key.K, GameInput.Skills), (Key.C, GameInput.Character),
             (Key.G, GameInput.Build), (Key.N, GameInput.Talents), (Key.H, GameInput.Haven), (Key.M, GameInput.WorldMap),
             (Key.V, GameInput.CameraToggleStyle), (Key.LeftShift, GameInput.BuildFineRotate), (Key.LeftAlt, GameInput.BuildFreePlace),

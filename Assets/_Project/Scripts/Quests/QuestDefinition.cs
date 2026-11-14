@@ -79,6 +79,9 @@ public sealed class QuestDefinition : ScriptableObject
     [Tooltip("Automatically and On Quest Event: seconds to wait once it is ready, for a beat of its own (a breather before a big moment). " +
              "0 uses Between Quests (Systems Editor › World › Story Pacing). Either way it also waits out a fight and anyone talking.")]
     [SerializeField, Min(0f)] private float startDelay;
+    [Tooltip("Starts as soon as its delay is up, even in a fight or a conversation (Story Pacing otherwise holds it back, up to its " +
+             "Longest Hold): for a quest that is the fight, such as holding the stones while the old troll comes.")]
+    [SerializeField] private bool startsInAFight;
     [Tooltip("Custom events raised when this quest starts. Use them to drive scene listeners, weather, music and other quests.")]
     [SerializeField, RaisedByGame] private List<GameEventDefinition> onStarted = new List<GameEventDefinition>();
 
@@ -122,6 +125,7 @@ public sealed class QuestDefinition : ScriptableObject
     public QuestObjective StartWhen => startWhen;
     public QuestDefinition ClosedBy => closedBy;
     public float StartDelay => startDelay;
+    public bool StartsInAFight => startsInAFight;
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;

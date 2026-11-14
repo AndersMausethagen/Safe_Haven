@@ -113,8 +113,18 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
     }
 
-    /// <summary>Gives Insight now (an experience stone, a story, a quest): experience the player puts into any skill.</summary>
+    /// <summary>Gives Insight now (an experience stone, a story, a quest): experience the player puts into any skill. The
+    /// listed amount is scaled by LevelingSettings › Insight Scale; fractions are kept until they add up.</summary>
     public static void GrantInsight(int amount)
+    {
+        if (amount > 0)
+        {
+            GrantInsightShare(amount);
+        }
+    }
+
+    /// <summary>Insight exactly as given, unscaled (the cheat menu).</summary>
+    public static void GrantInsightExactly(int amount)
     {
         if (amount <= 0)
         {
@@ -124,6 +134,11 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         GameSession.Progress.AddInsight(amount);
         Gained?.Invoke(null, amount);
     }
+
+    /// <summary>What a listed Insight reward is really worth, for text that names the amount.</summary>
+    public static int InsightWorth(int listed) => Mathf.Max(listed > 0 ? 1 : 0, Mathf.RoundToInt(listed * InsightScale));
+
+    private static float InsightScale => Rules != null ? Rules.InsightScale : 1f;
 
     /// <summary>
     /// Practice of a skill at a place or node of <paramref name="tier"/>: <paramref name="baseAmount"/> experience before the
@@ -142,7 +157,8 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
         LevelingSettings rules = Rules;
         CharacterProgress progress = GameSession.Progress;
-        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), false) * Boost(skill);
+        float amount = baseAmount * rules.Multiplier(tier, progress.LevelOf(skill, rules), false) * Boost(skill)
+                       / Mathf.Max(0.01f, rules.PracticeTimeScale);
         Practised?.Invoke(skill, amount);
         // On a raid the bonus share waits for the way home: kept on extraction, lost otherwise.
         float bonus = onRaid ? amount * (rules.RaidMultiplier - 1f) : 0f;
@@ -257,16 +273,17 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     /// <summary>Insight from something worth a fraction of a point (a blow no skill trains): kept until it adds up.</summary>
     public static void GrantInsightShare(float amount)
     {
+        amount *= InsightScale;
         if (Current == null)
         {
-            GrantInsight(Mathf.RoundToInt(amount));
+            GrantInsightExactly(Mathf.RoundToInt(amount));
             return;
         }
 
         Current.carriedInsight += Mathf.Max(0f, amount);
         int whole = Mathf.FloorToInt(Current.carriedInsight);
         Current.carriedInsight -= whole;
-        GrantInsight(whole);
+        GrantInsightExactly(whole);
     }
 
     /// <summary>

@@ -5,6 +5,16 @@ using UnityEngine;
 /// <summary>Edit Mode tests for hunger and thirst (GDD §11): the meters, the settings' helper numbers and eating.</summary>
 public sealed class SurvivalTests
 {
+    // The Haven's lakes and rivers gave no waterskin for a week after its one Drinking Spot was removed (found 2026-11-14).
+    [Test]
+    public void OpenWater_HandsOutAWaterContainer()
+    {
+        SurvivalSettings settings = SurvivalSettings.Current;
+        Assert.NotNull(settings.OpenWaterFillItem, "Survival Settings › Open Water Fill Item");
+        Assert.IsTrue(settings.OpenWaterFillItem.HoldsWater, "it holds water");
+        Assert.Greater(settings.OpenWaterFillUpTo, 0);
+    }
+
     private readonly List<Object> created = new List<Object>();
 
     [TearDown]

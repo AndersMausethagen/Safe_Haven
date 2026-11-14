@@ -485,6 +485,30 @@ public sealed class PrologueMeadowTests
         }
     }
 
+    // The hunt went back to "two blight boar" after a Data rebuild (2026-11-14): only BuildPrologueBoar knew it was one Boar.
+    [Test]
+    public void TheHunt_IsOneOrdinaryBoar()
+    {
+        QuestDefinition hunt = Quest("HuntForThePot");
+        var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/Boar.asset");
+        Assert.AreEqual(1, hunt.Objectives.Count);
+        Assert.AreEqual(monster, new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("monster").objectReferenceValue);
+        Assert.AreEqual(1, hunt.Objectives[0].Amount);
+        StringAssert.DoesNotContain("blight", (hunt.Description + new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue).ToLowerInvariant());
+
+        var scene = EditorSceneManager.OpenPreviewScene(ScenePath);
+        try
+        {
+            MobSpawnZone zone = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Meadow Boars");
+            Assert.AreEqual(new Vector2Int(1, 1), new SerializedObject(zone).FindProperty("count").vector2IntValue);
+            Assert.AreEqual("ExpeditionBoar", zone.Entries[0].prefab.name);
+        }
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(scene);
+        }
+    }
+
     [Test]
     public void SavedScene_HasTheNewBeats()
     {

@@ -41,7 +41,7 @@ MonoBehaviour:
     nextWaveText: 
   - quest: {fileID: 11400000, guid: 0279feb93b7c8b74e9fd8683d9d10fd3, type: 2}
     behaviour: 0
-    arrivalText: That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.
+    arrivalText: The rock shelter is along the old road, not far in. Go on, we are right behind you.
     statusText: 
     duration: 0
     initialEnemies: 0

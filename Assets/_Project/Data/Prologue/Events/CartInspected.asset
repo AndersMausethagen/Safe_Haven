@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Looked Over the Cart
   objectiveText: 
   notes: 
+  homeOnly: 0

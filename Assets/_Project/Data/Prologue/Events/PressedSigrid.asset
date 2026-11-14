@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Pressed Sigrid About the Stones
   objectiveText: 
   notes: 
+  homeOnly: 0

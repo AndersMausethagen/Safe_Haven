@@ -62,6 +62,8 @@ MonoBehaviour:
   insightFullBelow: 20
   insightShareAbove: 0.5
   insightStep: 100
+  insightScale: 0.2
+  practiceTimeScale: 1.3
   titles:
   - totalLevel: 13
     name: Newcomer

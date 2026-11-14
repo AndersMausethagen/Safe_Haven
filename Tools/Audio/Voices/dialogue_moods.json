@@ -2802,5 +2802,47 @@
   "text": "I can see that. Light your torches. You, take this: fireflies in a jar. No flame for the r",
   "mood": "Stern",
   "by": "direction"
+ },
+ "f891827d0a5e": {
+  "speaker": "Runa",
+  "text": "As it happens. There is a boar out on the grass north of the road, east of the camp, which",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d968fc4473b3": {
+  "speaker": "Runa",
+  "text": "The boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "94054449dce8": {
+  "speaker": "Sigrid",
+  "text": "The road east is clear as far as the cart. Keep your eyes on the tree line, and stay close",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "58ea14aa65ff": {
+  "speaker": "Sigrid",
+  "text": "We set out at first light. Before that, is there anything you want to know about where we ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2b9edcedb588": {
+  "speaker": "Sigrid",
+  "text": "You're up. Good. The fire needs wood, and the stones need waking. Sit with me a while firs",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "65f136b2b6e6": {
+  "speaker": "Sigrid",
+  "text": "The rock shelter is along the old road, not far in. Go on, we are right behind you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "03b12203310a": {
+  "speaker": "The Portal",
+  "text": "Warmth stirs in the old stone. Little one. You fell out of the dark with the whole forest ",
+  "mood": "Calm",
+  "by": "kind"
  }
 }

@@ -142,7 +142,11 @@ public sealed class WaterSurface : MonoBehaviour
         place.transform.SetParent(transform, false);
         place.AddComponent<WaterShore>().Configure(this);
         var source = place.AddComponent<WaterSource>();
-        source.Configure(string.IsNullOrWhiteSpace(drinkName) ? (still ? "Lake" : "River") : drinkName, drinkAmount, fillItem, fillUpTo);
+        // A surface with no Fill Item of its own hands out the game's (Survival Settings › Open Water).
+        SurvivalSettings rules = SurvivalSettings.Current;
+        bool own = fillItem != null;
+        source.Configure(string.IsNullOrWhiteSpace(drinkName) ? (still ? "Lake" : "River") : drinkName, drinkAmount,
+            own ? fillItem : rules != null ? rules.OpenWaterFillItem : null, own ? fillUpTo : rules != null ? rules.OpenWaterFillUpTo : 0);
         place.GetComponent<Interactable>().Configure(InteractionAnimation.GatherLow, DrinkSeconds, DrinkReach, false);
     }
 

@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: A Name Went Missing by the Fire
   objectiveText: 
   notes: 
+  homeOnly: 0

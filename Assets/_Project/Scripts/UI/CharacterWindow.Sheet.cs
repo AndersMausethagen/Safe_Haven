@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
 /// The character window as a sheet (Hearthline 3, the UI kit, after the user's reference picture): wider, the player's
-/// name in the display face over a live portrait between the gear columns, and the stats as cards with an icon on each
+/// name in the display face over a portrait between the gear columns (a still, idle stand-in in the worn gear), and the stats as cards with an icon on each
 /// line: Attributes, Offense, Resistances (two by two) and Gathering. The gear slots, their dragging and tooltips are the
 /// window's own and unchanged; the old stats label is kept up to date but hidden. Laid out once, the first time it opens.
 /// </summary>
@@ -28,8 +29,11 @@ public sealed partial class CharacterWindow
     private KitStatRow weaponRow;
     private readonly KitStatRow[] resistanceRows = new KitStatRow[4];
     private readonly KitStatRow[] toolRows = new KitStatRow[3];
-    private RenderTexture portraitTexture;
-    private Camera portraitCamera;
+    private RawImage portraitPicture;
+    private CharacterPreviewStage portraitStage;
+    private readonly List<GearLookDefinition> portraitLooks = new List<GearLookDefinition>();
+    private readonly List<GearLookDefinition> portraitWorn = new List<GearLookDefinition>();
+    private int portraitFrames;
 
     private void BuildSheet()
     {
@@ -63,10 +67,8 @@ public sealed partial class CharacterWindow
         inner.offsetMin = new Vector2(5f, 5f);
         inner.offsetMax = new Vector2(-5f, -5f);
         inner.gameObject.AddComponent<RectMask2D>();
-        var picture = CodeUI.Stretch("Render", inner).gameObject.AddComponent<RawImage>();
-        portraitTexture = new RenderTexture(600, 640, 24) { name = "Character Portrait" };
-        picture.texture = portraitTexture;
-        picture.raycastTarget = false;
+        portraitPicture = CodeUI.Stretch("Render", inner).gameObject.AddComponent<RawImage>();
+        portraitPicture.raycastTarget = false;
         HearthKit.Rim(frame, 0.85f, 1.5f).transform.SetAsLastSibling();
 
         RectTransform attributes = HearthKit.Card(window, "Attributes", StatsX, 64f, StatsWidth, 150f);
@@ -153,7 +155,9 @@ public sealed partial class CharacterWindow
         }
     }
 
-    // The live portrait: a camera before the player, at chest height, only while the window is open.
+    // The portrait (the user, 2026-11-14: "no animation, just an idle pose"): the character creation screen's stand-in, in
+    // the player's look and worn gear, before the painted backdrop. It plays its idle for a few frames to settle into the
+    // pose, then holds still. Held things (a weapon in hand, the lantern) are not shown: the stand-in wears looks only.
     private void LateUpdate()
     {
         if (!sheetBuilt || equipment == null)
@@ -161,32 +165,72 @@ public sealed partial class CharacterWindow
             return;
         }
 
-        if (portraitCamera == null)
+        if (portraitStage == null)
         {
-            var holder = new GameObject("Character Portrait Camera");
-            holder.transform.SetParent(transform, false);
-            portraitCamera = holder.AddComponent<Camera>();
-            portraitCamera.targetTexture = portraitTexture;
-            portraitCamera.fieldOfView = 30f;
-            portraitCamera.nearClipPlane = 0.2f;
-            portraitCamera.farClipPlane = 80f;
+            portraitStage = CharacterPreviewStage.Create(600, 640);
+            portraitPicture.texture = portraitStage.Texture;
+            PortraitStage.On(portraitStage.View, "CharacterBackdrop", portraitStage.Model);
+            portraitWorn.Clear();
+            portraitWorn.Add(null); // never matches: dress on the first frame
+            portraitFrames = 0;
         }
 
-        // Hearthline 3: the player before a painted backdrop, not the world behind them (PortraitStage).
-        PortraitStage.On(portraitCamera, "CharacterBackdrop", equipment.transform);
+        DressPortrait();
+        if (portraitFrames < 4 && ++portraitFrames == 4)
+        {
+            portraitStage.Still(true);
+        }
+    }
 
-        portraitCamera.enabled = true;
-        Transform body = equipment.transform;
-        Vector3 look = body.position + Vector3.up * 1.05f;
-        portraitCamera.transform.position = look + body.forward * 3.6f + body.right * 0.6f + Vector3.up * 0.25f;
-        portraitCamera.transform.LookAt(look);
+    private void DressPortrait()
+    {
+        ModularCharacter body = equipment.GetComponentInChildren<ModularCharacter>();
+        CharacterAppearance look = body != null && body.Appearance != null ? body.Appearance : GameSession.Appearance;
+        if (look == null)
+        {
+            return;
+        }
+
+        int clothes = look.clothes;
+        PlayerLook.Outfit(slot =>
+        {
+            ItemStack stack = equipment.Gear.Get(slot);
+            return stack.IsEmpty ? null : stack.Item;
+        }, clothes, portraitLooks);
+        if (Same(portraitLooks, portraitWorn))
+        {
+            return;
+        }
+
+        portraitWorn.Clear();
+        portraitWorn.AddRange(portraitLooks);
+        portraitStage.Show(look, portraitLooks.ToArray());
+    }
+
+    private static bool Same(List<GearLookDefinition> a, List<GearLookDefinition> b)
+    {
+        if (a.Count != b.Count)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < a.Count; i++)
+        {
+            if (a[i] != b[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void HidePortrait()
     {
-        if (portraitCamera != null)
+        if (portraitStage != null)
         {
-            portraitCamera.enabled = false;
+            Destroy(portraitStage.gameObject);
+            portraitStage = null;
         }
     }
 }

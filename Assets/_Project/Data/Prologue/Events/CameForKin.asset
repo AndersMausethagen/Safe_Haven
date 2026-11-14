@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Came for Someone
   objectiveText: 
   notes: 
+  homeOnly: 0

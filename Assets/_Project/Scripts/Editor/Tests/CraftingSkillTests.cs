@@ -146,7 +146,7 @@ public sealed class CraftingSkillTests
         {
             ExperienceTracker.PractiseCraft(recipe);
             int tier = Mathf.Max(1, recipe.Output.Tier);
-            float expected = settings.TierExperience(tier) * settings.CraftWork(CraftedGoods.Weapons);
+            float expected = settings.TierExperience(tier) * settings.CraftWork(CraftedGoods.Weapons) / settings.PracticeTimeScale;
             Assert.AreEqual(Mathf.FloorToInt(expected), GameSession.Progress.ExperienceOf(skill));
         }
         finally

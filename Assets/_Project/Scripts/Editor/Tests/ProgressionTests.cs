@@ -156,12 +156,13 @@ public sealed class ProgressionTests
         GameSession.StartNewGame();
         try
         {
+            // Practice Time Scale stretches every level (1.3 since 2026-11-14): what is practised counts for that much less.
             ExperienceTracker.Practise(woodcutting, 1, settings.TierExperience(1));
-            Assert.AreEqual(10, GameSession.Progress.ExperienceOf(woodcutting));
+            Assert.AreEqual(Mathf.FloorToInt(10f / settings.PracticeTimeScale), GameSession.Progress.ExperienceOf(woodcutting));
             Assert.AreEqual(0, GameSession.Progress.Insight);
 
             ExperienceTracker.Practise(ProficiencyTraining.Archery, 1, 10f);
-            Assert.AreEqual(10, GameSession.Progress.ExperienceOf(settings.SkillTrainedBy(ProficiencyTraining.Archery)), "a kind of practice trains its skill");
+            Assert.AreEqual(Mathf.FloorToInt(10f / settings.PracticeTimeScale), GameSession.Progress.ExperienceOf(settings.SkillTrainedBy(ProficiencyTraining.Archery)), "a kind of practice trains its skill");
             Assert.AreEqual(0, GameSession.Progress.Insight);
         }
         finally
@@ -183,7 +184,7 @@ public sealed class ProgressionTests
             GameSession.Settlement.NoteBuilt(smithing.Mentor, 3);
             Assert.AreEqual(1.1f, ExperienceTracker.Boost(smithing), 0.0001f, "two tiers above I: +10%");
             ExperienceTracker.Practise(smithing, 1, 10f, false);
-            Assert.AreEqual(11, GameSession.Progress.ExperienceOf(smithing));
+            Assert.AreEqual(Mathf.FloorToInt(11f / settings.PracticeTimeScale), GameSession.Progress.ExperienceOf(smithing));
         }
         finally
         {
@@ -369,9 +370,12 @@ public sealed class ProgressionTests
         try
         {
             ExperienceTracker.Practise(skill, 1, 20f);
-            CollectionAssert.AreEqual(new[] { 20f }, practised, "practice is announced for friends to watch");
-            ExperienceTracker.LearnByWatching(skill, 20f * settings.WatchShare);
-            Assert.AreEqual(25, GameSession.Progress.ExperienceOf(skill));
+            float done = 20f / settings.PracticeTimeScale;
+            Assert.AreEqual(1, practised.Count, "practice is announced for friends to watch");
+            Assert.AreEqual(done, practised[0], 0.001f);
+            ExperienceTracker.LearnByWatching(skill, done * settings.WatchShare);
+            // Each is paid in whole points (no tracker in an edit-mode test keeps the fractions).
+            Assert.AreEqual(Mathf.FloorToInt(done) + Mathf.FloorToInt(done * settings.WatchShare), GameSession.Progress.ExperienceOf(skill));
             Assert.AreEqual(1, practised.Count, "what was watched is not announced again, so it can't echo");
         }
         finally

@@ -25,4 +25,6 @@ MonoBehaviour:
   parchedRegeneration: 0.75
   parchedCombatRegeneration: 0.5
   mealSlots: 2
+  openWaterFillItem: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+  openWaterFillUpTo: 1
   drankAtWater: {fileID: 11400000, guid: bb15b74aea6e5ba48a6c5fff9cafe3ca, type: 2}

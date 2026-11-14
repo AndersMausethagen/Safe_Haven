@@ -23,7 +23,7 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+  - {fileID: 11400000, guid: 2614c1d189f3a034691f98f3d3efeee0, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -49,7 +49,8 @@ MonoBehaviour:
     bringHome: 0
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
-  startDelay: 0
+  startDelay: 30
+  startsInAFight: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:

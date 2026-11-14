@@ -27,7 +27,7 @@ public sealed class SkillTests
     public void LoadoutHasFiveEmptySlots()
     {
         var loadout = new SkillLoadout();
-        Assert.AreEqual(5, SkillLoadout.SlotCount);
+        Assert.AreEqual(9, SkillLoadout.SlotCount);
         Assert.AreEqual(0, loadout.FirstEmptySlot());
         Assert.IsNull(loadout.Get(4));
         Assert.IsNull(loadout.Get(5));
@@ -72,7 +72,7 @@ public sealed class SkillTests
             Assert.AreEqual(bread, loadout.GetItem(1));
             Assert.IsNull(loadout.GetItem(2), "only the first of a duplicate");
             Assert.IsNull(loadout.GetItem(4));
-            CollectionAssert.AreEqual(new ItemDefinition[] { null, bread, null, null, null }, loadout.ToItemArray());
+            CollectionAssert.AreEqual(new ItemDefinition[] { null, bread, null, null, null, null, null, null, null }, loadout.ToItemArray());
         }
         finally
         {

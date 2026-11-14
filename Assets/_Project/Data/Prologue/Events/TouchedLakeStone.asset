@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Touched the Stone by the Lake
   objectiveText: 
   notes: 
+  homeOnly: 0

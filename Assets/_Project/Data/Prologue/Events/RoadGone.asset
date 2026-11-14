@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: The Road Behind Is Gone
   objectiveText: 
   notes: 
+  homeOnly: 0

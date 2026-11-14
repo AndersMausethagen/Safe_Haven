@@ -176,7 +176,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
 
         float cost = BlockCost(damage);
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
-            Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity, cost);
+            Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity,
+            stamina != null ? stamina.Scaled(cost) : cost);
         switch (outcome)
         {
             case GuardOutcome.Parried:
@@ -194,7 +195,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             case GuardOutcome.GuardBroken:
                 if (stamina != null)
                 {
-                    stamina.TrySpend(stamina.Current);
+                    stamina.Exhaust();
                 }
                 stunnedUntil = Time.time + Rules.GuardBreakStun;
                 SetGuarding(false);
@@ -222,6 +223,13 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         {
             combat.GrantCounter();
         }
+
+        // A parry's reward on the stamina bar (PlayerStaminaSettings › Parry Return): timing a guard pays for itself.
+        if (stamina != null)
+        {
+            stamina.Restore(stamina.ParryReturn);
+        }
+
         Parried?.Invoke(damage);
     }
 }

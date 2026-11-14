@@ -69,6 +69,11 @@ public static class BuildPrologueMeadow
         new Vector3(-93f, 8f, -26f), new Vector3(-86f, 5.2f, -29f), new Vector3(-70f, 4.4f, -40f), new Vector3(-58f, 3.8f, -52f), new Vector3(-40f, 3.2f, -70f),
         new Vector3(-12f, 2.6f, -86f), new Vector3(12f, 2.2f, -99f) };
 
+    // Sigrid's word at the tree line: said in the forest's cinematic (Story - The Forest Closes In, 2026-11-14). The shelter
+    // chapter's own arrival line, said by the director once the cinematic is over, only sends the player on.
+    private const string ShelterBriefing = "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.";
+    private const string ShelterOnward = "The rock shelter is along the old road, not far in. Go on, we are right behind you.";
+
     // ==================================================================== Data
 
     public static string Data()
@@ -126,7 +131,7 @@ public static class BuildPrologueMeadow
         // One quest from the tree line to the first fire. It was four (the tree line, the shelter, the fuel, the fire), each
         // handed over in a talk with Sigrid: nine quests in six minutes of the playtest. It starts by itself as the forest
         // closes in, and its chapters end at its objectives (PrologueChapter.EndsAtObjective).
-        const string shelterBriefing = "That was no weather. The sun went down hours early and this storm came out of a clear sky. Ingrid, Bjarne, Tor and Liv walked into this two days ago, so we go on, not back. Follow the old road into the trees and find us dry shelter. We are right behind you.";
+        const string shelterBriefing = ShelterOnward;
         Edit(shelter, so =>
         {
             so.FindProperty("description").stringValue = "It should be noon, and it is the middle of the night. The expedition came for four of its own, and the forest has already put out the sun. Follow the old road in, find dry shelter and get a fire going beside it.";
@@ -139,7 +144,7 @@ public static class BuildPrologueMeadow
             var steps = new List<(ObjectiveType type, string text, int amount, Object target)> { (ObjectiveType.ReachPlace, "Find the rock shelter along the old road", 1, null) };
             // What the fire costs, so the quest and the build menu always agree (PrologueTests checks it).
             foreach (ItemAmount cost in prologue.Campfire.ConstructionItems) steps.Add((ObjectiveType.CollectItem, "", cost.Amount, cost.Item));
-            steps.Add((ObjectiveType.BuildStructure, "Build a Campfire beside the shelter (G)", 1, null));
+            steps.Add((ObjectiveType.BuildStructure, "Build a Campfire beside the shelter ({key:Build})", 1, null));
             Objectives(so, false, steps.ToArray());
             SerializedProperty list = so.FindProperty("objectives");
             for (int i = 0; i < list.arraySize; i++)
@@ -190,10 +195,16 @@ public static class BuildPrologueMeadow
             list.GetArrayElementAtIndex(0).FindPropertyRelative("target").objectReferenceValue = Load<QuestTargetDefinition>("Assets/_Project/Data/Quests/Targets/Waystones.asset");
             list.GetArrayElementAtIndex(1).FindPropertyRelative("target").objectReferenceValue = null;
         });
-        Edit(hold, so => Prerequisites(so, stones));
+        // The minute at the stones is the fight: it starts at once, troll or no troll (2026-11-14: Story Pacing held it back while
+        // the old troll hunted the player, up to a minute, and a reload was what started it in the playtest).
+        Edit(hold, so =>
+        {
+            Prerequisites(so, stones);
+            so.FindProperty("startsInAFight").boolValue = true;
+        });
         // The journal's notes for the quests that took others in (BuildJournal holds the same text).
         Edit(road, so => so.FindProperty("journalNotes").stringValue = "The old road runs straight at the trees. Somebody built it to go somewhere, and nobody at the camp knows where.\n\nChoose your weapon by how you want to fight rather than by its numbers. You will be making others soon enough.");
-        Edit(shelter, so => so.FindProperty("journalNotes").stringValue = "It really is noon. Everyone agrees on that and no one can explain the stars. Runa says the forest has moved since the others came through, which is not something forests do.\n\nSticks and small rocks lie about on the forest floor, and you can pick them up as you walk: this is how every fire you ever build starts. Press (G) to open the build menu. It is the first fire anyone has lit in here for a very long time, though you won't know that yet.");
+        Edit(shelter, so => so.FindProperty("journalNotes").stringValue = "It really is noon. Everyone agrees on that and no one can explain the stars. Runa says the forest has moved since the others came through, which is not something forests do.\n\nSticks and small rocks lie about on the forest floor, and you can pick them up as you walk: this is how every fire you ever build starts. Press ({key:Build}) to open the build menu. It is the first fire anyone has lit in here for a very long time, though you won't know that yet.");
         Edit(stones, so => so.FindProperty("journalNotes").stringValue = "Whatever it is, the trees are moving out of its way. Don't stop to look.\n\nSigrid has seen writing like this once before, and she doesn't say where. The stones are older than the road, and much older than anyone who should know how to use them.");
 
         foreach (string retired in new[] { "TreeLine", "GatherFuel", "LightFire", "ActivatePortal" })
@@ -203,13 +214,17 @@ public static class BuildPrologueMeadow
         }
 
         // Optional errands by the fire. Closed By ends them when the expedition sets out.
+        // The hunt is one ordinary Boar (2026-11-08, BuildPrologueBoar made the creature): three Blight Boar were too tough
+        // for the start. This builder owns the quest, the zone's count and Runa's lines; a Data run once put the blight boar
+        // back because only BuildPrologueBoar knew (found 2026-11-14). PrologueMeadowTests.TheHunt_IsOneOrdinaryBoar guards it.
         Edit(Quest("HuntForThePot"), so =>
         {
             Basics(so, "prologue.hunt_for_the_pot", "Meat for the Road", SideChain,
-                "Runa has seen blight boar on the grass north of the road, east of the camp, where they have no business being. She lent you her spare bow. Bring two down.", "");
+                "Runa has seen a boar on the grass north of the road, east of the camp, where boar have no business being. She lent you her spare bow. Bring it down.", "");
             Side(so, road);
-            Objectives(so, false, (ObjectiveType.KillMonster, "Bring down two blight boar on the grass north of the road", 2,
-                Load<MonsterDefinition>("Assets/_Project/Data/Monsters/BlightBoar.asset")));
+            Objectives(so, false, (ObjectiveType.KillMonster, "Bring down the boar on the grass north of the road", 1,
+                Load<MonsterDefinition>("Assets/_Project/Data/Monsters/Boar.asset")));
+            so.FindProperty("journalNotes").stringValue = "Runa doesn't like it. Boar don't come this far onto open grass. She hasn't said what she thinks it means, but she has stopped lending out arrows without counting them.";
             Rewards(so, (Item("CrudeStoneArrow"), 20));
         });
         Edit(Quest("FishForBreakfast"), so =>
@@ -238,7 +253,7 @@ public static class BuildPrologueMeadow
             Side(so, road);
             Objectives(so, true,
                 (ObjectiveType.QuestEvent, "Strike the dummy three times (left mouse)", 3, lessonHit),
-                (ObjectiveType.QuestEvent, "Dodge (Space)", 1, lessonDodged),
+                (ObjectiveType.QuestEvent, "Dodge ({key:Dodge})", 1, lessonDodged),
                 (ObjectiveType.QuestEvent, "Parry Eirik: hold the right mouse just before his blow lands, or dodge through it", 1, lessonDefended),
                 (ObjectiveType.QuestEvent, "Win the duel: wear Eirik down until he yields", 1, lessonDone));
             Rewards(so, (Item("Bandage"), 2));
@@ -352,7 +367,7 @@ public static class BuildPrologueMeadow
         Story(Row(road, PrologueStep.Story, RoadBriefing), PrologueSite.Meadow, PrologueCompanions.StoryLeads, false);
         // Shelter from the Storm, in two parts: to the shelter, then the fire beside it.
         Row(shelter, PrologueStep.FindShelter, shelterBriefing, 1);
-        Row(shelter, PrologueStep.LightFire, FireBriefing).FindPropertyRelative("statusText").stringValue = "Build a Campfire beside the shelter (G)";
+        Row(shelter, PrologueStep.LightFire, FireBriefing).FindPropertyRelative("statusText").stringValue = "Build a Campfire beside the shelter ({key:Build})";
         // The rest opens with what Sigrid can't remember (Story - A Name Gone Missing), so the chapter has no line of its own.
         Story(Row(rest, PrologueStep.Story, ""), PrologueSite.Camp, PrologueCompanions.WaitAtSite, true);
         // The camp was two wolves and over in fifteen seconds (playtest logs): three now, and three more when they have fallen.
@@ -371,7 +386,7 @@ public static class BuildPrologueMeadow
         return $"{chapters.arraySize} chapters";
     }
 
-    private const string FireBriefing = "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).";
+    private const string FireBriefing = "Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter ({key:Build}).";
     private const string MorningBriefing = "There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.";
     private const string RoadBriefing = "The packs are tied and the fire is nearly out. Ingrid's party should have been back yesterday, and the forest is half a morning down the road. If you have anything left to do here, do it now: once we set out, we do not come back for it. Are you ready?";
 
@@ -1242,6 +1257,8 @@ public static class BuildPrologueMeadow
         GameObject oldRoot = GameObject.Find("Prologue Meadow");
         // What saved games remember of its stories goes to the ones made again (StoryBuilder).
         if (oldRoot != null) StoryBuilder.Remember(oldRoot.transform);
+        // Props nudged, turned or resized in the scene by hand keep it (2026-11-14: a rebuild put them all back).
+        Dictionary<string, PropEdit> propEdits = oldRoot != null ? KeepPropEdits(oldRoot.transform) : new Dictionary<string, PropEdit>();
         if (oldRoot != null) Object.DestroyImmediate(oldRoot);
         var root = new GameObject("Prologue Meadow").transform;
         Transform moments = new GameObject("Morning Moments").transform;
@@ -1256,6 +1273,7 @@ public static class BuildPrologueMeadow
         Fire(root, fireAt);
         FireCamera(root, fireAt);
         WorldProps(root);
+        int propsKept = 0;
         string places = Places(director, root, fireAt, sigrid, eirik, runa);
         GiverData(companions, eirik, runa);
         SigridOffers(sigrid);
@@ -1268,7 +1286,7 @@ public static class BuildPrologueMeadow
         Transform treeLine = routeOn.GetChild(routeOn.childCount - 1);
         Waypoints(root, sigrid, eirik, runa, treeLine);
 
-        MobSpawnZone boars = Zone(root, "Meadow Boars", Prologue + "ExpeditionBoar.prefab", BoarMeadow, 9f, 3, MobSpawnTrigger.Manual, false, true);
+        MobSpawnZone boars = Zone(root, "Meadow Boars", Prologue + "ExpeditionBoar.prefab", BoarMeadow, 9f, 1, MobSpawnTrigger.Manual, false, true);
         MobSpawnZone ambushZone = Zone(root, "Rootlings on the Road", Prologue + "ExpeditionRootling.prefab", new Vector2(-46f, -3f), 6f, 4, MobSpawnTrigger.Manual, true, false);
         // What the boar are running from: the first fight, by the cart and in daylight.
         MobSpawnZone roadWolves = Zone(root, "Wolves on the Road", Prologue + "ExpeditionWolf.prefab", RoadWolves, 5f, 3, MobSpawnTrigger.Manual, true, false);
@@ -1297,6 +1315,7 @@ public static class BuildPrologueMeadow
         Reactions(root, threshold, sigrid, eirik);
         Stories(moments, sigrid, eirik, runa, route, treeLine, threshold, ambushZone, boars);
         Beats(moments, root, companions, sigrid, eirik, runa, route, routeOn, treeLine, dummy, practice, cartProp, lakeStone, troll, runners, behind, roadWolves);
+        propsKept = RestorePropEdits(root, propEdits);
 
         var surface = Object.FindAnyObjectByType<Unity.AI.Navigation.NavMeshSurface>();
         surface.BuildNavMesh();
@@ -1311,7 +1330,7 @@ public static class BuildPrologueMeadow
         EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
         string problems = string.Join("; ", moments.GetComponentsInChildren<StoryScript>().SelectMany(s => s.FindProblems()));
-        return $"{places}; boars {boars.transform.position:F0}; {marks}; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
+        return $"{places}; boars {boars.transform.position:F0}; {marks}; props kept as edited: {propsKept}; problems: {(problems.Length > 0 ? problems : "none")}; dirty {scene.isDirty}";
     }
 
     // A fire to stand around: the campfire's model and light, without what makes it a building the player owns.
@@ -1373,6 +1392,99 @@ public static class BuildPrologueMeadow
 
     // The user (2026-11-13): unique things around the world, rune stones with blue glowing runes. LocalSpawn's props
     // (BuildWorldProps) along the party's walk, each well off the road and clear of the story's places.
+    // ----- Hand edits to props survive a rebuild -----
+    // Moments makes everything under "Prologue Meadow" again, which used to drop whatever had been done to its props in the
+    // scene since (a cairn resized, logs settled on the ground). Each prop instance's transform overrides (its own and its
+    // children's) are kept by path and put back on the prop made again in its place: same prefab, and within 3 m of where
+    // the builder now puts it. A prop the builder has deliberately moved further goes where the builder says.
+    private const float KeptWithin = 3f;
+
+    private sealed class PropEdit
+    {
+        public GameObject Prefab;
+        public Vector3 Position;
+        // The transforms the scene had changed from the prefab (the prop's own and its parts'), by path inside the prop.
+        public readonly Dictionary<string, (Vector3 position, Quaternion rotation, Vector3 scale)> Transforms =
+            new Dictionary<string, (Vector3 position, Quaternion rotation, Vector3 scale)>();
+    }
+
+    private static Dictionary<string, PropEdit> KeepPropEdits(Transform oldRoot)
+    {
+        var kept = new Dictionary<string, PropEdit>();
+        foreach (Transform t in oldRoot.GetComponentsInChildren<Transform>(true))
+        {
+            if (!PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject)) continue;
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject);
+            PropertyModification[] mods = PrefabUtility.GetPropertyModifications(t.gameObject);
+            if (prefab == null || mods == null) continue;
+            var edit = new PropEdit { Prefab = prefab, Position = t.position };
+            // Which of the prop's transforms the scene overrides: those (and only those) are read and put back as they are.
+            foreach (Transform part in t.GetComponentsInChildren<Transform>(true))
+            {
+                Object source = PrefabUtility.GetCorrespondingObjectFromSource(part);
+                if (source != null && mods.Any(m => m.target == source && (m.propertyPath.StartsWith("m_LocalPosition") ||
+                        m.propertyPath.StartsWith("m_LocalRotation") || m.propertyPath.StartsWith("m_LocalScale"))))
+                {
+                    edit.Transforms[PartPath(t, part)] = (part.localPosition, part.localRotation, part.localScale);
+                }
+            }
+
+            if (edit.Transforms.Count > 0) kept[PropKey(oldRoot, t)] = edit;
+        }
+
+        return kept;
+    }
+
+    // Sets the kept values outright on the new prop's parts: nothing else of the instance is touched (setting its
+    // modifications wholesale undid what the builder had just set in code, such as names).
+    private static int RestorePropEdits(Transform root, Dictionary<string, PropEdit> kept)
+    {
+        int restored = 0;
+        foreach (Transform t in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (!PrefabUtility.IsOutermostPrefabInstanceRoot(t.gameObject) || !kept.TryGetValue(PropKey(root, t), out PropEdit edit)) continue;
+            if (PrefabUtility.GetCorrespondingObjectFromSource(t.gameObject) != edit.Prefab || Vector3.Distance(t.position, edit.Position) > KeptWithin) continue;
+            foreach (var part in edit.Transforms)
+            {
+                Transform same = part.Key.Length == 0 ? t : t.Find(part.Key);
+                if (same == null) continue;
+                same.localPosition = part.Value.position;
+                same.localRotation = part.Value.rotation;
+                same.localScale = part.Value.scale;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(same);
+            }
+
+            restored++;
+        }
+
+        return restored;
+    }
+
+    private static string PartPath(Transform prop, Transform part)
+    {
+        var names = new List<string>();
+        for (Transform at = part; at != null && at != prop; at = at.parent) names.Add(at.name);
+        names.Reverse();
+        return string.Join("/", names);
+    }
+
+    // A prop's path under the root, with its place among same-named siblings (two Rotting Logs by the fire).
+    private static string PropKey(Transform root, Transform t)
+    {
+        var parts = new List<string>();
+        for (Transform at = t; at != null && at != root; at = at.parent)
+        {
+            int nth = 0;
+            if (at.parent != null)
+                for (int i = 0; i < at.GetSiblingIndex(); i++)
+                    if (at.parent.GetChild(i).name == at.name) nth++;
+            parts.Add(at.name + "#" + nth);
+        }
+
+        parts.Reverse();
+        return string.Join("/", parts);
+    }
+
     private static string WorldProps(Transform root)
     {
         Transform old = root.Find("World Props");
@@ -1546,9 +1658,9 @@ public static class BuildPrologueMeadow
         SideGiver(runa, new[]
         {
             ("HuntForThePot", "Anything I can help with?",
-                "As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.",
-                "I'll hunt them.",
-                "Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
+                "As it happens. There is a boar out on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring it down.",
+                "I'll hunt it.",
+                "The boar, on the grass north of the road, east of the camp. Hold the left button to draw.",
                 "Clean enough. Keep the bow; you've earned it, and I was tired of carrying it."),
         });
         SideGiver(eirik, new[]
@@ -1707,11 +1819,8 @@ public static class BuildPrologueMeadow
             }
         }
 
-        var quest = Existing("ReachPortal");
-        var so = new SerializedObject(quest);
-        so.FindProperty("description").stringValue = "Something much larger is approaching. Leave the camp and take the old path north to the standing stones.";
-        so.ApplyModifiedPropertiesWithoutUndo();
-        EditorUtility.SetDirty(quest);
+        // The quest's description is Data's (reach the stones and wake them, one quest since 2026-11-10): this step used to
+        // write the older one back after it (found 2026-11-14).
     }
 
     // The first look is the Haven's sunlit one; the second is the raid's own, faded in when the forest closes over them.
@@ -2036,16 +2145,28 @@ public static class BuildPrologueMeadow
         var notYet = Aside(S(), "Not alone, and not before we are ready. Come back to the others.");
         Link(eager, (atEdge, 0, setOutYet), (setOutYet, 0, notYet));
 
-        // ----- Across the line -----
+        // ----- Across the line: a cinematic (the user, 2026-11-14) -----
+        // The walk starts it (Story - The Road East: the party seen from in front, then from behind with the forest ahead);
+        // crossing the line turns the camera up into the trees as the storm and the mist come in (the Entered the Forest
+        // reaction brings them over 10-14 s), everyone says their piece, and Sigrid sends the player on to the shelter, whose
+        // quest (and its marker) starts once she has. Lines follow one another with no waits: a quiet gap would let the shelter
+        // quest start mid-cinematic (Story Pacing waits only while someone talks).
+        InGameCinematic intoTheTrees = IntoTheTrees(moments, sigrid);
         var line2 = Story(moments, "Story - The Forest Closes In");
         var across = new WhenQuestEvent { questEvent = entered };
+        var toStorm = new CueCinematicNode { cinematic = intoTheTrees, shot = 3 };
         var flash = new LightningNode();
         var shake = new ShakeCameraNode { strength = 0.5f };
         var thunder = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset") };
         var wind = Aside(R(), "There. Feel that? The wind turned, and there is mist coming up off the moss.");
-        var listen = new WaitNode { seconds = 5f };
         var clearSky = Aside(E(), "Twenty years a soldier, and I have never seen the sun simply leave.");
-        Link(line2, (across, 0, flash), (across, 0, shake), (across, 0, thunder), (across, 0, wind), (across, 0, listen), (listen, 0, clearSky));
+        var flashAgain = new LightningNode();
+        var thunderAgain = new PlaySoundNode { sound = Load<SoundDefinition>("Assets/_Project/Audio/Sounds/Library/Thunder.asset") };
+        var toSigrid = new CueCinematicNode { cinematic = intoTheTrees, shot = 4 };
+        var briefing = Aside(S(), ShelterBriefing);
+        var done = new StopCinematicNode { cinematic = intoTheTrees };
+        Link(line2, (across, 0, toStorm), (across, 0, flash), (across, 0, shake), (across, 0, thunder), (across, 0, wind),
+            (wind, 0, flashAgain), (wind, 0, thunderAgain), (wind, 0, clearSky), (clearSky, 0, toSigrid), (toSigrid, 0, briefing), (briefing, 0, done));
 
         // ----- The storm breaks with the first attack on the camp, and stays broken after loading -----
         var breaks = Story(moments, "Story - The Storm Breaks");
@@ -2333,6 +2454,10 @@ public static class BuildPrologueMeadow
             Link(walkStory, (moveOn, 0, wait), (wait, 0, new ChangeTimeOfDayNode { hour = hour, seconds = Fade, fadeStraightThere = true }));
         }
 
+        // The forest's cinematic begins on the last stretch, while they still walk (Story - The Forest Closes In plays it on).
+        var nearTrees = new WaitForWalkNode { reaches = 0.8f };
+        var intoTheTrees = new PlayCinematicNode { cinematic = moments.Find("Cinematic - Into the Trees").GetComponent<InGameCinematic>(), waitUntilFinished = false };
+        Link(walkStory, (moveOn, 0, nearTrees), (nearTrees, 0, intoTheTrees));
         var crossed = new RaiseQuestEventNode { questEvent = Ev("ForestEntered") };
         var stoneWakes = new GlowNode { target = lakeStone.transform, colour = new Color(0.55f, 0.8f, 1f), intensity = 5f, range = 9f, fadeSeconds = 6f };
         Link(walkStory, (moveOn, 0, walkOn), (moveOn, 0, stoneWakes), (walkOn, 0, crossed));
@@ -2721,6 +2846,46 @@ public static class BuildPrologueMeadow
         startOffset = new Vector3(3f, 2.6f, 8.5f), endOffset = new Vector3(2.2f, 2.4f, 7f),
         startFieldOfView = 46f, endFieldOfView = 36f, ease = CameraShot.Ease.EaseOut,
     };
+
+    // The party walking into the forest: in front of them as they come up the road, behind them with the trees ahead, up into
+    // the canopy as the storm and the mist come in, and Sigrid as she sends the player on. Shots 2-4 hold until the story
+    // cues the next (Story - The Forest Closes In). The party keeps walking through it (Hold The World off), and the walk
+    // doesn't wait for the held player (WalkPartyNode.MustWait).
+    private static InGameCinematic IntoTheTrees(Transform moments, Transform sigrid)
+    {
+        Transform ahead = Spot(moments, "Into the Trees (camera)", -62f, -14f);
+        Transform canopy = Spot(moments, "Storm Over the Trees (camera)", -82f, -11f);
+        InGameCinematic cinematic = Cinematic(moments, "Cinematic - Into the Trees", 1.2f, 1.4f,
+            new CameraShot
+            {
+                name = "Walking to the trees", seconds = 5f, subject = sigrid, lookOffset = new Vector3(0f, 1.4f, 0f),
+                startOffset = new Vector3(1.2f, 1.8f, 9f), endOffset = new Vector3(0.8f, 1.6f, 6.5f),
+                startFieldOfView = 40f, endFieldOfView = 36f, ease = CameraShot.Ease.EaseInOut,
+            },
+            new CameraShot
+            {
+                name = "The forest ahead", seconds = 5f, subject = sigrid, lookAt = ahead, lookOffset = new Vector3(0f, 4f, 0f),
+                startOffset = new Vector3(1.4f, 2.4f, -4.5f), endOffset = new Vector3(1f, 2.8f, -6.5f),
+                startFieldOfView = 42f, endFieldOfView = 46f, ease = CameraShot.Ease.EaseInOut, blendIn = 1.2f, holdUntilCued = true,
+            },
+            new CameraShot
+            {
+                name = "The storm comes", seconds = 7f, subject = canopy, space = CameraShot.Space.World, lookOffset = new Vector3(14f, 16f, -2f),
+                startOffset = new Vector3(-12f, 1.8f, 3f), endOffset = new Vector3(-10f, 1.5f, 2f), followSubject = false,
+                startFieldOfView = 50f, endFieldOfView = 44f, ease = CameraShot.Ease.EaseOut, blendIn = 1.4f, holdUntilCued = true, rumble = 0.08f,
+            },
+            new CameraShot
+            {
+                name = "Sigrid sends you on", seconds = 4f, subject = sigrid, lookOffset = new Vector3(0f, 1.55f, 0f),
+                startOffset = new Vector3(-1f, 1.8f, 3.6f), endOffset = new Vector3(-0.8f, 1.7f, 3f),
+                startFieldOfView = 34f, endFieldOfView = 30f, ease = CameraShot.Ease.EaseOut, blendIn = 1f, holdUntilCued = true,
+            });
+        var data = new SerializedObject(cinematic);
+        data.FindProperty("holdTheWorld").boolValue = false;
+        data.FindProperty("revealRadius").floatValue = 26f;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return cinematic;
+    }
 
     // ----- At the night camp: it comes for the fire -----
     private static void FirstTroll(Transform intro, Transform troll, Transform sigrid, Transform runa)

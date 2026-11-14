@@ -16,6 +16,17 @@ public sealed class CharacterPreviewStage : MonoBehaviour
     private float yaw = StartYaw;
 
     public RenderTexture Texture => texture;
+    public Camera View => view;
+    public Transform Model => model != null ? model.transform : null;
+
+    /// <summary>Stops (or restarts) the stand-in's idle: the character window shows a still pose.</summary>
+    public void Still(bool still)
+    {
+        if (model != null && model.TryGetComponent(out Animator animator))
+        {
+            animator.speed = still ? 0f : 1f;
+        }
+    }
 
     public static CharacterPreviewStage Create(int width, int height)
     {

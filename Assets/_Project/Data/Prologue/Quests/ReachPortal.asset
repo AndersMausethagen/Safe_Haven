@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.reachportal
   displayName: Something Is Coming
-  description: Something much larger is approaching. Leave the camp and take the old path north to the standing stones.
+  description: Something much larger is approaching. Leave the camp, take the old path north to the standing stones, and wake them.
   chain: Prologue - The Unquiet Forest
   journalNotes: 'Whatever it is, the trees are moving out of its way. Don''t stop to look.
 
@@ -53,6 +53,7 @@ MonoBehaviour:
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 8
+  startsInAFight: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:

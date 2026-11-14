@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Finished the Lesson
   objectiveText: 
   notes: 
+  homeOnly: 0

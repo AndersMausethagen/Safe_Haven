@@ -170942,6 +170942,70 @@ Transform:
   - {fileID: 545450714}
   m_Father: {fileID: 1255795}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &648524571
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 648524574}
+  - component: {fileID: 648524573}
+  - component: {fileID: 648524572}
+  m_Layer: 0
+  m_Name: Quest Waypoint - Strength for the Road (nearest water)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &648524572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648524571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8501cd2fc70f5144ae604ed6adaa26b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::NearestWaterMark
+  lookEvery: 3
+  reach: 800
+--- !u!114 &648524573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648524571}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
+  quest: {fileID: 11400000, guid: 9ffed2822f546824fa97d9d34216d5d5, type: 2}
+  objective: 2
+  label: Water
+  when: 0
+  untilGathered: {fileID: 0}
+--- !u!4 &648524574
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 648524571}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -35, y: -0.48701063, z: 23.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &648648018
 GameObject:
   m_ObjectHideFlags: 0
@@ -541024,3 +541088,4 @@ SceneRoots:
   - {fileID: 130791071}
   - {fileID: 1108136631}
   - {fileID: 1738110530}
+  - {fileID: 648524574}

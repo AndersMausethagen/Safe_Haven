@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Struck the Dummy
   objectiveText: 
   notes: 
+  homeOnly: 0

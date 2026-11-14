@@ -31,8 +31,9 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Min(0.1f)] private float range = 2f;
     [Tooltip("Width of the hit cone in degrees. 360 hits everything around the attacker.")]
     [SerializeField, Range(1f, 360f)] private float arc = 110f;
-    [Tooltip("The most targets one hit can reach, nearest first. 0 means no limit.")]
-    [SerializeField, Min(0)] private int maxTargets = 3;
+    [Tooltip("The most targets one hit can reach, nearest first. 0 means no limit. 1 by default: an attack only hits " +
+             "several targets (a sweep, a slam) when it is authored to.")]
+    [SerializeField, Min(0)] private int maxTargets = 1;
 
     [Header("Timing")]
     [Tooltip("Seconds after the attack starts when the damage lands. Match it to the swing of the animation.")]

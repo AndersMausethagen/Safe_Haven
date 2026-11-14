@@ -127,6 +127,6 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
         next++;
         // Held while it is read: about the time a subtitle stays up, at least a few seconds.
         holdUntil = Time.time + Mathf.Clamp(2.5f + line.Length * 0.045f, 4f, 9f);
-        DialogueBox.Current.Aside(DialogueSpeaker.Player(), $"<i>{line}</i>", () => holdUntil = Mathf.Min(holdUntil, Time.time + 0.5f));
+        DialogueBox.Current.Bark(DialogueSpeaker.Player(), $"<i>{line}</i>", () => holdUntil = Mathf.Min(holdUntil, Time.time + 0.5f));
     }
 }

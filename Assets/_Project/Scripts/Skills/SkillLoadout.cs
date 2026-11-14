@@ -2,14 +2,14 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// The five slots on the skill bar, like V Rising's ability bar. Each slot holds at most one skill or one usable item (a
+/// The nine slots on the skill bar (keys 1-9; five until 2026-11-14), like V Rising's ability bar. Each slot holds at most one skill or one usable item (a
 /// consumable: its key uses one from the bag, as the quickbar does), and a skill or an item is in at most one slot:
 /// putting one that is already slotted moves it, swapping with whatever was in the target. Plain C# so it can be tested
 /// without a scene; every change is reported per slot through SlotChanged, like ItemContainer.
 /// </summary>
 public sealed class SkillLoadout
 {
-    public const int SlotCount = 5;
+    public const int SlotCount = 9;
 
     private readonly SkillDefinition[] slots = new SkillDefinition[SlotCount];
     private readonly ItemDefinition[] items = new ItemDefinition[SlotCount];

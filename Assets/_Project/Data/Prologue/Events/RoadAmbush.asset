@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Ambush on the Road
   objectiveText: 
   notes: 
+  homeOnly: 0

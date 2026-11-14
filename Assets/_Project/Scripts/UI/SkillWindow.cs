@@ -254,6 +254,13 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
         {
             layout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             layout.constraintCount = columns;
+            // A row wider than its frame (the bar has nine slots since 2026-11-14) shrinks its cells to fit.
+            float room = root.rect.width - layout.padding.horizontal - layout.spacing.x * (columns - 1);
+            if (room > 0f && layout.cellSize.x * columns > room)
+            {
+                float width = room / columns;
+                layout.cellSize = new Vector2(width, width * layout.cellSize.y / Mathf.Max(1f, layout.cellSize.x));
+            }
         }
 
         for (int i = 0; i < count; i++)

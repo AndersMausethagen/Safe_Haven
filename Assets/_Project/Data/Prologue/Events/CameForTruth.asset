@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Came to Know
   objectiveText: 
   notes: 
+  homeOnly: 0

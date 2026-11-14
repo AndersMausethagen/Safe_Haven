@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: Came for the Coin
   objectiveText: 
   notes: 
+  homeOnly: 0

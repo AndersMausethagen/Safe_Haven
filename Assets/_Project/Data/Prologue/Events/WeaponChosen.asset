@@ -16,3 +16,4 @@ MonoBehaviour:
   displayName: 
   objectiveText: Choose a weapon
   notes: 
+  homeOnly: 0

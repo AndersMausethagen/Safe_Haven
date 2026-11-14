@@ -119,6 +119,12 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     [SerializeField, Range(0.05f, 1f)] private float insightShareAbove = 0.5f;
     [Tooltip("Insight the skills window's button puts into a skill at a time.")]
     [SerializeField, Min(1)] private int insightStep = 100;
+    [Tooltip("Every Insight reward, times this (quests, raids, exploring, stones, books...). 0.2 = a fifth of the listed " +
+             "amounts. Fractions add up across rewards. Cheats are not scaled.")]
+    [SerializeField, Range(0f, 2f)] private float insightScale = 1f;
+    [Tooltip("How much longer practice takes to raise a skill, at every level: 1.3 = 30% longer. Divides practice " +
+             "experience (gathering, fighting, crafting...), so saved levels stay as they are.")]
+    [SerializeField, Range(0.25f, 4f)] private float practiceTimeScale = 1f;
 
     [Header("Total level")]
     [Tooltip("Titles for every skill's level added up, lowest first: the highest reached is the player's.")]
@@ -197,6 +203,8 @@ public sealed class LevelingSettings : GameSettings<LevelingSettings>
     public int RenownFor(int totalLevel) => Mathf.Max(0, totalLevel - skills.Count) / Mathf.Max(1, totalLevelsPerRenown);
     public float WatchReach => watchReach;
     public int InsightFullBelow => insightFullBelow;
+    public float InsightScale => insightScale;
+    public float PracticeTimeScale => practiceTimeScale;
 
     /// <summary>Experience one point of Insight is worth to a skill at this level.</summary>
     public float InsightRate(int level) => level < insightFullBelow ? 1f : insightShareAbove;

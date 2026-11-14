@@ -553,7 +553,7 @@ public static class Territory
 
         string what = info.task == RegionTaskKind.Hunt ? "Bring down" : info.task == RegionTaskKind.Fish ? "Land" : "Gather";
         string things = info.task == RegionTaskKind.Hunt ? "creatures or game" : info.task == RegionTaskKind.Fish ? "fish" : "times (fell, mine or forage)";
-        return $"{what} {info.taskCount} {things} in {region}: {State.Of(region).TaskProgress} so far. Hold +{Settings.TaskHold:0}, {Settings.TaskInsight} Insight.";
+        return $"{what} {info.taskCount} {things} in {region}: {State.Of(region).TaskProgress} so far. Hold +{Settings.TaskHold:0}, {ExperienceTracker.InsightWorth(Settings.TaskInsight)} Insight.";
     }
 
     private static void OnGameEvent(GameEvent happened)

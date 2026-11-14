@@ -50,6 +50,7 @@ MonoBehaviour:
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:

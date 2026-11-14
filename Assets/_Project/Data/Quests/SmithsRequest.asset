@@ -22,7 +22,8 @@ MonoBehaviour:
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
-  prerequisites: []
+  prerequisites:
+  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}
@@ -49,6 +50,7 @@ MonoBehaviour:
     countAlreadyOwned: 0
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:

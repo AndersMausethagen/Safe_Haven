@@ -290,7 +290,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 74b7a60713ceb95408be796aca66d42d, type: 3}
     mood: Neutral
   - speaker: Eirik
-    text: Long reach, and it wants both hands. If you ever need a light instead, press {key:ToggleTorch} to swap them.
+    text: Long reach, and it wants both hands. If you ever need a light instead, press L to swap them.
     clip: {fileID: 8300000, guid: 66f291ca0d56c844581fafbd4c919ccb, type: 3}
     mood: Neutral
   - speaker: Eirik
@@ -682,7 +682,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2811366d1e044d44aa5cf44521b6c5e2, type: 3}
     mood: Stern
   - speaker: Runa
-    text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press {key:ToggleTorch} to swap them.'
+    text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them.'
     clip: {fileID: 8300000, guid: e10a06dcf9691e348ad0d7a0d4993041, type: 3}
     mood: Glad
   - speaker: Runa
@@ -702,8 +702,8 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 4e42d85a37bb25144afd9728e84015d6, type: 3}
     mood: Neutral
   - speaker: Runa
-    text: 'As it happens. There are blight boar on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring down two.'
-    clip: {fileID: 8300000, guid: 1f3ba2136e07161439fa5efaef36d854, type: 3}
+    text: 'As it happens. There is a boar out on the grass north of the road, east of the camp, which is wrong all by itself, and we could use the meat. Take my spare bow: hold the left button to draw, let go to shoot. Bring it down.'
+    clip: {fileID: 8300000, guid: a64060f13f71ac9448ca60b05258baf2, type: 3}
     mood: Neutral
   - speaker: Runa
     text: Behind you! Turn around!
@@ -898,6 +898,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 087f9d3db4e570049b9a94dd4bae4adb, type: 3}
     mood: Glad
   - speaker: Runa
+    text: The boar, on the grass north of the road, east of the camp. Hold the left button to draw.
+    clip: {fileID: 8300000, guid: 55330e0598b41784ba3b6782f12ac214, type: 3}
+    mood: Neutral
+  - speaker: Runa
     text: The forest doesn't hate us. It doesn't notice us. That's worse. Next time I pick the way.
     clip: {fileID: 8300000, guid: 63833d0fe975b874bbe39f3852ff5d29, type: 3}
     mood: Neutral
@@ -932,10 +936,6 @@ MonoBehaviour:
   - speaker: Runa
     text: Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushing everything out of the high woods, and it is big.
     clip: {fileID: 8300000, guid: 884998b47e09f6f42aa1238c2ab52ed9, type: 3}
-    mood: Neutral
-  - speaker: Runa
-    text: Two boar, on the grass north of the road, east of the camp. Hold the left button to draw.
-    clip: {fileID: 8300000, guid: f1a2f189f99c84e47b91c1fb535afb99, type: 3}
     mood: Neutral
   - speaker: Runa
     text: Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.
@@ -1030,7 +1030,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: f08432fac0d2bd04bbee093a9ab05ac2, type: 3}
     mood: Tired
   - speaker: Sigrid
-    text: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter ({key:Build}).'
+    text: 'Dry stone overhead. Good work. Now a fire, before anyone can think clearly: eight sticks and twelve small rocks off the forest floor, then build it beside the shelter (G).'
     clip: {fileID: 8300000, guid: ccd248fd8a2be19479a6a510320b4aa3, type: 3}
     mood: Neutral
   - speaker: Sigrid
@@ -1072,7 +1072,7 @@ MonoBehaviour:
   - speaker: Sigrid
     text: I can see that. Light your torches, and take this one.
     clip: {fileID: 8300000, guid: 035b81e87a1636046bbc8fb5f78ca244, type: 3}
-    mood: 
+    mood: Stern
   - speaker: Sigrid
     text: I can't take much more of this.
     clip: {fileID: 8300000, guid: 8c2a664d43eeca6439da4c8bd6a4e82f, type: 3}
@@ -1218,6 +1218,14 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: d4382ffa15e73194384e39cf1f4d5914, type: 3}
     mood: Neutral
   - speaker: Sigrid
+    text: The road east is clear as far as the cart. Keep your eyes on the tree line, and stay close to the fire tonight.
+    clip: {fileID: 8300000, guid: c1fdf2d0ad833ef4abc598319d84389f, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: The rock shelter is along the old road, not far in. Go on, we are right behind you.
+    clip: {fileID: 8300000, guid: 357c6378f4b9b0841a22b06f60ab7df7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: The stones are drawing power! Hold them off until the connection forms!
     clip: {fileID: 8300000, guid: 8066c856d41f13d43a1dcb7fa53f0812, type: 3}
     mood: Yelling
@@ -1248,6 +1256,10 @@ MonoBehaviour:
   - speaker: Sigrid
     text: We leave when you are ready. If you want to earn your porridge first, ask the others. They always have something.
     clip: {fileID: 8300000, guid: 1788a4952f01a484a8f5f458185166d7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: We set out at first light. Before that, is there anything you want to know about where we are going?
+    clip: {fileID: 8300000, guid: 9652ee60019e4b440b890ed55ee548d3, type: 3}
     mood: Neutral
   - speaker: Sigrid
     text: Weapons up!
@@ -1281,8 +1293,12 @@ MonoBehaviour:
     text: You're bleeding. Here.
     clip: {fileID: 8300000, guid: 4457d8f362d59914390905af27a78f06, type: 3}
     mood: Stern
+  - speaker: Sigrid
+    text: You're up. Good. The fire needs wood, and the stones need waking. Sit with me a while first.
+    clip: {fileID: 8300000, guid: e062e4fa754e23040817c4d44eb2516c, type: 3}
+    mood: Neutral
   - speaker: The Portal
-    text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu ({key:Build}) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
+    text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu (G) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
     clip: {fileID: 8300000, guid: a2b574d661a62a44f9bea6d4d4460fad, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1326,7 +1342,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 95776a46879c4f74ea3405b97c68b607, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag ({key:Items}).</i>'
+    text: '<i>Bare hands bring little home, little one. A hatchet in your belt and a pick beside it bring wood and ore. Sticks and sharp stones: make them in your bag (B).</i>'
     clip: {fileID: 8300000, guid: 2740700c16cdd924ca535772bad8580a, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1550,7 +1566,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 92501bcf7ce226941abbadd2eba70c0d, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop ({key:Build}), and put in it what you cannot bear to lose.</i>
+    text: <i>What you carry through me, the woods can take from you. What you leave here, I keep. Build a chest beside your workshop (G), and put in it what you cannot bear to lose.</i>
     clip: {fileID: 8300000, guid: 67dfff8ced5006a47ac8e185cb37edbf, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1606,7 +1622,7 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1ed23c52d4c657448b67201578f40c43, type: 3}
     mood: Neutral
   - speaker: The Portal
-    text: '<i>You have a fire. Now a roof to work under: a workshop beside it ({key:Build}). What the woods break, it mends.</i>'
+    text: '<i>You have a fire. Now a roof to work under: a workshop beside it (G). What the woods break, it mends.</i>'
     clip: {fileID: 8300000, guid: 64b42d68b6d472e45991c36cbef2ac45, type: 3}
     mood: Neutral
   - speaker: The Portal
@@ -1620,6 +1636,10 @@ MonoBehaviour:
   - speaker: The Portal
     text: Warmth stirs in the old stone. <i>Little one. You fell out of the dark with the whole forest at your heels, and I caught you. I could only catch one.</i>
     clip: {fileID: 8300000, guid: 5e908dad5b84b034aa1c89605501007c, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: Warmth stirs in the old stone. Little one. You fell out of the dark with the whole forest at your heels, and I caught you.
+    clip: {fileID: 8300000, guid: c0bc10ad127760f41bf8def281d20d27, type: 3}
     mood: Neutral
   - speaker: Tor
     text: Anything else?

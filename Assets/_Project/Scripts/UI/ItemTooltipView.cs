@@ -220,6 +220,8 @@ public sealed class ItemTooltipView : MonoBehaviour
             bodyLabel.text += "\n" + hints;
         }
 
+        // Last among its window's children: parts a window adds after it is built (the character sheet's stat cards) would draw over it.
+        panel.SetAsLastSibling();
         panel.gameObject.SetActive(true);
         Header(ItemRarity.Common, ItemQuality.Plain);
         LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
