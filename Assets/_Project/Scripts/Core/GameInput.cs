@@ -152,7 +152,8 @@ public static class GameInput
 
     // What a line of text may name a key by, besides an action's own name ({key:Interact}): the thing it does. Text says
     // "{key:Dismount}", and which action gets the rider down is decided here, once, not in every journal page and line.
-    private static readonly Dictionary<string, string> Verbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    // Read-only tables (this and PadVerbs), not state: nothing for the play-session reset to clear.
+    private static readonly IReadOnlyDictionary<string, string> Verbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
     {
         { "Dismount", "Whistle" }, { "GetDown", "Whistle" }, { "Gallop", "Dodge" }, { "Canter", "Dodge" }, { "Rear", "Dodge" },
         { "Walk", "Sneak" }, { "Crouch", "Sneak" }, { "Feed", "Interact" }, { "Mount", "Interact" }, { "Use", "Interact" },
@@ -162,7 +163,7 @@ public static class GameInput
     };
 
     // A verb that is another button on a controller: in the saddle, B gets you down (PlayerRiding).
-    private static readonly Dictionary<string, string> PadVerbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    private static readonly IReadOnlyDictionary<string, string> PadVerbs = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
     {
         { "Dismount", "System/Back" }, { "GetDown", "System/Back" },
     };

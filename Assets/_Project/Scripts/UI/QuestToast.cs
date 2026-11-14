@@ -110,11 +110,24 @@ public sealed class QuestToast : MonoBehaviour
         card.anchoredPosition = new Vector2(0f, Mathf.Lerp(Height, -178f, eased));
     }
 
-    private void OnStarted(QuestDefinition quest) => Tell(quest, Kind.Started);
+    // A quest authored to start or end quietly (Announce Start / Completion off) gets no card either, as QuestManager posts no message.
+    private void OnStarted(QuestDefinition quest)
+    {
+        if (quest != null && quest.AnnounceStart)
+        {
+            Tell(quest, Kind.Started);
+        }
+    }
 
     private void OnProgressed(QuestDefinition quest, int objective) => Tell(quest, Kind.Updated);
 
-    private void OnCompleted(QuestDefinition quest) => Tell(quest, Kind.Complete);
+    private void OnCompleted(QuestDefinition quest)
+    {
+        if (quest != null && quest.AnnounceCompletion)
+        {
+            Tell(quest, Kind.Complete);
+        }
+    }
 
     private void Tell(QuestDefinition quest, Kind kind)
     {

@@ -104,6 +104,15 @@ public sealed class PlayerSnapshot
         return this;
     }
 
+    /// <summary>Sets the skill book and bar (read from a save file). Returns this snapshot.</summary>
+    public PlayerSnapshot WithSkills(IEnumerable<SkillDefinition> known, SkillDefinition[] bar)
+    {
+        knownSkills.Clear();
+        knownSkills.AddRange(known);
+        skillLoadout = bar;
+        return this;
+    }
+
     /// <summary>Sets the quickbar (read from a save file). Returns this snapshot.</summary>
     public PlayerSnapshot WithQuickItems(IEnumerable<ItemDefinition> items)
     {

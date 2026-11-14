@@ -15,6 +15,10 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
 {
     private static readonly HashSet<string> Noticed = new HashSet<string>();
 
+    // Entering play mode doesn't reload scripts in this project, so the session's notices are forgotten here.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Noticed.Clear();
+
     [Tooltip("What it is called on the prompt.")]
     [SerializeField] private string placeName = "";
     [Tooltip("What the player thinks on seeing it, one at a time: the first on noticing it, the next on each closer look.")]

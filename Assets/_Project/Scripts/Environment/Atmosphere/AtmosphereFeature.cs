@@ -157,6 +157,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private readonly Vector4[] mistWaves = new Vector4[MaxMists];
         private readonly Vector4[] mistPooling = new Vector4[MaxMists];
         private readonly List<MistVolume> volumeOrder = new List<MistVolume>();
+        private readonly ByDistance byDistance = new ByDistance();
         private readonly Matrix4x4[] volumeTransforms = new Matrix4x4[MaxMistVolumes];
         private readonly Vector4[] volumeSizes = new Vector4[MaxMistVolumes];
         private readonly Vector4[] volumeShapes = new Vector4[MaxMistVolumes];
@@ -454,7 +455,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     }
                 }
 
-                mistOrder.Sort((a, b) => a.DistanceSquared(cameraPosition).CompareTo(b.DistanceSquared(cameraPosition)));
+                byDistance.From = cameraPosition;
+                mistOrder.Sort(byDistance);
                 int mists = hasGround ? Mathf.Min(MaxMists, mistOrder.Count) : 0;
                 // One terrain's map of where mist always lies (the nearest that has one).
                 int regionIndex = -1;
@@ -500,7 +502,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     if (volume.EffectiveDensity > 0f && Mathf.Abs(scale.x * scale.y * scale.z) > 1e-6f)
                         volumeOrder.Add(volume);
                 }
-                volumeOrder.Sort((a, b) => a.DistanceSquared(cameraPosition).CompareTo(b.DistanceSquared(cameraPosition)));
+                byDistance.From = cameraPosition;
+                volumeOrder.Sort(byDistance);
                 int volumes = Mathf.Min(MaxMistVolumes, volumeOrder.Count);
                 for (int i = 0; i < volumes; i++)
                 {
@@ -607,10 +610,24 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
 
             if (order.Count > max)
             {
-                order.Sort((a, b) => (a.transform.position - from).sqrMagnitude.CompareTo((b.transform.position - from).sqrMagnitude));
+                SortByDistance(order, from);
             }
 
             return Mathf.Min(max, order.Count);
+        }
+
+        // Apart from Nearest: a lambda there captured `from`, which made a new closure on every call, sorted or not.
+        private static void SortByDistance<T>(List<T> order, Vector3 from) where T : Component =>
+            order.Sort((a, b) => (a.transform.position - from).sqrMagnitude.CompareTo((b.transform.position - from).sqrMagnitude));
+
+        // Nearest first, with no new closure (and its capture of the camera) every frame for every camera.
+        private sealed class ByDistance : IComparer<TerrainMist>, IComparer<MistVolume>
+        {
+            public Vector3 From;
+
+            public int Compare(TerrainMist a, TerrainMist b) => a.DistanceSquared(From).CompareTo(b.DistanceSquared(From));
+
+            public int Compare(MistVolume a, MistVolume b) => a.DistanceSquared(From).CompareTo(b.DistanceSquared(From));
         }
     }
 }

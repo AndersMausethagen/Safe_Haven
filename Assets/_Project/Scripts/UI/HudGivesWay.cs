@@ -27,7 +27,11 @@ public sealed class HudGivesWay : MonoBehaviour
     };
 
     private readonly List<CanvasGroup> holders = new List<CanvasGroup>();
+    // Per look: whether a root canvas holds windows (searching the shared UI root for one, part by part, was most of a look).
+    private readonly Dictionary<Canvas, bool> sharesWithWindows = new Dictionary<Canvas, bool>();
     private float shown = 1f;
+    private float written = -1f;
+    private int writtenTo = -1;
     private float nextScan;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -51,13 +55,26 @@ public sealed class HudGivesWay : MonoBehaviour
 
     private void Update()
     {
-        if (Time.unscaledTime >= nextScan)
+        // The parts are only looked for while a window covers the HUD (the moment one opens, then every second): uncovered,
+        // a part not yet held shows as it is, which is what showing means. Every second in every scene, the 16 searches of
+        // the whole scene were a steady cost.
+        bool covered = Covered;
+        if (!covered)
+        {
+            nextScan = 0f;
+        }
+        else if (Time.unscaledTime >= nextScan)
         {
             nextScan = Time.unscaledTime + ScanSeconds;
             Scan();
         }
 
-        shown = Mathf.MoveTowards(shown, Covered ? 0f : 1f, Time.unscaledDeltaTime * FadeSpeed);
+        shown = Mathf.MoveTowards(shown, covered ? 0f : 1f, Time.unscaledDeltaTime * FadeSpeed);
+        if (shown == written && holders.Count == writtenTo)
+        {
+            return;
+        }
+
         for (int i = holders.Count - 1; i >= 0; i--)
         {
             if (holders[i] == null)
@@ -69,10 +86,14 @@ public sealed class HudGivesWay : MonoBehaviour
             holders[i].alpha = shown;
             holders[i].blocksRaycasts = shown > 0.5f;
         }
+
+        written = shown;
+        writtenTo = holders.Count;
     }
 
     private void Scan()
     {
+        sharesWithWindows.Clear();
         foreach (Type type in HudParts)
         {
             foreach (UnityEngine.Object found in FindObjectsByType(type, FindObjectsInactive.Include))
@@ -88,7 +109,11 @@ public sealed class HudGivesWay : MonoBehaviour
     private void Hold(Transform part, Canvas root)
     {
         var rootRect = (RectTransform)root.transform;
-        bool shared = root.GetComponentInChildren<UIWindow>(true) != null;
+        if (!sharesWithWindows.TryGetValue(root, out bool shared))
+        {
+            shared = root.GetComponentInChildren<UIWindow>(true) != null;
+            sharesWithWindows[root] = shared;
+        }
         if (!shared)
         {
             HoldCanvas(rootRect);

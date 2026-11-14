@@ -131,8 +131,9 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void OnEscape(InputAction.CallbackContext context)
     {
-        // The screens over this menu answer Escape themselves, and the press that closes one isn't one for this menu.
-        if (leaving || SceneTransition.IsBusy || OptionsScreen.HasEscape || SavesScreen.HasEscape)
+        // The screens over this menu answer Escape themselves, and the press that closes one isn't one for this menu. Held,
+        // Escape skips a cinematic (CinematicScreen): the menu would open under it.
+        if (leaving || SceneTransition.IsBusy || CinematicScreen.IsPlaying || OptionsScreen.HasEscape || SavesScreen.HasEscape)
         {
             return;
         }
@@ -151,7 +152,7 @@ public sealed class PauseMenu : MonoBehaviour
     // menu (B is also stop working and dodge's neighbour). Start opens it.
     private void OnBack(InputAction.CallbackContext context)
     {
-        if (leaving || SceneTransition.IsBusy || OptionsScreen.HasEscape || SavesScreen.HasEscape)
+        if (leaving || SceneTransition.IsBusy || CinematicScreen.IsPlaying || OptionsScreen.HasEscape || SavesScreen.HasEscape)
         {
             return;
         }

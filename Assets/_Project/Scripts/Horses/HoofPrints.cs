@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -106,8 +107,15 @@ public sealed class HoofPrints : MonoBehaviour
 
     private static bool TryGround(Vector3 at, out float ground)
     {
-        foreach (Terrain terrain in Terrain.activeTerrains)
+        IReadOnlyList<Terrain> terrains = Terrains.Active;
+        for (int i = 0; i < terrains.Count; i++)
         {
+            Terrain terrain = terrains[i];
+            if (terrain == null || terrain.terrainData == null)
+            {
+                continue;
+            }
+
             Vector3 local = at - terrain.transform.position;
             Vector3 size = terrain.terrainData.size;
             if (local.x >= 0f && local.z >= 0f && local.x <= size.x && local.z <= size.z)

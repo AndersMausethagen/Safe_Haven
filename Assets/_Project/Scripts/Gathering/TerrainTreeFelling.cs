@@ -22,6 +22,8 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private const float ReleaseRadius = 14f;
     private const float RefreshSeconds = 0.25f;
     private const string RuntimeSuffix = " (runtime)";
+    // The choppable trees by ground cell, so a refresh looks at those round the player, not every tree (the Haven has 130 000).
+    private const float CellSize = 16f;
 
     /// <summary>A painted tree a falling tree might meet.</summary>
     public readonly struct Standing
@@ -47,6 +49,8 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private readonly Dictionary<int, (TreeInstance tree, float regrowAt)> felled = new Dictionary<int, (TreeInstance, float)>();
     private readonly List<int> scratch = new List<int>();
     private readonly List<Vector3> positions = new List<Vector3>();
+    private readonly Dictionary<long, List<int>> cells = new Dictionary<long, List<int>>();
+    private float nextRegrowAt = float.PositiveInfinity;
     private Terrain terrain;
     private TerrainData cachedFor;
     private int cachedCount = -1;
@@ -113,6 +117,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
         TreeInstance tree = data.GetTreeInstance(index);
         felled[index] = (tree, KeepsFelled ? float.PositiveInfinity : Time.time + secondsLeft);
+        nextRegrowAt = Mathf.Min(nextRegrowAt, felled[index].regrowAt);
         Hide(index, tree);
     }
 
@@ -247,7 +252,12 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         return false;
     }
 
-    private void Awake() => terrain = GetComponent<Terrain>();
+    private void Awake()
+    {
+        terrain = GetComponent<Terrain>();
+        // Out of step with the node streamers on the same terrain, which refresh as often.
+        nextRefresh = Time.time + Random.value * RefreshSeconds;
+    }
 
     private void Update()
     {
@@ -276,14 +286,29 @@ public sealed class TerrainTreeFelling : MonoBehaviour
             Release(index);
         }
 
-        for (int i = 0; i < positions.Count; i++)
+        int reach = Mathf.CeilToInt(ProxyRadius / CellSize);
+        int cellX = Mathf.FloorToInt(player.x / CellSize), cellZ = Mathf.FloorToInt(player.z / CellSize);
+        for (int x = cellX - reach; x <= cellX + reach; x++)
         {
-            if (choppable[i] && !proxies.ContainsKey(i) && !felled.ContainsKey(i) && (positions[i] - player).sqrMagnitude <= ProxyRadius * ProxyRadius)
+            for (int z = cellZ - reach; z <= cellZ + reach; z++)
             {
-                Spawn(i);
+                if (!cells.TryGetValue(CellKey(x, z), out List<int> near))
+                {
+                    continue;
+                }
+
+                foreach (int i in near)
+                {
+                    if ((positions[i] - player).sqrMagnitude <= ProxyRadius * ProxyRadius && !proxies.ContainsKey(i) && !felled.ContainsKey(i))
+                    {
+                        Spawn(i);
+                    }
+                }
             }
         }
     }
+
+    private static long CellKey(int x, int z) => ((long)x << 32) | (uint)z;
 
     // World positions of the trees and which prototypes can be felled; again when the data is swapped (a raid map turns
     // its terrain) or trees are added.
@@ -318,13 +343,25 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
         TreeInstance[] trees = data.treeInstances;
         positions.Clear();
+        cells.Clear();
         choppable = new bool[trees.Length];
         Vector3 size = data.size;
         Vector3 origin = terrain.GetPosition();
         for (int i = 0; i < trees.Length; i++)
         {
-            positions.Add(origin + Vector3.Scale(trees[i].position, size));
+            Vector3 at = origin + Vector3.Scale(trees[i].position, size);
+            positions.Add(at);
             choppable[i] = trees[i].prototypeIndex < canFell.Length && canFell[trees[i].prototypeIndex];
+            if (choppable[i])
+            {
+                long key = CellKey(Mathf.FloorToInt(at.x / CellSize), Mathf.FloorToInt(at.z / CellSize));
+                if (!cells.TryGetValue(key, out List<int> cell))
+                {
+                    cells[key] = cell = new List<int>();
+                }
+
+                cell.Add(i);
+            }
         }
     }
 
@@ -436,6 +473,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     {
         float respawn = TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
         felled[index] = (tree, KeepsFelled || respawn <= 0f ? float.PositiveInfinity : Time.time + respawn);
+        nextRegrowAt = Mathf.Min(nextRegrowAt, felled[index].regrowAt);
         Hide(index, tree);
         Release(index);
         TreeDown?.Invoke(index);
@@ -467,19 +505,25 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         Down(index, tree);
     }
 
+    // Only when the soonest is due (at home nothing grows back: every frame it walked every tree down since the save).
     private void RegrowDue()
     {
-        if (felled.Count == 0)
+        if (felled.Count == 0 || Time.time < nextRegrowAt)
         {
             return;
         }
 
         scratch.Clear();
+        nextRegrowAt = float.PositiveInfinity;
         foreach (var pair in felled)
         {
             if (Time.time >= pair.Value.regrowAt)
             {
                 scratch.Add(pair.Key);
+            }
+            else
+            {
+                nextRegrowAt = Mathf.Min(nextRegrowAt, pair.Value.regrowAt);
             }
         }
 

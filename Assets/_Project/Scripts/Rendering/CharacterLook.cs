@@ -16,6 +16,8 @@ public sealed class CharacterLook : MonoBehaviour
 
     private RenderingSettings settings;
     private float nextScan;
+    // Animators already looked at: each is decided once, not searched up and down its hierarchy every look while it rains.
+    private readonly System.Collections.Generic.HashSet<Animator> seen = new System.Collections.Generic.HashSet<Animator>();
 
     public void Initialise(RenderingSettings rules)
     {
@@ -64,14 +66,22 @@ public sealed class CharacterLook : MonoBehaviour
             return;
         }
 
+        seen.RemoveWhere(gone => gone == null);
         foreach (Animator animator in FindObjectsByType<Animator>(FindObjectsInactive.Exclude))
         {
+            if (seen.Contains(animator))
+            {
+                continue;
+            }
+
+            // Not decided while it has no skinned body yet (one built in code a moment later): looked at again next time.
             GameObject character = animator.gameObject;
             if (character.GetComponentInChildren<SkinnedMeshRenderer>() == null)
             {
                 continue;
             }
 
+            seen.Add(animator);
             // One wetness per character: never inside or over another's (nested animators), or materials would wet twice.
             if (character.GetComponentInParent<CharacterWetness>() == null
                 && character.GetComponentInChildren<CharacterWetness>() == null)

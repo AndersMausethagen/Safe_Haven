@@ -126,7 +126,6 @@ public static class GameSession
     {
         ActiveRaid = null;
         report.BroughtDownBy = report.Outcome == RaidOutcome.Died ? CreatureRecords.TakeKillerName() : null;
-        JournalNotices.WriteDown(report, report.BroughtDownBy);
         pendingReport = report;
     }
 

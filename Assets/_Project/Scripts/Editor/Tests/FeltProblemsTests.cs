@@ -300,7 +300,8 @@ public sealed class FeltProblemsTests
         Assert.AreEqual(0, lodgeII.Progress(new GameEvent(GameEventKind.Upgraded, Building("Forge"), 2)));
         Assert.AreEqual(0, lodgeII.Progress(new GameEvent(GameEventKind.Built, Building("Sawbench"), 1)), "building it is tier I");
         Assert.AreEqual(0, QuestObjective.Upgrade(Building("Sawbench"), 3).Progress(new GameEvent(GameEventKind.Upgraded, Building("Sawbench"), 2)));
-        Assert.AreEqual("Raise the Woodcutter's Lodge to Tier II (H)", lodgeII.Describe());
+        // The key is named by its action; the views that show the line turn it into the bound key (GameInput.WithRebinds).
+        Assert.AreEqual("Raise the Woodcutter's Lodge to Tier II ({key:Haven})", lodgeII.Describe());
         Assert.IsNull(lodgeII.FindProblem());
         Assert.IsNotNull(QuestObjective.Upgrade(Building("Sawbench"), 99).FindProblem(), "no such tier");
     }

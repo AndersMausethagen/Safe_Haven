@@ -154,6 +154,9 @@ public static class BuildSaplings
         so.FindProperty("gatherSeconds").floatValue = 1.5f;
         so.FindProperty("depleteOnGather").boolValue = true;
         so.FindProperty("respawnSeconds").floatValue = 0f;
+        // Its world object is the small tree stand-in (TreeChoppingSettings › Small Tree Proxy), not the copied Sticks node.
+        so.FindProperty("worldPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Systems/TerrainSmallTreeProxy.prefab");
+        so.FindProperty("worldModelPrefab").objectReferenceValue = null;
         SerializedProperty entries = so.FindProperty("yields.entries");
         entries.arraySize = 2;
         SetEntry(entries.GetArrayElementAtIndex(0), sticks, 2, 3);

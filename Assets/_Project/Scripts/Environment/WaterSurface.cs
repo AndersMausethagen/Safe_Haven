@@ -185,8 +185,10 @@ public sealed class WaterSurface : MonoBehaviour
     // The terrain's height under a point; far below when no terrain is there (open water then).
     public static float GroundBelow(Vector3 point)
     {
-        foreach (Terrain terrain in Terrain.activeTerrains)
+        IReadOnlyList<Terrain> terrains = Terrains.Active;
+        for (int i = 0; i < terrains.Count; i++)
         {
+            Terrain terrain = terrains[i];
             if (terrain == null || terrain.terrainData == null)
             {
                 continue;

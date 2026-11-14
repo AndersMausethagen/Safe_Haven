@@ -20,7 +20,8 @@ public sealed class SaveSlotInfo
 
         Place = PlaceName(data.scene);
         RaidCutShort = data.raidUnderWay;
-        Level = data.progress != null ? Math.Max(1, data.progress.level) : 1;
+        // The character level went with the skills (it is no longer written, so it read 1 for every save): the day says how far.
+        Day = data.settlement != null ? Math.Max(0, data.settlement.daysPassed) + 1 : 1;
         PlayedSeconds = data.playtest != null ? data.playtest.playedSeconds : 0f;
         if (DateTime.TryParse(data.savedAtUtc, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime saved))
         {
@@ -36,20 +37,21 @@ public sealed class SaveSlotInfo
 
     public string Name { get; }
     public string Place { get; }
-    public int Level { get; }
+    /// <summary>The day of the journey it was saved on, from 1.</summary>
+    public int Day { get; } = 1;
     public float PlayedSeconds { get; }
     public DateTime SavedAt { get; }
     /// <summary>Why it can't be loaded, or null when it can.</summary>
     public string Problem { get; }
     public bool IsReadable => Problem == null;
 
-    /// <summary>"Safe Haven  ·  Level 4  ·  3 h 20 min played  ·  30 Oct 2026, 15:39".</summary>
+    /// <summary>"Safe Haven  ·  Day 4  ·  3 h 20 min played  ·  30 Oct 2026, 15:39".</summary>
     public string Details
     {
         get
         {
             string when = SavedAt.ToString("d MMM yyyy, HH:mm", CultureInfo.InvariantCulture);
-            return IsReadable ? $"{Place}  ·  Level {Level}  ·  {DescribePlayed(PlayedSeconds)}  ·  {when}" : $"{Problem}  ·  {when}";
+            return IsReadable ? $"{Place}  ·  Day {Day}  ·  {DescribePlayed(PlayedSeconds)}  ·  {when}" : $"{Problem}  ·  {when}";
         }
     }
 

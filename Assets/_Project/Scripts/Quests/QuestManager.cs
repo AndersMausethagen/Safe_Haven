@@ -273,10 +273,20 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             pendingRewards.Clear();
             StartAvailableQuests();
             StartQuestsWhoseEventHappened();
-            RecountOwned();
+            // A frame on: this runs before the scene's Start, where saved objects get their state back (a building its tier).
+            StartCoroutine(RecountOwnedNextFrame());
         }
 
         RaiseChanged();
+    }
+
+    private System.Collections.IEnumerator RecountOwnedNextFrame()
+    {
+        yield return null;
+        if (Player.Current != null)
+        {
+            RecountOwned();
+        }
     }
 
     /// <summary>

@@ -21,7 +21,7 @@ MonoBehaviour:
   value: 1
   gearScoreOverride: 0
   icon: {fileID: 21300000, guid: c4e7f9c820bf0464492a8fb6effe7b9c, type: 3}
-  prefab: {fileID: 3122919519078347016, guid: bbd1c36eaf3edd744be708f47153a67e, type: 3}
+  prefab: {fileID: 0}
   heldModel: {fileID: 0}
   heldPosition: {x: 0, y: 0, z: 0}
   heldRotation: {x: 0, y: 0, z: 0}
@@ -58,4 +58,9 @@ MonoBehaviour:
   transport: {fileID: 0}
   sapling: {fileID: 0}
   lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
   raidModifier: {fileID: 0}

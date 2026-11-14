@@ -296,6 +296,10 @@ public sealed class PlayerSaveData
     public List<string> quickItems;
     /// <summary>The items on the skill bar, by slot: an item id, or "" where a skill or nothing is. Missing in older saves.</summary>
     public List<string> skillBarItems;
+    /// <summary>The skills the player knows (a boss's reward among them), by id. Missing in older saves, which keep the starting ones.</summary>
+    public List<string> knownSkills;
+    /// <summary>The skill bar, by slot: a skill id, or "" for an empty slot. Missing in older saves.</summary>
+    public List<string> skillBar;
 }
 
 [Serializable]

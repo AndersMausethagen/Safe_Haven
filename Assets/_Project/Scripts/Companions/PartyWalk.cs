@@ -25,6 +25,18 @@ public sealed class PartyWalk
     /// <summary>The walk under way, or the last one: what Wait Until The Walk Reaches and Change Time of Day follow.</summary>
     public static PartyWalk Current { get; internal set; }
 
+    // Entering play mode doesn't reload scripts in this project. A walk also belongs to its scene: one stopped with it (its
+    // node's coroutine ends without running its finally) mustn't be waited on in the next.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        UnityEngine.SceneManagement.SceneManager.sceneUnloaded -= Forget;
+        UnityEngine.SceneManagement.SceneManager.sceneUnloaded += Forget;
+    }
+
+    private static void Forget(UnityEngine.SceneManagement.Scene scene) => Current = null;
+
     public float Length { get; }
 
     /// <summary>How much of the way is behind them, 0 to 1.</summary>

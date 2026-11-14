@@ -42,6 +42,9 @@ public sealed class PrologueDirector : MonoBehaviour
     private bool chapterActive;
     private bool wolvesComing; // the camp's warning line is up; its wolves spawn when it closes
     private const float BetweenCampWaves = 3f;
+    // The longest the warning can be up. An aside's callback is lost when another line or a conversation takes the box,
+    // so the wolves never wait on it alone.
+    private const float WolvesComeAtLatest = 15f;
     private PrologueBuildArea buildArea;
 
     public static PrologueDirector Current { get; private set; }
@@ -159,6 +162,8 @@ public sealed class PrologueDirector : MonoBehaviour
         }
         elapsed += Time.deltaTime;
         enemies.RemoveAll(enemy => enemy == null || !enemy.IsAlive);
+        if (wolvesComing && step == PrologueStep.DefendCamp && elapsed >= WolvesComeAtLatest)
+            WolvesArrive();
         if (step == PrologueStep.CatchBreath && elapsed >= chapter.Duration)
             GameEvents.Raise(definition.RestedEvent);
         else if (step == PrologueStep.DefendCamp && enemies.Count == 0 && !wolvesComing)
@@ -214,15 +219,16 @@ public sealed class PrologueDirector : MonoBehaviour
         portalVisual.SetActive(step.PortalOpen());
         // A story leads them once it gets going; until then they wait at the chapter's place like anyone.
         PrologueCompanions orders = chapter != null ? chapter.Companions : PrologueCompanions.WaitAtSite;
+        Transform checkpoint = PointAt(chapter != null ? chapter.Checkpoint : step.Checkpoint());
         if (orders != PrologueCompanions.StandStill && (orders != PrologueCompanions.StoryLeads || restoring))
         {
             Transform rally = orders == PrologueCompanions.Follow ? null : PointAt(chapter != null ? chapter.RallySite : PrologueSite.Portal);
             foreach (PrologueCompanion companion in companions)
-                if (companion != null) companion.RallyAt(rally, restoring);
+                if (companion != null) companion.RallyAt(rally, restoring, checkpoint);
         }
 
         if (restoring)
-            MovePlayer(PointAt(chapter != null ? chapter.Checkpoint : step.Checkpoint()));
+            MovePlayer(checkpoint);
         if (step == PrologueStep.Finished)
         {
             BeginEnding(false);
@@ -238,12 +244,7 @@ public sealed class PrologueDirector : MonoBehaviour
             {
                 // The camp's wolves come once the warning has been spoken (an aside, so the player is free meanwhile).
                 wolvesComing = true;
-                Speak(chapter.ArrivalText, () =>
-                {
-                    if (!wolvesComing || !chapterActive || step != PrologueStep.DefendCamp) return;
-                    wolvesComing = false;
-                    StartChapter();
-                }, false);
+                Speak(chapter.ArrivalText, WolvesArrive, false);
             }
             else
             {
@@ -261,6 +262,14 @@ public sealed class PrologueDirector : MonoBehaviour
     private Transform PointAt(PrologueSite site) =>
         site == PrologueSite.Portal ? portalPoint : site == PrologueSite.Camp ? campPoint :
         site == PrologueSite.Meadow ? meadowPoint : startPoint;
+
+    // The warning has been read (or has been up long enough, see WolvesComeAtLatest): the camp's first wave comes.
+    private void WolvesArrive()
+    {
+        if (!wolvesComing || !chapterActive || step != PrologueStep.DefendCamp) return;
+        wolvesComing = false;
+        StartChapter();
+    }
 
     // The chapter's clock and arrivals: wolves, the portal's rumble.
     private void StartChapter()
@@ -382,7 +391,15 @@ public sealed class PrologueDirector : MonoBehaviour
         ClearEnemies();
         health.Revive(1f);
         if (Player.Current.TryGetComponent(out PlayerAnimationController body)) body.SetDead(false);
-        RefreshStep(true);
+        // While a story leads the party (a walk, its fight) a restart would send everyone back to the chapter's start and
+        // leave the story's own enemies where they are; on the run to the stones the camp's checkpoint is where the old troll
+        // now stands. The player wakes beside the party instead, and the story keeps its orders.
+        bool besideParty = chapter != null && (chapter.Companions == PrologueCompanions.StoryLeads || step == PrologueStep.ReachPortal);
+        PrologueCompanion near = besideParty ? System.Array.Find(companions, c => c != null && c.isActiveAndEnabled) : null;
+        if (near != null && NavMesh.SamplePosition(near.transform.position - near.transform.forward * 1.5f, out NavMeshHit beside, 3f, NavMesh.AllAreas))
+            MovePlayer(beside.position, near.transform.rotation);
+        else
+            RefreshStep(true);
         reviving = false;
     }
 
@@ -393,12 +410,14 @@ public sealed class PrologueDirector : MonoBehaviour
         enemies.Clear();
     }
 
-    private void MovePlayer(Transform point)
+    private void MovePlayer(Transform point) => MovePlayer(point.position, point.rotation);
+
+    private void MovePlayer(Vector3 position, Quaternion rotation)
     {
         CharacterController body = Player.Current.GetComponent<CharacterController>();
         bool wasEnabled = body != null && body.enabled;
         if (wasEnabled) body.enabled = false;
-        Player.Current.transform.SetPositionAndRotation(point.position, point.rotation);
+        Player.Current.transform.SetPositionAndRotation(position, rotation);
         if (wasEnabled) body.enabled = true;
     }
 

@@ -239,6 +239,7 @@ public static class RaidLauncher
             Companion = companion,
             IsLarge = large,
             Foretold = RaidForecast.For(raid, runSeed, foretoldEvents),
+            ExtraRumours = HavenReadiness.ExtraRumours,
         };
         if (elapsed > 0f)
         {

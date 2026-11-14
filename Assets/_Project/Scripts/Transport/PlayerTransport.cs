@@ -96,6 +96,15 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
             yield break;
         }
 
+        // A scene's setup steps can outlast its Start: a generated raid lays out its ground and moves the player to its
+        // start behind the loading screen, which would leave a cart set down here behind.
+        bool ready = false;
+        SceneTransition.WhenReady(() => ready = true);
+        while (!ready)
+        {
+            yield return null;
+        }
+
         // Set down too early it falls through a scene that is still waking. The player standing proves the ground is there.
         for (float waited = 0f; !Movement.IsGrounded && waited < ArrivalSeconds; waited += Time.unscaledDeltaTime)
         {
@@ -332,6 +341,12 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
         if (transport.Driver is Haulable haulable)
         {
             haulable.Take(this);
+        }
+
+        // Home again: the save on coming home was written before the cart and its load were set down.
+        if (RaidDirector.Current == null)
+        {
+            SaveGameService.SaveAfterArrival();
         }
     }
 }

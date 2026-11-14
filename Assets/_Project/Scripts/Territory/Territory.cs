@@ -44,18 +44,25 @@ public static class Territory
     public static Action<LandWork, string, int> ForHost { get; set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void Listen()
+    private static void ResetForNewPlaySession()
     {
-        GameEvents.Raised -= OnGameEvent;
-        GameEvents.Raised += OnGameEvent;
-        ExperienceTracker.Practised -= OnPractised;
-        ExperienceTracker.Practised += OnPractised;
         waiting.Clear();
         burnedOnRuns.Clear();
         haven = null;
         placesByRegion = null;
         Changed = null;
         ForHost = null;
+    }
+
+    // After the reset phase: GameEvents clears its own listeners in SubsystemRegistration, and in a build the order of hooks
+    // in one phase isn't fixed, so subscribing there could be wiped (the bug audit's B10).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+    private static void Listen()
+    {
+        GameEvents.Raised -= OnGameEvent;
+        GameEvents.Raised += OnGameEvent;
+        ExperienceTracker.Practised -= OnPractised;
+        ExperienceTracker.Practised += OnPractised;
     }
 
     /// <summary>The host's lands have arrived in a guest's game (HavenSync): the stones show them.</summary>

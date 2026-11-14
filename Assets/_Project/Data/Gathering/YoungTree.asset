@@ -42,7 +42,7 @@ MonoBehaviour:
   burstYields:
     entries: []
   feedback: {fileID: 0}
-  worldModelPrefab: {fileID: 4814477786203790681, guid: 2813b2a24ee3b3f4c8ede941df63e3a9, type: 3}
-  worldPrefab: {fileID: 7857519288705744795, guid: e8f5ac7427646e942aaf261bf18f6768, type: 3}
+  worldModelPrefab: {fileID: 0}
+  worldPrefab: {fileID: 1000865458160168767, guid: 3ff15ae3251d803438f641815fb6dacb, type: 3}
   modelVariants: []
   variantScale: {x: 0.9, y: 1.1}

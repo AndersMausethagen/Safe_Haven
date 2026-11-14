@@ -26,6 +26,9 @@ public sealed class RaidSession
     /// <summary>What the briefing said would happen on this raid. These are drawn first, so it comes true.</summary>
     public IReadOnlyList<RaidEventDefinition> Foretold { get; set; } = Array.Empty<RaidEventDefinition>();
 
+    /// <summary>The rumours the Haven's buildings add (a Watch Post's), counted at home: the raid's scene has none of them.</summary>
+    public int ExtraRumours { get; set; }
+
     /// <summary>How many bosses fell on this raid, for what those who went along remember.</summary>
     public int BossesBeaten { get; set; }
 

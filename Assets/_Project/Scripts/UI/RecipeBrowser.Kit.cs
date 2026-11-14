@@ -12,7 +12,8 @@ using UnityEngine.UI;
 /// </summary>
 public sealed partial class RecipeBrowser
 {
-    private const string FavouritesKey = "SafeHaven.FavouriteRecipes";
+    // Not a const: CoopWireTests reads every "SafeHaven." constant as a co-op message name, and this is a PlayerPrefs key.
+    private static readonly string FavouritesKey = "SafeHaven.FavouriteRecipes";
 
     private static HashSet<string> favourites;
 

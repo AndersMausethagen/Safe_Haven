@@ -53,6 +53,16 @@ public sealed class RaidHudView : MonoBehaviour
     private float nextRiskRefresh;
     private float nextAlertsRefresh;
     private float nameUntil;
+    private int shownSecond = -1;
+    private RaidStage namedStage;
+    private RaidDirector namedFor;
+    private string stageText = "";
+    private string raidAndStageText = "";
+    private QuestDefinition timedQuest;
+    private int timedObjective = -1;
+    private int timedKeys = -1;
+    private string timedName = "";
+    private string timedText = "";
     private float timerSize;
     private bool rumoursHinted;
     private Canvas canvas;
@@ -96,17 +106,26 @@ public sealed class RaidHudView : MonoBehaviour
             bool show = QuestTimers.TryGetHudTimer(out QuestDefinition quest, out float remaining, out float duration);
             canvas.enabled = show;
             if (!show) return;
-            raidNameLabel.text = quest.DisplayName.ToUpperInvariant();
             ShowTime(remaining, Mathf.Min(warningTime, duration * 0.5f), Mathf.Min(criticalTime, duration * 0.2f));
             QuestLog.Entry entry = GameSession.Quests.Get(quest);
-            string objective = "";
+            int open = -1;
             for (int i = 0; i < entry.Counts.Length; i++)
                 if (entry.IsObjectiveOpen(i))
                 {
-                    objective = GameInput.WithRebinds(quest.Objectives[i].Describe());
+                    open = i;
                     break;
                 }
-            extractionLabel.text = objective;
+            // Made again only when the quest, its open step or the keys change (WithRebinds runs a regex over the line).
+            if (quest != timedQuest || open != timedObjective || GameInput.KeysVersion != timedKeys)
+            {
+                timedQuest = quest;
+                timedObjective = open;
+                timedKeys = GameInput.KeysVersion;
+                timedName = quest.DisplayName.ToUpperInvariant();
+                timedText = open >= 0 ? GameInput.WithRebinds(quest.Objectives[open].Describe()) : "";
+            }
+            SetText(raidNameLabel, timedName);
+            SetText(extractionLabel, timedText);
             SetText(alertLabel, "");
             SetText(riskLabel, "");
             SetText(companionLabel, "");
@@ -158,16 +177,18 @@ public sealed class RaidHudView : MonoBehaviour
     // The raid's name when the player arrives and when things change; after that only the stage, if there is one.
     private void ShowRaidName()
     {
+        // Both lines made when the stage changes, not every frame.
         RaidStage stage = director.CurrentStage;
-        string stageText = stage == null ? "" : $"<color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
-        if (director.Session.Elapsed >= NameSeconds && Time.unscaledTime >= nameUntil)
+        if (stage != namedStage || namedFor != director)
         {
-            SetText(raidNameLabel, stageText);
-            return;
+            namedStage = stage;
+            namedFor = director;
+            stageText = stage == null ? "" : $"<color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
+            string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
+            raidAndStageText = stage == null ? raid : $"{raid}  ·  {stageText}";
         }
 
-        string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
-        SetText(raidNameLabel, stage == null ? raid : $"{raid}  ·  {stageText}");
+        SetText(raidNameLabel, director.Session.Elapsed >= NameSeconds && Time.unscaledTime >= nameUntil ? stageText : raidAndStageText);
     }
 
     private static void SetText(TMP_Text label, string value)
@@ -262,7 +283,13 @@ public sealed class RaidHudView : MonoBehaviour
     private void ShowTime(float remaining, float warning, float critical)
     {
         timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
-        timerLabel.text = RaidStats.FormatTime(remaining);
+        // The clock shows whole seconds: written when the second changes, not a new string every frame.
+        int second = Mathf.Max(0, Mathf.CeilToInt(remaining - 0.001f));
+        if (second != shownSecond)
+        {
+            shownSecond = second;
+            timerLabel.text = RaidStats.FormatTime(remaining);
+        }
         if (remaining <= critical)
         {
             float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 8f);

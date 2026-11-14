@@ -132,9 +132,11 @@ public static class RaidRumours
 {
     /// <summary>
     /// The rumours of a run: as many as the raid's Raid Rumours system asks for, plus what a resident's job adds. Empty for a
-    /// raid without one.
+    /// raid without one. <paramref name="fromBuildings"/> is what the Haven's buildings add, counted at home
+    /// (RaidSession.ExtraRumours); left out, it is counted from the buildings standing now, which only the Haven has.
     /// </summary>
-    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, SettlementState settlement, PlayerCrafting crafting, float rumourScale = 1f)
+    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, SettlementState settlement, PlayerCrafting crafting, float rumourScale = 1f,
+        int? fromBuildings = null)
     {
         var picked = new List<RaidRumourDefinition>();
         RaidRumoursSystem system = raid != null ? raid.GetSystem<RaidRumoursSystem>() : null;
@@ -156,7 +158,7 @@ public static class RaidRumours
         }
 
         var random = new System.Random(RaidLayout.SeedFor(seed, "Rumours"));
-        int wanted = Mathf.RoundToInt(system.Count * rumourScale) + settlement.JobBonus(job => job.ExtraRumours) + HavenReadiness.ExtraRumours;
+        int wanted = Mathf.RoundToInt(system.Count * rumourScale) + settlement.JobBonus(job => job.ExtraRumours) + (fromBuildings ?? HavenReadiness.ExtraRumours);
         for (int i = candidates.Count - 1; i >= 0 && picked.Count < wanted; i--)
         {
             if (candidates[i].Urgent)

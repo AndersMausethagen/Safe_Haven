@@ -22,6 +22,8 @@ public sealed class RaidEventDirector : MonoBehaviour
     private Transform container;
     private float nextThink;
     private float nextEventAt = -1f;
+    // The raid's own events, counted against Max Per Raid; the rumours' pinned sites are in `used` too but not counted.
+    private int randomEvents;
 
     /// <summary>Sites still waiting for the player, for the HUD.</summary>
     public IReadOnlyList<RaidEventSite> OpenSites => open;
@@ -56,7 +58,7 @@ public sealed class RaidEventDirector : MonoBehaviour
         }
 
         open.RemoveAll(site => site == null || site.IsResolved);
-        if (session.Elapsed < nextEventAt || used.Count >= settings.maxPerRaid || open.Count >= settings.maxOpenSites)
+        if (session.Elapsed < nextEventAt || randomEvents >= settings.maxPerRaid || open.Count >= settings.maxOpenSites)
         {
             return;
         }
@@ -67,6 +69,7 @@ public sealed class RaidEventDirector : MonoBehaviour
         // A failed placement tries again on the next think, with the player somewhere else.
         if (next != null && Begin(next))
         {
+            randomEvents++;
             float spread = ((float)random.NextDouble() * 2f - 1f) * settings.intervalSpread;
             nextEventAt = session.Elapsed + Mathf.Max(5f, settings.interval + spread);
         }

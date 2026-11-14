@@ -35,7 +35,11 @@ public sealed class FirstActTests
         Assert.AreSame(heartroot, new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(hunt.Objectives.ToList().IndexOf(kill)).FindPropertyRelative("monster").objectReferenceValue);
         Assert.IsTrue(kill.CountAlreadyOwned, "a Heartroot beaten before the quest counts: it won't come again");
         Assert.AreSame(Ember, hunt.Objectives.Single(o => o.Type == ObjectiveType.CraftItem).Item);
-        Assert.AreEqual(ObjectiveType.TalkTo, road.Objectives.Single().Type, "the twist is told at the portal");
+        // The conversation's end raises it (FixQuestAudit): a Talk To the portal counted every talk before the quest.
+        QuestObjective told = road.Objectives.Single();
+        Assert.AreEqual(ObjectiveType.QuestEvent, told.Type, "the twist is told at the portal");
+        Assert.AreSame(Load<GameEventDefinition>(Quests + "Events/RoadNorthHeard.asset"), told.QuestEvent);
+        Assert.IsFalse(told.CountAlreadyOwned, "only this conversation counts");
         Assert.AreSame(new SerializedObject(Load<RaidDefinition>("Assets/_Project/Data/Raids/TrollValley.asset")).FindProperty("unlockedBy").objectReferenceValue, heartroot.Prefab.GetComponent<BossEncounter>().Definition,
             "the road north is Troll Valley, which the Heartroot's fall opens");
     }
@@ -125,7 +129,9 @@ public sealed class FirstActTests
             Assert.IsFalse(twist.IsFight);
             Assert.AreEqual(3, twist.Nodes.OfType<HasHappenedNode>().Count(), "a word for each reason the player came");
             Assert.IsTrue(twist.Nodes.OfType<SayNode>().Any(n => n.line.Contains("we broke the pact first")));
-            Assert.AreEqual(1, twist.Nodes.OfType<CountAsDoneNode>().Count(), "the quest is done once it has been said");
+            var heard = Load<GameEventDefinition>(Quests + "Events/RoadNorthHeard.asset");
+            Assert.AreEqual(1, twist.Nodes.OfType<RaiseQuestEventNode>().Count(n => n.questEvent == heard), "the quest is done once it has been said");
+            Assert.IsEmpty(twist.Nodes.OfType<CountAsDoneNode>(), "a Talk To the portal would count every earlier talk");
 
             HomePortal portal = roots.SelectMany(r => r.GetComponentsInChildren<HomePortal>(true)).Single();
             SerializedProperty whispers = new SerializedObject(portal).FindProperty("questWhispers");

@@ -34,20 +34,6 @@ public sealed class GroundPaintTests
         Assert.IsTrue(rules.Rules.All(r => r.layer != null), look);
     }
 
-    [Test]
-    public void TheHavenGroves_StandOnOldGrowthFloor()
-    {
-        var scene = EditorSceneManager.OpenPreviewScene("Assets/_Project/Scenes/SafeHaven.unity");
-        try
-        {
-            GroundPaintArea[] floors = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<GroundPaintArea>(true)).ToArray();
-            Assert.AreEqual(4, floors.Length);
-            Assert.IsTrue(floors.All(f => f.Rules == WorldLook.ForestLake.Rules("Old-Growth Forest") && f.IsArea && f.Spline.Closed),
-                          "the Forest Lake's old-growth floor");
-        }
-        finally
-        {
-            EditorSceneManager.ClosePreviewScene(scene);
-        }
-    }
+    // The Haven's four old-growth groves (Ground Paint Areas from the old BuildHavenWorld) went with the regenerated Haven:
+    // HavenWorldGenerator paints its ground itself, the Haven Meadow and Dark Forest rules blended by distance.
 }

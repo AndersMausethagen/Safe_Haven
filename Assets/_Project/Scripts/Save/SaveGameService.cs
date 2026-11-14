@@ -87,12 +87,14 @@ public static class SaveGameService
     /// <summary>Why the game can't be saved right now, in words for the player, or null when it can.</summary>
     public static string CheckSave()
     {
-        if (loading)
+        // Behind a loading screen the old scene is still alive and half recorded.
+        if (loading || SceneTransition.IsBusy)
         {
             return "The game is still loading.";
         }
 
-        if (GameSession.ActiveRaid != null)
+        // The raid's scene stays a moment after its outcome (ActiveRaid is cleared then): a save there would start a raid.
+        if (GameSession.ActiveRaid != null || RaidDirector.Current != null)
         {
             return RaidRefusal;
         }
@@ -108,7 +110,8 @@ public static class SaveGameService
     /// <summary>Why a save can't be loaded right now, in words for the player, or null when one can.</summary>
     public static string CheckLoad()
     {
-        if (loading)
+        // A load during a scene change would replace the game while the change carries on to its own scene.
+        if (loading || SceneTransition.IsBusy)
         {
             return "The game is already loading.";
         }
@@ -118,7 +121,12 @@ public static class SaveGameService
             return "You're in a friend's Haven. Leave the session first (Escape menu).";
         }
 
-        return GameSession.ActiveRaid != null ? RaidRefusal : null;
+        if (CinematicScreen.IsPlaying)
+        {
+            return "Let the scene finish first.";
+        }
+
+        return GameSession.ActiveRaid != null || RaidDirector.Current != null ? RaidRefusal : null;
     }
 
     /// <summary>
@@ -165,6 +173,16 @@ public static class SaveGameService
         }
 
         SceneTransition.SceneReady += OnReady;
+    }
+
+    /// <summary>Saves again once what came home with the player (a cart, a horse) has been set down, after the save on
+    /// coming home, which is written before they arrive.</summary>
+    public static void SaveAfterArrival()
+    {
+        if (ShouldAutosave && RaidDirector.Current == null && CheckSave() == null && !TrySave(out string problem))
+        {
+            Debug.LogWarning("Couldn't save after arriving: " + problem);
+        }
     }
 
     // A test session in the Editor, playing a scene with no game loaded, doesn't leave saves behind for Continue to find.
@@ -251,7 +269,7 @@ public static class SaveGameService
     /// </summary>
     public static bool TryPlay(SaveData data, IContentLookup content, string caption, out string problem)
     {
-        problem = loading ? "The game is already loading." : GameSession.ActiveRaid != null ? RaidRefusal : null;
+        problem = loading || SceneTransition.IsBusy ? "The game is already loading." : GameSession.ActiveRaid != null ? RaidRefusal : null;
         if (problem != null)
         {
             return false;
@@ -458,7 +476,7 @@ public static class SaveGameService
     /// <summary>Starts over in the given scene as the character made on the character creation screen.</summary>
     public static bool TryStartNewGame(string scene, CharacterAppearance look, out string problem)
     {
-        problem = loading ? "The game is already loading." : !CanLoad(scene) ? $"The scene '{scene}' isn't in the build." : null;
+        problem = loading || SceneTransition.IsBusy ? "The game is already loading." : !CanLoad(scene) ? $"The scene '{scene}' isn't in the build." : null;
         if (problem != null)
         {
             return false;
@@ -474,7 +492,8 @@ public static class SaveGameService
     private static void Go(string scene, string notice, string caption)
     {
         // The player stays in the old scene until the new one is ready, so keep them still meanwhile.
-        if (Player.Current != null && Player.Current.TryGetComponent(out PlayerInputHandler input))
+        PlayerInputHandler input = null;
+        if (Player.Current != null && Player.Current.TryGetComponent(out input))
         {
             input.enabled = false;
         }
@@ -499,6 +518,10 @@ public static class SaveGameService
             SceneManager.sceneLoaded -= pendingArrival;
             pendingArrival = null;
             loading = false;
+            if (input != null)
+            {
+                input.enabled = true;
+            }
         }
     }
 

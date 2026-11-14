@@ -331,7 +331,16 @@ public sealed class RaidDirector : MonoBehaviour
             extracted ? MessageKind.Gain : MessageKind.Warning);
         // Started before listeners run, so a faulty one can't leave the player stranded in the raid.
         StartCoroutine(ReturnAfterDelay());
-        Ended?.Invoke(Session);
+        try
+        {
+            Ended?.Invoke(Session);
+        }
+        finally
+        {
+            // After Ended, which fills in who was rescued (RescuableTraveler), so the journal names them.
+            JournalNotices.WriteDown(Report, Report.BroughtDownBy);
+        }
+
         // After Ended: someone rescued has come home and taught what they know, so their workplace answers nothing now.
         HavenAnswers.Fill(Report, player != null ? player.GetComponent<PlayerCrafting>() : null,
             Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), GameSession.Settlement);
@@ -353,6 +362,18 @@ public sealed class RaidDirector : MonoBehaviour
         if (player.TryGetComponent(out PlayerInputHandler input))
         {
             input.enabled = false;
+        }
+
+        // The report is written: nothing may change the outcome now. A blow would kill an extracted player under
+        // "Extracted!", and an event's choices still open would apply to a raid that has ended.
+        if (player.TryGetComponent(out Damageable body))
+        {
+            body.AddInvulnerability(this);
+        }
+
+        if (ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen)
+        {
+            ActionMenuWindow.Current.Close();
         }
     }
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -93,8 +94,10 @@ public static class HorseGround
 
     private static Terrain TerrainAt(Vector3 point)
     {
-        foreach (Terrain terrain in Terrain.activeTerrains)
+        IReadOnlyList<Terrain> terrains = Terrains.Active;
+        for (int i = 0; i < terrains.Count; i++)
         {
+            Terrain terrain = terrains[i];
             if (terrain == null || terrain.terrainData == null)
             {
                 continue;

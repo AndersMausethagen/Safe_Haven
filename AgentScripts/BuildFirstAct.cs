@@ -69,6 +69,8 @@ public static class BuildFirstAct
             so.FindProperty("description").stringValue = "A live coal from your own fire, banked in moss and bark. It stays warm for days. The forest cannot forget a hearth that someone tends, and this is a piece of one.";
             so.FindProperty("icon").objectReferenceValue = Load<ItemDefinition>("Assets/_Project/Data/Items/HandTorch.asset").Icon;
             so.FindProperty("weight").floatValue = 0.3f;
+            // Not the copied Sticks prefab: dropped, an ember looked like sticks (HavenBuildingTests: a world prefab of its own).
+            so.FindProperty("prefab").objectReferenceValue = null;
         });
 
         RecipeDefinition recipe = Copy<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/StewedBerries.asset", "Assets/_Project/Data/Crafting/Recipes/HearthEmber.asset");

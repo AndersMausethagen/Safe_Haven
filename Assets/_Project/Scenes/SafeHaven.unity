@@ -414558,10 +414558,8 @@ MonoBehaviour:
   - rid: 2623126038171615473
   - rid: 2623126038171615474
   - rid: 2623126038171615475
+  - rid: 2623126096390914204
   links:
-  - from: afce4d96955543cdaea4db17101ba398
-    output: 0
-    to: 7652550cb95340a0bf77dc8dcde54379
   - from: 7652550cb95340a0bf77dc8dcde54379
     output: 0
     to: 18adcd2543574fd0a18bdea6827c469a
@@ -414571,6 +414569,12 @@ MonoBehaviour:
   - from: 20a262ac06a84ebcb4348ecad2b1a97b
     output: 0
     to: 32c572d8cbec49288de78d4a83164496
+  - from: ca8e348bec7844e7a9c6788a3e64bc9c
+    output: 0
+    to: 7652550cb95340a0bf77dc8dcde54379
+  - from: afce4d96955543cdaea4db17101ba398
+    output: 0
+    to: ca8e348bec7844e7a9c6788a3e64bc9c
   logSteps: 0
   references:
     version: 2
@@ -414580,7 +414584,7 @@ MonoBehaviour:
       data:
         id: afce4d96955543cdaea4db17101ba398
         position: {x: 40, y: 60}
-        once: 1
+        once: 0
         raids: 3
     - rid: 2623126038171615472
       type: {class: WaitNode, ns: , asm: SafeHaven}
@@ -414613,6 +414617,12 @@ MonoBehaviour:
       data:
         id: 32c572d8cbec49288de78d4a83164496
         position: {x: 1240, y: 60}
+        quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
+    - rid: 2623126096390914204
+      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
+      data:
+        id: ca8e348bec7844e7a9c6788a3e64bc9c
+        position: {x: 190, y: 230}
         quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
 --- !u!1001 &1640636843
 PrefabInstance:

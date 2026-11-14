@@ -25,6 +25,8 @@ public sealed class HorseHud : MonoBehaviour
     private TMP_Text hint;
     private Bar first;
     private Bar second;
+    private string interactKey;
+    private int keysSeen = -1;
 
     private sealed class Bar
     {
@@ -95,7 +97,14 @@ public sealed class HorseHud : MonoBehaviour
         Player player = Player.Current;
         PlayerRiding riding = player != null && player.TryGetComponent(out PlayerRiding found) ? found : null;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        string key = GameInput.KeyLabel(GameInput.Interact);
+        // Looked up again only when the keys change (a rebinding, a controller picked up): it reads the binding each time.
+        if (keysSeen != GameInput.KeysVersion)
+        {
+            keysSeen = GameInput.KeysVersion;
+            interactKey = GameInput.KeyLabel(GameInput.Interact);
+        }
+
+        string key = interactKey;
         Horse horse = null;
         if (taming != null && taming.Current == HorseTaming.Phase.Struggle)
         {

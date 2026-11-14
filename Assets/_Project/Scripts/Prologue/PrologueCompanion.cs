@@ -64,12 +64,17 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
         if (companion == null) Debug.LogError("An expedition member needs a Companion to walk and fight.", this);
     }
 
-    /// <summary>The director's rally point: stay there (in formation), or follow the player when there is none.</summary>
-    public void RallyAt(Transform point, bool restore)
+    /// <summary>The director's rally point: stay there (in formation), or follow the player when there is none. Restoring
+    /// a follow chapter (a load, a revival), they are put beside <paramref name="followFrom"/>, where the player is put,
+    /// rather than walking the road from where the scene left them.</summary>
+    public void RallyAt(Transform point, bool restore, Transform followFrom = null)
     {
         if (companion == null) return;
         if (point == null)
         {
+            if (restore && followFrom != null && agent != null &&
+                NavMesh.SamplePosition(followFrom.position + companion.FormationOffset, out NavMeshHit near, 5f, NavMesh.AllAreas))
+                agent.Warp(near.position);
             companion.Command(CompanionOrder.Follow);
             return;
         }

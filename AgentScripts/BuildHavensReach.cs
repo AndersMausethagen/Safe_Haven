@@ -173,12 +173,15 @@ public static class BuildHavensReach
 
         // ----- After the third raid: the call -----
         StoryScript call = StoryBuilder.Fresh(root, "Story - The Cold Stones");
-        var thrice = new WhenRaidsDone { raids = RaidsBefore };
+        // Not once: the save on coming home lands in its wait, and a once-only trigger saved as spent there would never offer
+        // the quest again. The check keeps it to one call: each homecoming asks again only while the quest isn't begun.
+        var thrice = new WhenRaidsDone { raids = RaidsBefore, once = false };
+        var unasked = new CheckQuestNode { quest = cold };
         var settle = new WaitNode { seconds = 8f };
         var quiet = new WaitForQuietNode();
         var calling = Aside(Call);
         var begin = new StartQuestNode { quest = cold };
-        StoryBuilder.Link(call, (thrice, 0, settle), (settle, 0, quiet), (quiet, 0, calling), (calling, 0, begin));
+        StoryBuilder.Link(call, (thrice, 0, unasked), (unasked, 0, settle), (settle, 0, quiet), (quiet, 0, calling), (calling, 0, begin));
 
         // ----- What the stones were: the conversation at the portal -----
         StoryScript told = StoryBuilder.Fresh(root, "Story - What the Stones Were");

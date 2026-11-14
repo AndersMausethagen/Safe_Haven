@@ -104,6 +104,25 @@ public static class SaveMapper
                 }
             }
 
+            // Skills learned in play (a boss's reward) are lost with the session without this.
+            if (player.SkillBar != null)
+            {
+                data.player.knownSkills = new List<string>();
+                foreach (SkillDefinition skill in player.KnownSkills)
+                {
+                    if (skill != null)
+                    {
+                        data.player.knownSkills.Add(skill.Id);
+                    }
+                }
+
+                data.player.skillBar = new List<string>();
+                foreach (SkillDefinition skill in player.SkillBar)
+                {
+                    data.player.skillBar.Add(skill != null ? skill.Id : "");
+                }
+            }
+
             PlayerSnapshot.Condition state = player.State;
             data.player.hasNeeds = state.HasNeeds;
             data.player.hunger = state.Hunger;
@@ -603,6 +622,8 @@ public static class SaveMapper
             loaded.Player.WithSkillBarItems(onBar);
         }
 
+        ReadSkills(player, content as ContentDatabase, loaded);
+
         StashSaveData stash = data.stash ?? new StashSaveData();
         loaded.Stash = new StashStorage();
         ReadSlots(stash.items, loaded.Stash.Items, content, loaded.MissingContent);
@@ -854,6 +875,41 @@ public static class SaveMapper
         }
 
         return becameItems;
+    }
+
+    // The skill book and bar, when the save has them (a whole bar of SkillLoadout.SlotCount slots: JsonUtility writes a list
+    // it wasn't given as an empty one). Skills are looked up in the ContentDatabase only, not through IContentLookup, so a
+    // lookup without skills (tests) leaves the starting skills alone, and so does a save none of whose skills can be found.
+    private static void ReadSkills(PlayerSaveData player, ContentDatabase database, LoadedGame loaded)
+    {
+        if (database == null || player.skillBar == null || player.skillBar.Count != SkillLoadout.SlotCount)
+        {
+            return;
+        }
+
+        var known = new List<SkillDefinition>();
+        foreach (string id in player.knownSkills ?? new List<string>())
+        {
+            SkillDefinition skill = Resolve(database.FindSkill(id), "skill", id, loaded.MissingContent);
+            if (skill != null)
+            {
+                known.Add(skill);
+            }
+        }
+
+        if (known.Count == 0)
+        {
+            return;
+        }
+
+        var bar = new SkillDefinition[SkillLoadout.SlotCount];
+        for (int i = 0; i < bar.Length; i++)
+        {
+            string id = player.skillBar[i];
+            bar[i] = string.IsNullOrEmpty(id) ? null : Resolve(database.FindSkill(id), "skill", id, loaded.MissingContent);
+        }
+
+        loaded.Player.WithSkills(known, bar);
     }
 
     private static T Resolve<T>(T found, string kind, string id, List<string> missing) where T : UnityEngine.Object

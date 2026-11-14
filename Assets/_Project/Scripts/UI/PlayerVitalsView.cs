@@ -39,6 +39,9 @@ public sealed class PlayerVitalsView : MonoBehaviour
         [NonSerialized] public float target = 1f;
         [NonSerialized] public float shown = 1f;
         [NonSerialized] public float holdUntil;
+        // What the label says now: stamina changes every frame while it fills, and SetText rebuilds the label every time.
+        [NonSerialized] public float labelCurrent = float.NaN;
+        [NonSerialized] public float labelMax = float.NaN;
     }
 
     [SerializeField] private Bar health = new Bar();
@@ -322,9 +325,12 @@ public sealed class PlayerVitalsView : MonoBehaviour
         SetAnchor(bar.fill, fraction);
         SetAnchor(bar.trail, bar.shown);
 
-        if (bar.value != null)
+        float whole = Mathf.Ceil(current);
+        if (bar.value != null && (whole != bar.labelCurrent || max != bar.labelMax))
         {
-            bar.value.SetText("{0:0} / {1:0}", Mathf.Ceil(current), max);
+            bar.labelCurrent = whole;
+            bar.labelMax = max;
+            bar.value.SetText("{0:0} / {1:0}", whole, max);
         }
     }
 

@@ -8,7 +8,9 @@ using UnityEngine;
 /// </summary>
 public static class JournalNotices
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    // After SubsystemRegistration, where GameEvents clears Raised: Unity doesn't order hooks within one phase, and one run
+    // after this one would leave the journal deaf for the whole session.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
     private static void Listen()
     {
         GameEvents.Raised -= OnGameEvent;

@@ -33,6 +33,8 @@ public sealed class HorseTravel : MonoBehaviour
     }
 
     private static Carried? pending;
+    // The game the horse belongs to: one carried out of a game since replaced (New Game, Load) has nowhere to go.
+    private static WorldState pendingWorld;
     private static HorseTravel current;
 
     /// <summary>The horse that came through the portal into this raid, while it is here; null otherwise.</summary>
@@ -46,6 +48,7 @@ public sealed class HorseTravel : MonoBehaviour
     private static void ResetForNewPlaySession()
     {
         pending = null;
+        pendingWorld = null;
         InRaid = null;
         IsTied = false;
     }
@@ -61,9 +64,11 @@ public sealed class HorseTravel : MonoBehaviour
         var holder = new GameObject("Horse Travel");
         DontDestroyOnLoad(holder);
         current = holder.AddComponent<HorseTravel>();
+        // Only where there is a player (woken by now): the results screen between a raid and home has none, and the horse
+        // waits through it.
         SceneManager.sceneLoaded += (scene, mode) =>
         {
-            if (pending.HasValue && current != null)
+            if (pending.HasValue && current != null && Player.Current != null)
             {
                 current.StartCoroutine(current.Arrive());
             }
@@ -123,12 +128,16 @@ public sealed class HorseTravel : MonoBehaviour
 
         bool ridden = horse.Rider != null;
         pending = new Carried(entity.PrefabId, horse.CaptureState(), horse.Health.HealthFraction, ridden);
+        pendingWorld = GameSession.World;
         if (horse.Rider != null)
         {
             horse.Rider.Dismount(thrown: true);
         }
 
         HorseHitch.Unhitch(horse);
+        // Gone from the Haven's world, as a cart is (Transport.Remove): destroyed alone, it is recorded as still there and
+        // comes back on returning, besides the one the raid sends home.
+        entity.MarkDestroyed();
         Destroy(horse.gameObject);
     }
 
@@ -161,6 +170,7 @@ public sealed class HorseTravel : MonoBehaviour
             }
 
             pending = new Carried(entity.PrefabId, horse.CaptureState(), horse.Health.HealthFraction, ridden && extracted);
+            pendingWorld = GameSession.World;
         }
 
         if (report != null)
@@ -207,6 +217,19 @@ public sealed class HorseTravel : MonoBehaviour
     {
         Carried carried = pending.Value;
         pending = null;
+        if (GameSession.World != pendingWorld)
+        {
+            yield break;
+        }
+
+        // A generated raid moves the player to its start while it is laid out, behind the loading screen.
+        bool ready = false;
+        SceneTransition.WhenReady(() => ready = true);
+        while (!ready)
+        {
+            yield return null;
+        }
+
         Player player = null;
         for (float waited = 0f; waited < ArrivalSeconds; waited += Time.unscaledDeltaTime)
         {
@@ -220,9 +243,21 @@ public sealed class HorseTravel : MonoBehaviour
         }
 
         yield return new WaitForSecondsRealtime(0.4f);
+        player = player != null ? player : Player.Current;
+        if (player == null)
+        {
+            // Nobody here to come to (a scene with no player): it waits for the next one, if the game is still the same.
+            if (!pending.HasValue && GameSession.World == pendingWorld)
+            {
+                pending = carried;
+            }
+
+            yield break;
+        }
+
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         SaveableEntity prefab = content != null ? content.FindPrefab(carried.PrefabId) : null;
-        if (prefab == null || player == null)
+        if (prefab == null)
         {
             yield break;
         }
@@ -249,6 +284,12 @@ public sealed class HorseTravel : MonoBehaviour
         if (carried.Ridden)
         {
             PlayerRiding.For(player.gameObject).Mount(horse, animate: false);
+        }
+
+        // The save on coming home was written before the horse was here.
+        if (!raid)
+        {
+            SaveGameService.SaveAfterArrival();
         }
     }
 }

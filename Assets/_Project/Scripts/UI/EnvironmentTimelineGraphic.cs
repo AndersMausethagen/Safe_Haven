@@ -18,6 +18,8 @@ public sealed class EnvironmentTimelineGraphic : MaskableGraphic
 
     public void SetTime(float value, float rise, float set)
     {
+        // To the in-game minute: the dot moves a fraction of a pixel a frame, and every change rebuilds the mesh and its canvas.
+        value = Mathf.Floor(value * 60f) / 60f;
         if (hour == value && sunrise == rise && sunset == set)
         {
             return;

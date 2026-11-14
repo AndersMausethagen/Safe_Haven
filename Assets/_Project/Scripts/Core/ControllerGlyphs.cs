@@ -12,7 +12,8 @@ public static class ControllerGlyphs
     public const string SpriteAssetName = "Controller Glyphs";
 
     // Gamepad controls by their names in a binding path; usages ({Submit}) and aliases are the button they stand for.
-    private static readonly Dictionary<string, string> Controls = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
+    // Read-only: a table, not state (nothing for the play-session reset to clear).
+    private static readonly IReadOnlyDictionary<string, string> Controls = new Dictionary<string, string>(System.StringComparer.OrdinalIgnoreCase)
     {
         { "buttonSouth", "buttonSouth" }, { "a", "buttonSouth" }, { "cross", "buttonSouth" }, { "{Submit}", "buttonSouth" },
         { "buttonEast", "buttonEast" }, { "b", "buttonEast" }, { "circle", "buttonEast" }, { "{Cancel}", "buttonEast" }, { "{Back}", "buttonEast" },
@@ -116,7 +117,11 @@ public static class ControllerGlyphs
 
     /// <summary>Looks for the sprite asset again (it was just built), and on every play session.</summary>
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
-    public static void Refresh() => spritesAvailable = null;
+    public static void Refresh()
+    {
+        spritesAvailable = null;
+        Tags.Clear();
+    }
 
     // The glyphs are TMP Settings' default sprite asset; looked up once.
     private static bool HasSprites

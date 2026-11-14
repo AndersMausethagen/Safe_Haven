@@ -59,6 +59,9 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     private bool alarmRaised;
     private bool extracted;
     private float nextCallAt;
+    // What the clock has done to this way out so far (see Status).
+    private bool openedOnce;
+    private bool closedOnce;
 
     /// <summary>Every enabled extraction point in the scene.</summary>
     public static IReadOnlyList<ExtractionPoint> Active => active;
@@ -94,11 +97,14 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     /// <summary>Seconds still to hold: the full duration before it is lit.</summary>
     public float TimeLeft => IsLit ? hold.Remaining : Duration;
 
-    /// <summary>Open, not yet open or closed, by the raid clock. Always open outside a raid.</summary>
-    public ExtractionStatus Status => ExtractionWindow.StatusAt(opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
+    /// <summary>Open, not yet open or closed, by the raid clock. Always open outside a raid. Once open it doesn't close
+    /// again before its time, and once closed it stays closed, though a site's choice adds time to the clock.</summary>
+    public ExtractionStatus Status => closedOnce ? ExtractionStatus.Closed
+        : ExtractionWindow.StatusAt(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
     public bool IsOpen => Status == ExtractionStatus.Open;
     /// <summary>Seconds until this point opens or closes, or -1 when it won't change again.</summary>
-    public float SecondsUntilChange => ExtractionWindow.SecondsUntilChange(opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
+    public float SecondsUntilChange => closedOnce ? -1f
+        : ExtractionWindow.SecondsUntilChange(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
 
     public string Verb => "Light the way home";
 
@@ -137,6 +143,13 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     private void Update()
     {
         ExtractionStatus status = Status;
+        // Only in a raid: outside one every point reads open.
+        if (RaidDirector.Current != null)
+        {
+            openedOnce |= status == ExtractionStatus.Open;
+            closedOnce |= status == ExtractionStatus.Closed;
+        }
+
         if (status != lastStatus)
         {
             lastStatus = status;

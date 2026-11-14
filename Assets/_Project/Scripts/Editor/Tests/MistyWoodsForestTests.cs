@@ -237,7 +237,15 @@ public sealed class MistyWoodsForestTests
         {
             CapsuleCollider capsule = rock.prefab.GetComponent<CapsuleCollider>();
             Assert.IsTrue(capsule.direction == 0 || capsule.direction == 1, "the navmesh's trunk shapes read upright or along x");
-            Assert.IsNotNull(rock.prefab.GetComponent<UnityEngine.AI.NavMeshObstacle>(), rock.prefab.name);
+            Assert.IsFalse(capsule.isTrigger, rock.prefab.name + " blocks");
+            // What nothing can mine, fell, break or move has no obstacle: the bake cuts round its collider
+            // (VegetationPackConverter.DropStaticObstacle). What can go away carves the NavMesh while it stands.
+            bool canGo = rock.prefab.GetComponent<ResourceNode>() != null || rock.prefab.GetComponent<ChoppableTree>() != null
+                || rock.prefab.GetComponent<Interactable>() != null || rock.prefab.GetComponent<Rigidbody>() != null;
+            if (canGo)
+            {
+                Assert.IsNotNull(rock.prefab.GetComponent<UnityEngine.AI.NavMeshObstacle>(), rock.prefab.name);
+            }
         }
 
         Assert.IsTrue(Map.Undergrowth.Where(u => u.prefab.GetComponent<ChoppableTree>() == null).All(u => u.prefab.GetComponent<Collider>() == null),

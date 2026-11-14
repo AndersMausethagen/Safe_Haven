@@ -16,8 +16,10 @@ using UnityEngine.Rendering;
 public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
 {
     // Identifies this run of the game, so a restore can tell "away on a raid" (same run: time passed) from "loaded from
-    // disk" (another run: no way to know how long it was).
-    private static readonly string Run = System.Guid.NewGuid().ToString("N");
+    // disk" (another run: no way to know how long it was). With the game's world: a save made earlier in the same run and
+    // loaded again is a new world, and must not count the real time since it was made as time away.
+    private static readonly string Process = System.Guid.NewGuid().ToString("N");
+    private static string Run => Process + "." + System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(GameSession.World);
 
     [SerializeField] private DayNightProfile profile;
     [Tooltip("The scene's directional light: the sun by day, the moon by night.")]

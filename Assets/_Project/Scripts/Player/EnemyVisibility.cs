@@ -64,15 +64,25 @@ public sealed class EnemyVisibility : MonoBehaviour
             bowTarget = archery.Target;
         }
 
-        foreach (MonsterAI monster in MonsterAI.Active)
+        IReadOnlyList<MonsterAI> monsters = MonsterAI.Active;
+        for (int i = 0; i < monsters.Count; i++)
         {
+            MonsterAI monster = monsters[i];
             if (monster == null || !monster.TryGetComponent(out Damageable health))
             {
                 continue;
             }
 
+            bool inRange = player != null && (health.transform.position - player.transform.position).sqrMagnitude <= rangeSquared;
             if (!outlines.TryGetValue(health, out Tracked tracked))
             {
+                // Made the first time it comes within range: a raid's every creature at once was a burst of objects, and
+                // most are never near.
+                if (!inRange)
+                {
+                    continue;
+                }
+
                 tracked = new Tracked
                 {
                     Copies = OutlineCopies.Create(health.transform, outlineMaterial, maskMaterial, "Enemy Visibility Outline", "Enemy Visibility Mask"),
@@ -87,7 +97,6 @@ public sealed class EnemyVisibility : MonoBehaviour
                 OutlineCopies.SetOutlineMaterial(tracked.Copies, hostile ? hostileMaterial : outlineMaterial);
             }
 
-            bool inRange = player != null && (health.transform.position - player.transform.position).sqrMagnitude <= rangeSquared;
             OutlineCopies.SetShown(tracked.Copies, show && inRange && health.IsAlive && health != bowTarget);
         }
 

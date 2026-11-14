@@ -28,6 +28,8 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     [SerializeField] private List<JobDefinition> jobs = new List<JobDefinition>();
     [Tooltip("Every gathering node, for nodes that pick one at random (RandomResourceNode).")]
     [SerializeField] private List<GatheringNodeDefinition> gatheringNodes = new List<GatheringNodeDefinition>();
+    [Tooltip("Every skill (the skill book: starting ones and bosses' rewards). Filled in automatically in the Editor.")]
+    [SerializeField] private List<SkillDefinition> skills = new List<SkillDefinition>();
 
     [NonSerialized] private Dictionary<string, ItemDefinition> itemsById;
     [NonSerialized] private Dictionary<string, RecipeDefinition> recipesById;
@@ -69,6 +71,11 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     public QuestDefinition FindQuest(string id)
     {
         return string.IsNullOrEmpty(id) ? null : quests.Find(quest => quest != null && quest.Id == id);
+    }
+
+    public SkillDefinition FindSkill(string id)
+    {
+        return string.IsNullOrEmpty(id) ? null : skills.Find(skill => skill != null && skill.Id == id);
     }
 
     /// <summary>The prefab a spawned object was made from, by the prefab id it was saved with.</summary>
@@ -155,6 +162,7 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
         CollectAll(ref residents);
         CollectAll(ref jobs);
         CollectAll(ref gatheringNodes);
+        CollectAll(ref skills);
         return added;
     }
 

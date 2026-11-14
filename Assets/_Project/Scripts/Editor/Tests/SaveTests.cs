@@ -294,10 +294,10 @@ public sealed class SaveTests
         Assert.AreEqual("First", read.scene);
     }
 
-    private SaveData Written(SaveStorage storage, string slot, string name, string savedAt, int level = 1)
+    private SaveData Written(SaveStorage storage, string slot, string name, string savedAt, int day = 1)
     {
         var data = new SaveData { version = SaveMapper.CurrentVersion, savedAtUtc = savedAt, scene = "SafeHaven", displayName = name };
-        data.progress.level = level;
+        data.settlement.daysPassed = day - 1;
         storage.Write(slot, data);
         return data;
     }
@@ -346,7 +346,7 @@ public sealed class SaveTests
         Assert.AreEqual(3, saves.Count);
         var readable = saves.FindAll(save => save.IsReadable);
         Assert.AreEqual("New Game", readable[0].Name);
-        Assert.AreEqual(7, readable[0].Level);
+        Assert.AreEqual(7, readable[0].Day);
         Assert.AreEqual("Old Game", readable[1].Name);
         Assert.IsFalse(saves.Find(save => save.Slot == "broken").IsReadable);
         Assert.AreEqual("new", SaveGameService.LatestSave().Slot);

@@ -80,7 +80,12 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         }
     }
 
-    private void Awake() => terrain = GetComponent<Terrain>();
+    private void Awake()
+    {
+        terrain = GetComponent<Terrain>();
+        // Out of step with the tree felling on the same terrain, which refreshes as often.
+        nextRefresh = Time.time + Random.value * RefreshSeconds;
+    }
 
     private void Update()
     {
@@ -127,7 +132,8 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
 
         for (int i = 0; i < positions.Count; i++)
         {
-            if (gatherable[i] && !stands.ContainsKey(i) && (positions[i] - player).sqrMagnitude <= ProxyRadius * ProxyRadius)
+            // The distance before the lookup: nearly every painted tree is far.
+            if (gatherable[i] && (positions[i] - player).sqrMagnitude <= ProxyRadius * ProxyRadius && !stands.ContainsKey(i))
             {
                 Spawn(i);
             }

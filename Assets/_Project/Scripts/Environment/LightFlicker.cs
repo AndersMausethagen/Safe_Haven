@@ -26,7 +26,14 @@ public sealed class LightFlicker : MonoBehaviour
     [Tooltip("Sparks per second.")]
     [SerializeField, Min(0f)] private float sparksPerSecond = 3f;
 
+    // A fire this far from the camera holds still at its authored light: its flicker can't be told from there, and many
+    // torches each animating their light every frame add up. Looked at a few times a second, out of step with the others.
+    private const float FlickerDistance = 60f;
+    private const float DistanceCheckSeconds = 0.5f;
+
     private Light fire;
+    private float nextDistanceCheck;
+    private bool far;
     private float baseIntensity;
     private float baseRange;
     private Color baseColour;
@@ -58,6 +65,7 @@ public sealed class LightFlicker : MonoBehaviour
         baseColour = fire.color;
         basePosition = transform.localPosition;
         seed = Random.value * 100f;
+        nextDistanceCheck = Time.time + Random.value * DistanceCheckSeconds;
         // Only a light on its own child wanders: never the torch, the arrow or the building it belongs to.
         if (transform.parent == null || GetComponent<Renderer>() != null || GetComponent<Collider>() != null || GetComponent<Rigidbody>() != null)
         {
@@ -76,6 +84,12 @@ public sealed class LightFlicker : MonoBehaviour
 
     private void OnDisable()
     {
+        Settle();
+        far = false;
+    }
+
+    private void Settle()
+    {
         if (fire != null)
         {
             fire.intensity = baseIntensity;
@@ -87,6 +101,24 @@ public sealed class LightFlicker : MonoBehaviour
 
     private void Update()
     {
+        if (Time.time >= nextDistanceCheck)
+        {
+            nextDistanceCheck = Time.time + DistanceCheckSeconds;
+            Camera view = Camera.main;
+            bool nowFar = view != null && (view.transform.position - transform.position).sqrMagnitude > FlickerDistance * FlickerDistance;
+            if (nowFar && !far)
+            {
+                Settle();
+            }
+
+            far = nowFar;
+        }
+
+        if (far)
+        {
+            return;
+        }
+
         float t = Time.time * speed + seed;
         float wave = Wave(t, seed);
         fire.intensity = baseIntensity * (1f + wave * intensityVariation);
