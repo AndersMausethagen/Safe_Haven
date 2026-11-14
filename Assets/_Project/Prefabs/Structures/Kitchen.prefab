@@ -63,8 +63,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.3, y: 2.55, z: 1.2}
-  m_Center: {x: 0, y: 1.275, z: 0}
+  m_Size: {x: 2.2402837, y: 1.7911825, z: 2.3999994}
+  m_Center: {x: 0.0030966997, y: 0.8917005, z: -0.000775218}
 --- !u!114 &7725449350737930936
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 2.8
+  height: 2.0372918
   spread: 0.4
 --- !u!208 &5556987227083309443
 NavMeshObstacle:
@@ -140,11 +140,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.15, y: 1.275, z: 0.6}
+  m_Extents: {x: 1.1201419, y: 0.89559126, z: 1.1999997}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0, y: 1.275, z: 0}
+  m_Center: {x: 0.0030966997, y: 0.8917005, z: -0.000775218}
   m_TimeToStationary: 0.5
 --- !u!114 &4913640684769617672
 MonoBehaviour:
@@ -226,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::HearthSmoke
-  chimney: {x: 0.40249997, y: 2.55, z: -0.15}
+  chimney: {x: 0, y: 0, z: 0}
   puffs: 1.6
   rise: 9
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
@@ -388,7 +388,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 3
+      value: 2.2372918
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

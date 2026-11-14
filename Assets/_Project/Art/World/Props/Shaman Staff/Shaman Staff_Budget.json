@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Shaman Staff A": {
+   "source": 9996,
+   "view": 323,
+   "triangles": 436,
+   "shape_limited": true,
+   "check": "(deviation 0.4%, silhouette 0.954)",
+   "holes_generated": 0,
+   "holes_filled": 0,
+   "holes": 0,
+   "largest_hole": 0.0,
+   "non_manifold_edges": 0,
+   "unwrap": "regions"
+  }
+ }
+}

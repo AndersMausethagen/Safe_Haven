@@ -9,7 +9,8 @@
   "Sod roofs are drawn bare (dark peat, no grass): the game grows its own grass on the roof.",
   "A building is made to look like its concept image, not like the stand-in it replaces: one long low building seen",
   "from its open or entrance side, which is the side the game's camera looks at.",
-  "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+  "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
+  "2026-11-14, the user: replace the remaining primitive stand-ins with LocalSpawn models (Kitchen to Farm Bed). Their flames, glows and lights stay in the game's prefabs (BuildStructureModels.Placeholders)."
  ],
  "art": "Assets/_Project/Art/Haven/Structures",
  "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow.",
@@ -173,6 +174,324 @@
      "prompt": "A small old Norse cartwright's workshop yard, seen from outside: a low open timber shelter on four posts with diagonal braces under a low-pitched roof of bare dark brown peat earth, with no grass and no plants, a peeled log along each eave; under it a heavy wooden workbench with tools; around it a half-built wooden cart frame standing on two trestles, two big spoked wooden cart wheels with iron tyres leaning against a post, a stack of planks, a chopping block with an axe, and a wooden tub. No people."
     }
    ]
-  }
+  },
+ {
+  "asset": "Kitchen",
+  "width": 2.4,
+  "max_height": 2.2,
+  "texture_size": 2048,
+  "lod0_triangles": 7000,
+  "metal_floor": 0.5,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6701,
+    "prompt": "An old Norse outdoor cooking hearth: a waist-high block of fitted grey field stones with a flat slab top, a short square stone chimney rising from its left end, a round black iron cooking pot set into the top on the right, and a thick plank work board along the front with two wooden bowls and a ladle. Cold: no fire, no smoke."
+   }
+  ]
+ },
+{
+  "asset": "Well",
+  "width": 1.9,
+  "max_height": 2.4,
+  "texture_size": 2048,
+  "lod0_triangles": 6000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6702,
+    "prompt": "An old Norse village well: a round knee-high wall of fitted grey field stones around a dark opening, two stout wooden posts on either side holding a wooden windlass with coiled rope, a wooden bucket resting on the stone rim, and a small pitched roof of wooden shingles on top of the posts."
+   }
+  ]
+ },
+{
+  "asset": "Watch Post",
+  "width": 2.2,
+  "max_height": 3.8,
+  "texture_size": 2048,
+  "lod0_triangles": 9000,
+  "quality": "hero",
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6703,
+    "prompt": "A small old Norse wooden lookout tower: four tall rough log posts with diagonal cross-braces, a square plank platform at the top with a low log railing, a simple log ladder leaning against one side, and a small iron lantern hanging from one corner post. Unlit."
+   }
+  ]
+ },
+{
+  "asset": "Storage Shed",
+  "width": 3.0,
+  "max_height": 2.6,
+  "texture_size": 2048,
+  "lod0_triangles": 9000,
+  "quality": "hero",
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6704,
+    "prompt": "A small old Norse open-fronted storage lean-to: a sloping roof of wooden shingles on four stout posts, the back and sides walled with horizontal planks, open at the front, with grain sacks, two barrels and a wooden crate stacked inside on a floor of flat stones."
+   }
+  ]
+ },
+{
+  "asset": "Furnace",
+  "width": 1.6,
+  "max_height": 2.4,
+  "texture_size": 2048,
+  "lod0_triangles": 5000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6705,
+    "prompt": "A Viking age iron smelting furnace: a squat round tower of grey field stones and cracked brown clay about chest high, narrowing to a short chimney, a small arched opening at the bottom front, and a pair of leather bellows on a low wooden frame beside it. Cold: no fire, no glow, no smoke."
+   }
+  ]
+ },
+{
+  "asset": "Purification Altar",
+  "width": 1.5,
+  "max_height": 1.3,
+  "texture_size": 2048,
+  "lod0_triangles": 5000,
+  "glow": {
+   "mode": "hue",
+   "colour": [
+    0.45,
+    1.0,
+    0.55
+   ],
+   "tint": [
+    0.55,
+    1.0,
+    0.6
+   ],
+   "threshold": 0.55,
+   "min_brightness": 0.4,
+   "min_saturation": 0.25
+  },
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6706,
+    "prompt": "An ancient Norse stone altar: a low square plinth of fitted grey stones, on top a round carved stone basin with a shallow bowl, pale green runes cut into its sides, a little moss in the cracks. The basin is empty. Matte runes."
+   }
+  ]
+ },
+{
+  "asset": "Standing Torch",
+  "width": 0.8,
+  "max_height": 2.0,
+  "texture_size": 1024,
+  "lod0_triangles": 2000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6727,
+    "prompt": "A tall Viking age standing torch: a straight rough wooden pole set upright in a small mound of fist-sized grey stones, its top end thickly wrapped in dark brown tarred rags bound round with twine. Unlit: no flame, no smoke, no metal."
+   }
+  ]
+ },
+{
+  "asset": "Lantern Post",
+  "width": 1.0,
+  "max_height": 2.1,
+  "texture_size": 1024,
+  "lod0_triangles": 2500,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6708,
+    "prompt": "A wooden lantern post: a squared timber post about two metres tall with a short arm at its top, and a small iron-framed lantern with pale horn panes hanging from the arm. Unlit."
+   }
+  ]
+ },
+{
+  "asset": "Haven Banner",
+  "width": 1.2,
+  "max_height": 2.4,
+  "texture_size": 2048,
+  "lod0_triangles": 3000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6709,
+    "prompt": "A tall wooden banner pole with a short crossbar near the top, hanging a long woven wool banner in deep blue with an ochre border and a stitched ochre tree emblem, a carved round wooden knob on top of the pole, its foot set in a few grey stones."
+   }
+  ]
+ },
+{
+  "asset": "Herb Planter",
+  "width": 1.5,
+  "max_height": 0.45,
+  "texture_size": 2048,
+  "lod0_triangles": 4000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6710,
+    "prompt": "A low rectangular raised planter box of weathered wooden planks, filled to the brim with dark crumbly soil, nothing planted."
+   }
+  ]
+ },
+{
+  "asset": "Beehive",
+  "width": 1.0,
+  "max_height": 1.2,
+  "texture_size": 1024,
+  "lod0_triangles": 3000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6711,
+    "prompt": "A traditional Norse straw bee skep: a dome of coiled straw bands bound with willow, sitting on a small square wooden stand with four short legs, a small entrance hole at the bottom front."
+   }
+  ]
+ },
+{
+  "asset": "Ward Totem",
+  "width": 1.5,
+  "max_height": 2.8,
+  "texture_size": 2048,
+  "lod0_triangles": 4000,
+  "glow": {
+   "mode": "hue",
+   "colour": [
+    0.35,
+    0.65,
+    1.0
+   ],
+   "tint": [
+    0.45,
+    0.75,
+    1.0
+   ],
+   "threshold": 0.55,
+   "min_brightness": 0.4,
+   "min_saturation": 0.25
+  },
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6712,
+    "prompt": "An old Norse ward stone: a tall rough-hewn grey standing stone on a low square stone base, deep pale blue runes carved down its front, and a few feathers and small bones tied to it with cord. Matte runes."
+   }
+  ]
+ },
+{
+  "asset": "Spike Trap",
+  "width": 1.9,
+  "max_height": 1.0,
+  "texture_size": 2048,
+  "lod0_triangles": 3000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6763,
+    "prompt": "A square patch of dark earth inside a low frame of rough split logs, with nine short thick sharpened wooden stakes pointing up in three neat rows, pale fresh-cut points."
+   }
+  ]
+ },
+{
+  "asset": "Iron Trap",
+  "width": 1.9,
+  "max_height": 0.45,
+  "texture_size": 2048,
+  "lod0_triangles": 3000,
+  "metal_floor": 0.5,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6714,
+    "prompt": "A square patch of dark earth inside a low frame of wooden boards, with nine short sharp black iron spikes pointing up in three neat rows."
+   }
+  ]
+ },
+{
+  "asset": "Festival Bonfire",
+  "width": 2.4,
+  "max_height": 1.7,
+  "texture_size": 2048,
+  "lod0_triangles": 6000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6735,
+    "prompt": "A large festival bonfire built and waiting, never lit: a tall cone of split birch logs leaned together, clean white bark, standing on bare earth inside a ring of big rounded grey stones. Cold: no fire, no flames, no glow, no embers, no smoke, no charring."
+   }
+  ]
+ },
+{
+  "asset": "Training Dummy",
+  "width": 1.0,
+  "max_height": 1.9,
+  "texture_size": 1024,
+  "lod0_triangles": 3000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6716,
+    "prompt": "A straw training dummy: a bundle of straw bound with rope into a rough body and round head, a wooden crossbar through it for arms, on a stout wooden post standing in a small wooden cross foot."
+   }
+  ]
+ },
+{
+  "asset": "Armored Dummy",
+  "width": 1.0,
+  "max_height": 1.95,
+  "texture_size": 1024,
+  "lod0_triangles": 3500,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6717,
+    "prompt": "A straw training dummy on a wooden post wearing a battered iron mail shirt and a dented round iron helmet, a wooden crossbar for arms, on a wooden cross foot."
+   }
+  ]
+ },
+{
+  "asset": "Farm Bed",
+  "width": 3.1,
+  "max_height": 0.35,
+  "texture_size": 2048,
+  "lod0_triangles": 4000,
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6718,
+    "prompt": "A rectangular farm bed of dark tilled soil in neat furrows, edged with a low frame of split logs. Bare soil, nothing growing yet."
+   }
+  ]
+ },
+ {
+  "asset": "Palisade",
+  "width": 4.0,
+  "max_height": 2.3,
+  "texture_size": 2048,
+  "lod0_triangles": 6000,
+  "quality": "hero",
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6751,
+    "prompt": "A straight four-metre section of an old Norse defensive palisade seen square from the front: twelve thick upright tree trunks of the same dark weathered grey-brown bark, packed tightly side by side with no gaps, each sharpened to a point at the top, bound together with rope. Nothing sticks out past the first and last trunk. Perfectly straight."
+   }
+  ]
+ },
+ {
+  "asset": "Stone Wall",
+  "width": 4.0,
+  "max_height": 2.0,
+  "texture_size": 2048,
+  "lod0_triangles": 6000,
+  "quality": "hero",
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6742,
+    "prompt": "A straight four-metre section of an old dry-stone wall seen square from the front: fitted grey field stones stacked head high without mortar, a little moss in the joints, a flat top, both ends cut off clean and square."
+   }
+  ]
+ }
  ]
 }

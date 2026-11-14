@@ -196,8 +196,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.46, y: 2.1699998, z: 0.38}
-  m_Center: {x: 0.000000014901161, y: 1.045, z: 0}
+  m_Size: {x: 0.5981396, y: 2.3269901, z: 0.5674086}
+  m_Center: {x: 0, y: 1.1234951, z: 0}
 --- !u!114 &2963280910055392739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 2.3799999
+  height: 2.5369902
   spread: 0.4
 --- !u!208 &7281727314402313437
 NavMeshObstacle:
@@ -273,11 +273,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 0.23, y: 1.0849999, z: 0.19}
+  m_Extents: {x: 0.2990698, y: 1.1634951, z: 0.2837043}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.000000014901161, y: 1.045, z: 0}
+  m_Center: {x: 0, y: 1.1234951, z: 0}
   m_TimeToStationary: 0.5
 --- !u!114 &2739863785985149535
 MonoBehaviour:
@@ -413,7 +413,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 2.58
+      value: 2.7369902
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

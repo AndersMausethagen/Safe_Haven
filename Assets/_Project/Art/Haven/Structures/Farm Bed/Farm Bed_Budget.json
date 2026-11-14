@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Farm Bed A": {
+   "source": 9854,
+   "view": 4000,
+   "triangles": 4000,
+   "shape_limited": false,
+   "check": "(cap; deviation 1.2%, silhouette 0.967)",
+   "holes_generated": 7,
+   "holes_filled": 0,
+   "holes": 7,
+   "largest_hole": 0.028,
+   "non_manifold_edges": 102,
+   "unwrap": "regions"
+  }
+ }
+}

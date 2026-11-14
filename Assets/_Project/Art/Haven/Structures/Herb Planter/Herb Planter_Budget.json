@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Herb Planter A": {
+   "source": 9959,
+   "view": 501,
+   "triangles": 501,
+   "shape_limited": false,
+   "check": "(deviation 0.5%, silhouette 1.000)",
+   "holes_generated": 1,
+   "holes_filled": 0,
+   "holes": 1,
+   "largest_hole": 0.025,
+   "non_manifold_edges": 2,
+   "unwrap": "regions"
+  }
+ }
+}

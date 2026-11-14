@@ -60,8 +60,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.8, y: 0.44, z: 1.8}
-  m_Center: {x: 0, y: 0.2, z: 0}
+  m_Size: {x: 1.8, y: 1.0002053, z: 1.8}
+  m_Center: {x: 0, y: 0.4789457, z: -0.000000059604645}
 --- !u!114 &3982002636359741346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,7 +125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 0.67
+  height: 1.2290484
   spread: 0.4
 --- !u!114 &5759702757960867051
 MonoBehaviour:
@@ -320,7 +320,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 0.87
+      value: 1.4290483
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name
