@@ -19,6 +19,13 @@ MonoBehaviour:
   burst: {fileID: 4551094190977830189, guid: bcfe13b4bd0890043b8a46b27db8ece2, type: 3}
   leaves: {fileID: 2915389246791848757, guid: 3b3642d71542ebd44aa653eca0aaa86c, type: 3}
   splash: {fileID: 427604759136440720, guid: d500fd09614e25f46b5c5f1fa49f7033, type: 3}
+  scorch: {fileID: 2100000, guid: 482c6d188d2b0534b8a6fbebc34dfe02, type: 2}
+  grassFire: {fileID: 6143943940367357886, guid: 36babbbca52e5094d8f4678b5176daed, type: 3}
+  steam: {fileID: 1275639213483061923, guid: d957d0ed1e0ca2e46a5df4b75a89e73f, type: 3}
+  igniteSound: {fileID: 0}
+  gasIgniteSound: {fileID: 0}
+  douseSound: {fileID: 0}
+  freezeSound: {fileID: 0}
   dirt: {r: 0.45, g: 0.36, b: 0.25, a: 1}
   grass: {r: 0.36, g: 0.42, b: 0.2, a: 1}
   rock: {r: 0.52, g: 0.5, b: 0.47, a: 1}
@@ -27,6 +34,10 @@ MonoBehaviour:
   mud: {r: 0.22, g: 0.17, b: 0.11, a: 1}
   wetFromRain: 0.35
   stampShader: {fileID: 4800000, guid: 16ce25b85cc83284780f24e13efa360f, type: 3}
+  friendlyDamage: 0.1
+  friendlyToss: 3
+  dazeSeconds: 1
+  dazeSound: {fileID: 0}
   maxGusts: 6
   maxDecals: 12
   markArea: 48

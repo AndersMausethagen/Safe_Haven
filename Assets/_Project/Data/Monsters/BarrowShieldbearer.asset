@@ -188,6 +188,13 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 0
   canLoseLimbs: 1
+  hitMaterial: 2
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 3
+  armourPerChip: 0.12
+  chipFromShare: 0.07
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 7f709feef0127764d96cab70ec00d2a2, type: 3}

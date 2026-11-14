@@ -183,6 +183,12 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             GameObject effect = structure ? feel.StructureHitEffect : strong ? feel.CriticalHitEffect
                 : weaponEffect != null ? weaponEffect : bled ? null : feel.HitEffect;
             Spawn(effect, damage.HitPoint, damage.Direction);
+            // Stone throws grit and sparks, plate rings, bark splinters (HitMaterials): on top of the usual hit.
+            if (!structure)
+            {
+                HitMaterials.Struck(victim, damage);
+            }
+
             Vector3 heardAt = HeardAt(damage);
             AudioManager.Play(HitSoundFor(damage, structure), heardAt);
             if (strong && !structure)

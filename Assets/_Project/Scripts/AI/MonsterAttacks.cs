@@ -246,7 +246,7 @@ public sealed class MonsterAttacks
         {
             hitPending = false;
             AttackResolver.Execute(combatant, attack, definition.AttackDamage, self.position, direction, targetLayers);
-            Shake(attack);
+            Shake(attack, definition.AttackDamage);
         }
 
         if (elapsed >= attack.RecoveryTime)
@@ -363,7 +363,7 @@ public sealed class MonsterAttacks
                 {
                     hitPending = false;
                     AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers);
-                    Shake(attack);
+                    Shake(attack, action.damage);
                 }
 
                 if (blowsLeft > 0 && elapsed >= attack.HitDelay + action.comboGap)
@@ -418,7 +418,7 @@ public sealed class MonsterAttacks
         {
             exposedAt = Time.time;
             movement.Stop();
-            GroundImpacts.Strike(attack, combatant, self.position + direction * 0.8f, direction);
+            GroundImpacts.Strike(attack, combatant, self.position + direction * 0.8f, direction, false, action.damage);
             if (action.hazardPrefab != null && action.hazardEvery <= 0f)
             {
                 GroundHazard.Spawn(action.hazardPrefab, self.position, combatant);
@@ -492,7 +492,7 @@ public sealed class MonsterAttacks
     }
 
     // The blow strikes the ground where it lands (its Ground Impact): a stomp at its feet, a sweep ahead of it.
-    private void Shake(AttackDefinition attack)
+    private void Shake(AttackDefinition attack, float damage)
     {
         if (attack.GroundImpact == null)
         {
@@ -500,7 +500,7 @@ public sealed class MonsterAttacks
         }
 
         Vector3 at = attack.Arc >= 300f ? self.position : self.position + direction * Mathf.Min(attack.Range * 0.6f, 3f);
-        GroundImpacts.Strike(attack, combatant, at, direction);
+        GroundImpacts.Strike(attack, combatant, at, direction, false, damage);
     }
 
     // One lob of a burst: where the foe stands (ahead of them by Lead Target), the later ones scattered about them.

@@ -75,6 +75,12 @@ public sealed class GroundImpactDefinition : ScriptableObject
     [Tooltip("Camera shake for the player near it (0-1), less with distance.")]
     [SerializeField, Range(0f, 1f)] private float shake;
 
+    [Header("Noise and element")]
+    [Tooltip("Metres the noise carries: monsters inside hear it and come, game bolts, birds take flight (WorldNoise).")]
+    [SerializeField, Min(0f)] private float noise;
+    [Tooltip("Fire sets webs, gas and dry grass alight where it lands; frost freezes pools and puts fires out (GroundHazard).")]
+    [SerializeField] private HazardElement element = HazardElement.None;
+
     [Header("Footing")]
     [Tooltip("Metres from the middle within which the player stumbles, hit or not (0: never).")]
     [SerializeField, Min(0f)] private float stumbleRadius;
@@ -107,6 +113,8 @@ public sealed class GroundImpactDefinition : ScriptableObject
     public float PushRadius => pushRadius;
     public float TreeShake => treeShake;
     public float Shake => shake;
+    public float Noise => noise;
+    public HazardElement Element => element;
     public float StumbleRadius => stumbleRadius;
     public float StumbleSeconds => stumbleSeconds;
     public SoundDefinition Sound => sound;

@@ -314,6 +314,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
         CharacterFillLight.Mark(gameObject); // lit by the player's fill light, so creatures stand out in the dark woods
         WalkerFootprints.AddTo(gameObject, 0.75f, 0.18f); // tracks, which last in snow
+        if (!TryGetComponent(out CreatureWounds _)) gameObject.AddComponent<CreatureWounds>(); // limping, blood trails, armour breaking
         combatant = GetComponent<Combatant>();
         damageable = GetComponent<Damageable>();
         var agent = GetComponent<NavMeshAgent>();

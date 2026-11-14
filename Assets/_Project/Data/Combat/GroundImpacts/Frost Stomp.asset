@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eba2b52199d03a4ebdae07aa742d9a6, type: 3}
+  m_Name: Frost Stomp
+  m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
+  referenceHeight: 3
+  gustRadius: 9
+  gustStrength: 0.9
+  gustSpeed: 18
+  gustArc: 360
+  dust: 28
+  debris: 18
+  clippings: 16
+  dustRadius: 3.5
+  mark: 1
+  markRadius: 1.6
+  markDepth: 0.22
+  rimHeight: 0.06
+  furrowLength: 2.5
+  grassFlatten: 0.95
+  markSeconds: 120
+  decal: {fileID: 2100000, guid: 4dd150bff8b6b204fa525f0eb31016f0, type: 2}
+  decalSize: 4
+  push: 7
+  pushRadius: 6
+  treeShake: 14
+  shake: 0.45
+  noise: 28
+  element: 4
+  stumbleRadius: 4.5
+  stumbleSeconds: 0.6
+  sound: {fileID: 0}

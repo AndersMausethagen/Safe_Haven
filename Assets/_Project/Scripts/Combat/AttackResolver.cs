@@ -29,6 +29,15 @@ public static class AttackResolver
         HitTechnique technique = HitTechnique.None,
         bool forceCritical = false)
     {
+        // Fire sets webs, gas and dry grass alight where it lands; frost freezes pools and puts fires out (GroundHazard).
+        if (attack.DamageType == DamageType.Fire || attack.DamageType == DamageType.Frost)
+        {
+            Vector3 flat = direction;
+            flat.y = 0f;
+            Vector3 middle = origin + (flat.sqrMagnitude > 1e-4f ? flat.normalized : Vector3.zero) * (attack.Arc >= 300f ? 0f : attack.Range * 0.5f);
+            GroundHazard.Meet(attack.DamageType == DamageType.Fire ? HazardElement.Fire : HazardElement.Frost, middle, attack.Range * 0.6f, attacker);
+        }
+
         List<HitDetector.Hit> hits = spareLists.Count > 0 ? spareLists.Pop() : new List<HitDetector.Hit>(8);
         try
         {

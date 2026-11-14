@@ -52,3 +52,8 @@ MonoBehaviour:
   tick: 0.5
   color: {r: 0.35, g: 0.75, b: 0.25, a: 1}
   effectPrefab: {fileID: 0}
+  element: 5
+  burnsInto: {fileID: 1624440738395572245, guid: d03958cd3af3abe45aa229a8f17bc3c4, type: 3}
+  freezesInto: {fileID: 0}
+  ignitionDamage: 25
+  spreadsOnGrass: 0

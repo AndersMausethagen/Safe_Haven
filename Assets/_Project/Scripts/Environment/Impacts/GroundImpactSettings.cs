@@ -21,6 +21,18 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     [SerializeField] private GameObject leaves;
     [Tooltip("Where it comes down in open water.")]
     [SerializeField] private GameObject splash;
+    [Tooltip("The decal of burnt ground (grass fires).")]
+    [SerializeField] private Material scorch;
+
+    [Header("Fire and frost meeting hazards (GroundHazard)")]
+    [Tooltip("A grass fire (a GroundHazard with Element Fire and Spreads On Grass).")]
+    [SerializeField] private GameObject grassFire;
+    [Tooltip("Where a fire is put out (rain, frost).")]
+    [SerializeField] private GameObject steam;
+    [SerializeField] private SoundDefinition igniteSound;
+    [SerializeField] private SoundDefinition gasIgniteSound;
+    [SerializeField] private SoundDefinition douseSound;
+    [SerializeField] private SoundDefinition freezeSound;
 
     [Header("Ground colours (the dust takes the colour of what it is thrown from)")]
     [SerializeField] private Color dirt = new Color(0.45f, 0.36f, 0.25f, 1f);
@@ -34,6 +46,15 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
 
     [Tooltip("Hidden/Safe Haven/Ground Impact Stamp: referenced here so builds keep it.")]
     [SerializeField] private Shader stampShader;
+
+    [Header("Its own side (a giant's stomp among its pack)")]
+    [Tooltip("Share of the blow's damage taken by creatures of the attacker's own side inside the stumble ring.")]
+    [SerializeField, Range(0f, 1f)] private float friendlyDamage = 0.1f;
+    [Tooltip("Metres they are tossed outward.")]
+    [SerializeField, Min(0f)] private float friendlyToss = 3f;
+    [Tooltip("Seconds they stand dazed after.")]
+    [SerializeField, Min(0f)] private float dazeSeconds = 1f;
+    [SerializeField] private SoundDefinition dazeSound;
 
     [Header("Caps")]
     [Tooltip("Wind bursts through the grass at once (the shader's limit is 6).")]
@@ -55,6 +76,13 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     public GameObject Burst => burst;
     public GameObject Leaves => leaves;
     public GameObject Splash => splash;
+    public Material Scorch => scorch;
+    public GameObject GrassFire => grassFire;
+    public GameObject Steam => steam;
+    public SoundDefinition IgniteSound => igniteSound;
+    public SoundDefinition GasIgniteSound => gasIgniteSound;
+    public SoundDefinition DouseSound => douseSound;
+    public SoundDefinition FreezeSound => freezeSound;
     public Color Dirt => dirt;
     public Color Grass => grass;
     public Color Rock => rock;
@@ -67,4 +95,8 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     public float MarkArea => markArea;
     public int MarkResolution => Mathf.Clamp(Mathf.ClosestPowerOfTwo(markResolution), 128, 1024);
     public float MaxDistance => maxDistance;
+    public float FriendlyDamage => friendlyDamage;
+    public float FriendlyToss => friendlyToss;
+    public float DazeSeconds => dazeSeconds;
+    public SoundDefinition DazeSound => dazeSound;
 }

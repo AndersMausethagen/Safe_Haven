@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4fd77a2e76e847429578708e79e30b4, type: 3}
+  m_Name: HitMaterialSettings
+  m_EditorClassIdentifier: SafeHaven::HitMaterialSettings
+  materials:
+  - material: 1
+    effects:
+    - {fileID: 1800097642604793677, guid: aa3cec24f3dda2240a1beaa511aacb72, type: 3}
+    - {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
+    sound: {fileID: 0}
+    glanceEffects:
+    - {fileID: 1800097642604793677, guid: aa3cec24f3dda2240a1beaa511aacb72, type: 3}
+    - {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
+    glanceSound: {fileID: 0}
+  - material: 2
+    effects:
+    - {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
+    - {fileID: 6609181195610218049, guid: 222ec1a8f47dc7846b95698a1d0d5401, type: 3}
+    sound: {fileID: 0}
+    glanceEffects:
+    - {fileID: 5583508145942354200, guid: d9f0ff7865e61e24a85ad4aaa13a8213, type: 3}
+    glanceSound: {fileID: 0}
+  - material: 3
+    effects:
+    - {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
+    sound: {fileID: 0}
+    glanceEffects:
+    - {fileID: 8295756250413705008, guid: 45368d8d22cd2124d91815e3daa02143, type: 3}
+    glanceSound: {fileID: 0}

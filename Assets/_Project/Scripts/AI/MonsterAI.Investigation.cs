@@ -13,6 +13,18 @@ public sealed partial class MonsterAI
     /// </summary>
     public void Hear(Vector3 position, float radius)
     {
+        // Game (deer, foxes) doesn't come to look: a loud enough sound near it sends it running from it.
+        if (definition != null && definition.Timid && CurrentState != State.Dead && !IsRemote)
+        {
+            float heard = PerceptionRules.HeardLevel(HorizontalDistance(position), radius, definition.Hearing, PerceptionSettings.Current);
+            if (heard >= PerceptionSettings.Current.GameStartleLevel)
+            {
+                Bolt(position);
+            }
+
+            return;
+        }
+
         if (!CanInvestigate())
         {
             return;

@@ -68,6 +68,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     comboChance: 0.5
@@ -118,6 +119,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -167,6 +169,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -235,6 +238,13 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 0
   canLoseLimbs: 1
+  hitMaterial: 2
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 3
+  armourPerChip: 0.12
+  chipFromShare: 0.07
   sizeVariation: 0.05
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 8d3f77f369f27ae4181654ccdf07ff80, type: 3}

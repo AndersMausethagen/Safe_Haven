@@ -127,7 +127,7 @@ public sealed class LobStrike : MonoBehaviour
             Vector3 toward = transform.position - from;
             toward.y = 0f;
             AttackResolver.Execute(source, action.attack, action.damage, transform.position, toward.sqrMagnitude > 1e-4f ? toward.normalized : Vector3.forward, layers);
-            GroundImpacts.Strike(action.attack, source, transform.position, toward);
+            GroundImpacts.Strike(action.attack, source, transform.position, toward, false, action.damage);
             if (action.hazardPrefab != null)
             {
                 GroundHazard.Spawn(action.hazardPrefab, transform.position, source);

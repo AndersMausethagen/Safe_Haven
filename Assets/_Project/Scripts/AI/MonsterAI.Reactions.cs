@@ -183,5 +183,11 @@ public sealed partial class MonsterAI
         movement.Halt();
         SetState(State.Dead);
         pack?.MemberFell(this);
+        // Its death cry carries: others near enough come to see what happened (a big creature's further).
+        if (!IsRemote)
+        {
+            float size = Mathf.Clamp(transform.lossyScale.y * (TryGetComponent(out CapsuleCollider body) ? body.height : 2f) / 2f, 0.5f, 3f);
+            WorldNoise.Emit(transform.position, PerceptionSettings.Current.DeathCryNoise * size);
+        }
     }
 }

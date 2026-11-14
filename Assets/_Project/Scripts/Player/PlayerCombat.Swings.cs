@@ -328,6 +328,12 @@ public sealed partial class PlayerCombat
         float poise = activePoiseMultiplier * Mathf.Lerp(1f, Rules.HeavyChargePoise, charge);
         Vector3 origin = transform.position;
         HitDetector.FindTargets(origin, activeDirection, activeAttack, combatant.Faction, hitLayers, foundHits);
+        // A swing that met nobody may still meet a boulder or a tree, and glance off it (HitMaterials).
+        if (foundHits.Count == 0)
+        {
+            HitMaterials.Glance(origin, activeDirection, activeAttack.Range, gameObject);
+        }
+
         // A heavy blow or a weapon art strikes the ground too, hit or miss: wind, dust, a mark (GroundImpacts).
         if (activeKind == SwingKind.Heavy || activeKind == SwingKind.Art)
         {

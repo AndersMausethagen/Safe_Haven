@@ -34,6 +34,8 @@ MonoBehaviour:
   pushRadius: 5
   treeShake: 6
   shake: 0.2
+  noise: 15
+  element: 0
   stumbleRadius: 0
   stumbleSeconds: 0.5
   sound: {fileID: 0}

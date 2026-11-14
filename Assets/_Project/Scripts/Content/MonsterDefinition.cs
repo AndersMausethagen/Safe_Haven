@@ -147,6 +147,23 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("A slashing killing blow can take its head or a limb, which then bleeds hard (Combat Feel › Gore › Sever Chance). " +
              "Off for what has nothing to cut off.")]
     [SerializeField] private bool canLoseLimbs = true;
+    [Tooltip("What it is made of: what a blow on it throws off and sounds like (HitMaterials). Flesh bleeds as usual.")]
+    [SerializeField] private HitMaterial hitMaterial = HitMaterial.Flesh;
+
+    [Header("Wounds")]
+    [Tooltip("Below this share of its health it limps: slower, so a hurt creature can be run down. 0: never.")]
+    [SerializeField, Range(0f, 1f)] private float limpBelow = 0.3f;
+    [Tooltip("How fast it moves while limping, as a share.")]
+    [SerializeField, Range(0.3f, 1f)] private float limpSpeed = 0.75f;
+    [Tooltip("Below this share of its health it leaves a trail of blood as it goes (if it bleeds), which can be followed. 0: never.")]
+    [SerializeField, Range(0f, 1f)] private float bleedTrailBelow = 0.5f;
+    [Tooltip("Pieces of armour a heavy blow can break off it (knights, the armoured dead). Each one costs it some of its armour.")]
+    [SerializeField, Min(0)] private int armourChips;
+    [Tooltip("Share of its armour each broken piece takes with it.")]
+    [SerializeField, Range(0f, 0.5f)] private float armourPerChip = 0.12f;
+    [Tooltip("A blow taking at least this share of its health breaks a piece off (a blunt blow, half as much).")]
+    [SerializeField, Range(0.01f, 0.5f)] private float chipFromShare = 0.07f;
+
     [Tooltip("How much bigger or smaller each one is than the model, as a share. 0.08 is up to 8% either way. Leave a one-off at 0.")]
     [SerializeField, Range(0f, 0.3f)] private float sizeVariation;
     [Tooltip("How much lighter, darker, warmer or colder each one is, as a share, so a pack isn't one creature several times over.")]
@@ -226,6 +243,13 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public bool RagdollOnDeath => ragdollOnDeath;
     public bool CanBeSmashed => canBeSmashed;
     public bool CanLoseLimbs => canLoseLimbs;
+    public HitMaterial HitMaterial => hitMaterial;
+    public float LimpBelow => limpBelow;
+    public float LimpSpeed => limpSpeed;
+    public float BleedTrailBelow => bleedTrailBelow;
+    public int ArmourChips => armourChips;
+    public float ArmourPerChip => armourPerChip;
+    public float ChipFromShare => chipFromShare;
     public IReadOnlyList<MonsterAttack> Attacks => attacks;
     public MonsterMovementTactic MovementTactic => movementTactic;
     public MonsterTemperament Temperament => temperament;

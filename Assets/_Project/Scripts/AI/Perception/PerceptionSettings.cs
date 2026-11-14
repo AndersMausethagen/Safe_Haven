@@ -107,6 +107,10 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Min(0f)] private float combatNoiseInterval = 0.6f;
     [Tooltip("Each stroke while swimming, every Footstep Interval.")]
     [SerializeField, Min(0f)] private float swimNoise = 4f;
+    [Tooltip("A creature's death cry, for one of about a person's size (a bigger one carries further).")]
+    [SerializeField, Min(0f)] private float deathCryNoise = 9f;
+    [Tooltip("How loud a sound must reach game (deer, foxes) to send it running (0-1 of a sound heard right beside it).")]
+    [SerializeField, Range(0.05f, 1f)] private float gameStartleLevel = 0.35f;
     [Tooltip("Coming down hard.")]
     [SerializeField, Min(0f)] private float landingNoise = 6f;
     [Tooltip("Falling at least this fast (m/s) counts as coming down hard.")]
@@ -189,6 +193,8 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float SneakSpeedScale => sneakSpeedScale;
 
     public float FootstepNoise => footstepNoise;
+    public float DeathCryNoise => deathCryNoise;
+    public float GameStartleLevel => gameStartleLevel;
     public float SneakingFootstepNoise => sneakingFootstepNoise;
     public float FootstepInterval => footstepInterval;
     public float DodgeNoise => dodgeNoise;

@@ -69,7 +69,7 @@ public static class GroundImpacts
     }
 
     /// <summary>A creature's blow landing: its attack's Ground Impact, if it has one, at its body's size.</summary>
-    public static void Strike(AttackDefinition attack, Combatant source, Vector3 at, Vector3 forward, bool trail = false)
+    public static void Strike(AttackDefinition attack, Combatant source, Vector3 at, Vector3 forward, bool trail = false, float damage = 0f)
     {
         GroundImpactDefinition impact = attack != null ? attack.GroundImpact : null;
         if (impact == null || source == null)
@@ -80,13 +80,13 @@ public static class GroundImpacts
         float scale = Mathf.Clamp(BodyHeight(source) / impact.ReferenceHeight, 0.5f, 2.5f);
         // A round blow's crater is its warning circle (the attack's Range): what the ground shows is what it reached.
         float circle = attack.Arc >= 300f && impact.Mark == GroundMarkShape.Crater ? attack.Range : 0f;
-        Play(impact, at, forward, source, scale, source.gameObject, trail, circle);
+        Play(impact, at, forward, source, scale, source.gameObject, trail, circle, damage);
     }
 
     /// <summary>Plays <paramref name="impact"/> at <paramref name="at"/>. <paramref name="trail"/>: a mark along a charge,
     /// with no stumble, shake or thrown things.</summary>
     public static void Play(GroundImpactDefinition impact, Vector3 at, Vector3 forward, Combatant source, float scale, GameObject self, bool trail = false,
-        float circle = 0f)
+        float circle = 0f, float damage = 0f)
     {
         // Only in play: what it makes (decals, the host) would otherwise be left in the open scene.
         if (impact == null || !Application.isPlaying)
@@ -99,6 +99,26 @@ public static class GroundImpacts
         if (!trail)
         {
             Stumble(impact, at, scale, source);
+            Kin(impact, at, scale, source, damage);
+        }
+
+        // What it means to the world, whatever the look is set to: the noise carries, fire and frost meet what lies there.
+        float noise = impact.Noise * Mathf.Sqrt(scale) * (trail ? 0.4f : 1f);
+        if (noise > 0f)
+        {
+            if (source != null && Player.Current != null && source.gameObject == Player.Current.gameObject && Player.Current.Noise != null)
+            {
+                Player.Current.Noise.Make(at, noise);
+            }
+            else
+            {
+                WorldNoise.Emit(at, noise);
+            }
+        }
+
+        if (impact.Element != HazardElement.None)
+        {
+            GroundHazard.Meet(impact.Element, at, Mathf.Max(impact.MarkRadius, impact.DustRadius) * scale, source);
         }
 
         Camera view = Camera.main;
@@ -194,6 +214,83 @@ public static class GroundImpacts
         if (impact.Sound != null)
         {
             AudioManager.Play(impact.Sound, ground);
+        }
+    }
+
+    // A big blow among its own kind (a giant's stomp in its pack): a little of the blow, tossed outward, dazed a moment.
+    private static void Kin(GroundImpactDefinition impact, Vector3 at, float scale, Combatant source, float damage)
+    {
+        if (impact.StumbleRadius <= 0f || source == null || !source.TryGetComponent(out MonsterAI thrower))
+        {
+            return;
+        }
+
+        GroundImpactSettings settings = GroundImpactSettings.Current;
+        float reach = impact.StumbleRadius * scale;
+        var near = new List<MonsterAI>();
+        foreach (MonsterAI other in MonsterAI.Active)
+        {
+            if (other == thrower || other.CurrentState == MonsterAI.State.Dead || other.IsRemote || !other.TryGetComponent(out Combatant side)
+                || side.Faction != source.Faction)
+            {
+                continue;
+            }
+
+            Vector3 offset = other.transform.position - at;
+            if (Mathf.Abs(offset.y) <= 2f && new Vector2(offset.x, offset.z).magnitude <= reach)
+            {
+                near.Add(other);
+            }
+        }
+
+        foreach (MonsterAI other in near)
+        {
+            Vector3 away = other.transform.position - at;
+            away.y = 0f;
+            if (away.sqrMagnitude < 1e-3f)
+            {
+                Vector2 any = Random.insideUnitCircle.normalized;
+                away = new Vector3(any.x, 0f, any.y);
+            }
+
+            away.Normalize();
+            if (damage > 0f && settings.FriendlyDamage > 0f && other.TryGetComponent(out Damageable body))
+            {
+                body.ApplyDamage(new DamageInfo(source, null, damage * settings.FriendlyDamage, DamageType.Physical, false,
+                    other.transform.position + Vector3.up, away));
+            }
+
+            if (other.CurrentState == MonsterAI.State.Dead)
+            {
+                continue;
+            }
+
+            ForcedMove.Drag(other.transform, other.transform.position - away, -settings.FriendlyToss, 0.35f); // out from where it landed
+            other.StaggerAtLeast(settings.DazeSeconds);
+            AudioManager.Play(settings.DazeSound, other.transform.position);
+        }
+    }
+
+    /// <summary>True where grass grows (the ground layer there reads as grass or moss), for fire to spread through.</summary>
+    public static bool IsGrassy(Vector3 at)
+    {
+        return Ground(at, out _, out GroundImpactBurst.Ground surface, out bool water) && !water && surface.Grassy && !surface.Wet && !surface.Snowy;
+    }
+
+    /// <summary>Burnt ground: the grass burnt short and a scorch on the earth for <paramref name="seconds"/>.</summary>
+    public static void Scorch(Vector3 at, float radius, float seconds)
+    {
+        if (Quality <= 0 || !Application.isPlaying)
+        {
+            return;
+        }
+
+        Host runner = Runner();
+        runner.Field.Press(GroundMarkShape.Mow, at, Vector3.forward, radius, 0f, 0f, 0f, 0.9f, seconds, 360f);
+        Material scorch = GroundImpactSettings.Current.Scorch;
+        if (scorch != null)
+        {
+            runner.Decal(scorch, at, Vector3.forward, radius * 2.2f, seconds);
         }
     }
 
