@@ -740,6 +740,10 @@ MonoBehaviour:
   extractedSound: {fileID: 8300000, guid: 2e8e6b142e12583459fc59db01a49e37, type: 3}
   failedSound: {fileID: 8300000, guid: 67855d961bca5f84aad80b9bb81e8c68, type: 3}
   placeArtwork: {fileID: 21300000, guid: 8b26dcac07882c744ac57d8cae8286c2, type: 3}
+  firstVisitCinematic: {fileID: 11400000, guid: ffd539bcbac3f6b4f8654a96cbce9849, type: 2}
+  calmAfterCinematic: 8
+  arrivalEffect: {fileID: 5995523188953507264, guid: 50dfbb6cc2742904dbedfe5b683543c9, type: 3}
+  arrivalSound: {fileID: 11400000, guid: d67d31b9bdbcfc34d9e3c51817bf8cd2, type: 2}
   references:
     version: 2
     RefIds:

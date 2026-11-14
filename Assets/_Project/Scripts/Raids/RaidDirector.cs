@@ -37,6 +37,9 @@ public sealed class RaidDirector : MonoBehaviour
     private Damageable playerHealth;
     private RaidGenerator generator;
     private bool running;
+    private bool testRaid;
+    private bool firstVisitChecked;
+    private float calmUntil = -1f;
 
     /// <summary>The raid running in the loaded scene, or null outside raids.</summary>
     public static RaidDirector Current { get; private set; }
@@ -56,6 +59,12 @@ public sealed class RaidDirector : MonoBehaviour
 
     /// <summary>True from when the clock starts until the raid ends.</summary>
     public bool IsRunning => running && Session != null && !Session.IsOver;
+
+    /// <summary>
+    /// True for a few seconds after a first-visit cinematic (RaidDefinition › Calm After Cinematic): creatures notice
+    /// nobody, so the player can take in where they are. One the player strikes still fights back.
+    /// </summary>
+    public static bool IsArrivalCalm => Current != null && Current.calmUntil > Time.time;
 
     /// <summary>The report of the raid once it has ended (also handed to GameSession); null while it runs.</summary>
     public RaidReport Report { get; private set; }
@@ -90,6 +99,7 @@ public sealed class RaidDirector : MonoBehaviour
 
         // "global::" because this class has its own Player property (the player's GameObject).
         player = global::Player.Current != null ? global::Player.Current.gameObject : null;
+        testRaid = GameSession.ActiveRaid == null;
         Session = GameSession.ActiveRaid ?? StartTestRaid();
         if (Session == null)
         {
@@ -165,6 +175,12 @@ public sealed class RaidDirector : MonoBehaviour
             return;
         }
 
+        // A character's first time here plays the raid's cinematic first; the raid begins when it ends.
+        if (PlayFirstVisit())
+        {
+            return;
+        }
+
         running = true;
         Creatures.StrengthenAll(true);
         Companions.BringCompanion();
@@ -183,6 +199,60 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         GameMessages.Post($"{Session.Definition.DisplayName}: grab what you can and reach an extraction within {RaidStats.FormatTime(Session.TimeRemaining)}.");
+    }
+
+    /// <summary>
+    /// Plays the raid's first-visit cinematic when this character has never been here (once per save; not for a test
+    /// raid or in co-op, where pausing doesn't stop the others). The visit is remembered either way. True when the
+    /// cinematic is playing and will begin the raid as it ends.
+    /// </summary>
+    private bool PlayFirstVisit()
+    {
+        if (firstVisitChecked)
+        {
+            return false;
+        }
+
+        firstVisitChecked = true;
+        RaidDefinition raid = Session.Definition;
+        bool first = !testRaid && GameSession.Progress.MarkRaidVisited(raid.Id);
+        bool together = CoopSession.Current != null && CoopSession.Current.IsActive;
+        if (!first || together || raid.FirstVisitCinematic == null)
+        {
+            return false;
+        }
+
+        CinematicScreen.Play(raid.FirstVisitCinematic, () =>
+        {
+            Arrive(raid);
+            BeginRaid();
+        });
+        return true;
+    }
+
+    // The cinematic lifts into the game: fog rolls round the player, something stirs, and nothing notices them yet.
+    private void Arrive(RaidDefinition raid)
+    {
+        if (this == null)
+        {
+            return;
+        }
+
+        calmUntil = Time.time + raid.CalmAfterCinematic;
+        if (player == null)
+        {
+            return;
+        }
+
+        if (raid.ArrivalEffect != null)
+        {
+            Instantiate(raid.ArrivalEffect, player.transform.position, Quaternion.Euler(0f, player.transform.eulerAngles.y, 0f));
+        }
+
+        if (raid.ArrivalSound != null)
+        {
+            AudioManager.Play(raid.ArrivalSound, player.transform.position);
+        }
     }
 
     private void OnDestroy()

@@ -37,6 +37,25 @@ public sealed class CharacterProgress
         }
     }
 
+    private readonly HashSet<string> raidsVisited = new HashSet<string>();
+
+    /// <summary>Raids this character has entered at least once, by raid id (a first visit plays the raid's cinematic).</summary>
+    public IEnumerable<string> RaidsVisited => raidsVisited;
+
+    public bool HasVisitedRaid(string raidId) => !string.IsNullOrEmpty(raidId) && raidsVisited.Contains(raidId);
+
+    /// <summary>True the first time this character enters the raid.</summary>
+    public bool MarkRaidVisited(string raidId) => !string.IsNullOrEmpty(raidId) && raidsVisited.Add(raidId);
+
+    public void RestoreRaidsVisited(IEnumerable<string> visited)
+    {
+        raidsVisited.Clear();
+        if (visited != null)
+        {
+            raidsVisited.UnionWith(visited);
+        }
+    }
+
     /// <summary>Counts up whenever the choice of perks changes, so what they teach is worked out again (Techniques).</summary>
     public int PerkVersion { get; private set; }
 

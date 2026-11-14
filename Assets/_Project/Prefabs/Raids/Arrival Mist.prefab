@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5995523188953507264
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7451047424248394582}
+  - component: {fileID: 6821527233477414416}
+  - component: {fileID: 2713893068094199869}
+  m_Layer: 0
+  m_Name: Arrival Mist
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7451047424248394582
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5995523188953507264}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6821527233477414416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5995523188953507264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10a93a378ea476549bc8ccdffd69ac5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::MistVolume
+  size: {x: 36, y: 5, z: 36}
+  density: 0.32
+  edgeFade: 9
+  tint: {r: 0.72, g: 0.79, b: 0.85, a: 1}
+  skyLight: 0.2
+  cloudSize: 9
+  coverage: 0.85
+  erosion: 0.35
+  flowStretch: 3.5
+  wind: {x: 0.6, y: 0.3}
+  driftSpeed: 2.2
+  waveAmplitude: 0.8
+  waveLength: 12
+  waveSpeed: 0.3
+  followsWeather: 0
+  weatherWindInfluence: 0
+--- !u!114 &2713893068094199869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5995523188953507264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49690a0d2fcdbf743ad5f50991740496, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArrivalMist
+  rollIn: 1.5
+  startAt: 0.6
+  hold: 6
+  thinOut: 14
+  sink: 1.5

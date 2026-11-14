@@ -84,7 +84,11 @@ public sealed class CinematicScreen : MonoBehaviour
     private CinematicTimeline timeline;
     private Action finished;
     private RectTransform stage;
+    private Image backdrop;
     private Image curtain;
+    // After a cinematic that ends in the game: how long the black takes to lift, and how far it has.
+    private float revealSeconds;
+    private float revealed;
     private TMP_Text subtitle;
     private CanvasGroup hint;
     private RectTransform hintFill;
@@ -165,7 +169,7 @@ public sealed class CinematicScreen : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         // Black behind the frame, and nothing under the screen can be clicked.
-        Image backdrop = CodeUI.Stretch("Backdrop", root).gameObject.AddComponent<Image>();
+        backdrop = CodeUI.Stretch("Backdrop", root).gameObject.AddComponent<Image>();
         backdrop.color = Color.black;
 
         stage = CodeUI.Box("Frame", root, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
@@ -242,6 +246,8 @@ public sealed class CinematicScreen : MonoBehaviour
         skip.Reset();
         subtitle.text = "";
         hint.alpha = 0f;
+        revealSeconds = 0f;
+        backdrop.enabled = true;
 
         foreach (CinematicMusic cue in cinematic.Music)
         {
@@ -273,6 +279,7 @@ public sealed class CinematicScreen : MonoBehaviour
     {
         if (definition == null)
         {
+            Reveal();
             return;
         }
 
@@ -582,6 +589,7 @@ public sealed class CinematicScreen : MonoBehaviour
     private void Finish()
     {
         Action done = finished;
+        CinematicDefinition ending = definition;
         finished = null;
         definition = null;
         timeline = null;
@@ -601,8 +609,43 @@ public sealed class CinematicScreen : MonoBehaviour
         shotViews.Clear();
         GamePause.Release(this);
         AudioManager.ReleaseMusic(this);
-        gameObject.SetActive(false);
+        subtitle.text = "";
+        shownSubtitle = null;
+        hint.alpha = 0f;
+        // A cinematic that ends in the game lifts its black off the scene, which plays on underneath; one followed
+        // by a loading screen goes at once.
+        revealSeconds = ending != null ? ending.FadeIntoSceneSeconds : 0f;
+        if (revealSeconds > 0f)
+        {
+            revealed = 0f;
+            backdrop.enabled = false;
+            curtain.color = Color.black;
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+
         done?.Invoke();
+    }
+
+    // The black lifting off the game after a cinematic that ends in it. Nothing under it is blocked meanwhile.
+    private void Reveal()
+    {
+        if (revealSeconds <= 0f)
+        {
+            return;
+        }
+
+        revealed += Mathf.Min(Time.unscaledDeltaTime, LongestStep) / revealSeconds;
+        float left = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(revealed));
+        curtain.color = new Color(0f, 0f, 0f, left);
+        if (revealed >= 1f)
+        {
+            revealSeconds = 0f;
+            backdrop.enabled = true;
+            gameObject.SetActive(false);
+        }
     }
 
     private void OnDestroy()

@@ -1,0 +1,158 @@
+{
+  "mw1_ward": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.423,
+      "file": "mw1_ward_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.235,
+      "file": "mw1_ward_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.288,
+      "file": "mw1_ward_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.054,
+      "file": "mw1_ward_3_front.png"
+    }
+  ],
+  "mw2_swallow": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.493,
+      "file": "mw2_swallow_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.125,
+      "file": "mw2_swallow_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.3,
+      "file": "mw2_swallow_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.081,
+      "file": "mw2_swallow_3_front.png"
+    }
+  ],
+  "mw3_corruption": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.481,
+      "file": "mw3_corruption_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.155,
+      "file": "mw3_corruption_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.257,
+      "file": "mw3_corruption_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.107,
+      "file": "mw3_corruption_3_front.png"
+    }
+  ],
+  "mw4_holds": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.448,
+      "file": "mw4_holds_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.272,
+      "file": "mw4_holds_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.174,
+      "file": "mw4_holds_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.106,
+      "file": "mw4_holds_3_front.png"
+    }
+  ],
+  "mw5_avoid": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.483,
+      "file": "mw5_avoid_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.28,
+      "file": "mw5_avoid_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.111,
+      "file": "mw5_avoid_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.126,
+      "file": "mw5_avoid_3_front.png"
+    }
+  ],
+  "mw6_return": [
+    {
+      "name": "far",
+      "depth": 4.0,
+      "share": 0.456,
+      "file": "mw6_return_0_far.png"
+    },
+    {
+      "name": "middle",
+      "depth": 1.0,
+      "share": 0.141,
+      "file": "mw6_return_1_middle.png"
+    },
+    {
+      "name": "near",
+      "depth": 0.0,
+      "share": 0.307,
+      "file": "mw6_return_2_near.png"
+    },
+    {
+      "name": "front",
+      "depth": -0.45,
+      "share": 0.096,
+      "file": "mw6_return_3_front.png"
+    }
+  ]
+}

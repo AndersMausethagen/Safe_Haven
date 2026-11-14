@@ -1900,6 +1900,19 @@ It is made like the opening, from `AgentScripts/BuildPrologueEndCinematic.cs` (a
 `Tools/LocalSpawn/generate_prologue_end.py` (which only names its paintings and reuses `generate_backstory.py`) and
 `Tools/Audio/prologue_end_voice.py` (the portal's voice through LocalSpawn's acting model, one clip a sentence).
 
+### A third cinematic: "The Misty Woods", on a character's first raid (2026-11-14)
+
+`RaidDefinition` › **First Visit** holds a cinematic played the first time a character enters that raid
+([script](../../../Docs/MistyWoodsCinematic.md); `Data/Cinematics/MistyWoods.asset` on the Misty Woods). `RaidDirector.BeginRaid`
+runs as the loading screen lifts; on a first visit (`CharacterProgress.MarkRaidVisited`, saved as `raidsVisited`) it plays the
+cinematic instead and begins the raid when it ends, so the clock waits. Not for a test raid (a raid scene played straight from the
+Editor) or in co-op, where a pause doesn't stop the others; the visit is remembered either way. The cinematic's **Fade Into
+Scene** lifts its black off the game (`CinematicScreen` keeps only the curtain, nothing under it blocked) instead of vanishing
+before a loading screen. As it lifts, the raid's **Arrival Effect** is set down at the player (`ArrivalMist`: a `MistVolume`
+whose `DensityScale` rolls in, holds and thins away), its **Arrival Sound** plays, and for **Calm After Cinematic** seconds
+`RaidDirector.IsArrivalCalm` makes `MonsterTargeting.IsSenseCandidate` notice nobody (a creature the player strikes still fights).
+The asset was made once with `CinematicBuilder`'s parts and is edited directly now (builders are retired).
+
 **Writing another one.** The parts a shot is made of are in `Editor/Cinematics/CinematicBuilder`: `Use(artFolder,
 voicePrefix)` names the cinematic's files and sets their import settings, then `Shot`, `Painting`, `Glow`, `Specks`,
 `Mist`, `Snow`, `Vignette`, `Bed`, `Keys` and `Save`. A builder script is then only what is in each shot. Where a glow

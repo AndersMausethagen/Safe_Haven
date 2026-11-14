@@ -44,7 +44,9 @@ public sealed class MistVolume : MonoBehaviour
 
     public static IReadOnlyList<MistVolume> Active => active;
     public Vector3 Size => Vector3.Max(size, Vector3.one * 0.1f);
-    public float EffectiveDensity => Mathf.Max(0f, density) * (followsWeather ? AtmosphereConditions.WeatherMist : 1f);
+    /// <summary>How much of its density shows right now, 0..1: for mist that rolls in and thins out (ArrivalMist). Not saved.</summary>
+    public float DensityScale { get; set; } = 1f;
+    public float EffectiveDensity => Mathf.Max(0f, density) * Mathf.Clamp01(DensityScale) * (followsWeather ? AtmosphereConditions.WeatherMist : 1f);
     public float EdgeFade => Mathf.Clamp(edgeFade, 0.01f, Mathf.Min(Size.x, Size.z) * 0.5f);
     public Color Tint => tint.linear;
     public float SkyLight => skyLight;

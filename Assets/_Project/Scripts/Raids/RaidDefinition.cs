@@ -127,6 +127,24 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("A painting of the place, shown in the raid planner when it is chosen (LocalSpawn: Tools/LocalSpawn/raid_art.json).")]
     [SerializeField] private Sprite placeArtwork;
 
+    [Header("First Visit")]
+    [Tooltip("Played the first time a character enters this raid, as the loading screen lifts and before the clock starts. " +
+             "Once per save; not in co-op. Empty: none.")]
+    [SerializeField] private CinematicDefinition firstVisitCinematic;
+    [Tooltip("Seconds after that cinematic in which no creature notices the player, so the arrival can be taken in. " +
+             "A creature the player strikes still fights back.")]
+    [SerializeField, Min(0f)] private float calmAfterCinematic = 8f;
+    [Tooltip("Optional: set down around the player as the cinematic fades into the game (fog rolling round them).")]
+    [SerializeField] private GameObject arrivalEffect;
+    [Tooltip("Optional: heard as the cinematic fades into the game.")]
+    [SerializeField] private SoundDefinition arrivalSound;
+
+    /// <summary>The cinematic of a character's first visit, or null.</summary>
+    public CinematicDefinition FirstVisitCinematic => firstVisitCinematic;
+    public float CalmAfterCinematic => calmAfterCinematic;
+    public GameObject ArrivalEffect => arrivalEffect;
+    public SoundDefinition ArrivalSound => arrivalSound;
+
     /// <summary>This raid's own results artwork for the outcome, or null to use the default.</summary>
     public Sprite ResultArtwork(bool extracted) => extracted ? extractedArtwork : failedArtwork;
 

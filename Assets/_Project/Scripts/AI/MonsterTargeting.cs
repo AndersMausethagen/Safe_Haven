@@ -72,7 +72,8 @@ public sealed class MonsterTargeting
     /// (unless relentless) one inside its ground around <paramref name="home"/>.</summary>
     public bool IsSenseCandidate(IDamageable candidate, Collider candidateCollider, Vector3 home, bool relentless)
     {
-        if (!CanTarget(candidate) || IsAvoided(candidateCollider.transform.position))
+        // Just after a raid's first-visit cinematic nothing notices anyone yet (a blow still provokes, by another way).
+        if (RaidDirector.IsArrivalCalm || !CanTarget(candidate) || IsAvoided(candidateCollider.transform.position))
         {
             return false;
         }

@@ -196,6 +196,9 @@ public sealed class CinematicDefinition : ScriptableObject
     [SerializeField, Range(0.1f, 1f)] private float musicWhileSpeaking = 0.55f;
     [Tooltip("Seconds the last shot takes to fade to black at the end.")]
     [SerializeField, Min(0f)] private float endFadeSeconds = 1.5f;
+    [Tooltip("Seconds the black then takes to lift off the scene underneath, for a cinematic that ends in the game " +
+             "(0: the screen goes at once, for one followed by a loading screen).")]
+    [SerializeField, Min(0f)] private float fadeIntoSceneSeconds;
     [Tooltip("Seconds a subtitle stays after its line, when the next one doesn't replace it first.")]
     [SerializeField, Min(0f)] private float subtitleLinger = 0.6f;
     [Tooltip("Seconds the skip key must be held.")]
@@ -206,6 +209,7 @@ public sealed class CinematicDefinition : ScriptableObject
     public IReadOnlyList<CinematicMusic> Music => music;
     public float MusicWhileSpeaking => musicWhileSpeaking;
     public float EndFadeSeconds => endFadeSeconds;
+    public float FadeIntoSceneSeconds => fadeIntoSceneSeconds;
     public float SubtitleLinger => subtitleLinger;
     public float SkipHoldSeconds => skipHoldSeconds;
 
@@ -217,6 +221,13 @@ public sealed class CinematicDefinition : ScriptableObject
         title = newTitle;
         shots = newShots ?? new List<CinematicShot>();
         music = newMusic ?? new List<CinematicMusic>();
+    }
+
+    /// <summary>How the end lifts into the game (editor scripts and tests only).</summary>
+    public void AuthorEnding(float fadeToBlack, float fadeIntoScene)
+    {
+        endFadeSeconds = Mathf.Max(0f, fadeToBlack);
+        fadeIntoSceneSeconds = Mathf.Max(0f, fadeIntoScene);
     }
 #endif
 }
