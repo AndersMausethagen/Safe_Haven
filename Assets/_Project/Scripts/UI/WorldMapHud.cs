@@ -227,7 +227,7 @@ public sealed class WorldMapHud : MonoBehaviour
         playerMarker.raycastTarget = false;
 
         // The minimap has already painted this scene's ground: showing it is instant. Painting again only without one.
-        Texture2D painted = MinimapHud.Current != null ? MinimapHud.Current.PaintedMap : null;
+        Texture2D painted = MinimapHud.Current != null ? MinimapHud.Current.PaintedMapFor(area) : null;
         if (painted != null)
         {
             map = painted;

@@ -60,6 +60,8 @@ public sealed class MinimapHud : MonoBehaviour
     private float turn;
     private float nextRefresh;
     private bool painted;
+    // The ground the painting shows: a raid lays its map out after this is made, and its first painting is of the old ground.
+    private Rect paintedArea;
     private bool? raidTheme;
 
     public static MinimapHud Current { get; private set; }
@@ -69,6 +71,10 @@ public sealed class MinimapHud : MonoBehaviour
 
     /// <summary>This scene's painted ground, or null until it is painted. Owned by the minimap; the world map only shows it.</summary>
     public Texture2D PaintedMap => painted ? map : null;
+
+    /// <summary>The painted ground if it shows <paramref name="wanted"/> (the world map's area now), else null: the world
+    /// map then paints its own rather than show the ground as it was before a raid laid its map out.</summary>
+    public Texture2D PaintedMapFor(Rect wanted) => painted && paintedArea == wanted ? map : null;
 
     /// <summary>Makes the map for this scene, unless it has one or there is no ground to map.</summary>
     public static MinimapHud Create()
@@ -184,6 +190,8 @@ public sealed class MinimapHud : MonoBehaviour
 
         area = found;
         material.SetVector(AreaId, new Vector4(area.width, area.height, 0f, 0f));
+        // The old painting is of the ground before the raid was laid out: hidden until the new one is done.
+        painted = false;
         StopAllCoroutines();
         StartCoroutine(Paint());
     }
@@ -201,6 +209,7 @@ public sealed class MinimapHud : MonoBehaviour
 
             map = finished;
             ground.texture = map;
+            paintedArea = area;
             painted = true;
         });
     }

@@ -156,8 +156,11 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         }
     }
 
-    /// <summary>Saplings at most this tall can be snapped by a heavy blow or a charge (Snap).</summary>
-    public const float SnapHeight = 5f;
+    /// <summary>Saplings (in the raids, 4-7 m) at most this tall can be snapped by a heavy blow or a charge (Snap).</summary>
+    public const float SnapHeight = 7.5f;
+
+    /// <summary>How tall it stands: its model's height, or for a terrain tree's stand-in (no model of its own) its tree's.</summary>
+    public float StandingHeight => Height > 0.1f ? Height : Parts.Height;
 
     /// <summary>
     /// Snapped by a giant's blow or a charge going through it (GroundImpacts): a sapling (at most <see cref="SnapHeight"/>
@@ -166,7 +169,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     /// </summary>
     public bool Snap(Vector3 from)
     {
-        if (!IsStanding || Height <= 0.1f || Height > SnapHeight || node == null || !node.BreakDown())
+        if (!IsStanding || StandingHeight > SnapHeight || node == null || !node.BreakDown())
         {
             return false;
         }

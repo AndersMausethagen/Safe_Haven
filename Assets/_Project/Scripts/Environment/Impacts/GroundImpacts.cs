@@ -303,7 +303,7 @@ public static class GroundImpacts
             Vector3 offset = tree.transform.position - at;
             offset.y = 0f;
             float distance = offset.magnitude;
-            if (snaps && distance <= breaks && tree.Height <= ChoppableTree.SnapHeight && tree.Snap(at))
+            if (snaps && distance <= breaks && tree.StandingHeight <= ChoppableTree.SnapHeight && tree.Snap(at))
             {
                 AudioManager.Play(GroundImpactSettings.Current.SnapSound, tree.transform.position);
                 continue;
