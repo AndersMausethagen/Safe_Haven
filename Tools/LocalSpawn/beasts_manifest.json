@@ -1,0 +1,20 @@
+{
+  "_notes": [
+    "Creatures that are not humanoids (2026-11-14): no T-pose, no rigger. The giant black widow's body only: its legs are made and walked procedurally in Unity (SpiderLegs), so the generated model must have no legs."
+  ],
+  "art": "Assets/_Project/Art/Enemies/Downloaded",
+  "common": "Isolated on a plain light grey background, the whole thing visible and centred. Dark realistic Nordic folk-tale style, not cute. Matte, softly lit, no glow, no shadows on the ground.",
+  "assets": [
+    {
+      "asset": "BlackWidow",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8301,
+          "prompt": "The body of a giant black widow spider with every leg removed, like a museum specimen without its legs: seen from the side and slightly above. A huge glossy jet-black round abdomen with a vivid red hourglass mark on its underside and a thin red stripe on top, joined by a narrow waist to a smaller black cephalothorax with eight small dark-red glinting eyes in two rows and two curved black fangs, fine short bristles, no legs at all."
+        }
+      ]
+    }
+  ]
+}

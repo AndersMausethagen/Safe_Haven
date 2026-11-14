@@ -3,7 +3,8 @@
     "New monsters from Nordic folk tales the user asked for (2026-11-13): 'give them textures, skeleton and animations. Refine them in Blender. Make them fit into the Safe Haven world setting and give them traits that fit their look.'",
     "Concept image and Hunyuan3D + UltraTex model here (generate_gathering.py --group creatures images|3d); then the rig (Make-It-Animatable, D:/ComfyUI/agent/integrations/rigging/rig_mia.py: the 52 Mixamo bones, so they are Humanoids that play MonsterHumanoid's clips), Tools/Blender/folk_creatures.py (height, pivot, check), AgentScripts/BuildCreatureModels.cs (bodies) and AgentScripts/BuildFolkCreatures.cs (definitions, traits).",
     "Front view, full body, T-pose with straight arms and legs a little apart: what the rigger reads best. Dark Nordic folk-tale look, painted and grounded, never cute.",
-    "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release."
+    "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
+    "2026-11-14, the user: 'add some more monsters by creating them in LocalSpawn ... create a new model for the barklin monsters and replace their model ... create some more different troll monsters, of varying sizes and functionality'. BarkRootling (the Rootling's new body), StoneTroll, BogTroll, TrollRunt. The bulk builders are retired: the Unity side is a targeted script per creature."
   ],
   "art": "Assets/_Project/Art/Enemies/Downloaded",
   "common": "Full body, seen straight from the front, standing upright in a T-pose with both arms held straight out to the sides at shoulder height, palms down, legs straight and a little apart, the whole figure visible and centred, isolated on a plain light grey background. Dark Nordic folk-tale style, realistic and grounded, not cute. Matte, softly lit, no glow, no shadows on the ground.",
@@ -38,6 +39,50 @@
           "key": "A",
           "seed": 8303,
           "prompt": "A Berg-jutul, a mountain giant of Norwegian folklore made of stone: a huge broad humanoid body built of rough grey granite slabs and boulders, cracked and weathered, with thick moss and small ferns growing on its shoulders and back, a heavy hunched head with a craggy face, a jutting brow of rock and deep shadowed eye sockets, massive long arms ending in big stone hands, thick short legs like pillars. A creature of the mountain, ancient and slow."
+        }
+      ]
+    },
+    {
+      "asset": "BarkRootling",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8211,
+          "prompt": "A rootling of the dark Nordic forest: a small knee-high creature grown out of a living tree. Its body is cracked dark-brown bark over twisted roots, long thin arms ending in sharp twig claws, short legs of gnarled root, green moss and pale lichen in the cracks of the bark, a hollow face carved by nature in the bark with two faintly glowing amber eyes deep in knotholes and a jagged split for a mouth, a few young leaves sprouting from its shoulders. Hunched, wiry and menacing."
+        }
+      ]
+    },
+    {
+      "asset": "StoneTroll",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8221,
+          "prompt": "A stone troll of Norwegian folklore, huge and heavy: its hide is grey granite slabs and lichen-covered rock, cracked like a mountain face, with moss and small ferns growing in the cracks; a massive hunched body, very long thick arms with stony knuckles, short legs like boulders, a long drooping nose and a heavy brow over small deep-set eyes, tufts of coarse dry grass for hair, a belt of old rope with a few bones. Ancient and slow."
+        }
+      ]
+    },
+    {
+      "asset": "BogTroll",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8231,
+          "prompt": "A bog troll of Norwegian folklore: a tall lanky troll with mottled green-brown wet skin, long thin limbs and webbed hands with long black nails, a hunched back draped with dripping peat moss and bog weed, a wide frog-like mouth with crooked yellow teeth, bulging yellow eyes, a long hooked nose, reeds and a rotten rope belt with dangling fish bones. Wet, lean and unsettling."
+        }
+      ]
+    },
+    {
+      "asset": "TrollRunt",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8241,
+          "prompt": "A troll runt of Norwegian folklore: a small scrawny young troll about the height of a child, wiry and quick, grey-green warty skin, oversized pointed ears and a long crooked nose, big greedy eyes, a ragged hide loincloth, a stolen sack tied to its back with trinkets poking out, big bare feet with long toes. Mischievous and nasty."
         }
       ]
     }
