@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Gas Ignite
   caption: 
   clips:
-  - {fileID: 8300000, guid: 0764232b51302cc43a3a299728029c1f, type: 3}
+  - {fileID: 8300000, guid: 098bdffe6a020f444a6338a2dba432b7, type: 3}
+  - {fileID: 8300000, guid: 7ec1c1119db9fd5498dd65fe4d4027d3, type: 3}
   channel: 2
   volume: 0.9
   volumeVariation: 0.1

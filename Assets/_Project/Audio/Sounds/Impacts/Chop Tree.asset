@@ -16,6 +16,7 @@ MonoBehaviour:
   caption: 
   clips:
   - {fileID: 8300000, guid: 043f361c205c770458a332053fc591e0, type: 3}
+  - {fileID: 8300000, guid: 62f73cfca01fa834eb866cb773b60330, type: 3}
   channel: 2
   volume: 0.7
   volumeVariation: 0.1

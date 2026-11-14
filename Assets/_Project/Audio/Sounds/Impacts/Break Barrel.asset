@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Break Barrel
   caption: 
   clips:
-  - {fileID: 8300000, guid: 692d33137a329394a8fbb3ad8b0f5130, type: 3}
-  - {fileID: 8300000, guid: 4ffd9311010b965478f106721882cf93, type: 3}
+  - {fileID: 8300000, guid: 9809d7b2da1dfae47b9b6a6c9620f8b4, type: 3}
+  - {fileID: 8300000, guid: 377817b4aac8e0f40875c6e38e23d5df, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

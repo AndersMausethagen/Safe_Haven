@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Tree Shake
   caption: 
   clips:
-  - {fileID: 8300000, guid: d29f04b25efdbd744b37962bfa2f2187, type: 3}
+  - {fileID: 8300000, guid: a7f212fd71ae7e5479ed6bff04a0bc70, type: 3}
+  - {fileID: 8300000, guid: c160b83c389eb1a4e9acc2e20726c43d, type: 3}
   channel: 2
   volume: 0.7
   volumeVariation: 0.1

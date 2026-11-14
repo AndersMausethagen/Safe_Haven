@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Impact Boulder Landing
   caption: 
   clips:
-  - {fileID: 8300000, guid: 23d65ac59d22c62419c1b1f54fafaf60, type: 3}
-  - {fileID: 8300000, guid: a5b85ec4e9b0e8c4799d6ee4b85a86bb, type: 3}
+  - {fileID: 8300000, guid: c81c468ae723d87418b1fd53a48cea80, type: 3}
+  - {fileID: 8300000, guid: 25cb1d71db3d611429dc9442338a01e3, type: 3}
   channel: 2
   volume: 0.9
   volumeVariation: 0.1

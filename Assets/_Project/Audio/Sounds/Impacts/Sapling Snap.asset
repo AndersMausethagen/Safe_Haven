@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Sapling Snap
   caption: 
   clips:
-  - {fileID: 8300000, guid: fe97b400c4dda6d4dbeabffefc69e132, type: 3}
+  - {fileID: 8300000, guid: 35773a83d11bcb04e85ed714610b7dcb, type: 3}
+  - {fileID: 8300000, guid: 16718bddef71e604aba05a11190fa77e, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

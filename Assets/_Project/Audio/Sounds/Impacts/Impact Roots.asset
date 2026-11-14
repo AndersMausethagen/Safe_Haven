@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Impact Roots
   caption: 
   clips:
-  - {fileID: 8300000, guid: cab1e1e6a3307e04c86dbd5dd9849a6a, type: 3}
+  - {fileID: 8300000, guid: 871556b097eaab94d8bf48328d89335f, type: 3}
+  - {fileID: 8300000, guid: b6fd732aa9a5d4945b3217e79d66c57e, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

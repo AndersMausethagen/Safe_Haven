@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Hit Stone
   caption: 
   clips:
-  - {fileID: 8300000, guid: fa750588f4d3f504aa2ed369597bcc0d, type: 3}
-  - {fileID: 8300000, guid: d7208db36dab49e4886819ea775b126f, type: 3}
+  - {fileID: 8300000, guid: b1832a1b1dee4dc47a60c25651f4b0b0, type: 3}
+  - {fileID: 8300000, guid: 80703ac58800f3e48abe62d67be32cb6, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

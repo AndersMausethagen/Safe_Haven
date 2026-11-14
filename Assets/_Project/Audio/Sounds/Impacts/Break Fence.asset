@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Break Fence
   caption: 
   clips:
-  - {fileID: 8300000, guid: 6479d616391334d4b91725e8df2cb674, type: 3}
+  - {fileID: 8300000, guid: 01d40c99341eb95489107187ab85b843, type: 3}
+  - {fileID: 8300000, guid: b6a56e243ebbf3441a29bbf727b00f63, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

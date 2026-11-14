@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Glance Rock
   caption: 
   clips:
-  - {fileID: 8300000, guid: 7c5c4bb50078fcb40b66cc3333b73f20, type: 3}
-  - {fileID: 8300000, guid: 5651ea6e07e3e8743a8b684ee446a43b, type: 3}
+  - {fileID: 8300000, guid: fda0dc5f4201d354e81e9c973c113cbb, type: 3}
+  - {fileID: 8300000, guid: 4f4941b542a57d048b4e8b3d03f83f40, type: 3}
   channel: 2
   volume: 0.7
   volumeVariation: 0.1

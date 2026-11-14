@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Impact Maul
   caption: 
   clips:
-  - {fileID: 8300000, guid: ae79fe9a7002ef542bf928a9a4400991, type: 3}
   - {fileID: 8300000, guid: 596217328155c7d4191f1b8446fbe128, type: 3}
+  - {fileID: 8300000, guid: e1115db4c8dc0cb45ba82d92f05af8a0, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1
