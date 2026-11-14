@@ -32,6 +32,7 @@ public static class CharacterLibraryBuilder
 
     public static string BuildAll()
     {
+        if (RetiredBuilders.Refuse("Build Character Library")) return "retired (see AgentScripts/RETIRED.md)";
         Index();
         EnsureFolder(DataRoot);
         EnsureFolder(EmoteRoot);

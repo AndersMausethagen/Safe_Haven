@@ -22,6 +22,7 @@ public static partial class CombatAnimationSetup
     [MenuItem("Safe Haven/Setup/Characters/Set Up Sneak Animation", false, 200)]
     public static void BuildSneakLayer()
     {
+        if (RetiredBuilders.Refuse("Set Up Sneak Animation")) return;
         var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath);
         AnimationClip idle = Ual1("Crouch_Idle_Loop");
         AnimationClip walk = Ual1("Crouch_Fwd_Loop");

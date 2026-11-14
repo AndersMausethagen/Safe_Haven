@@ -22,6 +22,7 @@ public static class RecipeBrowserBuilder
     [MenuItem("Safe Haven/Setup/UI/Build Recipe Browsers", false, 200)]
     public static void BuildAll()
     {
+        if (RetiredBuilders.Refuse("Build Recipe Browsers")) return;
         BuildRow();
         BuildBag();
         StationWindowBuilder.Build();

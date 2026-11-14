@@ -37,6 +37,7 @@ public sealed class ModelSimplifier : EditorWindow
     [MenuItem("Safe Haven/Setup/Art Pipeline/Simplify Model Meshes", false, 200)]
     private static void Open()
     {
+        if (RetiredBuilders.Refuse("Simplify Model Meshes")) return;
         var window = GetWindow<ModelSimplifier>("Simplify Model");
         if (Selection.activeGameObject != null && EditorUtility.IsPersistent(Selection.activeGameObject))
             window.Load(Selection.activeGameObject);

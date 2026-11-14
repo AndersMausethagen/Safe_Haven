@@ -20,6 +20,7 @@ public static class HearthlineArtworkBuilder
     [MenuItem("Safe Haven/Setup/UI/Regenerate Hearthline Artwork", false, 200)]
     public static void Install()
     {
+        if (RetiredBuilders.Refuse("Regenerate Hearthline Artwork")) return;
         UIStyle style = AssetDatabase.LoadAssetAtPath<UIStyle>(StylePath);
         if (style == null)
         {

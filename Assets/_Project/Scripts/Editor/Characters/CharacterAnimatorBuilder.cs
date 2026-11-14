@@ -54,6 +54,7 @@ public static class CharacterAnimatorBuilder
 
     public static string BuildAll()
     {
+        if (RetiredBuilders.Refuse("Build Character Animators")) return "retired (see AgentScripts/RETIRED.md)";
         Dictionary<string, AnimationClip> clips = CharacterLibraryBuilder.Clips(CharacterLibraryBuilder.MaleClipsPath);
         IReadOnlyList<EmoteDefinition> emotes = CharacterCatalog.Current.Emotes;
         if (emotes.Count == 0)
@@ -223,6 +224,7 @@ public static class CharacterAnimatorBuilder
     [MenuItem("Safe Haven/Setup/Characters/Build Player Locomotion", false, 200)]
     public static void BuildLocomotionFromMenu()
     {
+        if (RetiredBuilders.Refuse("Build Player Locomotion")) return;
         var player = AssetDatabase.LoadAssetAtPath<AnimatorController>(PlayerControllerPath);
         Debug.Log(BuildLocomotion(player, CharacterLibraryBuilder.Clips(CharacterLibraryBuilder.MaleClipsPath)));
         AssetDatabase.SaveAssets();

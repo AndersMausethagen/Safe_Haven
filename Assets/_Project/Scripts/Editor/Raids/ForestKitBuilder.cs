@@ -19,6 +19,7 @@ public static class ForestKitBuilder
 
     public static string Build()
     {
+        if (RetiredBuilders.Refuse("Build Forest Kit")) return "retired (see AgentScripts/RETIRED.md)";
         Ensure(Root);
         Ensure(Root + "/Meshes");
         Ensure(Root + "/Materials");

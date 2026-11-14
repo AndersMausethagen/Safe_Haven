@@ -125,6 +125,7 @@ public static class SoundLibrarySetup
     [MenuItem("Safe Haven/Setup/Audio/Set Up Weapon Sounds", false, 200)]
     public static void SetUpWeaponSounds()
     {
+        if (RetiredBuilders.Refuse("Set Up Weapon Sounds")) return;
         const string combat = "Combat";
         // Fists: a quick cloth swish and a dull punch; axes: a deep whoosh and a heavy, low thud.
         SoundDefinition punchSwing = Sound(new Spec { Name = "Punch Swing", Clips = Made(combat, "Punch Swing", 4), Volume = 0.36f, Audible = 15f });

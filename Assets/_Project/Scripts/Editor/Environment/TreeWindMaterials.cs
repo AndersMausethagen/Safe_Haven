@@ -35,6 +35,7 @@ public sealed class TreeWindMaterials : AssetPostprocessor
     [MenuItem("Safe Haven/Setup/Art Pipeline/Apply Tree Wind Materials", false, 200)]
     public static void ApplyToSelection()
     {
+        if (RetiredBuilders.Refuse("Apply Tree Wind Materials")) return;
         int assets = 0, instances = 0;
         foreach (Object selected in Selection.objects)
         {

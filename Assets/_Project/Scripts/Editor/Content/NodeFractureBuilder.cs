@@ -14,6 +14,7 @@ public static class NodeFractureBuilder
     [MenuItem("Safe Haven/Setup/Resources/Crack Mined Nodes", false, 200)]
     public static void CrackAll()
     {
+        if (RetiredBuilders.Refuse("Crack Mined Nodes")) return;
         int cracked = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:GatheringNodeDefinition"))
         {

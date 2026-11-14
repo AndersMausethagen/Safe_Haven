@@ -16,6 +16,7 @@ public static class ForestGroundShowcase
     [MenuItem("Safe Haven/Setup/Art Pipeline/Upgrade Moss Preview Materials", false, 200)]
     public static void Upgrade()
     {
+        if (RetiredBuilders.Refuse("Upgrade Moss Preview Materials")) return;
         var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         if (scene.path != TerrainMossTools.PreviewPath || EditorApplication.isPlaying)
             throw new InvalidOperationException("Open the saved MossPreview scene outside Play mode before upgrading.");

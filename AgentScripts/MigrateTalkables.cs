@@ -1,3 +1,4 @@
+#error Retired 2026-11-14: this script rebuilt content from its own stored copy and could silently overwrite newer work (AgentScripts/RETIRED.md). The scenes and assets are the source of truth: make a small targeted edit with a before/after diff, and restore earlier states from git.
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;

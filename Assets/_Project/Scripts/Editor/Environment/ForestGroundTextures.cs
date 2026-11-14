@@ -11,6 +11,7 @@ public static class ForestGroundTextures
     [MenuItem("Safe Haven/Setup/Art Pipeline/Regenerate Forest Ground Textures", false, 200)]
     private static void Regenerate()
     {
+        if (RetiredBuilders.Refuse("Regenerate Forest Ground Textures")) return;
         if (EditorUtility.DisplayDialog("Regenerate ground textures",
             "Overwrite the generated Moss, Soil and Stone texture maps? Materials and scene settings are kept.", "Regenerate", "Cancel"))
             Generate();

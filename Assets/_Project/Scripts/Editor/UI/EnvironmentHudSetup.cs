@@ -13,6 +13,7 @@ public static class EnvironmentHudSetup
     [MenuItem("Safe Haven/Setup/UI/Add Environment HUD to Scene", false, 200)]
     public static void AddFromMenu()
     {
+        if (RetiredBuilders.Refuse("Add Environment HUD to Scene")) return;
         Selection.activeGameObject = AddToScene().gameObject;
     }
 

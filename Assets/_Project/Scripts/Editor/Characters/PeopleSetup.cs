@@ -65,6 +65,7 @@ public static class PeopleSetup
     /// done separately (<see cref="ReplaceInPrologue"/>), as it has to be open.</summary>
     public static string BuildAll()
     {
+        if (RetiredBuilders.Refuse("Build People")) return "retired (see AgentScripts/RETIRED.md)";
         CharacterLibraryBuilder.EnsureFolder(PeopleFolder);
         var report = new StringBuilder();
         foreach (Person person in People)

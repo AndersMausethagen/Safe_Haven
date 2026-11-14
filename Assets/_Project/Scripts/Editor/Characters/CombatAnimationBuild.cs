@@ -34,6 +34,7 @@ public static partial class CombatAnimationSetup
     [MenuItem("Safe Haven/Setup/Characters/Set Up Combat Animations", false, 200)]
     public static void SetUpAll()
     {
+        if (RetiredBuilders.Refuse("Set Up Combat Animations")) return;
         ConfigureImport();
         AddHeavyClip();
         BuildPlayerController();

@@ -30,6 +30,7 @@ public static class HearthlineSetup
     [MenuItem("Safe Haven/Setup/UI/Apply Hearthline", false, 200)]
     public static void ApplyAll()
     {
+        if (RetiredBuilders.Refuse("Apply Hearthline")) return;
         SetUpType();
         int changed = ApplyPrefabs();
         foreach (string scene in GameScenes)
@@ -495,6 +496,7 @@ public static class HearthlineSetup
     /// <summary>Only the skill bar's step, on the SkillHUD prefab (`--entry HearthlineSetup.ApplySkillBar`).</summary>
     public static string ApplySkillBar()
     {
+        if (RetiredBuilders.Refuse("Apply Skill Bar")) return "retired: edit the SkillHUD prefab directly";
         string path = AssetDatabase.FindAssets("SkillHUD t:Prefab", new[] { PrefabFolder }).Select(AssetDatabase.GUIDToAssetPath)
             .FirstOrDefault(p => System.IO.Path.GetFileNameWithoutExtension(p) == "SkillHUD");
         if (path == null)

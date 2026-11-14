@@ -20,6 +20,7 @@ public static class CombatEffectsBuilder
     [MenuItem("Safe Haven/Setup/Combat/Build Combat Effects", false, 200)]
     public static void BuildAll()
     {
+        if (RetiredBuilders.Refuse("Build Combat Effects")) return;
         Directory.CreateDirectory(ArtFolder);
         Directory.CreateDirectory(PrefabFolder);
         AssetDatabase.Refresh();
@@ -101,6 +102,7 @@ public static class CombatEffectsBuilder
     [MenuItem("Safe Haven/Setup/Combat/Build Blood and Markers", false, 200)]
     public static void BuildBloodAndMarkers()
     {
+        if (RetiredBuilders.Refuse("Build Blood and Markers")) return;
         Directory.CreateDirectory(ArtFolder);
         Directory.CreateDirectory(PrefabFolder);
         AssetDatabase.Refresh();
@@ -317,6 +319,7 @@ public static class CombatEffectsBuilder
     [MenuItem("Safe Haven/Setup/Combat/Build Weapon Hit Effects", false, 200)]
     public static void BuildWeaponEffects()
     {
+        if (RetiredBuilders.Refuse("Build Weapon Hit Effects")) return;
         // Run on its own, it reuses the particle materials Build Combat Effects made.
         if (dot == null) dot = AssetDatabase.LoadAssetAtPath<Material>($"{ArtFolder}/Combat Dot.mat");
         if (dot == null) dot = ParticleMaterial("Dot", DotPixels);

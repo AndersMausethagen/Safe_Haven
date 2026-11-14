@@ -18,6 +18,7 @@ public static class HearthKitArtInstaller
 
     public static string Install()
     {
+        if (RetiredBuilders.Refuse("Install Hearthline Kit Art")) return "retired (see AgentScripts/RETIRED.md)";
         var style = AssetDatabase.LoadAssetAtPath<UIStyle>(StylePath);
         if (style == null)
         {

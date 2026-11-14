@@ -22,6 +22,7 @@ public static class PlaceholderAudioGenerator
     [MenuItem("Safe Haven/Setup/Audio/Generate Placeholder Sounds", false, 200)]
     public static void Generate()
     {
+        if (RetiredBuilders.Refuse("Generate Placeholder Sounds")) return;
         PrefabBuildUtility.EnsureFolder(ClipFolder);
         PrefabBuildUtility.EnsureFolder(SoundFolder);
         PrefabBuildUtility.EnsureFolder("Assets/_Project/Resources");

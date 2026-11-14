@@ -21,6 +21,7 @@ public static class VitalsFocusBar
 
     public static string Add()
     {
+        if (RetiredBuilders.Refuse("Add Focus Bar to Vitals HUD")) return "retired (see AgentScripts/RETIRED.md)";
         GameObject root = PrefabUtility.LoadPrefabContents(PrefabPath);
         try
         {

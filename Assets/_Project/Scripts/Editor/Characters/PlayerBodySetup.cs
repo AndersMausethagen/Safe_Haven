@@ -19,6 +19,7 @@ public static class PlayerBodySetup
 
     public static string UseModularBody()
     {
+        if (RetiredBuilders.Refuse("Use Modular Body for Player")) return "retired (see AgentScripts/RETIRED.md)";
         GameObject root = PrefabUtility.LoadPrefabContents(CombatAnimationSetup.PlayerPrefabPath);
         string result;
         try

@@ -38,6 +38,7 @@ public static class ControllerGlyphsBuilder
     [MenuItem("Safe Haven/Setup/UI/Build Controller Glyphs", false, 200)]
     public static void Build()
     {
+        if (RetiredBuilders.Refuse("Build Controller Glyphs")) return;
         if (!File.Exists(AtlasPath) || !File.Exists(NamesPath))
         {
             throw new FileNotFoundException("Run python Tools/UI/controller_glyphs.py first.", AtlasPath);
