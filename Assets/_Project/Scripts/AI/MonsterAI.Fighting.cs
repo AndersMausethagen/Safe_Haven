@@ -251,9 +251,16 @@ public sealed partial class MonsterAI
     private void UpdateAttack()
     {
         int blow = attacks.Blow;
+        MonsterAttack doing = attacks.Action;
         if (!attacks.Update(CanTarget(target) ? targetComponent.transform.position : (Vector3?)null))
         {
             SetState(State.Chasing);
+            // Spent by it (Open After): it reels a while, open to blows, as a staggered creature is.
+            if (doing != null && doing.openAfter > 0f && CurrentState != State.Dead)
+            {
+                StaggerAtLeast(doing.openAfter);
+            }
+
             return;
         }
 

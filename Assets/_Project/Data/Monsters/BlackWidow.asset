@@ -63,6 +63,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -112,6 +113,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 1494918415717876867, guid: 7536eddf833037c43b99d2fbfae9a3df, type: 3}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -161,6 +163,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -233,7 +236,7 @@ MonoBehaviour:
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 5ea01bd5f20097642a2b542ee827ade7, type: 3}
   journalLore: 'The old folk say the great spiders were spun out of the dark under the roots, and that a web across a path is a door someone has shut. What they agree on is the hourglass: when you see the red, you are already in its reach.'
-  journalAdvice: 'Its web roots you where you stand: dodge the pale shot. Its bite poisons. A hammer cracks its shell (weak to blunt blows); blades and points turn on it. Cut its legs and it bleeds out fast.'
+  journalAdvice: 'Its web roots you where you stand: dodge the pale shot. Its bite poisons. A hammer cracks its shell (weak to blunt blows); blades and points turn on it. Stand off its web and make it come to you.'
   journalHabitat: The deep Misty Woods, from the second tier
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a2e9644f7543c8d4a80e011c4bda70a9, type: 2}

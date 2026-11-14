@@ -60,6 +60,10 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
     followUps:
     - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
     comboChance: 0.45
@@ -80,10 +84,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 1
   preferredDistance: 7
@@ -102,10 +117,11 @@ MonoBehaviour:
   boltSeconds: 7
   thief: 1
   stealReach: 1.5
-  escapeDistance: 40
+  escapeDistance: 18
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 0
   openWhileStriking: 1
   parriesBackstabs: 1
@@ -121,7 +137,7 @@ MonoBehaviour:
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: ae0884888d62e5b43925b5ef29b00599, type: 3}
   journalLore: The tusser live under the hills and in the roots of old trees, and they have always taken what was left out. Grandmothers set out porridge to keep them sweet. Nobody sets out porridge now, so they come for the rest.
-  journalAdvice: 'It runs for your bag or a cart, snatches one thing and is off. Kill it and it drops what it took; let it get far enough and that is gone. It only fights when it has nowhere to run, and then not for long: corner it against rock or water.'
+  journalAdvice: 'It runs for your bag or a cart, snatches one thing and is off. Kill it and it drops what it took; let it get far enough and that is gone. It only fights when it has nowhere to run, and then not for long: corner it against rock or water. It slips into the ground soon after: be quick.'
   journalHabitat: Roots, hollows and old stone, wherever travellers stop
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: 415a96cbaf087eb449e41c2d36dbc819, type: 2}

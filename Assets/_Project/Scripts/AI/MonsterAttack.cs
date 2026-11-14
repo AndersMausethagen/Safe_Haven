@@ -39,6 +39,9 @@ public sealed class MonsterAttack
     public GameObject hazardPrefab;
     [Tooltip("Charge: metres between the hazards it leaves along its path. 0: one where it stops.")]
     [Min(0f)] public float hazardEvery;
+    [Tooltip("Seconds it reels afterwards, spent by it and open to blows as a staggered creature is (the Heartroot after it " +
+             "calls up its roots). 0: none.")]
+    [Min(0f)] public float openAfter;
     [Header("Melee: combos and held blows")]
     [Tooltip("Strikes that can follow this one, in order. Each is aimed anew, with its own wind-up and warning.")]
     public AttackDefinition[] followUps;

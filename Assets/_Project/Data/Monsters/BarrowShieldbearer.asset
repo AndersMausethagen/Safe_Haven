@@ -15,7 +15,7 @@ MonoBehaviour:
   id: barrow_shieldbearer
   displayName: Barrow Shieldbearer
   description: 'A Draug that still remembers its shield wall. Nothing gets through from the front: get behind it, wait for it to strike, or break the guard with something heavy.'
-  combatStats: {fileID: 11400000, guid: c29bad7300c63a74ca18ade20a30dd5c, type: 2}
+  combatStats: {fileID: 11400000, guid: cf1d47e3323d5c543a63e8c1c4b508b4, type: 2}
   faction: 1
   drops:
     entries:
@@ -68,6 +68,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     comboChance: 0.4
@@ -118,6 +119,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2

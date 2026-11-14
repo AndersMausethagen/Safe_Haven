@@ -77,6 +77,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -126,6 +127,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -175,6 +177,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -224,6 +227,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 4
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -251,7 +255,7 @@ MonoBehaviour:
     alertsOthers: 0
     foeStatus: {fileID: 0}
     foePull: 0
-    announce: 
+    announce: calls up its roots, and its heart lies open!
     summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
     summonCount: 2
     summonRadius: 3
@@ -273,6 +277,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -322,6 +327,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
