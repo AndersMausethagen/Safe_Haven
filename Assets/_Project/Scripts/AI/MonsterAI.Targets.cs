@@ -9,6 +9,13 @@ public sealed partial class MonsterAI
     // While hunting one target, looks for a better one it can see (MonsterTargeting: the player first while reachable).
     private void ScanForNearerTarget()
     {
+        // A wall-breaker at a wall or a building stays at it until someone makes it angry (HomeAssault).
+        if (definition.BreaksWalls && !IsProvoked && target is Damageable structure && structure != null
+            && structure.Category == TargetCategory.Structure && structure.IsAlive && !structure.IsBroken)
+        {
+            return;
+        }
+
         if (targeting.TryFindBetter(target, DistanceToTarget(), senses, home, Relentless, out IDamageable better, out Collider betterCollider))
         {
             SetTarget(better, betterCollider);
@@ -86,5 +93,6 @@ public sealed partial class MonsterAI
         return offset.magnitude;
     }
 
-    private bool IsProvoked => Time.time < provokedUntil;
+    /// <summary>Something has hurt it lately (Perception › Provoked Seconds).</summary>
+    public bool IsProvoked => Time.time < provokedUntil;
 }

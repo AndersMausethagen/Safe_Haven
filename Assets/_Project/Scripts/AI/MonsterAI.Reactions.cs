@@ -131,7 +131,9 @@ public sealed partial class MonsterAI
             return;
         }
 
-        if (!CanTarget(target))
+        // A wall-breaker at a wall turns on whoever hurts it (HomeAssault); it goes back to the walls when they stop.
+        bool atStructure = target is Damageable structure && structure != null && structure.Category == TargetCategory.Structure;
+        if (!CanTarget(target) || (atStructure && definition.BreaksWalls))
         {
             SetTarget(attackerTarget, null);
         }

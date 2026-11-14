@@ -297,7 +297,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             }
 
             // What was done to the breach's source in a raid leaves it short of fighters, though never of all of them.
-            List<GameObject> roster = running.Roster(wave);
+            List<GameObject> roster = running.Roster(wave, GameSession.Settlement.BreachesWon);
             int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Settlement.BreachWeakening)));
             for (int i = 0; i < fielded && IsActive; i++)
             {
@@ -397,17 +397,12 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
     }
 
-    // A fight with someone close is left alone, and so is a building or the ward still standing. Otherwise: on to the next.
+    // A fight with someone close is left alone, and so is a building or the ward still standing (HomeAssault). Otherwise: on to the next.
     private void Direct(MonsterAI ai, int index)
     {
-        if (ai.Target is Damageable current && current != null && current.IsAlive)
+        if (HomeAssault.StaysOnFight(ai, WardBreachSettings.Current.ChaseLimit))
         {
-            bool person = current.Category == TargetCategory.Creature;
-            float limit = WardBreachSettings.Current.ChaseLimit;
-            if (person ? (current.transform.position - ai.transform.position).sqrMagnitude <= limit * limit : !current.IsBroken)
-            {
-                return;
-            }
+            return;
         }
 
         Damageable objective = Objective(ai, index);
@@ -417,16 +412,17 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
     }
 
-    // Every other attacker makes for the ward as long as a way to it is open. The rest, and any walled off, take the nearest building.
+    // Every other attacker makes for the ward as long as a way to it is open. The rest, and any walled off, take the nearest
+    // building. A wall-breaker goes for the walls first, and for the ward only when nothing is left standing.
     private Damageable Objective(MonsterAI ai, int index)
     {
         Vector3 from = ai.transform.position;
-        if (ward != null && index % 2 == 0 && CanWalkTo(from, ward.transform.position))
+        if (ward != null && index % 2 == 0 && !HomeAssault.BreaksWalls(ai) && CanWalkTo(from, ward.transform.position))
         {
             return ward;
         }
 
-        Damageable nearest = HomeAssault.NearestBuilding(from);
+        Damageable nearest = HomeAssault.Objective(ai, from);
         return nearest != null ? nearest : ward;
     }
 

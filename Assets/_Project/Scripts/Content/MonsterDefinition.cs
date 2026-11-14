@@ -113,6 +113,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool canBeFinished;
     [Tooltip("How much it spreads out around its target with others of its side, so a group surrounds rather than clumps. 0: straight at it. 1: the widest flank.")]
     [SerializeField, Range(0f, 1f)] private float flankSpread;
+    [Tooltip("When it attacks the Haven (ward breaches, corruption nights) it goes for walls and buildings, walls first, and " +
+             "pays people no mind until one hurts it. For the big trolls, which come to tear the place down.")]
+    [SerializeField] private bool breaksWalls;
 
     [Header("Poise")]
     [Tooltip("How much it takes before it staggers (attacks' Poise Damage wears it down). 0 uses the game-wide default; " +
@@ -238,6 +241,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float IdleSleepChance => idleSleepChance;
     public float IdleSleepAttention => idleSleepAttention;
     public float FlankSpread => flankSpread;
+    /// <summary>At the Haven it goes for walls and buildings before people (HomeAssault).</summary>
+    public bool BreaksWalls => breaksWalls;
     public bool CanBeFinished => canBeFinished;
     public float HoverHeight => hoverHeight;
     public bool HasTemperament(MonsterTemperament value) => (temperament & value) != 0;

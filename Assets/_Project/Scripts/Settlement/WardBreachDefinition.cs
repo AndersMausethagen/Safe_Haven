@@ -9,6 +9,8 @@ public sealed class BreachGroup
     [Tooltip("The monster prefab that attacks (it needs MonsterAI).")]
     public GameObject enemy;
     [Min(1)] public int count = 1;
+    [Tooltip("They come only once this many breaches have been held off (the last breach repeats, harder each time). 0: always.")]
+    [Min(0)] public int fromBreachesWon;
 }
 
 /// <summary>Who comes at once.</summary>
@@ -87,8 +89,11 @@ public sealed class WardBreachDefinition : ScriptableObject
     public IReadOnlyList<ResourceAmount> Reward => reward;
     public GameEventDefinition WonEvent => wonEvent;
 
-    /// <summary>Everyone who comes in a wave (from 0), in the order they arrive.</summary>
-    public List<GameObject> Roster(int wave)
+    /// <summary>Everyone who comes in a wave (from 0), in the order they arrive, with every group counted.</summary>
+    public List<GameObject> Roster(int wave) => Roster(wave, int.MaxValue);
+
+    /// <summary>Everyone who comes in a wave (from 0) once <paramref name="breachesWon"/> breaches have been held off.</summary>
+    public List<GameObject> Roster(int wave, int breachesWon)
     {
         var roster = new List<GameObject>();
         if (waves.Count == 0)
@@ -103,7 +108,7 @@ public sealed class WardBreachDefinition : ScriptableObject
 
         foreach (BreachGroup group in waves[Mathf.Clamp(wave, 0, waves.Count - 1)].groups)
         {
-            for (int i = 0; i < group.count && group.enemy != null; i++)
+            for (int i = 0; i < group.count && group.enemy != null && breachesWon >= group.fromBreachesWon; i++)
             {
                 roster.Add(group.enemy);
             }

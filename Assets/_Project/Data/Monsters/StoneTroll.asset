@@ -175,6 +175,7 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 1
   poise: 220
   openWhileStriking: 0
   parriesBackstabs: 0

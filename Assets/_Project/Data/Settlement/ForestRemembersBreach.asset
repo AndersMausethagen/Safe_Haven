@@ -25,22 +25,36 @@ MonoBehaviour:
   - groups:
     - enemy: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
       count: 4
+      fromBreachesWon: 0
     - enemy: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
       count: 2
+      fromBreachesWon: 0
   - groups:
     - enemy: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       count: 2
+      fromBreachesWon: 0
     - enemy: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
       count: 2
+      fromBreachesWon: 0
     - enemy: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
       count: 1
+      fromBreachesWon: 0
   - groups:
     - enemy: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       count: 2
+      fromBreachesWon: 0
     - enemy: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       count: 2
+      fromBreachesWon: 0
     - enemy: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
       count: 3
+      fromBreachesWon: 0
+    - enemy: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+      count: 1
+      fromBreachesWon: 0
+    - enemy: {fileID: 9066855856663566298, guid: 9bb9b3bba4b4e0541b99c1424291cef6, type: 3}
+      count: 1
+      fromBreachesWon: 4
   enemyPrefab: {fileID: 0}
   enemyCount: 3
   secondsBetweenEnemies: 1.5
