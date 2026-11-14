@@ -149,6 +149,18 @@ public sealed class RaidTests
     }
 
     [Test]
+    public void Session_HoldsAtZero_WhileThePlayerStandsInAnOpenWayOut()
+    {
+        RaidSession session = CreateSession();
+        session.Tick(719f);
+        Assert.IsFalse(session.Tick(5f, holdAtZero: true), "in a circle, running out doesn't end it");
+        Assert.IsFalse(session.IsOver);
+        Assert.AreEqual(0f, session.TimeRemaining);
+        Assert.IsTrue(session.Tick(0.1f), "stepping out at zero ends it");
+        Assert.AreEqual(RaidOutcome.TimeExpired, session.Outcome);
+    }
+
+    [Test]
     public void Session_KeepsOnlyTheFirstOutcome()
     {
         RaidSession session = CreateSession();

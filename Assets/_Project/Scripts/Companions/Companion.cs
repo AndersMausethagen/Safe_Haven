@@ -51,6 +51,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
     private NavMeshAgent agent;
     private Combatant combatant;
     private Damageable health;
+    private WoundTending tending;
     private Interactable interactable;
     private Talkable talkable;
     private CompanionBody body;
@@ -288,8 +289,9 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         }
 
         weapon.Fight(engaged, Time.time < dodgingUntil || shotBlocked);
-        // Stops to listen while the player talks to them, unless there is fighting to do.
-        agent.isStopped = threats.Count == 0 && talkable != null && talkable.IsTalking;
+        // Stops to listen while the player talks to them, unless there is fighting to do, and to bandage itself (WoundTending).
+        tending ??= WoundTending.For(gameObject, DisplayName);
+        agent.isStopped = (threats.Count == 0 && talkable != null && talkable.IsTalking) || tending.IsBandaging;
         body.SetSpeed(agent.isStopped ? 0f : agent.velocity.magnitude, engaged == null ? walkingPace : 0f);
     }
 

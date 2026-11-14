@@ -109,10 +109,12 @@ public sealed class ItemInventory : MonoBehaviour
     /// <summary>The same, for a fish of a length (centimetres), which the bag shows (ItemStack.Size).</summary>
     public int Give(ItemDefinition item, int amount, float size)
     {
+        bool had = Container.Count(item) > 0;
         int added = Container.Add(item, amount, size);
         if (added > 0)
         {
             Received?.Invoke(item, added);
+            QuickOnArrival(item, had);
             GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, item, added, gameObject));
             if (item.IsEquippable)
             {
@@ -141,10 +143,12 @@ public sealed class ItemInventory : MonoBehaviour
             return Give(made.Item, made.Count);
         }
 
+        bool had = Container.Count(made.Item) > 0;
         int added = Container.AddStack(made);
         if (added > 0)
         {
             Received?.Invoke(made.Item, added);
+            QuickOnArrival(made.Item, had);
             GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, made.Item, added, gameObject));
             if (made.Item.IsEquippable && TryGetComponent(out PlayerEquipment equipment))
             {
@@ -153,6 +157,18 @@ public sealed class ItemInventory : MonoBehaviour
         }
 
         return added;
+    }
+
+    /// <summary>
+    /// A consumable new to the bag (none were in it) goes on the quickbar when there is room (the user, 2026-11-14). Only on
+    /// arrival: one the player took off the bar stays off while they still carry some.
+    /// </summary>
+    private void QuickOnArrival(ItemDefinition item, bool alreadyCarried)
+    {
+        if (!alreadyCarried && item.Category == ItemCategory.Consumable && QuickItems.Accepts(item) && !Quick.Contains(item) && !Quick.IsFull)
+        {
+            Quick.Toggle(item);
+        }
     }
 
     /// <summary>Offers several items and reports what was stored and what did not fit.</summary>

@@ -214,10 +214,22 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
     {
         artwork.sprite = sprite;
         artwork.enabled = sprite != null;
-        if (sprite != null && artworkFitter != null)
+        if (sprite != null)
         {
-            artworkFitter.aspectRatio = sprite.rect.width / Mathf.Max(1f, sprite.rect.height);
+            Cover().AspectRatio = sprite.rect.width / Mathf.Max(1f, sprite.rect.height);
         }
+    }
+
+    // ArtCover, not the scene's envelope fitter: on a super-ultrawide screen the envelope cut away over half the picture
+    // (and the motion drawn over it), zoomed right in. ArtCover crops at most a fifth, then shows black at the sides.
+    private ArtCover Cover()
+    {
+        if (artworkFitter != null)
+        {
+            artworkFitter.enabled = false;
+        }
+
+        return artwork.TryGetComponent(out ArtCover cover) ? cover : artwork.gameObject.AddComponent<ArtCover>();
     }
 
     private void OnReady()

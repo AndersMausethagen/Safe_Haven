@@ -274,6 +274,28 @@ public sealed class RaidDirector : MonoBehaviour
         GameSession.AbandonRaid(Session);
     }
 
+    private bool toldSheltered;
+
+    /// <summary>True when the player stands in the circle of an extraction that is open: time running out there doesn't end the raid.</summary>
+    private bool InOpenExtraction()
+    {
+        if (player == null)
+        {
+            return false;
+        }
+
+        Vector3 at = player.transform.position;
+        foreach (ExtractionPoint point in ExtractionPoint.Active)
+        {
+            if (point != null && point.IsOpen && point.Inside(at))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void Update()
     {
         if (!running || Session.IsOver)
@@ -281,10 +303,18 @@ public sealed class RaidDirector : MonoBehaviour
             return;
         }
 
-        if (Session.Tick(Time.deltaTime))
+        bool atZero = Session.TimeRemaining <= Time.deltaTime;
+        bool sheltered = atZero && InOpenExtraction();
+        if (Session.Tick(Time.deltaTime, sheltered))
         {
             Finish();
             return;
+        }
+
+        if (sheltered && !toldSheltered)
+        {
+            toldSheltered = true;
+            GameMessages.Post("Out of time, but the way home holds while you stand in its circle. Get out now!", MessageKind.Warning);
         }
 
         while (pendingWarnings.Count > 0 && Session.TimeRemaining <= pendingWarnings[0])

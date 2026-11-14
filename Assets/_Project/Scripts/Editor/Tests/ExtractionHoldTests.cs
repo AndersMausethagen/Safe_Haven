@@ -12,15 +12,16 @@ public sealed class ExtractionHoldTests
     }
 
     [Test]
-    public void FillsOnlyWhileInsideAndUncontested()
+    public void FillsWhileInside_AtHalfSpeedWhenContested()
     {
         var hold = new ExtractionHold();
         hold.Light(30f);
         Assert.AreEqual(ExtractionHoldState.Holding, hold.Tick(10f, true, false));
         Assert.AreEqual(ExtractionHoldState.Waiting, hold.Tick(10f, false, false), "outside the circle");
-        Assert.AreEqual(ExtractionHoldState.Contested, hold.Tick(10f, true, true), "a creature in the circle");
-        Assert.AreEqual(10f, hold.Held, 1e-4f, "waiting and contests pause, they don't reset");
-        Assert.AreEqual(20f, hold.Remaining, 1e-4f);
+        Assert.AreEqual(10f, hold.Held, 1e-4f, "waiting pauses, it doesn't reset");
+        Assert.AreEqual(ExtractionHoldState.Contested, hold.Tick(10f, true, true, 0.5f), "a creature in the circle");
+        Assert.AreEqual(15f, hold.Held, 1e-4f, "a contest slows it to the contested rate");
+        Assert.AreEqual(ExtractionHoldState.Done, hold.Tick(40f, true, true, 0.5f), "it still finishes while contested");
     }
 
     [Test]

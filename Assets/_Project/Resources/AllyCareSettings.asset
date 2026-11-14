@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec02847d565079e49993ffa3ce3be944, type: 3}
+  m_Name: AllyCareSettings
+  m_EditorClassIdentifier: SafeHaven::AllyCareSettings
+  bandagesCarried: 2
+  mostBandages: 2
+  makeOneEvery: 75
+  bandageBelow: 0.45
+  safeDistance: 6
+  bandageSeconds: 2.5
+  bandageHeals: 0.35
+  tendSeconds: 1.5
+  tendBelow: 0.9
+  tendStrength: 1.5
+  fightRadius: 16
+  keepClear: 6.5
+  readsAttacks: 0.8
+  sidestep: 3

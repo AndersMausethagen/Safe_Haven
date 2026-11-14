@@ -57,9 +57,12 @@ public sealed class SpawnTable : ScriptableObject
     {
         var picks = new List<GameObject>(amount);
         var counts = new Dictionary<GameObject, int>();
+        RaidCreatureConditions conditions = RaidCreatureConditions.Now;
         foreach (Entry entry in entries)
         {
-            int guaranteed = entry.maxPerGroup > 0 ? Mathf.Min(entry.minPerGroup, entry.maxPerGroup) : entry.minPerGroup;
+            // A creature the conditions send away (chance 0) isn't guaranteed either.
+            int guaranteed = conditions != null && conditions.ChanceFor(entry.prefab) <= 0f ? 0
+                : entry.maxPerGroup > 0 ? Mathf.Min(entry.minPerGroup, entry.maxPerGroup) : entry.minPerGroup;
             for (int i = 0; i < guaranteed && picks.Count < amount && entry.prefab != null; i++)
             {
                 Add(entry.prefab);
@@ -87,19 +90,41 @@ public sealed class SpawnTable : ScriptableObject
         }
     }
 
-    /// <summary>Pick for any list of entries.</summary>
+    private static readonly List<RaidCreatureConditions.Addition> added = new List<RaidCreatureConditions.Addition>();
+
+    /// <summary>Pick for any list of entries. In a raid, the hour, the weather and the season change the creatures'
+    /// chances, and may add creatures to a pick of creatures only (RaidCreatureConditions).</summary>
     public static GameObject Pick(IReadOnlyList<Entry> entries, System.Random random, Dictionary<GameObject, int> counts)
     {
+        RaidCreatureConditions conditions = RaidCreatureConditions.Now;
         var weights = new List<float>(entries.Count);
+        bool creaturesOnly = entries.Count > 0;
         foreach (Entry entry in entries)
         {
             bool capped = entry.maxPerGroup > 0 && counts != null && entry.prefab != null
                           && counts.TryGetValue(entry.prefab, out int placed) && placed >= entry.maxPerGroup;
-            weights.Add(entry.prefab == null || capped ? 0f : entry.weight);
+            float chance = conditions != null ? conditions.ChanceFor(entry.prefab) : 1f;
+            weights.Add(entry.prefab == null || capped ? 0f : entry.weight * chance);
+            creaturesOnly &= entry.prefab == null || RaidCreatureConditions.CreatureIn(entry.prefab) != null;
+        }
+
+        added.Clear();
+        if (conditions != null && creaturesOnly)
+        {
+            conditions.AddedNow(GameSession.ActiveRaid.Tier, added);
+            foreach (RaidCreatureConditions.Addition addition in added)
+            {
+                weights.Add(addition.weight * conditions.ChanceFor(addition.creature));
+            }
         }
 
         int index = RaidLayout.PickWeighted(random, weights);
-        return index >= 0 ? entries[index].prefab : null;
+        if (index < 0)
+        {
+            return null;
+        }
+
+        return index < entries.Count ? entries[index].prefab : added[index - entries.Count].creature;
     }
 
     /// <summary>True when every prefab in the entries is (or carries) a creature, so enemy density applies to them.</summary>

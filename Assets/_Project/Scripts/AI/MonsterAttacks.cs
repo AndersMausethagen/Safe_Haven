@@ -86,6 +86,12 @@ public sealed class MonsterAttacks
     /// <summary>True after a charge, while it stands open to a counter.</summary>
     public bool IsExposed => exposedAt >= 0f;
 
+    /// <summary>When its last shot or throw started (Time.time), for the ranged turns at the player.</summary>
+    public float RangedStartedAt { get; private set; } = float.NegativeInfinity;
+
+    /// <summary>Actions that hit from afar: a shot or a throw.</summary>
+    public static bool IsRanged(MonsterAttackKind kind) => kind == MonsterAttackKind.Projectile || kind == MonsterAttackKind.Lob;
+
     /// <summary>True once the last strike's cooldown is over.</summary>
     public bool IsReady => Time.time >= nextAttackTime;
 
@@ -201,6 +207,11 @@ public sealed class MonsterAttacks
 
         direction = toTarget.sqrMagnitude > 0.0001f ? toTarget.normalized : self.forward;
         startTime = Time.time;
+        if (action != null && IsRanged(action.kind))
+        {
+            RangedStartedAt = Time.time;
+        }
+
         hitPending = true;
         shotsFired = 0;
         chargeTravelled = 0f;

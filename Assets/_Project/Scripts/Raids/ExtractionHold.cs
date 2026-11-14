@@ -7,15 +7,16 @@ public enum ExtractionHoldState
     Holding,
     /// <summary>The player has left the circle: progress waits (it is kept).</summary>
     Waiting,
-    /// <summary>A hostile creature is inside the circle: progress waits until it is driven out or killed.</summary>
+    /// <summary>A hostile creature is inside the circle: progress slows (the contested rate) until it is driven out or killed.</summary>
     Contested,
     /// <summary>Held long enough: the player leaves.</summary>
     Done,
 }
 
 /// <summary>
-/// The rules of holding an extraction point (GDD §8.1): once lit, it fills only while the player stands inside its
-/// circle and no hostile creature does. Leaving or a contest pauses it, never resets it. Plain C#, owned by
+/// The rules of holding an extraction point (GDD §8.1): once lit, it fills while the player stands inside its circle, at
+/// the contested rate while a hostile creature does too (the user, 2026-11-14: "allow the timer to continue to go down even
+/// if its contested. But it could be 50% slower"). Leaving pauses it, never resets it. Plain C#, owned by
 /// ExtractionPoint (which decides who is inside); tested in ExtractionHoldTests.
 /// </summary>
 public sealed class ExtractionHold
@@ -47,10 +48,10 @@ public sealed class ExtractionHold
     }
 
     /// <summary>
-    /// Advances by <paramref name="deltaTime"/> seconds and returns the new state. Only Holding fills it; reaching the
-    /// duration returns Done exactly once and stays Done.
+    /// Advances by <paramref name="deltaTime"/> seconds and returns the new state. Holding fills it, Contested fills it at
+    /// <paramref name="contestedRate"/>; reaching the duration returns Done exactly once and stays Done.
     /// </summary>
-    public ExtractionHoldState Tick(float deltaTime, bool playerInside, bool contested)
+    public ExtractionHoldState Tick(float deltaTime, bool playerInside, bool contested, float contestedRate = 0.5f)
     {
         if (!IsLit || State == ExtractionHoldState.Done)
         {
@@ -63,14 +64,9 @@ public sealed class ExtractionHold
             return State;
         }
 
-        if (contested)
-        {
-            State = ExtractionHoldState.Contested;
-            return State;
-        }
-
-        Held = System.Math.Min(Duration, Held + System.Math.Max(0f, deltaTime));
-        State = Held >= Duration ? ExtractionHoldState.Done : ExtractionHoldState.Holding;
+        float rate = contested ? System.Math.Max(0f, System.Math.Min(1f, contestedRate)) : 1f;
+        Held = System.Math.Min(Duration, Held + System.Math.Max(0f, deltaTime) * rate);
+        State = Held >= Duration ? ExtractionHoldState.Done : contested ? ExtractionHoldState.Contested : ExtractionHoldState.Holding;
         return State;
     }
 }

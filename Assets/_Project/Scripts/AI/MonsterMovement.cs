@@ -11,6 +11,13 @@ public sealed class MonsterMovement
     private const float FacingTolerance = 20f;
     private const float NavMeshSnapDistance = 2f;
     private const float CutOffGap = 1.5f;
+    // Buried: the terrain's surface more than this far above it (a raid spawn put a wolf inside a hill, 2026-11-14).
+    private const float BuriedDepth = 1f;
+    private const float GroundCheckInterval = 1f;
+    private const float GroundProbeHeight = 40f;
+    private const float SurfaceSnapDistance = 4f;
+
+    private static readonly RaycastHit[] GroundHits = new RaycastHit[8];
 
     private readonly Transform self;
     private readonly NavMeshAgent agent;
@@ -18,6 +25,7 @@ public sealed class MonsterMovement
     private readonly float turnSpeed;
 
     private float nextRepathTime;
+    private float nextGroundCheck;
     private bool warnedOffNavMesh;
     private Vector3 asked;
     private bool hasAsked;
@@ -203,6 +211,16 @@ public sealed class MonsterMovement
 
         if (agent.isOnNavMesh)
         {
+            if (Time.time >= nextGroundCheck)
+            {
+                nextGroundCheck = Time.time + GroundCheckInterval;
+                if (Buried(out Vector3 surface)
+                    && NavMesh.SamplePosition(surface, out NavMeshHit above, SurfaceSnapDistance, agent.areaMask))
+                {
+                    agent.Warp(above.position);
+                }
+            }
+
             return true;
         }
 
@@ -212,10 +230,38 @@ public sealed class MonsterMovement
             return true;
         }
 
+        if (Buried(out Vector3 ground)
+            && NavMesh.SamplePosition(ground, out NavMeshHit onTop, SurfaceSnapDistance, agent.areaMask)
+            && agent.Warp(onTop.position))
+        {
+            return true;
+        }
+
         if (!warnedOffNavMesh)
         {
             warnedOffNavMesh = true;
             Debug.LogWarning($"{self.name} is not on a NavMesh, so it can't move. Add a NavMeshSurface to the scene and bake it.", self);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// True when the terrain's surface lies more than <see cref="BuriedDepth"/> above it: inside a hill. Only terrain
+    /// counts, so a creature under a bridge, an arch or a tree is never taken for buried.
+    /// </summary>
+    private bool Buried(out Vector3 surface)
+    {
+        surface = self.position;
+        Vector3 from = self.position + Vector3.up * GroundProbeHeight;
+        int count = Physics.RaycastNonAlloc(from, Vector3.down, GroundHits, GroundProbeHeight, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (GroundHits[i].collider is TerrainCollider && GroundHits[i].point.y > self.position.y + BuriedDepth)
+            {
+                surface = GroundHits[i].point;
+                return true;
+            }
         }
 
         return false;

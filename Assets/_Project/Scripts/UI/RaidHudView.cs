@@ -320,7 +320,7 @@ public sealed class RaidHudView : MonoBehaviour
                 case ExtractionHoldState.Done:
                     return $"<color={UIStyle.Current.GoodHex}>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
                 case ExtractionHoldState.Contested:
-                    return $"<color={UIStyle.Current.DangerHex}>{point.DisplayName} contested! Drive them out  ({percent}%)</color>";
+                    return $"<color={UIStyle.Current.DangerHex}>{point.DisplayName} contested! Slowed until you drive them out... {percent}%  ({point.TimeLeft:0} s)</color>";
                 default:
                     float away = player != null ? point.DistanceFrom(player.transform.position) : 0f;
                     return $"<color={UIStyle.Current.WarningHex}>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";

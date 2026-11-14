@@ -279,6 +279,11 @@ public sealed partial class MonsterAI
     // they are counted. True when it held back.
     private bool HoldsBack(MonsterAttackKind kind, Vector3 toTarget, float distance)
     {
+        if (MonsterAttacks.IsRanged(kind))
+        {
+            return IsAtThePlayer && WaitsToShoot(toTarget);
+        }
+
         if ((kind != MonsterAttackKind.Melee && kind != MonsterAttackKind.Charge) || !OpenWhileStriking || !IsAtThePlayer)
         {
             return false;
@@ -311,6 +316,31 @@ public sealed partial class MonsterAI
             default:
                 return false;
         }
+    }
+
+    // At most so many shoot or throw at the player at once (each holds its turn a while after it starts); the rest keep their
+    // aim and their distance until one goes quiet. Every rank waits, elites too: the rule is about how much comes in at once.
+    private bool WaitsToShoot(Vector3 toTarget)
+    {
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        int shooting = 0;
+        foreach (MonsterAI other in active)
+        {
+            if (other != this && other.target == target && Time.time - other.attacks.RangedStartedAt < rules.RangedTurnSeconds)
+            {
+                shooting++;
+            }
+        }
+
+        if (shooting < rules.RangedAtOnce)
+        {
+            return false;
+        }
+
+        movement.Stop();
+        SetState(State.Chasing);
+        movement.TurnTowards(toTarget);
+        return true;
     }
 
     // Sideways around the target, eyes on it, drifting to the distance it waits at.

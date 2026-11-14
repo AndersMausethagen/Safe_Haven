@@ -118,8 +118,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float backstabRefundWithin = 1.5f;
 
     [Header("Taking turns at the player")]
-    [Tooltip("How many can be closing in on the player with a strike at once. Others circle. Great beasts, elites and ranged attacks don't wait.")]
+    [Tooltip("How many can be closing in on the player with a strike at once. Others circle. Great beasts and elites don't wait; ranged attacks have their own count.")]
     [SerializeField, Min(1)] private int attackersAtOnce = 2;
+    [Tooltip("How many may shoot or throw at the player at once, besides those closing in (the user, 2026-11-14: \"at most 2 ranged\"). The rest hold their aim.")]
+    [SerializeField, Min(1)] private int rangedAtOnce = 2;
+    [Tooltip("Seconds a ranged attacker keeps its turn after it starts a shot or a throw, so a third waits for a quiet moment.")]
+    [SerializeField, Min(0.1f)] private float rangedTurnSeconds = 2.5f;
     [Tooltip("Seconds between one close strike at the player starting and the next.")]
     [SerializeField, Min(0f)] private float attackTurnSpacing = 0.35f;
     [Tooltip("Seconds one circles before it tries again, least and most.")]
@@ -260,6 +264,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float BackstabRefund => backstabRefund;
     public float BackstabRefundWithin => backstabRefundWithin;
     public int AttackersAtOnce => attackersAtOnce;
+    public int RangedAtOnce => rangedAtOnce;
+    public float RangedTurnSeconds => rangedTurnSeconds;
     public float AttackTurnSpacing => attackTurnSpacing;
     public Vector2 CircleSeconds => circleSeconds;
     public float CircleDistance => circleDistance;

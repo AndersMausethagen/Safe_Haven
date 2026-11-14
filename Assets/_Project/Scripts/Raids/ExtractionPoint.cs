@@ -48,6 +48,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     [Header("Holding")]
     [Tooltip("Radius of the circle the player has to hold, in metres from this point.")]
     [SerializeField, Min(1f)] private float holdRadius = 5f;
+    [Tooltip("How fast the hold fills while a hostile creature is in the circle too (0.5 = half speed, 0 = it waits).")]
+    [SerializeField, Range(0f, 1f)] private float contestedHoldRate = 0.5f;
     [Tooltip("While lit, the beacon calls out this far every Call Interval: idle creatures inside come to look. 0 = silent.")]
     [SerializeField, Min(0f)] private float callRadius = 35f;
     [SerializeField, Min(0.5f)] private float callInterval = 5f;
@@ -171,7 +173,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 
         GameObject player = HolderCandidate();
         bool inside = player != null && Inside(player.transform.position);
-        ExtractionHoldState state = hold.Tick(Time.deltaTime, inside, IsContested());
+        ExtractionHoldState state = hold.Tick(Time.deltaTime, inside, IsContested(), contestedHoldRate);
         if (state != lastHoldState)
         {
             AnnounceHold(state);
@@ -316,7 +318,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         switch (state)
         {
             case ExtractionHoldState.Contested:
-                GameMessages.Post("Something is in the circle! Drive it out to keep the way open.", MessageKind.Warning);
+                GameMessages.Post("Something is in the circle! The way opens slower until you drive it out.", MessageKind.Warning);
                 break;
             case ExtractionHoldState.Waiting when lastHoldState == ExtractionHoldState.Holding
                                                   || lastHoldState == ExtractionHoldState.Contested:

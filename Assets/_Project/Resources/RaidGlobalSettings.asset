@@ -16,5 +16,5 @@ MonoBehaviour:
   wakeDistance: 70
   nearDistance: 60
   farDistance: 110
-  globalEnemyDensity: 1
+  globalEnemyDensity: 0.8
   maxCreaturesAlive: 0

@@ -110,8 +110,12 @@ public sealed class RaidSession
     public RaidOutcome Outcome { get; private set; } = RaidOutcome.InProgress;
     public bool IsOver => Outcome != RaidOutcome.InProgress;
 
-    /// <summary>Advances the clock. Returns true on the tick that runs out of time, which ends the raid as TimeExpired.</summary>
-    public bool Tick(float deltaTime)
+    /// <summary>
+    /// Advances the clock. Returns true on the tick that runs out of time, which ends the raid as TimeExpired. With
+    /// <paramref name="holdAtZero"/> (the player stands in an open extraction circle) the clock stops at zero instead and
+    /// the raid goes on, so they can still extract (the user, 2026-11-14).
+    /// </summary>
+    public bool Tick(float deltaTime, bool holdAtZero = false)
     {
         if (IsOver || deltaTime <= 0f)
         {
@@ -119,7 +123,7 @@ public sealed class RaidSession
         }
 
         Elapsed = Mathf.Min(Elapsed + deltaTime, TotalSeconds);
-        return Elapsed >= TotalSeconds && End(RaidOutcome.TimeExpired);
+        return Elapsed >= TotalSeconds && !holdAtZero && End(RaidOutcome.TimeExpired);
     }
 
     /// <summary>Adds seconds to the clock, or takes them away; an event can't end the raid on the spot.</summary>

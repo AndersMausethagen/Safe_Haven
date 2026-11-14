@@ -1,0 +1,221 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b523e3fe0d83e564ebf65734a6758ff5, type: 3}
+  m_Name: RaidCreatureConditions
+  m_EditorClassIdentifier: SafeHaven::RaidCreatureConditions
+  seasons: {fileID: 11400000, guid: 954a71a0b12124e4a8fcaf686e64d010, type: 2}
+  yearStartDay: 2
+  weatherThreshold: 0.35
+  rules:
+  - creature: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    when: 0
+    named: Night
+    chance: 2
+  - creature: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+    when: 0
+    named: Night
+    chance: 1.6
+  - creature: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+    when: 0
+    named: Night
+    chance: 1.4
+  - creature: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
+    when: 0
+    named: Night
+    chance: 1.4
+  - creature: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
+    when: 0
+    named: Night
+    chance: 1.4
+  - creature: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+    when: 0
+    named: Night
+    chance: 1.5
+  - creature: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    when: 0
+    named: Night
+    chance: 1.5
+  - creature: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    when: 0
+    named: Night
+    chance: 2
+  - creature: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    when: 0
+    named: Night
+    chance: 0.6
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 0
+    named: Night
+    chance: 0.7
+  - creature: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    when: 0
+    named: Night
+    chance: 1.5
+  - creature: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    when: 0
+    named: Day
+    chance: 0.4
+  - creature: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+    when: 0
+    named: Day
+    chance: 0.6
+  - creature: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    when: 0
+    named: Day
+    chance: 0
+  - creature: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    when: 0
+    named: Day
+    chance: 0.5
+  - creature: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    when: 0
+    named: Day
+    chance: 1.4
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 0
+    named: Day
+    chance: 1.3
+  - creature: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    when: 0
+    named: Dusk
+    chance: 1.4
+  - creature: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    when: 0
+    named: Dusk
+    chance: 1.4
+  - creature: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    when: 3
+    named: 
+    chance: 2
+  - creature: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    when: 3
+    named: 
+    chance: 1.6
+  - creature: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    when: 3
+    named: 
+    chance: 1.3
+  - creature: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+    when: 2
+    named: 
+    chance: 1.7
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 2
+    named: 
+    chance: 1.3
+  - creature: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+    when: 2
+    named: 
+    chance: 0.4
+  - creature: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    when: 2
+    named: 
+    chance: 0.6
+  - creature: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
+    when: 4
+    named: 
+    chance: 1.6
+  - creature: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+    when: 4
+    named: 
+    chance: 0.3
+  - creature: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
+    when: 1
+    named: Winter
+    chance: 2.5
+  - creature: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+    when: 1
+    named: Winter
+    chance: 0.5
+  - creature: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
+    when: 1
+    named: Winter
+    chance: 0.6
+  - creature: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    when: 1
+    named: Winter
+    chance: 0.6
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 1
+    named: Winter
+    chance: 0.4
+  - creature: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+    when: 1
+    named: Winter
+    chance: 0.4
+  - creature: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+    when: 1
+    named: Winter
+    chance: 1.5
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 1
+    named: Spring
+    chance: 1.6
+  - creature: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+    when: 1
+    named: Spring
+    chance: 1.3
+  - creature: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+    when: 1
+    named: Spring
+    chance: 1.3
+  - creature: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+    when: 1
+    named: Summer
+    chance: 1.6
+  - creature: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+    when: 1
+    named: Summer
+    chance: 1.3
+  - creature: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+    when: 1
+    named: Autumn
+    chance: 1.4
+  - creature: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    when: 1
+    named: Autumn
+    chance: 1.5
+  - creature: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    when: 1
+    named: Autumn
+    chance: 1.3
+  additions:
+  - creature: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
+    when: 0
+    named: Dusk
+    weight: 0.35
+    fromTier: 0
+  - creature: {fileID: 6267209934607442583, guid: 76a470aa63338604b9110596e079afc3, type: 3}
+    when: 0
+    named: Night
+    weight: 0.35
+    fromTier: 0
+  - creature: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+    when: 0
+    named: Night
+    weight: 0.4
+    fromTier: 0
+  - creature: {fileID: 3643037256157110189, guid: 19eccf1f7288cf14cba8e4fbb26eb7f8, type: 3}
+    when: 2
+    named: 
+    weight: 0.3
+    fromTier: 0
+  - creature: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
+    when: 3
+    named: 
+    weight: 0.25
+    fromTier: 2
+  - creature: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
+    when: 1
+    named: Autumn
+    weight: 0.2
+    fromTier: 2
