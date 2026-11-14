@@ -202,6 +202,23 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Tooltip("The most corpses at once; beyond it the oldest goes.")]
     [SerializeField, Min(1)] private int corpseLimit = 14;
 
+    [Header("Gore (killing blows; none while the Blood option is off)")]
+    [Tooltip("Chance a two-handed blunt weapon's killing blow bursts a small creature (Monster › Can Be Smashed) into pieces.")]
+    [SerializeField, Range(0f, 1f)] private float smashChance = 0.35f;
+    [Tooltip("Chance a slashing killing blow takes the head or a limb (Monster › Can Lose Limbs).")]
+    [SerializeField, Range(0f, 1f)] private float severChance = 0.3f;
+    [Tooltip("Of those, the share that take the head.")]
+    [SerializeField, Range(0f, 1f)] private float severHeadShare = 0.4f;
+    [Tooltip("A cut-off stump pumps this many times as long and as hard as an ordinary wound.")]
+    [SerializeField, Range(1f, 4f)] private float severBleed = 1.8f;
+    [Tooltip("Metres per second the pieces of a smashed body are flung, slowest and fastest.")]
+    [SerializeField, Min(0f)] private float smashSpeedMin = 3.5f;
+    [SerializeField, Min(0f)] private float smashSpeedMax = 9f;
+    [Tooltip("Gobbets of gore thrown out besides the body's own pieces.")]
+    [SerializeField, Range(0, 24)] private int smashGobbets = 9;
+    [Tooltip("Metres round a smashed body that its blood splatters the ground.")]
+    [SerializeField, Min(0f)] private float smashSplatterReach = 3.5f;
+
     [Header("Hurt vignette")]
     [Tooltip("Screen edges flash this color when the player is hurt. Alpha is the strength.")]
     [SerializeField] private Color hurtColor = new Color(0.65f, 0.05f, 0.02f, 0.55f);
@@ -329,6 +346,14 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float CorpseSettleSeconds => corpseSettleSeconds;
     public float CorpseSeconds => corpseSeconds;
     public int CorpseLimit => corpseLimit;
+    public float SmashChance => smashChance;
+    public float SeverChance => severChance;
+    public float SeverHeadShare => severHeadShare;
+    public float SeverBleed => severBleed;
+    public float SmashSpeedMin => smashSpeedMin;
+    public float SmashSpeedMax => smashSpeedMax;
+    public int SmashGobbets => smashGobbets;
+    public float SmashSplatterReach => smashSplatterReach;
     public Color HurtColor => hurtColor;
     public float HurtSeconds => hurtSeconds;
     public float LowHealthBelow => lowHealthBelow;

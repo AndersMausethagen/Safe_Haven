@@ -115,6 +115,8 @@ MonoBehaviour:
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 1
+  canLoseLimbs: 1
   sizeVariation: 0.1
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: ae0884888d62e5b43925b5ef29b00599, type: 3}

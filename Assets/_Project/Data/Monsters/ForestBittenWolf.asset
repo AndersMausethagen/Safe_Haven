@@ -179,6 +179,10 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 0
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 1
   poise: 0
@@ -190,6 +194,8 @@ MonoBehaviour:
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 1
+  canLoseLimbs: 1
   sizeVariation: 0.08
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 3d1695c02a14ecf4bb127f270293a6cc, type: 3}

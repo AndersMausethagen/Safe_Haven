@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Knotted Club
   stance: 1
   kind: 0
+  strikeOverride: 1
   damage: 12
   basicAttack: {fileID: 11400000, guid: df8b2e7b746bd9e468568415751529aa, type: 2}
   combo:
@@ -25,6 +26,7 @@ MonoBehaviour:
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 11400000, guid: d9740238ef4f0bf41afa3aa4fe467b0c, type: 2}
   secondHandDistance: 0.24
+  heavySwingArmor: 0
   weaponArt: {fileID: 11400000, guid: 2469662c3166a71459278163a6dc0f3a, type: 2}
   weaponArtFocus: 30
   guardLetThrough: 0.35
@@ -40,6 +42,7 @@ MonoBehaviour:
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
   swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
   hitSound: {fileID: 11400000, guid: d35929fdaefdd164d8047ffebb5d331d, type: 2}
   hitEffect: {fileID: 0}

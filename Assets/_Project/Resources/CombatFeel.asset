@@ -35,6 +35,9 @@ MonoBehaviour:
   knockbackDistance: 0.35
   knockbackDistanceCrit: 0.8
   knockbackSeconds: 0.12
+  highGroundFrom: 1.5
+  highGroundPerMetre: 0.03
+  highGroundMost: 0.25
   telegraphMaterial: {fileID: 2100000, guid: f9bd178c025c9844d939f9ad1a38402f, type: 2}
   telegraphAreaColor: {r: 1, g: 0.25, b: 0.15, a: 0.18}
   telegraphFillColor: {r: 1, g: 0.3, b: 0.1, a: 0.45}
@@ -131,6 +134,14 @@ MonoBehaviour:
   corpseSettleSeconds: 4
   corpseSeconds: 14
   corpseLimit: 14
+  smashChance: 0.35
+  severChance: 0.3
+  severHeadShare: 0.4
+  severBleed: 1.8
+  smashSpeedMin: 3.5
+  smashSpeedMax: 9
+  smashGobbets: 9
+  smashSplatterReach: 3.5
   hurtColor: {r: 0.65, g: 0.05, b: 0.02, a: 0.55}
   hurtSeconds: 0.45
   lowHealthBelow: 0.3

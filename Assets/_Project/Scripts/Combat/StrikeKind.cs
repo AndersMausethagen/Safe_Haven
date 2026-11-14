@@ -39,5 +39,17 @@ public static class StrikeKindExtensions
         }
     }
 
+    /// <summary>How a blow by <paramref name="source"/> with <paramref name="attack"/> lands: the weapon in hand's override
+    /// (Combatant.StrikeOverride), else the attack's own kind. None for anything not physical.</summary>
+    public static StrikeKind Of(Combatant source, AttackDefinition attack)
+    {
+        if (attack == null || !attack.DamageType.IsPhysical())
+        {
+            return StrikeKind.None;
+        }
+
+        return source != null && source.StrikeOverride != StrikeKind.None ? source.StrikeOverride : attack.Strike;
+    }
+
     public static string Label(this StrikeKind kind) => kind == StrikeKind.None ? "" : kind.ToString();
 }

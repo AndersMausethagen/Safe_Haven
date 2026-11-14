@@ -404,6 +404,11 @@ public sealed class PlayerEquipment : MonoBehaviour
 
         ItemStack stack = MainHand;
         WeaponDefinition weapon = !stack.IsEmpty && stack.Item.IsWeapon && !stack.IsBroken ? stack.Item.Weapon : unarmed;
+        if (combatant != null)
+        {
+            combatant.StrikeOverride = weapon != null ? weapon.StrikeOverride : StrikeKind.None;
+        }
+
         if (combat != null && combat.Weapon != weapon)
         {
             combat.Weapon = weapon;

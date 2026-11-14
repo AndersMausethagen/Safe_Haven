@@ -20,6 +20,10 @@ public sealed class Combatant : MonoBehaviour
 
     public Faction Faction => faction;
 
+    /// <summary>How this one's physical blows land whatever the attack says: set from the weapon in hand (a club's sword
+    /// moves land blunt, WeaponDefinition › Strike Override). None: each attack's own kind.</summary>
+    public StrikeKind StrikeOverride { get; set; }
+
     /// <summary>Changes sides for a while (a practice duel, CompanionSpar), so the other side's blows land; put it back after.</summary>
     public void SetFaction(Faction value) => faction = value;
     public bool IsPriorityTarget => priorityTarget;

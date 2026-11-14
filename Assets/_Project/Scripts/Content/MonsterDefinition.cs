@@ -138,6 +138,12 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool ragdollOnDeath = true;
     [Tooltip("With Ragdoll On Death: it falls by its Death animation instead of going loose, as a tree should. Off, the body is thrown by the blow.")]
     [SerializeField] private bool fallsByAnimation;
+    [Tooltip("Small enough that a killing blow from a two-handed blunt weapon can burst it, flinging pieces and gore " +
+             "(Combat Feel › Gore › Smash Chance). For the small ones: rootlings, wolves, boars, little trolls.")]
+    [SerializeField] private bool canBeSmashed;
+    [Tooltip("A slashing killing blow can take its head or a limb, which then bleeds hard (Combat Feel › Gore › Sever Chance). " +
+             "Off for what has nothing to cut off.")]
+    [SerializeField] private bool canLoseLimbs = true;
     [Tooltip("How much bigger or smaller each one is than the model, as a share. 0.08 is up to 8% either way. Leave a one-off at 0.")]
     [SerializeField, Range(0f, 0.3f)] private float sizeVariation;
     [Tooltip("How much lighter, darker, warmer or colder each one is, as a share, so a pack isn't one creature several times over.")]
@@ -215,6 +221,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public bool Bleeds => bleeds;
     public Color BloodColor => bloodColor;
     public bool RagdollOnDeath => ragdollOnDeath;
+    public bool CanBeSmashed => canBeSmashed;
+    public bool CanLoseLimbs => canLoseLimbs;
     public IReadOnlyList<MonsterAttack> Attacks => attacks;
     public MonsterMovementTactic MovementTactic => movementTactic;
     public MonsterTemperament Temperament => temperament;

@@ -26,6 +26,8 @@ public sealed class WeaponDefinition : ScriptableObject
     [Tooltip("Selects the combat idle, attack animation and arm pose.")]
     [SerializeField] private WeaponStance stance = WeaponStance.OneHanded;
     [SerializeField] private WeaponKind kind;
+    [Tooltip("How its blows land whatever its moves say: Blunt for a club that swings like a sword. None: each attack's own kind.")]
+    [SerializeField] private StrikeKind strikeOverride;
     [Tooltip("The weapon's base damage, before the player's power and the attack's ratio.")]
     [SerializeField, Min(0f)] private float damage = 10f;
     [Tooltip("The first swing, and the only one when the combo chain is empty.")]
@@ -119,10 +121,17 @@ public sealed class WeaponDefinition : ScriptableObject
 
     /// <summary>How its usual blows land: the first combo attack's kind (or the basic attack's). A weapon's heavy or art may
     /// differ (a sword's thrust stabs).</summary>
+    public StrikeKind StrikeOverride => strikeOverride;
+
     public StrikeKind Strike
     {
         get
         {
+            if (strikeOverride != StrikeKind.None)
+            {
+                return strikeOverride;
+            }
+
             AttackDefinition usual = combo.Count > 0 && combo[0] != null ? combo[0] : basicAttack;
             return usual != null ? usual.Strike : StrikeKind.None;
         }

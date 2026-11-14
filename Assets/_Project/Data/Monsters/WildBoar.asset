@@ -50,6 +50,8 @@ MonoBehaviour:
   closeSenseRange: 3.5
   hearing: 1.1
   alertness: 1.2
+  huntsHorses: 1
+  frightensHorses: 0
   attacks: []
   movementTactic: 0
   temperament: 5
@@ -67,6 +69,10 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 1
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0.4
   poise: 40
@@ -78,6 +84,8 @@ MonoBehaviour:
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 1
+  canLoseLimbs: 1
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: 07e4276df2c8dad45a0cd63ac96041ac, type: 3}
