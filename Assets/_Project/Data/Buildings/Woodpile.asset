@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: Woodpile
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: woodpile
+  displayName: Woodpile
+  description: Split billets stacked to dry under bark. A home that means to see the winter.
+  icon: {fileID: 21300000, guid: 75a720e14f849fe41b85944884fb1be2, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 3287466866788848140, guid: e688500df2b5e6348bb07245499ba5ac, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
+    amount: 8
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 913
+  requires: []
+  requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 0
+  decoration: 1
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 2
+  renown: 2
+  upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
+  deathSound: {fileID: 0}

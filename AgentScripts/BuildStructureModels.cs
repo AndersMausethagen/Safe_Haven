@@ -687,6 +687,248 @@ public static class BuildStructureModels
         return material;
     }
 
+    // ----- Decorations (2026-11-14, the user: "more decorations, like benches") -----
+
+    // Modelled by Tools/Blender/haven_decor.py in the kit's materials (its manifest: haven_decor_manifest.json): the asset,
+    // its building's id and file, what it says, what it costs, the comfort and renown it brings, the Workshop tier it needs
+    // (0: known from the start), and seconds of hammering. Comfort only on what people sit or linger at, so ten new kinds
+    // don't stretch Well Rested past a raid's length.
+    private static readonly (string asset, string id, string file, string text, (string item, int amount)[] cost, int comfort,
+        int renown, int workshop, float work)[] DecorPieces =
+    {
+        ("Log Bench", "log_bench", "LogBench", "A log sawn flat on two stumps. Somewhere to sit and watch the clearing.",
+            new[] { ("OakWood", 4) }, 1, 2, 0, 2f),
+        ("Plank Bench", "plank_bench", "PlankBench", "A plank bench with a back to lean on, for the long evenings.",
+            new[] { ("OakPlank", 4), ("OakWood", 2) }, 1, 3, 1, 3f),
+        ("Trestle Table", "trestle_table", "TrestleTable", "A table and two stools. A meal eaten together is a meal remembered.",
+            new[] { ("OakPlank", 6), ("OakWood", 4) }, 1, 4, 1, 4f),
+        ("Woodpile", "woodpile", "Woodpile", "Split billets stacked to dry under bark. A home that means to see the winter.",
+            new[] { ("OakWood", 8) }, 0, 2, 0, 2f),
+        ("Barrels and Crates", "barrels_and_crates", "BarrelsAndCrates", "Barrels, crates and a sack: the clutter of a place where things are made.",
+            new[] { ("OakPlank", 6), ("IronIngot", 1), ("Linen", 1) }, 0, 3, 1, 3f),
+        ("Carved Post", "carved_post", "CarvedPost", "A guardian post with a stern face, painted red. It watches the edge of the woods.",
+            new[] { ("OakWood", 6), ("Berries", 2) }, 0, 5, 2, 4f),
+        ("Flower Bed", "flower_bed", "FlowerBed", "Wildflowers and herbs in a ring of stones. Colour that nothing in the woods put there.",
+            new[] { ("GreyStone", 6), ("HealingHerb", 2) }, 1, 3, 1, 3f),
+        ("Signpost", "signpost", "Signpost", "Three painted arrows. Nobody here needs them, but a village has one.",
+            new[] { ("OakWood", 2), ("OakPlank", 3) }, 0, 2, 0, 2f),
+        ("Rune Stone", "rune_stone", "RuneStone", "A standing stone cut with a serpent band. Those who made this place, remembered.",
+            new[] { ("GreyStone", 10), ("Berries", 2) }, 1, 5, 2, 5f),
+        ("Hay Bales", "hay_bales", "HayBales", "Bales of hay and an old cart wheel. It smells of summer.",
+            new[] { ("Barley", 6), ("NettleCord", 1), ("OakPlank", 2) }, 0, 2, 1, 2f),
+    };
+
+    // The decorations made before these, moved to the same tab.
+    private static readonly string[] OlderDecorations = { "LanternPost", "HavenBanner", "HerbPlanter" };
+
+    // A building's torch on its wall (BuildWallTorches puts them up): the kit model, its flame and a light, lit at dusk.
+    private const string WallTorchPrefab = "Assets/_Project/Prefabs/Structures/Parts/Wall Torch.prefab";
+    // Where the torch's charred tip is, in its own space (the manifest's Flame mark), and the flame above it.
+    private static readonly Vector3 TorchTip = new Vector3(0f, 0.31f, 0.253f);
+
+    /// <summary>The decorations (`--entry BuildStructureModels.Decor`): their look prefabs from the FBXs, their building
+    /// definitions and prefabs, the build menu's Decorations tab; and the Wall Torch part. Re-runnable.</summary>
+    public static string Decor()
+    {
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Dictionary<string, Material> materials = KitSlots();
+        var report = new List<string>();
+        var workshop = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/ConstructionTable.asset");
+        var planter = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/HerbPlanter.asset");
+        int order = 910;
+        foreach (var piece in DecorPieces)
+        {
+            (GameObject look, Mesh[] levels) = DecorLook(piece.asset, materials);
+            if (look == null)
+            {
+                report.Add($"{piece.asset}: no model");
+                continue;
+            }
+
+            string path = "Assets/_Project/Data/Buildings/" + piece.file + ".asset";
+            var building = Load<BuildingDefinition>(path);
+            if (building == null)
+            {
+                building = ScriptableObject.CreateInstance<BuildingDefinition>();
+                AssetDatabase.CreateAsset(building, path);
+            }
+
+            var data = new SerializedObject(building);
+            data.FindProperty("id").stringValue = piece.id;
+            data.FindProperty("displayName").stringValue = piece.asset;
+            data.FindProperty("description").stringValue = piece.text;
+            data.FindProperty("combatStats").objectReferenceValue = planter.CombatStats;
+            SerializedProperty items = data.FindProperty("constructionItems");
+            items.arraySize = piece.cost.Length;
+            for (int i = 0; i < piece.cost.Length; i++)
+            {
+                var item = Load<ItemDefinition>("Assets/_Project/Data/Items/Materials/" + piece.cost[i].item + ".asset");
+                if (item == null) throw new System.Exception("No item " + piece.cost[i].item);
+                items.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue = item;
+                items.GetArrayElementAtIndex(i).FindPropertyRelative("amount").intValue = piece.cost[i].amount;
+            }
+
+            data.FindProperty("knownFromStart").boolValue = true;
+            data.FindProperty("showInBuildMenu").boolValue = true;
+            data.FindProperty("sortOrder").intValue = order++;
+            SerializedProperty requires = data.FindProperty("requires");
+            requires.arraySize = piece.workshop > 0 ? 1 : 0;
+            if (piece.workshop > 0)
+            {
+                requires.GetArrayElementAtIndex(0).FindPropertyRelative("building").objectReferenceValue = workshop;
+                requires.GetArrayElementAtIndex(0).FindPropertyRelative("tier").intValue = piece.workshop;
+            }
+
+            data.FindProperty("decoration").boolValue = true;
+            data.FindProperty("comfort").intValue = piece.comfort;
+            data.FindProperty("yardDepth").floatValue = 0f;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            building.ConfigureBuildingUp(piece.work, piece.renown, new BuildingLevel[0]);
+            EditorUtility.SetDirty(building);
+
+            if (building.Prefab == null)
+            {
+                GameObject prefab = BuildingPrefabBuilder.Create(building, look);
+                data.Update();
+                data.FindProperty("prefab").objectReferenceValue = prefab;
+                data.ApplyModifiedPropertiesWithoutUndo();
+            }
+            else
+            {
+                Transform current = building.Prefab.transform.Find(PrefabBuildUtility.ModelChildName);
+                if (current == null || PrefabUtility.GetCorrespondingObjectFromSource(current.gameObject) != look)
+                {
+                    PrefabBuildUtility.ReplaceModel(building.Prefab, look, BuildingPrefabBuilder.Placeholder);
+                }
+
+                BuildingPrefabBuilder.Update(building.Prefab, building);
+                Refit(AssetDatabase.GetAssetPath(building.Prefab));
+            }
+
+            // Hammered up like any building (BuildHaven.AddConstruction gives the older ones theirs).
+            PrefabBuildUtility.EditPrefab(building.Prefab, root =>
+            {
+                if (root.GetComponent<Construction>() == null)
+                {
+                    root.AddComponent<Construction>();
+                }
+            });
+            AssetDatabase.SaveAssetIfDirty(building);
+            report.Add(Budget(piece.asset, levels, 6000, 512));
+        }
+
+        foreach (string older in OlderDecorations)
+        {
+            var building = Load<BuildingDefinition>("Assets/_Project/Data/Buildings/" + older + ".asset");
+            if (building == null) continue;
+            var data = new SerializedObject(building);
+            data.FindProperty("decoration").boolValue = true;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssetIfDirty(building);
+        }
+
+        report.Add(WallTorch(materials));
+        AssetDatabase.SaveAssets();
+        return string.Join("\n", report);
+    }
+
+    private static (GameObject look, Mesh[] levels) DecorLook(string asset, Dictionary<string, Material> materials)
+    {
+        string fbx = Art + asset + "/" + asset + ".fbx";
+        if (Load<GameObject>(fbx) == null)
+        {
+            return (null, null);
+        }
+
+        Model(fbx, materials);
+        var model = Load<GameObject>(fbx);
+        var levels = new List<Mesh>();
+        var slots = new List<Material[]>();
+        foreach (string suffix in new[] { "", " LOD1", " LOD2" })
+        {
+            Transform part = model.transform.Find(asset + suffix);
+            if (part == null && suffix.Length == 0 && model.TryGetComponent(out MeshFilter _))
+            {
+                part = model.transform;
+            }
+
+            if (part == null) continue;
+            levels.Add(part.GetComponent<MeshFilter>().sharedMesh);
+            slots.Add(part.GetComponent<MeshRenderer>().sharedMaterials);
+        }
+
+        if (levels.Count == 0)
+        {
+            return (null, null);
+        }
+
+        GameObject look = LookPrefab(System.IO.Path.ChangeExtension(fbx, ".prefab"), asset, levels.ToArray(), slots.ToArray());
+        return (look, levels.ToArray());
+    }
+
+    // The Wall Torch part: its model; a Lit child at the tip holding the flame (the Fire shader's sphere, as the standing
+    // torch's) and a warm flickering light a hand in front of it that lights the wall and hangs in the mist; NightFlame
+    // shows Lit after dusk.
+    private static string WallTorch(Dictionary<string, Material> materials)
+    {
+        (GameObject look, Mesh[] levels) = DecorLook("Wall Torch", materials);
+        if (look == null)
+        {
+            return "Wall Torch: no model";
+        }
+
+        string folder = System.IO.Path.GetDirectoryName(WallTorchPrefab).Replace('\\', '/');
+        if (!AssetDatabase.IsValidFolder(folder))
+        {
+            AssetDatabase.CreateFolder(System.IO.Path.GetDirectoryName(folder).Replace('\\', '/'), System.IO.Path.GetFileName(folder));
+        }
+
+        var root = new GameObject("Wall Torch");
+        try
+        {
+            var model = (GameObject)PrefabUtility.InstantiatePrefab(look, root.transform);
+            model.name = "Model";
+            var lit = new GameObject("Lit");
+            lit.transform.SetParent(root.transform, false);
+            lit.transform.localPosition = TorchTip;
+
+            GameObject flame = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            flame.name = "Flame";
+            Object.DestroyImmediate(flame.GetComponent<Collider>());
+            flame.transform.SetParent(lit.transform, false);
+            // As big as the standing torch's flame, near enough: smaller, the Fire shader's tongues were too faint to see
+            // from the game's camera (seen in Play, 2026-11-14).
+            flame.transform.localPosition = new Vector3(0f, 0.12f, 0.02f);
+            flame.transform.localScale = new Vector3(0.24f, 0.42f, 0.24f);
+            var flameRenderer = flame.GetComponent<MeshRenderer>();
+            flameRenderer.sharedMaterial = Load<Material>("Assets/_Project/Materials/Stations/StationFire.mat");
+            flameRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            flameRenderer.receiveShadows = false;
+
+            var glow = new GameObject("Light");
+            glow.transform.SetParent(lit.transform, false);
+            // Out from the wall, so it lights the wall broadly rather than burning a white patch just above the torch.
+            glow.transform.localPosition = new Vector3(0f, 0.15f, 0.32f);
+            var light = glow.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = new Color(1f, 0.8f, 0.46f);
+            light.intensity = 3f;
+            light.range = 6.5f;
+            light.shadows = LightShadows.None;
+            glow.AddComponent<LightFlicker>().Configure(new Color(1f, 0.52f, 0.2f, 0.4f), 0.02f, false, 0f);
+            glow.AddComponent<AtmosphereLight>().Configure(0.8f, 2.5f);
+
+            root.AddComponent<NightFlame>().Configure(lit);
+            PrefabUtility.SaveAsPrefabAsset(root, WallTorchPrefab);
+        }
+        finally
+        {
+            Object.DestroyImmediate(root);
+        }
+
+        return Budget("Wall Torch", levels, 2000, 512);
+    }
+
     private static string KitBuilding(string name, int cap, string modelPrefab, string building)
     {
         string fbx = Art + name + "/" + name + ".fbx";
@@ -742,13 +984,15 @@ public static class BuildStructureModels
                 Bounds body = levels[0].bounds;
                 PrefabBuildUtility.EditPrefab(definition.Prefab, root =>
                 {
-                    // The kit model is life-size (the Workshop's stand-in was shown at 0.7).
+                    // The kit model is life-size; the building shows it at its ModelScale (half for the big ones, the user
+                    // 2026-11-14), with what stands in its space scaled alike (BuildBuildingScale).
+                    float size = definition.ModelScale;
                     var modelAsset = Load<GameObject>(modelPrefab);
                     foreach (Transform child in root.transform)
                     {
                         if (PrefabUtility.GetCorrespondingObjectFromSource(child.gameObject) == modelAsset)
                         {
-                            child.localScale = Vector3.one;
+                            child.localScale = definition.ModelSize;
                         }
                     }
 
@@ -757,7 +1001,9 @@ public static class BuildStructureModels
                     Transform line = lived != null ? lived.Find("Line") : null;
                     if (line != null)
                     {
-                        lived.localPosition += new Vector3(0f, 0f, body.min.z - 1.3f - (lived.localPosition.z + line.localPosition.z));
+                        lived.localScale = definition.ModelSize;
+                        float behind = (body.min.z - 1.3f) * size;
+                        lived.localPosition = new Vector3(lived.localPosition.x, lived.localPosition.y, behind - line.localPosition.z * size);
                     }
 
                     if (lived != null)
@@ -778,8 +1024,8 @@ public static class BuildStructureModels
                         if (root.TryGetComponent(out HearthSmoke smoke))
                         {
                             var data = new SerializedObject(smoke);
-                            data.FindProperty("chimney").vector3Value = hearth.chimney;
-                            data.FindProperty("lightAt").vector3Value = hearth.light;
+                            data.FindProperty("chimney").vector3Value = Vector3.Scale(hearth.chimney, definition.ModelSize);
+                            data.FindProperty("lightAt").vector3Value = Vector3.Scale(hearth.light, definition.ModelSize);
                             data.ApplyModifiedPropertiesWithoutUndo();
                         }
                     });

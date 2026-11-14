@@ -32,6 +32,7 @@ MonoBehaviour:
   sortOrder: 19
   requires: []
   requiredRank: 0
+  modelScale: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0

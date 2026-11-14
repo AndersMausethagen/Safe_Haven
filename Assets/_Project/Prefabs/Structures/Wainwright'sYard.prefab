@@ -62,8 +62,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 5.7224584, y: 4.003354, z: 4.2742085}
-  m_Center: {x: 0.13622856, y: 1.9497042, z: 0.08117652}
+  m_Size: {x: 4.0057206, y: 3.2227, z: 2.991946}
+  m_Center: {x: 0.09535992, y: 1.5695119, z: 0.05682361}
 --- !u!114 &2501270353842943012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 4.201381
+  height: 3.430862
   spread: 0.4
 --- !u!208 &2539794507066641874
 NavMeshObstacle:
@@ -139,11 +139,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 2.8612292, y: 2.001677, z: 2.1371043}
+  m_Extents: {x: 2.0028603, y: 1.61135, z: 1.495973}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.13622856, y: 1.9497042, z: 0.08117652}
+  m_Center: {x: 0.09535992, y: 1.5695119, z: 0.05682361}
   m_TimeToStationary: 0.5
 --- !u!114 &3697652591141356283
 MonoBehaviour:
@@ -221,6 +221,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6614546860286996174}
     m_Modifications:
+    - target: {fileID: 7205642041221859914, guid: 5d0d1cbef321ac34ea81c88b99dce6ec, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7205642041221859914, guid: 5d0d1cbef321ac34ea81c88b99dce6ec, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.80499995
+      objectReference: {fileID: 0}
+    - target: {fileID: 7205642041221859914, guid: 5d0d1cbef321ac34ea81c88b99dce6ec, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 7205642041221859914, guid: 5d0d1cbef321ac34ea81c88b99dce6ec, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -365,7 +377,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 4.401381
+      value: 3.630862
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name

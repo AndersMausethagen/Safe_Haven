@@ -34,6 +34,8 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
   requiredRank: 0
+  modelScale: 0.5
+  modelHeight: 1.3
   yardDepth: 2
   yardSide: 0
   placeInLines: 0
@@ -66,6 +68,7 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -98,6 +101,7 @@ MonoBehaviour:
       tier: 1
     - building: {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
       tier: 1
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -132,6 +136,7 @@ MonoBehaviour:
     requires:
     - building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
       tier: 2
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -162,6 +167,7 @@ MonoBehaviour:
     requires:
     - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
       tier: 4
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0

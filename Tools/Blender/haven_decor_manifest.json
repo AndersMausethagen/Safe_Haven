@@ -1,0 +1,807 @@
+{
+  "note": "Made by Tools/Blender/haven_decor.py. size_m: x across, z deep (the front is +Z), y up, in metres. triangles/vertices per level (LOD0, LOD1, LOD2; vertices as the engine splits them). budget: ScreenBudget.cs numbers for these bounds. cost: suggested construction items (asset names under Data/Items/Materials); comfort: suggested BuildingDefinition.comfort. collider: a suggested primitive in the model's space (Unity axes). marks_unity: the Wall Torch's empties in the model's space.",
+  "assets": {
+    "Log Bench": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Log Bench",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Log Bench/Log Bench.fbx",
+      "objects": [
+        "Log Bench",
+        "Log Bench LOD1",
+        "Log Bench LOD2"
+      ],
+      "size_m": {
+        "x": 1.714,
+        "z": 0.481,
+        "y": 0.482
+      },
+      "bounds_unity": {
+        "min": [
+          -0.857,
+          0.0,
+          -0.2406
+        ],
+        "max": [
+          0.857,
+          0.482,
+          0.2406
+        ]
+      },
+      "triangles": [
+        160,
+        90,
+        62
+      ],
+      "vertices": [
+        166,
+        94,
+        70
+      ],
+      "vertices_per_triangle": 1.04,
+      "lod_share": [
+        1.0,
+        0.56,
+        0.39
+      ],
+      "budget": {
+        "default_view_pixels": 15115,
+        "aim_40px": 756,
+        "floor_25px": 1209,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood"
+      ],
+      "cost": {
+        "OakWood": 4
+      },
+      "comfort": 1,
+      "notes": "A log sawn flat on top, on two stumps. Seat height 0.47 m.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.241,
+          0.0
+        ],
+        "size": [
+          1.714,
+          0.482,
+          0.481
+        ]
+      }
+    },
+    "Plank Bench": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Plank Bench",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Plank Bench/Plank Bench.fbx",
+      "objects": [
+        "Plank Bench",
+        "Plank Bench LOD1",
+        "Plank Bench LOD2"
+      ],
+      "size_m": {
+        "x": 1.6,
+        "z": 0.566,
+        "y": 1.072
+      },
+      "bounds_unity": {
+        "min": [
+          -0.8,
+          -0.0051,
+          -0.3705
+        ],
+        "max": [
+          0.8,
+          1.0667,
+          0.195
+        ]
+      },
+      "triangles": [
+        396,
+        280,
+        160
+      ],
+      "vertices": [
+        578,
+        434,
+        292
+      ],
+      "vertices_per_triangle": 1.46,
+      "lod_share": [
+        1.0,
+        0.71,
+        0.4
+      ],
+      "budget": {
+        "default_view_pixels": 23595,
+        "aim_40px": 1180,
+        "floor_25px": 1888,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks"
+      ],
+      "cost": {
+        "OakPlank": 4,
+        "OakWood": 2
+      },
+      "comfort": 1,
+      "notes": "Seat height 0.45 m; the backrest leans back 9 degrees, its back side is +Z's opposite (the bench faces +Z).",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.531,
+          -0.088
+        ],
+        "size": [
+          1.6,
+          1.072,
+          0.566
+        ]
+      }
+    },
+    "Trestle Table": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Trestle Table",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Trestle Table/Trestle Table.fbx",
+      "objects": [
+        "Trestle Table",
+        "Trestle Table LOD1",
+        "Trestle Table LOD2"
+      ],
+      "size_m": {
+        "x": 1.927,
+        "z": 1.79,
+        "y": 0.933
+      },
+      "bounds_unity": {
+        "min": [
+          -0.9657,
+          -0.0129,
+          -0.8998
+        ],
+        "max": [
+          0.9617,
+          0.92,
+          0.8902
+        ]
+      },
+      "triangles": [
+        502,
+        391,
+        210
+      ],
+      "vertices": [
+        539,
+        451,
+        308
+      ],
+      "vertices_per_triangle": 1.07,
+      "lod_share": [
+        1.0,
+        0.78,
+        0.42
+      ],
+      "budget": {
+        "default_view_pixels": 48839,
+        "aim_40px": 2442,
+        "floor_25px": 3907,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron"
+      ],
+      "cost": {
+        "OakPlank": 6,
+        "OakWood": 4
+      },
+      "comfort": 2,
+      "notes": "Table top 0.8 m; a stool at each long side (one in front, one behind), a bowl and a tankard on the top.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.002,
+          0.454,
+          -0.005
+        ],
+        "size": [
+          1.927,
+          0.933,
+          1.79
+        ]
+      }
+    },
+    "Woodpile": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Woodpile",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Woodpile/Woodpile.fbx",
+      "objects": [
+        "Woodpile",
+        "Woodpile LOD1",
+        "Woodpile LOD2"
+      ],
+      "size_m": {
+        "x": 1.994,
+        "z": 0.618,
+        "y": 1.302
+      },
+      "bounds_unity": {
+        "min": [
+          -0.9941,
+          -0.0009,
+          -0.3056
+        ],
+        "max": [
+          1.0,
+          1.3009,
+          0.3121
+        ]
+      },
+      "triangles": [
+        894,
+        510,
+        156
+      ],
+      "vertices": [
+        1420,
+        1036,
+        292
+      ],
+      "vertices_per_triangle": 1.59,
+      "lod_share": [
+        1.0,
+        0.57,
+        0.17
+      ],
+      "budget": {
+        "default_view_pixels": 34389,
+        "aim_40px": 1719,
+        "floor_25px": 2751,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks"
+      ],
+      "cost": {
+        "OakWood": 8
+      },
+      "comfort": 1,
+      "notes": "Split billets end-on to the front between two posts, under three bark slabs.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.003,
+          0.65,
+          0.003
+        ],
+        "size": [
+          1.994,
+          1.302,
+          0.618
+        ]
+      }
+    },
+    "Barrels and Crates": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Barrels and Crates",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Barrels and Crates/Barrels and Crates.fbx",
+      "objects": [
+        "Barrels and Crates",
+        "Barrels and Crates LOD1",
+        "Barrels and Crates LOD2"
+      ],
+      "size_m": {
+        "x": 1.569,
+        "z": 1.189,
+        "y": 0.83
+      },
+      "bounds_unity": {
+        "min": [
+          -0.8492,
+          -0.0099,
+          -0.58
+        ],
+        "max": [
+          0.72,
+          0.82,
+          0.6094
+        ]
+      },
+      "triangles": [
+        695,
+        497,
+        200
+      ],
+      "vertices": [
+        919,
+        725,
+        235
+      ],
+      "vertices_per_triangle": 1.32,
+      "lod_share": [
+        1.0,
+        0.72,
+        0.29
+      ],
+      "budget": {
+        "default_view_pixels": 29281,
+        "aim_40px": 1464,
+        "floor_25px": 2342,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron",
+        "Kit Linen"
+      ],
+      "cost": {
+        "OakPlank": 6,
+        "IronIngot": 1,
+        "Linen": 1
+      },
+      "comfort": 0,
+      "notes": "Set dressing; could double as a small store if wanted.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.065,
+          0.405,
+          0.015
+        ],
+        "size": [
+          1.569,
+          0.83,
+          1.189
+        ]
+      }
+    },
+    "Carved Post": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Carved Post",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Carved Post/Carved Post.fbx",
+      "objects": [
+        "Carved Post",
+        "Carved Post LOD1",
+        "Carved Post LOD2"
+      ],
+      "size_m": {
+        "x": 0.676,
+        "z": 0.61,
+        "y": 2.252
+      },
+      "bounds_unity": {
+        "min": [
+          -0.3469,
+          -0.0224,
+          -0.2735
+        ],
+        "max": [
+          0.3287,
+          2.23,
+          0.337
+        ]
+      },
+      "triangles": [
+        504,
+        332,
+        274
+      ],
+      "vertices": [
+        563,
+        425,
+        353
+      ],
+      "vertices_per_triangle": 1.12,
+      "lod_share": [
+        1.0,
+        0.66,
+        0.54
+      ],
+      "budget": {
+        "default_view_pixels": 17174,
+        "aim_40px": 859,
+        "floor_25px": 1374,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Iron",
+        "Kit Boulder",
+        "Kit Cloth",
+        "Kit Dye Ochre"
+      ],
+      "cost": {
+        "OakWood": 6,
+        "Berries": 2
+      },
+      "comfort": 1,
+      "collider": {
+        "type": "capsule",
+        "center": [
+          0.0,
+          1.12,
+          0.0
+        ],
+        "radius": 0.22,
+        "height": 2.23,
+        "direction": "y"
+      },
+      "notes": "2.2 m guardian post; the face is on the front (+Z). Berries stand for the red paint (optional)."
+    },
+    "Flower Bed": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Flower Bed",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Flower Bed/Flower Bed.fbx",
+      "objects": [
+        "Flower Bed",
+        "Flower Bed LOD1",
+        "Flower Bed LOD2"
+      ],
+      "size_m": {
+        "x": 1.453,
+        "z": 1.45,
+        "y": 0.415
+      },
+      "bounds_unity": {
+        "min": [
+          -0.7364,
+          -0.0341,
+          -0.7162
+        ],
+        "max": [
+          0.7166,
+          0.3814,
+          0.7335
+        ]
+      },
+      "triangles": [
+        876,
+        420,
+        283
+      ],
+      "vertices": [
+        1074,
+        692,
+        465
+      ],
+      "vertices_per_triangle": 1.23,
+      "lod_share": [
+        1.0,
+        0.48,
+        0.32
+      ],
+      "budget": {
+        "default_view_pixels": 25535,
+        "aim_40px": 1277,
+        "floor_25px": 2043,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Boulder",
+        "Kit Soil",
+        "Kit Trollstone",
+        "Kit Cloth",
+        "Kit Linen",
+        "Kit Dye Blue",
+        "Kit Dye Ochre"
+      ],
+      "cost": {
+        "GreyStone": 6,
+        "HealingHerb": 2
+      },
+      "comfort": 2,
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.1,
+          0.0
+        ],
+        "size": [
+          1.45,
+          0.2,
+          1.45
+        ]
+      },
+      "notes": "Low (0.3 m): a walk-over collider or none may suit it better than a solid one."
+    },
+    "Signpost": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Signpost",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Signpost/Signpost.fbx",
+      "objects": [
+        "Signpost",
+        "Signpost LOD1",
+        "Signpost LOD2"
+      ],
+      "size_m": {
+        "x": 1.309,
+        "z": 0.617,
+        "y": 2.225
+      },
+      "bounds_unity": {
+        "min": [
+          -0.6544,
+          -0.0254,
+          -0.3602
+        ],
+        "max": [
+          0.6544,
+          2.2,
+          0.2572
+        ]
+      },
+      "triangles": [
+        286,
+        136,
+        109
+      ],
+      "vertices": [
+        382,
+        256,
+        205
+      ],
+      "vertices_per_triangle": 1.34,
+      "lod_share": [
+        1.0,
+        0.48,
+        0.38
+      ],
+      "budget": {
+        "default_view_pixels": 33053,
+        "aim_40px": 1653,
+        "floor_25px": 2644,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Boulder",
+        "Kit Cloth",
+        "Kit Dye Blue",
+        "Kit Dye Ochre"
+      ],
+      "cost": {
+        "OakWood": 2,
+        "OakPlank": 3
+      },
+      "comfort": 0,
+      "collider": {
+        "type": "capsule",
+        "center": [
+          0.0,
+          1.05,
+          0.0
+        ],
+        "radius": 0.2,
+        "height": 2.2,
+        "direction": "y"
+      },
+      "notes": "No text: the arrow heads are painted red, ochre and blue; arrows at 1.86, 1.62, 1.38 m."
+    },
+    "Rune Stone": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Rune Stone",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Rune Stone/Rune Stone.fbx",
+      "objects": [
+        "Rune Stone",
+        "Rune Stone LOD1",
+        "Rune Stone LOD2"
+      ],
+      "size_m": {
+        "x": 0.992,
+        "z": 0.698,
+        "y": 1.484
+      },
+      "bounds_unity": {
+        "min": [
+          -0.4834,
+          -0.0849,
+          -0.4177
+        ],
+        "max": [
+          0.5084,
+          1.3995,
+          0.2803
+        ]
+      },
+      "triangles": [
+        510,
+        224,
+        108
+      ],
+      "vertices": [
+        582,
+        286,
+        152
+      ],
+      "vertices_per_triangle": 1.14,
+      "lod_share": [
+        1.0,
+        0.44,
+        0.21
+      ],
+      "budget": {
+        "default_view_pixels": 19444,
+        "aim_40px": 972,
+        "floor_25px": 1555,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Boulder",
+        "Kit Cloth"
+      ],
+      "cost": {
+        "GreyStone": 10,
+        "Berries": 2
+      },
+      "comfort": 2,
+      "notes": "1.4 m; the painted band and runes are on the front (+Z).",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.012,
+          0.657,
+          -0.069
+        ],
+        "size": [
+          0.992,
+          1.484,
+          0.698
+        ]
+      }
+    },
+    "Hay Bales": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Hay Bales",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Hay Bales/Hay Bales.fbx",
+      "objects": [
+        "Hay Bales",
+        "Hay Bales LOD1",
+        "Hay Bales LOD2"
+      ],
+      "size_m": {
+        "x": 2.571,
+        "z": 1.101,
+        "y": 0.968
+      },
+      "bounds_unity": {
+        "min": [
+          -1.4442,
+          -0.0309,
+          -0.5696
+        ],
+        "max": [
+          1.1267,
+          0.937,
+          0.5315
+        ]
+      },
+      "triangles": [
+        618,
+        294,
+        140
+      ],
+      "vertices": [
+        574,
+        306,
+        171
+      ],
+      "vertices_per_triangle": 0.93,
+      "lod_share": [
+        1.0,
+        0.48,
+        0.23
+      ],
+      "budget": {
+        "default_view_pixels": 48861,
+        "aim_40px": 2443,
+        "floor_25px": 3909,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Planks",
+        "Kit Iron",
+        "Kit Linen",
+        "Kit Hay"
+      ],
+      "cost": {
+        "Barley": 6,
+        "NettleCord": 1,
+        "OakPlank": 2
+      },
+      "comfort": 0,
+      "notes": "Three bales and a leaning cart wheel on a mat of spilt hay.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.159,
+          0.453,
+          -0.019
+        ],
+        "size": [
+          2.571,
+          0.968,
+          1.101
+        ]
+      }
+    },
+    "Wall Torch": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Wall Torch",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Wall Torch/Wall Torch.fbx",
+      "objects": [
+        "Wall Torch",
+        "Wall Torch LOD1",
+        "Wall Torch LOD2",
+        "Mount",
+        "Flame"
+      ],
+      "size_m": {
+        "x": 0.09,
+        "z": 0.282,
+        "y": 0.62
+      },
+      "bounds_unity": {
+        "min": [
+          -0.043,
+          -0.31,
+          -0.0
+        ],
+        "max": [
+          0.047,
+          0.3096,
+          0.2817
+        ]
+      },
+      "triangles": [
+        140,
+        93,
+        49
+      ],
+      "vertices": [
+        153,
+        110,
+        74
+      ],
+      "vertices_per_triangle": 1.09,
+      "lod_share": [
+        1.0,
+        0.66,
+        0.35
+      ],
+      "budget": {
+        "default_view_pixels": 1758,
+        "aim_40px": 88,
+        "floor_25px": 141,
+        "test_cap": 2500
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Iron",
+        "Kit Soil",
+        "Kit Hide"
+      ],
+      "cost": {
+        "Sticks": 2,
+        "NettleFiber": 1,
+        "IronIngot": 1
+      },
+      "comfort": 0,
+      "collider": null,
+      "notes": "Origin = Mount (the back plate's centre, its back face on the wall); the torch stands out along +Z. The charred tip is its own slot (Kit Soil) so the game can swap it for an ember material when lit.",
+      "marks_unity": {
+        "Mount": [
+          -0.0,
+          0.0,
+          -0.0
+        ],
+        "Flame": [
+          0.0,
+          0.3096,
+          0.2526
+        ]
+      },
+      "marks_checked": {
+        "Mount": true,
+        "Flame": true
+      }
+    }
+  }
+}

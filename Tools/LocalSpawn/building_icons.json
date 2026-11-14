@@ -34,5 +34,15 @@
   "wardtotem": "A tall standing stone carved with Norse runes glowing pale icy blue, a little frost around its base, cold mist curling around it",
   "watchpost": "A tall wooden watch platform on four stilts with a ladder, a fire basket of glowing flames burning on top under a small pointed roof",
   "well": "A round village well of grey field stones with a small pitched wooden roof on two posts, a winch with rope and a wooden bucket",
-  "stable": "A low Norse log stable with a turf roof of short grass and an open front, a split-rail fence before it and a brown horse's head looking out over a stall door"
+  "stable": "A low Norse log stable with a turf roof of short grass and an open front, a split-rail fence before it and a brown horse's head looking out over a stall door",
+  "log_bench": "A simple Nordic log bench: one thick pine log sawn flat on top, resting on two short round stumps, bark on its sides",
+  "plank_bench": "A Nordic wooden bench of weathered grey planks with a slanted plank backrest, on four sturdy square legs",
+  "trestle_table": "A rough wooden trestle table of planks on crossed legs, a round wooden stool on each long side, a wooden bowl and a tankard on top",
+  "woodpile": "A neat stack of split firewood billets, cut ends facing out, between two upright posts under a little roof of three bark slabs",
+  "barrels_and_crates": "Two oak barrels with dark iron hoops beside a stack of wooden crates, a linen sack slumped against them",
+  "carved_post": "A tall Norse guardian post of dark wood carved with a stern bearded face near the top, red ochre paint in the carving, standing on a few stones",
+  "flower_bed": "A round bed of dark soil ringed with grey field stones, full of blue, yellow and white wildflowers and green herbs",
+  "signpost": "A Nordic wooden signpost: a tall post with three plank arrows pointing different ways, their tips painted red, ochre and blue, stones round its foot",
+  "rune_stone": "An upright grey Norse rune stone, a carved serpent band painted red winding round its face with runes along it",
+  "hay_bales": "Three golden hay bales tied with cord on a mat of spilt hay, an old wooden cart wheel leaning against them"
 }

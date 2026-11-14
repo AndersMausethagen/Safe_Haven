@@ -1744,8 +1744,10 @@ public static class BuildHorses
                 return found;
             }
 
-            Transform[] stalls = Enumerable.Range(0, 4).Select(i => Point("Stall " + i, new Vector3(-3.6f + i * 2.4f, 0f, 0.9f))).ToArray();
-            Transform door = Point("Door", new Vector3(0f, 0f, 5.2f));
+            // In the model's space: the stable is shown at its ModelScale (BuildBuildingScale).
+            float size = building.ModelScale;
+            Transform[] stalls = Enumerable.Range(0, 4).Select(i => Point("Stall " + i, new Vector3(-3.6f + i * 2.4f, 0f, 0.9f) * size)).ToArray();
+            Transform door = Point("Door", new Vector3(0f, 0f, 5.2f) * size);
             HorseStable stable = Ensure<HorseStable>(root);
             var keep = new SerializedObject(stable);
             SetObjects(keep.FindProperty("stalls"), stalls);

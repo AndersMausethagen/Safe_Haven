@@ -34,6 +34,8 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
     tier: 2
   requiredRank: 0
+  modelScale: 0.7
+  modelHeight: 1.15
   yardDepth: 2.5
   yardSide: 0
   placeInLines: 0
@@ -64,6 +66,7 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0

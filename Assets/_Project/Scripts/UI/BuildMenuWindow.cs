@@ -29,7 +29,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
     private const float RiseUnits = 30f;
     private const float ReadSeconds = 0.5f;
 
-    private static readonly BuildCategory[] Tabs = { BuildCategory.Stations, BuildCategory.Walls, BuildCategory.Structures, BuildCategory.Manage };
+    // Decorations last of the things to build (appended to the enum so saved tab choices keep their numbers), then Manage.
+    private static readonly BuildCategory[] Tabs =
+        { BuildCategory.Stations, BuildCategory.Walls, BuildCategory.Structures, BuildCategory.Decorations, BuildCategory.Manage };
     private static BuildCategory lastTab = BuildCategory.Stations;
 
     // Hearthline 3: framed tabs as KitTabs draws them, with the count of what is in each.

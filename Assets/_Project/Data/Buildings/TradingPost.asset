@@ -36,6 +36,8 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 2
   requiredRank: 3
+  modelScale: 0.5
+  modelHeight: 1.3
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0

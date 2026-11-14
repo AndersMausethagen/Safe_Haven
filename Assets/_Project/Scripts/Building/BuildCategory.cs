@@ -5,6 +5,7 @@ public enum BuildCategory
     Walls,
     Structures,
     Manage,
+    Decorations,
 }
 
 public static class BuildCategories
@@ -16,7 +17,12 @@ public static class BuildCategories
             return BuildCategory.Stations;
         }
 
-        return building.PlaceInLines ? BuildCategory.Walls : BuildCategory.Structures;
+        if (building.PlaceInLines)
+        {
+            return BuildCategory.Walls;
+        }
+
+        return building.Decoration ? BuildCategory.Decorations : BuildCategory.Structures;
     }
 
     public static string Name(BuildCategory category)
@@ -26,6 +32,7 @@ public static class BuildCategories
             case BuildCategory.Stations: return "Crafting Stations";
             case BuildCategory.Walls: return "Walls & Fences";
             case BuildCategory.Structures: return "Structures";
+            case BuildCategory.Decorations: return "Decorations";
             default: return "Manage";
         }
     }
