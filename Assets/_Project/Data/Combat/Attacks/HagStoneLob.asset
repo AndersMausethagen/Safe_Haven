@@ -31,6 +31,7 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 11400000, guid: dc8496e4059a4b84fbe1af1f9279a491, type: 2}
   unblockable: 0
   pull: 0
   animationState: Strike Overhead

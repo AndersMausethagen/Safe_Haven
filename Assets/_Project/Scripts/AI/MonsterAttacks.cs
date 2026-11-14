@@ -33,6 +33,7 @@ public sealed class MonsterAttacks
     private float holdFrom;
     private float holdLeft;
     private float hazardTravelled;
+    private float trailTravelled;
     private readonly Damageable health;
     // A held wind-up stops here in its fill, before the end, so the blow is plainly still to come.
     private const float HoldAtShare = 0.6f;
@@ -204,6 +205,7 @@ public sealed class MonsterAttacks
         shotsFired = 0;
         chargeTravelled = 0f;
         hazardTravelled = 0f;
+        trailTravelled = 0f;
         chargeLength = action != null ? Mathf.Min(action.chargeDistance, toTarget.magnitude + 0.7f) : 0f;
         exposedAt = -1f;
         chargeHit = false;
@@ -244,6 +246,7 @@ public sealed class MonsterAttacks
         {
             hitPending = false;
             AttackResolver.Execute(combatant, attack, definition.AttackDamage, self.position, direction, targetLayers);
+            Shake(attack);
         }
 
         if (elapsed >= attack.RecoveryTime)
@@ -360,6 +363,7 @@ public sealed class MonsterAttacks
                 {
                     hitPending = false;
                     AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers);
+                    Shake(attack);
                 }
 
                 if (blowsLeft > 0 && elapsed >= attack.HitDelay + action.comboGap)
@@ -393,6 +397,13 @@ public sealed class MonsterAttacks
         bool blocked = movement.Rush(direction, step);
         chargeTravelled += step;
         hazardTravelled += step;
+        trailTravelled += step;
+        GroundImpactDefinition plough = attack.GroundImpact;
+        if (plough != null && plough.Mark == GroundMarkShape.Furrow && trailTravelled >= plough.FurrowLength)
+        {
+            trailTravelled = 0f;
+            GroundImpacts.Strike(attack, combatant, self.position, direction, true);
+        }
         if (action.hazardPrefab != null && action.hazardEvery > 0f && hazardTravelled >= action.hazardEvery)
         {
             hazardTravelled = 0f;
@@ -407,6 +418,7 @@ public sealed class MonsterAttacks
         {
             exposedAt = Time.time;
             movement.Stop();
+            GroundImpacts.Strike(attack, combatant, self.position + direction * 0.8f, direction);
             if (action.hazardPrefab != null && action.hazardEvery <= 0f)
             {
                 GroundHazard.Spawn(action.hazardPrefab, self.position, combatant);
@@ -477,6 +489,18 @@ public sealed class MonsterAttacks
         Vector3 chest = foe.position + Vector3.up * 1.2f;
         return !Physics.Linecast(eye, chest, out RaycastHit hit, ~0, QueryTriggerInteraction.Ignore)
             || hit.transform.IsChildOf(foe) || hit.transform.IsChildOf(self);
+    }
+
+    // The blow strikes the ground where it lands (its Ground Impact): a stomp at its feet, a sweep ahead of it.
+    private void Shake(AttackDefinition attack)
+    {
+        if (attack.GroundImpact == null)
+        {
+            return;
+        }
+
+        Vector3 at = attack.Arc >= 300f ? self.position : self.position + direction * Mathf.Min(attack.Range * 0.6f, 3f);
+        GroundImpacts.Strike(attack, combatant, at, direction);
     }
 
     // One lob of a burst: where the foe stands (ahead of them by Lead Target), the later ones scattered about them.

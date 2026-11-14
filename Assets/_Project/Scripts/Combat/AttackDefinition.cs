@@ -61,6 +61,11 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Chance from 0 to 1 that a hit leaves the status.")]
     [SerializeField, Range(0f, 1f)] private float statusChance = 1f;
 
+    [Header("The world")]
+    [Tooltip("What the blow does to the ground and the grass round it when it lands (dust, wind, a crater). Empty: nothing, " +
+             "except the player's heavy swings, which use Ground Impact Settings by the kind of blow.")]
+    [SerializeField] private GroundImpactDefinition groundImpact;
+
     [Header("Grabs and rushes")]
     [Tooltip("Can't be blocked or parried, only dodged: a grab, a shield rush, a quake. Its warning on the ground shows in " +
              "Combat Feel's Unblockable colour.")]
@@ -120,6 +125,8 @@ public sealed class AttackDefinition : ScriptableObject
     public bool Unblockable => unblockable;
     /// <summary>Metres a hit drags its target toward the attacker (negative: away).</summary>
     public float Pull => pull;
+    /// <summary>What the blow does to the ground round it (GroundImpacts).</summary>
+    public GroundImpactDefinition GroundImpact => groundImpact;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float StrikeSpeed => strikeSpeed;

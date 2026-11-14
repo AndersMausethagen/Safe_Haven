@@ -31,6 +31,9 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 11400000, guid: 5f8d497db95bfa9459d267051309da41, type: 2}
+  unblockable: 0
+  pull: 0
   animationState: Strike Lunge
   animationSpeed: 0.32333332
   strikeSpeed: 1

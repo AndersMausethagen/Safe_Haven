@@ -21,12 +21,14 @@ Shader "Hidden/Safe Haven/Terrain/Footprint Stamp"
             float4 _Boot; // centre UV, inverse width/length in field UV
             float2 _Direction;
 
-            float Fragment(v2f_img input) : SV_Target
+            // G carries a heavy blow's mark (GroundImpacts mirrors it in): moved with the window, never touched here.
+            float2 Fragment(v2f_img input) : SV_Target
             {
                 float2 oldUV = input.uv + _Shift;
                 float inside = all(oldUV >= 0) && all(oldUV <= 1);
-                float previous = max(0, tex2D(_MainTex, saturate(oldUV)).r - _Decay) * inside;
-                if (_Stamp <= 0) return previous;
+                float2 old = tex2D(_MainTex, saturate(oldUV)).rg * inside;
+                float previous = max(0, old.r - _Decay);
+                if (_Stamp <= 0) return float2(previous, old.g);
                 float2 offset = input.uv - _Boot.xy;
                 float2 local = float2(dot(offset, float2(_Direction.y, -_Direction.x)), dot(offset, _Direction)) * _Boot.zw;
                 float2 soleUV = local + 0.5;
@@ -58,7 +60,7 @@ Shader "Hidden/Safe Haven/Terrain/Footprint Stamp"
                         sole = max(body, heel) * lerp(0.3, 1, tread);
                     }
                 }
-                return max(previous, saturate(sole) * _Stamp);
+                return float2(max(previous, saturate(sole) * _Stamp), old.g);
             }
             ENDHLSL
         }

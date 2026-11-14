@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Fire Knight's Charge
   damageType: 1
+  strike: 0
   baseDamage: 0
   weaponDamageRatio: 1
   powerScaling: 1
@@ -30,6 +31,9 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 11400000, guid: a0f26db529cc80943a68cc79b966799e, type: 2}
+  unblockable: 0
+  pull: 0
   animationState: Strike Lunge
   animationSpeed: 0.32333332
   strikeSpeed: 1

@@ -55,6 +55,10 @@ public static class InputRebinds
         new RebindRow("Combat", "Ability 3", "Player/Skill3"),
         new RebindRow("Combat", "Ability 4", "Player/Skill4"),
         new RebindRow("Combat", "Ability 5", "Player/Skill5"),
+        new RebindRow("Combat", "Ability 6", "Player/Skill6"),
+        new RebindRow("Combat", "Ability 7", "Player/Skill7"),
+        new RebindRow("Combat", "Ability 8", "Player/Skill8"),
+        new RebindRow("Combat", "Ability 9", "Player/Skill9"),
 
         new RebindRow("Windows", "Bag (second key)", "Player/Inventory"),
         new RebindRow("Windows", "Bag", "Player/Items"),

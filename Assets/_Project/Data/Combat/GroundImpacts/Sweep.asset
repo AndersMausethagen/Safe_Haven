@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eba2b52199d03a4ebdae07aa742d9a6, type: 3}
+  m_Name: Sweep
+  m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
+  referenceHeight: 3
+  gustRadius: 7
+  gustStrength: 0.7
+  gustSpeed: 16
+  gustArc: 170
+  dust: 16
+  debris: 6
+  clippings: 20
+  dustRadius: 3
+  mark: 3
+  markRadius: 4
+  markDepth: 0
+  rimHeight: 0
+  furrowLength: 2.5
+  grassFlatten: 0.85
+  markSeconds: 120
+  decal: {fileID: 0}
+  decalSize: 3
+  push: 5
+  pushRadius: 5
+  treeShake: 6
+  shake: 0.2
+  stumbleRadius: 0
+  stumbleSeconds: 0.5
+  sound: {fileID: 0}

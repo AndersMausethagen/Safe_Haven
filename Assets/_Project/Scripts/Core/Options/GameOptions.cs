@@ -48,6 +48,7 @@ public static class GameOptions
     public static readonly GameOption AmbientOcclusion = GameOption.Toggle("AmbientOcclusion", "Ambient Occlusion", "Soft shade where things meet the ground.", true);
     public static readonly GameOption VolumetricFog = GameOption.Choice("VolumetricFog", "Volumetric Fog", "Detail of the fog and light shafts. Costly in the raid forests.", 2, "Low", "Medium", "High");
     public static readonly GameOption TerrainDetail = GameOption.Choice("TerrainDetail", "Terrain Detail", "How much the ground's surface is shaped by its stones and roots.", 3, "Off", "Low", "Balanced", "Ultra");
+    public static readonly GameOption GroundImpacts = GameOption.Choice("GroundImpacts", "Ground Impacts", "Heavy blows blow the grass flat, throw up dust and leave marks in the ground for a while. Low leaves out the flying stones, leaves and most marks.", 2, "Off", "Low", "High");
     public static readonly GameOption GrassDensity = GameOption.Slider("GrassDensity", "Grass Density", "How much grass and small plants are drawn.", 1f, 0.25f, 1f, 0.05f);
     public static readonly GameOption ViewDistance = GameOption.Choice("ViewDistance", "View Distance", "How far objects keep their full detail.", 2, "Low", "Medium", "High");
     public static readonly GameOption TextureQuality = GameOption.Choice("TextureQuality", "Texture Quality", "Sharpness of textures. Lower uses less video memory.", 2, "Low", "Medium", "High");
@@ -99,7 +100,7 @@ public static class GameOptions
     }
 
     public static readonly IReadOnlyList<GameOption> Graphics = new[]
-        { Preset, RenderScale, Upscaling, AntiAliasing, Shadows, AmbientOcclusion, VolumetricFog, TerrainDetail, GrassDensity, ViewDistance, TextureQuality };
+        { Preset, RenderScale, Upscaling, AntiAliasing, Shadows, AmbientOcclusion, VolumetricFog, TerrainDetail, GroundImpacts, GrassDensity, ViewDistance, TextureQuality };
 
     // ----- Graphics: look -----
 

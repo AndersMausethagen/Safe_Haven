@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eba2b52199d03a4ebdae07aa742d9a6, type: 3}
+  m_Name: Charge
+  m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
+  referenceHeight: 3
+  gustRadius: 4
+  gustStrength: 0.45
+  gustSpeed: 14
+  gustArc: 360
+  dust: 14
+  debris: 6
+  clippings: 12
+  dustRadius: 2
+  mark: 2
+  markRadius: 0.5
+  markDepth: 0.12
+  rimHeight: 0.05
+  furrowLength: 2.5
+  grassFlatten: 0.9
+  markSeconds: 120
+  decal: {fileID: 0}
+  decalSize: 3
+  push: 5
+  pushRadius: 5
+  treeShake: 8
+  shake: 0.3
+  stumbleRadius: 0
+  stumbleSeconds: 0.5
+  sound: {fileID: 0}

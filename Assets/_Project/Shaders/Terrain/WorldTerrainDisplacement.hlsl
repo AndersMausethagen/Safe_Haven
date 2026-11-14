@@ -88,7 +88,7 @@ float WorldDisplacementHeightLOD(float2 uv, float mip)
     return WorldDisplacementHeightLOD(uv, mip, response);
 }
 
-float WorldFootprintMask(float2 worldXZ)
+float WorldFootprintOnly(float2 worldXZ)
 {
     if (_FootprintSettings.w <= 0) return 0;
     float2 fieldUV = (worldXZ - _FootprintArea.xy) * _FootprintArea.z;
@@ -96,18 +96,36 @@ float WorldFootprintMask(float2 worldXZ)
     return SAMPLE_TEXTURE2D_LOD(_FootprintField, sampler_FootprintField, fieldUV, 0).r * _TerrainDetailQuality.x;
 }
 
+// Marks heavy blows leave (GroundImpacts): metres pressed down (negative: a raised lip). They come in the footprint
+// field's second channel (GroundImpactField.Mirror): this shader has no room for another texture (64 at most).
+float4 _GroundImpactArea; // global: x = on while any mark heals
+
+float WorldImpact(float2 worldXZ)
+{
+    if (_GroundImpactArea.w <= 0 || _FootprintSettings.w <= 0) return 0;
+    float2 fieldUV = (worldXZ - _FootprintArea.xy) * _FootprintArea.z;
+    if (any(fieldUV < 0) || any(fieldUV > 1)) return 0;
+    return SAMPLE_TEXTURE2D_LOD(_FootprintField, sampler_FootprintField, fieldUV, 0).g;
+}
+
+// Pressed by feet, or torn up by a blow: the snow cover and the darkening of disturbed ground both follow it.
+float WorldFootprintMask(float2 worldXZ)
+{
+    return max(WorldFootprintOnly(worldXZ), saturate(abs(WorldImpact(worldXZ)) * 6.0) * _TerrainDetailQuality.x);
+}
+
 float WorldSurfaceOffsetLOD(float2 uv, float mip, float2 worldXZ)
 {
     float response;
     float minimumHeight;
     float height = WorldDisplacementHeightLOD(uv, mip, response, minimumHeight);
-    float mask = WorldFootprintMask(worldXZ);
+    float mask = WorldFootprintOnly(worldXZ);
     float footprint = mask * response;
     float compression = saturate(mask * 4) * response;
     float originalHeight = height * _DisplacementStrength;
     float floorHeight = min(originalHeight, minimumHeight * _DisplacementStrength);
     float pressedHeight = lerp(originalHeight, floorHeight, compression * _FootprintSettings.y) - footprint * _FootprintSettings.x;
-    return min(originalHeight, pressedHeight);
+    return min(originalHeight, pressedHeight) - WorldImpact(worldXZ) * _TerrainDetailQuality.x;
 }
 
 float WorldDisplacementHeight(float2 uv) { return WorldDisplacementHeightLOD(uv, _DisplacementMip); }
@@ -240,7 +258,7 @@ void WorldDisplace(inout float4 positionOS, float3 normalOS, float2 uv)
     float fade = WorldDisplacementFade(positionOS.xyz);
     if (fade <= 0) return;
     float3 original = positionOS.xyz;
-    if ((_DisplacementStrength > 0 || _FootprintSettings.w > 0) && _DisplacementLayerCount > 0)
+    if ((_DisplacementStrength > 0 || _FootprintSettings.w > 0 || _GroundImpactArea.w > 0) && _DisplacementLayerCount > 0)
     {
         // Vertical detail tapers off on cliffs, where the rock's own relief takes over.
         float slopeFade = WorldSlopeFade(normalOS);
@@ -271,7 +289,7 @@ float WorldSurfaceMip(float2 uv)
 
 float3 WorldSurfaceNormal(float2 uv, float3 positionWS, float3 baseNormalWS, float3 mappedNormalWS)
 {
-    float footprint = WorldFootprintMask(positionWS.xz);
+    float footprint = WorldFootprintOnly(positionWS.xz);
     if (footprint > 0)
     {
         float response;
@@ -281,7 +299,7 @@ float3 WorldSurfaceNormal(float2 uv, float3 positionWS, float3 baseNormalWS, flo
     }
     if (_DisplacementNormalStrength <= 0 || _DisplacementLayerCount <= 0 || _TerrainDetailQuality.w <= 0)
         return mappedNormalWS;
-    if (_DisplacementStrength <= 0 && _FootprintSettings.w <= 0) return mappedNormalWS;
+    if (_DisplacementStrength <= 0 && _FootprintSettings.w <= 0 && _GroundImpactArea.w <= 0) return mappedNormalWS;
     float3 positionOS = TransformWorldToObject(positionWS);
     float fade = WorldDisplacementFade(positionOS);
     float3 baseOS = TransformWorldToObjectNormal(baseNormalWS);
@@ -342,7 +360,7 @@ float WorldEdgeFactor(float3 a, float3 b)
     // 64 and of 16 cost the same), so a lower Terrain Detail coarsens the target too: Ultra's 10 px becomes about 15.
     if (_TessellationPixels > 0) desired = min(desired, projectedPixels / (_TessellationPixels / max(_TerrainDetailQuality.y, 0.05)));
     float factor = clamp(desired, 1.0, max(_TessellationFactor * _TerrainDetailQuality.y, 1.0));
-    float displaces = max(max(step(0.0001, _DisplacementStrength), _FootprintSettings.w) * step(0.5, _DisplacementLayerCount),
+    float displaces = max(max(max(step(0.0001, _DisplacementStrength), _FootprintSettings.w), step(0.5, _GroundImpactArea.w)) * step(0.5, _DisplacementLayerCount),
                           step(0.0001, _CliffDisplacement * _CliffStrength));
     return lerp(1.0, factor, fade * displaces);
 }

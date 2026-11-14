@@ -328,6 +328,11 @@ public sealed partial class PlayerCombat
         float poise = activePoiseMultiplier * Mathf.Lerp(1f, Rules.HeavyChargePoise, charge);
         Vector3 origin = transform.position;
         HitDetector.FindTargets(origin, activeDirection, activeAttack, combatant.Faction, hitLayers, foundHits);
+        // A heavy blow or a weapon art strikes the ground too, hit or miss: wind, dust, a mark (GroundImpacts).
+        if (activeKind == SwingKind.Heavy || activeKind == SwingKind.Art)
+        {
+            GroundImpacts.PlayerSwing(activeAttack, combatant, origin, activeDirection, weapon != null && weapon.Stance == WeaponStance.TwoHanded, charge);
+        }
 
         float first = float.MaxValue;
         float sweep = StrikeRules.SweepSeconds(activeAttack.Arc, Rules.SweepSeconds);

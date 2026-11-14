@@ -147,7 +147,7 @@ public sealed class TerrainFootprints : MonoBehaviour
             enabled = false;
             return false;
         }
-        if (!stampShader.isSupported || !SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RFloat))
+        if (!stampShader.isSupported || !SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.RGFloat))
         {
             Debug.LogError("Terrain footprint rendering is not supported on this device.", this);
             enabled = false;
@@ -164,7 +164,7 @@ public sealed class TerrainFootprints : MonoBehaviour
 
     private RenderTexture CreateField(int resolution)
     {
-        var target = new RenderTexture(resolution, resolution, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear)
+        var target = new RenderTexture(resolution, resolution, 0, RenderTextureFormat.RGFloat, RenderTextureReadWrite.Linear)
         {
             name = "Runtime Terrain Footprints",
             hideFlags = HideFlags.HideAndDontSave,
@@ -200,6 +200,50 @@ public sealed class TerrainFootprints : MonoBehaviour
         Graphics.Blit(field, scratch, stampMaterial);
         RenderTexture.active = previous;
         (field, scratch) = (scratch, field);
+    }
+
+    /// <summary>
+    /// Makes sure the field exists and covers <paramref name="worldPosition"/> (a heavy blow's mark, GroundImpacts): made if
+    /// no print has been pressed yet, and moved only when the point lies outside it, so the player's own trail stays.
+    /// </summary>
+    public void Include(Vector3 worldPosition)
+    {
+        if (!isActiveAndEnabled) return;
+        if (terrain == null) Awake();
+        if (Profile == null || !Profile.footprints || terrain.terrainData == null || !EnsureResources()) return;
+        Vector2 centre = new Vector2(worldPosition.x, worldPosition.z);
+        Vector2 uv = (centre - origin) / area;
+        if (uv.x >= 0.1f && uv.y >= 0.1f && uv.x <= 0.9f && uv.y <= 0.9f)
+        {
+            Bind();
+            return;
+        }
+        float texel = area / field.width;
+        Vector2 nextOrigin = centre - Vector2.one * (area * 0.5f);
+        nextOrigin = new Vector2(Mathf.Round(nextOrigin.x / texel), Mathf.Round(nextOrigin.y / texel)) * texel;
+        Vector2 shift = (nextOrigin - origin) / area;
+        origin = nextOrigin;
+        Render(shift, 0, false, Vector2.zero, Vector2.up);
+        Bind();
+    }
+
+    /// <summary>The fields in use: GroundImpacts mirrors heavy blows' marks into their second channel.</summary>
+    public static IReadOnlyList<TerrainFootprints> Fields => ActiveFields;
+
+    /// <summary>Runs <paramref name="material"/>'s <paramref name="pass"/> over the field (its _MainTex), keeping the
+    /// result: GroundImpacts writes the craters of heavy blows into G (R, the prints, it leaves as they are).</summary>
+    public void Overlay(Material material, int pass)
+    {
+        if (field == null || material == null)
+        {
+            return;
+        }
+
+        RenderTexture previous = RenderTexture.active;
+        Graphics.Blit(field, scratch, material, pass);
+        RenderTexture.active = previous;
+        (field, scratch) = (scratch, field);
+        Bind();
     }
 
     private void Bind()

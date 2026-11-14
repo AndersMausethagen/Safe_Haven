@@ -45,6 +45,28 @@ public sealed partial class PlayerCombat
         Flinched?.Invoke(Rules.FlinchSeconds, lostSwing);
     }
 
+    /// <summary>Loses their footing for a moment (a troll's stomp shaking the ground under them, GroundImpacts): a flinch
+    /// that breaks off a swing still winding up.</summary>
+    public void Stumble(float seconds)
+    {
+        if (seconds <= 0f || IsFlinching)
+        {
+            return;
+        }
+
+        bool lostSwing = activeKind != SwingKind.None && hitPending;
+        if (lostSwing)
+        {
+            EndSwing();
+        }
+
+        queuedKind = SwingKind.None;
+        pressTime = -1f;
+        flinchUntil = Time.time + seconds;
+        movement.SetSpeedScale(Flinch, 0.25f);
+        Flinched?.Invoke(seconds, lostSwing);
+    }
+
     /// <summary>Thrown back by a monster's parry of the blow that just landed. The swing has already been spent, so it plays out.</summary>
     public void Rebuff(float seconds)
     {

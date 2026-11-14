@@ -93,6 +93,23 @@ Shader "Safe Haven/Grass"
         float4 _GrassFootprintDarkening;
         float4 _GrassFootprintDepths;
         float _GrassFootprintCount;
+        // Heavy blows (GroundImpacts): bursts of wind rolling out through the grass, and the marks they leave (the
+        // impact field: R = ground pressed down in metres, B = grass pressed down or cut, 0-1).
+        #define GROUND_MAX_GUSTS 6
+        float4 _GroundGusts[GROUND_MAX_GUSTS];      // x, z, start time, strength (metres at the tip)
+        float4 _GroundGustShapes[GROUND_MAX_GUSTS]; // radius, speed, cos of half the arc (-2: all round), heading
+        float _GroundGustCount;
+        TEXTURE2D(_GroundImpactField); SAMPLER(sampler_GroundImpactField);
+        float4 _GroundImpactArea; // origin x, z, 1 / metres, on
+
+        float2 GroundImpact(float2 worldXZ)
+        {
+            if (_GroundImpactArea.w <= 0) return 0;
+            float2 uv = (worldXZ - _GroundImpactArea.xy) * _GroundImpactArea.z;
+            if (any(uv < 0) || any(uv > 1)) return 0;
+            float4 mark = SAMPLE_TEXTURE2D_LOD(_GroundImpactField, sampler_GroundImpactField, uv, 0);
+            return float2(mark.r, saturate(mark.b));
+        }
 
         float3 GrassFootprint(float2 worldXZ)
         {
@@ -205,9 +222,15 @@ Shader "Safe Haven/Grass"
             #else
             float2 footprint = GrassFootprint(world.xz).xz;
             #endif
+            #if defined(_BAKED_ROOTS)
+            float2 impact = float2(0, 0);
+            #else
+            float2 impact = GroundImpact(rootWS.xz);
+            #endif
             if (animate <= 0.0 || keep <= 0.0)
             {
                 world.y = lerp(world.y, min(world.y, rootWS.y + 0.01), footprint.x) - footprint.y;
+                world.y = lerp(world.y, rootWS.y + (world.y - rootWS.y) * 0.2, impact.y) - impact.x;
                 return world;
             }
             float bend = input.color.r * input.color.r * animate;
@@ -240,7 +263,27 @@ Shader "Safe Haven/Grass"
                     world.y -= (_Flatten * reach * height * 0.6 + dot(push, push) / (2.0 * height)) * input.color.r;
                 }
             }
+            // A heavy blow's wind: a wave rolling out from where it landed (or ahead along the swing), pressing the grass
+            // over as it passes, then letting it spring back and sway a moment.
+            int gusts = (int)min(_GroundGustCount, GROUND_MAX_GUSTS);
+            for (int g = 0; g < gusts; g++)
+            {
+                float4 gustAt = _GroundGusts[g];
+                float4 gustShape = _GroundGustShapes[g];
+                float2 out_ = rootWS.xz - gustAt.xy;
+                float far = length(out_);
+                float since = _Time.y - gustAt.z - far / max(gustShape.y, 0.1);
+                if (since <= 0 || far > gustShape.x || far < 1e-3) continue;
+                out_ /= far;
+                float arc = gustShape.z < -1.5 ? 1.0 : saturate((dot(out_, float2(sin(gustShape.w), cos(gustShape.w))) - gustShape.z) * 6.0);
+                float response = saturate(since * 25.0) * exp(-since * 3.0) * (0.75 + 0.25 * cos(since * 13.0));
+                float push = gustAt.w * arc * response * saturate(1.0 - far / gustShape.x) * bend;
+                world.xz += out_ * push;
+                world.y -= push * push / (2.0 * height) * input.color.r;
+            }
             world.y = lerp(world.y, min(world.y, rootWS.y + 0.01), footprint.x) - footprint.y;
+            // Pressed down or cut short where a blow landed, and sunk with the ground in a crater.
+            world.y = lerp(world.y, rootWS.y + (world.y - rootWS.y) * 0.2, impact.y) - impact.x;
             return world;
         }
 

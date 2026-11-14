@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eba2b52199d03a4ebdae07aa742d9a6, type: 3}
+  m_Name: Cleave
+  m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
+  referenceHeight: 2
+  gustRadius: 3
+  gustStrength: 0.3
+  gustSpeed: 14
+  gustArc: 150
+  dust: 4
+  debris: 0
+  clippings: 8
+  dustRadius: 1.5
+  mark: 3
+  markRadius: 2.2
+  markDepth: 0
+  rimHeight: 0
+  furrowLength: 2.5
+  grassFlatten: 0.5
+  markSeconds: 120
+  decal: {fileID: 0}
+  decalSize: 3
+  push: 1
+  pushRadius: 2
+  treeShake: 0
+  shake: 0
+  stumbleRadius: 0
+  stumbleSeconds: 0.5
+  sound: {fileID: 0}
