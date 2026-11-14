@@ -32,6 +32,11 @@ CREATURES = {
     "Fossegrim": 2.1,
     "Trollkjerring": 1.9,
     "Bergjutul": 3.6,
+    # 2026-11-14: the Rootling's new body and three trolls of different sizes.
+    "BarkRootling": 1.0,
+    "StoneTroll": 3.2,
+    "BogTroll": 2.4,
+    "TrollRunt": 1.2,
 }
 
 
