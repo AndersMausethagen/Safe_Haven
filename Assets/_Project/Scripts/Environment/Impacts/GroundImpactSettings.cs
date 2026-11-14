@@ -33,6 +33,10 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     [SerializeField] private SoundDefinition gasIgniteSound;
     [SerializeField] private SoundDefinition douseSound;
     [SerializeField] private SoundDefinition freezeSound;
+    [Tooltip("A sapling snapped by a blow or a charge.")]
+    [SerializeField] private SoundDefinition snapSound;
+    [Tooltip("Trees shaken by a heavy blow.")]
+    [SerializeField] private SoundDefinition treeShakeSound;
 
     [Header("Ground colours (the dust takes the colour of what it is thrown from)")]
     [SerializeField] private Color dirt = new Color(0.45f, 0.36f, 0.25f, 1f);
@@ -83,6 +87,8 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     public SoundDefinition GasIgniteSound => gasIgniteSound;
     public SoundDefinition DouseSound => douseSound;
     public SoundDefinition FreezeSound => freezeSound;
+    public SoundDefinition SnapSound => snapSound;
+    public SoundDefinition TreeShakeSound => treeShakeSound;
     public Color Dirt => dirt;
     public Color Grass => grass;
     public Color Rock => rock;

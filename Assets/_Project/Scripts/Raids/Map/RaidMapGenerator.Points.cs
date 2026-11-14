@@ -38,6 +38,65 @@ public static partial class RaidMapGenerator
         }
     }
 
+    private const string ClutterName = "Clutter";
+
+    // Crates, barrels and fence sections about the camps, caches and event sites: things to break, now and then with
+    // something inside. On the ground, off steep slopes, never in the middle of the site.
+    private static void PlaceClutter(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain, System.Func<Vector2, Vector3> world)
+    {
+        Transform old = map.transform.Find(ClutterName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        IReadOnlyList<GameObject> kinds = rules.SiteClutter;
+        if (kinds == null || kinds.Count == 0)
+        {
+            return;
+        }
+
+        var holder = new GameObject(ClutterName).transform;
+        holder.SetParent(map.transform, false);
+        var random = new System.Random(plan.Seed * 31 + 7);
+        Vector2Int count = rules.ClutterPerSite;
+        Vector2 reach = rules.ClutterReach;
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (site.Kind != RaidSiteKind.EnemyCamp && site.Kind != RaidSiteKind.SupplyCache && site.Kind != RaidSiteKind.EventSite)
+            {
+                continue;
+            }
+
+            Vector3 centre = world(site.Position);
+            int many = random.Next(count.x, count.y + 1);
+            for (int i = 0; i < many; i++)
+            {
+                GameObject kind = kinds[random.Next(kinds.Count)];
+                if (kind == null)
+                {
+                    continue;
+                }
+
+                float turn = (float)(random.NextDouble() * Mathf.PI * 2.0);
+                float far = Mathf.Lerp(reach.x, reach.y, (float)random.NextDouble());
+                Vector3 at = centre + new Vector3(Mathf.Cos(turn), 0f, Mathf.Sin(turn)) * far;
+                Vector3 local = at - terrain.transform.position;
+                Vector3 size = terrain.terrainData.size;
+                Vector2 uv = new Vector2(local.x / size.x, local.z / size.z);
+                if (uv.x < 0.02f || uv.y < 0.02f || uv.x > 0.98f || uv.y > 0.98f || terrain.terrainData.GetSteepness(uv.x, uv.y) > 22f)
+                {
+                    continue;
+                }
+
+                at.y = terrain.SampleHeight(at) + terrain.transform.position.y;
+                GameObject made = Object.Instantiate(kind, at, Quaternion.Euler(0f, (float)(random.NextDouble() * 360.0), 0f), holder);
+                made.name = kind.name;
+            }
+        }
+    }
+
     private static void PlaceStart(RaidMap map, RaidLayoutPlan plan, System.Func<Vector2, Vector3> world)
     {
         if (map.PlayerStart == null)

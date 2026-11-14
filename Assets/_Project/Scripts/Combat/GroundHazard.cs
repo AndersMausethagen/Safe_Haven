@@ -55,6 +55,8 @@ public sealed class GroundHazard : MonoBehaviour
     [SerializeField, Min(0f)] private float ignitionDamage;
     [Tooltip("Fire: it spreads to dry grass round it, a few times over, and burns it short.")]
     [SerializeField] private bool spreadsOnGrass;
+    [Tooltip("Played over it, looping, while it lasts (a fire's crackle).")]
+    [SerializeField] private SoundDefinition loopSound;
 
     private Combatant source;
     private Faction faction;
@@ -306,6 +308,16 @@ public sealed class GroundHazard : MonoBehaviour
         if (effectPrefab != null)
         {
             Instantiate(effectPrefab, transform.position, Quaternion.identity, transform);
+        }
+
+        if (loopSound != null && loopSound.HasClips)
+        {
+            var voice = gameObject.AddComponent<AudioSource>();
+            AudioManager.Configure(voice, loopSound);
+            voice.clip = loopSound.PickClip();
+            voice.loop = true;
+            voice.time = Random.Range(0f, voice.clip.length);
+            voice.Play();
         }
 
         Destroy(gameObject, seconds);

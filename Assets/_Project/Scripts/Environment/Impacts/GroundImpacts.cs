@@ -121,6 +121,9 @@ public static class GroundImpacts
             GroundHazard.Meet(impact.Element, at, Mathf.Max(impact.MarkRadius, impact.DustRadius) * scale, source);
         }
 
+        // Saplings snap and crates burst in its way: all round a heavy blow, along a charge's path.
+        Wreck(impact, at, forward, scale, source, trail);
+
         Camera view = Camera.main;
         if (Quality <= 0 || view == null || (view.transform.position - at).sqrMagnitude > Sq(GroundImpactSettings.Current.MaxDistance))
         {
@@ -268,6 +271,54 @@ public static class GroundImpacts
             ForcedMove.Drag(other.transform, other.transform.position - away, -settings.FriendlyToss, 0.35f); // out from where it landed
             other.StaggerAtLeast(settings.DazeSeconds);
             AudioManager.Play(settings.DazeSound, other.transform.position);
+        }
+    }
+
+    // A heavy blow breaks what is close (breakables, saplings) and sways the trees further off; a charge ploughs through.
+    private static void Wreck(GroundImpactDefinition impact, Vector3 at, Vector3 forward, float scale, Combatant source, bool trail)
+    {
+        if (!trail && impact.Push < 3f)
+        {
+            return;
+        }
+
+        float breaks = trail ? 1.4f * scale : impact.PushRadius * scale * 0.6f;
+        Breakable.SmashNear(at, breaks, source);
+        bool snaps = trail || impact.Push >= 5f;
+        float sways = trail ? 0f : impact.PushRadius * scale * 1.5f;
+        float reach = Mathf.Max(snaps ? breaks : 0f, sways);
+        if (reach <= 0f)
+        {
+            return;
+        }
+
+        bool shook = false;
+        foreach (ChoppableTree tree in new List<ChoppableTree>(ChoppableTree.Enabled))
+        {
+            if (tree == null || !tree.IsStanding)
+            {
+                continue;
+            }
+
+            Vector3 offset = tree.transform.position - at;
+            offset.y = 0f;
+            float distance = offset.magnitude;
+            if (snaps && distance <= breaks && tree.Height <= ChoppableTree.SnapHeight && tree.Snap(at))
+            {
+                AudioManager.Play(GroundImpactSettings.Current.SnapSound, tree.transform.position);
+                continue;
+            }
+
+            if (distance <= sways && impact.TreeShake > 0f)
+            {
+                tree.Knocked(distance > 0.01f ? offset / distance : forward, impact.TreeShake * (1f - distance / sways) * 0.6f);
+                shook = true;
+            }
+        }
+
+        if (shook)
+        {
+            AudioManager.Play(GroundImpactSettings.Current.TreeShakeSound, at);
         }
     }
 

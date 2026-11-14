@@ -214,6 +214,14 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Radius of a great hill, in metres, least and most. Its steepest flank is 1.5 times height over radius.")]
     [SerializeField] private Vector2 greatHillRadius = new Vector2(24f, 45f);
 
+    [Header("Clutter by camps and caches (2026-11-14)")]
+    [Tooltip("Breakable things left about camps, caches and event sites: crates, barrels, fence sections (Breakable).")]
+    [SerializeField] private List<GameObject> siteClutter = new List<GameObject>();
+    [Tooltip("How many round each such site, least and most.")]
+    [SerializeField] private Vector2Int clutterPerSite = new Vector2Int(2, 5);
+    [Tooltip("How far from the site's middle, nearest and furthest, in metres.")]
+    [SerializeField] private Vector2 clutterReach = new Vector2(3.5f, 8f);
+
     [Header("Boulders and Lookouts")]
     [Tooltip("The great boulders that lie about in the wild ground, solid to walk into (a Cliff Kit's pieces).")]
     [SerializeField] private CliffKit boulderKit;
@@ -430,6 +438,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Vector2 GreatHillHeight => greatHillHeight;
     public Vector2 GreatHillRadius => greatHillRadius;
     public CliffKit BoulderKit => boulderKit;
+    public IReadOnlyList<GameObject> SiteClutter => siteClutter;
+    public Vector2Int ClutterPerSite => clutterPerSite;
+    public Vector2 ClutterReach => clutterReach;
     public Vector2Int BoulderClusters => boulderClusters;
     public Vector2Int BoulderClusterSize => boulderClusterSize;
     public Vector2 BoulderScale => boulderScale;

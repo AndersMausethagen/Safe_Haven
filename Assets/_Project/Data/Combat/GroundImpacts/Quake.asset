@@ -38,4 +38,4 @@ MonoBehaviour:
   element: 0
   stumbleRadius: 6.5
   stumbleSeconds: 0.8
-  sound: {fileID: 0}
+  sound: {fileID: 11400000, guid: bd4c0f66bb9194e408eb044199ed92c1, type: 2}

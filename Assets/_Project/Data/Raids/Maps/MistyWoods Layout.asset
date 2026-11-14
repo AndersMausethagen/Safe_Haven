@@ -33,6 +33,15 @@ MonoBehaviour:
   greatHills: {x: 2, y: 4}
   greatHillHeight: {x: 4, y: 9}
   greatHillRadius: {x: 22, y: 42}
+  siteClutter:
+  - {fileID: 5390177154788761150, guid: 23baff40fa0026149a5ae94c66d6bd4c, type: 3}
+  - {fileID: 5390177154788761150, guid: 23baff40fa0026149a5ae94c66d6bd4c, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 3426992302977726391, guid: 0dc7664d74f49e74898850bf23fc6b21, type: 3}
+  - {fileID: 7160763822417819799, guid: b6580e4b71d5c8449ac4f63fedfc4f36, type: 3}
+  clutterPerSite: {x: 2, y: 5}
+  clutterReach: {x: 3.5, y: 8}
   boulderKit: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
   boulderClusters: {x: 6, y: 10}
   boulderClusterSize: {x: 1, y: 3}

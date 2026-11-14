@@ -101,6 +101,7 @@ public static partial class RaidMapGenerator
         PlaceFog(map, plan, World);
         RaidMapSurface.SnapToGround(map.Content, terrain);
         PlacePieces(map, plan, terrain, position => World(position));
+        PlaceClutter(map, plan, rules, terrain, World);
         PlaceBoulders(map, plan, rules);
 
         var rumours = new List<Vector3>();

@@ -285,6 +285,26 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         return true;
     }
 
+    /// <summary>Broken down by no one (a troll's charge snapping a sapling): as if gathered, with nothing given. False when
+    /// it is already down.</summary>
+    public bool BreakDown()
+    {
+        if (IsDepleted || node == null || !interactable.enabled)
+        {
+            return false;
+        }
+
+        Harvested?.Invoke();
+        if (!node.DepleteOnGather)
+        {
+            return true;
+        }
+
+        respawnAt = Time.time + node.RespawnSeconds;
+        SetPresent(false, 0f);
+        return true;
+    }
+
     private void Gathered(GameObject by)
     {
         if (node != null && TryGetComponent(out ResourceSource source))

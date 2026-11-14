@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WoundSettings
   m_EditorClassIdentifier: SafeHaven::WoundSettings
   armourShards: {fileID: 1800097642604793677, guid: dc906b2aa094da04199286213a5c6fa2, type: 3}
-  armourChipSound: {fileID: 0}
+  armourChipSound: {fileID: 11400000, guid: cc35313aad6a57f49af7045ed0b375c4, type: 2}
   trailSeconds: 90
   playerBlood: {r: 0.4, g: 0.02, b: 0.02, a: 0.95}
   mud: {r: 0.22, g: 0.15, b: 0.08, a: 0.95}

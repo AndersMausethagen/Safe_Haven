@@ -57,3 +57,4 @@ MonoBehaviour:
   freezesInto: {fileID: 0}
   ignitionDamage: 0
   spreadsOnGrass: 0
+  loopSound: {fileID: 11400000, guid: 95e1d10a5ee89cd45aea5504a35fa4c2, type: 2}

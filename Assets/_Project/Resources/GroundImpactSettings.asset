@@ -22,10 +22,12 @@ MonoBehaviour:
   scorch: {fileID: 2100000, guid: 482c6d188d2b0534b8a6fbebc34dfe02, type: 2}
   grassFire: {fileID: 6143943940367357886, guid: 36babbbca52e5094d8f4678b5176daed, type: 3}
   steam: {fileID: 1275639213483061923, guid: d957d0ed1e0ca2e46a5df4b75a89e73f, type: 3}
-  igniteSound: {fileID: 0}
-  gasIgniteSound: {fileID: 0}
-  douseSound: {fileID: 0}
-  freezeSound: {fileID: 0}
+  igniteSound: {fileID: 11400000, guid: 3595b978b7825d9489dc4641a186e5ce, type: 2}
+  gasIgniteSound: {fileID: 11400000, guid: 1ef6c926367c7b448b44a510940cdccd, type: 2}
+  douseSound: {fileID: 11400000, guid: c734f438ec0ccce41a28c5cc7d26e341, type: 2}
+  freezeSound: {fileID: 11400000, guid: 7c9984155f7538e4c990afd15f8c15bc, type: 2}
+  snapSound: {fileID: 11400000, guid: 5b3809b97f3b4bb4a9394e6d9d0829e9, type: 2}
+  treeShakeSound: {fileID: 11400000, guid: 568167ad73ad3224ea94ac401350d465, type: 2}
   dirt: {r: 0.45, g: 0.36, b: 0.25, a: 1}
   grass: {r: 0.36, g: 0.42, b: 0.2, a: 1}
   rock: {r: 0.52, g: 0.5, b: 0.47, a: 1}
@@ -37,7 +39,7 @@ MonoBehaviour:
   friendlyDamage: 0.1
   friendlyToss: 3
   dazeSeconds: 1
-  dazeSound: {fileID: 0}
+  dazeSound: {fileID: 11400000, guid: 502f6de79d5da534aac2d0ed5e735299, type: 2}
   maxGusts: 6
   maxDecals: 12
   markArea: 48

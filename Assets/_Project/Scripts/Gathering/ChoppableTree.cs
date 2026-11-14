@@ -156,6 +156,34 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         }
     }
 
+    /// <summary>Saplings at most this tall can be snapped by a heavy blow or a charge (Snap).</summary>
+    public const float SnapHeight = 5f;
+
+    /// <summary>
+    /// Snapped by a giant's blow or a charge going through it (GroundImpacts): a sapling (at most <see cref="SnapHeight"/>
+    /// tall) falls as a felled tree away from <paramref name="from"/>, its wood left lying for whoever wants it; it grows
+    /// back like a felled one. False for a bigger tree or one already down.
+    /// </summary>
+    public bool Snap(Vector3 from)
+    {
+        if (!IsStanding || Height <= 0.1f || Height > SnapHeight || node == null || !node.BreakDown())
+        {
+            return false;
+        }
+
+        if (notch != null)
+        {
+            Destroy(notch.gameObject);
+            notch = null;
+        }
+
+        TreeParts parts = Parts;
+        Vector3 away = parts.Base - from;
+        away.y = 0f;
+        FelledTree.Spawn(parts, Size, null, new List<ItemAmount>(), away.sqrMagnitude > 1e-3f ? away : Vector3.forward);
+        return true;
+    }
+
     /// <summary>Chips fly from the trunk, on the side facing the axe, not the edge of the crown.</summary>
     public Vector3 HitPoint(Vector3 from)
     {

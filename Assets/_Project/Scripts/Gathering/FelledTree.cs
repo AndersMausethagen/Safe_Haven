@@ -69,7 +69,12 @@ public sealed class FelledTree : MonoBehaviour
     public bool IsLying => stage == Stage.Lying;
 
     /// <summary>Brings a tree down, away from whoever felled it. Returns null when no fallen tree is set up, so nothing can fall.</summary>
-    public static FelledTree Spawn(TreeParts parts, float size, GameObject feller, List<ItemAmount> logs)
+    public static FelledTree Spawn(TreeParts parts, float size, GameObject feller, List<ItemAmount> logs) =>
+        Spawn(parts, size, feller, logs, feller != null ? parts.Base - feller.transform.position : Vector3.forward);
+
+    /// <summary>As <see cref="Spawn(TreeParts, float, GameObject, List{ItemAmount})"/>, falling (as near as it can) along
+    /// <paramref name="away"/>: a sapling snapped by a charge falls the way it was struck.</summary>
+    public static FelledTree Spawn(TreeParts parts, float size, GameObject feller, List<ItemAmount> logs, Vector3 away)
     {
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         if (rules.FelledTreePrefab == null || parts.Parts.Count == 0)
@@ -77,7 +82,6 @@ public sealed class FelledTree : MonoBehaviour
             return null;
         }
 
-        Vector3 away = feller != null ? parts.Base - feller.transform.position : Vector3.forward;
         Vector3 direction = FellDirection.Choose(away, rules.FallSpreadDegrees, 5, way => Clearance(parts, way));
         var tree = Instantiate(rules.FelledTreePrefab, parts.Base, Quaternion.identity).GetComponent<FelledTree>();
         tree.name = "Felled Tree";
