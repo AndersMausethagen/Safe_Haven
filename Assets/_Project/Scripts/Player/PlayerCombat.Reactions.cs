@@ -27,7 +27,24 @@ public sealed partial class PlayerCombat
             EnterCombat();
         }
 
-        if (result.Blocked || result.Killed || damage.IsOverTime || health == null || result.Damage < health.MaxHealth * Rules.FlinchShare || IsPushingThrough)
+        if (result.Blocked || result.Killed || damage.IsOverTime || health == null)
+        {
+            return;
+        }
+
+        // A heavy hit buys a moment to answer before the next lands (anti-overwhelm, 2026-11-14).
+        if (result.Damage >= health.MaxHealth * Rules.HeavyHitShare && Rules.HeavyHitInvulnerable > 0f)
+        {
+            heavyHitSafeUntil = Time.time + Rules.HeavyHitInvulnerable;
+            if (!heavyHitSafe)
+            {
+                heavyHitSafe = true;
+                health.AddInvulnerability(this);
+            }
+        }
+
+        // Inside the grace after a flinch the hit still hurts, but doesn't stagger again.
+        if (result.Damage < health.MaxHealth * Rules.FlinchShare || IsPushingThrough || Time.time < flinchGraceUntil)
         {
             return;
         }
@@ -41,6 +58,7 @@ public sealed partial class PlayerCombat
         queuedKind = SwingKind.None;
         pressTime = -1f;
         flinchUntil = Time.time + Rules.FlinchSeconds;
+        flinchGraceUntil = flinchUntil + Rules.FlinchGrace;
         movement.SetSpeedScale(Flinch, 0.25f);
         Flinched?.Invoke(Rules.FlinchSeconds, lostSwing);
     }
@@ -49,7 +67,7 @@ public sealed partial class PlayerCombat
     /// that breaks off a swing still winding up.</summary>
     public void Stumble(float seconds)
     {
-        if (seconds <= 0f || IsFlinching)
+        if (seconds <= 0f || IsFlinching || Time.time < flinchGraceUntil)
         {
             return;
         }
@@ -63,6 +81,7 @@ public sealed partial class PlayerCombat
         queuedKind = SwingKind.None;
         pressTime = -1f;
         flinchUntil = Time.time + seconds;
+        flinchGraceUntil = flinchUntil + Rules.FlinchGrace;
         movement.SetSpeedScale(Flinch, 0.25f);
         Flinched?.Invoke(seconds, lostSwing);
     }

@@ -12,6 +12,9 @@ public sealed class MonsterSenses
 {
     private static readonly Collider[] Overlaps = new Collider[64];
     private static readonly RaycastHit[] Hits = new RaycastHit[16];
+    // A shot's width, and the stretch at the target's end that isn't checked (the target stands there itself).
+    private const float ShotRadius = 0.3f;
+    private const float ShotClearOfTarget = 0.8f;
 
     /// <summary>How much of what it sees gets through: less while it sleeps.</summary>
     public float Attention { get; set; } = 1f;
@@ -144,6 +147,45 @@ public sealed class MonsterSenses
     {
         PerceptionSettings rules = PerceptionSettings.Current;
         return HasLineOfSight(Eye(rules), position + Vector3.up * rules.TargetHeight, self);
+    }
+
+    /// <summary>A clear path for a shot: no wall, and no other creature in the way. Hearing keeps HasClearPathTo, so a
+    /// crowd never muffles noise.</summary>
+    public bool HasClearShotTo(Vector3 position)
+    {
+        PerceptionSettings rules = PerceptionSettings.Current;
+        Vector3 eye = Eye(rules), point = position + Vector3.up * rules.TargetHeight;
+        return HasLineOfSight(eye, point, self) && !CreatureInTheWay(eye, point);
+    }
+
+    // A shot isn't clear through another creature (anti-overwhelm 2, 2026-11-14): sight looks past bodies, but an arrow
+    // stops in the wolf in front, so the shooter finds a line of its own instead of firing into its pack.
+    private bool CreatureInTheWay(Vector3 eye, Vector3 point)
+    {
+        Vector3 toPoint = point - eye;
+        float length = toPoint.magnitude - ShotClearOfTarget;
+        if (length <= 0.5f)
+        {
+            return false;
+        }
+
+        int count = Physics.SphereCastNonAlloc(eye, ShotRadius, toPoint.normalized, Hits, length, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            Transform hit = Hits[i].collider.transform;
+            if (Hits[i].distance <= 0f || hit.IsChildOf(self))
+            {
+                continue;
+            }
+
+            MonsterAI other = Hits[i].collider.GetComponentInParent<MonsterAI>();
+            if (other != null && other.transform != self && !self.IsChildOf(other.transform))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Vector3 Eye(PerceptionSettings rules) => self.position + Vector3.up * rules.EyeHeight;

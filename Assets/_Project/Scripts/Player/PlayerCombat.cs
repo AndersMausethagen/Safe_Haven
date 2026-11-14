@@ -176,6 +176,10 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private int rhythm;
     private float counterUntil = float.NegativeInfinity;
     private float flinchUntil = float.NegativeInfinity;
+    // No new flinch or stumble before this (Flinch Grace), and invulnerable until this after a heavy hit.
+    private float flinchGraceUntil = float.NegativeInfinity;
+    private float heavyHitSafeUntil = float.NegativeInfinity;
+    private bool heavyHitSafe;
     // Key for the flinch's slowdown, separate from the swing's own.
     private static readonly object Flinch = new object();
 
@@ -331,6 +335,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private void OnDisable()
     {
         EndFinish();
+        if (heavyHitSafe && health != null)
+        {
+            heavyHitSafe = false;
+            health.RemoveInvulnerability(this);
+        }
+
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
         stateMachine.ShieldBashRequested -= OnShieldBashRequested;
@@ -379,6 +389,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
         {
             flinchUntil = 0f;
             movement.SetSpeedScale(Flinch, 1f);
+        }
+
+        if (heavyHitSafe && Time.time >= heavyHitSafeUntil && health != null)
+        {
+            heavyHitSafe = false;
+            health.RemoveInvulnerability(this);
         }
 
         UpdateRunning();

@@ -299,7 +299,23 @@ public sealed partial class MonsterAI
             }
         }
 
-        switch (AttackTurns.Decide(closingIn, rules.AttackersAtOnce, Time.time, nextTurnAt))
+        // Off screen it waits its moment: nobody else closing in, and a beat since it got there, so blows come from where
+        // they can be read (anti-overwhelm 3, 2026-11-14).
+        AttackTurn turn = AttackTurns.Decide(closingIn, rules.AttackersAtOnce, Time.time, nextTurnAt);
+        if (turn == AttackTurn.Strike && OffScreen(rules))
+        {
+            offScreenSince = offScreenSince >= 0f ? offScreenSince : Time.time;
+            if (closingIn > 0 || Time.time < offScreenSince + rules.OffScreenWait)
+            {
+                turn = AttackTurn.Circle;
+            }
+        }
+        else if (turn == AttackTurn.Strike)
+        {
+            offScreenSince = -1f;
+        }
+
+        switch (turn)
         {
             case AttackTurn.Circle:
                 circling = true;
@@ -341,6 +357,23 @@ public sealed partial class MonsterAI
         SetState(State.Chasing);
         movement.TurnTowards(toTarget);
         return true;
+    }
+
+    private float offScreenSince = -1f;
+
+    // Behind the local player's camera, past Off Screen Angle (flat). Only for this game's own player.
+    private bool OffScreen(CombatTechniqueSettings rules)
+    {
+        Camera view = Camera.main;
+        if (view == null || targetComponent == null || !global::Player.IsPlayer(targetComponent.gameObject))
+        {
+            return false;
+        }
+
+        Vector3 look = view.transform.forward, to = transform.position - view.transform.position;
+        look.y = 0f;
+        to.y = 0f;
+        return look.sqrMagnitude > 0.001f && to.sqrMagnitude > 0.001f && Vector3.Angle(look, to) > rules.OffScreenAngle;
     }
 
     // Sideways around the target, eyes on it, drifting to the distance it waits at.

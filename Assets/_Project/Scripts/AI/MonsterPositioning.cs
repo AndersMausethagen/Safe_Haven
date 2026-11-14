@@ -54,7 +54,7 @@ public sealed class MonsterPositioning
         if (Time.time >= nextShotCheckAt)
         {
             nextShotCheckAt = Time.time + ShotCheckSeconds;
-            shotIsClear = senses.HasClearPathTo(target);
+            shotIsClear = senses.HasClearShotTo(target);
         }
 
         return shotIsClear;

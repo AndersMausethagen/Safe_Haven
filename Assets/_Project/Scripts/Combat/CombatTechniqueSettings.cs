@@ -41,6 +41,13 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "still winding up is lost and they can't act for a moment. 0 = every hit.")]
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.05f;
     [SerializeField, Min(0f)] private float flinchSeconds = 0.45f;
+    [Tooltip("Seconds after a flinch or a stumble ends before another can start (the damage still lands), so two attackers " +
+             "can't keep the player flinching (the user, 2026-11-14: anti-overwhelm 1).")]
+    [SerializeField, Min(0f)] private float flinchGrace = 1f;
+    [Tooltip("A hit worth at least this share of the player's max health also gives a moment of invulnerability...")]
+    [SerializeField, Range(0.05f, 1f)] private float heavyHitShare = 0.2f;
+    [Tooltip("...this many seconds: one chance to answer before the next blow lands.")]
+    [SerializeField, Min(0f)] private float heavyHitInvulnerable = 0.3f;
     [Tooltip("The chain pips and rhythm readout under the player. Off keeps the screen clean; the feel is in the sound and motion.")]
     [SerializeField] private bool showComboHud;
     [Header("Heavy attack (hold the attack button)")]
@@ -124,6 +131,11 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(1)] private int rangedAtOnce = 2;
     [Tooltip("Seconds a ranged attacker keeps its turn after it starts a shot or a throw, so a third waits for a quiet moment.")]
     [SerializeField, Min(0.1f)] private float rangedTurnSeconds = 2.5f;
+    [Tooltip("A melee attacker further than this many degrees off the camera's view is off screen: it strikes only when no " +
+             "other is closing in, and after Off Screen Wait; otherwise it circles back into view (anti-overwhelm 3). Noticing " +
+             "and coming is unchanged: noise still draws everything in.")]
+    [SerializeField, Range(30f, 180f)] private float offScreenAngle = 70f;
+    [SerializeField, Min(0f)] private float offScreenWait = 0.6f;
     [Tooltip("Seconds between one close strike at the player starting and the next.")]
     [SerializeField, Min(0f)] private float attackTurnSpacing = 0.35f;
     [Tooltip("Seconds one circles before it tries again, least and most.")]
@@ -234,6 +246,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float HeavyMoveSpeed => heavyMoveSpeed;
     public float FlinchShare => flinchShare;
     public float FlinchSeconds => flinchSeconds;
+    public float FlinchGrace => flinchGrace;
+    public float HeavyHitShare => heavyHitShare;
+    public float HeavyHitInvulnerable => heavyHitInvulnerable;
     public bool ShowComboHud => showComboHud;
     public float HeavyHoldSeconds => heavyHoldSeconds;
     public float HeavyChargeSeconds => heavyChargeSeconds;
@@ -266,6 +281,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public int AttackersAtOnce => attackersAtOnce;
     public int RangedAtOnce => rangedAtOnce;
     public float RangedTurnSeconds => rangedTurnSeconds;
+    public float OffScreenAngle => offScreenAngle;
+    public float OffScreenWait => offScreenWait;
     public float AttackTurnSpacing => attackTurnSpacing;
     public Vector2 CircleSeconds => circleSeconds;
     public float CircleDistance => circleDistance;
