@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Hit Metal
   caption: 
   clips:
-  - {fileID: 8300000, guid: 55b5a6147d4f34f4d9c0337e685cb770, type: 3}
-  - {fileID: 8300000, guid: 8736ba5a051193d4abfec2bc2513cdf9, type: 3}
+  - {fileID: 8300000, guid: 1a1719bea2827bf4ba55eef1f004cfb3, type: 3}
+  - {fileID: 8300000, guid: be8f7dde400331b4aa4ce998c6a49bdc, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Fire Douse
   caption: 
   clips:
-  - {fileID: 8300000, guid: e16b54caa1358bc419213027bae151df, type: 3}
+  - {fileID: 8300000, guid: 33efcb050ae3ef847b8c6c855541aa20, type: 3}
+  - {fileID: 8300000, guid: 4dc4eed05180cc844b42ea8ebc11dc14, type: 3}
   channel: 2
   volume: 0.7
   volumeVariation: 0.1

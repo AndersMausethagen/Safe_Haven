@@ -15,7 +15,8 @@ MonoBehaviour:
   displayName: Armour Chip
   caption: 
   clips:
-  - {fileID: 8300000, guid: 65893d50ac9739d4799d89c4189758a2, type: 3}
+  - {fileID: 8300000, guid: ec942388508812f45bdd61732ad04476, type: 3}
+  - {fileID: 8300000, guid: 3bdb445718b835a409ecfe9c0f04e93a, type: 3}
   channel: 2
   volume: 0.8
   volumeVariation: 0.1

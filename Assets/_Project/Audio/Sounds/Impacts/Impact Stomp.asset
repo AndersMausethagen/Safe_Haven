@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Impact Stomp
   caption: 
   clips:
-  - {fileID: 8300000, guid: 8a9da7c9a7daf7e4099b3e001bb8315f, type: 3}
-  - {fileID: 8300000, guid: 36d65f834ac2b3442965d9d439aa3392, type: 3}
+  - {fileID: 8300000, guid: 95eb9d5c8b428af4f84deeb6b039dc1a, type: 3}
+  - {fileID: 8300000, guid: f8d88c80236636a4fb0a1dd476ac22ac, type: 3}
   channel: 2
   volume: 0.9
   volumeVariation: 0.1

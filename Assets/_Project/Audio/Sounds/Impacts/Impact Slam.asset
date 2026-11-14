@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Impact Slam
   caption: 
   clips:
-  - {fileID: 8300000, guid: e187d5e3f027e014c9a64cd807260bd2, type: 3}
-  - {fileID: 8300000, guid: 619c08cedd0804f4283da38fee91c122, type: 3}
+  - {fileID: 8300000, guid: 46ce7f9712850d048a0553aaed4f6b2f, type: 3}
+  - {fileID: 8300000, guid: dc0f425634f40c045981b8533fb1b1ea, type: 3}
   channel: 2
   volume: 0.85
   volumeVariation: 0.1
