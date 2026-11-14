@@ -35,9 +35,9 @@ What we take from them: show the problem first and the person second, so a rescu
 | 5 | Lodge II | (Tor) | You can't carry enough home: ore and planks weigh too much | **Wainwright's Yard** (Wheelbarrow, Handcart, Rowboat), taught by Tor at Lodge II instead of found plans |
 | 6 | Smithy II–III | (Bjarne) | The woods hit harder than wood and stone can take | Copper weapons and armour, with the ore the carts brought home |
 | 7 | Before the first breach | **Eirik**, Warden | Something is testing the ward | Watch Post; the ward holds half as long again |
-| 8 | After copper | **Gunnar**, Hunter and Fisher | Hides pile up, and copper is the last armour without leather | Hunter's Lodge (leather); the Dock |
-| 9 | After the Hunter's Lodge | **Asa**, Farmer and Weaver | Food runs out on long raids; iron gear needs linen | Farm Plot and Tailor's Shop |
-| 10 | After the Farm Plot | **Yrsa**, Cook | Plain food only keeps you alive | Kitchen: meals with lasting bonuses |
+| 8 | After Eirik | **Yrsa**, Cook | Plain food only keeps you alive, and raids now run long | Kitchen: meals with lasting bonuses (moved up from tenth on 2026-11-14, the design review's 8.10: the spec puts the cook third, and the portal's third tier asks for her) |
+| 9 | After Yrsa | **Gunnar**, Hunter and Fisher | Hides pile up, and copper is the last armour without leather | Hunter's Lodge (leather); the Dock |
+| 10 | After the Hunter's Lodge | **Asa**, Farmer and Weaver | Food runs out on long raids; iron gear needs linen | Farm Plot and Tailor's Shop |
 | 11 | Mid game | **Runa**, Tracker | Raids feel random | One more rumour in every briefing |
 | 12 | Mid game | **Liv**, Rune Scholar | The deep woods need more than steel | The raid runes (she works at Ingrid's Cauldron) |
 | 13 | Village rank | **Hild**, Mason | Palisades burn and huts are cramped | Stone Wall and Cottage (Workshop III) |

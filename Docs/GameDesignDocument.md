@@ -5,7 +5,7 @@
 Build a home worth protecting.  
 Venture into the darkness to give it a future.
 
-**VERSION** 0.4 • October 30, 2026
+**VERSION** 0.5 • November 14, 2026
 
 **FORMAT** Isometric Action RPG / Survival / Base Building
 
@@ -57,6 +57,8 @@ This document defines the game fantasy, player promises, gameplay loops, rule se
 **Version 0.3 design changes:** The decisions behind the first-90-minutes prototype are recorded in §26.1: a one-slot safe pocket that is never lost, durability rules for deployed equipment, Portal Sparks, hunger and thirst that always drain but never kill, the carry budget, free building inside the ward, the first recruit, and the first scripted ward breach.
 
 **Version 0.4 design changes:** Raids now have random events with warnings, places and priced choices (§9.3–9.4). Gear runs Stone → Copper → Iron → Moonsilver, with jewellery and shields (§10.4). Six new creatures and three status effects widen what a fight asks of the player (§10.5–10.6). Cooked meals give lasting bonuses, and crops grow at Farm Plots (§11.3–11.4). More structures from §14.2 exist. The game has a full Options screen (§18.5) and any number of saved games (§20.6). The decisions are recorded in §26.1.
+
+**Version 0.5 design changes:** A design review against the Game Design Specification v0.1 (Docs/DesignReview_2026-11-13.md) asked 18 questions, and each took its recommended answer (§26.1). The portal's tier is now the visible spine of progress (§6.4.2). Home attacks follow the portal's tier, the raid tier, blight and the story, never the number of buildings, and corruption nights are foretold a raid ahead (§6.3). A won breach teaches the defences their next step (§6.7). A held region wears away only under blight. Raids start at 12 minutes, to be measured in play (§7.3). Yrsa the Cook is the fifth person home, right after the Warden, not the tenth (Docs/RescueOrder.md). The big buildings are about half their old size, so a base reads from above, and the Haven has ten more decorations and torches on its walls that are lit at dusk (§6.5).
 
 ## 1. Game overview and vision
 
@@ -231,6 +233,10 @@ the dark back: this is how the home grows into the night (see Docs/Atmosphere.md
 
 **What prowlers carry (amended October 31, 2026).** Prowlers drop hide and bone but no Cursed Essence. Essence is the raids' reward: at home it would be free, with nothing at risk and no extraction to survive.
 
+**Corruption nights are foretold (amended November 14, 2026).** A corruption night is the small, warned kind of home attack: a few corrupted creatures come through the dark to the ward one night. It is never a surprise at nightfall. After a successful extraction, a few seconds after coming home, the portal may foretell one ("the woods to the north are restless"): it names the direction and comes at the next nightfall. None is foretold while a breach is near or waiting. How likely and how big depend only on the portal's tier and the blight round home, never on buildings or renown: none before Tier II, then 25% (+5% a tier, +30% at full blight, at most 50%), 3 creatures (+1 a tier, +3 at full blight, at most 8). Prowlers still keep to the dark outside the light.
+
+**Territory only wears away under blight (November 14, 2026).** A held region keeps its hold while the woods round home are clean. Erosion starts with the first blight, is all there at a quarter of it, and grows with more. Home must not become upkeep that punishes going out.
+
 ### 6.4 Extending the clearing
 
 The player may expand buildable space through runes, Portal upgrades, specific resources, or story milestones. Expansion should produce a visible change to the settlement and unlock meaningful placement options, rather than simply adding empty ground.
@@ -245,9 +251,25 @@ The Construction Table, Sawbench, Furnace and Forge are replaced by whole buildi
 
 **The portal at the heart (November 3, 2026).** The Heart Tree is gone, as it blocked the view of the base. The portal stands at the centre of Safe Haven and does everything the tree did: it speaks, holds the ward, wakes the fallen, and opens one menu for raids, the ward, Portal Sparks and repairs. Asleep it is a frame of dark stone. The story is the same: the stones that dropped the player here are what caught them. As it speaks, a wordless murmur comes from the arch (`Tools/Audio/portal.py`): the player reads the words, the sound says something is speaking.
 
+### 6.4.2 Portal tiers: the spine of progress (November 14, 2026)
+
+The portal's tier is the one figure that says how far the home has come. It is shown in the portal's menu and the Haven window (H) as a numeral and a name:
+
+| Tier | Name | Reached by |
+|---|---|---|
+| 0 | Dormant | The portal before it is repaired |
+| I | Awakened | Repairing the portal |
+| II | Stabilized | Ward I: the Smithy standing |
+| III | Restored | Ward II: the Smithy at Tier II, and Yrsa the Cook home |
+| IV | Reclaimed | Ward III: the Smithy at Tier III, and one great foe beaten |
+
+Each tier asks for materials and one or two other things, each one that going deeper needs anyway: a building's level, a resident at home, or a boss beaten. What is missing is shown on the portal's "Raise the portal" action ("Needs a Smithy at Tier II and Yrsa at home"). The tier opens the raid tiers, as the ward levels did before. Corruption nights start at Tier II. Names and lines are data (`SettlementSettings`); the logic is `PortalTiers`.
+
 ### 6.5 Architectural progression
 
 The visual progression should move from campfire and rough timber to huts, workshops, paths, gardens, palisades, protective runestones, and a lively fairy-tale village. Defenses should visually communicate that residents are protecting a valued home, without turning every square into a fortress. Decoration is valuable, but initially subordinate to functional construction.
+
+**Sizes that read from above, decorations and torches (November 14, 2026).** The big buildings were too large to read in a top-down view and left little room to build a village. The Workshop, the Smithy, both lodges, the Tailor's Shop, the Trading Post, the Cottage, the Hut and the Sauna are now half as wide and deep and a little more than half as tall (×0.5 across, ×0.65 up, for steeper roofs). The Stable and the Wainwright's Yard are 0.7 across, so horses and carts still fit. Stations and small structures keep their size. A building's size on screen is data (`BuildingDefinition` › Model Scale and Model Height). Ten decorations join the Lantern Post, Haven Banner and Herb Planter under the build menu's new Decorations tab: Log Bench, Plank Bench, Trestle Table, Woodpile, Barrels and Crates, Carved Post, Flower Bed, Signpost, Rune Stone and Hay Bales. Only what people sit or linger at gives comfort, so Well Rested doesn't outgrow a raid. The bigger buildings have torches on their front walls, lit one by one at dusk and put out at dawn.
 
 ### 6.6 Controlled ward breaches
 
@@ -258,6 +280,8 @@ A ward breach is an **occasional settlement event**, not a random raid against a
 ### 6.7 Defense gameplay
 
 A breach has four steps: **warning → preparation → defense → recovery**. During preparation, the player can repair structures, adjust the build layout, craft traps, assign defenders, and replenish the ward. During defense, enemies follow readable entry routes and threaten structures, storage, or ward anchors. Players fight using the same responsive top-down combat as in Raids while NPCs and defenses support them. Recovery summarizes protected assets, damage, injuries, consumed ammunition, and repairs. A small reward, story clue, or ward resource can make successful defense feel productive without making attacks the dominant Essence farming strategy.
+
+**A won defence teaches (November 14, 2026).** Holding off a breach is how the defences learn their next step. The Watch Post's Lookout opens after the first breach is won and its Beacon after the second (`BuildingLevel` › Breaches Won). The victory message says what has opened. A breach still pays its own material reward and never Essence.
 
 ### 6.8 Defensive structures and NPC roles
 
@@ -282,6 +306,8 @@ A raid is an instanced, time-limited visit to an unsafe region through the porta
 ### 7.3 Timer and extensions
 
 The proposed baseline is **12 minutes**. One **Portal Spark** grants **+3 minutes**, with a prototype cap of **two extensions** purchased before departure. A roughly **60-second final danger phase** may intensify enemy pressure and provide a last extraction opportunity; this is a test candidate, not a promise of a free exit. The exact fail state and grace-period behavior must be unambiguous in both UI and implementation.
+
+**Raids start at 12 minutes (November 14, 2026).** Misty Woods and Troll Valley run 12:00 (720 s), as designed and as their danger stages and exits were written for. They had been longer while the raids were tested by script rather than played. This is to be measured in real end-to-end play before it changes again.
 
 Time extensions should be a resource-planning tradeoff and never remove all tension. The clock must not secretly scale against the player after purchases. Pausing, dialogues, inventory interactions, and cutscenes need a documented timer policy.
 
@@ -1251,9 +1277,26 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 - **Graphics defaults** stay at the game as made. Trade-offs are the player's, in Options.
 - **Saved games:** unlimited, one per game, named by the player. A save stays when a new game starts.
 
+**Decided November 13–14, 2026 (the design review's 18 questions, each taking its recommended answer):**
+- **Core:** timed extraction with loss stays the heart of the game (8.1).
+- **Building:** anywhere in Haven Meadows. Inside the ward has its own advantages, and breach lanes always start outside what is built (8.2).
+- **Portal tiers** are the visible spine, Dormant to Reclaimed (8.3, §6.4.2). Each tier asks for materials plus one or two of a building's level, a resident home, or a boss or key find (8.4).
+- **Home attacks** are ward breaches plus corruption nights, the warned small variant. Prowlers stay outside the light (8.5, §6.3). Their strength follows portal tier, raid tier, blight and story, never buildings or renown (8.6).
+- **A won defence** teaches defence upgrades and gives its own material, never Essence (8.7, §6.7).
+- **Seekers** leave residents Shaken; nobody dies (8.8; to build after the playtest).
+- **Residents** rise in rank by milestones, and crafting speed grows within a rank (8.9; after the playtest).
+- **The Cook** is the fifth person home, right after the Warden (8.10, Docs/RescueOrder.md).
+- **Companions:** one, two from portal Tier III (8.11; after the playtest). Fallen companions stay as now (8.12).
+- **Morale** gets a light view and no decay (8.13; after the playtest).
+- **Territory** wears away only under blight (8.14, §6.3).
+- **Missing buildings become roles:** an Infirmary at the Cauldron, scouts and guards at the Watch Post, and a gathering place that grows into a Hall (8.15; after the playtest).
+- **Scope:** validate the slice first, a new game to Ward I and the second breach in about 90 to 120 minutes. Co-op, horses in raids and new biomes are frozen until then (8.16).
+- **Raids** start at 12 minutes and are measured (8.17, §7.3).
+- **Names:** the game keeps its own names; the specification is the one to change (8.18).
+
 ### 26.2 Still open
 
-- How long should a raid be? The design says 12 minutes; Misty Woods now runs at 16:40 (1000 s), with its danger stages and exits written for 12, and a large raid (four times the ground, chosen in the planner) at 29:10. No 12-minute raid has been played yet, so its pacing with events is untested.
+- How long should a raid be? Since November 14, 2026, Misty Woods and Troll Valley run the designed 12 minutes (720 s). No 12-minute raid has been played end to end yet, so its pacing with events is untested.
 
 - How strong should the new gear, creatures and meals be? Their numbers are first estimates and none have been playtested.
 
