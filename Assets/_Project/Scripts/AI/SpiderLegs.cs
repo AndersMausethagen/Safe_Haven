@@ -356,7 +356,8 @@ public sealed class SpiderLegs : MonoBehaviour
     {
         const int sides = 10;
         float[] zs = { 0f, 0.06f, 0.2f, 0.55f, 0.9f, 1f };
-        float[] rs = { 0.55f, 1f, 0.92f, 0.78f, 0.62f, 0.4f };
+        // Thick at both joints, so one part meets the next without a gap.
+        float[] rs = { 0.8f, 1f, 0.9f, 0.76f, 0.72f, 0.7f };
         var vertices = new System.Collections.Generic.List<Vector3>();
         var normals = new System.Collections.Generic.List<Vector3>();
         var uvs = new System.Collections.Generic.List<Vector2>();
@@ -378,7 +379,8 @@ public sealed class SpiderLegs : MonoBehaviour
             for (int s = 0; s < sides; s++)
             {
                 int a = ring * (sides + 1) + s, b = a + sides + 1;
-                triangles.AddRange(new[] { a, b, a + 1, a + 1, b, b + 1 });
+                // Clockwise seen from outside (Unity's front face).
+                triangles.AddRange(new[] { a, a + 1, b, a + 1, b + 1, b });
             }
         }
 
