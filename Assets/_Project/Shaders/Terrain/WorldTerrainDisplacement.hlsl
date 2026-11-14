@@ -2,7 +2,10 @@
 #define SAFE_HAVEN_TERRAIN_DISPLACEMENT_INCLUDED
 
 TEXTURE2D_ARRAY(_DisplacementMasks); SAMPLER(sampler_DisplacementMasks);
-TEXTURE2D(_DisplacementLayers);
+// Per layer: tiling, height remap, footprint response and rock kind, three rows of 16 (baked by TerrainDisplacementEditor
+// into a small texture on the material, passed in by TerrainSurface as numbers: this shader may read only 64 textures).
+float4 _DisplacementLayerData[48];
+float4 DisplacementLayerData(int layer, int row) { return layer < 16 ? _DisplacementLayerData[row * 16 + layer] : 0; }
 TEXTURE2D(_FootprintField); SAMPLER(sampler_FootprintField);
 float4 _FootprintArea, _FootprintSettings;
 float _FootprintDarkening;
@@ -57,8 +60,8 @@ float WorldDisplacementHeightLOD(float2 uv, float mip, out float footprintRespon
     {
         float weight = controls[layer >> 2][layer & 3];
         if (weight <= 0.0001) continue;
-        float4 tiling = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 0));
-        float4 remap = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 1));
+        float4 tiling = DisplacementLayerData(layer, 0);
+        float4 remap = DisplacementLayerData(layer, 1);
         float midpoint = _DisplacementDataVersion > 0 ? remap.w : 0.5;
         float amplitude = _DisplacementDataVersion > 0 ? remap.z : 1;
         float sampleHeight = SAMPLE_TEXTURE2D_ARRAY_LOD(_DisplacementMasks, sampler_DisplacementMasks, uv * tiling.xy + tiling.zw, layer, mip).r;
@@ -68,7 +71,7 @@ float WorldDisplacementHeightLOD(float2 uv, float mip, out float footprintRespon
         height += (h - midpoint) * amplitude * weight;
         minimumHeight += min((remap.y - midpoint) * amplitude, (remap.x + remap.y - midpoint) * amplitude) * weight;
         if (_DisplacementDataVersion >= 2)
-            footprintResponse += LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 2)).r * weight;
+            footprintResponse += DisplacementLayerData(layer, 2).r * weight;
         weightSum += weight;
     }
     footprintResponse /= max(weightSum, 0.0001);
@@ -164,7 +167,7 @@ float2 WorldRock(float2 uv, float slope)
         [loop]
         for (uint layer = 0; layer < (uint)_DisplacementLayerCount; layer++)
         {
-            float kind = LOAD_TEXTURE2D(_DisplacementLayers, int2(layer, 2)).g;
+            float kind = DisplacementLayerData(layer, 2).g;
             float weight = controls[layer >> 2][layer & 3];
             rocky += kind > 0.5 && kind < 1.5 ? weight : 0;
             cliff += kind > 1.5 ? weight : 0;
@@ -277,7 +280,7 @@ float WorldSurfaceMip(float2 uv)
     [loop]
     for (uint i = 0; i < (uint)_DisplacementLayerCount; i++)
     {
-        float2 tiling = LOAD_TEXTURE2D(_DisplacementLayers, int2(i, 0)).xy;
+        float2 tiling = DisplacementLayerData(i, 0).xy;
         float2 dx = uvDx * tiling;
         float2 dy = uvDy * tiling;
         largest = max(largest, max(dot(dx, dx), dot(dy, dy)));

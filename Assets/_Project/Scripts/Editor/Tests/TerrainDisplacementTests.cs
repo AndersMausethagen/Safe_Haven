@@ -19,9 +19,11 @@ public sealed class TerrainDisplacementTests
         (float low, float high, float _) = GroundRelief.Spread(layer.maskMapTexture, 2);
         Assert.Greater(low, 0.02f, "no flat floor of clipped height (was 21% on Haven Path)");
         Assert.Less(high, 0.98f, "no flat tops of clipped height (was 43% on Haven Rock)");
-        Assert.AreEqual(TextureImporterCompression.Uncompressed,
-            ((TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GetAssetPath(layer.maskMapTexture))).textureCompression,
-            "block compression steps the height");
+        // The masks are block-compressed for the game (2026-11-14, BC7), which steps the height: the relief bake reads the
+        // height from the mask's file instead.
+        Texture2D fromFile = TerrainDisplacementEditor.SourcePixels(layer.maskMapTexture);
+        Assert.IsNotNull(fromFile, "the relief bake must read this mask's height from its file, at full precision");
+        Object.DestroyImmediate(fromFile);
     }
 
     [Test]
@@ -194,6 +196,8 @@ public sealed class TerrainDisplacementTests
 
             Color32[] Render(float strength, bool far = false)
             {
+                // The relief settings reach the shader as numbers (TerrainSurface does it for a terrain).
+                material.SetVectorArray("_DisplacementLayerData", TerrainSurface.DisplacementData(layerData));
                 material.SetFloat("_DisplacementStrength", strength);
                 Vector3 eye = new Vector3(1, 1, -3);
                 Matrix4x4 view = Matrix4x4.TRS(eye, Quaternion.LookRotation(new Vector3(1, 0, 1) - eye), Vector3.one).inverse;

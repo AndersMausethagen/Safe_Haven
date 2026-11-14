@@ -19,7 +19,9 @@ SAMPLER(sampler_linear_clamp);
 TEXTURE2D(_WorldControl4);
 // Per slot, by row: 0 tiling (xy) and offset (zw); 1 diffuse remap (rgb); 2 mask remap scale; 3 mask remap offset;
 // 4 normal scale, smoothness, metallic, smoothness source; 5 has a mask map (x), the layer's index on the terrain (y).
-TEXTURE2D(_WorldLayerTable);
+// Each slot's settings, six rows of WORLD_SLOTS (TerrainSurface): numbers, not a texture, as this shader may read only 64.
+float4 _WorldLayerData[WORLD_SLOTS * 6];
+#define WORLD_LAYER_DATA(slot, row) _WorldLayerData[(row) * WORLD_SLOTS + (slot)]
 float _WorldSlotCount;
 
 #define WORLD_LAYER_TEXTURES(L) TEXTURE2D(_WorldAlbedo##L); TEXTURE2D(_WorldNormal##L); TEXTURE2D(_WorldMask##L);
@@ -44,11 +46,11 @@ void WorldAccumulateLayer(int layer, half weight, float2 uv, float2 dx, float2 d
                           TEXTURE2D_PARAM(albedoMap, albedoSampler), TEXTURE2D_PARAM(normalMap, normalSampler),
                           TEXTURE2D_PARAM(maskMap, maskSampler), inout WorldLayerMix mix)
 {
-    float4 remap = LOAD_TEXTURE2D(_WorldLayerTable, int2(layer, 1));
-    float4 maskScale = LOAD_TEXTURE2D(_WorldLayerTable, int2(layer, 2));
-    float4 maskOffset = LOAD_TEXTURE2D(_WorldLayerTable, int2(layer, 3));
-    float4 settings = LOAD_TEXTURE2D(_WorldLayerTable, int2(layer, 4));
-    bool hasMask = LOAD_TEXTURE2D(_WorldLayerTable, int2(layer, 5)).x > 0.5;
+    float4 remap = WORLD_LAYER_DATA(layer, 1);
+    float4 maskScale = WORLD_LAYER_DATA(layer, 2);
+    float4 maskOffset = WORLD_LAYER_DATA(layer, 3);
+    float4 settings = WORLD_LAYER_DATA(layer, 4);
+    bool hasMask = WORLD_LAYER_DATA(layer, 5).x > 0.5;
 
     half blend = WorldAntiTileWeight(uv);
     float2x2 turn = WorldAntiTileTurn * _AntiTilingScale;
@@ -95,7 +97,7 @@ void WorldAccumulateLayer(int layer, half weight, float2 uv, float2 dx, float2 d
 // A slot's weight: its layer's channel in the control map holding it.
 half WorldSlotWeight(int slot, half4 controls[5])
 {
-    int layer = (int)LOAD_TEXTURE2D(_WorldLayerTable, int2(slot, 5)).y;
+    int layer = (int)WORLD_LAYER_DATA(slot, 5).y;
     int channel = layer & 3;
     return dot(controls[min(layer >> 2, 4)], half4(channel == 0, channel == 1, channel == 2, channel == 3));
 }
@@ -105,7 +107,7 @@ half WorldSlotWeight(int slot, half4 controls[5])
         half layerWeight = L < (int)_WorldSlotCount ? WorldSlotWeight(L, controls) : 0; \
         [branch] if (layerWeight > 0) \
         { \
-            float4 st = LOAD_TEXTURE2D(_WorldLayerTable, int2(L, 0)); \
+            float4 st = WORLD_LAYER_DATA(L, 0); \
             WorldAccumulateLayer(L, layerWeight, uv * st.xy + st.zw, uvDx * st.xy, uvDy * st.xy, \
                 TEXTURE2D_ARGS(_WorldAlbedo##L, sampler_trilinear_repeat_aniso8), TEXTURE2D_ARGS(_WorldNormal##L, sampler_trilinear_repeat_aniso8), \
                 TEXTURE2D_ARGS(_WorldMask##L, sampler_trilinear_repeat_aniso8), mix); \

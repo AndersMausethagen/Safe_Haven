@@ -128,7 +128,11 @@ public static class TerrainDisplacementEditor
                 TerrainLayer layer = layers[i];
                 TerrainSurfaceProfile.Layer entry = profile.Find(layer);
                 Texture2D source = entry.heightMap != null ? entry.heightMap : layer.maskMapTexture;
-                Graphics.Blit(source != null ? source : Texture2D.grayTexture, target);
+                // A mask's height is read from its file, at full precision, not from the imported texture: the masks are
+                // block-compressed for the game (BC7), and compression steps the height, which tessellation shows.
+                Texture2D fromFile = entry.heightMap == null ? SourcePixels(source) : null;
+                Graphics.Blit(fromFile != null ? fromFile : source != null ? source : Texture2D.grayTexture, target);
+                if (fromFile != null) UnityEngine.Object.DestroyImmediate(fromFile);
                 RenderTexture.active = target;
                 readback.ReadPixels(new Rect(0, 0, resolution, resolution), 0, 0);
                 readback.Apply(false);
@@ -282,6 +286,20 @@ public static class TerrainDisplacementEditor
         EditorUtility.SetDirty(terrain.materialTemplate);
         AssetDatabase.SaveAssetIfDirty(terrain.materialTemplate);
         terrain.GetComponent<TerrainSurface>().Apply();
+    }
+
+    // The texture's own file, decoded as it is on disk (linear, uncompressed), or null when Unity can't decode it here
+    // (only PNG and JPG can be): the imported texture is used then.
+    internal static Texture2D SourcePixels(Texture2D texture)
+    {
+        if (texture == null) return null;
+        string path = AssetDatabase.GetAssetPath(texture);
+        string extension = System.IO.Path.GetExtension(path).ToLowerInvariant();
+        if (extension != ".png" && extension != ".jpg" && extension != ".jpeg") return null;
+        var decoded = new Texture2D(2, 2, TextureFormat.RGBA32, true, true) { hideFlags = HideFlags.HideAndDontSave };
+        if (decoded.LoadImage(System.IO.File.ReadAllBytes(path), false)) return decoded;
+        UnityEngine.Object.DestroyImmediate(decoded);
+        return null;
     }
 
     private static T SaveResource<T>(T resource, string path) where T : UnityEngine.Object

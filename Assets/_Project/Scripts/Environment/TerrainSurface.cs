@@ -13,7 +13,13 @@ public sealed class TerrainSurface : MonoBehaviour
              "ground painted across three passes cost three times as much; the picture is the same.")]
     [SerializeField] private bool singlePass = true;
     private Terrain terrain;
-    private Texture2D layerTable;
+    // Each painted slot's settings for the one-pass mix (six rows of 14), and each layer's relief settings (three rows of
+    // 16, copied from the material's baked Displacement Layers texture): both go to the shader as numbers, which cost none
+    // of the 64 textures a shader may read.
+    private readonly Vector4[] layerData = new Vector4[MaxSinglePassLayers * 6];
+    private readonly Vector4[] displacementData = new Vector4[DisplacementLayers * 3];
+    private Texture2D warnedUnreadable;
+    private const int DisplacementLayers = 16; // the width of TerrainDisplacementEditor's layer texture
     private int boundLayers = -1;
     private const int MaxSinglePassLayers = 14; // WORLD_SLOTS in WorldTerrainAllLayers.hlsl
     private const string AllLayersKeyword = "_WORLD_ALL_LAYERS";
@@ -67,11 +73,6 @@ public sealed class TerrainSurface : MonoBehaviour
         terrain.SetSplatMaterialPropertyBlock(block);
         if (ownsBounds) terrain.patchBoundsMultiplier = previousBounds;
         ownsBounds = false;
-    }
-
-    private void OnDestroy()
-    {
-        if (layerTable != null) DestroyImmediate(layerTable);
     }
 
     // Apply can resize the terrain's patch bounds, which Unity forbids inside OnValidate ("SendMessage cannot be called
@@ -148,33 +149,25 @@ public sealed class TerrainSurface : MonoBehaviour
         Texture2D[] controls = data.alphamapTextures;
         block.SetFloat("_WorldSlotCount", slots.Count);
         block.SetTexture("_WorldControl4", controls.Length > 4 ? controls[4] : Texture2D.blackTexture);
-        if (layerTable == null)
-        {
-            layerTable = new Texture2D(MaxSinglePassLayers, 6, TextureFormat.RGBAFloat, false, true)
-            {
-                name = "Terrain Layer Table", hideFlags = HideFlags.DontSave, filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp
-            };
-        }
-
+        System.Array.Clear(layerData, 0, layerData.Length);
         for (int slot = 0; slot < slots.Count; slot++)
         {
             int index = slots[slot];
             TerrainLayer layer = layers[index];
             Vector2 tile = new Vector2(Mathf.Max(layer.tileSize.x, 0.001f), Mathf.Max(layer.tileSize.y, 0.001f));
             // As Unity sets a pass's _SplatN_ST, remaps and constants for a layer.
-            layerTable.SetPixel(slot, 0, new Color(data.size.x / tile.x, data.size.z / tile.y, layer.tileOffset.x / tile.x, layer.tileOffset.y / tile.y));
-            layerTable.SetPixel(slot, 1, layer.diffuseRemapMax);
-            layerTable.SetPixel(slot, 2, layer.maskMapRemapMax - layer.maskMapRemapMin);
-            layerTable.SetPixel(slot, 3, layer.maskMapRemapMin);
-            layerTable.SetPixel(slot, 4, new Color(layer.normalScale, layer.smoothness, layer.metallic, (float)layer.smoothnessSource));
-            layerTable.SetPixel(slot, 5, new Color(layer.maskMapTexture != null ? 1f : 0f, index, 0f, 0f));
+            layerData[0 * MaxSinglePassLayers + slot] = (Vector4)new Color(data.size.x / tile.x, data.size.z / tile.y, layer.tileOffset.x / tile.x, layer.tileOffset.y / tile.y);
+            layerData[1 * MaxSinglePassLayers + slot] = (Vector4)layer.diffuseRemapMax;
+            layerData[2 * MaxSinglePassLayers + slot] = (Vector4)layer.maskMapRemapMax - layer.maskMapRemapMin;
+            layerData[3 * MaxSinglePassLayers + slot] = (Vector4)layer.maskMapRemapMin;
+            layerData[4 * MaxSinglePassLayers + slot] = (Vector4)new Color(layer.normalScale, layer.smoothness, layer.metallic, (float)layer.smoothnessSource);
+            layerData[5 * MaxSinglePassLayers + slot] = (Vector4)new Color(layer.maskMapTexture != null ? 1f : 0f, index, 0f, 0f);
             block.SetTexture("_WorldAlbedo" + slot, layer.diffuseTexture != null ? layer.diffuseTexture : Texture2D.whiteTexture);
             block.SetTexture("_WorldNormal" + slot, layer.normalMapTexture != null ? layer.normalMapTexture : Texture2D.normalTexture);
             block.SetTexture("_WorldMask" + slot, layer.maskMapTexture != null ? layer.maskMapTexture : Texture2D.grayTexture);
         }
 
-        layerTable.Apply(false, false);
-        block.SetTexture("_WorldLayerTable", layerTable);
+        block.SetVectorArray("_WorldLayerData", layerData);
     }
 
     // Which layers have any weight anywhere, read from the control maps themselves.
@@ -201,6 +194,42 @@ public sealed class TerrainSurface : MonoBehaviour
         return painted;
     }
 
+    // The material's baked relief settings (a small readable texture) read into numbers for the shader.
+    private void BindDisplacementData()
+    {
+        Material material = terrain.materialTemplate;
+        Texture2D source = material != null && material.HasProperty("_DisplacementLayers") ? material.GetTexture("_DisplacementLayers") as Texture2D : null;
+        // Read on every Apply (48 pixels): a rebake writes new numbers into the same texture.
+        {
+            DisplacementData(source, displacementData);
+            if (source != null && !source.isReadable && warnedUnreadable != source)
+            {
+                warnedUnreadable = source;
+                Debug.LogWarning($"{name}: the terrain material's Displacement Layers texture isn't readable; the relief has no settings.", this);
+            }
+        }
+
+        block.SetVectorArray("_DisplacementLayerData", displacementData);
+    }
+
+    /// <summary>The relief settings baked into a Displacement Layers texture (16 x 3, readable), as the shader's
+    /// _DisplacementLayerData numbers. Zeros where there is none.</summary>
+    public static Vector4[] DisplacementData(Texture2D source, Vector4[] into = null)
+    {
+        into ??= new Vector4[DisplacementLayers * 3];
+        System.Array.Clear(into, 0, into.Length);
+        if (source == null || !source.isReadable) return into;
+        for (int row = 0; row < 3 && row < source.height; row++)
+        {
+            for (int layer = 0; layer < DisplacementLayers && layer < source.width; layer++)
+            {
+                into[row * DisplacementLayers + layer] = source.GetPixel(layer, row);
+            }
+        }
+
+        return into;
+    }
+
     public void Apply()
     {
         if (terrain == null) terrain = GetComponent<Terrain>();
@@ -216,6 +245,7 @@ public sealed class TerrainSurface : MonoBehaviour
         Texture2D[] controls = terrain.terrainData.alphamapTextures;
         for (int i = 0; i < 4; i++)
             block.SetTexture("_DisplacementControl" + i, i < controls.Length ? controls[i] : Texture2D.blackTexture);
+        BindDisplacementData();
         BindAllLayers(terrain.terrainData);
         terrain.SetSplatMaterialPropertyBlock(block);
         if (terrain.materialTemplate != null && terrain.materialTemplate.HasProperty("_DisplacementStrength"))
