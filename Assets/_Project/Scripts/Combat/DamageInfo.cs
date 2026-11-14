@@ -23,6 +23,9 @@ public readonly struct DamageInfo
     public readonly float Poise;
     public readonly HitTechnique Technique;
 
+    /// <summary>How the blow lands (crushing, cutting, piercing), from its attack. None for anything not a physical blow.</summary>
+    public StrikeKind Strike => Attack != null ? Attack.Strike : StrikeKind.None;
+
     /// <summary>A tick of damage over time, not a blow: burning, poison.</summary>
     public bool IsOverTime => (Technique & HitTechnique.OverTime) != 0;
 

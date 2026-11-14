@@ -16,6 +16,9 @@ public sealed class AttackDefinition : ScriptableObject
 
     [Header("Damage")]
     [SerializeField] private DamageType damageType = DamageType.Physical;
+    [Tooltip("How a physical blow lands: Blunt (crushing), Slash (cutting) or Stab (piercing). Targets resist or are weak " +
+             "to each kind (Blunt/Slash/Stab Resistance). None: neither (a spell, a shove that only pushes).")]
+    [SerializeField] private StrikeKind strike;
     [Tooltip("Flat damage that doesn't depend on a weapon. Abilities mostly use this.")]
     [SerializeField, Min(0f)] private float baseDamage;
     [Tooltip("How much of the equipped weapon's damage this attack uses. 1 is 100%, 0 ignores the weapon.")]
@@ -89,6 +92,7 @@ public sealed class AttackDefinition : ScriptableObject
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public DamageType DamageType => damageType;
+    public StrikeKind Strike => damageType.IsPhysical() ? strike : StrikeKind.None;
     public float BaseDamage => baseDamage;
     public float WeaponDamageRatio => weaponDamageRatio;
     public float PowerScaling => powerScaling;

@@ -199,7 +199,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
             }
         }
 
-        float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, Owner.Stats, Owner.Rules) * DamageTakenMultiplier;
+        float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, Owner.Stats, Owner.Rules) * DamageTakenMultiplier;
         float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;
 

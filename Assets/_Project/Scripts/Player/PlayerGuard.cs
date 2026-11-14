@@ -162,7 +162,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
             return GuardRules.BlockCost(damage.Amount, Rules.BlockStaminaPerDamage, 1f);
         }
 
-        float worth = DamageCalculator.Mitigate(damage.Amount, damage.Type, self.Stats, self.Rules);
+        float worth = DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, self.Stats, self.Rules);
         return GuardRules.BlockCost(worth, Rules.BlockStaminaPerDamage, Mathf.Max(0.1f, 1f + self.Stats.Get(StatType.BlockStaminaCost)));
     }
 

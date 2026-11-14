@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::AttackDefinition
   displayName: Shoulder Barge
   damageType: 0
+  strike: 1
   baseDamage: 6
   weaponDamageRatio: 0
   powerScaling: 1
@@ -25,11 +26,18 @@ MonoBehaviour:
   hitDelay: 0
   recoveryTime: 0.1
   poiseDamage: 30
+  impact: 1
   lunge: 0
   staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
   animationState: 
   animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 0, g: 0, b: 0, a: 0}
+  slashSweep: 1
+  slashTilt: 0

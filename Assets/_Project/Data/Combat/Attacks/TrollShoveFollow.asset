@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Troll Shove
   damageType: 0
+  strike: 1
   baseDamage: 0
   weaponDamageRatio: 0.75
   powerScaling: 1

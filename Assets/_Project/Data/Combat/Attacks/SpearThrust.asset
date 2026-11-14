@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Spear Thrust
   damageType: 0
+  strike: 3
   baseDamage: 0
   weaponDamageRatio: 1
   powerScaling: 1

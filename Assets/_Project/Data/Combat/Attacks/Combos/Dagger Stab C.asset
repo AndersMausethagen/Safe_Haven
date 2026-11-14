@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Dagger Stab C
   damageType: 0
+  strike: 3
   baseDamage: 0
   weaponDamageRatio: 1.3
   powerScaling: 1

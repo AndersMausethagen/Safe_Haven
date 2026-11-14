@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Boar Gore
   damageType: 0
+  strike: 3
   baseDamage: 0
   weaponDamageRatio: 1
   powerScaling: 1
@@ -25,12 +26,15 @@ MonoBehaviour:
   hitDelay: 0.45
   recoveryTime: 0.9
   poiseDamage: 10
+  impact: 1
   lunge: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
   animationState: 
   animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}

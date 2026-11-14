@@ -29,7 +29,7 @@ public static class ContentAudit
         "TreeChoppingSettings.limbingItem", "FishingSettings.fish", "FireflyProfile.catchable", "HavenRequestDefinition.reward",
         "QuestDefinition.rewardItems", "RaidDefinition.difficulties[].eliteLoot", "RaidEventDefinition.choices[].outcomes",
         "RelicSettings.gear", "TerritorySettings.regions[].tithe", "TradeSettings.offers", "TransportDefinition.kit",
-        "WaterSource.fillItem", "PrologueDefinition.startingArmor", "PrologueDefinition.startingBackpack", "PrologueDefinition.sticks",
+        "WaterSource.fillItem", "SurvivalSettings.openWaterFillItem", "PrologueDefinition.startingArmor", "PrologueDefinition.startingBackpack", "PrologueDefinition.sticks",
         "PrologueDefinition.stones", "ItemWorldObject.definition", "RaidLayoutRules.pondFillItem",
     };
 

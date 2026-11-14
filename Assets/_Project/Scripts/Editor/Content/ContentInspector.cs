@@ -29,6 +29,9 @@ public sealed class ContentInspector
         { StatType.FrostResistance, "Share of frost damage ignored. 0.25 is 25% less; negative is a weakness." },
         { StatType.HolyResistance, "Share of holy damage ignored. 0.25 is 25% less; negative is a weakness." },
         { StatType.StructureDamage, "Extra damage against buildings. 0.5 is +50%." },
+        { StatType.BluntResistance, "Share of crushing blows ignored (hammers, clubs, a troll's fist). Negative is a weakness: -0.5 takes half again as much." },
+        { StatType.SlashResistance, "Share of cutting blows ignored (swords, axes, claws). Negative is a weakness." },
+        { StatType.StabResistance, "Share of piercing blows ignored (spears, thrusts, arrows, fangs). Negative is a weakness." },
     };
 
     private readonly Func<string, ContentSection> findSection;

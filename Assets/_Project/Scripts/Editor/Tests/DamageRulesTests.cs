@@ -115,6 +115,38 @@ public sealed class DamageRulesTests
         Assert.AreEqual(1f, victim.CurrentHealth, 0.001f);
     }
 
+    // ----- Blunt, slash and stab (2026-11-14) -----
+
+    [Test]
+    public void AKindOfBlow_MeetsItsResistanceOrWeakness_AndOnlyPhysicalBlowsHaveOne()
+    {
+        var wall = new StatSheet();
+        wall.SetBase(StatType.BluntResistance, -0.5f);
+        wall.SetBase(StatType.SlashResistance, 0.5f);
+        Assert.AreEqual(150f, DamageCalculator.Mitigate(100f, DamageType.Physical, StrikeKind.Blunt, wall, CombatRules.Default), 0.01f, "weak to a hammer");
+        Assert.AreEqual(50f, DamageCalculator.Mitigate(100f, DamageType.Physical, StrikeKind.Slash, wall, CombatRules.Default), 0.01f, "a blade glances off");
+        Assert.AreEqual(100f, DamageCalculator.Mitigate(100f, DamageType.Physical, StrikeKind.Stab, wall, CombatRules.Default), 0.01f, "no say on stabs");
+        Assert.AreEqual(100f, DamageCalculator.Mitigate(100f, DamageType.Physical, wall, CombatRules.Default), 0.01f, "a blow of no kind as before");
+        Assert.AreEqual(100f, DamageCalculator.Mitigate(100f, DamageType.Fire, StrikeKind.Blunt, wall, CombatRules.Default), 0.01f, "fire is not a blow");
+    }
+
+    [Test]
+    public void Weapons_AndTheWalls_HaveTheirKinds()
+    {
+        Assert.AreEqual(StrikeKind.Slash, Slash.Strike);
+        var hammer = AssetDatabase.LoadAssetAtPath<AttackDefinition>("Assets/_Project/Data/Combat/Attacks/Combos/Hammer A.asset");
+        Assert.AreEqual(StrikeKind.Blunt, hammer.Strike);
+        foreach (string wall in new[] { "Palisade", "StoneWall", "Skigard", "Skigard Gate" })
+        {
+            var building = AssetDatabase.LoadAssetAtPath<BuildingDefinition>($"Assets/_Project/Data/Buildings/{wall}.asset");
+            var sheet = new StatSheet();
+            building.CombatStats.ApplyTo(sheet);
+            Assert.Less(sheet.Get(StatType.BluntResistance), 0f, wall + " is weak to blunt blows");
+            Assert.AreEqual(building.CombatStats, building.Prefab.GetComponent<Combatant>() != null
+                ? new SerializedObject(building.Prefab.GetComponent<Combatant>()).FindProperty("baseStats").objectReferenceValue : null, wall + "'s prefab reads its stats");
+        }
+    }
+
     // ----- Blocking -----
 
     [Test]

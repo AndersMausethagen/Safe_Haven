@@ -17,7 +17,7 @@ MonoBehaviour:
   description: A gate in the skigard. It opens for the Haven's own people and stays shut to the creatures of the woods.
   icon: {fileID: 21300000, guid: fcfcb7e20bf2e15409358daa318ad9fc, type: 3}
   faction: 0
-  combatStats: {fileID: 11400000, guid: 39f9817b68eb59f43ac012be7715f000, type: 2}
+  combatStats: {fileID: 11400000, guid: a36f105ce6191c940b859e93a4bcef2b, type: 2}
   prefab: {fileID: 5723684251509998500, guid: dd9ee142316a09b419a72ca831f1abbd, type: 3}
   constructionCost: []
   constructionItems:
@@ -30,9 +30,12 @@ MonoBehaviour:
   sortOrder: 7
   requires: []
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 1
+  decoration: 0
   station: 0
   outputCapacity: 10
   queueLength: 5

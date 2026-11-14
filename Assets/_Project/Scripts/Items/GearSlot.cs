@@ -302,6 +302,9 @@ public static class StatNames
             case StatType.GallopStaminaCost: return "Gallop Stamina Cost";
             case StatType.HorseBond: return "Bond Gained";
             case StatType.MountedDamage: return "Mounted Damage";
+            case StatType.BluntResistance: return "Blunt Resistance";
+            case StatType.SlashResistance: return "Slash Resistance";
+            case StatType.StabResistance: return "Stab Resistance";
             default: return stat.ToString();
         }
     }

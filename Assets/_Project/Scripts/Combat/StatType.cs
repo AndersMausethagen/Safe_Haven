@@ -113,4 +113,11 @@ public enum StatType
     HorseBond = 54,
     /// <summary>Share more damage dealt from the saddle.</summary>
     MountedDamage = 55,
+    /// <summary>Resistance to crushing blows (StrikeKind.Blunt), like the other resistances: 0.25 takes a quarter less,
+    /// -0.5 takes half again as much (a wall, a stone giant).</summary>
+    BluntResistance = 56,
+    /// <summary>Resistance to cutting blows (StrikeKind.Slash). Below zero is a weakness.</summary>
+    SlashResistance = 57,
+    /// <summary>Resistance to piercing blows (StrikeKind.Stab), arrows included. Below zero is a weakness.</summary>
+    StabResistance = 58,
 }

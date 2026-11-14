@@ -527,7 +527,8 @@ public sealed class ItemTooltipView : MonoBehaviour
             }
             else if (item.Weapon.Damage > 0f)
             {
-                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage.</color>");
+                string kind = item.Weapon.Strike != StrikeKind.None ? ", " + item.Weapon.Strike.Label().ToLowerInvariant() : "";
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Weapon: {Mathf.RoundToInt(item.Weapon.Damage)} damage{kind}.</color>");
             }
         }
 

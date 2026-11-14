@@ -9,7 +9,8 @@ using UnityEngine;
 ///   x (1 + damage bonus),
 ///   x structure multiplier and the structure damage stat against structures, x (1 + crit damage) on a crit.
 /// Defender side (Mitigate):
-///   physical damage x (1 - armor / (armor + armor for half reduction)), then every type x (1 - resistance).
+///   physical damage x (1 - armor / (armor + armor for half reduction)), then every type x (1 - resistance),
+///   then a physical blow x (1 - its kind's resistance) (Blunt/Slash/Stab; below zero is a weakness).
 /// </summary>
 public static class DamageCalculator
 {
@@ -66,7 +67,11 @@ public static class DamageCalculator
     }
 
     /// <summary>Damage after the defender's armor and resistances.</summary>
-    public static float Mitigate(float amount, DamageType type, StatSheet defender, CombatRules rules)
+    public static float Mitigate(float amount, DamageType type, StatSheet defender, CombatRules rules) =>
+        Mitigate(amount, type, StrikeKind.None, defender, rules);
+
+    /// <summary>Damage after the defender's armor, resistances and its resistance or weakness to this kind of blow.</summary>
+    public static float Mitigate(float amount, DamageType type, StrikeKind strike, StatSheet defender, CombatRules rules)
     {
         if (amount <= 0f)
         {
@@ -80,6 +85,10 @@ public static class DamageCalculator
         }
 
         result *= 1f - rules.ClampResistance(defender.Get(type.ResistanceStat()));
+        if (type.IsPhysical() && strike.TryResistanceStat(out StatType kind))
+        {
+            result *= 1f - rules.ClampResistance(defender.Get(kind));
+        }
 
         // A hit that did damage keeps doing a little, but never more than it arrived with.
         return Mathf.Max(result, Mathf.Min(amount, rules.MinimumDamage));

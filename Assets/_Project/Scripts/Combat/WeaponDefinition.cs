@@ -116,6 +116,17 @@ public sealed class WeaponDefinition : ScriptableObject
     public bool IsShield => kind == WeaponKind.Shield;
     public float Damage => damage;
     public AttackDefinition BasicAttack => basicAttack;
+
+    /// <summary>How its usual blows land: the first combo attack's kind (or the basic attack's). A weapon's heavy or art may
+    /// differ (a sword's thrust stabs).</summary>
+    public StrikeKind Strike
+    {
+        get
+        {
+            AttackDefinition usual = combo.Count > 0 && combo[0] != null ? combo[0] : basicAttack;
+            return usual != null ? usual.Strike : StrikeKind.None;
+        }
+    }
     public AttackDefinition HeavyAttack => heavyAttack;
     public AttackDefinition CounterAttack => counterAttack;
     public AttackDefinition RushAttack => rushAttack;

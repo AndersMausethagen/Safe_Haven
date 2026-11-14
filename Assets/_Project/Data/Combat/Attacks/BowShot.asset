@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::AttackDefinition
   displayName: Bow Shot
   damageType: 0
+  strike: 3
   baseDamage: 0
   weaponDamageRatio: 1
   powerScaling: 0.8

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Root Grasp
   damageType: 0
+  strike: 1
   baseDamage: 0
   weaponDamageRatio: 1
   powerScaling: 1
@@ -25,12 +26,15 @@ MonoBehaviour:
   hitDelay: 0.5
   recoveryTime: 0.9
   poiseDamage: 10
+  impact: 1
   lunge: 0
   staminaCost: -1
   appliesStatus: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
   statusChance: 0.3
   animationState: 
   animationSpeed: 1
+  strikeSpeed: 1
+  strikeLead: 0
   followThroughSpeed: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}

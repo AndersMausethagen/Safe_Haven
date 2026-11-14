@@ -180,7 +180,7 @@ public sealed partial class PlayerCombat
         // What this blow is worth against this creature: as it leaves the hand (no lucky critical counted), then through the
         // creature's own defenses and what being caught unaware adds.
         float outgoing = DamageCalculator.CalculateOutgoing(combatant.Stats, combatant.Rules, pending.Attack, pending.WeaponDamage, target.Category, 1f, out _) * damage;
-        float blow = DamageCalculator.Mitigate(outgoing, pending.Attack.DamageType, theirs.Stats, theirs.Rules) * body.DamageTakenMultiplier;
+        float blow = DamageCalculator.Mitigate(outgoing, pending.Attack.DamageType, pending.Attack.Strike, theirs.Stats, theirs.Rules) * body.DamageTakenMultiplier;
         if (!StrikeRules.IsTakedown(body.CurrentHealth, blow, TechniqueSettings.Current.TakedownReach))
         {
             return damage;

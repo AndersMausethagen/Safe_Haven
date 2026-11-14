@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Axe Rush
   damageType: 0
+  strike: 2
   baseDamage: 0
   weaponDamageRatio: 1.2
   powerScaling: 1
