@@ -1093,3 +1093,16 @@ MonoBehaviour:
     about: {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
     text: I've met people like it. It would be easier if it were cruel.
   findChance: 0.2
+  cinematics:
+  - cinematic: {fileID: 11400000, guid: 99fb5dd853d76e54f85207adc9391432, type: 2}
+    line: 'The pact, the hearth, and the winter the fire went out: what came before the meadow morning.'
+    afterQuest: {fileID: 0}
+    afterRaid: {fileID: 0}
+  - cinematic: {fileID: 11400000, guid: 468c4ed3de124374fa17b8c85ad6970b, type: 2}
+    line: What happened at the stones, who caught you, and why you are here.
+    afterQuest: {fileID: 11400000, guid: a089752e48d75934fb5e34dbeec0b389, type: 2}
+    afterRaid: {fileID: 0}
+  - cinematic: {fileID: 11400000, guid: ffd539bcbac3f6b4f8654a96cbce9849, type: 2}
+    line: 'The forest beyond the Ward: why you go in, and why you must come back.'
+    afterQuest: {fileID: 0}
+    afterRaid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}

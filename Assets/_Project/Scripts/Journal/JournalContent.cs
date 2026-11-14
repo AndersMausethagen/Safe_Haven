@@ -13,9 +13,15 @@ public static class JournalContent
     /// <summary>What marks a row not read yet.</summary>
     public const string UnreadMark = "•";
 
+    /// <summary>The Backstory tab's shelf of cinematics to watch again.</summary>
+    public const string CinematicShelf = "Cinematics";
+
     private const string PlainStrike = "Monster Strike";
 
-    public static List<HavenShelf> Backstory(JournalSettings settings, QuestLog log, CharacterProgress progress, out string summary)
+    /// <param name="watch">Plays a cinematic from its row. Null: the rows have no Watch button.</param>
+    /// <param name="watchBlocked">Why a cinematic can't be watched here and now (co-op); the button is greyed with it. Empty: it can.</param>
+    public static List<HavenShelf> Backstory(JournalSettings settings, QuestLog log, CharacterProgress progress, out string summary,
+        System.Action<CinematicDefinition> watch = null, string watchBlocked = null)
     {
         var shelves = new List<HavenShelf>();
         int known = 0;
@@ -32,8 +38,67 @@ public static class JournalContent
             ShelfFor(shelves, page.group).Entries.Add(entry);
         }
 
+        // The story as it was told on screen, first: the opening is the backstory.
+        var told = new HavenShelf(CinematicShelf);
+        foreach (JournalCinematic cinematic in settings.Cinematics)
+        {
+            if (IsUnlocked(cinematic, log, progress))
+            {
+                told.Entries.Add(CinematicEntry(cinematic, watch, watchBlocked));
+            }
+        }
+
+        if (told.Entries.Count > 0)
+        {
+            shelves.Insert(0, told);
+        }
+
         summary = $"{known} of {settings.Backstory.Count} pages written";
         return shelves;
+    }
+
+    /// <summary>True once the character has reached the cinematic: every one has seen the opening, the quest that plays one
+    /// is done, the raid whose first visit plays one has been entered.</summary>
+    public static bool IsUnlocked(JournalCinematic told, QuestLog log, CharacterProgress progress)
+    {
+        if (told == null || told.cinematic == null)
+        {
+            return false;
+        }
+
+        if (told.afterQuest != null && log.StatusOf(told.afterQuest) != QuestStatus.Completed)
+        {
+            return false;
+        }
+
+        // A save from before raid visits were kept still has the raid in its record.
+        return told.afterRaid == null || progress.HasVisitedRaid(told.afterRaid.Id)
+            || progress.Journal.Raids.Any(raid => raid.Raid == told.afterRaid.DisplayName);
+    }
+
+    /// <summary>A cinematic as a row with its painting, length and a Watch button: the journal's and the main menu's.</summary>
+    public static HavenEntry CinematicEntry(JournalCinematic told, System.Action<CinematicDefinition> watch, string watchBlocked = null)
+    {
+        CinematicDefinition cinematic = told.cinematic;
+        int seconds = UnityEngine.Mathf.RoundToInt(new CinematicTimeline(cinematic).Seconds);
+        string length = $"{seconds / 60}:{seconds % 60:00}";
+        var entry = new HavenEntry
+        {
+            Key = cinematic,
+            Name = cinematic.Title,
+            Line = told.line,
+            Status = $"A cinematic, {length} long",
+            State = HavenEntryState.Good,
+            Icon = cinematic.Poster,
+            Description = told.line,
+        };
+        if (watch != null)
+        {
+            bool free = string.IsNullOrEmpty(watchBlocked);
+            entry.Actions.Add(new HavenAction(free ? "Watch" : $"Watch ({watchBlocked})", () => watch(cinematic), free));
+        }
+
+        return entry;
     }
 
     public static List<HavenShelf> Mechanics(JournalSettings settings, QuestLog log, CharacterProgress progress, out string summary)

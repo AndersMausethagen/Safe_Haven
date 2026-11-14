@@ -28,6 +28,19 @@ public sealed class JournalPage
     [TextArea(2, 4)] public string summary;
 }
 
+/// <summary>A cinematic the journal (Backstory tab) and the main menu (Cinematics) offer to watch again.</summary>
+[Serializable]
+public sealed class JournalCinematic
+{
+    public CinematicDefinition cinematic;
+    [Tooltip("What it tells, in a line, under its title.")]
+    public string line;
+    [Tooltip("Listed in a character's journal once this quest is done (the quest whose end plays it). Empty: no quest is needed.")]
+    public QuestDefinition afterQuest;
+    [Tooltip("Listed in a character's journal once they have entered this raid (its first visit plays it). Empty: no raid is needed.")]
+    public RaidDefinition afterRaid;
+}
+
 /// <summary>What someone at home has to say about a creature, shown on its page once they are back.</summary>
 [Serializable]
 public sealed class ResidentNote
@@ -52,8 +65,12 @@ public sealed class JournalSettings : GameSettings<JournalSettings>
     [SerializeField] private List<ResidentNote> residentNotes = new List<ResidentNote>();
     [Tooltip("The chance a searched cache in a raid holds the next page still to be found.")]
     [SerializeField, Range(0f, 1f)] private float findChance = 0.2f;
+    [Tooltip("The cinematics that can be watched again, in story order: in the journal once the character has reached each, " +
+             "and in the main menu once it has been seen on this computer.")]
+    [SerializeField] private List<JournalCinematic> cinematics = new List<JournalCinematic>();
 
     public IReadOnlyList<JournalPage> Backstory => backstory;
+    public IReadOnlyList<JournalCinematic> Cinematics => cinematics;
     public IReadOnlyList<JournalPage> Mechanics => mechanics;
     public IReadOnlyList<MonsterDefinition> Creatures => creatures;
     public IReadOnlyList<ResidentNote> ResidentNotes => residentNotes;

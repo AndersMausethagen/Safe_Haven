@@ -237,6 +237,7 @@ public sealed class CinematicScreen : MonoBehaviour
         definition = cinematic;
         timeline = new CinematicTimeline(cinematic);
         finished = onFinished;
+        CinematicArchive.Remember(cinematic);
         time = 0f;
         duck = 1f;
         skippedAt = -1f;

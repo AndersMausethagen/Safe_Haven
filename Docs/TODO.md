@@ -186,7 +186,7 @@ by screenshots of every shot, the flow by starting a new game on throwaway saves
       Nightsong), and the levels of the wind, birds and footsteps.
 - [ ] Its narration was spoken by Qwen3-TTS; the portal's lines in the game and the prologue-end cinematic by the acting
       model in the same voice. If they sound like two people, speak the opening again with the acting model.
-- [ ] Watch it again from the journal's Backstory tab (the screen plays over any scene; the tab has no button yet).
+- [x] Watch it again from the journal's Backstory tab and the main menu's Cinematics (2026-11-14, all three cinematics).
 - [ ] The abandoned village (6c) came out without the guardians standing in it, and the promise (2) shows two of three.
       Repaint if they are missed.
 - [ ] Layers are cut by a depth estimate and filled by mirroring. Good at these small moves; a bigger move would need

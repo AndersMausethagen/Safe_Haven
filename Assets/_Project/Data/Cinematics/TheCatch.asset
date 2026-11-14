@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TheCatch
   m_EditorClassIdentifier: SafeHaven::CinematicDefinition
   title: The Catch
+  poster: {fileID: 21300000, guid: f892b2433ee531846884ed52671990ab, type: 3}
   shots:
   - name: The Hand On The Stone
     arrives: 2
@@ -4070,5 +4071,6 @@ MonoBehaviour:
     fadeOut: 2.5
   musicWhileSpeaking: 0.55
   endFadeSeconds: 1.5
+  fadeIntoSceneSeconds: 0
   subtitleLinger: 0.6
   skipHoldSeconds: 1

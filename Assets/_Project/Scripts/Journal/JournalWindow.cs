@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// The journal (J, or from the Escape menu): the backstory, the quests in more depth than the tracker has room for, the creatures met, how things work and the
+/// The journal (J, or from the Escape menu): the backstory (with the cinematics reached, to watch again), the quests in more depth than the tracker has room for, the creatures met, how things work and the
 /// raids behind you, one tab each. It reads and shows; JournalContent decides what there is to say. Built in code for every scene with a player
 /// (ExperienceTracker).
 /// </summary>
@@ -227,9 +227,16 @@ public sealed class JournalWindow : MonoBehaviour
             case Tab.Raids:
                 return JournalContent.Raids(progress, out summary);
             default:
-                return JournalContent.Backstory(settings, log, progress, out summary);
+                return JournalContent.Backstory(settings, log, progress, out summary, Watch, WatchBlocked());
         }
     }
+
+    // The journal closes first (the action does), then the cinematic plays over the game, which it holds still.
+    private static void Watch(CinematicDefinition cinematic) => CinematicScreen.Play(cinematic);
+
+    // A cinematic pauses this game, which in co-op stops nobody else.
+    private static string WatchBlocked() =>
+        CoopSession.Current != null && CoopSession.Current.IsActive ? "not in co-op" : null;
 
     private static void Pin(QuestDefinition quest)
     {

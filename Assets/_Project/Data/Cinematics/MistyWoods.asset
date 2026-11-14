@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MistyWoods
   m_EditorClassIdentifier: SafeHaven::CinematicDefinition
   title: The Misty Woods
+  poster: {fileID: 21300000, guid: 46783728bcfbd694097b854cfce8207c, type: 3}
   shots:
   - name: Beyond The Ward
     arrives: 2

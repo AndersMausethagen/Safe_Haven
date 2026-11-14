@@ -190,6 +190,8 @@ public sealed class CinematicMusic
 public sealed class CinematicDefinition : ScriptableObject
 {
     [SerializeField] private string title = "The Old Story";
+    [Tooltip("The picture the journal and the main menu show for it, to watch it again. Empty: the first shot's back layer.")]
+    [SerializeField] private Sprite poster;
     [SerializeField] private List<CinematicShot> shots = new List<CinematicShot>();
     [SerializeField] private List<CinematicMusic> music = new List<CinematicMusic>();
     [Tooltip("How far the music drops while a line is spoken (1 not at all).")]
@@ -205,6 +207,7 @@ public sealed class CinematicDefinition : ScriptableObject
     [SerializeField, Min(0.1f)] private float skipHoldSeconds = 1f;
 
     public string Title => title;
+    public Sprite Poster => poster != null ? poster : FirstPicture();
     public IReadOnlyList<CinematicShot> Shots => shots;
     public IReadOnlyList<CinematicMusic> Music => music;
     public float MusicWhileSpeaking => musicWhileSpeaking;
@@ -212,6 +215,23 @@ public sealed class CinematicDefinition : ScriptableObject
     public float FadeIntoSceneSeconds => fadeIntoSceneSeconds;
     public float SubtitleLinger => subtitleLinger;
     public float SkipHoldSeconds => skipHoldSeconds;
+
+    // The first painting shown: the back layer of the first shot that has one.
+    private Sprite FirstPicture()
+    {
+        foreach (CinematicShot shot in shots)
+        {
+            foreach (CinematicLayer layer in shot.layers)
+            {
+                if (layer.kind == CinematicLayerKind.Picture && layer.picture != null)
+                {
+                    return layer.picture;
+                }
+            }
+        }
+
+        return null;
+    }
 
 #if UNITY_EDITOR
     /// <summary>Replaces the shots and the music. For the editor script that writes this asset, and for tests that

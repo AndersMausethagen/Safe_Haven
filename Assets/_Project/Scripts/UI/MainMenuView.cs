@@ -5,7 +5,7 @@ using TMPro;
 
 /// <summary>
 /// The start menu: start a new game, carry on with the newest save (shown with what it is), pick another from the saved
-/// games, change the options or quit. It only reads saves to describe them; starting and loading go through
+/// games, change the options, watch a cinematic seen before again, or quit. It only reads saves to describe them; starting and loading go through
 /// SaveGameService. A new game gets a save of its own, so it never touches the others.
 /// </summary>
 public sealed class MainMenuView : MonoBehaviour
@@ -27,6 +27,8 @@ public sealed class MainMenuView : MonoBehaviour
     [SerializeField] private Button savesButton;
     [Tooltip("Empty: made at start as a copy of the Exit button, which moves down to make room.")]
     [SerializeField] private Button optionsButton;
+    [Tooltip("Opens the cinematics seen on this computer, to watch again. Empty: made at start as a copy of the Exit button.")]
+    [SerializeField] private Button cinematicsButton;
     [Tooltip("How far the Exit button moves down for each button made.")]
     [SerializeField, Min(0f)] private float buttonSpacing = 72f;
     [Tooltip("Describes the save under the Load Game button.")]
@@ -40,6 +42,7 @@ public sealed class MainMenuView : MonoBehaviour
     {
         savesButton = savesButton != null ? savesButton : AddButton("Saved Games Button", "SAVED GAMES");
         optionsButton = optionsButton != null ? optionsButton : AddButton("Options Button", "OPTIONS");
+        cinematicsButton = cinematicsButton != null ? cinematicsButton : AddButton("Cinematics Button", "CINEMATICS");
     }
 
     // A copy of the Exit button in its place; Exit moves down one step.
@@ -66,6 +69,7 @@ public sealed class MainMenuView : MonoBehaviour
         exitButton.onClick.AddListener(Exit);
         savesButton.onClick.AddListener(OpenSaves);
         optionsButton.onClick.AddListener(OpenOptions);
+        cinematicsButton.onClick.AddListener(OpenCinematics);
     }
 
     private void OnDisable()
@@ -75,6 +79,7 @@ public sealed class MainMenuView : MonoBehaviour
         exitButton.onClick.RemoveListener(Exit);
         savesButton.onClick.RemoveListener(OpenSaves);
         optionsButton.onClick.RemoveListener(OpenOptions);
+        cinematicsButton.onClick.RemoveListener(OpenCinematics);
     }
 
     private void Start()
@@ -86,6 +91,13 @@ public sealed class MainMenuView : MonoBehaviour
     private void RefreshSave()
     {
         savesButton.interactable = SaveGameService.HasSave;
+        // Every save began with a new game, and so with the opening.
+        if (SaveGameService.HasSave)
+        {
+            CinematicArchive.Remember(openingCinematic);
+        }
+
+        cinematicsButton.interactable = CinematicsScreen.HasAny;
         latest = SaveGameService.LatestSave();
         loadGameButton.interactable = latest != null;
         if (latest != null)
@@ -154,6 +166,8 @@ public sealed class MainMenuView : MonoBehaviour
 
     private static void OpenOptions() => OptionsScreen.Open();
 
+    private void OpenCinematics() => CinematicsScreen.Open(RefreshSave);
+
     private static void Exit()
     {
 #if UNITY_EDITOR
@@ -170,5 +184,6 @@ public sealed class MainMenuView : MonoBehaviour
         exitButton.interactable = interactable;
         savesButton.interactable = interactable;
         optionsButton.interactable = interactable;
+        cinematicsButton.interactable = interactable && CinematicsScreen.HasAny;
     }
 }

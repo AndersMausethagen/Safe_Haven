@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Backstory
   m_EditorClassIdentifier: SafeHaven::CinematicDefinition
   title: The Old Story
+  poster: {fileID: 21300000, guid: b9eb47e4528ab174f9f71a92775c4e6e, type: 3}
   shots:
   - name: Embers
     arrives: 2
@@ -4730,5 +4731,6 @@ MonoBehaviour:
     fadeOut: 2.5
   musicWhileSpeaking: 0.55
   endFadeSeconds: 1.5
+  fadeIntoSceneSeconds: 0
   subtitleLinger: 0.6
   skipHoldSeconds: 1

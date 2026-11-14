@@ -325,6 +325,109 @@ public sealed class JournalTests
         }
     }
 
+    private static JournalCinematic Told(string asset) => Settings.Cinematics.First(c => c.cinematic != null && c.cinematic.name == asset);
+
+    private static string[] CinematicsListed(QuestLog log, CharacterProgress progress)
+    {
+        HavenShelf shelf = JournalContent.Backstory(Settings, log, progress, out _).FirstOrDefault(s => s.Title == JournalContent.CinematicShelf);
+        return shelf == null ? new string[0] : shelf.Entries.Select(e => ((CinematicDefinition)e.Key).name).ToArray();
+    }
+
+    [Test]
+    public void EveryCinematic_CanBeWatchedAgain()
+    {
+        var listed = Settings.Cinematics.Select(c => c.cinematic).ToList();
+        foreach (string guid in AssetDatabase.FindAssets("t:CinematicDefinition", new[] { "Assets/_Project/Data" }))
+        {
+            var cinematic = AssetDatabase.LoadAssetAtPath<CinematicDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            CollectionAssert.Contains(listed, cinematic, $"{cinematic.name} can't be watched again.");
+            Assert.IsNotEmpty(cinematic.Title, cinematic.name);
+            Assert.IsNotNull(cinematic.Poster, $"{cinematic.name} has no picture to show in the list.");
+        }
+
+        foreach (JournalCinematic told in Settings.Cinematics)
+        {
+            Assert.IsNotEmpty(told.line, told.cinematic.name);
+        }
+    }
+
+    [Test]
+    public void ACinematic_IsInTheJournal_OnceTheCharacterHasReachedIt()
+    {
+        var log = new QuestLog();
+        var progress = new CharacterProgress();
+        CollectionAssert.AreEqual(new[] { "Backstory" }, CinematicsListed(log, progress), "Every character has seen the opening.");
+
+        var hold = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Prologue/Quests/HoldPortal.asset");
+        Assert.AreSame(hold, Told("TheCatch").afterQuest, "The Catch plays as the portal is held.");
+        log.Restore(hold, QuestStatus.Active, null);
+        CollectionAssert.AreEqual(new[] { "Backstory" }, CinematicsListed(log, progress), "Still holding the portal.");
+        log.Restore(hold, QuestStatus.Completed, null);
+        CollectionAssert.AreEqual(new[] { "Backstory", "TheCatch" }, CinematicsListed(log, progress));
+
+        RaidDefinition woods = Told("MistyWoods").afterRaid;
+        Assert.AreSame(AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset"), woods);
+        progress.MarkRaidVisited(woods.Id);
+        CollectionAssert.AreEqual(new[] { "Backstory", "TheCatch", "MistyWoods" }, CinematicsListed(log, progress));
+
+        // A save from before raid visits were kept: the raid is in its record.
+        var older = new CharacterProgress();
+        Assert.IsFalse(JournalContent.IsUnlocked(Told("MistyWoods"), log, older));
+        older.Journal.AddRaid(new RaidRecord { Raid = woods.DisplayName, Outcome = "Extracted!" });
+        Assert.IsTrue(JournalContent.IsUnlocked(Told("MistyWoods"), log, older));
+    }
+
+    [Test]
+    public void AWatchButton_PlaysItsCinematic_OrSaysWhyNot()
+    {
+        CinematicDefinition played = null;
+        HavenEntry entry = JournalContent.CinematicEntry(Told("TheCatch"), c => played = c);
+        Assert.AreEqual("Watch", entry.Actions[0].Label);
+        Assert.IsTrue(entry.Actions[0].Enabled);
+        Assert.AreSame(Told("TheCatch").cinematic.Poster, entry.Icon);
+        StringAssert.Contains(":", entry.Status, "Its length.");
+        entry.Actions[0].Run();
+        Assert.AreSame(Told("TheCatch").cinematic, played);
+
+        entry = JournalContent.CinematicEntry(Told("TheCatch"), c => played = c, "not in co-op");
+        Assert.IsFalse(entry.Actions[0].Enabled);
+        StringAssert.Contains("not in co-op", entry.Actions[0].Label);
+        Assert.IsEmpty(JournalContent.CinematicEntry(Told("TheCatch"), null).Actions, "Nothing to press where nothing can play.");
+    }
+
+    [Test]
+    public void TheArchive_RemembersWhatThisComputerHasSeen()
+    {
+        const string key = "Cinematics.Seen";
+        bool had = PlayerPrefs.HasKey(key);
+        string kept = PlayerPrefs.GetString(key, "");
+        try
+        {
+            CinematicArchive.Forget();
+            CinematicDefinition opening = Told("Backstory").cinematic;
+            Assert.IsFalse(CinematicArchive.HasSeen(opening));
+            CinematicArchive.Remember(opening);
+            Assert.IsTrue(CinematicArchive.HasSeen(opening));
+
+            // A save that has reached a cinematic fills the record in.
+            CinematicArchive.Forget();
+            var log = new QuestLog();
+            log.Restore(Told("TheCatch").afterQuest, QuestStatus.Completed, null);
+            CinematicArchive.RememberReached(Settings, log, new CharacterProgress());
+            Assert.IsTrue(CinematicArchive.HasSeen(opening));
+            Assert.IsTrue(CinematicArchive.HasSeen(Told("TheCatch").cinematic));
+            Assert.IsFalse(CinematicArchive.HasSeen(Told("MistyWoods").cinematic), "Not entered the woods yet.");
+        }
+        finally
+        {
+            CinematicArchive.Forget();
+            if (had)
+            {
+                PlayerPrefs.SetString(key, kept);
+            }
+        }
+    }
+
     [Test]
     public void EveryPrologueCreature_WearsItsBody()
     {
