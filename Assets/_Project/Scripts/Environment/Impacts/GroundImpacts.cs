@@ -271,6 +271,13 @@ public static class GroundImpacts
         }
     }
 
+    /// <summary>What the ground is like at <paramref name="at"/> (its colour, grass, wet, snow), and whether it is open water.</summary>
+    public static GroundImpactBurst.Ground SurfaceAt(Vector3 at, out bool water)
+    {
+        Ground(at, out _, out GroundImpactBurst.Ground surface, out water);
+        return surface;
+    }
+
     /// <summary>True where grass grows (the ground layer there reads as grass or moss), for fire to spread through.</summary>
     public static bool IsGrassy(Vector3 at)
     {

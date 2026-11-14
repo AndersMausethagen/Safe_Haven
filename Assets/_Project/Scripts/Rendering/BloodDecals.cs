@@ -31,6 +31,14 @@ public static class BloodDecals
         DecalPool.Current.Press(For(color), ground, normal, along, new Vector2(size, size), uv, seconds, grow, growSeconds);
     }
 
+    /// <summary>The blood decal material in <paramref name="color"/> (its 2 x 2 atlas tinted), or null when blood decals are
+    /// not set up. Shared, cached per colour: never destroy it.</summary>
+    public static Material MaterialFor(Color color)
+    {
+        RenderingSettings settings = RenderingSettings.Current;
+        return settings.BloodDecal != null && settings.BloodAtlas != null && settings.BloodAtlas.isReadable ? For(color) : null;
+    }
+
     private static Material For(Color color)
     {
         Color32 key = color;

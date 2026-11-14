@@ -55,6 +55,7 @@ public sealed class Player : MonoBehaviour
         PlayerTraining.AddTo(gameObject);
         PlayerTechniques.AddTo(gameObject);
         PlayerWarmth.AddTo(gameObject);
+        CarriedGrime.AddTo(gameObject); // blood and mud from a fight, washed off by rain and water
         if (Current != null && Current != this)
         {
             Debug.LogWarning($"A second player ({name}) appeared; the newest one is used.", this);

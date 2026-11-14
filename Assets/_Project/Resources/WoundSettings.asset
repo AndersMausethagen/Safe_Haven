@@ -15,3 +15,11 @@ MonoBehaviour:
   armourShards: {fileID: 1800097642604793677, guid: dc906b2aa094da04199286213a5c6fa2, type: 3}
   armourChipSound: {fileID: 0}
   trailSeconds: 90
+  playerBlood: {r: 0.4, g: 0.02, b: 0.02, a: 0.95}
+  mud: {r: 0.22, g: 0.15, b: 0.08, a: 0.95}
+  mudDecal: {fileID: 0}
+  bloodPerHitTaken: 0.12
+  bloodPerHitDealt: 0.12
+  mudPerMetre: 0.02
+  rainWash: 0.02
+  waterWash: 0.5
