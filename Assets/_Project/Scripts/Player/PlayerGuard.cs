@@ -169,7 +169,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     public GuardOutcome Guard(in DamageInfo damage, out float letThrough)
     {
         letThrough = 1f;
-        if (!isActiveAndEnabled || damage.IsOverTime)
+        // A grab or a rush that no guard stops (Attack Definition › Unblockable): only a dodge gets out of it.
+        if (!isActiveAndEnabled || damage.IsOverTime || (damage.Attack != null && damage.Attack.Unblockable))
         {
             return GuardOutcome.None;
         }

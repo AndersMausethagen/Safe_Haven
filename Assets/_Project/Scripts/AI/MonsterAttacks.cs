@@ -32,6 +32,8 @@ public sealed class MonsterAttacks
     private int blowsLeft;
     private float holdFrom;
     private float holdLeft;
+    private float hazardTravelled;
+    private readonly Damageable health;
     // A held wind-up stops here in its fill, before the end, so the blow is plainly still to come.
     private const float HoldAtShare = 0.6f;
 
@@ -46,7 +48,14 @@ public sealed class MonsterAttacks
         this.movement = movement;
         this.targetLayers = targetLayers;
         readyAt = new float[definition.Attacks.Count];
+        health = self.GetComponent<Damageable>();
     }
+
+    /// <summary>Whom the current strike is at (set as it begins): a call reaches them, a screech tells the others.</summary>
+    public IDamageable Target { get; set; }
+
+    // Its own health as a share, for actions it only uses when hurt (Below Health).
+    private float HealthShare => health != null && health.MaxHealth > 0f ? health.CurrentHealth / health.MaxHealth : 1f;
 
     /// <summary>How its target is moving, flat, for actions that aim ahead of it (Lead Target).</summary>
     public Vector3 TargetVelocity { get; set; }
@@ -80,7 +89,7 @@ public sealed class MonsterAttacks
     public bool IsReady => Time.time >= nextAttackTime;
 
     /// <summary>The highest-priority action usable at <paramref name="distance"/> now, or -1.</summary>
-    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier, Phase);
+    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier, Phase, HealthShare);
 
     /// <summary>The strike that reaches <paramref name="distance"/>, spent or not, or -1: what it wheels round into when it answers a
     /// backstab. The blow it was knocked out of has just gone on cooldown, and that mustn't leave it with nothing to answer with.</summary>
@@ -104,13 +113,13 @@ public sealed class MonsterAttacks
     // Read each time, as a creature can outlive a raid's start but never changes raids.
     private static int RaidTier => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
 
-    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0, int phase = 0)
+    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0, int phase = 0, float health = 1f)
     {
         int chosen = -1;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase)
+            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase, health)
                 && (chosen < 0 || candidate.priority > attacks[chosen].priority))
             {
                 chosen = i;
@@ -194,6 +203,7 @@ public sealed class MonsterAttacks
         hitPending = true;
         shotsFired = 0;
         chargeTravelled = 0f;
+        hazardTravelled = 0f;
         chargeLength = action != null ? Mathf.Min(action.chargeDistance, toTarget.magnitude + 0.7f) : 0f;
         exposedAt = -1f;
         chargeHit = false;
@@ -317,6 +327,18 @@ public sealed class MonsterAttacks
                     return Finish();
                 }
                 return true;
+            case MonsterAttackKind.Lob:
+                if (shotsFired < action.burstCount && elapsed >= attack.HitDelay + shotsFired * action.burstInterval)
+                {
+                    ThrowLob(aimPoint);
+                    shotsFired++;
+                }
+                if (shotsFired >= action.burstCount
+                    && elapsed >= Mathf.Max(attack.RecoveryTime, attack.HitDelay + (action.burstCount - 1) * action.burstInterval + 0.3f))
+                {
+                    return Finish();
+                }
+                return true;
             case MonsterAttackKind.Charge:
                 return UpdateCharge(attack);
             case MonsterAttackKind.Howl:
@@ -370,6 +392,12 @@ public sealed class MonsterAttacks
         float step = Mathf.Min(action.chargeSpeed * Time.deltaTime, chargeLength - chargeTravelled);
         bool blocked = movement.Rush(direction, step);
         chargeTravelled += step;
+        hazardTravelled += step;
+        if (action.hazardPrefab != null && action.hazardEvery > 0f && hazardTravelled >= action.hazardEvery)
+        {
+            hazardTravelled = 0f;
+            GroundHazard.Spawn(action.hazardPrefab, self.position, combatant);
+        }
         if (!chargeHit)
         {
             chargeHit = AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers) > 0;
@@ -379,31 +407,90 @@ public sealed class MonsterAttacks
         {
             exposedAt = Time.time;
             movement.Stop();
+            if (action.hazardPrefab != null && action.hazardEvery <= 0f)
+            {
+                GroundHazard.Spawn(action.hazardPrefab, self.position, combatant);
+            }
         }
 
         return true;
     }
 
-    // Monsters of its side nearby hit harder for a while.
+    // A call: its side nearby (or only itself) hits harder, mends, hurries or hardens for a while; the others of its side
+    // learn where its foe is; its foe, near and in sight, is laid under a spell and drawn in.
     private void Howl()
     {
-        foreach (MonsterAI other in MonsterAI.Active)
+        bool rallies = action.damageBonus > 0f || action.healShare > 0f || action.speedBonus > 0f || action.hasteBonus > 0f || action.toughness > 0f;
+        if (rallies)
         {
-            if (other.CurrentState == MonsterAI.State.Dead || !other.TryGetComponent(out Combatant side) || side.Faction != combatant.Faction
-                || Vector3.Distance(self.position, other.transform.position) > action.buffRadius)
+            foreach (MonsterAI other in MonsterAI.Active)
             {
-                continue;
-            }
+                if (other.CurrentState == MonsterAI.State.Dead || !other.TryGetComponent(out Combatant side) || side.Faction != combatant.Faction
+                    || (action.selfOnly ? other.transform != self : Vector3.Distance(self.position, other.transform.position) > action.buffRadius))
+                {
+                    continue;
+                }
 
-            MonsterHowlBuff buff = other.GetComponent<MonsterHowlBuff>();
-            if (buff == null)
-            {
-                buff = other.gameObject.AddComponent<MonsterHowlBuff>();
+                MonsterHowlBuff.For(other.gameObject, action).Refresh(action);
             }
-            buff.Refresh(action.damageBonus, action.buffSeconds);
         }
 
-        GameMessages.Post($"{definition.DisplayName} howls! Nearby monsters gain +{action.damageBonus:P0} damage.", MessageKind.Warning);
+        Component foe = Target as Component;
+        if (action.alertsOthers && foe != null)
+        {
+            foreach (MonsterAI other in MonsterAI.Active)
+            {
+                if (other.transform != self && other.CurrentState != MonsterAI.State.Dead && other.TryGetComponent(out Combatant side)
+                    && side.Faction == combatant.Faction && Vector3.Distance(self.position, other.transform.position) <= action.buffRadius
+                    && !(other.Target is Component busy && busy != null))
+                {
+                    other.Engage(Target);
+                }
+            }
+        }
+
+        if ((action.foeStatus != null || Mathf.Abs(action.foePull) > 0.01f) && foe != null && Target.IsAlive
+            && Vector3.Distance(self.position, foe.transform.position) <= action.buffRadius && InSight(foe.transform))
+        {
+            if (action.foeStatus != null && foe is Damageable body)
+            {
+                StatusEffects.Apply(body, action.foeStatus, combatant);
+            }
+
+            ForcedMove.Drag(foe.transform, self.position, action.foePull, Mathf.Min(1.5f, action.buffSeconds));
+        }
+
+        if (!string.IsNullOrWhiteSpace(action.announce))
+        {
+            GameMessages.Post($"{definition.DisplayName} {action.announce}", MessageKind.Warning);
+        }
+        else if (action.damageBonus > 0f)
+        {
+            GameMessages.Post($"{definition.DisplayName} howls! Nearby monsters gain +{action.damageBonus:P0} damage.", MessageKind.Warning);
+        }
+    }
+
+    // Nothing solid between its eyes and the foe's chest.
+    private bool InSight(Transform foe)
+    {
+        Vector3 eye = self.position + Vector3.up * 1.5f;
+        Vector3 chest = foe.position + Vector3.up * 1.2f;
+        return !Physics.Linecast(eye, chest, out RaycastHit hit, ~0, QueryTriggerInteraction.Ignore)
+            || hit.transform.IsChildOf(foe) || hit.transform.IsChildOf(self);
+    }
+
+    // One lob of a burst: where the foe stands (ahead of them by Lead Target), the later ones scattered about them.
+    private void ThrowLob(Vector3? aimPoint)
+    {
+        Vector3 point = aimPoint ?? self.position + direction * Mathf.Min(action.maximumRange, 8f);
+        point += TargetVelocity * (action.lobSeconds * action.leadTarget);
+        if (shotsFired > 0 && action.lobScatter > 0f)
+        {
+            Vector2 scatter = Random.insideUnitCircle * action.lobScatter;
+            point += new Vector3(scatter.x, 0f, scatter.y);
+        }
+
+        LobStrike.Throw(combatant, action, self.position + Vector3.up * 2.2f + self.forward * 0.6f, point, targetLayers);
     }
 
     // Others of its kind rise around it and go for the player. A raid gives them its own strength.
@@ -451,7 +538,7 @@ public sealed class MonsterAttacks
 
         if (called > 0)
         {
-            GameMessages.Post($"{definition.DisplayName} calls up its kin!", MessageKind.Warning);
+            GameMessages.Post(string.IsNullOrWhiteSpace(action.announce) ? $"{definition.DisplayName} calls up its kin!" : $"{definition.DisplayName} {action.announce}", MessageKind.Warning);
         }
     }
 

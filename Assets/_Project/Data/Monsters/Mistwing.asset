@@ -60,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0.25
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -79,10 +82,70 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 2b91b6f6f679fd84c99bd78d2a9bfcd1, type: 2}
+    kind: 3
+    damage: 8
+    minimumRange: 0
+    maximumRange: 20
+    priority: 30
+    cooldown: 30
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 25
+    buffSeconds: 1
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 1
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: screeches! Everything near knows where you are.
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 1
   preferredDistance: 6
@@ -105,6 +168,7 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 0
   openWhileStriking: 1
   parriesBackstabs: 0
@@ -120,7 +184,7 @@ MonoBehaviour:
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: 940297f4488683d4eba43aa14661deb5, type: 3}
   journalLore: A low-flying thing of the deep mist, all leather and hunger. Birds go quiet when they pass.
-  journalAdvice: It holds off, then commits to one long dive. Dodge the dive and hit it during the two seconds it spends on the ground getting up again. An arrow will also find it while it circles.
+  journalAdvice: It holds off, then commits to one long dive. Dodge the dive and hit it during the two seconds it spends on the ground getting up again. An arrow will also find it while it circles. Its screech brings the whole wood down on you. Shoot it before it sees you.
   journalHabitat: Low over the ground wherever the mist is deep
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: f8c14c4607011c0488026009fd017f8b, type: 2}

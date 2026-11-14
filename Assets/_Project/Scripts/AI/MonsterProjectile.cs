@@ -11,6 +11,7 @@ public sealed class MonsterProjectile : MonoBehaviour
     private float speed;
     private float radius;
     private float remaining;
+    private GameObject hazard;
     private readonly RaycastHit[] hits = new RaycastHit[32];
 
     public void Initialize(Combatant source, MonsterAttack action, Vector3 aim)
@@ -22,6 +23,16 @@ public sealed class MonsterProjectile : MonoBehaviour
         speed = action.projectileSpeed;
         radius = action.projectileRadius;
         remaining = action.maximumRange + 3f;
+        hazard = action.hazardPrefab;
+    }
+
+    // Where it comes down, it leaves its hazard (a pool of bile), on the ground beneath.
+    private void Splash(Vector3 at)
+    {
+        if (hazard != null && owner != null)
+        {
+            GroundHazard.Spawn(hazard, at, owner);
+        }
     }
 
     private void Update()
@@ -65,7 +76,9 @@ public sealed class MonsterProjectile : MonoBehaviour
                 DamageResult result = victim.ApplyDamage(info);
                 owner.ReportDamageDealt(victim, info, result);
                 StatusEffects.AfterHit(attack, victim, owner, result);
+                ForcedMove.AfterHit(attack, victim, owner, result);
             }
+            Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point);
             PrefabPool.Release(gameObject);
             return;
         }
@@ -73,6 +86,7 @@ public sealed class MonsterProjectile : MonoBehaviour
         remaining -= step;
         if (remaining <= 0f)
         {
+            Splash(transform.position);
             PrefabPool.Release(gameObject);
         }
     }

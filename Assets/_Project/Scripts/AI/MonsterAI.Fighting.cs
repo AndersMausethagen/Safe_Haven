@@ -228,6 +228,7 @@ public sealed partial class MonsterAI
     {
         LastAction = action;
         circling = false;
+        attacks.Target = CanTarget(target) ? target : null;
         attacks.Begin(action, toTarget);
         if (IsAtThePlayer)
         {

@@ -60,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -79,10 +82,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
     kind: 1
     damage: 7.2000003
@@ -95,6 +109,9 @@ MonoBehaviour:
     leadTarget: 0.4
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 7922212942557804517, guid: f19165ba8b418784a8a32102d0e1ebe0, type: 3}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -114,10 +131,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
     kind: 1
     damage: 6
@@ -130,6 +158,9 @@ MonoBehaviour:
     leadTarget: 0.4
     fromTier: 2
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 7922212942557804517, guid: f19165ba8b418784a8a32102d0e1ebe0, type: 3}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -149,10 +180,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 1
   preferredDistance: 8
@@ -175,6 +217,7 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 35
   openWhileStriking: 1
   parriesBackstabs: 0

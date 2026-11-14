@@ -60,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps:
     - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
     comboChance: 0.45
@@ -80,10 +83,70 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 9ba16da4827cadd4d9ee418971056178, type: 2}
+    kind: 1
+    damage: 1
+    minimumRange: 3
+    maximumRange: 10
+    priority: 15
+    cooldown: 7
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 14
+    projectileRadius: 0.3
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 1
   preferredDistance: 7
@@ -106,6 +169,7 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 0
   openWhileStriking: 1
   parriesBackstabs: 1

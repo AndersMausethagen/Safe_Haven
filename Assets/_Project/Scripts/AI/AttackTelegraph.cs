@@ -69,6 +69,14 @@ public sealed class AttackTelegraph : MonoBehaviour
     private void OnAttackStarted()
     {
         attack = ai.CurrentAttack;
+        // A lob's warning is the ring where it will land (LobStrike), not an area around the thrower.
+        if (ai.ActiveAction != null && ai.ActiveAction.kind == MonsterAttackKind.Lob)
+        {
+            attack = null;
+            Hide();
+            return;
+        }
+
         if (attack == null || !EnsureMarker())
         {
             return;
@@ -128,7 +136,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     private void UpdateParryCue(float elapsed)
     {
         float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
-        if (cued || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
+        if (cued || attack.Unblockable || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
         {
             return;
         }
@@ -153,9 +161,11 @@ public sealed class AttackTelegraph : MonoBehaviour
     {
         progress = Mathf.Clamp01(progress);
         fill.localScale = new Vector3(progress, 1f, progress);
-        Color color = CombatFeelSettings.Current.TelegraphFillColor;
+        // A blow no guard stops shows in its own colour, and has no parry moment to cue.
+        bool unblockable = attack != null && attack.Unblockable;
+        Color color = unblockable ? CombatFeelSettings.Current.UnblockableColor : CombatFeelSettings.Current.TelegraphFillColor;
         float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
-        if (attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
+        if (!unblockable && attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
         {
             color = CombatFeelSettings.Current.ParryCueColor;
         }

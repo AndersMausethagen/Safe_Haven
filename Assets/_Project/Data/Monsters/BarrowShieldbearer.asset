@@ -65,6 +65,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     comboChance: 0.4
@@ -85,11 +88,22 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
-  - attack: {fileID: 11400000, guid: 0874246261e87ab489ae813831bdd9ed, type: 2}
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 82734b2b32b633a4391919bac93080f6, type: 2}
     kind: 2
     damage: 36
     minimumRange: 3
@@ -101,6 +115,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -120,10 +137,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -140,8 +168,13 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 0
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 1
   flankSpread: 0.4
+  breaksWalls: 0
   poise: 110
   openWhileStriking: 1
   parriesBackstabs: 1
@@ -151,11 +184,13 @@ MonoBehaviour:
   bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 7f709feef0127764d96cab70ec00d2a2, type: 3}
   journalLore: A draug that still remembers its shield wall. Whoever it was standing beside has been gone for centuries, and it has not noticed.
-  journalAdvice: Nothing gets through from the front. Get behind it, wait for it to strike, or break its guard with something heavy. Once staggered it can be finished like any draug.
+  journalAdvice: Nothing gets through from the front. Get behind it, wait for it to strike, or break its guard with something heavy. Once staggered it can be finished like any draug. Its shield rush can't be blocked. Step aside and strike its back.
   journalHabitat: Barrows, usually near other draugar
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: c8b7123b6caa1c14e935baba896b65c4, type: 2}

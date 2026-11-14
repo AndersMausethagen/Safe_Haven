@@ -70,6 +70,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0
     comboGap: 0
@@ -89,10 +92,21 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: f06957d4b4e90e64c852606e9bd1d50f, type: 2}
     kind: 2
     damage: 45
@@ -105,6 +119,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0
     comboGap: 0
@@ -124,10 +141,70 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 0
     summonRadius: 0
     summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 5a34058c9f6b119439a7fec3318e602f, type: 2}
+    kind: 0
+    damage: 30
+    minimumRange: 0
+    maximumRange: 3.5
+    priority: 15
+    cooldown: 10
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -144,8 +221,13 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 0
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 1
   flankSpread: 0.5
+  breaksWalls: 0
   poise: 220
   openWhileStriking: 1
   parriesBackstabs: 1
@@ -155,6 +237,8 @@ MonoBehaviour:
   bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
   sizeVariation: 0.05
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 0520016b9bfbdaa4b8a9d26748b1aa39, type: 3}

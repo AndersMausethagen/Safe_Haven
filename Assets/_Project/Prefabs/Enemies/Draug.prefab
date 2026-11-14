@@ -899,6 +899,7 @@ GameObject:
   - component: {fileID: 4589184919865568081}
   - component: {fileID: 3595056491348933822}
   - component: {fileID: 8939987690615947197}
+  - component: {fileID: 6502672948704765963}
   m_Layer: 0
   m_Name: Draug
   m_TagString: Untagged
@@ -1152,6 +1153,22 @@ MonoBehaviour:
   strideMeters: 1.3
   shake: 0
   feltDistance: 28
+--- !u!114 &6502672948704765963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9066855856663566298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f2c4922c6a050b4cb834c2c6b1633a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::RisesAgain
+  riseWith: 0.35
+  liesFor: 4
+  fallText: falls, but the dead do not stay down. Finish it, or burn it!
+  riseText: rises again!
 --- !u!1001 &2501747107637357074
 PrefabInstance:
   m_ObjectHideFlags: 0

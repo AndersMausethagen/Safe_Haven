@@ -45,6 +45,8 @@ MonoBehaviour:
   closeSenseRange: 2
   hearing: 0.6
   alertness: 1.1
+  huntsHorses: 1
+  frightensHorses: 0
   attacks:
   - attack: {fileID: 11400000, guid: 1a8ce5e4a858b50499cd9b8a27946517, type: 2}
     kind: 1
@@ -58,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -77,10 +82,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 1a8ce5e4a858b50499cd9b8a27946517, type: 2}
     kind: 1
     damage: 8.400001
@@ -93,6 +109,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 2
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -112,10 +131,70 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 1fc893bc90379cc428d0f2d7d4b3e0f9, type: 2}
+    kind: 4
+    damage: 8
+    minimumRange: 0
+    maximumRange: 14
+    priority: 20
+    cooldown: 16
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: flickers, and there are three of it! Only the true one shoots.
+    summonPrefab: {fileID: 6379332253838537309, guid: 254f934cf6943864295c4f5229006956, type: 3}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 3
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 3
   preferredDistance: 9
@@ -130,8 +209,15 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 15
   openWhileStriking: 1
   parriesBackstabs: 0
@@ -141,11 +227,13 @@ MonoBehaviour:
   bloodColor: {r: 0, g: 0, b: 0, a: 0}
   ragdollOnDeath: 0
   fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 10fb75a7ceeb39b48a12f403b0dc3cf8, type: 3}
   journalLore: A pale light drifting over wet ground. Every marsh story has one, and in all of them somebody follows it. Nobody knows what they are, and it doesn't seem to have a body to find out with.
-  journalAdvice: Follow it and it leads you off the path. Get close and it runs. Its cold bolts slow you down for whatever else is waiting, so deal with it quickly, carry a Warming Brew, and don't chase it into anything.
+  journalAdvice: Follow it and it leads you off the path. Get close and it runs. Its cold bolts slow you down for whatever else is waiting, so deal with it quickly, carry a Warming Brew, and don't chase it into anything. It calls up false lights that burst at a touch. Watch which one shoots.
   journalHabitat: Wet ground and fog banks, more often the later it gets
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: b633b11901431314faf13c709f1c62fa, type: 2}

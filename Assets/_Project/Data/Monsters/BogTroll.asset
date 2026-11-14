@@ -65,6 +65,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -84,10 +87,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
     kind: 1
     damage: 9
@@ -100,6 +114,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -119,10 +136,119 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 8bfa97a451b36b94b8b0ab374f71682c, type: 2}
+    kind: 0
+    damage: 10
+    minimumRange: 2.5
+    maximumRange: 6
+    priority: 25
+    cooldown: 9
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
+    kind: 1
+    damage: 7
+    minimumRange: 2.5
+    maximumRange: 13
+    priority: 18
+    cooldown: 10
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0.3
+    fromTier: 2
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 7922212942557804517, guid: f19165ba8b418784a8a32102d0e1ebe0, type: 3}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: db74ed924740f3f4a94f907842780bb3, type: 3}
+    burstCount: 3
+    burstInterval: 0.25
+    projectileSpeed: 12
+    projectileRadius: 0.2
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 1
   temperament: 3
   preferredDistance: 10
@@ -145,6 +271,7 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 60
   openWhileStriking: 1
   parriesBackstabs: 1
@@ -160,7 +287,7 @@ MonoBehaviour:
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: b666b4e08fa07cb4bad353b6d4ff7e01, type: 3}
   journalLore: 'In the bog villages they leave the last fish of a catch on the bank. Not for luck: so the bog troll takes that one, and not the one who caught it.'
-  journalAdvice: 'It spits poison from a distance: close in fast. Its wet hide parts under a blade (weak to slash).'
+  journalAdvice: 'It spits poison from a distance: close in fast. Its wet hide parts under a blade (weak to slash). Its tongue can''t be blocked: dodge sideways when it rears back, or it drags you in and holds you.'
   journalHabitat: The bogs and meres of the Misty Woods
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: 201034bce08e01645af54626573919a2, type: 2}

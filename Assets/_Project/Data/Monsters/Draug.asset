@@ -65,6 +65,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     comboChance: 0.5
@@ -85,10 +88,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 0874246261e87ab489ae813831bdd9ed, type: 2}
     kind: 2
     damage: 36
@@ -101,6 +115,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -120,10 +137,21 @@ MonoBehaviour:
     buffSeconds: 8
     damageBonus: 0.05
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 0dcc825bd266e1f41b828c5061e51af5, type: 2}
     kind: 3
     damage: 0
@@ -136,6 +164,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 4
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -155,10 +186,21 @@ MonoBehaviour:
     buffSeconds: 10
     damageBonus: 0.15
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -175,8 +217,13 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 0
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 1
   flankSpread: 0.5
+  breaksWalls: 0
   poise: 140
   openWhileStriking: 1
   parriesBackstabs: 1
@@ -186,11 +233,13 @@ MonoBehaviour:
   bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
   sizeVariation: 0.05
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 8d3f77f369f27ae4181654ccdf07ff80, type: 3}
   journalLore: The dead of the barrows, still in their mail. They were buried with honour and in good iron, and they remember only the iron. Old stories say fire ends them.
-  journalAdvice: Slow, patient and hard to stop, and its touch is grave-cold. It will raise a war cry to rally others. Staggered and struck from behind it can be finished outright, but it has hands enough to parry what it sees coming.
+  journalAdvice: Slow, patient and hard to stop, and its touch is grave-cold. It will raise a war cry to rally others. Staggered and struck from behind it can be finished outright, but it has hands enough to parry what it sees coming. Struck down, it rises again. Finish it while it reels, or burn it.
   journalHabitat: The old barrows and the ground around them
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: bcd71f943ff486449a5096064ea50c03, type: 2}

@@ -60,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -79,10 +82,21 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 366b223e4e5df8548802df8a32de601e, type: 2}
     kind: 0
     damage: 137.9
@@ -95,6 +109,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -114,10 +131,21 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: fb33c009bef9aad4fa946599b4db060b, type: 2}
     kind: 2
     damage: 116.2
@@ -130,6 +158,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 3
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -149,10 +180,21 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 6768ede71e21aad4dbc250cd735cdbba, type: 2}
     kind: 4
     damage: 0
@@ -165,6 +207,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 4
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -184,10 +229,119 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
     summonCount: 2
     summonRadius: 4
     summonLimit: 3
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 158d9154f59748848aa2c2eab6b9a844, type: 2}
+    kind: 0
+    damage: 120
+    minimumRange: 0
+    maximumRange: 5
+    priority: 18
+    cooldown: 12
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 250f6165bf4e86f42b02529b42205b73, type: 2}
+    kind: 5
+    damage: 85
+    minimumRange: 6
+    maximumRange: 24
+    priority: 14
+    cooldown: 14
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0.4
+    fromTier: 2
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: 0e772e2a1f82a9344ae148f75ee14d72, type: 3}
+    burstCount: 3
+    burstInterval: 0.5
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.3
+    lobScatter: 3.5
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -226,7 +380,7 @@ MonoBehaviour:
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: e2341c1edb7399046aaef05e6d041dc6, type: 3}
   journalLore: The jutuls were here before the trees. They sleep for a hundred years at a time and wake up cross, with moss on their shoulders, and walk until they find whatever woke them.
-  journalAdvice: 'Slow, and stone all over: blades skid off it. Stay out of its stamp and sweep and hit it as it recovers. Blunt weapons and fire do better than edges.'
+  journalAdvice: 'Slow, and stone all over: blades skid off it. Stay out of its stamp and sweep and hit it as it recovers. Blunt weapons and fire do better than edges. Its quake can''t be blocked: run when it raises both fists.'
   journalHabitat: Old stone and high ground, alone
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}

@@ -130,13 +130,7 @@ public sealed class RallyingBehaviour : EliteBehaviour
                 if (other != elite.Ai && other.CurrentState != MonsterAI.State.Dead && other.TryGetComponent(out Combatant side)
                     && side.Faction == elite.Combatant.Faction && Vector3.Distance(elite.transform.position, other.transform.position) <= radius)
                 {
-                    MonsterHowlBuff buff = other.GetComponent<MonsterHowlBuff>();
-                    if (buff == null)
-                    {
-                        buff = other.gameObject.AddComponent<MonsterHowlBuff>();
-                    }
-
-                    buff.Refresh(damageBonus, Interval * 1.5f);
+                    MonsterHowlBuff.For(other.gameObject, null).Refresh(damageBonus, Interval * 1.5f);
                 }
             }
         }

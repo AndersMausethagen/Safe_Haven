@@ -61,6 +61,13 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Chance from 0 to 1 that a hit leaves the status.")]
     [SerializeField, Range(0f, 1f)] private float statusChance = 1f;
 
+    [Header("Grabs and rushes")]
+    [Tooltip("Can't be blocked or parried, only dodged: a grab, a shield rush, a quake. Its warning on the ground shows in " +
+             "Combat Feel's Unblockable colour.")]
+    [SerializeField] private bool unblockable;
+    [Tooltip("Metres a hit drags its target toward the attacker (a tongue, a hand from the bog). Negative throws it away.")]
+    [SerializeField] private float pull;
+
     [Header("Animation (player)")]
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Setup › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
@@ -109,6 +116,10 @@ public sealed class AttackDefinition : ScriptableObject
     public float StaminaCost => staminaCost;
     public StatusEffectDefinition AppliesStatus => appliesStatus;
     public float StatusChance => statusChance;
+    /// <summary>Only a dodge gets out of it: no block or parry stops it.</summary>
+    public bool Unblockable => unblockable;
+    /// <summary>Metres a hit drags its target toward the attacker (negative: away).</summary>
+    public float Pull => pull;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float StrikeSpeed => strikeSpeed;

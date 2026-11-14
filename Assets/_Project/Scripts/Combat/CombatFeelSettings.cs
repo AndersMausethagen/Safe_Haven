@@ -80,6 +80,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField] private Color telegraphFillColor = new Color(1f, 0.3f, 0.1f, 0.45f);
     [Tooltip("Seconds the marker lingers, bright, after the hit lands.")]
     [SerializeField, Min(0f)] private float telegraphLinger = 0.1f;
+    [Tooltip("The fill of a blow no guard stops (a grab, a shield rush, a quake): it can only be dodged.")]
+    [SerializeField] private Color unblockableColor = new Color(0.72f, 0.12f, 0.95f, 0.55f);
 
     [Header("Dodge")]
     [Tooltip("Trail left behind while dodging. Uses the telegraph material.")]
@@ -109,6 +111,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField] private GameObject perfectDodgeEffect;
     [Tooltip("Small glint on an attacker at the parry moment.")]
     [SerializeField] private GameObject parryCueEffect;
+    [Tooltip("Where a lobbed boulder or a burst of roots lands. Empty: the structure-hit dust.")]
+    [SerializeField] private GameObject landingEffect;
 
     [Header("Slash arcs")]
     [Tooltip("Material of the arc drawn along a swing (Safe Haven/Slash). Empty draws none.")]
@@ -294,6 +298,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     public string CounterText => counterText;
     public Color TechniqueTextColor => techniqueTextColor;
     public Color ParryCueColor => parryCueColor;
+    public Color UnblockableColor => unblockableColor;
+    public GameObject LandingEffect => landingEffect != null ? landingEffect : structureHitEffect;
     public GameObject HitEffect => hitEffect;
     public GameObject CriticalHitEffect => criticalHitEffect;
     public GameObject StructureHitEffect => structureHitEffect;

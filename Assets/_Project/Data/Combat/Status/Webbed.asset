@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31b2a2fc172e1d9488596043f27fc341, type: 3}
+  m_Name: Webbed
+  m_EditorClassIdentifier: SafeHaven::StatusEffectDefinition
+  id: Webbed
+  displayName: Webbed
+  description: Strands of web cling to your legs while you stand in them.
+  color: {r: 0.85, g: 0.85, b: 0.8, a: 1}
+  icon: {fileID: 0}
+  seconds: 1
+  damagePerSecond: 0
+  damageType: 0
+  moveSpeed: 0.4

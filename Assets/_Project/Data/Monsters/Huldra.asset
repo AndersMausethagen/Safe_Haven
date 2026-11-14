@@ -39,7 +39,7 @@ MonoBehaviour:
   prefab: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
   experience: 0
   neverElite: 0
-  attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
+  attack: {fileID: 11400000, guid: aa5ba64be9ed91e46bd184a2217d1f77, type: 2}
   attackDamage: 16.800001
   attackCooldown: 1.1
   moveSpeed: 3.5
@@ -50,7 +50,109 @@ MonoBehaviour:
   closeSenseRange: 2.5
   hearing: 0.9
   alertness: 1
-  attacks: []
+  huntsHorses: 1
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: aa5ba64be9ed91e46bd184a2217d1f77, type: 2}
+    kind: 0
+    damage: 16.8
+    minimumRange: 0
+    maximumRange: 1.8
+    priority: 10
+    cooldown: 1
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps:
+    - {fileID: 11400000, guid: aa5ba64be9ed91e46bd184a2217d1f77, type: 2}
+    - {fileID: 11400000, guid: aa5ba64be9ed91e46bd184a2217d1f77, type: 2}
+    comboChance: 0.55
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0.4
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 9ae2aeb33b06edb4e8f45b9dc3152caf, type: 2}
+    kind: 3
+    damage: 8
+    minimumRange: 3
+    maximumRange: 12
+    priority: 25
+    cooldown: 14
+    interruptible: 1
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 12
+    buffSeconds: 1.2
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 11400000, guid: f288a998670b3b542bba0f0cd7349ca1, type: 2}
+    foePull: 3.5
+    announce: sings. Your feet carry you toward her...
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -65,8 +167,15 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0
   idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  breaksWalls: 0
   poise: 0
   openWhileStriking: 0
   parriesBackstabs: 0
@@ -76,11 +185,13 @@ MonoBehaviour:
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: e262214f43c6c3f469ac99aa734ab016, type: 3}
   journalLore: A forest spirit in the shape of a beautiful woman, with a hollow back like a rotten tree. Every valley has a story of someone who followed her, and they all end the same way.
-  journalAdvice: Never follow her into the trees. She is only ever open to a backstab while staggered, so wear her down and watch for the claws.
+  journalAdvice: Never follow her into the trees. She is only ever open to a backstab while staggered, so wear her down and watch for the claws. Her song draws you in. Strike her while she sings, or break her line of sight.
   journalHabitat: The deep woods, alone, where you weren't going
   journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: 5dbbae9b13ddf374e85422718aab1a71, type: 2}

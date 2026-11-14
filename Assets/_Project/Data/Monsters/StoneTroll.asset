@@ -60,6 +60,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -79,10 +82,21 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 366b223e4e5df8548802df8a32de601e, type: 2}
     kind: 0
     damage: 30
@@ -95,6 +109,9 @@ MonoBehaviour:
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -114,29 +131,43 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
-  - attack: {fileID: 11400000, guid: f92e43931c0ea274ca43f4e5bfabe6ae, type: 2}
-    kind: 1
-    damage: 14
-    minimumRange: 4
-    maximumRange: 14
-    priority: 10
-    cooldown: 6
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: c3a3e4a568fba6a45bf4d4e6d507a16d, type: 2}
+    kind: 5
+    damage: 22
+    minimumRange: 5
+    maximumRange: 22
+    priority: 12
+    cooldown: 7
     interruptible: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
     holdSeconds: 0.45
-    projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
+    projectilePrefab: {fileID: 4774033439812504928, guid: 0e772e2a1f82a9344ae148f75ee14d72, type: 3}
     burstCount: 1
     burstInterval: 0
     projectileSpeed: 0
@@ -149,10 +180,70 @@ MonoBehaviour:
     buffSeconds: 0
     damageBonus: 0
     packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
     summonLimit: 4
+    lobSeconds: 1.2
+    lobScatter: 0
+  - attack: {fileID: 11400000, guid: 57178be927a106b4c8d954833a1a7241, type: 2}
+    kind: 3
+    damage: 8
+    minimumRange: 0
+    maximumRange: 30
+    priority: 30
+    cooldown: 20
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 0.5
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 5
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 1
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0.75
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: turns to stone! Only blunt blows crack it now.
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7
@@ -191,7 +282,7 @@ MonoBehaviour:
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 068b3c93b782a844a89e6c45e4f15c2a, type: 3}
   journalLore: The old folk say a stone troll was once a troll who sat too long in the sun. It didn't die; it set. Now it walks the scree, and the mountain walks with it.
-  journalAdvice: 'Weak to blunt blows; blades and points skid. Its stomp shakes the ground around it: get out, then back in. It throws stones at range.'
+  journalAdvice: 'Weak to blunt blows; blades and points skid. Its stomp shakes the ground around it: get out, then back in. It throws stones at range. Hurt, it turns to stone for a moment: back off or bring a hammer. It throws boulders at those who stand off.'
   journalHabitat: Troll country and the deep Misty Woods, from the second tier
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}
