@@ -188,7 +188,7 @@ MonoBehaviour:
   canLoseLimbs: 1
   sizeVariation: 0.12
   shadeVariation: 0.14
-  portrait: {fileID: 21300000, guid: c74c9bd89c7b1c243ae2583b4f070b12, type: 3}
+  portrait: {fileID: 21300000, guid: 5ea01bd5f20097642a2b542ee827ade7, type: 3}
   journalLore: 'The old folk say the great spiders were spun out of the dark under the roots, and that a web across a path is a door someone has shut. What they agree on is the hourglass: when you see the red, you are already in its reach.'
   journalAdvice: 'Its web roots you where you stand: dodge the pale shot. Its bite poisons. A hammer cracks its shell (weak to blunt blows); blades and points turn on it. Cut its legs and it bleeds out fast.'
   journalHabitat: The deep Misty Woods, from the second tier

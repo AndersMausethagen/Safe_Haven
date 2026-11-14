@@ -1,0 +1,168 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: BogTroll
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: bog_troll
+  displayName: Bog Troll
+  description: A long, wet troll of the meres, more frog than man about the mouth. It keeps its distance and spits bog-venom, and shoves hard when you close in.
+  combatStats: {fileID: 11400000, guid: 976da372810926e44895f08537685bdb, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.5
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 3
+      maxQuantity: 4
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
+  experience: 45
+  neverElite: 0
+  attack: {fileID: 11400000, guid: 0733c212316a9e54999ba6d7020052f3, type: 2}
+  attackDamage: 13
+  attackCooldown: 0.6
+  moveSpeed: 3.3
+  detectionRange: 13
+  chaseRange: 20
+  leashRange: 28
+  sightAngle: 130
+  closeSenseRange: 3
+  hearing: 1.1
+  alertness: 1
+  huntsHorses: 1
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: 0733c212316a9e54999ba6d7020052f3, type: 2}
+    kind: 0
+    damage: 13
+    minimumRange: 0
+    maximumRange: 2.2
+    priority: 20
+    cooldown: 2
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  - attack: {fileID: 11400000, guid: afcd653bc45774044abc9bfc3b1ceb77, type: 2}
+    kind: 1
+    damage: 9
+    minimumRange: 2.5
+    maximumRange: 13
+    priority: 15
+    cooldown: 3.5
+    interruptible: 1
+    sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: db74ed924740f3f4a94f907842780bb3, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 3
+  preferredDistance: 10
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.3
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 5
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 0
+  poise: 60
+  openWhileStriking: 1
+  parriesBackstabs: 1
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.14, g: 0.18, b: 0.05, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
+  sizeVariation: 0.06
+  shadeVariation: 0.1
+  portrait: {fileID: 21300000, guid: b666b4e08fa07cb4bad353b6d4ff7e01, type: 3}
+  journalLore: 'In the bog villages they leave the last fish of a catch on the bank. Not for luck: so the bog troll takes that one, and not the one who caught it.'
+  journalAdvice: 'It spits poison from a distance: close in fast. Its wet hide parts under a blade (weak to slash).'
+  journalHabitat: The bogs and meres of the Misty Woods
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: 201034bce08e01645af54626573919a2, type: 2}
+  hurtSound: {fileID: 11400000, guid: edf9a8b417ec32e4e913f2aa6f79111a, type: 2}
+  attackSound: {fileID: 11400000, guid: 5b105067691d27646b16ebcebf7e5ba4, type: 2}

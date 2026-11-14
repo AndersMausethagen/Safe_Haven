@@ -1,0 +1,129 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: TrollRunt
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: troll_runt
+  displayName: Troll Runt
+  description: A scrawny young troll with quick hands and a sack. It snatches what it can from your pack and runs; it only fights when cornered.
+  combatStats: {fileID: 11400000, guid: 356184f36b2d30c4a8ce0021ff055d04, type: 2}
+  faction: 1
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+  unlocksRecipes: []
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+  experience: 20
+  neverElite: 0
+  attack: {fileID: 0}
+  attackDamage: 8.400001
+  attackCooldown: 0.6
+  moveSpeed: 4.8
+  detectionRange: 16
+  chaseRange: 18
+  leashRange: 25
+  sightAngle: 120
+  closeSenseRange: 3
+  hearing: 1
+  alertness: 0.9
+  huntsHorses: 1
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: ea84f5e69338fbd449215ef3ad11f3c3, type: 2}
+    kind: 0
+    damage: 4
+    minimumRange: 0
+    maximumRange: 1.7
+    priority: 20
+    cooldown: 1.4
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    followUps:
+    - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
+    comboChance: 0.45
+    comboGap: 0.2
+    comboFromTier: 2
+    holdChance: 0.25
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+  movementTactic: 1
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 6
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.5
+  idleGrazeChance: 0
+  idleSleepChance: 0.25
+  idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 1
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 0
+  poise: 0
+  openWhileStriking: 1
+  parriesBackstabs: 1
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 1
+  canLoseLimbs: 1
+  sizeVariation: 0.1
+  shadeVariation: 0.1
+  portrait: {fileID: 21300000, guid: 6f2528cf750429d4497f5b092c32f144, type: 3}
+  journalLore: 'Troll mothers send the runts out to learn the trade: steal, run, don''t get caught. Most of them learn the last part the hard way.'
+  journalAdvice: 'It goes for your pack, not your throat: catch it before it gets away and you get your things back. One good blow ends it.'
+  journalHabitat: Anywhere trolls go, from the first tier
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: 415a96cbaf087eb449e41c2d36dbc819, type: 2}
+  hurtSound: {fileID: 11400000, guid: 75cac6d67c2e10946b34d63ee4baec2c, type: 2}
+  attackSound: {fileID: 11400000, guid: bc7e2a748bdd9df49b0acb06c0ae61f8, type: 2}

@@ -67,11 +67,42 @@ def clean_skin(mesh, armature):
         islands.append(island)
     crumbs = [v for island in islands if len(island) < len(bm.verts) * 0.002 for v in island]
     bmesh.ops.delete(bm, geom=crumbs, context='VERTS')
+    # Bridges: where a hand hung against a thigh in the generated pose, the rig's T-pose stretches the faces between them
+    # into sheets (the Stone Troll, 2026-11-14). No real face on these bodies has an edge near 18% of the height.
+    zs = [v.co.z for v in bm.verts]
+    longest = (max(zs) - min(zs)) * 0.18
+    bridges = [f for f in bm.faces if any(e.calc_length() > longest for e in f.edges)]
+    bmesh.ops.delete(bm, geom=bridges, context='FACES_ONLY')
+    loose = [v for v in bm.verts if not v.link_faces]
+    bmesh.ops.delete(bm, geom=loose, context='VERTS')
+    print(f"[folk] {len(bridges)} stretched bridge faces removed")
     bmesh.update_edit_mesh(mesh.data)
     bpy.ops.object.mode_set(mode='OBJECT')
 
     groups = {g.index: g.name for g in mesh.vertex_groups}
     bones = set(b.name for b in armature.data.bones)
+    # No weight from a bone far from the vertex (2026-11-14: a few of the Stone Troll's hand vertices carried weight from
+    # its spine, a metre off, and stretched into blades whenever the arms moved). Far: 30% of the body's height from the
+    # bone's segment. What this leaves unweighted gets its nearest neighbour's weights below.
+    from mathutils import Vector
+    from mathutils.geometry import intersect_point_line
+    corners = [mesh.matrix_world @ Vector(c) for c in mesh.bound_box]
+    reach = (max(c.z for c in corners) - min(c.z for c in corners)) * 0.3
+    segments = {b.name: (armature.matrix_world @ b.head_local, armature.matrix_world @ b.tail_local) for b in armature.data.bones}
+    far = 0
+    for v in mesh.data.vertices:
+        p = mesh.matrix_world @ v.co
+        for g in list(v.groups):
+            name = groups.get(g.group)
+            if name not in segments or g.weight <= 0.0:
+                continue
+            a, b = segments[name]
+            q, t = intersect_point_line(p, a, b)
+            q = a if t < 0 else b if t > 1 else q
+            if (p - q).length > reach:
+                mesh.vertex_groups[g.group].remove([v.index])
+                far += 1
+    print(f"[folk] {mesh.name}: {far} weights from far bones removed")
     unweighted = [v.index for v in mesh.data.vertices if not any(g.weight > 1e-4 and groups.get(g.group) in bones for g in v.groups)]
     if unweighted:
         # Give each the weights of the nearest weighted vertex.
