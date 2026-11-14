@@ -465,6 +465,14 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         string rewards = breach.Reward.Count > 0 ? $" Reward: {AmountText.Describe(breach.Reward)}." : "";
+        // What holding it off has taught the defences (8.7): the upgrades that waited for this many breaches won.
+        PlayerCrafting crafting = player != null ? player.GetComponent<PlayerCrafting>() : null;
+        List<string> opened = crafting != null ? BuildingUnlocks.OpenedByBreaches(GameSession.Settlement.BreachesWon, crafting.Buildings) : new List<string>();
+        if (opened.Count > 0)
+        {
+            rewards += $" Now you can raise {string.Join(" and ", opened)}.";
+        }
+
         GameMessages.Post(breach.WonText + rewards, MessageKind.Gain);
         AudioManager.Play(AudioManager.Sounds?.BreachWon, transform.position);
         QuestDeeds.Raise(GameEventKind.BreachRepelled, breach, player);
@@ -644,6 +652,25 @@ public sealed class WardBreachDirector : MonoBehaviour
         laneMarkers.Clear();
     }
 
+    // How far from the portal the farthest of the player's buildings stands (on the ground plane).
+    private static float OutermostBuilding(Vector3 centre)
+    {
+        float farthest = 0f;
+        foreach (BuildingObject building in BuildingObject.Active)
+        {
+            if (building == null || building.Definition == null || building.Definition.Faction != Faction.Player)
+            {
+                continue;
+            }
+
+            Vector3 offset = building.transform.position - centre;
+            offset.y = 0f;
+            farthest = Mathf.Max(farthest, offset.magnitude + building.Footprint.HalfSize.magnitude);
+        }
+
+        return farthest;
+    }
+
     private void FindLanes(WardBreachDefinition breach, int breachNumber)
     {
         HomePortal tree = HomePortal.Current;
@@ -654,7 +681,9 @@ public sealed class WardBreachDirector : MonoBehaviour
 
         ClearLanes();
         lanesFor = breachNumber;
-        float distance = tree.WardRadius + WardBreachSettings.Current.LaneDistance;
+        // Outside what the player has built, not only outside the ward: the whole meadow can be built on (2026-11-12), and an
+        // attack must come from beyond the walls and the outermost house (the design review's 8.2, 2026-11-14).
+        float distance = Mathf.Max(tree.WardRadius, OutermostBuilding(tree.transform.position)) + WardBreachSettings.Current.LaneDistance;
         lanes.AddRange(BreachLanes.Find(tree.transform.position, distance, breach.LaneCount, breachNumber * 7919 + 1));
         if (pathMarker == null)
         {

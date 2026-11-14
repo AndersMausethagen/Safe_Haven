@@ -20,6 +20,13 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         [Min(0f)] public float raidSeconds = 90f;
         [Tooltip("What it opens, for the player: \"Opens tier II raids.\" Which tier a level opens is set on the raid's difficulties.")]
         public string opens;
+        [Tooltip("Buildings that must stand first, at a tier (the spec §4.3: a portal tier asks more than materials; " +
+                 "decision 8.4: one or two such things per tier, not a checklist).")]
+        public List<BuildingRequirement> requires = new List<BuildingRequirement>();
+        [Tooltip("Residents who must live in the Haven first.")]
+        public List<ResidentDefinition> residents = new List<ResidentDefinition>();
+        [Tooltip("Bosses that must have been beaten first (any of them; 0 = none).")]
+        [Min(0)] public int bossesBeaten;
     }
 
     /// <summary>One improvement of the portal: what it does for the moment things go wrong out there.</summary>
@@ -213,8 +220,20 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [Header("Portal ward")]
     [Tooltip("Radius around the portal, in meters, where the player may build before any upgrade.")]
     [SerializeField, Min(1f)] private float baseWardRadius = 16f;
-    [Tooltip("Upgrades bought at the portal, in order. Each grows the buildable area (GDD §6.4).")]
+    [Tooltip("Upgrades bought at the portal, in order. Each grows the sheltered area and is the next portal tier (PortalTiers).")]
     [SerializeField] private List<WardLevel> wardLevels = new List<WardLevel>();
+    [Tooltip("The portal's tiers by name (decision 8.3, 2026-11-14: the one ladder the Haven's progress is shown on): " +
+             "0 not yet repaired, 1 repaired, then one per ward level.")]
+    [SerializeField] private List<string> portalTierNames = new List<string> { "Dormant", "Awakened", "Stabilized", "Restored", "Reclaimed" };
+    [Tooltip("What each tier means, for the player, in the same order.")]
+    [SerializeField] private List<string> portalTierLines = new List<string>
+    {
+        "The portal sleeps, cracked and dark.",
+        "The portal is awake: the way to the raids stands open.",
+        "The ward holds steady around the clearing.",
+        "The portal's light reaches the edge of the meadows.",
+        "The clearing is the forest's no longer: it is yours.",
+    };
 
     [Header("Purification (GDD §13.5)")]
     [SerializeField] private ResourceDefinition cursedEssence;
@@ -236,6 +255,8 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     public int MaxSparksPerRaid => maxSparksPerRaid;
     public float BaseWardRadius => baseWardRadius;
     public IReadOnlyList<WardLevel> WardLevels => wardLevels;
+    public string PortalTierName(int tier) => tier >= 0 && tier < portalTierNames.Count ? portalTierNames[tier] : $"Tier {tier}";
+    public string PortalTierLine(int tier) => tier >= 0 && tier < portalTierLines.Count ? portalTierLines[tier] : "";
     public IReadOnlyList<PortalLevel> PortalLevels => portalLevels;
 
     /// <summary>Safe pocket slots the portal's improvements add, at a level.</summary>

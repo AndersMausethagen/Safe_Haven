@@ -49,6 +49,8 @@ public sealed class HavenOverview
     /// <summary>How far up the ladder of ranks Safe Haven stands, 0..1.</summary>
     public float Climb { get; private set; }
     public float WardRadius { get; private set; }
+    /// <summary>The portal's tier (PortalTiers): the one ladder the Haven's progress is shown on.</summary>
+    public int PortalTier { get; private set; }
     public float ClearedShare { get; private set; }
     public int Buildings { get; private set; }
     public List<HavenRenown.Part> Parts { get; } = new List<HavenRenown.Part>();
@@ -66,6 +68,7 @@ public sealed class HavenOverview
         overview.Rank = Mathf.Max(GameSession.Settlement.HavenRank, settings.RankFor(overview.Renown));
         overview.Climb = ClimbOf(settings.Ranks, overview.Rank, overview.Renown);
         overview.WardRadius = HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f;
+        overview.PortalTier = PortalTiers.Current;
         overview.ClearedShare = Overgrowth.ClearedShare;
         overview.Buildings = BuildingObject.Active.Count(IsStandingBuilding);
         overview.Parts.AddRange(Grouped(parts));
@@ -149,6 +152,15 @@ public sealed class HavenOverview
         if (hurt > 0)
         {
             Steps.Add(new Step("Mend the clearing", $"{hurt} building{(hurt == 1 ? " is" : "s are")} damaged. Pay for repairs at the portal.", use, 0));
+        }
+
+        // The portal's next tier: its materials, or what it still waits for (decision 8.4).
+        SettlementSettings.WardLevel nextTier = PortalTiers.Next(GameSession.Settlement);
+        if (nextTier != null)
+        {
+            string needs = PortalTiers.Missing(nextTier, GameSession.Settlement);
+            Steps.Add(new Step($"Raise the portal to {PortalTiers.Title(PortalTiers.Current + 1)}",
+                needs.Length > 0 ? needs : $"{AmountText.Describe(nextTier.cost)}, at the portal.", use, 0));
         }
 
         int left = Overgrowth.All.Count(piece => !piece.IsCleared);

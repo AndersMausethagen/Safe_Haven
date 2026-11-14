@@ -31,12 +31,12 @@ MonoBehaviour:
     cost: []
     result: '"Mind it. That''s the last of my village."'
     outcomes:
-    - rid: 2623125980239888502
-    - rid: 2623125980239888503
+    - rid: 2623126096390914194
+    - rid: 2623126096390914195
   references:
     version: 2
     RefIds:
-    - rid: 2623125980239888502
+    - rid: 2623126096390914194
       type: {class: GiveBoonOutcome, ns: , asm: SafeHaven}
       data:
         name: Seed Sack
@@ -45,7 +45,7 @@ MonoBehaviour:
           op: 0
           value: -15
         seconds: 180
-    - rid: 2623125980239888503
+    - rid: 2623126096390914195
       type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
       data:
         resident: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}

@@ -9,7 +9,8 @@ using UnityEngine;
 /// </summary>
 public sealed class RescueOrderTests
 {
-    private static readonly string[] Order = { "Bjarne", "Tor", "Eirik", "Gunnar", "Asa", "Yrsa", "Runa", "Liv", "Hild", "Sigrid" };
+    // Yrsa fifth since the design review (8.10, 2026-11-14): food came too late as tenth.
+    private static readonly string[] Order = { "Bjarne", "Tor", "Eirik", "Yrsa", "Gunnar", "Asa", "Runa", "Liv", "Hild", "Sigrid" };
 
     private static RaidDefinition Woods => AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
     private static RaidRumourDefinition Rumour(string file) => AssetDatabase.LoadAssetAtPath<RaidRumourDefinition>($"Assets/_Project/Data/Raids/Rumours/{file}.asset");

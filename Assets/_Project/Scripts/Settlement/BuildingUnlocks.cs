@@ -35,7 +35,8 @@ public static class BuildingUnlocks
     }
 
     /// <summary>Whether what an upgrade asks for stands. The level below it is the upgrade's own business.</summary>
-    public static bool IsOpen(BuildingLevel level) => Cheats.NoRequirements || level == null || AllStand(level.requires);
+    public static bool IsOpen(BuildingLevel level) => Cheats.NoRequirements || level == null
+        || (AllStand(level.requires) && GameSession.Settlement.BreachesWon >= level.breachesWon);
 
     /// <summary>What still has to stand, for the player: "Needs a Smithy." or "Needs a Workshop at Tier II." Empty when open.</summary>
     public static string Missing(BuildingDefinition building)
@@ -54,6 +55,12 @@ public static class BuildingUnlocks
     public static string Missing(BuildingLevel level)
     {
         List<string> missing = level != null ? Unmet(level.requires) : new List<string>();
+        int toWin = level != null ? level.breachesWon - GameSession.Settlement.BreachesWon : 0;
+        if (toWin > 0)
+        {
+            missing.Add(toWin == 1 ? "one more breach held off at the portal" : $"{toWin} more breaches held off at the portal");
+        }
+
         return missing.Count > 0 ? $"Needs {string.Join(" and ", missing)}." : "";
     }
 
@@ -71,6 +78,31 @@ public static class BuildingUnlocks
         }
 
         return missing;
+    }
+
+    /// <summary>The upgrades a won breach has just opened ("the Watch Post to Lookout"): those that ask exactly this many
+    /// breaches held off and nothing else still missing.</summary>
+    public static List<string> OpenedByBreaches(int won, IEnumerable<BuildingDefinition> all)
+    {
+        var opened = new List<string>();
+        foreach (BuildingDefinition building in all)
+        {
+            if (building == null)
+            {
+                continue;
+            }
+
+            for (int tier = 2; tier <= building.MaxLevel; tier++)
+            {
+                BuildingLevel level = building.UpgradeTo(tier);
+                if (level != null && level.breachesWon == won && AllStand(level.requires))
+                {
+                    opened.Add($"the {building.DisplayName} to {level.title}");
+                }
+            }
+        }
+
+        return opened;
     }
 
     /// <summary>"a Workshop" at tier 1, "a Workshop at Tier II" above it.</summary>

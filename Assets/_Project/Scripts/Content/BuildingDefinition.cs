@@ -44,6 +44,9 @@ public sealed class BuildingLevel
     [Header("What it does for the haven")]
     [Tooltip("What must stand before this level can be ordered, besides the level below it.")]
     public List<BuildingRequirement> requires = new List<BuildingRequirement>();
+    [Tooltip("Ward breaches held off first: a won defence teaches the defences their next step (the design review's 8.7, " +
+             "2026-11-14). 0 = none.")]
+    [Min(0)] public int breachesWon;
     [Tooltip("More beds. A resident with a bed works faster and adds comfort; nobody needs one to live or work here.")]
     [Min(0)] public int beds;
     [Tooltip("Share more Purified Essence from each batch at the altar. 0.25 means 25% more.")]
@@ -125,12 +128,23 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Min(0)] private int requiredRank;
 
     [Header("Placement")]
+    [Tooltip("The size its model is shown at (1 = as modelled, life-size). The Haven's big buildings are half size (the " +
+             "user, 2026-11-14: too big and hard to read top-down); a stable or a yard that horses and carts use is less " +
+             "small. Applied to the prefab by AgentScripts/BuildBuildingScale.cs: its collider, navigation, smoke, " +
+             "lights and points all follow. People's ground (the yard) keeps its size.")]
+    [SerializeField, Range(0.25f, 1.5f)] private float modelScale = 1f;
+    [Tooltip("Its height on top of that, as a share (1 = in proportion). The halved buildings stand a little taller than " +
+             "half (the user, 2026-11-14: \"they are a bit low now\"), for steeper roofs and doors that fit the people.")]
+    [SerializeField, Range(0.5f, 2f)] private float modelHeight = 1f;
     [Tooltip("Meters of open ground kept clear on the entrance side so the building can be reached and used. Nothing may be built there. 0 = no yard.")]
     [SerializeField, Min(0f)] private float yardDepth;
     [Tooltip("Which side of the model is the entrance, in the model's own axes (Front is its local +Z).")]
     [SerializeField] private YardSide yardSide = YardSide.Front;
     [Tooltip("Built in lines by dragging, joining the ends of others like it: walls, fences, palisades.")]
     [SerializeField] private bool placeInLines;
+    [Tooltip("Shown under the build menu's Decorations: benches, woodpiles, flower beds, posts. Things that make the Haven " +
+             "a home (comfort and renown) and do no work.")]
+    [SerializeField] private bool decoration;
 
     [Header("Crafting")]
     [Tooltip("Makes the building a crafting station: using it opens its queue of recipes for this station.")]
@@ -176,8 +190,13 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public int RequiredRank => requiredRank;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public float YardDepth => yardDepth;
+    public float ModelScale => modelScale;
+    public float ModelHeight => modelHeight;
+    /// <summary>The scale its model is shown at, per axis: ModelScale across, ModelScale × ModelHeight up.</summary>
+    public Vector3 ModelSize => new Vector3(modelScale, modelScale * modelHeight, modelScale);
     public YardSide YardSide => yardSide;
     public bool PlaceInLines => placeInLines;
+    public bool Decoration => decoration;
     public CraftingStationType Station => station;
     public int OutputCapacity => Mathf.Max(1, outputCapacity);
     public int QueueLength => Mathf.Max(1, queueLength);

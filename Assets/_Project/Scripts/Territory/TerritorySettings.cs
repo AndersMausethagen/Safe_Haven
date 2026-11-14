@@ -66,7 +66,10 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Tooltip("From here a held region is Secure.")]
     [SerializeField, Range(0f, 100f)] private float secureFrom = 70f;
 
-    [Header("Erosion (each turn: a dawn at home, or a raid ended)")]
+    [Header("Erosion (each turn: a dawn at home, or a raid ended), only under blight")]
+    [Tooltip("What a turn wears off a held region as soon as the woods round home are blighted at all (at a quarter of " +
+             "the blight it is all there). Without blight a hold stands still (design review 8.14, 2026-11-14: the home " +
+             "mustn't become upkeep that punishes going out).")]
     [SerializeField, Min(0f)] private float erosion = 1f;
     [Tooltip("More erosion at full blight.")]
     [SerializeField, Min(0f)] private float erosionPerBlight = 4f;
@@ -160,7 +163,8 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     public float FindHold => findHold;
     public float SlippingBelow => slippingBelow;
     public float SecureFrom => secureFrom;
-    public float ErosionAt(float blight) => erosion + erosionPerBlight * Mathf.Clamp01(blight);
+    public float ErosionAt(float blight) => blight <= 0f ? 0f
+        : erosion * Mathf.Clamp01(blight * 4f) + erosionPerBlight * Mathf.Clamp01(blight);
     public int FirstPushAfter => firstPushAfter;
     public int RestAfterPush => restAfterPush;
     public float PushChanceAt(float blight) => Mathf.Min(mostPushChance, pushChance + pushChancePerBlight * Mathf.Clamp01(blight));

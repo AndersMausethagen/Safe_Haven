@@ -29,7 +29,11 @@ public sealed class HomePortalMenu
         var body = new StringBuilder();
         // What it says is its own (MenuPage.Story: PortalWindow shows it apart, in italics); the rest is what it tells.
         string line = portal.SpokenLine();
-        body.Append($"<color={UIStyle.Hex(style.Accent)}>The ward shelters {portal.WardRadius:0} m around the portal. You can build inside it.</color>");
+        // The portal's tier first: the one ladder the Haven's progress is shown on (PortalTiers). The whole meadow can be built
+        // on (2026-11-12); the ward is the sheltered ground, where the night's prowlers don't come.
+        int tier = PortalTiers.Of(settlement);
+        body.Append($"<color={UIStyle.Hex(style.Accent)}>Portal {PortalTiers.Title(tier)}.</color> {PortalTiers.Line(tier)}");
+        body.Append($"\n<color={UIStyle.Hex(style.Muted)}>The ward shelters {portal.WardRadius:0} m around the portal.</color>");
         WardBreachDirector breach = WardBreachDirector.Current;
         if (breach != null && breach.IsPending)
         {
@@ -79,14 +83,18 @@ public sealed class HomePortalMenu
         }
 
         int level = settlement.WardLevel;
-        if (level < settings.WardLevels.Count)
+        SettlementSettings.WardLevel next = sleeping ? null : PortalTiers.Next(settlement);
+        if (next != null)
         {
-            SettlementSettings.WardLevel next = settings.WardLevels[level];
             bool affordable = MaterialPool.For(user).CanAfford(next.cost, null, out string missing);
+            // Beyond its materials a tier asks one or two things (decision 8.4): those show in place of the cost until they stand.
+            string needs = PortalTiers.Missing(next, settlement);
             string opens = string.IsNullOrEmpty(next.opens) ? "" : $". {next.opens}";
             // What is missing shows as its state on the right ("Not enough"), so the line keeps to what it costs and gives.
-            string detail = $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}";
-            page.Add(new MenuAction("Strengthen the ward", detail, affordable, () => StrengthenWard(user)) { Icon = "Barding", Status = affordable ? "" : "Not enough" });
+            string detail = needs.Length > 0 ? needs : $"{AmountText.Describe(next.cost)}  →  ward {settings.WardRadiusAt(level + 1):0} m{opens}";
+            bool open = needs.Length == 0;
+            page.Add(new MenuAction($"Raise the portal to {PortalTiers.Title(tier + 1)}", detail, affordable && open, () => StrengthenWard(user))
+                { Icon = "Barding", Status = !open ? "Needs more" : affordable ? "" : "Not enough" });
         }
 
         if (breach != null && breach.IsPending)
@@ -171,7 +179,19 @@ public sealed class HomePortalMenu
     {
         SettlementSettings settings = SettlementSettings.Current;
         int level = GameSession.Settlement.WardLevel;
-        if (level >= settings.WardLevels.Count || !MaterialPool.For(user).TrySpend(settings.WardLevels[level].cost))
+        if (level >= settings.WardLevels.Count)
+        {
+            return;
+        }
+
+        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Settlement);
+        if (needs.Length > 0)
+        {
+            GameMessages.Post(needs, MessageKind.Warning);
+            return;
+        }
+
+        if (!MaterialPool.For(user).TrySpend(settings.WardLevels[level].cost))
         {
             return;
         }
@@ -190,10 +210,17 @@ public sealed class HomePortalMenu
             return HavenDecisions.Outcome.Refused("The ward was raised meanwhile: what you gave is back in your bag.");
         }
 
+        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Settlement);
+        if (needs.Length > 0)
+        {
+            return HavenDecisions.Outcome.Refused(needs + " What you gave is back in your bag.");
+        }
+
         GameSession.Settlement.RaiseWardLevel();
         string opens = settings.WardLevels[level].opens;
         float reach = settings.WardRadiusAt(GameSession.Settlement.WardLevel);
-        return HavenDecisions.Outcome.Made($"The portal glows brighter. The ward now reaches {reach:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}");
+        string tier = PortalTiers.Title(PortalTiers.Current);
+        return HavenDecisions.Outcome.Made($"The portal glows brighter: it stands at {tier}. The ward now reaches {reach:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}");
     }
 
     private static void OpenHaven()

@@ -63,18 +63,22 @@ public sealed class NightTests
         StringAssert.Contains("Cursed Essence", night.briefing);
     }
 
-    // Playtest 2026-11-05: corruption from the Misty Woods, rare at first and growing with the Haven.
+    // Playtest 2026-11-05: corruption from the Misty Woods; since the design review (8.5, 8.6, 2026-11-14) foretold a raid
+    // ahead, by the portal's tier and the blight, never by the buildings.
     [Test]
-    public void Corruption_IsRareAtFirst_GrowsWithTheHaven_AndStaysASmallBand()
+    public void Corruption_IsRareAtFirst_GrowsWithThePortalAndTheBlight_AndStaysASmallBand()
     {
         CorruptionSettings settings = CorruptionSettings.Current;
         Assert.NotNull(settings, "Resources/CorruptionSettings");
-        Assert.AreEqual(0f, settings.ChanceAt(0), "the first days are left to building");
-        Assert.AreEqual(1f / 6f, settings.ChanceAt(1), 0.02f, "about one night in six at first");
-        Assert.Greater(settings.ChanceAt(5), settings.ChanceAt(1), "more likely as the Haven grows");
-        Assert.LessOrEqual(settings.ChanceAt(50), 0.5f, "never most nights");
-        Assert.AreEqual(3, settings.CountAt(1));
-        Assert.LessOrEqual(settings.CountAt(50), 8, "a band, not a breach");
+        Assert.AreEqual(0f, settings.ChanceAt(0, 1f), "nothing before the portal wakes");
+        Assert.AreEqual(0f, settings.ChanceAt(1, 1f), "nor before the ward is first raised: the first days are left to building");
+        Assert.Greater(settings.ChanceAt(2, 0f), 0f, "it can come once the ward stands");
+        Assert.Less(settings.ChanceAt(2, 0f), 0.34f, "rare at first");
+        Assert.Greater(settings.ChanceAt(4, 0f), settings.ChanceAt(2, 0f), "more likely as the portal grows");
+        Assert.Greater(settings.ChanceAt(2, 1f), settings.ChanceAt(2, 0f), "and as the blight spreads");
+        Assert.LessOrEqual(settings.ChanceAt(4, 1f), 0.5f, "never most homecomings");
+        Assert.AreEqual(3, settings.CountAt(2, 0f));
+        Assert.LessOrEqual(settings.CountAt(4, 1f), 8, "a band, not a breach");
         Assert.Greater(settings.Creatures.Count, 0);
         foreach (UnityEngine.GameObject creature in settings.Creatures)
         {

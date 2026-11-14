@@ -2,28 +2,35 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// How the Misty Woods' corruption creeps into the Haven at night (CorruptionNights). Rare at first and more likely, and
-/// larger, as the Haven grows (its rank): a small wave that walls, guards and the player can mostly hold, unlike a ward
-/// breach. Lives in Resources.
+/// How the Misty Woods' corruption creeps into the Haven at night (CorruptionNights): a small wave that walls, guards and
+/// the player can mostly hold, unlike a ward breach. Since the design review (decisions 8.5 and 8.6, 2026-11-14) it is
+/// foretold, never a surprise: when the player comes home from a raid the portal may sense it gathering, says from where,
+/// and it comes at the next nightfall. How likely and how large follow the portal's tier and the blight in the woods,
+/// never the buildings or renown (the spec's principle 11: don't punish building). Lives in Resources.
 /// </summary>
 [CreateAssetMenu(fileName = "CorruptionSettings", menuName = "Safe Haven/Settings/Corruption Settings")]
 public sealed class CorruptionSettings : GameSettings<CorruptionSettings>
 {
-    [Header("When")]
-    [Tooltip("No corruption before the Haven reaches this rank, so the first days are left to building.")]
-    [SerializeField, Min(0)] private int fromRank = 1;
-    [Tooltip("Chance on a night at that first rank (0.17: about one night in six).")]
-    [SerializeField, Range(0f, 1f)] private float chance = 0.17f;
-    [Tooltip("Chance added per Haven rank above the first.")]
-    [SerializeField, Range(0f, 0.3f)] private float chancePerRank = 0.03f;
-    [SerializeField, Range(0f, 1f)] private float mostChance = 0.45f;
+    [Header("When: foretold at a homecoming, a raid ahead")]
+    [Tooltip("No corruption before the portal reaches this tier (PortalTiers; 2 = Stabilized, the ward's first level): the " +
+             "woods take notice once the ward is raised, and the first days are left to building.")]
+    [SerializeField, Min(0)] private int fromPortalTier = 2;
+    [Tooltip("Chance, on coming home from a successful raid at that first tier, that it gathers for the next night.")]
+    [SerializeField, Range(0f, 1f)] private float chance = 0.25f;
+    [Tooltip("Chance added per portal tier above the first.")]
+    [SerializeField, Range(0f, 0.3f)] private float chancePerTier = 0.05f;
+    [Tooltip("Chance added at full blight in the woods round home (it scales with the blight).")]
+    [SerializeField, Range(0f, 1f)] private float chancePerBlight = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float mostChance = 0.5f;
 
     [Header("The wave")]
     [Tooltip("What comes. One is picked at random for each creature.")]
     [SerializeField] private List<GameObject> creatures = new List<GameObject>();
     [SerializeField, Min(1)] private int count = 3;
-    [Tooltip("Haven ranks for each extra creature.")]
-    [SerializeField, Min(1)] private int ranksPerExtra = 2;
+    [Tooltip("Creatures added per portal tier above the first.")]
+    [SerializeField, Min(0)] private int countPerTier = 1;
+    [Tooltip("Creatures added at full blight (it scales with the blight).")]
+    [SerializeField, Min(0)] private int countPerBlight = 3;
     [SerializeField, Min(1)] private int mostCount = 8;
     [Tooltip("Metres from the Haven's portal where they come out of the dark.")]
     [SerializeField] private Vector2 distance = new Vector2(45f, 60f);
@@ -49,6 +56,8 @@ public sealed class CorruptionSettings : GameSettings<CorruptionSettings>
     [SerializeField, Min(0)] private int experiencePerCreature = 10;
 
     [Header("Words")]
+    [Tooltip("Said on coming home when it gathers for the next night. {0} is where from (\"the north-east\").")]
+    [SerializeField] private string foretold = "The portal stirs: corruption gathers in the woods to the {0}. At nightfall it will come for the Haven. Ready the walls and the fire.";
     [SerializeField] private string warning = "The mist thickens at the forest edge. Something from the Misty Woods is coming for the Haven.";
     [SerializeField] private string cleared = "The corruption is beaten back. The night is quiet again.";
 
@@ -58,15 +67,19 @@ public sealed class CorruptionSettings : GameSettings<CorruptionSettings>
     public float Delay => delay;
     public float DawnSeconds => dawnSeconds;
     public string Warning => warning;
+    public string Foretold => foretold;
     public string Cleared => cleared;
     public SoundDefinition WarningSound => warningSound;
     public WeatherDefinition Weather => weather;
     public float WeatherSeconds => weatherSeconds;
     public int ExperienceFor(int creatures) => experience + experiencePerCreature * Mathf.Max(0, creatures);
 
-    /// <summary>The chance of a corrupted night at a Haven rank (0 below the first rank).</summary>
-    public float ChanceAt(int rank) => rank < fromRank ? 0f : Mathf.Min(mostChance, chance + chancePerRank * (rank - fromRank));
+    /// <summary>The chance, on a homecoming, that it gathers for the next night: by the portal's tier and the blight (0..1),
+    /// 0 below the first tier. Never by buildings or renown.</summary>
+    public float ChanceAt(int portalTier, float blight) => portalTier < fromPortalTier ? 0f
+        : Mathf.Min(mostChance, chance + chancePerTier * (portalTier - fromPortalTier) + chancePerBlight * Mathf.Clamp01(blight));
 
-    /// <summary>How many come at a Haven rank.</summary>
-    public int CountAt(int rank) => Mathf.Min(mostCount, count + Mathf.Max(0, rank - fromRank) / ranksPerExtra);
+    /// <summary>How many come: by the portal's tier and the blight.</summary>
+    public int CountAt(int portalTier, float blight) => Mathf.Min(mostCount,
+        count + countPerTier * Mathf.Max(0, portalTier - fromPortalTier) + Mathf.RoundToInt(countPerBlight * Mathf.Clamp01(blight)));
 }

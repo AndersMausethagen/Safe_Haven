@@ -61,7 +61,7 @@ public static class ContentAudit
     {
         "BuildingDefinition.requires", "BuildingDefinition.upgrades[].requires", "BuildingObject.definition", "JobDefinition.workplace",
         "ProficiencyDefinition.mentor", "PrologueDefinition.campfire", "QuestDefinition.objectives", "RaidRumourDefinition.needsBuilding",
-        "RecipeBook.buildings", "SettlementSettings.residentGatheringPlace",
+        "RecipeBook.buildings", "SettlementSettings.residentGatheringPlace", "SettlementSettings.wardLevels[].requires",
     };
 
     private static readonly string[] MonsterAsks = { "QuestDefinition.objectives", "JournalSettings.", "RaidDefinition.knownEnemies" };

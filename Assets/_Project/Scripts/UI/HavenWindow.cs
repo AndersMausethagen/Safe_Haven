@@ -372,7 +372,8 @@ public sealed class HavenWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         IReadOnlyList<HavenSettings.Rank> ranks = HavenSettings.Current.Ranks;
         bool last = overview.Rank >= ranks.Count - 1;
-        wardValue.text = $"{overview.WardRadius:0}<size=60%> m";
+        // The portal's tier, the one ladder (PortalTiers): its numeral, and its name small beside it.
+        wardValue.text = $"{Tiers.ToRoman(overview.PortalTier)}<size=50%> {PortalTiers.Name(overview.PortalTier)}</size>";
         clearedValue.text = $"{overview.ClearedShare * 100f:0}<size=60%>%";
         buildingsValue.text = overview.Buildings.ToString();
         if (ranks.Count == 0)
@@ -550,7 +551,7 @@ public sealed class HavenWindow : MonoBehaviour
         rankLine.color = style.Muted;
 
         renownValue = Figure("Renown", 664f, 148f, style.Accent, style);
-        wardValue = Figure("Ward", 812f, 124f, style.Text, style);
+        wardValue = Figure("Portal", 812f, 124f, style.Text, style);
         clearedValue = Figure("Cleared", 936f, 124f, style.Text, style);
         buildingsValue = Figure("Buildings", 1060f, 136f, style.Text, style);
     }

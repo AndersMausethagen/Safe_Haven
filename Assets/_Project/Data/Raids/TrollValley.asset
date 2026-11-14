@@ -42,7 +42,7 @@ MonoBehaviour:
   likelyResources:
   - {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
   - {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-  durationSeconds: 1000
+  durationSeconds: 720
   extractionSeconds: 30
   lootMultiplier: 1
   enemyHealthMultiplier: 1
@@ -707,6 +707,10 @@ MonoBehaviour:
     lootBonus: 0.8
   extractedArtwork: {fileID: 21300000, guid: f6200e83d47f53b4a9bb5caaac1e4ce0, type: 3}
   failedArtwork: {fileID: 21300000, guid: 2d5abc1323296414dbc3f2a04829ebc2, type: 3}
+  extractedMotion: {fileID: 0}
+  failedMotion: {fileID: 0}
+  extractedSound: {fileID: 0}
+  failedSound: {fileID: 0}
   placeArtwork: {fileID: 21300000, guid: de7ec80d00a4d5f49a908925d1de0e06, type: 3}
   references:
     version: 2

@@ -31,16 +31,16 @@ MonoBehaviour:
     cost: []
     result: '"Mind the stakes," he says, from somewhere under the boar.'
     outcomes:
-    - rid: 2623125980239888500
-    - rid: 2623125980239888501
+    - rid: 2623126096390914192
+    - rid: 2623126096390914193
   references:
     version: 2
     RefIds:
-    - rid: 2623125980239888500
+    - rid: 2623126096390914192
       type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
       data:
         seconds: -30
-    - rid: 2623125980239888501
+    - rid: 2623126096390914193
       type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
       data:
         resident: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}

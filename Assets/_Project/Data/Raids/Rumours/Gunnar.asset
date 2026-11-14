@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
-  afterHome: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+  afterHome: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1
@@ -28,3 +28,4 @@ MonoBehaviour:
   untilBeaten: {fileID: 0}
   urgent: 1
   seeksLost: 0
+  forestPushing: 0

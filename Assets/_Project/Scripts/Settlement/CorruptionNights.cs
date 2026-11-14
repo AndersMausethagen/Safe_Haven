@@ -3,12 +3,13 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Corruption from the Misty Woods (playtest 2026-11-05): at each nightfall there is a chance (CorruptionSettings, rare at
-/// first and growing with the Haven's rank) that it creeps in. The player is warned, and a little later a band of creatures
-/// comes out of the dark from one direction and goes for the buildings, turning on anyone close (HomeAssault, as a ward
-/// breach does). They keep their loot. Survivors slink off at dawn. Unlike Night Prowlers they do walk into the light.
-/// Never during a ward breach. Not saved: a night loaded mid-way is not rolled again. Lives in SafeHaven, beside
-/// NightProwlers.
+/// Corruption from the Misty Woods (playtest 2026-11-05), foretold since the design review (decision 8.5, 2026-11-14):
+/// coming home from a successful raid, the portal may sense it gathering (CorruptionSettings: by the portal's tier and the
+/// blight, never the buildings) and says from which side; at the next nightfall it comes, and a little after the warning
+/// a band of creatures comes out of the dark from that side and goes for the buildings, turning on anyone close
+/// (HomeAssault, as a ward breach does). They keep their loot. Survivors slink off at dawn. Unlike Night Prowlers they do
+/// walk into the light. Never during a ward breach. Not saved: a foretelling or a night loaded mid-way is let go. Lives in
+/// SafeHaven, beside NightProwlers.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class CorruptionNights : MonoBehaviour
@@ -29,6 +30,15 @@ public sealed class CorruptionNights : MonoBehaviour
     private int bandSize;
     private WeatherSystem weatherSystem;
     private WeatherDefinition weatherBefore;
+    private float foretellAt = -1f;
+
+    // The homecoming the last foretelling was made for (successful raids so far), and whether it gathers for the next night,
+    // from where. Kept across the scenes of a play session, as the player goes out and comes home.
+    private static int foretoldFor = -1;
+    private static bool foretold;
+    private static float foretoldBearing;
+    // A moment after arriving, so the homecoming's own words come first.
+    private const float ForetellDelay = 6f;
 
     /// <summary>The corruption in the loaded scene, or null.</summary>
     public static CorruptionNights Current { get; private set; }
@@ -39,7 +49,16 @@ public sealed class CorruptionNights : MonoBehaviour
     public IReadOnlyList<MonsterAI> Attackers => attackers;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        foretoldFor = -1;
+        foretold = false;
+        foretoldBearing = 0f;
+    }
+
+    /// <summary>True when it has gathered and comes at the next nightfall.</summary>
+    public static bool IsForetold => foretold;
 
     private void OnEnable() => Current = this;
 
@@ -53,6 +72,13 @@ public sealed class CorruptionNights : MonoBehaviour
         cycle = FindAnyObjectByType<DayNightCycle>();
         // A game loaded at night doesn't roll that night again.
         wasNight = cycle != null && cycle.IsNight;
+        // The first arrival of a play session (a new or loaded game) is no homecoming: nothing is foretold for it.
+        if (foretoldFor < 0)
+        {
+            foretoldFor = GameSession.Settlement.SuccessfulExtractions;
+        }
+
+        foretellAt = Time.time + ForetellDelay;
     }
 
     private void Update()
@@ -64,6 +90,12 @@ public sealed class CorruptionNights : MonoBehaviour
         }
 
         nextCheck = Time.time + CheckInterval;
+        if (foretellAt >= 0f && Time.time >= foretellAt)
+        {
+            foretellAt = -1f;
+            Foretell();
+        }
+
         bool night = cycle != null && cycle.IsNight;
         if (night && !wasNight)
         {
@@ -96,9 +128,10 @@ public sealed class CorruptionNights : MonoBehaviour
         GameMessages.Post(settings.Warning, MessageKind.Warning);
         comeAt = Time.time + (afterSeconds >= 0f ? afterSeconds : settings.Delay);
         fought = false;
-        // The night's direction is chosen now, so the warning comes from where the band will.
-        // From the weakest of the Haven's lands, or where the forest is pushing (Territory).
-        bearing = Territory.NightBearing(Centre());
+        // The night's direction: where it was foretold from, else chosen now (the weakest of the Haven's lands, or where the
+        // forest is pushing: Territory), so the warning comes from where the band will.
+        bearing = foretold ? foretoldBearing : Territory.NightBearing(Centre());
+        foretold = false;
         Vector3 edge = Centre() + Direction(bearing) * settings.Distance.x;
         AudioManager.Play(settings.WarningSound, edge);
         BringWeather(settings);
@@ -134,18 +167,48 @@ public sealed class CorruptionNights : MonoBehaviour
         weatherBefore = null;
     }
 
+    // Only what was foretold comes: never a surprise (decision 8.5).
     private void Nightfall()
     {
-        if (IsActive || (WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive))
+        if (!foretold || IsActive || (WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive))
         {
             return;
         }
 
-        float chance = CorruptionSettings.Current.ChanceAt(GameSession.Settlement.HavenRank);
-        if (chance > 0f && Random.value < chance)
+        Begin();
+    }
+
+    // On coming home from a successful raid: whether it gathers for the next night, and from where. Not while a ward breach
+    // is near or waiting, which is the home's fight then.
+    private void Foretell()
+    {
+        SettlementState settlement = GameSession.Settlement;
+        int extractions = settlement.SuccessfulExtractions;
+        if (extractions == foretoldFor || HavenVisit.IsVisiting)
         {
-            Begin();
+            return;
         }
+
+        foretoldFor = extractions;
+        foretold = false;
+        WardBreachDirector breach = WardBreachDirector.Current;
+        if (IsActive || settlement.BreachIsNear || (breach != null && (breach.IsActive || breach.IsPending)))
+        {
+            return;
+        }
+
+        CorruptionSettings settings = CorruptionSettings.Current;
+        float chance = settings.ChanceAt(PortalTiers.Of(settlement), settlement.Blight);
+        if (chance <= 0f || Random.value >= chance)
+        {
+            return;
+        }
+
+        foretold = true;
+        Vector3 centre = Centre();
+        foretoldBearing = Territory.NightBearing(centre);
+        string side = "the " + BreachLanes.Compass(centre, centre + Direction(foretoldBearing) * 10f);
+        GameMessages.Post(string.Format(settings.Foretold, side), MessageKind.Warning);
     }
 
     // The band comes from one direction, out of sight in the dark beyond the clearing.
@@ -158,7 +221,7 @@ public sealed class CorruptionNights : MonoBehaviour
         }
 
         Vector3 centre = Centre();
-        int count = settings.CountAt(GameSession.Settlement.HavenRank);
+        int count = settings.CountAt(PortalTiers.Current, GameSession.Settlement.Blight);
         float chaseLimit = WardBreachSettings.Current.ChaseLimit;
         for (int i = 0; i < count; i++)
         {

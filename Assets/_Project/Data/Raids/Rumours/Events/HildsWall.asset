@@ -31,32 +31,32 @@ MonoBehaviour:
     cost: []
     result: '"There. Now it''ll stand."'
     outcomes:
-    - rid: 2623125980239888508
-    - rid: 2623125980239888509
+    - rid: 2623126096390914200
+    - rid: 2623126096390914201
   - label: Pull a stretch down
     detail: Quick, and loud, and she'll never forgive you.
     cost: []
     result: She climbs out over the rubble without a word.
     outcomes:
-    - rid: 2623125980239888510
-    - rid: 2623125980239888511
+    - rid: 2623126096390914202
+    - rid: 2623126096390914203
   references:
     version: 2
     RefIds:
-    - rid: 2623125980239888508
+    - rid: 2623126096390914200
       type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
       data:
         seconds: -90
-    - rid: 2623125980239888509
+    - rid: 2623126096390914201
       type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
       data:
         resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
         traveler: {fileID: 4560087502640453408, guid: 34ab3b53d3ced634486fa4ab89e59887, type: 3}
-    - rid: 2623125980239888510
+    - rid: 2623126096390914202
       type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
       data:
         radius: 35
-    - rid: 2623125980239888511
+    - rid: 2623126096390914203
       type: {class: RescueResidentOutcome, ns: , asm: SafeHaven}
       data:
         resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}

@@ -44,7 +44,9 @@ public static class BuildRescueOrder
         public string WorkFile, WorkTitle, WorkText;
     }
 
-    // The order of Docs/RescueOrder.md. Ingrid is the story's first rescue (AStrangerInTheMist) and is not a rumour.
+    // The order of Docs/RescueOrder.md. Ingrid is the story's first rescue (AStrangerInTheMist) and is not a rumour. Yrsa
+    // comes fifth, after Eirik (the design review's 8.10, 2026-11-14: food and the Kitchen felt too late as tenth); her
+    // meals need meat, fish, mushrooms and berries from the woods, not the farm that comes after her.
     private static readonly Person[] Order =
     {
         new Person
@@ -54,7 +56,7 @@ public static class BuildRescueOrder
             RescueText = "Every raid sends your club and tools home more broken, and the Workshop can only patch them. Ingrid heard a hammer in the deep woods at dusk: Bjarne, the expedition's smith. Look for him in the portal's briefing, find him and bring him home.",
             Whisper = "<i>Listen. A hammer, far off in the deep woods, slow and uneven. One of yours. Ask me what the woods hold before you go, and I will tell you where.</i>",
             WorkFile = "TheSmith", WorkTitle = "A Smith's Hearth",
-            WorkText = "Bjarne mends what the woods break, at half the cost, and smelts the copper you bring him. Give him the Smith's work, and raise the Smithy he showed you (G). At Tier II it makes copper tools.",
+            WorkText = "Bjarne mends what the woods break, at half the cost, and smelts the copper you bring him. Give him the Smith's work, and raise the Smithy he showed you ({key:Build}). At Tier II it makes copper tools.",
         },
         new Person
         {
@@ -63,7 +65,7 @@ public static class BuildRescueOrder
             RescueText = "Logs are heavy and good for little: shields, walls and a dry shed all want planks, and a hatchet won't make them. Bjarne says Tor, the expedition's carpenter, was thrown into the deep woods with a broken leg. Listen for a saw where nobody saws, and bring him home.",
             Whisper = "<i>A saw, out where nobody saws. Your carpenter is hurt, but he is still measuring.</i>",
             WorkFile = "WoodcuttersLodge", WorkTitle = "The Woodcutter's Lodge",
-            WorkText = "Tor turns logs into planks while you are away. Give him the Carpenter's work and build the Woodcutter's Lodge he showed you, near the trees (G). Palisades, a storage shed and a watch post all start with a plank, and at Tier II his lodge plans a Wainwright's Yard.",
+            WorkText = "Tor turns logs into planks while you are away. Give him the Carpenter's work and build the Woodcutter's Lodge he showed you, near the trees ({key:Build}). Palisades, a storage shed and a watch post all start with a plank, and at Tier II his lodge plans a Wainwright's Yard.",
         },
         new Person
         {
@@ -72,25 +74,7 @@ public static class BuildRescueOrder
             RescueText = "Something has started testing the ward, and walls alone won't hold it. Someone has been holding a clearing against wolves for days: it can only be Eirik, who taught you to fight. Bring him home.",
             Whisper = "<i>Something tests my ward. Out there, someone else is holding a clearing against the wolves. Bring him to hold mine.</i>",
             WorkFile = "TheWarden", WorkTitle = "The Watch",
-            WorkText = "Eirik keeps the ward: in a breach it holds half as long again. Give him the Warden's work, and build a Watch Post where he can see the old path (G).",
-        },
-        new Person
-        {
-            Name = "Gunnar", Resident = "Settlement/Gunnar", Job = "Hunter", Workplace = "TanningRack",
-            RescueTitle = "The Hunter's Pit",
-            RescueText = "Hides pile up in the stash and rot there, and copper is the last armour you can make without leather to line it. A hunter has been setting snares in the deep woods, alone by choice. Find him, and bring him home.",
-            Whisper = "<i>A snare line, a mile of it, and at the end a man who did not mean to be caught.</i>",
-            WorkFile = "TheHunter", WorkTitle = "Hides and Hooks",
-            WorkText = "Gunnar cures hides into leather. Give him the Hunter's work and build him a Hunter's Lodge (G). He knows the water as well as the woods: as a Fisher he runs a Dock.",
-        },
-        new Person
-        {
-            Name = "Asa", Resident = "Settlement/Asa", Job = "Farmer", Workplace = "FarmPlot",
-            RescueTitle = "Seed from the Ashes",
-            RescueText = "Berries and game don't stretch to a haven full of people, and long raids leave you hungry. A farmer was seen at a burned farmstead in the deep woods, still guarding her seed. Bring her home.",
-            Whisper = "<i>Smoke from a farmstead that burned long ago. Someone kept the seed.</i>",
-            WorkFile = "TheFarmer", WorkTitle = "Good Dirt",
-            WorkText = "Asa grows what you can't gather. Give her the Farmer's work and lay out a Farm Plot (G). She weaves too: as a Weaver she runs a Tailor's Shop, and iron gear will want its linen.",
+            WorkText = "Eirik keeps the ward: in a breach it holds half as long again. Give him the Warden's work, and build a Watch Post where he can see the old path ({key:Build}).",
         },
         new Person
         {
@@ -99,7 +83,25 @@ public static class BuildRescueOrder
             RescueText = "Berries and a stew over the campfire keep you alive, and that is all they do. Someone has been cooking in the deep woods, well enough that the wolves come for the smell. Find the cook and bring her home.",
             Whisper = "<i>Someone is cooking out there. The wolves can smell it. So can I.</i>",
             WorkFile = "TheCook", WorkTitle = "Show Me Your Kitchen",
-            WorkText = "Yrsa cooked for a jarl once, and tells you so. Give her the Cook's work and build a Kitchen (G): her meals last, and send you out stronger.",
+            WorkText = "Yrsa cooked for a jarl once, and tells you so. Give her the Cook's work and build a Kitchen ({key:Build}): her meals last, and send you out stronger.",
+        },
+        new Person
+        {
+            Name = "Gunnar", Resident = "Settlement/Gunnar", Job = "Hunter", Workplace = "TanningRack",
+            RescueTitle = "The Hunter's Pit",
+            RescueText = "Hides pile up in the stash and rot there, and copper is the last armour you can make without leather to line it. A hunter has been setting snares in the deep woods, alone by choice. Find him, and bring him home.",
+            Whisper = "<i>A snare line, a mile of it, and at the end a man who did not mean to be caught.</i>",
+            WorkFile = "TheHunter", WorkTitle = "Hides and Hooks",
+            WorkText = "Gunnar cures hides into leather. Give him the Hunter's work and build him a Hunter's Lodge ({key:Build}). He knows the water as well as the woods: as a Fisher he runs a Dock.",
+        },
+        new Person
+        {
+            Name = "Asa", Resident = "Settlement/Asa", Job = "Farmer", Workplace = "FarmPlot",
+            RescueTitle = "Seed from the Ashes",
+            RescueText = "Berries and game don't stretch to a haven full of people, and long raids leave you hungry. A farmer was seen at a burned farmstead in the deep woods, still guarding her seed. Bring her home.",
+            Whisper = "<i>Smoke from a farmstead that burned long ago. Someone kept the seed.</i>",
+            WorkFile = "TheFarmer", WorkTitle = "Good Dirt",
+            WorkText = "Asa grows what you can't gather. Give her the Farmer's work and lay out a Farm Plot ({key:Build}). She weaves too: as a Weaver she runs a Tailor's Shop, and iron gear will want its linen.",
         },
         new Person
         {
@@ -135,7 +137,7 @@ public static class BuildRescueOrder
             RescueText = "Everyone else is home. Only Sigrid, who led the expedition and whose voice you heard in the stones, is still out there. A horn has been heard at dusk, calling the expedition's signal.",
             Whisper = "<i>A horn at dusk, the expedition's signal. She is the last of them. Bring her home, little one.</i>",
             WorkFile = "TheLeader", WorkTitle = "Under One Banner",
-            WorkText = "Sigrid keeps the portal's watch: with her as Leader every raid has more time. Raise a Haven Banner where everyone can see it (G).",
+            WorkText = "Sigrid keeps the portal's watch: with her as Leader every raid has more time. Raise a Haven Banner where everyone can see it ({key:Build}).",
         },
     };
 
@@ -487,7 +489,8 @@ public static class BuildRescueOrder
 
     private static void People()
     {
-        Line("Settlement/Ingrid", "welcomeLine", "I watched your fire for three nights from under a root. When the stones broke I heard Bjarne's hammer start up, somewhere deep in the woods, slow, like he's working one-handed. The rest I couldn't see. Let me be of use until we find them.");
+        // The first act's line (BuildFirstAct, the night the door broke), so the two builders don't undo each other.
+        Line("Settlement/Ingrid", "welcomeLine", "I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn't come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik's. I called to it. It turned, and it didn't know its name. When the stones broke I heard Bjarne's hammer start up, somewhere deep in the woods, slow, like he's working one-handed. Let me be of use until we find them.");
         Line("Settlement/Gunnar", "rescueLine", "Took you long enough. That boar's been lying on me since yesterday.");
         Line("Settlement/Asa", "rescueLine", "You're not from the village. Doesn't matter. Help me with this sack.");
         Line("Settlement/Yrsa", "rescueLine", "Mind the pot. If you've come to eat, you'll carry.");
@@ -513,7 +516,19 @@ public static class BuildRescueOrder
             if (person.Workplace != null)
             {
                 BuildingDefinition place = Building(person.Workplace);
-                work.Add((QuestObjective.Create(ObjectiveType.BuildStructure, 1, place), $"Build a {place.DisplayName} (build menu: {{key:Build}})"));
+                // What it waits for, from its own definition, so the step says why it may not be in the menu yet. Not the
+                // Workshop at its first tier: that stands from the opening (Docs/RescueOrder.md).
+                string waits = "";
+                foreach (BuildingRequirement requirement in place.Requires)
+                {
+                    if (requirement.building != null && !(requirement.building.name == "ConstructionTable" && requirement.tier <= 1))
+                    {
+                        waits = requirement.tier > 1 ? $": it wants {BuildingUnlocks.Describe(requirement)}" : $": it wants the {requirement.building.DisplayName} standing";
+                        break;
+                    }
+                }
+
+                work.Add((QuestObjective.Create(ObjectiveType.BuildStructure, 1, place), $"Build a {place.DisplayName} (build menu: {{key:Build}}){waits}"));
             }
 
             // The smith's point is the mending: once is enough to see it costs half now.
@@ -531,7 +546,7 @@ public static class BuildRescueOrder
         Edit(Quest("TheAlchemist"), so =>
         {
             so.FindProperty("chain").stringValue = Work;
-            so.FindProperty("description").stringValue = "Ingrid brought two things home: a healer's hands and the old ways of cleansing cursed things. Give her the Alchemist's work and build the Purification Altar she showed you (G). Her Cauldron brews healing draughts.";
+            so.FindProperty("description").stringValue = "Ingrid brought two things home: a healer's hands and the old ways of cleansing cursed things. Give her the Alchemist's work and build the Purification Altar she showed you ({key:Build}). Her Cauldron brews healing draughts.";
         });
         After("RaiseTheWalls", Quest("WoodcuttersLodge"));
         QuestDefinition growing = Quest("AGrowingHome");
@@ -547,7 +562,7 @@ public static class BuildRescueOrder
         Made("HeavyLoads", "work.heavy_loads", "Heavy Loads", Work,
             "Copper ore and planks weigh more than any pack can take home. Tor knows carts: raise his Woodcutter's Lodge to Tier II and he plans a Wainwright's Yard, where barrows, handcarts and a rowboat are built.",
             Quest("WoodcuttersLodge"), true,
-            (QuestObjective.Upgrade(Building("Sawbench"), 2), "Raise the Woodcutter's Lodge to Tier II (H)"),
+            (QuestObjective.Upgrade(Building("Sawbench"), 2), "Raise the Woodcutter's Lodge to Tier II ({key:Haven})"),
             (QuestObjective.Create(ObjectiveType.BuildStructure, 1, Building("WainwrightsYard")), "Build a Wainwright's Yard (build menu: {key:Build})"),
             (QuestObjective.Create(ObjectiveType.CraftItem, 1, Find<ItemDefinition>("Wheelbarrow")), "Make a Wheelbarrow at the Wainwright's Yard"));
         return made + 1 + " quests in order";

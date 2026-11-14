@@ -12,6 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e3af07ed91cc3840b0c8a2e011411d2, type: 3}
   m_Name: SettlementSettings
   m_EditorClassIdentifier: Assembly-CSharp::SettlementSettings
+  workerRanks:
+  - name: Novice
+    crafts: 0
+    speed: 1
+    extraChance: 0
+  - name: Apprentice
+    crafts: 10
+    speed: 1.1
+    extraChance: 0.03
+  - name: Journeyman
+    crafts: 30
+    speed: 1.2
+    extraChance: 0.06
+  - name: Expert
+    crafts: 70
+    speed: 1.3
+    extraChance: 0.09
+  - name: Master
+    crafts: 150
+    speed: 1.4
+    extraChance: 0.12
+  lessonWork: 6
   residentWakeHour: 6.5
   residentWorkFromHour: 8
   residentMealFromHour: 12
@@ -179,6 +201,11 @@ MonoBehaviour:
     extraRadius: 6
     raidSeconds: 90
     opens: Opens tier II raids.
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 1
+    residents: []
+    bossesBeaten: 0
   - cost:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 12
@@ -187,6 +214,12 @@ MonoBehaviour:
     extraRadius: 6
     raidSeconds: 90
     opens: Opens tier III raids.
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 2
+    residents:
+    - {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    bossesBeaten: 0
   - cost:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20
@@ -195,6 +228,23 @@ MonoBehaviour:
     extraRadius: 6
     raidSeconds: 90
     opens: Opens tier IV raids.
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    residents: []
+    bossesBeaten: 1
+  portalTierNames:
+  - Dormant
+  - Awakened
+  - Stabilized
+  - Restored
+  - Reclaimed
+  portalTierLines:
+  - The portal sleeps, cracked and dark.
+  - 'The portal is awake: the way to the raids stands open.'
+  - The ward holds steady around the clearing.
+  - The portal's light reaches the edge of the meadows.
+  - 'The clearing is the forest''s no longer: it is yours.'
   cursedEssence: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
   purifiedEssence: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
   cursedPerBatch: 2
