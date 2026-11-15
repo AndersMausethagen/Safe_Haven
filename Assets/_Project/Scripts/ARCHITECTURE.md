@@ -282,6 +282,10 @@ Each authored stride produces the same sound and distance-attenuated camera feed
 **Walk The Party** (`WalkPartyNode`, moved by plain C# `PartyWalk`) walks companions along a route (an object whose children
 are its points) at one pace: they keep their formation, turned with the road, and stride towards a spot a little ahead so they
 don't catch up and stop. The walk waits for a conversation, a fight, a companion left behind, or a player too far behind.
+While an in-game cinematic holds the player (Hold Player), the walk leads the player too, at the party's back
+(`WalkPartyNode.LeadPlayer` drives `PlayerMovement.SetMovementInput`; 2026-11-15, "the player stands still while the NPCs
+walk"). **Hold the Party** / **Let the Party Go** (`HoldPartyNode`, `Companion.HoldForStory`) keeps every companion where it
+stands through a scene that runs on after its cinematic (the night camp's troll scene, until Sigrid's "Now!").
 **Wait Until The Walk Reaches** and **Change Time of Day** (Follow Walk) follow `PartyWalk.Current`, so talk and sunset belong
 to places on the road and wait along with the party. A load restarts the walk from the chapter's site (**Also After Loading**).
 
@@ -530,7 +534,8 @@ adds generated dressing (stone plinth and lanterns, then banners and a flower bo
 `StashChest` (slots). Looks and sounds: `Resources/ConstructionSettings`. `HavenRenown` adds up renown (every standing
 building and its levels, a second of a kind counts half, cleared overgrowth, residents); `HavenProgress` (added to the
 Portal) celebrates each `HavenSettings` rank once and records it in `SettlementState.HavenRank`, which widens the
-ward (`HomePortal.WardRadius`; the moss spreads out to the new edge). Content is built by `AgentScripts/BuildHaven.cs`. A level can ask for other buildings (`BuildingLevel.requires`), a building for a rank (`requiredRank`); `BuildingUnlocks` answers both. Ranks can bring a settler (`HavenSettings.Rank.settler`). Beds are counted in `SettlementState.NoteBuildings` and never gate anyone. What every reached upgrade adds, where raids can't look at the scene, comes from `SettlementState.UpgradeBonus`. The Trading Post is `TradingPost` + `TradeSettings`; `WatchPostArcher` and `WardTotem` act only in a breach; `FieldCamp` and any other `ItemDefinition.placesInRaid` kit are set down by `ItemInventory`. See [base progression](../../../Docs/BaseProgression.md).
+ward (`HomePortal.WardRadius`). (The moss bloom that painted the green moss skin over the ward after the first extraction,
+`TerrainMossBloom` on SafeHaven's Portal Bloom, is switched off since 2026-11-15: its listener is disabled.) Content is built by `AgentScripts/BuildHaven.cs`. A level can ask for other buildings (`BuildingLevel.requires`), a building for a rank (`requiredRank`); `BuildingUnlocks` answers both. Ranks can bring a settler (`HavenSettings.Rank.settler`). Beds are counted in `SettlementState.NoteBuildings` and never gate anyone. What every reached upgrade adds, where raids can't look at the scene, comes from `SettlementState.UpgradeBonus`. The Trading Post is `TradingPost` + `TradeSettings`; `WatchPostArcher` and `WardTotem` act only in a breach; `FieldCamp` and any other `ItemDefinition.placesInRaid` kit are set down by `ItemInventory`. See [base progression](../../../Docs/BaseProgression.md).
 
 ### Lanterns and fireflies
 
@@ -2301,3 +2306,27 @@ Import workers are limited in the local Editor user settings (2 at most, none ke
 | A model's budget (generated models arrive at ~10k triangles whatever their size) | Top-down rule (the user, 2026-11-09): nothing in the top-down view draws a lower LOD; LOD0 is sized for that view and the lighter levels only serve the action camera's horizon (`Editor/Environment/ScreenBudget`: 147 px a metre at 2160p at the default zoom, 40 px per visible triangle, LOD0 down to the farthest ground at full zoom-out). `Tools/Blender/ingest_generated.py` decimates each generated look as far as its shape allows, measured in a fraction of a second without baking (95% of the surface within 2% of its size, silhouette from the game camera 95% the same), and writes the result to `<Asset>_Budget.json`; LOD1/LOD2 come from Blender or, where its collapse fails, Unity's mesh LOD generator (`ModelSimplifier.Lighter`). `Editor/Tests/ModelBudgetTests` checks every gathering node: LOD0 in the whole top-down view, pixels per triangle at the default view (shape-limited looks reported, leaf cards excluded: their cost is overdraw), LOD0 cap by size, vertices per triangle, hull size, readable meshes, texture size. Known debt listed there: the scanned FallenLog, GreatBoulder and OldStump are denser than the view needs |
 | Ambient occlusion | The SSAO feature on `Settings/Rendering/PC_Renderer` |
 | A new place's mood | Duplicate a volume profile, assign it to the new scene's Global Volume, set its lighting |
+
+## Storage: a chest each, quick stack, water as a cost (2026-11-15)
+
+From the user's playtest list. **Each chest has its own items**: `StashStorage.Items` is cut into blocks of
+`StashStorage.ChestSlots` (60), up to `MaxChests` (16); a `StashChest` takes the lowest free block when it first stands (the
+biggest first when several load together, so an older save's whole stash lands in the biggest chest) and saves it
+(`ISaveable`, key `stash-chest`). Only the standing chests' blocks are open (`ItemContainer.SetUnlockedMask`); a gone chest's
+items wait in its block for the next chest. The chest window shows its block (`StashWindow.Grid.First`), drags both ways
+(`ItemDrag`), and Sort, Store all and the click all stay in the chest (`Store(..., block)`, `AddWithin`, `TransferTo(..., first,
+count)`). Everything that treats the Haven's storage as one (crafting's `MaterialPool`, `WorkerProduction`, trading, quests,
+the co-op share, the save) still reads all of `Items`.
+
+**Quick stack** (`StashQuickStack`, key Stack On Stored, V; the pad's action wheel): inside the ward, every stackable stack in
+the bag that a chest already holds goes onto that chest (`StashStorage.StackOnStored`); what is on the skill bar or quickbar
+stays.
+
+**Water as a recipe cost**: an `ItemDefinition` with Water Measure (`Data/Items/Water`) is never in a bag: `ItemContainer`
+counts, takes and pours it from the water containers in it (`WaterHeld`, `DrainWater`, `PourWater`), so "10 Water" in
+Stewed Berries takes 10 of a waterskin's 100 through every existing cost path. `ContentAudit` knows it comes from water.
+
+**The skill bar** (`SkillBarView`): its size is the Skill Bar Size option (115% by default); a consumable new to the bag
+(`ItemInventory.ConsumableArrived`, checked once a frame so moving stacks doesn't count, quiet while a bag is put back:
+`BeginRestore`/`EndRestore`) takes the next empty slot of 1-9 (`PlayerSkills`); its slots catch a consumable dragged from the
+bag, only while the bag is open. Hovering an essence in the bag shows `ResourceDefinition.Uses`.
