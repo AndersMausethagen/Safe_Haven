@@ -470,6 +470,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2d2e0777309fdde4dbb1a9b0219694d0, type: 3}
     mood: Neutral
   - speaker: Ingrid
+    text: An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.
+    clip: {fileID: 8300000, guid: b8a5f702339adfa449df4c07a324d4a7, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
     text: Anything else?
     clip: {fileID: 8300000, guid: 771b8c90681689a459d9b8bc289d2489, type: 3}
     mood: Neutral
@@ -477,6 +481,10 @@ MonoBehaviour:
     text: Behind you!
     clip: {fileID: 8300000, guid: baffb943bef550c458235f11ef47355f, type: 3}
     mood: Yelling
+  - speaker: Ingrid
+    text: Bog venom, carried carefully. It makes the strongest draughts. 4 Bog Venom, if you come across it.
+    clip: {fileID: 8300000, guid: a402a887d41d09a40a8bd6986869209a, type: 3}
+    mood: Neutral
   - speaker: Ingrid
     text: Clear. Get your breath.
     clip: {fileID: 8300000, guid: 4bd5ece68cfd5084f92278d69c02afa0, type: 3}
@@ -510,6 +518,13 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: a34168d08bced6947a42e7b291497dbb, type: 3}
     mood: Tired
   - speaker: Ingrid
+    text: 'I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn''t come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik''s. I called to it. It turned, and it didn''t know its name. When the stones broke I heard Bjarne''s hammer start up, somewhere deep in the woods, slow, like he''s working one-handed. Let me be of use until we find them.
+
+
+      <color=#D9A75A>Has no job yet.</color>'
+    clip: {fileID: 8300000, guid: 775f200ccccac9f4995bae7a65e9a96f, type: 3}
+    mood: Tired
+  - speaker: Ingrid
     text: I'll hold this spot.
     clip: {fileID: 8300000, guid: 814b624a65521a24897ddbdc325aa962, type: 3}
     mood: Neutral
@@ -525,6 +540,10 @@ MonoBehaviour:
     text: It's you! I saw a light through the trees and thought the forest had finally taken my wits. Get me out of here.
     clip: {fileID: 8300000, guid: 171236ce7c4a21f4098e784cc7857a0b, type: 3}
     mood: Glad
+  - speaker: Ingrid
+    text: My grandmother left bread on the old stones. Never hurts.
+    clip: {fileID: 8300000, guid: d98f5b274a2c0b444bb6365715d27231, type: 3}
+    mood: Neutral
   - speaker: Ingrid
     text: Not yet, you don't. Drink.
     clip: {fileID: 8300000, guid: bcdec0d6d08e53944914e6f052e5648c, type: 3}
@@ -558,8 +577,19 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 6b4a6341e4ba9e948891dd65e8f60561, type: 3}
     mood: Glad
   - speaker: Ingrid
+    text: 'The expedition''s alchemist, and the first of the seven to come home. She knows more about the curse than she lets on.
+
+
+      <color=#D9A75A>Works as the Alchemist.</color> Tends the Purification Altar, turning Cursed Essence into Purified Essence. Teaches you to build the altar.'
+    clip: {fileID: 8300000, guid: 9721d13dc4e6fe3408e8ce71145a6efd, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
     text: The plants are wrong. Roots that should sleep in this season are warm to the touch. Something is feeding the enchantment. Stay close; I brought a little medicine.
     clip: {fileID: 8300000, guid: 3207f5acc12276649a29fd77f9eedcd4, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: Up early? The portal hums louder before the sun.
+    clip: {fileID: 8300000, guid: f22367b2494af9b4ebb2a6b926a144a1, type: 3}
     mood: Neutral
   - speaker: Ingrid
     text: Watch your back!
@@ -589,6 +619,16 @@ MonoBehaviour:
     text: Clear. Get your breath.
     clip: {fileID: 8300000, guid: 89dc2c86b836c494d8ff5d71bb8e5b50, type: 3}
     mood: Glad
+  - speaker: Liv
+    text: 'Gear takes one mark at a time, cut at the altar with essence. Purified marks are safe. Cursed ones are stronger, and they always take a price: it''s written on them, so you know before you cut.
+
+
+      Nobody can teach a mark from nothing. It has to be found. The elites out there carry the mark that made them what they are: kill one and its inscription may be on it. The great ones, the trolls and the thing under the roots, carry great marks, the kind that change how a fight goes. And the carved stones in the deep woods: press a Blank Parchment to one and rub charcoal over it. Fiber and charcoal, nothing more.
+
+
+      Bring the inscription home and read it here. Out there you''d only lose it in the mud. And mind this: a mark counts once, however many pieces carry it. Two of the same is one.'
+    clip: {fileID: 8300000, guid: d098f636805f581409db4102908cdbf0, type: 3}
+    mood: Neutral
   - speaker: Liv
     text: Here they come!
     clip: {fileID: 8300000, guid: 48f6a81b82906004fb457969902956dd, type: 3}

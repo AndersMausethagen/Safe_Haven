@@ -2844,5 +2844,81 @@
   "text": "Warmth stirs in the old stone. Little one. You fell out of the dark with the whole forest ",
   "mood": "Calm",
   "by": "kind"
+ },
+ "abc9aa09153c": {
+  "speaker": "Ingrid",
+  "text": "An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a88c3c56df23": {
+  "speaker": "Ingrid",
+  "text": "Bog venom, carried carefully. It makes the strongest draughts. 4 Bog Venom, if you come ac",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e01062a21422": {
+  "speaker": "Ingrid",
+  "text": "I watched your fire for three nights from under a root. You should know two things. The ol",
+  "mood": "Tired",
+  "by": "direction",
+  "emotion": {
+   "melancholic": 0.3,
+   "afraid": 0.2
+  }
+ },
+ "560a10db69d2": {
+  "speaker": "Ingrid",
+  "text": "My grandmother left bread on the old stones. Never hurts.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "071615aca10e": {
+  "speaker": "Ingrid",
+  "text": "The expedition's alchemist, and the first of the seven to come home. She knows more about ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "96b9b97511c1": {
+  "speaker": "Ingrid",
+  "text": "Up early? The portal hums louder before the sun.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "6dab6365b0fe": {
+  "speaker": "Liv",
+  "text": "Gear takes one mark at a time, cut at the altar with essence. Purified marks are safe. Cur",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "859a612074e1": {
+  "speaker": "Notice Board",
+  "text": "To whoever comes after: this hearth wants copper, and hands that can work it. Smelt ingots",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e83e0ed91e02": {
+  "speaker": "Notice Board",
+  "text": "A note in Eirik's square hand, or whoever keeps watch: \"Forest-bitten wolves on the paths ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "68ca7e10dc93": {
+  "speaker": "Notice Board",
+  "text": "Copper ingots, and a pickaxe made from them.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "6e64dc0dcb3c": {
+  "speaker": "Notice Board",
+  "text": "The note is still pinned there. Two wolves, it says.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "91569dfd3f6f": {
+  "speaker": "Sigrid",
+  "text": "A test line while the bag opens over it.",
+  "mood": "Neutral",
+  "by": "kind"
  }
 }

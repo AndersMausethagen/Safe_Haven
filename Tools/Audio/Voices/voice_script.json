@@ -1298,6 +1298,64 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/9a43f5e57993.wav"
  },
  {
+  "id": "abc9aa09153c",
+  "voice": "ingrid",
+  "text": "An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/abc9aa09153c.wav"
+ },
+ {
+  "id": "a88c3c56df23",
+  "voice": "ingrid",
+  "text": "Bog venom, carried carefully. It makes the strongest draughts. 4 Bog Venom, if you come across it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/a88c3c56df23.wav"
+ },
+ {
+  "id": "e01062a21422",
+  "voice": "ingrid",
+  "text": "I watched your fire for three nights from under a root. You should know two things. The old troll at the stones didn't come for us: it came for the door. And on the second night something walked past my root in Granheim mail, like Eirik's. I called to it. It turned, and it didn't know its name. When the stones broke I heard Byarna's hammer start up, somewhere deep in the woods, slow, like he's working one-handed. Let me be of use until we find them. Has no job yet.",
+  "engine": "acted",
+  "mood": "Tired",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/e01062a21422.wav",
+  "emotion": {
+   "melancholic": 0.3,
+   "afraid": 0.2
+  }
+ },
+ {
+  "id": "560a10db69d2",
+  "voice": "ingrid",
+  "text": "My grandmother left bread on the old stones. Never hurts.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/560a10db69d2.wav"
+ },
+ {
+  "id": "071615aca10e",
+  "voice": "ingrid",
+  "text": "The expedition's alchemist, and the first of the seven to come home. She knows more about the curse than she lets on. Works as the Alchemist. Tends the Purification Altar, turning Cursed Essence into Purified Essence. Teaches you to build the altar.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/071615aca10e.wav"
+ },
+ {
+  "id": "96b9b97511c1",
+  "voice": "ingrid",
+  "text": "Up early? The portal hums louder before the sun.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/ingrid/96b9b97511c1.wav"
+ },
+ {
   "id": "58a94203429e",
   "voice": "ingrid",
   "text": "I kept saying the word so the forest couldn't take it. Fire. Fire. Fire. And then I saw yours.",
@@ -1559,6 +1617,15 @@
   "mood": "Neutral",
   "effects": {},
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/09f8f3147553.wav"
+ },
+ {
+  "id": "6dab6365b0fe",
+  "voice": "liv",
+  "text": "Gear takes one mark at a time, cut at the altar with essence. Purified marks are safe. Cursed ones are stronger, and they always take a price: it's written on them, so you know before you cut. Nobody can teach a mark from nothing. It has to be found. The elites out there carry the mark that made them what they are: kill one and its inscription may be on it. The great ones, the trolls and the thing under the roots, carry great marks, the kind that change how a fight goes. And the carved stones in the deep woods: press a Blank Parchment to one and rub charcoal over it. Fiber and charcoal, nothing more. Bring the inscription home and read it here. Out there you'd only lose it in the mud. And mind this: a mark counts once, however many pieces carry it. Two of the same is one.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {},
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/liv/6dab6365b0fe.wav"
  },
  {
   "id": "c31f49e71de1",
