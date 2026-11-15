@@ -155,7 +155,9 @@ Select an expedition NPC in `Prologue_MistyWoods` to edit its `PrologueCompanion
 portal dialogue, camp topics (questions the player can ask around the camp, from gathering fuel until the wolves) and
 the alchemist's healing amount/interval; the speaker's name, camera distance and TalkedTo event are on its `Talkable`. Walking and fighting are its `Companion`
 (formation offset, Fighter or Archer definition): the director's rally points become Stay orders, no rally is Follow,
-and it stands still until the expedition sets out.
+and it stands still until the expedition sets out. A chapter whose quest starts by itself gives its orders only once that
+quest has started (StoryPacing can hold it back seconds after a fight), so a story that opens with Hold the Party (the old
+troll at the night camp) has the party before it sets off; restoring a save and quest-giver chapters rally at once.
 When an NPC also has a `QuestGiver`, keep it above the `PrologueCompanion`: the first part with a line speaks it (the
 offer before the camp chatter), and every part adds its answers (`IConversationTopics`).
 The morning's moments are story graphs under **Prologue Meadow › Morning Moments**, the forest's under **Intro Moments** (both

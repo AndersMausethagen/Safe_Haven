@@ -220,7 +220,11 @@ public sealed class PrologueDirector : MonoBehaviour
         // A story leads them once it gets going; until then they wait at the chapter's place like anyone.
         PrologueCompanions orders = chapter != null ? chapter.Companions : PrologueCompanions.WaitAtSite;
         Transform checkpoint = PointAt(chapter != null ? chapter.Checkpoint : step.Checkpoint());
-        if (orders != PrologueCompanions.StandStill && (orders != PrologueCompanions.StoryLeads || restoring))
+        // A chapter whose quest starts by itself waits for it (StoryPacing holds a quest back for a breath after a fight), and
+        // its orders wait with it: the camp's last wolf fell, the run to the stones was ordered at once, and the party was
+        // halfway there before the quest started the old troll's story and its Hold the Party (the user, three times).
+        bool waitsForItsQuest = !active && !restoring && chapter != null && chapter.Quest.Start != QuestStart.ByQuestGiver;
+        if (!waitsForItsQuest && orders != PrologueCompanions.StandStill && (orders != PrologueCompanions.StoryLeads || restoring))
         {
             Transform rally = orders == PrologueCompanions.Follow ? null : PointAt(chapter != null ? chapter.RallySite : PrologueSite.Portal);
             foreach (PrologueCompanion companion in companions)
