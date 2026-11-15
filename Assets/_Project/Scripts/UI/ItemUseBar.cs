@@ -22,6 +22,7 @@ public sealed class ItemUseBar : MonoBehaviour
     private PlayerEating eating;
     private PlayerGathering gathering;
     private PlayerInteractor interactor;
+    private HandCraftQueue craftQueue;
     private GameObject root;
     private CanvasGroup group;
     private TMP_Text label;
@@ -47,6 +48,7 @@ public sealed class ItemUseBar : MonoBehaviour
         eating = GetComponent<PlayerEating>();
         gathering = GetComponent<PlayerGathering>();
         interactor = GetComponent<PlayerInteractor>();
+        craftQueue = HandCraftQueue.For(gameObject);
         Build();
     }
 
@@ -118,6 +120,16 @@ public sealed class ItemUseBar : MonoBehaviour
     // Harvesting: a node's swings so far, or a timed job's share. False when the player is doing neither.
     private bool ShowWork()
     {
+        // Crafting by hand (HandCraftQueue): what is being made, and how many more are waiting.
+        HandCraftQueue hand = craftQueue;
+        if (hand != null && hand.Current != null)
+        {
+            string made = hand.Current.Output != null ? hand.Current.Output.DisplayName : hand.Current.OutputResource != null ? hand.Current.OutputResource.DisplayName : hand.Current.name;
+            label.text = hand.Queued > 0 ? $"Crafting {made}  (+{hand.Queued})" : $"Crafting {made}";
+            SetFill(hand.Progress);
+            return true;
+        }
+
         Interactable job = interactor != null ? interactor.Current : null;
         GatheringSession session = gathering != null ? gathering.Session : null;
         if (session != null && session.SwingsRequired > 0)

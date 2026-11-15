@@ -109,7 +109,7 @@ public static class RecipeMaking
     }
 }
 
-/// <summary>Crafting by hand from the bag: instant, one PlayerCrafting.TryCraft at a time.</summary>
+/// <summary>Crafting by hand from the bag: each make is paid at once and made in turn after its seconds (HandCraftQueue).</summary>
 public sealed class HandMaker : IRecipeMaker
 {
     private readonly PlayerCrafting crafting;
@@ -122,8 +122,8 @@ public sealed class HandMaker : IRecipeMaker
     public string Verb => "Craft";
     public MaterialPool Pool => crafting.Pool;
     public GameObject User => crafting.gameObject;
-    public int Waiting(RecipeDefinition recipe) => 0;
-    public float Seconds(RecipeDefinition recipe) => recipe.CraftSeconds;
+    public int Waiting(RecipeDefinition recipe) => HandCraftQueue.For(crafting.gameObject).Waiting(recipe);
+    public float Seconds(RecipeDefinition recipe) => HandCraftingSettings.Current.SecondsFor(recipe);
 
     public string WhyNot(RecipeDefinition recipe)
     {
@@ -135,7 +135,8 @@ public sealed class HandMaker : IRecipeMaker
 
     public void Make(RecipeDefinition recipe, int count)
     {
-        for (int i = 0; i < count && crafting.TryCraft(recipe); i++)
+        HandCraftQueue queue = HandCraftQueue.For(crafting.gameObject);
+        for (int i = 0; i < count && queue.Add(recipe); i++)
         {
         }
     }

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8bda84500d2a6648b21a46ca150a85c, type: 3}
+  m_Name: HandCraftingSettings
+  m_EditorClassIdentifier: SafeHaven::HandCraftingSettings
+  weaponSeconds: 20
+  smallWeaponSeconds: 10
+  toolSeconds: 10
+  gearSeconds: 10
+  consumableSeconds: 5
+  ammunitionSeconds: 3
+  otherSeconds: 3
+  walkShare: 0.5

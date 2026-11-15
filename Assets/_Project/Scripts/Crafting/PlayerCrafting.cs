@@ -5,8 +5,9 @@ using UnityEngine;
 /// <summary>
 /// The player's crafting knowledge and hand crafting: which recipes and buildings they know, whether a By Hand recipe
 /// can be made right now, and making it. A hand recipe needs to be known, its costs in the MaterialPool (what is carried,
-/// plus storage at home) and room for the result; it is made instantly: items go to the bag, resources to the resource
-/// bars (at home, overflow goes to storage). Every other recipe is queued at its crafting station (StationCrafting,
+/// plus storage at home) and room for the result; the player's crafts from the bag take time (HandCraftQueue: paid when
+/// asked for, made after HandCraftingSettings' seconds), TryCraft makes one at once: items go to the bag, resources to the
+/// resource bars (at home, overflow goes to storage). Every other recipe is queued at its crafting station (StationCrafting,
 /// StationQueue) and Check explains where it is made.
 /// <para>
 /// Learning: recipes and buildings that aren't known from the start are learned through Unlock / UnlockBuildings, from a
@@ -243,8 +244,21 @@ public sealed class PlayerCrafting : MonoBehaviour
         return Mathf.Min(count, room / Mathf.Max(1, recipe.OutputAmount));
     }
 
-    /// <summary>Crafts the recipe if possible; otherwise tells the player why not. Returns true when it was crafted.</summary>
+    /// <summary>Crafts the recipe at once if possible (tests, and anything that hands a craft over whole); otherwise tells the
+    /// player why not. Returns true when it was crafted. The player's own crafting from the bag takes time: HandCraftQueue.</summary>
     public bool TryCraft(RecipeDefinition recipe)
+    {
+        if (!TryPay(recipe))
+        {
+            return false;
+        }
+
+        Finish(recipe);
+        return true;
+    }
+
+    /// <summary>Takes what one craft costs, if it can be made now; otherwise tells the player why not.</summary>
+    public bool TryPay(RecipeDefinition recipe)
     {
         CraftCheck check = Check(recipe);
         if (!check.CanCraft)
@@ -253,12 +267,22 @@ public sealed class PlayerCrafting : MonoBehaviour
             return false;
         }
 
-        MaterialPool pool = Pool;
-        if (!pool.TrySpend(recipe.ResourceCost, recipe.ItemCost))
-        {
-            return false;
-        }
+        return Pool.TrySpend(recipe.ResourceCost, recipe.ItemCost);
+    }
 
+    /// <summary>Gives back what one craft of <paramref name="recipe"/> cost (a craft that was paid and not finished).</summary>
+    public void GiveBack(RecipeDefinition recipe)
+    {
+        if (recipe != null)
+        {
+            Pool.GiveBack(recipe.ResourceCost, recipe.ItemCost, transform);
+        }
+    }
+
+    /// <summary>Makes one paid craft of <paramref name="recipe"/>: its result, the skill it trains, and the Crafted events.</summary>
+    public void Finish(RecipeDefinition recipe)
+    {
+        MaterialPool pool = Pool;
         if (recipe.Output != null)
         {
             // Made by hand: quality, condition and any extra come from the player's crafting skill, which it trains.
@@ -273,7 +297,6 @@ public sealed class PlayerCrafting : MonoBehaviour
 
         Crafted?.Invoke(recipe);
         GameEvents.Raise(new GameEvent(GameEventKind.Crafted, recipe.OutputDefinition, recipe.OutputAmount, gameObject));
-        return true;
     }
 
     private void EnsureInitialised()
