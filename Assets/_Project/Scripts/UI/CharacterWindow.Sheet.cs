@@ -33,7 +33,6 @@ public sealed partial class CharacterWindow
     private CharacterPreviewStage portraitStage;
     private readonly List<GearLookDefinition> portraitLooks = new List<GearLookDefinition>();
     private readonly List<GearLookDefinition> portraitWorn = new List<GearLookDefinition>();
-    private int portraitFrames;
 
     private void BuildSheet()
     {
@@ -68,7 +67,15 @@ public sealed partial class CharacterWindow
         inner.offsetMax = new Vector2(-5f, -5f);
         inner.gameObject.AddComponent<RectMask2D>();
         portraitPicture = CodeUI.Stretch("Render", inner).gameObject.AddComponent<RawImage>();
-        portraitPicture.raycastTarget = false;
+        // Dragged sideways, the character turns round (the user, 2026-11-15: "let us rotate the player's model").
+        portraitPicture.raycastTarget = true;
+        portraitPicture.gameObject.AddComponent<DragToTurn>().Turned += degrees =>
+        {
+            if (portraitStage != null)
+            {
+                portraitStage.Turn(degrees);
+            }
+        };
         HearthKit.Rim(frame, 0.85f, 1.5f).transform.SetAsLastSibling();
 
         RectTransform attributes = HearthKit.Card(window, "Attributes", StatsX, 64f, StatsWidth, 150f);
@@ -158,9 +165,10 @@ public sealed partial class CharacterWindow
         }
     }
 
-    // The portrait (the user, 2026-11-14: "no animation, just an idle pose"): the character creation screen's stand-in, in
-    // the player's look and worn gear, before the painted backdrop. It plays its idle for a few frames to settle into the
-    // pose, then holds still. Held things (a weapon in hand, the lantern) are not shown: the stand-in wears looks only.
+    // The portrait: the character creation screen's stand-in, in the player's look and worn gear, before the painted
+    // backdrop, playing the player's own idle (the clip of the player's Idle state) and turned by dragging it. It held still
+    // after a few frames since 2026-11-14 ("no animation, just an idle pose"); on 2026-11-15 the user asked for the idle to
+    // play and the model to turn. Held things (a weapon in hand, the lantern) are not shown: the stand-in wears looks only.
     private void LateUpdate()
     {
         if (!sheetBuilt || equipment == null)
@@ -175,14 +183,9 @@ public sealed partial class CharacterWindow
             PortraitStage.On(portraitStage.View, "CharacterBackdrop", portraitStage.Model);
             portraitWorn.Clear();
             portraitWorn.Add(null); // never matches: dress on the first frame
-            portraitFrames = 0;
         }
 
         DressPortrait();
-        if (portraitFrames < 4 && ++portraitFrames == 4)
-        {
-            portraitStage.Still(true);
-        }
     }
 
     private void DressPortrait()
