@@ -16,6 +16,10 @@ public sealed class Breakable : MonoBehaviour
     private static readonly Collider[] Overlaps = new Collider[32];
     private static readonly List<Breakable> Found = new List<Breakable>();
 
+    // Entering Play doesn't reload scripts in this project: the last session's breakables go with it.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Found.Clear();
+
     [Tooltip("Cells its meshes are cut into: more for more, smaller pieces.")]
     [SerializeField] private Vector3Int pieces = new Vector3Int(2, 2, 2);
     [Tooltip("Thrown where it breaks (a pooled effect: splinters, dust).")]

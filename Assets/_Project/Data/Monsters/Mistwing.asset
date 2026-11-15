@@ -54,6 +54,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 8
     priority: 10
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 3
     interruptible: 0
     sound: {fileID: 0}
@@ -63,6 +66,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -103,15 +107,19 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 20
     priority: 30
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 30
     interruptible: 0
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 96e2dc1ca5b4d8945872381078c6fb7d, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -169,7 +177,17 @@ MonoBehaviour:
   canBeFinished: 0
   flankSpread: 0
   breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 0
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -180,6 +198,14 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 1
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.1
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: 940297f4488683d4eba43aa14661deb5, type: 3}

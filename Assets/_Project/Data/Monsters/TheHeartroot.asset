@@ -338,7 +338,7 @@ MonoBehaviour:
     heavy: 0
     cooldown: 30
     interruptible: 1
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: 90f7fbf1f37808648ba96b97f965e1e6, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 2
@@ -404,6 +404,14 @@ MonoBehaviour:
   flankSpread: 0
   breaksWalls: 0
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 320
   parryResponse: 0
   openWhileStriking: 0
@@ -423,6 +431,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 1f56c95d2bef296448cb6503a55551f3, type: 3}

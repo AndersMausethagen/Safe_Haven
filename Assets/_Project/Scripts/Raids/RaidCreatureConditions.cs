@@ -63,6 +63,10 @@ public sealed class RaidCreatureConditions : GameSettings<RaidCreatureConditions
 
     private static readonly Dictionary<GameObject, MonsterDefinition> creatureOf = new Dictionary<GameObject, MonsterDefinition>();
 
+    // Entering Play doesn't reload scripts: a prefab edited since the last session is read afresh.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => creatureOf.Clear();
+
     public IReadOnlyList<Rule> Rules => rules;
     public IReadOnlyList<Addition> Additions => additions;
 

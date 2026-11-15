@@ -92,6 +92,10 @@ public sealed class SpawnTable : ScriptableObject
 
     private static readonly List<RaidCreatureConditions.Addition> added = new List<RaidCreatureConditions.Addition>();
 
+    // Entering Play doesn't reload scripts: the last pick's additions go with the last session.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => added.Clear();
+
     /// <summary>Pick for any list of entries. In a raid, the hour, the weather and the season change the creatures'
     /// chances, and may add creatures to a pick of creatures only (RaidCreatureConditions).</summary>
     public static GameObject Pick(IReadOnlyList<Entry> entries, System.Random random, Dictionary<GameObject, int> counts)

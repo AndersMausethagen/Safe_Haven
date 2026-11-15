@@ -121,4 +121,21 @@ public sealed class CoopLiveTests
         yield return new ExitPlayMode();
         LogAssert.ignoreFailingMessages = false;
     }
+
+    // The Haven was opened for this test, and the runner doesn't put its scratch scene back: the tests after it (Grass, Perception,
+    // Rain Drips, Water) ran among the Haven's grass, water and colliders and failed in a full run. Leave it, pass or fail.
+    [UnityTearDown]
+    public IEnumerator LeaveTheHaven()
+    {
+        if (Application.isPlaying)
+        {
+            yield return new ExitPlayMode();
+        }
+
+        LogAssert.ignoreFailingMessages = false;
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "SafeHaven")
+        {
+            TestScenes.StartClean();
+        }
+    }
 }

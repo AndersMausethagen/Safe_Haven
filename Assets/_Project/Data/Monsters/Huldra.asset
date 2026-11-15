@@ -119,7 +119,7 @@ MonoBehaviour:
     heavy: 0
     cooldown: 14
     interruptible: 1
-    sound: {fileID: 0}
+    sound: {fileID: 11400000, guid: bc9f8e6af9db1ed408d14ce679de2a2f, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0

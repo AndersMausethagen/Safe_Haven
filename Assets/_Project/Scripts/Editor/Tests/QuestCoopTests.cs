@@ -77,6 +77,12 @@ public sealed class QuestCoopTests
     {
         var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SmithsRequest.asset");
         var log = new QuestLog();
+        // Offered once what comes before it is done (A Roof for the Work, since quests came in order).
+        foreach (QuestDefinition before in quest.Prerequisites)
+        {
+            log.Restore(before, QuestStatus.Completed, null);
+        }
+
         Assert.AreEqual(QuestGiverState.Available, QuestGiver.StateFor(quest, log), "the notice board offers it at home");
         try
         {

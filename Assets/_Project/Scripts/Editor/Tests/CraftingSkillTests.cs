@@ -131,8 +131,12 @@ public sealed class CraftingSkillTests
         StringAssert.Contains("Armorcrafting", helm.SkillProblem(progress));
         progress.AddExperience(helm.RequiredSkill, LevelingSettings.Current.TotalExperienceFor(helm.RequiredSkillLevel), LevelingSettings.Current);
         Assert.IsNull(helm.SkillProblem(progress));
+        // Docs/Skills.md: the kits from copper to moonsilver never wait on a skill, as raid tiers need them. Runecraft's own work does,
+        // by design (GDD: the runic staff at Runecraft 3, the art runes at Runecraft 5); it is no tier's kit.
+        bool RunecraftsOwn(RecipeDefinition r) => r.RequiredSkill != null && r.RequiredSkill.Id == "runecraft";
         Assert.IsTrue(Recipes().Where(r => r.Output != null && r.Output.Tier <= 4 && CraftedWork.Of(r.Output) != CraftedGoods.Meals
-                && CraftedWork.Of(r.Output) != CraftedGoods.Tonics).All(r => r.RequiredSkill == null), "the tier kits never wait on a skill");
+                && CraftedWork.Of(r.Output) != CraftedGoods.Tonics && !RunecraftsOwn(r)).All(r => r.RequiredSkill == null), "the tier kits never wait on a skill");
+        Assert.IsTrue(RunecraftsOwn(Recipes().First(r => r.Output != null && r.Output.name == "RunicStaff")), "the runic staff waits on Runecraft");
     }
 
     [Test]

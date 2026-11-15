@@ -35,6 +35,7 @@ public static class GroundImpacts
         host = null;
         Shader.SetGlobalFloat(GustCountId, 0f);
         GroundImpactField.ClearGlobals();
+        Pushed.Clear();
     }
 
     /// <summary>The player's heavy swing or weapon art landing (it struck the ground whether or not it hit anyone).</summary>

@@ -29,6 +29,8 @@ public sealed class StashChest : MonoBehaviour, ISaveable
     private static void ResetForNewPlaySession()
     {
         standing.Clear();
+        waiting.Clear();
+        openSlots.Clear();
         allocationDue = false;
     }
     private Interactable interactable;

@@ -152,6 +152,18 @@ def troll_dies(rng):
     return place(fade_end(drive(groan, 2.2) * bump(t, 0, 0.06, 0.62), 0.35), fall(rng, 1.6), rng.uniform(1.15, 1.35), 0.8)
 
 
+def stone_skin(rng):
+    """A troll turning to stone: a low groan held while grit grinds and the skin cracks over, ending in a set, heavy knock."""
+    seconds = 1.7
+    t = times(seconds)
+    groan = throat(seconds, lambda t: rng.uniform(64, 70) * (1 - 0.08 * t / seconds), [(520, 470, 5, 1.0), (1000, 900, 6, 0.6), (2200, 2000, 7, 0.15)], rng, rough=1.0, breath=0.4, under=0.45)
+    grind = band(np.abs(white(len(t), rng)) * pink(len(t), rng), 300, 2600) * np.clip(t / 1.1, 0, 1)
+    out = drive(groan, 2.0) * bump(t, 0, 0.15, 0.9) * 0.8 + norm(grind) * bump(t, 0.1, 0.5, 0.7) * 0.5
+    out = out + scatter(seconds, 26, lambda: chip(rng, 900, 3200, 0.05), rng, early=0.6) * 0.45
+    place(out, norm(strike(stone(rng.uniform(140, 190), rng), 0.5, 0.003, rng)), 1.15, 0.7)
+    return fade_end(out, 0.25)
+
+
 def shaman_call(rng):
     """Throat singing: one low held note, and the shape of the mouth drawing a thin high tone over it."""
     seconds = 1.9
@@ -229,6 +241,18 @@ def root_dies(rng):
 
 # ----- Blight Boar -----
 
+def root_regrowth(rng):
+    """Wood growing back: a slow creak that stretches and swells, new shoots rustling, and a soft creaking settle at the end."""
+    seconds = 2.0
+    t = times(seconds)
+    stretch = creak(seconds, rng, 160, 1100, (5, 16)) * bump(t, 0.05, 0.6, 1.2)
+    rustle = norm(band(pink(len(t), rng), 1800, 6000)) * (0.5 + 0.5 * np.abs(np.sin(TAU * 3.1 * t))) * bump(t, 0.4, 0.4, 0.7) * 0.35
+    out = stretch + rustle
+    for at in (0.7, 1.05, 1.5):
+        place(out, crack(rng, rng.uniform(140, 220)), at, 0.18)
+    return fade_end(out, 0.3)
+
+
 def boar_charge(rng):
     seconds = 0.72
     t = times(seconds)
@@ -303,6 +327,22 @@ def light_dies(rng):
     return fade_end(tone + puff + scatter(seconds, 34, lambda: chip(rng, 3500, 9000), rng, early=0.8) * 0.28, 0.3)
 
 
+def light_splits(rng):
+    """A marsh light making its decoys: one glassy tone that wavers, then breaks into three that drift apart, with a whisper."""
+    seconds = 1.5
+    t = times(seconds)
+    base = rng.uniform(900, 1000)
+    one = glass(0.55, base, rng, base * 1.06) * (0.7 + 0.3 * np.sin(TAU * 9 * times(0.55)))
+    out = blank(seconds)
+    place(out, one * bump(times(0.55), 0, 0.05, 0.6), 0.0, 0.9)
+    for ratio in (0.84, 1.0, 1.19):
+        tail = seconds - 0.45
+        tt = times(tail)
+        place(out, glass(tail, base * 1.06, rng, base * ratio * 1.3) * bump(tt, 0, 0.03, 0.45), 0.45, 0.55)
+    whisper = norm(band(pink(len(t), rng), 2600, 8000)) * bump(t, 0.35, 0.06, 0.4) * 0.3
+    return fade_end(out + whisper + scatter(seconds, 18, lambda: chip(rng, 3500, 9000), rng, early=0.7) * 0.2, 0.3)
+
+
 # ----- Mistwing -----
 
 def wing_screech(rng):
@@ -335,6 +375,21 @@ def wing_dies(rng):
     return place(out, fall(rng, 0.6), 0.75, 0.45)
 
 
+def wing_alarm(rng):
+    """The screech that calls the woods in: three harsh cries, each higher and longer than the last, with the wings beating hard."""
+    seconds = 1.7
+    out = blank(seconds)
+    at = 0.0
+    for i, length in enumerate((0.3, 0.36, 0.55)):
+        t = times(length)
+        top = rng.uniform(1700, 1850) * (1 + 0.08 * i)
+        cry = throat(length, lambda t: arch(t, length, top * 0.75, top, top * 0.82, 0.25), [(2300, 1900, 6, 1.0), (3700, 3300, 7, 0.6), (5300, 4900, 8, 0.22)], rng, rough=0.8, breath=0.35)
+        place(out, drive(cry, 2.0) * bump(t, 0, 0.01, length * 0.6), at, 0.75 + 0.1 * i)
+        at += length + rng.uniform(0.07, 0.1)
+    beat = whoosh(seconds, 300, 1400, 1.6, rng, peak=0.5, flutter=0.5, flutter_rate=17)
+    return fade_end(out + norm(beat) * 0.3, 0.2)
+
+
 # ----- Huldra: a woman's voice, and the rotten tree in her back -----
 
 def huldra_wail(rng):
@@ -344,6 +399,24 @@ def huldra_wail(rng):
     wail = throat(seconds, lambda t: arch(t, seconds, 390, rng.uniform(540, 600), 470, 0.6) * (1 + 0.012 * np.sin(TAU * 5.6 * t)), [(760, 1100, 9, 1.0), (1450, 2150, 10, 0.6), (3000, 3200, 12, 0.25)], rng, rough=0.1, breath=0.6)
     out = wail * bump(t, 0.05, 0.1, 0.5) + creak(seconds, rng, 200, 900) * bump(t, 0, 0.3, 0.5) * 0.28
     return place(fade_end(out, 0.25), hiss, 0.0, 0.8)
+
+
+def huldra_call(rng):
+    """Her lokk, the herding call (kulning) that draws the player in: a bright head voice scooping up to a high held note, breaking down a
+    step and rising again. Purer than the wail (little breath, no hiss), so the pull is heard apart from her strike."""
+    seconds = 2.6
+    t = times(seconds)
+    high = rng.uniform(800, 860)
+    keys = [0.0, 0.22, 1.25, 1.36, 1.85, 2.2, seconds]
+    notes = [high * 0.66, high, high, high * 0.75, high * 0.75, high * 0.89, high * 0.86]
+    swell = np.clip((t - 0.35) / 0.6, 0, 1) * (1 - np.clip((t - 1.2) / 0.1, 0, 1)) + np.clip((t - 1.5) / 0.4, 0, 1)
+    pitch = lambda t: np.interp(t, keys, notes) * (1 + 0.014 * np.sin(TAU * 5.4 * t) * swell)
+    song = throat(seconds, pitch, [(900, 1000, 9, 1.0), (1500, 1700, 10, 0.5), (3100, 3300, 12, 0.28)], rng, rough=0.04, breath=0.18)
+    # Held, as a call carries: a dip at the break, the second phrase nearly as strong as the first.
+    held = np.interp(t, [0.0, 0.14, 1.2, 1.3, 1.42, 2.0, seconds], [0.0, 1.0, 0.86, 0.55, 0.82, 0.72, 0.0])
+    # The lower note's harmonics fall between her formants, so it comes out about a third as loud: made up after the break.
+    held = held * np.interp(t, [1.28, 1.42], [1.0, 3.2])
+    return fade_end(song * held, 0.15)
 
 
 def huldra_hurt(rng):
@@ -364,7 +437,7 @@ def huldra_dies(rng):
 
 
 # How much of the top end a throat keeps: a growl's roughness makes noise far above what a big chest would let out. By the first word of the name.
-DARKER = {"Wolf": 1.0, "Troll": 3.0, "Shaman": 2.0, "Draug": 2.5, "Root": 1.5, "Boar": 1.0, "Bog": 1.5}
+DARKER = {"Wolf": 1.0, "Troll": 3.0, "Stone": 3.0, "Shaman": 2.0, "Draug": 2.5, "Root": 1.5, "Boar": 1.0, "Bog": 1.5}
 
 # Name, recipe, takes, how much of it is the forest's echo.
 SOUNDS = [
@@ -377,11 +450,15 @@ SOUNDS = [
     ("Light Rises", light_rises, 4, 0.3), ("Light Hurt", light_hurt, 4, 0.22), ("Light Dies", light_dies, 3, 0.3),
     ("Wing Screech", wing_screech, 4, 0.18), ("Wing Chitter", wing_chitter, 4, 0.14), ("Wing Dies", wing_dies, 3, 0.16),
     ("Huldra Wail", huldra_wail, 4, 0.3), ("Huldra Hurt", huldra_hurt, 4, 0.2), ("Huldra Dies", huldra_dies, 3, 0.28),
+    ("Huldra Call", huldra_call, 2, 0.45),
+    ("Stone Skin", stone_skin, 2, 0.2), ("Light Splits", light_splits, 2, 0.3), ("Wing Alarm", wing_alarm, 2, 0.35), ("Root Regrowth", root_regrowth, 2, 0.25),
 ]
 
 
-def main():
+def main(only=None):
     for stem, recipe, count, wet in SOUNDS:
+        if only and stem not in only:
+            continue
         for i in range(1, count + 1):
             name = f"{stem} {i}"
             dry = recipe(seeded(name))
@@ -390,4 +467,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # Names after the script make only those (python Tools/Audio/creatures.py "Huldra Call"); none makes them all.
+    main(sys.argv[1:] or None)

@@ -66,6 +66,17 @@ Play-mode probes from the CLI and tests only: every number is a first guess. Pla
 - [ ] Mixamo clips were not used (no browser in the agent session), nor the optional two-hand or power-stance toggle: decide
       whether either is still wanted.
 
+## Creature calls and status icons (2026-11-15)
+
+Made to close the failing tests; not heard or seen in game:
+- [ ] Listen to the five new creature calls (Python takes in `Tools/Audio/creatures.py`): Huldra Call (a two-phrase herding song),
+      Stone Skin (Stone Troll), Light Splits (Marsh Light decoys), Wing Alarm (Mistwing), Root Regrowth (Heartroot). Move any you
+      dislike to the Sound picks page for MOSS or Stable Audio takes.
+- [ ] Paint the status icons for Enthralled, Grit, Hamstrung and Webbed. Their lines are in `Tools/LocalSpawn/condition_icons.json`.
+      Run `D:\ComfyUI\.venv\Scripts\python.exe Tools/LocalSpawn/generate_item_icons.py all --model z-image --set conditions Enthralled Grit Hamstrung Webbed`,
+      then `AgentScripts/BuildIcons.cs` (Conditions). Do it with Minecraft closed: it was open with 1.3 GB free, so it was skipped.
+      `PaintedIconTests.StatusEffectDefinition` fails until then.
+
 ## Player stats (2026-11-15)
 
 Everything in Docs/PlayerStatsResearch.md was built (its Status section). Tests only; nothing played by hand:
