@@ -14,17 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Spear Thrust B
   damageType: 0
-  strike: 3
+  strike: 2
   baseDamage: 0
-  weaponDamageRatio: 1
+  weaponDamageRatio: 1.05
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
   range: 3.2
-  arc: 40
+  arc: 120
   maxTargets: 2
-  hitDelay: 0.4444446
-  recoveryTime: 0.79444456
+  hitDelay: 0.5
+  recoveryTime: 0.85
   poiseDamage: 10
   impact: 0.9
   lunge: 0.9
@@ -39,13 +39,16 @@ MonoBehaviour:
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
-  animationState: Attack Polearm
-  animationSpeed: 0.82058823
-  strikeSpeed: 1.35
-  strikeLead: 0.06666667
-  followThroughSpeed: 1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  animationState: KI Pole Sweep
+  animationSpeed: 0.9603178
+  strikeSpeed: 1.5
+  strikeLead: 0.08
+  followThroughSpeed: 1.8
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.75}
   slashSweep: 1
-  slashTilt: 0
+  slashTilt: -13.999085

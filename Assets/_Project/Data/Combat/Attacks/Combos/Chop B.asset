@@ -16,15 +16,15 @@ MonoBehaviour:
   damageType: 0
   strike: 2
   baseDamage: 0
-  weaponDamageRatio: 1.1
+  weaponDamageRatio: 1.15
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
   range: 2.2
   arc: 120
   maxTargets: 3
-  hitDelay: 0.29629633
-  recoveryTime: 0.562963
+  hitDelay: 0.4
+  recoveryTime: 0.66
   poiseDamage: 12
   impact: 1.1
   lunge: 1
@@ -39,13 +39,16 @@ MonoBehaviour:
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
-  animationState: 1H Stab
-  animationSpeed: 1.0161288
-  strikeSpeed: 1.35
-  strikeLead: 0.06666667
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  animationState: KI 1H Overhead
+  animationSpeed: 1.2083337
+  strikeSpeed: 1.5
+  strikeLead: 0.08
   followThroughSpeed: 1.8
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.75}
-  slashSweep: 0
-  slashTilt: 78.641975
+  slashSweep: 1
+  slashTilt: 21.558882

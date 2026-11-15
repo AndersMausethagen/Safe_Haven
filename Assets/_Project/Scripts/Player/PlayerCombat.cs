@@ -281,7 +281,10 @@ public sealed partial class PlayerCombat : MonoBehaviour
     public bool IsFlinching => Time.time < flinchUntil;
 
     /// <summary>True in the wind-up of a heavy swing with a weapon heavy enough to trade blows: hits hurt less and don't knock it out.</summary>
-    public bool IsPushingThrough => activeKind == SwingKind.Heavy && hitPending && Weapon != null && Weapon.HeavySwingArmor > 0f;
+    public bool IsPushingThrough => hitPending && Weapon != null && Weapon.HeavySwingArmor > 0f
+        && (activeKind == SwingKind.Heavy
+            // A greatsword's Hyper Armour: its finisher and charged blows push through as its heavy does.
+            || (Weapon.Signature == WeaponSignature.HyperArmour && (activeTechnique & (HitTechnique.Finisher | HitTechnique.Charged)) != 0));
 
     /// <summary>Raised when a hit makes the player flinch, with how long; true when it cost them a swing.</summary>
     public event Action<float, bool> Flinched;

@@ -26,11 +26,13 @@ MonoBehaviour:
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 0}
   backstepAttack: {fileID: 0}
-  guardCounterAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 11400000, guid: e6fc6546850f4dc4eb77e051de04a0d1, type: 2}
   heavyFollowUp: {fileID: 0}
   chargedAttack: {fileID: 0}
   secondHandDistance: 0.24
   heavySwingArmor: 0
+  signature: 0
+  signaturePower: 1
   weaponArt: {fileID: 0}
   weaponArtFocus: 30
   guardLetThrough: 0.22

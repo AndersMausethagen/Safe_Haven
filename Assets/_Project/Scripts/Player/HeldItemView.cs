@@ -87,12 +87,23 @@ public sealed class HeldItemView : MonoBehaviour
         }
     }
 
+    /// <summary>The weapon in hand is out of it, thrown (a weapon art): its model is hidden until it comes back.</summary>
+    public bool Thrown { get; set; }
+
+    /// <summary>The model in the right hand right now, or null.</summary>
+    public GameObject Current => current;
+
     private void LateUpdate()
     {
         ItemDefinition wanted = Wanted();
         if (wanted != Shown)
         {
             Show(wanted);
+        }
+
+        if (current != null && current.activeSelf == Thrown)
+        {
+            current.SetActive(!Thrown);
         }
 
         UpdateGlow();

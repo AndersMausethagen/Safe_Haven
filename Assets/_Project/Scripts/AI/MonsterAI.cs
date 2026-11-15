@@ -261,16 +261,47 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
                 return false;
             }
 
+            return !definition.OpenWhileStriking || IsElite || InBossFight;
+        }
+    }
+
+    private bool? inBossFight;
+
+    /// <summary>True in a boss fight (BossEncounter).</summary>
+    public bool InBossFight
+    {
+        get
+        {
             if (inBossFight == null)
             {
                 inBossFight = GetComponentInParent<BossEncounter>() != null;
             }
 
-            return !definition.OpenWhileStriking || IsElite || inBossFight.Value;
+            return inBossFight.Value;
         }
     }
 
-    private bool? inBossFight;
+    /// <summary>True while it charges in (a Charge action, before or during its rush): a spear set against it stops it (Anti Charge).</summary>
+    public bool IsCharging => CurrentState == State.Attacking && attacks != null && attacks.Action != null && attacks.Action.kind == MonsterAttackKind.Charge;
+
+    /// <summary>A spear set against its charge: the charge is broken off and, unless it is a boss, it staggers.</summary>
+    public void StopCharge(Combatant by)
+    {
+        if (!IsCharging)
+        {
+            return;
+        }
+
+        attacks.Cancel();
+        pose?.CancelAttack();
+        SetState(State.Chasing);
+        if (!InBossFight)
+        {
+            Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+        }
+
+        AnyInterrupted?.Invoke(this, by);
+    }
 
     /// <summary>A finishing blow has it, and lands in this many seconds. Whatever animates it stands it up to take it.</summary>
     public event Action<float> HeldForFinish;

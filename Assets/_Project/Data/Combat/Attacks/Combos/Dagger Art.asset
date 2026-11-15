@@ -14,30 +14,41 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
   displayName: Dagger Art
   damageType: 0
-  strike: 2
+  strike: 3
   baseDamage: 0
   weaponDamageRatio: 2.6
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
-  range: 2.2
-  arc: 200
-  maxTargets: 3
-  hitDelay: 0.4
-  recoveryTime: 0.85
+  range: 2
+  arc: 90
+  maxTargets: 1
+  hitDelay: 0.3
+  recoveryTime: 0.8
   poiseDamage: 45
   impact: 1
   lunge: 0.8
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
-  animationState: 1H Spin
-  animationSpeed: 0.734568
-  strikeSpeed: 1.7
-  strikeLead: 0.082352936
-  followThroughSpeed: 1.3925946
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: -1
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 2
+  motionDistance: 6
+  alwaysCritical: 0
+  animationState: 1H Thrust
+  animationSpeed: 1.1060609
+  strikeSpeed: 1.5
+  strikeLead: 0.08
+  followThroughSpeed: 1.1400009
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.62, b: 0.3, a: 0.95}
-  slashSweep: 0
-  slashTilt: 9.632152
+  slashSweep: 1
+  slashTilt: 26.328506

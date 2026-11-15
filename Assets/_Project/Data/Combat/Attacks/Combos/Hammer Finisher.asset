@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: Hammer Finisher
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Hammer Finisher
+  damageType: 0
+  strike: 1
+  baseDamage: 0
+  weaponDamageRatio: 1.6
+  powerScaling: 1
+  structureDamageMultiplier: 1
+  canCrit: 1
+  range: 2.7
+  arc: 120
+  maxTargets: 2
+  hitDelay: 0.66
+  recoveryTime: 1.42
+  poiseDamage: 34
+  impact: 1.7
+  lunge: 1.2
+  staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: 0.05
+  afterContactMove: 0.25
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  animationState: 2H Overhead
+  animationSpeed: 0.5229886
+  strikeSpeed: 1.5
+  strikeLead: 0.08
+  followThroughSpeed: 0.9342179
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.8, b: 0.45, a: 0.9}
+  slashSweep: 1
+  slashTilt: 10.367406

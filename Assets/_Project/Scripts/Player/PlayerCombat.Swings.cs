@@ -99,7 +99,12 @@ public sealed partial class PlayerCombat
         activeIsFollowUp = followUp;
 
         fumbled = false;
-        rhythm = kind == SwingKind.Light && step > 0 ? ComboRules.NextRhythm(rhythm, judge, Rules) : 0;
+        rhythm = kind == SwingKind.Light && step > 0 ? (judge == ChainPress.Rhythm ? Mathf.Min(rhythm + 1, MaxRhythm) : 0) : 0;
+        if (kind == SwingKind.Light && step == 0 && judge == ChainPress.Late)
+        {
+            momentum = 0;
+        }
+
         bool finisher = kind == SwingKind.Light && chain > 1 && step == chain - 1;
         lastStep = kind == SwingKind.Rush || kind == SwingKind.GuardCounter ? 0 : kind == SwingKind.Light && !finisher ? step : -1;
 
@@ -139,6 +144,17 @@ public sealed partial class PlayerCombat
             activePoiseMultiplier *= Rules.GuardCounterPoise;
         }
 
+        // Fists' Flurry: each rhythm stack adds weight; a greataxe's Momentum: each swing in a row that landed adds poise.
+        if (Has(WeaponSignature.Flurry) && rhythm > 0)
+        {
+            activePoiseMultiplier *= 1f + weapon.SignaturePower * rhythm;
+        }
+
+        if (Has(WeaponSignature.Momentum) && momentum > 0 && (kind == SwingKind.Light || kind == SwingKind.Heavy))
+        {
+            activePoiseMultiplier *= 1f + MomentumPoisePerStack * momentum;
+        }
+
         activeLunge = attack != null ? attack.Lunge : 0f;
         if (CounterIsReady && kind != SwingKind.ShieldBash && kind != SwingKind.GuardCounter)
         {
@@ -146,15 +162,18 @@ public sealed partial class PlayerCombat
             activeDamageMultiplier *= Rules.CounterDamageMultiplier;
             activePoiseMultiplier *= 2f;
             activeForceCritical = true;
-            counterUntil = float.NegativeInfinity;
+            // A sword's Counter Chain readies more than one: the window opens again for the next.
+            counterCharges--;
+            counterUntil = counterCharges > 0 ? Time.time + Rules.CounterSeconds * CounterChainWindow : float.NegativeInfinity;
             if (counterLunges && weapon != null && weapon.RushAttack != null)
             {
                 activeLunge = Mathf.Max(activeLunge, weapon.RushAttack.Lunge);
             }
 
-            counterLunges = false;
+            counterLunges &= counterCharges > 0;
         }
 
+        activeForceCritical |= attack != null && attack.AlwaysCritical;
         activeTechnique = technique;
         activeStartTime = Time.time;
         chargeHeld = 0f;
@@ -168,6 +187,12 @@ public sealed partial class PlayerCombat
         }
 
         activeDirection = toFinish != null ? toFinish.transform.forward : AimAssist(movement.AimDirection, attack, out _);
+        activeMotion = kind == SwingKind.Art && attack != null ? attack.Motion : ArtMotion.None;
+        if (activeMotion == ArtMotion.BlinkBehind && !BlinkBehindFocus(attack.MotionDistance))
+        {
+            activeMotion = ArtMotion.None;
+        }
+
         movement.SnapFacing(activeDirection);
         if (toFinish != null)
         {
@@ -181,6 +206,20 @@ public sealed partial class PlayerCombat
         float hitIn = HitAt(attack, activeSpeed);
         activeWindupMove = SwingMotion.WindupMove(attack, kind, Rules);
         activeLungeLead = SwingMotion.LungeLead(attack, kind, hitIn, LungeSeconds, attack != null ? Mathf.Max(attack.StrikeLead, LungeSeconds) : 0f, Rules);
+        // A leap or a dash closes its whole distance over the wind-up, as a rush does; a dash goes through bodies.
+        bool travels = activeMotion == ArtMotion.LeapTo || activeMotion == ArtMotion.DashThrough;
+        if (travels && hitPending)
+        {
+            activeLunge = attack.MotionDistance;
+            activeLungeLead = hitIn;
+            stepPending = true;
+            dashFrom = transform.position;
+            if (activeMotion == ArtMotion.DashThrough)
+            {
+                PassThroughBodies();
+            }
+        }
+
         feetReleased = false;
         movement.FacingLocked = true;
         movement.SetSpeedScale(this, activeWindupMove);
@@ -188,7 +227,7 @@ public sealed partial class PlayerCombat
         {
             ReleaseFeet();
         }
-        else if (kind == SwingKind.Rush && stepPending)
+        else if ((kind == SwingKind.Rush || travels) && stepPending)
         {
             // A rush carries the movement it came with: the lunge runs for the whole wind-up instead of waiting for the strike.
             StepIntoBlow(HitAt(attack, activeSpeed));
@@ -413,7 +452,8 @@ public sealed partial class PlayerCombat
         stepPending = false;
         activeDirection = AimAssist(activeDirection, activeAttack, out float targetDistance);
         movement.SnapFacing(activeDirection);
-        float distance = targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
+        float distance = activeMotion == ArtMotion.DashThrough ? activeLunge
+            : targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
         float seconds = Mathf.Max(0.05f, secondsLeft);
         movement.Lunge(activeDirection * (distance / seconds), seconds);
     }
@@ -429,7 +469,28 @@ public sealed partial class PlayerCombat
         float damage = activeDamageMultiplier * Mathf.Lerp(1f, Rules.HeavyChargeDamage, charge);
         float poise = activePoiseMultiplier * Mathf.Lerp(1f, Rules.HeavyChargePoise, charge);
         Vector3 origin = transform.position;
-        HitDetector.FindTargets(origin, activeDirection, activeAttack, combatant.Faction, hitLayers, foundHits);
+        if (activeMotion == ArtMotion.Throw && ThrowWeapon(damage, poise))
+        {
+            return 0;
+        }
+
+        if (activeMotion == ArtMotion.DashThrough)
+        {
+            // Everything the dash went through, and what stands just past its end.
+            HitDetector.FindAlong(dashFrom, origin + activeDirection * (activeAttack.Range * 0.5f), Mathf.Max(0.8f, activeAttack.Range * 0.5f),
+                combatant.Faction, hitLayers, activeAttack.MaxTargets, foundHits);
+            GiveBodiesBack();
+        }
+        else
+        {
+            float arcBonus = Has(WeaponSignature.Momentum) ? MomentumArcPerStack * momentum : 0f;
+            HitDetector.FindTargets(origin, activeDirection, activeAttack, combatant.Faction, hitLayers, foundHits, arcBonus);
+        }
+
+        if (Has(WeaponSignature.Momentum) && (activeKind == SwingKind.Light || activeKind == SwingKind.Heavy))
+        {
+            momentum = foundHits.Count > 0 ? Mathf.Min(momentum + 1, Mathf.RoundToInt(weapon.SignaturePower)) : 0;
+        }
         // A swing that met nobody may still meet a boulder or a tree, and glance off it (HitMaterials).
         if (foundHits.Count == 0)
         {
@@ -496,14 +557,16 @@ public sealed partial class PlayerCombat
         }
 
         float damage = pending.Damage;
+        float poise = pending.Poise;
         HitTechnique technique = pending.Technique;
         // A sneak attack is always a critical.
         bool critical = pending.Critical || PlayerProficiencies.CaughtUnaware(target);
         bool backstab = IsBackstab(target, out MonsterAI backstabbed);
         if (backstab)
         {
-            // A stagger is earned, and pays most; catching it mid-strike pays less, and no sure critical.
-            damage *= backstabbed.IsStaggered ? Rules.BackstabDamage : Rules.BackstabOnStrikeDamage;
+            // A stagger is earned, and pays most (more with a dagger: Assassin); catching it mid-strike pays less, and no sure critical.
+            float staggered = Has(WeaponSignature.Assassin) ? Mathf.Max(Rules.BackstabDamage, weapon.SignaturePower) : Rules.BackstabDamage;
+            damage *= backstabbed.IsStaggered ? staggered : Rules.BackstabOnStrikeDamage;
             technique |= HitTechnique.Backstab;
             critical |= backstabbed.IsStaggered;
         }
@@ -521,9 +584,46 @@ public sealed partial class PlayerCombat
 
         damage = SilentTakedown(target, pending, damage);
         technique |= HitTechnique.Melee;
+        MonsterAI monster = target is Component struck && struck != null && struck.TryGetComponent(out MonsterAI found) ? found : null;
+        // An axe's Guard Breaker on a raised shield; a spear's Anti Charge against a creature charging in.
+        bool shieldUp = monster != null && monster.ShieldIsUp;
+        bool charging = monster != null && monster.IsCharging;
+        if (Has(WeaponSignature.GuardBreaker) && shieldUp)
+        {
+            poise *= weapon.SignaturePower;
+        }
+
+        if (Has(WeaponSignature.AntiCharge) && charging)
+        {
+            poise *= weapon.SignaturePower;
+        }
+
+        // A hammer's Crush: a heavy blow on poise already worn low staggers at once, great beasts too.
+        const HitTechnique Weighty = HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Charged;
+        bool crush = Has(WeaponSignature.Crush) && (technique & Weighty) != 0 && monster != null && monster.Poise != null
+            && monster.Poise.Fraction < weapon.SignaturePower && !monster.IsStaggered;
         // A charge: at a gallop the blow knocks the struck off their feet.
         AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
-            pending.Poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
+            poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
+        if (monster != null && target.IsAlive)
+        {
+            if (crush && !monster.IsStaggered)
+            {
+                monster.Stagger(Rules.StaggerSeconds);
+                SignatureUsed?.Invoke(WeaponSignature.Crush, monster);
+            }
+
+            if (Has(WeaponSignature.AntiCharge) && charging)
+            {
+                monster.StopCharge(combatant);
+                SignatureUsed?.Invoke(WeaponSignature.AntiCharge, monster);
+            }
+
+            if (Has(WeaponSignature.GuardBreaker) && shieldUp)
+            {
+                SignatureUsed?.Invoke(WeaponSignature.GuardBreaker, monster);
+            }
+        }
         if (backstab)
         {
             Backstabbed?.Invoke(target);
@@ -551,6 +651,8 @@ public sealed partial class PlayerCombat
     private void EndSwing()
     {
         EndFinish();
+        GiveBodiesBack();
+        activeMotion = ArtMotion.None;
         if (activeKind != SwingKind.None)
         {
             lastStartTime = activeStartTime + chargeHeld;
@@ -607,7 +709,9 @@ public sealed partial class PlayerCombat
     /// Riposte perk) it steps in as far as the weapon's rush.</summary>
     public void GrantCounter(float seconds, bool lunges)
     {
-        counterUntil = Mathf.Max(counterUntil, Time.time + seconds);
+        bool chain = Has(WeaponSignature.CounterChain);
+        counterCharges = chain ? Mathf.Max(1, Mathf.RoundToInt(weapon.SignaturePower)) : 1;
+        counterUntil = Mathf.Max(counterUntil, Time.time + seconds * (chain ? CounterChainWindow : 1f));
         counterLunges |= lunges;
         CounterReady?.Invoke();
     }

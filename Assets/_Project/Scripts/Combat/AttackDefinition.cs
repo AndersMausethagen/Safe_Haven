@@ -89,6 +89,16 @@ public sealed class AttackDefinition : ScriptableObject
              "uses the settings' Lunge Share. A rush steps all through its wind-up.")]
     [SerializeField, Range(-1f, 1f)] private float lungeShare = -1f;
 
+    [Header("How a weapon art moves (player)")]
+    [Tooltip("None: an ordinary swing. Dash Through: the player dashes Motion Distance through enemies, striking all along the way, and " +
+             "ends past them (behind for a backstab). Blink Behind: steps at once to the back of the enemy in focus within Motion Distance, " +
+             "then strikes. Leap To: closes up to Motion Distance on the enemy in focus over the whole wind-up. Throw: the weapon flies " +
+             "Motion Distance, striking what it meets (up to Max Targets), and comes back to the hand.")]
+    [SerializeField] private ArtMotion motion;
+    [SerializeField, Min(0f)] private float motionDistance = 3.5f;
+    [Tooltip("Always a critical hit (a dagger's focused stab).")]
+    [SerializeField] private bool alwaysCritical;
+
     [Header("Animation (player)")]
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Setup › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
@@ -149,6 +159,9 @@ public sealed class AttackDefinition : ScriptableObject
     public float WindupTurnRate => windupTurnRate;
     public float MoveAt => moveAt;
     public float LungeShare => lungeShare;
+    public ArtMotion Motion => motion;
+    public float MotionDistance => motionDistance;
+    public bool AlwaysCritical => alwaysCritical;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float StrikeSpeed => strikeSpeed;
@@ -204,6 +217,16 @@ public sealed class AttackDefinition : ScriptableObject
         // The attack can't be ready to chain before the damage has landed.
         recoveryTime = Mathf.Max(recoveryTime, hitDelay);
     }
+}
+
+/// <summary>How a weapon art moves the player (AttackDefinition › How a weapon art moves).</summary>
+public enum ArtMotion
+{
+    None,
+    DashThrough,
+    BlinkBehind,
+    LeapTo,
+    Throw,
 }
 
 /// <summary>Which way a slash arc sweeps, as seen from behind the attacker.</summary>

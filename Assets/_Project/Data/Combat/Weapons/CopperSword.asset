@@ -15,19 +15,29 @@ MonoBehaviour:
   displayName: Copper Sword
   stance: 1
   kind: 0
+  strikeOverride: 0
   damage: 15
   basicAttack: {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
   combo:
   - {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
   - {fileID: 11400000, guid: 2bb886f084a65db46be3e113eac1044b, type: 2}
+  - {fileID: 11400000, guid: 04a754899534dbe4e9c9f2959d75e342, type: 2}
   - {fileID: 11400000, guid: 72952aea0799d8f4293ae88df456eb20, type: 2}
   heavyAttack: {fileID: 11400000, guid: c27b7f4b0e8770b468650d183df959b8, type: 2}
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 11400000, guid: cea869980d7ef9745ae1b64a479dd4a7, type: 2}
+  backstepAttack: {fileID: 11400000, guid: 23e2bc27ec5350841a51e3e63528d399, type: 2}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 11400000, guid: 865edbaa2fc50604eb802518cae1cde6, type: 2}
+  chargedAttack: {fileID: 11400000, guid: 13f2513b47f39fa438436d23a253e1a6, type: 2}
   secondHandDistance: 0.24
+  heavySwingArmor: 0
+  signature: 1
+  signaturePower: 2
   weaponArt: {fileID: 11400000, guid: 4398173f027e9ad46aadd2cfb8461b4c, type: 2}
   weaponArtFocus: 30
   guardLetThrough: 0.35
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

@@ -137,7 +137,9 @@ public sealed partial class PlayerAnimationController
         int layer = onTheRun && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         plantedSwing = 0;
-        if (swing.Kind == SwingKind.Heavy && hash != 0 && upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, hash))
+        // A charged blow is already past its charge: it strikes with the whole body (it may leap).
+        if (swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0 && hash != 0 && upperBodyLayer >= 0
+            && animator.HasState(upperBodyLayer, hash))
         {
             layer = upperBodyLayer;
             plantedSwing = hash;

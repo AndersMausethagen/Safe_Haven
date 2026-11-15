@@ -35,7 +35,8 @@ public static class HitDetector
         AttackDefinition attack,
         Faction attackerFaction,
         int layerMask,
-        List<Hit> results)
+        List<Hit> results,
+        float arcBonus = 0f)
     {
         results.Clear();
 
@@ -44,7 +45,7 @@ public static class HitDetector
 
         Vector3 center = origin + Vector3.up * CenterHeight;
         int count = Physics.OverlapSphereNonAlloc(center, attack.Range, Overlaps, layerMask, QueryTriggerInteraction.Ignore);
-        float halfArc = attack.Arc * 0.5f;
+        float halfArc = Mathf.Min(360f, attack.Arc + arcBonus) * 0.5f;
 
         for (int i = 0; i < count; i++)
         {
@@ -74,6 +75,35 @@ public static class HitDetector
         if (attack.MaxTargets > 0 && results.Count > attack.MaxTargets)
         {
             results.RemoveRange(attack.MaxTargets, results.Count - attack.MaxTargets);
+        }
+    }
+
+    /// <summary>Fills results with the living, hostile targets within <paramref name="radius"/> of the path from <paramref name="start"/> to
+    /// <paramref name="end"/> (feet height; the path is searched at body height), nearest the start first, up to <paramref name="maxTargets"/>
+    /// (0: all). A dash through enemies and a thrown weapon use it.</summary>
+    public static void FindAlong(Vector3 start, Vector3 end, float radius, Faction attackerFaction, int layerMask, int maxTargets, List<Hit> results)
+    {
+        results.Clear();
+        Vector3 a = start + Vector3.up * CenterHeight, b = end + Vector3.up * CenterHeight;
+        int count = Physics.OverlapCapsuleNonAlloc(a, b, Mathf.Max(0.05f, radius), Overlaps, layerMask, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            IDamageable target = Overlaps[i].GetComponentInParent<IDamageable>();
+            if (target == null || !target.IsAlive || target.Faction.AreAllies(attackerFaction) || Contains(results, target))
+            {
+                continue;
+            }
+
+            Vector3 point = NearestPoint(Overlaps[i], Vector3.Lerp(a, b, 0.5f));
+            Vector3 flat = point - start;
+            flat.y = 0f;
+            results.Add(new Hit(target, point, flat.magnitude));
+        }
+
+        results.Sort(ByDistance);
+        if (maxTargets > 0 && results.Count > maxTargets)
+        {
+            results.RemoveRange(maxTargets, results.Count - maxTargets);
         }
     }
 

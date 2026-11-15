@@ -15,19 +15,29 @@ MonoBehaviour:
   displayName: Venom Fang
   stance: 1
   kind: 0
+  strikeOverride: 0
   damage: 11
   basicAttack: {fileID: 11400000, guid: bbbb60ea617343f498e3c033d3efa014, type: 2}
   combo:
   - {fileID: 11400000, guid: bbbb60ea617343f498e3c033d3efa014, type: 2}
+  - {fileID: 11400000, guid: ed1b57e31af652749b05d3c0943d2162, type: 2}
   - {fileID: 11400000, guid: c35ed7b4e89d16e4799e4606db650bfc, type: 2}
   - {fileID: 11400000, guid: 3fc57dd8ccea52e48926e14e6b2311e7, type: 2}
   heavyAttack: {fileID: 11400000, guid: 8b9e2b19b54593d4697ed6d3461dd1f7, type: 2}
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 11400000, guid: 257d70f262a8a1048aa1155d719cb4c1, type: 2}
+  backstepAttack: {fileID: 11400000, guid: 5910a098f92471949a5f4edbc6fecac6, type: 2}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 11400000, guid: 6338be01dacc29b408f77e8911767a3b, type: 2}
   secondHandDistance: 0.24
+  heavySwingArmor: 0
+  signature: 2
+  signaturePower: 2
   weaponArt: {fileID: 11400000, guid: 50662c3cc7d4d5442a4ed5e095173243, type: 2}
   weaponArtFocus: 25
   guardLetThrough: 0.35
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

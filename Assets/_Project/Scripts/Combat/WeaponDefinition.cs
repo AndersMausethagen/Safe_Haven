@@ -60,6 +60,18 @@ public sealed class WeaponDefinition : ScriptableObject
     [Tooltip("Share of a blow's damage shrugged off during a heavy swing's wind-up. Above 0 the swing also pushes through hits instead of being knocked out: for what is heavy enough to trade blows.")]
     [SerializeField, Range(0f, 0.9f)] private float heavySwingArmor;
 
+    [Header("Signature (what this kind of weapon does that no other does)")]
+    [Tooltip("Counter Chain (swords): a parry or perfect dodge readies Power counters, and their window is half again as long. " +
+             "Assassin (daggers): a backstab on a staggered enemy deals Power times (instead of the usual), and a quickstep costs less. " +
+             "Guard Breaker (axes, clubs): Power times the poise against a raised shield. Momentum (greataxes): each swing in a row that " +
+             "lands adds a stack, at most Power: wider swings and more poise; a whiff or a pause loses them. Hyper Armour (greatswords): " +
+             "the chain's finisher and a charged blow push through hits as a heavy swing does. Crush (hammers): a heavy, finisher or " +
+             "charged blow on an enemy whose poise is below Power of its whole staggers it at once, great beasts too. Anti Charge (spears): " +
+             "a blow on an enemy charging in deals Power times the poise and stops the charge. Flurry (fists): rhythm stacks to 3 and each " +
+             "adds Power of the blow's poise.")]
+    [SerializeField] private WeaponSignature signature;
+    [SerializeField, Min(0f)] private float signaturePower = 1f;
+
     [Header("Weapon art")]
     [Tooltip("The special attack this weapon knows: paid for with Focus, not stamina (middle mouse, or attack while guarding " +
              "without a shield). Empty: none.")]
@@ -160,6 +172,8 @@ public sealed class WeaponDefinition : ScriptableObject
     public AttackDefinition HeavyFollowUp => heavyFollowUp;
     public AttackDefinition ChargedAttack => chargedAttack;
     public float BlockPoise => blockPoise;
+    public WeaponSignature Signature => signature;
+    public float SignaturePower => signaturePower;
     public float SecondHandDistance => secondHandDistance;
     public float HeavySwingArmor => heavySwingArmor;
     public AttackDefinition WeaponArt => weaponArt;
@@ -204,4 +218,18 @@ public sealed class WeaponDefinition : ScriptableObject
             basicAttack = chain[0];
         }
     }
+}
+
+/// <summary>What a kind of weapon does that no other does (WeaponDefinition › Signature; Docs/CombatResearch.md §3.5).</summary>
+public enum WeaponSignature
+{
+    None,
+    CounterChain,
+    Assassin,
+    GuardBreaker,
+    Momentum,
+    HyperArmour,
+    Crush,
+    AntiCharge,
+    Flurry,
 }

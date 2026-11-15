@@ -170,7 +170,7 @@ public sealed class PlayerDodge : MonoBehaviour
 
         DodgeStyle style = Style;
         DodgeShape shape = settings.ShapeOf(style);
-        if (stamina != null && !stamina.TrySpend(stamina.DodgeCost * shape.stamina))
+        if (stamina != null && !stamina.TrySpend(stamina.DodgeCost * shape.stamina * (combat != null ? combat.DodgeCostScale : 1f)))
         {
             return false;
         }

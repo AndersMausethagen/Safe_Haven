@@ -15,19 +15,28 @@ MonoBehaviour:
   displayName: Stone Axe
   stance: 2
   kind: 0
+  strikeOverride: 0
   damage: 16
   basicAttack: {fileID: 11400000, guid: 5560658063fc36647a4ede31a52b1ad6, type: 2}
   combo:
   - {fileID: 11400000, guid: 5560658063fc36647a4ede31a52b1ad6, type: 2}
+  - {fileID: 11400000, guid: b2351122fa361484087c75d3cb981434, type: 2}
   - {fileID: 11400000, guid: 5194566a9a4ce58459aa7b2ec6105d10, type: 2}
   heavyAttack: {fileID: 11400000, guid: 93dfc0815102c974c961dba05f87b033, type: 2}
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: 062a02f69d8783c4a9628d9f400b04ca, type: 2}
+  backstepAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 11400000, guid: 2acc7578ea470fd4cbafd40442971236, type: 2}
   secondHandDistance: 0.34
   heavySwingArmor: 0.3
+  signature: 4
+  signaturePower: 3
   weaponArt: {fileID: 11400000, guid: 061c62dd7403cdb4b84d87032296c596, type: 2}
   weaponArtFocus: 40
   guardLetThrough: 0.4
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

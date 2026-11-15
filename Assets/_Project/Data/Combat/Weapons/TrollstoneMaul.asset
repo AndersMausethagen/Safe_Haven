@@ -15,19 +15,28 @@ MonoBehaviour:
   displayName: Trollstone Maul
   stance: 2
   kind: 0
+  strikeOverride: 0
   damage: 50
   basicAttack: {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}
   combo:
   - {fileID: 11400000, guid: 1b77eb34ce9a9d046872d336c401e61b, type: 2}
   - {fileID: 11400000, guid: 9e02ace2e97fd3f478bf6f510fbb30ae, type: 2}
+  - {fileID: 11400000, guid: 0f652dfeaff846445b9719b0fc0b8d0c, type: 2}
   heavyAttack: {fileID: 11400000, guid: 8b601bffdeba5cd459307f6bf4231fbb, type: 2}
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: 1101a366a500355439a81bb13a3b0f6c, type: 2}
+  backstepAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 11400000, guid: 5c87200ac90cf06418b85419b4507964, type: 2}
   secondHandDistance: 0.34
   heavySwingArmor: 0.4
+  signature: 6
+  signaturePower: 0.3
   weaponArt: {fileID: 11400000, guid: 906d6736688abce4aae52f5bd7fa40ad, type: 2}
   weaponArtFocus: 40
   guardLetThrough: 0.4
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

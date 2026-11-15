@@ -15,19 +15,29 @@ MonoBehaviour:
   displayName: Fists
   stance: 0
   kind: 0
+  strikeOverride: 0
   damage: 5
   basicAttack: {fileID: 11400000, guid: ffeb578093ca93c4292bf2adf73c4027, type: 2}
   combo:
   - {fileID: 11400000, guid: ffeb578093ca93c4292bf2adf73c4027, type: 2}
   - {fileID: 11400000, guid: 9a7b19c9a71e4094ba37320ae76f742c, type: 2}
   - {fileID: 11400000, guid: cbb9c5beef19edd449c4d86ee5007ef9, type: 2}
-  heavyAttack: {fileID: 0}
+  - {fileID: 11400000, guid: d2c6debb3ef7bba488f77c32c7852228, type: 2}
+  heavyAttack: {fileID: 11400000, guid: e1e2be13be413834f8009a0a4861f1ee, type: 2}
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: c67abfd25b1a525449541539a8b019b0, type: 2}
+  backstepAttack: {fileID: 11400000, guid: cf1b7b0714aa16c44b0c23061dcfa2e7, type: 2}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 0}
   secondHandDistance: 0.24
-  weaponArt: {fileID: 0}
-  weaponArtFocus: 0
+  heavySwingArmor: 0
+  signature: 8
+  signaturePower: 0.25
+  weaponArt: {fileID: 11400000, guid: c7461b086c5832c47ad4bcfb9d6477a5, type: 2}
+  weaponArtFocus: 25
   guardLetThrough: 0.6
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32
@@ -40,6 +50,7 @@ MonoBehaviour:
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
   swingSound: {fileID: 11400000, guid: 8ea0cd3b53fb0d64b8105352ea14c1b5, type: 2}
   hitSound: {fileID: 11400000, guid: 3c8f3ee6d3ab96d4ebc9f3e9c3b213f4, type: 2}
   hitEffect: {fileID: 4050785798968798827, guid: 44a445af987eb9b4797ef7d7c3bf50ec, type: 3}

@@ -15,19 +15,28 @@ MonoBehaviour:
   displayName: Iron Greatsword
   stance: 2
   kind: 0
+  strikeOverride: 0
   damage: 30
   basicAttack: {fileID: 11400000, guid: 2d64ac21946bd1e4abf07ed1449499f2, type: 2}
   combo:
   - {fileID: 11400000, guid: 2d64ac21946bd1e4abf07ed1449499f2, type: 2}
+  - {fileID: 11400000, guid: 2397efd4cd278814798335093372c4fc, type: 2}
   - {fileID: 11400000, guid: 55293a90ef0148d4e933667257b3a8de, type: 2}
   heavyAttack: {fileID: 11400000, guid: 85aaa385c6cde3c46b6814c436ac7c52, type: 2}
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: 2ed922a7de7b1494aa275048fa34b5b3, type: 2}
+  backstepAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 11400000, guid: b67652ca102d9f648b8266f38744d3a5, type: 2}
+  chargedAttack: {fileID: 11400000, guid: 7e26d52160581c746a08cedee860abee, type: 2}
   secondHandDistance: 0.17
   heavySwingArmor: 0.3
+  signature: 5
+  signaturePower: 1
   weaponArt: {fileID: 11400000, guid: 54b1444be62bf60438b43419ffd4e51e, type: 2}
   weaponArtFocus: 35
   guardLetThrough: 0.4
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

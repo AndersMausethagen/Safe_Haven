@@ -192,7 +192,7 @@ public sealed class CombatTechniqueTests
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(CombatAnimationSetup.PlayerControllerPath);
         var full = controller.layers.First(l => l.name == CombatAnimationSetup.FullBodyLayer).stateMachine.states.Select(s => s.state.name);
         var arms = controller.layers.First(l => l.name == "Attack Arms").stateMachine.states.Select(s => s.state.name).ToList();
-        CollectionAssert.IsSubsetOf(full.Where(state => state != "Quickstep" && state != "Roll" && state != "Heavy Roll"), arms, "every swing can go on the arms");
+        CollectionAssert.IsSubsetOf(full.Where(state => state != "Quickstep" && state != "Roll" && state != "Heavy Roll" && state != "Knockdown"), arms, "every swing can go on the arms");
     }
 
     [Test]

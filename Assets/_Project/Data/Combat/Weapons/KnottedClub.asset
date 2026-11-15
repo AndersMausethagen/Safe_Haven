@@ -25,11 +25,18 @@ MonoBehaviour:
   heavyAttack: {fileID: 11400000, guid: f9e3d2bae0fc82e41950e0ff6d07eed2, type: 2}
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 11400000, guid: d9740238ef4f0bf41afa3aa4fe467b0c, type: 2}
+  backstepAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 11400000, guid: b876c87559bb7794e92ecb8b5fdbfc1b, type: 2}
   secondHandDistance: 0.24
   heavySwingArmor: 0
+  signature: 3
+  signaturePower: 2
   weaponArt: {fileID: 11400000, guid: 2469662c3166a71459278163a6dc0f3a, type: 2}
   weaponArtFocus: 30
   guardLetThrough: 0.35
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32

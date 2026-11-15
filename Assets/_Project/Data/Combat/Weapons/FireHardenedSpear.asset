@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Fire-Hardened Spear
   stance: 3
   kind: 0
+  strikeOverride: 0
   damage: 10.200001
   basicAttack: {fileID: 11400000, guid: 8289df3b0f804ce45ac64071c7956b43, type: 2}
   combo:
@@ -24,10 +25,18 @@ MonoBehaviour:
   heavyAttack: {fileID: 11400000, guid: 9941ba148405a124d89edd31f0a36564, type: 2}
   counterAttack: {fileID: 0}
   rushAttack: {fileID: 11400000, guid: 4f6f80fd67a166342abbcaa8e128466a, type: 2}
+  backstepAttack: {fileID: 11400000, guid: f91cc66995b934246a41c03f597408ff, type: 2}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 11400000, guid: 3de2cfd8571bfc84d87f6e5046d5aeda, type: 2}
+  chargedAttack: {fileID: 11400000, guid: 9bf4bff86b5af904eb213458a90aec2f, type: 2}
   secondHandDistance: 0.45
+  heavySwingArmor: 0
+  signature: 7
+  signaturePower: 2
   weaponArt: {fileID: 11400000, guid: 1f3c95b1382243441a87d964b6a28d43, type: 2}
   weaponArtFocus: 30
   guardLetThrough: 0.4
+  blockPoise: 0
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32
