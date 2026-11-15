@@ -44,6 +44,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private static readonly int ActionSpeedHash = Animator.StringToHash("ActionSpeed");
     private static readonly int HitStateHash = Animator.StringToHash("Hit");
     private static readonly int HopStateHash = Animator.StringToHash("Hop");
+    private static readonly int HeavyHitStateHash = Animator.StringToHash("Hit Heavy");
+    private static readonly int KnockdownStateHash = Animator.StringToHash("Knockdown");
+    // Reactions by the blow's weight (No Rest for the Wicked 1.0: "hit reactions depend on how much poise damage an attack deals"): a
+    // light flinch, a heavy stagger back for a weighty blow, a knockdown when a charged or crushing blow breaks its poise.
+    private const float HeavyHitPoiseShare = 0.3f;
+    private const HitTechnique Weighty = HitTechnique.Heavy | HitTechnique.Charged | HitTechnique.Counter | HitTechnique.GuardCounter | HitTechnique.Finisher;
+    private float lastBlowAt = -1f;
+    private bool lastBlowFells;
 
     private Damageable health;
     private MonsterAI ai;
@@ -169,12 +177,38 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
-        bool flinches = animator != null && animator.isHuman && animator.enabled && result.Damage > 0f && !result.Killed && !result.Blocked
-            && !damage.IsOverTime && result.Damage >= health.MaxHealth * flinchShare
-            && ai.CurrentState != MonsterAI.State.Attacking && ai.CurrentState != MonsterAI.State.Staggered;
-        if (flinches && animator.HasState(0, HitStateHash))
+        float maxPoise = ai.Poise != null ? ai.Poise.Max : 30f;
+        bool weighty = (damage.Technique & Weighty) != 0 || damage.Poise >= maxPoise * HeavyHitPoiseShare;
+        lastBlowAt = Time.time;
+        lastBlowFells = (damage.Technique & HitTechnique.Charged) != 0 || damage.Poise >= maxPoise * 0.75f;
+        // A blow that staggered it already (the AI heard it first): a felling blow knocks it down.
+        if (ai.CurrentState == MonsterAI.State.Staggered && lastBlowFells && !result.Killed)
         {
-            animator.CrossFadeInFixedTime(HitStateHash, FlinchFade, 0, 0f);
+            KnockDown();
+            return;
+        }
+
+        bool flinches = animator != null && animator.isHuman && animator.enabled && result.Damage > 0f && !result.Killed && !result.Blocked
+            && !damage.IsOverTime && (result.Damage >= health.MaxHealth * flinchShare || weighty)
+            && ai.CurrentState != MonsterAI.State.Attacking && ai.CurrentState != MonsterAI.State.Staggered;
+        if (!flinches)
+        {
+            return;
+        }
+
+        int state = weighty && animator.HasState(0, HeavyHitStateHash) ? HeavyHitStateHash : HitStateHash;
+        if (animator.HasState(0, state))
+        {
+            animator.CrossFadeInFixedTime(state, FlinchFade, 0, 0f);
+        }
+    }
+
+    private void KnockDown()
+    {
+        if (animator != null && animator.isHuman && animator.enabled && animator.HasState(0, KnockdownStateHash))
+        {
+            animator.CrossFadeInFixedTime(KnockdownStateHash, FlinchFade, 0, 0f);
+            lastBlowFells = false;
         }
     }
 
@@ -192,6 +226,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private void OnStaggered(float seconds)
     {
+        // Felled by the blow that broke it (a charged swing, a crush): down, not just reeling.
+        if (lastBlowFells && Time.time - lastBlowAt < 0.05f)
+        {
+            KnockDown();
+            return;
+        }
+
         if (hasStagger)
         {
             if (hasAttack) animator.ResetTrigger(attackHash);

@@ -17,6 +17,74 @@ public static class JournalNotices
         GameEvents.Raised += OnGameEvent;
         ExperienceTracker.Practised -= OnPractised;
         ExperienceTracker.Practised += OnPractised;
+        Player.Spawned -= Follow;
+        Player.Spawned += Follow;
+        MonsterAI.AnyStaggered -= OnAnyStaggered;
+        MonsterAI.AnyStaggered += OnAnyStaggered;
+    }
+
+    // ----- Fighting: each combat page opens the first time what it is about comes up (JournalPage.unlockedByTechnique) -----
+
+    /// <summary>The keys a page can wait for.</summary>
+    public static readonly string[] Techniques = { "guard", "parry", "dodge", "stagger", "stamina", "hurt" };
+
+    public static string TechniqueKey(string technique) => "technique:" + technique;
+
+    private static PlayerGuard guard;
+    private static PlayerDodge dodge;
+    private static PlayerStamina stamina;
+    private static PlayerCombat combat;
+    private static Damageable health;
+
+    /// <summary>The player has just done this in a fight: the first time, the pages that wait for it open.</summary>
+    public static void TriedTechnique(string technique)
+    {
+        if (!string.IsNullOrEmpty(technique) && GameSession.Progress.Journal.NoteTried(TechniqueKey(technique)))
+        {
+            CheckPages();
+        }
+    }
+
+    private static void Follow(Player player)
+    {
+        if (guard != null) { guard.Blocked -= OnBlocked; guard.Parried -= OnParried; }
+        if (dodge != null) dodge.Dodged -= OnDodged;
+        if (stamina != null) stamina.SpendRefused -= OnStaminaRefused;
+        if (combat != null) combat.SwingStarted -= OnSwingStarted;
+        if (health != null) health.Damaged -= OnHurt;
+        guard = player != null ? player.GetComponent<PlayerGuard>() : null;
+        dodge = player != null ? player.GetComponent<PlayerDodge>() : null;
+        stamina = player != null ? player.Stamina : null;
+        combat = player != null ? player.GetComponent<PlayerCombat>() : null;
+        health = player != null ? player.Health : null;
+        if (guard != null) { guard.Blocked += OnBlocked; guard.Parried += OnParried; }
+        if (dodge != null) dodge.Dodged += OnDodged;
+        if (stamina != null) stamina.SpendRefused += OnStaminaRefused;
+        if (combat != null) combat.SwingStarted += OnSwingStarted;
+        if (health != null) health.Damaged += OnHurt;
+    }
+
+    private static void OnBlocked(DamageInfo damage) => TriedTechnique("guard");
+    private static void OnParried(DamageInfo damage) { TriedTechnique("guard"); TriedTechnique("parry"); }
+    private static void OnDodged(Vector3 direction) => TriedTechnique("dodge");
+    private static void OnStaminaRefused() => TriedTechnique("stamina");
+    private static void OnSwingStarted(SwingInfo swing) { if (swing.Kind == SwingKind.Art) TriedTechnique("stamina"); }
+
+    private static void OnHurt(DamageInfo damage, DamageResult result)
+    {
+        if (!result.Blocked && result.Damage > 0f && !damage.IsOverTime && damage.Source != null)
+        {
+            TriedTechnique("hurt");
+        }
+    }
+
+    // A creature staggering close to the player: the player's doing, near enough.
+    private static void OnAnyStaggered(MonsterAI monster, float seconds)
+    {
+        if (combat != null && monster != null && (monster.transform.position - combat.transform.position).sqrMagnitude < 64f)
+        {
+            TriedTechnique("stagger");
+        }
     }
 
     private static void OnPractised(ProficiencyDefinition skill, float amount) => Tried(skill);

@@ -61,6 +61,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds after a flinch or a stumble ends before another can start (the damage still lands), so two attackers " +
              "can't keep the player flinching (the user, 2026-11-14: anti-overwhelm 1).")]
     [SerializeField, Min(0f)] private float flinchGrace = 1f;
+    [Tooltip("A hit worth at least this share of the player's max health floors them for Knockdown Seconds (the whole body goes down), " +
+             "untouchable while down so the blow isn't followed by a free combo. 1: never.")]
+    [SerializeField, Range(0.05f, 1f)] private float knockdownShare = 0.35f;
+    [SerializeField, Min(0f)] private float knockdownSeconds = 1f;
     [Tooltip("A hit worth at least this share of the player's max health also gives a moment of invulnerability...")]
     [SerializeField, Range(0.05f, 1f)] private float heavyHitShare = 0.2f;
     [Tooltip("...this many seconds: one chance to answer before the next blow lands.")]
@@ -260,6 +264,14 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "so it always comes out. Paid in Focus it costs no stamina: fighting well makes it free.")]
     [SerializeField, Min(0f)] private float artStaminaWithoutFocus = 30f;
 
+    [Header("Regain (strike back to win back health)")]
+    [Tooltip("Share of a blow that got through which striking back can win back (PlayerRegain). 0 turns Regain off.")]
+    [SerializeField, Range(0f, 1f)] private float regainShare = 0.4f;
+    [Tooltip("Seconds it can be won back; it drains evenly meanwhile.")]
+    [SerializeField, Min(0.1f)] private float regainSeconds = 3f;
+    [Tooltip("Health won back per point of melee damage dealt, up to what is left.")]
+    [SerializeField, Min(0f)] private float regainPerDamage = 0.5f;
+
     [Header("Eating and drinking (committed healing)")]
     [Tooltip("Seconds eating or drinking takes. Getting hit or dodging stops it, and the food is kept.")]
     [SerializeField, Min(0.1f)] private float eatSeconds = 1.3f;
@@ -297,6 +309,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float BufferWindow => bufferWindow;
     public float CancelLockout => cancelLockout;
     public float FlinchShare => flinchShare;
+    public float KnockdownShare => knockdownShare;
+    public float KnockdownSeconds => knockdownSeconds;
     public float FlinchSeconds => flinchSeconds;
     public float FlinchGrace => flinchGrace;
     public float HeavyHitShare => heavyHitShare;
@@ -398,6 +412,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FocusHoldSeconds => focusHoldSeconds;
     public float FocusDrainPerSecond => focusDrainPerSecond;
     public float ArtStaminaWithoutFocus => artStaminaWithoutFocus;
+    public float RegainShare => regainShare;
+    public float RegainSeconds => regainSeconds;
+    public float RegainPerDamage => regainPerDamage;
     public float EatSeconds => eatSeconds;
     public float EatMoveSpeed => eatMoveSpeed;
     public float HealOverSeconds => healOverSeconds;

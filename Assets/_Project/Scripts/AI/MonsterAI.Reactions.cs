@@ -168,7 +168,9 @@ public sealed partial class MonsterAI
         {
             bool strong = result.IsCritical || result.Killed
                 || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter)) != 0;
-            pose.Hit(damage.Direction, strong ? 1f : 0.6f, Time.time);
+            // The recoil grows with the blow's poise damage, so a hammer rocks it more than a dagger (reactions by weight).
+            float weight = poise != null ? Mathf.Clamp(0.45f + damage.Poise / poise.Max * 1.5f, 0.45f, 1.2f) : 0.6f;
+            pose.Hit(damage.Direction, strong ? Mathf.Max(1f, weight) : weight, Time.time);
         }
 
         if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))

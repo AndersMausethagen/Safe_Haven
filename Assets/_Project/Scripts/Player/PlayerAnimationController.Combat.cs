@@ -223,13 +223,32 @@ public sealed partial class PlayerAnimationController
 
     private void OnGuardBroken(float seconds) => CrossFadeUpper(GuardBreakStateHash, 0.05f);
 
-    // Skills reuse the weapon swing until they have animations of their own.
+    // A skill plays its own state (a cast, a dash, a spin) where it has one; else the weapon stance's old attack.
     private void OnSkillCast(int slot, SkillDefinition skill)
     {
-        if (skill.PlayAttackAnimation)
+        if (!skill.PlayAttackAnimation)
         {
-            PlayAttack();
+            return;
         }
+
+        int state = string.IsNullOrEmpty(skill.AnimationState) ? 0 : Animator.StringToHash(skill.AnimationState);
+        int layer = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
+        if (state != 0 && layer >= 0 && animator.HasState(layer, state))
+        {
+            SetFloat(ActionSpeedHash, skill.AnimationSpeed);
+            animator.CrossFadeInFixedTime(state, ActionFade, layer, 0f);
+            foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
+            {
+                if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
+                {
+                    animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
+                }
+            }
+
+            return;
+        }
+
+        PlayAttack();
     }
 
     public void PlayHit()
@@ -252,7 +271,36 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
+        // A flinch for the stance in hand (the Stylized pack's own per stance), else the old one.
+        int stanceHit = Animator.StringToHash(weaponStance == WeaponStance.OneHanded ? "Hit 1H" : weaponStance == WeaponStance.TwoHanded ? "Hit 2H"
+            : weaponStance == WeaponStance.Polearm ? "Hit Polearm" : "Hit Unarmed");
+        if (upperBodyLayer >= 0 && weaponStance != WeaponStance.Bow && animator.HasState(upperBodyLayer, stanceHit))
+        {
+            CrossFadeUpper(stanceHit, 0.05f);
+            return;
+        }
+
         PlayHit();
+    }
+
+    // Floored by a huge blow (PlayerCombat: Knockdown Share): the whole body goes down and gets up again.
+    private void OnKnockedDown(float seconds)
+    {
+        int state = Animator.StringToHash("Knockdown");
+        if (fullBodyLayer < 0 || !animator.HasState(fullBodyLayer, state))
+        {
+            return;
+        }
+
+        SetFloat(ActionSpeedHash, 1f);
+        animator.CrossFadeInFixedTime(state, 0.06f, fullBodyLayer, 0f);
+        foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
+        {
+            if (other >= 0 && animator.HasState(other, EmptyStateHash))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, 0.06f, other);
+            }
+        }
     }
 
     // A dodge cancels the swing in gameplay, so a swing still waiting for the animator shouldn't play afterwards.

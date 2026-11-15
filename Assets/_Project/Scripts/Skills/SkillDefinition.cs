@@ -53,6 +53,11 @@ public sealed class SkillDefinition : ScriptableObject
 
     [Header("Presentation")]
     [SerializeField] private bool playAttackAnimation = true;
+    [Tooltip("The player's animator state the skill plays with the whole body (a cast, a dash, a spin), by name. Empty: the weapon " +
+             "stance's old attack, as before.")]
+    [SerializeField] private string animationState;
+    [Tooltip("Playback speed of that state.")]
+    [SerializeField, Range(0.25f, 3f)] private float animationSpeed = 1f;
 
     /// <summary>Stable identifier, used for saves: the asset's name.</summary>
     public string Id => name;
@@ -71,5 +76,7 @@ public sealed class SkillDefinition : ScriptableObject
     public IReadOnlyList<SkillStatBuff> Buffs => buffs;
     public float BuffDuration => buffDuration;
     public bool PlayAttackAnimation => playAttackAnimation;
+    public string AnimationState => animationState;
+    public float AnimationSpeed => animationSpeed;
     public bool HasBuffs => buffs.Count > 0 && buffDuration > 0f;
 }

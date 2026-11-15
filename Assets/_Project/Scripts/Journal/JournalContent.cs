@@ -268,6 +268,13 @@ public static class JournalContent
             return false;
         }
 
+        // A page a save from before had already announced stays open.
+        if (!string.IsNullOrEmpty(page.unlockedByTechnique) && !progress.Journal.HasTried(JournalNotices.TechniqueKey(page.unlockedByTechnique))
+            && !System.Linq.Enumerable.Contains(progress.Journal.Announced, page.title))
+        {
+            return false;
+        }
+
         return !page.foundInRaids || progress.Journal.HasFound(page.title);
     }
 

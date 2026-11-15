@@ -22,6 +22,9 @@ public sealed class JournalPage
     public bool foundInRaids;
     [Tooltip("Hidden until the player first tries this skill (swings at a tree, casts a line, lands a blow). A mechanics page that opens is shown as a tutorial.")]
     public ProficiencyDefinition unlockedBySkill;
+    [Tooltip("Hidden until the player first does this in a fight (JournalNotices.Techniques: guard, parry, dodge, stagger, stamina, " +
+             "hurt), so the combat pages open one at a time as each comes up, not all at the first blow. Empty: none needed.")]
+    public string unlockedByTechnique;
     [Tooltip("A painting of it, for the tutorial window and the journal (LocalSpawn: Tools/LocalSpawn/tutorial_art.json). Mechanics pages only.")]
     public Sprite art;
     [Tooltip("What it is, in a sentence or two, above how it works (the body). Mechanics pages only.")]

@@ -27,3 +27,5 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
+  animationState: KI 2H Overhead
+  animationSpeed: 1.3

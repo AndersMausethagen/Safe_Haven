@@ -23,6 +23,9 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0f)] private float hitStopWhenHurt = 0.06f;
     [Tooltip("Game speed during a hit stop. 0 freezes completely.")]
     [SerializeField, Range(0f, 1f)] private float hitStopTimeScale = 0.05f;
+    [Tooltip("Metres the struck body shudders side to side for the hit stop (times the blow's weight), shrinking as it ends. Hosting " +
+             "co-op, where time can't stop for everyone, the struck body's animation holds still instead and the attacker's slows. 0: no shudder.")]
+    [SerializeField, Range(0f, 0.2f)] private float victimShake = 0.045f;
 
     [Header("Camera shake (0-1 strength)")]
     [SerializeField, Range(0f, 1f)] private float shakeOnHit = 0.15f;
@@ -97,6 +100,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField] private string guardBrokenText = "";
     [SerializeField] private string staggerText = "";
     [SerializeField] private string counterText = "";
+    [Tooltip("Over a creature whose wind-up a blow broke off (it also sparks and clangs).")]
+    [SerializeField] private string interruptText = "";
     [SerializeField] private Color techniqueTextColor = new Color(1f, 0.85f, 0.4f);
     [Tooltip("The telegraph fill turns this color for the last moment before the hit: the time to raise the guard and parry.")]
     [SerializeField] private Color parryCueColor = new Color(1f, 0.92f, 0.8f, 0.55f);
@@ -256,6 +261,8 @@ public sealed class CombatFeelSettings : ScriptableObject
 
     public float HitStopOnHit => hitStopOnHit;
     public float HitStopOnCrit => hitStopOnCrit;
+    public float VictimShake => victimShake;
+    public string InterruptText => interruptText;
     public float HitStopOnKill => hitStopOnKill;
     public float HitStopWhenHurt => hitStopWhenHurt;
     public float HitStopTimeScale => hitStopTimeScale;

@@ -30,3 +30,5 @@ MonoBehaviour:
     value: 20
   buffDuration: 6
   playAttackAnimation: 0
+  animationState: Cast High
+  animationSpeed: 1.1

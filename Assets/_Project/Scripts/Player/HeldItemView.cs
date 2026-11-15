@@ -63,6 +63,8 @@ public sealed class HeldItemView : MonoBehaviour
     private void Awake()
     {
         equipment = GetComponent<PlayerEquipment>();
+        artCombat = GetComponent<PlayerCombat>();
+        artFocus = GetComponent<PlayerFocus>();
         gathering = GetComponent<PlayerGathering>();
         swimming = GetComponent<PlayerSwimming>();
         transportUser = GetComponent<PlayerTransport>();
@@ -106,6 +108,8 @@ public sealed class HeldItemView : MonoBehaviour
             current.SetActive(!Thrown);
         }
 
+        UpdateArtReady();
+
         UpdateGlow();
         ItemStack offHand = equipment != null ? equipment.OffHand : ItemStack.Empty;
         // Gathering tools and broken lights do not leave a burning torch in the other hand.
@@ -121,6 +125,48 @@ public sealed class HeldItemView : MonoBehaviour
         }
         if (IsTorch(Shown) && current != null) current.transform.rotation = Quaternion.identity;
         if (offHandModel != null && IsTorch(offHandShown)) offHandModel.transform.rotation = Quaternion.identity;
+    }
+
+    // ----- The weapon art ready (teach the verbs, Docs/CombatResearch.md §3.3 #13) -----
+    // When Focus can pay for the art in hand, a faint ember light breathes on the weapon: the art (middle mouse) is there to use.
+    private static readonly Color ArtReadyColour = new Color(1f, 0.62f, 0.3f);
+    private const float ArtReadyIntensity = 0.9f;
+    private PlayerCombat artCombat;
+    private PlayerFocus artFocus;
+    private Light artLight;
+
+    /// <summary>True while the weapon in hand glows: its art can be paid for in Focus.</summary>
+    public bool ArtReady { get; private set; }
+
+    private void UpdateArtReady()
+    {
+        WeaponDefinition weapon = artCombat != null ? artCombat.Weapon : null;
+        ArtReady = current != null && current.activeInHierarchy && weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
+            && artFocus != null && artFocus.CanSpend(weapon.WeaponArtFocus) && weapon.WeaponArtFocus > 0f;
+        if (!ArtReady)
+        {
+            if (artLight != null && artLight.enabled) artLight.enabled = false;
+            return;
+        }
+
+        if (artLight == null)
+        {
+            var glow = new GameObject("Art Ready Glow");
+            artLight = glow.AddComponent<Light>();
+            artLight.type = LightType.Point;
+            artLight.color = ArtReadyColour;
+            artLight.range = 1.1f;
+            artLight.shadows = LightShadows.None;
+        }
+
+        if (artLight.transform.parent != current.transform)
+        {
+            artLight.transform.SetParent(current.transform, false);
+            artLight.transform.localPosition = Vector3.up * 0.4f;
+        }
+
+        artLight.enabled = true;
+        artLight.intensity = ArtReadyIntensity * (0.55f + 0.45f * Mathf.Sin(Time.time * 4f));
     }
 
     // Only touches the materials when what is in the hand, or what was done to it, has changed.

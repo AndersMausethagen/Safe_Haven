@@ -25,6 +25,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: be9b38a6d1e80f04b9412f36fe351069, type: 3}
     summary: 
   - group: The old world
@@ -39,6 +40,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 4309b569c79f91447abd766ead239143, type: 3}
     summary: 
   - group: The old world
@@ -56,6 +58,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: c89a5bcf92e164347b7e6ec84e091158, type: 3}
     summary: 
   - group: The old world
@@ -70,6 +73,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 084db206456f42e46a331a84e1af59f6, type: 3}
     summary: 
   - group: The expedition
@@ -87,6 +91,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 55b4e1172114b804ca7eeca9d56c0489, type: 3}
     summary: 
   - group: The expedition
@@ -104,6 +109,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 2dbe96364a9b5f045b67fd500c07b820, type: 3}
     summary: 
   - group: The expedition
@@ -118,6 +124,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 549b1d6c09f61624db2b6d1ca1e75e16, type: 3}
     summary: 
   - group: The old world
@@ -135,6 +142,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: e44f24c818bfcfc4c9063f56bf4b521a, type: 3}
     summary: 
   - group: The forest's own
@@ -149,6 +157,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: c3b37904069014841a0dcd346c26acd2, type: 3}
     summary: 
   - group: The forest's own
@@ -163,6 +172,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 7a61a48f6e3663244a3ffc24f4680a9e, type: 3}
     summary: 
   - group: The forest's own
@@ -177,6 +187,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 0f8550ed498e12241a3a12a44e3bb053, type: 3}
     summary: 
   - group: The forest's own
@@ -191,6 +202,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 4b229cbf90a12f344ba05af46771aeb5, type: 3}
     summary: 
   - group: The people
@@ -208,6 +220,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: d44ee5592bb9a2c4aa2953eb4fab1ad7, type: 3}
     summary: 
   - group: The people
@@ -225,6 +238,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 226878f3b74cac74f92744bfe07aca7f, type: 3}
     summary: 
   - group: The people
@@ -242,6 +256,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 597886e2642f88c4eab3fc52a1e60eb4, type: 3}
     summary: 
   - group: The people
@@ -259,6 +274,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: cebe443fe120590438073ac16c885b26, type: 3}
     summary: 
   - group: The people
@@ -276,6 +292,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 34f6a519f6c1b304094d0d38d7c6689a, type: 3}
     summary: 
   - group: The people
@@ -293,6 +310,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: a68b4df3b2228c44aa638d42833cedec, type: 3}
     summary: 
   - group: Found in the woods
@@ -310,6 +328,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: da47952fda29d084cbe75b901262741f, type: 3}
     summary: 
   - group: Found in the woods
@@ -330,6 +349,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: f7acd31b0d110644cb72c5789d2250b5, type: 3}
     summary: 
   - group: Found in the woods
@@ -347,6 +367,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 5aa62c88656ebf340ab5a9d8dabf5a22, type: 3}
     summary: 
   - group: Found in the woods
@@ -368,6 +389,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 10e0ae7a661139940994890c891d05a9, type: 3}
     summary: 
   - group: Found in the woods
@@ -393,6 +415,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 8ce0b158af6046c41956e616f0e2e711, type: 3}
     summary: 
   - group: Found in the woods
@@ -416,6 +439,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 6c00416e61ff33349a28fc7fde039531, type: 3}
     summary: 
   - group: Found in the woods
@@ -433,6 +457,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 94d913258f8068a449d54e66787c7bc3, type: 3}
     summary: 
   - group: Found in the woods
@@ -450,6 +475,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 7aee147a37d03104fbb95a90aaba2d27, type: 3}
     summary: 
   - group: Found in the woods
@@ -464,6 +490,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: fd049309f7114524fac3de4f7f65ca31, type: 3}
     summary: 
   - group: Found in the woods
@@ -481,6 +508,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 1
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: fc10e401fb174e54887378e64aa6ee77, type: 3}
     summary: 
   mechanics:
@@ -514,6 +542,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 22db94b9ccae2104aadefa5b986d4c37, type: 3}
     summary: Everything you carry, make and know has a window of its own, each on its own key.
   - group: Getting about
@@ -534,6 +563,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 242e9835e13c1fe4d8de161e7692ec81, type: 3}
     summary: 'The journal keeps what you learn: the story so far, your quests, the creatures you have met and how things work.'
   - group: Getting about
@@ -548,6 +578,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: cada299a42945b04b8c891d31b0c5351, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 73168179ecadba64aa0f05aa045be5e0, type: 3}
     summary: Moving slowly and quietly so the forest's creatures don't notice you, and striking first when they haven't.
   - group: Gathering
@@ -568,6 +599,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: a277ba53f2eae0648aa06826e44cbfd8, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 0c0b7be86e94b4b4a971fc035b8fe418, type: 3}
     summary: Cut trees with an axe for logs and sticks. Well-timed swings bring down more wood.
   - group: Gathering
@@ -588,6 +620,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: e9528bdd6784e9d4eaa85d8753dfa51c, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 33eef5039153005419ad83faba57856e, type: 3}
     summary: Break rock and ore with a pickaxe. Better ore needs a better pick.
   - group: Gathering
@@ -608,6 +641,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 4fde8ce0d82ef0d42b6bc607ec3f9a7a, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: de00f5232f0e6fc439112f1356d4e8e6, type: 3}
     summary: Pick plants by hand, or cut them with a sickle, for food, medicine and cloth.
   - group: Gathering
@@ -628,40 +662,49 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: b7b0a5e2ce2709341b1d81708498a315, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 4bfbc7941652ae6459908fec8bfee9d1, type: 3}
     summary: Catch fish with a rod and bait. Landing one is a tug of war you win by being steady.
   - group: Combat
     title: Swings and Chains
     line: Patience beats clicking
-    body: 'Tap the left mouse button for a light swing. Press again after it has landed and you go on to the next swing of the weapon''s chain, and the last one is a finisher: wider, harder and better at breaking poise.
+    body: 'Tap the left mouse button for a light swing. Press again as it lands and you go on to the next swing of the weapon''s chain; the last one is a finisher: wider, harder and better at breaking poise. Every kind of weapon has a chain of its own.
 
 
-      Pressing right as a swing recovers is on the rhythm, a small edge in damage. Swings never get faster, so mashing gains nothing.
+      You can walk while you swing: a dagger or bare fists hardly slow you, a two-handed weapon plants your feet until the blow has landed, and a moment after any blow you can walk out of it. A press is only kept in the last moment before the next swing can start, so mashing gains nothing; hold the button through a swing and the chain goes on by itself.
 
 
-      Hold the button and the swing turns heavy: slow, nearly rooted, and hard enough to break poise. Keep holding to charge it, then let go to strike.'
+      Hold the button and the swing turns heavy: slow, rooted, and hard enough to break poise. Keep holding to charge it. Let go early for a quick heavy; hold it to the end and the weapon lets go its strongest blow. Some weapons follow a heavy with a second if you hold again as it lands.
+
+
+      How you come into a swing changes it: on the run or out of a roll you lunge in; out of a dodge away from your aim you strike while keeping your distance.'
     unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 7c67b2279454d4b408f27add06b9e25b, type: 3}
     summary: Your weapon's attacks come as a chain of swings, and timing matters more than speed.
   - group: Combat
     title: Guard and Parry
     line: Part of a blow, or none of it
-    body: 'Hold the right mouse button to guard. It stops blows from the front, but part of each still gets through (a lot with bare fists, much less with a shield) and each block costs stamina. Run out and your guard breaks, and you reel for over a second.
+    body: 'Hold the right mouse button to guard. It stops blows from the front, but part of each still gets through (a lot with bare fists, much less with a shield) and each block costs stamina. Run out and your guard breaks, and you reel for over a second. A shield knocks back what it blocks.
 
 
-      Raise the guard just before a blow lands and it is a parry: no damage, no stamina, the attacker staggers and your next swing is a sure critical. A creature''s warning on the ground turns pale and the creature glints at exactly that moment.
+      Raise the guard just before a blow lands and it is a parry: no damage, and attacking straight out of it is a sure critical counter. An ordinary creature staggers; a troll, a boss or a raid''s elite only loses part of its poise, so it takes two parries, or a parry and some blows, to floor one. A creature''s warning on the ground turns pale and the creature glints at exactly that moment.
 
 
-      Lowering your guard locks it for a moment, so tapping it is no free parry.'
+      Attack right after a blow is blocked for a guard counter: no critical, but it hits hard and breaks poise.
+
+
+      A guard tapped and dropped without catching anything locks for a moment, longer than one that was held, so fishing for parries costs.'
     unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: guard
     art: {fileID: 21300000, guid: 93da85e4e0d667b41a6deb8751bb1fcc, type: 3}
     summary: A guard takes part of a blow. A guard raised at the last moment takes none of it and opens the attacker up.
   - group: Combat
@@ -679,26 +722,34 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: dodge
     art: {fileID: 21300000, guid: aaacc12f67da1d34384aa499ec5f4489, type: 3}
     summary: A quick roll or step out of harm's way, and the surest way out of a bad spot.
   - group: Combat
     title: Stamina and Focus
     line: One holds you up, the other pays for skills
-    body: 'Stamina runs everything physical and comes back quickly once you stop spending it. Watch it: an empty bar in the middle of a fight is how most people die.
+    body: 'Stamina runs everything physical and comes back quickly once you stop spending it, sooner after a swing than after a dodge or a block. Watch it: an empty bar in the middle of a fight is how most people die.
 
 
-      Focus, the gold bar, is earned by fighting well. Every hit adds some, a perfect dodge more and a parry most of all. It holds for ten seconds after your last gain, then drains. Skills and weapon arts cost Focus, so they are what good fighting buys and not what opens a fight.'
+      Focus, the gold bar, is earned by fighting well: every blow that lands adds some, a parry or a perfect dodge about as much as two blows. It holds for ten seconds after your last gain, then drains. Your weapon''s art (the middle mouse button) and your skills cost Focus, so attacking well pays for them; your weapon glows when its art is ready.
+
+
+      Every kind of weapon has an art that moves you: a sword dashes through, a dagger steps behind, an axe or a spear is thrown and comes back, a greatsword or a hammer leaps in, a greataxe whirls as you walk.'
     unlockedByQuest: {fileID: 0}
     unlockedByCreature: {fileID: 0}
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: stamina
     art: {fileID: 21300000, guid: 97a1cd59086df964295e568fcf764acc, type: 3}
     summary: 'Two bars run a fight: stamina for everything you do, Focus for your abilities.'
   - group: Combat
     title: Poise and Stagger
     line: The thin amber bar
-    body: 'Every hit wears down a creature''s poise, the thin amber bar under its health. Heavy swings, finishers and counters wear it most. At zero it staggers: its attack is cancelled, it reels, and it takes more damage. A parry staggers it too.
+    body: 'Every hit wears down a creature''s poise, the thin amber bar under its health. Heavy swings, finishers and counters wear it most. At zero it staggers: its attack is cancelled, it reels, and it takes more damage. A charged blow that breaks it knocks it down.
+
+
+      Strike a creature while it winds up a light blow (a bite, a shove) and you break it off. A heavy swing, a counter or a weapon art breaks off its heavier blows too, though never a troll''s or a boss''s.
 
 
       Poise comes back after a couple of seconds without being hit, so keep at it.'
@@ -707,6 +758,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: stagger
     art: {fileID: 21300000, guid: 3ec88d50adef5e849a6e644c1b950c1d, type: 3}
     summary: Wear a creature down and it staggers, open to your best blows.
   - group: Combat
@@ -727,6 +779,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: parry
     art: {fileID: 21300000, guid: c4d1a7d56cb31d8409bdd56417434419, type: 3}
     summary: Striking a staggered enemy from behind is the strongest blow there is.
   - group: Combat
@@ -741,6 +794,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 98481e79d59499846a4c2d233cfe5948, type: 2}
+    unlockedByTechnique: hurt
     art: {fileID: 21300000, guid: a801f1ab35ac02f41aca7387aef7936a, type: 3}
     summary: What happens when a blow gets through, and why trading hits is a losing game.
   - group: Combat
@@ -761,6 +815,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: c02bc5ecd6589b94daa2ae6d5320cfb6, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 6e8443e0fad678943bef5c172ef7d827, type: 3}
     summary: Shoot arrows with a bow. A full draw, let go at the right moment, hits hardest.
   - group: Combat
@@ -781,6 +836,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: d03cfd5169e5ca240a4efca33f4f72f5, type: 3}
     summary: Abilities are strong moves and spells on keys 1 to 5, paid for with Focus and stamina.
   - group: Raids
@@ -795,6 +851,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 47081b5d7f0750b4ca34505de73bc596, type: 3}
     summary: A raid is a trip through the portal into the forest, to find what the Haven needs and bring it home.
   - group: Raids
@@ -812,6 +869,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 4e65a6e3278530d4c82d1bdd3810c280, type: 3}
     summary: Every raid runs on a clock, and you must reach an exit and get through it before time runs out.
   - group: Raids
@@ -829,6 +887,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 99bb56b3d61b2d24580e64220d0475d3, type: 3}
     summary: Falling on a raid costs what you carry. Knowing what is at stake helps you decide what to bring.
   - group: Raids
@@ -843,6 +902,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 314f3d943d6c38549afc8ffe5480e69c, type: 3}
     summary: Everything you carry has weight, and a heavy load slows you down.
   - group: Raids
@@ -857,6 +917,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: d9fea10ab2d58cf4f837866b9dc87a21, type: 3}
     summary: Someone from the Haven can come with you on a raid, at a risk.
   - group: Safe Haven
@@ -871,6 +932,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 60a0b7c0a0b81d44cb1c5ddcaf53ba18, type: 3}
     summary: The portal's ward keeps the clearing safe, and it grows as the Haven grows.
   - group: Safe Haven
@@ -885,6 +947,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: 71d286514cbbbe149ba663b354b4f1ae, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: b8881e57aaf87664791862c7672142d4, type: 3}
     summary: Raise new buildings anywhere in the Haven's meadows. Each one opens new things to make and do.
   - group: Safe Haven
@@ -899,6 +962,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 53ba481bb31f8fb4fa92e183265ef1c9, type: 3}
     summary: Crafting stations work while you are away, and your people can work them for you.
   - group: Safe Haven
@@ -913,6 +977,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 69ad07a97c5115840a66eae67d0d706a, type: 3}
     summary: Night brings creatures to the edge of the light, and now and then something tests the ward.
   - group: Safe Haven
@@ -939,6 +1004,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 61a07dc305b888543bfb5d0879a80e08, type: 3}
     summary: Beyond the meadows the land is split into regions, each with a boundary stone. Light a stone and its region is the Haven's; hold it against the forest and it gives back.
   - group: Keeping going
@@ -956,6 +1022,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 6d70f426af47d0242b7c7793361c6028, type: 3}
     summary: You need to eat and drink to stay at your best, and a good meal does more than fill you.
   - group: Keeping going
@@ -976,6 +1043,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: 5cc9278b6487dbc43a5261fd3732c42b, type: 3}
     summary: 'You get better at what you do: thirteen skills, from Woodcutting to Runecraft, each with its own level and perks.'
   - group: Keeping going
@@ -990,6 +1058,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 0}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
     summary: Cursed Essence comes from the forest. Purified at the altar, it makes your gear and skills stronger.
   - group: Getting about
@@ -1016,6 +1085,7 @@ MonoBehaviour:
     unlockedByResident: {fileID: 0}
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
+    unlockedByTechnique: 
     art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
     summary: Taming, keeping and riding horses.
   creatures:

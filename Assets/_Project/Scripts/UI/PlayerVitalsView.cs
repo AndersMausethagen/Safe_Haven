@@ -87,6 +87,10 @@ public sealed class PlayerVitalsView : MonoBehaviour
     private float flashUntil = -1f;
     private float nextStaminaMessageAt = -1f;
     private PlayerFocus boundFocus;
+    // Regain (PlayerRegain): an amber stretch past the health fill, what striking back can still win back.
+    private static readonly Color RegainColour = new Color(0.95f, 0.6f, 0.22f, 0.85f);
+    private PlayerRegain boundRegain;
+    private RectTransform regainSegment;
     private float lastActiveAt;
 
     private void Awake()
@@ -179,6 +183,37 @@ public sealed class PlayerVitalsView : MonoBehaviour
         return glowSprite;
     }
 
+    private void UpdateRegain()
+    {
+        float left = boundRegain != null && bound != null && bound.Health != null ? boundRegain.Regainable : 0f;
+        if (left <= 0.01f || health.fill == null)
+        {
+            if (regainSegment != null && regainSegment.gameObject.activeSelf) regainSegment.gameObject.SetActive(false);
+            return;
+        }
+
+        if (regainSegment == null)
+        {
+            var made = new GameObject("Regain", typeof(RectTransform), typeof(Image));
+            regainSegment = (RectTransform)made.transform;
+            regainSegment.SetParent(health.fill.parent, false);
+            // Over the trail, under the fill.
+            regainSegment.SetSiblingIndex(health.fill.GetSiblingIndex());
+            var image = made.GetComponent<Image>();
+            image.color = RegainColour;
+            image.raycastTarget = false;
+            regainSegment.pivot = new Vector2(0f, 0.5f);
+        }
+
+        float max = Mathf.Max(1f, bound.Health.MaxHealth);
+        float from = Mathf.Clamp01(bound.Health.CurrentHealth / max);
+        regainSegment.gameObject.SetActive(true);
+        regainSegment.anchorMin = new Vector2(from, health.fill.anchorMin.y);
+        regainSegment.anchorMax = new Vector2(Mathf.Clamp01(from + left / max), health.fill.anchorMax.y);
+        regainSegment.offsetMin = new Vector2(0f, health.fill.offsetMin.y);
+        regainSegment.offsetMax = new Vector2(0f, health.fill.offsetMax.y);
+    }
+
     private void UpdateDodgeGlow()
     {
         if (dodgeGlow == null)
@@ -235,6 +270,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
 
         boundDodge = bound.GetComponent<PlayerDodge>();
         boundFocus = bound.GetComponent<PlayerFocus>();
+        boundRegain = bound.GetComponent<PlayerRegain>();
         if (boundFocus != null)
         {
             boundFocus.FocusChanged += OnFocusChanged;
@@ -265,6 +301,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
         }
 
         boundFocus = null;
+        boundRegain = null;
         boundDodge = null;
         bound = null;
         nextStaminaMessageAt = -1f;
@@ -359,6 +396,7 @@ public sealed class PlayerVitalsView : MonoBehaviour
 
         UpdateQuiet();
         UpdateDodgeGlow();
+        UpdateRegain();
         if (staminaFrame != null && flashUntil >= 0f)
         {
             float t = Mathf.Clamp01((flashUntil - Time.unscaledTime) / flashDuration);

@@ -54,6 +54,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         Damageable.AnyDamaged += OnAnyDamaged;
         Damageable.AnyGuarded += OnAnyGuarded;
         MonsterAI.AnyStaggered += OnAnyStaggered;
+        MonsterAI.AnyInterrupted += OnAnyInterrupted;
     }
 
     private void OnDestroy()
@@ -61,6 +62,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         Damageable.AnyDamaged -= OnAnyDamaged;
         Damageable.AnyGuarded -= OnAnyGuarded;
         MonsterAI.AnyStaggered -= OnAnyStaggered;
+        MonsterAI.AnyInterrupted -= OnAnyInterrupted;
         WatchPlayer(null);
         EndHitStop();
         if (Current == this)
@@ -243,8 +245,19 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 : (damage.Technique & HitTechnique.Finisher) != 0 ? 1.25f : 1f;
             // A dagger's nick and a warhammer's blow don't land alike; the attack's Impact says how they differ.
             extra *= impact;
-            HitStop((result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra);
+            float stop = (result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra;
+            HitStop(stop);
             CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
+            // The struck body shudders through the moment; hosting co-op, time can't stop, so its animation holds and the swing slows.
+            if (!result.Killed && GameOptions.HitStop.On)
+            {
+                bool shared = GamePause.TimeIsShared;
+                HitShake.Play(victim, stop, feel.VictimShake * Mathf.Min(extra, 2f), shared);
+                if (shared && playerCombat != null)
+                {
+                    HitShake.Slow(playerCombat.GetComponentInChildren<Animator>(), stop, 0.15f);
+                }
+            }
         }
     }
 
@@ -379,6 +392,33 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
     private const float BackstabMarkerRange = 12f;
 
+    // A wind-up broken off by a blow (No Rest for the Wicked's Crucible: a spark on interrupt): sparks, a clang and a beat of hit stop.
+    private void OnAnyInterrupted(MonsterAI monster, Combatant by)
+    {
+        Vector3 chest = monster.transform.position + Vector3.up * 1.2f;
+        Spawn(feel.ParryEffect, chest, monster.transform.forward);
+        AudioManager.Play(Sounds != null ? Sounds.Block : null, chest);
+        Callout(monster, feel.InterruptText);
+        if (by != null && Player.IsPlayer(by.gameObject))
+        {
+            HitStop(feel.HitStopOnCrit);
+        }
+    }
+
+    // A weapon's signature at work (a hammer's crush, a spear stopping a charge, an axe through a shield): a strong flash and the stagger's sound.
+    private void OnSignatureUsed(WeaponSignature signature, MonsterAI monster)
+    {
+        if (monster == null)
+        {
+            return;
+        }
+
+        Vector3 chest = monster.transform.position + Vector3.up * 1.2f;
+        Spawn(feel.CriticalHitEffect, chest, monster.transform.forward);
+        AudioManager.Play(Sounds != null ? Sounds.GuardBreak : null, chest);
+        CameraShake.Add(feel.ShakeOnCrit);
+    }
+
     // ----- The player -----
 
     private void WatchPlayer(Player player)
@@ -395,6 +435,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.PerfectDodge -= OnPerfectDodge;
             playerCombat.CounterReady -= OnCounterReady;
             playerCombat.ChargeFull -= OnChargeFull;
+            playerCombat.SignatureUsed -= OnSignatureUsed;
         }
 
         if (playerDodge != null)
@@ -436,6 +477,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.PerfectDodge += OnPerfectDodge;
             playerCombat.CounterReady += OnCounterReady;
             playerCombat.ChargeFull += OnChargeFull;
+            playerCombat.SignatureUsed += OnSignatureUsed;
         }
 
         if (playerDodge != null)

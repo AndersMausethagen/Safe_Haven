@@ -207,6 +207,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
             combat.SwingStarted += OnSwingStarted;
             combat.SwingLanded += OnSwingLanded;
             combat.WeaponChanged += OnWeaponChanged;
+            combat.KnockedDown += OnKnockedDown;
         }
 
         if (interactor != null)
@@ -263,6 +264,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (combat != null)
         {
             combat.SwingStarted -= OnSwingStarted;
+            combat.KnockedDown -= OnKnockedDown;
             combat.SwingLanded -= OnSwingLanded;
             combat.WeaponChanged -= OnWeaponChanged;
         }

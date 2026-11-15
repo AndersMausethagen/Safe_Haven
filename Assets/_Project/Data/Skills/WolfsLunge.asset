@@ -27,3 +27,5 @@ MonoBehaviour:
   buffs: []
   buffDuration: 6
   playAttackAnimation: 1
+  animationState: Sword Counter
+  animationSpeed: 1.2

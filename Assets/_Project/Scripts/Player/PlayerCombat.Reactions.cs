@@ -58,19 +58,39 @@ public sealed partial class PlayerCombat
             return;
         }
 
-        bool lostSwing = activeKind != SwingKind.None && hitPending;
+        bool lostSwing = activeKind != SwingKind.None && (hitPending || Floors(result));
         if (lostSwing)
         {
             EndSwing();
         }
 
+        // A huge blow floors the player: down for longer, untouchable meanwhile, so it isn't followed by a free combo.
+        bool floored = Floors(result);
+        float seconds = floored ? Rules.KnockdownSeconds : Rules.FlinchSeconds;
         queuedKind = SwingKind.None;
         pressTime = -1f;
-        flinchUntil = Time.time + Rules.FlinchSeconds;
+        flinchUntil = Time.time + seconds;
         flinchGraceUntil = flinchUntil + Rules.FlinchGrace;
-        movement.SetSpeedScale(Flinch, 0.25f);
-        Flinched?.Invoke(Rules.FlinchSeconds, lostSwing);
+        movement.SetSpeedScale(Flinch, floored ? 0f : 0.25f);
+        if (floored)
+        {
+            heavyHitSafeUntil = Mathf.Max(heavyHitSafeUntil, flinchUntil);
+            if (!heavyHitSafe)
+            {
+                heavyHitSafe = true;
+                health.AddInvulnerability(this);
+            }
+
+            KnockedDown?.Invoke(seconds);
+        }
+
+        Flinched?.Invoke(seconds, lostSwing);
     }
+
+    private bool Floors(DamageResult result) => Rules.KnockdownShare < 1f && result.Damage >= health.MaxHealth * Rules.KnockdownShare;
+
+    /// <summary>Raised when a huge blow floors the player, with how long they are down.</summary>
+    public event System.Action<float> KnockedDown;
 
     /// <summary>Loses their footing for a moment (a troll's stomp shaking the ground under them, GroundImpacts): a flinch
     /// that breaks off a swing still winding up.</summary>
