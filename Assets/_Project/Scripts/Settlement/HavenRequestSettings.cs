@@ -11,9 +11,17 @@ public sealed class HavenRequestSettings : GameSettings<HavenRequestSettings>
     [SerializeField] private List<HavenRequestDefinition> requests = new List<HavenRequestDefinition>();
     [Tooltip("Asks standing at once.")]
     [SerializeField, Min(1)] private int atOnce = 3;
+    [Tooltip("The building the asks are posted at: none are asked until one stands (asks already standing stay). Empty: asked from the " +
+             "start. The Notice Board, built once the Haven is a Homestead (the user, 2026-11-15: the board comes later, and brings " +
+             "the fetch and crafting asks with it).")]
+    [SerializeField] private BuildingDefinition postedAt;
 
     public IReadOnlyList<HavenRequestDefinition> Requests => requests;
     public int AtOnce => atOnce;
+    public BuildingDefinition PostedAt => postedAt;
+
+    /// <summary>Whether new asks can be posted: the Posted At building stands (or none is set).</summary>
+    public bool CanPost => postedAt == null || BuildingUnlocks.HighestTier(postedAt) > 0;
 
     public HavenRequestDefinition Find(string id) => requests.Find(request => request != null && request.Id == id);
 

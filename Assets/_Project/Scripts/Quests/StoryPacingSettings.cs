@@ -16,8 +16,13 @@ public sealed class StoryPacingSettings : GameSettings<StoryPacingSettings>
     [SerializeField, Min(0f)] private float afterDialogueSeconds = 1.5f;
     [Tooltip("A quest ready to start waits at most this long for a fight or a conversation to end, so a monster nobody can reach can't stop the story.")]
     [SerializeField, Min(1f)] private float longestHoldSeconds = 60f;
+    [Tooltip("Haven, side and optional quests that start by themselves begin only at home, and at most this many per return from a raid " +
+             "(held back rather than a flood: nine started in the eleven minutes after the first raid). When none of a kind is under way, " +
+             "one more of it may begin, so there is always something to do at home.")]
+    [SerializeField, Min(1)] private int newPerHomecoming = 2;
 
     public float BetweenQuestsSeconds => betweenQuestsSeconds;
+    public int NewPerHomecoming => newPerHomecoming;
     public float AfterFightSeconds => afterFightSeconds;
     public float AfterDialogueSeconds => afterDialogueSeconds;
     public float LongestHoldSeconds => longestHoldSeconds;

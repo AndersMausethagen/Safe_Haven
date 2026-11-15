@@ -41,6 +41,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private QuestLog log;
     private readonly List<QuestDefinition> pendingRewards = new List<QuestDefinition>();
     private readonly List<WaitingQuest> waiting = new List<WaitingQuest>();
+    private readonly List<WaitingQuest> due = new List<WaitingQuest>();
 
     public static QuestManager Current { get; private set; }
 
@@ -105,23 +106,49 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     /// <summary>True while the quest can start and is only waiting for its moment, for the designer's Play Test panel.</summary>
     public bool IsWaiting(QuestDefinition quest) => waiting.Exists(entry => entry.Quest == quest);
 
-    /// <summary>Starts every waiting quest whose moment has come.</summary>
+    /// <summary>
+    /// True while a Haven, side or optional quest is ready but held for a homecoming (QuestDefinition.HeldForHomecoming): the
+    /// player is away, or this return's share has begun. The journal lists these, so nothing is hidden.
+    /// </summary>
+    public bool IsHeld(QuestDefinition quest) => quest != null && quest.HeldForHomecoming && IsWaiting(quest) && !MayStartHeld(quest);
+
+    /// <summary>Starts every waiting quest whose moment has come, in the order they became ready.</summary>
     internal void StartWaitingQuests(float now)
     {
         StoryPacingSettings rules = StoryPacingSettings.Current;
-        // Backwards: starting one can complete it and add its followers to the end of the list.
-        for (int i = waiting.Count - 1; i >= 0; i--)
+        // A copy: starting one can complete it and add its followers to the list (they get their turn next frame). Held quests can
+        // wait a whole raid, so the copy is kept rather than made each frame.
+        due.Clear();
+        due.AddRange(waiting);
+        for (int i = 0; i < due.Count; i++)
         {
-            WaitingQuest entry = waiting[i];
+            WaitingQuest entry = due[i];
             if (!CanBegin(entry.Quest))
             {
-                waiting.RemoveAt(i);
+                Forget(entry.Quest);
+            }
+            else if (!MayStartHeld(entry.Quest))
+            {
+                // Held: its moment counts from when it may begin, so on coming home it still waits out a welcome or a fight
+                // (a moment long past would otherwise have outlasted Longest Hold and started over someone talking).
+                Hold(entry.Quest, now);
             }
             else if (entry.Quest.StartsInAFight ? now >= entry.ReadyAt : Pacing.CanStart(entry.ReadyAt, now, rules))
             {
-                waiting.RemoveAt(i);
-                Log.TryStart(entry.Quest);
+                Forget(entry.Quest);
+                StartNow(entry.Quest);
             }
+        }
+    }
+
+    private void Forget(QuestDefinition quest) => waiting.RemoveAll(entry => entry.Quest == quest);
+
+    private void Hold(QuestDefinition quest, float now)
+    {
+        int index = waiting.FindIndex(entry => entry.Quest == quest);
+        if (index >= 0 && waiting[index].ReadyAt < now)
+        {
+            waiting[index] = new WaitingQuest(quest, now);
         }
     }
 
@@ -137,15 +164,75 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         StoryPacingSettings rules = StoryPacingSettings.Current;
         float readyAt = Pacing.ReadyAt(quest.StartDelay, Time.time, rules);
-        if (quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules))
+        if ((quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules)) && MayStartHeld(quest))
         {
-            Log.TryStart(quest);
+            StartNow(quest);
         }
         else
         {
             waiting.Add(new WaitingQuest(quest, readyAt));
             RaiseChanged();
         }
+    }
+
+    // The homecoming whose share of held quests is being counted, and how many of them have begun since.
+    private int heldHomecoming = -1;
+    private int heldStarted;
+
+    private void StartNow(QuestDefinition quest)
+    {
+        if (Log.TryStart(quest) && quest.HeldForHomecoming)
+        {
+            heldStarted++;
+        }
+    }
+
+    // A held quest begins only at home (not on a raid, not in a friend's Haven), within this homecoming's share, or when nothing
+    // of its kind is under way. Not saved: a loaded game may start a fresh share, which is harmless.
+    private bool MayStartHeld(QuestDefinition quest)
+    {
+        if (!quest.HeldForHomecoming)
+        {
+            return true;
+        }
+
+        if (GameSession.ActiveRaid != null || HavenVisit.IsVisiting)
+        {
+            return false;
+        }
+
+        int homecoming = GameSession.Settlement.SuccessfulExtractions;
+        if (homecoming != heldHomecoming)
+        {
+            heldHomecoming = homecoming;
+            heldStarted = 0;
+        }
+
+        return heldStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
+    }
+
+    // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses.
+    private readonly bool[] underWay = new bool[8];
+    private bool underWayKnown;
+
+    private bool AnyUnderWay(QuestRank rank)
+    {
+        if (!underWayKnown)
+        {
+            System.Array.Clear(underWay, 0, underWay.Length);
+            foreach (QuestLog.Entry entry in Log.Entries)
+            {
+                if (entry.Quest != null && (int)entry.Quest.Rank < underWay.Length
+                    && (entry.Status == QuestStatus.Active || entry.Status == QuestStatus.ReadyToTurnIn))
+                {
+                    underWay[(int)entry.Quest.Rank] = true;
+                }
+            }
+
+            underWayKnown = true;
+        }
+
+        return (int)rank < underWay.Length && underWay[(int)rank];
     }
 
     /// <summary>
@@ -235,6 +322,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         Unbind();
         pendingRewards.Clear();
         waiting.Clear();
+        heldHomecoming = -1;
+        underWayKnown = false;
         log = GameSession.Quests;
         log.Started += OnQuestStarted;
         log.Progressed += OnQuestProgressed;
@@ -261,6 +350,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     public void OnSceneEntered(Scene scene)
     {
+        underWayKnown = false; // a loaded game's quests came back without starting events
         // Quests begin once there is a player to receive them, not in the menu.
         if (Player.Current != null)
         {
@@ -370,6 +460,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void OnQuestStarted(QuestDefinition quest)
     {
+        underWayKnown = false;
         if (quest.AnnounceStart)
             GameMessages.Post(QuestMarkerSettings.NewQuestText(quest), MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));
@@ -402,6 +493,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void OnQuestLapsed(QuestDefinition quest)
     {
+        underWayKnown = false;
         GameMessages.Post($"Left undone: {quest.DisplayName}", MessageKind.Info);
         RaiseChanged();
     }
@@ -426,6 +518,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void OnQuestCompleted(QuestDefinition quest)
     {
+        underWayKnown = false;
         Pacing.QuestCompleted(Time.time);
         string rewards;
         // Once a raid is decided, what the player takes home is already settled, so rewards wait until they arrive.

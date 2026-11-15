@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: aroofforthework
   displayName: A Roof for the Work
-  description: 'What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: {key:Build}). It mends what a raid wears down, and the chest, the club and the bandages all start at its bench.'
+  description: 'What the woods give you is only wood and ore until there is somewhere to work it. Raise a Workshop beside the fire (build menu: {key:Build}). It mends what a raid wears down, squares Grey Stone into blocks and splits oak into rough planks, and the chest, the club and the bandages all start at its bench.'
   chain: The First Days
   journalNotes: 'The Workshop wants oak, grey stone and sticks: fell the oaks at the clearing''s edge with a hatchet and break the grey boulders with a pick. Repairs are made at its bench.'
   rank: 4
@@ -49,9 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -75,11 +80,18 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

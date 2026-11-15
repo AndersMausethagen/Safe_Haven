@@ -440,11 +440,83 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailGlyph.text = Initials(building.DisplayName);
         detailKind.text = BuildCategories.Name(BuildCategories.Of(building));
         detailTags.text = Tags(building, style);
-        detailText.text = string.IsNullOrWhiteSpace(building.Description) ? "" : building.Description;
+        detailText.text = (string.IsNullOrWhiteSpace(building.Description) ? "" : building.Description) + MadeAt(building, pool, style);
         costHeading.text = building.PlaceInLines ? "COST, EACH PIECE" : "COST";
         ShowCosts(building, pool);
         buildButton.interactable = card.Affordable;
         buildLabel.text = card.Affordable ? "Build" : "Not enough materials";
+    }
+
+    /// <summary>
+    /// Where a material the player is short of is made, from the recipes they know: "Stone Block: Workshop, 4 Grey Stone → 2". A
+    /// cost never names a material without saying where it comes from (the user, 2026-11-15: the altar asked for stone blocks and
+    /// nothing said how to make them). Empty when nothing is short or nothing known makes it.
+    /// </summary>
+    public static string MadeAt(BuildingDefinition building, MaterialPool pool, UIStyle style)
+    {
+        PlayerCrafting crafting = Player.Current != null ? Player.Current.GetComponent<PlayerCrafting>() : null;
+        if (building == null || crafting == null)
+        {
+            return "";
+        }
+
+        var lines = new List<string>();
+        foreach (ItemAmount cost in building.ConstructionItems)
+        {
+            if (cost.Item == null || cost.Amount <= 0 || (pool != null && pool.Have(cost.Item) >= cost.Amount))
+            {
+                continue;
+            }
+
+            string ways = WaysToMake(cost.Item, crafting);
+            if (ways.Length > 0)
+            {
+                lines.Add($"{cost.Item.DisplayName}: {ways}");
+            }
+        }
+
+        if (lines.Count == 0)
+        {
+            return "";
+        }
+
+        string muted = ColorUtility.ToHtmlStringRGB(style.Muted);
+        return $"\n<size=85%><color=#{muted}>" + string.Join("\n", lines) + "</color></size>";
+    }
+
+    /// <summary>"Workshop, 4 Grey Stone → 2" for each known recipe that makes the item, joined with "or". Empty when none does.</summary>
+    public static string WaysToMake(ItemDefinition item, PlayerCrafting crafting)
+    {
+        var ways = new List<string>();
+        foreach (RecipeDefinition recipe in crafting.Recipes)
+        {
+            if (recipe == null || recipe.Output != item || !crafting.IsKnown(recipe))
+            {
+                continue;
+            }
+
+            var inputs = new List<string>();
+            foreach (ItemAmount input in recipe.ItemCost)
+            {
+                if (input.Item != null)
+                {
+                    inputs.Add($"{input.Amount} {input.Item.DisplayName}");
+                }
+            }
+
+            foreach (ResourceAmount input in recipe.ResourceCost)
+            {
+                if (input.Resource != null)
+                {
+                    inputs.Add($"{input.Amount} {input.Resource.DisplayName}");
+                }
+            }
+
+            string where = recipe.IsHandcrafted ? "by hand" : recipe.Station.DisplayName();
+            ways.Add($"{where}, {string.Join(" + ", inputs)} → {recipe.OutputAmount}");
+        }
+
+        return string.Join(" or ", ways);
     }
 
     private static string Tags(BuildingDefinition building, UIStyle style)

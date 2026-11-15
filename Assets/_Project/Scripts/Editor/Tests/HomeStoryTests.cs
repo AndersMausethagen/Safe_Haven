@@ -114,7 +114,9 @@ public sealed class HomeStoryTests
         CollectionAssert.AreEqual(new[] { Quest("PrimitiveTools") }, Quest("FoodAndWater").Prerequisites, "food after the tools");
         CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal"), Quest("PrimitiveTools") }, Quest("ARoofForTheWork").Prerequisites, "the workshop home from the first raid, with tools for its oak and stone");
         CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal") }, Quest("KnowYourEnemy").Prerequisites);
-        CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("SmithsRequest").Prerequisites, "the smith's note once there is a workshop");
+        // Both are pinned to the Notice Board, built later (the user, 2026-11-15); copper wants the Smithy and the Lodge's charcoal.
+        Assert.AreEqual(QuestStart.ByQuestGiver, Quest("KnowYourEnemy").Start, "the wolves are asked on the board");
+        CollectionAssert.AreEqual(new[] { Quest("TheSmith"), Quest("WoodcuttersLodge") }, Quest("SmithsRequest").Prerequisites, "the smith's note once the Smithy and the Lodge stand");
         Assert.Greater(Quest("FirstWeapon").StartDelay, 0f, "the club a while after the chest");
         CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("SafeKeeping").Prerequisites);
         CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("FirstWeapon").Prerequisites);
@@ -149,7 +151,8 @@ public sealed class HomeStoryTests
     [Test]
     public void TheBuildingQuests_ComeAfterTor()
     {
-        CollectionAssert.AreEqual(new[] { Quest("BringTorHome") }, Quest("WoodcuttersLodge").Prerequisites, "the lodge is his to show");
+        // His to show, once the Workshop it needs stands (asked before taught, QuestReachability, 2026-11-15).
+        CollectionAssert.AreEqual(new[] { Quest("BringTorHome"), Quest("ARoofForTheWork") }, Quest("WoodcuttersLodge").Prerequisites, "the lodge is his to show");
         CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("RaiseTheWalls").Prerequisites);
         CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("AGrowingHome").Prerequisites, "its smithy and shed need the lodge");
         Assert.AreEqual(4, Quest("RaiseTheWalls").Objectives.Single().Amount, "four lengths of palisade");

@@ -82,6 +82,10 @@ public sealed class QuestDefinition : ScriptableObject
     [Tooltip("Starts as soon as its delay is up, even in a fight or a conversation (Story Pacing otherwise holds it back, up to its " +
              "Longest Hold): for a quest that is the fight, such as holding the stones while the old troll comes.")]
     [SerializeField] private bool startsInAFight;
+    [Tooltip("Haven, side and optional quests that start by themselves wait for the player at home, and only Story Pacing › New Per " +
+             "Homecoming of them begin per return from a raid (one more whenever none of its kind is under way). Tick to let this one " +
+             "start as soon as it can. Main and Rescue quests never wait.")]
+    [SerializeField] private bool startsWithoutWaiting;
     [Tooltip("Custom events raised when this quest starts. Use them to drive scene listeners, weather, music and other quests.")]
     [SerializeField, RaisedByGame] private List<GameEventDefinition> onStarted = new List<GameEventDefinition>();
 
@@ -131,6 +135,13 @@ public sealed class QuestDefinition : ScriptableObject
     public QuestDefinition ClosedBy => closedBy;
     public float StartDelay => startDelay;
     public bool StartsInAFight => startsInAFight;
+
+    /// <summary>
+    /// Held for a homecoming (QuestManager): a Haven, side or optional quest that starts by itself, unless Starts Without Waiting.
+    /// The flood after the first raid was nine of these starting in eleven minutes (Docs/QuestAndStoryResearch.md 1.3).
+    /// </summary>
+    public bool HeldForHomecoming => start == QuestStart.Automatically && !startsWithoutWaiting
+        && (rank == QuestRank.Haven || rank == QuestRank.SideQuest || rank == QuestRank.Optional);
     public IReadOnlyList<GameEventDefinition> OnStarted => onStarted;
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;

@@ -16,6 +16,64 @@ engaging story lines and how quests and story lines from NPCs can make the playe
 
 ---
 
+## Status and the user's decisions (2026-11-15)
+
+The user: "Start with fix 1-4", with these answers to §3.13. Where the user said "you decide", the decision taken is marked *(decided)*.
+
+| # | Question | Answer |
+|---|---|---|
+| 1 | One quest per colour on the tracker, at most 2 new per homecoming | **Yes** |
+| 2 | Haven quests chained, or held for homecomings | **Held back** |
+| 3 | Keep 16 stone blocks and teach them through Ingrid, or lower the cost | **Lower the cost** (so no "Squared Stone" quest) |
+| 4 | Planks before Tor | **A rough plank at the Workshop, and charcoal at the campfire** |
+| 5 | Know Your Enemy | **The notice board leaves the start.** "Remove the notice board, it doesn't make sense. We can have that as a way for the haven to give quests later, the player can build it at some later time which will unlock fetch or crafting quests" |
+| 6 | The antagonist | *(decided)* **The hunger**, with **the man in grey** as its human face (option A), unnamed per answer 15. He wakes doors to bring back his own taken family; each cold door lets the hunger further in |
+| 7 | Why the stones woke for the player | *(decided)* **"You kept their fire"**, no bloodline (§3.8.6) |
+| 8 | Four strangers taken in earlier wakings, time sliding in the mist | **Yes** |
+| 9 | Runa's flaw (paid by the man in grey) | **Yes: "I like dark"** |
+| 10 | Sigrid's past, and Act II ending with her rescue in Troll Valley | **Yes** |
+| 11 | The old troll | *(decided)* **A guardian who smashes doors, fought or paid** (§3.7.2 #19). Paying costs a Hearth Ember and Life Orbs; fighting is the boss. Both end the act |
+| 12 | Eirik's sister Sigrun as a twelfth person | **Yes** |
+| 13 | Voice order | *(decided)* **The eight homecoming memories first** (short, every person), then **Ingrid, Bjarne and Tor's lines**, then the rest in rescue order, then Act II |
+| 14 | Gifts and trust | *(decided)* **Quests only for now**, with the existing companion bond as the "trust". A Give Item objective inside the lines (Ingrid's bread on the stones, Yrsa's dish) gives the gift feeling without a second meter. Revisit after a playtest |
+| 15 | Jarl Ottar, Holt, "the Waker" | **Leave them unnamed**: "the jarl of Granheim", "the farmstead", "the man in grey" |
+
+### Built (fixes 1-4, 2026-11-15)
+
+1. **The flood:**
+   - **Held for a homecoming** (`QuestDefinition.HeldForHomecoming`, `QuestManager.MayStartHeld`):
+     - Haven, side and optional quests that start by themselves begin only at home, at most Story Pacing › **New Per Homecoming** (2) per return.
+     - One more may begin when none of its kind is under way, so the player is never left with nothing to do at home.
+     - Main and Rescue quests are never held. A quest can opt out with **Starts Without Waiting**.
+     - The journal lists what is held under **"Waiting for a homecoming"**.
+   - **The tracker** shows one quest per colour (plus the pinned one, and anything on a clock), then "+N more in the journal" (`QuestTrackerView.OnePerKind`).
+   - **Order fixes:**
+     - Tools of the Clearing stays after The Door Wakes: the user's own 2026-11-14 fix for the same overwhelm. §3.4.1's move to the fire was tried, then undone.
+     - What Breathes Under the Roots waits for Bjarne too (its rumour needs two extractions).
+     - The Cold Stones call comes after The Road North, not on the third homecoming (the scene trigger, `Story - The Cold Stones`).
+2. **The stone-block gap:**
+   - **The altar's price:** the Purification Altar costs **6 Stone Blocks and 4 Life Orbs** (was 16 and 6).
+   - **The Alchemist** waits for the Workshop (A Roof for the Work), and its text names the blocks, where they are made and where the orbs are. A Roof for the Work and A Smith's Hearth name their materials too.
+   - **The build menu** says where a short material is made from known recipes: "Stone Block: Workshop, 4 Grey Stone → 2" (`BuildMenuWindow.MadeAt`).
+3. **Planks and charcoal before Tor:**
+   - **Rough Plank** at the Workshop (6 Oak Wood → 1, 8 s).
+   - **Charcoal by the fire** at the campfire (4 Oak Wood → 1, 10 s).
+   - The Lodge's recipes stay better (4 → 2 and 3 → 2).
+   - The Smith's Request waits for A Smith's Hearth and the Lodge, and asks to raise the Smithy to Tier II before the pickaxe.
+4. **Asked before taught** (`QuestReachability.AskedBeforeTaught`, `QuestAuditTests.NothingIsAsked_BeforeItIsTaught`):
+   - **How it works:** for every quest it works out what the quests before it leave the player with: buildings built, people home and what their jobs teach, recipes known. It fails when a quest asks for a building, a material or a craft that can't be had from that. Crate luck doesn't count.
+   - **First run:** 19 findings. They are fixed by:
+     - the job quests waiting for the quest that has the player build what they need (the Workshop, the Smithy, the Lodge);
+     - Hild's quest asking to raise the Workshop to Tier II before the Cottage;
+     - the Smith's Request asking for Smithy II.
+5. **The Notice Board** (answer 5):
+   - **The old board is gone:** the stand-in in the clearing is removed.
+   - **A new building:** **Notice Board** (`Data/Buildings/NoticeBoard.asset`), which needs a Workshop and a Homestead (Haven rank 1). It costs 10 Oak Wood and 2 Oak Plank. Its look is still the old stand-in, and its icon is the Signpost's (to replace).
+   - **What it offers:** Know Your Enemy, then The Smith's Request (now a note Bjarne found in the old hearth stones).
+   - **The Haven's asks** (fetch and crafting requests) are posted only once a board stands (`HavenRequestSettings.postedAt`).
+
+---
+
 ## 0. Summary
 
 ### What the data shows

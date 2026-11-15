@@ -118,7 +118,10 @@ public sealed class RescueOrderTests
                      ("TheCook", "Yrsa"), ("TheTracker", "Runa"), ("TheRuneScholar", "Liv"), ("TheMason", "Hild"), ("TheLeader", "Sigrid") })
         {
             QuestDefinition quest = Quest(work);
-            CollectionAssert.AreEqual(new[] { Quest("Bring" + rescue + "Home") }, quest.Prerequisites, work);
+            // The rescue first; anything after it is a Haven quest that teaches what the work asks for (the Workshop for the
+            // Smithy's stone blocks: QuestReachability, the user 2026-11-15).
+            Assert.AreEqual(Quest("Bring" + rescue + "Home"), quest.Prerequisites[0], work);
+            Assert.IsTrue(quest.Prerequisites.Skip(1).All(before => before.Rank == QuestRank.Haven), work + ": only Haven quests may stand beside the rescue");
             Assert.AreEqual(ObjectiveType.AssignJob, quest.Objectives[0].Type, work);
             Assert.IsEmpty(quest.FindProblems(), work);
         }

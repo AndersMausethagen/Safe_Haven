@@ -77,7 +77,7 @@ public sealed class QuestCoopTests
     {
         var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SmithsRequest.asset");
         var log = new QuestLog();
-        // Offered once what comes before it is done (A Roof for the Work, since quests came in order).
+        // Offered once what comes before it is done (A Smith's Hearth and the Lodge; the board is built later, 2026-11-15).
         foreach (QuestDefinition before in quest.Prerequisites)
         {
             log.Restore(before, QuestStatus.Completed, null);

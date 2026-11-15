@@ -168,6 +168,90 @@ public sealed class QuestPacingTests
         Assert.IsFalse(manager.IsWaiting(second));
     }
 
+    private QuestDefinition Haven(string id, params QuestDefinition[] after)
+    {
+        QuestDefinition quest = Quest(id, QuestStart.Automatically, after: after);
+        var data = new SerializedObject(quest);
+        data.FindProperty("rank").enumValueIndex = (int)QuestRank.Haven;
+        data.FindProperty("id").stringValue = id;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        return quest;
+    }
+
+    // Held back (the user, 2026-11-15): after the first raid nine quests started in eleven minutes.
+    [Test]
+    public void HavenQuests_StartAFewPerHomecoming_TheRestWaitForTheNext()
+    {
+        var door = Quest("door", QuestStart.ByQuestGiver);
+        var one = Haven("one", door);
+        var two = Haven("two", door);
+        var three = Haven("three", door);
+        Run(door, one, two, three);
+        Assert.AreEqual(2, StoryPacingSettings.Current.NewPerHomecoming, "the share per homecoming the user agreed to");
+        manager.Log.ForceComplete(door);
+        manager.StartWaitingQuests(Time.time + 1000f);
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(one));
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(two));
+        Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(three), "a third Haven quest waits while two are under way");
+        Assert.IsTrue(manager.IsHeld(three), "and the journal lists it as waiting");
+
+        GameSession.Settlement.RecordExtraction();
+        manager.StartWaitingQuests(Time.time + 1000f);
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(three), "the next homecoming brings it");
+        Assert.IsFalse(manager.IsHeld(three));
+    }
+
+    [Test]
+    public void AHeldQuest_StartsWhenNothingOfItsKindIsUnderWay()
+    {
+        var door = Quest("door", QuestStart.ByQuestGiver);
+        var one = Haven("one", door);
+        var two = Haven("two", door);
+        var three = Haven("three", door);
+        Run(door, one, two, three);
+        manager.Log.ForceComplete(door);
+        manager.StartWaitingQuests(Time.time + 1000f);
+        manager.Log.ForceComplete(one);
+        manager.Log.ForceComplete(two);
+        manager.StartWaitingQuests(Time.time + 1000f);
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(three), "never nothing to do at home");
+    }
+
+    [Test]
+    public void MainAndRescueQuests_AreNeverHeld()
+    {
+        var door = Quest("door", QuestStart.ByQuestGiver);
+        var one = Haven("one", door);
+        var two = Haven("two", door);
+        var story = Quest("story", QuestStart.Automatically, after: door);
+        Run(door, one, two, story);
+        Assert.IsFalse(story.HeldForHomecoming);
+        manager.Log.ForceComplete(door);
+        manager.StartWaitingQuests(Time.time + 1000f);
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(story), "the main story comes whatever the share");
+    }
+
+    [Test]
+    public void TheTracker_ShowsOneQuestOfEachKind_AndThePinnedOne()
+    {
+        var door = Quest("door", QuestStart.ByQuestGiver);
+        var one = Haven("one", door);
+        var two = Haven("two", door);
+        var story = Quest("story", QuestStart.ByQuestGiver);
+        Run(door, one, two, story);
+        manager.Log.ForceComplete(door);
+        manager.StartWaitingQuests(Time.time + 1000f);
+        Assert.IsTrue(manager.TryStartQuest(story, out _));
+
+        var shown = manager.Log.Entries.Where(e => e.Status == QuestStatus.Active).OrderBy(e => QuestMarkerSettings.RankOrder(e.Quest.Rank)).ThenBy(e => e.Quest.name).ToList();
+        Assert.AreEqual(1, QuestTrackerView.OnePerKind(shown, null), "the second green one goes to the journal");
+        CollectionAssert.AreEquivalent(new[] { story, one }, shown.Select(e => e.Quest));
+
+        var pinnedFirst = manager.Log.Entries.Where(e => e.Status == QuestStatus.Active).OrderBy(e => e.Quest == two ? 0 : 1).ToList();
+        QuestTrackerView.OnePerKind(pinnedFirst, two.Id);
+        CollectionAssert.Contains(pinnedFirst.Select(e => e.Quest), two, "a pinned quest is always shown");
+    }
+
     [Test]
     public void AGiverStartsAQuest_AtOnce_WhateverIsWaiting()
     {

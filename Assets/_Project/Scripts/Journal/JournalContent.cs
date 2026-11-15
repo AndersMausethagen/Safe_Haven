@@ -142,10 +142,32 @@ public static class JournalContent
             (entry.Status == QuestStatus.Completed ? done : entry.Status == QuestStatus.Lapsed ? letGo : underWay).Entries.Add(shown);
         }
 
+        // Ready but held for a homecoming (QuestManager.IsHeld): listed, so a quest held back is never a quest lost.
+        var held = new HavenShelf("Waiting for a homecoming");
+        QuestManager manager = QuestManager.Current;
+        if (manager != null && allQuests != null)
+        {
+            foreach (QuestDefinition quest in allQuests)
+            {
+                if (quest != null && log.StatusOf(quest) == QuestStatus.NotStarted && manager.IsHeld(quest))
+                {
+                    held.Entries.Add(new HavenEntry
+                    {
+                        Key = quest,
+                        Name = quest.DisplayName,
+                        Line = QuestMarkerSettings.RankName(quest.Rank),
+                        State = HavenEntryState.Locked,
+                        Status = "Begins when you come home from a raid",
+                        Description = GameInput.WithRebinds(quest.Description),
+                    });
+                }
+            }
+        }
+
         // The newest thing done is the one most likely to be looked up.
         done.Entries.Reverse();
-        summary = $"{underWay.Entries.Count} under way, {done.Entries.Count} done";
-        return new List<HavenShelf> { underWay, done, letGo };
+        summary = $"{underWay.Entries.Count} under way, {done.Entries.Count} done" + (held.Entries.Count > 0 ? $", {held.Entries.Count} waiting" : "");
+        return new List<HavenShelf> { underWay, held, done, letGo };
     }
 
     // Only at home, where walking there is what going there means; a raid's ways are the raid's own.

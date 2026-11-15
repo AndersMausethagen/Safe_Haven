@@ -93,6 +93,7 @@ public sealed class QuestTrackerView : MonoBehaviour
         // The main story on top, then rescues, the haven, tales and errands.
         string pinned = GameSession.Progress.Journal.PinnedQuest;
         active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : ByRankThenName(a.Quest, b.Quest));
+        int hidden = OnePerKind(active, pinned);
         available.Sort(ByRankThenName);
         panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();
@@ -143,9 +144,10 @@ public sealed class QuestTrackerView : MonoBehaviour
             shown++;
         }
 
-        if (active.Count + available.Count > maxQuests)
+        int more = hidden + Mathf.Max(0, active.Count + available.Count - maxQuests);
+        if (more > 0)
         {
-            builder.Append($"\n\n<color={Muted}>+{active.Count + available.Count - maxQuests} more</color>");
+            builder.Append($"\n\n<color={Muted}>+{more} more in the journal</color>");
         }
 
         if (atHome > 0)
@@ -192,6 +194,23 @@ public sealed class QuestTrackerView : MonoBehaviour
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Keeps the first quest of each kind (colour) and the pinned one, in their order, and returns how many it left out: the tracker
+    /// shows one gold, one teal, one green... and the rest are in the journal (the user, 2026-11-15: too many at once after the first
+    /// raid). Anything on a clock stays, as it can't wait.
+    /// </summary>
+    public static int OnePerKind(List<QuestLog.Entry> sorted, string pinned)
+    {
+        var seen = new HashSet<QuestRank>();
+        int before = sorted.Count;
+        sorted.RemoveAll(entry =>
+        {
+            bool firstOfKind = seen.Add(entry.Quest.Rank); // the pinned one is sorted first, so it takes its kind's place
+            return !(firstOfKind || entry.Quest.Id == pinned || QuestTimers.TryGet(entry.Quest, out _));
+        });
+        return before - sorted.Count;
     }
 
     /// <summary>The tracker's order: by kind (QuestMarkerSettings.RankOrder), then by name.</summary>

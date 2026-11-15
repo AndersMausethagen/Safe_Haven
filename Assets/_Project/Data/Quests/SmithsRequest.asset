@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: smiths_request
   displayName: The Smith's Request
-  description: 'An old note on the board, in the last smith''s hand: this hearth wants copper, and proof you can work it.'
+  description: 'A note Bjarne found in the old hearth stones and pinned to the board, in the last smith''s hand: this hearth wants copper, and proof you can work it.'
   chain: Errands
   journalNotes: There was a smith here before, and the note is older than it looks. Nobody knows who wrote it, or who they thought would read it.
   rank: 2
@@ -23,7 +23,8 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
+  - {fileID: 11400000, guid: 26c34c56b5f966642ba1377c4e221cd7, type: 2}
+  - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}
@@ -48,9 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -74,6 +80,34 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 18
+    description: 'Raise the Smithy to Tier II ({key:Haven}): copper tools want it'
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 4
     description: 
     amount: 1
@@ -94,6 +128,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   turnInToGiver: 0
   turnInTo: 
   rewardItems:
@@ -101,6 +139,9 @@ MonoBehaviour:
     amount: 2
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

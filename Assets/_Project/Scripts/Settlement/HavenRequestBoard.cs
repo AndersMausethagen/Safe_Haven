@@ -191,13 +191,14 @@ public sealed class HavenRequestBoard : MonoBehaviour
     {
         SettlementState settlement = GameSession.Settlement;
         int homecoming = settlement.SuccessfulExtractions;
-        if (!force && askedAtHomecoming == homecoming)
+        HavenRequestSettings settings = HavenRequestSettings.Current;
+        // Nothing new is asked until there is a board to post it on; the first asks come as soon as it stands.
+        if (!force && askedAtHomecoming == homecoming || !settings.CanPost)
         {
             return;
         }
 
         askedAtHomecoming = homecoming;
-        HavenRequestSettings settings = HavenRequestSettings.Current;
         List<HavenRequestDefinition> standing = Standing();
         foreach (string id in new List<string>(settlement.Requests))
         {

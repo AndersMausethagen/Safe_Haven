@@ -40,6 +40,16 @@ public sealed class QuestAuditTests
         CollectionAssert.IsEmpty(QuestAudit.SilentPortalMoments());
     }
 
+    /// <summary>
+    /// Nothing is asked before it is taught (QuestReachability): the Alchemist's altar wanted stone blocks before anything had the
+    /// player build the Workshop that makes them, and the Smithy wanted planks only Tor's Lodge made (the user, 2026-11-15).
+    /// </summary>
+    [Test]
+    public void NothingIsAsked_BeforeItIsTaught()
+    {
+        CollectionAssert.IsEmpty(QuestReachability.AskedBeforeTaught());
+    }
+
     [Test]
     public void EveryRescue_IsPlacedOnARaid()
     {

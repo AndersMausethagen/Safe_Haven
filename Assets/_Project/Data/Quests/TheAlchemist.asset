@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: thealchemist
   displayName: The Alchemist
-  description: 'Ingrid brought two things home: a healer''s hands and the old ways of cleansing cursed things. Give her the Alchemist''s work and build the Purification Altar she showed you ({key:Build}). Her Cauldron brews healing draughts.'
+  description: 'Ingrid brought two things home: a healer''s hands and the old ways of cleansing cursed things. Give her the Alchemist''s work and build the Purification Altar she showed you ({key:Build}): 6 Stone Blocks and 4 Life Orbs. The Workshop squares Grey Stone into blocks (4 make 2), and the rootbound stones in the meadows still hold orbs. Her Cauldron brews healing draughts.'
   chain: Hands at Home
   journalNotes: Ingrid knows the old ways of cleansing cursed things and is cagey about where she learned them. Give her a job from the H window. Cursed Essence is useless raw; the altar is where it starts to pay.
   rank: 4
@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
+  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -48,8 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -73,6 +80,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 7
     description: 
     amount: 1
@@ -93,6 +104,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
@@ -100,6 +115,9 @@ MonoBehaviour:
   - resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
     amount: 4
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

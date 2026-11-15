@@ -21,19 +21,21 @@ MonoBehaviour:
   prefab: {fileID: 6037293471147771744, guid: 2139a483d64f51f4aace40f89b955510, type: 3}
   constructionCost:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
-    amount: 6
+    amount: 4
   constructionItems:
   - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-    amount: 16
+    amount: 6
   showInBuildMenu: 1
   knownFromStart: 0
   sortOrder: 9
   requires: []
   requiredRank: 0
   modelScale: 1
+  modelHeight: 1
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
+  decoration: 0
   station: 0
   outputCapacity: 10
   queueLength: 5
@@ -61,9 +63,11 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0.25
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
   - title: Radiant
@@ -89,9 +93,11 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0.25
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
   comfort: 0
