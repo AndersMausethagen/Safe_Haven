@@ -271,6 +271,25 @@ public sealed class PlayerEquipment : MonoBehaviour
 
     private static bool IsSwappable(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind != WeaponKind.Torch && !item.Weapon.IsShield;
 
+    /// <summary>The weapon put away and still carried, worn on the body (StowedWeaponView): the two-handed one put away
+    /// for the torch, else the one Z would take out again (the weapon held before this one). Null when there is none.</summary>
+    public ItemDefinition Stowed
+    {
+        get
+        {
+            ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
+            foreach (ItemDefinition candidate in new[] { stowedWeapon, previousWeapon })
+            {
+                if (candidate != null && candidate != held && FindInBag(found => found == candidate) >= 0)
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+    }
+
     // Remembers the weapon put away whenever the main hand changes (equipping goes through an empty hand: old, none, new).
     private void TrackHeldWeapon()
     {
