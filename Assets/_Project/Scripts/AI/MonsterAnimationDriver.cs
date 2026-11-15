@@ -162,6 +162,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private void Update()
     {
+        // The body went to a corpse (DeathRagdoll.TakeBody) and the corpse is gone before this creature's own delayed destroy.
+        if (animator == null)
+        {
+            enabled = false;
+            return;
+        }
+
         // Story movement owns locomotion while the AI is disabled.
         if (ai.enabled && hasSpeed)
         {

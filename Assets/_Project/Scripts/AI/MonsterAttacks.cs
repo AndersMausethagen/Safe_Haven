@@ -582,8 +582,16 @@ public sealed class MonsterAttacks
                 if (hitPending)
                 {
                     hitPending = false;
-                    AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers);
-                    Shake(attack, action.damage);
+                    float damage = action.damage;
+                    AttackResolver.Execute(combatant, attack, damage, self.position, direction, targetLayers);
+                    // What the blow met can break the strike off as it lands (a parry staggers it: Cancel), and then there
+                    // is no action left to go on with (a NullReferenceException in the user's 2026-11-15 playtest).
+                    if (action == null)
+                    {
+                        return false;
+                    }
+
+                    Shake(attack, damage);
                 }
 
                 if (blowsLeft > 0 && elapsed >= attack.HitDelay + action.comboGap)
@@ -632,6 +640,11 @@ public sealed class MonsterAttacks
         if (!chargeHit)
         {
             chargeHit = AttackResolver.Execute(combatant, attack, action.damage, self.position, direction, targetLayers) > 0;
+            // A charge met by a parry or a shield is broken off as it lands (Cancel): nothing is left to finish.
+            if (action == null)
+            {
+                return false;
+            }
         }
 
         if (blocked || chargeTravelled >= chargeLength || chargeHit)
