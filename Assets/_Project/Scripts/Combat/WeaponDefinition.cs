@@ -43,6 +43,18 @@ public sealed class WeaponDefinition : ScriptableObject
 
     [Tooltip("The quick lunge an attack becomes out of a dodge or on the run. Empty: those are ordinary swings.")]
     [SerializeField] private AttackDefinition rushAttack;
+
+    [Header("Context attacks (the state you attack from changes the attack)")]
+    [Tooltip("Attacking out of a dodge away from where you aim (a backstep): a quick blow that keeps the distance, a spear's butt strike. " +
+             "Empty: the rush, as for any dodge.")]
+    [SerializeField] private AttackDefinition backstepAttack;
+    [Tooltip("Attacking out of the guard just after a blow was blocked on it: a hard answer that breaks poise (Combat Technique Settings › " +
+             "Guard Counter). Empty: the counter attack, else the heavy attack.")]
+    [SerializeField] private AttackDefinition guardCounterAttack;
+    [Tooltip("Holding attack again as a heavy swing lands: a second heavy blow following on from it. Empty: none, the chain starts over.")]
+    [SerializeField] private AttackDefinition heavyFollowUp;
+    [Tooltip("What a heavy swing held to its full charge lets go as instead: its strongest blow. Empty: the heavy at full charge.")]
+    [SerializeField] private AttackDefinition chargedAttack;
     [Tooltip("Two-handed weapons: metres along the handle from the right hand to the left.")]
     [SerializeField, Min(0.05f)] private float secondHandDistance = 0.24f;
     [Tooltip("Share of a blow's damage shrugged off during a heavy swing's wind-up. Above 0 the swing also pushes through hits instead of being knocked out: for what is heavy enough to trade blows.")]
@@ -58,6 +70,8 @@ public sealed class WeaponDefinition : ScriptableObject
     [Header("Guard")]
     [Tooltip("Share of a blocked hit that still gets through with this weapon (a shield blocks better).")]
     [SerializeField, Range(0f, 1f)] private float guardLetThrough = 0.35f;
+    [Tooltip("A shield: poise a blow blocked on it costs the attacker (it is knocked back by the rim). 0: none.")]
+    [SerializeField, Min(0f)] private float blockPoise;
 
     [Header("Bow")]
     [Tooltip("Seconds from nocking to full draw. A shot loosed earlier flies slower, hits softer and strays more.")]
@@ -139,6 +153,13 @@ public sealed class WeaponDefinition : ScriptableObject
     public AttackDefinition HeavyAttack => heavyAttack;
     public AttackDefinition CounterAttack => counterAttack;
     public AttackDefinition RushAttack => rushAttack;
+    public AttackDefinition BackstepAttack => backstepAttack;
+    public AttackDefinition GuardCounterAttack => guardCounterAttack != null ? guardCounterAttack : counterAttack != null ? counterAttack : heavyAttack;
+    /// <summary>The guard counter this weapon (a shield) sets itself, without falling back to its counter or heavy.</summary>
+    public AttackDefinition OwnGuardCounter => guardCounterAttack;
+    public AttackDefinition HeavyFollowUp => heavyFollowUp;
+    public AttackDefinition ChargedAttack => chargedAttack;
+    public float BlockPoise => blockPoise;
     public float SecondHandDistance => secondHandDistance;
     public float HeavySwingArmor => heavySwingArmor;
     public AttackDefinition WeaponArt => weaponArt;

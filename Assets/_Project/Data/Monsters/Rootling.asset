@@ -55,7 +55,7 @@ MonoBehaviour:
     maximumRange: 1.5
     priority: 10
     cooldown: 1.8
-    interruptible: 0
+    interruptible: 1
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
@@ -122,6 +122,7 @@ MonoBehaviour:
   flankSpread: 0.7
   breaksWalls: 0
   poise: 10
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0

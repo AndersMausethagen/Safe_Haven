@@ -69,11 +69,18 @@ public sealed partial class PlayerAnimationController
 
     // A blow that has landed gives the legs back: when the player walks off, the arms finish the swing over them from
     // where the body had got to, instead of a whole-body swing skating along the ground. That includes a swing whose
-    // gameplay has ended but whose animation tail is still on the whole body.
+    // gameplay has ended but whose animation tail is still on the whole body. A swing that lets the player walk through its
+    // wind-up (SwingMotion) hands over the same way when they start walking, but not while it steps into the blow: that step
+    // is the legs' own.
     private void WalkOutOfSwing()
     {
-        if (combat == null || combat.IsWindingUp || movement.HorizontalSpeed <= ArmsOnlySpeed
+        if (combat == null || movement.HorizontalSpeed <= ArmsOnlySpeed
             || fullBodyLayer < 0 || attackArmsLayer < 0 || animator.IsInTransition(fullBodyLayer))
+        {
+            return;
+        }
+
+        if (combat.IsWindingUp && (combat.WindupMoveShare <= 0f || combat.IsSteppingIn || movement.MovementInput.sqrMagnitude < 0.01f))
         {
             return;
         }
@@ -119,13 +126,14 @@ public sealed partial class PlayerAnimationController
     }
 
     // A swing with its own animation state plays it at once: with the whole body (the legs step into the blow, which is
-    // what reads from above), as a swing plants the feet. Only if the settings let the player run through a wind-up does it
-    // go on the arms. One without a state uses the stance's older triggered attack.
+    // what reads from above) when it starts standing. Started on the move, by a swing that lets the player walk through its
+    // wind-up (SwingMotion), it goes on the arms over the walking legs. One without a state uses the stance's older triggered attack.
     private void OnSwingStarted(SwingInfo swing)
     {
         string stateName = swing.Attack != null ? swing.Attack.AnimationState : null;
         int standing = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
-        bool onTheRun = CombatTechniqueSettings.Current.WindupMoveSpeed > 0f && movement.HorizontalSpeed > ArmsOnlySpeed;
+        bool onTheRun = combat != null && combat.WindupMoveShare > 0f && movement.HorizontalSpeed > ArmsOnlySpeed
+            && movement.MovementInput.sqrMagnitude >= 0.01f;
         int layer = onTheRun && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         plantedSwing = 0;

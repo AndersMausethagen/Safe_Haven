@@ -15,6 +15,7 @@ MonoBehaviour:
   displayName: Wicker Shield
   stance: 1
   kind: 4
+  strikeOverride: 0
   damage: 3
   basicAttack: {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
   combo:
@@ -24,10 +25,16 @@ MonoBehaviour:
   heavyAttack: {fileID: 11400000, guid: c27b7f4b0e8770b468650d183df959b8, type: 2}
   counterAttack: {fileID: 11400000, guid: 46f9dbd915280b241b67edb6b238f24f, type: 2}
   rushAttack: {fileID: 0}
+  backstepAttack: {fileID: 0}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 0}
   secondHandDistance: 0.24
+  heavySwingArmor: 0
   weaponArt: {fileID: 0}
   weaponArtFocus: 30
   guardLetThrough: 0.22
+  blockPoise: 12
   drawSeconds: 1
   reloadSeconds: 0.6
   arrowSpeed: 32
@@ -40,6 +47,7 @@ MonoBehaviour:
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
   swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
   hitSound: {fileID: 11400000, guid: d35929fdaefdd164d8047ffebb5d331d, type: 2}
   hitEffect: {fileID: 0}

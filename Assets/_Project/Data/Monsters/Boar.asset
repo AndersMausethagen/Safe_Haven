@@ -120,7 +120,7 @@ MonoBehaviour:
     maximumRange: 1.8
     priority: 10
     cooldown: 1
-    interruptible: 0
+    interruptible: 1
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
@@ -237,6 +237,7 @@ MonoBehaviour:
   flankSpread: 0.4
   breaksWalls: 0
   poise: 40
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -247,6 +248,13 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 1
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: ab66feaef411117448f1348aa709939b, type: 3}

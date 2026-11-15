@@ -57,6 +57,33 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         minuteXp.Clear();
+        FlushCombat();
+    }
+
+    // How the player fought over the minute (CombatTally), one row per technique: the parry/aggression balance is read from these.
+    private readonly CombatTally combat = new CombatTally();
+    private Player followed;
+
+    private void FollowPlayer()
+    {
+        Player current = Player.Current;
+        if (current == followed)
+        {
+            return;
+        }
+
+        followed = current;
+        combat.Follow(current != null ? current.gameObject : null);
+    }
+
+    private void FlushCombat()
+    {
+        foreach (System.Collections.Generic.KeyValuePair<string, int> count in combat.Counts)
+        {
+            Write(PlaytestLog.Combat, count.Key, count.Value, combat.Weapon);
+        }
+
+        combat.Clear();
     }
 
     // Levels with the played minute they came at: what the skills' pace is measured from (PlaytestLog.SkillPace).
@@ -89,6 +116,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         PlaytestRun current = EnsureRun();
+        FollowPlayer();
         if (!GamePause.IsPaused)
         {
             current.PlayedSeconds += Time.unscaledDeltaTime;
@@ -235,6 +263,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         ExperienceTracker.InsightSpent -= OnInsightSpent;
         ExperienceTracker.Gained -= OnGained;
         FlushSkillXp();
+        combat.Unfollow();
         EndSession();
     }
 

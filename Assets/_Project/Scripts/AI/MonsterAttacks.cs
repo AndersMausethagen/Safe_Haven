@@ -302,10 +302,11 @@ public sealed class MonsterAttacks
         }
     }
 
-    /// <summary>Ends an interruptible action hit during its wind-up. True when that happened.</summary>
-    public bool TryInterrupt(float healthLost)
+    /// <summary>Ends an interruptible action hit during its wind-up. With <paramref name="breakThrough"/> (a heavy blow, Combat
+    /// Technique Settings › Break Through) the action needn't be Interruptible. True when that happened.</summary>
+    public bool TryInterrupt(float healthLost, bool breakThrough = false)
     {
-        if (action == null || !action.interruptible || healthLost <= 0f || Time.time - startTime >= Attack.HitDelay)
+        if (action == null || (!action.interruptible && !breakThrough) || healthLost <= 0f || !IsWindingUp)
         {
             return false;
         }
@@ -313,6 +314,9 @@ public sealed class MonsterAttacks
         Finish();
         return true;
     }
+
+    /// <summary>True while the action in progress hasn't landed its blow yet.</summary>
+    public bool IsWindingUp => action != null && hitPending && Time.time - startTime < Attack.HitDelay;
 
     /// <summary>No new strike for <paramref name="seconds"/> (catching its breath after a stagger).</summary>
     public void Delay(float seconds)

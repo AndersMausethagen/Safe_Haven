@@ -23,4 +23,8 @@ public enum HitTechnique
     Shot = 512,
     /// <summary>The player's spell: trains the Runecraft skill.</summary>
     Spell = 1024,
+    /// <summary>Attacking out of the guard just after a block: poise-heavy, never a sure critical.</summary>
+    GuardCounter = 2048,
+    /// <summary>A fully charged heavy swing let go.</summary>
+    Charged = 4096,
 }

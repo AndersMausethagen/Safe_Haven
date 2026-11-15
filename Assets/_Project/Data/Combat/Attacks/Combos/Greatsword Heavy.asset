@@ -31,6 +31,14 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: 0
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
   animationState: 2H Drive
   animationSpeed: 0.5542857
   strikeSpeed: 1.8

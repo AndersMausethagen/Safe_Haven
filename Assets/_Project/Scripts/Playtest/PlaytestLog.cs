@@ -62,6 +62,9 @@ public static class PlaytestLog
     public const string InsightSpent = "InsightSpent";
     /// <summary>Experience a skill gained by practice in the last played minute: subject its id, amount the experience.</summary>
     public const string SkillXp = "SkillXp";
+    /// <summary>How the player fought in the last played minute: subject the technique (see <see cref="CombatTally"/>), amount how often,
+    /// detail the weapon held. What the parry/aggression balance is measured from (Docs/CombatResearch.md §3.3 #10).</summary>
+    public const string Combat = "Combat";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

@@ -55,7 +55,7 @@ MonoBehaviour:
     maximumRange: 2
     priority: 20
     cooldown: 1.8
-    interruptible: 0
+    interruptible: 1
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
@@ -63,6 +63,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps:
     - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
     comboChance: 0.45
@@ -113,6 +114,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -162,6 +164,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -220,6 +223,7 @@ MonoBehaviour:
   flankSpread: 0
   breaksWalls: 0
   poise: 0
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0
@@ -230,6 +234,13 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 1
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: b469bb8adb03a544b88f658abbf73281, type: 3}

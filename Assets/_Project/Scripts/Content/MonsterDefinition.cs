@@ -121,6 +121,10 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("How much it takes before it staggers (attacks' Poise Damage wears it down). 0 uses the game-wide default; " +
              "a very high value makes it unstoppable.")]
     [SerializeField, Min(0f)] private float poise;
+    [Tooltip("What a parry of its strike does to it. Auto: an ordinary creature staggers, a great beast, boss or elite (one that isn't " +
+             "Open While Striking) loses part of its poise instead (Combat Technique Settings › Parry Poise Share) and staggers only " +
+             "when that breaks it. Recoil: it only reels back a moment, its strike broken off.")]
+    [SerializeField] private ParryResponse parryResponse = ParryResponse.Auto;
 
     [Header("Backstabs and guarding")]
     [Tooltip("A blow from behind in the middle of its strike is a backstab. Off for great beasts and bosses: they have to be staggered first. Elites never are, whatever this says.")]
@@ -234,6 +238,7 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public SoundDefinition AttackSound => attackSound;
     /// <summary>Its poise, or 0 when it uses the game-wide default.</summary>
     public float Poise => poise;
+    public ParryResponse ParryResponse => parryResponse;
     public bool OpenWhileStriking => openWhileStriking;
     public bool ParriesBackstabs => parriesBackstabs;
     public float ShieldArc => shieldArc;
@@ -276,4 +281,17 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
         chaseRange = Mathf.Max(chaseRange, detectionRange);
         drops.Validate();
     }
+}
+
+/// <summary>What a parry of a monster's strike does to it (MonsterDefinition › Parry Response).</summary>
+public enum ParryResponse
+{
+    /// <summary>Stagger for an ordinary creature, Poise Damage for a great beast, boss or elite.</summary>
+    Auto,
+    /// <summary>It staggers: open to blows and a backstab.</summary>
+    Stagger,
+    /// <summary>It loses part of its poise and reels a moment; it staggers only when that breaks it.</summary>
+    PoiseDamage,
+    /// <summary>It only reels back a moment, its strike broken off.</summary>
+    Recoil,
 }

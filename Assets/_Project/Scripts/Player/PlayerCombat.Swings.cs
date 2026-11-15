@@ -14,11 +14,30 @@ public sealed partial class PlayerCombat
         int chain = weapon != null ? weapon.ComboLength : 1;
         AttackDefinition attack;
         HitTechnique technique = HitTechnique.None;
+        bool followUp = false;
         switch (kind)
         {
             case SwingKind.Heavy:
-                attack = weapon != null ? weapon.HeavyAttack : null;
+                // Held again as a heavy lands: the weapon's heavy follow-up, then back to the heavy (a heavy chain of two). A full charge
+                // let go is the weapon's charged attack (forcedAttack).
+                followUp = forcedAttack == null && weapon != null && weapon.HeavyFollowUp != null && !lastHeavyWasFollowUp
+                    && Time.time - lastHeavyEndedAt <= Rules.ChainGrace + Rules.HeavyHoldSeconds + Rules.BufferWindow;
+                attack = forcedAttack != null ? forcedAttack : weapon == null ? null : followUp ? weapon.HeavyFollowUp : weapon.HeavyAttack;
                 technique |= HitTechnique.Heavy;
+                if (forcedAttack != null)
+                {
+                    technique |= HitTechnique.Charged;
+                }
+
+                break;
+            case SwingKind.GuardCounter:
+                attack = HasShield && Shield != null && Shield.OwnGuardCounter != null ? Shield.OwnGuardCounter : weapon != null ? weapon.GuardCounterAttack : null;
+                technique |= HitTechnique.GuardCounter;
+                if (attack == null)
+                {
+                    return;
+                }
+
                 break;
             case SwingKind.ShieldBash:
                 attack = shieldBash;
@@ -37,8 +56,11 @@ public sealed partial class PlayerCombat
 
                 break;
             case SwingKind.Rush:
-                // Out of a perfect dodge the counter is the better blow; a rush leads on into the chain's second swing.
-                attack = CounterIsReady && weapon != null && weapon.CounterAttack != null ? weapon.CounterAttack : weapon != null ? weapon.RushAttack : null;
+                // Out of a perfect dodge the counter is the better blow; out of a dodge away from the aim (a backstep) the weapon's
+                // backstep attack; a rush leads on into the chain's second swing.
+                attack = CounterIsReady && weapon != null && weapon.CounterAttack != null ? weapon.CounterAttack
+                    : weapon != null && weapon.BackstepAttack != null && IsBackstep() ? weapon.BackstepAttack
+                    : weapon != null ? weapon.RushAttack : null;
                 if (dodge != null)
                 {
                     dodge.CutShort();
@@ -67,15 +89,19 @@ public sealed partial class PlayerCombat
         }
 
         // Pay the full cost when the swing actually starts, rechecking affordability for buffered swings.
-        if (stamina != null && !stamina.TrySpend(Mathf.Max(0f, CostOf(kind, attack) - heavyCredit)))
+        if (stamina != null && !stamina.TrySpendOnAttack(Mathf.Max(0f, CostOf(kind, attack) - heavyCredit)))
         {
+            forcedAttack = null;
             return;
         }
+
+        forcedAttack = null;
+        activeIsFollowUp = followUp;
 
         fumbled = false;
         rhythm = kind == SwingKind.Light && step > 0 ? ComboRules.NextRhythm(rhythm, judge, Rules) : 0;
         bool finisher = kind == SwingKind.Light && chain > 1 && step == chain - 1;
-        lastStep = kind == SwingKind.Rush ? 0 : kind == SwingKind.Light && !finisher ? step : -1;
+        lastStep = kind == SwingKind.Rush || kind == SwingKind.GuardCounter ? 0 : kind == SwingKind.Light && !finisher ? step : -1;
 
         activeKind = kind;
         activeAttack = attack;
@@ -108,13 +134,25 @@ public sealed partial class PlayerCombat
             activePoiseMultiplier *= 1.5f;
         }
 
-        if (CounterIsReady && kind != SwingKind.ShieldBash)
+        if (kind == SwingKind.GuardCounter)
+        {
+            activePoiseMultiplier *= Rules.GuardCounterPoise;
+        }
+
+        activeLunge = attack != null ? attack.Lunge : 0f;
+        if (CounterIsReady && kind != SwingKind.ShieldBash && kind != SwingKind.GuardCounter)
         {
             technique |= HitTechnique.Counter;
             activeDamageMultiplier *= Rules.CounterDamageMultiplier;
             activePoiseMultiplier *= 2f;
             activeForceCritical = true;
             counterUntil = float.NegativeInfinity;
+            if (counterLunges && weapon != null && weapon.RushAttack != null)
+            {
+                activeLunge = Mathf.Max(activeLunge, weapon.RushAttack.Lunge);
+            }
+
+            counterLunges = false;
         }
 
         activeTechnique = technique;
@@ -122,7 +160,7 @@ public sealed partial class PlayerCombat
         chargeHeld = 0f;
         charging = false;
         hitPending = attack != null;
-        stepPending = attack != null && attack.Lunge > 0f;
+        stepPending = activeLunge > 0f;
         // Toward the aim, or the target it snaps to; while it winds up it may still follow the focused enemy.
         if (focusTarget != null)
         {
@@ -137,9 +175,15 @@ public sealed partial class PlayerCombat
             BeginFinish(toFinish, HitAt(attack, activeSpeed));
         }
 
-        // Planted, facing the blow, until it lands: legs running under a swing and a body skating through one both look wrong.
+        // Facing is the swing's own until a moment after the blow: early in the wind-up it may still turn toward the aim (TrackAim)
+        // or the focused enemy (TrackFocus). The feet keep the attack's share of speed (SwingMotion): planted for a heavy swing or a
+        // two-hander, walking for a dagger; a swing walked through plays on the arms over the legs.
+        float hitIn = HitAt(attack, activeSpeed);
+        activeWindupMove = SwingMotion.WindupMove(attack, kind, Rules);
+        activeLungeLead = SwingMotion.LungeLead(attack, kind, hitIn, LungeSeconds, attack != null ? Mathf.Max(attack.StrikeLead, LungeSeconds) : 0f, Rules);
+        feetReleased = false;
         movement.FacingLocked = true;
-        movement.SetSpeedScale(this, Rules.WindupMoveSpeed);
+        movement.SetSpeedScale(this, activeWindupMove);
         if (!hitPending)
         {
             ReleaseFeet();
@@ -237,9 +281,10 @@ public sealed partial class PlayerCombat
         }
 
         float elapsed = ActiveElapsed;
-        if (hitPending && elapsed < hitAt - LungeSeconds)
+        if (hitPending && elapsed < hitAt - activeLungeLead)
         {
             TrackFocus();
+            TrackAim(elapsed, hitAt, false);
         }
         else if (hitPending && stepPending)
         {
@@ -250,11 +295,17 @@ public sealed partial class PlayerCombat
         {
             hitPending = false;
             int hits = LandSwing();
-            ReleaseFeet();
             SwingLanded?.Invoke(current, hits);
         }
 
-        if (elapsed >= RecoverAt(activeAttack, activeSpeed))
+        // A moment after the blow the legs and facing come back (Move At); the swing itself goes on to its recovery.
+        float recoverAt = RecoverAt(activeAttack, activeSpeed);
+        if (!hitPending && !feetReleased && elapsed >= SwingMotion.MoveAt(activeAttack, hitAt, recoverAt, activeSpeed, Rules))
+        {
+            ReleaseFeet();
+        }
+
+        if (elapsed >= recoverAt)
         {
             SwingKind next = queuedKind;
             ChainPress judge = queuedJudge;
@@ -272,6 +323,7 @@ public sealed partial class PlayerCombat
     {
         float most = Rules.HeavyChargeSeconds;
         bool waits = activeKind == SwingKind.Heavy && hitPending && attackHeld && most > 0f && chargeHeld < most
+            && (activeTechnique & HitTechnique.Charged) == 0
             && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, LungeSeconds);
         if (!waits)
         {
@@ -282,14 +334,37 @@ public sealed partial class PlayerCombat
         charging = true;
         chargeHeld = Mathf.Min(most, chargeHeld + Time.deltaTime);
         TrackFocus();
+        // A charging blow can be aimed as it is held.
+        TrackAim(ActiveElapsed, hitAt, true);
         if (chargeHeld >= most)
         {
             charging = false;
             ChargeFull?.Invoke();
+            // Held to the full: the weapon's charged attack, its strongest blow, instead of the heavy (Hades II's Omega moves).
+            if (weapon != null && weapon.ChargedAttack != null)
+            {
+                ReleaseCharged();
+                return true;
+            }
         }
 
         return charging;
     }
+
+    // The heavy swing hands over to the charged attack, already paid for, from the top of its wind-up.
+    private void ReleaseCharged()
+    {
+        AttackDefinition charged = weapon.ChargedAttack;
+        EndSwing();
+        forcedAttack = charged;
+        heavyCredit = float.MaxValue;
+        Begin(SwingKind.Heavy, ChainPress.Late);
+        heavyCredit = 0f;
+    }
+
+    // Out of a dodge that went away from where the player aims: the backstep, and the weapon's backstep attack.
+    private bool IsBackstep() => dodge != null && (dodge.IsDodging || dodge.JustDodged(Rules.RushAfterDodgeSeconds))
+        && lastDodgeDirection.sqrMagnitude > 0.01f && Vector3.Angle(lastDodgeDirection, movement.AimDirection) >= Rules.BackstepAngle;
 
     // Until it steps into the blow, a swing keeps turning toward the enemy it is focused on.
     private void TrackFocus()
@@ -304,14 +379,41 @@ public sealed partial class PlayerCombat
         movement.SnapFacing(activeDirection);
     }
 
-    // The last moment before the blow: the body travels with the strike, as far as the target (or half way with none), so the
-    // step ends as it lands instead of sliding at the start and then standing still through the swing.
+    // No Rest for the Wicked's "change targets during attack windups": with no enemy in focus, early in the wind-up the blow turns
+    // toward where the player aims, at the attack's turn rate (the focused enemy is TrackFocus's). <paramref name="always"/>: a
+    // charging heavy, aimed for as long as it is held.
+    private void TrackAim(float elapsed, float hitAt, bool always)
+    {
+        if (focusTarget != null && focusTarget.HasFocus)
+        {
+            return;
+        }
+
+        float rate = SwingMotion.TurnRate(activeAttack, Rules);
+        if (rate <= 0f || (!always && !SwingMotion.CanTurn(elapsed, hitAt, activeLungeLead, Rules)))
+        {
+            return;
+        }
+
+        Vector3 aim = movement.AimDirection;
+        aim.y = 0f;
+        if (aim.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        activeDirection = Vector3.RotateTowards(activeDirection, aim.normalized, rate * Mathf.Deg2Rad * Time.deltaTime, 0f);
+        movement.SnapFacing(activeDirection);
+    }
+
+    // The last part of the wind-up (the attack's Lunge Share of it): the body travels with the strike, as far as the target (or
+    // half way with none), so the step ends as it lands instead of sliding at the start and then standing still through the swing.
     private void StepIntoBlow(float secondsLeft)
     {
         stepPending = false;
         activeDirection = AimAssist(activeDirection, activeAttack, out float targetDistance);
         movement.SnapFacing(activeDirection);
-        float distance = targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeAttack.Lunge) : activeAttack.Lunge * 0.5f;
+        float distance = targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
         float seconds = Mathf.Max(0.05f, secondsLeft);
         movement.Lunge(activeDirection * (distance / seconds), seconds);
     }
@@ -435,11 +537,13 @@ public sealed partial class PlayerCombat
             && StrikeRules.IsBehind(body.transform.position, body.transform.forward, transform.position, Rules.BackstabArc);
     }
 
-    // The blow has landed: the rest is follow-through, walked out of at the rules' speed. At 0 the player stays planted
-    // and facing the blow until the swing ends. The swing itself goes on, so walking off doesn't bring the next attack sooner.
+    // The blow has landed and Move At has passed: the rest is follow-through, walked out of at the attack's speed (SwingMotion). At 0
+    // the player stays planted and facing the blow until the swing ends. The swing itself goes on, so walking off doesn't bring the
+    // next attack sooner.
     private void ReleaseFeet()
     {
-        float speed = activeKind == SwingKind.Heavy ? Rules.HeavyMoveSpeed : Rules.SwingMoveSpeed;
+        feetReleased = true;
+        float speed = SwingMotion.AfterContactMove(activeAttack, activeKind, Rules);
         movement.FacingLocked = speed <= 0f;
         movement.SetSpeedScale(this, speed);
     }
@@ -452,12 +556,27 @@ public sealed partial class PlayerCombat
             lastStartTime = activeStartTime + chargeHeld;
             lastHitAt = HitAt(activeAttack, activeSpeed);
             lastRecoverAt = RecoverAt(activeAttack, activeSpeed);
+            // A heavy that landed can be followed by the heavy follow-up; any other swing that landed ends that chain.
+            if (!hitPending && activeKind == SwingKind.Heavy && (activeTechnique & HitTechnique.Charged) == 0)
+            {
+                lastHeavyEndedAt = Time.time;
+                lastHeavyWasFollowUp = activeIsFollowUp;
+            }
+            else if (!hitPending)
+            {
+                lastHeavyEndedAt = float.NegativeInfinity;
+                lastHeavyWasFollowUp = false;
+            }
         }
+
+        activeIsFollowUp = false;
 
         activeKind = SwingKind.None;
         activeAttack = null;
         hitPending = false;
         stepPending = false;
+        feetReleased = false;
+        activeWindupMove = 0f;
         charging = false;
         chargeHeld = 0f;
         movement.FacingLocked = false;
@@ -482,9 +601,14 @@ public sealed partial class PlayerCombat
     public void SpendCounter() => counterUntil = float.NegativeInfinity;
 
     /// <summary>Readies a counter: the next swing within the settings' counter time is a critical counter.</summary>
-    public void GrantCounter()
+    public void GrantCounter() => GrantCounter(Rules.CounterSeconds, false);
+
+    /// <summary>Readies a counter for <paramref name="seconds"/> (never less than one already ready); with <paramref name="lunges"/> (the
+    /// Riposte perk) it steps in as far as the weapon's rush.</summary>
+    public void GrantCounter(float seconds, bool lunges)
     {
-        counterUntil = Time.time + Rules.CounterSeconds;
+        counterUntil = Mathf.Max(counterUntil, Time.time + seconds);
+        counterLunges |= lunges;
         CounterReady?.Invoke();
     }
 

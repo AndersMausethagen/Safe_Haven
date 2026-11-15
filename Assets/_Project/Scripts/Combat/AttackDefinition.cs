@@ -73,6 +73,22 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Metres a hit drags its target toward the attacker (a tongue, a hand from the bog). Negative throws it away.")]
     [SerializeField] private float pull;
 
+    [Header("Movement (player)")]
+    [Tooltip("Share of walking speed the player keeps while this swing winds up (on the arms, over walking legs). Below 0 uses Combat " +
+             "Technique Settings' Windup Move Speed for a light swing or a shield bash, and plants a heavy, a rush or an art. 0 plants the feet.")]
+    [SerializeField, Range(-1f, 1f)] private float windupMove = -1f;
+    [Tooltip("Share of walking speed from Move At to the end of the swing: the arms finish it while the legs walk off. Below 0 uses the " +
+             "settings' Swing Move Speed (Heavy Move Speed for a heavy). It never brings the next swing sooner.")]
+    [SerializeField, Range(-1f, 1f)] private float afterContactMove = -1f;
+    [Tooltip("Degrees per second the blow turns toward where the player aims early in its wind-up (the focused enemy is followed at " +
+             "Swing Tracking instead). Below 0 uses the settings' Windup Turn Rate. 0 aims it only as it starts.")]
+    [SerializeField, Min(-1f)] private float windupTurnRate = -1f;
+    [Tooltip("Seconds after the blow lands before the player walks and turns again. Below 0 uses the settings' Move After Contact.")]
+    [SerializeField, Min(-1f)] private float moveAt = -1f;
+    [Tooltip("Share of the wind-up, counted back from the blow, that the step into it (Lunge) takes: 0.33 is the last third. Below 0 " +
+             "uses the settings' Lunge Share. A rush steps all through its wind-up.")]
+    [SerializeField, Range(-1f, 1f)] private float lungeShare = -1f;
+
     [Header("Animation (player)")]
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Setup › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
@@ -127,6 +143,12 @@ public sealed class AttackDefinition : ScriptableObject
     public float Pull => pull;
     /// <summary>What the blow does to the ground round it (GroundImpacts).</summary>
     public GroundImpactDefinition GroundImpact => groundImpact;
+    /// <summary>Movement (player): below 0 means "the settings' value" (see <see cref="SwingMotion"/>).</summary>
+    public float WindupMove => windupMove;
+    public float AfterContactMove => afterContactMove;
+    public float WindupTurnRate => windupTurnRate;
+    public float MoveAt => moveAt;
+    public float LungeShare => lungeShare;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float StrikeSpeed => strikeSpeed;
@@ -146,6 +168,16 @@ public sealed class AttackDefinition : ScriptableObject
         poiseDamage = poise;
         lunge = lungeDistance;
         slashColor = slash;
+    }
+
+    /// <summary>Sets how the player moves through the swing (editor setup and tests); below 0 leaves a value to the settings.</summary>
+    public void ConfigureMovement(float windup, float afterContact, float turnRate = -1f, float moveAfter = -1f, float lungeLeadShare = -1f)
+    {
+        windupMove = windup;
+        afterContactMove = afterContact;
+        windupTurnRate = turnRate;
+        moveAt = moveAfter;
+        lungeShare = lungeLeadShare;
     }
 
     /// <summary>Sets how the wind-up plays (editor setup and tests).</summary>

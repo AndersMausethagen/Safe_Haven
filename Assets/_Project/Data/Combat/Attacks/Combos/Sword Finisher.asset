@@ -27,10 +27,18 @@ MonoBehaviour:
   recoveryTime: 1.292683
   poiseDamage: 22
   impact: 1.15
-  lunge: 0.6
+  lunge: 1.5
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: 0.3
+  afterContactMove: 0.5
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
   animationState: Sword Finisher
   animationSpeed: 0.77133256
   strikeSpeed: 1.35

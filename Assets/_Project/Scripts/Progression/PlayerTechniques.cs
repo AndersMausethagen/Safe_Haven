@@ -52,9 +52,10 @@ public sealed class PlayerTechniques : MonoBehaviour
 
     private void OnParried(DamageInfo damage)
     {
+        // Every parry readies a counter (PlayerGuard); Riposte keeps it ready longer and lets it lunge as far as the rush.
         if (combat != null && Techniques.Has(PerkTechnique.Riposte))
         {
-            combat.GrantCounter();
+            combat.GrantCounter(CombatTechniqueSettings.Current.CounterSeconds * Rules.RiposteWindow, true);
             Techniques.Used(PerkTechnique.Riposte);
         }
     }

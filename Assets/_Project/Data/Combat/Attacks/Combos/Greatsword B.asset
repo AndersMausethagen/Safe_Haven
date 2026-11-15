@@ -27,10 +27,18 @@ MonoBehaviour:
   recoveryTime: 1.4166667
   poiseDamage: 28
   impact: 1.4
-  lunge: 0.6
+  lunge: 1.2
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: 0.08
+  afterContactMove: 0.25
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
   animationState: 2H Wide
   animationSpeed: 0.78431404
   strikeSpeed: 1.6

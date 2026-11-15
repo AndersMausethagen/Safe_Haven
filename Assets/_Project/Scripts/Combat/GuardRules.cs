@@ -73,4 +73,28 @@ public static class GuardRules
 
         return Resolve(true, 1f, facing, hitDirection, arc, 0f, 0f, 0f);
     }
+
+    /// <summary>What a parry does to a monster by its definition's Parry Response: Auto staggers an ordinary creature and wears a great
+    /// beast's, boss's or elite's poise instead.</summary>
+    public static ParryResponse ParryResponseOf(ParryResponse response, bool heavyweight) =>
+        response != ParryResponse.Auto ? response : heavyweight ? ParryResponse.PoiseDamage : ParryResponse.Stagger;
+
+    /// <summary>Whether a blow breaks off a wind-up its strike's Interruptible doesn't allow (Combat Technique Settings › Break Through):
+    /// a heavy swing, a counter, a guard counter, a finisher or an art, or poise damage of at least <paramref name="share"/> of the
+    /// monster's poise. Never a great beast's, boss's or elite's; 0 turns it off.</summary>
+    public static bool BreaksThrough(HitTechnique technique, float poiseDamage, float maxPoise, float share, bool heavyweight)
+    {
+        if (share <= 0f || heavyweight)
+        {
+            return false;
+        }
+
+        const HitTechnique Weighty = HitTechnique.Heavy | HitTechnique.Counter | HitTechnique.GuardCounter | HitTechnique.Finisher | HitTechnique.WeaponArt;
+        return (technique & Weighty) != 0 || (maxPoise > 0f && poiseDamage >= maxPoise * share);
+    }
+
+    /// <summary>How long a lowered guard stays down: a tap that caught nothing was a parry fished for (Whiff Relock); a guard held up,
+    /// or one that caught a blow, the usual Guard Relock.</summary>
+    public static float RelockAfter(bool caughtABlow, float heldFor, float tapSeconds, float relock, float whiffRelock) =>
+        !caughtABlow && heldFor < tapSeconds ? Mathf.Max(relock, whiffRelock) : relock;
 }

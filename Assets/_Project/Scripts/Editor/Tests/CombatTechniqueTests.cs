@@ -178,19 +178,21 @@ public sealed class CombatTechniqueTests
         }
     }
 
+    // 2026-11-01 planted every swing to stop foot glide; 2026-11-15 (the user: "locks the player in place") the player walks
+    // through and out of swings again, by weapon, with the swing on the arms over the walking legs so nothing skates.
     [Test]
-    public void ASwing_PlantsTheFeet_ThenLetsThePlayerWalkOut()
+    public void ASwing_LetsThePlayerWalk_OnTheArmsOverTheLegs()
     {
         CombatTechniqueSettings rules = Resources.Load<CombatTechniqueSettings>(CombatTechniqueSettings.ResourceName);
-        Assert.AreEqual(0f, rules.WindupMoveSpeed, "any speed here and the whole-body swing skates over the ground");
-        Assert.AreEqual(0f, rules.SwingMoveSpeed, "the player stays planted until the swing ends; arms over moving legs look wrong");
-        Assert.AreEqual(0f, rules.HeavyMoveSpeed);
+        Assert.Greater(rules.SwingMoveSpeed, 0f, "the player walks out of the follow-through");
+        Assert.Greater(rules.HeavyMoveSpeed, 0f);
+        Assert.Less(rules.HeavyMoveSpeed, rules.SwingMoveSpeed, "a heavy swing lets go of the feet less");
 
-        // Walking out hands the swing from the whole body to the arms, so every swing has to be on both.
+        // Walking hands the swing from the whole body to the arms, so every swing has to be on both.
         var controller = AssetDatabase.LoadAssetAtPath<UnityEditor.Animations.AnimatorController>(CombatAnimationSetup.PlayerControllerPath);
         var full = controller.layers.First(l => l.name == CombatAnimationSetup.FullBodyLayer).stateMachine.states.Select(s => s.state.name);
         var arms = controller.layers.First(l => l.name == "Attack Arms").stateMachine.states.Select(s => s.state.name).ToList();
-        CollectionAssert.IsSubsetOf(full.Where(state => state.StartsWith("Sword") || state.StartsWith("Punch")), arms);
+        CollectionAssert.IsSubsetOf(full.Where(state => state != "Quickstep" && state != "Roll" && state != "Heavy Roll"), arms, "every swing can go on the arms");
     }
 
     [Test]

@@ -11,8 +11,10 @@ public enum SwingKind
     ShieldBash,
     /// <summary>A weapon art, paid for with Focus.</summary>
     Art,
-    /// <summary>A quick lunge out of a dodge or on the run.</summary>
+    /// <summary>A quick lunge out of a dodge or on the run (out of a dodge away from the aim: the weapon's backstep attack).</summary>
     Rush,
+    /// <summary>Attacking out of the guard just after a blow was blocked on it.</summary>
+    GuardCounter,
 }
 
 /// <summary>Everything about a swing as it starts, for animation, sounds and the combo display.</summary>
@@ -147,6 +149,25 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private bool activeForceCritical;
     // Still to step into the blow, a moment before it lands.
     private bool stepPending;
+    // How the swing lets the feet move (SwingMotion): its share of speed while winding up, how long before the blow it steps in,
+    // and whether the player has their legs back after it landed.
+    private float activeWindupMove;
+    private float activeLungeLead;
+    private bool feetReleased;
+    // The bounded buffer: a press dropped for coming too early, which counts once the window opens if the button is still held.
+    private bool heldEarlyPress;
+    // No new attack before this: a dodge cut a wind-up short (Cancel Lockout).
+    private float attackLockedUntil = float.NegativeInfinity;
+    // Context attacks: which way the last dodge went (a backstep away from the aim), when a heavy last landed and whether it was the
+    // follow-up, and an attack the next Begin must use (a full charge's release).
+    private Vector3 lastDodgeDirection;
+    private float lastHeavyEndedAt = float.NegativeInfinity;
+    private bool lastHeavyWasFollowUp;
+    private AttackDefinition forcedAttack;
+    private bool activeIsFollowUp;
+    // How far the swing in progress steps into its blow (its attack's Lunge, or the rush's for a Riposte counter).
+    private float activeLunge;
+    private bool counterLunges;
     // How long a heavy swing has waited at the top of its wind-up; the swing's clock stands still meanwhile.
     private float chargeHeld;
     private bool charging;
@@ -217,6 +238,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
     /// <summary>Seconds until the swing in progress lands; meaningful while <see cref="IsWindingUp"/>.</summary>
     public float TimeToHit => HitAt(activeAttack, activeSpeed) - ActiveElapsed;
+
+    /// <summary>Share of walking speed the swing in progress keeps while it winds up (0: planted).</summary>
+    public float WindupMoveShare => IsWindingUp ? activeWindupMove : 0f;
+
+    /// <summary>True while the swing steps into its blow (a rush all through its wind-up): the legs are the clip's own then.</summary>
+    public bool IsSteppingIn => IsWindingUp && activeLunge > 0f && !stepPending;
 
     /// <summary>True while a heavy swing waits at the top of its wind-up, charging.</summary>
     public bool IsCharging => charging;
@@ -364,6 +391,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
         queuedKind = SwingKind.None;
         pressTime = -1f;
         attackHeld = false;
+        heldEarlyPress = false;
         movement.SetSpeedScale(this, 1f);
     }
 
@@ -398,6 +426,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
         }
 
         UpdateRunning();
+        UpdateEarlyPress();
         UpdateHeldPress();
         UpdateSwing();
         ApplyPendingHits();

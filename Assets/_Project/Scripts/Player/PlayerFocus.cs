@@ -97,7 +97,7 @@ public sealed class PlayerFocus : MonoBehaviour
         {
             gain *= 2f;
         }
-        else if (swing.Kind == SwingKind.Heavy)
+        else if (swing.Kind == SwingKind.Heavy || swing.Kind == SwingKind.GuardCounter)
         {
             gain *= 1.5f;
         }

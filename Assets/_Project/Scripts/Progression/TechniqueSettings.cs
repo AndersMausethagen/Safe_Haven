@@ -39,6 +39,9 @@ public sealed class TechniqueSettings : GameSettings<TechniqueSettings>
     [SerializeField, Min(1f)] private float raiseSpeed = 2f;
 
     [Header("Combat")]
+    [Tooltip("Riposte: a parry's counter stays ready this many times longer, and steps in as far as the weapon's rush, so the parried " +
+             "enemy, knocked back, is still reached. (Before 2026-11-15 the perk only gave the counter every parry already gives.)")]
+    [SerializeField, Min(1f)] private float riposteWindow = 1.6f;
     [Tooltip("Second Wind: stamina back for a kill with a weapon swing.")]
     [SerializeField, Min(0f)] private float secondWindStamina = 20f;
     [Tooltip("Deadly Draw: how much harder a perfect shot hits.")]
@@ -79,6 +82,7 @@ public sealed class TechniqueSettings : GameSettings<TechniqueSettings>
     public float PatchUpCost => patchUpCost;
     public float RaiseSpeed => raiseSpeed;
     public float SecondWindStamina => secondWindStamina;
+    public float RiposteWindow => riposteWindow;
     public float DeadlyDraw => deadlyDraw;
     public StatusEffectDefinition Pinning => pinning;
     public float SpellEchoChance => spellEchoChance;

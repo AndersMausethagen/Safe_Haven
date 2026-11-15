@@ -25,6 +25,83 @@ public sealed partial class MonsterAI
         }
     }
 
+    /// <summary>
+    /// Its strike was parried (PlayerGuard). By its Parry Response: an ordinary creature staggers for <paramref name="staggerSeconds"/>;
+    /// a great beast, boss or elite loses the settings' Parry Poise Share of its poise and reels back a moment, staggering only when
+    /// that breaks it (two parries, or one and some blows). A friend's copy in co-op keeps no poise, so there it only reels.
+    /// </summary>
+    public void Parried(float staggerSeconds)
+    {
+        if (definition == null || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        switch (GuardRules.ParryResponseOf(definition.ParryResponse, IsHeavyweight))
+        {
+            case ParryResponse.Stagger:
+                Stagger(staggerSeconds);
+                break;
+            case ParryResponse.PoiseDamage:
+                if (!IsRemote && poise != null && CurrentState != State.Staggered && poise.Hit(poise.Max * rules.ParryPoiseShare, Time.time))
+                {
+                    Stagger(staggerSeconds);
+                }
+                else
+                {
+                    Recoil(rules.ParryRecoilSeconds);
+                }
+
+                break;
+            default:
+                Recoil(rules.ParryRecoilSeconds);
+                break;
+        }
+    }
+
+    /// <summary>Reels back a moment: the strike in progress and what would follow it are broken off and it strikes again only after
+    /// <paramref name="seconds"/>, but it isn't staggered (no backstab opening, no extra damage taken).</summary>
+    public void Recoil(float seconds)
+    {
+        if (definition == null || CurrentState == State.Dead || CurrentState == State.Staggered || seconds <= 0f)
+        {
+            return;
+        }
+
+        if (CurrentState == State.Attacking)
+        {
+            attacks.Cancel();
+            pose?.CancelAttack();
+            SetState(State.Chasing);
+        }
+
+        attacks.Delay(seconds);
+        pose?.Hit(-transform.forward, 0.8f, Time.time);
+    }
+
+    /// <summary>Wears its poise down without a blow (a shield block knocking it back); a break staggers it as a blow's would.</summary>
+    public void TakePoise(float amount)
+    {
+        if (IsRemote || poise == null || amount <= 0f || CurrentState == State.Staggered || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        if (poise.Hit(amount, Time.time))
+        {
+            Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+        }
+    }
+
+    // Combat Technique Settings › Break Through: a heavy swing, a counter, a finisher, a weapon art, or a blow whose poise damage is a good
+    // share of its poise, breaks off a wind-up the strike's own Interruptible doesn't allow. Never a great beast's, boss's or elite's.
+    private bool BreaksThrough(in DamageInfo damage)
+    {
+        return GuardRules.BreaksThrough(damage.Technique, damage.Poise, poise != null ? poise.Max : 0f,
+            CombatTechniqueSettings.Current.BreakThroughPoiseShare, IsHeavyweight);
+    }
+
     /// <summary>Staggers it for at least this long: a new stagger, or more of the one it is in (never less).</summary>
     public void StaggerAtLeast(float seconds)
     {
@@ -94,10 +171,12 @@ public sealed partial class MonsterAI
             pose.Hit(damage.Direction, strong ? 1f : 0.6f, Time.time);
         }
 
-        if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost))
+        if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))
         {
             pose?.CancelAttack();
             SetState(State.Chasing);
+            attacks.Delay(CombatTechniqueSettings.Current.InterruptDelay);
+            AnyInterrupted?.Invoke(this, damage.Source);
         }
 
         if ((damage.Technique & HitTechnique.Backstab) != 0)

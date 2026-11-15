@@ -16,19 +16,35 @@ public sealed partial class PlayerCombat
 
         if (guard != null && guard.IsGuarding)
         {
-            if (HasShield)
+            // Just after a parry the press is the counter itself (the light swing a ready counter becomes), not the art or a bash: the
+            // parry leads into aggression (No Rest for the Wicked lets a parry cancel into the attack).
+            if (CounterIsReady)
+            {
+                guard.Lower();
+            }
+            // Just after a block: the guard counter, a hard answer out of the guard (Elden Ring).
+            else if (weapon != null && !weapon.TakesAttackInput && guard.JustBlocked(Rules.GuardCounterSeconds) && HasGuardCounter)
+            {
+                guard.SpendBlock();
+                guard.Lower();
+                Request(SwingKind.GuardCounter, ChainPress.Late);
+                return;
+            }
+            else if (HasShield)
             {
                 Request(SwingKind.ShieldBash, ChainPress.Late);
                 return;
             }
-
-            // Without a shield, attacking drops the guard into the weapon art, paid in Focus or else in stamina; a plain
-            // swing only when neither can pay (a ready counter is spent there).
-            guard.Lower();
-            if (CanAffordArt)
+            else
             {
-                Request(SwingKind.Art, ChainPress.Late);
-                return;
+                // Without a shield, attacking drops the guard into the weapon art, paid in Focus or else in stamina; a plain
+                // swing only when neither can pay.
+                guard.Lower();
+                if (CanAffordArt)
+                {
+                    Request(SwingKind.Art, ChainPress.Late);
+                    return;
+                }
             }
         }
 
@@ -49,16 +65,41 @@ public sealed partial class PlayerCombat
         ChainJudged?.Invoke(pressJudge);
 
         // The light swing starts on the press, so a tap is answered at once (waiting for the release to tell a tap from a
-        // hold made every light swing late). Held on, UpdateHeldPress turns it into the heavy one.
-        Request(SwingKind.Light, pressJudge);
+        // hold made every light swing late). Held on, UpdateHeldPress turns it into the heavy one. A press too early to keep
+        // (the bounded buffer) is dropped; still held when the window opens, it counts then (UpdateEarlyPress).
+        bool taken = Request(SwingKind.Light, pressJudge);
         bool hasHeavy = weapon != null && weapon.HeavyAttack != null;
-        pressTime = hasHeavy ? Time.time : -1f;
+        pressTime = taken && hasHeavy ? Time.time : -1f;
+        heldEarlyPress = !taken && IsAttacking;
         heavyStarted = false;
+    }
+
+    // Holding the button through a swing keeps the chain going: the press it began with was too early to keep, so it is made
+    // again as the buffer window opens (and from then on is a press like any, so holding on makes it the heavy one).
+    private void UpdateEarlyPress()
+    {
+        if (!heldEarlyPress)
+        {
+            return;
+        }
+
+        if (!attackHeld || !IsAttacking)
+        {
+            heldEarlyPress = false;
+            return;
+        }
+
+        if (queuedKind == SwingKind.None && BufferOpen(SwingKind.Light))
+        {
+            heldEarlyPress = false;
+            OnAttackPressed();
+        }
     }
 
     private void OnAttackReleased()
     {
         attackHeld = false;
+        heldEarlyPress = false;
         if (pressTime < 0f || weapon != null && weapon.TakesAttackInput)
         {
             return;
@@ -87,6 +128,8 @@ public sealed partial class PlayerCombat
     // be Focus alone, and guard-then-attack turned into a plain swing most of the time.
     private bool CanAffordArt => weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
         && (focus == null || focus.CanSpend(weapon.WeaponArtFocus) || stamina == null || stamina.Current >= stamina.Scaled(CostOfArtOnStamina()));
+
+    private bool HasGuardCounter => (HasShield && Shield != null && Shield.OwnGuardCounter != null) || (weapon != null && weapon.GuardCounterAttack != null);
 
     private float CostOfArtOnStamina() => Rules.ArtStaminaWithoutFocus * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
 
@@ -169,22 +212,58 @@ public sealed partial class PlayerCombat
         return ComboRules.Judge(Time.time - lastStartTime, lastHitAt, lastRecoverAt, Rules);
     }
 
-    private void Request(SwingKind kind, ChainPress judge)
+    // True when the swing starts now or is kept for later; false when the press is dropped (eating, the lockout after a dodge cut a
+    // wind-up short, or too early to keep: the bounded buffer).
+    private bool Request(SwingKind kind, ChainPress judge)
     {
         if (eating != null && eating.IsEating)
         {
-            return; // eating takes both hands
+            return false; // eating takes both hands
+        }
+
+        if (Time.time < attackLockedUntil)
+        {
+            return false;
         }
 
         bool busy = activeKind != SwingKind.None || IsFlinching || (dodge != null && dodge.IsDodging) || (guard != null && guard.IsStunned);
         if (busy)
         {
+            if (!BufferOpen(kind))
+            {
+                return false;
+            }
+
             // Buffered: it starts as soon as the current swing has recovered or the dodge has ended.
             queuedKind = kind;
             queuedJudge = judge;
-            return;
+            return true;
         }
 
         Begin(kind, judge);
+        return true;
+    }
+
+    // The bounded buffer (SwingMotion.Buffers): a press is kept for the next swing only in the last moments before the swing in
+    // progress can chain, or before a dodge, flinch or broken guard ends. A rush out of a dodge is the dodge's own attack, kept
+    // at any point of it.
+    private bool BufferOpen(SwingKind kind)
+    {
+        if (activeKind != SwingKind.None)
+        {
+            return SwingMotion.Buffers(ActiveElapsed, RecoverAt(activeAttack, activeSpeed), Rules);
+        }
+
+        if (dodge != null && dodge.IsDodging)
+        {
+            return kind == SwingKind.Rush || SwingMotion.BuffersWithin(dodge.TimeLeft, Rules);
+        }
+
+        if (IsFlinching)
+        {
+            return SwingMotion.BuffersWithin(flinchUntil - Time.time, Rules);
+        }
+
+        return guard == null || !guard.IsStunned || SwingMotion.BuffersWithin(guard.StunLeft, Rules);
     }
 }

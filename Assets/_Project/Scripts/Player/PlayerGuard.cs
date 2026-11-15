@@ -29,12 +29,26 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     private float raisedAt = float.NegativeInfinity;
     private float loweredAt = float.NegativeInfinity;
     private float stunnedUntil = float.NegativeInfinity;
+    // A missed parry (the guard tapped with nothing caught on it) keeps it down longer (Whiff Relock).
+    private float relockFor;
+    private bool caughtSinceRaised;
+    private float blockedAt = float.NegativeInfinity;
+
+    /// <summary>True within <paramref name="seconds"/> of a blow caught on the guard (blocked, not parried): attacking then is the
+    /// guard counter.</summary>
+    public bool JustBlocked(float seconds) => Time.time - blockedAt <= seconds;
+
+    /// <summary>Forgets the block, once a guard counter has answered it.</summary>
+    public void SpendBlock() => blockedAt = float.NegativeInfinity;
 
     /// <summary>True while the guard is up.</summary>
     public bool IsGuarding { get; private set; }
 
     /// <summary>True while reeling from a broken guard: no attacking, guarding or moving.</summary>
     public bool IsStunned => Time.time < stunnedUntil;
+
+    /// <summary>Seconds of the broken guard's stun still to go (0 when none).</summary>
+    public float StunLeft => Mathf.Max(0f, stunnedUntil - Time.time);
 
     /// <summary>Raised when the guard goes up (true) or down (false).</summary>
     public event Action<bool> GuardChanged;
@@ -96,7 +110,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         bool stunned = IsStunned;
         bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging)
                         && (combat == null || combat.CanGuard) && (eating == null || !eating.IsEating)
-                        && Time.time - loweredAt >= Rules.GuardRelock;
+                        && Time.time - loweredAt >= relockFor;
         if (held && !IsGuarding && canRaise)
         {
             if (combat != null)
@@ -130,10 +144,13 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         if (guarding)
         {
             raisedAt = Time.time;
+            caughtSinceRaised = false;
         }
         else
         {
             loweredAt = Time.time;
+            // A tap that caught nothing was a parry fished for: it stays down longer. Held up, or having caught a blow, it doesn't.
+            relockFor = GuardRules.RelockAfter(caughtSinceRaised, loweredAt - raisedAt, Rules.WhiffTapSeconds, Rules.GuardRelock, Rules.WhiffRelock);
         }
 
         GuardChanged?.Invoke(guarding);
@@ -179,6 +196,11 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
             Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity,
             stamina != null ? stamina.Scaled(cost) : cost);
+        if (outcome != GuardOutcome.None)
+        {
+            caughtSinceRaised = true;
+        }
+
         switch (outcome)
         {
             case GuardOutcome.Parried:
@@ -191,6 +213,9 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
                 {
                     stamina.TrySpend(cost);
                 }
+
+                blockedAt = Time.time;
+                KnockBackWithShield(damage);
                 Blocked?.Invoke(damage);
                 break;
             case GuardOutcome.GuardBroken:
@@ -207,14 +232,38 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         return outcome;
     }
 
+    // A shield takes a blow with weight behind it (No Rest for the Wicked's Breach: shields deal poise on block): the attacker loses the
+    // shield's Block Poise. Only within reach of its own swing, as with a parry.
+    private void KnockBackWithShield(in DamageInfo damage)
+    {
+        WeaponDefinition shield = combat != null ? combat.Shield : null;
+        if (shield == null || shield.BlockPoise <= 0f || !InReach(damage) || !damage.Source.TryGetComponent(out MonsterAI monster))
+        {
+            return;
+        }
+
+        monster.TakePoise(shield.BlockPoise);
+    }
+
+    private bool InReach(in DamageInfo damage)
+    {
+        Combatant attacker = damage.Source;
+        float reach = damage.Attack != null ? damage.Attack.Range + 1.5f : 3f;
+        return attacker != null && Vector3.Distance(attacker.transform.position, transform.position) <= reach;
+    }
+
     private void OnParried(in DamageInfo damage)
     {
-        // Only an attacker within reach of its own swing staggers: parrying an arrow doesn't stun the archer.
+        // Only an attacker within reach of its own swing staggers: parrying an arrow doesn't stun the archer. A monster answers by its
+        // Parry Response (a great beast loses poise rather than reeling).
         Combatant attacker = damage.Source;
-        if (attacker != null && attacker.TryGetComponent(out IStaggerable staggerable))
+        if (InReach(damage))
         {
-            float reach = damage.Attack != null ? damage.Attack.Range + 1.5f : 3f;
-            if (Vector3.Distance(attacker.transform.position, transform.position) <= reach)
+            if (attacker.TryGetComponent(out MonsterAI monster))
+            {
+                monster.Parried(Rules.ParryStagger);
+            }
+            else if (attacker.TryGetComponent(out IStaggerable staggerable))
             {
                 staggerable.Stagger(Rules.ParryStagger);
             }

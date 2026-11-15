@@ -9,9 +9,18 @@ using UnityEngine;
 public sealed partial class PlayerCombat
 {
     // Dodging is the way out of trouble, so it cuts a swing short; a swing that hadn't landed yet deals no damage. The
-    // chain survives it, so dodge-cancelled combos still count if the next press is in time.
+    // chain survives it, so dodge-cancelled combos still count if the next press is in time. Cutting a wind-up short locks
+    // attacking for a moment (Cancel Lockout), so swing-dodge-swing can't fish for the dodge's invulnerability.
     private void OnDodged(Vector3 direction)
     {
+        // A charging heavy dodged out of is a feint (Elden Ring), not a cancel fished for: no lockout.
+        if (activeKind != SwingKind.None && hitPending && !charging && Rules.CancelLockout > 0f)
+        {
+            attackLockedUntil = Time.time + Rules.CancelLockout;
+        }
+
+        lastDodgeDirection = direction;
+
         EndSwing();
         queuedKind = SwingKind.None;
         pressTime = -1f;

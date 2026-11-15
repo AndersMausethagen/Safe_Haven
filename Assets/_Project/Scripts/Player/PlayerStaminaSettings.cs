@@ -10,6 +10,10 @@ public sealed class PlayerStaminaSettings : ScriptableObject
     [SerializeField, Min(0f)] private float regenPerSecond = 28f;
     [Tooltip("Seconds after spending stamina before it starts to regenerate.")]
     [SerializeField, Min(0f)] private float regenDelay = 0.8f;
+    [Tooltip("The same pause after a swing's stamina: shorter than after a dodge or a block (Regen Delay), so attacking keeps the bar " +
+             "moving and a dodge still costs its pause (No Rest for the Wicked freezes stamina after a dodge). A longer pause already " +
+             "running is never cut short.")]
+    [SerializeField, Min(0f)] private float attackRegenDelay = 0.5f;
 
     [Header("Costs")]
     [SerializeField, Min(0f)] private float attackCost = 15f;
@@ -31,6 +35,7 @@ public sealed class PlayerStaminaSettings : ScriptableObject
     public float ParryReturn => parryReturn;
     public float RegenPerSecond => regenPerSecond;
     public float RegenDelay => regenDelay;
+    public float AttackRegenDelay => attackRegenDelay;
     public float AttackCost => attackCost;
     public float ShieldBashCost => shieldBashCost;
     public float DodgeCost => dodgeCost;

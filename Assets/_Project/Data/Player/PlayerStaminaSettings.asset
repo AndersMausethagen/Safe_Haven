@@ -15,6 +15,7 @@ MonoBehaviour:
   maxStamina: 100
   regenPerSecond: 26
   regenDelay: 0.9
+  attackRegenDelay: 0.5
   attackCost: 12
   shieldBashCost: 18
   dodgeCost: 25

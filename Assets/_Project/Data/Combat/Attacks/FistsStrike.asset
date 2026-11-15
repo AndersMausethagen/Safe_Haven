@@ -27,10 +27,18 @@ MonoBehaviour:
   recoveryTime: 0.43333334
   poiseDamage: 6
   impact: 0.65
-  lunge: 0.4
+  lunge: 0.8
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: 0.6
+  afterContactMove: 0.6
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
   animationState: Punch Jab
   animationSpeed: 0.85263157
   strikeSpeed: 1.35

@@ -28,15 +28,32 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("On: a dodge can cut a swing short while it winds up (it then deals no damage; its stamina is spent). Off: " +
              "a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
     [SerializeField] private bool dodgeCancelsWindup = true;
-    [Tooltip("Movement speed from the start of a swing until its blow lands, as a share of normal. 0 plants the feet, so the whole " +
-             "body swings and a chain looks the same every time; only the attack's own lunge moves the player. Above 0 a swing started " +
-             "on the run plays on the arms over the running legs.")]
+    [Tooltip("Movement speed from the start of a light swing until its blow lands, as a share of normal, for attacks that don't set " +
+             "their own (AttackDefinition › Movement). 0 plants the feet, so the whole body swings; above 0 a swing walked through plays " +
+             "on the arms over the walking legs. Heavy swings, rushes and arts stay planted unless the attack says otherwise.")]
     [SerializeField, Range(0f, 1f)] private float windupMoveSpeed;
-    [Tooltip("Movement speed once the blow has landed, for the rest of the swing, and the same after a heavy swing, as a share of normal. " +
-             "0 keeps the player planted and facing the blow until the swing ends. Above 0, walking off lets the arms finish the swing " +
-             "over the legs; the next attack still waits for the swing's recovery.")]
+    [Tooltip("Movement speed from Move After Contact to the end of the swing, and the same after a heavy swing, as a share of normal, " +
+             "for attacks that don't set their own. 0 keeps the player planted and facing the blow until the swing ends. Above 0, walking " +
+             "off lets the arms finish the swing over the legs; the next attack still waits for the swing's recovery.")]
     [SerializeField, Range(0f, 1f)] private float swingMoveSpeed;
     [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed;
+    [Tooltip("Degrees per second a swing turns toward where the player aims early in its wind-up, when no enemy is in focus (No Rest " +
+             "for the Wicked's \"change targets during attack windups\"). An attack can set its own (Movement › Windup Turn Rate). 0: aimed only as it starts.")]
+    [SerializeField, Min(0f)] private float windupTurnRate = 150f;
+    [Tooltip("Share of the wind-up, from its start, in which the blow may still turn toward the aim. It never turns once it steps in.")]
+    [SerializeField, Range(0f, 1f)] private float windupTurnShare = 0.6f;
+    [Tooltip("Seconds after a blow lands before the player walks and turns again (the arms finish the swing). An attack can set its own.")]
+    [SerializeField, Min(0f)] private float moveAfterContact = 0.1f;
+    [Tooltip("Share of a swing's wind-up, counted back from the blow, the step into it (the attack's Lunge) takes, at least 0.12 s. " +
+             "An attack can set its own. Rushes step all through their wind-up.")]
+    [SerializeField, Range(0f, 1f)] private float lungeShare = 0.33f;
+    [Tooltip("The bounded buffer: a press during a swing is kept for the next one only this many seconds before the swing's chain point " +
+             "(its Recovery Time), or in the last moments of a dodge, a flinch or a broken guard. Earlier presses are dropped, unless the " +
+             "button is still held when the window opens. 0 keeps every press (mashing then commits to the whole chain).")]
+    [SerializeField, Min(0f)] private float bufferWindow = 0.25f;
+    [Tooltip("Seconds after a dodge that cut a swing's wind-up short in which no new attack starts, so cancelling into a dodge over and " +
+             "over can't fish for its invulnerability (Path of Exile 2's lockout).")]
+    [SerializeField, Min(0f)] private float cancelLockout = 0.35f;
     [Tooltip("A hit that gets through (not blocked) worth at least this share of the player's max health makes them flinch: a swing " +
              "still winding up is lost and they can't act for a moment. 0 = every hit.")]
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.05f;
@@ -70,6 +87,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(0.1f, 1f)] private float rushRunShare = 0.7f;
     [SerializeField, Min(0f)] private float rushRunSeconds = 0.2f;
     [SerializeField, Range(10f, 180f)] private float rushRunAngle = 70f;
+    [Tooltip("A dodge at least this many degrees away from where the player aims is a backstep: attacking out of it is the weapon's " +
+             "backstep attack (when it has one) instead of the rush.")]
+    [SerializeField, Range(60f, 180f)] private float backstepAngle = 120f;
 
     [Header("Dodging around an enemy (while it is in focus)")]
     [Tooltip("Steering a dodge toward or past the enemy in focus, within this many metres, curves it around to the spot behind.")]
@@ -191,6 +211,32 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds an attacker staggers when its hit is parried.")]
     [SerializeField, Min(0f)] private float parryStagger = 1.0f;
 
+    [Header("Parry economy (the user, 2026-11-15: parrying was the whole loop)")]
+    [Tooltip("A great beast, boss or elite (Monster Definition › Parry Response: Auto or Poise Damage) isn't floored by a parry: it loses " +
+             "this share of its poise instead, and a parry that breaks what is left staggers it. Two parries, or one and some blows, open it " +
+             "(No Rest for the Wicked: \"Bosses are no longer fully staggered from parry\").")]
+    [SerializeField, Range(0f, 1f)] private float parryPoiseShare = 0.4f;
+    [Tooltip("Seconds a parried attacker that doesn't stagger reels: its strike and what would follow are broken off, but it isn't open " +
+             "to a backstab and takes no extra damage.")]
+    [SerializeField, Min(0f)] private float parryRecoilSeconds = 0.45f;
+    [Tooltip("A guard raised and lowered again within this many seconds with no blow caught on it is a missed parry: it can't go up " +
+             "again for Whiff Relock instead of Guard Relock. Tapping the guard to fish for parries costs, holding it doesn't.")]
+    [SerializeField, Min(0f)] private float whiffTapSeconds = 0.5f;
+    [SerializeField, Range(0f, 2f)] private float whiffRelock = 0.6f;
+    [Tooltip("Seconds after a blow is blocked in which attacking out of the guard is the weapon's guard counter (Elden Ring): a hard, " +
+             "poise-heavy answer, no critical. After a parry the press is the counter itself.")]
+    [SerializeField, Min(0f)] private float guardCounterSeconds = 0.6f;
+    [Tooltip("Poise damage of a guard counter, as a multiplier on its attack's.")]
+    [SerializeField, Min(1f)] private float guardCounterPoise = 1.75f;
+
+    [Header("Interrupts (hitting a wind-up)")]
+    [Tooltip("A blow in a monster's wind-up breaks it off even when the strike isn't Interruptible, if it is a heavy swing, a counter, a " +
+             "finisher or a weapon art, or its poise damage is at least this share of the monster's poise. Great beasts, bosses and elites " +
+             "are never broken off this way. 0 turns it off.")]
+    [SerializeField, Range(0f, 1f)] private float breakThroughPoiseShare = 0.25f;
+    [Tooltip("Seconds an interrupted monster waits before it strikes again.")]
+    [SerializeField, Min(0f)] private float interruptDelay = 0.5f;
+
     [Header("Counters (after a parry or a perfect dodge)")]
     [Tooltip("Seconds the counter stays ready: the next swing that lands in time is a critical counter.")]
     [SerializeField, Min(0f)] private float counterSeconds = 1f;
@@ -244,6 +290,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float WindupMoveSpeed => windupMoveSpeed;
     public float SwingMoveSpeed => swingMoveSpeed;
     public float HeavyMoveSpeed => heavyMoveSpeed;
+    public float WindupTurnRate => windupTurnRate;
+    public float WindupTurnShare => windupTurnShare;
+    public float MoveAfterContact => moveAfterContact;
+    public float LungeShare => lungeShare;
+    public float BufferWindow => bufferWindow;
+    public float CancelLockout => cancelLockout;
     public float FlinchShare => flinchShare;
     public float FlinchSeconds => flinchSeconds;
     public float FlinchGrace => flinchGrace;
@@ -258,6 +310,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float RushRunShare => rushRunShare;
     public float RushRunSeconds => rushRunSeconds;
     public float RushRunAngle => rushRunAngle;
+    public float BackstepAngle => backstepAngle;
     public float DodgeAroundRange => dodgeAroundRange;
     public float DodgeAroundSpeed => dodgeAroundSpeed;
     public float DodgeAroundSeconds => dodgeAroundSeconds;
@@ -325,6 +378,14 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float UnarmedLetThrough => unarmedLetThrough;
     public float GuardBreakStun => guardBreakStun;
     public float ParryStagger => parryStagger;
+    public float ParryPoiseShare => parryPoiseShare;
+    public float ParryRecoilSeconds => parryRecoilSeconds;
+    public float WhiffTapSeconds => whiffTapSeconds;
+    public float WhiffRelock => whiffRelock;
+    public float GuardCounterSeconds => guardCounterSeconds;
+    public float GuardCounterPoise => guardCounterPoise;
+    public float BreakThroughPoiseShare => breakThroughPoiseShare;
+    public float InterruptDelay => interruptDelay;
     public float CounterSeconds => counterSeconds;
     public float CounterDamageMultiplier => counterDamageMultiplier;
     public float SlowMotionScale => slowMotionScale;

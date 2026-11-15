@@ -182,6 +182,7 @@ MonoBehaviour:
   flankSpread: 0.5
   breaksWalls: 0
   poise: 220
+  parryResponse: 2
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0

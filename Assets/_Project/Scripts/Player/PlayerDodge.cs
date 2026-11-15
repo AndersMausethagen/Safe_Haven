@@ -88,6 +88,9 @@ public sealed class PlayerDodge : MonoBehaviour
     /// <summary>True for <paramref name="seconds"/> after a dodge ended.</summary>
     public bool JustDodged(float seconds) => !IsDodging && Time.time - dashEndsAt <= seconds;
 
+    /// <summary>Seconds until the dodge in progress ends (0 when none): presses are only kept in its last moments.</summary>
+    public float TimeLeft => IsDodging ? Mathf.Max(0f, dashEndsAt - Time.time) : 0f;
+
     /// <summary>Ends the dodge here (a rush attack takes over).</summary>
     public void CutShort()
     {

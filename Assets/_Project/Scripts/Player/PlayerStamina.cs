@@ -78,7 +78,12 @@ public sealed class PlayerStamina : MonoBehaviour
     public float Scaled(float cost) => cost * CostScale * (settings != null ? settings.ActionCostScale : 1f);
 
     /// <summary>Pays the full action cost. Returns false when stamina is insufficient, and the action must not happen.</summary>
-    public bool TrySpend(float cost)
+    public bool TrySpend(float cost) => TrySpend(cost, settings != null ? settings.RegenDelay : 0f);
+
+    /// <summary>Pays a swing's cost: as <see cref="TrySpend(float)"/>, but regeneration waits only the shorter Attack Regen Delay.</summary>
+    public bool TrySpendOnAttack(float cost) => TrySpend(cost, settings != null ? settings.AttackRegenDelay : 0f);
+
+    private bool TrySpend(float cost, float regenDelay)
     {
         cost = Scaled(cost);
         if (!pool.TrySpend(cost))
@@ -89,7 +94,8 @@ public sealed class PlayerStamina : MonoBehaviour
 
         if (cost > 0f)
         {
-            regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
+            // A longer pause already running (a dodge's) is never cut short by a swing's shorter one.
+            regenAt = Mathf.Max(regenAt, Time.time + regenDelay);
             StaminaChanged?.Invoke(pool.Current, pool.Max);
         }
 
@@ -102,7 +108,7 @@ public sealed class PlayerStamina : MonoBehaviour
     {
         if (pool.Drain(amount * (settings != null ? settings.ActionCostScale : 1f)))
         {
-            regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
+            regenAt = Mathf.Max(regenAt, Time.time + (settings != null ? settings.RegenDelay : 0f));
             StaminaChanged?.Invoke(pool.Current, pool.Max);
         }
     }
@@ -112,7 +118,7 @@ public sealed class PlayerStamina : MonoBehaviour
     {
         if (pool.Drain(pool.Current))
         {
-            regenAt = Time.time + (settings != null ? settings.RegenDelay : 0f);
+            regenAt = Mathf.Max(regenAt, Time.time + (settings != null ? settings.RegenDelay : 0f));
             StaminaChanged?.Invoke(pool.Current, pool.Max);
         }
     }

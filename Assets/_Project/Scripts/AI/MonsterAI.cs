@@ -247,6 +247,31 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>Raised when any monster starts staggering (game-wide feedback).</summary>
     public static event Action<MonsterAI, float> AnyStaggered;
 
+    /// <summary>Raised when a blow breaks off any monster's wind-up, with who struck it (game-wide feedback: the spark, the tally).</summary>
+    public static event Action<MonsterAI, Combatant> AnyInterrupted;
+
+    /// <summary>A great beast, boss or elite: not Open While Striking, made an elite, or in a boss fight. A parry doesn't floor it and a
+    /// heavy blow doesn't break off its strike.</summary>
+    public bool IsHeavyweight
+    {
+        get
+        {
+            if (definition == null)
+            {
+                return false;
+            }
+
+            if (inBossFight == null)
+            {
+                inBossFight = GetComponentInParent<BossEncounter>() != null;
+            }
+
+            return !definition.OpenWhileStriking || IsElite || inBossFight.Value;
+        }
+    }
+
+    private bool? inBossFight;
+
     /// <summary>A finishing blow has it, and lands in this many seconds. Whatever animates it stands it up to take it.</summary>
     public event Action<float> HeldForFinish;
 
