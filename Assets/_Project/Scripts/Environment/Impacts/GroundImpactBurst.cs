@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// What a heavy blow throws up from the ground: a ring of dust rolling out low, clods and pebbles flung up that fall back
-/// and bounce, grass bits where grass grows, and clots of mud when the ground is wet. Every part takes the colour of the
+/// and bounce, grass bits where grass grows, and mud splashed onto wet ground (as splats). Every part takes the colour of the
 /// ground it is thrown from (GroundImpacts reads it). On the root of the burst prefab, beside a PooledEffect, which returns
 /// it to the pool; each part is a particle system that only emits when told.
 /// </summary>
@@ -12,7 +12,6 @@ public sealed class GroundImpactBurst : MonoBehaviour
     [SerializeField] private ParticleSystem dust;
     [SerializeField] private ParticleSystem debris;
     [SerializeField] private ParticleSystem clippings;
-    [SerializeField] private ParticleSystem mud;
 
     /// <summary>What the ground is like where it lands.</summary>
     public struct Ground
@@ -90,23 +89,49 @@ public sealed class GroundImpactBurst : MonoBehaviour
 
         if (ground.Wet && !ground.Snowy)
         {
-            GroundImpactSettings settings = GroundImpactSettings.Current;
-            for (int i = 0; i < Mathf.Max(3, debrisCount); i++)
-            {
-                Vector3 out_ = Outward(forward, arc);
-                var p = new ParticleSystem.EmitParams
-                {
-                    position = transform.position + out_ * Random.Range(0f, 0.3f) * radius + Vector3.up * 0.1f,
-                    velocity = (out_ * Random.Range(2f, 4.5f) + Vector3.up * Random.Range(2.5f, 5f)) * Mathf.Sqrt(scale),
-                    startSize = Random.Range(0.1f, 0.28f) * Mathf.Sqrt(scale),
-                    startColor = settings.Mud,
-                    startLifetime = Random.Range(0.9f, 1.4f),
-                    rotation = Random.Range(0f, 360f),
-                };
-                Emit(mud, p);
-            }
+            SplashMud(debrisCount, radius, scale, forward, arc);
         }
     }
+
+    // Wet ground: mud splashed onto the ground round the blow, as splats (the blood splat atlas tinted mud brown, BloodDecals).
+    // The clots used to fly as particles on the built-in sphere mesh: brown balls "like large soccer balls, not mud" (the
+    // user, 2026-11-15). The prefab's Mud particle system is unused since.
+    private void SplashMud(int debrisCount, float radius, float scale, Vector3 forward, float arc)
+    {
+        if (!BloodDecals.Available)
+        {
+            return;
+        }
+
+        GroundImpactSettings settings = GroundImpactSettings.Current;
+        int splats = Mathf.Clamp(debrisCount / 2, 2, 6);
+        for (int i = 0; i < splats; i++)
+        {
+            Vector3 out_ = Outward(forward, arc);
+            Vector3 at = transform.position + out_ * Random.Range(0.2f, 1.1f) * Mathf.Max(radius, 0.5f);
+            Vector3 normal = Vector3.up;
+            // The ground under it, not whoever stands there.
+            int count = Physics.RaycastNonAlloc(at + Vector3.up * MudRayHeight, Vector3.down, MudHits, MudRayHeight * 2f,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            float nearest = float.MaxValue;
+            for (int h = 0; h < count; h++)
+            {
+                if (MudHits[h].distance < nearest && MudHits[h].collider.GetComponentInParent<IDamageable>() == null)
+                {
+                    nearest = MudHits[h].distance;
+                    at = MudHits[h].point;
+                    normal = MudHits[h].normal;
+                }
+            }
+
+            // One colour, so one tinted copy of the atlas (BloodDecals keeps one per colour).
+            BloodDecals.Splat(at, normal, Random.Range(0.35f, 0.8f) * Mathf.Sqrt(scale), settings.Mud, MudSeconds);
+        }
+    }
+
+    private const float MudRayHeight = 2f;
+    private const float MudSeconds = 90f;
+    private static readonly RaycastHit[] MudHits = new RaycastHit[8];
 
     private static void Emit(ParticleSystem system, ParticleSystem.EmitParams parameters)
     {
