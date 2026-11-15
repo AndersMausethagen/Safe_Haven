@@ -252,7 +252,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
         // Weather tints the fog towards its own colour, kept as bright as the hour's fog (dark at night).
         Color tint = sky.FogTint * (Brightness(state.FogColour) / Mathf.Max(Brightness(sky.FogTint), 0.05f));
         RenderSettings.fogColor = Color.Lerp(state.FogColour, tint, sky.FogTint.a) + flashAmbient * 0.3f;
-        RenderSettings.fogDensity = state.FogDensity * sky.Fog;
+        RenderSettings.fogDensity = state.FogDensity * sky.Fog * AtmosphereConditions.SceneFogScale;
         AtmosphereConditions.GoldenHour = state.GoldenHour * (1f - sky.Clouds);
         AtmosphereConditions.Night = state.Night;
         AtmosphereConditions.Hour = Hour;

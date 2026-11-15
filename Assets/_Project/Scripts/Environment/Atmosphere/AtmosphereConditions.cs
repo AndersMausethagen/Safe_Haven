@@ -34,6 +34,10 @@ public static class AtmosphereConditions
     /// <summary>How dark it is: 0 by day, 1 at night (DayNightCycle; 0 without a sky rig).</summary>
     public static float Night { get; set; }
 
+    /// <summary>The scene's own share of every fog's density (volumetric fog, fog areas, mists, the distance fog): 1 as
+    /// authored. Set by a <see cref="SceneFog"/> in the scene; the prologue's fog is thinner than the profiles it shares.</summary>
+    public static float SceneFogScale { get; set; } = 1f;
+
     /// <summary>How much of their sight range monsters keep in the current fog and dark (PerceptionSettings › Fog and Dark).</summary>
     public static float SightScale(PerceptionSettings rules) =>
         PerceptionRules.FogSightScale(FogDensity, rules.DenseFog, rules.SightInDenseFog)
@@ -52,5 +56,6 @@ public static class AtmosphereConditions
         WeatherOnlyAtmosphere = false;
         FogDensity = 0f;
         Night = 0f;
+        SceneFogScale = 1f;
     }
 }

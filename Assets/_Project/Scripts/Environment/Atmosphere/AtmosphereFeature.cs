@@ -417,7 +417,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 extraWindTime = 0f;
             extraWindTime += Mathf.Max(0f, now - lastWindTime) * (AtmosphereConditions.WeatherWind - 1f);
             lastWindTime = now;
-            float weather = fogOn ? AtmosphereConditions.FogMultiplier(fog.weatherInfluence.value) : 1f;
+            // The scene's own share (SceneFog) goes in with the weather's, so fog areas and mists thin with it too.
+            float weather = fogOn ? AtmosphereConditions.FogMultiplier(fog.weatherInfluence.value) * AtmosphereConditions.SceneFogScale : 1f;
             AtmosphereConditions.FogDensity = fogOn ? fog.density.value * weather : 0f;
             if (fogOn)
             {
@@ -467,13 +468,13 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     {
                         regionIndex = i;
                         material.SetTexture("_TerrainMistRegionTex", mist.RegionMap);
-                        material.SetFloat("_TerrainMistRegionDensity", mist.RegionDensity);
+                        material.SetFloat("_TerrainMistRegionDensity", mist.RegionDensity * AtmosphereConditions.SceneFogScale);
                     }
 
                     Vector3 origin = mist.Terrain.transform.position;
                     Vector3 size = mist.Terrain.terrainData.size;
                     mistRects[i] = new Vector4(origin.x, origin.z, size.x, size.z);
-                    mistShapes[i] = new Vector4(mist.EffectiveDensity, mist.Bottom, mist.Thickness, mist.EdgeFade);
+                    mistShapes[i] = new Vector4(mist.EffectiveDensity * AtmosphereConditions.SceneFogScale, mist.Bottom, mist.Thickness, mist.EdgeFade);
                     mistClouds[i] = new Vector4(1f / mist.CloudSize, mist.Coverage, mist.Erosion, mist.FlowStretch);
                     mistWinds[i] = new Vector4(mist.Wind.x, mist.Wind.y, extraWindTime * mist.WeatherWindInfluence,
                         Mathf.Max(0f, AtmosphereConditions.WeatherWind - 0.4f) * mist.WeatherWindInfluence);
@@ -511,7 +512,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                     Vector3 size = volume.Size;
                     volumeTransforms[i] = volume.transform.worldToLocalMatrix;
                     volumeSizes[i] = new Vector4(size.x, size.y, size.z, 0f);
-                    volumeShapes[i] = new Vector4(volume.EffectiveDensity, 0f, size.y, volume.EdgeFade);
+                    volumeShapes[i] = new Vector4(volume.EffectiveDensity * AtmosphereConditions.SceneFogScale, 0f, size.y, volume.EdgeFade);
                     volumeClouds[i] = new Vector4(1f / volume.CloudSize, volume.Coverage, volume.Erosion, volume.FlowStretch);
                     volumeWinds[i] = new Vector4(volume.Wind.x, volume.Wind.y,
                         extraWindTime * volume.WeatherWindInfluence,
@@ -534,7 +535,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 {
                     FogArea fogArea = areaOrder[i];
                     Vector3 p = fogArea.transform.position;
-                    float areaWeather = fogArea.FollowsWeather ? weather : 1f;
+                    float areaWeather = fogArea.FollowsWeather ? weather : AtmosphereConditions.SceneFogScale;
                     areas[i] = new Vector4(p.x, p.y, p.z, fogArea.Density * areaWeather);
                     areaShapes[i] = new Vector4(1f / fogArea.Radius, 1f / fogArea.Height, fogArea.Softness, 0f);
                 }
