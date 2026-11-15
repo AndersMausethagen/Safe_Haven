@@ -56,8 +56,13 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         ApplySize();
         for (int i = 0; i < slots.Length; i++)
         {
-            // The skill window is where skills are arranged; here a consumable can only be dropped on from the bag.
+            // The skill window is where skills are arranged; here a consumable can only be dropped on from the bag. The
+            // slot's frame catches the drop, and only while the bag is open (CatchDrops): in play the bar never takes a click.
             slots[i]?.view?.Bind(this, i);
+            if (slots[i]?.view != null && slots[i].view.TryGetComponent(out Image frame))
+            {
+                frame.raycastTarget = true;
+            }
         }
     }
 
@@ -332,12 +337,19 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         }
 
         UIStateManager ui = UIStateManager.Current;
-        bool hide = HudGivesWay.Covered && !(ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character));
+        bool bagOpen = ui != null && (ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character));
+        bool hide = HudGivesWay.Covered && !bagOpen;
         float target = hide ? 0f : 1f;
         if (group.alpha != target)
         {
             group.alpha = Mathf.MoveTowards(group.alpha, target, Time.unscaledDeltaTime * 7f);
-            group.blocksRaycasts = group.alpha > 0.5f;
+        }
+
+        // Catches a stack dragged from the bag; otherwise the pointer goes through to the game.
+        bool catchDrops = bagOpen && group.alpha > 0.5f;
+        if (group.blocksRaycasts != catchDrops)
+        {
+            group.blocksRaycasts = catchDrops;
         }
     }
 
