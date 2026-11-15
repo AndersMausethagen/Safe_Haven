@@ -58,6 +58,13 @@ public sealed partial class PlayerCombat
             return;
         }
 
+        // A warded blow (Unyielding, a great enchantment) hurts but doesn't stagger: the ward is spent on it.
+        if (FlinchWarded)
+        {
+            FlinchWarded = false;
+            return;
+        }
+
         bool lostSwing = activeKind != SwingKind.None && (hitPending || Floors(result));
         if (lostSwing)
         {

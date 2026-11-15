@@ -142,15 +142,21 @@ public static class AltarWork
         }
 
         held.Container.SetSlot(held.Slot, stack.WithEmpower(level));
+        // Work at the altar is Runecraft's practice (Docs/EnchantingResearch.md #4).
+        Inscriptions.Practise(stack.Item.Tier, EssenceSettings.Current.EmpowerWork);
         Finished(user, $"{stack.Item.DisplayName} is empowered to +{level}.");
     }
 
     // ----- Enchanting -----
 
-    /// <summary>The gear in reach that takes an enchantment, with every enchantment that fits it.</summary>
+    /// <summary>
+    /// The gear in reach that takes an enchantment, with every enchantment that fits it: the known ones to carve, then the unknown
+    /// ones greyed with where their inscriptions are found, so each is a goal (Docs/EnchantingResearch.md #8).
+    /// </summary>
     public static List<AltarSubject> Enchanting(GameObject user)
     {
         var subjects = new List<AltarSubject>();
+        var fitting = new List<EnchantmentDefinition>();
         foreach (Held held in Gear(user))
         {
             ItemStack stack = held.Stack;
@@ -161,12 +167,24 @@ public static class AltarWork
             }
 
             AltarSubject subject = Subject(held);
+            fitting.Clear();
             foreach (EnchantmentDefinition enchantment in EssenceSettings.Current.Enchantments)
             {
                 if (enchantment != null && enchantment.Fits(stack.Item))
                 {
-                    subject.Offers.Add(EnchantOffer(user, held, stack, enchantment));
+                    fitting.Add(enchantment);
                 }
+            }
+
+            // Known first, by tier; then the unknown, by tier, so the next goals sit at the top of what is left.
+            fitting.Sort((a, b) =>
+            {
+                int known = GameSession.Progress.Knows(b).CompareTo(GameSession.Progress.Knows(a));
+                return known != 0 ? known : a.Tier != b.Tier ? a.Tier.CompareTo(b.Tier) : string.CompareOrdinal(a.DisplayName, b.DisplayName);
+            });
+            foreach (EnchantmentDefinition enchantment in fitting)
+            {
+                subject.Offers.Add(EnchantOffer(user, held, stack, enchantment));
             }
 
             if (subject.Offers.Count > 0)
@@ -180,32 +198,92 @@ public static class AltarWork
 
     private static AltarOffer EnchantOffer(GameObject user, Held held, ItemStack stack, EnchantmentDefinition enchantment)
     {
+        UIStyle style = UIStyle.Current;
         bool cursed = enchantment.School == EssenceSchool.Cursed;
+        bool known = GameSession.Progress.Knows(enchantment);
+        string tags = (enchantment.IsGreat ? $"  <size=75%><color=#{Hex(style.Accent)}>Great</color></size>" : "")
+                      + (cursed ? $"  <size=75%><color=#{Hex(style.Danger)}>Cursed</color></size>" : "");
+        string effects = Effects(enchantment);
+        string what = enchantment.Bonuses.Count > 0 ? ItemTooltipView.DescribeBonuses(enchantment.Bonuses) : "";
+        string once = OnceNote(user, held, enchantment);
+        bool canCarve = Inscriptions.CanCarve(enchantment, out bool byCarver, out string skillProblem);
+        ResidentRecord carver = byCarver ? Inscriptions.Carver() : null;
         var offer = new AltarOffer
         {
-            Title = cursed ? $"{enchantment.DisplayName}  <size=75%><color=#{Hex(UIStyle.Current.Danger)}>Cursed</color></size>" : enchantment.DisplayName,
-            Detail = ItemTooltipView.DescribeBonuses(enchantment.Bonuses),
-            Effect = $"<b>{enchantment.DisplayName}</b>{Lines(enchantment.Bonuses)}\n\n{enchantment.Description}" +
-                     (cursed ? "\n\n<alpha=#AA>Raw Cursed Essence: stronger, and it always takes its price." : ""),
+            Title = known ? enchantment.DisplayName + tags : $"<alpha=#88>{enchantment.DisplayName}{tags}",
+            Detail = known ? (what.Length > 0 ? what : StripTags(effects)) : $"Not known: {enchantment.SourceHint}",
+            Effect = $"<b>{enchantment.DisplayName}</b>{Lines(enchantment.Bonuses)}{(effects.Length > 0 ? "\n" + effects : "")}\n\n{enchantment.Description}" +
+                     $"\n\n<alpha=#AA>Fits {enchantment.DescribeTargets()}." +
+                     (enchantment.RequiredRunecraft > 0 ? $" Needs Runecraft {enchantment.RequiredRunecraft}." : "") +
+                     (known ? "" : $"\nNot known yet. {enchantment.SourceHint}: its inscription teaches it, read at home.") +
+                     (carver != null ? $"\n{carver.Resident.DisplayName} carves this one for you." : "") +
+                     (once.Length > 0 ? "\n" + once : "") +
+                     (cursed ? "\nRaw Cursed Essence: stronger, and it always takes its price." : ""),
             Verb = stack.Enchantment != null ? $"Replace {stack.Enchantment.DisplayName}" : "Enchant",
             Done = stack.Enchantment == enchantment,
         };
         offer.Cost.Resources.AddRange(enchantment.Cost);
-        offer.Problem = offer.Done ? "It already carries this." : Missing(user, offer.Cost);
+        offer.Problem = offer.Done ? "It already carries this."
+            : !known ? $"Not known yet. {enchantment.SourceHint}."
+            : !canCarve ? skillProblem
+            : Missing(user, offer.Cost);
         offer.Apply = () => Enchant(user, held, enchantment, offer.Cost);
         return offer;
+    }
+
+    // A great enchantment's effects, one line each.
+    private static string Effects(EnchantmentDefinition enchantment)
+    {
+        var lines = new System.Text.StringBuilder();
+        foreach (RelicEffect effect in enchantment.Effects)
+        {
+            if (effect != null)
+            {
+                lines.Append(lines.Length > 0 ? "\n" : "").Append($"<color=#{Hex(UIStyle.Current.Accent)}>{effect.Describe()}</color>");
+            }
+        }
+
+        return lines.ToString();
+    }
+
+    private static string StripTags(string text) => System.Text.RegularExpressions.Regex.Replace(text, "<.*?>", "");
+
+    // "Counts once": another worn piece already gives it, so this would add nothing while both are worn.
+    private static string OnceNote(GameObject user, Held held, EnchantmentDefinition enchantment)
+    {
+        PlayerEquipment equipment = user != null ? user.GetComponent<PlayerEquipment>() : null;
+        if (equipment == null)
+        {
+            return "";
+        }
+
+        int except = held.Container == equipment.Gear.Slots ? held.Slot : -1;
+        ItemStack carrier = GearPower.CarrierOf(equipment.Gear.Slots, enchantment, except);
+        return carrier.IsEmpty ? "" : $"Counts once: your {carrier.DisplayName} already gives it.";
     }
 
     private static void Enchant(GameObject user, Held held, EnchantmentDefinition enchantment, RepairCost cost)
     {
         ItemStack stack = held.Stack;
-        if (stack.IsEmpty || !enchantment.Fits(stack.Item) || !MaterialPool.For(user).TrySpend(cost.Resources, cost.Items))
+        if (stack.IsEmpty || !enchantment.Fits(stack.Item) || !GameSession.Progress.Knows(enchantment)
+            || !Inscriptions.CanCarve(enchantment, out bool byCarver, out _) || !MaterialPool.For(user).TrySpend(cost.Resources, cost.Items))
         {
             return;
         }
 
         held.Container.SetSlot(held.Slot, stack.WithEnchantment(enchantment));
-        Finished(user, $"{stack.Item.DisplayName} now carries {enchantment.DisplayName}.");
+        // Carving is Runecraft's practice, and the carver at home learns from every piece worked while she is there.
+        Inscriptions.Practise(stack.Item.Tier, EssenceSettings.Current.EnchantWork);
+        ResidentRecord carver = Inscriptions.Carver();
+        if (carver != null)
+        {
+            carver.WorkDone += EssenceSettings.Current.WorkPerEnchanting;
+        }
+
+        GameEvents.Raise(new GameEvent(GameEventKind.Enchanted, enchantment, 1, user, detail: stack.Item));
+        Finished(user, byCarver && carver != null
+            ? $"{carver.Resident.DisplayName} carves {enchantment.DisplayName} into your {stack.Item.DisplayName}."
+            : $"{stack.Item.DisplayName} now carries {enchantment.DisplayName}.");
     }
 
     // ----- Deepening skills -----
@@ -320,7 +398,7 @@ public static class AltarWork
         var lines = new System.Text.StringBuilder();
         foreach (StatBonus bonus in bonuses)
         {
-            lines.Append($"\n<color=#{Hex(bonus.value >= 0f ? style.Good : style.Danger)}>{bonus.Describe()}</color>");
+            lines.Append($"\n<color=#{Hex(StatNames.IsPenalty(bonus.stat, bonus.value) ? style.Danger : style.Good)}>{bonus.Describe()}</color>");
         }
 
         return lines.ToString();

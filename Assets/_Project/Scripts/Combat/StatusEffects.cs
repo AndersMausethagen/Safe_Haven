@@ -34,6 +34,9 @@ public sealed class StatusEffects : MonoBehaviour
     public event Action<StatusEffectDefinition, bool> Changed;
 
     /// <summary>Puts <paramref name="effect"/> on <paramref name="target"/>. Null when it can't take it.</summary>
+    /// <summary>A status was laid on something (co-op sends a friend's to the host's creature: CreaturePuppets).</summary>
+    public static event System.Action<Damageable, StatusEffectDefinition, Combatant> Applied;
+
     public static StatusEffects Apply(Damageable target, StatusEffectDefinition effect, Combatant source)
     {
         if (target == null || effect == null || !target.IsAlive)
@@ -53,6 +56,7 @@ public sealed class StatusEffects : MonoBehaviour
         }
 
         effects.Add(effect, source);
+        Applied?.Invoke(target, effect, source);
         return effects;
     }
 

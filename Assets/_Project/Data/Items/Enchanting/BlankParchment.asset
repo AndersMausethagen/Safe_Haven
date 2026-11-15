@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c76fa069e85f784a9c1abb8f78fae26, type: 3}
+  m_Name: BlankParchment
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  id: enchant.blankparchment
+  displayName: Blank Parchment
+  description: Rough sheets of beaten nettle, with charcoal to rub with. Pressed to a carved stone in the deep woods, it takes the marks.
+  category: 2
+  tier: 1
+  rarity: 0
+  value: 4
+  gearScoreOverride: 0
+  icon: {fileID: 21300000, guid: 14c09fded10542e43a65284350b6655f, type: 3}
+  prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
+  stackable: 1
+  maximumStack: 5
+  weight: 0.1
+  toolType: 0
+  toolTier: 0
+  weapon: {fileID: 0}
+  arrow: {fileID: 0}
+  healAmount: 0
+  hungerRestore: 0
+  thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
+  carryCapacityBonus: 0
+  bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
+  armorSlot: 0
+  wornLook: {fileID: 0}
+  statBonuses: []
+  teachesBuildings: []
+  teachesRecipes: []
+  experience: 0
+  learnedAtHome: 0
+  inscription: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
+  raidModifier: {fileID: 0}

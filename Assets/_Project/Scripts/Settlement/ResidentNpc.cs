@@ -197,6 +197,12 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             }));
         }
 
+        // Someone who carves enchantments (Liv): how it works, what she can carve, and inscriptions handed to her.
+        if (current != null && current.Carves && !HavenVisit.InHostsHaven)
+        {
+            EnchanterTalk.AddTopics(page, speaker, record, afterAnswer);
+        }
+
         foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(resident))
         {
             if (job == null)

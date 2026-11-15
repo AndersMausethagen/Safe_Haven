@@ -23,6 +23,7 @@ public sealed class CoopWireTests
         // 2026-11-15: creature poses carry poise, waiting, felled, guarding, marked and noticing (22 bytes); look state carries Drawing;
         // friends' noise, shots and casts as RPCs.
         [24] = "b11aa4e41e43882d9564f37168585240",
+        [25] = "fbdd95d903325dec171610c2ae9adaba",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

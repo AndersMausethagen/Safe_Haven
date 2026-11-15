@@ -45,6 +45,12 @@ public enum ObjectiveType
     RepairItem = 17,
     /// <summary>Raise X of a building (or any building) to a tier: 2 is its first upgrade.</summary>
     UpgradeBuilding = 18,
+    /// <summary>Enchant X pieces of gear at the altar: with one enchantment, any, or any great one.</summary>
+    EnchantItem = 19,
+    /// <summary>Learn X enchantments (an inscription read at home, or a teacher): one, any, any great one, or any of one source.</summary>
+    LearnEnchantment = 20,
+    /// <summary>Hand X inscriptions to someone who carves (Liv): to the person named, or anyone.</summary>
+    GiveInscription = 21,
 }
 
 /// <summary>
@@ -102,13 +108,21 @@ public sealed class QuestObjective
     [SerializeField] private bool bringHome;
     [Tooltip("Counts what the player already has when the quest starts, including a Quest Event that already happened (counts once).")]
     [SerializeField] private bool countAlreadyOwned;
+    [Tooltip("Empty: any enchantment.")]
+    [SerializeField] private EnchantmentDefinition enchantment;
+    [Tooltip("Only great enchantments count.")]
+    [SerializeField] private bool greatOnly;
+    [Tooltip("Only enchantments whose inscriptions come from the Source below count.")]
+    [SerializeField] private bool onlySource;
+    [SerializeField] private EnchantmentSource source = EnchantmentSource.Elite;
 
     public ObjectiveType Type => type;
 
     /// <summary>Whether a raid can move this on whatever is out there. A Quest Event depends on the place: see what has a waypoint there.</summary>
     public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent
         && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank && type != ObjectiveType.StoreItem
-        && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding;
+        && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding && type != ObjectiveType.EnchantItem
+        && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -242,6 +256,12 @@ public sealed class QuestObjective
                 return new[] { nameof(item) };
             case ObjectiveType.UpgradeBuilding:
                 return new[] { nameof(building), nameof(tier), nameof(countAlreadyOwned) };
+            case ObjectiveType.EnchantItem:
+                return new[] { nameof(enchantment), nameof(greatOnly) };
+            case ObjectiveType.LearnEnchantment:
+                return new[] { nameof(enchantment), nameof(greatOnly), nameof(onlySource), nameof(source) };
+            case ObjectiveType.GiveInscription:
+                return new[] { nameof(person) };
             default:
                 return Array.Empty<string>();
         }
@@ -279,6 +299,11 @@ public sealed class QuestObjective
         [ObjectiveType.StoreItem] = false,
         [ObjectiveType.RepairItem] = true,
         [ObjectiveType.UpgradeBuilding] = false,
+        // The altar and the carver are a Haven's: a visitor works at their own.
+        [ObjectiveType.EnchantItem] = false,
+        // What the player learns is their own, wherever they read it.
+        [ObjectiveType.LearnEnchantment] = true,
+        [ObjectiveType.GiveInscription] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
@@ -350,10 +375,21 @@ public sealed class QuestObjective
             case ObjectiveType.UpgradeBuilding:
                 // Amount carries the tier reached, not a count: one building raised is one.
                 return gameEvent.Kind == GameEventKind.Upgraded && Is(building, gameEvent.Subject, false) && gameEvent.Amount >= Tier ? 1 : 0;
+            case ObjectiveType.EnchantItem:
+                return gameEvent.Kind == GameEventKind.Enchanted && EnchantmentCounts(gameEvent.Subject) ? 1 : 0;
+            case ObjectiveType.LearnEnchantment:
+                return gameEvent.Kind == GameEventKind.EnchantmentLearned && EnchantmentCounts(gameEvent.Subject)
+                       && (!onlySource || (gameEvent.Subject is EnchantmentDefinition learned && learned.Source == source)) ? 1 : 0;
+            case ObjectiveType.GiveInscription:
+                return gameEvent.Kind == GameEventKind.InscriptionGiven && Is(person, gameEvent.Detail, false) ? 1 : 0;
             default:
                 return 0;
         }
     }
+
+    // The enchantment named, or any; great ones only when asked.
+    private bool EnchantmentCounts(Object subject) =>
+        subject is EnchantmentDefinition done && (enchantment == null || done == enchantment) && (!greatOnly || done.IsGreat);
 
     /// <summary>True when the event is what this objective waits for: a story's or a quest's "when the player does".</summary>
     public bool Matches(in GameEvent gameEvent) => Progress(gameEvent) > 0;
@@ -487,6 +523,24 @@ public sealed class QuestObjective
             case ObjectiveType.RepairItem:
                 string bench = DurabilitySettings.Current != null ? DurabilitySettings.Current.RepairStation.DisplayName() : "Workshop";
                 return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
+            case ObjectiveType.EnchantItem:
+                string carved = enchantment != null ? enchantment.DisplayName : greatOnly ? "a great enchantment" : "an enchantment";
+                return Amount == 1 ? $"Carve {carved} into your gear at the altar" : $"Carve {carved} into {count} pieces of gear at the altar";
+            case ObjectiveType.LearnEnchantment:
+                string what = enchantment != null ? enchantment.DisplayName : greatOnly ? "great enchantment" : "enchantment";
+                string from = onlySource ? source switch
+                {
+                    EnchantmentSource.CarvedStone => " from a carved stone's rubbing",
+                    EnchantmentSource.Elite => " carried by an elite",
+                    EnchantmentSource.Boss => " carried by a great creature",
+                    EnchantmentSource.Found => " found in the woods",
+                    _ => "",
+                } : "";
+                return enchantment != null ? $"Learn {what} (read its inscription at home)"
+                    : Amount == 1 ? $"Learn an {what}{from} (read its inscription at home)" : $"Learn {count} {what}s{from}";
+            case ObjectiveType.GiveInscription:
+                string carver = person != null ? person.DisplayName : "someone who carves";
+                return Amount == 1 ? $"Give {carver} an inscription" : $"Give {carver} {count} inscriptions";
             case ObjectiveType.UpgradeBuilding:
                 string which = building != null ? $"the {building.DisplayName}" : "a building";
                 return Amount == 1 ? $"Raise {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})" : $"Raise {count} of {which} to Tier {Tiers.ToRoman(Tier)} ({{key:Haven}})";

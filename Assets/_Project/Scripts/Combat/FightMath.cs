@@ -21,6 +21,8 @@ public static class FightMath
         public float CritDamage = 0.5f;
         public float DamageBonus;
         public float MeleeDamage;
+        /// <summary>Share of a physical blow taken away: Physical Resistance, and a third of each strike kind's (blunt, slash, stab).</summary>
+        public float Resist;
 
         public Totals Copy() => (Totals)MemberwiseClone();
 
@@ -39,6 +41,9 @@ public static class FightMath
                 case StatType.PhysicalCritDamage: CritDamage += value; break;
                 case StatType.DamageBonus: DamageBonus += value; break;
                 case StatType.MeleeDamage: MeleeDamage += value; break;
+                case StatType.PhysicalResistance: Resist += value; break;
+                // The reference creature's blows are of every kind: a strike kind's resistance stops a third of them.
+                case StatType.BluntResistance: case StatType.SlashResistance: case StatType.StabResistance: Resist += value / 3f; break;
             }
         }
 
@@ -53,8 +58,8 @@ public static class FightMath
             Mathf.Max(0f, 1f + (Strength * rules.PowerPerStrength + Power) * rules.DamagePerPower) * Mathf.Max(0f, 1f + DamageBonus)
             * Mathf.Max(0f, 1f + MeleeDamage) * (1f + Mathf.Clamp01(CritChance) * Mathf.Max(0f, CritDamage));
 
-        /// <summary>How much damage it takes to kill: health over what armour lets through.</summary>
-        public float Toughness(CombatRules rules) => FullHealth / Mathf.Max(0.01f, 1f - rules.GetArmorReduction(Armor));
+        /// <summary>How much damage it takes to kill: health over what armour and resistance let through.</summary>
+        public float Toughness(CombatRules rules) => FullHealth / Mathf.Max(0.01f, (1f - rules.GetArmorReduction(Armor)) * (1f - Mathf.Clamp(Resist, 0f, 0.9f)));
     }
 
     /// <summary>The totals a live stat sheet comes to (the player now), with health as its <paramref name="maxHealth"/>.</summary>
@@ -65,6 +70,8 @@ public static class FightMath
             Armor = stats.Get(StatType.Armor), Health = maxHealth, Strength = stats.Get(StatType.Strength), Power = stats.Get(StatType.PhysicalPower),
             CritChance = stats.Get(StatType.PhysicalCritChance), CritDamage = stats.Get(StatType.PhysicalCritDamage),
             DamageBonus = stats.Get(StatType.DamageBonus), MeleeDamage = stats.Get(StatType.MeleeDamage),
+            Resist = stats.Get(StatType.PhysicalResistance)
+                     + (stats.Get(StatType.BluntResistance) + stats.Get(StatType.SlashResistance) + stats.Get(StatType.StabResistance)) / 3f,
         };
     }
 

@@ -27,6 +27,8 @@ public sealed class CoopCreatures : ICoopPart
     public const string WakeMessage = "SafeHaven.CreatureWake";
     public const string CallMessage = "SafeHaven.CreatureCall";
     public const string StaggerMessage = "SafeHaven.CreatureStagger";
+    /// <summary>Friend to host: the friend laid a status on a puppet (a great enchantment's chill or roots): the real creature takes it.</summary>
+    public const string StatusMessage = "SafeHaven.CreatureStatus";
 
     /// <summary>Seconds between updates.</summary>
     public const float Interval = 0.1f;

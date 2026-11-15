@@ -55,6 +55,14 @@ public enum GameEventKind
     Repaired = 23,
     /// <summary>A building's upgrade was finished. Subject: the BuildingDefinition; Amount: the tier it stands at now, from 2.</summary>
     Upgraded = 24,
+    /// <summary>A piece of gear was enchanted at the altar. Subject: the EnchantmentDefinition; Detail: the ItemDefinition.</summary>
+    Enchanted = 25,
+    /// <summary>An enchantment was learned from an inscription or a teacher. Subject: the EnchantmentDefinition.</summary>
+    EnchantmentLearned = 26,
+    /// <summary>An inscription was handed to someone (Liv). Subject: the EnchantmentDefinition it carried; Detail: the ResidentDefinition.</summary>
+    InscriptionGiven = 27,
+    /// <summary>An inscription was found: a drop, a cache, a rubbing. Subject: the EnchantmentDefinition; Amount: its tier.</summary>
+    InscriptionFound = 28,
 }
 
 /// <summary>

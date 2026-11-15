@@ -23,12 +23,16 @@ public static class GearBalance
         public float Armor;
         public float Health;
         public float Reduction;
+        /// <summary>Share of a physical blow resistances take away (FightMath.Totals.Resist); 0 in the plain kit.</summary>
+        public float Resist;
+        /// <summary>The enchantment counted on each piece of the stacked kit, for the window.</summary>
+        public readonly List<EnchantmentDefinition> Enchantments = new List<EnchantmentDefinition>();
         /// <summary>The Melee skill's damage bonus at the level expected for the tier, already in Damage.</summary>
         public float SkillDamage;
         public readonly List<ItemDefinition> Pieces = new List<ItemDefinition>();
 
         /// <summary>How much damage it takes to kill: health over what armor lets through.</summary>
-        public float Toughness => Health / Mathf.Max(0.01f, 1f - Reduction);
+        public float Toughness => Health / Mathf.Max(0.01f, (1f - Reduction) * (1f - Mathf.Clamp(Resist, 0f, 0.9f)));
     }
 
     private static readonly ArmorSlot[] WornSlots = { ArmorSlot.Head, ArmorSlot.Neck, ArmorSlot.Chest, ArmorSlot.Hands, ArmorSlot.Waist, ArmorSlot.Feet };
@@ -126,7 +130,36 @@ public static class GearBalance
     /// (FightMath), where the plain kit counts gear armour, health, Strength and crit only. Empowering is left out: it raises the kit's gear
     /// score, so the planner already counts an empowered kit as the next tier's.
     /// </summary>
-    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear)
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear) => StackedKitOf(tier, gear, true);
+
+    /// <summary>
+    /// <see cref="StackedKitOf(int, IReadOnlyList{ItemDefinition})"/>, with or without enchantments: they have a budget of their own on
+    /// top of the rest (RaidTierTests: Enchantments Add At Most), so the two are measured apart.
+    /// </summary>
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted) => StackedKitOf(tier, gear, enchanted, tier);
+
+    /// <summary>
+    /// The tier's gear with what can be stacked on it by <paramref name="reached"/>: the skill level expected then (perks, and the
+    /// Runecraft an enchantment needs), the food and enchantments its raids hand out. With <paramref name="reached"/> one below the
+    /// gear's tier it is the player arriving at the tier with what the last one gave them (the user, 2026-11-15: count what is within
+    /// reach when; each tier hard at entry and mastered just before the next).
+    /// </summary>
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached) =>
+        StackedKitOf(tier, gear, enchanted, reached, true);
+
+    /// <summary>
+    /// The kit a player enters a tier with (the user, 2026-11-15: hard at entry, mastered just before the next): the tier's gear and what
+    /// they keep from the tier before (perks, enchantments known), without what is eaten or slept for each raid. The tier's multipliers
+    /// are tuned to this one (RaidTierTests); a player who eats and rests well finds it easier, and a mastered one is ready for the next.
+    /// At tier I it is the plain kit: a new player has nothing yet.
+    /// </summary>
+    public static Kit EntryKitOf(int tier, IReadOnlyList<ItemDefinition> gear) =>
+        tier <= 1 ? KitOf(tier, gear) : StackedKitOf(tier, gear, true, tier - 1, false);
+
+    /// <summary>Everything within reach by the end of the tier, food and rest included: the tier mastered.</summary>
+    public static Kit MasteredKitOf(int tier, IReadOnlyList<ItemDefinition> gear) => StackedKitOf(tier, gear, true, tier, true);
+
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables)
     {
         Kit plain = KitOf(tier, gear);
         var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
@@ -143,7 +176,13 @@ public static class GearBalance
 
             foreach (StatBonus bonus in piece.StatBonuses)
             {
-                totals.Add(bonus);
+                // The kit's own resistances (Iron Mail's) are part of what the tier was tuned to, and the plain kit leaves them out too:
+                // counted here they would read as stacking. Only what is stacked on top adds resistance.
+                if (bonus.stat != StatType.PhysicalResistance && bonus.stat != StatType.BluntResistance && bonus.stat != StatType.SlashResistance
+                    && bonus.stat != StatType.StabResistance)
+                {
+                    totals.Add(bonus);
+                }
             }
         }
 
@@ -158,7 +197,7 @@ public static class GearBalance
 
         // Perks: Melee's, and the crafting or gathering skill that adds most, the stronger side at each milestone reached.
         LevelingSettings leveling = LevelingSettings.Current;
-        int level = leveling.ExpectedLevel(tier);
+        int level = leveling.ExpectedLevel(Mathf.Max(1, reached));
         FightMath.Totals WithPerks(ProficiencyDefinition skill, FightMath.Totals from)
         {
             FightMath.Totals with = from.Copy();
@@ -200,7 +239,7 @@ public static class GearBalance
 
         // Food: the best meals and tonics of the tier, as many as there are slots.
         List<ItemDefinition> food = AssetDatabase.FindAssets("t:ItemDefinition").Select(id => AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(id)))
-            .Where(item => item != null && item.HasBoon && item.Tier <= tier).ToList();
+            .Where(item => item != null && item.HasBoon && item.Tier <= Mathf.Max(1, reached)).ToList();
         SurvivalSettings survival = SurvivalSettings.Current;
         void Eat(bool tonics, int slots)
         {
@@ -214,15 +253,55 @@ public static class GearBalance
             }
         }
 
-        Eat(false, survival != null ? survival.MealSlots : 2);
-        Eat(true, survival != null ? survival.TonicSlots : 1);
-        // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
-        totals.HealthShare += WellRestedHealth;
+        if (consumables)
+        {
+            Eat(false, survival != null ? survival.MealSlots : 2);
+            Eat(true, survival != null ? survival.TonicSlots : 1);
+            // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
+            totals.HealthShare += WellRestedHealth;
+        }
+
+        // Enchantments (Docs/EnchantingResearch.md #1): on each piece the one that fits and adds most, from those the tier's raids hand out
+        // (or known from the start), each counted once however many pieces could carry it, as GearSet counts them. Their numbers only:
+        // what a great enchantment does is a verb, kept out as attack speed and sustain are.
+        var enchantments = !enchanted ? new List<EnchantmentDefinition>() : EssenceSettings.Current.Enchantments.Where(e => e != null
+            && e.School != EssenceSchool.Relic && (e.KnownFromStart || e.Tier <= Mathf.Max(1, reached)) && e.Bonuses.Count > 0
+            && e.RequiredRunecraft <= level).ToList();
+        var used = new HashSet<EnchantmentDefinition>();
+        foreach (ItemDefinition piece in plain.Pieces)
+        {
+            EnchantmentDefinition pick = null;
+            float most = Worth(totals);
+            foreach (EnchantmentDefinition enchantment in enchantments)
+            {
+                if (used.Contains(enchantment) || !enchantment.Fits(piece))
+                {
+                    continue;
+                }
+
+                FightMath.Totals with = totals.Copy();
+                Take(enchantment.Bonuses, with);
+                float worth = Worth(with);
+                if (worth > most + 1e-4f)
+                {
+                    most = worth;
+                    pick = enchantment;
+                }
+            }
+
+            if (pick != null)
+            {
+                Take(pick.Bonuses, totals);
+                used.Add(pick);
+                kit.Enchantments.Add(pick);
+            }
+        }
 
         kit.Damage = totals.Damage(weapon, rules);
         kit.Armor = totals.Armor;
         kit.Health = totals.FullHealth;
         kit.Reduction = rules.GetArmorReduction(totals.Armor);
+        kit.Resist = Mathf.Clamp(totals.Resist, 0f, 0.9f);
         return kit;
     }
 

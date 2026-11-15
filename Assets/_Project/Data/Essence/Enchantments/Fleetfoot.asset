@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
   id: fleetfoot
   displayName: Fleetfoot
-  description: Light as a hare on the first snow.
+  description: Boots that would rather be running.
   school: 0
-  targets: 2
+  targets: 256
   cost:
   - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
     amount: 12
@@ -24,3 +24,14 @@ MonoBehaviour:
   - stat: 16
     op: 0
     value: 0.05
+  effects: []
+  knownFromStart: 1
+  knownInOldSaves: 1
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
+  references:
+    version: 2
+    RefIds: []

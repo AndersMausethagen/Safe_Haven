@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb47e913a2759648a401929037aa9ea, type: 3}
+  m_Name: Stoneblood
+  m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
+  id: stoneblood
+  displayName: Stoneblood
+  description: 'The Stone Troll''s blood remembers: brought low, your skin turns to stone.'
+  school: 0
+  targets: 512
+  cost:
+  - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+    amount: 20
+  bonuses: []
+  effects:
+  - rid: 2623126133347975288
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 3
+  tier: 3
+  requiredRunecraft: 25
+  great: 1
+  sourceHint: Carried by the Stone Troll
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126133347975288
+      type: {class: StoneSkinWhenLowEffect, ns: , asm: SafeHaven}
+      data:
+        below: 0.3
+        armor: 40
+        seconds: 6
+        cooldown: 60

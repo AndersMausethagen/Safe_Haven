@@ -487,6 +487,17 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             player.Crafting.Unlock(quest.RewardRecipes);
         }
 
+        foreach (EnchantmentDefinition enchantment in quest.RewardEnchantments)
+        {
+            Inscriptions.Learn(enchantment, player.gameObject, "quest");
+        }
+
+        ResidentRecord worker = quest.RewardWorkFor != null && !HavenVisit.InHostsHaven ? GameSession.Settlement.Find(quest.RewardWorkFor) : null;
+        if (worker != null && quest.RewardWork > 0)
+        {
+            worker.WorkDone += quest.RewardWork;
+        }
+
         return quest.DescribeRewards();
     }
 

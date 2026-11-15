@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb47e913a2759648a401929037aa9ea, type: 3}
+  m_Name: Watchful
+  m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
+  id: watchful
+  displayName: Watchful
+  description: 'The Watchful ones see and are not seen: sneaking, you are seen and heard less.'
+  school: 0
+  targets: 16
+  cost:
+  - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+    amount: 14
+  bonuses:
+  - stat: 32
+    op: 0
+    value: -0.15
+  - stat: 31
+    op: 0
+    value: -0.2
+  effects: []
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 2
+  tier: 2
+  requiredRunecraft: 10
+  great: 0
+  sourceHint: Carried by elites marked Watchful (tier II and up)
+  references:
+    version: 2
+    RefIds: []

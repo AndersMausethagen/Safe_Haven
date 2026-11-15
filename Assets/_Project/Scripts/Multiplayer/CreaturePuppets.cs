@@ -54,6 +54,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.On(CoopCreatures.GoneMessage, OnGone);
         Damageable.AnyDamaged += OnAnyDamaged;
         MonsterAI.RemoteStaggered += OnStaggeredHere;
+        StatusEffects.Applied += OnStatusHere;
     }
 
     /// <summary>The session ended: mid-raid, puppets become this game's own creatures rather than standing still.</summary>
@@ -61,6 +62,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     {
         Damageable.AnyDamaged -= OnAnyDamaged;
         MonsterAI.RemoteStaggered -= OnStaggeredHere;
+        StatusEffects.Applied -= OnStatusHere;
         HandBack(quiet: true);
         MonsterAI.RemoteClock = null;
         link = null;
@@ -424,6 +426,22 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         writer.WriteValueSafe(puppet.Id);
         writer.WriteValueSafe(seconds);
         link.ToHost(CoopCreatures.StaggerMessage, writer);
+    }
+
+    // A status this player laid on a puppet (Frostbound's chill, Rootbinder's roots): the host's creature, which does the fighting,
+    // takes it too. Without this a friend's status only slowed their own copy (Docs/EnchantingResearch.md #9).
+    private void OnStatusHere(Damageable target, StatusEffectDefinition status, Combatant source)
+    {
+        if (!FromHost || link == null || target == null || status == null || source == null || !IsMine(source)
+            || !target.TryGetComponent(out MonsterAI creature) || !byCreature.TryGetValue(creature, out Puppet puppet))
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(80, Allocator.Temp);
+        writer.WriteValueSafe(puppet.Id);
+        writer.WriteValueSafe(new FixedString64Bytes(status.Id ?? string.Empty));
+        link.ToHost(CoopCreatures.StatusMessage, writer);
     }
 
     // This player, or the companion they brought on the raid: the blows that are theirs to send. Not anyone else on their

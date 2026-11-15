@@ -56,7 +56,8 @@ public readonly struct ItemStack
         wear = empty || !item.KeepsCondition ? 0f : 1f - Mathf.Clamp01(durability);
         bool gear = !empty && item.HasDurability;
         Empower = gear ? Mathf.Max(0, empower) : 0;
-        Enchantment = gear ? enchantment : null;
+        // An inscription carries the enchantment it teaches (Inscriptions), though it is no gear.
+        Enchantment = gear || (!empty && item.IsInscription) ? enchantment : null;
         Quality = gear ? quality : ItemQuality.Plain;
         Maker = Quality != ItemQuality.Plain && !string.IsNullOrEmpty(maker) ? maker : "";
         Size = empty ? 0f : Mathf.Max(0f, size);

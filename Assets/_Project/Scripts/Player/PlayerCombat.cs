@@ -317,6 +317,9 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// <summary>Raised when a hit is dodged through at the last moment (during the dodge's invulnerability).</summary>
     public event Action<DamageInfo> PerfectDodge;
 
+    /// <summary>The next blow that would make the player flinch doesn't (Unyielding, a great enchantment); spent by that blow.</summary>
+    public bool FlinchWarded { get; set; }
+
     /// <summary>Raised when the equipped weapon changes, including being cleared.</summary>
     public event Action<WeaponDefinition> WeaponChanged;
 

@@ -24,6 +24,7 @@ MonoBehaviour:
   armor: 0
   size: 1
   behaviours: []
+  inscription: {fileID: 11400000, guid: 00be6442d166bac4ab26852b759aa818, type: 2}
   references:
     version: 2
     RefIds: []

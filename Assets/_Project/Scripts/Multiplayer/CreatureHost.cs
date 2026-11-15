@@ -105,6 +105,7 @@ public sealed class CreatureHost
         link.On(CoopCreatures.WakeMessage, OnWake);
         link.On(CoopCreatures.CallMessage, OnCall);
         link.On(CoopCreatures.StaggerMessage, OnStagger);
+        link.On(CoopCreatures.StatusMessage, OnStatus);
         Damageable.AnyDied += OnAnyDied;
         Damageable.AnyDamaged += OnAnyDamaged;
     }
@@ -605,6 +606,28 @@ public sealed class CreatureHost
         }
 
         hosted.Ai.StaggerAtLeast(Mathf.Min(seconds, LongestAskedStagger));
+    }
+
+    // A friend laid a status on their copy of a creature: the real one takes it (statuses are found among the loaded definitions,
+    // which a great enchantment holds by reference).
+    private void OnStatus(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadValueSafe(out int id);
+        reader.ReadValueSafe(out FixedString64Bytes statusId);
+        if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Health == null || !hosted.Health.IsAlive || FriendOnThisRun(sender) == null)
+        {
+            return;
+        }
+
+        string wanted = statusId.ToString();
+        foreach (StatusEffectDefinition status in Resources.FindObjectsOfTypeAll<StatusEffectDefinition>())
+        {
+            if (status != null && status.Id == wanted)
+            {
+                StatusEffects.Apply(hosted.Health, status, null);
+                return;
+            }
+        }
     }
 
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.

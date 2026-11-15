@@ -10,7 +10,8 @@ using UnityEngine;
 public sealed class RescueOrderTests
 {
     // Yrsa fifth since the design review (8.10, 2026-11-14): food came too late as tenth.
-    private static readonly string[] Order = { "Bjarne", "Tor", "Eirik", "Yrsa", "Gunnar", "Asa", "Runa", "Liv", "Hild", "Sigrid" };
+    // Liv moved up after Gunnar on 2026-11-15 (Docs/EnchantingResearch.md #6): she teaches enchanting as elites start carrying inscriptions.
+    private static readonly string[] Order = { "Bjarne", "Tor", "Eirik", "Yrsa", "Gunnar", "Liv", "Asa", "Runa", "Hild", "Sigrid" };
 
     private static RaidDefinition Woods => AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
     private static RaidRumourDefinition Rumour(string file) => AssetDatabase.LoadAssetAtPath<RaidRumourDefinition>($"Assets/_Project/Data/Raids/Rumours/{file}.asset");

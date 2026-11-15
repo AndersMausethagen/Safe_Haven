@@ -25,20 +25,72 @@ MonoBehaviour:
   toolYield: 0.03
   toolCare: 0.1
   enchantments:
-  - {fileID: 11400000, guid: fad3fce20202ca54e87a0d5fc2320290, type: 2}
   - {fileID: 11400000, guid: ef1d90bcf60801d488704e162ee8bac1, type: 2}
+  - {fileID: 11400000, guid: fad3fce20202ca54e87a0d5fc2320290, type: 2}
   - {fileID: 11400000, guid: 6de04be5d94e949489436b2403328272, type: 2}
-  - {fileID: 11400000, guid: 1c324859bbe15e641aedbb9eeed8acab, type: 2}
-  - {fileID: 11400000, guid: a84adb4fb2351894193eee806c954c71, type: 2}
   - {fileID: 11400000, guid: fe74ea59f6b3b7d4ead581515c37a4e9, type: 2}
+  - {fileID: 11400000, guid: a84adb4fb2351894193eee806c954c71, type: 2}
+  - {fileID: 11400000, guid: 1c324859bbe15e641aedbb9eeed8acab, type: 2}
   - {fileID: 11400000, guid: 6242c3368d6e2ac47a11b965b3c78ad2, type: 2}
   - {fileID: 11400000, guid: 060d9d0887ffa2943a867e3d1ce276a7, type: 2}
   - {fileID: 11400000, guid: c7fc190474dea394b8afec12c00ccea5, type: 2}
+  - {fileID: 11400000, guid: 319c2ed817fc8f246a2ca6d804769dc9, type: 2}
   - {fileID: 11400000, guid: b073b379e315e0641be76176e5477314, type: 2}
   - {fileID: 11400000, guid: a64c3c40cd5c61842b095ef0d2587801, type: 2}
   - {fileID: 11400000, guid: a6a45ef5bc7a2d34aa68160c7f6f8969, type: 2}
-  - {fileID: 11400000, guid: 319c2ed817fc8f246a2ca6d804769dc9, type: 2}
   - {fileID: 11400000, guid: 188bd7074f530404dbe544530bc59b91, type: 2}
+  - {fileID: 11400000, guid: e2730d037dc059a4cba167a754137d45, type: 2}
+  - {fileID: 11400000, guid: 5256bf70ce3e50948ab521c0bb9fb35c, type: 2}
+  - {fileID: 11400000, guid: 5d5e84ada025ba7439be17e1e2f8565d, type: 2}
+  - {fileID: 11400000, guid: 49586389aa6ebe54a96e2e9b9a165814, type: 2}
+  - {fileID: 11400000, guid: 029c795d155acae4fbeaf6f78072c0e2, type: 2}
+  - {fileID: 11400000, guid: 3d13d5243276b0146ab9e8ef27073c5e, type: 2}
+  - {fileID: 11400000, guid: c42f4d3c07548ae459d491b690747c84, type: 2}
+  - {fileID: 11400000, guid: 315386213c683f24ca1a5969c05c575e, type: 2}
+  - {fileID: 11400000, guid: 3bdf6d928509a754b8072d4f35ace66d, type: 2}
+  - {fileID: 11400000, guid: 5657a8419872c5647a71c7011702280c, type: 2}
+  - {fileID: 11400000, guid: 463d3a4f785ea7840acde97271bcc564, type: 2}
+  - {fileID: 11400000, guid: b7560c9bb8b3f5c4a90110f4dd338b07, type: 2}
+  - {fileID: 11400000, guid: 2fb3c2ee9e5da9d44b9a7e1f13b0f59a, type: 2}
+  - {fileID: 11400000, guid: 7a73c5a13eec3b54f83199ab32fa602d, type: 2}
+  - {fileID: 11400000, guid: 498c964cafb43654db46782a166b8daf, type: 2}
+  - {fileID: 11400000, guid: 281a1b60cc5113e4ea3f7046e8b48e8d, type: 2}
+  - {fileID: 11400000, guid: 71935053fe032a24ea5b6f0a5f96a30a, type: 2}
+  - {fileID: 11400000, guid: c61e386a3e4d4a845a1f299d7db5e465, type: 2}
+  - {fileID: 11400000, guid: 9c2a850bb26c199439888225228b5663, type: 2}
+  - {fileID: 11400000, guid: 00be6442d166bac4ab26852b759aa818, type: 2}
+  - {fileID: 11400000, guid: 43b3da718d84a6c45bf9c6fa766c82de, type: 2}
+  - {fileID: 11400000, guid: 44c13f7e82577464387182d15b6caa2c, type: 2}
+  - {fileID: 11400000, guid: a42baa2b8276e1d469669e02e6847077, type: 2}
+  - {fileID: 11400000, guid: 1bbd5ae8ff3569f4b9dc5c42bc9de098, type: 2}
+  - {fileID: 11400000, guid: c92520f637854ec42b0ff1585c3f2416, type: 2}
+  - {fileID: 11400000, guid: 3b4fc65054ac21341aa43dda8e90c388, type: 2}
+  - {fileID: 11400000, guid: 5f80338b7296eaf48b596b51b7dc0b29, type: 2}
+  - {fileID: 11400000, guid: 75bcda2aa1278c740ac6da4c487242b5, type: 2}
+  - {fileID: 11400000, guid: 4a9129cabf7c51740a7ef0e9427a475e, type: 2}
+  - {fileID: 11400000, guid: a7afb9a556745ab48ba405466800ecee, type: 2}
+  - {fileID: 11400000, guid: 6a4d1dd5c34d63a468606c0306935bcb, type: 2}
+  - {fileID: 11400000, guid: 112c2657e3e63b34a867fe0e1477c5b3, type: 2}
+  - {fileID: 11400000, guid: 3a2c172db1f4fb34b806b7f0ae2584b1, type: 2}
+  - {fileID: 11400000, guid: e4cae53e70d45b54cacbcd3a82984838, type: 2}
+  - {fileID: 11400000, guid: 250777be4bd301145a98a89f7338f368, type: 2}
+  enchantingSkill: {fileID: 11400000, guid: 0bf8c75e4c32304428c7000e1e01913b, type: 2}
+  inscription: {fileID: 11400000, guid: 48a214c3d87e0434bb42be0e1a5bcc08, type: 2}
+  blankParchment: {fileID: 11400000, guid: 06321fa18cb018b4abc8432713f21aab, type: 2}
+  enchantWork: 3
+  empowerWork: 2
+  studyWork: 1.5
+  stoneWork: 2
+  eliteInscriptionChance:
+  - 0.1
+  - 0.2
+  - 0.25
+  - 0.3
+  - 0.3
+  bossRepeatChance: 0.25
+  cacheInscriptionChance: 0.03
+  workPerInscriptionGiven: 5
+  workPerEnchanting: 1
   purifiedGlow: {r: 0.25, g: 0.75, b: 0.45, a: 1}
   cursedGlow: {r: 0.8, g: 0.1, b: 0.14, a: 1}
   empowerGlow: {r: 0.45, g: 0.3, b: 0.1, a: 1}

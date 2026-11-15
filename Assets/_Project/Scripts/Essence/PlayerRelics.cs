@@ -28,6 +28,10 @@ public sealed class PlayerRelics : MonoBehaviour
     public PlayerStamina Stamina { get; private set; }
     public PlayerNoise Noise { get; private set; }
     public PlayerDodge Dodge { get; private set; }
+    public PlayerCombat Combat { get; private set; }
+    public PlayerFocus Focus { get; private set; }
+    public PlayerStealth Stealth { get; private set; }
+    public PlayerRegain Regain { get; private set; }
 
     /// <summary>How many relic effects are running, for tests.</summary>
     public int ActiveCount => worn.Count;
@@ -52,6 +56,10 @@ public sealed class PlayerRelics : MonoBehaviour
         Stamina = GetComponent<PlayerStamina>();
         Noise = GetComponent<PlayerNoise>();
         Dodge = GetComponent<PlayerDodge>();
+        Combat = GetComponent<PlayerCombat>();
+        Focus = GetComponent<PlayerFocus>();
+        Stealth = GetComponent<PlayerStealth>();
+        Regain = GetComponent<PlayerRegain>();
     }
 
     private void OnEnable()
@@ -90,12 +98,16 @@ public sealed class PlayerRelics : MonoBehaviour
         }
     }
 
+    // A power counts once however many pieces carry it (Docs/EnchantingResearch.md #1): two Hushed pieces are one Hushed.
+    private readonly HashSet<EnchantmentDefinition> started = new HashSet<EnchantmentDefinition>();
+
     private void PutOn()
     {
+        started.Clear();
         for (int i = 0; i < GearSlots.Count; i++)
         {
             ItemStack stack = equipment.Gear.Get((GearSlot)i);
-            if (stack.IsEmpty || stack.IsBroken || stack.Enchantment == null)
+            if (stack.IsEmpty || stack.IsBroken || stack.Enchantment == null || !started.Add(stack.Enchantment))
             {
                 continue;
             }

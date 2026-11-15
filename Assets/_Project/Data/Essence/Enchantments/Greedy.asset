@@ -27,3 +27,14 @@ MonoBehaviour:
   - stat: 19
     op: 0
     value: -0.3
+  effects: []
+  knownFromStart: 0
+  knownInOldSaves: 1
+  source: 4
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
+  references:
+    version: 2
+    RefIds: []

@@ -141,14 +141,41 @@ public sealed class RaidTierTests
         float die = GearBalance.HitsToDie(first, 15f, Raid.Difficulties[0].enemyPower);
         foreach (RaidDifficulty tier in Raid.Difficulties)
         {
+            // Tuned to the kit a player enters the tier with: its gear and what they kept from the last (perks, enchantments known),
+            // so every tier is as hard at entry as the first (the user, 2026-11-15).
             GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
-            Assert.AreEqual(1f, GearBalance.HitsToKill(kit, 100f, 10f, tier.enemyHealth) / kill, 0.2f, $"tier {tier.tier}: hits to kill");
-            Assert.AreEqual(1f, GearBalance.HitsToDie(kit, 15f, tier.enemyPower) / die, 0.2f, $"tier {tier.tier}: hits to die");
+            GearBalance.Kit entry = GearBalance.EntryKitOf(tier.tier, gear);
+            Assert.AreEqual(1f, GearBalance.HitsToKill(entry, 100f, 10f, tier.enemyHealth) / kill, 0.2f, $"tier {tier.tier}: hits to kill");
+            Assert.AreEqual(1f, GearBalance.HitsToDie(entry, 15f, tier.enemyPower) / die, 0.2f, $"tier {tier.tier}: hits to die");
             if (tier.tier > 1)
             {
                 GearBalance.Kit before = GearBalance.KitOf(tier.tier - 1, gear);
                 Assert.Greater(GearBalance.HitsToKill(before, 100f, 10f, tier.enemyHealth), GearBalance.HitsToKill(kit, 100f, 10f, tier.enemyHealth) * 1.1f, $"tier {tier.tier}: kit before kills slower");
                 Assert.Less(GearBalance.HitsToDie(before, 15f, tier.enemyPower), GearBalance.HitsToDie(kit, 15f, tier.enemyPower) * 0.9f, $"tier {tier.tier}: kit before dies sooner");
+            }
+        }
+    }
+
+    // The ladder (the user, 2026-11-15): "in the beginning a tier should be hard, but mastered right before he is ready for the next". A
+    // player who has everything within reach by the end of a tier (perks, enchantments, food, rest) has it clearly easier than at entry,
+    // and the next tier is a step up even for them.
+    [Test]
+    public void EachTier_IsHardAtEntry_MasteredByItsEnd_AndTheNextIsAStepUp()
+    {
+        List<ItemDefinition> gear = GearBalance.AllGear();
+        for (int i = 0; i < Raid.Difficulties.Count; i++)
+        {
+            RaidDifficulty tier = Raid.Difficulties[i];
+            GearBalance.Kit entry = GearBalance.EntryKitOf(tier.tier, gear);
+            GearBalance.Kit mastered = GearBalance.MasteredKitOf(tier.tier, gear);
+            float entryWork = GearBalance.HitsToKill(entry, 100f, 10f, tier.enemyHealth) / GearBalance.HitsToDie(entry, 15f, tier.enemyPower);
+            float masteredWork = GearBalance.HitsToKill(mastered, 100f, 10f, tier.enemyHealth) / GearBalance.HitsToDie(mastered, 15f, tier.enemyPower);
+            Assert.Less(masteredWork, entryWork * 0.8f, $"tier {tier.tier}: mastering it makes it at least a fifth easier");
+            if (i + 1 < Raid.Difficulties.Count)
+            {
+                RaidDifficulty next = Raid.Difficulties[i + 1];
+                float nextWork = GearBalance.HitsToKill(mastered, 100f, 10f, next.enemyHealth) / GearBalance.HitsToDie(mastered, 15f, next.enemyPower);
+                Assert.Greater(nextWork, masteredWork * 1.3f, $"tier {next.tier} is a step up for one who mastered tier {tier.tier}");
             }
         }
     }
@@ -165,11 +192,32 @@ public sealed class RaidTierTests
         foreach (RaidDifficulty tier in Raid.Difficulties)
         {
             GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
-            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear);
+            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false);
             Assert.That(stacked.Toughness / kit.Toughness, Is.LessThanOrEqualTo(StackedToughnessReach),
                 $"tier {tier.tier}: stacked toughness {stacked.Toughness:0} against the kit's {kit.Toughness:0}");
             Assert.That(stacked.Damage / kit.Damage, Is.LessThanOrEqualTo(StackedDamageReach),
                 $"tier {tier.tier}: stacked damage {stacked.Damage:0.0} against the kit's {kit.Damage:0.0}");
+        }
+    }
+
+    // Enchantments have a budget of their own on top of everything else (Docs/EnchantingResearch.md #1, the user: "limit enchants"): the
+    // best fitting one on each piece of the tier's kit, each counted once, adds at most this much. Great enchantments' verbs are left
+    // out, as attack speed and sustain are; their numbers count.
+    public const float EnchantedToughnessReach = 1.12f;
+    public const float EnchantedDamageReach = 1.08f;
+
+    [Test]
+    public void Enchantments_AddAtMostTheirBudget()
+    {
+        List<ItemDefinition> gear = GearBalance.AllGear();
+        foreach (RaidDifficulty tier in Raid.Difficulties)
+        {
+            GearBalance.Kit without = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false);
+            GearBalance.Kit with = GearBalance.StackedKitOf(tier.tier, gear, enchanted: true);
+            string worn = string.Join(", ", with.Enchantments.Select(e => e.name));
+            Assert.That(with.Toughness / without.Toughness, Is.LessThanOrEqualTo(EnchantedToughnessReach), $"tier {tier.tier}: {worn}");
+            Assert.That(with.Damage / without.Damage, Is.LessThanOrEqualTo(EnchantedDamageReach), $"tier {tier.tier}: {worn}");
+            Assert.AreEqual(with.Enchantments.Count, with.Enchantments.Distinct().Count(), "each counts once");
         }
     }
 

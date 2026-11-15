@@ -25,6 +25,7 @@ MonoBehaviour:
   size: 1
   behaviours:
   - rid: 2623125818519847023
+  inscription: {fileID: 11400000, guid: 43b3da718d84a6c45bf9c6fa766c82de, type: 2}
   references:
     version: 2
     RefIds:

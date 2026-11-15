@@ -51,6 +51,32 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
     [Header("Enchantments")]
     [SerializeField] private List<EnchantmentDefinition> enchantments = new List<EnchantmentDefinition>();
 
+    [Header("Learning enchantments (Docs/EnchantingResearch.md)")]
+    [Tooltip("The skill enchanting trains and asks for (Runecraft).")]
+    [SerializeField] private ProficiencyDefinition enchantingSkill;
+    [Tooltip("The parchment that carries an enchantment until it is read at home (its stack's Enchantment is what it teaches).")]
+    [SerializeField] private ItemDefinition inscription;
+    [Tooltip("A blank one, carried to a carved stone to take a rubbing.")]
+    [SerializeField] private ItemDefinition blankParchment;
+    [Tooltip("Runecraft practice for carving an enchantment, times the item's tier experience (the crafting skills' Craft Work).")]
+    [SerializeField, Min(0f)] private float enchantWork = 3f;
+    [Tooltip("Runecraft practice for empowering a level, times the item's tier experience.")]
+    [SerializeField, Min(0f)] private float empowerWork = 2f;
+    [Tooltip("Runecraft practice for reading an inscription already known, times its tier experience (or handing it to Liv).")]
+    [SerializeField, Min(0f)] private float studyWork = 1.5f;
+    [Tooltip("Runecraft practice for reading a carved stone, times the raid tier's experience.")]
+    [SerializeField, Min(0f)] private float stoneWork = 2f;
+    [Tooltip("Chance an elite gives an inscription, by raid tier (I, II, III...).")]
+    [SerializeField] private float[] eliteInscriptionChance = { 0.1f, 0.2f, 0.25f, 0.3f, 0.3f };
+    [Tooltip("Once a great creature's own are all known, the chance it still gives one (for Liv, or practice).")]
+    [SerializeField, Range(0f, 1f)] private float bossRepeatChance = 0.25f;
+    [Tooltip("Chance a raid's supply cache holds an inscription besides its loot, before the raid's loot multiplier.")]
+    [SerializeField, Range(0f, 1f)] private float cacheInscriptionChance = 0.03f;
+    [Tooltip("Liv's rank grows by this much work for each inscription handed to her.")]
+    [SerializeField, Min(0)] private int workPerInscriptionGiven = 5;
+    [Tooltip("And by this much for each enchantment carved at the altar while she is home.")]
+    [SerializeField, Min(0)] private int workPerEnchanting = 1;
+
     [Header("How worked gear looks in the hand")]
     [Tooltip("A weapon with a Purified enchantment.")]
     [SerializeField, ColorUsage(false, true)] private Color purifiedGlow = new Color(0.25f, 0.75f, 0.45f);
@@ -79,6 +105,21 @@ public sealed class EssenceSettings : GameSettings<EssenceSettings>
     public float ToolYield => toolYield;
     public float ToolCare => toolCare;
     public IReadOnlyList<EnchantmentDefinition> Enchantments => enchantments;
+    public ProficiencyDefinition EnchantingSkill => enchantingSkill;
+    public ItemDefinition Inscription => inscription;
+    public ItemDefinition BlankParchment => blankParchment;
+    public float EnchantWork => enchantWork;
+    public float EmpowerWork => empowerWork;
+    public float StudyWork => studyWork;
+    public float StoneWork => stoneWork;
+    public float BossRepeatChance => bossRepeatChance;
+    public float CacheInscriptionChance => cacheInscriptionChance;
+    public int WorkPerInscriptionGiven => workPerInscriptionGiven;
+    public int WorkPerEnchanting => workPerEnchanting;
+
+    /// <summary>Chance an elite of a raid at <paramref name="tier"/> gives an inscription.</summary>
+    public float EliteInscriptionChance(int tier) =>
+        eliteInscriptionChance == null || eliteInscriptionChance.Length == 0 ? 0f : eliteInscriptionChance[Mathf.Clamp(tier, 1, eliteInscriptionChance.Length) - 1];
     public Color PurifiedGlow => purifiedGlow;
     public Color CursedGlow => cursedGlow;
     public Color EmpowerGlow => empowerGlow;

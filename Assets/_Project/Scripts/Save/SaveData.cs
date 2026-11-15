@@ -196,6 +196,10 @@ public sealed class ProgressSaveData
     public List<string> raidsVisited = new List<string>();
     /// <summary>Art runes attuned, "Kind=itemId" (CharacterProgress.AttunedRunes).</summary>
     public List<string> attunedRunes = new List<string>();
+    /// <summary>Enchantments learned from inscriptions, by id (CharacterProgress.LearnedEnchantments).</summary>
+    public List<string> enchantments = new List<string>();
+    /// <summary>False in saves from before inscriptions: they know every enchantment marked Known In Old Saves.</summary>
+    public bool enchantmentsLearned;
     /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();

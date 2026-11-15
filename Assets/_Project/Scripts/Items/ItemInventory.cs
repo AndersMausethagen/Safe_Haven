@@ -343,6 +343,12 @@ public sealed class ItemInventory : MonoBehaviour
             return ArtRunes.Attune(item);
         }
 
+        // An enchantment's inscription (not an art rune: those attune a kind of weapon; this teaches what the altar carves on one piece).
+        if (item.IsInscription)
+        {
+            return Inscriptions.Read(gameObject, from, slot);
+        }
+
         if (item.IsEquippable)
         {
             var equipment = GetComponent<PlayerEquipment>();

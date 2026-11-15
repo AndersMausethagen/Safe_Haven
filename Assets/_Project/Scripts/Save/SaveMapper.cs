@@ -683,6 +683,8 @@ public static class SaveMapper
         into.techniquesSeen.AddRange(progress.TechniquesSeen);
         into.raidsVisited.AddRange(progress.RaidsVisited);
         into.attunedRunes.AddRange(progress.AttunedRunes);
+        into.enchantments.AddRange(progress.LearnedEnchantments);
+        into.enchantmentsLearned = true;
 
         foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
         {
@@ -761,6 +763,18 @@ public static class SaveMapper
         progress.RestoreTechniquesSeen(saved.techniquesSeen);
         progress.RestoreRaidsVisited(saved.raidsVisited);
         progress.RestoreAttunedRunes(saved.attunedRunes);
+        progress.RestoreEnchantments(saved.enchantments);
+        if (!saved.enchantmentsLearned)
+        {
+            // Before inscriptions every enchantment was for sale at the altar: an old save keeps all it could carve.
+            foreach (EnchantmentDefinition enchantment in EssenceSettings.Current.Enchantments)
+            {
+                if (enchantment != null && enchantment.KnownInOldSaves)
+                {
+                    progress.Learn(enchantment);
+                }
+            }
+        }
         var creatures = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
         {

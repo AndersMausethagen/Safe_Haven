@@ -17,6 +17,9 @@ public sealed class LootOnDeath : MonoBehaviour
     [SerializeField] private List<RecipeDefinition> unlocksRecipes = new List<RecipeDefinition>();
     [Tooltip("Chance it leaves a relic (RelicSettings), in a raid only: for what stands at the end of the map.")]
     [SerializeField, Range(0f, 1f)] private float relicChance;
+    [Tooltip("A great creature's own enchantments (Source Boss), in a raid only: while the killer doesn't know one, it always leaves " +
+             "an inscription of one; after that, at Essence Settings › Boss Repeat Chance (Docs/EnchantingResearch.md #3).")]
+    [SerializeField] private List<EnchantmentDefinition> inscriptions = new List<EnchantmentDefinition>();
 
     private Damageable damageable;
 
@@ -28,6 +31,7 @@ public sealed class LootOnDeath : MonoBehaviour
     /// </summary>
     public bool WithholdsEssence { get; set; }
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
+    public IReadOnlyList<EnchantmentDefinition> Inscriptions => inscriptions;
 
     private void Awake()
     {
@@ -111,6 +115,21 @@ public sealed class LootOnDeath : MonoBehaviour
         if (raid != null && relicChance > 0f && inventory != null && Random.value < relicChance)
         {
             RelicSettings.Grant(inventory.gameObject, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
+        }
+
+        if (raid != null && inscriptions.Count > 0 && inventory != null)
+        {
+            var random = new System.Random(Random.Range(0, int.MaxValue));
+            EnchantmentDefinition own = global::Inscriptions.Pick(inscriptions, inventory.gameObject, random, copies: false);
+            if (own == null && Random.value < EssenceSettings.Current.BossRepeatChance)
+            {
+                own = inscriptions[random.Next(inscriptions.Count)];
+            }
+
+            if (own != null)
+            {
+                global::Inscriptions.Grant(inventory.gameObject, own, name);
+            }
         }
 
         var crafting = taker.GetComponentInParent<PlayerCrafting>();

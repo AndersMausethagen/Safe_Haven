@@ -85,6 +85,37 @@ public sealed class CharacterProgress
         }
     }
 
+    // Enchantments learned from inscriptions, by id (Docs/EnchantingResearch.md #2). Those Known From Start need no entry.
+    private readonly HashSet<string> enchantments = new HashSet<string>();
+
+    /// <summary>Enchantments learned, by id (the save's form). Those known from the start aren't listed.</summary>
+    public IEnumerable<string> LearnedEnchantments => enchantments;
+
+    /// <summary>True when this character can carve the enchantment: known from the start, or learned.</summary>
+    public bool Knows(EnchantmentDefinition enchantment) =>
+        enchantment != null && (enchantment.KnownFromStart || enchantments.Contains(enchantment.Id));
+
+    /// <summary>Learns an enchantment for good; true when it was new.</summary>
+    public bool Learn(EnchantmentDefinition enchantment)
+    {
+        if (enchantment == null || Knows(enchantment) || !enchantments.Add(enchantment.Id))
+        {
+            return false;
+        }
+
+        Changed?.Invoke();
+        return true;
+    }
+
+    public void RestoreEnchantments(IEnumerable<string> saved)
+    {
+        enchantments.Clear();
+        if (saved != null)
+        {
+            enchantments.UnionWith(saved);
+        }
+    }
+
     private readonly HashSet<string> raidsVisited = new HashSet<string>();
 
     /// <summary>Raids this character has entered at least once, by raid id (a first visit plays the raid's cinematic).</summary>

@@ -362,6 +362,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 3f7803232b50e354a8dc761eb093ddde, type: 2}
   - {fileID: 11400000, guid: 78d155ea180e0304ebc63416e467734c, type: 2}
   relicChance: 0
+  inscriptions:
+  - {fileID: 11400000, guid: 6a4d1dd5c34d63a468606c0306935bcb, type: 2}
 --- !u!114 &1291413385866200264
 MonoBehaviour:
   m_ObjectHideFlags: 0

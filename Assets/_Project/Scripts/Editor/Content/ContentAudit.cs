@@ -31,6 +31,8 @@ public static class ContentAudit
         "RelicSettings.gear", "TerritorySettings.regions[].tithe", "TradeSettings.offers", "TransportDefinition.kit",
         "WaterSource.fillItem", "SurvivalSettings.openWaterFillItem", "PrologueDefinition.startingArmor", "PrologueDefinition.startingBackpack", "PrologueDefinition.sticks",
         "PrologueDefinition.stones", "ItemWorldObject.definition", "RaidLayoutRules.pondFillItem",
+        // Inscriptions are made by drops, caches and rubbings from the one item (Inscriptions.Make).
+        "EssenceSettings.inscription",
     };
 
     private static readonly string[] ItemUses =
@@ -39,6 +41,8 @@ public static class ContentAudit
         "RaidEventDefinition.choices[].cost", "HavenRequestDefinition.wanted", "SettlementSettings.portalLevels",
         "QuestDefinition.objectives", "FishingSettings.bait", "LanternDefinition.refill", "JobDefinition.workTool", "TerritorySettings.pactRune",
         "HorseDefinition.lasso", "HorseDefinition.barley",
+        // A carved stone's rubbing uses one up (CarvedStone).
+        "EssenceSettings.blankParchment",
     };
 
     private static readonly string[] ItemNeither =

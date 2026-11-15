@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Grit in your eyes
   description: A fistful of dirt in your face. You stumble for a moment.
   color: {r: 0.55, g: 0.4, b: 0.25, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 4237744fe15fd564cb1c89fec880dc03, type: 3}
   seconds: 3
   damagePerSecond: 0
   damageType: 0

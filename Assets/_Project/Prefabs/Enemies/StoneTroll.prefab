@@ -144,6 +144,8 @@ MonoBehaviour:
       probability: 1
   unlocksRecipes: []
   relicChance: 1
+  inscriptions:
+  - {fileID: 11400000, guid: 4a9129cabf7c51740a7ef0e9427a475e, type: 2}
 --- !u!114 &1291413385866200264
 MonoBehaviour:
   m_ObjectHideFlags: 0

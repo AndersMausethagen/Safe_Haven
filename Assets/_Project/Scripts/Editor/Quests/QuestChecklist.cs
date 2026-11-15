@@ -335,8 +335,10 @@ public static class QuestChecklist
             case ObjectiveType.RescuePerson:
                 return component == typeof(RescuableTraveler);
             case ObjectiveType.ReachPlace:
-            case ObjectiveType.UseObject:
                 return component == typeof(GameEventTrigger);
+            case ObjectiveType.UseObject:
+                // A carved stone raises Use itself when read (it stands in raid set pieces and event sites, as a prefab).
+                return component == typeof(GameEventTrigger) || component == typeof(CarvedStone);
             default:
                 return true;
         }

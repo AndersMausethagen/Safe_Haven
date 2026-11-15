@@ -220,5 +220,7 @@
   "runeoftheround": "A wide ring-shaped grey rune stone with a hole through its centre, a full circle of small runes around it, glowing warm amber",
   "runeofthemillstone": "A small round grey millstone with a square hole, carved with a whirling rune around its rim, glowing warm amber",
   "runeofthevault": "A tall narrow grey rune stone shaped like a spearhead, carved with an arching leaping rune, the cut glowing warm amber",
-  "runeoftheknee": "A knobbly grey rune stone shaped like a clenched fist, carved with a bent knee rune, the cut glowing warm amber"
+  "runeoftheknee": "A knobbly grey rune stone shaped like a clenched fist, carved with a bent knee rune, the cut glowing warm amber",
+  "enchant.inscription": "A rolled sheet of rough parchment, half open, with dark charcoal rubbings of angular carved marks glowing faintly pale blue",
+  "enchant.blankparchment": "A small bundle of blank rough nettle-fibre parchment sheets tied with twine, with a stick of black charcoal tucked under the twine"
 }

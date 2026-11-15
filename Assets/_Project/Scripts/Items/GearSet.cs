@@ -200,7 +200,15 @@ public sealed class GearSet
 
     private void OnSlotChanged(int index)
     {
-        ApplyStats(index);
+        // An enchantment counts on its first piece only, so a change can move it to another slot: every enchanted slot again.
+        for (int i = 0; i < GearSlots.Count; i++)
+        {
+            if (i == index || Slots.GetSlot(i).Enchantment != null)
+            {
+                ApplyStats(i);
+            }
+        }
+
         Changed?.Invoke((GearSlot)index);
     }
 
@@ -218,7 +226,7 @@ public sealed class GearSet
             return;
         }
 
-        foreach (StatBonus bonus in GearPower.BonusesOf(stack, EssenceSettings.Current))
+        foreach (StatBonus bonus in GearPower.BonusesOf(stack, EssenceSettings.Current, GearPower.CountsEnchantment(Slots, index)))
         {
             if (bonus.value != 0f)
             {

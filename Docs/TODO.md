@@ -77,6 +77,20 @@ Made to close the failing tests; not heard or seen in game:
       then `AgentScripts/BuildIcons.cs` (Conditions). Do it with Minecraft closed: it was open with 1.3 GB free, so it was skipped.
       `PaintedIconTests.StatusEffectDefinition` fails until then.
 
+## Enchanting (2026-11-15)
+
+Docs/EnchantingResearch.md › Status. Tests only, unplayed:
+- [ ] Liv's line (The Old Marks → The Great Work): does her lesson make enchanting clear? Is she early enough after Gunnar?
+- [ ] Inscription drops: one new enchantment about every raid at tiers II-III? Watch InscriptionFound / EnchantmentLearned rows.
+- [ ] Carved stones: found in the Standing Stones, Liv's Circle, the Living Stones; does the rubbing (3 s) feel right? Paint icons for
+      the Inscription and the Blank Parchment (they borrow the folio's and the ledger's for now; lines in item_icons.json to add).
+- [ ] Great enchantments in play: Frenzied, Mistcloaked, Vengeful, Thornguard, Stormcall... fun, readable, too strong? Co-op: a friend's
+      Frostbound chill on the host's creature.
+- [ ] A friend's enchanted weapon still shows plain (look state sends ids only): not done.
+- [ ] Tier ladder (the user, 2026-11-15): tiers retuned to the entry kit (enemy power +20% at II, +10% at III, +19% at IV; health +9%
+      at III, +7% at IV). Play a tier II-IV raid: hard at entry, easier once fed, rested and enchanted? Tier III's own new power is thin.
+- [ ] The Hamstrung icon came out as a red jar with a bite: repaint if it doesn't read.
+
 ## Player stats (2026-11-15)
 
 Everything in Docs/PlayerStatsResearch.md was built (its Status section). Tests only; nothing played by hand:

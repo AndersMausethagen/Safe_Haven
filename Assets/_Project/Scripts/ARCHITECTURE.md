@@ -1428,6 +1428,25 @@ The player is no super soldier: combat is about reading the enemy and committing
     `GroundHazard.Harm` for the ground they leave. `ItemTooltipView` shows `MealFamily`, `EffectOf` and per-stat arrows. `StatNames`
     shows Might and Blight.
   - **Telemetry:** Kit and Hurt rows in `PlaytestLog`.
+- **Enchanting (2026-11-15, Docs/EnchantingResearch.md › Status):**
+  - **Learning:** `EnchantmentDefinition` gains slot flags (Head to Staff; a shield is `Shield`), `Source`, `Tier`, `RequiredRunecraft`,
+    `KnownFromStart`, `KnownInOldSaves` and `IsGreat`. `CharacterProgress.Knows`/`Learn` keep learned ids, saved as
+    `ProgressSaveData.enchantments`; when `enchantmentsLearned` is false the save is old and learns the first 14.
+  - **Inscriptions** (Essence, plain C#): pools by source and tier, `Pick` (unknown first), `Grant`, `Read`, `CanCarve` (Runecraft or
+    the carver's reach: `JobDefinition.carvesPast` by rank), `Give`. An inscription is one `ItemDefinition` (`inscription`) whose
+    `ItemStack.Enchantment` is what it teaches; `ItemStack` keeps an enchantment on inscriptions as on gear.
+  - **Sources:** `LootOnDeath.inscriptions` (great creatures), `EliteAffixDefinition.inscription`, `LootCache`, `GiveInscriptionOutcome`,
+    and `CarvedStone` (Interactable; the `CarvedStone` prefab in the Standing Stones, Livs Circle and Living Stones sites).
+  - **The once rule:** `GearPower.CountsEnchantment`/`CarrierOf`, used by `GearSet.ApplyStats` (it reapplies every enchanted slot on
+    a change) and by `PlayerRelics` (each power started once).
+  - **Great enchantments:** `GreatEnchantmentEffects.cs` holds `RelicEffect`s for verbs. They use the hooks `PlayerRegain.WonScale`,
+    `PlayerStealth.Veil`, `PlayerCombat.FlinchWarded` and `Near.Enemies`.
+  - **Liv:** `EnchanterTalk` (ResidentNpc topics).
+  - **Quests:** objectives `EnchantItem`, `LearnEnchantment` and `GiveInscription`; events `Enchanted`, `EnchantmentLearned`,
+    `InscriptionGiven` and `InscriptionFound`; rewards `rewardEnchantments` and `rewardWorkFor`/`rewardWork`.
+  - **Balance:** `GearBalance.StackedKitOf(tier, gear, enchanted, reached)` counts the best fitting enchantment per piece once, and
+    stacking by what is within reach at a tier. `FightMath` counts physical and strike-kind resistance (`Resist`).
+  - **Co-op:** `StatusEffects.Applied` → `CreaturePuppets` StatusMessage → `CreatureHost.OnStatus` (wire format 25).
 - **Heavy swings that push through:** `WeaponDefinition.HeavySwingArmor`, read by `PlayerCombat.IsPushingThrough`, which sets the player's `DamageTakenMultiplier`
   and skips the flinch. The player's multiplier belongs to `PlayerCombat`.
 - **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse

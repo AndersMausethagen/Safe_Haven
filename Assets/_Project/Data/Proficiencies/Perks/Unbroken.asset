@@ -20,4 +20,4 @@ MonoBehaviour:
   bonuses:
   - stat: 8
     op: 0
-    value: 0.06
+    value: 0.03

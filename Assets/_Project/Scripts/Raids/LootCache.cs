@@ -26,6 +26,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private readonly List<ItemAmount> contents = new List<ItemAmount>();
     private readonly List<ResourceAmount> resourceContents = new List<ResourceAmount>();
     private bool holdsRelic;
+    private bool holdsInscription;
     private Interactable interactable;
     private bool rolled;
     private bool unlocked;
@@ -90,6 +91,17 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
         }
 
+        if (holdsInscription)
+        {
+            holdsInscription = false;
+            int tier = RaidDirector.Current != null ? RaidDirector.Current.Session.Tier : 1;
+            EnchantmentDefinition found = Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Found, tier), searcher, new System.Random(Random.Range(0, int.MaxValue)));
+            if (found != null)
+            {
+                Inscriptions.Grant(searcher, found, "a supply cache");
+            }
+        }
+
         if (contents.Count == 0 && resourceContents.Count == 0)
         {
             GameMessages.Post("Nothing useful inside.");
@@ -150,6 +162,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         }
 
         holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
+        holdsInscription = RaidDirector.Current != null && Random.value < EssenceSettings.Current.CacheInscriptionChance * multiplier;
         foreach (ItemAmount drop in drops.Roll())
         {
             if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item) || !RaidDirector.Current.Session.Allows(drop.Item)))

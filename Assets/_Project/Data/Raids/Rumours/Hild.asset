@@ -19,7 +19,7 @@ MonoBehaviour:
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
-  afterHome: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+  afterHome: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
   teaches: {fileID: 0}
   breachComing: 0
   afterExtractions: 1

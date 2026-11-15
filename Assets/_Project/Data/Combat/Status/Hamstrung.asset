@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Hamstrung
   description: A bite behind the knee. You move slower for a while.
   color: {r: 0.75, g: 0.18, b: 0.18, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5f6fb44609522c6419dccfd812b74199, type: 3}
   seconds: 4
   damagePerSecond: 0
   damageType: 0

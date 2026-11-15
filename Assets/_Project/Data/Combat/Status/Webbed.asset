@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Webbed
   description: Strands of web cling to your legs while you stand in them.
   color: {r: 0.85, g: 0.85, b: 0.8, a: 1}
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 9afc04fbd2d96734e9652e5f35f2c137, type: 3}
   seconds: 1
   damagePerSecond: 0
   damageType: 0

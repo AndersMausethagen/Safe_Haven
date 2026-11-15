@@ -77,6 +77,9 @@ public sealed class JobDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float wardHealth;
     [Tooltip("Seconds added to the clock of every raid.")]
     [SerializeField, Min(0f)] private float raidSeconds;
+    [Tooltip("Carves enchantments at the altar past the player's own Runecraft, by this many levels at each worker rank (Novice, " +
+             "Apprentice, Journeyman, Expert, Master): Liv the Rune Scholar (Docs/EnchantingResearch.md #6). Empty: doesn't carve.")]
+    [SerializeField] private int[] carvesPast = new int[0];
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -93,6 +96,11 @@ public sealed class JobDefinition : ScriptableObject
     public float WardHealth => wardHealth;
     public CompanionDefinition DefendsAs => defendsAs;
     public float RaidSeconds => raidSeconds;
+    /// <summary>True for a job that carves enchantments at the altar (Liv's).</summary>
+    public bool Carves => carvesPast != null && carvesPast.Length > 0;
+
+    /// <summary>Runecraft levels past the player's own this job carves at worker rank <paramref name="rankIndex"/> (0 = Novice).</summary>
+    public int CarvesPastAt(int rankIndex) => !Carves ? 0 : carvesPast[Mathf.Clamp(rankIndex, 0, carvesPast.Length - 1)];
 
     /// <summary>What the job does for the haven, in a line for the player. Empty when it does none of these.</summary>
     public string DescribeBonus()

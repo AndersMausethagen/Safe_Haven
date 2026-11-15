@@ -37,8 +37,12 @@ public sealed class EliteAffixDefinition : ScriptableObject
 
     [Header("What it does")]
     [SerializeReference] private List<EliteBehaviour> behaviours = new List<EliteBehaviour>();
+    [Tooltip("The enchantment an elite with this mark carries: its inscription, at Essence Settings › Elite Inscription Chance " +
+             "(Docs/EnchantingResearch.md #3), so the player takes home the trick that nearly killed them.")]
+    [SerializeField] private EnchantmentDefinition inscription;
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+    public EnchantmentDefinition Inscription => inscription;
     public string Description => description;
     public Color Colour => colour;
     public int FromTier => fromTier;

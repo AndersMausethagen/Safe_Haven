@@ -15,6 +15,118 @@ we need to make this a complete feature? Research methods other games do this, a
 making raids and progression feel exiting, allowing the player to fine tune his build or completely changes how certain items or systems
 work. Do a deep analysis on how this can work in line with other systems in the game and report"
 
+## Status (2026-11-15): built
+
+The user: "great suggestions. limit enchants, maybe also make some slot specific. create about 30 - 50 different enchants and add a quest
+line for Liv, starting with teaching the player about enchants and how to find them. Allow her to be rescued earlier. add all systems and
+changes thats needed. make sure that this doesnt conflict with weapon runes."
+
+Built on `test`, checked by Edit Mode tests (`EnchantingTests` new, `EssenceTests`, `RaidTierTests`, `RescueOrderTests`, `QuestAuditTests`,
+`CoopWireTests` at wire format 25). Not played by hand.
+
+**Words.** Nothing in enchanting is called a rune. The weapon (art) runes and the raid runes keep the word, and art runes are untouched:
+they attune a kind of weapon, while an enchantment is carved into one piece. The recipe is an **Inscription**, not a "stave", because the
+code already calls staffs "staves". Its blank is a **Blank Parchment** (2 Nettle Fiber and 1 Charcoal, by hand). The raid stones are
+**carved stones**. A test holds that no enchantment's name contains "Rune".
+
+**The 49 enchantments:**
+- **The first 14,** ids kept. The 8 Purified ones are known from the start. The Cursed ones became finds: Bloodletting, Gravebound,
+  Hollow and Witchlit from stones; Reaping and Greedy from caches. Old saves know all 14.
+- **19 stat enchantments for one slot:**
+  - helmets: Owl-Eyed, Hardened, Watchful;
+  - body armour: Barkhide, Mailward, Ironhide, Gravebound;
+  - gloves: Steady Grip, Bowyer's Fingers;
+  - belts: Girded;
+  - boots: Soft-Shod, Rider's Heel, Fleetfoot (now boots only);
+  - shields: Wardwood;
+  - rings: Hunter's Eye, Grave-Tongue;
+  - amulets: Scholar's;
+  - staves: Spellsung;
+  - bows: Gale-Fletched;
+  - weapons: Keen, Ambusher's.
+
+  Several use stats nothing gave before: blunt, slash and stab resistance, draw speed, sneak noise and ambush damage.
+- **16 great enchantments,** verbs on weapons, shields and jewellery:
+  - one per elite mark: Frenzied, Frostbound, Regrowing, Unyielding, Mistcloaked, Relentless, Vengeful and Rallying (Ironhide and
+    Watchful are stat ones);
+  - one per great creature: Rootbinder (Old Moss Troll), Stoneblood (Stone Troll), Avalanche (Bergjutul), Heartwood (the Heartroot);
+  - found ones: Thornguard, Stormcall and Pinning, and the Cursed Blood-Price.
+
+**Sources and rates (#3), as recommended:**
+- A great creature gives its own while unknown, and after that 25%.
+- Elites give theirs at 10%, 20%, 25%, 30% and 30% by tier, the mark's own first, else another unknown elite one.
+- Caches give one at 3% × the loot multiplier.
+- The Give an Inscription outcome is ready for raid events.
+- Carved stones stand in the Standing Stones set piece, Liv's Circle and the Living Stones. A stone is read once a raid, because raids
+  move their set pieces; the Runecraft practice falls off with level.
+
+**Runecraft (#4).**
+- Carving trains it 3× the item's tier experience, empowering 2×, a known inscription 1.5× and a stone 2×.
+- Required levels: 0 to 5 at tier I, 10 to 15 at tier II, 20 to 25 at tier III, 30 for the strongest.
+- Liv carves past your level by 3, 6, 10, 15 or 20 levels, from Novice to Master. Her rank grows by 1 for each enchantment carved while
+  she is home, 5 for each inscription given to her, and 10 to 30 for each of her quests.
+
+**Liv.**
+- She is rescued right after Gunnar (the rescue chain is Gunnar → Liv → Asa → Runa → Hild).
+- **The Old Marks,** five Haven quests after Runes for the Road:
+  1. The Old Marks: her lesson, and a first enchantment.
+  2. Rubbings: a parchment, a carved stone, and an enchantment learned from it.
+  3. Marks of the Marked: an elite's.
+  4. A Hand for the Shelf: two inscriptions given to her.
+  5. The Great Work: carve a great enchantment; she teaches Thornguard.
+- Her conversation gains "Ask about enchanting", "Ask what she can carve" and "Give her the … inscription".
+
+**Limits (#1).**
+- An enchantment counts once, however many pieces carry it; the same holds for relic powers.
+- A shield is no longer a weapon for enchanting.
+- **Enchantments have a budget of their own:** on top of a fully stacked kit, the best fitting enchantment on each piece adds at most
+  ×1.12 toughness and ×1.08 damage (`RaidTierTests.Enchantments_AddAtMostTheirBudget`). Measured: at most ×1.11 and ×1.04.
+- Trims to get there:
+  - Mossgrown: +8% health → +4%.
+  - Hearthbound: +8 armour → +4.
+  - Gravebound: +16 → +6, body armour only.
+  - Ironhide: +5.
+  - Bloodletting: +15% damage → +10%.
+- **Physical and strike-kind resistances now count** in the balance model (`FightMath.Resist`), except the kit's own. That showed the
+  Unbroken perk's 6% physical resistance taking tier IV over the ×1.5 reach, so it gives 3%.
+
+**Co-op (#9).**
+- A friend's status on a creature reaches the host's creature (`CreatureStatus` message; wire format 25).
+- **Not done:** a friend's enchanted weapon still shows plain.
+
+**The tier ladder (the user, the same day).** "Count what is within reach when; each tier hard at entry and mastered just before the
+next; raise the tiers' multipliers if the player gets too strong." `StackedKitOf` now counts perks, food and enchantments by the tier
+reached, and enchantments only up to the Runecraft expected then.
+
+Measured against the reference creature (blows to kill / blows to die; the tuning target is about 5 / 13):
+
+| Tier | Plain kit (tuned to) | Arriving with the last tier's stacks | Mastered | Mastered, stepping into the next tier |
+|---|---|---|---|---|
+| I | 4.9 / 13.2 | - | 4.7 / 17.7 | 7.0 / 13.1 |
+| II | 5.0 / 13.2 | 4.8 / 17.3 | 3.8 / 18.4 | 5.8 / 9.6 |
+| III | 4.9 / 12.9 | 3.7 / 17.4 | 3.7 / 17.8 | 4.8 / 13.6 |
+| IV | 5.0 / 13.4 | 3.5 / 18.0 | 3.8 / 21.3 | - |
+
+Each tier was a step up, but arriving players were about 35% tougher than the tiers were tuned for.
+
+**Retuned (the same day).** The tiers are now tuned to the **entry kit** (`GearBalance.EntryKitOf`): the tier's gear plus what was kept
+from the last tier (perks, known enchantments), without food or rest. At tier I that is the plain kit. So every tier is as hard at entry
+as the first. The **mastered kit** (`MasteredKitOf`) is everything within reach by the tier's end.
+
+| Raid | Tier II health / power | Tier III | Tier IV |
+|---|---|---|---|
+| Misty Woods | 1.5 / 1.35 → 1.6 | 2.3 → 2.5 / 2.6 → 2.85 | 3.0 → 3.2 / 3.4 → 4.05 |
+| Troll Valley | 1.4 / 1.35 → 1.6 | 2.1 → 2.3 / 2.6 → 2.85 | 2.6 → 2.8 / 3.4 → 4.05 |
+
+`RaidTierTests` now hold:
+- the entry kit within 20% of the tier I fight;
+- mastering a tier makes it at least a fifth easier;
+- the next tier is a step up (at least 30% harder) even for a player who mastered the last.
+
+A player who neither eats nor rests finds every tier harder than before; that is the intent ("hard at the start"). Not yet done: tier
+III's own new power is thin (its food and enchantments add little over tier II's).
+
+
 ## 0. Summary
 
 **The three biggest findings:**

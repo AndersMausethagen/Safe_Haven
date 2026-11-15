@@ -15,6 +15,16 @@ public sealed class PlayerStealth : MonoBehaviour
     private Combatant combatant;
     private bool sneakRequested;
     private float fightingUntil = -1f;
+    private float veiledUntil = -1f;
+
+    /// <summary>
+    /// Hides the player for <paramref name="seconds"/> whatever they do: seen at a sliver of their sneaking visibility, so creatures
+    /// lose sight of them and an ambush is possible again (Mistcloaked, a great enchantment).
+    /// </summary>
+    public void Veil(float seconds) => veiledUntil = Mathf.Max(veiledUntil, Time.time + seconds);
+
+    /// <summary>True while a veil (Veil) hides the player.</summary>
+    public bool IsVeiled => Time.time < veiledUntil;
 
     /// <summary>True while the player sneaks (held, and not dodging).</summary>
     public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging);
@@ -46,6 +56,11 @@ public sealed class PlayerStealth : MonoBehaviour
         get
         {
             PerceptionSettings rules = PerceptionSettings.Current;
+            if (IsVeiled)
+            {
+                return rules.SneakingVisibility * 0.15f;
+            }
+
             if (IsFighting)
             {
                 return rules.FightingVisibility;

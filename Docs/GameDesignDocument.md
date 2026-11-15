@@ -782,6 +782,28 @@ Essence has three main sinks: **equipment tier upgrades/enchantments**, **select
 
 Empowering and enchanting belong to the one item, survive a failed raid with it and are shown in its name: *Gravebound Iron Mail Hauberk +1*. In a slot the level stands beside the tier and an enchantment colours the frame and adds a mark; in the hand a weapon sheds motes in its school's colour, stronger the more it has been empowered. Raw Cursed work happens at once, while purifying waits in the queue, which is part of the choice. Two enchantments feed the loop back: *Reaping* finds more Cursed Essence, *Hollow* drains life from what it hits. Upgrading the altar makes it purify faster. All of this happens in one window at the Purification Altar: Purify, Empower, Enchant and Skills.
 
+**Enchanting as a build (November 15, 2026; Docs/EnchantingResearch.md › Status):** enchantments are learned, not bought.
+- **The list.** 49 enchantments: the 8 Purified ones a new game knows, stat enchantments that fit one kind of slot (boots, gloves,
+  helmets, body armour, belts, shields, rings, amulets, bows, staves), and 16 great enchantments that change how something plays
+  (on weapons, shields and jewellery only).
+- **Inscriptions.** The rest are learned from an inscription, a parchment carrying one enchantment, read at home:
+  - carved stones in raids (read for Runecraft practice, or take a rubbing with a Blank Parchment of nettle fiber and charcoal);
+  - elites, each carrying its own mark's;
+  - the great creatures, which always give their own the first times;
+  - supply caches and strange events.
+
+  A source gives one not yet known first. A copy is Runecraft practice, or goes to Liv.
+- **Runecraft.** Carving trains Runecraft, and each enchantment needs a Runecraft level. Liv, the Rune Scholar, carves past the
+  player's own by her rank, which grows with every inscription given to her, every enchantment carved while she is home, and her
+  quests.
+- **Liv's quest line,** The Old Marks, teaches all of this. She is now rescued right after Gunnar.
+- **Limits.**
+  - An enchantment counts once, however many pieces carry it.
+  - A shield is no longer a weapon for enchanting.
+  - Enchantments together add at most ×1.12 toughness and ×1.08 damage on top of a fully stacked kit (a test holds this).
+- **Old saves** know all fourteen enchantments they could carve before.
+- **Art runes are untouched.** They attune a kind of weapon, and enchantments are never called runes.
+
 ### 13.6 Relics
 
 A **relic** is a piece of gear carrying a power nobody at home can make. Where an enchantment adds numbers, a relic changes how the game is played, and many state a price:

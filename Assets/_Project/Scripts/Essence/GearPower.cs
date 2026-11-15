@@ -12,7 +12,13 @@ public static class GearPower
     public static bool CanEmpower(ItemDefinition item) => EnchantmentDefinition.TargetOf(item) != EnchantTarget.None;
 
     /// <summary>Everything the stack adds while worn: the item's own stats, its empowering and its enchantment.</summary>
-    public static List<StatBonus> BonusesOf(ItemStack stack, EssenceSettings settings)
+    public static List<StatBonus> BonusesOf(ItemStack stack, EssenceSettings settings) => BonusesOf(stack, settings, true);
+
+    /// <summary>
+    /// What the stack adds while worn, with its enchantment's bonuses only when <paramref name="withEnchantment"/>: an enchantment
+    /// counts once however many pieces carry it (GearSet.CountsEnchantment, Docs/EnchantingResearch.md #1).
+    /// </summary>
+    public static List<StatBonus> BonusesOf(ItemStack stack, EssenceSettings settings, bool withEnchantment)
     {
         var bonuses = new List<StatBonus>();
         if (stack.IsEmpty)
@@ -23,12 +29,51 @@ public static class GearPower
         bonuses.AddRange(stack.Item.StatBonuses);
         bonuses.AddRange(QualityBonuses(stack.Item, stack.Quality, settings));
         bonuses.AddRange(EmpowerBonuses(stack.Item, stack.Empower, settings));
-        if (stack.Enchantment != null)
+        if (withEnchantment && stack.Enchantment != null)
         {
             bonuses.AddRange(stack.Enchantment.Bonuses);
         }
 
         return bonuses;
+    }
+
+    /// <summary>
+    /// True when the enchantment on <paramref name="index"/> of <paramref name="slots"/> counts: it is the first whole piece that
+    /// carries it. A second Mossgrown piece adds nothing (Docs/EnchantingResearch.md #1); a broken first piece hands it on.
+    /// </summary>
+    public static bool CountsEnchantment(ItemContainer slots, int index)
+    {
+        ItemStack stack = slots.GetSlot(index);
+        if (stack.IsEmpty || stack.Enchantment == null)
+        {
+            return true;
+        }
+
+        for (int i = 0; i < index; i++)
+        {
+            ItemStack other = slots.GetSlot(i);
+            if (!other.IsEmpty && !other.IsBroken && other.Enchantment == stack.Enchantment)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>The worn piece that already gives this enchantment, if <paramref name="except"/> isn't it: for "counts once".</summary>
+    public static ItemStack CarrierOf(ItemContainer slots, EnchantmentDefinition enchantment, int except = -1)
+    {
+        for (int i = 0; slots != null && enchantment != null && i < slots.SlotCount; i++)
+        {
+            ItemStack other = slots.GetSlot(i);
+            if (i != except && !other.IsEmpty && !other.IsBroken && other.Enchantment == enchantment)
+            {
+                return other;
+            }
+        }
+
+        return ItemStack.Empty;
     }
 
     /// <summary>

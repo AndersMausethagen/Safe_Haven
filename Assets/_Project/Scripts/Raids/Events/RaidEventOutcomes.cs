@@ -313,6 +313,29 @@ public sealed class GiveRelicOutcome : RaidEventOutcome
     }
 }
 
+/// <summary>
+/// An inscription (Docs/EnchantingResearch.md #3): the one named, or one of the raid tier's found ones not yet known. Lost like anything
+/// else if the player doesn't get it home.
+/// </summary>
+[Serializable]
+public sealed class GiveInscriptionOutcome : RaidEventOutcome
+{
+    [Tooltip("Empty: one of the tier's Found enchantments, one not yet known first.")]
+    [SerializeField] private EnchantmentDefinition enchantment;
+
+    public override string DisplayName => "Give an Inscription";
+
+    public override void Apply(RaidEventContext context)
+    {
+        EnchantmentDefinition given = enchantment != null ? enchantment
+            : Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Found, context.Session.Tier), context.Player, context.Random);
+        if (given != null)
+        {
+            Inscriptions.Grant(context.Player, given, "a strange place");
+        }
+    }
+}
+
 /// <summary>Someone is freed and follows the player: they come home if they are alive and still with the player when they extract (RescuableTraveler).</summary>
 [Serializable]
 public sealed class RescueResidentOutcome : RaidEventOutcome

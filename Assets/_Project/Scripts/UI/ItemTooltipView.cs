@@ -742,10 +742,13 @@ public sealed class ItemTooltipView : MonoBehaviour
             return;
         }
 
-        builder.Append($"\n\n<color={UIStyle.Current.AccentHex}>{stack.Enchantment.DisplayName}</color>");
+        EnchantmentDefinition enchantment = stack.Enchantment;
+        bool inscription = stack.Item.IsInscription;
+        string kind = enchantment.IsRelic ? "" : enchantment.IsGreat ? "  <size=80%>Great enchantment</size>" : enchantment.School == EssenceSchool.Cursed ? "  <size=80%>Cursed</size>" : "";
+        builder.Append($"\n\n<color={UIStyle.Current.AccentHex}>{(inscription ? "Teaches: " : "")}{enchantment.DisplayName}</color>{kind}");
         foreach (StatBonus bonus in stack.Enchantment.Bonuses)
         {
-            builder.Append(bonus.value >= 0f ? $"\n<color={UIStyle.Current.GoodHex}>" : $"\n<color={UIStyle.Current.DangerHex}>").Append(bonus.Describe()).Append("</color>");
+            builder.Append(!StatNames.IsPenalty(bonus.stat, bonus.value) ? $"\n<color={UIStyle.Current.GoodHex}>" : $"\n<color={UIStyle.Current.DangerHex}>").Append(bonus.Describe()).Append("</color>");
         }
 
         foreach (RelicEffect effect in stack.Enchantment.Effects)
@@ -759,6 +762,39 @@ public sealed class ItemTooltipView : MonoBehaviour
         if (stack.Enchantment.IsRelic)
         {
             builder.Append("\n<alpha=#AA>A relic. Nobody at home could make this.");
+        }
+
+        string muted = UIStyle.Current.MutedHex;
+        if (inscription)
+        {
+            // What it fits and needs, and what reading it does: teach, or practice when known (Docs/EnchantingResearch.md #8).
+            bool known = GameSession.Progress.Knows(enchantment);
+            builder.Append($"\n<color={muted}>Fits {enchantment.DescribeTargets()}." +
+                           (enchantment.RequiredRunecraft > 0 ? $" Carving needs Runecraft {enchantment.RequiredRunecraft}." : "") +
+                           (known ? " You know it already: reading it is Runecraft practice, or give it to Liv." : " Read it at home to learn it.") + "</color>");
+            return;
+        }
+
+        // An enchantment counts once, however many pieces carry it: say so when another worn piece already gives this one.
+        PlayerEquipment equipment = Player.Current != null ? Player.Current.GetComponent<PlayerEquipment>() : null;
+        if (equipment != null && !enchantment.IsRelic)
+        {
+            ItemContainer worn = equipment.Gear.Slots;
+            int self = -1;
+            for (int i = 0; i < worn.SlotCount && self < 0; i++)
+            {
+                ItemStack at = worn.GetSlot(i);
+                if (!at.IsEmpty && at.Item == stack.Item && at.Enchantment == enchantment && at.Empower == stack.Empower)
+                {
+                    self = i;
+                }
+            }
+
+            ItemStack other = GearPower.CarrierOf(worn, enchantment, self);
+            if (!other.IsEmpty && (self < 0 || !GearPower.CountsEnchantment(worn, self)))
+            {
+                builder.Append($"\n<color={UIStyle.Current.DangerHex}>Counts once: your {other.DisplayName} already gives it.</color>");
+            }
         }
     }
 

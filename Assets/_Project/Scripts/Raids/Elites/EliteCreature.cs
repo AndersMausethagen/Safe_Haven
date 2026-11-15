@@ -250,6 +250,35 @@ public sealed class EliteCreature : MonoBehaviour
         {
             RelicSettings.Grant(killer, new System.Random(UnityEngine.Random.Range(0, int.MaxValue)), difficulty.tier);
         }
+
+        GiveInscription(killer, difficulty.tier);
+    }
+
+    // The mark's own enchantment, one not yet known first; when its marks' are all known, another elite one of the tier, else a copy.
+    private void GiveInscription(GameObject killer, int tier)
+    {
+        if (UnityEngine.Random.value >= EssenceSettings.Current.EliteInscriptionChance(tier))
+        {
+            return;
+        }
+
+        var own = new List<EnchantmentDefinition>();
+        foreach (EliteAffixDefinition affix in Affixes)
+        {
+            if (affix != null && affix.Inscription != null)
+            {
+                own.Add(affix.Inscription);
+            }
+        }
+
+        var random = new System.Random(UnityEngine.Random.Range(0, int.MaxValue));
+        EnchantmentDefinition found = Inscriptions.Pick(own, killer, random, copies: false)
+                                      ?? Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Elite, tier), killer, random, copies: false)
+                                      ?? (own.Count > 0 ? own[random.Next(own.Count)] : null);
+        if (found != null)
+        {
+            Inscriptions.Grant(killer, found, Title);
+        }
     }
 
     private void OnDestroy()

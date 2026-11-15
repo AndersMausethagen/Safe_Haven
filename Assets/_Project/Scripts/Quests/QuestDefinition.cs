@@ -101,6 +101,11 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private List<ItemAmount> rewardItems = new List<ItemAmount>();
     [SerializeField] private List<ResourceAmount> rewardResources = new List<ResourceAmount>();
     [SerializeField] private List<RecipeDefinition> rewardRecipes = new List<RecipeDefinition>();
+    [Tooltip("Enchantments taught for good (a teacher shows how): Liv's quests (Docs/EnchantingResearch.md #6).")]
+    [SerializeField] private List<EnchantmentDefinition> rewardEnchantments = new List<EnchantmentDefinition>();
+    [Tooltip("Someone at home whose worker rank grows with the quest (their Work Done): Liv's rank from her own quests.")]
+    [SerializeField] private ResidentDefinition rewardWorkFor;
+    [SerializeField, Min(0)] private int rewardWork;
     [Tooltip("Experience for completing it. 0: the Quest Experience from LevelingSettings.")]
     [SerializeField, Min(0)] private int experience;
     [Tooltip("Raised when the quest is completed, for scene reactions (open a gate) through a GameEventListener.")]
@@ -137,6 +142,9 @@ public sealed class QuestDefinition : ScriptableObject
     public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
+    public IReadOnlyList<EnchantmentDefinition> RewardEnchantments => rewardEnchantments;
+    public ResidentDefinition RewardWorkFor => rewardWorkFor;
+    public int RewardWork => rewardWork;
     public GameEventDefinition CompletionEvent => completionEvent;
 
     /// <summary>The rewards in words: "3 Iron Ingot, 10 Hardwood, recipe: Iron Axe".</summary>
@@ -148,6 +156,14 @@ public sealed class QuestDefinition : ScriptableObject
             if (recipe != null)
             {
                 parts.Add("recipe: " + recipe.DisplayName);
+            }
+        }
+
+        foreach (EnchantmentDefinition enchantment in rewardEnchantments)
+        {
+            if (enchantment != null)
+            {
+                parts.Add("enchantment: " + enchantment.DisplayName);
             }
         }
 

@@ -14,16 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
   id: gravebound
   displayName: Gravebound
-  description: Heavy as a barrow door, and as hard to move.
+  description: 'Barrow-iron in the weave: heavy and cold. +6 armour, 6% slower. Body armour only.'
   school: 1
-  targets: 2
+  targets: 32
   cost:
   - resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
     amount: 14
   bonuses:
   - stat: 7
     op: 0
-    value: 16
+    value: 6
   - stat: 16
     op: 0
     value: -0.06
+  effects: []
+  knownFromStart: 0
+  knownInOldSaves: 1
+  source: 1
+  tier: 2
+  requiredRunecraft: 10
+  great: 0
+  sourceHint: 
+  references:
+    version: 2
+    RefIds: []

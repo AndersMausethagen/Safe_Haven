@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
   id: mossgrown
   displayName: Mossgrown
-  description: Soft green at the edges, and it closes small wounds.
+  description: 'Moss takes root in the seams and holds you together: +4% health.'
   school: 0
   targets: 6
   cost:
@@ -22,5 +22,16 @@ MonoBehaviour:
     amount: 10
   bonuses:
   - stat: 0
-    op: 0
-    value: 20
+    op: 1
+    value: 0.04
+  effects: []
+  knownFromStart: 1
+  knownInOldSaves: 1
+  source: 0
+  tier: 1
+  requiredRunecraft: 0
+  great: 0
+  sourceHint: 
+  references:
+    version: 2
+    RefIds: []

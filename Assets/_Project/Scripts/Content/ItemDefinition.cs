@@ -142,6 +142,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0)] private int experience;
     [Tooltip("What it teaches can only be taken in at home, so it has to survive the way back: plans found in a raid, a swarm of bees.")]
     [SerializeField] private bool learnedAtHome;
+    [Tooltip("An inscription: it teaches the enchantment its stack carries when read at home (Inscriptions). One item serves every " +
+             "enchantment; a blank one (no enchantment) is for a carved stone's rubbing.")]
+    [SerializeField] private bool inscription;
 
     [Header("Transport")]
     [Tooltip("Makes this item a transport's kit: using it sets the cart or boat down. Empty for other items.")]
@@ -241,7 +244,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso || IsArtRune;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso || IsArtRune || inscription;
     /// <summary>An art rune: attuning it gives the weapons of its kind a second art (ArtRunes).</summary>
     public bool IsArtRune => runeArt != null && runeFor != WeaponSignature.None;
     public AttackDefinition RuneArt => runeArt;
@@ -264,6 +267,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public bool IsBlueprint => teachesBuildings.Count > 0 || teachesRecipes.Count > 0;
     public bool IsLearnedAtHome => learnedAtHome;
+    /// <summary>A parchment that teaches the enchantment its stack carries (Inscriptions.Read).</summary>
+    public bool IsInscription => inscription;
     /// <summary>Experience for reading it (a rune book).</summary>
     public int Experience => experience;
     /// <summary>Gear wears: tools, weapons, backpacks and armor are deployed equipment that survives death with damage.</summary>

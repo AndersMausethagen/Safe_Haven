@@ -222,16 +222,27 @@ public sealed class EssenceTests
             bool cursed = enchantment.School == EssenceSchool.Cursed;
             Assert.AreNotEqual(EnchantTarget.None, enchantment.Targets, enchantment.name);
             Assert.AreEqual(cursed ? settlement.CursedEssence : settlement.PurifiedEssence, enchantment.Cost.Single().Resource, enchantment.name);
-            Assert.AreEqual(cursed, enchantment.Bonuses.Any(b => b.value < 0f), $"{enchantment.name}: every drawback must be stated, and only Cursed work has one");
-            Assert.IsTrue(enchantment.Bonuses.Any(b => b.value > 0f), enchantment.name);
+            // A penalty is what makes its owner worse off: a negative health, or a positive noise (StatNames.IsPenalty).
+            Assert.AreEqual(cursed, enchantment.Bonuses.Any(b => StatNames.IsPenalty(b.stat, b.value)), $"{enchantment.name}: every drawback must be stated, and only Cursed work has one");
+            // A great enchantment gives a verb (its effect) where others give a number (Docs/EnchantingResearch.md #7).
+            Assert.IsTrue(enchantment.Bonuses.Any(b => !StatNames.IsPenalty(b.stat, b.value)) || (enchantment.IsGreat && enchantment.Effects.Any(e => e != null)), enchantment.name);
+            Assert.AreEqual(enchantment.IsGreat, enchantment.Effects.Any(e => e != null), $"{enchantment.name}: great means it has an effect");
             Assert.IsNotEmpty(enchantment.Description, enchantment.name);
             StringAssert.DoesNotContain(" ", enchantment.Id, enchantment.name);
         }
 
-        foreach (EnchantTarget target in new[] { EnchantTarget.Weapon, EnchantTarget.Armor, EnchantTarget.Jewelry, EnchantTarget.Tool })
+        // Each kind of gear with its slots (an enchantment made for body armour alone is still an armour choice).
+        var kinds = new System.Collections.Generic.Dictionary<EnchantTarget, EnchantTarget>
         {
-            Assert.IsTrue(enchantments.Any(e => e.School == EssenceSchool.Purified && (e.Targets & target) != 0), $"a safe choice for {target}");
-            Assert.IsTrue(enchantments.Any(e => e.School == EssenceSchool.Cursed && (e.Targets & target) != 0), $"a risky choice for {target}");
+            [EnchantTarget.Weapon] = EnchantTarget.Weapon | EnchantTarget.Bow | EnchantTarget.Staff,
+            [EnchantTarget.Armor] = EnchantTarget.Armor | EnchantTarget.Head | EnchantTarget.Chest | EnchantTarget.Hands | EnchantTarget.Waist | EnchantTarget.Feet,
+            [EnchantTarget.Jewelry] = EnchantTarget.Jewelry | EnchantTarget.Neck | EnchantTarget.Ring,
+            [EnchantTarget.Tool] = EnchantTarget.Tool,
+        };
+        foreach (var kind in kinds)
+        {
+            Assert.IsTrue(enchantments.Any(e => e.School == EssenceSchool.Purified && (e.Targets & kind.Value) != 0), $"a safe choice for {kind.Key}");
+            Assert.IsTrue(enchantments.Any(e => e.School == EssenceSchool.Cursed && (e.Targets & kind.Value) != 0), $"a risky choice for {kind.Key}");
         }
     }
 
@@ -287,12 +298,12 @@ public sealed class EssenceTests
     [Test]
     public void TargetOf_SortsGearTheWayEnchantmentsMeanIt()
     {
-        Assert.AreEqual(EnchantTarget.Armor, EnchantmentDefinition.TargetOf(Helm()));
+        Assert.AreEqual(EnchantTarget.Armor | EnchantTarget.Head, EnchantmentDefinition.TargetOf(Helm()));
         ItemDefinition ring = Create<ItemDefinition>("ring");
         var data = new SerializedObject(ring);
         data.FindProperty("armorSlot").intValue = (int)ArmorSlot.Finger;
         data.ApplyModifiedPropertiesWithoutUndo();
-        Assert.AreEqual(EnchantTarget.Jewelry, EnchantmentDefinition.TargetOf(ring));
+        Assert.AreEqual(EnchantTarget.Jewelry | EnchantTarget.Ring, EnchantmentDefinition.TargetOf(ring));
         Assert.AreEqual(EnchantTarget.None, EnchantmentDefinition.TargetOf(null));
     }
 

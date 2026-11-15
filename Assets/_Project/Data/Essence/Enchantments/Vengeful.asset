@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acb47e913a2759648a401929037aa9ea, type: 3}
+  m_Name: Vengeful
+  m_EditorClassIdentifier: SafeHaven::EnchantmentDefinition
+  id: vengeful
+  displayName: Vengeful
+  description: 'What you kill doesn''t go quietly: it bursts, and hurts what stood beside it.'
+  school: 0
+  targets: 1
+  cost:
+  - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+    amount: 18
+  bonuses: []
+  effects:
+  - rid: 2623126133347975285
+  knownFromStart: 0
+  knownInOldSaves: 0
+  source: 2
+  tier: 3
+  requiredRunecraft: 25
+  great: 1
+  sourceHint: Carried by elites marked Vengeful (tier III and up)
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126133347975285
+      type: {class: DeathBurstEffect, ns: , asm: SafeHaven}
+      data:
+        delay: 1
+        share: 0.25
+        radius: 3.5
+        burstEffect: {fileID: 0}
+        burstSound: {fileID: 0}

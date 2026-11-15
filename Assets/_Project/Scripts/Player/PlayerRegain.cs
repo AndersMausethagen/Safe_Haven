@@ -15,6 +15,9 @@ public sealed class PlayerRegain : MonoBehaviour
     private float pool;
     private float hurtAt = float.NegativeInfinity;
 
+    /// <summary>Multiplies what a blow wins back (a great enchantment, Regrowing). 1 as made.</summary>
+    public float WonScale { get; set; } = 1f;
+
     /// <summary>Health that striking back can still win back right now (drains to 0 over the Regain window).</summary>
     public float Regainable => RegainRules.Left(pool, Time.time - hurtAt, Rules.RegainSeconds);
 
@@ -69,7 +72,7 @@ public sealed class PlayerRegain : MonoBehaviour
         }
 
         float left = Regainable;
-        float heal = RegainRules.Won(left, result.Damage, Rules.RegainPerDamage);
+        float heal = RegainRules.Won(left, result.Damage, Rules.RegainPerDamage * Mathf.Max(0f, WonScale));
         if (heal <= 0f)
         {
             return;
