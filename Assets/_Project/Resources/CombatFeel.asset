@@ -48,7 +48,6 @@ MonoBehaviour:
   heavyEdgeColor: {r: 0.75, g: 0.04, b: 0.02, a: 0.8}
   heavyEdgeWidth: 0.09
   heavyImpact: 1.5
-  heavyShare: 0.25
   heavyWindupSound: {fileID: 11400000, guid: 2ac89e3c665e52d4ba32f4f317785bdd, type: 2}
   openingColor: {r: 0.45, g: 1, b: 0.5, a: 0.45}
   openingReach: 0.45
@@ -57,6 +56,7 @@ MonoBehaviour:
   reelingSway: 4
   reelingSwayRate: 0.9
   reelingBarColor: {r: 1, g: 0.55, b: 0.15, a: 1}
+  furyEffect: {fileID: 5697260504565289270, guid: ea417f5788ec80b4c9b4b074524ffb57, type: 3}
   dodgeTrailColor:
     serializedVersion: 2
     key0: {r: 0.6, g: 0.85, b: 1, a: 0.55}

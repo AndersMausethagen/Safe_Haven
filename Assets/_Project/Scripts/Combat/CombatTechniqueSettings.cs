@@ -294,6 +294,16 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "sees a stagger is near (the hammer's Crush line). Only a look: it fights on as before.")]
     [SerializeField, Range(0f, 1f)] private float reelingShare = 0.3f;
 
+    [Header("Creatures answering back (Docs/EnemyCombatResearch.md, phase C)")]
+    [Tooltip("Seconds an ordinary creature is down when felled: a heavy, charged, art or guard-counter blow while it reels, a charged blow " +
+             "that breaks its poise, or a blow worth three quarters of its poise. It falls, lies, and gets up as it ends.")]
+    [SerializeField, Min(0f)] private float felledSeconds = 1.8f;
+    [Tooltip("A stagger that breaks through a raised shield lasts this many times as long (Guard Broken); two of them splinter the shield.")]
+    [SerializeField, Min(1f)] private float guardBrokenScale = 1.5f;
+    [SerializeField, Min(1)] private int guardBreaksToSplinter = 2;
+    [Tooltip("Seconds between a nimble creature's side steps from a bow held past its perfect release (Monster Definition › Arrow Dodge).")]
+    [SerializeField, Min(0f)] private float arrowDodgeCooldown = 5f;
+
     public float ChainGrace => chainGrace;
     public float RhythmEarly => rhythmEarly;
     public float RhythmLate => rhythmLate;
@@ -426,5 +436,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float PoiseRecoveryPerSecond => poiseRecoveryPerSecond;
     public float StaggerSeconds => staggerSeconds;
     public float ReelingShare => reelingShare;
+    public float FelledSeconds => felledSeconds;
+    public float GuardBrokenScale => guardBrokenScale;
+    public int GuardBreaksToSplinter => guardBreaksToSplinter;
+    public float ArrowDodgeCooldown => arrowDodgeCooldown;
     public float StaggeredDamageTaken => staggeredDamageTaken;
 }

@@ -109,6 +109,8 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0.1f)] private float reelingSwayRate = 0.9f;
     [Tooltip("The poise bar pulses towards this colour while the creature reels.")]
     [SerializeField] private Color reelingBarColor = new Color(1f, 0.55f, 0.15f, 1f);
+    [Tooltip("Looping breath or steam over a creature that has turned in fury, badly hurt (Monster Definition > When Hurt).")]
+    [SerializeField] private GameObject furyEffect;
 
     [Header("Dodge")]
     [Tooltip("Trail left behind while dodging. Uses the telegraph material.")]
@@ -342,6 +344,7 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float ReelingSway => reelingSway;
     public float ReelingSwayRate => reelingSwayRate;
     public Color ReelingBarColor => reelingBarColor;
+    public GameObject FuryEffect => furyEffect;
     public GameObject LandingEffect => landingEffect != null ? landingEffect : structureHitEffect;
     public GameObject HitEffect => hitEffect;
     public GameObject CriticalHitEffect => criticalHitEffect;

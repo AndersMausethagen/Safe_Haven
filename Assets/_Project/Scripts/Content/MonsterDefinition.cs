@@ -120,6 +120,24 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
              "a tell that it has seen the player, and a moment for the first blow. 0: none (beasts, casters).")]
     [SerializeField, Min(0f)] private float spottedPause;
 
+    [Header("Answering back (phase C)")]
+    [Tooltip("Light blows within Guard Within seconds that make it raise its weapon to turn the next ones aside (the armed dead). 0: never.")]
+    [SerializeField, Min(0)] private int guardAfterBlows;
+    [SerializeField, Min(0.1f)] private float guardWithin = 2f;
+    [Tooltip("Seconds its weapon guard stays up at most. A heavy blow, an art or one from its flank breaks it; a third light blow into it draws a quick answer.")]
+    [SerializeField, Min(0.1f)] private float guardSeconds = 1f;
+    [Tooltip("Share of a light blow from the front that gets past its weapon guard (it still wears poise).")]
+    [SerializeField, Range(0f, 1f)] private float guardLetsThrough = 0.3f;
+    [Tooltip("Raid tier from which it guards (0: everywhere).")]
+    [SerializeField, Range(0, Tiers.Max)] private int guardFromTier = 2;
+    [Tooltip("Below this share of its health it turns (When Hurt). 0: never.")]
+    [SerializeField, Range(0f, 1f)] private float hurtBelow;
+    [Tooltip("How it turns when hurt. Fury: a cry, angry eyes and breath, cooldowns 15% shorter (wind-ups as they were). Desperate: a cry " +
+             "and angry eyes; its strikes with Below Health come out. Cowardly creatures cry out as they turn to run whatever this says.")]
+    [SerializeField] private HurtMood hurtMood;
+    [Tooltip("Chance it steps aside when the player holds a bow on it past the perfect release (never from a perfect release). 0: never; for the nimble.")]
+    [SerializeField, Range(0f, 1f)] private float arrowDodge;
+
     [Header("Poise")]
     [Tooltip("How much it takes before it staggers (attacks' Poise Damage wears it down). 0 uses the game-wide default; " +
              "a very high value makes it unstoppable.")]
@@ -170,6 +188,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField, Range(0f, 0.5f)] private float armourPerChip = 0.12f;
     [Tooltip("A blow taking at least this share of its health breaks a piece off (a blunt blow, half as much).")]
     [SerializeField, Range(0.01f, 0.5f)] private float chipFromShare = 0.07f;
+    [Tooltip("What each broken piece is on the model, in order: names of its child objects, several in one entry with commas (\"Helm,Nasal,Rim\"). " +
+             "They come away and fall; chips past the end of the list break nothing you can see.")]
+    [SerializeField] private string[] armourParts = new string[0];
 
     [Tooltip("How much bigger or smaller each one is than the model, as a share. 0.08 is up to 8% either way. Leave a one-off at 0.")]
     [SerializeField, Range(0f, 0.3f)] private float sizeVariation;
@@ -277,6 +298,15 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public bool BreaksWalls => breaksWalls;
     public bool CanBeFinished => canBeFinished;
     public float SpottedPause => spottedPause;
+    public IReadOnlyList<string> ArmourParts => armourParts;
+    public int GuardAfterBlows => guardAfterBlows;
+    public float GuardWithin => guardWithin;
+    public float GuardSeconds => guardSeconds;
+    public float GuardLetsThrough => guardLetsThrough;
+    public int GuardFromTier => guardFromTier;
+    public float HurtBelow => hurtBelow;
+    public HurtMood HurtMood => hurtMood;
+    public float ArrowDodge => arrowDodge;
     public float HoverHeight => hoverHeight;
     public bool HasTemperament(MonsterTemperament value) => (temperament & value) != 0;
 

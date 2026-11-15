@@ -560,8 +560,10 @@ lasts, and draw their weapon when they spot someone unaware. The ground warning 
 purple one can't be blocked, a creature's great blow has a dark edge and a low swell), a green ring shows the opening after a blow, and
 a creature low on poise sways with embers at its chest. Draug, Shieldbearer, trolls, wolves and boars choose their strikes by chance
 and answer what the player does (a raised guard, backing off, a drawn bow). Summons scatter when their summoner falls, and a brutal
-kill makes creatures nearby falter. Damage, health and cooldowns are unchanged; the balance-changing ideas (a reeling creature felled by
-a heavy blow, enemy guards, hurt states, elite verbs, breakable armour, dodging arrows) wait for the playtest.
+kill makes creatures nearby falter. Damage, health and cooldowns are unchanged by that part. The same day they were also given ways to
+answer back (phase C, approved by the user): a weighty blow fells a reeling creature for longer, shields jolt and splinter, the armed
+dead raise a weapon guard against a flurry of light blows, badly hurt creatures rage or turn desperate, armour pieces fall off, the
+nimble step aside from a bow held too long, and three elite affixes change how a fight goes (Unyielding, Watchful, Relentless).
 
 ### 10.6 Status effects
 

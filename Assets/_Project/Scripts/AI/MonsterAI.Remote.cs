@@ -138,11 +138,14 @@ public sealed partial class MonsterAI
     /// </summary>
     /// <param name="poiseShare">The host's creature's poise, 0-1: this copy wears none of its own, so its reeling and poise bar show the host's.</param>
     /// <param name="waiting">The host's creature is waiting its turn (a ready stance).</param>
+    /// <param name="felled">The host's creature is down from a felling blow (a longer stagger, lying and getting up).</param>
+    /// <param name="guarding">The host's creature has its weapon raised (light blows from the front are turned aside here too).</param>
     public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None,
-        float poiseShare = 1f, bool waiting = false)
+        float poiseShare = 1f, bool waiting = false, bool felled = false, bool guarding = false)
     {
         remoteHunt = hunting;
         remoteWaiting = waiting;
+        remoteGuarding = guarding;
         poise?.Show(poiseShare);
         // Nothing was sent while it stood still: it starts moving from where it stood, a moment before this, not slides from
         // the last pose a while ago.
@@ -163,7 +166,9 @@ public sealed partial class MonsterAI
             {
                 // The host's creature staggers (its poise broke, someone parried it): shown here as a stagger is, open to the
                 // same blows and out of any strike it was playing, but not told back to the host.
-                BeginStagger(CombatTechniqueSettings.Current.StaggerSeconds);
+                felling = felled;
+                BeginStagger(felled ? CombatTechniqueSettings.Current.FelledSeconds : CombatTechniqueSettings.Current.StaggerSeconds);
+                felling = false;
             }
             else if (CurrentState != State.Attacking && state != State.Attacking)
             {

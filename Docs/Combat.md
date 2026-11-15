@@ -200,6 +200,23 @@ Small Moss Trolls chain their shove from Tier II, and hold it 25% of the time.
 - *They notice each other.* Rootlings run for a while when their Shaman falls, and a finishing blow or a staggered backstab kill
   makes ordinary creatures nearby falter a moment.
 
+**Creatures answering back (2026-11-15, phase C):**
+- *Fell what reels.* A heavy, a charged blow, an art or a guard counter on a reeling creature (poise under 30%) floors it for 1.8 s: it
+  falls, lies and gets up. A charged blow, or one worth three quarters of its poise, floors it too. Great beasts, bosses and elites only
+  stagger.
+- *Shields break.* A Shieldbearer's shield jolts with each blow it takes; breaking its poise through the shield staggers it half as long
+  again with a crash, and the second time the shield splinters and falls away.
+- *The armed dead guard.* From Tier II a Draug hit by three light blows in two seconds raises its sword for a second: light blows from
+  the front glance off (30% gets through, poise still wears), a heavy, an art or a blow from its side breaks the guard, and a third light
+  blow into it is answered with a strike.
+- *Hurt creatures turn.* Below 30% of their health trolls, wolves and boars rage (a cry, angry eyes, breath, shorter pauses between
+  strikes); a Draug turns desperate (a cry, and a three-blow flurry it never uses otherwise); the cowardly cry out as they run.
+- *Armour comes off.* Each heavy blow that breaks a piece of a Draug's, Shieldbearer's or knight's armour knocks it off the model.
+- *The nimble watch your bow.* A Huldra, Fossegrim, Tusse or Troll Runt may step aside from a bow held on it past the perfect release.
+  Release on time and it never does.
+- *Elites with a trick.* Unyielding (a yellow ring: unstoppable until a third of its health is gone, then a long stagger), Watchful
+  (reads backstabs from the start), Relentless (every strike a held string).
+
 | Creature | Reads as | How to beat it |
 |---|---|---|
 | Marsh Light | Pale hovering light, keeps its distance, flees when hurt | Its cold bolts are slow: dodge, then shoot it or run it down |

@@ -84,8 +84,14 @@ public sealed class CreatureWounds : MonoBehaviour
             return;
         }
 
-        // A piece breaks off: shards fly and it is that much less protected from here on.
+        // A piece breaks off: shards fly, the piece itself falls away when the model names one, and it is that much less protected.
+        int chip = definition.ArmourChips - chipsLeft;
         chipsLeft--;
+        if (chip < definition.ArmourParts.Count && !string.IsNullOrWhiteSpace(definition.ArmourParts[chip]))
+        {
+            ArmourDebris.BreakOff(transform, definition.ArmourParts[chip], damage.Direction);
+        }
+
         float armour = combatant.Stats.Get(StatType.Armor);
         combatant.Stats.AddModifier(new StatModifier(StatType.Armor, StatModifierOp.Flat, -armour * definition.ArmourPerChip, this));
         WoundSettings settings = WoundSettings.Current;

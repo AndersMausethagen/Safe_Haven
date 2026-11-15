@@ -46,6 +46,8 @@ public sealed partial class MonsterAI
         movement.RepathNow();
         lastSeenTargetAt = Time.time;
         lastKnownTargetPosition = targetComponent.transform.position;
+        // Found again after losing it: its weapon is already in hand.
+        bool refound = searchingLostTarget;
         searchingLostTarget = false;
         if (senses != null)
         {
@@ -53,7 +55,11 @@ public sealed partial class MonsterAI
             senses.Awareness.Alert(lastKnownTargetPosition);
             if (fresh)
             {
-                BeginDrawIfUnaware();
+                if (!refound)
+                {
+                    BeginDrawIfUnaware();
+                }
+
                 OnSpotted();
             }
         }

@@ -42,6 +42,13 @@ public sealed class PoiseMeter
         return true;
     }
 
+    /// <summary>Breaks it now whatever is left (a felling blow on a reeling creature): it refills, as a break does.</summary>
+    public void Break(float now)
+    {
+        lastHit = now;
+        Current = Max;
+    }
+
     /// <summary>Co-op, a friend's copy: shows the host's creature's poise (<paramref name="fraction"/> of it). The copy wears none of its own.</summary>
     public void Show(float fraction)
     {

@@ -80,6 +80,10 @@ public sealed class AttackTelegraph : MonoBehaviour
         ai.AttackStarted -= OnAttackStarted;
         ai.StateChanged -= OnStateChanged;
         Hide();
+        if (opening != null)
+        {
+            opening.gameObject.SetActive(false);
+        }
     }
 
     private void OnDestroy()

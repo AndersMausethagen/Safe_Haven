@@ -58,6 +58,15 @@ public sealed class CreatureHost
     /// <summary>Set in a pose's hunting byte while the creature waits its turn (a ready stance).</summary>
     public const byte WaitingFlag = 0x80;
 
+    /// <summary>Set in a pose's hunting byte while the creature is down from a felling blow.</summary>
+    public const byte FelledFlag = 0x40;
+
+    /// <summary>Set in a pose's hunting byte while the creature's weapon guard is up.</summary>
+    public const byte GuardingFlag = 0x20;
+
+    /// <summary>The hunting byte's low bits: whom it is after (MonsterAI.RemoteHunt).</summary>
+    public const byte HuntMask = 0x03;
+
     // Poise in steps of a 64th, so a creature getting its breath back isn't a change every tick.
     private const int PoiseSteps = 64;
 
@@ -363,7 +372,8 @@ public sealed class CreatureHost
         Speed = (byte)Mathf.Clamp(Mathf.RoundToInt(hosted.Ai.Speed * 10f), 0, 255),
         State = (byte)hosted.Ai.CurrentState,
         Health = HealthByte(hosted),
-        Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)),
+        Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)
+            | (hosted.Ai.IsStaggered && hosted.Ai.IsFelled ? FelledFlag : 0) | (hosted.Ai.IsWeaponGuarding ? GuardingFlag : 0)),
         Poise = PoiseByte(hosted.Ai),
         At = now,
     };

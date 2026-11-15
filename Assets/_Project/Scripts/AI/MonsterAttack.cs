@@ -12,6 +12,16 @@ public enum MonsterTemperament
     Defensive = 4,
 }
 
+/// <summary>How a creature turns when badly hurt (Monster Definition › When Hurt).</summary>
+public enum HurtMood
+{
+    None,
+    /// <summary>A cry, angry eyes and breath; its cooldowns shorten (wind-ups as they were).</summary>
+    Fury,
+    /// <summary>A cry and angry eyes; its Below Health strikes come out.</summary>
+    Desperate,
+}
+
 /// <summary>What the player (a creature's target) is visibly doing, which a strike can be chosen against (Monster Attack › When Foe).</summary>
 [Flags]
 public enum FoeDoing

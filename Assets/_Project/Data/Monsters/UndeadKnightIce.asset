@@ -241,6 +241,14 @@ MonoBehaviour:
   flankSpread: 0.5
   breaksWalls: 0
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 220
   parryResponse: 2
   openWhileStriking: 1
@@ -260,6 +268,8 @@ MonoBehaviour:
   armourChips: 4
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts:
+  - Undead_Soulders
   sizeVariation: 0.05
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 0520016b9bfbdaa4b8a9d26748b1aa39, type: 3}

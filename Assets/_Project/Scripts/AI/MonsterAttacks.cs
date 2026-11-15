@@ -61,6 +61,9 @@ public sealed class MonsterAttacks
     /// <summary>How its target is moving, flat, for actions that aim ahead of it (Lead Target).</summary>
     public Vector3 TargetVelocity { get; set; }
 
+    /// <summary>It always goes on into its follow-ups and holds the wind-ups it can hold (a Relentless elite).</summary>
+    public bool AlwaysPresses { get; set; }
+
     /// <summary>Multiplies how long it waits between strikes (a frenzied elite). Wind-ups stay as they are, so they can still be read.</summary>
     public float CooldownScale { get; set; } = 1f;
 
@@ -344,8 +347,8 @@ public sealed class MonsterAttacks
         chargeHit = false;
         Blow = 0;
         bool melee = action != null && action.kind == MonsterAttackKind.Melee;
-        blowsLeft = melee && action.followUps != null && RaidTier >= action.comboFromTier && Random.value < action.comboChance ? action.followUps.Length : 0;
-        holdLeft = melee && Random.value < action.holdChance ? action.holdSeconds : 0f;
+        blowsLeft = melee && action.followUps != null && (AlwaysPresses || (RaidTier >= action.comboFromTier && Random.value < action.comboChance)) ? action.followUps.Length : 0;
+        holdLeft = melee && action.holdChance > 0f && (AlwaysPresses || Random.value < action.holdChance) ? action.holdSeconds : 0f;
         holdFrom = action != null && action.attack != null ? action.attack.HitDelay * HoldAtShare : 0f;
     }
 

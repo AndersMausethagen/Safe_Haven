@@ -169,3 +169,123 @@ public sealed class MistCloakBehaviour : EliteBehaviour
         };
     }
 }
+
+
+/// <summary>
+/// Armoured (Hades II): the first share of its health is an armour layer, outlined in a ring of its colour, through which nothing
+/// flinches, interrupts or staggers it (a parry only makes it recoil). Wearing the layer away breaks it with a crash and a long stagger.
+/// It is taken from its health, not added to it, so the hits it takes to kill hold. The answer: commit, then punish the break.
+/// </summary>
+[Serializable]
+public sealed class UnyieldingBehaviour : EliteBehaviour
+{
+    [Tooltip("Share of its health the armour layer is: it breaks when this much is gone.")]
+    [SerializeField, Range(0.05f, 0.9f)] private float layer = 0.3f;
+    [Tooltip("Seconds it staggers when the layer breaks.")]
+    [SerializeField, Min(0f)] private float breakStagger = 2.2f;
+    [SerializeField] private Color ringColour = new Color(1f, 0.82f, 0.2f, 0.55f);
+
+    public override string DisplayName => "Unyielding";
+
+    public override Action Attach(EliteCreature elite)
+    {
+        MonsterAI ai = elite.Ai;
+        ai.IsUnyielding = true;
+        GameObject ring = MakeRing(elite.transform, ringColour);
+        void Break()
+        {
+            ai.IsUnyielding = false;
+            if (ring != null)
+            {
+                UnityEngine.Object.Destroy(ring);
+            }
+
+            AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.GuardBreak : null, elite.transform.position + Vector3.up);
+            GameObject burst = CombatFeelSettings.Current.StaggerEffect;
+            if (burst != null)
+            {
+                PrefabPool.Spawn(burst, elite.transform.position + Vector3.up, Quaternion.identity);
+            }
+
+            ai.StaggerAtLeast(breakStagger);
+        }
+
+        // By its health share, so a friend's copy (whose health the host's game sets) breaks it too.
+        void OnTick(float deltaTime)
+        {
+            if (ai.IsUnyielding && elite.Health.CurrentHealth > 0f && elite.Health.HealthFraction <= 1f - layer)
+            {
+                Break();
+            }
+        }
+
+        elite.Ticked += OnTick;
+        return () =>
+        {
+            elite.Ticked -= OnTick;
+            ai.IsUnyielding = false;
+            if (ring != null)
+            {
+                UnityEngine.Object.Destroy(ring);
+            }
+        };
+    }
+
+    // A ring of the layer's colour at its feet, the telegraph's look.
+    private static GameObject MakeRing(Transform body, Color colour)
+    {
+        Material material = CombatFeelSettings.Current.TelegraphMaterial;
+        if (material == null)
+        {
+            return null;
+        }
+
+        var ring = new GameObject("Unyielding Ring");
+        ring.transform.SetParent(body, false);
+        ring.transform.localPosition = Vector3.up * 0.07f;
+        float radius = body.TryGetComponent(out UnityEngine.AI.NavMeshAgent agent) ? agent.radius + 0.35f : 0.9f;
+        ring.transform.localScale = Vector3.one * radius;
+        ring.AddComponent<MeshFilter>().sharedMesh = AttackTelegraph.BandFor(360f, 0.2f);
+        var renderer = ring.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        var block = new MaterialPropertyBlock();
+        block.SetColor("_BaseColor", colour);
+        block.SetColor("_Color", colour);
+        renderer.SetPropertyBlock(block);
+        return ring;
+    }
+}
+
+/// <summary>Watchful: it knows the trick from the start and never forgets, so it reads backstabs as one that has taken several. The answer:
+/// beat it from the front, or catch it striking.</summary>
+[Serializable]
+public sealed class WatchfulBehaviour : EliteBehaviour
+{
+    [Tooltip("Backstabs it is taken to remember, always.")]
+    [SerializeField, Min(0)] private int foreknown = 2;
+
+    public override string DisplayName => "Watchful";
+
+    public override Action Attach(EliteCreature elite)
+    {
+        MonsterAI ai = elite.Ai;
+        ai.BackstabsForeknown = foreknown;
+        return () => ai.BackstabsForeknown = 0;
+    }
+}
+
+/// <summary>Relentless: it always goes on into its follow-ups and holds the wind-ups it can hold, so its strikes come as strings. The
+/// answer: don't roll on the first blow; wait out the hold.</summary>
+[Serializable]
+public sealed class PressingBehaviour : EliteBehaviour
+{
+    public override string DisplayName => "Relentless";
+
+    public override Action Attach(EliteCreature elite)
+    {
+        MonsterAI ai = elite.Ai;
+        ai.Presses = true;
+        return () => ai.Presses = false;
+    }
+}

@@ -66,6 +66,7 @@ MonoBehaviour:
     priority: 20
     weight: 0
     whenFoe: 0
+    heavy: 0
     cooldown: 14
     interruptible: 1
     sound: {fileID: 11400000, guid: d2b68a9637836884a89327fada25cb8c, type: 2}
@@ -118,6 +119,7 @@ MonoBehaviour:
     priority: 10
     weight: 1
     whenFoe: 0
+    heavy: 0
     cooldown: 1
     interruptible: 1
     sound: {fileID: 0}
@@ -170,6 +172,7 @@ MonoBehaviour:
     priority: 15
     weight: 0.6
     whenFoe: 6
+    heavy: 0
     cooldown: 7
     interruptible: 0
     sound: {fileID: 0}
@@ -238,6 +241,14 @@ MonoBehaviour:
   flankSpread: 1
   breaksWalls: 0
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0.3
+  hurtMood: 1
+  arrowDodge: 0
   poise: 0
   parryResponse: 0
   openWhileStriking: 1
@@ -257,6 +268,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 3d1695c02a14ecf4bb127f270293a6cc, type: 3}

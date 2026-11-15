@@ -82,8 +82,14 @@ Moss Shaman with its Rootlings, a Stone Troll and a pack of wolves:
 - [ ] The 0.55 s weapon draw on spotting: a fair first-strike moment, or a free hit?
 - [ ] Strikes by chance: less predictable without feeling random? Do lunges come when you back off or draw the bow?
 - [ ] The Old Moss Troll's log throw now plays slowly to match its 1.4 s wind-up: heavy, or slow motion?
-- [ ] Phase C (needs your pick): a heavy blow felling a reeling creature, enemy guards (shield wall, a parrying Draug), hurt states,
-      elite verbs, breakable armour, dodging arrows.
+- [ ] Phase C, felling: is a heavy, charged or art blow on a reeling creature a satisfying payoff? Is 1.8 s on the ground too long
+      a free window (a charged blow that breaks poise now fells for that long too)?
+- [ ] The Draug's weapon guard (Tier II+): does it read, and is breaking it with a heavy or a flank fun, or does it slow fights down?
+      The Shieldbearer's shield splintering after two guard breaks: right number?
+- [ ] Hurt states: the trolls', wolves' and boars' fury and the Draug's desperate flurry below 30% health: fair, or a wall at the end?
+- [ ] The three new elite affixes (Unyielding, Watchful, Relentless): fun to fight, or just harder?
+- [ ] Armour pieces falling off Draugs, Shieldbearers and knights: visible from the camera? The arrow dodge of Huldra, Fossegrim, Tusse
+      and Troll Runt (only from a bow held past its perfect release): fair? It was not seen live in a probe.
 
 ## Horses and the playtest list (2026-11-11)
 

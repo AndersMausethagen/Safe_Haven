@@ -13,7 +13,8 @@ public sealed partial class MonsterAI
     /// </summary>
     public void Stagger(float seconds)
     {
-        if (definition == null || CurrentState == State.Dead || seconds <= 0f)
+        // An Unyielding elite's armour layer takes no stagger until it breaks.
+        if (definition == null || CurrentState == State.Dead || seconds <= 0f || IsUnyielding)
         {
             return;
         }
@@ -38,6 +39,12 @@ public sealed partial class MonsterAI
         }
 
         CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
+        if (IsUnyielding)
+        {
+            Recoil(rules.ParryRecoilSeconds);
+            return;
+        }
+
         switch (GuardRules.ParryResponseOf(definition.ParryResponse, IsHeavyweight))
         {
             case ParryResponse.Stagger:
@@ -121,6 +128,8 @@ public sealed partial class MonsterAI
         movement.Stop();
         staggerUntil = Time.time + seconds;
         pose?.Stagger(Time.time, seconds);
+        IsFelled = felling;
+        weaponGuardUntil = float.NegativeInfinity;
         // After the state, which clears what the last stagger added.
         SetState(State.Staggered);
         damageable.DamageTakenMultiplier = CombatTechniqueSettings.Current.StaggeredDamageTaken;
@@ -164,6 +173,13 @@ public sealed partial class MonsterAI
     {
         // Before it reacts: a hit from the shadows is judged by how things stood when it landed.
         LastHitAmbushed = damageable.DamageTakenMultiplier > 1f && IsUnaware;
+        // A raised shield taking a blow: the arm jolts and the body is shoved back a little.
+        if (result.Blocked && ShieldArcNow > 0f && !IsWeaponGuarding)
+        {
+            pose?.Hit(damage.Direction, 0.35f, Time.time);
+            ShieldBlocked?.Invoke();
+        }
+
         // Burning ticks don't jolt the body; strong blows rock it hardest.
         if (pose != null && result.Damage > 0f && !result.Blocked && (damage.Technique & HitTechnique.OverTime) == 0)
         {
@@ -174,7 +190,7 @@ public sealed partial class MonsterAI
             pose.Hit(damage.Direction, strong ? Mathf.Max(1f, weight) : weight, Time.time);
         }
 
-        if (CurrentState == State.Attacking && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))
+        if (CurrentState == State.Attacking && !IsUnyielding && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))
         {
             pose?.CancelAttack();
             SetState(State.Chasing);
@@ -190,11 +206,12 @@ public sealed partial class MonsterAI
 
         // A friend's copy of the host's creature (co-op) keeps no poise of its own: the blow goes to the host's game, whose
         // creature's poise it wears down, and the stagger comes back from there for everyone.
-        if (!IsRemote && poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed
-            && poise.Hit(damage.Poise, Time.time))
+        if (!IsRemote && poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed)
         {
-            Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+            TakeBlowOnPoise(damage, result);
         }
+
+        NoteLightBlow(damage, result);
 
         Combatant attacker = damage.Source;
         // Game runs from whatever struck it (MonsterAI.Timid).
@@ -250,7 +267,13 @@ public sealed partial class MonsterAI
             return GuardOutcome.Parried;
         }
 
-        if (CurrentState != State.Chasing || GuardRules.ResolveShield(definition.ShieldArc, transform.forward, damage.Direction, damage.Technique) != GuardOutcome.Blocked)
+        GuardOutcome? weapon = WeaponGuard(damage, out letThrough);
+        if (weapon.HasValue)
+        {
+            return weapon.Value;
+        }
+
+        if (CurrentState != State.Chasing || GuardRules.ResolveShield(ShieldArcNow, transform.forward, damage.Direction, damage.Technique) != GuardOutcome.Blocked)
         {
             return GuardOutcome.None;
         }
@@ -267,6 +290,7 @@ public sealed partial class MonsterAI
         movement.Halt();
         SetState(State.Dead);
         reelingTell?.Clear();
+        ClearAnswers();
         pack?.MemberFell(this);
         ShakeTheOthers(killingBlow, wasStaggered);
         // Its death cry carries: others near enough come to see what happened (a big creature's further).

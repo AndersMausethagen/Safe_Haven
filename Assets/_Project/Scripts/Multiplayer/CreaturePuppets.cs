@@ -309,7 +309,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             if (byId.TryGetValue(id, out Puppet puppet) && puppet.Ai != null)
             {
                 puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state,
-                    (MonsterAI.RemoteHunt)(hunting & ~CreatureHost.WaitingFlag), poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0);
+                    (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
+                    (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0);
                 if (puppet.Health != null)
                 {
                     puppet.Health.ShowShare(health / 255f);

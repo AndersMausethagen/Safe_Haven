@@ -132,6 +132,62 @@ public sealed class MonsterBehaviorTests
     }
 
     [Test]
+    public void Felling_TheWeightyVerbsFellAReelingCreature()
+    {
+        foreach (HitTechnique fells in new[] { HitTechnique.Heavy, HitTechnique.Charged, HitTechnique.WeaponArt, HitTechnique.GuardCounter, HitTechnique.Melee | HitTechnique.Heavy })
+        {
+            Assert.IsTrue(GuardRules.FellsReeling(fells), fells.ToString());
+        }
+
+        foreach (HitTechnique not in new[] { HitTechnique.None, HitTechnique.Melee, HitTechnique.Rhythm, HitTechnique.Shot, HitTechnique.Backstab })
+        {
+            Assert.IsFalse(GuardRules.FellsReeling(not), not.ToString());
+        }
+    }
+
+    [Test]
+    public void WeaponGuard_RaisedByLightBlowsFromItsTierAndTurnsOnlyThoseAside()
+    {
+        Assert.IsTrue(GuardRules.IsLight(HitTechnique.Melee));
+        Assert.IsTrue(GuardRules.IsLight(HitTechnique.Melee | HitTechnique.Rhythm));
+        Assert.IsTrue(GuardRules.IsLight(HitTechnique.Shot), "an arrow is turned aside like a light blow");
+        foreach (HitTechnique heavy in new[] { HitTechnique.Heavy, HitTechnique.Charged, HitTechnique.WeaponArt, HitTechnique.Finisher, HitTechnique.Backstab, HitTechnique.Counter, HitTechnique.GuardCounter, HitTechnique.OverTime })
+        {
+            Assert.IsFalse(GuardRules.IsLight(heavy | HitTechnique.Melee), heavy.ToString());
+        }
+
+        Assert.IsTrue(GuardRules.RaisesGuard(3, 3, 2, 2));
+        Assert.IsFalse(GuardRules.RaisesGuard(2, 3, 2, 2), "not yet enough blows");
+        Assert.IsFalse(GuardRules.RaisesGuard(5, 3, 1, 2), "below the tier it learns it");
+        Assert.IsFalse(GuardRules.RaisesGuard(9, 0, 5, 0), "0 needed: never");
+    }
+
+    [Test]
+    public void ArrowDodge_OnlyFromABowHeldPastItsPerfectRelease()
+    {
+        Assert.IsTrue(GuardRules.SidestepsDraw(true, true, 1f, false, false, true));
+        Assert.IsFalse(GuardRules.SidestepsDraw(true, true, 1f, true, false, true), "never from a perfect release");
+        Assert.IsFalse(GuardRules.SidestepsDraw(true, true, 0.8f, false, false, true), "not before the draw is full");
+        Assert.IsFalse(GuardRules.SidestepsDraw(true, false, 1f, false, false, true), "aimed at someone else");
+        Assert.IsFalse(GuardRules.SidestepsDraw(true, true, 1f, false, true, true), "one roll per draw");
+        Assert.IsFalse(GuardRules.SidestepsDraw(true, true, 1f, false, false, false), "its step still cooling down");
+        Assert.IsFalse(GuardRules.SidestepsDraw(false, true, 1f, false, false, true));
+    }
+
+    [Test]
+    public void Poise_BreakingRefillsItAsABreakDoes()
+    {
+        var meter = new PoiseMeter(100f, 2f, 15f);
+        meter.Hit(80f, 0f);
+        Assert.AreEqual(0.2f, meter.Fraction, 1e-5f);
+        meter.Break(1f);
+        Assert.AreEqual(1f, meter.Fraction, 1e-5f);
+        meter.Hit(30f, 1f);
+        meter.Tick(2f, 1f);
+        Assert.AreEqual(0.7f, meter.Fraction, 1e-5f, "a break counts as a hit: it waits its delay before coming back");
+    }
+
+    [Test]
     public void Selection_SkipsIncompleteEntries()
     {
         Assert.AreEqual(-1, MonsterAttacks.SelectAttack(new MonsterAttack[] { null, new MonsterAttack() }, new float[2], 1f, 0f, true));

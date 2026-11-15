@@ -50,6 +50,17 @@ public sealed class MonsterShieldPose : MonoBehaviour
         localFace = FaceOf(shield);
     }
 
+    /// <summary>The shield splinters (two guard-broken staggers): it falls away in pieces and the arm is let go for good.</summary>
+    public void Splinter(Vector3 blowDirection)
+    {
+        if (shield != null && shield.gameObject.activeInHierarchy)
+        {
+            ArmourDebris.BreakOff(shield, blowDirection, splinters: true);
+        }
+
+        enabled = false;
+    }
+
     // The thinnest way through the shield's mesh is the way its face looks.
     private static Vector3 FaceOf(Transform model)
     {

@@ -82,6 +82,26 @@ public static class GuardRules
     /// <summary>Whether a blow breaks off a wind-up its strike's Interruptible doesn't allow (Combat Technique Settings › Break Through):
     /// a heavy swing, a counter, a guard counter, a finisher or an art, or poise damage of at least <paramref name="share"/> of the
     /// monster's poise. Never a great beast's, boss's or elite's; 0 turns it off.</summary>
+    /// <summary>The blows that fell a reeling creature (poise under Reeling Share): a heavy, a charged blow, a weapon art or a guard
+    /// counter. The verbs the combat rework teaches, cashed in.</summary>
+    public static bool FellsReeling(HitTechnique technique) =>
+        (technique & (HitTechnique.Heavy | HitTechnique.Charged | HitTechnique.WeaponArt | HitTechnique.GuardCounter)) != 0;
+
+    /// <summary>A light blow: none of the weighty techniques, no backstab or finisher, nothing over time. What a creature's weapon guard
+    /// turns aside, and what makes it raise one.</summary>
+    public static bool IsLight(HitTechnique technique) =>
+        (technique & (HitTechnique.Heavy | HitTechnique.Charged | HitTechnique.WeaponArt | HitTechnique.GuardCounter | HitTechnique.Counter
+            | HitTechnique.Finisher | HitTechnique.Backstab | HitTechnique.ShieldBash | HitTechnique.OverTime)) == 0;
+
+    /// <summary>Whether a creature raises its weapon guard: at least <paramref name="needed"/> light blows within the window (counted by
+    /// the caller), not before the raid tier it learns it, and never with 0 needed.</summary>
+    public static bool RaisesGuard(int lightBlows, int needed, int tier, int fromTier) => needed > 0 && lightBlows >= needed && tier >= fromTier;
+
+    /// <summary>Whether a nimble creature may step aside from a bow now (one roll per draw): the bow is drawn full on it and held past
+    /// its perfect release, and its side step has cooled down. A perfect release is never stepped from.</summary>
+    public static bool SidestepsDraw(bool drawing, bool aimedAtIt, float draw, bool inPerfectWindow, bool rolledThisDraw, bool cooledDown) =>
+        drawing && aimedAtIt && draw >= 1f && !inPerfectWindow && !rolledThisDraw && cooledDown;
+
     public static bool BreaksThrough(HitTechnique technique, float poiseDamage, float maxPoise, float share, bool heavyweight)
     {
         if (share <= 0f || heavyweight)

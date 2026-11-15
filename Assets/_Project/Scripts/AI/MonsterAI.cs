@@ -226,7 +226,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     public bool IsElite { get; set; }
 
     /// <summary>True while its shield is up: hunting, not striking, staggering or hopping.</summary>
-    public bool ShieldIsUp => definition != null && definition.ShieldArc > 0f && CurrentState == State.Chasing;
+    public bool ShieldIsUp => ShieldArcNow > 0f && CurrentState == State.Chasing;
 
     /// <summary>True while it holds a wind-up before letting the blow go: the same clock stops for its body and its warning.</summary>
     public bool IsHoldingStrike => CurrentState == State.Attacking && attacks.IsHolding;
@@ -237,7 +237,8 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         get
         {
             CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
-            return BackstabMemory.ReadChance(backstabs.Remembered(Time.time, rules.BackstabForgotAfter), rules.ReadChancePerBackstab, rules.ReadChanceMost);
+            int remembered = Mathf.Max(BackstabsForeknown, backstabs.Remembered(Time.time, rules.BackstabForgotAfter));
+            return BackstabMemory.ReadChance(remembered, rules.ReadChancePerBackstab, rules.ReadChanceMost);
         }
     }
 
@@ -456,6 +457,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         damageable.Died -= OnDied;
         damageable.RemoveInvulnerability(this);
         reelingTell?.Clear();
+        ClearAnswers();
     }
 
     private void Update()
@@ -512,6 +514,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
         // A thief steals and runs, and fights only when cornered (MonsterAI.Thief).
         if (UpdateThief())
+        {
+            return;
+        }
+
+        if (UpdateWeaponGuard())
         {
             return;
         }

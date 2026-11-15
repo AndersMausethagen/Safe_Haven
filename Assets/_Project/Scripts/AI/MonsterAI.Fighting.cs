@@ -111,7 +111,7 @@ public sealed partial class MonsterAI
             return;
         }
 
-        if (HoldsWhileDrawing(toTarget))
+        if (HoldsWhileDrawing(toTarget) || DodgesArrow())
         {
             return;
         }
@@ -144,6 +144,7 @@ public sealed partial class MonsterAI
                 && distance < definition.FleeDistance + (fleeing ? definition.DistanceTolerance : -definition.DistanceTolerance);
             if (fleeing)
             {
+                NoteFleeing();
                 SetState(State.Chasing);
                 Retreat(toTarget, definition.FleeDistance - distance);
                 return;

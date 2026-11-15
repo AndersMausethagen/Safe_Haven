@@ -33,6 +33,9 @@ public sealed partial class MonsterAI
     /// <summary>Raised when it wavers (one of its side killed brutally nearby): the body flinches back.</summary>
     public event System.Action Wavered;
 
+    /// <summary>Raised when it stops to draw its weapon on spotting someone (Monster Definition › Spotted Pause).</summary>
+    public event System.Action DrawStarted;
+
     /// <summary>Its poise is worn low (under Combat Technique Settings › Reeling Share): a stagger is near. A look only.</summary>
     public bool IsReeling => poise != null && CurrentState != State.Staggered && CurrentState != State.Dead
         && poise.Fraction < CombatTechniqueSettings.Current.ReelingShare;
@@ -66,6 +69,7 @@ public sealed partial class MonsterAI
 
         drawingUntil = Time.time + definition.SpottedPause;
         attacks?.DelayAtLeast(definition.SpottedPause);
+        DrawStarted?.Invoke();
     }
 
     // Drawing its weapon: it stands and turns to its foe until done. True while it does.
@@ -174,6 +178,7 @@ public sealed partial class MonsterAI
             return;
         }
 
+        UpdateHurt();
         reelingTell.Update(IsReeling, Time.deltaTime);
         if (pose != null)
         {

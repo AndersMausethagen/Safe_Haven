@@ -246,6 +246,14 @@ MonoBehaviour:
   flankSpread: 0.4
   breaksWalls: 0
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0.3
+  hurtMood: 1
+  arrowDodge: 0
   poise: 70
   parryResponse: 0
   openWhileStriking: 1
@@ -265,6 +273,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: afd57db930e4b6443ac343b993132c70, type: 3}

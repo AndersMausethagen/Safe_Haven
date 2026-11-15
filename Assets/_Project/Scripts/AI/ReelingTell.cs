@@ -23,6 +23,9 @@ public sealed class ReelingTell
             : 1.1f;
     }
 
+    /// <summary>Height of its chest above its feet, in metres.</summary>
+    public float ChestHeight => chestHeight;
+
     /// <summary>How much it reels now, 0-1, eased: the sway's strength.</summary>
     public float Amount { get; private set; }
 

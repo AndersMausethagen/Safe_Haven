@@ -1400,6 +1400,12 @@ The player is no super soldier: combat is about reading the enemy and committing
   strikes, edges a creature's great blow (Monster Attack › Heavy) and draws the opening ring from `MonsterAttacks.TryGetOpening`.
   `MonsterAttacks.SelectAttack` picks among weighted actions by chance (Weight, When Foe, `RepeatPenalty`, `FoeBonus`; pure and tested);
   `MonsterAI.ReadFoe` reads guard, backing off, bow and flank. Co-op poses carry poise and a waiting flag (20 bytes).
+- **Creatures answering back (phase C):** `MonsterAI.Answers` (partial): `TakeBlowOnPoise` fells (`IsFelled`, Felled Seconds) or breaks a
+  raised shield (`GuardBroken`, `MonsterShieldPose.Splinter`); the weapon guard (`NoteLightBlow`, `WeaponGuard` from `Guard`,
+  `UpdateWeaponGuard`, Monster Definition › Answering back); `UpdateHurt` (When Hurt: Fury, Desperate); `DodgesArrow`. `ArmourDebris` breaks
+  named pieces off a body (`CreatureWounds` per chip, Armour Parts). Elite kinds `UnyieldingBehaviour`, `WatchfulBehaviour`,
+  `PressingBehaviour` set `MonsterAI.IsUnyielding`, `BackstabsForeknown`, `Presses`. Rules in `GuardRules` (`FellsReeling`, `IsLight`,
+  `RaisesGuard`, `SidestepsDraw`). The pose stream's hunting byte also carries Felled (0x40) and Guarding (0x20).
 - **Heavy swings that push through:** `WeaponDefinition.HeavySwingArmor`, read by `PlayerCombat.IsPushingThrough`, which sets the player's `DamageTakenMultiplier`
   and skips the flinch. The player's multiplier belongs to `PlayerCombat`.
 - **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse

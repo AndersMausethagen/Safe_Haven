@@ -10,6 +10,11 @@ using UnityEngine;
 /// by where a blow came from, only its arms while it recovers from its own blow ("Flinch Arms" layer); a strike broken off shows; and it
 /// draws its weapon when it spots someone (Draw).
 /// </para>
+/// <para>
+/// Answering back (phase C): felled, it falls, lies ("Down") and gets up ("Get Up") as its stagger ends; its weapon guard ("Guarding",
+/// the "Guard" state) jolts when a blow is turned aside ("Guard Hit" on the arms layer), as its shield does ("Block Hit"); badly hurt it
+/// cries out ("Roar"); an Unyielding elite doesn't flinch.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI))]
@@ -68,6 +73,16 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private static readonly int ReadyHash = Animator.StringToHash("Ready");
     private static readonly int MoveXHash = Animator.StringToHash("MoveX");
     private static readonly int MoveZHash = Animator.StringToHash("MoveZ");
+    private static readonly int GuardingHash = Animator.StringToHash("Guarding");
+    private static readonly int GetUpStateHash = Animator.StringToHash("Get Up");
+    private static readonly int GuardHitStateHash = Animator.StringToHash("Guard Hit");
+    private static readonly int BlockHitStateHash = Animator.StringToHash("Block Hit");
+    private static readonly int RoarStateHash = Animator.StringToHash("Roar");
+    // How long "Get Up" takes as played; it starts this long before the felled stagger ends, so it stands as the creature acts again.
+    private const float GetUpSeconds = 1.0f;
+    private bool hasGuarding;
+    private float getUpAt = -1f;
+    private int interruptedFrame = -1;
     private const string FlinchLayerName = "Flinch Arms";
     // A call or cast without a Strike Lead of its own lets go this long before the hit.
     private const float DefaultReleaseLead = 0.15f;
@@ -78,6 +93,8 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private bool hasStaggered;
     private bool hasReady;
     private bool hasMove;
+    private bool hasMoveX;
+    private bool hasMoveZ;
     private int flinchLayer = -1;
     private int releaseHash;
     private float releaseAt = -1f;
@@ -111,6 +128,10 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.HeldForFinish += OnHeldForFinish;
         ai.Interrupted += OnInterrupted;
         ai.Wavered += OnWavered;
+        ai.ShieldBlocked += OnShieldBlocked;
+        ai.GuardTurnedAside += OnGuardTurnedAside;
+        ai.TurnedHurt += OnTurnedHurt;
+        ai.DrawStarted += PlayDraw;
         if (health != null)
         {
             health.Damaged += OnDamaged;
@@ -127,12 +148,16 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.HeldForFinish -= OnHeldForFinish;
         ai.Interrupted -= OnInterrupted;
         ai.Wavered -= OnWavered;
+        ai.ShieldBlocked -= OnShieldBlocked;
+        ai.GuardTurnedAside -= OnGuardTurnedAside;
+        ai.TurnedHurt -= OnTurnedHurt;
+        ai.DrawStarted -= PlayDraw;
         if (health != null)
         {
             health.Damaged -= OnDamaged;
         }
 
-        releaseAt = -1f;
+        getUpAt = -1f;
     }
 
     private void Update()
@@ -198,6 +223,20 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             animator.SetBool(StaggeredHash, ai.CurrentState == MonsterAI.State.Staggered);
         }
 
+        if (hasGuarding)
+        {
+            animator.SetBool(GuardingHash, ai.IsWeaponGuarding);
+        }
+
+        if (getUpAt >= 0f && Time.time >= getUpAt)
+        {
+            getUpAt = -1f;
+            if (ai.CurrentState == MonsterAI.State.Staggered && animator.isHuman && animator.HasState(0, GetUpStateHash))
+            {
+                animator.CrossFadeInFixedTime(GetUpStateHash, 0.2f, 0, 0f);
+            }
+        }
+
         if (hasReady)
         {
             animator.SetBool(ReadyHash, ai.IsWaitingTurn);
@@ -236,9 +275,12 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             hasStride |= parameter.nameHash == StrideRateHash && parameter.type == AnimatorControllerParameterType.Float;
             hasStaggered |= parameter.nameHash == StaggeredHash && parameter.type == AnimatorControllerParameterType.Bool;
             hasReady |= parameter.nameHash == ReadyHash && parameter.type == AnimatorControllerParameterType.Bool;
-            hasMove |= parameter.nameHash == MoveXHash && parameter.type == AnimatorControllerParameterType.Float;
+            hasMoveX |= parameter.nameHash == MoveXHash && parameter.type == AnimatorControllerParameterType.Float;
+            hasMoveZ |= parameter.nameHash == MoveZHash && parameter.type == AnimatorControllerParameterType.Float;
+            hasGuarding |= parameter.nameHash == GuardingHash && parameter.type == AnimatorControllerParameterType.Bool;
         }
 
+        hasMove = hasMoveX && hasMoveZ;
         flinchLayer = animator.GetLayerIndex(FlinchLayerName);
     }
 
@@ -303,6 +345,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private void OnInterrupted()
     {
         releaseAt = -1f;
+        interruptedFrame = Time.frameCount;
         if (animator == null || !animator.isHuman || !animator.enabled)
         {
             return;
@@ -318,14 +361,41 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     // Shaken by a brutal kill nearby: its arms flinch while its legs carry on.
     private void OnWavered() => FlinchArms();
 
-    private bool FlinchArms()
+    private bool FlinchArms() => PlayOnArms(FlinchStateHash);
+
+    // Its raised shield took a blow, or its weapon guard turned one aside: the arm jolts.
+    private void OnShieldBlocked() => PlayOnArms(BlockHitStateHash);
+
+    private void OnGuardTurnedAside() => PlayOnArms(GuardHitStateHash);
+
+    // Spotted someone while unaware: it readies its weapon while MonsterAI holds it still.
+    private void PlayDraw()
     {
-        if (animator == null || !animator.isHuman || !animator.enabled || flinchLayer < 0 || !animator.HasState(flinchLayer, FlinchStateHash))
+        if (animator != null && animator.isHuman && animator.enabled && animator.HasState(0, DrawStateHash))
+        {
+            animator.CrossFadeInFixedTime(DrawStateHash, StrikeFade, 0, 0f);
+        }
+    }
+
+    // Badly hurt, it cries out (a roar, a call), unless busy striking or reeling.
+    private void OnTurnedHurt()
+    {
+        if (animator != null && animator.isHuman && animator.enabled && animator.HasState(0, RoarStateHash)
+            && ai.CurrentState != MonsterAI.State.Attacking && ai.CurrentState != MonsterAI.State.Staggered)
+        {
+            animator.SetFloat(ActionSpeedHash, 1.4f);
+            animator.CrossFadeInFixedTime(RoarStateHash, StrikeFade, 0, 0f);
+        }
+    }
+
+    private bool PlayOnArms(int state)
+    {
+        if (animator == null || !animator.isHuman || !animator.enabled || flinchLayer < 0 || !animator.HasState(flinchLayer, state))
         {
             return false;
         }
 
-        animator.CrossFadeInFixedTime(FlinchStateHash, FlinchFade, flinchLayer, 0f);
+        animator.CrossFadeInFixedTime(state, FlinchFade, flinchLayer, 0f);
         return true;
     }
 
@@ -338,7 +408,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         // A blow that staggered it already (the AI heard it first): a felling blow knocks it down.
         if (ai.CurrentState == MonsterAI.State.Staggered && lastBlowFells && !result.Killed)
         {
-            KnockDown();
+            KnockDown(ai.StaggerSecondsLeft);
+            return;
+        }
+
+        // An Unyielding elite doesn't flinch; a raised weapon guard shows its own jolt; a strike just broken off shows its reel.
+        if (ai.IsUnyielding || ai.IsWeaponGuarding || interruptedFrame == Time.frameCount)
+        {
             return;
         }
 
@@ -375,12 +451,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
     }
 
-    private void KnockDown()
+    // Down: it falls, lies while it staggers (the controller's "Down") and gets up a moment before the stagger ends.
+    private void KnockDown(float seconds)
     {
         if (animator != null && animator.isHuman && animator.enabled && animator.HasState(0, KnockdownStateHash))
         {
             animator.CrossFadeInFixedTime(KnockdownStateHash, FlinchFade, 0, 0f);
             lastBlowFells = false;
+            getUpAt = animator.HasState(0, GetUpStateHash) ? Time.time + Mathf.Max(0.5f, seconds - GetUpSeconds) : -1f;
         }
     }
 
@@ -398,10 +476,10 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
     private void OnStaggered(float seconds)
     {
-        // Felled by the blow that broke it (a charged swing, a crush): down, not just reeling.
-        if (lastBlowFells && Time.time - lastBlowAt < 0.05f)
+        // Felled (MonsterAI.IsFelled: caught reeling by a weighty blow, or a charged or crushing one broke it): down, not just reeling.
+        if (ai.IsFelled || (lastBlowFells && Time.time - lastBlowAt < 0.05f))
         {
-            KnockDown();
+            KnockDown(seconds);
             return;
         }
 
@@ -430,11 +508,12 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             }
         }
 
-        // Spotted someone while unaware: it readies its weapon (MonsterAI holds still meanwhile; a friend's copy plays it the same).
-        if (body && current == MonsterAI.State.Chasing && (previous == MonsterAI.State.Idle || previous == MonsterAI.State.Investigating)
-            && ai.Definition != null && ai.Definition.SpottedPause > 0f && animator.HasState(0, DrawStateHash))
+        // A friend's copy draws when the host's creature goes from idle to the chase (the host's own draw comes from MonsterAI.DrawStarted;
+        // a search for a lost target, through Investigating, isn't a first sighting).
+        if (ai.IsRemote && current == MonsterAI.State.Chasing && previous == MonsterAI.State.Idle
+            && ai.Definition != null && ai.Definition.SpottedPause > 0f)
         {
-            animator.CrossFadeInFixedTime(DrawStateHash, StrikeFade, 0, 0f);
+            PlayDraw();
         }
 
         if (current == MonsterAI.State.Hopping && animator != null && animator.isHuman && animator.HasState(0, HopStateHash))

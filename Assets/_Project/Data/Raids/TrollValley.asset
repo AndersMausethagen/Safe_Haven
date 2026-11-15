@@ -139,6 +139,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 20158eb0ae9165e478d19e1d76a9d553, type: 2}
   - {fileID: 11400000, guid: 4872bd8eac9ec8c4695c4f8d544d05fe, type: 2}
   - {fileID: 11400000, guid: 64d24d4180baec546ae6b6b280ffea7c, type: 2}
+  - {fileID: 11400000, guid: 5e9df453a8dc51342b46feca7e830b58, type: 2}
+  - {fileID: 11400000, guid: 29a05817c019ef543a47b1510137e8a5, type: 2}
+  - {fileID: 11400000, guid: 0c3eecf17dc4e8d4b8c7a83d9839609c, type: 2}
   timesOfDay:
   - name: Day
     hour: 11
@@ -712,6 +715,10 @@ MonoBehaviour:
   extractedSound: {fileID: 0}
   failedSound: {fileID: 0}
   placeArtwork: {fileID: 21300000, guid: de7ec80d00a4d5f49a908925d1de0e06, type: 3}
+  firstVisitCinematic: {fileID: 0}
+  calmAfterCinematic: 8
+  arrivalEffect: {fileID: 0}
+  arrivalSound: {fileID: 0}
   references:
     version: 2
     RefIds:

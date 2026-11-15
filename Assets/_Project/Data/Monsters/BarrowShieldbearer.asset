@@ -184,6 +184,14 @@ MonoBehaviour:
   flankSpread: 0.4
   breaksWalls: 0
   spottedPause: 0.55
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 110
   parryResponse: 0
   openWhileStriking: 1
@@ -203,6 +211,10 @@ MonoBehaviour:
   armourChips: 3
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts:
+  - Pauldron.001
+  - Pauldron
+  - Helm,Nasal,Rim
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 7f709feef0127764d96cab70ec00d2a2, type: 3}

@@ -36,10 +36,31 @@ or behaving like the player, so a fight is more dynamic, more varied, and gives 
 | 10 | Answers to the bow: side steps and raised arms on agile humanoids | Med-Low | S-M | Yes (bow pace) |
 | 11 | Enemies react to each other: summons scatter, nearby creatures hesitate after a brutal kill | Low-Med | S | Slight (easier) |
 
-## Status (2026-11-15): phases A and B built
+## Status (2026-11-15): phases A, B and C built
 
-The user asked for phases A and B. Both are built on `test`, checked by Edit Mode tests and Play-mode probes from the CLI, not yet played
-by hand. Phase C (§4.4's payoff, 4.5, 4.7-4.10) waits for the user's pick after the combat rework's playtest.
+The user asked for phases A and B, then C ("it sounds good"). All three are built on `test`, checked by Edit Mode tests and Play-mode
+probes from the CLI, not yet played by hand. An independent code review of A and B found five issues, all fixed with C (a second draw on
+finding a lost target, the interrupt reel overwritten by a flinch, the opening ring left on a disabled telegraph, a channel looping after a
+disable, MoveZ unchecked).
+
+**Phase C (answers back; changes balance, approved by the user):**
+
+| Item | Built | Where |
+|---|---|---|
+| 4.4 Reeling payoff | A heavy, charged, art or guard-counter blow on a reeling creature breaks its poise and fells it: an ordinary creature is down for Felled Seconds (1.8 s: falls, lies in `Down`, gets up in `Get Up`, UAL2 LayToIdle), a body without the clip recoils fully. A charged blow or one worth 75% of its poise fells too (it was a 1 s knockdown). Great beasts, bosses and elites only stagger. Felled travels to friends as a pose bit | `MonsterAI.TakeBlowOnPoise`, `Fell`, `GuardRules.FellsReeling`, `PoiseMeter.Break`, driver `KnockDown` |
+| 4.5a Shield wall | A raised shield taking a blow jolts the arm (`Block Hit`, KI BlockShield01) and shoves the body; poise broken through it is a Guard Broken stagger ×1.5 with the guard-break crash; two of them splinter the shield (it falls away, the arm is let go, no more blocking) | `GuardBroken`, `MonsterShieldPose.Splinter`, `ArmourDebris` |
+| 4.5b Weapon guard | The Draug, from raid tier II: three light blows within 2 s raise its sword (`Guard`, KI Parry1H01_R) for 1 s; light blows from the front are turned aside (30% through, poise still worn, `Guard Hit` on the arms); a heavy, an art or a blow from its flank breaks it and it reels; the third light blow into it is answered with a strike (its own wind-up and warning). 4 s before it can guard again. Not on the knights (no rider clips) | `MonsterAI.NoteLightBlow`, `WeaponGuard`, `UpdateWeaponGuard`, Monster Definition › Answering back |
+| 4.7 Hurt states | Below 30% health: Fury (Stone Troll, Small Moss Troll, wolves, boars, Troll Runt, Tusse): a cry, angry eyes, breath over its head, cooldowns ×0.85. Desperate (Draug): a cry and angry eyes, and a new Below Health action, its cleave run into a backswing and another cleave (cd 7 s). Cowardly creatures cry out as they turn to run | `MonsterAI.UpdateHurt`, `NoteFleeing`, Monster Definition › When Hurt |
+| 4.8 Elite verbs | Unyielding (tier II+): a yellow ring; nothing flinches, interrupts or staggers it (a parry only makes it recoil) until a third of its health is gone, then it breaks with a crash and a 2.2 s stagger. Watchful (tier II+): reads backstabs as if it remembered two, always. Relentless (tier III+): always follows up and holds. In both raids' pools | `EliteBehaviour.cs`: `UnyieldingBehaviour`, `WatchfulBehaviour`, `PressingBehaviour`; Data/Raids/Elites |
+| 4.9 Armour falls off | Each armour chip breaks the next named piece off the model (Draug and Shieldbearer: pauldrons, then the helm; knights: their shoulders), thrown along the blow and gone after 6 s | Monster Definition › Armour Parts, `CreatureWounds`, `ArmourDebris` |
+| 4.10 Bow answers | Huldra (50%), Fossegrim (40%), Tusse (35%) and Troll Runt (30%) may step aside once per draw from a bow held on them past its perfect release; never from a perfect release; 5 s between steps. The local player's bow only | `MonsterAI.DodgesArrow`, `GuardRules.SidestepsDraw` |
+
+Phase C checks: `MonsterBehaviorTests` 17/17 (felling verbs, light blows, guard raising, the sidestep rule, poise breaks), `RaidTierTests`
+36/36, and Play probes (felled and getting up, armour pieces falling, the guard raised, turning a blow aside and answering, a shield jolting
+and splintering after two guard breaks, a wolf's fury, an Unyielding elite ignoring a poise break and breaking at 65%). The arrow dodge was
+not seen live: a probe can't hold the bow's aim on a creature, so its rule is tested on its own.
+
+**Phases A and B:**
 
 | Item | Built | Where |
 |---|---|---|
