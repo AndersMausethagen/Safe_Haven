@@ -72,6 +72,15 @@ public sealed class AwarenessIndicator : MonoBehaviour
             color.a = Mathf.Lerp(0.5f, 1f, sure);
             Show("?", color);
         }
+        else if (visible && rules.ShowStealthReadout && Player.Current != null && Player.Current.Health != null
+                 && monster.NoticeLevelOf(Player.Current.Health) > NoticingShownFrom)
+        {
+            // Before the "?": a faint one forming over it as it notices the player, from nothing to the suspicious line.
+            float filled = Mathf.Clamp01(monster.NoticeLevelOf(Player.Current.Health) / Mathf.Max(0.01f, rules.SuspiciousAt));
+            Color color = rules.NoticingColor;
+            color.a *= Mathf.Lerp(0.25f, 1f, filled);
+            Show("?", color, Mathf.Lerp(0.55f, 0.85f, filled));
+        }
         else
         {
             text.enabled = false;
@@ -85,10 +94,14 @@ public sealed class AwarenessIndicator : MonoBehaviour
         }
     }
 
-    private void Show(string symbol, Color color)
+    // Below this the faint "?" isn't shown: a glance that came to nothing.
+    private const float NoticingShownFrom = 0.03f;
+
+    private void Show(string symbol, Color color, float size = 1f)
     {
         text.enabled = true;
         text.text = symbol;
         text.color = color;
+        text.fontSize = PerceptionSettings.Current.IndicatorFontSize * size;
     }
 }

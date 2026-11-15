@@ -18,6 +18,16 @@ public static class ArcheryRules
     private const float ShakeSpreadPerSecond = 0.6f;
 
     /// <summary>Share of a full draw (0-1) after holding for <paramref name="heldSeconds"/>.</summary>
+    /// <summary>
+    /// A bow's damage a second firing as fast as it can (Docs/RangedStealthResearch.md §3.5): every release perfect (0.05 s into the window,
+    /// a sure critical worth <paramref name="critDamage"/> and the bow's perfect multiplier), or every one a full draw let go late (0.25 s
+    /// after). Power, armour, skills, misses and flight time left out, as the melee ratio per second leaves them out.
+    /// </summary>
+    public static float DamagePerSecond(float arrowDamage, float drawWeight, float drawSeconds, float reloadSeconds, float perfectDamage, float critDamage, bool perfect) =>
+        perfect
+            ? arrowDamage * drawWeight * perfectDamage * critDamage / Mathf.Max(0.05f, drawSeconds + 0.05f + reloadSeconds)
+            : arrowDamage * drawWeight / Mathf.Max(0.05f, drawSeconds + 0.25f + reloadSeconds);
+
     public static float DrawShare(float heldSeconds, float drawSeconds) => Mathf.Clamp01(heldSeconds / Mathf.Max(0.01f, drawSeconds));
 
     /// <summary>True when letting go after <paramref name="heldSeconds"/> is a perfect release: within

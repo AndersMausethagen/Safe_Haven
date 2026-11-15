@@ -257,7 +257,7 @@ public sealed partial class PlayerCombat
     // <paramref name="damage"/> is the swing's multiplier so far, and what comes back is the multiplier to strike with.
     private float SilentTakedown(IDamageable target, in PendingHit pending, float damage)
     {
-        if (!(target is Damageable body) || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnaware
+        if (!(target is Damageable body) || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnawareOf(transform.position)
             || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null
             || !Techniques.Has(PerkTechnique.SilentTakedown) || !body.TryGetComponent(out Combatant theirs))
         {
@@ -480,7 +480,7 @@ public sealed partial class PlayerCombat
 
         if (activeAttack.CastProjectile != null)
         {
-            Cast();
+            Cast(damage, poise);
             return 0;
         }
 
@@ -571,7 +571,7 @@ public sealed partial class PlayerCombat
         float poise = pending.Poise;
         HitTechnique technique = pending.Technique;
         // A sneak attack is always a critical.
-        bool critical = pending.Critical || PlayerProficiencies.CaughtUnaware(target);
+        bool critical = pending.Critical || PlayerProficiencies.CaughtUnaware(target, transform.position);
         bool backstab = IsBackstab(target, out MonsterAI backstabbed);
         if (backstab)
         {
@@ -584,7 +584,7 @@ public sealed partial class PlayerCombat
 
         // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
         // counter) holds at every level; a perk can add to a blow from the shadows.
-        damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target);
+        damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target, transform.position);
         // From the saddle: Horsemanship's Mounted Damage, and the gallop's weight behind it.
         float mounted = PlayerRiding.MountedScale(gameObject);
         damage *= mounted;

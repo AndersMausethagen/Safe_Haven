@@ -303,6 +303,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(1)] private int guardBreaksToSplinter = 2;
     [Tooltip("Seconds between a nimble creature's side steps from a bow held past its perfect release (Monster Definition › Arrow Dodge).")]
     [SerializeField, Min(0f)] private float arrowDodgeCooldown = 5f;
+    [Tooltip("Seconds a creature stays marked by a perfect release from a bow with Hunter's Mark, and how many times the poise it takes from every blow meanwhile.")]
+    [SerializeField, Min(0f)] private float huntersMarkSeconds = 6f;
+    [SerializeField, Min(1f)] private float huntersMarkPoise = 1.5f;
 
     public float ChainGrace => chainGrace;
     public float RhythmEarly => rhythmEarly;
@@ -440,5 +443,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float GuardBrokenScale => guardBrokenScale;
     public int GuardBreaksToSplinter => guardBreaksToSplinter;
     public float ArrowDodgeCooldown => arrowDodgeCooldown;
+    public float HuntersMarkSeconds => huntersMarkSeconds;
+    public float HuntersMarkPoise => huntersMarkPoise;
     public float StaggeredDamageTaken => staggeredDamageTaken;
 }

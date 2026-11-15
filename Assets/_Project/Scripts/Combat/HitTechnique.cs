@@ -27,4 +27,6 @@ public enum HitTechnique
     GuardCounter = 2048,
     /// <summary>A fully charged heavy swing let go.</summary>
     Charged = 4096,
+    /// <summary>A perfect release from a bow with Hunter's Mark: the creature it strikes is marked and takes more poise from every blow.</summary>
+    Marking = 8192,
 }

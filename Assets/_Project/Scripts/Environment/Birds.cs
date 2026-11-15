@@ -130,6 +130,11 @@ public sealed class Birds : MonoBehaviour
         }
 
         AudioManager.Play(profile.Call, position + Vector3.up * profile.FlushHeight);
+        // The flock's alarm carries (Docs/RangedStealthResearch.md §3.11); its own noise can't flush them again (the gap above).
+        if (profile.AlarmRadius > 0f)
+        {
+            WorldNoise.Emit(position, profile.AlarmRadius);
+        }
     }
 
     private void LateUpdate()

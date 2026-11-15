@@ -577,6 +577,16 @@ A massive troll guards a stone bridge in Troll Valley. Phase one teaches a wide 
 
 ### 10.8 Senses and stealth
 
+**Reading and playing stealth (November 15, 2026; Docs/RangedStealthResearch.md):** what notices the player shows before it is
+suspicious: a faint "?" forms over the creature and its sight cone and close-sense ring are drawn faintly on the ground; the player's
+sounds spread as rings to their real reach; a dark ring at the feet means sneaking unseen; an arrow at the screen's edge points to one
+noticing from off screen. The focus ring and the bow's outline turn pale gold on a creature still unaware, brighter when a Silent
+Takedown would finish it. A kill from the shadows is quiet (heard 4 m, a faint death cry, the player stays hidden), but a creature that
+sees one of its side fall turns suspicious toward the body. A sound too faint for a "?" only turns heads, and a suspicious creature
+struck from outside its sight cone is still caught unaware. Shrubs hide a sneaking player (half as visible), never from the close
+sense; flushed birds call an alarm. In co-op a friend's sounds now reach the host's creatures, their drawn bow or cast counts as
+shooting, their arrows and bolts are seen, and the noticing shows for them too.
+
 Danger should come from creatures that notice the player, not from creatures that simply know. Monsters **see** in a
 cone that terrain, trees, rocks and buildings block, **notice anything very close** from any direction, and **hear**
 footsteps, dodges, fights and gathering. A glimpse or a sound makes a monster **suspicious** (a "?" over it): it comes

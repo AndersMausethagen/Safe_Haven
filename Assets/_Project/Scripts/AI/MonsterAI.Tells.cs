@@ -23,6 +23,8 @@ public sealed partial class MonsterAI
     private const float SummonRoutSeconds = 4f;
 
     private float waitingUntil = float.NegativeInfinity;
+    private float remoteNoticeLevel;
+    private RemoteHunt remoteNoticing;
     private float drawingUntil = float.NegativeInfinity;
     private bool remoteWaiting;
     private ReelingTell reelingTell;
@@ -33,6 +35,20 @@ public sealed partial class MonsterAI
     /// <summary>Raised when it wavers (one of its side killed brutally nearby): the body flinches back.</summary>
     public event System.Action Wavered;
 
+    /// <summary>Raised when a creature spots the player, with how: "Sight", "Close" (its close sense), "Search" (looking where it heard or
+    /// glimpsed something) or "Struck" (a blow told it). The playtest log counts them.</summary>
+    public static event System.Action<MonsterAI, string> SpottedPlayer;
+
+    private bool spottingByBlow;
+
+    private void NoteSpottedPlayer()
+    {
+        string how = spottingByBlow ? "Struck"
+            : targetComponent != null && HorizontalDistance(targetComponent.transform.position) <= definition.CloseSenseRange ? "Close"
+            : CurrentState == State.Investigating ? "Search" : "Sight";
+        SpottedPlayer?.Invoke(this, how);
+    }
+
     /// <summary>Raised when it stops to draw its weapon on spotting someone (Monster Definition › Spotted Pause).</summary>
     public event System.Action DrawStarted;
 
@@ -42,6 +58,32 @@ public sealed partial class MonsterAI
 
     /// <summary>True while it waits its turn at its target: circling, standing ready, or holding its aim or its distance.</summary>
     public bool IsWaitingTurn => CurrentState == State.Chasing && (IsRemote ? remoteWaiting : Time.time < waitingUntil);
+
+    /// <summary>
+    /// How full its awareness is (0-1) toward <paramref name="who"/> while it hunts nobody: what it is noticing, filling toward a "?"
+    /// and a "!" (StealthReadout, the faint "?"). 0 when it notices something else or nothing. A friend's copy shows what the host's
+    /// creature notices of this game's player.
+    /// </summary>
+    public float NoticeLevelOf(Component who)
+    {
+        if (who == null || CurrentState == State.Dead || definition == null)
+        {
+            return 0f;
+        }
+
+        if (IsRemote)
+        {
+            return remoteNoticing == RemoteHunt.You ? remoteNoticeLevel : 0f;
+        }
+
+        return senses != null && !CanTarget(target) && senses.Noticing is Component noticed && noticed == who ? senses.Awareness.Level : 0f;
+    }
+
+    /// <summary>Whom it notices (co-op: for a friend, whether it is them), for the host's poses.</summary>
+    public IDamageable Noticing => senses != null && !CanTarget(target) && CurrentState != State.Dead ? senses.Noticing : null;
+
+    /// <summary>Its awareness, 0-1 (0 before it has woken).</summary>
+    public float AwarenessLevel => senses != null ? senses.Awareness.Level : 0f;
 
     /// <summary>True while it draws its weapon on spotting someone (Monster Definition › Spotted Pause).</summary>
     public bool IsDrawing => Time.time < drawingUntil;
@@ -118,7 +160,9 @@ public sealed partial class MonsterAI
             doing |= FoeDoing.Guarding;
         }
 
-        if (foe.TryGetComponent(out PlayerArchery archery) && (archery.IsDrawing || archery.IsAiming))
+        if ((foe.TryGetComponent(out PlayerArchery archery) && (archery.IsDrawing || archery.IsAiming))
+            || (foe.TryGetComponent(out PlayerCombat caster) && caster.IsCasting)
+            || (foe.TryGetComponent(out FriendHitbox friend) && friend.IsDrawing))
         {
             doing |= FoeDoing.Shooting;
         }
@@ -153,6 +197,21 @@ public sealed partial class MonsterAI
         }
 
         attacks?.RoutSummoned(SummonRoutSeconds);
+        // Killed unaware: those of its side that see it fall turn suspicious toward the body (a quiet kill in front of the others still
+        // gives the player away).
+        float sees = PerceptionSettings.Current.SeesKillRange;
+        if (LastHitAmbushed && sees > 0f && TryGetComponent(out Combatant fallen))
+        {
+            foreach (MonsterAI other in active)
+            {
+                if (other != this && other.CurrentState != State.Dead && other.TryGetComponent(out Combatant kin) && kin.Faction == fallen.Faction
+                    && (other.transform.position - transform.position).sqrMagnitude <= sees * sees && other.Sees(transform.position))
+                {
+                    other.SuspectAt(transform.position);
+                }
+            }
+        }
+
         bool brutal = (killingBlow.Technique & HitTechnique.Finisher) != 0
             || ((killingBlow.Technique & HitTechnique.Backstab) != 0 && wasStaggered);
         if (!brutal || !TryGetComponent(out Combatant mine))
@@ -170,6 +229,33 @@ public sealed partial class MonsterAI
         }
     }
 
+    // Whether a point is in its sight: in its cone or close, with nothing in between.
+    private bool Sees(Vector3 point)
+    {
+        if (senses == null || definition == null)
+        {
+            return false;
+        }
+
+        Vector3 toward = point - transform.position;
+        toward.y = 0f;
+        SenseProfile profile = SenseProfile.Of(definition);
+        bool looking = toward.magnitude <= profile.CloseRange || Vector3.Angle(transform.forward, toward) <= profile.HalfAngle;
+        return looking && toward.magnitude <= profile.SightRange && senses.HasClearPathTo(point);
+    }
+
+    /// <summary>Turns it suspicious of something at <paramref name="point"/> (one of its side fell there): a "?" and a look.</summary>
+    public void SuspectAt(Vector3 point)
+    {
+        if (!CanInvestigate())
+        {
+            return;
+        }
+
+        senses.Awareness.Hear(Mathf.Min(0.95f, PerceptionSettings.Current.SuspiciousAt + 0.1f), point);
+        BeginInvestigate(false);
+    }
+
     // Body language after movement: the sway and embers of worn-down poise.
     private void UpdateTells()
     {
@@ -179,6 +265,7 @@ public sealed partial class MonsterAI
         }
 
         UpdateHurt();
+        UpdateMarkRing();
         reelingTell.Update(IsReeling, Time.deltaTime);
         if (pose != null)
         {

@@ -35,6 +35,57 @@ public sealed partial class MonsterAI
     private GameObject furyBreath;
     private float nextArrowDodgeAt;
     private bool rolledForThisDraw;
+    private float markedUntil = float.NegativeInfinity;
+    private bool remoteMarked;
+    private GameObject markRing;
+
+    /// <summary>Marked by a perfect release from a bow with Hunter's Mark: it takes more poise from every blow until it fades.</summary>
+    public bool IsMarked => CurrentState != State.Dead && (IsRemote ? remoteMarked : Time.time < markedUntil);
+
+    // Poise a blow does while marked, as a multiplier.
+    private float MarkScale => IsMarked ? CombatTechniqueSettings.Current.HuntersMarkPoise : 1f;
+
+    // A marking blow (HitTechnique.Marking) landed: marked anew for Hunter's Mark Seconds. The host's game marks for everyone.
+    private void NoteMark(in DamageInfo damage)
+    {
+        if (!IsRemote && (damage.Technique & HitTechnique.Marking) != 0 && CurrentState != State.Dead)
+        {
+            markedUntil = Time.time + CombatTechniqueSettings.Current.HuntersMarkSeconds;
+        }
+    }
+
+    // The mark's thin ring at its feet while it holds.
+    private void UpdateMarkRing()
+    {
+        bool marked = IsMarked;
+        if (marked && markRing == null)
+        {
+            Material material = CombatFeelSettings.Current.TelegraphMaterial;
+            if (material == null)
+            {
+                return;
+            }
+
+            markRing = new GameObject("Hunter's Mark");
+            markRing.transform.SetParent(transform, false);
+            markRing.transform.localPosition = Vector3.up * 0.08f;
+            float radius = TryGetComponent(out UnityEngine.AI.NavMeshAgent agent) ? agent.radius + 0.25f : 0.8f;
+            markRing.transform.localScale = Vector3.one * radius / Mathf.Max(0.1f, transform.lossyScale.x);
+            markRing.AddComponent<MeshFilter>().sharedMesh = AttackTelegraph.BandFor(360f, 0.08f);
+            var renderer = markRing.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = material;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            var block = new MaterialPropertyBlock();
+            block.SetColor("_BaseColor", CombatFeelSettings.Current.HuntersMarkColor);
+            block.SetColor("_Color", CombatFeelSettings.Current.HuntersMarkColor);
+            renderer.SetPropertyBlock(block);
+        }
+        else if (!marked && markRing != null)
+        {
+            Destroy(markRing);
+            markRing = null;
+        }
+    }
 
     /// <summary>Raised when its raised shield takes a blow: the shield arm jolts.</summary>
     public event System.Action ShieldBlocked;
@@ -93,7 +144,7 @@ public sealed partial class MonsterAI
 
         bool reeling = IsReeling;
         bool weighty = GuardRules.FellsReeling(damage.Technique);
-        float hit = damage.Poise;
+        float hit = damage.Poise * MarkScale;
         bool broke = poise.Hit(hit, Time.time);
         if (!broke && reeling && weighty)
         {
@@ -330,6 +381,12 @@ public sealed partial class MonsterAI
 
     private void ClearAnswers()
     {
+        if (markRing != null)
+        {
+            Destroy(markRing);
+            markRing = null;
+        }
+
         if (furyBreath != null)
         {
             Destroy(furyBreath);

@@ -84,6 +84,16 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [Header("Ambush")]
     [Tooltip("Damage an unaware monster takes (a hit from the shadows). 1 = no bonus.")]
     [SerializeField, Min(1f)] private float ambushDamageTaken = 1.5f;
+    [Tooltip("Metres a blow that kills an unaware creature is heard (any other blow: Combat Noise). Equal to Combat Noise: no quieter.")]
+    [SerializeField, Min(0f)] private float ambushKillNoise = 13f;
+    [Tooltip("Share of its death cry a creature killed unaware lets out (1: all of it).")]
+    [SerializeField, Range(0f, 1f)] private float ambushDeathCry = 1f;
+    [Tooltip("A kill from the shadows makes the player stand out as fighting does (Fighting Visibility). Off: a clean kill leaves them hidden.")]
+    [SerializeField] private bool ambushKillFighting = true;
+    [Tooltip("A suspicious creature (a \"?\", not hunting anyone) struck from outside its sight cone is still caught unaware (Sekiro's rule).")]
+    [SerializeField] private bool ambushFromBehindWhenSuspicious;
+    [Tooltip("A creature that sees one of its side killed unaware within this many metres turns suspicious toward the body. 0: none do.")]
+    [SerializeField, Min(0f)] private float seesKillRange;
 
     [Header("Player visibility (1 = plainly visible)")]
     [SerializeField, Min(0f)] private float movingVisibility = 1f;
@@ -152,6 +162,25 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField] private SoundDefinition spottedSound;
     [Tooltip("Plays when a monster becomes suspicious of a noise or a glimpse. Empty: none.")]
     [SerializeField] private SoundDefinition suspiciousSound;
+
+    [Header("Presentation: reading stealth from above (Docs/RangedStealthResearch.md §3.1-3.2)")]
+    [Tooltip("Shows what is noticing the player before it is suspicious: a faint '?' filling over it, its sight cone on the ground, the " +
+             "player's sounds as rings, a dark ring while sneaking unseen, and an arrow at the screen's edge for one noticing from off screen.")]
+    [SerializeField] private bool showStealthReadout = true;
+    [Tooltip("The faint '?' over a creature still filling toward suspicious.")]
+    [SerializeField] private Color noticingColor = new Color(0.92f, 0.9f, 0.82f, 0.45f);
+    [Tooltip("The noticing creature's sight cone and close-sense ring on the ground.")]
+    [SerializeField] private Color coneColor = new Color(1f, 0.92f, 0.7f, 0.13f);
+    [Tooltip("The ring a sound of the player's spreads to (its real reach).")]
+    [SerializeField] private Color noiseRingColor = new Color(0.85f, 0.9f, 1f, 0.35f);
+    [Tooltip("Sounds under this many metres draw no ring (footsteps while sneaking).")]
+    [SerializeField, Min(0f)] private float noiseRingFrom = 2f;
+    [Tooltip("The ring at the player's feet while sneaking and noticed by nothing.")]
+    [SerializeField] private Color unseenColor = new Color(0.12f, 0.16f, 0.3f, 0.35f);
+    [Tooltip("The focus ring and the bow's outline on a creature that is still unaware: a blow now is an ambush.")]
+    [SerializeField] private Color ambushColor = new Color(1f, 0.86f, 0.45f, 1f);
+    [Tooltip("The focus ring on an unaware creature a Silent Takedown would finish.")]
+    [SerializeField] private Color takedownColor = new Color(1f, 0.97f, 0.92f, 1f);
 
     public float SuspiciousAt => suspiciousAt;
     public float NearNoticeSeconds => nearNoticeSeconds;
@@ -224,4 +253,17 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float SpottedShowSeconds => spottedShowSeconds;
     public SoundDefinition SpottedSound => spottedSound;
     public SoundDefinition SuspiciousSound => suspiciousSound;
+    public float AmbushKillNoise => ambushKillNoise;
+    public float AmbushDeathCry => ambushDeathCry;
+    public bool AmbushKillFighting => ambushKillFighting;
+    public bool AmbushFromBehindWhenSuspicious => ambushFromBehindWhenSuspicious;
+    public float SeesKillRange => seesKillRange;
+    public bool ShowStealthReadout => showStealthReadout;
+    public Color NoticingColor => noticingColor;
+    public Color ConeColor => coneColor;
+    public Color NoiseRingColor => noiseRingColor;
+    public float NoiseRingFrom => noiseRingFrom;
+    public Color UnseenColor => unseenColor;
+    public Color AmbushColor => ambushColor;
+    public Color TakedownColor => takedownColor;
 }

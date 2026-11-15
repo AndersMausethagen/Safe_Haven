@@ -120,11 +120,80 @@ public sealed partial class PlayerCombat
         passedThrough.Clear();
     }
 
+    /// <summary>Raised as a cast's bolts leave the hand: its attack, where from, and where aimed (co-op shows it to friends).</summary>
+    public event System.Action<AttackDefinition, Vector3, Vector3> CastLoosed;
+
+    private Damageable castTarget;
+    private int castTargetFrame = -1;
+    private static readonly RaycastHit[] CastSweep = new RaycastHit[16];
+
+    /// <summary>True through the wind-up of a cast (a staff's bolt or burst): it aims, and creatures read it as shooting.</summary>
+    public bool IsCasting => IsWindingUp && activeAttack != null && activeAttack.CastProjectile != null;
+
+    /// <summary>Where the swing in progress is aimed (flat).</summary>
+    public Vector3 ActiveDirection => activeDirection;
+
+    /// <summary>The creature a cast in its wind-up would strike first along its way, or null: outlined as a bow's target is.</summary>
+    public Damageable CastTarget
+    {
+        get
+        {
+            if (!IsCasting)
+            {
+                return null;
+            }
+
+            if (castTargetFrame != Time.frameCount)
+            {
+                castTargetFrame = Time.frameCount;
+                castTarget = null;
+                Vector3 from = transform.position + Vector3.up * 1.3f;
+                int count = Physics.SphereCastNonAlloc(from, Mathf.Max(0.3f, activeAttack.CastRadius * 2f), activeDirection, CastSweep,
+                    Mathf.Max(1f, activeAttack.CastRange), hitLayers, QueryTriggerInteraction.Ignore);
+                float nearest = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    Damageable body = CastSweep[i].collider.GetComponentInParent<Damageable>();
+                    if (body != null && body.IsAlive && body.Category == TargetCategory.Creature && combatant.Faction.WillAttack(body.Faction)
+                        && CastSweep[i].distance < nearest)
+                    {
+                        nearest = CastSweep[i].distance;
+                        castTarget = body;
+                    }
+                }
+            }
+
+            return castTarget;
+        }
+    }
+
+    /// <summary>
+    /// Whether the weapon's opening swing, struck now from the shadows, would be a Silent Takedown of <paramref name="body"/>: the perk's own
+    /// arithmetic, so the focus ring can say so before the blow (Docs/RangedStealthResearch.md §3.2).
+    /// </summary>
+    public bool WouldTakedown(Damageable body)
+    {
+        if (body == null || weapon == null || weapon.Combo.Count == 0 || weapon.Combo[0] == null || !Techniques.Has(PerkTechnique.SilentTakedown)
+            || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnawareOf(transform.position)
+            || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null || !body.TryGetComponent(out Combatant theirs))
+        {
+            return false;
+        }
+
+        AttackDefinition attack = weapon.Combo[0];
+        float outgoing = DamageCalculator.CalculateOutgoing(combatant.Stats, combatant.Rules, attack, weapon.Damage, body.Category, 1f, out _)
+            * Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage));
+        float blow = DamageCalculator.Mitigate(outgoing, attack.DamageType, StrikeKindExtensions.Of(combatant, attack), theirs.Stats, theirs.Rules)
+            * PerceptionSettings.Current.AmbushDamageTaken;
+        return StrikeRules.IsTakedown(body.CurrentHealth, blow, TechniqueSettings.Current.TakedownReach);
+    }
+
     // A staff's cast: its bolts fly from the hand as the blow would land (MonsterProjectile: straight, swept, stopped by scenery), striking
     // as the attack would at the weapon's damage; a fan when it casts several. Channel (staves): every cast earns Focus.
-    private void Cast()
+    private void Cast(float damageMultiplier, float poiseMultiplier)
     {
         AttackDefinition attack = activeAttack;
+        var volley = new CastVolley { Multiplier = damageMultiplier, Poise = poiseMultiplier, Technique = HitTechnique.Spell };
         var bolt = new MonsterAttack
         {
             attack = attack, damage = activeWeaponDamage, projectileSpeed = attack.CastSpeed, projectileRadius = attack.CastRadius,
@@ -139,7 +208,7 @@ public sealed partial class PlayerCombat
             GameObject flight = PrefabPool.Spawn(attack.CastProjectile, from, Quaternion.LookRotation(aim));
             if (flight.TryGetComponent(out MonsterProjectile projectile))
             {
-                projectile.Initialize(combatant, bolt, aim);
+                projectile.Initialize(combatant, bolt, aim, volley);
             }
             else
             {
@@ -153,6 +222,7 @@ public sealed partial class PlayerCombat
         }
 
         ArtMoved?.Invoke(ArtMotion.Throw, from, from + activeDirection * attack.CastRange);
+        CastLoosed?.Invoke(attack, from, activeDirection);
     }
 
     // Throw: the weapon in hand flies out and back (ThrownWeapon). False with nothing in the hand to throw, or one already out: the art

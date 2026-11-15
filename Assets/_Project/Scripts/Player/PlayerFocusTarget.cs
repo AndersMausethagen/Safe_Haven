@@ -196,6 +196,13 @@ public sealed class PlayerFocusTarget : MonoBehaviour
         }
 
         Color color = feel.FocusMarkerColor;
+        if (target.TryGetComponent(out MonsterAI quarry) && PlayerProficiencies.CaughtUnaware(target, transform.position))
+        {
+            // Docs/RangedStealthResearch.md §3.2: still unaware, a blow now is an ambush; brighter when it would finish it.
+            PerceptionSettings rules = PerceptionSettings.Current;
+            color = combat != null && combat.WouldTakedown(target) ? rules.TakedownColor : rules.AmbushColor;
+        }
+
         color.a *= HasFocus ? 1f : 0.35f;
         block.SetColor(TintId, color);
         float size = (markerRadius + MarkerMargin) * 2f;

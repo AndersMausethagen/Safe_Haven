@@ -7,6 +7,27 @@ phase C being built). This was read-only: no Unity, no CLI, no project edits apa
 **The question (the user):** "look at stealth and ranged combat, like archery and staff in this game. Use the same method you used to
 analyse combat; that one mainly focused on melee combat."
 
+## Status (2026-11-15): built
+
+The user: "Do all changes, great suggestions." Every recommendation (§3.1-3.11) was built the same day on `test`, checked by Edit Mode
+tests (`ArcheryTests` with a per-tier bow band, `PerceptionTests`, `MonsterBehaviorTests`, `CoopWireTests` at wire format 24) and
+Play probes (the noticing fill and cone, noise and unseen rings, an ambush kill heard 4 m and a watcher turning suspicious, Hunter's
+Mark's ring and ×1.5 poise, the staff's aim line, cast target and spell hits). Not played by hand.
+
+Choices made where the report left them open:
+- §3.5: Option B, a bow Draw Weight (Crude 1.5, Hunter's 0.95, Elderwood 1.25 with the Hunter's 0.85 s draw, Moonstrung 1.95,
+  Trollhorn 2.4), and the perfect release's extra multiplier set to 1 on every bow, so its reward is the sure critical. Full draws let go
+  late come to 47-55% of the tier's sword, all-perfect to 86-93% (the test holds 45-62% and 80-98%). No new arrows.
+- §3.6: Escape Shot costs 25 Focus on every bow; Hunter's Mark lasts 6 s at ×1.5 poise (Combat Technique Settings).
+- §3.8: the point-blank fan stays, but a body struck again by the same cast takes half (`CastVolley.RepeatShare`).
+- §3.4 and §3.7 are on in `PerceptionSettings`: Ambush Kill Noise 4 m, Ambush Death Cry 0.3, Ambush Kill Fighting off, Ambush From
+  Behind When Suspicious on, Sees Kill Range 9 m, Heard Awareness Far 0.2.
+- §3.10: `Concealment` (×0.5 visibility while sneaking) on the Misty Woods shrubs (Broadleaf, Forest Shrub A and B, Young Cedar Bushy).
+- §3.11: both bird profiles call a 14 m alarm when flushed.
+- §3.9: friends' sounds over 3 m (at most 5 a second), a Drawing flag in the look state, the noticing bytes, and visual-only arrows and
+  bolts for friends. The enemy answer to a friend's bow reads Drawing; the arrow side-step still answers only the local bow.
+- §3.1's "rim darkens" became a dark ring at the feet (no rim shader to darken).
+
 ## 0. Summary
 
 **The three biggest findings:**

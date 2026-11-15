@@ -96,7 +96,7 @@ public sealed partial class MonsterAI
             return;
         }
 
-        if (poise.Hit(amount, Time.time))
+        if (poise.Hit(amount * MarkScale, Time.time))
         {
             Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
         }
@@ -172,7 +172,7 @@ public sealed partial class MonsterAI
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
         // Before it reacts: a hit from the shadows is judged by how things stood when it landed.
-        LastHitAmbushed = damageable.DamageTakenMultiplier > 1f && IsUnaware;
+        LastHitAmbushed = damageable.DamageTakenMultiplier > 1f && IsUnawareOf(BlowOrigin(damage));
         // A raised shield taking a blow: the arm jolts and the body is shoved back a little.
         if (result.Blocked && ShieldArcNow > 0f && !IsWeaponGuarding)
         {
@@ -206,6 +206,7 @@ public sealed partial class MonsterAI
 
         // A friend's copy of the host's creature (co-op) keeps no poise of its own: the blow goes to the host's game, whose
         // creature's poise it wears down, and the stagger comes back from there for everyone.
+        NoteMark(damage);
         if (!IsRemote && poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed)
         {
             TakeBlowOnPoise(damage, result);
@@ -235,7 +236,9 @@ public sealed partial class MonsterAI
         bool atStructure = target is Damageable structure && structure != null && structure.Category == TargetCategory.Structure;
         if (!CanTarget(target) || (atStructure && definition.BreaksWalls))
         {
+            spottingByBlow = true;
             SetTarget(attackerTarget, null);
+            spottingByBlow = false;
         }
 
         if (target == attackerTarget)
@@ -252,6 +255,8 @@ public sealed partial class MonsterAI
         {
             return GuardOutcome.None;
         }
+
+        JudgeAmbushFrom(BlowOrigin(damage));
 
         if (Time.time < parryUntil)
         {
@@ -297,7 +302,9 @@ public sealed partial class MonsterAI
         if (!IsRemote)
         {
             float size = Mathf.Clamp(transform.lossyScale.y * (TryGetComponent(out CapsuleCollider body) ? body.height : 2f) / 2f, 0.5f, 3f);
-            WorldNoise.Emit(transform.position, PerceptionSettings.Current.DeathCryNoise * size);
+            // Killed unaware, it hardly cries out (Perception Settings › Ambush Death Cry).
+            float cry = LastHitAmbushed ? PerceptionSettings.Current.AmbushDeathCry : 1f;
+            WorldNoise.Emit(transform.position, PerceptionSettings.Current.DeathCryNoise * size * cry);
         }
     }
 }

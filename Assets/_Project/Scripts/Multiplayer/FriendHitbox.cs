@@ -19,6 +19,9 @@ public sealed class FriendHitbox : MonoBehaviour, IDamageable
     /// <summary>How easily they are seen, 0 to 1, as their own game's stealth says (sneaking, in cover, fighting).</summary>
     public float Visibility { get; set; } = 1f;
 
+    /// <summary>Drawing or aiming a bow, or winding up a cast, as their own game says: creatures answer it as shooting.</summary>
+    public bool IsDrawing { get; set; }
+
     private static readonly System.Collections.Generic.List<FriendHitbox> active = new System.Collections.Generic.List<FriendHitbox>();
 
     /// <summary>Friends' bodies standing in the host's game now.</summary>

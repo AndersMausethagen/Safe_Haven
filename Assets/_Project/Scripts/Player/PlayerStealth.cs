@@ -19,6 +19,24 @@ public sealed class PlayerStealth : MonoBehaviour
     /// <summary>True while the player sneaks (held, and not dodging).</summary>
     public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging);
 
+    private float cover = 1f;
+    private float coverReadAt = -1f;
+
+    /// <summary>How deep in cover the player stands (Concealment), as a visibility share: read a few times a second, as senses scan.</summary>
+    public float Cover
+    {
+        get
+        {
+            if (Time.time >= coverReadAt)
+            {
+                coverReadAt = Time.time + 0.2f;
+                cover = Concealment.ScaleAt(transform.position);
+            }
+
+            return cover;
+        }
+    }
+
     /// <summary>True while fighting, or shortly after a hit landed or was taken.</summary>
     public bool IsFighting => Time.time < fightingUntil;
 
@@ -37,7 +55,7 @@ public sealed class PlayerStealth : MonoBehaviour
             {
                 // The Sneaking skill: a beginner crouches badly, a master hardly shows.
                 float skill = combatant != null ? Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.SneakVisibility)) : 1f;
-                return rules.SneakingVisibility * skill;
+                return rules.SneakingVisibility * skill * Cover;
             }
 
             return movement.IsMoving ? rules.MovingVisibility : rules.StillVisibility;
@@ -49,6 +67,17 @@ public sealed class PlayerStealth : MonoBehaviour
 
     private void Awake()
     {
+        // Reading stealth from above (the local player's own: it checks it is theirs).
+        if (!TryGetComponent(out StealthReadout _))
+        {
+            gameObject.AddComponent<StealthReadout>();
+        }
+
+        if (!TryGetComponent(out CastAimLine _) && TryGetComponent(out PlayerCombat _))
+        {
+            gameObject.AddComponent<CastAimLine>();
+        }
+
         movement = GetComponent<PlayerMovement>();
         dodge = GetComponent<PlayerDodge>();
         health = GetComponent<Damageable>();
@@ -93,6 +122,13 @@ public sealed class PlayerStealth : MonoBehaviour
     {
         if (victim == health || (combatant != null && damage.Source == combatant))
         {
+            // A clean kill from the shadows can leave the player hidden (Perception Settings › Ambush Kill Fighting).
+            PlayerNoise sounds = GetComponent<PlayerNoise>();
+            if (!PerceptionSettings.Current.AmbushKillFighting && sounds != null && sounds.IsAmbushKill(victim, damage, result))
+            {
+                return;
+            }
+
             fightingUntil = Time.time + PerceptionSettings.Current.FightingSeconds;
         }
     }

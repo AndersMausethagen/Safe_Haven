@@ -66,6 +66,22 @@ Play-mode probes from the CLI and tests only: every number is a first guess. Pla
 - [ ] Mixamo clips were not used (no browser in the agent session), nor the optional two-hand or power-stance toggle: decide
       whether either is still wanted.
 
+## Ranged and stealth (2026-11-15)
+
+Everything in Docs/RangedStealthResearch.md was built (its Status section). Probes and tests only:
+- [ ] Sneaking up on a Draug, a troll and a wolf pack: does the faint "?" and the cone on the ground tell you when to stop? Too much on
+      screen, or too little? Are the noise rings and the dark "unseen" ring helpful or clutter?
+- [ ] Quiet kills (4 m, a faint cry, you stay hidden): can a careful player now take a camp apart one by one? Does a creature seeing its
+      neighbour fall feel fair?
+- [ ] The bow by tier (Draw Weight; the perfect release is now only a critical): does it feel worth carrying at tiers III-V, and is the
+      Hunter's Bow no longer the best weapon at tier II? Watch the Bow.Perfect / Bow.Shot rate in the Combat rows.
+- [ ] Escape Shot (dodge away at full draw, 25 Focus) and Hunter's Mark (a perfect release, ×1.5 poise for 6 s): used, and fun?
+- [ ] The staff's bolts as spells (multipliers, sure critical from hiding, Spell Damage, half on a second hit from one cast) and its aim
+      line: does the staff hold up now?
+- [ ] Hiding in shrubs and birds giving you away: noticeable in a raid? Grace on the "?" (a suspicious creature struck from behind is
+      still ambushed) and faint sounds only turning heads.
+- [ ] Co-op (two clients): a friend's footsteps draw a "?" on the host's creatures, friends see arrows and bolts and the noticing.
+
 ## Enemy identity and tells (2026-11-15)
 
 Phases A and B of Docs/EnemyCombatResearch.md (its Status section). Checked by probes and tests only. Fight a Draug, a Shieldbearer, a

@@ -25,6 +25,9 @@ MonoBehaviour:
   sightBlockers:
     serializedVersion: 2
     m_Bits: 1
+  provokedSeconds: 12
+  cutOffSeconds: 4
+  cutOffForgetSeconds: 10
   denseFog: 0.06
   sightInDenseFog: 0.55
   sightAtNight: 0.75
@@ -37,11 +40,16 @@ MonoBehaviour:
   idleGlanceSeconds: {x: 4, y: 9}
   idleGlanceAngle: 75
   spottedCallRadius: 10
-  heardAwarenessFar: 0.35
+  heardAwarenessFar: 0.2
   heardAwarenessNear: 0.9
   heardThroughCover: 0.6
   heardSpreadAtEdge: 6
   ambushDamageTaken: 1.5
+  ambushKillNoise: 4
+  ambushDeathCry: 0.3
+  ambushKillFighting: 0
+  ambushFromBehindWhenSuspicious: 1
+  seesKillRange: 9
   movingVisibility: 1
   stillVisibility: 0.75
   sneakingVisibility: 0.45
@@ -55,6 +63,8 @@ MonoBehaviour:
   combatNoise: 13
   combatNoiseInterval: 0.6
   swimNoise: 4
+  deathCryNoise: 9
+  gameStartleLevel: 0.35
   landingNoise: 6
   landingSpeed: 3
   heavyGearNoise: 1.4
@@ -75,3 +85,11 @@ MonoBehaviour:
   spottedShowSeconds: 1.4
   spottedSound: {fileID: 11400000, guid: 4cc9bc40fb223354aa6032cf0c7fb0f2, type: 2}
   suspiciousSound: {fileID: 11400000, guid: 7d8b9863f1ce89e4f8124447eb47e843, type: 2}
+  showStealthReadout: 1
+  noticingColor: {r: 0.92, g: 0.9, b: 0.82, a: 0.45}
+  coneColor: {r: 1, g: 0.92, b: 0.7, a: 0.13}
+  noiseRingColor: {r: 0.85, g: 0.9, b: 1, a: 0.35}
+  noiseRingFrom: 2
+  unseenColor: {r: 0.12, g: 0.16, b: 0.3, a: 0.35}
+  ambushColor: {r: 1, g: 0.86, b: 0.45, a: 1}
+  takedownColor: {r: 1, g: 0.97, b: 0.92, a: 1}

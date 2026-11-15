@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -104,6 +105,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        FollowOwnPlayer(null);
         all.Remove(this);
         look.OnValueChanged -= OnLookChanged;
         if (!IsOwner && announced)
@@ -146,10 +148,12 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
     private void UpdateOwn()
     {
         Player player = Player.Current;
+        FollowOwnPlayer(player);
         // Going down (or getting up) is told at once: friends need the "Help up" straight away.
         // Going down (or getting up) and starting or stopping to sneak are told at once; the rest twice a second.
         if (Time.unscaledTime >= nextLookCheck || look.Value.Downed != CoopDowned.IsDown
-            || Mathf.Abs(look.Value.Visibility - PlayerLookState.VisibilityByte(Player.Current)) > 40)
+            || Mathf.Abs(look.Value.Visibility - PlayerLookState.VisibilityByte(Player.Current)) > 40
+            || look.Value.Drawing != PlayerLookState.DrawingOf(Player.Current))
         {
             nextLookCheck = Time.unscaledTime + LookCheckInterval;
             PublishLook();
@@ -255,6 +259,128 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
     }
 
+    // ---- Ranged and stealth in co-op (Docs/RangedStealthResearch.md §3.9): the owner's sounds go to the host's creatures, which never heard
+    // a friend before; their arrows and bolts are drawn in the others' games (each game still judges its own blows).
+
+    // Sounds under this are left out (a sneaking step), and no more than this many a second go.
+    private const float SentNoiseFrom = 3f;
+    private const int NoisesPerSecond = 5;
+    private Player followed;
+    private float noiseWindowAt;
+    private int noisesInWindow;
+
+    private void FollowOwnPlayer(Player player)
+    {
+        if (followed == player)
+        {
+            return;
+        }
+
+        if (followed != null)
+        {
+            if (followed.Noise != null) followed.Noise.Made -= OnOwnNoise;
+            if (followed.TryGetComponent(out PlayerArchery oldBow)) oldBow.Shot -= OnOwnShot;
+            if (followed.TryGetComponent(out PlayerCombat oldCombat)) oldCombat.CastLoosed -= OnOwnCast;
+        }
+
+        followed = player;
+        if (followed != null)
+        {
+            if (followed.Noise != null) followed.Noise.Made += OnOwnNoise;
+            if (followed.TryGetComponent(out PlayerArchery bow)) bow.Shot += OnOwnShot;
+            if (followed.TryGetComponent(out PlayerCombat combat)) combat.CastLoosed += OnOwnCast;
+        }
+    }
+
+    private void OnOwnNoise(Vector3 position, float radius)
+    {
+        if (IsServer || radius < SentNoiseFrom)
+        {
+            return;
+        }
+
+        if (Time.unscaledTime >= noiseWindowAt)
+        {
+            noiseWindowAt = Time.unscaledTime + 1f;
+            noisesInWindow = 0;
+        }
+
+        if (++noisesInWindow <= NoisesPerSecond)
+        {
+            NoiseRpc(position, radius);
+        }
+    }
+
+    // In the host's game: a friend's sound, heard by the host's creatures if they stand in the same place.
+    [Rpc(SendTo.Server, Delivery = RpcDelivery.Unreliable)]
+    private void NoiseRpc(Vector3 position, float radius)
+    {
+        if (!IsOwner && look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopPlace.Key))
+        {
+            WorldNoise.Emit(position, radius);
+        }
+    }
+
+    private void OnOwnShot(ArrowShot shot)
+    {
+        if (shot.Arrow != null)
+        {
+            ShotRpc(shot.Origin, shot.Velocity, shot.Arrow.Id);
+        }
+    }
+
+    [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
+    private void ShotRpc(Vector3 origin, Vector3 velocity, FixedString64Bytes arrowId)
+    {
+        ItemDefinition arrowItem = HereToSee() ? Content()?.FindItem(arrowId.ToString()) : null;
+        if (arrowItem == null || arrowItem.Arrow == null || arrowItem.Arrow.Projectile == null)
+        {
+            return;
+        }
+
+        ArrowProjectile flight = PrefabPool.Spawn(arrowItem.Arrow.Projectile, origin, Quaternion.LookRotation(velocity.sqrMagnitude > 1e-4f ? velocity : Vector3.forward));
+        flight.Launch(null, null, arrowItem, 0f, velocity, visualOnly: true);
+    }
+
+    private void OnOwnCast(AttackDefinition attack, Vector3 from, Vector3 aim)
+    {
+        if (attack != null)
+        {
+            CastRpc(from, aim, attack.name);
+        }
+    }
+
+    // The staff it came from is the one their look says they hold.
+    [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
+    private void CastRpc(Vector3 from, Vector3 aim, FixedString64Bytes attackName)
+    {
+        ItemDefinition item = HereToSee() && look.Value.Held.Length > 0 ? Content()?.FindItem(look.Value.Held.ToString()) : null;
+        AttackDefinition attack = item != null && item.Weapon != null ? item.Weapon.FindAttack(attackName.ToString()) : null;
+        if (attack == null || attack.CastProjectile == null)
+        {
+            return;
+        }
+
+        var bolt = new MonsterAttack { attack = attack, projectileSpeed = attack.CastSpeed, projectileRadius = attack.CastRadius, maximumRange = attack.CastRange };
+        int count = Mathf.Max(1, attack.CastCount);
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 way = Quaternion.Euler(0f, (i - (count - 1) * 0.5f) * attack.CastSpread, 0f) * aim;
+            GameObject flight = PrefabPool.Spawn(attack.CastProjectile, from, Quaternion.LookRotation(way.sqrMagnitude > 1e-4f ? way : Vector3.forward));
+            if (flight.TryGetComponent(out MonsterProjectile projectile))
+            {
+                projectile.Initialize(null, bolt, way, null, visual: true);
+            }
+            else
+            {
+                PrefabPool.Release(flight);
+            }
+        }
+    }
+
+    // This friend stands where this game's player is, so what they loose can be seen.
+    private bool HereToSee() => look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopPlace.Key);
+
     [Rpc(SendTo.NotOwner, Delivery = RpcDelivery.Unreliable)]
     private void PoseRpc(PoseSnapshot pose)
     {
@@ -308,6 +434,7 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         {
             hitbox.IsDown = look.Value.Downed || fallen;
             hitbox.Visibility = look.Value.Visibility / 255f;
+            hitbox.IsDrawing = look.Value.Drawing;
         }
 
         double renderTime = NetworkManager.ServerTime.Time - settings.InterpolationDelay;

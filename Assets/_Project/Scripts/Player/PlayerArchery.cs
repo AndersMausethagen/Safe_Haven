@@ -87,6 +87,12 @@ public sealed class PlayerArchery : MonoBehaviour
     private Combatant combatant;
     private PlayerCombat combat;
     private PlayerDodge dodge;
+    private PlayerFocus focus;
+    // A dodge at least this far from the aim (the cosine between them) is "away": Escape Shot looses on it.
+    private const float EscapeShotAway = -0.3f;
+
+    /// <summary>Raised when a dodge away from the aim looses the drawn arrow (Escape Shot).</summary>
+    public event Action EscapeShot;
     private PlayerEating eating;
     private PlayerGathering gathering;
     private PlayerGuard guard;
@@ -168,6 +174,7 @@ public sealed class PlayerArchery : MonoBehaviour
         combatant = GetComponent<Combatant>();
         combat = GetComponent<PlayerCombat>();
         dodge = GetComponent<PlayerDodge>();
+        focus = GetComponent<PlayerFocus>();
         eating = GetComponent<PlayerEating>();
         gathering = GetComponent<PlayerGathering>();
         guard = GetComponent<PlayerGuard>();
@@ -440,7 +447,10 @@ public sealed class PlayerArchery : MonoBehaviour
             Techniques.Used(PerkTechnique.DeadlyDraw);
         }
         float damage = arrow.Damage * ArcheryRules.DamageShare(draw) * damageMultiplier * skill * deadly * PlayerRiding.MountedScale(gameObject);
-        HitTechnique technique = HitTechnique.Shot | (counter ? HitTechnique.Counter : HitTechnique.None);
+        // A bow's draw weight drives the arrow (Docs/RangedStealthResearch.md §3.5); Hunter's Mark marks what a perfect release strikes.
+        damage *= bow.DrawWeight;
+        HitTechnique technique = HitTechnique.Shot | (counter ? HitTechnique.Counter : HitTechnique.None)
+            | (perfect && bow.Signature == WeaponSignature.HuntersMark ? HitTechnique.Marking : HitTechnique.None);
         projectile.Launch(combatant, bow.ShotAttack, arrowItem, damage, direction * speed, technique, perfect, recoverable: true);
 
         movement.SnapFacing(direction);
@@ -737,7 +747,39 @@ public sealed class PlayerArchery : MonoBehaviour
         }
     }
 
-    private void OnDodged(Vector3 direction) => CancelDraw();
+    private void OnDodged(Vector3 direction)
+    {
+        if (!TryEscapeShot(direction))
+        {
+            CancelDraw();
+        }
+    }
+
+    // Escape Shot (the bow's art): a dodge away from the aim at full draw looses the arrow as the hop starts, perfect if the window was
+    // open, for the bow's Escape Shot Focus. Without the Focus, or the draw not full, the dodge drops the draw as it always did.
+    private bool TryEscapeShot(Vector3 direction)
+    {
+        WeaponDefinition bow = Bow;
+        if (bow == null || bow.EscapeShotFocus <= 0f || State != Phase.Drawing || Draw < 1f || focus == null)
+        {
+            return false;
+        }
+
+        Vector3 aim = AimPoint - transform.position;
+        aim.y = 0f;
+        direction.y = 0f;
+        if (aim.sqrMagnitude < 0.01f || direction.sqrMagnitude < 0.01f || Vector3.Dot(aim.normalized, direction.normalized) > EscapeShotAway
+            || !focus.TrySpend(bow.EscapeShotFocus))
+        {
+            return false;
+        }
+
+        float heldFor = Time.time - drawStartedAt;
+        bool perfect = IsPerfect(bow, heldFor);
+        Loose(bow, 1f, SpreadNow(bow), perfect ? bow.PerfectReleaseDamage : 1f, perfect, false);
+        EscapeShot?.Invoke();
+        return true;
+    }
 
     private void OnFlinched(float seconds, bool lostSwing) => CancelDraw();
 

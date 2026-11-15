@@ -102,6 +102,11 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float perfectReleaseSeconds = 0.2f;
     [Tooltip("Damage multiplier of a perfect release, on top of the critical hit.")]
     [SerializeField, Range(1f, 3f)] private float perfectReleaseDamage = 1.25f;
+    [Tooltip("Multiplies the arrow's damage: a stronger bow drives the same arrow harder, so bows grow with the tiers as blades do. 1: the arrow as it is.")]
+    [SerializeField, Min(0.1f)] private float drawWeight = 1f;
+    [Tooltip("Escape Shot, the bow's art: Focus it costs to loose a full draw as the player dodges away from the aim (perfect if the window " +
+             "was open), instead of the dodge dropping the draw. 0: no Escape Shot.")]
+    [SerializeField, Min(0f)] private float escapeShotFocus;
     [Tooltip("Spread while aiming (holding guard) as a share of normal.")]
     [SerializeField, Range(0.1f, 1f)] private float aimSpread = 0.5f;
     [Tooltip("Share of a normal shot's damage the instant shot after a perfect dodge deals.")]
@@ -134,6 +139,8 @@ public sealed class WeaponDefinition : ScriptableObject
     public float DrawMoveSpeed => drawMoveSpeed;
     public float PerfectReleaseSeconds => perfectReleaseSeconds;
     public float PerfectReleaseDamage => perfectReleaseDamage;
+    public float DrawWeight => drawWeight;
+    public float EscapeShotFocus => escapeShotFocus;
     public float AimSpread => aimSpread;
     public float CounterShotDamage => counterShotDamage;
     public AttackDefinition ShotAttack => shotAttack;
@@ -200,6 +207,32 @@ public sealed class WeaponDefinition : ScriptableObject
 
     public IReadOnlyList<AttackDefinition> Combo => combo;
 
+    /// <summary>The weapon's attack named <paramref name="attackName"/> (its chain, heavy, arts and context attacks), or null. Co-op uses it to
+    /// draw a friend's cast.</summary>
+    public AttackDefinition FindAttack(string attackName)
+    {
+        foreach (System.Reflection.FieldInfo field in typeof(WeaponDefinition).GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic))
+        {
+            if (field.GetValue(this) is AttackDefinition one && one != null && one.name == attackName)
+            {
+                return one;
+            }
+
+            if (field.GetValue(this) is IEnumerable<AttackDefinition> many)
+            {
+                foreach (AttackDefinition attack in many)
+                {
+                    if (attack != null && attack.name == attackName)
+                    {
+                        return attack;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>Sets the weapon art (editor setup and tests).</summary>
     public void ConfigureArt(AttackDefinition art, float focus)
     {
@@ -234,4 +267,7 @@ public enum WeaponSignature
     Flurry,
     /// <summary>Staves: every cast earns Focus (Power times a landed hit's), so a caster keeps skills and arts coming.</summary>
     Channel,
+    /// <summary>Bows: a perfect release marks the creature for a while; it takes Power times the poise from every blow, the archer's or
+    /// a friend's, so a stagger comes sooner (damage unchanged).</summary>
+    HuntersMark,
 }

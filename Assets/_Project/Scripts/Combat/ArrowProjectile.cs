@@ -153,9 +153,13 @@ public sealed class ArrowProjectile : MonoBehaviour
 
     /// <summary>Starts a flight from where the copy stands. <paramref name="arrowItem"/>'s Arrow sets the drop, burning and
     /// recovery; <paramref name="forceCritical"/> makes the hit critical (a perfect release).</summary>
+    private bool visualOnly;
+
     public void Launch(Combatant source, AttackDefinition shot, ItemDefinition arrowItem, float shotDamage, Vector3 launchVelocity,
-        HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false, bool recoverable = false)
+        HitTechnique hitTechnique = HitTechnique.None, bool forceCritical = false, bool recoverable = false, bool visualOnly = false)
     {
+        // Co-op: a friend's arrow, drawn here as it flies; it strikes and sounds nothing (their game judges the shot).
+        this.visualOnly = visualOnly;
         restScale = restScale != Vector3.zero ? restScale : transform.localScale;
         owner = source;
         attack = shot;
@@ -196,7 +200,7 @@ public sealed class ArrowProjectile : MonoBehaviour
             return;
         }
 
-        if (owner == null || Time.time >= flightEnds)
+        if ((owner == null && !visualOnly) || Time.time >= flightEnds)
         {
             ReturnToPool();
             return;
@@ -230,7 +234,7 @@ public sealed class ArrowProjectile : MonoBehaviour
 
             // A friend in the way doesn't stop it: an arrow that vanished on a companion's back was a shot wasted for nothing.
             if (owner != null && hits[i].collider.GetComponentInParent<Damageable>() is Damageable body && body.IsAlive
-                && body.Category == TargetCategory.Creature && !owner.Faction.WillAttack(body.Faction))
+                && body.Category == TargetCategory.Creature && owner != null && !owner.Faction.WillAttack(body.Faction))
             {
                 continue;
             }
@@ -262,7 +266,8 @@ public sealed class ArrowProjectile : MonoBehaviour
             bodyPart = struckBody ? NearestBodyPart(victim, hit.point) : null;
 
             // A perfect release, or a sneak attack (always a critical, as with a blade).
-            bool sure = critical || PlayerProficiencies.CaughtUnaware(victim);
+            Vector3 shotFrom = hit.point - direction * 2f;
+            bool sure = critical || PlayerProficiencies.CaughtUnaware(victim, shotFrom);
             DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, sure ? DamageCalculator.SureCrit : Random.value);
             if (technique != HitTechnique.None || sure)
             {
@@ -270,7 +275,7 @@ public sealed class ArrowProjectile : MonoBehaviour
             }
 
             info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point)
-                * PlayerProficiencies.AmbushScale(owner.Stats, victim));
+                * PlayerProficiencies.AmbushScale(owner.Stats, victim, shotFrom));
 
             DamageResult result = victim.ApplyDamage(info);
             owner.ReportDamageDealt(victim, info, result);
@@ -288,7 +293,10 @@ public sealed class ArrowProjectile : MonoBehaviour
                 AudioManager.Play(arrow.HitSound, hit.point);
             }
 
-            WorldNoise.Emit(hit.point, arrow.ImpactNoise);
+            if (!visualOnly)
+            {
+                WorldNoise.Emit(hit.point, arrow.ImpactNoise);
+            }
         }
 
         // In a body it goes where that part goes, into the corpse too, for a while.

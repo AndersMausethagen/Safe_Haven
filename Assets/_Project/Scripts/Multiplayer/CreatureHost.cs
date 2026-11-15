@@ -18,9 +18,9 @@ public sealed class CreatureHost
     /// <summary>Metres beyond which a creature's pose goes three times a second instead of ten (unless its state changes).</summary>
     private const float NearReach = 40f;
 
-    /// <summary>Poses per unreliable message (20 bytes each), under the transport's single-packet limit (the same total as 54 of
-    /// the old 19-byte poses).</summary>
-    private const int PosesPerMessage = 51;
+    /// <summary>Poses per unreliable message (22 bytes each), under the transport's single-packet limit (no more than 54 of the old
+    /// 19-byte poses).</summary>
+    private const int PosesPerMessage = 46;
 
     /// <summary>Seconds after which a creature's pose is sent again even when nothing changed, in case one was lost.</summary>
     private const float KeyframeSeconds = 1f;
@@ -52,6 +52,9 @@ public sealed class CreatureHost
         // Whom it is after (RemoteHunt) in the low bits; WaitingFlag set while it waits its turn.
         public byte Hunting;
         public byte Poise;
+        // How full its awareness is, and whom it is noticing (RemoteHunt, for that friend): their stealth readout.
+        public byte Notice;
+        public byte Noticing;
         public float At;
     }
 
@@ -63,6 +66,9 @@ public sealed class CreatureHost
 
     /// <summary>Set in a pose's hunting byte while the creature's weapon guard is up.</summary>
     public const byte GuardingFlag = 0x20;
+
+    /// <summary>Set in a pose's hunting byte while the creature is marked (Hunter's Mark).</summary>
+    public const byte MarkedFlag = 0x10;
 
     /// <summary>The hunting byte's low bits: whom it is after (MonsterAI.RemoteHunt).</summary>
     public const byte HuntMask = 0x03;
@@ -328,7 +334,8 @@ public sealed class CreatureHost
             SentPose pose = PoseOf(hosted, now, clientId);
             bool seen = last.TryGetValue(id, out SentPose was);
             bool changed = !seen || (was.Position - pose.Position).sqrMagnitude > 0.0009f || was.Yaw != pose.Yaw || was.State != pose.State
-                || was.Health != pose.Health || was.Speed != pose.Speed || was.Hunting != pose.Hunting || was.Poise != pose.Poise;
+                || was.Health != pose.Health || was.Speed != pose.Speed || was.Hunting != pose.Hunting || was.Poise != pose.Poise
+                || was.Notice != pose.Notice || was.Noticing != pose.Noticing;
             bool due = !seen || now - was.At >= KeyframeSeconds;
             bool far = distance > NearReach * NearReach;
             if ((!changed && !due) || (far && !due && seen && was.State == pose.State && ticks % 3 != 0))
@@ -343,7 +350,7 @@ public sealed class CreatureHost
         for (int from = 0; from < outgoing.Count; from += PosesPerMessage)
         {
             int count = Mathf.Min(PosesPerMessage, outgoing.Count - from);
-            using var poses = new FastBufferWriter(16 + count * 20, Allocator.Temp);
+            using var poses = new FastBufferWriter(16 + count * 22, Allocator.Temp);
             poses.WriteValueSafe(link.Now);
             poses.WriteValueSafe((ushort)count);
             for (int i = from; i < from + count; i++)
@@ -357,6 +364,8 @@ public sealed class CreatureHost
                 poses.WriteValueSafe(pose.Health);
                 poses.WriteValueSafe(pose.Hunting);
                 poses.WriteValueSafe(pose.Poise);
+                poses.WriteValueSafe(pose.Notice);
+                poses.WriteValueSafe(pose.Noticing);
             }
 
             link.Send(CoopCreatures.PosesMessage, clientId, poses, NetworkDelivery.UnreliableSequenced);
@@ -373,10 +382,25 @@ public sealed class CreatureHost
         State = (byte)hosted.Ai.CurrentState,
         Health = HealthByte(hosted),
         Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)
-            | (hosted.Ai.IsStaggered && hosted.Ai.IsFelled ? FelledFlag : 0) | (hosted.Ai.IsWeaponGuarding ? GuardingFlag : 0)),
+            | (hosted.Ai.IsStaggered && hosted.Ai.IsFelled ? FelledFlag : 0) | (hosted.Ai.IsWeaponGuarding ? GuardingFlag : 0)
+            | (hosted.Ai.IsMarked ? MarkedFlag : 0)),
         Poise = PoiseByte(hosted.Ai),
+        Notice = (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.Round(hosted.Ai.AwarenessLevel * PoiseSteps) / PoiseSteps * 255f), 0, 255),
+        Noticing = (byte)NoticingFor(hosted.Ai, friend),
         At = now,
     };
+
+    // Whom it is noticing, for that friend: them (their body here), someone else on the players' side, or nobody.
+    private static MonsterAI.RemoteHunt NoticingFor(MonsterAI creature, ulong friend)
+    {
+        IDamageable noticed = creature.Noticing;
+        if (noticed is FriendHitbox body && body != null)
+        {
+            return body.ClientId == friend ? MonsterAI.RemoteHunt.You : MonsterAI.RemoteHunt.Friend;
+        }
+
+        return noticed is Component other && other != null && Player.IsPlayer(other.gameObject) ? MonsterAI.RemoteHunt.Friend : MonsterAI.RemoteHunt.None;
+    }
 
     private static byte PoiseByte(MonsterAI creature)
     {
@@ -603,7 +627,9 @@ public sealed class CreatureHost
         // carries the host's name. Every other is the friend's alone: named as the host's, each showed in the host's game as
         // a blow of their own (its hit feedback, their stealth and their relics all listen for those).
         Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, amount, (DamageType)type) ? Player.Current.Combatant : null;
-        // Judged already: the friend's game put the blow to its copy's guard (a shield, as it faced there) before sending it.
+        // Judged already: the friend's game put the blow to its copy's guard (a shield, as it faced there) before sending it. Whether it
+        // was caught unaware is this game's to say, from where the blow came.
+        hosted.Ai.JudgeAmbushFrom(point - direction * 2f);
         hosted.Health.ApplyJudged(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique));
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {

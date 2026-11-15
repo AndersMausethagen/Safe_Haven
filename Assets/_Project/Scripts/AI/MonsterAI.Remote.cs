@@ -141,9 +141,18 @@ public sealed partial class MonsterAI
     /// <param name="felled">The host's creature is down from a felling blow (a longer stagger, lying and getting up).</param>
     /// <param name="guarding">The host's creature has its weapon raised (light blows from the front are turned aside here too).</param>
     public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None,
-        float poiseShare = 1f, bool waiting = false, bool felled = false, bool guarding = false)
+        float poiseShare = 1f, bool waiting = false, bool felled = false, bool guarding = false, float noticeLevel = 0f, RemoteHunt noticing = RemoteHunt.None,
+        bool marked = false)
     {
+        remoteMarked = marked;
         remoteHunt = hunting;
+        remoteNoticeLevel = noticeLevel;
+        remoteNoticing = noticing;
+        if (noticing == RemoteHunt.You && noticeLevel > 0f)
+        {
+            EnsureIndicator();
+        }
+
         remoteWaiting = waiting;
         remoteGuarding = guarding;
         poise?.Show(poiseShare);

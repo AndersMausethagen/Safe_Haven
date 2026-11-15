@@ -240,11 +240,20 @@ A bow is held in the left hand and shoots arrows from the bag. It trades the mel
 - **The arrow decides the damage.** The Crude Stone Arrow does 14 before the player's power and the target's armor; the
   bow's Bow Shot attack sets the type, power scaling, crit and poise. Arrows fall on an arc: the bow aims high enough to
   land on the target, so the arc only shows on long shots.
-- **The target in sight is outlined red.** The hostile monster nearest the cursor (within 1.5 m of its spot) or the
-  crosshair (within 5°), in the bow's line of sight and in range (45 m), glows red; that is where the arrow flies.
+- **The target in sight is outlined red** (pale gold while it is still unaware: a shot now is an ambush). The hostile monster nearest
+  the cursor (within 2.5 m of its spot) or the crosshair (within 9°), in the bow's line of sight and in range (45 m), glows; that is where
+  the arrow flies.
   Without one, top-down arrows fly level at chest height toward the cursor.
 - **Perfect release.** The bow's leather creaks and glints as the draw fills, and the draw bar above the action bar turns gold: let go within
-  0.2 s and the shot is critical, flies true and hits 25% harder, with a beat of weight as it goes and a gold trail behind it.
+  0.2 s and the shot is a sure critical (×1.5 with the base critical damage) and flies true, with a beat of weight as it goes and a gold
+  trail behind it. (Before 2026-11-15 it also hit 25-55% harder; the critical is now the whole reward.)
+- **Bows grow with the tiers** (2026-11-15, Docs/RangedStealthResearch.md): each bow's Draw Weight multiplies the arrow (Crude 1.5,
+  Hunter's 0.95, Elderwood 1.25 and as quick to draw as the Hunter's, Moonstrung 1.95, Trollhorn 2.4). Full draws let go late deal about
+  half the tier's sword a second, every release perfect about nine tenths (`ArcheryTests.Bows_GrowWithTheTiersBelowTheSword`).
+- **Escape Shot, the bow's art:** dodge away from the aim at full draw and, for 25 Focus, the arrow is loosed as you go (perfect if the
+  window was open). Without the Focus the dodge drops the draw, as before.
+- **Hunter's Mark, the bow's signature:** a perfect release marks what it strikes for 6 s (a thin green ring); every blow on it, yours or a
+  friend's, wears ×1.5 poise, so it reels and staggers sooner. Damage is unchanged.
 - **Feel.** Arrows leave a trail, which is what shows a shot from the high camera. A loosed bow kicks the camera by the strength of its draw.
   An arrow stays where it struck a body for 12 s, going where that part goes, into the corpse too. A hit earns Focus as a swing does (a critical
   twice as much), so archers can pay for skills. Drawing out of a dodge starts 35% of the way to full: roll, then shoot.
@@ -276,6 +285,9 @@ A two-handed staff that casts instead of striking (GDD §10.4, "magic and contro
   again a landed hit's Focus, so a caster keeps skills and arts coming.
 - **Pace.** From range it deals 1.22 times its damage a second, against a sword's 1.6 up close: range is what it trades for.
 - **Its look:** its own low-poly model (about 540 triangles, flat colours like the other gear; `Tools/Blender/runic_staff.py`), carried upright in one hand like a walking staff, and its own icon. Its bolt and burst casts lead with the stone end at the hand; whether that reads well is for a playtest.
+- **Bolts are spells** (2026-11-15): a cast takes the swing's multiplier (rhythm, a charge), a sneak attack's sure critical, Ambush
+  Damage and Runecraft's Spell Damage, and trains Runecraft. A body struck again by the same cast takes half, so the held fan point-blank
+  is strong without tripling. Through a cast's wind-up a line shows where the bolt will fly and its target is outlined.
 
 ## Readable animation
 

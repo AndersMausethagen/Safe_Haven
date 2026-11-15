@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1796bb8140ce3dc4c94ca925f12461c5, type: 3}
   m_Name: Birds - Haven
   m_EditorClassIdentifier: SafeHaven::BirdProfile
+  flushNoise: 24
+  flushFlocks: 2
+  alarmRadius: 14
+  flushHeight: 9
   colours:
   - {r: 0.62, g: 0.47, b: 0.32, a: 1}
   - {r: 0.78, g: 0.66, b: 0.3, a: 1}

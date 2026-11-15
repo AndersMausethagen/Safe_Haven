@@ -41,6 +41,9 @@ public sealed class MonsterSenses
     /// <summary>True when the last <see cref="Look"/> saw something it is suspicious of.</summary>
     public bool IsSeeingSomething { get; private set; }
 
+    /// <summary>What the last <see cref="Look"/> was noticing most (its awareness filling toward it), or null.</summary>
+    public IDamageable Noticing { get; private set; }
+
     /// <summary>The target it spotted on the <see cref="Look"/> that returned true.</summary>
     public IDamageable Spotted { get; private set; }
     public Collider SpottedCollider { get; private set; }
@@ -102,6 +105,7 @@ public sealed class MonsterSenses
         }
 
         IsSeeingSomething = best != null;
+        Noticing = best;
         if (best == null)
         {
             Awareness.Decay(rules.DecayPerSecond * elapsed);

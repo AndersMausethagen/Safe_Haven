@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4930556036414568155}
   - component: {fileID: 5195227919021032744}
   - component: {fileID: 8280454864519112315}
+  - component: {fileID: 5399980959507075438}
   m_Layer: 0
   m_Name: Broadleaf Shrub
   m_TagString: Untagged
@@ -91,6 +92,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::TreeLeafLook
   leafFall: {fileID: 4074184185658077091, guid: 856a1b1c93d65ad40a783739691d716a, type: 3}
   colour: {r: 0.20840845, g: 0.22913966, b: 0.13141336, a: 1}
+--- !u!114 &5399980959507075438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259393855304652138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f8c77f989e2e724f976e7e7bdf55dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::Concealment
+  visibilityScale: 0.5
+  radius: 0
 --- !u!1 &3163679131466890459
 GameObject:
   m_ObjectHideFlags: 0

@@ -51,7 +51,21 @@ public sealed partial class MonsterAI
         {
             BeginInvestigate(false);
         }
+        else if (CurrentState == State.Idle)
+        {
+            // Too faint for a "?": it only turns its head that way a while (Dishonored's harmless sounds).
+            Vector3 toward = position - transform.position;
+            toward.y = 0f;
+            if (toward.sqrMagnitude > 0.01f)
+            {
+                glanceHeading = toward.normalized;
+                nextGlanceAt = Time.time + FaintSoundLookSeconds;
+            }
+        }
     }
+
+    // How long a sound too faint to make it suspicious holds its gaze.
+    private const float FaintSoundLookSeconds = 2.5f;
 
     /// <summary>Sends it to look at a position as if it had heard something loud there (an angry forest).</summary>
     public void Investigate(Vector3 position)

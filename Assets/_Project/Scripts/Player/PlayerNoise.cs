@@ -89,8 +89,14 @@ public sealed class PlayerNoise : MonoBehaviour
     {
         PerceptionSettings rules = PerceptionSettings.Current;
         float muted = radius * Reach * PerceptionRules.RainNoiseScale(AtmosphereConditions.WeatherRain, rules);
-        WorldNoise.Emit(position, meter.Add(muted, rules));
+        float heard = meter.Add(muted, rules);
+        WorldNoise.Emit(position, heard);
+        Made?.Invoke(position, heard);
     }
+
+    /// <summary>Raised for every sound the player makes, with where and how far it carries (after rain and build-up): the rings on the
+    /// ground (StealthReadout), and co-op sending it to the host's creatures.</summary>
+    public event System.Action<Vector3, float> Made;
 
     private void Update()
     {
@@ -154,6 +160,11 @@ public sealed class PlayerNoise : MonoBehaviour
 
         PerceptionSettings rules = PerceptionSettings.Current;
         nextCombatNoiseAt = Time.time + rules.CombatNoiseInterval;
-        Make(victim.transform.position, rules.CombatNoise);
+        Make(victim.transform.position, IsAmbushKill(victim, damage, result) ? rules.AmbushKillNoise : rules.CombatNoise);
     }
+
+    /// <summary>A blow of the player's that killed a creature caught unaware (each creature knows, after the blow).</summary>
+    public bool IsAmbushKill(Damageable victim, in DamageInfo damage, DamageResult result) =>
+        result.Killed && combatant != null && damage.Source == combatant && victim != null
+        && victim.TryGetComponent(out MonsterAI monster) && monster.LastHitAmbushed;
 }

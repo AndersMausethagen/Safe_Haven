@@ -12,6 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1796bb8140ce3dc4c94ca925f12461c5, type: 3}
   m_Name: Birds - Misty Woods
   m_EditorClassIdentifier: SafeHaven::BirdProfile
+  flushNoise: 24
+  flushFlocks: 2
+  alarmRadius: 14
+  flushHeight: 9
   colours:
   - {r: 0.075, g: 0.075, b: 0.09, a: 1}
   - {r: 0.1, g: 0.095, b: 0.11, a: 1}

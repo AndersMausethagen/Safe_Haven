@@ -20,6 +20,9 @@ public sealed class CoopWireTests
         [21] = "c8d2be2d283c800d221e1ecebbb69670",
         // 22 (horses, CoopHorses) went out without one; 23 adds the Haven's decisions (CoopDecisions).
         [23] = "54295e6eb7f1a2795b8bbf713d654006",
+        // 2026-11-15: creature poses carry poise, waiting, felled, guarding, marked and noticing (22 bytes); look state carries Drawing;
+        // friends' noise, shots and casts as RPCs.
+        [24] = "b11aa4e41e43882d9564f37168585240",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

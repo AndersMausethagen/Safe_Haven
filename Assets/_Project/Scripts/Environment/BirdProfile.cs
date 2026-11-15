@@ -12,6 +12,8 @@ public sealed class BirdProfile : ScriptableObject
     [SerializeField, Min(1f)] private float flushNoise = 24f;
     [Tooltip("How many flocks go up. 0: this place's birds are never in the trees.")]
     [SerializeField, Range(0, 4)] private int flushFlocks = 2;
+    [Tooltip("A flock that goes up calls an alarm creatures hear this far (metres), as crows give a hunter away. 0: birds tell no one.")]
+    [SerializeField, Min(0f)] private float alarmRadius;
     [Tooltip("How high in the trees they start, in metres.")]
     [SerializeField, Min(1f)] private float flushHeight = 9f;
 
@@ -73,6 +75,7 @@ public sealed class BirdProfile : ScriptableObject
 
     /// <summary>Whether a noise of this radius is loud enough to flush the birds out of the trees.</summary>
     public bool FlushedBy(float noiseRadius) => flushFlocks > 0 && noiseRadius >= flushNoise;
+    public float AlarmRadius => alarmRadius;
 
     public int FlushFlocks => flushFlocks;
     public float FlushHeight => flushHeight;

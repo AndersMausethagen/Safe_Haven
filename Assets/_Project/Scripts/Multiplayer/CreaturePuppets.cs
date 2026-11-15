@@ -306,11 +306,14 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             reader.ReadValueSafe(out byte health);
             reader.ReadValueSafe(out byte hunting);
             reader.ReadValueSafe(out byte poise);
+            reader.ReadValueSafe(out byte notice);
+            reader.ReadValueSafe(out byte noticing);
             if (byId.TryGetValue(id, out Puppet puppet) && puppet.Ai != null)
             {
                 puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state,
                     (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
-                    (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0);
+                    (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0, notice / 255f, (MonsterAI.RemoteHunt)noticing,
+                    (hunting & CreatureHost.MarkedFlag) != 0);
                 if (puppet.Health != null)
                 {
                     puppet.Health.ShowShare(health / 255f);

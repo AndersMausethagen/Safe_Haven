@@ -131,11 +131,23 @@ public sealed class PlayerProficiencies : MonoBehaviour
     public static bool CaughtUnaware(IDamageable target) =>
         target is Component body && body != null && body.TryGetComponent(out MonsterAI monster) && monster.IsUnaware;
 
+    /// <summary>Caught unaware by a blow from <paramref name="from"/>: unaware, or (Perception Settings › Ambush From Behind When
+    /// Suspicious) suspicious and struck from outside its sight cone.</summary>
+    public static bool CaughtUnaware(IDamageable target, Vector3 from) =>
+        target is Component body && body != null && body.TryGetComponent(out MonsterAI monster) && monster.IsUnawareOf(from);
+
     /// <summary>Extra damage from the attacker's Ambush Damage when the target is an unaware monster; 1 otherwise.</summary>
     public static float AmbushScale(StatSheet attacker, IDamageable target)
     {
         float bonus = attacker.Get(StatType.AmbushDamage);
         return bonus > 0f && target is Component body && body.TryGetComponent(out MonsterAI monster) && monster.IsUnaware ? 1f + bonus : 1f;
+    }
+
+    /// <summary>As <see cref="AmbushScale(StatSheet, IDamageable)"/>, judged from where the blow comes from.</summary>
+    public static float AmbushScale(StatSheet attacker, IDamageable target, Vector3 from)
+    {
+        float bonus = attacker != null ? attacker.Get(StatType.AmbushDamage) : 0f;
+        return bonus > 0f && target is Component body && body.TryGetComponent(out MonsterAI monster) && monster.IsUnawareOf(from) ? 1f + bonus : 1f;
     }
 
     // Levels and perks, folded into one number: a change in either means the modifiers must be made again.

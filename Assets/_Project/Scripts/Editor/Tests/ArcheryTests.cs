@@ -7,6 +7,42 @@ using UnityEngine;
 public sealed class ArcheryTests
 {
     private const string Items = "Assets/_Project/Data/Items/";
+    private const string Weapons = "Assets/_Project/Data/Combat/Weapons/";
+    private const string Arrows = "Assets/_Project/Data/Combat/Arrows/";
+
+    // Each tier's bow with its best arrow against the tier's sword (damage x 1.6, the melee ratio per second): full draws let go late near
+    // half the sword, every release perfect near nine tenths (Docs/RangedStealthResearch.md §3.5). The bow trades pace for range.
+    [TestCase("CrudeWoodenBow", "CrudeStoneArrow", "WornSword")]
+    [TestCase("HuntersBow", "BodkinArrow", "CopperSword")]
+    [TestCase("ElderwoodLongbow", "BodkinArrow", "IronSword")]
+    [TestCase("MoonstrungBow", "BodkinArrow", "MoonsilverBlade")]
+    [TestCase("TrollhornBow", "BodkinArrow", "TrollstoneBlade")]
+    public void Bows_GrowWithTheTiersBelowTheSword(string bowName, string arrowName, string swordName)
+    {
+        var bow = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(Weapons + bowName + ".asset");
+        var arrow = AssetDatabase.LoadAssetAtPath<ArrowDefinition>(Arrows + arrowName + ".asset");
+        var sword = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(Weapons + swordName + ".asset");
+        Assert.IsNotNull(bow, bowName);
+        Assert.IsNotNull(arrow, arrowName);
+        Assert.IsNotNull(sword, swordName);
+        float swordPerSecond = sword.Damage * 1.6f;
+        float late = ArcheryRules.DamagePerSecond(arrow.Damage, bow.DrawWeight, bow.DrawSeconds, bow.ReloadSeconds, bow.PerfectReleaseDamage, 1.5f, false) / swordPerSecond;
+        float perfect = ArcheryRules.DamagePerSecond(arrow.Damage, bow.DrawWeight, bow.DrawSeconds, bow.ReloadSeconds, bow.PerfectReleaseDamage, 1.5f, true) / swordPerSecond;
+        Assert.That(late, Is.InRange(0.45f, 0.62f), $"{bowName}: full draws let go late at {late:P0} of the {swordName}");
+        Assert.That(perfect, Is.InRange(0.8f, 0.98f), $"{bowName}: every release perfect at {perfect:P0} of the {swordName}");
+    }
+
+    [Test]
+    public void Bows_DrawNoSlowerAsTheyGetBetter()
+    {
+        string[] order = { "CrudeWoodenBow", "HuntersBow", "ElderwoodLongbow", "MoonstrungBow", "TrollhornBow" };
+        for (int i = 1; i < order.Length; i++)
+        {
+            var before = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(Weapons + order[i - 1] + ".asset");
+            var after = AssetDatabase.LoadAssetAtPath<WeaponDefinition>(Weapons + order[i] + ".asset");
+            Assert.That(after.DrawSeconds + after.ReloadSeconds, Is.LessThanOrEqualTo(before.DrawSeconds + before.ReloadSeconds + 0.06f), $"{order[i]} after {order[i - 1]}");
+        }
+    }
 
     [Test]
     public void ALongerDrawFliesFasterHitsHarderAndStraysLess()

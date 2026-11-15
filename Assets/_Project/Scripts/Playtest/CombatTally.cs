@@ -14,12 +14,18 @@ public sealed class CombatTally
     public const string Landed = "Landed", Whiffed = "Whiffed", Parry = "Parry", Block = "Block", GuardBroken = "GuardBroken";
     public const string Dodge = "Dodge", PerfectDodge = "PerfectDodge", Flinch = "Flinch", LostSwing = "LostSwing", Counter = "Counter";
     public const string Backstab = "Backstab", Finisher = "FinishingBlow", Interrupt = "Interrupt", Hurt = "Hurt";
+    // Ranged and stealth (Docs/RangedStealthResearch.md §3.3): the perfect-release rate decides where the bow stands against a sword.
+    public const string BowShot = "Bow.Shot", BowPerfect = "Bow.Perfect", BowCounter = "Bow.Counter", BowHit = "Bow.Hit";
+    public const string StaffCast = "Staff.Cast", StaffHit = "Staff.Hit";
+    public const string Ambush = "Ambush", AmbushKill = "Ambush.Kill", SpottedBy = "Spotted.";
 
     private readonly Dictionary<string, int> counts = new Dictionary<string, int>();
     private PlayerCombat combat;
     private PlayerGuard guard;
     private PlayerDodge dodge;
     private Damageable health;
+    private PlayerArchery archery;
+    private Combatant self;
 
     /// <summary>The weapon the player held when the last count was made (the rows' detail).</summary>
     public string Weapon { get; private set; } = "";
@@ -53,6 +59,15 @@ public sealed class CombatTally
         guard = player.GetComponent<PlayerGuard>();
         dodge = player.GetComponent<PlayerDodge>();
         health = player.GetComponent<Damageable>();
+        archery = player.GetComponent<PlayerArchery>();
+        self = player.GetComponent<Combatant>();
+        if (archery != null)
+        {
+            archery.Shot += OnShot;
+        }
+
+        Damageable.AnyDamaged += OnAnyDamaged;
+        MonsterAI.SpottedPlayer += OnSpotted;
         if (combat != null)
         {
             combat.SwingStarted += OnSwingStarted;
@@ -85,6 +100,15 @@ public sealed class CombatTally
 
     public void Unfollow()
     {
+        if (archery != null)
+        {
+            archery.Shot -= OnShot;
+        }
+
+        Damageable.AnyDamaged -= OnAnyDamaged;
+        MonsterAI.SpottedPlayer -= OnSpotted;
+        archery = null;
+        self = null;
         if (combat != null)
         {
             combat.SwingStarted -= OnSwingStarted;
@@ -130,9 +154,39 @@ public sealed class CombatTally
         _ => LightSwing,
     };
 
+    private void OnShot(ArrowShot shot)
+    {
+        Note(BowShot);
+        if (shot.Perfect) Note(BowPerfect);
+        if (shot.Counter) Note(BowCounter);
+    }
+
+    // The player's arrows and bolts that struck, and blows from the shadows (each creature knows, after the blow, whether it was caught unaware).
+    private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
+    {
+        if (self == null || damage.Source != self || result.Damage <= 0f || damage.IsOverTime)
+        {
+            return;
+        }
+
+        if ((damage.Technique & HitTechnique.Shot) != 0) Note(BowHit);
+        if ((damage.Technique & HitTechnique.Spell) != 0) Note(StaffHit);
+        if (victim.TryGetComponent(out MonsterAI monster) && monster.LastHitAmbushed)
+        {
+            Note(result.Killed ? AmbushKill : Ambush);
+        }
+    }
+
+    private void OnSpotted(MonsterAI monster, string how) => Note(SpottedBy + how);
+
     private void OnSwingStarted(SwingInfo swing)
     {
         Note(SwingName(swing.Kind));
+        if (swing.Attack != null && swing.Attack.CastProjectile != null)
+        {
+            Note(StaffCast);
+        }
+
         if (swing.IsCounter)
         {
             Note(Counter);

@@ -52,6 +52,12 @@ public sealed partial class MonsterAI
             return;
         }
 
+        // Noticing the player, before any "?": its mark is made now, to show the fill.
+        if (senses.Noticing is Component noticed && noticed != null && global::Player.IsPlayer(noticed.gameObject))
+        {
+            EnsureIndicator();
+        }
+
         if (senses.Stage == AwarenessStage.Suspicious && CurrentState != State.Investigating && CanInvestigate())
         {
             BeginInvestigate(false);
@@ -98,6 +104,45 @@ public sealed partial class MonsterAI
         : senses != null && CurrentState != State.Dead && CurrentState != State.Staggered
             && !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
 
+    /// <summary>
+    /// Caught unaware by a blow from <paramref name="from"/>: unaware, or (Perception Settings › Ambush From Behind When Suspicious) only
+    /// suspicious, hunting nobody, and struck from outside its sight cone (Sekiro's rule: its back shows from above). A friend's copy
+    /// goes by its state alone; the host's game judges the blow itself.
+    /// </summary>
+    public bool IsUnawareOf(Vector3 from)
+    {
+        if (IsUnaware)
+        {
+            return true;
+        }
+
+        if (IsRemote || senses == null || definition == null || !PerceptionSettings.Current.AmbushFromBehindWhenSuspicious
+            || CurrentState == State.Dead || CurrentState == State.Staggered || CanTarget(target) || senses.Stage != AwarenessStage.Suspicious)
+        {
+            return false;
+        }
+
+        Vector3 toward = from - transform.position;
+        toward.y = 0f;
+        return toward.sqrMagnitude > 1e-4f && Vector3.Angle(transform.forward, toward) > SenseProfile.Of(definition).HalfAngle;
+    }
+
+    /// <summary>Sets what the next blow does to it for being caught unaware, judged from where it comes from (Guard asks before every
+    /// blow; the host's game before a friend's).</summary>
+    public void JudgeAmbushFrom(Vector3 from)
+    {
+        if (IsRemote || senses == null || CurrentState == State.Staggered || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        damageable.DamageTakenMultiplier = IsUnawareOf(from) ? PerceptionSettings.Current.AmbushDamageTaken : 1f;
+    }
+
+    // Where a blow was struck from: its striker, or back along its way.
+    private static Vector3 BlowOrigin(in DamageInfo damage) =>
+        damage.Source != null ? damage.Source.transform.position : damage.HitPoint - damage.Direction * 2f;
+
     /// <summary>Whether the last blow it took found it unaware (read after the blow, when it already knows).</summary>
     public bool LastHitAmbushed { get; private set; }
 
@@ -136,6 +181,7 @@ public sealed partial class MonsterAI
         if (global::Player.IsPlayer(targetComponent.gameObject))
         {
             CreatureRecords.NoteMet(definition);
+            NoteSpottedPlayer();
         }
 
         if (global::Player.IsPlayer(targetComponent.gameObject) && Time.time >= nextSpottedSoundAt)

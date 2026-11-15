@@ -1406,6 +1406,17 @@ The player is no super soldier: combat is about reading the enemy and committing
   named pieces off a body (`CreatureWounds` per chip, Armour Parts). Elite kinds `UnyieldingBehaviour`, `WatchfulBehaviour`,
   `PressingBehaviour` set `MonsterAI.IsUnyielding`, `BackstabsForeknown`, `Presses`. Rules in `GuardRules` (`FellsReeling`, `IsLight`,
   `RaisesGuard`, `SidestepsDraw`). The pose stream's hunting byte also carries Felled (0x40) and Guarding (0x20).
+- **Ranged and stealth (2026-11-15, Docs/RangedStealthResearch.md › Status):** `StealthReadout` (local player: the noticer's cone and
+  close ring, noise rings from `PlayerNoise.Made`, the unseen ring, an edge arrow) reads `MonsterAI.NoticeLevelOf` (`MonsterSenses.Noticing`;
+  co-op: two pose bytes, 22 bytes a pose, wire format 24); `AwarenessIndicator` draws the faint "?". Ambush is judged per blow from
+  where it comes (`MonsterAI.IsUnawareOf`, `JudgeAmbushFrom` from `Guard` and the host's friend-hit path; `PlayerProficiencies.CaughtUnaware`
+  and `AmbushScale` overloads). Quiet kills (`PlayerNoise.IsAmbushKill`, Perception Settings › Ambush), `SuspectAt` for creatures that see
+  a kill, `Concealment` on shrub prefabs (`PlayerStealth.Cover`), `BirdProfile.AlarmRadius`. Bows: `WeaponDefinition.DrawWeight`,
+  `EscapeShotFocus` (`PlayerArchery.TryEscapeShot`), `WeaponSignature.HuntersMark` → `HitTechnique.Marking` → `MonsterAI.IsMarked`
+  (poise ×, ring; pose bit 0x10); `ArcheryRules.DamagePerSecond`. Staff: `CastVolley` through `MonsterProjectile` (spell, multipliers,
+  half on a repeat), `PlayerCombat.IsCasting`/`CastTarget`/`CastLoosed`, `CastAimLine`. Telemetry: `CombatTally` Bow.*, Staff.*, Ambush,
+  Spotted.* (`MonsterAI.SpottedPlayer`). Co-op: `PlayerLookState.Drawing` → `FriendHitbox.IsDrawing`; `NetworkPlayerAvatar` NoiseRpc,
+  ShotRpc, CastRpc (visual-only arrows and bolts).
 - **Heavy swings that push through:** `WeaponDefinition.HeavySwingArmor`, read by `PlayerCombat.IsPushingThrough`, which sets the player's `DamageTakenMultiplier`
   and skips the flinch. The player's multiplier belongs to `PlayerCombat`.
 - **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse

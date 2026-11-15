@@ -14,6 +14,10 @@ public sealed class ArcheryTrajectoryView : MonoBehaviour
     private const float StepSeconds = 0.05f;
 
     [SerializeField] private Material lineMaterial;
+
+    /// <summary>The line's material and colour, shared with a staff's cast line (CastAimLine).</summary>
+    public Material LineMaterial => lineMaterial;
+    public Color LineColor => color;
     [SerializeField] private Color color = new Color(1f, 0.95f, 0.8f, 0.35f);
     [Tooltip("Its colour while letting go would be a perfect release.")]
     [SerializeField] private Color perfectColor = new Color(1f, 0.78f, 0.32f, 0.95f);

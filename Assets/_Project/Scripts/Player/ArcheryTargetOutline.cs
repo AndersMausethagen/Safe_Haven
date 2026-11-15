@@ -23,9 +23,15 @@ public sealed class ArcheryTargetOutline : MonoBehaviour
     /// <summary>The monster outlined right now, or null.</summary>
     public Damageable Shown => shown;
 
+    private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
+    private Material ambushMaterial;
+    private bool shownAmbush;
+    private PlayerCombat combat;
+
     private void Awake()
     {
         archery = GetComponent<PlayerArchery>();
+        combat = GetComponent<PlayerCombat>();
         if (outlineMaterial == null || maskMaterial == null)
         {
             Debug.LogError("ArcheryTargetOutline requires outline and mask materials.", this);
@@ -37,6 +43,12 @@ public sealed class ArcheryTargetOutline : MonoBehaviour
     {
         bool visible = !GamePause.IsPaused && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         Damageable target = visible && archery.isActiveAndEnabled ? archery.Target : null;
+        // A staff's cast in its wind-up shows what the cast is aimed at, as a drawn bow does.
+        if (target == null && visible && combat != null && combat.CastTarget != null)
+        {
+            target = combat.CastTarget;
+        }
+
         if (target != shown)
         {
             if (shown != null && outlines.TryGetValue(shown, out List<OutlineCopies.Entry> old))
@@ -55,6 +67,34 @@ public sealed class ArcheryTargetOutline : MonoBehaviour
         if (shown != null && outlines.TryGetValue(shown, out List<OutlineCopies.Entry> entries))
         {
             OutlineCopies.SetShown(entries, shown.IsAlive);
+            // Still unaware: a shot now is an ambush (Docs/RangedStealthResearch.md §3.2).
+            bool ambush = PlayerProficiencies.CaughtUnaware(shown, transform.position);
+            if (ambush != shownAmbush || target != null)
+            {
+                shownAmbush = ambush;
+                Material look = ambush ? AmbushMaterial : outlineMaterial;
+                foreach (OutlineCopies.Entry entry in entries)
+                {
+                    if (entry.Outline != null && entry.Outline.sharedMaterial != look)
+                    {
+                        entry.Outline.sharedMaterial = look;
+                    }
+                }
+            }
+        }
+    }
+
+    private Material AmbushMaterial
+    {
+        get
+        {
+            if (ambushMaterial == null)
+            {
+                ambushMaterial = new Material(outlineMaterial) { name = "Target Outline (Ambush)" };
+            }
+
+            ambushMaterial.SetColor(OutlineColorId, PerceptionSettings.Current.AmbushColor);
+            return ambushMaterial;
         }
     }
 
