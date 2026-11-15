@@ -59,6 +59,9 @@ public sealed class Yards : MonoBehaviour
     private static void ResetForNewPlaySession()
     {
         yards.Clear();
+        edges.Clear();
+        owners.Clear();
+        counted.Clear();
         Current = null;
     }
 

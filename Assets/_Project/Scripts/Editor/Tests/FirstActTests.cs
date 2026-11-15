@@ -19,7 +19,8 @@ public sealed class FirstActTests
     public void TheAct_EndsAtTheHeartroot_AndGoesOnNorth()
     {
         QuestDefinition hunt = Quest("WhatBreathesUnderTheRoots"), road = Quest("TheRoadNorth");
-        CollectionAssert.AreEqual(new[] { Quest("TheWeakeningWard") }, hunt.Prerequisites, "after the first breach, when the roots have been seen in the dead");
+        // And once Bjarne is home: its rumour needs two extractions, so it no longer starts a raid early (2026-11-15).
+        CollectionAssert.AreEqual(new[] { Quest("TheWeakeningWard"), Quest("BringBjarneHome") }, hunt.Prerequisites, "after the first breach, when the roots have been seen in the dead");
         CollectionAssert.AreEqual(new[] { hunt }, road.Prerequisites);
         foreach (QuestDefinition quest in new[] { hunt, road })
         {

@@ -31,11 +31,17 @@ public static class HomeLife
             return;
         }
 
+        // Play sessions don't reload scripts here: off first, so a second session doesn't listen twice.
         listening = true;
+        BuildingObject.ActiveChanged -= Forget;
+        Construction.Finished -= OnFinished;
+        HavenHomes.Changed -= Forget;
         BuildingObject.ActiveChanged += Forget;
-        Construction.Finished += _ => Forget();
+        Construction.Finished += OnFinished;
         HavenHomes.Changed += Forget;
     }
+
+    private static void OnFinished(Construction _) => Forget();
 
     /// <summary>How good this house is, and why. Null for a building that isn't a house.</summary>
     public static HomeQuality.Report Of(BuildingObject house)

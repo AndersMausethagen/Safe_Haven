@@ -16,6 +16,14 @@ public static class BuildHere
     private static readonly List<(BuildingDefinition kind, float distance)> near = new List<(BuildingDefinition, float)>();
     private static readonly List<Vector2> work = new List<Vector2>();
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        text.Clear();
+        near.Clear();
+        work.Clear();
+    }
+
     /// <summary>The readout for <paramref name="kind"/> standing at <paramref name="point"/> turned by <paramref name="yaw"/>.</summary>
     public static string Describe(BuildingDefinition kind, Vector3 point, float yaw, Bounds local)
     {

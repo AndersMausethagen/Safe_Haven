@@ -23,6 +23,7 @@ public static class StationExtensions
     {
         served.Clear();
         serving.Clear();
+        empty.Clear();
         dirty = true;
         listening = false;
     }
@@ -34,11 +35,17 @@ public static class StationExtensions
             return;
         }
 
+        // Play sessions don't reload scripts here: off first, so a second session doesn't listen twice.
         listening = true;
+        BuildingObject.ActiveChanged -= Forget;
+        Construction.Finished -= OnFinished;
+        Yards.Changed -= Forget;
         BuildingObject.ActiveChanged += Forget;
-        Construction.Finished += _ => Forget();
+        Construction.Finished += OnFinished;
         Yards.Changed += Forget;
     }
+
+    private static void OnFinished(Construction _) => Forget();
 
     /// <summary>Works it out again on the next question.</summary>
     public static void Forget() => dirty = true;
