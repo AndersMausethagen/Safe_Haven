@@ -54,6 +54,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 4
     priority: 1
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 1.2
     interruptible: 0
     sound: {fileID: 0}
@@ -63,6 +66,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -103,6 +107,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 3
     priority: 2
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 7
     interruptible: 0
     sound: {fileID: 0}
@@ -112,6 +119,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -152,6 +160,9 @@ MonoBehaviour:
     minimumRange: 4
     maximumRange: 11
     priority: 15
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 13
     interruptible: 0
     sound: {fileID: 0}
@@ -161,6 +172,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -201,6 +213,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 14
     priority: 25
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 32
     interruptible: 0
     sound: {fileID: 11400000, guid: ca60a941079fed04bad550318182d713, type: 2}
@@ -210,6 +225,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -250,6 +266,9 @@ MonoBehaviour:
     minimumRange: 6
     maximumRange: 24
     priority: 12
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 12
     interruptible: 0
     sound: {fileID: 0}
@@ -259,6 +278,7 @@ MonoBehaviour:
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
+    openAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -316,7 +336,9 @@ MonoBehaviour:
   canBeFinished: 0
   flankSpread: 0
   breaksWalls: 1
+  spottedPause: 0
   poise: 450
+  parryResponse: 0
   openWhileStriking: 0
   parriesBackstabs: 0
   shieldArc: 0
@@ -327,6 +349,13 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 0
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
   sizeVariation: 0
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: c83dc226c90a6fc49b9a7188291c7e91, type: 3}

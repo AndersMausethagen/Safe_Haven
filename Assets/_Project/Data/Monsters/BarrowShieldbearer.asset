@@ -53,12 +53,15 @@ MonoBehaviour:
   huntsHorses: 1
   frightensHorses: 10
   attacks:
-  - attack: {fileID: 11400000, guid: 7c51c0a6123522543bd74150b578d845, type: 2}
+  - attack: {fileID: 11400000, guid: 247bac19489e94d41b6299d7ef99ec2d, type: 2}
     kind: 0
     damage: 28.800001
     minimumRange: 0
     maximumRange: 2.2
     priority: 10
+    weight: 1
+    whenFoe: 0
+    heavy: 0
     cooldown: 1
     interruptible: 0
     sound: {fileID: 0}
@@ -110,6 +113,9 @@ MonoBehaviour:
     minimumRange: 3
     maximumRange: 8
     priority: 20
+    weight: 0.6
+    whenFoe: 7
+    heavy: 1
     cooldown: 9
     interruptible: 0
     sound: {fileID: 0}
@@ -177,7 +183,9 @@ MonoBehaviour:
   canBeFinished: 1
   flankSpread: 0.4
   breaksWalls: 0
+  spottedPause: 0.55
   poise: 110
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 150

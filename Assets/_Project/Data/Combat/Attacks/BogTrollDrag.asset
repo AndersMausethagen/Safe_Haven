@@ -31,10 +31,26 @@ MonoBehaviour:
   staminaCost: -1
   appliesStatus: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
   statusChance: 1
+  groundImpact: {fileID: 0}
   unblockable: 1
   pull: 4
-  animationState: 
-  animationSpeed: 1
+  windupMove: -1
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
+  animationState: Strike Claw
+  animationSpeed: 0.6210528
   strikeSpeed: 1
   strikeLead: 0
   followThroughSpeed: 1

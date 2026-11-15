@@ -6,7 +6,7 @@ more of the same rather than a louder sting. The rest is synthesised. A parry ha
 brightest thing here: two iron edges, sharp contact, long dark ring, a scrape as they slide apart. Hits vary in every
 variant, since these are the sounds a player hears thousands of times.
 
-Run from the project root: python Tools/Audio/combat.py
+Run from the project root: python Tools/Audio/combat.py [stem ...] (all, or only the named sounds)
 """
 import os
 import sys
@@ -212,6 +212,18 @@ def stagger(rng):
     return darken(drive(flesh(rng, 1.4, 0.5, seconds) + gear, 1.6), weight=2)
 
 
+def heavy_windup(rng):
+    """A great blow gathering: a low swell under the wind-up, so a heavy strike is heard coming before it is seen."""
+    seconds = rng.uniform(0.62, 0.72)
+    t = times(seconds)
+    x = t / seconds
+    swell = x ** 1.6 * np.clip((1 - x) / 0.12, 0, 1)
+    rumble = band(pink(len(t), rng), 55, 260) * swell
+    sub = np.sin(TAU * np.cumsum(rng.uniform(44, 52) + 10 * x) / RATE) * swell * 0.35
+    grit = scatter(seconds, 14, lambda: chip(rng, 160, 520, 0.06), rng, early=0.5) * 0.25
+    return darken(drive(rumble / max(1e-9, np.abs(rumble).max()) + sub + grit, 1.4), top=-6, weight=3)
+
+
 def player_hurt(rng):
     """A blow landing on you, close, and the breath going out."""
     seconds = 0.7
@@ -239,13 +251,16 @@ SOUNDS = [
     ("Swing", swing, 4, True), ("Heavy Swing", heavy_swing, 3, True), ("Axe Swing", axe_swing, 3, True), ("Punch Swing", punch_swing, 4, True),
     ("Dodge", dodge, 4, True), ("Perfect Dodge", perfect_dodge, 2, False),
     ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Stab Hit", stab_hit, 5, True), ("Blunt Hit", blunt_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
-    ("Block", block, 5, True), ("Parry", parry, 5, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True),
+    ("Block", block, 5, True), ("Parry", parry, 5, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True), ("Heavy Windup", heavy_windup, 3, True),
     ("Player Hurt", player_hurt, 6, False), ("Land", land, 4, True),
 ]
 
 
-def main():
+def main(only=None):
+    """Makes every sound, or only those whose stems are named on the command line."""
     for stem, recipe, count, positional in SOUNDS:
+        if only and stem not in only:
+            continue
         for i in range(1, count + 1):
             name = f"{stem} {i}"
             sound = recipe(seeded(name))
@@ -255,4 +270,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

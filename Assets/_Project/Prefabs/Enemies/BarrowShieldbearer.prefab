@@ -146,6 +146,10 @@ PrefabInstance:
       propertyPath: prefabId
       value: e6646a32ac93d664c950e5e95fd45e0e
       objectReference: {fileID: 0}
+    - target: {fileID: 3866351388672147124, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: f9168d2b60100554b85f679a0415a10e, type: 2}
     - target: {fileID: 5457787183531467037, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       propertyPath: turnSpeed
       value: 240

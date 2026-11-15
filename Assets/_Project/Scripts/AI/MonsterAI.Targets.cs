@@ -53,6 +53,7 @@ public sealed partial class MonsterAI
             senses.Awareness.Alert(lastKnownTargetPosition);
             if (fresh)
             {
+                BeginDrawIfUnaware();
                 OnSpotted();
             }
         }

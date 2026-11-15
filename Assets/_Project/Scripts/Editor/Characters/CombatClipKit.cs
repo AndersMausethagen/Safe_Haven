@@ -63,8 +63,9 @@ public static class CombatClipKit
         return $"{state} on {layerName}: {(made ? "made" : "refreshed")}";
     }
 
-    /// <summary>A state on the humanoid monsters' controller, leaving for Locomotion near its end.</summary>
-    public static string MonsterState(string state, AnimationClip clip, float speed, float exitTime = 0.85f)
+    /// <summary>A state on the humanoid monsters' controller, leaving for Locomotion near its end. <paramref name="fitted"/>: it plays at
+    /// the ActionSpeed parameter (a strike fitted to its attack's Hit Delay), times <paramref name="speed"/>.</summary>
+    public static string MonsterState(string state, AnimationClip clip, float speed, float exitTime = 0.85f, bool fitted = false)
     {
         var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(CombatAnimationSetup.MonsterControllerPath);
         if (controller == null || clip == null)
@@ -73,7 +74,7 @@ public static class CombatClipKit
         }
 
         AnimatorStateMachine machine = controller.layers[0].stateMachine;
-        bool made = Configure(machine, state, clip, false, exitTime, "Locomotion", speedParameter: false);
+        bool made = Configure(machine, state, clip, false, exitTime, "Locomotion", speedParameter: fitted);
         machine.states.First(s => s.state.name == state).state.speed = speed;
         EditorUtility.SetDirty(controller);
         return $"monster {state}: {(made ? "made" : "refreshed")}";

@@ -24,7 +24,10 @@ public sealed class WorldHealthBar : MonoBehaviour
 
     private MonsterAI monster;
     private RectTransform poiseFill;
+    private UnityEngine.UI.Graphic poiseGraphic;
     private GameObject poiseBar;
+    // Pulses a reeling creature's poise bar this many times a second.
+    private const float ReelingPulseRate = 2.2f;
     private Camera viewCamera;
     private float lastChangeTime = float.NegativeInfinity;
     private bool dead;
@@ -97,7 +100,8 @@ public sealed class WorldHealthBar : MonoBehaviour
             return;
         }
 
-        poiseFill.GetComponent<UnityEngine.UI.Graphic>().color = UIStyle.Current.Accent;
+        poiseGraphic = poiseFill.GetComponent<UnityEngine.UI.Graphic>();
+        poiseGraphic.color = UIStyle.Current.Accent;
     }
 
     private const float PoiseGap = 3f;
@@ -151,6 +155,12 @@ public sealed class WorldHealthBar : MonoBehaviour
         if (shown && poiseFill != null)
         {
             poiseFill.anchorMax = new Vector2(monster.Poise.Fraction, 1f);
+            // Reeling (poise worn low, a stagger near): the bar pulses towards the reeling colour.
+            if (poiseGraphic != null)
+            {
+                float pulse = monster.IsReeling ? 0.5f + 0.5f * Mathf.Sin(Time.time * ReelingPulseRate * Mathf.PI * 2f) : 0f;
+                poiseGraphic.color = Color.Lerp(UIStyle.Current.Accent, CombatFeelSettings.Current.ReelingBarColor, pulse);
+            }
         }
     }
 

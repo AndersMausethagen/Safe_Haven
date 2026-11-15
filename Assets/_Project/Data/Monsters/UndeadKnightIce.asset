@@ -64,6 +64,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 3
     priority: 10
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 1
     interruptible: 0
     sound: {fileID: 0}
@@ -114,6 +117,9 @@ MonoBehaviour:
     minimumRange: 5
     maximumRange: 14
     priority: 20
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 8
     interruptible: 0
     sound: {fileID: 0}
@@ -164,6 +170,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 3.5
     priority: 15
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 10
     interruptible: 0
     sound: {fileID: 0}
@@ -231,6 +240,7 @@ MonoBehaviour:
   canBeFinished: 1
   flankSpread: 0.5
   breaksWalls: 0
+  spottedPause: 0
   poise: 220
   parryResponse: 2
   openWhileStriking: 1

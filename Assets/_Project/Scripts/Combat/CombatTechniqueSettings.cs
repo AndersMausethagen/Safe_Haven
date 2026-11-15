@@ -290,6 +290,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Min(0f)] private float staggerSeconds = 1f;
     [Tooltip("Damage a staggered monster takes, as a multiplier.")]
     [SerializeField, Min(1f)] private float staggeredDamageTaken = 1.2f;
+    [Tooltip("Below this share of its poise a creature reels: it sways, embers show at its chest and its poise bar pulses, so the player " +
+             "sees a stagger is near (the hammer's Crush line). Only a look: it fights on as before.")]
+    [SerializeField, Range(0f, 1f)] private float reelingShare = 0.3f;
 
     public float ChainGrace => chainGrace;
     public float RhythmEarly => rhythmEarly;
@@ -422,5 +425,6 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float PoiseRecoveryDelay => poiseRecoveryDelay;
     public float PoiseRecoveryPerSecond => poiseRecoveryPerSecond;
     public float StaggerSeconds => staggerSeconds;
+    public float ReelingShare => reelingShare;
     public float StaggeredDamageTaken => staggeredDamageTaken;
 }

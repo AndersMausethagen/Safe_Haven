@@ -111,10 +111,16 @@ public sealed partial class MonsterAI
             return;
         }
 
+        if (HoldsWhileDrawing(toTarget))
+        {
+            return;
+        }
+
         if (circling)
         {
             if (Time.time < circlingUntil)
             {
+                MarkWaiting();
                 Circle(toTarget, distance);
                 return;
             }
@@ -146,7 +152,7 @@ public sealed partial class MonsterAI
 
         if (definition.Attacks.Count > 0)
         {
-            int chosen = attacks.ChooseAction(distance, IsHowler);
+            int chosen = attacks.ChooseAction(distance, IsHowler, ReadFoe(toTarget));
             if (chosen >= 0 && attacks.IsReady)
             {
                 if (HoldsBack(definition.Attacks[chosen].kind, toTarget, distance))
@@ -181,6 +187,8 @@ public sealed partial class MonsterAI
                 }
                 else
                 {
+                    // Holding its distance, eyes on the foe: waiting for its next cast.
+                    MarkWaiting();
                     movement.Stop();
                     movement.TurnTowards(toTarget);
                 }
@@ -318,6 +326,7 @@ public sealed partial class MonsterAI
         switch (turn)
         {
             case AttackTurn.Circle:
+                MarkWaiting();
                 circling = true;
                 circlingUntil = Time.time + UnityEngine.Random.Range(rules.CircleSeconds.x, Mathf.Max(rules.CircleSeconds.x, rules.CircleSeconds.y));
                 circleSide = UnityEngine.Random.value < 0.5f ? -1f : 1f;
@@ -325,6 +334,7 @@ public sealed partial class MonsterAI
                 Circle(toTarget, distance);
                 return true;
             case AttackTurn.StandReady:
+                MarkWaiting();
                 movement.Stop();
                 SetState(State.Chasing);
                 movement.TurnTowards(toTarget);
@@ -353,6 +363,7 @@ public sealed partial class MonsterAI
             return false;
         }
 
+        MarkWaiting();
         movement.Stop();
         SetState(State.Chasing);
         movement.TurnTowards(toTarget);

@@ -74,6 +74,7 @@ public sealed partial class MonsterAI
             attacks.Cancel();
             pose?.CancelAttack();
             SetState(State.Chasing);
+            RaiseInterrupted();
         }
 
         attacks.Delay(seconds);
@@ -179,6 +180,7 @@ public sealed partial class MonsterAI
             SetState(State.Chasing);
             attacks.Delay(CombatTechniqueSettings.Current.InterruptDelay);
             AnyInterrupted?.Invoke(this, damage.Source);
+            RaiseInterrupted();
         }
 
         if ((damage.Technique & HitTechnique.Backstab) != 0)
@@ -259,11 +261,14 @@ public sealed partial class MonsterAI
 
     private void OnDied(Damageable victim, DamageInfo killingBlow)
     {
+        bool wasStaggered = CurrentState == State.Staggered;
         damageable.DamageTakenMultiplier = 1f;
         ClearTarget();
         movement.Halt();
         SetState(State.Dead);
+        reelingTell?.Clear();
         pack?.MemberFell(this);
+        ShakeTheOthers(killingBlow, wasStaggered);
         // Its death cry carries: others near enough come to see what happened (a big creature's further).
         if (!IsRemote)
         {

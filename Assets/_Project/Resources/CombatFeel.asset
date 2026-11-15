@@ -17,6 +17,7 @@ MonoBehaviour:
   hitStopOnKill: 0.13
   hitStopWhenHurt: 0.07
   hitStopTimeScale: 0.05
+  victimShake: 0.045
   shakeOnHit: 0.15
   shakeOnCrit: 0.3
   shakeOnKill: 0.45
@@ -42,6 +43,20 @@ MonoBehaviour:
   telegraphAreaColor: {r: 1, g: 0.25, b: 0.15, a: 0.18}
   telegraphFillColor: {r: 1, g: 0.3, b: 0.1, a: 0.45}
   telegraphLinger: 0.1
+  unblockableColor: {r: 0.72, g: 0.12, b: 0.95, a: 0.55}
+  interruptibleColor: {r: 0.3, g: 0.78, b: 1, a: 0.5}
+  heavyEdgeColor: {r: 0.75, g: 0.04, b: 0.02, a: 0.8}
+  heavyEdgeWidth: 0.09
+  heavyImpact: 1.5
+  heavyShare: 0.25
+  heavyWindupSound: {fileID: 11400000, guid: 2ac89e3c665e52d4ba32f4f317785bdd, type: 2}
+  openingColor: {r: 0.45, g: 1, b: 0.5, a: 0.45}
+  openingReach: 0.45
+  openingWidth: 0.12
+  reelingEffect: {fileID: 856958082518358719, guid: 6b642e6b83299754bb296e7dc6927940, type: 3}
+  reelingSway: 4
+  reelingSwayRate: 0.9
+  reelingBarColor: {r: 1, g: 0.55, b: 0.15, a: 1}
   dodgeTrailColor:
     serializedVersion: 2
     key0: {r: 0.6, g: 0.85, b: 1, a: 0.55}
@@ -80,6 +95,7 @@ MonoBehaviour:
   guardBrokenText: 
   staggerText: 
   counterText: 
+  interruptText: 
   techniqueTextColor: {r: 1, g: 0.85, b: 0.4, a: 1}
   parryCueColor: {r: 1, g: 0.92, b: 0.8, a: 0.55}
   hitEffect: {fileID: 213189225444777386, guid: 005b43df436f75a428ebfa2fbd5b55e4, type: 3}
@@ -90,6 +106,7 @@ MonoBehaviour:
   staggerEffect: {fileID: 3448059979457001899, guid: 14ad6f4879c11a64da0187a81c7a5b91, type: 3}
   perfectDodgeEffect: {fileID: 1787437530139827587, guid: 86a01c434ea7768488bace9e1a63ad52, type: 3}
   parryCueEffect: {fileID: 2567207178870873406, guid: 3c1734e30b572104ea3954b443333234, type: 3}
+  landingEffect: {fileID: 0}
   slashMaterial: {fileID: 2100000, guid: da6ce870da817894b98a9f869375c163, type: 2}
   slashSeconds: 0.2
   slashHeight: 1.05

@@ -12,7 +12,23 @@ public enum MonsterTemperament
     Defensive = 4,
 }
 
-/// <summary>One available action. Higher priority wins; list order breaks ties.</summary>
+/// <summary>What the player (a creature's target) is visibly doing, which a strike can be chosen against (Monster Attack › When Foe).</summary>
+[Flags]
+public enum FoeDoing
+{
+    None = 0,
+    /// <summary>Has had the guard up a while, facing it.</summary>
+    Guarding = 1,
+    /// <summary>Walking or running away from it.</summary>
+    BackingOff = 2,
+    /// <summary>Drawing or aiming a bow.</summary>
+    Shooting = 4,
+    /// <summary>At its side or behind it.</summary>
+    Behind = 8,
+}
+
+/// <summary>One available action. Higher priority wins; list order breaks ties. Actions given a Weight share their band and are
+/// chosen among by chance instead (Monster Attacks › SelectAttack).</summary>
 [Serializable]
 public sealed class MonsterAttack
 {
@@ -22,6 +38,16 @@ public sealed class MonsterAttack
     [Min(0f)] public float minimumRange;
     [Min(0.1f)] public float maximumRange = 2f;
     public int priority;
+    [Tooltip("0: chosen by priority alone, as always. Above 0: when the highest-priority ready action has a weight, every ready action with " +
+             "a weight (and no weightless one above it) is a candidate, picked by chance in proportion to these, so a fight doesn't run in " +
+             "the same order every time. The action just used counts half; cooldowns are kept.")]
+    [Min(0f)] public float weight;
+    [Tooltip("Picked more readily (Foe Bonus times its weight) while its target does one of these: a shield rush at a raised guard, " +
+             "a lunge at someone backing off or shooting, a backhand at someone at its flank.")]
+    public FoeDoing whenFoe;
+    [Tooltip("A great blow, its big one (a stomp, a charge, a quake): its warning gets a dark edge and a low swell as it starts, so it " +
+             "is told apart from its everyday strikes. An attack with Impact of Combat Feel's Heavy Impact or more counts anyway.")]
+    public bool heavy;
     [Min(0f)] public float cooldown = 1f;
     public bool interruptible;
     [Tooltip("Plays as this action starts, instead of the creature's Attack Sound: a howl, a call to the ground. Empty: the creature's own.")]

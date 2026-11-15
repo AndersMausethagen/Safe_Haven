@@ -1,8 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Plays a monster's animations from what its MonsterAI is doing. It only sets parameters its Animator Controller has,
-/// so a monster with a simpler controller, or none yet, still works.
+/// Plays a monster's animations from what its MonsterAI is doing. It only sets parameters and plays states its Animator Controller
+/// has, so a monster with a simpler controller, or none yet, still works.
+/// <para>
+/// A humanoid body has its own moves, not the player's (Docs/EnemyCombatResearch.md §4.1): a call or a cast channels (the "Call" or
+/// "Cast" state, or the attack's own) and lets go in its "&lt;state&gt; Release" state the attack's Strike Lead before the hit; it stands
+/// ready and steps sideways while waiting its turn (Ready, MoveX, MoveZ); it stays dazed as long as it staggers (Staggered); it flinches
+/// by where a blow came from, only its arms while it recovers from its own blow ("Flinch Arms" layer); a strike broken off shows; and it
+/// draws its weapon when it spots someone (Draw).
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI))]
@@ -53,6 +60,29 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private float lastBlowAt = -1f;
     private bool lastBlowFells;
 
+    // States and parameters of its own moves (all optional).
+    private static readonly int LocomotionStateHash = Animator.StringToHash("Locomotion");
+    private static readonly int DrawStateHash = Animator.StringToHash("Draw");
+    private static readonly int FlinchStateHash = Animator.StringToHash("Flinch");
+    private static readonly int StaggeredHash = Animator.StringToHash("Staggered");
+    private static readonly int ReadyHash = Animator.StringToHash("Ready");
+    private static readonly int MoveXHash = Animator.StringToHash("MoveX");
+    private static readonly int MoveZHash = Animator.StringToHash("MoveZ");
+    private const string FlinchLayerName = "Flinch Arms";
+    // A call or cast without a Strike Lead of its own lets go this long before the hit.
+    private const float DefaultReleaseLead = 0.15f;
+    private const float ReleaseFade = 0.08f;
+    // A blow from further round than this is from behind: the body tips forward with it (MonsterPose), no flinch back.
+    private const float FromBehindDegrees = 110f;
+    private const float MoveDampTime = 0.15f;
+    private bool hasStaggered;
+    private bool hasReady;
+    private bool hasMove;
+    private int flinchLayer = -1;
+    private int releaseHash;
+    private float releaseAt = -1f;
+    private Vector3 lastPosition;
+
     private Damageable health;
     private MonsterAI ai;
     private int speedHash;
@@ -79,10 +109,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.StateChanged += OnStateChanged;
         ai.Staggered += OnStaggered;
         ai.HeldForFinish += OnHeldForFinish;
+        ai.Interrupted += OnInterrupted;
+        ai.Wavered += OnWavered;
         if (health != null)
         {
             health.Damaged += OnDamaged;
         }
+
+        lastPosition = transform.position;
     }
 
     private void OnDisable()
@@ -91,10 +125,14 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         ai.StateChanged -= OnStateChanged;
         ai.Staggered -= OnStaggered;
         ai.HeldForFinish -= OnHeldForFinish;
+        ai.Interrupted -= OnInterrupted;
+        ai.Wavered -= OnWavered;
         if (health != null)
         {
             health.Damaged -= OnDamaged;
         }
+
+        releaseAt = -1f;
     }
 
     private void Update()
@@ -127,6 +165,53 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             holding = !holding;
             animator.speed = holding ? HeldPlayback : 1f;
         }
+
+        UpdateOwnMoves();
+    }
+
+    // The channel's release on time, the ready stance and its side steps, and the daze held while it staggers.
+    private void UpdateOwnMoves()
+    {
+        if (animator == null || !animator.enabled)
+        {
+            return;
+        }
+
+        if (releaseAt >= 0f)
+        {
+            if (ai.IsHoldingStrike)
+            {
+                releaseAt += Time.deltaTime;
+            }
+            else if (Time.time >= releaseAt)
+            {
+                releaseAt = -1f;
+                if (ai.CurrentState == MonsterAI.State.Attacking)
+                {
+                    animator.CrossFadeInFixedTime(releaseHash, ReleaseFade, 0, 0f);
+                }
+            }
+        }
+
+        if (hasStaggered)
+        {
+            animator.SetBool(StaggeredHash, ai.CurrentState == MonsterAI.State.Staggered);
+        }
+
+        if (hasReady)
+        {
+            animator.SetBool(ReadyHash, ai.IsWaitingTurn);
+        }
+
+        if (hasMove && Time.deltaTime > 0f)
+        {
+            // From how it actually moved, so a friend's copy (moved by the host's poses) steps the same way.
+            Vector3 local = transform.InverseTransformDirection((transform.position - lastPosition) / Time.deltaTime);
+            animator.SetFloat(MoveXHash, local.x, MoveDampTime, Time.deltaTime);
+            animator.SetFloat(MoveZHash, local.z, MoveDampTime, Time.deltaTime);
+        }
+
+        lastPosition = transform.position;
     }
 
     private void CacheParameters()
@@ -149,21 +234,38 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             hasStagger |= parameter.nameHash == staggerHash && parameter.type == AnimatorControllerParameterType.Trigger;
             hasResting |= parameter.nameHash == RestingHash && parameter.type == AnimatorControllerParameterType.Bool;
             hasStride |= parameter.nameHash == StrideRateHash && parameter.type == AnimatorControllerParameterType.Float;
+            hasStaggered |= parameter.nameHash == StaggeredHash && parameter.type == AnimatorControllerParameterType.Bool;
+            hasReady |= parameter.nameHash == ReadyHash && parameter.type == AnimatorControllerParameterType.Bool;
+            hasMove |= parameter.nameHash == MoveXHash && parameter.type == AnimatorControllerParameterType.Float;
         }
+
+        flinchLayer = animator.GetLayerIndex(FlinchLayerName);
     }
 
-    // A strike with a state of its own plays it, fitted so the blow lands at its Hit Delay (Set Up Combat Animations works the speed
-    // out); any other plays the controller's one Attack state.
+    // A strike with a state of its own plays it, fitted so the blow lands at its Hit Delay (the attack's Animation Speed); one without
+    // plays the body's own move for its kind (a call, a cast, a throw) when it has one, else the controller's one Attack state. A state
+    // with a "<state> Release" channels until the attack's Strike Lead before the hit, then lets go.
     private void OnAttackStarted()
     {
+        releaseAt = -1f;
         AttackDefinition attack = ai.CurrentAttack;
-        if (animator != null && animator.isHuman && attack != null && !string.IsNullOrEmpty(attack.AnimationState))
+        if (animator != null && animator.isHuman && attack != null)
         {
-            int state = Animator.StringToHash(attack.AnimationState);
-            if (animator.HasState(0, state))
+            bool own = !string.IsNullOrEmpty(attack.AnimationState);
+            string name = own ? attack.AnimationState : KindState(ai.ActiveAction);
+            int state = name != null ? Animator.StringToHash(name) : 0;
+            if (name != null && animator.HasState(0, state))
             {
-                animator.SetFloat(ActionSpeedHash, attack.AnimationSpeed);
+                animator.SetFloat(ActionSpeedHash, own ? attack.AnimationSpeed : 1f);
                 animator.CrossFadeInFixedTime(state, StrikeFade, 0, 0f);
+                int release = Animator.StringToHash(name + " Release");
+                if (animator.HasState(0, release))
+                {
+                    releaseHash = release;
+                    float lead = attack.StrikeLead > 0f ? attack.StrikeLead : DefaultReleaseLead;
+                    releaseAt = Time.time + Mathf.Max(0f, attack.HitDelay - lead);
+                }
+
                 return;
             }
         }
@@ -173,6 +275,58 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             animator.SetFloat(ActionSpeedHash, 1f);
             animator.SetTrigger(attackHash);
         }
+    }
+
+    // The body's own move for an action that names none: a howl or a summon calls, a shot casts, a lob is thrown.
+    private static string KindState(MonsterAttack action)
+    {
+        if (action == null)
+        {
+            return null;
+        }
+
+        switch (action.kind)
+        {
+            case MonsterAttackKind.Howl:
+            case MonsterAttackKind.Summon:
+                return "Call";
+            case MonsterAttackKind.Projectile:
+                return "Cast";
+            case MonsterAttackKind.Lob:
+                return "Throw";
+            default:
+                return null;
+        }
+    }
+
+    // A blow or a parry broke its strike off before it landed: it reels out of the swing, so the interrupt is seen.
+    private void OnInterrupted()
+    {
+        releaseAt = -1f;
+        if (animator == null || !animator.isHuman || !animator.enabled)
+        {
+            return;
+        }
+
+        int state = animator.HasState(0, HeavyHitStateHash) ? HeavyHitStateHash : HitStateHash;
+        if (animator.HasState(0, state))
+        {
+            animator.CrossFadeInFixedTime(state, FlinchFade, 0, 0f);
+        }
+    }
+
+    // Shaken by a brutal kill nearby: its arms flinch while its legs carry on.
+    private void OnWavered() => FlinchArms();
+
+    private bool FlinchArms()
+    {
+        if (animator == null || !animator.isHuman || !animator.enabled || flinchLayer < 0 || !animator.HasState(flinchLayer, FlinchStateHash))
+        {
+            return false;
+        }
+
+        animator.CrossFadeInFixedTime(FlinchStateHash, FlinchFade, flinchLayer, 0f);
+        return true;
     }
 
     private void OnDamaged(DamageInfo damage, DamageResult result)
@@ -188,10 +342,28 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             return;
         }
 
-        bool flinches = animator != null && animator.isHuman && animator.enabled && result.Damage > 0f && !result.Killed && !result.Blocked
-            && !damage.IsOverTime && (result.Damage >= health.MaxHealth * flinchShare || weighty)
-            && ai.CurrentState != MonsterAI.State.Attacking && ai.CurrentState != MonsterAI.State.Staggered;
-        if (!flinches)
+        bool felt = animator != null && animator.isHuman && animator.enabled && result.Damage > 0f && !result.Killed && !result.Blocked
+            && !damage.IsOverTime && (result.Damage >= health.MaxHealth * flinchShare || weighty);
+        if (!felt || ai.CurrentState == MonsterAI.State.Staggered)
+        {
+            return;
+        }
+
+        // Struck while it recovers from its own blow: only its arms flinch, a punish seen that changes nothing.
+        if (ai.CurrentState == MonsterAI.State.Attacking)
+        {
+            if (ai.TryGetOpening(out _, out _))
+            {
+                FlinchArms();
+            }
+
+            return;
+        }
+
+        // From behind, the blow tips it forward (MonsterPose); a flinch back from the front would read wrong.
+        Vector3 cameFrom = -damage.Direction;
+        cameFrom.y = 0f;
+        if (cameFrom.sqrMagnitude > 0.0001f && Vector3.Angle(transform.forward, cameFrom) > FromBehindDegrees)
         {
             return;
         }
@@ -245,6 +417,24 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (current == MonsterAI.State.Dead && hasDead)
         {
             animator.SetBool(deadHash, true);
+        }
+
+        bool body = animator != null && animator.isHuman && animator.enabled;
+        // A channel broken off before it let go (a rout, a recoil) mustn't loop on.
+        if (previous == MonsterAI.State.Attacking && releaseAt >= 0f)
+        {
+            releaseAt = -1f;
+            if (body && current == MonsterAI.State.Chasing && animator.HasState(0, LocomotionStateHash))
+            {
+                animator.CrossFadeInFixedTime(LocomotionStateHash, StrikeFade, 0, 0f);
+            }
+        }
+
+        // Spotted someone while unaware: it readies its weapon (MonsterAI holds still meanwhile; a friend's copy plays it the same).
+        if (body && current == MonsterAI.State.Chasing && (previous == MonsterAI.State.Idle || previous == MonsterAI.State.Investigating)
+            && ai.Definition != null && ai.Definition.SpottedPause > 0f && animator.HasState(0, DrawStateHash))
+        {
+            animator.CrossFadeInFixedTime(DrawStateHash, StrikeFade, 0, 0f);
         }
 
         if (current == MonsterAI.State.Hopping && animator != null && animator.isHuman && animator.HasState(0, HopStateHash))

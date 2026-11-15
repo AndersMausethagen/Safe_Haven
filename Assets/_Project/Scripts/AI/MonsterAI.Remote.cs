@@ -136,9 +136,14 @@ public sealed partial class MonsterAI
     /// Where the host's creature was at <paramref name="time"/> (the session's clock) and what it was doing. A strike or death
     /// in progress here finishes first.
     /// </summary>
-    public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None)
+    /// <param name="poiseShare">The host's creature's poise, 0-1: this copy wears none of its own, so its reeling and poise bar show the host's.</param>
+    /// <param name="waiting">The host's creature is waiting its turn (a ready stance).</param>
+    public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None,
+        float poiseShare = 1f, bool waiting = false)
     {
         remoteHunt = hunting;
+        remoteWaiting = waiting;
+        poise?.Show(poiseShare);
         // Nothing was sent while it stood still: it starts moving from where it stood, a moment before this, not slides from
         // the last pose a while ago.
         if (remotePoses.TryNewest(out PoseSnapshot newest) && time - newest.Time > RemoteQuietGap)

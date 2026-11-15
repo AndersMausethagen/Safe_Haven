@@ -36,6 +36,29 @@ or behaving like the player, so a fight is more dynamic, more varied, and gives 
 | 10 | Answers to the bow: side steps and raised arms on agile humanoids | Med-Low | S-M | Yes (bow pace) |
 | 11 | Enemies react to each other: summons scatter, nearby creatures hesitate after a brutal kill | Low-Med | S | Slight (easier) |
 
+## Status (2026-11-15): phases A and B built
+
+The user asked for phases A and B. Both are built on `test`, checked by Edit Mode tests and Play-mode probes from the CLI, not yet played
+by hand. Phase C (§4.4's payoff, 4.5, 4.7-4.10) waits for the user's pick after the combat rework's playtest.
+
+| Item | Built | Where |
+|---|---|---|
+| 4.1 Calls and casts | Howls and summons channel arms up (`Call`, Spell_Unarmed_Up), shots channel arms forward (`Cast`, Spell_Unarmed_Forward), and let go in `<state> Release` the attack's Strike Lead before the hit. Stones, dirt and the troll's log are thrown (`Throw`, Combat_Defend_Spell); shoves are their own (`Shove`, Combat_Unarmed_Attack01); drags, rushes and grasps claw. An action with no state falls back by kind | `MonsterAnimationDriver.OnAttackStarted`, `KindState`; attack assets' Animation State and Strike Lead |
+| 4.1 Draug and Shieldbearer strikes | Draug: UAL1 Sword_Attack, Combat_1H_Attack_Off02, UAL2 Zombie_Scratch. Shieldbearer (own override): Combat_Defend_Attack01, KI AttackShield02, its own `ShieldbearerCleave` (the Draug's numbers, its clip's timing) | `Draug.overrideController`, `Shieldbearer.overrideController` |
+| 4.1 Ready stances and side steps | `Ready` state, a 2D blend on MoveX/MoveZ (KI Walk01 left/right/back/forward) round Combat_Unarmed_Ready; the Draug holds a sword ready, the Shieldbearer its shield, casters (`Caster.overrideController`: Shaman, Fossegrim, troll-wife) their hands; riders sit, treants idle | `MonsterAI.IsWaitingTurn` (marked while circling, standing ready, holding aim or distance); `CreatureHost.WaitingFlag` in co-op |
+| 4.1 Stun loop | `Stagger` plays KI CombatDamage02, then `Stunned` (Combat_Stun) while the `Staggered` bool holds | controller |
+| 4.1 Get-up | Not changed: the knockdown clip already ends standing within its 1.4 s; a separate lie-and-rise would lengthen the opening, which belongs with C's Reeling payoff | |
+| 4.1 Weapon draw | Draug and Shieldbearer (Monster Definition › Spotted Pause 0.55 s) stop and draw (KI CombatEnter1H01) when they spot someone while idle or looking round | `MonsterAI.BeginDrawIfUnaware`, `HoldsWhileDrawing` |
+| 4.2 Telegraph tiers | Interruptible strikes fill blue; a creature's great blow (Monster Attack › Heavy: charges, stomps, quakes, ground slams; or Impact ≥ 1.5) gets a dark edge and a low swell (Heavy Windup, `Tools/Audio/combat.py`); after a blow is spent a pale green ring shrinks at its feet for the opening. The damage-share rule in §4.2 marked 31 of 68 strikes at 100 health, so it was dropped for the explicit mark | `AttackTelegraph`, `MonsterAttacks.TryGetOpening`, `CombatFeelSettings` › Attack telegraphs |
+| 4.3 Weighted choice | Monster Attack › Weight and When Foe; the one used last counts half, an answer to what the foe does counts 3×, a weightless action above the band still goes first, a choice holds 0.6 s. Given to Draug, Shieldbearer, Stone Troll, Bog Troll, Small Moss Troll, wolves and boars; bosses unchanged | `MonsterAttacks.SelectAttack`, `ChoiceWeight`, `MonsterAI.ReadFoe` |
+| 4.4 Reeling look | Below Reeling Share (0.3) of poise the body sways, embers glow at the chest (Reeling Embers) and the poise bar pulses; poise is a byte in co-op poses (20 bytes now), so friends see it too. The payoff (a heavy blow fells it) is phase C | `ReelingTell`, `MonsterPose.Reeling`, `WorldHealthBar`, `CreatureHost.PoiseByte` |
+| 4.6 Reactions | Light flinch UAL1 Hit_Chest, heavy Hit_Head; casters Combat_Cast_Hit, the Shieldbearer Combat_Defend_Hit; none from behind (the procedural pose tips it forward); an arms-only `Flinch` on the upper-body `Flinch Arms` layer when struck in its own recovery; a strike broken off (interrupt, recoil) plays the heavy flinch | `MonsterAnimationDriver.OnDamaged`, `OnInterrupted` |
+| 4.11 Reacting to each other | Summons rout for 4 s when their summoner dies; a finishing blow or a staggered backstab kill makes ordinary creatures within 8 m falter 0.6 s | `MonsterAI.ShakeTheOthers`, `Waver`, `MonsterAttacks.RoutSummoned` |
+
+Not built from A and B: the Draug's guard-breaking shove (it would be a new attack; the Shieldbearer's rush and the Stone Troll's stomp
+answer a raised guard instead). Every new field defaults to the old behaviour; Old Moss Troll's log throw now plays slowly (×0.29) to land
+its throw at its 1.4 s wind-up: a playtest check.
+
 ## 1. What enemies do in a fight today
 
 ### 1.1-1.5 The fight, system by system

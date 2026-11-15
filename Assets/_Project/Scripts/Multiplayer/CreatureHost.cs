@@ -18,8 +18,9 @@ public sealed class CreatureHost
     /// <summary>Metres beyond which a creature's pose goes three times a second instead of ten (unless its state changes).</summary>
     private const float NearReach = 40f;
 
-    /// <summary>Poses per unreliable message (19 bytes each), under the transport's single-packet limit.</summary>
-    private const int PosesPerMessage = 54;
+    /// <summary>Poses per unreliable message (20 bytes each), under the transport's single-packet limit (the same total as 54 of
+    /// the old 19-byte poses).</summary>
+    private const int PosesPerMessage = 51;
 
     /// <summary>Seconds after which a creature's pose is sent again even when nothing changed, in case one was lost.</summary>
     private const float KeyframeSeconds = 1f;
@@ -48,9 +49,17 @@ public sealed class CreatureHost
         public byte Speed;
         public byte State;
         public byte Health;
+        // Whom it is after (RemoteHunt) in the low bits; WaitingFlag set while it waits its turn.
         public byte Hunting;
+        public byte Poise;
         public float At;
     }
+
+    /// <summary>Set in a pose's hunting byte while the creature waits its turn (a ready stance).</summary>
+    public const byte WaitingFlag = 0x80;
+
+    // Poise in steps of a 64th, so a creature getting its breath back isn't a change every tick.
+    private const int PoiseSteps = 64;
 
     private readonly Dictionary<int, Hosted> byId = new Dictionary<int, Hosted>();
     private readonly Dictionary<MonsterAI, Hosted> byCreature = new Dictionary<MonsterAI, Hosted>();
@@ -310,7 +319,7 @@ public sealed class CreatureHost
             SentPose pose = PoseOf(hosted, now, clientId);
             bool seen = last.TryGetValue(id, out SentPose was);
             bool changed = !seen || (was.Position - pose.Position).sqrMagnitude > 0.0009f || was.Yaw != pose.Yaw || was.State != pose.State
-                || was.Health != pose.Health || was.Speed != pose.Speed || was.Hunting != pose.Hunting;
+                || was.Health != pose.Health || was.Speed != pose.Speed || was.Hunting != pose.Hunting || was.Poise != pose.Poise;
             bool due = !seen || now - was.At >= KeyframeSeconds;
             bool far = distance > NearReach * NearReach;
             if ((!changed && !due) || (far && !due && seen && was.State == pose.State && ticks % 3 != 0))
@@ -325,7 +334,7 @@ public sealed class CreatureHost
         for (int from = 0; from < outgoing.Count; from += PosesPerMessage)
         {
             int count = Mathf.Min(PosesPerMessage, outgoing.Count - from);
-            using var poses = new FastBufferWriter(16 + count * 19, Allocator.Temp);
+            using var poses = new FastBufferWriter(16 + count * 20, Allocator.Temp);
             poses.WriteValueSafe(link.Now);
             poses.WriteValueSafe((ushort)count);
             for (int i = from; i < from + count; i++)
@@ -338,13 +347,15 @@ public sealed class CreatureHost
                 poses.WriteValueSafe(pose.State);
                 poses.WriteValueSafe(pose.Health);
                 poses.WriteValueSafe(pose.Hunting);
+                poses.WriteValueSafe(pose.Poise);
             }
 
             link.Send(CoopCreatures.PosesMessage, clientId, poses, NetworkDelivery.UnreliableSequenced);
         }
     }
 
-    // Facing to 1.4 degrees, speed to a tenth of a metre a second, health to a 255th; and whom it is after, for that friend.
+    // Facing to 1.4 degrees, speed to a tenth of a metre a second, health to a 255th; whom it is after, for that friend, and whether it
+    // waits its turn; its poise to a 64th (friends' copies show it: reeling, the poise bar).
     private static SentPose PoseOf(Hosted hosted, float now, ulong friend) => new SentPose
     {
         Position = hosted.Ai.transform.position,
@@ -352,9 +363,16 @@ public sealed class CreatureHost
         Speed = (byte)Mathf.Clamp(Mathf.RoundToInt(hosted.Ai.Speed * 10f), 0, 255),
         State = (byte)hosted.Ai.CurrentState,
         Health = HealthByte(hosted),
-        Hunting = (byte)HuntingFor(hosted.Ai, friend),
+        Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)),
+        Poise = PoiseByte(hosted.Ai),
         At = now,
     };
+
+    private static byte PoiseByte(MonsterAI creature)
+    {
+        float share = creature.Poise != null ? creature.Poise.Fraction : 1f;
+        return (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.Round(share * PoiseSteps) / PoiseSteps * 255f), 0, 255);
+    }
 
     // After this friend, after someone else on the players' side (the host, another friend), or nobody.
     private static MonsterAI.RemoteHunt HuntingFor(MonsterAI creature, ulong friend)

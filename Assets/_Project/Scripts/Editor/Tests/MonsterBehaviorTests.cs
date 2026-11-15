@@ -48,6 +48,90 @@ public sealed class MonsterBehaviorTests
     }
 
     [Test]
+    public void Selection_WeightlessKeepsPriorityWhateverTheRoll()
+    {
+        MonsterAttack cleave = Action(10), lunge = Action(20);
+        foreach (float roll in new[] { 0f, 0.5f, 0.99f })
+        {
+            Assert.AreEqual(1, MonsterAttacks.SelectAttack(new[] { cleave, lunge }, new float[2], 1f, 0f, false, roll: roll));
+        }
+    }
+
+    [Test]
+    public void Selection_WeightedShareTheirBandByChance()
+    {
+        MonsterAttack cleave = Action(10), lunge = Action(20);
+        cleave.weight = 3f;
+        lunge.weight = 1f;
+        var both = new[] { cleave, lunge };
+        // Cleave holds the first three quarters of the roll, the lunge the last.
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, roll: 0.1f));
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, roll: 0.74f));
+        Assert.AreEqual(1, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, roll: 0.76f));
+        Assert.AreEqual(1, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, roll: 1f));
+        // A spent one isn't a candidate.
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(both, new[] { 0f, 5f }, 1f, 0f, false, roll: 0.9f));
+    }
+
+    [Test]
+    public void Selection_ARepeatCountsHalfAndAnAnswerToTheFoeMore()
+    {
+        MonsterAttack cleave = Action(10), lunge = Action(20);
+        cleave.weight = lunge.weight = 1f;
+        lunge.whenFoe = FoeDoing.BackingOff;
+        var both = new[] { cleave, lunge };
+        Assert.AreEqual(MonsterAttacks.RepeatPenalty, MonsterAttacks.ChoiceWeight(cleave, true, FoeDoing.None), 1e-5f);
+        Assert.AreEqual(MonsterAttacks.FoeBonus, MonsterAttacks.ChoiceWeight(lunge, false, FoeDoing.BackingOff | FoeDoing.Guarding), 1e-5f);
+        Assert.AreEqual(1f, MonsterAttacks.ChoiceWeight(lunge, false, FoeDoing.Guarding), 1e-5f);
+        // The cleave just used counts 0.5 against the lunge's 1: a third of the roll.
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, last: 0, roll: 0.3f));
+        Assert.AreEqual(1, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, last: 0, roll: 0.36f));
+        // The foe backing off: the lunge counts 3 against 1, three quarters of the roll.
+        Assert.AreEqual(1, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, foe: FoeDoing.BackingOff, roll: 0.3f));
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(both, new float[2], 1f, 0f, false, foe: FoeDoing.BackingOff, roll: 0.2f));
+    }
+
+    [Test]
+    public void Selection_AReadyWeightlessActionAboveTheBandStillGoesFirst()
+    {
+        MonsterAttack cleave = Action(10), lunge = Action(20), warCry = Action(25), stones = Action(15);
+        cleave.weight = lunge.weight = 1f;
+        // A weightless call above them all wins outright.
+        Assert.AreEqual(2, MonsterAttacks.SelectAttack(new[] { cleave, lunge, warCry }, new float[3], 1f, 0f, false, roll: 0.9f));
+        // A weightless throw in the middle keeps what is below it out of the band: only the lunge is left.
+        foreach (float roll in new[] { 0f, 0.5f, 1f })
+        {
+            Assert.AreEqual(1, MonsterAttacks.SelectAttack(new[] { cleave, lunge, stones }, new float[3], 1f, 0f, false, roll: roll));
+        }
+    }
+
+    [Test]
+    public void Telegraph_HeavyWhenMarkedOrHardHitting()
+    {
+        Assert.IsTrue(AttackTelegraph.IsHeavy(true, 1f, 1.5f), "a creature's great blow");
+        Assert.IsTrue(AttackTelegraph.IsHeavy(false, 1.5f, 1.5f), "a weighty attack counts anyway");
+        Assert.IsFalse(AttackTelegraph.IsHeavy(false, 1.2f, 1.5f), "an everyday strike");
+    }
+
+    [Test]
+    public void Poise_AFriendsCopyShowsTheHostsShare()
+    {
+        var meter = new PoiseMeter(140f, 2f, 15f);
+        meter.Show(0.25f);
+        Assert.AreEqual(0.25f, meter.Fraction, 1e-5f);
+        meter.Show(2f);
+        Assert.AreEqual(1f, meter.Fraction, 1e-5f);
+    }
+
+    [Test]
+    public void Reeling_SwaysBothWaysAndNotAtRest()
+    {
+        Assert.AreEqual(0f, ReelingTell.Sway(0f, 0.3f, 4f, 1f), 1e-5f);
+        Assert.AreEqual(4f, ReelingTell.Sway(1f, 0.25f, 4f, 1f), 1e-4f);
+        Assert.AreEqual(-4f, ReelingTell.Sway(1f, 0.75f, 4f, 1f), 1e-4f);
+    }
+
+    [Test]
     public void Selection_SkipsIncompleteEntries()
     {
         Assert.AreEqual(-1, MonsterAttacks.SelectAttack(new MonsterAttack[] { null, new MonsterAttack() }, new float[2], 1f, 0f, true));

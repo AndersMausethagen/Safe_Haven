@@ -451,18 +451,18 @@ PrefabInstance:
     - target: {fileID: 5866666021909216657, guid: 127aaabf45a1cc64fa6d6e042baa9f16, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+      objectReference: {fileID: 22100000, guid: d874ead5d5d61e445aedd4dda35e3b03, type: 2}
     - target: {fileID: 5866666021909216657, guid: 127aaabf45a1cc64fa6d6e042baa9f16, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7208261743932278219, guid: 127aaabf45a1cc64fa6d6e042baa9f16, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.014994283
+      value: -0.014994284
       objectReference: {fileID: 0}
     - target: {fileID: 7208261743932278219, guid: 127aaabf45a1cc64fa6d6e042baa9f16, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.045338176
+      value: -0.04533818
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

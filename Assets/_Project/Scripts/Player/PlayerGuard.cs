@@ -44,6 +44,9 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     /// <summary>True while the guard is up.</summary>
     public bool IsGuarding { get; private set; }
 
+    /// <summary>Seconds the guard has been up (0 while it is down): a creature reads a guard held a while as a turtle to break.</summary>
+    public float GuardedFor => IsGuarding ? Time.time - raisedAt : 0f;
+
     /// <summary>True while reeling from a broken guard: no attacking, guarding or moving.</summary>
     public bool IsStunned => Time.time < stunnedUntil;
 

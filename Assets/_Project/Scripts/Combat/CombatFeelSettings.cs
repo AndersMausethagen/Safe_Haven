@@ -85,6 +85,30 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0f)] private float telegraphLinger = 0.1f;
     [Tooltip("The fill of a blow no guard stops (a grab, a shield rush, a quake): it can only be dodged.")]
     [SerializeField] private Color unblockableColor = new Color(0.72f, 0.12f, 0.95f, 0.55f);
+    [Tooltip("The fill of a strike any blow in its wind-up breaks off (Interruptible: a call, a cast, a quick shove), so the player " +
+             "learns which ones to hit rather than dodge.")]
+    [SerializeField] private Color interruptibleColor = new Color(0.3f, 0.78f, 1f, 0.5f);
+    [Tooltip("The edge drawn round a heavy strike's area: a creature's great blow (Monster Attack › Heavy) or one with Impact at least Heavy Impact.")]
+    [SerializeField] private Color heavyEdgeColor = new Color(0.75f, 0.04f, 0.02f, 0.8f);
+    [Tooltip("Width of a heavy strike's edge, as a share of its reach.")]
+    [SerializeField, Range(0.02f, 0.3f)] private float heavyEdgeWidth = 0.09f;
+    [SerializeField, Range(0.25f, 3f)] private float heavyImpact = 1.5f;
+    [Tooltip("Plays as a heavy strike starts its wind-up: a low swell, heard before it is seen.")]
+    [SerializeField] private SoundDefinition heavyWindupSound;
+    [Tooltip("The ring at a creature's feet after its blow lands, shrinking until it can act again: the opening to punish it in.")]
+    [SerializeField] private Color openingColor = new Color(0.45f, 1f, 0.5f, 0.45f);
+    [Tooltip("Metres the opening ring reaches past the body when it opens (it shrinks in to the body as it closes), and the ring's width.")]
+    [SerializeField, Min(0f)] private float openingReach = 0.45f;
+    [SerializeField, Min(0.02f)] private float openingWidth = 0.12f;
+
+    [Header("Reeling (a creature's poise worn low: Combat Technique Settings › Reeling Share)")]
+    [Tooltip("Looping effect at a reeling creature's chest (embers through the cracks).")]
+    [SerializeField] private GameObject reelingEffect;
+    [Tooltip("Degrees a reeling body sways side to side, and how many times a second.")]
+    [SerializeField, Min(0f)] private float reelingSway = 4f;
+    [SerializeField, Min(0.1f)] private float reelingSwayRate = 0.9f;
+    [Tooltip("The poise bar pulses towards this colour while the creature reels.")]
+    [SerializeField] private Color reelingBarColor = new Color(1f, 0.55f, 0.15f, 1f);
 
     [Header("Dodge")]
     [Tooltip("Trail left behind while dodging. Uses the telegraph material.")]
@@ -306,6 +330,18 @@ public sealed class CombatFeelSettings : ScriptableObject
     public Color TechniqueTextColor => techniqueTextColor;
     public Color ParryCueColor => parryCueColor;
     public Color UnblockableColor => unblockableColor;
+    public Color InterruptibleColor => interruptibleColor;
+    public Color HeavyEdgeColor => heavyEdgeColor;
+    public float HeavyEdgeWidth => heavyEdgeWidth;
+    public float HeavyImpact => heavyImpact;
+    public SoundDefinition HeavyWindupSound => heavyWindupSound;
+    public Color OpeningColor => openingColor;
+    public float OpeningReach => openingReach;
+    public float OpeningWidth => openingWidth;
+    public GameObject ReelingEffect => reelingEffect;
+    public float ReelingSway => reelingSway;
+    public float ReelingSwayRate => reelingSwayRate;
+    public Color ReelingBarColor => reelingBarColor;
     public GameObject LandingEffect => landingEffect != null ? landingEffect : structureHitEffect;
     public GameObject HitEffect => hitEffect;
     public GameObject CriticalHitEffect => criticalHitEffect;

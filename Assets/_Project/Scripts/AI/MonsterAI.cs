@@ -380,6 +380,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         Transform visual = transform.Find("Model");
         CreatureLook.Vary(visual, definition);
         pose = visual != null ? new MonsterPose(visual) { RestsByAnimation = HasRestClip(visual) } : null;
+        reelingTell = new ReelingTell(transform);
         if (pose != null && damageable != null)
         {
             // The pose recoils from blows and owns the model's scale, so the generic squash would fight it.
@@ -454,6 +455,7 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         damageable.Damaged -= OnDamaged;
         damageable.Died -= OnDied;
         damageable.RemoveInvulnerability(this);
+        reelingTell?.Clear();
     }
 
     private void Update()
@@ -659,6 +661,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     // Body language (MonsterPose) after movement, so it shows this frame's attack and stagger.
     private void LateUpdate()
     {
+        if (definition != null && !suppressed)
+        {
+            UpdateTells();
+        }
+
         if (pose == null || definition == null)
         {
             return;

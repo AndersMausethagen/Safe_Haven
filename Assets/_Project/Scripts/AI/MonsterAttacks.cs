@@ -95,8 +95,53 @@ public sealed class MonsterAttacks
     /// <summary>True once the last strike's cooldown is over.</summary>
     public bool IsReady => Time.time >= nextAttackTime;
 
-    /// <summary>The highest-priority action usable at <paramref name="distance"/> now, or -1.</summary>
-    public int ChooseAction(float distance, bool isLeader) => SelectAttack(definition.Attacks, readyAt, distance, Time.time, isLeader, RaidTier, Phase, HealthShare);
+    /// <summary>A weighted action just used counts this much at the next choice, so the same strike rarely comes twice running.</summary>
+    public const float RepeatPenalty = 0.5f;
+
+    /// <summary>A weighted action whose When Foe matches what its target is doing counts this many times over.</summary>
+    public const float FoeBonus = 3f;
+
+    // A choice by chance stands this long while the creature turns and closes, so it isn't rolled again every frame and what the foe
+    // was doing when it chose (at its flank) still counts when it strikes.
+    private const float ChoiceHoldSeconds = 0.6f;
+    private int heldChoice = -1;
+    private float choiceHeldUntil;
+    private int lastActionIndex = -1;
+
+    /// <summary>The action usable at <paramref name="distance"/> now (highest priority, or by chance among weighted ones), or -1.</summary>
+    public int ChooseAction(float distance, bool isLeader, FoeDoing foe = FoeDoing.None)
+    {
+        float now = Time.time;
+        IReadOnlyList<MonsterAttack> actions = definition.Attacks;
+        if (heldChoice >= 0 && heldChoice < actions.Count && now < choiceHeldUntil && actions[heldChoice] != null
+            && actions[heldChoice].IsAvailable(distance, now, readyAt[heldChoice], isLeader, RaidTier, Phase, HealthShare)
+            && !WeightlessReadyAbove(actions[heldChoice].priority, distance, now, isLeader))
+        {
+            return heldChoice;
+        }
+
+        int chosen = SelectAttack(actions, readyAt, distance, now, isLeader, RaidTier, Phase, HealthShare, lastActionIndex, foe, Random.value);
+        heldChoice = chosen >= 0 && actions[chosen].weight > 0f ? chosen : -1;
+        choiceHeldUntil = now + ChoiceHoldSeconds;
+        return chosen;
+    }
+
+    // A weightless action above this priority came ready (a call): it still goes first, whatever was chosen by chance.
+    private bool WeightlessReadyAbove(int priority, float distance, float now, bool isLeader)
+    {
+        IReadOnlyList<MonsterAttack> actions = definition.Attacks;
+        for (int i = 0; i < actions.Count; i++)
+        {
+            MonsterAttack candidate = actions[i];
+            if (candidate != null && candidate.weight <= 0f && candidate.priority > priority
+                && candidate.IsAvailable(distance, now, readyAt[i], isLeader, RaidTier, Phase, HealthShare))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>The strike that reaches <paramref name="distance"/>, spent or not, or -1: what it wheels round into when it answers a
     /// backstab. The blow it was knocked out of has just gone on cooldown, and that mustn't leave it with nothing to answer with.</summary>
@@ -120,19 +165,90 @@ public sealed class MonsterAttacks
     // Read each time, as a creature can outlive a raid's start but never changes raids.
     private static int RaidTier => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
 
-    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0, int phase = 0, float health = 1f)
+    /// <summary>
+    /// The action to use, or -1. The highest-priority ready one, as always, unless it has a Weight: then every ready action with a weight
+    /// whose priority isn't below a ready weightless one is a candidate, picked by <paramref name="roll"/> (0-1) in proportion to its
+    /// weight (<see cref="ChoiceWeight"/>: the one used last counts half, one matching what the foe does counts more). Pure, for tests.
+    /// </summary>
+    public static int SelectAttack(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, bool isLeader, int tier = 0, int phase = 0, float health = 1f,
+        int last = -1, FoeDoing foe = FoeDoing.None, float roll = 0f)
     {
         int chosen = -1;
+        int weightlessTop = int.MinValue;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate != null && candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase, health)
-                && (chosen < 0 || candidate.priority > attacks[chosen].priority))
+            if (candidate == null || !candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase, health))
+            {
+                continue;
+            }
+
+            if (chosen < 0 || candidate.priority > attacks[chosen].priority)
             {
                 chosen = i;
             }
+
+            if (candidate.weight <= 0f)
+            {
+                weightlessTop = Mathf.Max(weightlessTop, candidate.priority);
+            }
         }
-        return chosen;
+
+        if (chosen < 0 || attacks[chosen].weight <= 0f)
+        {
+            return chosen;
+        }
+
+        float total = 0f;
+        for (int i = 0; i < attacks.Count; i++)
+        {
+            total += BandWeight(attacks, cooldowns, i, distance, now, isLeader, tier, phase, health, weightlessTop, last, foe);
+        }
+
+        float pick = Mathf.Clamp01(roll) * total;
+        int fallback = chosen;
+        for (int i = 0; i < attacks.Count; i++)
+        {
+            float weight = BandWeight(attacks, cooldowns, i, distance, now, isLeader, tier, phase, health, weightlessTop, last, foe);
+            if (weight <= 0f)
+            {
+                continue;
+            }
+
+            fallback = i;
+            pick -= weight;
+            if (pick < 0f)
+            {
+                return i;
+            }
+        }
+
+        // A roll of exactly 1 lands past the last; it is the last candidate's.
+        return fallback;
+    }
+
+    /// <summary>How much a weighted action counts in a choice: half if it was the last used, Foe Bonus times if it answers what the foe does.</summary>
+    public static float ChoiceWeight(MonsterAttack action, bool usedLast, FoeDoing foe)
+    {
+        if (action == null || action.weight <= 0f)
+        {
+            return 0f;
+        }
+
+        return action.weight * (usedLast ? RepeatPenalty : 1f) * ((action.whenFoe & foe) != 0 ? FoeBonus : 1f);
+    }
+
+    private static float BandWeight(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, int i, float distance, float now, bool isLeader, int tier, int phase,
+        float health, int weightlessTop, int last, FoeDoing foe)
+    {
+        MonsterAttack candidate = attacks[i];
+        if (candidate == null || candidate.weight <= 0f || candidate.priority < weightlessTop
+            || !candidate.IsAvailable(distance, now, cooldowns[i], isLeader, tier, phase, health))
+        {
+            return 0f;
+        }
+
+        return ChoiceWeight(candidate, i == last, foe);
     }
 
     /// <summary>True when one of its actions that strikes (not a howl) reaches <paramref name="distance"/>, so it can hold its ground.</summary>
@@ -200,6 +316,12 @@ public sealed class MonsterAttacks
     {
         actionIndex = index;
         action = index >= 0 ? definition.Attacks[index] : null;
+        heldChoice = -1;
+        if (index >= 0)
+        {
+            lastActionIndex = index;
+        }
+
         if (action != null && action.kind == MonsterAttackKind.Charge && action.leadTarget > 0f)
         {
             toTarget += TargetVelocity * (toTarget.magnitude / Mathf.Max(action.chargeSpeed, 0.1f) * action.leadTarget);
@@ -322,6 +444,86 @@ public sealed class MonsterAttacks
     public void Delay(float seconds)
     {
         nextAttackTime = Time.time + seconds;
+    }
+
+    /// <summary>No new strike for at least <paramref name="seconds"/>: a wait already longer stands.</summary>
+    public void DelayAtLeast(float seconds)
+    {
+        nextAttackTime = Mathf.Max(nextAttackTime, Time.time + seconds);
+    }
+
+    /// <summary>
+    /// True once the strike has spent itself and nothing more follows (the blow landed with no follow-up to come, a charge ended exposed,
+    /// the last shot is away): the opening before it can act again. <paramref name="left"/> and <paramref name="length"/> are its seconds.
+    /// </summary>
+    public bool TryGetOpening(out float left, out float length)
+    {
+        left = length = 0f;
+        AttackDefinition attack = Attack;
+        if (attack == null)
+        {
+            return false;
+        }
+
+        float elapsed = Time.time - startTime;
+        float spent = attack.HitDelay, end = attack.RecoveryTime;
+        if (action != null)
+        {
+            switch (action.kind)
+            {
+                case MonsterAttackKind.Charge:
+                    if (exposedAt < 0f)
+                    {
+                        return false;
+                    }
+
+                    left = action.exposedSeconds - (Time.time - exposedAt);
+                    length = action.exposedSeconds;
+                    return left > 0f && length > 0f;
+                case MonsterAttackKind.Projectile:
+                case MonsterAttackKind.Lob:
+                    if (shotsFired < action.burstCount)
+                    {
+                        return false;
+                    }
+
+                    spent = attack.HitDelay + (action.burstCount - 1) * action.burstInterval;
+                    end = Mathf.Max(attack.RecoveryTime, spent + (action.kind == MonsterAttackKind.Lob ? 0.3f : 0.5f));
+                    break;
+                default:
+                    if (hitPending || blowsLeft > 0)
+                    {
+                        return false;
+                    }
+
+                    break;
+            }
+        }
+        else if (hitPending)
+        {
+            return false;
+        }
+
+        left = end - elapsed;
+        length = end - spent;
+        return left > 0f && length > 0f;
+    }
+
+    /// <summary>What it called up runs from the fight for <paramref name="seconds"/> (their summoner fell).</summary>
+    public void RoutSummoned(float seconds)
+    {
+        foreach (GameObject root in summoned)
+        {
+            if (root == null)
+            {
+                continue;
+            }
+
+            foreach (MonsterAI ai in root.GetComponentsInChildren<MonsterAI>())
+            {
+                ai.Rout(seconds);
+            }
+        }
     }
 
     private bool UpdateAction(AttackDefinition attack, float elapsed, Vector3? aimPoint)

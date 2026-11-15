@@ -45,6 +45,9 @@ public sealed class MonsterPose
     /// <summary>The body has a clip for resting, so the whole of it isn't tipped and pressed down as well.</summary>
     public bool RestsByAnimation { get; set; }
 
+    /// <summary>How much it reels from worn-down poise, 0-1 (ReelingTell): it sways side to side, a little bent.</summary>
+    public float Reeling { get; set; }
+
     public void Attack(AttackDefinition attack, float start)
     {
         posedAttack = attack;
@@ -150,8 +153,16 @@ public sealed class MonsterPose
         float restLean = RestsByAnimation ? 0f : Mathf.Sin(Mathf.Clamp01(restNow) * Mathf.PI) * GrazeLean;
         float height = RestsByAnimation ? pose.Height : pose.Height * Mathf.Lerp(1f, SleepHeight, Mathf.InverseLerp(0.5f, 1f, restNow));
         float width = 1f / Mathf.Sqrt(Mathf.Max(0.5f, height));
+        float reelSway = 0f, reelLean = 0f;
+        if (Reeling > 0f && !dead)
+        {
+            CombatFeelSettings feel = CombatFeelSettings.Current;
+            reelSway = ReelingTell.Sway(Reeling, Time.time, feel.ReelingSway, feel.ReelingSwayRate);
+            reelLean = Reeling * feel.ReelingSway * 0.5f;
+        }
+
         visual.localPosition = homePosition + Vector3.up * (hover + leap) + Vector3.forward * pose.Shift + shove;
-        visual.localRotation = tip * Quaternion.Euler(-pose.Lean + restLean, 0f, pose.Sway) * homeRotation;
+        visual.localRotation = tip * Quaternion.Euler(-pose.Lean + restLean + reelLean, 0f, pose.Sway + reelSway) * homeRotation;
         visual.localScale = Vector3.Scale(homeScale, new Vector3(width * (1f + squash), height * (1f - squash), width * (1f + squash)));
     }
 }

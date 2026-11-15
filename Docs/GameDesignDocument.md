@@ -553,6 +553,16 @@ These values remain editable prototyping defaults pending encounter playtesting.
 
 Their bodies are placeholders, and they appear through the raid's spawn lists and events.
 
+**Enemies of their own (November 15, 2026):** after the player's combat rework, creatures were given their own moves and clearer tells
+rather than the player's (Docs/EnemyCombatResearch.md, phases A and B). Human-shaped creatures call, cast, throw, shove and swing with
+clips the player never uses; they stand ready and step round the player while waiting their turn, are dazed for as long as a stagger
+lasts, and draw their weapon when they spot someone unaware. The ground warning tells strikes apart (any blow breaks off a blue one, a
+purple one can't be blocked, a creature's great blow has a dark edge and a low swell), a green ring shows the opening after a blow, and
+a creature low on poise sways with embers at its chest. Draug, Shieldbearer, trolls, wolves and boars choose their strikes by chance
+and answer what the player does (a raised guard, backing off, a drawn bow). Summons scatter when their summoner falls, and a brutal
+kill makes creatures nearby falter. Damage, health and cooldowns are unchanged; the balance-changing ideas (a reeling creature felled by
+a heavy blow, enemy guards, hurt states, elite verbs, breakable armour, dodging arrows) wait for the playtest.
+
 ### 10.6 Status effects
 
 **Poison:** damage over time, cleansed or mitigated by herbs and brews. **Frost:** slows movement/attacks; clothing or warming food helps. **Roots:** brief ground-telegraphed immobilization. **Enchanted:** temporarily weakens healing or abilities and can be cleansed. **Warmth / Courage:** beneficial effects from meals, equipment, and companions. Keep status icons distinct and accessible.

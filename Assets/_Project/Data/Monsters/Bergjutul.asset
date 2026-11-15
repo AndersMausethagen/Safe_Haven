@@ -54,6 +54,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 4
     priority: 1
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 1.2
     interruptible: 0
     sound: {fileID: 0}
@@ -104,6 +107,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 3
     priority: 2
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 7
     interruptible: 0
     sound: {fileID: 0}
@@ -154,6 +160,9 @@ MonoBehaviour:
     minimumRange: 4
     maximumRange: 11
     priority: 15
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 13
     interruptible: 0
     sound: {fileID: 0}
@@ -204,6 +213,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 14
     priority: 25
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 32
     interruptible: 0
     sound: {fileID: 11400000, guid: ca60a941079fed04bad550318182d713, type: 2}
@@ -254,6 +266,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 5
     priority: 18
+    weight: 0
+    whenFoe: 0
+    heavy: 1
     cooldown: 12
     interruptible: 0
     sound: {fileID: 0}
@@ -304,6 +319,9 @@ MonoBehaviour:
     minimumRange: 6
     maximumRange: 24
     priority: 14
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 14
     interruptible: 0
     sound: {fileID: 0}
@@ -371,7 +389,9 @@ MonoBehaviour:
   canBeFinished: 0
   flankSpread: 0
   breaksWalls: 1
+  spottedPause: 0
   poise: 450
+  parryResponse: 0
   openWhileStriking: 0
   parriesBackstabs: 0
   shieldArc: 0

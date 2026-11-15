@@ -184,6 +184,22 @@ Some melee strikes go on into a follow-up, aimed anew with its own wind-up and w
 stopped part-filled, so a roll on reflex comes too soon. Draug and Barrow Shieldbearer chain a cleave into a backswing, and hold a cleave 30% of the time;
 Small Moss Trolls chain their shove from Tier II, and hold it 25% of the time.
 
+**Reading a creature (2026-11-15, Docs/EnemyCombatResearch.md):**
+- *The warning on the ground says what to do.* Red fills are ordinary strikes. Blue fills can be broken off by any blow in the wind-up
+  (calls, casts, quick shoves): hit them. Purple can't be blocked: dodge. A dark red edge and a low swell mark a creature's great blow
+  (a charge, a stomp, a quake). The parry moment still turns the fill pale at the end.
+- *The opening shows.* Once a blow is spent, a pale green ring at the creature's feet shrinks over the time it can't act: punish inside it.
+- *Reeling.* Below 30% of its poise a creature sways, embers glow at its chest and its poise bar pulses: a stagger is near, so press.
+- *Its own moves.* Creatures don't use the player's swings. Casters channel with their arms up (a call) or forward (a cast) and let go
+  just before it lands; stones are thrown; the Draug swings ragged and rakes with its off hand, the Shieldbearer bashes with its shield.
+  One waiting its turn stands ready and steps round you; a Draug or Shieldbearer that spots you unaware stops a beat to draw.
+  Staggered, it is dazed for as long as the stagger lasts. Struck in its own recovery, only its arms flinch.
+- *Not the same order every time.* Draug, Shieldbearer, trolls, wolves and boars pick among their strikes by chance, rarely the same
+  one twice, and answer what you do: backing off or drawing a bow draws a lunge or a charge, a guard held up a while a shield rush or
+  a stomp. Calls and bosses still go by priority.
+- *They notice each other.* Rootlings run for a while when their Shaman falls, and a finishing blow or a staggered backstab kill
+  makes ordinary creatures nearby falter a moment.
+
 | Creature | Reads as | How to beat it |
 |---|---|---|
 | Marsh Light | Pale hovering light, keeps its distance, flees when hurt | Its cold bolts are slow: dodge, then shoot it or run it down |

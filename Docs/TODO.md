@@ -66,6 +66,25 @@ Play-mode probes from the CLI and tests only: every number is a first guess. Pla
 - [ ] Mixamo clips were not used (no browser in the agent session), nor the optional two-hand or power-stance toggle: decide
       whether either is still wanted.
 
+## Enemy identity and tells (2026-11-15)
+
+Phases A and B of Docs/EnemyCombatResearch.md (its Status section). Checked by probes and tests only. Fight a Draug, a Shieldbearer, a
+Moss Shaman with its Rootlings, a Stone Troll and a pack of wolves:
+- [ ] The ground colours: blue (hit it), purple (dodge it), red with a dark edge and a low swell (a great blow). Readable at a glance,
+      or too many colours? Is the swell heard in a crowd?
+- [ ] The green opening ring after a blow: seen, and does it make punishing feel fair? Is it told apart from the orange focus ring?
+- [ ] Reeling (poise under 30%): the sway, the chest embers and the pulsing poise bar. Seen from the gameplay camera, by day and in a
+      dark raid?
+- [ ] Calls and casts: does the shaman's arms-up channel read as "interrupt me"? Do the casts let go when the bolt leaves?
+- [ ] The Draug's new swings and rake, the Shieldbearer's shield bash and rush: do they look like a dead warrior and a shield-bearer,
+      and do blows land where the arm is?
+- [ ] Ready stances and side steps while waiting a turn: do the feet slide? The Draug steps with a human walk sideways.
+- [ ] The 0.55 s weapon draw on spotting: a fair first-strike moment, or a free hit?
+- [ ] Strikes by chance: less predictable without feeling random? Do lunges come when you back off or draw the bow?
+- [ ] The Old Moss Troll's log throw now plays slowly to match its 1.4 s wind-up: heavy, or slow motion?
+- [ ] Phase C (needs your pick): a heavy blow felling a reeling creature, enemy guards (shield wall, a parrying Draug), hurt states,
+      elite verbs, breakable armour, dodging arrows.
+
 ## Horses and the playtest list (2026-11-11)
 
 Built and checked in Play (see GDD §10.9); none of it played by hand yet.

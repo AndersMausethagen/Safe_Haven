@@ -42,6 +42,12 @@ public sealed class PoiseMeter
         return true;
     }
 
+    /// <summary>Co-op, a friend's copy: shows the host's creature's poise (<paramref name="fraction"/> of it). The copy wears none of its own.</summary>
+    public void Show(float fraction)
+    {
+        Current = Mathf.Clamp01(fraction) * Max;
+    }
+
     public void Tick(float now, float deltaTime)
     {
         if (now - lastHit >= recoveryDelay)
