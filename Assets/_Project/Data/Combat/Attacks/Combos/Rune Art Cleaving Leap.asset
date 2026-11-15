@@ -42,11 +42,18 @@ MonoBehaviour:
   motion: 3
   motionDistance: 3
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: KI 2H Leap Slam
-  animationSpeed: 1.0000004
-  strikeSpeed: 1.0000004
-  strikeLead: 0
-  followThroughSpeed: 1.1315789
+  animationSpeed: 0.78767145
+  strikeSpeed: 1.25
+  strikeLead: 0.05333345
+  followThroughSpeed: 1.25
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.62, b: 0.3, a: 0.95}

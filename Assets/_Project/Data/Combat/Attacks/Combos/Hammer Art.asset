@@ -42,11 +42,18 @@ MonoBehaviour:
   motion: 3
   motionDistance: 3.5
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: 2H Slam
-  animationSpeed: 0.8177086
-  strikeSpeed: 0.8177086
-  strikeLead: 0
-  followThroughSpeed: 0.7
+  animationSpeed: 0.57926846
+  strikeSpeed: 1.25
+  strikeLead: 0.09333344
+  followThroughSpeed: 0.9
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.62, b: 0.3, a: 0.95}

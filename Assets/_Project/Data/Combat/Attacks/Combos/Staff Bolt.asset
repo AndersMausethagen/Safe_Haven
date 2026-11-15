@@ -50,10 +50,10 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Staff Bolt
-  animationSpeed: 1.6145838
-  strikeSpeed: 1.6145838
-  strikeLead: 0
-  followThroughSpeed: 0.7
+  animationSpeed: 1.4
+  strikeSpeed: 1.6279094
+  strikeLead: 0.08190475
+  followThroughSpeed: 0.9
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

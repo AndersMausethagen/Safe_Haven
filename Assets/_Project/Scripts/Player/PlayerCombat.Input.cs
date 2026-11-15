@@ -197,10 +197,15 @@ public sealed partial class PlayerCombat
                 return;
             }
 
+            // The arms are already part way up the light wind-up: the heavy one goes on from as far, not from its first frame
+            // (the user, 2026-11-15: holding for a heavy looked like a light swing changing its mind).
+            float elapsed = ActiveElapsed;
+            HeavyGrownFrom = Mathf.Clamp(elapsed / Mathf.Max(0.01f, elapsed + TimeToHit), 0f, 0.8f);
             EndSwing();
             heavyCredit = credit;
             Begin(SwingKind.Heavy, ChainPress.Late);
             heavyCredit = 0f;
+            HeavyGrownFrom = 0f;
             return;
         }
 

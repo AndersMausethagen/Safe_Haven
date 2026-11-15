@@ -39,11 +39,21 @@ MonoBehaviour:
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: Pole Rise
-  animationSpeed: 0.662439
-  strikeSpeed: 1.8
-  strikeLead: 0.083333336
-  followThroughSpeed: 1.8
+  animationSpeed: 0.5379097
+  strikeSpeed: 1.25
+  strikeLead: 0.10666676
+  followThroughSpeed: 1.3
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

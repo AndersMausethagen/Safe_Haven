@@ -240,6 +240,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// <summary>Seconds until the swing in progress lands; meaningful while <see cref="IsWindingUp"/>.</summary>
     public float TimeToHit => HitAt(activeAttack, activeSpeed) - ActiveElapsed;
 
+    /// <summary>
+    /// While a held press turns its light swing into the heavy one: how far through its wind-up the light swing had got (0-0.8), so the
+    /// heavy one's animation takes up from there instead of starting over (PlayerAnimationController). 0 otherwise.
+    /// </summary>
+    public float HeavyGrownFrom { get; private set; }
+
     /// <summary>Share of walking speed the swing in progress keeps while it winds up (0: planted).</summary>
     public float WindupMoveShare => IsWindingUp ? activeWindupMove : 0f;
 

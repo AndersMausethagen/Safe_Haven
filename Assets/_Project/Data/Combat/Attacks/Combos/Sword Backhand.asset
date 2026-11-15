@@ -42,11 +42,18 @@ MonoBehaviour:
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: KI 1H Backhand
-  animationSpeed: 1.2948723
-  strikeSpeed: 1.5
-  strikeLead: 0.08
-  followThroughSpeed: 1.8
+  animationSpeed: 1.0465119
+  strikeSpeed: 1.25
+  strikeLead: 0.0533334
+  followThroughSpeed: 1.3
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.75}

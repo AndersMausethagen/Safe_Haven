@@ -1428,6 +1428,9 @@ The player is no super soldier: combat is about reading the enemy and committing
     `GroundHazard.Harm` for the ground they leave. `ItemTooltipView` shows `MealFamily`, `EffectOf` and per-stat arrows. `StatNames`
     shows Might and Blight.
   - **Telemetry:** Kit and Hurt rows in `PlaytestLog`.
+- **Swing timing (2026-11-15):** `CombatSwingTiming` (Editor) measures a player swing's clip on the rig (weapon hand: end of
+  wind-up, contact, settle) and fits Animation Speed, Strike Speed, Strike Lead and Follow-Through Speed to the attack's unchanged Hit
+  Delay and Recovery Time; `CombatSwingTimingTests` hold every swing to it. Swing states leave at the clip's end (0.15 s).
 - **Enchanting (2026-11-15, Docs/EnchantingResearch.md › Status):**
   - **Learning:** `EnchantmentDefinition` gains slot flags (Head to Staff; a shield is `Shield`), `Source`, `Tier`, `RequiredRunecraft`,
     `KnownFromStart`, `KnownInOldSaves` and `IsGreat`. `CharacterProgress.Knows`/`Learn` keep learned ids, saved as

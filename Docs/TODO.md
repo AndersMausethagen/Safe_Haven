@@ -77,6 +77,18 @@ Made to close the failing tests; not heard or seen in game:
       then `AgentScripts/BuildIcons.cs` (Conditions). Do it with Minecraft closed: it was open with 1.3 GB free, so it was skipped.
       `PaintedIconTests.StatusEffectDefinition` fails until then.
 
+## Swing timing (2026-11-15)
+
+Every player swing re-timed from its clip (CombatSwingTiming; the user: "like the character holds back while swinging"). Gameplay
+timing (Hit Delay, Recovery Time, so cadence and damage per second) is unchanged:
+- the real swing (the drive from the top of the backswing to contact) plays at 1.25x, the blow lands on the clip's contact (it landed
+  0.09 s of clip after it on every attack), and the anticipation absorbs the slowing;
+- the follow-through keeps the clip's momentum (0.9-1.3x, not squeezed into the chain point), and swing states leave at the clip's
+  end with a 0.15 s blend (was 92%), so the greatsword's Full Turn finishes its turn.
+- [ ] Play the greatsword (first attack, Full Turn), the warhammer finisher, the club's third chop: do they read as committed blows?
+      Is the slower anticipation too slow on any (Hammer Finisher, Axe Heavy, Chop Heavy wind up at about 0.38x)?
+- [ ] Combos: the next swing may now start while the last one's tail still plays; does the chain still flow?
+
 ## Combat playtest fixes (2026-11-15)
 
 From the user's playtest. Tests only, unplayed:

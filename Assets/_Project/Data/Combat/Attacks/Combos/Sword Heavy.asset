@@ -39,11 +39,21 @@ MonoBehaviour:
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: Sword Heavy
-  animationSpeed: 0.61415094
-  strikeSpeed: 1.35
-  strikeLead: 0.06666667
-  followThroughSpeed: 1
+  animationSpeed: 0.7383966
+  strikeSpeed: 1.25
+  strikeLead: 0.12000015
+  followThroughSpeed: 1.0999998
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

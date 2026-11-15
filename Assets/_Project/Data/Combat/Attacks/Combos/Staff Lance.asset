@@ -50,10 +50,10 @@ MonoBehaviour:
   castRange: 18
   castHazard: {fileID: 0}
   animationState: Staff Channel
-  animationSpeed: 1.2435896
-  strikeSpeed: 1.5
-  strikeLead: 0.08
-  followThroughSpeed: 1.1333537
+  animationSpeed: 1.1413041
+  strikeSpeed: 1.25
+  strikeLead: 0.2933333
+  followThroughSpeed: 1.2333537
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

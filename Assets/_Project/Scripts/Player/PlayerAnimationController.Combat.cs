@@ -22,7 +22,10 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
-        float speed = combat.IsCharging ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : attack.AnimationSpeed;
+        // A heavy swing grown out of a light one started part way into its wind-up clip: the rest of the wind-up plays slower by as
+        // much, so the strike frame still meets the blow.
+        float windup = attack.AnimationSpeed * (1f - grownFrom);
+        float speed = combat.IsCharging ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : windup;
         SetFloat(ActionSpeedHash, speed * swingSpeed);
         if (plantedSwing != 0 && !combat.IsCharging && combat.TimeToHit <= Mathf.Max(attack.StrikeLead, PlantedStrikeLead))
         {
@@ -166,9 +169,19 @@ public sealed partial class PlayerAnimationController
         }
 
         swingSpeed = swing.Speed;
-        SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed);
+        // Grown out of the light swing its press began: take up the heavy clip as far into its wind-up as the light one had got,
+        // so the arms go on rising instead of dropping back to the first frame.
+        grownFrom = swing.Kind == SwingKind.Heavy && combat != null ? combat.HeavyGrownFrom : 0f;
+        float start = 0f;
+        if (grownFrom > 0f)
+        {
+            float windupClip = Mathf.Max(0f, combat.TimeToHit - swing.Attack.StrikeLead) * swing.Attack.AnimationSpeed * swing.Speed;
+            start = windupClip * grownFrom;
+        }
+
+        SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
         float fade = swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
-        animator.CrossFadeInFixedTime(hash, fade, layer, 0f);
+        animator.CrossFadeInFixedTime(hash, fade, layer, start);
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
         {
             if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))

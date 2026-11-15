@@ -134,6 +134,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private float swingSpeed = 1f;
     // The heavy swing winding up on the upper body, by state; 0 when none is.
     private int plantedSwing;
+    // How far into its wind-up a heavy swing grown out of a light one started (PlayerCombat.HeavyGrownFrom); 0 for any other swing.
+    private float grownFrom;
 
     public WeaponStance WeaponStance
     {
