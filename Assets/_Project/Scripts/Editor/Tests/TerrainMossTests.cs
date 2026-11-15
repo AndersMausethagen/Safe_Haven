@@ -66,6 +66,46 @@ public sealed class TerrainMossTests
         Assert.AreEqual(1f, alphas[10, 10, 1], 1e-4f, "A weaker repaint never removes moss.");
     }
 
+    // The Haven's portal ground: layer 0 meadow, 1 moss, 2 soil, 3 leaves. The first raid turns the earth back to moss and
+    // leaves the meadow alone (the user, 2026-11-15: the circle should take the moss that lies round it).
+    [Test]
+    public void TurnBackCircle_TurnsOnlyTheEarthIntoMoss()
+    {
+        const int size = 21;
+        var alphas = new float[size, size, 4];
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                alphas[y, x, 0] = 0.4f;
+                alphas[y, x, 2] = 0.35f;
+                alphas[y, x, 3] = 0.25f;
+            }
+        }
+
+        var earth = new[] { 2, 3 };
+        TerrainMossBloom.TurnBackCircle(alphas, 1, earth, new Vector2(10f, 10f), 6f, 2f, 1f);
+
+        Assert.AreEqual(0.6f, alphas[10, 10, 1], 1e-4f, "The centre's earth is all moss.");
+        Assert.AreEqual(0.4f, alphas[10, 10, 0], 1e-6f, "The meadow keeps its share.");
+        Assert.AreEqual(0f, alphas[10, 10, 2] + alphas[10, 10, 3], 1e-4f);
+        Assert.AreEqual(0f, alphas[0, 0, 1], 1e-6f, "Outside the circle is untouched.");
+        float edge = alphas[10, 15, 1];
+        Assert.That(edge, Is.GreaterThan(0f).And.LessThan(0.6f), "The edge fades.");
+        float soilShare = alphas[10, 15, 2] / (alphas[10, 15, 2] + alphas[10, 15, 3]);
+        Assert.AreEqual(0.35f / 0.6f, soilShare, 1e-4f, "Soil and leaves give way alike.");
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                Assert.AreEqual(1f, alphas[y, x, 0] + alphas[y, x, 1] + alphas[y, x, 2] + alphas[y, x, 3], 1e-4f);
+            }
+        }
+
+        TerrainMossBloom.TurnBackCircle(alphas, 1, earth, new Vector2(10f, 10f), 6f, 2f, 1f);
+        Assert.AreEqual(edge, alphas[10, 15, 1], 1e-5f, "Painting the same circle again changes nothing (the spread paints it many times).");
+    }
+
     [Test]
     public void MaskSampling_UsesTerrainZYXLayoutAndBilinearInterpolation()
     {

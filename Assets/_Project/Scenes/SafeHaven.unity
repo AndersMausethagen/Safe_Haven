@@ -388847,7 +388847,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1532415259}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 43e3c1647f8283b4da88c48e044bb95c, type: 3}
   m_Name: 
@@ -388900,8 +388900,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::TerrainMossBloom
   moss: {fileID: 0}
-  followWardRadius: 1
-  radius: 12
+  paintLayer: {fileID: 8574412962073106934, guid: 41b8a24d3605c4d4391595396ff1716e, type: 2}
+  turnBack:
+  - {fileID: 8574412962073106934, guid: f7c1b94bbb5ffbe4c8e8d1a7e37be29c, type: 2}
+  - {fileID: 8574412962073106934, guid: ac2687241cb9efd47a58dde51927c4de, type: 2}
+  followWardRadius: 0
+  radius: 36
   edgeWidth: 3
   strength: 1
   spreadSeconds: 3

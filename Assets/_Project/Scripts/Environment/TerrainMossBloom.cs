@@ -7,6 +7,9 @@ using UnityEngine;
 /// and particles, <see cref="BloomInstantly"/> jumps to the end state (use it as a listener's on-load response). By
 /// default the circle follows the portal's ward and grows again when the ward levels up. In Play mode it paints a
 /// runtime copy of the terrain data, so the terrain asset on disk is never changed and the moss is rebuilt each load.
+/// With a Paint Layer and Turn Back layers it paints that layer instead, out of those layers only: the Haven's portal
+/// ground starts as brown earth (Cedar Soil and Litter, HavenWorldGenerator.TurnMossToEarth) and the first raid turns
+/// it back into the moss that lies round it (Haven Lush Moss), leaving the meadow and the paths as they are.
 /// </summary>
 [AddComponentMenu("Safe Haven/Environment/Terrain Moss Bloom")]
 public sealed class TerrainMossBloom : MonoBehaviour
@@ -16,6 +19,11 @@ public sealed class TerrainMossBloom : MonoBehaviour
 
     [Tooltip("Leave empty to use the first Terrain Moss in the scene.")]
     [SerializeField] private TerrainMoss moss;
+    [Tooltip("The layer painted. Empty: the Terrain Moss's own layer.")]
+    [SerializeField] private TerrainLayer paintLayer;
+    [Tooltip("Only these layers turn into the painted one (what the ground was turned into); every other layer stays. " +
+             "Empty: every layer gives way to it.")]
+    [SerializeField] private TerrainLayer[] turnBack = new TerrainLayer[0];
     [Tooltip("Use the portal's ward radius (and grow when the ward levels up) instead of the fixed radius.")]
     [SerializeField] private bool followWardRadius = true;
     [SerializeField, Min(0.5f)] private float radius = 12f;
@@ -174,13 +182,15 @@ public sealed class TerrainMossBloom : MonoBehaviour
             moss.Rebuild();
         }
 
-        return System.Array.IndexOf(terrain.terrainData.terrainLayers, moss.MossLayer) >= 0;
+        return System.Array.IndexOf(terrain.terrainData.terrainLayers, PaintedLayer) >= 0;
     }
+
+    private TerrainLayer PaintedLayer => paintLayer != null ? paintLayer : moss.MossLayer;
 
     private void Paint(float toRadius, bool rebuildTufts)
     {
         TerrainData data = terrain.terrainData;
-        int mossIndex = System.Array.IndexOf(data.terrainLayers, moss.MossLayer);
+        int mossIndex = System.Array.IndexOf(data.terrainLayers, PaintedLayer);
         int resolution = data.alphamapResolution;
         Vector3 local = transform.position - terrain.transform.position;
         float texelsPerMetre = resolution / data.size.x;
@@ -194,7 +204,26 @@ public sealed class TerrainMossBloom : MonoBehaviour
         if (xMax > xMin && yMax > yMin)
         {
             float[,,] alphas = data.GetAlphamaps(xMin, yMin, xMax - xMin, yMax - yMin);
-            PaintCircle(alphas, mossIndex, centre - new Vector2(xMin, yMin), radiusTexels, edgeWidth * texelsPerMetre, strength);
+            Vector2 at = centre - new Vector2(xMin, yMin);
+            if (turnBack != null && turnBack.Length > 0)
+            {
+                var from = new List<int>(turnBack.Length);
+                foreach (TerrainLayer layer in turnBack)
+                {
+                    int index = System.Array.IndexOf(data.terrainLayers, layer);
+                    if (index >= 0 && index != mossIndex)
+                    {
+                        from.Add(index);
+                    }
+                }
+
+                TurnBackCircle(alphas, mossIndex, from, at, radiusTexels, edgeWidth * texelsPerMetre, strength);
+            }
+            else
+            {
+                PaintCircle(alphas, mossIndex, at, radiusTexels, edgeWidth * texelsPerMetre, strength);
+            }
+
             data.SetAlphamaps(xMin, yMin, alphas);
         }
 
@@ -240,6 +269,55 @@ public sealed class TerrainMossBloom : MonoBehaviour
                 {
                     alphas[y, x, layer] = layer == mossLayer ? target : alphas[y, x, layer] * scale;
                 }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Inside a soft circle, gives the <paramref name="fromLayers"/>' weight to <paramref name="toLayer"/>: of their weight and
+    /// its own together, at least the circle's share (full inside, fading over the edge) becomes it. Other layers keep their
+    /// weight, so every texel still sums to one. Only ever adds, so painting again or wider never takes any back.
+    /// </summary>
+    public static void TurnBackCircle(float[,,] alphas, int toLayer, IReadOnlyList<int> fromLayers, Vector2 centreTexel, float radiusTexels,
+        float edgeTexels, float strength)
+    {
+        int height = alphas.GetLength(0);
+        int width = alphas.GetLength(1);
+        float inner = Mathf.Max(0f, radiusTexels - edgeTexels);
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                float distance = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), centreTexel);
+                if (distance >= radiusTexels)
+                {
+                    continue;
+                }
+
+                float fade = distance <= inner || radiusTexels <= inner ? 0f : Mathf.SmoothStep(0f, 1f, (distance - inner) / (radiusTexels - inner));
+                float share = strength * (1f - fade);
+                float from = 0f;
+                foreach (int layer in fromLayers)
+                {
+                    from += alphas[y, x, layer];
+                }
+
+                float current = alphas[y, x, toLayer];
+                float pool = from + current;
+                float target = pool * share;
+                if (from <= 1e-5f || target <= current)
+                {
+                    continue;
+                }
+
+                // Taken from each in proportion, so soil and leaves give way alike.
+                float keep = (pool - target) / from;
+                foreach (int layer in fromLayers)
+                {
+                    alphas[y, x, layer] *= keep;
+                }
+
+                alphas[y, x, toLayer] = target;
             }
         }
     }

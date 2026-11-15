@@ -536,8 +536,10 @@ adds generated dressing (stone plinth and lanterns, then banners and a flower bo
 `StashChest` (slots). Looks and sounds: `Resources/ConstructionSettings`. `HavenRenown` adds up renown (every standing
 building and its levels, a second of a kind counts half, cleared overgrowth, residents); `HavenProgress` (added to the
 Portal) celebrates each `HavenSettings` rank once and records it in `SettlementState.HavenRank`, which widens the
-ward (`HomePortal.WardRadius`). (The moss bloom that painted the green moss skin over the ward after the first extraction,
-`TerrainMossBloom` on SafeHaven's Portal Bloom, is switched off since 2026-11-15: its listener is disabled. The ground round the portal is brown earth instead of green moss:
+ward (`HomePortal.WardRadius`). (The ground round the portal starts as brown earth, and the first extraction turns it back into the moss that lies round it:
+`TerrainMossBloom` on SafeHaven's Portal Bloom answers Portal Bloomed (and, loading a game past it, paints at once) by turning
+Cedar Soil and Cedar Litter back into Haven Lush Moss out to 36 m, the earth's outer radius, leaving the meadow and paths
+(its Paint Layer and Turn Back fields; the green Haven Mossy Ground skin it painted before 2026-11-15 is not used). The earth:
 `HavenWorldGenerator.TurnMossToEarth` turns the Haven's moss paint into Cedar Soil and Cedar Litter within the recipe's
 `portalEarth` radii, meadow kept, and the grass colour follows the paint; both layers are already bound by the one-pass terrain
 shader, which draws a layer it hasn't bound dark.) Content is built by `AgentScripts/BuildHaven.cs`. A level can ask for other buildings (`BuildingLevel.requires`), a building for a rank (`requiredRank`); `BuildingUnlocks` answers both. Ranks can bring a settler (`HavenSettings.Rank.settler`). Beds are counted in `SettlementState.NoteBuildings` and never gate anyone. What every reached upgrade adds, where raids can't look at the scene, comes from `SettlementState.UpgradeBonus`. The Trading Post is `TradingPost` + `TradeSettings`; `WatchPostArcher` and `WardTotem` act only in a breach; `FieldCamp` and any other `ItemDefinition.placesInRaid` kit are set down by `ItemInventory`. See [base progression](../../../Docs/BaseProgression.md).
