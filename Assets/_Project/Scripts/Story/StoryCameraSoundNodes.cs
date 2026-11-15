@@ -30,7 +30,7 @@ public sealed class FocusCameraNode : StoryNode
     [Tooltip("Lifts the dark (the night and unexplored ground) this many metres around it while the camera looks, so it can be seen. 0: off.")]
     [Min(0f)] public float revealRadius = 14f;
     [Tooltip("Turn even when the story is a fight (it has Spawn Enemies or Creature Hunts): the player keeps control, so it " +
-             "suits a glance at what matters (the troll's fist coming down). Off: in a fight the camera stays with the player.")]
+             "suits a glance at what matters (the troll's fist coming down); the enemies wait and can't hurt the player meanwhile. Off: in a fight the camera stays with the player.")]
     public bool evenInAFight;
 
     public override string Title => "Focus Camera";
@@ -58,12 +58,35 @@ public sealed class FocusCameraNode : StoryNode
             sight.AddComponent<VisibilitySource>().Configure(revealRadius, 0.4f, true, revealRadius, false);
         }
 
+        // In a fight the camera looking away is no opening for the enemies (the user, 2026-11-15: "monsters still attack me
+        // during a cinematic"): they start no move or blow and the player can't be hurt until it is back.
+        if (context.InFight)
+        {
+            InGameCinematic.HoldTheWorldFor(seconds);
+            Damageable health = context.Player != null ? context.Player.Health : null;
+            if (health != null)
+            {
+                health.AddInvulnerability(this);
+                camera.StartCoroutine(Unshield(health, this, seconds));
+            }
+        }
+
         camera.BeginFocus(target);
         yield return new WaitForSeconds(seconds);
         camera.EndFocus(target);
         if (sight != null)
         {
             UnityEngine.Object.Destroy(sight);
+        }
+    }
+
+    // On the camera, so it ends even if the story is stopped while the camera looks away.
+    private static IEnumerator Unshield(Damageable health, object source, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        if (health != null)
+        {
+            health.RemoveInvulnerability(source);
         }
     }
 

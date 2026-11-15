@@ -56,8 +56,17 @@ public sealed class InGameCinematic : MonoBehaviour
     /// <summary>True while any in-game cinematic has the camera.</summary>
     public static bool IsPlaying => playing != null;
 
+    /// <summary>True while the cinematic playing holds the player (Hold Player): their own input is off.</summary>
+    public static bool HoldsThePlayer => playing != null && playing.holdPlayer;
+
     /// <summary>True while the cinematic playing holds enemies and companions still (Hold The World).</summary>
-    public static bool HoldsTheWorld => playing != null && playing.holdTheWorld;
+    public static bool HoldsTheWorld => (playing != null && playing.holdTheWorld) || Time.time < worldHeldUntil;
+
+    // Held for a while by something else that takes the camera off the player (a story's Focus Camera in a fight).
+    private static float worldHeldUntil = -1f;
+
+    /// <summary>Holds enemies and companions as a cinematic does, for <paramref name="seconds"/> from now.</summary>
+    public static void HoldTheWorldFor(float seconds) => worldHeldUntil = Mathf.Max(worldHeldUntil, Time.time + seconds);
 
     public bool IsRunning => running != null;
 
@@ -73,7 +82,11 @@ public sealed class InGameCinematic : MonoBehaviour
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => playing = null;
+    private static void ResetForNewPlaySession()
+    {
+        playing = null;
+        worldHeldUntil = -1f;
+    }
 
     /// <summary>Ends whatever cinematic is playing at once (a scene change, the prologue's ending taking over).</summary>
     public static void StopAll()

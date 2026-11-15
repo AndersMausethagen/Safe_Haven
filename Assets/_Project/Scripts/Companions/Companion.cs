@@ -34,7 +34,11 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => active.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        active.Clear();
+        holdingStory = null;
+    }
 
     [SerializeField] private CompanionDefinition definition;
     [Tooltip("Who they are: the name used when they are knocked down.")]
@@ -143,6 +147,15 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
     /// <summary>Stands still and stays out of fights while set (a story moment: before the expedition sets out).</summary>
     public bool Paused { get; set; }
+
+    // A story's Hold the Party (HoldPartyNode): every companion stands until it lets go, or its scene is gone.
+    private static StoryScript holdingStory;
+
+    /// <summary>True while a story holds the party where it stands.</summary>
+    public static bool HeldByStory => holdingStory != null;
+
+    /// <summary>Holds every companion for a story (null lets them go).</summary>
+    public static void HoldForStory(StoryScript story) => holdingStory = story;
 
     /// <summary>Someone lost, standing where a rumour said: they wait, nothing touches them, and there is no talking to them until they are found.</summary>
     public void StandLost()
@@ -275,7 +288,7 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
         weapon.LandDue();
         // Companions wait out an in-game cinematic where they stand (2026-11-14: they had run off to the stones before the
         // old troll's cinematic was over), then go on with what they were doing.
-        if (Paused || InGameCinematic.HoldsTheWorld || leader.Player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
+        if (Paused || InGameCinematic.HoldsTheWorld || HeldByStory || leader.Player == null || !agent.isActiveAndEnabled || !agent.isOnNavMesh)
         {
             Halt();
             body.SetSpeed(0f);

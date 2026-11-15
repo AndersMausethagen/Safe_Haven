@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 0.962963
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 410087040}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -40174,10 +40174,9 @@ MonoBehaviour:
   - rid: 2623126109533503989
   - rid: 2623126109533503990
   - rid: 2623126109533503991
+  - rid: 2623126112131874932
+  - rid: 2623126112131874933
   links:
-  - from: df8fdfbec14f4fdbbcaa0be43bc4b643
-    output: 0
-    to: f4fd249f3d6d4e82988d438f5695461d
   - from: f4fd249f3d6d4e82988d438f5695461d
     output: 0
     to: dc5a4759b58b47edae0ce07636965063
@@ -40235,7 +40234,16 @@ MonoBehaviour:
   - from: 8e763a3219af42489edc788a5c65d7f5
     output: 0
     to: 643bf808d57e45f3bed96fbb8e1d83de
+  - from: df8fdfbec14f4fdbbcaa0be43bc4b643
+    output: 0
+    to: 91056074180043318d22445f34089f39
+  - from: 91056074180043318d22445f34089f39
+    output: 0
+    to: f4fd249f3d6d4e82988d438f5695461d
   - from: 643bf808d57e45f3bed96fbb8e1d83de
+    output: 0
+    to: baa5ada71ce149759f9b0fa5e672df30
+  - from: baa5ada71ce149759f9b0fa5e672df30
     output: 0
     to: 3436c5cf1cc14b5284e78039c8ff42c9
   logSteps: 0
@@ -40437,6 +40445,18 @@ MonoBehaviour:
         seconds: 3.5
         revealRadius: 18
         evenInAFight: 1
+    - rid: 2623126112131874932
+      type: {class: HoldPartyNode, ns: , asm: SafeHaven}
+      data:
+        id: 91056074180043318d22445f34089f39
+        position: {x: 40, y: 200}
+        hold: 1
+    - rid: 2623126112131874933
+      type: {class: HoldPartyNode, ns: , asm: SafeHaven}
+      data:
+        id: baa5ada71ce149759f9b0fa5e672df30
+        position: {x: 1840, y: 200}
+        hold: 0
 --- !u!1 &721401212
 GameObject:
   m_ObjectHideFlags: 0
@@ -67229,7 +67249,7 @@ MonoBehaviour:
         id: c8beda30fd5441999daa1db064010619
         position: {x: 940, y: 60}
         cinematic: {fileID: 1922524715}
-        shot: 4
+        shot: 5
     - rid: 2623126109533504231
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -99929,6 +99949,8 @@ Transform:
   - {fileID: 1397181296}
   - {fileID: 218983017}
   - {fileID: 1061907992}
+  - {fileID: 1816468901}
+  - {fileID: 1914506083}
   m_Father: {fileID: 1478527750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1674546877
@@ -106513,6 +106535,37 @@ Transform:
   - {fileID: 1792199063}
   m_Father: {fileID: 768269224}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1816468900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1816468901}
+  m_Layer: 0
+  m_Name: Down the Road (camera)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1816468901
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1816468900}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -71.3, y: 5.3, z: -12.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1673818619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1816916837
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -111728,6 +111781,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7732742093923070724, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
   m_PrefabInstance: {fileID: 1913275455}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1914506082
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1914506083}
+  m_Layer: 0
+  m_Name: Down the Road (look)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1914506083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1914506082}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -31.1, y: 4.5, z: -15.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1673818619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1914836122
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -112299,7 +112383,7 @@ MonoBehaviour:
     holdUntilCued: 1
     rumble: 0
   - name: The storm comes
-    seconds: 7
+    seconds: 4.5
     subject: {fileID: 349249106}
     lookAt: {fileID: 0}
     lookOffset: {x: 14, y: 16, z: -2}
@@ -112311,8 +112395,23 @@ MonoBehaviour:
     endFieldOfView: 44
     ease: 2
     blendIn: 1.4
-    holdUntilCued: 1
+    holdUntilCued: 0
     rumble: 0.08
+  - name: Down the road into the forest
+    seconds: 8.5
+    subject: {fileID: 1816468901}
+    lookAt: {fileID: 1914506083}
+    lookOffset: {x: 0, y: 1.8, z: 0}
+    space: 1
+    startOffset: {x: -19.3, y: 10.8, z: 1.4}
+    endOffset: {x: 15.3, y: 1.7, z: -1.1}
+    followSubject: 0
+    startFieldOfView: 48
+    endFieldOfView: 42
+    ease: 1
+    blendIn: 1.6
+    holdUntilCued: 1
+    rumble: 0
   - name: Sigrid sends you on
     seconds: 4
     subject: {fileID: 983162859}

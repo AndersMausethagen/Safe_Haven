@@ -90,6 +90,28 @@ public sealed class SetActiveNode : StoryNode
 }
 
 /// <summary>
+/// Keeps every companion where they stand (Hold the Party) until the story lets them go (Let the Party Go), for a scene
+/// that runs on after its cinematic: the prologue's party waits for "to the standing stones. Now!" instead of setting off
+/// while the old troll is still coming out of the trees (the user, 2026-11-15). An order given meanwhile is carried out
+/// once they are let go; the hold ends with its story's scene too.
+/// </summary>
+[Serializable]
+public sealed class HoldPartyNode : StoryNode
+{
+    [Tooltip("On: they stay where they stand. Off: they go on with their orders.")]
+    public bool hold = true;
+
+    public override string Title => hold ? "Hold the Party" : "Let the Party Go";
+    public override string Category => "World";
+
+    public override IEnumerator Run(StoryContext context)
+    {
+        Companion.HoldForStory(hold ? context.Script : null);
+        yield break;
+    }
+}
+
+/// <summary>
 /// Wakes a creature placed as a story puppet (its MonsterAI and NavMeshAgent switched off) so it walks to a place by
 /// itself and fights whoever it meets there, with its usual chase and leash; or puts it back to sleep so Move Object
 /// can lead it again. E.g. the prologue's old troll heads for the camp fire.
@@ -588,16 +610,19 @@ public sealed class WalkPartyNode : StoryNode
             member.SetPace(pace);
         }
 
+        PlayerMovement led = null;
         try
         {
             float refresh = 0f;
             while (!walk.IsDone)
             {
-                if (!MustWait(walk, party, context.Player))
+                bool waiting = MustWait(walk, party, context.Player);
+                if (!waiting)
                 {
                     walk.Advance(pace * Time.deltaTime);
                 }
 
+                led = LeadPlayer(walk, context.Player, waiting, led);
                 refresh -= Time.deltaTime;
                 if (refresh <= 0f)
                 {
@@ -613,11 +638,47 @@ public sealed class WalkPartyNode : StoryNode
         }
         finally
         {
+            if (led != null)
+            {
+                led.SetMovementInput(Vector3.zero);
+            }
+
             foreach (Companion member in party)
             {
                 if (member != null) member.SetPace(0f);
             }
         }
+    }
+
+    // While a cinematic holds the player (a shot of the party walking), the player walks with the party, at its back,
+    // instead of standing where they were (the user, 2026-11-15). Their own input is off meanwhile (CinematicView), and
+    // takes over again as the cinematic lets go. Returns the legs being led, or null once it isn't.
+    private const float PlayerBehind = 0.5f;
+
+    private static PlayerMovement LeadPlayer(PartyWalk walk, Player player, bool waiting, PlayerMovement led)
+    {
+        if (player == null || !InGameCinematic.HoldsThePlayer)
+        {
+            if (led != null)
+            {
+                led.SetMovementInput(Vector3.zero);
+            }
+
+            return null;
+        }
+
+        PlayerMovement legs = led != null ? led : player.GetComponent<PlayerMovement>();
+        if (legs == null)
+        {
+            return null;
+        }
+
+        Vector3 to = walk.Position - walk.Heading() * PlayerBehind - player.transform.position;
+        to.y = 0f;
+        float distance = to.magnitude;
+        // Eased in as they close up, so they fall into step rather than running up and stopping.
+        legs.SetMovementInput(waiting || distance < 0.5f ? Vector3.zero : to / distance * Mathf.Clamp(distance / 4f, 0.3f, 1f));
+        return legs;
     }
 
     // Each walks to a spot a little ahead of them on the road (kept in formation, turned with the road), so they stride
