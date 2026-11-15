@@ -579,7 +579,7 @@ A massive troll guards a stone bridge in Troll Valley. Phase one teaches a wide 
 
 **Reading and playing stealth (November 15, 2026; Docs/RangedStealthResearch.md):** what notices the player shows before it is
 suspicious: a faint "?" forms over the creature and its sight cone and close-sense ring are drawn faintly on the ground; the player's
-sounds spread as rings to their real reach; a dark ring at the feet means sneaking unseen; an arrow at the screen's edge points to one
+sounds show as the HUD noise meter's word and metres (the rings were removed 2026-11-15); a dark ring at the feet means sneaking unseen; an arrow at the screen's edge points to one
 noticing from off screen. The focus ring and the bow's outline turn pale gold on a creature still unaware, brighter when a Silent
 Takedown would finish it. A kill from the shadows is quiet (heard 4 m, a faint death cry, the player stays hidden), but a creature that
 sees one of its side fall turns suspicious toward the body. A sound too faint for a "?" only turns heads, and a suspicious creature

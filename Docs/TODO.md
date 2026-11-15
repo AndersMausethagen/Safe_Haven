@@ -77,6 +77,19 @@ Made to close the failing tests; not heard or seen in game:
       then `AgentScripts/BuildIcons.cs` (Conditions). Do it with Minecraft closed: it was open with 1.3 GB free, so it was skipped.
       `PaintedIconTests.StatusEffectDefinition` fails until then.
 
+## Combat playtest fixes (2026-11-15)
+
+From the user's playtest. Tests only, unplayed:
+- [ ] The spear toss flies point first (the model's long axis is found from its meshes: ThrownWeapon.PointFirst).
+- [ ] Nothing swings while the weapon is out on a throw, and arts wait 2 s (Combat Technique Settings > Art Cooldown).
+- [ ] Walking back or aside while swinging: no step forward into the blow; light swings keep 60% of walking speed in the wind-up
+      and 70% after the blow (was 25% / 50%).
+- [ ] Walking swings now play on the Upper Body layer (the pack author's Human Body Upper Mask) over Combat Locomotion, whose walks
+      and runs are now the same pack's Walk01 / Run01 (8 directions, cadence matched). Does attacking on the move blend? The author's
+      SpineProxy (hips twist) needs a generic rig, so it isn't used: if the torso turn looks short, that is why.
+- [ ] Grass: every ordinary blow sends a light gust (Ground Impact Settings > Light Swing, wind only); heavy gusts are 1.6x stronger.
+      Check in the Prologue meadow.
+
 ## Enchanting (2026-11-15)
 
 Docs/EnchantingResearch.md › Status. Tests only, unplayed:
@@ -107,7 +120,7 @@ Everything in Docs/PlayerStatsResearch.md was built (its Status section). Tests 
 
 Everything in Docs/RangedStealthResearch.md was built (its Status section). Probes and tests only:
 - [ ] Sneaking up on a Draug, a troll and a wolf pack: does the faint "?" and the cone on the ground tell you when to stop? Too much on
-      screen, or too little? Are the noise rings and the dark "unseen" ring helpful or clutter?
+      screen, or too little? Is the dark "unseen" ring helpful or clutter? (Noise rings removed 2026-11-15 at the user's request.)
 - [ ] Quiet kills (4 m, a faint cry, you stay hidden): can a careful player now take a camp apart one by one? Does a creature seeing its
       neighbour fall feel fair?
 - [ ] The bow by tier (Draw Weight; the perfect release is now only a critical): does it feel worth carrying at tiers III-V, and is the

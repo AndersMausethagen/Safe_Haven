@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2eba2b52199d03a4ebdae07aa742d9a6, type: 3}
+  m_Name: Light Swing
+  m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
+  referenceHeight: 1.8
+  gustRadius: 3
+  gustStrength: 0.4
+  gustSpeed: 16
+  gustArc: 120
+  dust: 0
+  debris: 0
+  clippings: 0
+  dustRadius: 1.8
+  mark: 0
+  markRadius: 2.6
+  markDepth: 0
+  rimHeight: 0
+  furrowLength: 2.5
+  grassFlatten: 0
+  markSeconds: 120
+  decal: {fileID: 0}
+  decalSize: 3
+  push: 0
+  pushRadius: 3
+  treeShake: 0
+  shake: 0
+  noise: 0
+  element: 0
+  stumbleRadius: 0
+  stumbleSeconds: 0
+  sound: {fileID: 0}

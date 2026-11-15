@@ -32,6 +32,21 @@ public sealed partial class PlayerCombat
     private Vector3 dashFrom;
     private readonly List<Collider> passedThrough = new List<Collider>(8);
     private HeldItemView heldView;
+    private float artReadyAt;
+
+    /// <summary>True while the weapon is out on a throw and not yet back in the hand.</summary>
+    public bool WeaponInFlight
+    {
+        get
+        {
+            if (heldView == null)
+            {
+                heldView = GetComponentInChildren<HeldItemView>();
+            }
+
+            return heldView != null && heldView.Thrown;
+        }
+    }
 
     /// <summary>Raised when the weapon's signature does its thing to a creature (a crush, a stopped charge, a broken guard), for feedback.</summary>
     public event Action<WeaponSignature, MonsterAI> SignatureUsed;

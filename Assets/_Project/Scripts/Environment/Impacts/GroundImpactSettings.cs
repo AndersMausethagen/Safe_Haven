@@ -13,6 +13,8 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     [SerializeField] private GroundImpactDefinition heavyStab;
     [Tooltip("A two-handed blunt weapon's heavy blow (a maul, a club): a crater of its own.")]
     [SerializeField] private GroundImpactDefinition heavyTwoHandedBlunt;
+    [Tooltip("Any other blow of the player's: a sudden wind through the grass ahead, nothing more (no dust, mark or noise).")]
+    [SerializeField] private GroundImpactDefinition lightSwing;
 
     [Header("Effects")]
     [Tooltip("The burst of dust, clods, grass bits and mud (GroundImpactBurst).")]
@@ -76,6 +78,7 @@ public sealed class GroundImpactSettings : GameSettings<GroundImpactSettings>
     public GroundImpactDefinition HeavyBlunt => heavyBlunt;
     public GroundImpactDefinition HeavyStab => heavyStab;
     public GroundImpactDefinition HeavyTwoHandedBlunt => heavyTwoHandedBlunt;
+    public GroundImpactDefinition LightSwing => lightSwing;
     public Shader StampShader => stampShader != null ? stampShader : Shader.Find("Hidden/Safe Haven/Ground Impact Stamp");
     public GameObject Burst => burst;
     public GameObject Leaves => leaves;

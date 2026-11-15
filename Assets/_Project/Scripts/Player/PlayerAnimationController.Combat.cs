@@ -100,11 +100,17 @@ public sealed partial class PlayerAnimationController
 
         if (isSwing)
         {
-            animator.CrossFadeInFixedTime(swing.shortNameHash, WalkOutFade, attackArmsLayer, swing.normalizedTime * swing.length);
+            animator.CrossFadeInFixedTime(swing.shortNameHash, WalkOutFade, MovingSwingLayer(swing.shortNameHash), swing.normalizedTime * swing.length);
         }
 
         animator.CrossFadeInFixedTime(EmptyStateHash, WalkOutFade, fullBodyLayer);
     }
+
+    // A swing over walking legs plays on the Upper Body layer (Human Body Upper Mask: spine, chest, head and arms), as the pack's author
+    // mixes them: the torso turns into the blow while the legs walk or strafe (Combat Locomotion, the same pack's Walk01/Run01). The
+    // arms-only layer left the swing coming out of an upright walking torso, which is what looked wrong (the user, 2026-11-15).
+    private int MovingSwingLayer(int hash) =>
+        upperBodyLayer >= 0 && hash != 0 && animator.HasState(upperBodyLayer, hash) ? upperBodyLayer : attackArmsLayer;
 
     /// <summary>Plays the attack for the current weapon stance. One-handed attacks alternate between the two slashes.</summary>
     public void PlayAttack()
@@ -134,8 +140,8 @@ public sealed partial class PlayerAnimationController
         int standing = fullBodyLayer >= 0 ? fullBodyLayer : upperBodyLayer;
         bool onTheRun = combat != null && combat.WindupMoveShare > 0f && movement.HorizontalSpeed > ArmsOnlySpeed
             && movement.MovementInput.sqrMagnitude >= 0.01f;
-        int layer = onTheRun && attackArmsLayer >= 0 ? attackArmsLayer : standing;
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
+        int layer = onTheRun && attackArmsLayer >= 0 ? MovingSwingLayer(hash) : standing;
         plantedSwing = 0;
         // A charged blow is already past its charge: it strikes with the whole body (it may leap).
         if (swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0 && hash != 0 && upperBodyLayer >= 0

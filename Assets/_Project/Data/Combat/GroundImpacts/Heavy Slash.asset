@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Heavy Slash
   m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
   referenceHeight: 1.8
-  gustRadius: 4
-  gustStrength: 0.45
+  gustRadius: 5
+  gustStrength: 0.71999997
   gustSpeed: 16
   gustArc: 150
   dust: 8

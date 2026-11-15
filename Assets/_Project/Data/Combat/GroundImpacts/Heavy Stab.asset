@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Heavy Stab
   m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
   referenceHeight: 1.8
-  gustRadius: 2.5
-  gustStrength: 0.25
+  gustRadius: 3.125
+  gustStrength: 0.4
   gustSpeed: 16
   gustArc: 60
   dust: 5
@@ -34,6 +34,8 @@ MonoBehaviour:
   pushRadius: 2
   treeShake: 0
   shake: 0
+  noise: 0
+  element: 0
   stumbleRadius: 0
   stumbleSeconds: 0.5
   sound: {fileID: 0}

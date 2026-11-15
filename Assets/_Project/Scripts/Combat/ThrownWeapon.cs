@@ -32,6 +32,7 @@ public sealed class ThrownWeapon : MonoBehaviour
     private int targetLayers;
     private float until;
     private bool spins;
+    private Quaternion pointFirst = Quaternion.identity;
     private Action caught;
 
     /// <summary>Raised when it strikes something, for feedback (the hit itself goes through AttackResolver).</summary>
@@ -64,7 +65,8 @@ public sealed class ThrownWeapon : MonoBehaviour
         flight.spins = art.Strike != StrikeKind.Stab;
         if (!flight.spins)
         {
-            model.transform.rotation = Quaternion.LookRotation(flight.direction, Vector3.up);
+            flight.pointFirst = PointFirst(model);
+            model.transform.rotation = Quaternion.LookRotation(flight.direction, Vector3.up) * flight.pointFirst;
         }
 
         return flight;
@@ -121,7 +123,54 @@ public sealed class ThrownWeapon : MonoBehaviour
         else if (returning)
         {
             Vector3 heading = to - from;
-            if (heading.sqrMagnitude > 0.0001f) transform.rotation = Quaternion.LookRotation(heading.normalized, Vector3.up);
+            if (heading.sqrMagnitude > 0.0001f) transform.rotation = Quaternion.LookRotation(heading.normalized, Vector3.up) * pointFirst;
+        }
+    }
+
+    // A held weapon's model runs along whichever of its own axes it was made on (a spear usually up its Y, held upright in the hand):
+    // the longest axis of its meshes, toward the end furthest from the grip at its origin, is the point. This turns that onto +Z, so
+    // LookRotation(flight) * this flies it point first instead of shaft-up.
+    private static Quaternion PointFirst(GameObject model)
+    {
+        Vector3 min = Vector3.positiveInfinity, max = Vector3.negativeInfinity;
+        Matrix4x4 toModel = model.transform.worldToLocalMatrix;
+        foreach (MeshFilter filter in model.GetComponentsInChildren<MeshFilter>(true))
+        {
+            if (filter.sharedMesh != null)
+            {
+                Encapsulate(filter.sharedMesh.bounds, toModel * filter.transform.localToWorldMatrix, ref min, ref max);
+            }
+        }
+
+        foreach (SkinnedMeshRenderer skinned in model.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        {
+            if (skinned.sharedMesh != null)
+            {
+                Encapsulate(skinned.sharedMesh.bounds, toModel * skinned.transform.localToWorldMatrix, ref min, ref max);
+            }
+        }
+
+        if (float.IsInfinity(min.x))
+        {
+            return Quaternion.identity;
+        }
+
+        Vector3 size = max - min;
+        int axis = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+        Vector3 point = Vector3.zero;
+        point[axis] = Mathf.Abs(max[axis]) >= Mathf.Abs(min[axis]) ? 1f : -1f;
+        Vector3 side = axis == 1 ? Vector3.forward : Vector3.up;
+        return Quaternion.Inverse(Quaternion.LookRotation(point, side));
+    }
+
+    private static void Encapsulate(Bounds bounds, Matrix4x4 into, ref Vector3 min, ref Vector3 max)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            Vector3 corner = bounds.center + Vector3.Scale(bounds.extents, new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1));
+            Vector3 p = into.MultiplyPoint3x4(corner);
+            min = Vector3.Min(min, p);
+            max = Vector3.Max(max, p);
         }
     }
 

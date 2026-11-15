@@ -20,8 +20,8 @@ MonoBehaviour:
   rhythmSpeedPerStack: 0
   earlyPressFumbles: 0
   dodgeCancelsWindup: 1
-  windupMoveSpeed: 0.25
-  swingMoveSpeed: 0.5
+  windupMoveSpeed: 0.6
+  swingMoveSpeed: 0.7
   heavyMoveSpeed: 0.2
   windupTurnRate: 150
   windupTurnShare: 0.6
@@ -32,6 +32,8 @@ MonoBehaviour:
   flinchShare: 0.05
   flinchSeconds: 0.45
   flinchGrace: 1
+  knockdownShare: 0.35
+  knockdownSeconds: 1
   heavyHitShare: 0.2
   heavyHitInvulnerable: 0.3
   showComboHud: 0
@@ -114,6 +116,9 @@ MonoBehaviour:
   focusHoldSeconds: 10
   focusDrainPerSecond: 4
   artStaminaWithoutFocus: 30
+  regainShare: 0.4
+  regainSeconds: 3
+  regainPerDamage: 0.5
   eatSeconds: 1.3
   eatMoveSpeed: 0.35
   healOverSeconds: 6
@@ -122,6 +127,14 @@ MonoBehaviour:
   poiseRecoveryPerSecond: 15
   staggerSeconds: 1.3
   staggeredDamageTaken: 1.2
+  reelingShare: 0.3
+  felledSeconds: 1.8
+  guardBrokenScale: 1.5
+  guardBreaksToSplinter: 2
+  arrowDodgeCooldown: 5
+  artCooldown: 2
+  huntersMarkSeconds: 6
+  huntersMarkPoise: 1.5
   finishStab: {fileID: 11400000, guid: 1734cf527328c454dbfac4ce4ca6b391, type: 2}
   finishReach: 2.6
   finishGap: 0.95

@@ -88,8 +88,6 @@ MonoBehaviour:
   showStealthReadout: 1
   noticingColor: {r: 0.92, g: 0.9, b: 0.82, a: 0.45}
   coneColor: {r: 1, g: 0.92, b: 0.7, a: 0.13}
-  noiseRingColor: {r: 0.85, g: 0.9, b: 1, a: 0.35}
-  noiseRingFrom: 2
   unseenColor: {r: 0.12, g: 0.16, b: 0.3, a: 0.35}
   ambushColor: {r: 1, g: 0.86, b: 0.45, a: 1}
   takedownColor: {r: 1, g: 0.97, b: 0.92, a: 1}

@@ -16,6 +16,7 @@ MonoBehaviour:
   heavyBlunt: {fileID: 11400000, guid: 77afdbccfc9b9fb40aa5594c60cf3c6d, type: 2}
   heavyStab: {fileID: 11400000, guid: 9e30d6438516ff2419954703abe397b1, type: 2}
   heavyTwoHandedBlunt: {fileID: 11400000, guid: 3b42b530c9ae2d740914a4936db4a1d8, type: 2}
+  lightSwing: {fileID: 11400000, guid: 463f90a86778371458853854f4f74c8e, type: 2}
   burst: {fileID: 4551094190977830189, guid: bcfe13b4bd0890043b8a46b27db8ece2, type: 3}
   leaves: {fileID: 2915389246791848757, guid: 3b3642d71542ebd44aa653eca0aaa86c, type: 3}
   splash: {fileID: 427604759136440720, guid: d500fd09614e25f46b5c5f1fa49f7033, type: 3}

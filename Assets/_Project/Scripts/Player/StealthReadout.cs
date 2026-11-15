@@ -6,7 +6,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Stealth you can read from above (Docs/RangedStealthResearch.md §3.1), for the local player only: the creature noticing them most has
 /// its sight cone and close-sense ring drawn faintly on the ground while its awareness fills (Shadow Tactics; its "?" forming over it is
-/// AwarenessIndicator's); every sound they make over a couple of metres spreads as a ring to its real reach (Mark of the Ninja); sneaking
+/// AwarenessIndicator's); how far a sound carries is the HUD's noise meter (NoiseMeterView), not a ring (removed 2026-11-15); sneaking
 /// and noticed by nothing, a dark ring sits at their feet; one noticing them from off screen has an arrow at the screen's edge (Hitman).
 /// Looks are PerceptionSettings › Presentation; all ground marks use the telegraph material. Added by PlayerStealth.
 /// </summary>
@@ -18,25 +18,13 @@ public sealed class StealthReadout : MonoBehaviour
     // Creatures further than this aren't looked at; a level below this is a glance that came to nothing.
     private const float LookOut = 40f;
     private const float ShownFrom = 0.03f;
-    private const float RingSeconds = 0.45f;
     private const float UnseenRadius = 0.75f;
-    private const int RingPool = 6;
-
-    private sealed class Ring
-    {
-        public Transform Mark;
-        public MeshRenderer Renderer;
-        public float Started = -10f;
-        public float Radius;
-    }
 
     private Player player;
     private PlayerStealth stealth;
-    private PlayerNoise noise;
     private Transform cone;
     private Transform close;
     private Transform unseen;
-    private readonly List<Ring> rings = new List<Ring>();
     private MaterialPropertyBlock block;
     private RectTransform edgeArrow;
     private TextMeshProUGUI edgeGlyph;
@@ -46,26 +34,9 @@ public sealed class StealthReadout : MonoBehaviour
     {
         player = GetComponent<Player>();
         stealth = GetComponent<PlayerStealth>();
-        noise = GetComponent<PlayerNoise>();
     }
 
-    private void OnEnable()
-    {
-        if (noise != null)
-        {
-            noise.Made += OnNoise;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (noise != null)
-        {
-            noise.Made -= OnNoise;
-        }
-
-        HideAll();
-    }
+    private void OnDisable() => HideAll();
 
     private void OnDestroy()
     {
@@ -77,14 +48,6 @@ public sealed class StealthReadout : MonoBehaviour
             }
         }
 
-        foreach (Ring ring in rings)
-        {
-            if (ring.Mark != null)
-            {
-                Destroy(ring.Mark.gameObject);
-            }
-        }
-
         if (edgeArrow != null)
         {
             Destroy(edgeArrow.root.gameObject);
@@ -92,28 +55,6 @@ public sealed class StealthReadout : MonoBehaviour
     }
 
     private bool IsLocal => player != null && Player.Current == player;
-
-    private void OnNoise(Vector3 position, float radius)
-    {
-        PerceptionSettings rules = PerceptionSettings.Current;
-        if (!IsLocal || !rules.ShowStealthReadout || !rules.ShowNoiseRings || radius < rules.NoiseRingFrom || !Build())
-        {
-            return;
-        }
-
-        Ring oldest = rings[0];
-        foreach (Ring ring in rings)
-        {
-            if (ring.Started < oldest.Started)
-            {
-                oldest = ring;
-            }
-        }
-
-        oldest.Started = Time.time;
-        oldest.Radius = radius;
-        oldest.Mark.position = Ground(position);
-    }
 
     private void LateUpdate()
     {
@@ -146,7 +87,6 @@ public sealed class StealthReadout : MonoBehaviour
 
         UpdateCone(noticer, most, rules);
         UpdateUnseen(noticer == null && !hunted && stealth != null && stealth.IsSneaking, rules);
-        UpdateRings(rules);
         UpdateEdge(noticer, most, rules);
     }
 
@@ -190,26 +130,6 @@ public sealed class StealthReadout : MonoBehaviour
         }
     }
 
-    private void UpdateRings(PerceptionSettings rules)
-    {
-        foreach (Ring ring in rings)
-        {
-            float t = (Time.time - ring.Started) / RingSeconds;
-            bool live = t >= 0f && t < 1f;
-            ring.Mark.gameObject.SetActive(live);
-            if (!live)
-            {
-                continue;
-            }
-
-            float eased = 1f - (1f - t) * (1f - t);
-            ring.Mark.localScale = Vector3.one * Mathf.Lerp(0.3f, ring.Radius, eased);
-            Color color = rules.NoiseRingColor;
-            color.a *= 1f - t * t;
-            Tint(ring.Mark, color);
-        }
-    }
-
     // A noticer off screen: an arrow at the edge, toward it.
     private void UpdateEdge(MonsterAI noticer, float level, PerceptionSettings rules)
     {
@@ -241,14 +161,6 @@ public sealed class StealthReadout : MonoBehaviour
             if (mark != null)
             {
                 mark.gameObject.SetActive(false);
-            }
-        }
-
-        foreach (Ring ring in rings)
-        {
-            if (ring.Mark != null)
-            {
-                ring.Mark.gameObject.SetActive(false);
             }
         }
 
@@ -285,12 +197,6 @@ public sealed class StealthReadout : MonoBehaviour
         cone = Mark("Stealth Cone", AttackTelegraph.FanFor(120f), material);
         close = Mark("Stealth Close Sense", AttackTelegraph.BandFor(360f, 0.05f), material);
         unseen = Mark("Stealth Unseen", AttackTelegraph.BandFor(360f, 0.3f), material);
-        for (int i = 0; i < RingPool; i++)
-        {
-            Transform mark = Mark("Noise Ring", AttackTelegraph.BandFor(360f, 0.06f), material);
-            rings.Add(new Ring { Mark = mark, Renderer = mark.GetComponent<MeshRenderer>() });
-        }
-
         var canvasObject = new GameObject("Stealth Edge Arrow", typeof(Canvas), typeof(CanvasScaler));
         var canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;

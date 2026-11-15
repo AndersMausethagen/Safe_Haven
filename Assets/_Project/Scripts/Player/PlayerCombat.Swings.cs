@@ -10,6 +10,13 @@ public sealed partial class PlayerCombat
     private void Begin(SwingKind kind, ChainPress judge)
     {
         queuedKind = SwingKind.None;
+        // The weapon is out on a throw (a spear toss): nothing to swing until it is back in the hand. And an art waits out its
+        // cooldown, so a second press mid-throw doesn't strike again.
+        if (WeaponInFlight || (kind == SwingKind.Art && Time.time < artReadyAt))
+        {
+            return;
+        }
+
         int step = 0;
         int chain = weapon != null ? weapon.ComboLength : 1;
         AttackDefinition attack;
@@ -50,6 +57,8 @@ public sealed partial class PlayerCombat
                 {
                     return;
                 }
+
+                artReadyAt = Time.time + Rules.ArtCooldown;
 
                 // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
                 artOnStamina = focus != null && !focus.TrySpend(ArtFocus);
@@ -458,6 +467,14 @@ public sealed partial class PlayerCombat
         movement.SnapFacing(activeDirection);
         float distance = activeMotion == ArtMotion.DashThrough ? activeLunge
             : targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
+        // Walking back or aside while swinging keeps that way: the blow doesn't drag the player forward (the user, 2026-11-15).
+        Vector3 walking = movement.MovementInput;
+        walking.y = 0f;
+        if (activeMotion != ArtMotion.DashThrough && walking.sqrMagnitude > 0.04f && Vector3.Dot(walking.normalized, activeDirection) < 0.5f)
+        {
+            distance = 0f;
+        }
+
         float seconds = Mathf.Max(0.05f, secondsLeft);
         movement.Lunge(activeDirection * (distance / seconds), seconds);
     }
@@ -512,6 +529,11 @@ public sealed partial class PlayerCombat
         if (activeKind == SwingKind.Heavy || activeKind == SwingKind.Art)
         {
             GroundImpacts.PlayerSwing(activeAttack, combatant, origin, activeDirection, weapon != null && weapon.Stance == WeaponStance.TwoHanded, charge);
+        }
+        else
+        {
+            // Any other blow is a sudden wind through the grass ahead, and nothing else (the user, 2026-11-15).
+            GroundImpacts.LightSwing(combatant, origin, activeDirection);
         }
 
         float first = float.MaxValue;

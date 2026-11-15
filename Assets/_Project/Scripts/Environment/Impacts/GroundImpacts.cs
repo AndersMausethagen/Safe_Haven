@@ -69,6 +69,16 @@ public static class GroundImpacts
         Play(impact, at, forward, player, Mathf.Lerp(0.75f, 1.15f, charge), player.gameObject);
     }
 
+    /// <summary>An ordinary blow of the player's: a sudden wind through the grass ahead (Ground Impact Settings › Light Swing).</summary>
+    public static void LightSwing(Combatant player, Vector3 origin, Vector3 forward)
+    {
+        GroundImpactDefinition impact = GroundImpactSettings.Current.LightSwing;
+        if (impact != null && player != null)
+        {
+            Play(impact, origin + forward * 0.6f, forward, player, 1f, player.gameObject);
+        }
+    }
+
     /// <summary>A creature's blow landing: its attack's Ground Impact, if it has one, at its body's size.</summary>
     public static void Strike(AttackDefinition attack, Combatant source, Vector3 at, Vector3 forward, bool trail = false, float damage = 0f)
     {

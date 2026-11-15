@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Heavy Two-Handed Blunt
   m_EditorClassIdentifier: SafeHaven::GroundImpactDefinition
   referenceHeight: 1.8
-  gustRadius: 5
-  gustStrength: 0.6
+  gustRadius: 6.25
+  gustStrength: 0.96000004
   gustSpeed: 14
   gustArc: 360
   dust: 20
