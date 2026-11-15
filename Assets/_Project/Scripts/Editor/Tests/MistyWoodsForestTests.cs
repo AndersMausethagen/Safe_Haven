@@ -205,9 +205,8 @@ public sealed class MistyWoodsForestTests
             Assert.IsNotNull(renderer.sharedMaterial.GetTexture("_BaseMap"));
             Assert.IsFalse(ShaderUtil.ShaderHasError(renderer.sharedMaterial.shader));
 
-            var flies = roots.Select(r => r.GetComponentInChildren<AmbientOneShots>(true)).FirstOrDefault(c => c != null);
-            Assert.IsNotNull(flies?.Sound, "flies buzz past");
-            Assert.IsTrue(flies.Sound.Clips.Any(c => c != null));
+            // The flies buzzing past were taken out (the user, 2026-11-15: loud, starting and stopping abruptly).
+            Assert.IsFalse(roots.Any(r => r.GetComponentsInChildren<AmbientOneShots>(true).Any(a => a.name == "Forest Flies")), "no flies buzzing past");
 
             SceneAudio audio = roots.Select(r => r.GetComponentInChildren<SceneAudio>(true)).First(a => a != null);
             Assert.IsTrue(audio.Ambience.tracks.Any(t => t.clip != null && t.clip.name == "Forest_Background_wind_1"), "the recorded forest wind underneath");

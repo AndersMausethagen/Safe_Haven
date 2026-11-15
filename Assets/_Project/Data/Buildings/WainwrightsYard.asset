@@ -34,11 +34,12 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
     tier: 2
   requiredRank: 0
-  modelScale: 0.7
-  modelHeight: 1.15
+  modelScale: 0.8
+  modelHeight: 1.4
   yardDepth: 2.5
   yardSide: 0
   placeInLines: 0
+  decoration: 0
   station: 13
   outputCapacity: 10
   queueLength: 5

@@ -64,8 +64,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 3.5800538, y: 2.9629936, z: 3.1046338}
-  m_Center: {x: 0.0025268793, y: 1.4369868, z: 0.12445879}
+  m_Size: {x: 4.2960653, y: 4.2393603, z: 3.7255607}
+  m_Center: {x: 0.003032446, y: 2.0559967, z: 0.1493504}
 --- !u!114 &8073902222109260655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: 
+  id: b1da62f1b0e9419eab298869b1ff89ae
   prefabId: 7f012aa07ee3260488473b34dbc38683
   saveTransform: 1
   saveActiveState: 1
@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::DamageNumberSpawner
   prefab: {fileID: 2585767536226189764, guid: a3d82cadb26fc11408659ab4fc485897, type: 3}
-  height: 3.1684837
+  height: 4.425677
   spread: 0.4
 --- !u!208 &7672833679850872598
 NavMeshObstacle:
@@ -141,11 +141,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.7900269, y: 1.4814968, z: 1.5523169}
+  m_Extents: {x: 2.1480327, y: 2.1196802, z: 1.8627803}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.0025268793, y: 1.4369868, z: 0.12445879}
+  m_Center: {x: 0.003032446, y: 2.0559967, z: 0.1493504}
   m_TimeToStationary: 0.5
 --- !u!114 &1976909167664250985
 MonoBehaviour:
@@ -224,11 +224,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2582949664537544eba4cb3754fc8eaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::HearthSmoke
-  chimney: {x: 0.48999998, y: 2.4302423, z: -0.12140399}
+  chimney: {x: 0.588, y: 3.477116, z: -0.1456848}
   puffs: 1.6
   rise: 9
   smoke: {fileID: 2100000, guid: e0dc5fdfe4f83b44294848291dbc9ed2, type: 2}
-  lightAt: {x: 0, y: 0.715, z: 1.6679226}
+  lightAt: {x: 0, y: 1.023, z: 2.0015073}
   lightRange: 6
   lightIntensity: 1.6
   lightColour: {r: 1, g: 0.62, b: 0.3, a: 1}
@@ -256,15 +256,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7892707094783924286, guid: 70d2a8234d6511f458956968b556eb45, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.5327145
+      value: 0.63925743
       objectReference: {fileID: 0}
     - target: {fileID: 7892707094783924286, guid: 70d2a8234d6511f458956968b556eb45, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7614901
+      value: 1.0895166
       objectReference: {fileID: 0}
     - target: {fileID: 7892707094783924286, guid: 70d2a8234d6511f458956968b556eb45, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.9760184
+      value: 1.1712222
       objectReference: {fileID: 0}
     - target: {fileID: 7892707094783924286, guid: 70d2a8234d6511f458956968b556eb45, type: 3}
       propertyPath: m_LocalRotation.w
@@ -318,15 +318,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 8675481504685515573, guid: 6ed8206dfd1ba224f8f701727103ae4a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.5
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 8675481504685515573, guid: 6ed8206dfd1ba224f8f701727103ae4a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.65
+      value: 0.93
       objectReference: {fileID: 0}
     - target: {fileID: 8675481504685515573, guid: 6ed8206dfd1ba224f8f701727103ae4a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.5
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 8675481504685515573, guid: 6ed8206dfd1ba224f8f701727103ae4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -472,7 +472,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6116774650318019959, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: height
-      value: 3.3684838
+      value: 4.6256766
       objectReference: {fileID: 0}
     - target: {fileID: 6538676668843931636, guid: 23fed0501bab5b243abf7d5db76c65a8, type: 3}
       propertyPath: m_Name
