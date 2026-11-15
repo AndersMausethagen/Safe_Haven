@@ -155,20 +155,24 @@ public sealed class CraftingStation : MonoBehaviour
     }
 
     public int OutputCapacity => (building != null && building.Definition != null ? building.Definition.OutputCapacity : DefaultOutputCapacity)
-        + Mathf.RoundToInt(Upgrades(level => level.extraOutput));
+        + Mathf.RoundToInt(Upgrades(level => level.extraOutput)) + Mathf.RoundToInt(Extensions(extension => extension.extraOutput));
     public int QueueLength => (building != null && building.Definition != null ? building.Definition.QueueLength : DefaultQueueLength)
-        + Mathf.RoundToInt(Upgrades(level => level.extraQueue));
+        + Mathf.RoundToInt(Upgrades(level => level.extraQueue)) + Mathf.RoundToInt(Extensions(extension => extension.extraQueue));
 
-    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus), plus a horse at work
-    /// beside it (HorseJobs).</summary>
+    // What the extensions standing by it add (a tool rack's queue, a log rack's output).
+    private float Extensions(System.Func<ExtensionBonus, float> bonus) => building != null ? StationExtensions.Bonus(building, bonus) : 0f;
+
+    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus, more from a good home:
+    /// HomeLife), plus a horse at work beside it (HorseJobs), its yard's role (Yards) and its extensions (StationExtensions).</summary>
     public float Speed
     {
         get
         {
             ResidentRecord worker = Worker;
-            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Settlement.HasBed(worker) ? BedSpeedBonus : 0f);
+            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Settlement.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker);
             // A horse put to work beside it (ploughing, hauling) adds its job's bonus.
-            return 1f + Upgrades(level => level.craftSpeed) + staffed + HorseJobs.SpeedBonusFor(this);
+            return 1f + Upgrades(level => level.craftSpeed) + staffed + HorseJobs.SpeedBonusFor(this)
+                + (building != null ? Yards.StationSpeed(building) + StationExtensions.Bonus(building, extension => extension.craftSpeed) : 0f);
         }
     }
 
@@ -181,7 +185,11 @@ public sealed class CraftingStation : MonoBehaviour
     /// <summary>True when a resident's job has this building as its workplace.</summary>
     public bool HasWorker => Worker != null;
 
-    /// <summary>The resident whose job has this building as its workplace, or null.</summary>
+    /// <summary>
+    /// The resident who works here: whose job has this kind of building as its workplace and who works at this one (the one
+    /// nearest their home, HavenHomes), or anywhere of its kind before that is known. Null when nobody does: a second Smithy
+    /// with no smith of its own runs at the plain speed.
+    /// </summary>
     public ResidentRecord Worker
     {
         get
@@ -193,7 +201,8 @@ public sealed class CraftingStation : MonoBehaviour
 
             foreach (ResidentRecord resident in GameSession.Settlement.Residents)
             {
-                if (resident.Job != null && resident.Job.Workplace == building.Definition)
+                if (resident.Job != null && resident.Job.Workplace == building.Definition
+                    && (string.IsNullOrEmpty(resident.WorkQueue) || resident.WorkQueue == Id))
                 {
                     return resident;
                 }
@@ -214,6 +223,8 @@ public sealed class CraftingStation : MonoBehaviour
                 // The building's level, and the rank of the resident who works here.
                 queue.SpeedMultiplier = Speed * GameSession.Settlement.WorkerSpeed(type);
                 queue.Tier = Tier;
+                // Kept on the queue so its worker's luck holds during raids, when no station is loaded.
+                queue.ExtraChance = Extensions(extension => extension.extraChance);
             }
 
             return queue;

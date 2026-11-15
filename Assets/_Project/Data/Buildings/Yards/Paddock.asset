@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be17b6288b7ada04dba5c880cdfa50db, type: 3}
+  m_Name: Paddock
+  m_EditorClassIdentifier: SafeHaven::YardRoleDefinition
+  displayName: Paddock
+  description: 'A stable with room round it, fenced: the horses'' own ground.'
+  icon: HorseHead
+  colour: {r: 0.85, g: 0.7, b: 0.5, a: 1}
+  needs:
+  - anyOf:
+    - {fileID: 11400000, guid: 08a3177177c32de4fa1bcd278a16ee86, type: 2}
+    count: 1
+    words: a stable
+  minArea: 60
+  homeQuality: 0
+  stationSpeed: 0
+  extensionSlots: 0
+  comfort: 1
+  renown: 2
+  gatheringPlace: 0
+  pasture: 1
+  clutter:
+  - {fileID: 4476360073440484508, guid: 75e07bf11be05ce41bd16de38c8e00c0, type: 3}
+  clutterCount: 2

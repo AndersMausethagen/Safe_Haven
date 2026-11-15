@@ -97,6 +97,7 @@ public sealed partial class BuildPlacer
         }
 
         ghost.Show(lineCenters.Count);
+        Overlay.Here(Kind, pressPoint, pressYaw, LocalBounds);
         int paid = 0;
         for (int i = 0; i < lineCenters.Count; i++)
         {

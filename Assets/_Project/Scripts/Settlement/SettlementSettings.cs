@@ -76,6 +76,9 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
 
     public float LessonWork => lessonWork;
 
+    /// <summary>The worker ranks, lowest first.</summary>
+    public IReadOnlyList<WorkerRank> WorkerRanks => workerRanks;
+
     /// <summary>The rank a worker with this many crafts behind them has reached, and its place in the list.</summary>
     public WorkerRank RankFor(int crafts) => workerRanks.Count > 0 ? workerRanks[RankIndex(crafts)] : new WorkerRank("", 0, 1f, 0f);
 

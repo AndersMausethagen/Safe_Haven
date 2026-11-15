@@ -2,7 +2,7 @@ using UnityEngine;
 
 /// <summary>
 /// A resident out and about after dark carries a little light (a lantern, a lit splinter): the Haven at night is people
-/// moving between warm windows, not an empty dark. Off while they sleep. Added by ResidentNpc.
+/// moving between warm windows, not an empty dark. Off once they are in bed. Added by ResidentNpc.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class ResidentLantern : MonoBehaviour
@@ -31,7 +31,8 @@ public sealed class ResidentLantern : MonoBehaviour
 
     private void Update()
     {
-        bool awake = life == null || life.Activity != ResidentActivity.Sleep;
+        // Lit on the way home after dark, out once they are in bed.
+        bool awake = life == null || !life.IsResting;
         float dark = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.45f, 0.85f, NightSettings.Darkness));
         flicker += Time.deltaTime * 6f;
         float wanted = awake ? dark * Intensity * (0.85f + 0.15f * Mathf.PerlinNoise(flicker, 0.5f)) : 0f;

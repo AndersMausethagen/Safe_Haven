@@ -218,6 +218,32 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             gameObject.AddComponent<HavenProgress>();
         }
 
+        // Who lives in which house and works where, and the paths drawn between them (Docs/BuildingSystemResearch.md §3.4).
+        if (!TryGetComponent(out HavenHomes _))
+        {
+            gameObject.AddComponent<HavenHomes>();
+        }
+
+        if (!TryGetComponent(out HavenPaths _))
+        {
+            gameObject.AddComponent<HavenPaths>();
+        }
+
+        if (!TryGetComponent(out Yards _))
+        {
+            gameObject.AddComponent<Yards>();
+        }
+
+        if (!TryGetComponent(out ResidentBuilders _))
+        {
+            gameObject.AddComponent<ResidentBuilders>();
+        }
+
+        if (!TryGetComponent(out Footpaths _))
+        {
+            gameObject.AddComponent<Footpaths>();
+        }
+
         interactable = GetComponent<Interactable>();
         raid = GetComponent<RaidPortal>();
         station = GetComponent<CraftingStation>();

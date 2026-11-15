@@ -271,6 +271,31 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Finish(siteInteractable.Interactor);
     }
 
+    /// <summary>
+    /// Work done on it by someone else (the Carpenter and Mason while the player raids: ResidentBuilders): adds seconds of
+    /// hammering, finishing it when it is done. Returns the seconds it used. Nothing for a ruin not yet paid for.
+    /// </summary>
+    public float AddWork(float seconds)
+    {
+        if (!IsBuilding || !Paid || seconds <= 0f)
+        {
+            return 0f;
+        }
+
+        float used = Mathf.Min(seconds, WorkNeeded - Work);
+        Work += used;
+        if (Work + 0.01f >= WorkNeeded)
+        {
+            Finish();
+        }
+        else
+        {
+            ShowRise();
+        }
+
+        return used;
+    }
+
     /// <summary>Ends the work at once (tests, editor tools, and when the hammering is done).</summary>
     public void Finish(GameObject by = null)
     {

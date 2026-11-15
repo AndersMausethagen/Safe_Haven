@@ -14,7 +14,7 @@ public static class WorkerProduction
     {
         foreach (ResidentRecord record in settlement.Residents)
         {
-            StationQueue queue = QueueOf(settlement, record.Job);
+            StationQueue queue = QueueOf(settlement, record);
             if (queue == null)
             {
                 continue;
@@ -28,7 +28,32 @@ public static class WorkerProduction
         }
     }
 
-    /// <summary>The queue of the station a job works at, or null when it has no workplace or none stands.</summary>
+    /// <summary>
+    /// The queue of the station this resident works at: the one nearest their home (ResidentRecord.WorkQueue), else the
+    /// first of their job's kind. Null when their job has no workplace or none stands.
+    /// </summary>
+    public static StationQueue QueueOf(SettlementState settlement, ResidentRecord record)
+    {
+        if (record == null)
+        {
+            return null;
+        }
+
+        if (!string.IsNullOrEmpty(record.WorkQueue) && record.Job != null && record.Job.Workplace != null)
+        {
+            foreach (StationQueue queue in settlement.Workshops.Queues)
+            {
+                if (queue.StationId == record.WorkQueue && queue.Type == record.Job.Workplace.Station)
+                {
+                    return queue;
+                }
+            }
+        }
+
+        return QueueOf(settlement, record.Job);
+    }
+
+    /// <summary>The queue of the first station of a job's kind, or null when it has no workplace or none stands.</summary>
     public static StationQueue QueueOf(SettlementState settlement, JobDefinition job)
     {
         if (job == null || job.Workplace == null || job.Workplace.Station == CraftingStationType.None)

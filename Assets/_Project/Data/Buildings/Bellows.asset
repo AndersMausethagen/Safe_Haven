@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: Bellows
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: bellows
+  displayName: Bellows
+  description: 'A great leather bellows for the Smithy''s forge: a hotter fire, and now and then an ingot more.'
+  icon: {fileID: 21300000, guid: 41be1fb3e20c92b44993f8e4924b6088, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
+  prefab: {fileID: 2058507201180911008, guid: d61fd1a4ae1abb647bc6ee2d631bb9f1, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 5b9dacc5b9eb6cc44b9e831ab423c051, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 1
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 7
+  requires:
+  - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+    tier: 1
+  requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0.2
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0.05
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 4
+  renown: 1
+  upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
+  deathSound: {fileID: 0}

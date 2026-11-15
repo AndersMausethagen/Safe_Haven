@@ -14,6 +14,9 @@ public sealed class WatchPostArcher : MonoBehaviour
     private const float ShotShowsSeconds = 0.12f;
 
     [SerializeField, Min(1f)] private float reach = 18f;
+
+    /// <summary>How far it shoots (drawn on the build ghost's readout).</summary>
+    public float Reach => reach;
     [Tooltip("Damage per shot for each tier above the first.")]
     [SerializeField, Min(0f)] private float damagePerTier = 8f;
     [SerializeField, Min(0.2f)] private float secondsBetweenShots = 3f;

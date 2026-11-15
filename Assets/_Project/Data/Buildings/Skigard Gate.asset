@@ -36,6 +36,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 1
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 1
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5

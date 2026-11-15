@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be17b6288b7ada04dba5c880cdfa50db, type: 3}
+  m_Name: WorkYard
+  m_EditorClassIdentifier: SafeHaven::YardRoleDefinition
+  displayName: Work Yard
+  description: 'A workshop and one of its extensions fenced in together: extensions count anywhere in the yard, and the station takes one more.'
+  icon: Hammer
+  colour: {r: 0.62, g: 0.8, b: 0.95, a: 1}
+  needs:
+  - anyOf:
+    - {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+    - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+    - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+    - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
+    - {fileID: 11400000, guid: e26a3ab6b257d3942925a533c5c2ebda, type: 2}
+    - {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+    count: 1
+    words: a workshop
+  - anyOf:
+    - {fileID: 11400000, guid: 5cce24373949c9b4eab805398fe452f4, type: 2}
+    - {fileID: 11400000, guid: a53dfc3a1cc8b784284ae72ab91e5da3, type: 2}
+    - {fileID: 11400000, guid: 56f2c980d35b2fe45a97a8cf6e01002b, type: 2}
+    - {fileID: 11400000, guid: 6e9f39952f5c82042a46e2c526318b61, type: 2}
+    - {fileID: 11400000, guid: d7f60d3909c8f1b498b5ac65391a2582, type: 2}
+    - {fileID: 11400000, guid: ddc73a620daecb042833174b4764b89d, type: 2}
+    - {fileID: 11400000, guid: 94635f7d779b4874cb740bd12188e4a4, type: 2}
+    - {fileID: 11400000, guid: 4cb16a62a3403e54c86a5fb04bd1e958, type: 2}
+    - {fileID: 11400000, guid: a9d2a485c51fbc14d92a8338c4289237, type: 2}
+    count: 1
+    words: a station extension
+  minArea: 0
+  homeQuality: 0
+  stationSpeed: 0.1
+  extensionSlots: 1
+  comfort: 0
+  renown: 2
+  gatheringPlace: 0
+  pasture: 0
+  clutter:
+  - {fileID: 6943662779149978081, guid: 275e0a9b57289c84fb2f09dc22f811d2, type: 3}
+  - {fileID: 7965108127962174536, guid: 1a2514cdb148dc84693c9b8d20183e37, type: 3}
+  clutterCount: 2

@@ -23,8 +23,10 @@ public static class HavenReadiness
 
     public static int ExtraLogs => Mathf.RoundToInt(BestOfEachKind(level => level.extraLogs));
 
-    /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add, and everyone with a bed.</summary>
-    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Settlement.Housed;
+    /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add, everyone with a bed, the
+    /// best home once (HomeLife) and each kind of yard once (Yards).</summary>
+    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Settlement.Housed
+        + HomeLife.Comfort + Yards.Comfort;
 
     public static float RestedSeconds => Comfort * HavenSettings.Current.RestedSecondsPerComfort;
 

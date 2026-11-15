@@ -55,6 +55,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
         SettlementState settlement = GameSession.Settlement;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
+        // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders).
+        if (HomePortal.Current == null && ResidentBuilders.Count(settlement) > 0 && settlement.ScaffoldsWaiting)
+        {
+            settlement.AddBuilderSeconds(Time.deltaTime);
+        }
+
         if (Time.unscaledTime >= nextWorkerLook)
         {
             nextWorkerLook = Time.unscaledTime + WorkerLookSeconds;
@@ -115,7 +121,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             GameMessages.Post($"{worker.Resident.DisplayName} is now a {settings.RankFor(worker.WorkDone).name} {worker.Job.DisplayName}.", MessageKind.Gain);
         }
 
-        if (recipe.Output != null && !recipe.Output.HasDurability && UnityEngine.Random.value < settings.RankFor(worker.WorkDone).extraChance)
+        if (recipe.Output != null && !recipe.Output.HasDurability && UnityEngine.Random.value < settings.RankFor(worker.WorkDone).extraChance + station.ExtraChance)
         {
             station.AddExtra(recipe.Output, 1);
         }

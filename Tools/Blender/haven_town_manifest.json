@@ -1,0 +1,755 @@
+{
+  "note": "Made by Tools/Blender/haven_town_props.py, as haven_decor_manifest.json.",
+  "assets": {
+    "Bellows": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Bellows",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Bellows/Bellows.fbx",
+      "objects": [
+        "Bellows",
+        "Bellows LOD1",
+        "Bellows LOD2"
+      ],
+      "size_m": {
+        "x": 1.556,
+        "z": 0.52,
+        "y": 1.142
+      },
+      "bounds_unity": {
+        "min": [
+          -0.8258,
+          -0.0124,
+          -0.26
+        ],
+        "max": [
+          0.73,
+          1.13,
+          0.26
+        ]
+      },
+      "triangles": [
+        188,
+        156,
+        120
+      ],
+      "vertices": [
+        284,
+        252,
+        204
+      ],
+      "vertices_per_triangle": 1.51,
+      "lod_share": [
+        1.0,
+        0.83,
+        0.64
+      ],
+      "budget": {
+        "default_view_pixels": 23214,
+        "aim_40px": 1161,
+        "floor_25px": 1857,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron",
+        "Kit Hide"
+      ],
+      "extends": "Forge",
+      "notes": "Beside the Smithy's forge; the nozzle points +x.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.048,
+          0.559,
+          0.0
+        ],
+        "size": [
+          1.556,
+          1.142,
+          0.52
+        ]
+      }
+    },
+    "Quench Tub": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Quench Tub",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Quench Tub/Quench Tub.fbx",
+      "objects": [
+        "Quench Tub",
+        "Quench Tub LOD1",
+        "Quench Tub LOD2"
+      ],
+      "size_m": {
+        "x": 1.203,
+        "z": 1.021,
+        "y": 0.63
+      },
+      "bounds_unity": {
+        "min": [
+          -0.45,
+          0.0,
+          -0.4387
+        ],
+        "max": [
+          0.7525,
+          0.6298,
+          0.5826
+        ]
+      },
+      "triangles": [
+        270,
+        182,
+        103
+      ],
+      "vertices": [
+        280,
+        202,
+        120
+      ],
+      "vertices_per_triangle": 1.04,
+      "lod_share": [
+        1.0,
+        0.67,
+        0.38
+      ],
+      "budget": {
+        "default_view_pixels": 18405,
+        "aim_40px": 920,
+        "floor_25px": 1472,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Planks",
+        "Kit Iron",
+        "Kit Boulder"
+      ],
+      "extends": "Forge",
+      "notes": "Water-filled tub with tongs.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.151,
+          0.315,
+          0.072
+        ],
+        "size": [
+          1.202,
+          0.63,
+          1.021
+        ]
+      }
+    },
+    "Tool Rack": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Tool Rack",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Tool Rack/Tool Rack.fbx",
+      "objects": [
+        "Tool Rack",
+        "Tool Rack LOD1",
+        "Tool Rack LOD2"
+      ],
+      "size_m": {
+        "x": 1.22,
+        "z": 0.5,
+        "y": 1.5
+      },
+      "bounds_unity": {
+        "min": [
+          -0.61,
+          0.0,
+          -0.25
+        ],
+        "max": [
+          0.61,
+          1.5,
+          0.25
+        ]
+      },
+      "triangles": [
+        248,
+        248,
+        84
+      ],
+      "vertices": [
+        428,
+        428,
+        168
+      ],
+      "vertices_per_triangle": 1.73,
+      "lod_share": [
+        1.0,
+        1.0,
+        0.34
+      ],
+      "budget": {
+        "default_view_pixels": 21754,
+        "aim_40px": 1088,
+        "floor_25px": 1740,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron"
+      ],
+      "extends": "Forge",
+      "notes": "Upright rack, faces the front (+Z).",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.75,
+          0.0
+        ],
+        "size": [
+          1.22,
+          1.5,
+          0.5
+        ]
+      }
+    },
+    "Chopping Block": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Chopping Block",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Chopping Block/Chopping Block.fbx",
+      "objects": [
+        "Chopping Block",
+        "Chopping Block LOD1",
+        "Chopping Block LOD2"
+      ],
+      "size_m": {
+        "x": 1.385,
+        "z": 1.155,
+        "y": 1.014
+      },
+      "bounds_unity": {
+        "min": [
+          -0.6526,
+          -0.0412,
+          -0.5775
+        ],
+        "max": [
+          0.7325,
+          0.9725,
+          0.5778
+        ]
+      },
+      "triangles": [
+        188,
+        60,
+        48
+      ],
+      "vertices": [
+        318,
+        82,
+        70
+      ],
+      "vertices_per_triangle": 1.69,
+      "lod_share": [
+        1.0,
+        0.32,
+        0.26
+      ],
+      "budget": {
+        "default_view_pixels": 27599,
+        "aim_40px": 1380,
+        "floor_25px": 2208,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron"
+      ],
+      "extends": "Sawbench",
+      "notes": "Stump with an axe in it.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.04,
+          0.466,
+          0.0
+        ],
+        "size": [
+          1.385,
+          1.014,
+          1.155
+        ]
+      }
+    },
+    "Log Rack": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Log Rack",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Log Rack/Log Rack.fbx",
+      "objects": [
+        "Log Rack",
+        "Log Rack LOD1",
+        "Log Rack LOD2"
+      ],
+      "size_m": {
+        "x": 1.9,
+        "z": 1.185,
+        "y": 1.0
+      },
+      "bounds_unity": {
+        "min": [
+          -0.95,
+          0.0,
+          -0.5952
+        ],
+        "max": [
+          0.95,
+          1.0,
+          0.5899
+        ]
+      },
+      "triangles": [
+        488,
+        376,
+        212
+      ],
+      "vertices": [
+        584,
+        472,
+        288
+      ],
+      "vertices_per_triangle": 1.2,
+      "lod_share": [
+        1.0,
+        0.77,
+        0.43
+      ],
+      "budget": {
+        "default_view_pixels": 38179,
+        "aim_40px": 1909,
+        "floor_25px": 3054,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood"
+      ],
+      "extends": "Sawbench",
+      "notes": "Three rows of logs between posts.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.5,
+          -0.003
+        ],
+        "size": [
+          1.9,
+          1.0,
+          1.185
+        ]
+      }
+    },
+    "Sawhorse": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Sawhorse",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Sawhorse/Sawhorse.fbx",
+      "objects": [
+        "Sawhorse",
+        "Sawhorse LOD1",
+        "Sawhorse LOD2"
+      ],
+      "size_m": {
+        "x": 1.771,
+        "z": 0.701,
+        "y": 1.043
+      },
+      "bounds_unity": {
+        "min": [
+          -0.9959,
+          -0.0164,
+          -0.3505
+        ],
+        "max": [
+          0.775,
+          1.0269,
+          0.3505
+        ]
+      },
+      "triangles": [
+        192,
+        164,
+        80
+      ],
+      "vertices": [
+        256,
+        228,
+        120
+      ],
+      "vertices_per_triangle": 1.33,
+      "lod_share": [
+        1.0,
+        0.85,
+        0.42
+      ],
+      "budget": {
+        "default_view_pixels": 27991,
+        "aim_40px": 1400,
+        "floor_25px": 2239,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron"
+      ],
+      "extends": "Sawbench",
+      "notes": "Crossed legs, a log across, a bow saw.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.11,
+          0.505,
+          0.0
+        ],
+        "size": [
+          1.771,
+          1.043,
+          0.701
+        ]
+      }
+    },
+    "Smoke Rack": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Smoke Rack",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Smoke Rack/Smoke Rack.fbx",
+      "objects": [
+        "Smoke Rack",
+        "Smoke Rack LOD1",
+        "Smoke Rack LOD2"
+      ],
+      "size_m": {
+        "x": 1.24,
+        "z": 0.701,
+        "y": 1.453
+      },
+      "bounds_unity": {
+        "min": [
+          -0.62,
+          -0.0014,
+          -0.3503
+        ],
+        "max": [
+          0.62,
+          1.4514,
+          0.3503
+        ]
+      },
+      "triangles": [
+        555,
+        273,
+        207
+      ],
+      "vertices": [
+        697,
+        459,
+        359
+      ],
+      "vertices_per_triangle": 1.26,
+      "lod_share": [
+        1.0,
+        0.49,
+        0.37
+      ],
+      "budget": {
+        "default_view_pixels": 24000,
+        "aim_40px": 1200,
+        "floor_25px": 1920,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Boulder",
+        "Kit Soil",
+        "Kit Hide",
+        "Kit Dye Ochre"
+      ],
+      "extends": "Kitchen",
+      "notes": "Poles over a smouldering pit, fish and meat hanging.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.725,
+          0.0
+        ],
+        "size": [
+          1.24,
+          1.453,
+          0.701
+        ]
+      }
+    },
+    "Larder": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Larder",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Larder/Larder.fbx",
+      "objects": [
+        "Larder",
+        "Larder LOD1",
+        "Larder LOD2"
+      ],
+      "size_m": {
+        "x": 1.658,
+        "z": 0.81,
+        "y": 1.03
+      },
+      "bounds_unity": {
+        "min": [
+          -0.82,
+          -0.0021,
+          -0.4051
+        ],
+        "max": [
+          0.8375,
+          1.0283,
+          0.4051
+        ]
+      },
+      "triangles": [
+        344,
+        186,
+        72
+      ],
+      "vertices": [
+        386,
+        264,
+        128
+      ],
+      "vertices_per_triangle": 1.12,
+      "lod_share": [
+        1.0,
+        0.54,
+        0.21
+      ],
+      "budget": {
+        "default_view_pixels": 27755,
+        "aim_40px": 1388,
+        "floor_25px": 2220,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Planks",
+        "Kit Iron",
+        "Kit Boulder",
+        "Kit Cloth",
+        "Kit Linen"
+      ],
+      "extends": "Kitchen",
+      "notes": "Plank store on stone feet.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.009,
+          0.513,
+          0.0
+        ],
+        "size": [
+          1.657,
+          1.03,
+          0.81
+        ]
+      }
+    },
+    "Herb Garden": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Herb Garden",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Herb Garden/Herb Garden.fbx",
+      "objects": [
+        "Herb Garden",
+        "Herb Garden LOD1",
+        "Herb Garden LOD2"
+      ],
+      "size_m": {
+        "x": 1.5,
+        "z": 0.97,
+        "y": 0.412
+      },
+      "bounds_unity": {
+        "min": [
+          -0.75,
+          0.0,
+          -0.485
+        ],
+        "max": [
+          0.75,
+          0.412,
+          0.485
+        ]
+      },
+      "triangles": [
+        187,
+        140,
+        92
+      ],
+      "vertices": [
+        273,
+        208,
+        156
+      ],
+      "vertices_per_triangle": 1.46,
+      "lod_share": [
+        1.0,
+        0.75,
+        0.49
+      ],
+      "budget": {
+        "default_view_pixels": 19381,
+        "aim_40px": 969,
+        "floor_25px": 1550,
+        "test_cap": 6000
+      },
+      "materials": [
+        "Kit Planks",
+        "Kit Soil",
+        "Kit Trollstone",
+        "Kit Linen"
+      ],
+      "extends": "Kitchen",
+      "notes": "Raised plank bed of herbs.",
+      "collider": {
+        "type": "box",
+        "center": [
+          0.0,
+          0.206,
+          0.0
+        ],
+        "size": [
+          1.5,
+          0.412,
+          0.97
+        ]
+      }
+    },
+    "Hedge": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Hedge",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Hedge/Hedge.fbx",
+      "objects": [
+        "Hedge",
+        "Hedge LOD1",
+        "Hedge LOD2"
+      ],
+      "size_m": {
+        "x": 4.099,
+        "z": 0.834,
+        "y": 1.16
+      },
+      "bounds_unity": {
+        "min": [
+          -2.05,
+          -0.0066,
+          -0.4256
+        ],
+        "max": [
+          2.0495,
+          1.1529,
+          0.4081
+        ]
+      },
+      "triangles": [
+        828,
+        312,
+        36
+      ],
+      "vertices": [
+        780,
+        378,
+        72
+      ],
+      "vertices_per_triangle": 0.94,
+      "lod_share": [
+        1.0,
+        0.38,
+        0.04
+      ],
+      "budget": {
+        "default_view_pixels": 74170,
+        "aim_40px": 3709,
+        "floor_25px": 5934,
+        "test_cap": 8000
+      },
+      "materials": [
+        "Kit Wood",
+        "Kit Turf"
+      ],
+      "fence": true,
+      "notes": "A line piece 4.12 m along x, like the Skigard.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.0,
+          0.573,
+          -0.009
+        ],
+        "size": [
+          4.099,
+          1.159,
+          0.834
+        ]
+      }
+    },
+    "Dry-stone Wall": {
+      "folder": "Assets/_Project/Art/Haven/Structures/Dry-stone Wall",
+      "fbx": "Assets/_Project/Art/Haven/Structures/Dry-stone Wall/Dry-stone Wall.fbx",
+      "objects": [
+        "Dry-stone Wall",
+        "Dry-stone Wall LOD1",
+        "Dry-stone Wall LOD2"
+      ],
+      "size_m": {
+        "x": 4.119,
+        "z": 0.655,
+        "y": 0.84
+      },
+      "bounds_unity": {
+        "min": [
+          -2.06,
+          0.0038,
+          -0.3316
+        ],
+        "max": [
+          2.0588,
+          0.844,
+          0.3231
+        ]
+      },
+      "triangles": [
+        2112,
+        528,
+        528
+      ],
+      "vertices": [
+        2376,
+        1056,
+        1056
+      ],
+      "vertices_per_triangle": 1.12,
+      "lod_share": [
+        1.0,
+        0.25,
+        0.25
+      ],
+      "budget": {
+        "default_view_pixels": 56006,
+        "aim_40px": 2800,
+        "floor_25px": 4480,
+        "test_cap": 8000
+      },
+      "materials": [
+        "Kit Boulder"
+      ],
+      "fence": true,
+      "notes": "A line piece 4.12 m along x, like the Skigard.",
+      "collider": {
+        "type": "box",
+        "center": [
+          -0.001,
+          0.424,
+          -0.004
+        ],
+        "size": [
+          4.119,
+          0.84,
+          0.655
+        ]
+      }
+    }
+  }
+}

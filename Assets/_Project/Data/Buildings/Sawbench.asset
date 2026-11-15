@@ -38,6 +38,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 1
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 7
   outputCapacity: 10
   queueLength: 5
@@ -69,8 +82,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Treadle
     description: A treadle saw, and every tree at home gives more.
     cost:
@@ -98,8 +113,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 1
   - title: Waterwheel
     description: A wheel that never tires.
     cost:
@@ -129,8 +146,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Haven's Own
     description: No log leaves this yard wasted.
     cost:
@@ -160,8 +179,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

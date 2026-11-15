@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// A lived-in building: smoke rising from its roof while it stands, drifting with the wind, and a warm light in it at night.
+/// A lived-in building: smoke rising from its roof while it stands, drifting with the wind, and a warm light in it at night
+/// (in a house, only while someone sleeps in it: HavenHomes).
 /// The GDD's hearth is what the lost see of home, and the Haven's ranks speak of "smoke from more than one chimney"; this is
 /// that smoke. A building under construction or in ruins gives none. Smoke and light run only while the building is near
 /// enough to be on screen, so a whole village costs nothing when the player is in the woods.
@@ -29,6 +30,7 @@ public sealed class HearthSmoke : MonoBehaviour
     [SerializeField] private GameObject livedIn;
 
     private Construction construction;
+    private BuildingObject building;
 
     /// <summary>The building stands (built, not being built): its hearth burns and warms whoever is near.</summary>
     public bool Burning => construction == null || (construction.IsStanding && !construction.IsBuilding);
@@ -48,6 +50,7 @@ public sealed class HearthSmoke : MonoBehaviour
     private void Awake()
     {
         construction = GetComponent<Construction>();
+        building = GetComponent<BuildingObject>();
         if (smoke != null)
         {
             system = MakeSmoke();
@@ -150,7 +153,9 @@ public sealed class HearthSmoke : MonoBehaviour
         {
             // Lit from dusk, a little brighter and redder as the fire burns down, flickering as fire does.
             float dark = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.25f, 0.75f, NightSettings.Darkness));
-            float wanted = standing && near ? dark : 0f;
+            // A house's window is lit while someone is home in it (HavenHomes); other hearths whenever they stand.
+            bool lit = building == null || building.Definition == null || building.Definition.Beds <= 0 || HavenHomes.Indoors(building) > 0;
+            float wanted = standing && near && lit ? dark : 0f;
             flicker += Time.deltaTime * 7f;
             float flame = 0.86f + 0.14f * Mathf.PerlinNoise(flicker, 0.37f);
             glow.intensity = Mathf.MoveTowards(glow.intensity, wanted * lightIntensity * flame, Time.deltaTime * 2f);

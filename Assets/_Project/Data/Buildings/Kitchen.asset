@@ -35,9 +35,24 @@ MonoBehaviour:
     tier: 1
   requiredRank: 0
   modelScale: 1
+  modelHeight: 1
   yardDepth: 2
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 1
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 9
   outputCapacity: 10
   queueLength: 5
@@ -69,11 +84,14 @@ MonoBehaviour:
     requires:
     - building: {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
       tier: 1
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 1
   - title: The Long Table
     description: 'Everyone eats together: the Haven Feast and Moon Broth, and you can carry one more meal into the woods.'
     cost:
@@ -99,11 +117,14 @@ MonoBehaviour:
     requires:
     - building: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
       tier: 3
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 1
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 2
   beds: 0
   teachesRecipes: []

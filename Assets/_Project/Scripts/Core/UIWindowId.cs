@@ -48,4 +48,6 @@ public enum UIWindowId
     HorsePanel = 20,
     /// <summary>The Haven's portal: its painting, its words, what it offers (PortalWindow).</summary>
     Portal = 21,
+    /// <summary>A resident's page: their picture, home, work and story; where their home is chosen (ResidentWindow).</summary>
+    ResidentPanel = 22,
 }

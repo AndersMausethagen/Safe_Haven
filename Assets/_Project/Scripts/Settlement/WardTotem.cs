@@ -12,6 +12,9 @@ using UnityEngine;
 public sealed class WardTotem : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float radius = 7f;
+
+    /// <summary>How far it guards (drawn on the build ghost's readout).</summary>
+    public float Radius => radius;
     [SerializeField, Min(0.2f)] private float pulseSeconds = 2f;
     [SerializeField, Min(0f)] private float damagePerPulse = 4f;
     [Tooltip("Put on every attacker in reach at each pulse.")]

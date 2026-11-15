@@ -70,7 +70,9 @@ public sealed partial class BuildPlacer
     private string CheckSpot(Vector3 point, float pieceYaw)
     {
         FootprintRect footprint = BuildPlacement.Footprint(point, pieceYaw, LocalBounds);
-        string outside = Area.CheckSpot(footprint, point);
+        // A path follows the ground, slopes and all, and may cross yards: only its middle must be in the land and dry.
+        bool path = Kind != null && Kind.IsPath;
+        string outside = Area.CheckSpot(path ? new FootprintRect(footprint.Center, Vector2.one * 0.05f, footprint.Yaw) : footprint, point);
         if (outside != null)
         {
             return outside;
@@ -90,7 +92,7 @@ public sealed partial class BuildPlacer
 
         foreach (BuildingObject other in BuildingObject.Active)
         {
-            if (other.TryGetYard(out FootprintRect otherYard) && BuildPlacement.Overlaps(footprint, otherYard))
+            if (!path && other.TryGetYard(out FootprintRect otherYard) && BuildPlacement.Overlaps(footprint, otherYard))
             {
                 return $"That's in front of the {other.Definition.DisplayName}. Keep its entrance clear.";
             }

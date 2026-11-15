@@ -654,7 +654,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         float farthest = 0f;
         foreach (BuildingObject building in BuildingObject.Active)
         {
-            if (building == null || building.Definition == null || building.Definition.Faction != Faction.Player)
+            if (building == null || building.Definition == null || building.Definition.Faction != Faction.Player || building.Definition.IsPath)
             {
                 continue;
             }

@@ -90,6 +90,12 @@ public sealed class SettlementSaveData
     /// <summary>Share taken off the next breach. Missing in older saves.</summary>
     public float breachWeakening;
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
+    /// <summary>What has been put in each house (HomeLifeSettings › Comforts): "house id|comfort id". Missing in older saves.</summary>
+    public List<string> houseComforts = new List<string>();
+    /// <summary>The worn footpaths round home (Footpaths), packed. Missing in older saves.</summary>
+    public string footpaths = "";
+    /// <summary>Raid seconds the Carpenter and Mason have yet to spend on scaffolds at home (ResidentBuilders).</summary>
+    public float builderSeconds;
     /// <summary>Ids of the bosses beaten. Missing in older saves.</summary>
     public List<string> defeatedBosses = new List<string>();
     public string lastBossBeaten;
@@ -171,6 +177,13 @@ public sealed class ResidentSaveData
     public int workDone;
     /// <summary>A lesson given since the last raid survived.</summary>
     public bool taughtSinceRaid;
+    /// <summary>The house they sleep in (a building's save id), or empty for the home spots by the portal. Missing in older saves.</summary>
+    public string home;
+    /// <summary>The house the player chose for them, or empty to let them choose (HavenHomes).</summary>
+    public string homeChosen;
+    /// <summary>Which of the buildings of their job's kind they work at (a building's save id), and its station's queue.</summary>
+    public string workplace;
+    public string workQueue;
 }
 
 [Serializable]

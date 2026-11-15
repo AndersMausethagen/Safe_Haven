@@ -44,5 +44,18 @@
   "flower_bed": "A round bed of dark soil ringed with grey field stones, full of blue, yellow and white wildflowers and green herbs",
   "signpost": "A Nordic wooden signpost: a tall post with three plank arrows pointing different ways, their tips painted red, ochre and blue, stones round its foot",
   "rune_stone": "An upright grey Norse rune stone, a carved serpent band painted red winding round its face with runes along it",
-  "hay_bales": "Three golden hay bales tied with cord on a mat of spilt hay, an old wooden cart wheel leaning against them"
+  "hay_bales": "Three golden hay bales tied with cord on a mat of spilt hay, an old wooden cart wheel leaning against them",
+  "dirt_path": "A short stretch of packed brown earth footpath winding through green grass, two worn wheel ruts and tufts of grass along its edges, seen from above at an angle",
+  "stone_path": "A short stretch of grey flagstone path, irregular flat stones bedded in dark earth with grass between the joints, its edges ragged with grass, seen from above at an angle",
+  "hedge": "A short, neatly clipped green hedge of small dense leaves, a low leafy wall with woody stems showing at its foot, standing on grass",
+  "dry_stone_wall": "A low dry-stone wall of flat grey field stones stacked in courses without mortar, a row of stones set on edge along its top, on grass",
+  "bellows": "A large blacksmith's leather bellows on a low wooden trestle: two wedge-shaped plank boards with dark brown leather pleated between them and a black iron nozzle",
+  "quench_tub": "A broad, low wooden tub banded with black iron hoops, full of dark water, a pair of black iron tongs leaning on its rim",
+  "tool_rack": "An upright wooden rack of planks between two posts, blacksmith's hammers and iron tongs hanging from pegs on it",
+  "chopping_block": "A broad round tree-stump chopping block with an axe bitten into its scarred top, pale wood chips scattered round it on the ground",
+  "log_rack": "A rack of round logs stacked lengthwise in three rows between two pairs of wooden posts, the cut log ends pale",
+  "sawhorse": "A wooden sawhorse with crossed legs, a round log lying across it and a wooden bow saw leaning against one end",
+  "smoke_rack": "A rack of wooden poles over a small smouldering fire pit ringed with grey stones, split fish and strips of dried meat hanging from the crossbars, a wisp of smoke",
+  "larder": "A small wooden store box on four stone feet with a sloping plank lid and a little plank door, a clay crock and a tied linen sack beside it",
+  "herb_garden": "A raised garden bed of weathered planks full of dark soil and rows of leafy green kitchen herbs with a few small white flowers"
 }

@@ -1,0 +1,340 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+/// <summary>
+/// Where Safe Haven's people live and work (Docs/BuildingSystemResearch.md §3.4.1): each resident sleeps in a house (the one
+/// the player chose for them, else the nearest free bed to their work, HomeRules) and works at the building of their job's
+/// kind nearest that home. Two Smithies mean two places to work; a Cottage by the forge is where the smith walks home to.
+/// Anyone without a bed sleeps at the home spots by the portal, as before.
+/// <para>
+/// Worked out again only when something changes (a building placed, moved, finished or upgraded; a job given; a home
+/// chosen), never per frame, and written to the residents' records so it is saved and reaches a co-op friend with the
+/// settlement. A friend's game reads what the host worked out. Added to the portal with HavenProgress.
+/// </para>
+/// </summary>
+[DisallowMultipleComponent]
+public sealed class HavenHomes : MonoBehaviour
+{
+    private static readonly Dictionary<BuildingObject, int> indoors = new Dictionary<BuildingObject, int>();
+    private readonly List<HomeRules.House> houses = new List<HomeRules.House>();
+    private readonly List<HomeRules.Person> people = new List<HomeRules.Person>();
+    private bool dirty = true;
+    private string lastSeen = "";
+
+    public static HavenHomes Current { get; private set; }
+
+    /// <summary>Raised when someone's home or workplace changed: residents set off again, windows light up elsewhere.</summary>
+    public static event Action Changed;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        indoors.Clear();
+    }
+
+    private void OnEnable()
+    {
+        Current = this;
+        BuildingObject.ActiveChanged += MarkDirty;
+        Construction.Finished += OnFinished;
+        GameSession.Settlement.Changed += MarkDirty;
+        dirty = true;
+    }
+
+    private void OnDisable()
+    {
+        BuildingObject.ActiveChanged -= MarkDirty;
+        Construction.Finished -= OnFinished;
+        GameSession.Settlement.Changed -= MarkDirty;
+        if (Current == this)
+        {
+            Current = null;
+        }
+    }
+
+    private void OnFinished(Construction _) => MarkDirty();
+
+    /// <summary>Works everyone's home out again at the end of this frame.</summary>
+    public void MarkDirty() => dirty = true;
+
+    private void LateUpdate()
+    {
+        if (!dirty)
+        {
+            return;
+        }
+
+        dirty = false;
+        // A friend's Haven is worked out in their game; its answer arrives with the settlement (a Changed, so this runs then).
+        bool changed = HavenVisit.IsVisiting ? SeenNew() : Settle();
+        if (changed)
+        {
+            Changed?.Invoke();
+        }
+    }
+
+    // Shares the beds out and finds each one's workplace. True when anything changed.
+    private bool Settle()
+    {
+        SettlementState settlement = GameSession.Settlement;
+        IReadOnlyList<ResidentRecord> residents = settlement.Residents;
+        Vector3 middle = Gather();
+        string[] homes = HomeRules.Assign(houses, people);
+        bool changed = false;
+        for (int i = 0; i < residents.Count; i++)
+        {
+            ResidentRecord record = residents[i];
+            BuildingObject home = BuildingObject.WithId(homes[i]);
+            Vector3 from = home != null ? home.Door(out _) : middle;
+            BuildingDefinition kind = record.Job != null ? record.Job.Workplace : null;
+            BuildingObject work = kind != null ? BuildingObject.Nearest(kind, from) : null;
+            string queue = work != null && work.TryGetComponent(out CraftingStation station) && kind.Station != CraftingStationType.None ? station.Id : "";
+            changed |= settlement.SetHome(record, homes[i], work != null ? work.Id : "", queue);
+        }
+
+        return changed;
+    }
+
+    // The houses with beds and the people to share them among; returns the middle of the Haven.
+    private Vector3 Gather()
+    {
+        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        Vector3 middle = HomePortal.Current != null ? HomePortal.Current.transform.position : transform.position;
+
+        houses.Clear();
+        foreach (BuildingObject building in BuildingObject.Active)
+        {
+            int beds = building.Beds;
+            string id = building.Id;
+            if (beds > 0 && id != null)
+            {
+                Vector3 door = building.Door(out _);
+                houses.Add(new HomeRules.House(id, Flat(door), beds));
+            }
+        }
+
+        // In id order, so every machine and every load shares the beds the same way.
+        houses.Sort((a, b) => string.CompareOrdinal(a.Id, b.Id));
+        people.Clear();
+        foreach (ResidentRecord record in residents)
+        {
+            BuildingDefinition kind = record.Job != null ? record.Job.Workplace : null;
+            BuildingObject work = kind != null ? BuildingObject.Nearest(kind, middle) : null;
+            people.Add(new HomeRules.Person(record.Resident != null ? record.Resident.Id : "", record.HomeChosen, Flat(work != null ? work.transform.position : middle)));
+        }
+
+        return middle;
+    }
+
+    // A friend's game: did the host's last word move anyone? (Their settlement arrives every two seconds.)
+    private bool SeenNew()
+    {
+        var seen = new System.Text.StringBuilder();
+        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        {
+            seen.Append(record.Home).Append('/').Append(record.Workplace).Append(';');
+        }
+
+        string now = seen.ToString();
+        bool changed = now != lastSeen;
+        lastSeen = now;
+        return changed;
+    }
+
+    // ----- Asking -----
+
+    /// <summary>The house this resident sleeps in, standing in this scene, or null (the home spots by the portal).</summary>
+    public static BuildingObject HomeOf(ResidentRecord record) => record != null ? BuildingObject.WithId(record.Home) : null;
+
+    /// <summary>
+    /// The building they work at: the one of their job's kind nearest their home (worked out by HavenHomes), else the
+    /// nearest to <paramref name="from"/>. Null when none stands.
+    /// </summary>
+    public static BuildingObject WorkplaceOf(ResidentRecord record, Vector3 from)
+    {
+        BuildingDefinition kind = record != null && record.Job != null ? record.Job.Workplace : null;
+        if (kind == null)
+        {
+            return null;
+        }
+
+        BuildingObject chosen = BuildingObject.WithId(record.Workplace);
+        if (chosen != null && chosen.Definition == kind && chosen.IsStanding)
+        {
+            return chosen;
+        }
+
+        BuildingObject home = HomeOf(record);
+        return BuildingObject.Nearest(kind, home != null ? home.Door(out _) : from);
+    }
+
+    /// <summary>Everyone whose home this house is, in order of arrival.</summary>
+    public static List<ResidentRecord> LivingIn(BuildingObject house)
+    {
+        var found = new List<ResidentRecord>();
+        string id = house != null ? house.Id : null;
+        if (id == null)
+        {
+            return found;
+        }
+
+        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        {
+            if (record.Home == id)
+            {
+                found.Add(record);
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>How many are inside this house now (asleep): its window is lit while anyone is.</summary>
+    public static int Indoors(BuildingObject house) => house != null && indoors.TryGetValue(house, out int count) ? count : 0;
+
+    /// <summary>Someone went into (true) or came out of (false) a house. ResidentLife calls it.</summary>
+    public static void NoteIndoors(BuildingObject house, bool inside)
+    {
+        if (house == null)
+        {
+            return;
+        }
+
+        indoors.TryGetValue(house, out int count);
+        count = Mathf.Max(0, count + (inside ? 1 : -1));
+        if (count == 0)
+        {
+            indoors.Remove(house);
+        }
+        else
+        {
+            indoors[house] = count;
+        }
+    }
+
+    /// <summary>
+    /// Who would move into a house with <paramref name="beds"/> beds and its door at <paramref name="door"/> if it stood
+    /// there now (the build ghost's readout): the beds shared out again with it among the houses.
+    /// </summary>
+    public static List<ResidentRecord> WouldMoveIn(Vector3 door, int beds)
+    {
+        var found = new List<ResidentRecord>();
+        HavenHomes homes = Current;
+        if (homes == null || beds <= 0)
+        {
+            return found;
+        }
+
+        const string ghost = "\u0001ghost";
+        homes.Gather();
+        homes.houses.Add(new HomeRules.House(ghost, Flat(door), beds));
+        string[] assigned = HomeRules.Assign(homes.houses, homes.people);
+        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        for (int i = 0; i < assigned.Length && i < residents.Count; i++)
+        {
+            if (assigned[i] == ghost)
+            {
+                found.Add(residents[i]);
+            }
+        }
+
+        return found;
+    }
+
+    // ----- Choosing (the resident's window) -----
+
+    /// <summary>The player chooses a house for someone (empty: let them choose), made where the Haven is kept.</summary>
+    public static void Choose(ResidentDefinition resident, string house) =>
+        HavenDecisions.Do("resident.home", (resident != null ? resident.Id : "") + "|" + (house ?? ""));
+
+    [HavenDecision("resident.home")]
+    private static HavenDecisions.Outcome ChooseHome(string args)
+    {
+        string[] parts = (args ?? "").Split('|');
+        ResidentRecord record = HavenPeople.RecordOf(parts[0]);
+        if (record == null)
+        {
+            return HavenDecisions.Outcome.Refused("They don't live here now.");
+        }
+
+        string house = parts.Length > 1 ? parts[1] : "";
+        if (house.Length == 0)
+        {
+            GameSession.Settlement.ChooseHome(record, "");
+            return HavenDecisions.Outcome.Made($"{record.Resident.DisplayName} will find a bed of their own.");
+        }
+
+        BuildingObject building = BuildingObject.WithId(house);
+        if (building == null || building.Beds <= 0)
+        {
+            return HavenDecisions.Outcome.Refused("That isn't a house with beds.");
+        }
+
+        // Room for them: a bed nobody chose, or one already theirs. Someone the player put there keeps their bed.
+        int taken = 0;
+        foreach (ResidentRecord other in GameSession.Settlement.Residents)
+        {
+            taken += other != record && other.HomeChosen == house ? 1 : 0;
+        }
+
+        if (taken >= building.Beds)
+        {
+            return HavenDecisions.Outcome.Refused($"Every bed in the {building.Definition.DisplayName} is promised to someone you put there.");
+        }
+
+        GameSession.Settlement.ChooseHome(record, house);
+        return HavenDecisions.Outcome.Made($"{record.Resident.DisplayName} moves into the {building.Definition.DisplayName}.");
+    }
+
+    /// <summary>A building as the player would point it out: "Hut by the Well", else "Hut, 23 m north of the portal".</summary>
+    public static string Describe(BuildingObject building)
+    {
+        if (building == null || building.Definition == null)
+        {
+            return "";
+        }
+
+        const float near = 14f;
+        BuildingObject by = null;
+        float best = near * near;
+        foreach (BuildingObject other in BuildingObject.Active)
+        {
+            BuildingDefinition kind = other.Definition;
+            if (other == building || kind == null || kind == building.Definition || kind.PlaceInLines || !other.IsStanding)
+            {
+                continue;
+            }
+
+            float distance = Flat(other.transform.position - building.transform.position).sqrMagnitude;
+            if (distance < best)
+            {
+                best = distance;
+                by = other;
+            }
+        }
+
+        if (by != null)
+        {
+            return $"{building.Definition.DisplayName} by the {by.Definition.DisplayName}";
+        }
+
+        Vector3 portal = HomePortal.Current != null ? HomePortal.Current.transform.position : Vector3.zero;
+        Vector2 away = Flat(building.transform.position - portal);
+        return away.magnitude < 3f ? $"{building.Definition.DisplayName} by the portal"
+            : $"{building.Definition.DisplayName}, {away.magnitude:0} m {Compass(away)} of the portal";
+    }
+
+    /// <summary>Metres on the ground between two places.</summary>
+    public static float Walk(Vector3 from, Vector3 to) => Flat(to - from).magnitude;
+
+    private static string Compass(Vector2 direction)
+    {
+        string[] names = { "north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west" };
+        float bearing = Mathf.Repeat(Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg, 360f);
+        return names[Mathf.RoundToInt(bearing / 45f) % 8];
+    }
+
+    private static Vector2 Flat(Vector3 point) => new Vector2(point.x, point.z);
+}

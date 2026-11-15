@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// A resident's day (GDD §15): they walk to their work and get on with it, eat, sit at the fire of an evening, sleep at their own spot,
-/// and run for the portal when the haven is attacked. They stop to talk when spoken to and carry on after. What they do when is
+/// A resident's day (GDD §15): they walk to their work and get on with it, eat, sit at the fire of an evening, sleep in their
+/// house (walking in at night, its window lit while they are in; out of the door at dawn) or at their own spot by the portal
+/// when no house is theirs (HavenHomes), and run for the portal when the haven is attacked. They stop to talk when spoken to and carry on after. What they do when is
 /// ResidentRoutine and Settlement Settings › Daily Life; the gesture for a job is on its JobDefinition. Added by ResidentNpc. Where
 /// the ground has no NavMesh they go straight to their place, as there is no way to walk there.
 /// </summary>
@@ -43,12 +44,40 @@ public sealed class ResidentLife : MonoBehaviour
     private ItemDefinition toolItem;
     private float workSoundAt = float.PositiveInfinity;
     private ResidentDefender defender;
+    // The house they are asleep in (hidden inside, its window lit), and what was switched off to hide them.
+    private BuildingObject insideOf;
+    private BuildingObject sleepsIn;
+    private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
+    private readonly List<Collider> hiddenColliders = new List<Collider>();
+    private readonly List<Behaviour> hiddenParts = new List<Behaviour>();
 
     /// <summary>What they are about right now.</summary>
     public ResidentActivity Activity => activity;
 
     /// <summary>True once they are at the place for it and getting on with it.</summary>
     public bool HasArrived => arrived;
+
+    /// <summary>Asleep inside their house: not seen, not spoken to, its window lit.</summary>
+    public bool IsIndoors => insideOf != null;
+
+    /// <summary>The house they are asleep in, or null.</summary>
+    public BuildingObject Inside => insideOf;
+
+    /// <summary>In bed, in a house or at their spot by the portal: no lantern then.</summary>
+    public bool IsResting => activity == ResidentActivity.Sleep && arrived;
+
+    private void OnEnable()
+    {
+        HavenHomes.Changed += Refresh;
+        HavenHomes.NoteIndoors(insideOf, true);
+    }
+
+    // Switched off (the scene going) while asleep inside: the house no longer counts them, and they stay as they are.
+    private void OnDisable()
+    {
+        HavenHomes.Changed -= Refresh;
+        HavenHomes.NoteIndoors(insideOf, false);
+    }
 
     private void Awake()
     {
@@ -118,6 +147,18 @@ public sealed class ResidentLife : MonoBehaviour
             return;
         }
 
+        if (insideOf != null)
+        {
+            // Asleep in the house: only the hour (or danger) brings them out.
+            if (Time.time >= nextThinkAt)
+            {
+                nextThinkAt = Time.time + ThinkSeconds;
+                Decide(false);
+            }
+
+            return;
+        }
+
         if (talkable != null && talkable.IsTalking)
         {
             Listen();
@@ -134,6 +175,12 @@ public sealed class ResidentLife : MonoBehaviour
         {
             nextThinkAt = Time.time + ThinkSeconds;
             Decide(false);
+            // On a drawn path they walk faster, as the player does (HavenPaths).
+            if (agent != null && agent.enabled && !arrived)
+            {
+                SettlementSettings pace = SettlementSettings.Current;
+                agent.speed = (activity == ResidentActivity.Shelter ? pace.ResidentRunSpeed : pace.ResidentWalkSpeed) * HavenPaths.SpeedAt(transform.position);
+            }
         }
 
         if (arrived)
@@ -159,6 +206,7 @@ public sealed class ResidentLife : MonoBehaviour
         defender ??= new ResidentDefender(transform, animator, agent);
         if (how != null && !defender.IsOnGuard)
         {
+            ComeOut();
             if (emotes != null && emotes.IsPlaying)
             {
                 emotes.Stop();
@@ -178,8 +226,7 @@ public sealed class ResidentLife : MonoBehaviour
     // Up on the Watch Post if that is where their job is; otherwise a ring out from the portal, between it and what comes.
     private Vector3 GuardPost()
     {
-        BuildingDefinition workplace = npc.Job?.Workplace;
-        BuildingObject post = workplace != null ? BuildingObject.Find(workplace) : null;
+        BuildingObject post = npc.Workplace;
         if (post != null && post.GetComponent<WatchPostArcher>() != null && npc.TryGetWorkplace(out Vector3 spot, out _))
         {
             return spot;
@@ -227,6 +274,11 @@ public sealed class ResidentLife : MonoBehaviour
         bool hasWorkplace = npc.TryGetWorkplace(out Vector3 workSpot, out Quaternion workFacing);
         float hour = clock != null ? clock.Hour : 12f;
         bool danger = InDanger(settings);
+        // Asleep in their house, a creature prowling past is no reason to run out into the dark: only a breach brings them out.
+        if (danger && insideOf != null && (WardBreachDirector.Current == null || !WardBreachDirector.Current.IsActive))
+        {
+            danger = false;
+        }
         ResidentActivity next = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, hasWorkplace, danger), hour, PlayerWarmth.ColdNow());
         bool freeToGo = next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom);
         if (freeToGo && GoingOut(hour, out Vector3 outTo, out Quaternion outFacing))
@@ -245,7 +297,15 @@ public sealed class ResidentLife : MonoBehaviour
             return;
         }
 
+        // Their house, if one is theirs: they sleep inside it, going in at its door.
+        bool housed = npc.TryGetHome(out Vector3 door, out Quaternion outward, out BuildingObject house);
+        if (insideOf != null && (next != ResidentActivity.Sleep || insideOf != house))
+        {
+            ComeOut();
+        }
+
         activity = next;
+        sleepsIn = next == ResidentActivity.Sleep && housed ? house : null;
         switch (next)
         {
             case ResidentActivity.Work:
@@ -253,8 +313,14 @@ public sealed class ResidentLife : MonoBehaviour
                 facing = workFacing;
                 break;
             case ResidentActivity.Sleep:
-                place = home;
-                facing = homeFacing;
+                place = housed ? door : home;
+                facing = housed ? outward * Quaternion.Euler(0f, 180f, 0f) : homeFacing;
+                if (insideOf != null)
+                {
+                    // Already in bed in this house: nothing to walk to.
+                    return;
+                }
+
                 break;
             case ResidentActivity.Outing:
                 place = workSpot;
@@ -292,7 +358,8 @@ public sealed class ResidentLife : MonoBehaviour
         }
     }
 
-    // Where they gather: the fire if there is one, else the portal. In danger, always the portal: it is the heart of the place.
+    // Where they gather: the fire nearest their home if there is one, else the portal. In danger, always the portal: it is the
+    // heart of the place.
     private Vector3 Gathering(ResidentActivity next, SettlementSettings settings)
     {
         if (Festivals.Now != null && next != ResidentActivity.Shelter)
@@ -300,7 +367,11 @@ public sealed class ResidentLife : MonoBehaviour
             return Festivals.Place;
         }
 
-        BuildingObject fire = next != ResidentActivity.Shelter && settings.ResidentGatheringPlace != null ? BuildingObject.Find(settings.ResidentGatheringPlace) : null;
+        // A Feast Green's fire first (Yards), else the fire nearest home.
+        Vector3 from = npc.TryGetHome(out Vector3 door, out _, out _) ? door : home;
+        BuildingObject fire = next != ResidentActivity.Shelter && settings.ResidentGatheringPlace != null
+            ? Yards.GatheringFire(from, settings.ResidentGatheringPlace) ?? BuildingObject.Nearest(settings.ResidentGatheringPlace, from)
+              ?? BuildingObject.Find(settings.ResidentGatheringPlace) : null;
         if (fire != null)
         {
             return fire.transform.position;
@@ -469,6 +540,12 @@ public sealed class ResidentLife : MonoBehaviour
             agent.ResetPath();
         }
 
+        if (activity == ResidentActivity.Sleep && sleepsIn != null)
+        {
+            GoIn(sleepsIn);
+            return;
+        }
+
         nextGestureAt = 0f;
         JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
         if (job != null)
@@ -576,6 +653,114 @@ public sealed class ResidentLife : MonoBehaviour
             nextGestureAt = activity != ResidentActivity.Work ? Time.time + Random.Range(18f, 40f)
                 : Random.value < 0.2f ? Time.time + Random.Range(2f, 4f) : Time.time + Random.Range(0.1f, 0.5f);
         }
+    }
+
+    // In at the door: hidden and quiet until morning, the house's window lit (HearthSmoke reads HavenHomes.Indoors).
+    private void GoIn(BuildingObject house)
+    {
+        if (insideOf == house || house == null)
+        {
+            return;
+        }
+
+        ComeOut();
+        insideOf = house;
+        HavenHomes.NoteIndoors(house, true);
+        ShowTool(null, 1f);
+        if (emotes != null && emotes.IsPlaying)
+        {
+            emotes.Stop();
+        }
+
+        foreach (Renderer part in GetComponentsInChildren<Renderer>())
+        {
+            if (part.enabled)
+            {
+                part.enabled = false;
+                hiddenRenderers.Add(part);
+            }
+        }
+
+        foreach (Collider part in GetComponentsInChildren<Collider>())
+        {
+            if (part.enabled)
+            {
+                part.enabled = false;
+                hiddenColliders.Add(part);
+            }
+        }
+
+        foreach (Interactable part in GetComponents<Interactable>())
+        {
+            if (part.enabled)
+            {
+                part.enabled = false;
+                hiddenParts.Add(part);
+            }
+        }
+
+        if (animator != null && animator.enabled)
+        {
+            animator.enabled = false;
+            hiddenParts.Add(animator);
+        }
+
+        if (agent != null && agent.enabled)
+        {
+            agent.enabled = false;
+            hiddenParts.Add(agent);
+        }
+    }
+
+    // Out of the door again: seen, spoken to, walking.
+    private void ComeOut()
+    {
+        if (insideOf == null)
+        {
+            return;
+        }
+
+        BuildingObject house = insideOf;
+        insideOf = null;
+        HavenHomes.NoteIndoors(house, false);
+        Vector3 door = house != null ? house.Door(out _) : transform.position;
+        foreach (Renderer part in hiddenRenderers)
+        {
+            if (part != null)
+            {
+                part.enabled = true;
+            }
+        }
+
+        foreach (Collider part in hiddenColliders)
+        {
+            if (part != null)
+            {
+                part.enabled = true;
+            }
+        }
+
+        foreach (Behaviour part in hiddenParts)
+        {
+            if (part != null)
+            {
+                part.enabled = true;
+            }
+        }
+
+        hiddenRenderers.Clear();
+        hiddenColliders.Clear();
+        hiddenParts.Clear();
+        if (agent != null && agent.enabled && NavMesh.SamplePosition(door, out NavMeshHit hit, 3f, agent.areaMask))
+        {
+            agent.Warp(hit.position);
+        }
+        else if (agent == null)
+        {
+            transform.position = door;
+        }
+
+        arrived = false;
     }
 
     private static EmoteDefinition Pick(EmoteDefinition[] gestures) =>

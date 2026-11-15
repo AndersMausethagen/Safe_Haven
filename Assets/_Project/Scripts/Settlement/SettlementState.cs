@@ -46,6 +46,15 @@ public sealed class ResidentRecord
     public int WorkDone { get; set; }
     /// <summary>They have given the player a lesson since the last raid survived (one each in between).</summary>
     public bool TaughtSinceRaid { get; set; }
+    /// <summary>The house they sleep in, by its building's save id; empty for the home spots by the portal. Worked out at
+    /// home by HavenHomes (the player's choice first, else the nearest free bed to their work).</summary>
+    public string Home { get; set; } = "";
+    /// <summary>The house the player chose for them in their window, or empty to let them choose.</summary>
+    public string HomeChosen { get; set; } = "";
+    /// <summary>The building of their job's kind they work at (nearest their home), by its save id; empty before it is known.</summary>
+    public string Workplace { get; set; } = "";
+    /// <summary>That building's station queue (StationQueue.StationId), so their work goes on there during raids.</summary>
+    public string WorkQueue { get; set; } = "";
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
@@ -244,13 +253,154 @@ public sealed class SettlementState
     public int Beds { get; private set; }
 
     /// <summary>How many residents have a bed.</summary>
-    public int Housed => Math.Min(Beds, residents.Count);
+    public int Housed
+    {
+        get
+        {
+            if (!HomesKnown)
+            {
+                return Math.Min(Beds, residents.Count);
+            }
 
-    /// <summary>Whether this resident has a bed. They are shared out in order of arrival.</summary>
+            int housed = 0;
+            foreach (ResidentRecord record in residents)
+            {
+                housed += string.IsNullOrEmpty(record.Home) ? 0 : 1;
+            }
+
+            return housed;
+        }
+    }
+
+    /// <summary>True once homes have been shared out at home (HavenHomes): a bed is then a house someone lives in.</summary>
+    public bool HomesKnown
+    {
+        get
+        {
+            foreach (ResidentRecord record in residents)
+            {
+                if (!string.IsNullOrEmpty(record.Home))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Settles where someone lives and works (HavenHomes, at home, in the game that keeps the Haven). Quiet: those who care
+    /// listen to HavenHomes.Changed. False when nothing changed.
+    /// </summary>
+    public bool SetHome(ResidentRecord record, string home, string workplace, string workQueue)
+    {
+        home ??= "";
+        workplace ??= "";
+        workQueue ??= "";
+        if (record == null || (record.Home == home && record.Workplace == workplace && record.WorkQueue == workQueue))
+        {
+            return false;
+        }
+
+        Borrowed();
+        record.Home = home;
+        record.Workplace = workplace;
+        record.WorkQueue = workQueue;
+        return true;
+    }
+
+    /// <summary>The player chose a house for someone (empty: let them choose). Raises Changed so their home is worked out again.</summary>
+    public void ChooseHome(ResidentRecord record, string house)
+    {
+        house ??= "";
+        if (record == null || record.HomeChosen == house)
+        {
+            return;
+        }
+
+        Borrowed();
+        record.HomeChosen = house;
+        Changed?.Invoke();
+    }
+
+    private readonly Dictionary<string, List<string>> houseComforts = new Dictionary<string, List<string>>();
+
+    /// <summary>What has been put in each house (HomeLifeSettings › Comforts), by the house's save id.</summary>
+    public IReadOnlyDictionary<string, List<string>> HouseComforts => houseComforts;
+
+    /// <summary>The comforts in one house; empty when none.</summary>
+    public IReadOnlyList<string> ComfortsIn(string house) =>
+        house != null && houseComforts.TryGetValue(house, out List<string> found) ? (IReadOnlyList<string>)found : Array.Empty<string>();
+
+    public bool HasComfort(string house, string comfort) =>
+        house != null && houseComforts.TryGetValue(house, out List<string> found) && found.Contains(comfort);
+
+    /// <summary>Puts a comfort in a house (HomeLife's decision). False when it is there already.</summary>
+    public bool AddComfort(string house, string comfort)
+    {
+        if (string.IsNullOrEmpty(house) || string.IsNullOrEmpty(comfort) || HasComfort(house, comfort))
+        {
+            return false;
+        }
+
+        Borrowed();
+        RestoreComfort(house, comfort);
+        Changed?.Invoke();
+        return true;
+    }
+
+    /// <summary>Puts a saved comfort back. Used by SaveMapper only.</summary>
+    public void RestoreComfort(string house, string comfort)
+    {
+        if (!houseComforts.TryGetValue(house, out List<string> list))
+        {
+            houseComforts[house] = list = new List<string>();
+        }
+
+        if (!list.Contains(comfort))
+        {
+            list.Add(comfort);
+        }
+    }
+
+    /// <summary>Seconds the player has been away on raids while someone who builds lives here (HomeLifeSettings › Builders):
+    /// spent on the scaffolds standing at home when the player comes back (ResidentBuilders).</summary>
+    public float BuilderSeconds { get; private set; }
+
+    public void AddBuilderSeconds(float seconds)
+    {
+        if (seconds > 0f)
+        {
+            Borrowed();
+            BuilderSeconds += seconds;
+        }
+    }
+
+    /// <summary>Takes what was saved up, leaving none.</summary>
+    public float TakeBuilderSeconds()
+    {
+        float seconds = BuilderSeconds;
+        BuilderSeconds = 0f;
+        return seconds;
+    }
+
+    /// <summary>Puts saved builder time back. Used by SaveMapper only.</summary>
+    public void RestoreBuilderSeconds(float seconds) => BuilderSeconds = Math.Max(0f, seconds);
+
+    /// <summary>The worn footpaths round home, packed (Footpaths): only how they look, kept with the game.</summary>
+    public string Footpaths { get; set; } = "";
+
+    /// <summary>Whether this resident has a bed: a house they live in, or before homes are known, a bed shared out in order of arrival.</summary>
     public bool HasBed(ResidentRecord record)
     {
+        if (record != null && !string.IsNullOrEmpty(record.Home))
+        {
+            return true;
+        }
+
         int index = residents.IndexOf(record);
-        return index >= 0 && index < Beds;
+        return !HomesKnown && index >= 0 && index < Beds;
     }
 
     /// <summary>How far the portal has been improved (SettlementSettings.PortalLevels).</summary>
@@ -294,6 +444,12 @@ public sealed class SettlementState
 
         return best;
     }
+
+    /// <summary>Scaffolds (paid for) stood at home when it was last seen: builders have work waiting there.</summary>
+    public bool ScaffoldsWaiting { get; private set; }
+
+    /// <summary>Notes whether paid-for scaffolds stand at home (HavenProgress, with NoteBuildings).</summary>
+    public void NoteScaffolds(bool waiting) => ScaffoldsWaiting = waiting;
 
     /// <summary>Remembers what stands at home, since a raid can't look. Read again by HavenProgress; not saved, as loading a game lands at home.</summary>
     public void NoteBuildings(IEnumerable<BuildingObject> standing)

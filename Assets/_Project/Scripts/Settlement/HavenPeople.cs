@@ -71,9 +71,14 @@ public static class HavenPeople
             }
         }
 
-        entry.Details.Add(new HavenDetail("Where they sleep", settlement.HasBed(record)
+        BuildingObject house = HavenHomes.HomeOf(record);
+        entry.Details.Add(new HavenDetail("Where they sleep", house != null
+            ? $"In the {HavenHomes.Describe(house)}, a bed of their own: their work goes {CraftingStation.BedSpeedBonus * 100f:0}% faster, and home is that bit more comfortable."
+            : settlement.HasBed(record)
             ? $"In a bed of their own: their work goes {CraftingStation.BedSpeedBonus * 100f:0}% faster, and home is that bit more comfortable."
             : "By the fire. They manage, but a Hut or Cottage would help."));
+        // Their own page: the house they live in (and moving them), their work and their story.
+        entry.Actions.Add(new HavenAction("Their page", () => ResidentWindow.Show(person, "Home"), primary: false));
         AddWork(entry, record, settlement);
         List<JobDefinition> others = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null && one != job).ToList();
         if (others.Count > 0)
@@ -108,7 +113,7 @@ public static class HavenPeople
             return;
         }
 
-        StationQueue queue = WorkerProduction.QueueOf(settlement, record.Job);
+        StationQueue queue = WorkerProduction.QueueOf(settlement, record);
         if (queue == null)
         {
             entry.Line = $"{record.Job.DisplayName}, nowhere to work";

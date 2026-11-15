@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be17b6288b7ada04dba5c880cdfa50db, type: 3}
+  m_Name: HomeYard
+  m_EditorClassIdentifier: SafeHaven::YardRoleDefinition
+  displayName: Home Yard
+  description: 'A house and a hearth or bench in one fenced yard: a farmstead, the old way. The house is better for it.'
+  icon: House
+  colour: {r: 0.95, g: 0.78, b: 0.38, a: 1}
+  needs:
+  - anyOf:
+    - {fileID: 11400000, guid: 79557d0752e9c694ebfdb0a6e647f771, type: 2}
+    - {fileID: 11400000, guid: 00ba6eab323cada479456440115e7140, type: 2}
+    count: 1
+    words: a house
+  - anyOf:
+    - {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+    - {fileID: 11400000, guid: fdb9a592fff9567459b1e00fdc1342c4, type: 2}
+    - {fileID: 11400000, guid: 105ff541d28df654ba20b786907ced0e, type: 2}
+    - {fileID: 11400000, guid: d89da1ee1237ce34d8c2a40d6fba62c6, type: 2}
+    count: 1
+    words: a hearth or a bench
+  minArea: 0
+  homeQuality: 1
+  stationSpeed: 0
+  extensionSlots: 0
+  comfort: 1
+  renown: 2
+  gatheringPlace: 0
+  pasture: 0
+  clutter:
+  - {fileID: 7965108127962174536, guid: 1a2514cdb148dc84693c9b8d20183e37, type: 3}
+  - {fileID: 6943662779149978081, guid: 275e0a9b57289c84fb2f09dc22f811d2, type: 3}
+  clutterCount: 2

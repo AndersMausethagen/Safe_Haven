@@ -314,6 +314,12 @@ public sealed class MinimapHud : MonoBehaviour
         used = 0;
         foreach (BuildingObject building in BuildingObject.Active)
         {
+            // Paths are many small pieces: they'd crowd the map with dots.
+            if (building.Definition != null && building.Definition.IsPath)
+            {
+                continue;
+            }
+
             if (Found(building.transform.position, explored))
             {
                 bool broken = building.TryGetComponent(out Damageable health) && health.IsBroken;

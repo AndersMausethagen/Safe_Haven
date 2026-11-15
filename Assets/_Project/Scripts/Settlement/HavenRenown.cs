@@ -86,6 +86,21 @@ public static class HavenRenown
             parts?.Add(new Part($"The Haven's lands ({GameSession.Settlement.Territory.ClaimedCount} held)", lands));
         }
 
+        // The best home, once, and each kind of yard, once: a town laid out with care is talked of.
+        HomeLifeSettings.Level home = HomeLife.Best(out BuildingObject bestHouse);
+        if (home != null && home.renown > 0)
+        {
+            total += home.renown;
+            parts?.Add(new Part($"A {home.name.ToLowerInvariant()} home ({HavenHomes.Describe(bestHouse)})", home.renown));
+        }
+
+        int yardRenown = Yards.Renown;
+        if (yardRenown > 0)
+        {
+            total += yardRenown;
+            parts?.Add(new Part("Its yards", yardRenown));
+        }
+
         int residents = GameSession.Settlement.Residents.Count * settings.ResidentRenown;
         if (residents > 0)
         {

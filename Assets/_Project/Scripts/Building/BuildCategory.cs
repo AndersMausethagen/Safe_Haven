@@ -12,7 +12,8 @@ public static class BuildCategories
 {
     public static BuildCategory Of(BuildingDefinition building)
     {
-        if (building.Station != CraftingStationType.None)
+        // A station's extensions (a bellows, a log rack) sit with the stations they extend.
+        if (building.Station != CraftingStationType.None || building.Extends != null)
         {
             return BuildCategory.Stations;
         }
@@ -30,7 +31,7 @@ public static class BuildCategories
         switch (category)
         {
             case BuildCategory.Stations: return "Crafting Stations";
-            case BuildCategory.Walls: return "Walls & Fences";
+            case BuildCategory.Walls: return "Fences & Paths";
             case BuildCategory.Structures: return "Structures";
             case BuildCategory.Decorations: return "Decorations";
             default: return "Manage";

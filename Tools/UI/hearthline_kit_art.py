@@ -8,7 +8,8 @@ size and scaled down so every edge is smooth, white so UIStyle tints it.
 - Hearthline Card and Card Rim: a rounded card and its rim alone, 9-sliced, for cards, tabs, bars and chips.
 - Icons, one flat glyph each, for the stats, the sections and the buttons: Heart, Bolt, Weight, Horseshoe, Bond, Info,
   Stats, Star, Wheat, Brush, Gear, HorseHead, Lead, Stable, Saddle, Hourglass, Pencil, Barding, Bags, Wheel, Stay,
-  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book, Skull, Coin, Eye.
+  Graze, Sword, Flame, Snowflake, Sun, Crit, Spark, Axe, Pickaxe, Sickle, Lock, Hammer, Book, Skull, Coin, Eye;
+  for the Haven town: House, Bed, Pot (kitchen), Drop (water), Bench, Lantern, Path, Fence.
 - Kit Icons.png and .json (next to the folder): the icons in one atlas, for TextMesh Pro's <sprite name=...>.
 
 Run from the project root: python Tools/UI/hearthline_kit_art.py
@@ -535,6 +536,92 @@ def eye():
     save(img, 'Eye', ICON)
 
 
+# ----- The Haven town (homes, yards, paths: Docs/BuildingSystemResearch.md) -----
+
+def house():
+    img, d = canvas(ICON)
+    # A turf-roofed house front: a steep gable over log walls, a door in the middle.
+    d.polygon(P([(50, 6), (96, 46), (86, 46), (86, 94), (14, 94), (14, 46), (4, 46)]), fill=W)
+    d.rounded_rectangle([R(40), R(60), R(60), R(94)], radius=R(3), fill=CLEAR)
+    d.line(P([(20, 56), (34, 56)]), fill=CLEAR, width=int(R(3)))
+    d.line(P([(66, 56), (80, 56)]), fill=CLEAR, width=int(R(3)))
+    save(img, 'House', ICON)
+
+
+def bed():
+    img, d = canvas(ICON)
+    # From the side: headboard high on the left, a pillow, the blanket over the mattress, short legs.
+    d.rounded_rectangle([R(6), R(24), R(16), R(88)], radius=R(3), fill=W)
+    d.rounded_rectangle([R(84), R(48), R(94), R(88)], radius=R(3), fill=W)
+    d.rounded_rectangle([R(14), R(56), R(86), R(76)], radius=R(4), fill=W)
+    d.rounded_rectangle([R(20), R(40), R(42), R(54)], radius=R(6), fill=W)
+    d.rounded_rectangle([R(46), R(44), R(86), R(58)], radius=R(5), fill=W)
+    save(img, 'Bed', ICON)
+
+
+def pot():
+    img, d = canvas(ICON)
+    # A cooking pot over a small fire: the kitchen.
+    d.line(P([(16, 30), (84, 30)]), fill=W, width=int(R(6)))
+    d.arc([R(20), R(18), R(80), R(44)], start=180, end=360, fill=W, width=int(R(5)))
+    d.chord([R(18), R(22), R(82), R(78)], start=0, end=180, fill=W)
+    d.rectangle([R(18), R(36), R(82), R(52)], fill=W)
+    d.polygon(P([(38, 96), (44, 80), (50, 88), (56, 78), (62, 96)]), fill=W)
+    save(img, 'Pot', ICON)
+
+
+def drop():
+    img, d = canvas(ICON)
+    # Water close: one drop.
+    d.polygon(P([(50, 4), (76, 50), (24, 50)]), fill=W)
+    circle(d, 50, 64, 30)
+    d.arc([R(32), R(52), R(60), R(84)], start=110, end=200, fill=CLEAR, width=int(R(5)))
+    save(img, 'Drop', ICON)
+
+
+def bench():
+    img, d = canvas(ICON)
+    # A plank bench from the front-side: seat, backrest, legs.
+    d.rounded_rectangle([R(6), R(48), R(94), R(60)], radius=R(3), fill=W)
+    d.rounded_rectangle([R(10), R(20), R(90), R(30)], radius=R(3), fill=W)
+    d.rectangle([R(16), R(28), R(22), R(50)], fill=W)
+    d.rectangle([R(78), R(28), R(84), R(50)], fill=W)
+    d.rectangle([R(14), R(58), R(22), R(92)], fill=W)
+    d.rectangle([R(78), R(58), R(86), R(92)], fill=W)
+    save(img, 'Bench', ICON)
+
+
+def lantern():
+    img, d = canvas(ICON)
+    # A lantern on a hook: the lit lane.
+    d.arc([R(38), R(2), R(62), R(22)], start=180, end=360, fill=W, width=int(R(5)))
+    d.polygon(P([(30, 22), (70, 22), (62, 14), (38, 14)]), fill=W)
+    d.rounded_rectangle([R(30), R(22), R(70), R(82)], radius=R(5), fill=W)
+    d.rounded_rectangle([R(38), R(30), R(62), R(74)], radius=R(4), fill=CLEAR)
+    d.polygon(P([(50, 38), (58, 56), (50, 70), (42, 56)]), fill=W)
+    d.polygon(P([(26, 82), (74, 82), (66, 94), (34, 94)]), fill=W)
+    save(img, 'Lantern', ICON)
+
+
+def path():
+    img, d = canvas(ICON)
+    # A path running away into the distance: two edges meeting, stones between.
+    d.polygon(P([(36, 6), (64, 6), (96, 96), (4, 96)]), fill=W)
+    for (x, y, r) in ((50, 22, 6), (42, 44, 8), (60, 50, 7), (36, 74, 10), (66, 78, 10)):
+        circle(d, x, y, r, fill=CLEAR)
+    save(img, 'Path', ICON)
+
+
+def fence():
+    img, d = canvas(ICON)
+    # Skigard: posts in pairs and the slanting rails between them; a yard's ring.
+    for x in (18, 50, 82):
+        d.rounded_rectangle([R(x - 4), R(14), R(x + 4), R(94)], radius=R(2), fill=W)
+    for y in (30, 50, 70):
+        d.polygon(P([(10, y + 8), (14, y + 12), (90, y - 8), (86, y - 12)]), fill=W)
+    save(img, 'Fence', ICON)
+
+
 def _periodic_noise(size, cutoff, rng):
     """Smooth noise that tiles: white noise low-passed in the frequency domain (an FFT wraps), scaled to 0..1."""
     import numpy as np
@@ -661,7 +748,8 @@ def atlas():
 if __name__ == '__main__':
     for make in (heart, bolt, weight, horseshoe, bond, info, stats, star, wheat, brush, gear, horse_head, lead, stable,
                  saddle, hourglass, pencil, barding, bags, wheel, stay, graze, sword, flame, snowflake, sun, crit, spark, axe,
-                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, scroll_corner, card, leather, vignette, sheen):
+                 pickaxe, sickle, lock, hammer, book, skull, coin, eye, house, bed, pot, drop, bench, lantern, path, fence,
+                 scroll_corner, card, leather, vignette, sheen):
         make()
     atlas()
     print('kit art ->', os.path.abspath(OUT))

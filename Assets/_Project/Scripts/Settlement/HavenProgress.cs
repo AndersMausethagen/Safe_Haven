@@ -144,6 +144,7 @@ public sealed class HavenProgress : MonoBehaviour
         }
 
         GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
+        GameSession.Settlement.NoteScaffolds(ResidentBuilders.AnyScaffold());
         foreach (CraftingStation station in CraftingStation.Active)
         {
             if (station.HasWorker && station.Usable)

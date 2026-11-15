@@ -176,6 +176,9 @@ public sealed class StationQueue
     /// <summary>How fast it works: 1 is normal. Set by its CraftingStation from upgrades and a worker; not saved.</summary>
     public float SpeedMultiplier { get; set; } = 1f;
 
+    /// <summary>A worker's extra chance of one more here, from the station's extensions (set at home with the speed).</summary>
+    public float ExtraChance { get; set; }
+
     /// <summary>The tier of the station working this queue, kept up by the station. Stations that aren't buildings have no limit.</summary>
     public int Tier { get; set; } = Tiers.Max;
 

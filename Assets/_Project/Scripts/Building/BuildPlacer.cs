@@ -97,6 +97,10 @@ public sealed partial class BuildPlacer : MonoBehaviour
     // Where the spot is while picking a building on a controller (no ghost shows then): a flat disc on the ground.
     private GameObject padMarker;
 
+    // The town while building: the "Here" readout, radii and yards (BuildOverlay), made the first time it is needed.
+    private BuildOverlay overlay;
+    private BuildOverlay Overlay => overlay != null ? overlay : overlay = BuildOverlay.Create(ghostMaterial);
+
     private BuildingDefinition Kind => placing != null ? placing : moving != null ? moving.Definition : null;
     private static IBuildArea Area => BuildArea.Current;
     /// <summary>True inside an open build area (Safe Haven's ward), where the build menu works.</summary>
@@ -361,6 +365,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
         }
 
         ghost.Place(0, point, pieceYaw, problem, Kind);
+        Overlay.Here(Kind, point, pieceYaw, LocalBounds);
 
         bool overUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         if (!GameInput.BuildPlace.WasPressedThisFrame() || overUI)
@@ -401,6 +406,19 @@ public sealed partial class BuildPlacer : MonoBehaviour
         }
 
         BuildingObject building = hit.collider.GetComponentInParent<BuildingObject>();
+        // A path has nothing to click on: the ground under the pointer picks the piece lying there.
+        if (building == null && !upgrading)
+        {
+            foreach (PathPiece piece in PathPiece.All)
+            {
+                if (piece.Covers(hit.point, 0f))
+                {
+                    building = piece.GetComponent<BuildingObject>();
+                    break;
+                }
+            }
+        }
+
         if (upgrading)
         {
             if (building == null || building.Definition == null)
@@ -547,11 +565,37 @@ public sealed partial class BuildPlacer : MonoBehaviour
         padMarker.transform.position = hit.point + Vector3.up * 0.03f;
     }
 
+    // The overlay shows while the build menu is open or something is being placed; a ghost's readout is laid in Update.
+    private void LateUpdate()
+    {
+        BuildMenuWindow menu = BuildMenuWindow.Current;
+        bool menuOpen = menu != null && menu.IsOpen;
+        if (!IsBusy && !menuOpen)
+        {
+            if (overlay != null)
+            {
+                overlay.Show(false);
+            }
+
+            return;
+        }
+
+        if (placing == null && moving == null)
+        {
+            Overlay.NoGhost();
+        }
+    }
+
     private void OnDestroy()
     {
         if (padMarker != null)
         {
             Destroy(padMarker);
+        }
+
+        if (overlay != null)
+        {
+            Destroy(overlay.gameObject);
         }
     }
 

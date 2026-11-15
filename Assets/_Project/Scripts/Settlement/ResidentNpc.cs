@@ -27,14 +27,41 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
     public ResidentDefinition Resident => resident;
 
+    private static readonly List<ResidentNpc> present = new List<ResidentNpc>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => present.Clear();
+
+    /// <summary>Everyone standing in this scene.</summary>
+    public static IReadOnlyList<ResidentNpc> Present => present;
+
+    /// <summary>The one standing in this scene for <paramref name="who"/>, or null.</summary>
+    public static ResidentNpc Of(ResidentDefinition who)
+    {
+        foreach (ResidentNpc npc in present)
+        {
+            if (npc != null && npc.resident == who)
+            {
+                return npc;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>What they are doing now: their day (ResidentLife), or null before it starts.</summary>
+    public ResidentLife Life => life;
+
     private void OnEnable()
     {
+        present.Add(this);
         GameEvents.Raised += OnGameEvent;
         GameSession.Settlement.Changed += GoToWork;
     }
 
     private void OnDisable()
     {
+        present.Remove(this);
         GameEvents.Raised -= OnGameEvent;
         GameSession.Settlement.Changed -= GoToWork;
     }
@@ -120,13 +147,39 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         }
     }
 
-    /// <summary>Where they stand to work, when their job has a workplace that has been built.</summary>
+    /// <summary>Their record in the settlement, or null.</summary>
+    public ResidentRecord Record => resident != null ? GameSession.Settlement.Find(resident) : null;
+
+    /// <summary>The building they work at: the one of their job's kind nearest their home (HavenHomes), or null.</summary>
+    public BuildingObject Workplace => HavenHomes.WorkplaceOf(Record, homePosition);
+
+    /// <summary>The house they sleep in, or null (the home spot they were given by the portal).</summary>
+    public BuildingObject Home => HavenHomes.HomeOf(Record);
+
+    /// <summary>The spot by the portal they sleep at when no house is theirs.</summary>
+    public Vector3 HomeSpot => homePosition;
+
+    /// <summary>The door of the house they sleep in, and the way out of it. False when they have no house.</summary>
+    public bool TryGetHome(out Vector3 door, out Quaternion outward, out BuildingObject house)
+    {
+        house = Home;
+        if (house == null)
+        {
+            door = homePosition;
+            outward = homeRotation;
+            return false;
+        }
+
+        door = house.Door(out outward);
+        return true;
+    }
+
+    /// <summary>Where they stand to work, when their job has a workplace that has been built: the one nearest their home.</summary>
     public bool TryGetWorkplace(out Vector3 spot, out Quaternion facing)
     {
         spot = homePosition;
         facing = homeRotation;
-        JobDefinition job = resident != null ? GameSession.Settlement.Find(resident)?.Job : null;
-        BuildingObject building = job != null && job.Workplace != null ? BuildingObject.Find(job.Workplace) : null;
+        BuildingObject building = Workplace;
         if (building == null)
         {
             return false;
@@ -195,6 +248,12 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
                     ? $"Watch my hands, not my face. There. (+{learned} {skill.DisplayName})"
                     : "There's nothing more I can show you. You know it better than I do now.", afterAnswer);
             }));
+        }
+
+        // Their page: home (and moving them), work and story (ResidentWindow).
+        if (record != null)
+        {
+            page.Add(new MenuAction("Your home and work", "Their house, their work and their story", true, () => ResidentWindow.Show(resident, "Home")));
         }
 
         // Someone who carves enchantments (Liv): how it works, what she can carve, and inscriptions handed to her.

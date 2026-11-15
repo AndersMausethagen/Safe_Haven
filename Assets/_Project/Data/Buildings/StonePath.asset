@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: StonePath
+  m_EditorClassIdentifier: SafeHaven::BuildingDefinition
+  id: stone_path
+  displayName: Stone Path
+  description: Flagstones bedded in earth, a Stone Block a piece. At home you walk 15% faster on it, and a paved lane by a door makes a better home.
+  icon: {fileID: 21300000, guid: 9415032715fe607479282d83bff811fd, type: 3}
+  faction: 0
+  combatStats: {fileID: 0}
+  prefab: {fileID: 5437690115581385927, guid: aba2859076473374ebb8c09b9c5d81f1, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 1
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 13
+  requires:
+  - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    tier: 1
+  requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 1
+  decoration: 0
+  pathSpeed: 1.15
+  paved: 1
+  pathDecal: {fileID: 2100000, guid: aafc3811cc32e8d4d9bb76f9ddd51265, type: 2}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 0
+  renown: 0
+  upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
+  deathSound: {fileID: 0}

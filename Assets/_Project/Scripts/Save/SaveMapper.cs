@@ -241,9 +241,19 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "" });
         }
 
+        foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
+        {
+            foreach (string comfort in house.Value)
+            {
+                into.houseComforts.Add(house.Key + "|" + comfort);
+            }
+        }
+
+        into.footpaths = settlement.Footpaths ?? "";
+        into.builderSeconds = settlement.BuilderSeconds;
         into.defeatedBosses.AddRange(settlement.DefeatedBosses);
         into.lastBossBeaten = settlement.LastBossBeaten;
         into.lastBossBeatenAt = settlement.LastBossBeatenAt;
@@ -334,9 +344,24 @@ public static class SaveMapper
                 restored.AllCameBack = entry.allCameBack;
                 restored.WorkDone = entry.workDone;
                 restored.TaughtSinceRaid = entry.taughtSinceRaid;
+                restored.Home = entry.home ?? "";
+                restored.HomeChosen = entry.homeChosen ?? "";
+                restored.Workplace = entry.workplace ?? "";
+                restored.WorkQueue = entry.workQueue ?? "";
             }
         }
 
+        foreach (string entry in saved.houseComforts ?? new List<string>())
+        {
+            int bar = entry.IndexOf('|');
+            if (bar > 0)
+            {
+                settlement.RestoreComfort(entry.Substring(0, bar), entry.Substring(bar + 1));
+            }
+        }
+
+        settlement.Footpaths = saved.footpaths ?? "";
+        settlement.RestoreBuilderSeconds(saved.builderSeconds);
         foreach (string boss in saved.defeatedBosses ?? new List<string>())
         {
             settlement.MarkBossDefeated(boss);

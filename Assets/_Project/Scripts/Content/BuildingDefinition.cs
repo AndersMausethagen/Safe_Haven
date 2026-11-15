@@ -59,6 +59,8 @@ public sealed class BuildingLevel
     [Min(0)] public int extraGame;
     [Tooltip("Metres more light around it, pushing the night back.")]
     [Min(0f)] public float extraLight;
+    [Tooltip("More station extensions (a bellows, a tool rack) it takes at this level (StationExtensions).")]
+    [Min(0)] public int extensionSlots;
 
     /// <summary>"12 Oak Plank, 8 Purified Essence".</summary>
     public string CostText
@@ -93,6 +95,34 @@ public struct BuildingRequirement
 /// what is known). Each placed building reads this; its current health lives on its own Damageable. Placement rules (a
 /// yard kept clear in front of the entrance, building walls in lines) are read by BuildPlacer.
 /// </summary>
+/// <summary>What a station extension adds to the station it stands by (StationExtensions). Never speed alone.</summary>
+[Serializable]
+public sealed class ExtensionBonus
+{
+    [Tooltip("The station works this much faster.")]
+    [Min(0f)] public float craftSpeed;
+    [Tooltip("More crafts can wait in its queue.")]
+    [Min(0)] public int extraQueue;
+    [Tooltip("Its output slot holds more.")]
+    [Min(0)] public int extraOutput;
+    [Tooltip("A worker's chance of one more of what they make there.")]
+    [Range(0f, 0.5f)] public float extraChance;
+
+    /// <summary>True when it does something besides speed.</summary>
+    public bool DoesMoreThanSpeed => extraQueue > 0 || extraOutput > 0 || extraChance > 0f;
+
+    /// <summary>In words: "+20% speed, +1 queue".</summary>
+    public string Describe()
+    {
+        var parts = new List<string>();
+        if (craftSpeed > 0f) parts.Add($"+{craftSpeed * 100f:0}% speed");
+        if (extraQueue > 0) parts.Add($"+{extraQueue} in the queue");
+        if (extraOutput > 0) parts.Add($"+{extraOutput} in the output");
+        if (extraChance > 0f) parts.Add($"{extraChance * 100f:0}% chance of one more");
+        return string.Join(", ", parts);
+    }
+}
+
 [CreateAssetMenu(fileName = "NewBuilding", menuName = "Safe Haven/Buildings/Building Definition")]
 public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
 {
@@ -147,6 +177,31 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [Tooltip("Shown under the build menu's Decorations: benches, woodpiles, flower beds, posts. Things that make the Haven " +
              "a home (comfort and renown) and do no work.")]
     [SerializeField] private bool decoration;
+
+    [Header("Path")]
+    [Tooltip("A path drawn in lines (PathPiece): how much faster the player walks on it at home. 1 = not a path. Paths may cross " +
+             "yards and gentle slopes, and block nothing.")]
+    [SerializeField, Range(1f, 1.5f)] private float pathSpeed = 1f;
+    [Tooltip("Paved (stone): counts for a home as a lit or paved lane, and footpaths never wear across it.")]
+    [SerializeField] private bool paved;
+    [Tooltip("The path's look: a decal laid along each piece (Art/Decals).")]
+    [SerializeField] private Material pathDecal;
+
+    [Header("Yards")]
+    [Tooltip("A line piece that closes a yard (Skigard, Palisade, Stone Wall, Hedge...): rings of them with a gate are yards (Yards).")]
+    [SerializeField] private bool encloses;
+    [Tooltip("A gate in a yard's ring: people go in and out here. A yard needs one.")]
+    [SerializeField] private bool isGate;
+
+    [Header("Station extensions")]
+    [Tooltip("How many extensions (a bellows, a quench tub...) this station takes at its first level; upgrades add more " +
+             "(BuildingLevel › Extension Slots). 0: none.")]
+    [SerializeField, Min(0)] private int extensionSlots;
+    [Tooltip("This is an extension of that station: standing within Extension Reach of one (or in the same Work Yard), and " +
+             "with a slot free, it adds its bonus there (StationExtensions). Empty: not an extension.")]
+    [SerializeField] private BuildingDefinition extends;
+    [SerializeField, Min(0.5f)] private float extensionReach = 6f;
+    [SerializeField] private ExtensionBonus extensionBonus = new ExtensionBonus();
 
     [Header("Crafting")]
     [Tooltip("Makes the building a crafting station: using it opens its queue of recipes for this station.")]
@@ -203,6 +258,20 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public int OutputCapacity => Mathf.Max(1, outputCapacity);
     public int QueueLength => Mathf.Max(1, queueLength);
     public SoundDefinition DeathSound => deathSound;
+    /// <summary>Extensions it takes at its first level.</summary>
+    public int ExtensionSlots => extensionSlots;
+    /// <summary>The station this extends, or null.</summary>
+    public BuildingDefinition Extends => extends;
+    public float ExtensionReach => extensionReach;
+    public ExtensionBonus Extension => extensionBonus;
+    /// <summary>How much faster the player walks on it at home; 1 for anything that isn't a path.</summary>
+    public float PathSpeed => pathSpeed;
+    public bool IsPath => pathSpeed > 1.001f;
+    public bool Paved => paved;
+    public Material PathDecal => pathDecal;
+    /// <summary>A line piece that closes a yard.</summary>
+    public bool Encloses => encloses || isGate;
+    public bool IsGate => isGate;
     SoundDefinition ICombatSounds.HurtSound => null;
     public float BuildWork => buildWork;
     public int Renown => renown;

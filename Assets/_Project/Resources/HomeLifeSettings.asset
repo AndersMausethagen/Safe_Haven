@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e65e83311d9a5d64bbf66f376df4f8fa, type: 3}
+  m_Name: HomeLifeSettings
+  m_EditorClassIdentifier: SafeHaven::HomeLifeSettings
+  features:
+  - name: Warm
+    icon: Flame
+    kind: 0
+    near:
+    - {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+    - {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+    - {fileID: 11400000, guid: 474cf010baf69a14893028a455c25f1a, type: 2}
+    within: 12
+    pathWithin: 4
+    orComfort: kitchen
+    hint: A Campfire, Kitchen or Sauna within 12 m
+    points: 1
+  - name: Water close
+    icon: Drop
+    kind: 0
+    near:
+    - {fileID: 11400000, guid: 66653f52a1587f64da2a6661efac3afa, type: 2}
+    within: 20
+    pathWithin: 4
+    orComfort: 
+    hint: A Well within 20 m
+    points: 1
+  - name: Lit lane
+    icon: Lantern
+    kind: 1
+    near:
+    - {fileID: 11400000, guid: 28817ef1a29fdf444a7f8e1c0185a7d5, type: 2}
+    - {fileID: 11400000, guid: dc29fc8311788994b80c6bd84c2478d8, type: 2}
+    within: 10
+    pathWithin: 4
+    orComfort: 
+    hint: A Lantern Post or Torch within 10 m, or a stone path past the door
+    points: 1
+  - name: A place to sit
+    icon: Bench
+    kind: 0
+    near:
+    - {fileID: 11400000, guid: fdb9a592fff9567459b1e00fdc1342c4, type: 2}
+    - {fileID: 11400000, guid: 105ff541d28df654ba20b786907ced0e, type: 2}
+    - {fileID: 11400000, guid: d89da1ee1237ce34d8c2a40d6fba62c6, type: 2}
+    within: 6
+    pathWithin: 4
+    orComfort: 
+    hint: A bench or table within 6 m of the door
+    points: 1
+  - name: Near work
+    icon: Hammer
+    kind: 2
+    near: []
+    within: 30
+    pathWithin: 4
+    orComfort: 
+    hint: Their work within 30 m
+    points: 1
+  pointsPerTier: 1
+  comforts:
+  - id: beds
+    name: Proper Beds
+    icon: Bed
+    description: Linen sheets and wool blankets on proper bunks
+    cost:
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 6
+    points: 1
+  - id: kitchen
+    name: Kitchen Hearth
+    icon: Pot
+    description: 'A stone hearth and a pot of their own: warm, and fed'
+    cost:
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 8
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      amount: 2
+    points: 1
+  levels:
+  - name: Bare
+    quality: 0
+    workSpeed: 0
+    comfort: 0
+    renown: 0
+  - name: Plain
+    quality: 2
+    workSpeed: 0.05
+    comfort: 1
+    renown: 2
+  - name: Snug
+    quality: 4
+    workSpeed: 0.1
+    comfort: 2
+    renown: 4
+  - name: Fine
+    quality: 6
+    workSpeed: 0.15
+    comfort: 3
+    renown: 6
+  - name: Grand
+    quality: 8
+    workSpeed: 0.2
+    comfort: 4
+    renown: 8
+  likings:
+  - resident: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
+    likes: Warm
+    line: '"A smith''s bones like a warm house. The forge is warm enough by day."'
+  - resident: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
+    likes: A place to sit
+    line: '"A bench by the door, for the evening and my leg."'
+  - resident: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
+    likes: Water close
+    line: '"Clean water close by, for the work and for washing it off."'
+  - resident: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
+    likes: Lit lane
+    line: '"A lit way home. I''ve seen what waits in the dark."'
+  - resident: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    likes: Near work
+    line: '"Not far to the lodge. Meat won''t cure itself."'
+  - resident: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    likes: Water close
+    line: '"Water near, for the beds and the flax."'
+  - resident: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
+    likes: Warm
+    line: '"A warm hearth. A cook can''t abide a cold house."'
+  - resident: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
+    likes: Lit lane
+    line: '"A light on the path. I come home late."'
+  - resident: {fileID: 11400000, guid: 8adfc30233928ec499c01587419eabaa, type: 2}
+    likes: A place to sit
+    line: '"Somewhere to sit and read the stones."'
+  - resident: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
+    likes: Near work
+    line: '"Close to the stone. Every walk is a block not cut."'
+  - resident: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
+    likes: Lit lane
+    line: '"Light on the lanes. People should see their way home."'
+  contentWorkSpeed: 0.05
+  pathsOnlyAtHome: 1
+  wearPerStep: 0.04
+  wearRegrowth: 0.0006
+  builders:
+  - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
+  - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
+  builderWorkPerSecond: 0.5
