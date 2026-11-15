@@ -55,7 +55,7 @@ public sealed class HavenLoopTests
     {
         var stash = new StashStorage();
         ItemDefinition filler = Item(ItemCategory.Material, 1);
-        stash.Items.Add(filler, StashStorage.Columns * StashStorage.Rows);
+        stash.Items.Add(filler, stash.Items.SlotCount);
         var bag = new ItemContainer(4, 1);
         ItemDefinition ore = Item(ItemCategory.Material);
         bag.Add(ore, 10);

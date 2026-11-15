@@ -50,6 +50,8 @@ public static class GameInput
     public static InputAction Ping => Find("Player/Ping");
     /// <summary>Whistle for a horse of yours (HorseWhistle).</summary>
     public static InputAction Whistle => Find("Player/Whistle");
+    /// <summary>Inside the ward: the bag's stacks onto the same items in the chests (StashQuickStack).</summary>
+    public static InputAction StackOnStored => Find("Player/StackOnStored");
     /// <summary>In the saddle: a tap canters, a hold gallops (Shift, or the left stick's click). Space (Dodge) jumps.</summary>
     public static InputAction HorseGallop => Find("Player/HorseGallop");
     /// <summary>In the saddle: the horse rears and strikes out ahead (PlayerRiding).</summary>

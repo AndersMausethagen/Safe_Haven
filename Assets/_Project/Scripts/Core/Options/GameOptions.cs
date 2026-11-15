@@ -138,6 +138,8 @@ public static class GameOptions
     // ----- Accessibility -----
 
     public static readonly GameOption UiScale = GameOption.Slider("UiScale", "UI and Text Size", "The size of all menus, text and the HUD.", 1f, 0.75f, 1.5f, 0.05f);
+    /// <summary>The skill bar's size on the HUD (keys 1-9). 100% was its size until 2026-11-15, when the user asked for 15% more.</summary>
+    public static readonly GameOption SkillBarSize = GameOption.Slider("SkillBarSize", "Skill Bar Size", "The size of the skill bar (keys 1-9) at the bottom of the screen.", 1.15f, 0.75f, 1.6f, 0.05f);
     public static readonly GameOption ScreenShake = GameOption.Slider("ScreenShake", "Screen Shake", "How much hits and heavy footsteps shake the camera.", 1f, 0f, 1f, 0.05f);
     public static readonly GameOption HitStop = GameOption.Toggle("HitStop", "Hit Stop", "The game freezes for a moment on strong hits.", true);
     public static readonly GameOption ScreenFlash = GameOption.Slider("ScreenFlash", "Screen Flashes", "How strongly the screen edges flash when you are hurt or low on health.", 1f, 0f, 1f, 0.05f);
@@ -157,7 +159,7 @@ public static class GameOptions
     public static readonly GameOption TimingHelp = GameOption.Choice("TimingHelp", "Parry and Dodge Timing",
         "How long the moment to parry lasts, and how long a dodge carries you through a blow.", 0, "Normal", "Longer", "Much Longer");
 
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, SkillBarSize, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
 
     /// <summary>The share of a blow that reaches the player.</summary>
     public static float DamageTakenShare => DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;

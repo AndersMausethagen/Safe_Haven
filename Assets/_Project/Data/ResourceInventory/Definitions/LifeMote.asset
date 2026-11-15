@@ -17,20 +17,7 @@ MonoBehaviour:
   category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
   tier: 1
   description: A tiny spark of forest light, too faint to wake the portal alone.
-  weight: 0.2
-  hungerRestore: 0
-  thirstRestore: 0
+  uses: 'Brewing: the Healing Salve and Orb Tincture. Also part of improving the Cauldron.'
   icon: {fileID: 21300000, guid: 1a88a591f2aceaf45b5f6029ac105949, type: 3}
   color: {r: 0.58, g: 0.9, b: 0.62, a: 1}
   sortOrder: 0
-  gatherTool: 0
-  requiredToolTier: 1
-  gatherAnimation: 1
-  gatherSeconds: 2
-  gatherRange: 1.6
-  minYield: 3
-  maxYield: 5
-  depleteOnGather: 1
-  respawnSeconds: 180
-  worldModelPrefab: {fileID: 9056648997488566577, guid: 4c86f5fd3167bd0499c2e377a5ce2ef1, type: 3}
-  worldPrefab: {fileID: 1158895183621609222, guid: e010c7c1cd96e8a4cb11aa834ca0a563, type: 3}

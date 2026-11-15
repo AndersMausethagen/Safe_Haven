@@ -278,6 +278,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         Hook(GameInput.Sneak, OnSneak, on, canceled: true);
         Hook(GameInput.CycleArrows, OnCycleArrows, on);
         Hook(GameInput.ToggleTorch, OnToggleTorch, on);
+        Hook(GameInput.StackOnStored, OnStackOnStored, on);
         Hook(GameInput.SwapWeapon, OnSwapWeapon, on);
         Hook(GameInput.Talents, OnTalents, on);
         Hook(GameInput.Journal, OnJournal, on);
@@ -354,6 +355,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
     }
 
     private void OnToggleTorch(InputAction.CallbackContext context) => ToggleLight();
+
+    private void OnStackOnStored(InputAction.CallbackContext context) => StashQuickStack.Stack(gameObject);
 
     /// <summary>The light key: the lantern on the belt when one is worn, else the torch in the off hand. Also on a controller's action wheel.</summary>
     public void ToggleLight()

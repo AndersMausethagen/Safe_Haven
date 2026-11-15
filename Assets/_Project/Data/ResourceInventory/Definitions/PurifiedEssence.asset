@@ -17,6 +17,7 @@ MonoBehaviour:
   category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
   tier: 2
   description: Cursed Essence made clean at the Purification Altar. Strengthens the portal's ward, gear and magic.
+  uses: 'At the Purification Altar: empowers and enchants gear, and buys ranks in your abilities. It also strengthens the portal''s ward, improves the stations (Cauldron, Construction Table, Forge, Sawbench, Tanning Rack) and brews the Purified Draught.'
   icon: {fileID: 21300000, guid: 2228d41268b2e824ea502b11d81497f5, type: 3}
   color: {r: 1, g: 0.88, b: 0.5, a: 1}
   sortOrder: 0

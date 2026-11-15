@@ -89,6 +89,29 @@ public sealed class PlayerSkills : MonoBehaviour
         {
             dodge.Dodged += OnDodged;
         }
+
+        if (TryGetComponent(out bagItems))
+        {
+            bagItems.ConsumableArrived += OnConsumableArrived;
+        }
+    }
+
+    private ItemInventory bagItems;
+
+    // A consumable new to the bag goes on the first empty slot of the bar, 1 to 9 (the user, 2026-11-15: with 1-5 full they
+    // went nowhere). One already on the bar stays where the player put it.
+    private void OnConsumableArrived(ItemDefinition item)
+    {
+        if (loadout.IndexOf(item) >= 0)
+        {
+            return;
+        }
+
+        int free = loadout.FirstEmptySlot();
+        if (free >= 0)
+        {
+            loadout.EquipItem(free, item);
+        }
     }
 
     private void OnDisable()
@@ -97,6 +120,11 @@ public sealed class PlayerSkills : MonoBehaviour
         if (dodge != null)
         {
             dodge.Dodged -= OnDodged;
+        }
+
+        if (bagItems != null)
+        {
+            bagItems.ConsumableArrived -= OnConsumableArrived;
         }
 
         pendingHit = null;

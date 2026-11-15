@@ -1,13 +1,15 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
 /// The essences the player is carrying, in the bag window: icon, name, a thin fill line and amount/capacity for each one found
 /// so far. Essences have no weight or slot, so they live here rather than in the grid. Built in code on enable; it follows the
-/// player's ResourceStorage and only displays it.
+/// player's ResourceStorage and only displays it. Pointing at one shows what it is and what it is used for (the bag's
+/// tooltip, ResourceDefinition.Uses; the user, 2026-11-15).
 /// </summary>
 public sealed class CarriedEssencesView : MonoBehaviour
 {
@@ -31,6 +33,8 @@ public sealed class CarriedEssencesView : MonoBehaviour
     private readonly List<ResourceDefinition> ordered = new List<ResourceDefinition>();
     private ResourceStorage storage;
     private TMP_Text emptyNote;
+    private ItemTooltipView tooltip;
+    private ResourceDefinition pointed;
 
     private void OnEnable()
     {
@@ -49,6 +53,7 @@ public sealed class CarriedEssencesView : MonoBehaviour
 
     private void OnDisable()
     {
+        Unpoint(pointed);
         if (storage != null)
         {
             storage.Changed -= OnChanged;
@@ -97,6 +102,11 @@ public sealed class CarriedEssencesView : MonoBehaviour
         float x = index % Columns * (width + ColumnGap);
         float y = index / Columns * RowHeight;
         RectTransform rect = At(resource.DisplayName, transform, x, y, width, RowHeight);
+        // The whole row answers the pointer (an invisible graphic catches it) and shows the essence's tooltip.
+        rect.gameObject.AddComponent<Image>().color = Color.clear;
+        var hover = rect.gameObject.AddComponent<EventTrigger>();
+        AddTrigger(hover, EventTriggerType.PointerEnter, () => Point(resource));
+        AddTrigger(hover, EventTriggerType.PointerExit, () => Unpoint(resource));
         var icon = At("Icon", rect, 0f, 2f, IconSize, IconSize).gameObject.AddComponent<Image>();
         icon.sprite = resource.Icon;
         icon.preserveAspect = true;
@@ -116,6 +126,38 @@ public sealed class CarriedEssencesView : MonoBehaviour
         fillImage.color = resource.Color;
         fillImage.raycastTarget = false;
         return new Row { Resource = resource, Root = rect.gameObject, Fill = fill, Amount = amount };
+    }
+
+    private static void AddTrigger(EventTrigger trigger, EventTriggerType type, System.Action action)
+    {
+        var entry = new EventTrigger.Entry { eventID = type };
+        entry.callback.AddListener(_ => action());
+        trigger.triggers.Add(entry);
+    }
+
+    // The bag window's tooltip follows the pointer every frame, so showing it is enough.
+    private void Point(ResourceDefinition resource)
+    {
+        if (tooltip == null)
+        {
+            ItemInventoryWindow bag = GetComponentInParent<ItemInventoryWindow>(true);
+            tooltip = bag != null ? bag.GetComponentInChildren<ItemTooltipView>(true) : null;
+        }
+
+        if (tooltip != null && resource != null)
+        {
+            pointed = resource;
+            tooltip.ShowDefinition(resource);
+        }
+    }
+
+    private void Unpoint(ResourceDefinition resource)
+    {
+        if (tooltip != null && resource != null && pointed == resource)
+        {
+            pointed = null;
+            tooltip.Hide();
+        }
     }
 
     private void Refresh()

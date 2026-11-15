@@ -375,6 +375,15 @@
                     "interactions": "",
                     "initialStateCheck": false,
                     "priority": 0
+                },
+                {
+                    "name": "StackOnStored",
+                    "type": "Button",
+                    "id": "f0403c38-386a-4402-ad20-6934159c63b8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -1189,6 +1198,17 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "WindowsWheel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2b792266-2e6b-4326-9503-622ca0f8ca3c",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "StackOnStored",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

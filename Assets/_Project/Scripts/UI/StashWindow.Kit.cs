@@ -87,7 +87,7 @@ public sealed partial class StashWindow
         // Over each grid, at the right end of its first row (worked out from its cells, as the layout places them later).
         GridButton(bagGrid, bag, "Sort", "Stats", 104f, 0f, () => Sort(bag.Container));
         GridButton(bagGrid, bag, "Store all", "Lock", 132f, 112f, StoreAll);
-        GridButton(stashGrid, stash, "Sort", "Stats", 104f, 0f, () => Sort(stash.Container));
+        GridButton(stashGrid, stash, "Sort", "Stats", 104f, 0f, () => Sort(stash.Container, stash.First, stash.Count));
 
         foreach (TMP_Text label in GetComponentsInChildren<TMP_Text>(true))
         {
@@ -118,7 +118,10 @@ public sealed partial class StashWindow
         rect.anchoredPosition = new Vector2(cellsRight - fromRight, 6f);
     }
 
-    private static void Sort(ItemContainer container)
+    private static void Sort(ItemContainer container) => Sort(container, 0, container != null ? container.SlotCount : 0);
+
+    // Sorts the open slots from first to first + count - 1 (a chest sorts only its own block).
+    private static void Sort(ItemContainer container, int first, int count)
     {
         if (container == null)
         {
@@ -127,7 +130,7 @@ public sealed partial class StashWindow
 
         var stacks = new List<ItemStack>();
         var places = new List<int>();
-        for (int i = 0; i < container.SlotCount; i++)
+        for (int i = first; i < Mathf.Min(container.SlotCount, first + count); i++)
         {
             if (!container.IsUnlocked(i))
             {
@@ -162,13 +165,13 @@ public sealed partial class StashWindow
         {
             if (!from.GetSlot(i).IsEmpty)
             {
-                moved += from.TransferTo(i, to);
+                moved += GameSession.Stash.Store(from, i, player, chest != null ? chest.Block : -1);
             }
         }
 
         if (moved == 0)
         {
-            GameMessages.Post(to.CountItems() > 0 ? "Storage has no room for more." : "Nothing in the bag to store.", MessageKind.Info);
+            GameMessages.Post(from.CountItems() > 0 ? "This chest has no room for more." : "Nothing in the bag to store.", MessageKind.Info);
         }
     }
 }

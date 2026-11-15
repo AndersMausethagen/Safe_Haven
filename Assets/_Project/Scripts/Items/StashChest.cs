@@ -5,14 +5,15 @@ using UnityEngine;
 /// The stash chest in Safe Haven. Using it (its Interactable) opens the stash window, where the player leaves what they
 /// don't want to risk in a raid. The Interactable beside it must not deactivate on completion.
 /// <para>
-/// Every chest opens the same stash (GameSession.Stash), but the stash only has as many slots as the biggest chest
-/// standing at home: a Small Chest early on, all of them with a Storage Shed. Items in slots that close again (a bigger
-/// chest gone) are kept, just out of reach until there is room again.
+/// Each chest holds its own items (the user, 2026-11-15; until then every chest opened one shared stash): its Block of
+/// GameSession.Stash.Items, chosen when it first stands and kept in the save. Its size is its StashSlots (a Small Chest
+/// 12, a Storage Shed all 60 of a block). Items in a chest that is gone are kept in its block, out of reach until a new
+/// chest takes that block (the lowest free one is taken first, so they come back in the next chest built).
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-public sealed class StashChest : MonoBehaviour
+public sealed class StashChest : MonoBehaviour, ISaveable
 {
     [Tooltip("Left empty, the first StashWindow in the scene is used.")]
     [SerializeField] private StashWindow window;
@@ -25,30 +26,45 @@ public sealed class StashChest : MonoBehaviour
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => standing.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        standing.Clear();
+        allocationDue = false;
+    }
     private Interactable interactable;
+    private int block = -1;
+    private bool started;
 
     /// <summary>Stash slots this chest gives room for (all of them for 0).</summary>
-    public int StashSlots => Mathf.Min(StashStorage.Columns * StashStorage.Rows,
-        (stashSlots > 0 ? stashSlots : StashStorage.Columns * StashStorage.Rows) + Mathf.RoundToInt(Upgraded));
+    public int StashSlots => Mathf.Min(StashStorage.ChestSlots,
+        (stashSlots > 0 ? stashSlots : StashStorage.ChestSlots) + Mathf.RoundToInt(Upgraded));
+
+    /// <summary>Which block of GameSession.Stash.Items holds this chest's items; -1 until it first stands.</summary>
+    public int Block => block;
+
+    /// <summary>The first slot of this chest's items in GameSession.Stash.Items.</summary>
+    public int FirstSlot => StashStorage.BlockStart(Mathf.Max(0, block));
+
+    /// <summary>True when it is built (not a scaffold or a ruin) and so holds things.</summary>
+    public bool IsStanding => !TryGetComponent(out Construction construction) || construction.IsStanding;
 
     // Upgrades (Construction) add stash slots.
     private float Upgraded => TryGetComponent(out Construction construction) ? construction.Sum(level => level.extraStorage) : 0f;
 
-    /// <summary>The stash slots the chests standing now give room for: the biggest one's; -1 with no chest.</summary>
+    /// <summary>The stash slots the chests standing now give room for, all of them together; -1 with no chest.</summary>
     public static int SlotsStanding()
     {
-        int most = -1;
+        int total = -1;
         foreach (StashChest chest in standing)
         {
             // A chest still being built (or a ruin) holds nothing yet.
-            if (!chest.TryGetComponent(out Construction construction) || construction.IsStanding)
+            if (chest.IsStanding)
             {
-                most = Mathf.Max(most, chest.StashSlots);
+                total = Mathf.Max(0, total) + chest.StashSlots;
             }
         }
 
-        return most;
+        return total;
     }
 
     /// <summary>True when a finished chest stands within <paramref name="reach"/> metres of a point.</summary>
@@ -79,6 +95,25 @@ public sealed class StashChest : MonoBehaviour
         RefreshStash();
     }
 
+    // After SaveableEntity (order -80) has put back the block this chest had: only a chest without one takes a new one,
+    // at the end of the frame, once every chest loaded with it has started too (so the biggest is first).
+    private static bool allocationDue;
+
+    private void Start()
+    {
+        started = true;
+        allocationDue = true;
+    }
+
+    private void LateUpdate()
+    {
+        if (allocationDue)
+        {
+            allocationDue = false;
+            RefreshStash();
+        }
+    }
+
     private void OnDisable()
     {
         interactable.Completed.RemoveListener(OnUsed);
@@ -95,14 +130,92 @@ public sealed class StashChest : MonoBehaviour
         }
     }
 
-    // Away from home (no chest standing) the stash keeps its size: it can't be opened there anyway.
+    // Chests that stand and have no block yet take one (the biggest first, so a save from before blocks puts its whole
+    // stash in the biggest chest), then exactly the standing chests' slots are opened. Away from home (no chest standing)
+    // the stash keeps its slots: it can't be opened there anyway.
+    private static readonly List<StashChest> waiting = new List<StashChest>();
+    private static readonly List<bool> openSlots = new List<bool>();
+
     private static void RefreshStash()
     {
-        int slots = SlotsStanding();
-        if (slots >= 0)
+        waiting.Clear();
+        foreach (StashChest chest in standing)
         {
-            GameSession.Stash.Items.SetUnlockedSlots(slots);
+            if (chest.started && chest.block < 0 && chest.IsStanding)
+            {
+                waiting.Add(chest);
+            }
         }
+
+        waiting.Sort((a, b) => b.StashSlots != a.StashSlots ? b.StashSlots.CompareTo(a.StashSlots) : string.CompareOrdinal(a.name, b.name));
+        foreach (StashChest chest in waiting)
+        {
+            chest.block = FreeBlock();
+        }
+
+        if (SlotsStanding() < 0)
+        {
+            return;
+        }
+
+        openSlots.Clear();
+        for (int i = 0; i < GameSession.Stash.Items.SlotCount; i++)
+        {
+            openSlots.Add(false);
+        }
+
+        foreach (StashChest chest in standing)
+        {
+            if (chest.block >= 0 && chest.IsStanding)
+            {
+                int start = chest.FirstSlot;
+                for (int i = start; i < start + chest.StashSlots && i < openSlots.Count; i++)
+                {
+                    openSlots[i] = true;
+                }
+            }
+        }
+
+        GameSession.Stash.Items.SetUnlockedMask(openSlots);
+    }
+
+    // The lowest block no chest here has. A gone chest's block counts as free, so its items come back in the next chest.
+    private static int FreeBlock()
+    {
+        for (int candidate = 0; candidate < StashStorage.MaxChests; candidate++)
+        {
+            if (!standing.Exists(chest => chest.block == candidate))
+            {
+                return candidate;
+            }
+        }
+
+        Debug.LogWarning($"Every one of the {StashStorage.MaxChests} chest blocks is taken: a new chest shares the last one.");
+        return StashStorage.MaxChests - 1;
+    }
+
+    // ----- Saving: which block is this chest's -----
+
+    [System.Serializable]
+    private struct SavedState
+    {
+        public int block;
+    }
+
+    public string SaveKey => "stash-chest";
+
+    public string CaptureState() => JsonUtility.ToJson(new SavedState { block = block });
+
+    public void RestoreState(string state)
+    {
+        if (string.IsNullOrEmpty(state))
+        {
+            return;
+        }
+
+        int saved = JsonUtility.FromJson<SavedState>(state).block;
+        block = saved >= 0 && saved < StashStorage.MaxChests ? saved : -1;
+        RefreshStash();
     }
 
     /// <summary>True while a position is close enough to keep the stash window open.</summary>

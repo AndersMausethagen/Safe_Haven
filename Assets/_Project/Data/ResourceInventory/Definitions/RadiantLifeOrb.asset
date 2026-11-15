@@ -17,20 +17,7 @@ MonoBehaviour:
   category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
   tier: 3
   description: A blazing orb of old magic, rare and precious.
-  weight: 0.5
-  hungerRestore: 0
-  thirstRestore: 0
+  uses: 'Brewing the strongest draughts: the Greater Healing Draught and the Radiant Draught.'
   icon: {fileID: 21300000, guid: a0d3d5c5571cd9a47950e34be12e6af4, type: 3}
   color: {r: 0.25, g: 0.95, b: 0.82, a: 1}
   sortOrder: 0
-  gatherTool: 0
-  requiredToolTier: 1
-  gatherAnimation: 1
-  gatherSeconds: 4.5
-  gatherRange: 1.6
-  minYield: 1
-  maxYield: 3
-  depleteOnGather: 1
-  respawnSeconds: 600
-  worldModelPrefab: {fileID: 7097349728917456308, guid: 2560fc16b34470249a4dd4f1c5585b44, type: 3}
-  worldPrefab: {fileID: 4707785568422404063, guid: 8c73a6bd5fac65d40856f43f9a67962d, type: 3}

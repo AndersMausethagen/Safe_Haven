@@ -172,6 +172,11 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append("\n\n").Append(resource.Description);
         }
 
+        if (!string.IsNullOrWhiteSpace(resource.Uses))
+        {
+            builder.Append($"\n\n<color={UIStyle.Current.AccentHex}>Used for</color>\n").Append(resource.Uses);
+        }
+
         return builder.ToString();
     }
 

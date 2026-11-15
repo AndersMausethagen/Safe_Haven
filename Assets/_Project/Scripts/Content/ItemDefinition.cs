@@ -96,6 +96,9 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("A water container (a waterskin): the water it holds when full. Each one keeps its own level; drinking from " +
              "it restores thirst from what is in it and keeps the container, and water sources fill it. 0 for anything else.")]
     [SerializeField, Min(0f)] private float waterCapacity;
+    [Tooltip("Not a thing in the bag: stands for water carried in water containers (waterskins), as a recipe cost. Counting, " +
+             "taking and giving it works on the water in them (ItemContainer), so \"10 Water\" takes 10 of a waterskin's water.")]
+    [SerializeField] private bool waterMeasure;
     [Tooltip("Bonuses for Boon Seconds after it is eaten or drunk (GDD §11.4): Strength, Max Stamina, Move Speed, Gather Yield...")]
     [SerializeField] private List<StatBonus> boonBonuses = new List<StatBonus>();
     [Tooltip("Seconds its bonuses last.")]
@@ -201,6 +204,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float ThirstRestore => thirstRestore;
     public float WaterCapacity => waterCapacity;
     public bool HoldsWater => waterCapacity > 0f;
+    /// <summary>Water itself, measured from the water containers carried (see waterMeasure).</summary>
+    public bool IsWaterMeasure => waterMeasure;
     public SaplingDefinition Sapling => sapling;
     public bool IsSapling => sapling != null;
     public LanternDefinition Lantern => lantern;

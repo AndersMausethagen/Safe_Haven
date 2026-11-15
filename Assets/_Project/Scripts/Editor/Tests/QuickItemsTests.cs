@@ -49,6 +49,68 @@ public sealed class QuickItemsTests
         Assert.AreEqual(8, QuickItems.Capacity);
     }
 
+    // The user, 2026-11-15: with keys 1-5 full, new consumables went nowhere; they take the next empty slot of 1-9, however
+    // they reach the bag, and putting a saved bag back doesn't count as new.
+    [Test]
+    public void NewConsumablesTakeTheNextEmptySkillSlot()
+    {
+        var player = new GameObject("Bar Player");
+        created.Add(player);
+        player.AddComponent<PlayerStateMachine>();
+        var items = player.AddComponent<ItemInventory>();
+        var skills = player.AddComponent<PlayerSkills>();
+        Invoke(items, "Awake");
+        Invoke(skills, "Awake");
+        Invoke(skills, "OnEnable");
+        for (int i = 0; i < 5; i++)
+        {
+            var skill = ScriptableObject.CreateInstance<SkillDefinition>();
+            created.Add(skill);
+            skills.Loadout.Equip(i, skill);
+        }
+
+        Assert.AreEqual(5, skills.Loadout.FirstEmptySlot(), "1-5 are full");
+        items.Container.Add(Stew, 2);
+        Invoke(items, "LateUpdate");
+        Assert.AreEqual(5, skills.Loadout.IndexOf(Stew), "it goes on key 6");
+
+        items.Container.Remove(Stew, 2);
+        Invoke(items, "LateUpdate");
+        skills.Loadout.Clear(5);
+        items.BeginRestore();
+        items.Container.Add(Stew, 1);
+        items.EndRestore();
+        Invoke(items, "LateUpdate");
+        Assert.AreEqual(-1, skills.Loadout.IndexOf(Stew), "a bag put back from a save is not new");
+        Invoke(skills, "OnDisable");
+    }
+
+    // The user, 2026-11-15: Stewed Berries take 10 of the water carried, not a whole waterskin.
+    [Test]
+    public void WaterIsMeasuredFromTheWaterskins()
+    {
+        var water = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Water.asset");
+        var skin = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Waterskin.asset");
+        Assert.IsTrue(water.IsWaterMeasure);
+        var recipe = AssetDatabase.LoadAssetAtPath<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/StewedBerries.asset");
+        CollectionAssert.Contains(new List<ItemAmount>(recipe.ItemCost).ConvertAll(cost => cost.Item.name + " " + cost.Amount), "Water 10");
+
+        var bag = new ItemContainer(4, 1);
+        bag.AddStack(new ItemStack(skin, 1).WithWater(25f));
+        Assert.AreEqual(25, bag.Count(water));
+        Assert.AreEqual(10, bag.Remove(water, 10));
+        Assert.AreEqual(15f, bag.GetSlot(0).Water, 0.01f, "the waterskin keeps the rest");
+        Assert.AreEqual(1, bag.Count(skin), "and stays in the bag");
+        Assert.AreEqual(5, bag.Add(water, 5), "a refund pours back in");
+        Assert.AreEqual(20f, bag.GetSlot(0).Water, 0.01f);
+        Assert.AreEqual(20, bag.Remove(water, 30), "only what is there");
+    }
+
+    private static void Invoke(object target, string method)
+    {
+        target.GetType().GetMethod(method, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(target, null);
+    }
+
     [Test]
     public void Restore_KeepsOrder_AndSkipsRepeatsAndUnusables()
     {

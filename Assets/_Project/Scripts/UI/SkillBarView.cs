@@ -1,19 +1,21 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// The always-visible skill bar on the HUD, V Rising style: the five loadout slots with their keys (a skill, or a
+/// The always-visible skill bar on the HUD, V Rising style: the nine loadout slots with their keys (a skill, or a
 /// consumable with how many are carried), a radial shade and seconds counter while a skill cools down, a bright pulse when it is cast and a red one when a cast is refused. The
-/// slots are the same ItemSlotView cells the bag and skill window use; this view only feeds them. It changes nothing:
-/// casting is input -> PlayerSkills, arranging is the skill window.
+/// slots are the same ItemSlotView cells the bag and skill window use; this view only feeds them. Casting is input ->
+/// PlayerSkills and arranging skills is the skill window; the one change made here is a consumable dragged from the bag
+/// and dropped on a slot (the user, 2026-11-15). Its size is the Skill Bar Size option (GameOptions.SkillBarSize).
 /// <para>
 /// Where it belongs: the SkillHUD prefab, placed in every gameplay scene. It finds the player through Player.Current /
 /// Player.Spawned, so it needs no scene references.
 /// </para>
 /// </summary>
-public sealed class SkillBarView : MonoBehaviour
+public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
 {
     [Serializable]
     private sealed class Slot
@@ -42,16 +44,20 @@ public sealed class SkillBarView : MonoBehaviour
     private Player bound;
     private PlayerSkills skills;
     private ItemInventory inventory;
+    private Vector3 baseScale;
+    private bool baseScaleKnown;
 
     private void OnEnable()
     {
         Player.Spawned += Bind;
         GameInput.KeysChanged += OnKeysChanged;
+        GameOption.AnyChanged += OnOptionChanged;
         SetVisible(false);
-        foreach (Slot slot in slots)
+        ApplySize();
+        for (int i = 0; i < slots.Length; i++)
         {
-            // The HUD bar is display only: the skill window is where skills are arranged.
-            slot?.view?.Bind(null, 0);
+            // The skill window is where skills are arranged; here a consumable can only be dropped on from the bag.
+            slots[i]?.view?.Bind(this, i);
         }
     }
 
@@ -59,7 +65,81 @@ public sealed class SkillBarView : MonoBehaviour
     {
         Player.Spawned -= Bind;
         GameInput.KeysChanged -= OnKeysChanged;
+        GameOption.AnyChanged -= OnOptionChanged;
         Unbind();
+    }
+
+    private void OnOptionChanged(GameOption option)
+    {
+        if (option == GameOptions.SkillBarSize)
+        {
+            ApplySize();
+        }
+    }
+
+    // The bar grows from its bottom centre (its pivot), so it stays on the screen's edge at any size.
+    private void ApplySize()
+    {
+        if (!baseScaleKnown)
+        {
+            baseScale = transform.localScale;
+            baseScaleKnown = true;
+        }
+
+        transform.localScale = baseScale * GameOptions.SkillBarSize.Value;
+    }
+
+    // ----- Dropping a consumable from the bag -----
+
+    public void OnSlotDropped(ItemSlotView target)
+    {
+        if (skills == null || !ItemDrag.Active || target == null)
+        {
+            return;
+        }
+
+        ItemStack stack = ItemDrag.Source.GetSlot(ItemDrag.Index);
+        if (stack.IsEmpty)
+        {
+            return;
+        }
+
+        if (!QuickItems.Accepts(stack.Item))
+        {
+            GameMessages.Post("Only things you can use go on the skill bar.", MessageKind.Warning);
+            return;
+        }
+
+        SkillDefinition replaced = skills.Loadout.Get(target.Index);
+        if (skills.Loadout.EquipItem(target.Index, stack.Item))
+        {
+            GameMessages.Post($"{stack.Item.DisplayName} is on the skill bar: {PlayerInputHandler.SkillKeyLabel(target.Index)} uses it"
+                + (replaced != null ? $" ({replaced.DisplayName} went back to the skill book)." : "."), MessageKind.Info);
+        }
+    }
+
+    public void OnSlotClicked(ItemSlotView slot, PointerEventData eventData)
+    {
+    }
+
+    public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData)
+    {
+    }
+
+    public void OnSlotDragged(PointerEventData eventData)
+    {
+    }
+
+    public void OnSlotDragEnded()
+    {
+    }
+
+    public void OnSlotHovered(ItemSlotView slot)
+    {
+    }
+
+    public void OnSlotUnhovered(ItemSlotView slot)
+    {
     }
 
     // Each slot shows the key or button that casts it.

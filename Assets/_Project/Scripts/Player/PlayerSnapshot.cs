@@ -288,6 +288,25 @@ public sealed class PlayerSnapshot
         ItemInventory items = player.GetComponent<ItemInventory>();
         ResourceInventory resourceInventory = player.GetComponent<ResourceInventory>();
         PlayerSkills skills = player.GetComponent<PlayerSkills>();
+        // Putting a saved bag back is not new consumables arriving (they'd fill the bars the save says are empty).
+        if (items == null)
+        {
+            return ApplyRestoring(player, null, resourceInventory, skills);
+        }
+
+        items.BeginRestore();
+        try
+        {
+            return ApplyRestoring(player, items, resourceInventory, skills);
+        }
+        finally
+        {
+            items.EndRestore();
+        }
+    }
+
+    private List<ItemAmount> ApplyRestoring(GameObject player, ItemInventory items, ResourceInventory resourceInventory, PlayerSkills skills)
+    {
         if (skills != null && skillLoadout != null)
         {
             skills.Restore(knownSkills, skillLoadout, skillBarItems);

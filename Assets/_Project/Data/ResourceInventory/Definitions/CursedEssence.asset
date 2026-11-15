@@ -17,20 +17,7 @@ MonoBehaviour:
   category: {fileID: 11400000, guid: e289374eba5676d42a49c5a224658e6d, type: 2}
   tier: 2
   description: Dark, restless magic left behind by cursed creatures. Worthless until it is extracted and purified.
-  weight: 0.1
-  hungerRestore: 0
-  thirstRestore: 0
+  uses: Purified at the Purification Altar into Purified Essence. Raw, it pays for the altar's cursed enchantments (Bloodletting, Greedy, Hollow, Reaping) and brews the Cursed Draught.
   icon: {fileID: 21300000, guid: 6adbc4f37cb0b3b4b9bf65fce80e8231, type: 3}
   color: {r: 0.5, g: 0.2, b: 0.62, a: 1}
   sortOrder: 0
-  gatherTool: 0
-  requiredToolTier: 1
-  gatherAnimation: 2
-  gatherSeconds: 3
-  gatherRange: 1.5
-  minYield: 1
-  maxYield: 3
-  depleteOnGather: 1
-  respawnSeconds: 180
-  worldModelPrefab: {fileID: 0}
-  worldPrefab: {fileID: 0}

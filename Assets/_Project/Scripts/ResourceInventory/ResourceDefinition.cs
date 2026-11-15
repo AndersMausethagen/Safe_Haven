@@ -23,6 +23,8 @@ public sealed class ResourceDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Range(Tiers.Min, Tiers.Max)] private int tier = 1;
     [Tooltip("One or two sentences for tooltips: what it is and what it is good for.")]
     [SerializeField, TextArea] private string description;
+    [Tooltip("What the player spends it on, for its tooltip (the bag's essences): \"Purified at the altar; ...\". Empty: not shown.")]
+    [SerializeField, TextArea] private string uses;
 
     [Header("Inventory UI")]
     [Tooltip("Small picture shown next to the resource's bar.")]
@@ -37,6 +39,8 @@ public sealed class ResourceDefinition : ScriptableObject, IStackDefinition
     public ResourceCategory Category => category;
     public int Tier => tier;
     public string Description => description;
+    /// <summary>What it is spent on, in words for the player; empty when not written.</summary>
+    public string Uses => uses;
     public Sprite Icon => icon;
     public Color Color => color;
     int IStackDefinition.StackSize => int.MaxValue;

@@ -72,6 +72,7 @@ public static class InputRebinds
         new RebindRow("Windows", "World Map", "Player/WorldMap"),
         new RebindRow("Windows", "Command Wheel", "Player/CommandWheel"),
         new RebindRow("Windows", "Quickbar (hold; in the bag: add or remove)", "Player/QuickItems"),
+        new RebindRow("Windows", "Stack Bag onto Chests (inside the ward)", "Player/StackOnStored"),
         new RebindRow("Windows", "Mark for Friends (co-op)", "Player/Ping"),
         new RebindRow("Windows", "Windows Wheel (controller, hold)", "Player/WindowsWheel"),
 

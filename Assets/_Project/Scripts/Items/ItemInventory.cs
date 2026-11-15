@@ -101,6 +101,14 @@ public sealed class ItemInventory : MonoBehaviour
     {
         _ = Container;
         health = GetComponent<Damageable>();
+        Container.SlotChanged += OnStacksChanged;
+        if (SafePocket != null)
+        {
+            SafePocket.SlotChanged += OnStacksChanged;
+        }
+
+        // What the bag starts with is already carried, not an arrival.
+        SyncCarried(announce: false);
     }
 
     /// <summary>Adds as many as fit and returns how many arrived.</summary>
@@ -109,12 +117,10 @@ public sealed class ItemInventory : MonoBehaviour
     /// <summary>The same, for a fish of a length (centimetres), which the bag shows (ItemStack.Size).</summary>
     public int Give(ItemDefinition item, int amount, float size)
     {
-        bool had = Container.Count(item) > 0;
         int added = Container.Add(item, amount, size);
         if (added > 0)
         {
             Received?.Invoke(item, added);
-            QuickOnArrival(item, had);
             GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, item, added, gameObject));
             if (item.IsEquippable)
             {
@@ -143,12 +149,10 @@ public sealed class ItemInventory : MonoBehaviour
             return Give(made.Item, made.Count);
         }
 
-        bool had = Container.Count(made.Item) > 0;
         int added = Container.AddStack(made);
         if (added > 0)
         {
             Received?.Invoke(made.Item, added);
-            QuickOnArrival(made.Item, had);
             GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, made.Item, added, gameObject));
             if (made.Item.IsEquippable && TryGetComponent(out PlayerEquipment equipment))
             {
@@ -159,16 +163,93 @@ public sealed class ItemInventory : MonoBehaviour
         return added;
     }
 
+    // ----- Consumables arriving -----
+
     /// <summary>
-    /// A consumable new to the bag (none were in it) goes on the quickbar when there is room (the user, 2026-11-14). Only on
-    /// arrival: one the player took off the bar stays off while they still carry some.
+    /// A consumable the bag and pocket held none of has arrived, however it came (looted, crafted, bought, taken out of
+    /// storage). PlayerSkills puts it on an empty slot of the skill bar (keys 1-9). Not raised while a saved or carried bag
+    /// is put back (BeginRestore/EndRestore), nor when stacks are only moved around.
     /// </summary>
-    private void QuickOnArrival(ItemDefinition item, bool alreadyCarried)
+    public event Action<ItemDefinition> ConsumableArrived;
+
+    private readonly HashSet<ItemDefinition> carriedConsumables = new HashSet<ItemDefinition>();
+    private readonly HashSet<ItemDefinition> carriedScratch = new HashSet<ItemDefinition>();
+    private readonly List<ItemDefinition> arrivals = new List<ItemDefinition>();
+    private bool carriedDirty;
+    private int restoring;
+
+    /// <summary>A saved or carried bag is being put back: what appears now isn't a new arrival.</summary>
+    public void BeginRestore() => restoring++;
+
+    public void EndRestore()
     {
-        if (!alreadyCarried && item.Category == ItemCategory.Consumable && QuickItems.Accepts(item) && !Quick.Contains(item) && !Quick.IsFull)
+        restoring = Mathf.Max(0, restoring - 1);
+        if (restoring == 0)
+        {
+            SyncCarried(announce: false);
+        }
+    }
+
+    private void OnStacksChanged(int index) => carriedDirty = true;
+
+    // Checked once a frame, after everything that frame has moved: a stack swapped or moved between the bag and the pocket
+    // leaves its slot for a moment, which must not read as gone-and-arrived.
+    private void LateUpdate()
+    {
+        if (carriedDirty && restoring == 0)
+        {
+            SyncCarried(announce: true);
+        }
+    }
+
+    private void SyncCarried(bool announce)
+    {
+        carriedDirty = false;
+        carriedScratch.Clear();
+        CollectConsumables(container, carriedScratch);
+        CollectConsumables(safePocket, carriedScratch);
+        arrivals.Clear();
+        if (announce)
+        {
+            foreach (ItemDefinition item in carriedScratch)
+            {
+                if (!carriedConsumables.Contains(item))
+                {
+                    arrivals.Add(item);
+                }
+            }
+        }
+
+        carriedConsumables.Clear();
+        carriedConsumables.UnionWith(carriedScratch);
+        foreach (ItemDefinition item in arrivals)
+        {
+            OnConsumableArrived(item);
+        }
+    }
+
+    private static void CollectConsumables(ItemContainer from, HashSet<ItemDefinition> into)
+    {
+        for (int i = 0; from != null && i < from.SlotCount; i++)
+        {
+            ItemDefinition item = from.GetSlot(i).Item;
+            if (item != null && item.Category == ItemCategory.Consumable && QuickItems.Accepts(item))
+            {
+                into.Add(item);
+            }
+        }
+    }
+
+    // A consumable new to the bag also goes on the quickbar (hold F) when there is room (the user, 2026-11-14). Only on
+    // arrival: one the player took off a bar stays off while they still carry some.
+    private void OnConsumableArrived(ItemDefinition item)
+    {
+        if (!Quick.Contains(item) && !Quick.IsFull)
         {
             Quick.Toggle(item);
         }
+
+        ConsumableArrived?.Invoke(item);
     }
 
     /// <summary>Offers several items and reports what was stored and what did not fit.</summary>

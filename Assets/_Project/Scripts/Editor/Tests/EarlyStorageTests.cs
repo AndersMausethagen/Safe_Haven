@@ -21,19 +21,73 @@ public sealed class EarlyStorageTests
             }
         }
 
-        GameSession.Stash.Items.SetUnlockedSlots(StashStorage.Columns * StashStorage.Rows);
+        GameSession.Stash.Items.Clear();
+        GameSession.Stash.Items.SetUnlockedSlots(GameSession.Stash.Items.SlotCount);
+    }
+
+    // The user, 2026-11-15: two chests shared one inventory; each has its own now (a block of the stash).
+    [Test]
+    public void EachChestKeepsItsOwnItems()
+    {
+        // Loaded together, as a save's chests are: the biggest takes the first block.
+        small = Chest("Small", 12, start: false);
+        big = Chest("Shed", 0, start: false);
+        StashChest smallChest = small.GetComponent<StashChest>(), shed = big.GetComponent<StashChest>();
+        Invoke(smallChest, "Start");
+        Invoke(shed, "Start");
+        Invoke(smallChest, "LateUpdate");
+        Assert.AreEqual(0, shed.Block, "the biggest chest takes the first block (an old save's whole stash)");
+        Assert.AreEqual(1, smallChest.Block);
+        Assert.AreEqual(12 + StashStorage.ChestSlots, GameSession.Stash.Items.UnlockedSlots, "the chests' room adds up");
+
+        var berries = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Berries.asset");
+        var bag = new ItemContainer(4, 1);
+        bag.Add(berries, 7);
+        Assert.AreEqual(7, GameSession.Stash.Store(bag, 0, null, smallChest.Block));
+        Assert.AreEqual(7, Held(smallChest, berries), "stored in the chest it was put in");
+        Assert.AreEqual(0, Held(shed, berries), "not in the other one");
+        Assert.AreEqual(7, GameSession.Stash.Items.Count(berries), "crafting and workers still see all chests together");
+
+        Invoke(smallChest, "OnDisable");
+        Assert.AreEqual(StashStorage.ChestSlots, GameSession.Stash.Items.UnlockedSlots, "a chest that is gone closes its block");
+        Assert.AreEqual(7, GameSession.Stash.Items.Count(berries), "and keeps what was in it");
+        Invoke(smallChest, "OnEnable");
+        Assert.AreEqual(1, smallChest.Block, "a chest keeps its block");
     }
 
     [Test]
-    public void TheBiggestChestStandingDecidesTheStashSize()
+    public void QuickStackSendsWhatChestsHoldToThem()
     {
         small = Chest("Small", 12);
-        Assert.AreEqual(12, GameSession.Stash.Items.UnlockedSlots);
         big = Chest("Shed", 0);
-        Assert.AreEqual(StashStorage.Columns * StashStorage.Rows, GameSession.Stash.Items.UnlockedSlots, "a shed opens all of it");
-        Invoke(big.GetComponent<StashChest>(), "OnDisable");
-        Object.DestroyImmediate(big);
-        Assert.AreEqual(12, GameSession.Stash.Items.UnlockedSlots);
+        StashChest smallChest = small.GetComponent<StashChest>(), shed = big.GetComponent<StashChest>();
+        var berries = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Berries.asset");
+        var sticks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Sticks.asset");
+        var stew = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StewedBerries.asset");
+        GameSession.Stash.Items.AddWithin(berries, 2, 0f, smallChest.FirstSlot, StashStorage.ChestSlots);
+        GameSession.Stash.Items.AddWithin(stew, 1, 0f, shed.FirstSlot, StashStorage.ChestSlots);
+        var bag = new ItemContainer(4, 1);
+        bag.Add(berries, 5);
+        bag.Add(sticks, 3);
+        bag.Add(stew, 2);
+
+        int moved = GameSession.Stash.StackOnStored(bag, stack => stack.Item == stew);
+        Assert.AreEqual(5, moved);
+        Assert.AreEqual(7, Held(smallChest, berries), "onto the chest that already holds berries");
+        Assert.AreEqual(3, bag.Count(sticks), "no chest holds sticks, so they stay");
+        Assert.AreEqual(2, bag.Count(stew), "what the bars hold stays with the player");
+    }
+
+    private static int Held(StashChest chest, ItemDefinition item)
+    {
+        int count = 0;
+        for (int i = chest.FirstSlot; i < chest.FirstSlot + StashStorage.ChestSlots; i++)
+        {
+            ItemStack stack = GameSession.Stash.Items.GetSlot(i);
+            count += stack.Item == item ? stack.Count : 0;
+        }
+
+        return count;
     }
 
     [Test]
@@ -61,7 +115,7 @@ public sealed class EarlyStorageTests
         Assert.Less(recipe.Output.CarryCapacityBonus, satchel.CarryCapacityBonus, "the satchel is still the better pack");
     }
 
-    private static GameObject Chest(string name, int slots)
+    private static GameObject Chest(string name, int slots, bool start = true)
     {
         var go = new GameObject(name);
         go.AddComponent<Interactable>();
@@ -71,6 +125,12 @@ public sealed class EarlyStorageTests
         data.ApplyModifiedPropertiesWithoutUndo();
         Invoke(chest, "Awake");
         Invoke(chest, "OnEnable");
+        if (start)
+        {
+            Invoke(chest, "Start");
+            Invoke(chest, "LateUpdate");
+        }
+
         return go;
     }
 

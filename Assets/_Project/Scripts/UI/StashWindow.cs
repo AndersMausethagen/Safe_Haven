@@ -7,14 +7,16 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// The stash, opened at the stash chest in Safe Haven: the bag on one side and the stash on the other. Click a stack to
-/// move it across; raw resources move all at once with the buttons. What is in the stash stays home during raids, so a
-/// failed raid can't take it. The bag side shows the player's ItemInventory and ResourceInventory, the stash side the
-/// GameSession's stash. It closes when the player walks away from the chest.
+/// The stash, opened at a stash chest in Safe Haven: the bag on one side and that chest on the other. Click a stack to
+/// move it across, or drag it onto a slot on either side (the user, 2026-11-15); raw resources move all at once with the
+/// buttons. What is in the stash stays home during raids, so a failed raid can't take it. The bag side shows the player's
+/// ItemInventory and ResourceInventory, the chest side its own block of the GameSession's stash (StashChest.Block). It
+/// closes when the player walks away from the chest.
 /// </summary>
 public sealed partial class StashWindow : MonoBehaviour
 {
-    // One grid of slots showing one container. Clicking a stack sends it to the other grid.
+    // One grid of slots showing one container, or one chest's block of it (First, Count). Clicking a stack sends it to
+    // the other grid; dragging drops it on a slot of either. Indexes passed to the window are the container's own.
     private sealed class Grid : IItemSlotHandler
     {
         private readonly StashWindow owner;
@@ -29,13 +31,26 @@ public sealed partial class StashWindow : MonoBehaviour
 
         public ItemContainer Container { get; private set; }
 
-        public void Show(ItemContainer container)
+        /// <summary>The container's first slot shown here.</summary>
+        public int First { get; private set; }
+
+        /// <summary>How many of the container's slots are shown, from First.</summary>
+        public int Count => views.Count;
+
+        // A chest's grid leaves out the locked slots past its size, unless something is kept in one.
+        private bool hideLockedEmpty;
+
+        public void Show(ItemContainer container) => Show(container, 0, container.SlotCount, false);
+
+        public void Show(ItemContainer container, int first, int count, bool hideLocked)
         {
             Hide();
             Container = container;
+            First = first;
+            hideLockedEmpty = hideLocked;
             container.SlotChanged += OnSlotChanged;
             container.LayoutChanged += ShowAll;
-            if (views.Count != container.SlotCount)
+            if (views.Count != count)
             {
                 for (int i = root.childCount - 1; i >= 0; i--)
                 {
@@ -50,7 +65,7 @@ public sealed partial class StashWindow : MonoBehaviour
                     layout.constraintCount = container.Columns;
                 }
 
-                for (int i = 0; i < container.SlotCount; i++)
+                for (int i = 0; i < count; i++)
                 {
                     ItemSlotView view = Object.Instantiate(owner.slotPrefab, root);
                     view.name = "Slot " + i;
@@ -66,10 +81,22 @@ public sealed partial class StashWindow : MonoBehaviour
         {
             for (int i = 0; i < views.Count; i++)
             {
-                views[i].Show(Container.GetSlot(i), !Container.IsUnlocked(i));
+                ShowSlot(i);
             }
 
             owner.Compacted(Container, views, root);
+        }
+
+        private void ShowSlot(int view)
+        {
+            int index = First + view;
+            ItemStack stack = Container.GetSlot(index);
+            bool locked = !Container.IsUnlocked(index);
+            views[view].Show(stack, locked);
+            if (hideLockedEmpty && views[view].gameObject.activeSelf != (!locked || !stack.IsEmpty))
+            {
+                views[view].gameObject.SetActive(!locked || !stack.IsEmpty);
+            }
         }
 
         public void Hide()
@@ -84,12 +111,14 @@ public sealed partial class StashWindow : MonoBehaviour
 
         private void OnSlotChanged(int index)
         {
-            if (index >= 0 && index < views.Count)
+            int view = index - First;
+            if (view < 0 || view >= views.Count)
             {
-                views[index].Show(Container.GetSlot(index), !Container.IsUnlocked(index));
-                owner.Compacted(Container, views, root);
+                return;
             }
 
+            ShowSlot(view);
+            owner.Compacted(Container, views, root);
             owner.OnSlotChanged(this, index);
         }
 
@@ -97,30 +126,21 @@ public sealed partial class StashWindow : MonoBehaviour
         {
             if (!eventData.dragging && eventData.button == PointerEventData.InputButton.Left)
             {
-                owner.Transfer(this, slot.Index);
+                owner.Transfer(this, First + slot.Index);
             }
         }
 
-        public void OnSlotHovered(ItemSlotView slot) => owner.ShowTooltip(this, slot.Index);
+        public void OnSlotHovered(ItemSlotView slot) => owner.ShowTooltip(this, First + slot.Index);
 
-        public void OnSlotUnhovered(ItemSlotView slot) => owner.HideTooltip(this, slot.Index);
+        public void OnSlotUnhovered(ItemSlotView slot) => owner.HideTooltip(this, First + slot.Index);
 
-        // Stacks move with a click here; dragging does nothing.
-        public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData)
-        {
-        }
+        public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData) => owner.BeginDrag(this, First + slot.Index, eventData);
 
-        public void OnSlotDragged(PointerEventData eventData)
-        {
-        }
+        public void OnSlotDragged(PointerEventData eventData) => owner.MoveDragIcon(eventData);
 
-        public void OnSlotDropped(ItemSlotView target)
-        {
-        }
+        public void OnSlotDropped(ItemSlotView target) => owner.DropOn(this, First + target.Index);
 
-        public void OnSlotDragEnded()
-        {
-        }
+        public void OnSlotDragEnded() => owner.EndDrag();
     }
 
     [SerializeField] private UIWindow window;
@@ -190,7 +210,7 @@ public sealed partial class StashWindow : MonoBehaviour
         chest = source;
         player = user;
         bag.Show(items.Container);
-        stash.Show(GameSession.Stash.Items);
+        ShowChest();
         BuildKit();
         bag.Show(items.Container);
 
@@ -212,6 +232,100 @@ public sealed partial class StashWindow : MonoBehaviour
         window.Close();
     }
 
+    // This chest's own block of the stash: its slots, and any locked slot of the block that still keeps something.
+    private void ShowChest()
+    {
+        stash.Show(GameSession.Stash.Items, chest.FirstSlot, StashStorage.ChestSlots, true);
+    }
+
+    // ----- Dragging between the bag and the chest -----
+
+    private Image dragIcon;
+    private bool dragging;
+
+    private void BeginDrag(Grid grid, int index, PointerEventData eventData)
+    {
+        ItemStack stack = grid.Container != null ? grid.Container.GetSlot(index) : ItemStack.Empty;
+        if (eventData.button != PointerEventData.InputButton.Left || stack.IsEmpty)
+        {
+            return;
+        }
+
+        dragging = true;
+        ItemDrag.Begin(grid.Container, index);
+        Image icon = DragIcon();
+        icon.sprite = stack.Item.Icon;
+        icon.gameObject.SetActive(stack.Item.Icon != null);
+        icon.transform.SetAsLastSibling();
+        tooltip.Hide();
+        MoveDragIcon(eventData);
+    }
+
+    private void MoveDragIcon(PointerEventData eventData)
+    {
+        if (!dragging || dragIcon == null)
+        {
+            return;
+        }
+
+        var area = (RectTransform)dragIcon.rectTransform.parent;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(area, eventData.position, eventData.pressEventCamera, out Vector2 local);
+        dragIcon.rectTransform.anchoredPosition = local;
+    }
+
+    private void DropOn(Grid grid, int index)
+    {
+        if (!ItemDrag.Active || grid.Container == null)
+        {
+            return;
+        }
+
+        ItemContainer source = ItemDrag.Source;
+        int from = ItemDrag.Index;
+        ItemStack moving = source.GetSlot(from);
+        if (ItemDrag.DropOn(grid.Container, index) && grid == stash && source != stash.Container && !moving.IsEmpty)
+        {
+            // Put away by hand, as a click would: a quest can ask for it ("A Safe Place").
+            ItemStack left = source.GetSlot(from);
+            int moved = left.Item == moving.Item ? moving.Count - left.Count : moving.Count;
+            if (moved > 0)
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.Stored, moving.Item, moved, player));
+            }
+        }
+    }
+
+    private void EndDrag()
+    {
+        if (dragging)
+        {
+            ItemDrag.End();
+        }
+
+        dragging = false;
+        if (dragIcon != null)
+        {
+            dragIcon.gameObject.SetActive(false);
+        }
+    }
+
+    // Made on first use, over everything in the window, never in the way of the pointer.
+    private Image DragIcon()
+    {
+        if (dragIcon == null)
+        {
+            var rect = (RectTransform)new GameObject("Drag Icon", typeof(RectTransform)).transform;
+            rect.SetParent(transform, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(56f, 56f);
+            dragIcon = rect.gameObject.AddComponent<Image>();
+            dragIcon.raycastTarget = false;
+            dragIcon.preserveAspect = true;
+        }
+
+        return dragIcon;
+    }
+
     private void OnOpenChanged(bool open)
     {
         if (!open)
@@ -231,6 +345,7 @@ public sealed partial class StashWindow : MonoBehaviour
         }
 
         GameSession.Stash.Resources.Changed -= OnResourcesChanged;
+        EndDrag();
         hoveredGrid = null;
         hoveredIndex = -1;
         chest = null;
@@ -249,7 +364,7 @@ public sealed partial class StashWindow : MonoBehaviour
             return;
         }
 
-        int moved = to == stash ? GameSession.Stash.Store(from.Container, index, player) : from.Container.TransferTo(index, to.Container);
+        int moved = to == stash ? GameSession.Stash.Store(from.Container, index, player, chest.Block) : from.Container.TransferTo(index, to.Container);
         if (moved == 0)
         {
             GameMessages.Post(to == stash ? "Storage is full." : "No room in the bag.", MessageKind.Warning);
@@ -287,7 +402,7 @@ public sealed partial class StashWindow : MonoBehaviour
     private void StoreResources()
     {
         int moved = GameSession.Stash.StoreResources(carried, player);
-        moved += GameSession.Stash.StoreMaterials(bag.Container, player);
+        moved += GameSession.Stash.StoreMaterials(bag.Container, player, chest.Block);
         GameMessages.Post(moved > 0 ? $"Stored {moved} materials." : "You carry no materials.", moved > 0 ? MessageKind.Info : MessageKind.Warning);
     }
 

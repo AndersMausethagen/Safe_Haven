@@ -145,6 +145,10 @@ public sealed class CommandWheel : MonoBehaviour
         bool mounted = riding != null && riding.IsRiding;
         choices.Add(new Choice("Light", () => GetComponent<PlayerInputHandler>()?.ToggleLight()));
         choices.Add(new Choice(mounted ? "Get down" : "Whistle", () => GameInput.Press(GameInput.Whistle)));
+        if (StashQuickStack.CanStack(player != null ? player.gameObject : null))
+        {
+            choices.Add(new Choice("Stack onto chests", () => StashQuickStack.Stack(player.gameObject)));
+        }
         if (mounted)
         {
             choices.Add(new Choice("Rear and strike", () => GameInput.Press(GameInput.HorseKick)));

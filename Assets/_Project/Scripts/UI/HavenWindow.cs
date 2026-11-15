@@ -350,9 +350,9 @@ public sealed class HavenWindow : MonoBehaviour
 
         ItemContainer stash = GameSession.Stash.Items;
         int used = 0;
-        for (int i = 0; i < stash.UnlockedSlots; i++)
+        for (int i = 0; i < stash.SlotCount; i++)
         {
-            if (!stash.GetSlot(i).IsEmpty)
+            if (stash.IsUnlocked(i) && !stash.GetSlot(i).IsEmpty)
             {
                 used++;
             }

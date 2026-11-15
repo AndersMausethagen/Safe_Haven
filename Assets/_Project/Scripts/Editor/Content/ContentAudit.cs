@@ -190,9 +190,16 @@ public static class ContentAudit
             && !(r.Field == "RecipeDefinition.output" && unlearnable.Contains(Path.GetFileNameWithoutExtension(r.From)))).Select(r => r.Target));
         string scenes = string.Concat(Scenes.Where(File.Exists).Select(File.ReadAllText));
         return Index().Where(r => r.Kind == "Item" && Is(r.Field, ItemUses)).GroupBy(r => r.Target)
-            .Where(asked => !sources.Contains(asked.Key) && !scenes.Contains(AssetDatabase.AssetPathToGUID(asked.Key)))
+            .Where(asked => !sources.Contains(asked.Key) && !scenes.Contains(AssetDatabase.AssetPathToGUID(asked.Key)) && !IsWaterMeasure(asked.Key))
             .Select(asked => $"{Path.GetFileNameWithoutExtension(asked.Key)}: asked for by {string.Join(", ", asked.Select(r => Path.GetFileNameWithoutExtension(r.From)).Distinct().Take(4))}, given by nothing")
             .ToList();
+    }
+
+    // Water as a recipe cost is had in waterskins (filled at water), not given as an item.
+    private static bool IsWaterMeasure(string path)
+    {
+        ItemDefinition item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(path);
+        return item != null && item.IsWaterMeasure;
     }
 
     /// <summary>Monsters a quest, the journal or a raid names that have no body (prefab), or whose body nothing spawns.</summary>

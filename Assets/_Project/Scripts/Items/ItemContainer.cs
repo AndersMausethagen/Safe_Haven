@@ -18,6 +18,9 @@ public sealed class ItemContainer
     private readonly ItemStack[] slots;
     private readonly Dictionary<object, float> weightBonuses = new Dictionary<object, float>();
     private int unlockedSlots;
+    // Null: the first unlockedSlots are open. Otherwise exactly the slots marked true (storage made of several chests).
+    private bool[] openMask;
+    private int openCount;
     private float baseWeightCapacity;
     private float currentWeight;
 
@@ -37,7 +40,10 @@ public sealed class ItemContainer
     /// How many slots, from the front, can receive items. The rest are locked: they keep what they hold (so a smaller
     /// backpack never destroys anything) but nothing new goes in. All slots are unlocked unless SetUnlockedSlots says less.
     /// </summary>
-    public int UnlockedSlots => unlockedSlots;
+    public int UnlockedSlots => openMask == null ? unlockedSlots : openCount;
+
+    // Loops over open slots run to here and skip what IsUnlocked refuses.
+    private int OpenEnd => openMask == null ? unlockedSlots : slots.Length;
 
     /// <summary>Raised after a slot's content changes, with the slot's index.</summary>
     public event Action<int> SlotChanged;
@@ -150,18 +156,47 @@ public sealed class ItemContainer
 
     public bool IsUnlocked(int index)
     {
-        return index >= 0 && index < unlockedSlots;
+        return index >= 0 && (openMask != null ? index < slots.Length && openMask[index] : index < unlockedSlots);
     }
 
     public void SetUnlockedSlots(int count)
     {
         count = Mathf.Clamp(count, 0, slots.Length);
-        if (count == unlockedSlots)
+        if (count == unlockedSlots && openMask == null)
         {
             return;
         }
 
+        openMask = null;
         unlockedSlots = count;
+        LayoutChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// Opens exactly the slots the mask marks (one entry per slot; missing entries are locked), for storage made of
+    /// several chests that each hold a block of slots. SetUnlockedSlots goes back to counting from the front.
+    /// </summary>
+    public void SetUnlockedMask(IReadOnlyList<bool> mask)
+    {
+        bool same = openMask != null;
+        for (int i = 0; same && i < slots.Length; i++)
+        {
+            same = openMask[i] == (mask != null && i < mask.Count && mask[i]);
+        }
+
+        if (same)
+        {
+            return;
+        }
+
+        openMask ??= new bool[slots.Length];
+        openCount = 0;
+        for (int i = 0; i < slots.Length; i++)
+        {
+            openMask[i] = mask != null && i < mask.Count && mask[i];
+            openCount += openMask[i] ? 1 : 0;
+        }
+
         LayoutChanged?.Invoke();
     }
 
@@ -171,6 +206,11 @@ public sealed class ItemContainer
         if (item == null)
         {
             return count;
+        }
+
+        if (item.IsWaterMeasure)
+        {
+            return Mathf.FloorToInt(WaterHeld() + 0.001f);
         }
 
         foreach (ItemStack stack in slots)
@@ -193,6 +233,11 @@ public sealed class ItemContainer
             return count;
         }
 
+        if (item.IsWaterMeasure)
+        {
+            return Count(item);
+        }
+
         foreach (ItemStack stack in slots)
         {
             if (stack.Item == item && stack.Quality >= least)
@@ -213,6 +258,11 @@ public sealed class ItemContainer
         if (item == null || amount <= 0)
         {
             return 0;
+        }
+
+        if (item.IsWaterMeasure)
+        {
+            return DrainWater(amount);
         }
 
         int remaining = amount;
@@ -243,9 +293,19 @@ public sealed class ItemContainer
             return 0;
         }
 
-        int space = 0;
-        for (int i = 0; i < unlockedSlots; i++)
+        if (item.IsWaterMeasure)
         {
+            return Mathf.FloorToInt(WaterRoom() + 0.001f);
+        }
+
+        int space = 0;
+        for (int i = 0; i < OpenEnd; i++)
+        {
+            if (!IsUnlocked(i))
+            {
+                continue;
+            }
+
             ItemStack stack = slots[i];
             if (stack.IsEmpty && CanHold(i, item))
             {
@@ -267,18 +327,30 @@ public sealed class ItemContainer
     public int Add(ItemDefinition item, int amount) => Add(item, amount, 0f);
 
     /// <summary>The same, for fish of a length (centimetres): a stack keeps the biggest one's (ItemStack.Size).</summary>
-    public int Add(ItemDefinition item, int amount, float size)
+    public int Add(ItemDefinition item, int amount, float size) => AddWithin(item, amount, size, 0, slots.Length);
+
+    /// <summary>
+    /// Add, but only into slots first to first + count - 1 (one chest's block of a storage made of several).
+    /// </summary>
+    public int AddWithin(ItemDefinition item, int amount, float size, int first, int count)
     {
+        if (item != null && item.IsWaterMeasure)
+        {
+            return PourWater(amount);
+        }
+
         amount = item != null ? Mathf.Min(amount, FitsByWeight(item)) : 0;
         if (item == null || amount <= 0)
         {
             return 0;
         }
 
+        int start = Mathf.Max(0, first);
+        int end = Mathf.Min(OpenEnd, first + count);
         int remaining = amount;
-        for (int i = 0; i < unlockedSlots && remaining > 0; i++)
+        for (int i = start; i < end && remaining > 0; i++)
         {
-            if (slots[i].Item == item && slots[i].SpaceLeft > 0)
+            if (IsUnlocked(i) && slots[i].Item == item && slots[i].SpaceLeft > 0)
             {
                 int added = Mathf.Min(slots[i].SpaceLeft, remaining);
                 Set(i, new ItemStack(item, slots[i].Count + added).WithSize(Mathf.Max(slots[i].Size, size)));
@@ -286,9 +358,9 @@ public sealed class ItemContainer
             }
         }
 
-        for (int i = 0; i < unlockedSlots && remaining > 0; i++)
+        for (int i = start; i < end && remaining > 0; i++)
         {
-            if (slots[i].IsEmpty && CanHold(i, item))
+            if (IsUnlocked(i) && slots[i].IsEmpty && CanHold(i, item))
             {
                 int added = Mathf.Min(item.MaximumStack, remaining);
                 Set(i, new ItemStack(item, added).WithSize(size));
@@ -310,6 +382,11 @@ public sealed class ItemContainer
             return 0;
         }
 
+        if (item.IsWaterMeasure)
+        {
+            return DrainWater(amount);
+        }
+
         int remaining = amount;
         for (int i = slots.Length - 1; i >= 0 && remaining > 0; i--)
         {
@@ -320,6 +397,70 @@ public sealed class ItemContainer
         }
 
         return amount - remaining;
+    }
+
+    // ----- Water as a measure (ItemDefinition.IsWaterMeasure): the water in the containers here -----
+
+    /// <summary>All the water in the water containers here.</summary>
+    public float WaterHeld()
+    {
+        float water = 0f;
+        foreach (ItemStack stack in slots)
+        {
+            water += stack.Water;
+        }
+
+        return water;
+    }
+
+    private float WaterRoom()
+    {
+        float room = 0f;
+        foreach (ItemStack stack in slots)
+        {
+            room += !stack.IsEmpty && stack.Item.HoldsWater ? stack.Item.WaterCapacity - stack.Water : 0f;
+        }
+
+        return room;
+    }
+
+    // Takes water from the containers, the last slots first (as Remove takes items); each keeps what is left in it.
+    private int DrainWater(int amount)
+    {
+        float remaining = amount;
+        for (int i = slots.Length - 1; i >= 0 && remaining > 0.001f; i--)
+        {
+            float water = slots[i].Water;
+            if (water > 0.001f)
+            {
+                float taken = Mathf.Min(water, remaining);
+                Set(i, slots[i].WithWater(water - taken));
+                remaining -= taken;
+            }
+        }
+
+        return amount - Mathf.CeilToInt(remaining - 0.001f);
+    }
+
+    // Pours water back into the containers that have room (a refund), the first slots first.
+    private int PourWater(int amount)
+    {
+        float remaining = amount;
+        for (int i = 0; i < slots.Length && remaining > 0.001f; i++)
+        {
+            ItemStack stack = slots[i];
+            if (!stack.IsEmpty && stack.Item.HoldsWater)
+            {
+                float poured = Mathf.Min(stack.Item.WaterCapacity - stack.Water, remaining);
+                if (poured > 0.001f)
+                {
+                    Set(i, stack.WithWater(stack.Water + poured));
+                    remaining -= poured;
+                }
+            }
+        }
+
+        return amount - Mathf.CeilToInt(remaining - 0.001f);
     }
 
     /// <summary>Removes up to the amount from one slot. Returns how many were removed.</summary>
@@ -375,7 +516,10 @@ public sealed class ItemContainer
     /// Puts a whole stack, durability (or a water container's level) included, into the first free unlocked slot, topping up equal stacks first when it
     /// stacks. Returns how many arrived. Use it to move existing gear; Add makes new items.
     /// </summary>
-    public int AddStack(ItemStack stack)
+    public int AddStack(ItemStack stack) => AddStackWithin(stack, 0, slots.Length);
+
+    /// <summary>AddStack, but only into slots first to first + count - 1.</summary>
+    public int AddStackWithin(ItemStack stack, int first, int count)
     {
         if (stack.IsEmpty)
         {
@@ -384,10 +528,10 @@ public sealed class ItemContainer
 
         if (!stack.Item.KeepsCondition)
         {
-            return Add(stack.Item, stack.Count, stack.Size);
+            return AddWithin(stack.Item, stack.Count, stack.Size, first, count);
         }
 
-        int empty = FirstEmptySlotFor(stack.Item);
+        int empty = FirstEmptySlotFor(stack.Item, first, count);
         if (empty < 0 || !CanTakeWeight(WeightOf(stack)))
         {
             return 0;
@@ -401,7 +545,10 @@ public sealed class ItemContainer
     /// Moves as much of one slot's stack as fits into another container (bag to stash, say). What doesn't fit stays in the
     /// slot. Returns how many were moved.
     /// </summary>
-    public int TransferTo(int index, ItemContainer target)
+    public int TransferTo(int index, ItemContainer target) => target != null ? TransferTo(index, target, 0, target.SlotCount) : 0;
+
+    /// <summary>TransferTo, into the target's slots first to first + count - 1 only (one chest of the stash).</summary>
+    public int TransferTo(int index, ItemContainer target, int first, int count)
     {
         ItemStack stack = GetSlot(index);
         if (target == null || target == this || stack.IsEmpty)
@@ -409,7 +556,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        int moved = stack.Item.KeepsCondition ? target.AddStack(stack) : target.Add(stack.Item, stack.Count, stack.Size);
+        int moved = stack.Item.KeepsCondition ? target.AddStackWithin(stack, first, count) : target.AddWithin(stack.Item, stack.Count, stack.Size, first, count);
         if (moved > 0)
         {
             RemoveAt(index, moved);
@@ -513,11 +660,15 @@ public sealed class ItemContainer
     public int FirstEmptySlot() => FirstEmptySlotFor(null);
 
     /// <summary>The first empty unlocked slot whose rule takes the item, or -1.</summary>
-    public int FirstEmptySlotFor(ItemDefinition item)
+    public int FirstEmptySlotFor(ItemDefinition item) => FirstEmptySlotFor(item, 0, slots.Length);
+
+    /// <summary>The first empty unlocked slot from first to first + count - 1 whose rule takes the item, or -1.</summary>
+    public int FirstEmptySlotFor(ItemDefinition item, int first, int count)
     {
-        for (int i = 0; i < unlockedSlots; i++)
+        int end = Mathf.Min(OpenEnd, first + count);
+        for (int i = Mathf.Max(0, first); i < end; i++)
         {
-            if (slots[i].IsEmpty && CanHold(i, item))
+            if (IsUnlocked(i) && slots[i].IsEmpty && CanHold(i, item))
             {
                 return i;
             }
