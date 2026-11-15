@@ -19,11 +19,12 @@ MonoBehaviour:
   tier: 2
   rarity: 0
   value: 34
+  gearScoreOverride: 0
   icon: {fileID: 21300000, guid: dca01c8b4110a6f4680c71bb32f586bc, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 2303267275556148562, guid: 4cb587361dd16e74ab0f5d1020c1effc, type: 3}
-  heldPosition: {x: 0, y: 0, z: 0}
-  heldRotation: {x: 0, y: 0, z: 0}
+  heldPosition: {x: 0.007013456, y: 0.0010845533, z: 0.018698534}
+  heldRotation: {x: 3.1085417, y: 200.56009, z: 162.98285}
   heldScale: 1
   stackable: 0
   maximumStack: 99
@@ -35,13 +36,21 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
   boonBonuses: []
   boonSeconds: 300
   tonic: 0
   cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
+  wornLook: {fileID: 0}
   statBonuses:
   - stat: 7
     op: 0
@@ -49,4 +58,16 @@ MonoBehaviour:
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  learnedAtHome: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
   raidModifier: {fileID: 0}
