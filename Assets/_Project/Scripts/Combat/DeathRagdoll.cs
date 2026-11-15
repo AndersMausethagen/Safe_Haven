@@ -319,18 +319,17 @@ public sealed class DeathRagdoll : MonoBehaviour
         var shape = new Bounds();
         foreach (SkinnedMeshRenderer skin in GetComponentsInChildren<SkinnedMeshRenderer>())
         {
-            if (OutlineCopies.IsCopy(skin) || !skin.enabled || !BodyCutter.Split(skin, limb, out Mesh piece, out Mesh rest))
+            // The body keeps its own skin (the limb folds away below), so only the piece is cut out.
+            if (OutlineCopies.IsCopy(skin) || !skin.enabled || !BodyCutter.Split(skin, limb, out Mesh piece, out _, false))
             {
                 continue;
             }
 
-            Object.Destroy(rest);
             bakedMeshes.Add(piece);
             var part = new GameObject(skin.name, typeof(MeshFilter), typeof(MeshRenderer));
-            part.transform.SetParent(root.transform, true);
-            part.transform.SetPositionAndRotation(skin.transform.position, skin.transform.rotation);
-            // The baked mesh is in the skin's parent's units (BodyCutter.Split).
-            part.transform.localScale = skin.transform.parent != null ? skin.transform.parent.lossyScale : Vector3.one;
+            // The baked mesh is in the skin's own space, its scale included (BodyCutter.Split). Placed at the parent's scale, a
+            // Mixamo troll's arm (its 0.01 on the skin) flew off 70 m across with a box collider as big: the lag of a cut.
+            BodyCutter.PlaceLike(part.transform, skin, root.transform);
             part.GetComponent<MeshFilter>().sharedMesh = piece;
             part.GetComponent<MeshRenderer>().sharedMaterials = skin.sharedMaterials;
             Bounds inRoot = TransformBounds(piece.bounds, part.transform, root.transform);
@@ -702,8 +701,7 @@ public sealed class DeathRagdoll : MonoBehaviour
                 foreach ((Mesh mesh, string label) in new[] { (cutRest, skin.name), (cutPiece, skin.name + " (cut off)") })
                 {
                     var made = new GameObject(label, typeof(MeshFilter), typeof(MeshRenderer));
-                    made.transform.SetParent(skin.transform.parent, false);
-                    made.transform.SetPositionAndRotation(skin.transform.position, skin.transform.rotation);
+                    BodyCutter.PlaceLike(made.transform, skin, skin.transform.parent);
                     made.GetComponent<MeshFilter>().sharedMesh = mesh;
                     made.GetComponent<MeshRenderer>().sharedMaterials = skin.sharedMaterials;
                 }
@@ -716,8 +714,7 @@ public sealed class DeathRagdoll : MonoBehaviour
             skin.BakeMesh(baked, true);
             bakedMeshes.Add(baked);
             var piece = new GameObject(skin.name, typeof(MeshFilter), typeof(MeshRenderer));
-            piece.transform.SetParent(skin.transform.parent, false);
-            piece.transform.SetPositionAndRotation(skin.transform.position, skin.transform.rotation);
+            BodyCutter.PlaceLike(piece.transform, skin, skin.transform.parent);
             piece.GetComponent<MeshFilter>().sharedMesh = baked;
             piece.GetComponent<MeshRenderer>().sharedMaterials = skin.sharedMaterials;
             skin.enabled = false;

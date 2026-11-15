@@ -14,10 +14,12 @@ public static class BodyCutter
 
     /// <summary>
     /// Splits <paramref name="skin"/>, as posed now, into the triangles that move with <paramref name="limb"/> (it and its
-    /// children) and the rest. Both meshes are in the skin's own space (its position and rotation, scale applied), with
-    /// the skin's submeshes, so they take its materials. False when the skin has no weights or nothing of it is the limb's.
+    /// children) and the rest. Both meshes are in the skin's own space (place them with the skin's world position, rotation
+    /// and lossy scale: <see cref="PlaceLike"/>), with the skin's submeshes, so they take its materials. False when the skin has no weights or nothing of it is the limb's.
+    /// With <paramref name="wantRest"/> false only the piece is built (<paramref name="rest"/> stays null): a humanoid keeps
+    /// its own skin and folds the limb away, so the rest would be thrown away at once.
     /// </summary>
-    public static bool Split(SkinnedMeshRenderer skin, Transform limb, out Mesh piece, out Mesh rest)
+    public static bool Split(SkinnedMeshRenderer skin, Transform limb, out Mesh piece, out Mesh rest, bool wantRest = true)
     {
         piece = null;
         rest = null;
@@ -59,41 +61,55 @@ public static class BodyCutter
         bool[] cut = source.isReadable && source.boneWeights.Length == source.vertexCount
             ? ByWeights(source.boneWeights, cutBones)
             : ByNearestBone(baked, skin, bones, cutBones);
-        piece = Copy(baked, source.name + " (cut off)");
-        rest = Copy(baked, source.name + " (left)");
+        // The triangles each half keeps, per submesh, decided before any mesh is made: nothing is copied for a cut that misses.
+        var mine = new List<int>[baked.subMeshCount];
+        var theirs = new List<int>[baked.subMeshCount];
         int inPiece = 0;
         for (int sub = 0; sub < baked.subMeshCount; sub++)
         {
             int[] triangles = baked.GetTriangles(sub);
-            var mine = new List<int>();
-            var theirs = new List<int>();
+            mine[sub] = new List<int>();
+            theirs[sub] = wantRest ? new List<int>(triangles.Length) : null;
             for (int t = 0; t + 2 < triangles.Length; t += 3)
             {
                 int votes = (cut[triangles[t]] ? 1 : 0) + (cut[triangles[t + 1]] ? 1 : 0) + (cut[triangles[t + 2]] ? 1 : 0);
-                List<int> into = votes >= 2 ? mine : theirs;
+                List<int> into = votes >= 2 ? mine[sub] : theirs[sub];
+                if (into == null)
+                {
+                    continue;
+                }
+
                 into.Add(triangles[t]);
                 into.Add(triangles[t + 1]);
                 into.Add(triangles[t + 2]);
             }
 
-            piece.SetTriangles(mine, sub, false);
-            rest.SetTriangles(theirs, sub, false);
-            inPiece += mine.Count;
+            inPiece += mine[sub].Count;
         }
 
-        Object.Destroy(baked);
-        // Only the vertices each half uses: its bounds (and so the piece's collider and weight) are its own, not the body's.
-        piece = Compact(piece);
-        rest = Compact(rest);
         if (inPiece == 0)
         {
-            Object.Destroy(piece);
-            Object.Destroy(rest);
-            piece = rest = null;
+            Object.Destroy(baked);
             return false;
         }
 
+        // Only the vertices each half uses: its bounds (and so the piece's collider and weight) are its own, not the body's.
+        var data = new MeshData(baked);
+        Object.Destroy(baked);
+        piece = Compact(data, mine, source.name + " (cut off)");
+        rest = wantRest ? Compact(data, theirs, source.name + " (left)") : null;
         return true;
+    }
+
+    /// <summary>Puts <paramref name="piece"/> under <paramref name="parent"/> where <paramref name="skin"/> is, at its world
+    /// scale, so a mesh baked from that skin shows as it was. The parent must not be skewed (a plain corpse or bone).</summary>
+    public static void PlaceLike(Transform piece, SkinnedMeshRenderer skin, Transform parent)
+    {
+        piece.SetParent(parent, false);
+        piece.SetPositionAndRotation(skin.transform.position, skin.transform.rotation);
+        Vector3 world = skin.transform.lossyScale;
+        Vector3 above = parent != null ? parent.lossyScale : Vector3.one;
+        piece.localScale = new Vector3(world.x / Mathf.Max(1e-6f, above.x), world.y / Mathf.Max(1e-6f, above.y), world.z / Mathf.Max(1e-6f, above.z));
     }
 
     /// <summary>
@@ -270,11 +286,10 @@ public static class BodyCutter
     // with the bone whose segment (the bone to its first child) is nearest.
     private static bool[] ByNearestBone(Mesh baked, SkinnedMeshRenderer skin, Transform[] bones, HashSet<int> cutBones)
     {
-        // BakeMesh gives vertices in the skin's own position and rotation, in its parent's units (an imported model's 0.01
-        // or 0.11 lives on the parent): what a piece placed under that parent, at the skin's pose, shows as it was.
-        Transform parent = skin.transform.parent;
-        Matrix4x4 local = Matrix4x4.TRS(skin.transform.localPosition, skin.transform.localRotation, Vector3.one);
-        Matrix4x4 toBaked = (parent != null ? parent.localToWorldMatrix * local : local).inverse;
+        // BakeMesh gives vertices in the skin's own space, its scale included: an imported model's 0.01 or 0.11 can live on the
+        // parent (the generated creatures) or on the skin itself (a Mixamo mesh at 0.01). Measuring bones without the skin's own
+        // scale put them a hundredth of the way to the troll's vertices, and its cut went by direction alone.
+        Matrix4x4 toBaked = skin.transform.worldToLocalMatrix;
         var starts = new Vector3[bones.Length];
         var ends = new Vector3[bones.Length];
         var usable = new bool[bones.Length];
@@ -310,98 +325,164 @@ public static class BodyCutter
             }
         }
 
+        // The cut bones are few (a limb and what hangs from it), so each vertex measures those first; then the rest only until
+        // one is nearer, starting with the bone that won the vertex before (neighbours share one). The same owner as measuring
+        // every bone, at a fraction of the cost: a 20,000-vertex troll took 60 ms the slow way, a hitch on the killing blow.
+        var cutList = new List<int>();
+        var otherList = new List<int>();
+        for (int b = 0; b < bones.Length; b++)
+        {
+            if (usable[b])
+            {
+                (cutBones.Contains(b) ? cutList : otherList).Add(b);
+            }
+        }
+
+        var along = new Vector3[bones.Length];
+        var inverseLength = new float[bones.Length];
+        for (int b = 0; b < bones.Length; b++)
+        {
+            along[b] = ends[b] - starts[b];
+            float length = along[b].sqrMagnitude;
+            inverseLength[b] = length > 1e-8f ? 1f / length : 0f;
+        }
+
+        float DistanceTo(int b, Vector3 point)
+        {
+            float t = Mathf.Clamp01(Vector3.Dot(point - starts[b], along[b]) * inverseLength[b]);
+            return (point - (starts[b] + along[b] * t)).sqrMagnitude;
+        }
+
+        // A ball round every cut segment: a vertex further outside it than another bone is near can't be the cut's, unmeasured.
+        Vector3 middle = Vector3.zero;
+        foreach (int b in cutList)
+        {
+            middle += (starts[b] + ends[b]) * 0.5f;
+        }
+
+        middle = cutList.Count > 0 ? middle / cutList.Count : middle;
+        float reach = 0f;
+        foreach (int b in cutList)
+        {
+            reach = Mathf.Max(reach, Mathf.Max((starts[b] - middle).magnitude, (ends[b] - middle).magnitude));
+        }
+
         Vector3[] vertices = baked.vertices;
         var cut = new bool[vertices.Length];
+        int lastWinner = -1;
         for (int i = 0; i < vertices.Length; i++)
         {
-            float nearest = float.MaxValue;
-            int owner = -1;
-            for (int b = 0; b < bones.Length; b++)
+            Vector3 point = vertices[i];
+            if (lastWinner >= 0)
             {
-                if (!usable[b])
+                float outside = (point - middle).magnitude - reach;
+                if (outside > 0f && outside * outside > DistanceTo(lastWinner, point) + 1e-6f)
                 {
                     continue;
                 }
+            }
 
-                Vector3 along = ends[b] - starts[b];
-                float t = along.sqrMagnitude > 1e-8f ? Mathf.Clamp01(Vector3.Dot(vertices[i] - starts[b], along) / along.sqrMagnitude) : 0f;
-                float distance = (vertices[i] - (starts[b] + along * t)).sqrMagnitude;
-                // A tie (two bones on one joint) goes to the cut.
-                if (distance < nearest || (distance <= nearest + 1e-6f && cutBones.Contains(b)))
+            float nearestCut = float.MaxValue;
+            foreach (int b in cutList)
+            {
+                nearestCut = Mathf.Min(nearestCut, DistanceTo(b, point));
+            }
+
+            // A tie (two bones on one joint) goes to the cut: another bone owns the vertex only when it is clearly nearer.
+            float beat = nearestCut - 1e-6f;
+            bool owned = nearestCut < float.MaxValue;
+            if (owned && lastWinner >= 0 && DistanceTo(lastWinner, point) < beat)
+            {
+                owned = false;
+            }
+
+            if (owned)
+            {
+                foreach (int b in otherList)
                 {
-                    nearest = distance;
-                    owner = b;
+                    if (b != lastWinner && DistanceTo(b, point) < beat)
+                    {
+                        owned = false;
+                        lastWinner = b;
+                        break;
+                    }
                 }
             }
 
-            cut[i] = owner >= 0 && cutBones.Contains(owner);
+            cut[i] = owned;
         }
 
         return cut;
     }
 
-    // A mesh with the vertices none of its triangles use taken out.
-    private static Mesh Compact(Mesh mesh)
+    // The baked mesh's vertex data, read once for both halves (every Mesh getter copies its whole array).
+    private readonly struct MeshData
     {
-        var map = new Dictionary<int, int>();
-        var keep = new List<int>();
-        var subs = new List<int>[mesh.subMeshCount];
-        for (int sub = 0; sub < mesh.subMeshCount; sub++)
+        public readonly Vector3[] Vertices;
+        public readonly Vector3[] Normals;
+        public readonly Vector4[] Tangents;
+        public readonly Color[] Colors;
+        public readonly List<Vector2> Uv0;
+        public readonly List<Vector2> Uv1;
+
+        public MeshData(Mesh mesh)
         {
-            int[] triangles = mesh.GetTriangles(sub);
-            subs[sub] = new List<int>(triangles.Length);
-            foreach (int index in triangles)
+            Vertices = mesh.vertices;
+            Normals = mesh.normals;
+            Tangents = mesh.tangents;
+            Colors = mesh.colors;
+            Uv0 = new List<Vector2>();
+            Uv1 = new List<Vector2>();
+            mesh.GetUVs(0, Uv0);
+            mesh.GetUVs(1, Uv1);
+        }
+    }
+
+    // A mesh of <paramref name="triangles"/> (per submesh, indices into the baked mesh) with only the vertices they use.
+    private static Mesh Compact(in MeshData data, List<int>[] triangles, string name)
+    {
+        int count = data.Vertices.Length;
+        var map = new int[count];
+        for (int i = 0; i < count; i++)
+        {
+            map[i] = -1;
+        }
+
+        var keep = new List<int>();
+        var subs = new List<int>[triangles.Length];
+        for (int sub = 0; sub < triangles.Length; sub++)
+        {
+            subs[sub] = new List<int>(triangles[sub].Count);
+            foreach (int index in triangles[sub])
             {
-                if (!map.TryGetValue(index, out int now))
+                if (map[index] < 0)
                 {
-                    now = keep.Count;
-                    map[index] = now;
+                    map[index] = keep.Count;
                     keep.Add(index);
                 }
 
-                subs[sub].Add(now);
+                subs[sub].Add(map[index]);
             }
         }
 
-        Vector3[] v = mesh.vertices;
-        Vector3[] n = mesh.normals;
-        Vector4[] t = mesh.tangents;
-        Color[] c = mesh.colors;
-        var uv0 = new List<Vector2>();
-        var uv1 = new List<Vector2>();
-        mesh.GetUVs(0, uv0);
-        mesh.GetUVs(1, uv1);
-        var compact = new Mesh { name = mesh.name, indexFormat = keep.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16 };
+        var compact = new Mesh { name = name, indexFormat = keep.Count > 65000 ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16 };
+        Vector3[] v = data.Vertices, n = data.Normals;
+        Vector4[] t = data.Tangents;
+        Color[] c = data.Colors;
+        List<Vector2> uv0 = data.Uv0, uv1 = data.Uv1;
         compact.SetVertices(keep.ConvertAll(i => v[i]));
-        if (n.Length == v.Length) compact.SetNormals(keep.ConvertAll(i => n[i]));
-        if (t.Length == v.Length) compact.SetTangents(keep.ConvertAll(i => t[i]));
-        if (c.Length == v.Length) compact.SetColors(keep.ConvertAll(i => c[i]));
-        if (uv0.Count == v.Length) compact.SetUVs(0, keep.ConvertAll(i => uv0[i]));
-        if (uv1.Count == v.Length) compact.SetUVs(1, keep.ConvertAll(i => uv1[i]));
-        compact.subMeshCount = mesh.subMeshCount;
+        if (n.Length == count) compact.SetNormals(keep.ConvertAll(i => n[i]));
+        if (t.Length == count) compact.SetTangents(keep.ConvertAll(i => t[i]));
+        if (c.Length == count) compact.SetColors(keep.ConvertAll(i => c[i]));
+        if (uv0.Count == count) compact.SetUVs(0, keep.ConvertAll(i => uv0[i]));
+        if (uv1.Count == count) compact.SetUVs(1, keep.ConvertAll(i => uv1[i]));
+        compact.subMeshCount = subs.Length;
         for (int sub = 0; sub < subs.Length; sub++)
         {
             compact.SetTriangles(subs[sub], sub, false);
         }
 
         compact.RecalculateBounds();
-        Object.Destroy(mesh);
         return compact;
-    }
-
-    private static Mesh Copy(Mesh baked, string name)
-    {
-        var copy = new Mesh { name = name, indexFormat = baked.indexFormat };
-        copy.SetVertices(baked.vertices);
-        copy.SetNormals(baked.normals);
-        if (baked.tangents.Length == baked.vertexCount) copy.SetTangents(baked.tangents);
-        var uv = new List<Vector2>();
-        baked.GetUVs(0, uv);
-        if (uv.Count == baked.vertexCount) copy.SetUVs(0, uv);
-        baked.GetUVs(1, uv);
-        if (uv.Count == baked.vertexCount) copy.SetUVs(1, uv);
-        if (baked.colors.Length == baked.vertexCount) copy.colors = baked.colors;
-        copy.subMeshCount = baked.subMeshCount;
-        return copy;
     }
 }
