@@ -15,6 +15,18 @@ MonoBehaviour:
   buildable: 70
   haven: 170
   forest: 330
+  yard: 55
+  portalEarth: {x: 24, y: 36}
+  portalEarthPatch: 7
+  havenShelves: 3.6
+  shelfScale: 85
+  havenKnolls: {x: 2, y: 2}
+  knollHeight: {x: 4, y: 5}
+  knollRadius: {x: 34, y: 40}
+  havenStream: 1
+  havenPondDistance: {x: 72, y: 95}
+  havenPondRadius: {x: 10, y: 13}
+  havenWaterBearings: {x: 285, y: 100}
   size: 1000
   depthAndHeight: {x: 30, y: 150}
   heightResolution: 1025

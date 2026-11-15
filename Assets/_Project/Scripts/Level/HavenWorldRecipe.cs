@@ -107,6 +107,12 @@ public sealed class HavenWorldRecipe : ScriptableObject
     [Header("The Haven itself (building is open over all its meadows)")]
     [Tooltip("Kept as level as ever round the portal, where saved buildings and the hand-placed props stand (the ward reaches 49 m at most).")]
     [Min(10f)] public float yard = 55f;
+    [Tooltip("The ground round the portal is brown earth, not green moss: the moss there turns to forest soil and fallen leaves out to " +
+             "the first distance and fades back in by the second (metres from the portal; the ward is 16 m at first, 34 m at most). " +
+             "The meadow grass stays. 0: moss as everywhere else.")]
+    public Vector2 portalEarth = new Vector2(24f, 36f);
+    [Tooltip("Metres across a patch of soil among the fallen leaves there.")]
+    [Min(1f)] public float portalEarthPatch = 7f;
     [Tooltip("Metres the meadows' low shelves stand above the rest beyond the yard (their hollows sink six tenths of it): flat tops to build on, " +
              "a few metres of slope to walk up. 0: none.")]
     [Min(0f)] public float havenShelves = 3.6f;

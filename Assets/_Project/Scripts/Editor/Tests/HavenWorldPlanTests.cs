@@ -288,6 +288,45 @@ public sealed class HavenWorldPlanTests
         }
     }
 
+    // The user, 2026-11-15: the moss round the portal goes back to its natural brown; the meadow grass stays.
+    [Test]
+    public void TheMossRoundThePortalIsBrownEarth()
+    {
+        const int Meadow = 0, Moss = 1, Soil = 2, Leaves = 3;
+        float[] Painted(Vector2 at)
+        {
+            var weights = new[] { 0.4f, 0.6f, 0f, 0f };
+            HavenWorldGenerator.TurnMossToEarth(weights, at, recipe.portalEarth, recipe.portalEarthPatch, new[] { Moss }, Soil, Leaves);
+            return weights;
+        }
+
+        float[] near = Painted(new Vector2(6f, -3f));
+        Assert.That(near[Moss], Is.Zero, "no moss by the portal");
+        Assert.That(near[Soil] + near[Leaves], Is.EqualTo(0.6f).Within(1e-5f), "it is earth there");
+        Assert.That(near[Meadow], Is.EqualTo(0.4f), "the meadow grass stays");
+        Assert.That(Painted(new Vector2(0f, recipe.portalEarth.y + 1f)), Is.EqualTo(new[] { 0.4f, 0.6f, 0f, 0f }), "moss as ever further out");
+
+        // And the Haven's saved terrain has it: no moss within the full radius.
+        var data = AssetDatabase.LoadAssetAtPath<TerrainData>("Assets/_Project/Art/Terrain/SafeHaven/Haven World Terrain.asset");
+        Assert.That(data, Is.Not.Null, "The Haven's terrain data is missing.");
+        int lush = System.Array.FindIndex(data.terrainLayers, layer => layer != null && layer.name == "Haven Lush Moss");
+        int resolution = data.alphamapResolution;
+        float pixel = data.size.x / resolution, reach = recipe.portalEarth.x - 1f;
+        int first = Mathf.FloorToInt((data.size.x / 2f - reach) / pixel), across = Mathf.CeilToInt(2f * reach / pixel);
+        float[,,] maps = data.GetAlphamaps(first, first, across, across);
+        float most = 0f;
+        for (int y = 0; y < across; y++)
+        {
+            for (int x = 0; x < across; x++)
+            {
+                var at = new Vector2((first + x + 0.5f) * pixel - data.size.x / 2f, (first + y + 0.5f) * pixel - data.size.z / 2f);
+                if (at.magnitude <= reach) most = Mathf.Max(most, maps[y, x, lush]);
+            }
+        }
+
+        Assert.That(most, Is.LessThan(0.02f), "The Haven's terrain still has moss by the portal.");
+    }
+
     [Test]
     public void TheHavenSceneHoldsItsWater()
     {

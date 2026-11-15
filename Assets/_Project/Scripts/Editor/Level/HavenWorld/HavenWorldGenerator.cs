@@ -232,6 +232,9 @@ public static class HavenWorldGenerator
         int[] woodsIndex = woods.Rules.Select(rule => rule.layer != null ? Index(rule.layer.name) : -1).ToArray();
         int meadow = Index("Haven Meadow"), litter = Index("Cedar Litter"), scree = Index("Gravel"), mud = Index("Muddy Bank"), bank = Index("Haven Bank");
         int moss = Index("Cedar Moss"), cliffRock = Index("Cliff Rock");
+        int[] havenMoss = { Index("Haven Lush Moss"), Index("Haven Old Moss") };
+        int soil = Index("Cedar Soil");
+        HavenWorldRecipe recipe = plan.Recipe;
         int riverBed = WorldLook.ForestLake.RiverBed != null ? Index(WorldLook.ForestLake.RiverBed.name) : -1;
         int count = layers.Length, resolution = data.alphamapResolution, heightsCount = heights.GetLength(0);
         Vector3 origin = terrain.transform.position;
@@ -322,11 +325,51 @@ public static class HavenWorldGenerator
                     Blend(a, scree, 0.55f * Mathf.InverseLerp(0.4f, 0.8f, ramp) * Mathf.InverseLerp(9f, 14f, slope));
                 }
 
+                TurnMossToEarth(a, point, recipe.portalEarth, recipe.portalEarthPatch, havenMoss, soil, litter);
                 for (int l = 0; l < count; l++) total += a[l];
                 for (int l = 0; l < count; l++) maps[y, x, l] = total > 0f ? a[l] / total : 0f;
             }
         });
         data.SetAlphamaps(0, 0, maps);
+    }
+
+    /// <summary>
+    /// The ground round the portal is brown earth, not green moss (the user, 2026-11-15: "return it to its natural brown"). The Haven's
+    /// moss there turns to forest soil in slow patches with fallen leaves between, fully out to <paramref name="radii"/>.x and fading
+    /// back in by .y. The meadow grass stays, so it reads as trodden forest floor: a flat brown disc reads as a path from above. Soil and
+    /// leaves are layers the woods already paint, so the one-pass terrain shader binds nothing more (a layer it hasn't bound draws dark).
+    /// The grass takes its colour from the ground, so it browns with it. <paramref name="point"/> is in metres from the portal.
+    /// </summary>
+    public static void TurnMossToEarth(float[] weights, Vector2 point, Vector2 radii, float patch, IReadOnlyList<int> moss, int soil, int leaves)
+    {
+        if (radii.y <= 0f || soil < 0 || leaves < 0)
+        {
+            return;
+        }
+
+        float t = Mathf.Clamp01((point.magnitude - radii.x) / Mathf.Max(radii.y - radii.x, 0.01f));
+        float near = 1f - t * t * (3f - 2f * t);
+        if (near <= 0f)
+        {
+            return;
+        }
+
+        float taken = 0f;
+        foreach (int layer in moss)
+        {
+            if (layer < 0)
+            {
+                continue;
+            }
+
+            float part = weights[layer] * near;
+            weights[layer] -= part;
+            taken += part;
+        }
+
+        float toSoil = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.35f, 0.65f, WorldNoise2D.Fbm(point.x / patch, point.y / patch, 731)));
+        weights[soil] += taken * toSoil;
+        weights[leaves] += taken * (1f - toSoil);
     }
 
     private static void Apply(TerrainPaintRules rules, int[] index, float[] weights, float slope, float height, float hollow, Vector2 point)
