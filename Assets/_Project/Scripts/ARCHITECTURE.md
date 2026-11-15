@@ -1193,7 +1193,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | Change what residents say in passing | `Resources/SettlementSettings` › Asides (homecoming, morning, day, evening lines; Aside Every) |
 | Change fireflies, or add them to a place | A `FireflyProfile` in `Data/World`, and the Fireflies prefab in the scene (see [Weather](../../../Docs/Weather.md)) |
 | Change how crafting looks in the bag and at stations | Both are one `RecipeBrowser` (`UI/RecipeBrowser`, built by Safe Haven › Setup › UI › Build Recipe Browsers). It reads and makes through an `IRecipeMaker`: `HandMaker` or `StationMaker` |
-| Add a station recipe or tune craft time, output slot and queue size | Recipe: set **Station** and **Craft Seconds** in the Content Editor (Station "By Hand" = instant from the bag). Overview in Systems Editor > Crafting; output slot and queue length per building in Systems Editor > Portal & Building. Station state lives in `SettlementState.Workshops` and is saved |
+| Add a station recipe or tune craft time, output slot and queue size | Recipe: set **Station** and **Craft Seconds** in the Content Editor (Station "By Hand" = made from the bag through `HandCraftQueue`: paid at once, made after `Resources/HandCraftingSettings`' seconds for what it is, weapons 20 s, one-handed 10 s, at half walking speed; an attack or dodge stops it and gives the materials back). Overview in Systems Editor > Crafting; output slot and queue length per building in Systems Editor > Portal & Building. Station state lives in `SettlementState.Workshops` and is saved |
 | Add a choice to a station's menu (like "Repair gear…" or "Plan a raid") | Implement `IStationMenuExtension` on a component next to the `CraftingStation`; its actions show as buttons in `StationWindow` (which closes before the action runs) or as rows in the `StationMenu` fallback |
 | Recolor the windows | Safe Haven > UI > Select UI Theme, edit the colors, then Safe Haven > UI > Apply UI Theme |
 | Change where monsters, resources or caches can appear in a raid | Raid scene > "Raid Layout" > the group: move/duplicate its "Point NN" children. Which groups a list uses: Content Editor > Raids > the raid > Enemies/Resources/… tab > **Where** |
@@ -1884,6 +1884,12 @@ Set up by `AgentScripts/BuildWinter.cs` (sounds from `Tools/Audio/winter.py`) an
 - **`PlayerEquipment`** owns the `GearSet`. It applies each worn item's `StatBonus` list to `CombatStats` and removes it
   again when the item comes off or breaks. It exposes the weapon and `ToolTier`; tools only count while on the tool
   belt. Gear arriving through Give or crafting auto-equips into an empty matching slot.
+- **Put away, still worn** (2026-11-15): `StowedWeaponView` (added to the local player by `PlayerInputHandler`) wears
+  `PlayerEquipment.Stowed` (the two-handed weapon put away for the torch, else the one Z would take out again) on the body:
+  two-handed weapons, polearms, staffs (Channel signature) and bows across the back, one-handed weapons at the left hip.
+  Each model is laid by its own biggest mesh's box (length from the grip, flat against the body), so items need no extra
+  pose; places and directions are `Resources/StowedWeaponSettings`. The character window's portrait plays the idle and turns
+  when dragged (`DragToTurn`).
 - **Shields**: a weapon of `WeaponKind.Shield` goes in the Off Hand, never the Main Hand. `PlayerEquipment` hands it to
   `PlayerCombat.Shield`; its Guard Let Through decides blocks, and attacking while guarding bashes. L stows it for the torch.
 - **Stats**: `Strength` adds physical power 1:1 (`CombatRules.powerPerStrength`). MaxHealth bonuses scale current
