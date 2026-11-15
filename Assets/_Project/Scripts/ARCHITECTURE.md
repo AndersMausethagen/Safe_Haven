@@ -65,7 +65,7 @@ of the GDD, **Not started** = design only. Update this table when a system is ad
 | §7 Raids, timer, planning | Partial | `RaidDefinition`, `RaidSession`, `RaidParameters`, `RaidLauncher` (Portal Sparks), `RaidPreparationWindow` (built in code: destination tabs, tier picker, Spark stepper, modifiers; the briefing at a glance with its details on hover) | 12 min timer and Portal Sparks (+3 min, max 2, paid once) as designed, and `MistyWoods.asset` and `TrollValley.asset` run the designed 720 s since 2026-11-14 (to be measured in play); raid modifiers are crafted runes. Danger stages escalate the raid (`RaidStage`, see "Raid tension"). Each run's reason is a rumour (`RaidRumourDefinition`, see "What only raids give"); no other objectives |
 | §8 Extraction, loss | Partial | `ExtractionPoint` (lit once, then held: `ExtractionHold`, `ExtractionZoneView`; windows, availability, cost, alarm), `RaidRisk`, `PlayerSnapshot.AfterFailedRaid`, `DurabilitySettings`, safe pocket in `ItemInventory`, `RaidSummaryWindow`, `PlayerArrivalPoint` | Death/time-out rules as designed (deployed gear kept at −25% durability). No companions in raids. Carts come through the portal and home again: see "Transport" |
 | §9 Raid world, events | Partial | `LootCache`, `ItemDropTable`, `GameEventTrigger`, `RescuableTraveler` | Misty Woods is generated anew each run from rules (`RaidLayoutRules`, see "Generated raid maps"), not from modules; a raid without rules plays the painted map. Random events: `Raids/Events/*` (ten for Misty Woods, see "Raid events") |
-| §10 Movement, combat, enemies | Partial | `Player*`, `PlayerEquipment`, `PlayerDodge`, `PlayerGuard`, `Combat/*` (`ComboRules`, `GuardRules`, `PoiseMeter`, `CombatTechniqueSettings`), `MonsterAI`, `MonsterAttack`, `MonsterProjectile`, `MonsterPack`, `MonsterHowlBuff`, `AttackTelegraph` | Slow, deliberate melee: timed combo chains with finishers, heavy attack, guard and parry, flinch, monster poise and stagger, perfect dodge and counters (see "Combat technique"). Composable enemy tactics/temperaments and multiple attacks; small ranged troll, low-hover charging Mistwing, wolf packs/howl. Monsters notice through senses: a sight cone blocked by cover, a close sense, hearing; the player can sneak (see "Senses and stealth"). Apex: the Old Moss Troll walks a round (`MonsterPatrol`) and is heard coming (`CreatureFootfalls`). More creatures, built by `AgentScripts/BuildCreatures.cs`: Marsh Light, Draug, Bog Spitter, Blight Boar, Rootling swarms and the Moss Shaman (a `MonsterAttackKind.Summon` action). Status effects: `StatusEffectDefinition` + `StatusEffects` (Poison, Chill, Roots; `AttackDefinition` › Applies Status, cured by `ItemDefinition` › Cures). Shields: `WeaponKind.Shield` in the off hand. Player weapons: melee and a bow (`PlayerArchery`, see "Combat technique" › Bow). Wading and swimming in ponds and rivers (`PlayerSwimming`: swimming forward costs stamina, empty stamina swims slower, never drowns; held items are put away; no diving or swimming clips yet). Dodge is **0.18 s / 2 s cooldown** (GDD: ~0.35 s / 2–3 s). No boss |
+| §10 Movement, combat, enemies | Partial | `Player*`, `PlayerEquipment`, `PlayerDodge`, `PlayerGuard`, `Combat/*` (`ComboRules`, `GuardRules`, `PoiseMeter`, `CombatTechniqueSettings`), `MonsterAI`, `MonsterAttack`, `MonsterProjectile`, `MonsterPack`, `MonsterHowlBuff`, `AttackTelegraph` | Slow, deliberate melee: timed combo chains with finishers, heavy attack, guard and parry, flinch, monster poise and stagger, perfect dodge and counters (see "Combat technique"). Composable enemy tactics/temperaments and multiple attacks; small ranged troll, low-hover charging Mistwing, wolf packs/howl. Monsters notice through senses: a sight cone blocked by cover, a close sense, hearing; the player can sneak (see "Senses and stealth"). Apex: the Old Moss Troll walks a round (`MonsterPatrol`) and is heard coming (`CreatureFootfalls`). More creatures, built by `AgentScripts/BuildCreatures.cs`: Marsh Light, Draug, Bog Spitter, Blight Boar, Rootling swarms and the Moss Shaman (a `MonsterAttackKind.Summon` action). Status effects: `StatusEffectDefinition` + `StatusEffects` (Poison, Chill, Roots; `AttackDefinition` › Applies Status, cured by `ItemDefinition` › Cures). Shields: `WeaponKind.Shield` in the off hand. Player weapons: melee and a bow (`PlayerArchery`, see "Combat technique" › Bow). Wading and swimming in ponds and rivers (`PlayerSwimming`: swimming forward costs stamina, empty stamina swims slower, never drowns; held items are put away; no diving or swimming clips yet). Since 2026-11-15 every melee family has its own chain, context attacks, signature and moving art, there are art runes and a runic staff, and parrying, interrupts and Regain were rebalanced (see "Combat rework (2026-11-15)"). Dodge is **0.18 s / 2 s cooldown** (GDD: ~0.35 s / 2–3 s). No boss |
 | §11 Survival, farming | Partial | `Survival/*` (`PlayerNeeds`, `NeedMeter`, `SurvivalSettings`, `WaterSource`), campfire recipes | Hunger and thirst as decided (never lethal). Meals with timed bonuses and tonics: `PlayerBoons`, `ItemDefinition` › Boon Bonuses (two meal slots, `SurvivalSettings` › Meal Slots; carried through the portal, not written to the save). Farming: a Farm Plot is a station whose recipes are crops, so they grow during raids |
 | §12 Resources, inventory | Done | Materials are items (`Data/Items/Materials`, each with a weight, bag capped at 150 by `ItemContainer`'s weight budget). Essences only in `ResourceInventory/*` (weightless bars). `GatheringNodeDefinition` + `ResourceSource`/`ResourceNode`, `MaterialPool`, `ItemInventory`, `BackpackCapacity` (slots + carry bonus), `Gathering/*` (axe/pickaxe/sickle timing minigame, raid noise, Forest Annoyance, raid summary stats). Every tree can be felled with an axe: tree prefabs carry the shared Tree node and `ChoppableTree` (logs by axe tier and tree size, a chance of Hardwood/Elderwood: `TreeChoppingSettings`, Systems Editor › Tree Chopping); painted terrain trees get invisible stand-ins near the player and shrink away when felled (`TerrainTreeFelling`, added to terrains by itself, on a runtime copy of the terrain data). Oak Wood is shown as Wood | |
 | §13 Crafting, refining | Partial | `RecipeDefinition`, `RecipeBook`, `PlayerCrafting` (hand recipes only), `CraftingStation` + `StationQueue`/`WorkshopState`/`StationCrafting`/`StationWindow` (timed station queues; `StationMenu` is the text fallback), `Durability/*` (repairs), `PurificationAltar` | Stone → Copper → Iron ladder, station queues (pay on queue, keep working during raids, resources to storage first, output slot), repairs and purification work. Gear runs Stone → Copper → Iron → Moonsilver, with jewellery, shields and meals (`AgentScripts/BuildGear.cs`, `BuildFood.cs`). New stations: Kitchen, Tanning Rack, Farm Plot and Beehive; a crop is a recipe with long Craft Seconds. Essence uses: see "Essence" |
@@ -708,7 +708,7 @@ that part directly (`director.Creatures.Wake(...)`, `director.Companions.Compani
 **A state machine** whose behaviour all reads and writes the same state stays one class and is split into partial files
 by concern: `X.cs` holds the state (fields, properties, events) and the lifecycle; each `X.Concern.cs` holds behaviour,
 and its summary ends "Part of X, in its own file". `MonsterAI` (Awareness, Investigation, Targets, Fighting, Home,
-Reactions, Backstabs, Remote, Gizmos), `PlayerCombat` (Input, Swings, Finishers, Reactions), `PlayerAnimationController`
+Reactions, Backstabs, Remote, Gizmos), `PlayerCombat` (Input, Swings, Arts, Finishers, Reactions), `PlayerAnimationController`
 (Locomotion, Combat, Work, Debug), `RaidPreparationWindow` (Briefing, Preparation, Building), `BuildPlacer` (Spots,
 Lines) and `RaidLayoutPlanner` (Rooms, Sites, Ground, Cliffs, Regions, Routes, Height, Rivers, Landmarks, each with its own tuning
 constants; the map's data is `RaidLayoutPlan`), `RaidLayoutField` (Levels, Ravines, Rivers, Ground), `RaidMapGenerator` (Points, Scenery, Water, Reach) and `HavenWorldPlan` (Ground, Water, Paths, Woodland, Rock, Resources, AlongTheWay). A raid map step draws random numbers in a fixed order: moving code
@@ -1112,8 +1112,8 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | Change the safe pocket size | `ItemInventory.safePocketSlots` on the PlayerArmature prefab |
 | Tune hit stop, shake, hit flash, knockback, telegraph colors, effects, the weapon trail, blood, corpses, the hurt vignette | `Resources/CombatFeel` (Systems Editor › Movement & Combat). No code. |
 | Tune combo timing, charging, focus on an enemy, backstabs, parry window, guard, flinch, poise and stagger | `Resources/CombatTechniqueSettings` (Systems Editor › Movement & Combat). No code. |
-| Give a weapon a longer chain, a heavy attack, a counter or a weapon art | Content Editor › Weapons: **Combo**, **Heavy Attack**, **Counter Attack**, **Weapon Art**. Each attack names its **Animation State**; rerun Safe Haven › Setup › Characters › Set Up Combat Animations to retime the built-in ones from their clips |
-| Give a weapon family a different swing | Its `Swing(...)` line in `Editor/Characters/CombatMovesets.cs` (add a clip to `StylizedStates` if it is new), then Set Up Combat Animations. Its damage and cadence come from the attack in `From`, so they don't move |
+| Give a weapon a longer chain, a heavy attack, a counter or a weapon art | Content Editor › Weapons: **Combo**, **Heavy Attack**, **Counter Attack**, **Weapon Art**, the context attacks (**Backstep Attack**, **Guard Counter Attack**, **Heavy Follow Up**, **Charged Attack**) and **Signature**. Each attack names its **Animation State**; Set Up Combat Animations is retired, so a new swing is fitted to its clip with `CombatClipKit.FitAttack` |
+| Give a weapon family a different swing | `CombatClipKit.PlayerSwingState` (the state on Upper Body, Attack Arms and Combat Full Body), a copy of the attack it replaces (`CombatClipKit.Attack`) fitted with `FitAttack` at that attack's Hit Delay and Recovery Time, and its `Swing(...)` line in `Editor/Characters/CombatMovesets.cs` for `CombatMovesetTests`. `WeaponIdentityTests` fails if the family's damage per second moves more than 6% |
 | Change what a monster bleeds, or stop it ragdolling | Content Editor › Monsters › Body |
 | Make a monster harder to stagger | Content Editor › Monsters › **Poise** (0 = the game-wide default) |
 | Change how far or wide a monster sees, how well it hears, how quickly it spots you | Content Editor › Monsters › **Detection Range** (sight) and **Senses** (Sight Angle, Close Sense Range, Hearing, Alertness). All monsters side by side: Systems Editor › World › Senses & Stealth |
@@ -1359,8 +1359,9 @@ The player is no super soldier: combat is about reading the enemy and committing
 `Resources/CombatTechniqueSettings` (Systems Editor › Player › Movement & Combat); the design is in [combat](../../../Docs/Combat.md).
 
 - **Chains** (`PlayerCombat`, rules in `ComboRules`, tested): a weapon's `combo` list is walked by presses *in time*
-  after each swing; a press before the swing lands is buffered and only misses the rhythm bonus (`EarlyPressFumbles`
-  makes it fumble the chain instead); a press right as a swing recovers builds a small rhythm bonus. The last step is
+  after each swing; a press in the Buffer Window before the chain point is kept (earlier ones are dropped: `SwingMotion.Buffers`) and,
+  if before the swing lands, only misses the rhythm bonus (`EarlyPressFumbles` makes it fumble the chain instead); a press right as a
+  swing recovers builds a small rhythm bonus. The last step is
   the finisher (more damage and poise). The light swing starts on the press; held for `HeavyHoldSeconds` while it still
   winds up, it turns into the **heavy attack** (`heavyAttack`, paying only the stamina difference); a ready counter
   uses `counterAttack`.
@@ -1368,7 +1369,8 @@ The player is no super soldier: combat is about reading the enemy and committing
   (Options › Gameplay › Poise Bars), so no prefab needs it.
 - **Landing a swing** (`PlayerCombat`, arithmetic in `StrikeRules`, tested): `AttackDefinition` plays a build-up (`AnimationSpeed`), a
   strike (`StrikeSpeed` for the last `StrikeLead` seconds) and a follow-through; `PlayerAnimationController.UpdateSwingSpeed` drives them
-  through `ActionSpeed`. The lunge (`StepIntoBlow`) runs in the last `LungeSeconds`, ending at contact. A held heavy swing waits at the top
+  through `ActionSpeed`. The lunge (`StepIntoBlow`) runs over the attack's Lunge Share of the wind-up, at least `LungeSeconds`
+  (`SwingMotion.LungeLead`), ending at contact. A held heavy swing waits at the top
   of its wind-up (`IsCharging`, `Charge`, `ChargeFull`) with its clock stopped by `chargeHeld`. `LandSwing` finds targets, orders them by
   `StrikeRules.SweepPosition` and queues each as a `PendingHit`, applied through `AttackResolver.Apply`, so a sweep strikes in the order the
   blade reaches them. `AttackDefinition.Impact` scales hit stop, shake, blood and the corpse's throw; it changes no damage. Monsters still
@@ -1422,13 +1424,15 @@ The player is no super soldier: combat is about reading the enemy and committing
   from, so swapping a clip changes no damage per second. `CombatMovesetTests` guards states and shape. Humanoid monsters: `MonsterAnimationDriver`
   crossfades `AttackDefinition.AnimationState` at `AnimationSpeed` (fitted to `HitDelay`) and flinches through a `Hit` state.
 - **Getting out and flinch:** a dodge cuts a swing short, during the wind-up too (`DodgeCancelsWindup`; the swing is
-  lost); the player moves slowly while swinging; a hit that gets through while winding up loses the swing and staggers
-  the player (`Flinched`).
+  lost, and attacking is locked for `CancelLockout` unless it was a charging heavy); how the player moves while swinging is
+  `SwingMotion`'s (see "Combat rework" below); a hit that gets through while winding up loses the swing and staggers
+  the player (`Flinched`), or floors them when it is worth `KnockdownShare` of their health.
 - **Guard and parry** (`PlayerGuard`, an `IHitGuard` that `Damageable` asks before applying a hit; `GuardRules`):
   right mouse / left trigger. Frontal hits are blocked (part gets through, stamina pays); without stamina the guard
   breaks and the player reels; raised within the parry window before a hit it parries: no damage, the attacker
-  staggers (`MonsterAI.Stagger`) and a counter is ready. Attack while guarding = shield bash with a shield, else it drops
-  the guard. Events: `Damageable.Guarded` / `AnyGuarded`, `DamageResult.Guard`.
+  answers by its Parry Response (`MonsterAI.Stagger` for an ordinary creature, see "Combat rework" below) and a counter is ready.
+  Attack while guarding = the counter just after a parry, the guard counter just after a block, else a shield bash with a shield,
+  else it drops the guard into an art. Events: `Damageable.Guarded` / `AnyGuarded`, `DamageResult.Guard`.
 - **Poise** (`PoiseMeter` on every `MonsterAI`; `MonsterDefinition.Poise`, attacks' `Poise Damage`): at zero the monster
   enters `State.Staggered` (attack cancelled, extra damage taken, `MonsterAI.AnyStaggered`). `AttackTelegraph` turns
   the parry colour and glints for the last parry window of the wind-up.
@@ -1471,11 +1475,12 @@ The player is no super soldier: combat is about reading the enemy and committing
   `AttackResolver.Execute` takes the swing's damage and poise multipliers.
 - **Animation:** swings are played by crossfading into the attack's **Animation State** by name
   (`PlayerAnimationController.OnSwingStarted`, `ActionSpeed` parameter), so the animation starts with the gameplay swing.
-  Swings and dodges play on the **Combat Full Body** layer (legs included): a swing plants the feet from its start until
-  the blow lands (`WindupMoveSpeed`, 0; `PlayerCombat.ReleaseFeet`) and `PlayerMovement.FacingLocked` holds the body on the
-  blow, so only the attack's Lunge moves it. Once it has landed the player moves at `SwingMoveSpeed` / `HeavyMoveSpeed`
-  (both 0: planted and facing the blow until the swing ends, since arms swinging over running legs looked wrong). Above 0,
-  walking off hands the rest of the swing to Attack Arms from the same moment (`PlayerAnimationController.WalkOutOfSwing`).
+  Swings and dodges play on the **Combat Full Body** layer (legs included) when they start standing. A swing whose wind-up lets
+  the player walk (`SwingMotion.WindupMove`; it was 0 for everything from 2026-11-01 to 2026-11-15, as arms over running legs
+  looked wrong) starts on **Attack Arms** over the walking legs when the player is moving, and `PlayerMovement.FacingLocked` holds
+  the body on the blow except for the early turn toward the aim (`SwingMotion.CanTurn`). From `SwingMotion.MoveAt` after contact
+  (`PlayerCombat.ReleaseFeet`) the player moves at `SwingMotion.AfterContactMove`; walking off hands the rest of the swing to
+  Attack Arms from the same moment (`PlayerAnimationController.WalkOutOfSwing`, never while it steps in: that step is the legs').
   The swing's timer runs on, so walking off doesn't bring the next attack sooner; every way out goes through `EndSwing`,
   which frees the feet. The wind-up plays at Animation Speed and, from the hit, the strike at Follow Through Speed.
   The player's body is the N-hance modular human (`ModularCharacter` + `PlayerLook`, see "Characters"); the clips the
@@ -1486,7 +1491,8 @@ The player is no super soldier: combat is about reading the enemy and committing
   clip to the actual speed (capped at Max Motion Speed) so the feet don't slide. Rebuild with **Safe Haven › Characters ›
   Build Player Locomotion**. Moving away from the facing direction (cursor-facing in combat, or a locked facing) costs
   speed: `PlayerMovementSettings` › Backpedal Speed (0.7 = 70% straight backwards).
-  States and timings come from **Safe Haven › Setup › Characters › Set Up Combat Animations** (`CombatAnimationSetup`: imports
+  States and timings came from **Safe Haven › Setup › Characters › Set Up Combat Animations** (retired 2026-11-14; new swings go in
+  with `CombatClipKit`, below) (`CombatAnimationSetup`: imports
   the Quaternius UAL1/UAL2 clips, adds the states to `PlayerAnimator` and a Stagger state to `MonsterHumanoid`, measures
   each clip's contact moment from the weapon hand's speed and writes Hit Delay / Recovery, builds the weapons' chains).
 - **Feedback** (`CombatFeedback`): pooled spark effects for hits, critical hits, blocks, parries, staggers and perfect
@@ -1494,6 +1500,78 @@ The player is no super soldier: combat is about reading the enemy and committing
   `CombatScreenEffects` vignette (hurt flash, low-health pulse), an optional `ComboHud`, and sounds from Audio Settings
   (attack, then weapon, then game-wide). Effects are built by **Safe Haven › Setup › Combat › Build Combat Effects**
   (`CombatEffectsBuilder`, Prefabs/Effects/Combat, "Safe Haven/Effect Particle"). Text callouts are empty by default.
+
+### Combat rework (2026-11-15)
+
+Everything in [the combat research](../../../Docs/CombatResearch.md) was built, at the user's request (commits 7a3bd7ab, 107d9078,
+0df62c9d, decc03dc). The design is in [combat](../../../Docs/Combat.md); the research's Status section maps each recommendation to its commit.
+
+- **The invariant: cadence and damage per second hold.** Nothing moves the chain point: the next swing still waits for the attack's
+  Recovery Time (`RecoverAt`). A family's pace is Σ weapon ratio over Σ recovery across its chain (CombatResearch §1.3); every new swing
+  copies the numbers of the attack it replaces, and `WeaponIdentityTests` fails when a family's pace moves more than 6%, when two
+  families swing the same chain, or when a shield has no guard counter. Raid tiers and gear score were tuned to those paces.
+- **`SwingMotion`** (plain static functions, `SwingMotionTests`) says how a swing lets the player move: `WindupMove` and
+  `AfterContactMove` (shares of walking speed), `TurnRate` and `CanTurn` (the early turn toward the aim, never once it steps in),
+  `MoveAt` (when the feet are free after contact, never after recovery), `LungeLead` (the step in over a share of the wind-up; a rush
+  steps all through, a heavy only after its charge) and the **bounded buffer** (`Buffers`, `BuffersWithin`: a press is kept only in
+  `BufferWindow` before the chain point or before a dodge, flinch or broken guard ends). Each reads `AttackDefinition` › Movement
+  (player) first; a value below 0 falls back to `CombatTechniqueSettings`, which plants heavies, rushes and arts.
+- **`PlayerCombat`'s parts.** `PlayerCombat.cs` holds the state, `SwingKind` (now with `GuardCounter`) and `SwingInfo`.
+  `.Input` turns presses into swings: the bounded buffer (`BufferOpen`), a held early press re-made as the window opens
+  (`UpdateEarlyPress`: hold to keep chaining), the lockout after a dodge cut a wind-up short (`CancelLockout`, not out of a charging
+  heavy), and attacking out of the guard in this order: the counter just after a parry, the guard counter within `GuardCounterSeconds`
+  of a block (`PlayerGuard.JustBlocked`; refused, it doesn't spend the block), a shield bash, else an art (the attuned rune's, else the
+  weapon's). `.Swings` picks the attack as a swing starts (heavy follow-up, guard counter, backstep by `BackstepAngle`, the charged
+  attack at `ChargeFull`), winds it up, turns it, steps it in and lands it; the signatures that act on a landed blow live here (Crush,
+  Anti Charge, Guard Breaker, Momentum's stacks, Flurry's poise, `AlwaysCritical`). `.Arts` moves the player for an art (Blink Behind,
+  Dash Through, Leap To, Throw) and fires a cast; it raises `SignatureUsed` and `ArtMoved`, and holds the signatures' constants.
+  `.Reactions` is the dodge cut, the flinch, the knockdown and the perfect dodge; `.Finishers` the finishing blow, whose invulnerability
+  has its own key (`FinishKey`) so ending a swing can't strip a knockdown's.
+- **`GuardRules`** (plain, tested in `ParryEconomyTests`): `ParryResponseOf` (Auto becomes Stagger, or Poise Damage for a heavyweight),
+  `BreaksThrough` (a heavy, counter, guard counter, finisher or art, or poise damage of at least `BreakThroughPoiseShare` of the
+  monster's poise; never a heavyweight) and `RelockAfter` (`WhiffRelock` for a tap under `WhiffTapSeconds` that caught nothing).
+- **Monsters.** `MonsterDefinition` › Parry Response (`ParryResponse`: Auto, Stagger, Poise Damage, Recoil); `MonsterAI.IsHeavyweight`
+  is a definition not Open While Striking, an elite, or one in a boss fight. `MonsterAI.Reactions` applies the parry
+  (`ParryPoiseShare`, `ParryRecoilSeconds`) and asks `MonsterAttacks.TryInterrupt(healthLost, BreaksThrough(...))`, which also breaks
+  off a strike ticked Interruptible (13 light strikes); an interrupted monster waits `InterruptDelay` and raises the static
+  `MonsterAI.AnyInterrupted` (the spark, the tally). `MonsterAnimationDriver` plays Hit Heavy and Knockdown by the blow's poise, and
+  `MonsterAI.Reactions` scales `MonsterPose.Hit` by it (0.45-1.2) for bodies without an animator.
+- **`WeaponDefinition`**: context-attack slots (`BackstepAttack`, `GuardCounterAttack` falling back to the counter then the heavy, with
+  `OwnGuardCounter` for a shield's own; `HeavyFollowUp`, `ChargedAttack`), a shield's `BlockPoise`, and **Signature** (`WeaponSignature`:
+  CounterChain, Assassin, GuardBreaker, Momentum, HyperArmour, Crush, AntiCharge, Flurry, Channel) with its `SignaturePower`. The
+  signature is also the "kind" a rune fits. `HitTechnique` gained `GuardCounter` and `Charged`.
+- **`AttackDefinition`** gained three headers: **Movement (player)** (read by `SwingMotion`), **How a weapon art moves** (`ArtMotion`:
+  None, DashThrough, BlinkBehind, LeapTo, Throw; `MotionDistance`; `AlwaysCritical`) and **Cast (player)** (`CastProjectile`, a
+  `MonsterProjectile` prefab fired with the player as owner as the blow would land, with count, spread, speed, radius, range and a
+  `GroundHazard` left where it comes down). A cast or a throw lands later, so it isn't tallied as a whiff.
+- **`ThrownWeapon`**: a copy of the held model flies out, strikes each hostile once along the way (`HitDetector.FindAlong`, up to Max
+  Targets), glances off scenery and comes back, striking on the return; plain flight, no physics, so it can't be lost.
+  `HeldItemView.Thrown` hides the hand's model meanwhile.
+- **`BodyPassThrough`**: collisions between the player and bodies, ignored and restored counted per pair, so the dodge
+  (`PlayerDodge`), the dash art and the finishing blow can overlap without one making a body solid under another.
+- **`HitShake`**: added to a struck body by `CombatFeedback`. It shakes the hips bone after the animator (visual only, nothing builds
+  up, the collider never moves; Combat Feel › Victim Shake). Hosting co-op (`GamePause.TimeIsShared`), where `Time.timeScale` can't
+  dip, it holds the victim's animator and slows the attacker's instead, and puts back only the speed it set.
+- **Reactions and stamina.** The player flinches by stance and is floored by a blow worth `KnockdownShare` of max health for
+  `KnockdownSeconds`, untouchable. `PlayerStamina.TrySpendOnAttack` pauses regeneration for `PlayerStaminaSettings.AttackRegenDelay`;
+  a shorter pause never shortens a longer one.
+- **`PlayerRegain`** (on the player prefab): `Damageable.Damaged` fills a pool of `RegainShare` of each blow that got through, and
+  `Combatant.DamageDealt` (melee) heals `RegainPerDamage` a point from it until `RegainSeconds` drain it. The arithmetic is
+  `RegainRules` (`RegainTests`); `PlayerVitalsView` draws it as an amber stretch.
+- **`ArtRunes`** (static): an `ItemDefinition` with Art rune (Rune Art, Rune Focus, Rune For) is usable; `ItemInventory.Use` calls
+  `ArtRunes.Attune`, which records it in `CharacterProgress` (`AttuneRune`, `RuneIdFor`, keyed by the signature's name) and stays in
+  the bag. Saved as `ProgressSaveData.attunedRunes` ("Kind=itemId"). `PlayerCombat.Input` strikes the rune's art when attacking
+  out of the guard without a shield. `ArtRuneTests`.
+- **Teaching and feel.** `JournalPage.unlockedByTechnique` (guard, parry, dodge, stagger, stamina, hurt; `JournalNotices.TriedTechnique`)
+  opens each combat page on its own trigger. `HeldItemView` lights the art-ready ember while `PlayerFocus` can pay for the art.
+  `SkillDefinition` › Animation State plays a skill's own clip. `CombatFeedback` sparks and clangs on `AnyInterrupted` and flashes on
+  `SignatureUsed`.
+- **Telemetry**: `CombatTally` listens only to the player's own events, so no fighting code knows of it; `PlaytestLogger` writes one
+  `PlaytestLog.Combat` row per technique each played minute (subject the technique, amount the count, detail the weapon held).
+- **Clips: `CombatClipKit`** (Editor/Characters) replaces the retired Set Up Combat Animations for one swing at a time, driven
+  from a CLI eval: `PlayerSwingState` adds a state on Upper Body, Attack Arms and Combat Full Body, `MonsterState` one on
+  `MonsterHumanoid`, `Attack` copies a template attack, and `FitAttack` fits it to its clip so the blow lands at Hit Delay and the clip
+  plays out by Recovery Time (the retired builder's fitting, kept here). `Set` writes serialized fields by name.
 
 ## Senses and stealth: monsters notice, the player hides
 
@@ -2042,7 +2120,7 @@ The journal (J, `Journal/JournalWindow`, or the Escape menu's Journal) has five 
 - **The record:** `CreatureRecords` notes a creature as met when it spots the player or a blow passes between them, and slain when the player's side kills it. It lives in `CharacterProgress`, is saved in `ProgressSaveData.creatures`, and a failed raid doesn't take it back. A creature not met shows only as "???".
 - **A creature gives itself up in steps** (`JournalContent.KnowledgeOf`): how it fights and what it leaves after the first kill, how to live through it after Kills To Know (or being killed by one), and what is told of it after twice that. What is only ever fought once or twice has Kills To Know 1.
 - **`JournalRecord`** (in `CharacterProgress`, saved in `ProgressSaveData.journal`) holds pages read, announced and found, the skills tried, what has killed the player, the quest pinned to the top of the tracker and the last 60 raids. `JournalNotices` announces new pages, rolls `LootCache` searches for the next lost page and writes each raid down in `GameSession.EndRaid`. The window only reads what these leave behind, so all of it goes on with the window closed.
-- **Tutorials are the Mechanics pages.** A mechanics page has a Summary (what it is) above its body (how it works), an Art painting (LocalSpawn: `Tools/LocalSpawn/tutorial_art.json`, `generate_ui_art.py tutorials`, copied in by `BuildJournal`) and may wait for a skill to be tried (`JournalPage.unlockedBySkill`, `BuildJournal.MechanicsTriedBy`). `JournalNotices.Tried(skill)` marks it on first practice (`ExperienceTracker.Practised`) and where a system starts one before any experience is earned: a swing at a node (`PlayerGathering`), a cast (`PlayerFishing.Throw`), a crouch (`PlayerInputHandler.OnSneak`). A save with experience in a skill counts it as tried. A mechanics page that opens is not announced in words but queued in `Tutorials` (this session only; cleared by `GameSession.StartNewGame`/`LoadGame`): `TutorialNoticeHud` shows a card at the right edge with the newest one's picture until all are read, and `TutorialWindow` (T, `UIWindowId.Tutorial`, or a click on the card) shows them large, oldest first, with Previous/Next; a page shown counts as read. The journal's Mechanics tab shows each page's picture and opens it in the tutorial window. To add one: a page in `BuildJournal.Mechanics` (with its skill in `MechanicsTriedBy`), its picture in `tutorial_art.json`, paint, `BuildJournal.Apply`. `TutorialTests`.
+- **Tutorials are the Mechanics pages.** A mechanics page has a Summary (what it is) above its body (how it works), an Art painting (LocalSpawn: `Tools/LocalSpawn/tutorial_art.json`, `generate_ui_art.py tutorials`, copied in by `BuildJournal`) and may wait for a skill to be tried (`JournalPage.unlockedBySkill`, `BuildJournal.MechanicsTriedBy`) or, for a combat page, for a technique (`JournalPage.unlockedByTechnique`, from `JournalNotices.TriedTechnique`; pages a save already announced stay open). `JournalNotices.Tried(skill)` marks it on first practice (`ExperienceTracker.Practised`) and where a system starts one before any experience is earned: a swing at a node (`PlayerGathering`), a cast (`PlayerFishing.Throw`), a crouch (`PlayerInputHandler.OnSneak`). A save with experience in a skill counts it as tried. A mechanics page that opens is not announced in words but queued in `Tutorials` (this session only; cleared by `GameSession.StartNewGame`/`LoadGame`): `TutorialNoticeHud` shows a card at the right edge with the newest one's picture until all are read, and `TutorialWindow` (T, `UIWindowId.Tutorial`, or a click on the card) shows them large, oldest first, with Previous/Next; a page shown counts as read. The journal's Mechanics tab shows each page's picture and opens it in the tutorial window. To add one: a page in `BuildJournal.Mechanics` (with its skill in `MechanicsTriedBy`), its picture in `tutorial_art.json`, paint, `BuildJournal.Apply`. `TutorialTests`.
 
 ## Creature bodies
 

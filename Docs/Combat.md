@@ -9,11 +9,11 @@ by motion, sound and weight rather than on-screen text.
 
 | Input | Does |
 |---|---|
-| Left mouse / right trigger (tap) | Light swing, starting the moment you press. Pressed again **in time** after a swing lands, the next swing of the weapon's chain |
-| Left mouse (hold) | Held on (0.22 s), the light swing turns into the heavy swing while it still winds up: slow, nearly rooted, hard; breaks poise. You pay only the difference in stamina. Held on further, it waits at the top of its wind-up and charges (up to 0.9 s: +40% damage, +50% poise); letting go strikes |
+| Left mouse / right trigger (tap) | Light swing, starting the moment you press. Pressed again **in time** after a swing lands, the next swing of the weapon's chain. A press is kept for the next swing only in the last 0.25 s before the swing can chain; holding the button keeps the chain going |
+| Left mouse (hold) | Held on (0.22 s), the light swing turns into the heavy swing while it still winds up: slow, planted, hard; breaks poise. You pay only the difference in stamina. Held on further, it waits at the top of its wind-up and charges (up to 0.9 s: +40% damage, +50% poise); letting go strikes. Held to the full charge, it lets go as the weapon's **charged attack**; held again as a heavy lands, the **heavy follow-up** (where the weapon has them) |
 | Right mouse / left trigger (hold) | Guard. Raised just before a hit lands: parry |
-| Left mouse while guarding | Shield bash with a shield (off hand); without one it drops the guard into the weapon art, paid in Focus or, when Focus is short, in 30 stamina; a plain swing only when neither can pay |
-| Middle mouse | The weapon art (with a bow: next kind of arrow) |
+| Left mouse while guarding | Right after a parry: the counter. Right after a block (0.6 s): the **guard counter**. Otherwise a shield bash with a shield (off hand); without one it drops the guard into an art: the attuned rune's if there is one, else the weapon's own, paid in Focus or, when Focus is short, in 30 stamina; a plain swing only when neither can pay |
+| Middle mouse | The weapon's own art, even with a rune attuned (with a bow: next kind of arrow) |
 | Space / south button | Dodge: a quickstep, a roll or a heavy shoulder charge, by how much gear you wear |
 | Using food or drink | Stop and eat: takes a moment, heals over time |
 | Left Ctrl / left bumper (hold) | Sneak: half speed, quiet, hard to see. A hit on a monster that hasn't noticed you is an ambush (+50%) |
@@ -27,8 +27,31 @@ by motion, sound and weight rather than on-screen text.
   ground marks it, and it is kept until another is clearly nearer the aim. A swing still winding up keeps turning toward it. While the
   aim points well away from it (over 100°) you look and swing where the aim points, so you can always turn on something else. Bows
   have their own target. Options › Gameplay › Focus on Enemy turns it off.
-- **Weapon arts.** Every armed weapon knows a special attack, paid for with Focus and no stamina (short of Focus, it costs 30 stamina instead: Combat Technique Settings › Art Stamina Without Focus): sword 30, dagger 25, one-handed
-  axe or club 30, greataxe's whirlwind 40 (all around you), greatsword 35, hammer's ground blow 40 (all around you), spear 30.
+- **Weapon arts.** Every weapon knows a special attack, paid for with Focus and no stamina (short of Focus, it costs 30 stamina instead: Combat Technique Settings › Art Stamina Without Focus).
+  Each art moves you: sword 30, a dash 3.5 m through enemies, striking all along the way and ending past them; dagger 25, a blink behind the
+  focused enemy and a stab; one-handed axe or club 30, the weapon hurled 12 m, striking what it passes, and back to the hand; greataxe 40, a
+  whirlwind you can walk at 40%; greatsword 35, a leap slam that closes 4 m; hammer 40, a quake leap of 3.5 m that throws back; spear 30, a
+  javelin thrown 14 m that comes back; fists 25, a jumping uppercut; runic staff 30, a bolt that leaves the black widow's web where it lands. A thrown
+  weapon glances off walls and never gets lost. While Focus can pay for the art, the weapon in hand breathes a faint ember light.
+- **Art runes.** Eight runes, carved at the Alchemy Table with Runecraft 5, each give one kind of weapon a second art. Used from the bag, a rune
+  attunes every weapon of its kind; it stays in the bag, another of the same kind takes its place, and the save keeps it. Attacking out of the
+  guard without a shield strikes the rune's art; the middle button keeps the weapon's own. The arts the families had before 2026-11-15 are
+  runes now, so none was lost: Rune of the Whirl (sword: a spin), of Many Cuts (dagger: a spin), of the Reaver (axe or club: a low cut), of the
+  Vault (spear: a vaulting slam); and new ones: of the Cleaver (greataxe: a leap slam), of the Round (greatsword: a spinning sweep), of the
+  Millstone (hammer: a walking whirlwind), of the Knee (fists: a flying knee). A rune's art costs what its family's own art costs.
+- **What each weapon does that no other does** (its signature):
+
+  | Weapon | Signature |
+  |---|---|
+  | Sword | **Counter Chain:** a parry or perfect dodge readies two counters, and their window is half again as long |
+  | Dagger | **Assassin:** a backstab on a staggered enemy deals 2.0 times instead of 1.75; dodges cost 80% |
+  | One-handed axe, club | **Guard Breaker:** twice the poise against a raised shield |
+  | Greataxe | **Momentum:** each landed swing in a row adds 20° to the arc and 15% poise, up to three; it fades a second after the chain's grace without a landed swing, and with a weapon swap |
+  | Greatsword | **Hyper Armour:** the chain's finisher and the charged blow push through hits, as a heavy swing does |
+  | Hammer | **Crush:** a heavy, finisher or charged blow on an enemy whose poise is below 30% staggers it at once, great beasts too |
+  | Spear | **Anti Charge:** a blow on an enemy charging in deals twice the poise and stops the charge (it staggers, unless a boss); thrusts pierce two |
+  | Fists | **Flurry:** rhythm stacks to three, each adding a quarter of the blow's poise |
+  | Runic staff | **Channel:** every cast earns half again a landed hit's Focus |
 - **Backstab.** An enemy struck from behind (a pale wedge on the ground shows where) takes more if it is open. Staggering, it takes a sure
   critical at 1.75 times the damage, on top of the staggered bonus: that is the best blow there is, so parry, roll behind, strike. Caught in the
   middle of a strike, it takes 1.35 times, with no sure critical, and the strike is broken off. Great beasts (Old Moss Troll, Root Guardian, Huldra)
@@ -47,40 +70,86 @@ by motion, sound and weight rather than on-screen text.
   heavy roll is a charge and always goes straight). No dodge is blocked by bodies: it passes through them. The cooldown is 0.9 s (0.72 s for a quickstep); stamina
   is what really limits dodging: about six quicksteps, four rolls or two heavy rolls from full.
 - **Sweeps.** A wide swing strikes its targets in the order the blade reaches them, not all at once; narrow swings hardly differ.
-- **Chains.** Each weapon has a chain of light swings (sword: three; axes: two; spear: three; fists: three). A press
-  after a swing has landed continues the chain; the last swing is the **finisher** (wider, harder, more poise damage).
-  A press *before* the swing has landed is buffered: the chain goes on, but the press misses the rhythm bonus.
-  (Combat Technique › Early Press Fumbles turns mashing back into a fumble that restarts the chain.) A press right as a
-  swing recovers is **on the rhythm**: a small damage edge (+5% per step, at most two).
-  Swings never get faster.
+- **Chains.** Each kind of weapon has its own chain of light swings, no two alike:
+
+  | Weapon | Chain |
+  |---|---|
+  | Sword | slash, slash, backhand, finisher |
+  | Dagger | thrust, twin cut, slash, stab |
+  | One-handed axe, club | forehand, overhead, chop |
+  | Greataxe | wide, mirrored backhand, cleave |
+  | Greatsword | sweep, wide, diagonal finisher |
+  | Hammer | cleave, sweep, overhead finisher |
+  | Spear | thrust, low sweep, lunge |
+  | Fists | jab, cross, hook, front kick |
+  | Runic staff | rune bolt, rune bolt, a burst around you that throws back |
+
+  A press after a swing has landed continues the chain; the last swing is the **finisher** (wider, harder, more poise damage).
+  A press is kept for the next swing only in the last 0.25 s before the swing can chain (Combat Technique › Buffer Window);
+  earlier presses are dropped, so mashing doesn't commit you to a whole chain. Holding the button through a swing keeps the chain
+  going. A press kept before the swing has landed misses the rhythm bonus. (Combat Technique › Early Press Fumbles turns an
+  early press into a fumble that restarts the chain.) A press right as a swing recovers is **on the rhythm**: a small damage
+  edge (+5% per step, at most two). Swings never get faster: the next one still waits for the swing's Recovery Time.
+- **Context attacks.** Where you attack from changes the attack, where the weapon has one:
+  - **Counter:** after a parry or perfect dodge (attacking out of the guard right after a parry is the counter too, not the art).
+  - **Guard counter:** attacking out of the guard within 0.6 s of a block: a hard answer, 1.75 times the poise, never a critical.
+    A shield's is Shield Cut; without one it is the weapon's counter, else its heavy swing.
+  - **Backstep attack:** out of a dodge at least 120° away from where you aim: the sword's and dagger's backstep thrust, the spear's butt
+    strike (it shoves 1.5 m), the fists' push kick.
+  - **Heavy follow-up:** holding attack again as a heavy swing lands (sword: a sweep; greatsword: a backhand; spear: a spin).
+  - **Charged attack:** a heavy held to its full charge lets go as the weapon's strongest blow (sword: a spinning leap; dagger: a focused stab
+    that is always critical; axe or club: a heavy chop; greataxe: a spinning sweep all around; greatsword: a lunging drive; hammer: a leap
+    slam all around; spear: an overhead slam).
+- **Moving while you swing.** A light swing lets you walk at a share of your speed while it winds up, the arms swinging over walking legs:
+  daggers and fists 60%, swords, axes and spears 30%, two-handed weapons 5-8%. Heavy swings, rushes and arts keep the feet planted. Early in
+  the wind-up the blow turns toward where you aim (150° a second, over its first 60%), and a charging heavy can be aimed while held. The
+  step into the blow takes the last third of the wind-up: 0.8-1.0 m for chain swings, 1.2-1.5 m for finishers. A moment after it lands
+  (0.1 s) you walk off at half speed (two-handed weapons a quarter, heavy swings a fifth). Walking off never brings the next swing sooner.
 - **Rush attacks.** An attack pressed during a dodge or up to 0.3 s after, or while running toward where you aim, is the weapon's rush
   attack: a quick lunge that carries your movement into the blow (the sword's lands in 0.28 s). Pressed during a dodge it waits only for
-  the dodge's invulnerability to end, then cuts the rest of the dodge short. After a perfect dodge it is the counter, where the weapon has one.
-  The next press goes on with the chain's second swing.
+  the dodge's invulnerability to end, then cuts the rest of the dodge short. After a perfect dodge it is the counter, where the weapon has one;
+  out of a dodge away from the aim, the backstep attack. The next press goes on with the chain's second swing.
 - **Staying in the fight.** Being struck, blocking or dodging a blow puts you in Combat, and you stay there while an enemy within 14 m is
   after you, whether or not you hit back. Five seconds after the last blow with no one after you, it ends.
 - **Getting out.** A dodge cuts a swing short at any time. During the wind-up the swing is lost: it deals no damage,
-  and its stamina is spent. You move slowly while swinging and hardly at all during a heavy swing. (Combat Technique ›
-  Dodge Cancels Windup off makes every swing a commitment again: no dodging until it lands.)
+  and its stamina is spent. No new attack starts for 0.35 s after that, so dodging in and out of wind-ups can't fish for invulnerability. Out of a
+  charging heavy there is no such pause: that is a feint. How fast you move while swinging is in *Moving while you swing* above. (Combat
+  Technique › Dodge Cancels Windup off makes every swing a commitment again: no dodging until it lands.)
 - **Flinch.** A hit that gets through (not blocked) while you wind up loses the swing, and you reel for a moment
-  (no attacking, guarding or dodging). Trading blows with a monster is a losing game, unless the weapon is heavy enough: the wind-up of a
-  heavy swing pushes through hits with a hammer or maul (40% less damage) and a greatsword or two-handed axe (30% less). Lighter weapons dodge instead.
+  (no attacking, guarding or dodging), in a flinch that fits how you hold the weapon (one-handed, two-handed, a polearm or bare fists).
+  Trading blows with a monster is a losing game, unless the weapon is heavy enough: the wind-up of a
+  heavy swing pushes through hits with a hammer or maul (40% less damage) and a greatsword or two-handed axe (30% less), and a greatsword's
+  finisher and charged blow do too. Lighter weapons dodge instead.
+- **Knockdown.** A single blow worth 35% of your health or more floors you for a second; you can't be hit while you are down (Combat
+  Technique › Knockdown Share and Knockdown Seconds).
+- **Regain.** Part of a blow that got through (40%) can be won back for 3 s by striking back: every melee blow that lands heals half a point
+  per point of damage it deals, up to what is left. What isn't won back drains away. The health bar shows it as an amber stretch. It
+  rewards answering a hit rather than backing off to wait for a parry (Combat Technique › Regain).
 - **Guard.** Blocks hits from the front. Part of each hit still gets through (60% with fists, 35–40% with a weapon,
   10% with a shield) and each block costs stamina: 0.8 for each point of damage the blow would have done you, after your
   armor and resistances (`GuardRules.BlockCost`), so armor makes a guard last and a raid's tier doesn't price blocking out
   (a tier IV wolf's bite costs 17 in moonsilver, where its raw 61 damage would cost 49). Run out and the guard **breaks**:
   you reel for over a second.
-- **Parry.** Raise the guard within 0.15 s before a hit lands: no damage, no stamina, the attacker staggers and your
-  next swing is a **counter** (a critical hit; the sword's is a dashing thrust). Lowering the guard locks it for 0.3 s,
-  so tapping it is no free parry. A monster's ground telegraph turns pale and the monster glints exactly when to raise
-  it.
+- **Parry.** Raise the guard within 0.15 s before a hit lands: no damage, no stamina, and your next swing is a **counter**
+  (a critical hit; the sword's is a dashing thrust). What the attacker does depends on what it is (Content Editor › Monsters › Parry
+  Response): an ordinary creature staggers; a great beast, boss or elite isn't floored but loses 40% of its poise and reels back 0.45 s,
+  its strike broken off, and staggers only when that breaks its poise, so it takes two parries, or a parry and some hard blows. Lowering
+  the guard locks it for 0.3 s; a guard tapped and lowered within 0.5 s that caught nothing stays down 0.6 s, so tapping it is no free
+  parry. A monster's ground telegraph turns pale and the monster glints exactly when to raise it. Parrying is one way into a fight, not
+  the whole of it: a parry earns about as much Focus as two landed blows.
 - **Perfect dodge.** Dodging through a hit (during the dodge's invulnerability) also readies a counter.
-- **Stamina.** 100, back at 26 per second from 0.9 s after the last spend (empty to full in under five seconds): a
-  light swing costs 12, a dodge 25 (a quickstep 15, a heavy roll 35), a shield bash 18, a drawn arrow 4, a block part of the hit.
-- **Focus.** Fighting well earns Focus (the gold bar under stamina): each hit that lands (finishers twice as much, heavy
-  swings and counters half again), a parry (worth about six hits), a perfect dodge (about four), a block (a little). It
-  holds for ten seconds after the last gain, then drains. Skills cost Focus on top of their cooldown (Wolf's Lunge 25,
-  Whirling Steel 40, Trollsbane Wrath 60, ...), so they are what good fighting buys, not what opens a fight.
+- **Interrupts.** The light strikes of ordinary creatures (bites, gores, shoves, the tongue lash, the Rootling's grasp, a runt's strike) are
+  broken off by any blow that lands in their wind-up. Any wind-up of an ordinary creature is broken off by a heavy swing, a counter, a guard
+  counter, a finishing blow, an art, or a blow worth a quarter of its poise (Combat Technique › Break Through); a great beast's never is. An
+  interrupted creature waits 0.5 s before it strikes again, and the break sparks, clangs and holds a beat.
+- **Stamina.** 100, back at 26 per second (empty to full in under five seconds) from 0.5 s after a swing, or 0.9 s after a dodge or a block;
+  a shorter pause never cuts a longer one short. A light swing costs 12, a dodge 25 (a quickstep 15, a heavy roll 35), a shield bash 18, a
+  drawn arrow 4, a block part of the hit. A full charge or an art paid in Focus is never refused on an empty bar.
+- **Focus.** Fighting well earns Focus (the gold bar under stamina): each hit that lands (8; finishers twice as much, heavy
+  swings and counters half again), a parry (18, about two hits), a perfect dodge (18), a block (a little), and each cast of the runic
+  staff (half again a hit). A whole sword chain that lands earns about 50. It holds for ten seconds after the last gain, then drains.
+  Skills cost Focus on top of their cooldown (Wolf's Lunge 25, Whirling Steel 40, Trollsbane Wrath 60, ...), so they are what good
+  fighting buys, not what opens a fight. Each skill plays its own animation (a cast, a high cast, a spin, a dash, a deep overhead).
 - **Gear weight decides the dodge.** Worn armour, rings and the weapon add up to an equipment load. Light (6 or less): a
   short, cheap quickstep. Normal: a half-second roll. Heavy (13 or more): a slow, costly shoulder charge that barges
   enemies at its end (it breaks their poise), and you move a little slower.
@@ -102,7 +171,9 @@ by motion, sound and weight rather than on-screen text.
 
 A shield is held in the off hand, beside a one-handed weapon. Two-handed weapons and bows don't leave a hand free; L swaps it
 for the torch and back. Each shield has its own Guard Let Through: Round Shield 22%, Copper-Bound 15%, Iron Kite 8%. Heavier
-ones add more to the equipment load, which decides the dodge.
+ones add more to the equipment load, which decides the dodge. A blow blocked on a shield costs the attacker poise (Block Poise:
+Wicker and Round 12, Copper-Bound 16, Iron Kite, Moonwood and Trollwall 20), and attacking out of the guard within 0.6 s of a block
+is the shield's guard counter, Shield Cut.
 
 ## Creatures
 
@@ -117,9 +188,9 @@ Small Moss Trolls chain their shove from Tier II, and hold it 25% of the time.
 |---|---|---|
 | Marsh Light | Pale hovering light, keeps its distance, flees when hurt | Its cold bolts are slow: dodge, then shoot it or run it down |
 | Draug | Slow armoured dead with a blade, hard to stagger | Fire hurts it more; bait the lunge, it stands open after |
-| Barrow Shieldbearer | A Draug with a shield, slow to turn. Its shield takes 75% of what comes from the front, arrows too, while it hunts | Get behind it or to its side, catch it striking, or go through with a heavy blow or an art |
+| Barrow Shieldbearer | A Draug with a shield, slow to turn. Its shield takes 75% of what comes from the front, arrows too, while it hunts | Get behind it or to its side, catch it striking, or go through with a heavy blow or an art; an axe or club breaks its guard |
 | Bog Spitter | Squat, spits venom from range | Close in: it is weak up close. Carry an Antidote |
-| Blight Boar | Leaves you alone at a distance | Sidestep the charge and hit it while it stands blown |
+| Blight Boar | Leaves you alone at a distance | Sidestep the charge and hit it while it stands blown, or stop the charge with a spear |
 | Rootling | Small, fast, always several; a grasp can root you | Sweeping swings. Kill the Shaman that calls them |
 | Moss Shaman | Hangs back with a staff, calls Rootlings, rallies its side | Reach it first; hitting it interrupts a call |
 
@@ -161,6 +232,18 @@ A bow is held in the left hand and shoots arrows from the bag. It trades the mel
   Arrows and 1 Bone. At the Construction Table: the **Hunter's Bow** (Tier II: 0.85 s draw, 0.5 s reload, 40 m/s,
   steadier) from 3 Oak Planks, 2 Nettle Cord and 1 Rough Hide.
 
+## The runic staff
+
+A two-handed staff that casts instead of striking (GDD §10.4, "magic and control"), made at the Alchemy Table with Runecraft 3 from
+3 Bone, 2 Nettle Cord and 2 Orb Tincture. It uses the melee buttons, guard and dodge as any weapon does.
+
+- **Its chain** casts two rune bolts and ends in a burst around you that throws enemies back. Bolts fly straight from the hand as the
+  blow would land, strike as the swing would at the staff's damage, and stop at scenery. Held, it casts a fan of three bolts.
+- **Its art** (30 Focus) is a bolt that leaves the black widow's web where it lands. Its signature, Channel, makes every cast earn half
+  again a landed hit's Focus, so a caster keeps skills and arts coming.
+- **Pace.** From range it deals 1.22 times its damage a second, against a sword's 1.6 up close: range is what it trades for.
+- **Not finished:** it holds the Moss Shaman's staff model like a spear and shows the iron spear's icon; both want an art pass.
+
 ## Readable animation
 
 Combat lives or dies on seeing what is about to happen, so the animation is built for it:
@@ -168,31 +251,39 @@ Combat lives or dies on seeing what is about to happen, so the animation is buil
 - **One body for every animation.** The player is Kevin Iglesias' human (the body the movement and work clips were
   made for); the Quaternius combat clips retarget onto it cleanly (Safe Haven › Characters › Use Human Body for Player).
 - **Whole-body swings.** Standing still, swings play on a full-body layer, so the legs step into the blow and the weight
-  shifts; that is what reads from a top-down camera. While running only the arms swing.
+  shifts; that is what reads from a top-down camera. Started on the move (by a swing that lets you walk), or walked out of after the
+  blow, only the arms swing, over walking legs; the step into the blow is always the legs' own.
 - **A build-up, then a strike.** A swing has three speeds: a slower build-up you can read (Animation Speed), a fast strike in the
-  last moment before contact (Strike Speed, for Strike Lead seconds), and the follow-through. Set Up Combat Animations works the
-  build-up out so the swing still lands at its Hit Delay: changing the shape of a swing changes no damage per second. Swings too quick
-  for a build-up (a dagger's stab) play at one speed. The body steps into the blow in its last moments, ending as it lands.
+  last moment before contact (Strike Speed, for Strike Lead seconds), and the follow-through. The build-up is worked out when a swing
+  is fitted to its clip, so the swing still lands at its Hit Delay: changing the shape of a swing changes no damage per second. Swings too quick
+  for a build-up (a dagger's stab) play at one speed. The body steps into the blow over the last third of its wind-up, ending as it lands.
   Chain swings that aren't followed up blend into their recovery at the matching pose instead of starting over.
 - **Heavy swings keep their feet on the ground until they strike.** A heavy swing winds up and charges on the upper body over the planted
   legs, and the whole body joins in for the strike. Some clips stride or leave the ground, and holding one of those for as long as the
   button is held leaves the player hanging in the air, so leaps (`Combat_2H_AttackSpecial`, `Combat_2HL_AttackSpecial`) are used only for arts, which
-  nothing holds, and play at one speed. `CombatMovesetTests` refuses a heavy swing that leaps.
+  nothing holds, and play at one speed. `CombatMovesetTests` refuses a heavy swing that leaps. A charged attack is let go, never held, so it
+  plays on the whole body and may leave the ground (the sword's spinning leap, the hammer's leap slam).
 - **Both hands on two-handed weapons** (`TwoHandGrip`): after the animation, the left arm is bent so the palm closes on the handle, the
   weapon's Second Hand Distance from the right hand. It lets go in a dodge, at work, eating or swimming, and when a follow-through takes the handle out of reach.
-- **Each family moves its own way.** One-handed swords keep the Quaternius chain; daggers, one-handed axes and clubs, greataxes,
-  greatswords, hammers and spears have their own swings from the Stylized Character pack, retimed to the cadence of the attack they
-  were split from, which is also where their damage comes from. So a new clip never moves a weapon's damage per second or gear score.
-  The pack's other 2HL swings lead with the butt of a spear, so spears keep the Kevin Iglesias thrust for their first two swings.
+- **Each family moves its own way.** Since 2026-11-15 no two families swing the same chain. Most new swings come from Kevin Iglesias'
+  *Human Melee Animations* (bought by the user; made for the same body as the player), beside the Quaternius and Stylized Character
+  clips already in use: one-handed swords keep the Quaternius slashes with a Kevin Iglesias backhand; one-handed axes and clubs no longer
+  borrow the dagger's clips; spears no longer play the same thrust twice (the second swing is a low sweep); greataxes mirror their wide
+  swing into a backhand. Every swing is retimed to the cadence of the attack it took its numbers from, so a new clip never moves a
+  weapon's damage per second or gear score: each family's stays within 6% of what it was (`WeaponIdentityTests`).
+- **The player reacts by stance and weight.** A flinch fits the grip (Hit 1H, 2H, Polearm, Unarmed); a blow worth 35% of health plays a
+  knockdown on the whole body.
 - **Humanoid monsters strike and flinch properly.** The Draug, Root Guardian, Old Moss Troll and Huldra play their own strikes,
-  fitted so the blow lands at the attack's Hit Delay, and flinch from blows worth 4% of their health or more. Monsters built from
-  rigid parts keep their procedural pose.
+  fitted so the blow lands at the attack's Hit Delay, and flinch from blows worth 4% of their health or more. They react by the
+  blow's weight: a heavy swing, counter, guard counter, finisher or a blow worth 30% of their poise sends them staggering back (Hit Heavy),
+  and a charged blow (or one worth 75% of their poise) that breaks their poise knocks them down. In the middle of a strike they don't
+  flinch. Monsters built from rigid parts keep their procedural pose, recoiling harder the more poise a blow takes.
 - **Monsters coil and lunge.** Monsters lean back, draw back and crouch through their wind-up (slowly, then fast at the
   end), snap forward at the hit and settle; staggered monsters sway and sag (`AttackPose`, on top of any animation).
   Their ground telegraph turns pale with a glint for the last moment: the time to parry.
 
 The Quaternius libraries need their own import setup (Bake Axis Conversion, the rig's root as root motion node, and an
-avatar made after that), or every pose comes out rotated; Set Up Combat Animations applies and checks it.
+avatar made after that), or every pose comes out rotated; Set Up Combat Animations applied and checked it, and a new library needs the same.
 
 ## Feedback
 
@@ -215,7 +306,11 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 - **Bleeding out.** The killing blow throws blood as hard as blood can fly, whatever the blow. Then what bleeds goes on pumping from where it
   was struck for 5 s, in pulses that weaken and slow, flinging blood and stains around the body; and once it lies still a pool spreads out under
   it over about 9 s, as wide as the body lies, with a smaller one under the wound. Pools last 45 s. Amounts: Combat Feel › Blood and Corpses.
-- Hit stop and shake scale with the attack's Impact, so a dagger's nick and a hammer's blow land differently.
+- Hit stop and shake scale with the attack's Impact, so a dagger's nick and a hammer's blow land differently. The struck body shudders
+  side to side through the stop, shrinking as it ends (Combat Feel › Victim Shake, 0.045 m). Hosting co-op, where time can't stop for
+  everyone, the struck body's animation holds and the attacker's slows instead, so a blow still lands with weight.
+- A wind-up broken off by a blow sparks, clangs and holds a beat. A signature at work (a crush, a stopped charge, a broken guard)
+  flashes and shakes.
 - The swing's whoosh plays as the weapon moves, just before it lands (Combat Feel › Swing Sound Lead), not as the
   wind-up starts. A swing that is dodged out of or turned heavy stays silent.
 - Monsters recoil from blows: the body tips and is shoved the way the blow went, squashes, and springs back with a small
@@ -227,20 +322,42 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 - **Axes** have a deep whoosh and a heavy, low thud (Axe Swing, Axe Hit). Swords use the game-wide blade swing and hit.
 - Parries and perfect dodges give a short hitch (a beat of weight, not slow motion). Hits on and by the player stop
   time for a few milliseconds and shake the camera, more for heavy swings and finishers.
-- Hurt: the screen edges flash red, stronger for bigger hits; below 30% health they pulse.
+- Hurt: the screen edges flash red, stronger for bigger hits; below 30% health they pulse. What Regain can still win back shows as an
+  amber stretch on the health bar.
+- Art ready: the weapon in hand breathes a faint ember light while Focus can pay for its art.
 - Optional: a chain readout under the player (Combat Technique › Show Combo Hud) and text callouts (Combat Feel ›
-  Technique callouts). Both are off by default.
+  Technique callouts, Interrupt Text). Both are off by default.
+
+## Learning it
+
+The combat pages of the journal open one at a time, each when what it is about first comes up: Swings and Chains on the first blow,
+Guard and Parry on the first block, Dodging on the first dodge, Stamina and Focus when stamina runs out or on the first art, Poise and
+Stagger on the first stagger, Backstabs on the first parry, Getting Hit when first hurt. Pages a save has already announced stay open.
+The pages are written from this document, so a changed rule has to be changed there too.
+
+## Measuring it
+
+The playtest log writes **Combat** rows for each played minute, with the weapon held: swings by kind, blows landed and whiffed,
+parries, blocks, broken guards, dodges and perfect dodges, flinches and the swings they cost, counters, backstabs, interrupts and
+times hurt. They show how much of a fight is parrying, to compare one playtest with the next.
 
 ## Where to tune it
 
 | What | Where |
 |---|---|
 | Chain timing, rhythm, heavy hold and charge, sweep time, swing tracking, focus on an enemy, backstab, guard, parry window, flinch, poise and stagger | Systems Editor › Player › Movement & Combat › Combat technique (`Resources/CombatTechniqueSettings`) |
-| Hit stop, shake, effects, weapon trail, slash arcs, markers, blood amounts, corpses, swing sound lead, hit recoil, vignette, telegraph colours, callouts | Systems Editor › Movement & Combat › Combat feel (`Resources/CombatFeel`) |
-| A weapon's chain, heavy and counter attack, weapon art and its Focus, how well it guards, its sounds and Hit Effect | Content Editor › Weapons |
+| Moving while swinging (fallbacks), the turn early in a wind-up, the step in, the buffer window, the lockout after a dodged wind-up, the backstep angle | Combat technique |
+| The parry economy (a heavyweight's poise loss and recoil, the missed-parry relock), the guard counter, Break Through, the interrupt pause, knockdown, Regain | Combat technique |
+| Hit stop, shake, victim shake, effects, weapon trail, slash arcs, markers, blood amounts, corpses, swing sound lead, hit recoil, vignette, telegraph colours, callouts | Systems Editor › Movement & Combat › Combat feel (`Resources/CombatFeel`) |
+| A weapon's chain, heavy and counter attack, context attacks (backstep, guard counter, heavy follow-up, charged), weapon art and its Focus, signature and its Power, how well it guards, a shield's Block Poise, its sounds and Hit Effect | Content Editor › Weapons |
 | An attack's damage, reach, timing, poise damage, Impact, lunge, animation speeds (build-up, strike, follow-through) and slash colour, sweep and tilt | Content Editor › Attacks & Abilities |
-| A monster's poise, blood (whether, and its colour), ragdoll, hurt and wind-up sounds | Content Editor › Monsters |
-| Which clip each weapon family plays | `CombatMovesets.cs`, then Safe Haven › Setup › Characters › Set Up Combat Animations |
+| How an attack lets the player move (Movement: wind-up and after-contact speed, turn rate, Move At, Lunge Share), how an art moves (dash, blink, leap, throw, and how far), Always Critical, and a staff's Cast (bolts, fan, hazard) | Content Editor › Attacks & Abilities |
+| A monster's poise, Parry Response, blood (whether, and its colour), ragdoll, hurt and wind-up sounds | Content Editor › Monsters |
+| Which monster strikes can be interrupted | The monster's attack list › Interruptible |
+| A rune's art, its Focus and the kind of weapon it fits | The rune item › Art rune |
+| The stamina pause after a swing | `PlayerStaminaSettings` › Attack Regen Delay (Regen Delay after a dodge or block) |
+| A skill's animation | Content Editor › Skills › Animation State |
+| Which clip each weapon family plays | `CombatMovesets.cs` and the animator; new swings go in one at a time with `CombatClipKit` (Set Up Combat Animations is retired) |
 | Game-wide combat sounds | Sound Editor › Sound Effects › Game-wide effects |
 | Focus gains, how long it holds, eating time and heal-over-time | Combat technique (Focus, Eating and drinking) |
 | A skill's Focus cost | Content Editor › Skills › Focus Cost |
@@ -248,11 +365,14 @@ avatar made after that), or every pose comes out rotated; Set Up Combat Animatio
 | A bow's draw time, reload time, arrow speed, spread, minimum draw, move speed while drawing, perfect release window and bonus, aim spread, quick shot damage and shot attack | Content Editor › Weapons (Bow) |
 | An arrow's damage, speed, drop, impact noise, recover chance, burning and what flies | Content Editor › Arrows, and the arrow item's Arrow field |
 
-**Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`), the Kevin Iglesias packs and
-the Stylized Character pack (`Assets/StylizedCharacter`). **Safe Haven › Setup › Characters › Set Up Combat Animations** imports them, adds the
-combat states to the player's and monsters' animator controllers, and fits every built-in attack to its clip: it finds the contact by
+**Animations** come from the Quaternius Universal Animation Libraries (CC0, `Assets/Quaternius`), the Kevin Iglesias packs (Human
+Melee Animations among them since 2026-11-15) and the Stylized Character pack (`Assets/StylizedCharacter`). **Safe Haven › Setup ›
+Characters › Set Up Combat Animations** is retired with the other bulk builders (2026-11-14): it rebuilt from a stored copy and could
+overwrite newer work. New swings are added one at a time with `CombatClipKit` (a swing state on the player's three swing layers, a
+monster state, and the attack fitted to its clip), which keeps the builder's fitting. The builder imported the clips, added the
+combat states to the player's and monsters' animator controllers, and fitted every built-in attack to its clip. The fitting finds the contact by
 playing the clip on the player's rig and watching the weapon hand. For the big Stylized swings the hand's top speed is often the weapon
 going up, so there it looks for the hand driving forward or down, and allows for the blade following the hand (`DrivenContact`,
-`BladeLag`). It leaves a built Sneak layer and the dodge's distance alone. It also builds the **Bow** layer from Kevin Iglesias' *Human
-Archer Animations FREE* (Load, Hold, Release and a bow idle, upper body only). Effects are rebuilt with **Safe Haven › Combat › Build
-Combat Effects**, blood and the focus ring alone with **Build Blood and Markers**.
+`BladeLag`). The builder left a built Sneak layer and the dodge's distance alone, and also built the **Bow** layer from Kevin Iglesias'
+*Human Archer Animations FREE* (Load, Hold, Release and a bow idle, upper body only). Effects were built with **Safe Haven › Combat › Build
+Combat Effects**, blood and the focus ring with **Build Blood and Markers**; both are retired too, so effects are edited directly now.

@@ -38,6 +38,34 @@ Open work and ideas. Tick items off (`[x]`) or delete them when done. Architectu
    easier; the size on the fish item (looks only), and the biggest catch in the journal.~~ (done 2026-11-12: FishInTheWater,
    FishSizes, ARCHITECTURE "Fish you can see". Checked in Play at the Haven pond; a whole catch not played by hand.)
 
+## Combat rework (2026-11-15)
+
+Everything in Docs/CombatResearch.md was built (its Status section lists what and where; rules in Docs/Combat.md). Checked by
+Play-mode probes from the CLI and tests only: every number is a first guess. Play it by hand, ideally the same short fight
+(wolves, a Draug, a Shieldbearer, a troll) with each weapon:
+- [ ] Walking while swinging from the top-down camera: do the feet glide under the arms? Try it over the shoulder (V) too.
+- [ ] The bounded buffer (0.25 s): does the chain feel responsive, or does it swallow presses? Does holding the button to keep
+      chaining feel natural?
+- [ ] The 0.35 s lockout after dodging out of a wind-up: noticeable, or in the way?
+- [ ] Is the parry still worth it at 18 Focus, and do great beasts, bosses and elites feel right needing two parries (40% poise
+      each) instead of one?
+- [ ] Are interrupts readable: does the spark and clang show which blow broke a wind-up off?
+- [ ] Does each family feel like its own weapon: its chain, its context attacks (guard counter, backstep, heavy follow-up,
+      charged attack) and its signature? Is any one clearly best?
+- [ ] Each family's moving art: the sword's dash, the dagger's blink, the axe's hurl, the walking whirlwind, the leap slam,
+      the quake leap, the javelin, the uppercut. Do any land somewhere awkward (in a wall, off a ledge)?
+- [ ] Art runes: is carving and attuning one clear from the bag, and is "attack out of the guard" for the rune's art found?
+- [ ] The runic staff: does it play well from range, and is its pace (1.22 against a sword's 1.6) fair? Its grip (held like a
+      spear) and icon (the iron spear's) need an art pass; the eight runes still use Hush Rune's icon.
+- [ ] Regain: is 40% of a hit, won back at 0.5 a point dealt within 3 s, enough to change how you answer a hit? Is the amber
+      stretch on the health bar seen?
+- [ ] Knockdown at 35% of health in one blow: too often, too rare? Is a second down too long?
+- [ ] The art-ready ember glow on the weapon: noticeable, but not distracting?
+- [ ] Combat rows in the playtest log (CombatTally): compare the parry share, hits per fight and deaths with a run from before
+      2026-11-15, if one is in LocalLow.
+- [ ] Mixamo clips were not used (no browser in the agent session), nor the optional two-hand or power-stance toggle: decide
+      whether either is still wanted.
+
 ## Horses and the playtest list (2026-11-11)
 
 Built and checked in Play (see GDD §10.9); none of it played by hand yet.
@@ -131,8 +159,9 @@ notice and the window were seen in Play from the CLI, before their pictures were
 paintings and the status icons beside the vitals are new too.
 - [ ] Play it by hand from a new game: is the notice noticed, is T found, and is opening five tutorials at once at the
       first scene too many? (Your Windows, Your Journal, Hunger and Thirst and Skills and Perks come at once.)
-- [ ] The seven combat pages all open on the first blow that lands. Spread them (parry, dodge, first stagger) if it is
-      too much at once.
+- [x] The seven combat pages all open on the first blow that lands. Spread them (parry, dodge, first stagger) if it is
+      too much at once. (Done 2026-11-15: they open one at a time on their own triggers, the first block, dodge, stagger,
+      parry, empty stamina or art, and hurt; `JournalPage.unlockedByTechnique`. Not yet seen in a new game by hand.)
 - [ ] Look at the paintings in the game: the tutorial window, the journal's creatures, the People page, the raid
       planner's header and the results screen; the status icons beside the vitals.
 - [ ] 21 quests from 2026-11-10 have no Journal Notes (BringAsaHome and the other homecomings, the job quests,

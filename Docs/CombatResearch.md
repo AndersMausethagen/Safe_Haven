@@ -3,6 +3,46 @@
 Research date: 2026-11-15. This was read-only: no project files were edited, and no Unity CLI or Play mode was used.
 Paths are relative to `d:\Safe Haven\Safe Haven` unless they are absolute. `file:line` points at the current `test` branch.
 
+## Status (2026-11-15): built
+
+The user asked for everything this report recommends ("do everything it recommends"), and it was built the same day in four commits
+on `test`. The rest of this report is the research record and is left as it was written: its `file:line` references point at the code
+before these commits. How combat works now is in `Docs/Combat.md`; the architecture is in ARCHITECTURE.md › Combat rework (2026-11-15).
+
+| §3.3 | Recommendation | What was built | Commit |
+|---|---|---|---|
+| 1 | Unroot the player | Per-attack Movement (`AttackDefinition`, `SwingMotion`; settings 0.25 / 0.5 / 0.2 as fallbacks). Light swings keep 60% of walking speed (daggers, fists), 30% (swords, axes, spears) or 5-8% (two-handers) in the wind-up, on the arms over walking legs; heavies, rushes and arts stay planted. The player walks off 0.1 s after contact (50%, two-handers 25%, heavies 20%). The blow turns toward the aim at 150°/s over the first 60% of the wind-up. The step in takes the last third of the wind-up: 0.8-1.0 m for chain swings, 1.2-1.5 m for finishers | 7a3bd7ab |
+| 2 | Bounded buffer, split windows | A press is kept only in the last 0.25 s before the chain point (or of a dodge, flinch or broken guard); holding the button keeps the chain going. The chain point stays Recovery Time (no `ChainAt` field); Move At and the turn rate are per attack, else the settings, and the turn window is the settings' Windup Turn Share. A dodge out of a wind-up locks attacking for 0.35 s, except out of a charging heavy (a feint) | 7a3bd7ab |
+| 3 | Parry economy | Focus: parry 35 → 18, hit 6 → 8, perfect dodge 25 → 18. `MonsterDefinition` › Parry Response: ordinary creatures stagger; great beasts, bosses and elites lose 40% of their poise and recoil 0.45 s. A guard tapped under 0.5 s that caught nothing stays down 0.6 s. Attacking right after a parry is the counter, not the art | 7a3bd7ab |
+| 4 | Let aggression interrupt | 13 light monster strikes ticked Interruptible. Break Through: a heavy, counter, guard counter, finisher, art or a blow worth 25% of the poise breaks off an ordinary creature's wind-up (never a great beast's); it waits 0.5 s. The spark, clang and beat of hit stop came in 0df62c9d | 7a3bd7ab, 0df62c9d |
+| 5 | Context attacks | `WeaponDefinition` slots: Backstep Attack, Guard Counter Attack (×1.75 poise), Heavy Follow Up, Charged Attack. Shields deal Block Poise 12-20 and guard-counter with Shield Cut. Throw arts for axes, clubs and spears | 7a3bd7ab (slots), 107d9078 (attacks, clips) |
+| 6 | Distinct chains per family | Every family its own chain of 3-4 swings, from 65 Kevin Iglesias Human Melee clips (bought by the user) and owned packs; spear swings 1 and 2 differ. Each family's damage per second within 6% of before (`WeaponIdentityTests`) | 107d9078 |
+| 7 | Signature and moving art | Eight signatures (Counter Chain, Assassin, Guard Breaker, Momentum, Hyper Armour, Crush, Anti Charge, Flurry) and arts that move (dash through, blink behind, hurl, walking whirlwind, leap slam, quake leap, javelin, jumping uppercut) | 107d9078 |
+| 8 | Hit stop in co-op, reactions | `HitShake`: the struck body shudders through the stop; hosting co-op its animation holds and the attacker's slows. The player flinches by stance and is floored by a blow worth 35% of health. Humanoid monsters play Hit Heavy and Knockdown; procedural ones recoil by poise damage | 0df62c9d |
+| 9 | Stamina pause split | 0.5 s after a swing, 0.9 s after a dodge or block (as before); a shorter pause never cuts a longer one short | 7a3bd7ab |
+| 10 | Telemetry | `CombatTally`: Combat rows in the playtest log each played minute, with the weapon held | 7a3bd7ab |
+| 11 | Riposte perk | Keeps a parry's counter ready 1.6× longer and lets it lunge as far as the weapon's rush | 7a3bd7ab |
+| 12 | Ability animations | `SkillDefinition` › Animation State for all seven skills | 0df62c9d |
+| 13 | Teach the verbs | The combat journal pages open one at a time on their own triggers; four rewritten. The weapon glows ember while Focus can pay for its art | 0df62c9d |
+
+| §3.6 | Status |
+|---|---|
+| Phase 0 | Done (7a3bd7ab). Item 6 was answered by the user: build all of it. |
+| Phase 1 | Done (7a3bd7ab, 107d9078, 0df62c9d). The shield moveset is one guard counter (Shield Cut), not a whole Defend chain. |
+| Phase 2 | Done (107d9078), with arts per family, not per weapon. |
+| Phase 3 | 3.1 art runes: eight, one per family, a second art struck out of the guard (decc03dc). 3.2 build and spend: Regain (0df62c9d); Momentum, Flurry and Crush are the priming. 3.3 the runic staff (decc03dc). decc03dc also has nine fixes from an independent code review of the three earlier commits. |
+
+Signatures differ from the §3.5 table in places: the dagger's is a deeper staggered backstab (×2.0) and a cheaper quickstep, not bleed
+stacks; the greatsword's is Hyper Armour, not a stance; the spear's Anti Charge works on any blow into a charge, not a held brace; the
+fists' art is a jumping uppercut, not a grab and throw.
+
+**Not done:**
+- Mixamo clips: there was no browser access in the agent session. The Kevin Iglesias pack and the packs already owned covered every family.
+- The optional two-hand or power-stance toggle (Phase 3.2): not built.
+- Kubold and HY-Motion were not used.
+- Art pass owed: the runes use Hush Rune's icon, the staff uses the iron spear's icon, and the staff is held like a spear.
+- Nothing has been played by hand. Every number is a first guess, checked only by Play-mode probes from the CLI and by tests.
+
 ---
 
 ## 0. Summary

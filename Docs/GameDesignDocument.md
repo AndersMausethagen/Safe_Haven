@@ -477,7 +477,7 @@ Use responsive, isometric/top-down 3D movement and directional attacks, broadly 
 
 ### 10.3 Combat feel
 
-Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. A swing plants the feet from its wind-up until the blow lands, with only the attack's own lunge carrying the player in, and the body stays facing the blow; once it has landed the player can walk out of the follow-through, though the next attack still waits for the swing to finish, and a dodge can always break off a wind-up. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with a **0.9-second** cooldown in the build, stamina being what really limits dodging (the prototype target was 2–3 seconds); adjust after enemy timings and animations are playable.
+Combat should be driven by positioning and readable telegraphs. Enemies have distinguishable anticipation, active hit, and recovery windows. Hit detection must be dependable. Moving while aiming is generally allowed, while heavy weapons commit the player for longer. **Swing movement (November 15, 2026):** each attack says how much the player may move through it. A light swing keeps a share of walking speed while it winds up, played on the arms over walking legs (daggers and fists 60%, swords, axes and spears 30%, two-handed weapons 5–8%); heavy swings, rushes and arts keep the feet planted. Early in the wind-up the blow turns toward the aim, the step into the blow takes its last third (0.8–1.0 m for chain swings, 1.2–1.5 m for finishers), and a moment after contact the player walks out of the follow-through (half speed, a quarter with two-handed weapons, a fifth after a heavy). The next attack still waits for the swing's recovery, so moving never changes damage per second. A press is kept for the next swing only in the last 0.25 s before it can chain (holding the button keeps the chain going), so mashing no longer commits the player to a whole chain. A dodge can always break off a wind-up, but attacking is then locked for 0.35 s, except out of a charging heavy (a feint). **Context attacks:** where the player attacks from changes the attack: a counter after a parry or perfect dodge, a guard counter right after a block, a backstep attack out of a dodge away from the aim, a heavy follow-up held as a heavy lands, and a charged attack at a heavy's full charge. Parrying is one way into a fight, not the whole loop: great beasts, bosses and elites lose poise to a parry instead of being floored, ordinary creatures' light strikes and any wind-up hit hard enough can be interrupted, and Regain wins back part of a hit by striking back. Rules and numbers: Docs/Combat.md. Dodge has a short invulnerability window and cannot be used without a meaningful cooldown. **Prototype dodge target:** approximately **0.35 seconds** duration, with a **0.9-second** cooldown in the build, stamina being what really limits dodging (the prototype target was 2–3 seconds); adjust after enemy timings and animations are playable.
 
 ### 10.4 Weapon families
 
@@ -487,9 +487,27 @@ Combat should be driven by positioning and readable telegraphs. Enemies have dis
 | Sword         | Flexible melee          | Quick sequences, parries or counters                       |
 | Bow           | Range / positioning     | Charged shots, traps, sight lines                          |
 | Runic staff   | Magic / control         | Projectiles, area control, support                         |
-| Spear (later) | Reach / spacing         | Thrusts, throws, area denial                               |
+| Spear         | Reach / spacing         | Thrusts, throws, area denial                               |
 
 There are no locked classes; chosen gear and abilities define a build. Gathering should not require endlessly repeating full combat animations against ordinary rocks.
+
+**Weapon identity (November 15, 2026):** the player found combat too basic (three planted swings for every weapon), so every melee family now has its own chain of three or four swings, context attacks, a **signature** (what that kind of weapon does that no other does) and an art that moves the player. Each family's damage per second stayed within 6% of what the raid tiers were tuned to.
+
+| **Family**          | **Signature**                                                                 | **Art (Focus)**                                         |
+|---------------------|-------------------------------------------------------------------------------|---------------------------------------------------------|
+| Sword               | Counter Chain: a parry or perfect dodge readies two counters, window ×1.5     | Dash 3.5 m through enemies, ending past them (30)       |
+| Dagger              | Assassin: staggered backstab ×2.0, dodges cost 80%                            | Blink behind the focused enemy and stab (25)            |
+| One-handed axe, club| Guard Breaker: ×2 poise against a raised shield                               | Hurl the weapon 12 m; it comes back (30)                |
+| Greataxe            | Momentum: each landed swing in a row widens the arc and adds poise, up to 3   | Whirlwind, walking at 40% (40)                          |
+| Greatsword          | Hyper Armour: finisher and charged blows push through hits                    | Leap slam closing 4 m (35)                              |
+| Hammer              | Crush: heavy, finisher or charged blow on poise below 30% staggers at once    | Quake leap 3.5 m that throws back (40)                  |
+| Spear               | Anti Charge: ×2 poise on an enemy charging in, and the charge is stopped      | Javelin 14 m; it comes back (30)                        |
+| Fists               | Flurry: rhythm stacks to 3, each adding poise                                 | Jumping uppercut (25)                                   |
+| Runic staff         | Channel: every cast earns 1.5× a hit's Focus                                  | A bolt that leaves a web where it lands (30)            |
+
+**The runic staff (implemented November 15, 2026):** made at the Alchemy Table with Runecraft 3. Its light chain casts two rune bolts and ends in a burst around the player that throws enemies back; held, it casts a fan of three bolts. It trades pace for range (1.22 times its damage a second against a sword's 1.6). Its model and icon are borrowed and want an art pass.
+
+**Art runes (November 15, 2026):** eight runes, carved at the Alchemy Table with Runecraft 5, each give one kind of weapon a second art, struck by attacking out of the guard without a shield (the middle button keeps the weapon's own). The arts the families had before are runes now, so no move was lost. Bows are unchanged: the bow keeps its own draw-and-loose play (Docs/Combat.md › The bow).
 
 **Implemented gear (October 30, 2026):** weapons now fill the tiers: Copper Sword, Hand Axe and Spear at the Construction Table, so metal arrives before the Forge; the Venom Fang, a quick dagger whose cuts can poison; Iron Greatsword and War Hammer, whose heavy blow breaks poise; the Grave Blade from barrow iron; the Trollstone Maul; the Moonsilver Blade; and the Elderwood Longbow, with Bodkin Arrows.
 
