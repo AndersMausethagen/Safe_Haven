@@ -23,6 +23,12 @@ public sealed class PortalWindow : MonoBehaviour
     private const float RightWidth = Width - RightX - 36f;
     private const float RowHeight = 66f;
     private const float RefreshSeconds = 0.5f;
+    // The portal's words have a box of their own, the same height whatever it says: its lines change as it talks, and a box
+    // as tall as the line moved everything under it and resized the window every half second (the user, 2026-11-15: "the
+    // text at the top changes the whole window's size, instead of staying in the same place"). Long lines shrink to fit.
+    private const float StoryHeight = 104f;
+    private const float StorySize = 21f;
+    private const float StoryLeastSize = 15f;
 
     private static PortalWindow current;
 
@@ -51,6 +57,10 @@ public sealed class PortalWindow : MonoBehaviour
     private Action closed;
     private MenuAction havenAction;
     private float nextRefresh;
+    // The tallest the window has been since it opened: it may grow (a new choice), never shrink while open.
+    private float heldHeight;
+    // Once the portal has spoken since the window opened its box stays, empty between lines, so nothing under it moves up.
+    private bool storyShown;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => current = null;
@@ -83,6 +93,8 @@ public sealed class PortalWindow : MonoBehaviour
         current.anchor = near;
         current.range = maxDistance;
         current.window.Open();
+        current.heldHeight = 0f;
+        current.storyShown = false;
         current.Refresh();
     }
 
@@ -107,9 +119,13 @@ public sealed class PortalWindow : MonoBehaviour
 
         title = HearthKit.DisplayName(panel, RightX, 14f, RightWidth - 60f, 46f);
         rule = HearthKit.Rule(panel, RightX, 102f, RightWidth * 0.75f, 0.55f);
-        story = CodeUI.Paragraph("Story", panel, RightX, 118f, RightWidth, 100f, 21f, style.Text);
+        story = CodeUI.Paragraph("Story", panel, RightX, 118f, RightWidth, StoryHeight, StorySize, style.Text);
         style.Title(story);
         story.fontStyle = FontStyles.Italic;
+        story.enableAutoSizing = true;
+        story.fontSizeMin = StoryLeastSize;
+        story.fontSizeMax = StorySize;
+        story.alignment = TextAlignmentOptions.TopLeft;
         info = CodeUI.Paragraph("Info", panel, RightX, 230f, RightWidth, 60f, 18f, style.Muted);
 
         task = HearthKit.Card(panel, "Task", RightX, 300f, RightWidth, 70f, 0.75f, Color.Lerp(style.Inset, style.AccentDeep, 0.22f), 1.3f);
@@ -190,11 +206,15 @@ public sealed class PortalWindow : MonoBehaviour
         UIStyle style = UIStyle.Current;
         title.text = page.Title;
         float y = 118f;
-        story.gameObject.SetActive(!string.IsNullOrWhiteSpace(page.Story));
+        bool speaks = !string.IsNullOrWhiteSpace(page.Story);
+        storyShown |= speaks;
+        story.gameObject.SetActive(storyShown);
         if (story.gameObject.activeSelf)
         {
-            story.text = "“" + GameInput.WithRebinds(page.Story.Trim()) + "”";
-            y = Place(story, y) + 16f;
+            story.text = speaks ? "“" + GameInput.WithRebinds(page.Story.Trim()) + "”" : "";
+            story.rectTransform.anchoredPosition = new Vector2(RightX, -y);
+            story.rectTransform.sizeDelta = new Vector2(RightWidth, StoryHeight);
+            y += StoryHeight + 16f;
         }
 
         info.text = HearthKit.ToneNumbers(GameInput.WithRebinds(page.Body ?? "").Trim());
@@ -254,7 +274,8 @@ public sealed class PortalWindow : MonoBehaviour
         y += 22f;
         closeButton.anchoredPosition = new Vector2(closeButton.anchoredPosition.x, -y);
         y += 46f + Margin;
-        float height = Mathf.Max(MinHeight, y);
+        heldHeight = Mathf.Max(heldHeight, Mathf.Max(MinHeight, y));
+        float height = heldHeight;
         panel.sizeDelta = new Vector2(Width, height);
         painting.sizeDelta = new Vector2(PaintingWidth, height - Margin * 2f);
         HearthKit.FitToScreen(panel, (RectTransform)transform, Width, height);
