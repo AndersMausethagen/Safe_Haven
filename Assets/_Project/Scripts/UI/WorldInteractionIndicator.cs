@@ -130,7 +130,8 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     }
 
     // The name players know the thing by (IInteractionName on the object), else the object's name.
-    private static string NameOf(Interactable target)
+    /// <summary>What a prompt calls the thing: its own name for itself (a node's "Pine"), or its object's.</summary>
+    public static string NameOf(Interactable target)
     {
         if (target.TryGetComponent(out IInteractionName named) && !string.IsNullOrEmpty(named.InteractionName))
         {

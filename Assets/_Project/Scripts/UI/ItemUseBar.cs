@@ -7,6 +7,10 @@ using UnityEngine.UI;
 /// as a meal or draught takes (PlayerEating), or a quick full bar for what happens at once (gear put on, a lantern
 /// refilled, a rune book read). It sits above open windows, so a right-click in the bag is seen to work. Built in code;
 /// it only reads ItemInventory.ItemUsed and PlayerEating. Hearthline: type and a thin line in UIStyle's colours.
+/// While the player harvests it shows how far the work has come too: a node's swings ("Pine 3/8", PlayerGathering's
+/// session) or a timed job's share (picking, repairing: Interactable.Progress). The minigame's own timing bar is hidden
+/// with hold to raise, and the world prompt hides while working, so nothing else showed it (the user, 2026-11-15:
+/// "there's no progress bar while harvesting resources any more").
 /// </summary>
 public sealed class ItemUseBar : MonoBehaviour
 {
@@ -16,6 +20,8 @@ public sealed class ItemUseBar : MonoBehaviour
 
     private ItemInventory inventory;
     private PlayerEating eating;
+    private PlayerGathering gathering;
+    private PlayerInteractor interactor;
     private GameObject root;
     private CanvasGroup group;
     private TMP_Text label;
@@ -39,6 +45,8 @@ public sealed class ItemUseBar : MonoBehaviour
     {
         inventory = GetComponent<ItemInventory>();
         eating = GetComponent<PlayerEating>();
+        gathering = GetComponent<PlayerGathering>();
+        interactor = GetComponent<PlayerInteractor>();
         Build();
     }
 
@@ -88,6 +96,7 @@ public sealed class ItemUseBar : MonoBehaviour
     {
         bool meal = eating != null && eating.IsEating && eating.Meal != null;
         bool instant = !meal && Time.unscaledTime < instantUntil;
+        bool work = !meal && !instant && ShowWork();
         if (meal)
         {
             label.text = $"Using {eating.Meal.DisplayName}";
@@ -99,12 +108,37 @@ public sealed class ItemUseBar : MonoBehaviour
             SetFill(1f);
         }
 
-        float target = meal || instant ? 1f : 0f;
+        float target = meal || instant || work ? 1f : 0f;
         shownAlpha = Mathf.MoveTowards(shownAlpha, target, Time.unscaledDeltaTime / FadeSeconds);
         group.alpha = shownAlpha;
     }
 
     private void SetFill(float progress) => fill.anchorMax = new Vector2(Mathf.Clamp01(progress), 1f);
+
+    // Harvesting: a node's swings so far, or a timed job's share. False when the player is doing neither.
+    private bool ShowWork()
+    {
+        Interactable job = interactor != null ? interactor.Current : null;
+        GatheringSession session = gathering != null ? gathering.Session : null;
+        if (session != null && session.SwingsRequired > 0)
+        {
+            string name = job != null ? WorldInteractionIndicator.NameOf(job) : null;
+            label.text = string.IsNullOrEmpty(name) ? session.Counter : $"{name}  {session.Counter}";
+            SetFill(session.Progress / session.SwingsRequired);
+            return true;
+        }
+
+        if (job != null && !job.HoldOpen && job.Duration > 0f)
+        {
+            string verb = job.TryGetComponent(out IInteractionVerb named) && !string.IsNullOrEmpty(named.Verb) ? named.Verb : null;
+            string name = WorldInteractionIndicator.NameOf(job);
+            label.text = verb != null ? $"{verb} {name}" : name;
+            SetFill(job.Progress);
+            return true;
+        }
+
+        return false;
+    }
 
     private void Build()
     {
