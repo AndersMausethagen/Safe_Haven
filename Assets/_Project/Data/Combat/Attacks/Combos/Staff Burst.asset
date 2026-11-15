@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: Staff Burst
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Staff Burst
+  damageType: 0
+  strike: 0
+  baseDamage: 0
+  weaponDamageRatio: 1.3
+  powerScaling: 1
+  structureDamageMultiplier: 1
+  canCrit: 1
+  range: 3.2
+  arc: 360
+  maxTargets: 6
+  hitDelay: 0.45
+  recoveryTime: 1.1
+  poiseDamage: 30
+  impact: 1.4
+  lunge: 0
+  staminaCost: -1
+  appliesStatus: {fileID: 0}
+  statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: -1.5
+  windupMove: 0.2
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
+  animationState: Staff Burst
+  animationSpeed: 1.0720725
+  strikeSpeed: 1.5
+  strikeLead: 0.08
+  followThroughSpeed: 0.7
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}
+  slashSweep: 1
+  slashTilt: -48.889412

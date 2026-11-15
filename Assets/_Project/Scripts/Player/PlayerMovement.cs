@@ -215,6 +215,9 @@ public sealed class PlayerMovement : MonoBehaviour
         lungeUntil = Time.time + duration;
     }
 
+    /// <summary>Stops a lunge still running (a swing lost before its blow).</summary>
+    public void CancelLunge() => lungeUntil = -1f;
+
     /// <summary>Scales movement speed while <paramref name="source"/> asks (guarding, a stun, heavy gear); 1 removes it.
     /// Several sources multiply.</summary>
     public void SetSpeedScale(object source, float scale)

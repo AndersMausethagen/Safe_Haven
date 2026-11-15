@@ -24,6 +24,9 @@ public sealed partial class PlayerCombat
     private const float BlinkClearance = 0.35f;
 
     private int momentum;
+    private float momentumAt = float.NegativeInfinity;
+    // Momentum (greataxes): seconds past the chain's grace it holds without a landed swing.
+    private const float MomentumHoldSeconds = 1f;
     private int counterCharges;
     private ArtMotion activeMotion;
     private Vector3 dashFrom;
@@ -96,7 +99,7 @@ public sealed partial class PlayerCombat
             if (monster != null && monster.TryGetComponent(out Collider solid) && solid.enabled
                 && (monster.transform.position - transform.position).sqrMagnitude <= (activeLunge + 4f) * (activeLunge + 4f))
             {
-                Physics.IgnoreCollision(controller, solid, true);
+                BodyPassThrough.Ignore(controller, solid);
                 passedThrough.Add(solid);
             }
         }
@@ -110,11 +113,46 @@ public sealed partial class PlayerCombat
         {
             if (solid != null && controller != null)
             {
-                Physics.IgnoreCollision(controller, solid, false);
+                BodyPassThrough.Restore(controller, solid);
             }
         }
 
         passedThrough.Clear();
+    }
+
+    // A staff's cast: its bolts fly from the hand as the blow would land (MonsterProjectile: straight, swept, stopped by scenery), striking
+    // as the attack would at the weapon's damage; a fan when it casts several. Channel (staves): every cast earns Focus.
+    private void Cast()
+    {
+        AttackDefinition attack = activeAttack;
+        var bolt = new MonsterAttack
+        {
+            attack = attack, damage = activeWeaponDamage, projectileSpeed = attack.CastSpeed, projectileRadius = attack.CastRadius,
+            maximumRange = attack.CastRange, hazardPrefab = attack.CastHazard,
+        };
+        Vector3 from = transform.position + Vector3.up * 1.3f + activeDirection * 0.7f;
+        int count = Mathf.Max(1, attack.CastCount);
+        for (int i = 0; i < count; i++)
+        {
+            float turn = (i - (count - 1) * 0.5f) * attack.CastSpread;
+            Vector3 aim = Quaternion.Euler(0f, turn, 0f) * activeDirection;
+            GameObject flight = PrefabPool.Spawn(attack.CastProjectile, from, Quaternion.LookRotation(aim));
+            if (flight.TryGetComponent(out MonsterProjectile projectile))
+            {
+                projectile.Initialize(combatant, bolt, aim);
+            }
+            else
+            {
+                PrefabPool.Release(flight);
+            }
+        }
+
+        if (Has(WeaponSignature.Channel) && focus != null)
+        {
+            focus.Gain(Rules.FocusPerHit * weapon.SignaturePower);
+        }
+
+        ArtMoved?.Invoke(ArtMotion.Throw, from, from + activeDirection * attack.CastRange);
     }
 
     // Throw: the weapon in hand flies out and back (ThrownWeapon). False with nothing in the hand to throw, or one already out: the art

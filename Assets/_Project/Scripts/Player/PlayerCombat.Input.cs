@@ -25,9 +25,14 @@ public sealed partial class PlayerCombat
             // Just after a block: the guard counter, a hard answer out of the guard (Elden Ring).
             else if (weapon != null && !weapon.TakesAttackInput && guard.JustBlocked(Rules.GuardCounterSeconds) && HasGuardCounter)
             {
-                guard.SpendBlock();
+                // Lowered first (a swing can't start under a raised guard); refused, the guard goes up again by itself while held and
+                // the block can still be answered.
                 guard.Lower();
-                Request(SwingKind.GuardCounter, ChainPress.Late);
+                if (Request(SwingKind.GuardCounter, ChainPress.Late))
+                {
+                    guard.SpendBlock();
+                }
+
                 return;
             }
             else if (HasShield)
@@ -37,14 +42,17 @@ public sealed partial class PlayerCombat
             }
             else
             {
-                // Without a shield, attacking drops the guard into the weapon art, paid in Focus or else in stamina; a plain
-                // swing only when neither can pay.
+                // Without a shield, attacking drops the guard into an art, paid in Focus or else in stamina: the attuned rune's
+                // (ArtRunes) when there is one, else the weapon's own; a plain swing only when neither can pay.
                 guard.Lower();
+                artFromRune = ArtRunes.For(weapon) != null;
                 if (CanAffordArt)
                 {
                     Request(SwingKind.Art, ChainPress.Late);
                     return;
                 }
+
+                artFromRune = false;
             }
         }
 
@@ -126,8 +134,14 @@ public sealed partial class PlayerCombat
 
     // Focus pays for the art; short of it, stamina does (Combat Technique Settings › Art Stamina Without Focus). It used to
     // be Focus alone, and guard-then-attack turned into a plain swing most of the time.
-    private bool CanAffordArt => weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
-        && (focus == null || focus.CanSpend(weapon.WeaponArtFocus) || stamina == null || stamina.Current >= stamina.Scaled(CostOfArtOnStamina()));
+    private bool CanAffordArt => weapon != null && ArtAttack != null && !weapon.TakesAttackInput
+        && (focus == null || focus.CanSpend(ArtFocus) || stamina == null || stamina.Current >= stamina.Scaled(CostOfArtOnStamina()));
+
+    // The art the next Art swing strikes: the attuned rune's, asked for by attacking out of the guard, else the weapon's own.
+    private bool artFromRune;
+    private ItemDefinition ArtRune => artFromRune ? ArtRunes.For(weapon) : null;
+    private AttackDefinition ArtAttack => ArtRune != null ? ArtRune.RuneArt : weapon != null ? weapon.WeaponArt : null;
+    private float ArtFocus => ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f;
 
     private bool HasGuardCounter => (HasShield && Shield != null && Shield.OwnGuardCounter != null) || (weapon != null && weapon.GuardCounterAttack != null);
 
@@ -136,6 +150,7 @@ public sealed partial class PlayerCombat
     // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
     private void OnArtRequested()
     {
+        artFromRune = false;
         if (weapon == null || weapon.TakesAttackInput || weapon.WeaponArt == null)
         {
             return;

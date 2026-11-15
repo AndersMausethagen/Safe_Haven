@@ -167,6 +167,14 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Food a horse eats from the hand: the bond it gives (barley, apples). 0 for other items.")]
     [SerializeField, Min(0f)] private float horseTreat;
 
+    [Header("Art rune")]
+    [Tooltip("Makes this item an art rune, carved with Runecraft: using it from the bag attunes the weapons of its kind (Rune For) to a " +
+             "second weapon art, struck by attacking out of the guard (without a shield); the middle button keeps the weapon's own. It " +
+             "stays in the bag; using another rune of the same kind swaps them. Empty for other items.")]
+    [SerializeField] private AttackDefinition runeArt;
+    [SerializeField, Min(0f)] private float runeFocus = 30f;
+    [SerializeField] private WeaponSignature runeFor;
+
     [Header("Raid")]
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
     [SerializeField] private RaidModifierDefinition raidModifier;
@@ -233,7 +241,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>
-    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso;
+    public bool IsUsable => IsConsumable || IsEquippable || IsBlueprint || experience > 0 || transport != null || IsSapling || lasso || IsArtRune;
+    /// <summary>An art rune: attuning it gives the weapons of its kind a second art (ArtRunes).</summary>
+    public bool IsArtRune => runeArt != null && runeFor != WeaponSignature.None;
+    public AttackDefinition RuneArt => runeArt;
+    public float RuneFocus => runeFocus;
+    public WeaponSignature RuneFor => runeFor;
     public TransportDefinition Transport => transport;
     public int CarryCapacityBonus => carryCapacityBonus;
     public float CarryNoise => carryNoise;

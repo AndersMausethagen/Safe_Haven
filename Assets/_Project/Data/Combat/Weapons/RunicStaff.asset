@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bc49664ac533524f8d9a2bfd443f4fa, type: 3}
+  m_Name: RunicStaff
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
+  displayName: Runic Staff
+  stance: 3
+  kind: 0
+  strikeOverride: 0
+  damage: 14
+  basicAttack: {fileID: 11400000, guid: 947167c4210add74396c65a4ac802bdd, type: 2}
+  combo:
+  - {fileID: 11400000, guid: 947167c4210add74396c65a4ac802bdd, type: 2}
+  - {fileID: 11400000, guid: c9483e17658219c4b943942c261aefd1, type: 2}
+  - {fileID: 11400000, guid: 26d4aaca8042b9b45b785679d3d12ecb, type: 2}
+  heavyAttack: {fileID: 11400000, guid: 9d38bff522fc9ba488d44ee5c0d40621, type: 2}
+  counterAttack: {fileID: 0}
+  rushAttack: {fileID: 11400000, guid: 4f6f80fd67a166342abbcaa8e128466a, type: 2}
+  backstepAttack: {fileID: 11400000, guid: f91cc66995b934246a41c03f597408ff, type: 2}
+  guardCounterAttack: {fileID: 0}
+  heavyFollowUp: {fileID: 0}
+  chargedAttack: {fileID: 0}
+  secondHandDistance: 0.45
+  heavySwingArmor: 0
+  signature: 9
+  signaturePower: 1.5
+  weaponArt: {fileID: 11400000, guid: 0ba7d4aafd08f7b41bb863a4133c0e80, type: 2}
+  weaponArtFocus: 30
+  guardLetThrough: 0.45
+  blockPoise: 0
+  drawSeconds: 1
+  reloadSeconds: 0.6
+  arrowSpeed: 32
+  spread: 1.5
+  minimumDraw: 0.25
+  drawMoveSpeed: 0.55
+  perfectReleaseSeconds: 0.2
+  perfectReleaseDamage: 1.25
+  aimSpread: 0.5
+  counterShotDamage: 0.6
+  shotAttack: {fileID: 0}
+  drawSound: {fileID: 0}
+  fullDrawSound: {fileID: 0}
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 11400000, guid: cd11aa3a19c156848aeeb768f7bf8023, type: 2}
+  hitEffect: {fileID: 0}

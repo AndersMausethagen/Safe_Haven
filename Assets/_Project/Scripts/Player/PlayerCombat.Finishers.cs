@@ -18,12 +18,12 @@ public sealed partial class PlayerCombat
         finishingCollider = target.GetComponentInChildren<Collider>();
         if (finishingCollider != null && controller != null)
         {
-            Physics.IgnoreCollision(controller, finishingCollider, true);
+            BodyPassThrough.Ignore(controller, finishingCollider);
         }
 
         if (health != null)
         {
-            health.AddInvulnerability(this);
+            health.AddInvulnerability(FinishKey);
         }
 
         target.HoldForFinish(hitAt + Rules.FinishHoldSeconds + Rules.FinishCloseSeconds, hitAt);
@@ -57,18 +57,22 @@ public sealed partial class PlayerCombat
         movement.SnapFacing(finishing.transform.forward);
     }
 
+    // Its own key: the heavy-hit and knockdown safety use the combat's, and ending a swing must not strip those.
+    private static readonly object FinishKey = new object();
+
     private void EndFinish()
     {
         if (finishingCollider != null && controller != null)
         {
-            Physics.IgnoreCollision(controller, finishingCollider, false);
+            BodyPassThrough.Restore(controller, finishingCollider);
         }
 
+        bool wasFinishing = finishing != null;
         finishingCollider = null;
         finishing = null;
-        if (health != null)
+        if (wasFinishing && health != null)
         {
-            health.RemoveInvulnerability(this);
+            health.RemoveInvulnerability(FinishKey);
         }
     }
 }

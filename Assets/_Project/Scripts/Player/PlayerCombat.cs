@@ -211,6 +211,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
         {
             weapon = value;
             lastStep = -1;
+            momentum = 0;
             AnnounceWeapon();
         }
     }

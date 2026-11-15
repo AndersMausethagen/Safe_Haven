@@ -264,7 +264,7 @@ public sealed class PlayerDodge : MonoBehaviour
             if (monster != null && (monster.transform.position - transform.position).sqrMagnitude <= PassThroughRange * PassThroughRange
                 && monster.TryGetComponent(out Collider solid) && solid.enabled)
             {
-                Physics.IgnoreCollision(body, solid, true);
+                BodyPassThrough.Ignore(body, solid);
                 passedThrough.Add(solid);
             }
         }
@@ -276,7 +276,7 @@ public sealed class PlayerDodge : MonoBehaviour
         {
             if (solid != null && body != null)
             {
-                Physics.IgnoreCollision(body, solid, false);
+                BodyPassThrough.Restore(body, solid);
             }
         }
 

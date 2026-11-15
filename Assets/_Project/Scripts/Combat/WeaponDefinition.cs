@@ -232,4 +232,6 @@ public enum WeaponSignature
     Crush,
     AntiCharge,
     Flurry,
+    /// <summary>Staves: every cast earns Focus (Power times a landed hit's), so a caster keeps skills and arts coming.</summary>
+    Channel,
 }

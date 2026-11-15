@@ -141,6 +141,11 @@ public sealed class CombatTally
 
     private void OnSwingLanded(SwingInfo swing, int hits)
     {
+        if (swing.Attack != null && (swing.Attack.Motion == ArtMotion.Throw || swing.Attack.CastProjectile != null))
+        {
+            return;
+        }
+
         if (hits > 0) Note(Landed, hits);
         else Note(Whiffed);
     }

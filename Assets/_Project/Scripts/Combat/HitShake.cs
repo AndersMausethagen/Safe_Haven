@@ -18,6 +18,8 @@ public sealed class HitShake : MonoBehaviour
     private float strength;
     private float heldUntil = -1f;
     private float speedBefore = 1f;
+    // What this wrote: only that is put back, so a speed something else set meanwhile (a creature's held wind-up ending) stands.
+    private float heldSpeed = -1f;
 
     /// <summary>Shakes <paramref name="victim"/>'s body for <paramref name="seconds"/> of real time by up to <paramref name="metres"/>;
     /// with <paramref name="holdAnimator"/>, its animator stands still as long.</summary>
@@ -61,9 +63,10 @@ public sealed class HitShake : MonoBehaviour
             bone = animator != null && animator.isHuman ? animator.GetBoneTransform(HumanBodyBones.Hips) : null;
         }
 
+        bool shaking = Time.unscaledTime < until;
         startedAt = Time.unscaledTime;
-        until = Mathf.Max(until, startedAt + seconds);
-        strength = Mathf.Max(metres, Time.unscaledTime < until ? strength : 0f);
+        until = Mathf.Max(shaking ? until : -1f, startedAt + seconds);
+        strength = shaking ? Mathf.Max(metres, strength) : metres;
         if (holdAnimator)
         {
             Hold(seconds, 0f);
@@ -89,6 +92,7 @@ public sealed class HitShake : MonoBehaviour
 
         heldUntil = Mathf.Max(heldUntil, Time.unscaledTime + seconds);
         animator.speed = speed;
+        heldSpeed = speed;
     }
 
     private void LateUpdate()
@@ -97,7 +101,7 @@ public sealed class HitShake : MonoBehaviour
         if (heldUntil >= 0f && now >= heldUntil)
         {
             heldUntil = -1f;
-            if (animator != null)
+            if (animator != null && Mathf.Approximately(animator.speed, heldSpeed))
             {
                 animator.speed = speedBefore;
             }
@@ -114,7 +118,7 @@ public sealed class HitShake : MonoBehaviour
 
     private void OnDisable()
     {
-        if (heldUntil >= 0f && animator != null)
+        if (heldUntil >= 0f && animator != null && Mathf.Approximately(animator.speed, heldSpeed))
         {
             animator.speed = speedBefore;
         }

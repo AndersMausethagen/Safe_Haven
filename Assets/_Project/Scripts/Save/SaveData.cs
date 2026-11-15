@@ -194,6 +194,8 @@ public sealed class ProgressSaveData
     public List<string> techniquesSeen = new List<string>();
     /// <summary>Raids entered at least once, by raid id. Missing in older saves: their next raid plays its first-visit cinematic.</summary>
     public List<string> raidsVisited = new List<string>();
+    /// <summary>Art runes attuned, "Kind=itemId" (CharacterProgress.AttunedRunes).</summary>
+    public List<string> attunedRunes = new List<string>();
     /// <summary>Ranks deepened at the altar, by skill id. Missing in older saves.</summary>
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();

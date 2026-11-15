@@ -37,6 +37,54 @@ public sealed class CharacterProgress
         }
     }
 
+    // Art runes attuned, by the kind of weapon they fit (WeaponSignature name -> rune item id).
+    private readonly Dictionary<string, string> attunedRunes = new Dictionary<string, string>();
+
+    /// <summary>Art runes attuned, as "Kind=itemId" (the save's form).</summary>
+    public IEnumerable<string> AttunedRunes
+    {
+        get
+        {
+            foreach (KeyValuePair<string, string> rune in attunedRunes)
+            {
+                yield return rune.Key + "=" + rune.Value;
+            }
+        }
+    }
+
+    /// <summary>The rune attuned for this kind of weapon, by item id, or null.</summary>
+    public string RuneIdFor(WeaponSignature kind) => attunedRunes.TryGetValue(kind.ToString(), out string id) ? id : null;
+
+    /// <summary>Attunes the kind of weapon to the rune; true when that changed anything.</summary>
+    public bool AttuneRune(WeaponSignature kind, string itemId)
+    {
+        if (kind == WeaponSignature.None || string.IsNullOrEmpty(itemId) || RuneIdFor(kind) == itemId)
+        {
+            return false;
+        }
+
+        attunedRunes[kind.ToString()] = itemId;
+        return true;
+    }
+
+    public void RestoreAttunedRunes(IEnumerable<string> saved)
+    {
+        attunedRunes.Clear();
+        if (saved == null)
+        {
+            return;
+        }
+
+        foreach (string entry in saved)
+        {
+            int at = entry != null ? entry.IndexOf('=') : -1;
+            if (at > 0 && at < entry.Length - 1)
+            {
+                attunedRunes[entry.Substring(0, at)] = entry.Substring(at + 1);
+            }
+        }
+    }
+
     private readonly HashSet<string> raidsVisited = new HashSet<string>();
 
     /// <summary>Raids this character has entered at least once, by raid id (a first visit plays the raid's cinematic).</summary>

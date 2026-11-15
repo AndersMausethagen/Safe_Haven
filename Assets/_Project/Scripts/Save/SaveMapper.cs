@@ -682,6 +682,7 @@ public static class SaveMapper
 
         into.techniquesSeen.AddRange(progress.TechniquesSeen);
         into.raidsVisited.AddRange(progress.RaidsVisited);
+        into.attunedRunes.AddRange(progress.AttunedRunes);
 
         foreach (KeyValuePair<string, int> skill in progress.SkillRanks)
         {
@@ -759,6 +760,7 @@ public static class SaveMapper
         progress.RestorePlainRuns(runs);
         progress.RestoreTechniquesSeen(saved.techniquesSeen);
         progress.RestoreRaidsVisited(saved.raidsVisited);
+        progress.RestoreAttunedRunes(saved.attunedRunes);
         var creatures = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData creature in saved.creatures ?? new List<AmountSaveData>())
         {

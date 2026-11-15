@@ -44,7 +44,7 @@ public sealed partial class PlayerCombat
                 technique |= HitTechnique.ShieldBash;
                 break;
             case SwingKind.Art:
-                attack = weapon != null ? weapon.WeaponArt : null;
+                attack = ArtAttack;
                 technique |= HitTechnique.WeaponArt;
                 if (attack == null)
                 {
@@ -52,7 +52,8 @@ public sealed partial class PlayerCombat
                 }
 
                 // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
-                artOnStamina = focus != null && !focus.TrySpend(weapon.WeaponArtFocus);
+                artOnStamina = focus != null && !focus.TrySpend(ArtFocus);
+                artFromRune = false;
 
                 break;
             case SwingKind.Rush:
@@ -89,7 +90,9 @@ public sealed partial class PlayerCombat
         }
 
         // Pay the full cost when the swing actually starts, rechecking affordability for buffered swings.
-        if (stamina != null && !stamina.TrySpendOnAttack(Mathf.Max(0f, CostOf(kind, attack) - heavyCredit)))
+        float owed = Mathf.Max(0f, CostOf(kind, attack) - heavyCredit);
+        // Nothing owed (a charge already paid for, an art paid in Focus): never refused for an empty bar.
+        if (stamina != null && owed > 0f && !stamina.TrySpendOnAttack(owed))
         {
             forcedAttack = null;
             return;
@@ -100,7 +103,8 @@ public sealed partial class PlayerCombat
 
         fumbled = false;
         rhythm = kind == SwingKind.Light && step > 0 ? (judge == ChainPress.Rhythm ? Mathf.Min(rhythm + 1, MaxRhythm) : 0) : 0;
-        if (kind == SwingKind.Light && step == 0 && judge == ChainPress.Late)
+        // Momentum fades with a pause: a new chain, or longer than the chain's grace since a swing last landed.
+        if ((kind == SwingKind.Light && step == 0 && judge == ChainPress.Late) || Time.time - momentumAt > Rules.ChainGrace + MomentumHoldSeconds)
         {
             momentum = 0;
         }
@@ -474,6 +478,12 @@ public sealed partial class PlayerCombat
             return 0;
         }
 
+        if (activeAttack.CastProjectile != null)
+        {
+            Cast();
+            return 0;
+        }
+
         if (activeMotion == ArtMotion.DashThrough)
         {
             // Everything the dash went through, and what stands just past its end.
@@ -490,6 +500,7 @@ public sealed partial class PlayerCombat
         if (Has(WeaponSignature.Momentum) && (activeKind == SwingKind.Light || activeKind == SwingKind.Heavy))
         {
             momentum = foundHits.Count > 0 ? Mathf.Min(momentum + 1, Mathf.RoundToInt(weapon.SignaturePower)) : 0;
+            momentumAt = Time.time;
         }
         // A swing that met nobody may still meet a boulder or a tree, and glance off it (HitMaterials).
         if (foundHits.Count == 0)
@@ -652,6 +663,12 @@ public sealed partial class PlayerCombat
     {
         EndFinish();
         GiveBodiesBack();
+        // A swing lost before its blow (a flinch, a dodge) stops its step into it: a dash or leap mustn't slide on.
+        if (activeKind != SwingKind.None && hitPending)
+        {
+            movement.CancelLunge();
+        }
+
         activeMotion = ArtMotion.None;
         if (activeKind != SwingKind.None)
         {
@@ -700,7 +717,12 @@ public sealed partial class PlayerCombat
     }
 
     /// <summary>Uses up a ready counter without a swing (a bow's instant shot after a perfect dodge).</summary>
-    public void SpendCounter() => counterUntil = float.NegativeInfinity;
+    public void SpendCounter()
+    {
+        counterUntil = float.NegativeInfinity;
+        counterCharges = 0;
+        counterLunges = false;
+    }
 
     /// <summary>Readies a counter: the next swing within the settings' counter time is a critical counter.</summary>
     public void GrantCounter() => GrantCounter(Rules.CounterSeconds, false);
@@ -712,7 +734,7 @@ public sealed partial class PlayerCombat
         bool chain = Has(WeaponSignature.CounterChain);
         counterCharges = chain ? Mathf.Max(1, Mathf.RoundToInt(weapon.SignaturePower)) : 1;
         counterUntil = Mathf.Max(counterUntil, Time.time + seconds * (chain ? CounterChainWindow : 1f));
-        counterLunges |= lunges;
+        counterLunges = lunges;
         CounterReady?.Invoke();
     }
 

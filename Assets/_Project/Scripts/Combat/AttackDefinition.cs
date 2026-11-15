@@ -99,6 +99,19 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("Always a critical hit (a dagger's focused stab).")]
     [SerializeField] private bool alwaysCritical;
 
+    [Header("Cast (player: a staff's bolts)")]
+    [Tooltip("The swing casts this instead of striking in melee: a projectile prefab with a MonsterProjectile (a rune bolt), fired as the " +
+             "blow would land. It strikes as this attack would, at the weapon's damage. Empty: an ordinary blow.")]
+    [SerializeField] private GameObject castProjectile;
+    [SerializeField, Min(1)] private int castCount = 1;
+    [Tooltip("Degrees between bolts when it casts several (a fan).")]
+    [SerializeField, Range(0f, 45f)] private float castSpread = 12f;
+    [SerializeField, Min(1f)] private float castSpeed = 18f;
+    [SerializeField, Min(0.05f)] private float castRadius = 0.3f;
+    [SerializeField, Min(1f)] private float castRange = 16f;
+    [Tooltip("Left where a bolt comes down (a GroundHazard prefab: binding runes, a web). Empty: none.")]
+    [SerializeField] private GameObject castHazard;
+
     [Header("Animation (player)")]
     [Tooltip("Animator state the swing plays, by name (Safe Haven › Setup › Characters › Set Up Combat Animations makes them). " +
              "Empty uses the weapon stance's old attack animation.")]
@@ -162,6 +175,13 @@ public sealed class AttackDefinition : ScriptableObject
     public ArtMotion Motion => motion;
     public float MotionDistance => motionDistance;
     public bool AlwaysCritical => alwaysCritical;
+    public GameObject CastProjectile => castProjectile;
+    public int CastCount => castCount;
+    public float CastSpread => castSpread;
+    public float CastSpeed => castSpeed;
+    public float CastRadius => castRadius;
+    public float CastRange => castRange;
+    public GameObject CastHazard => castHazard;
     public string AnimationState => animationState;
     public float AnimationSpeed => animationSpeed;
     public float StrikeSpeed => strikeSpeed;

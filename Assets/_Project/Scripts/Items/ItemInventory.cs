@@ -338,6 +338,11 @@ public sealed class ItemInventory : MonoBehaviour
             return true;
         }
 
+        if (item.IsArtRune)
+        {
+            return ArtRunes.Attune(item);
+        }
+
         if (item.IsEquippable)
         {
             var equipment = GetComponent<PlayerEquipment>();
