@@ -225,6 +225,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 511a30132e62d4841b52c35b90981e16, type: 2}
   - {fileID: 11400000, guid: fb83138bc06ecda40a96a6168f0d6a05, type: 2}
   - {fileID: 11400000, guid: ada0c42a71e7bfc4d88c5c729fdfd49b, type: 2}
+  - {fileID: 11400000, guid: 0a1138e9bdc2f264f9efe45438e5bc6a, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
