@@ -76,6 +76,15 @@ public sealed class GroundHazard : MonoBehaviour
     public float Radius => radius;
     public HazardElement Element => element;
 
+    /// <summary>The kind of harm standing in it does (RaidHarms): its status's, its damage's, or its element's.</summary>
+    public DamageType Harm =>
+        status != null && status.DamageType != DamageType.Physical ? status.DamageType
+        : damageType != DamageType.Physical ? damageType
+        : element == HazardElement.Fire ? DamageType.Fire
+        : element == HazardElement.Frost ? DamageType.Frost
+        : element == HazardElement.Poison || element == HazardElement.Gas ? DamageType.Holy
+        : DamageType.Physical;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Active.Clear();
 

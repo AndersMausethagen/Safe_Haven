@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: wood_axe_fighter
   displayName: Axe Fighter
-  description: Twenty winters of felling make a fearsome arm.
+  description: 'The axe is part of your arm: you fell trees faster.'
   icon: {fileID: 21300000, guid: a8916cbe783452b419211347e01db315, type: 3}
   technique: 0
   bonuses:
-  - stat: 28
+  - stat: 22
     op: 0
-    value: 0.049999997
+    value: 0.15

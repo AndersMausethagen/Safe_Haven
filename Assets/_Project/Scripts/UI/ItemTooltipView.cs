@@ -425,6 +425,77 @@ public sealed class ItemTooltipView : MonoBehaviour
     }
 
     // Against what is worn in the slot it would go to: an arrow up in green, down in red, nothing when it is the same.
+    /// <summary>What a stat does, where it isn't plain (Docs/PlayerStatsResearch.md #2): Might as the damage it adds.</summary>
+    public static string EffectOf(StatBonus bonus)
+    {
+        if (bonus.op != StatModifierOp.Flat || (bonus.stat != StatType.Strength && bonus.stat != StatType.PhysicalPower))
+        {
+            return "";
+        }
+
+        CombatRules rules = CombatRules.Default;
+        float power = bonus.stat == StatType.Strength ? bonus.value * rules.PowerPerStrength : bonus.value;
+        return $" <color={UIStyle.Current.MutedHex}>({(power >= 0f ? "+" : "")}{Mathf.RoundToInt(power * rules.DamagePerPower * 100f)}% damage)</color>";
+    }
+
+    // This stat against the same stat on what is worn in the slot: an arrow per stat, beside the gear score's.
+    private static string StatCompared(ItemDefinition item, StatBonus bonus)
+    {
+        PlayerEquipment equipment = Player.Current != null ? Player.Current.GetComponent<PlayerEquipment>() : null;
+        if (equipment == null || !GearSlots.TryFindSlot(item, equipment.Gear.Slots, out GearSlot slot))
+        {
+            return "";
+        }
+
+        ItemStack worn = equipment.Gear.Get(slot);
+        if (worn.IsEmpty || worn.Item == item)
+        {
+            return "";
+        }
+
+        float theirs = 0f;
+        foreach (StatBonus other in worn.Item.StatBonuses)
+        {
+            if (other.stat == bonus.stat && other.op == bonus.op)
+            {
+                theirs += other.value;
+            }
+        }
+
+        float difference = bonus.value - theirs;
+        if (Mathf.Abs(difference) < 0.001f)
+        {
+            return "";
+        }
+
+        bool fraction = bonus.op == StatModifierOp.Percent || StatNames.IsFraction(bonus.stat);
+        string amount = fraction ? $"{Mathf.RoundToInt(difference * 100f)}%" : $"{difference:0.#}";
+        UIStyle style = UIStyle.Current;
+        return difference > 0f ? $"  <color={style.GoodHex}>\u25B2 +{amount}</color>" : $"  <color={style.DangerHex}>\u25BC {amount}</color>";
+    }
+
+    /// <summary>
+    /// A meal's or tonic's family (Docs/PlayerStatsResearch.md #8), so a raid's food is chosen by what it is for: Hearty (health, armour),
+    /// Swift (stamina, speed), Fierce (damage, often at a cost), Warding (resistances). Empty when it is none of these.
+    /// </summary>
+    public static string MealFamily(System.Collections.Generic.IReadOnlyList<StatBonus> bonuses)
+    {
+        float hearty = 0f, swift = 0f, fierce = 0f, warding = 0f;
+        foreach (StatBonus bonus in bonuses)
+        {
+            switch (bonus.stat)
+            {
+                case StatType.MaxHealth: case StatType.Armor: case StatType.PhysicalResistance: hearty += 1f; break;
+                case StatType.MaxStamina: case StatType.MoveSpeed: swift += 1f; break;
+                case StatType.Strength: case StatType.PhysicalPower: case StatType.DamageBonus: case StatType.MeleeDamage: fierce += 1.5f; break;
+                case StatType.FireResistance: case StatType.FrostResistance: case StatType.HolyResistance: warding += 1f; break;
+            }
+        }
+
+        float most = Mathf.Max(Mathf.Max(hearty, swift), Mathf.Max(fierce, warding));
+        return most <= 0f ? "" : fierce == most ? "Fierce" : hearty == most ? "Hearty" : warding == most ? "Warding" : "Swift";
+    }
+
     private static string Compared(ItemDefinition item, int score)
     {
         PlayerEquipment equipment = Player.Current != null ? Player.Current.GetComponent<PlayerEquipment>() : null;
@@ -476,7 +547,7 @@ public sealed class ItemTooltipView : MonoBehaviour
         int numbersStart = builder.Length;
         foreach (StatBonus bonus in item.StatBonuses)
         {
-            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(bonus.Describe()).Append("</color>");
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(bonus.Describe()).Append(EffectOf(bonus)).Append("</color>").Append(StatCompared(item, bonus));
         }
 
         if (held)
@@ -555,6 +626,11 @@ public sealed class ItemTooltipView : MonoBehaviour
             if (item.HasBoon)
             {
                 builder.Append($"\n<color={UIStyle.Current.AccentHex}>{(item.IsTonic ? "Tonic" : "Meal")}: {DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(item.BoonSeconds)}.</color>");
+                string family = MealFamily(item.BoonBonuses);
+                if (family.Length > 0)
+                {
+                    builder.Append($"  <color={UIStyle.Current.MutedHex}>{family}</color>");
+                }
             }
 
             if (item.Cures.Count > 0)

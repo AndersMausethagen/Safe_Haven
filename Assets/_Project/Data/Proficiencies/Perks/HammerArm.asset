@@ -14,10 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: weapon_hammer_arm
   displayName: Hammer Arm
-  description: A thousand blows on the anvil.
+  description: 'A smith''s arm: weapons you make are of better quality, and your tools wear slower.'
   icon: {fileID: 21300000, guid: 5128f33b2884b79439b9c131c583ca8e, type: 3}
   technique: 0
   bonuses:
-  - stat: 13
+  - stat: 35
     op: 0
-    value: 3
+    value: 0.08
+  - stat: 19
+    op: 0
+    value: 0.1

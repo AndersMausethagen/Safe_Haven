@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: build_hearth_keeper
   displayName: Hearth Keeper
-  description: The Haven keeps you as you keep it.
+  description: 'You know a house by heart: you build faster.'
   icon: {fileID: 21300000, guid: 5d7943c9f1a528d4e8396becf1eade88, type: 3}
   technique: 0
   bonuses:
-  - stat: 0
+  - stat: 43
     op: 0
-    value: 10
+    value: 0.1

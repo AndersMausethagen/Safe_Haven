@@ -1417,6 +1417,17 @@ The player is no super soldier: combat is about reading the enemy and committing
   half on a repeat), `PlayerCombat.IsCasting`/`CastTarget`/`CastLoosed`, `CastAimLine`. Telemetry: `CombatTally` Bow.*, Staff.*, Ambush,
   Spotted.* (`MonsterAI.SpottedPlayer`). Co-op: `PlayerLookState.Drawing` → `FriendHitbox.IsDrawing`; `NetworkPlayerAvatar` NoiseRpc,
   ShotRpc, CastRpc (visual-only arrows and bolts).
+- **Player stats (2026-11-15, Docs/PlayerStatsResearch.md › Status):**
+  - **Balance:** `FightMath` (Combat, plain C#) is the one formula for damage share, toughness and blows. It is used by `GearBalance`,
+    whose `StackedKitOf` counts every source, held by `RaidTierTests` at ×1.5 toughness and ×1.35 damage, and by `FightCard` (UI),
+    the character window's Fight card.
+  - **Tonics:** `PlayerBoons.TonicSlots` comes from Survival Settings › Tonic Slots, plus `BuildingLevel.extraTonicSlots`, plus
+    `PerkTechnique.SecondVial`. `BoonRecord.IsTonic` marks a tonic.
+  - **Load:** `PlayerEquipment.LoadOf` counts a bow at `BowLoadShare`.
+  - **Planner and tooltips:** `RaidHarms` (Raids, plain C#) reads fire, frost and blight off a raid's creatures, using
+    `GroundHazard.Harm` for the ground they leave. `ItemTooltipView` shows `MealFamily`, `EffectOf` and per-stat arrows. `StatNames`
+    shows Might and Blight.
+  - **Telemetry:** Kit and Hurt rows in `PlaytestLog`.
 - **Heavy swings that push through:** `WeaponDefinition.HeavySwingArmor`, read by `PlayerCombat.IsPushingThrough`, which sets the player's `DamageTakenMultiplier`
   and skips the flinch. The player's multiplier belongs to `PlayerCombat`.
 - **Archery feel:** `ArrowProjectile.Strike` parents the arrow to the nearest bone or rigid part (`NearestBodyPart`, found before the blow, so a kill's corpse

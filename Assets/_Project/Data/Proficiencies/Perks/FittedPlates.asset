@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: armor_fitted_plates
   displayName: Fitted Plates
-  description: Made to your own shape.
+  description: 'Plates sit as they should: armour you make is of better quality.'
   icon: {fileID: 21300000, guid: 59deebd4ec50d07449c01aadd37986f2, type: 3}
   technique: 0
   bonuses:
-  - stat: 7
+  - stat: 37
     op: 0
-    value: 6
+    value: 0.08

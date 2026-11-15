@@ -36,6 +36,8 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
   boonBonuses: []
   boonSeconds: 300
   tonic: 0
@@ -44,12 +46,15 @@ MonoBehaviour:
   placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
   wornLook: {fileID: 0}
   statBonuses:
-  - stat: 2
+  - stat: 4
     op: 0
-    value: 8
+    value: 0.1
   - stat: 3
     op: 0
     value: 0.05
@@ -58,4 +63,14 @@ MonoBehaviour:
   experience: 0
   learnedAtHome: 0
   transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
   raidModifier: {fileID: 0}

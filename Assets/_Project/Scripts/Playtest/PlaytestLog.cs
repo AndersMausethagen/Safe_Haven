@@ -65,6 +65,10 @@ public static class PlaytestLog
     /// <summary>How the player fought in the last played minute: subject the technique (see <see cref="CombatTally"/>), amount how often,
     /// detail the weapon held. What the parry/aggression balance is measured from (Docs/CombatResearch.md §3.3 #10).</summary>
     public const string Combat = "Combat";
+    /// <summary>The player's kit as a raid starts and ends (Docs/PlayerStatsResearch.md #3): health, armour, damage share, toughness, boons.</summary>
+    public const string Kit = "Kit";
+    /// <summary>A blow that took at least 5% of the player's health: what struck, how hard, with what.</summary>
+    public const string Hurt = "Hurt";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

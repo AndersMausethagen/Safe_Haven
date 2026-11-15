@@ -31,7 +31,7 @@ MonoBehaviour:
     turnSpeedMultiplier: 1
     faceCursor: 1
   lightLoad: 6
-  heavyLoad: 13
+  heavyLoad: 13.5
   quickstep:
     distance: 0.6
     duration: 0.65
@@ -59,6 +59,10 @@ MonoBehaviour:
     moveSpeed: 0.9
     animationState: Heavy Roll
     animationSpeed: 0.8148148
+  heavyFromShare: 0.8
+  speedAtFullBag: 0.8
+  staminaAtFullBag: 1.4
+  noiseAtFullBag: 1.35
   wadeFrom: 0.2
   deepWadeSpeed: 0.55
   swimDepth: 1.3

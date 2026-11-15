@@ -37,10 +37,11 @@ MonoBehaviour:
   hungerRestore: 70
   thirstRestore: 20
   waterCapacity: 0
+  waterMeasure: 0
   boonBonuses:
   - stat: 0
-    op: 0
-    value: 25
+    op: 1
+    value: 0.1
   boonSeconds: 480
   tonic: 0
   cures: []
@@ -61,4 +62,12 @@ MonoBehaviour:
   transport: {fileID: 0}
   sapling: {fileID: 0}
   lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
   raidModifier: {fileID: 0}

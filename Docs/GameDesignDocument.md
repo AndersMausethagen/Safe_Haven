@@ -682,6 +682,24 @@ Simple food refills meters; cooked dishes additionally grant time-limited bonuse
 
 **Implemented (October 30, 2026):** simple food from the Campfire fills meters, and meals from the Kitchen also give bonuses for several minutes: Strength, Maximum Stamina, Maximum Health, Armor, Move Speed, Frost Resistance, Gather Yield or Damage, some at a price (Honey Mead hits harder and protects less). Two meals work at once; a third pushes out the one closest to ending. Tonics from the Cauldron take no meal slot and are for the fight rather than the road. Bonuses go through the portal, are lost on a failed raid and aren't kept in a save file. A Sauna gives a similar lasting warmth at home.
 
+**Stats without a new bar (November 15, 2026; Docs/PlayerStatsResearch.md):** the game has no attributes, points or level. Its stats come from gear, skills, perks, meals and tonics, and they are made readable and kept in bounds.
+- **One tonic at a time.** A new tonic pushes out the last. A second slot comes from the Cauldron's Master's Shelf or the Second Vial perk.
+- **Meal families.** Meals and tonics are tagged Hearty (health, armour), Swift (stamina, speed), Fierce (damage, often at a cost) or Warding (resistances).
+- **Harms in the planner.** The raid planner names the harms a run holds, read from the creatures that can be met and from the season: frost from the Draug, blight from the Blight Boar and Bog Spitter, and the cold. It says what answers them: Warding food or the matching resistance.
+- **The Fight card.** The character window shows what the numbers come to:
+  - damage as one share of the weapon's;
+  - blows to fell and blows to take at the raid tier ahead;
+  - stamina as dodges or swings;
+  - the dodge class from the equipment load.
+- **Honest labels.**
+  - Strength and Physical Power both read as Might, with the damage they add.
+  - Holy Resistance reads as Blight Resistance.
+  - Spell Power is marked as being for the staff and abilities.
+  - Tooltips compare each stat with what is worn.
+- **Weight is the build stat.** Light means quickstep and sneaking, heavy means barging and armour. A bow counts at 40% of its weight, so the archer's leather stays a quickstep. Copper Scale with a sword is a roll.
+- **Perks.** Gathering and crafting perks help their own work, not the fight. The fight perks are trade-offs: Reaver hits harder for more swing stamina, Warden is tougher and slower.
+- **Bounds.** A fully stacked kit (perks, the best meals and tonics, Well Rested) stays within ×1.5 toughness and ×1.35 damage of the kit each raid tier was tuned to. A test holds this.
+
 ## 12. Resources, categories, and inventory
 
 ### 12.1 Core rule: materials are items, essences are bars
@@ -1310,7 +1328,7 @@ These decisions cover §21 and the first ward breach. All numbers are tuning def
 
 **Decided October 30, 2026 (all numbers are tuning defaults):**
 - **Raid events:** the clock keeps running while the player chooses, and an event happens at most once a raid.
-- **Meals:** two meal slots; tonics take none. Bonuses survive the portal, not a failed raid, and aren't saved to file.
+- **Meals:** two meal slots; tonics take none of them but have one slot of their own (since November 15, 2026; a second from the Cauldron's Master's Shelf or Second Vial). Bonuses survive the portal, not a failed raid, and aren't saved to file.
 - **Status effects:** a blocked hit leaves none, and they never count as blows.
 - **Farming:** crops are station recipes, so they grow during raids. Seeds come from raids.
 - **Copper gear** is made at the Construction Table, so it comes before the Forge.

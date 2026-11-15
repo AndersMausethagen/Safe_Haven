@@ -33,9 +33,11 @@ MonoBehaviour:
     tier: 1
   requiredRank: 0
   modelScale: 1
+  modelHeight: 1
   yardDepth: 1.5
   yardSide: 2
   placeInLines: 0
+  decoration: 0
   station: 4
   outputCapacity: 10
   queueLength: 5
@@ -63,9 +65,11 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
   - title: Master's Shelf
@@ -93,9 +97,11 @@ MonoBehaviour:
     requires:
     - building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
       tier: 2
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 1
     extraGame: 0
     extraLight: 0
   comfort: 0

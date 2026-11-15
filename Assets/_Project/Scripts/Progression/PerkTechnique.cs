@@ -64,6 +64,8 @@ public enum PerkTechnique
     SureSeat = 27,
     /// <summary>Horsemanship: at a gallop, your horse runs down a creature in its path and knocks it off its feet.</summary>
     Trample = 28,
+    /// <summary>Alchemy: a second tonic can work at once (Docs/PlayerStatsResearch.md #4).</summary>
+    SecondVial = 29,
 }
 
 /// <summary>

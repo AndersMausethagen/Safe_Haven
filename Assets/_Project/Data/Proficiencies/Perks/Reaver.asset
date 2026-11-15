@@ -14,10 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: melee_reaver
   displayName: Reaver
-  description: Every blow a finishing blow.
+  description: '+10% melee damage, at a cost: every swing takes 10% more stamina.'
   icon: {fileID: 21300000, guid: d12984c287baf4b4491589d83660d091, type: 3}
   technique: 0
   bonuses:
   - stat: 28
     op: 0
-    value: 0.099999994
+    value: 0.1
+  - stat: 29
+    op: 0
+    value: 0.1

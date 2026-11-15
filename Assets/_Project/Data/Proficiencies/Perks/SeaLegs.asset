@@ -14,10 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: fish_sea_legs
   displayName: Sea Legs
-  description: Steady on any footing.
+  description: 'Water is home: a little more from every catch and gathering, and an easier reel.'
   icon: {fileID: 21300000, guid: cf704fd1bc177ae449893301b138ec59, type: 3}
   technique: 0
   bonuses:
-  - stat: 0
+  - stat: 18
     op: 0
-    value: 15
+    value: 0.06
+  - stat: 47
+    op: 0
+    value: 0.05

@@ -112,7 +112,9 @@ public sealed partial class RaidPreparationWindow
         if (enemies.Count > 0)
         {
             y = Stack(dangersHeading, y, HeadingHeight);
-            dangersLabel.text = string.Join("  ·  ", enemies);
+            // What hurts beyond blows, and the food or resistance that answers it (Docs/PlayerStatsResearch.md #8-9).
+            List<RaidHarms.Harm> harms = RaidHarms.For(raid, plan.Difficulty != null ? plan.Difficulty.tier : Tiers.Max);
+            dangersLabel.text = $"{string.Join("  ·  ", enemies)}\n{RaidHarms.Describe(harms, RaidHarms.IsCold(PlayerWarmth.ColdNow()), style.MutedHex)}";
             y = Stack(dangersLabel, y, Measure(dangersLabel, ColumnWidth), SectionGap);
         }
 

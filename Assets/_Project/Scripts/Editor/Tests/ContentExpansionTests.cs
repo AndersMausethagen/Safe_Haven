@@ -401,4 +401,28 @@ public sealed class ContentExpansionTests
         Assert.Less(Load("CuredLeatherCap", "CuredLeatherJack", "CuredLeatherGloves", "CuredLeatherBoots", "CuredLeatherBelt"), 6f);
         Assert.Greater(Load("IronMailHelm", "IronMailHauberk", "IronMailGauntlets", "IronMailBoots", "IronMailBelt"), 13f);
     }
+
+    // Docs/PlayerStatsResearch.md #6: light means quickstep and sneaking, heavy means barging and armour. The archer's leather stays
+    // a quickstep with any bow; Copper Scale with a sword is a roll, and a shield on top makes it heavy.
+    [Test]
+    public void LeatherWithAnyBowIsAQuickstep_AndCopperScaleWithASwordIsARoll()
+    {
+        var settings = AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
+        ItemDefinition Item(string folder, string file) => AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/{folder}/{file}.asset");
+        float Armour(params string[] files) => files.Sum(file => PlayerEquipment.LoadOf(Item("Armor", file), GearSlot.Chest));
+        float leather = Armour("CuredLeatherCap", "CuredLeatherJack", "CuredLeatherGloves", "CuredLeatherBoots", "CuredLeatherBelt");
+        float copper = Armour("CopperScaleHelm", "CopperScaleHauberk", "CopperScaleGauntlets", "CopperScaleGreaves", "CopperScaleGirdle");
+
+        List<ItemDefinition> bows = All<ItemDefinition>().Where(item => item.Weapon != null && item.Weapon.IsBow).ToList();
+        Assert.Greater(bows.Count, 2);
+        foreach (ItemDefinition bow in bows)
+        {
+            Assert.AreEqual(DodgeStyle.Quickstep, settings.StyleFor(leather + PlayerEquipment.LoadOf(bow, GearSlot.MainHand)), bow.name);
+        }
+
+        float sword = PlayerEquipment.LoadOf(Item("Weapons", "CopperSword"), GearSlot.MainHand);
+        Assert.AreEqual(DodgeStyle.Roll, settings.StyleFor(copper + sword));
+        Assert.AreEqual(DodgeStyle.HeavyRoll, settings.StyleFor(copper + sword + Item("Weapons", "CopperBoundShield").Weight));
+        Assert.AreEqual(DodgeStyle.Roll, settings.StyleFor(leather + sword), "a sword is not a bow: leather with one rolls");
+    }
 }

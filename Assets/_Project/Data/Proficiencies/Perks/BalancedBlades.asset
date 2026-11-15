@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: weapon_balanced_blades
   displayName: Balanced Blades
-  description: You know where the weight should sit.
+  description: 'You balance every blade: weapons you make come out fine or better more often.'
   icon: {fileID: 21300000, guid: 13f67e23082980d4689900d7fb89e72a, type: 3}
   technique: 0
   bonuses:
-  - stat: 3
+  - stat: 36
     op: 0
-    value: 0.03
+    value: 0.1

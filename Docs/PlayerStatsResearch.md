@@ -9,6 +9,94 @@ are relative to `d:\Safe Haven\Safe Haven`, scripts under `Assets/_Project/Scrip
 can implement stats without overpowering the player or adding another player progression bar. Do we need player stats? What are the
 benefits of having it, versus not having it? How could this smoothly integrate into the other systems?"
 
+## Status (2026-11-15): built
+
+The user: "do all suggestions." All nine recommendations were built the same day on `test`. They were checked by Edit Mode tests:
+`RaidTierTests` (a fully stacked kit stays within a reach), `PlayerStatsTests` (new) and `ContentExpansionTests` (the dodge classes).
+Not played by hand.
+
+The choices made where the report left them open:
+
+- **#1, counting every source.**
+  - `GearBalance.StackedKitOf` adds to the tier's kit:
+    - every stat on the gear;
+    - the Melee perks, and the perks of the best crafting or gathering skill, taking the stronger side of each milestone up to the
+      tier's expected level;
+    - the best meals and tonics of the tier, as many as the slots hold;
+    - Well Rested.
+  - The raid tier window gains a "Fully stacked: kill / die" column.
+  - **Empowering is left out.** It raises the gear score, so an empowered player already counts toward the next tier.
+  - **The reach is toughness ×1.5 and damage ×1.35** against the plain kit (`RaidTierTests.StackedToughnessReach` and
+    `StackedDamageReach`). The fully stacked kit now comes to:
+
+    | Tier | Damage | Toughness |
+    |---|---|---|
+    | I | ×1.03 | ×1.21 |
+    | II | ×1.30 | ×1.27 |
+    | III | ×1.29 | ×1.28 |
+    | IV | ×1.26 | ×1.44 |
+
+    At the start it reached up to ×2.04 toughness. The changes that brought it inside the reach:
+    - **The perks (#7).**
+    - **Health meals give a share of health instead of flat health:**
+      - Hunter's Stew: +25 → +10%.
+      - Purified Draught: +40 → +10%.
+      - Smoked Boar: +10 → +4%.
+      - Haven Feast: +12% → +10%.
+- **#2, the Fight card.**
+  - The character window's Offense card is now **Fight**, with these rows:
+    - **Damage:** one share of the weapon's damage, and the blow it makes.
+    - **Blows:** blows to fell, and blows to take, against the tiers' reference creature at the tier ahead (the raid being fought in,
+      or the one the gear is ready for).
+    - **Stamina:** stamina as dodges or swings.
+    - **Dodge:** the dodge class, the load, and how far it is to the next class.
+    - **Staff and abilities:** spell power and spell critical chance.
+  - `FightMath` is the one formula behind both the Fight card and `GearBalance`.
+  - Item tooltips:
+    - an arrow for each stat against the piece worn in that slot;
+    - "(+X% damage)" beside Might;
+    - the meal family beside a meal or tonic.
+- **#3, the playtest log.** Two new kinds of row:
+  - **Kit,** at the start and end of each raid: max health, armour, the damage share, toughness and active boons.
+  - **Hurt,** for every blow that takes at least 5% of health: what struck, how hard, and with what.
+- **#4, the tonic slot.**
+  - One tonic at a time (Survival Settings › Tonic Slots); a new tonic pushes out the one closest to ending.
+  - A second slot comes from the Cauldron's Master's Shelf (Building Level › Extra Tonic Slots) and from the perk **Second Vial**.
+    Second Vial is the old Rune Steeping perk; its id is kept.
+- **#5, honest stats.**
+  - Strength and Physical Power both read as **Might**. Holy Resistance reads as **Blight Resistance**; the enum is unchanged.
+  - Spell Power is marked "(staff and abilities)".
+  - **The off hand already counted in the load.** §1.5 was wrong: `PlayerEquipment.EquipLoad` adds it after the loop.
+  - **Spell Power is gone from seven melee pieces.** The report named five of them; it missed the Trollstone Helm and Gauntlets.
+    - Moonsilver Circlet and Gloves, Trollstone Helm and Gauntlets: +8 Max Stamina.
+    - Moonsilver and Trollstone Blades: +0.1 Physical Crit Damage.
+    - Moonsilver Ring: +5% Move Speed.
+    - The Wisp Pendant keeps its Spell Power.
+- **#6, weight.**
+  - A bow in hand counts at 40% of its weight in the load (`PlayerEquipment.BowLoadShare`). Half weight would still have made the
+    Trollhorn Bow (2.6) roll in leather. Leather (4.9) with any bow is now a quickstep, and the gear noise follows the load.
+  - Heavy Load is now 13.5 (it was 13). Copper Scale with a sword (13.0) rolls, and with a shield it is a heavy roll.
+- **#7, the perks.** Gathering and crafting perks give no more fight numbers:
+  - **Armour and weapon crafting** perks give finish and quality.
+  - **Hearthkeeper:** build speed.
+  - **Stone Skin:** refining yield.
+  - **Strong Stomach:** meals last longer.
+  - **Sea Legs, Wildheart and Iron Arms:** yields and tool care.
+  - **Axe Fighter:** chop speed.
+
+  The two combat perks became trade-offs:
+  - **Reaver:** +10% melee damage, and 10% more stamina a swing.
+  - **Warden:** +15 health and +5 armour, and 3% slower.
+- **#8 and #9, meal families and harms.**
+  - Meals and tonics are tagged Hearty, Swift, Fierce or Warding.
+  - The raid planner reads the harms off the raid's data (`RaidHarms`): fire, frost and blight from the creatures that can be met at
+    the tier, and the season's cold. It names them under the known dangers, and says that Warding food or the matching resistance
+    answers them. A run of plain blows suggests Hearty or Fierce food.
+  - **The rumour texts were not changed.** A rumour leads to a place, not to the creatures there, so the harm line comes from the run
+    instead.
+  - Misty Woods now reads: Frost (Draug) and Blight (Blight Boar, Bog Spitter).
+  - Nothing deals fire yet. The planner will name fire once a creature does.
+
 ## 0. Summary
 
 **The three biggest findings:**

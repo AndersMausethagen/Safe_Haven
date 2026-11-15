@@ -119,6 +119,116 @@ public static class GearBalance
         kit.Reduction = rules.GetArmorReduction(kit.Armor);
     }
 
+    /// <summary>
+    /// The kit with everything a player can stack on it by the tier (Docs/PlayerStatsResearch.md #1): the stronger fight perk at each
+    /// milestone reached by the level expected for the tier, in Melee and in the one crafting or gathering skill that adds most; the
+    /// tier's two best meals (or as many as there are slots) and its best tonics (Tonic Slots); Well Rested. Counted with every fight stat
+    /// (FightMath), where the plain kit counts gear armour, health, Strength and crit only. Empowering is left out: it raises the kit's gear
+    /// score, so the planner already counts an empowered kit as the next tier's.
+    /// </summary>
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear)
+    {
+        Kit plain = KitOf(tier, gear);
+        var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
+        kit.Pieces.AddRange(plain.Pieces);
+        CombatRules rules = CombatRules.Default;
+        var totals = new FightMath.Totals { MeleeDamage = plain.SkillDamage };
+        float weapon = 0f;
+        foreach (ItemDefinition piece in plain.Pieces)
+        {
+            if (piece.IsWeapon && !piece.Weapon.IsShield)
+            {
+                weapon = piece.Weapon.Damage;
+            }
+
+            foreach (StatBonus bonus in piece.StatBonuses)
+            {
+                totals.Add(bonus);
+            }
+        }
+
+        float Worth(FightMath.Totals t) => t.Damage(weapon, rules) * t.Toughness(rules);
+        void Take(System.Collections.Generic.IEnumerable<StatBonus> bonuses, FightMath.Totals into)
+        {
+            foreach (StatBonus bonus in bonuses)
+            {
+                into.Add(bonus);
+            }
+        }
+
+        // Perks: Melee's, and the crafting or gathering skill that adds most, the stronger side at each milestone reached.
+        LevelingSettings leveling = LevelingSettings.Current;
+        int level = leveling.ExpectedLevel(tier);
+        FightMath.Totals WithPerks(ProficiencyDefinition skill, FightMath.Totals from)
+        {
+            FightMath.Totals with = from.Copy();
+            foreach (ProficiencyDefinition.Milestone milestone in skill.Milestones)
+            {
+                if (milestone.level > level)
+                {
+                    continue;
+                }
+
+                FightMath.Totals first = with.Copy(), second = with.Copy();
+                if (milestone.first != null) Take(milestone.first.Bonuses, first);
+                if (milestone.second != null) Take(milestone.second.Bonuses, second);
+                with = Worth(first) >= Worth(second) ? first : second;
+            }
+
+            return with;
+        }
+
+        var skills = AssetDatabase.FindAssets("t:ProficiencyDefinition").Select(id => AssetDatabase.LoadAssetAtPath<ProficiencyDefinition>(AssetDatabase.GUIDToAssetPath(id)))
+            .Where(skill => skill != null).ToList();
+        ProficiencyDefinition melee = leveling.SkillTrainedBy(ProficiencyTraining.Melee);
+        if (melee != null)
+        {
+            totals = WithPerks(melee, totals);
+        }
+
+        FightMath.Totals best = totals;
+        foreach (ProficiencyDefinition skill in skills.Where(s => s.Group == ProficiencyGroup.Crafting || s.Group == ProficiencyGroup.Gathering))
+        {
+            FightMath.Totals with = WithPerks(skill, totals);
+            if (Worth(with) > Worth(best))
+            {
+                best = with;
+            }
+        }
+
+        totals = best;
+
+        // Food: the best meals and tonics of the tier, as many as there are slots.
+        List<ItemDefinition> food = AssetDatabase.FindAssets("t:ItemDefinition").Select(id => AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(id)))
+            .Where(item => item != null && item.HasBoon && item.Tier <= tier).ToList();
+        SurvivalSettings survival = SurvivalSettings.Current;
+        void Eat(bool tonics, int slots)
+        {
+            var left = food.Where(item => item.IsTonic == tonics).ToList();
+            for (int i = 0; i < slots && left.Count > 0; i++)
+            {
+                ItemDefinition pick = left.OrderByDescending(item => { FightMath.Totals t = totals.Copy(); Take(item.BoonBonuses, t); return Worth(t); })
+                    .ThenBy(item => item.name, StringComparer.Ordinal).First();
+                Take(pick.BoonBonuses, totals);
+                left.Remove(pick);
+            }
+        }
+
+        Eat(false, survival != null ? survival.MealSlots : 2);
+        Eat(true, survival != null ? survival.TonicSlots : 1);
+        // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
+        totals.HealthShare += WellRestedHealth;
+
+        kit.Damage = totals.Damage(weapon, rules);
+        kit.Armor = totals.Armor;
+        kit.Health = totals.FullHealth;
+        kit.Reduction = rules.GetArmorReduction(totals.Armor);
+        return kit;
+    }
+
+    /// <summary>The health share Well Rested adds (Docs/BaseProgression.md › Endurance).</summary>
+    public const float WellRestedHealth = 0.1f;
+
     /// <summary>Hits a kit needs to kill a creature of this health and armor.</summary>
     public static float HitsToKill(Kit kit, float health, float armor, float healthScale) =>
         health * healthScale / Mathf.Max(0.01f, kit.Damage * (1f - CombatRules.Default.GetArmorReduction(armor)));
@@ -240,17 +350,18 @@ internal static class RaidTierEditor
         EditorGUILayout.Space(4f);
         EditorGUILayout.LabelField("What it comes to", EditorStyles.miniBoldLabel);
         EditorGUILayout.LabelField($"The best kit of each tier against a reference creature ({ReferenceHealth:0} health, {ReferenceArmor:0} armor, hits for {ReferenceDamage:0}). " +
-                                   "'Own kit' should stay about the same down the table. 'Kit before' shows what skipping a tier costs. Suggested: the scaling that keeps hits level with tier I.",
+                                   "'Own kit' should stay about the same down the table. 'Kit before' shows what skipping a tier costs. 'Fully stacked' adds every perk, meal, tonic and Well Rested a player can have by the tier " +
+                                   "(RaidTierTests holds it within x1.5 toughness and x1.35 damage of the kit). Suggested: the scaling that keeps hits level with tier I.",
             ContentUtility.WrappedMiniLabel);
         List<ItemDefinition> gear = GearBalance.AllGear();
-        Row(EditorStyles.miniBoldLabel, "Tier", "Kit score", "Damage", "Armor", "Health", "Own kit: hits to kill / die", "Kit before: kill / die", "Suggested health / power");
+        Row(EditorStyles.miniBoldLabel, "Tier", "Kit score", "Damage", "Armor", "Health", "Own kit: hits to kill / die", "Kit before: kill / die", "Fully stacked: kill / die", "Suggested health / power");
         GearBalance.Kit first = GearBalance.KitOf(raid.Difficulties[0].tier, gear);
         foreach (RaidDifficulty tier in raid.Difficulties)
         {
             GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
             GearBalance.Kit before = GearBalance.KitOf(tier.tier - 1, gear);
             Row(EditorStyles.miniLabel, Tiers.ToRoman(tier.tier), kit.Score.ToString(), kit.Damage.ToString("0.#"), kit.Armor.ToString("0"), kit.Health.ToString("0"),
-                Hits(kit, tier), Hits(before, tier), $"x{kit.Damage / first.Damage:0.##} / x{kit.Toughness / first.Toughness:0.##}");
+                Hits(kit, tier), Hits(before, tier), Hits(GearBalance.StackedKitOf(tier.tier, gear), tier), $"x{kit.Damage / first.Damage:0.##} / x{kit.Toughness / first.Toughness:0.##}");
         }
     }
 

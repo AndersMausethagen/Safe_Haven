@@ -74,21 +74,24 @@ public sealed partial class CharacterWindow
         RectTransform attributes = HearthKit.Card(window, "Attributes", StatsX, 64f, StatsWidth, 150f);
         HearthKit.Section(attributes, "Attributes", "Star", 20f, 14f);
         healthRow = Row(attributes, 0, "Health", "Heart", bar: true);
-        strengthRow = Row(attributes, 1, "Strength", "Weight");
+        // Strength and Physical Power were one number shown twice: one Might row, as the damage it adds (Docs/PlayerStatsResearch.md #5).
+        strengthRow = Row(attributes, 1, "Might", "Sword");
         armorRow = Row(attributes, 2, "Armor", "Barding");
 
-        RectTransform offense = HearthKit.Card(window, "Offense", StatsX, 222f, StatsWidth, 208f);
-        HearthKit.Section(offense, "Offense", "Sword", 20f, 14f);
-        physicalPowerRow = Row(offense, 0, "Physical power", "Sword");
-        spellPowerRow = Row(offense, 1, "Spell power", "Spark");
-        physicalCritRow = Row(offense, 2, "Physical crit", "Crit");
-        spellCritRow = Row(offense, 3, "Spell crit", "Crit");
-        weaponRow = Row(offense, 4, "Weapon", "Sword");
+        // The Fight card (Docs/PlayerStatsResearch.md #2): what the numbers come to, in blows and dodges, against the raid tier ahead.
+        RectTransform offense = HearthKit.Card(window, "Fight", StatsX, 222f, StatsWidth, 208f);
+        HearthKit.Section(offense, "Fight", "Sword", 20f, 14f);
+        physicalPowerRow = Row(offense, 0, "Damage", "Sword");
+        spellPowerRow = Row(offense, 1, "Blows", "Crit");
+        physicalCritRow = Row(offense, 2, "Stamina", "Spark");
+        spellCritRow = Row(offense, 3, "Dodge", "Weight");
+        weaponRow = Row(offense, 4, "Staff and abilities", "Spark");
 
         RectTransform resistances = HearthKit.Card(window, "Resistances", StatsX, 438f, StatsWidth, 108f);
         HearthKit.Section(resistances, "Resistances", "Barding", 20f, 14f);
-        string[] names = { "Physical", "Fire", "Frost", "Holy" };
-        string[] icons = { "Barding", "Flame", "Snowflake", "Sun" };
+        // "Holy" only ever stopped Poison: shown as Blight (the stat keeps its name in code and saves).
+        string[] names = { "Physical", "Fire", "Frost", "Blight" };
+        string[] icons = { "Barding", "Flame", "Snowflake", "Skull" };
         float half = (StatsWidth - 52f) * 0.5f;
         for (int i = 0; i < names.Length; i++)
         {
@@ -131,15 +134,15 @@ public sealed partial class CharacterWindow
             healthRow.Set($"{Mathf.CeilToInt(health.CurrentHealth)} / {Mathf.RoundToInt(health.MaxHealth)}", health.HealthFraction, style.Good, style.Danger);
         }
 
-        strengthRow.Set(Number(stats.Get(StatType.Strength)), 0f, style.Text, style.Text);
+        float might = rules.PowerFor(stats, DamageType.Physical) * rules.DamagePerPower;
+        strengthRow.Set($"{Number(rules.PowerFor(stats, DamageType.Physical))} <color={muted}>(+{Mathf.RoundToInt(might * 100f)}% damage)</color>", 0f, style.Text, style.Text);
         armorRow.Set($"{Number(armor)} <color={muted}>({Mathf.RoundToInt(rules.GetArmorReduction(armor) * 100f)}% less)</color>", 0f, style.Text, style.Text);
-        physicalPowerRow.Set(Number(rules.PowerFor(stats, DamageType.Physical)), 0f, style.Text, style.Text);
-        spellPowerRow.Set(Number(rules.PowerFor(stats, DamageType.Fire)), 0f, style.Text, style.Text);
-        physicalCritRow.Set($"{Percent(stats.Get(StatType.PhysicalCritChance))} <color={muted}>×{1f + stats.Get(StatType.PhysicalCritDamage):0.##}</color>", 0f, style.Text, style.Text);
-        spellCritRow.Set($"{Percent(stats.Get(StatType.SpellCritChance))} <color={muted}>×{1f + stats.Get(StatType.SpellCritDamage):0.##}</color>", 0f, style.Text, style.Text);
-        bool armed = !equipment.MainHand.IsEmpty && !equipment.MainHand.IsBroken;
-        weaponRow.Set(armed ? $"{equipment.MainHand.Item.DisplayName} <color={muted}>{Mathf.RoundToInt(equipment.MainHand.Item.Weapon.Damage)}</color>" : $"<color={muted}>Unarmed</color>",
-            0f, style.Text, style.Text);
+        FightCard card = FightCard.Read(combatant.gameObject, stats, rules, health != null ? health.MaxHealth : 100f);
+        physicalPowerRow.Set(card.Damage, 0f, style.Text, style.Text);
+        spellPowerRow.Set(card.Blows, 0f, style.Text, style.Text);
+        physicalCritRow.Set(card.Stamina, 0f, style.Text, style.Text);
+        spellCritRow.Set(card.Dodge, 0f, style.Text, style.Text);
+        weaponRow.Set($"{Number(rules.PowerFor(stats, DamageType.Fire))} <color={muted}>power · {Percent(stats.Get(StatType.SpellCritChance))} crit</color>", 0f, style.Text, style.Text);
         StatType[] resist = { StatType.PhysicalResistance, StatType.FireResistance, StatType.FrostResistance, StatType.HolyResistance };
         for (int i = 0; i < resist.Length; i++)
         {

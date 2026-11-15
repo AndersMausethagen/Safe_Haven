@@ -8,14 +8,16 @@ public readonly struct BoonRecord
     public readonly string Id;
     public readonly string Name;
     public readonly bool IsMeal;
+    public readonly bool IsTonic;
     public readonly float SecondsLeft;
     public readonly IReadOnlyList<StatBonus> Bonuses;
 
-    public BoonRecord(string id, string name, bool isMeal, float secondsLeft, IReadOnlyList<StatBonus> bonuses)
+    public BoonRecord(string id, string name, bool isMeal, float secondsLeft, IReadOnlyList<StatBonus> bonuses, bool isTonic = false)
     {
         Id = id;
         Name = name;
         IsMeal = isMeal;
+        IsTonic = isTonic;
         SecondsLeft = secondsLeft;
         Bonuses = bonuses;
     }
@@ -35,6 +37,7 @@ public sealed class PlayerBoons : MonoBehaviour
         public string Id;
         public string Name;
         public bool IsMeal;
+        public bool IsTonic;
         public float SecondsLeft;
         public IReadOnlyList<StatBonus> Bonuses;
     }
@@ -54,7 +57,7 @@ public sealed class PlayerBoons : MonoBehaviour
         var records = new List<BoonRecord>(active.Count);
         foreach (Entry entry in active)
         {
-            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses));
+            records.Add(new BoonRecord(entry.Id, entry.Name, entry.IsMeal, entry.SecondsLeft, entry.Bonuses, entry.IsTonic));
         }
 
         return records;
@@ -74,7 +77,7 @@ public sealed class PlayerBoons : MonoBehaviour
     }
 
     /// <summary>Starts a boon, or restarts it when one with this id is at work. Returns false when it gives nothing.</summary>
-    public bool Add(string id, string displayName, IReadOnlyList<StatBonus> bonuses, float seconds, bool isMeal)
+    public bool Add(string id, string displayName, IReadOnlyList<StatBonus> bonuses, float seconds, bool isMeal, bool isTonic = false)
     {
         if (bonuses == null || bonuses.Count == 0 || seconds <= 0f)
         {
@@ -86,8 +89,12 @@ public sealed class PlayerBoons : MonoBehaviour
         {
             MakeRoomForMeal();
         }
+        else if (isTonic)
+        {
+            MakeRoomForTonic();
+        }
 
-        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, SecondsLeft = seconds, Bonuses = bonuses });
+        Begin(new Entry { Id = id, Name = displayName, IsMeal = isMeal, IsTonic = isTonic, SecondsLeft = seconds, Bonuses = bonuses });
         Changed?.Invoke();
         return true;
     }
@@ -102,7 +109,7 @@ public sealed class PlayerBoons : MonoBehaviour
 
         foreach (BoonRecord record in records)
         {
-            Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
+            Begin(new Entry { Id = record.Id, Name = record.Name, IsMeal = record.IsMeal, IsTonic = record.IsTonic, SecondsLeft = record.SecondsLeft, Bonuses = record.Bonuses });
         }
 
         Changed?.Invoke();
@@ -155,6 +162,42 @@ public sealed class PlayerBoons : MonoBehaviour
         if (meals >= slots && shortest >= 0)
         {
             GameMessages.Post($"{active[shortest].Name} gives way to the new meal.");
+            Stop(shortest);
+        }
+    }
+
+    /// <summary>How many tonics can work at once: Survival Settings › Tonic Slots, the Cauldron's top upgrade, the Second Vial perk.</summary>
+    public int TonicSlots => SurvivalSettings.Current.TonicSlots + GameSession.Settlement.UpgradeBonus(level => level.extraTonicSlots)
+                             + (Techniques.Has(PerkTechnique.SecondVial) ? 1 : 0);
+
+    // Tonics share their slots as meals do (Docs/PlayerStatsResearch.md #4): a new one pushes out the one closest to ending.
+    private void MakeRoomForTonic()
+    {
+        int tonics = 0;
+        int shortest = -1;
+        for (int i = 0; i < active.Count; i++)
+        {
+            if (!active[i].IsTonic)
+            {
+                continue;
+            }
+
+            tonics++;
+            if (shortest < 0 || active[i].SecondsLeft < active[shortest].SecondsLeft)
+            {
+                shortest = i;
+            }
+        }
+
+        int slots = TonicSlots;
+        if (Techniques.Has(PerkTechnique.SecondVial) && tonics == slots - 1)
+        {
+            Techniques.Used(PerkTechnique.SecondVial);
+        }
+
+        if (tonics >= slots && shortest >= 0)
+        {
+            GameMessages.Post($"{active[shortest].Name} gives way to the new tonic.");
             Stop(shortest);
         }
     }

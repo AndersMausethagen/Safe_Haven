@@ -64,16 +64,34 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private readonly CombatTally combat = new CombatTally();
     private Player followed;
 
+    private RaidDirector kitLoggedFor;
+
     private void FollowPlayer()
     {
+        // A raid has begun: the kit the player went in with.
+        if (RaidDirector.Current != null && RaidDirector.Current != kitLoggedFor && Player.Current != null)
+        {
+            kitLoggedFor = RaidDirector.Current;
+            WriteKit("start");
+        }
+
         Player current = Player.Current;
         if (current == followed)
         {
             return;
         }
 
+        if (followed != null && followed.Health != null)
+        {
+            followed.Health.Damaged -= OnPlayerHurt;
+        }
+
         followed = current;
         combat.Follow(current != null ? current.gameObject : null);
+        if (followed != null && followed.Health != null)
+        {
+            followed.Health.Damaged += OnPlayerHurt;
+        }
     }
 
     private void FlushCombat()
@@ -141,6 +159,11 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
         bool raid = gameEvent.Kind == GameEventKind.RaidFinished;
         RaidSession session = raid && RaidDirector.Current != null ? RaidDirector.Current.Session : null;
+        if (raid)
+        {
+            WriteKit("end");
+        }
+
         if (session != null && session.Difficulty != null)
         {
             Write(PlaytestLog.RaidTier, NameOf(gameEvent.Subject), session.Tier,
@@ -195,6 +218,35 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         run.Sessions++;
         WriteRow(PlaytestLog.SessionStart, Application.version, 0, run.Sessions == 1 ? "new run" : "continued");
         return current;
+    }
+
+    // The player's kit now: max health in the amount; armour, damage share, toughness and boons in the detail.
+    private void WriteKit(string when)
+    {
+        Player player = Player.Current;
+        if (player == null || player.Health == null || !player.TryGetComponent(out Combatant self))
+        {
+            return;
+        }
+
+        FightMath.Totals totals = FightMath.Of(self.Stats, player.Health.MaxHealth);
+        var boons = player.TryGetComponent(out PlayerBoons active) ? active.Capture() : null;
+        string names = boons != null && boons.Count > 0 ? string.Join("+", boons.ConvertAll(boon => boon.Name.Replace(';', ',').Replace(' ', '_'))) : "none";
+        Write(PlaytestLog.Kit, when, Mathf.RoundToInt(player.Health.MaxHealth),
+            $"armour {totals.Armor:0} damage x{totals.DamageShare(self.Rules):0.00} toughness {totals.Toughness(self.Rules):0} boons {names}");
+    }
+
+    // A blow worth noting: what struck the player, how hard, with what attack.
+    private void OnPlayerHurt(DamageInfo damage, DamageResult result)
+    {
+        Damageable health = followed != null ? followed.Health : null;
+        if (health == null || result.Damage < health.MaxHealth * 0.05f || damage.IsOverTime)
+        {
+            return;
+        }
+
+        string by = damage.Source != null ? (damage.Source.TryGetComponent(out MonsterAI monster) && monster.Definition != null ? monster.Definition.name : damage.Source.name) : "unknown";
+        Write(PlaytestLog.Hurt, by, Mathf.RoundToInt(result.Damage), $"{(damage.Attack != null ? damage.Attack.name : "-")} {damage.Type}{(result.Blocked ? " blocked" : "")}");
     }
 
     private void Write(string eventName, string subject, int amount = 0, string detail = "")

@@ -44,8 +44,12 @@ public sealed class PlayerEquipment : MonoBehaviour
     public ItemStack MainHand => gear.Get(GearSlot.MainHand);
     public ItemStack OffHand => gear.Get(GearSlot.OffHand);
 
-    /// <summary>What the player carries on their body: the weight of worn armor, rings and the weapon (not the tool belt
-    /// or the backpack). Decides the dodge (PlayerMovementSettings › Equipment load).</summary>
+    // A bow in hand weighs on the dodge like a dagger: 2-2.6 counts as 0.8-1.04, so the leather set (4.9, the archer's) stays a
+    // quickstep with any bow (Docs/PlayerStatsResearch.md #6). Its carried weight in the bag is unchanged.
+    public const float BowLoadShare = 0.4f;
+
+    /// <summary>What the player carries on their body: the weight of worn armor, rings, the weapon (a bow at BowLoadShare) and
+    /// the off hand (not the tool belt or the backpack). Decides the dodge (PlayerMovementSettings › Equipment load).</summary>
     public float EquipLoad
     {
         get
@@ -56,7 +60,7 @@ public sealed class PlayerEquipment : MonoBehaviour
                 ItemStack stack = gear.Get(slot);
                 if (!stack.IsEmpty)
                 {
-                    load += stack.Item.Weight;
+                    load += LoadOf(stack.Item, slot);
                 }
             }
 
@@ -65,6 +69,10 @@ public sealed class PlayerEquipment : MonoBehaviour
             return load;
         }
     }
+
+    /// <summary>What a piece worn in <paramref name="slot"/> adds to the equipment load: its weight, a bow in hand at BowLoadShare.</summary>
+    public static float LoadOf(ItemDefinition item, GearSlot slot) =>
+        item == null ? 0f : item.Weight * (slot == GearSlot.MainHand && item.Weapon != null && item.Weapon.IsBow ? BowLoadShare : 1f);
 
     /// <summary>Raised after any gear slot changes: equipped, unequipped, worn down or repaired.</summary>
     public event Action Changed;

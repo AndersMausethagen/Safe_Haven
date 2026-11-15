@@ -14,10 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: forage_wildheart
   displayName: Wildheart
-  description: The forest's strength runs in you.
+  description: 'The wild gives to you: more from foraging and from every gathering.'
   icon: {fileID: 21300000, guid: c68c404f510ef9f41b899a60b384beba, type: 3}
   technique: 0
   bonuses:
-  - stat: 0
+  - stat: 46
     op: 0
-    value: 20
+    value: 0.1
+  - stat: 18
+    op: 0
+    value: 0.04

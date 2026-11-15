@@ -14,13 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::PerkDefinition
   id: melee_warden
   displayName: Warden
-  description: Behind you, the Haven. In front, nothing gets past.
+  description: '+15 health and +5 armour, at a cost: you move 3% slower.'
   icon: {fileID: 21300000, guid: d86023d9c8db5c04f9bbea80b5cb13e0, type: 3}
   technique: 0
   bonuses:
   - stat: 0
     op: 0
-    value: 25
+    value: 15
   - stat: 7
     op: 0
     value: 5
+  - stat: 16
+    op: 0
+    value: -0.03

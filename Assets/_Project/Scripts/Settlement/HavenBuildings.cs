@@ -361,6 +361,7 @@ public static class HavenBuildings
         if (level.beds > 0) parts.Add($"{level.beds} more beds");
         if (level.purifyYield > 0f) parts.Add($"{Mathf.RoundToInt(level.purifyYield * 100f)}% more Purified Essence");
         if (level.extraMealSlots > 0) parts.Add($"{level.extraMealSlots} more meal at once");
+        if (level.extraTonicSlots > 0) parts.Add($"{level.extraTonicSlots} more tonic at once");
         if (level.extraGame > 0) parts.Add($"{level.extraGame} more game at home");
         if (level.extraLight > 0f) parts.Add($"{level.extraLight:0} m more light");
         foreach (RecipeDefinition recipe in level.teachesRecipes)

@@ -249,8 +249,10 @@ public static class StatNames
         switch (stat)
         {
             case StatType.MaxHealth: return "Health";
-            case StatType.PhysicalPower: return "Physical Power";
-            case StatType.SpellPower: return "Spell Power";
+            // Strength and Physical Power are one power (Docs/PlayerStatsResearch.md #5): both read as Might.
+            case StatType.Strength: return "Might";
+            case StatType.PhysicalPower: return "Might";
+            case StatType.SpellPower: return "Spell Power (staff and abilities)";
             case StatType.PhysicalCritChance: return "Physical Crit Chance";
             case StatType.PhysicalCritDamage: return "Physical Crit Damage";
             case StatType.SpellCritChance: return "Spell Crit Chance";
@@ -258,7 +260,8 @@ public static class StatNames
             case StatType.PhysicalResistance: return "Physical Resistance";
             case StatType.FireResistance: return "Fire Resistance";
             case StatType.FrostResistance: return "Frost Resistance";
-            case StatType.HolyResistance: return "Holy Resistance";
+            // Only Poison is of this kind: shown as Blight (the stat keeps its name in code and saves).
+            case StatType.HolyResistance: return "Blight Resistance";
             case StatType.StructureDamage: return "Structure Damage";
             case StatType.DamageBonus: return "Damage";
             case StatType.MaxStamina: return "Stamina";

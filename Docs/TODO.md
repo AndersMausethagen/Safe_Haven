@@ -66,6 +66,18 @@ Play-mode probes from the CLI and tests only: every number is a first guess. Pla
 - [ ] Mixamo clips were not used (no browser in the agent session), nor the optional two-hand or power-stance toggle: decide
       whether either is still wanted.
 
+## Player stats (2026-11-15)
+
+Everything in Docs/PlayerStatsResearch.md was built (its Status section). Tests only; nothing played by hand:
+- [ ] The Fight card (C): do "fell in 4.2 · take 11" and the dodge row mean something to you? Are they too many numbers?
+- [ ] One tonic at a time: does it make you choose, or is it a nuisance? Is the Master's Shelf or Second Vial worth having?
+- [ ] The raid planner's harm line (Frost, Blight, the cold, and what answers them): does it make you pack a Warding meal or a resistance
+      piece?
+- [ ] Leather and a bow now quickstep, and Copper Scale with a sword rolls: do light and heavy feel different?
+- [ ] The perk rework: are crafting and gathering perks still worth picking without fight numbers? Are Reaver's and Warden's costs
+      felt?
+- [ ] The Kit and Hurt rows in the playtest log: after a few raids, look at what hits hardest and what kits are carried.
+
 ## Ranged and stealth (2026-11-15)
 
 Everything in Docs/RangedStealthResearch.md was built (its Status section). Probes and tests only:

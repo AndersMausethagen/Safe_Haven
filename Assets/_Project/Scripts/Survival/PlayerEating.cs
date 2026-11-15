@@ -161,7 +161,7 @@ public sealed class PlayerEating : MonoBehaviour
 
         // A cook knows how to make a meal last, an alchemist a tonic (the Cooking and Alchemy skills).
         float boonSeconds = item.BoonSeconds * BoonScale(item);
-        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, !item.IsTonic))
+        if (item.HasBoon && boons != null && boons.Add(item.Id, item.DisplayName, item.BoonBonuses, boonSeconds, !item.IsTonic, item.IsTonic))
         {
             GameMessages.Post($"{item.DisplayName}: {ItemTooltipView.DescribeBonuses(item.BoonBonuses)} for {RaidStats.FormatTime(boonSeconds)}", MessageKind.Gain);
         }

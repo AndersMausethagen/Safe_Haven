@@ -53,6 +53,8 @@ public sealed class BuildingLevel
     [Min(0f)] public float purifyYield;
     [Tooltip("More meals the player can have in them at once.")]
     [Min(0)] public int extraMealSlots;
+    [Tooltip("More tonics the player can have in them at once.")]
+    [Min(0)] public int extraTonicSlots;
     [Tooltip("More game roaming outside the light at home.")]
     [Min(0)] public int extraGame;
     [Tooltip("Metres more light around it, pushing the night back.")]
