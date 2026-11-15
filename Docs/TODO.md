@@ -55,8 +55,8 @@ Play-mode probes from the CLI and tests only: every number is a first guess. Pla
 - [ ] Each family's moving art: the sword's dash, the dagger's blink, the axe's hurl, the walking whirlwind, the leap slam,
       the quake leap, the javelin, the uppercut. Do any land somewhere awkward (in a wall, off a ledge)?
 - [ ] Art runes: is carving and attuning one clear from the bag, and is "attack out of the guard" for the rune's art found?
-- [ ] The runic staff: does it play well from range, and is its pace (1.22 against a sword's 1.6) fair? Its grip (held like a
-      spear) and icon (the iron spear's) need an art pass; the eight runes still use Hush Rune's icon.
+- [ ] The runic staff: does it play well from range, and is its pace (1.22 against a sword's 1.6) fair? Its new model is carried
+      upright in one hand; do its bolt and burst casts read well (the stone end leads at the hand)? Runes and staff have their own icons.
 - [ ] Regain: is 40% of a hit, won back at 0.5 a point dealt within 3 s, enough to change how you answer a hit? Is the amber
       stretch on the health bar seen?
 - [ ] Knockdown at 35% of health in one blow: too often, too rare? Is a second down too long?

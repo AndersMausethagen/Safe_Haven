@@ -20,11 +20,11 @@ MonoBehaviour:
   rarity: 0
   value: 55
   gearScoreOverride: 0
-  icon: {fileID: 21300000, guid: c1ae582395062ee4785bf461276c0db0, type: 3}
-  prefab: {fileID: 1233948469560021199, guid: fbe98105c7f4869428af131f0a1933c6, type: 3}
-  heldModel: {fileID: 1233948469560021199, guid: fbe98105c7f4869428af131f0a1933c6, type: 3}
+  icon: {fileID: 21300000, guid: 6dc6eddd34325644c8e288bcc6f62179, type: 3}
+  prefab: {fileID: 7093484995238262737, guid: 24fd7ab8c94f23b4abaefccdcd508bc4, type: 3}
+  heldModel: {fileID: 7093484995238262737, guid: 24fd7ab8c94f23b4abaefccdcd508bc4, type: 3}
   heldPosition: {x: 0, y: 0, z: 0}
-  heldRotation: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 353.74, y: 157.22, z: 263.18}
   heldScale: 1
   stackable: 0
   maximumStack: 99

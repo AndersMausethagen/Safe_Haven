@@ -505,7 +505,7 @@ There are no locked classes; chosen gear and abilities define a build. Gathering
 | Fists               | Flurry: rhythm stacks to 3, each adding poise                                 | Jumping uppercut (25)                                   |
 | Runic staff         | Channel: every cast earns 1.5× a hit's Focus                                  | A bolt that leaves a web where it lands (30)            |
 
-**The runic staff (implemented November 15, 2026):** made at the Alchemy Table with Runecraft 3. Its light chain casts two rune bolts and ends in a burst around the player that throws enemies back; held, it casts a fan of three bolts. It trades pace for range (1.22 times its damage a second against a sword's 1.6). Its model and icon are borrowed and want an art pass.
+**The runic staff (implemented November 15, 2026):** made at the Alchemy Table with Runecraft 3. Its light chain casts two rune bolts and ends in a burst around the player that throws enemies back; held, it casts a fan of three bolts. It trades pace for range (1.22 times its damage a second against a sword's 1.6). It has its own model (a forked crook clasping a rune stone that glows amber) and icon, and is carried upright in one hand.
 
 **Art runes (November 15, 2026):** eight runes, carved at the Alchemy Table with Runecraft 5, each give one kind of weapon a second art, struck by attacking out of the guard without a shield (the middle button keeps the weapon's own). The arts the families had before are runes now, so no move was lost. Bows are unchanged: the bow keeps its own draw-and-loose play (Docs/Combat.md › The bow).
 

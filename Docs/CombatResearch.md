@@ -40,7 +40,7 @@ fists' art is a jumping uppercut, not a grab and throw.
 - Mixamo clips: there was no browser access in the agent session. The Kevin Iglesias pack and the packs already owned covered every family.
 - The optional two-hand or power-stance toggle (Phase 3.2): not built.
 - Kubold and HY-Motion were not used.
-- Art pass owed: the runes use Hush Rune's icon, the staff uses the iron spear's icon, and the staff is held like a spear.
+- Art pass done later the same day: the runic staff has its own model (Tools/Blender/runic_staff.py, from a LocalSpawn concept), an upright one-handed grip and its own icon; the eight runes have their own icons.
 - Nothing has been played by hand. Every number is a first guess, checked only by Play-mode probes from the CLI and by tests.
 
 ---

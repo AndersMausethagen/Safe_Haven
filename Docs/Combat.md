@@ -242,7 +242,7 @@ A two-handed staff that casts instead of striking (GDD §10.4, "magic and contro
 - **Its art** (30 Focus) is a bolt that leaves the black widow's web where it lands. Its signature, Channel, makes every cast earn half
   again a landed hit's Focus, so a caster keeps skills and arts coming.
 - **Pace.** From range it deals 1.22 times its damage a second, against a sword's 1.6 up close: range is what it trades for.
-- **Not finished:** it holds the Moss Shaman's staff model like a spear and shows the iron spear's icon; both want an art pass.
+- **Its look:** its own low-poly model (about 540 triangles, flat colours like the other gear; `Tools/Blender/runic_staff.py`), carried upright in one hand like a walking staff, and its own icon. Its bolt and burst casts lead with the stone end at the hand; whether that reads well is for a playtest.
 
 ## Readable animation
 

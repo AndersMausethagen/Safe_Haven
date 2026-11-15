@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RunicStaff
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Runic Staff
-  stance: 3
+  stance: 1
   kind: 0
   strikeOverride: 0
   damage: 14
