@@ -96,7 +96,7 @@ public sealed class StealthReadout : MonoBehaviour
     private void OnNoise(Vector3 position, float radius)
     {
         PerceptionSettings rules = PerceptionSettings.Current;
-        if (!IsLocal || !rules.ShowStealthReadout || radius < rules.NoiseRingFrom || !Build())
+        if (!IsLocal || !rules.ShowStealthReadout || !rules.ShowNoiseRings || radius < rules.NoiseRingFrom || !Build())
         {
             return;
         }

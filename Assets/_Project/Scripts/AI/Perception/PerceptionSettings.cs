@@ -171,6 +171,9 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField] private Color noticingColor = new Color(0.92f, 0.9f, 0.82f, 0.45f);
     [Tooltip("The noticing creature's sight cone and close-sense ring on the ground.")]
     [SerializeField] private Color coneColor = new Color(1f, 0.92f, 0.7f, 0.13f);
+    [Tooltip("Draw a ring on the ground to each sound's reach. Off since 2026-11-15 (the user found it annoying): the HUD's noise meter " +
+             "says how many metres the player is heard instead.")]
+    [SerializeField] private bool showNoiseRings;
     [Tooltip("The ring a sound of the player's spreads to (its real reach).")]
     [SerializeField] private Color noiseRingColor = new Color(0.85f, 0.9f, 1f, 0.35f);
     [Tooltip("Sounds under this many metres draw no ring (footsteps while sneaking).")]
@@ -263,6 +266,7 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public Color ConeColor => coneColor;
     public Color NoiseRingColor => noiseRingColor;
     public float NoiseRingFrom => noiseRingFrom;
+    public bool ShowNoiseRings => showNoiseRings;
     public Color UnseenColor => unseenColor;
     public Color AmbushColor => ambushColor;
     public Color TakedownColor => takedownColor;
