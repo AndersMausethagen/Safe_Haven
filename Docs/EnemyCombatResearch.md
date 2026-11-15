@@ -311,7 +311,8 @@ New `EliteBehaviour` kinds (affixes already reach friends with the spawn):
 
 - Agile humanoids (Huldra, Fossegrim, Tusse) that are the bow's target at full draw, and not striking, may side-step (`Hop`,
   monster-only) on a cooldown. Armoured ones raise an arm (NRftW's evasion against projectiles).
-- A perfect release is never evaded, and the chance stays low: the bow already trades pace (1.22) for range.
+- A perfect release is never evaded, and the chance stays low: the bow already trades pace for range. (Corrected: 1.22 is the runic
+  staff's pace, not the bow's; the bow's numbers by tier are in Docs/RangedStealthResearch.md §1.1.)
 
 ### 4.11 Enemies reacting to each other (impact Low-Med, effort S, slightly easier)
 
