@@ -51,9 +51,35 @@ public sealed class QuestWaypoint : MonoBehaviour
 
     public ResourceNode UntilGathered => untilGathered;
 
-    private void OnEnable() => active.Add(this);
+    // A waypoint on an objective to drink at open water ("Strength for the Road") shows the nearest water instead of where
+    // it was put: regenerating the Haven moves its rivers and lakes, and one placed by hand went stale (the user, 2026-11-15).
+    private bool followsWater;
+    private float nextWaterCheck;
+
+    private void OnEnable()
+    {
+        active.Add(this);
+        GameEventDefinition drink = SurvivalSettings.Current != null ? SurvivalSettings.Current.DrankAtWater : null;
+        int index = objective - 1;
+        followsWater = drink != null && quest != null && index >= 0 && index < quest.Objectives.Count
+            && quest.Objectives[index].QuestEvent == drink;
+    }
 
     private void OnDisable() => active.Remove(this);
+
+    private void Update()
+    {
+        if (!followsWater || Time.time < nextWaterCheck || Player.Current == null)
+        {
+            return;
+        }
+
+        nextWaterCheck = Time.time + 0.5f;
+        if (WaterSource.Nearest(Player.Current.transform.position, out Vector3 water))
+        {
+            transform.position = water;
+        }
+    }
 
     /// <summary>True while the player should be shown the way here.</summary>
     public bool IsWanted(QuestLog log)

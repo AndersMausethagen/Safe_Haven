@@ -4,8 +4,10 @@ using UnityEngine.AI;
 /// <summary>
 /// Someone stranded in a raid who can be brought home (GDD §15.2, §21.4): found on a side path, freed with a short
 /// interaction, then follows the player. Enemies can attack them; if they fall they stay behind for this raid and wait at
-/// the same place next time. Reaching extraction close to the player moves them into Safe Haven (SettlementState); a
-/// person not extracted never arrives at home. Once they live in Safe Haven they no longer appear in raids.
+/// the same place next time. Still following when the player extracts, however far behind (the user, 2026-11-15: Ingrid
+/// was left in the forest for not standing in the circle), they move into Safe Haven (SettlementState); a person not
+/// extracted never arrives at home. Once they live in Safe Haven they no longer appear in raids. A Quest Waypoint under
+/// them marks them on the map while they wait to be found, and is put away while they follow.
 /// <para>
 /// Where it belongs: on a character in a raid scene with an Interactable (deactivates on completion), a NavMeshAgent, a
 /// Combatant of the Ally faction and a Damageable that isn't destroyed on death. The person is a ResidentDefinition.
@@ -29,8 +31,6 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
     [SerializeField, RaisedByGame] private GameEventDefinition rescuedEvent;
     [Tooltip("They stop this close to the player, in meters.")]
     [SerializeField, Min(0.5f)] private float followDistance = 2.5f;
-    [Tooltip("They come along when the player extracts within this distance of them, in meters.")]
-    [SerializeField, Min(1f)] private float extractionReach = 12f;
     [Tooltip("Float parameter on the Animator set to the walking speed.")]
     [SerializeField] private string speedParameter = "Speed";
 
@@ -168,6 +168,12 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
     private void OnFreed()
     {
         state = State.Following;
+        // At the player's side now: the map needn't point at them, and the way out is what to look for.
+        foreach (QuestWaypoint mark in GetComponentsInChildren<QuestWaypoint>(true))
+        {
+            mark.enabled = false;
+        }
+
         if (tending != null)
         {
             tending.enabled = true;
@@ -335,9 +341,8 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
 
         GameObject player = raid != null ? raid.Player : null;
-        if (player == null || Vector3.Distance(player.transform.position, transform.position) > extractionReach)
+        if (player == null)
         {
-            GameMessages.Post($"{resident.DisplayName} was too far behind and is left in the forest.", MessageKind.Warning);
             return;
         }
 

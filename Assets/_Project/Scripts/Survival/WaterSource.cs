@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -51,13 +52,48 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
         fillUpTo = Mathf.Max(0, upTo);
     }
 
+    private static readonly List<WaterSource> active = new List<WaterSource>();
+
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => active.Clear();
+
+    /// <summary>
+    /// The nearest place to drink from a point: along a river's or lake's edge (its WaterShore) or at a well. False when
+    /// there is none.
+    /// </summary>
+    public static bool Nearest(Vector3 from, out Vector3 at)
+    {
+        at = from;
+        float best = float.MaxValue;
+        foreach (WaterSource source in active)
+        {
+            if (source == null)
+            {
+                continue;
+            }
+
+            Vector3 point = source.TryGetComponent(out WaterShore shore) ? shore.ClosestPoint(from) : source.transform.position;
+            float distance = (point - from).sqrMagnitude;
+            if (distance < best)
+            {
+                best = distance;
+                at = point;
+            }
+        }
+
+        return best < float.MaxValue;
+    }
+
     private void OnEnable()
     {
         interactable.Completed.AddListener(OnUsed);
+        active.Add(this);
     }
 
     private void OnDisable()
     {
+        active.Remove(this);
         interactable.Completed.RemoveListener(OnUsed);
     }
 

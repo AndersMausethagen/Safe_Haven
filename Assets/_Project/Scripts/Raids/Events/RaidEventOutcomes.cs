@@ -313,7 +313,7 @@ public sealed class GiveRelicOutcome : RaidEventOutcome
     }
 }
 
-/// <summary>Someone is freed and follows the player: they only come home if they reach an exit alive (RescuableTraveler).</summary>
+/// <summary>Someone is freed and follows the player: they come home if they are alive and still with the player when they extract (RescuableTraveler).</summary>
 [Serializable]
 public sealed class RescueResidentOutcome : RaidEventOutcome
 {
