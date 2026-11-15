@@ -8,6 +8,9 @@ using UnityEngine.Rendering.Universal;
 /// soft shadows, the nearest at a finer resolution (picked from WorldLights' list, scanned every few seconds); every other light keeps none. By day the sun drowns them, so none
 /// cast. Every light it switched on is put back as it was when it drops out of the budget. Made by WorldRendering;
 /// numbers in RenderingSettings › Fire shadows.
+/// The resolutions are picked to fit the additional-light shadow atlas (GraphicsOptions sizes it by the Shadows option):
+/// the nearest as fine as fits, the rest one step coarser. A light without URP's additional data asked for the High tier
+/// whatever was set (the data was never added), and URP halved them all with a console warning every frame.
 /// </summary>
 public sealed class LightShadowBudget : MonoBehaviour
 {
@@ -72,6 +75,7 @@ public sealed class LightShadowBudget : MonoBehaviour
             shadowed.Remove(light);
         }
 
+        PickTiers(out int nearestTier, out int otherTier);
         for (int i = 0; i < chosen.Count; i++)
         {
             Light light = chosen[i];
@@ -84,14 +88,60 @@ public sealed class LightShadowBudget : MonoBehaviour
                 light.shadowNearPlane = 0.2f;
             }
 
-            if (light.TryGetComponent(out UniversalAdditionalLightData data))
-            {
-                // The nearest one sharp, the rest coarser: all of them fit the shadow atlas together.
-                data.additionalLightsShadowResolutionTier = i == 0 ? UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium
-                    : UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow;
-            }
+            // The nearest one sharp, the rest coarser: all of them fit the shadow atlas together.
+            light.GetUniversalAdditionalLightData().additionalLightsShadowResolutionTier = i == 0 ? nearestTier : otherTier;
         }
     }
+
+    // The finest pair of tiers (nearest, others) whose shadow maps fit the atlas together: a point light needs six maps.
+    private void PickTiers(out int nearestTier, out int otherTier)
+    {
+        nearestTier = UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium;
+        otherTier = UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow;
+        if (!(UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset pipeline) || chosen.Count == 0)
+        {
+            return;
+        }
+
+        int otherMaps = 0;
+        for (int i = 1; i < chosen.Count; i++)
+        {
+            otherMaps += MapsFor(chosen[i]);
+        }
+
+        Tiers(pipeline.additionalLightsShadowmapResolution, pipeline.additionalLightsShadowResolutionTierHigh,
+            pipeline.additionalLightsShadowResolutionTierMedium, pipeline.additionalLightsShadowResolutionTierLow,
+            MapsFor(chosen[0]), otherMaps, out nearestTier, out otherTier);
+    }
+
+    /// <summary>
+    /// The finest tiers (URP's High 2, Medium 1, Low 0) for the nearest light's <paramref name="nearestMaps"/> and the others'
+    /// <paramref name="otherMaps"/> shadow maps that fit an <paramref name="atlas"/>-wide atlas: (High, Medium), then
+    /// (Medium, Low), then (Low, Low), which is also the answer when nothing fits.
+    /// </summary>
+    public static void Tiers(int atlas, int high, int medium, int low, int nearestMaps, int otherMaps, out int nearestTier, out int otherTier)
+    {
+        long room = (long)atlas * atlas;
+        (int near, int rest, long nearSize, long restSize)[] pairs =
+        {
+            (UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierHigh, UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium, high, medium),
+            (UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierMedium, UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow, medium, low),
+            (UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow, UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow, low, low),
+        };
+        foreach (var pair in pairs)
+        {
+            nearestTier = pair.near;
+            otherTier = pair.rest;
+            if (pair.nearSize * pair.nearSize * nearestMaps + pair.restSize * pair.restSize * otherMaps <= room)
+            {
+                return;
+            }
+        }
+
+        nearestTier = otherTier = UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow;
+    }
+
+    private static int MapsFor(Light light) => light.type == LightType.Point ? 6 : 1;
 
     private void Choose(Vector3 centre)
     {

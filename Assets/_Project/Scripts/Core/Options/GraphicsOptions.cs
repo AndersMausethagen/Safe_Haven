@@ -17,6 +17,10 @@ public static class GraphicsOptions
     private const int TemporalChoice = 4;
     // Ultra goes past the pipeline asset's own 4096: the sun's 8192 map (URP's largest), for the ground's small relief shadows.
     private static readonly int[] ShadowResolution = { 1024, 2048, 4096, 8192 };
+    // The atlas the fires' and lamps' shadows share (LightShadowBudget fits their resolutions to it). High and Ultra's 4096
+    // holds the nearest point light at the High tier and two more at Medium; the pipeline asset's 2048 couldn't hold even one
+    // at High, and URP halved them all with a warning every frame (the user, 2026-11-15). Low and Medium keep the asset's 2048.
+    private static readonly int[] AdditionalShadowAtlas = { 2048, 2048, 4096, 4096 };
     private const int UltraShadows = 3;
     private static readonly float[] ShadowDistanceShare = { 0.5f, 0.7f, 1f, 1f };
     // High and Ultra keep the pipeline's own four (sharper near the player over the same distance).
@@ -117,6 +121,7 @@ public static class GraphicsOptions
             : Mathf.Min(ShadowResolution[shadows], authored.mainLightShadowmapResolution);
         runtime.shadowDistance = authored.shadowDistance * ShadowDistanceShare[shadows];
         runtime.shadowCascadeCount = Mathf.Min(ShadowCascades[shadows], authored.shadowCascadeCount);
+        runtime.additionalLightsShadowmapResolution = AdditionalShadowAtlas[shadows];
 
         if (occlusion != null)
         {

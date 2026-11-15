@@ -50,4 +50,20 @@ public sealed class LightShadowBudgetTests
         long atlas = (long)pipeline.additionalLightsShadowmapResolution * pipeline.additionalLightsShadowmapResolution;
         Assert.LessOrEqual(needed, atlas);
     }
+
+    // Three point lights by night (the Haven's torches, the prologue's camp): URP warned every frame when they asked for more
+    // than the atlas holds (the user, 2026-11-15). The finest tiers that fit are picked for the atlas the options give.
+    [Test]
+    public void Tiers_AreTheFinestThatFit()
+    {
+        const int high = 2, medium = 1, low = 0;
+        LightShadowBudget.Tiers(4096, 1024, 512, 256, 6, 12, out int near, out int rest);
+        Assert.AreEqual((high, medium), (near, rest), "4096 holds the nearest at 1024 and two more at 512");
+        LightShadowBudget.Tiers(2048, 1024, 512, 256, 6, 12, out near, out rest);
+        Assert.AreEqual((medium, low), (near, rest), "2048 can't hold one point light at 1024");
+        LightShadowBudget.Tiers(4096, 1024, 512, 256, 6, 0, out near, out rest);
+        Assert.AreEqual(high, near, "one light alone");
+        LightShadowBudget.Tiers(1024, 1024, 512, 256, 6, 12, out near, out rest);
+        Assert.AreEqual((low, low), (near, rest), "nothing fits: the coarsest");
+    }
 }
