@@ -54,6 +54,10 @@ public static class RumourWay
     private const float AWayOff = 70f;
     /// <summary>Size of the squares a rumoured spot is rounded to. Its corners are under 36 m from its centre, inside the 40 m a hidden beacon shows from: go to the mark and it can be seen.</summary>
     private const float RoughCell = 50f;
+
+    /// <summary>How far from <see cref="RoughSpot"/> the thing may be: the square's corner, with a little to spare. The world map
+    /// shades this much round a rumour not found yet.</summary>
+    public const float RoughRadius = 38f;
     private static readonly string[] Points = { "north", "north-east", "east", "south-east", "south", "south-west", "west", "north-west" };
 
     public static string Describe(Vector3 offset)

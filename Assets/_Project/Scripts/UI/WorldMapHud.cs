@@ -23,6 +23,8 @@ public sealed class WorldMapHud : MonoBehaviour
     private Rect area;
     private RectTransform canvasRect;
     private RectTransform mapRect;
+    private readonly System.Collections.Generic.List<Image> areas = new System.Collections.Generic.List<Image>();
+    private static Sprite softDisc;
     private RawImage mapImage;
     private Material material;
     private Texture2D map;
@@ -404,13 +406,25 @@ public sealed class WorldMapHud : MonoBehaviour
         }
 
         Vector3 from = player.transform.position;
+        int areaCount = 0;
         foreach (RaidEventSite site in events.PinnedSites)
         {
             if (site != null && !site.IsResolved)
             {
                 ShowMark(used++, site.MarkFrom(from), style.Accent, style.RumourMark,
                     RaidHudText.RumourLabel(site.DisplayName, site.PlaceName), width, height);
+                // Until it is found, the rumour's whole square is shaded: somewhere in here, not a spot to walk to (the user,
+                // 2026-11-15: "a rescue raid should show the vicinity or area where the NPC is").
+                if (!site.IsFoundFrom(from))
+                {
+                    ShowArea(areaCount++, RumourWay.RoughSpot(site.transform.position), RumourWay.RoughRadius, style.Accent, width, height);
+                }
             }
+        }
+
+        for (int i = areaCount; i < areas.Count; i++)
+        {
+            areas[i].gameObject.SetActive(false);
         }
 
         foreach (RaidEventSite site in events.OpenSites)
@@ -425,6 +439,58 @@ public sealed class WorldMapHud : MonoBehaviour
     }
 
     public static string QuestLabel(string label, QuestRank rank) => $"{label} ({QuestMarkerSettings.RankName(rank)})";
+
+    // A soft disc on the map, <paramref name="radius"/> metres round <paramref name="centre"/>, under the marks.
+    private void ShowArea(int index, Vector3 centre, float radius, Color colour, float width, float height)
+    {
+        if (index == areas.Count)
+        {
+            RectTransform rect = Rect("Search Area", mapRect, Vector2.one * 0.5f, Vector2.one * 0.5f, Vector2.zero, Vector2.zero);
+            var image = rect.gameObject.AddComponent<Image>();
+            image.sprite = SoftDisc();
+            image.raycastTarget = false;
+            areas.Add(image);
+        }
+
+        Image area = areas[index];
+        area.gameObject.SetActive(true);
+        area.transform.SetSiblingIndex(0);
+        var rectTransform = (RectTransform)area.transform;
+        rectTransform.anchoredPosition = new Vector2(
+            (Mathf.Clamp01((centre.x - this.area.xMin) / this.area.width) - 0.5f) * width,
+            (Mathf.Clamp01((centre.z - this.area.yMin) / this.area.height) - 0.5f) * height);
+        rectTransform.sizeDelta = new Vector2(2f * radius / this.area.width * width, 2f * radius / this.area.height * height);
+        area.color = new Color(colour.r, colour.g, colour.b, 0.6f);
+    }
+
+    // A disc with a firm rim fading to a light middle, made once.
+    private static Sprite SoftDisc()
+    {
+        if (softDisc != null)
+        {
+            return softDisc;
+        }
+
+        const int size = 128;
+        var texture = new Texture2D(size, size, TextureFormat.RGBA32, false) { name = "Search Area", wrapMode = TextureWrapMode.Clamp, hideFlags = HideFlags.DontSave };
+        var pixels = new Color32[size * size];
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float r = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(size * 0.5f, size * 0.5f)) / (size * 0.5f);
+                float rim = Mathf.Clamp01(1f - Mathf.Abs(r - 0.94f) / 0.05f);
+                float fill = r < 0.97f ? 0.35f : 0f;
+                pixels[y * size + x] = new Color32(255, 255, 255, (byte)(Mathf.Max(rim, fill) * 255f));
+            }
+        }
+
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
+        softDisc = Sprite.Create(texture, new Rect(0, 0, size, size), Vector2.one * 0.5f, 100f);
+        softDisc.hideFlags = HideFlags.DontSave;
+        return softDisc;
+    }
 
     private void ShowMark(int index, Vector3 position, Color colour, Sprite sprite, string label, float width, float height)
     {
