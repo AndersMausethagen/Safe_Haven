@@ -117,6 +117,22 @@ public sealed class HorseMotion : MonoBehaviour
     // A kick on command from the saddle: when its forelegs land.
     private float kickLands = -1f;
     private LineRenderer lead;
+    private static Material leadMaterial;
+
+    // One rope material for every horse (each made its own, never destroyed).
+    private static Material LeadMaterial
+    {
+        get
+        {
+            if (leadMaterial == null)
+            {
+                leadMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                leadMaterial.SetColor("_BaseColor", new Color(0.55f, 0.42f, 0.28f));
+            }
+
+            return leadMaterial;
+        }
+    }
     private bool puppet;
     private float nextLure;
     private float nextHand;
@@ -1292,9 +1308,7 @@ public sealed class HorseMotion : MonoBehaviour
             lead.widthMultiplier = 0.04f;
             lead.useWorldSpace = true;
             lead.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            var material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            material.SetColor("_BaseColor", new Color(0.55f, 0.42f, 0.28f));
-            lead.sharedMaterial = material;
+            lead.sharedMaterial = LeadMaterial;
         }
 
         if (lead == null)

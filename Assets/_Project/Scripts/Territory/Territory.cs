@@ -43,6 +43,14 @@ public static class Territory
     /// </summary>
     public static Action<LandWork, string, int> ForHost { get; set; }
 
+    /// <summary>Forgets what belonged to the game being played (news waiting to be told, hearts burned on its runs): a new game
+    /// or a loaded one starts clean (GameSession).</summary>
+    public static void ForgetGame()
+    {
+        waiting.Clear();
+        burnedOnRuns.Clear();
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {

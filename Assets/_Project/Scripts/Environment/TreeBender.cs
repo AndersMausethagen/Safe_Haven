@@ -94,6 +94,11 @@ public sealed class TreeBender : MonoBehaviour
         }
     }
 
+    // Sorted against a static eye with one cached comparison: a lambda capturing the eye was a new delegate every frame.
+    private static Vector3 sortEye;
+    private static readonly System.Comparison<TreeBender> NearestFirst =
+        (a, b) => (a.transform.position - sortEye).sqrMagnitude.CompareTo((b.transform.position - sortEye).sqrMagnitude);
+
     /// <summary>Sends the active benders to the tree shader; returns how many were sent.</summary>
     public static int Upload()
     {
@@ -101,8 +106,8 @@ public sealed class TreeBender : MonoBehaviour
         if (Active.Count > Max)
         {
             Camera camera = Camera.main;
-            Vector3 eye = camera != null ? camera.transform.position : Vector3.zero;
-            Active.Sort((a, b) => (a.transform.position - eye).sqrMagnitude.CompareTo((b.transform.position - eye).sqrMagnitude));
+            sortEye = camera != null ? camera.transform.position : Vector3.zero;
+            Active.Sort(NearestFirst);
         }
 
         int count = Mathf.Min(Active.Count, Max);

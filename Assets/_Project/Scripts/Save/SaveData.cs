@@ -324,6 +324,28 @@ public sealed class PlayerSaveData
     public List<string> knownSkills;
     /// <summary>The skill bar, by slot: a skill id, or "" for an empty slot. Missing in older saves.</summary>
     public List<string> skillBar;
+    /// <summary>Crafts by hand under way when saved, already paid (HandCraftQueue). Null when there were none, and in older saves.</summary>
+    public HandCraftSaveData handCrafts;
+}
+
+/// <summary>The hand-craft queue as saved: each craft in order (the first under way), and how far the first has come.</summary>
+[Serializable]
+public sealed class HandCraftSaveData
+{
+    public List<HandCraftEntrySaveData> crafts = new List<HandCraftEntrySaveData>();
+    /// <summary>Seconds the first craft has been worked on.</summary>
+    public float elapsed;
+}
+
+/// <summary>One paid craft, with what was paid from where, so it can be given back there (MaterialPool.Payment).</summary>
+[Serializable]
+public sealed class HandCraftEntrySaveData
+{
+    public string recipe;
+    public List<AmountSaveData> carried = new List<AmountSaveData>();
+    public List<AmountSaveData> stored = new List<AmountSaveData>();
+    public List<AmountSaveData> fromBag = new List<AmountSaveData>();
+    public List<AmountSaveData> fromStore = new List<AmountSaveData>();
 }
 
 [Serializable]

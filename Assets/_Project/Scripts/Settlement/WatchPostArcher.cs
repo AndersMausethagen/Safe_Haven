@@ -55,8 +55,9 @@ public sealed class WatchPostArcher : MonoBehaviour
     private void Update()
     {
         WardBreachDirector breach = WardBreachDirector.Current;
-        if (Time.time < nextShot || breach == null || !breach.IsActive || construction == null || construction.Level < 2 || construction.IsBuilding
-            || (health != null && health.IsBroken))
+        // Its archer comes with the second level.
+        if (Time.time < nextShot || breach == null || !breach.IsActive || construction == null || construction.Level < 2
+            || !Construction.DefenceWorks(construction, health))
         {
             return;
         }

@@ -11,7 +11,9 @@ using UnityEngine.AI;
 [DisallowMultipleComponent]
 public sealed class FenceGate : MonoBehaviour
 {
-    private static readonly Collider[] Near = new Collider[16];
+    // Room for what crowds a gate (the fence, the ground, overgrowth, its own leaf and sides) besides the people at it: with 16
+    // the player could fall outside the buffer in a dense spot and the gate stayed shut.
+    private static readonly Collider[] Near = new Collider[64];
 
     [SerializeField] private Transform leaf;
     [Tooltip("Degrees it swings open.")]
@@ -80,9 +82,17 @@ public sealed class FenceGate : MonoBehaviour
     private float Look()
     {
         Vector3 centre = transform.position + Vector3.up;
-        int count = Physics.OverlapSphereNonAlloc(centre, openWithin, Near, ~0, QueryTriggerInteraction.Ignore);
         float best = float.MaxValue;
         float swing = 0f;
+        // The player first, by distance: never missed whatever else is near.
+        Player player = Player.Current;
+        if (player != null && (player.transform.position - centre).sqrMagnitude <= openWithin * openWithin)
+        {
+            best = (player.transform.position - centre).sqrMagnitude;
+            swing = IsOpen ? wanted : SwingFor(transform.InverseTransformPoint(player.transform.position).z, openAngle);
+        }
+
+        int count = Physics.OverlapSphereNonAlloc(centre, openWithin, Near, ~0, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
             Collider found = Near[i];

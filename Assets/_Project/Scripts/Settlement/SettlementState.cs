@@ -577,6 +577,22 @@ public sealed class SettlementState
     /// <summary>Puts back how far the portal was improved. Used by SaveMapper only.</summary>
     public void RestorePortal(int level) => PortalLevel = Math.Max(0, level);
 
+    /// <summary>
+    /// Home from a raid: the one place that says what every return does and what only an extraction does (review 2026-11-16: it
+    /// was spread over listeners, and a lost raid opened the held quests while the lessons stayed shut). Every return opens a
+    /// share of the held quests (a player who keeps dying isn't starved of what the Haven has for them); an extraction also counts
+    /// for the breaches, eases the ward's strain, restocks the trade and opens the lessons again (RecordExtraction). The territory
+    /// turns at every raid's end on its own (Territory).
+    /// </summary>
+    public void CameHome(RaidOutcome outcome)
+    {
+        OpenHeldQuestShare();
+        if (outcome == RaidOutcome.Extracted)
+        {
+            RecordExtraction();
+        }
+    }
+
     public void RecordExtraction()
     {
         Borrowed();

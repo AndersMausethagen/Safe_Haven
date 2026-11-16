@@ -278,15 +278,7 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
     }
 
     /// <summary>Takes it out of the world for good.</summary>
-    public void Remove()
-    {
-        if (entity != null)
-        {
-            entity.MarkDestroyed();
-        }
-
-        Destroy(gameObject);
-    }
+    public void Remove() => SaveableEntity.RemoveForGood(gameObject);
 
     // ----- Saving -----
 

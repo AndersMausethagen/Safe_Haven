@@ -196,15 +196,7 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
         }
     }
 
-    private void Remove()
-    {
-        if (TryGetComponent(out SaveableEntity saveable))
-        {
-            saveable.MarkDestroyed();
-        }
-
-        Destroy(gameObject);
-    }
+    private void Remove() => SaveableEntity.RemoveForGood(gameObject);
 
     // Ahead of the user. With a wall in the way, or a drop there too far to reach back from, it lands at their feet.
     private static Vector3 FindSpot(Transform user, DroppedItemSettings settings)

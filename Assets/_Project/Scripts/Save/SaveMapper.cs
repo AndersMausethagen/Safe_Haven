@@ -650,6 +650,7 @@ public static class SaveMapper
             loaded.Player.WithSkillBarItems(onBar);
         }
 
+        loaded.Player.HandCrafts = player.handCrafts != null && player.handCrafts.crafts.Count > 0 ? player.handCrafts : null;
         ReadSkills(player, content as ContentDatabase, loaded);
 
         StashSaveData stash = data.stash ?? new StashSaveData();

@@ -419,10 +419,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             return;
         }
 
+        // Onto the NavMesh first (up to a few metres, out of a hill it spawned in), then home where it stands: home taken first
+        // could lie off the mesh, a place it could never walk back to.
+        movement.EnsureOnNavMesh();
         ResetHome();
         lastSenseTime = Time.time;
         nextGlanceAt = Time.time + UnityEngine.Random.Range(0f, PerceptionSettings.Current.IdleGlanceSeconds.y);
-        movement.EnsureOnNavMesh();
         RefreshAmbush();
     }
 

@@ -23,6 +23,8 @@ public sealed class CoopPings : ICoopPart
     {
         public Vector3 Position;
         public string Who;
+        /// <summary>Whose it is, by client id: one ping each, whatever the names (two players may share one).</summary>
+        public ulong WhoId;
         public bool Enemy;
         public float Until;
         public PingMarker Marker;
@@ -93,8 +95,8 @@ public sealed class CoopPings : ICoopPart
 
         nextPing = Time.unscaledTime + Spacing;
         string me = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName;
-        Show(at, me, enemy);
-        Send(at, me, enemy, link.IsHost ? link.Guests() : link.Only(NetworkManager.ServerClientId));
+        Show(at, me, link.LocalId, enemy);
+        Send(at, me, link.LocalId, enemy, link.IsHost ? link.Guests() : link.Only(NetworkManager.ServerClientId));
     }
 
     // What lies under the crosshair (the middle of the screen), past the player's own body.
@@ -130,19 +132,20 @@ public sealed class CoopPings : ICoopPart
         reader.ReadValueSafe(out Vector3 at);
         reader.ReadValueSafe(out bool enemy);
         reader.ReadValueSafe(out string who);
+        reader.ReadValueSafe(out ulong whoId);
         // The host passes a guest's ping on to the others.
         if (network.IsServer)
         {
-            Send(at, who, enemy, link.Guests(sender), place);
+            Send(at, who, whoId, enemy, link.Guests(sender), place);
         }
 
         if (place.Equals(CoopPlace.Key))
         {
-            Show(at, who, enemy);
+            Show(at, who, whoId, enemy);
         }
     }
 
-    private void Send(Vector3 at, string who, bool enemy, IReadOnlyList<ulong> to, FixedString128Bytes? place = null)
+    private void Send(Vector3 at, string who, ulong whoId, bool enemy, IReadOnlyList<ulong> to, FixedString128Bytes? place = null)
     {
         if (to.Count == 0)
         {
@@ -154,15 +157,16 @@ public sealed class CoopPings : ICoopPart
         writer.WriteValueSafe(at);
         writer.WriteValueSafe(enemy);
         writer.WriteValueSafe(who);
+        writer.WriteValueSafe(whoId);
         network.CustomMessagingManager.SendNamedMessage(PingMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
-    private static void Show(Vector3 at, string who, bool enemy)
+    private static void Show(Vector3 at, string who, ulong whoId, bool enemy)
     {
         // One ping each: a new one from the same player replaces theirs.
         for (int i = active.Count - 1; i >= 0; i--)
         {
-            if (active[i].Who == who)
+            if (active[i].WhoId == whoId)
             {
                 if (active[i].Marker != null)
                 {
@@ -173,7 +177,7 @@ public sealed class CoopPings : ICoopPart
             }
         }
 
-        var ping = new Ping { Position = at, Who = who, Enemy = enemy, Until = Time.unscaledTime + Lasts };
+        var ping = new Ping { Position = at, Who = who, WhoId = whoId, Enemy = enemy, Until = Time.unscaledTime + Lasts };
         ping.Marker = PingMarker.Create(ping);
         active.Add(ping);
         GameMessages.Post(enemy ? $"{who}: enemy there!" : $"{who}: over here.");

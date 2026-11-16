@@ -102,9 +102,8 @@ public static class Inscriptions
             return ItemStack.Empty;
         }
 
-        if (bag.Container.AddStack(found) == 0)
+        if (ItemDelivery.Give(bag, found, newFind: false, toStash: false).Fell)
         {
-            DroppedItem.Drop(bag.transform, found);
             GameMessages.Post("Bag full: it falls at your feet.", MessageKind.Warning);
         }
 

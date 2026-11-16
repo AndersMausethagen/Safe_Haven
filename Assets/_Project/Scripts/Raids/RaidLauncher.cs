@@ -35,6 +35,12 @@ public static class RaidLauncher
             return "A raid is already under way.";
         }
 
+        // A scene change under way would refuse the raid's load after the Sparks were paid and the input switched off.
+        if (SceneTransition.IsBusy)
+        {
+            return "The way isn't open yet: wait a moment.";
+        }
+
         if (string.IsNullOrWhiteSpace(raid.SceneName) || !Application.CanStreamedLevelBeLoaded(raid.SceneName))
         {
             return $"{raid.DisplayName} can't be reached: its scene isn't in the build.";
@@ -184,6 +190,11 @@ public static class RaidLauncher
         float cut = ExtractionCut;
         int foretold = HavenReadiness.ForetoldEvents;
         RaidSession session = Go(raid, modifiers, player, runSeed, difficulty, sparks, isLarge, extra, cut, foretold, CanGoAlong(companion) ? companion : null, 0f);
+        if (session == null)
+        {
+            return false;
+        }
+
         Launched?.Invoke(RaidInvite.Of(session, extra, cut, foretold));
         return true;
     }
@@ -219,9 +230,8 @@ public static class RaidLauncher
         }
 
         HavenReadiness.GiveRest(player);
-        Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
-            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed);
-        return true;
+        return Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed) != null;
     }
 
     /// <summary>The run a friend's invite describes, as <see cref="TryFollow"/> builds it (without going anywhere).</summary>
@@ -288,7 +298,21 @@ public static class RaidLauncher
             input.enabled = false;
         }
 
-        SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}");
+        if (!SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}"))
+        {
+            // The load didn't start (CheckLaunch rules this out; a safety net): no raid under way, the controls back, rather than
+            // a player frozen at the portal with a raid that never comes.
+            GameSession.AbandonRaid(session);
+            GameSession.TakePlayerState();
+            if (input != null)
+            {
+                input.enabled = true;
+            }
+
+            GameMessages.Post("The way didn't open. Try the portal again.", MessageKind.Warning);
+            return null;
+        }
+
         return session;
     }
 }

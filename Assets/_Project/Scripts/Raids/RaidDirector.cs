@@ -429,6 +429,8 @@ public sealed class RaidDirector : MonoBehaviour
         Companions.Settle(Report, extracted);
         ExperienceTracker.SettleRaid(Report, extracted);
         GameSession.EndRaid(Report);
+        // Written now, before the results screen (a crash there lost the haul), and again once home.
+        SaveGameService.SaveAtRaidEnd(keeps);
         SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
         GameSession.CarryPlayerState(keeps);

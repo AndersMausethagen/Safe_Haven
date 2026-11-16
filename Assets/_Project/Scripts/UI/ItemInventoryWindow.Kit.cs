@@ -155,10 +155,12 @@ public sealed partial class ItemInventoryWindow
             {
                 ItemStack other = joined[j];
                 int room = other.Item.MaximumStack - other.Count;
-                if (room > 0 && other.WithCount(1).Equals(rest.WithCount(1)))
+                // One rule with the bag's own stacking (ItemStack.StacksWith; a fish stack shows its biggest), not a field-by-field
+                // compare that kept apart what Add would have joined.
+                if (room > 0 && other.StacksWith(rest))
                 {
                     int moved = Mathf.Min(room, rest.Count);
-                    joined[j] = other.WithCount(other.Count + moved);
+                    joined[j] = other.WithCount(other.Count + moved).WithSize(Mathf.Max(other.Size, rest.Size));
                     rest = rest.Count - moved > 0 ? rest.WithCount(rest.Count - moved) : ItemStack.Empty;
                 }
             }

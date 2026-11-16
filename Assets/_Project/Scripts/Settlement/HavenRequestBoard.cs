@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// The Haven's asks, at home: keeps HavenRequestSettings › At Once asks standing (SettlementState.Requests, saved), and
-/// as soon as what one asks for is home (in the bag or the stash) hands it over: the asker takes it, thanks the player
-/// and gives its reward (items to the bag or the stash, coin, experience, the blight eased). A new ask takes its place
+/// The Haven's asks, at home: keeps HavenRequestSettings › At Once asks standing (SettlementState.Requests, saved). Once what
+/// one asks for is home (in the bag or the stash), an ask of someone living here is handed to them in talk (AddHandIn, the
+/// player told once that it is ready), the Haven's own asks at once: the asker takes it (every bare piece before one the
+/// player has worked on), thanks the player and gives its reward (items to the bag, the stash or the feet: ItemDelivery;
+/// coin, experience, the blight eased). A new ask takes its place
 /// the next time the player comes home from a raid, so each run can be planned round what is wanted.
 /// <para>Where it belongs: once in the Haven scene (set up by AgentScripts/BuildHavenRequests.cs).</para>
 /// </summary>
@@ -100,17 +102,94 @@ public sealed class HavenRequestBoard : MonoBehaviour
         ItemInventory bag = player.GetComponent<ItemInventory>();
         foreach (HavenRequestDefinition request in Standing())
         {
-            if (AtHome(request, bag) >= request.Count)
+            if (AtHome(request, bag) < request.Count)
             {
-                Answer(request, bag);
+                told.Remove(request.Id);
+                continue;
             }
+
+            // An ask of someone living here is handed to them (AddHandIn: talk to them), so nothing worked on is taken unasked and
+            // the giving is a moment the player sees; they are told once that it is ready. The Haven's own asks (no asker, or one
+            // no longer here) are answered at once, as before.
+            if (HandedIn(request))
+            {
+                if (told.Add(request.Id))
+                {
+                    string what = request.Count == 1 ? $"the {request.WantedName}" : $"{request.Count} {request.WantedName}";
+                    GameMessages.Post($"{request.AskerName} can have {what} now: take it to them.", MessageKind.Info);
+                }
+
+                continue;
+            }
+
+            Answer(request, bag);
         }
 
         Refill(force: false);
     }
 
-    /// <summary>Takes what was asked for (from the bag first, then the stash) and gives the reward.</summary>
-    public static void Answer(HavenRequestDefinition request, ItemInventory bag)
+    private readonly HashSet<string> told = new HashSet<string>();
+
+    // Asked by someone who lives here: handed over by talking to them.
+    private static bool HandedIn(HavenRequestDefinition request) =>
+        request.Asker != null && GameSession.Settlement.Find(request.Asker) != null;
+
+    /// <summary>
+    /// The asker's line for handing over what they asked for (ResidentNpc.AddTopics): ready once it is home, naming what goes, and
+    /// warning when a piece the player has empowered or enchanted would have to go (every bare one goes first).
+    /// </summary>
+    public static void AddHandIn(MenuPage page, ResidentDefinition asker, GameObject player, DialogueSpeaker speaker, System.Action afterAnswer)
+    {
+        HavenRequestDefinition request = AskedBy(asker);
+        if (request == null || RaidDirector.Current != null || HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        ItemInventory bag = player != null ? player.GetComponent<ItemInventory>() : null;
+        int home = AtHome(request, bag);
+        string what = request.Count == 1 ? request.WantedName : $"{request.Count} {request.WantedName}";
+        bool ready = home >= request.Count;
+        string detail = !ready ? $"{home}/{request.Count} home (bag or stash)"
+            : Bare(request, bag) < request.Count ? $"<color={UIStyle.Current.WarningHex}>A piece you have empowered or enchanted goes too</color>"
+            : request.IsOrder ? "The plainest piece that will do, from your bag or the stash" : "From your bag or the stash";
+        page.Add(new MenuAction($"Hand over {what}", detail, ready, () =>
+        {
+            Answer(request, bag, spoken: true);
+            string thanks = string.IsNullOrEmpty(request.Thanks) ? "Thank you." : request.Thanks;
+            if (DialogueBox.Current != null)
+            {
+                DialogueBox.Current.Say(speaker, thanks, afterAnswer);
+            }
+            else
+            {
+                afterAnswer?.Invoke();
+            }
+        }));
+    }
+
+    // How many bare pieces (not empowered or enchanted) of what is asked are home.
+    private static int Bare(HavenRequestDefinition request, ItemInventory bag)
+    {
+        int count = 0;
+        foreach (ItemContainer container in new[] { bag != null ? bag.Container : null, GameSession.Stash != null ? GameSession.Stash.Items : null })
+        {
+            for (int i = 0; container != null && i < container.SlotCount; i++)
+            {
+                ItemStack stack = container.GetSlot(i);
+                if (stack.Item == request.Wanted && stack.Quality >= request.Quality && !stack.IsWorked)
+                {
+                    count += stack.Count;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /// <summary>Takes what was asked for (from the bag first, then the stash) and gives the reward. <paramref name="spoken"/>: handed
+    /// over in talk, where the asker says their thanks (no message of it).</summary>
+    public static void Answer(HavenRequestDefinition request, ItemInventory bag, bool spoken = false)
     {
         // Every bare piece, bag then stash, goes before any the player has empowered or enchanted: an order is answered on its
         // own, so it must not take a worked spare from the bag while a plain one waits in the stash.
@@ -161,7 +240,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         string thanks = string.IsNullOrEmpty(request.Thanks) ? "Thank you." : request.Thanks;
         string what = request.Count == 1 ? request.WantedName : $"{request.Count} {request.WantedName}";
-        GameMessages.Post($"{request.AskerName} takes the {what}. \"{thanks}\"", MessageKind.Gain);
+        GameMessages.Post(spoken ? $"{request.AskerName} takes the {what}." : $"{request.AskerName} takes the {what}. \"{thanks}\"", MessageKind.Gain);
         if (given.Count > 0)
         {
             GameMessages.Post("For it: " + string.Join(", ", given) + ".", MessageKind.Gain);
@@ -178,19 +257,8 @@ public sealed class HavenRequestBoard : MonoBehaviour
             return;
         }
 
-        int placed = bag != null ? bag.Give(item, count) : 0;
-        if (placed < count && GameSession.Stash != null)
-        {
-            placed += GameSession.Stash.Items.Add(item, count - placed);
-        }
-
-        // Neither bag nor stash has room: the reward is set down at the player's feet rather than lost.
-        if (placed < count && bag != null)
-        {
-            DroppedItem.Drop(bag.transform, new ItemStack(item, count - placed));
-            placed = count;
-        }
-
+        // Bag, then stash, then the player's feet: a reward is never lost for want of room.
+        int placed = ItemDelivery.Give(bag, new ItemStack(item, count), newFind: true, toStash: true).Total;
         if (placed > 0)
         {
             given.Add($"{placed} {item.DisplayName}");

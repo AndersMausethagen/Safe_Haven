@@ -261,14 +261,19 @@ public sealed class TerrainFootprints : MonoBehaviour
         UploadGrass();
     }
 
+    // Sorted against a static eye with one cached comparison: a lambda capturing the eye was a new delegate every frame.
+    private static Vector2 sortEye;
+    private static readonly System.Comparison<TerrainFootprints> NearestFirst =
+        (a, b) => (a.origin - sortEye).sqrMagnitude.CompareTo((b.origin - sortEye).sqrMagnitude);
+
     private static void UploadGrass()
     {
         ActiveFields.RemoveAll(item => item == null || item.field == null);
         if (ActiveFields.Count > MaxGrassFields)
         {
             Vector3 eye = Camera.main != null ? Camera.main.transform.position : Vector3.zero;
-            Vector2 eyeXZ = new Vector2(eye.x, eye.z);
-            ActiveFields.Sort((a, b) => (a.origin - eyeXZ).sqrMagnitude.CompareTo((b.origin - eyeXZ).sqrMagnitude));
+            sortEye = new Vector2(eye.x, eye.z);
+            ActiveFields.Sort(NearestFirst);
         }
         int count = Mathf.Min(ActiveFields.Count, MaxGrassFields);
         Vector4 darkening = Vector4.zero;

@@ -31,13 +31,80 @@ public sealed class HorseNameWindow : MonoBehaviour
     private KitPortrait picture;
     private Horse horse;
 
+    // Horses waiting to be named once the player is free (Offer).
+    private static readonly System.Collections.Generic.List<Horse> waiting = new System.Collections.Generic.List<Horse>();
+    private static HorseNameAsker asker;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => current = null;
+    private static void ResetForNewPlaySession()
+    {
+        current = null;
+        waiting.Clear();
+        asker = null;
+    }
 
     /// <summary>True while it asks for this horse's name.</summary>
     public static bool IsNaming(Horse horse) => current != null && horse != null && current.horse == horse && current.window != null && current.window.IsOpen;
 
-    /// <summary>Asks for this horse's name.</summary>
+    /// <summary>
+    /// Asks for a new horse's name when the player is free: at once if they are, else once no fight, window, talk or cinematic
+    /// holds them, one horse after another (a foal and a bought horse together each get theirs). The question took every key at
+    /// once, mid-breach or mid-talk, and a second ask replaced the first horse in it.
+    /// </summary>
+    public static void Offer(Horse horse)
+    {
+        if (horse == null || waiting.Contains(horse))
+        {
+            return;
+        }
+
+        waiting.Add(horse);
+        if (asker == null)
+        {
+            asker = new GameObject("Horse Name Asker").AddComponent<HorseNameAsker>();
+        }
+    }
+
+    /// <summary>The player is free to answer: nothing fights them, no window, talk or cinematic is up.</summary>
+    public static bool PlayerIsFree()
+    {
+        Player player = Player.Current;
+        return player != null && (player.Stealth == null || !player.Stealth.IsFighting)
+               && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen)
+               && !DialogueBox.IsOpen && !CinematicScreen.IsPlaying && !InGameCinematic.IsPlaying;
+    }
+
+    // Asks the next waiting horse's name when the player is free; gone once none waits.
+    private sealed class HorseNameAsker : MonoBehaviour
+    {
+        private float nextLook;
+
+        private void Update()
+        {
+            if (Time.unscaledTime < nextLook)
+            {
+                return;
+            }
+
+            nextLook = Time.unscaledTime + 0.5f;
+            waiting.RemoveAll(horse => horse == null);
+            if (waiting.Count == 0)
+            {
+                asker = null;
+                Destroy(gameObject);
+                return;
+            }
+
+            if ((current == null || current.window == null || !current.window.IsOpen) && PlayerIsFree())
+            {
+                Horse next = waiting[0];
+                waiting.RemoveAt(0);
+                Ask(next);
+            }
+        }
+    }
+
+    /// <summary>Asks for this horse's name now (the player chose to, from its menu).</summary>
     public static void Ask(Horse horse)
     {
         if (horse == null)

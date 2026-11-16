@@ -280,8 +280,7 @@ public sealed class ItemContainer
         {
             for (int i = slots.Length - 1; i >= 0 && remaining > 0; i--)
             {
-                bool isWorked = slots[i].Empower > 0 || slots[i].Enchantment != null;
-                if (slots[i].Item == item && slots[i].Quality == make && isWorked == worked)
+                if (slots[i].Item == item && slots[i].Quality == make && slots[i].IsWorked == worked)
                 {
                     remaining -= RemoveAt(i, remaining);
                 }
@@ -537,7 +536,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        if (!MovesWhole(stack))
+        if (!stack.IsUnique)
         {
             return AddWithin(stack.Item, stack.Count, stack.Size, first, count);
         }
@@ -561,13 +560,6 @@ public sealed class ItemContainer
 
         return placed;
     }
-
-    /// <summary>
-    /// A stack that is a piece of its own moves as it is, never re-made by kind: gear and containers keep their condition, a
-    /// parchment its enchantment, anything that doesn't stack everything it carries. Water as a measure is poured, not placed.
-    /// </summary>
-    private static bool MovesWhole(ItemStack stack) =>
-        !stack.Item.IsWaterMeasure && (!stack.Item.Stackable || stack.Enchantment != null);
 
     /// <summary>
     /// Moves as much of one slot's stack as fits into another container (bag to stash, say). What doesn't fit stays in the
@@ -631,7 +623,7 @@ public sealed class ItemContainer
         }
 
         // Gear never stacks, so two copies of it swap: one may be worn, the other enchanted.
-        if (destination.Item == source.Item && source.Item.Stackable)
+        if (destination.StacksWith(source))
         {
             int moved = Mathf.Min(destination.SpaceLeft, source.Count);
             if (otherContainer)

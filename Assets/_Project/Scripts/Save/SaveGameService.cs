@@ -157,6 +157,34 @@ public static class SaveGameService
         raidUnderWay = null;
     }
 
+    /// <summary>
+    /// Writes the raid's end at once (RaidDirector.Finish), before the results screen: home in the Haven with what was kept, at the
+    /// portal. The save on coming home (SaveOnceHome) waits for a scene with a player, and the results screen has none: a crash or
+    /// a quit there lost an extraction's haul, and the next load said the raid was cut short. Once home it is saved again, with
+    /// what came home with the player (a cart, a horse).
+    /// </summary>
+    public static void SaveAtRaidEnd(PlayerSnapshot keeps)
+    {
+        if (!ShouldAutosave || keeps == null || CurrentSlot == null || HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        try
+        {
+            SaveData data = SaveMapper.ToSaveData(keeps, GameSession.Stash, HavenVisit.HavenScene, null, DateTime.UtcNow,
+                GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+            data.displayName = CurrentName;
+            data.appearance = GameSession.Appearance.Clone();
+            data.raidUnderWay = null;
+            Storage.Write(CurrentSlot, data);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogWarning("Couldn't save the raid's end: " + exception.Message);
+        }
+    }
+
     /// <summary>Saves as soon as the player stands somewhere that can be saved: home from a raid, past its results screen.</summary>
     public static void SaveOnceHome()
     {
@@ -233,7 +261,9 @@ public static class SaveGameService
             return false;
         }
 
-        SaveData data = Capture();
+        // Crafts under way go on through a save at home (F5, autosaves stopped them with "You stop crafting" each time); in a
+        // friend's Haven they stop as before, the save going into another journey.
+        SaveData data = Capture(keepCrafts: !HavenVisit.IsVisiting);
         // In a friend's Haven (co-op) only the character is this player's: it goes into their own journey, whose world stays as they left it.
         if (HavenVisit.IsVisiting)
         {
@@ -259,12 +289,15 @@ public static class SaveGameService
     /// <summary>The game being played, as a save held in memory (nothing is written). Needs a player.</summary>
     /// <param name="forWorldOnly">Only the world is wanted (the Haven sent to a friend joining, HavenShare): the player's side
     /// is thrown away, so crafts under way go on instead of being stopped and refunded at every join.</param>
-    public static SaveData Capture(bool forWorldOnly = false)
+    /// <param name="keepCrafts">A save written to disk (F5, an autosave): crafts by hand under way go on, written into the save
+    /// already paid, so loading it puts them back (HandCraftQueue.CaptureState). Every other capture is a handover elsewhere (a
+    /// friend's Haven, home from one), where they stop and their materials go back first, or the copy would keep them paid
+    /// for and never made.</param>
+    public static SaveData Capture(bool forWorldOnly = false, bool keepCrafts = false)
     {
         PlayerPersistence player = Player.Current.Persistence;
-        // Crafts by hand under way aren't saved: their materials go back to the bag first, or a save (and the raid that
-        // copies the kit after it) would keep them paid for and never made.
-        if (!forWorldOnly && Player.Current.TryGetComponent(out HandCraftQueue crafts))
+        Player.Current.TryGetComponent(out HandCraftQueue crafts);
+        if (!forWorldOnly && !keepCrafts && crafts != null)
         {
             crafts.Stop();
         }
@@ -273,6 +306,11 @@ public static class SaveGameService
         SaveableEntity.CaptureAll();
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
             GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+        if (keepCrafts && crafts != null && data.player != null)
+        {
+            data.player.handCrafts = crafts.CaptureState();
+        }
+
         data.displayName = CurrentName;
         data.appearance = GameSession.Appearance.Clone();
         data.raidUnderWay = raidUnderWay;

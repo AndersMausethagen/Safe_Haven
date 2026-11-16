@@ -66,6 +66,11 @@ public sealed class GrassInteractor : MonoBehaviour
         }
     }
 
+    // Sorted against a static eye with one cached comparison: a lambda capturing the eye was a new delegate every frame.
+    private static Vector3 sortEye;
+    private static readonly System.Comparison<GrassInteractor> NearestFirst =
+        (a, b) => (a.Point - sortEye).sqrMagnitude.CompareTo((b.Point - sortEye).sqrMagnitude);
+
     /// <summary>Sends the active interactors to the grass shader; returns how many were sent.</summary>
     public static int Upload()
     {
@@ -73,8 +78,8 @@ public sealed class GrassInteractor : MonoBehaviour
         if (Active.Count > Max)
         {
             Camera camera = Camera.main;
-            Vector3 eye = camera != null ? camera.transform.position : Vector3.zero;
-            Active.Sort((a, b) => (a.Point - eye).sqrMagnitude.CompareTo((b.Point - eye).sqrMagnitude));
+            sortEye = camera != null ? camera.transform.position : Vector3.zero;
+            Active.Sort(NearestFirst);
         }
 
         int count = Mathf.Min(Active.Count, Max);

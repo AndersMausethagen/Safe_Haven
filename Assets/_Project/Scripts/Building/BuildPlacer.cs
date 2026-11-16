@@ -115,12 +115,41 @@ public sealed partial class BuildPlacer : MonoBehaviour
     private void OnEnable()
     {
         BackHandlers.Register(BackHandlers.BuildPlacementPriority, CancelByBack);
+        GamePause.Changed += OnPauseChanged;
+        if (TryGetComponent(out Damageable health))
+        {
+            health.Died += OnDied;
+        }
     }
 
     private void OnDisable()
     {
         BackHandlers.Unregister(CancelByBack);
+        GamePause.Changed -= OnPauseChanged;
+        if (TryGetComponent(out Damageable health))
+        {
+            health.Died -= OnDied;
+        }
+
         Cancel();
+    }
+
+    // The Build map stays on behind a pause (the cheat window, a cinematic) and on a body: a click there placed a building. Building
+    // stops instead, a carried building going back where it stood.
+    private void OnPauseChanged(bool paused)
+    {
+        if (paused && IsBusy)
+        {
+            Cancel();
+        }
+    }
+
+    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    {
+        if (IsBusy)
+        {
+            Cancel();
+        }
     }
 
     private bool CancelByBack()
@@ -202,15 +231,49 @@ public sealed partial class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (building != null && building.Prefab != null && HasBuildArea)
+        if (building == null || building.Prefab == null || !HasBuildArea)
         {
-            BeginPlacing(building);
+            return;
         }
+
+        // Every way in is held to what the build menu offers (known, its requirements met: IBuildArea.Buildable); the Haven
+        // window's "Build another" asked only whether it was known.
+        var crafting = GetComponent<PlayerCrafting>();
+        if (crafting != null && !IsBuildableHere(building, crafting) && !(crafting.IsKnown(building) && BuildingUnlocks.IsOpen(building)))
+        {
+            GameMessages.Post(!crafting.IsKnown(building) ? $"You don't know how to build the {building.DisplayName} yet."
+                : !BuildingUnlocks.IsOpen(building) ? $"Not open yet: {BuildingUnlocks.Missing(building)}"
+                : $"The {building.DisplayName} can't be built here.", MessageKind.Warning);
+            return;
+        }
+
+        BeginPlacing(building);
+    }
+
+    private static bool IsBuildableHere(BuildingDefinition building, PlayerCrafting crafting)
+    {
+        foreach (BuildingDefinition offered in Area.Buildable(crafting))
+        {
+            if (offered == building)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Lets the player click a building they built, to upgrade or repair it (true) or to move it (false).</summary>
     public void PickBuilding(bool toUpgrade)
     {
+        // Not moved during a breach: carried off, it left BuildingObject.Active, so the attackers, the repairs and the renown
+        // lost it until it was set down again.
+        if (!toUpgrade && !HavenTravel.IsOpen)
+        {
+            GameMessages.Post("Not while the ward is breached.", MessageKind.Warning);
+            return;
+        }
+
         if (!HavenVisit.BuildingNeedsAsking() && AllowsChanges)
         {
             BeginPicking(toUpgrade);
@@ -478,7 +541,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
             return;
         }
 
-        if (placed.TryGetComponent(out Construction construction) && construction.IsBuilding)
+        if (!StandsAtOnce(placed))
         {
             GameMessages.Post($"The scaffold for the {building.DisplayName} is up. Hold {{key:Hammer}} at it to build.");
         }
@@ -490,6 +553,9 @@ public sealed partial class BuildPlacer : MonoBehaviour
 
         Cancel();
     }
+
+    // True when what was placed stands at once; false for a scaffold to hammer up (Construction), which is Built when finished.
+    private static bool StandsAtOnce(GameObject placed) => !(placed.TryGetComponent(out Construction construction) && construction.IsBuilding);
 
     // Pays and places one building: a scaffold to hammer up when its kind takes work (Construction). Null when it can't
     // be paid for.

@@ -1003,7 +1003,7 @@ Content: `AgentScripts/BuildRaidReasons.cs` (after BuildRaidEvents and BuildRaid
 
 - **The Haven's asks** (`HavenRequestDefinition` in `Data/Settlement/Requests`, `Resources/HavenRequestSettings`; content by `AgentScripts/BuildHavenRequests.cs`): residents (or the Haven as a whole) ask for what only raids give, for example Bjarne asks for iron ore and Ingrid for bog venom. Each ask has a reward (an item, coin, experience, the blight eased). Up to three stand at once, never two from one person, and only from people who live there and in the ask's season (`HavenRequestSettings.Choose`, seeded by the day, so a reload asks the same). They are saved as `SettlementState.Requests`.
 - **Where they show:** in the raid planner's briefing, under the rumours, with how much is home already (`HavenRequestBoard.BriefingLines`), and in the asker's words in passing (`ResidentAsides`).
-- **Handing in:** `HavenRequestBoard` (SafeHaven › 05 Gameplay) hands an ask in as soon as what it wants is home, in the bag or the stash. New asks come with the next homecoming.
+- **Handing in:** `HavenRequestBoard` (SafeHaven › 05 Gameplay). An ask of someone living here is handed to them in talk, once what it wants is home in the bag or the stash (`HavenRequestBoard.AddHandIn` on their page, `ResidentNpc.AddTopics`; the player is told once that it is ready). The Haven's own asks (no asker, or one no longer here) are answered at once. Every bare piece, bag then stash, goes before one the player has empowered or enchanted (`ItemContainer.Remove(..., worked)`), and the line warns when a worked piece would have to go. Rewards go bag, stash, feet (`ItemDelivery`). New asks come with the next homecoming.
 - **Staying on pays:** each danger stage has a **Loot Bonus** (`RaidStage`, Misty Woods +25/50/80%), and its message says so. `RaidDirector.StageLoot` multiplies what caches and events hold (`LootCache`, `RaidEventOutcomes`) and the essence creatures drop (`LootOnDeath`).
 
 ## Fences: the skigard
@@ -1071,7 +1071,9 @@ without loading it, and a file that can't be read still gets a row so it can be 
 from the main menu and the Escape menu: load, overwrite and Save as New while playing, rename, delete. The old `save.json` is
 just the first slot ("Journey 1"). F6 loads the current save, or the newest. Continue on the main menu loads the newest.
 
-**Autosave and crashes (GDD §20.6):** `SaveGameService.SaveBeforeRaid` saves when a raid sets out, with the sparks and runes paid and `SaveData.raidUnderWay` set, and `SaveOnceHome` saves once the player stands at home again, past the results screen. Nothing is saved in a raid, so a raid that never comes home simply didn't happen: its haul is gone and nothing can be doubled. Loading a save with the mark tells the player so (`NoticeFor`), then saves it away. Quitting a raid to the menu goes the same way. It costs the raid's haul and spares a failed raid's wear, a fair price for a crash and little gain from pulling the plug. An Editor session playing a scene with no game loaded doesn't autosave, so it leaves nothing for Continue to find.
+**Autosave and crashes (GDD §20.6):** `SaveGameService.SaveBeforeRaid` saves when a raid sets out, with the sparks and runes paid and `SaveData.raidUnderWay` set; `SaveAtRaidEnd` writes the raid's end at once (`RaidDirector.Finish`: home in the Haven with what was kept, before the results screen, so a crash there no longer loses an extraction's haul), and `SaveOnceHome` saves again once the player stands at home, with what came home with them (a cart, a horse). Nothing is saved in a raid, so a raid that never comes home simply didn't happen: its haul is gone and nothing can be doubled. Loading a save with the mark tells the player so (`NoticeFor`), then saves it away. Quitting a raid to the menu goes the same way. It costs the raid's haul and spares a failed raid's wear, a fair price for a crash and little gain from pulling the plug. An Editor session playing a scene with no game loaded doesn't autosave, so it leaves nothing for Continue to find.
+
+Crafts by hand under way go on through a save written at home (F5, autosaves): `HandCraftQueue.CaptureState` writes them, paid, into `PlayerSaveData.handCrafts` with what each cost from where (`MaterialPool.Payment`), and a load puts them back (`PlayerSnapshot.HandCrafts`, `PlayerPersistence.Start`). Every other capture is a handover elsewhere (a raid, a friend's Haven) and stops them first, the materials going back where they were paid from. Anything removed from the world for good other than by dying goes through `SaveableEntity.RemoveForGood` (recorded gone, then destroyed): destroyed alone, a saved object is recorded as still there and comes back on the next load.
 
 What the file holds besides the bag, stash and quests: the settlement (`SaveData.settlement`: portal, ward level,
 breach, residents with jobs, purification queue), each item's wear (`SlotSaveData.wear`, so saves from before durability
@@ -1930,6 +1932,12 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
 **Work.** `JobDefinition` › Work Tool, Work Tool Scale, Work Sound, Work Sound Delay: `ResidentLife` shows the tool only while working. A repeated gesture sounds at its moment of contact (read off the clip by `AgentScripts/BuildHavenWork.cs`), and a held one every so often.
 
 ## Loot: rarity, carry space and the safe pocket
+
+- **One rule for what is the same, one way to give** (review 2026-11-16): `ItemStack.SameKind` (item, quality, maker,
+  empowering, enchantment), `StacksWith`, `IsUnique` (a piece moved as it is: gear, containers, anything that doesn't stack
+  or carries an enchantment) and `IsWorked` decide moving, stacking (`ItemContainer`, the bag's Sort), matching what was
+  carried into a raid (`PlayerSnapshot.AfterFailedRaid`) and what an order takes. Rewards, refunds, finds and moved gear
+  arrive through `ItemDelivery.Give`: bag, then the stash at home, then the feet; ItemObtained only for a new find.
 
 - **Rarity and value** live on `ItemDefinition` (Loot header). `Rarity` (in `Items/ItemRarity.cs`) turns a rarity into a
   color, name and pickup sound from `RaritySettingsDefinition`. Slots tint by rarity, tooltips and the message feed

@@ -137,10 +137,9 @@ public sealed class HorseTravel : MonoBehaviour
         }
 
         HorseHitch.Unhitch(horse);
-        // Gone from the Haven's world, as a cart is (Transport.Remove): destroyed alone, it is recorded as still there and
-        // comes back on returning, besides the one the raid sends home.
-        entity.MarkDestroyed();
-        Destroy(horse.gameObject);
+        // Gone from the Haven's world, as a cart is (Transport.Remove), or it comes back on returning besides the one the raid
+        // sends home.
+        SaveableEntity.RemoveForGood(horse.gameObject);
     }
 
     /// <summary>The raid is over: the horse comes home if it was ridden, near the player at an extraction, or tied at the

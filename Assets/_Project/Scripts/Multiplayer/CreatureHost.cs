@@ -227,7 +227,10 @@ public sealed class CreatureHost
         int friends = 0;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
-            if (friend != null && friend.OwnerClientId != NetworkManager.ServerClientId && friend.IsVisible && friend.Look.Place.Equals(place))
+            // Standing, or down and waiting to be helped up (so the count doesn't flap): one fallen for good and watching the others
+            // (CoopSpectate) left the survivors fighting at +60% for each of them for the rest of the run.
+            if (friend != null && friend.OwnerClientId != NetworkManager.ServerClientId && friend.IsVisible && friend.Look.Place.Equals(place)
+                && (friend.Look.Health > 0 || friend.Look.Downed))
             {
                 friends++;
             }

@@ -25,6 +25,8 @@ public sealed class PlayerPersistence : MonoBehaviour
             {
                 Debug.LogWarning($"No room in the bag for {lost.Amount} {lost.Item.DisplayName} carried over from the last scene.", this);
             }
+
+            pendingCrafts = carried.HandCrafts;
         }
 
         ResidentNpc.TeachEveryoneHome(gameObject);
@@ -41,6 +43,18 @@ public sealed class PlayerPersistence : MonoBehaviour
             {
                 MoveTo(new PlayerPose(point.transform.position, point.transform.eulerAngles.y));
             }
+        }
+    }
+
+    private HandCraftSaveData pendingCrafts;
+
+    // Crafts a loaded save had under way go on, once every part of the player (movement, crafting) is awake.
+    private void Start()
+    {
+        if (pendingCrafts != null)
+        {
+            HandCraftQueue.For(gameObject).Restore(pendingCrafts, Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
+            pendingCrafts = null;
         }
     }
 

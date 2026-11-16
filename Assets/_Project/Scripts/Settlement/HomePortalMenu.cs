@@ -167,7 +167,9 @@ public sealed class HomePortalMenu
         foreach (SteamLobby.FriendHaven friend in friends)
         {
             ulong lobby = friend.Lobby;
-            page.Add(new MenuAction($"{friend.Name}'s Haven", "Walk through to them", true, () => coop.Visit(lobby), closesMenu: true));
+            string title = friend.IsHost ? $"{friend.Name}'s Haven" : $"The Haven {friend.Name} is in";
+            string with = friend.IsHost && friend.Friends != friend.Name ? $"Walk through to them ({friend.Friends} there)" : "Walk through to them";
+            page.Add(new MenuAction(title, with, true, () => coop.Visit(lobby), closesMenu: true));
         }
 
         page.Add(new MenuAction("Back", null, true, () => { ActionMenuWindow.Current.Close(); PortalWindow.Show(() => Build(user), user, portal.transform, 6f); }));

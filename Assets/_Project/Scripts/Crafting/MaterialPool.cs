@@ -122,7 +122,34 @@ public sealed class MaterialPool
     /// Pays every cost, carried things first. Returns false and pays nothing when something is missing, so a cost is
     /// never half paid.
     /// </summary>
-    public bool TrySpend(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items = null)
+    public bool TrySpend(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items = null) => Pay(resources, items, null);
+
+    /// <summary>
+    /// TrySpend, noting in <paramref name="paid"/> what came from where, so a refund can put it back there (GiveBack(Payment)):
+    /// a cancelled craft paid from the stash goes back to the stash, not into a bag it then fills.
+    /// </summary>
+    public bool TrySpend(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items, out Payment paid)
+    {
+        paid = new Payment();
+        return Pay(resources, items, paid);
+    }
+
+    /// <summary>What a payment took, and from where. Empty when costs are free (a cheat).</summary>
+    public sealed class Payment
+    {
+        /// <summary>Resources from what the player carries.</summary>
+        public readonly List<ResourceAmount> Carried = new List<ResourceAmount>();
+        /// <summary>Resources from the stash.</summary>
+        public readonly List<ResourceAmount> Stored = new List<ResourceAmount>();
+        /// <summary>Items from the bag.</summary>
+        public readonly List<ItemAmount> FromBag = new List<ItemAmount>();
+        /// <summary>Items from a cart's cargo or the stash, which go back to the stash (the cart may have gone).</summary>
+        public readonly List<ItemAmount> FromStore = new List<ItemAmount>();
+
+        public bool IsEmpty => Carried.Count == 0 && Stored.Count == 0 && FromBag.Count == 0 && FromStore.Count == 0;
+    }
+
+    private bool Pay(IEnumerable<ResourceAmount> resources, IEnumerable<ItemAmount> items, Payment record)
     {
         if (!CanAfford(resources, items))
         {
@@ -138,7 +165,7 @@ public sealed class MaterialPool
         {
             foreach (ResourceAmount cost in resources)
             {
-                Spend(cost.Resource, cost.Amount);
+                Spend(cost.Resource, cost.Amount, record);
             }
         }
 
@@ -151,7 +178,8 @@ public sealed class MaterialPool
                     continue;
                 }
 
-                int taken = bag != null ? bag.Remove(cost.Item, cost.Amount) : 0;
+                int fromBag = bag != null ? bag.Remove(cost.Item, cost.Amount) : 0;
+                int taken = fromBag;
                 for (int i = 0; cargo != null && i < cargo.Count && taken < cost.Amount; i++)
                 {
                     taken += cargo[i].Remove(cost.Item, cost.Amount - taken);
@@ -159,15 +187,18 @@ public sealed class MaterialPool
 
                 if (taken < cost.Amount && storedItems != null)
                 {
-                    storedItems.Remove(cost.Item, cost.Amount - taken);
+                    taken += storedItems.Remove(cost.Item, cost.Amount - taken);
                 }
+
+                Note(record?.FromBag, cost.Item, fromBag);
+                Note(record?.FromStore, cost.Item, taken - fromBag);
             }
         }
 
         return true;
     }
 
-    private void Spend(ResourceDefinition resource, int amount)
+    private void Spend(ResourceDefinition resource, int amount, Payment record)
     {
         if (resource == null || amount <= 0)
         {
@@ -175,9 +206,68 @@ public sealed class MaterialPool
         }
 
         int taken = carried != null ? carried.Remove(resource, amount) : 0;
-        if (taken < amount && stored != null)
+        int fromStore = taken < amount && stored != null ? stored.Remove(resource, amount - taken) : 0;
+        if (record != null)
         {
-            stored.Remove(resource, amount - taken);
+            if (taken > 0)
+            {
+                record.Carried.Add(new ResourceAmount(resource, taken));
+            }
+
+            if (fromStore > 0)
+            {
+                record.Stored.Add(new ResourceAmount(resource, fromStore));
+            }
+        }
+    }
+
+    private static void Note(List<ItemAmount> into, ItemDefinition item, int amount)
+    {
+        if (into != null && amount > 0)
+        {
+            into.Add(new ItemAmount(item, amount));
+        }
+    }
+
+    /// <summary>
+    /// Puts back what <paramref name="paid"/> took, each where it came from: carried resources to what is carried and stored ones
+    /// to the stash (the other when that is full or out of reach), bag items to the bag, cargo and stash items to the stash; what
+    /// fits nowhere falls at <paramref name="dropAt"/> (ItemDelivery).
+    /// </summary>
+    public void GiveBack(Payment paid, Transform dropAt)
+    {
+        if (paid == null)
+        {
+            return;
+        }
+
+        foreach (ResourceAmount amount in paid.Carried)
+        {
+            int back = carried != null ? carried.Add(amount.Resource, amount.Amount) : 0;
+            if (back < amount.Amount && stored != null)
+            {
+                stored.Add(amount.Resource, amount.Amount - back);
+            }
+        }
+
+        foreach (ResourceAmount amount in paid.Stored)
+        {
+            int back = stored != null ? stored.Add(amount.Resource, amount.Amount) : 0;
+            if (back < amount.Amount && carried != null)
+            {
+                carried.Add(amount.Resource, amount.Amount - back);
+            }
+        }
+
+        foreach (ItemAmount amount in paid.FromBag)
+        {
+            ItemDelivery.Give(bag, new ItemStack(amount.Item, amount.Amount), storedItems, dropAt);
+        }
+
+        foreach (ItemAmount amount in paid.FromStore)
+        {
+            // Away from home (a save loaded elsewhere) the stash is out of reach: the bag, then the ground.
+            ItemDelivery.Give(storedItems ?? bag, new ItemStack(amount.Item, amount.Amount), storedItems != null ? bag : null, dropAt);
         }
     }
 
@@ -224,13 +314,8 @@ public sealed class MaterialPool
                 continue;
             }
 
-            int added = bag != null ? bag.Add(amount.Item, amount.Amount) : 0;
-            // Water is poured back into the waterskins that have room; what they can't hold runs off, as a "Water" sack on
-            // the ground could only be picked up into a waterskin anyway.
-            if (added < amount.Amount && dropAt != null && !amount.Item.IsWaterMeasure)
-            {
-                DroppedItem.Drop(dropAt, new ItemStack(amount.Item, amount.Amount - added));
-            }
+            // Into the bag, then the stash at home, then the ground (water runs off: ItemDelivery).
+            ItemDelivery.Give(bag, new ItemStack(amount.Item, amount.Amount), storedItems, dropAt);
         }
     }
 

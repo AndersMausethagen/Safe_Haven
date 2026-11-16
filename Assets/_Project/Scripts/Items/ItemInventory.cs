@@ -135,8 +135,8 @@ public sealed class ItemInventory : MonoBehaviour
         return added;
     }
 
-    /// <summary>Gives one piece just made, with its quality and condition (CraftedWork.Make), as Give gives a new item.
-    /// Returns how many arrived.</summary>
+    /// <summary>Gives a stack as it is (a piece just made with its quality and condition, CraftedWork.Make; a find; a reward), as
+    /// Give gives a new item: ItemObtained is raised and gear is put on. Returns how many arrived.</summary>
     public int GiveMade(ItemStack made)
     {
         if (made.IsEmpty)
@@ -144,11 +144,7 @@ public sealed class ItemInventory : MonoBehaviour
             return 0;
         }
 
-        if (!made.Item.KeepsCondition)
-        {
-            return Give(made.Item, made.Count);
-        }
-
+        // AddStack keeps what a piece of its own carries (an inscription's enchantment) and adds the rest by kind.
         int added = Container.AddStack(made);
         if (added > 0)
         {

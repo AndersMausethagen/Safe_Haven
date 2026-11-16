@@ -66,12 +66,15 @@ public sealed class StealthReadout : MonoBehaviour
         }
 
         MonsterAI noticer = null;
+        MonsterAI game = null;
+        float gameDistance = float.MaxValue;
         float most = ShownFrom;
         bool hunted = false;
         Vector3 here = transform.position;
         foreach (MonsterAI monster in MonsterAI.Active)
         {
-            if (monster == null || (monster.transform.position - here).sqrMagnitude > LookOut * LookOut)
+            float distance = monster != null ? (monster.transform.position - here).sqrMagnitude : float.MaxValue;
+            if (monster == null || distance > LookOut * LookOut)
             {
                 continue;
             }
@@ -83,6 +86,28 @@ public sealed class StealthReadout : MonoBehaviour
                 most = level;
                 noticer = monster;
             }
+
+            // Game bolts at the first notice (MonsterSenses.CanNotice) and has no awareness to fill: the nearest one in sight
+            // range is the one being stalked.
+            if (monster.Definition != null && monster.Definition.Timid && !monster.IsBolting && monster.CurrentState != MonsterAI.State.Dead
+                && distance < gameDistance)
+            {
+                float reach = SenseProfile.Of(monster.Definition).SightRange * rules.MaxRangeScale;
+                if (distance < reach * reach)
+                {
+                    game = monster;
+                    gameDistance = distance;
+                }
+            }
+        }
+
+        // Stalking game (sneaking, nothing hostile noticing): its cone shows how near they can come, as a hunter's does.
+        if (noticer == null && game != null && stealth != null && stealth.IsSneaking)
+        {
+            UpdateCone(game, rules.SuspiciousAt * 0.5f, rules);
+            UpdateUnseen(false, rules);
+            UpdateEdge(null, 0f, rules);
+            return;
         }
 
         UpdateCone(noticer, most, rules);

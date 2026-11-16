@@ -77,9 +77,8 @@ public sealed class RelicSettings : GameSettings<RelicSettings>
             return ItemStack.Empty;
         }
 
-        if (bag.Container.AddStack(relic) == 0)
+        if (ItemDelivery.Give(bag, relic, newFind: false, toStash: false).Fell)
         {
-            DroppedItem.Drop(bag.transform, relic);
             GameMessages.Post("Bag full: it falls at your feet.", MessageKind.Warning);
         }
 

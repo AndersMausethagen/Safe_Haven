@@ -24,7 +24,7 @@ public sealed partial class MonsterAI
     {
         if (!roaming)
         {
-            home = transform.position;
+            home = OnWalkableGround(transform.position);
         }
 
         Vector3 facing = transform.forward;
@@ -44,11 +44,18 @@ public sealed partial class MonsterAI
         }
 
         ClearTarget();
-        home = destination;
+        // Every caller's point (a hunt spot with a random offset, a waypoint, the player's feet) is put on the walkable ground
+        // here, once for all of them: a point off the mesh or inside a trunk is where a walk home never ends.
+        home = OnWalkableGround(destination);
         roaming = true;
         BeginReturn();
         ApplySpeed();
     }
+
+    // The nearest walkable point within a few metres, or the point itself when there is none.
+    private Vector3 OnWalkableGround(Vector3 point) => movement != null && movement.TryFindGround(point, HomeSnapRadius, out Vector3 ground) ? ground : point;
+
+    private const float HomeSnapRadius = 3f;
 
     private void UpdateReturn()
     {

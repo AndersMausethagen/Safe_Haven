@@ -275,8 +275,12 @@ public sealed class PlayerCrafting : MonoBehaviour
     }
 
     /// <summary>Takes what one craft costs, if it can be made now; otherwise tells the player why not.</summary>
-    public bool TryPay(RecipeDefinition recipe)
+    public bool TryPay(RecipeDefinition recipe) => TryPay(recipe, out _);
+
+    /// <summary>TryPay, noting what came from where (bag, cart, stash) for a refund.</summary>
+    public bool TryPay(RecipeDefinition recipe, out MaterialPool.Payment paid)
     {
+        paid = null;
         CraftCheck check = Check(recipe);
         if (!check.CanCraft)
         {
@@ -284,7 +288,7 @@ public sealed class PlayerCrafting : MonoBehaviour
             return false;
         }
 
-        return Pool.TrySpend(recipe.ResourceCost, recipe.ItemCost);
+        return Pool.TrySpend(recipe.ResourceCost, recipe.ItemCost, out paid);
     }
 
     /// <summary>Gives back what one craft of <paramref name="recipe"/> cost (a craft that was paid and not finished).</summary>
@@ -294,6 +298,12 @@ public sealed class PlayerCrafting : MonoBehaviour
         {
             Pool.GiveBack(recipe.ResourceCost, recipe.ItemCost, transform);
         }
+    }
+
+    /// <summary>Gives back a payment where it came from (a craft that was paid and not finished).</summary>
+    public void GiveBack(MaterialPool.Payment paid)
+    {
+        Pool.GiveBack(paid, transform);
     }
 
     /// <summary>Makes one paid craft of <paramref name="recipe"/>: its result, the skill it trains, and the Crafted events.</summary>

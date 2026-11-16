@@ -111,7 +111,7 @@ public sealed partial class MonsterAI
     // Where it stops is where it lives now: it does not walk back to where it was frightened.
     private void SettleAfterBolt()
     {
-        home = transform.position;
+        home = OnWalkableGround(transform.position);
         ApplySpeed();
     }
 }

@@ -41,6 +41,8 @@ public sealed class CoopDowned : ICoopPart, IDisposable
     private int falls;
     private int fallsInRun;
     private string helper;
+    // Who is helping, by client id: two helpers sharing a name, one stopping cleared the other's progress.
+    private ulong helperId;
     private float helpStartedAt = -1f;
     private float helpSeconds;
 
@@ -200,6 +202,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         using var writer = new FastBufferWriter(128, Allocator.Temp);
         writer.WriteValueSafe(friendClientId);
         writer.WriteValueSafe(GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName);
+        writer.WriteValueSafe(network.LocalClientId);
         writer.WriteValueSafe(helping);
         writer.WriteValueSafe(seconds);
         ulong to = network.IsServer ? friendClientId : NetworkManager.ServerClientId;
@@ -210,6 +213,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
     {
         reader.ReadValueSafe(out ulong target);
         reader.ReadValueSafe(out string who);
+        reader.ReadValueSafe(out ulong whoId);
         reader.ReadValueSafe(out bool helping);
         reader.ReadValueSafe(out float seconds);
         if (network.IsServer && target != NetworkManager.ServerClientId)
@@ -217,6 +221,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
             using var writer = new FastBufferWriter(128, Allocator.Temp);
             writer.WriteValueSafe(target);
             writer.WriteValueSafe(who);
+            writer.WriteValueSafe(whoId);
             writer.WriteValueSafe(helping);
             writer.WriteValueSafe(seconds);
             network.CustomMessagingManager.SendNamedMessage(HelpingMessage, target, writer, NetworkDelivery.ReliableFragmentedSequenced);
@@ -231,10 +236,11 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         if (helping)
         {
             helper = who;
+            helperId = whoId;
             helpSeconds = seconds;
             helpStartedAt = Time.time;
         }
-        else if (helper == who)
+        else if (helperId == whoId)
         {
             helpStartedAt = -1f;
         }

@@ -39,6 +39,10 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private readonly List<Vector3> rumourSpots = new List<Vector3>();
     private readonly List<Mesh> pondMeshes = new List<Mesh>();
     private RaidLayoutRules generatedBy;
+    // This run's own copies (a large raid's), destroyed with the map.
+    private RaidLayoutRules scaledRules;
+    private RaidMapDefinition scaledDefinition;
+    private RaidLayoutRules prefetchedRules;
     private TerrainData turnedData;
     private Mesh generatedTrunks;
     private Texture2D generatedColour;
@@ -92,8 +96,9 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             float width = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.WidthScale : 1f;
             if (width > 1f)
             {
-                rules = rules.ScaledBy(width);
-                definition = definition.ScaledBy(width);
+                // Copies for this run, destroyed with the map (OnDestroy): they leaked once per large raid.
+                rules = scaledRules = rules.ScaledBy(width);
+                definition = scaledDefinition = definition.ScaledBy(width);
             }
 
             generatedBy = rules;
@@ -181,10 +186,15 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             // The first attempt may have been laid out while the player got ready (RaidLayoutPrefetch); wait for it if it is under way.
             if (attempt == 0)
             {
-                while (RaidLayoutPrefetch.TryTake(ruleAsset, seed, width, definition.Size, out bool ready, out RaidLayoutPlan plan, out field) && !ready)
+                RaidLayoutRules prefetchCopy = null;
+                while (RaidLayoutPrefetch.TryTake(ruleAsset, seed, width, definition.Size, out bool ready, out RaidLayoutPlan plan, out field,
+                           out prefetchCopy) && !ready)
                 {
                     yield return null;
                 }
+
+                // The field reads the copy its rules were made into: kept until this map goes (OnDestroy).
+                prefetchedRules = prefetchCopy;
 
                 prepared = field != null;
                 Layout = prepared ? field.Plan : null;
@@ -533,6 +543,14 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         if (turnedData != null)
         {
             Destroy(turnedData);
+        }
+
+        foreach (Object copy in new Object[] { scaledRules, scaledDefinition, prefetchedRules })
+        {
+            if (copy != null)
+            {
+                Destroy(copy);
+            }
         }
 
         if (generatedTrunks != null)

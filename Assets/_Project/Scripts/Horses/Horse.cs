@@ -107,7 +107,18 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public bool HasName => !string.IsNullOrWhiteSpace(horseName);
     public float Stamina { get; set; }
     /// <summary>Its stamina with what its bond adds.</summary>
-    public float MaxStamina => Stats.maxStamina * (IsTamed ? HorseBondRules.StaminaScale(Bond, HorseSettings.Current) : 1f);
+    // The bond as the rest of the game reads it (CurrentBond, the panel): worn by idle days, whether or not the wear has been
+    // written down yet. The raw Bond showed a bond the horse no longer had until something asked.
+    public float MaxStamina => Stats.maxStamina * (IsTamed ? HorseBondRules.StaminaScale(BondNow, HorseSettings.Current) : 1f);
+
+    private float BondNow
+    {
+        get
+        {
+            float idle = PlantedTrees.Today - LastCared;
+            return idle >= 1f ? HorseBondRules.AfterIdle(Bond, idle, HorseSettings.Current) : Bond;
+        }
+    }
     public ItemDefinition Saddle => saddle;
     public ItemDefinition Armour => armour;
     public Damageable Health => health;

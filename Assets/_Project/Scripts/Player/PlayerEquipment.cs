@@ -375,10 +375,7 @@ public sealed class PlayerEquipment : MonoBehaviour
             }
 
             gear.Slots.SetSlot(i, ItemStack.Empty);
-            if (Inventory.Container.AddStack(stack) < stack.Count)
-            {
-                GameSession.Stash.Items.AddStack(stack);
-            }
+            ItemDelivery.Give(Inventory, stack, newFind: false, toStash: true, transform);
 
             GameMessages.Post($"{stack.Item.DisplayName} has no gear slot any more: put in your bag.", MessageKind.Info);
         }

@@ -49,6 +49,13 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     public bool StartsRuined => startsRuined;
     public bool IsBuilding => Target > Level;
     public bool IsStanding => Level >= 1;
+
+    /// <summary>
+    /// Whether a defence (a trap, a ward totem, a watch post) does its work: it stands (not a scaffold or a ruin) and isn't broken
+    /// down; being upgraded it goes on. The one rule for all three (review 2026-11-16: each had its own, and a broken trap still bit).
+    /// </summary>
+    public static bool DefenceWorks(Construction construction, Damageable health) =>
+        (construction == null || construction.IsStanding) && (health == null || !health.IsBroken);
     public bool CanUpgrade => IsStanding && !IsBuilding && Level < Definition.MaxLevel;
     public float WorkNeeded => Target <= 1 ? (Definition.BuildWork > 0f ? Definition.BuildWork : ConstructionSettings.Current.RepairWork)
         : Definition.UpgradeTo(Target)?.work ?? 0f;

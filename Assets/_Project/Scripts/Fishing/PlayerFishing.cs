@@ -128,13 +128,26 @@ public sealed class PlayerFishing : MonoBehaviour
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
         stateMachine.GuardRequested += OnGuard;
+        if (health != null)
+        {
+            health.Died += OnDied;
+        }
     }
+
+    // Killed with a line out: the line goes with them. The fight ticked on while they lay there and woke them rooted, facing
+    // the water, at the portal.
+    private void OnDied(Damageable victim, DamageInfo killingBlow) => EndLine(null);
 
     private void OnDisable()
     {
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
         stateMachine.GuardRequested -= OnGuard;
+        if (health != null)
+        {
+            health.Died -= OnDied;
+        }
+
         EndLine(null);
         if (Current == this)
         {
@@ -166,6 +179,14 @@ public sealed class PlayerFishing : MonoBehaviour
             case Phase.Ready:
                 if (interactor != null && interactor.Current != null)
                 {
+                    return;
+                }
+
+                // Not from a seat (the saddle, a boat) or with a cart in hand: the cast and the fight root the angler where they stand.
+                if (movement != null && movement.IsSeated
+                    || (TryGetComponent(out PlayerTransport transport) && transport.Using != null))
+                {
+                    GameMessages.Post("Stand on your own feet to fish.", MessageKind.Warning);
                     return;
                 }
 

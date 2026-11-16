@@ -231,6 +231,9 @@ public sealed class NokkenEncounter : MonoBehaviour
         }
     }
 
+    private static Material skinMaterial;
+    private static Material eyeMaterial;
+
     // The model (stripped of anything that would make it act), darkened, with two pale eyes.
     private static GameObject Figure(GameObject model)
     {
@@ -250,10 +253,16 @@ public sealed class NokkenEncounter : MonoBehaviour
             agent.enabled = false;
         }
 
-        // Wet, black-green skin whatever the model's own shader.
-        var skin = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        skin.SetColor("_BaseColor", new Color(0.03f, 0.06f, 0.06f));
-        skin.SetFloat("_Smoothness", 0.85f);
+        // Wet, black-green skin whatever the model's own shader: one material for every encounter (a new one each time was
+        // never destroyed).
+        if (skinMaterial == null)
+        {
+            skinMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            skinMaterial.SetColor("_BaseColor", new Color(0.03f, 0.06f, 0.06f));
+            skinMaterial.SetFloat("_Smoothness", 0.85f);
+        }
+
+        Material skin = skinMaterial;
         Bounds bounds = new Bounds(figure.transform.position, Vector3.zero);
         foreach (Renderer renderer in figure.GetComponentsInChildren<Renderer>(true))
         {
@@ -273,9 +282,12 @@ public sealed class NokkenEncounter : MonoBehaviour
             eye.transform.SetParent(figure.transform, true);
             eye.transform.localPosition = new Vector3(side, eyes / scale, 0.18f / scale);
             eye.transform.localScale = Vector3.one * 0.055f / scale;
-            var glow = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
-            glow.color = new Color(0.75f, 1f, 0.9f);
-            eye.GetComponent<Renderer>().material = glow;
+            if (eyeMaterial == null)
+            {
+                eyeMaterial = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { color = new Color(0.75f, 1f, 0.9f) };
+            }
+
+            eye.GetComponent<Renderer>().sharedMaterial = eyeMaterial;
         }
 
         var light = new GameObject("Eyes Light").AddComponent<Light>();

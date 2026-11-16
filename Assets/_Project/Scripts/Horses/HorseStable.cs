@@ -489,6 +489,6 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         mare.LastFoaled = today;
         PlayerHorsemanship.Practise(HorseWork.Foal);
         GameMessages.Post($"{mare.HorseName} has foaled: a {foal.Stats.SexName} foal, {HorseTemperamentRules.NameOf(foal.Stats.temperament)} by nature. Give it a name.", MessageKind.Gain);
-        HorseNameWindow.Ask(foal);
+        HorseNameWindow.Offer(foal);
     }
 }

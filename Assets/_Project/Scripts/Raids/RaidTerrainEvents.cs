@@ -85,15 +85,24 @@ public sealed class RaidTerrainEvents : MonoBehaviour
             return;
         }
 
-        List<Vector2> necks = ClosableNecks(map.Layout);
+        List<(Vector2 at, int link)> necks = ClosableNecks(map.Layout);
         var random = new System.Random(RaidLayout.SeedFor(director.Session.Seed, "Rockfall"));
         Terrain terrain = map.Terrain;
         Vector3 origin = terrain.transform.position;
-        for (int i = 0; i < settings.Rockfalls && necks.Count > 0; i++)
+        // Every exit must stay reachable with all the falls so far, not with each alone: two could cut one off together.
+        var closed = new HashSet<int>();
+        for (int fallen = 0; fallen < settings.Rockfalls && necks.Count > 0;)
         {
             int pick = random.Next(necks.Count);
-            Vector2 neck = necks[pick];
+            (Vector2 neck, int link) = necks[pick];
             necks.RemoveAt(pick);
+            if (closed.Add(link) && !StillReachable(map.Layout, closed))
+            {
+                closed.Remove(link);
+                continue;
+            }
+
+            fallen++;
             var at = origin + new Vector3(neck.x, 0f, neck.y);
             at.y = terrain.SampleHeight(at) + origin.y;
             StartCoroutine(Fall(kit, at, terrain, random));
@@ -144,12 +153,12 @@ public sealed class RaidTerrainEvents : MonoBehaviour
     }
 
     // Where a trail crosses a ravine on a neck whose trail isn't needed: without its link every exit can still be reached from the start.
-    private static List<Vector2> ClosableNecks(RaidLayoutPlan plan)
+    private static List<(Vector2 at, int link)> ClosableNecks(RaidLayoutPlan plan)
     {
-        var necks = new List<Vector2>();
+        var necks = new List<(Vector2, int)>();
         for (int link = 0; link < plan.Links.Count && link < plan.Trails.Count; link++)
         {
-            if (!StillReachable(plan, link))
+            if (!StillReachable(plan, new HashSet<int> { link }))
             {
                 continue;
             }
@@ -163,7 +172,7 @@ public sealed class RaidTerrainEvents : MonoBehaviour
                     {
                         if (Intersect(trail[i], trail[i + 1], ravine.Line[k], ravine.Line[k + 1], out Vector2 crossing))
                         {
-                            necks.Add(crossing);
+                            necks.Add((crossing, link));
                         }
                     }
                 }
@@ -173,7 +182,7 @@ public sealed class RaidTerrainEvents : MonoBehaviour
         return necks;
     }
 
-    private static bool StillReachable(RaidLayoutPlan plan, int without)
+    private static bool StillReachable(RaidLayoutPlan plan, HashSet<int> without)
     {
         var reached = new bool[plan.Rooms.Count];
         var open = new Queue<int>();
@@ -184,7 +193,7 @@ public sealed class RaidTerrainEvents : MonoBehaviour
             int room = open.Dequeue();
             for (int link = 0; link < plan.Links.Count; link++)
             {
-                if (link == without)
+                if (without.Contains(link))
                 {
                     continue;
                 }

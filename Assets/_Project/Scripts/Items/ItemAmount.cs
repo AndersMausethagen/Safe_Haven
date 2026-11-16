@@ -127,4 +127,21 @@ public readonly struct ItemStack
 
     /// <summary>How many more of the same item fit on this stack.</summary>
     public int SpaceLeft => IsEmpty ? 0 : Mathf.Max(0, Item.MaximumStack - Count);
+
+    // ----- What makes two stacks the same: one rule, for moving, stacking, matching and taking (review 2026-11-16: each place
+    // had its own, and they drifted: a parchment re-made blank, a relic taken for the sword carried in) -----
+
+    /// <summary>The same piece in everything but wear, count and size: item, quality, maker, empowering, enchantment.</summary>
+    public bool SameKind(ItemStack other) =>
+        Item == other.Item && Quality == other.Quality && Maker == other.Maker && Empower == other.Empower && Enchantment == other.Enchantment;
+
+    /// <summary>Whether <paramref name="other"/> can join this stack: the same kind of an item that stacks.</summary>
+    public bool StacksWith(ItemStack other) => !IsEmpty && Item.Stackable && SameKind(other);
+
+    /// <summary>A piece of its own, moved as it is and never re-made by kind (ItemContainer): anything that doesn't stack (gear and
+    /// containers keep their condition), or carries an enchantment (an inscription). Water as a measure is poured, never placed.</summary>
+    public bool IsUnique => !IsEmpty && !Item.IsWaterMeasure && (!Item.Stackable || Enchantment != null);
+
+    /// <summary>Empowered or enchanted: work done on it, which nothing takes unasked while a bare piece would do.</summary>
+    public bool IsWorked => Empower > 0 || Enchantment != null;
 }

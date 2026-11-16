@@ -114,6 +114,26 @@ public sealed class SaveableEntity : MonoBehaviour
         Capture();
     }
 
+    /// <summary>
+    /// Takes <paramref name="target"/> out of the world for good: recorded as gone (when it is saved), then destroyed. Use it for every
+    /// removal that isn't a death: destroyed alone, a saved object is recorded as still there and comes back on the next load
+    /// (review 2026-11-16: a sold horse came back, the coin kept).
+    /// </summary>
+    public static void RemoveForGood(GameObject target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        if (target.TryGetComponent(out SaveableEntity entity))
+        {
+            entity.MarkDestroyed();
+        }
+
+        Destroy(target);
+    }
+
     /// <summary>Writes the current state of every loaded saveable object into memory, before saving.</summary>
     public static void CaptureAll()
     {

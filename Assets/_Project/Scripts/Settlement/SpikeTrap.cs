@@ -29,8 +29,7 @@ public sealed class SpikeTrap : MonoBehaviour
 
     private void Update()
     {
-        // A trap worn down to its floor is broken, as a broken Ward Totem or Watch Post: it bites again once mended.
-        if (Time.time < nextCheck || (construction != null && construction.IsBuilding) || (health != null && health.IsBroken))
+        if (Time.time < nextCheck || !Construction.DefenceWorks(construction, health))
         {
             return;
         }

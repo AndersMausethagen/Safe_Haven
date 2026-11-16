@@ -200,5 +200,9 @@ public static class GameSession
         pendingReport = null;
         pendingTransport = null;
         ActiveRaid = null;
+        // What other systems hold of the game being played goes with it: quitting to the menu just after a raid's end and
+        // loading another save posted the old run's territory news in the loaded Haven.
+        global::Territory.ForgetGame();
+        CreatureRecords.ForgetGame();
     }
 }

@@ -77,6 +77,10 @@ public sealed class PlayerSnapshot
     /// <summary>True when the bag, the safe pocket or the resource inventory holds anything.</summary>
     public bool HasBelongings => slots.Count > 0 || pocket.Count > 0 || gear.Count > 0 || resources.Count > 0;
 
+    /// <summary>Crafts by hand a loaded save had under way, already paid (HandCraftQueue.Restore). Only a load sets it: a raid's or
+    /// a visit's handover stops the crafts first, so nothing else carries them.</summary>
+    public HandCraftSaveData HandCrafts { get; set; }
+
     /// <summary>The occupied bag slots, in slot order.</summary>
     public IReadOnlyList<SlotRecord> Slots => slots;
     /// <summary>The occupied safe pocket slots, in slot order. Kept even when a raid fails.</summary>
@@ -525,14 +529,16 @@ public sealed class PlayerSnapshot
     {
         if (exact)
         {
-            return deployed.FindIndex(candidate => SamePiece(candidate, stack) && Mathf.Approximately(candidate.Durability, stack.Durability));
+            return deployed.FindIndex(candidate => candidate.SameKind(stack) && Mathf.Approximately(candidate.Durability, stack.Durability));
         }
 
         int best = -1;
         for (int i = 0; i < deployed.Count; i++)
         {
             ItemStack candidate = deployed[i];
-            if (SamePiece(candidate, stack) && candidate.Durability > stack.Durability && (best < 0 || candidate.Durability < deployed[best].Durability))
+            // Nothing done to a piece in a raid changes what it is (empowering and enchanting are the altar's work at home), so
+            // the whole make has to agree, wear aside.
+            if (candidate.SameKind(stack) && candidate.Durability > stack.Durability && (best < 0 || candidate.Durability < deployed[best].Durability))
             {
                 best = i;
             }
@@ -540,11 +546,6 @@ public sealed class PlayerSnapshot
 
         return best;
     }
-
-    // Nothing done to a piece in a raid changes what it is (empowering and enchanting are the altar's work at home), so the
-    // whole make has to agree, wear aside.
-    private static bool SamePiece(ItemStack a, ItemStack b) =>
-        a.Item == b.Item && a.Quality == b.Quality && a.Maker == b.Maker && a.Empower == b.Empower && a.Enchantment == b.Enchantment;
 
     /// <summary>
     /// Gear that wore down since <paramref name="loadout"/> (an extraction's report): each worn piece, matched to what was worn

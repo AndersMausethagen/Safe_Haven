@@ -173,15 +173,22 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
     {
         Using = null;
         Movement.SetSpeedScale(this, 1f);
-        if (stateMachine.IsAboard)
+        // Only the aboard this set (a boat's seat): one rule for standing up, whoever sat the player down undoes it. A cart let
+        // go under a rider switched the saddle's aboard off, and the rider could act as if on foot.
+        if (seatedAboard && stateMachine.IsAboard)
         {
             stateMachine.SetAboard(false);
         }
+
+        seatedAboard = false;
     }
+
+    private bool seatedAboard;
 
     /// <summary>Sits the player down on something that moves.</summary>
     public void SitAt(Transform seat, Vector3 offset)
     {
+        seatedAboard = true;
         stateMachine.SetAboard(true);
         Movement.SitAt(seat, offset);
     }

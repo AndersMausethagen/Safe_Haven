@@ -128,6 +128,7 @@ public sealed partial class BuildPlacer
         drawingLine = false;
         BuildingDefinition building = placing;
         int built = 0;
+        int standing = 0;
         int blocked = 0;
         string firstProblem = null;
         for (int i = 0; i < ghost.Count; i++)
@@ -141,12 +142,14 @@ public sealed partial class BuildPlacer
             }
 
             Transform piece = ghost.PieceAt(i);
-            if (Build(building, piece.position, piece.rotation) == null)
+            GameObject placed = Build(building, piece.position, piece.rotation);
+            if (placed == null)
             {
                 break;
             }
 
             built++;
+            standing += StandsAtOnce(placed) ? 1 : 0;
         }
 
         if (built == 0)
@@ -155,9 +158,16 @@ public sealed partial class BuildPlacer
             return;
         }
 
+        // As a single building is (Confirm): only what stands at once is built now; a scaffold is Built when it is hammered up
+        // (Construction.Finish), so it isn't counted twice.
         string name = built == 1 ? $"the {building.DisplayName}" : $"{built} × {building.DisplayName}";
-        GameMessages.Post(blocked > 0 ? $"Built {name}. {blocked} spot(s) were left: {firstProblem}" : $"Built {name}.", MessageKind.Gain);
-        GameEvents.Raise(new GameEvent(GameEventKind.Built, building, built, gameObject));
+        string done = standing == built ? $"Built {name}." : $"The scaffolds for {name} are up. Hold {{key:Hammer}} at them to build.";
+        GameMessages.Post(blocked > 0 ? $"{done} {blocked} spot(s) were left: {firstProblem}" : done, MessageKind.Gain);
+        if (standing > 0)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.Built, building, standing, gameObject));
+        }
+
         Cancel();
     }
 }

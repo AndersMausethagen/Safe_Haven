@@ -19,6 +19,9 @@ public static class CreatureRecords
         lastKiller = null;
     }
 
+    /// <summary>Forgets what brought the player down in the game being played (a new game, or a load: GameSession).</summary>
+    public static void ForgetGame() => lastKiller = null;
+
     /// <summary>The player and this creature have seen each other.</summary>
     public static void NoteMet(MonsterDefinition creature)
     {

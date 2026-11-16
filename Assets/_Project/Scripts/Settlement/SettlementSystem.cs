@@ -34,20 +34,15 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
     private static void OnGameEvent(GameEvent gameEvent)
     {
-        // Every return home opens a share of held quests (QuestManager), a lost raid too: a player who keeps dying isn't
-        // starved of what the Haven has for them (review 2026-11-16; Docs/QuestAndStoryResearch.md: "per return home").
-        if (gameEvent.Kind == GameEventKind.RaidFinished && !HavenVisit.ChangeHome(own => own.OpenHeldQuestShare()))
+        // What a return home does is SettlementState.CameHome's to say. Co-op: a raid followed with the host counts for this
+        // player's own Haven (its breaches, the ward's strain), not the copy of the host's they stand in, which the host's next
+        // word would undo.
+        if (gameEvent.Kind == GameEventKind.RaidFinished)
         {
-            GameSession.Settlement.OpenHeldQuestShare();
-        }
-
-        if (gameEvent.Kind == GameEventKind.RaidFinished && gameEvent.Outcome == RaidOutcome.Extracted)
-        {
-            // Co-op: a raid followed with the host counts for this player's own Haven (its breaches, the ward's strain),
-            // not the copy of the host's they stand in, which the host's next word would undo.
-            if (!HavenVisit.ChangeHome(own => own.RecordExtraction()))
+            RaidOutcome outcome = gameEvent.Outcome;
+            if (!HavenVisit.ChangeHome(own => own.CameHome(outcome)))
             {
-                GameSession.Settlement.RecordExtraction();
+                GameSession.Settlement.CameHome(outcome);
             }
         }
     }

@@ -56,10 +56,14 @@ public static class RaidLayoutPrefetch
     /// True when this run was prepared: <paramref name="ready"/> says whether it is finished (wait a frame and ask again if not). The plan and
     /// field are handed over once, when ready; a failed or mismatched one is dropped.
     /// </summary>
-    public static bool TryTake(RaidLayoutRules source, int seed, float width, float size, out bool ready, out RaidLayoutPlan plan, out RaidLayoutField field)
+    /// <param name="madeCopy">The larger map's rules copy the field was built on (it keeps reading it), handed over with the field
+    /// for its new owner to destroy when done (RaidMap); null for a normal-sized run. It leaked once per large raid.</param>
+    public static bool TryTake(RaidLayoutRules source, int seed, float width, float size, out bool ready, out RaidLayoutPlan plan, out RaidLayoutField field,
+        out RaidLayoutRules madeCopy)
     {
         plan = null;
         field = null;
+        madeCopy = null;
         ready = false;
         Job job = current;
         if (job == null || job.Source != source || job.Seed != seed || !Mathf.Approximately(job.Width, width) || !Mathf.Approximately(job.Size, size))
@@ -77,10 +81,16 @@ public static class RaidLayoutPrefetch
         if (job.Work.IsFaulted || job.Work.IsCanceled)
         {
             Debug.LogWarning($"Laying out the run ahead failed, so it is laid out on loading: {job.Work.Exception?.InnerException?.Message}");
+            if (job.Rules != job.Source && Application.isPlaying)
+            {
+                Object.Destroy(job.Rules);
+            }
+
             return false;
         }
 
         (plan, field) = job.Work.Result;
+        madeCopy = job.Rules != job.Source ? job.Rules : null;
         return true;
     }
 

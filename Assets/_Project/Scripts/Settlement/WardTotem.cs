@@ -35,7 +35,7 @@ public sealed class WardTotem : MonoBehaviour
     private void Update()
     {
         WardBreachDirector breach = WardBreachDirector.Current;
-        if (Time.time < nextPulse || breach == null || !breach.IsActive || (construction != null && !construction.IsStanding) || (health != null && health.IsBroken))
+        if (Time.time < nextPulse || breach == null || !breach.IsActive || !Construction.DefenceWorks(construction, health))
         {
             return;
         }

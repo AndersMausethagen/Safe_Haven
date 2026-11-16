@@ -132,12 +132,17 @@ public sealed class Festivals : MonoBehaviour
     private void Join(int today)
     {
         Player player = Player.Current;
-        if (player == null || boonGivenOn == today || (player.transform.position - Place).sqrMagnitude > joinWithin * joinWithin)
+        // Once a festival day, kept in the save (the journal's notes): a field on this component started again with every
+        // homecoming, and the boon was handed out again each time the player came back during a festival.
+        string joined = $"festival:{today}";
+        JournalRecord journal = GameSession.Progress.Journal;
+        if (player == null || boonGivenOn == today || journal.HasTried(joined) || (player.transform.position - Place).sqrMagnitude > joinWithin * joinWithin)
         {
             return;
         }
 
         boonGivenOn = today;
+        journal.NoteTried(joined);
         PlayerBoons boons = player.GetComponent<PlayerBoons>();
         if (boons != null && Now.Boon.Count > 0)
         {

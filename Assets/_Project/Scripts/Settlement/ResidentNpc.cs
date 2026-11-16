@@ -235,6 +235,9 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             page.Body = said != null ? said + "\n\n" + body : body.ToString();
         }
 
+        // What they asked the Haven for, handed to them once it is home.
+        HavenRequestBoard.AddHandIn(page, resident, Player.Current != null ? Player.Current.gameObject : null, speaker, afterAnswer);
+
         // A lesson in their job's skill, once between raids.
         ResidentRecord record = GameSession.Settlement.Find(resident);
         if (current != null && current.Teaches != null && record != null)

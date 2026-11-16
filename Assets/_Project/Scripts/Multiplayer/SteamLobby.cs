@@ -18,13 +18,20 @@ public sealed class SteamLobby : IDisposable
     /// <summary>A friend in an open session of this game: their name and the lobby to walk in through.</summary>
     public readonly struct FriendHaven
     {
+        /// <summary>Whose Haven it is (the lobby's host) when known, else a friend who is in it.</summary>
         public readonly string Name;
         public readonly ulong Lobby;
+        /// <summary>True when <see cref="Name"/> is the host's: a friend may be a guest in a third player's Haven.</summary>
+        public readonly bool IsHost;
+        /// <summary>The friends in it, by name.</summary>
+        public readonly string Friends;
 
-        public FriendHaven(string name, ulong lobby)
+        public FriendHaven(string name, ulong lobby, bool isHost = true, string friends = null)
         {
             Name = name;
             Lobby = lobby;
+            IsHost = isHost;
+            Friends = friends ?? name;
         }
     }
 
@@ -128,7 +135,10 @@ public sealed class SteamLobby : IDisposable
     /// <summary>Friends (from the Steam friends list) playing this game in an open session that can be joined.</summary>
     public System.Collections.Generic.List<FriendHaven> FriendsHosting()
     {
-        var found = new System.Collections.Generic.List<FriendHaven>();
+        // One entry a lobby, named for its host (the lobby's own data): listed by the friend found in it, "Bob's Haven" walked
+        // into Alice's when Bob was her guest.
+        var byLobby = new System.Collections.Generic.Dictionary<ulong, System.Collections.Generic.List<string>>();
+        var order = new System.Collections.Generic.List<ulong>();
         AppId_t game = SteamUtils.GetAppID();
         int count = SteamFriends.GetFriendCount(EFriendFlags.k_EFriendFlagImmediate);
         for (int i = 0; i < count; i++)
@@ -137,7 +147,32 @@ public sealed class SteamLobby : IDisposable
             if (SteamFriends.GetFriendGamePlayed(friend, out FriendGameInfo_t playing) && playing.m_gameID.AppID() == game &&
                 playing.m_steamIDLobby.IsValid() && playing.m_steamIDLobby.m_SteamID != 0)
             {
-                found.Add(new FriendHaven(SteamFriends.GetFriendPersonaName(friend), playing.m_steamIDLobby.m_SteamID));
+                ulong lobby = playing.m_steamIDLobby.m_SteamID;
+                if (!byLobby.TryGetValue(lobby, out System.Collections.Generic.List<string> names))
+                {
+                    byLobby[lobby] = names = new System.Collections.Generic.List<string>();
+                    order.Add(lobby);
+                }
+
+                names.Add(SteamFriends.GetFriendPersonaName(friend));
+            }
+        }
+
+        var found = new System.Collections.Generic.List<FriendHaven>();
+        foreach (ulong lobby in order)
+        {
+            string friends = string.Join(", ", byLobby[lobby]);
+            var id = new CSteamID(lobby);
+            string host = SteamMatchmaking.GetLobbyData(id, HostKey);
+            if (ulong.TryParse(host, out ulong hostId) && hostId != 0)
+            {
+                found.Add(new FriendHaven(SteamFriends.GetFriendPersonaName(new CSteamID(hostId)), lobby, true, friends));
+            }
+            else
+            {
+                // Not heard yet: asked for, and named by the friend in it until it comes (the page is rebuilt while it shows).
+                SteamMatchmaking.RequestLobbyData(id);
+                found.Add(new FriendHaven(byLobby[lobby][0], lobby, false, friends));
             }
         }
 

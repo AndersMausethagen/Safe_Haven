@@ -591,7 +591,7 @@ public sealed class HorseTaming : MonoBehaviour
         tamed.Motion.PlayRear();
         PlayerHorsemanship.Practise(HorseWork.Tame);
         GameMessages.Post($"It stands quiet under you. It is yours, a {HorseTemperamentRules.NameOf(tamed.Stats.temperament)} {tamed.Stats.SexName}: give it a name.", MessageKind.Gain);
-        HorseNameWindow.Ask(tamed);
+        HorseNameWindow.Offer(tamed);
     }
 
     /// <summary>It gets away: off the rope or out from under the rider, and runs. Null says nothing.</summary>

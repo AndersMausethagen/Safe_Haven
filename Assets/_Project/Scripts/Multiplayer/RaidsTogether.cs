@@ -29,7 +29,8 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
 
     private readonly MultiplayerSettings settings;
     private readonly Action followed;
-    private readonly Dictionary<string, (RaidOutcome outcome, string raid, float at)> news = new Dictionary<string, (RaidOutcome, string, float)>();
+    // By client id, not the name shown: two players called "Wanderer" took each other's news and counted once together.
+    private readonly Dictionary<ulong, (RaidOutcome outcome, string raid, float at)> news = new Dictionary<ulong, (RaidOutcome, string, float)>();
     private CoopLink link;
     private RaidInvite openRaid;
     private float openRaidSince;
@@ -181,7 +182,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     }
 
     /// <summary>How a friend's last raid ended, if word came in the last few minutes (the party panel).</summary>
-    public bool TryNews(string friend, out RaidOutcome outcome)
+    public bool TryNews(ulong friend, out RaidOutcome outcome)
     {
         outcome = RaidOutcome.InProgress;
         if (!news.TryGetValue(friend, out var heard) || Time.unscaledTime - heard.at > NewsLasts)
@@ -202,14 +203,15 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
             RewardTogether(raid);
         }
 
-        using var writer = News(me, (byte)gameEvent.Outcome, raid);
+        using var writer = News(me, link.LocalId, (byte)gameEvent.Outcome, raid);
         link.ToOthers(NewsMessage, writer);
     }
 
-    private static FastBufferWriter News(string who, byte outcome, string raid)
+    private static FastBufferWriter News(string who, ulong whoId, byte outcome, string raid)
     {
         var writer = CoopLink.Writer(256);
         writer.WriteValueSafe(who);
+        writer.WriteValueSafe(whoId);
         writer.WriteValueSafe(outcome);
         writer.WriteValueSafe(raid);
         return writer;
@@ -218,16 +220,17 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     private void OnNews(ulong sender, FastBufferReader reader)
     {
         reader.ReadValueSafe(out string who);
+        reader.ReadValueSafe(out ulong whoId);
         reader.ReadValueSafe(out byte outcome);
         reader.ReadValueSafe(out string raid);
         // The host passes a guest's news on to the others.
         if (link.IsHost)
         {
-            using var writer = News(who, outcome, raid);
+            using var writer = News(who, whoId, outcome, raid);
             link.ToGuests(NewsMessage, writer, sender);
         }
 
-        news[who] = ((RaidOutcome)outcome, raid, Time.unscaledTime);
+        news[whoId] = ((RaidOutcome)outcome, raid, Time.unscaledTime);
         switch ((RaidOutcome)outcome)
         {
             case RaidOutcome.Extracted:
@@ -245,18 +248,18 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     // Getting out together pays: friends beside this player as they extract, or who got out of the same raid within the minute.
     private void RewardTogether(string raid)
     {
-        var together = new HashSet<string>();
+        var together = new HashSet<ulong>();
         FixedString128Bytes place = CoopPlace.Key;
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && !friend.IsOwner && friend.IsVisible && friend.Body != null && friend.Look.Health > 0 && friend.Look.Place.Equals(place)
                 && Player.Current != null && Vector3.Distance(friend.Body.transform.position, Player.Current.transform.position) <= TogetherReach)
             {
-                together.Add(friend.Look.DisplayName);
+                together.Add(friend.OwnerClientId);
             }
         }
 
-        foreach (KeyValuePair<string, (RaidOutcome outcome, string raid, float at)> heard in news)
+        foreach (KeyValuePair<ulong, (RaidOutcome outcome, string raid, float at)> heard in news)
         {
             if (heard.Value.outcome == RaidOutcome.Extracted && heard.Value.raid == raid && Time.unscaledTime - heard.Value.at <= TogetherSeconds)
             {
