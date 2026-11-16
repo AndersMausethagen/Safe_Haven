@@ -2519,10 +2519,10 @@ MonoBehaviour:
       volume: 0.1
       loop: 0
       fade: 0.05
-    - clip: {fileID: 8300000, guid: 1fd2bdb5275cb424eb677b439022149b, type: 3}
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 6.60198
       volume: 0.2
-      loop: 0
+      loop: 1
       fade: 1.2
   - name: The Fire Dies
     arrives: 1
@@ -3814,10 +3814,10 @@ MonoBehaviour:
       secondsWithoutVoice: 2.5
     holdAfter: 1.2
     sounds:
-    - clip: {fileID: 8300000, guid: 66e0bc9faadc768418a422b8c60d4634, type: 3}
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 0.2
       volume: 0.22
-      loop: 0
+      loop: 1
       fade: 0.8
   - name: The Clearing
     arrives: 1

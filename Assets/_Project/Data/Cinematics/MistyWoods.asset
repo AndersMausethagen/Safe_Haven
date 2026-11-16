@@ -4384,10 +4384,10 @@ MonoBehaviour:
       volume: 0.5
       loop: 0
       fade: 0.4
-    - clip: {fileID: 8300000, guid: 1fd2bdb5275cb424eb677b439022149b, type: 3}
+    - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 5.814083
       volume: 0.22
-      loop: 0
+      loop: 1
       fade: 0.4
   music:
   - clip: {fileID: 8300000, guid: e480c78ef6f17ec48972bd9bb8820db6, type: 3}

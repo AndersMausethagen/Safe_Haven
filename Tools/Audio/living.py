@@ -1,8 +1,7 @@
-"""Synthesises the sounds of a lived-in world: an owl at night, wind over a ridge, the Nokk's song over still water, a
-deer's alarm bark, an offering taken, and the hush of something seen and gone.
+"""Synthesises the sounds of a lived-in world: an owl at night, the Nokk's song over still water, a deer's alarm
+bark, an offering taken, and the hush of something seen and gone. (Ridge wind was removed on 2026-11-16: it whistled.)
 
-An owl is two soft hoots, a low sine with a breathy edge, the second held longer. Ridge wind is pink noise through a
-slowly wandering band, swelling and falling. The Nokk plays a slow fiddle phrase: a bowed sawtooth through body
+An owl is two soft hoots, a low sine with a breathy edge, the second held longer. The Nokk plays a slow fiddle phrase: a bowed sawtooth through body
 resonances, a little out of tune and slurred, with a long tail. A deer barks: a short, hoarse burst falling in pitch.
 The offering is a soft wooden knock and a rising airy shimmer. A glimpse leaving is a breath of filtered noise with a
 faint, falling whisper.
@@ -65,23 +64,8 @@ def owl(variant):
     return lowpass(call, 1800)
 
 
-def ridge_wind(variant):
-    seconds = 4.5 + variant
-    length = int(RATE * seconds)
-    t = np.arange(length) / RATE
-    noise = pink(length)
-    centre = 500 + 300 * np.sin(2 * np.pi * t / seconds + variant)
-    out = np.zeros(length)
-    block = 2048
-    for start in range(0, length, block):
-        end = min(length, start + block)
-        c = centre[start]
-        out[start:end] = band(noise[max(0, start - 512):end], c * 0.5, c * 1.6)[-(end - start):]
-    swell = np.sin(np.pi * t / seconds) ** 1.6 * (0.8 + 0.2 * np.sin(2 * np.pi * 0.7 * t + variant))
-    whistle = 0.04 * np.sin(2 * np.pi * (900 + 80 * np.sin(2 * np.pi * 0.3 * t)) * t) * swell
-    return out * swell + whistle
-
-
+# Ridge wind was removed on 2026-11-16: its sliding tone sounded like a wavy whistle (the user: "remove it completely
+# from the game").
 def bowed(freq, seconds, slide=0.0):
     length = int(RATE * seconds)
     t = np.arange(length) / RATE
@@ -150,7 +134,6 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     for i in range(3):
         save(f"Owl Hoot {i + 1}", owl(i), 0.6)
-        save(f"Ridge Wind {i + 1}", ridge_wind(i), 0.55)
         save(f"Nokk Song {i + 1}", nokk(i), 0.6)
         save(f"Deer Alarm {i + 1}", deer_bark(i), 0.7)
         save(f"Offering Taken {i + 1}", offering(i), 0.55)
