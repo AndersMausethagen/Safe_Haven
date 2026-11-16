@@ -94,6 +94,10 @@ public sealed class SaveCoverageTests
     // Values a component writes fresh at each save, not read back: the moment of saving.
     private static readonly HashSet<string> WrittenFresh = new HashSet<string> { "ResourceNode.savedAt" };
 
+    // Values that count the real time between saving and loading (a node regrowing while away): they come back less the seconds the
+    // test itself took, so they are compared to within a few seconds.
+    private static readonly HashSet<string> CountsTimeAway = new HashSet<string> { "ResourceNode.respawnRemaining" };
+
     [Test]
     public void EverySavedComponent_ReadsBackWhatItWrites()
     {
@@ -152,7 +156,7 @@ public sealed class SaveCoverageTests
                         string changed = Probed(written, field => WrittenFresh.Contains($"{type.Name}.{field}"));
                         saveable.RestoreState(changed);
                         string back = saveable.CaptureState();
-                        foreach (string field in Differences(changed, back))
+                        foreach (string field in Differences(changed, back, name => CountsTimeAway.Contains($"{type.Name}.{name}") ? 5.0 : 1e-3))
                         {
                             if (!WrittenFresh.Contains($"{type.Name}.{field}"))
                             {
@@ -213,7 +217,7 @@ public sealed class SaveCoverageTests
     }
 
     // The named values that differ between two flat JSON states, numbers compared as numbers.
-    private static IEnumerable<string> Differences(string expected, string actual)
+    private static IEnumerable<string> Differences(string expected, string actual, Func<string, double> tolerance)
     {
         var pattern = new System.Text.RegularExpressions.Regex("\"(\\w+)\":(-?\\d+(?:\\.\\d+)?(?:[eE][-+]?\\d+)?|true|false)");
         Dictionary<string, string> Values(string json)
@@ -230,14 +234,14 @@ public sealed class SaveCoverageTests
         Dictionary<string, string> want = Values(expected), got = Values(actual);
         foreach (KeyValuePair<string, string> pair in want)
         {
-            if (!got.TryGetValue(pair.Key, out string value) || !SameText(pair.Value, value))
+            if (!got.TryGetValue(pair.Key, out string value) || !SameText(pair.Value, value, tolerance(pair.Key)))
             {
                 yield return pair.Key;
             }
         }
     }
 
-    private static bool SameText(string a, string b)
+    private static bool SameText(string a, string b, double tolerance)
     {
         if (a == b)
         {
@@ -246,7 +250,7 @@ public sealed class SaveCoverageTests
 
         var invariant = System.Globalization.CultureInfo.InvariantCulture;
         return double.TryParse(a, System.Globalization.NumberStyles.Float, invariant, out double x)
-            && double.TryParse(b, System.Globalization.NumberStyles.Float, invariant, out double y) && Math.Abs(x - y) < 1e-3;
+            && double.TryParse(b, System.Globalization.NumberStyles.Float, invariant, out double y) && Math.Abs(x - y) < tolerance;
     }
 
     // Records made of content can't be invented: one of each is made from real content, and its own fields are then probed.

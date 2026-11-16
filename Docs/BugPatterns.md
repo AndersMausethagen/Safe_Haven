@@ -105,3 +105,21 @@ quests, stops being possible by accident.
 | 7. One blow pipeline | built: `PlayerBlows` (FromTheShadows: sure critical and Ambush Damage; CatchesUnaware; UnawareBlowWorth) used by blades, arrows, casts, thrown weapons, Silent Takedown and the focus ring's estimate (which disagreed before); `ConventionTests.BlowsFromTheShadows_AreWorkedOutInPlayerBlows`. High ground stays a projectile's own |
 | 8. Events say why | built: `ArrivalCause` (found, crafted, caught, rewarded, bought, filled, refunded, moved) on `GameEvent.Cause`, set by every give that says why (crafting, fishing, water, quest and ask rewards); `ArrivalCauses.IsNewlyHad` is the declared rule collect and gather quests count by; `QuestCoopTests.EveryArrivalCause_SaysWhetherItIsNewlyHad_AndARefundNeverCounts`. Whose it is stays the event's Actor |
 | 9. Here and Home | built: `GameSession.Here` (the Haven one stands in, to read) and `GameSession.Home` (one's own, to change; in a friend's Haven the guest's own, alive for the visit, `HavenVisit.OwnHaven`, saved with them); `GameSession.Settlement` obsolete and gone from the code (233 reads to Here, every change to Home, after an agent classified each change: none reachable in a guest's game changes the host's world); the guest's special cases (an extraction, a rescue, a boss, a spirit's gift, Liv's work, the Huldra) are one `Home` call each; `ConventionTests.TheHavenHere_IsRead_AndOnesOwn_IsChanged`. Found on building it: a guest talking to the host's residents used up their raid memories on the copy, and the host's carver lent a guest her reach at the host's altar (both silent: resident records cry out at nothing); and the Haven rank and job quest steps, the Huldra's welcome and "already rescued" read the host's Haven on a friend's raid |
+
+## Second round (the user: "add all recommended fixes")
+
+What the nine guards still left open, found while building them.
+
+| Fix | Status |
+|---|---|
+| 1. Resident records cry out on a borrowed copy | built: `ResidentRecord`'s setters go through `SettlementState.RecordChanging`, which says so as `Borrowed()` does (the two co-op bugs of guard 9 were silent writes to records); `CoopHomeTests.ABorrowedResident_SaysSoWhenChanged` |
+| 2. `Here` read-only by type | planned |
+| 3. Visitor rules per menu choice | planned |
+| 4. Explicit ids for content | planned |
+| 5. The quest arrow's one-per-kind, Blood-Price's cost | planned |
+| 6. Old saves as test fixtures | planned |
+| 7. A scripted run through the game's loop (Play mode) | planned |
+| 8. A two-player test with two built copies | planned |
+| 9. One command for the whole suite | built: `RunTests.ps1 -All` (one run, totals and failures); `AgentScripts/BuildWindows.ps1` runs it and builds only when everything passes |
+| 10. A leak detector in every build | built: `LeaseWatch` (in `PlaytestLogger`): invulnerability, keys held off, speed changed or a health floor held far too long or by something gone is a warning and a "Stuck" row in the playtest log; `LeaseWatchTests` |
+

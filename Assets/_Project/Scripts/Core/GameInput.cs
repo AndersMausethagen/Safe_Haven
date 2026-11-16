@@ -169,6 +169,9 @@ public static class GameInput
 
     private static readonly HashSet<object> Suspenders = new HashSet<object>();
 
+    /// <summary>Who holds the gameplay keys off now (a window, a cinematic, a name being typed): what LeaseWatch looks at.</summary>
+    public static IEnumerable<object> GameplaySuspenders => Suspenders;
+
     /// <summary>Where the pointer (mouse, pen, touch) is on the screen.</summary>
     public static Vector2 PointerPosition => Point.ReadValue<Vector2>();
 

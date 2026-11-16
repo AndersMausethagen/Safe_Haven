@@ -152,8 +152,32 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
     }
 
+    // What is held and never let go (LeaseWatch), looked at every few seconds, in every build: a warning in the player's log, and a
+    // "Stuck" row when the run is logged.
+    private readonly LeaseWatch leases = new LeaseWatch();
+    private float nextLeaseLook;
+
+    private void LookForLeaks()
+    {
+        if (Time.unscaledTime < nextLeaseLook)
+        {
+            return;
+        }
+
+        nextLeaseLook = Time.unscaledTime + 5f;
+        foreach (string leak in leases.Look(Time.unscaledTime))
+        {
+            Debug.LogWarning("[LeaseWatch] " + leak);
+            if (logging)
+            {
+                Write("Stuck", leak.Split(' ')[0], 0, leak);
+            }
+        }
+    }
+
     private void Update()
     {
+        LookForLeaks();
         if (!logging)
         {
             return;

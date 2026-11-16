@@ -92,6 +92,38 @@ public sealed class CoopHomeTests
         }
     }
 
+    // Second round of Docs/BugPatterns.md: a resident's record changed silently on the copy of the host's (a guest used up their raid
+    // memories, wrote the host's carver's work); it says so now, as the settlement's own changers do.
+    [Test]
+    public void ABorrowedResident_SaysSoWhenChanged()
+    {
+        ResidentDefinition person = null;
+        foreach (string guid in AssetDatabase.FindAssets("t:ResidentDefinition"))
+        {
+            person = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (person != null)
+            {
+                break;
+            }
+        }
+
+        GameSession.StartNewGame();
+        ((System.Collections.Generic.HashSet<string>)typeof(SettlementState).GetField("told", BindingFlags.NonPublic | BindingFlags.Static).GetValue(null)).Clear();
+        try
+        {
+            GameSession.Home.AddResident(person);
+            GameSession.Here.Find(person).WorkDone += 1; // at home: nothing to say
+            Visit(new SettlementState());
+            Assert.IsTrue(GameSession.Here.IsBorrowed);
+            LogAssert.Expect(LogType.Error, new Regex("Co-op: a resident's WorkDone changed on the copy of the host's settlement"));
+            GameSession.Here.Find(person).WorkDone += 1;
+        }
+        finally
+        {
+            Leave();
+        }
+    }
+
     [Test]
     public void ChangingHome_LeavesEverythingElseAsItWas()
     {

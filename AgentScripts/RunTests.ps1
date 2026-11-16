@@ -13,13 +13,19 @@ Unity's native save dialog and every CLI command times out until someone answers
 .EXAMPLE
 powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/RunTests.ps1 -Filter CoopTests
 powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/RunTests.ps1 -Filter "WeatherTests;CoopTests" -Timeout 600
+powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/RunTests.ps1 -All -Timeout 3600
+  (-All: the whole suite of the mode in one run, every class, with only the totals and what failed reported. Run it before
+  a build: AgentScripts/BuildWindows.ps1 does.)
 #>
 param(
-    [Parameter(Mandatory = $true)][string]$Filter,
+    [string]$Filter = '',
+    [switch]$All,
     [int]$Timeout = 300,
     [ValidateSet('EditMode', 'PlayMode')][string]$Mode = 'EditMode',
     [string]$Project = 'D:/Safe Haven/Safe Haven'
 )
+
+if (-not $All -and [string]::IsNullOrWhiteSpace($Filter)) { Write-Output '[RunTests] Name a -Filter (a class, or "A;B"), or -All.'; exit 2 }
 
 # Continue: the CLI writes hints to stderr, which Windows PowerShell would otherwise turn into errors.
 $ErrorActionPreference = 'Continue'
@@ -117,9 +123,11 @@ if ($saved -match '"result":"([^"]*)"') { Write-Output "[RunTests] scenes: $($Ma
 $out = Join-Path $env:TEMP 'SafeHavenRunTests_out.txt'
 $err = Join-Path $env:TEMP 'SafeHavenRunTests_err.txt'
 $failedRuns = 0
-foreach ($name in ($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+$names = if ($All) { @('') } else { @($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
+foreach ($name in $names) {
     $before = if (Test-Path $results) { (Get-Item $results).LastWriteTime } else { [datetime]::MinValue }
-    $arguments = @('command', 'test', 'run', '--mode', $Mode, '--filter', "`"$name`"", '--no-banner', '--timeout', "$Timeout")
+    $arguments = if ($All) { @('command', 'test', 'run', '--mode', $Mode, '--no-banner', '--timeout', "$Timeout") }
+        else { @('command', 'test', 'run', '--mode', $Mode, '--filter', "`"$name`"", '--no-banner', '--timeout', "$Timeout") }
     $run = Start-Process -FilePath $unity -ArgumentList $arguments -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
     $reported = @{}
     while (-not $run.HasExited) {
@@ -128,7 +136,21 @@ foreach ($name in ($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Obj
     }
 
     # 4. What the CLI said, and the totals of this run.
-    Get-Content $out, $err -ErrorAction SilentlyContinue | Where-Object { $_ -match '\S' } | Select-Object -Last 40
+    Get-Content $out, $err -ErrorAction SilentlyContinue | Where-Object { $_ -match '\S' } | Select-Object -Last $(if ($All) { 5 } else { 40 })
+    if ($All -and (Test-Path $results) -and (Get-Item $results).LastWriteTime -gt $before) {
+        # The whole suite: the totals, each class that failed, and each failure.
+        [xml]$xml = Get-Content $results
+        $r = $xml.'test-run'
+        $fixtures = @($xml.SelectNodes("//test-suite[@type='TestFixture']"))
+        Write-Output "[RunTests] all $Mode tests: $($r.passed)/$($r.total) passed, $($r.failed) failed, $($r.skipped) skipped, $($fixtures.Count) classes ($([math]::Round([double]$r.duration / 60, 1)) min)"
+        foreach ($f in ($fixtures | Where-Object { [int]$_.failed -gt 0 })) { Write-Output "  class $($f.name): $($f.failed) failed of $($f.total)" }
+        foreach ($case in $xml.SelectNodes("//test-case[@result='Failed']")) {
+            Write-Output "  FAILED $($case.fullname): $($case.failure.message.'#cdata-section')"
+        }
+        if ([int]$r.failed -gt 0) { $failedRuns++ }
+        continue
+    }
+
     if ((Test-Path $results) -and (Get-Item $results).LastWriteTime -gt $before) {
         [xml]$xml = Get-Content $results
         $r = $xml.'test-run'

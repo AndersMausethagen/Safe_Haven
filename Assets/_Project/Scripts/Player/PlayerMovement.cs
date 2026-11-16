@@ -35,6 +35,9 @@ public sealed class PlayerMovement : MonoBehaviour
     private Vector3 lungeVelocity;
     private float lungeUntil = -1f;
     private readonly System.Collections.Generic.Dictionary<object, float> speedScales = new System.Collections.Generic.Dictionary<object, float>();
+
+    /// <summary>Who slows (or speeds) the player now (a swing's wind-up, crafting by hand, a status): what LeaseWatch looks at.</summary>
+    public System.Collections.Generic.IEnumerable<object> SpeedScaleHolders => speedScales.Keys;
     private float speedScale = 1f;
     private bool floating;
     private float floatHeight;

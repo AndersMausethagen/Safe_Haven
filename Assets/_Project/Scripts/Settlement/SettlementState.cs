@@ -19,42 +19,67 @@ public sealed class ResidentRecord
     public ResidentRecord(ResidentDefinition resident, JobDefinition job = null)
     {
         Resident = resident;
-        Job = job;
+        this.job = job;
+    }
+
+    // What the setters below keep. Each change goes through Change, which cries out (as SettlementState's changers do) when the record
+    // is one of a guest's copy of the host's settlement (co-op): a guest used up the host's residents' raid memories and wrote the host's
+    // carver's work there, silently, undone at the host's next word (Docs/BugPatterns.md, second round).
+    private JobDefinition job;
+    private bool workPaused;
+    private int raidsAlong;
+    private int killsAlong;
+    private int timesHelpedUp;
+    private CompanionMemory memory;
+    private bool isStranger;
+    private CompanionMemory comingBack;
+    private bool allCameBack;
+    private int workDone;
+    private bool taughtSinceRaid;
+    private string home = "";
+    private string homeChosen = "";
+    private string workplace = "";
+    private string workQueue = "";
+
+    private void Change<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string change = null)
+    {
+        SettlementState.RecordChanging(this, change);
+        field = value;
     }
 
     public ResidentDefinition Resident { get; }
-    public JobDefinition Job { get; set; }
+    public JobDefinition Job { get => job; set => Change(ref job, value); }
     /// <summary>The player asked them to stop working through their job's orders.</summary>
-    public bool WorkPaused { get; set; }
+    public bool WorkPaused { get => workPaused; set => Change(ref workPaused, value); }
     /// <summary>Raids they have gone on with the player and come back from.</summary>
-    public int RaidsAlong { get; set; }
-    public int KillsAlong { get; set; }
-    public int TimesHelpedUp { get; set; }
+    public int RaidsAlong { get => raidsAlong; set => Change(ref raidsAlong, value); }
+    public int KillsAlong { get => killsAlong; set => Change(ref killsAlong, value); }
+    public int TimesHelpedUp { get => timesHelpedUp; set => Change(ref timesHelpedUp, value); }
     /// <summary>What they will bring up next time they are spoken to.</summary>
-    public CompanionMemory Memory { get; set; }
+    public CompanionMemory Memory { get => memory; set => Change(ref memory, value); }
     /// <summary>What has happened with the player, as far as they know.</summary>
     public List<CompanionMemory> Remembers { get; } = new List<CompanionMemory>();
     /// <summary>What the forest took from them and raids together haven't yet brought back, next to return first.</summary>
     public List<CompanionMemory> Forgotten { get; } = new List<CompanionMemory>();
     /// <summary>Found again and not yet spoken to: they don't know the player.</summary>
-    public bool IsStranger { get; set; }
+    public bool IsStranger { get => isStranger; set => Change(ref isStranger, value); }
     /// <summary>A memory that has just come back, to say when next spoken to.</summary>
-    public CompanionMemory ComingBack { get; set; }
+    public CompanionMemory ComingBack { get => comingBack; set => Change(ref comingBack, value); }
     /// <summary>That was the last of them.</summary>
-    public bool AllCameBack { get; set; }
+    public bool AllCameBack { get => allCameBack; set => Change(ref allCameBack, value); }
     /// <summary>Crafts made at their workplace on their own: their rank in the job grows with it (SettlementSettings › Worker Ranks).</summary>
-    public int WorkDone { get; set; }
+    public int WorkDone { get => workDone; set => Change(ref workDone, value); }
     /// <summary>They have given the player a lesson since the last raid survived (one each in between).</summary>
-    public bool TaughtSinceRaid { get; set; }
+    public bool TaughtSinceRaid { get => taughtSinceRaid; set => Change(ref taughtSinceRaid, value); }
     /// <summary>The house they sleep in, by its building's save id; empty for the home spots by the portal. Worked out at
     /// home by HavenHomes (the player's choice first, else the nearest free bed to their work).</summary>
-    public string Home { get; set; } = "";
+    public string Home { get => home; set => Change(ref home, value); }
     /// <summary>The house the player chose for them in their window, or empty to let them choose.</summary>
-    public string HomeChosen { get; set; } = "";
+    public string HomeChosen { get => homeChosen; set => Change(ref homeChosen, value); }
     /// <summary>The building of their job's kind they work at (nearest their home), by its save id; empty before it is known.</summary>
-    public string Workplace { get; set; } = "";
+    public string Workplace { get => workplace; set => Change(ref workplace, value); }
     /// <summary>That building's station queue (StationQueue.StationId), so their work goes on there during raids.</summary>
-    public string WorkQueue { get; set; } = "";
+    public string WorkQueue { get => workQueue; set => Change(ref workQueue, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>
@@ -565,6 +590,23 @@ public sealed class SettlementState
         {
             UnityEngine.Debug.LogError($"Co-op: {change} changed the copy of the host's settlement in a guest's game, and the host's next word undoes it. " +
                 "Send it to the guest's own Haven (HavenVisit.ChangeHome), to the host (HavenHelp, Territory.ForHost), or refuse it (HavenVisit.LeftToHost).\n" + Environment.StackTrace);
+        }
+    }
+
+    /// <summary>A resident's record changes (ResidentRecord): says so as <see cref="Borrowed"/> does when the record is one of a guest's
+    /// copy of the host's settlement. A record read from a save, or from the host's word before it is taken on, is no one's yet.</summary>
+    internal static void RecordChanging(ResidentRecord record, string change)
+    {
+        if (!HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        SettlementState here = GameSession.Here;
+        if (here.IsBorrowed && here.residents.Contains(record) && told.Add("ResidentRecord." + change))
+        {
+            UnityEngine.Debug.LogError($"Co-op: a resident's {change} changed on the copy of the host's settlement in a guest's game, and the host's next word undoes it. " +
+                "Change the guest's own (GameSession.Home), send it to the host (HavenHelp), or skip it in a friend's Haven (HavenVisit.InHostsHaven).\n" + Environment.StackTrace);
         }
     }
 

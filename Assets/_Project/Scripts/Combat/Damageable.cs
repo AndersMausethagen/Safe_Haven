@@ -33,6 +33,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     public bool IsAlive { get; private set; } = true;
     /// <summary>True while anything (a dodge, a cutscene) makes this object ignore hits. See AddInvulnerability.</summary>
     public bool IsInvulnerable => invulnerableSources.Count > 0;
+
+    /// <summary>Who holds it invulnerable now (a dodge, a hop, a finishing blow): what LeaseWatch looks at for one held too long.</summary>
+    public System.Collections.Generic.IEnumerable<object> InvulnerabilityHolders => invulnerableSources;
+
+    /// <summary>Who holds a floor under its health now (a Draug's RisesAgain, co-op's downed rule).</summary>
+    public IEnumerable<object> FloorHolders => heldFloors.Keys;
     public Faction Faction => Owner.Faction;
     public TargetCategory Category => category;
     public float CurrentHealth => currentHealth;
