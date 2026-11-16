@@ -75,7 +75,8 @@ public sealed class CoopHorses : ICoopPart
         public LineRenderer Rope;
     }
 
-    private struct PoseIn
+    // One horse's pose, as sent and received: health, stamina and strain in 255ths, the animator's speed as a half.
+    private struct PoseIn : INetworkSerializable
     {
         public uint Key;
         public PoseSnapshot Pose;
@@ -84,6 +85,152 @@ public sealed class CoopHorses : ICoopPart
         public PoseFlags Flags;
         public byte Strain;
         public ushort Speed;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Key);
+            serializer.SerializeValue(ref Pose.Time);
+            serializer.SerializeValue(ref Pose.Position);
+            serializer.SerializeValue(ref Pose.Yaw);
+            serializer.SerializeValue(ref Health);
+            serializer.SerializeValue(ref Stamina);
+            serializer.SerializeValue(ref Flags);
+            serializer.SerializeValue(ref Strain);
+            serializer.SerializeValue(ref Speed);
+            // The animation only when there is one (read into FramePool's arrays).
+            bool animated = Pose.Animation.LayerCount > 0;
+            serializer.SerializeValue(ref animated);
+            if (animated)
+            {
+                Pose.Animation.NetworkSerialize(serializer);
+            }
+        }
+    }
+
+    // HorsePoses: where (the place's hash), whose game runs them, and up to PosesPerMessage poses.
+    private struct HorsePosesMessage : INetworkSerializable
+    {
+        public int Place;
+        public ulong Runner;
+        public List<PoseIn> Poses;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Place);
+            serializer.SerializeValue(ref Runner);
+            byte count = (byte)(Poses?.Count ?? 0);
+            serializer.SerializeValue(ref count);
+            if (serializer.IsReader)
+            {
+                if (Poses == null)
+                {
+                    Poses = new List<PoseIn>(count);
+                }
+                else
+                {
+                    Poses.Clear();
+                }
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                PoseIn pose = serializer.IsReader ? default : Poses[i];
+                pose.NetworkSerialize(serializer);
+                if (serializer.IsReader)
+                {
+                    Poses.Add(pose);
+                }
+            }
+        }
+    }
+
+    // HorseState: the horse, where, whose game runs it, its prefab, whether it is one of the Haven's world, where it last stood,
+    // its health, and everything else about it (Horse.CaptureShared).
+    private struct HorseStateMessage : INetworkSerializable
+    {
+        public uint Key;
+        public int Place;
+        public ulong Runner;
+        public string PrefabId;
+        public bool InWorld;
+        public Vector3 Position;
+        public float Yaw;
+        public float Health;
+        public string State;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Key);
+            serializer.SerializeValue(ref Place);
+            serializer.SerializeValue(ref Runner);
+            serializer.SerializeValue(ref PrefabId);
+            serializer.SerializeValue(ref InWorld);
+            serializer.SerializeValue(ref Position);
+            serializer.SerializeValue(ref Yaw);
+            serializer.SerializeValue(ref Health);
+            serializer.SerializeValue(ref State);
+        }
+    }
+
+    // HorseClaim: the horse a guest takes in hand.
+    private struct HorseKeyMessage : INetworkSerializable
+    {
+        public uint Key;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Key);
+    }
+
+    // HorseKeeper, HorseRefused: the horse, and who has it in hand (CoopLink.NoOne: nobody).
+    private struct HorseKeeperMessage : INetworkSerializable
+    {
+        public uint Key;
+        public ulong Keeper;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Key);
+            serializer.SerializeValue(ref Keeper);
+        }
+    }
+
+    // HorseLetGo: the horse a guest hands back, as their game last had it.
+    private struct HorseLetGoMessage : INetworkSerializable
+    {
+        public uint Key;
+        public string State;
+        public float Health;
+        public Vector3 Position;
+        public float Yaw;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Key);
+            serializer.SerializeValue(ref State);
+            serializer.SerializeValue(ref Health);
+            serializer.SerializeValue(ref Position);
+            serializer.SerializeValue(ref Yaw);
+        }
+    }
+
+    // HorseGone: the horse, and the place's hash.
+    private struct HorseGoneMessage : INetworkSerializable
+    {
+        public uint Key;
+        public int Place;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Key);
+            serializer.SerializeValue(ref Place);
+        }
+    }
+
+    // HorseHello: a guest's playtest id (whose horses they are, Horse.OwnerId).
+    private struct HorseHelloMessage : INetworkSerializable
+    {
+        public string Owner;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Owner);
     }
 
     private static CoopHorses current;
@@ -96,6 +243,7 @@ public sealed class CoopHorses : ICoopPart
     private readonly List<uint> scratchKeys = new List<uint>();
     private readonly List<PoseIn> received = new List<PoseIn>();
     private readonly List<Entry> outgoing = new List<Entry>();
+    private readonly List<PoseIn> sending = new List<PoseIn>();
     private readonly HashSet<ulong> friendsHere = new HashSet<ulong>();
     private readonly HashSet<ulong> friendsSeen = new HashSet<ulong>();
     private MultiplayerSettings settings;
@@ -106,7 +254,8 @@ public sealed class CoopHorses : ICoopPart
     private uint counter;
     private float nextStateLook;
     private float nextKeepersLook;
-    private AnimatorFrame scratchFrame;
+    // One frame for each pose in a message: each keeps its horse's animation until the message is written.
+    private readonly AnimatorFrame[] scratchFrames = new AnimatorFrame[PosesPerMessage];
     private ContentDatabase content;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -191,15 +340,15 @@ public sealed class CoopHorses : ICoopPart
             link.On(LetGoMessage, OnLetGo);
             link.On(HelloMessage, (sender, reader) =>
             {
-                reader.ReadValueSafe(out string owner);
-                owners[sender] = owner ?? "";
+                reader.ReadNetworkSerializable(out HorseHelloMessage hello);
+                owners[sender] = hello.Owner ?? "";
             });
         }
         else
         {
             link.On(RefusedMessage, OnRefused);
             using FastBufferWriter writer = CoopLink.Writer();
-            writer.WriteValueSafe(GameSession.Playtest.Id ?? "");
+            writer.WriteNetworkSerializable(new HorseHelloMessage { Owner = GameSession.Playtest.Id ?? "" });
             link.ToHost(HelloMessage, writer);
         }
     }
@@ -604,7 +753,7 @@ public sealed class CoopHorses : ICoopPart
         {
             keepers[entry.Key] = link.LocalId;
             using FastBufferWriter writer = CoopLink.Writer();
-            writer.WriteValueSafe(entry.Key);
+            writer.WriteNetworkSerializable(new HorseKeyMessage { Key = entry.Key });
             link.ToHost(ClaimMessage, writer);
         }
 
@@ -690,8 +839,7 @@ public sealed class CoopHorses : ICoopPart
             }
 
             using FastBufferWriter writer = CoopLink.Writer();
-            writer.WriteValueSafe(entry.Key);
-            writer.WriteValueSafe(placeHash);
+            writer.WriteNetworkSerializable(new HorseGoneMessage { Key = entry.Key, Place = placeHash });
             link.ToOthers(GoneMessage, writer);
         }
     }
@@ -805,19 +953,18 @@ public sealed class CoopHorses : ICoopPart
         }
 
         using FastBufferWriter writer = CoopLink.Writer();
-        writer.WriteValueSafe(key);
-        writer.WriteValueSafe(keeper);
+        writer.WriteNetworkSerializable(new HorseKeeperMessage { Key = key, Keeper = keeper });
         link.ToGuests(KeeperMessage, writer);
     }
 
     private void OnClaim(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
+        reader.ReadNetworkSerializable(out HorseKeyMessage claim);
+        uint key = claim.Key;
         if (keepers.TryGetValue(key, out ulong keeper) && keeper != sender && (keeper == link.LocalId || link.IsConnected(keeper)))
         {
             using FastBufferWriter writer = CoopLink.Writer();
-            writer.WriteValueSafe(key);
-            writer.WriteValueSafe(keeper);
+            writer.WriteNetworkSerializable(new HorseKeeperMessage { Key = key, Keeper = keeper });
             link.Send(RefusedMessage, sender, writer);
             return;
         }
@@ -827,8 +974,9 @@ public sealed class CoopHorses : ICoopPart
 
     private void OnKeeper(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
-        reader.ReadValueSafe(out ulong keeper);
+        reader.ReadNetworkSerializable(out HorseKeeperMessage told);
+        uint key = told.Key;
+        ulong keeper = told.Keeper;
         if (keeper == CoopLink.NoOne)
         {
             // A let-go this game sent comes back as nobody's; one it has just claimed again stays its own.
@@ -847,8 +995,9 @@ public sealed class CoopHorses : ICoopPart
     // Too late: a friend had it in hand first. Whatever began here stops, and it is drawn as theirs.
     private void OnRefused(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
-        reader.ReadValueSafe(out ulong keeper);
+        reader.ReadNetworkSerializable(out HorseKeeperMessage refused);
+        uint key = refused.Key;
+        ulong keeper = refused.Keeper;
         keepers[key] = keeper;
         if (!entries.TryGetValue(key, out Entry entry) || entry.Horse == null)
         {
@@ -877,21 +1026,18 @@ public sealed class CoopHorses : ICoopPart
     private void SendLetGo(uint key, string state, float health, Vector3 position, float yaw)
     {
         using FastBufferWriter writer = CoopLink.Writer(1024, 128 * 1024);
-        writer.WriteValueSafe(key);
-        writer.WriteValueSafe(state ?? "");
-        writer.WriteValueSafe(health);
-        writer.WriteValueSafe(position);
-        writer.WriteValueSafe(yaw);
+        writer.WriteNetworkSerializable(new HorseLetGoMessage { Key = key, State = state ?? "", Health = health, Position = position, Yaw = yaw });
         link.ToHost(LetGoMessage, writer);
     }
 
     private void OnLetGo(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
-        reader.ReadValueSafe(out string state);
-        reader.ReadValueSafe(out float health);
-        reader.ReadValueSafe(out Vector3 position);
-        reader.ReadValueSafe(out float yaw);
+        reader.ReadNetworkSerializable(out HorseLetGoMessage letGo);
+        uint key = letGo.Key;
+        string state = letGo.State;
+        float health = letGo.Health;
+        Vector3 position = letGo.Position;
+        float yaw = letGo.Yaw;
         if (!keepers.TryGetValue(key, out ulong keeper) || keeper != sender)
         {
             return;
@@ -970,46 +1116,37 @@ public sealed class CoopHorses : ICoopPart
         }
 
         using FastBufferWriter writer = CoopLink.Writer(1024, 128 * 1024);
-        WriteState(writer, entry, link.LocalId);
+        writer.WriteNetworkSerializable(new HorseStateMessage
+        {
+            Key = entry.Key,
+            Place = placeHash,
+            Runner = link.LocalId,
+            PrefabId = entry.PrefabId ?? "",
+            InWorld = entry.InWorld,
+            Position = entry.LastPosition,
+            Yaw = entry.LastYaw,
+            Health = entry.Health,
+            State = entry.State ?? "",
+        });
         link.ToOthers(StateMessage, writer);
-    }
-
-    private void WriteState(FastBufferWriter writer, Entry entry, ulong runner)
-    {
-        writer.WriteValueSafe(entry.Key);
-        writer.WriteValueSafe(placeHash);
-        writer.WriteValueSafe(runner);
-        writer.WriteValueSafe(entry.PrefabId ?? "");
-        writer.WriteValueSafe(entry.InWorld);
-        writer.WriteValueSafe(entry.LastPosition);
-        writer.WriteValueSafe(entry.LastYaw);
-        writer.WriteValueSafe(entry.Health);
-        writer.WriteValueSafe(entry.State ?? "");
     }
 
     private void OnState(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
-        reader.ReadValueSafe(out int place);
-        reader.ReadValueSafe(out ulong runner);
-        reader.ReadValueSafe(out string prefabId);
-        reader.ReadValueSafe(out bool inWorld);
-        reader.ReadValueSafe(out Vector3 position);
-        reader.ReadValueSafe(out float yaw);
-        reader.ReadValueSafe(out float health);
-        reader.ReadValueSafe(out string state);
+        reader.ReadNetworkSerializable(out HorseStateMessage told);
+        uint key = told.Key;
+        int place = told.Place;
+        ulong runner = told.Runner;
+        string prefabId = told.PrefabId;
+        bool inWorld = told.InWorld;
+        Vector3 position = told.Position;
+        float yaw = told.Yaw;
+        float health = told.Health;
+        string state = told.State;
         if (link.IsHost)
         {
             using FastBufferWriter relay = CoopLink.Writer(1024, 128 * 1024);
-            relay.WriteValueSafe(key);
-            relay.WriteValueSafe(place);
-            relay.WriteValueSafe(runner);
-            relay.WriteValueSafe(prefabId ?? "");
-            relay.WriteValueSafe(inWorld);
-            relay.WriteValueSafe(position);
-            relay.WriteValueSafe(yaw);
-            relay.WriteValueSafe(health);
-            relay.WriteValueSafe(state ?? "");
+            relay.WriteNetworkSerializable(told);
             link.ToGuests(StateMessage, relay, sender);
         }
 
@@ -1081,13 +1218,13 @@ public sealed class CoopHorses : ICoopPart
 
     private void OnGone(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out uint key);
-        reader.ReadValueSafe(out int place);
+        reader.ReadNetworkSerializable(out HorseGoneMessage gone);
+        uint key = gone.Key;
+        int place = gone.Place;
         if (link.IsHost)
         {
             using FastBufferWriter relay = CoopLink.Writer();
-            relay.WriteValueSafe(key);
-            relay.WriteValueSafe(place);
+            relay.WriteNetworkSerializable(gone);
             link.ToGuests(GoneMessage, relay, sender);
             keepers.Remove(key);
         }
@@ -1119,24 +1256,24 @@ public sealed class CoopHorses : ICoopPart
         {
             int count = Mathf.Min(PosesPerMessage, outgoing.Count - from);
             using FastBufferWriter writer = CoopLink.Writer(1024, 8 * 1024);
-            writer.WriteValueSafe(placeHash);
-            writer.WriteValueSafe(link.LocalId);
-            writer.WriteValueSafe((byte)count);
+            sending.Clear();
             for (int i = from; i < from + count; i++)
             {
-                WritePose(writer, outgoing[i], now);
+                sending.Add(PoseOf(outgoing[i], now, i - from));
             }
 
+            writer.WriteNetworkSerializable(new HorsePosesMessage { Place = placeHash, Runner = link.LocalId, Poses = sending });
             link.ToOthers(PosesMessage, writer, NetworkDelivery.UnreliableSequenced);
         }
     }
 
-    private void WritePose(FastBufferWriter writer, Entry entry, double now)
+    // A horse's pose now, its animation read into the frame of its place in the message (slot).
+    private PoseIn PoseOf(Entry entry, double now, int slot)
     {
         Horse horse = entry.Horse;
         var pose = new PoseSnapshot { Time = now, Position = horse.transform.position, Yaw = horse.transform.eulerAngles.y };
-        entry.Mirror?.Capture(ref scratchFrame);
-        pose.Animation = entry.Mirror != null ? scratchFrame : default;
+        entry.Mirror?.Capture(ref scratchFrames[slot]);
+        pose.Animation = entry.Mirror != null ? scratchFrames[slot] : default;
         PoseFlags flags = PoseFlags.None;
         if (horse.Rider != null)
         {
@@ -1153,75 +1290,31 @@ public sealed class CoopHorses : ICoopPart
             flags |= PoseFlags.Dead;
         }
 
-        writer.WriteValueSafe(entry.Key);
-        writer.WriteValueSafe(pose.Time);
-        writer.WriteValueSafe(pose.Position);
-        writer.WriteValueSafe(pose.Yaw);
-        writer.WriteValueSafe((byte)Mathf.RoundToInt(Mathf.Clamp01(horse.Health.HealthFraction) * 255f));
-        writer.WriteValueSafe((byte)Mathf.RoundToInt(Mathf.Clamp01(horse.MaxStamina > 0f ? horse.Stamina / horse.MaxStamina : 0f) * 255f));
-        writer.WriteValueSafe((byte)flags);
-        writer.WriteValueSafe((byte)Mathf.RoundToInt(Mathf.Clamp01(horse.Taming != null ? horse.Taming.Strain : 0f) * 255f));
-        writer.WriteValueSafe(Mathf.FloatToHalf(horse.Motion.Animator != null ? horse.Motion.Animator.speed : 1f));
-        writer.WriteValueSafe(pose.Animation.LayerCount > 0);
-        if (pose.Animation.LayerCount > 0)
+        return new PoseIn
         {
-            writer.WriteNetworkSerializable(pose.Animation);
-        }
+            Key = entry.Key,
+            Pose = pose,
+            Health = (byte)Mathf.RoundToInt(Mathf.Clamp01(horse.Health.HealthFraction) * 255f),
+            Stamina = (byte)Mathf.RoundToInt(Mathf.Clamp01(horse.MaxStamina > 0f ? horse.Stamina / horse.MaxStamina : 0f) * 255f),
+            Flags = flags,
+            Strain = (byte)Mathf.RoundToInt(Mathf.Clamp01(horse.Taming != null ? horse.Taming.Strain : 0f) * 255f),
+            Speed = Mathf.FloatToHalf(horse.Motion.Animator != null ? horse.Motion.Animator.speed : 1f),
+        };
     }
 
     private void OnPoses(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int place);
-        reader.ReadValueSafe(out ulong runner);
-        reader.ReadValueSafe(out byte count);
-        received.Clear();
-        for (int i = 0; i < count; i++)
-        {
-            var pose = new PoseIn();
-            reader.ReadValueSafe(out pose.Key);
-            reader.ReadValueSafe(out pose.Pose.Time);
-            reader.ReadValueSafe(out pose.Pose.Position);
-            reader.ReadValueSafe(out pose.Pose.Yaw);
-            reader.ReadValueSafe(out pose.Health);
-            reader.ReadValueSafe(out pose.Stamina);
-            reader.ReadValueSafe(out byte flags);
-            pose.Flags = (PoseFlags)flags;
-            reader.ReadValueSafe(out pose.Strain);
-            reader.ReadValueSafe(out pose.Speed);
-            reader.ReadValueSafe(out bool animated);
-            if (animated)
-            {
-                reader.ReadNetworkSerializable(out pose.Pose.Animation);
-            }
-
-            received.Add(pose);
-        }
+        // Read in place into the kept list: poses come many times a second.
+        var poses = new HorsePosesMessage { Poses = received };
+        reader.ReadNetworkSerializableInPlace(ref poses);
+        int place = poses.Place;
+        ulong runner = poses.Runner;
 
         // The host passes a guest's poses on to the others before keeping its own copy (which takes the frames).
         if (link.IsHost && link.Guests(sender).Count > 0)
         {
             using FastBufferWriter relay = CoopLink.Writer(1024, 8 * 1024);
-            relay.WriteValueSafe(place);
-            relay.WriteValueSafe(runner);
-            relay.WriteValueSafe(count);
-            foreach (PoseIn pose in received)
-            {
-                relay.WriteValueSafe(pose.Key);
-                relay.WriteValueSafe(pose.Pose.Time);
-                relay.WriteValueSafe(pose.Pose.Position);
-                relay.WriteValueSafe(pose.Pose.Yaw);
-                relay.WriteValueSafe(pose.Health);
-                relay.WriteValueSafe(pose.Stamina);
-                relay.WriteValueSafe((byte)pose.Flags);
-                relay.WriteValueSafe(pose.Strain);
-                relay.WriteValueSafe(pose.Speed);
-                relay.WriteValueSafe(pose.Pose.Animation.LayerCount > 0);
-                if (pose.Pose.Animation.LayerCount > 0)
-                {
-                    relay.WriteNetworkSerializable(pose.Pose.Animation);
-                }
-            }
-
+            relay.WriteNetworkSerializable(poses);
             link.ToGuests(PosesMessage, relay, sender, NetworkDelivery.UnreliableSequenced);
         }
 

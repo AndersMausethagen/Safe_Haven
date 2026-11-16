@@ -31,6 +31,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     private readonly Dictionary<int, Puppet> byId = new Dictionary<int, Puppet>();
     private readonly Dictionary<MonsterAI, Puppet> byCreature = new Dictionary<MonsterAI, Puppet>();
     private readonly List<MonsterAI> scratch = new List<MonsterAI>();
+    // The poses messages' list, reused (read in place): they come ten times a second.
+    private readonly List<CreaturePose> posesIn = new List<CreaturePose>();
     private CoopLink link;
     private ContentDatabase content;
     private Scene scene;
@@ -230,15 +232,15 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
     private void OnSpawn(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int count);
-        for (int i = 0; i < count; i++)
+        reader.ReadNetworkSerializable(out CreatureSpawnMessage spawns);
+        foreach (CreatureSpawn spawn in spawns.Creatures)
         {
-            reader.ReadValueSafe(out int id);
-            reader.ReadValueSafe(out string prefabId);
-            reader.ReadValueSafe(out Vector3 position);
-            reader.ReadValueSafe(out float yaw);
-            reader.ReadValueSafe(out byte health);
-            reader.ReadValueSafe(out string affixes);
+            int id = spawn.Id;
+            string prefabId = spawn.PrefabId;
+            Vector3 position = spawn.Position;
+            float yaw = spawn.Yaw;
+            byte health = spawn.Health;
+            string affixes = spawn.Affixes;
             if (!FromHost || byId.ContainsKey(id))
             {
                 continue;
@@ -320,29 +322,21 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
     private void OnPoses(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out double time);
-        reader.ReadValueSafe(out ushort count);
-        for (int i = 0; i < count; i++)
+        var poses = new CreaturePosesMessage { Poses = posesIn };
+        reader.ReadNetworkSerializableInPlace(ref poses);
+        double time = poses.Time;
+        foreach (CreaturePose pose in poses.Poses)
         {
-            reader.ReadValueSafe(out ushort id);
-            reader.ReadValueSafe(out Vector3 position);
-            reader.ReadValueSafe(out byte yaw);
-            reader.ReadValueSafe(out byte speed);
-            reader.ReadValueSafe(out byte state);
-            reader.ReadValueSafe(out byte health);
-            reader.ReadValueSafe(out byte hunting);
-            reader.ReadValueSafe(out byte poise);
-            reader.ReadValueSafe(out byte notice);
-            reader.ReadValueSafe(out byte noticing);
-            if (byId.TryGetValue(id, out Puppet puppet) && puppet.Ai != null)
+            byte hunting = pose.Hunting;
+            if (byId.TryGetValue(pose.Id, out Puppet puppet) && puppet.Ai != null)
             {
-                puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state,
-                    (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
-                    (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0, notice / 255f, (MonsterAI.RemoteHunt)noticing,
+                puppet.Ai.ApplyRemotePose(time, pose.Position, pose.Yaw * (360f / 256f), pose.Speed / 10f, (MonsterAI.State)pose.State,
+                    (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), pose.Poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
+                    (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0, pose.Notice / 255f, (MonsterAI.RemoteHunt)pose.Noticing,
                     (hunting & CreatureHost.MarkedFlag) != 0, (hunting & CreatureHost.ShieldBrokenFlag) != 0);
                 if (puppet.Health != null)
                 {
-                    puppet.Health.ShowShare(health / 255f);
+                    puppet.Health.ShowShare(pose.Health / 255f);
                 }
             }
         }
@@ -350,28 +344,20 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
     private void OnStrike(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        reader.ReadValueSafe(out int action);
-        reader.ReadValueSafe(out ulong at);
-        reader.ReadValueSafe(out double time);
-        reader.ReadValueSafe(out Vector3 from);
-        reader.ReadValueSafe(out float yaw);
-        reader.ReadValueSafe(out Vector3 aim);
-        reader.ReadValueSafe(out byte followUps);
-        reader.ReadValueSafe(out float hold);
-        if (link == null || link.Now - time > StaleStrike || !byId.TryGetValue(id, out Puppet puppet) || puppet.Ai == null)
+        reader.ReadNetworkSerializable(out CreatureStrikeMessage strike);
+        if (link == null || link.Now - strike.Time > StaleStrike || !byId.TryGetValue(strike.Id, out Puppet puppet) || puppet.Ai == null)
         {
             return;
         }
 
-        IDamageable me = at == link.LocalId && Player.Current != null ? Player.Current.Health : null;
-        puppet.Ai.PlayRemoteStrike(action, me, from, yaw, aim, followUps, hold);
+        IDamageable me = strike.At == link.LocalId && Player.Current != null ? Player.Current.Health : null;
+        puppet.Ai.PlayRemoteStrike(strike.Action, me, strike.From, strike.Yaw, strike.Aim, strike.FollowUps, strike.Hold);
     }
 
     private void OnDied(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        if (!byId.TryGetValue(id, out Puppet puppet))
+        reader.ReadNetworkSerializable(out CreatureIdMessage died);
+        if (!byId.TryGetValue(died.Id, out Puppet puppet))
         {
             return;
         }
@@ -387,8 +373,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
     private void OnGone(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        if (byId.TryGetValue(id, out Puppet puppet))
+        reader.ReadNetworkSerializable(out CreatureIdMessage gone);
+        if (byId.TryGetValue(gone.Id, out Puppet puppet))
         {
             Forget(puppet);
             if (puppet.Ai != null)
@@ -417,7 +403,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
         string path = RaidGenerator.PathOf(group.transform);
         using var writer = CoopLink.Writer(16 + path.Length * 2);
-        writer.WriteValueSafe(path);
+        writer.WriteNetworkSerializable(new CreatureWakeMessage { Path = path });
         link.ToHost(CoopCreatures.WakeMessage, writer);
         return true;
     }
@@ -433,10 +419,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         }
 
         using var writer = CoopLink.Writer(32 + prefabId.Length * 2);
-        writer.WriteValueSafe(prefabId);
-        writer.WriteValueSafe(position);
-        writer.WriteValueSafe(yaw);
-        writer.WriteValueSafe(hunt);
+        writer.WriteNetworkSerializable(new CreatureCallMessage { PrefabId = prefabId, Position = position, Yaw = yaw, Hunt = hunt });
         link.ToHost(CoopCreatures.CallMessage, writer);
     }
 
@@ -449,8 +432,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         }
 
         using var writer = new FastBufferWriter(16, Allocator.Temp);
-        writer.WriteValueSafe(puppet.Id);
-        writer.WriteValueSafe(seconds);
+        writer.WriteNetworkSerializable(new CreatureStaggerMessage { Id = puppet.Id, Seconds = seconds });
         link.ToHost(CoopCreatures.StaggerMessage, writer);
     }
 
@@ -465,8 +447,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         }
 
         using var writer = new FastBufferWriter(80, Allocator.Temp);
-        writer.WriteValueSafe(puppet.Id);
-        writer.WriteValueSafe(new FixedString64Bytes(status.Id ?? string.Empty));
+        writer.WriteNetworkSerializable(new CreatureStatusMessage { Id = puppet.Id, StatusId = new FixedString64Bytes(status.Id ?? string.Empty) });
         link.ToHost(CoopCreatures.StatusMessage, writer);
     }
 
@@ -502,16 +483,19 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
         puppet.HitByMe = true;
         using var writer = new FastBufferWriter(96, Allocator.Temp);
-        writer.WriteValueSafe(puppet.Id);
-        writer.WriteValueSafe(damage.Amount);
-        writer.WriteValueSafe((byte)damage.Type);
-        writer.WriteValueSafe(damage.IsCritical);
-        writer.WriteValueSafe(damage.HitPoint);
-        writer.WriteValueSafe(damage.Direction);
-        writer.WriteValueSafe(damage.Poise);
-        writer.WriteValueSafe((int)damage.Technique);
-        writer.WriteValueSafe((byte)damage.Strike);
-        writer.WriteValueSafe((byte)result.Guard);
+        writer.WriteNetworkSerializable(new CreatureHitMessage
+        {
+            Id = puppet.Id,
+            Amount = damage.Amount,
+            Type = (byte)damage.Type,
+            Critical = damage.IsCritical,
+            Point = damage.HitPoint,
+            Direction = damage.Direction,
+            Poise = damage.Poise,
+            Technique = (int)damage.Technique,
+            Strike = (byte)damage.Strike,
+            Guard = (byte)result.Guard,
+        });
         link.ToHost(CoopCreatures.HitMessage, writer);
     }
 

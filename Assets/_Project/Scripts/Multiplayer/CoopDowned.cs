@@ -200,31 +200,26 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(128, Allocator.Temp);
-        writer.WriteValueSafe(friendClientId);
-        writer.WriteValueSafe(GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName);
-        writer.WriteValueSafe(network.LocalClientId);
-        writer.WriteValueSafe(helping);
-        writer.WriteValueSafe(seconds);
+        writer.WriteNetworkSerializable(new HelpingFriendMessage
+        {
+            Target = friendClientId,
+            Who = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName,
+            WhoId = network.LocalClientId,
+            Helping = helping,
+            Seconds = seconds,
+        });
         ulong to = network.IsServer ? friendClientId : NetworkManager.ServerClientId;
         network.CustomMessagingManager.SendNamedMessage(HelpingMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
     private void OnHelping(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out ulong target);
-        reader.ReadValueSafe(out string who);
-        reader.ReadValueSafe(out ulong whoId);
-        reader.ReadValueSafe(out bool helping);
-        reader.ReadValueSafe(out float seconds);
-        if (network.IsServer && target != NetworkManager.ServerClientId)
+        reader.ReadNetworkSerializable(out HelpingFriendMessage help);
+        if (network.IsServer && help.Target != NetworkManager.ServerClientId)
         {
             using var writer = new FastBufferWriter(128, Allocator.Temp);
-            writer.WriteValueSafe(target);
-            writer.WriteValueSafe(who);
-            writer.WriteValueSafe(whoId);
-            writer.WriteValueSafe(helping);
-            writer.WriteValueSafe(seconds);
-            network.CustomMessagingManager.SendNamedMessage(HelpingMessage, target, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            writer.WriteNetworkSerializable(help);
+            network.CustomMessagingManager.SendNamedMessage(HelpingMessage, help.Target, writer, NetworkDelivery.ReliableFragmentedSequenced);
             return;
         }
 
@@ -233,14 +228,14 @@ public sealed class CoopDowned : ICoopPart, IDisposable
             return;
         }
 
-        if (helping)
+        if (help.Helping)
         {
-            helper = who;
-            helperId = whoId;
-            helpSeconds = seconds;
+            helper = help.Who;
+            helperId = help.WhoId;
+            helpSeconds = help.Seconds;
             helpStartedAt = Time.time;
         }
-        else if (helperId == whoId)
+        else if (helperId == help.WhoId)
         {
             helpStartedAt = -1f;
         }
@@ -255,29 +250,62 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(128, Allocator.Temp);
-        writer.WriteValueSafe(friendClientId);
-        writer.WriteValueSafe(GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName);
+        writer.WriteNetworkSerializable(new HelpUpFriendMessage
+        {
+            Target = friendClientId,
+            Helper = GameSession.Appearance != null ? GameSession.Appearance.DisplayName : CharacterAppearance.DefaultName,
+        });
         ulong to = network.IsServer ? friendClientId : NetworkManager.ServerClientId;
         network.CustomMessagingManager.SendNamedMessage(HelpUpMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
     private void OnHelpUp(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out ulong target);
-        reader.ReadValueSafe(out string helper);
+        reader.ReadNetworkSerializable(out HelpUpFriendMessage help);
         // The host passes a guest's help on to the guest it is for.
-        if (network.IsServer && target != NetworkManager.ServerClientId)
+        if (network.IsServer && help.Target != NetworkManager.ServerClientId)
         {
             using var writer = new FastBufferWriter(128, Allocator.Temp);
-            writer.WriteValueSafe(target);
-            writer.WriteValueSafe(helper);
-            network.CustomMessagingManager.SendNamedMessage(HelpUpMessage, target, writer, NetworkDelivery.ReliableFragmentedSequenced);
+            writer.WriteNetworkSerializable(help);
+            network.CustomMessagingManager.SendNamedMessage(HelpUpMessage, help.Target, writer, NetworkDelivery.ReliableFragmentedSequenced);
             return;
         }
 
         if (IsDown)
         {
-            StandUp(helper, quiet: false);
+            StandUp(help.Helper, quiet: false);
+        }
+    }
+
+    // A friend began (or stopped) helping: for whom (client id), who (by name and client id), and the seconds it takes.
+    private struct HelpingFriendMessage : INetworkSerializable
+    {
+        public ulong Target;
+        public string Who;
+        public ulong WhoId;
+        public bool Helping;
+        public float Seconds;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Target);
+            serializer.SerializeValue(ref Who);
+            serializer.SerializeValue(ref WhoId);
+            serializer.SerializeValue(ref Helping);
+            serializer.SerializeValue(ref Seconds);
+        }
+    }
+
+    // A friend helped someone up: whom (client id), and the helper's name.
+    private struct HelpUpFriendMessage : INetworkSerializable
+    {
+        public ulong Target;
+        public string Helper;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Target);
+            serializer.SerializeValue(ref Helper);
         }
     }
 

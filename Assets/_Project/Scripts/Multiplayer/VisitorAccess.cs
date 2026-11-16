@@ -180,7 +180,7 @@ public sealed class VisitorAccess : ICoopPart
 
         using (var writer = new FastBufferWriter(4, Allocator.Temp))
         {
-            writer.WriteValueSafe((byte)right);
+            writer.WriteNetworkSerializable(new RightAskMessage { Right = (byte)right });
             network.CustomMessagingManager.SendNamedMessage(AskMessage, NetworkManager.ServerClientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
@@ -190,9 +190,9 @@ public sealed class VisitorAccess : ICoopPart
 
     private void OnAnswer(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte rightByte);
-        reader.ReadValueSafe(out bool yes);
-        var right = (VisitorRight)rightByte;
+        reader.ReadNetworkSerializable(out RightAnswerMessage answer);
+        bool yes = answer.Yes;
+        var right = (VisitorRight)answer.Right;
         waiting.Remove(right);
         if (!HavenVisit.IsVisiting)
         {
@@ -223,13 +223,13 @@ public sealed class VisitorAccess : ICoopPart
 
     private void OnStash(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packed);
+        reader.ReadNetworkSerializable(out StashPacketMessage snapshot);
         if (!HavenVisit.IsVisiting || !HavenVisit.StashAllowed)
         {
             return;
         }
 
-        if (stash.TakeSnapshot(WorldTransfer.Unpack<StashShare.Snapshot>(packed), GameSession.Stash, Content()))
+        if (stash.TakeSnapshot(WorldTransfer.Unpack<StashShare.Snapshot>(snapshot.Packed), GameSession.Stash, Content()))
         {
             HavenVisit.StashArrived();
         }
@@ -269,8 +269,7 @@ public sealed class VisitorAccess : ICoopPart
                 if (network != null && link.IsConnected(pair.Key))
                 {
                     using var writer = new FastBufferWriter(8, Allocator.Temp);
-                    writer.WriteValueSafe((byte)right);
-                    writer.WriteValueSafe(false);
+                    writer.WriteNetworkSerializable(new RightAnswerMessage { Right = (byte)right, Yes = false });
                     network.CustomMessagingManager.SendNamedMessage(AnswerMessage, pair.Key, writer, NetworkDelivery.ReliableFragmentedSequenced);
                 }
             }
@@ -306,8 +305,8 @@ public sealed class VisitorAccess : ICoopPart
 
     private void OnAsk(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte rightByte);
-        var right = (VisitorRight)rightByte;
+        reader.ReadNetworkSerializable(out RightAskMessage ask);
+        var right = (VisitorRight)ask.Right;
         if (right != VisitorRight.Build && right != VisitorRight.Stash)
         {
             return;
@@ -335,8 +334,7 @@ public sealed class VisitorAccess : ICoopPart
     {
         using (var writer = new FastBufferWriter(8, Allocator.Temp))
         {
-            writer.WriteValueSafe((byte)right);
-            writer.WriteValueSafe(yes);
+            writer.WriteNetworkSerializable(new RightAnswerMessage { Right = (byte)right, Yes = yes });
             network.CustomMessagingManager.SendNamedMessage(AnswerMessage, clientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
         }
 
@@ -349,7 +347,7 @@ public sealed class VisitorAccess : ICoopPart
 
     private void OnStashChange(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packed);
+        reader.ReadNetworkSerializable(out StashPacketMessage changed);
         bool using_ = allowed.TryGetValue(sender, out HashSet<VisitorRight> rights) && rights.Contains(VisitorRight.Stash);
         bool closing = !using_ && closingStash.Remove(sender);
         if (!using_ && !closing)
@@ -360,7 +358,7 @@ public sealed class VisitorAccess : ICoopPart
         // Always answered, even when nothing could be done: the guest waits for this number before taking the stash on.
         try
         {
-            StashShare.Change change = WorldTransfer.Unpack<StashShare.Change>(packed);
+            StashShare.Change change = WorldTransfer.Unpack<StashShare.Change>(changed.Packed);
             stashApplied[sender] = Mathf.Max(stashApplied.TryGetValue(sender, out int applied) ? applied : 0, change.number);
             StashShare.ApplyChange(change, GameSession.Stash, Content());
         }
@@ -396,8 +394,37 @@ public sealed class VisitorAccess : ICoopPart
     private void Send(string message, ulong to, byte[] packed)
     {
         using var writer = new FastBufferWriter(packed.Length + 16, Allocator.Temp);
-        writer.WriteValueSafe(packed);
+        writer.WriteNetworkSerializable(new StashPacketMessage { Packed = packed });
         network.CustomMessagingManager.SendNamedMessage(message, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
+    }
+
+    // A guest asks for a VisitorRight.
+    private struct RightAskMessage : INetworkSerializable
+    {
+        public byte Right;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Right);
+    }
+
+    // The host's answer to it (a no also takes a yes back).
+    private struct RightAnswerMessage : INetworkSerializable
+    {
+        public byte Right;
+        public bool Yes;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Right);
+            serializer.SerializeValue(ref Yes);
+        }
+    }
+
+    // The stash both ways, packed (WorldTransfer.Pack): the host's snapshot (Stash), a guest's change (StashChange).
+    private struct StashPacketMessage : INetworkSerializable
+    {
+        public byte[] Packed;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Packed);
     }
 
     private static ContentDatabase content;

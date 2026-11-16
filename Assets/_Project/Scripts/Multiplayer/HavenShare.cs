@@ -122,11 +122,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
         {
             byte[] piece = pieces[index];
             using var writer = CoopLink.Writer(piece.Length + 256);
-            writer.WriteValueSafe(transfer);
-            writer.WriteValueSafe(index);
-            writer.WriteValueSafe(pieces.Count);
-            writer.WriteValueSafe(hostName);
-            writer.WriteValueSafe(piece);
+            writer.WriteNetworkSerializable(new WorldPieceMessage { Transfer = transfer, Index = index, Count = pieces.Count, HostName = hostName, Piece = piece });
             link.Send(WorldMessage, clientId, writer);
         }
 
@@ -136,12 +132,8 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
     private void OnWorldPiece(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int transfer);
-        reader.ReadValueSafe(out int index);
-        reader.ReadValueSafe(out int count);
-        reader.ReadValueSafe(out string hostName);
-        reader.ReadValueSafe(out byte[] piece);
-        byte[] packed = worldPieces.Add(transfer, index, count, piece);
+        reader.ReadNetworkSerializable(out WorldPieceMessage piece);
+        byte[] packed = worldPieces.Add(piece.Transfer, piece.Index, piece.Count, piece.Piece);
         if (packed == null)
         {
             return;
@@ -159,7 +151,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
             return;
         }
 
-        if (!HavenVisit.Begin(world, hostName, content, out string problem))
+        if (!HavenVisit.Begin(world, piece.HostName, content, out string problem))
         {
             VisitFailed?.Invoke(problem);
         }
@@ -193,7 +185,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
             foreach (byte[] packet in sync.Collect(false))
             {
                 using var writer = CoopLink.Writer(packet.Length + 16);
-                writer.WriteValueSafe(packet);
+                writer.WriteNetworkSerializable(new HavenPacketMessage { Packet = packet });
                 link.ToHost(EntitiesMessage, writer);
             }
         }
@@ -203,17 +195,17 @@ public sealed class HavenShare : ICoopPart, IDisposable
     private void SendPacket(string message, byte[] packet, ulong except)
     {
         using var writer = CoopLink.Writer(packet.Length + 16);
-        writer.WriteValueSafe(packet);
+        writer.WriteNetworkSerializable(new HavenPacketMessage { Packet = packet });
         link.ToGuests(message, writer, except);
     }
 
     // A guest's change: taken on here (the host's next look sends the result to everyone), and passed to the other guests.
     private void OnEntitiesFromGuest(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packet);
+        reader.ReadNetworkSerializable(out HavenPacketMessage changes);
         try
         {
-            sync.Apply(packet, true, noteMarks: false);
+            sync.Apply(changes.Packet, true, noteMarks: false);
         }
         catch (Exception exception)
         {
@@ -221,12 +213,12 @@ public sealed class HavenShare : ICoopPart, IDisposable
             return;
         }
 
-        SendPacket(EntitiesMessage, packet, sender);
+        SendPacket(EntitiesMessage, changes.Packet, sender);
     }
 
     private void OnEntitiesFromHost(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packet);
+        reader.ReadNetworkSerializable(out HavenPacketMessage changes);
         if (!HavenVisit.IsVisiting)
         {
             return;
@@ -234,7 +226,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
         try
         {
-            sync.Apply(packet, false);
+            sync.Apply(changes.Packet, false);
         }
         catch (Exception exception)
         {
@@ -244,7 +236,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
     private void OnSettlement(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packet);
+        reader.ReadNetworkSerializable(out HavenPacketMessage settlement);
         if (!HavenVisit.IsVisiting)
         {
             return;
@@ -252,7 +244,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
         try
         {
-            HavenSync.ApplySettlement(packet, content);
+            HavenSync.ApplySettlement(settlement.Packet, content);
         }
         catch (Exception exception)
         {
@@ -274,15 +266,15 @@ public sealed class HavenShare : ICoopPart, IDisposable
         WeatherSystem weather = WeatherSystem.Active;
         string weatherName = weather != null && weather.Weather != null ? weather.Weather.name : string.Empty;
         using var writer = CoopLink.Writer(16 + weatherName.Length * 2);
-        writer.WriteValueSafe(clock.Hour);
-        writer.WriteValueSafe(weatherName);
+        writer.WriteNetworkSerializable(new HavenClockMessage { Hour = clock.Hour, Weather = weatherName });
         link.ToGuests(ClockMessage, writer, CoopLink.NoOne, NetworkDelivery.Reliable);
     }
 
     private void OnClock(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out float hour);
-        reader.ReadValueSafe(out string weatherName);
+        reader.ReadNetworkSerializable(out HavenClockMessage told);
+        float hour = told.Hour;
+        string weatherName = told.Weather;
         // A raid keeps its own hour and weather (from its seed), wherever the host is.
         DayNightCycle clock = HavenVisit.IsVisiting && GameSession.ActiveRaid == null ? ClockHere() : null;
         if (clock == null)
@@ -348,5 +340,45 @@ public sealed class HavenShare : ICoopPart, IDisposable
         homeAfterRaid = false;
         HavenVisit.End(content != null ? content : Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
         return true;
+    }
+
+    // One piece of the host's world (WorldTransfer.Split): which transfer, which piece of how many, the host's name, the bytes.
+    private struct WorldPieceMessage : INetworkSerializable
+    {
+        public int Transfer;
+        public int Index;
+        public int Count;
+        public string HostName;
+        public byte[] Piece;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Transfer);
+            serializer.SerializeValue(ref Index);
+            serializer.SerializeValue(ref Count);
+            serializer.SerializeValue(ref HostName);
+            serializer.SerializeValue(ref Piece);
+        }
+    }
+
+    // What changed in the Haven (Entities) or the host's settlement (Settlement), packed by HavenSync.
+    private struct HavenPacketMessage : INetworkSerializable
+    {
+        public byte[] Packet;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Packet);
+    }
+
+    // The host's hour and weather (by name, or empty).
+    private struct HavenClockMessage : INetworkSerializable
+    {
+        public float Hour;
+        public string Weather;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Hour);
+            serializer.SerializeValue(ref Weather);
+        }
     }
 }

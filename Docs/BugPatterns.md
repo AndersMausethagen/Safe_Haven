@@ -97,7 +97,7 @@ quests, stops being possible by accident.
 | Guard | Status |
 |---|---|
 | 1. Save round-trip | built: `SaveCoverageTests` (every field of SettlementState with its residents and fallen, QuestLog, CharacterProgress with its journal; every ISaveable on the prefabs, its JSON probed and read back), `[NotSaved("why")]`. Found on building it: a purification batch's remainder was never saved |
-| 2. Messages as types | planned |
+| 2. Messages as types | built (format 28): every co-op message a struct written whole (CreatureSpawn, Poses, Strike, Hit, Stagger, Status, horses, drops, lands, lessons, pings, raid news, visitor rights, the Haven share...); `CoopWireTests` sees their fields; `CoopMessageTests` round-trips all 43 structs and forbids field-by-field writes. The bytes on the wire are as before |
 | 3. Declared co-op rules | planned |
 | 4. Placeholder bans, shown numbers | built: Attack Definition's six "below 0: the default" values are nullable (`OwnStaminaCost`, `OwnWindupMove`...), the sky-occlusion renderer too; `ConventionTests.APlaceholderValue_IsNeverHandedOutAsANumber`; the telegraph's colour reads the AI's own rule (`MonsterAI.AnyBlowBreaksStrike`), the Fight card and Frenzied the swing's real cost (`PlayerCombat.StaminaCostOf`, `LastSwingStaminaPaid`) |
 | 5. Creatures: one way in, puppets that only show | planned |

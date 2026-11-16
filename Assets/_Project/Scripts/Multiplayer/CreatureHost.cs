@@ -89,6 +89,8 @@ public sealed class CreatureHost
     private readonly Dictionary<ulong, FixedString128Bytes> friendPlace = new Dictionary<ulong, FixedString128Bytes>();
     private readonly List<Hosted> scratch = new List<Hosted>();
     private readonly List<(int id, SentPose pose)> outgoing = new List<(int, SentPose)>();
+    private readonly List<CreatureSpawn> spawning = new List<CreatureSpawn>();
+    private readonly List<CreaturePose> posing = new List<CreaturePose>();
     private readonly List<int> vanished = new List<int>();
     private readonly float healthPerFriend;
     private CoopLink link;
@@ -281,7 +283,7 @@ public sealed class CreatureHost
                 if (pair.Value.Remove(id))
                 {
                     using var writer = new FastBufferWriter(8, Allocator.Temp);
-                    writer.WriteValueSafe(id);
+                    writer.WriteNetworkSerializable(new CreatureIdMessage { Id = id });
                     link.Send(CoopCreatures.GoneMessage, pair.Key, writer);
                 }
             }
@@ -310,18 +312,22 @@ public sealed class CreatureHost
         {
             // Strings go two bytes a character: room to grow, up to a large batch.
             using var spawns = new FastBufferWriter(256 + scratch.Count * 192, Allocator.Temp, 256 * 1024);
-            spawns.WriteValueSafe(scratch.Count);
+            spawning.Clear();
             foreach (Hosted hosted in scratch)
             {
                 known.Add(hosted.Id);
-                spawns.WriteValueSafe(hosted.Id);
-                spawns.WriteValueSafe(hosted.PrefabId);
-                spawns.WriteValueSafe(hosted.Ai.transform.position);
-                spawns.WriteValueSafe(hosted.Ai.transform.eulerAngles.y);
-                spawns.WriteValueSafe(HealthByte(hosted));
-                spawns.WriteValueSafe(AffixesOf(hosted.Ai));
+                spawning.Add(new CreatureSpawn
+                {
+                    Id = hosted.Id,
+                    PrefabId = hosted.PrefabId,
+                    Position = hosted.Ai.transform.position,
+                    Yaw = hosted.Ai.transform.eulerAngles.y,
+                    Health = HealthByte(hosted),
+                    Affixes = AffixesOf(hosted.Ai),
+                });
             }
 
+            spawns.WriteNetworkSerializable(new CreatureSpawnMessage { Creatures = spawning });
             link.Send(CoopCreatures.SpawnMessage, clientId, spawns);
         }
 
@@ -367,23 +373,26 @@ public sealed class CreatureHost
         {
             int count = Mathf.Min(PosesPerMessage, outgoing.Count - from);
             using var poses = new FastBufferWriter(16 + count * 22, Allocator.Temp);
-            poses.WriteValueSafe(link.Now);
-            poses.WriteValueSafe((ushort)count);
+            posing.Clear();
             for (int i = from; i < from + count; i++)
             {
                 (int id, SentPose pose) = outgoing[i];
-                poses.WriteValueSafe((ushort)id);
-                poses.WriteValueSafe(pose.Position);
-                poses.WriteValueSafe(pose.Yaw);
-                poses.WriteValueSafe(pose.Speed);
-                poses.WriteValueSafe(pose.State);
-                poses.WriteValueSafe(pose.Health);
-                poses.WriteValueSafe(pose.Hunting);
-                poses.WriteValueSafe(pose.Poise);
-                poses.WriteValueSafe(pose.Notice);
-                poses.WriteValueSafe(pose.Noticing);
+                posing.Add(new CreaturePose
+                {
+                    Id = (ushort)id,
+                    Position = pose.Position,
+                    Yaw = pose.Yaw,
+                    Speed = pose.Speed,
+                    State = pose.State,
+                    Health = pose.Health,
+                    Hunting = pose.Hunting,
+                    Poise = pose.Poise,
+                    Notice = pose.Notice,
+                    Noticing = pose.Noticing,
+                });
             }
 
+            poses.WriteNetworkSerializable(new CreaturePosesMessage { Time = link.Now, Poses = posing });
             link.Send(CoopCreatures.PosesMessage, clientId, poses, NetworkDelivery.UnreliableSequenced);
         }
     }
@@ -487,15 +496,18 @@ public sealed class CreatureHost
             }
 
             using var writer = new FastBufferWriter(80, Allocator.Temp);
-            writer.WriteValueSafe(hosted.Id);
-            writer.WriteValueSafe(creature.LastAction);
-            writer.WriteValueSafe(at);
-            writer.WriteValueSafe(link.Now);
-            writer.WriteValueSafe(creature.transform.position);
-            writer.WriteValueSafe(creature.transform.eulerAngles.y);
-            writer.WriteValueSafe(aim);
-            writer.WriteValueSafe((byte)Mathf.Clamp(creature.StrikeFollowUps, 0, 255));
-            writer.WriteValueSafe(creature.StrikeHold);
+            writer.WriteNetworkSerializable(new CreatureStrikeMessage
+            {
+                Id = hosted.Id,
+                Action = creature.LastAction,
+                At = at,
+                Time = link.Now,
+                From = creature.transform.position,
+                Yaw = creature.transform.eulerAngles.y,
+                Aim = aim,
+                FollowUps = (byte)Mathf.Clamp(creature.StrikeFollowUps, 0, 255),
+                Hold = creature.StrikeHold,
+            });
             link.Send(CoopCreatures.StrikeMessage, pair.Key, writer);
         }
     }
@@ -512,7 +524,7 @@ public sealed class CreatureHost
             if (pair.Value.Remove(hosted.Id))
             {
                 using var writer = new FastBufferWriter(8, Allocator.Temp);
-                writer.WriteValueSafe(hosted.Id);
+                writer.WriteNetworkSerializable(new CreatureIdMessage { Id = hosted.Id });
                 link.Send(CoopCreatures.DiedMessage, pair.Key, writer);
             }
         }
@@ -539,7 +551,8 @@ public sealed class CreatureHost
     // A friend lit an extraction beacon on this run: its alarm group is filled here and hunts them.
     private void OnWake(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string path);
+        reader.ReadNetworkSerializable(out CreatureWakeMessage wake);
+        string path = wake.Path;
         FriendHitbox friend = FriendOnThisRun(sender);
         RaidDirector director = RaidDirector.Current;
         RaidGenerator generator = director != null ? director.GetComponentInChildren<RaidGenerator>() : null;
@@ -560,10 +573,11 @@ public sealed class CreatureHost
     // An event a friend set off made creatures: made here, by prefab id, and sent after them if they hunt.
     private void OnCall(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string prefabId);
-        reader.ReadValueSafe(out Vector3 position);
-        reader.ReadValueSafe(out float yaw);
-        reader.ReadValueSafe(out bool hunt);
+        reader.ReadNetworkSerializable(out CreatureCallMessage call);
+        string prefabId = call.PrefabId;
+        Vector3 position = call.Position;
+        float yaw = call.Yaw;
+        bool hunt = call.Hunt;
         FriendHitbox friend = FriendOnThisRun(sender);
         RaidDirector director = RaidDirector.Current;
         if (friend == null || director == null || (position - friend.transform.position).sqrMagnitude > CallReach * CallReach)
@@ -620,8 +634,9 @@ public sealed class CreatureHost
     // fought on, and its next strike played over the stagger in their game.
     private void OnStagger(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        reader.ReadValueSafe(out float seconds);
+        reader.ReadNetworkSerializable(out CreatureStaggerMessage stagger);
+        int id = stagger.Id;
+        float seconds = stagger.Seconds;
         if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
             || !(seconds > 0f) || FriendOnThisRun(sender) == null)
         {
@@ -635,8 +650,9 @@ public sealed class CreatureHost
     // which a great enchantment holds by reference).
     private void OnStatus(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        reader.ReadValueSafe(out FixedString64Bytes statusId);
+        reader.ReadNetworkSerializable(out CreatureStatusMessage laid);
+        int id = laid.Id;
+        FixedString64Bytes statusId = laid.StatusId;
         if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Health == null || !hosted.Health.IsAlive || FriendOnThisRun(sender) == null)
         {
             return;
@@ -675,16 +691,17 @@ public sealed class CreatureHost
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.
     private void OnHit(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out int id);
-        reader.ReadValueSafe(out float amount);
-        reader.ReadValueSafe(out byte type);
-        reader.ReadValueSafe(out bool critical);
-        reader.ReadValueSafe(out Vector3 point);
-        reader.ReadValueSafe(out Vector3 direction);
-        reader.ReadValueSafe(out float poise);
-        reader.ReadValueSafe(out int technique);
-        reader.ReadValueSafe(out byte strike);
-        reader.ReadValueSafe(out byte guard);
+        reader.ReadNetworkSerializable(out CreatureHitMessage hit);
+        int id = hit.Id;
+        float amount = hit.Amount;
+        byte type = hit.Type;
+        bool critical = hit.Critical;
+        Vector3 point = hit.Point;
+        Vector3 direction = hit.Direction;
+        float poise = hit.Poise;
+        int technique = hit.Technique;
+        byte strike = hit.Strike;
+        byte guard = hit.Guard;
         // From a friend still on this run, as the other friend messages ask: a late arrow from one who just extracted lands nowhere.
         if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
             || FriendOnThisRun(sender) == null)

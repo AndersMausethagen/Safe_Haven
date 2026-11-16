@@ -128,20 +128,16 @@ public sealed class CoopPings : ICoopPart
 
     private void OnPing(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out FixedString128Bytes place);
-        reader.ReadValueSafe(out Vector3 at);
-        reader.ReadValueSafe(out bool enemy);
-        reader.ReadValueSafe(out string who);
-        reader.ReadValueSafe(out ulong whoId);
+        reader.ReadNetworkSerializable(out PingMarkMessage ping);
         // The host passes a guest's ping on to the others.
         if (network.IsServer)
         {
-            Send(at, who, whoId, enemy, link.Guests(sender), place);
+            Send(ping.At, ping.Who, ping.WhoId, ping.Enemy, link.Guests(sender), ping.Place);
         }
 
-        if (place.Equals(CoopPlace.Key))
+        if (ping.Place.Equals(CoopPlace.Key))
         {
-            Show(at, who, whoId, enemy);
+            Show(ping.At, ping.Who, ping.WhoId, ping.Enemy);
         }
     }
 
@@ -153,12 +149,27 @@ public sealed class CoopPings : ICoopPart
         }
 
         using var writer = new FastBufferWriter(512, Allocator.Temp);
-        writer.WriteValueSafe(place ?? CoopPlace.Key);
-        writer.WriteValueSafe(at);
-        writer.WriteValueSafe(enemy);
-        writer.WriteValueSafe(who);
-        writer.WriteValueSafe(whoId);
+        writer.WriteNetworkSerializable(new PingMarkMessage { Place = place ?? CoopPlace.Key, At = at, Enemy = enemy, Who = who, WhoId = whoId });
         network.CustomMessagingManager.SendNamedMessage(PingMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
+    }
+
+    // The message: where (CoopPlace.Key), the spot, whether it is an enemy, and who made it (by name and client id).
+    private struct PingMarkMessage : INetworkSerializable
+    {
+        public FixedString128Bytes Place;
+        public Vector3 At;
+        public bool Enemy;
+        public string Who;
+        public ulong WhoId;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Place);
+            serializer.SerializeValue(ref At);
+            serializer.SerializeValue(ref Enemy);
+            serializer.SerializeValue(ref Who);
+            serializer.SerializeValue(ref WhoId);
+        }
     }
 
     private static void Show(Vector3 at, string who, ulong whoId, bool enemy)

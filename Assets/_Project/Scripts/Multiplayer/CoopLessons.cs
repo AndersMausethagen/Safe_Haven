@@ -49,7 +49,7 @@ public sealed class CoopLessons : ICoopPart
         foreach (KeyValuePair<ProficiencyDefinition, float> lesson in pending)
         {
             using var writer = new FastBufferWriter(256, Allocator.Temp);
-            Write(writer, CoopPlace.Key, at, lesson.Key.Id, lesson.Value);
+            writer.WriteNetworkSerializable(new PracticeMessage { Place = CoopPlace.Key, At = at, Skill = new FixedString64Bytes(lesson.Key.Id), Amount = lesson.Value });
             link.ToOthers(LessonMessage, writer);
         }
 
@@ -64,32 +64,38 @@ public sealed class CoopLessons : ICoopPart
 
     private void OnLesson(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out FixedString128Bytes place);
-        reader.ReadValueSafe(out Vector3 at);
-        reader.ReadValueSafe(out FixedString64Bytes skillId);
-        reader.ReadValueSafe(out float amount);
+        reader.ReadNetworkSerializable(out PracticeMessage lesson);
         // The host passes a guest's lesson on to the others.
         if (link.IsHost)
         {
             using var writer = new FastBufferWriter(256, Allocator.Temp);
-            Write(writer, place, at, skillId.ToString(), amount);
+            writer.WriteNetworkSerializable(lesson);
             link.ToGuests(LessonMessage, writer, sender);
         }
 
         LevelingSettings settings = LevelingSettings.Current;
-        ProficiencyDefinition skill = settings.FindSkill(skillId.ToString());
-        if (skill != null && Player.Current != null && place.Equals(CoopPlace.Key)
-            && (Player.Current.transform.position - at).sqrMagnitude <= settings.WatchReach * settings.WatchReach)
+        ProficiencyDefinition skill = settings.FindSkill(lesson.Skill.ToString());
+        if (skill != null && Player.Current != null && lesson.Place.Equals(CoopPlace.Key)
+            && (Player.Current.transform.position - lesson.At).sqrMagnitude <= settings.WatchReach * settings.WatchReach)
         {
-            ExperienceTracker.LearnByWatching(skill, amount * settings.WatchShare);
+            ExperienceTracker.LearnByWatching(skill, lesson.Amount * settings.WatchShare);
         }
     }
 
-    private static void Write(FastBufferWriter writer, FixedString128Bytes place, Vector3 at, string skill, float amount)
+    // The message: where (CoopPlace.Key) and where they stood, the skill's id, and how much was practised.
+    private struct PracticeMessage : INetworkSerializable
     {
-        writer.WriteValueSafe(place);
-        writer.WriteValueSafe(at);
-        writer.WriteValueSafe(new FixedString64Bytes(skill));
-        writer.WriteValueSafe(amount);
+        public FixedString128Bytes Place;
+        public Vector3 At;
+        public FixedString64Bytes Skill;
+        public float Amount;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Place);
+            serializer.SerializeValue(ref At);
+            serializer.SerializeValue(ref Skill);
+            serializer.SerializeValue(ref Amount);
+        }
     }
 }

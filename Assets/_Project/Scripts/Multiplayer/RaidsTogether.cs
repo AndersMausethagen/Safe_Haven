@@ -140,19 +140,19 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     {
         byte[] packet = WorldTransfer.Pack(invite);
         var writer = CoopLink.Writer(packet.Length + 16);
-        writer.WriteValueSafe(packet);
+        writer.WriteNetworkSerializable(new RaidOpenMessage { Packet = packet });
         return writer;
     }
 
     private void OnRaidOpen(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out byte[] packet);
+        reader.ReadNetworkSerializable(out RaidOpenMessage open);
         if (!HavenVisit.IsVisiting)
         {
             return;
         }
 
-        openRaid = WorldTransfer.Unpack<RaidInvite>(packet);
+        openRaid = WorldTransfer.Unpack<RaidInvite>(open.Packet);
         openRaidSince = Time.unscaledTime - Mathf.Max(0f, openRaid.elapsed);
         GameMessages.Post($"{HavenVisit.HostName} went through the portal. Use the portal to follow them.");
     }
@@ -203,45 +203,64 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
             RewardTogether(raid);
         }
 
-        using var writer = News(me, link.LocalId, (byte)gameEvent.Outcome, raid);
+        using var writer = News(new RaidNewsMessage { Who = me, WhoId = link.LocalId, Outcome = (byte)gameEvent.Outcome, Raid = raid });
         link.ToOthers(NewsMessage, writer);
     }
 
-    private static FastBufferWriter News(string who, ulong whoId, byte outcome, string raid)
+    private static FastBufferWriter News(in RaidNewsMessage told)
     {
         var writer = CoopLink.Writer(256);
-        writer.WriteValueSafe(who);
-        writer.WriteValueSafe(whoId);
-        writer.WriteValueSafe(outcome);
-        writer.WriteValueSafe(raid);
+        writer.WriteNetworkSerializable(told);
         return writer;
     }
 
     private void OnNews(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string who);
-        reader.ReadValueSafe(out ulong whoId);
-        reader.ReadValueSafe(out byte outcome);
-        reader.ReadValueSafe(out string raid);
+        reader.ReadNetworkSerializable(out RaidNewsMessage told);
         // The host passes a guest's news on to the others.
         if (link.IsHost)
         {
-            using var writer = News(who, whoId, outcome, raid);
+            using var writer = News(told);
             link.ToGuests(NewsMessage, writer, sender);
         }
 
-        news[whoId] = ((RaidOutcome)outcome, raid, Time.unscaledTime);
-        switch ((RaidOutcome)outcome)
+        news[told.WhoId] = ((RaidOutcome)told.Outcome, told.Raid, Time.unscaledTime);
+        switch ((RaidOutcome)told.Outcome)
         {
             case RaidOutcome.Extracted:
-                GameMessages.Post($"{who} got out of {raid} with their haul.", MessageKind.Gain);
+                GameMessages.Post($"{told.Who} got out of {told.Raid} with their haul.", MessageKind.Gain);
                 break;
             case RaidOutcome.Died:
-                GameMessages.Post($"{who} fell in {raid}.", MessageKind.Warning);
+                GameMessages.Post($"{told.Who} fell in {told.Raid}.", MessageKind.Warning);
                 break;
             case RaidOutcome.TimeExpired:
-                GameMessages.Post($"{who} was caught as {raid} closed.", MessageKind.Warning);
+                GameMessages.Post($"{told.Who} was caught as {told.Raid} closed.", MessageKind.Warning);
                 break;
+        }
+    }
+
+    // The host's run, packed (WorldTransfer.Pack of a RaidInvite).
+    private struct RaidOpenMessage : INetworkSerializable
+    {
+        public byte[] Packet;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Packet);
+    }
+
+    // How a player's raid ended: who (by name and client id), the RaidOutcome, and the raid's name.
+    private struct RaidNewsMessage : INetworkSerializable
+    {
+        public string Who;
+        public ulong WhoId;
+        public byte Outcome;
+        public string Raid;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Who);
+            serializer.SerializeValue(ref WhoId);
+            serializer.SerializeValue(ref Outcome);
+            serializer.SerializeValue(ref Raid);
         }
     }
 

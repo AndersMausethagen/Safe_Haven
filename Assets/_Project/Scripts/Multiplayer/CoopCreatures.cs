@@ -1,3 +1,8 @@
+using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Netcode;
+using UnityEngine;
+
 /// <summary>
 /// Creatures in co-op: the host's game runs them, friends on the same run or in the host's Haven see the host's (a friend's
 /// game makes none there: <see cref="CreatureSource.Remote"/>; it takes them over if the host leaves). Two roles, one per side:
@@ -101,4 +106,244 @@ public sealed class CoopCreatures : ICoopPart
 
     /// <summary>This friend is going into the host's run (see <see cref="CreaturePuppets.FollowHost"/>).</summary>
     public void FollowHost() => puppets.FollowHost();
+}
+
+// ---- The messages (CoopCreatures' list above), host to friend first, then friend to host.
+
+/// <summary><c>CreatureSpawn</c>: new creatures near a friend.</summary>
+public struct CreatureSpawnMessage : INetworkSerializable
+{
+    public List<CreatureSpawn> Creatures;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        int count = Creatures?.Count ?? 0;
+        serializer.SerializeValue(ref count);
+        if (serializer.IsReader)
+        {
+            Creatures = new List<CreatureSpawn>();
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            CreatureSpawn creature = serializer.IsReader ? default : Creatures[i];
+            creature.NetworkSerialize(serializer);
+            if (serializer.IsReader)
+            {
+                Creatures.Add(creature);
+            }
+        }
+    }
+}
+
+/// <summary>One new creature: its number, what to build it from, where, its health (a 255th) and its elite affixes ("Frenzied|Ironhide").</summary>
+public struct CreatureSpawn : INetworkSerializable
+{
+    public int Id;
+    public string PrefabId;
+    public Vector3 Position;
+    public float Yaw;
+    public byte Health;
+    public string Affixes;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref PrefabId);
+        serializer.SerializeValue(ref Position);
+        serializer.SerializeValue(ref Yaw);
+        serializer.SerializeValue(ref Health);
+        serializer.SerializeValue(ref Affixes);
+    }
+}
+
+/// <summary>
+/// <c>CreaturePoses</c>: the session's time and the poses (unreliable, so under one packet: CreatureHost.PosesPerMessage). Read in
+/// place into one kept message, its list reused, as it comes ten times a second.
+/// </summary>
+public struct CreaturePosesMessage : INetworkSerializable
+{
+    public double Time;
+    public List<CreaturePose> Poses;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Time);
+        ushort count = (ushort)(Poses?.Count ?? 0);
+        serializer.SerializeValue(ref count);
+        if (serializer.IsReader)
+        {
+            if (Poses == null)
+            {
+                Poses = new List<CreaturePose>(count);
+            }
+            else
+            {
+                Poses.Clear();
+            }
+        }
+
+        for (int i = 0; i < count; i++)
+        {
+            CreaturePose pose = serializer.IsReader ? default : Poses[i];
+            pose.NetworkSerialize(serializer);
+            if (serializer.IsReader)
+            {
+                Poses.Add(pose);
+            }
+        }
+    }
+}
+
+/// <summary>
+/// One creature's pose (22 bytes): position exact, the rest a byte each (facing in 256ths of a turn, speed in tenths, state,
+/// health and poise in 255ths, the hunting byte with CreatureHost's flags, how full its awareness is and whom it is noticing).
+/// </summary>
+public struct CreaturePose : INetworkSerializable
+{
+    public ushort Id;
+    public Vector3 Position;
+    public byte Yaw;
+    public byte Speed;
+    public byte State;
+    public byte Health;
+    public byte Hunting;
+    public byte Poise;
+    public byte Notice;
+    public byte Noticing;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref Position);
+        serializer.SerializeValue(ref Yaw);
+        serializer.SerializeValue(ref Speed);
+        serializer.SerializeValue(ref State);
+        serializer.SerializeValue(ref Health);
+        serializer.SerializeValue(ref Hunting);
+        serializer.SerializeValue(ref Poise);
+        serializer.SerializeValue(ref Notice);
+        serializer.SerializeValue(ref Noticing);
+    }
+}
+
+/// <summary>
+/// <c>CreatureStrike</c>: which creature, its action, at whom (a client id, or CoopLink.NoOne), when, where it began and faced,
+/// where it is aimed, and the string's follow-ups and hold.
+/// </summary>
+public struct CreatureStrikeMessage : INetworkSerializable
+{
+    public int Id;
+    public int Action;
+    public ulong At;
+    public double Time;
+    public Vector3 From;
+    public float Yaw;
+    public Vector3 Aim;
+    public byte FollowUps;
+    public float Hold;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref Action);
+        serializer.SerializeValue(ref At);
+        serializer.SerializeValue(ref Time);
+        serializer.SerializeValue(ref From);
+        serializer.SerializeValue(ref Yaw);
+        serializer.SerializeValue(ref Aim);
+        serializer.SerializeValue(ref FollowUps);
+        serializer.SerializeValue(ref Hold);
+    }
+}
+
+/// <summary><c>CreatureDied</c>, <c>CreatureGone</c>: which creature.</summary>
+public struct CreatureIdMessage : INetworkSerializable
+{
+    public int Id;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Id);
+}
+
+/// <summary>
+/// <c>CreatureHit</c>: a friend's blow on a puppet, as their game judged it: the DamageInfo's parts (type, technique and strike
+/// kind by number) and how the copy's guard took it (GuardOutcome).
+/// </summary>
+public struct CreatureHitMessage : INetworkSerializable
+{
+    public int Id;
+    public float Amount;
+    public byte Type;
+    public bool Critical;
+    public Vector3 Point;
+    public Vector3 Direction;
+    public float Poise;
+    public int Technique;
+    public byte Strike;
+    public byte Guard;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref Amount);
+        serializer.SerializeValue(ref Type);
+        serializer.SerializeValue(ref Critical);
+        serializer.SerializeValue(ref Point);
+        serializer.SerializeValue(ref Direction);
+        serializer.SerializeValue(ref Poise);
+        serializer.SerializeValue(ref Technique);
+        serializer.SerializeValue(ref Strike);
+        serializer.SerializeValue(ref Guard);
+    }
+}
+
+/// <summary><c>CreatureWake</c>: the extraction beacon's alarm group a friend woke, by its path (RaidGenerator.PathOf).</summary>
+public struct CreatureWakeMessage : INetworkSerializable
+{
+    public string Path;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Path);
+}
+
+/// <summary><c>CreatureCall</c>: a creature an event made for a friend: its prefab id, where, and whether it hunts.</summary>
+public struct CreatureCallMessage : INetworkSerializable
+{
+    public string PrefabId;
+    public Vector3 Position;
+    public float Yaw;
+    public bool Hunt;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref PrefabId);
+        serializer.SerializeValue(ref Position);
+        serializer.SerializeValue(ref Yaw);
+        serializer.SerializeValue(ref Hunt);
+    }
+}
+
+/// <summary><c>CreatureStagger</c>: which creature a friend staggered, and for how long.</summary>
+public struct CreatureStaggerMessage : INetworkSerializable
+{
+    public int Id;
+    public float Seconds;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref Seconds);
+    }
+}
+
+/// <summary><c>CreatureStatus</c>: which creature a friend laid a status on, and the status's id.</summary>
+public struct CreatureStatusMessage : INetworkSerializable
+{
+    public int Id;
+    public FixedString64Bytes StatusId;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref StatusId);
+    }
 }

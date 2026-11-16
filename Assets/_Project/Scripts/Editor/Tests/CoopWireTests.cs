@@ -9,8 +9,8 @@ using Unity.Netcode;
 /// The co-op wire format (MultiplayerSettings.WireFormat) is raised whenever a message changes, so builds that would misread
 /// each other's messages are turned away instead. A fingerprint of every message (its name, the fields of what is sent as a
 /// whole, and the signatures that write and read them) is kept here by format: change a message, and this fails until the
-/// format is raised and its new fingerprint put below. Messages written field by field inside a handler aren't seen: keep
-/// their writing in a Write/Read pair (CoopLands, CoopFishing...).
+/// format is raised and its new fingerprint put below. Every message is a struct, so its fields are seen here; a message
+/// written field by field inside a handler wouldn't be, and CoopMessageTests turns those away.
 /// </summary>
 public sealed class CoopWireTests
 {
@@ -30,6 +30,8 @@ public sealed class CoopWireTests
         // 2026-11-16 (combat review): a creature's strike carries its follow-ups and hold and is sent once a string, a friend's blow
         // carries its strike kind and how the guard took it, and poses a splintered shield (all written in handlers: same fingerprint).
         [27] = "fbdd95d903325dec171610c2ae9adaba",
+        // 2026-11-16 (guard 2): every message a struct; the fingerprint now sees their fields.
+        [28] = "710fc926782d06237bee24b71c43102c",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

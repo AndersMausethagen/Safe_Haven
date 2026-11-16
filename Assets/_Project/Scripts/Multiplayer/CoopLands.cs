@@ -94,40 +94,60 @@ public sealed class CoopLands : ICoopPart
     }
 
     /// <summary>The help message: what, who (a resident's id), the share and most a breach loses, and the run.</summary>
-    public static void WriteHelp(FastBufferWriter writer, HavenHelpKind kind, string id, float share, float most, int run)
-    {
-        writer.WriteValueSafe((byte)kind);
-        writer.WriteValueSafe(new FixedString64Bytes(id ?? string.Empty));
-        writer.WriteValueSafe(share);
-        writer.WriteValueSafe(most);
-        writer.WriteValueSafe(run);
-    }
+    public static void WriteHelp(FastBufferWriter writer, HavenHelpKind kind, string id, float share, float most, int run) =>
+        writer.WriteNetworkSerializable(new HavenHelpMessage { Kind = (byte)kind, Id = new FixedString64Bytes(id ?? string.Empty), Share = share, Most = most, Run = run });
 
     public static void ReadHelp(FastBufferReader reader, out HavenHelpKind kind, out string id, out float share, out float most, out int run)
     {
-        reader.ReadValueSafe(out byte what);
-        reader.ReadValueSafe(out FixedString64Bytes who);
-        reader.ReadValueSafe(out share);
-        reader.ReadValueSafe(out most);
-        reader.ReadValueSafe(out run);
-        kind = (HavenHelpKind)what;
-        id = who.ToString();
+        reader.ReadNetworkSerializable(out HavenHelpMessage help);
+        share = help.Share;
+        most = help.Most;
+        run = help.Run;
+        kind = (HavenHelpKind)help.Kind;
+        id = help.Id.ToString();
     }
 
     /// <summary>The message: what was done, where, and the task's kind or the run.</summary>
-    public static void Write(FastBufferWriter writer, LandWork work, string region, int detail)
-    {
-        writer.WriteValueSafe((byte)work);
-        writer.WriteValueSafe(new FixedString64Bytes(region));
-        writer.WriteValueSafe(detail);
-    }
+    public static void Write(FastBufferWriter writer, LandWork work, string region, int detail) =>
+        writer.WriteNetworkSerializable(new LandWorkMessage { Work = (byte)work, Region = new FixedString64Bytes(region), Detail = detail });
 
     public static void Read(FastBufferReader reader, out LandWork work, out string region, out int detail)
     {
-        reader.ReadValueSafe(out byte kind);
-        reader.ReadValueSafe(out FixedString64Bytes name);
-        reader.ReadValueSafe(out detail);
-        work = (LandWork)kind;
-        region = name.ToString();
+        reader.ReadNetworkSerializable(out LandWorkMessage message);
+        detail = message.Detail;
+        work = (LandWork)message.Work;
+        region = message.Region.ToString();
+    }
+
+    private struct HavenHelpMessage : INetworkSerializable
+    {
+        public byte Kind;
+        public FixedString64Bytes Id;
+        public float Share;
+        public float Most;
+        public int Run;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Kind);
+            serializer.SerializeValue(ref Id);
+            serializer.SerializeValue(ref Share);
+            serializer.SerializeValue(ref Most);
+            serializer.SerializeValue(ref Run);
+        }
+    }
+
+    private struct LandWorkMessage : INetworkSerializable
+    {
+        public byte Work;
+        public FixedString64Bytes Region;
+        public int Detail;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Work);
+            serializer.SerializeValue(ref Region);
+            serializer.SerializeValue(ref Detail);
+        }
     }
 }

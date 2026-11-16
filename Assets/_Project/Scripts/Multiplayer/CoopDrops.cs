@@ -141,7 +141,7 @@ public sealed class CoopDrops : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(128, Allocator.Temp);
-        writer.WriteValueSafe(item.ShareId);
+        writer.WriteNetworkSerializable(new DropIdMessage { Id = item.ShareId });
         network.CustomMessagingManager.SendNamedMessage(ClaimMessage, NetworkManager.ServerClientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
         return true;
     }
@@ -170,37 +170,29 @@ public sealed class CoopDrops : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(1024, Allocator.Temp, 64 * 1024);
-        writer.WriteValueSafe(place);
-        writer.WriteValueSafe(id);
-        writer.WriteValueSafe(state);
-        writer.WriteValueSafe(at);
-        writer.WriteValueSafe(facing);
+        writer.WriteNetworkSerializable(new SharedDropMessage { Place = place, Id = id, State = state, At = at, Facing = facing });
         network.CustomMessagingManager.SendNamedMessage(DropMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
     private void OnDrop(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out FixedString128Bytes place);
-        reader.ReadValueSafe(out string id);
-        reader.ReadValueSafe(out string state);
-        reader.ReadValueSafe(out Vector3 at);
-        reader.ReadValueSafe(out Quaternion facing);
+        reader.ReadNetworkSerializable(out SharedDropMessage drop);
         if (network.IsServer)
         {
-            SendDrop(id, state, at, facing, place, link.Guests(sender));
+            SendDrop(drop.Id, drop.State, drop.At, drop.Facing, drop.Place, link.Guests(sender));
         }
 
         KeepToThisScene();
-        if (!place.Equals(CoopPlace.Key) || drops.ContainsKey(id))
+        if (!drop.Place.Equals(CoopPlace.Key) || drops.ContainsKey(drop.Id))
         {
             return;
         }
 
-        DroppedItem item = DroppedItem.PlaceAt(state, at, facing);
+        DroppedItem item = DroppedItem.PlaceAt(drop.State, drop.At, drop.Facing);
         if (item != null)
         {
-            item.ShareId = id;
-            drops[id] = item;
+            item.ShareId = drop.Id;
+            drops[drop.Id] = item;
         }
     }
 
@@ -208,10 +200,11 @@ public sealed class CoopDrops : ICoopPart, IDisposable
 
     private void OnClaim(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string id);
+        reader.ReadNetworkSerializable(out DropIdMessage claim);
+        string id = claim.Id;
         bool free = drops.TryGetValue(id, out DroppedItem item) && item != null && !claimedBy.ContainsKey(id);
         using var writer = new FastBufferWriter(128, Allocator.Temp);
-        writer.WriteValueSafe(id);
+        writer.WriteNetworkSerializable(new DropIdMessage { Id = id });
         if (free)
         {
             claimedBy[id] = sender;
@@ -222,7 +215,8 @@ public sealed class CoopDrops : ICoopPart, IDisposable
 
     private void OnGranted(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string id);
+        reader.ReadNetworkSerializable(out DropIdMessage granted);
+        string id = granted.Id;
         string left = string.Empty;
         if (drops.TryGetValue(id, out DroppedItem item) && item != null && Player.Current != null)
         {
@@ -231,15 +225,15 @@ public sealed class CoopDrops : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(1024, Allocator.Temp, 64 * 1024);
-        writer.WriteValueSafe(id);
-        writer.WriteValueSafe(left);
+        writer.WriteNetworkSerializable(new DropLeftMessage { Id = id, Left = left });
         network.CustomMessagingManager.SendNamedMessage(ResultMessage, NetworkManager.ServerClientId, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
     private void OnResult(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string id);
-        reader.ReadValueSafe(out string left);
+        reader.ReadNetworkSerializable(out DropLeftMessage result);
+        string id = result.Id;
+        string left = result.Left;
         if (!claimedBy.TryGetValue(id, out ulong claimer) || claimer != sender)
         {
             return;
@@ -275,18 +269,16 @@ public sealed class CoopDrops : ICoopPart, IDisposable
         }
 
         using var writer = new FastBufferWriter(1024, Allocator.Temp, 64 * 1024);
-        writer.WriteValueSafe(id);
-        writer.WriteValueSafe(left);
+        writer.WriteNetworkSerializable(new DropLeftMessage { Id = id, Left = left });
         network.CustomMessagingManager.SendNamedMessage(UpdateMessage, to, writer, NetworkDelivery.ReliableFragmentedSequenced);
     }
 
     private void OnUpdate(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string id);
-        reader.ReadValueSafe(out string left);
-        if (drops.TryGetValue(id, out DroppedItem item))
+        reader.ReadNetworkSerializable(out DropLeftMessage update);
+        if (drops.TryGetValue(update.Id, out DroppedItem item))
         {
-            Apply(item, id, left);
+            Apply(item, update.Id, update.Left);
         }
     }
 
@@ -315,5 +307,45 @@ public sealed class CoopDrops : ICoopPart, IDisposable
     private static void ResetForNewPlaySession()
     {
         Current = null;
+    }
+
+    // A drop: where (CoopPlace.Key), its share id, its saved state, and how it lies.
+    private struct SharedDropMessage : INetworkSerializable
+    {
+        public FixedString128Bytes Place;
+        public string Id;
+        public string State;
+        public Vector3 At;
+        public Quaternion Facing;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Place);
+            serializer.SerializeValue(ref Id);
+            serializer.SerializeValue(ref State);
+            serializer.SerializeValue(ref At);
+            serializer.SerializeValue(ref Facing);
+        }
+    }
+
+    // A drop by its share id: a claim, and the host's yes (DropGranted) or no (DropDenied).
+    private struct DropIdMessage : INetworkSerializable
+    {
+        public string Id;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter => serializer.SerializeValue(ref Id);
+    }
+
+    // What is left of a drop after a pickup (its saved state, or empty when it is gone): DropResult, DropUpdate.
+    private struct DropLeftMessage : INetworkSerializable
+    {
+        public string Id;
+        public string Left;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Id);
+            serializer.SerializeValue(ref Left);
+        }
     }
 }

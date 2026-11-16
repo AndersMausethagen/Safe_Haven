@@ -61,40 +61,62 @@ public sealed class CoopDecisions : ICoopPart
         }
 
         using FastBufferWriter writer = CoopLink.Writer(256, 16 * 1024);
-        writer.WriteValueSafe(name ?? "");
-        writer.WriteValueSafe(args ?? "");
-        writer.WriteValueSafe(paid ?? "");
+        writer.WriteNetworkSerializable(new DecisionAskMessage { Name = name ?? "", Args = args ?? "", Paid = paid ?? "" });
         link.ToHost(AskMessage, writer);
         return true;
     }
 
     private void OnAsk(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out string name);
-        reader.ReadValueSafe(out string args);
-        reader.ReadValueSafe(out string paid);
-        HavenDecisions.Outcome outcome = HavenDecisions.Make(name, args);
+        reader.ReadNetworkSerializable(out DecisionAskMessage ask);
+        HavenDecisions.Outcome outcome = HavenDecisions.Make(ask.Name, ask.Args);
         if (outcome.Done && !string.IsNullOrEmpty(outcome.Text))
         {
             GameMessages.Post($"{NetworkPlayerAvatar.NameOf(sender)}, for your Haven: {outcome.Text}", MessageKind.Info);
         }
 
         using FastBufferWriter writer = CoopLink.Writer(256, 16 * 1024);
-        writer.WriteValueSafe(outcome.Done);
-        writer.WriteValueSafe(outcome.Text ?? "");
-        writer.WriteValueSafe(outcome.Done ? "" : paid ?? "");
+        writer.WriteNetworkSerializable(new DecisionAnswerMessage { Done = outcome.Done, Text = outcome.Text ?? "", Paid = outcome.Done ? "" : ask.Paid ?? "" });
         link.Send(AnswerMessage, sender, writer);
     }
 
     private static void OnAnswer(ulong sender, FastBufferReader reader)
     {
-        reader.ReadValueSafe(out bool done);
-        reader.ReadValueSafe(out string text);
-        reader.ReadValueSafe(out string paid);
-        HavenDecisions.Say(done ? HavenDecisions.Outcome.Made(text) : HavenDecisions.Outcome.Refused(text));
-        if (!done)
+        reader.ReadNetworkSerializable(out DecisionAnswerMessage answer);
+        HavenDecisions.Say(answer.Done ? HavenDecisions.Outcome.Made(answer.Text) : HavenDecisions.Outcome.Refused(answer.Text));
+        if (!answer.Done)
         {
-            HavenDecisions.GiveBack(paid);
+            HavenDecisions.GiveBack(answer.Paid);
+        }
+    }
+
+    // A guest's ask: the decision's name, what it is about, and what they paid.
+    private struct DecisionAskMessage : INetworkSerializable
+    {
+        public string Name;
+        public string Args;
+        public string Paid;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Name);
+            serializer.SerializeValue(ref Args);
+            serializer.SerializeValue(ref Paid);
+        }
+    }
+
+    // The host's answer: made or not, what to say, and the payment to give back when not.
+    private struct DecisionAnswerMessage : INetworkSerializable
+    {
+        public bool Done;
+        public string Text;
+        public string Paid;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref Done);
+            serializer.SerializeValue(ref Text);
+            serializer.SerializeValue(ref Paid);
         }
     }
 }
