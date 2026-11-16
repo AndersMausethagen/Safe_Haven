@@ -209,7 +209,8 @@ public sealed class PrologueWaveEnemy
     public GameObject prefab;
     [Tooltip("How often it comes, against the others' weights.")]
     [Min(0f)] public float weight = 1f;
-    [Tooltip("It comes from this wave on (1 = the enemies waiting when the hold starts).")]
+    [Tooltip("It comes from this wave on. At the camp, 1 = the enemies waiting when the defence starts. At the portal the enemies " +
+             "waiting and the first timed wave are both 1, so 2 comes with the second timed wave (kept on purpose: the gentler hold).")]
     [Min(1)] public int fromWave = 1;
 
     public bool Allowed(int wave) => prefab != null && weight > 0f && Mathf.Max(1, wave) >= fromWave;

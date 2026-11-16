@@ -184,7 +184,7 @@ public sealed class WardBreachDirector : MonoBehaviour
 
         if (settlement.Breach != BreachStatus.Pending)
         {
-            int due = settlement.BreachesWon == 0 ? next.AvailableAfterExtractions : settlement.NextBreachAt;
+            int due = settlement.BreachesWon == 0 ? next.AvailableAfterExtractions : settlement.NextBreachAt; // as SettlementState.NextBreachDueAt
             if (settlement.SuccessfulExtractions < due)
             {
                 return;

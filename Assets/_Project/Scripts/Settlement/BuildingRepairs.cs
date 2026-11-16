@@ -81,11 +81,26 @@ public static class BuildingRepairs
         string costs = resources.Count > 0 ? AmountText.Describe(resources) + (items.Count > 0 ? ", " : "") : "";
         string detail = $"{damaged.Count} damaged: {costs}{(items.Count > 0 ? AmountText.Describe(items) : "")}";
         string lacking = affordable ? "" : $"   <color={UIStyle.Hex(UIStyle.Current.Danger)}>{missing}</color>";
+        // Not in the middle of a fight for the Haven (the user, 2026-11-16): every wall made whole at once mid-breach.
+        if (UnderAttack)
+        {
+            return new MenuAction("Mend the clearing", "Not while the Haven is under attack", false, () => { });
+        }
+
         return new MenuAction("Mend the clearing", detail + lacking, affordable, () => Mend(user));
     }
 
+    private static bool UnderAttack => (WardBreachDirector.Current != null && WardBreachDirector.Current.IsUnderWay)
+                                       || (CorruptionNights.Current != null && CorruptionNights.Current.IsActive);
+
     private static void Mend(GameObject user)
     {
+        if (UnderAttack)
+        {
+            GameMessages.Post("Not while the Haven is under attack.", MessageKind.Warning);
+            return;
+        }
+
         List<Damageable> damaged = Damaged();
         Cost(damaged, MendShare, out List<ResourceAmount> resources, out List<ItemAmount> items);
         if (!MaterialPool.For(user).TrySpend(resources, items))

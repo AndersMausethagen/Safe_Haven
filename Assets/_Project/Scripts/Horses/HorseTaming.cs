@@ -149,6 +149,14 @@ public sealed class HorseTaming : MonoBehaviour
             return;
         }
 
+        // A window over the taming (the bag, the map) holds it (the user, 2026-11-16): its HUD is hidden and its keys can't be
+        // pressed, and strain, patience and balance ran on, the horse slipping away unseen.
+        if (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen)
+        {
+            Hold(Time.deltaTime);
+            return;
+        }
+
         AudioManager.KeepCombat();
         switch (phase)
         {
@@ -184,6 +192,30 @@ public sealed class HorseTaming : MonoBehaviour
         }
 
         UpdateRope();
+    }
+
+    // Every clock of the taming moves on by what was held, so nothing comes due while it waits.
+    private void Hold(float seconds)
+    {
+        Later(ref lungeUntil, seconds);
+        Later(ref mountUntil, seconds);
+        Later(ref nextAsk, seconds);
+        Later(ref askUntil, seconds);
+        Later(ref veerUntil, seconds);
+        Later(ref nextVeer, seconds);
+        Later(ref lastResisted, seconds);
+        Later(ref tellUntil, seconds);
+        Later(ref balkUntil, seconds);
+        Later(ref rearUntil, seconds);
+    }
+
+    // 0 is "not set" for some (a rear not under way): left so.
+    private static void Later(ref float time, float seconds)
+    {
+        if (time > 0f)
+        {
+            time += seconds;
+        }
     }
 
     private void UpdateStruggle()

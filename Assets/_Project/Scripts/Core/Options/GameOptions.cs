@@ -61,7 +61,8 @@ public static class GameOptions
     {
         new[] { 0.75f, 0f, 0f, 0f, 0f, 0f, 0.4f, 0f, 1f },
         new[] { 0.85f, 1f, 1f, 1f, 1f, 1f, 0.7f, 1f, 2f },
-        new[] { 1f, 2f, 1f, 1f, 1f, 2f, 0.85f, 2f, 2f },
+        // High: high shadows (the user, 2026-11-16: it had Medium's, and only Ultra was higher).
+        new[] { 1f, 2f, 2f, 1f, 1f, 2f, 0.85f, 2f, 2f },
         new[] { 1f, 2f, 3f, 1f, 2f, 3f, 1f, 2f, 2f },
     };
 

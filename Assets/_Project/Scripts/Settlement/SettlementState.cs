@@ -244,8 +244,25 @@ public sealed class SettlementState
     /// <summary>Share taken off the next breach by what was done to its source in a raid. 0 when nothing was.</summary>
     public float BreachWeakening { get; private set; }
 
-    /// <summary>True when a breach is waiting, or the next successful raid will bring one on.</summary>
-    public bool BreachIsNear => Breach == BreachStatus.Pending || (BreachesWon > 0 && SuccessfulExtractions + 1 >= NextBreachAt);
+    /// <summary>True when a breach is waiting, or the next successful raid will bring one on: the first one too (the user,
+    /// 2026-11-16), at the extraction its definition comes after, as WardBreachDirector.Announce reckons it.</summary>
+    public bool BreachIsNear => Breach == BreachStatus.Pending || SuccessfulExtractions + 1 >= NextBreachDueAt;
+
+    /// <summary>The successful raid count the next breach comes at: the first breach's own (Available After Extractions), then
+    /// NextBreachAt. One rule for the rumour and the announcement.</summary>
+    public int NextBreachDueAt
+    {
+        get
+        {
+            if (BreachesWon > 0)
+            {
+                return NextBreachAt;
+            }
+
+            WardBreachDefinition first = WardBreachSettings.Current != null ? WardBreachSettings.Current.For(0) : null;
+            return first != null ? first.AvailableAfterExtractions : int.MaxValue;
+        }
+    }
 
     public IReadOnlyList<ResidentRecord> Residents => residents;
 
