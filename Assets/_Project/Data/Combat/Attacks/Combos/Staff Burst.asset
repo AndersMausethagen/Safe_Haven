@@ -53,7 +53,7 @@ MonoBehaviour:
   animationSpeed: 0.88607645
   strikeSpeed: 1.25
   strikeLead: 0.1866668
-  followThroughSpeed: 0.9
+  followThroughSpeed: 0.20513731
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

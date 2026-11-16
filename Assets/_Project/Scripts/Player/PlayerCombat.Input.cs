@@ -44,14 +44,24 @@ public sealed partial class PlayerCombat
             {
                 // Without a shield, attacking drops the guard into an art, paid in Focus or else in stamina: the attuned rune's
                 // (ArtRunes) when there is one, else the weapon's own; a plain swing only when neither can pay.
-                guard.Lower();
                 artFromRune = ArtRunes.For(weapon) != null;
                 if (CanAffordArt)
                 {
+                    // Not ready yet (its cooldown, or the weapon out on a throw): the guard stays up and the press asks for nothing
+                    // else, instead of dropping the guard for an art that then quietly doesn't start (review 2026-11-16).
+                    if (ArtCoolingDown)
+                    {
+                        artFromRune = false;
+                        ArtNotReady?.Invoke();
+                        return;
+                    }
+
+                    guard.Lower();
                     Request(SwingKind.Art, ChainPress.Late);
                     return;
                 }
 
+                guard.Lower();
                 artFromRune = false;
             }
         }
@@ -162,6 +172,13 @@ public sealed partial class PlayerCombat
             return;
         }
 
+        // Not ready yet: the guard stays up and nothing is spent.
+        if (ArtCoolingDown)
+        {
+            ArtNotReady?.Invoke();
+            return;
+        }
+
         if (guard != null && guard.IsGuarding)
         {
             guard.Lower();
@@ -185,7 +202,7 @@ public sealed partial class PlayerCombat
         // Still winding up the light swing this press began (at once, or buffered behind the swing before): it becomes the
         // heavy one, paying only the difference. A counter stays a counter, and without the stamina for the difference the
         // light swing goes on.
-        bool turn = activeKind == SwingKind.Light && activeStartTime >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
+        bool turn = weapon != null && activeKind == SwingKind.Light && activeStartTime >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
         heavyStarted = true;
         pressTime = -1f;
         if (turn)

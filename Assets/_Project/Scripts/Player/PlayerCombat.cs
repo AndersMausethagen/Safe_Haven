@@ -78,6 +78,9 @@ public sealed partial class PlayerCombat : MonoBehaviour
     // Recovery for an attack that has no definition, so unconfigured attacks still animate and can't be spammed.
     private const float FallbackRecoveryTime = 0.6f;
     private const float LungeSeconds = 0.12f;
+    /// <summary>The least time a charged attack let go from the hold (ChargedFromHold) takes to land: the animation's blend into it
+    /// (PlayerAnimationController) is this long, so the blow never lands mid-blend.</summary>
+    internal const float ChargedReleaseSeconds = 0.04f;
     // How close a lunge stops before the target's edge.
     private const float LungeStandOff = 0.8f;
 
@@ -212,6 +215,11 @@ public sealed partial class PlayerCombat : MonoBehaviour
         get => weapon;
         set
         {
+            if (value != weapon)
+            {
+                DropSwingForSwap();
+            }
+
             weapon = value;
             lastStep = -1;
             momentum = 0;
@@ -469,6 +477,21 @@ public sealed partial class PlayerCombat : MonoBehaviour
         bool running = activeKind == SwingKind.None && !movement.IsDashing && settings != null
             && movement.HorizontalSpeed >= settings.MoveSpeed * Rules.RushRunShare;
         runningFor = running ? runningFor + Time.deltaTime : 0f;
+    }
+
+    // A weapon put away or swapped mid-swing: the press held for the old one is let go (it would grow into the new weapon's heavy, or
+    // read a weapon no longer there), nothing buffered carries over, and a wind-up not yet landed is lost. A blow already landed
+    // recovers as it was.
+    private void DropSwingForSwap()
+    {
+        pressTime = -1f;
+        heldEarlyPress = false;
+        queuedKind = SwingKind.None;
+        forcedAttack = null;
+        if (activeKind != SwingKind.None && hitPending)
+        {
+            EndSwing();
+        }
     }
 
     private void AnnounceWeapon()

@@ -48,6 +48,13 @@ public sealed partial class PlayerCombat
         }
     }
 
+    /// <summary>Raised when an art is asked for before it can start (its cooldown, or the weapon still out on a throw): nothing is
+    /// spent, and attacking out of the guard leaves the guard up.</summary>
+    public event Action ArtNotReady;
+
+    // The art can't start yet: still cooling down from the last one, or the weapon is out on a throw.
+    private bool ArtCoolingDown => Time.time < artReadyAt || WeaponInFlight;
+
     /// <summary>Raised when the weapon's signature does its thing to a creature (a crush, a stopped charge, a broken guard), for feedback.</summary>
     public event Action<WeaponSignature, MonsterAI> SignatureUsed;
 

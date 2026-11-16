@@ -56,6 +56,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private const float ActionFade = 0.06f;
     // A heavy swing grows out of the light one its press began, so that blend is long enough not to read as a restart.
     private const float HeavyFade = 0.16f;
+    // A charged attack let go from the hold is already at the top of its backswing: a short blend, done before its blow.
+    private const float ChargedReleaseFade = PlayerCombat.ChargedReleaseSeconds;
     // How slowly the light swing's legs give way when a held press grows it into the planted heavy one.
     private const float GrownLegsFade = 0.25f;
     // Out of a dodge the body is already moving, so a rush attack needn't snap into its first frame.

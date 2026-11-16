@@ -13,7 +13,8 @@ using UnityEngine;
 /// <item>the anticipation [0, end of wind-up] plays at Animation Speed: all the slowing that makes a blow readable lives here;</item>
 /// <item>the swing [end of wind-up, contact] plays at Strike Speed, never slower than the clip (Strike Lead covers exactly it);</item>
 /// <item>the blow lands on the clip's contact, not after the weapon has passed;</item>
-/// <item>the follow-through plays at the clip's own momentum (0.9 to 1.3), fitted to the chain point only within that.</item>
+/// <item>the follow-through plays at the clip's own momentum (0.9 to 1.3), fitted to the chain point only within that, unless the
+/// clip's tail is too short to last until the recovery even at 0.9: then just slow enough to reach it.</item>
 /// </list>
 /// Measured on the player's rig (the weapon hand's speed), as CombatAnimationSetup measures contacts. Used once to re-time the attack
 /// assets and by CombatSwingTimingTests to keep them so; not a builder.
@@ -97,6 +98,33 @@ public static class CombatSwingTiming
         return swings;
     }
 
+    /// <summary>
+    /// Clip time at which the attack's standing (Combat Full Body) state starts to blend out by itself: its earliest exit-time
+    /// transition, else the clip's end. Past it the character heads back to idle whatever the swing's gameplay is doing.
+    /// </summary>
+    public static float BlendsOutAt(AttackDefinition attack, AnimationClip clip)
+    {
+        var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(Controller);
+        foreach (AnimatorControllerLayer layer in controller.layers)
+        {
+            if (layer.name != "Combat Full Body")
+            {
+                continue;
+            }
+
+            foreach (ChildAnimatorState child in layer.stateMachine.states)
+            {
+                if (child.state.name == attack.AnimationState)
+                {
+                    float exit = child.state.transitions.Where(t => t.hasExitTime).Select(t => t.exitTime).DefaultIfEmpty(1f).Min();
+                    return Mathf.Min(1f, exit) * clip.length;
+                }
+            }
+        }
+
+        return clip.length;
+    }
+
     // A state left after more than one pass of its clip loops it (a whirlwind): it has no one contact to fit.
     private static bool LeavesLate(AnimatorState state) => state.transitions.Any(t => t.hasExitTime && t.exitTime > 1.01f);
 
@@ -174,6 +202,12 @@ public static class CombatSwingTiming
         float tail = clip.length - contact;
         float chain = attack.RecoveryTime - hit;
         float follow = chain > 0.05f ? Mathf.Clamp(tail / chain, SlowestFollow, FastestFollow) : 1f;
+        // A tail too short to last until the recovery even at Slowest Follow plays slower still, just enough to reach it: else the
+        // clip ran out and blended to idle while the swing was still recovering (review 2026-11-16).
+        if (chain > 0.05f && tail > 0f && tail / follow < chain)
+        {
+            follow = tail / chain;
+        }
 
         // A clip that is already moving from its first frame has no wind-up to slow: it plays evenly to the contact.
         if (windupEnd < 0.06f)

@@ -14,6 +14,11 @@ public sealed partial class PlayerCombat
         // cooldown, so a second press mid-throw doesn't strike again.
         if (WeaponInFlight || (kind == SwingKind.Art && Time.time < artReadyAt))
         {
+            if (kind == SwingKind.Art)
+            {
+                ArtNotReady?.Invoke();
+            }
+
             return;
         }
 
@@ -57,8 +62,6 @@ public sealed partial class PlayerCombat
                 {
                     return;
                 }
-
-                artReadyAt = Time.time + Rules.ArtCooldown;
 
                 // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
                 artOnStamina = focus != null && !focus.TrySpend(ArtFocus);
@@ -109,6 +112,11 @@ public sealed partial class PlayerCombat
 
         forcedAttack = null;
         activeIsFollowUp = followUp;
+        // The cooldown runs from an art that really begins: one refused for want of stamina above doesn't start it.
+        if (kind == SwingKind.Art)
+        {
+            artReadyAt = Time.time + Rules.ArtCooldown;
+        }
 
         fumbled = false;
         rhythm = kind == SwingKind.Light && step > 0 ? (judge == ChainPress.Rhythm ? Mathf.Min(rhythm + 1, MaxRhythm) : 0) : 0;
@@ -188,7 +196,10 @@ public sealed partial class PlayerCombat
 
         activeForceCritical |= attack != null && attack.AlwaysCritical;
         activeTechnique = technique;
-        activeStartTime = Time.time;
+        // A full charge let go (ChargedFromHold): the hold was its wind-up, so its clock starts where only the strike is left. Set
+        // here, before SwingStarted, so the animation and the whoosh time themselves from the real moment of the blow (shifting it
+        // afterwards left the whoosh scheduled after the blow, so it never played).
+        activeStartTime = Time.time - (ChargedFromHold && attack != null ? ChargedWindupSkipped(attack, activeSpeed) : 0f);
         chargeHeld = 0f;
         holdWaited = 0f;
         waitingForHold = false;
@@ -423,6 +434,9 @@ public sealed partial class PlayerCombat
         if (waitingForHold)
         {
             holdWaited += Time.deltaTime;
+            // It stands still as a charging heavy does, and can be aimed as that can.
+            TrackFocus();
+            TrackAim(ActiveElapsed, hitAt, true);
         }
 
         return waitingForHold;
@@ -435,17 +449,18 @@ public sealed partial class PlayerCombat
         EndSwing();
         forcedAttack = charged;
         heavyCredit = float.MaxValue;
+        // The hold was its wind-up: it strikes now, not after a second one (the user, 2026-11-15: it went back to a standing pose,
+        // wound up again, then struck). Begin starts its clock past the wind-up (ChargedWindupSkipped).
         ChargedFromHold = true;
         Begin(SwingKind.Heavy, ChainPress.Late);
         ChargedFromHold = false;
         heavyCredit = 0f;
-        // The hold was its wind-up: it strikes now, not after a second one (the user, 2026-11-15: it went back to a standing pose,
-        // wound up again, then struck). Only the strike's own moment is left before the blow.
-        if (activeKind == SwingKind.Heavy && activeAttack == charged && hitPending)
-        {
-            activeStartTime -= Mathf.Max(0f, HitAt(charged, activeSpeed) - Mathf.Max(charged.StrikeLead, 0.02f));
-        }
     }
+
+    // How much of a charged attack's wind-up the hold stood in for: all but the strike's own moment, and never less than the blend
+    // into it (ChargedReleaseSeconds) left before the blow.
+    private static float ChargedWindupSkipped(AttackDefinition charged, float speed) =>
+        Mathf.Max(0f, HitAt(charged, speed) - Mathf.Max(charged.StrikeLead, ChargedReleaseSeconds));
 
     // Out of a dodge that went away from where the player aims: the backstep, and the weapon's backstep attack.
     private bool IsBackstep() => dodge != null && (dodge.IsDodging || dodge.JustDodged(Rules.RushAfterDodgeSeconds))
@@ -500,10 +515,14 @@ public sealed partial class PlayerCombat
         movement.SnapFacing(activeDirection);
         float distance = activeMotion == ArtMotion.DashThrough ? activeLunge
             : targetDistance >= 0f ? Mathf.Clamp(targetDistance - LungeStandOff, 0f, activeLunge) : activeLunge * 0.5f;
-        // Walking back or aside while swinging keeps that way: the blow doesn't drag the player forward (the user, 2026-11-15).
+        // Walking back or aside while swinging keeps that way: an ordinary blow doesn't drag the player forward (the user, 2026-11-15).
+        // An art that moves the player (a leap, a dash: all its distance is this step) and a heavy, charged or counter blow stepping in
+        // toward a target keep their step: those are the move itself, and strafing left a leap art going nowhere (review 2026-11-16).
         Vector3 walking = movement.MovementInput;
         walking.y = 0f;
-        if (activeMotion != ArtMotion.DashThrough && walking.sqrMagnitude > 0.04f && Vector3.Dot(walking.normalized, activeDirection) < 0.5f)
+        bool committed = activeMotion != ArtMotion.None
+            || (targetDistance >= 0f && (activeKind == SwingKind.Heavy || (activeTechnique & (HitTechnique.Charged | HitTechnique.Counter)) != 0));
+        if (!committed && walking.sqrMagnitude > 0.04f && Vector3.Dot(walking.normalized, activeDirection) < 0.5f)
         {
             distance = 0f;
         }

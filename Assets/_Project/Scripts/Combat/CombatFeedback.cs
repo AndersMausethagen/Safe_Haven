@@ -31,9 +31,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private PlayerArchery playerArchery;
     private CombatScreenEffects screen;
     private ComboHud comboHud;
-    // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead).
+    // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead), and which swing it is for.
     private SoundDefinition pendingSwingSound;
-    private float pendingSwingAt;
     private float pendingSwingStart;
 
     public static CombatFeedback Current { get; private set; }
@@ -117,25 +116,29 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         PlayPendingSwingSound();
     }
 
-    // Only if that swing is still winding up: a swing dodged out of, lost to a flinch or turned heavy stays silent.
+    // The whoosh comes Swing Sound Lead before the blow, timed from the swing's own clock (PlayerCombat.TimeToHit), so a swing that
+    // stands still at the top of its wind-up (a heavy charging, a light one waiting to see whether its press is held) whooshes only
+    // once it moves on, and a charged attack let go from the hold, with less than the lead left, whooshes at once. Only if that swing
+    // is still winding up: a swing dodged out of, lost to a flinch or turned heavy stays silent.
     private void PlayPendingSwingSound()
     {
-        if (pendingSwingSound == null || Time.time < pendingSwingAt)
+        if (pendingSwingSound == null)
         {
             return;
         }
 
-        // A heavy swing held at the top of its wind-up: the whoosh waits for the strike.
-        if (playerCombat != null && playerCombat.IsCharging && Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
+        if (playerCombat == null || !playerCombat.IsWindingUp || !Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
+        {
+            pendingSwingSound = null;
+            return;
+        }
+
+        if (playerCombat.IsHoldingSwing || playerCombat.TimeToHit > feel.SwingSoundLead)
         {
             return;
         }
 
-        if (playerCombat != null && playerCombat.IsWindingUp && Mathf.Approximately(playerCombat.SwingStartTime, pendingSwingStart))
-        {
-            AudioManager.Play(pendingSwingSound, playerCombat.transform.position + Vector3.up);
-        }
-
+        AudioManager.Play(pendingSwingSound, playerCombat.transform.position + Vector3.up);
         pendingSwingSound = null;
     }
 
@@ -436,6 +439,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.CounterReady -= OnCounterReady;
             playerCombat.ChargeFull -= OnChargeFull;
             playerCombat.SignatureUsed -= OnSignatureUsed;
+            playerCombat.ArtNotReady -= OnArtNotReady;
         }
 
         if (playerDodge != null)
@@ -478,6 +482,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             playerCombat.CounterReady += OnCounterReady;
             playerCombat.ChargeFull += OnChargeFull;
             playerCombat.SignatureUsed += OnSignatureUsed;
+            playerCombat.ArtNotReady += OnArtNotReady;
         }
 
         if (playerDodge != null)
@@ -520,9 +525,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             return;
         }
 
-        float landsIn = swing.Attack.HitDelay / Mathf.Max(0.01f, swing.Speed);
         pendingSwingSound = sound;
-        pendingSwingAt = Time.time + Mathf.Max(0f, landsIn - feel.SwingSoundLead);
         pendingSwingStart = playerCombat.SwingStartTime;
         PlayPendingSwingSound();
     }
@@ -609,6 +612,12 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private void OnStaminaRefused()
     {
         AudioManager.Play(Sounds != null ? Sounds.OutOfStamina : null, playerStamina.transform.position);
+    }
+
+    // An art asked for while it is still cooling down: the same short refusal, so the press isn't simply lost.
+    private void OnArtNotReady()
+    {
+        AudioManager.Play(Sounds != null ? Sounds.OutOfStamina : null, playerCombat.transform.position);
     }
 
     // A dodge that avoided a hit some other way (not during its own invulnerability) still says so.

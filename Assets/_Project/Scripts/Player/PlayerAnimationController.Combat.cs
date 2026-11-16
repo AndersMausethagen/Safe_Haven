@@ -179,16 +179,21 @@ public sealed partial class PlayerAnimationController
             start = windupClip * grownFrom;
         }
 
-        // A full charge let go: the charged attack starts at the top of its backswing (where its wind-up ends), as the hold stood there.
+        // A full charge let go: the charged attack starts at the top of its backswing (where its wind-up ends), as the hold stood there,
+        // or as much before it as the blow is still away (PlayerCombat leaves at least the blend's length), and blends in quickly: only
+        // the strike is left, and the long heavy blend had the blow land mid-blend (review 2026-11-16).
         bool fromHold = swing.Kind == SwingKind.Heavy && combat != null && combat.ChargedFromHold;
+        bool striking = false;
         if (fromHold)
         {
             AttackDefinition charged = swing.Attack;
-            start = charged.AnimationSpeed * Mathf.Max(0f, charged.HitDelay - charged.StrikeLead * swing.Speed);
+            float left = Mathf.Max(combat.TimeToHit, charged.StrikeLead);
+            start = charged.AnimationSpeed * swing.Speed * Mathf.Max(0f, charged.HitDelay / swing.Speed - left);
+            striking = combat.TimeToHit <= charged.StrikeLead + 0.005f;
         }
 
-        SetFloat(ActionSpeedHash, fromHold ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
-        float fade = swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
+        SetFloat(ActionSpeedHash, striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
+        float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
         animator.CrossFadeInFixedTime(hash, fade, layer, start);
         // Grown out of a light swing, the legs leave its stance for the planted heavy's slowly, so the hips don't twitch.
         float othersFade = grownFrom > 0f ? GrownLegsFade : fade;
