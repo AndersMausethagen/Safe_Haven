@@ -95,6 +95,9 @@ public sealed class GameLoopLiveTests
         }
 
         SaveGameService.Storage = new SaveStorage();
+        // The game it played stays in the session after Play: its stash with every chest's block shut (a new Haven has no chest), so
+        // a test after it that gave to the stash found no room (CheatTests, in a whole-suite run). A fresh session for whoever is next.
+        GameSession.StartNewGame();
         LogAssert.ignoreFailingMessages = false;
         if (folder != null && Directory.Exists(folder))
         {

@@ -133,6 +133,8 @@ public sealed class CoopLiveTests
         }
 
         LogAssert.ignoreFailingMessages = false;
+        // The Haven played shut the stash's blocks of chests it doesn't have, in the session the tests after it share: a fresh one.
+        GameSession.StartNewGame();
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "SafeHaven")
         {
             TestScenes.StartClean();
