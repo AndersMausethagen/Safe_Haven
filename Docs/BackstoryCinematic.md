@@ -1,313 +1,175 @@
-# Backstory cinematic: "The Old Story"
-
-**Status:** built, 2026-11-10: it plays when a new game starts (1:56). Seen in screenshots of every shot and run from
-the main menu on throwaway saves; nobody has listened to it yet. How it is put together and how to change it is in
-[ARCHITECTURE.md](../Assets/_Project/Scripts/ARCHITECTURE.md) under "Cinematics". What differs from this script is listed
-at the end, in section 8.
-
-A painted, narrated opening of about 1 minute 45 seconds. Twelve shots, each a still painting cut into layers and
-moved by a slow camera, tell what happened before the game starts: the pact, the hearth, the winter the fire went out, what the
-forest does to the lost, and why the player is walking towards it.
-
-## 1. The frame
-
-| | |
-|---|---|
-| **Plays** | On New Game, before the meadow morning. Replayable from the journal's Backstory tab. Hold a key to skip. |
-| **Narrator** | The portal, in first person, speaking to the player ("little one"). It never names itself. The player recognises the voice at home, when the stones say "Listen, little one. Rest your hand on the stone." |
-| **Length** | About 1:45 as written (173 spoken words). Real shot lengths come from the recorded lines. |
-| **Ends on** | The expedition's morning fire in the meadow, which is where the game begins. |
-
-### What it leaves out on purpose
-
-The first act has reveals this must not spend:
-
-- **Who let the fire go out.** The narration says only "the fire went out". The portal admits at the end of Act I that
-  people broke the pact first.
-- **What the guardians became.** They appear twice as silent figures, once whole and once overgrown. Nothing is said.
-- **The old troll** that breaks the stones, and **the stones breaking**. The prologue plays that.
-- **The names of the lost.** The four are told apart by their silhouettes only.
-- **Why the stones wake for the player's hand.** The portal itself doesn't know.
-
-## 2. The voice
-
-**Direction.** Old, low and unhurried. Warm, but worn thin, like someone who has not spoken aloud for a long time. It
-speaks to one person sitting close, not to a hall: no booming fantasy narrator. Short pauses between sentences, longer
-ones where marked. A small warmth on "little one".
-
-**How it is made.** Text-to-speech on this PC, with Qwen3-TTS (Apache 2.0, so a sold game may use it):
-
-1. The *VoiceDesign* model makes a voice from a written description. No real person is cloned, so there is no
-   question of whose voice it is.
-2. The *Base* model then reuses that one designed clip as its reference for every line, so all lines share a voice.
-
-It would be added to LocalSpawn as a third audio kind, `voice`, beside `sfx` and `music`, running in its own Python
-3.12 environment because the model's packages don't fit ComfyUI's Python 3.13 one. This is not installed or tested
-yet, and nobody has heard it: the first step is three test voices reading shots 1, 5 and 6 for you to choose from.
-
-Test voices to generate:
-
-- **A. Old woman.** "An old woman's voice, low and dry, warm, slightly hoarse, slow and calm, telling a folktale to
-  a child by a fire. Neutral English accent."
-- **B. Old man.** "An old man's voice, deep and soft, tired but kind, slow and calm, telling a folktale to a child
-  by a fire. Neutral English accent."
-- **C. Ageless.** "A soft, low, ageless voice, neither clearly male nor female, calm and distant, a little hollow,
-  as if spoken from inside stone."
-
-My pick before hearing them is A: a grandmother's hearth-side voice fits the folktale tone and avoids the stock deep
-male narrator. That is a guess until the clips exist.
-
-## 3. The look
-
-- **Style:** LocalSpawn's "Safe Haven - Home" style for the warm shots and "Safe Haven - Raid" for the cold ones,
-  1920x1088, with one added line for every painting so they read as a set: *storybook gouache illustration, visible
-  brushwork, soft edges, small figures under very large trees*.
-- **Colour tells the story.** Pact and hearth: fresh green and amber. After the fire goes out: cold blue, mist, no
-  warm light anywhere. The last two shots: sun again.
-- **The portal stones** are painted from a render of the in-game model, so the stones in the paintings are the ones
-  the player later stands beside.
-- **Figures** are small, cloaked, and seen from behind or the side. The player is always from behind and hooded.
-- **Layers.** Each painting is cut into 3 to 5 layers (sky, far, middle, subject, foreground) placed at different
-  distances from the camera. A camera move then makes near layers slide faster than far ones. "Push in" below means
-  the camera moves towards the picture, "pull back" away from it, "track" sideways, "rise" upwards. Percentages are
-  of the picture's width.
-- **Moving details** are added in Unity, not painted: fire, sparks, snow, mist, light shafts, glow on the runes.
-
-## 4. The shots
-
-| # | Shot | Narration | About |
-|---|---|---|---|
-| 1 | Embers | "Listen, little one..." | 10 s |
-| 2 | The promise | "Long ago, your people made a promise..." | 14 s |
-| 3 | The hearth | "Beside my stones they built a hearth..." | 12 s |
-| 4 | The seasons | "It held longer than anyone has counted." | 8 s |
-| 5 | The fire goes out | "Then, one winter, the fire went out." | 8 s |
-| 6a | The way home | "The forest does not kill the lost. It forgets them. First the way home." | 6 s |
-| 6b | Their names | "Then their names." | 4 s |
-| 6c | No one left | "Then there is no one left to find." | 5 s |
-| 7 | One clearing | "A hundred winters I kept one small clearing, alone..." | 11 s |
-| 8 | Four went in | "Then four of your people walked in under the trees..." | 11 s |
-| 9 | Four more | "So four more came looking. One of them was you." | 7 s |
-| 10 | The morning fire | "That is the old story. Yours begins here..." | 10 s |
-
-### 1. Embers
-
-> **"Listen, little one. This is an old story, and I am nearly the last who remembers it."**
-
-- **Picture:** black. A low amber glow at the bottom edge, as from a fire just out of frame.
-- **Layers:** glow; two layers of drifting embers at different distances.
-- **Camera:** almost still. Rises 2% over the whole shot.
-- **Moving details:** embers lift and go out. The glow breathes with the fire.
-- **Voice:** quiet, close. A pause after "little one".
-- **Sound:** a small fire, close. No music until the last second, when one low held note begins.
-- **Into the next:** the glow swells to fill the frame and becomes sunlight.
-
-### 2. The promise
-
-> **"Long ago, your people made a promise with the forest. They would leave it room to live. And its guardians would
-> keep older, hungrier things at bay."**
-
-- **Picture:** a summer clearing ringed by enormous pines. The portal stones stand in the middle, runes faintly gold.
-  On the left a small group of people in cloaks, one of them a child. On the right, at the tree line, three tall
-  guardians made of root and moss, heads bowed. Shafts of sun fall between the two groups, onto the stones.
-- **Layers:** sky and light shafts; far wall of trees; guardians and middle trees; stones and people; dark foreground
-  trunks and ferns on both edges.
-- **Camera:** pushes in 12% towards the stones and rises slightly. The foreground trunks slide apart like a curtain.
-- **Moving details:** light shafts shimmer, pollen drifts, moss on the guardians stirs.
-- **Voice:** telling, steady. "Older, hungrier things" a little slower.
-- **Sound:** summer birds, soft wind in needles. The held note gains a second, warmer one.
-- **Into the next:** slow dissolve.
-
-### 3. The hearth
-
-> **"Beside my stones they built a hearth. They kept the fire, and I kept the night from their door. That was the
-> pact."**
-
-- **Picture:** close and low. A ring of hearth stones in the grass at the foot of one rune stone. Two hands lay a
-  split log on the fire. Behind, soft and out of focus, a timber house with a turf roof and a lit doorway.
-- **Layers:** dusk sky; house; rune stone; hearth and hands; grass blades in front.
-- **Camera:** tracks right 8% with a slight push in. The fire stays sharp, the house stays soft.
-- **Moving details:** flames, rising sparks, firelight moving on the stone. On "I kept the night from their door" the
-  rune brightens once, like an answer.
-- **Voice:** warmest line in the piece. "That was the pact" plain and final.
-- **Sound:** fire close, the log set down, a low warm hum from the stone on the rune's pulse.
-- **Into the next:** dissolve.
-- **Note:** shot 5 repeats this exact framing. Paint them as a pair.
-
-### 4. The seasons
-
-> **"It held longer than anyone has counted."**
-
-- **Picture:** the village from a little above: the hearth by the stones at the centre, a handful of turf-roofed
-  houses, trails leading out into the trees. Three versions of the same painting, summer, autumn and winter, fading
-  one into the next. The fire is in the same place in all three, and lit in all three.
-- **Layers:** sky; forest; houses and trails; stones and hearth; a foreground branch.
-- **Camera:** one continuous pull back of 10% across all three seasons.
-- **Moving details:** falling leaves in autumn, snow in winter, chimney smoke throughout.
-- **Voice:** the line sits over autumn. Unhurried, a little proud.
-- **Sound:** the season beds cross-fade under it; far-off children; one phrase on a fiddle.
-- **Into the next:** the winter version darkens to night and dissolves into shot 5.
-
-### 5. The fire goes out
-
-> **"Then, one winter, the fire went out."**
-
-- **Picture:** the framing of shot 3, in a winter night. Blue. Ash in the hearth with one ember left. Snow settling
-  on the hearth stones. No hands. The doorway behind is dark.
-- **Layers:** as shot 3.
-- **Camera:** still for three seconds, then pushes in 6% on the ember.
-- **Moving details:** snow falls. The ember dims and dies as the line ends. The rune fades to nothing.
-- **Voice:** flat, almost matter-of-fact. No blame in it. A long pause afterwards.
-- **Sound:** the music stops on the first word. Wind, then a soft hiss as the ember goes. Two seconds of near
-  silence.
-- **Into the next:** cut.
-
-### 6a. The way home
-
-> **"The forest does not kill the lost. It forgets them. First the way home."**
-
-- **Picture:** a forest trail with a carved waymarker post. Roots have grown across the path. Pale mist stands at the
-  far end.
-- **Layers:** mist; far trunks; trail and post; roots; near trunks.
-- **Camera:** pushes in 10% along the trail.
-- **Moving details:** the mist comes forward and closes the trail behind the post.
-- **Voice:** "It forgets them" quieter than the sentence before it.
-- **Sound:** cold wind, a creak of wood. The held note returns, lower and colder.
-- **Into the next:** cut on "Then".
-
-### 6b. Their names
-
-> **"Then their names."**
-
-- **Picture:** close on a doorpost. A name carved in runes, and under it notches marking a child's height, year by
-  year.
-- **Layers:** dark doorway; doorpost; moss; a drifting wisp of mist.
-- **Camera:** tilts down 6%, from the name to the notches.
-- **Moving details:** moss creeps over the carving until the name can't be read.
-- **Sound:** the wind alone.
-- **Into the next:** cut on "Then".
-
-### 6c. No one left
-
-> **"Then there is no one left to find."**
-
-- **Picture:** the village of shot 4 at night. Roofs sagging, doorways black, mist at knee height between the houses.
-  The three guardians of shot 2 stand among the houses now, larger, overgrown, and still.
-- **Layers:** sky; forest; houses; guardians; mist in two layers; foreground branch as in shot 4.
-- **Camera:** tracks left 8%.
-- **Moving details:** mist drifts through the doorways. Nothing else moves.
-- **Voice:** slow. Let the last word fall.
-- **Sound:** a far-off low groan, as of a big tree leaning.
-- **Into the next:** dissolve.
-
-### 7. One clearing
-
-> **"A hundred winters I kept one small clearing, alone. I grew thin. And at last, I slept."**
-
-- **Picture:** from high above, the angle the game is played from. Dark forest to every edge, and in the middle one
-  small round clearing, still green, with the cracked stones in it. Roots have begun to climb three of the stones.
-- **Layers:** forest canopy; clearing; stones; the ward as a faint gold rim; passing mist above.
-- **Camera:** starts close over the stones and pulls back and up by 35%, the largest move in the piece, until the
-  clearing is a coin of green in the dark.
-- **Moving details:** the ward's rim pulses, slower each time. Fireflies thin out. On "I slept" the runes go dark.
-  The clearing stays green.
-- **Voice:** tired. "I grew thin" almost to itself. A breath before "I slept".
-- **Sound:** the stone's hum slowing, then gone. Wind over treetops.
-- **Into the next:** dissolve.
-
-### 8. Four went in
-
-> **"Then four of your people walked in under the trees, to learn what the woods had become. They did not walk out."**
-
-- **Picture:** dusk at the forest's edge, from behind. Four figures with lanterns walk into pale mist between huge
-  trunks. Each is told apart by an outline: a satchel of bottles, a smith's hammer, a carpenter's axe and saw, a
-  rune-reader's staff.
-- **Layers:** mist; far trunks; the four figures, each on its own layer and each deeper than the last; near trunks.
-- **Camera:** pushes in 10% after them.
-- **Moving details:** the lanterns go out one at a time, the farthest first. The last goes on "They did not walk
-  out".
-- **Voice:** even. No drama on the last sentence.
-- **Sound:** footsteps on needles, fading. A lantern handle creaking. Then nothing.
-- **Into the next:** hard cut to daylight, the only hard cut to brightness in the piece.
-
-### 9. Four more
-
-> **"So four more came looking. One of them was you."**
-
-- **Picture:** open country in late-afternoon sun. Wildflowers, a big sky, a path over a low hill. Four travellers
-  seen from behind walk towards a dark line of trees on the horizon. A tall woman leads. The last and nearest figure
-  is hooded: the player.
-- **Layers:** sky and clouds; the tree line; hill and path; the four travellers; foreground grass and flowers.
-- **Camera:** tracks right 6% with the walkers, then on "One of them was you" pushes gently towards the nearest
-  figure.
-- **Moving details:** clouds drift, grass bends in the wind, a bird crosses.
-- **Voice:** lighter. The small warmth again on "you".
-- **Sound:** birdsong back all at once, wind in grass. One fiddle note joins the held note.
-- **Into the next:** dissolve.
-
-### 10. The morning fire
-
-> **"That is the old story. Yours begins here: a bright morning, a small fire, and the trees waiting."**
-
-- **Picture:** dawn at the meadow's edge. A small campfire in front, bedrolls, the four packing up around it. Beyond
-  them the first big trees, dark, with mist between them.
-- **Layers:** dawn sky; forest edge; meadow; camp and figures; fire; foreground grass.
-- **Camera:** pulls back and rises 15% towards the game's own camera angle.
-- **Moving details:** flames, smoke going straight up, mist moving between the far trunks.
-- **Voice:** settled, near a smile. A pause before "and the trees waiting".
-- **Sound:** the small fire of shot 1 again, birds, and the music resolving.
-- **Into the game:** fade through white into the meadow morning, where the same fire is burning.
-
-## 5. Sound and music
-
-- **Effects** come from `Tools/Audio` scripts, as the rest of the game's do. Several beds already exist there (fire,
-  birds, seasons, wind, footsteps, the portal's hum). New for this piece: the ember hiss, the moss creep, the
-  lanterns going out, the far tree groan.
-- **Music** comes from the game's own tracks and follows the colour in three parts. Proposed, to be judged by ear:
-  - *Safe haven - Nightsong* (3:20) under the warm shots, 1 to 4. Its first 20 seconds are quiet and rise slowly,
-    which suits coming in under the embers.
-  - Silence at shot 5, then *Misty woods - Eerie raid* (3:00) under the cold shots, 6a to 8, starting from its quiet
-    opening and held low.
-  - *Nightsong* again from the hard cut to daylight at shot 9, to the end.
-
-  The music must stay under the voice: Eerie raid is about 4 dB louder than Nightsong and needs turning down to
-  match. If two tracks feel like too much for 1:45, Nightsong alone with the gap at shot 5 is the simpler version.
-- **Mix:** the voice leads. Music and effects duck under each line. The silence after shot 5 is part of the score.
-
-## 6. Subtitles
-
-On by default, one sentence at a time, in the game's Hearthline style. No speaker name. They follow the game's
-Dialogue Speed option for how long each stays up.
-
-## 7. Decisions
-
-Settled (2026-11-10):
-
-- **Where it plays:** on New Game. The portal's lines at home then repeat the pact, and can be trimmed later.
-- **Music:** the game's own Nightsong or Eerie raid, as proposed in section 5.
-
-Open:
-
-1. **The voice.** A, B or C above, chosen by ear from the test clips.
-2. **Length.** 1:45 as written. For about 1:15, drop shot 4 and make 6a to 6c one painting.
-3. **The portal in the game.** Its lines at home are text only. After a voiced opening a silent portal may feel
-   odd. Voicing its main lines with the same voice is possible later.
-4. **One track or two.** See section 5.
-
-## 8. As built
-
-- **Voice:** `portal_f_british_northern`, a sixth test voice (an old woman, a soft northern English accent in its
-  description), chosen by ear. Each sentence is its own clip. The model speaks briskly (about 160 to 250 words a minute
-  within a sentence) and has no speed control, so the unhurried pace comes from the pauses between sentences.
-- **Length:** 1:56, with those pauses.
-- **Shot 1** has no painting: a glow from below the frame and rising embers.
-- **Shot 3 and 5:** no hands lay a log; the fire and the stone carry it. The cold hearth is its own painting with the
-  same framing, as a redraw of the lit one kept its flames.
-- **Shot 4:** three whole paintings fading into each other, with a slow pull back but no layers.
-- **Shot 6b:** the moss does not creep over the name; the camera tilts from the name to the notches.
-- **Shot 6c:** the guardians are not in the painting.
-- **Shot 7:** from a hill, not straight down, and a ring of stones, not the arch.
-- **Shot 8:** three lanterns, not four (the fourth traveller carries the staff). They go out right to left.
-- **The end** fades to black, not through white: the loading screen that follows is dark.
-- **Music:** Nightsong under shots 1 to 4, silence at 5, Eerie raid (quieter) under 6a to 8, Nightsong from 9.
-- **Not built:** watching it again from the journal.
+# Opening cinematic: "The Fire at the Stones"
+
+**Status:** built 2026-11-16 from the user's script below ("ta en titt på introen, og endre den til dette forslaget,
+generer bilder som passer til hver scene"; music as before). It replaced "The Old Story" (2026-11-10, twelve shots, 1:56),
+whose script and paintings are in git history. It plays on New Game, before the prologue, and from the journal's Backstory
+tab and the main menu's Cinematics. Hold Esc, Space or Enter to skip. How it was built, and what differs from the script,
+is in [As built](#as-built) at the end. Nobody has watched or heard it yet.
+
+## The script (the user's, unchanged)
+
+THE FIRE AT THE STONES
+Opening cinematic · Target length: approximately 1:35
+
+Narrator: The Portal. Close and quiet, as if recalling something it has nearly lost. It never names itself.
+
+**1. A Small Fire**
+
+Picture: Black frame. An ember glows. It catches into a small fire beside a carved stone. A thin ring of light travels
+outward from the rune.
+
+> A fire is a small thing, little one.
+> Until it is all that stands between home and the dark.
+
+Sound: Fire, close. A low stone hum begins beneath it.
+
+**2. The Bargain**
+
+Picture: The old clearing in summer. People stand on one side of the stones; root-and-moss guardians wait at the tree
+line. Keep the dark beyond the guardians indistinct.
+
+> Your people made a bargain with the woods.
+> They would leave it room to live.
+> Its guardians would hold the older hunger beyond the trees.
+
+Sound: Wind in the pines. Birdsong, warm but restrained.
+
+**3. The Ward**
+
+Picture: The hearth beside the stones. The flame brightens a rune; a soft line of light reaches toward the village homes.
+
+> Beside my stones, they kept a hearth.
+> Their flame fed my ward.
+> My ward kept the night from their doors.
+
+Sound: A log settles. The stone answers with a gentle pulse.
+
+**4. The Years**
+
+Picture: The same clearing in summer, autumn and winter. Keep the hearth and the rune in the same place through every
+season. Let small signs of life appear in the homes.
+
+> For generations, each kept their part.
+
+Sound: Children in the distance; harvest sounds; winter wind. No extra narration.
+
+**5. The Fire Dies**
+
+Picture: Match the hearth's earlier framing on a winter night. The flame disappears. The rune dims. No person is shown
+tending or abandoning the fire.
+
+> Then, one winter, the fire died.
+
+Sound: The music cuts. A small hiss from the ember. Hold silence.
+
+**6. The Road Changes**
+
+Picture: The marker stone on the forest path. Roots cover the trail; mist closes across it.
+
+> The ward thinned.
+> The old road began to turn.
+
+Sound: Wind and a creak of wood. A low note returns, cold and uncertain.
+
+**7. The Name**
+
+Picture: A carved mark beside a doorway, with the notches of a child's height below it. Moss obscures the mark; the
+village behind is empty.
+
+> The lost were still out there.
+> But little by little, the way to them was forgotten.
+
+Sound: Let the wind fall away after "forgotten."
+
+**8. The Clearing**
+
+Picture: Pull back from the stones. The green clearing remains, ringed by dark forest. The ward pulses more slowly, then
+fades.
+
+> I held one clearing for as long as I could.
+> A hundred winters passed.
+> My light grew thin.
+>
+> *A pause.*
+>
+> Then I slept.
+
+Sound: The stone hum slows to silence.
+
+**9. The First Four**
+
+Picture: Four travellers enter the woods: a satchel of bottles, a hammer, a saw, a staff. Their lanterns disappear one at
+a time.
+
+> Much later, four walked the old road to learn what had changed.
+> Their lights went in.
+> None came back.
+
+Sound: Footsteps recede. Lanterns go out. No musical swell.
+
+**10. The Ones Who Follow**
+
+Picture: Four more travellers gather at a small morning fire. The hooded figure nearest the viewer is the player. Beyond
+them, the road leads to the forest.
+
+> Four more prepared to follow.
+> One of them was you.
+>
+> *A pause.*
+>
+> Why you came is yours to say.
+
+Sound: Birds return. Keep one faint, uneasy note beneath them.
+
+**11. The Road East**
+
+Picture: Match the campfire and framing to the opening of the playable prologue. Beyond the group, the trees stand
+still. A broad shadow passes briefly over the standing stones—or the fire bends toward them.
+
+> At dawn, you will take the old road east.
+> The woods have already begun to change.
+
+Sound: Fire crackle joins the morning ambience. Cut directly into gameplay.
+
+## As built
+
+2026-11-16. Checked in Play from captured frames of every shot (not watched in motion, not heard).
+
+- **Length:** 1:45 (target 1:35). The narration is 62 s; the portal's voice speaks briskly (about 190 words a minute), so
+  the quiet comes from the pauses between lines, which were cut by a third to get here. Shots run 6 to 14 s.
+- **Voice:** your lines word for word, one clip a sentence, in the portal's own voice (Qwen3-TTS, `portal_g_mysterious`, as
+  its dialogue at home), best of three takes each (all 78 takes said their words). `Tools/Audio/opening_voice.py`.
+- **Paintings:** LocalSpawn's Safe Haven styles, as the other cinematics (`Tools/LocalSpawn/generate_backstory.py`).
+  Shots 10 and 11 are painted without the Home style, which always adds cabins. Shot 11 is painted over the game's own
+  first view of the prologue (captured in Play, the HUD hidden), so the cinematic ends on the picture the game opens on.
+- **1. A Small Fire:** black with one ember; the painting comes up as the fire catches (1.5 to 3 s), then three widening
+  glows from the rune make the ring of light. Fire, ignition and the stone's hum.
+- **2. The Bargain:** grown villagers by the stones, three tall root-and-moss guardians at the tree line. The runes breathe.
+- **3. The Ward:** the rune brightens on "Their flame fed my ward" with the stone's pulse; on the next line a soft light runs
+  along the path to the cabins and their doors warm.
+- **4. The Years:** three whole paintings fading summer to autumn to winter, hearth and arch in place. No children's
+  voices (there is no recording, and they can't be synthesised here): birds, wood split, a sack, a cart, winter wind.
+- **5. The Fire Dies:** the painted flame and the rune's glow go out as the line ends: an unlit copy of the hearth, made
+  from the painting's own layers (`Tools/LocalSpawn/opening_unlit.py`), fades in over it, leaving smoke and a few embers.
+  The ember's hiss, then silence: the music stops before the shot.
+- **6. The Road Changes:** roots across the path, marker stones, the mist closing in. The cold music comes in under it.
+- **7. The Name:** marks carved on a door with moss over them and an empty village behind; the child's-height notches
+  don't read clearly in the painting.
+- **8. The Clearing:** the largest move, pulling back from a ring of standing stones (not the arch) to a green clearing in
+  dark forest; the ward pulses slower and is gone on "Then I slept", as the stone's hum slows to nothing.
+- **9. The First Four:** three lanterns (the staff-bearer carries none), out one at a time, each with its own small sound,
+  the last on "None came back". Footsteps fade.
+- **10. The Ones Who Follow:** four at the morning fire, the hooded one nearest, the road to the forest beyond. Birds,
+  and the Misty Woods drone held very low as the uneasy note.
+- **11. The Road East:** a dark band sweeps across once on the last line (the broad shadow), with a rush of air. The fire
+  does not bend.
+- **Into the game:** a 1.2 s fade to black, the loading screen (the prologue has been loading behind the cinematic all
+  along), then the prologue opens on the same view. A straight cut would need the loading screen to stay behind the
+  cinematic's black; not done.
+- **Music:** as the opening had it: Nightsong under 1 to 4, silence at 5, Eerie raid (quieter) under 6 to 9, Nightsong
+  from 10.
+- **Made sounds:** stone hum, its pulse, the hum slowing to silence, the ember's hiss, a lantern going out, the shadow
+  (`Tools/Audio/opening_cinematic.py`). The fire, wind, birds, creaks and footsteps are the game's own.
+- **How it was put together:** the asset (`Data/Cinematics/Backstory.asset`) was written once by a one-off script from
+  `Editor/Cinematics/CinematicBuilder`'s parts (builders are retired); change the asset now. The old cinematic's
+  paintings and voice clips are still in the project, unused.

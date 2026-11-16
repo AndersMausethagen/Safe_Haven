@@ -2103,8 +2103,9 @@ Anywhere the sky is dark, `Resources/NightSettings` applies, scaled by `Atmosphe
 
 ## Cinematics: the backstory that opens a new game
 
-A new game starts with "The Old Story" ([script](../../../Docs/BackstoryCinematic.md)): twelve painted shots, the portal's
-narration with subtitles, sounds and the game's own music, about two minutes, skippable by holding Esc, Space or Enter.
+A new game starts with "The Fire at the Stones" ([script](../../../Docs/BackstoryCinematic.md), the user's, 2026-11-16; it
+replaced "The Old Story"): eleven painted shots, the portal's narration with subtitles, sounds and the game's own music,
+1:45, skippable by holding Esc, Space or Enter. Its last painting is the prologue's own first view, painted over.
 `MainMenuView` › **Opening Cinematic** plays it after character creation and starts the game when it ends or is skipped;
 empty goes straight to the first scene. **Load During Cinematic** loads that scene in the background meanwhile
 (`SceneTransition.Preload`), so the wait afterwards is a few seconds.
@@ -2132,15 +2133,17 @@ empty goes straight to the first scene. **Load During Cinematic** loads that sce
 - **Dissolves fade the new shot's layers in one by one**, not as one picture, so a near layer shows a little of its own
   background through it halfway. Not noticeable at these lengths; a render texture per shot would cure it.
 
-**Changing it.** The asset is written by `AgentScripts/BuildBackstoryCinematic.cs`: shots, camera moves, pauses, glows and
-music are there, and re-running it rewrites the asset, so change it there and not in the Inspector. The parts it reads:
+**Changing it.** The asset is the source of truth: it was written once by a one-off script from `CinematicBuilder`'s parts
+(the old builder, `AgentScripts/BuildBackstoryCinematic.cs`, is retired), so change shots, pauses and glows in it. The parts:
 
 | Part | Made by | Kept in |
 |---|---|---|
 | Paintings | `Tools/LocalSpawn/generate_backstory.py paintings` (LocalSpawn's Safe Haven styles; prompts in the script) | `Tools/LocalSpawn/Backstory/` |
 | Layers | `... generate_backstory.py layers` (`backstory_layers.py`: a depth estimate splits the painting, what a nearer layer hid is filled with its surroundings mirrored) | `Art/Cinematics/Backstory/` |
 | Glow, mist, vignette | `Tools/Art/cinematic_overlays.py` | `Art/Cinematics/Shared/` |
-| Narration | LocalSpawn's Voice tab or `Tools/Audio/backstory_voice.py` (Qwen3-TTS, voice `portal_f_british_northern`, kept in `Tools/Audio/Voices/`), then `Tools/Audio/narration.py` picks the take of each line that says its words and sets the level | `Audio/Voice/Backstory/` |
+| Unlit copies | `Tools/LocalSpawn/opening_unlit.py`: a flame put out (the hearth, the lanterns), made from its own layer so it sits exactly over it | `Art/Cinematics/Backstory/o05x_*, o09x_*` |
+| Narration | `Tools/Audio/opening_voice.py` (Qwen3-TTS, the portal's voice `portal_g_mysterious`, one clip a sentence), then `Tools/Audio/narration.py` picks the take of each line that says its words and sets the level | `Audio/Voice/Opening/` |
+| Made sounds | `Tools/Audio/opening_cinematic.py` (the stone's hum and pulse, an ember's hiss, a lantern out, a passing shadow) | `Audio/SFX/Safe Haven Cinematics/Opening *` |
 
 Traps: the image model keeps a fire it is redrawing however cold the words are (paint the cold hearth afresh, without the
 word fire); it writes letters on any signpost; and it adds a wanderer to an empty place unless told nobody is there. The

@@ -215,7 +215,7 @@ public sealed class CinematicTests
         CinematicDefinition backstory = Backstory;
         Assert.IsNotNull(backstory, BackstoryPath);
         var timeline = new CinematicTimeline(backstory);
-        Assert.AreEqual(24, timeline.Lines.Count);
+        Assert.AreEqual(26, timeline.Lines.Count, "the user's script, one sentence a line (Docs/BackstoryCinematic.md)");
         foreach (CinematicTimeline.SpokenLine line in timeline.Lines)
         {
             Assert.IsNotNull(line.Line.voice, line.Line.subtitle);
@@ -223,8 +223,8 @@ public sealed class CinematicTests
             Assert.That(line.Line.subtitle.Length, Is.LessThanOrEqualTo(95), "one sentence a subtitle: " + line.Line.subtitle);
         }
 
-        Assert.That(timeline.Seconds, Is.InRange(85f, 130f), "about a minute and three quarters");
-        Assert.AreEqual("Listen, little one.", timeline.Lines[0].Line.subtitle);
+        Assert.That(timeline.Seconds, Is.InRange(80f, 125f), "about a minute and a half (the script's target is 1:35)");
+        Assert.AreEqual("A fire is a small thing, little one.", timeline.Lines[0].Line.subtitle);
     }
 
     [Test]
@@ -275,7 +275,7 @@ public sealed class CinematicTests
             Assert.Less(timeline.MusicStart(cue), timeline.MusicEnd(cue));
         }
 
-        int coldHearth = Enumerable.Range(0, backstory.Shots.Count).First(i => backstory.Shots[i].name.Contains("Fire Goes Out"));
+        int coldHearth = Enumerable.Range(0, backstory.Shots.Count).First(i => backstory.Shots[i].name.Contains("Fire Dies"));
         float middle = (timeline.ShotStart(coldHearth) + timeline.ShotEnd(coldHearth)) * 0.5f;
         Assert.AreEqual(0f, backstory.Music.Sum(cue => timeline.MusicLevel(cue, middle)), 0.001f, "silence is part of the score");
     }
