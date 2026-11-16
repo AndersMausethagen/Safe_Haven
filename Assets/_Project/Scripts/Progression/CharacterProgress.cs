@@ -136,6 +136,7 @@ public sealed class CharacterProgress
     }
 
     /// <summary>Counts up whenever the choice of perks changes, so what they teach is worked out again (Techniques).</summary>
+    [field: NotSaved("a change counter for windows that redraw on it")]
     public int PerkVersion { get; private set; }
 
     /// <summary>Plain pieces made in a row, by kind ("weapons", "armour"), for Sure Hand.</summary>

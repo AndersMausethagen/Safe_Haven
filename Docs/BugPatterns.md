@@ -1,0 +1,107 @@
+# Bug patterns and the guards against them
+
+Written 2026-11-16, after a day of systematic code reviews (commits 7122942c to cdbcf614: about 170 fixes across every
+system). The user asked: is there a pattern, can systems be changed so it stops happening when content is added or
+changed, and can co-op stay in sync without a check in everything that happens. This is the answer, and the plan built
+from it. Status per guard is kept at the bottom.
+
+## What the bugs had in common
+
+Most were not one-off mistakes. A rule lived at each call site instead of in one place everything goes through, so every
+new feature had to remember it, and the bugs are where one didn't.
+
+| Pattern | Share of the day's fixes | Examples | Root cause |
+|---|---|---|---|
+| Not cleaned up when interrupted | ~38 | a creature staggered mid-hop stayed invulnerable; hand crafts and fishing not ending on death; "any resume turned every key back on"; skills cast while floored | each activity undoes its own flags on its happy path, and knows only the interruptions someone thought of |
+| Saving gaps | ~35 | a horse's health share, the stable's clock, the held-quest share, quest rewards waiting for home, when the Haven's asks were posted | the save mappers are written by hand; nothing checks a new field is saved and read back |
+| Co-op: whose world, who decides | ~28+ | a guest writing to their copy of the host's settlement; quests counting the host's Haven; a friend's poison ticking twice; combo blows replayed as the opener; the strike kind lost on the way to the host | a guest's game holds two Havens under one name (`GameSession.Settlement`), and a puppet creature runs the same simulation as the real one unless each system checks |
+| One rule worked out in several places | ~22 | Stamina Cost -1 ("the default") read as the cost; arrows and blades disagreeing on neutral targets; staff and thrown weapons missing what a blade's blow adds | each path rebuilds the rule from raw data |
+| Events counting the wrong thing | ~20 | a refund counted as a find (collect quests farmed); a refused job unlocking recipes; kill credit lost | events say what happened mechanically, and each listener guesses what it meant |
+
+Counted from the bullet lines of the day's fix commits by keyword, with overlap: a rough shape, not exact numbers.
+
+The fixes that have held are the ones turned into a test: `ConventionTests` (statics reset each Play session),
+`ContentAudit`, `CoopWireTests`, and `QuestObjective.TypesWithACoopRule`, which fails until a new objective type says
+whether it counts in a friend's Haven. That last one is the model for most of the guards below: **a choke point every
+case goes through, and a test that fails until a new case declares itself.**
+
+Measured in the code the same day: `GameSession.Settlement` used 243 times in 80 files, `HavenVisit.IsVisiting` checked
+80 times in 43 files, `IsRemote` 40 times in 14 files, and 176 message fields written by hand in 12 files where
+`CoopWireTests` can't see them. `SettlementState.Borrowed()` (31 setters) catches a write to the host's copy only at
+runtime, only when co-op is played, and never a read (the quest bug of the day was a read).
+
+## The guards
+
+### 1. Saving: every field saved, or marked as not
+
+A round-trip test over the saved runtime state (SettlementState, QuestLog, and each saved component's state): every
+field gets a value that isn't its default, is saved and loaded, and must come back equal. A field that isn't saved on
+purpose carries `[NotSaved("why")]`. A new field can no longer be forgotten in the mapper.
+
+### 2. Co-op messages as types
+
+Each co-op message becomes a struct (`INetworkSerializable`), which `CoopWireTests` fingerprints by its fields, so a
+field added or dropped fails the test until the wire format is raised. A round-trip test writes and reads every message
+struct and compares every field, so a field the serializer forgets fails at once (the strike kind and the guard outcome
+were lost exactly that way). A convention test keeps hand-written `WriteValueSafe` to the serializers.
+
+### 3. A declared co-op rule for each kind of thing
+
+As `QuestObjective.TypesWithACoopRule`: each kind of interaction (what a visitor may use in a friend's Haven: anyone,
+ask the host, the host only), each kind of game event (whom it counts for), and each elite trick, relic effect and
+status (simulated by the host, or by this game) declares its rule, and a test fails until a new kind does. The check is
+made once at the choke point (`Interactable`, the quest log, the creature's host) instead of in each feature.
+
+### 4. No placeholder values in public data; shown numbers checked against the rule
+
+A field where -1 means "use the default" is read only through the rule that resolves it (Attack Definition › Stamina
+Cost through `PlayerCombat.StaminaCostOf`). A convention test bans the raw reads outside their owner. Numbers the player
+is shown (the Fight card, a telegraph's colour, the journal's reasons) get tests against the rule they describe.
+
+### 5. The host's creatures: one way in, and puppets that only show
+
+Everything gameplay does to a creature (damage, stagger, a status, a pull, finishing it) reaches the host through the
+same few events (`Damageable.AnyDamaged`, `StatusEffects.Applied`, the stagger notice), carrying the whole blow
+(`DamageInfo` through one serializer). On a friend's copy the creature's own simulation is off by construction
+(statuses don't tick, poise isn't worn, attacks aren't chosen): a component that simulates says so once, and the puppet
+switches it off when it is made, instead of each system checking `IsRemote`. Parity tests apply the same blow, status
+and stagger directly and through the co-op path, and compare.
+
+### 6. One interrupt for the player, enter and exit for monster states
+
+Death, a stagger or knockdown, a scene change, pause, a cinematic, a window opening, mounting and a weapon swap raise one
+player interrupt. Every activity (a swing, a finishing blow, an interaction, fishing, taming, crafting by hand,
+building) registers and ends on it unless it says otherwise. A new activity is cleaned up by default. A monster's states
+have enter and exit steps, so what a state gives (a hop's invulnerability) is taken back however the state ends.
+
+### 7. One pipeline for the player's blows
+
+Melee, arrows, staff casts, thrown weapons and Silent Takedown's estimate build their hits through one place: the
+swing's techniques, a sure critical (a counter, a sneak attack), Ambush Damage, the mounted bonus. A path can't forget
+one.
+
+### 8. Events say why
+
+A game event carries why it happened (found, crafted, rewarded, refunded, moved, loaded) and, in co-op, whose it is.
+Quests and unlocks count by a declared rule instead of each listener guessing; a refund can't be counted as a find.
+
+### 9. Two Havens, two names
+
+`GameSession.Settlement` is split into `Here` (the Haven the player stands in; in a friend's, the host's copy, read
+only) and `Home` (the player's own, always theirs to change). The old name is marked obsolete so the compiler lists
+every use to move; a convention test bans changing `Here`. Writing to the host's world, or reading it for one's own
+quests, stops being possible by accident.
+
+## Status
+
+| Guard | Status |
+|---|---|
+| 1. Save round-trip | built: `SaveCoverageTests` (every field of SettlementState with its residents and fallen, QuestLog, CharacterProgress with its journal; every ISaveable on the prefabs, its JSON probed and read back), `[NotSaved("why")]`. Found on building it: a purification batch's remainder was never saved |
+| 2. Messages as types | planned |
+| 3. Declared co-op rules | planned |
+| 4. Placeholder bans, shown numbers | planned |
+| 5. Creatures: one way in, puppets that only show | planned |
+| 6. Player interrupt, monster state exits | planned |
+| 7. One blow pipeline | planned |
+| 8. Events say why | planned |
+| 9. Here and Home | planned |

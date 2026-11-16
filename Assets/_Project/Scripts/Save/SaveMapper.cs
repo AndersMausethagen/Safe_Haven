@@ -234,6 +234,7 @@ public static class SaveMapper
         into.purificationProgress = settlement.PurificationProgress;
         into.purificationBonus = settlement.PurificationBonus;
         into.purificationYield = settlement.PurificationYield;
+        into.purifiedRemainder = settlement.PurifiedRemainder;
         into.portalLevel = settlement.PortalLevel;
         foreach (KeyValuePair<string, int> bought in settlement.TradeBought)
         {
@@ -308,6 +309,7 @@ public static class SaveMapper
         settlement.Restore(saved.portalRepaired, saved.wardLevel, saved.successfulExtractions, (BreachStatus)saved.breach,
             saved.purificationQueued, saved.purificationProgress, saved.purificationBonus);
         settlement.SetPurificationYield(saved.purificationYield);
+        settlement.RestorePurifiedRemainder(saved.purifiedRemainder);
         settlement.RestorePortal(saved.portalLevel);
         settlement.RestoreDays(saved.daysPassed);
         settlement.RestoreBlight(saved.blight);

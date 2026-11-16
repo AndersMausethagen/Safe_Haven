@@ -115,6 +115,8 @@ public sealed class SettlementSaveData
     public float purificationBonus;
     /// <summary>Share more Purified from each batch. Missing in older saves; the altar sets it again at home.</summary>
     public float purificationYield;
+    /// <summary>The part of a Purified a yield bonus has made but not yet given (it comes with a later batch). Missing in older saves: 0.</summary>
+    public float purifiedRemainder;
     /// <summary>How far the portal has been improved. Missing in older saves.</summary>
     public int portalLevel;
     /// <summary>What was bought at the Trading Post since the last raid survived. Missing in older saves.</summary>

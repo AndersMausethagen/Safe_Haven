@@ -95,6 +95,7 @@ public sealed class FallenRecord
 /// </summary>
 public sealed class SettlementState
 {
+    [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)")]
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
     private readonly List<FallenRecord> fallen = new List<FallenRecord>();
@@ -102,6 +103,11 @@ public sealed class SettlementState
     private readonly List<JobDefinition> vacantJobs = new List<JobDefinition>();
     private readonly Dictionary<string, int> tradeBought = new Dictionary<string, int>();
     private float purifiedRemainder;
+
+    /// <summary>The part of a Purified the yield bonus has made but not yet given; it comes with a later batch (saved).</summary>
+    public float PurifiedRemainder => purifiedRemainder;
+
+    public void RestorePurifiedRemainder(float remainder) => purifiedRemainder = Math.Max(0f, Math.Min(0.9999f, remainder));
 
     public bool PortalRepaired { get; private set; }
     public int WardLevel { get; private set; }
@@ -278,6 +284,7 @@ public sealed class SettlementState
     public IReadOnlyList<ResidentRecord> Residents => residents;
 
     /// <summary>Beds standing at home, as last seen there. Nobody needs one; whoever has one works faster and adds comfort.</summary>
+    [field: NotSaved("what this game sees standing, counted from the houses at home")]
     public int Beds { get; private set; }
 
     /// <summary>How many residents have a bed.</summary>
@@ -455,6 +462,7 @@ public sealed class SettlementState
     public int SmithyTier => BuiltTier(CraftingStationType.Anvil);
 
     /// <summary>What workers have made since the player last heard about it.</summary>
+    [field: NotSaved("only the next message about it; what was made is already in the stash")]
     public Dictionary<IStackDefinition, int> MadeByWorkers { get; } = new Dictionary<IStackDefinition, int>();
 
     /// <summary>The best tier standing of a kind of building, as last seen at home.</summary>
@@ -475,6 +483,7 @@ public sealed class SettlementState
     }
 
     /// <summary>Scaffolds (paid for) stood at home when it was last seen: builders have work waiting there.</summary>
+    [field: NotSaved("what this game sees standing, from the scaffolds at home")]
     public bool ScaffoldsWaiting { get; private set; }
 
     /// <summary>Notes whether paid-for scaffolds stand at home (HavenProgress, with NoteBuildings).</summary>
