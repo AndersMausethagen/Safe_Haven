@@ -7,7 +7,9 @@ using UnityEngine;
 /// </summary>
 public sealed partial class PlayerCombat
 {
-    private void Begin(SwingKind kind, ChainPress judge)
+    // True when the swing started; false when it was refused (the weapon out on a throw, an art cooling down, nothing to strike with,
+    // the stamina short), so a press that asked for it can keep what it would have spent (a guard counter keeps its block).
+    private bool Begin(SwingKind kind, ChainPress judge)
     {
         queuedKind = SwingKind.None;
         // The weapon is out on a throw (a spear toss): nothing to swing until it is back in the hand. And an art waits out its
@@ -19,7 +21,7 @@ public sealed partial class PlayerCombat
                 ArtNotReady?.Invoke();
             }
 
-            return;
+            return false;
         }
 
         int step = 0;
@@ -47,7 +49,7 @@ public sealed partial class PlayerCombat
                 technique |= HitTechnique.GuardCounter;
                 if (attack == null)
                 {
-                    return;
+                    return false;
                 }
 
                 break;
@@ -60,7 +62,7 @@ public sealed partial class PlayerCombat
                 technique |= HitTechnique.WeaponArt;
                 if (attack == null)
                 {
-                    return;
+                    return false;
                 }
 
                 // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
@@ -107,7 +109,14 @@ public sealed partial class PlayerCombat
         if (stamina != null && owed > 0f && !stamina.TrySpendOnAttack(owed))
         {
             forcedAttack = null;
-            return;
+            return false;
+        }
+
+        LastSwingStaminaPaid = stamina != null && owed > 0f ? stamina.Scaled(owed) : 0f;
+        if (kind == SwingKind.Art)
+        {
+            ArtsBegun++;
+            ArtFocusPaid = artOnStamina || focus == null ? 0f : ArtFocus;
         }
 
         forcedAttack = null;
@@ -272,6 +281,8 @@ public sealed partial class PlayerCombat
         {
             AttackPerformed?.Invoke();
         }
+
+        return true;
     }
 
     // Silent Takedown: a blow from the shadows finishes an ordinary creature it has nearly done for anyway. Never a boss or
@@ -300,6 +311,10 @@ public sealed partial class PlayerCombat
         // As hard as it takes to finish it and a little over, so the number shown is about what the creature had left.
         return damage * Mathf.Max(1f, body.CurrentHealth / blow * 1.05f);
     }
+
+    /// <summary>The stamina a swing of this kind with this attack takes from the bar, all told (the Melee skill, Action Cost Scale and the
+    /// burden): what the Fight card counts swings with.</summary>
+    public float StaminaCostOf(SwingKind kind, AttackDefinition attack) => stamina != null ? stamina.Scaled(CostOf(kind, attack)) : 0f;
 
     // The swing's stamina, after the Melee skill: a beginner tires sooner, a master later.
     private float CostOf(SwingKind kind, AttackDefinition attack) =>
@@ -688,11 +703,12 @@ public sealed partial class PlayerCombat
         bool crush = Has(WeaponSignature.Crush) && (technique & Weighty) != 0 && monster != null && monster.Poise != null
             && monster.Poise.Fraction < weapon.SignaturePower && !monster.IsStaggered;
         // A charge: at a gallop the blow knocks the struck off their feet.
-        AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
+        DamageResult result = AttackResolver.Apply(combatant, pending.Attack, pending.WeaponDamage, pending.Hit, pending.Origin, pending.Direction, damage,
             poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
         if (monster != null && target.IsAlive)
         {
-            if (crush && !monster.IsStaggered)
+            // Only a blow that struck home crushes: not one it hopped clear of or parried.
+            if (crush && !monster.IsStaggered && result.Landed && !result.Parried)
             {
                 monster.Stagger(Rules.StaggerSeconds);
                 SignatureUsed?.Invoke(WeaponSignature.Crush, monster);

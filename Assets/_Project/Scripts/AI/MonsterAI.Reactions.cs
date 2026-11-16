@@ -84,7 +84,7 @@ public sealed partial class MonsterAI
             RaiseInterrupted();
         }
 
-        attacks.Delay(seconds);
+        attacks.DelayAtLeast(seconds);
         pose?.Hit(-transform.forward, 0.8f, Time.time);
     }
 
@@ -163,7 +163,7 @@ public sealed partial class MonsterAI
         }
 
         damageable.DamageTakenMultiplier = 1f;
-        attacks.Delay(0.35f);
+        attacks.DelayAtLeast(0.35f);
         SetState(State.Chasing);
     }
 
@@ -293,6 +293,9 @@ public sealed partial class MonsterAI
         damageable.DamageTakenMultiplier = 1f;
         ClearTarget();
         movement.Halt();
+        // A strike under way ends with it: a pouncer's leap height no longer holds the body up where it died.
+        attacks.Cancel();
+        pose?.CancelAttack();
         SetState(State.Dead);
         reelingTell?.Clear();
         ClearAnswers();

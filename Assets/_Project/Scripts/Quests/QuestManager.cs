@@ -39,7 +39,6 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private ContentDatabase content;
     private QuestLog log;
-    private readonly List<QuestDefinition> pendingRewards = new List<QuestDefinition>();
     private readonly List<WaitingQuest> waiting = new List<WaitingQuest>();
     private readonly List<WaitingQuest> due = new List<WaitingQuest>();
 
@@ -120,7 +119,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             return "Begins when you come home from a raid";
         }
 
-        return $"Begins when a {QuestMarkerSettings.RankName(quest.Rank)} quest under way is done, or after your next raid";
+        // As MayStartHeld has it: once this homecoming's share is used, when no other of its kind is under way. RankName already says
+        // "quest" where it should ("Haven quest", "Tale").
+        return $"Begins when no other {QuestMarkerSettings.RankName(quest.Rank).ToLowerInvariant()} is under way, or after your next raid";
     }
 
     /// <summary>Starts every waiting quest whose moment has come, in the order they became ready.</summary>
@@ -171,6 +172,20 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
     }
 
+    // A quest is done: nothing waiting starts within Between Quests of it. A held quest it frees (one of its kind no longer under
+    // way) was held at "now" and began in the same frame, the two notices together and its stories at once.
+    internal void SpaceWaitingFrom(float now)
+    {
+        float earliest = now + StoryPacingSettings.Current.BetweenQuestsSeconds;
+        for (int i = 0; i < waiting.Count; i++)
+        {
+            if (waiting[i].ReadyAt < earliest)
+            {
+                waiting[i] = new WaitingQuest(waiting[i].Quest, earliest);
+            }
+        }
+    }
+
     // Coming home: held quests count their moment from the arrival, not from the last frame before the loading screen.
     private void HoldAllHeld(float now)
     {
@@ -195,7 +210,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         StoryPacingSettings rules = StoryPacingSettings.Current;
         float readyAt = Pacing.ReadyAt(quest.StartDelay, Time.time, rules);
-        if ((quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules)) && MayStartHeld(quest)
+        // Not behind a loading screen (a scene just entered runs this before it is shown): it waits, and Update starts it once seen.
+        if (!SceneTransition.IsBusy && (quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules)) && MayStartHeld(quest)
             && (!quest.HeldForHomecoming || Time.time >= heldSpacedUntil))
         {
             StartNow(quest);
@@ -296,7 +312,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
         else if (!Log.PrerequisitesMet(quest))
         {
-            reason = "Not yet: finish " + DescribeMissing(quest) + " first.";
+            reason = NotYetReason(quest);
         }
 
         return reason == null && Log.TryStart(quest);
@@ -351,7 +367,6 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
 
         Unbind();
-        pendingRewards.Clear();
         waiting.Clear();
         underWayKnown = false;
         heldSpacedUntil = float.NegativeInfinity;
@@ -386,13 +401,12 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         // Quests begin once there is a player to receive them, not in the menu.
         if (Player.Current != null)
         {
-            foreach (QuestDefinition quest in new List<QuestDefinition>(pendingRewards))
+            foreach (QuestDefinition quest in Log.TakeWaitingRewards())
             {
                 string rewards = GiveRewards(quest);
                 GameMessages.Post($"Rewards for {quest.DisplayName}: {rewards}", MessageKind.Gain);
             }
 
-            pendingRewards.Clear();
             StartAvailableQuests();
             StartQuestsWhoseEventHappened();
             // A frame on: this runs before the scene's Start, where saved objects get their state back (a building its tier).
@@ -552,11 +566,12 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     {
         underWayKnown = false;
         Pacing.QuestCompleted(Time.time);
+        SpaceWaitingFrom(Time.time);
         string rewards;
         // Once a raid is decided, what the player takes home is already settled, so rewards wait until they arrive.
         if (RaidDirector.Current != null && RaidDirector.Current.Session.IsOver && quest.DescribeRewards().Length > 0)
         {
-            pendingRewards.Add(quest);
+            log.HoldRewards(quest);
             rewards = "rewards waiting at home";
         }
         else
@@ -591,17 +606,23 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         ItemInventory bag = player.Bag;
         ResourceStorage storage = player.Resources.Storage;
+        // As every reward arrives (ItemDelivery): the bag, then the stash at home, then the ground at the player's feet. The rewards of a
+        // quest done on a raid are paid on coming home, into a bag full of the raid's loot, and were lost there.
+        bool atHome = RaidDirector.Current == null && !HavenVisit.IsVisiting;
         foreach (ItemAmount reward in quest.RewardItems)
         {
-            if (reward.Item != null && bag.Give(reward.Item, reward.Amount) < reward.Amount)
+            if (reward.Item != null && reward.Amount > 0
+                && ItemDelivery.Give(bag, new ItemStack(reward.Item, reward.Amount), newFind: true, toStash: atHome, player.transform).Fell)
             {
-                GameMessages.Post($"Bag full: some {reward.Item.DisplayName} from the quest was lost.", MessageKind.Warning);
+                GameMessages.Post($"No room for all the {reward.Item.DisplayName} from the quest: it lies at your feet.", MessageKind.Warning);
             }
         }
 
         foreach (ResourceAmount reward in quest.RewardResources)
         {
-            if (reward.Resource != null && storage.Add(reward.Resource, reward.Amount) < reward.Amount)
+            int carried = reward.Resource != null ? storage.Add(reward.Resource, reward.Amount) : reward.Amount;
+            int stored = carried < reward.Amount && atHome ? GameSession.Stash.Resources.Add(reward.Resource, reward.Amount - carried) : 0;
+            if (carried + stored < reward.Amount)
             {
                 GameMessages.Post($"Can't carry all the {reward.Resource.DisplayName} from the quest.", MessageKind.Warning);
             }
@@ -617,10 +638,23 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             Inscriptions.Learn(enchantment, player.gameObject, "quest");
         }
 
-        ResidentRecord worker = quest.RewardWorkFor != null && !HavenVisit.InHostsHaven ? GameSession.Settlement.Find(quest.RewardWorkFor) : null;
-        if (worker != null && quest.RewardWork > 0)
+        // In the player's own Haven: while visiting (in the friend's Haven or on their raid) the settlement here is the host's, and the
+        // work went nowhere (or to the host's copy of the person).
+        if (quest.RewardWorkFor != null && quest.RewardWork > 0)
         {
-            worker.WorkDone += quest.RewardWork;
+            void AddWork(SettlementState settlement)
+            {
+                ResidentRecord worker = settlement.Find(quest.RewardWorkFor);
+                if (worker != null)
+                {
+                    worker.WorkDone += quest.RewardWork;
+                }
+            }
+
+            if (!HavenVisit.ChangeHome(AddWork))
+            {
+                AddWork(GameSession.Settlement);
+            }
         }
 
         return quest.DescribeRewards();
@@ -657,5 +691,26 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
 
         return string.Join(" and ", missing);
+    }
+
+    /// <summary>Why a quest can't be taken yet, for its giver: what must be finished first, and what only has to have begun (Started
+    /// First, which QuestLog.PrerequisitesMet asks too: without it the reason read "finish  first", naming nothing).</summary>
+    public string NotYetReason(QuestDefinition quest)
+    {
+        var begun = new List<string>();
+        foreach (QuestDefinition first in quest.StartedFirst)
+        {
+            if (first != null && Log.StatusOf(first) == QuestStatus.NotStarted)
+            {
+                begun.Add($"\"{first.DisplayName}\"");
+            }
+        }
+
+        string finish = DescribeMissing(quest);
+        string take = string.Join(" and ", begun);
+        return finish.Length > 0 && take.Length > 0 ? $"Not yet: take up {take} and finish {finish} first."
+            : finish.Length > 0 ? $"Not yet: finish {finish} first."
+            : take.Length > 0 ? $"Not yet: take up {take} first."
+            : "Not yet.";
     }
 }

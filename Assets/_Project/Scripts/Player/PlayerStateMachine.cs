@@ -146,6 +146,10 @@ public sealed class PlayerStateMachine : MonoBehaviour
 
     public void RequestArrowCycle() => ArrowCycleRequested?.Invoke();
 
+    /// <summary>Whether an attack may start now, as <see cref="RequestAttack"/> lets one: not at the oars, a cart's handles or swimming,
+    /// nor in the middle of an interaction. The middle button's weapon art asks it (it shares the arrow key's request).</summary>
+    public bool CanStartAttack => !ArmsTaken && CurrentState != PlayerState.Interacting;
+
     /// <summary>Dodging while working on something (gathering, crafting) stops the work first.</summary>
     public void RequestDodge()
     {

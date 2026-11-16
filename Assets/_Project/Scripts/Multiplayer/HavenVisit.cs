@@ -329,6 +329,17 @@ public static class HavenVisit
         return true;
     }
 
+    /// <summary>Whether <paramref name="residentId"/> lives in this guest's own Haven (not the host's, which a visit mirrors): what a
+    /// quest's "already home" asks while visiting.</summary>
+    public static bool HomeHasResident(string residentId) =>
+        home != null && home.settlement != null && home.settlement.residents != null && !string.IsNullOrEmpty(residentId)
+        && (home.settlement.residents.Exists(entry => entry.id == residentId)
+            || (home.settlement.fallen != null && home.settlement.fallen.Exists(entry => entry.id == residentId)));
+
+    /// <summary>Whether this guest has beaten <paramref name="bossId"/> for their own Haven (BossBeatenHome counts a win on the host's raid).</summary>
+    public static bool HomeBeatBoss(string bossId) =>
+        home != null && home.settlement != null && home.settlement.defeatedBosses != null && home.settlement.defeatedBosses.Contains(bossId);
+
     /// <summary>Whether this guest's own Haven holds a spirit's gift (what they learnt is theirs, wherever they stand).</summary>
     public static bool HomeHasSpiritGift(string id) =>
         home != null && home.settlement != null && home.settlement.spiritGifts != null && home.settlement.spiritGifts.Contains(id);

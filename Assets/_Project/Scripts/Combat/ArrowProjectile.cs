@@ -234,7 +234,7 @@ public sealed class ArrowProjectile : MonoBehaviour
 
             // A friend in the way doesn't stop it: an arrow that vanished on a companion's back was a shot wasted for nothing.
             if (owner != null && hits[i].collider.GetComponentInParent<Damageable>() is Damageable body && body.IsAlive
-                && body.Category == TargetCategory.Creature && owner != null && !owner.Faction.WillAttack(body.Faction))
+                && body.Category == TargetCategory.Creature && owner.Faction.AreAllies(body.Faction))
             {
                 continue;
             }
@@ -259,7 +259,8 @@ public sealed class ArrowProjectile : MonoBehaviour
         IDamageable victim = hit.collider.GetComponentInParent<IDamageable>();
         bool struckBody = false;
         Transform bodyPart = null;
-        if (victim != null && victim.IsAlive && owner != null && owner.Faction.WillAttack(victim.Faction) && attack != null)
+        // As a blade (HitDetector): anything not of the shooter's side, so game can be hunted with a bow and a crate shot open.
+        if (victim != null && victim.IsAlive && owner != null && !owner.Faction.AreAllies(victim.Faction) && attack != null)
         {
             // Found before the blow: if it kills, the body goes off to become a corpse and takes this part with it.
             struckBody = victim.Category == TargetCategory.Creature;

@@ -120,6 +120,12 @@ public sealed class BossEncounter : MonoBehaviour
             bar.Set(health.HealthFraction);
         }
 
+        // The killing blow ends the fight: no phase is entered on the way down to 0 (its line, shake and reel over the defeat).
+        if (!health.IsAlive)
+        {
+            return;
+        }
+
         int reached = BossDefinition.PhaseAt(health.HealthFraction, definition.Phases);
         while (phase < reached)
         {

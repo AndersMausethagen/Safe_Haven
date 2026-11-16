@@ -12,6 +12,9 @@ public readonly struct DamageResult
     public readonly DamageType Type;
     /// <summary>How a guard took it (see <see cref="IHitGuard"/>): blocked hits arrive reduced, parried ones not at all.</summary>
     public readonly GuardOutcome Guard;
+    /// <summary>The hit met its target (blocked and parried hits too). False for <see cref="None"/>: dodged (invulnerable), already
+    /// dead, or a friend's body in the host's game, whose own game plays the blow. A hit can land for nothing (a 0-damage shove).</summary>
+    public readonly bool Landed;
 
     public DamageResult(float incoming, float damage, float healthLost, bool killed, bool isCritical, DamageType type,
         GuardOutcome guard = GuardOutcome.None)
@@ -23,6 +26,7 @@ public readonly struct DamageResult
         IsCritical = isCritical;
         Type = type;
         Guard = guard;
+        Landed = true;
     }
 
     public bool Blocked => Guard == GuardOutcome.Blocked;

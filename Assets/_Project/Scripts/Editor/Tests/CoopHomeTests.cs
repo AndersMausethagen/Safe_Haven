@@ -51,6 +51,45 @@ public sealed class CoopHomeTests
         }
     }
 
+    // Review 2026-11-16: "Bring Tor Home" completed on arriving in a friend's Haven where Tor lives (the settlement there is the
+    // host's), and Tor never came to the guest's own.
+    [Test]
+    public void APersonLivingInTheHostsHaven_IsntRescuedForTheGuest()
+    {
+        ResidentDefinition person = null;
+        foreach (string guid in AssetDatabase.FindAssets("t:ResidentDefinition"))
+        {
+            person = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (person != null && !string.IsNullOrEmpty(person.Id))
+            {
+                break;
+            }
+        }
+
+        Assert.IsNotNull(person);
+        QuestObjective rescue = QuestObjective.Create(ObjectiveType.RescuePerson, 1, person);
+        typeof(QuestObjective).GetField("countAlreadyOwned", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(rescue, true);
+        var log = new QuestLog();
+        GameSession.StartNewGame();
+        try
+        {
+            GameSession.Settlement.AddResident(person);
+            Assert.AreEqual(1, rescue.Owned(null, log), "at home, one living there is found and home both");
+
+            Visit(new SettlementState());
+            Assert.AreEqual(0, rescue.Owned(null, log), "in a friend's Haven, the one living there is the host's");
+
+            var own = new SettlementState();
+            own.AddResident(person);
+            Visit(own);
+            Assert.AreEqual(1, rescue.Owned(null, log), "one living in the guest's own Haven counts");
+        }
+        finally
+        {
+            Leave();
+        }
+    }
+
     [Test]
     public void ChangingHome_LeavesEverythingElseAsItWas()
     {

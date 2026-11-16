@@ -215,7 +215,12 @@ public sealed partial class PlayerCombat
     private void Cast(float damageMultiplier, float poiseMultiplier)
     {
         AttackDefinition attack = activeAttack;
-        var volley = new CastVolley { Multiplier = damageMultiplier, Poise = poiseMultiplier, Technique = HitTechnique.Spell };
+        // The swing's own techniques go with its bolts (a heavy cast is a heavy blow to a shield, a counter cast a sure critical), as a
+        // blade's and a thrown weapon's do.
+        var volley = new CastVolley
+        {
+            Multiplier = damageMultiplier, Poise = poiseMultiplier, Technique = HitTechnique.Spell | activeTechnique, Critical = activeForceCritical,
+        };
         var bolt = new MonsterAttack
         {
             attack = attack, damage = activeWeaponDamage, projectileSpeed = attack.CastSpeed, projectileRadius = attack.CastRadius,

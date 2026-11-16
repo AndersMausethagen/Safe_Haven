@@ -193,14 +193,23 @@ public sealed partial class MonsterAI
         guardBreaks++;
         if (!shieldBroken && guardBreaks >= rules.GuardBreaksToSplinter)
         {
-            shieldBroken = true;
-            MonsterShieldPose shield = GetComponentInChildren<MonsterShieldPose>(true);
-            if (shield != null)
-            {
-                shield.Splinter(blowDirection);
-            }
+            Splinter(blowDirection);
         }
     }
+
+    // The shield splinters: it guards no more, and its model breaks apart.
+    private void Splinter(Vector3 blowDirection)
+    {
+        shieldBroken = true;
+        MonsterShieldPose shield = GetComponentInChildren<MonsterShieldPose>(true);
+        if (shield != null)
+        {
+            shield.Splinter(blowDirection);
+        }
+    }
+
+    /// <summary>True once its shield has splintered (co-op: the host's word, so friends' copies stop blocking with it too).</summary>
+    public bool ShieldBroken => shieldBroken;
 
     // A light blow landed: enough of them in a short while and the armed dead raise their weapon to turn the next aside.
     private void NoteLightBlow(in DamageInfo damage, DamageResult result)

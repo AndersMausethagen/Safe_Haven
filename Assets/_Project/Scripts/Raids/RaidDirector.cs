@@ -429,8 +429,7 @@ public sealed class RaidDirector : MonoBehaviour
         Companions.Settle(Report, extracted);
         ExperienceTracker.SettleRaid(Report, extracted);
         GameSession.EndRaid(Report);
-        // Written now, before the results screen (a crash there lost the haul), and again once home.
-        SaveGameService.SaveAtRaidEnd(keeps);
+        // Saved again once home; and below, before the results screen (a crash there lost the haul).
         SaveGameService.SaveOnceHome();
         GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
         GameSession.CarryPlayerState(keeps);
@@ -457,6 +456,10 @@ public sealed class RaidDirector : MonoBehaviour
         // After Ended: someone rescued has come home and taught what they know, so their workplace answers nothing now.
         HavenAnswers.Fill(Report, player != null ? player.GetComponent<PlayerCrafting>() : null,
             Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), GameSession.Settlement);
+        // Written now, before the results screen (a crash or a quit there lost the haul), and once all of the raid's end is counted:
+        // the raids done (quests that count them, their rewards kept waiting for home), the one rescued made a resident, the
+        // homecoming (held quests opened), the journal's record. Saved before those, a crash lost them.
+        SaveGameService.SaveAtRaidEnd(keeps);
     }
 
     // The raid is decided; the player only watches the outcome until the scene changes.

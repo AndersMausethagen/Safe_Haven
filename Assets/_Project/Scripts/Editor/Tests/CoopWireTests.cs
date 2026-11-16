@@ -27,6 +27,9 @@ public sealed class CoopWireTests
         // 2026-11-16: raid news, pings and "helping up" carry the sender's client id (written inside their handlers, so the
         // fingerprint is the same).
         [26] = "fbdd95d903325dec171610c2ae9adaba",
+        // 2026-11-16 (combat review): a creature's strike carries its follow-ups and hold and is sent once a string, a friend's blow
+        // carries its strike kind and how the guard took it, and poses a splintered shield (all written in handlers: same fingerprint).
+        [27] = "fbdd95d903325dec171610c2ae9adaba",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

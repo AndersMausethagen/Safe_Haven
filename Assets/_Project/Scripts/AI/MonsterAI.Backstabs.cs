@@ -132,8 +132,8 @@ public sealed partial class MonsterAI
         if (!movement.EnsureOnNavMesh() || Time.time >= hopEndsAt
             || movement.Rush(hopDirection, rules.HopDistance / rules.HopSeconds * Time.deltaTime))
         {
-            damageable.RemoveInvulnerability(this);
-            attacks.Delay(0.2f);
+            attacks.DelayAtLeast(0.2f);
+            // Leaving the hop gives back its invulnerability (SetState).
             SetState(State.Chasing);
         }
     }

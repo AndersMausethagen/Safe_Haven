@@ -115,6 +115,53 @@ public sealed class DamageRulesTests
         Assert.AreEqual(1f, victim.CurrentHealth, 0.001f);
     }
 
+    // Review 2026-11-16: a Draug held at its floor and ended by fire (or a finishing blow) died of a made-up blow, and whoever struck
+    // heard no kill: no sever or smash, no brutal-kill waver, no Second Wind or Flurry Focus.
+    [Test]
+    public void ADraugEndedByFire_DiesOfThatBlow_AndTheStrikerHearsOfTheKill()
+    {
+        Damageable victim = Victim(50f, 0f);
+        var rises = victim.gameObject.AddComponent<RisesAgain>();
+        Invoke(rises, "Awake");
+        Invoke(rises, "OnEnable");
+        Combatant player = Fighter("Player", Faction.Player);
+        DamageInfo diedOf = default;
+        victim.Died += (body, blow) => diedOf = blow;
+
+        DamageResult plain = victim.ApplyDamage(new DamageInfo(player, Slash, 80f, DamageType.Physical, false, Vector3.zero, Vector3.forward));
+        Assert.IsTrue(victim.IsAlive, "an ordinary blow leaves it down at its floor");
+        Assert.IsFalse(plain.Killed);
+
+        DamageResult fire = victim.ApplyDamage(new DamageInfo(player, Slash, 5f, DamageType.Fire, false, Vector3.zero, Vector3.right));
+
+        Assert.IsFalse(victim.IsAlive);
+        Assert.IsTrue(fire.Killed, "the blow that ended it is reported as the kill");
+        Assert.AreEqual(DamageType.Fire, diedOf.Type);
+        Assert.AreSame(Slash, diedOf.Attack, "the death carries the blow's own attack");
+        Assert.AreEqual(Vector3.right, diedOf.Direction, "and its direction, for the ragdoll's throw");
+        Object.DestroyImmediate(rises);
+    }
+
+    // ----- What a dodge escapes -----
+
+    // Review 2026-11-16: a bog troll's drag and a shield rush pulled a player who dodged through them.
+    [Test]
+    public void ADodgedBlow_DragsNobody_AndOneThatLandsDoes()
+    {
+        var drag = AssetDatabase.LoadAssetAtPath<AttackDefinition>("Assets/_Project/Data/Combat/Attacks/BogTrollDrag.asset");
+        Assert.IsNotNull(drag);
+        Assert.Greater(Mathf.Abs(drag.Pull), 0.01f);
+        Combatant troll = Fighter("Bog Troll", Faction.Enemy);
+        Damageable dodger = Victim(100f, 0f);
+        dodger.transform.position = new Vector3(0f, 0f, 6f);
+
+        ForcedMove.AfterHit(drag, dodger, troll, DamageResult.None);
+        Assert.IsNull(dodger.GetComponent<ForcedMove>(), "a dodged blow (DamageResult.None) moves no one");
+
+        ForcedMove.AfterHit(drag, dodger, troll, new DamageResult(0f, 0f, 0f, false, false, DamageType.Physical));
+        Assert.IsNotNull(dodger.GetComponent<ForcedMove>(), "one that lands drags, even for no damage (the drag's own is 0)");
+    }
+
     // ----- Blunt, slash and stab (2026-11-14) -----
 
     [Test]

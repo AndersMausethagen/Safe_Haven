@@ -39,8 +39,8 @@ public sealed class FreeSwingAfterPerfectDodgeEffect : RelicEffect
             }
 
             until = -1f;
-            float cost = swing.Attack.StaminaCost * Mathf.Max(0.1f, 1f + wearer.Combatant.Stats.Get(StatType.MeleeStaminaCost));
-            wearer.Stamina.Restore(cost);
+            // What the swing really took (an attack's Stamina Cost of -1 means the default, which came back as nothing).
+            wearer.Stamina.Restore(combat.LastSwingStaminaPaid);
         }
 
         combat.PerfectDodge += OnPerfect;

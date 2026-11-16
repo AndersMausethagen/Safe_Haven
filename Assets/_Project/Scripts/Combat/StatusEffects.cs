@@ -165,6 +165,13 @@ public sealed class StatusEffects : MonoBehaviour
 
     private void Tick(Active entry)
     {
+        // A friend's copy of the host's creature (co-op): the host's game was sent the status (CoopCreatures › Status) and ticks it on the
+        // creature that counts, whose health comes back here. Ticking here too sent every tick to the host as a blow: poison twice over.
+        if (TryGetComponent(out MonsterAI copy) && copy.IsRemote)
+        {
+            return;
+        }
+
         Vector3 at = transform.position + Vector3.up;
         var tick = new DamageInfo(entry.Source, null, entry.Definition.DamagePerSecond * TickSeconds, entry.Definition.DamageType, false, at, Vector3.up, 0f,
             HitTechnique.OverTime);

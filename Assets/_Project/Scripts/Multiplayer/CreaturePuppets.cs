@@ -339,7 +339,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
                 puppet.Ai.ApplyRemotePose(time, position, yaw * (360f / 256f), speed / 10f, (MonsterAI.State)state,
                     (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
                     (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0, notice / 255f, (MonsterAI.RemoteHunt)noticing,
-                    (hunting & CreatureHost.MarkedFlag) != 0);
+                    (hunting & CreatureHost.MarkedFlag) != 0, (hunting & CreatureHost.ShieldBrokenFlag) != 0);
                 if (puppet.Health != null)
                 {
                     puppet.Health.ShowShare(health / 255f);
@@ -357,13 +357,15 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         reader.ReadValueSafe(out Vector3 from);
         reader.ReadValueSafe(out float yaw);
         reader.ReadValueSafe(out Vector3 aim);
+        reader.ReadValueSafe(out byte followUps);
+        reader.ReadValueSafe(out float hold);
         if (link == null || link.Now - time > StaleStrike || !byId.TryGetValue(id, out Puppet puppet) || puppet.Ai == null)
         {
             return;
         }
 
         IDamageable me = at == link.LocalId && Player.Current != null ? Player.Current.Health : null;
-        puppet.Ai.PlayRemoteStrike(action, me, from, yaw, aim);
+        puppet.Ai.PlayRemoteStrike(action, me, from, yaw, aim, followUps, hold);
     }
 
     private void OnDied(ulong sender, FastBufferReader reader)
@@ -508,6 +510,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         writer.WriteValueSafe(damage.Direction);
         writer.WriteValueSafe(damage.Poise);
         writer.WriteValueSafe((int)damage.Technique);
+        writer.WriteValueSafe((byte)damage.Strike);
+        writer.WriteValueSafe((byte)result.Guard);
         link.ToHost(CoopCreatures.HitMessage, writer);
     }
 

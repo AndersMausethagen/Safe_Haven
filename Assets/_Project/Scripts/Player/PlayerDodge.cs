@@ -162,7 +162,13 @@ public sealed class PlayerDodge : MonoBehaviour
         // A swing is a commitment until it lands, and a flinching player can't throw themselves clear.
         if (combat != null && !combat.CanDodge)
         {
-            bufferedUntil = Time.time + DodgeBuffer; // it goes the moment the swing lands
+            // It goes the moment the swing lands, if that is soon: set on the press, not again each frame it waits (Update asks
+            // again), or a press during a long knockdown was kept for good.
+            if (bufferedUntil < 0f)
+            {
+                bufferedUntil = Time.time + DodgeBuffer;
+            }
+
             return false;
         }
 
@@ -170,12 +176,14 @@ public sealed class PlayerDodge : MonoBehaviour
 
         DodgeStyle style = Style;
         DodgeShape shape = settings.ShapeOf(style);
-        if (stamina != null && !stamina.TrySpend(stamina.DodgeCost * shape.stamina * (combat != null ? combat.DodgeCostScale : 1f)))
+        float cost = stamina != null ? stamina.DodgeCost * shape.stamina * (combat != null ? combat.DodgeCostScale : 1f) : 0f;
+        if (stamina != null && !stamina.TrySpend(cost))
         {
             return false;
         }
 
-        paidForDodge = stamina != null ? stamina.DodgeCost * shape.stamina : 0f;
+        // What the bar really gave (a dagger's lighter dodge, the burden): a backstab out of it refunds half of that.
+        paidForDodge = stamina != null ? stamina.Scaled(cost) : 0f;
 
         float distance = settings.DodgeDistance * shape.distance;
         float duration = settings.DodgeDuration * shape.duration;

@@ -223,6 +223,8 @@ public sealed partial class PlayerCombat : MonoBehaviour
             weapon = value;
             lastStep = -1;
             momentum = 0;
+            // A sword's Counter Chain readies its extra counters for the sword: a ready counter stays one for the weapon taken up.
+            counterCharges = Mathf.Min(counterCharges, 1);
             AnnounceWeapon();
         }
     }
@@ -287,6 +289,15 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
     /// <summary>True while the two bodies are locked together.</summary>
     public bool IsFinishing => finishing != null;
+
+    /// <summary>The stamina the last swing begun took from the bar (0 for one already paid for, or an art paid in Focus).</summary>
+    public float LastSwingStaminaPaid { get; private set; }
+
+    /// <summary>Weapon arts begun so far, so what answers an art's landing can tell one art from the next.</summary>
+    public int ArtsBegun { get; private set; }
+
+    /// <summary>The Focus the last art begun was paid with (the rune's or the weapon's), 0 for one paid in stamina.</summary>
+    public float ArtFocusPaid { get; private set; }
 
     /// <summary>A finishing blow has begun on this creature.</summary>
     public event Action<MonsterAI> FinishStarted;

@@ -146,7 +146,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         {
             if (candidate?.Quest == null) continue;
             last = candidate;
-            if (log.StatusOf(candidate.Quest) != QuestStatus.Completed) return candidate;
+            // A lapsed quest is over too (the story moved on): it doesn't hold back the offers after it.
+            QuestStatus status = log.StatusOf(candidate.Quest);
+            if (status != QuestStatus.Completed && status != QuestStatus.Lapsed) return candidate;
         }
         return last;
     }
@@ -190,7 +192,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             case QuestGiverState.ReadyToTurnIn:
                 return true;
             case QuestGiverState.NotYet:
-                reason = QuestManager.Current != null ? "Not yet: finish " + QuestManager.Current.DescribeMissing(Quest) + " first." : "Not yet.";
+                reason = QuestManager.Current != null ? QuestManager.Current.NotYetReason(Quest) : "Not yet.";
                 return false;
             case QuestGiverState.InProgress:
                 reason = waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;

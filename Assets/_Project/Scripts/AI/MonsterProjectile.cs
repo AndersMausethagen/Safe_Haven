@@ -62,6 +62,14 @@ public sealed class MonsterProjectile : MonoBehaviour
             {
                 continue;
             }
+
+            // A player's bolt goes past their own side (a companion, a tamed horse, a friend), as their arrows do: one stopped on a
+            // companion's back was a cast wasted for nothing.
+            if (owner != null && owner.Faction.IsPlayerSide() && collider.GetComponentInParent<IDamageable>() is IDamageable body && body.IsAlive
+                && body.Category == TargetCategory.Creature && owner.Faction.AreAllies(body.Faction))
+            {
+                continue;
+            }
             if (nearest < 0 || contacts[i].distance < contacts[nearest].distance)
             {
                 nearest = i;
@@ -71,7 +79,8 @@ public sealed class MonsterProjectile : MonoBehaviour
         {
             RaycastHit hit = contacts[nearest];
             IDamageable victim = hit.collider.GetComponentInParent<IDamageable>();
-            if (!visualOnly && victim != null && victim.IsAlive && owner.Faction.WillAttack(victim.Faction))
+            // What the side's blades can strike, its bolts can (a deer, a crate): only its own side is spared.
+            if (!visualOnly && victim != null && victim.IsAlive && !owner.Faction.AreAllies(victim.Faction))
             {
                 DamageInfo info = volley != null ? CastBlow(victim, hit)
                     : DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, Random.value);
@@ -103,7 +112,7 @@ public sealed class MonsterProjectile : MonoBehaviour
     private DamageInfo CastBlow(IDamageable victim, RaycastHit hit)
     {
         Vector3 from = hit.point - direction * 2f;
-        bool sure = PlayerProficiencies.CaughtUnaware(victim, from);
+        bool sure = volley.Critical || PlayerProficiencies.CaughtUnaware(victim, from);
         DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, sure ? DamageCalculator.SureCrit : Random.value);
         info = info.Scaled(1f, volley.Poise, volley.Technique, sure && attack.CanCrit);
         float again = volley.Struck.Add(victim) ? 1f : volley.RepeatShare;
@@ -119,6 +128,8 @@ public sealed class CastVolley
     public float Multiplier = 1f;
     public float Poise = 1f;
     public HitTechnique Technique = HitTechnique.Spell;
+    /// <summary>A sure critical where the attack can crit: the swing's (a counter, an always-critical attack).</summary>
+    public bool Critical;
     public float RepeatShare = 0.5f;
     public readonly System.Collections.Generic.HashSet<IDamageable> Struck = new System.Collections.Generic.HashSet<IDamageable>();
 }

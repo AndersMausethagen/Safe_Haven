@@ -57,9 +57,10 @@ public readonly struct FightCard
         string staminaText = "-";
         if (stamina != null && settings != null)
         {
-            float dodgeCost = stamina.DodgeCost * settings.ShapeOf(style).stamina * (combat != null ? combat.DodgeCostScale : 1f);
-            float swingCost = weapon != null && weapon.Combo.Count > 0 && weapon.Combo[0] != null
-                ? weapon.Combo[0].StaminaCost * Mathf.Max(0.1f, 1f + stats.Get(StatType.MeleeStaminaCost)) : 0f;
+            // As the bar is charged: the action cost scale and the burden too, and an attack's default cost (Stamina Cost -1).
+            float dodgeCost = stamina.Scaled(stamina.DodgeCost * settings.ShapeOf(style).stamina * (combat != null ? combat.DodgeCostScale : 1f));
+            float swingCost = combat != null && weapon != null && weapon.Combo.Count > 0 && weapon.Combo[0] != null
+                ? combat.StaminaCostOf(SwingKind.Light, weapon.Combo[0]) : 0f;
             int dodges = dodgeCost > 0f ? Mathf.FloorToInt(stamina.Max / dodgeCost) : 0;
             int swings = swingCost > 0f ? Mathf.FloorToInt(stamina.Max / swingCost) : 0;
             staminaText = $"{Mathf.RoundToInt(stamina.Max)} <color={muted}>{dodges} dodges{(swings > 0 ? $" or {swings} swings" : "")}</color>";

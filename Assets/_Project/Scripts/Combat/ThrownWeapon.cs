@@ -192,8 +192,12 @@ public sealed class ThrownWeapon : MonoBehaviour
             }
 
             Vector3 heading = to - from;
-            AttackResolver.Apply(source, attack, weaponDamage, hit, from, heading.sqrMagnitude > 0.0001f ? heading.normalized : direction,
-                damageScale, poiseScale, technique, critical);
+            Vector3 along = heading.sqrMagnitude > 0.0001f ? heading.normalized : direction;
+            // From the shadows as a blade's or an arrow's: a sure critical on a creature caught unaware, and Ambush Damage.
+            Vector3 cameFrom = hit.Point - along * 2f;
+            bool unaware = PlayerProficiencies.CaughtUnaware(hit.Target, cameFrom);
+            float scale = damageScale * PlayerProficiencies.AmbushScale(source.Stats, hit.Target, cameFrom);
+            AttackResolver.Apply(source, attack, weaponDamage, hit, from, along, scale, poiseScale, technique, critical || unaware);
             Struck?.Invoke(this, hit.Target);
         }
     }

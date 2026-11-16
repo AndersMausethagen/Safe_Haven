@@ -73,6 +73,9 @@ public sealed class CreatureHost
     /// <summary>Set in a pose's hunting byte while the creature is marked (Hunter's Mark).</summary>
     public const byte MarkedFlag = 0x10;
 
+    /// <summary>Set in a pose's hunting byte once the creature's shield has splintered.</summary>
+    public const byte ShieldBrokenFlag = 0x08;
+
     /// <summary>The hunting byte's low bits: whom it is after (MonsterAI.RemoteHunt).</summary>
     public const byte HuntMask = 0x03;
 
@@ -396,7 +399,7 @@ public sealed class CreatureHost
         Health = HealthByte(hosted),
         Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)
             | (hosted.Ai.IsStaggered && hosted.Ai.IsFelled ? FelledFlag : 0) | (hosted.Ai.IsWeaponGuarding ? GuardingFlag : 0)
-            | (hosted.Ai.IsMarked ? MarkedFlag : 0)),
+            | (hosted.Ai.IsMarked ? MarkedFlag : 0) | (hosted.Ai.ShieldBroken ? ShieldBrokenFlag : 0)),
         Poise = PoiseByte(hosted.Ai),
         Notice = (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.Round(hosted.Ai.AwarenessLevel * PoiseSteps) / PoiseSteps * 255f), 0, 255),
         Noticing = (byte)NoticingFor(hosted.Ai, friend),
@@ -464,6 +467,12 @@ public sealed class CreatureHost
         }
 
         MonsterAI creature = hosted.Ai;
+        // A combo's later blows (AttackStarted is raised for each) aren't sent: friends' copies play the string from its first.
+        if (creature.StrikeBlow > 0)
+        {
+            return;
+        }
+
         ulong at = creature.Target is FriendHitbox friend ? friend.ClientId
             : creature.Target is Component body && Player.IsPlayer(body.gameObject) ? NetworkManager.ServerClientId
             : CoopLink.NoOne;
@@ -477,7 +486,7 @@ public sealed class CreatureHost
                 continue;
             }
 
-            using var writer = new FastBufferWriter(64, Allocator.Temp);
+            using var writer = new FastBufferWriter(80, Allocator.Temp);
             writer.WriteValueSafe(hosted.Id);
             writer.WriteValueSafe(creature.LastAction);
             writer.WriteValueSafe(at);
@@ -485,6 +494,8 @@ public sealed class CreatureHost
             writer.WriteValueSafe(creature.transform.position);
             writer.WriteValueSafe(creature.transform.eulerAngles.y);
             writer.WriteValueSafe(aim);
+            writer.WriteValueSafe((byte)Mathf.Clamp(creature.StrikeFollowUps, 0, 255));
+            writer.WriteValueSafe(creature.StrikeHold);
             link.Send(CoopCreatures.StrikeMessage, pair.Key, writer);
         }
     }
@@ -593,14 +604,14 @@ public sealed class CreatureHost
     }
 
     // Whether a blow of this size ends the creature as it stands: after its defenses, and unless it can't be hit just now.
-    private static bool WouldKill(Hosted hosted, float amount, DamageType type)
+    private static bool WouldKill(Hosted hosted, float amount, DamageType type, StrikeKind strike)
     {
         if (hosted.Health.IsInvulnerable || hosted.Combatant == null)
         {
             return false;
         }
 
-        float worth = DamageCalculator.Mitigate(amount, type, hosted.Combatant.Stats, hosted.Combatant.Rules) * hosted.Health.DamageTakenMultiplier;
+        float worth = DamageCalculator.Mitigate(amount, type, strike, hosted.Combatant.Stats, hosted.Combatant.Rules) * hosted.Health.DamageTakenMultiplier;
         return worth >= hosted.Health.CurrentHealth - hosted.Health.HealthFloor;
     }
 
@@ -631,15 +642,34 @@ public sealed class CreatureHost
             return;
         }
 
-        string wanted = statusId.ToString();
+        StatusEffectDefinition status = StatusById(statusId.ToString());
+        if (status != null)
+        {
+            StatusEffects.Apply(hosted.Health, status, null);
+        }
+    }
+
+    // Statuses by id, found once each: a friend in a hazard refreshes its status every half second, and each message scanned every
+    // loaded object for it.
+    private readonly Dictionary<string, StatusEffectDefinition> statusesById = new Dictionary<string, StatusEffectDefinition>();
+
+    private StatusEffectDefinition StatusById(string wanted)
+    {
+        if (statusesById.TryGetValue(wanted, out StatusEffectDefinition known) && known != null)
+        {
+            return known;
+        }
+
         foreach (StatusEffectDefinition status in Resources.FindObjectsOfTypeAll<StatusEffectDefinition>())
         {
             if (status != null && status.Id == wanted)
             {
-                StatusEffects.Apply(hosted.Health, status, null);
-                return;
+                statusesById[wanted] = status;
+                return status;
             }
         }
+
+        return null;
     }
 
     // A friend's blow on one of the host's creatures: applied here, and the creature turns on them.
@@ -653,6 +683,8 @@ public sealed class CreatureHost
         reader.ReadValueSafe(out Vector3 direction);
         reader.ReadValueSafe(out float poise);
         reader.ReadValueSafe(out int technique);
+        reader.ReadValueSafe(out byte strike);
+        reader.ReadValueSafe(out byte guard);
         // From a friend still on this run, as the other friend messages ask: a late arrow from one who just extracted lands nowhere.
         if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
             || FriendOnThisRun(sender) == null)
@@ -663,11 +695,14 @@ public sealed class CreatureHost
         // Struck by the host before: should this blow kill it, the kill and its loot count for the host too. Only that blow
         // carries the host's name. Every other is the friend's alone: named as the host's, each showed in the host's game as
         // a blow of their own (its hit feedback, their stealth and their relics all listen for those).
-        Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, amount, (DamageType)type) ? Player.Current.Combatant : null;
+        Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, amount, (DamageType)type, (StrikeKind)strike) ? Player.Current.Combatant : null;
         // Judged already: the friend's game put the blow to its copy's guard (a shield, as it faced there) before sending it. Whether it
         // was caught unaware is this game's to say, from where the blow came.
         hosted.Ai.JudgeAmbushFrom(point - direction * 2f);
-        hosted.Health.ApplyJudged(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique));
+        // With how it lands (a hammer against a creature weak to blunt) and how its shield there took it (poise broken through a raised
+        // shield breaks the guard here, toward the splinter).
+        hosted.Health.ApplyJudged(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique, (StrikeKind)strike),
+            guard == (byte)GuardOutcome.Blocked ? GuardOutcome.Blocked : GuardOutcome.None);
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && friend.OwnerClientId == sender && friend.Body != null && friend.Body.TryGetComponent(out FriendHitbox hitbox))

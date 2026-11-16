@@ -196,7 +196,7 @@ public sealed partial class MonsterAI
             }
             else
             {
-                if (attacks.AnyStrikeReaches(distance))
+                if (attacks.AnyStrikeReaches(distance, IsHowler))
                 {
                     movement.Stop();
                     movement.TurnTowards(toTarget);

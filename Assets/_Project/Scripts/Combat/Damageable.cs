@@ -154,11 +154,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     /// Co-op, in the host's game: a friend's blow, which their game has already put to this creature's guard as they saw it
     /// (its shield, where it faced there). Asking the guard again here would take its share off twice.
     /// </summary>
-    public DamageResult ApplyJudged(in DamageInfo hit) => Apply(hit, false, false);
+    public DamageResult ApplyJudged(in DamageInfo hit, GuardOutcome judged = GuardOutcome.None) => Apply(hit, false, false, judged);
 
-    // askGuards: off for a blow another game has judged. exact: the amount is taken from health as it stands, past
+    // askGuards: off for a blow another game has judged, which says how its guard took it (judged: a shield blocking it there, so
+    // poise broken through it breaks the guard here too). exact: the amount is taken from health as it stands, past
     // invulnerability and defenses (Finish), so a death decided elsewhere shows what was left and not a number made up to be sure.
-    private DamageResult Apply(in DamageInfo hit, bool askGuards, bool exact)
+    private DamageResult Apply(in DamageInfo hit, bool askGuards, bool exact, GuardOutcome judged = GuardOutcome.None)
     {
         if (!IsAlive)
         {
@@ -177,7 +178,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         DamageInfo damage = hit;
-        GuardOutcome guard = GuardOutcome.None;
+        GuardOutcome guard = askGuards ? GuardOutcome.None : judged;
         if (guards != null && askGuards && !exact)
         {
             foreach (IHitGuard candidate in guards)
@@ -200,6 +201,7 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         float final = exact ? damage.Amount : DamageCalculator.Mitigate(damage.Amount, damage.Type, damage.Strike, Owner.Stats, Owner.Rules) * DamageTakenMultiplier;
+        float healthBefore = currentHealth;
         float healthLost = Mathf.Min(final, Mathf.Max(0f, currentHealth - HealthFloor));
         currentHealth -= healthLost;
 
@@ -254,6 +256,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
             {
                 Destroy(gameObject, destroyDelay);
             }
+        }
+        else if (!IsAlive)
+        {
+            // A listener ended it with this blow (RisesAgain: fire or a finishing blow on a Draug held at the floor): its death went
+            // out with the blow (Finish), and whoever struck hears of the kill (Second Wind, the kill's Focus).
+            result = new DamageResult(damage.Amount, final, healthBefore, true, damage.IsCritical, damage.Type, guard);
         }
 
         return result;
@@ -333,13 +341,20 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     /// <summary>Co-op: dies now, as the host's game says this creature did, by <paramref name="killer"/>'s blow (or none).</summary>
     public void Finish(Combatant killer)
     {
+        Finish(new DamageInfo(killer, null, 0f, DamageType.Physical, false, transform.position, transform.forward, 0f, HitTechnique.None));
+    }
+
+    /// <summary>Dies now of <paramref name="killingBlow"/>, whatever is left and past any floor: the blow's attack, kind, direction and
+    /// technique go with the death (the ragdoll's throw, a severed limb, a brutal kill's waver), not a made-up blow.</summary>
+    public void Finish(in DamageInfo killingBlow)
+    {
         if (!IsAlive)
         {
             return;
         }
 
         HealthFloor = 0f;
-        Apply(new DamageInfo(killer, null, currentHealth, DamageType.Physical, false, transform.position, transform.forward, 0f, HitTechnique.None), false, true);
+        Apply(killingBlow.WithAmount(currentHealth), false, true);
     }
 
     /// <summary>

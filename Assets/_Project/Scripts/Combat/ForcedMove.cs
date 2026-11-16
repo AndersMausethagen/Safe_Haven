@@ -18,10 +18,11 @@ public sealed class ForcedMove : MonoBehaviour
     private Vector3 velocity;
     private float until;
 
-    /// <summary>After a hit that got through: the attack's Pull drags the target toward the attacker (or throws it off).</summary>
+    /// <summary>After a hit that got through: the attack's Pull drags the target toward the attacker (or throws it off). Not one that
+    /// was dodged (the bog troll's drag and the shield rush are escaped by a dodge), nor a friend's body in the host's game.</summary>
     public static void AfterHit(AttackDefinition attack, IDamageable victim, Combatant source, in DamageResult result)
     {
-        if (attack == null || Mathf.Abs(attack.Pull) < 0.01f || source == null || result.Killed || result.Parried
+        if (attack == null || Mathf.Abs(attack.Pull) < 0.01f || source == null || !result.Landed || result.Killed || result.Parried
             || !(victim is Component body) || body == null)
         {
             return;

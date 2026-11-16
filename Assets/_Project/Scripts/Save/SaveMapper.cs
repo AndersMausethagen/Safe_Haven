@@ -222,6 +222,7 @@ public static class SaveMapper
         into.huldraAwayUntil = settlement.HuldraAwayUntil;
         into.requests = new List<string>(settlement.Requests);
         into.requestsAnswered = settlement.RequestsAnswered;
+        into.requestsAskedAt = settlement.RequestsAskedAt;
         into.orderRenown = settlement.OrderRenown;
         into.breach = (int)settlement.Breach;
         into.breachesWon = settlement.BreachesWon;
@@ -312,7 +313,7 @@ public static class SaveMapper
         settlement.RestoreBlight(saved.blight);
         ReadTerritory(saved.territory, settlement.Territory);
         settlement.RestoreSpirits(saved.spiritGifts, saved.huldraRespect, saved.huldraAwayUntil);
-        settlement.RestoreRequests(saved.requests, saved.requestsAnswered, saved.orderRenown);
+        settlement.RestoreRequests(saved.requests, saved.requestsAnswered, saved.orderRenown, saved.requestsAskedAt);
         if (saved.tradeBought != null)
         {
             foreach (TradeSaveData bought in saved.tradeBought)
@@ -434,7 +435,7 @@ public static class SaveMapper
 
         foreach (QuestLog.Entry entry in quests.Entries)
         {
-            into.Add(new QuestSaveData { id = entry.Quest.Id, status = (int)entry.Status, counts = new List<int>(entry.Counts) });
+            into.Add(new QuestSaveData { id = entry.Quest.Id, status = (int)entry.Status, counts = new List<int>(entry.Counts), rewardsWaiting = entry.RewardsWaiting });
         }
     }
 
@@ -451,7 +452,7 @@ public static class SaveMapper
             QuestDefinition quest = Resolve(content.FindQuest(entry?.id), "quest", entry?.id, missing);
             if (quest != null)
             {
-                quests.Restore(quest, (QuestStatus)entry.status, entry.counts);
+                quests.Restore(quest, (QuestStatus)entry.status, entry.counts, entry.rewardsWaiting);
             }
         }
 

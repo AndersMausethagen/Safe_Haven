@@ -255,9 +255,9 @@ public sealed class MonsterAttacks
     }
 
     /// <summary>True when one of its actions that strikes (not a howl) reaches <paramref name="distance"/>, so it can hold its ground.</summary>
-    public bool AnyStrikeReaches(float distance)
+    public bool AnyStrikeReaches(float distance, bool isLeader)
     {
-        return HoldsGround(definition.Attacks, readyAt, distance, Time.time, RaidTier, Phase);
+        return HoldsGround(definition.Attacks, readyAt, distance, Time.time, RaidTier, Phase, HealthShare, isLeader);
     }
 
     /// <summary>
@@ -266,14 +266,17 @@ public sealed class MonsterAttacks
     /// runs in to bite, and a Guardian whose wide slam is spent walks up to use its own. A creature whose only strike is on a long
     /// cooldown, such as a Mistwing's dive, has nothing to walk up with, so it keeps its distance until that is ready.
     /// </summary>
-    public static bool HoldsGround(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, int tier, int phase = 0)
+    public static bool HoldsGround(IReadOnlyList<MonsterAttack> attacks, float[] cooldowns, float distance, float now, int tier, int phase = 0,
+        float health = 1f, bool isLeader = true)
     {
         float everyday = 0f;
         bool any = false, charges = false;
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            if (candidate == null || !candidate.Strikes || candidate.fromPhase > phase || !candidate.KnownAt(tier))
+            // What it can't use at all yet (as IsAvailable: its phase, its tier, Below Health, the pack leader's own) is no reason to stand.
+            if (candidate == null || !candidate.Strikes || candidate.fromPhase > phase || !candidate.KnownAt(tier) || !candidate.WhenHurt(health)
+                || (candidate.packLeaderOnly && !isLeader))
             {
                 continue;
             }
@@ -350,6 +353,25 @@ public sealed class MonsterAttacks
         blowsLeft = melee && action.followUps != null && (AlwaysPresses || (RaidTier >= action.comboFromTier && Random.value < action.comboChance)) ? action.followUps.Length : 0;
         holdLeft = melee && action.holdChance > 0f && (AlwaysPresses || Random.value < action.holdChance) ? action.holdSeconds : 0f;
         holdFrom = action != null && action.attack != null ? action.attack.HitDelay * HoldAtShare : 0f;
+        PlannedFollowUps = blowsLeft;
+        PlannedHold = holdLeft;
+    }
+
+    /// <summary>The follow-up blows this strike was begun with (its combo roll), before any is struck.</summary>
+    public int PlannedFollowUps { get; private set; }
+
+    /// <summary>How long this strike was begun to hold its wind-up (its hold roll), 0 for none.</summary>
+    public float PlannedHold { get; private set; }
+
+    /// <summary>Co-op, a friend's copy: the strike just begun goes as the host's creature rolled it (its follow-ups and its hold), not as
+    /// this game's own rolls would have it.</summary>
+    public void PlayAsPlanned(int followUps, float hold)
+    {
+        bool melee = action != null && action.kind == MonsterAttackKind.Melee;
+        blowsLeft = melee && action.followUps != null ? Mathf.Clamp(followUps, 0, action.followUps.Length) : 0;
+        holdLeft = melee ? Mathf.Max(0f, hold) : 0f;
+        PlannedFollowUps = blowsLeft;
+        PlannedHold = holdLeft;
     }
 
     /// <summary>Carries the strike on. False once it is over, so the owner goes back to the chase.</summary>

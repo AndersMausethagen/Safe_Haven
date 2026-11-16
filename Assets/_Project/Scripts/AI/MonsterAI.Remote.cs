@@ -88,6 +88,15 @@ public sealed partial class MonsterAI
     /// <summary>The attack action last begun (-1: the definition's plain attack), so a host can tell friends which.</summary>
     public int LastAction { get; private set; } = -1;
 
+    /// <summary>The blow of the strike under way: 0 for its first, then each follow-up of a combo (each raises AttackStarted).</summary>
+    public int StrikeBlow => attacks != null ? attacks.Blow : 0;
+
+    /// <summary>The follow-ups and the hold the strike under way was begun with, so friends' copies play the same string.</summary>
+    public int StrikeFollowUps => attacks != null ? attacks.PlannedFollowUps : 0;
+
+    /// <inheritdoc cref="StrikeFollowUps"/>
+    public float StrikeHold => attacks != null ? attacks.PlannedHold : 0f;
+
     /// <summary>Hands this creature to the host's game: no more thinking or path finding here.</summary>
     public void MakeRemote()
     {
@@ -142,9 +151,15 @@ public sealed partial class MonsterAI
     /// <param name="guarding">The host's creature has its weapon raised (light blows from the front are turned aside here too).</param>
     public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None,
         float poiseShare = 1f, bool waiting = false, bool felled = false, bool guarding = false, float noticeLevel = 0f, RemoteHunt noticing = RemoteHunt.None,
-        bool marked = false)
+        bool marked = false, bool shieldSplintered = false)
     {
         remoteMarked = marked;
+        // The host's creature's shield splintered (a friend's blows count toward it there): this copy's goes too.
+        if (shieldSplintered && !shieldBroken)
+        {
+            Splinter(-transform.forward);
+        }
+
         remoteHunt = hunting;
         remoteNoticeLevel = noticeLevel;
         remoteNoticing = noticing;
@@ -194,7 +209,7 @@ public sealed partial class MonsterAI
     /// same action plays here, at <paramref name="at"/> (this player, where they really stand) or, for a strike at someone
     /// else, at <paramref name="aimedAt"/>: where the host's creature aimed it.
     /// </summary>
-    public void PlayRemoteStrike(int action, IDamageable at, Vector3 from, float yaw, Vector3? aimedAt = null)
+    public void PlayRemoteStrike(int action, IDamageable at, Vector3 from, float yaw, Vector3? aimedAt = null, int followUps = 0, float hold = 0f)
     {
         if (!IsRemote || CurrentState == State.Dead || definition == null)
         {
@@ -231,6 +246,8 @@ public sealed partial class MonsterAI
 
         toTarget.y = 0f;
         BeginAttack(action, toTarget.sqrMagnitude > 0.0001f ? toTarget : transform.forward * RemoteAimDistance);
+        // The host's creature rolled its string once, at its first blow, and sends only that: its follow-ups play on here as they do there.
+        attacks.PlayAsPlanned(followUps, hold);
     }
 
     /// <summary>

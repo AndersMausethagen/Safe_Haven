@@ -19,6 +19,8 @@ public sealed class PlayerTechniques : MonoBehaviour
     private PlayerBoons boons;
     private PlayerFocus focus;
     private bool sweeping;
+    // The art (PlayerCombat.ArtsBegun) whose kill last gave Focus back: Flurry's refund is once an art.
+    private int flurryRefundedArt = -1;
 
     public static PlayerTechniques AddTo(GameObject player) =>
         player.TryGetComponent(out PlayerTechniques existing) ? existing : player.AddComponent<PlayerTechniques>();
@@ -78,9 +80,12 @@ public sealed class PlayerTechniques : MonoBehaviour
         if ((damage.Technique & HitTechnique.WeaponArt) != 0 && combat != null && combat.Weapon != null && Techniques.HasFlourish)
         {
             WeaponDefinition weapon = combat.Weapon;
-            if (weapon.Stance == WeaponStance.OneHanded && result.Killed && focus != null)
+            // Once an art, and a share of the Focus it really took: an art paid in stamina gives none back, a rune's art its rune's,
+            // and a sweep that fells several doesn't pay for itself.
+            if (weapon.Stance == WeaponStance.OneHanded && result.Killed && focus != null && combat.ArtsBegun != flurryRefundedArt)
             {
-                focus.Gain(weapon.WeaponArtFocus * Rules.FlurryRefund);
+                flurryRefundedArt = combat.ArtsBegun;
+                focus.Gain(combat.ArtFocusPaid * Rules.FlurryRefund);
             }
             else if (weapon.Stance == WeaponStance.Polearm && !result.Killed && Rules.Pinning != null && target is Damageable pinned && pinned.IsAlive)
             {

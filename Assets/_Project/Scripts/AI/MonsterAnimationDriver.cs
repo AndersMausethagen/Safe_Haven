@@ -412,8 +412,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         bool weighty = (damage.Technique & Weighty) != 0 || damage.Poise >= maxPoise * HeavyHitPoiseShare;
         lastBlowAt = Time.time;
         lastBlowFells = (damage.Technique & HitTechnique.Charged) != 0 || damage.Poise >= maxPoise * 0.75f;
-        // A blow that staggered it already (the AI heard it first): a felling blow knocks it down.
-        if (ai.CurrentState == MonsterAI.State.Staggered && lastBlowFells && !result.Killed)
+        // A blow that staggered it already (the AI heard it first): a felling blow knocks it down. Never a great beast, boss or elite,
+        // which only stagger (MonsterAI.TakeBlowOnPoise).
+        if (ai.CurrentState == MonsterAI.State.Staggered && lastBlowFells && !result.Killed && !ai.IsHeavyweight)
         {
             KnockDown(ai.StaggerSecondsLeft);
             return;

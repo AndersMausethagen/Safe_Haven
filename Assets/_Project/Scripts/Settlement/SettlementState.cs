@@ -170,9 +170,20 @@ public sealed class SettlementState
         OrderRenown += Math.Max(0, renown);
     }
 
-    public void RestoreRequests(IEnumerable<string> asked, int answered, int orderRenown = 0)
+    /// <summary>The homecoming (SuccessfulExtractions) the Haven's asks were last posted at, -1 for none yet: new asks come once a
+    /// homecoming, not with every load of the Haven (it was the board's own, so a save and load posted again).</summary>
+    public int RequestsAskedAt { get; private set; } = -1;
+
+    public void NoteRequestsAsked(int homecoming)
+    {
+        Borrowed();
+        RequestsAskedAt = homecoming;
+    }
+
+    public void RestoreRequests(IEnumerable<string> asked, int answered, int orderRenown = 0, int askedAt = -1)
     {
         OrderRenown = Math.Max(0, orderRenown);
+        RequestsAskedAt = askedAt;
         requests.Clear();
         if (asked != null)
         {

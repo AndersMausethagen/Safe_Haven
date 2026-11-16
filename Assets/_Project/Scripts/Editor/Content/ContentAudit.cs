@@ -77,7 +77,8 @@ public static class ContentAudit
     };
 
     private static readonly string[] MonsterAsks = { "QuestDefinition.objectives", "JournalSettings.", "RaidDefinition.knownEnemies" };
-    private static readonly string[] MonsterNeither = { "MonsterAI.definition", "CheatSettings.creatures" };
+    // Wildlife.senses: scenery game borrows a huntable kind's senses (2026-11-16), which neither asks for that creature nor makes it.
+    private static readonly string[] MonsterNeither = { "MonsterAI.definition", "CheatSettings.creatures", "Wildlife.senses" };
 
     private static readonly string[] Scenes = { "Assets/_Project/Scenes/SafeHaven.unity", "Assets/_Project/Scenes/Prologue_MistyWoods.unity" };
 

@@ -161,7 +161,8 @@ public sealed partial class PlayerCombat
     private void OnArtRequested()
     {
         artFromRune = false;
-        if (weapon == null || weapon.TakesAttackInput || weapon.WeaponArt == null)
+        // As any attack: not swimming, at the oars or a cart's handles, nor mid-interaction (gathering, crafting).
+        if (weapon == null || weapon.TakesAttackInput || weapon.WeaponArt == null || (stateMachine != null && !stateMachine.CanStartAttack))
         {
             return;
         }
@@ -277,8 +278,7 @@ public sealed partial class PlayerCombat
             return true;
         }
 
-        Begin(kind, judge);
-        return true;
+        return Begin(kind, judge);
     }
 
     // The bounded buffer (SwingMotion.Buffers): a press is kept for the next swing only in the last moments before the swing in

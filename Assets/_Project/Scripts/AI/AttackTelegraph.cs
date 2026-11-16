@@ -49,6 +49,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     private float hideAt = -1f;
     private bool cued;
     private bool interruptible;
+    private bool cuesParry = true;
     private static bool warnedNoMaterial;
     private MeshFilter edgeFilter;
     private Transform opening;
@@ -123,7 +124,11 @@ public sealed class AttackTelegraph : MonoBehaviour
             ? ai.ActiveAction.chargeDistance : attack.Range;
         marker.localScale = Vector3.one * range;
         marker.gameObject.SetActive(true);
-        interruptible = ai.ActiveAction != null && ai.ActiveAction.interruptible;
+        // An Unyielding elite's strikes break off for nothing until its layer breaks, whatever the strike allows.
+        interruptible = ai.ActiveAction != null && ai.ActiveAction.interruptible && !ai.IsUnyielding;
+        // A shot leaves the hand and a charge starts its rush at Hit Delay: contact comes later, by the flight or the run, so the
+        // moment before Hit Delay is no time to parry them (a guard raised on that cue blocks instead).
+        cuesParry = ai.ActiveAction == null || (ai.ActiveAction.kind != MonsterAttackKind.Charge && !MonsterAttacks.IsRanged(ai.ActiveAction.kind));
         ShowHeavy();
         Place();
         UpdateFill(0f);
@@ -191,7 +196,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     private void UpdateParryCue(float elapsed)
     {
         float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
-        if (cued || attack.Unblockable || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
+        if (cued || !cuesParry || attack.Unblockable || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
         {
             return;
         }
@@ -221,7 +226,7 @@ public sealed class AttackTelegraph : MonoBehaviour
         CombatFeelSettings feel = CombatFeelSettings.Current;
         Color color = unblockable ? feel.UnblockableColor : interruptible ? feel.InterruptibleColor : feel.TelegraphFillColor;
         float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
-        if (!unblockable && attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
+        if (!unblockable && cuesParry && attack != null && attack.HitDelay > window && progress >= 1f - window / attack.HitDelay && progress < 1f)
         {
             color = CombatFeelSettings.Current.ParryCueColor;
         }

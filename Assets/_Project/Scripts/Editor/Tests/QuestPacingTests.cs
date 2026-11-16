@@ -217,6 +217,52 @@ public sealed class QuestPacingTests
         Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(three), "never nothing to do at home");
     }
 
+    // Review 2026-11-16: held at "now" every frame, the quest a completion freed began in that same frame ("Quest complete" and
+    // "New Haven quest" together, its stories at once).
+    [Test]
+    public void AHeldQuestFreedByACompletion_WaitsTheGapBetweenQuests()
+    {
+        var door = Quest("door", QuestStart.ByQuestGiver);
+        var one = Haven("one", door);
+        var two = Haven("two", door);
+        var three = Haven("three", door);
+        Run(door, one, two, three);
+        manager.Log.ForceComplete(door);
+        float now = Time.time + 1000f;
+        manager.StartWaitingQuests(now);
+        Assert.IsTrue(manager.IsHeld(three));
+
+        manager.Log.ForceComplete(one);
+        manager.Log.ForceComplete(two);
+        manager.SpaceWaitingFrom(now); // the completions, on this test's clock
+        manager.StartWaitingQuests(now);
+        Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(three), "not in the frame the last of its kind was done");
+
+        manager.StartWaitingQuests(now + StoryPacingSettings.Current.BetweenQuestsSeconds);
+        Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(three));
+    }
+
+    // Review 2026-11-16: rewards of a quest done after a raid was decided wait for home, and were only in memory: the raid-end save,
+    // written once the raid's end is counted, has them.
+    [Test]
+    public void RewardsWaitingForHome_AreSaved_AndGivenOnce()
+    {
+        var log = new QuestLog();
+        var quest = Quest("reward", QuestStart.ByQuestGiver);
+        log.Restore(quest, QuestStatus.Completed, new int[0]);
+        log.HoldRewards(quest);
+
+        var saved = new System.Collections.Generic.List<QuestSaveData>();
+        typeof(SaveMapper).GetMethod("WriteQuests", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+            .Invoke(null, new object[] { log, saved });
+        Assert.IsTrue(saved[0].rewardsWaiting);
+
+        var loaded = new QuestLog();
+        loaded.Restore(quest, (QuestStatus)saved[0].status, saved[0].counts, saved[0].rewardsWaiting);
+        CollectionAssert.AreEqual(new[] { quest }, loaded.TakeWaitingRewards());
+        Assert.IsEmpty(loaded.TakeWaitingRewards(), "given once");
+    }
+
     [Test]
     public void MainAndRescueQuests_AreNeverHeld()
     {

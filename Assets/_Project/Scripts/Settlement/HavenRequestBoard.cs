@@ -16,7 +16,6 @@ public sealed class HavenRequestBoard : MonoBehaviour
     [SerializeField, Min(0.5f)] private float checkEvery = 2f;
 
     private float nextCheck;
-    private int askedAtHomecoming = -1;
 
     /// <summary>The asks standing now.</summary>
     public static List<HavenRequestDefinition> Standing()
@@ -81,6 +80,12 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
     private void Start()
     {
+        // In a friend's Haven the asks are the host's (as in Update): this game's copy of their settlement isn't posted to.
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         // A fresh game, or asks gone from the settings: fill up at once.
         Refill(force: GameSession.Settlement.Requests.Count == 0);
     }
@@ -273,12 +278,12 @@ public sealed class HavenRequestBoard : MonoBehaviour
         int homecoming = settlement.SuccessfulExtractions;
         HavenRequestSettings settings = HavenRequestSettings.Current;
         // Nothing new is asked until there is a board to post it on; the first asks come as soon as it stands.
-        if (!force && askedAtHomecoming == homecoming || !settings.CanPost)
+        if (!force && settlement.RequestsAskedAt == homecoming || !settings.CanPost)
         {
             return;
         }
 
-        askedAtHomecoming = homecoming;
+        settlement.NoteRequestsAsked(homecoming);
         List<HavenRequestDefinition> standing = Standing();
         foreach (string id in new List<string>(settlement.Requests))
         {

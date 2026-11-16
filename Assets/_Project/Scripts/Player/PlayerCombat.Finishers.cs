@@ -12,6 +12,7 @@ public sealed partial class PlayerCombat
     private void BeginFinish(MonsterAI target, float hitAt)
     {
         finishing = target;
+        finishUnderWay = true;
         finishFrom = transform.position;
         finishEndsAt = Time.time + hitAt + Rules.FinishHoldSeconds;
         // Past each other's bodies for the stab, and not to be knocked out of it before the blade lands.
@@ -32,12 +33,14 @@ public sealed partial class PlayerCombat
 
     private void UpdateFinish()
     {
-        if (finishing == null)
+        if (!finishUnderWay)
         {
             return;
         }
 
-        if (Time.time >= finishEndsAt)
+        // Done, or the creature is gone mid-finish (destroyed: a friend's copy taken away, a thief fled): it ends either way, or the
+        // invulnerability it gave would stay for good.
+        if (finishing == null || Time.time >= finishEndsAt)
         {
             EndFinish();
             return;
@@ -60,6 +63,9 @@ public sealed partial class PlayerCombat
     // Its own key: the heavy-hit and knockdown safety use the combat's, and ending a swing must not strip those.
     private static readonly object FinishKey = new object();
 
+    // True from a finishing blow's start until EndFinish, even if the creature is destroyed meanwhile (then "finishing" reads null).
+    private bool finishUnderWay;
+
     private void EndFinish()
     {
         if (finishingCollider != null && controller != null)
@@ -67,7 +73,9 @@ public sealed partial class PlayerCombat
             BodyPassThrough.Restore(controller, finishingCollider);
         }
 
-        bool wasFinishing = finishing != null;
+        // Not "finishing != null": a creature destroyed mid-finish reads as null, and its invulnerability stayed.
+        bool wasFinishing = finishUnderWay;
+        finishUnderWay = false;
         finishingCollider = null;
         finishing = null;
         if (wasFinishing && health != null)

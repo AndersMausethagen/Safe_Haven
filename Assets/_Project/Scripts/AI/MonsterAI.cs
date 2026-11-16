@@ -765,6 +765,25 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
             damageable.DamageTakenMultiplier = 1f;
         }
 
+        // However a hop ends (a stagger, a felling tree, a friend's parry): it can be hurt again. Only UpdateHop gave it back before,
+        // so one staggered mid-hop fought on with every blow evaded.
+        if (previous == State.Hopping && damageable != null)
+        {
+            damageable.RemoveInvulnerability(this);
+        }
+
+        // A staggered creature never reads a swing: a parry it was readying is gone with the stagger.
+        if (next == State.Staggered)
+        {
+            parryUntil = -1f;
+        }
+
+        // Circling is a way of chasing: walking home or looking about goes at its own pace.
+        if (next != State.Chasing)
+        {
+            circling = false;
+        }
+
         if (previous == State.Idle && idleLife != null)
         {
             idleLife.Reset();

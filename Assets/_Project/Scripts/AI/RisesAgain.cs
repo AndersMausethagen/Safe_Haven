@@ -69,7 +69,8 @@ public sealed class RisesAgain : MonoBehaviour
         if (damage.Type == DamageType.Fire || burning || (damage.Technique & HitTechnique.Finisher) != 0)
         {
             Release();
-            health.Finish(damage.Source);
+            // With the blow itself, so it dies of it: the finisher's kill, the fire's, the cut that severs.
+            health.Finish(damage);
             return;
         }
 

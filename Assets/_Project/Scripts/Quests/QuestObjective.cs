@@ -421,8 +421,9 @@ public sealed class QuestObjective
             case ObjectiveType.UseObject:
                 return log != null && log.HasDone(DeedKey) ? 1 : 0;
             case ObjectiveType.RescuePerson:
-                // Home already (an older save, or rescued before the quest): that is found and home both.
-                return log != null && (log.HasDone(DeedKey) || (person != null && GameSession.Settlement.HasResident(person))) ? 1 : 0;
+                // Home already (an older save, or rescued before the quest): that is found and home both. Home is the player's own
+                // Haven: in a friend's (co-op) the settlement is the host's, where the person may long have lived.
+                return log != null && (log.HasDone(DeedKey) || (person != null && LivesAtHome(person))) ? 1 : 0;
             case ObjectiveType.AssignJob:
                 return HasJob() ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
@@ -444,8 +445,17 @@ public sealed class QuestObjective
     private bool BossBeaten()
     {
         BossEncounter boss = monster != null && monster.Prefab != null ? monster.Prefab.GetComponent<BossEncounter>() : null;
-        return boss != null && boss.Definition != null && GameSession.Settlement.IsBossDefeated(boss.Definition.Id);
+        if (boss == null || boss.Definition == null)
+        {
+            return false;
+        }
+
+        // Beaten for the player's own Haven: in a friend's, the settlement is the host's, and their win isn't this player's.
+        return HavenVisit.IsVisiting ? HavenVisit.HomeBeatBoss(boss.Definition.Id) : GameSession.Settlement.IsBossDefeated(boss.Definition.Id);
     }
+
+    private static bool LivesAtHome(ResidentDefinition person) =>
+        HavenVisit.IsVisiting ? HavenVisit.HomeHasResident(person.Id) : GameSession.Settlement.HasResident(person);
 
     // Buildings of the kind (or any) standing at the tier asked for or above.
     private int StandingAtTier()

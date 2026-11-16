@@ -76,6 +76,8 @@ public sealed class SettlementSaveData
     /// <summary>What the Haven is asking for (HavenRequestDefinition ids), and how many asks were answered. Empty in older saves.</summary>
     public List<string> requests = new List<string>();
     public int requestsAnswered;
+    /// <summary>The homecoming the asks were last posted at. Missing in older saves: -1, posted at the next look.</summary>
+    public int requestsAskedAt = -1;
     /// <summary>Renown kept for crafting orders filled. 0 in older saves.</summary>
     public int orderRenown;
     /// <summary>A BreachStatus.</summary>
@@ -264,6 +266,8 @@ public sealed class QuestSaveData
     public int status;
     /// <summary>Progress per objective, in the quest's objective order.</summary>
     public List<int> counts = new List<int>();
+    /// <summary>Completed after a raid was decided, its rewards not yet given (they are given at home). Missing in older saves: none.</summary>
+    public bool rewardsWaiting;
 }
 
 [Serializable]

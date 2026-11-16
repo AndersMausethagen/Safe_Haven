@@ -119,6 +119,14 @@ public sealed class GroundHazard : MonoBehaviour
                 continue;
             }
 
+            // A fire already burning here: the grass under it is alight, so no second fire is laid on it. A fire knight's charge meets
+            // the ground every frame of its rush and stacked a fire a frame up to the cap.
+            if (arriving == HazardElement.Fire && hazard.element == HazardElement.Fire)
+            {
+                touchedAny = true;
+                continue;
+            }
+
             touchedAny |= arriving == HazardElement.Fire ? hazard.Ignite(by) : hazard.Freeze(by);
         }
 

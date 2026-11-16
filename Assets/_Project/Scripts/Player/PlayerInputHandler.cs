@@ -350,7 +350,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnCycleArrows(InputAction.CallbackContext context)
     {
-        if (!PadBusy(context))
+        // While a building is being placed the buttons are the placer's, a mouse's middle button too (it is the weapon art's).
+        if (!PadBusy(context) && !BuildPlacer.IsBusy)
         {
             stateMachine.RequestArrowCycle();
         }

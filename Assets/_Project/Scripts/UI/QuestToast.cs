@@ -82,6 +82,7 @@ public sealed class QuestToast : MonoBehaviour
             {
                 watched.Started -= OnStarted;
                 watched.Progressed -= OnProgressed;
+                watched.ReadyToTurnIn -= OnReadyToTurnIn;
                 watched.Completed -= OnCompleted;
             }
 
@@ -90,6 +91,7 @@ public sealed class QuestToast : MonoBehaviour
             {
                 watched.Started += OnStarted;
                 watched.Progressed += OnProgressed;
+                watched.ReadyToTurnIn += OnReadyToTurnIn;
                 watched.Completed += OnCompleted;
             }
         }
@@ -120,6 +122,10 @@ public sealed class QuestToast : MonoBehaviour
     }
 
     private void OnProgressed(QuestDefinition quest, int objective) => Tell(quest, Kind.Updated);
+
+    // The last step done: the card says where to hand it in. Progressed comes first, before the quest is ready, and its card had an
+    // empty line.
+    private void OnReadyToTurnIn(QuestDefinition quest) => Tell(quest, Kind.Updated);
 
     private void OnCompleted(QuestDefinition quest)
     {

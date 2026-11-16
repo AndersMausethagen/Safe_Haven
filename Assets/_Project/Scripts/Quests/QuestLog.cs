@@ -32,6 +32,10 @@ public sealed class QuestLog
         public QuestStatus Status { get; internal set; }
         public int[] Counts { get; internal set; }
 
+        /// <summary>Completed after a raid was decided: its rewards wait to be given at home (saved, so a crash on the results screen
+        /// doesn't lose them).</summary>
+        public bool RewardsWaiting { get; internal set; }
+
         public bool IsObjectiveDone(int index) => index >= 0 && index < Counts.Length && Counts[index] >= Quest.Objectives[index].Amount;
 
         /// <summary>The objectives that count right now: all of them, or only the first unfinished one for ordered quests.</summary>
@@ -273,15 +277,40 @@ public sealed class QuestLog
         Complete(entry);
     }
 
+    /// <summary>Its rewards wait for the player to be home (QuestManager pays them with <see cref="TakeWaitingRewards"/>).</summary>
+    public void HoldRewards(QuestDefinition quest)
+    {
+        if (quest != null && entries.TryGetValue(quest, out Entry entry))
+        {
+            entry.RewardsWaiting = true;
+        }
+    }
+
+    /// <summary>The quests whose rewards wait, no longer waiting once taken.</summary>
+    public List<QuestDefinition> TakeWaitingRewards()
+    {
+        var waiting = new List<QuestDefinition>();
+        foreach (Entry entry in entries.Values)
+        {
+            if (entry.RewardsWaiting)
+            {
+                entry.RewardsWaiting = false;
+                waiting.Add(entry.Quest);
+            }
+        }
+
+        return waiting;
+    }
+
     /// <summary>Puts back saved progress without raising any events.</summary>
-    public void Restore(QuestDefinition quest, QuestStatus status, IReadOnlyList<int> counts)
+    public void Restore(QuestDefinition quest, QuestStatus status, IReadOnlyList<int> counts, bool rewardsWaiting = false)
     {
         if (quest == null || status == QuestStatus.NotStarted)
         {
             return;
         }
 
-        var entry = new Entry(quest) { Status = status };
+        var entry = new Entry(quest) { Status = status, RewardsWaiting = rewardsWaiting && status == QuestStatus.Completed };
         // Saved before the quest's steps changed (a step added or taken out): counts kept by place would land on the wrong
         // steps (review 2026-11-16: Smith's Request's new "Raise the Smithy"). They start again from nothing instead; what
         // is already owned or built is counted again once the scene is in (QuestManager.RecountOwned).

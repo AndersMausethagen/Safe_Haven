@@ -23,8 +23,11 @@ public readonly struct DamageInfo
     public readonly float Poise;
     public readonly HitTechnique Technique;
 
+    // How the blow lands when it was said outright (co-op: a friend's blow arrives without its attack); None: from the attack.
+    private readonly StrikeKind statedStrike;
+
     /// <summary>How the blow lands (crushing, cutting, piercing), from its attack. None for anything not a physical blow.</summary>
-    public StrikeKind Strike => StrikeKindExtensions.Of(Source, Attack);
+    public StrikeKind Strike => statedStrike != StrikeKind.None ? statedStrike : StrikeKindExtensions.Of(Source, Attack);
 
     /// <summary>A tick of damage over time, not a blow: burning, poison.</summary>
     public bool IsOverTime => (Technique & HitTechnique.OverTime) != 0;
@@ -35,8 +38,9 @@ public readonly struct DamageInfo
     }
 
     public DamageInfo(Combatant source, AttackDefinition attack, float amount, DamageType type, bool isCritical, Vector3 hitPoint,
-        Vector3 direction, float poise, HitTechnique technique)
+        Vector3 direction, float poise, HitTechnique technique, StrikeKind strike = StrikeKind.None)
     {
+        statedStrike = strike;
         Source = source;
         Attack = attack;
         Amount = amount;
@@ -52,10 +56,10 @@ public readonly struct DamageInfo
     public DamageInfo Scaled(float multiplier, float poiseMultiplier, HitTechnique technique, bool critical)
     {
         return new DamageInfo(Source, Attack, Amount * multiplier, Type, IsCritical || critical, HitPoint, Direction,
-            Poise * poiseMultiplier, Technique | technique);
+            Poise * poiseMultiplier, Technique | technique, statedStrike);
     }
 
     /// <summary>The same hit with a different amount, as a guard lets part of it through.</summary>
     public DamageInfo WithAmount(float amount) =>
-        new DamageInfo(Source, Attack, amount, Type, IsCritical, HitPoint, Direction, Poise, Technique);
+        new DamageInfo(Source, Attack, amount, Type, IsCritical, HitPoint, Direction, Poise, Technique, statedStrike);
 }

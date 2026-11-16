@@ -79,8 +79,11 @@ public sealed class PlayerSkills : MonoBehaviour
         stamina = GetComponent<PlayerStamina>();
         combat = GetComponent<PlayerCombat>();
         dodge = GetComponent<PlayerDodge>();
+        guard = GetComponent<PlayerGuard>();
         EnsureInitialised();
     }
+
+    private PlayerGuard guard;
 
     private void OnEnable()
     {
@@ -88,6 +91,11 @@ public sealed class PlayerSkills : MonoBehaviour
         if (dodge != null)
         {
             dodge.Dodged += OnDodged;
+        }
+
+        if (combat != null)
+        {
+            combat.Flinched += OnFlinched;
         }
 
         if (TryGetComponent(out bagItems))
@@ -120,6 +128,11 @@ public sealed class PlayerSkills : MonoBehaviour
         if (dodge != null)
         {
             dodge.Dodged -= OnDodged;
+        }
+
+        if (combat != null)
+        {
+            combat.Flinched -= OnFlinched;
         }
 
         if (bagItems != null)
@@ -299,6 +312,9 @@ public sealed class PlayerSkills : MonoBehaviour
             || (dodge != null && dodge.IsDodging)
             || movement.IsDashing
             || (TryGetComponent(out PlayerEating eating) && eating.IsEating)
+            // Rocked back, floored, stunned by a broken guard or locked in a finishing blow: no more a skill than a swing.
+            || (combat != null && (combat.IsFlinching || combat.IsFinishing))
+            || (guard != null && guard.IsStunned)
             || Time.time < busyUntil)
         {
             return SkillCastResult.Busy;
@@ -399,6 +415,12 @@ public sealed class PlayerSkills : MonoBehaviour
 
     // A dodge is the way out of trouble: like a weapon swing, a skill hit that hadn't landed yet is lost.
     private void OnDodged(Vector3 direction)
+    {
+        pendingHit = null;
+    }
+
+    // Struck out of it: a skill hit that hadn't landed yet is lost, as a weapon swing's is.
+    private void OnFlinched(float seconds, bool lostSwing)
     {
         pendingHit = null;
     }

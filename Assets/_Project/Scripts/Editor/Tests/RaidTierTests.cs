@@ -385,6 +385,28 @@ public sealed class RaidTierTests
         }
     }
 
+    // Review 2026-11-16: a long-reaching strike it may not use yet (Below Health, the pack leader's own) held it at a range nothing
+    // else it had could strike from.
+    [Test]
+    public void AStrikeItMayNotUseYet_IsNoReasonToStandOff()
+    {
+        var attack = ScriptableObject.CreateInstance<AttackDefinition>();
+        var bite = new MonsterAttack { attack = attack, kind = MonsterAttackKind.Melee, maximumRange = 2f };
+        var desperate = new MonsterAttack { attack = attack, kind = MonsterAttackKind.Melee, maximumRange = 6f, belowHealth = 0.3f };
+        var leaders = new MonsterAttack { attack = attack, kind = MonsterAttackKind.Melee, maximumRange = 6f, packLeaderOnly = true };
+        try
+        {
+            Assert.IsFalse(MonsterAttacks.HoldsGround(new[] { bite, desperate }, new[] { 0f, 0f }, 5f, 0f, 1, 0, 1f), "whole, it walks up to bite");
+            Assert.IsTrue(MonsterAttacks.HoldsGround(new[] { bite, desperate }, new[] { 0f, 0f }, 5f, 0f, 1, 0, 0.2f), "badly hurt, it strikes from here");
+            Assert.IsFalse(MonsterAttacks.HoldsGround(new[] { bite, leaders }, new[] { 0f, 0f }, 5f, 0f, 1, 0, 1f, false), "not the leader: it walks up");
+            Assert.IsTrue(MonsterAttacks.HoldsGround(new[] { bite, leaders }, new[] { 0f, 0f }, 5f, 0f, 1, 0, 1f, true));
+        }
+        finally
+        {
+            Object.DestroyImmediate(attack);
+        }
+    }
+
     [Test]
     public void ACreatureWithOnlyACharge_KeepsItsDistanceBetweenCharges()
     {
