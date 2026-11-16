@@ -190,6 +190,8 @@ public sealed partial class PlayerCombat
         activeTechnique = technique;
         activeStartTime = Time.time;
         chargeHeld = 0f;
+        holdWaited = 0f;
+        waitingForHold = false;
         charging = false;
         hitPending = attack != null;
         stepPending = activeLunge > 0f;
@@ -327,7 +329,7 @@ public sealed partial class PlayerCombat
         }
 
         float hitAt = HitAt(activeAttack, activeSpeed);
-        if (UpdateCharge(hitAt))
+        if (UpdateCharge(hitAt) || WaitsForHold(hitAt))
         {
             return;
         }
@@ -403,6 +405,29 @@ public sealed partial class PlayerCombat
         return charging;
     }
 
+    // A press still held may yet become the heavy one: the light swing it began waits at the top of its swing until the hold decides.
+    // Let go, it strikes at once (a tap is answered as before); held on, UpdateHeldPress grows it into the heavy from that pose. A
+    // fast weapon's light blow used to land before the hold could be told apart, so a held press swung, stood, and only then began
+    // the heavy (the user, 2026-11-15). True while it waits.
+    private const float HoldTellSeconds = 0.12f;
+
+    private bool WaitsForHold(float hitAt)
+    {
+        // Only once the press has outlasted a click (HoldTellSeconds): a tap on a fast weapon (fists, dagger) whose blow comes
+        // before then strikes on time, rather than waiting for the finger to lift (review 2026-11-16: up to 0.07 s late).
+        waitingForHold = activeKind == SwingKind.Light && hitPending && attackHeld && pressTime >= 0f && !heavyStarted
+            && activeStartTime >= pressTime && (activeTechnique & HitTechnique.Counter) == 0
+            && Time.time - pressTime >= HoldTellSeconds
+            && Time.time - pressTime < Rules.HeavyHoldSeconds + 0.05f
+            && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, Mathf.Max(activeLungeLead, LungeSeconds));
+        if (waitingForHold)
+        {
+            holdWaited += Time.deltaTime;
+        }
+
+        return waitingForHold;
+    }
+
     // The heavy swing hands over to the charged attack, already paid for, from the top of its wind-up.
     private void ReleaseCharged()
     {
@@ -410,8 +435,16 @@ public sealed partial class PlayerCombat
         EndSwing();
         forcedAttack = charged;
         heavyCredit = float.MaxValue;
+        ChargedFromHold = true;
         Begin(SwingKind.Heavy, ChainPress.Late);
+        ChargedFromHold = false;
         heavyCredit = 0f;
+        // The hold was its wind-up: it strikes now, not after a second one (the user, 2026-11-15: it went back to a standing pose,
+        // wound up again, then struck). Only the strike's own moment is left before the blow.
+        if (activeKind == SwingKind.Heavy && activeAttack == charged && hitPending)
+        {
+            activeStartTime -= Mathf.Max(0f, HitAt(charged, activeSpeed) - Mathf.Max(charged.StrikeLead, 0.02f));
+        }
     }
 
     // Out of a dodge that went away from where the player aims: the backstep, and the weapon's backstep attack.
@@ -694,7 +727,7 @@ public sealed partial class PlayerCombat
         activeMotion = ArtMotion.None;
         if (activeKind != SwingKind.None)
         {
-            lastStartTime = activeStartTime + chargeHeld;
+            lastStartTime = activeStartTime + chargeHeld + holdWaited;
             lastHitAt = HitAt(activeAttack, activeSpeed);
             lastRecoverAt = RecoverAt(activeAttack, activeSpeed);
             // A heavy that landed can be followed by the heavy follow-up; any other swing that landed ends that chain.
@@ -720,6 +753,8 @@ public sealed partial class PlayerCombat
         activeWindupMove = 0f;
         charging = false;
         chargeHeld = 0f;
+        holdWaited = 0f;
+        waitingForHold = false;
         movement.FacingLocked = false;
         movement.SetSpeedScale(this, 1f);
     }

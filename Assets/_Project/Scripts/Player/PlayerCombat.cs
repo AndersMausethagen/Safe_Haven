@@ -170,6 +170,9 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private bool counterLunges;
     // How long a heavy swing has waited at the top of its wind-up; the swing's clock stands still meanwhile.
     private float chargeHeld;
+    // Seconds the light swing a press began has waited at the top of its swing for the hold to decide (WaitsForHold).
+    private float holdWaited;
+    private bool waitingForHold;
     private bool charging;
     private bool attackHeld;
     // How long the player has been running, for the running attack.
@@ -246,6 +249,12 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// </summary>
     public float HeavyGrownFrom { get; private set; }
 
+    /// <summary>
+    /// While a full charge hands over to the weapon's charged attack: the hold was its wind-up, so it goes straight into the strike
+    /// from the top of its backswing (PlayerAnimationController starts its clip there). False otherwise.
+    /// </summary>
+    public bool ChargedFromHold { get; private set; }
+
     /// <summary>Share of walking speed the swing in progress keeps while it winds up (0: planted).</summary>
     public float WindupMoveShare => IsWindingUp ? activeWindupMove : 0f;
 
@@ -254,6 +263,10 @@ public sealed partial class PlayerCombat : MonoBehaviour
 
     /// <summary>True while a heavy swing waits at the top of its wind-up, charging.</summary>
     public bool IsCharging => charging;
+
+    /// <summary>True while the swing stands still at the top of its wind-up: a heavy charging, or a light one waiting to see whether
+    /// its press becomes a heavy (the animation holds its pose).</summary>
+    public bool IsHoldingSwing => charging || waitingForHold;
 
     /// <summary>How far a charging or charged heavy swing has got, from 0 to 1.</summary>
     public float Charge => Rules.HeavyChargeSeconds > 0f ? Mathf.Clamp01(chargeHeld / Rules.HeavyChargeSeconds) : 0f;
@@ -276,7 +289,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private Collider finishingCollider;
     private CharacterController controller;
 
-    private float ActiveElapsed => Time.time - activeStartTime - chargeHeld;
+    private float ActiveElapsed => Time.time - activeStartTime - chargeHeld - holdWaited;
 
     /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
     public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);

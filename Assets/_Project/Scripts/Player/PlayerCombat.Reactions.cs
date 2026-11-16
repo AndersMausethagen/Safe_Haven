@@ -13,8 +13,9 @@ public sealed partial class PlayerCombat
     // attacking for a moment (Cancel Lockout), so swing-dodge-swing can't fish for the dodge's invulnerability.
     private void OnDodged(Vector3 direction)
     {
-        // A charging heavy dodged out of is a feint (Elden Ring), not a cancel fished for: no lockout.
-        if (activeKind != SwingKind.None && hitPending && !charging && Rules.CancelLockout > 0f)
+        // A charging heavy dodged out of is a feint (Elden Ring), not a cancel fished for: no lockout. So is a light swing held
+        // at the top of its swing while the hold decides (WaitsForHold): the same press, the same feint.
+        if (activeKind != SwingKind.None && hitPending && !IsHoldingSwing && Rules.CancelLockout > 0f)
         {
             attackLockedUntil = Time.time + Rules.CancelLockout;
         }

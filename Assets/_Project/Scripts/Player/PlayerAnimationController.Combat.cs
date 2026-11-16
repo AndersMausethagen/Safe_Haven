@@ -25,7 +25,7 @@ public sealed partial class PlayerAnimationController
         // A heavy swing grown out of a light one started part way into its wind-up clip: the rest of the wind-up plays slower by as
         // much, so the strike frame still meets the blow.
         float windup = attack.AnimationSpeed * (1f - grownFrom);
-        float speed = combat.IsCharging ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : windup;
+        float speed = combat.IsHoldingSwing ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : windup;
         SetFloat(ActionSpeedHash, speed * swingSpeed);
         if (plantedSwing != 0 && !combat.IsCharging && combat.TimeToHit <= Mathf.Max(attack.StrikeLead, PlantedStrikeLead))
         {
@@ -179,14 +179,24 @@ public sealed partial class PlayerAnimationController
             start = windupClip * grownFrom;
         }
 
-        SetFloat(ActionSpeedHash, swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
+        // A full charge let go: the charged attack starts at the top of its backswing (where its wind-up ends), as the hold stood there.
+        bool fromHold = swing.Kind == SwingKind.Heavy && combat != null && combat.ChargedFromHold;
+        if (fromHold)
+        {
+            AttackDefinition charged = swing.Attack;
+            start = charged.AnimationSpeed * Mathf.Max(0f, charged.HitDelay - charged.StrikeLead * swing.Speed);
+        }
+
+        SetFloat(ActionSpeedHash, fromHold ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
         float fade = swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
         animator.CrossFadeInFixedTime(hash, fade, layer, start);
+        // Grown out of a light swing, the legs leave its stance for the planted heavy's slowly, so the hips don't twitch.
+        float othersFade = grownFrom > 0f ? GrownLegsFade : fade;
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
         {
             if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
             {
-                animator.CrossFadeInFixedTime(EmptyStateHash, fade, other);
+                animator.CrossFadeInFixedTime(EmptyStateHash, othersFade, other);
             }
         }
     }
