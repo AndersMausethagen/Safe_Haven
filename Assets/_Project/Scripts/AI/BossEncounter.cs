@@ -3,6 +3,7 @@ using UnityEngine;
 /// <summary>A boss in the world: on its prefab beside MonsterAI. Moves the fight through its phases, shows the bar and pays out when it falls.</summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI), typeof(Damageable))]
+[OnAFriendsCopy(CopyRule.Same, "the bar, the music and the phases follow the health the host sends; the wake is the host's (skipped on a copy)")]
 public sealed class BossEncounter : MonoBehaviour
 {
     [SerializeField] private BossDefinition definition;

@@ -10,6 +10,7 @@ using UnityEngine;
 /// reported rather than silently lost.
 /// </summary>
 [RequireComponent(typeof(Damageable))]
+[OnAFriendsCopy(CopyRule.Same, "personal loot: each game rolls its own")]
 public sealed class LootOnDeath : MonoBehaviour
 {
     [SerializeField] private ItemDropTable drops = new ItemDropTable();

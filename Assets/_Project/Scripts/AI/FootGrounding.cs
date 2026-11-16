@@ -11,6 +11,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(50)]
 [RequireComponent(typeof(Animator))]
+[OnAFriendsCopy(CopyRule.Same, "puts the copy's feet on its ground")]
 public sealed class FootGrounding : MonoBehaviour
 {
     [Tooltip("Height of each foot bone over its sole in the model's rest pose, in metres at the body's size (negative: the " +

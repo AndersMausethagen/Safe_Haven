@@ -8,7 +8,8 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Damageable))]
-public sealed class RisesAgain : MonoBehaviour
+[OnAFriendsCopy(CopyRule.HostOnly, "whether it rises is the host's: a copy holds no floor of its own and shows the host's word")]
+public sealed class RisesAgain : MonoBehaviour, ICopyAware
 {
     [Tooltip("Share of its health it stands up with.")]
     [SerializeField, Range(0.05f, 1f)] private float riseWith = 0.35f;
@@ -47,6 +48,23 @@ public sealed class RisesAgain : MonoBehaviour
     {
         health.Damaged -= OnDamaged;
         Release();
+    }
+
+    // A copy is made one after it is built (OnEnable has held the floor by then): it lets go, and whether it rises, falls or is
+    // finished is the host's word (a friend's fire could finish the copy here while the host's creature lived on). Taken back into
+    // this game (the host left), it holds the floor again unless it has already risen.
+    public void OnCopyChanged(bool isCopy)
+    {
+        if (isCopy)
+        {
+            Release();
+            down = false;
+        }
+        else if (!risen && !holding && health.IsAlive)
+        {
+            health.HoldFloor(this, 1f);
+            holding = true;
+        }
     }
 
     private void Release()

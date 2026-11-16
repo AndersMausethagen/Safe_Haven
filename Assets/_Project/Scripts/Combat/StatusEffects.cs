@@ -9,7 +9,8 @@ using UnityEngine;
 /// numbers but no hit stop, shake, flinch or guard. Only the player's speed is changed: monsters keep walking.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class StatusEffects : MonoBehaviour
+[OnAFriendsCopy(CopyRule.HostOnly, "a status this player lays is sent to the host's creature, which ticks it; the copy's own don't tick")]
+public sealed class StatusEffects : MonoBehaviour, ICopyAware
 {
     private const float TickSeconds = 0.5f;
 
@@ -101,11 +102,18 @@ public sealed class StatusEffects : MonoBehaviour
         return cured;
     }
 
+    // On a friend's copy of the host's creature: the host's game ticks the statuses (CopyRule.HostOnly).
+    private bool isCopy;
+
     private void Awake()
     {
         target = GetComponent<Damageable>();
         movement = GetComponent<PlayerMovement>();
+        // Laid on a creature already a copy (added with the first status).
+        isCopy = TryGetComponent(out MonsterAI creature) && creature.IsRemote;
     }
+
+    public void OnCopyChanged(bool copy) => isCopy = copy;
 
     private void OnDisable()
     {
@@ -174,7 +182,7 @@ public sealed class StatusEffects : MonoBehaviour
     {
         // A friend's copy of the host's creature (co-op): the host's game was sent the status (CoopCreatures › Status) and ticks it on the
         // creature that counts, whose health comes back here. Ticking here too sent every tick to the host as a blow: poison twice over.
-        if (TryGetComponent(out MonsterAI copy) && copy.IsRemote)
+        if (isCopy)
         {
             return;
         }

@@ -7,6 +7,7 @@ using UnityEngine.AI;
 /// huldra's call draws the one who hears it (Monster Attack › Foe Pull). Added to the body when first needed.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "a pull moves the body here; the host's poses carry it on")]
 public sealed class ForcedMove : MonoBehaviour
 {
     // A drag stops this far short of whoever drags, so it never pulls a body into theirs.

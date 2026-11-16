@@ -693,15 +693,6 @@ public sealed class CreatureHost
     {
         reader.ReadNetworkSerializable(out CreatureHitMessage hit);
         int id = hit.Id;
-        float amount = hit.Amount;
-        byte type = hit.Type;
-        bool critical = hit.Critical;
-        Vector3 point = hit.Point;
-        Vector3 direction = hit.Direction;
-        float poise = hit.Poise;
-        int technique = hit.Technique;
-        byte strike = hit.Strike;
-        byte guard = hit.Guard;
         // From a friend still on this run, as the other friend messages ask: a late arrow from one who just extracted lands nowhere.
         if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
             || FriendOnThisRun(sender) == null)
@@ -712,14 +703,14 @@ public sealed class CreatureHost
         // Struck by the host before: should this blow kill it, the kill and its loot count for the host too. Only that blow
         // carries the host's name. Every other is the friend's alone: named as the host's, each showed in the host's game as
         // a blow of their own (its hit feedback, their stealth and their relics all listen for those).
-        Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, amount, (DamageType)type, (StrikeKind)strike) ? Player.Current.Combatant : null;
+        DamageInfo blow = hit.Blow(null);
+        Combatant host = hosted.HitByHost && Player.Current != null && WouldKill(hosted, blow.Amount, blow.Type, blow.Strike) ? Player.Current.Combatant : null;
         // Judged already: the friend's game put the blow to its copy's guard (a shield, as it faced there) before sending it. Whether it
         // was caught unaware is this game's to say, from where the blow came.
-        hosted.Ai.JudgeAmbushFrom(point - direction * 2f);
+        hosted.Ai.JudgeAmbushFrom(blow.HitPoint - blow.Direction * 2f);
         // With how it lands (a hammer against a creature weak to blunt) and how its shield there took it (poise broken through a raised
         // shield breaks the guard here, toward the splinter).
-        hosted.Health.ApplyJudged(new DamageInfo(host, null, amount, (DamageType)type, critical, point, direction, poise, (HitTechnique)technique, (StrikeKind)strike),
-            guard == (byte)GuardOutcome.Blocked ? GuardOutcome.Blocked : GuardOutcome.None);
+        hosted.Health.ApplyJudged(hit.Blow(host), hit.JudgedGuard);
         foreach (NetworkPlayerAvatar friend in NetworkPlayerAvatar.All)
         {
             if (friend != null && friend.OwnerClientId == sender && friend.Body != null && friend.Body.TryGetComponent(out FriendHitbox hitbox))

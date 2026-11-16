@@ -11,6 +11,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[OnAFriendsCopy(CopyRule.Same, "personal loot: each game rolls its own")]
 public sealed class LootCache : MonoBehaviour, IInteractionVerb
 {
     [SerializeField] private ItemDropTable drops = new ItemDropTable();

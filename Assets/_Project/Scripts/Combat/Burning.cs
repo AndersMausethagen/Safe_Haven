@@ -6,6 +6,7 @@ using UnityEngine;
 /// <see cref="HitTechnique.OverTime"/>, so they show damage numbers but no hit stop, shake or flinch.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Forwarded, "this player's fire: its ticks are their blows, sent to the host as hits")]
 public sealed class Burning : MonoBehaviour
 {
     private const float TickSeconds = 0.5f;

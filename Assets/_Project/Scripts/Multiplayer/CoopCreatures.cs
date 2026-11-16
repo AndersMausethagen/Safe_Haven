@@ -282,6 +282,32 @@ public struct CreatureHitMessage : INetworkSerializable
     public byte Strike;
     public byte Guard;
 
+    /// <summary>
+    /// The whole blow, as this game struck it (Docs/BugPatterns.md, guard 5): every part of the DamageInfo but who struck it (the host
+    /// decides that: <see cref="Blow"/>) and its attack (what it brings travels as its parts). CopyRuleTests fails when DamageInfo
+    /// gains a part this doesn't carry, as the strike kind and the guard outcome were once dropped on the way.
+    /// </summary>
+    public static CreatureHitMessage Of(int id, in DamageInfo damage, in DamageResult result) => new CreatureHitMessage
+    {
+        Id = id,
+        Amount = damage.Amount,
+        Type = (byte)damage.Type,
+        Critical = damage.IsCritical,
+        Point = damage.HitPoint,
+        Direction = damage.Direction,
+        Poise = damage.Poise,
+        Technique = (int)damage.Technique,
+        Strike = (byte)damage.Strike,
+        Guard = (byte)result.Guard,
+    };
+
+    /// <summary>The blow again, in the host's game, struck by <paramref name="striker"/> (or no one).</summary>
+    public DamageInfo Blow(Combatant striker) =>
+        new DamageInfo(striker, null, Amount, (DamageType)Type, Critical, Point, Direction, Poise, (HitTechnique)Technique, (StrikeKind)Strike);
+
+    /// <summary>How the friend's copy's guard took it: only a block is passed on (a parry never reaches here).</summary>
+    public GuardOutcome JudgedGuard => Guard == (byte)GuardOutcome.Blocked ? GuardOutcome.Blocked : GuardOutcome.None;
+
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
         serializer.SerializeValue(ref Id);

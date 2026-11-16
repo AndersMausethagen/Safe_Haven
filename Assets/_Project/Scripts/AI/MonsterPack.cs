@@ -2,6 +2,7 @@ using UnityEngine;
 
 /// <summary>A small authored pack, with shared alerts and staggered attack starts. It can break: once its leader falls or too many have,
 /// the rest flee for a while.</summary>
+[OnAFriendsCopy(CopyRule.Same, "on a copy its creatures think nothing, so its calls change nothing; the host's pack decides")]
 public sealed class MonsterPack : MonoBehaviour
 {
     [SerializeField] private MonsterAI leader;

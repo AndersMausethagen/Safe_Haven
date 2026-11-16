@@ -9,6 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(MonsterAI))]
 // After the animator's own update, as with the player's TwoHandGrip.
 [DefaultExecutionOrder(100)]
+[OnAFriendsCopy(CopyRule.Same, "the shield's pose, and its splinter the host sends")]
 public sealed class MonsterShieldPose : MonoBehaviour
 {
     private const float FadePerSecond = 9f;

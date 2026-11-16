@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Light))]
+[OnAFriendsCopy(CopyRule.Same, "a flickering light")]
 public sealed class LightFlicker : MonoBehaviour
 {
     [Tooltip("How far intensity strays from its authored value (share).")]

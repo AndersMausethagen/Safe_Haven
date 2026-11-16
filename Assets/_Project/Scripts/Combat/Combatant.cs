@@ -7,6 +7,7 @@ using UnityEngine;
 /// and a building all work the same way. Gear and buffs change the stats through <see cref="Stats"/>.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "the creature's side and stats, readied as the host's (RaidCreatures.Prepare)")]
 public sealed class Combatant : MonoBehaviour
 {
     [SerializeField] private Faction faction = Faction.Enemy;

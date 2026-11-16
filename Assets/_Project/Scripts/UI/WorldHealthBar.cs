@@ -6,6 +6,7 @@ using UnityEngine;
 /// object on a world-space canvas; it follows the target, faces the camera, and ignores the parent's scale so the bar
 /// keeps its shape on a stretched target.
 /// </summary>
+[OnAFriendsCopy(CopyRule.Same, "shows the health the host sends")]
 public sealed class WorldHealthBar : MonoBehaviour
 {
     [Tooltip("Left empty, the Damageable on a parent is used.")]

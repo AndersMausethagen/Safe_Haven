@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI))]
+[OnAFriendsCopy(CopyRule.Same, "steps and shakes from how the copy moves")]
 public sealed class CreatureFootfalls : MonoBehaviour
 {
     [Tooltip("Played each stride. Make it positional with a long audible distance.")]

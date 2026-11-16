@@ -36,6 +36,7 @@ using UnityEngine.AI;
 [RequireComponent(typeof(Combatant))]
 [RequireComponent(typeof(Damageable))]
 [RequireComponent(typeof(NavMeshAgent))]
+[OnAFriendsCopy(CopyRule.FollowsTheHost, "on a copy it thinks nothing and follows the host's poses, strikes and staggers (MakeRemote)")]
 public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerable, IHitGuard
 {
     public enum State

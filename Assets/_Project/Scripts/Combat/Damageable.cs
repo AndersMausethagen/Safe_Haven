@@ -9,6 +9,7 @@ using UnityEngine;
 /// Other systems react through events (damage numbers, health bars, audio, loot) without this component knowing them.
 /// </summary>
 [RequireComponent(typeof(Combatant))]
+[OnAFriendsCopy(CopyRule.Forwarded, "a friend's blows show here and can't kill (floor 1): they go to the host's creature, whose health comes back")]
 public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedState
 {
     [Serializable]

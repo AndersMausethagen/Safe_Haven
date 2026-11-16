@@ -14,6 +14,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(-80)]
+[OnAFriendsCopy(CopyRule.Same, "a copy isn't saved in a friend's game (their raid, the host's Haven)")]
 public sealed class SaveableEntity : MonoBehaviour
 {
     [Tooltip("Identifies this object in saves. Assigned automatically; don't copy it between objects.")]

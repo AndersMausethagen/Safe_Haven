@@ -18,6 +18,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI))]
+[OnAFriendsCopy(CopyRule.Same, "plays what the copy does")]
 public sealed class MonsterAnimationDriver : MonoBehaviour
 {
     [Tooltip("Left empty, the first Animator on this object or its children is used.")]

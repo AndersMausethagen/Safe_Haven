@@ -17,6 +17,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI))]
+[OnAFriendsCopy(CopyRule.Same, "warns of the strikes the copy plays, which the host sends")]
 public sealed class AttackTelegraph : MonoBehaviour
 {
     private const float DegreesPerSegment = 6f;

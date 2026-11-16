@@ -483,19 +483,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
 
         puppet.HitByMe = true;
         using var writer = new FastBufferWriter(96, Allocator.Temp);
-        writer.WriteNetworkSerializable(new CreatureHitMessage
-        {
-            Id = puppet.Id,
-            Amount = damage.Amount,
-            Type = (byte)damage.Type,
-            Critical = damage.IsCritical,
-            Point = damage.HitPoint,
-            Direction = damage.Direction,
-            Poise = damage.Poise,
-            Technique = (int)damage.Technique,
-            Strike = (byte)damage.Strike,
-            Guard = (byte)result.Guard,
-        });
+        writer.WriteNetworkSerializable(CreatureHitMessage.Of(puppet.Id, damage, result));
         link.ToHost(CoopCreatures.HitMessage, writer);
     }
 

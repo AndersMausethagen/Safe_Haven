@@ -115,6 +115,16 @@ public sealed partial class MonsterAI
         }
 
         RefreshAmbush();
+        TellCopyChanged(true);
+    }
+
+    // What the host's game decides (CopyRule.HostOnly) stands down on a copy and takes over again when it is this game's: told here, once.
+    private void TellCopyChanged(bool isCopy)
+    {
+        foreach (ICopyAware part in GetComponentsInChildren<ICopyAware>(true))
+        {
+            part.OnCopyChanged(isCopy);
+        }
     }
 
     /// <summary>Takes this creature back into this game (the host left the run): it thinks and finds its way again.</summary>
@@ -139,6 +149,7 @@ public sealed partial class MonsterAI
         }
 
         RefreshAmbush();
+        TellCopyChanged(false);
     }
 
     /// <summary>

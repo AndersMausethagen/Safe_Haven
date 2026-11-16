@@ -8,6 +8,7 @@ using UnityEngine.AI;
 /// Hoofbeats on every beat near the player.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "the knight's horse follows the knight, copy or not")]
 public sealed class KnightSteed : MonoBehaviour
 {
     private static readonly int GaitId = Animator.StringToHash("Gait");

@@ -8,6 +8,7 @@ using UnityEngine;
 /// kills it. The ring and name are what make it readable from the gameplay camera above. Added by RaidElites; gone with the raid.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "the affixes the host's creature has, sent by name and made here")]
 public sealed class EliteCreature : MonoBehaviour
 {
     private const float RingThickness = 0.14f;

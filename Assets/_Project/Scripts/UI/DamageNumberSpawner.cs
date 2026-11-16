@@ -5,6 +5,7 @@
 /// PrefabPool rather than living under the target, so they finish their animation even when the hit destroys it.
 /// </summary>
 [RequireComponent(typeof(Damageable))]
+[OnAFriendsCopy(CopyRule.Same, "shows the blows struck here")]
 public sealed class DamageNumberSpawner : MonoBehaviour
 {
     [SerializeField] private DamageNumber prefab;

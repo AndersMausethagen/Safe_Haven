@@ -10,6 +10,7 @@ using UnityEngine;
 [ExecuteAlways]
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Light))]
+[OnAFriendsCopy(CopyRule.Same, "a light dimmed by the atmosphere, in every game alike")]
 public sealed class AtmosphereLight : MonoBehaviour
 {
     private static readonly List<AtmosphereLight> active = new List<AtmosphereLight>();

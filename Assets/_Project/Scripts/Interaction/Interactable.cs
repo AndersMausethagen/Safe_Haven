@@ -15,6 +15,7 @@ public enum InteractionResult
 /// and Cancelled events, or call Complete() yourself when the work is done.
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "what the player may do with it, judged in their own game")]
 public sealed class Interactable : MonoBehaviour
 {
     private static readonly List<Interactable> active = new List<Interactable>();

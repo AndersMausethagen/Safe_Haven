@@ -15,6 +15,7 @@ using UnityEngine;
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
+[OnAFriendsCopy(CopyRule.Same, "walks the legs the copy moves")]
 public sealed class SpiderLegs : MonoBehaviour
 {
     [Serializable]
