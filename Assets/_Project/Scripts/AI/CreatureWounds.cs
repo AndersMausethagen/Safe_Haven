@@ -123,7 +123,7 @@ public sealed class CreatureWounds : MonoBehaviour
 
         lastDrop = here;
         Vector3 side = Vector3.Cross(Vector3.up, moved.normalized) * Random.Range(-0.25f, 0.25f);
-        if (Physics.Raycast(here + side + Vector3.up, Vector3.down, out RaycastHit ground, 3f, ~0, QueryTriggerInteraction.Ignore)
+        if (BloodDecals.Available && Physics.Raycast(here + side + Vector3.up, Vector3.down, out RaycastHit ground, 3f, ~0, QueryTriggerInteraction.Ignore)
             && !ground.collider.transform.IsChildOf(transform))
         {
             BloodDecals.Splat(ground.point, ground.normal, Random.Range(0.25f, 0.5f), definition.BloodColor, WoundSettings.Current.TrailSeconds, 1.2f, 0.4f);

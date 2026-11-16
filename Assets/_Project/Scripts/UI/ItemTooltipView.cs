@@ -555,7 +555,8 @@ public sealed class ItemTooltipView : MonoBehaviour
             AppendEssenceWork(builder, stack.Value);
         }
 
-        if (item.HasDurability && held)
+        // A lantern's condition is its light, shown in hours below, not as durability.
+        if (item.HasDurability && !item.IsLantern && held)
         {
             ItemStack worn = stack.Value;
             int percent = Mathf.RoundToInt(worn.Durability * 100f);

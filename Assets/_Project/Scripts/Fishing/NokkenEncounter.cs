@@ -165,9 +165,13 @@ public sealed class NokkenEncounter : MonoBehaviour
             camera.EndDialogue(figure);
         }
 
-        SetInput(true);
+        // Not for a player it killed (here or with the last drag under): their death already took the controls (HomeRevival,
+        // RaidDirector.StopPlayer), and giving them back would let a dead body walk.
+        Damageable alive = player.GetComponent<Damageable>();
+        died |= alive != null && !alive.IsAlive;
         if (!died)
         {
+            SetInput(true);
             GameMessages.Post(brokeFree ? "You tear free. The Nøkken sinks back into the black water." :
                 "The Nøkken drags you under... you claw your way back to the bank, coughing.", brokeFree ? MessageKind.Gain : MessageKind.Warning);
         }

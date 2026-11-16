@@ -84,11 +84,12 @@ public readonly struct ItemStack
     /// <summary>1 when as new, 0 when broken. Always 1 for items without durability.</summary>
     public float Durability => 1f - wear;
 
-    /// <summary>True for worn-out gear: it is kept, but can't be used until repaired.</summary>
-    public bool IsBroken => !IsEmpty && Item.HasDurability && Durability <= 0.0001f;
+    /// <summary>True for worn-out gear: it is kept, but can't be used until repaired. A lantern's condition is its light, not
+    /// wear: an empty one is dark, not broken (a firefly fills it, PlayerLantern), so it never counts here.</summary>
+    public bool IsBroken => !IsEmpty && Item.HasDurability && !Item.IsLantern && Durability <= 0.0001f;
 
-    /// <summary>True when the item has lost some durability and can be repaired.</summary>
-    public bool IsDamaged => !IsEmpty && Item.HasDurability && wear > 0.0001f;
+    /// <summary>True when the item has lost some durability and can be repaired. Never a lantern burning down (see IsBroken).</summary>
+    public bool IsDamaged => !IsEmpty && Item.HasDurability && !Item.IsLantern && wear > 0.0001f;
 
     /// <summary>The same stack with another durability.</summary>
     public ItemStack WithDurability(float durability) => new ItemStack(Item, Count, durability, Empower, Enchantment, Quality, Maker, Size);

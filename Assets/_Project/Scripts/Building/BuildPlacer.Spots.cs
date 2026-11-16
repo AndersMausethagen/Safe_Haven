@@ -84,7 +84,9 @@ public sealed partial class BuildPlacer
         int count = Physics.OverlapBoxNonAlloc(center, extents, Overlaps, rotation, blockingLayers, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
-            if (!ghost.Contains(Overlaps[i]))
+            // The ground itself is the area's to judge (Area.CheckSpot allows some unevenness): on a slope the rising terrain
+            // inside the box made "in the way" of ground the area accepts.
+            if (!ghost.Contains(Overlaps[i]) && !(Overlaps[i] is TerrainCollider))
             {
                 return "Something is in the way.";
             }

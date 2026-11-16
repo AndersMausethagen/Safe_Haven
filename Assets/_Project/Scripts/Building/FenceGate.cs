@@ -25,6 +25,12 @@ public sealed class FenceGate : MonoBehaviour
     private float angle;
     private float wanted;
     private float nextLook;
+    private Damageable health;
+
+    private void Awake()
+    {
+        health = GetComponent<Damageable>();
+    }
 
     public bool IsOpen => Mathf.Abs(wanted) > 0.01f;
 
@@ -48,7 +54,10 @@ public sealed class FenceGate : MonoBehaviour
         if (Time.time >= nextLook)
         {
             nextLook = Time.time + 0.15f;
-            float next = Look();
+            // Broken down, it hangs open for anyone, as a broken wall opens the way (Construction): the attackers who broke it
+            // stop striking it and walk through. Mended, it shuts again.
+            bool broken = health != null && health.IsBroken;
+            float next = broken ? (IsOpen ? wanted : openAngle) : Look();
             if (!Mathf.Approximately(next, wanted))
             {
                 if (Mathf.Approximately(wanted, 0f) || Mathf.Approximately(next, 0f))

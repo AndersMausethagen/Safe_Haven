@@ -351,16 +351,22 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     public bool IsOverfilled => false;
     public float SpeedScale => 1f;
 
-    // Saving: the trough's food.
+    // Saving: the trough's food, the hour last looked at and each stall's meal, so the hours away on a raid mend the horses
+    // kept here (a stall's meal isn't eaten again just for the Haven loading).
     [System.Serializable]
     private sealed class Saved
     {
         public System.Collections.Generic.List<SlotSaveData> trough = new System.Collections.Generic.List<SlotSaveData>();
+        public float lastHour = -1f;
+        public float[] fedUntil;
     }
 
     string ISaveable.SaveKey => "stable";
 
-    public string CaptureState() => JsonUtility.ToJson(new Saved { trough = SaveMapper.ToSlots(trough) });
+    public string CaptureState() => JsonUtility.ToJson(new Saved
+    {
+        trough = SaveMapper.ToSlots(trough), lastHour = lastHour, fedUntil = (float[])fedUntil.Clone(),
+    });
 
     public void RestoreState(string state)
     {
@@ -370,6 +376,15 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         if (saved != null && saved.trough != null && content != null)
         {
             SaveMapper.ReadSlots(saved.trough, trough, content, new System.Collections.Generic.List<string>());
+        }
+
+        if (saved != null)
+        {
+            lastHour = saved.lastHour;
+            for (int i = 0; saved.fedUntil != null && i < saved.fedUntil.Length && i < fedUntil.Length; i++)
+            {
+                fedUntil[i] = saved.fedUntil[i];
+            }
         }
     }
 

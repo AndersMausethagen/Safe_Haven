@@ -455,7 +455,7 @@ public sealed class ResidentWindow : MonoBehaviour
         storyRows[2].Set("Foes felled along", $"{record.KillsAlong}");
         storyRows[3].Set("Helped you up", $"{record.TimesHelpedUp} times");
         storyRows[4].Set("A lesson", record.Job != null && record.Job.Teaches != null
-            ? record.TaughtSinceRaid ? $"{record.Job.Teaches.DisplayName}, again after a raid" : $"{record.Job.Teaches.DisplayName}: ask them"
+            ? record.TaughtSinceRaid ? $"{record.Job.Teaches.DisplayName}, again after a raid survived" : $"{record.Job.Teaches.DisplayName}: ask them"
             : "Nothing to teach");
         storyRows[5].Set("Remembers", record.Forgotten.Count > 0 ? $"{record.Remembers.Count}, with {record.Forgotten.Count} still lost to the forest" : $"{record.Remembers.Count} things you did together");
         storyRows[6].Set("Came home", string.IsNullOrWhiteSpace(who.ArrivalLine) ? "With the expedition" : $"\"{who.ArrivalLine}\"");

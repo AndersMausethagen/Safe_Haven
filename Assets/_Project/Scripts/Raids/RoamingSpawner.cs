@@ -77,7 +77,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             nextSpawn = Time.time;
         }
 
-        int cap = settings.AliveCap(director.StageIndex, director.Creatures.AlarmsRaised, director.Session.Definition.EffectiveEnemyDensity) + ExtraCap;
+        int cap = settings.AliveCap(director.StageIndex, director.Creatures.AlarmsRaised, director.Session.Definition.SessionEnemyDensity) + ExtraCap;
         if (Time.time >= nextSpawn && AliveCount < cap && spent < settings.TotalLimit && !AtGlobalLimit())
         {
             // A failed placement retries on the next think rather than waiting a whole interval.
@@ -192,7 +192,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             position /= alive;
-            if (!busy && Flat(position - player) > settings.DespawnDistance && !RaidSpots.IsVisible(position))
+            if (!busy && Flat(position - player) > settings.DespawnDistance && !RaidSpots.IsVisible(position, root.transform))
             {
                 spent = Mathf.Max(0, spent - alive);
                 nextHunt.Remove(root);

@@ -38,7 +38,7 @@ public sealed partial class MonsterAI
             {
                 float distance = HorizontalDistance(player.transform.position);
                 // Seen as any creature sees: a sneaking hunter is seen from closer, one in cover not at all.
-                if (distance < definition.CloseSenseRange || (distance < definition.DetectionRange && senses.CanSee(player.transform, definition.DetectionRange)))
+                if (distance < definition.CloseSenseRange || senses.CanNotice(player.transform))
                 {
                     Bolt(player.transform.position);
                 }

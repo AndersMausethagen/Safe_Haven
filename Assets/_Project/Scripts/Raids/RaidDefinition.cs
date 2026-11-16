@@ -256,11 +256,16 @@ public sealed class RaidDefinition : ScriptableObject
         return null;
     }
 
+    /// <summary>How many creatures this run places and keeps roaming: the raid's and the global density, times the hour's and the
+    /// tier's (both say they multiply how many the raid places or spawns). Camps (GetSpawnRules) and roamers (RoamingSpawner) share it.</summary>
+    public float SessionEnemyDensity =>
+        EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f) * (GameSession.ActiveRaid?.Difficulty?.enemyDensity ?? 1f);
+
     /// <summary>The rules spawn lists and groups fill by in this raid, measured from the given entry (null ignores bands).</summary>
     public SpawnRules GetSpawnRules(Vector3? entry)
     {
         RaidGlobalSettings global = RaidGlobalSettings.Current;
-        float density = EffectiveEnemyDensity * (GameSession.ActiveRaid?.TimeOfDay?.enemyDensity ?? 1f) * (GameSession.ActiveRaid?.Difficulty?.enemyDensity ?? 1f);
+        float density = SessionEnemyDensity;
         float area = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.AreaScale : 1f;
         return overrideBands ? new SpawnRules(density, entry, nearDistance, farDistance, area)
             : new SpawnRules(density, entry, global.NearDistance, global.FarDistance, area);

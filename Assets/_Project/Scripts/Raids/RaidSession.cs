@@ -129,7 +129,9 @@ public sealed class RaidSession
     /// <summary>Adds seconds to the clock, or takes them away; an event can't end the raid on the spot.</summary>
     public void AddTime(float seconds)
     {
-        bonusSeconds = Mathf.Max(bonusSeconds + seconds, Elapsed + MinimumSecondsLeft - Parameters.Duration);
+        // The floor keeps a loss from ending the raid, but never turns one into a gain: a "-0:45" at 8 s left gave +7 s.
+        float floor = Mathf.Min(bonusSeconds, Elapsed + MinimumSecondsLeft - Parameters.Duration);
+        bonusSeconds = Mathf.Max(bonusSeconds + seconds, floor);
     }
 
     /// <summary>What didn't fit in the bag (or the essence bars) and stayed out there, for the summary.</summary>

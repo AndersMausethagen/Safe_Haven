@@ -32,7 +32,9 @@ public static class HorseJobs
         var jobs = HorseSettings.Current.Jobs;
         foreach (Horse horse in Horse.All)
         {
-            if (horse == null || !horse.IsAlive || !horse.IsTamed || horse.Order != Horse.Orders.Work || horse.Job < 0 || horse.Job >= jobs.Count)
+            // A horse in its stall or under a rider isn't at the station, whatever its last order says.
+            if (horse == null || !horse.IsAlive || !horse.IsTamed || horse.Order != Horse.Orders.Work || horse.Job < 0 || horse.Job >= jobs.Count
+                || horse.IsStabled || horse.Rider != null)
             {
                 continue;
             }

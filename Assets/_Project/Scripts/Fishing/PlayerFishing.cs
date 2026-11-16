@@ -417,7 +417,7 @@ public sealed class PlayerFishing : MonoBehaviour
         rodSide = Mathf.MoveTowards(rodSide, RodInput(), 5f * seconds);
         float before = Fight.Distance;
         Fight.Tick(seconds, Held, rodSide);
-        PlaceFish();
+        PlaceFish(before);
         FishFight.Mood mood = Fight.Current;
         bool thrashing = mood == FishFight.Mood.Running || mood == FishFight.Mood.Warning;
         look.Hooked(fishAt, Fight.Tension, thrashing);
@@ -535,7 +535,7 @@ public sealed class PlayerFishing : MonoBehaviour
     // The fish on the water: off the line of the cast by the fight's angle, as far as the line out, and kept on the water
     // (a run towards the bank swings back in where the water is narrow). Brought in to where the shore comes up through
     // the water, it is landed there.
-    private void PlaceFish()
+    private void PlaceFish(float before)
     {
         Vector3 from = cast.From;
         Vector3 straight = Flat(cast.Landing - from);
@@ -555,6 +555,14 @@ public sealed class PlayerFishing : MonoBehaviour
 
                 return;
             }
+        }
+
+        // No water there. Running out (a long cast lands by the far bank), the fish meets that bank and stays where it was;
+        // only one brought in to the angler's own shore is landed.
+        if (Fight.Distance > before)
+        {
+            Fight.HoldAt(before);
+            return;
         }
 
         Fight.Beach();
@@ -628,15 +636,8 @@ public sealed class PlayerFishing : MonoBehaviour
         landed = true;
         FishingSettings settings = FishingSettings.Current;
         ItemDefinition fish = hooked.item;
-        // Double Catch: now and then a second one comes up on the line.
-        int caught = Techniques.Has(PerkTechnique.DoubleCatch) && Random.value < TechniqueSettings.Current.DoubleCatchChance ? 2 : 1;
-        if (caught > 1 && items.Give(fish, 1, FishSizes.Roll(Random.value, Random.value, hooked.lengthScale)) > 0)
-        {
-            GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
-            Techniques.Used(PerkTechnique.DoubleCatch);
-        }
-
-        // Its length goes with it (the bag shows it), and the journal keeps the biggest of each kind.
+        // Its length goes with it (the bag shows it), and the journal keeps the biggest of each kind. The fish fought comes
+        // first: with room for one only, the Double Catch's extra must not take the place of a trophy.
         if (items.Give(fish, 1, centimetres) < 1)
         {
             GameMessages.Post($"No room for the {fish.DisplayName}. You let it go.", MessageKind.Warning);
@@ -649,6 +650,17 @@ public sealed class PlayerFishing : MonoBehaviour
             GameEvents.Raise(new GameEvent(GameEventKind.FishCaught, fish, 1, gameObject));
             int tier = Mathf.Max(1, fish.Tier);
             ExperienceTracker.Practise(ProficiencyTraining.Fishing, tier, LevelingSettings.Current.TierExperience(tier) * LevelingSettings.Current.CatchWork);
+
+            // Double Catch: now and then a second one comes up on the line, a catch like the first.
+            float second = FishSizes.Roll(Random.value, Random.value, hooked.lengthScale);
+            if (Techniques.Has(PerkTechnique.DoubleCatch) && Random.value < TechniqueSettings.Current.DoubleCatchChance
+                && items.Give(fish, 1, second) > 0)
+            {
+                GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
+                Techniques.Used(PerkTechnique.DoubleCatch);
+                GameSession.Progress.Journal.NoteCatch(fish.Id, second, out _);
+                GameEvents.Raise(new GameEvent(GameEventKind.FishCaught, fish, 1, gameObject));
+            }
         }
 
         AudioManager.Play(settings.CatchSound, transform.position);

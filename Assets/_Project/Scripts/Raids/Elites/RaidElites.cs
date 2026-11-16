@@ -43,7 +43,8 @@ public static class RaidElites
     /// <summary>Whether a creature can be made an elite: a fighter of the enemy side, and not one its definition rules out.</summary>
     public static bool CanPromote(MonsterAI creature)
     {
-        return creature != null && creature.Definition != null && !creature.Definition.NeverElite
+        // Never a friend's copy of the host's creature (co-op): it is only an elite where the host's game made it one.
+        return creature != null && !creature.IsRemote && creature.Definition != null && !creature.Definition.NeverElite
             && creature.gameObject.activeInHierarchy && creature.CurrentState != MonsterAI.State.Dead
             && creature.TryGetComponent(out Combatant side) && side.Faction == Faction.Enemy && creature.GetComponent<EliteCreature>() == null;
     }

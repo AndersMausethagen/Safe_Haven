@@ -146,6 +146,31 @@ public sealed class MonsterSenses
         return distance <= range && CanSeeAny(Eye(rules), target, rules);
     }
 
+    /// <summary>
+    /// True when it would notice <paramref name="target"/> now the way <see cref="Look"/> notices: within its cone, as visible as
+    /// the target is (sneaking, cover, a lantern), as far as fog and night let it see and as attentive as it is (grazing,
+    /// asleep), with nothing in between. For creatures that act on the first notice instead of growing aware: game that bolts,
+    /// a thief that slinks off. <see cref="CanSee"/> is for a target already hunted, which is watched all round.
+    /// </summary>
+    public bool CanNotice(Transform target)
+    {
+        if (target == null || Attention <= 0f)
+        {
+            return false;
+        }
+
+        PerceptionSettings rules = PerceptionSettings.Current;
+        SenseProfile profile = SenseProfile.Of(definition);
+        Vector3 flat = target.position + Vector3.up * rules.TargetHeight - self.position;
+        flat.y = 0f;
+        float distance = flat.magnitude;
+        float angle = distance > 0.01f ? Vector3.Angle(self.forward, flat) : 0f;
+        // A drowsy creature notices as if the target stood further off.
+        float seemsAt = distance / Mathf.Min(1f, Attention);
+        float rate = PerceptionRules.NoticeRate(seemsAt, angle, profile, VisibilityOf(target), rules, AtmosphereConditions.SightScale(rules));
+        return rate > 0f && (distance <= profile.CloseRange || CanSeeAny(Eye(rules), target, rules));
+    }
+
     /// <summary>True when no cover stands between it and a sound at <paramref name="position"/>.</summary>
     public bool HasClearPathTo(Vector3 position)
     {

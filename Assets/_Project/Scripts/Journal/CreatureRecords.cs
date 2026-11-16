@@ -56,6 +56,13 @@ public static class CreatureRecords
 
     private static void OnAnyDied(Damageable victim, DamageInfo blow)
     {
+        // Every death of the player says what (if anything) brought them down: one with no creature behind it (a ravine fall)
+        // reported the monster of some earlier death at home, never asked about, in the raid's report and journal for good.
+        if (Player.Current != null && victim == Player.Current.Health)
+        {
+            lastKiller = null;
+        }
+
         if (blow.Source == null)
         {
             return;

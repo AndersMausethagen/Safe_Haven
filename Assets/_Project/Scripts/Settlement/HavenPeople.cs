@@ -62,7 +62,7 @@ public static class HavenPeople
 
             if (job.Teaches != null)
             {
-                entry.Details.Add(new HavenDetail("Teaches", record.TaughtSinceRaid ? $"{job.Teaches.DisplayName} (again after a raid)" : job.Teaches.DisplayName));
+                entry.Details.Add(new HavenDetail("Teaches", record.TaughtSinceRaid ? $"{job.Teaches.DisplayName} (again after a raid survived)" : job.Teaches.DisplayName));
             }
             string workplace = WorkplaceText(job);
             if (workplace != null)

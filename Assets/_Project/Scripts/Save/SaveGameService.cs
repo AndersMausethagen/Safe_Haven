@@ -121,6 +121,13 @@ public static class SaveGameService
             return "You're in a friend's Haven. Leave the session first (Escape menu).";
         }
 
+        // Hosting: nothing would send the loaded world to the friends, who'd go on in the old Haven while the host's changed
+        // under them (and their changes landed in the loaded one).
+        if (CoopSession.Current != null && CoopSession.Current.IsHost && Player.Current != null)
+        {
+            return "Your Haven is open to friends. Close it to them first (Escape menu).";
+        }
+
         if (CinematicScreen.IsPlaying)
         {
             return "Let the scene finish first.";
@@ -250,12 +257,14 @@ public static class SaveGameService
     }
 
     /// <summary>The game being played, as a save held in memory (nothing is written). Needs a player.</summary>
-    public static SaveData Capture()
+    /// <param name="forWorldOnly">Only the world is wanted (the Haven sent to a friend joining, HavenShare): the player's side
+    /// is thrown away, so crafts under way go on instead of being stopped and refunded at every join.</param>
+    public static SaveData Capture(bool forWorldOnly = false)
     {
         PlayerPersistence player = Player.Current.Persistence;
         // Crafts by hand under way aren't saved: their materials go back to the bag first, or a save (and the raid that
         // copies the kit after it) would keep them paid for and never made.
-        if (Player.Current.TryGetComponent(out HandCraftQueue crafts))
+        if (!forWorldOnly && Player.Current.TryGetComponent(out HandCraftQueue crafts))
         {
             crafts.Stop();
         }

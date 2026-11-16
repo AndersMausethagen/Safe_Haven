@@ -69,6 +69,15 @@ public static class WorldTransfer
         private int received;
         private int transfer = -1;
 
+        /// <summary>Forgets a transfer cut off half way (a new session): its pieces mustn't fill slots of another host's
+        /// transfer that happens to share its id and piece count.</summary>
+        public void Reset()
+        {
+            transfer = -1;
+            pieces = null;
+            received = 0;
+        }
+
         /// <summary>Takes a piece; returns the whole packed world once every piece has come, else null.</summary>
         public byte[] Add(int transferId, int index, int count, byte[] piece)
         {

@@ -42,12 +42,20 @@ public sealed class PlayerInteractor : MonoBehaviour
     {
         stateMachine.InteractionRequested += OnInteractionRequested;
         stateMachine.StateChanged += OnPlayerStateChanged;
+        if (health != null)
+        {
+            health.Died += OnDied;
+        }
     }
 
     private void OnDisable()
     {
         stateMachine.InteractionRequested -= OnInteractionRequested;
         stateMachine.StateChanged -= OnPlayerStateChanged;
+        if (health != null)
+        {
+            health.Died -= OnDied;
+        }
 
         if (isInteracting)
         {
@@ -76,6 +84,10 @@ public sealed class PlayerInteractor : MonoBehaviour
             End(InteractionResult.Completed);
         }
     }
+
+    // Killed while at work (a scaffold hammered at home when the breach came): the work stops with them, here for every death
+    // (home, raid, co-op), and they don't wake at the portal still hammering the far-off site.
+    private void OnDied(Damageable victim, DamageInfo killingBlow) => CancelInteraction();
 
     /// <summary>Stops what the player is working at, unfinished (struck down, say: work doesn't go on without them).</summary>
     public void CancelInteraction()

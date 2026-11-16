@@ -75,6 +75,8 @@ public sealed class Wildlife : MonoBehaviour
     private float nextLook;
     private Vector3 home;
     private Vector3 threat;
+    // An alert at the player can end in grazing again (they stopped short or backed off); anything else ends in flight.
+    private bool threatWasPlayer = true;
 
     /// <summary>True once it has fled out of sight: its herd removes it.</summary>
     public bool HasFled { get; private set; }
@@ -112,8 +114,18 @@ public sealed class Wildlife : MonoBehaviour
             case State.Wander when !agent.pathPending && agent.remainingDistance < 0.4f:
                 Graze();
                 break;
+            // Look startles it on into flight while the player is still too close; one who stopped short or backed off is
+            // let be: it goes back to grazing.
             case State.Alert when Time.time >= until:
-                Flee(threat);
+                if (StartledBy(Player.Current, out _) || !threatWasPlayer)
+                {
+                    Flee(threat);
+                }
+                else
+                {
+                    Graze();
+                }
+
                 break;
             case State.Flee:
                 Vector3 player = Player.Current != null ? Player.Current.transform.position : transform.position;
@@ -149,22 +161,18 @@ public sealed class Wildlife : MonoBehaviour
         }
 
         Player player = Player.Current;
-        if (player != null)
+        if (StartledBy(player, out bool atOnce))
         {
-            float heard = player.Noise != null ? player.Noise.Level : 0f;
-            float startle = shyDistance + heard * perHeardMetre;
-            Vector3 offset = player.transform.position - transform.position;
-            offset.y = 0f;
-            if (offset.sqrMagnitude < startle * startle)
-            {
-                Startle(player.transform.position, offset.magnitude < startle * 0.5f);
-                return;
-            }
+            threatWasPlayer = true;
+            Startle(player.transform.position, atOnce);
+            return;
         }
 
         foreach (MonsterAI monster in MonsterAI.Active)
         {
-            if (monster == null)
+            // Not the Haven's own game (timid deer and foxes graze among them) or a dead one.
+            if (monster == null || monster.CurrentState == MonsterAI.State.Dead
+                || (monster.Definition != null && monster.Definition.Timid))
             {
                 continue;
             }
@@ -173,10 +181,28 @@ public sealed class Wildlife : MonoBehaviour
             offset.y = 0f;
             if (offset.sqrMagnitude < creatureDistance * creatureDistance)
             {
+                threatWasPlayer = false;
                 Startle(monster.transform.position, true);
                 return;
             }
         }
+    }
+
+    // The player within its startle distance (the shy distance, and further the louder they are); at once when within half.
+    private bool StartledBy(Player player, out bool atOnce)
+    {
+        atOnce = false;
+        if (player == null)
+        {
+            return false;
+        }
+
+        float heard = player.Noise != null ? player.Noise.Level : 0f;
+        float startle = shyDistance + heard * perHeardMetre;
+        Vector3 offset = player.transform.position - transform.position;
+        offset.y = 0f;
+        atOnce = offset.magnitude < startle * 0.5f;
+        return offset.sqrMagnitude < startle * startle;
     }
 
     private void Startle(Vector3 from, bool atOnce)

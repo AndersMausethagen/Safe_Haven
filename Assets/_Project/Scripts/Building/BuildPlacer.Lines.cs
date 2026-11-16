@@ -102,7 +102,10 @@ public sealed partial class BuildPlacer
         for (int i = 0; i < lineCenters.Count; i++)
         {
             float pieceYaw = BuildPlacement.LineYaw(lineDirections[i], alongX);
-            Vector3 position = BuildPlacement.PivotFor(lineCenters[i], pieceYaw, LocalBounds);
+            // Each piece on the ground where it stands, as a single piece is (Spots): laid at the press point's height, a line
+            // down a slope floated and one up it ran into the hill.
+            Vector3 center = Area != null ? Area.OnGround(lineCenters[i]) : lineCenters[i];
+            Vector3 position = BuildPlacement.PivotFor(center, pieceYaw, LocalBounds);
             string problem = CheckSpot(position, pieceYaw);
             if (problem == null)
             {
@@ -153,7 +156,7 @@ public sealed partial class BuildPlacer
         }
 
         string name = built == 1 ? $"the {building.DisplayName}" : $"{built} × {building.DisplayName}";
-        GameMessages.Post(blocked > 0 ? $"Built {name}. {blocked} spot(s) were blocked or unaffordable." : $"Built {name}.", MessageKind.Gain);
+        GameMessages.Post(blocked > 0 ? $"Built {name}. {blocked} spot(s) were left: {firstProblem}" : $"Built {name}.", MessageKind.Gain);
         GameEvents.Raise(new GameEvent(GameEventKind.Built, building, built, gameObject));
         Cancel();
     }

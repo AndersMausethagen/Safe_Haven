@@ -248,6 +248,12 @@ public sealed class FishFight
         }
     }
 
+    /// <summary>The far bank stops a run: the fish gets no further out than <paramref name="distance"/> metres.</summary>
+    public void HoldAt(float distance)
+    {
+        Distance = Mathf.Min(Distance, Mathf.Max(0f, distance));
+    }
+
     /// <summary>Keeps the fish within <paramref name="degrees"/> of the cast (the water is narrower there).</summary>
     public void Confine(float degrees)
     {

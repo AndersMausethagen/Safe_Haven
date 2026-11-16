@@ -255,6 +255,16 @@ public sealed class ItemContainer
     /// </summary>
     public int Remove(ItemDefinition item, int amount, ItemQuality least)
     {
+        int removed = Remove(item, amount, least, worked: false);
+        return removed + Remove(item, amount - removed, least, worked: true);
+    }
+
+    /// <summary>
+    /// Remove(item, amount, least) among bare pieces only (<paramref name="worked"/> false) or only those empowered or enchanted
+    /// (true), so a caller drawing on several containers can spend every bare piece before any worked one.
+    /// </summary>
+    public int Remove(ItemDefinition item, int amount, ItemQuality least, bool worked)
+    {
         if (item == null || amount <= 0)
         {
             return 0;
@@ -262,7 +272,7 @@ public sealed class ItemContainer
 
         if (item.IsWaterMeasure)
         {
-            return DrainWater(amount);
+            return worked ? 0 : DrainWater(amount);
         }
 
         int remaining = amount;
@@ -270,7 +280,8 @@ public sealed class ItemContainer
         {
             for (int i = slots.Length - 1; i >= 0 && remaining > 0; i--)
             {
-                if (slots[i].Item == item && slots[i].Quality == make)
+                bool isWorked = slots[i].Empower > 0 || slots[i].Enchantment != null;
+                if (slots[i].Item == item && slots[i].Quality == make && isWorked == worked)
                 {
                     remaining -= RemoveAt(i, remaining);
                 }
@@ -473,7 +484,7 @@ public sealed class ItemContainer
 
         ItemStack stack = slots[index];
         int removed = Mathf.Min(stack.Count, amount);
-        Set(index, new ItemStack(stack.Item, stack.Count - removed));
+        Set(index, stack.WithCount(stack.Count - removed));
         return removed;
     }
 
@@ -526,20 +537,37 @@ public sealed class ItemContainer
             return 0;
         }
 
-        if (!stack.Item.KeepsCondition)
+        if (!MovesWhole(stack))
         {
             return AddWithin(stack.Item, stack.Count, stack.Size, first, count);
         }
 
-        int empty = FirstEmptySlotFor(stack.Item, first, count);
-        if (empty < 0 || !CanTakeWeight(WeightOf(stack)))
+        // Piece by piece, so a count above the stack size (several identical swords from a co-op friend's stash) takes a slot each
+        // instead of piling into one gear slot that a reload would clamp back to one.
+        int pieceCount = stack.Item.MaximumStack;
+        int placed = 0;
+        while (placed < stack.Count)
         {
-            return 0;
+            ItemStack piece = stack.WithCount(Mathf.Min(pieceCount, stack.Count - placed));
+            int empty = FirstEmptySlotFor(stack.Item, first, count);
+            if (empty < 0 || !CanTakeWeight(WeightOf(piece)))
+            {
+                break;
+            }
+
+            Set(empty, piece);
+            placed += piece.Count;
         }
 
-        Set(empty, stack);
-        return stack.Count;
+        return placed;
     }
+
+    /// <summary>
+    /// A stack that is a piece of its own moves as it is, never re-made by kind: gear and containers keep their condition, a
+    /// parchment its enchantment, anything that doesn't stack everything it carries. Water as a measure is poured, not placed.
+    /// </summary>
+    private static bool MovesWhole(ItemStack stack) =>
+        !stack.Item.IsWaterMeasure && (!stack.Item.Stackable || stack.Enchantment != null);
 
     /// <summary>
     /// Moves as much of one slot's stack as fits into another container (bag to stash, say). What doesn't fit stays in the
@@ -556,7 +584,7 @@ public sealed class ItemContainer
             return 0;
         }
 
-        int moved = stack.Item.KeepsCondition ? target.AddStackWithin(stack, first, count) : target.AddWithin(stack.Item, stack.Count, stack.Size, first, count);
+        int moved = target.AddStackWithin(stack, first, count);
         if (moved > 0)
         {
             RemoveAt(index, moved);

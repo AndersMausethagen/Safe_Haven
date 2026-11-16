@@ -67,6 +67,10 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
         return weight > 0f && elapsed >= earliestSeconds && secondsLeft >= latestSecondsLeft && stage >= minimumStage;
     }
 
+    /// <summary>Whether it can still begin later in a raid with <paramref name="secondsLeft"/> to go: time and stage only
+    /// grow, so only its last moment can have passed.</summary>
+    public bool CanStillHappen(float secondsLeft) => weight > 0f && secondsLeft >= latestSecondsLeft;
+
 #if UNITY_EDITOR
     /// <summary>Sets when it can happen (tests).</summary>
     public void ConfigureTiming(float chance, float earliest, float latestLeft, int stage)

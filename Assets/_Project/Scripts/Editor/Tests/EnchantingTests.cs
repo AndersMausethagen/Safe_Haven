@@ -227,6 +227,36 @@ public sealed class EnchantingTests
         Assert.IsTrue(GearPower.CountsEnchantment(gear.Slots, (int)GearSlot.Finger2));
     }
 
+    [Test]
+    public void TheGearScore_CountsAnEnchantmentOnce_AsTheStatsDo()
+    {
+        // Review 2026-11-16: each enchanted piece added Per Enchantment to the score, while the stats take it once.
+        var gear = new GearSet();
+        EnchantmentDefinition springfed = E("Springfed");
+        ItemDefinition ring = Item("Jewelry/CopperBand");
+        gear.Slots.SetSlot((int)GearSlot.Finger1, new ItemStack(ring, 1, 1f, 0, springfed));
+        gear.Slots.SetSlot((int)GearSlot.Finger2, new ItemStack(ring, 1));
+        int once = GearScore.Of(gear);
+        gear.Slots.SetSlot((int)GearSlot.Finger2, new ItemStack(ring, 1, 1f, 0, springfed));
+        Assert.AreEqual(once, GearScore.Of(gear), "a second copy of the enchantment scores nothing");
+        gear.Slots.SetSlot((int)GearSlot.Finger1, new ItemStack(ring, 1));
+        Assert.AreEqual(once, GearScore.Of(gear), "the other piece takes the score over");
+    }
+
+    [Test]
+    public void AnInscription_KeepsItsEnchantment_IntoABagAndAChest()
+    {
+        // Review 2026-11-16: AddStack (every Grant, a pickup) and TransferTo (Store) re-made a parchment by kind, blank.
+        EnchantmentDefinition vengeful = E("Vengeful");
+        var bag = new ItemContainer(4, 1);
+        var chest = new ItemContainer(4, 1);
+        Assert.AreEqual(1, bag.AddStack(Inscriptions.Make(vengeful)));
+        Assert.AreEqual(vengeful, bag.GetSlot(0).Enchantment, "into the bag whole");
+        Assert.AreEqual(1, bag.TransferTo(0, chest));
+        Assert.AreEqual(vengeful, chest.GetSlot(0).Enchantment, "into a chest whole");
+        Assert.IsTrue(bag.GetSlot(0).IsEmpty);
+    }
+
     // ----- Liv -----
 
     [Test]

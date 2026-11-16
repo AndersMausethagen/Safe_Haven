@@ -212,6 +212,14 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
         {
             Using.Driver.LetGo();
         }
+
+        // A boat's LetGo leaves the rower on the seat (getting out is Disembark's, at a shore): the seat would hold the body
+        // and undo the move to the portal when they wake (HomeRevival).
+        bool riding = TryGetComponent(out PlayerRiding rider) && rider.IsRiding;
+        if (Movement.IsSeated && !riding)
+        {
+            Movement.StandAt(transform.position);
+        }
     }
 
     private void OnAboardInteraction()

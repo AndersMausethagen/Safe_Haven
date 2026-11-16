@@ -208,8 +208,10 @@ public sealed class ExperienceHud : MonoBehaviour
         UIMotion.Burst(bannerRect, new Vector2(0f, 14f), milestone ? 34 : 14, style.Accent, milestone ? 460f : 260f, milestone ? 1.4f : 0.9f, milestone ? 13f : 9f);
         if (milestone)
         {
-            // At home and out of a fight, the world holds its breath a moment as a milestone lands.
-            if (GameSession.ActiveRaid == null && Player.Current != null && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting))
+            // At home and out of a fight, the world holds its breath a moment as a milestone lands. Not in a world shared with
+            // friends (hosting): it would slow their creatures and residents too (hit-stop skips it the same way).
+            if (GameSession.ActiveRaid == null && !GamePause.TimeIsShared && Player.Current != null
+                && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting))
             {
                 slowUntil = Time.unscaledTime + SlowSeconds;
                 slowing = true;

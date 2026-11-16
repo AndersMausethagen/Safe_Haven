@@ -273,6 +273,14 @@ public sealed class Companion : MonoBehaviour, IConversationTopics, IQuestPerson
 
         if (IsDowned)
         {
+            // A cinematic that holds the world holds the player too, who can't reach them meanwhile: the bleeding waits.
+            if (InGameCinematic.HoldsTheWorld)
+            {
+                bleedOutAt += Time.deltaTime;
+                getUpAt += Time.deltaTime;
+                return;
+            }
+
             if (bleedsOut && Time.time >= bleedOutAt)
             {
                 Lose();

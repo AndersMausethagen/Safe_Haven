@@ -15,6 +15,8 @@ public sealed class HorseHerd : MonoBehaviour
 {
     private const string HavenScene = "SafeHaven";
     private const string FirstHorseFlag = "horse:first";
+    private const string FirstHorseToldFlag = "horse:first:told";
+    private Horse promised;
     private const float NotNearer = 45f;
 
     private DayNightCycle clock;
@@ -147,6 +149,12 @@ public sealed class HorseHerd : MonoBehaviour
             return false;
         }
 
+        // The calm horse brought this visit is still about, waiting to be tamed.
+        if (promised != null && promised.IsAlive && !promised.IsTamed)
+        {
+            return false;
+        }
+
         Horse horse = SpawnInRing(settings.WildHorse, settings.FirstHorseRing, 25f);
         if (horse == null)
         {
@@ -156,9 +164,16 @@ public sealed class HorseHerd : MonoBehaviour
         HorseStats stats = horse.Stats;
         stats.temperament = HorseTemperament.Calm;
         horse.Give(stats);
-        journal.NoteTried(FirstHorseFlag);
-        GameMessages.Post($"{settings.FirstHorseTeller}: \"{settings.FirstHorseLine}\"", MessageKind.Info);
-        JournalNotices.Tried(ProficiencyTraining.Horsemanship);
+        // The promise is kept once a horse is tamed (HasHorse above), not when this one comes: a wild horse isn't saved, so
+        // one left untamed at a raid or a reload must come again on the next visit.
+        promised = horse;
+        if (!journal.HasTried(FirstHorseToldFlag))
+        {
+            journal.NoteTried(FirstHorseToldFlag);
+            GameMessages.Post($"{settings.FirstHorseTeller}: \"{settings.FirstHorseLine}\"", MessageKind.Info);
+            JournalNotices.Tried(ProficiencyTraining.Horsemanship);
+        }
+
         return true;
     }
 

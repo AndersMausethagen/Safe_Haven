@@ -10,8 +10,17 @@ public static class RaidSpots
     private const float GroundProbeHeight = 60f;
     private const float NavMeshSnap = 4f;
 
+    private static readonly RaycastHit[] SightHits = new RaycastHit[16];
+
     /// <summary>In front of the camera, inside its view and with nothing solid in between.</summary>
-    public static bool IsVisible(Vector3 point)
+    public static bool IsVisible(Vector3 point) => IsVisible(point, null);
+
+    /// <summary>
+    /// The same for something standing at <paramref name="point"/>: its own colliders (under <paramref name="self"/>) don't hide
+    /// it. A troll's capsule reaches past chest height, so the plain check always found it hidden by its own body, and roamers
+    /// were taken away in plain sight.
+    /// </summary>
+    public static bool IsVisible(Vector3 point, Transform self)
     {
         Camera view = Camera.main;
         if (view == null)
@@ -26,7 +35,23 @@ public static class RaidSpots
             return false;
         }
 
-        return !Physics.Linecast(view.transform.position, chest, ~0, QueryTriggerInteraction.Ignore);
+        Vector3 from = view.transform.position;
+        if (self == null)
+        {
+            return !Physics.Linecast(from, chest, ~0, QueryTriggerInteraction.Ignore);
+        }
+
+        Vector3 way = chest - from;
+        int count = Physics.RaycastNonAlloc(from, way.normalized, SightHits, way.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (!SightHits[i].transform.IsChildOf(self))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>Points are picked flat at the player's height; this drops one onto the ground below or above it so the

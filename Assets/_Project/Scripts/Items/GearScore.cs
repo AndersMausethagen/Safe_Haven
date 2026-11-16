@@ -20,7 +20,12 @@ public static class GearScore
     public static bool Counts(ItemDefinition item) => item != null && BaseOf(item, GearScoreSettings.Current) > 0f;
 
     /// <summary>What a piece in hand is worth with its empowering and enchantment. Broken gear gives no stats, so it counts for nothing.</summary>
-    public static int Of(ItemStack stack)
+    public static int Of(ItemStack stack) => Of(stack, enchantmentCounts: true);
+
+    // The enchantment scores where the stats take it (GearPower.BonusesOf): only where it may be carved (Fits), and, worn,
+    // only on the first whole piece carrying it (GearPower.CountsEnchantment), so seven copies of one cheap enchantment
+    // can't lift the score towards a tier the stats don't reach.
+    private static int Of(ItemStack stack, bool enchantmentCounts)
     {
         if (stack.IsEmpty || stack.IsBroken)
         {
@@ -31,7 +36,8 @@ public static class GearScore
         float score = BaseOf(stack.Item, settings);
         // A better make counts as the part of an empowering level it is worth (LevelingSettings › Quality Strength).
         float empowered = stack.Empower + LevelingSettings.Current.QualityStrength(stack.Quality);
-        float extra = empowered * settings.PerEmpowerLevel + (stack.Enchantment != null ? settings.PerEnchantment : 0f);
+        bool enchanted = enchantmentCounts && stack.Enchantment != null && stack.Enchantment.Fits(stack.Item);
+        float extra = empowered * settings.PerEmpowerLevel + (enchanted ? settings.PerEnchantment : 0f);
         return Mathf.RoundToInt(score * (1f + extra));
     }
 
@@ -43,7 +49,7 @@ public static class GearScore
         {
             foreach (GearSlot slot in Counted)
             {
-                total += Of(gear.Get(slot));
+                total += Of(gear.Get(slot), GearPower.CountsEnchantment(gear.Slots, (int)slot));
             }
         }
 

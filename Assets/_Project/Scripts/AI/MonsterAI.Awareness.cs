@@ -102,7 +102,12 @@ public sealed partial class MonsterAI
     /// <summary>Not hunting anyone and hasn't noticed anything: a blow now is an ambush.</summary>
     public bool IsUnaware => IsRemote ? IsRemoteUnaware
         : senses != null && CurrentState != State.Dead && CurrentState != State.Staggered
-            && !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+            && !CanTarget(target) && Stage == AwarenessStage.Unaware;
+
+    // How aware it counts as for an ambush. Searching (its "?" up) is at least suspicious, though awareness drains while it sees
+    // nothing: unaware a second after a sound, it took the full ambush from the front with its question mark showing.
+    private AwarenessStage Stage => CurrentState == State.Investigating && senses.Stage == AwarenessStage.Unaware
+        ? AwarenessStage.Suspicious : senses.Stage;
 
     /// <summary>
     /// Caught unaware by a blow from <paramref name="from"/>: unaware, or (Perception Settings › Ambush From Behind When Suspicious) only
@@ -117,7 +122,7 @@ public sealed partial class MonsterAI
         }
 
         if (IsRemote || senses == null || definition == null || !PerceptionSettings.Current.AmbushFromBehindWhenSuspicious
-            || CurrentState == State.Dead || CurrentState == State.Staggered || CanTarget(target) || senses.Stage != AwarenessStage.Suspicious)
+            || CurrentState == State.Dead || CurrentState == State.Staggered || CanTarget(target) || Stage != AwarenessStage.Suspicious)
         {
             return false;
         }
@@ -154,7 +159,7 @@ public sealed partial class MonsterAI
             return;
         }
 
-        bool unaware = IsRemote ? IsRemoteUnaware : !CanTarget(target) && senses.Stage == AwarenessStage.Unaware;
+        bool unaware = IsRemote ? IsRemoteUnaware : !CanTarget(target) && Stage == AwarenessStage.Unaware;
         damageable.DamageTakenMultiplier = unaware ? PerceptionSettings.Current.AmbushDamageTaken : 1f;
     }
 

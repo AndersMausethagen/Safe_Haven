@@ -121,7 +121,12 @@ public sealed class StashChest : MonoBehaviour, ISaveable
         interactable.Completed.RemoveListener(OnUsed);
         standing.Remove(this);
         Construction.Finished -= OnUpgraded;
-        RefreshStash();
+        // The Haven unloading switches every chest off one by one; refreshing on each would shrink the open slots to the last
+        // chest's block for the whole raid (workers carry their output into the stash meanwhile).
+        if (!SceneLoader.IsLeaving)
+        {
+            RefreshStash();
+        }
     }
 
     private void OnUpgraded(Construction upgraded)

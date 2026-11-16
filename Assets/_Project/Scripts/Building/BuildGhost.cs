@@ -50,12 +50,13 @@ public sealed class BuildGhost
     public bool Exists => pieces.Count > 0;
 
     /// <summary>One piece, copied from <paramref name="source"/>, with a yard marker when <paramref name="hasYard"/>.
-    /// More pieces for a line are copies of this first one.</summary>
-    public void Create(Transform source, bool hasYard)
+    /// More pieces for a line are copies of this first one. <paramref name="bounds"/> is the footprint to check, when it isn't
+    /// what the source's meshes span (a standing building being moved carries its scaffold, sunk model and dressing).</summary>
+    public void Create(Transform source, bool hasYard, Bounds? bounds = null)
     {
         Clear();
         var ghost = new GameObject("Build Ghost");
-        LocalBounds = BuildPlacement.LocalBounds(source);
+        LocalBounds = bounds ?? BuildPlacement.LocalBounds(source);
         Matrix4x4 toRoot = source.worldToLocalMatrix;
         foreach (MeshFilter filter in source.GetComponentsInChildren<MeshFilter>(true))
         {

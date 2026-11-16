@@ -228,6 +228,12 @@ public sealed class SaveableEntity : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switched off only while it is carried to a new place (BuildPlacer's move): it is saved as standing where it stood, so a
+    /// save or a scene change in the middle of the move doesn't keep it switched off for good.
+    /// </summary>
+    public bool Carried { get; set; }
+
     private void Capture()
     {
         // A loaded save replaces the world; objects from before it must not write into the new one.
@@ -248,7 +254,7 @@ public sealed class SaveableEntity : MonoBehaviour
 
         if (saveActiveState)
         {
-            entity.Active = gameObject.activeSelf;
+            entity.Active = gameObject.activeSelf || Carried;
         }
 
         if (saveTransform || spawned)

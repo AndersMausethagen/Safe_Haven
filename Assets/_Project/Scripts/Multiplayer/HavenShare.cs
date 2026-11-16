@@ -46,6 +46,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
         link = session;
         content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         sync.Reset();
+        worldPieces.Reset();
         if (link.IsHost)
         {
             // Friends ask once fully connected: sent any earlier, the Haven could arrive before they listen.
@@ -112,7 +113,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
 
         // Packed on the main thread on purpose: it and the changes after it go out in order on one channel, and packing it
         // elsewhere would let those changes overtake it.
-        SaveData world = HavenVisit.WorldOf(SaveGameService.Capture(), HavenVisit.HostIsHome());
+        SaveData world = HavenVisit.WorldOf(SaveGameService.Capture(forWorldOnly: true), HavenVisit.HostIsHome());
         byte[] packed = WorldTransfer.Pack(world);
         var pieces = WorldTransfer.Split(packed);
         int transfer = ++transfers;

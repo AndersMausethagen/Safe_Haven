@@ -112,15 +112,20 @@ public sealed class HavenRequestBoard : MonoBehaviour
     /// <summary>Takes what was asked for (from the bag first, then the stash) and gives the reward.</summary>
     public static void Answer(HavenRequestDefinition request, ItemInventory bag)
     {
+        // Every bare piece, bag then stash, goes before any the player has empowered or enchanted: an order is answered on its
+        // own, so it must not take a worked spare from the bag while a plain one waits in the stash.
         int left = request.Count;
-        if (bag != null)
+        foreach (bool worked in new[] { false, true })
         {
-            left -= bag.Container.Remove(request.Wanted, left, request.Quality);
-        }
+            if (bag != null)
+            {
+                left -= bag.Container.Remove(request.Wanted, left, request.Quality, worked);
+            }
 
-        if (left > 0 && GameSession.Stash != null)
-        {
-            left -= GameSession.Stash.Items.Remove(request.Wanted, left, request.Quality);
+            if (left > 0 && GameSession.Stash != null)
+            {
+                left -= GameSession.Stash.Items.Remove(request.Wanted, left, request.Quality, worked);
+            }
         }
 
         SettlementState settlement = GameSession.Settlement;
@@ -177,6 +182,13 @@ public sealed class HavenRequestBoard : MonoBehaviour
         if (placed < count && GameSession.Stash != null)
         {
             placed += GameSession.Stash.Items.Add(item, count - placed);
+        }
+
+        // Neither bag nor stash has room: the reward is set down at the player's feet rather than lost.
+        if (placed < count && bag != null)
+        {
+            DroppedItem.Drop(bag.transform, new ItemStack(item, count - placed));
+            placed = count;
         }
 
         if (placed > 0)

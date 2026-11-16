@@ -151,6 +151,25 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
         }
 
         Hour = saved + Mathf.Max(0f, away);
+        PassDawnsAway(saved, saved + Mathf.Max(0f, away));
+    }
+
+    // Seasons counts a day each time it sees the clock pass 6:00, but the hours away on a raid are added here at once, out of its
+    // sight: a raid over a dawn lost that day (the day count went back, saplings shrank). Each dawn the time away went past is
+    // passed here instead, where Seasons keeps the days (in a friend's Haven the days are theirs).
+    private static void PassDawnsAway(float from, float to)
+    {
+        int dawns = Mathf.FloorToInt((to - 6f) / 24f) - Mathf.FloorToInt((from - 6f) / 24f);
+        if (dawns <= 0 || HavenVisit.IsVisiting || GameSession.Settlement == null || FindAnyObjectByType<Seasons>() == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < Mathf.Min(dawns, 30); i++)
+        {
+            GameSession.Settlement.PassDay();
+            global::Territory.Turn(true);
+        }
     }
 
     private void OnEnable()

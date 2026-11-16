@@ -192,7 +192,11 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         Transform start = FindAnyObjectByType<RaidMap>()?.PlayerStart;
-        RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
+        // Following the host, the creatures are the host's (puppets here): the host's game picks its elites.
+        if (CreatureSource.Remote == null)
+        {
+            RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
+        }
         if (NightSettings.IsDark)
         {
             GameMessages.Post(NightSettings.Current.NightRaidText, MessageKind.Warning);
@@ -396,6 +400,13 @@ public sealed class RaidDirector : MonoBehaviour
 
     private void Finish()
     {
+        // Crafts under way give their materials back before the bag is copied for home, as at a launch: one finishing on the way
+        // (or refunded when the scene unloads) would land in a bag already copied.
+        if (player != null && player.TryGetComponent(out HandCraftQueue crafts))
+        {
+            crafts.Stop();
+        }
+
         PlayerSnapshot final = player != null ? PlayerSnapshot.Capture(player) : Session.Loadout;
         bool extracted = Session.Outcome == RaidOutcome.Extracted;
         // A failed raid keeps knowledge, the safe pocket and the deployed equipment, worn down (GDD §8.3).

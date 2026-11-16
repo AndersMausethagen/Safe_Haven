@@ -99,6 +99,38 @@ public sealed class DurabilityTests
     }
 
     [Test]
+    public void FailedRaid_AFoundCopyOfAnotherMake_DoesntTakeTheCarriedPiecesPlace()
+    {
+        // Review 2026-11-16: matched on item and wear only, a relic of the same sword in an earlier slot was kept and the sword
+        // carried in lost.
+        ItemDefinition sword = Gear("sword");
+        EnchantmentDefinition relicMark = Create<EnchantmentDefinition>("relic mark");
+        var bag = new ItemContainer(4, 1);
+        bag.SetSlot(2, new ItemStack(sword, 1));
+        PlayerSnapshot loadout = PlayerSnapshot.Capture(bag, null, null);
+        bag.SetSlot(0, new ItemStack(sword, 1, 1f, 0, relicMark));
+
+        PlayerSnapshot kept = PlayerSnapshot.Capture(bag, null, null).AfterFailedRaid(loadout, 0.25f);
+
+        Assert.AreEqual(1, kept.Slots.Count);
+        Assert.AreEqual(2, kept.Slots[0].Index, "the sword carried in is kept");
+        Assert.IsNull(kept.Slots[0].Stack.Enchantment, "the relic found out there is lost");
+    }
+
+    [Test]
+    public void AddStack_PutsSeveralIdenticalPieces_OneToASlot()
+    {
+        // Review 2026-11-16: a co-op friend's two identical axes arrived as one "2 axes" gear slot, which a reload clamped to one.
+        ItemDefinition axe = Gear("axe");
+        var chest = new ItemContainer(4, 1);
+
+        Assert.AreEqual(2, chest.AddStack(new ItemStack(axe, 2, 0.5f)));
+        Assert.AreEqual(1, chest.GetSlot(0).Count);
+        Assert.AreEqual(1, chest.GetSlot(1).Count);
+        Assert.AreEqual(0.5f, chest.GetSlot(1).Durability, 0.001f, "each keeps its condition");
+    }
+
+    [Test]
     public void Settings_CountFailedRaidsUntilNewGearBreaks()
     {
         DurabilitySettings settings = Create<DurabilitySettings>("durability");

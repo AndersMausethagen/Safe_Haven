@@ -93,7 +93,9 @@ public sealed class HorseTravel : MonoBehaviour
         foreach (Horse horse in Horse.All)
         {
             float distance = horse != null ? (horse.transform.position - player.transform.position).sqrMagnitude : float.MaxValue;
-            if (horse != null && horse.IsAlive && horse.IsTamed && horse.Order == Horse.Orders.Follow && distance < bestDistance)
+            // Not one in its stall (stabling keeps the last order), nor a friend's horse following them.
+            if (horse != null && horse.IsAlive && horse.IsTamed && horse.Order == Horse.Orders.Follow && !horse.IsStabled && horse.IsMine
+                && distance < bestDistance)
             {
                 best = horse;
                 bestDistance = distance;

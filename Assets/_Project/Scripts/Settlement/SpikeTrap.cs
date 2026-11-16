@@ -18,16 +18,19 @@ public sealed class SpikeTrap : MonoBehaviour
     private Combatant owner;
     private Construction construction;
     private float nextCheck;
+    private Damageable health;
 
     private void Awake()
     {
         owner = GetComponent<Combatant>();
         construction = GetComponent<Construction>();
+        health = GetComponent<Damageable>();
     }
 
     private void Update()
     {
-        if (Time.time < nextCheck || (construction != null && construction.IsBuilding))
+        // A trap worn down to its floor is broken, as a broken Ward Totem or Watch Post: it bites again once mended.
+        if (Time.time < nextCheck || (construction != null && construction.IsBuilding) || (health != null && health.IsBroken))
         {
             return;
         }

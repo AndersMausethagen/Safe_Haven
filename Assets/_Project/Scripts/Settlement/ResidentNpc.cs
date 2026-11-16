@@ -240,7 +240,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         if (current != null && current.Teaches != null && record != null)
         {
             ProficiencyDefinition skill = current.Teaches;
-            string why = record.TaughtSinceRaid ? "Another, after your next raid." : $"What a {SettlementSettings.Current.RankFor(record.WorkDone).name} {current.DisplayName} knows";
+            string why = record.TaughtSinceRaid ? "Another, after your next raid survived." : $"What a {SettlementSettings.Current.RankFor(record.WorkDone).name} {current.DisplayName} knows";
             page.Add(new MenuAction($"Ask for a lesson in {skill.DisplayName}", why, !record.TaughtSinceRaid, () =>
             {
                 int learned = ExperienceTracker.TakeLesson(record);

@@ -63,9 +63,23 @@ public sealed class RaidEventDirector : MonoBehaviour
             return;
         }
 
-        // What the briefing named comes first, so it comes true.
-        RaidEventDefinition next = RaidEventPicker.Pick(session.Foretold, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used)
-            ?? RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+        // What the briefing named comes first, so it comes true. Each foretold event that can still come keeps its place in the
+        // raid's count: the pool's picks used every place up before a late one's window opened (an Oskorei waits for stage 1),
+        // and the Watch Post's word never came true.
+        int owed = 0;
+        foreach (RaidEventDefinition foretold in session.Foretold)
+        {
+            if (foretold != null && !used.Contains(foretold) && foretold.CanStillHappen(session.TimeRemaining))
+            {
+                owed++;
+            }
+        }
+
+        RaidEventDefinition next = RaidEventPicker.Pick(session.Foretold, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+        if (next == null && randomEvents + owed < settings.maxPerRaid)
+        {
+            next = RaidEventPicker.Pick(settings.pool, random, session.Elapsed, session.TimeRemaining, director.StageIndex, used);
+        }
         // A failed placement tries again on the next think, with the player somewhere else.
         if (next != null && Begin(next))
         {

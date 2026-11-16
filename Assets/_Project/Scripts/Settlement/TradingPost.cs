@@ -113,6 +113,11 @@ public sealed class TradingPost : MonoBehaviour
         }
 
         TradeSettings settings = TradeSettings.Current;
+        if (!StashTakesCoin(settings, sale.coins))
+        {
+            return;
+        }
+
         if (settings.Coin != null && MaterialPool.For(user).TrySpend(null, new[] { new ItemAmount(sale.item, 1) }))
         {
             int added = GameSession.Stash.Items.Add(settings.Coin, sale.coins);
@@ -130,7 +135,7 @@ public sealed class TradingPost : MonoBehaviour
         TradeSettings settings = TradeSettings.Current;
         ItemStack piece = bag.Container.GetSlot(index);
         int coins = settings.CoinsFor(piece);
-        if (settings.Coin == null || coins <= 0)
+        if (settings.Coin == null || coins <= 0 || !StashTakesCoin(settings, coins))
         {
             return;
         }
@@ -159,5 +164,17 @@ public sealed class TradingPost : MonoBehaviour
         GameSession.Stash.Items.Add(offer.item, offer.amount);
         GameSession.Settlement.NoteBought(offer.Key);
         GameMessages.Post($"Bought {offer.amount} {offer.item.DisplayName}, in the stash.", MessageKind.Gain);
+    }
+
+    // A sale pays into the stash, so it waits until the stash has room for the coin: a full stash took the goods for nothing.
+    private static bool StashTakesCoin(TradeSettings settings, int coins)
+    {
+        if (settings.Coin == null || GameSession.Stash.Items.SpaceFor(settings.Coin) >= coins)
+        {
+            return true;
+        }
+
+        GameMessages.Post("No room in the stash for the coin: make room in a chest first.", MessageKind.Warning);
+        return false;
     }
 }

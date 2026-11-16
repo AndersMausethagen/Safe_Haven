@@ -84,8 +84,7 @@ public sealed partial class MonsterAI
         float distance = HorizontalDistance(playerAt);
         if (!thiefFleeing)
         {
-            bool noticed = distance < definition.CloseSenseRange
-                || (distance < definition.DetectionRange && senses.CanSee(player.transform, definition.DetectionRange));
+            bool noticed = distance < definition.CloseSenseRange || senses.CanNotice(player.transform);
             if (!noticed)
             {
                 return false;

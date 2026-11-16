@@ -589,7 +589,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
         bool overUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         // While placing a building the mouse buttons place and cancel instead of attacking.
-        if (!overUI && !DialogueBox.ClaimsClick && !BuildPlacer.IsBusy)
+        if (!overUI && !DialogueBox.ClaimsClick && !BuildPlacer.IsBusy && !BuildPlacer.EndedThisFrame)
         {
             if (mouseAttackPending)
             {

@@ -119,10 +119,21 @@ public sealed class PlayerRiding : MonoBehaviour
 
     public void HoldRope(HorseTaming horse)
     {
+        LetGoOfCart();
         holding = horse;
         feetFree = false;
         stateMachine.SetAboard(true);
         movement.SetSpeedScale(this, 0f);
+    }
+
+    // A cart in hand is let go first: dragged from the saddle or the rope, it pulled against the horse, drained stamina and,
+    // letting go when stuck, switched the aboard state off under the rider (PlayerTransport.Ended).
+    private void LetGoOfCart()
+    {
+        if (TryGetComponent(out PlayerTransport transport) && transport.Using != null && transport.Using.Driver is Haulable hauled)
+        {
+            hauled.LetGo();
+        }
     }
 
     /// <summary>The horse has given in: the player keeps the rope but walks up to it to get on.</summary>
@@ -220,6 +231,8 @@ public sealed class PlayerRiding : MonoBehaviour
         {
             return;
         }
+
+        LetGoOfCart();
 
         if (Riding != null)
         {

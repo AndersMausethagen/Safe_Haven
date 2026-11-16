@@ -147,6 +147,9 @@ public static class CoopPlace
     private static string text = string.Empty;
     private static UnityEngine.SceneManagement.Scene scene;
     private static int seed;
+    private static bool wasArrived;
+    // Not yet anywhere: this game's own, so it is never the same place as another player's.
+    private static readonly string Nowhere = "~" + System.Guid.NewGuid().ToString("N").Substring(0, 12);
 
     public static string Here
     {
@@ -171,14 +174,20 @@ public static class CoopPlace
     {
         UnityEngine.SceneManagement.Scene active = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         int run = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed : 0;
-        if (active == scene && run == seed && text.Length > 0)
+        // Nowhere yet while a scene is still being set up, or for a guest still in their own Haven before the host's arrives (both
+        // are "SafeHaven" by name): the host's creatures told meanwhile were dropped or built into the scene going away, and the
+        // place never changing on arrival, the host never told them again.
+        bool arrived = !SceneTransition.IsBusy
+                       && !(CoopSession.Current != null && !CoopSession.Current.IsHost && !HavenVisit.IsVisiting && GameSession.ActiveRaid == null);
+        if (active == scene && run == seed && arrived == wasArrived && text.Length > 0)
         {
             return;
         }
 
         scene = active;
         seed = run;
-        text = GameSession.ActiveRaid != null ? active.name + "#" + run : active.name;
+        wasArrived = arrived;
+        text = !arrived ? Nowhere : GameSession.ActiveRaid != null ? active.name + "#" + run : active.name;
         key = default;
         key.CopyFromTruncated(text);
     }

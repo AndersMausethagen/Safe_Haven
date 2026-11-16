@@ -118,10 +118,17 @@ public static class StationCrafting
                 continue;
             }
 
-            int given = bag != null ? bag.Give(cost.Item, cost.Amount) : 0;
-            if (given < cost.Amount)
+            // Straight into the container, not bag.Give: a refund is no find, and ItemObtained would count it again for
+            // collect quests (cancel, queue, cancel...). What neither bag nor stash takes falls at the player's feet.
+            int left = cost.Amount - (bag != null ? bag.Container.Add(cost.Item, cost.Amount) : 0);
+            if (left > 0)
             {
-                GameSession.Stash.Items.Add(cost.Item, cost.Amount - given);
+                left -= GameSession.Stash.Items.Add(cost.Item, left);
+            }
+
+            if (left > 0 && user != null)
+            {
+                DroppedItem.Drop(user.transform, new ItemStack(cost.Item, left));
             }
         }
     }

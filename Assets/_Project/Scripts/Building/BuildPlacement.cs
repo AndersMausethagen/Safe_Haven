@@ -312,7 +312,8 @@ public static class BuildPlacement
         float step = 2f * Mathf.Asin(Mathf.Clamp01(pieceLength / (2f * radius)));
         float first = Mathf.Atan2(from.y, from.x);
         float turn = Mathf.DeltaAngle(first * Mathf.Rad2Deg, Mathf.Atan2(to.y, to.x) * Mathf.Rad2Deg) * Mathf.Deg2Rad;
-        int count = Mathf.Clamp(Mathf.CeilToInt(Mathf.Abs(turn) / step - 0.05f), 1, Mathf.Max(1, maxPieces));
+        // Only a hair under a whole piece is let off (float error): letting off 5% made each chord up to 5% longer than a piece.
+        int count = Mathf.Clamp(Mathf.CeilToInt(Mathf.Abs(turn) / step - 1e-4f), 1, Mathf.Max(1, maxPieces));
         if (count < maxPieces || Mathf.Abs(turn) <= step * count)
         {
             step = Mathf.Abs(turn) / count; // even, and never longer than a piece: they meet (or overlap) at every post pair
@@ -325,7 +326,7 @@ public static class BuildPlacement
             Vector2 p = middle + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius;
             Vector2 q = middle + new Vector2(Mathf.Cos(b), Mathf.Sin(b)) * radius;
             Vector2 mid = (p + q) * 0.5f;
-            centers.Add(new Vector3(mid.x, start.y, mid.y));
+            centers.Add(new Vector3(mid.x, start.y, mid.y)); // put on the ground by the placer (BuildPlacer.Lines)
             directions.Add(new Vector3(q.x - p.x, 0f, q.y - p.y).normalized);
         }
     }

@@ -547,42 +547,50 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
         if (CurrentState == State.Returning)
         {
+            // Every way into a walk home clears the target, so one it has now came on the way: a blow (OnDamaged), its pack's
+            // call or Engage. It turns and fights instead of taking blows in the back the whole way home.
+            // Its home stays where it is: the chase's leash still brings it back.
             if (!roaming)
             {
-                UpdateReturn();
-                return;
-            }
-
-            if (Time.time >= nextScanTime)
-            {
-                nextScanTime = Time.time + scanInterval;
-                if (definition.HasTemperament(MonsterTemperament.Aggressive))
+                if (!CanTarget(target))
                 {
-                    Sense();
+                    UpdateReturn();
+                    return;
                 }
             }
-            if (CurrentState == State.Investigating)
+            else
             {
-                return;
-            }
-            if (!CanTarget(target))
-            {
-                UpdateReturn();
-                return;
-            }
+                if (Time.time >= nextScanTime)
+                {
+                    nextScanTime = Time.time + scanInterval;
+                    if (definition.HasTemperament(MonsterTemperament.Aggressive))
+                    {
+                        Sense();
+                    }
+                }
+                if (CurrentState == State.Investigating)
+                {
+                    return;
+                }
+                if (!CanTarget(target))
+                {
+                    UpdateReturn();
+                    return;
+                }
 
-            // Held to its destination: what it meets far from there is left alone, and it walks on.
-            if (HoldsHome && IsBeyondLeash())
-            {
-                ClearTarget();
-                UpdateReturn();
-                return;
-            }
+                // Held to its destination: what it meets far from there is left alone, and it walks on.
+                if (HoldsHome && IsBeyondLeash())
+                {
+                    ClearTarget();
+                    UpdateReturn();
+                    return;
+                }
 
-            roaming = false;
-            if (!HoldsHome)
-            {
-                home = transform.position;
+                roaming = false;
+                if (!HoldsHome)
+                {
+                    home = transform.position;
+                }
             }
         }
 

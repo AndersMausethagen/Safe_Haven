@@ -52,12 +52,56 @@ public sealed partial class MonsterAI
 
     private void UpdateReturn()
     {
-        if (HorizontalDistance(home) <= HomeTolerance || !movement.MoveTo(home))
+        float distance = HorizontalDistance(home);
+        if (distance <= HomeTolerance || !movement.MoveTo(home))
         {
-            roaming = false;
-            movement.Stop();
-            SetState(State.Idle);
+            ArriveHome();
+            return;
         }
+
+        // No headway for a while: it stands at the end of the way it can find, short of home (a spot on a cut-off NavMesh
+        // island, a roam point inside a trunk). A partial path keeps MoveTo true for ever, so without this it walked in place,
+        // deaf and blind, for good. Where it stands becomes home. A story's walk (HoldsHome) is the story's to end.
+        if (HoldsHome)
+        {
+            return;
+        }
+
+        if (Time.time - returnTickAt > 0.5f)
+        {
+            // Not updated meanwhile (held by a cinematic, a pause): the window starts again.
+            returnBest = distance;
+            returnCheckAt = Time.time + ReturnHeadwaySeconds;
+        }
+
+        returnTickAt = Time.time;
+        if (Time.time < returnCheckAt)
+        {
+            return;
+        }
+
+        if (distance > returnBest - ReturnHeadway)
+        {
+            home = transform.position;
+            ArriveHome();
+            return;
+        }
+
+        returnBest = distance;
+        returnCheckAt = Time.time + ReturnHeadwaySeconds;
+    }
+
+    private const float ReturnHeadway = 0.25f;
+    private const float ReturnHeadwaySeconds = 3f;
+    private float returnBest = float.MaxValue;
+    private float returnCheckAt;
+    private float returnTickAt = float.NegativeInfinity;
+
+    private void ArriveHome()
+    {
+        roaming = false;
+        movement.Stop();
+        SetState(State.Idle);
     }
 
     private void GoHomeOrIdle()
@@ -74,6 +118,7 @@ public sealed partial class MonsterAI
 
     private void BeginReturn()
     {
+        returnTickAt = float.NegativeInfinity;
         movement.RepathNow();
         senses?.Awareness.Calm();
         SetState(State.Returning);

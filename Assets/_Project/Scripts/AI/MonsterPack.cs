@@ -15,6 +15,7 @@ public sealed class MonsterPack : MonoBehaviour
     [SerializeField, Min(0f)] private float fleeSeconds = 8f;
     private float nextAttackAt;
     private MonsterAI[] members;
+    private int startCount;
     private bool broken;
 
     /// <summary>Whether a pack breaks, with this many of it left of its whole.</summary>
@@ -36,20 +37,18 @@ public sealed class MonsterPack : MonoBehaviour
             return;
         }
 
-        int whole = 0, left = 0;
+        // The pack as it set out: a fallen member's body is destroyed a moment after it dies, and counting only what is still
+        // there shrank the whole with every corpse, so the loss rule fired only when two fell within that moment.
+        int left = 0;
         foreach (MonsterAI member in members)
         {
-            if (member != null && member.gameObject.activeInHierarchy)
+            if (member != null && member.gameObject.activeInHierarchy && member != fallen && member.CurrentState != MonsterAI.State.Dead)
             {
-                whole++;
-                if (member != fallen && member.CurrentState != MonsterAI.State.Dead)
-                {
-                    left++;
-                }
+                left++;
             }
         }
 
-        if (!Breaks(left, whole, fallen == leader, breaksWithItsLeader, breaksAtLosses))
+        if (!Breaks(left, startCount, fallen == leader, breaksWithItsLeader, breaksAtLosses))
         {
             return;
         }
@@ -73,6 +72,16 @@ public sealed class MonsterPack : MonoBehaviour
             seed = RaidLayout.SeedFor(seed, $"{transform.position.x:F2},{transform.position.z:F2}");
             optionalMember.SetActive(new System.Random(seed).Next(2) == 1);
         }
+
+        startCount = 0;
+        foreach (MonsterAI member in members)
+        {
+            if (member.gameObject.activeInHierarchy)
+            {
+                startCount++;
+            }
+        }
+
         foreach (MonsterAI member in members)
         {
             var agent = member.GetComponent<UnityEngine.AI.NavMeshAgent>();

@@ -58,7 +58,9 @@ public sealed class BossEncounter : MonoBehaviour
             playingMusic = true;
         }
 
-        if (definition.WakeSeconds <= 0f)
+        // A friend's copy of the host's boss (co-op) is built when they come near, often mid-fight: the waking is the host's game's,
+        // and replaying it here froze the copy (its AI off, so its poses stopped) and made it untouchable for the wake's length.
+        if (definition.WakeSeconds <= 0f || (ai != null && ai.IsRemote))
         {
             yield break;
         }

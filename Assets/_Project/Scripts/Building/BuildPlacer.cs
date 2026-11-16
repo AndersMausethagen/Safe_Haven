@@ -441,8 +441,21 @@ public sealed partial class BuildPlacer : MonoBehaviour
         picking = false;
         moving = building;
         yaw = building.transform.eulerAngles.y;
-        CreateGhost(building.transform);
+        // Checked against the building's own footprint (measured on its model before any dressing), not the scaffold, the sunk
+        // rising model or the level dressing it wears now: those made a site unmovable and a dressed building's box too big.
+        CreateGhost(building.transform, building.LocalBounds);
+        SetCarried(building, true);
         building.gameObject.SetActive(false);
+    }
+
+    // Saved as standing at its old place while carried (SaveableEntity.Carried): a save or a raid launched mid-move kept it
+    // switched off for good.
+    private static void SetCarried(BuildingObject building, bool carried)
+    {
+        if (building != null && building.TryGetComponent(out SaveableEntity entity))
+        {
+            entity.Carried = carried;
+        }
     }
 
     private void Confirm(Vector3 point, Quaternion rotation)
@@ -451,6 +464,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
         {
             moving.transform.SetPositionAndRotation(point, rotation);
             moving.gameObject.SetActive(true);
+            SetCarried(moving, false);
             GameMessages.Post($"Moved the {moving.Definition.DisplayName}.");
             moving = null;
             Cancel();
@@ -612,6 +626,7 @@ public sealed partial class BuildPlacer : MonoBehaviour
         if (moving != null)
         {
             moving.gameObject.SetActive(true);
+            SetCarried(moving, false);
             moving = null;
         }
 
@@ -620,14 +635,27 @@ public sealed partial class BuildPlacer : MonoBehaviour
         placing = null;
         picking = false;
         upgrading = false;
+        if (IsBusy)
+        {
+            endedFrame = Time.frameCount;
+        }
+
         IsBusy = false;
     }
 
+    private static int endedFrame = -1;
+
+    /// <summary>
+    /// True in the frame building ended: the click that placed, picked or cancelled ended it, and must not also swing the weapon
+    /// (PlayerInputHandler reads its pending clicks after this has run or before it, in no set order).
+    /// </summary>
+    public static bool EndedThisFrame => endedFrame == Time.frameCount;
+
     // The ghost of what is placed, and the yards already standing, while building.
-    private void CreateGhost(Transform source)
+    private void CreateGhost(Transform source, Bounds? bounds = null)
     {
         BuildingDefinition kind = Kind;
-        ghost.Create(source, kind != null && kind.YardDepth > 0f);
+        ghost.Create(source, kind != null && kind.YardDepth > 0f, bounds);
         ghost.ShowPlacedYards(Area.GroundHeight);
         IsBusy = true;
     }

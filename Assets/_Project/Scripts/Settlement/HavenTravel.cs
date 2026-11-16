@@ -28,6 +28,13 @@ public static class HavenTravel
             return;
         }
 
+        // In the saddle or a boat the seat puts the body back the next frame: get down first.
+        if (player.TryGetComponent(out PlayerMovement movement) && movement.IsSeated)
+        {
+            GameMessages.Post("Get down first to go there.", MessageKind.Warning);
+            return;
+        }
+
         Vector3 spot = SpotBeside(target, player.transform.position);
         Vector3 facing = target.position - spot;
         facing.y = 0f;

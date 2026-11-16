@@ -1347,6 +1347,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         public string owner = "";
         public string ownerName = "";
         public bool arriving;
+        /// <summary>Its health as a share of its maximum; -1 in saves from before (2026-11-16).</summary>
+        public float healthShare = -1f;
     }
 
     string ISaveable.SaveKey => "horse";
@@ -1360,6 +1362,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             bornOn = BornOn, withFoalSince = WithFoalSince, foalSire = FoalSire, lastFoaled = LastFoaled,
             order = (int)Order, job = Job, workAt = WorkAt, roughMetres = roughMetres, swumMetres = swumMetres, rodeMetres = rodeMetres, hurtRidden = hurtRidden,
             owner = ownerId, ownerName = ownerName, arriving = arriving,
+            healthShare = health != null ? health.HealthFraction : -1f,
         };
         if (Cargo != null)
         {
@@ -1389,8 +1392,13 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             stats.growth = 1f;
         }
 
-        // Its health is its Damageable's to save.
+        // Its health is its Damageable's to save, but the Damageable may restore first, against the maximum of the stats Awake
+        // rolled at random: Give then rescales it by saved/rolled. The saved share is put back after the saved stats.
         Give(stats);
+        if (saved.healthShare >= 0f && health != null)
+        {
+            health.SetHealthFraction(saved.healthShare);
+        }
         horseName = saved.name ?? "";
         Stamina = Mathf.Clamp(saved.stamina, 0f, MaxStamina);
         LastGroomed = saved.lastGroomed;

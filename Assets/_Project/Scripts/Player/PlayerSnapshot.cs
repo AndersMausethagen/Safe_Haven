@@ -458,6 +458,20 @@ public sealed class PlayerSnapshot
             deployed.Add(record.Stack);
         }
 
+        // A carried-in piece moved into the safe pocket is kept there anyway; it must not leave its place in the loadout free
+        // for a copy found out there.
+        foreach (bool exact in new[] { true, false })
+        {
+            foreach (SlotRecord record in pocket)
+            {
+                int match = record.Stack.Item.HasDurability ? CarriedIn(deployed, record.Stack, exact) : -1;
+                if (match >= 0)
+                {
+                    deployed.RemoveAt(match);
+                }
+            }
+        }
+
         // Worn gear is matched first, so it stays on when the same item was also in the bag. Every piece with its exact wear is
         // matched before any chipped one (a glancing blow wears an axe on the way), so a piece found out there can't take the
         // place of the one carried in.
@@ -490,7 +504,8 @@ public sealed class PlayerSnapshot
 
                 done[i] = true;
                 deployed.RemoveAt(match);
-                ItemStack worn = stack.WithDurability(stack.Durability - durabilityLoss);
+                // A lantern keeps its light: that is what it holds, not wear.
+                ItemStack worn = stack.Item.IsLantern ? stack : stack.WithDurability(stack.Durability - durabilityLoss);
                 (i < wornCount ? kept.gear : kept.slots).Add(new SlotRecord(held[i].Index, worn));
                 wear?.Add(new EquipmentWear(stack.Item, stack.Durability, worn.Durability));
                 if (i >= wornCount && held[i].Index == condition.EquippedSlot)
@@ -503,20 +518,21 @@ public sealed class PlayerSnapshot
         return kept;
     }
 
-    // Which carried-in piece a piece held at the end is: the same item with the same wear, or (not exact) the least worn-down
-    // copy that was more whole going in. A piece found out there in better shape than anything carried in matches none.
+    // Which carried-in piece a piece held at the end is: the same piece (item, quality, maker, empowering, enchantment) with
+    // the same wear, or (not exact) the least worn-down copy that was more whole going in. A piece found out there in better
+    // shape than anything carried in, or of another make (a relic's enchantment, a plain copy of a Masterwork), matches none.
     private static int CarriedIn(List<ItemStack> deployed, ItemStack stack, bool exact)
     {
         if (exact)
         {
-            return deployed.FindIndex(candidate => candidate.Item == stack.Item && Mathf.Approximately(candidate.Durability, stack.Durability));
+            return deployed.FindIndex(candidate => SamePiece(candidate, stack) && Mathf.Approximately(candidate.Durability, stack.Durability));
         }
 
         int best = -1;
         for (int i = 0; i < deployed.Count; i++)
         {
             ItemStack candidate = deployed[i];
-            if (candidate.Item == stack.Item && candidate.Durability > stack.Durability && (best < 0 || candidate.Durability < deployed[best].Durability))
+            if (SamePiece(candidate, stack) && candidate.Durability > stack.Durability && (best < 0 || candidate.Durability < deployed[best].Durability))
             {
                 best = i;
             }
@@ -524,6 +540,11 @@ public sealed class PlayerSnapshot
 
         return best;
     }
+
+    // Nothing done to a piece in a raid changes what it is (empowering and enchanting are the altar's work at home), so the
+    // whole make has to agree, wear aside.
+    private static bool SamePiece(ItemStack a, ItemStack b) =>
+        a.Item == b.Item && a.Quality == b.Quality && a.Maker == b.Maker && a.Empower == b.Empower && a.Enchantment == b.Enchantment;
 
     /// <summary>
     /// Gear that wore down since <paramref name="loadout"/> (an extraction's report): each worn piece, matched to what was worn

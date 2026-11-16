@@ -83,8 +83,26 @@ public static class HorseTrader
         }
 
         TradeSettings trade = TradeSettings.Current;
+        if (trade.Coin != null && GameSession.Stash.Items.SpaceFor(trade.Coin) < price)
+        {
+            GameMessages.Post("No room in the stash for the coin: make room in a chest first.", MessageKind.Warning);
+            return;
+        }
+
         string name = horse.HorseName;
+        if (horse.Rider != null)
+        {
+            horse.Rider.Dismount(thrown: false);
+        }
+
         HorseHitch.Unhitch(horse);
+        // Gone from the Haven's world for good (as HorseTravel.LeaveForRaid does): destroyed alone, the save records it as still
+        // there and the sold horse comes back on the next load.
+        if (horse.TryGetComponent(out SaveableEntity entity))
+        {
+            entity.MarkDestroyed();
+        }
+
         Object.Destroy(horse.gameObject);
         int added = GameSession.Stash.Items.Add(trade.Coin, price);
         GameMessages.Post($"Sold {name} to the caravan for {added} {trade.Coin.DisplayName}, in the stash.", MessageKind.Gain);

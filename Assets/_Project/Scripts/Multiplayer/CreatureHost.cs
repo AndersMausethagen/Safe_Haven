@@ -135,6 +135,12 @@ public sealed class CreatureHost
             {
                 hosted.Ai.AttackStarted -= hosted.OnStrike;
             }
+
+            // The party's extra health goes with the party: closed mid-raid, the host fought every creature at +60% a friend alone.
+            if (hosted.Combatant != null)
+            {
+                hosted.Combatant.Stats.RemoveModifiersFrom(this);
+            }
         }
 
         byId.Clear();
@@ -641,7 +647,9 @@ public sealed class CreatureHost
         reader.ReadValueSafe(out Vector3 direction);
         reader.ReadValueSafe(out float poise);
         reader.ReadValueSafe(out int technique);
-        if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive)
+        // From a friend still on this run, as the other friend messages ask: a late arrow from one who just extracted lands nowhere.
+        if (!byId.TryGetValue(id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
+            || FriendOnThisRun(sender) == null)
         {
             return;
         }

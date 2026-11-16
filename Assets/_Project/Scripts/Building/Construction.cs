@@ -261,9 +261,13 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         nextBlow = Time.time + 0.15f;
     }
 
+    // Completed (not cancelled) and paid for means the hammering ran its time, which was set to the work left (OnSiteStarted);
+    // the only early Complete is an unpaid start. Work counted in this Update can lag the interaction's own clock by a frame (no
+    // set order between them), and Progress reads 0 here (End resets it first), so checking Work let a fast builder's last
+    // frame end the hammering with nothing standing.
     private void OnSiteCompleted()
     {
-        if (!Paid || Work + 0.05f < WorkNeeded && siteInteractable.Progress < 1f)
+        if (!Paid)
         {
             return;
         }

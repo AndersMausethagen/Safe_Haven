@@ -203,6 +203,16 @@ public static class HavenVisit
             return;
         }
 
+        // A scene still being set up (home from the raid the session ended during, or the session ending mid-load): TryPlay
+        // refuses to load then, and with the visit already forgotten the save on coming home (SaveOnceHome) wrote the friend's
+        // Haven into this player's own journey. Still visiting until the scene is ready, that save keeps to the character
+        // (ForOwnSave), and the way home is taken once it can be.
+        if (travel && SceneTransition.IsBusy)
+        {
+            SceneTransition.WhenReady(() => End(content, true));
+            return;
+        }
+
         SaveData back = home;
         if (Player.Current != null && Player.Current.Persistence != null)
         {

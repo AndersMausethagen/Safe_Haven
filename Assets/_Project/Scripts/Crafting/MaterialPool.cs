@@ -225,7 +225,9 @@ public sealed class MaterialPool
             }
 
             int added = bag != null ? bag.Add(amount.Item, amount.Amount) : 0;
-            if (added < amount.Amount && dropAt != null)
+            // Water is poured back into the waterskins that have room; what they can't hold runs off, as a "Water" sack on
+            // the ground could only be picked up into a waterskin anyway.
+            if (added < amount.Amount && dropAt != null && !amount.Item.IsWaterMeasure)
             {
                 DroppedItem.Drop(dropAt, new ItemStack(amount.Item, amount.Amount - added));
             }
