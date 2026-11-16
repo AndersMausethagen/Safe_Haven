@@ -12,6 +12,8 @@ The lines come from Unity (AgentScripts/BuildDialogueVoices.cs, entry Harvest ->
   speak    Have LocalSpawn speak the script's lines that have no clip yet.
   new      moods + script + speak: everything a new line needs. What Unity's Voice Lines window runs.
   again    The same for the lines named by id, spoken over the clips they have: `again 8a4f5935addb 17f7d4...`.
+  pauses   The voice changer run again over every clip from its untouched recording, with the script's dials (the
+           Longest Pause, 2026-11-16): no new takes, the clips written in place.
 
 The easy way is in Unity: Safe Haven > Voice Lines lists every line, sets a line's mood, and has buttons for
 "new" and "again" and for adding the clips to the game. By hand it is: Harvest in Unity (AgentScripts/
@@ -24,7 +26,7 @@ To hear a character in another voice, redesign it in LocalSpawn's Voice tab unde
 its folder under Audio/Voice/Dialogue, and speak again.
 
 Run with LocalSpawn's Python:
-  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/Audio/dialogue_voices.py voices|moods [--llm]|script|speak|new|again ID...|all
+  D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/Audio/dialogue_voices.py voices|moods [--llm]|script|speak|new|again ID...|pauses|all
 """
 import json
 import os
@@ -49,6 +51,10 @@ CLIPS =os.path.join("..", "..", "..", "Assets", "_Project", "Audio", "Voice", "D
 # Who speaks the lines: "acted" is LocalSpawn's IndexTTS-2.5, which plays the mood as it speaks; "shaped" is
 # Qwen3-TTS with the mood made afterwards by the voice changer. The voices are the same for both.
 ENGINE = "acted"
+# The longest silence left inside a line (the voice changer's Longest Pause): IndexTTS leaves 0.6-1.5 s between two
+# sentences after the long reference clips, which the user heard as lines "cut into parts" (2026-11-16). About a
+# natural pause; the words and the voice are untouched, only the silence is shortened.
+LONGEST_PAUSE = 0.4
 OLLAMA = "http://127.0.0.1:11434/api/chat"
 OLLAMA_MODEL = "qwen3:4b-instruct"
 
@@ -459,10 +465,11 @@ def write_script():
                  "output": os.path.join(CLIPS, folder(line["speaker"]), line["id"] + ".wav").replace("\\", "/")}
         if engine == "shaped":
             # Qwen3-TTS reads plainly: its moods are made afterwards on the sound, which "sounds bad" (the user,
-            # 2026-11-10), so none is applied; the line's delivery is the reference clip's. It also runs one sentence
-            # into the next: a sentence on a line of its own gave the clearest pause (0.70 s against 0.45).
-            entry.update(mood="Neutral", effects={}, direction=how.get("mood", "Neutral"),
-                         text=re.sub(r"(?<=[.!?])\s+(?=\S)", "\n", entry["text"]))
+            # 2026-11-10), so none is applied; the line's delivery is the reference clip's. The line is read as written,
+            # in one go: a sentence on a line of its own gave longer pauses (0.70 s against 0.45), but the user heard the
+            # portal's lines come out cut into parts (2026-11-16), so line breaks are never put in.
+            entry.update(mood="Neutral", effects={}, direction=how.get("mood", "Neutral"))
+        entry["effects"] = dict(entry["effects"], pause=LONGEST_PAUSE)
         # A line's own feeling in dialogue_moods.json is played instead of its mood's: "emotion" (weights), "feeling"
         # (words: "bitter, holding back tears") or "emotion_audio" (a recording beside the script whose way of
         # speaking is borrowed); "strength" turns any of them up or down.
@@ -512,6 +519,30 @@ def tidy_raw():
     return moved
 
 
+def pauses():
+    """The voice changer run again over every clip from its untouched recording (Tools/Audio/Voices/raw/<speaker>/),
+    with the script's dials: after a change to them that needs no new take (the Longest Pause, 2026-11-16). The
+    clips are written in place, so Unity keeps every reference to them."""
+    sys.path.insert(0, AGENT)
+    import generate_voice as gv
+    items, missing = [], []
+    for entry in gv.read_script_file(SCRIPT):
+        raw = os.path.join(RAW, os.path.basename(os.path.dirname(entry["output"])), os.path.basename(entry["output"]))
+        if not os.path.isfile(raw) or not os.path.isfile(entry["output"]):
+            missing.append(entry["id"])
+            continue
+        if entry.get("engine", ENGINE) == "acted":
+            effects = gv.acted_effects(entry.get("mood"), entry.get("effects"), entry.get("character"))[0]
+        else:
+            effects = gv.effects_for(entry.get("mood"), entry.get("effects"), entry.get("character"))
+        items.append({"input": raw, "output": entry["output"], "effects": effects})
+    if items:
+        gv.run_worker({"mode": "effects", "items": items}, 3600, runner=gv.FX_RUNNER, gpu=False)
+    print(f"PAUSES {len(items)} clips made again from their recordings"
+          + (f"; {len(missing)} have none to make them from: {' '.join(missing)}" if missing else "."))
+    return 0
+
+
 def speak(only=None, every=False):
     """Has LocalSpawn speak the script's lines that have no clip yet, or the lines named, or every line (both over the
     clips they have). This is the Voice tab's "Speak a script", run from here so Unity's Voice Lines window can start it."""
@@ -555,6 +586,9 @@ if __name__ == "__main__":
     # its clip (after a change to how all of them are said: a voice, the pace).
     if step == "tidy":
         print(f"{tidy_raw()} untouched recordings moved out of Assets.")
+    if step == "pauses":
+        write_script()
+        sys.exit(pauses())
     if step in ("speak", "new"):
         sys.exit(speak())
     if step == "again":
