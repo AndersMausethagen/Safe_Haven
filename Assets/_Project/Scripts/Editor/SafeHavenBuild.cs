@@ -64,6 +64,19 @@ public static class SafeHavenBuild
 
         // A dirty scene (the World Builder dirties the Haven after every Editor start) makes the build ask to save in a native
         // dialog no command can answer, and it waits there for good: save first, as the test runner does.
+        // A test run leaves its own unsaved "Untitled" scene open, and saving that asks where, in the same dialog (2026-11-16): the
+        // first scene of the build is opened in its place, dropping the test's scratch scene unsaved.
+        bool scratchOpen = false;
+        for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
+        {
+            scratchOpen |= string.IsNullOrEmpty(UnityEngine.SceneManagement.SceneManager.GetSceneAt(i).path);
+        }
+
+        if (scratchOpen)
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenes[0], UnityEditor.SceneManagement.OpenSceneMode.Single);
+        }
+
         UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
         // Full-size textures in the build, whatever the Editor works with (EditorTextureCap).
         BuildReport report = EditorTextureCap.WithFullTextures(() => BuildPipeline.BuildPlayer(options));
