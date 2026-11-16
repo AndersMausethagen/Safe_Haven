@@ -31,6 +31,31 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             ExperienceTracker.LevelReached += OnLevelReached;
             ExperienceTracker.InsightSpent += OnInsightSpent;
             ExperienceTracker.Gained += OnGained;
+            Damageable.AnyDamaged += OnAnyDamaged;
+        }
+    }
+
+    // Every creature's blows taken, written as a Kill row when it dies: how many blows it took and from whom.
+    private readonly KillLedger kills = new KillLedger();
+
+    private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
+    {
+        if (result.Incoming <= 0f || !victim.TryGetComponent(out MonsterAI monster) || monster.Definition == null)
+        {
+            return;
+        }
+
+        Combatant source = damage.Source;
+        bool fromPlayer = source != null && Player.Current != null && source.gameObject == Player.Current.gameObject;
+        string sourceName = source == null ? "environment"
+            : source.TryGetComponent(out Player _) ? "other player"
+            : source.TryGetComponent(out MonsterAI attacker) && attacker.Definition != null ? attacker.Definition.name
+            : source.name;
+        KillLedger.Record done = kills.Note(victim, monster.Definition.name, victim.MaxHealth, fromPlayer, sourceName, damage.IsOverTime,
+            result.IsCritical, result.HealthLost, result.Killed, Time.time);
+        if (done != null)
+        {
+            Write(PlaytestLog.Kill, done.Name, done.PlayerHits, done.Detail);
         }
     }
 
@@ -119,6 +144,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
     public void OnSceneEntered(Scene scene)
     {
+        kills.Clear();
         Write(PlaytestLog.SceneEntered, scene.name);
         if (!string.IsNullOrEmpty(GameOptions.AssistsInUse))
         {
@@ -314,6 +340,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         ExperienceTracker.LevelReached -= OnLevelReached;
         ExperienceTracker.InsightSpent -= OnInsightSpent;
         ExperienceTracker.Gained -= OnGained;
+        Damageable.AnyDamaged -= OnAnyDamaged;
         FlushSkillXp();
         combat.Unfollow();
         EndSession();

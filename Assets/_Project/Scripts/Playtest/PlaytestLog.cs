@@ -69,6 +69,9 @@ public static class PlaytestLog
     public const string Kit = "Kit";
     /// <summary>A blow that took at least 5% of the player's health: what struck, how hard, with what.</summary>
     public const string Hurt = "Hurt";
+    /// <summary>A creature died (KillLedger): subject the monster, amount the player's blows on it, detail who made the kill, the player's
+    /// damage, everyone else's, its health and how long the fight took.</summary>
+    public const string Kill = "Kill";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

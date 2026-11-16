@@ -99,4 +99,34 @@ public sealed class PlaytestTests
 
         Assert.IsNull(loaded.Playtest, "GameSession then starts a fresh run.");
     }
+
+    [Test]
+    public void KillLedger_CountsThePlayersBlows_AndWhoMadeTheKill()
+    {
+        var ledger = new KillLedger();
+        object wolf = new object(), other = new object();
+
+        Assert.IsNull(ledger.Note(wolf, "ForestBittenWolf", 156f, true, "", false, false, 40f, false, 10f));
+        Assert.IsNull(ledger.Note(other, "Rootling", 50f, true, "", false, false, 20f, false, 10.5f));
+        Assert.IsNull(ledger.Note(wolf, "ForestBittenWolf", 156f, false, "Ingrid", false, false, 30f, false, 11f));
+        Assert.IsNull(ledger.Note(wolf, "ForestBittenWolf", 156f, true, "", true, false, 6f, false, 11.5f));
+        KillLedger.Record done = ledger.Note(wolf, "ForestBittenWolf", 156f, true, "", false, true, 80f, true, 13f);
+
+        Assert.NotNull(done);
+        Assert.AreEqual(KillLedger.ByPlayer, done.Killer);
+        Assert.AreEqual(2, done.PlayerHits, "a burn ticking is not a blow");
+        Assert.AreEqual(120f, done.PlayerDamage, 0.01f);
+        Assert.AreEqual(80f, done.PlayerBiggestHit, 0.01f);
+        Assert.AreEqual(1, done.PlayerCriticals);
+        Assert.AreEqual(1, done.OtherHits);
+        Assert.AreEqual(30f, done.OtherDamage, 0.01f);
+        Assert.AreEqual(6f, done.OverTimeDamage, 0.01f);
+        Assert.AreEqual(3f, done.Seconds, 0.01f);
+        Assert.AreEqual(1, ledger.Open, "the rootling's fight is still open");
+        StringAssert.DoesNotContain(",", done.Detail, "the detail stays one CSV field without quoting");
+
+        KillLedger.Record stolen = ledger.Note(other, "Rootling", 50f, false, "Ingrid", false, false, 30f, true, 12f);
+        Assert.AreEqual("Ingrid", stolen.Killer);
+        Assert.AreEqual(0, ledger.Open);
+    }
 }
