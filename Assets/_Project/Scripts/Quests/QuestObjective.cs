@@ -328,11 +328,12 @@ public sealed class QuestObjective
         switch (type)
         {
             case ObjectiveType.CollectItem:
-                return gameEvent.Kind == GameEventKind.ItemObtained && Is(item, gameEvent.Subject, true) ? gameEvent.Amount : 0;
+                // Only what is newly had (ArrivalCauses): a refund or a move raised as an arrival would never count.
+                return gameEvent.Kind == GameEventKind.ItemObtained && ArrivalCauses.IsNewlyHad(gameEvent.Cause) && Is(item, gameEvent.Subject, true) ? gameEvent.Amount : 0;
             case ObjectiveType.GatherResource:
                 // Material items arrive in the bag like any item (gathered, looted, found); essences arrive as ResourceGathered.
                 GameEventKind arrives = item != null ? GameEventKind.ItemObtained : GameEventKind.ResourceGathered;
-                return gameEvent.Kind == arrives && Is(GatherTarget, gameEvent.Subject, true) ? gameEvent.Amount : 0;
+                return gameEvent.Kind == arrives && ArrivalCauses.IsNewlyHad(gameEvent.Cause) && Is(GatherTarget, gameEvent.Subject, true) ? gameEvent.Amount : 0;
             case ObjectiveType.KillMonster:
                 // With no monster set, kills of the chosen side count: "kill 5 enemies" never counts the player, a
                 // companion or a traveller falling.

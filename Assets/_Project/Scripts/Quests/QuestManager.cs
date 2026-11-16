@@ -612,7 +612,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         foreach (ItemAmount reward in quest.RewardItems)
         {
             if (reward.Item != null && reward.Amount > 0
-                && ItemDelivery.Give(bag, new ItemStack(reward.Item, reward.Amount), newFind: true, toStash: atHome, player.transform).Fell)
+                && ItemDelivery.Give(bag, new ItemStack(reward.Item, reward.Amount), newFind: true, toStash: atHome, player.transform, ArrivalCause.Rewarded).Fell)
             {
                 GameMessages.Post($"No room for all the {reward.Item.DisplayName} from the quest: it lies at your feet.", MessageKind.Warning);
             }

@@ -14,6 +14,21 @@ public sealed class QuestCoopTests
 {
     private static void Visiting(bool visiting) => typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting)).SetValue(null, visiting);
 
+    // Guard 8 of Docs/BugPatterns.md: every way a thing comes to the player says whether it is newly had, and a collect quest counts
+    // only those (a cancelled craft's refund once counted as a find).
+    [Test]
+    public void EveryArrivalCause_SaysWhetherItIsNewlyHad_AndARefundNeverCounts()
+    {
+        CollectionAssert.AreEquivalent(Enum.GetValues(typeof(ArrivalCause)).Cast<ArrivalCause>(), ArrivalCauses.Classified,
+            "a new cause says whether it is newly had (ArrivalCauses)");
+        var club = AssetDatabase.FindAssets("t:ItemDefinition").Select(g => AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(g))).First(i => i != null);
+        QuestObjective collect = QuestObjective.Create(ObjectiveType.CollectItem, 5, club);
+        Assert.AreEqual(2, collect.Progress(new GameEvent(GameEventKind.ItemObtained, club, 2, cause: ArrivalCause.Found)));
+        Assert.AreEqual(2, collect.Progress(new GameEvent(GameEventKind.ItemObtained, club, 2, cause: ArrivalCause.Rewarded)));
+        Assert.AreEqual(0, collect.Progress(new GameEvent(GameEventKind.ItemObtained, club, 2, cause: ArrivalCause.Refunded)), "what was paid, given back");
+        Assert.AreEqual(0, collect.Progress(new GameEvent(GameEventKind.ItemObtained, club, 2, cause: ArrivalCause.Moved)));
+    }
+
     [Test]
     public void EveryObjectiveType_HasACoopRule()
     {

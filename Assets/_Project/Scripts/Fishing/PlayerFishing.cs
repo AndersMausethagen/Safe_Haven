@@ -659,7 +659,7 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         ItemDefinition fish = hooked.item;
         // Its length goes with it (the bag shows it), and the journal keeps the biggest of each kind. The fish fought comes
         // first: with room for one only, the Double Catch's extra must not take the place of a trophy.
-        if (items.Give(fish, 1, centimetres) < 1)
+        if (items.Give(fish, 1, centimetres, ArrivalCause.Caught) < 1)
         {
             GameMessages.Post($"No room for the {fish.DisplayName}. You let it go.", MessageKind.Warning);
         }
@@ -675,7 +675,7 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
             // Double Catch: now and then a second one comes up on the line, a catch like the first.
             float second = FishSizes.Roll(Random.value, Random.value, hooked.lengthScale);
             if (Techniques.Has(PerkTechnique.DoubleCatch) && Random.value < TechniqueSettings.Current.DoubleCatchChance
-                && items.Give(fish, 1, second) > 0)
+                && items.Give(fish, 1, second, ArrivalCause.Caught) > 0)
             {
                 GameMessages.Post($"Double Catch: two {fish.DisplayName} on the one line!", MessageKind.Gain);
                 Techniques.Used(PerkTechnique.DoubleCatch);

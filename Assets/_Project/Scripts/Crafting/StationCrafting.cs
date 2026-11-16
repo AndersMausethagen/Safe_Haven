@@ -164,7 +164,7 @@ public static class StationCrafting
                 }
                 else
                 {
-                    bag.Give(item, queue.TakeOutput(taken));
+                    bag.Give(item, queue.TakeOutput(taken), ArrivalCause.Crafted);
                 }
             }
         }

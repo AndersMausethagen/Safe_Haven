@@ -263,7 +263,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
         }
 
         // Bag, then stash, then the player's feet: a reward is never lost for want of room.
-        int placed = ItemDelivery.Give(bag, new ItemStack(item, count), newFind: true, toStash: true).Total;
+        int placed = ItemDelivery.Give(bag, new ItemStack(item, count), newFind: true, toStash: true, cause: ArrivalCause.Rewarded).Total;
         if (placed > 0)
         {
             given.Add($"{placed} {item.DisplayName}");

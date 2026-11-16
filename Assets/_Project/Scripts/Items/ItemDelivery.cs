@@ -36,14 +36,15 @@ public static class ItemDelivery
     /// <param name="newFind">Newly come by (a reward, a find): what reaches the bag raises ItemObtained, so collect quests count it
     /// and gear is put on. False for what goes back or is only moved (a refund, gear out of a retired slot), which is no find.</param>
     /// <param name="toStash">The stash may take what the bag can't: at home only, where it can be reached.</param>
-    public static Delivery Give(ItemInventory bag, ItemStack stack, bool newFind, bool toStash, Transform dropAt = null)
+    /// <param name="cause">Why it came, carried by ItemObtained when it is a new find (a reward, a find).</param>
+    public static Delivery Give(ItemInventory bag, ItemStack stack, bool newFind, bool toStash, Transform dropAt = null, ArrivalCause cause = ArrivalCause.Found)
     {
         if (stack.IsEmpty)
         {
             return default;
         }
 
-        int inBag = bag == null ? 0 : newFind ? bag.GiveMade(stack) : bag.Container.AddStack(stack);
+        int inBag = bag == null ? 0 : newFind ? bag.GiveMade(stack, cause) : bag.Container.AddStack(stack);
         ItemContainer stash = toStash && GameSession.Stash != null ? GameSession.Stash.Items : null;
         Delivery rest = Give(null, stack.WithCount(stack.Count - inBag), stash, dropAt != null ? dropAt : bag != null ? bag.transform : null);
         return new Delivery(inBag, rest.Stash, rest.Ground);

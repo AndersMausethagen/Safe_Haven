@@ -66,6 +66,53 @@ public enum GameEventKind
 }
 
 /// <summary>
+/// Why something came to the player (Docs/BugPatterns.md, guard 8): events say so, and what counts it (a collect quest) counts by a
+/// declared rule (<see cref="ArrivalCauses"/>) instead of guessing (a cancelled craft's refund was counted as a find, and collect
+/// quests could be farmed). Values are serialized as numbers: add new ones at the end.
+/// </summary>
+public enum ArrivalCause : byte
+{
+    /// <summary>Picked up, looted, gathered, dropped by a creature: come by in the world (the default).</summary>
+    Found = 0,
+    /// <summary>Made: by hand, at a station, by a worker.</summary>
+    Crafted = 1,
+    /// <summary>Landed with a rod.</summary>
+    Caught = 2,
+    /// <summary>Given for a quest, an order or an ask answered.</summary>
+    Rewarded = 3,
+    /// <summary>Paid for at a trader.</summary>
+    Bought = 4,
+    /// <summary>A container filled at water.</summary>
+    Filled = 5,
+    /// <summary>Given back what was paid (a cancelled craft, a turned-down decision): never a find.</summary>
+    Refunded = 6,
+    /// <summary>Only moved (gear out of a retired slot, a stash to a bag): never a find.</summary>
+    Moved = 7,
+}
+
+/// <summary>Which causes make a thing newly had, for what counts arrivals (collect and gather objectives). Every cause says.</summary>
+public static class ArrivalCauses
+{
+    private static readonly System.Collections.Generic.Dictionary<ArrivalCause, bool> NewlyHad = new System.Collections.Generic.Dictionary<ArrivalCause, bool>
+    {
+        [ArrivalCause.Found] = true,
+        [ArrivalCause.Crafted] = true,
+        [ArrivalCause.Caught] = true,
+        [ArrivalCause.Rewarded] = true,
+        [ArrivalCause.Bought] = true,
+        [ArrivalCause.Filled] = true,
+        [ArrivalCause.Refunded] = false,
+        [ArrivalCause.Moved] = false,
+    };
+
+    /// <summary>The causes classified (a test checks every one is).</summary>
+    public static System.Collections.Generic.IEnumerable<ArrivalCause> Classified => NewlyHad.Keys;
+
+    /// <summary>True when what arrived this way is the player's newly: counted by collect quests, announced as a find.</summary>
+    public static bool IsNewlyHad(ArrivalCause cause) => NewlyHad.TryGetValue(cause, out bool newly) && newly;
+}
+
+/// <summary>
 /// Something that happened in the game, in a form any system can react to: what kind of thing, what it was about
 /// (an item, a monster, a raid...), how many, who did it and what it happened to. Quests count these; the audio manager
 /// plays death sounds from them; GameEventListeners turn them into scene reactions.
@@ -88,10 +135,13 @@ public readonly struct GameEvent
     public readonly Faction? VictimFaction;
     /// <summary>A second thing it was about, when there is one: for JobAssigned, the person given the job.</summary>
     public readonly Object Detail;
+    /// <summary>For an arrival (ItemObtained, ResourceGathered): why it came. Found unless said.</summary>
+    public readonly ArrivalCause Cause;
 
     public GameEvent(GameEventKind kind, Object subject, int amount = 1, GameObject actor = null, RaidOutcome outcome = RaidOutcome.InProgress,
-        float seconds = 0f, GameObject origin = null, Faction? victimFaction = null, Object detail = null)
+        float seconds = 0f, GameObject origin = null, Faction? victimFaction = null, Object detail = null, ArrivalCause cause = ArrivalCause.Found)
     {
+        Cause = cause;
         Detail = detail;
         Kind = kind;
         Subject = subject;

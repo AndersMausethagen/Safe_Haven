@@ -111,17 +111,17 @@ public sealed class ItemInventory : MonoBehaviour
         SyncCarried(announce: false);
     }
 
-    /// <summary>Adds as many as fit and returns how many arrived.</summary>
-    public int Give(ItemDefinition item, int amount) => Give(item, amount, 0f);
+    /// <summary>Adds as many as fit and returns how many arrived. <paramref name="cause"/> says why (ItemObtained carries it).</summary>
+    public int Give(ItemDefinition item, int amount, ArrivalCause cause = ArrivalCause.Found) => Give(item, amount, 0f, cause);
 
     /// <summary>The same, for a fish of a length (centimetres), which the bag shows (ItemStack.Size).</summary>
-    public int Give(ItemDefinition item, int amount, float size)
+    public int Give(ItemDefinition item, int amount, float size, ArrivalCause cause = ArrivalCause.Found)
     {
         int added = Container.Add(item, amount, size);
         if (added > 0)
         {
             Received?.Invoke(item, added);
-            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, item, added, gameObject));
+            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, item, added, gameObject, cause: cause));
             if (item.IsEquippable)
             {
                 var equipment = GetComponent<PlayerEquipment>();
@@ -137,7 +137,7 @@ public sealed class ItemInventory : MonoBehaviour
 
     /// <summary>Gives a stack as it is (a piece just made with its quality and condition, CraftedWork.Make; a find; a reward), as
     /// Give gives a new item: ItemObtained is raised and gear is put on. Returns how many arrived.</summary>
-    public int GiveMade(ItemStack made)
+    public int GiveMade(ItemStack made, ArrivalCause cause = ArrivalCause.Found)
     {
         if (made.IsEmpty)
         {
@@ -149,7 +149,7 @@ public sealed class ItemInventory : MonoBehaviour
         if (added > 0)
         {
             Received?.Invoke(made.Item, added);
-            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, made.Item, added, gameObject));
+            GameEvents.Raise(new GameEvent(GameEventKind.ItemObtained, made.Item, added, gameObject, cause: cause));
             if (made.Item.IsEquippable && TryGetComponent(out PlayerEquipment equipment))
             {
                 equipment.AutoEquip(made.Item);

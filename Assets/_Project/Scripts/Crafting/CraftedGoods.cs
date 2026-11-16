@@ -203,7 +203,7 @@ public static class CraftedWork
                 GameMessages.Post($"A little extra: +1 {item.DisplayName}", MessageKind.Gain);
             }
 
-            int arrived = bag.Give(item, amount + extra);
+            int arrived = bag.Give(item, amount + extra, ArrivalCause.Crafted);
             if (arrived > 0)
             {
                 Made?.Invoke(item, arrived, ItemQuality.Plain, item.DisplayName);
@@ -216,7 +216,7 @@ public static class CraftedWork
         for (int i = 0; i < amount; i++)
         {
             ItemStack piece = Make(item, maker);
-            if (bag.GiveMade(piece) <= 0)
+            if (bag.GiveMade(piece, ArrivalCause.Crafted) <= 0)
             {
                 break;
             }

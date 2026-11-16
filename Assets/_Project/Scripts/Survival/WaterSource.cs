@@ -134,7 +134,7 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
             int missing = fillUpTo - bag.Container.Count(fillItem);
             if (missing > 0)
             {
-                filled += bag.Give(fillItem, missing);
+                filled += bag.Give(fillItem, missing, ArrivalCause.Filled);
             }
         }
 
