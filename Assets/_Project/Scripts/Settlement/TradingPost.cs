@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "trades take the host's stores: the host's (HavenVisit.LeftToHost)")]
 public sealed class TradingPost : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float menuRange = 6f;

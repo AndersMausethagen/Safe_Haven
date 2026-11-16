@@ -13,6 +13,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "a knock at a door")]
 public sealed class HouseDoor : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     private const float Reach = 2.2f;

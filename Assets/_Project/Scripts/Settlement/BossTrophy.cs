@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "looking at a trophy changes nothing")]
 public sealed class BossTrophy : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     [Tooltip("Written on the screen when the player looks at it.")]

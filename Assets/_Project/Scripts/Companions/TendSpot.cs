@@ -1,6 +1,7 @@
 using UnityEngine;
 
 /// <summary>The Bandage prompt on a hurt follower (WoundTending): a short piece of work for the player, with a healing item.</summary>
+[InAFriendsHaven(HavenUse.Anyone, "tending a companion")]
 public sealed class TendSpot : MonoBehaviour, IInteractionVerb, IInteractionCondition
 {
     private const float Reach = 2f;

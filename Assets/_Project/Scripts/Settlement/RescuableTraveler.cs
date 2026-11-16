@@ -15,6 +15,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(NavMeshAgent))]
+[InAFriendsHaven(HavenUse.NotInAHaven, "found on a raid; they join the guest's own Haven (HavenVisit.RescuedHome)")]
 public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 {
     private enum State

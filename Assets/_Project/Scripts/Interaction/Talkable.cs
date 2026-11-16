@@ -17,6 +17,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
 [AddComponentMenu("Safe Haven/Interaction/Talkable")]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "talking is anyone's; a friend's people ask a visitor nothing")]
 public sealed class Talkable : MonoBehaviour, IInteractionName
 {
     [Tooltip("The speaker's name in the dialogue box and above them. Empty: the object's name.")]

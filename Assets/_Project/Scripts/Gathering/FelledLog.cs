@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(ResourceNode), typeof(ResourceSource))]
+[InAFriendsHaven(HavenUse.Anyone, "their own yield; the work on the host's land goes to the host (CoopLands)")]
 public sealed class FelledLog : MonoBehaviour, IHarvestBody
 {
     private const float TipRadiusShare = 0.6f;

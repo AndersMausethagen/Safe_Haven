@@ -11,6 +11,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
 [AddComponentMenu("Safe Haven/Essence/Carved Stone")]
+[InAFriendsHaven(HavenUse.Anyone, "a rubbing is the visitor's own")]
 public sealed class CarvedStone : MonoBehaviour, IInteractionName
 {
     [Tooltip("The raid tier its marks belong to. 0: the raid's own.")]

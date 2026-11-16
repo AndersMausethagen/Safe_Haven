@@ -13,6 +13,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.AsksTheHost, "the host's stores: with the host's yes (HavenVisit.MayUseStash)")]
 public sealed class StashChest : MonoBehaviour, ISaveable
 {
     [Tooltip("Left empty, the first StashWindow in the scene is used.")]

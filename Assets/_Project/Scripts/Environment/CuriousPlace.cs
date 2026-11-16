@@ -11,6 +11,7 @@ using UnityEngine;
 /// it across loads (JournalRecord.Noticed); a raid's sites, new each raid, only for the session.
 /// </summary>
 [DisallowMultipleComponent]
+[InAFriendsHaven(HavenUse.Anyone, "a look, the visitor's own")]
 public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     private static readonly HashSet<string> Noticed = new HashSet<string>();

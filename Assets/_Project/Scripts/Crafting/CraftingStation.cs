@@ -102,6 +102,7 @@ public interface IStationMenuExtension
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "a visitor browses; starting, cancelling and collecting the host's jobs are the host's (StationCrafting)")]
 public sealed class CraftingStation : MonoBehaviour
 {
     public const int DefaultOutputCapacity = 10;

@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "a memorial: reading it changes nothing")]
 public sealed class FallenCairn : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     private const float FirstRing = 9f;

@@ -15,6 +15,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "the portal talks to a visitor; its raids and the Haven's work are the host's")]
 public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
 {
     /// <summary>What the portal says while a quest is active, so it points the way one step at a time.</summary>

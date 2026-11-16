@@ -3,6 +3,7 @@ using UnityEngine;
 public enum PrologueInteractionKind { Campfire, Portal }
 
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.NotInAHaven, "the prologue is played alone")]
 public sealed class PrologueInteraction : MonoBehaviour, IInteractionCondition
 {
     [SerializeField] private PrologueInteractionKind kind;

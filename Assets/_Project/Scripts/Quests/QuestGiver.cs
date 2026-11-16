@@ -56,6 +56,7 @@ public enum QuestGiverState
 /// </summary>
 [DisallowMultipleComponent]
 [AddComponentMenu("Safe Haven/Quests/Quest Giver")]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "a friend's people offer a visitor nothing (QuestGiver.StateFor)")]
 public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteractionNote, IConversationTopics
 {
     private const string DefaultWaitingText = "Come back when it's done.";

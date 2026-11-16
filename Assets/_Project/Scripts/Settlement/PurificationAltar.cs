@@ -12,6 +12,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "the altar's batches are the host's")]
 public sealed class PurificationAltar : MonoBehaviour
 {
     [SerializeField, Min(1f)] private float menuRange = 6f;

@@ -17,6 +17,7 @@ public abstract class EliteBehaviour
 }
 
 /// <summary>Its hits can carry a status effect. The answer: don't get hit, or cure it.</summary>
+[OnAFriendsCopy(CopyRule.Same, "the copy's strikes play out in this game, on this player, and lay their status here")]
 [Serializable]
 public sealed class StatusOnHitBehaviour : EliteBehaviour
 {
@@ -44,6 +45,7 @@ public sealed class StatusOnHitBehaviour : EliteBehaviour
 }
 
 /// <summary>Grows back while nobody is hitting it. The answer: stay on it, or finish it in one go.</summary>
+[OnAFriendsCopy(CopyRule.Same, "heals as the host's does; the health the host sends sets the copy right")]
 [Serializable]
 public sealed class RegrowthBehaviour : EliteBehaviour
 {
@@ -78,6 +80,7 @@ public sealed class RegrowthBehaviour : EliteBehaviour
 }
 
 /// <summary>Bursts when it dies, after a warning on the ground. The answer: kill it, then step out of the circle.</summary>
+[OnAFriendsCopy(CopyRule.Same, "bursts where the copy dies, on this player, when the host's word ends it")]
 [Serializable]
 public sealed class BurstOnDeathBehaviour : EliteBehaviour
 {
@@ -105,6 +108,7 @@ public sealed class BurstOnDeathBehaviour : EliteBehaviour
 }
 
 /// <summary>Those around it hit harder while it lives, and the circle under it shows how far. The answer: kill it first.</summary>
+[OnAFriendsCopy(CopyRule.Same, "the copy's kin strike harder here, as the host's do there")]
 [Serializable]
 public sealed class RallyingBehaviour : EliteBehaviour
 {
@@ -144,6 +148,7 @@ public sealed class RallyingBehaviour : EliteBehaviour
 }
 
 /// <summary>Walks wrapped in fog, so it is hard to see until it is close. The answer: fall back to open ground and watch for its ring.</summary>
+[OnAFriendsCopy(CopyRule.Same, "the mist round it is seen in every game")]
 [Serializable]
 public sealed class MistCloakBehaviour : EliteBehaviour
 {
@@ -179,6 +184,7 @@ public sealed class MistCloakBehaviour : EliteBehaviour
 /// flinches, interrupts or staggers it (a parry only makes it recoil). Wearing the layer away breaks it with a crash and a long stagger.
 /// It is taken from its health, not added to it, so the hits it takes to kill hold. The answer: commit, then punish the break.
 /// </summary>
+[OnAFriendsCopy(CopyRule.Same, "the copy shows its ring and refuses to break off; the host's layer breaking ends it here too")]
 [Serializable]
 public sealed class UnyieldingBehaviour : EliteBehaviour
 {
@@ -263,6 +269,7 @@ public sealed class UnyieldingBehaviour : EliteBehaviour
 /// <summary>Watchful: it knows the trick from the start and never forgets: while it strikes, a swing from behind is seen as by one that
 /// has taken several backstabs, and it breaks off to step aside or parry (MonsterAI.SeesBackstabComing). Like every elite it is open to a
 /// backstab only when staggered. The answer: beat it from the front, or parry it.</summary>
+[OnAFriendsCopy(CopyRule.Same, "a copy thinks nothing, so its watching is the host's creature's")]
 [Serializable]
 public sealed class WatchfulBehaviour : EliteBehaviour
 {
@@ -281,6 +288,7 @@ public sealed class WatchfulBehaviour : EliteBehaviour
 
 /// <summary>Relentless: it always goes on into its follow-ups and holds the wind-ups it can hold, so its strikes come as strings. The
 /// answer: don't roll on the first blow; wait out the hold.</summary>
+[OnAFriendsCopy(CopyRule.Same, "the host's creature presses its strings, which the copy plays as sent")]
 [Serializable]
 public sealed class PressingBehaviour : EliteBehaviour
 {

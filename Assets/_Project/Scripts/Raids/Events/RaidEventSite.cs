@@ -7,6 +7,7 @@
 /// the player gets close: what stands there (a cache, a fog bank) does the rest.
 /// </summary>
 [DisallowMultipleComponent]
+[InAFriendsHaven(HavenUse.NotInAHaven, "a raid's event: its co-op rule is the raid's (the host's game)")]
 public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     [Tooltip("What marks the site while it waits: a pillar of light, a glow. Hidden once it is done.")]

@@ -13,6 +13,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "repairs the visitor's own gear")]
 public sealed class RepairBench : MonoBehaviour, IStationMenuExtension
 {
     [SerializeField, Min(1f)] private float menuRange = 6f;

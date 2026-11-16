@@ -9,6 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "the offering and its favour are the visitor's own")]
 public sealed class OfferingStone : MonoBehaviour, IInteractionVerb
 {
     [SerializeField] private string favourName = "The Forest's Favour";

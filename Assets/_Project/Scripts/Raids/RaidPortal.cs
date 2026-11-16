@@ -15,6 +15,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "setting out is the host's; a visitor follows when they go")]
 public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteractionName
 {
     [Tooltip("The first destination offered.")]

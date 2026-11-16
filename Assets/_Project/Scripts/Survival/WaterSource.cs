@@ -12,6 +12,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "a drink, a filled waterskin")]
 public sealed class WaterSource : MonoBehaviour, IInteractionName
 {
     public string InteractionName => string.IsNullOrWhiteSpace(sourceName) ? "Stream" : sourceName;

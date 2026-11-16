@@ -234,7 +234,37 @@ public sealed class Interactable : MonoBehaviour
             }
         }
 
+        // In a friend's Haven, what is the host's alone is refused here, once, for every such thing (InAFriendsHaven: HostOnly).
+        if (HavenVisit.InHostsHaven && HostsAlone())
+        {
+            blockedReason = HavenVisit.Refusal;
+            return false;
+        }
+
         return true;
+    }
+
+    // Whether any part answering this is the host's alone: looked up once (a visitor's indicator asks every frame).
+    private bool? hostsAlone;
+
+    private bool HostsAlone()
+    {
+        if (hostsAlone.HasValue)
+        {
+            return hostsAlone.Value;
+        }
+
+        hostsAlone = false;
+        foreach (MonoBehaviour part in GetComponents<MonoBehaviour>())
+        {
+            if (part != null && InAFriendsHavenAttribute.Of(part.GetType()) == HavenUse.HostOnly)
+            {
+                hostsAlone = true;
+                break;
+            }
+        }
+
+        return hostsAlone.Value;
     }
 
     /// <summary>Starts work only when every requirement passes; otherwise returns the reason shown by the indicator.</summary>

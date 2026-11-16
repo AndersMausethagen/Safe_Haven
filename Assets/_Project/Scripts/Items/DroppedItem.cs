@@ -15,6 +15,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "personal loot: a shared drop is claimed through the host (CoopDrops)")]
 public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, IInteractionVerb
 {
     private const float HandHeight = 1.1f;

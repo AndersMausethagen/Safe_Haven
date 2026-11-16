@@ -14,6 +14,7 @@ using UnityEngine;
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "the stable's stalls are the host's")]
 public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
 {
     /// <summary>How near a horse must stand to a stable to be led into it.</summary>

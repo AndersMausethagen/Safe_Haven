@@ -9,6 +9,7 @@ using UnityEngine;
 /// On an object that also has an Interactable, completing the interaction grants the drops to whoever did the work.
 /// Anything else (a destructible's death handler) calls GrantTo itself.
 /// </summary>
+[InAFriendsHaven(HavenUse.Anyone, "their own yield")]
 public sealed class ResourceSource : MonoBehaviour
 {
     [SerializeField] private ItemDropTable drops = new ItemDropTable();

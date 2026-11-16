@@ -7,6 +7,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "helping a companion up")]
 public sealed class CompanionRevive : MonoBehaviour, IInteractionVerb
 {
     private const float Reach = 1.8f;

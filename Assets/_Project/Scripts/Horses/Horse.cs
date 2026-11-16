@@ -24,6 +24,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Damageable), typeof(Combatant))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "the visitor's own horse is theirs; another's bags and stores ask the host")]
 public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity
 {
     public enum Mode { Wild, Lassoed, Breaking, Tamed }

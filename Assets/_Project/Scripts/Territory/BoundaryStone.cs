@@ -8,6 +8,7 @@ using UnityEngine;
 /// Spawned at the atlas's stone points by TerritorySpawner; the prefab (BuildTerritory) carries the Interactable and collider.
 /// </summary>
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.ItsChoicesDecide, "claiming and the watches are the host's (Territory.ForHost)")]
 public sealed class BoundaryStone : MonoBehaviour, IInteractionName
 {
     private static readonly int EmissionId = Shader.PropertyToID("_EmissionColor");

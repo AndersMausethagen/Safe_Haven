@@ -11,6 +11,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(ResourceNode), typeof(ResourceSource))]
+[InAFriendsHaven(HavenUse.Anyone, "their own yield; the work on the host's land goes to the host (CoopLands)")]
 public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 {
     private const float ChopHeight = 1.1f;

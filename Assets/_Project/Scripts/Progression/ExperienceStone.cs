@@ -9,6 +9,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
 [AddComponentMenu("Safe Haven/Progression/Experience Stone")]
+[InAFriendsHaven(HavenUse.Anyone, "the visitor's own experience")]
 public sealed class ExperienceStone : MonoBehaviour
 {
     [SerializeField, Min(1)] private int experience = 60;

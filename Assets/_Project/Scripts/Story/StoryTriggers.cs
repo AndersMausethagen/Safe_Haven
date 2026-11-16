@@ -134,6 +134,7 @@ public sealed class WhenBuilt : StoryTrigger
 }
 
 [Serializable]
+[InAFriendsHaven(HavenUse.Anyone, "a story's moment, the visitor's own story")]
 public sealed class WhenUsed : StoryTrigger
 {
     [Tooltip("Starts when the player finishes using this object (its Interactable). Create one with the + button.")]

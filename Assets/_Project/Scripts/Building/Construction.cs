@@ -20,6 +20,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(BuildingObject))]
+[InAFriendsHaven(HavenUse.AsksTheHost, "hammering and upgrading wait for the host's yes (HavenVisit.BuildingNeedsAsking)")]
 public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStationMenuExtension
 {
     [Tooltip("A ruin waiting to be repaired: dark, sunken and tilted until the player pays its cost and hammers it up.")]

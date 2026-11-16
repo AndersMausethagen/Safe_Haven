@@ -14,6 +14,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.NotInAHaven, "a raid's way out")]
 public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInteractionNote, IInteractionVerb
 {
     private static readonly List<ExtractionPoint> active = new List<ExtractionPoint>();

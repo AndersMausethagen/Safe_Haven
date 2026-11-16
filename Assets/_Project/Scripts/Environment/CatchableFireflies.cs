@@ -12,6 +12,7 @@ using UnityEngine;
 /// InteractableGrid files it there) while the glow wanders round it. Made by <see cref="Fireflies"/>.
 /// </para>
 /// </summary>
+[InAFriendsHaven(HavenUse.Anyone, "caught into their own bag")]
 public sealed class CatchableFireflies : MonoBehaviour
 {
     private const float CatchReach = 2.2f;

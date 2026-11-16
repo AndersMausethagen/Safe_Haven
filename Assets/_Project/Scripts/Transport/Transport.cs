@@ -26,6 +26,7 @@ public interface ITransportDriver
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Rigidbody), typeof(Interactable))]
+[InAFriendsHaven(HavenUse.AsksTheHost, "a cart's cargo is the host's stores (HavenVisit.StoresNeedAsking); pulling it is anyone's")]
 public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
 {
     /// <summary>What a raycast may stand a wheel or a person on: not transports themselves (Ignore Raycast), not water.</summary>

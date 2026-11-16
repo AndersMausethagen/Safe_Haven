@@ -6,6 +6,7 @@ using UnityEngine;
 /// height, so climbing to high ground pays.
 /// </summary>
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.NotInAHaven, "a raid's lookout")]
 public sealed class RaidLookout : MonoBehaviour, IInteractionName, IInteractionVerb
 {
     [Tooltip("Metres of the map revealed around the lookout.")]

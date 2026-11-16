@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
+[InAFriendsHaven(HavenUse.Anyone, "a sauna's or a meal's boon is the visitor's own")]
 public sealed class BoonSource : MonoBehaviour, IInteractionVerb
 {
     [SerializeField] private string boonName = "Warmed Through";

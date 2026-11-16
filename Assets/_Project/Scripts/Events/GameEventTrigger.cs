@@ -38,6 +38,7 @@ public enum TriggerRepeat
 /// </para>
 /// </summary>
 [AddComponentMenu("Safe Haven/Quests/Quest Event Trigger")]
+[InAFriendsHaven(HavenUse.Anyone, "a quest event: whether it counts in a friend's Haven is its own Home Only")]
 public sealed class GameEventTrigger : MonoBehaviour
 {
     private const float AreaCheckInterval = 0.25f;
