@@ -28,8 +28,9 @@ public static class StationMenu
         page.Body = Describe(queue);
         if (queue.Output != null)
         {
+            // The host's workshop in a friend's Haven: its output, its queue and its jobs are theirs (HostOnly).
             page.Add(new MenuAction($"Collect {queue.OutputAmount} {NameOf(queue.Output)}", null, true,
-                () => StationCrafting.Collect(user, queue)));
+                () => StationCrafting.Collect(user, queue)) { HostOnly = true });
         }
 
         List<RecipeDefinition> recipes = StationCrafting.KnownRecipesFor(user, station.Type);
@@ -38,13 +39,13 @@ public static class StationMenu
             string problem = StationCrafting.Check(user, queue, recipe);
             string detail = $"{Costs(recipe)}   {recipe.CraftSeconds:0.#}s" + (problem != null ? $"   <color={ProblemColor}>{problem}</color>" : "");
             RecipeDefinition chosen = recipe;
-            page.Add(new MenuAction($"Craft {Makes(recipe)}", detail, problem == null, () => StationCrafting.TryQueue(user, queue, chosen)));
+            page.Add(new MenuAction($"Craft {Makes(recipe)}", detail, problem == null, () => StationCrafting.TryQueue(user, queue, chosen)) { HostOnly = true });
         }
 
         if (queue.CanCancelLast)
         {
             RecipeDefinition last = queue.Jobs[queue.Jobs.Count - 1].Recipe;
-            page.Add(new MenuAction($"Cancel one {last.DisplayName}", "Materials are given back", true, () => StationCrafting.CancelLast(user, queue)));
+            page.Add(new MenuAction($"Cancel one {last.DisplayName}", "Materials are given back", true, () => StationCrafting.CancelLast(user, queue)) { HostOnly = true });
         }
 
         if (recipes.Count == 0)

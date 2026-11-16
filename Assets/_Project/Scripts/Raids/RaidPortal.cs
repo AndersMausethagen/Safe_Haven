@@ -255,7 +255,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         bool unlocked = repairRequires.IsMet;
         page.Add(new MenuAction("Wake the portal", !unlocked ? repairLockedText
             : AmountText.Describe(cost) + (affordable ? "" : $"   <color={UIStyle.Current.DangerHex}>{missing}</color>"), unlocked && affordable,
-            () => Repair(user), closesMenu: true));
+            () => Repair(user), closesMenu: true) { HostOnly = true });
     }
 
     private void Repair(GameObject user)

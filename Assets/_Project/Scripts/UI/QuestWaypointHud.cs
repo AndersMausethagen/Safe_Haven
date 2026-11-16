@@ -123,8 +123,15 @@ public sealed class QuestWaypointHud : MonoBehaviour
         }
     }
 
-    // The nearest waypoint whose quest wants the player there.
+    // The nearest waypoint whose quest wants the player there, of the quests the tracker shows first (one of each colour and the pinned
+    // one: the arrow led to one hidden behind another), else of any.
     private static QuestWaypoint Pick(out float distance)
+    {
+        QuestWaypoint shown = Pick(true, out distance);
+        return shown != null ? shown : Pick(false, out distance);
+    }
+
+    private static QuestWaypoint Pick(bool onlyShown, out float distance)
     {
         distance = 0f;
         Player player = Player.Current;
@@ -138,7 +145,7 @@ public sealed class QuestWaypointHud : MonoBehaviour
         float nearest = float.MaxValue;
         foreach (QuestWaypoint waypoint in QuestWaypoint.Active)
         {
-            if (waypoint == null || !waypoint.IsWanted(log))
+            if (waypoint == null || !waypoint.IsWanted(log) || (onlyShown && !QuestTrackerView.Shown.Contains(waypoint.Quest)))
             {
                 continue;
             }

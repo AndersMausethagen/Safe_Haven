@@ -345,6 +345,12 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         HealthChanged?.Invoke(currentHealth, MaxHealth);
     }
 
+    /// <summary>
+    /// Takes exactly <paramref name="cost"/>'s amount from health, past invulnerability and defenses, never below a floor held: a price
+    /// paid in health (Blood-Price), which armour, the Damage Taken assist or a dodge must not shrink or skip.
+    /// </summary>
+    public DamageResult PayExactly(in DamageInfo cost) => Apply(cost, false, true);
+
     /// <summary>Co-op: dies now, as the host's game says this creature did, by <paramref name="killer"/>'s blow (or none).</summary>
     public void Finish(Combatant killer)
     {

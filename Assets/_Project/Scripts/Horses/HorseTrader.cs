@@ -47,7 +47,7 @@ public static class HorseTrader
             Horse chosen = horse;
             int price = Mathf.RoundToInt(PriceOf(horse.Stats, horse.Definition) * settings.TradeSellShare);
             page.Add(new MenuAction($"Sell {horse.HorseName}", $"{price} {coin}. It goes with the caravan for good", !HavenVisit.IsVisiting,
-                () => Sell(chosen, price)));
+                () => Sell(chosen, price)) { HostOnly = true });
         }
 
         string key = OfferKey();
@@ -59,7 +59,7 @@ public static class HorseTrader
             string what = $"a {(rare.HasValue ? rare.Value.name.ToLowerInvariant() + " " : "")}{offer.SexName}, {HorseTemperamentRules.NameOf(offer.temperament)}";
             int purse = MaterialPool.For(user).Have(trade.Coin);
             page.Add(new MenuAction($"Buy {what}", $"{price} {coin}. Broken in, gallops {offer.gallopSpeed:0.0} m/s, carries {offer.carryWeight:0}",
-                !HavenVisit.IsVisiting && purse >= price, () => Buy(user, post, offer, price, key)));
+                !HavenVisit.IsVisiting && purse >= price, () => Buy(user, post, offer, price, key)) { HostOnly = true });
         }
     }
 

@@ -574,7 +574,9 @@ public sealed class BloodPriceEffect : RelicEffect
             paying = true;
             try
             {
-                wearer.Health.ApplyDamage(new DamageInfo(null, null, price, DamageType.Physical, false, wearer.transform.position + Vector3.up, Vector3.down)
+                // Exactly the price (Damageable.PayExactly): through armour and the Damage Taken assist it was less, and in a dodge nothing,
+                // with the Focus given back all the same.
+                wearer.Health.PayExactly(new DamageInfo(null, null, price, DamageType.Physical, false, wearer.transform.position + Vector3.up, Vector3.down)
                     .Scaled(1f, 0f, HitTechnique.OverTime, false));
                 focus.Gain(back);
                 last = focus.Current;

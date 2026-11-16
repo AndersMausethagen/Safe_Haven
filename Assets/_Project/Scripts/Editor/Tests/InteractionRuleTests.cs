@@ -80,6 +80,27 @@ public sealed class InteractionRuleTests
         }
     }
 
+    // Second round: a choice that is the host's says so where it is made, and every window greys it for a visitor, saying whose it is.
+    [Test]
+    public void AChoiceThatIsTheHosts_IsGreyedForAVisitor_WithWhose()
+    {
+        var trade = new MenuAction("Buy 5 Iron Ore", "10 coins", true, () => { }) { HostOnly = true };
+        var talk = new MenuAction("Ask about the road", "", true, () => { });
+        Assert.IsTrue(trade.Enabled, "at home it is the player's");
+        try
+        {
+            Visiting(true);
+            Assert.IsFalse(trade.Enabled);
+            Assert.AreEqual(HavenVisit.Refusal, trade.Detail);
+            Assert.IsTrue(talk.Enabled, "what isn't the host's stays open");
+        }
+        finally
+        {
+            Visiting(false);
+            HavenVisit.Forget();
+        }
+    }
+
     [Test]
     public void EveryEliteTrick_SaysWhatItDoesOnAFriendsCopy()
     {

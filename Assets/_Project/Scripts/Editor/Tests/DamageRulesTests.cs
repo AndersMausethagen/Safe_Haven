@@ -173,6 +173,21 @@ public sealed class DamageRulesTests
         Assert.AreEqual(expected, PlayerBlows.UnawareBlowWorth(player, victim, Slash, 20f, 1.5f), 1e-3f);
     }
 
+    // Second round: Blood-Price's health went through armour and the Damage Taken assist, and a dodge skipped it while the Focus came
+    // back all the same; a price is paid exactly.
+    [Test]
+    public void APriceInHealth_IsPaidExactly_WhateverTheArmourOrADodge()
+    {
+        Damageable payer = Victim(100f, 300f);
+        payer.AddInvulnerability(this);
+        payer.DamageTakenMultiplier = 0.5f;
+        var price = new DamageInfo(null, null, 10f, DamageType.Physical, false, Vector3.zero, Vector3.down).Scaled(1f, 0f, HitTechnique.OverTime, false);
+
+        payer.PayExactly(price);
+
+        Assert.AreEqual(90f, payer.CurrentHealth, 1e-3f);
+    }
+
     // ----- What a dodge escapes -----
 
     // Review 2026-11-16: a bog troll's drag and a shield rush pulled a player who dodged through them.

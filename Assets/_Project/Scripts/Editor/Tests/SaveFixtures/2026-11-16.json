@@ -1,0 +1,1831 @@
+{
+    "version": 1,
+    "savedAtUtc": "2026-11-16T16:29:57.1934370Z",
+    "scene": "Prologue_MistyWoods",
+    "hasPlayerPose": true,
+    "playerPosition": {
+        "x": 0.4788162410259247,
+        "y": 3.964374303817749,
+        "z": 8.824536323547363
+    },
+    "playerYaw": 59.75032424926758,
+    "player": {
+        "bag": [
+            {
+                "slot": 0,
+                "item": "softwood",
+                "count": 20,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 1,
+                "item": "sticks",
+                "count": 27,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 2,
+                "item": "hardwood",
+                "count": 3,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 3,
+                "item": "grubs",
+                "count": 8,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 4,
+                "item": "fishing_rod",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 5,
+                "item": "waterskin",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 6,
+                "item": "bandage",
+                "count": 2,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 7,
+                "item": "rough_hide",
+                "count": 14,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 8,
+                "item": "bone",
+                "count": 3,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 9,
+                "item": "rootlingbark",
+                "count": 3,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 10,
+                "item": "small_rocks",
+                "count": 9,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 11,
+                "item": "sharp_fang",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            }
+        ],
+        "safePocket": [],
+        "resources": [
+            {
+                "id": "cursed_essence",
+                "amount": 12
+            }
+        ],
+        "discoveredResources": [
+            "cursed_essence"
+        ],
+        "knownRecipes": [
+            "copper_axe",
+            "copper_ingot",
+            "copper_pickaxe",
+            "copper_sickle",
+            "fiber_pack",
+            "granite_blocks",
+            "greater_healing_potion",
+            "hardwood_planks",
+            "healing_potion",
+            "healing_salve",
+            "iron_ingot",
+            "life_essence",
+            "linen",
+            "planks",
+            "plant_rope",
+            "stone_bricks",
+            "beardedgreataxe",
+            "ironspear",
+            "ironsword",
+            "portalspark",
+            "stewedberries",
+            "stoneaxe",
+            "stonehatchet",
+            "stonepickaxe",
+            "stonesickle",
+            "woven_cord_belt",
+            "woven_hide_boots",
+            "woven_hide_cap",
+            "woven_hide_gloves",
+            "woven_hide_jerkin",
+            "craft_hand_torch",
+            "craft_woodsmans_axe",
+            "crudewoodenbow",
+            "crudestonearrow",
+            "firearrow",
+            "whistlingarrow",
+            "huntersbow",
+            "barkpack",
+            "fishingrod",
+            "grilledperch",
+            "grilledtrout",
+            "pikesteak",
+            "smokedchar",
+            "bodkinarrow",
+            "bonecharm",
+            "copperband",
+            "copperboundshield",
+            "copperhandaxe",
+            "copperscalegauntlets",
+            "copperscalegirdle",
+            "copperscalegreaves",
+            "copperscalehauberk",
+            "copperscalehelm",
+            "copperspear",
+            "coppersword",
+            "curedleatherbelt",
+            "curedleatherboots",
+            "curedleathercap",
+            "curedleathergloves",
+            "curedleatherjack",
+            "deepstonesignet",
+            "elderwoodlongbow",
+            "fangdagger",
+            "fangnecklace",
+            "graveblade",
+            "heartrootamulet",
+            "irongreatsword",
+            "ironkiteshield",
+            "ironmailbelt",
+            "ironmailboots",
+            "ironmailgauntlets",
+            "ironmailhauberk",
+            "ironmailhelm",
+            "ironwarhammer",
+            "roundshield",
+            "tuskring",
+            "wisppendant",
+            "antidote",
+            "bakedturnip",
+            "barkskindraught",
+            "barleybread",
+            "beartonic",
+            "cloudberrycream",
+            "curedleather",
+            "curedthickhide",
+            "farmbarley",
+            "farmflax",
+            "farmhealingherb",
+            "farmturnips",
+            "fishsoup",
+            "foragersbroth",
+            "hivehoney",
+            "honeycake",
+            "honeymead",
+            "huntersstew",
+            "mushroomskewer",
+            "roastboar",
+            "smokedboar",
+            "swiftfoottonic",
+            "warmingbrew",
+            "curseddraught",
+            "purifieddraught",
+            "handcart",
+            "rowboat",
+            "wheelbarrow",
+            "knottedclub",
+            "firehardenedspear",
+            "wickershield",
+            "bandage",
+            "bettercuredleather",
+            "bettercuredthickhide",
+            "boarpie",
+            "fieldrepairkit",
+            "forwardcampkit",
+            "frostwarddraught",
+            "havenfeast",
+            "ironbarkdraught",
+            "moonbroth",
+            "moonsilvergreatsword",
+            "moonsilverspear",
+            "moonstrungbow",
+            "moonwoodshield",
+            "radiantdraught",
+            "travellerspack",
+            "trollhornbow",
+            "trollstoneblade",
+            "trollstoneboots",
+            "trollstonegauntlets",
+            "trollstonegirdle",
+            "trollstonehauberk",
+            "trollstonehelm",
+            "trollwallshield",
+            "troutincream",
+            "wayfarersframe",
+            "waystoneshard",
+            "haul_sack",
+            "charcoal",
+            "charcoal_sticks",
+            "dockdeeplines",
+            "docknets",
+            "dockpiketraps",
+            "docktroutlines",
+            "primitive_firefly_lantern",
+            "hearth_ember",
+            "hide_saddle",
+            "lasso",
+            "blackened_barding",
+            "leather_saddle",
+            "painted_barding",
+            "reinforced_saddle",
+            "silvered_barding",
+            "runeofthewhirl",
+            "runeofmanycuts",
+            "runeofthereaver",
+            "runeofthecleaver",
+            "runeoftheround",
+            "runeofthemillstone",
+            "runeofthevault",
+            "runeoftheknee",
+            "runicstaff",
+            "enchant_blankparchment",
+            "planks_rough",
+            "charcoal_campfire"
+        ],
+        "knownBuildings": [
+            "smelter",
+            "workbench",
+            "campfire",
+            "palisade",
+            "storageshed",
+            "torch",
+            "smallchest",
+            "herbplanter",
+            "lanternpost",
+            "spiketrap",
+            "well",
+            "hut",
+            "irontrap",
+            "tradingpost",
+            "wardtotem",
+            "skigard",
+            "skigard_gate",
+            "stable",
+            "barrels_and_crates",
+            "carved_post",
+            "flower_bed",
+            "hay_bales",
+            "log_bench",
+            "plank_bench",
+            "rune_stone",
+            "signpost",
+            "trestle_table",
+            "woodpile",
+            "notice_board",
+            "bellows",
+            "chopping_block",
+            "dirt_path",
+            "dry_stone_wall",
+            "hedge",
+            "herb_garden",
+            "larder",
+            "log_rack",
+            "quench_tub",
+            "sawhorse",
+            "smoke_rack",
+            "stone_path",
+            "tool_rack",
+            "palisade_gate",
+            "hedge_gate",
+            "dry_stone_gap"
+        ],
+        "hasNeeds": true,
+        "hunger": 47.583946228027344,
+        "thirst": 80.59598541259766,
+        "equippedSlot": -1,
+        "hasGear": true,
+        "gear": [
+            {
+                "slot": 0,
+                "item": "woven_hide_cap",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 4,
+                "item": "woven_hide_jerkin",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 6,
+                "item": "woven_hide_gloves",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 9,
+                "item": "woven_hide_boots",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 12,
+                "item": "worn_sword",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 13,
+                "item": "leather_pack",
+                "count": 1,
+                "wear": 0.0,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 14,
+                "item": "stone_hatchet",
+                "count": 1,
+                "wear": 0.019999980926513672,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            },
+            {
+                "slot": 18,
+                "item": "primitive_firefly_lantern",
+                "count": 1,
+                "wear": 0.1584741473197937,
+                "empower": 0,
+                "enchantment": "",
+                "quality": 0,
+                "maker": "",
+                "size": 0.0
+            }
+        ],
+        "quickItems": [
+            "waterskin",
+            "bandage"
+        ],
+        "skillBarItems": [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "waterskin",
+            "bandage",
+            "",
+            ""
+        ],
+        "knownSkills": [
+            "WhirlingSteel",
+            "WolfsLunge",
+            "FrostRune",
+            "AshladsEmber",
+            "TrollsbaneWrath",
+            "HuldrasBlessing"
+        ],
+        "skillBar": [
+            "WhirlingSteel",
+            "WolfsLunge",
+            "FrostRune",
+            "AshladsEmber",
+            "TrollsbaneWrath",
+            "",
+            "",
+            "",
+            ""
+        ],
+        "handCrafts": {
+            "crafts": [],
+            "elapsed": 0.0
+        }
+    },
+    "stash": {
+        "items": [],
+        "resources": []
+    },
+    "world": [
+        {
+            "scene": "Prologue_MistyWoods",
+            "entities": [
+                {
+                    "id": "9086df06e4004890a5d9041b03b1cfdb",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "7bf0e0fa6f47426e96f2b7286dd6a7bf,f55daa25c4f7429c849a6b7f972c85a9"
+                        }
+                    ]
+                },
+                {
+                    "id": "0764e108749d408099932b107dac7396",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "d2452eaab6234a4fb49819d808256deb"
+                        }
+                    ]
+                },
+                {
+                    "id": "ef3b94f148c04ab29fc984bc05a3229d",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "14488509a4ae41188a828a55e0678292"
+                        }
+                    ]
+                },
+                {
+                    "id": "81d58da59f12471781ecc6ea5e6a6391",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "66f0ab99333e49f381f0ddfba691bce3"
+                        }
+                    ]
+                },
+                {
+                    "id": "6b517036a70b42daa1d6a36cf19dec58",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "77173c14c76a41aeb12704da0e6353f9"
+                        }
+                    ]
+                },
+                {
+                    "id": "35990e04cb0346eb83f6f75947bd8768",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "f94b01525a144449af82dbeff62c8e0f"
+                        }
+                    ]
+                },
+                {
+                    "id": "8b3b7e2f515644cdbcb186f141e2fd77",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": ""
+                        }
+                    ]
+                },
+                {
+                    "id": "44dbdb1ef731453c9d93cbfe76d43ed6",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "c0b05366aad1459c9e681fe99b2ca401"
+                        }
+                    ]
+                },
+                {
+                    "id": "0c434b538e634e36ab7a4a73192262ab",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 3.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "df8fdfbec14f4fdbbcaa0be43bc4b643"
+                        }
+                    ]
+                },
+                {
+                    "id": "f0caa07e69d0472fb9cb37fb5debd86a",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "878d28c5c2ad4c49abe0b599833f6380,d9d4ce4d61cc43c38001a20f002ea392,425a1eec58374aa3a77c55581db059d3"
+                        }
+                    ]
+                },
+                {
+                    "id": "cc0ef1d8c7ee4db7b1cab157e77ef81f",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "c3f54860dfcc4361ad3386f6485cb24f"
+                        }
+                    ]
+                },
+                {
+                    "id": "ec8d77cc44d04e1b8bb21fcd8abd263e",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "21452d74d51d420a85ceeeec2ee10361"
+                        }
+                    ]
+                },
+                {
+                    "id": "0cce9be9e3bd408c90a640102e94a30f",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "29de94101c0d4709bc3cb925fc9c7757"
+                        }
+                    ]
+                },
+                {
+                    "id": "a4943d94e602400794cdcf8a630c73c9",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "b493703a6f2e4dbcac7694e401857c01"
+                        }
+                    ]
+                },
+                {
+                    "id": "5b0985cc61cd49b1805c095ce6842d84",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "cfcaa560c11d4733a82ea41d92025a3f"
+                        }
+                    ]
+                },
+                {
+                    "id": "2e899d07b5dd42dc8db71cc990ef029e",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "0773c953897b4946b09dedc59edfe1f4"
+                        }
+                    ]
+                },
+                {
+                    "id": "b8282f7638d74be18c4f7480ef12ffc4",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "1914024cb0514807984c8b47955bfa52"
+                        }
+                    ]
+                },
+                {
+                    "id": "b055523e0d004f5091d4935c33bed9ed",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": ""
+                        }
+                    ]
+                },
+                {
+                    "id": "cbe9758f1a62441ab4e80b186a356bae",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 1.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": ""
+                        }
+                    ]
+                },
+                {
+                    "id": "e2fcad5ba41a4c7d9ee0e2ec45330a66",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 2.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": ""
+                        }
+                    ]
+                },
+                {
+                    "id": "b87c2d7dca2f4d6281276b51b7cd384c",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "cf183705e9d44607a5d1fccc91fe953b"
+                        }
+                    ]
+                },
+                {
+                    "id": "a53478d7ac8a49fd9c3d01a3bfcde43b",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "cb3365203042454dac909c08a16c8010,cfc4e86404ab4e22b6decabd8c606215"
+                        }
+                    ]
+                },
+                {
+                    "id": "d5752db6fef74f39a15ac8ce17f26ecf",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "55f9d56a52ce4aee992278725b2af66c,a5b3215b01574749aa8c11dc172f86df"
+                        }
+                    ]
+                },
+                {
+                    "id": "362ecdbe022e4871905eec7f2072f9b8",
+                    "prefab": "",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "story",
+                            "state": "bff15d05ea1244a290cac2c42938f66b,1a2e31d5d6f44265886f81568f0eda58"
+                        }
+                    ]
+                },
+                {
+                    "id": "7f4302571c784b14b34268c093fcc3db",
+                    "prefab": "e8f5ac7427646e942aaf261bf18f6768",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 1.0,
+                        "y": 2.4302754402160645,
+                        "z": -33.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187119037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "54af30d62b6247fc8b34766cfe6ad383",
+                    "prefab": "e8f5ac7427646e942aaf261bf18f6768",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 1.0,
+                        "y": 2.361532688140869,
+                        "z": -35.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187235037414}"
+                        }
+                    ]
+                },
+                {
+                    "id": "68dea0497cb641b3a4f8d877c65f32ee",
+                    "prefab": "e8f5ac7427646e942aaf261bf18f6768",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -3.0,
+                        "y": 2.803377866744995,
+                        "z": -35.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187259037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "8055ca0bcea14cd58e217a65f08a5908",
+                    "prefab": "e8f5ac7427646e942aaf261bf18f6768",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -3.0,
+                        "y": 2.797736644744873,
+                        "z": -33.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187297037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "28b59da717304da58767c7a49ff4b8df",
+                    "prefab": "e8f5ac7427646e942aaf261bf18f6768",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -3.0,
+                        "y": 2.8267343044281006,
+                        "z": -37.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187325037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "ad75ef27a6e446589f4efc158e1e0779",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -21.0,
+                        "y": 3.820425510406494,
+                        "z": -38.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.8509425520896912,
+                        "z": 0.0,
+                        "w": -0.5252587795257568
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187353037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "eec7b6f76a42450e80111b1d6e18c603",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -24.0,
+                        "y": 4.051900863647461,
+                        "z": -35.5
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.04119008779525757,
+                        "z": 0.0,
+                        "w": -0.999151349067688
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187374037414}"
+                        }
+                    ]
+                },
+                {
+                    "id": "78636e9977cc4aab8ff0eaed82bc8a63",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -26.0,
+                        "y": 3.3683652877807617,
+                        "z": -40.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.32026907801628113,
+                        "z": 0.0,
+                        "w": -0.94732666015625
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187409037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "f1e974860e8d4423ad46e27cd3b219c6",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -28.0,
+                        "y": 4.200000762939453,
+                        "z": -34.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.9995194673538208,
+                        "z": 0.0,
+                        "w": -0.03099771775305271
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187443037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "641aca3fc15e42c593760e39a50c57e7",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -22.5,
+                        "y": 4.029532432556152,
+                        "z": -33.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.6686400771141052,
+                        "z": 0.0,
+                        "w": -0.7435862421989441
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187465037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "17b6797d3179413db72956a40da161f2",
+                    "prefab": "a9997326276cfce4fa8853b4de82eab1",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -30.0,
+                        "y": 3.666667938232422,
+                        "z": -37.5
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.6106275916099548,
+                        "z": 0.0,
+                        "w": 0.7919179797172546
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187484037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "0aa1f17c39454c0fa7437d6b86074de1",
+                    "prefab": "2ed04a7f37f319e4ba101d693a7c82f5",
+                    "spawned": false,
+                    "destroyed": true,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -353.0,
+                        "y": 17.99945068359375,
+                        "z": 45.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 1.0,
+                        "z": 0.0,
+                        "w": 0.0
+                    },
+                    "components": []
+                },
+                {
+                    "id": "50c48638aef4458abf8a172147adf929",
+                    "prefab": "4cff8733c679b964f97f5aa116eda933",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 3.0,
+                        "y": 1.5892870426177979,
+                        "z": -33.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187510037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "b6fa2a1bf675410bbcaf6012d2dd4d68",
+                    "prefab": "4cff8733c679b964f97f5aa116eda933",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -1.0,
+                        "y": 2.8073463439941406,
+                        "z": -37.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187543037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "db217d7e33594f5fa13ebafbeacd22f2",
+                    "prefab": "4cff8733c679b964f97f5aa116eda933",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -1.0,
+                        "y": 2.7533769607543945,
+                        "z": -35.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187561037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "fe2a9de71b5a4ae0b10c8426cabf2f62",
+                    "prefab": "4cff8733c679b964f97f5aa116eda933",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": -1.0,
+                        "y": 2.7439231872558594,
+                        "z": -33.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187581037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "b5bda0ba841340e48d19a9f8f9645f8e",
+                    "prefab": "4cff8733c679b964f97f5aa116eda933",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 3.0,
+                        "y": 1.506613850593567,
+                        "z": -35.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "node",
+                            "state": "{\"depleted\":false,\"respawnRemaining\":0.0,\"run\":\"eeda6dca1f884e3681bc30d3d54b5e18.-1848644748\",\"savedAt\":984.2187600037415}"
+                        }
+                    ]
+                },
+                {
+                    "id": "spawned-7fd33b8479f64f6289d4f6917d5d5a22",
+                    "prefab": "62042647728bcb448a5358ddaddaa4a1",
+                    "spawned": true,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 0.0,
+                        "y": 2.6856069564819336,
+                        "z": -26.0
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": 0.0,
+                        "z": 0.0,
+                        "w": 1.0
+                    },
+                    "components": [
+                        {
+                            "key": "health",
+                            "state": "{\"health\":400.0}"
+                        },
+                        {
+                            "key": "construction",
+                            "state": "1,1,0,1"
+                        }
+                    ]
+                },
+                {
+                    "id": "7410715367ce434c9fb065069e43fbb2",
+                    "prefab": "c62686ef298686e40ae6736dc586a03f",
+                    "spawned": false,
+                    "destroyed": false,
+                    "active": true,
+                    "hasTransform": true,
+                    "position": {
+                        "x": 1.3390724658966064,
+                        "y": 2.1329030990600586,
+                        "z": -33.706356048583984
+                    },
+                    "rotation": {
+                        "x": 0.0,
+                        "y": -0.10294581204652786,
+                        "z": 0.0,
+                        "w": 0.994687020778656
+                    },
+                    "components": [
+                        {
+                            "key": "health",
+                            "state": "{\"health\":3640.0}"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "quests": [
+        {
+            "id": "prologue.morning_camp",
+            "status": 2,
+            "counts": [
+                1
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.wood_for_the_road",
+            "status": 2,
+            "counts": [
+                6
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.fish_for_breakfast",
+            "status": 4,
+            "counts": [
+                0
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.road_to_forest",
+            "status": 2,
+            "counts": [
+                1
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.findshelter",
+            "status": 2,
+            "counts": [
+                1,
+                8,
+                12,
+                1
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.catchbreath",
+            "status": 2,
+            "counts": [
+                1
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.defendcamp",
+            "status": 2,
+            "counts": [
+                1
+            ],
+            "rewardsWaiting": false
+        },
+        {
+            "id": "prologue.reachportal",
+            "status": 2,
+            "counts": [
+                1,
+                1
+            ],
+            "rewardsWaiting": false
+        }
+    ],
+    "settlement": {
+        "portalRepaired": false,
+        "wardLevel": 0,
+        "havenRank": 0,
+        "successfulExtractions": 0,
+        "daysPassed": 0,
+        "blight": 0.0,
+        "territory": {
+            "turn": 0,
+            "restUntil": 0,
+            "firstClaimTurn": -1,
+            "freeClaimUsed": false,
+            "holds": [],
+            "hasPush": false,
+            "pushRegion": "",
+            "pushDue": 0,
+            "pushStrength": 0.0,
+            "pushWeakened": 0.0
+        },
+        "spiritGifts": [],
+        "huldraRespect": 0,
+        "huldraAwayUntil": 0,
+        "requests": [],
+        "requestsAnswered": 0,
+        "requestsAskedAt": -1,
+        "orderRenown": 0,
+        "breach": 0,
+        "breachesWon": 0,
+        "nextBreachAt": 0,
+        "breachPendingSince": 0,
+        "wardStrain": 0,
+        "breachWeakening": 0.0,
+        "residents": [],
+        "houseComforts": [],
+        "footpaths": "",
+        "builderSeconds": 0.0,
+        "defeatedBosses": [],
+        "lastBossBeaten": "",
+        "lastBossBeatenAt": 0,
+        "heldQuestsHomecoming": 0,
+        "heldQuestsStarted": 0,
+        "fallen": [],
+        "vacantJobs": [],
+        "purificationQueued": 0,
+        "purificationProgress": 0.0,
+        "purificationBonus": 0.0,
+        "purificationYield": 0.0,
+        "purifiedRemainder": 0.0,
+        "portalLevel": 0,
+        "tradeBought": [],
+        "stations": []
+    },
+    "playtest": {
+        "runId": "20261116-171414",
+        "playedSeconds": 551.5970458984375,
+        "sessions": 1
+    },
+    "happenedEvents": [
+        "prologue.started",
+        "talked:expedition.sigrid",
+        "prologue.came_for_kin",
+        "prologue.met_the_expedition",
+        "talked:expedition.eirik",
+        "prologue.fire_talk",
+        "prologue.lesson_hit",
+        "prologue.weapon_chosen",
+        "survival.drank_at_water",
+        "prologue.cart_inspected",
+        "prologue.road_wolves_beaten",
+        "prologue.torches_lit",
+        "prologue.forest_entered",
+        "prologue.road_gone",
+        "prologue.road_ambush",
+        "reached:rock-shelter",
+        "prologue.shelterfound",
+        "prologue.firelit",
+        "prologue.name_gone_missing",
+        "prologue.rested",
+        "prologue.campdefended",
+        "reached:waystones",
+        "prologue.portalreached",
+        "prologue.portalactivated"
+    ],
+    "progress": {
+        "level": 1,
+        "experience": 0,
+        "talents": [],
+        "proficiencies": [
+            {
+                "id": "woodcutting",
+                "amount": 84
+            },
+            {
+                "id": "melee",
+                "amount": 245
+            },
+            {
+                "id": "foraging",
+                "amount": 76
+            }
+        ],
+        "perks": [],
+        "insight": 148,
+        "plainRuns": [],
+        "techniquesSeen": [],
+        "raidsVisited": [],
+        "attunedRunes": [],
+        "enchantments": [],
+        "enchantmentsLearned": true,
+        "skillRanks": [],
+        "crafted": [],
+        "stones": [],
+        "creatures": [
+            {
+                "id": "hide_ravager",
+                "amount": 9
+            },
+            {
+                "id": "Rootling",
+                "amount": 4
+            }
+        ],
+        "journal": {
+            "read": [],
+            "announced": [
+                "The Pact",
+                "Seven Went In",
+                "Your Windows",
+                "Your Journal",
+                "Hunger and Thirst",
+                "Skills and Perks",
+                "Woodcutting",
+                "Swings and Chains",
+                "Dodging",
+                "Stamina and Focus",
+                "Poise and Stagger",
+                "Getting Hit",
+                "Guard and Parry",
+                "Foraging"
+            ],
+            "found": [],
+            "killedBy": [],
+            "pinned": "",
+            "raids": [],
+            "tried": [
+                "technique:dodge",
+                "technique:stamina",
+                "woodcutting",
+                "technique:stagger",
+                "melee",
+                "technique:hurt",
+                "technique:guard",
+                "foraging"
+            ],
+            "discovered": [],
+            "noticed": [],
+            "biggestFish": []
+        }
+    },
+    "displayName": "Zelda's Journey",
+    "appearance": {
+        "name": "Zelda",
+        "gender": 1,
+        "skin": 0,
+        "hair": 0,
+        "hairColour": 2,
+        "brows": 0,
+        "beard": 0,
+        "eyes": 1,
+        "underclothes": 0,
+        "clothes": 0
+    },
+    "raidUnderWay": ""
+}

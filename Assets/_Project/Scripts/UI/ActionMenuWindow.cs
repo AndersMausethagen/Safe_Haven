@@ -10,17 +10,33 @@ public sealed class MenuAction
     public MenuAction(string label, string detail, bool enabled, Action chosen, bool closesMenu = false, QuestDefinition quest = null, QuestAnswer does = QuestAnswer.None)
     {
         Label = label;
-        Detail = detail;
-        Enabled = enabled;
+        this.detail = detail;
+        this.enabled = enabled;
         Chosen = chosen;
         ClosesMenu = closesMenu;
         Quest = quest;
         Does = does;
     }
 
+    private readonly string detail;
+    private readonly bool enabled;
+
     public string Label { get; }
-    public string Detail { get; }
-    public bool Enabled { get; }
+
+    /// <summary>The detail, or, for a visitor in a friend's Haven (co-op) and a choice that is the host's (<see cref="HostOnly"/>), whose it is.</summary>
+    public string Detail => RefusedHere ? HavenVisit.Refusal : detail;
+
+    /// <summary>Whether it can be chosen: as made, and never by a visitor when it is the host's alone (every window asks this).</summary>
+    public bool Enabled => enabled && !RefusedHere;
+
+    /// <summary>
+    /// The host's alone in a friend's Haven (co-op): a visitor sees it greyed, with whose it is, and can't choose it. Declared where the
+    /// choice is made, read by every window through Enabled and Detail (Docs/BugPatterns.md, second round), instead of each choice
+    /// refusing itself when chosen (its own check, HavenVisit.LeftToHost, stays behind it).
+    /// </summary>
+    public bool HostOnly { get; set; }
+
+    private bool RefusedHere => HostOnly && HavenVisit.InHostsHaven;
     public Action Chosen { get; }
     public bool ClosesMenu { get; }
     /// <summary>The quest this answer is about, when spoken in a conversation (DialogueBox shows it in its rank's colour).</summary>

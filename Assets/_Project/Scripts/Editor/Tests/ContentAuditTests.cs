@@ -22,6 +22,12 @@ public sealed class ContentAuditTests
     }
 
     [Test]
+    public void EveryDefinition_HasAnIdOfItsOwn()
+    {
+        CollectionAssert.IsEmpty(ContentAudit.ImplicitIds(), "set its id (the one it has now: its name, or what Id makes of it) so saves keep it through a rename");
+    }
+
+    [Test]
     public void EveryRecipe_CanBeLearned()
     {
         CollectionAssert.IsEmpty(ContentAudit.UnlearnableRecipes());

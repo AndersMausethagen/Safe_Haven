@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93223f1186c87c843a8dc266465485b0, type: 3}
   m_Name: StoneSilenced
   m_EditorClassIdentifier: SafeHaven::GameEventDefinition
-  id: 
+  id: StoneSilenced
   displayName: The stone fell silent
   objectiveText: Silence the waking stone
   notes: 
+  homeOnly: 0

@@ -316,7 +316,34 @@ public static class ContentAudit
     }
 
     /// <summary>Everything above in one list, for the build.</summary>
+    /// <summary>
+    /// Content saved by its id that has none of its own, so its asset's name stands in: renaming the asset would lose it from every
+    /// save (Docs/BugPatterns.md, second round; PortalBloomed and StoneSilenced were found so). Every definition with an Id and an
+    /// id field to set says it.
+    /// </summary>
+    public static List<string> ImplicitIds()
+    {
+        var found = new List<string>();
+        foreach (string guid in AssetDatabase.FindAssets("t:ScriptableObject", new[] { "Assets/_Project" }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+            if (asset == null || asset.GetType().Assembly != typeof(SettlementState).Assembly || asset.GetType().GetProperty("Id") == null)
+            {
+                continue;
+            }
+
+            SerializedProperty id = new SerializedObject(asset).FindProperty("id");
+            if (id != null && id.propertyType == SerializedPropertyType.String && string.IsNullOrWhiteSpace(id.stringValue))
+            {
+                found.Add($"{asset.GetType().Name} {path} has no id of its own: its name stands in, and a rename would lose it from saves");
+            }
+        }
+
+        return found;
+    }
+
     public static List<string> All() =>
         BrokenReferences().Concat(UnlearnableRecipes()).Concat(UnlearnableBuildings()).Concat(ItemsThatNeverCome()).Concat(MonstersNothingSpawns())
-            .Concat(UnsortedFields().Select(f => "the content audit doesn't know what this field means: " + f)).ToList();
+            .Concat(UnsortedFields().Select(f => "the content audit doesn't know what this field means: " + f)).Concat(ImplicitIds()).ToList();
 }

@@ -114,10 +114,10 @@ What the nine guards still left open, found while building them.
 |---|---|
 | 1. Resident records cry out on a borrowed copy | built: `ResidentRecord`'s setters go through `SettlementState.RecordChanging`, which says so as `Borrowed()` does (the two co-op bugs of guard 9 were silent writes to records); `CoopHomeTests.ABorrowedResident_SaysSoWhenChanged` |
 | 2. `Here` read-only by type | planned |
-| 3. Visitor rules per menu choice | planned |
-| 4. Explicit ids for content | planned |
-| 5. The quest arrow's one-per-kind, Blood-Price's cost | planned |
-| 6. Old saves as test fixtures | planned |
+| 3. Visitor rules per menu choice | built: `MenuAction.HostOnly`, declared where a choice is made; every window greys it for a visitor and says whose it is through `Enabled` and `Detail` (a station's craft, collect and cancel, the trading post's trades, the horse trader's, waking the portal); the choice's own check stays behind it. `InteractionRuleTests` |
+| 4. Explicit ids for content | built: `ContentAudit.ImplicitIds` (in the build's audits) and `ContentAuditTests.EveryDefinition_HasAnIdOfItsOwn`; the 19 that went by their name (18 gathering nodes and the StoneSilenced event) were given the id they already used |
+| 5. The quest arrow's one-per-kind, Blood-Price's cost | built: the waypoint arrow leads to the quests the tracker shows first (`QuestTrackerView.Shown`); Blood-Price takes its price exactly (`Damageable.PayExactly`: armour, the Damage Taken assist and a dodge made it less or nothing, the Focus given back all the same); `DamageRulesTests` |
+| 6. Old saves as test fixtures | built: three real saves from 11-12, 11-14 and 11-16 (no personal data in them) in `Editor/Tests/SaveFixtures`; `SaveFixtureTests`: each loads with all its content found, keeps its residents, quests, raids and bag through a save made from it, and saving again changes nothing |
 | 7. A scripted run through the game's loop (Play mode) | planned |
 | 8. A two-player test with two built copies | planned |
 | 9. One command for the whole suite | built: `RunTests.ps1 -All` (one run, totals and failures); `AgentScripts/BuildWindows.ps1` runs it and builds only when everything passes |

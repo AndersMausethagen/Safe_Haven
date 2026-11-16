@@ -51,7 +51,7 @@ public sealed class TradingPost : MonoBehaviour
             if (held > 0)
             {
                 TradeSettings.Sale chosen = sale;
-                page.Add(new MenuAction($"Sell {sale.item.DisplayName}", $"You have {held}. {sale.coins} {coin} each", true, () => Sell(user, chosen)));
+                page.Add(new MenuAction($"Sell {sale.item.DisplayName}", $"You have {held}. {sale.coins} {coin} each", true, () => Sell(user, chosen)) { HostOnly = true });
             }
         }
 
@@ -66,7 +66,7 @@ public sealed class TradingPost : MonoBehaviour
                 if (coins > 0)
                 {
                     int index = i;
-                    page.Add(new MenuAction($"Sell your {piece.DisplayName}", $"{coins} {coin}: good work fetches a good price", true, () => SellMade(user, index)));
+                    page.Add(new MenuAction($"Sell your {piece.DisplayName}", $"{coins} {coin}: good work fetches a good price", true, () => SellMade(user, index)) { HostOnly = true });
                 }
             }
         }
@@ -81,7 +81,7 @@ public sealed class TradingPost : MonoBehaviour
             int left = offer.stock - GameSession.Here.BoughtSinceLastRaid(offer.Key);
             TradeSettings.Offer chosen = offer;
             string stock = left > 0 ? $"{offer.price} {coin}, {left} left" : "Sold out until the caravan returns";
-            page.Add(new MenuAction($"Buy {offer.amount} {offer.item.DisplayName}", stock, left > 0 && purse >= offer.price, () => Buy(user, chosen)));
+            page.Add(new MenuAction($"Buy {offer.amount} {offer.item.DisplayName}", stock, left > 0 && purse >= offer.price, () => Buy(user, chosen)) { HostOnly = true });
         }
 
         // The caravan's horse trade: the player's horses standing near the post, and one of its own each time it comes.

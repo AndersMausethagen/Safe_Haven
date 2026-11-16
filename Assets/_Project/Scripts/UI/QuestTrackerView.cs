@@ -95,6 +95,18 @@ public sealed class QuestTrackerView : MonoBehaviour
         active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : ByRankThenName(a.Quest, b.Quest));
         int hidden = OnePerKind(active, pinned);
         available.Sort(ByRankThenName);
+        // What the waypoint arrow may lead to: what is shown here (it led to a quest hidden behind another of its colour).
+        Shown.Clear();
+        foreach (QuestLog.Entry entry in active)
+        {
+            Shown.Add(entry.Quest);
+        }
+
+        foreach (QuestDefinition quest in available)
+        {
+            Shown.Add(quest);
+        }
+
         panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();
         timed = false;
@@ -201,6 +213,14 @@ public sealed class QuestTrackerView : MonoBehaviour
     /// shows one gold, one teal, one green... and the rest are in the journal (the user, 2026-11-15: too many at once after the first
     /// raid). Anything on a clock stays, as it can't wait.
     /// </summary>
+    /// <summary>The quests the tracker shows now (under way, one of each kind and the pinned one; to hand in; ready to take): the
+    /// waypoint arrow leads to these first. Empty with no tracker.</summary>
+    public static readonly HashSet<QuestDefinition> Shown = new HashSet<QuestDefinition>();
+
+    // Entering Play doesn't reload scripts in this project: statics carry over unless cleared.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Shown.Clear();
+
     public static int OnePerKind(List<QuestLog.Entry> sorted, string pinned)
     {
         var seen = new HashSet<QuestRank>();
