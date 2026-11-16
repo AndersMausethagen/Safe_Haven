@@ -1,0 +1,30 @@
+{
+  "_note": "Part-by-part test (2026-11-16) on the user's T-pose troll (concept.png from the user). The loincloth tests cloth. Boxes are concept pixels (1240x1268).",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "head",
+      "box": [515, 25, 725, 240],
+      "keep": "the bald troll's head: his face, big nose and ears, cut off cleanly at the bottom of the neck; no shoulders and no cloth",
+      "seed": 1
+    },
+    {
+      "name": "hand_r",
+      "box": [0, 285, 160, 372],
+      "keep": "the troll's right hand and wrist seen from above, the fingers and thumb exactly as shown, cut off cleanly at the wrist, no arm",
+      "seed": 1
+    },
+    {
+      "name": "hand_l",
+      "box": [1080, 285, 1240, 368],
+      "keep": "the troll's left hand and wrist seen from above, the fingers and thumb exactly as shown, cut off cleanly at the wrist, no arm",
+      "seed": 1
+    },
+    {
+      "name": "loincloth",
+      "box": [378, 538, 862, 965],
+      "keep": "the ragged mossy leather loincloth skirt with its twisted rope belt and hanging rope knot, as a garment on its own: the same jagged tattered hem, no body, no belly, no legs, the skirt hollow inside where the body was",
+      "seed": 1
+    }
+  ]
+}

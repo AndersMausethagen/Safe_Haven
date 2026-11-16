@@ -4,4 +4,7 @@
 !*/
 !concept.png
 !.gitignore
+# Part-by-part recipes (LocalSpawn split_parts.py) are inputs too; their working folders are not.
+!parts_recipe.json
+parts_*/
 _rejected/

@@ -1,0 +1,31 @@
+{
+  "_note": "Part-by-part test (2026-11-16): split_parts.py isolates these from the concept, generate_3d.py makes each with Hunyuan3D + UltraTex, assemble_parts.py fits them onto the whole take. Boxes are concept pixels.",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "head",
+      "box": [385, 50, 645, 300],
+      "keep": "the old troll woman's head: her face, big pointed ears and white hair, cut off cleanly at the bottom of the neck, with her two white braids ending just below her jaw; no shawl, no hood and no clothing",
+      "seed": 8202
+    },
+    {
+      "name": "head_bald",
+      "box": [385, 50, 645, 300],
+      "keep": "the old troll woman's head with her face and big pointed ears, but completely bald: no hair at all, no braids, a smooth bare wrinkled scalp with the same warty skin as her face, and a short piece of her neck; no shawl, no hood and no clothing",
+      "seed": 8202,
+      "_why": "Long hair came out as flat foil-like facets at 3k triangles; the hair is added in Blender as cards and braids instead (the user, 2026-11-16)."
+    },
+    {
+      "name": "hand_r",
+      "box": [220, 555, 340, 708],
+      "keep": "the troll woman's warty right hand and wrist, the fingers and thumb exactly as shown, cut off cleanly at the wrist, no sleeve and no arm",
+      "seed": 8202
+    },
+    {
+      "name": "hand_l",
+      "box": [715, 540, 810, 692],
+      "keep": "the troll woman's warty left hand and wrist, the fingers and thumb exactly as shown, cut off cleanly at the wrist, no sleeve and no arm",
+      "seed": 8202
+    }
+  ]
+}
