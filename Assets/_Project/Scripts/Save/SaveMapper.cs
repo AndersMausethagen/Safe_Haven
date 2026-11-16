@@ -257,6 +257,8 @@ public static class SaveMapper
         into.defeatedBosses.AddRange(settlement.DefeatedBosses);
         into.lastBossBeaten = settlement.LastBossBeaten;
         into.lastBossBeatenAt = settlement.LastBossBeatenAt;
+        into.heldQuestsHomecoming = settlement.HeldQuestsHomecoming;
+        into.heldQuestsStarted = settlement.HeldQuestsStarted;
         foreach (FallenRecord record in settlement.Fallen)
         {
             into.fallen.Add(new FallenSaveData { id = record.Resident.Id, where = record.Where, atExtraction = record.AtExtraction, raidsAlong = record.RaidsAlong, forgotten = ToSaved(record.Forgotten) });
@@ -368,6 +370,7 @@ public static class SaveMapper
         }
 
         settlement.RestoreLastBoss(saved.lastBossBeaten, saved.lastBossBeatenAt);
+        settlement.RestoreHeldQuests(saved.heldQuestsHomecoming, saved.heldQuestsStarted);
         foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
         {
             settlement.RestoreFallen(Resolve(content.FindResident(entry?.id), "resident", entry?.id, missing), entry?.where, entry != null ? entry.atExtraction : 0, entry != null ? entry.raidsAlong : 0, FromSaved(entry?.forgotten));

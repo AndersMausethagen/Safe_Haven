@@ -263,6 +263,12 @@ public sealed partial class MonsterAI
         MonsterAttack doing = attacks.Action;
         if (!attacks.Update(CanTarget(target) ? targetComponent.transform.position : (Vector3?)null))
         {
+            // What the blow met may already have moved it on (a parry staggers it as it lands): that state stands.
+            if (CurrentState != State.Attacking)
+            {
+                return;
+            }
+
             SetState(State.Chasing);
             // Spent by it (Open After): it reels a while, open to blows, as a staggered creature is.
             if (doing != null && doing.openAfter > 0f && CurrentState != State.Dead)

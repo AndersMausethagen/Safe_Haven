@@ -196,6 +196,7 @@ public sealed class SaveTests
         settlement.ChangeBlight(0.35f);
         settlement.GiveSpiritGift(SpiritBonds.NokkGift);
         settlement.SetHuldra(1, 9);
+        settlement.NoteHeldQuestStarted(2);
 
         SaveData data = SaveMapper.ToSaveData(player, null, "SafeHaven", null, DateTime.UtcNow, settlement: settlement);
         LoadedGame loaded = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), lookup);
@@ -211,6 +212,8 @@ public sealed class SaveTests
         Assert.AreEqual(3, loaded.Player.State.EquippedSlot);
 
         SettlementState restored = loaded.Settlement;
+        Assert.AreEqual(1, restored.HeldQuestsStartedAt(2), "a Continue doesn't open a fresh share of held quests at the same homecoming");
+        Assert.AreEqual(0, restored.HeldQuestsStartedAt(3), "the next homecoming does");
         Assert.AreEqual(0.35f, restored.Blight, 0.001f);
         Assert.IsTrue(restored.HasSpiritGift(SpiritBonds.NokkGift));
         Assert.AreEqual(1, restored.HuldraRespect);

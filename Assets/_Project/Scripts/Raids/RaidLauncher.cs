@@ -253,6 +253,12 @@ public static class RaidLauncher
     private static RaidSession Go(RaidDefinition raid, List<RaidModifierDefinition> modifiers, GameObject player, int runSeed, RaidDifficulty difficulty,
         int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed)
     {
+        // Crafts under way give their materials back before the save and the kit copied for the raid (not when the scene unloads).
+        if (player.TryGetComponent(out HandCraftQueue crafts))
+        {
+            crafts.Stop();
+        }
+
         SaveGameService.SaveBeforeRaid(raid);
         if (player.TryGetComponent(out PlayerTransport transport))
         {

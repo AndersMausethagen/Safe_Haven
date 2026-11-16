@@ -257,6 +257,23 @@ public sealed class PlayerCrafting : MonoBehaviour
         return true;
     }
 
+    /// <summary>Whether what one craft of <paramref name="recipe"/> makes would fit now (a paid craft waits for room rather than
+    /// being made into a full bag and lost).</summary>
+    public bool HasRoomFor(RecipeDefinition recipe)
+    {
+        if (recipe == null)
+        {
+            return false;
+        }
+
+        if (recipe.Output != null)
+        {
+            return items.Container.SpaceFor(recipe.Output) >= recipe.OutputAmount;
+        }
+
+        return recipe.OutputResource == null || Pool.FreeSpaceFor(recipe.OutputResource) >= recipe.OutputAmount;
+    }
+
     /// <summary>Takes what one craft costs, if it can be made now; otherwise tells the player why not.</summary>
     public bool TryPay(RecipeDefinition recipe)
     {

@@ -696,6 +696,26 @@ public sealed class SettlementState
         LastBossBeatenAt = atExtraction;
     }
 
+    /// <summary>The homecoming whose share of held quests has begun (QuestManager), and how many have begun in it. Saved, so
+    /// loading a game doesn't open a fresh share at the same homecoming.</summary>
+    public int HeldQuestsHomecoming { get; private set; }
+    public int HeldQuestsStarted { get; private set; }
+
+    /// <summary>How many held quests have begun at this homecoming.</summary>
+    public int HeldQuestsStartedAt(int homecoming) => HeldQuestsHomecoming == homecoming ? HeldQuestsStarted : 0;
+
+    public void NoteHeldQuestStarted(int homecoming)
+    {
+        HeldQuestsStarted = HeldQuestsStartedAt(homecoming) + 1;
+        HeldQuestsHomecoming = homecoming;
+    }
+
+    public void RestoreHeldQuests(int homecoming, int started)
+    {
+        HeldQuestsHomecoming = homecoming;
+        HeldQuestsStarted = Mathf.Max(0, started);
+    }
+
     /// <summary>Those who went along on a raid and haven't come home.</summary>
     public IReadOnlyList<FallenRecord> Fallen => fallen;
 

@@ -253,6 +253,13 @@ public static class SaveGameService
     public static SaveData Capture()
     {
         PlayerPersistence player = Player.Current.Persistence;
+        // Crafts by hand under way aren't saved: their materials go back to the bag first, or a save (and the raid that
+        // copies the kit after it) would keep them paid for and never made.
+        if (Player.Current.TryGetComponent(out HandCraftQueue crafts))
+        {
+            crafts.Stop();
+        }
+
         // Objects keep their own state; it is gathered into memory first, then copied out.
         SaveableEntity.CaptureAll();
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,

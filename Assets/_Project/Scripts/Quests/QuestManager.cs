@@ -143,12 +143,32 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     private void Forget(QuestDefinition quest) => waiting.RemoveAll(entry => entry.Quest == quest);
 
+    // Runs each frame for every held quest while away (a whole raid), so no closure.
     private void Hold(QuestDefinition quest, float now)
     {
-        int index = waiting.FindIndex(entry => entry.Quest == quest);
-        if (index >= 0 && waiting[index].ReadyAt < now)
+        for (int i = 0; i < waiting.Count; i++)
         {
-            waiting[index] = new WaitingQuest(quest, now);
+            if (waiting[i].Quest == quest)
+            {
+                if (waiting[i].ReadyAt < now)
+                {
+                    waiting[i] = new WaitingQuest(quest, now);
+                }
+
+                return;
+            }
+        }
+    }
+
+    // Coming home: held quests count their moment from the arrival, not from the last frame before the loading screen.
+    private void HoldAllHeld(float now)
+    {
+        for (int i = 0; i < waiting.Count; i++)
+        {
+            if (waiting[i].Quest != null && waiting[i].Quest.HeldForHomecoming && waiting[i].ReadyAt < now)
+            {
+                waiting[i] = new WaitingQuest(waiting[i].Quest, now);
+            }
         }
     }
 
@@ -175,20 +195,22 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
     }
 
-    // The homecoming whose share of held quests is being counted, and how many of them have begun since.
-    private int heldHomecoming = -1;
-    private int heldStarted;
-
+    // The share of held quests each homecoming is counted in the settlement (SettlementState.HeldQuestsStarted), which is saved:
+    // a Continue at the same homecoming doesn't open a fresh share.
     private void StartNow(QuestDefinition quest)
     {
         if (Log.TryStart(quest) && quest.HeldForHomecoming)
         {
-            heldStarted++;
+            SettlementState settlement = GameSession.Settlement;
+            settlement.NoteHeldQuestStarted(settlement.SuccessfulExtractions);
         }
     }
 
-    // A held quest begins only at home (not on a raid, not in a friend's Haven), within this homecoming's share, or when nothing
-    // of its kind is under way. Not saved: a loaded game may start a fresh share, which is harmless.
+    /// <summary>At home: not on a raid (nor in its scene after the extraction, whose results are still showing), not in a
+    /// friend's Haven. Held quests begin only here.</summary>
+    private static bool AtHome => GameSession.ActiveRaid == null && RaidDirector.Current == null && !HavenVisit.IsVisiting;
+
+    // A held quest begins only at home, within this homecoming's share, or when nothing of its kind is under way.
     private bool MayStartHeld(QuestDefinition quest)
     {
         if (!quest.HeldForHomecoming)
@@ -196,19 +218,14 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             return true;
         }
 
-        if (GameSession.ActiveRaid != null || HavenVisit.IsVisiting)
+        if (!AtHome)
         {
             return false;
         }
 
-        int homecoming = GameSession.Settlement.SuccessfulExtractions;
-        if (homecoming != heldHomecoming)
-        {
-            heldHomecoming = homecoming;
-            heldStarted = 0;
-        }
-
-        return heldStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
+        SettlementState settlement = GameSession.Settlement;
+        return settlement.HeldQuestsStartedAt(settlement.SuccessfulExtractions) < StoryPacingSettings.Current.NewPerHomecoming
+            || !AnyUnderWay(quest.Rank);
     }
 
     // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses.
@@ -322,7 +339,6 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         Unbind();
         pendingRewards.Clear();
         waiting.Clear();
-        heldHomecoming = -1;
         underWayKnown = false;
         log = GameSession.Quests;
         log.Started += OnQuestStarted;
@@ -351,6 +367,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     public void OnSceneEntered(Scene scene)
     {
         underWayKnown = false; // a loaded game's quests came back without starting events
+        HoldAllHeld(Time.time);
         // Quests begin once there is a player to receive them, not in the menu.
         if (Player.Current != null)
         {

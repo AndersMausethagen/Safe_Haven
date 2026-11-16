@@ -19,6 +19,7 @@ public sealed class HandCraftQueue : MonoBehaviour
     private RecipeDefinition current;
     private float elapsed;
     private float seconds;
+    private bool toldNoRoom;
 
     /// <summary>The craft under way, or null.</summary>
     public RecipeDefinition Current => current;
@@ -106,6 +107,7 @@ public sealed class HandCraftQueue : MonoBehaviour
 
         current = null;
         waiting.Clear();
+        toldNoRoom = false;
         Slow(false);
     }
 
@@ -142,6 +144,21 @@ public sealed class HandCraftQueue : MonoBehaviour
         elapsed += Time.deltaTime;
         if (elapsed >= seconds)
         {
+            // Made into a full bag it would be lost (the bag was checked when it was paid, not for what was still waiting):
+            // it waits, finished, for room. An attack or a dodge still gives the materials back.
+            if (!crafting.HasRoomFor(current))
+            {
+                if (!toldNoRoom)
+                {
+                    toldNoRoom = true;
+                    GameMessages.Post($"No room in the bag for the {current.OutputName}: make room and it is done.", MessageKind.Warning);
+                }
+
+                elapsed = seconds;
+                return;
+            }
+
+            toldNoRoom = false;
             RecipeDefinition done = current;
             current = null;
             crafting.Finish(done);

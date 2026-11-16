@@ -34,11 +34,13 @@ public sealed class Footpaths : MonoBehaviour
     private float nextKeep;
     private bool changed;
     private Transform root;
+    private SettlementState keptIn;
 
     private void Start()
     {
         origin = transform.position - new Vector3(Cells * CellSize * 0.5f, 0f, Cells * CellSize * 0.5f);
-        Unpack(GameSession.Settlement.Footpaths);
+        keptIn = GameSession.Settlement;
+        Unpack(keptIn.Footpaths);
         nextLay = 0f;
     }
 
@@ -201,8 +203,10 @@ public sealed class Footpaths : MonoBehaviour
 
     private void Keep()
     {
-        // A friend's game shows its own; the host's is the one kept.
-        if (!HavenVisit.IsVisiting && isActiveAndEnabled)
+        // A friend's game shows its own; the host's is the one kept. Only into the game these paths were read from (leaving the
+        // scene for a loaded or new game must not write them into it); not "isActiveAndEnabled", which is false in OnDisable,
+        // so the wear since the last lay was lost on every raid (review 2026-11-16).
+        if (!HavenVisit.IsVisiting && keptIn != null && keptIn == GameSession.Settlement)
         {
             GameSession.Settlement.Footpaths = Pack(wear, worn);
         }

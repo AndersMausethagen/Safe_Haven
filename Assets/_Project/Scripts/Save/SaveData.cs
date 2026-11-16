@@ -100,6 +100,9 @@ public sealed class SettlementSaveData
     public List<string> defeatedBosses = new List<string>();
     public string lastBossBeaten;
     public int lastBossBeatenAt;
+    /// <summary>The homecoming whose share of held quests has begun, and how many of them (QuestManager). Missing in older saves: a full share.</summary>
+    public int heldQuestsHomecoming;
+    public int heldQuestsStarted;
     /// <summary>Those lost on raids. Missing in older saves.</summary>
     public List<FallenSaveData> fallen = new List<FallenSaveData>();
     /// <summary>Ids of the jobs they left. Missing in older saves.</summary>
