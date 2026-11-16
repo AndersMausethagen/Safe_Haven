@@ -19,7 +19,7 @@ public sealed class HavenDecisionAttribute : Attribute
 
 /// <summary>
 /// The Haven's own decisions, made where the Haven is kept: its residents' work, its ward, its portal, its altar. A decision is
-/// one static method marked <see cref="HavenDecisionAttribute"/>, changing <see cref="GameSession.Settlement"/> by its own
+/// one static method marked <see cref="HavenDecisionAttribute"/>, changing <see cref="GameSession.Here"/> by its own
 /// rules and saying how it went. A feature pays what it costs from the player's own materials, then calls <see cref="Do"/>:
 /// <list type="bullet">
 /// <item>in this player's own Haven (alone, or hosting) the decision is made at once;</item>

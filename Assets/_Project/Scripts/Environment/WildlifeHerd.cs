@@ -89,7 +89,7 @@ public sealed class WildlifeHerd : MonoBehaviour
             return;
         }
 
-        float blight = GameSession.Settlement.Blight;
+        float blight = GameSession.Here.Blight;
         int wanted = Mathf.Max(1, Mathf.RoundToInt(Random.Range(count.x, count.y + 1) * (1f - 0.5f * blight)));
         bool hollowOne = hollowed != null && Random.value < blight * 0.7f;
         for (int i = 0; i < wanted * 3 && living.Count < wanted; i++)

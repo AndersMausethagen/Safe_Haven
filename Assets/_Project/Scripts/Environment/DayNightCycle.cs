@@ -161,14 +161,14 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
     private static void PassDawnsAway(float from, float to)
     {
         int dawns = Mathf.FloorToInt((to - 6f) / 24f) - Mathf.FloorToInt((from - 6f) / 24f);
-        if (dawns <= 0 || HavenVisit.IsVisiting || GameSession.Settlement == null || FindAnyObjectByType<Seasons>() == null)
+        if (dawns <= 0 || HavenVisit.IsVisiting || GameSession.Here == null || FindAnyObjectByType<Seasons>() == null)
         {
             return;
         }
 
         for (int i = 0; i < Mathf.Min(dawns, 30); i++)
         {
-            GameSession.Settlement.PassDay();
+            GameSession.Home.PassDay();
             global::Territory.Turn(true);
         }
     }

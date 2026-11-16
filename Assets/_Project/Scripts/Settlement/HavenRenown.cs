@@ -5,7 +5,7 @@ using UnityEngine;
 /// How much Safe Haven is worth, added up from what stands in it (HavenSettings has the numbers): every finished
 /// building's renown plus its upgrades (another of a kind already standing brings only part of it, so variety pays),
 /// the share of overgrowth cleared, and the residents living there. Pure reading of the loaded scene and
-/// GameSession.Settlement; the parts are shown in the Haven window (HavenOverview).
+/// GameSession.Here; the parts are shown in the Haven window (HavenOverview).
 /// </summary>
 public static class HavenRenown
 {
@@ -72,7 +72,7 @@ public static class HavenRenown
             parts?.Add(new Part($"Your skills (total level {totalLevel})", skilled));
         }
 
-        int orders = GameSession.Settlement.OrderRenown;
+        int orders = GameSession.Here.OrderRenown;
         if (orders > 0)
         {
             total += orders;
@@ -83,7 +83,7 @@ public static class HavenRenown
         if (lands > 0)
         {
             total += lands;
-            parts?.Add(new Part($"The Haven's lands ({GameSession.Settlement.Territory.ClaimedCount} held)", lands));
+            parts?.Add(new Part($"The Haven's lands ({GameSession.Here.Territory.ClaimedCount} held)", lands));
         }
 
         // The best home, once, and each kind of yard, once: a town laid out with care is talked of.
@@ -101,11 +101,11 @@ public static class HavenRenown
             parts?.Add(new Part("Its yards", yardRenown));
         }
 
-        int residents = GameSession.Settlement.Residents.Count * settings.ResidentRenown;
+        int residents = GameSession.Here.Residents.Count * settings.ResidentRenown;
         if (residents > 0)
         {
             total += residents;
-            parts?.Add(new Part($"Residents ({GameSession.Settlement.Residents.Count})", residents));
+            parts?.Add(new Part($"Residents ({GameSession.Here.Residents.Count})", residents));
         }
 
         return total;

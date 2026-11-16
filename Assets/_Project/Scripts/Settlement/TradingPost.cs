@@ -73,12 +73,12 @@ public sealed class TradingPost : MonoBehaviour
 
         foreach (TradeSettings.Offer offer in settings.Offers)
         {
-            if (offer.item == null || GameSession.Settlement.SmithyTier < offer.smithyTier)
+            if (offer.item == null || GameSession.Here.SmithyTier < offer.smithyTier)
             {
                 continue;
             }
 
-            int left = offer.stock - GameSession.Settlement.BoughtSinceLastRaid(offer.Key);
+            int left = offer.stock - GameSession.Here.BoughtSinceLastRaid(offer.Key);
             TradeSettings.Offer chosen = offer;
             string stock = left > 0 ? $"{offer.price} {coin}, {left} left" : "Sold out until the caravan returns";
             page.Add(new MenuAction($"Buy {offer.amount} {offer.item.DisplayName}", stock, left > 0 && purse >= offer.price, () => Buy(user, chosen)));
@@ -154,7 +154,7 @@ public sealed class TradingPost : MonoBehaviour
         }
 
         TradeSettings settings = TradeSettings.Current;
-        if (settings.Coin == null || GameSession.Settlement.BoughtSinceLastRaid(offer.Key) >= offer.stock
+        if (settings.Coin == null || GameSession.Here.BoughtSinceLastRaid(offer.Key) >= offer.stock
             || GameSession.Stash.Items.SpaceFor(offer.item) < offer.amount
             || !MaterialPool.For(user).TrySpend(null, new[] { new ItemAmount(settings.Coin, offer.price) }))
         {
@@ -163,7 +163,7 @@ public sealed class TradingPost : MonoBehaviour
         }
 
         GameSession.Stash.Items.Add(offer.item, offer.amount);
-        GameSession.Settlement.NoteBought(offer.Key);
+        GameSession.Home.NoteBought(offer.Key);
         GameMessages.Post($"Bought {offer.amount} {offer.item.DisplayName}, in the stash.", MessageKind.Gain);
     }
 

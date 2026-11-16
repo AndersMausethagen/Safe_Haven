@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 
 /// <summary>
-/// What the Haven window shows, read fresh from the loaded scene and GameSession.Settlement: where Safe Haven stands on its
+/// What the Haven window shows, read fresh from the loaded scene and GameSession.Here: where Safe Haven stands on its
 /// climb, what its renown is made of, who of the expedition has come home and what to do next. Plain data, so the window
 /// only draws it.
 /// </summary>
@@ -65,7 +65,7 @@ public sealed class HavenOverview
         var overview = new HavenOverview();
         var parts = new List<HavenRenown.Part>();
         overview.Renown = HavenRenown.Compute(parts);
-        overview.Rank = Mathf.Max(GameSession.Settlement.HavenRank, settings.RankFor(overview.Renown));
+        overview.Rank = Mathf.Max(GameSession.Here.HavenRank, settings.RankFor(overview.Renown));
         overview.Climb = ClimbOf(settings.Ranks, overview.Rank, overview.Renown);
         overview.WardRadius = HomePortal.Current != null ? HomePortal.Current.WardRadius : 0f;
         overview.PortalTier = PortalTiers.Current;
@@ -116,7 +116,7 @@ public sealed class HavenOverview
                 continue;
             }
 
-            ResidentRecord record = GameSession.Settlement.Find(person);
+            ResidentRecord record = GameSession.Here.Find(person);
             Expedition.Add(new Person(person.DisplayName, record != null, record != null && record.Job != null ? record.Job.DisplayName : ""));
         }
     }
@@ -155,10 +155,10 @@ public sealed class HavenOverview
         }
 
         // The portal's next tier: its materials, or what it still waits for (decision 8.4).
-        SettlementSettings.WardLevel nextTier = PortalTiers.Next(GameSession.Settlement);
+        SettlementSettings.WardLevel nextTier = PortalTiers.Next(GameSession.Here);
         if (nextTier != null)
         {
-            string needs = PortalTiers.Missing(nextTier, GameSession.Settlement);
+            string needs = PortalTiers.Missing(nextTier, GameSession.Here);
             Steps.Add(new Step($"Raise the portal to {PortalTiers.Title(PortalTiers.Current + 1)}",
                 needs.Length > 0 ? needs : $"{AmountText.Describe(nextTier.cost)}, at the portal.", use, 0));
         }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 /// <summary>
 /// Safe Haven's standing at the top of the screen while at home: its rank, renown towards the next rank on a thin bar,
 /// "+6 Renown" rising when something is built, upgraded or cleared, and a banner across the screen when a new rank is
-/// reached. Built in code by HavenProgress; it only reads it and GameSession.Settlement.
+/// reached. Built in code by HavenProgress; it only reads it and GameSession.Here.
 /// </summary>
 public sealed class HavenHud : MonoBehaviour
 {
@@ -150,7 +150,7 @@ public sealed class HavenHud : MonoBehaviour
         nextStanding = Time.unscaledTime + StandingSeconds;
         HavenSettings settings = HavenSettings.Current;
         int renown = HavenProgress.Current != null ? HavenProgress.Current.Renown : 0;
-        int rank = Mathf.Max(GameSession.Settlement.HavenRank, settings.RankFor(renown));
+        int rank = Mathf.Max(GameSession.Here.HavenRank, settings.RankFor(renown));
         bool last = rank >= settings.Ranks.Count - 1;
         int from = settings.Ranks.Count > 0 ? settings.Ranks[rank].renown : 0;
         int to = last ? from : settings.Ranks[rank + 1].renown;

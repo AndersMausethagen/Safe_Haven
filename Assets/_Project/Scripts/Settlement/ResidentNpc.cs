@@ -56,14 +56,14 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     {
         present.Add(this);
         GameEvents.Raised += OnGameEvent;
-        GameSession.Settlement.Changed += GoToWork;
+        GameSession.Here.Changed += GoToWork;
     }
 
     private void OnDisable()
     {
         present.Remove(this);
         GameEvents.Raised -= OnGameEvent;
-        GameSession.Settlement.Changed -= GoToWork;
+        GameSession.Here.Changed -= GoToWork;
     }
 
     /// <summary>Sets who this is and where their home spot is. Called by ResidentSpawner.</summary>
@@ -78,7 +78,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             life = gameObject.AddComponent<ResidentLife>();
         }
 
-        life.Settle(homePosition, homeRotation, GameSession.Settlement.Find(who) is ResidentRecord record ? IndexOf(record) : 0);
+        life.Settle(homePosition, homeRotation, GameSession.Here.Find(who) is ResidentRecord record ? IndexOf(record) : 0);
         // A lantern after dark, and a word in passing: the village lived in.
         if (!TryGetComponent(out ResidentLantern _))
         {
@@ -106,7 +106,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         }
 
         SettlementSettings settings = SettlementSettings.Current;
-        foreach (ResidentRecord other in GameSession.Settlement.Residents)
+        foreach (ResidentRecord other in GameSession.Here.Residents)
         {
             if (other.Resident != resident && other.IsStranger && settings.HomecomingAsides.Length > 0)
             {
@@ -119,7 +119,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
     private static int IndexOf(ResidentRecord record)
     {
-        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        IReadOnlyList<ResidentRecord> residents = GameSession.Here.Residents;
         for (int i = 0; i < residents.Count; i++)
         {
             if (residents[i] == record)
@@ -148,7 +148,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     }
 
     /// <summary>Their record in the settlement, or null.</summary>
-    public ResidentRecord Record => resident != null ? GameSession.Settlement.Find(resident) : null;
+    public ResidentRecord Record => resident != null ? GameSession.Here.Find(resident) : null;
 
     /// <summary>The building they work at: the one of their job's kind nearest their home (HavenHomes), or null.</summary>
     public BuildingObject Workplace => HavenHomes.WorkplaceOf(Record, homePosition);
@@ -206,7 +206,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     public EmoteDefinition WorkGesture => Job?.WorkGesture;
 
     /// <summary>The job they hold now, or null.</summary>
-    public JobDefinition Job => resident != null ? GameSession.Settlement.Find(resident)?.Job : null;
+    public JobDefinition Job => resident != null ? GameSession.Here.Find(resident)?.Job : null;
 
     /// <summary>Who they are and what they do (when nothing before it spoke), and the jobs they can take as answers.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
@@ -216,7 +216,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             return;
         }
 
-        JobDefinition current = GameSession.Settlement.Find(resident)?.Job;
+        JobDefinition current = GameSession.Here.Find(resident)?.Job;
         if (string.IsNullOrWhiteSpace(page.Body))
         {
             var body = new StringBuilder(current == null && !string.IsNullOrWhiteSpace(resident.WelcomeLine) ? resident.WelcomeLine : resident.Description);
@@ -240,7 +240,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
         // A lesson in their job's skill, once between raids; in their own Haven only (as Liv's carving): a guest's "taught" mark
         // lived on the copy of the host's settlement, undone by the host's next word, and the lesson could be taken again and again.
-        ResidentRecord record = GameSession.Settlement.Find(resident);
+        ResidentRecord record = GameSession.Here.Find(resident);
         if (current != null && current.Teaches != null && record != null && !HavenVisit.InHostsHaven)
         {
             ProficiencyDefinition skill = current.Teaches;
@@ -266,7 +266,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             EnchanterTalk.AddTopics(page, speaker, record, afterAnswer);
         }
 
-        foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(resident))
+        foreach (JobDefinition job in GameSession.Here.JobsOpenTo(resident))
         {
             if (job == null)
             {
@@ -285,7 +285,14 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     // What they have to say of the last raid they went on, once.
     private string Remembered()
     {
-        ResidentRecord record = GameSession.Settlement.Find(resident);
+        // A friend's people (co-op) remember the host's raids, not this visitor's: a guest heard and used up their lines on the copy,
+        // which the host's next word undid, so they came again.
+        if (HavenVisit.InHostsHaven)
+        {
+            return null;
+        }
+
+        ResidentRecord record = GameSession.Here.Find(resident);
         if (record == null)
         {
             return null;
@@ -325,7 +332,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     private string Grief()
     {
         SettlementSettings settings = SettlementSettings.Current;
-        FallenRecord loss = GameSession.Settlement.RecentLoss(settings.GriefRaids);
+        FallenRecord loss = GameSession.Here.RecentLoss(settings.GriefRaids);
         if (loss == null || settings.GriefLines.Length == 0)
         {
             return null;
@@ -338,7 +345,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     // For a while after a boss falls, it is what people talk about.
     private string BossTalk()
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         SettlementSettings settings = SettlementSettings.Current;
         if (string.IsNullOrEmpty(settlement.LastBossBeaten) || settlement.SuccessfulExtractions - settlement.LastBossBeatenAt > settings.GriefRaids)
         {
@@ -391,7 +398,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             return;
         }
 
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             TeachWhatTheyKnow(record.Resident, user, false);
         }
@@ -433,7 +440,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         // Their own work or a job left vacant (SettlementState.JobsOpenTo, what every job list offers): only their own was taken,
         // and a fallen Smith's work could be offered to anyone but given to no one.
         JobDefinition job = null;
-        foreach (JobDefinition can in resident != null ? GameSession.Settlement.JobsOpenTo(resident) : new List<JobDefinition>())
+        foreach (JobDefinition can in resident != null ? GameSession.Here.JobsOpenTo(resident) : new List<JobDefinition>())
         {
             job = can != null && parts.Length > 1 && can.Id == parts[1] ? can : job;
         }
@@ -444,7 +451,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         }
 
         // Quietly, as ever: the Haven window shows it (and a visitor sees it there when the mirror comes).
-        GameSession.Settlement.AssignJob(resident, job);
+        GameSession.Home.AssignJob(resident, job);
         return HavenDecisions.Outcome.Made();
     }
 }

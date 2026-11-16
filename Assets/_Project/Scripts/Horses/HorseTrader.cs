@@ -51,7 +51,7 @@ public static class HorseTrader
         }
 
         string key = OfferKey();
-        if (GameSession.Settlement.BoughtSinceLastRaid(key) == 0)
+        if (GameSession.Here.BoughtSinceLastRaid(key) == 0)
         {
             HorseStats offer = Offer(settings);
             int price = PriceOf(offer, settings.WildHorse);
@@ -64,11 +64,11 @@ public static class HorseTrader
     }
 
     // One horse each time the caravan comes: the same one until bought or the caravan moves on.
-    private static string OfferKey() => "horse:" + GameSession.Settlement.SuccessfulExtractions;
+    private static string OfferKey() => "horse:" + GameSession.Here.SuccessfulExtractions;
 
     private static HorseStats Offer(HorseSettings settings)
     {
-        var random = new System.Random(GameSession.Settlement.SuccessfulExtractions * 7919 + 131);
+        var random = new System.Random(GameSession.Here.SuccessfulExtractions * 7919 + 131);
         HorseStats stats = HorseStats.Roll(settings.WildHorse, random);
         // The caravan picks its horses: never a poor one.
         HorseStats other = HorseStats.Roll(settings.WildHorse, random);
@@ -120,7 +120,7 @@ public static class HorseTrader
         SaveableEntity made = SaveableEntity.Spawn(settings.WildHorse.Prefab.GetComponent<SaveableEntity>(), at, post.rotation);
         Horse horse = made.GetComponent<Horse>();
         horse.BecomeTamed(stats, 1f);
-        GameSession.Settlement.NoteBought(key);
+        GameSession.Home.NoteBought(key);
         GameMessages.Post($"The caravan's horse is yours: a {stats.SexName}, waiting by the post. Give it a name.", MessageKind.Gain);
         HorseNameWindow.Offer(horse);
     }

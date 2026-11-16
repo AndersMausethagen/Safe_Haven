@@ -208,7 +208,7 @@ public static class HavenBuildings
                 {
                     if (job != null && job.TeachesBuildings.Contains(building))
                     {
-                        ways.Add(GameSession.Settlement.HasResident(resident)
+                        ways.Add(GameSession.Here.HasResident(resident)
                             ? $"Give {resident.DisplayName} the {job.DisplayName} job."
                             : $"Bring {resident.DisplayName} home: the {job.DisplayName} knows how.");
                     }
@@ -244,7 +244,7 @@ public static class HavenBuildings
             return null;
         }
 
-        int level = GameSession.Settlement.WardLevel;
+        int level = GameSession.Here.WardLevel;
         int most = settings.WardLevels.Count;
         string radius = HomePortal.Current != null ? $"{HomePortal.Current.WardRadius:0} m" : $"{settings.WardRadiusAt(level):0} m";
         var entry = new HavenEntry
@@ -294,7 +294,7 @@ public static class HavenBuildings
             }
 
             // Find, not station.Queue: only looking mustn't create a queue that gets saved.
-            StationQueue queue = GameSession.Settlement.Workshops.Find(station.Id);
+            StationQueue queue = GameSession.Here.Workshops.Find(station.Id);
             if (queue != null && queue.Current != null)
             {
                 return $"Making {queue.Current.DisplayName}";

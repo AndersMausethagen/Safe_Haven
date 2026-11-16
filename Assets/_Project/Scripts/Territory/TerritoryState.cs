@@ -94,7 +94,7 @@ public sealed class TerritoryState
     // host's next word. Territory sends a guest's work to the host instead; this says so loudly if something doesn't.
     private void Borrowed([System.Runtime.CompilerServices.CallerMemberName] string change = null)
     {
-        if (HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Settlement.Territory))
+        if (HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Here.Territory))
         {
             UnityEngine.Debug.LogError($"Co-op: TerritoryState.{change} changed the copy of the host's lands in a guest's game; send it with Territory.ForHost.\n" + System.Environment.StackTrace);
         }

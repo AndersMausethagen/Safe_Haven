@@ -106,7 +106,7 @@ public sealed class WaterSource : MonoBehaviour, IInteractionName
             return;
         }
 
-        int today = GameSession.Settlement.DaysPassed;
+        int today = GameSession.Here.DaysPassed;
         if (FreezesNow && iceBrokenOnDay != today)
         {
             iceBrokenOnDay = today;

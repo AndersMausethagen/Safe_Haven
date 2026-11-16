@@ -113,11 +113,11 @@ public sealed class HavenManagementTests
     {
         JobDefinition smith = Job("Smith");
         ResidentDefinition bjarne = Person("Bjarne", smith);
-        GameSession.Settlement.AddResident(bjarne);
+        GameSession.Home.AddResident(bjarne);
 
         ResidentNpc.GiveJob(bjarne, smith, null);
 
-        Assert.AreEqual(smith, GameSession.Settlement.Find(bjarne).Job);
+        Assert.AreEqual(smith, GameSession.Here.Find(bjarne).Job);
         GameSession.StartNewGame();
     }
 

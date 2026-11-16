@@ -73,11 +73,11 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
         }
     }
 
-    private bool IsPushed => GameSession.Settlement.Territory.Incursion != null && GameSession.Settlement.Territory.Incursion.Region == region;
+    private bool IsPushed => GameSession.Here.Territory.Incursion != null && GameSession.Here.Territory.Incursion.Region == region;
 
     private void Show()
     {
-        bool claimed = GameSession.Settlement.Territory.IsClaimed(region);
+        bool claimed = GameSession.Here.Territory.IsClaimed(region);
         // A visitor's quest wants their own stones lit, not the host's.
         if (waypoint != null)
         {
@@ -119,7 +119,7 @@ public sealed class BoundaryStone : MonoBehaviour, IInteractionName
     private MenuPage Page(GameObject user)
     {
         TerritorySettings settings = TerritorySettings.Current;
-        TerritoryState state = GameSession.Settlement.Territory;
+        TerritoryState state = GameSession.Here.Territory;
         TerritorySettings.RegionInfo info = settings.Info(region);
         UIStyle style = UIStyle.Current;
         var body = new StringBuilder();

@@ -232,7 +232,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     {
         if (Log.TryStart(quest) && quest.HeldForHomecoming)
         {
-            GameSession.Settlement.NoteHeldQuestStarted();
+            GameSession.Here.NoteHeldQuestStarted();
             // The next held one waits its turn after this one (not two toasts in one frame on coming home).
             heldSpacedUntil = Time.time + StoryPacingSettings.Current.BetweenQuestsSeconds;
         }
@@ -255,7 +255,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             return false;
         }
 
-        return GameSession.Settlement.HeldQuestsStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
+        return GameSession.Here.HeldQuestsStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
     }
 
     // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses.
@@ -651,10 +651,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
                 }
             }
 
-            if (!HavenVisit.ChangeHome(AddWork))
-            {
-                AddWork(GameSession.Settlement);
-            }
+            AddWork(GameSession.Home);
         }
 
         return quest.DescribeRewards();

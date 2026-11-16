@@ -53,7 +53,7 @@ public sealed class SkyDome : MonoBehaviour
 
         float hour = cycle.Hour;
         cycle.Profile.SkyAt(hour, out Vector3 sun, out Vector3 moon, out Color sunColour);
-        float days = (GameSession.Settlement != null ? GameSession.Settlement.DaysPassed : 0) + hour / 24f;
+        float days = (GameSession.Here != null ? GameSession.Here.DaysPassed : 0) + hour / 24f;
         float phase = MoonPhase(days, settings.MoonCycleDays, settings.MoonPhaseAtStart);
         DayNightState state = cycle.State;
         float flash = WeatherSystem.Active != null ? WeatherSystem.Active.LightningFlash : 0f;

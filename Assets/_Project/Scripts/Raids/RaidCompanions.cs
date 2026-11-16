@@ -45,14 +45,14 @@ public sealed class RaidCompanions
 
         Companion = Companion.SpawnForRaid(prefab, session.Companion, hit.position);
         Companion.FormationOffset = new Vector3(2f, 0f, -3f);
-        ResidentRecord record = GameSession.Settlement.Find(session.Companion);
+        ResidentRecord record = GameSession.Here.Find(session.Companion);
         Toughen(Companion, record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null);
     }
 
     /// <summary>Whoever is lost longest stands here, waiting, as a rumour said they would.</summary>
     public void StandLostAt(Vector3 position)
     {
-        FallenRecord lost = GameSession.Settlement.LostToFind;
+        FallenRecord lost = GameSession.Here.LostToFind;
         Companion prefab = SettlementSettings.Current.RaidCompanionPrefab;
         if (lost == null || prefab == null || LostOne != null)
         {
@@ -94,13 +94,13 @@ public sealed class RaidCompanions
             report.CompanionLost = Companion != null && (Companion.IsLost || Companion.IsDowned);
             if (report.CompanionLost)
             {
-                GameSession.Settlement.LoseResident(session.Companion, session.Definition.DisplayName);
+                GameSession.Home.LoseResident(session.Companion, session.Definition.DisplayName);
             }
             else if (Companion != null)
             {
-                bool rose = GameSession.Settlement.RecordRaidAlong(session.Companion, SettlementSettings.Current.BondRanks, extracted, session.BossesBeaten,
+                bool rose = GameSession.Home.RecordRaidAlong(session.Companion, SettlementSettings.Current.BondRanks, extracted, session.BossesBeaten,
                     Companion.TimesHelpedUp, session.TimeRemaining, Companion.Kills, SettlementSettings.Current.MemoryReturnsEvery);
-                ResidentRecord record = GameSession.Settlement.Find(session.Companion);
+                ResidentRecord record = GameSession.Here.Find(session.Companion);
                 report.CompanionNewRank = rose ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
             }
         }

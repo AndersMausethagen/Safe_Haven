@@ -302,7 +302,7 @@ public sealed class RaidTierTests
             Assert.AreEqual(1, Raid.DifficultyFor(500).tier, "the ward holds the way open: no tier above it, whatever the gear");
             for (int level = 0; level < 3; level++)
             {
-                GameSession.Settlement.RaiseWardLevel();
+                GameSession.Home.RaiseWardLevel();
             }
 
             Assert.AreEqual(1, Raid.DifficultyFor(0).tier);

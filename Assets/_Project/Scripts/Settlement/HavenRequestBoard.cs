@@ -22,7 +22,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
     {
         var standing = new List<HavenRequestDefinition>();
         HavenRequestSettings settings = HavenRequestSettings.Current;
-        foreach (string id in GameSession.Settlement.Requests)
+        foreach (string id in GameSession.Here.Requests)
         {
             HavenRequestDefinition request = settings.Find(id);
             if (request != null)
@@ -87,7 +87,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
         }
 
         // A fresh game, or asks gone from the settings: fill up at once.
-        Refill(force: GameSession.Settlement.Requests.Count == 0);
+        Refill(force: GameSession.Here.Requests.Count == 0);
     }
 
     private void Update()
@@ -137,7 +137,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
     // Asked by someone who lives here: handed over by talking to them.
     private static bool HandedIn(HavenRequestDefinition request) =>
-        request.Asker != null && GameSession.Settlement.Find(request.Asker) != null;
+        request.Asker != null && GameSession.Here.Find(request.Asker) != null;
 
     /// <summary>
     /// The asker's line for handing over what they asked for (ResidentNpc.AddTopics): ready once it is home, naming what goes, and
@@ -212,7 +212,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
             }
         }
 
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         settlement.RemoveRequest(request.Id);
         settlement.RecordRequestAnswered(request.Renown);
         var given = new List<string>();
@@ -274,7 +274,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
     // raid is planned round what is wanted then.
     private void Refill(bool force)
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         int homecoming = settlement.SuccessfulExtractions;
         HavenRequestSettings settings = HavenRequestSettings.Current;
         // Nothing new is asked until there is a board to post it on; the first asks come as soon as it stands.

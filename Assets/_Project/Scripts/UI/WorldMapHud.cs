@@ -637,7 +637,7 @@ public sealed class WorldMapHud : MonoBehaviour
             return;
         }
 
-        TerritoryState lands = GameSession.Settlement.Territory;
+        TerritoryState lands = GameSession.Here.Territory;
         UIStyle style = UIStyle.Current;
         for (int i = 0; i < regionLabels.Count && i < atlas.Regions.Count; i++)
         {

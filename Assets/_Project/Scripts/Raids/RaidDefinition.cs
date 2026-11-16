@@ -162,7 +162,7 @@ public sealed class RaidDefinition : ScriptableObject
     public string Description => description;
     public int Tier => tier;
     public string SceneName => sceneName;
-    public bool IsLocked => locked && (unlockedBy == null || !GameSession.Settlement.IsBossDefeated(unlockedBy.Id));
+    public bool IsLocked => locked && (unlockedBy == null || !GameSession.Here.IsBossDefeated(unlockedBy.Id));
     public string LockedText => lockedText;
     public RaidSizeOption LargeRaid => largeRaid;
     public bool CanBeLarge => layoutRules != null && largeRaid != null && largeRaid.widthScale > 1f;

@@ -31,19 +31,19 @@ public static class BuildingUnlocks
             return true;
         }
 
-        return GameSession.Settlement.HavenRank >= building.RequiredRank && AllStand(building.Requires);
+        return GameSession.Here.HavenRank >= building.RequiredRank && AllStand(building.Requires);
     }
 
     /// <summary>Whether what an upgrade asks for stands. The level below it is the upgrade's own business.</summary>
     public static bool IsOpen(BuildingLevel level) => Cheats.NoRequirements || level == null
-        || (AllStand(level.requires) && GameSession.Settlement.BreachesWon >= level.breachesWon);
+        || (AllStand(level.requires) && GameSession.Here.BreachesWon >= level.breachesWon);
 
     /// <summary>What still has to stand, for the player: "Needs a Smithy." or "Needs a Workshop at Tier II." Empty when open.</summary>
     public static string Missing(BuildingDefinition building)
     {
         List<string> missing = Unmet(building.Requires);
         IReadOnlyList<HavenSettings.Rank> ranks = HavenSettings.Current.Ranks;
-        if (GameSession.Settlement.HavenRank < building.RequiredRank && building.RequiredRank < ranks.Count)
+        if (GameSession.Here.HavenRank < building.RequiredRank && building.RequiredRank < ranks.Count)
         {
             missing.Insert(0, $"Safe Haven to be a {ranks[building.RequiredRank].name}");
         }
@@ -55,7 +55,7 @@ public static class BuildingUnlocks
     public static string Missing(BuildingLevel level)
     {
         List<string> missing = level != null ? Unmet(level.requires) : new List<string>();
-        int toWin = level != null ? level.breachesWon - GameSession.Settlement.BreachesWon : 0;
+        int toWin = level != null ? level.breachesWon - GameSession.Here.BreachesWon : 0;
         if (toWin > 0)
         {
             missing.Add(toWin == 1 ? "one more breach held off at the portal" : $"{toWin} more breaches held off at the portal");

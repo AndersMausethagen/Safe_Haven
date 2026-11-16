@@ -234,7 +234,7 @@ public sealed class FeltProblemsTests
     [Test]
     public void EveryoneHome_TeachesTheirWorkplace_SoARaidRescueReachesHome()
     {
-        GameSession.Settlement.AddResident(Person("Bjarne"));
+        GameSession.Home.AddResident(Person("Bjarne"));
         PlayerCrafting crafting = NewPlayer();
         Assert.IsFalse(crafting.IsKnown(Building("Forge")));
 

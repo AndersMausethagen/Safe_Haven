@@ -53,7 +53,7 @@ public sealed class BossTests
     [Test]
     public void BeatingTheHeartrootOpensTrollValley()
     {
-        var saved = GameSession.Settlement;
+        var saved = GameSession.Here;
         Assert.IsTrue(saved.IsBossDefeated(Boss.Id) || Valley.IsLocked, "Shut until then");
     }
 

@@ -348,7 +348,7 @@ public sealed class RescueResidentOutcome : RaidEventOutcome
 
     public override void Apply(RaidEventContext context)
     {
-        if (resident == null || traveler == null || GameSession.Settlement.HasResident(resident))
+        if (resident == null || traveler == null || GameSession.Home.HasResident(resident))
         {
             return;
         }

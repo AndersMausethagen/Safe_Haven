@@ -72,7 +72,7 @@ public sealed partial class RaidPreparationWindow
         y = anyChip ? chips + 44f : chips;
 
         List<RaidEventDefinition> foretold = closed ? new List<RaidEventDefinition>() : RaidForecast.For(raid, plan.Seed, HavenReadiness.ForetoldEvents);
-        List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, plan.Seed, GameSession.Settlement, plan.Player != null ? plan.Player.GetComponent<PlayerCrafting>() : null, plan.Large ? raid.LargeRaid.widthScale : 1f);
+        List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, plan.Seed, GameSession.Here, plan.Player != null ? plan.Player.GetComponent<PlayerCrafting>() : null, plan.Large ? raid.LargeRaid.widthScale : 1f);
         List<string> asked = closed ? new List<string>() : HavenRequestBoard.BriefingLines(plan.Player);
         int lines = rumours.Count + foretold.Count + asked.Count;
         while (rumourLines.Count < lines)
@@ -86,7 +86,7 @@ public sealed partial class RaidPreparationWindow
             line.Rect.gameObject.SetActive(i < lines);
             if (i < lines)
             {
-                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Settlement)
+                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Here)
                     : i < rumours.Count + foretold.Count ? $"Seen from the Watch Post: {foretold[i - rumours.Count].DisplayName}."
                     : asked[i - rumours.Count - foretold.Count];
                 float height = Measure(line.Label, ColumnWidth - 16f);

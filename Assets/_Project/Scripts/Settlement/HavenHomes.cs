@@ -44,7 +44,7 @@ public sealed class HavenHomes : MonoBehaviour
         Current = this;
         BuildingObject.ActiveChanged += MarkDirty;
         Construction.Finished += OnFinished;
-        GameSession.Settlement.Changed += MarkDirty;
+        GameSession.Here.Changed += MarkDirty;
         dirty = true;
     }
 
@@ -52,7 +52,7 @@ public sealed class HavenHomes : MonoBehaviour
     {
         BuildingObject.ActiveChanged -= MarkDirty;
         Construction.Finished -= OnFinished;
-        GameSession.Settlement.Changed -= MarkDirty;
+        GameSession.Here.Changed -= MarkDirty;
         if (Current == this)
         {
             Current = null;
@@ -83,7 +83,7 @@ public sealed class HavenHomes : MonoBehaviour
     // Shares the beds out and finds each one's workplace. True when anything changed.
     private bool Settle()
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         IReadOnlyList<ResidentRecord> residents = settlement.Residents;
         Vector3 middle = Gather();
         string[] homes = HomeRules.Assign(houses, people, HomeLifeSettings.Current.MoveHomeFor);
@@ -106,7 +106,7 @@ public sealed class HavenHomes : MonoBehaviour
     // The houses with beds and the people to share them among; returns the middle of the Haven.
     private Vector3 Gather()
     {
-        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        IReadOnlyList<ResidentRecord> residents = GameSession.Here.Residents;
         Vector3 middle = HomePortal.Current != null ? HomePortal.Current.transform.position : transform.position;
 
         houses.Clear();
@@ -178,7 +178,7 @@ public sealed class HavenHomes : MonoBehaviour
         if (left != null)
         {
             var stay = new List<string>();
-            foreach (string comfort in GameSession.Settlement.ComfortsIn(from))
+            foreach (string comfort in GameSession.Here.ComfortsIn(from))
             {
                 HomeLifeSettings.Comfort known = HomeLifeSettings.Current.FindComfort(comfort);
                 stay.Add(known != null ? known.name : comfort);
@@ -197,7 +197,7 @@ public sealed class HavenHomes : MonoBehaviour
     // house there change how good it is: its quality is worked out again then (HomeLife).
     private bool SeenNew()
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         seen.Clear();
         foreach (ResidentRecord record in settlement.Residents)
         {
@@ -267,7 +267,7 @@ public sealed class HavenHomes : MonoBehaviour
             return found;
         }
 
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (record.Home == id)
             {
@@ -326,7 +326,7 @@ public sealed class HavenHomes : MonoBehaviour
         homes.Gather();
         homes.houses.Add(new HomeRules.House(ghost, Flat(door), beds));
         string[] assigned = HomeRules.Assign(homes.houses, homes.people, HomeLifeSettings.Current.MoveHomeFor);
-        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        IReadOnlyList<ResidentRecord> residents = GameSession.Here.Residents;
         for (int i = 0; i < assigned.Length && i < residents.Count; i++)
         {
             if (assigned[i] == ghost)
@@ -355,7 +355,7 @@ public sealed class HavenHomes : MonoBehaviour
         string house = parts.Length > 1 ? parts[1] : "";
         if (house.Length == 0)
         {
-            GameSession.Settlement.ChooseHome(record, "");
+            GameSession.Home.ChooseHome(record, "");
             return HavenDecisions.Outcome.Made($"{record.Resident.DisplayName} will find a bed of their own.");
         }
 
@@ -367,7 +367,7 @@ public sealed class HavenHomes : MonoBehaviour
 
         // Room for them: a bed nobody chose, or one already theirs. Someone the player put there keeps their bed.
         int taken = 0;
-        foreach (ResidentRecord other in GameSession.Settlement.Residents)
+        foreach (ResidentRecord other in GameSession.Here.Residents)
         {
             taken += other != record && other.HomeChosen == house ? 1 : 0;
         }
@@ -377,7 +377,7 @@ public sealed class HavenHomes : MonoBehaviour
             return HavenDecisions.Outcome.Refused($"Every bed in the {building.Definition.DisplayName} is promised to someone you put there.");
         }
 
-        GameSession.Settlement.ChooseHome(record, house);
+        GameSession.Home.ChooseHome(record, house);
         return HavenDecisions.Outcome.Made($"{record.Resident.DisplayName} moves into the {building.Definition.DisplayName}.");
     }
 

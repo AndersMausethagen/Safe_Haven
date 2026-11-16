@@ -45,11 +45,12 @@ public sealed class SpiritBonds : MonoBehaviour
 
     /// <summary>Whether this player has a spirit's gift: their own Haven's, also while visiting a friend's (co-op).</summary>
     public static bool HasGift(string id) =>
-        HavenVisit.IsVisiting ? HavenVisit.HomeHasSpiritGift(id) : GameSession.Settlement.HasSpiritGift(id);
+        GameSession.Home.HasSpiritGift(id);
 
     /// <summary>Whether a glimpse may show itself now: a spirit that was chased keeps away for a while.</summary>
     public static bool Welcome(Glimpse glimpse) =>
-        glimpse == null || glimpse.Spirit != Huldra || GameSession.Settlement.DaysPassed >= GameSession.Settlement.HuldraAwayUntil;
+        // Her memory is the player's own Haven's (Answer keeps it there), so is the day it is judged by.
+        glimpse == null || glimpse.Spirit != Huldra || GameSession.Home.DaysPassed >= GameSession.Home.HuldraAwayUntil;
 
     /// <summary>The Huldra's memory after a glimpse of her ends: (respect, away until, leaves a gift now).</summary>
     public static (int respect, int awayUntil, bool gift) AfterHuldra(int respect, int awayUntil, bool chased, int today, int needed, int away)
@@ -84,10 +85,7 @@ public sealed class SpiritBonds : MonoBehaviour
             leaves = gift;
         }
 
-        if (!HavenVisit.ChangeHome(Answer))
-        {
-            Answer(GameSession.Settlement);
-        }
+        Answer(GameSession.Home);
         if (chased)
         {
             GameMessages.Post("She is gone between the trees, and the woods feel colder for it.");
@@ -138,15 +136,8 @@ public sealed class SpiritBonds : MonoBehaviour
 
         if (stoodFor >= listen.y)
         {
-            // Learnt for good: in a friend's Haven, it goes home with this player (their copy here is the host's).
-            if (HavenVisit.IsVisiting)
-            {
-                HavenVisit.SpiritGiftHome(NokkGift);
-            }
-            else
-            {
-                GameSession.Settlement.GiveSpiritGift(NokkGift);
-            }
+            // Learnt for good: theirs, in their own Haven, wherever they stand.
+            GameSession.Home.GiveSpiritGift(NokkGift);
 
             GameMessages.Post("A tune rises out of the dark water, and stays with you. The Nøkk has taught you its air: "
                 + "fish will come to your line, and the Nøkken leaves you be.", MessageKind.Gain);

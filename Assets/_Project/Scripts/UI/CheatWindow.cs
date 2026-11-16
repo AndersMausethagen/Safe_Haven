@@ -636,7 +636,7 @@ public sealed class CheatWindow : MonoBehaviour
         int home = 0;
         foreach (ResidentDefinition person in HavenSettings.Current.Expedition)
         {
-            if (person != null && !GameSession.Settlement.HasResident(person))
+            if (person != null && !GameSession.Here.HasResident(person))
             {
                 Cheats.BringHome(person);
                 home++;

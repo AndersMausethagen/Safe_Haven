@@ -724,6 +724,22 @@ kept by `[SerializeReference]` (story nodes, raid outcomes) are found by class n
 renaming one needs `[MovedFrom]`. Story nodes live in one file per graph menu category (`Story/StoryTriggers.cs`,
 `StoryTalkNodes.cs`, `StoryFlowNodes.cs`, `StoryQuestNodes.cs`, `StoryWorldNodes.cs`, `StoryCameraSoundNodes.cs`).
 
+**Guards: a choke point, and a test that fails until a new case declares itself** (Docs/BugPatterns.md, after the 2026-11-16
+reviews). When adding something, go through these, and the tests say when one is missed:
+- Saved state: a new field of SettlementState, QuestLog, CharacterProgress or an ISaveable's state comes back from a save or says
+  `[NotSaved("why")]` (`SaveCoverageTests`).
+- Co-op messages: a struct (`INetworkSerializable`) written whole; never `WriteValueSafe` field by field (`CoopMessageTests`).
+- A creature's component: `[OnAFriendsCopy(CopyRule..., "how")]`; one the host decides is an `ICopyAware` (`CopyRuleTests`).
+- Something answering an Interactable: `[InAFriendsHaven(HavenUse..., "how")]`; HostOnly is refused by Interactable
+  (`InteractionRuleTests`). A quest objective type: its co-op rule (`QuestObjective.TypesWithACoopRule`).
+- A player activity (building, fishing, working...): an `IPlayerActivity` registered with `PlayerInterrupts`, ending on death and
+  on what it says; it never listens to the player's death, a pause or a flinch itself (`PlayerInterruptsTests`).
+- A player's blow from the shadows: `PlayerBlows` (`ConventionTests`).
+- A serialized `-1` placeholder: read through a nullable or its rule, never handed out raw (`ConventionTests`).
+- Something coming to the player: its `ArrivalCause`; what counts arrivals asks `ArrivalCauses.IsNewlyHad` (`QuestCoopTests`).
+- The settlement: `GameSession.Here` to read the Haven one stands in, `GameSession.Home` to change one's own; never the old
+  `GameSession.Settlement` (`ConventionTests`).
+
 ## Scene changes, raid results and raid layouts
 
 - **What the loading screen shows:** `SceneTransitionSettings` › Destinations gives a scene its own picture and tips (`Art/UI/Loading`; `AgentScripts/BuildLoadingScreens.cs`); what a destination leaves empty comes from the general ones. Keys in tips follow a rebind.

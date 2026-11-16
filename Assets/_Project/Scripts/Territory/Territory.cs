@@ -151,7 +151,7 @@ public static class Territory
         return $"the nearest lies about {Mathf.Max(10, Mathf.RoundToInt(bestDistance / 10f) * 10)} m to the {ways[Mathf.RoundToInt(bearing / 45f) % 8]}";
     }
 
-    private static TerritoryState State => GameSession.Settlement.Territory;
+    private static TerritoryState State => GameSession.Here.Territory;
     private static TerritorySettings Settings => TerritorySettings.Current;
 
     /// <summary>The Haven's atlas, wherever the player is (the Lands tab reads it on raids too).</summary>
@@ -477,7 +477,7 @@ public static class Territory
             return;
         }
 
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         bool pushComing = State.Incursion != null;
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread);
         if (!pushComing && State.Incursion != null)

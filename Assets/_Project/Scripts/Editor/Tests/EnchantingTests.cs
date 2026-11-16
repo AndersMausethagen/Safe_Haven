@@ -191,8 +191,8 @@ public sealed class EnchantingTests
             .First(r => r.name == "Liv");
         var job = AssetDatabase.LoadAssetAtPath<JobDefinition>("Assets/_Project/Data/Settlement/RuneScholar.asset");
         Assert.IsTrue(job.Carves);
-        GameSession.Settlement.AddResident(liv, job);
-        ResidentRecord record = GameSession.Settlement.Find(liv);
+        GameSession.Home.AddResident(liv, job);
+        ResidentRecord record = GameSession.Here.Find(liv);
         record.WorkDone = 1000;
         Assert.AreEqual(job.CarvesPastAt(4), Inscriptions.CarverReach(record), "a master carves furthest");
         EnchantmentDefinition frenzied = E("Frenzied");

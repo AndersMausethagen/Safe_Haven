@@ -10,7 +10,7 @@ using System.Collections.Generic;
 public static class PortalTiers
 {
     /// <summary>The portal's tier now.</summary>
-    public static int Current => Of(GameSession.Settlement);
+    public static int Current => Of(GameSession.Here);
 
     /// <summary>The tier a settlement's portal stands at.</summary>
     public static int Of(SettlementState settlement) => settlement == null || !settlement.PortalRepaired ? 0 : 1 + settlement.WardLevel;

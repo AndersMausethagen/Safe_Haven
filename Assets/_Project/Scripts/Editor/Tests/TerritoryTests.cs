@@ -212,7 +212,7 @@ public sealed class TerritoryTests
     public void AGuest_SendsTheirWorkToTheHost_AndChangesNothingHere()
     {
         GameSession.StartNewGame();
-        TerritoryState lands = GameSession.Settlement.Territory;
+        TerritoryState lands = GameSession.Here.Territory;
         lands.Claim(Region, Settings);
         while (lands.Incursion == null)
         {
@@ -266,7 +266,7 @@ public sealed class TerritoryTests
     {
         GameSession.StartNewGame();
         ForgetBurnedHearts();
-        TerritoryState lands = GameSession.Settlement.Territory;
+        TerritoryState lands = GameSession.Here.Territory;
         try
         {
             lands.Claim(Region, Settings);
@@ -421,12 +421,12 @@ public sealed class TerritoryTests
             Assert.AreEqual(RegionStanding.Secure, Territory.StandingOf(Region));
             Assert.AreEqual(1, heard.Count(e => e == Settings.LandSecure), "Secure is told once, as it is reached");
 
-            for (int turn = 0; turn < 300 && GameSession.Settlement.Territory.Incursion == null; turn++)
+            for (int turn = 0; turn < 300 && GameSession.Here.Territory.Incursion == null; turn++)
             {
                 Territory.Turn(false);
             }
 
-            Assert.IsNotNull(GameSession.Settlement.Territory.Incursion);
+            Assert.IsNotNull(GameSession.Here.Territory.Incursion);
             Assert.AreEqual(1, heard.Count(e => e == Settings.ForestGathers), "the warning is told once");
             Territory.Defended(Region);
             CollectionAssert.Contains(heard, Settings.PushAnswered);
@@ -560,7 +560,7 @@ public sealed class TerritoryTests
         GameEvents.Raised += listen;
         try
         {
-            GameSession.Settlement.Territory.Claim(Region, Settings);
+            GameSession.Here.Territory.Claim(Region, Settings);
             Territory.FromFriend(LandWork.Rune, Region, 0, "Ingrid");
             CollectionAssert.Contains(heard, Settings.RuneOffered);
             TerritorySettings.RegionInfo info = Settings.Info(Region);

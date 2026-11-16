@@ -12,7 +12,7 @@ public static class HavenPeople
     public const string AwayShelf = "Still out there";
 
     /// <summary>The expedition from the settings, plus anyone else who has come to live here.</summary>
-    public static List<HavenShelf> Read() => Read(HavenSettings.Current.Expedition, GameSession.Settlement);
+    public static List<HavenShelf> Read() => Read(HavenSettings.Current.Expedition, GameSession.Here);
 
     public static List<HavenShelf> Read(IEnumerable<ResidentDefinition> expedition, SettlementState settlement)
     {
@@ -39,7 +39,7 @@ public static class HavenPeople
     private static HavenEntry HomeEntry(ResidentDefinition person, ResidentRecord record, SettlementState settlement)
     {
         JobDefinition job = record.Job;
-        bool canWork = GameSession.Settlement.JobsOpenTo(person).Count > 0;
+        bool canWork = GameSession.Here.JobsOpenTo(person).Count > 0;
         var entry = new HavenEntry
         {
             Key = person,
@@ -80,7 +80,7 @@ public static class HavenPeople
         // Their own page: the house they live in (and moving them), their work and their story.
         entry.Actions.Add(new HavenAction("Their page", () => ResidentWindow.Show(person, "Home"), primary: false));
         AddWork(entry, record, settlement);
-        List<JobDefinition> others = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null && one != job).ToList();
+        List<JobDefinition> others = GameSession.Here.JobsOpenTo(person).Where(one => one != null && one != job).ToList();
         if (others.Count > 0)
         {
             entry.Details.Add(new HavenDetail(job != null ? "Could also work as" : "Could work as",
@@ -163,7 +163,7 @@ public static class HavenPeople
     /// <summary>A resident of this Haven by their id, or null (what a friend's decision names them by).</summary>
     public static ResidentRecord RecordOf(string residentId)
     {
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (record != null && record.Resident != null && record.Resident.Id == residentId)
             {
@@ -187,7 +187,7 @@ public static class HavenPeople
             Icon = person.Portrait,
         };
 
-        List<JobDefinition> jobs = GameSession.Settlement.JobsOpenTo(person).Where(one => one != null).ToList();
+        List<JobDefinition> jobs = GameSession.Here.JobsOpenTo(person).Where(one => one != null).ToList();
         if (jobs.Count > 0)
         {
             entry.Details.Add(new HavenDetail("What they would bring",

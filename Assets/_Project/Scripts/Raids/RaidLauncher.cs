@@ -84,13 +84,13 @@ public static class RaidLauncher
     /// <summary>Why the portal can't yet hold the way open to a tier, or null when it can.</summary>
     public static string CheckWard(RaidDifficulty difficulty)
     {
-        return difficulty == null || Cheats.NoRequirements || GameSession.Settlement.WardLevel >= difficulty.wardLevelNeeded
+        return difficulty == null || Cheats.NoRequirements || GameSession.Here.WardLevel >= difficulty.wardLevelNeeded
             ? null
             : $"The ward isn't strong enough to hold the way open to tier {Tiers.ToRoman(difficulty.tier)}. Strengthen it at the portal.";
     }
 
     /// <summary>Share off the extraction time, from what has been done to the portal.</summary>
-    public static float ExtractionCut => SettlementSettings.Current.ExtractionCutAt(GameSession.Settlement.PortalLevel);
+    public static float ExtractionCut => SettlementSettings.Current.ExtractionCutAt(GameSession.Here.PortalLevel);
 
     /// <summary>Why the player can't spend this many Portal Sparks, or null when they can.</summary>
     public static string CheckSparks(GameObject player, int sparks)
@@ -111,7 +111,7 @@ public static class RaidLauncher
 
     /// <summary>The seconds a raid gets on top of its rules: Portal Sparks, and what residents' jobs add.</summary>
     public static float ExtraSeconds(int sparks) =>
-        sparks * SettlementSettings.Current.SecondsPerSpark + GameSession.Settlement.JobBonus(job => job.RaidSeconds) + HavenReadiness.RaidSeconds;
+        sparks * SettlementSettings.Current.SecondsPerSpark + GameSession.Here.JobBonus(job => job.RaidSeconds) + HavenReadiness.RaidSeconds;
 
     /// <summary>What a number of Portal Sparks costs, as resources.</summary>
     public static List<ResourceAmount> SparkCost(int sparks)
@@ -132,7 +132,7 @@ public static class RaidLauncher
     /// </summary>
     /// <summary>True for someone who lives in the Haven and knows how to fight on a raid.</summary>
     public static bool CanGoAlong(ResidentDefinition person) =>
-        person != null && person.RaidCompanion != null && GameSession.Settlement.Find(person) != null;
+        person != null && person.RaidCompanion != null && GameSession.Here.Find(person) != null;
 
     /// <summary>Raised when the player goes through the portal, with what friends need to follow (co-op).</summary>
     public static event Action<RaidInvite> Launched;

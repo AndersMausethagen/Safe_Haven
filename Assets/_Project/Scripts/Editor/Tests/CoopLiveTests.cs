@@ -45,13 +45,13 @@ public sealed class CoopLiveTests
         try
         {
             TerritorySettings settings = TerritorySettings.Current;
-            TerritoryState lands = GameSession.Settlement.Territory;
+            TerritoryState lands = GameSession.Here.Territory;
             lands.Claim(Region, settings);
             float hold = lands.HoldOf(Region);
             var tor = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Tor.asset");
-            GameSession.Settlement.AddResident(tor);
-            GameSession.Settlement.LoseResident(tor, "the Misty Woods");
-            float weakening = GameSession.Settlement.BreachWeakening;
+            GameSession.Home.AddResident(tor);
+            GameSession.Home.LoseResident(tor, "the Misty Woods");
+            float weakening = GameSession.Here.BreachWeakening;
 
             Assert.IsTrue(coop.Host(out string problem), "host: " + problem);
             for (int i = 0; i < 10; i++) yield return null;
@@ -107,8 +107,8 @@ public sealed class CoopLiveTests
 
             Assert.AreEqual(hold + settings.RuneHold, lands.HoldOf(Region), 0.01f, "the friend's rune holds the host's land");
             Assert.AreEqual(hold + settings.RuneHold, seenHold, 0.01f, "and the friend's game hears so with the settlement");
-            Assert.AreEqual(Mathf.Min(0.6f, weakening + 0.3f), GameSession.Settlement.BreachWeakening, 0.001f, "one blow a run, however many strike it");
-            Assert.IsNotNull(GameSession.Settlement.Find(tor), "the host's lost one is home");
+            Assert.AreEqual(Mathf.Min(0.6f, weakening + 0.3f), GameSession.Here.BreachWeakening, 0.001f, "one blow a run, however many strike it");
+            Assert.IsNotNull(GameSession.Here.Find(tor), "the host's lost one is home");
         }
         finally
         {

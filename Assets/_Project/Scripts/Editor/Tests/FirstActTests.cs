@@ -93,11 +93,11 @@ public sealed class FirstActTests
         var heartroot = Load<MonsterDefinition>("Assets/_Project/Data/Monsters/TheHeartroot.asset");
         string id = heartroot.Prefab.GetComponent<BossEncounter>().Definition.Id;
         QuestObjective kill = Quest("WhatBreathesUnderTheRoots").Objectives.Single(o => o.Type == ObjectiveType.KillMonster);
-        bool before = GameSession.Settlement.IsBossDefeated(id);
+        bool before = GameSession.Here.IsBossDefeated(id);
         try
         {
             if (!before) Assert.AreEqual(0, kill.Owned(null, new QuestLog()));
-            GameSession.Settlement.MarkBossDefeated(id);
+            GameSession.Home.MarkBossDefeated(id);
             Assert.AreEqual(1, kill.Owned(null, new QuestLog()));
             QuestObjective wolves = QuestObjective.Create(ObjectiveType.KillMonster, 2, Load<MonsterDefinition>("Assets/_Project/Data/Monsters/ForestBittenWolf.asset"));
             Assert.AreEqual(0, wolves.Owned(null, new QuestLog()), "only a boss counts this way, and only when asked to");

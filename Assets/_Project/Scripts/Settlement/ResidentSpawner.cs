@@ -24,7 +24,7 @@ public sealed class ResidentSpawner : MonoBehaviour
 
     private void OnEnable()
     {
-        GameSession.Settlement.Changed += Sync;
+        GameSession.Here.Changed += Sync;
         if (started)
         {
             Sync();
@@ -33,7 +33,7 @@ public sealed class ResidentSpawner : MonoBehaviour
 
     private void OnDisable()
     {
-        GameSession.Settlement.Changed -= Sync;
+        GameSession.Here.Changed -= Sync;
     }
 
     private void Start()
@@ -46,7 +46,7 @@ public sealed class ResidentSpawner : MonoBehaviour
     private void RaiseCairns()
     {
         FallenCairn prefab = SettlementSettings.Current.FallenCairn;
-        IReadOnlyList<FallenRecord> fallen = GameSession.Settlement.Fallen;
+        IReadOnlyList<FallenRecord> fallen = GameSession.Here.Fallen;
         Vector3 centre = HomePortal.Current != null ? HomePortal.Current.transform.position : transform.position;
         for (int i = 0; prefab != null && i < fallen.Count; i++)
         {
@@ -67,7 +67,7 @@ public sealed class ResidentSpawner : MonoBehaviour
         for (int i = 0; i < bosses.Count; i++)
         {
             BossDefinition boss = bosses[i];
-            if (boss != null && boss.Trophy != null && GameSession.Settlement.IsBossDefeated(boss.Id) && trophies.Add(boss))
+            if (boss != null && boss.Trophy != null && GameSession.Here.IsBossDefeated(boss.Id) && trophies.Add(boss))
             {
                 Instantiate(boss.Trophy, FallenCairn.SpotFor(centre, i, TrophyRing, 200f), Quaternion.Euler(0f, i * 53f, 0f), transform).Bind(boss);
             }
@@ -81,7 +81,7 @@ public sealed class ResidentSpawner : MonoBehaviour
             return;
         }
 
-        IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
+        IReadOnlyList<ResidentRecord> residents = GameSession.Here.Residents;
         for (int i = 0; i < residents.Count; i++)
         {
             ResidentDefinition resident = residents[i].Resident;

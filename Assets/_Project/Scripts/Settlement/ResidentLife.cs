@@ -419,7 +419,7 @@ public sealed class ResidentLife : MonoBehaviour
         to = default;
         facingThere = Quaternion.identity;
         string who = npc.Resident != null ? npc.Resident.DisplayName : name;
-        int day = GameSession.Settlement.DaysPassed;
+        int day = GameSession.Here.DaysPassed;
         if (!ResidentRoutine.Outing(who, day, out float start, out float hours) || hour < start || hour >= start + hours)
         {
             return false;

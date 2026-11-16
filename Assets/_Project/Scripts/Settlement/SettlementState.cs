@@ -554,7 +554,7 @@ public sealed class SettlementState
     /// True while this is the copy of the host's settlement a guest plays in (co-op): it is taken on every couple of seconds
     /// (<see cref="TakeOn"/>), so a change made to it is undone at the host's next word.
     /// </summary>
-    public bool IsBorrowed => HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Settlement);
+    public bool IsBorrowed => HavenVisit.IsVisiting && ReferenceEquals(this, GameSession.Here);
 
     // Called by every change: says loudly, once a change, when it is made to a borrowed copy, so a new leak shows the first
     // time co-op is played (five were found by reading the code, 2026-11-11). Send it home (HavenVisit.ChangeHome), to the

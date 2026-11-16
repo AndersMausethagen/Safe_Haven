@@ -210,6 +210,43 @@ public sealed class ConventionTests
         CollectionAssert.IsEmpty(direct, "ask PlayerBlows (FromTheShadows, CatchesUnaware, UnawareBlowWorth) instead");
     }
 
+    // Guard 9 of Docs/BugPatterns.md: two Havens, two names. In a friend's Haven (co-op) the Haven one stands in is the host's (Here,
+    // read only) and one's own is elsewhere (Home): one name for both had quests count the host's Haven, a guest's companion lost on the
+    // host's raid never lost at home, and writes undone at the host's next word.
+    [Test]
+    public void TheHavenHere_IsRead_AndOnesOwn_IsChanged()
+    {
+        string state = File.ReadAllText("Assets/_Project/Scripts/Settlement/SettlementState.cs");
+        // What changes a settlement says so (Borrowed(), which cries out when it is a guest's copy of the host's).
+        var changers = new HashSet<string>();
+        foreach (Match method in Regex.Matches(state, @"public\s+[\w<>\[\],\s]+?\s+(\w+)\s*\([^)]*\)\s*\{(?:(?!\n    \}).)*?Borrowed\(\)", RegexOptions.Singleline))
+        {
+            changers.Add(method.Groups[1].Value);
+        }
+
+        Assert.Greater(changers.Count, 20, "the settlement's changers were found");
+        var oldName = new List<string>();
+        var changingHere = new List<string>();
+        foreach ((string path, string source) in RuntimeScripts())
+        {
+            if (Regex.IsMatch(source, @"GameSession\.Settlement\b"))
+            {
+                oldName.Add(Path.GetFileNameWithoutExtension(path));
+            }
+
+            foreach (Match call in Regex.Matches(source, @"GameSession\.Here\.(\w+)\s*\("))
+            {
+                if (changers.Contains(call.Groups[1].Value))
+                {
+                    changingHere.Add($"{Path.GetFileNameWithoutExtension(path)}: {call.Groups[1].Value}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(oldName, "choose GameSession.Here (the Haven one stands in, to read) or GameSession.Home (one's own, to change)");
+        CollectionAssert.IsEmpty(changingHere, "the Haven one stands in is the host's in a friend's: change one's own (GameSession.Home), or the host's through HavenHelp");
+    }
+
     [Test]
     public void EveryStaticEventSubscription_IsUndone()
     {

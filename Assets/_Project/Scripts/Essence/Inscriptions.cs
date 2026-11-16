@@ -189,7 +189,14 @@ public static class Inscriptions
     /// <summary>The resident at home who carves (a job with Carves Past, Liv), or null. Not while away on a raid with the player.</summary>
     public static ResidentRecord Carver()
     {
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        // The player's own carver: in a friend's Haven (co-op) theirs carves for them, not the host's (it lent its reach and wrote its
+        // work on the copy, undone at the host's next word), as Liv's carving talk is offered only at home.
+        if (HavenVisit.InHostsHaven)
+        {
+            return null;
+        }
+
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (record != null && record.Job != null && record.Job.Carves)
             {

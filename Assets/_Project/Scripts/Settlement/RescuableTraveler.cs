@@ -15,7 +15,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable), typeof(NavMeshAgent))]
-[InAFriendsHaven(HavenUse.NotInAHaven, "found on a raid; they join the guest's own Haven (HavenVisit.RescuedHome)")]
+[InAFriendsHaven(HavenUse.NotInAHaven, "found on a raid; they join the guest's own Haven (GameSession.Home)")]
 public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 {
     private enum State
@@ -98,7 +98,8 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
 
         // Already living in Safe Haven: nobody to find here any more.
-        if (resident == null || GameSession.Settlement.HasResident(resident))
+        // (In the player's own Haven: on a friend's raid, one living in the host's is still theirs to find.)
+        if (resident == null || GameSession.Home.HasResident(resident))
         {
             gameObject.SetActive(false);
             return;
@@ -350,7 +351,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         // Rescued on a friend's raid (co-op): they make their home in this player's own Haven, not the friend's.
         if (HavenVisit.IsVisiting)
         {
-            if (HavenVisit.RescuedHome(resident))
+            if (GameSession.Home.AddResident(resident))
             {
                 raid.Report?.Rescued.Add(resident);
                 GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
@@ -365,7 +366,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             return;
         }
 
-        if (GameSession.Settlement.AddResident(resident))
+        if (GameSession.Home.AddResident(resident))
         {
             raid.Report?.Rescued.Add(resident);
             GameMessages.Post($"{resident.DisplayName} steps through the portal with you.", MessageKind.Gain);

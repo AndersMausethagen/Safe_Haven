@@ -18,11 +18,13 @@ public sealed class CoopHomeTests
     private static void Visit(SettlementState own)
     {
         Home.SetValue(null, new SaveData { scene = "SafeHaven", settlement = SaveMapper.ToData(own) });
+        // A new own Haven: the live one is made from it when first wanted (HavenVisit.OwnHaven).
+        typeof(HavenVisit).GetField("ownHaven", BindingFlags.NonPublic | BindingFlags.Static).SetValue(null, null);
         typeof(HavenVisit).GetProperty(nameof(HavenVisit.IsVisiting)).SetValue(null, true);
     }
 
-    private static SettlementState OwnHaven() =>
-        SaveMapper.SettlementFrom(((SaveData)Home.GetValue(null)).settlement, Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
+    // The guest's own Haven, alive while they visit (GameSession.Home): written into the game kept as home when it is saved.
+    private static SettlementState OwnHaven() => HavenVisit.OwnHaven;
 
     private static void Leave()
     {
@@ -39,11 +41,11 @@ public sealed class CoopHomeTests
         try
         {
             Visit(new SettlementState());
-            int hostsBefore = GameSession.Settlement.SuccessfulExtractions;
+            int hostsBefore = GameSession.Here.SuccessfulExtractions;
             typeof(SettlementSystem).GetMethod("OnGameEvent", BindingFlags.NonPublic | BindingFlags.Static)
                 .Invoke(null, new object[] { new GameEvent(GameEventKind.RaidFinished, null, outcome: RaidOutcome.Extracted) });
             Assert.AreEqual(1, OwnHaven().SuccessfulExtractions, "their own Haven counts it (its breaches come by extractions)");
-            Assert.AreEqual(hostsBefore, GameSession.Settlement.SuccessfulExtractions, "the copy of the host's is left to the host");
+            Assert.AreEqual(hostsBefore, GameSession.Here.SuccessfulExtractions, "the copy of the host's is left to the host");
         }
         finally
         {
@@ -73,7 +75,7 @@ public sealed class CoopHomeTests
         GameSession.StartNewGame();
         try
         {
-            GameSession.Settlement.AddResident(person);
+            GameSession.Home.AddResident(person);
             Assert.AreEqual(1, rescue.Owned(null, log), "at home, one living there is found and home both");
 
             Visit(new SettlementState());
@@ -122,7 +124,7 @@ public sealed class CoopHomeTests
             HavenHelp.ForHost = (kind, id, share, most, run) => sent = kind;
             HavenHelp.WeakenBreach(0.3f, 0.6f);
             Assert.AreEqual(HavenHelpKind.WeakenBreach, sent);
-            Assert.AreEqual(0f, GameSession.Settlement.BreachWeakening, 0.001f, "nothing changes in the copy");
+            Assert.AreEqual(0f, GameSession.Here.BreachWeakening, 0.001f, "nothing changes in the copy");
         }
         finally
         {
@@ -131,9 +133,9 @@ public sealed class CoopHomeTests
 
         HavenHelp.FromFriend(HavenHelpKind.WeakenBreach, "", 0.3f, 0.6f, 777, "Ingrid", null);
         HavenHelp.FromFriend(HavenHelpKind.WeakenBreach, "", 0.3f, 0.6f, 777, "Bjarne", null);
-        Assert.AreEqual(0.3f, GameSession.Settlement.BreachWeakening, 0.001f, "every player on the run has the rumour, but it is one blow");
+        Assert.AreEqual(0.3f, GameSession.Here.BreachWeakening, 0.001f, "every player on the run has the rumour, but it is one blow");
         HavenHelp.FromFriend(HavenHelpKind.WeakenBreach, "", 0.3f, 0.6f, 778, "Ingrid", null);
-        Assert.AreEqual(0.6f, GameSession.Settlement.BreachWeakening, 0.001f);
+        Assert.AreEqual(0.6f, GameSession.Here.BreachWeakening, 0.001f);
         Leave();
     }
 
@@ -143,8 +145,8 @@ public sealed class CoopHomeTests
         GameSession.StartNewGame();
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         var tor = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Tor.asset");
-        GameSession.Settlement.AddResident(tor);
-        GameSession.Settlement.LoseResident(tor, "the Misty Woods");
+        GameSession.Home.AddResident(tor);
+        GameSession.Home.LoseResident(tor, "the Misty Woods");
         try
         {
             Visit(new SettlementState());
@@ -152,7 +154,7 @@ public sealed class CoopHomeTests
             HavenHelp.ForHost = (kind, id, share, most, run) => sent = id;
             Assert.IsTrue(HavenHelp.FoundAgain(tor));
             Assert.AreEqual(tor.Id, sent);
-            Assert.IsNull(GameSession.Settlement.Find(tor), "still lost in the copy until the host says otherwise");
+            Assert.IsNull(GameSession.Here.Find(tor), "still lost in the copy until the host says otherwise");
         }
         finally
         {
@@ -161,7 +163,7 @@ public sealed class CoopHomeTests
         }
 
         HavenHelp.FromFriend(HavenHelpKind.FoundAgain, tor.Id, 0f, 0f, 0, "Ingrid", content);
-        Assert.IsNotNull(GameSession.Settlement.Find(tor), "home in the host's Haven");
+        Assert.IsNotNull(GameSession.Here.Find(tor), "home in the host's Haven");
         Leave();
     }
 
@@ -173,9 +175,9 @@ public sealed class CoopHomeTests
         try
         {
             Visit(new SettlementState());
-            Assert.IsTrue(GameSession.Settlement.IsBorrowed);
+            Assert.IsTrue(GameSession.Here.IsBorrowed);
             LogAssert.Expect(LogType.Error, new Regex("Co-op: ChangeBlight changed the copy of the host's settlement"));
-            GameSession.Settlement.ChangeBlight(0.1f);
+            GameSession.Here.ChangeBlight(0.1f); // the copy, on purpose: what the error is for
             // Its own Haven, read and written by ChangeHome, is the guest's to change: no word.
             Assert.IsTrue(HavenVisit.ChangeHome(own => own.ChangeBlight(0.1f)));
             LogAssert.NoUnexpectedReceived();
@@ -185,7 +187,7 @@ public sealed class CoopHomeTests
             Leave();
         }
 
-        Assert.IsFalse(GameSession.Settlement.IsBorrowed, "at home the settlement is the player's own");
+        Assert.IsFalse(GameSession.Here.IsBorrowed, "at home the settlement is the player's own");
     }
 
     [Test]

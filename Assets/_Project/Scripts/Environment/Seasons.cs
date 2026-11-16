@@ -36,7 +36,7 @@ public sealed class Seasons : MonoBehaviour
     public static Seasons Active { get; private set; }
 
     /// <summary>The day of the year now (whole days and the fraction since dawn), from the saved days at home.</summary>
-    public float Day => startDay + GameSession.Settlement.DaysPassed + Mathf.Repeat(AtmosphereConditions.Hour - 6f, 24f) / 24f;
+    public float Day => startDay + GameSession.Here.DaysPassed + Mathf.Repeat(AtmosphereConditions.Hour - 6f, 24f) / 24f;
 
     private void OnEnable()
     {
@@ -94,7 +94,7 @@ public sealed class Seasons : MonoBehaviour
         // In a friend's Haven the day is theirs: it comes with their settlement (co-op).
         if (lastHour >= 0f && lastHour < 6f && hour >= 6f && hour - lastHour < 2f && !HavenVisit.IsVisiting)
         {
-            GameSession.Settlement.PassDay();
+            GameSession.Home.PassDay();
             global::Territory.Turn(true);
         }
 
@@ -104,7 +104,7 @@ public sealed class Seasons : MonoBehaviour
             return;
         }
 
-        float day = startDay + GameSession.Settlement.DaysPassed + Mathf.Repeat(hour - 6f, 24f) / 24f;
+        float day = startDay + GameSession.Here.DaysPassed + Mathf.Repeat(hour - 6f, 24f) / 24f;
         Vector3 look = cycle.LookAt(day);
         Shader.SetGlobalVector(SeasonId, new Vector4(look.x, look.y, look.z, GroundFrost(look.z, hour, AtmosphereConditions.Morning)));
         cycle.At(day, out SeasonCycle.Season season, out _, out _);

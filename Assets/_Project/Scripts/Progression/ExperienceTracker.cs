@@ -194,7 +194,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     /// </summary>
     public static float Boost(ProficiencyDefinition skill)
     {
-        float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Settlement.BuiltTier(skill.Mentor)) : 0f;
+        float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Here.BuiltTier(skill.Mentor)) : 0f;
         float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
         return Mathf.Max(0f, 1f + mentor + gain);
     }
@@ -208,7 +208,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         }
 
         int rank = 1 + SettlementSettings.Current.RankIndex(teacher.WorkDone);
-        int workplace = teacher.Job.Workplace != null ? GameSession.Settlement.BuiltTier(teacher.Job.Workplace) : 0;
+        int workplace = teacher.Job.Workplace != null ? GameSession.Here.BuiltTier(teacher.Job.Workplace) : 0;
         return Mathf.Clamp(Mathf.Max(rank, workplace), 1, Tiers.Max);
     }
 

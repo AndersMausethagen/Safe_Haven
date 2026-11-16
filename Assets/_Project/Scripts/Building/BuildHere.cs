@@ -304,7 +304,7 @@ public static class BuildHere
     // A workplace: how far its worker walks from home.
     private static void Workplace(BuildingDefinition kind, Vector3 point)
     {
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (record.Job == null || record.Job.Workplace != kind)
             {

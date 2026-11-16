@@ -40,8 +40,8 @@ public sealed class ResidentLearningTests
         GameSession.StartNewGame();
         try
         {
-            GameSession.Settlement.AddResident(Bjarne, smith);
-            ResidentRecord bjarne = GameSession.Settlement.Find(Bjarne);
+            GameSession.Home.AddResident(Bjarne, smith);
+            ResidentRecord bjarne = GameSession.Here.Find(Bjarne);
             int learned = ExperienceTracker.TakeLesson(bjarne);
             // A lesson is practice, so the Practice Time Scale slows it like any other (as the crafting test counts it).
             LevelingSettings leveling = LevelingSettings.Current;
@@ -49,7 +49,7 @@ public sealed class ResidentLearningTests
             Assert.AreEqual(learned, GameSession.Progress.ExperienceOf(smith.Teaches));
             Assert.AreEqual(0, ExperienceTracker.TakeLesson(bjarne), "one between raids");
 
-            GameSession.Settlement.RecordExtraction();
+            GameSession.Home.RecordExtraction();
             Assert.Greater(ExperienceTracker.TakeLesson(bjarne), 0, "again after a raid survived");
 
             bjarne.WorkDone = 150;

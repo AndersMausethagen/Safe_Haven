@@ -69,7 +69,7 @@ public sealed class GlimpseWatcher : MonoBehaviour
         Vector3 at = player.transform.position;
         float fromHome = HomePortal.Current != null ? Vector3.Distance(at, HomePortal.Current.transform.position) : float.MaxValue;
         float hour = AtmosphereConditions.Hour;
-        float blight = GameSession.Settlement.Blight;
+        float blight = GameSession.Here.Blight;
         Entry pick = Pick(entry => entry.prefab != null && fromHome >= entry.BeyondNow(blight) && SpiritBonds.Welcome(entry.prefab)
             && UnityEngine.Random.value < entry.byHour.Evaluate(hour), blight);
         if (pick == null)

@@ -514,7 +514,7 @@ public sealed partial class SkillsWindow : MonoBehaviour
         var parts = new List<string>();
         if (skill.Mentor != null)
         {
-            int tier = GameSession.Settlement.BuiltTier(skill.Mentor);
+            int tier = GameSession.Here.BuiltTier(skill.Mentor);
             float bonus = settings.MentorBonus(tier);
             parts.Add(bonus > 0f
                 ? $"{skill.Mentor.DisplayName} {Tiers.ToRoman(tier)}: <color={style.GoodHex}>+{Mathf.RoundToInt(bonus * 100f)}% experience</color>"

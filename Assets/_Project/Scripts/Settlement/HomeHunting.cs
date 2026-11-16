@@ -58,7 +58,7 @@ public sealed class HomeHunting : MonoBehaviour
             return;
         }
 
-        if (alive.Count < maxAlive + GameSession.Settlement.UpgradeBonus(level => level.extraGame) && Time.time >= nextSpawnAt && game.Count > 0)
+        if (alive.Count < maxAlive + GameSession.Here.UpgradeBonus(level => level.extraGame) && Time.time >= nextSpawnAt && game.Count > 0)
         {
             nextSpawnAt = Time.time + spawnInterval;
             TrySpawn();

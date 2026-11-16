@@ -103,7 +103,7 @@ public sealed class RaidPlanTests
     {
         var sigrid = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Sigrid.asset");
         Assert.IsNotNull(sigrid.RaidCompanion);
-        GameSession.Settlement.AddResident(sigrid);
+        GameSession.Home.AddResident(sigrid);
         RaidPlan plan = NewPlan();
         plan.Settle();
         CollectionAssert.AreEqual(new[] { sigrid }, plan.Companions);
@@ -115,7 +115,7 @@ public sealed class RaidPlanTests
         plan.StepCompanion(-1);
         Assert.AreSame(sigrid, plan.Companion);
 
-        GameSession.Settlement.LoseResident(sigrid, "The Misty Woods");
+        GameSession.Home.LoseResident(sigrid, "The Misty Woods");
         plan.Settle();
         Assert.IsNull(plan.Companion, "Someone lost can't be asked along");
         Assert.AreEqual(0, plan.Companions.Count);
@@ -136,7 +136,7 @@ public sealed class RaidPlanTests
     public void APlan_IsSettledFromTheStart()
     {
         var sigrid = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Sigrid.asset");
-        GameSession.Settlement.AddResident(sigrid);
+        GameSession.Home.AddResident(sigrid);
         RaidPlan plan = NewPlan();
         plan.Begin(Portal(mistyWoods), null);
         Assert.IsNotNull(plan.Difficulty, "A tier from the start");

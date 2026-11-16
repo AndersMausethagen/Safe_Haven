@@ -77,9 +77,9 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     private static void ResetForNewPlaySession() => Current = null;
 
     /// <summary>How far from the portal the player may build, at the current ward level.</summary>
-    public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Settlement.WardLevel)
-        + HavenSettings.Current.WardBonusAt(GameSession.Settlement.HavenRank)
-        - (GameSession.Settlement.WardStrain > 0 ? WardBreachSettings.Current.StrainRadius : 0f);
+    public float WardRadius => SettlementSettings.Current.WardRadiusAt(GameSession.Here.WardLevel)
+        + HavenSettings.Current.WardBonusAt(GameSession.Here.HavenRank)
+        - (GameSession.Here.WardStrain > 0 ? WardBreachSettings.Current.StrainRadius : 0f);
 
     /// <summary>True when a point (and a margin around it, such as a building's size) is inside the ward.</summary>
     public bool Contains(Vector3 position, float margin = 0f)
@@ -255,14 +255,14 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
     private void OnEnable()
     {
         interactable.Completed.AddListener(OnUsed);
-        GameSession.Settlement.Changed += DrawWard;
+        GameSession.Here.Changed += DrawWard;
         DrawWard();
     }
 
     private void OnDisable()
     {
         interactable.Completed.RemoveListener(OnUsed);
-        GameSession.Settlement.Changed -= DrawWard;
+        GameSession.Here.Changed -= DrawWard;
     }
 
     private void OnDestroy()

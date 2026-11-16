@@ -63,7 +63,7 @@ public sealed class PlantedTrees : MonoBehaviour, ISaveable
     public int Count => planted.Count;
 
     /// <summary>The in-game day now, counting from the first dawn, with the hour as its fraction (days start at dawn).</summary>
-    public static float Today => (GameSession.Settlement != null ? GameSession.Settlement.DaysPassed : 0) + Mathf.Repeat(AtmosphereConditions.Hour - 6f, 24f) / 24f;
+    public static float Today => (GameSession.Here != null ? GameSession.Here.DaysPassed : 0) + Mathf.Repeat(AtmosphereConditions.Hour - 6f, 24f) / 24f;
 
     private void Awake()
     {

@@ -40,10 +40,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         if (gameEvent.Kind == GameEventKind.RaidFinished)
         {
             RaidOutcome outcome = gameEvent.Outcome;
-            if (!HavenVisit.ChangeHome(own => own.CameHome(outcome)))
-            {
-                GameSession.Settlement.CameHome(outcome);
-            }
+            GameSession.Home.CameHome(outcome);
         }
     }
 
@@ -55,7 +52,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
         // home, not one who went along on the raid.
@@ -93,7 +90,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             WorkerLearned(station, recipe);
             if (recipe.OutputDefinition is IStackDefinition made)
             {
-                GameSession.Settlement.NoteMadeByWorker(made, recipe.OutputAmount);
+                GameSession.Home.NoteMadeByWorker(made, recipe.OutputAmount);
             }
         }
         else
@@ -110,7 +107,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     // one more out of what they make.
     private static void WorkerLearned(StationQueue station, RecipeDefinition recipe)
     {
-        ResidentRecord worker = GameSession.Settlement.WorkerAt(station.Type);
+        ResidentRecord worker = GameSession.Here.WorkerAt(station.Type);
         if (worker == null)
         {
             return;
@@ -156,7 +153,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
-        foreach (StationQueue station in GameSession.Settlement.Workshops.Queues)
+        foreach (StationQueue station in GameSession.Here.Workshops.Queues)
         {
             bool blocked = station.Blocked;
             if (blocked && !blockedStations.Contains(station.StationId))

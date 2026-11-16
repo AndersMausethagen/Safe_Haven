@@ -74,7 +74,7 @@ public sealed class ResidentWindow : MonoBehaviour
     /// <summary>Opens it on someone who lives here, at <paramref name="first"/>'s tab.</summary>
     public static void Show(ResidentDefinition resident, string first = null)
     {
-        if (resident == null || GameSession.Settlement.Find(resident) == null)
+        if (resident == null || GameSession.Here.Find(resident) == null)
         {
             return;
         }
@@ -253,7 +253,7 @@ public sealed class ResidentWindow : MonoBehaviour
             return;
         }
 
-        if (who == null || GameSession.Settlement.Find(who) == null)
+        if (who == null || GameSession.Here.Find(who) == null)
         {
             window.Close();
             return;
@@ -267,7 +267,7 @@ public sealed class ResidentWindow : MonoBehaviour
 
     private void Refresh()
     {
-        ResidentRecord record = who != null ? GameSession.Settlement.Find(who) : null;
+        ResidentRecord record = who != null ? GameSession.Here.Find(who) : null;
         if (record == null)
         {
             return;
@@ -308,7 +308,7 @@ public sealed class ResidentWindow : MonoBehaviour
     private void SetHeader(ResidentRecord record, BuildingObject house, BuildingObject work, UIStyle style)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        headerRows[0].Set(house != null ? house.Definition.DisplayName : record.Home.Length > 0 || GameSession.Settlement.HasBed(record) ? "A bed" : "By the fire",
+        headerRows[0].Set(house != null ? house.Definition.DisplayName : record.Home.Length > 0 || GameSession.Here.HasBed(record) ? "A bed" : "By the fire",
             house != null ? 1f : 0f, style.Accent, style.Warning);
         CraftingStation station = work != null ? work.GetComponent<CraftingStation>() : null;
         headerRows[1].Set(station != null ? $"{station.Speed * 100f:0}% speed" : work != null ? work.Definition.DisplayName : "None", 0f, style.Text, style.Accent);
@@ -343,7 +343,7 @@ public sealed class ResidentWindow : MonoBehaviour
         else
         {
             houseCard.Set("By the fire", "No bed of their own", false);
-            houseLine.text = GameSession.Settlement.Housed >= GameSession.Settlement.Residents.Count
+            houseLine.text = GameSession.Here.Housed >= GameSession.Here.Residents.Count
                 ? "" : "Every bed is taken. Another Hut or Cottage gives them one of their own, and their work goes faster for it.";
         }
 
@@ -382,7 +382,7 @@ public sealed class ResidentWindow : MonoBehaviour
                 continue;
             }
 
-            bool has = GameSession.Settlement.HasComfort(house.Id, comfort.id);
+            bool has = GameSession.Here.HasComfort(house.Id, comfort.id);
             bool afford = Player.Current != null && MaterialPool.For(Player.Current.gameObject).CanAfford(System.Array.Empty<ResourceAmount>(), comfort.cost);
             HomeLifeSettings.Comfort chosen = comfort;
             BuildingObject inHouse = house;
@@ -412,7 +412,7 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         int row = 0;
-        StationQueue queue = WorkerProduction.QueueOf(GameSession.Settlement, record);
+        StationQueue queue = WorkerProduction.QueueOf(GameSession.Here, record);
         if (job != null && queue != null)
         {
             foreach (WorkOrder order in job.WorkOrders)
@@ -466,7 +466,7 @@ public sealed class ResidentWindow : MonoBehaviour
     private List<MenuAction> JobActions(ResidentRecord record)
     {
         var actions = new List<MenuAction>();
-        foreach (JobDefinition job in GameSession.Settlement.JobsOpenTo(who))
+        foreach (JobDefinition job in GameSession.Here.JobsOpenTo(who))
         {
             if (job == null)
             {
@@ -502,7 +502,7 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             string id = house.Id;
             int chosenBy = 0;
-            foreach (ResidentRecord other in GameSession.Settlement.Residents)
+            foreach (ResidentRecord other in GameSession.Here.Residents)
             {
                 chosenBy += other != record && other.HomeChosen == id ? 1 : 0;
             }
@@ -570,7 +570,7 @@ public sealed class ResidentWindow : MonoBehaviour
             shown.Add((record.Job.DisplayName, style.Good));
         }
 
-        shown.Add((GameSession.Settlement.HasBed(record) ? "Has a bed" : "No bed", GameSession.Settlement.HasBed(record) ? style.Info : style.Warning));
+        shown.Add((GameSession.Here.HasBed(record) ? "Has a bed" : "No bed", GameSession.Here.HasBed(record) ? style.Info : style.Warning));
         HomeLifeSettings.Liking liking = HomeLifeSettings.Current.LikingOf(who);
         if (liking != null)
         {

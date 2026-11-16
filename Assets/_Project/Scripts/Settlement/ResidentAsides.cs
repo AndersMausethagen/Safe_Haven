@@ -43,7 +43,7 @@ public sealed class ResidentAsides : MonoBehaviour
         }
 
         SettlementSettings settings = SettlementSettings.Current;
-        int homecoming = GameSession.Settlement.SuccessfulExtractions;
+        int homecoming = GameSession.Here.SuccessfulExtractions;
         string line = null;
         if (newsToldAt != homecoming)
         {

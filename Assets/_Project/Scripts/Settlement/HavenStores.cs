@@ -51,7 +51,7 @@ public static class HavenStores
             cargo.Add((transport.Definition != null ? transport.Definition.DisplayName : transport.name, transport.Cargo));
         }
 
-        return Read(GameSession.Stash, GameSession.Settlement.Workshops, cargo);
+        return Read(GameSession.Stash, GameSession.Here.Workshops, cargo);
     }
 
     public static List<HavenShelf> Read(StashStorage stash, WorkshopState workshops, IEnumerable<(string Place, ItemContainer Items)> cargo)

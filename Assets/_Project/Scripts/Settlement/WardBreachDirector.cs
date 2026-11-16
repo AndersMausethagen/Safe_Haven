@@ -67,13 +67,13 @@ public sealed class WardBreachDirector : MonoBehaviour
 
     /// <summary>The breach under way, else the one due next.</summary>
     public WardBreachDefinition Definition => running != null ? running
-        : WardBreachSettings.Current.For(GameSession.Settlement.BreachesWon) ?? definition;
+        : WardBreachSettings.Current.For(GameSession.Here.BreachesWon) ?? definition;
 
     public bool IsActive { get; private set; }
 
     /// <summary>True from the ward giving way (its countdown) to the breach's end: the Haven is under attack.</summary>
     public bool IsUnderWay => IsActive || givingWay;
-    public bool IsPending => Definition != null && !IsActive && GameSession.Settlement.Breach == BreachStatus.Pending;
+    public bool IsPending => Definition != null && !IsActive && GameSession.Here.Breach == BreachStatus.Pending;
 
     /// <summary>The ways in, for the breach pending or under way. Empty for the first, which keeps to its marked path.</summary>
     public IReadOnlyList<BreachLane> Lanes => lanes;
@@ -96,7 +96,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     {
         get
         {
-            SettlementState settlement = GameSession.Settlement;
+            SettlementState settlement = GameSession.Here;
             return IsPending && settlement.BreachesWon > 0
                 && settlement.SuccessfulExtractions >= settlement.BreachPendingSince + WardBreachSettings.Current.RaidsPutOff;
         }
@@ -150,12 +150,12 @@ public sealed class WardBreachDirector : MonoBehaviour
 
     private void OnEnable()
     {
-        GameSession.Settlement.Changed += UpdateMarker;
+        GameSession.Here.Changed += UpdateMarker;
     }
 
     private void OnDisable()
     {
-        GameSession.Settlement.Changed -= UpdateMarker;
+        GameSession.Here.Changed -= UpdateMarker;
     }
 
     private IEnumerator Start()
@@ -175,7 +175,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     // A breach only ever comes due on the way home from a successful raid, never after a failed one (GDD §6.6).
     private void Announce()
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         WardBreachDefinition next = Definition;
         if (next == null)
         {
@@ -283,8 +283,8 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         ward = Instantiate(prefab, HomePortal.Current.transform.position, Quaternion.identity);
-        float stronger = GameSession.Settlement.WardLevel * WardBreachSettings.Current.WardHealthPerLevel
-                         + GameSession.Settlement.JobBonus(job => job.WardHealth);
+        float stronger = GameSession.Here.WardLevel * WardBreachSettings.Current.WardHealthPerLevel
+                         + GameSession.Here.JobBonus(job => job.WardHealth);
         ward.GetComponent<Combatant>().Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, stronger, this));
         ward.Heal(ward.MaxHealth);
         ward.Died += OnWardFell;
@@ -303,7 +303,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             }
 
             // What was done to the breach's source in a raid leaves it short of fighters, though never of all of them.
-            List<GameObject> roster = running.Roster(wave, GameSession.Settlement.BreachesWon);
+            List<GameObject> roster = running.Roster(wave, GameSession.Here.BreachesWon);
             roster.RemoveAll(prefab => prefab == null);
             // A wave with nobody in it (every group gated by breaches won, or without a prefab) is skipped: roster[0] threw and
             // left the breach spawning for good, ending only at its longest.
@@ -312,7 +312,7 @@ public sealed class WardBreachDirector : MonoBehaviour
                 continue;
             }
 
-            int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Settlement.BreachWeakening)));
+            int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Here.BreachWeakening)));
             for (int i = 0; i < fielded && IsActive; i++)
             {
                 Spawn(roster[i]);
@@ -363,7 +363,7 @@ public sealed class WardBreachDirector : MonoBehaviour
             loot.enabled = false;
         }
 
-        float stronger = WardBreachSettings.Current.Strength(GameSession.Settlement.BreachesWon) * (1f - GameSession.Settlement.BreachWeakening);
+        float stronger = WardBreachSettings.Current.Strength(GameSession.Here.BreachesWon) * (1f - GameSession.Here.BreachWeakening);
         if (enemy.TryGetComponent(out Combatant combatant))
         {
             StatSheet stats = combatant.Stats;
@@ -466,7 +466,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         WardBreachDefinition breach = running;
         SendAway();
         End();
-        GameSession.Settlement.WinBreach(WardBreachSettings.Current.RaidsBetween);
+        GameSession.Home.WinBreach(WardBreachSettings.Current.RaidsBetween);
         GameObject player = Player.Current != null ? Player.Current.gameObject : null;
         MaterialPool pool = MaterialPool.For(player);
         foreach (ResourceAmount reward in breach.Reward)
@@ -477,7 +477,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         string rewards = breach.Reward.Count > 0 ? $" Reward: {AmountText.Describe(breach.Reward)}." : "";
         // What holding it off has taught the defences (8.7): the upgrades that waited for this many breaches won.
         PlayerCrafting crafting = player != null ? player.GetComponent<PlayerCrafting>() : null;
-        List<string> opened = crafting != null ? BuildingUnlocks.OpenedByBreaches(GameSession.Settlement.BreachesWon, crafting.Buildings) : new List<string>();
+        List<string> opened = crafting != null ? BuildingUnlocks.OpenedByBreaches(GameSession.Here.BreachesWon, crafting.Buildings) : new List<string>();
         if (opened.Count > 0)
         {
             rewards += $" Now you can raise {string.Join(" and ", opened)}.";
@@ -503,7 +503,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         SendAway();
         End();
         WardBreachSettings settings = WardBreachSettings.Current;
-        GameSession.Settlement.LoseBreach(settings.StrainRaids);
+        GameSession.Home.LoseBreach(settings.StrainRaids);
         GameMessages.Post(breach.FailedText, MessageKind.Warning);
         AudioManager.Play(AudioManager.Sounds?.BreachLost, transform.position);
         string strained = settings.StrainRaids > 0
@@ -645,8 +645,8 @@ public sealed class WardBreachDirector : MonoBehaviour
 
         // Found again whenever what they run round changes within a stay too: the ward raised (it widens) or a building put up
         // where a lane started, not only at the next breach.
-        int breachNumber = GameSession.Settlement.BreachesWon;
-        var key = (GameSession.Settlement.WardLevel, BuildingObject.Active.Count);
+        int breachNumber = GameSession.Here.BreachesWon;
+        var key = (GameSession.Here.WardLevel, BuildingObject.Active.Count);
         if (lanesFor != breachNumber || key != lanesSeen)
         {
             lanesSeen = key;

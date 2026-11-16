@@ -71,7 +71,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         }
     }
 
-    public bool IsRepaired => !needsRepair || GameSession.Settlement.PortalRepaired;
+    public bool IsRepaired => !needsRepair || GameSession.Here.PortalRepaired;
     public string InteractionName => IsRepaired ? "Portal" : "Sleeping Portal";
     public string RuinText => ruinText;
 
@@ -89,14 +89,14 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
             interactable.Completed.AddListener(OnUsed);
         }
 
-        GameSession.Settlement.Changed += ShowState;
+        GameSession.Here.Changed += ShowState;
         ShowState();
     }
 
     private void OnDisable()
     {
         interactable.Completed.RemoveListener(OnUsed);
-        GameSession.Settlement.Changed -= ShowState;
+        GameSession.Here.Changed -= ShowState;
     }
 
     /// <summary>True while a position is close enough to keep the preparation window open.</summary>
@@ -172,7 +172,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     private static void AddImprovement(MenuPage page, GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.PortalLevel;
+        int level = GameSession.Here.PortalLevel;
         if (level >= settings.PortalLevels.Count)
         {
             return;
@@ -188,7 +188,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     private static void Improve(GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.PortalLevel;
+        int level = GameSession.Here.PortalLevel;
         if (level >= settings.PortalLevels.Count || !MaterialPool.For(user).TrySpend(settings.PortalLevels[level].cost, settings.PortalLevels[level].items))
         {
             return;
@@ -202,13 +202,13 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
     private static HavenDecisions.Outcome ImprovePortal(string fromLevel)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.PortalLevel;
+        int level = GameSession.Here.PortalLevel;
         if (!int.TryParse(fromLevel, out int seen) || seen != level || level >= settings.PortalLevels.Count)
         {
             return HavenDecisions.Outcome.Refused("The portal was improved meanwhile: what you gave is back in your bag.");
         }
 
-        GameSession.Settlement.ImprovePortal();
+        GameSession.Home.ImprovePortal();
         // The safe pocket grows with the portal (the Haven's own player's).
         if (Player.Current != null && Player.Current.TryGetComponent(out ItemInventory inventory))
         {
@@ -275,7 +275,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
             return;
         }
 
-        GameSession.Settlement.RepairPortal();
+        GameSession.Home.RepairPortal();
         GameMessages.Post("The stones drink the Life Orbs' light. The portal wakes, humming, and the mist beyond it parts.", MessageKind.Gain);
         if (repairedEvent != null)
         {

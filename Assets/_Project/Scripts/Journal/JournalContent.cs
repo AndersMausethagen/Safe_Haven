@@ -323,7 +323,7 @@ public static class JournalContent
 
     private static bool IsHome(ResidentDefinition who)
     {
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (record.Resident == who)
             {

@@ -82,7 +82,7 @@ public sealed class CorruptionNights : MonoBehaviour
         // The first arrival of a play session (a new or loaded game) is no homecoming: nothing is foretold for it.
         if (foretoldFor < 0)
         {
-            foretoldFor = GameSession.Settlement.SuccessfulExtractions;
+            foretoldFor = GameSession.Here.SuccessfulExtractions;
         }
 
         foretellAt = Time.time + ForetellDelay;
@@ -189,7 +189,7 @@ public sealed class CorruptionNights : MonoBehaviour
     // is near or waiting, which is the home's fight then.
     private void Foretell()
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         int extractions = settlement.SuccessfulExtractions;
         if (extractions == foretoldFor || HavenVisit.IsVisiting)
         {
@@ -228,7 +228,7 @@ public sealed class CorruptionNights : MonoBehaviour
         }
 
         Vector3 centre = Centre();
-        int count = settings.CountAt(PortalTiers.Current, GameSession.Settlement.Blight);
+        int count = settings.CountAt(PortalTiers.Current, GameSession.Here.Blight);
         float chaseLimit = WardBreachSettings.Current.ChaseLimit;
         for (int i = 0; i < count; i++)
         {
@@ -283,7 +283,7 @@ public sealed class CorruptionNights : MonoBehaviour
             leaveAt = -1f;
             ReturnWeather();
             GameMessages.Post(CorruptionSettings.Current.Cleared, MessageKind.Gain);
-            GameSession.Settlement.ChangeBlight(-0.1f); // beaten back: the woods heal a little
+            GameSession.Home.ChangeBlight(-0.1f); // beaten back: the woods heal a little
             int reward = CorruptionSettings.Current.ExperienceFor(bandSize);
             if (reward > 0)
             {
@@ -335,6 +335,6 @@ public sealed class CorruptionNights : MonoBehaviour
         fought = false;
         leaveAt = Time.time + CorruptionSettings.Current.DawnSeconds;
         // They got away with it: the blight they carry spreads in the woods round home.
-        GameSession.Settlement.ChangeBlight(0.08f + 0.04f * attackers.Count);
+        GameSession.Home.ChangeBlight(0.08f + 0.04f * attackers.Count);
     }
 }

@@ -96,7 +96,7 @@ public sealed class HavenProgress : MonoBehaviour
         renown = now;
         HavenSettings settings = HavenSettings.Current;
         int rank = settings.RankFor(renown);
-        if (GameSession.Settlement.ReachHavenRank(rank))
+        if (GameSession.Home.ReachHavenRank(rank))
         {
             HavenSettings.Rank reached = settings.Ranks[rank];
             if (HavenHud.Current != null)
@@ -116,7 +116,7 @@ public sealed class HavenProgress : MonoBehaviour
     // Every rank reached counts, so a haven that got there before this settler existed still gets them. Beds help, but nobody waits for one.
     private static void WelcomeSettlers(HavenSettings settings)
     {
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         for (int i = 0; i <= settlement.HavenRank && i < settings.Ranks.Count; i++)
         {
             ResidentDefinition settler = settings.Ranks[i].settler;
@@ -139,8 +139,8 @@ public sealed class HavenProgress : MonoBehaviour
     {
         // In a friend's Haven (co-op) what stands there is noted too, into the copy: its tiers and beds count for the guest
         // there and on the raids they follow from it (SettlementState.TakeOn keeps them).
-        GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
-        GameSession.Settlement.NoteScaffolds(ResidentBuilders.AnyScaffold());
+        GameSession.Here.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
+        GameSession.Here.NoteScaffolds(ResidentBuilders.AnyScaffold());
         // The friend's stations are theirs to run: their queues are made in their game.
         if (HavenVisit.IsVisiting)
         {
@@ -162,7 +162,7 @@ public sealed class HavenProgress : MonoBehaviour
 
     private static void TellWhatWorkersMade()
     {
-        var made = GameSession.Settlement.MadeByWorkers;
+        var made = GameSession.Here.MadeByWorkers;
         if (made.Count == 0)
         {
             return;
@@ -181,13 +181,13 @@ public sealed class HavenProgress : MonoBehaviour
     // Every rank reached counts, so a quest about a rank also finishes for a haven that got there before the event existed.
     private static void RaiseRankEvents(HavenSettings settings)
     {
-        int rank = GameSession.Settlement.HavenRank;
+        int rank = GameSession.Here.HavenRank;
         if (rank > 0)
         {
             GameEvents.Raise(new GameEvent(GameEventKind.HavenRankReached, null, rank, Player.Current != null ? Player.Current.gameObject : null));
         }
 
-        for (int i = 0; i <= GameSession.Settlement.HavenRank && i < settings.Ranks.Count; i++)
+        for (int i = 0; i <= GameSession.Here.HavenRank && i < settings.Ranks.Count; i++)
         {
             GameEventDefinition reachedEvent = settings.Ranks[i].reachedEvent;
             if (reachedEvent != null && !GameSession.Quests.HasHappened(reachedEvent))

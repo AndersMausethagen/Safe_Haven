@@ -428,7 +428,7 @@ public sealed class QuestObjective
             case ObjectiveType.AssignJob:
                 return HasJob() ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
-                return GameSession.Settlement.HavenRank >= Rank ? 1 : 0;
+                return GameSession.Home.HavenRank >= Rank ? 1 : 0; // the player's own Haven's rank, also on a friend's raid
             case ObjectiveType.StoreItem:
                 // Already in the stash (an older save, or put away before the quest): it is safe, which is the point.
                 StashStorage stash = GameSession.Stash;
@@ -451,12 +451,11 @@ public sealed class QuestObjective
             return false;
         }
 
-        // Beaten for the player's own Haven: in a friend's, the settlement is the host's, and their win isn't this player's.
-        return HavenVisit.IsVisiting ? HavenVisit.HomeBeatBoss(boss.Definition.Id) : GameSession.Settlement.IsBossDefeated(boss.Definition.Id);
+        // Beaten for the player's own Haven: in a friend's, the Haven here is the host's, and their win isn't this player's.
+        return GameSession.Home.IsBossDefeated(boss.Definition.Id);
     }
 
-    private static bool LivesAtHome(ResidentDefinition person) =>
-        HavenVisit.IsVisiting ? HavenVisit.HomeHasResident(person.Id) : GameSession.Settlement.HasResident(person);
+    private static bool LivesAtHome(ResidentDefinition person) => GameSession.Home.HasResident(person);
 
     // Buildings of the kind (or any) standing at the tier asked for or above.
     private int StandingAtTier()
@@ -595,7 +594,8 @@ public sealed class QuestObjective
     // Someone holds the job (the person named, or anyone).
     private bool HasJob()
     {
-        SettlementState settlement = GameSession.Settlement;
+        // The player's own people's jobs, also on a friend's raid.
+        SettlementState settlement = GameSession.Home;
         if (person != null)
         {
             ResidentRecord record = settlement.Find(person);

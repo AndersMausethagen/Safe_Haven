@@ -63,7 +63,7 @@ public static class AltarWork
     public static bool Purify(GameObject user, int batches)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int room = settings.MaxQueuedBatches - GameSession.Settlement.PurificationQueued;
+        int room = settings.MaxQueuedBatches - GameSession.Here.PurificationQueued;
         batches = Mathf.Min(batches, room);
         int cost = batches * settings.CursedPerBatch;
         var price = new[] { new ResourceAmount(settings.CursedEssence, cost) };
@@ -80,13 +80,13 @@ public static class AltarWork
     private static HavenDecisions.Outcome QueueAtAltar(string count)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int room = settings.MaxQueuedBatches - GameSession.Settlement.PurificationQueued;
+        int room = settings.MaxQueuedBatches - GameSession.Here.PurificationQueued;
         if (!int.TryParse(count, out int batches) || batches <= 0 || batches > room)
         {
             return HavenDecisions.Outcome.Refused("The altar has no room for that much now: your essence is back in your bag.");
         }
 
-        GameSession.Settlement.QueuePurification(batches, settings.MaxQueuedBatches);
+        GameSession.Here.QueuePurification(batches, settings.MaxQueuedBatches);
         return HavenDecisions.Outcome.Made($"The altar takes {batches * settings.CursedPerBatch} {settings.CursedEssence.DisplayName}.");
     }
 

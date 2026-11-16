@@ -193,7 +193,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private static bool IsAboveThePlayer(ItemDefinition item)
     {
         bool ladder = item.Category == ItemCategory.Material || item.Category == ItemCategory.Equipment || item.Category == ItemCategory.Tool;
-        return ladder && item.Tier > Mathf.Max(MostEarlyTier, GameSession.Settlement.SmithyTier + 1);
+        return ladder && item.Tier > Mathf.Max(MostEarlyTier, GameSession.Here.SmithyTier + 1);
     }
 
     private void ShowState()

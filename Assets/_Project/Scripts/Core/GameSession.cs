@@ -44,7 +44,22 @@ public static class GameSession
     public static CharacterProgress Progress => progress ??= new CharacterProgress();
 
     /// <summary>Safe Haven as a place: portal, ward, residents, breach, purification. Created on first use.</summary>
-    public static SettlementState Settlement => settlement ??= new SettlementState();
+    /// <summary>The settlement by its old name, which meant two Havens in a friend's: choose <see cref="Here"/> or <see cref="Home"/>.</summary>
+    [System.Obsolete("Choose GameSession.Here (the Haven one stands in, to read) or GameSession.Home (one's own, to change): Docs/BugPatterns.md, guard 9.")]
+    public static SettlementState Settlement => Here;
+
+    /// <summary>
+    /// The Haven the player stands in, to read: their own, or in a friend's (co-op) the copy of the host's, which the host's word
+    /// keeps (SettlementState.TakeOn) and a guest never changes (Docs/BugPatterns.md, guard 9: ConventionTests bans its changers).
+    /// </summary>
+    public static SettlementState Here => settlement ??= new SettlementState();
+
+    /// <summary>
+    /// The player's own Haven, always theirs to change: the one they stand in at home, and in a friend's their own, kept alive for
+    /// the visit (HavenVisit.OwnHaven) and saved with them. Their extraction, the person they rescued, the boss they beat, their
+    /// companion lost: here, in one call, wherever they are.
+    /// </summary>
+    public static SettlementState Home => HavenVisit.OwnHaven ?? Here;
 
     /// <summary>The playthrough being logged for playtests. A new game starts a new run; a load continues the saved one.</summary>
     public static PlaytestRun Playtest => playtest ??= PlaytestRun.StartNew();

@@ -505,10 +505,12 @@ public sealed class CoopTests
         homeField.SetValue(null, ownGame);
         try
         {
-            Assert.IsTrue(HavenVisit.RescuedHome(traveller));
-            Assert.IsFalse(HavenVisit.RescuedHome(traveller), "Once.");
-            HavenVisit.BossBeatenHome("heartroot");
-            HavenVisit.BossBeatenHome("heartroot");
+            // GameSession.Home is the guest's own Haven while they visit (guard 9).
+            Assert.AreSame(HavenVisit.OwnHaven, GameSession.Home);
+            Assert.IsTrue(GameSession.Home.AddResident(traveller));
+            Assert.IsFalse(GameSession.Home.AddResident(traveller), "Once.");
+            GameSession.Home.MarkBossDefeated("heartroot");
+            GameSession.Home.MarkBossDefeated("heartroot");
 
             SaveData written = HavenVisit.ForOwnSave(new SaveData { scene = "SafeHaven" });
             Assert.AreEqual(1, written.settlement.residents.Count);
@@ -545,8 +547,8 @@ public sealed class CoopTests
             Assert.IsTrue(HavenVisit.StoresNeedAsking(), "taken back");
 
             Assert.IsFalse(SpiritBonds.HasGift(SpiritBonds.NokkGift));
-            HavenVisit.SpiritGiftHome(SpiritBonds.NokkGift);
-            HavenVisit.SpiritGiftHome(SpiritBonds.NokkGift);
+            GameSession.Home.GiveSpiritGift(SpiritBonds.NokkGift);
+            GameSession.Home.GiveSpiritGift(SpiritBonds.NokkGift);
             Assert.IsTrue(SpiritBonds.HasGift(SpiritBonds.NokkGift), "learnt at a friend's pond, it is theirs");
             SaveData written = HavenVisit.ForOwnSave(new SaveData { scene = "SafeHaven" });
             CollectionAssert.AreEqual(new[] { SpiritBonds.NokkGift }, written.settlement.spiritGifts, "and goes home with them, once");

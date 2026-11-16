@@ -75,8 +75,8 @@ public sealed class PurificationAltar : MonoBehaviour
             yield = Mathf.Max(yield, construction.Sum(level => level.purifyYield));
         }
 
-        GameSession.Settlement.SetPurificationBonus(speed);
-        GameSession.Settlement.SetPurificationYield(yield);
+        GameSession.Home.SetPurificationBonus(speed);
+        GameSession.Home.SetPurificationYield(yield);
     }
 
     private void OnUsed()

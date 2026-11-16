@@ -153,7 +153,7 @@ public sealed class PlayerBoons : MonoBehaviour
             }
         }
 
-        int slots = SurvivalSettings.Current.MealSlots + GameSession.Settlement.UpgradeBonus(level => level.extraMealSlots)
+        int slots = SurvivalSettings.Current.MealSlots + GameSession.Here.UpgradeBonus(level => level.extraMealSlots)
                     + (Techniques.Has(PerkTechnique.ThirdPlate) ? 1 : 0);
         if (Techniques.Has(PerkTechnique.ThirdPlate) && meals == slots - 1)
         {
@@ -167,7 +167,7 @@ public sealed class PlayerBoons : MonoBehaviour
     }
 
     /// <summary>How many tonics can work at once: Survival Settings › Tonic Slots, the Cauldron's top upgrade, the Second Vial perk.</summary>
-    public int TonicSlots => SurvivalSettings.Current.TonicSlots + GameSession.Settlement.UpgradeBonus(level => level.extraTonicSlots)
+    public int TonicSlots => SurvivalSettings.Current.TonicSlots + GameSession.Here.UpgradeBonus(level => level.extraTonicSlots)
                              + (Techniques.Has(PerkTechnique.SecondVial) ? 1 : 0);
 
     // Tonics share their slots as meals do (Docs/PlayerStatsResearch.md #4): a new one pushes out the one closest to ending.

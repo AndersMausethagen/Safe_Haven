@@ -202,7 +202,7 @@ public sealed class HavenSync : IDisposable
     /// </summary>
     public byte[] CollectSettlement()
     {
-        SettlementSaveData data = SaveMapper.ToData(GameSession.Settlement);
+        SettlementSaveData data = SaveMapper.ToData(GameSession.Here);
         float purifying = data.purificationProgress;
         var progress = new List<float>();
         foreach (StationSaveData station in data.stations)
@@ -234,7 +234,7 @@ public sealed class HavenSync : IDisposable
         SettlementSaveData data = WorldTransfer.Unpack<SettlementSaveData>(packed);
         if (data != null)
         {
-            GameSession.Settlement.TakeOn(SaveMapper.SettlementFrom(data, content));
+            GameSession.Here.TakeOn(SaveMapper.SettlementFrom(data, content));
             Territory.MirrorArrived();
         }
     }

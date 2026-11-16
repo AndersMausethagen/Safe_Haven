@@ -37,7 +37,7 @@ public sealed class WatchPostArcher : MonoBehaviour
         health = GetComponent<Damageable>();
     }
 
-    private bool IsManned => building != null && GameSession.Settlement.Residents is var residents && HasWorkerHere(residents);
+    private bool IsManned => building != null && GameSession.Here.Residents is var residents && HasWorkerHere(residents);
 
     private bool HasWorkerHere(System.Collections.Generic.IReadOnlyList<ResidentRecord> residents)
     {

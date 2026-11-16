@@ -189,6 +189,7 @@ public static class HavenVisit
             return now;
         }
 
+        KeepOwnHaven();
         // Saved on the way into a raid (following the host): if the game ends mid-raid, the journey knows it never came home.
         SaveData kept = KeepHome(home, now);
         kept.raidUnderWay = now.raidUnderWay;
@@ -213,6 +214,7 @@ public static class HavenVisit
             return;
         }
 
+        KeepOwnHaven();
         SaveData back = home;
         if (Player.Current != null && Player.Current.Persistence != null)
         {
@@ -288,32 +290,44 @@ public static class HavenVisit
         return true;
     }
 
-    /// <summary>
-    /// A traveller this guest rescued on the host's raid: they join the guest's own Haven (the game kept as home, which
-    /// saving while visiting and going home both write), not the mirror of the host's. False when they already live there.
-    /// </summary>
-    public static bool RescuedHome(ResidentDefinition resident)
+    // This guest's own Haven, alive while they visit (GameSession.Home): made from the game kept as home the first time it is
+    // wanted, and written back into it before that game is saved or gone home to (KeepOwnHaven). Everything said of "home" here
+    // goes through it, so the two never differ.
+    private static SettlementState ownHaven;
+
+    /// <summary>This guest's own Haven while they visit (GameSession.Home): theirs to change; null when not visiting.</summary>
+    public static SettlementState OwnHaven
     {
-        if (home == null || resident == null)
+        get
         {
-            return false;
-        }
+            if (home == null)
+            {
+                return null;
+            }
 
-        home.settlement ??= new SettlementSaveData();
-        if (home.settlement.residents.Exists(entry => entry.id == resident.Id))
+            if (ownHaven == null)
+            {
+                var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+                ownHaven = SaveMapper.SettlementFrom(home.settlement ?? new SettlementSaveData(), content);
+            }
+
+            return ownHaven;
+        }
+    }
+
+    // The live own Haven into the game kept as home. A settlement read and written again is unchanged (SaveCoverageTests).
+    private static void KeepOwnHaven()
+    {
+        if (ownHaven != null && home != null)
         {
-            return false;
+            home.settlement = SaveMapper.ToData(ownHaven);
         }
-
-        home.settlement.residents.Add(new ResidentSaveData { id = resident.Id, job = "" });
-        return true;
     }
 
     /// <summary>
-    /// Changes this guest's own Haven (the game kept as home, which saving while visiting and going home both write) by its
-    /// own rules, not the mirror of the host's, which the host's next word would undo: what they earn for their own Haven on a
-    /// visit or a raid followed with the host (an extraction, the Huldra's respect). False when not visiting. A settlement
-    /// read and written again is unchanged (checked on real saves, 2026-11-11).
+    /// Changes this guest's own Haven by its own rules, not the mirror of the host's, which the host's next word would undo: what
+    /// they earn for their own Haven on a visit or a raid followed with the host (an extraction, the Huldra's respect). False when
+    /// not visiting. GameSession.Home says the same in one call.
     /// </summary>
     public static bool ChangeHome(System.Action<SettlementState> change)
     {
@@ -322,66 +336,11 @@ public static class HavenVisit
             return false;
         }
 
-        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
-        SettlementState own = SaveMapper.SettlementFrom(home.settlement ?? new SettlementSaveData(), content);
-        change(own);
-        home.settlement = SaveMapper.ToData(own);
+        change(OwnHaven);
+        KeepOwnHaven();
         return true;
     }
 
-    /// <summary>Whether <paramref name="residentId"/> lives in this guest's own Haven (not the host's, which a visit mirrors): what a
-    /// quest's "already home" asks while visiting.</summary>
-    public static bool HomeHasResident(string residentId) =>
-        home != null && home.settlement != null && home.settlement.residents != null && !string.IsNullOrEmpty(residentId)
-        && (home.settlement.residents.Exists(entry => entry.id == residentId)
-            || (home.settlement.fallen != null && home.settlement.fallen.Exists(entry => entry.id == residentId)));
-
-    /// <summary>Whether this guest has beaten <paramref name="bossId"/> for their own Haven (BossBeatenHome counts a win on the host's raid).</summary>
-    public static bool HomeBeatBoss(string bossId) =>
-        home != null && home.settlement != null && home.settlement.defeatedBosses != null && home.settlement.defeatedBosses.Contains(bossId);
-
-    /// <summary>Whether this guest's own Haven holds a spirit's gift (what they learnt is theirs, wherever they stand).</summary>
-    public static bool HomeHasSpiritGift(string id) =>
-        home != null && home.settlement != null && home.settlement.spiritGifts != null && home.settlement.spiritGifts.Contains(id);
-
-    /// <summary>A spirit's gift this guest earnt in the host's Haven (the Nøkk's air) goes home with them.</summary>
-    public static void SpiritGiftHome(string id)
-    {
-        if (home == null || string.IsNullOrEmpty(id))
-        {
-            return;
-        }
-
-        home.settlement ??= new SettlementSaveData();
-        home.settlement.spiritGifts ??= new System.Collections.Generic.List<string>();
-        if (!home.settlement.spiritGifts.Contains(id))
-        {
-            home.settlement.spiritGifts.Add(id);
-        }
-    }
-
-    /// <summary>
-    /// A boss this guest helped bring down on the host's raid counts in the guest's own Haven too (what it unlocks there).
-    /// True the first time it falls for them, as their own first win would be.
-    /// </summary>
-    public static bool BossBeatenHome(string bossId)
-    {
-        if (home == null || string.IsNullOrEmpty(bossId))
-        {
-            return false;
-        }
-
-        home.settlement ??= new SettlementSaveData();
-        if (home.settlement.defeatedBosses.Contains(bossId))
-        {
-            return false;
-        }
-
-        home.settlement.defeatedBosses.Add(bossId);
-        return true;
-    }
-
-    /// <summary>The host's answer about building or the stash.</summary>
     public static void Allow(VisitorRight right, bool yes)
     {
         if (right == VisitorRight.Build)
@@ -404,6 +363,7 @@ public static class HavenVisit
         IsVisiting = false;
         HostName = string.Empty;
         home = null;
+        ownHaven = null;
         MayBuild = false;
         StashAllowed = false;
         stashHere = false;

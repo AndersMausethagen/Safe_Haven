@@ -109,7 +109,7 @@ public sealed class RaidCreatureConditions : GameSettings<RaidCreatureConditions
             return null;
         }
 
-        seasons.At(yearStartDay + GameSession.Settlement.DaysPassed, out SeasonCycle.Season season, out _, out _);
+        seasons.At(yearStartDay + GameSession.Here.DaysPassed, out SeasonCycle.Season season, out _, out _);
         return season?.name;
     }
 

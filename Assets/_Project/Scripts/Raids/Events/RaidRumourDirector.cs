@@ -34,7 +34,7 @@ public sealed class RaidRumourDirector : MonoBehaviour
 
         placed = true;
         PlayerCrafting crafting = director.Player.GetComponent<PlayerCrafting>();
-        List<RaidRumourDefinition> rumours = RaidRumours.For(director.Session.Definition, director.Session.Seed, GameSession.Settlement, crafting,
+        List<RaidRumourDefinition> rumours = RaidRumours.For(director.Session.Definition, director.Session.Seed, GameSession.Here, crafting,
             director.Session.WidthScale, director.Session.ExtraRumours);
         RaidMap map = FindAnyObjectByType<RaidMap>();
         IReadOnlyList<Vector3> spots = map != null ? map.RumourSpots : null;

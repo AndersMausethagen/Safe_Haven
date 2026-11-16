@@ -51,7 +51,7 @@ public sealed class NightProwlers : MonoBehaviour
                 return false;
             }
 
-            if (requireBreachWon && GameSession.Settlement.BreachesWon == 0)
+            if (requireBreachWon && GameSession.Here.BreachesWon == 0)
             {
                 return false;
             }
@@ -95,7 +95,7 @@ public sealed class NightProwlers : MonoBehaviour
         }
 
         leavingUntil.Clear();
-        int most = settings.ProwlersAlive(maxAlive, GameSession.Settlement.BreachesWon);
+        int most = settings.ProwlersAlive(maxAlive, GameSession.Here.BreachesWon);
         if (alive.Count < most && Time.time >= nextSpawnAt && prowlers.Count > 0)
         {
             nextSpawnAt = Time.time + spawnInterval * settings.ProwlerSpawnScale;
@@ -169,7 +169,7 @@ public sealed class NightProwlers : MonoBehaviour
                 continue;
             }
 
-            GameObject deep = NightSettings.Current.DeepProwler(GameSession.Settlement.BreachesWon, Random.value);
+            GameObject deep = NightSettings.Current.DeepProwler(GameSession.Here.BreachesWon, Random.value);
             GameObject prefab = deep != null ? deep : prowlers[Random.Range(0, prowlers.Count)];
             if (prefab == null)
             {

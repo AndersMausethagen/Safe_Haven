@@ -61,7 +61,7 @@ public static class HomeLife
         Vector3 door = house.Door(out _);
         Fill(door, house);
         input.Tier = house.TryGetComponent(out Construction construction) ? Mathf.Max(1, construction.Level) : 1;
-        input.Comforts.AddRange(GameSession.Settlement.ComfortsIn(house.Id));
+        input.Comforts.AddRange(GameSession.Here.ComfortsIn(house.Id));
         foreach (ResidentRecord record in HavenHomes.LivingIn(house))
         {
             BuildingObject work = HavenHomes.WorkplaceOf(record, door);
@@ -195,7 +195,7 @@ public static class HomeLife
     /// <summary>Pays for a comfort and puts it in the house, made where the Haven is kept.</summary>
     public static bool Furnish(BuildingObject house, HomeLifeSettings.Comfort comfort, GameObject payer)
     {
-        if (house == null || comfort == null || house.Id == null || GameSession.Settlement.HasComfort(house.Id, comfort.id))
+        if (house == null || comfort == null || house.Id == null || GameSession.Here.HasComfort(house.Id, comfort.id))
         {
             return false;
         }
@@ -222,7 +222,7 @@ public static class HomeLife
             return HavenDecisions.Outcome.Refused("That house isn't here.");
         }
 
-        if (!GameSession.Settlement.AddComfort(house.Id, comfort.id))
+        if (!GameSession.Home.AddComfort(house.Id, comfort.id))
         {
             return HavenDecisions.Outcome.Refused($"The {house.Definition.DisplayName} has {comfort.name} already.");
         }

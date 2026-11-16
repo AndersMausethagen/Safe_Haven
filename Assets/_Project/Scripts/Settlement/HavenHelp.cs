@@ -58,7 +58,7 @@ public static class HavenHelp
             return ForHost != null;
         }
 
-        return GameSession.Settlement.FindAgain(resident);
+        return GameSession.Home.FindAgain(resident);
     }
 
     /// <summary>The host's game applies a friend's help (CoopLands).</summary>
@@ -81,7 +81,7 @@ public static class HavenHelp
                 break;
             case HavenHelpKind.FoundAgain:
                 ResidentDefinition resident = content != null ? content.FindResident(id) : null;
-                if (resident != null && GameSession.Settlement.FindAgain(resident))
+                if (resident != null && GameSession.Home.FindAgain(resident))
                 {
                     GameMessages.Post($"{friend} brought {resident.DisplayName} home.", MessageKind.Gain);
                 }
@@ -98,7 +98,7 @@ public static class HavenHelp
             return false;
         }
 
-        GameSession.Settlement.WeakenBreach(share, most);
+        GameSession.Home.WeakenBreach(share, most);
         return true;
     }
 }

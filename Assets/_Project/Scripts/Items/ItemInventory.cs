@@ -69,7 +69,7 @@ public sealed class ItemInventory : MonoBehaviour
                 // Laid out at its full size, so improving the portal only has to unlock slots.
                 int most = safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(int.MaxValue);
                 safePocket = new ItemContainer(most, 1);
-                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Settlement.PortalLevel));
+                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Here.PortalLevel));
             }
 
             return safePocket;
@@ -79,7 +79,7 @@ public sealed class ItemInventory : MonoBehaviour
     /// <summary>Opens the slots the portal's improvements have earned since the pocket was made.</summary>
     public void RefreshPocket()
     {
-        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Settlement.PortalLevel));
+        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Here.PortalLevel));
     }
 
     public float CarryWeight => carryWeight;

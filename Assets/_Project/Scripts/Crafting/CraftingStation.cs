@@ -170,7 +170,7 @@ public sealed class CraftingStation : MonoBehaviour
         get
         {
             ResidentRecord worker = Worker;
-            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Settlement.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker);
+            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Here.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker);
             // A horse put to work beside it (ploughing, hauling) adds its job's bonus.
             return 1f + Upgrades(level => level.craftSpeed) + staffed + HorseJobs.SpeedBonusFor(this)
                 + (building != null ? Yards.StationSpeed(building) + StationExtensions.Bonus(building, extension => extension.craftSpeed) : 0f);
@@ -200,7 +200,7 @@ public sealed class CraftingStation : MonoBehaviour
                 return null;
             }
 
-            foreach (ResidentRecord resident in GameSession.Settlement.Residents)
+            foreach (ResidentRecord resident in GameSession.Here.Residents)
             {
                 if (resident.Job != null && resident.Job.Workplace == building.Definition
                     && (string.IsNullOrEmpty(resident.WorkQueue) || resident.WorkQueue == Id))
@@ -218,11 +218,11 @@ public sealed class CraftingStation : MonoBehaviour
     {
         get
         {
-            StationQueue queue = GameSession.Settlement.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
+            StationQueue queue = GameSession.Here.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
             if (queue != null)
             {
                 // The building's level, and the rank of the resident who works here.
-                queue.SpeedMultiplier = Speed * GameSession.Settlement.WorkerSpeed(type);
+                queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(type);
                 queue.Tier = Tier;
                 // Kept on the queue so its worker's luck holds during raids, when no station is loaded.
                 queue.ExtraChance = Extensions(extension => extension.extraChance);

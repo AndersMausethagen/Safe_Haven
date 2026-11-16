@@ -13,7 +13,7 @@ public static class HavenLands
         var held = new HavenShelf("The Haven's lands");
         var wild = new HavenShelf("Wild");
         TerritorySettings settings = TerritorySettings.Current;
-        TerritoryState state = GameSession.Settlement.Territory;
+        TerritoryState state = GameSession.Here.Territory;
         foreach (WorldAtlas.Region region in Territory.Claimable)
         {
             HavenEntry entry = EntryOf(region.name, settings, state);
@@ -28,7 +28,7 @@ public static class HavenLands
     /// <summary>"3 of 11 held · the forest pushes on Ravenwood in 2 turns".</summary>
     public static string Summary()
     {
-        TerritoryState state = GameSession.Settlement.Territory;
+        TerritoryState state = GameSession.Here.Territory;
         int all = Territory.Claimable.Count();
         if (!Territory.Unlocked)
         {

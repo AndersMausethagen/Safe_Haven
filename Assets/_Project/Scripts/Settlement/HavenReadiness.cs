@@ -25,7 +25,7 @@ public static class HavenReadiness
 
     /// <summary>Comfort at home: what each kind of building gives once, plus what its upgrades add, everyone with a bed, the
     /// best home once (HomeLife) and each kind of yard once (Yards).</summary>
-    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Settlement.Housed
+    public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Here.Housed
         + HomeLife.Comfort + Yards.Comfort;
 
     public static float RestedSeconds => Comfort * HavenSettings.Current.RestedSecondsPerComfort;
@@ -36,7 +36,7 @@ public static class HavenReadiness
         {
             SettlementSettings settings = SettlementSettings.Current;
             float seconds = 0f;
-            for (int i = 0; i < GameSession.Settlement.WardLevel && i < settings.WardLevels.Count; i++)
+            for (int i = 0; i < GameSession.Here.WardLevel && i < settings.WardLevels.Count; i++)
             {
                 seconds += settings.WardLevels[i].raidSeconds;
             }
@@ -75,9 +75,9 @@ public static class HavenReadiness
 
     private static HavenEntry ReachEntry()
     {
-        float total = RaidSeconds + GameSession.Settlement.JobBonus(job => job.RaidSeconds);
+        float total = RaidSeconds + GameSession.Here.JobBonus(job => job.RaidSeconds);
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.WardLevel;
+        int level = GameSession.Here.WardLevel;
         var entry = new HavenEntry
         {
             Key = settings,
@@ -113,7 +113,7 @@ public static class HavenReadiness
         };
         var sources = Standing().Select(ComfortOf).Where(one => one.Comfort > 0).GroupBy(one => one.Building)
             .Select(kind => $"{kind.Key.DisplayName}: {kind.Max(one => one.Comfort)}").ToList();
-        int housed = GameSession.Settlement.Housed;
+        int housed = GameSession.Here.Housed;
         if (housed > 0)
         {
             sources.Add($"People with a bed: {housed}");
@@ -136,7 +136,7 @@ public static class HavenReadiness
 
     private static HavenEntry RumourEntry()
     {
-        int rumours = ExtraRumours + GameSession.Settlement.JobBonus(job => job.ExtraRumours);
+        int rumours = ExtraRumours + GameSession.Here.JobBonus(job => job.ExtraRumours);
         BuildingObject post = Standing().FirstOrDefault(one => one.Definition.Upgrades.Any(level => level.extraRumours > 0));
         var entry = new HavenEntry
         {

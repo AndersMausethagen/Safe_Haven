@@ -190,7 +190,7 @@ public static class SaveGameService
         try
         {
             SaveData data = SaveMapper.ToSaveData(keeps, GameSession.Stash, HavenVisit.HavenScene, null, DateTime.UtcNow,
-                GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+                GameSession.World, GameSession.Quests, GameSession.Here, GameSession.Playtest, GameSession.Progress);
             data.displayName = CurrentName;
             data.appearance = GameSession.Appearance.Clone();
             data.raidUnderWay = null;
@@ -322,7 +322,7 @@ public static class SaveGameService
         // Objects keep their own state; it is gathered into memory first, then copied out.
         SaveableEntity.CaptureAll();
         SaveData data = SaveMapper.ToSaveData(player.Capture(), GameSession.Stash, SceneManager.GetActiveScene().name, player.Pose, DateTime.UtcNow,
-            GameSession.World, GameSession.Quests, GameSession.Settlement, GameSession.Playtest, GameSession.Progress);
+            GameSession.World, GameSession.Quests, GameSession.Here, GameSession.Playtest, GameSession.Progress);
         if (keepCrafts && crafts != null && data.player != null)
         {
             data.player.handCrafts = crafts.CaptureState();

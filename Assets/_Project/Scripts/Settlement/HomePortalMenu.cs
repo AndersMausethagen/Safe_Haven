@@ -24,7 +24,7 @@ public sealed class HomePortalMenu
     public MenuPage Build(GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        SettlementState settlement = GameSession.Settlement;
+        SettlementState settlement = GameSession.Here;
         UIStyle style = UIStyle.Current;
         var body = new StringBuilder();
         // What it says is its own (MenuPage.Story: PortalWindow shows it apart, in italics); the rest is what it tells.
@@ -183,13 +183,13 @@ public sealed class HomePortalMenu
     private void StrengthenWard(GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.WardLevel;
+        int level = GameSession.Here.WardLevel;
         if (level >= settings.WardLevels.Count)
         {
             return;
         }
 
-        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Settlement);
+        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Here);
         if (needs.Length > 0)
         {
             GameMessages.Post(needs, MessageKind.Warning);
@@ -209,21 +209,21 @@ public sealed class HomePortalMenu
     private static HavenDecisions.Outcome RaiseWard(string fromLevel)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        int level = GameSession.Settlement.WardLevel;
+        int level = GameSession.Here.WardLevel;
         if (!int.TryParse(fromLevel, out int seen) || seen != level || level >= settings.WardLevels.Count)
         {
             return HavenDecisions.Outcome.Refused("The ward was raised meanwhile: what you gave is back in your bag.");
         }
 
-        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Settlement);
+        string needs = PortalTiers.Missing(settings.WardLevels[level], GameSession.Here);
         if (needs.Length > 0)
         {
             return HavenDecisions.Outcome.Refused(needs + " What you gave is back in your bag.");
         }
 
-        GameSession.Settlement.RaiseWardLevel();
+        GameSession.Home.RaiseWardLevel();
         string opens = settings.WardLevels[level].opens;
-        float reach = settings.WardRadiusAt(GameSession.Settlement.WardLevel);
+        float reach = settings.WardRadiusAt(GameSession.Here.WardLevel);
         string tier = PortalTiers.Title(PortalTiers.Current);
         return HavenDecisions.Outcome.Made($"The portal glows brighter: it stands at {tier}. The ward now reaches {reach:0} m.{(string.IsNullOrEmpty(opens) ? "" : " " + opens)}");
     }

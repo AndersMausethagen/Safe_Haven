@@ -153,7 +153,7 @@ public sealed class RaidPlan
         }
 
         companions.Clear();
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             if (RaidLauncher.CanGoAlong(record.Resident))
             {

@@ -541,14 +541,14 @@ public static class Cheats
 
     public static string FinishCrafts()
     {
-        int done = GameSession.Settlement.Workshops.Tick(FarAway * 1000f, GameSession.Stash.Resources, (station, recipe) =>
+        int done = GameSession.Here.Workshops.Tick(FarAway * 1000f, GameSession.Stash.Resources, (station, recipe) =>
             GameEvents.Raise(new GameEvent(GameEventKind.Crafted, recipe.OutputDefinition, recipe.OutputAmount)));
         return Did("Finish crafts", $"{done} crafts finished.");
     }
 
     public static string BringHome(ResidentDefinition person)
     {
-        if (person == null || !GameSession.Settlement.AddResident(person))
+        if (person == null || !GameSession.Home.AddResident(person))
         {
             return "They are already home.";
         }
@@ -577,7 +577,7 @@ public static class Cheats
             return breach == null ? "Only Safe Haven can be breached." : "A breach is already running.";
         }
 
-        GameSession.Settlement.SetBreach(BreachStatus.Pending);
+        GameSession.Home.SetBreach(BreachStatus.Pending);
         breach.Begin();
         return breach.IsActive ? Did("Breach", "The ward is under attack.") : "No breach could start here.";
     }

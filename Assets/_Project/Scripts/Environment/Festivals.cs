@@ -78,7 +78,7 @@ public sealed class Festivals : MonoBehaviour
 
         if (Now != null)
         {
-            Join(GameSession.Settlement.DaysPassed);
+            Join(GameSession.Here.DaysPassed);
         }
     }
 
