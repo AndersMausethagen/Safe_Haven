@@ -50,8 +50,14 @@ public sealed class GameLoopLiveTests
 
         // Into the Misty Woods.
         Assert.IsTrue(Cheats.StartRaid(raid, out string launched), "the raid: " + launched);
+        // A new character's first raid opens with its cinematic (The Misty Woods): seen to play, then ended as a player skips it.
+        // Left to play out, the raid waited on it and the test on the clock (failed once right after an Editor restart).
+        yield return Until(() => CinematicScreen.IsPlaying || (RaidDirector.Current != null && RaidDirector.Current.IsRunning), 180f, "the raid never loaded");
+        Assert.IsTrue(CinematicScreen.IsPlaying, "a first raid opens with its cinematic");
+        yield return Wait(2f);
+        CinematicScreen.Stop();
         yield return Until(() => RaidDirector.Current != null && RaidDirector.Current.IsRunning && Player.Current != null && !SceneTransition.IsBusy,
-            180f, "the raid never started");
+            60f, "the raid never started after its cinematic");
         RaidDirector.Current.Session.AddTime(900f);
         Assert.AreSame(raid, GameSession.ActiveRaid.Definition);
         for (int i = 0; i < 30; i++) yield return null;
