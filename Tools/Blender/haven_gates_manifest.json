@@ -1,0 +1,154 @@
+{
+  "note": "Made by Tools/Blender/haven_gates.py.",
+  "assets": {
+    "Stone Wall Gate": {
+      "fbx": "Assets/_Project/Art/Haven/Structures/Stone Wall Gate/Stone Wall Gate.fbx",
+      "objects": [
+        "Stone Wall Gate",
+        "Stone Wall Gate LOD1",
+        "Stone Wall Gate LOD2",
+        "Gate Leaf"
+      ],
+      "size_m": {
+        "x": 3.993,
+        "y": 2.36,
+        "z": 1.3
+      },
+      "piece_length": 4.0,
+      "triangles": [
+        3028,
+        1178,
+        405,
+        68
+      ],
+      "vertices": [
+        1972,
+        922,
+        424,
+        122
+      ],
+      "materials": [
+        "Kit Stone",
+        "Stone Wall"
+      ],
+      "hinge_unity": [
+        0.92,
+        0.0,
+        0.0
+      ],
+      "leaf_size": [
+        1.8399999999999999,
+        1.85
+      ]
+    },
+    "Palisade Gate": {
+      "fbx": "Assets/_Project/Art/Haven/Structures/Palisade Gate/Palisade Gate.fbx",
+      "objects": [
+        "Palisade Gate",
+        "Palisade Gate LOD1",
+        "Palisade Gate LOD2",
+        "Gate Leaf"
+      ],
+      "size_m": {
+        "x": 3.999,
+        "y": 2.85,
+        "z": 0.451
+      },
+      "piece_length": 4.0,
+      "triangles": [
+        1753,
+        660,
+        240,
+        192
+      ],
+      "vertices": [
+        1222,
+        547,
+        257,
+        240
+      ],
+      "materials": [
+        "Kit Wood",
+        "Palisade"
+      ],
+      "hinge_unity": [
+        0.91,
+        0.0,
+        0.0
+      ],
+      "leaf_size": [
+        1.8199999999999998,
+        2.15
+      ]
+    },
+    "Hedge Gate": {
+      "fbx": "Assets/_Project/Art/Haven/Structures/Hedge Gate/Hedge Gate.fbx",
+      "objects": [
+        "Hedge Gate",
+        "Hedge Gate LOD1",
+        "Hedge Gate LOD2",
+        "Gate Leaf"
+      ],
+      "size_m": {
+        "x": 4.125,
+        "y": 1.164,
+        "z": 0.814
+      },
+      "piece_length": 4.12,
+      "triangles": [
+        688,
+        224,
+        48,
+        72
+      ],
+      "vertices": [
+        628,
+        260,
+        84,
+        144
+      ],
+      "materials": [
+        "Kit Wood",
+        "Kit Turf"
+      ],
+      "hinge_unity": [
+        0.64,
+        0.0,
+        0.0
+      ],
+      "leaf_size": [
+        1.2799999999999998,
+        0.92
+      ]
+    },
+    "Dry-stone Gap": {
+      "fbx": "Assets/_Project/Art/Haven/Structures/Dry-stone Gap/Dry-stone Gap.fbx",
+      "objects": [
+        "Dry-stone Gap",
+        "Dry-stone Gap LOD1",
+        "Dry-stone Gap LOD2"
+      ],
+      "size_m": {
+        "x": 4.117,
+        "y": 1.148,
+        "z": 0.647
+      },
+      "piece_length": 4.12,
+      "triangles": [
+        1296,
+        396,
+        324
+      ],
+      "vertices": [
+        1458,
+        708,
+        648
+      ],
+      "materials": [
+        "Kit Boulder"
+      ],
+      "hinge_unity": null,
+      "leaf_size": []
+    }
+  }
+}

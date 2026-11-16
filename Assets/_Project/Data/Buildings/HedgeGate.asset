@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55433f6de2238c643b7ddfb32e5977d0, type: 3}
+  m_Name: HedgeGate
+  m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
+  id: hedge_gate
+  displayName: Hedge Gate
+  description: A gap in the hedge with a little wooden wicket that opens for the Haven's own people.
+  icon: {fileID: 21300000, guid: 32677c51997349543b0c1cc035d021cd, type: 3}
+  faction: 0
+  combatStats: {fileID: 11400000, guid: 39f9817b68eb59f43ac012be7715f000, type: 2}
+  prefab: {fileID: 5723684251509998500, guid: 084ebf2f7f601e04dab55e38fbc13e19, type: 3}
+  constructionCost: []
+  constructionItems:
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 2
+  showInBuildMenu: 1
+  knownFromStart: 1
+  sortOrder: 10
+  requires: []
+  requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
+  yardDepth: 0
+  yardSide: 0
+  placeInLines: 1
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 1
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  station: 0
+  outputCapacity: 10
+  queueLength: 5
+  buildWork: 0
+  renown: 1
+  upgrades: []
+  comfort: 0
+  beds: 0
+  teachesRecipes: []
+  deathSound: {fileID: 0}

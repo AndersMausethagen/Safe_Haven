@@ -58,5 +58,9 @@
   "smoke_rack": "A rack of wooden poles over a small smouldering fire pit ringed with grey stones, split fish and strips of dried meat hanging from the crossbars, a wisp of smoke",
   "larder": "A small wooden store box on four stone feet with a sloping plank lid and a little plank door, a clay crock and a tied linen sack beside it",
   "herb_garden": "A raised garden bed of weathered planks full of dark soil and rows of leafy green kitchen herbs with a few small white flowers",
-  "notice_board": "A small timber notice board on two wooden posts under a little shingle roof, paper notes pinned to its planks, a few curling at the corners"
+  "notice_board": "A small timber notice board on two wooden posts under a little shingle roof, paper notes pinned to its planks, a few curling at the corners",
+  "stone_wall_gate": "A gateway in a chest-high wall of grey mortared stone: two square stone gate pillars with flat cap stones, a heavy wooden plank door between them with two black iron straps, standing half open",
+  "palisade_gate": "A gate in a palisade of tall wooden stakes: two thick upright gate logs taller than the stakes, a door of upright round logs bound by two planks across the back, standing half open",
+  "hedge_gate": "A gap in a short, neatly clipped green hedge with a little wooden wicket gate of rails and a diagonal brace between two thin wooden posts, standing half open, on grass",
+  "dry_stone_gap": "An opening in a low dry-stone wall of flat grey field stones laid in courses without mortar, a tall rough grey standing stone of rock (no wood) set upright at each side of the gap like a gatepost, on grass"
 }

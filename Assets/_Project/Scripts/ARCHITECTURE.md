@@ -1833,14 +1833,19 @@ a side of a yard, more fence kinds, the Carpenter and Mason build while the play
 Everything is added to what was there: the home spots by the portal, first-of-kind lookups and the Tier N parts stay.
 
 - **Homes** (`HavenHomes` on the portal, rule `HomeRules`): every house with beds (`BuildingObject.Beds`) shares them out:
-  the player's choice first (`ResidentRecord.HomeChosen`, the `resident.home` Haven decision), then the nearest free bed to
-  each one's work, the shortest walks first, ties by id, so every machine works the same answer out. Worked out on
+  the player's choice first (`ResidentRecord.HomeChosen`, the `resident.home` Haven decision), then the house they live in
+  (homes are sticky since the 2026-11-16 review: they move only for a free bed `HomeLifeSettings` › Move Home For, 15 m,
+  nearer their work, or when their house is gone, and a message says so, with the comforts that stay behind; a house being
+  moved keeps its people), then the nearest free bed to each one's work, the shortest walks first, ties by id, so every
+  machine works the same answer out. Worked out on
   `BuildingObject.ActiveChanged`, `Construction.Finished` and `Settlement.Changed`, never per frame; written to the
   records (`Home`, `Workplace`, `WorkQueue`, saved) so they are mirrored to a co-op friend. `HasBed` is having a house once
   homes are known. Without a bed: the home spots, as before.
 - **Their day** (`ResidentLife`): at night they walk to the house's door (`BuildingObject.Door`: the middle of the yard side)
   and go in: hidden, agent and talk off, counted in `HavenHomes.Indoors`, so the house's `HearthSmoke` light is on only then;
-  at dawn they come out of the door. A creature prowling past doesn't bring a sleeper out, a breach does. They work at the
+  at dawn they come out of the door. Their quest marker stays at the door. Knocking (`HouseDoor`, a Use on a child of the
+  house, "Tor, asleep until dawn" / "Knock to wake") brings everyone inside out (`ResidentLife.Wake`): the one with a quest
+  marker talks at once, the rest stand at the door a while; they go back in after. A creature prowling past doesn't bring a sleeper out, a breach does. They work at the
   workplace of their kind nearest home (`HavenHomes.WorkplaceOf`; `CraftingStation.Worker` and `WorkerProduction.QueueOf`
   give the +50% and the work orders to that one station), and gather at a Feast Green's fire, else the fire nearest home.
 - **The resident window** (`ResidentWindow`, `UIWindowId.ResidentPanel`, Hearthline kit like `HorsePanelWindow`): live
@@ -1850,7 +1855,9 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
 - **Home quality** (`HomeQuality`, pure; `HomeLife` reads the scene and caches until something changes; numbers in
   `Resources/HomeLifeSettings`): warm, water close, a lit or paved lane, a place to sit, near work, +1 a tier above the
   first, the comforts (Proper Beds, Kitchen Hearth: `SettlementState.HouseComforts`, the `house.comfort` decision) and its
-  yard's role. Only adds. The level (Bare, Plain, Snug, Fine, Grand) gives those who live there work speed at their own
+  yard's role. Only adds. A comfort that also gives a feature (the Kitchen Hearth is warm) counts once: it meets the feature
+  when nothing round the house does, else adds its own point. A co-op friend's cache is dropped when the host's comforts
+  change (`HavenHomes.SeenNew`). The level (Bare, Plain, Snug, Fine, Grand) gives those who live there work speed at their own
   station (`CraftingStation.Speed`), +5% more when the home has what they like (`Likings`); the best home gives Well Rested
   comfort (`HavenReadiness.Comfort`) and renown (`HavenRenown`), once.
 - **The Here readout** (`BuildHere`, drawn by `BuildOverlay`, made by `BuildPlacer` while the build menu is open or a ghost is
@@ -1858,10 +1865,14 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
   in; a house's quality and who would move in (`HavenHomes.WouldMoveIn`); a workplace's walk from its worker's home; an
   extension's station and slot; a path's speed. Circles on the ground for lights, the Watch Post, Ward Totems and extension
   reach, and every fenced ring with its name, quality and hint. The build menu's backdrop blur hides the overlay while the
-  menu is open; it reads while placing.
+  menu is open; it reads while placing. The readout and circles follow a moving ghost five times a second and once more where
+  it stops; Watch Posts, Ward Totems and which building a light belongs to are looked up once per placement session
+  (`BuildHere.BeginSession`, again on `BuildingObject.ActiveChanged`). A house's door is on its yard side
+  (`BuildingObject.DoorAt`, shared with `Door`).
 - **Yards** (`YardRings` pure ring finder; `Yards` on the portal; `YardSettings` and `YardRoleDefinition` assets in
-  `Data/Buildings/Yards`): line pieces marked `Encloses` (Skigard, Palisade, Stone Wall, Hedge, Dry-stone Wall; the Skigard
-  Gate `IsGate`) and house walls (`YardSettings.HouseWallsClose`) are edges; ends within 0.9 m are one post; bounded faces of
+  `Data/Buildings/Yards`): line pieces marked `Encloses` (Skigard, Palisade, Stone Wall, Hedge, Dry-stone Wall; a gate for
+  each, `IsGate`: Skigard Gate, Stone Wall Gate, Palisade Gate, Hedge Gate with a wicket, Dry-stone Gap with no leaf, each
+  as long as its fence's piece) and house walls (`YardSettings.HouseWallsClose`) are edges; ends within 0.9 m are one post; bounded faces of
   12-900 m² are rings, yards once they have a gate. Roles by highest score, ties to the first listed: Home Yard (+1 home
   quality), Feast Green (the gathering place), Work Yard (extensions count anywhere inside, +1 slot, +10% speed), Kitchen
   Garden (+20% to stations inside), Paddock (60 m², comfort and renown only: horses don't graze in it yet). Quality 0-5:
@@ -1878,13 +1889,17 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
   and slopes (only their middle is checked). The player walks faster on one at home (`PlayerMovement.SetSpeedScale`),
   residents too. Picked by the ground under the pointer for moving. **Footpaths** (`Footpaths`): a 160 m wear map round the
   portal gains wear under walking residents and grows back; worn cells get Trampled Ground decals; never across stone;
-  kept packed in `SettlementState.Footpaths`.
-- **Builders while away** (`ResidentBuilders`): away from home `SettlementSystem` saves up seconds while a builder lives here
-  and paid scaffolds stand (`SettlementState.ScaffoldsWaiting`); back home they are spent, oldest scaffold first
-  (`Construction.AddWork`), seconds × builders × `BuilderWorkPerSecond`.
+  kept packed in `SettlementState.Footpaths`, wear from 0.05 that doesn't show yet too (a path needs a dozen passes, more
+  than one short stay at home), cells in order as steps from the last.
+- **Builders while away** (`ResidentBuilders`): away from home `SettlementSystem` saves up builder-seconds while paid
+  scaffolds stand (`SettlementState.ScaffoldsWaiting`): each second times the builders at home (`ResidentBuilders.Builds`:
+  not the raid's companion, not one whose work is paused); back home they are spent, oldest scaffold first
+  (`Construction.AddWork`), builder-seconds × `BuilderWorkPerSecond`, and the message names who did it.
 - **Art:** `Tools/Blender/haven_town_props.py` (on `haven_decor.py`'s helpers and the building kit) for the nine extensions
   and two fences; their look prefabs and building prefabs were made by a one-off script (the fences are copies of the
-  Skigard prefab with their own look and a fitted box). Icons painted with LocalSpawn (`building_icons.json`); the kit icons
+  Skigard prefab with their own look and a fitted box). The gates (2026-11-16): `Tools/Blender/haven_gates.py` cuts the
+  middle out of the Stone Wall and Palisade models and draws the hedge and dry-stone sides with the kit; their prefabs are
+  copies of the Skigard Gate's (side colliders, a swinging `FenceGate` leaf on its hinge; the Dry-stone Gap has none). Icons painted with LocalSpawn (`building_icons.json`); the kit icons
   House, Bed, Pot, Drop, Bench, Lantern, Path, Fence in `Tools/UI/hearthline_kit_art.py`; path decals in `Tools/Decals`.
 - Tests: `HavenHomeTests`, `HavenTownTests`.
 

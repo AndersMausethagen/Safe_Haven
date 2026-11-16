@@ -43,6 +43,8 @@ public static class ContentAudit
         "HorseDefinition.lasso", "HorseDefinition.barley",
         // A carved stone's rubbing uses one up (CarvedStone).
         "EssenceSettings.blankParchment",
+        // A comfort bought for a house from a resident's window (HomeLife.Furnish).
+        "HomeLifeSettings.comforts[].cost[].item",
     };
 
     private static readonly string[] ItemNeither =
@@ -68,6 +70,10 @@ public static class ContentAudit
         "RecipeBook.buildings", "SettlementSettings.residentGatheringPlace", "SettlementSettings.wardLevels[].requires",
         // Where the Haven's asks are posted (the Notice Board): needs it standing, teaches nothing.
         "HavenRequestSettings.postedAt",
+        // The Haven as a town (2026-11-15): the station an extension serves, and what a yard's role needs standing inside it.
+        "BuildingDefinition.extends", "YardRoleDefinition.needs[].anyOf[]",
+        // What standing near a home makes it better (HomeLifeSettings › Features).
+        "HomeLifeSettings.features[].near[]",
     };
 
     private static readonly string[] MonsterAsks = { "QuestDefinition.objectives", "JournalSettings.", "RaidDefinition.knownEnemies" };

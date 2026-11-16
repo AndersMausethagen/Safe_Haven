@@ -290,6 +290,39 @@ public sealed class HavenTownTests
         Assert.IsTrue(Building("Skigard Gate").IsGate);
     }
 
+    [Test]
+    public void EveryFenceKind_HasAGateOfItsOwn_AsLongAsItsPiece()
+    {
+        // The user: "yards need a gate" and "more fence kinds" (review 2026-11-16: every yard needed a wooden Skigard Gate).
+        foreach ((string fence, string gate, bool swings) in new[]
+                 {
+                     ("Skigard", "Skigard Gate", true), ("StoneWall", "StoneWallGate", true), ("Palisade", "PalisadeGate", true),
+                     ("Hedge", "HedgeGate", true), ("DryStoneWall", "DryStoneGap", false),
+                 })
+        {
+            BuildingDefinition kind = Building(gate);
+            Assert.IsNotNull(kind, gate);
+            Assert.IsTrue(kind.IsGate && kind.PlaceInLines && kind.Encloses, gate + ": a gate is a side of the ring too");
+            Assert.IsNotNull(kind.Prefab, gate);
+            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset").Buildings.Contains(kind),
+                gate + " is in the recipe book, so the player knows it");
+            Assert.AreEqual(kind, kind.Prefab.GetComponent<BuildingObject>().Definition, gate);
+            Assert.AreEqual(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(kind.Prefab)), kind.Prefab.GetComponent<SaveableEntity>().PrefabId,
+                gate + " comes back from a save as itself");
+            Assert.IsNotNull(kind.Prefab.GetComponent<Construction>(), gate);
+            Assert.AreEqual(swings, kind.Prefab.GetComponent<FenceGate>() != null, gate + (swings ? " swings open" : " is an opening"));
+
+            // As long as its fence's piece, so a line of them closes the ring (YardSettings › Join Distance).
+            float Length(BuildingDefinition piece) => BuildPlacement.LocalBounds(piece.Prefab.transform).size.x;
+            Assert.AreEqual(Length(Building(fence)), Length(kind), YardSettings.Current.JoinDistance * 0.5f, gate);
+            foreach (string side in new[] { "Side Left", "Side Right" })
+            {
+                Transform stub = kind.Prefab.transform.Find(side);
+                Assert.IsNotNull(stub != null ? stub.GetComponent<BoxCollider>() : null, $"{gate}: solid either side of the opening");
+            }
+        }
+    }
+
     // ----- Paths -----
 
     [Test]

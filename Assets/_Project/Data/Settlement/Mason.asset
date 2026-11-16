@@ -19,6 +19,7 @@ MonoBehaviour:
   teachesBuildings:
   - {fileID: 11400000, guid: 00ba6eab323cada479456440115e7140, type: 2}
   - {fileID: 11400000, guid: d076d5d9f032fc14ea227d5d823100fc, type: 2}
+  - {fileID: 11400000, guid: f95077b113b9b6b4da74567fe88aa3ec, type: 2}
   teachesRecipes: []
   workplace: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
   workGesture: {fileID: 11400000, guid: befa690f3a033144da5dc52883dbdb0f, type: 2}
@@ -42,3 +43,4 @@ MonoBehaviour:
   defendsAs: {fileID: 0}
   wardHealth: 0
   raidSeconds: 0
+  carvesPast: 
