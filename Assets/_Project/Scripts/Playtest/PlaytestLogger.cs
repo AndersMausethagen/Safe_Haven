@@ -23,7 +23,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
     public void Initialise(PlaytestSettings settings)
     {
-        logging = settings.LogRuns;
+        // The two-copy co-op test (CoopSmokeTest) isn't a playtest: its runs would read as two short human ones.
+        logging = settings.LogRuns && !CoopSmokeTest.IsRunning;
         Cheats.Used += OnCheat;
         if (logging)
         {

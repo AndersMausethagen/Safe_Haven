@@ -50,6 +50,13 @@ public sealed class SteamPlatform : MonoBehaviour, IGameSystem
             return;
         }
 
+        // Two copies on one machine play over the direct port (CoopSmokeTest), not as one Steam user twice.
+        if (CoopSmokeTest.IsRunning)
+        {
+            Problem = "Steam is off for the two-copy co-op test.";
+            return;
+        }
+
         try
         {
             if (appId == TestAppId || Application.isEditor)
