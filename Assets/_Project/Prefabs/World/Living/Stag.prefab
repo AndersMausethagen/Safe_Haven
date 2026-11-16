@@ -71,6 +71,7 @@ MonoBehaviour:
   walkSpeed: 1
   runSpeed: 7
   wanderRadius: 9
+  senses: {fileID: 11400000, guid: f728b8ea230e9154b865d39c8e5d49be, type: 2}
   shyDistance: 10
   perHeardMetre: 0.9
   creatureDistance: 14

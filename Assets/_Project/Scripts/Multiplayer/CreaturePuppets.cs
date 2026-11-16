@@ -198,9 +198,33 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         handedBack = true;
         hostGoneSince = -1f;
         SetFromHost(false);
+        RefillTheRaid();
         if (hadAny && !quiet)
         {
             GameMessages.Post($"{HavenVisit.HostName} has left the raid. You're on your own out here.", MessageKind.Warning);
+        }
+    }
+
+    // The host gone, the follower's map gets the creatures its layout skipped (the host's game made them), each where the seed's
+    // rolls put it, beyond the reach the host's own were handed back in. One player's raid again (the user, 2026-11-16: "make sure
+    // they get scaled down to 1-player difficulty"): everything here is made and readied as this game makes its own (Prepare:
+    // the tier's and the stage's strength, no party share, which is only ever the host's game's), and the handed-back ones keep
+    // only their share of health.
+    private static void RefillTheRaid()
+    {
+        RaidDirector raid = RaidDirector.Current;
+        Player player = Player.Current;
+        if (raid == null || !raid.IsRunning || player == null)
+        {
+            return;
+        }
+
+        foreach (SpawnGroup group in Object.FindObjectsByType<SpawnGroup>(FindObjectsInactive.Exclude))
+        {
+            foreach (GameObject made in group.PlaceSkipped(player.transform.position, CreatureHost.SendReach))
+            {
+                raid.Creatures.Prepare(made, false);
+            }
         }
     }
 

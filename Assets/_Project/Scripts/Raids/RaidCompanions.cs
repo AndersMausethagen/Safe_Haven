@@ -108,7 +108,9 @@ public sealed class RaidCompanions
         SettleTheLost(report, extracted);
     }
 
-    // Home only with the player, alive and close by: they don't know the way. Never found, nothing has changed.
+    // Home with the player when they get out, alive and still following, however far behind: as a rescued traveller is
+    // (RescuableTraveler; the user, 2026-11-16: "same as the traveller"). They had to stand close, and one lagging behind was
+    // left in the forest. Never found, nothing has changed.
     private void SettleTheLost(RaidReport report, bool extracted)
     {
         if (LostOne == null || !LostOneFollows)
@@ -116,10 +118,8 @@ public sealed class RaidCompanions
             return;
         }
 
-        GameObject player = raid.Player;
-        bool close = player != null && Vector3.Distance(player.transform.position, LostOne.transform.position) <= SettlementSettings.Current.FoundComesHomeWithin;
         // Co-op: a guest leads the host's lost home to the host's Haven (HavenHelp).
-        if (extracted && close && !LostOne.IsLost && !LostOne.IsDowned && HavenHelp.FoundAgain(LostOne.Resident))
+        if (extracted && !LostOne.IsLost && !LostOne.IsDowned && HavenHelp.FoundAgain(LostOne.Resident))
         {
             report.FoundAgain = LostOne.Resident;
         }

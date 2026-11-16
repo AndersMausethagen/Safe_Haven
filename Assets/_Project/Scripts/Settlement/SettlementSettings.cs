@@ -180,7 +180,7 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
     [Header("The lost")]
     [Tooltip("After being found again, one forgotten memory comes back for every this many raids together.")]
     [SerializeField, Min(1)] private int memoryReturnsEvery = 2;
-    [Tooltip("Someone found comes home if the player extracts with them this close, in metres. They don't know the way by themselves.")]
+    [Tooltip("Not read since 2026-11-16: someone found comes home with the player however far behind, alive and following, as a rescued traveller does (RaidCompanions.SettleTheLost). Kept for the asset.")]
     [SerializeField, Min(1f)] private float foundComesHomeWithin = 20f;
     [Tooltip("Under a companion's last words in the raid report, when the forest has them.")]
     [SerializeField, TextArea] private string lostReportLine;

@@ -2,9 +2,13 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// A timid animal (deer, fox): it grazes, ambles about its glade and bolts from whatever frightens it. The player is heard
-/// as the birds hear them (PlayerNoise), so a run sends it off early and a crouched walk gets close; a creature coming
-/// through the trees frightens it too, so animals fleeing towards the player are a warning. Purely life in the world: it
+/// A timid animal (deer, fox): it grazes, ambles about its glade and bolts from whatever frightens it. With its huntable kind
+/// set (Senses: the deer, stag or fox the player can hunt) it notices the player exactly as that game does (the user,
+/// 2026-11-16: "same notice rules"): seen in its sight cone as sneaking, cover, fog and night allow (MonsterSenses.CanNotice),
+/// within close range from any side, and sent off by a sound loud enough where it stands (PerceptionRules.HeardLevel); seen, it
+/// lifts its head first, and the player who stops or backs off out of its sight is let be. Without it, the older rule: the
+/// player is heard as the birds hear them (PlayerNoise), so a run sends it off early and a crouched walk gets close. A creature
+/// coming through the trees frightens it too, so animals fleeing towards the player are a warning. Purely life in the world: it
 /// can't be hurt, it carries nothing and it is gone once it has fled out of sight. Made and cleared by WildlifeHerd.
 /// <para>Its Animator needs a float "Speed" (metres a second) and a bool "Eating".</para>
 /// </summary>
@@ -20,7 +24,10 @@ public sealed class Wildlife : MonoBehaviour
     [SerializeField, Min(0.1f)] private float runSpeed = 7.5f;
     [Tooltip("Metres round its home it ambles in.")]
     [SerializeField, Min(1f)] private float wanderRadius = 9f;
-    [Tooltip("How near a quiet player may come; noise adds to it (metres of startle per metre the player is heard).")]
+    [Tooltip("The huntable kind it looks like (Data/Monsters: Deer, Stag, Fox): it notices the player by that game's senses, so " +
+             "sneaking up works the same on both. Empty: the shy distance below.")]
+    [SerializeField] private MonsterDefinition senses;
+    [Tooltip("Without Senses: how near a quiet player may come; noise adds to it (metres of startle per metre the player is heard).")]
     [SerializeField, Min(0f)] private float shyDistance = 7f;
     [SerializeField, Min(0f)] private float perHeardMetre = 0.9f;
     [Tooltip("A creature this near sends it off.")]
@@ -68,6 +75,7 @@ public sealed class Wildlife : MonoBehaviour
         }
     }
 
+    private MonsterSenses eyes;
     private NavMeshAgent agent;
     private Animator animator;
     private State state;
@@ -95,7 +103,29 @@ public sealed class Wildlife : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         agent.speed = walkSpeed;
         home = transform.position;
+        eyes = senses != null ? new MonsterSenses(transform, senses, 0, null) : null;
         Graze();
+    }
+
+    private void OnEnable() => WorldNoise.Emitted += OnNoise;
+
+    private void OnDisable() => WorldNoise.Emitted -= OnNoise;
+
+    // A sound loud enough where it stands sends it off, as it sends the game (MonsterAI.Hear).
+    private void OnNoise(Vector3 position, float radius)
+    {
+        if (eyes == null || state == State.Flee)
+        {
+            return;
+        }
+
+        Vector3 offset = position - transform.position;
+        offset.y = 0f;
+        if (PerceptionRules.HeardLevel(offset.magnitude, radius, senses.Hearing, PerceptionSettings.Current) >= PerceptionSettings.Current.GameStartleLevel)
+        {
+            threatWasPlayer = false;
+            Startle(position, true);
+        }
     }
 
     private void Update()
@@ -188,13 +218,22 @@ public sealed class Wildlife : MonoBehaviour
         }
     }
 
-    // The player within its startle distance (the shy distance, and further the louder they are); at once when within half.
+    // The player noticed: with Senses as the game notices (its cone, sneaking, fog, night; at once within close range); else within
+    // the startle distance (the shy distance, and further the louder they are), at once when within half.
     private bool StartledBy(Player player, out bool atOnce)
     {
         atOnce = false;
         if (player == null)
         {
             return false;
+        }
+
+        if (eyes != null)
+        {
+            Vector3 flat = player.transform.position - transform.position;
+            flat.y = 0f;
+            atOnce = flat.magnitude < senses.CloseSenseRange;
+            return atOnce || eyes.CanNotice(player.transform);
         }
 
         float heard = player.Noise != null ? player.Noise.Level : 0f;

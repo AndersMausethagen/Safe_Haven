@@ -148,15 +148,48 @@ public sealed class SpawnGroup : MonoBehaviour
         float yaw = (float)random.NextDouble() * 360f;
         if (CreatureSource.Remote != null && prefab.GetComponentInChildren<MonsterAI>(true) != null)
         {
+            // Kept with its rolls, should this game have to make it after all (the host left: PlaceSkipped).
+            skipped.Add((point, prefab, offset, yaw));
             return null;
         }
 
+        return Make(point, prefab, offset, yaw);
+    }
+
+    private GameObject Make(Transform point, GameObject prefab, Vector2 offset, float yaw)
+    {
         Vector3 position = Place(point.position, offset);
         Quaternion rotation = randomFacing ? Quaternion.Euler(0f, yaw, 0f) : point.rotation;
         GameObject copy = Instantiate(prefab, position, rotation, transform);
         copy.name = prefab.name;
         spawned.Add(copy);
         return copy;
+    }
+
+    // Creatures not made here while another game made them (co-op: a friend on the host's run), with the rolls they had.
+    private readonly List<(Transform point, GameObject prefab, Vector2 offset, float yaw)> skipped =
+        new List<(Transform, GameObject, Vector2, float)>();
+
+    /// <summary>
+    /// Makes here the creatures skipped while the host's game made them, each where its own rolls put it, except within
+    /// <paramref name="clear"/> metres of <paramref name="near"/>, where the host's own (handed back) already stand. The host
+    /// gone, the rest of a follower's map was empty: a free run. Returns what was made.
+    /// </summary>
+    public List<GameObject> PlaceSkipped(Vector3 near, float clear)
+    {
+        var made = new List<GameObject>();
+        foreach ((Transform point, GameObject prefab, Vector2 offset, float yaw) in skipped)
+        {
+            Vector3 flat = point != null ? point.position - near : Vector3.zero;
+            flat.y = 0f;
+            if (point != null && prefab != null && flat.sqrMagnitude > clear * clear)
+            {
+                made.Add(Make(point, prefab, offset, yaw));
+            }
+        }
+
+        skipped.Clear();
+        return made;
     }
 
     /// <summary>The count range after the raid's enemy density, before limiting to the points.</summary>

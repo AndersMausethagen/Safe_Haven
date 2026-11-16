@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>Edit Mode tests for seeded raid generation: spawn groups fill some of their points from the raid's seed.</summary>
@@ -385,5 +386,44 @@ public sealed class RaidGenerationTests
     {
         created.Add(asset);
         return asset;
+    }
+
+    private sealed class SomeoneElseMakesThem : IRaidCreatureSource
+    {
+        public bool Wake(SpawnGroup group) => true;
+        public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt) { }
+    }
+
+    [Test]
+    public void AFollowersSkippedCreatures_AreMadeWhenTheHostLeaves_BeyondTheHandedBackOnes()
+    {
+        // The user, 2026-11-16: the host gone, the follower's map is filled again (it was empty but for what stood near them).
+        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Enemies/BlackWidow.prefab");
+        Assert.IsNotNull(prefab);
+        var root = new GameObject("Spawn Group");
+        try
+        {
+            SpawnGroup group = root.AddComponent<SpawnGroup>();
+            Transform near = new GameObject("Near").transform;
+            near.SetParent(root.transform, false);
+            Transform far = new GameObject("Far").transform;
+            far.SetParent(root.transform, false);
+            far.position = new Vector3(200f, 0f, 0f);
+
+            CreatureSource.Remote = new SomeoneElseMakesThem();
+            Assert.IsNull(group.PlaceAt(near, prefab, new System.Random(1)), "the host's game makes them");
+            Assert.IsNull(group.PlaceAt(far, prefab, new System.Random(2)));
+            CreatureSource.Remote = null;
+
+            List<GameObject> made = group.PlaceSkipped(Vector3.zero, 90f);
+            Assert.AreEqual(1, made.Count, "only the far one: the near one is the host's, handed back");
+            Assert.Greater(made[0].transform.position.x, 150f);
+            Assert.AreEqual(0, group.PlaceSkipped(Vector3.zero, 90f).Count, "made once");
+        }
+        finally
+        {
+            CreatureSource.Remote = null;
+            Object.DestroyImmediate(root);
+        }
     }
 }

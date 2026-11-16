@@ -15,6 +15,9 @@ public sealed class CreatureHost
     /// <summary>Metres around a friend within which they hear of creatures.</summary>
     private const float Reach = 90f;
 
+    /// <summary>Metres round a friend inside which the host's creatures are sent to them (and, the host gone, handed back to them).</summary>
+    public const float SendReach = Reach;
+
     /// <summary>Metres beyond which a creature's pose goes three times a second instead of ten (unless its state changes).</summary>
     private const float NearReach = 40f;
 

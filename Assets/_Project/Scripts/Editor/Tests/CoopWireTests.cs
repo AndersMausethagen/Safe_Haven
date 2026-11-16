@@ -24,6 +24,9 @@ public sealed class CoopWireTests
         // friends' noise, shots and casts as RPCs.
         [24] = "b11aa4e41e43882d9564f37168585240",
         [25] = "fbdd95d903325dec171610c2ae9adaba",
+        // 2026-11-16: raid news, pings and "helping up" carry the sender's client id (written inside their handlers, so the
+        // fingerprint is the same).
+        [26] = "fbdd95d903325dec171610c2ae9adaba",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>
