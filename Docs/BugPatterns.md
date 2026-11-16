@@ -101,7 +101,7 @@ quests, stops being possible by accident.
 | 3. Declared co-op rules | planned |
 | 4. Placeholder bans, shown numbers | built: Attack Definition's six "below 0: the default" values are nullable (`OwnStaminaCost`, `OwnWindupMove`...), the sky-occlusion renderer too; `ConventionTests.APlaceholderValue_IsNeverHandedOutAsANumber`; the telegraph's colour reads the AI's own rule (`MonsterAI.AnyBlowBreaksStrike`), the Fight card and Frenzied the swing's real cost (`PlayerCombat.StaminaCostOf`, `LastSwingStaminaPaid`) |
 | 5. Creatures: one way in, puppets that only show | planned |
-| 6. Player interrupt, monster state exits | planned |
+| 6. Player interrupt, monster state exits | built: `PlayerInterrupts` (death, a flinch, a pause, a window, a weapon swap) and `IPlayerActivity` (EndsOn, Interrupt): building, fishing, riding, interacting, being aboard, crafting by hand and a skill's blow on its way are told there, death ends every one; `PlayerInterruptsTests` (the rule, and no activity listening itself). A monster's states give back what they gave in `MonsterAI.SetState` (a hop's invulnerability, a stagger's damage taken, a read parry, circling) |
 | 7. One blow pipeline | built: `PlayerBlows` (FromTheShadows: sure critical and Ambush Damage; CatchesUnaware; UnawareBlowWorth) used by blades, arrows, casts, thrown weapons, Silent Takedown and the focus ring's estimate (which disagreed before); `ConventionTests.BlowsFromTheShadows_AreWorkedOutInPlayerBlows`. High ground stays a projectile's own |
 | 8. Events say why | planned |
 | 9. Here and Home | planned |

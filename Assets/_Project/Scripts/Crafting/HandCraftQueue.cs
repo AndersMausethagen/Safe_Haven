@@ -11,7 +11,7 @@ using UnityEngine;
 /// craft under way. Added to the player by PlayerCrafting.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class HandCraftQueue : MonoBehaviour
+public sealed class HandCraftQueue : MonoBehaviour, IPlayerActivity
 {
     // One paid craft, with what it cost from where.
     private sealed class Craft
@@ -276,13 +276,6 @@ public sealed class HandCraftQueue : MonoBehaviour
             return;
         }
 
-        // Fallen: nothing is made by the dead (review 2026-11-16); what it cost goes back with the rest of the bag.
-        if (health != null && !health.IsAlive)
-        {
-            Stop(false);
-            return;
-        }
-
         elapsed += Time.deltaTime;
         if (elapsed >= seconds)
         {
@@ -316,8 +309,24 @@ public sealed class HandCraftQueue : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        PlayerInterrupts.For(gameObject).Add(this);
+    }
+
+    /// <summary>Death alone ends it (PlayerInterrupts tells every activity of a death).</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.None;
+
+    // Fallen: nothing is made by the dead (review 2026-11-16); what it cost goes back with the rest of the bag.
+    public void Interrupt(PlayerInterrupt reason) => Stop(false);
+
     private void OnDisable()
     {
+        if (TryGetComponent(out PlayerInterrupts interrupts))
+        {
+            interrupts.Remove(this);
+        }
+
         // Leaving the scene: every way out that keeps the player (a raid, home, a friend's Haven, a save) has stopped or saved the
         // crafts before the player was copied. A refund now would land in a bag already copied, or in the stash of the game a
         // load has put in place (paid for twice).

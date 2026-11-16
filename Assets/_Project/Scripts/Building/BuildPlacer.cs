@@ -33,7 +33,7 @@ using UnityEngine.InputSystem;
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
-public sealed partial class BuildPlacer : MonoBehaviour
+public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
 {
     // Overlap boxes start this far above the build plane so the ground itself doesn't count.
     private const float GroundLift = 0.15f;
@@ -115,20 +115,15 @@ public sealed partial class BuildPlacer : MonoBehaviour
     private void OnEnable()
     {
         BackHandlers.Register(BackHandlers.BuildPlacementPriority, CancelByBack);
-        GamePause.Changed += OnPauseChanged;
-        if (TryGetComponent(out Damageable health))
-        {
-            health.Died += OnDied;
-        }
+        PlayerInterrupts.For(gameObject).Add(this);
     }
 
     private void OnDisable()
     {
         BackHandlers.Unregister(CancelByBack);
-        GamePause.Changed -= OnPauseChanged;
-        if (TryGetComponent(out Damageable health))
+        if (TryGetComponent(out PlayerInterrupts interrupts))
         {
-            health.Died -= OnDied;
+            interrupts.Remove(this);
         }
 
         Cancel();
@@ -136,15 +131,10 @@ public sealed partial class BuildPlacer : MonoBehaviour
 
     // The Build map stays on behind a pause (the cheat window, a cinematic) and on a body: a click there placed a building. Building
     // stops instead, a carried building going back where it stood.
-    private void OnPauseChanged(bool paused)
-    {
-        if (paused && IsBusy)
-        {
-            Cancel();
-        }
-    }
+    public PlayerInterrupt EndsOn => PlayerInterrupt.Paused;
 
-    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    // A pause or a death (PlayerInterrupts).
+    public void Interrupt(PlayerInterrupt reason)
     {
         if (IsBusy)
         {

@@ -17,7 +17,7 @@ using UnityEngine.AI;
 /// Added to the player the first time it is needed (<see cref="For"/>).
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class PlayerRiding : MonoBehaviour
+public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
 {
     private PlayerStateMachine stateMachine;
     private PlayerMovement movement;
@@ -92,18 +92,15 @@ public sealed class PlayerRiding : MonoBehaviour
     private void OnEnable()
     {
         stateMachine.AboardInteraction += OnInteract;
-        if (health != null)
-        {
-            health.Died += OnDied;
-        }
+        PlayerInterrupts.For(gameObject).Add(this);
     }
 
     private void OnDisable()
     {
         stateMachine.AboardInteraction -= OnInteract;
-        if (health != null)
+        if (TryGetComponent(out PlayerInterrupts interrupts))
         {
-            health.Died -= OnDied;
+            interrupts.Remove(this);
         }
 
         // Gone (a scene change, a load): straight down, no clip to play out.
@@ -507,7 +504,10 @@ public sealed class PlayerRiding : MonoBehaviour
         }
     }
 
-    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    /// <summary>Death alone ends it (PlayerInterrupts tells every activity of a death).</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.None;
+
+    public void Interrupt(PlayerInterrupt reason)
     {
         if (Riding != null)
         {

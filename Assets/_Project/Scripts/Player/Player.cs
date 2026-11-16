@@ -51,6 +51,7 @@ public sealed class Player : MonoBehaviour
 
     private void Awake()
     {
+        PlayerInterrupts.For(gameObject); // first, so the activities' registrations find it
         ColdBreath.AddTo(gameObject);
         PlayerTraining.AddTo(gameObject);
         PlayerTechniques.AddTo(gameObject);

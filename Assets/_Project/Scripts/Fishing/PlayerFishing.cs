@@ -14,7 +14,7 @@ using UnityEngine;
 /// attack and guard buttons are this component's while it is held.
 /// </summary>
 [DisallowMultipleComponent]
-public sealed class PlayerFishing : MonoBehaviour
+public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
 {
     // Casting and Landing came later: the numbers are sent to friends in co-op, so the older ones keep theirs.
     public enum Phase { None, Ready, Charging, Waiting, Bite, Reeling, Grabbed, Casting, Landing }
@@ -128,24 +128,24 @@ public sealed class PlayerFishing : MonoBehaviour
         stateMachine.AttackRequested += OnAttackPressed;
         stateMachine.AttackReleased += OnAttackReleased;
         stateMachine.GuardRequested += OnGuard;
-        if (health != null)
-        {
-            health.Died += OnDied;
-        }
+        PlayerInterrupts.For(gameObject).Add(this);
     }
 
     // Killed with a line out: the line goes with them. The fight ticked on while they lay there and woke them rooted, facing
     // the water, at the portal.
-    private void OnDied(Damageable victim, DamageInfo killingBlow) => EndLine(null);
+    /// <summary>Death alone ends it (PlayerInterrupts tells every activity of a death).</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.None;
+
+    public void Interrupt(PlayerInterrupt reason) => EndLine(null);
 
     private void OnDisable()
     {
         stateMachine.AttackRequested -= OnAttackPressed;
         stateMachine.AttackReleased -= OnAttackReleased;
         stateMachine.GuardRequested -= OnGuard;
-        if (health != null)
+        if (TryGetComponent(out PlayerInterrupts interrupts))
         {
-            health.Died -= OnDied;
+            interrupts.Remove(this);
         }
 
         EndLine(null);

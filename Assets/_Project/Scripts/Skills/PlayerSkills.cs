@@ -29,7 +29,7 @@ public enum SkillCastResult
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerStateMachine), typeof(PlayerMovement), typeof(Combatant))]
 [RequireComponent(typeof(Damageable))]
-public sealed class PlayerSkills : MonoBehaviour
+public sealed class PlayerSkills : MonoBehaviour, IPlayerActivity
 {
     [SerializeField] private PlayerSkillSettings settings;
     [Tooltip("Layers skill hits can reach. Targets still have to be damageable and hostile.")]
@@ -93,10 +93,7 @@ public sealed class PlayerSkills : MonoBehaviour
             dodge.Dodged += OnDodged;
         }
 
-        if (combat != null)
-        {
-            combat.Flinched += OnFlinched;
-        }
+        PlayerInterrupts.For(gameObject).Add(this);
 
         if (TryGetComponent(out bagItems))
         {
@@ -130,9 +127,9 @@ public sealed class PlayerSkills : MonoBehaviour
             dodge.Dodged -= OnDodged;
         }
 
-        if (combat != null)
+        if (TryGetComponent(out PlayerInterrupts interrupts))
         {
-            combat.Flinched -= OnFlinched;
+            interrupts.Remove(this);
         }
 
         if (bagItems != null)
@@ -419,8 +416,10 @@ public sealed class PlayerSkills : MonoBehaviour
         pendingHit = null;
     }
 
-    // Struck out of it: a skill hit that hadn't landed yet is lost, as a weapon swing's is.
-    private void OnFlinched(float seconds, bool lostSwing)
+    /// <summary>A blow that rocks the player (and a death) loses a skill hit not yet landed, as a weapon swing's is.</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.Staggered;
+
+    public void Interrupt(PlayerInterrupt reason)
     {
         pendingHit = null;
     }

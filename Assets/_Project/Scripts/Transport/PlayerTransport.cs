@@ -9,7 +9,7 @@ using UnityEngine;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerMovement), typeof(PlayerStateMachine), typeof(CharacterController))]
-public sealed class PlayerTransport : MonoBehaviour, IHauler
+public sealed class PlayerTransport : MonoBehaviour, IHauler, IPlayerActivity
 {
     private const float BoardReach = 3.5f;
     private const float ArrivalSeconds = 5f;
@@ -63,10 +63,7 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
         stateMachine.GuardRequested += OnGuard;
         stateMachine.AboardInteraction += OnAboardInteraction;
         stateMachine.SwimmingInteraction += OnSwimmingInteraction;
-        if (health != null)
-        {
-            health.Died += OnDied;
-        }
+        PlayerInterrupts.For(gameObject).Add(this);
     }
 
     private void OnDisable()
@@ -78,9 +75,9 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
         stateMachine.GuardRequested -= OnGuard;
         stateMachine.AboardInteraction -= OnAboardInteraction;
         stateMachine.SwimmingInteraction -= OnSwimmingInteraction;
-        if (health != null)
+        if (TryGetComponent(out PlayerInterrupts interrupts))
         {
-            health.Died -= OnDied;
+            interrupts.Remove(this);
         }
 
         if (Current == this)
@@ -213,7 +210,10 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler
         }
     }
 
-    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    /// <summary>Death alone ends it (PlayerInterrupts tells every activity of a death).</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.None;
+
+    public void Interrupt(PlayerInterrupt reason)
     {
         if (Using != null)
         {
