@@ -570,7 +570,7 @@ public sealed class ItemTooltipView : MonoBehaviour
             string colour = hours < 1f ? UIStyle.Current.DangerHex : UIStyle.Current.GoodHex;
             string refill = item.Lantern.Refill != null ? item.Lantern.Refill.DisplayName.ToLowerInvariant() : "refill";
             builder.Append($"\n<color={colour}>Light {Mathf.CeilToInt(hours)} of {Mathf.RoundToInt(item.Lantern.Hours)} hours</color>");
-            Hint(builder, hints, $"Worn in the Light slot; L lights it. Right-click with a {refill} in the bag to refill it.");
+            Hint(builder, hints, GameInput.Keys($"Worn in the Light slot; {{key:Light}} lights it. Right-click with a {refill} in the bag to refill it."));
         }
 
         if (item.HoldsWater)
@@ -680,7 +680,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.IsEquippable && held)
         {
-            Hint(builder, hints, "Right-click to equip or unequip (C opens the character screen).");
+            Hint(builder, hints, GameInput.Keys("Right-click to equip or unequip ({key:Character} opens the character screen)."));
         }
 
         if (held && !string.IsNullOrWhiteSpace(item.Description))

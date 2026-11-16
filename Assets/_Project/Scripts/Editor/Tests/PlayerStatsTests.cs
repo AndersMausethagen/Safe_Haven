@@ -168,4 +168,22 @@ public sealed class PlayerStatsTests
             }
         }
     }
+
+    [Test]
+    public void APercentBonus_Works_OnAStatWithItsBaseOutsideTheSheet()
+    {
+        // Review 2026-11-16: Chilled (-8% speed, -15% stamina), Rested and Moon Broth (+15% stamina) and the Waystone (+10% gather
+        // yield, +5% speed) did nothing: the player has no base for these in the sheet, and a percent only scaled the flat ones.
+        var stats = new StatSheet();
+        stats.AddModifier(new StatModifier(StatType.MaxStamina, StatModifierOp.Percent, 0.15f, this));
+        Assert.AreEqual(115f, stats.GetOn(StatType.MaxStamina, 100f), 0.01f, "Rested: 15% more of the pool");
+
+        stats.AddModifier(new StatModifier(StatType.MoveSpeed, StatModifierOp.Percent, -0.08f, this));
+        Assert.AreEqual(0.92f, stats.GetOn(StatType.MoveSpeed, 1f), 0.001f, "Chilled slows");
+        stats.AddModifier(new StatModifier(StatType.MoveSpeed, StatModifierOp.Flat, -0.06f, this));
+        Assert.Less(stats.GetOn(StatType.MoveSpeed, 1f), 0.92f, "a slowing armour and the chill: slower still, not faster");
+
+        stats.AddModifier(new StatModifier(StatType.GatherYield, StatModifierOp.Percent, 0.1f, this));
+        Assert.AreEqual(0.1f, stats.GetChance(StatType.GatherYield), 0.001f, "the Waystone's ten points of extra yield");
+    }
 }

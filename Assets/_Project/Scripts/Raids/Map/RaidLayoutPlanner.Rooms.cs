@@ -88,7 +88,9 @@ public static partial class RaidLayoutPlanner
                     }
                 }
 
-                spine.Add(2);
+                // Ends at the exit it heads for (the one straight ahead, EnsureRoutes' too): a fixed 2 was that exit only with two or
+                // three exits, and a large raid's six ran its last trail round the rim to another.
+                spine.Add(1 + rules.ExitRooms / 2);
                 break;
         }
 

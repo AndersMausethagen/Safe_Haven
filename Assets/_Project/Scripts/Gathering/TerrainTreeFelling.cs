@@ -21,7 +21,6 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private const float ProxyRadius = 10f;
     private const float ReleaseRadius = 14f;
     private const float RefreshSeconds = 0.25f;
-    private const string RuntimeSuffix = " (runtime)";
     // The choppable trees by ground cell, so a refresh looks at those round the player, not every tree (the Haven has 130 000).
     private const float CellSize = 16f;
 
@@ -422,7 +421,13 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         GameObject prefab = terrain.terrainData.treePrototypes[tree.prototypeIndex].prefab;
         Quaternion turned = Quaternion.Euler(0f, tree.rotation * Mathf.Rad2Deg, 0f);
         var sized = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
-        choppableTree.SetStandIn(() => TreeParts.Of(prefab, at, turned, sized));
+        // Its stump lasts as long as it takes to grow back: for good where the woods are remembered.
+        choppableTree.SetStandIn(() =>
+        {
+            TreeParts parts = TreeParts.Of(prefab, at, turned, sized);
+            parts.RegrowSeconds = KeepsFelled ? -1f : 0f;
+            return parts;
+        });
         var node = proxy.GetComponent<ResourceNode>();
         int felledIndex = index;
         node.Harvested += () => Fell(felledIndex);
@@ -537,20 +542,10 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     // The scene's terrain data is an asset: fell on a copy (a raid map's turned terrain already is one).
     private void OwnTheData()
     {
-        TerrainData data = terrain.terrainData;
-        if (data.name.EndsWith(RuntimeSuffix) || data.name.EndsWith("(turned)"))
+        TerrainData copy = RuntimeTerrain.Own(terrain);
+        if (copy != null)
         {
-            return;
+            cachedFor = copy;
         }
-
-        TerrainData copy = Instantiate(data);
-        copy.name = data.name + RuntimeSuffix;
-        terrain.terrainData = copy;
-        if (terrain.TryGetComponent(out TerrainCollider ground))
-        {
-            ground.terrainData = copy;
-        }
-
-        cachedFor = copy;
     }
 }

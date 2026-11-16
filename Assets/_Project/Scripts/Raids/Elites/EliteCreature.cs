@@ -69,16 +69,14 @@ public sealed class EliteCreature : MonoBehaviour
         }
 
         // The raid's own bonuses are added as shares of the base value, so these are scaled by them to multiply rather than add.
-        StatSheet stats = Combatant.Stats;
-        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, (health - 1f) * healthScale, this));
-        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, (damage - 1f) * powerScale, this));
-        if (armor > 0f)
-        {
-            stats.AddModifier(new StatModifier(StatType.Armor, StatModifierOp.Flat, armor, this));
-        }
+        healthShare = health - 1f;
+        damageShare = damage - 1f;
+        armorBonus = armor;
+        Rescale(healthScale, powerScale);
 
         Health.Heal(Health.MaxHealth);
         ai.SpeedScale = speed;
+        // (the affixes' shares are kept for Rescale)
         ai.CooldownScale = cooldowns;
         transform.localScale *= size;
 
@@ -117,6 +115,26 @@ public sealed class EliteCreature : MonoBehaviour
             {
                 label.transform.rotation = viewCamera.transform.rotation;
             }
+        }
+    }
+
+    private float healthShare;
+    private float damageShare;
+    private float armorBonus;
+
+    /// <summary>
+    /// Sets the elite's own bonuses for the raid's scaling now (RaidCreatures.Strengthen, at promotion and at every stage
+    /// change): worked out once at promotion, a stage's bonus came on top of them instead of under them (×2.40 where ×2.52 was due).
+    /// </summary>
+    public void Rescale(float healthScale, float powerScale)
+    {
+        StatSheet stats = Combatant.Stats;
+        stats.RemoveModifiersFrom(this);
+        stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, healthShare * healthScale, this));
+        stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, damageShare * powerScale, this));
+        if (armorBonus > 0f)
+        {
+            stats.AddModifier(new StatModifier(StatType.Armor, StatModifierOp.Flat, armorBonus, this));
         }
     }
 

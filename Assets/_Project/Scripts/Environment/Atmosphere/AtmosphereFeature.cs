@@ -242,8 +242,10 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
 
         private History HistoryFor(Camera camera, int width, int height)
         {
-            if (histories.Count > 4)
+            if (!histories.TryGetValue(camera, out History history))
             {
+                // A camera new to the fog: the ones that are gone (every scene has its own main camera) let go of their history
+                // here, not only past four of them, which kept three or four dead cameras' textures (tens of MB each) alive.
                 foreach (Camera gone in new List<Camera>(histories.Keys))
                 {
                     if (gone == null)
@@ -252,10 +254,7 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                         histories.Remove(gone);
                     }
                 }
-            }
 
-            if (!histories.TryGetValue(camera, out History history))
-            {
                 history = new History();
                 histories[camera] = history;
             }

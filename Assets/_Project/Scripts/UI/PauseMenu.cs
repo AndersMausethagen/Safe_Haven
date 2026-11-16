@@ -402,7 +402,7 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void Refresh()
     {
-        string saveProblem = SaveGameService.CheckSave();
+        string saveProblem = SaveGameService.CheckPlayerSave();
         saveButton.interactable = !leaving && saveProblem == null;
         loadButton.interactable = !leaving && SaveGameService.HasSave && SaveGameService.CheckLoad() == null;
         continueButton.interactable = !leaving;
@@ -451,6 +451,13 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void Save()
     {
+        string busy = SaveGameService.CheckPlayerSave();
+        if (busy != null)
+        {
+            statusLabel.text = busy;
+            return;
+        }
+
         if (SaveGameService.TrySave(out string problem))
         {
             statusLabel.text = $"<color={UIStyle.Current.GoodHex}>Game saved.</color>";

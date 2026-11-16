@@ -27,6 +27,8 @@ public static class SceneLoader
     /// <summary>Records every saveable object and marks the scene as leaving. Called by SceneTransition just before it loads.</summary>
     internal static void BeginLeaving()
     {
+        // A line being spoken ends with the scene: its voice lives across loads, and ran on into the next scene or the menu.
+        VoicePlayer.Stop();
         SaveableEntity.CaptureAll();
         IsLeaving = true;
         SceneManager.sceneLoaded -= OnSceneLoaded;

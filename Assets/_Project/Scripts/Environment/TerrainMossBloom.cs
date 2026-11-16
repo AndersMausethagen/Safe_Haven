@@ -38,8 +38,6 @@ public sealed class TerrainMossBloom : MonoBehaviour
     [Tooltip("Grow the particle shape's radius with the spreading moss.")]
     [SerializeField] private bool fitParticlesToRadius = true;
 
-    private static readonly HashSet<TerrainData> RuntimeCopies = new HashSet<TerrainData>();
-
     private Terrain terrain;
     private TerrainData ownedCopy;
     private Coroutine spreading;
@@ -52,11 +50,6 @@ public sealed class TerrainMossBloom : MonoBehaviour
     /// <summary>The circle's full radius right now.</summary>
     public float TargetRadius => followWardRadius && HomePortal.Current != null ? HomePortal.Current.WardRadius : radius;
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession()
-    {
-        RuntimeCopies.Clear();
-    }
 
     /// <summary>Spreads the moss outward over Spread Seconds, with sound and particles.</summary>
     public void Bloom()
@@ -138,7 +131,8 @@ public sealed class TerrainMossBloom : MonoBehaviour
 
     private void PaintTo(float target)
     {
-        if (PrepareTerrain())
+        // The paint right after rebuilds the moss on the copy anyway: not twice on loading (each reads the whole alphamap).
+        if (PrepareTerrain(rebuildOnCopy: false))
         {
             Paint(target, true);
         }
@@ -153,7 +147,7 @@ public sealed class TerrainMossBloom : MonoBehaviour
         }
     }
 
-    private bool PrepareTerrain()
+    private bool PrepareTerrain(bool rebuildOnCopy = true)
     {
         if (moss == null)
         {
@@ -167,19 +161,16 @@ public sealed class TerrainMossBloom : MonoBehaviour
         }
 
         terrain = moss.GetComponent<Terrain>();
-        if (Application.isPlaying && !RuntimeCopies.Contains(terrain.terrainData))
+        // Never write into the terrain asset during play: paint the runtime copy every changer shares (RuntimeTerrain), made
+        // here if none is yet, dying with the scene.
+        TerrainData made = Application.isPlaying ? RuntimeTerrain.Own(terrain) : null;
+        if (made != null)
         {
-            // Never write into the terrain asset during play: paint an instance that dies with the scene.
-            ownedCopy = Instantiate(terrain.terrainData);
-            RuntimeCopies.Add(ownedCopy);
-            terrain.terrainData = ownedCopy;
-            TerrainCollider terrainCollider = terrain.GetComponent<TerrainCollider>();
-            if (terrainCollider != null)
+            ownedCopy = made;
+            if (rebuildOnCopy)
             {
-                terrainCollider.terrainData = ownedCopy;
+                moss.Rebuild();
             }
-
-            moss.Rebuild();
         }
 
         return System.Array.IndexOf(terrain.terrainData.terrainLayers, PaintedLayer) >= 0;
@@ -326,7 +317,6 @@ public sealed class TerrainMossBloom : MonoBehaviour
     {
         if (ownedCopy != null)
         {
-            RuntimeCopies.Remove(ownedCopy);
             Destroy(ownedCopy);
         }
     }

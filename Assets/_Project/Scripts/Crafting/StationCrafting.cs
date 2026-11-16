@@ -25,6 +25,12 @@ public static class StationCrafting
             return $"Made at {recipe.Station.WithArticle()}.";
         }
 
+        // Said here, without a message, so the browser greys the button instead of playing its punch for a refusal.
+        if (HavenVisit.IsVisiting)
+        {
+            return "Their workshop: your friend's to run.";
+        }
+
         if (crafting == null || !crafting.IsKnown(recipe))
         {
             return "Not learned yet.";
@@ -87,6 +93,13 @@ public static class StationCrafting
     /// <summary>Takes the last unstarted craft off the queue and gives its costs back. Returns false when nothing could be cancelled.</summary>
     public static bool CancelLast(GameObject user, StationQueue queue)
     {
+        // A friend's workshop (co-op) is the host's: cancelling here refunded the host's materials to the guest, and the job came
+        // back with the host's next word, to be cancelled again.
+        if (HavenVisit.LeftToHost())
+        {
+            return false;
+        }
+
         RecipeDefinition recipe = queue != null ? queue.CancelLast() : null;
         if (recipe == null)
         {
@@ -127,7 +140,8 @@ public static class StationCrafting
     /// <summary>Moves what fits from the output slot to the player. Returns how many were taken.</summary>
     public static int Collect(GameObject user, StationQueue queue)
     {
-        if (queue == null || queue.Output == null || user == null)
+        // The host's output, in a friend's Haven (co-op): taken here it was given to the guest while the host kept it too.
+        if (queue == null || queue.Output == null || user == null || HavenVisit.LeftToHost())
         {
             return 0;
         }

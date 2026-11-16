@@ -18,6 +18,9 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     {
         public bool depleted;
         public float respawnRemaining;
+        // When it was saved, in this run of the game (DayNightCycle.Run), so the time away on a raid counts.
+        public string run;
+        public double savedAt;
     }
 
     [SerializeField] private GatheringNodeDefinition node;
@@ -61,7 +64,10 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     // The regrowth time is saved as time left, since the game clock starts over after loading.
     public string CaptureState()
     {
-        return JsonUtility.ToJson(new SavedNode { depleted = IsDepleted, respawnRemaining = RespawnRemaining });
+        return JsonUtility.ToJson(new SavedNode
+        {
+            depleted = IsDepleted, respawnRemaining = RespawnRemaining, run = DayNightCycle.Run, savedAt = Time.realtimeSinceStartupAsDouble,
+        });
     }
 
     public void RestoreState(string state)
@@ -69,7 +75,10 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         SavedNode saved = JsonUtility.FromJson<SavedNode>(state);
         if (saved.depleted)
         {
-            respawnAt = Time.time + saved.respawnRemaining;
+            // Home from a raid in the same run, the time away counts, as it does for the clock, the days and the saplings: the node
+            // had exactly as long to go as when the player left. From disk (or a friend's game) there's no knowing how long it was.
+            float away = saved.run == DayNightCycle.Run ? (float)(Time.realtimeSinceStartupAsDouble - saved.savedAt) : 0f;
+            respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - Mathf.Max(0f, away));
             SetPresent(false);
         }
         else if (IsDepleted)

@@ -165,6 +165,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     {
         [Tooltip("Words to look for in the ground layer's name, comma separated (grass, moss).")]
         public string layerWords;
+        [System.NonSerialized] private string[] words;
         public SoundDefinition sound;
 
         public bool Matches(string layerName)
@@ -174,9 +175,10 @@ public sealed class AudioSettingsDefinition : ScriptableObject
                 return false;
             }
 
-            foreach (string word in layerWords.Split(','))
+            // Split once and kept: a split every footstep (and every friend's) made new strings each time.
+            words ??= System.Array.ConvertAll(layerWords.Split(','), word => word.Trim());
+            foreach (string trimmed in words)
             {
-                string trimmed = word.Trim();
                 if (trimmed.Length > 0 && layerName.IndexOf(trimmed, System.StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     return true;

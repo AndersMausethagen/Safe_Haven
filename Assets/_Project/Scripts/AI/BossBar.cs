@@ -20,10 +20,8 @@ public sealed class BossBar : MonoBehaviour
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 800;
-        var scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 1f;
+        // The UI's own scaler, so "UI and Text Size" applies from the start, not only after it is changed in a session.
+        UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         BossBar bar = root.AddComponent<BossBar>();
         bar.Build(boss);
         return bar;

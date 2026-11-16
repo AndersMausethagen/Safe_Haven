@@ -78,6 +78,16 @@ public static class BloodDecals
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
+        // DontSave: nothing else frees them, so each Play session left a texture and a material per blood colour behind.
+        foreach (Material tinted in Tinted.Values)
+        {
+            if (tinted != null)
+            {
+                Object.DestroyImmediate(tinted.GetTexture(BaseMapId));
+                Object.DestroyImmediate(tinted);
+            }
+        }
+
         Tinted.Clear();
     }
 }

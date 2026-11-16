@@ -155,8 +155,19 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         }
     }
 
+    /// <summary>
+    /// True while the pointer rests on a bag slot (no drag under way): the skill, quickbar, tab and drop keys are the bag's then,
+    /// not the player's. Read by the input callbacks, which run before this window's Update: a skill key put the item on the bar
+    /// and cast the slot's ability too (or drank the potion it was taking off), and Ctrl for a drop toggled sneaking.
+    /// </summary>
+    public static bool ClaimsKeys { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetClaims() => ClaimsKeys = false;
+
     private void OnDisable()
     {
+        ClaimsKeys = false;
         GameInput.KeysChanged -= OnKeysChanged;
         if (container != null)
         {
@@ -198,6 +209,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
 
     private void Update()
     {
+        ClaimsKeys = hovered != null && dragFrom < 0;
         UpdateLayout();
         Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);

@@ -17,7 +17,6 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
     private const float ProxyRadius = 9f;
     private const float ReleaseRadius = 13f;
     private const float RefreshSeconds = 0.25f;
-    private const string RuntimeSuffix = " (runtime)";
 
     private sealed class Stand
     {
@@ -214,7 +213,9 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
             return;
         }
 
-        bool sameInstances = data.treeInstanceCount == cachedCount;
+        // Trees are only ever added to the same data (a sapling planted): the instances already counted are the same ones, and a
+        // gathered rock waiting to grow back stays so. Treated as a new map, it was put back hidden for the rest of the visit.
+        bool sameInstances = data == cachedFor ? data.treeInstanceCount >= cachedCount : data.treeInstanceCount == cachedCount;
         foreach (int index in new List<int>(stands.Keys))
         {
             // A gathered rock keeps counting down to growing back, unless the map itself changed under it.
@@ -247,20 +248,10 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
     // The scene's terrain data is an asset: change a copy (one TerrainTreeFelling made, or a raid map's generated one, will do).
     private void OwnTheData()
     {
-        TerrainData data = terrain.terrainData;
-        if (data.name.EndsWith(RuntimeSuffix) || data.name.EndsWith("(turned)") || data.name.EndsWith("(generated)"))
+        TerrainData copy = RuntimeTerrain.Own(terrain);
+        if (copy != null)
         {
-            return;
+            cachedFor = copy;
         }
-
-        TerrainData copy = Instantiate(data);
-        copy.name = data.name + RuntimeSuffix;
-        terrain.terrainData = copy;
-        if (terrain.TryGetComponent(out TerrainCollider ground))
-        {
-            ground.terrainData = copy;
-        }
-
-        cachedFor = copy;
     }
 }

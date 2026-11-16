@@ -244,7 +244,9 @@ public sealed class PlayerAudio : MonoBehaviour
     public static int GrassUnder(Terrain terrain, Vector3 point)
     {
         TerrainData data = terrain.terrainData;
-        if (data == null || data.detailPrototypes.Length == 0 || data.detailResolution <= 0)
+        // detailPrototypes makes a new array of class objects each time it is read: once a step, not once a layer.
+        int layers = data != null ? data.detailPrototypes.Length : 0;
+        if (layers == 0 || data.detailResolution <= 0)
         {
             return 0;
         }
@@ -253,7 +255,7 @@ public sealed class PlayerAudio : MonoBehaviour
         int x = Mathf.Clamp(Mathf.FloorToInt(local.x / data.size.x * data.detailWidth), 0, data.detailWidth - 1);
         int z = Mathf.Clamp(Mathf.FloorToInt(local.z / data.size.z * data.detailHeight), 0, data.detailHeight - 1);
         int total = 0;
-        for (int layer = 0; layer < data.detailPrototypes.Length; layer++)
+        for (int layer = 0; layer < layers; layer++)
         {
             total += data.GetDetailLayer(x, z, 1, 1, layer)[0, 0];
         }
@@ -283,7 +285,8 @@ public sealed class PlayerAudio : MonoBehaviour
             }
         }
 
-        TerrainLayer layer = best < data.terrainLayers.Length ? data.terrainLayers[best] : null;
+        TerrainLayer[] painted = data.terrainLayers;
+        TerrainLayer layer = best < painted.Length ? painted[best] : null;
         return layer != null ? layer.name : null;
     }
 }

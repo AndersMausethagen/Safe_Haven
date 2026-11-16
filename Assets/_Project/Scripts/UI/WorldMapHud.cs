@@ -136,7 +136,7 @@ public sealed class WorldMapHud : MonoBehaviour
     {
         if (suspendedGameplay)
         {
-            GameInput.ResumeGameplay();
+            GameInput.ResumeGameplay(this);
             suspendedGameplay = false;
         }
 
@@ -257,7 +257,7 @@ public sealed class WorldMapHud : MonoBehaviour
             }
         }
 
-        GameInput.SuspendGameplay();
+        GameInput.SuspendGameplay(this);
         suspendedGameplay = true;
         // M stays live while the rest of play waits, so the key that opened the map also closes it.
         GameInput.WorldMap?.Enable();

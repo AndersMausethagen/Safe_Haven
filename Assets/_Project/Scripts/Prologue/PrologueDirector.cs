@@ -205,6 +205,7 @@ public sealed class PrologueDirector : MonoBehaviour
         PrologueChapter next = definition.Chapter(GameSession.Quests);
         bool active = next != null && GameSession.Quests.StatusOf(next.Quest) != QuestStatus.NotStarted;
         if (!restoring && next == chapter && chapterActive == active) return;
+        bool newChapter = next != chapter;
         if (chapter != null) QuestTimers.Clear(chapter.Quest);
         chapter = next;
         chapterActive = active;
@@ -259,7 +260,11 @@ public sealed class PrologueDirector : MonoBehaviour
                 StartChapter();
             }
         }
-        if (CanSave && !SaveGameService.TrySave(out string problem))
+        // A checkpoint at a new chapter, or once its giver's briefing is accepted; not when a quest that starts by itself becomes
+        // active a few seconds in: its opening story (a once-only trigger, the old troll's) had fired by then, and the checkpoint
+        // loaded skipped it, the party already at the stones.
+        bool accepted = chapterActive && chapter != null && chapter.Quest.Start == QuestStart.ByQuestGiver;
+        if ((newChapter || accepted || restoring) && CanSave && !SaveGameService.TrySave(out string problem))
             GameMessages.Post("Prologue checkpoint could not be saved: " + problem, MessageKind.Warning);
     }
 

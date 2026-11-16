@@ -221,12 +221,28 @@ public sealed class NodeStreaming : MonoBehaviour
 
     private void OnDisable() => active.Remove(this);
 
+    // By owner, not through the objects: at a scene's unload they may be gone first, and their entries stayed in the static maps
+    // (about a thousand dead ones each Haven visit).
     private void OnDestroy()
     {
-        foreach (Entry entry in entries)
+        RemoveOwned(byCollider);
+        RemoveOwned(liveByObject);
+    }
+
+    private void RemoveOwned<T>(Dictionary<T, Entry> map)
+    {
+        var mine = new List<T>();
+        foreach (KeyValuePair<T, Entry> pair in map)
         {
-            if (entry.Placed == null) continue;
-            foreach (Collider collider in entry.Placed.GetComponentsInChildren<Collider>(true)) byCollider.Remove(collider);
+            if (pair.Value == null || pair.Value.Owner == this || pair.Value.Owner == null)
+            {
+                mine.Add(pair.Key);
+            }
+        }
+
+        foreach (T key in mine)
+        {
+            map.Remove(key);
         }
     }
 

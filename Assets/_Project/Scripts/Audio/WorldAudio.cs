@@ -86,8 +86,10 @@ public sealed class WorldAudio
     {
         WeatherState state = weather != null && weather.isActiveAndEnabled ? weather.Current : default;
         bool snowing = weather != null && weather.isActiveAndEnabled && weather.Snowing;
-        Follow(rain, sounds.RainLoop, snowing ? 0f : state.Rain); // snow falls quietly
-        Follow(wind, sounds.WindLoop, Mathf.Clamp01((state.Wind - 0.8f) / 2.2f + state.Gusts * 0.4f));
+        // Under a painted cinematic (it holds the music) the world's loops fade too: rain and wind played over the narration.
+        float heard = AudioManager.MusicHeld ? 0f : 1f;
+        Follow(rain, sounds.RainLoop, (snowing ? 0f : state.Rain) * heard); // snow falls quietly
+        Follow(wind, sounds.WindLoop, Mathf.Clamp01((state.Wind - 0.8f) / 2.2f + state.Gusts * 0.4f) * heard);
         for (int i = thunderAt.Count - 1; i >= 0; i--)
         {
             if (Time.unscaledTime >= thunderAt[i])
@@ -203,7 +205,8 @@ public sealed class WorldAudio
                 AudioSource source = Loop("Water " + surface.name);
                 AudioManager.Configure(source, sound);
                 source.spatialBlend = 1f;
-                source.ignoreListenerPause = true;
+                // Hushed with the world when the game pauses (the menu, a cinematic), as every other world sound is.
+                source.ignoreListenerPause = false;
                 source.clip = clip;
                 source.time = Random.Range(0f, clip.length);
                 source.Play();

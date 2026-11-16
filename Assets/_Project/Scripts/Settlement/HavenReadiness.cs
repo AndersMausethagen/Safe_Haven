@@ -119,6 +119,17 @@ public static class HavenReadiness
             sources.Add($"People with a bed: {housed}");
         }
 
+        // The rest of what Comfort adds up, so the list sums to the total shown.
+        if (HomeLife.Comfort > 0)
+        {
+            sources.Add($"The best home: {HomeLife.Comfort}");
+        }
+
+        if (Yards.Comfort > 0)
+        {
+            sources.Add($"Yards: {Yards.Comfort}");
+        }
+
         entry.Details.Add(new HavenDetail("Comfort from", sources.Count > 0 ? string.Join("\n", sources) : "Nothing yet. A Hut is the best start."));
         return entry;
     }

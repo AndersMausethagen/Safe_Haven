@@ -71,7 +71,9 @@ public sealed class HorseNameWindow : MonoBehaviour
         Player player = Player.Current;
         return player != null && (player.Stealth == null || !player.Stealth.IsFighting)
                && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen)
-               && !DialogueBox.IsOpen && !CinematicScreen.IsPlaying && !InGameCinematic.IsPlaying;
+               && !DialogueBox.IsOpen && !CinematicScreen.IsPlaying && !InGameCinematic.IsPlaying
+               // The world map is no UIWindow, and anything else typing or choosing a key holds the keys too.
+               && !WorldMapHud.IsOpen && !GameInput.IsGameplaySuspended;
     }
 
     // Asks the next waiting horse's name when the player is free; gone once none waits.
@@ -183,11 +185,11 @@ public sealed class HorseNameWindow : MonoBehaviour
         {
             if (open)
             {
-                GameInput.SuspendGameplay();
+                GameInput.SuspendGameplay(this);
             }
             else
             {
-                GameInput.ResumeGameplay();
+                GameInput.ResumeGameplay(this);
                 picture.Hide();
             }
         };
@@ -197,7 +199,7 @@ public sealed class HorseNameWindow : MonoBehaviour
     {
         if (window != null && window.IsOpen)
         {
-            GameInput.ResumeGameplay();
+            GameInput.ResumeGameplay(this);
         }
     }
 

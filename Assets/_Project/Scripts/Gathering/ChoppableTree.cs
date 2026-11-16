@@ -93,6 +93,13 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
     private TreeParts WithWood(TreeParts tree)
     {
         tree.Wood = wood;
+        tree.Tier = node != null && node.Definition != null ? node.Definition.Tier : 0;
+        // Its own regrowth, unless it stands in for a terrain tree (which says its own).
+        if (standIn == null && node != null && node.Definition != null)
+        {
+            tree.RegrowSeconds = node.Definition.RespawnSeconds > 0f ? node.Definition.RespawnSeconds : -1f;
+        }
+
         return tree;
     }
 

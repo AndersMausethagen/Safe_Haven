@@ -214,7 +214,13 @@ public sealed class SpawnGroup : MonoBehaviour
             return new List<(int, GameObject)>();
         }
 
-        return Plan(random, CountFor(rules), points, minimumSpawnSeparation, table.Entries);
+        // Only what appears at this raid's tier, as raid spawn lists and roamers take it (SpawnTable.Entry.AppearsAt): a group of
+        // its own placed tier-gated creatures at tier I. With no raid (a scene played alone) every entry can appear.
+        RaidSession run = GameSession.ActiveRaid;
+        IReadOnlyList<SpawnTable.Entry> entries = run != null
+            ? new List<SpawnTable.Entry>(table.Entries).FindAll(entry => entry.AppearsAt(run.Tier))
+            : table.Entries;
+        return Plan(random, CountFor(rules), points, minimumSpawnSeparation, entries);
     }
 
     /// <summary>

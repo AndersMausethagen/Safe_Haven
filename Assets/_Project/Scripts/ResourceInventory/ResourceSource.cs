@@ -23,6 +23,23 @@ public sealed class ResourceSource : MonoBehaviour
     /// <summary>The node's definition when this is a gathering node: its tool and tier say which skill it trains.</summary>
     public GatheringNodeDefinition Node => TryGetComponent(out ResourceNode node) ? node.Definition : null;
 
+    private int tierOverride;
+    private ItemDefinition mainOverride;
+
+    /// <summary>The tier what is gathered here trains at: its node's, or the tree's it came from (TakeOnTree).</summary>
+    public int Tier => tierOverride > 0 ? tierOverride : Node != null ? Node.Tier : 1;
+
+    /// <summary>
+    /// A felled tree's source becomes the tree it was (FelledTree): its tier for the skill it trains, its own wood for the bonus
+    /// logs. The felled tree's own node is tier I with Oak Wood as its main yield, so an Elderwood's landing, limbing and
+    /// sections trained Woodcutting as a tier I tree and its lucky swings gave Oak Wood.
+    /// </summary>
+    public void TakeOnTree(int tier, ItemDefinition wood)
+    {
+        tierOverride = tier;
+        mainOverride = wood;
+    }
+
     public ItemDropTable Drops => drops;
 
     private void Awake()
@@ -77,7 +94,7 @@ public sealed class ResourceSource : MonoBehaviour
     private void AfterHarvest(GameObject recipient)
     {
         Combatant gatherer = recipient != null ? recipient.GetComponentInParent<Combatant>() : null;
-        if (gatherer != null && Random.value < gatherer.Stats.Get(StatType.GatherYield) + ToolYield(gatherer.Stats, Node))
+        if (gatherer != null && Random.value < gatherer.Stats.GetChance(StatType.GatherYield) + ToolYield(gatherer.Stats, Node))
         {
             GrantBonus(recipient, 1);
         }
@@ -135,7 +152,7 @@ public sealed class ResourceSource : MonoBehaviour
     /// </summary>
     public bool GrantBonus(GameObject recipient, int amount)
     {
-        Object main = drops.Entries.Count > 0 && drops.Entries[0] != null ? drops.Entries[0].Drop : null;
+        Object main = mainOverride != null ? mainOverride : drops.Entries.Count > 0 && drops.Entries[0] != null ? drops.Entries[0].Drop : null;
         ItemInventory bag = recipient != null ? recipient.GetComponentInParent<ItemInventory>() : null;
         if (amount <= 0 || main == null || recipient == null)
         {

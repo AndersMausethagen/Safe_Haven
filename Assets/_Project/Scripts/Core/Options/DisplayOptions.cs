@@ -94,10 +94,7 @@ public static class DisplayOptions
     /// <summary>Carries out the window, VSync and frame limit. The Editor's Game view keeps its own size.</summary>
     public static void Apply()
     {
-        (int vSyncCount, int renderEvery, int targetFrameRate) = Pacing(GameOptions.VSync.On, GameOptions.FrameRate, Screen.currentResolution.refreshRateRatio.value);
-        QualitySettings.vSyncCount = vSyncCount;
-        UnityEngine.Rendering.OnDemandRendering.renderFrameInterval = renderEvery;
-        Application.targetFrameRate = targetFrameRate;
+        ApplyPacing();
         if (Application.isEditor)
         {
             return;
@@ -105,5 +102,14 @@ public static class DisplayOptions
 
         Vector2Int size = Resolution;
         Screen.SetResolution(size.x, size.y, Modes[Mode]);
+    }
+
+    /// <summary>VSync and the frame limit alone: changing them set the window again, which can flicker in exclusive fullscreen.</summary>
+    public static void ApplyPacing()
+    {
+        (int vSyncCount, int renderEvery, int targetFrameRate) = Pacing(GameOptions.VSync.On, GameOptions.FrameRate, Screen.currentResolution.refreshRateRatio.value);
+        QualitySettings.vSyncCount = vSyncCount;
+        UnityEngine.Rendering.OnDemandRendering.renderFrameInterval = renderEvery;
+        Application.targetFrameRate = targetFrameRate;
     }
 }

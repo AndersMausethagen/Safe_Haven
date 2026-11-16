@@ -105,6 +105,11 @@ public sealed class PlayerEating : MonoBehaviour
             float amount = Mathf.Min(healLeft, healPerSecond * Time.deltaTime);
             healLeft -= amount;
             health.Heal(amount);
+            // All of it given: the rate goes with it. Kept, the strongest draught's rate healed every later meal in a moment.
+            if (healLeft <= 0f)
+            {
+                healPerSecond = 0f;
+            }
         }
     }
 

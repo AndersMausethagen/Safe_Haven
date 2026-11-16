@@ -36,8 +36,11 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
     public IEnumerator Setup()
     {
         Bake();
+        bakedInSetup = true;
         yield break;
     }
+
+    private bool bakedInSetup;
 
     private void OnEnable()
     {
@@ -51,7 +54,14 @@ public sealed class FogGround : MonoBehaviour, ISceneSetup
 
     private void Start()
     {
-        // All water surfaces have registered by Start, unlike during OnEnable on scene load.
+        // All water surfaces have registered by Start, unlike during OnEnable on scene load. Once only: a scene being set up
+        // bakes in Setup (in a raid after its terrain is made, so a bake here was of the terrain before it), and one baked
+        // there already needs no second full pass.
+        if (bakedInSetup || SceneTransition.IsBusy)
+        {
+            return;
+        }
+
         Bake();
     }
 

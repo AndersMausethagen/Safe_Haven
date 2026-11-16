@@ -28,11 +28,10 @@ public sealed class SaveHotkeys : MonoBehaviour
 
     private void OnSave(InputAction.CallbackContext context)
     {
-        // Mid-conversation a story has begun but not done what it is for, and a once-only one wouldn't start again after
-        // loading. Not in CheckSave: the prologue's checkpoints are taken while people talk.
-        if (DialogueBox.IsOpen || CinematicScreen.IsPlaying || InGameCinematic.IsPlaying)
+        // Not mid-conversation or mid-cinematic (SaveGameService.CheckPlayerSave says why); TrySave says the rest.
+        if (SaveGameService.CheckSave() == null && SaveGameService.CheckPlayerSave() is string busy)
         {
-            GameMessages.Post("Finish the conversation first.", MessageKind.Warning);
+            GameMessages.Post(busy, MessageKind.Warning);
             return;
         }
 

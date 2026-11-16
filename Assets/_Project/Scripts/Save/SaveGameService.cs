@@ -107,6 +107,23 @@ public static class SaveGameService
         return Player.Current == null || Player.Current.Persistence == null ? "There is nothing to save here." : null;
     }
 
+    /// <summary>
+    /// Why the player can't save right now (F5, the Escape menu, the saves screen), or null: CheckSave, and not mid-conversation
+    /// or mid-cinematic, where a story has begun but not done what it is for and a once-only one wouldn't start again after
+    /// loading. Not in CheckSave itself: the prologue's checkpoints are taken while people talk. One rule for every way the
+    /// player saves (review 2026-11-16: only F5 had it).
+    /// </summary>
+    public static string CheckPlayerSave()
+    {
+        string problem = CheckSave();
+        if (problem != null)
+        {
+            return problem;
+        }
+
+        return DialogueBox.IsOpen || CinematicScreen.IsPlaying || InGameCinematic.IsPlaying ? "Finish the conversation first." : null;
+    }
+
     /// <summary>Why a save can't be loaded right now, in words for the player, or null when one can.</summary>
     public static string CheckLoad()
     {

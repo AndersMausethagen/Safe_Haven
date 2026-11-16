@@ -97,13 +97,18 @@ public sealed class SavesScreen : MonoBehaviour
         }
     }
 
+    private int lastBackFrame = -1;
+
     // Back steps out of a question or a rename first, and only then out of the screen.
     private void OnBackPressed(InputAction.CallbackContext context)
     {
-        if (!window.activeSelf)
+        // Escape is both Pause and Cancel: one press came twice, stepping out of the question and then out of the screen.
+        if (!window.activeSelf || Time.frameCount == lastBackFrame)
         {
             return;
         }
+
+        lastBackFrame = Time.frameCount;
 
         if (footer.activeSelf)
         {
@@ -243,7 +248,7 @@ public sealed class SavesScreen : MonoBehaviour
             AddRow(save);
         }
 
-        string problem = InGame ? SaveGameService.CheckSave() : null;
+        string problem = InGame ? SaveGameService.CheckPlayerSave() : null;
         saveAsNew.gameObject.SetActive(InGame);
         saveAsNew.interactable = problem == null;
         if (problem != null)
@@ -287,7 +292,7 @@ public sealed class SavesScreen : MonoBehaviour
         add("Rename", () => StartRename(save), save.IsReadable);
         if (InGame)
         {
-            add("Overwrite", () => AskOverwrite(save), !playing && SaveGameService.CheckSave() == null);
+            add("Overwrite", () => AskOverwrite(save), !playing && SaveGameService.CheckPlayerSave() == null);
         }
 
         add("Load", () => AskLoad(save), save.IsReadable && SaveGameService.CheckLoad() == null);
@@ -364,7 +369,7 @@ public sealed class SavesScreen : MonoBehaviour
         renaming = save.Slot;
         ShowOnly(nameBar);
         ShowStatus("Type a new name.");
-        GameInput.SuspendGameplay();
+        GameInput.SuspendGameplay(this);
         nameField.text = save.Name;
         nameField.ActivateInputField();
         nameField.Select();
@@ -422,7 +427,7 @@ public sealed class SavesScreen : MonoBehaviour
         if (renaming != null)
         {
             renaming = null;
-            GameInput.ResumeGameplay();
+            GameInput.ResumeGameplay(this);
         }
     }
 

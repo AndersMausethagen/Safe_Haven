@@ -504,6 +504,14 @@ public sealed class HorseTaming : MonoBehaviour
         PlayerRiding riding = PlayerRiding.For(handler.gameObject);
         riding.ReleaseRope();
         riding.Mount(horse);
+        // The saddle can still refuse (someone already on it, a friend holding it): left Breaking with no rider, it pushed its
+        // timers on for ever.
+        if (riding.Riding != horse)
+        {
+            Escape("It shies away before you can get on.");
+            return;
+        }
+
         ItemInventory items = handler.GetComponent<ItemInventory>();
         ItemDefinition barley = horse.Definition.Barley;
         int carried = items != null && barley != null ? items.CountCarried(barley) : 0;

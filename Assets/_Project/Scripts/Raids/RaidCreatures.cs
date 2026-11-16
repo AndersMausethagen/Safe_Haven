@@ -146,6 +146,11 @@ public sealed class RaidCreatures
         stats.RemoveModifiersFrom(raid);
         stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, health - 1f, raid));
         stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, power - 1f, raid));
+        // An elite's own bonuses multiply the raid's, at its strength now (a stage change, the dark).
+        if (combatant.TryGetComponent(out EliteCreature elite))
+        {
+            elite.Rescale(health, power);
+        }
 
         // Enemies that have not woken yet start at their new maximum when they do; the rest are healed.
         if (damageable != null && damageable.CurrentHealth > 0f)

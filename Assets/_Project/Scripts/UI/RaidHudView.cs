@@ -141,7 +141,7 @@ public sealed class RaidHudView : MonoBehaviour
         if (session.IsOver)
             timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
         ExtractionPoint target = null;
-        extractionLabel.text = session.IsOver ? "" : DescribeExtraction(out target);
+        SetText(extractionLabel, session.IsOver ? "" : DescribeExtraction(out target));
         PointArrowAt(target);
         if (session.IsOver)
         {
@@ -318,12 +318,15 @@ public sealed class RaidHudView : MonoBehaviour
             {
                 case ExtractionHoldState.Holding:
                 case ExtractionHoldState.Done:
-                    return $"<color={UIStyle.Current.GoodHex}>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
+                    return Unchanged(point, 1, percent, Mathf.RoundToInt(point.TimeLeft)) ? lastWay
+                        : lastWay = $"<color={UIStyle.Current.GoodHex}>Holding {point.DisplayName}... {percent}%  ({point.TimeLeft:0} s)</color>";
                 case ExtractionHoldState.Contested:
-                    return $"<color={UIStyle.Current.DangerHex}>{point.DisplayName} contested! Slowed until you drive them out... {percent}%  ({point.TimeLeft:0} s)</color>";
+                    return Unchanged(point, 2, percent, Mathf.RoundToInt(point.TimeLeft)) ? lastWay
+                        : lastWay = $"<color={UIStyle.Current.DangerHex}>{point.DisplayName} contested! Slowed until you drive them out... {percent}%  ({point.TimeLeft:0} s)</color>";
                 default:
-                    float away = player != null ? point.DistanceFrom(player.transform.position) : 0f;
-                    return $"<color={UIStyle.Current.WarningHex}>Back to {point.DisplayName}'s circle  {Mathf.RoundToInt(away)} m  ({percent}%)</color>";
+                    int away = Mathf.RoundToInt(player != null ? point.DistanceFrom(player.transform.position) : 0f);
+                    return Unchanged(point, 3, percent, away) ? lastWay
+                        : lastWay = $"<color={UIStyle.Current.WarningHex}>Back to {point.DisplayName}'s circle  {away} m  ({percent}%)</color>";
             }
         }
 
@@ -335,12 +338,36 @@ public sealed class RaidHudView : MonoBehaviour
         nearest = ExtractionPoint.FindNearest(player.transform.position, out float distance);
         if (nearest != null)
         {
-            return RaidHudText.Way(nearest.DisplayName, distance, nearest.SecondsUntilChange, nearest.CostText);
+            return Unchanged(nearest, 4, Mathf.RoundToInt(distance), Mathf.CeilToInt(nearest.SecondsUntilChange)) ? lastWay
+                : lastWay = RaidHudText.Way(nearest.DisplayName, distance, nearest.SecondsUntilChange, nearest.CostText);
         }
 
         nearest = NextToOpen();
-        return nearest != null ? $"<color={UIStyle.Current.DangerHex}>No way out yet:</color> {nearest.DisplayName} opens in {RaidStats.FormatTime(nearest.SecondsUntilChange)}"
-            : $"<color={UIStyle.Current.DangerHex}>No open way out right now</color>";
+        if (nearest == null)
+        {
+            return Unchanged(null, 6, 0, 0) ? lastWay : lastWay = $"<color={UIStyle.Current.DangerHex}>No open way out right now</color>";
+        }
+
+        return Unchanged(nearest, 5, Mathf.CeilToInt(nearest.SecondsUntilChange), 0) ? lastWay
+            : lastWay = $"<color={UIStyle.Current.DangerHex}>No way out yet:</color> {nearest.DisplayName} opens in {RaidStats.FormatTime(nearest.SecondsUntilChange)}";
+    }
+
+    // The way-out line is made again only when what it says changes (its exit, state, whole metres, percent, whole seconds): it
+    // was a new string every frame of every raid.
+    private string lastWay = "";
+    private ExtractionPoint lastWayExit;
+    private (int kind, int a, int b) lastWayKey = (-1, 0, 0);
+
+    private bool Unchanged(ExtractionPoint point, int kind, int a, int b)
+    {
+        if (point == lastWayExit && (kind, a, b) == lastWayKey)
+        {
+            return true;
+        }
+
+        lastWayExit = point;
+        lastWayKey = (kind, a, b);
+        return false;
     }
 
     private static ExtractionPoint NextToOpen()
@@ -439,12 +466,13 @@ public sealed class RaidHudView : MonoBehaviour
             case RaidOutcome.TimeExpired:
                 bannerTitle.text = "RAID COLLAPSED";
                 bannerTitle.color = criticalColor;
-                bannerSubtitle.text = "Time ran out. Everything you carried is lost.";
+                // What a failed raid takes (PlayerSnapshot.AfterFailedRaid), as the planner and the results say it.
+                bannerSubtitle.text = "Time ran out. Materials, food and finds are lost; your gear and safe pocket come home.";
                 break;
             default:
                 bannerTitle.text = "YOU DIED";
                 bannerTitle.color = criticalColor;
-                bannerSubtitle.text = "Everything you carried is lost.";
+                bannerSubtitle.text = "Materials, food and finds are lost; your gear and safe pocket come home.";
                 break;
         }
     }

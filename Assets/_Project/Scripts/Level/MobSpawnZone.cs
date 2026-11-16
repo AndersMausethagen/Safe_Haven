@@ -73,6 +73,8 @@ public sealed class MobSpawnZone : MonoBehaviour
     private bool hasSpawned;
     private bool clearAnnounced = true;
     private float respawnAt = -1f;
+    private float retryAt;
+    private const float RetrySeconds = 10f;
 
     /// <summary>Raised when everything the zone spawned is dead.</summary>
     public event Action Cleared;
@@ -147,7 +149,7 @@ public sealed class MobSpawnZone : MonoBehaviour
             return;
         }
 
-        if (trigger == MobSpawnTrigger.PlayerNear && !hasSpawned && PlayerWithin(wakeDistance))
+        if (trigger == MobSpawnTrigger.PlayerNear && !hasSpawned && Time.time >= retryAt && PlayerWithin(wakeDistance))
         {
             Spawn();
         }
@@ -215,6 +217,18 @@ public sealed class MobSpawnZone : MonoBehaviour
         {
             clearAnnounced = false;
             onSpawned.Invoke();
+        }
+        else
+        {
+            // Nowhere to stand this time (a terrace above the NavMesh sampled, ground carved or flooded): it tries again a little
+            // later. Counted as filled, it went dead for good: never cleared, never refilled, and a story waiting for it to be
+            // cleared waited for ever.
+            hasSpawned = false;
+            retryAt = Time.time + RetrySeconds;
+            if (trigger != MobSpawnTrigger.PlayerNear)
+            {
+                respawnAt = retryAt;
+            }
         }
 
         return made;

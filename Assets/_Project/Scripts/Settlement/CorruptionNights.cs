@@ -52,6 +52,13 @@ public sealed class CorruptionNights : MonoBehaviour
     private static void ResetForNewPlaySession()
     {
         Current = null;
+        ForgetGame();
+    }
+
+    /// <summary>Forgets the foretelling of the game being played (a new game or a load: GameSession): it came into the loaded
+    /// game, a night with no warning there, or a load taken for a homecoming.</summary>
+    public static void ForgetGame()
+    {
         foretoldFor = -1;
         foretold = false;
         foretoldBearing = 0f;

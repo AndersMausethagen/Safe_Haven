@@ -39,10 +39,8 @@ public sealed class SoundCaptions : MonoBehaviour, IGameSystem
         var canvas = root.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 900;
-        var scaler = root.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(ReferenceWidth, ReferenceHeight);
-        scaler.matchWidthOrHeight = 1f;
+        // The UI's own scaler, so "UI and Text Size" applies from the start, not only after it is changed in a session.
+        UIRoot.ConfigureScaler(root.AddComponent<CanvasScaler>());
         column = new GameObject("Captions", typeof(RectTransform)).GetComponent<RectTransform>();
         column.SetParent(root.transform, false);
         column.anchorMin = column.anchorMax = column.pivot = new Vector2(1f, 0f);

@@ -297,7 +297,15 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Work += used;
         if (Work + 0.01f >= WorkNeeded)
         {
-            Finish();
+            FinishedByOthers = true;
+            try
+            {
+                Finish();
+            }
+            finally
+            {
+                FinishedByOthers = false;
+            }
         }
         else
         {
@@ -306,6 +314,10 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
         return used;
     }
+
+    /// <summary>True while Finished is raised for work others did (ResidentBuilders): it trains nobody's Construction, as
+    /// workers' orders train nobody's crafts. The player got full Construction practice for buildings finished while away.</summary>
+    public bool FinishedByOthers { get; private set; }
 
     /// <summary>Ends the work at once (tests, editor tools, and when the hammering is done).</summary>
     public void Finish(GameObject by = null)

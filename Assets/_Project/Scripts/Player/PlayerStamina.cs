@@ -141,7 +141,8 @@ public sealed class PlayerStamina : MonoBehaviour
     public void SetEfficiency(float maxMultiplier, float regenerationMultiplier)
     {
         maxEfficiency = maxMultiplier;
-        float baseMax = (settings != null ? settings.MaxStamina : 100f) + (combatant != null ? combatant.Stats.Get(StatType.MaxStamina) : 0f);
+        float poolBase = settings != null ? settings.MaxStamina : 100f;
+        float baseMax = combatant != null ? combatant.Stats.GetOn(StatType.MaxStamina, poolBase) : poolBase;
         pool.SetMax(baseMax * Mathf.Max(0.1f, maxMultiplier));
         regenMultiplier = Mathf.Max(0f, regenerationMultiplier);
         StaminaChanged?.Invoke(pool.Current, pool.Max);

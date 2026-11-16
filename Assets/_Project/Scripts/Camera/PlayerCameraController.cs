@@ -426,7 +426,7 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void UpdateStyle()
     {
-        if (GameInput.WasPressed(toggleAction))
+        if (!InCinematic && GameInput.WasPressed(toggleAction))
         {
             ToggleStyle();
         }
@@ -490,9 +490,13 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     // ----- Input and blending -----
 
+    // Nor through a cinematic: the wheel, the orbit and the style key changed the view behind it, and the player came back to it
+    // turned or zoomed.
+    private static bool InCinematic => CinematicScreen.IsPlaying || InGameCinematic.IsPlaying;
+
     private void ReadInput()
     {
-        if (IsUIOpen)
+        if (IsUIOpen || InCinematic)
         {
             return;
         }

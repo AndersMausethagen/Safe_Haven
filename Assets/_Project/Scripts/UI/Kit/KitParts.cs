@@ -550,6 +550,9 @@ public sealed class KitSearch
         var guard = box.gameObject.AddComponent<KitSearchGuard>();
         Field.onSelect.AddListener(_ => guard.Typing(true));
         Field.onDeselect.AddListener(_ => guard.Typing(false));
+        // Enter and Escape end the typing without a deselect (TMP keeps the field selected): every gameplay key stayed off
+        // until the next click.
+        Field.onEndEdit.AddListener(_ => guard.Typing(false));
     }
 
     private static void Fill(RectTransform rect)
@@ -576,11 +579,11 @@ public sealed class KitSearchGuard : MonoBehaviour
         suspended = typing;
         if (typing)
         {
-            GameInput.SuspendGameplay();
+            GameInput.SuspendGameplay(this);
         }
         else
         {
-            GameInput.ResumeGameplay();
+            GameInput.ResumeGameplay(this);
         }
     }
 

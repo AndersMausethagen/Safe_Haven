@@ -71,8 +71,9 @@ public sealed class PlayerInputHandler : MonoBehaviour
             int slot = i;
             skillCallbacks[i] = context =>
             {
-                // In a conversation the number keys and the d-pad pick answers; they cast nothing meanwhile.
-                if (!IsListening && !PadBusy(context))
+                // In a conversation the number keys and the d-pad pick answers (in a fight too, while it asks); over a bag slot
+                // they put the item on the bar. They cast nothing meanwhile.
+                if (!IsListening && !PadBusy(context) && !DialogueBox.IsAsking && !ItemInventoryWindow.ClaimsKeys)
                 {
                     stateMachine.RequestSkill(slot);
                 }
@@ -330,7 +331,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
             JournalNotices.Tried(ProficiencyTraining.Sneaking);
         }
 
-        if (context.performed && PadInWindow(context))
+        if (context.performed && (PadInWindow(context) || ItemInventoryWindow.ClaimsKeys))
         {
             return;
         }

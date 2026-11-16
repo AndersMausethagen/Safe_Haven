@@ -150,6 +150,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     /// <summary>Warns once when a station stops because a finished craft can't go in its output slot.</summary>
     private void LateUpdate()
     {
+        // A friend's stations are theirs to hear about (co-op), as Update leaves them alone.
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         foreach (StationQueue station in GameSession.Settlement.Workshops.Queues)
         {
             bool blocked = station.Blocked;

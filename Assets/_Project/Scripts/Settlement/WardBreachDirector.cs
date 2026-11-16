@@ -57,6 +57,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     private float nextCheck;
     private int nextLane;
     private int lanesFor = -1;
+    private (int ward, int buildings) lanesSeen = (-1, -1);
 
     /// <summary>The breach director in the loaded scene, or null.</summary>
     public static WardBreachDirector Current { get; private set; }
@@ -69,6 +70,9 @@ public sealed class WardBreachDirector : MonoBehaviour
         : WardBreachSettings.Current.For(GameSession.Settlement.BreachesWon) ?? definition;
 
     public bool IsActive { get; private set; }
+
+    /// <summary>True from the ward giving way (its countdown) to the breach's end: the Haven is under attack.</summary>
+    public bool IsUnderWay => IsActive || givingWay;
     public bool IsPending => Definition != null && !IsActive && GameSession.Settlement.Breach == BreachStatus.Pending;
 
     /// <summary>The ways in, for the breach pending or under way. Empty for the first, which keeps to its marked path.</summary>
@@ -241,7 +245,9 @@ public sealed class WardBreachDirector : MonoBehaviour
     {
         WardBreachDefinition breach = Definition;
         // A guest's copy of a friend's Haven doesn't hold its own breaches; the host's game does.
-        if (!IsPending || breach == null || !breach.HasEnemies || playerHealth == null || !playerHealth.IsAlive || HavenVisit.IsVisiting)
+        // Never on a corrupted night: the two would come at once.
+        if (!IsPending || breach == null || !breach.HasEnemies || playerHealth == null || !playerHealth.IsAlive || HavenVisit.IsVisiting
+            || (CorruptionNights.Current != null && CorruptionNights.Current.IsActive))
         {
             return;
         }
@@ -298,6 +304,14 @@ public sealed class WardBreachDirector : MonoBehaviour
 
             // What was done to the breach's source in a raid leaves it short of fighters, though never of all of them.
             List<GameObject> roster = running.Roster(wave, GameSession.Settlement.BreachesWon);
+            roster.RemoveAll(prefab => prefab == null);
+            // A wave with nobody in it (every group gated by breaches won, or without a prefab) is skipped: roster[0] threw and
+            // left the breach spawning for good, ending only at its longest.
+            if (roster.Count == 0)
+            {
+                continue;
+            }
+
             int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Settlement.BreachWeakening)));
             for (int i = 0; i < fielded && IsActive; i++)
             {
@@ -629,9 +643,13 @@ public sealed class WardBreachDirector : MonoBehaviour
             return;
         }
 
+        // Found again whenever what they run round changes within a stay too: the ward raised (it widens) or a building put up
+        // where a lane started, not only at the next breach.
         int breachNumber = GameSession.Settlement.BreachesWon;
-        if (lanesFor != breachNumber)
+        var key = (GameSession.Settlement.WardLevel, BuildingObject.Active.Count);
+        if (lanesFor != breachNumber || key != lanesSeen)
         {
+            lanesSeen = key;
             FindLanes(breach, breachNumber);
         }
     }

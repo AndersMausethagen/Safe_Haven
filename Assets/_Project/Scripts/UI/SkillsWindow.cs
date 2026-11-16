@@ -524,7 +524,8 @@ public sealed partial class SkillsWindow : MonoBehaviour
         float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
         if (gain > 0f)
         {
-            parts.Add($"<color={style.GoodHex}>Rested: +{Mathf.RoundToInt(gain * 100f)}% experience</color>");
+            // Every Experience Gain bonus (rest, the sauna, a meal), not only rest's.
+            parts.Add($"<color={style.GoodHex}>Learning faster: +{Mathf.RoundToInt(gain * 100f)}% experience</color>");
         }
 
         return parts.Count > 0 ? "\n" + string.Join("   ·   ", parts) : "";

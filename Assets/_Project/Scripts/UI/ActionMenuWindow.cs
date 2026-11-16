@@ -83,6 +83,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
     private Func<MenuPage> source;
     private Action closed;
     private Transform anchor;
+    private bool hadAnchor;
     private GameObject viewer;
     private float range;
     private float nextRefresh;
@@ -137,6 +138,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
         source = pageSource;
         viewer = user;
         anchor = near;
+        hadAnchor = near != null;
         range = maxDistance;
         Refresh();
         window.Open();
@@ -208,7 +210,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
             return;
         }
 
-        if (anchor != null && (viewer == null || HorizontalDistance(viewer.transform.position, anchor.position) > range))
+        // A menu of something that is gone (a horse sold, a building taken down) closes: a destroyed anchor read as "no anchor",
+        // and the menu stayed, rebuilding against the dead object.
+        if (hadAnchor && (anchor == null || viewer == null || HorizontalDistance(viewer.transform.position, anchor.position) > range))
         {
             Close();
             return;
@@ -244,6 +248,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
         {
             source = null;
             anchor = null;
+            hadAnchor = false;
             viewer = null;
             Action onClosed = closed;
             closed = null;

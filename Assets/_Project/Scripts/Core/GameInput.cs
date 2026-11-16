@@ -128,8 +128,16 @@ public static class GameInput
     /// Turns off every map but UI until <see cref="ResumeGameplay"/>, for when a key means something else for a moment:
     /// choosing a new key, typing a name. The screen stays alive; everything that plays the game waits.
     /// </summary>
-    public static void SuspendGameplay()
+    /// <param name="owner">Who asks (the window typing, the rebind): the keys come back only once every owner has resumed. One
+    /// shared switch let any resume turn everything back on: the world map closing gave the keys back under a horse's name being
+    /// typed, and the letters opened windows behind it.</param>
+    public static void SuspendGameplay(object owner)
     {
+        if (owner == null || !Suspenders.Add(owner) || Suspenders.Count > 1)
+        {
+            return;
+        }
+
         foreach (InputActionMap map in InputSystem.actions.actionMaps)
         {
             if (map.enabled && map.name != "UI")
@@ -140,8 +148,14 @@ public static class GameInput
         }
     }
 
-    public static void ResumeGameplay()
+    /// <summary>Gives back what <see cref="SuspendGameplay"/> took for <paramref name="owner"/>, once no other owner holds it.</summary>
+    public static void ResumeGameplay(object owner)
     {
+        if (owner == null || !Suspenders.Remove(owner) || Suspenders.Count > 0)
+        {
+            return;
+        }
+
         foreach (InputActionMap map in Suspended)
         {
             map.Enable();
@@ -149,6 +163,11 @@ public static class GameInput
 
         Suspended.Clear();
     }
+
+    /// <summary>True while anything has the gameplay keys suspended.</summary>
+    public static bool IsGameplaySuspended => Suspenders.Count > 0;
+
+    private static readonly HashSet<object> Suspenders = new HashSet<object>();
 
     /// <summary>Where the pointer (mouse, pen, touch) is on the screen.</summary>
     public static Vector2 PointerPosition => Point.ReadValue<Vector2>();
@@ -408,6 +427,7 @@ public static class GameInput
         Found.Clear();
         foundIn = null;
         Suspended.Clear();
+        Suspenders.Clear();
         PressedBy.Clear();
     }
 

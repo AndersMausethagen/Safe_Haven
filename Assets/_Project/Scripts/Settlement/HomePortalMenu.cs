@@ -99,7 +99,10 @@ public sealed class HomePortalMenu
 
         if (breach != null && breach.IsPending)
         {
-            page.Add(new MenuAction("Begin the defense", breach.Hint, true, breach.Begin, closesMenu: true) { Icon = "Sword", Status = "Now" });
+            // A guest's press did nothing (the host's game holds the breach): shown greyed with why. Not on a corrupted night either.
+            bool corrupted = CorruptionNights.Current != null && CorruptionNights.Current.IsActive;
+            string why = HavenVisit.IsVisiting ? "Your friend begins their own defense" : corrupted ? "Not while the corrupted night is on you" : breach.Hint;
+            page.Add(new MenuAction("Begin the defense", why, !HavenVisit.IsVisiting && !corrupted, breach.Begin, closesMenu: true) { Icon = "Sword", Status = "Now" });
         }
 
         MenuAction mend = BuildingRepairs.MendAction(user);

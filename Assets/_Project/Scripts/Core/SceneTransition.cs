@@ -35,6 +35,9 @@ public static class SceneTransition
     /// <summary>True while a scene is loading or being set up behind the loading screen.</summary>
     public static bool IsBusy { get; private set; }
 
+    // Counts the loads begun: a transition whose scene is ready leaves the screen to a newer one begun meanwhile.
+    private static int generation;
+
     /// <summary>Raised when a scene is loaded and set up, as the loading screen starts to fade away.</summary>
     public static event Action<Scene> SceneReady;
 
@@ -110,6 +113,7 @@ public static class SceneTransition
         }
 
         IsBusy = true;
+        generation++;
         GetRunner().StartTransition(scene, buildIndex, caption);
         return true;
     }
@@ -138,6 +142,7 @@ public static class SceneTransition
         }
 
         IsBusy = true;
+        generation++;
         GetRunner().StartFirstScene(scene, steps);
     }
 
@@ -249,12 +254,38 @@ public static class SceneTransition
 
         public void StartTransition(string scene, int buildIndex, string caption)
         {
-            StartCoroutine(Transition(scene, buildIndex, caption));
+            StartCoroutine(Guarded(Transition(scene, buildIndex, caption)));
         }
 
         public void StartFirstScene(Scene scene, List<ISceneSetup> steps)
         {
-            StartCoroutine(FirstScene(scene, steps));
+            StartCoroutine(Guarded(FirstScene(scene, steps)));
+        }
+
+        // Runs a transition so that, should it end without making its scene ready (an exception outside the guarded setup steps:
+        // the screen, the shader warm-up, a setting), the game isn't left busy for good: every later load refused, the loading
+        // screen up and the player stopped. It gives up on that load and lets the game go on where it stands.
+        private IEnumerator Guarded(IEnumerator work)
+        {
+            int started = generation;
+            try
+            {
+                while (work.MoveNext())
+                {
+                    yield return work.Current;
+                }
+            }
+            finally
+            {
+                if (IsBusy && generation == started)
+                {
+                    Debug.LogError("A scene change broke off before its scene was ready; the game goes on where it is.");
+                    SceneLoader.CancelLeaving();
+                    ResumePlayer();
+                    screen.Hide();
+                    MarkReady(SceneManager.GetActiveScene());
+                }
+            }
         }
 
         private IEnumerator FirstScene(Scene scene, List<ISceneSetup> steps)
@@ -263,9 +294,18 @@ public static class SceneTransition
             screen.Show(null, scene.name, settings);
             screen.Alpha = 1f;
             yield return RunSetups(steps);
+            int mine = generation;
             MarkReady(scene);
+            if (generation != mine)
+            {
+                yield break;
+            }
+
             yield return Fade(0f, settings.FadeInSeconds);
-            screen.Hide();
+            if (generation == mine)
+            {
+                screen.Hide();
+            }
         }
 
         private IEnumerator Transition(string scene, int buildIndex, string caption)
@@ -339,9 +379,20 @@ public static class SceneTransition
             }
 
             screen.Progress = 1f;
+            int mine = generation;
             MarkReady(loaded);
+            // A load begun from a ready callback (a co-op visit ending) has the screen now: this one mustn't fade it out or hide it
+            // in the middle of the new load.
+            if (generation != mine)
+            {
+                yield break;
+            }
+
             yield return Fade(0f, settings.FadeInSeconds);
-            screen.Hide();
+            if (generation == mine)
+            {
+                screen.Hide();
+            }
         }
 
         private IEnumerator SetUp(List<ISceneSetup> steps, Action done)

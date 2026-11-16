@@ -372,13 +372,15 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
                 return 0;
             }
 
-            float held = 0f;
+            // Each skill's whole points, as SettleRaid pays them: the fractions summed showed "4 held" for five skills at 0.9
+            // that pay nothing.
+            int held = 0;
             foreach (Lesson lesson in Current.lessons.Values)
             {
-                held += lesson.Held;
+                held += Mathf.FloorToInt(lesson.Held);
             }
 
-            return Mathf.FloorToInt(held);
+            return held;
         }
     }
 
@@ -572,7 +574,7 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
     private void OnConstructionFinished(Construction construction)
     {
-        if (!Application.isPlaying)
+        if (!Application.isPlaying || construction.FinishedByOthers)
         {
             return;
         }
@@ -594,7 +596,9 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
         ProficiencyDefinition skill = node != null ? settings.SkillFor(node.GatherTool) : null;
         if (skill != null)
         {
-            Practise(skill, node.Tier, settings.TierExperience(node.Tier));
+            // The source's tier: a felled tree trains as the tree it was (ResourceSource.TakeOnTree).
+            int tier = source.Tier;
+            Practise(skill, tier, settings.TierExperience(tier));
         }
         else
         {

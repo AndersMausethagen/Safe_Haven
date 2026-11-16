@@ -186,10 +186,16 @@ public sealed class WaterInteractor : MonoBehaviour
             }
         }
 
-        if (steps > 0 && (focus != null || WaterRipples.PendingStamps > 0 || WaterRipples.Texture != null))
+        // Only where there is water to ripple: once made, the texture kept the blit running in every scene after.
+        if (steps > 0 && WaterSurface.Surfaces.Count > 0 && (focus != null || WaterRipples.PendingStamps > 0 || WaterRipples.Texture != null))
         {
             Vector3 centre = focus != null ? focus.Point : camera != null ? GroundPoint(camera) : Vector3.zero;
             WaterRipples.Run(steps, centre);
+        }
+        else if (WaterSurface.Surfaces.Count == 0 && WaterRipples.Texture != null)
+        {
+            // A scene with no water: the last one's ripple textures go, and the shader's ripples with them.
+            WaterRipples.Release();
         }
 
         if (Spotted.Count > MaxFoamSpots)

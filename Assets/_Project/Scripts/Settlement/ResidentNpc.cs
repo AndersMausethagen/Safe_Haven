@@ -238,9 +238,10 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         // What they asked the Haven for, handed to them once it is home.
         HavenRequestBoard.AddHandIn(page, resident, Player.Current != null ? Player.Current.gameObject : null, speaker, afterAnswer);
 
-        // A lesson in their job's skill, once between raids.
+        // A lesson in their job's skill, once between raids; in their own Haven only (as Liv's carving): a guest's "taught" mark
+        // lived on the copy of the host's settlement, undone by the host's next word, and the lesson could be taken again and again.
         ResidentRecord record = GameSession.Settlement.Find(resident);
-        if (current != null && current.Teaches != null && record != null)
+        if (current != null && current.Teaches != null && record != null && !HavenVisit.InHostsHaven)
         {
             ProficiencyDefinition skill = current.Teaches;
             string why = record.TaughtSinceRaid ? "Another, after your next raid survived." : $"What a {SettlementSettings.Current.RankFor(record.WorkDone).name} {current.DisplayName} knows";
@@ -401,8 +402,9 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     {
         // The job is the Haven's to give, made where it is kept (HavenDecisions): a visitor's word goes to their friend's game.
         // What the job teaches, and the quests it counts for, are the player's own, and only in their own Haven.
-        HavenDecisions.Do("resident.job", resident.Id + "|" + (job != null ? job.Id : ""));
-        if (HavenVisit.IsVisiting || job == null)
+        // Refused (it says why), nothing else happens: the job's recipes and the quests counting it came even when it wasn't given.
+        bool made = HavenDecisions.Do("resident.job", resident.Id + "|" + (job != null ? job.Id : ""));
+        if (!made || HavenVisit.IsVisiting || job == null)
         {
             return;
         }
@@ -428,8 +430,10 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         string[] parts = (args ?? "").Split('|');
         ResidentRecord record = HavenPeople.RecordOf(parts[0]);
         ResidentDefinition resident = record != null ? record.Resident : null;
+        // Their own work or a job left vacant (SettlementState.JobsOpenTo, what every job list offers): only their own was taken,
+        // and a fallen Smith's work could be offered to anyone but given to no one.
         JobDefinition job = null;
-        foreach (JobDefinition can in resident != null ? resident.Jobs : System.Array.Empty<JobDefinition>())
+        foreach (JobDefinition can in resident != null ? GameSession.Settlement.JobsOpenTo(resident) : new List<JobDefinition>())
         {
             job = can != null && parts.Length > 1 && can.Id == parts[1] ? can : job;
         }

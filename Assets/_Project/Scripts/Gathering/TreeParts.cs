@@ -38,6 +38,11 @@ public sealed class TreeParts
 
     /// <summary>The tree's own wood (ChoppableTree.Wood), or null: its logs roll by the axe's tier.</summary>
     public ItemDefinition Wood { get; set; }
+    /// <summary>The tree's own tier (its gathering node's), or 0 when it has none: what work on it, felled, trains at.</summary>
+    public int Tier { get; set; }
+    /// <summary>Seconds until it grows back where it stood, for how long its stump lasts: 0 for the terrain's usual regrowth
+    /// (Tree Chopping Settings), negative for never (the Haven's remembered woods, a tree with no respawn).</summary>
+    public float RegrowSeconds { get; set; }
     /// <summary>The tree's own bark, or null when its bark is made for its model alone and won't wrap a log.</summary>
     public Material Bark { get; private set; }
 

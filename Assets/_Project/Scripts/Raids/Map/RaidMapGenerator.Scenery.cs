@@ -203,11 +203,27 @@ public static partial class RaidMapGenerator
         }
     }
 
+    private const string MoodFogSuffix = " (mood)";
+
     // The scene's banks of fog lie over clearings, plus as many more as the mood wants.
     private static void PlaceFog(RaidMap map, RaidLayoutPlan plan, System.Func<Vector2, Vector3> world)
     {
-        FogArea[] areas = map.Content.GetComponentsInChildren<FogArea>(true);
-        if (areas.Length == 0)
+        // The scene's own banks only: the mood's extras from an earlier attempt at the layout go (a retry added more each time
+        // and left them over the old map's clearings, on ridges and in ravines).
+        var areas = new List<FogArea>();
+        foreach (FogArea area in map.Content.GetComponentsInChildren<FogArea>(true))
+        {
+            if (area.name.EndsWith(MoodFogSuffix))
+            {
+                Object.Destroy(area.gameObject);
+            }
+            else
+            {
+                areas.Add(area);
+            }
+        }
+
+        if (areas.Count == 0)
         {
             return;
         }
@@ -215,10 +231,15 @@ public static partial class RaidMapGenerator
         var rooms = plan.Rooms.FindAll(room => room.Role == RaidRoomRole.Plain);
         var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Fog"));
         List<int> order = RaidLayout.PickIndices(random, rooms.Count, rooms.Count);
-        int wanted = areas.Length + plan.Mood.fogBanks;
+        int wanted = areas.Count + plan.Mood.fogBanks;
         for (int i = 0; i < wanted && i < order.Count; i++)
         {
-            FogArea area = i < areas.Length ? areas[i] : Object.Instantiate(areas[0], areas[0].transform.parent);
+            FogArea area = i < areas.Count ? areas[i] : Object.Instantiate(areas[0], areas[0].transform.parent);
+            if (i >= areas.Count)
+            {
+                area.name = areas[0].name + MoodFogSuffix;
+            }
+
             area.transform.position = world(rooms[order[i]].Position / plan.Size);
         }
     }

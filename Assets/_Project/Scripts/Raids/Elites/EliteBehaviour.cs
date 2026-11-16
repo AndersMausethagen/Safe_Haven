@@ -25,6 +25,9 @@ public sealed class StatusOnHitBehaviour : EliteBehaviour
 
     public override string DisplayName => "Status on Hit";
 
+    /// <summary>What its hits carry (RaidHarms names its harm for the planner).</summary>
+    public StatusEffectDefinition Effect => effect;
+
     public override Action Attach(EliteCreature elite)
     {
         void OnDealt(IDamageable target, DamageInfo blow, DamageResult result)

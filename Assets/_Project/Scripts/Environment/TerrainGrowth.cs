@@ -172,7 +172,8 @@ public static class TerrainGrowth
                 for (int k = 0; k < plants.Count; k++)
                 {
                     Plant plant = plants[k];
-                    if (!plant.enabled)
+                    // Not on this terrain (no detail prototype for it): never drawn, so it mustn't clear the grass round it either.
+                    if (!plant.enabled || plantLayers[k] < 0)
                     {
                         continue;
                     }

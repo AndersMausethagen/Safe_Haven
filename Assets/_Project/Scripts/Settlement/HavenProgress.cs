@@ -137,14 +137,18 @@ public sealed class HavenProgress : MonoBehaviour
     // current, and creates it, so its worker can start.
     private static void KeepTrackOfBuildings()
     {
-        // A friend's buildings are noted in their game (co-op).
+        // In a friend's Haven (co-op) what stands there is noted too, into the copy: its tiers and beds count for the guest
+        // there and on the raids they follow from it (SettlementState.TakeOn keeps them).
+        GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
+        GameSession.Settlement.NoteScaffolds(ResidentBuilders.AnyScaffold());
+        // The friend's stations are theirs to run: their queues are made in their game.
         if (HavenVisit.IsVisiting)
         {
             return;
         }
 
-        GameSession.Settlement.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
-        GameSession.Settlement.NoteScaffolds(ResidentBuilders.AnyScaffold());
+        PurificationAltar.NoteBest();
+
         foreach (CraftingStation station in CraftingStation.Active)
         {
             if (station.HasWorker && station.Usable)

@@ -201,6 +201,9 @@ public sealed class DialogueBox : MonoBehaviour
     /// <summary>True while a line is shown.</summary>
     public static bool IsOpen => current != null && current.window != null && current.window.IsOpen;
 
+    /// <summary>True while it asks a question: the number keys and the d-pad pick its answers, even in a fight.</summary>
+    public static bool IsAsking => IsOpen && current.choices != null && current.choices.Count > 0;
+
     /// <summary>True while anyone is talking: a line in the box or a subtitle.</summary>
     public static bool IsSpeaking => IsOpen || (current != null && current.IsSubtitling);
 
@@ -364,6 +367,8 @@ public sealed class DialogueBox : MonoBehaviour
         activeLine.maxVisibleCharacters = 0;
         letters = activeLine.text.Length;
         revealStarted = Time.unscaledTime;
+        // A new line takes the pad's selection off the last question's answers: the press that continues must not submit one.
+        ClearPadSelection();
         if (!window.IsOpen)
         {
             shownAt = Time.unscaledTime;
@@ -554,13 +559,24 @@ public sealed class DialogueBox : MonoBehaviour
         if (next && !Revealed)
         {
             activeLine.maxVisibleCharacters = letters;
+            revealPressFrame = Time.frameCount;
             UpdateHint();
             return;
         }
 
         if (choices != null && choices.Count > 0)
         {
-            SelectAnswerForPad();
+            // An answer is selected for the pad only once the line is out, and not on the frame A brought it out: that press
+            // also reached the selected answer and took the first one, unread.
+            if (Revealed && Time.frameCount > revealPressFrame + 1)
+            {
+                SelectAnswerForPad();
+            }
+            else
+            {
+                ClearPadSelection();
+            }
+
             // UI › Answer1-9: the number keys pick an answer.
             for (int i = 0; i < Mathf.Min(GameInput.AnswerCount, choices.Count); i++)
             {
@@ -633,6 +649,23 @@ public sealed class DialogueBox : MonoBehaviour
 
     // On a controller the answers are picked with the stick or d-pad and A (UI › Submit on the selected button): something
     // has to be selected for that. The mouse needs nothing, and a highlighted answer would only look chosen.
+    private int revealPressFrame = -1;
+
+    // Takes the selection off this box's answer buttons (a controller's Submit would press the selected one).
+    private void ClearPadSelection()
+    {
+        EventSystem events = EventSystem.current;
+        GameObject selected = events != null ? events.currentSelectedGameObject : null;
+        for (int i = 0; selected != null && i < buttons.Count; i++)
+        {
+            if (buttons[i] != null && buttons[i].gameObject == selected)
+            {
+                events.SetSelectedGameObject(null);
+                return;
+            }
+        }
+    }
+
     private void SelectAnswerForPad()
     {
         EventSystem events = EventSystem.current;

@@ -24,6 +24,10 @@ public static class HitMaterials
     private static readonly Collider[] Overlaps = new Collider[16];
     private static float nextGlance;
 
+    // Entering Play doesn't reload scripts in this project: the last session's time would keep glances silent until passed.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => nextGlance = 0f;
+
     /// <summary>A blow landed on <paramref name="victim"/>: its material's effect and sound, if it isn't flesh.</summary>
     public static void Struck(Damageable victim, in DamageInfo damage)
     {

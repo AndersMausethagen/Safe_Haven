@@ -204,5 +204,6 @@ public static class GameSession
         // loading another save posted the old run's territory news in the loaded Haven.
         global::Territory.ForgetGame();
         CreatureRecords.ForgetGame();
+        CorruptionNights.ForgetGame();
     }
 }

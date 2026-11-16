@@ -23,14 +23,21 @@ public sealed class PurificationAltar : MonoBehaviour
         interactable = GetComponent<Interactable>();
     }
 
+    private static readonly System.Collections.Generic.List<PurificationAltar> standing = new System.Collections.Generic.List<PurificationAltar>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => standing.Clear();
+
     private void OnEnable()
     {
+        standing.Add(this);
         interactable.Completed.AddListener(OnUsed);
         Construction.Finished += OnBuilt;
     }
 
     private void OnDisable()
     {
+        standing.Remove(this);
         interactable.Completed.RemoveListener(OnUsed);
         Construction.Finished -= OnBuilt;
     }
@@ -39,14 +46,36 @@ public sealed class PurificationAltar : MonoBehaviour
 
     private void OnBuilt(Construction _) => TellSpeed();
 
-    private void TellSpeed()
+    private void TellSpeed() => NoteBest();
+
+    /// <summary>
+    /// Tells SettlementState the purifying speed and yield of the best altar standing whole now, or none (HavenProgress, with what
+    /// else stands): whichever altar started or was rebuilt last set them, and a broken or demolished one kept its bonus.
+    /// </summary>
+    public static void NoteBest()
     {
         // A friend's altar is told of in their game (co-op).
-        if (!HavenVisit.IsVisiting && TryGetComponent(out Construction construction))
+        if (HavenVisit.IsVisiting)
         {
-            GameSession.Settlement.SetPurificationBonus(construction.Sum(level => level.craftSpeed));
-            GameSession.Settlement.SetPurificationYield(construction.Sum(level => level.purifyYield));
+            return;
         }
+
+        float speed = 0f;
+        float yield = 0f;
+        foreach (PurificationAltar altar in standing)
+        {
+            if (altar == null || !altar.TryGetComponent(out Construction construction) || !construction.IsStanding
+                || (altar.TryGetComponent(out Damageable health) && health.IsBroken))
+            {
+                continue;
+            }
+
+            speed = Mathf.Max(speed, construction.Sum(level => level.craftSpeed));
+            yield = Mathf.Max(yield, construction.Sum(level => level.purifyYield));
+        }
+
+        GameSession.Settlement.SetPurificationBonus(speed);
+        GameSession.Settlement.SetPurificationYield(yield);
     }
 
     private void OnUsed()

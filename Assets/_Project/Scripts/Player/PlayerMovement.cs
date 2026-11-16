@@ -364,7 +364,8 @@ public sealed class PlayerMovement : MonoBehaviour
             FaceDirection(direction);
         }
 
-        float bonus = combatant != null ? Mathf.Max(-0.5f, combatant.Stats.Get(StatType.MoveSpeed)) : 0f;
+        // A share of the player's own speed: a Percent modifier scales it, a Flat one adds to it (StatSheet.GetOn).
+        float bonus = combatant != null ? Mathf.Max(-0.5f, combatant.Stats.GetOn(StatType.MoveSpeed, 1f) - 1f) : 0f;
         float speed = settings.MoveSpeed * settings.GetSpeedMultiplier(currentGameState) * speedScale * (1f + bonus);
         if ((facingAim || FacingLocked) && direction.sqrMagnitude > 0.0001f)
         {

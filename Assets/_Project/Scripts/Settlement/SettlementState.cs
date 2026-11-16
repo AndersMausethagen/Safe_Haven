@@ -455,7 +455,8 @@ public sealed class SettlementState
     /// <summary>Remembers what stands at home, since a raid can't look. Read again by HavenProgress; not saved, as loading a game lands at home.</summary>
     public void NoteBuildings(IEnumerable<BuildingObject> standing)
     {
-        Borrowed();
+        // Seen, not decided: in a friend's Haven (co-op) the copy notes the friend's buildings too, kept through the host's word
+        // (TakeOn leaves what is seen alone).
         builtTiers.Clear();
         int beds = 0;
         foreach (BuildingObject building in standing)
@@ -475,7 +476,6 @@ public sealed class SettlementState
 
     public void NoteBuilt(BuildingDefinition building, int tier)
     {
-        Borrowed();
         builtTiers[building] = UnityEngine.Mathf.Max(BuiltTier(building), tier);
     }
 
@@ -531,6 +531,14 @@ public sealed class SettlementState
         }
     }
 
+    // What this game sees standing, not what is saved or sent (HavenProgress notes it where the player is): taken on from the
+    // host's word, a guest's copy had no building tiers, beds or scaffolds for the whole visit (meal slots, mentors, raid caches
+    // and rumours all read 0).
+    private static readonly string[] SeenHere =
+    {
+        nameof(builtTiers), "<Beds>k__BackingField", "<ScaffoldsWaiting>k__BackingField",
+    };
+
     public void TakeOn(SettlementState other)
     {
         if (other == null || other == this)
@@ -541,7 +549,7 @@ public sealed class SettlementState
         foreach (System.Reflection.FieldInfo field in typeof(SettlementState).GetFields(
                      System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic))
         {
-            if (field.Name != nameof(Changed))
+            if (field.Name != nameof(Changed) && System.Array.IndexOf(SeenHere, field.Name) < 0)
             {
                 field.SetValue(this, field.GetValue(other));
             }
@@ -902,8 +910,15 @@ public sealed class SettlementState
         ResidentRecord record = Find(resident);
         if (record != null && record.Job != job)
         {
+            JobDefinition before = record.Job;
             record.Job = job;
             vacantJobs.Remove(job);
+            // A vacant job they took and now leave goes back to waiting for someone: it is in nobody's own list, and was lost.
+            if (before != null && System.Array.IndexOf(resident.Jobs, before) < 0 && !IsHeld(before) && !vacantJobs.Contains(before))
+            {
+                vacantJobs.Add(before);
+            }
+
             Changed?.Invoke();
         }
     }

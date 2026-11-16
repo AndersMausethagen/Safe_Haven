@@ -41,6 +41,18 @@ public static class RaidLauncher
             return "The way isn't open yet: wait a moment.";
         }
 
+        // Not out of a fight for the Haven: leaving unloaded the attackers with nothing settled (no strain, no recovery, the
+        // breach still pending), and a corrupted night skipped its dawn and the blight it spreads.
+        if (WardBreachDirector.Current != null && WardBreachDirector.Current.IsUnderWay)
+        {
+            return "The ward is breached: defend the Haven first.";
+        }
+
+        if (CorruptionNights.Current != null && CorruptionNights.Current.IsActive)
+        {
+            return "The corrupted night is on the Haven: hold until dawn.";
+        }
+
         if (string.IsNullOrWhiteSpace(raid.SceneName) || !Application.CanStreamedLevelBeLoaded(raid.SceneName))
         {
             return $"{raid.DisplayName} can't be reached: its scene isn't in the build.";

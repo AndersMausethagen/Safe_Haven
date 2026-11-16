@@ -30,8 +30,34 @@ public sealed class StatSheet
     /// <summary>The stat's current value with every modifier applied.</summary>
     public float Get(StatType stat)
     {
-        float flat = 0f;
-        float percent = 0f;
+        Sum(stat, out float flat, out float percent);
+        return (baseValues[(int)stat] + flat) * Math.Max(0f, 1f + percent);
+    }
+
+    /// <summary>
+    /// The stat on a base kept outside the sheet (the stamina pool's, or 1 for a share read as 1 + its value, move speed):
+    /// (that base + the sheet's + flat) × (1 + percent). With nothing in the sheet's base a Percent modifier only scaled the
+    /// Flat ones: Chilled slowed nobody and took no stamina, Rested and Moon Broth gave none, and with a slowing armour Chilled
+    /// made the player faster (review 2026-11-16).
+    /// </summary>
+    public float GetOn(StatType stat, float outsideBase)
+    {
+        Sum(stat, out float flat, out float percent);
+        return (outsideBase + baseValues[(int)stat] + flat) * Math.Max(0f, 1f + percent);
+    }
+
+    /// <summary>A chance read as it is (gather yield): a Percent modifier adds its points as a Flat one does ("+10% gather yield"
+    /// is ten points more chance), as there is nothing for it to scale.</summary>
+    public float GetChance(StatType stat)
+    {
+        Sum(stat, out float flat, out float percent);
+        return baseValues[(int)stat] + flat + percent;
+    }
+
+    private void Sum(StatType stat, out float flat, out float percent)
+    {
+        flat = 0f;
+        percent = 0f;
         for (int i = 0; i < modifiers.Count; i++)
         {
             StatModifier modifier = modifiers[i];
@@ -49,8 +75,6 @@ public sealed class StatSheet
                 percent += modifier.Value;
             }
         }
-
-        return (baseValues[(int)stat] + flat) * Math.Max(0f, 1f + percent);
     }
 
     public void AddModifier(StatModifier modifier)

@@ -20,6 +20,7 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
     private FilmGrain grain;
     private LiftGammaGain gamma;
     private bool applyingPreset;
+    private bool echoingPreset;
 
     /// <summary>Called once by GameSystems when the game starts.</summary>
     public void Initialise()
@@ -58,13 +59,27 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
 
     private void OnChanged(GameOption option)
     {
+        // A preset sets its members and is applied once (SetPreset); a member changed by hand moves the preset to the one it now
+        // matches without that applying again. Each member set by a preset ran GraphicsOptions.Apply (about ten times, each with
+        // scene searches, terrain quality and a shadow map change).
         if (option == GameOptions.Preset)
         {
-            SetPreset(option.Index);
+            if (!echoingPreset)
+            {
+                SetPreset(option.Index);
+            }
         }
         else if (IsMember(option) && !applyingPreset)
         {
-            GameOptions.Preset.Value = GameOptions.MatchingPreset();
+            echoingPreset = true;
+            try
+            {
+                GameOptions.Preset.Value = GameOptions.MatchingPreset();
+            }
+            finally
+            {
+                echoingPreset = false;
+            }
         }
 
         if (option == GameOptions.DamageTaken && Player.Current != null)
@@ -77,13 +92,13 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
         }
         else if (option == GameOptions.VSync || option == GameOptions.FrameLimit)
         {
-            DisplayOptions.Apply();
+            DisplayOptions.ApplyPacing();
         }
         else if (option == GameOptions.Brightness || option == GameOptions.Bloom || option == GameOptions.MotionBlur || option == GameOptions.FilmGrain)
         {
             ApplyLook();
         }
-        else if (IsMember(option) || option == GameOptions.Upscaling)
+        else if ((IsMember(option) && !applyingPreset) || option == GameOptions.Upscaling)
         {
             GraphicsOptions.Apply();
         }

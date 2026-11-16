@@ -72,8 +72,19 @@ public sealed class FocusCameraNode : StoryNode
         }
 
         camera.BeginFocus(target);
+        // Ended on the camera, as the shield is: a story stopped while the camera looks away left it looking, and the sight lit.
+        camera.StartCoroutine(EndFocus(camera, target, sight, seconds));
         yield return new WaitForSeconds(seconds);
-        camera.EndFocus(target);
+    }
+
+    private static IEnumerator EndFocus(PlayerCameraController camera, Transform target, GameObject sight, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        if (camera != null)
+        {
+            camera.EndFocus(target);
+        }
+
         if (sight != null)
         {
             UnityEngine.Object.Destroy(sight);

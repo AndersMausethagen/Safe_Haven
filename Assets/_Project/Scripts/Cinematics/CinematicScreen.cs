@@ -90,6 +90,9 @@ public sealed class CinematicScreen : MonoBehaviour
     private float revealSeconds;
     private float revealed;
     private TMP_Text subtitle;
+    private TMP_Text hintLabel;
+
+    private static string SkipHint => InputDevices.UsingGamepad ? "Hold A to skip" : "Hold Esc or Space to skip";
     private CanvasGroup hint;
     private RectTransform hintFill;
     private AudioSource voice;
@@ -201,7 +204,8 @@ public sealed class CinematicScreen : MonoBehaviour
         hint.blocksRaycasts = false;
         Color muted = style != null ? style.Muted : Color.gray;
         TMP_Text label = CodeUI.Label("Label", corner, 0f, 0f, 260f, 28f, 18f, muted, TextAlignmentOptions.Right);
-        label.text = "Hold Esc or Space to skip";
+        label.text = SkipHint;
+        hintLabel = label;
         if (style != null)
         {
             style.OnWorld(label);
@@ -234,6 +238,14 @@ public sealed class CinematicScreen : MonoBehaviour
 
     private void Begin(CinematicDefinition cinematic, Action onFinished)
     {
+        // The game's own talk ends here: a line still up when the game paused for this went on over the narration, and its
+        // subtitle, frozen with the paused clock, kept the cinematic's music dipped throughout.
+        VoicePlayer.Stop();
+        if (DialogueBox.Current != null && DialogueBox.IsOpen)
+        {
+            DialogueBox.Current.Close();
+        }
+
         definition = cinematic;
         timeline = new CinematicTimeline(cinematic);
         finished = onFinished;
@@ -341,6 +353,11 @@ public sealed class CinematicScreen : MonoBehaviour
         }
 
         hint.alpha = Mathf.MoveTowards(hint.alpha, time < hintUntil ? 1f : 0f, step * 4f);
+        // In the words of what is in hand (it said Esc or Space to a controller).
+        if (hintLabel != null && hintLabel.text != SkipHint)
+        {
+            hintLabel.text = SkipHint;
+        }
         hintFill.anchorMax = new Vector2(skip.Progress, 1f);
     }
 
@@ -495,7 +512,8 @@ public sealed class CinematicScreen : MonoBehaviour
         float fade = SkipFade;
         float voiceVolume = AudioManager.ChannelVolume(AudioChannel.Voice) * fade;
         float effectsVolume = AudioManager.ChannelVolume(AudioChannel.Effects) * fade;
-        float musicVolume = AudioManager.ChannelVolume(AudioChannel.Music) * fade;
+        // Its own music at the player's volume, not dipped for the game's speech (the cinematic dips it for its own lines).
+        float musicVolume = AudioManager.MasterVolume * AudioManager.GetVolume(AudioChannel.Music) * fade;
 
         while (skippedAt < 0f && nextLine < timeline.Lines.Count && time >= timeline.Lines[nextLine].Start)
         {

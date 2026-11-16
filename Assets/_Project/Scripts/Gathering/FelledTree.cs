@@ -115,6 +115,12 @@ public sealed class FelledTree : MonoBehaviour
 
     private void Begin(TreeParts parts, float size, GameObject feller, List<ItemAmount> logs, Vector3 direction)
     {
+        // The tree it was, for the skill its logs train and the wood of its lucky swings.
+        if (source != null && parts != null)
+        {
+            source.TakeOnTree(parts.Tier, parts.Wood);
+        }
+
         this.parts = parts;
         this.size = size;
         this.feller = feller;

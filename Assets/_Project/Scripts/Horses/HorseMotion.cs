@@ -305,7 +305,9 @@ public sealed class HorseMotion : MonoBehaviour
 
         if (!kept)
         {
-            if (mode != Idle.Stall)
+            // Out of the stall: whatever the mode reads (fed there, it said Graze), the agent comes back on. Left off, the horse led
+            // out stood frozen for good, deaf to the whistle and running in place under a rider.
+            if (mode != Idle.Stall && agent.enabled)
             {
                 return;
             }
@@ -350,7 +352,8 @@ public sealed class HorseMotion : MonoBehaviour
 
     public void PlayEat()
     {
-        if (animator != null && mode != Idle.Ridden)
+        // Not out of the stall (or a hold or death) by eating: only the pose and its seconds.
+        if (animator != null && mode != Idle.Ridden && mode != Idle.Stall && mode != Idle.Dead)
         {
             until = Mathf.Max(until, Time.time + 4f);
             mode = Idle.Graze;
@@ -549,6 +552,13 @@ public sealed class HorseMotion : MonoBehaviour
 
     public void Die()
     {
+        // Killed in the air: it comes down where it was going, not hanging there through its death (Update stops for the dead).
+        if (jumping)
+        {
+            transform.position = jumpTo;
+            jumping = false;
+        }
+
         mode = Idle.Dead;
         if (agent.enabled && agent.isOnNavMesh)
         {

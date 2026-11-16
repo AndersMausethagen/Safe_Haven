@@ -56,6 +56,29 @@ public static class RaidHarms
             }
         }
 
+        // Elites the tier brings carry harms of their own (Frostbound chills): named "elites", from the affixes open at this tier.
+        bool elites = false;
+        foreach (RaidDifficulty difficulty in raid != null ? raid.Difficulties : new List<RaidDifficulty>())
+        {
+            elites |= difficulty != null && difficulty.tier == tier && difficulty.eliteCount.y > 0;
+        }
+
+        foreach (EliteAffixDefinition affix in elites ? raid.EliteAffixes : new List<EliteAffixDefinition>())
+        {
+            if (affix == null || affix.FromTier > tier)
+            {
+                continue;
+            }
+
+            foreach (EliteBehaviour behaviour in affix.Behaviours)
+            {
+                if (behaviour is StatusOnHitBehaviour onHit && onHit.Effect != null)
+                {
+                    Note(from, "elites", onHit.Effect.DamageType);
+                }
+            }
+        }
+
         var harms = new List<Harm>();
         foreach (DamageType kind in Kinds)
         {
@@ -114,7 +137,10 @@ public static class RaidHarms
         _ => StatType.PhysicalResistance,
     };
 
-    private static void Note(Dictionary<DamageType, List<string>> from, MonsterDefinition monster, DamageType type)
+    private static void Note(Dictionary<DamageType, List<string>> from, MonsterDefinition monster, DamageType type) =>
+        Note(from, monster.DisplayName, type);
+
+    private static void Note(Dictionary<DamageType, List<string>> from, string who, DamageType type)
     {
         if (type == DamageType.Physical)
         {
@@ -126,9 +152,9 @@ public static class RaidHarms
             from[type] = names = new List<string>();
         }
 
-        if (!names.Contains(monster.DisplayName))
+        if (!names.Contains(who))
         {
-            names.Add(monster.DisplayName);
+            names.Add(who);
         }
     }
 }

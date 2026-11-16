@@ -132,11 +132,14 @@ public sealed class CinematicView : MonoBehaviour
     /// <summary>Counts the skip key; true once it has been held long enough.</summary>
     public bool ReadSkip(HoldToSkip skip, float holdSeconds)
     {
-        bool held = (Keyboard.current != null && Keyboard.current.spaceKey.isPressed)
-            || (Gamepad.current != null && Gamepad.current.buttonSouth.isPressed);
+        // Space and A also step a conversation shown in the shot (UI › Advance): while one is up they don't count to the skip,
+        // which flashed its hint at every line and ended the shot when a line was held.
+        bool talking = DialogueBox.IsOpen;
+        bool held = !talking && ((Keyboard.current != null && Keyboard.current.spaceKey.isPressed)
+            || (Gamepad.current != null && Gamepad.current.buttonSouth.isPressed));
         bool anything = held || (Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame)
             || (Gamepad.current != null && Gamepad.current.wasUpdatedThisFrame && Gamepad.current.buttonSouth.wasPressedThisFrame);
-        if (anything)
+        if (anything && !talking)
         {
             hintUntil = Time.unscaledTime + 3f;
         }
@@ -198,11 +201,13 @@ public sealed class CinematicView : MonoBehaviour
         // black bands, so it fades out while the cinematic has the camera.
         AtmosphereFeature.WarScale = 1f - eased;
 
-        // Paused, the menu (in the UI root) must show; the cinematic waits meanwhile.
+        // Paused, the menu (in the UI root) must show; the cinematic waits meanwhile. So must a window the player opens during a
+        // cinematic that leaves them free (the morning's introductions): it opened unseen, and the conversation hid under it.
         if (hideHud && !ending)
         {
-            if (GamePause.IsPaused && hidden.Count > 0) ShowHud();
-            else if (!GamePause.IsPaused && hidden.Count == 0) HideHud();
+            bool shown = GamePause.IsPaused || HudGivesWay.Covered;
+            if (shown && hidden.Count > 0) ShowHud();
+            else if (!shown && hidden.Count == 0) HideHud();
         }
 
         if (hint != null)

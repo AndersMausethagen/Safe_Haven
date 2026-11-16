@@ -90,7 +90,8 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
 
     private static bool Wanted()
     {
-        if (!InputDevices.UsingGamepad || DialogueBox.IsOpen || CommandWheel.IsHeld || InputRebinds.IsListening || SceneTransition.IsBusy
+        // A window opened over a conversation (the bag, to check a hand-in) gets the pointer: the box hides under it.
+        if (!InputDevices.UsingGamepad || (DialogueBox.IsOpen && !HudGivesWay.Covered) || CommandWheel.IsHeld || InputRebinds.IsListening || SceneTransition.IsBusy
             || CinematicScreen.IsPlaying)
         {
             return false;
@@ -177,11 +178,13 @@ public sealed class PadCursor : MonoBehaviour, IGameSystem
         Vector2 wheel = scroll.ReadValue<Vector2>();
         Write(delta, new Vector2(0f, wheel.y * settings.ScrollSpeed * 120f * dt));
 
-        if (previousTab.WasPressedThisFrame())
+        // Over a bag slot the shoulders are the bag's (RB puts the item on the quickbar), not the tabs'.
+        bool bagClaims = ItemInventoryWindow.ClaimsKeys;
+        if (!bagClaims && previousTab.WasPressedThisFrame())
         {
             PadTabs.Step(-1);
         }
-        else if (nextTab.WasPressedThisFrame())
+        else if (!bagClaims && nextTab.WasPressedThisFrame())
         {
             PadTabs.Step(1);
         }

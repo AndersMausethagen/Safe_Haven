@@ -40,7 +40,9 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
     /// <summary>What it says, for the builder and tests.</summary>
     public IReadOnlyList<string> Thoughts => thoughts;
 
-    private string Key => $"{gameObject.scene.name}/{name}/{Mathf.RoundToInt(transform.position.x)},{Mathf.RoundToInt(transform.position.z)}";
+    // Made once: built anew it was two strings a frame for every such place.
+    private string key;
+    private string Key => key ??= $"{gameObject.scene.name}/{name}/{Mathf.RoundToInt(transform.position.x)},{Mathf.RoundToInt(transform.position.z)}";
 
     private void Awake()
     {
@@ -64,8 +66,8 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
     private void Update()
     {
         Player player = Player.Current;
-        if (player != null && thoughts.Length > 0 && !WasNoticed() && MayThink()
-            && (player.transform.position - transform.position).sqrMagnitude <= noticeRadius * noticeRadius)
+        if (player != null && thoughts.Length > 0 && (player.transform.position - transform.position).sqrMagnitude <= noticeRadius * noticeRadius
+            && !WasNoticed() && MayThink())
         {
             NoteNoticed();
             Muse();

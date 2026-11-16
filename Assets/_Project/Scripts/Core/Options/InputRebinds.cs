@@ -28,6 +28,9 @@ public readonly struct RebindRow
 /// </summary>
 public static class InputRebinds
 {
+    // Who holds the gameplay keys while a new key is chosen (GameInput.SuspendGameplay).
+    private static readonly object RebindOwner = new object();
+
     private const string Key = "SafeHaven.Bindings";
 
     public static readonly IReadOnlyList<RebindRow> Rows = new[]
@@ -223,7 +226,7 @@ public static class InputRebinds
         }
 
         string before = action.bindings[index].effectivePath;
-        GameInput.SuspendGameplay();
+        GameInput.SuspendGameplay(RebindOwner);
         var rebind = action.PerformInteractiveRebinding(index)
             .WithExpectedControlType("Button")
             .WithBindingGroup(scheme)
@@ -261,7 +264,7 @@ public static class InputRebinds
         operation?.Dispose();
         operation = null;
         finishedFrame = Time.frameCount;
-        GameInput.ResumeGameplay();
+        GameInput.ResumeGameplay(RebindOwner);
     }
 
     // Entering play mode doesn't reload scripts in this project (Enter Play Mode Options), so statics are reset here.

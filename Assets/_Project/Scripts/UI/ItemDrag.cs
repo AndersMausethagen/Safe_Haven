@@ -62,6 +62,13 @@ public static class ItemDrag
             return false;
         }
 
+        // The piece swapped back into a gear slot is put on as well: a broken one there gave nothing (GearSet.CanEquip refuses it).
+        if (!other.IsEmpty && source.SlotRule != null && other.IsBroken)
+        {
+            GameMessages.Post($"{other.Item.DisplayName} is broken. Repair it at a Workshop first.", MessageKind.Warning);
+            return false;
+        }
+
         return source.MoveTo(from, target, index);
     }
 
