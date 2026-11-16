@@ -122,7 +122,8 @@ public static class HomeLife
 
         foreach (VisibilitySource light in VisibilitySource.Active)
         {
-            if (light != null && light.IsLight && light.GetComponentInParent<BuildingObject>() is BuildingObject lamp && lamp != except && lamp.IsStanding)
+            // Which building a light belongs to is looked up once (BuildHere.LampOf): the ghost's readout asks this often.
+            if (light != null && light.IsLight && BuildHere.LampOf(light) is BuildingObject lamp && lamp != except && lamp.IsStanding)
             {
                 input.Lights.Add((Flat(light.transform.position), light.Radius));
             }

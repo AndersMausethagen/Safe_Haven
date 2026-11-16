@@ -6,22 +6,114 @@ using UnityEngine;
 /// The "Here" readout on the build ghost (Docs/BuildingSystemResearch.md §3.4, step 2): what a spot is near, whether it is lit
 /// and guarded, the yard it is in, and for the kind being placed what that spot means: a house's quality and who would move
 /// in, a workplace's walk from its worker's home, an extension's station and slot, a path's speed. Plain text with kit icons,
-/// worked out only when the ghost moves to another spot. The radii it speaks of are drawn by BuildOverlay.
+/// worked out only when the ghost moves to another spot, and then at most a few times a second (BuildOverlay). The radii it
+/// speaks of are drawn by BuildOverlay. What it looks up in the scene (the Watch Posts, Ward Totems and which building each
+/// light belongs to) is kept for the placement session (<see cref="BeginSession"/>) and looked up again when a building
+/// comes or goes.
 /// </summary>
 public static class BuildHere
 {
     private const float NearReach = 20f;
     private const int MostNear = 3;
     private static readonly StringBuilder text = new StringBuilder();
+    private static readonly StringBuilder said = new StringBuilder();
     private static readonly List<(BuildingDefinition kind, float distance)> near = new List<(BuildingDefinition, float)>();
     private static readonly List<Vector2> work = new List<Vector2>();
+    private static readonly List<ResidentRecord> movers = new List<ResidentRecord>();
+    private static readonly List<string> who = new List<string>();
+    private static readonly List<string> have = new List<string>();
+    private static readonly List<WatchPostArcher> posts = new List<WatchPostArcher>();
+    private static readonly List<WardTotem> totems = new List<WardTotem>();
+    private static readonly Dictionary<VisibilitySource, BuildingObject> lampOf = new Dictionary<VisibilitySource, BuildingObject>();
+    private static readonly System.Comparison<(BuildingDefinition kind, float distance)> ByDistance = (a, b) => a.distance.CompareTo(b.distance);
+    private static bool guardsKnown;
+    private static bool listening;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
         text.Clear();
+        said.Clear();
         near.Clear();
         work.Clear();
+        movers.Clear();
+        who.Clear();
+        have.Clear();
+        Forget();
+        listening = false;
+    }
+
+    /// <summary>A placement session begins (the overlay shows): what was looked up in the scene is looked up afresh.</summary>
+    public static void BeginSession()
+    {
+        if (!listening)
+        {
+            // Play sessions don't reload scripts here: off first, so a second session doesn't listen twice.
+            listening = true;
+            BuildingObject.ActiveChanged -= Forget;
+            BuildingObject.ActiveChanged += Forget;
+        }
+
+        Forget();
+    }
+
+    private static void Forget()
+    {
+        posts.Clear();
+        totems.Clear();
+        lampOf.Clear();
+        guardsKnown = false;
+    }
+
+    /// <summary>The Watch Posts standing now, found once per session (or again when a building comes or goes).</summary>
+    public static IReadOnlyList<WatchPostArcher> Posts
+    {
+        get
+        {
+            KnowGuards();
+            return posts;
+        }
+    }
+
+    /// <summary>The Ward Totems standing now, found as <see cref="Posts"/>.</summary>
+    public static IReadOnlyList<WardTotem> Totems
+    {
+        get
+        {
+            KnowGuards();
+            return totems;
+        }
+    }
+
+    private static void KnowGuards()
+    {
+        if (guardsKnown)
+        {
+            return;
+        }
+
+        guardsKnown = true;
+        posts.Clear();
+        totems.Clear();
+        posts.AddRange(Object.FindObjectsByType<WatchPostArcher>());
+        totems.AddRange(Object.FindObjectsByType<WardTotem>());
+    }
+
+    /// <summary>The building a light belongs to (null for one that isn't a building's), looked up once per session.</summary>
+    public static BuildingObject LampOf(VisibilitySource light)
+    {
+        if (light == null)
+        {
+            return null;
+        }
+
+        if (!lampOf.TryGetValue(light, out BuildingObject lamp))
+        {
+            lamp = light.GetComponentInParent<BuildingObject>();
+            lampOf[light] = lamp;
+        }
+
+        return lamp;
     }
 
     /// <summary>The readout for <paramref name="kind"/> standing at <paramref name="point"/> turned by <paramref name="yaw"/>.</summary>
@@ -92,7 +184,16 @@ public static class BuildHere
                 continue;
             }
 
-            int known = near.FindIndex(entry => entry.kind == kind);
+            int known = -1;
+            for (int i = 0; i < near.Count; i++)
+            {
+                if (near[i].kind == kind)
+                {
+                    known = i;
+                    break;
+                }
+            }
+
             if (known < 0)
             {
                 near.Add((kind, distance));
@@ -108,8 +209,8 @@ public static class BuildHere
             return "Open ground: nothing built within 20 m";
         }
 
-        near.Sort((a, b) => a.distance.CompareTo(b.distance));
-        var said = new StringBuilder("Near ");
+        near.Sort(ByDistance);
+        said.Clear().Append("Near ");
         for (int i = 0; i < near.Count && i < MostNear; i++)
         {
             said.Append(i > 0 ? ", " : "").Append(near[i].kind.DisplayName).Append(' ').Append(Mathf.RoundToInt(near[i].distance)).Append(" m");
@@ -127,7 +228,7 @@ public static class BuildHere
                 continue;
             }
 
-            BuildingObject lamp = source.GetComponentInParent<BuildingObject>();
+            BuildingObject lamp = LampOf(source);
             if (lamp != null && lamp.Definition != null && Flat(source.transform.position - point).magnitude <= source.Radius)
             {
                 return lamp.Definition.DisplayName;
@@ -139,17 +240,17 @@ public static class BuildHere
 
     private static string GuardedBy(Vector3 point)
     {
-        foreach (WatchPostArcher post in Object.FindObjectsByType<WatchPostArcher>())
+        foreach (WatchPostArcher post in Posts)
         {
-            if (Flat(post.transform.position - point).magnitude <= post.Reach)
+            if (post != null && Flat(post.transform.position - point).magnitude <= post.Reach)
             {
                 return "Within the Watch Post's bowshot";
             }
         }
 
-        foreach (WardTotem totem in Object.FindObjectsByType<WardTotem>())
+        foreach (WardTotem totem in Totems)
         {
-            if (Flat(totem.transform.position - point).magnitude <= totem.Radius)
+            if (totem != null && Flat(totem.transform.position - point).magnitude <= totem.Radius)
             {
                 return "Within a Ward Totem's reach";
             }
@@ -161,10 +262,11 @@ public static class BuildHere
     // A house: its quality from what is round it, what to add next, and who would move in.
     private static void House(BuildingDefinition kind, Vector3 point, float yaw, Bounds local)
     {
-        Vector3 door = point + Quaternion.Euler(0f, yaw, 0f) * new Vector3(local.center.x, 0f, local.max.z + 0.55f);
-        List<ResidentRecord> movers = HavenHomes.WouldMoveIn(door, kind.Beds);
+        // The door on the yard's side, where the house will have it once built (BuildingObject.Door).
+        Vector3 door = BuildingObject.DoorAt(point, yaw, local, kind.YardSide, out _);
+        HavenHomes.WouldMoveIn(door, kind.Beds, movers);
         work.Clear();
-        var who = new List<string>();
+        who.Clear();
         foreach (ResidentRecord record in movers)
         {
             BuildingObject place = record.Job != null && record.Job.Workplace != null ? BuildingObject.Nearest(record.Job.Workplace, door) : null;
@@ -180,7 +282,7 @@ public static class BuildHere
         }
 
         HomeQuality.Report report = HomeLife.Imagine(door, work);
-        var have = new List<string>();
+        have.Clear();
         foreach (HomeQuality.Line line in report.Lines)
         {
             if (line.Met)
@@ -196,7 +298,7 @@ public static class BuildHere
             Line("Star", "Better with " + char.ToLowerInvariant(next[0]) + next.Substring(1));
         }
 
-        Line("Bed", who.Count > 0 ? "Would move in: " + string.Join(", ", who) : "Nobody would move in now: everyone has a nearer bed");
+        Line("Bed", who.Count > 0 ? "Would move in: " + string.Join(", ", who) : "Nobody would move in now: everyone keeps the bed they have");
     }
 
     // A workplace: how far its worker walks from home.

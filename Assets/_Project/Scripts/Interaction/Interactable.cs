@@ -86,9 +86,12 @@ public sealed class Interactable : MonoBehaviour
         conditions = GetComponents<IInteractionCondition>();
     }
 
-    /// <summary>Sets it up from code (an interaction made while playing, such as a construction site).</summary>
-    public void Configure(InteractionAnimation animation, float seconds, float reach, bool deactivateWhenComplete)
+    /// <summary>Sets it up from code (an interaction made while playing, such as a construction site, or a Use such as a
+    /// door to knock at).</summary>
+    public void Configure(InteractionAnimation animation, float seconds, float reach, bool deactivateWhenComplete,
+        InteractionKind? interaction = null)
     {
+        kind = interaction ?? kind;
         animationType = animation;
         duration = Mathf.Max(0f, seconds);
         range = Mathf.Max(0f, reach);

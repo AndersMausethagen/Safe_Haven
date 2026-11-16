@@ -364,8 +364,9 @@ public sealed class SettlementState
         }
     }
 
-    /// <summary>Seconds the player has been away on raids while someone who builds lives here (HomeLifeSettings › Builders):
-    /// spent on the scaffolds standing at home when the player comes back (ResidentBuilders).</summary>
+    /// <summary>Builder-seconds saved up while the player is away on raids: each second times the builders at home then
+    /// (HomeLifeSettings › Builders; not one along on the raid, nor one paused). Spent on the scaffolds standing at home when
+    /// the player comes back (ResidentBuilders).</summary>
     public float BuilderSeconds { get; private set; }
 
     public void AddBuilderSeconds(float seconds)

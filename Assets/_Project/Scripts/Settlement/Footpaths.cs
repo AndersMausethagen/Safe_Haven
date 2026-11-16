@@ -9,7 +9,8 @@ using UnityEngine.Rendering.Universal;
 /// TODO): a coarse map of the ground round the portal (a metre a cell) gains wear under every resident on the move and grows
 /// back slowly; cells worn enough get a patch of trampled earth (the Trampled Ground decal), more solid the more worn. Never
 /// across a stone path. Looked at twice a second; decals laid again every few seconds, from a pool. The map is kept with the
-/// game, packed (SettlementState.Footpaths), so paths don't start over on every load. On the portal, with HavenHomes.
+/// game, packed (SettlementState.Footpaths), wear that doesn't show yet too, so paths don't start over on every load or raid.
+/// On the portal, with HavenHomes.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class Footpaths : MonoBehaviour
@@ -20,6 +21,8 @@ public sealed class Footpaths : MonoBehaviour
     private const float LaySeconds = 3f;
     private const float KeepSeconds = 30f;
     private const float ShowsFrom = 0.45f;
+    /// <summary>Wear kept with the game though it doesn't show yet: a cell walked a couple of times. Below it, forgotten.</summary>
+    public const float KeptFrom = 0.05f;
     private const float FullAt = 1f;
     private const int MostDecals = 450;
     private const float DecalSize = 1.7f;
@@ -208,11 +211,44 @@ public sealed class Footpaths : MonoBehaviour
         // so the wear since the last lay was lost on every raid (review 2026-11-16).
         if (!HavenVisit.IsVisiting && keptIn != null && keptIn == GameSession.Settlement)
         {
-            GameSession.Settlement.Footpaths = Pack(wear, worn);
+            GameSession.Settlement.Footpaths = Pack(wear, KeptFrom);
         }
     }
 
-    /// <summary>The worn cells as "cell:wear;" (wear in hundredths), the rest left out.</summary>
+    /// <summary>
+    /// Every cell with at least <paramref name="from"/> wear, in cell order, as "cell:wear;" (wear in hundredths), the rest
+    /// left out; to keep it short, a cell after the first is written as "+steps" on from the one before ("+1:12;"). Wear that
+    /// doesn't show yet is kept too (review 2026-11-16): a path needs a dozen passes to show, and short stays at home between
+    /// raids threw the beginnings away on every trip, so paths never formed.
+    /// </summary>
+    public static string Pack(float[] map, float from)
+    {
+        var packed = new StringBuilder();
+        int least = Mathf.Max(1, Mathf.RoundToInt(from * 100f));
+        int last = -1;
+        for (int cell = 0; cell < map.Length; cell++)
+        {
+            int hundredths = Mathf.RoundToInt(map[cell] * 100f);
+            if (hundredths >= least)
+            {
+                if (last >= 0)
+                {
+                    packed.Append('+').Append((cell - last).ToString(CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    packed.Append(cell.ToString(CultureInfo.InvariantCulture));
+                }
+
+                packed.Append(':').Append(hundredths.ToString(CultureInfo.InvariantCulture)).Append(';');
+                last = cell;
+            }
+        }
+
+        return packed.ToString();
+    }
+
+    /// <summary>The given cells as "cell:wear;" (wear in hundredths), the rest left out.</summary>
     public static string Pack(float[] map, IEnumerable<int> cells)
     {
         var packed = new StringBuilder();
@@ -227,26 +263,41 @@ public sealed class Footpaths : MonoBehaviour
 
     private void Unpack(string packed)
     {
+        Unpack(packed, wear, worn);
+        changed = true;
+    }
+
+    /// <summary>Reads what <see cref="Pack(float[], float)"/> (or the older <see cref="Pack(float[], IEnumerable{int})"/>) wrote
+    /// into <paramref name="map"/>; the cells worn enough to show go into <paramref name="showing"/>.</summary>
+    public static void Unpack(string packed, float[] map, ICollection<int> showing)
+    {
         if (string.IsNullOrEmpty(packed))
         {
             return;
         }
 
+        int last = -1;
         foreach (string entry in packed.Split(';'))
         {
             int colon = entry.IndexOf(':');
-            if (colon > 0 && int.TryParse(entry.Substring(0, colon), NumberStyles.Integer, CultureInfo.InvariantCulture, out int cell)
-                && int.TryParse(entry.Substring(colon + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int hundredths)
-                && cell >= 0 && cell < wear.Length)
+            bool onFrom = entry.Length > 0 && entry[0] == '+';
+            int start = onFrom ? 1 : 0;
+            if (colon > start && int.TryParse(entry.Substring(start, colon - start), NumberStyles.Integer, CultureInfo.InvariantCulture, out int cell)
+                && int.TryParse(entry.Substring(colon + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int hundredths))
             {
-                wear[cell] = hundredths / 100f;
-                if (wear[cell] >= ShowsFrom)
+                cell = onFrom ? last + cell : cell;
+                last = cell;
+                if (cell < 0 || cell >= map.Length)
                 {
-                    worn.Add(cell);
+                    continue;
+                }
+
+                map[cell] = hundredths / 100f;
+                if (map[cell] >= ShowsFrom)
+                {
+                    showing?.Add(cell);
                 }
             }
         }
-
-        changed = true;
     }
 }

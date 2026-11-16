@@ -90,6 +90,8 @@ public sealed class RaidHudTests
             Vector3 near = new Vector3(13f, 5f, 40f);
             Assert.IsTrue(site.IsFoundFrom(near));
             Assert.AreEqual(go.transform.position, site.MarkFrom(near));
+            Assert.IsTrue(site.IsFoundFrom(far), "once found it stays found: walking away doesn't bring the search area back");
+            Assert.AreEqual(go.transform.position, site.MarkFrom(far));
         }
         finally
         {

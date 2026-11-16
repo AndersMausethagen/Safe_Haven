@@ -101,12 +101,24 @@ public static class HomeQuality
         }
     }
 
+    /// <summary>
+    /// What a home is like. A comfort that also gives a feature (a Kitchen Hearth makes a house warm) counts once for its one
+    /// purchase (review 2026-11-16): when nothing round the house gives that feature, the comfort meets it and its own line
+    /// adds nothing more; when something does, the comfort adds its own point.
+    /// </summary>
     public static Report Rate(Input input, HomeLifeSettings settings)
     {
         var report = new Report();
+        List<string> spent = null;
         foreach (HomeLifeSettings.Feature feature in settings.Features)
         {
             string found = Find(feature, input);
+            if (found == null && !string.IsNullOrEmpty(feature.orComfort) && input.Comforts.Contains(feature.orComfort))
+            {
+                found = "Its own hearth";
+                (spent ??= new List<string>()).Add(feature.orComfort);
+            }
+
             report.Lines.Add(new Line
             {
                 Name = feature.name,
@@ -123,8 +135,9 @@ public static class HomeQuality
         foreach (HomeLifeSettings.Comfort comfort in settings.Comforts)
         {
             bool has = input.Comforts.Contains(comfort.id);
-            report.Lines.Add(new Line { Name = comfort.name, Icon = comfort.icon, Met = has, Points = comfort.points,
-                Detail = has ? "In the house" : comfort.description });
+            bool counted = has && spent != null && spent.Contains(comfort.id);
+            report.Lines.Add(new Line { Name = comfort.name, Icon = comfort.icon, Met = has, Points = counted ? 0 : comfort.points,
+                Detail = counted ? "In the house: it is what keeps it warm" : has ? "In the house" : comfort.description });
         }
 
         if (input.YardPoints > 0)
@@ -141,14 +154,10 @@ public static class HomeQuality
         return report;
     }
 
-    // What gives this feature, in words ("Well, 8 m"), or null when nothing does.
+    // What round the house gives this feature, in words ("Well, 8 m"), or null when nothing does (a comfort that gives it is
+    // looked at by Rate).
     private static string Find(HomeLifeSettings.Feature feature, Input input)
     {
-        if (!string.IsNullOrEmpty(feature.orComfort) && input.Comforts.Contains(feature.orComfort))
-        {
-            return "Its own hearth";
-        }
-
         switch (feature.kind)
         {
             case HomeFeatureKind.Work:

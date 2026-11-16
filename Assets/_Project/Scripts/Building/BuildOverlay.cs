@@ -8,7 +8,9 @@ using UnityEngine.UI;
 /// beside the ghost (BuildHere), circles on the ground for the radii that matter (lights, the Watch Post's bowshot, a Ward
 /// Totem's reach, an extension's reach round its station), and every fenced ring with its yard's name and quality, tinted
 /// by role. Shown while the build menu is open or something is being placed; nothing at all otherwise. Rings and labels are
-/// laid again only when the yards change or the ghost moves; no allocations per frame.
+/// laid again only when the yards change or the ghost moves; the readout and the radii follow a moving ghost at most
+/// <see cref="ReadoutsPerSecond"/> times a second, with a last one once it stops (each readout asks a good deal of the town:
+/// who would move in, what a home there would be like). No allocations per frame.
 /// <para>Made by BuildPlacer the first time it is needed; one for the local player.</para>
 /// </summary>
 public sealed class BuildOverlay : MonoBehaviour
@@ -18,6 +20,7 @@ public sealed class BuildOverlay : MonoBehaviour
     private const float RingWidth = 0.12f;
     private const float RingsWithin = 45f;
     private const int MostLabels = 24;
+    private const float ReadoutsPerSecond = 5f;
     private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
     private static readonly int ColorId = Shader.PropertyToID("_Color");
 
@@ -41,6 +44,13 @@ public sealed class BuildOverlay : MonoBehaviour
     private Vector3 lastPoint = new Vector3(float.NaN, 0f, 0f);
     private float lastYaw;
     private BuildingDefinition lastKind;
+    // Where the ghost is now, when the readout hasn't caught up with it yet (it moved within the last fifth of a second).
+    private bool pending;
+    private BuildingDefinition pendingKind;
+    private Vector3 pendingPoint;
+    private float pendingYaw;
+    private Bounds pendingLocal;
+    private float nextReadoutAt;
     private Vector3 readoutAt;
     private int usedCircles;
 
@@ -103,10 +113,13 @@ public sealed class BuildOverlay : MonoBehaviour
             }
 
             lastKind = null;
+            pending = false;
             return;
         }
 
         yardsStale = true;
+        // A new placement session: the Watch Posts, totems and lamps are looked up afresh, once.
+        BuildHere.BeginSession();
     }
 
     /// <summary>The ghost stands at <paramref name="point"/>: the readout and the radii follow it. Null hides the readout.</summary>
@@ -117,6 +130,7 @@ public sealed class BuildOverlay : MonoBehaviour
         {
             panel.gameObject.SetActive(false);
             lastKind = null;
+            pending = false;
             return;
         }
 
@@ -124,9 +138,28 @@ public sealed class BuildOverlay : MonoBehaviour
         panel.gameObject.SetActive(true);
         if (kind == lastKind && (point - lastPoint).sqrMagnitude < 0.01f && Mathf.Abs(yaw - lastYaw) < 0.5f)
         {
+            pending = false;
             return;
         }
 
+        // A new kind shows at once; a moving ghost is caught up with a few times a second, and once more where it stops.
+        if (kind == lastKind && Time.unscaledTime < nextReadoutAt)
+        {
+            pending = true;
+            pendingKind = kind;
+            pendingPoint = point;
+            pendingYaw = yaw;
+            pendingLocal = local;
+            return;
+        }
+
+        Describe(kind, point, yaw, local);
+    }
+
+    private void Describe(BuildingDefinition kind, Vector3 point, float yaw, Bounds local)
+    {
+        pending = false;
+        nextReadoutAt = Time.unscaledTime + 1f / ReadoutsPerSecond;
         lastKind = kind;
         lastPoint = point;
         lastYaw = yaw;
@@ -139,6 +172,7 @@ public sealed class BuildOverlay : MonoBehaviour
     {
         Show(true);
         panel.gameObject.SetActive(false);
+        pending = false;
         if (lastKind != null)
         {
             lastKind = null;
@@ -157,6 +191,11 @@ public sealed class BuildOverlay : MonoBehaviour
         {
             yardsStale = false;
             LayYards();
+        }
+
+        if (pending && Time.unscaledTime >= nextReadoutAt && panel.gameObject.activeSelf)
+        {
+            Describe(pendingKind, pendingPoint, pendingYaw, pendingLocal);
         }
 
         Camera view = Camera.main;
@@ -195,24 +234,24 @@ public sealed class BuildOverlay : MonoBehaviour
         float reach = RingsWithin * RingsWithin;
         foreach (VisibilitySource source in VisibilitySource.Active)
         {
-            if (source != null && source.IsLight && source.GetComponentInParent<BuildingObject>() != null
+            if (source != null && source.IsLight && BuildHere.LampOf(source) != null
                 && Flat(source.transform.position - point).sqrMagnitude < reach)
             {
                 Circle(source.transform.position, source.Radius, LightColour);
             }
         }
 
-        foreach (WatchPostArcher post in FindObjectsByType<WatchPostArcher>())
+        foreach (WatchPostArcher post in BuildHere.Posts)
         {
-            if (Flat(post.transform.position - point).sqrMagnitude < reach)
+            if (post != null && Flat(post.transform.position - point).sqrMagnitude < reach)
             {
                 Circle(post.transform.position, post.Reach, GuardColour);
             }
         }
 
-        foreach (WardTotem totem in FindObjectsByType<WardTotem>())
+        foreach (WardTotem totem in BuildHere.Totems)
         {
-            if (Flat(totem.transform.position - point).sqrMagnitude < reach)
+            if (totem != null && Flat(totem.transform.position - point).sqrMagnitude < reach)
             {
                 Circle(totem.transform.position, totem.Radius, WardColour);
             }

@@ -14,6 +14,51 @@ public sealed class HavenHomeTests
 
     private static HomeRules.Person Person(string id, float workX, string chosen = "") => new HomeRules.Person(id, chosen, new Vector2(workX, 0f));
 
+    private static HomeRules.Person Living(string id, float workX, string current, string chosen = "") =>
+        new HomeRules.Person(id, chosen, new Vector2(workX, 0f), current);
+
+    private const float MoveFor = 15f;
+
+    [Test]
+    public void Homes_AreSticky_ANearerHouseBuiltLater_DoesntTakeThemOut()
+    {
+        // The player furnished the Hut 30 m from Tor's work; a Cottage goes up 10 m nearer.
+        var houses = new[] { House("hut", 30f, 1), House("cottage", 20f, 1) };
+        var people = new[] { Living("tor", 0f, "hut") };
+        Assert.AreEqual("hut", HomeRules.Assign(houses, people, MoveFor)[0], "10 m nearer isn't worth leaving home for");
+        Assert.AreEqual("cottage", HomeRules.Assign(houses, people)[0], "without homes kept, the nearest (as before)");
+
+        var muchNearer = new[] { House("hut", 30f, 1), House("cottage", 5f, 1) };
+        Assert.AreEqual("cottage", HomeRules.Assign(muchNearer, people, MoveFor)[0], "25 m nearer their work: they move");
+        Assert.AreEqual(MoveFor, HomeLifeSettings.Current.MoveHomeFor, 0.001f, "Resources/HomeLifeSettings › Move Home For");
+    }
+
+    [Test]
+    public void SomeoneWhoseHouseIsGone_FindsTheNearestFreeBed()
+    {
+        var houses = new[] { House("far", 80f, 1), House("near", 10f, 1) };
+        var people = new[] { Living("tor", 0f, "burned-down") };
+        Assert.AreEqual("near", HomeRules.Assign(houses, people, MoveFor)[0]);
+    }
+
+    [Test]
+    public void TheBedSomeoneLeaves_IsFreeForANewcomer_AndThePlayersChoiceStillComesFirst()
+    {
+        var houses = new[] { House("old", 100f, 1), House("new", 10f, 1) };
+        var people = new[] { Living("tor", 0f, "old"), Person("hild", 100f) };
+        string[] homes = HomeRules.Assign(houses, people, MoveFor);
+        Assert.AreEqual("new", homes[0], "Tor moves 90 m nearer his work");
+        Assert.AreEqual("old", homes[1], "Hild, new here, takes the bed he left");
+
+        var chosen = new[] { Living("tor", 0f, "old"), Living("hild", 100f, "", "old") };
+        homes = HomeRules.Assign(houses, chosen, MoveFor);
+        Assert.AreEqual("old", homes[1], "the player put Hild in the old house");
+        Assert.AreEqual("new", homes[0], "so Tor, who lived there, has the other bed");
+
+        var settled = new[] { Living("tor", 0f, "new"), Living("hild", 100f, "old") };
+        CollectionAssert.AreEqual(new[] { "new", "old" }, HomeRules.Assign(houses, settled, MoveFor), "settled: nothing moves");
+    }
+
     [Test]
     public void Everyone_SleepsInTheFreeBedNearestTheirWork()
     {

@@ -21,6 +21,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     private RaidEventContext context;
     private Interactable interactable;
     private float beaconShowsWithin = -1f;
+    private bool found;
 
     /// <summary>The place it stands in, when a rumour put it in a set-piece. Empty otherwise.</summary>
     public string PlaceName { get; set; } = "";
@@ -28,12 +29,19 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
     /// <summary>The beacon stays out until the player is this close: what a rumour points to has to be found.</summary>
     public void HideBeaconBeyond(float metres) => beaconShowsWithin = metres;
 
-    /// <summary>True when the player here has found it: at once, unless a rumour hid its beacon.</summary>
+    /// <summary>True when the player here has found it: at once, unless a rumour hid its beacon. Once found it stays found
+    /// (review 2026-11-16): walking away from a rescue site already seen doesn't turn its map mark back into a search area.</summary>
     public bool IsFoundFrom(Vector3 position)
     {
+        if (found || beaconShowsWithin < 0f)
+        {
+            return true;
+        }
+
         Vector3 offset = transform.position - position;
         offset.y = 0f;
-        return beaconShowsWithin < 0f || offset.sqrMagnitude <= beaconShowsWithin * beaconShowsWithin;
+        found = offset.sqrMagnitude <= beaconShowsWithin * beaconShowsWithin;
+        return found;
     }
 
     /// <summary>Where a map marks it from there: roughly, until it has been found.</summary>
@@ -79,6 +87,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
         }
 
         bool close = (context.Player.transform.position - transform.position).sqrMagnitude <= beaconShowsWithin * beaconShowsWithin;
+        found |= close;
         if (beacon.activeSelf != close)
         {
             beacon.SetActive(close);

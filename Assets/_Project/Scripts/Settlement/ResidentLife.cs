@@ -5,7 +5,8 @@ using UnityEngine.AI;
 /// <summary>
 /// A resident's day (GDD §15): they walk to their work and get on with it, eat, sit at the fire of an evening, sleep in their
 /// house (walking in at night, its window lit while they are in; out of the door at dawn) or at their own spot by the portal
-/// when no house is theirs (HavenHomes), and run for the portal when the haven is attacked. They stop to talk when spoken to and carry on after. What they do when is
+/// when no house is theirs (HavenHomes), and run for the portal when the haven is attacked. They stop to talk when spoken to and carry on after; asleep inside, a knock at the house's door
+/// (HouseDoor) brings them out to talk, and they go back in after. What they do when is
 /// ResidentRoutine and Settlement Settings › Daily Life; the gesture for a job is on its JobDefinition. Added by ResidentNpc. Where
 /// the ground has no NavMesh they go straight to their place, as there is no way to walk there.
 /// </summary>
@@ -20,6 +21,9 @@ public sealed class ResidentLife : MonoBehaviour
     private const float RingRadius = 2.4f;
     private const float WorkmateGap = 1.2f;
     private const float GuardRadius = 6f;
+    // Woken by a knock: how long they stand at the door for the player, and how long they linger after a talk.
+    private const float AwakeSeconds = 12f;
+    private const float AfterTalkSeconds = 2.5f;
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
 
     private ResidentNpc npc;
@@ -50,6 +54,8 @@ public sealed class ResidentLife : MonoBehaviour
     private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
     private readonly List<Collider> hiddenColliders = new List<Collider>();
     private readonly List<Behaviour> hiddenParts = new List<Behaviour>();
+    // Woken by a knock: at the door until then, facing the player.
+    private float awakeUntil = -1f;
 
     /// <summary>What they are about right now.</summary>
     public ResidentActivity Activity => activity;
@@ -57,7 +63,7 @@ public sealed class ResidentLife : MonoBehaviour
     /// <summary>True once they are at the place for it and getting on with it.</summary>
     public bool HasArrived => arrived;
 
-    /// <summary>Asleep inside their house: not seen, not spoken to, its window lit.</summary>
+    /// <summary>Asleep inside their house: not seen, its window lit. Spoken to only by knocking at its door (HouseDoor).</summary>
     public bool IsIndoors => insideOf != null;
 
     /// <summary>The house they are asleep in, or null.</summary>
@@ -161,8 +167,27 @@ public sealed class ResidentLife : MonoBehaviour
 
         if (talkable != null && talkable.IsTalking)
         {
+            if (awakeUntil >= 0f)
+            {
+                awakeUntil = Time.time + AfterTalkSeconds;
+            }
+
             Listen();
             return;
+        }
+
+        // Woken by a knock: at the door for the player a little while, then back to bed (or on to the day, if it came).
+        if (awakeUntil >= 0f)
+        {
+            if (Time.time < awakeUntil)
+            {
+                arrived = true;
+                Listen();
+                return;
+            }
+
+            awakeUntil = -1f;
+            Decide(false, true);
         }
 
         if (agent != null && agent.isStopped)
@@ -655,7 +680,42 @@ public sealed class ResidentLife : MonoBehaviour
         }
     }
 
-    // In at the door: hidden and quiet until morning, the house's window lit (HearthSmoke reads HavenHomes.Indoors).
+    /// <summary>
+    /// A knock at the door of the house they are asleep in (HouseDoor): they come out to the door and stand there a while for
+    /// <paramref name="by"/>, talking to them at once when <paramref name="talk"/>; then they go back in. False when they
+    /// aren't inside.
+    /// </summary>
+    public bool Wake(GameObject by, bool talk)
+    {
+        if (insideOf == null)
+        {
+            return false;
+        }
+
+        ComeOut();
+        awakeUntil = Time.time + AwakeSeconds;
+        arrived = true;
+        if (talk && by != null && isActiveAndEnabled)
+        {
+            StartCoroutine(TalkTo(by));
+        }
+
+        return true;
+    }
+
+    // The next frame, once they stand at the door again: as if the player had spoken to them there.
+    private System.Collections.IEnumerator TalkTo(GameObject by)
+    {
+        yield return null;
+        Interactable speak = GetComponent<Interactable>();
+        if (speak != null && insideOf == null && by != null && speak.TryBegin(by))
+        {
+            speak.End(InteractionResult.Completed);
+        }
+    }
+
+    // In at the door: hidden and quiet until morning, the house's window lit (HearthSmoke reads HavenHomes.Indoors). The
+    // quest marker over them stays, at the door: that is where to knock (HouseDoor).
     private void GoIn(BuildingObject house)
     {
         if (insideOf == house || house == null)
@@ -665,7 +725,9 @@ public sealed class ResidentLife : MonoBehaviour
 
         ComeOut();
         insideOf = house;
+        awakeUntil = -1f;
         HavenHomes.NoteIndoors(house, true);
+        HouseDoor.For(house);
         ShowTool(null, 1f);
         if (emotes != null && emotes.IsPlaying)
         {
@@ -674,7 +736,7 @@ public sealed class ResidentLife : MonoBehaviour
 
         foreach (Renderer part in GetComponentsInChildren<Renderer>())
         {
-            if (part.enabled)
+            if (part.enabled && part.GetComponentInParent<QuestMarker>() == null)
             {
                 part.enabled = false;
                 hiddenRenderers.Add(part);

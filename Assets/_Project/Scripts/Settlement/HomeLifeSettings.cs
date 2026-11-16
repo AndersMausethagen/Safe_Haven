@@ -99,6 +99,12 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     [SerializeField] private List<Liking> likings = new List<Liking>();
     [SerializeField, Range(0f, 0.5f)] private float contentWorkSpeed = 0.05f;
 
+    [Header("Moving house")]
+    [Tooltip("Metres nearer their work a free bed must be before someone leaves the house they live in for it (homes are " +
+             "sticky: a nearer Cottage built later doesn't take them from the house the player furnished). A house that is " +
+             "gone, or the player's choice, moves them whatever this is.")]
+    [SerializeField, Min(0f)] private float moveHomeFor = 15f;
+
     [Header("Paths")]
     [Tooltip("The player's speed on a path is only raised at home, in the ward.")]
     [SerializeField] private bool pathsOnlyAtHome = true;
@@ -118,6 +124,7 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     public IReadOnlyList<Level> Levels => levels;
     public IReadOnlyList<Liking> Likings => likings;
     public float ContentWorkSpeed => contentWorkSpeed;
+    public float MoveHomeFor => moveHomeFor;
     public bool PathsOnlyAtHome => pathsOnlyAtHome;
     public float WearPerStep => wearPerStep;
     public float WearRegrowth => wearRegrowth;

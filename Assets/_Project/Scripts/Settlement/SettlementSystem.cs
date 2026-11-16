@@ -55,10 +55,11 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
         SettlementState settlement = GameSession.Settlement;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
-        // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders).
-        if (HomePortal.Current == null && ResidentBuilders.Count(settlement) > 0 && settlement.ScaffoldsWaiting)
+        // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
+        // home, not one who went along on the raid.
+        if (HomePortal.Current == null && settlement.ScaffoldsWaiting)
         {
-            settlement.AddBuilderSeconds(Time.deltaTime);
+            ResidentBuilders.WorkAway(settlement, Time.deltaTime, GameSession.ActiveRaid?.Companion);
         }
 
         if (Time.unscaledTime >= nextWorkerLook)

@@ -4,8 +4,9 @@ using UnityEngine;
 
 /// <summary>
 /// Where Safe Haven's people live and work (Docs/BuildingSystemResearch.md §3.4.1): each resident sleeps in a house (the one
-/// the player chose for them, else the nearest free bed to their work, HomeRules) and works at the building of their job's
-/// kind nearest that home. Two Smithies mean two places to work; a Cottage by the forge is where the smith walks home to.
+/// the player chose for them, else the one they live in, else the nearest free bed to their work, HomeRules) and works at
+/// the building of their job's kind nearest that home. Homes are sticky: someone moves only for a bed clearly nearer their
+/// work (HomeLifeSettings › Move Home For) or when their house is gone, and the move is told in a message. Two Smithies mean two places to work; a Cottage by the forge is where the smith walks home to.
 /// Anyone without a bed sleeps at the home spots by the portal, as before.
 /// <para>
 /// Worked out again only when something changes (a building placed, moved, finished or upgraded; a job given; a home
@@ -19,8 +20,12 @@ public sealed class HavenHomes : MonoBehaviour
     private static readonly Dictionary<BuildingObject, int> indoors = new Dictionary<BuildingObject, int>();
     private readonly List<HomeRules.House> houses = new List<HomeRules.House>();
     private readonly List<HomeRules.Person> people = new List<HomeRules.Person>();
+    // The houses as last seen standing, by id: one carried off to be moved is switched off for a while, and is still theirs.
+    private readonly Dictionary<string, BuildingObject> seenHouses = new Dictionary<string, BuildingObject>();
+    private readonly System.Text.StringBuilder seen = new System.Text.StringBuilder();
     private bool dirty = true;
     private string lastSeen = "";
+    private string lastComforts = "";
 
     public static HavenHomes Current { get; private set; }
 
@@ -81,11 +86,12 @@ public sealed class HavenHomes : MonoBehaviour
         SettlementState settlement = GameSession.Settlement;
         IReadOnlyList<ResidentRecord> residents = settlement.Residents;
         Vector3 middle = Gather();
-        string[] homes = HomeRules.Assign(houses, people);
+        string[] homes = HomeRules.Assign(houses, people, HomeLifeSettings.Current.MoveHomeFor);
         bool changed = false;
         for (int i = 0; i < residents.Count; i++)
         {
             ResidentRecord record = residents[i];
+            TellMove(record, record.Home, homes[i] ?? "");
             BuildingObject home = BuildingObject.WithId(homes[i]);
             Vector3 from = home != null ? home.Door(out _) : middle;
             BuildingDefinition kind = record.Job != null ? record.Job.Workplace : null;
@@ -112,6 +118,17 @@ public sealed class HavenHomes : MonoBehaviour
             {
                 Vector3 door = building.Door(out _);
                 houses.Add(new HomeRules.House(id, Flat(door), beds));
+                seenHouses[id] = building;
+            }
+        }
+
+        // A house being carried to a new spot is switched off until it is set down: its people keep it meanwhile.
+        foreach (ResidentRecord record in residents)
+        {
+            if (!string.IsNullOrEmpty(record.Home) && seenHouses.TryGetValue(record.Home, out BuildingObject away) && away != null
+                && !away.gameObject.activeInHierarchy && away.Beds > 0 && !Listed(record.Home))
+            {
+                houses.Add(new HomeRules.House(record.Home, Flat(away.Door(out _)), away.Beds));
             }
         }
 
@@ -122,17 +139,67 @@ public sealed class HavenHomes : MonoBehaviour
         {
             BuildingDefinition kind = record.Job != null ? record.Job.Workplace : null;
             BuildingObject work = kind != null ? BuildingObject.Nearest(kind, middle) : null;
-            people.Add(new HomeRules.Person(record.Resident != null ? record.Resident.Id : "", record.HomeChosen, Flat(work != null ? work.transform.position : middle)));
+            people.Add(new HomeRules.Person(record.Resident != null ? record.Resident.Id : "", record.HomeChosen,
+                Flat(work != null ? work.transform.position : middle), record.Home));
         }
 
         return middle;
     }
 
-    // A friend's game: did the host's last word move anyone? (Their settlement arrives every two seconds.)
+    private bool Listed(string id)
+    {
+        foreach (HomeRules.House house in houses)
+        {
+            if (house.Id == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Someone leaves the house they lived in: said, with where they go and what stays behind (comforts belong to a house).
+    // Not for the player's own choice (that decision says so itself), nor for anyone's first bed.
+    private static void TellMove(ResidentRecord record, string from, string to)
+    {
+        if (string.IsNullOrEmpty(from) || from == to || record.Resident == null || (!string.IsNullOrEmpty(to) && to == record.HomeChosen))
+        {
+            return;
+        }
+
+        string name = record.Resident.DisplayName;
+        BuildingObject left = BuildingObject.WithId(from);
+        BuildingObject next = BuildingObject.WithId(to);
+        string where = next != null ? $"the {Describe(next)}" : "their spot by the portal";
+        string said = left == null ? $"{name}'s house is gone: they sleep in {where} now."
+            : next != null ? $"{name} moves from the {Describe(left)} to the {Describe(next)}, nearer their work."
+            : $"{name} has no bed in the {Describe(left)} now: they sleep by the portal.";
+        if (left != null)
+        {
+            var stay = new List<string>();
+            foreach (string comfort in GameSession.Settlement.ComfortsIn(from))
+            {
+                HomeLifeSettings.Comfort known = HomeLifeSettings.Current.FindComfort(comfort);
+                stay.Add(known != null ? known.name : comfort);
+            }
+
+            if (stay.Count > 0)
+            {
+                said += $" The {string.Join(" and the ", stay)} stay in the {left.Definition.DisplayName}.";
+            }
+        }
+
+        GameMessages.Post(said);
+    }
+
+    // A friend's game: did the host's last word move anyone? (Their settlement arrives every two seconds.) Comforts put in a
+    // house there change how good it is: its quality is worked out again then (HomeLife).
     private bool SeenNew()
     {
-        var seen = new System.Text.StringBuilder();
-        foreach (ResidentRecord record in GameSession.Settlement.Residents)
+        SettlementState settlement = GameSession.Settlement;
+        seen.Clear();
+        foreach (ResidentRecord record in settlement.Residents)
         {
             seen.Append(record.Home).Append('/').Append(record.Workplace).Append(';');
         }
@@ -140,6 +207,26 @@ public sealed class HavenHomes : MonoBehaviour
         string now = seen.ToString();
         bool changed = now != lastSeen;
         lastSeen = now;
+
+        seen.Clear();
+        foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
+        {
+            seen.Append(house.Key).Append(':');
+            foreach (string comfort in house.Value)
+            {
+                seen.Append(comfort).Append(',');
+            }
+
+            seen.Append(';');
+        }
+
+        string comforts = seen.ToString();
+        if (comforts != lastComforts)
+        {
+            lastComforts = comforts;
+            HomeLife.Forget();
+        }
+
         return changed;
     }
 
@@ -221,16 +308,24 @@ public sealed class HavenHomes : MonoBehaviour
     public static List<ResidentRecord> WouldMoveIn(Vector3 door, int beds)
     {
         var found = new List<ResidentRecord>();
+        WouldMoveIn(door, beds, found);
+        return found;
+    }
+
+    /// <summary>As <see cref="WouldMoveIn(Vector3, int)"/>, into a list of the caller's (cleared first).</summary>
+    public static void WouldMoveIn(Vector3 door, int beds, List<ResidentRecord> found)
+    {
+        found.Clear();
         HavenHomes homes = Current;
         if (homes == null || beds <= 0)
         {
-            return found;
+            return;
         }
 
         const string ghost = "\u0001ghost";
         homes.Gather();
         homes.houses.Add(new HomeRules.House(ghost, Flat(door), beds));
-        string[] assigned = HomeRules.Assign(homes.houses, homes.people);
+        string[] assigned = HomeRules.Assign(homes.houses, homes.people, HomeLifeSettings.Current.MoveHomeFor);
         IReadOnlyList<ResidentRecord> residents = GameSession.Settlement.Residents;
         for (int i = 0; i < assigned.Length && i < residents.Count; i++)
         {
@@ -239,8 +334,6 @@ public sealed class HavenHomes : MonoBehaviour
                 found.Add(residents[i]);
             }
         }
-
-        return found;
     }
 
     // ----- Choosing (the resident's window) -----

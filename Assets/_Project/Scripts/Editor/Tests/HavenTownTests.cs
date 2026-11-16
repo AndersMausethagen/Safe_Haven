@@ -78,9 +78,29 @@ public sealed class HavenTownTests
         furnished.YardPoints = 1;
         furnished.YardName = "Home Yard";
         HomeQuality.Report report = HomeQuality.Rate(furnished, settings);
-        Assert.AreEqual(HomeQuality.Rate(plain, settings).Quality + settings.PointsPerTier + 1 + 1 + 1 + 1, report.Quality,
-            "tier, beds, kitchen, yard, and the kitchen's hearth makes it warm");
+        Assert.AreEqual(HomeQuality.Rate(plain, settings).Quality + settings.PointsPerTier + 1 + 1 + 1, report.Quality,
+            "tier, beds, yard, and the kitchen hearth, which makes it warm: one purchase counts once (review 2026-11-16)");
         Assert.IsTrue(report.Has("Warm"), "a kitchen hearth is warm");
+    }
+
+    [Test]
+    public void AKitchenHearth_CountsOnce_WhetherOrNotAFireIsNear()
+    {
+        HomeLifeSettings settings = HomeLifeSettings.Current;
+        HomeQuality.Input byTheFire = At(Vector2.zero);
+        byTheFire.Buildings.Add(new HomeQuality.Around(Building("Campfire"), new Vector2(4f, 0f)));
+        HomeQuality.Input byTheFireWithKitchen = At(Vector2.zero);
+        byTheFireWithKitchen.Buildings.Add(new HomeQuality.Around(Building("Campfire"), new Vector2(4f, 0f)));
+        byTheFireWithKitchen.Comforts.Add("kitchen");
+        Assert.IsTrue(HomeQuality.Rate(byTheFire, settings).Has("Warm"), "a campfire by the door is warm");
+        Assert.AreEqual(HomeQuality.Rate(byTheFire, settings).Quality + 1, HomeQuality.Rate(byTheFireWithKitchen, settings).Quality,
+            "warm already: the kitchen adds its own point");
+
+        HomeQuality.Input alone = At(Vector2.zero);
+        HomeQuality.Input aloneWithKitchen = At(Vector2.zero);
+        aloneWithKitchen.Comforts.Add("kitchen");
+        Assert.AreEqual(HomeQuality.Rate(alone, settings).Quality + 1, HomeQuality.Rate(aloneWithKitchen, settings).Quality,
+            "nothing warm near: the kitchen makes it warm, and that is its point");
     }
 
     [Test]
@@ -322,6 +342,35 @@ public sealed class HavenTownTests
     }
 
     [Test]
+    public void OnlyBuildersAtHome_Build_NotOneAlongOnTheRaid_NorOnePaused()
+    {
+        HomeLifeSettings settings = HomeLifeSettings.Current;
+        JobDefinition carpenter = settings.Builders.First(job => job != null && job.name == "Carpenter");
+        JobDefinition mason = settings.Builders.First(job => job != null && job.name == "Mason");
+        ResidentDefinition[] people = AssetDatabase.FindAssets("t:ResidentDefinition")
+            .Select(guid => AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid))).Where(one => one != null).Take(3).ToArray();
+        var settlement = new SettlementState();
+        settlement.AddResident(people[0], carpenter);
+        settlement.AddResident(people[1], mason);
+        settlement.AddResident(people[2]);
+        Assert.AreEqual(2, ResidentBuilders.Count(settlement));
+        Assert.AreEqual(1, ResidentBuilders.Count(settlement, people[0]), "the carpenter went along on the raid");
+        StringAssert.DoesNotContain(people[0].DisplayName, ResidentBuilders.Names(settlement, people[0]));
+
+        settlement.Find(people[1]).WorkPaused = true;
+        Assert.AreEqual(1, ResidentBuilders.Count(settlement), "the mason's work is paused");
+        Assert.AreEqual(0, ResidentBuilders.Count(settlement, people[0]), "nobody at home to build");
+        Assert.IsFalse(ResidentBuilders.WorkAway(settlement, 10f, people[0]), "no work done");
+        Assert.AreEqual(0f, settlement.BuilderSeconds);
+
+        settlement.Find(people[1]).WorkPaused = false;
+        Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, null));
+        Assert.AreEqual(20f, settlement.BuilderSeconds, 0.01f, "builder-seconds: ten seconds, two at home");
+        Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, people[0]));
+        Assert.AreEqual(30f, settlement.TakeBuilderSeconds(), 0.01f, "the next ten seconds with the carpenter away");
+    }
+
+    [Test]
     public void HouseComforts_AreSaved()
     {
         var settlement = new SettlementState();
@@ -340,6 +389,64 @@ public sealed class HavenTownTests
         map[3] = 0.75f;
         map[7] = 1.2f;
         Assert.AreEqual("3:75;7:120;", Footpaths.Pack(map, new[] { 3, 7 }));
+    }
+
+    [Test]
+    public void Footpaths_KeepWearThatDoesntShowYet_SoPathsCanForm()
+    {
+        var map = new float[200];
+        map[2] = 0.04f;  // walked once: forgotten
+        map[3] = 0.12f;  // a few passes: kept, though it doesn't show
+        map[7] = 0.75f;
+        map[150] = 1.2f;
+        string packed = Footpaths.Pack(map, Footpaths.KeptFrom);
+        Assert.AreEqual("3:12;+4:75;+143:120;", packed, "in cell order, each after the first as steps on from the last");
+
+        var back = new float[200];
+        var showing = new HashSet<int>();
+        Footpaths.Unpack(packed, back, showing);
+        Assert.AreEqual(0f, back[2]);
+        Assert.AreEqual(0.12f, back[3], 0.001f);
+        Assert.AreEqual(0.75f, back[7], 0.001f);
+        Assert.AreEqual(1.2f, back[150], 0.001f);
+        CollectionAssert.AreEquivalent(new[] { 7, 150 }, showing, "only what is worn enough shows");
+
+        var old = new float[200];
+        Footpaths.Unpack("3:75;7:120;", old, null);
+        Assert.AreEqual(0.75f, old[3], 0.001f, "an older save's paths still read");
+        Assert.AreEqual(1.2f, old[7], 0.001f);
+    }
+
+    // ----- Doors -----
+
+    [Test]
+    public void TheDoor_IsOnTheYardSide_AndTheGhostsReadoutPutsItThere()
+    {
+        var local = new Bounds(new Vector3(0f, 1.5f, 0f), new Vector3(4f, 3f, 6f));
+        Assert.AreEqual(new Vector3(0f, 0f, 3.55f), BuildingObject.DoorAt(Vector3.zero, 0f, local, YardSide.Front, out _));
+        Assert.AreEqual(new Vector3(0f, 0f, -3.55f), BuildingObject.DoorAt(Vector3.zero, 0f, local, YardSide.Back, out _));
+        Assert.AreEqual(new Vector3(2.55f, 0f, 0f), BuildingObject.DoorAt(Vector3.zero, 0f, local, YardSide.Right, out Quaternion right));
+        Assert.Less(Vector3.Distance(Vector3.right, right * Vector3.forward), 0.001f, "it opens to the right");
+        Vector3 turned = BuildingObject.DoorAt(new Vector3(10f, 2f, 0f), 90f, local, YardSide.Left, out _);
+        Assert.AreEqual(10f, turned.x, 0.001f, "turned a quarter, its left side faces north");
+        Assert.AreEqual(2.55f, turned.z, 0.001f);
+        Assert.AreEqual(2f, turned.y, "on the ground it stands on");
+
+        // A built house asks the same, with its definition's side.
+        BuildingDefinition sideways = Buildings().FirstOrDefault(kind => kind.YardSide != YardSide.Front && kind.Prefab != null);
+        Assume.That(sideways != null, "a building with its door on another side");
+        var go = Object.Instantiate(sideways.Prefab);
+        try
+        {
+            go.transform.SetPositionAndRotation(new Vector3(5f, 0f, -3f), Quaternion.Euler(0f, 30f, 0f));
+            BuildingObject built = go.GetComponent<BuildingObject>();
+            Vector3 door = built.Door(out _);
+            Assert.AreEqual(BuildingObject.DoorAt(go.transform.position, 30f, built.LocalBounds, sideways.YardSide, out _), door);
+        }
+        finally
+        {
+            Object.DestroyImmediate(go);
+        }
     }
 
     // ----- Station extensions -----

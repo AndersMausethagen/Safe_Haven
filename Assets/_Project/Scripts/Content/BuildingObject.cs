@@ -41,11 +41,16 @@ public sealed class BuildingObject : MonoBehaviour, IInteractionName, IEventSubj
     /// Where its door is: the middle of its entrance side (the yard's side), just outside the wall, and the way out of it.
     /// People walk in and out here; nothing about the door is modelled, so it works for every building.
     /// </summary>
-    public Vector3 Door(out Quaternion outward)
+    public Vector3 Door(out Quaternion outward) =>
+        DoorAt(transform.position, transform.eulerAngles.y, LocalBounds, definition != null ? definition.YardSide : YardSide.Front, out outward);
+
+    /// <summary>
+    /// Where the door of a building standing at <paramref name="position"/> turned by <paramref name="yaw"/> would be: the
+    /// middle of its <paramref name="side"/> (its yard's side), just outside the wall. The build ghost's readout asks the same.
+    /// </summary>
+    public static Vector3 DoorAt(Vector3 position, float yaw, Bounds local, YardSide side, out Quaternion outward)
     {
         const float clearance = 0.55f;
-        Bounds local = LocalBounds;
-        YardSide side = definition != null ? definition.YardSide : YardSide.Front;
         Vector3 edge = side switch
         {
             YardSide.Back => new Vector3(local.center.x, 0f, local.min.z - clearance),
@@ -54,12 +59,13 @@ public sealed class BuildingObject : MonoBehaviour, IInteractionName, IEventSubj
             _ => new Vector3(local.center.x, 0f, local.max.z + clearance),
         };
         Vector3 facing = side switch { YardSide.Back => Vector3.back, YardSide.Right => Vector3.right, YardSide.Left => Vector3.left, _ => Vector3.forward };
-        Quaternion turn = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+        Quaternion turn = Quaternion.Euler(0f, yaw, 0f);
         outward = Quaternion.LookRotation(turn * facing);
-        Vector3 door = transform.position + turn * edge;
-        door.y = transform.position.y;
+        Vector3 door = position + turn * edge;
+        door.y = position.y;
         return door;
     }
+
     Object IEventSubject.EventSubject => definition;
     public string InteractionName => definition != null ? definition.DisplayName : null;
 
