@@ -34,7 +34,8 @@ public static class PlayerBlows
             return 0f;
         }
 
-        float outgoing = DamageCalculator.CalculateOutgoing(attacker.Stats, attacker.Rules, attack, weaponDamage, body.Category, 1f, out _) * multiplier;
+        float outgoing = DamageCalculator.CalculateOutgoing(attacker.Stats, attacker.Rules, attack, weaponDamage, body.Category, 1f, out _) * multiplier
+            * DamageCalculator.DealtScale(attacker, body.Category);
         return DamageCalculator.Mitigate(outgoing, attack.DamageType, StrikeKindExtensions.Of(attacker, attack), theirs.Stats, theirs.Rules)
             * PerceptionSettings.Current.AmbushDamageTaken;
     }

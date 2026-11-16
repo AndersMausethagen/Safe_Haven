@@ -115,7 +115,8 @@ MonoBehaviour:
   focusOnBlock: 2
   focusHoldSeconds: 10
   focusDrainPerSecond: 4
-  artStaminaWithoutFocus: 30
+  playerDamage: 0.7
+  artDamage: 0.9
   regainShare: 0.4
   regainSeconds: 3
   regainPerDamage: 0.5

@@ -80,7 +80,7 @@ public sealed class PlayerTechniques : MonoBehaviour
         if ((damage.Technique & HitTechnique.WeaponArt) != 0 && combat != null && combat.Weapon != null && Techniques.HasFlourish)
         {
             WeaponDefinition weapon = combat.Weapon;
-            // Once an art, and a share of the Focus it really took: an art paid in stamina gives none back, a rune's art its rune's,
+            // Once an art, and a share of the Focus it really took: a rune's art its rune's,
             // and a sweep that fells several doesn't pay for itself.
             if (weapon.Stance == WeaponStance.OneHanded && result.Killed && focus != null && combat.ArtsBegun != flurryRefundedArt)
             {

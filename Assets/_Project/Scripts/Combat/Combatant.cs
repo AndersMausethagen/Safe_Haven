@@ -21,6 +21,12 @@ public sealed class Combatant : MonoBehaviour
 
     public Faction Faction => faction;
 
+    /// <summary>
+    /// What everything this one deals is multiplied by: its blows (DamageCalculator.Build) and the burning, poison and hazards they
+    /// leave (DamageCalculator.BonusScale). The player's is Combat Technique › Player Damage, set by Player; 1 for everyone else.
+    /// </summary>
+    public float DamageDealtScale { get; set; } = 1f;
+
     /// <summary>How this one's physical blows land whatever the attack says: set from the weapon in hand (a club's sword
     /// moves land blunt, WeaponDefinition › Strike Override). None: each attack's own kind.</summary>
     public StrikeKind StrikeOverride { get; set; }

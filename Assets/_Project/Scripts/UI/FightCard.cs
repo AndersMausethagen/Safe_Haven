@@ -30,7 +30,8 @@ public readonly struct FightCard
     {
         string muted = UIStyle.Current.MutedHex;
         FightMath.Totals totals = FightMath.Of(stats, maxHealth);
-        float share = totals.DamageShare(rules);
+        // As a blow lands on a creature: with Player Damage (Combat Technique) too.
+        float share = totals.DamageShare(rules) * DamageCalculator.DealtScale(player.GetComponent<Combatant>(), TargetCategory.Creature);
         PlayerEquipment equipment = player.GetComponent<PlayerEquipment>();
         PlayerCombat combat = player.GetComponent<PlayerCombat>();
         WeaponDefinition weapon = combat != null ? combat.Weapon : null;

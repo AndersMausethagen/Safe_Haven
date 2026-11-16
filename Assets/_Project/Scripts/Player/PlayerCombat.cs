@@ -191,8 +191,6 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private float pressTime = -1f;
     private ChainPress pressJudge = ChainPress.Late;
     private bool heavyStarted;
-    // The art now starting is paid in stamina, Focus being short.
-    private bool artOnStamina;
     // Stamina already paid for that light swing, taken off the heavy one's cost.
     private float heavyCredit;
     private SwingKind queuedKind;
@@ -296,7 +294,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// <summary>Weapon arts begun so far, so what answers an art's landing can tell one art from the next.</summary>
     public int ArtsBegun { get; private set; }
 
-    /// <summary>The Focus the last art begun was paid with (the rune's or the weapon's), 0 for one paid in stamina.</summary>
+    /// <summary>The Focus the last art begun was paid with (the rune's or the weapon's).</summary>
     public float ArtFocusPaid { get; private set; }
 
     /// <summary>A finishing blow has begun on this creature.</summary>

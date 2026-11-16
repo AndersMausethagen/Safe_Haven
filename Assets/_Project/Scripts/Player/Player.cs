@@ -72,6 +72,11 @@ public sealed class Player : MonoBehaviour
         Equipment = GetComponent<PlayerEquipment>();
         Skills = GetComponent<PlayerSkills>();
         Combatant = GetComponent<Combatant>();
+        // Every blow the player lands, and what it leaves burning or poisoned (Combat Technique › Player Damage).
+        if (Combatant != null)
+        {
+            Combatant.DamageDealtScale = CombatTechniqueSettings.Current.PlayerDamage;
+        }
         Persistence = GetComponent<PlayerPersistence>();
         Stealth = GetComponent<PlayerStealth>();
         Noise = GetComponent<PlayerNoise>();

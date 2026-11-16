@@ -29,9 +29,10 @@ if (-not $SkipTests) {
 $unity = (Get-Command unity).Source
 $data = Join-Path $Project 'Build/Windows/Safe Haven_Data/globalgamemanagers'
 $start = Get-Date
-$answer = & $unity command script eval --no-banner --timeout 7200 --code 'SafeHavenBuild.BuildWindows(); return "built";' 2>&1 | Out-String
+# No double quotes in the code: Windows PowerShell 5.1 strips them from a native command's arguments.
+$answer = & $unity command script eval --no-banner --timeout 7200 --code 'SafeHavenBuild.BuildWindows(); return 7;' 2>&1 | Out-String
 $written = (Test-Path $data) -and ((Get-Item $data).LastWriteTime -gt $start)
-if ($answer -match '"result":"built"' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
+if ($answer -match '"result":7' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
     Write-Output "[Build] Windows build done in $([math]::Round(((Get-Date) - $start).TotalMinutes, 1)) min: $Project/Build/Windows/Safe Haven.exe"
     exit 0
 }

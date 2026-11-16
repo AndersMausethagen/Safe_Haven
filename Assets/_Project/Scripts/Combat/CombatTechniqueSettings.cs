@@ -260,9 +260,15 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Seconds Focus holds after the last gain, then how fast it drains away (per second).")]
     [SerializeField, Min(0f)] private float focusHoldSeconds = 10f;
     [SerializeField, Min(0f)] private float focusDrainPerSecond = 4f;
-    [Tooltip("Stamina a weapon art (guard then attack, or the middle button) costs instead when Focus is short of its price, " +
-             "so it always comes out. Paid in Focus it costs no stamina: fighting well makes it free.")]
-    [SerializeField, Min(0f)] private float artStaminaWithoutFocus = 30f;
+
+    [Header("The player's damage")]
+    [Tooltip("Everything the player deals is multiplied by this: every blow however it is delivered (a blade, an arrow, a staff's " +
+             "cast, a thrown weapon) and the burning, poison and hazards it leaves; not what is dealt to structures. 0.7 since " +
+             "2026-11-16: the combat rework had made the player far too strong, and this took the place of twice the health on " +
+             "every enemy (the user: the change belongs on the player).")]
+    [SerializeField, Range(0.1f, 2f)] private float playerDamage = 0.7f;
+    [Tooltip("Weapon arts, on top of Player Damage: 0.9 is another tenth less. Arts are paid in Focus alone.")]
+    [SerializeField, Range(0.1f, 2f)] private float artDamage = 0.9f;
 
     [Header("Regain (strike back to win back health)")]
     [Tooltip("Share of a blow that got through which striking back can win back (PlayerRegain). 0 turns Regain off.")]
@@ -430,7 +436,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float FocusOnBlock => focusOnBlock;
     public float FocusHoldSeconds => focusHoldSeconds;
     public float FocusDrainPerSecond => focusDrainPerSecond;
-    public float ArtStaminaWithoutFocus => artStaminaWithoutFocus;
+    public float PlayerDamage => playerDamage;
+    public float ArtDamage => artDamage;
     public float RegainShare => regainShare;
     public float RegainSeconds => regainSeconds;
     public float RegainPerDamage => regainPerDamage;

@@ -27,7 +27,7 @@ by motion, sound and weight rather than on-screen text.
   ground marks it, and it is kept until another is clearly nearer the aim. A swing still winding up keeps turning toward it. While the
   aim points well away from it (over 100°) you look and swing where the aim points, so you can always turn on something else. Bows
   have their own target. Options › Gameplay › Focus on Enemy turns it off.
-- **Weapon arts.** Every weapon knows a special attack, paid for with Focus and no stamina (short of Focus, it costs 30 stamina instead: Combat Technique Settings › Art Stamina Without Focus).
+- **Weapon arts.** Every weapon knows a special attack, paid for with Focus alone and no stamina (2026-11-16: the stamina fallback made them far too strong). Arts strike at Art Damage (0.9) on top of the Player Damage (0.7) every blow of the player's takes (Combat Technique Settings › The player's damage).
   Each art moves you: sword 30, a dash 3.5 m through enemies, striking all along the way and ending past them; dagger 25, a blink behind the
   focused enemy and a stab; one-handed axe or club 30, the weapon hurled 12 m, striking what it passes, and back to the hand; greataxe 40, a
   whirlwind you can walk at 40%; greatsword 35, a leap slam that closes 4 m; hammer 40, a quake leap of 3.5 m that throws back; spear 30, a

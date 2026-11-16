@@ -30,16 +30,25 @@ public static class DamageCalculator
         Vector3 direction,
         float critRoll)
     {
-        float amount = CalculateOutgoing(attacker.Stats, attacker.Rules, attack, weaponDamage, targetCategory, critRoll, out bool isCritical);
+        float amount = CalculateOutgoing(attacker.Stats, attacker.Rules, attack, weaponDamage, targetCategory, critRoll, out bool isCritical)
+            * DealtScale(attacker, targetCategory);
         return new DamageInfo(attacker, attack, amount, attack.DamageType, isCritical, hitPoint, direction);
     }
+
+    /// <summary>
+    /// What <paramref name="attacker"/>'s blows against <paramref name="category"/> are multiplied by: its Damage Dealt Scale (the
+    /// player's Combat Technique › Player Damage, every path a blow takes meets here), but not against structures, which keep their pace.
+    /// </summary>
+    public static float DealtScale(Combatant attacker, TargetCategory category) =>
+        attacker == null || category == TargetCategory.Structure ? 1f : attacker.DamageDealtScale;
 
     /// <summary>
     /// What <paramref name="source"/>'s Damage Bonus (the raid's tier and stage, an elite's share, a boss's phase, gear) makes of damage
     /// over time and of hazards, as it does of its blows (the user, 2026-11-16: "scale like blows"; a tier V fire knight's trail burnt as
     /// a tier I one's). 1 for no source. Taken when the hazard, status or fire begins, so it keeps its power after its maker dies.
     /// </summary>
-    public static float BonusScale(Combatant source) => source != null ? Mathf.Max(0f, 1f + source.Stats.Get(StatType.DamageBonus)) : 1f;
+    public static float BonusScale(Combatant source) =>
+        source != null ? Mathf.Max(0f, 1f + source.Stats.Get(StatType.DamageBonus)) * source.DamageDealtScale : 1f;
 
     /// <summary>Damage after the attacker's power and crit, before the target's defenses.</summary>
     public static float CalculateOutgoing(

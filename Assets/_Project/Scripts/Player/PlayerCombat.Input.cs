@@ -42,8 +42,8 @@ public sealed partial class PlayerCombat
             }
             else
             {
-                // Without a shield, attacking drops the guard into an art, paid in Focus or else in stamina: the attuned rune's
-                // (ArtRunes) when there is one, else the weapon's own; a plain swing only when neither can pay.
+                // Without a shield, attacking drops the guard into an art, paid in Focus: the attuned rune's (ArtRunes) when there
+                // is one, else the weapon's own; a plain swing when Focus is short.
                 artFromRune = ArtRunes.For(weapon) != null;
                 if (CanAffordArt)
                 {
@@ -142,10 +142,9 @@ public sealed partial class PlayerCombat
         return StrikeRules.IsRunningAttack(runningFor, Rules.RushRunSeconds, Vector3.Angle(movement.HorizontalVelocity, movement.AimDirection), Rules.RushRunAngle);
     }
 
-    // Focus pays for the art; short of it, stamina does (Combat Technique Settings › Art Stamina Without Focus). It used to
-    // be Focus alone, and guard-then-attack turned into a plain swing most of the time.
-    private bool CanAffordArt => weapon != null && ArtAttack != null && !weapon.TakesAttackInput
-        && (focus == null || focus.CanSpend(ArtFocus) || stamina == null || stamina.Current >= stamina.Scaled(CostOfArtOnStamina()));
+    // Focus alone pays for an art (the user, 2026-11-16: arts were far too strong on stamina as well; short of Focus, guard then
+    // attack is a plain swing).
+    private bool CanAffordArt => weapon != null && ArtAttack != null && !weapon.TakesAttackInput && (focus == null || focus.CanSpend(ArtFocus));
 
     // The art the next Art swing strikes: the attuned rune's, asked for by attacking out of the guard, else the weapon's own.
     private bool artFromRune;
@@ -154,8 +153,6 @@ public sealed partial class PlayerCombat
     private float ArtFocus => ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f;
 
     private bool HasGuardCounter => (HasShield && Shield != null && Shield.OwnGuardCounter != null) || (weapon != null && weapon.GuardCounterAttack != null);
-
-    private float CostOfArtOnStamina() => Rules.ArtStaminaWithoutFocus * Mathf.Max(0.1f, 1f + combatant.Stats.Get(StatType.MeleeStaminaCost));
 
     // The middle button: the next arrow with a bow (PlayerArchery), the weapon's art with anything else.
     private void OnArtRequested()

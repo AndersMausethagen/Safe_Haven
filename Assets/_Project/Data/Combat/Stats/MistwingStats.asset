@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CombatStatsDefinition
   stats:
   - stat: 0
-    value: 116
+    value: 58
   - stat: 58
     value: -0.3

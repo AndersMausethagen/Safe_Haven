@@ -151,10 +151,17 @@ public sealed class RaidReasonsTests
     {
         RaidRumourDefinition source = Rumour("BreachSource");
         RaidTimeOfDay hour = RaidTimeOfDay.For(Woods, SeedAt("Day"));
+        // A breach won, and the next one four raids off: none near.
         var settlement = new SettlementState();
+        settlement.RestoreBreaches(1, 4, 0, 0);
+        Assert.IsFalse(settlement.BreachIsNear);
         Assert.IsFalse(source.CanComeUp(hour, settlement, null));
         settlement.WarnOfBreach();
         Assert.IsTrue(source.CanComeUp(hour, settlement, null));
+
+        // The first breach is near from a new game when it comes after the first extraction (the user, 2026-11-16).
+        var fresh = new SettlementState();
+        Assert.AreEqual(fresh.NextBreachDueAt <= 1, source.CanComeUp(hour, fresh, null));
     }
 
     [Test]

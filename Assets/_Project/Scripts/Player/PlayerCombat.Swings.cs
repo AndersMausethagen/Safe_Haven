@@ -65,8 +65,12 @@ public sealed partial class PlayerCombat
                     return false;
                 }
 
-                // Paid in Focus when there is enough (no stamina then), else in stamina (BaseCostOf).
-                artOnStamina = focus != null && !focus.TrySpend(ArtFocus);
+                // Paid in Focus alone, and no stamina: a buffered art Focus can no longer pay for doesn't start.
+                if (focus != null && !focus.TrySpend(ArtFocus))
+                {
+                    return false;
+                }
+
                 artFromRune = false;
 
                 break;
@@ -116,7 +120,7 @@ public sealed partial class PlayerCombat
         if (kind == SwingKind.Art)
         {
             ArtsBegun++;
-            ArtFocusPaid = artOnStamina || focus == null ? 0f : ArtFocus;
+            ArtFocusPaid = focus == null ? 0f : ArtFocus;
         }
 
         forcedAttack = null;
@@ -157,6 +161,12 @@ public sealed partial class PlayerCombat
                 activePoiseMultiplier *= flourish.SunderPoise;
             }
         }
+        // Arts strike softer than the player's other blows by Art Damage (on top of Player Damage, which every blow takes).
+        if (kind == SwingKind.Art)
+        {
+            activeDamageMultiplier *= Rules.ArtDamage;
+        }
+
         activeForceCritical = false;
         if (rhythm > 0)
         {
@@ -328,7 +338,7 @@ public sealed partial class PlayerCombat
 
         if (kind == SwingKind.Art)
         {
-            return artOnStamina ? Rules.ArtStaminaWithoutFocus : 0f;
+            return 0f;
         }
 
         if (attack != null && attack.OwnStaminaCost.HasValue)
