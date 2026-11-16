@@ -59,6 +59,7 @@ public sealed class GroundHazard : MonoBehaviour
     [SerializeField] private SoundDefinition loopSound;
 
     private Combatant source;
+    private float power = 1f;
     private Faction faction;
     private float startedAt;
     private float nextTick;
@@ -248,7 +249,7 @@ public sealed class GroundHazard : MonoBehaviour
 
             Vector3 where = ((Component)victim).transform.position;
             Vector3 outward = where - at;
-            victim.ApplyDamage(new DamageInfo(cause, null, ignitionDamage, DamageType.Fire, false, where, outward.sqrMagnitude > 1e-4f ? outward.normalized : Vector3.forward));
+            victim.ApplyDamage(new DamageInfo(cause, null, ignitionDamage * DamageCalculator.BonusScale(cause), DamageType.Fire, false, where, outward.sqrMagnitude > 1e-4f ? outward.normalized : Vector3.forward));
         }
     }
 
@@ -306,6 +307,8 @@ public sealed class GroundHazard : MonoBehaviour
         GroundHazard hazard = made.GetComponent<GroundHazard>();
         hazard.source = by;
         hazard.faction = by.Faction;
+        // As strong as its maker hits (Damage Bonus: a raid's tier, an elite, a boss's phase), kept if the maker dies.
+        hazard.power = DamageCalculator.BonusScale(by);
         return hazard;
     }
 
@@ -421,7 +424,7 @@ public sealed class GroundHazard : MonoBehaviour
 
             if (damagePerSecond > 0f)
             {
-                var hurt = new DamageInfo(source, null, damagePerSecond * tick, damageType, false, at, flat.sqrMagnitude > 1e-4f ? flat.normalized : Vector3.forward,
+                var hurt = new DamageInfo(source, null, damagePerSecond * tick * power, damageType, false, at, flat.sqrMagnitude > 1e-4f ? flat.normalized : Vector3.forward,
                     0f, HitTechnique.OverTime);
                 victim.ApplyDamage(hurt);
             }

@@ -260,8 +260,9 @@ public sealed class UnyieldingBehaviour : EliteBehaviour
     }
 }
 
-/// <summary>Watchful: it knows the trick from the start and never forgets, so it reads backstabs as one that has taken several. The answer:
-/// beat it from the front, or catch it striking.</summary>
+/// <summary>Watchful: it knows the trick from the start and never forgets: while it strikes, a swing from behind is seen as by one that
+/// has taken several backstabs, and it breaks off to step aside or parry (MonsterAI.SeesBackstabComing). Like every elite it is open to a
+/// backstab only when staggered. The answer: beat it from the front, or parry it.</summary>
 [Serializable]
 public sealed class WatchfulBehaviour : EliteBehaviour
 {

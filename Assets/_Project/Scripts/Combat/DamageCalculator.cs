@@ -34,6 +34,13 @@ public static class DamageCalculator
         return new DamageInfo(attacker, attack, amount, attack.DamageType, isCritical, hitPoint, direction);
     }
 
+    /// <summary>
+    /// What <paramref name="source"/>'s Damage Bonus (the raid's tier and stage, an elite's share, a boss's phase, gear) makes of damage
+    /// over time and of hazards, as it does of its blows (the user, 2026-11-16: "scale like blows"; a tier V fire knight's trail burnt as
+    /// a tier I one's). 1 for no source. Taken when the hazard, status or fire begins, so it keeps its power after its maker dies.
+    /// </summary>
+    public static float BonusScale(Combatant source) => source != null ? Mathf.Max(0f, 1f + source.Stats.Get(StatType.DamageBonus)) : 1f;
+
     /// <summary>Damage after the attacker's power and crit, before the target's defenses.</summary>
     public static float CalculateOutgoing(
         StatSheet attacker,

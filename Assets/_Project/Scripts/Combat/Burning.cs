@@ -35,6 +35,8 @@ public sealed class Burning : MonoBehaviour
         bool fresh = !burning.IsBurning;
         burning.target = target;
         burning.source = source;
+        // As strong as who set it alight hits (their Damage Bonus: a raid's tier, an elite, a boss's phase).
+        damagePerSecond *= DamageCalculator.BonusScale(source);
         burning.damagePerSecond = fresh ? damagePerSecond : Mathf.Max(burning.damagePerSecond, damagePerSecond);
         burning.endsAt = Time.time + seconds;
         if (fresh)

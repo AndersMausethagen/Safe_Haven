@@ -215,7 +215,7 @@ Small Moss Trolls chain their shove from Tier II, and hold it 25% of the time.
 - *The nimble watch your bow.* A Huldra, Fossegrim, Tusse or Troll Runt may step aside from a bow held on it past the perfect release.
   Release on time and it never does.
 - *Elites with a trick.* Unyielding (a yellow ring: unstoppable until a third of its health is gone, then a long stagger), Watchful
-  (reads backstabs from the start), Relentless (every strike a held string).
+  (while it strikes, sees a swing from behind coming from the start and steps aside or parries: beat it from the front), Relentless (every strike a held string).
 
 | Creature | Reads as | How to beat it |
 |---|---|---|

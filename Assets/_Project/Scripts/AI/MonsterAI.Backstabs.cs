@@ -66,11 +66,13 @@ public sealed partial class MonsterAI
     }
 
     // One that remembers watches for a swing from behind while it strikes. Each swing gets one chance to be seen, and what it sees it
-    // breaks off for. True when it did. Being staggered ends this, so a parry stays the sure way in.
+    // breaks off for. True when it did. Being staggered ends this, so a parry stays the sure way in. A Watchful elite watches too (the
+    // user, 2026-11-16: "reads rear swings"): it is never open while striking, so what it turns aside is a plain blow from behind, and
+    // the answer is to beat it from the front or parry it.
     private bool SeesBackstabComing()
     {
         float chance = BackstabReadChance;
-        if (chance <= 0f || !OpenWhileStriking || global::Player.Current == null
+        if (chance <= 0f || !(OpenWhileStriking || BackstabsForeknown > 0) || global::Player.Current == null
             || !global::Player.Current.TryGetComponent(out PlayerCombat swinger) || !swinger.IsWindingUp
             || Mathf.Approximately(swinger.SwingStartTime, lastSwingWatched))
         {

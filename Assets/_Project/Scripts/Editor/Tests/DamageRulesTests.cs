@@ -142,6 +142,22 @@ public sealed class DamageRulesTests
         Object.DestroyImmediate(rises);
     }
 
+    // The user, 2026-11-16: damage over time and hazards "scale like blows" (a tier V fire knight's trail burnt as a tier I one's).
+    [Test]
+    public void DamageOverTime_IsAsStrongAsItsSourceHits()
+    {
+        Combatant knight = Fighter("Knight", Faction.Enemy);
+        knight.Stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, 1f, this));
+        Assert.AreEqual(2f, DamageCalculator.BonusScale(knight), 1e-4f, "the raid's power and an elite's share live in Damage Bonus");
+        Assert.AreEqual(1f, DamageCalculator.BonusScale(null), 1e-4f, "the forest's own hurts as written");
+
+        var poison = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Poison.asset");
+        Damageable victim = Victim(100f, 0f);
+        StatusEffects effects = StatusEffects.Apply(victim, poison, knight);
+        Assert.AreEqual(2f, effects.Current[0].Scale, 1e-4f, "taken as it is laid, so it keeps its power after the knight falls");
+        Object.DestroyImmediate(effects);
+    }
+
     // ----- What a dodge escapes -----
 
     // Review 2026-11-16: a bog troll's drag and a shield rush pulled a player who dodged through them.

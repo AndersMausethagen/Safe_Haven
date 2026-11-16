@@ -18,6 +18,8 @@ public sealed class StatusEffects : MonoBehaviour
     {
         public StatusEffectDefinition Definition;
         public Combatant Source;
+        /// <summary>The source's Damage Bonus as it laid the status (DamageCalculator.BonusScale): what its ticks are multiplied by.</summary>
+        public float Scale = 1f;
         public float EndsAt;
         public float NextTick;
 
@@ -131,10 +133,15 @@ public sealed class StatusEffects : MonoBehaviour
         {
             entry.EndsAt = Time.time + effect.Seconds;
             entry.Source = source;
+            entry.Scale = DamageCalculator.BonusScale(source);
             return;
         }
 
-        active.Add(new Active { Definition = effect, Source = source, EndsAt = Time.time + effect.Seconds, NextTick = Time.time + TickSeconds });
+        active.Add(new Active
+        {
+            Definition = effect, Source = source, Scale = DamageCalculator.BonusScale(source), EndsAt = Time.time + effect.Seconds,
+            NextTick = Time.time + TickSeconds,
+        });
         UpdateSpeed();
         if (movement != null)
         {
@@ -173,7 +180,7 @@ public sealed class StatusEffects : MonoBehaviour
         }
 
         Vector3 at = transform.position + Vector3.up;
-        var tick = new DamageInfo(entry.Source, null, entry.Definition.DamagePerSecond * TickSeconds, entry.Definition.DamageType, false, at, Vector3.up, 0f,
+        var tick = new DamageInfo(entry.Source, null, entry.Definition.DamagePerSecond * TickSeconds * entry.Scale, entry.Definition.DamageType, false, at, Vector3.up, 0f,
             HitTechnique.OverTime);
         target.ApplyDamage(tick);
     }
