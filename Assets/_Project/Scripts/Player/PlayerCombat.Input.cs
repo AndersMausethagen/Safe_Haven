@@ -213,9 +213,12 @@ public sealed partial class PlayerCombat
             }
 
             // The arms are already part way up the light wind-up: the heavy one goes on from as far, not from its first frame
-            // (the user, 2026-11-15: holding for a heavy looked like a light swing changing its mind).
+            // (the user, 2026-11-15: holding for a heavy looked like a light swing changing its mind). Not when the heavy is
+            // another motion (Grows From Light off): the fists' kick took up a punch's pose 80% in and crawled through the rest
+            // of its wind-up at a fifth of its speed, then struck all at once (the user, 2026-11-16).
             float elapsed = ActiveElapsed;
-            HeavyGrownFrom = Mathf.Clamp(elapsed / Mathf.Max(0.01f, elapsed + TimeToHit), 0f, 0.8f);
+            HeavyGrownFrom = weapon.HeavyAttack != null && weapon.HeavyAttack.GrowsFromLight
+                ? Mathf.Clamp(elapsed / Mathf.Max(0.01f, elapsed + TimeToHit), 0f, 0.8f) : 0f;
             EndSwing();
             heavyCredit = credit;
             Begin(SwingKind.Heavy, ChainPress.Late);

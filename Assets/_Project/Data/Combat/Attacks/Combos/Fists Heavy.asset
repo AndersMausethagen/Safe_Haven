@@ -42,11 +42,19 @@ MonoBehaviour:
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: KI High Kick
   animationSpeed: 0.72549057
   strikeSpeed: 1.5
   strikeLead: 0.08
   followThroughSpeed: 1.0077518
+  growsFromLight: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0}

@@ -22,6 +22,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private static readonly int MoveXHash = Animator.StringToHash("MoveX");
     private static readonly int MoveZHash = Animator.StringToHash("MoveZ");
+    // Which legs Combat Locomotion walks on: 0 the Stylized pack's strafes, 1 the attack pack's own walk (Kevin Iglesias Walk01/Run01).
+    private static readonly int SwingLegsHash = Animator.StringToHash("SwingLegs");
     // Playback multiplier for the combat locomotion: above 1 once the player outruns the authored clip speed.
     private static readonly int MotionSpeedHash = Animator.StringToHash("MotionSpeed");
     // Yaw speed in degrees per second, positive when turning right.

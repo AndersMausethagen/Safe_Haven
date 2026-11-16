@@ -96,9 +96,13 @@ From the user's playtest. Tests only, unplayed:
 - [ ] Nothing swings while the weapon is out on a throw, and arts wait 2 s (Combat Technique Settings > Art Cooldown).
 - [ ] Walking back or aside while swinging: no step forward into the blow; light swings keep 60% of walking speed in the wind-up
       and 70% after the blow (was 25% / 50%).
-- [ ] Walking swings now play on the Upper Body layer (the pack author's Human Body Upper Mask) over Combat Locomotion, whose walks
-      and runs are now the same pack's Walk01 / Run01 (8 directions, cadence matched). Does attacking on the move blend? The author's
-      SpineProxy (hips twist) needs a generic rig, so it isn't used: if the torso turn looks short, that is why.
+- [ ] Walking swings now play on the Upper Body layer (the pack author's Human Body Upper Mask) over Combat Locomotion. Since
+      2026-11-16 (the user: "all strafing looks weird while locked on") the legs are the Stylized pack's strafes again, and the swing
+      pack's own Walk01 / Run01 only under a swing (SwingLegs, each stance's Combat Legs tree; 0.35 s after it ends). Does strafing
+      left read right now, and does attacking on the move still blend? The author's SpineProxy (hips twist) needs a generic rig, so
+      it isn't used: if the torso turn looks short, that is why.
+- [ ] Fists' charged kick: starts from its own first frame (Fists Heavy > Grows From Light off) instead of crawling from the punch's
+      pose at a fifth of its speed. Check the hold and the release.
 - [ ] Grass: every ordinary blow sends a light gust (Ground Impact Settings > Light Swing, wind only); heavy gusts are 1.6x stronger.
       Check in the Prologue meadow.
 

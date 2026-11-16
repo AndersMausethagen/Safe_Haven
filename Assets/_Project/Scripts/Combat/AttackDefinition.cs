@@ -126,6 +126,10 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float strikeLead;
     [Tooltip("Playback speed from the hit on: the follow-through. 1 keeps the clip's own snap.")]
     [SerializeField, Range(0.25f, 3f)] private float followThroughSpeed = 1f;
+    [Tooltip("A heavy swing a held press grows into takes up the light swing's pose, as far into its own wind-up as the light one " +
+             "had got, when it is the same motion going on. Off for a heavy that is another motion altogether (the fists' high kick " +
+             "after a punch): it starts from its first frame at its own pace, instead of crawling through the last of its wind-up.")]
+    [SerializeField] private bool growsFromLight = true;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -189,6 +193,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float StrikeSpeed => strikeSpeed;
     public float StrikeLead => strikeLead;
     public float FollowThroughSpeed => followThroughSpeed;
+    public bool GrowsFromLight => growsFromLight;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;

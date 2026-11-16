@@ -22,6 +22,7 @@ public sealed partial class PlayerAnimationController
         SetFloat(MoveZHash, local.z, speedDampTime, deltaTime);
 
         SetFloat(MotionSpeedHash, MotionSpeed(local));
+        UpdateSwingLegs(deltaTime);
         SetBool(HasMoveInputHash, !swim && movement.InputMagnitude > MoveInputThreshold);
         // Off in the air, in the water and in death, where Base's own poses have to show.
         bool alive = health == null || health.IsAlive;
@@ -29,6 +30,25 @@ public sealed partial class PlayerAnimationController
     }
 
     private bool IsSwimming => swimming != null && swimming.IsSwimming;
+
+    // Seconds the attack pack's legs stay after a swing ends, while its arms finish over them (WalkOutOfSwing), and how fast the
+    // legs change over.
+    private const float SwingLegsHold = 0.35f;
+    private const float SwingLegsDamp = 0.08f;
+    private float swingLegsUntil = float.NegativeInfinity;
+
+    // Combat Locomotion's legs (each stance's Combat Legs tree): the attack pack's own walk under a swing, as its author mixes them
+    // (another pack's walk under its swings glitched), and the Stylized pack's strafes the rest of the time, which read better
+    // circling a foe locked on (the user, 2026-11-16: "all strafing looks weird while locked on").
+    private void UpdateSwingLegs(float deltaTime)
+    {
+        if (combat != null && combat.IsAttacking)
+        {
+            swingLegsUntil = Time.time + SwingLegsHold;
+        }
+
+        SetFloat(SwingLegsHash, Time.time < swingLegsUntil ? 1f : 0f, SwingLegsDamp, deltaTime);
+    }
 
     // Playback rate that makes the run clip for this direction cover the ground actually moved: the clips run at
     // runClipSpeed up to sideways and at backRunClipSpeed from 45° behind, as the blend trees place them.
