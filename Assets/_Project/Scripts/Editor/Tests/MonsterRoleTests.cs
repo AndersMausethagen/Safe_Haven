@@ -35,4 +35,22 @@ public sealed class MonsterRoleTests
         Assert.AreEqual(1, MonsterAttacks.SelectAttack(actions, cooldowns, 2f, 1f, false, 0, 0, 0.3f));
         Object.DestroyImmediate(attack);
     }
+
+    // Review 2026-11-16: the Fossegrim and the Trollkjerring fought with the Moss Shaman's stats and the Berg-jutul with the Old
+    // Moss Troll's, so their own assets (and the journal, which shows them) changed nothing in play.
+    [Test]
+    public void EveryMonster_FightsWithItsOwnStats()
+    {
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:MonsterDefinition"))
+        {
+            var monster = UnityEditor.AssetDatabase.LoadAssetAtPath<MonsterDefinition>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+            if (monster.Prefab == null || monster.CombatStats == null || !monster.Prefab.TryGetComponent(out Combatant combatant))
+            {
+                continue;
+            }
+
+            Object used = new UnityEditor.SerializedObject(combatant).FindProperty("baseStats").objectReferenceValue;
+            Assert.AreSame(monster.CombatStats, used, $"{monster.name}'s prefab fights with {(used != null ? used.name : "nothing")}");
+        }
+    }
 }

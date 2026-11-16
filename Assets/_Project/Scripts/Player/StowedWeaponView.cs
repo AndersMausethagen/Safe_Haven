@@ -150,7 +150,44 @@ public sealed class StowedWeaponView : MonoBehaviour
             grip.position = bone.position + character.TransformVector(settings.HipGrip);
         }
 
+        // Kept against the bone as it is at rest, not as it is posed now: put away mid-run, mid-roll or on a horse, the place
+        // worked out above would have been tilted by that pose, and the model is kept for good (review 2026-11-16).
+        Quaternion rest = character.rotation * RestRelativeTo(animator, bone, character);
+        float scale = Mathf.Abs(bone.lossyScale.x) > 1e-6f ? bone.lossyScale.x : 1f;
+        Vector3 offset = grip.position - bone.position;
+        Quaternion placed = grip.rotation;
+        grip.localRotation = Quaternion.Inverse(rest) * placed;
+        grip.localPosition = Quaternion.Inverse(rest) * offset / scale;
         return grip.gameObject;
+    }
+
+    // The bone's rotation at rest relative to the character, from the avatar's skeleton (its rest pose); a bone the skeleton
+    // doesn't name keeps its rotation now.
+    private static Quaternion RestRelativeTo(Animator animator, Transform bone, Transform character)
+    {
+        var rest = new Dictionary<string, Quaternion>();
+        if (animator.avatar != null)
+        {
+            foreach (SkeletonBone entry in animator.avatar.humanDescription.skeleton)
+            {
+                rest[entry.name] = entry.rotation;
+            }
+        }
+
+        Quaternion relative = Quaternion.identity;
+        for (Transform t = bone; t != null && t != character; t = t.parent)
+        {
+            if (t == animator.transform && t != character)
+            {
+                // The animator's own object stands as it is placed under the character.
+                relative = t.localRotation * relative;
+                continue;
+            }
+
+            relative = (rest.TryGetValue(t.name, out Quaternion local) ? local : t.localRotation) * relative;
+        }
+
+        return relative;
     }
 
     // The model's bounds in the grip's space, from every mesh's own bounds.

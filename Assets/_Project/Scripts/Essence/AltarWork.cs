@@ -272,12 +272,17 @@ public static class AltarWork
         }
 
         held.Container.SetSlot(held.Slot, stack.WithEnchantment(enchantment));
-        // Carving is Runecraft's practice, and the carver at home learns from every piece worked while she is there.
-        Inscriptions.Practise(stack.Item.Tier, EssenceSettings.Current.EnchantWork);
+        // Carving is Runecraft's practice, and the carver at home learns from every piece worked while she is there. Only a
+        // piece carved for the first time teaches: carving one cheap piece over and over with two enchantments in turn was a
+        // way to farm both (review 2026-11-16).
         ResidentRecord carver = Inscriptions.Carver();
-        if (carver != null)
+        if (stack.Enchantment == null)
         {
-            carver.WorkDone += EssenceSettings.Current.WorkPerEnchanting;
+            Inscriptions.Practise(stack.Item.Tier, EssenceSettings.Current.EnchantWork);
+            if (carver != null)
+            {
+                carver.WorkDone += EssenceSettings.Current.WorkPerEnchanting;
+            }
         }
 
         GameEvents.Raise(new GameEvent(GameEventKind.Enchanted, enchantment, 1, user, detail: stack.Item));

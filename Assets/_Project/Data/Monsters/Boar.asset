@@ -46,7 +46,7 @@ MonoBehaviour:
       probability: 0.6
   unlocksRecipes: []
   animatorController: {fileID: 0}
-  prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+  prefab: {fileID: 3664732680575138757, guid: ea26cd939baa8e846a78b1a37fb9d6c2, type: 3}
   experience: 0
   neverElite: 0
   attack: {fileID: 11400000, guid: 66435e9db0670ee4eaf6c67757f0857f, type: 2}

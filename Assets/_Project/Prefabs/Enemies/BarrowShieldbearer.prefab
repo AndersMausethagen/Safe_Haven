@@ -150,6 +150,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 22100000, guid: f9168d2b60100554b85f679a0415a10e, type: 2}
+    - target: {fileID: 4852245321055086106, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: baseStats
+      value: 
+      objectReference: {fileID: 11400000, guid: cf1d47e3323d5c543a63e8c1c4b508b4, type: 2}
     - target: {fileID: 5457787183531467037, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       propertyPath: turnSpeed
       value: 240

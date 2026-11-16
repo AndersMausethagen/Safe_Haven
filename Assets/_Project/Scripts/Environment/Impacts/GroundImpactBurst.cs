@@ -110,13 +110,15 @@ public sealed class GroundImpactBurst : MonoBehaviour
             Vector3 out_ = Outward(forward, arc);
             Vector3 at = transform.position + out_ * Random.Range(0.2f, 1.1f) * Mathf.Max(radius, 0.5f);
             Vector3 normal = Vector3.up;
-            // The ground under it, not whoever stands there.
-            int count = Physics.RaycastNonAlloc(at + Vector3.up * MudRayHeight, Vector3.down, MudHits, MudRayHeight * 2f,
+            // The ground under it, not whoever stands there, nor a roof or a branch over it (review 2026-11-16): looked for from
+            // just above the blow's own height, and only on ground flat enough to lie on.
+            Vector3 from = new Vector3(at.x, transform.position.y + MudRayAbove, at.z);
+            int count = Physics.RaycastNonAlloc(from, Vector3.down, MudHits, MudRayAbove + MudRayHeight,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
             float nearest = float.MaxValue;
             for (int h = 0; h < count; h++)
             {
-                if (MudHits[h].distance < nearest && MudHits[h].collider.GetComponentInParent<IDamageable>() == null)
+                if (MudHits[h].distance < nearest && MudHits[h].normal.y >= 0.5f && MudHits[h].collider.GetComponentInParent<IDamageable>() == null)
                 {
                     nearest = MudHits[h].distance;
                     at = MudHits[h].point;
@@ -130,6 +132,7 @@ public sealed class GroundImpactBurst : MonoBehaviour
     }
 
     private const float MudRayHeight = 2f;
+    private const float MudRayAbove = 0.6f;
     private const float MudSeconds = 90f;
     private static readonly RaycastHit[] MudHits = new RaycastHit[8];
 

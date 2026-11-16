@@ -157,7 +157,7 @@ public static class JournalContent
                         Name = quest.DisplayName,
                         Line = QuestMarkerSettings.RankName(quest.Rank),
                         State = HavenEntryState.Locked,
-                        Status = "Begins when you come home from a raid",
+                        Status = manager.HeldReason(quest),
                         Description = GameInput.WithRebinds(quest.Description),
                     });
                 }

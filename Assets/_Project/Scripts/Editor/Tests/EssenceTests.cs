@@ -344,6 +344,8 @@ public sealed class EssenceTests
         bonuses.arraySize = 2;
         Bonus(bonuses.GetArrayElementAtIndex(0), StatType.Armor, 8f);
         Bonus(bonuses.GetArrayElementAtIndex(1), StatType.MaxHealth, -15f);
+        // For armour: an enchantment only counts where it may be carved (GearPower.BonusesOf checks Fits).
+        data.FindProperty("targets").intValue = (int)EnchantTarget.Armor;
         data.ApplyModifiedPropertiesWithoutUndo();
         return enchantment;
     }

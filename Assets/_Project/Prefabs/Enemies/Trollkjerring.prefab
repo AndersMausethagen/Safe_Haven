@@ -121,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Combatant
   faction: 1
-  baseStats: {fileID: 11400000, guid: 9feced56207df704e8442128dac96f23, type: 2}
+  baseStats: {fileID: 11400000, guid: 8c39096b6fac42a458a66cbc2973c8e7, type: 2}
   rules: {fileID: 0}
   priorityTarget: 0
 --- !u!114 &2122653105836984727
@@ -190,6 +190,7 @@ MonoBehaviour:
       probability: 1
   unlocksRecipes: []
   relicChance: 0
+  inscriptions: []
 --- !u!114 &6003715547336990356
 MonoBehaviour:
   m_ObjectHideFlags: 0

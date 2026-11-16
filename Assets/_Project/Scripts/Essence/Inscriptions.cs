@@ -34,8 +34,10 @@ public static class Inscriptions
             return true;
         }
 
+        // The stash too: an unread inscription put away at home is still one the player has (review 2026-11-16).
         ItemInventory bag = player != null ? player.GetComponentInParent<ItemInventory>() : null;
-        return bag != null && (Carries(bag.Container, enchantment) || Carries(bag.SafePocket, enchantment));
+        return (bag != null && (Carries(bag.Container, enchantment) || Carries(bag.SafePocket, enchantment)))
+            || Carries(GameSession.Stash.Items, enchantment);
     }
 
     private static bool Carries(ItemContainer container, EnchantmentDefinition enchantment)

@@ -697,19 +697,19 @@ public sealed class SettlementState
         LastBossBeatenAt = atExtraction;
     }
 
-    /// <summary>The homecoming whose share of held quests has begun (QuestManager), and how many have begun in it. Saved, so
-    /// loading a game doesn't open a fresh share at the same homecoming.</summary>
+    /// <summary>Which return home this is (each raid's end, whatever its outcome) and how many held quests have begun since
+    /// (QuestManager). Saved, so loading a game doesn't open a fresh share at the same homecoming.</summary>
     public int HeldQuestsHomecoming { get; private set; }
     public int HeldQuestsStarted { get; private set; }
 
-    /// <summary>How many held quests have begun at this homecoming.</summary>
-    public int HeldQuestsStartedAt(int homecoming) => HeldQuestsHomecoming == homecoming ? HeldQuestsStarted : 0;
-
-    public void NoteHeldQuestStarted(int homecoming)
+    /// <summary>A raid has ended, extracted or not: the next homecoming's share of held quests opens.</summary>
+    public void OpenHeldQuestShare()
     {
-        HeldQuestsStarted = HeldQuestsStartedAt(homecoming) + 1;
-        HeldQuestsHomecoming = homecoming;
+        HeldQuestsHomecoming++;
+        HeldQuestsStarted = 0;
     }
+
+    public void NoteHeldQuestStarted() => HeldQuestsStarted++;
 
     public void RestoreHeldQuests(int homecoming, int started)
     {

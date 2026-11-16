@@ -29,7 +29,9 @@ public static class GearPower
         bonuses.AddRange(stack.Item.StatBonuses);
         bonuses.AddRange(QualityBonuses(stack.Item, stack.Quality, settings));
         bonuses.AddRange(EmpowerBonuses(stack.Item, stack.Empower, settings));
-        if (withEnchantment && stack.Enchantment != null)
+        // Only where it may be carved (Fits): one carved before the slot rules (an old save's shield with a weapon's enchantment)
+        // adds nothing, as the altar would no longer allow it (review 2026-11-16).
+        if (withEnchantment && stack.Enchantment != null && stack.Enchantment.Fits(stack.Item))
         {
             bonuses.AddRange(stack.Enchantment.Bonuses);
         }

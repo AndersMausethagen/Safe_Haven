@@ -469,10 +469,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
             }
 
             string ways = WaysToMake(cost.Item, crafting);
-            if (ways.Length > 0)
-            {
-                lines.Add($"{cost.Item.DisplayName}: {ways}");
-            }
+            lines.Add($"{cost.Item.DisplayName}: {(ways.Length > 0 ? ways : NotYetMade(cost.Item, crafting))}");
         }
 
         if (lines.Count == 0)
@@ -517,6 +514,22 @@ public sealed class BuildMenuWindow : MonoBehaviour
         }
 
         return string.Join(" or ", ways);
+    }
+
+    /// <summary>Where an item no known recipe makes comes from (review 2026-11-16: a Life Orb or an unlearned Stone Block said
+    /// nothing): the station of a recipe not learned yet, or else that it is found, not made.</summary>
+    public static string NotYetMade(ItemDefinition item, PlayerCrafting crafting)
+    {
+        foreach (RecipeDefinition recipe in crafting.Recipes)
+        {
+            if (recipe != null && recipe.Output == item)
+            {
+                string where = recipe.IsHandcrafted ? "by hand" : $"at {recipe.Station.WithArticle()}";
+                return $"made {where}, once you learn how";
+            }
+        }
+
+        return "not made: found on raids or gathered";
     }
 
     private static string Tags(BuildingDefinition building, UIStyle style)

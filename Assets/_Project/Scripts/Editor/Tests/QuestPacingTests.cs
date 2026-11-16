@@ -195,7 +195,7 @@ public sealed class QuestPacingTests
         Assert.AreEqual(QuestStatus.NotStarted, manager.Log.StatusOf(three), "a third Haven quest waits while two are under way");
         Assert.IsTrue(manager.IsHeld(three), "and the journal lists it as waiting");
 
-        GameSession.Settlement.RecordExtraction();
+        GameSession.Settlement.OpenHeldQuestShare(); // a raid ended (SettlementSystem), extracted or not
         manager.StartWaitingQuests(Time.time + 1000f);
         Assert.AreEqual(QuestStatus.Active, manager.Log.StatusOf(three), "the next homecoming brings it");
         Assert.IsFalse(manager.IsHeld(three));

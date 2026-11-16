@@ -39,8 +39,10 @@ public static class AtmosphereConditions
     public static float SceneFogScale { get; set; } = 1f;
 
     /// <summary>How much of their sight range monsters keep in the current fog and dark (PerceptionSettings › Fog and Dark).</summary>
+    // The scene's share (SceneFog) is taken back out: it thins the fog for the eye (the prologue's), not monster sight, which
+    // would otherwise have reached a third further there (review 2026-11-16).
     public static float SightScale(PerceptionSettings rules) =>
-        PerceptionRules.FogSightScale(FogDensity, rules.DenseFog, rules.SightInDenseFog)
+        PerceptionRules.FogSightScale(SceneFogScale > 0.01f ? FogDensity / SceneFogScale : FogDensity, rules.DenseFog, rules.SightInDenseFog)
         * Mathf.Lerp(1f, rules.SightAtNight, Mathf.Clamp01(Night));
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

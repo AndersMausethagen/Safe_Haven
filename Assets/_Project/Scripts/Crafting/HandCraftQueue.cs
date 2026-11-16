@@ -16,6 +16,7 @@ public sealed class HandCraftQueue : MonoBehaviour
     private PlayerMovement movement;
     private PlayerCombat combat;
     private PlayerDodge dodge;
+    private Damageable health;
     private RecipeDefinition current;
     private float elapsed;
     private float seconds;
@@ -48,6 +49,7 @@ public sealed class HandCraftQueue : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         combat = GetComponent<PlayerCombat>();
         dodge = GetComponent<PlayerDodge>();
+        health = GetComponent<Damageable>();
     }
 
     /// <summary>How many of <paramref name="recipe"/> are under way or waiting.</summary>
@@ -138,6 +140,13 @@ public sealed class HandCraftQueue : MonoBehaviour
         if ((combat != null && combat.IsAttacking) || (dodge != null && dodge.IsDodging))
         {
             Stop();
+            return;
+        }
+
+        // Fallen: nothing is made by the dead (review 2026-11-16); what it cost goes back with the rest of the bag.
+        if (health != null && !health.IsAlive)
+        {
+            Stop(false);
             return;
         }
 

@@ -208,7 +208,8 @@ public sealed class QuestTrackerView : MonoBehaviour
         sorted.RemoveAll(entry =>
         {
             bool firstOfKind = seen.Add(entry.Quest.Rank); // the pinned one is sorted first, so it takes its kind's place
-            return !(firstOfKind || entry.Quest.Id == pinned || QuestTimers.TryGet(entry.Quest, out _));
+            // One waiting to be handed in always shows: "Return to X" hidden behind another of its colour leaves it forgotten.
+            return !(firstOfKind || entry.Quest.Id == pinned || entry.Status == QuestStatus.ReadyToTurnIn || QuestTimers.TryGet(entry.Quest, out _));
         });
         return before - sorted.Count;
     }

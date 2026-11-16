@@ -112,6 +112,17 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     /// </summary>
     public bool IsHeld(QuestDefinition quest) => quest != null && quest.HeldForHomecoming && IsWaiting(quest) && !MayStartHeld(quest);
 
+    /// <summary>Why a held quest (IsHeld) hasn't begun, in words for the journal.</summary>
+    public string HeldReason(QuestDefinition quest)
+    {
+        if (!AtHome)
+        {
+            return "Begins when you come home from a raid";
+        }
+
+        return $"Begins when a {QuestMarkerSettings.RankName(quest.Rank)} quest under way is done, or after your next raid";
+    }
+
     /// <summary>Starts every waiting quest whose moment has come, in the order they became ready.</summary>
     internal void StartWaitingQuests(float now)
     {
@@ -127,7 +138,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             {
                 Forget(entry.Quest);
             }
-            else if (!MayStartHeld(entry.Quest))
+            else if (!MayStartHeld(entry.Quest) || entry.Quest.HeldForHomecoming && now < heldSpacedUntil)
             {
                 // Held: its moment counts from when it may begin, so on coming home it still waits out a welcome or a fight
                 // (a moment long past would otherwise have outlasted Longest Hold and started over someone talking).
@@ -184,7 +195,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         StoryPacingSettings rules = StoryPacingSettings.Current;
         float readyAt = Pacing.ReadyAt(quest.StartDelay, Time.time, rules);
-        if ((quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules)) && MayStartHeld(quest))
+        if ((quest.StartsInAFight ? Time.time >= readyAt : Pacing.CanStart(readyAt, Time.time, rules)) && MayStartHeld(quest)
+            && (!quest.HeldForHomecoming || Time.time >= heldSpacedUntil))
         {
             StartNow(quest);
         }
@@ -195,14 +207,18 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         }
     }
 
+    // Until when the next held quest waits after one has begun.
+    private float heldSpacedUntil = float.NegativeInfinity;
+
     // The share of held quests each homecoming is counted in the settlement (SettlementState.HeldQuestsStarted), which is saved:
     // a Continue at the same homecoming doesn't open a fresh share.
     private void StartNow(QuestDefinition quest)
     {
         if (Log.TryStart(quest) && quest.HeldForHomecoming)
         {
-            SettlementState settlement = GameSession.Settlement;
-            settlement.NoteHeldQuestStarted(settlement.SuccessfulExtractions);
+            GameSession.Settlement.NoteHeldQuestStarted();
+            // The next held one waits its turn after this one (not two toasts in one frame on coming home).
+            heldSpacedUntil = Time.time + StoryPacingSettings.Current.BetweenQuestsSeconds;
         }
     }
 
@@ -223,9 +239,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             return false;
         }
 
-        SettlementState settlement = GameSession.Settlement;
-        return settlement.HeldQuestsStartedAt(settlement.SuccessfulExtractions) < StoryPacingSettings.Current.NewPerHomecoming
-            || !AnyUnderWay(quest.Rank);
+        return GameSession.Settlement.HeldQuestsStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
     }
 
     // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses.
@@ -340,6 +354,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         pendingRewards.Clear();
         waiting.Clear();
         underWayKnown = false;
+        heldSpacedUntil = float.NegativeInfinity;
         log = GameSession.Quests;
         log.Started += OnQuestStarted;
         log.Progressed += OnQuestProgressed;

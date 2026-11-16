@@ -282,7 +282,11 @@ public sealed class QuestLog
         }
 
         var entry = new Entry(quest) { Status = status };
-        for (int i = 0; i < entry.Counts.Length && counts != null && i < counts.Count; i++)
+        // Saved before the quest's steps changed (a step added or taken out): counts kept by place would land on the wrong
+        // steps (review 2026-11-16: Smith's Request's new "Raise the Smithy"). They start again from nothing instead; what
+        // is already owned or built is counted again once the scene is in (QuestManager.RecountOwned).
+        bool stepsChanged = counts != null && counts.Count != entry.Counts.Length && status != QuestStatus.Completed;
+        for (int i = 0; !stepsChanged && i < entry.Counts.Length && counts != null && i < counts.Count; i++)
         {
             entry.Counts[i] = Math.Max(0, counts[i]);
         }
