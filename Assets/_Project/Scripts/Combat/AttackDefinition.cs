@@ -157,7 +157,9 @@ public sealed class AttackDefinition : ScriptableObject
     public float PoiseDamage => poiseDamage;
     public float Impact => impact;
     public float Lunge => lunge;
-    public float StaminaCost => staminaCost;
+    /// <summary>Its own stamina cost, or null for the player's normal attack cost (PlayerCombat.StaminaCostOf resolves it). A placeholder
+    /// is never handed out as a number (Docs/BugPatterns.md, guard 4: "-1, the default" was read as a cost of -1).</summary>
+    public float? OwnStaminaCost => staminaCost >= 0f ? staminaCost : (float?)null;
     public StatusEffectDefinition AppliesStatus => appliesStatus;
     public float StatusChance => statusChance;
     /// <summary>Only a dodge gets out of it: no block or parry stops it.</summary>
@@ -166,12 +168,12 @@ public sealed class AttackDefinition : ScriptableObject
     public float Pull => pull;
     /// <summary>What the blow does to the ground round it (GroundImpacts).</summary>
     public GroundImpactDefinition GroundImpact => groundImpact;
-    /// <summary>Movement (player): below 0 means "the settings' value" (see <see cref="SwingMotion"/>).</summary>
-    public float WindupMove => windupMove;
-    public float AfterContactMove => afterContactMove;
-    public float WindupTurnRate => windupTurnRate;
-    public float MoveAt => moveAt;
-    public float LungeShare => lungeShare;
+    /// <summary>Movement (player): its own value, or null for the settings' (SwingMotion resolves each).</summary>
+    public float? OwnWindupMove => windupMove >= 0f ? windupMove : (float?)null;
+    public float? OwnAfterContactMove => afterContactMove >= 0f ? afterContactMove : (float?)null;
+    public float? OwnWindupTurnRate => windupTurnRate >= 0f ? windupTurnRate : (float?)null;
+    public float? OwnMoveAt => moveAt >= 0f ? moveAt : (float?)null;
+    public float? OwnLungeShare => lungeShare >= 0f ? lungeShare : (float?)null;
     public ArtMotion Motion => motion;
     public float MotionDistance => motionDistance;
     public bool AlwaysCritical => alwaysCritical;

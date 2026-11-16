@@ -124,8 +124,8 @@ public sealed class AttackTelegraph : MonoBehaviour
             ? ai.ActiveAction.chargeDistance : attack.Range;
         marker.localScale = Vector3.one * range;
         marker.gameObject.SetActive(true);
-        // An Unyielding elite's strikes break off for nothing until its layer breaks, whatever the strike allows.
-        interruptible = ai.ActiveAction != null && ai.ActiveAction.interruptible && !ai.IsUnyielding;
+        // The AI's own rule (an Unyielding elite's strikes break off for nothing until its layer breaks, whatever the strike allows).
+        interruptible = ai.AnyBlowBreaksStrike;
         // A shot leaves the hand and a charge starts its rush at Hit Delay: contact comes later, by the flight or the run, so the
         // moment before Hit Delay is no time to parry them (a guard raised on that cue blocks instead).
         cuesParry = ai.ActiveAction == null || (ai.ActiveAction.kind != MonsterAttackKind.Charge && !MonsterAttacks.IsRanged(ai.ActiveAction.kind));

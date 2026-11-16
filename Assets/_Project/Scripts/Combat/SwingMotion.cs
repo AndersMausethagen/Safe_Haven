@@ -18,9 +18,9 @@ public static class SwingMotion
     /// wind-up) and a weapon art (leaps and spins are whole-body clips) stay planted unless the attack says otherwise.</summary>
     public static float WindupMove(AttackDefinition attack, SwingKind kind, CombatTechniqueSettings rules)
     {
-        if (attack != null && attack.WindupMove >= 0f)
+        if (attack != null && attack.OwnWindupMove.HasValue)
         {
-            return attack.WindupMove;
+            return attack.OwnWindupMove.Value;
         }
 
         return kind == SwingKind.Light || kind == SwingKind.ShieldBash ? rules.WindupMoveSpeed : 0f;
@@ -29,9 +29,9 @@ public static class SwingMotion
     /// <summary>Share of walking speed from <see cref="MoveAt"/> to the end of the swing: the arms finish it over the legs.</summary>
     public static float AfterContactMove(AttackDefinition attack, SwingKind kind, CombatTechniqueSettings rules)
     {
-        if (attack != null && attack.AfterContactMove >= 0f)
+        if (attack != null && attack.OwnAfterContactMove.HasValue)
         {
-            return attack.AfterContactMove;
+            return attack.OwnAfterContactMove.Value;
         }
 
         return kind == SwingKind.Heavy ? rules.HeavyMoveSpeed : rules.SwingMoveSpeed;
@@ -39,13 +39,13 @@ public static class SwingMotion
 
     /// <summary>Degrees per second the blow turns toward the aim early in its wind-up (the focused enemy is followed at Swing Tracking).</summary>
     public static float TurnRate(AttackDefinition attack, CombatTechniqueSettings rules) =>
-        attack != null && attack.WindupTurnRate >= 0f ? attack.WindupTurnRate : rules.WindupTurnRate;
+        (attack != null ? attack.OwnWindupTurnRate : null) ?? rules.WindupTurnRate;
 
     /// <summary>Seconds after the swing starts (at its speed) when the player walks and turns again: a moment after the blow, never after
     /// the swing has recovered.</summary>
     public static float MoveAt(AttackDefinition attack, float hitAt, float recoverAt, float speed, CombatTechniqueSettings rules)
     {
-        float after = attack != null && attack.MoveAt >= 0f ? attack.MoveAt : rules.MoveAfterContact;
+        float after = (attack != null ? attack.OwnMoveAt : null) ?? rules.MoveAfterContact;
         return Mathf.Min(hitAt + after / Mathf.Max(0.01f, speed), recoverAt);
     }
 
@@ -66,7 +66,7 @@ public static class SwingMotion
             return hitAt;
         }
 
-        float share = attack != null && attack.LungeShare >= 0f ? attack.LungeShare : rules.LungeShare;
+        float share = (attack != null ? attack.OwnLungeShare : null) ?? rules.LungeShare;
         float lead = Mathf.Clamp(hitAt * share, Mathf.Min(shortest, hitAt), hitAt);
         return kind == SwingKind.Heavy ? Mathf.Min(lead, Mathf.Max(chargeLead, Mathf.Min(shortest, hitAt))) : lead;
     }

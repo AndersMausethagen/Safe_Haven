@@ -172,7 +172,8 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float SkyOcclusionMove => skyOcclusionMove;
     public float SkyOcclusionRefresh => skyOcclusionRefresh;
     public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
-    public int SkyOcclusionRendererIndex => skyOcclusionRendererIndex;
+    /// <summary>The Sky Occlusion Renderer's place in the pipeline's renderer list, or null when there is none (off).</summary>
+    public int? SkyOcclusionRenderer => skyOcclusionRendererIndex >= 0 ? skyOcclusionRendererIndex : (int?)null;
     public float RimStrength => rimStrength;
     public float RimSharpness => rimSharpness;
     public float RimAtNight => rimAtNight;

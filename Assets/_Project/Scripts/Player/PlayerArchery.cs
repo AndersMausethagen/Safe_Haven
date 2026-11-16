@@ -379,7 +379,8 @@ public sealed class PlayerArchery : MonoBehaviour
             return;
         }
 
-        float cost = bow.ShotAttack != null ? Mathf.Max(0f, bow.ShotAttack.StaminaCost) : 0f;
+        // A shot's own cost, or none (a bow has no "normal attack cost" to fall back on).
+        float cost = bow.ShotAttack != null ? bow.ShotAttack.OwnStaminaCost ?? 0f : 0f;
         if (stamina != null && cost > 0f && !stamina.TrySpend(cost))
         {
             return;

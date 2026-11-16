@@ -49,7 +49,8 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         above.allowMSAA = false;
         above.useOcclusionCulling = false;
         var data = go.AddComponent<UniversalAdditionalCameraData>();
-        data.SetRenderer(settings.SkyOcclusionRendererIndex);
+        // -1 is URP's "the default renderer": the camera stays off then anyway (Bind).
+        data.SetRenderer(settings.SkyOcclusionRenderer ?? -1);
         data.renderPostProcessing = false;
         data.renderShadows = false;
         data.requiresColorOption = CameraOverrideOption.Off;
@@ -64,7 +65,7 @@ public sealed class SkyOcclusionMap : MonoBehaviour
     public void Bind(float dimming)
     {
         strength = Mathf.Clamp01(dimming);
-        active = strength > 0f && settings.SkyOcclusion && settings.SkyOcclusionRendererIndex >= 0;
+        active = strength > 0f && settings.SkyOcclusion && settings.SkyOcclusionRenderer.HasValue;
         nextRender = 0f;
         renderedAt = new Vector3(float.MaxValue, 0f, 0f);
         if (!active)

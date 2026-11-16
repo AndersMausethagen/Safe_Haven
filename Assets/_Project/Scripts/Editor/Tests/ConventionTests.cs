@@ -164,6 +164,30 @@ public sealed class ConventionTests
         Assert.IsEmpty(offenders, "Not cleared when Play starts:\n" + string.Join("\n", offenders));
     }
 
+    // Guard 4 of Docs/BugPatterns.md: a serialized field that starts at -1 means "the default" (or "off"), and is never handed out as a
+    // number: its getter gives a nullable, or the rule that resolves it. Attack Definition › Stamina Cost was read as a cost of -1
+    // (Frenzied restored nothing, the Fight card showed no swings).
+    private static readonly Regex PlaceholderField = new Regex(@"\[SerializeField[^\]]*\]\s*private\s+(?:float|int)\s+(\w+)\s*=\s*-1f?\s*;");
+
+    [Test]
+    public void APlaceholderValue_IsNeverHandedOutAsANumber()
+    {
+        var raw = new List<string>();
+        foreach ((string path, string source) in RuntimeScripts())
+        {
+            foreach (Match field in PlaceholderField.Matches(source))
+            {
+                string name = field.Groups[1].Value;
+                if (Regex.IsMatch(source, @"=>\s*" + name + @"\s*;") || Regex.IsMatch(source, @"return\s+" + name + @"\s*;"))
+                {
+                    raw.Add($"{Path.GetFileNameWithoutExtension(path)}.{name}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(raw, "these hand out a -1 placeholder as a number: give a nullable (float? Own...) or the resolved value");
+    }
+
     [Test]
     public void EveryStaticEventSubscription_IsUndone()
     {

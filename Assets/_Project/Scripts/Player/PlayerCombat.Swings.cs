@@ -332,9 +332,9 @@ public sealed partial class PlayerCombat
             return artOnStamina ? Rules.ArtStaminaWithoutFocus : 0f;
         }
 
-        if (attack != null && attack.StaminaCost >= 0f)
+        if (attack != null && attack.OwnStaminaCost.HasValue)
         {
-            return attack.StaminaCost;
+            return attack.OwnStaminaCost.Value;
         }
 
         return kind == SwingKind.ShieldBash ? stamina.ShieldBashCost : kind == SwingKind.Heavy ? stamina.AttackCost * 2f : stamina.AttackCost;

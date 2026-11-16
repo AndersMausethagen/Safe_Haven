@@ -346,6 +346,10 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>The attack being performed, or null when not attacking. Its HitDelay is the wind-up before the hit.</summary>
     public AttackDefinition CurrentAttack => CurrentState == State.Attacking ? attacks.Attack : null;
     public MonsterAttack ActiveAction => CurrentState == State.Attacking ? attacks.Action : null;
+
+    /// <summary>True while the strike under way breaks off for any blow that hurts (its Interruptible; never an Unyielding elite's): the
+    /// one rule the telegraph's colour shows and OnDamaged keeps (with Break Through for blows heavy enough to break any).</summary>
+    public bool AnyBlowBreaksStrike => CurrentState == State.Attacking && !IsUnyielding && attacks.Action != null && attacks.Action.interruptible;
     public bool IsExposed => CurrentState == State.Attacking && attacks.IsExposed;
     public bool IsHowler => pack != null && pack.IsLeader(this);
 

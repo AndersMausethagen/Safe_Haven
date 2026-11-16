@@ -34,7 +34,7 @@ public sealed class WeaponIdentityTests
             Assert.AreEqual(pace, RatioPerSecond(weapon), pace * 0.06f, $"{name}'s damage per second moved");
             Assert.GreaterOrEqual(weapon.ComboLength, 3, $"{name} has a chain of three or more");
             Assert.IsNotNull(weapon.ChargedAttack, $"{name} has a full-charge release");
-            Assert.IsTrue(weapon.WeaponArt.Motion != ArtMotion.None || weapon.WeaponArt.WindupMove > 0f, $"{name}'s art moves the player");
+            Assert.IsTrue(weapon.WeaponArt.Motion != ArtMotion.None || (weapon.WeaponArt.OwnWindupMove ?? 0f) > 0f, $"{name}'s art moves the player");
         }
 
         Assert.AreEqual(WeaponSignature.Flurry, Weapon("Fists").Signature);
