@@ -212,7 +212,8 @@ public sealed class HavenRequestBoard : MonoBehaviour
             }
         }
 
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (every caller returns in a friend's Haven), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         settlement.RemoveRequest(request.Id);
         settlement.RecordRequestAnswered(request.Renown);
         var given = new List<string>();
@@ -274,7 +275,8 @@ public sealed class HavenRequestBoard : MonoBehaviour
     // raid is planned round what is wanted then.
     private void Refill(bool force)
     {
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (Start and Update return in a friend's Haven), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         int homecoming = settlement.SuccessfulExtractions;
         HavenRequestSettings settings = HavenRequestSettings.Current;
         // Nothing new is asked until there is a board to post it on; the first asks come as soon as it stands.

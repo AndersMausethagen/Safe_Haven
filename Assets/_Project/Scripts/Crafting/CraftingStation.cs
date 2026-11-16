@@ -218,7 +218,8 @@ public sealed class CraftingStation : MonoBehaviour
     {
         get
         {
-            StationQueue queue = GameSession.Here.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
+            // What this game sees standing: the queue of the station here, made on first look (so the settlement itself, not the view).
+            StationQueue queue = GameSession.HereItself.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
             if (queue != null)
             {
                 // The building's level, and the rank of the resident who works here.

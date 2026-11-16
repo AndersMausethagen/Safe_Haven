@@ -253,7 +253,7 @@ public sealed class AltarWindow : MonoBehaviour
 
         if (page == Page.Purify)
         {
-            SettlementState settlement = GameSession.Here;
+            IHavenView settlement = GameSession.Here;
             SettlementSettings settings = SettlementSettings.Current;
             float share = settlement.PurificationQueued > 0 ? settlement.PurificationProgress / settings.SecondsPerBatch : 0f;
             KitBar.Set(queueFill, queueFillImage, Mathf.Clamp01(share), UIStyle.Current.Accent);
@@ -314,7 +314,7 @@ public sealed class AltarWindow : MonoBehaviour
     {
         UIStyle style = UIStyle.Current;
         SettlementSettings settings = SettlementSettings.Current;
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         ResourceDefinition cursed = settings.CursedEssence;
         ResourceDefinition purified = settings.PurifiedEssence;
         if (cursed == null || purified == null)

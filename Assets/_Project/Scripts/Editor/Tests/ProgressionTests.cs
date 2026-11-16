@@ -181,7 +181,7 @@ public sealed class ProgressionTests
         try
         {
             Assert.AreEqual(1f, ExperienceTracker.Boost(smithing), 0.0001f, "no smithy, no lessons");
-            GameSession.Here.NoteBuilt(smithing.Mentor, 3);
+            GameSession.Home.NoteBuilt(smithing.Mentor, 3);
             Assert.AreEqual(1.1f, ExperienceTracker.Boost(smithing), 0.0001f, "two tiers above I: +10%");
             ExperienceTracker.Practise(smithing, 1, 10f, false);
             Assert.AreEqual(Mathf.FloorToInt(11f / settings.PracticeTimeScale), GameSession.Progress.ExperienceOf(smithing));

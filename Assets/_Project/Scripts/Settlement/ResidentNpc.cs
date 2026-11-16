@@ -345,7 +345,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     // For a while after a boss falls, it is what people talk about.
     private string BossTalk()
     {
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         SettlementSettings settings = SettlementSettings.Current;
         if (string.IsNullOrEmpty(settlement.LastBossBeaten) || settlement.SuccessfulExtractions - settlement.LastBossBeatenAt > settings.GriefRaids)
         {

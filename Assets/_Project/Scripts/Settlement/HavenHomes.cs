@@ -83,7 +83,8 @@ public sealed class HavenHomes : MonoBehaviour
     // Shares the beds out and finds each one's workplace. True when anything changed.
     private bool Settle()
     {
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (above), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         IReadOnlyList<ResidentRecord> residents = settlement.Residents;
         Vector3 middle = Gather();
         string[] homes = HomeRules.Assign(houses, people, HomeLifeSettings.Current.MoveHomeFor);
@@ -197,7 +198,7 @@ public sealed class HavenHomes : MonoBehaviour
     // house there change how good it is: its quality is worked out again then (HomeLife).
     private bool SeenNew()
     {
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         seen.Clear();
         foreach (ResidentRecord record in settlement.Residents)
         {

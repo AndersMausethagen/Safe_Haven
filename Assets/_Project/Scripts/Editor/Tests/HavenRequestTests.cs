@@ -76,7 +76,7 @@ public sealed class HavenRequestTests
         GameSession.StartNewGame();
         try
         {
-            SettlementState settlement = GameSession.Here;
+            SettlementState settlement = GameSession.Home;
             settlement.AddResident(order.Asker, null);
             Assert.IsFalse(order.CanAsk(settlement, "Summer"), "not before the player could make it");
             LevelingSettings leveling = LevelingSettings.Current;

@@ -46,20 +46,28 @@ public static class GameSession
     /// <summary>Safe Haven as a place: portal, ward, residents, breach, purification. Created on first use.</summary>
     /// <summary>The settlement by its old name, which meant two Havens in a friend's: choose <see cref="Here"/> or <see cref="Home"/>.</summary>
     [System.Obsolete("Choose GameSession.Here (the Haven one stands in, to read) or GameSession.Home (one's own, to change): Docs/BugPatterns.md, guard 9.")]
-    public static SettlementState Settlement => Here;
+    public static IHavenView Settlement => Here;
 
     /// <summary>
     /// The Haven the player stands in, to read: their own, or in a friend's (co-op) the copy of the host's, which the host's word
-    /// keeps (SettlementState.TakeOn) and a guest never changes (Docs/BugPatterns.md, guard 9: ConventionTests bans its changers).
+    /// keeps (SettlementState.TakeOn) and a guest never changes (Docs/BugPatterns.md, guard 9). Read-only by type: change one's
+    /// own through <see cref="Home"/>.
     /// </summary>
-    public static SettlementState Here => settlement ??= new SettlementState();
+    public static IHavenView Here => HereItself;
+
+    /// <summary>
+    /// The settlement object behind <see cref="Here"/>, for the few that must hold it: the co-op mirror (HavenSync), saving, and
+    /// what this game sees standing (HavenProgress, a station's queue, the territory's state). Never to change the host's world
+    /// in a friend's Haven; ConventionTests allows it only in the files it lists.
+    /// </summary>
+    public static SettlementState HereItself => settlement ??= new SettlementState();
 
     /// <summary>
     /// The player's own Haven, always theirs to change: the one they stand in at home, and in a friend's their own, kept alive for
     /// the visit (HavenVisit.OwnHaven) and saved with them. Their extraction, the person they rescued, the boss they beat, their
     /// companion lost: here, in one call, wherever they are.
     /// </summary>
-    public static SettlementState Home => HavenVisit.OwnHaven ?? Here;
+    public static SettlementState Home => HavenVisit.OwnHaven ?? HereItself;
 
     /// <summary>The playthrough being logged for playtests. A new game starts a new run; a load continues the saved one.</summary>
     public static PlaytestRun Playtest => playtest ??= PlaytestRun.StartNew();

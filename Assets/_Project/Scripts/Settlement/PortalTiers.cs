@@ -13,7 +13,7 @@ public static class PortalTiers
     public static int Current => Of(GameSession.Here);
 
     /// <summary>The tier a settlement's portal stands at.</summary>
-    public static int Of(SettlementState settlement) => settlement == null || !settlement.PortalRepaired ? 0 : 1 + settlement.WardLevel;
+    public static int Of(IHavenView settlement) => settlement == null || !settlement.PortalRepaired ? 0 : 1 + settlement.WardLevel;
 
     /// <summary>The highest tier there is.</summary>
     public static int Most => 1 + SettlementSettings.Current.WardLevels.Count;
@@ -26,7 +26,7 @@ public static class PortalTiers
     public static string Line(int tier) => SettlementSettings.Current.PortalTierLine(tier);
 
     /// <summary>The ward level that raises the portal past this tier, or null (not repaired yet, or the last tier).</summary>
-    public static SettlementSettings.WardLevel Next(SettlementState settlement)
+    public static SettlementSettings.WardLevel Next(IHavenView settlement)
     {
         IReadOnlyList<SettlementSettings.WardLevel> levels = SettlementSettings.Current.WardLevels;
         return settlement != null && settlement.PortalRepaired && settlement.WardLevel < levels.Count ? levels[settlement.WardLevel] : null;
@@ -34,7 +34,7 @@ public static class PortalTiers
 
     /// <summary>What still has to happen before a ward level can be raised, beyond its materials, for the player:
     /// "Needs a Smithy at Tier II and Yrsa living here." Empty when nothing is missing.</summary>
-    public static string Missing(SettlementSettings.WardLevel level, SettlementState settlement)
+    public static string Missing(SettlementSettings.WardLevel level, IHavenView settlement)
     {
         if (level == null || Cheats.NoRequirements)
         {

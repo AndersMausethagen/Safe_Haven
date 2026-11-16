@@ -116,7 +116,8 @@ public sealed class HavenProgress : MonoBehaviour
     // Every rank reached counts, so a haven that got there before this settler existed still gets them. Beds help, but nobody waits for one.
     private static void WelcomeSettlers(HavenSettings settings)
     {
-        SettlementState settlement = GameSession.Here;
+        // Called by Count past its visit guard: one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         for (int i = 0; i <= settlement.HavenRank && i < settings.Ranks.Count; i++)
         {
             ResidentDefinition settler = settings.Ranks[i].settler;
@@ -139,8 +140,8 @@ public sealed class HavenProgress : MonoBehaviour
     {
         // In a friend's Haven (co-op) what stands there is noted too, into the copy: its tiers and beds count for the guest
         // there and on the raids they follow from it (SettlementState.TakeOn keeps them).
-        GameSession.Here.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
-        GameSession.Here.NoteScaffolds(ResidentBuilders.AnyScaffold());
+        GameSession.HereItself.NoteBuildings(System.Linq.Enumerable.Where(BuildingObject.Active, IsStanding));
+        GameSession.HereItself.NoteScaffolds(ResidentBuilders.AnyScaffold());
         // The friend's stations are theirs to run: their queues are made in their game.
         if (HavenVisit.IsVisiting)
         {
@@ -162,7 +163,8 @@ public sealed class HavenProgress : MonoBehaviour
 
     private static void TellWhatWorkersMade()
     {
-        var made = GameSession.Here.MadeByWorkers;
+        // One's own people's work, noted in one's own Haven (SettlementSystem); told once, then forgotten.
+        var made = GameSession.Home.MadeByWorkers;
         if (made.Count == 0)
         {
             return;

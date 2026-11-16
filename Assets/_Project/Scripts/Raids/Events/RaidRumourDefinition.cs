@@ -62,7 +62,7 @@ public sealed class RaidRumourDefinition : ScriptableObject
     public bool ForestPushing => forestPushing;
 
     /// <summary>The line in the briefing as this game has it: the name of whoever it leads to.</summary>
-    public string BriefingFor(SettlementState settlement)
+    public string BriefingFor(IHavenView settlement)
     {
         FallenRecord lost = seeksLost ? settlement.LostToFind : null;
         if (lost != null)
@@ -81,7 +81,7 @@ public sealed class RaidRumourDefinition : ScriptableObject
     public ResidentDefinition AfterHome => afterHome;
 
     /// <summary>Whether it can come up for this hour and this state of the game.</summary>
-    public bool CanComeUp(RaidTimeOfDay timeOfDay, SettlementState settlement, PlayerCrafting crafting)
+    public bool CanComeUp(RaidTimeOfDay timeOfDay, IHavenView settlement, PlayerCrafting crafting)
     {
         if (site == null || weight <= 0f || settlement.SuccessfulExtractions < afterExtractions)
         {
@@ -135,7 +135,7 @@ public static class RaidRumours
     /// raid without one. <paramref name="fromBuildings"/> is what the Haven's buildings add, counted at home
     /// (RaidSession.ExtraRumours); left out, it is counted from the buildings standing now, which only the Haven has.
     /// </summary>
-    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, SettlementState settlement, PlayerCrafting crafting, float rumourScale = 1f,
+    public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, IHavenView settlement, PlayerCrafting crafting, float rumourScale = 1f,
         int? fromBuildings = null)
     {
         var picked = new List<RaidRumourDefinition>();

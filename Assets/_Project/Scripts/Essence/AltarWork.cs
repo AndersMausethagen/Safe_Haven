@@ -86,7 +86,8 @@ public static class AltarWork
             return HavenDecisions.Outcome.Refused("The altar has no room for that much now: your essence is back in your bag.");
         }
 
-        GameSession.Here.QueuePurification(batches, settings.MaxQueuedBatches);
+        // Made only in the game that keeps the Haven (HavenDecisions.Do), where one's own is the one here.
+        GameSession.Home.QueuePurification(batches, settings.MaxQueuedBatches);
         return HavenDecisions.Outcome.Made($"The altar takes {batches * settings.CursedPerBatch} {settings.CursedEssence.DisplayName}.");
     }
 

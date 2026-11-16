@@ -128,7 +128,8 @@ public sealed class ResidentBuilders : MonoBehaviour
             yield break;
         }
 
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (above), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         // Builder-seconds: each second away already times the builders who were at home then (WorkAway).
         float seconds = settlement.TakeBuilderSeconds();
         var who = new List<string>();

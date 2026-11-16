@@ -112,11 +112,11 @@ public sealed class CoopHomeTests
         try
         {
             GameSession.Home.AddResident(person);
-            GameSession.Here.Find(person).WorkDone += 1; // at home: nothing to say
+            GameSession.Home.Find(person).WorkDone += 1; // at home: nothing to say
             Visit(new SettlementState());
             Assert.IsTrue(GameSession.Here.IsBorrowed);
             LogAssert.Expect(LogType.Error, new Regex("Co-op: a resident's WorkDone changed on the copy of the host's settlement"));
-            GameSession.Here.Find(person).WorkDone += 1;
+            GameSession.HereItself.Find(person).WorkDone += 1; // the copy, on purpose
         }
         finally
         {
@@ -209,7 +209,7 @@ public sealed class CoopHomeTests
             Visit(new SettlementState());
             Assert.IsTrue(GameSession.Here.IsBorrowed);
             LogAssert.Expect(LogType.Error, new Regex("Co-op: ChangeBlight changed the copy of the host's settlement"));
-            GameSession.Here.ChangeBlight(0.1f); // the copy, on purpose: what the error is for
+            GameSession.HereItself.ChangeBlight(0.1f); // the copy, on purpose: what the error is for
             // Its own Haven, read and written by ChangeHome, is the guest's to change: no word.
             Assert.IsTrue(HavenVisit.ChangeHome(own => own.ChangeBlight(0.1f)));
             LogAssert.NoUnexpectedReceived();

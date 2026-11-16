@@ -189,7 +189,7 @@ public sealed class CorruptionNights : MonoBehaviour
     // is near or waiting, which is the home's fight then.
     private void Foretell()
     {
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         int extractions = settlement.SuccessfulExtractions;
         if (extractions == foretoldFor || HavenVisit.IsVisiting)
         {

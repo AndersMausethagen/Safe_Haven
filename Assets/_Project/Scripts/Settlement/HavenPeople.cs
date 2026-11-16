@@ -14,7 +14,7 @@ public static class HavenPeople
     /// <summary>The expedition from the settings, plus anyone else who has come to live here.</summary>
     public static List<HavenShelf> Read() => Read(HavenSettings.Current.Expedition, GameSession.Here);
 
-    public static List<HavenShelf> Read(IEnumerable<ResidentDefinition> expedition, SettlementState settlement)
+    public static List<HavenShelf> Read(IEnumerable<ResidentDefinition> expedition, IHavenView settlement)
     {
         var home = new HavenShelf(HomeShelf);
         var away = new HavenShelf(AwayShelf);
@@ -36,7 +36,7 @@ public static class HavenPeople
         return new List<HavenShelf> { home, away };
     }
 
-    private static HavenEntry HomeEntry(ResidentDefinition person, ResidentRecord record, SettlementState settlement)
+    private static HavenEntry HomeEntry(ResidentDefinition person, ResidentRecord record, IHavenView settlement)
     {
         JobDefinition job = record.Job;
         bool canWork = GameSession.Here.JobsOpenTo(person).Count > 0;
@@ -106,7 +106,7 @@ public static class HavenPeople
     }
 
     // What they make on their own, and why they aren't right now, with the way to stop them using up the stash.
-    private static void AddWork(HavenEntry entry, ResidentRecord record, SettlementState settlement)
+    private static void AddWork(HavenEntry entry, ResidentRecord record, IHavenView settlement)
     {
         if (record.Job == null || record.Job.WorkOrders.Count == 0)
         {

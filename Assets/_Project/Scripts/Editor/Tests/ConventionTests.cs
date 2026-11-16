@@ -247,6 +247,39 @@ public sealed class ConventionTests
         CollectionAssert.IsEmpty(changingHere, "the Haven one stands in is the host's in a friend's: change one's own (GameSession.Home), or the host's through HavenHelp");
     }
 
+    // Guard 9, second round: Here is read-only by type (IHavenView), so the object behind it is held only where it must be, each
+    // with its reason. Everywhere else reads through Here and changes one's own through Home.
+    private static readonly Dictionary<string, string> HoldingTheHavenHere = new Dictionary<string, string>
+    {
+        ["Multiplayer/HavenSync.cs"] = "the co-op mirror: the host's settlement packed, a guest's copy taking on the host's word",
+        ["Save/SaveGameService.cs"] = "saving: what is written is the settlement itself",
+        ["Settlement/SettlementState.cs"] = "RecordChanging: whether a changed record is one of a guest's copy",
+        ["Settlement/Footpaths.cs"] = "the paths go back only into the settlement they were read from",
+        ["Settlement/HavenProgress.cs"] = "what this game sees standing (NoteBuildings, NoteScaffolds), in a friend's Haven too",
+        ["Crafting/CraftingStation.cs"] = "the queue of a station standing here, made on first look",
+        ["Territory/Territory.cs"] = "the lands of the Haven one stands in: changed only off a visit, a guest's work goes to the host",
+        ["Editor/Tests/CoopHomeTests.cs"] = "changes a guest's copy on purpose, to hear it cry out",
+    };
+
+    [Test]
+    public void TheHavenHereItself_IsHeldOnlyWhereItMustBe()
+    {
+        const string root = "Assets/_Project/Scripts/";
+        var holding = new List<string>();
+        foreach (string file in Directory.GetFiles(root, "*.cs", SearchOption.AllDirectories))
+        {
+            string path = file.Replace('\\', '/');
+            if (Regex.IsMatch(WithoutComments(File.ReadAllText(path)), @"GameSession\.HereItself\b"))
+            {
+                holding.Add(path.Substring(root.Length).TrimStart('/'));
+            }
+        }
+
+        CollectionAssert.IsEmpty(holding.Except(HoldingTheHavenHere.Keys).ToList(),
+            "read the Haven one stands in through GameSession.Here and change one's own through GameSession.Home; the object itself only where this test lists why");
+        CollectionAssert.IsEmpty(HoldingTheHavenHere.Keys.Except(holding).ToList(), "these no longer hold it: take them off the list");
+    }
+
     [Test]
     public void EveryStaticEventSubscription_IsUndone()
     {

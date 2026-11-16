@@ -96,7 +96,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     {
         get
         {
-            SettlementState settlement = GameSession.Here;
+            IHavenView settlement = GameSession.Here;
             return IsPending && settlement.BreachesWon > 0
                 && settlement.SuccessfulExtractions >= settlement.BreachPendingSince + WardBreachSettings.Current.RaidsPutOff;
         }
@@ -175,7 +175,7 @@ public sealed class WardBreachDirector : MonoBehaviour
     // A breach only ever comes due on the way home from a successful raid, never after a failed one (GDD §6.6).
     private void Announce()
     {
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         WardBreachDefinition next = Definition;
         if (next == null)
         {
@@ -196,7 +196,8 @@ public sealed class WardBreachDirector : MonoBehaviour
                 return;
             }
 
-            settlement.WarnOfBreach();
+            // Past the visit guard: one's own Haven is the one here.
+            GameSession.Home.WarnOfBreach();
             GameMessages.Post(next.WarningText, MessageKind.Warning);
             AudioManager.Play(AudioManager.Sounds?.BreachWarning, transform.position);
         }

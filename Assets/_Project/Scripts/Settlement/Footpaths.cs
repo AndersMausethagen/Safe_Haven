@@ -42,7 +42,8 @@ public sealed class Footpaths : MonoBehaviour
     private void Start()
     {
         origin = transform.position - new Vector3(Cells * CellSize * 0.5f, 0f, Cells * CellSize * 0.5f);
-        keptIn = GameSession.Here;
+        // The object itself, not a view: Keep writes back only into the one these paths were read from.
+        keptIn = GameSession.HereItself;
         Unpack(keptIn.Footpaths);
         nextLay = 0f;
     }
@@ -211,7 +212,7 @@ public sealed class Footpaths : MonoBehaviour
         // so the wear since the last lay was lost on every raid (review 2026-11-16).
         if (!HavenVisit.IsVisiting && keptIn != null && keptIn == GameSession.Here)
         {
-            GameSession.Here.Footpaths = Pack(wear, KeptFrom);
+            keptIn.Footpaths = Pack(wear, KeptFrom);
         }
     }
 

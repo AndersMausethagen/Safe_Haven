@@ -118,7 +118,7 @@ public sealed class FallenRecord
 /// residents) listen to Changed to update themselves.
 /// </para>
 /// </summary>
-public sealed class SettlementState
+public sealed class SettlementState : IHavenView
 {
     [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)")]
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
@@ -602,7 +602,7 @@ public sealed class SettlementState
             return;
         }
 
-        SettlementState here = GameSession.Here;
+        SettlementState here = GameSession.HereItself;
         if (here.IsBorrowed && here.residents.Contains(record) && told.Add("ResidentRecord." + change))
         {
             UnityEngine.Debug.LogError($"Co-op: a resident's {change} changed on the copy of the host's settlement in a guest's game, and the host's next word undoes it. " +

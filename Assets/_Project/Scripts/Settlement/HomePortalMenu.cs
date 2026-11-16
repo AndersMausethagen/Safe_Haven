@@ -24,7 +24,7 @@ public sealed class HomePortalMenu
     public MenuPage Build(GameObject user)
     {
         SettlementSettings settings = SettlementSettings.Current;
-        SettlementState settlement = GameSession.Here;
+        IHavenView settlement = GameSession.Here;
         UIStyle style = UIStyle.Current;
         var body = new StringBuilder();
         // What it says is its own (MenuPage.Story: PortalWindow shows it apart, in italics); the rest is what it tells.

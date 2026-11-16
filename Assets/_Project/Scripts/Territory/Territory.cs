@@ -151,7 +151,8 @@ public static class Territory
         return $"the nearest lies about {Mathf.Max(10, Mathf.RoundToInt(bestDistance / 10f) * 10)} m to the {ways[Mathf.RoundToInt(bearing / 45f) % 8]}";
     }
 
-    private static TerritoryState State => GameSession.Here.Territory;
+    // The lands of the Haven one stands in: read here, changed only off a visit (a guest's work goes to the host: ForHost).
+    private static TerritoryState State => GameSession.HereItself.Territory;
     private static TerritorySettings Settings => TerritorySettings.Current;
 
     /// <summary>The Haven's atlas, wherever the player is (the Lands tab reads it on raids too).</summary>
@@ -477,7 +478,8 @@ public static class Territory
             return;
         }
 
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (above), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         bool pushComing = State.Incursion != null;
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread);
         if (!pushComing && State.Incursion != null)

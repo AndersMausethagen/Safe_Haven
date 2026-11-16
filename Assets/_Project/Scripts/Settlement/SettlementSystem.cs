@@ -52,7 +52,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             return;
         }
 
-        SettlementState settlement = GameSession.Here;
+        // Only off a visit (above), where one's own Haven is the one here.
+        SettlementState settlement = GameSession.Home;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
         // home, not one who went along on the raid.

@@ -32,7 +32,7 @@ public static class WorkerProduction
     /// The queue of the station this resident works at: the one nearest their home (ResidentRecord.WorkQueue), else the
     /// first of their job's kind. Null when their job has no workplace or none stands.
     /// </summary>
-    public static StationQueue QueueOf(SettlementState settlement, ResidentRecord record)
+    public static StationQueue QueueOf(IHavenView settlement, ResidentRecord record)
     {
         if (record == null)
         {
@@ -54,7 +54,7 @@ public static class WorkerProduction
     }
 
     /// <summary>The queue of the first station of a job's kind, or null when it has no workplace or none stands.</summary>
-    public static StationQueue QueueOf(SettlementState settlement, JobDefinition job)
+    public static StationQueue QueueOf(IHavenView settlement, JobDefinition job)
     {
         if (job == null || job.Workplace == null || job.Workplace.Station == CraftingStationType.None)
         {

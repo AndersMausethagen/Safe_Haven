@@ -232,7 +232,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     {
         if (Log.TryStart(quest) && quest.HeldForHomecoming)
         {
-            GameSession.Here.NoteHeldQuestStarted();
+            // Held quests begin only at home (MayStartHeld), where one's own Haven is the one here.
+            GameSession.Home.NoteHeldQuestStarted();
             // The next held one waits its turn after this one (not two toasts in one frame on coming home).
             heldSpacedUntil = Time.time + StoryPacingSettings.Current.BetweenQuestsSeconds;
         }

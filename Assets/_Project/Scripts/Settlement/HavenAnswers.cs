@@ -75,7 +75,7 @@ public static class HavenAnswers
     private const int MostAnswers = 2;
 
     /// <summary>Fills the report's problems: what came home unusable, what would have carried the load, who would mend the gear.</summary>
-    public static void Fill(RaidReport report, PlayerCrafting crafting, IContentTeachers teachers, SettlementState settlement)
+    public static void Fill(RaidReport report, PlayerCrafting crafting, IContentTeachers teachers, IHavenView settlement)
     {
         if (report == null || crafting == null || settlement == null)
         {
@@ -101,7 +101,7 @@ public static class HavenAnswers
         report.Mender = report.EquipmentDamaged.Count > 0 ? Mender(teachers, settlement) : null;
     }
 
-    private static void AddUnused(RaidReport report, Object what, int amount, PlayerCrafting crafting, IContentTeachers teachers, SettlementState settlement)
+    private static void AddUnused(RaidReport report, Object what, int amount, PlayerCrafting crafting, IContentTeachers teachers, IHavenView settlement)
     {
         List<HavenAnswer> answers = WhoCouldUse(what, crafting, teachers, settlement, out bool unusable);
         if (unusable)
@@ -115,7 +115,7 @@ public static class HavenAnswers
     /// first. Usable: something to eat, wear or read; or a known recipe at a known workplace takes it; or a known building costs
     /// it. A find no recipe or building in the game takes (a trophy, a valuable) is never unusable: there is nobody to ask.
     /// </summary>
-    public static List<HavenAnswer> WhoCouldUse(Object what, PlayerCrafting crafting, IContentTeachers teachers, SettlementState settlement, out bool unusable)
+    public static List<HavenAnswer> WhoCouldUse(Object what, PlayerCrafting crafting, IContentTeachers teachers, IHavenView settlement, out bool unusable)
     {
         var answers = new List<HavenAnswer>();
         unusable = false;
@@ -195,7 +195,7 @@ public static class HavenAnswers
     /// What would have carried a load left behind: the first carrier (an item that is a Transport) the player can make, or
     /// else who would teach the cheapest one. Null when the game has no carrier to make.
     /// </summary>
-    public static HavenAnswer CarrierFor(PlayerCrafting crafting, IContentTeachers teachers, SettlementState settlement)
+    public static HavenAnswer CarrierFor(PlayerCrafting crafting, IContentTeachers teachers, IHavenView settlement)
     {
         RecipeDefinition cheapest = null;
         foreach (RecipeDefinition recipe in crafting.Recipes.Where(r => r != null && r.Output != null && r.Output.Transport != null).OrderBy(r => r.Tier).ThenBy(r => r.SortOrder))
@@ -231,7 +231,7 @@ public static class HavenAnswers
     }
 
     /// <summary>Who would mend gear for less (a job with a Gear Repair Discount), while nobody at home works it. Null otherwise.</summary>
-    public static HavenAnswer Mender(IContentTeachers teachers, SettlementState settlement)
+    public static HavenAnswer Mender(IContentTeachers teachers, IHavenView settlement)
     {
         if (teachers == null || settlement == null || settlement.JobBonus(job => job.GearRepairDiscount) > 0f)
         {
@@ -251,7 +251,7 @@ public static class HavenAnswers
     }
 
     // Someone (a job that teaches it) or something (a plan) for each way to learn the building or recipe; a person once.
-    private static void AddTeachers(List<HavenAnswer> answers, IContentTeachers teachers, SettlementState settlement, BuildingDefinition building, RecipeDefinition recipe)
+    private static void AddTeachers(List<HavenAnswer> answers, IContentTeachers teachers, IHavenView settlement, BuildingDefinition building, RecipeDefinition recipe)
     {
         if (teachers == null)
         {
@@ -305,11 +305,11 @@ public static class HavenAnswers
 
     // A building the player has: one they can build from the menu, or one standing at home (an old one no longer in the menu
     // still works where it stands). A plan for a building that left the menu (the old Furnace) is no use.
-    private static bool Available(BuildingDefinition building, PlayerCrafting crafting, SettlementState settlement) =>
+    private static bool Available(BuildingDefinition building, PlayerCrafting crafting, IHavenView settlement) =>
         (building.ShowInBuildMenu && crafting.IsKnown(building)) || settlement.BuiltTier(building) > 0;
 
     // A station with no building of its own (the portal) is always there.
-    private static bool StationKnown(CraftingStationType station, PlayerCrafting crafting, SettlementState settlement)
+    private static bool StationKnown(CraftingStationType station, PlayerCrafting crafting, IHavenView settlement)
     {
         if (station == CraftingStationType.None)
         {
