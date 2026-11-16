@@ -7,10 +7,13 @@ a faint warm tone when Haven is named; a faint unsettling sound as it fades into
   Misty Woods Drone    a seamless 24 s loop: a sub hum that beats slowly against itself, a low bowed fifth that never
                        settles, and far wind in the canopy. Under every shot.
   Misty Woods Unease   15 s: low strings closing into a cluster (a semitone, then a tritone), a tremolo that quickens,
-                       glassy high harmonics rubbing a semitone apart, a rumble rising under it. The corruption shot.
+                       a rumble rising under it. The corruption shot.
   Misty Woods Warmth   12 s: a soft major chord of bowed strings far off, slow to come in. "Return to Haven".
-  Misty Woods Arrival  6 s, mono (the game places it at the player): a slow breath through the trees, a far creak,
-                       and a thin tone sliding down. As the picture comes up in the raid.
+  Misty Woods Arrival  6 s, mono (the game places it at the player): a slow breath through the trees and a far creak.
+                       As the picture comes up in the raid.
+
+No pure high tones (2026-11-16): the glassy harmonics over Unease, the halo over Warmth and the thin tone sliding down in
+Arrival sounded like a wavy whistle or flute to the user ("that one sounds really weird") and are gone.
 
 Run from the project root: python Tools/Audio/misty_woods_cinematic.py
 """
@@ -81,11 +84,8 @@ def unease(rng):
     # The tremolo quickens as it grows: a second, faster shiver laid in over the last half.
     shiver = 1 - 0.3 * np.clip((t - 6) / 5, 0, 1) * (0.5 + 0.5 * np.sin(TAU * (6 + 4 * np.clip((t - 6) / 6, 0, 1)) * t))
     low *= shiver
-    # Glass high above, two tones rubbing a semitone apart, barely there.
-    glass = (np.sin(TAU * 659.3 * t) + np.sin(TAU * 698.5 * t + 1.1)) * 0.5
-    glass *= np.clip((t - 3) / 7, 0, 1) ** 2 * np.clip((seconds - t) / 3, 0, 1) * (0.6 + 0.4 * np.sin(TAU * 0.3 * t))
     rumble = lowpass(pink(len(t), rng), 90) * np.clip(t / 11, 0, 1) ** 2 * np.clip((seconds - t) / 3, 0, 1)
-    dry = (0.7 * low / np.abs(low).max() + 0.14 * glass + 0.22 * rumble / np.abs(rumble).max()) * (0.2 + 0.8 * swell)
+    dry = (0.7 * low / np.abs(low).max() + 0.22 * rumble / np.abs(rumble).max()) * (0.2 + 0.8 * swell)
     return space(darken(dry), VALE, 0.35)
 
 
@@ -95,9 +95,7 @@ def warmth(rng):
     notes = [(146.8, 3.0), (185.0, 3.6), (220.0, 3.3), (293.7, 4.2)]
     out = sum(strings(f, seconds, rng, attack, 4.0) * (1.0 if f < 250 else 0.6) for f, attack in notes)
     out = lowpass(out, 1400)
-    t = times(seconds)
-    halo = (np.sin(TAU * 587.3 * t) + 0.5 * np.sin(TAU * 880.0 * t)) * np.clip((t - 2) / 4, 0, 1) ** 2 * np.clip((seconds - t) / 4, 0, 1)
-    return space(out / np.abs(out).max() + 0.05 * halo, VALE, 0.45)
+    return space(out / np.abs(out).max(), VALE, 0.45)
 
 
 def arrival(rng):
@@ -108,12 +106,9 @@ def arrival(rng):
     # Something far off: a wooden creak, low and stretched.
     creak = strings(55.0, 1.8, rng, 0.4, 0.8)
     creak = band(creak, 180, 1400) * 0.6
-    # A thin tone that slides down and away.
-    glide = np.sin(TAU * np.cumsum(880 * 2 ** (-0.6 * t / seconds)) / RATE) * bump(t, 1.2, 1.0, 1.6) * 0.18
     out = blank(seconds)
     out[:] += breath / np.abs(breath).max() * 0.7
     place(out, creak, 2.6, 0.5)
-    out += glide
     return space(darken(out), FOREST, 0.4)
 
 

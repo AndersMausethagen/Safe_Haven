@@ -3,8 +3,9 @@ wind, birds, creaks, footsteps and the ward's moments are the game's own; these 
 
   Opening Stone Hum     a seamless 16 s loop: the stone's low hum, two close tones beating slowly, a soft overtone.
                         Under the fire and the ward ("A low stone hum begins beneath it").
-  Opening Stone Pulse   3 s: the hum swells once and a faint ringing overtone answers. The rune's ring of light, the
-                        stone answering the log ("The stone answers with a gentle pulse").
+  Opening Stone Pulse   3 s: the hum swells once. The rune's ring of light, the stone answering the log ("The stone
+                        answers with a gentle pulse"). No ringing overtone: its pure high tones sounded like a wavy
+                        whistle or flute (the user, 2026-11-16). No pure tone above the hum's own in any of these.
   Opening Hum Fades     10 s: the hum pulsing slower and slower until it is gone ("The stone hum slows to silence").
   Opening Ember Hiss    1.6 s: the last ember going out, a small hiss and a tick ("A small hiss from the ember").
   Opening Lantern Out   0.8 s: a lantern blown out, a soft puff and a tiny tick of metal ("Lanterns go out").
@@ -52,8 +53,7 @@ def stone_pulse(rng):
     seconds = 3.0
     t = times(seconds)
     body = hum_tone(t, rng, 0.6) * bump(t, 0.05, 0.6, 0.9)
-    ring_ = (np.sin(TAU * HUM * 6 * t) + 0.5 * np.sin(TAU * HUM * 8.01 * t)) * bump(t, 0.25, 0.35, 0.8) * 0.12
-    return space(darken(body + ring_), VALE, 0.4)
+    return space(darken(body), VALE, 0.4)
 
 
 def hum_fades(rng):
