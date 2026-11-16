@@ -188,6 +188,28 @@ public sealed class ConventionTests
         CollectionAssert.IsEmpty(raw, "these hand out a -1 placeholder as a number: give a nullable (float? Own...) or the resolved value");
     }
 
+    // Guard 7 of Docs/BugPatterns.md: a player's blow from the shadows (a sure critical, Ambush Damage) is worked out in PlayerBlows for
+    // every way it lands, so no path forgets one (thrown weapons had neither; the takedown estimate left out Ambush Damage).
+    [Test]
+    public void BlowsFromTheShadows_AreWorkedOutInPlayerBlows()
+    {
+        var direct = new List<string>();
+        foreach ((string path, string source) in RuntimeScripts())
+        {
+            if (path.EndsWith("/PlayerBlows.cs") || path.EndsWith("/PlayerProficiencies.cs"))
+            {
+                continue;
+            }
+
+            if (Regex.IsMatch(source, @"PlayerProficiencies\.(?:CaughtUnaware|AmbushScale)\s*\("))
+            {
+                direct.Add(Path.GetFileNameWithoutExtension(path));
+            }
+        }
+
+        CollectionAssert.IsEmpty(direct, "ask PlayerBlows (FromTheShadows, CatchesUnaware, UnawareBlowWorth) instead");
+    }
+
     [Test]
     public void EveryStaticEventSubscription_IsUndone()
     {

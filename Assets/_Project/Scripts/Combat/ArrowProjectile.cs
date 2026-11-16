@@ -268,7 +268,7 @@ public sealed class ArrowProjectile : MonoBehaviour
 
             // A perfect release, or a sneak attack (always a critical, as with a blade).
             Vector3 shotFrom = hit.point - direction * 2f;
-            bool sure = critical || PlayerProficiencies.CaughtUnaware(victim, shotFrom);
+            bool sure = PlayerBlows.FromTheShadows(owner, victim, shotFrom, critical, out float ambush);
             DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, sure ? DamageCalculator.SureCrit : Random.value);
             if (technique != HitTechnique.None || sure)
             {
@@ -276,7 +276,7 @@ public sealed class ArrowProjectile : MonoBehaviour
             }
 
             info = info.WithAmount(info.Amount * CombatFeelSettings.HighGroundFor(owner.transform.position, victim is Component struck ? struck.transform.position : hit.point)
-                * PlayerProficiencies.AmbushScale(owner.Stats, victim, shotFrom));
+                * ambush);
 
             DamageResult result = victim.ApplyDamage(info);
             owner.ReportDamageDealt(victim, info, result);

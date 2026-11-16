@@ -112,12 +112,12 @@ public sealed class MonsterProjectile : MonoBehaviour
     private DamageInfo CastBlow(IDamageable victim, RaycastHit hit)
     {
         Vector3 from = hit.point - direction * 2f;
-        bool sure = volley.Critical || PlayerProficiencies.CaughtUnaware(victim, from);
+        bool sure = PlayerBlows.FromTheShadows(owner, victim, from, volley.Critical, out float ambush);
         DamageInfo info = DamageCalculator.Build(owner, attack, damage, victim.Category, hit.point, direction, sure ? DamageCalculator.SureCrit : Random.value);
         info = info.Scaled(1f, volley.Poise, volley.Technique, sure && attack.CanCrit);
         float again = volley.Struck.Add(victim) ? 1f : volley.RepeatShare;
         float spell = Mathf.Max(0f, 1f + owner.Stats.Get(StatType.SpellDamage));
-        return info.WithAmount(info.Amount * volley.Multiplier * again * spell * PlayerProficiencies.AmbushScale(owner.Stats, victim, from));
+        return info.WithAmount(info.Amount * volley.Multiplier * again * spell * ambush);
     }
 }
 

@@ -68,7 +68,7 @@ public sealed class ArcheryTargetOutline : MonoBehaviour
         {
             OutlineCopies.SetShown(entries, shown.IsAlive);
             // Still unaware: a shot now is an ambush (Docs/RangedStealthResearch.md §3.2).
-            bool ambush = PlayerProficiencies.CaughtUnaware(shown, transform.position);
+            bool ambush = PlayerBlows.CatchesUnaware(shown, transform.position);
             if (ambush != shownAmbush || target != null)
             {
                 shownAmbush = ambush;

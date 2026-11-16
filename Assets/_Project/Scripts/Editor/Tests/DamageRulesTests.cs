@@ -158,6 +158,21 @@ public sealed class DamageRulesTests
         Object.DestroyImmediate(effects);
     }
 
+    // Guard 7: Silent Takedown's two estimates (the focus ring before, the blow as it lands) are one rule, and it counts what being
+    // caught unaware adds, as the blow is judged when it lands (one read the creature's last Damage Taken, often 1).
+    [Test]
+    public void ABlowFromTheShadows_IsWorthWhatItDoesAsItLands()
+    {
+        Combatant player = Fighter("Player", Faction.Player);
+        Damageable victim = Victim(100f, 0f);
+        float outgoing = DamageCalculator.CalculateOutgoing(player.Stats, player.Rules, Slash, 20f, victim.Category, 1f, out _);
+        float expected = DamageCalculator.Mitigate(outgoing * 1.5f, Slash.DamageType, StrikeKindExtensions.Of(player, Slash), victim.GetComponent<Combatant>().Stats, victim.GetComponent<Combatant>().Rules)
+            * PerceptionSettings.Current.AmbushDamageTaken;
+
+        Assert.Greater(PerceptionSettings.Current.AmbushDamageTaken, 1f, "being caught unaware adds");
+        Assert.AreEqual(expected, PlayerBlows.UnawareBlowWorth(player, victim, Slash, 20f, 1.5f), 1e-3f);
+    }
+
     // ----- What a dodge escapes -----
 
     // Review 2026-11-16: a bog troll's drag and a shield rush pulled a player who dodged through them.

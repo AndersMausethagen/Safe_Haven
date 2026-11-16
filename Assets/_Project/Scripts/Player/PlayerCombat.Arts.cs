@@ -197,16 +197,15 @@ public sealed partial class PlayerCombat
     {
         if (body == null || weapon == null || weapon.Combo.Count == 0 || weapon.Combo[0] == null || !Techniques.Has(PerkTechnique.SilentTakedown)
             || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnawareOf(transform.position)
-            || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null || !body.TryGetComponent(out Combatant theirs))
+            || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null)
         {
             return false;
         }
 
+        // The first swing as SilentTakedown judges it as it lands (with the Melee skill and Ambush Damage): one rule for both.
         AttackDefinition attack = weapon.Combo[0];
-        float outgoing = DamageCalculator.CalculateOutgoing(combatant.Stats, combatant.Rules, attack, weapon.Damage, body.Category, 1f, out _)
-            * Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage));
-        float blow = DamageCalculator.Mitigate(outgoing, attack.DamageType, StrikeKindExtensions.Of(combatant, attack), theirs.Stats, theirs.Rules)
-            * PerceptionSettings.Current.AmbushDamageTaken;
+        PlayerBlows.FromTheShadows(combatant, body, transform.position, false, out float ambush);
+        float blow = PlayerBlows.UnawareBlowWorth(combatant, body, attack, weapon.Damage, Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * ambush);
         return StrikeRules.IsTakedown(body.CurrentHealth, blow, TechniqueSettings.Current.TakedownReach);
     }
 

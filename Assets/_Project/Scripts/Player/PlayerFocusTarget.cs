@@ -196,7 +196,7 @@ public sealed class PlayerFocusTarget : MonoBehaviour
         }
 
         Color color = feel.FocusMarkerColor;
-        if (target.TryGetComponent(out MonsterAI quarry) && PlayerProficiencies.CaughtUnaware(target, transform.position))
+        if (target.TryGetComponent(out MonsterAI quarry) && PlayerBlows.CatchesUnaware(target, transform.position))
         {
             // Docs/RangedStealthResearch.md §3.2: still unaware, a blow now is an ambush; brighter when it would finish it.
             PerceptionSettings rules = PerceptionSettings.Current;

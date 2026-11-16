@@ -292,15 +292,14 @@ public sealed partial class PlayerCombat
     {
         if (!(target is Damageable body) || !body.TryGetComponent(out MonsterAI monster) || !monster.IsUnawareOf(transform.position)
             || body.GetComponent<EliteCreature>() != null || body.GetComponentInParent<BossEncounter>() != null
-            || !Techniques.Has(PerkTechnique.SilentTakedown) || !body.TryGetComponent(out Combatant theirs))
+            || !Techniques.Has(PerkTechnique.SilentTakedown))
         {
             return damage;
         }
 
-        // What this blow is worth against this creature: as it leaves the hand (no lucky critical counted), then through the
-        // creature's own defenses and what being caught unaware adds.
-        float outgoing = DamageCalculator.CalculateOutgoing(combatant.Stats, combatant.Rules, pending.Attack, pending.WeaponDamage, target.Category, 1f, out _) * damage;
-        float blow = DamageCalculator.Mitigate(outgoing, pending.Attack.DamageType, StrikeKindExtensions.Of(combatant, pending.Attack), theirs.Stats, theirs.Rules) * body.DamageTakenMultiplier;
+        // What this blow is worth against this creature, as the focus ring's estimate (WouldTakedown) works it out too: the one rule.
+        // It read the creature's last Damage Taken before (often 1), not what being caught unaware adds as the blow lands.
+        float blow = PlayerBlows.UnawareBlowWorth(combatant, body, pending.Attack, pending.WeaponDamage, damage);
         if (!StrikeRules.IsTakedown(body.CurrentHealth, blow, TechniqueSettings.Current.TakedownReach))
         {
             return damage;
@@ -659,8 +658,8 @@ public sealed partial class PlayerCombat
         float damage = pending.Damage;
         float poise = pending.Poise;
         HitTechnique technique = pending.Technique;
-        // A sneak attack is always a critical.
-        bool critical = pending.Critical || PlayerProficiencies.CaughtUnaware(target, transform.position);
+        // A sneak attack is always a critical, and Ambush Damage adds to it (PlayerBlows: as every way a player's blow lands).
+        bool critical = PlayerBlows.FromTheShadows(combatant, target, transform.position, pending.Critical, out float ambush);
         bool backstab = IsBackstab(target, out MonsterAI backstabbed);
         if (backstab)
         {
@@ -673,7 +672,7 @@ public sealed partial class PlayerCombat
 
         // The Melee skill scales every swing alike, before nothing else changes, so the order of blows (plain, backstab,
         // counter) holds at every level; a perk can add to a blow from the shadows.
-        damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * PlayerProficiencies.AmbushScale(combatant.Stats, target, transform.position);
+        damage *= Mathf.Max(0f, 1f + combatant.Stats.Get(StatType.MeleeDamage)) * ambush;
         // From the saddle: Horsemanship's Mounted Damage, and the gallop's weight behind it.
         float mounted = PlayerRiding.MountedScale(gameObject);
         damage *= mounted;
