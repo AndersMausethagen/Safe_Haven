@@ -135,8 +135,8 @@ Sound: Fire crackle joins the morning ambience. Cut directly into gameplay.
 
 2026-11-16. Checked in Play from captured frames of every shot (not watched in motion, not heard).
 
-- **Length:** 1:45 (target 1:35). The narration is 62 s; the portal's voice speaks briskly (about 190 words a minute), so
-  the quiet comes from the pauses between lines, which were cut by a third to get here. Shots run 6 to 14 s.
+- **Length:** 2:06 (target 1:35). The narration is 62 s; the portal's voice speaks briskly (about 190 words a minute), so
+  the quiet comes from the pauses between lines. It was 1:45 until the violin was given room (below).
 - **Voice:** your lines word for word, one clip a sentence, in the portal's own voice (Qwen3-TTS, `portal_g_mysterious`, as
   its dialogue at home), best of three takes each (all 78 takes said their words). `Tools/Audio/opening_voice.py`.
 - **Paintings:** LocalSpawn's Safe Haven styles, as the other cinematics (`Tools/LocalSpawn/generate_backstory.py`).
@@ -167,7 +167,14 @@ Sound: Fire crackle joins the morning ambience. Cut directly into gameplay.
   along), then the prologue opens on the same view. A straight cut would need the loading screen to stay behind the
   cinematic's black; not done.
 - **Music:** as the opening had it: Nightsong under 1 to 4, silence at 5, Eerie raid (quieter) under 6 to 9, Nightsong
-  from 10.
+  from 10. **The violin between the lines** (the user: "start the music from the game in the beginning. I really like that
+  violin sound that comes in between the dialogue. try and time it with that"): Nightsong's first 22 s are a near-silent
+  build, so it now starts 21.35 s in, from the first second, and its first violin phrase enters as the fire catches. A
+  phrase enters every 6 to 9 s; where (seconds of the track, the 500-3000 Hz share of its harmonic part): 23.15, 31.14,
+  38.77, 45.42, 54.43, 61.61, 68.23, 76.28, 85.14. Every line's pause is set so that nothing is said from 0.25 s before an
+  entry until 1.6 s into it; a line may run on over a phrase's tail, where the music dips under the voice. The second
+  Nightsong starts 61 s in, so a phrase enters 0.6 s after the cut to the morning fire. `CinematicTests.TheBackstory_
+  LeavesRoomForNightsongsViolin` keeps it so when a line is spoken again.
 - **Made sounds:** stone hum, its pulse, the hum slowing to silence, the ember's hiss, a lantern going out, the shadow
   (`Tools/Audio/opening_cinematic.py`). The fire, wind, birds, creaks and footsteps are the game's own.
 - **How it was put together:** the asset (`Data/Cinematics/Backstory.asset`) was written once by a one-off script from

@@ -223,7 +223,7 @@ public sealed class CinematicTests
             Assert.That(line.Line.subtitle.Length, Is.LessThanOrEqualTo(95), "one sentence a subtitle: " + line.Line.subtitle);
         }
 
-        Assert.That(timeline.Seconds, Is.InRange(80f, 125f), "about a minute and a half (the script's target is 1:35)");
+        Assert.That(timeline.Seconds, Is.InRange(95f, 140f), "about two minutes: the script's 1:35, and room for the violin between lines");
         Assert.AreEqual("A fire is a small thing, little one.", timeline.Lines[0].Line.subtitle);
     }
 
@@ -250,6 +250,38 @@ public sealed class CinematicTests
                 }
             }
         }
+    }
+
+    // Where a phrase of Nightsong's violin enters, in seconds of the track (measured: Docs/BackstoryCinematic.md, As built).
+    private static readonly float[] NightsongViolin = { 23.15f, 31.14f, 38.77f, 45.42f, 54.43f, 61.61f, 68.23f, 76.28f, 85.14f };
+
+    // The violin comes in between the lines, never under one (the user, 2026-11-16: "I really like that violin sound that comes
+    // in between the dialogue. try and time it with that"). A line spoken again at another length must keep it so.
+    [Test]
+    public void TheBackstory_LeavesRoomForNightsongsViolin()
+    {
+        CinematicDefinition backstory = Backstory;
+        var timeline = new CinematicTimeline(backstory);
+        int heard = 0;
+        foreach (CinematicMusic cue in backstory.Music.Where(cue => cue.clip != null && cue.clip.name.Contains("Nightsong")))
+        {
+            foreach (float entry in NightsongViolin.Where(entry => entry >= cue.startAt))
+            {
+                float at = timeline.MusicStart(cue) + entry - cue.startAt;
+                if (at > timeline.MusicEnd(cue))
+                {
+                    continue;
+                }
+
+                heard++;
+                foreach (CinematicTimeline.SpokenLine line in timeline.Lines)
+                {
+                    Assert.IsFalse(line.Start < at + 1.5f && line.End > at - 0.2f, $"\"{line.Line.subtitle}\" is said as the violin comes in at {at:0.0} s");
+                }
+            }
+        }
+
+        Assert.GreaterOrEqual(heard, 6, "the violin comes in under the warm shots and the morning");
     }
 
     [Test]
