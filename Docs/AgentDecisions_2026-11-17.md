@@ -59,3 +59,5 @@ Each entry says what I did and why, and what to check.
   charges**, Q7 **an endgame ladder**: design changes I'd like your yes on. My leanings: Q4 no for now, Q5 yes, Q6 yes, Q7 after the
   slice playtest.
 - K3 (the strength-limit test counting every meal/tonic slot) is a tuning job that may cut meal numbers: queued.
+- **Q5, a first step done:** breaking down an empowered piece now gives back **a quarter of the Purified Essence** its levels cost
+  (the salvage text says so). Full reforging onto the next tier's piece is still yours to approve.

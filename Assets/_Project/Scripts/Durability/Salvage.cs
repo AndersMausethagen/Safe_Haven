@@ -72,7 +72,7 @@ public static class Salvage
 
         if (stack.Empower > 0)
         {
-            lost.Add($"+{stack.Empower}");
+            lost.Add($"+{stack.Empower} (a quarter of its essence comes back)");
         }
 
         return lost.Count == 0 ? null : string.Join(", ", lost);
@@ -105,6 +105,16 @@ public static class Salvage
             got.Add(part);
         }
 
+        // A quarter of the essence put into its empowering comes back (Docs/SystemDesignReview_2026-11-17.md K9): empowering a piece
+        // that will be outgrown was a pure loss, so essence had no pull until the last tier.
+        int refund = EmpowerRefund(stack, count);
+        ResourceDefinition purified = SettlementSettings.Current != null ? SettlementSettings.Current.PurifiedEssence : null;
+        if (refund > 0 && purified != null && player != null)
+        {
+            MaterialPool.For(player).Add(purified, refund);
+            GameMessages.Post($"{refund} {purified.DisplayName} drawn back out of its empowering.", MessageKind.Gain);
+        }
+
         string what = count > 1 ? $"{count} {stack.Item.DisplayName}" : stack.Item.DisplayName;
         GameMessages.Post($"Broke down {what}: {AmountText.Describe(got)}.", MessageKind.Gain);
         if (fell)
@@ -113,6 +123,27 @@ public static class Salvage
         }
 
         return true;
+    }
+
+    /// <summary>The share of an empowering's essence that breaking a piece down gives back.</summary>
+    public const float EmpowerRefundShare = 0.25f;
+
+    /// <summary>Purified Essence back from breaking <paramref name="count"/> of an empowered piece down: a share of what its levels cost.</summary>
+    public static int EmpowerRefund(ItemStack stack, int count)
+    {
+        EssenceSettings settings = EssenceSettings.Current;
+        if (stack.Item == null || stack.Empower <= 0 || settings == null)
+        {
+            return 0;
+        }
+
+        int spent = 0;
+        for (int level = 1; level <= stack.Empower && level <= settings.EmpowerLevels.Count; level++)
+        {
+            spent += settings.EmpowerLevels[level - 1].purified + (stack.Item.Tier - 1) * settings.PurifiedPerTier;
+        }
+
+        return Mathf.FloorToInt(spent * EmpowerRefundShare * Mathf.Max(1, count));
     }
 
     private static bool IsGear(ItemDefinition item) => item.Category == ItemCategory.Equipment || item.Category == ItemCategory.Tool;
