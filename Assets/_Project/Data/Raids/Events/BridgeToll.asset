@@ -40,7 +40,7 @@ MonoBehaviour:
     cost:
     - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
       amount: 3
-    result: It crunches them thoughtfully and points out every way through the woods.
+    result: It crunches them thoughtfully and points out every way up the valley.
     outcomes:
     - rid: 287758281410609273
     - rid: 287758281410609274

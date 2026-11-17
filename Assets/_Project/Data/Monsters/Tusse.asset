@@ -15,7 +15,7 @@ MonoBehaviour:
   id: Tusse
   displayName: Tusse
   description: One of the small hidden folk. It takes what is not held tight, and runs.
-  combatStats: {fileID: 11400000, guid: f42ebc920fa44714a89c73ce2d7cb640, type: 2}
+  combatStats: {fileID: 11400000, guid: 90bf3c5751d429f4b88ead03aee8d344, type: 2}
   faction: 1
   lootTable: {fileID: 11400000, guid: d2eef8910dfdac2498cc33629d96094d, type: 2}
   drops:

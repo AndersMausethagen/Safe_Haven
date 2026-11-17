@@ -69,3 +69,22 @@ MonoBehaviour:
     - A warning on the ground fills as a blow winds up. When it is full, the blow lands.
     - Roll through a blow at the last moment and you are owed a counter.
     - 'Talk to a companion to give them orders: follow, stay, defend or fall back.'
+  - scene: Raid_MossMarsh
+    art: {fileID: 0}
+    tips:
+    - Whatever you carry out of a raid is yours. Whatever you carry when it collapses is not.
+    - Your safe pocket keeps what's in it, even when a raid goes wrong.
+    - 'The fen is mostly water. Keep to the strings of firm peat, or wade: wading is faster, and louder.'
+    - Black water hides its depth. What lives in it hears you coming.
+    - The fen keeps its dead whole. What falls in the peat may stand up again.
+    - Peat cutters left their boxes on the moor. Drowned hoards lie deeper.
+    - Bog trolls live in the meres. They spit, and they shove you into the water.
+    - An exit has to be lit, then held. Light one with time to spare.
+  - scene: Encounter_BrukamsBridge
+    art: {fileID: 21300000, guid: de7ec80d00a4d5f49a908925d1de0e06, type: 3}
+    tips:
+    - 'Beyond the mist there is no way back but through. Come ready: eat, bring tonics, mend your gear.'
+    - The Brukam's club sweeps the whole width of the bridge. Step back, or under it.
+    - When the bridge starts to crack, get off the stones that shake.
+    - 'A fall into the gorge doesn''t kill: the river throws you up on the far bank, hurt.'
+    - Wait too long and he stops playing. The fight has a clock.

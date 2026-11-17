@@ -117,7 +117,7 @@ MonoBehaviour:
     chance: 25
     lootMultiplier: 1.15
     enemyDensity: 1.15
-    briefing: The mist starts to dance over the pools. A pale horse grazes on the shore, where no horse should be.
+    briefing: The mist starts to dance over the pools and the dead stir in the peat. A rider in rotten mail walks the far bank.
     skyCover: 0.4
   - name: Night
     hour: 23.5

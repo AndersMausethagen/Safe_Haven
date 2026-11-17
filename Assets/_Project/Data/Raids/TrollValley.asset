@@ -79,7 +79,7 @@ MonoBehaviour:
     enemyDensity: 1.3
     loot: 1.5
     dropsUpToTier: 0
-    briefing: 'Stone trolls stand on the bridges and the hoards hold moonsilver. Some of the stones on the slopes are not stones. Past the valley''s head the Brukam sits on his own bridge: the portal knows the way.'
+    briefing: 'Toll-takers wait at the bridges, stone trolls hold the lairs, and the hoards hold moonsilver. Some of the stones on the slopes are not stones. Past the valley''s head the Brukam sits on his own bridge: the portal knows the way.'
     eliteCount: {x: 2, y: 3}
     eliteAffixes: 1
     hunterEliteChance: 0.15
