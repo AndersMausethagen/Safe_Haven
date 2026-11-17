@@ -57,6 +57,7 @@ public sealed class Player : MonoBehaviour
         PlayerTechniques.AddTo(gameObject);
         PlayerWarmth.AddTo(gameObject);
         CarriedGrime.AddTo(gameObject); // blood and mud from a fight, washed off by rain and water
+        PlayerGlow.AddTo(gameObject); // a soft light round them in the dark
         if (Current != null && Current != this)
         {
             Debug.LogWarning($"A second player ({name}) appeared; the newest one is used.", this);

@@ -27,6 +27,10 @@ Shader "Hidden/Safe Haven/Atmosphere"
         float4 _FogParams1;
         // max distance, steps, clearing
         float4 _FogParams2;
+        // The player (xyz) and how much of the fog between the camera and them is cleared (w): the column the camera looks down.
+        float4 _FogViewClear;
+        // That column's radius in metres at the player.
+        float _FogViewClearRadius;
         // follow terrain, 1 / bank size, bank strength, bank speed
         float4 _FogParams3;
         float4 _FogAlbedo;
@@ -362,6 +366,26 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 return 1.0 - saturate(clearing);
             }
 
+            // Thinner fog in the column from the camera down to the player (the user, 2026-11-17: "make the fog thinner from the camera
+            // down to the player"): full near the line between them, fading out at its radius and just past the player, so the fog
+            // beyond and around them stays.
+            float ViewColumnRemaining(float3 p)
+            {
+                if (_FogViewClear.w <= 0.0)
+                {
+                    return 1.0;
+                }
+
+                float3 a = _WorldSpaceCameraPos;
+                float3 ab = _FogViewClear.xyz - a;
+                float along = dot(p - a, ab) / max(dot(ab, ab), 1e-4);
+                float t = saturate(along);
+                float radius = _FogViewClearRadius * lerp(0.6, 1.0, t);
+                float inside = 1.0 - smoothstep(radius * 0.45, radius, distance(p, a + ab * t));
+                inside *= 1.0 - smoothstep(1.0, 1.12, along);
+                return 1.0 - inside * _FogViewClear.w;
+            }
+
             struct MarchOutput
             {
                 float4 fog : SV_Target0;
@@ -417,7 +441,7 @@ Shader "Hidden/Safe Haven/Atmosphere"
                 #else
                     shaftDensity = 0.0;
                 #endif
-                    float remaining = LightFogRemaining(p);
+                    float remaining = LightFogRemaining(p) * ViewColumnRemaining(p);
                     fogDensity *= remaining;
                     mistDensity *= remaining;
                     mistTintDensity *= remaining;

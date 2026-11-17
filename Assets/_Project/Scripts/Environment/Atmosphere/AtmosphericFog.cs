@@ -65,6 +65,10 @@ public sealed class AtmosphericFog : VolumeComponent
     public ClampedFloatParameter weatherInfluence = new ClampedFloatParameter(0.5f, 0f, 1f);
     [Tooltip("How much a visibility source (the player, a torch, the portal) clears the fog inside its radius.")]
     public ClampedFloatParameter clearing = new ClampedFloatParameter(0.5f, 0f, 1f);
+    [Tooltip("How much of the fog between the camera and the player is cleared, so the player is seen through it from above (0: none).")]
+    public ClampedFloatParameter viewClearing = new ClampedFloatParameter(0.6f, 0f, 1f);
+    [Tooltip("Radius in metres of that clear column at the player; it narrows towards the camera.")]
+    public ClampedFloatParameter viewClearingRadius = new ClampedFloatParameter(4f, 0.5f, 15f);
     [Tooltip("Fog is gathered up to this distance from the camera.")]
     public ClampedFloatParameter maxDistance = new ClampedFloatParameter(90f, 10f, 400f);
     [Tooltip("Samples along each view ray. More is smoother and slower.")]

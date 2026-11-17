@@ -113,6 +113,8 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
         private static readonly int LightPositions = Shader.PropertyToID("_FogLightPositions");
         private static readonly int LightColors = Shader.PropertyToID("_FogLightColors");
         private static readonly int LightClearings = Shader.PropertyToID("_FogLightClearings");
+        private static readonly int FogViewClear = Shader.PropertyToID("_FogViewClear");
+        private static readonly int FogViewClearRadius = Shader.PropertyToID("_FogViewClearRadius");
         private static readonly int SourceCount = Shader.PropertyToID("_SourceCount");
         private static readonly int Sources = Shader.PropertyToID("_Sources");
         private static readonly int WarParams = Shader.PropertyToID("_WarParams");
@@ -424,6 +426,12 @@ public sealed class AtmosphereFeature : ScriptableRendererFeature
                 material.SetVector(FogParams0, new Vector4(fog.density.value * weather, fog.baseHeight.value, fog.heightFalloff.value, fog.anisotropy.value));
                 material.SetVector(FogParams1, new Vector4(fog.mainLight.value, fog.localLights.value, 1f / fog.noiseSize.value, fog.noiseStrength.value));
                 material.SetVector(FogParams2, new Vector4(fog.maxDistance.value, fog.steps.value, fog.clearing.value, 0f));
+                // The column from the camera down to the player, thinned (its chest, so the head and shoulders are clear).
+                Player viewed = Player.Current;
+                material.SetVector(FogViewClear, viewed != null
+                    ? new Vector4(viewed.transform.position.x, viewed.transform.position.y + 1.2f, viewed.transform.position.z, fog.viewClearing.value)
+                    : Vector4.zero);
+                material.SetFloat(FogViewClearRadius, fog.viewClearingRadius.value);
                 material.SetColor(FogAlbedo, fog.albedo.value.linear);
                 material.SetColor(FogAmbient, fog.ambient.value.linear);
                 Vector3 wind = fog.wind.value;
