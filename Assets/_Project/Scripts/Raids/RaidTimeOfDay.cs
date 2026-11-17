@@ -23,6 +23,10 @@ public sealed class RaidTimeOfDay
     [Min(0f)] public float enemyDensity = 1f;
     [Tooltip("One line for the briefing: what this hour means.")]
     [TextArea(1, 3)] public string briefing;
+    [Tooltip("How strongly what stands above (trees, rocks) darkens the ground at this hour: the sky-occlusion strength, 0 to 1 " +
+             "(Docs/LightingBakeResearch_2026-11-17.md §3: a dense wood more, an open valley less, the night less so the player stays " +
+             "readable). Below 0: Rendering Settings › Sky Occlusion In Raids.")]
+    [Range(-1f, 1f)] public float skyCover = -1f;
 
     public string DisplayName => string.IsNullOrWhiteSpace(name) ? $"{hour:00}:00" : name;
 

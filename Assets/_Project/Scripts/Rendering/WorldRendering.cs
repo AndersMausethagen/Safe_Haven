@@ -81,7 +81,9 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         wear?.Clear();
         RaidDefinition raid = GameSession.ActiveRaid?.Definition;
         raidGrade.Apply(raid != null ? raid.Grade : null);
-        occlusion?.Bind(raid == null ? 1f : settings.SkyOcclusionInRaids);
+        // Each raid's hour may set its own (RaidTimeOfDay › Sky Cover); otherwise the one strength for all raids.
+        RaidTimeOfDay hour = GameSession.ActiveRaid?.TimeOfDay;
+        occlusion?.Bind(raid == null ? 1f : hour != null && hour.skyCover >= 0f ? hour.skyCover : settings.SkyOcclusionInRaids);
         clouds?.Bind(RenderSettings.sun, raid == null || settings.CloudShadowsInRaids);
     }
 }

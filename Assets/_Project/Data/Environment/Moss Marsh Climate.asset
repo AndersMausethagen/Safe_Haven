@@ -12,18 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93aed5630a14a93428884b5b30627bc2, type: 3}
   m_Name: Moss Marsh Climate
   m_EditorClassIdentifier: SafeHaven::ClimateDefinition
-  start: {fileID: 11400000, guid: cb567ca6e45752c4aacbce31380b4c62, type: 2}
+  start: {fileID: 11400000, guid: 35f32e067e081ca45a5e0cb589f54109, type: 2}
   weathers:
-  - weather: {fileID: 11400000, guid: e0d34ae6b84cac24dabac1b3cf40f064, type: 2}
+  - weather: {fileID: 11400000, guid: 35f32e067e081ca45a5e0cb589f54109, type: 2}
     chance: 4
+  - weather: {fileID: 11400000, guid: e0d34ae6b84cac24dabac1b3cf40f064, type: 2}
+    chance: 2
+  - weather: {fileID: 11400000, guid: 82389c433d3a4ad4ba7f2982ac41125f, type: 2}
+    chance: 2
   - weather: {fileID: 11400000, guid: 969adbc63df8d1b4c98c09617667326d, type: 2}
-    chance: 3
-  - weather: {fileID: 11400000, guid: cb567ca6e45752c4aacbce31380b4c62, type: 2}
-    chance: 3
+    chance: 1.5
   - weather: {fileID: 11400000, guid: c8c28c69e426dd0488a9a1ab8513b80a, type: 2}
-    chance: 0.8
+    chance: 1.2
+  - weather: {fileID: 11400000, guid: ac800fba89188184986f338827a9d29a, type: 2}
+    chance: 1
   - weather: {fileID: 11400000, guid: fb724509576cf1a4290415d1a7e0fdd3, type: 2}
     chance: 0.2
   transitionSeconds: 45
   soakSeconds: 75
-  drySeconds: 240
+  drySeconds: 1800

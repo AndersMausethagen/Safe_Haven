@@ -62,7 +62,8 @@ public sealed class LootTableTests
     public void EveryRaid_HasItsOwnRegionalAndEliteTables()
     {
         var regional = new HashSet<LootTable>();
-        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition"))
+        // Expeditions: a boss encounter's loot is its boss's (Brukam's Bridge), with no caches, elites or regional finds.
+        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition").Where(each => !each.IsEncounter))
         {
             Assert.IsNotNull(raid.RegionalLoot, $"{raid.name}: what only it holds");
             Assert.IsNotNull(raid.EliteLoot, $"{raid.name}: what its elites give");
@@ -137,7 +138,7 @@ public sealed class LootTableTests
     public void EveryRaid_HasCacheKindsOfItsOwn()
     {
         var kindsByRaid = new Dictionary<RaidDefinition, HashSet<LootTable>>();
-        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition"))
+        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition").Where(each => !each.IsEncounter))
         {
             kindsByRaid[raid] = new HashSet<LootTable>(raid.SpawnLists
                 .SelectMany(list => list.entries)

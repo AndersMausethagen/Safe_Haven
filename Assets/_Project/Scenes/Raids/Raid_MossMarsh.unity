@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.63350874, g: 0.63567567, b: 0.62304246, a: 0.67064416}
+  m_FogColor: {r: 0.58219033, g: 0.60341954, b: 0.5496346, a: 0.6591981}
   m_FogMode: 2
   m_FogDensity: 0
   m_LinearFogStart: 0
@@ -3283,13 +3283,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13b1172324ca34649930e22adcd62eef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::TerrainMist
-  density: 0.18
-  tint: {r: 0.8, g: 0.87, b: 0.94, a: 1}
+  density: 0.1
+  tint: {r: 0.62, g: 0.78, b: 0.5, a: 1}
   skyLight: 0.2
-  bottom: 0.05
-  thickness: 2.4
+  bottom: 0.02
+  thickness: 1.2
   cloudSize: 18
-  coverage: 0.78
+  coverage: 0.85
   erosion: 0.35
   flowStretch: 3.5
   wind: {x: 0.7, y: 0.25}
@@ -3299,9 +3299,9 @@ MonoBehaviour:
   waveSpeed: 0.9
   lowlandBoost: 1
   poolingDepth: 2
-  waterBoost: 1.2
+  waterBoost: 1.5
   edgeFade: 5
-  baseAmount: 0
+  baseAmount: 0.5
   weatherAmount: 1
   goldenHourAmount: 1
   morningAmount: 0

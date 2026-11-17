@@ -375,6 +375,9 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
     }
 
+    // How wet a fen's ground counts at the least for what grows on it (0 to 1).
+    private const float FenDamp = 0.75f;
+
     // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
     // the colour grass takes from the ground, and the surface shader's view of the new paint.
     private void Dress(int seed)
@@ -395,6 +398,12 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             System.Func<Vector3, bool> underTrees = blocked;
             blocked = point => underTrees(point) || plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
             wetness = point => plan.Wetness(new Vector2(point.x - origin.x, point.z - origin.z), rules.WetReach, rules.DampGround);
+            // A fen has no ponds to be wet from: its ground is damp everywhere (the user, 2026-11-17: "wet soil").
+            if (rules.Fen.enabled)
+            {
+                System.Func<Vector3, float> ponds = wetness;
+                wetness = point => Mathf.Max(ponds(point), FenDamp);
+            }
         }
 
         TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness);

@@ -8,6 +8,16 @@ Light Probe System = Light Probe Groups (`m_LightProbeSystem: 0`), SH bands L1, 
 blending and box projection off, atlas on, GPU Resident Drawer on with occlusion culling, static batching off for Standalone. No
 scene has baked lighting today (`m_LightingDataAsset` is the built-in default in `SafeHaven.unity` and `Raid_MistyWoods.unity`).
 
+## Decisions (the user, 2026-11-17)
+
+1. **Baked while the raid loads (our own field): yes**, "as long as it looks good".
+2. **The Misty Woods' floor at night: not too dark.** "If necessary, we should add a stronger moonlight during all dark hours: a
+   pale, white light."
+3. **Arenas: one fixed hour each.**
+4. **The Haven: sun bounce too** ("we should handle it"), as a toggle in the options if it can be one.
+5. **The terrain shader's texture limit:** "Double check that terrain shader. We adjusted that not long ago. If not, see if there is
+   anything we could do."
+
 ## Short answer
 
 - **Only the boss arenas can be baked the normal way.** A raid map does not exist until the loading screen builds it, so an

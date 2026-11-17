@@ -216,41 +216,41 @@ MonoBehaviour:
   paintResolution: 512
   smoothing: 1
   terrainMaterial: {fileID: 2100000, guid: b36ca3fc94252094cbe5b1d5fa04cb25, type: 2}
-  forestLayer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
-  pathLayer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
+  forestLayer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
+  pathLayer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
   cliffLayer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
   cliffSlope: {x: 30, y: 42}
-  litterLayer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
-  litter: 0.55
+  litterLayer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
+  litter: 0.35
   growth:
-  - layer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
-    shortGrass: 0.65
-    tallGrass: 0.38
-    bushes: 0.1
-    plants: 0.25
+  - layer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
+    shortGrass: 0.45
+    tallGrass: 0.6
+    bushes: 0.15
+    plants: 0.6
     bareAt: 0
-    colour: {r: 0.56, g: 0.6, b: 0.3, a: 1}
-  - layer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
+    colour: {r: 0.34, g: 0.5, b: 0.2, a: 1}
+  - layer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
     shortGrass: 0
     tallGrass: 0
     bushes: 0
     plants: 0
-    bareAt: 0.8
-    colour: {r: 0.56, g: 0.5, b: 0.4, a: 1}
+    bareAt: 0.7
+    colour: {r: 0.3, g: 0.26, b: 0.18, a: 1}
   - layer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
     shortGrass: 0
     tallGrass: 0
     bushes: 0
     plants: 0
     bareAt: 0.45
-    colour: {r: 0.52, g: 0.5, b: 0.43, a: 1}
-  - layer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
-    shortGrass: 0.2
-    tallGrass: 0.1
-    bushes: 0.05
-    plants: 0.25
+    colour: {r: 0.46, g: 0.47, b: 0.42, a: 1}
+  - layer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
+    shortGrass: 0.3
+    tallGrass: 0.35
+    bushes: 0.1
+    plants: 0.45
     bareAt: 0
-    colour: {r: 0.64, g: 0.56, b: 0.32, a: 1}
+    colour: {r: 0.28, g: 0.3, b: 0.16, a: 1}
   plants:
   - prototype: Common Fern
     enabled: 1
@@ -276,17 +276,17 @@ MonoBehaviour:
   - prototype: Brake Fern
     enabled: 1
     patchSize: 6
-    rarity: 0.93
+    rarity: 0.62
     thickness: 0.45
     clearing: 1
-    loveOfWet: 0.6
+    loveOfWet: 0.9
   - prototype: Lake Fern
     enabled: 1
     patchSize: 7
-    rarity: 0.93
+    rarity: 0.62
     thickness: 0.4
     clearing: 1
-    loveOfWet: 0.5
+    loveOfWet: 0.9
   - prototype: Small Fern
     enabled: 1
     patchSize: 5
@@ -318,26 +318,26 @@ MonoBehaviour:
   - prototype: Lake Grass
     enabled: 1
     patchSize: 8
-    rarity: 0.5
+    rarity: 0.62
     thickness: 0.45
     clearing: 0
-    loveOfWet: 0.2
+    loveOfWet: 0.9
   - prototype: Wild Flowers
     enabled: 1
     patchSize: 5
-    rarity: 0.5
+    rarity: 0.62
     thickness: 0.3
     clearing: 0
-    loveOfWet: 0
+    loveOfWet: 0.9
   - prototype: Moss Cushion
     enabled: 1
     patchSize: 6
-    rarity: 0.93
+    rarity: 0.62
     thickness: 0.6
     clearing: 0
-    loveOfWet: 0.8
+    loveOfWet: 0.9
   - prototype: Leaf Litter
-    enabled: 1
+    enabled: 0
     patchSize: 8
     rarity: 0.64
     thickness: 0.4
@@ -351,42 +351,42 @@ MonoBehaviour:
     clearing: 0
     loveOfWet: 0.6
   - prototype: Glow Mushrooms
-    enabled: 1
+    enabled: 0
     patchSize: 5
     rarity: 0.93
     thickness: 0.22
     clearing: 0
     loveOfWet: 1
   - prototype: Glow Flowers
-    enabled: 1
+    enabled: 0
     patchSize: 6
     rarity: 0.88
     thickness: 0.2
     clearing: 0
     loveOfWet: 0.3
   - prototype: Needle Debris A
-    enabled: 1
+    enabled: 0
     patchSize: 4
     rarity: 0.5
     thickness: 0.55
     clearing: 0
     loveOfWet: 0
   - prototype: Needle Debris B
-    enabled: 1
+    enabled: 0
     patchSize: 5
     rarity: 0.52
     thickness: 0.5
     clearing: 0
     loveOfWet: 0
   - prototype: Needle Debris C
-    enabled: 1
+    enabled: 0
     patchSize: 7
     rarity: 0.58
     thickness: 0.45
     clearing: 0
     loveOfWet: 0
   - prototype: Dry Leaves
-    enabled: 1
+    enabled: 0
     patchSize: 6
     rarity: 0.5
     thickness: 0.4
@@ -423,10 +423,17 @@ MonoBehaviour:
   - prototype: Moss Cushion B
     enabled: 1
     patchSize: 6
-    rarity: 0.93
+    rarity: 0.62
     thickness: 0.6
     clearing: 0
-    loveOfWet: 0.8
+    loveOfWet: 0.9
+  - prototype: Yellow Flowers
+    enabled: 1
+    patchSize: 4
+    rarity: 0.82
+    thickness: 0.3
+    clearing: 0
+    loveOfWet: 0.5
   trees:
   - prefab: {fileID: 9151021589558116730, guid: 0a10eabb45908d2459f221815278f8aa, type: 3}
     weight: 3

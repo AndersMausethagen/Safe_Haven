@@ -17,6 +17,17 @@ This is the research and the proposal. Nothing in the project was changed except
 
 ---
 
+## Decisions (the user, 2026-11-17)
+
+Answers to §8's first five questions (6 to 9 are still open):
+
+1. **The Brukam is the old troll**, and Act II's "The Toll" is his fight or payment at his bridge: "we can start with that".
+2. **Troll Valley's Woods creatures and events:** "not sure, you decide". Decided: keep them, rare (as built: under 5% of the
+   creature lists, none of the Woods-only events or rumours, the Huldra Silk and Elderwood nodes at weight 0).
+3. **Trollstone is mainly the Valley's, at the high tier**: the Woods keep only the Old Moss Troll's, and their elites' row goes.
+4. **Yes:** the Rime-jutul is the Frost Peaks' "mountain ruler", and the antlered Jaw-keeper a toll-taker who is never fought.
+5. **Yes:** the Jaw-keeper's toll is a companion's memory, which comes back at the First Hearth.
+
 ## The short answer
 
 - **Troll Valley is still mostly the Misty Woods in its data.** The scene, valley shape, themed caches and the Brukam's table are its own,

@@ -86,6 +86,30 @@ MonoBehaviour:
     contrast: 1
     footprintResponse: 0.15
     rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
+    heightMap: {fileID: 0}
+    channel: 0
+    amplitude: 0.45132738
+    midpoint: 0.4427112
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
+    heightMap: {fileID: 2800000, guid: 973e206d6ed07dd48bf505aa90c9c28e, type: 3}
+    channel: 0
+    amplitude: 1.1590909
+    midpoint: 0.28085545
+    contrast: 1
+    footprintResponse: 1
+    rock: 0
+  - terrainLayer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
+    heightMap: {fileID: 2800000, guid: 71e0adf7d1d3830449515bfb13d95d1e, type: 3}
+    channel: 0
+    amplitude: 0.84999996
+    midpoint: 0.5753257
+    contrast: 1
+    footprintResponse: 0.9
+    rock: 0
   footprints: 1
   footprintLifetime: 30
   footprintDepth: 0.035

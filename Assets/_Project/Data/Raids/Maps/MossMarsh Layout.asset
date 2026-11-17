@@ -82,7 +82,7 @@ MonoBehaviour:
   pondFillUpTo: 1
   pondReach: 1.5
   wetReach: 12
-  dampGround: 0.45
+  dampGround: 0.8
   shapes:
   - shape: 1
     weight: 3
@@ -341,7 +341,7 @@ MonoBehaviour:
     hummockHeight: 0.35
     strings: 0.6
     stringSpacing: 16
-    water: {fileID: 0}
+    water: {fileID: 2100000, guid: 06493279e799f2542bf51a75e9865d39, type: 2}
   setPieces:
   - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}

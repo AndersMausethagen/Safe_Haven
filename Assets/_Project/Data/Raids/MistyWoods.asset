@@ -15,6 +15,7 @@ MonoBehaviour:
   id: wildlands
   displayName: Misty Woods
   description: The nearest wild forest beyond the portal, where mist hangs between old pines. Cursed things hunt here, and what lies deeper grows worse the harder you go.
+  land: forest
   tier: 1
   sceneName: Raid_MistyWoods
   locked: 0
@@ -27,6 +28,7 @@ MonoBehaviour:
     - Old Cairn
     - Drowned Stones
   lockedText: The way there is not yet open.
+  encounter: {fileID: 0}
   knownEnemies:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
   - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
@@ -134,18 +136,21 @@ MonoBehaviour:
     lootMultiplier: 1
     enemyDensity: 1
     briefing: Mist hangs in the valleys; the forest sees you coming.
+    skyCover: 0.6
   - name: Dusk
     hour: 19.2
     chance: 25
     lootMultiplier: 1.15
     enemyDensity: 1.15
     briefing: Long shadows and failing light. Things wake.
+    skyCover: 0.5
   - name: Night
     hour: 23.5
     chance: 20
     lootMultiplier: 1.4
     enemyDensity: 1.3
     briefing: Grey dark beyond arm's reach. More of them are out, and stronger; they see no better than you, but they hear as well as ever. They carry twice the Cursed Essence.
+    skyCover: 0.35
   grade:
     curve: 1
     exposure: -0.9
