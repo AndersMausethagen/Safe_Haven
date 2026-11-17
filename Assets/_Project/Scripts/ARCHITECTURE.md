@@ -1103,6 +1103,7 @@ filled in when it is saved (`SaveableEntityTools`). Safe Haven > Scene > Assign 
 | I want to... | Do this |
 |---|---|
 | Add an item, monster, quest... | Content Editor (Safe Haven > Content Editor). No code. |
+| Add an animation no library has (a troll's ground smash) | LocalSpawn's `animate_from_video.py` (its docs/animation.md): a start-pose picture, a generated clip, NVIDIA GEM-X, the retarget onto a Mixamo-named rig in Blender. Put the FBX in `Art/Animations/Custom`: it imports as a Humanoid clip (`CustomClipImport`: height and facing baked into the pose, ground travel left as root motion, loops by name; `CustomClipImportTests`). Keep an attack's cadence (see Combat feel). |
 | Change music, add a sound effect, find unused audio | Sound Editor (Safe Haven > Sound Editor). Music lives on each scene's "Scene Audio" object (exploring / combat / final-stretch / ambience playlists); empty lists fall back to the defaults in `AudioSettings`. `MusicRules.Choose` decides: final stretch → combat → exploring → default. Object sounds (death, pickup) are `SoundDefinition` assets set on the prefab or its definition. |
 | Add a new music situation (e.g. boss) | Add an `AudioMood`, a playlist on `SceneAudio`, and a step in `MusicRules.Choose` |
 | Make something react when a quest completes or a zone is entered | Add a `GameEventListener` / `GameEventTrigger` in the scene (Add Component › Safe Haven › Quests › Quest Event Listener / Trigger). No code. |
