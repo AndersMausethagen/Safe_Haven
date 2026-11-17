@@ -213,6 +213,12 @@ MonoBehaviour:
   clearing:
     m_OverrideState: 0
     m_Value: 0.5
+  viewClearing:
+    m_OverrideState: 0
+    m_Value: 0.6
+  viewClearingRadius:
+    m_OverrideState: 0
+    m_Value: 4
   maxDistance:
     m_OverrideState: 0
     m_Value: 90
