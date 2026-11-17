@@ -17,6 +17,7 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
     private WorldLights lights;
     private GroundWear wear;
     private SkyOcclusionMap occlusion;
+    private GroundLightMap groundLight;
 
     public void Initialise(RenderingSettings rules)
     {
@@ -40,6 +41,9 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         {
             occlusion = gameObject.AddComponent<SkyOcclusionMap>();
             occlusion.Initialise(settings);
+            // A generated raid map's light, worked out once while it loads (RaidMap calls it).
+            groundLight = gameObject.AddComponent<GroundLightMap>();
+            groundLight.Initialise(settings, occlusion);
         }
 
         var grade = new GameObject("Raid Grade");
@@ -83,6 +87,8 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         raidGrade.Apply(raid != null ? raid.Grade : null);
         // Each raid's hour may set its own (RaidTimeOfDay › Sky Cover); otherwise the one strength for all raids.
         RaidTimeOfDay hour = GameSession.ActiveRaid?.TimeOfDay;
+        // No ground light field until a generated raid map builds one, and the sky map follows the player until that map pins it.
+        groundLight?.Clear();
         occlusion?.Bind(raid == null ? 1f : hour != null && hour.skyCover >= 0f ? hour.skyCover : settings.SkyOcclusionInRaids);
         clouds?.Bind(RenderSettings.sun, raid == null || settings.CloudShadowsInRaids);
     }

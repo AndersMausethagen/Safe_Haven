@@ -17,6 +17,7 @@ struct Attributes
 };
 
 #include "WorldTerrainDisplacement.hlsl"
+#include "Assets/_Project/Shaders/GroundLight.hlsl"
 
 struct Varyings
 {
@@ -868,6 +869,9 @@ void SplatmapFragment(
 #endif
 
     InitializeBakedGIData(IN, inputData);
+    // A raid's ground light (GroundLight.hlsl): the canopy's and the land's shade, and light thrown back from sunlit ground.
+    occlusion *= GroundLightOnGround(IN.positionWS);
+    inputData.bakedGI += GroundLightBounce(IN.positionWS, inputData.normalWS);
 
 #ifdef TERRAIN_GBUFFER
 

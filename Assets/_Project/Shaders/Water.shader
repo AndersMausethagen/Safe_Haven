@@ -120,6 +120,8 @@ Shader "Safe Haven/Water"
             // Ice (WinterIce, per surface through a property block): still water freezes over in a snowing season.
             float _IceAmount;
             #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
+            // After SeasonSnow, so its snow keeps not reading the sky map here: only GroundLightAir is used (raids with a field).
+            #include "Assets/_Project/Shaders/SkyOcclusion.hlsl"
             #include "Assets/_Project/Shaders/CloudNoise.hlsl"
             // The sky's state (SkyDome, CloudLayer): the water traces the same clouds in its reflection.
             float4 _SkyState, _SkySunColour, _SkyClouds, _SafeHavenCloudOffset;
@@ -433,7 +435,9 @@ Shader "Safe Haven/Water"
                 }
 
                 Light sun = GetMainLight(TransformWorldToShadowCoord(positionWS));
-                half3 ambient = SampleSH(surfaceNormal);
+                // A pond under trees sees little sky (a raid's ground light; 1 elsewhere): its light and reflected sky dim.
+                half airLight = GroundLightAir(positionWS);
+                half3 ambient = SampleSH(surfaceNormal) * airLight;
                 half3 light = sun.color * sun.shadowAttenuation * (0.35 + 0.65 * saturate(dot(surfaceNormal, sun.direction))) + ambient;
                 half3 view = GetWorldSpaceNormalizeViewDir(positionWS);
                 InputData inputData = (InputData)0;
@@ -566,7 +570,7 @@ Shader "Safe Haven/Water"
                 // Seen from above, real water reflects about 2%: Reflection From Above keeps the sky in it readable.
                 half fresnel = max(0.02 + 0.98 * pow(1.0 - saturate(dot(normal, view)), 5.0), _SkyReflectionFloor);
                 float3 skyRay = SkyDirection(positionWS, normal, reflect(-view, normal));
-                half3 reflection = SkyInWater(skyRay, GlossyEnvironmentReflection(skyRay, positionWS, 1.0 - _Smoothness, 1.0, screenUV));
+                half3 reflection = SkyInWater(skyRay, GlossyEnvironmentReflection(skyRay, positionWS, 1.0 - _Smoothness, 1.0, screenUV)) * airLight;
                 #if !defined(SAFE_HAVEN_WATER_SIMPLE)
                     reflection = ScreenReflection(positionWS, reflect(-view, normal), reflection);
                 #endif

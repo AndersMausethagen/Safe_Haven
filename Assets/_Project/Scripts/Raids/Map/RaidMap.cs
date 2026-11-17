@@ -46,6 +46,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private TerrainData turnedData;
     private Mesh generatedTrunks;
     private Texture2D generatedColour;
+    // The paint as colour from Dress, held until the ground light has been worked out.
+    private Color32[] groundColours;
 
     public RaidMapDefinition Definition => definition;
     public Terrain Terrain => terrain;
@@ -124,6 +126,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
                 MinimapHud.Current.Refit();
             }
 
+            yield return BuildGroundLight();
             yield break;
         }
 
@@ -146,6 +149,16 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
             yield return RebuildNavMesh();
             ResumeAgents(agents);
+        }
+        else if (terrain != null)
+        {
+            // Grass grows into the terrain's data (Dress): on a runtime copy, destroyed with the map, so playing a painted map that
+            // isn't turned (a boss arena) never writes into the scene's terrain asset. A turned map already has its copy.
+            TerrainData copy = RuntimeTerrain.Own(terrain);
+            if (copy != null)
+            {
+                turnedData = copy;
+            }
         }
 
         Dress(seed);
@@ -407,11 +420,16 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness);
-        if (terrain.TryGetComponent(out GrassTerrainColour colour))
+        bool grassColour = terrain.TryGetComponent(out GrassTerrainColour colour);
+        // The paint as colour: what grass takes on, and on a generated map what the ground light throws back (BuildGroundLight).
+        Color32[] colours = grassColour || generatedBy != null ? TerrainGrowth.GroundColours(terrain.terrainData, definition.Growth) : null;
+        if (grassColour)
         {
-            generatedColour = TerrainGrowth.BakeColour(terrain, definition.Growth);
+            generatedColour = TerrainGrowth.ColourTexture(terrain.terrainData, colours);
             colour.ColourMap = generatedColour;
         }
+
+        groundColours = generatedBy != null ? colours : null;
 
         if (terrain.TryGetComponent(out TerrainSurface surface))
         {
@@ -420,6 +438,23 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
         terrain.Flush();
         Debug.Log($"Raid map dressed in {clock.ElapsedMilliseconds} ms.", this);
+    }
+
+    // The map's light, worked out once now that everything stands where it will (GroundLightMap): what stands overhead drawn once
+    // over the whole map, and, where the raid's Look › Ground Light is on, the land's shade and light thrown back from sunlit
+    // ground at the run's hour. Behind the loading screen; it logs its own steps.
+    private IEnumerator BuildGroundLight()
+    {
+        Color32[] colours = groundColours;
+        groundColours = null;
+        if (GroundLightMap.Current == null || terrain == null)
+        {
+            yield break;
+        }
+
+        RaidLayoutPlan plan = Layout;
+        System.Func<Vector2, bool> water = plan != null ? plan.InWater : (System.Func<Vector2, bool>)null;
+        yield return GroundLightMap.Current.Build(terrain, colours, water);
     }
 
     private void RebuildTrunks()

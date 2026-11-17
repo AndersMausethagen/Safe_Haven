@@ -68,6 +68,28 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Index of the Sky Occlusion Renderer in the pipeline's renderer list (set by AgentScripts/BuildRendering.cs); -1 off.")]
     [SerializeField] private int skyOcclusionRendererIndex = -1;
 
+    [Header("Ground light (generated raids)")]
+    [Tooltip("A generated raid map's light is worked out once while its loading screen is up (GroundLightMap; Docs/" +
+             "LightingBakeResearch_2026-11-17.md §2.1): what stands overhead is drawn once over the whole map instead of round the " +
+             "player every few seconds, and a raid whose Look › Ground Light is on also gets the land's shade and light thrown back " +
+             "from sunlit ground. Off: raids use the sky map round the player as before.")]
+    [SerializeField] private bool groundLight = true;
+    [Tooltip("Metres a texel of the cover drawn over the whole map (2048 texels a side at most; the map round the player was 0.31).")]
+    [SerializeField, Range(0.1f, 1f)] private float groundCoverTexel = 0.25f;
+    [Tooltip("Metres a cell of the field: the land's shade and the thrown-back light (1024 cells a side at most).")]
+    [SerializeField, Range(0.2f, 2f)] private float groundLightCell = 0.4f;
+    [Tooltip("Directions the land's shade looks along for higher ground.")]
+    [SerializeField, Range(4, 24)] private int reliefDirections = 12;
+    [Tooltip("From how near to how far (metres) higher ground shades a spot. Nearer than this is SSAO's.")]
+    [SerializeField] private Vector2 reliefReach = new Vector2(1.5f, 30f);
+    [Tooltip("Metres the light thrown back from sunlit ground spreads into the shade round it.")]
+    [SerializeField, Range(1f, 16f)] private float bounceSpread = 6f;
+    [Tooltip("At dusk and night the field keeps the ground's average light as it was before it (under canopy and in hollows darker, " +
+             "open ground lighter), so nights never get darker on the whole; lifting by at most this much (1: no lift).")]
+    [SerializeField, Range(1f, 2f)] private float nightLiftMost = 1.5f;
+    [Tooltip("Seconds after a tree is felled before the cover over it is drawn again (the falling tree has landed).")]
+    [SerializeField, Min(0f)] private float felledRedrawDelay = 6f;
+
     [Header("Characters")]
     [Tooltip("How bright the rim the sky and sun put on a figure's edge is (CharacterShading.hlsl).")]
     [SerializeField, Range(0f, 2f)] private float rimStrength = 0.2f;
@@ -174,6 +196,14 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public LayerMask SkyOcclusionLayers => skyOcclusionLayers;
     /// <summary>The Sky Occlusion Renderer's place in the pipeline's renderer list, or null when there is none (off).</summary>
     public int? SkyOcclusionRenderer => skyOcclusionRendererIndex >= 0 ? skyOcclusionRendererIndex : (int?)null;
+    public bool GroundLight => groundLight;
+    public float GroundCoverTexel => groundCoverTexel;
+    public float GroundLightCell => groundLightCell;
+    public int ReliefDirections => reliefDirections;
+    public Vector2 ReliefReach => reliefReach;
+    public float BounceSpread => bounceSpread;
+    public float NightLiftMost => nightLiftMost;
+    public float FelledRedrawDelay => felledRedrawDelay;
     public float RimStrength => rimStrength;
     public float RimSharpness => rimSharpness;
     public float RimAtNight => rimAtNight;

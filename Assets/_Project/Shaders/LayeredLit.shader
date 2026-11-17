@@ -421,6 +421,7 @@ Shader "Safe Haven/Layered Lit"
                     SurfaceWet(data.albedo, data.smoothness, lighting.normalWS, lighting.positionWS, 1.0 - data.metallic * 0.8);
                 #endif
                 data.occlusion *= SkyAmbient(lighting.positionWS);
+                lighting.bakedGI += GroundLightBounce(lighting.positionWS, lighting.normalWS);
                 half4 color = UniversalFragmentPBR(lighting, data);
                 color.rgb = MixFog(color.rgb, input.fog);
                 return half4(color.rgb, 1);

@@ -395,6 +395,7 @@ Shader "Safe Haven/Grass"
                 data.alpha = 1;
                 data.smoothness = _Smoothness;
                 data.occlusion = SkyAmbient(input.positionWS);
+                lighting.bakedGI += GroundLightBounce(input.positionWS, lighting.normalWS);
                 data.normalTS = half3(0, 0, 1);
                 SurfaceWet(data.albedo, data.smoothness, lighting.normalWS, input.positionWS, 0.5);
                 half4 colour = UniversalFragmentPBR(lighting, data);

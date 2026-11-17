@@ -918,6 +918,22 @@ numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) ow
   0.35 strength (`_SkyOcclusionRect.w`): full strength under the forest canopy hid the player at night. A render costs about
   3 ms of CPU, 2 of them the terrain's trees whatever their distance, so it redraws on need (12 m moved, a building up or down,
   every 10 s), not on a timer; drawing it a quarter a frame cost four times as much.
+- **The ground light field (generated raids; Docs/LightingBakeResearch_2026-11-17.md §2.1, step 3).** A run's hour never changes,
+  so `RaidMap` ends a generated map's load with `GroundLightMap.Build`: `SkyOcclusionMap.Pin` draws the cover once over the whole
+  map plus a 10% margin (so `SkyOcclusion.hlsl`'s edge fade lies outside it) with skinned meshes hidden, trees drawn at any
+  distance and the follow map's level of detail, and stops the redraws round the player; afterwards a felled tree's patch
+  (`TerrainTreeFelling.TreeDown`, after Felled Redraw Delay) or the map when a building count changes is drawn again. With the
+  raid's Look › Ground Light on, the cover is read back and `GroundLightField` (plain arrays, worker threads, EditMode-tested)
+  works out a two-slice RGBA8 array: slice 0 rgb the light thrown back from sunlit ground (ground colour from the paint's growth
+  colours, linear; ponds near black; × how much sun or moon reaches it at the hour through land and canopy; two box blurs), a the
+  land's shade (horizon tracing, 12 directions, 1.5-30 m, on ~0.75 m cells); slice 1 r the canopy's shade on the ground itself
+  (SkyOcclusion.hlsl's own five-tap test, for the terrain). At dusk and night one lift (`_GroundLightRect.w`) brings the ground's
+  average back to what it was before the field. Shaders read it through `Shaders/GroundLight.hlsl` with URP's
+  `sampler_LinearClamp` (the terrain: one texture more, 63 of 64 in its biggest variant, no new sampler): `SkyAmbient` multiplies in
+  the land's shade, the bounce is added to bakedGI in every shader that calls SkyAmbient, characters are never darker than the
+  cover alone (`SkyAmbientAtLeastCover`), the terrain reads it through the generator (`GROUND_LIGHT`), water and the mist through
+  `GroundLightAir` (one cover tap). Without a field (`_GroundLightRect.w` 0: the Haven, the prologue, painted maps) every
+  function returns what it did before. Rendering Settings › Ground Light switches it all off.
 - **Weather on surfaces.** `Shaders/SurfaceWetness.hlsl` soaks whatever has "Weather Settles On It" (the old snow toggle) plus trees
   and grass; the terrain's puddles are its own (`GenerateWorldTerrainShader.py`). Include SurfaceWetness before SeasonSnow, and in
   ASE shaders after URP's Lighting.hlsl (it needs `_Time`). Characters (URP Lit) soak per character instead (`CharacterWetness`,

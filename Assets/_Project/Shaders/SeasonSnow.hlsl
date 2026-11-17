@@ -58,7 +58,14 @@ void SeasonSnow(inout half3 albedo, inout half smoothness, half3 normalWS, float
 half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
 {
     #if defined(SAFE_HAVEN_SKY_OCCLUSION)
-        surfaceData.occlusion *= SkyAmbient(inputData.positionWS); // under roofs and canopies, less sky light
+        #if defined(SAFE_HAVEN_CHARACTER)
+            // Never darker than the cover alone: the player stays readable however deep the hollow.
+            surfaceData.occlusion *= SkyAmbientAtLeastCover(inputData.positionWS);
+        #else
+            surfaceData.occlusion *= SkyAmbient(inputData.positionWS); // under roofs and canopies, less sky light
+        #endif
+        // A raid's light thrown back from sunlit ground near by (GroundLight.hlsl; none elsewhere).
+        inputData.bakedGI += GroundLightBounce(inputData.positionWS, inputData.normalWS);
     #endif
     #if defined(_SEASON_SNOW)
         SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);

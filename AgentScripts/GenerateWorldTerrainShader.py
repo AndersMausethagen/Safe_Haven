@@ -462,6 +462,15 @@ CALL = """
 """
 
 
+# A generated raid's ground light field (GroundLight.hlsl, GroundLightMap): the canopy's and the land's shade on the ground, and
+# light thrown back from sunlit ground. One texture array read with URP's shared linear-clamp sampler (the terrain is near its
+# 64 textures and the four-layer pass at 14 of 16 samplers). Without a field (the Haven, the prologue) both lines change nothing.
+GROUND_LIGHT = """    InitializeBakedGIData(IN, inputData);
+    // A raid's ground light (GroundLight.hlsl): the canopy's and the land's shade, and light thrown back from sunlit ground.
+    occlusion *= GroundLightOnGround(IN.positionWS);
+    inputData.bakedGI += GroundLightBounce(IN.positionWS, inputData.normalWS);
+"""
+
 PASS_INCLUDE = 'Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl'
 DEPTH_INCLUDE = 'Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitDepthNormalsPass.hlsl'
 
@@ -597,7 +606,7 @@ def main():
     # Instancing is resolved once in the control vertex, before interpolation by the domain shader.
     passes = re.sub(r"    TerrainInstancing\([^;]+;\n", "", passes)
     anchor = passes.index("struct Varyings")
-    passes = passes[:anchor] + '#include "WorldTerrainDisplacement.hlsl"\n\n' + passes[anchor:]
+    passes = passes[:anchor] + '#include "WorldTerrainDisplacement.hlsl"\n#include "Assets/_Project/Shaders/GroundLight.hlsl"\n\n' + passes[anchor:]
     anchor = passes.find("void InitializeInputData(")
     end = passes.find("\n}\n", anchor) + 3
     passes = passes[:end] + FUNCTIONS + passes[end:]
@@ -629,6 +638,7 @@ def main():
         #endif
     }
 """)
+    passes = replace_once(passes, "    InitializeBakedGIData(IN, inputData);\n", GROUND_LIGHT, "the splatmap fragment's baked GI")
     passes = layer_sampling(passes)
     passes = single_pass_layers(passes)
     with open(os.path.join(TARGET, "WorldTerrainLitPasses.hlsl"), "w", encoding="utf-8", newline="\n") as f:

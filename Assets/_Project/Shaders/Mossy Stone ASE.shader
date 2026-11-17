@@ -893,6 +893,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 						SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0);
 					#endif
 					surfaceData.occlusion *= SkyAmbient(inputData.positionWS);
+					inputData.bakedGI += GroundLightBounce(inputData.positionWS, inputData.normalWS);
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif
 

@@ -1,0 +1,40 @@
+using System;
+using UnityEngine;
+
+/// <summary>
+/// How a raid's ground light field looks (RaidDefinition › Look; GroundLightMap builds it while a generated map loads;
+/// Docs/LightingBakeResearch_2026-11-17.md §3): the land's shade in hollows and under walls, and the light sunlit ground throws
+/// into the shade, in the raid's own colour. Off (the default) keeps the raid as it looked before the field. How much the canopy
+/// shades stays the hour's Sky Cover (RaidTimeOfDay).
+/// </summary>
+[Serializable]
+public sealed class RaidGroundLight
+{
+    [Tooltip("Work this raid's ground light out while its map loads. On, the canopy also shades the terrain, the water and the " +
+             "mist (not only what stands on the ground), and Relief and Bounce below apply. Off: as before the field.")]
+    [SerializeField] private bool enabled;
+    [Tooltip("How much hollows, ravines, cliff feet and valley walls darken the ground they hide the sky from (0 none, 1 fully). " +
+             "At dusk and night the ground's average light is kept as before the field (Rendering Settings › Night Lift Most), so " +
+             "nights don't get darker.")]
+    [SerializeField, Range(0f, 1f)] private float relief;
+    [Tooltip("How strongly sunlit ground nearby lights what stands in shade (0 none). Follows the sun or moon as it is, so clouds " +
+             "and night dim it by themselves.")]
+    [SerializeField, Range(0f, 4f)] private float bounce;
+    [Tooltip("The colour that thrown-back light takes on over the ground's own (white: the ground's colour as it is).")]
+    [SerializeField] private Color bounceTint = Color.white;
+
+    public bool Enabled => enabled;
+    public float Relief => relief;
+    public float Bounce => bounce;
+    public Color BounceTint => bounceTint;
+
+    public RaidGroundLight() { }
+
+    public RaidGroundLight(bool enabled, float relief, float bounce, Color bounceTint)
+    {
+        this.enabled = enabled;
+        this.relief = relief;
+        this.bounce = bounce;
+        this.bounceTint = bounceTint;
+    }
+}
