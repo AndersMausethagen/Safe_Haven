@@ -54,6 +54,9 @@ public static class PlaytestLog
     public const string Cheat = "Cheat";
     public const string Assist = "Assist";
     public const string SessionEnd = "SessionEnd";
+    /// <summary>Where the player stands in a raid, every few seconds (subject: x;z in metres; detail: the raid): for heatmaps of where
+    /// players really go (Docs/WorldDesignReview_2026-11-17.md).</summary>
+    public const string Position = "Position";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
     /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>

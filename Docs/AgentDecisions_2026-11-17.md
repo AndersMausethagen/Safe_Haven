@@ -64,3 +64,27 @@ Each entry says what I did and why, and what to check.
 - **Q6 (rested charges) not built:** Well Rested is already given in full at every raid launch (HavenReadiness.GiveRest), so charges
   would change nothing. Surplus comfort only matters if rest had to be earned (e.g. a night at home between raids): a design choice
   for you.
+
+## The world designer's review (Docs/WorldDesignReview_2026-11-17.md)
+
+Its verdict: the maps aren't open squares, but they play like one (trails are only paint, sites are spread evenly, landmarks are
+too small for the camera, one character per map). Its plan: districts, landmarks, compounds, barriers with gaps, a dressing pass,
+roads. **The generator code for those is being written now** (in order: districts, landmarks with short flags, roads, the Valley's
+crossing cap, the dressing pass, then compounds and barriers); I'll set the per-raid data and check each in launched raids.
+
+### Done by me
+- **Each raid its own fireflies:** the Valley 90 warm amber ones at night and none by day; the Marsh 240 green ones low over the
+  water (will-o'-wisps), 14 by day. The Woods keeps its blue.
+- **Heatmaps:** the playtest log now writes the player's position every 2 s in a raid (event `Position`, subject `x;z`), so we can
+  see where players really go.
+- **Arena dressing:** Guardian's Hollow got five giant cedars beyond the dead ring, root tangles and lichen boulders on its rim (the
+  floor stays clear; navmesh rebaked). Brukam's Bridge got 70 crags set into its gorge walls the way the Valley's ravines do it (a
+  first try with flat rock faces read as slabs and was removed), and the Brukam's club and old bones by his camp.
+- **Not used on purpose:** the Troll Hoard cache in the Brukam's camp (it would add loot to his fight); the low-poly packs the
+  review warns against.
+
+### Entities / DOTS (you asked)
+- **Not worth adopting now** (the review measured: scripts take about 1 ms; the frame goes to terrain, shadows and plants; co-op is
+  Netcode for GameObjects). Revisit with NGO 3.0 / Unity 6.7.
+- **The GPU Resident Drawer is on but probably skips the rocks:** their tessellated shader (`MeshSurface`) lacks DOTS instancing.
+  Worth adding once the dressing pass puts more rocks out; a shader change with some risk, so it gets its own measured step.

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8275f9d422c68a4e8518b99284a3776, type: 3}
+  m_Name: Fireflies - Moss Marsh
+  m_EditorClassIdentifier: SafeHaven::FireflyProfile
+  colour: {r: 0.55, g: 1, b: 0.45, a: 1}
+  nightCount: 240
+  dayCount: 14
+  radius: 26
+  height: {x: 0.15, y: 1.6}
+  size: {x: 0.18, y: 0.33}
+  life: {x: 6, y: 12}
+  wander: 0.9
+  rainShyness: 0.85
+  lightShare: 0.2
+  lightDistance: {x: 1.2, y: 5}
+  catchable: {fileID: 11400000, guid: 56e2fd4d1b777f24ca26e167686a976c, type: 2}
+  catchableAtNight: 3
+  catchableByDay: 0
+  nearPlayerShare: 0.35
+  catchableLife: {x: 45, y: 90}
+  catchableGlow: {fileID: 2100000, guid: 56ca087bb1eca684999b226916dc8156, type: 2}

@@ -63,6 +63,9 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     // Practice gathered over a played minute, written as one row per skill: what the pace is measured from.
     private readonly System.Collections.Generic.Dictionary<string, int> minuteXp = new System.Collections.Generic.Dictionary<string, int>();
     private float nextXpRow = 60f;
+    // Seconds between position samples in a raid (heatmaps).
+    private const float PositionEvery = 2f;
+    private float nextPosition;
 
     private void OnGained(ProficiencyDefinition skill, int amount)
     {
@@ -189,6 +192,13 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (!GamePause.IsPaused)
         {
             current.PlayedSeconds += Time.unscaledDeltaTime;
+        }
+
+        if (RaidDirector.Current != null && Player.Current != null && current.PlayedSeconds >= nextPosition)
+        {
+            nextPosition = current.PlayedSeconds + PositionEvery;
+            Vector3 at = Player.Current.transform.position;
+            Write(PlaytestLog.Position, $"{at.x:0};{at.z:0}", 0, RaidDirector.Current.Session.Definition.Id);
         }
 
         if (current.PlayedSeconds >= nextXpRow)
