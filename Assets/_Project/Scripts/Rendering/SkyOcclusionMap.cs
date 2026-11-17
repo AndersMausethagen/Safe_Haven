@@ -36,6 +36,11 @@ public sealed class SkyOcclusionMap : MonoBehaviour
     private float pinnedTop;
     private readonly List<Renderer> hidden = new List<Renderer>();
     private readonly List<Renderer> parts = new List<Renderer>();
+    // What moves, as the scans in FindMoving last found it: a burst of patches (a building moved: its ground then and now; a row of
+    // trees felled) scans the scene once, not six times a patch. Found anew for the whole map's draws and after MovingKeptSeconds.
+    private const float MovingKeptSeconds = 2f;
+    private readonly List<Renderer> moving = new List<Renderer>();
+    private float movingFoundAt = float.NegativeInfinity;
 
     /// <summary>How much cover dims indirect light in this scene (0-1), as bound.</summary>
     public float Strength => strength;
@@ -120,7 +125,7 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         pinnedArea = area;
         pinnedFloor = floor;
         pinnedTop = top;
-        RenderTexture drawn = Redraw(new RectInt(0, 0, resolution, resolution));
+        RenderTexture drawn = Redraw(new RectInt(0, 0, resolution, resolution), true);
         Shader.SetGlobalTexture(MapId, pinned);
         Shader.SetGlobalVector(RectId, new Vector4(area.xMin, area.yMin, 1f / area.width, active ? strength : 0f));
         return drawn;
@@ -128,9 +133,11 @@ public sealed class SkyOcclusionMap : MonoBehaviour
 
     /// <summary>
     /// Draws a block of the pinned map's texels again (something there changed: a felled tree, a building) and returns what was
-    /// drawn as a temporary texture of the block's size, for a readback (release it with RenderTexture.ReleaseTemporary).
+    /// drawn as a temporary texture of the block's size, for a readback (release it with RenderTexture.ReleaseTemporary). What moves is
+    /// left out as it was last found, unless <paramref name="rescan"/> (the whole map's draws, once things have been placed) or it was
+    /// found more than a moment ago.
     /// </summary>
-    public RenderTexture Redraw(RectInt texels)
+    public RenderTexture Redraw(RectInt texels, bool rescan = false)
     {
         if (pinned == null || !CanDraw)
         {
@@ -157,6 +164,11 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         above.farClipPlane = Mathf.Max(10f, pinnedTop - pinnedFloor + 5f);
         above.transform.SetPositionAndRotation(centre, Down);
         float reach = Mathf.Sqrt(texels.width * texels.width + texels.height * texels.height) * texel * 0.5f;
+        if (rescan || Time.unscaledTime - movingFoundAt > MovingKeptSeconds)
+        {
+            FindMoving();
+        }
+
         DrawOnce(halfHeight, Mathf.Sqrt(reach * reach + (pinnedTop - pinnedFloor) * (pinnedTop - pinnedFloor)));
         FollowView();
         Graphics.CopyTexture(block, 0, 0, 0, 0, texels.width, texels.height, pinned, 0, 0, texels.x, texels.y);
@@ -264,7 +276,11 @@ public sealed class SkyOcclusionMap : MonoBehaviour
                 terrains[i].treeDistance = Mathf.Max(treeDistances[i], farthest + 20f);
             }
 
-            HideMoving();
+            foreach (Renderer part in moving)
+            {
+                Hide(part);
+            }
+
             above.Render();
         }
         finally
@@ -290,39 +306,51 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         }
     }
 
-    // Switched off for one pinned draw: people and creatures (skinned meshes), and the whole of anything that walks (a character
-    // controller, a navmesh agent, an animator: with the weapon, the hat or the pack it carries), anything with a body (a felled
-    // tree falling or lying, a cart, a boat, thrown, broken and chopped pieces, a ragdoll) and things dropped on the ground.
-    private void HideMoving()
+    // What is switched off for a pinned draw: people and creatures (skinned meshes), and the whole of anything that walks (a character
+    // controller, a navmesh agent, an animated body: with the weapon, the hat or the pack it carries), anything with a body (a felled
+    // tree falling or lying, a cart, a boat, thrown, broken and chopped pieces, a ragdoll) and things dropped on the ground. An Animator
+    // counts only when it animates something (a controller) or a body (skinned meshes): a still prop that carries one (a door, a
+    // sign) is cover like any other.
+    private void FindMoving()
     {
+        movingFoundAt = Time.unscaledTime;
+        moving.Clear();
         foreach (SkinnedMeshRenderer skinned in FindObjectsByType<SkinnedMeshRenderer>())
         {
-            Hide(skinned);
+            moving.Add(skinned);
         }
 
-        HideUnder(FindObjectsByType<Rigidbody>());
-        HideUnder(FindObjectsByType<CharacterController>());
-        HideUnder(FindObjectsByType<NavMeshAgent>());
-        HideUnder(FindObjectsByType<Animator>());
-        HideUnder(FindObjectsByType<DroppedItem>());
+        AddUnder(FindObjectsByType<Rigidbody>());
+        AddUnder(FindObjectsByType<CharacterController>());
+        AddUnder(FindObjectsByType<NavMeshAgent>());
+        foreach (Animator animator in FindObjectsByType<Animator>())
+        {
+            if (animator != null && (animator.runtimeAnimatorController != null || animator.GetComponentInChildren<SkinnedMeshRenderer>(true) != null))
+            {
+                AddUnder(animator);
+            }
+        }
+
+        AddUnder(FindObjectsByType<DroppedItem>());
     }
 
-    private void HideUnder<T>(T[] roots) where T : Component
+    private void AddUnder<T>(T[] roots) where T : Component
     {
         foreach (T root in roots)
         {
-            if (root == null)
-            {
-                continue;
-            }
+            AddUnder(root);
+        }
+    }
 
-            root.GetComponentsInChildren(false, parts);
-            foreach (Renderer part in parts)
-            {
-                Hide(part);
-            }
+    private void AddUnder(Component root)
+    {
+        if (root == null)
+        {
+            return;
         }
 
+        root.GetComponentsInChildren(false, parts);
+        moving.AddRange(parts);
         parts.Clear();
     }
 
@@ -338,6 +366,8 @@ public sealed class SkyOcclusionMap : MonoBehaviour
 
     private void Unpin()
     {
+        moving.Clear();
+        movingFoundAt = float.NegativeInfinity;
         if (pinned == null)
         {
             return;

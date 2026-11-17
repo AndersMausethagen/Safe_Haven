@@ -17,6 +17,9 @@ using UnityEngine;
 /// <item><c>CreatureHit</c> (friend to host): a blow landed on a puppet, by the friend or the companion they brought.</item>
 /// <item><c>CreatureStagger</c> (friend to host): the friend staggered a puppet (a parry, a finishing blow holding it):
 /// the host's creature staggers, and its state shows that to everyone.</item>
+/// <item><c>CreaturePoise</c> (friend to host): the friend's blow did something to a puppet's poise, which a puppet keeps none of (a
+/// parry's share of a great beast's or boss's, a hammer's crush of a boss that topples): the host's creature takes it, and a break
+/// staggers or topples it for everyone.</item>
 /// <item><c>CreatureWake</c>, <c>CreatureCall</c> (friend to host): what the friend woke (an extraction beacon's alarm
 /// group by its path, an event's creatures by prefab id): made in the host's game and sent after the friend.</item>
 /// </list>
@@ -34,6 +37,8 @@ public sealed class CoopCreatures : ICoopPart
     public const string StaggerMessage = "SafeHaven.CreatureStagger";
     /// <summary>Friend to host: the friend laid a status on a puppet (a great enchantment's chill or roots): the real creature takes it.</summary>
     public const string StatusMessage = "SafeHaven.CreatureStatus";
+    /// <summary>Friend to host: the friend's parry or crush wore a puppet's poise (MonsterAI.PoiseBlow): the real creature takes it.</summary>
+    public const string PoiseMessage = "SafeHaven.CreaturePoise";
 
     /// <summary>Seconds between updates.</summary>
     public const float Interval = 0.1f;
@@ -358,6 +363,19 @@ public struct CreatureStaggerMessage : INetworkSerializable
     {
         serializer.SerializeValue(ref Id);
         serializer.SerializeValue(ref Seconds);
+    }
+}
+
+/// <summary><c>CreaturePoise</c>: which creature a friend's blow wore the poise of, and how (MonsterAI.PoiseBlow, by number).</summary>
+public struct CreaturePoiseMessage : INetworkSerializable
+{
+    public int Id;
+    public byte Blow;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref Id);
+        serializer.SerializeValue(ref Blow);
     }
 }
 

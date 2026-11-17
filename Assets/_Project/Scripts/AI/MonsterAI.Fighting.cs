@@ -276,7 +276,7 @@ public sealed partial class MonsterAI
             {
                 if (doing.toppleAfter)
                 {
-                    Topple(-transform.forward, doing.openAfter, false);
+                    Topple(-transform.forward, doing.openAfter, false, true);
                 }
                 else
                 {

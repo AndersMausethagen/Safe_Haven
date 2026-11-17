@@ -32,6 +32,9 @@ public sealed class CoopWireTests
         [27] = "fbdd95d903325dec171610c2ae9adaba",
         // 2026-11-16 (guard 2): every message a struct; the fingerprint now sees their fields.
         [28] = "710fc926782d06237bee24b71c43102c",
+        // 2026-11-17 (boss review fixes): a friend's parry or crush wears the host's creature's poise (CreaturePoise); a creature's pose says
+        // when its topple is a Topple After strike's (a flag in the hunting byte); a friend's world noises go by a reliable RPC.
+        [29] = "4ba9741053cf4aa27bcdec5ea5674d39",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

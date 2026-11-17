@@ -76,6 +76,10 @@ public sealed class CreatureHost
     /// <summary>Set in a pose's hunting byte once the creature's shield has splintered.</summary>
     public const byte ShieldBrokenFlag = 0x08;
 
+    /// <summary>Set in a pose's hunting byte while the creature lies toppled by a Topple After strike (MonsterAI.IsToppledByStrike): a
+    /// friend's copy lies for that strike's Open After, as the host's does, not its Topple Seconds.</summary>
+    public const byte StrikeToppleFlag = 0x04;
+
     /// <summary>The hunting byte's low bits: whom it is after (MonsterAI.RemoteHunt).</summary>
     public const byte HuntMask = 0x03;
 
@@ -114,6 +118,7 @@ public sealed class CreatureHost
         link.On(CoopCreatures.CallMessage, OnCall);
         link.On(CoopCreatures.StaggerMessage, OnStagger);
         link.On(CoopCreatures.StatusMessage, OnStatus);
+        link.On(CoopCreatures.PoiseMessage, OnPoise);
         Damageable.AnyDied += OnAnyDied;
         Damageable.AnyDamaged += OnAnyDamaged;
     }
@@ -408,7 +413,8 @@ public sealed class CreatureHost
         Health = HealthByte(hosted),
         Hunting = (byte)((byte)HuntingFor(hosted.Ai, friend) | (hosted.Ai.IsWaitingTurn ? WaitingFlag : 0)
             | (hosted.Ai.IsStaggered && hosted.Ai.IsFelled ? FelledFlag : 0) | (hosted.Ai.IsWeaponGuarding ? GuardingFlag : 0)
-            | (hosted.Ai.IsMarked ? MarkedFlag : 0) | (hosted.Ai.ShieldBroken ? ShieldBrokenFlag : 0)),
+            | (hosted.Ai.IsMarked ? MarkedFlag : 0) | (hosted.Ai.ShieldBroken ? ShieldBrokenFlag : 0)
+            | (hosted.Ai.IsToppledByStrike ? StrikeToppleFlag : 0)),
         Poise = PoiseByte(hosted.Ai),
         Notice = (byte)Mathf.Clamp(Mathf.RoundToInt(Mathf.Round(hosted.Ai.AwarenessLevel * PoiseSteps) / PoiseSteps * 255f), 0, 255),
         Noticing = (byte)NoticingFor(hosted.Ai, friend),
@@ -652,6 +658,21 @@ public sealed class CreatureHost
         }
 
         hosted.Ai.StaggerAtLeast(Mathf.Min(seconds, LongestAskedStagger));
+    }
+
+    // A friend's parry or crush wore their copy's poise, which a copy keeps none of: the real one takes it here (a parry's share and its
+    // reel back, a crush's break), and a break staggers or topples it for everyone through its state.
+    private void OnPoise(ulong sender, FastBufferReader reader)
+    {
+        reader.ReadNetworkSerializable(out CreaturePoiseMessage worn);
+        var blow = (MonsterAI.PoiseBlow)worn.Blow;
+        if (!byId.TryGetValue(worn.Id, out Hosted hosted) || hosted.Ai == null || hosted.Health == null || !hosted.Health.IsAlive
+            || (blow != MonsterAI.PoiseBlow.Parry && blow != MonsterAI.PoiseBlow.Crush) || FriendOnThisRun(sender) == null)
+        {
+            return;
+        }
+
+        hosted.Ai.TakeFriendsPoiseBlow(blow);
     }
 
     // A friend laid a status on their copy of a creature: the real one takes it (statuses are found among the loaded definitions,

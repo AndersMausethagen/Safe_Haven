@@ -57,6 +57,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         link.On(CoopCreatures.GoneMessage, OnGone);
         Damageable.AnyDamaged += OnAnyDamaged;
         MonsterAI.RemoteStaggered += OnStaggeredHere;
+        MonsterAI.RemotePoiseBlow += OnPoiseBlowHere;
         StatusEffects.Applied += OnStatusHere;
     }
 
@@ -65,6 +66,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
     {
         Damageable.AnyDamaged -= OnAnyDamaged;
         MonsterAI.RemoteStaggered -= OnStaggeredHere;
+        MonsterAI.RemotePoiseBlow -= OnPoiseBlowHere;
         StatusEffects.Applied -= OnStatusHere;
         HandBack(quiet: true);
         MonsterAI.RemoteClock = null;
@@ -334,7 +336,8 @@ public sealed class CreaturePuppets : IRaidCreatureSource
                 puppet.Ai.ApplyRemotePose(time, pose.Position, pose.Yaw * (360f / 256f), pose.Speed / 10f, (MonsterAI.State)pose.State,
                     (MonsterAI.RemoteHunt)(hunting & CreatureHost.HuntMask), pose.Poise / 255f, (hunting & CreatureHost.WaitingFlag) != 0,
                     (hunting & CreatureHost.FelledFlag) != 0, (hunting & CreatureHost.GuardingFlag) != 0, pose.Notice / 255f, (MonsterAI.RemoteHunt)pose.Noticing,
-                    (hunting & CreatureHost.MarkedFlag) != 0, (hunting & CreatureHost.ShieldBrokenFlag) != 0);
+                    (hunting & CreatureHost.MarkedFlag) != 0, (hunting & CreatureHost.ShieldBrokenFlag) != 0,
+                    (hunting & CreatureHost.StrikeToppleFlag) != 0);
                 if (puppet.Health != null)
                 {
                     puppet.Health.ShowShare(pose.Health / 255f);
@@ -494,6 +497,20 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         using var writer = new FastBufferWriter(16, Allocator.Temp);
         writer.WriteNetworkSerializable(new CreatureStaggerMessage { Id = puppet.Id, Seconds = seconds });
         link.ToHost(CoopCreatures.StaggerMessage, writer);
+    }
+
+    // This player's parry or crush wore a puppet's poise, which it keeps none of: the host's creature takes it (a break staggers or
+    // topples it, which comes back in its poses). Before, a friend's parries never brought a great beast or a boss nearer a break.
+    private void OnPoiseBlowHere(MonsterAI creature, MonsterAI.PoiseBlow blow)
+    {
+        if (!FromHost || link == null || creature == null || !byCreature.TryGetValue(creature, out Puppet puppet))
+        {
+            return;
+        }
+
+        using var writer = new FastBufferWriter(16, Allocator.Temp);
+        writer.WriteNetworkSerializable(new CreaturePoiseMessage { Id = puppet.Id, Blow = (byte)blow });
+        link.ToHost(CoopCreatures.PoiseMessage, writer);
     }
 
     // A status this player laid on a puppet (Frostbound's chill, Rootbinder's roots): the host's creature, which does the fighting,

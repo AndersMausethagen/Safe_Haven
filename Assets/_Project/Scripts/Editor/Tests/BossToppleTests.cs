@@ -160,6 +160,61 @@ public sealed class BossToppleTests
     }
 
     [Test]
+    public void AnOpenerNotUsedInItsStage_IsRetiredWithIt()
+    {
+        // The Heartroot's Heartburst opens stage 2; a boss taken through stage 2 too fast to use it mustn't open stage 3 with it.
+        var heartburst = new MonsterAttack { attack = Attack(), maximumRange = 40f, priority = 40, opener = true, fromPhase = 2 };
+        var slam = new MonsterAttack { attack = Attack(), maximumRange = 3f, priority = 10 };
+        var attacks = new[] { slam, heartburst };
+        Assert.IsFalse(heartburst.InPhase(1));
+        Assert.IsTrue(heartburst.InPhase(2), "its own stage");
+        Assert.IsFalse(heartburst.InPhase(3), "retired with its stage");
+        Assert.AreEqual(1, MonsterAttacks.SelectAttack(attacks, new float[2], 2f, 0f, false, 0, 2));
+        Assert.AreEqual(0, MonsterAttacks.SelectAttack(attacks, new float[2], 2f, 0f, false, 0, 3), "the next stage begins with its own");
+
+        heartburst.untilPhase = 4;
+        Assert.IsTrue(heartburst.InPhase(3), "an Until Phase past the next keeps it longer");
+        Assert.IsFalse(heartburst.InPhase(4));
+
+        heartburst.opener = false;
+        heartburst.untilPhase = 0;
+        Assert.IsTrue(heartburst.InPhase(3), "an everyday strike still runs to the end");
+    }
+
+    [Test]
+    public void AFriendsCopy_LiesAsLongAsTheHostsStrikeTopple()
+    {
+        // Take Root: Open After 5 with Topple After; the boss's own Topple Seconds 3. The host's game says the topple is the strike's
+        // (CreatureHost.StrikeToppleFlag); the copy finds the length from what it plays, played, or its kind's strikes.
+        var takeRoot = new MonsterAttack { attack = Attack(), openAfter = 5f, toppleAfter = true };
+        var slam = new MonsterAttack { attack = Attack(), openAfter = 1.2f };
+        var attacks = new[] { slam, takeRoot };
+        Assert.AreEqual(5f, MonsterAI.StrikeToppleSeconds(attacks, takeRoot, -1, 3f), "the strike it is playing");
+        Assert.AreEqual(5f, MonsterAI.StrikeToppleSeconds(attacks, null, 1, 3f), "the strike it last played");
+        Assert.AreEqual(5f, MonsterAI.StrikeToppleSeconds(attacks, slam, 0, 3f), "built after the strike began: its kind's");
+        Assert.AreEqual(3f, MonsterAI.StrikeToppleSeconds(new[] { slam }, null, -1, 3f), "none of its kind: its own topple");
+        Assert.AreEqual(3f, MonsterAI.StrikeToppleSeconds(null, null, 0, 3f));
+    }
+
+    [Test]
+    public void AFriendsCopyBuiltMidFight_OnlyCatchesUpWithTheStagesItMissed()
+    {
+        // Built at 10% (the host's at stage 3 of 3), before it is awake: every stage is a catch-up (no reel told to the host, no rings).
+        for (int stage = 0; stage < 3; stage++)
+        {
+            Assert.IsTrue(BossEncounter.CatchesUp(true, false, stage, 3), $"stage {stage + 1}");
+        }
+
+        // Awake, its health jumping past two marks: the first is passed through, the second is entered for real.
+        Assert.IsTrue(BossEncounter.CatchesUp(true, true, 1, 3));
+        Assert.IsFalse(BossEncounter.CatchesUp(true, true, 2, 3));
+        Assert.IsFalse(BossEncounter.CatchesUp(true, true, 0, 1), "one stage at a time, as a fight goes");
+        // The host's game, or a player alone, never catches up: every stage is its own.
+        Assert.IsFalse(BossEncounter.CatchesUp(false, false, 0, 3));
+        Assert.IsFalse(BossEncounter.CatchesUp(false, true, 1, 3));
+    }
+
+    [Test]
     public void AnEverydayStrike_IsReadyAfterItsCooldown_AsBefore()
     {
         var slam = new MonsterAttack { cooldown = 3f };

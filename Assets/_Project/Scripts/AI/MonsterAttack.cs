@@ -50,7 +50,9 @@ public sealed class MonsterAttack
     public int priority;
     [Tooltip("A stage's opener (a boss's set piece as a phase begins): used once, as soon as its From Phase has begun and it reaches, " +
              "and never again; its Cooldown isn't used, and it is never the answer to a backstab. Give it the highest priority, no weight, " +
-             "and a Maximum Range that reaches anywhere in the arena. Broken off before it lands, it is spent all the same.")]
+             "and a Maximum Range that reaches anywhere in the arena. Broken off before it lands, it is spent all the same. Not used in its " +
+             "stage (the boss went through it too fast), it is retired with it: it never opens a later stage, unless its Until Phase is set " +
+             "past its From Phase's next.")]
     public bool opener;
     [Tooltip("0: chosen by priority alone, as always. Above 0: when the highest-priority ready action has a weight, every ready action with " +
              "a weight (and no weightless one above it) is a candidate, picked by chance in proportion to these, so a fight doesn't run in " +
@@ -161,8 +163,11 @@ public sealed class MonsterAttack
             && now >= readyAt && (!packLeaderOnly || isLeader) && WhenHurt(health);
     }
 
-    /// <summary>Whether a boss at this stage of its fight uses it: from its From Phase on, and before its Until Phase (0: to the end).</summary>
-    public bool InPhase(int phase) => fromPhase <= phase && (untilPhase <= 0 || phase < untilPhase);
+    /// <summary>
+    /// Whether a boss at this stage of its fight uses it: from its From Phase on, and before its Until Phase (0: to the end). An opener
+    /// with no Until Phase belongs to its own stage only: one the boss went through too fast to use it doesn't open the next.
+    /// </summary>
+    public bool InPhase(int phase) => fromPhase <= phase && (untilPhase > 0 ? phase < untilPhase : !opener || phase == fromPhase);
 
     /// <summary>
     /// When it can be used again after it ends at <paramref name="now"/> (it landed, or was broken off): its cooldown, scaled; never for an

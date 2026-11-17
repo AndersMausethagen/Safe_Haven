@@ -436,10 +436,13 @@ public static class SceneTransition
 
         // Steps are driven by hand rather than as nested coroutines, so a step that doesn't yield finishes this frame and
         // the next one starts straight away, all before the scene's Start. A step may add another as it runs (AddSetup).
+        // What a step yields that is itself a routine (yield return Another()) is driven by hand too: left to Unity as a nested
+        // coroutine, an exception thrown in it stopped the whole chain, setup never finished and the loading screen stayed up.
         private IEnumerator RunSetups(List<ISceneSetup> steps)
         {
             setupProgress = 0f;
             runningSteps = steps;
+            var nested = new Stack<IEnumerator>();
             for (int i = 0; i < steps.Count; i++)
             {
                 runningStep = i;
@@ -454,22 +457,39 @@ public static class SceneTransition
                     continue;
                 }
 
-                while (routine != null)
+                nested.Clear();
+                if (routine != null)
                 {
+                    nested.Push(routine);
+                }
+
+                while (nested.Count > 0)
+                {
+                    IEnumerator running = nested.Peek();
                     object current;
                     try
                     {
-                        if (!routine.MoveNext())
+                        if (!running.MoveNext())
                         {
-                            break;
+                            nested.Pop();
+                            continue;
                         }
 
-                        current = routine.Current;
+                        current = running.Current;
                     }
                     catch (Exception exception)
                     {
                         Debug.LogException(exception, steps[i] as Object);
+                        // The step ends: what it was waiting in is abandoned, its finally blocks run (a flag it holds is let go).
+                        nested.Pop();
+                        DisposeAll(nested, steps[i] as Object);
                         break;
+                    }
+
+                    if (current is IEnumerator inner && !(current is CustomYieldInstruction))
+                    {
+                        nested.Push(inner);
+                        continue;
                     }
 
                     yield return current;
@@ -484,6 +504,22 @@ public static class SceneTransition
             }
 
             setupProgress = 1f;
+        }
+
+        // Abandons the routines a failed step was nested in, innermost first: each one's finally blocks run as it is disposed.
+        private static void DisposeAll(Stack<IEnumerator> routines, Object context)
+        {
+            while (routines.Count > 0)
+            {
+                try
+                {
+                    (routines.Pop() as IDisposable)?.Dispose();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception, context);
+                }
+            }
         }
 
         private IEnumerator Fade(float target, float seconds)

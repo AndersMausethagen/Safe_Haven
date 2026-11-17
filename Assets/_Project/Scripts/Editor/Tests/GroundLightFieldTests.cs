@@ -442,6 +442,90 @@ public sealed class GroundLightFieldTests
     }
 
     [Test]
+    public void ARebuild_KeepsTheLandsShade_AndTakesTheNewCoverIntoTheLiftAndTheBounce()
+    {
+        // The late setup step works the field out again once caches and nodes stand (GroundLightMap.Rebuild): the land's shade comes
+        // from the first build untraced, and the cover placed since counts in the night's lift and keeps the sun off the ground.
+        var albedo = new Vector3[Size * Size];
+        for (int i = 0; i < albedo.Length; i++)
+        {
+            albedo[i] = new Vector3(0.4f, 0.35f, 0.25f);
+        }
+
+        var open = new float[Size * Size];
+        for (int i = 0; i < open.Length; i++)
+        {
+            open[i] = -1000f;
+        }
+
+        var recipe = new GroundLightField.Recipe
+        {
+            Size = Size, Cell = Cell, Ground = Pit(), Relief = 1f, Dim = 1f, NightLiftMost = 2f, Cover = open, CoverSize = Size,
+            CoverSide = Size * Cell, CoverStrength = 0.6f, Albedo = albedo, Bounce = true, TowardLight = Vector3.up, BounceSpread = 3f,
+        };
+        GroundLightField.Result first = GroundLightField.Build(recipe);
+        Assert.IsNotNull(first.Relief, "the land's shade is handed on");
+
+        recipe.KnownRelief = first.Relief;
+        GroundLightField.Result same = GroundLightField.Build(recipe);
+        Assert.AreEqual(first.MeanGround, same.MeanGround, 1e-6f);
+        for (int i = 0; i < Size * Size; i++)
+        {
+            Assert.AreEqual(first.Light[i], same.Light[i], "reused, the land's shade comes out as traced");
+        }
+
+        // A stack of crates placed later over the middle: the second build sees it.
+        var placed = (float[])open.Clone();
+        for (int z = Size / 2 - 6; z < Size / 2 + 6; z++)
+        {
+            for (int x = Size / 2 - 6; x < Size / 2 + 6; x++)
+            {
+                placed[z * Size + x] = 30f;
+            }
+        }
+
+        recipe.Cover = placed;
+        GroundLightField.Result rebuilt = GroundLightField.Build(recipe);
+        int middle = Size / 2 * Size + Size / 2;
+        Assert.Less(rebuilt.MeanGround, first.MeanGround, "the new cover darkens the ground's average");
+        Assert.Greater(rebuilt.Lift, first.Lift, "so the night's lift makes up for it");
+        Assert.Less(rebuilt.Light[middle].r, first.Light[middle].r, "and the sun no longer reaches under it to bounce");
+        Assert.AreEqual(first.Light[middle].a, rebuilt.Light[middle].a, "the land's shade is the same");
+    }
+
+    [Test]
+    public void ARedrawnPatch_LeavesNoRingOfOldCover()
+    {
+        // A building's ground changed (BuildingMargin round its bounds): every field cell whose cover test can see the change (a metre
+        // out, and a texel's blend) must lie far enough inside the block drawn again to be worked out again from it.
+        const float texel = 0.25f, cell = 0.5f;
+        const int fieldSize = 512;
+        var changed = Rect.MinMaxRect(60.3f, 80.7f, 71.9f, 88.2f);
+        Rect drawn = GroundLightMap.DrawnFor(changed, texel);
+        // As SkyOcclusionMap.TexelsOver snaps it: out to whole texels.
+        float x0 = Mathf.Floor(drawn.xMin / texel) * texel, z0 = Mathf.Floor(drawn.yMin / texel) * texel;
+        float x1 = Mathf.Ceil(drawn.xMax / texel) * texel, z1 = Mathf.Ceil(drawn.yMax / texel) * texel;
+        Assert.IsTrue(GroundLightMap.CellsInside(new Vector2(x0, z0), new Vector2(x1 - x0, z1 - z0), cell, fieldSize,
+            out int first, out int firstRow, out int last, out int lastRow));
+
+        float seen = GroundLightMap.CoverTapReach + texel;
+        for (int z = 0; z < fieldSize; z++)
+        {
+            for (int x = 0; x < fieldSize; x++)
+            {
+                float cx = (x + 0.5f) * cell, cz = (z + 0.5f) * cell;
+                bool seesTheChange = cx >= changed.xMin - seen && cx <= changed.xMax + seen && cz >= changed.yMin - seen && cz <= changed.yMax + seen;
+                if (seesTheChange)
+                {
+                    Assert.IsTrue(x >= first && x <= last && z >= firstRow && z <= lastRow, $"cell {x}, {z} keeps the old cover");
+                    Assert.GreaterOrEqual(cx - x0, GroundLightMap.CellInset - 1e-4f, "and it reads only what was drawn");
+                    Assert.GreaterOrEqual(x1 - cx, GroundLightMap.CellInset - 1e-4f);
+                }
+            }
+        }
+    }
+
+    [Test]
     public void AddSetup_OutsideASceneSetup_IsRefused()
     {
         Assert.IsFalse(SceneTransition.IsBusy);

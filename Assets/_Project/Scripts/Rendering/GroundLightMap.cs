@@ -27,17 +27,15 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     private static readonly int RectId = Shader.PropertyToID("_GroundLightRect");
     private static readonly int BounceId = Shader.PropertyToID("_GroundLightBounce");
 
-    /// <summary>Metres round a felled or regrown tree drawn again: its crown, and the reach of the cover test round it.</summary>
+    /// <summary>Metres round a felled or regrown tree drawn again: its crown.</summary>
     private const float FelledReach = 12f;
-    /// <summary>Seconds after the cut by which a felled tree's patch is drawn even if it hasn't come to rest (FelledTree gives up
-    /// falling after 10 s and settling after 3).</summary>
-    private const float FelledLongest = 15f;
-    /// <summary>Metres from where a tree stood that its falling copy is looked for.</summary>
-    private const float FelledFind = 6f;
-    /// <summary>Seconds between looks at a tree still coming down.</summary>
-    private const float FelledRecheck = 0.5f;
-    /// <summary>Metres round a gathered or regrown resource drawn again: the rock, and the cover test's reach round it.</summary>
+    /// <summary>Metres round a gathered or regrown resource drawn again: the rock.</summary>
     private const float NodeReach = 5f;
+    /// <summary>Metres a field cell's cover test reaches from its centre: GroundLightField.CoverAt's taps, a metre out.</summary>
+    public const float CoverTapReach = 1f;
+    /// <summary>Metres inside a drawn block of the cover map a cell's centre must lie for its cover test to read only what was drawn:
+    /// the taps' reach and the blend between texels.</summary>
+    public const float CellInset = 1.5f;
     /// <summary>Seconds after a resource is gathered before its patch is drawn again (it breaks apart first).</summary>
     private const float NodeDelay = 1f;
     /// <summary>Metres round a building's bounds drawn again.</summary>
@@ -55,14 +53,11 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 
-    // A patch of ground to draw again once it is due: a felled tree's waits until the tree has come to rest.
+    // A patch of ground to draw again once it is due: a felled tree's a while after the cut, a gathered rock's once it has broken apart.
     private struct Waiting
     {
         public Rect Area;
-        public Vector3 At;
         public float Due;
-        public float GiveUp;
-        public bool Falls;
     }
 
     private RenderingSettings settings;
@@ -75,6 +70,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     private int fieldSize;
     private float[] fieldGround;
     private float coverStrength;
+    // The first build's recipe (its ground, colours and land's shade), kept until the late setup step has worked the field out again
+    // from the finished map's cover.
+    private GroundLightField.Recipe rebuild;
     private Terrain terrain;
     private TerrainTreeFelling felling;
     private TerrainNodeHarvesting harvesting;
@@ -147,6 +145,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
         terrain = null;
         fieldGround = null;
+        rebuild = null;
         halves = Array.Empty<ushort>();
         heights = Array.Empty<float>();
         Unbind();
@@ -222,7 +221,12 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
             step.Restart();
             bool read = false;
-            yield return ReadBack(drawn, ok => read = ok);
+            IEnumerator readBack = ReadBack(drawn, ok => read = ok);
+            while (Advance(readBack))
+            {
+                yield return null;
+            }
+
             Release(drawn);
             if (mine != generation || !read)
             {
@@ -298,21 +302,17 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             GroundLightField.Result result = work.Result;
             times.Append($"field worked out {step.ElapsedMilliseconds} ms ({result.Timings}), ");
             step.Restart();
-            field = new Texture2DArray(size, size, 2, TextureFormat.RGBA32, false, true)
-            {
-                name = "Ground Light", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave,
-            };
-            field.SetPixels32(result.Light, 0);
-            field.SetPixels32(result.Ground, 1);
-            field.Apply(false, true);
             fieldArea = map;
             fieldSize = size;
             fieldGround = recipe.Ground;
             coverStrength = recipe.CoverStrength;
             Color tint = look.BounceTint.linear * look.Bounce;
-            Shader.SetGlobalTexture(FieldId, field);
             Shader.SetGlobalVector(BounceId, new Vector4(tint.r, tint.g, tint.b, 0f));
-            Shader.SetGlobalVector(RectId, new Vector4(map.xMin, map.yMin, 1f / side, result.Lift));
+            Show(result);
+            // Worked out again by the late setup step from the finished map's cover (Setup), the land's shade kept.
+            recipe.KnownRelief = result.Relief;
+            recipe.Cover = null;
+            rebuild = drawnAgainLater ? recipe : null;
             times.Append($"uploaded {step.ElapsedMilliseconds} ms");
             Debug.Log($"Raid ground light built in {clock.ElapsedMilliseconds} ms ({size}² cells of {cell:0.00} m; hour {hour:0.0}, " +
                       $"{dim:0.00} of the night's lift: {result.Lift:0.00}; relief {look.Relief:0.00}, ground's mean light " +
@@ -330,8 +330,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
     /// <summary>
     /// The late setup step <see cref="Build"/> adds: once every other step has placed what it places (caches, resource nodes,
-    /// creatures), the whole map's cover is drawn again behind the loading screen, with what moves left out; from then on only
-    /// what changes.
+    /// creatures), the whole map's cover is drawn again behind the loading screen, with what moves left out, and with a field bound the
+    /// whole field is worked out again from it: the ground's cover, and the bounce's sun test and the night's lift, which read the
+    /// cover too. From then on only what changes. Driven step by step, so a fault in it is logged and the loading screen still goes.
     /// </summary>
     public IEnumerator Setup()
     {
@@ -355,11 +356,130 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         dirty.Clear();
         SeeBuildings();
         buildingsChanged = false;
-        yield return Redraw(cover.PinnedArea);
+        bool whole = rebuild != null && field != null;
+        IEnumerator redraw = whole ? Rebuild() : Redraw(cover.PinnedArea, true);
+        while (Advance(redraw))
+        {
+            yield return redraw.Current;
+        }
+
+        rebuild = null;
         if (mine == generation && cover.Pinned)
         {
             enabled = true;
-            Debug.Log($"Raid ground light: the cover drawn again over the whole map once it was set up, in {clock.ElapsedMilliseconds} ms.", this);
+            Debug.Log($"Raid ground light: the cover drawn again over the whole map once it was set up{(whole ? ", and the field worked out again from it" : "")}, " +
+                      $"in {clock.ElapsedMilliseconds} ms.", this);
+        }
+    }
+
+    // The whole field worked out again from the whole cover drawn anew (the late setup step), the land's shade kept from the first build:
+    // what was placed since (caches, resource nodes) shades the ground, keeps the sun off it and counts in the night's lift.
+    private IEnumerator Rebuild()
+    {
+        redrawing = true;
+        int mine = generation;
+        try
+        {
+            int resolution = cover.PinnedResolution;
+            RenderTexture drawn = cover.Redraw(new RectInt(0, 0, resolution, resolution), true);
+            if (drawn == null)
+            {
+                yield break;
+            }
+
+            reading = drawn;
+            bool read = false;
+            IEnumerator readBack = ReadBack(drawn, ok => read = ok);
+            while (Advance(readBack))
+            {
+                yield return null;
+            }
+
+            Release(drawn);
+            GroundLightField.Recipe recipe = rebuild;
+            if (mine != generation || !read || field == null || recipe == null)
+            {
+                yield break;
+            }
+
+            Rect area = cover.PinnedArea;
+            recipe.Cover = heights;
+            recipe.CoverSize = resolution;
+            recipe.CoverSide = area.width;
+            recipe.CoverCorner = new Vector2(area.xMin - fieldArea.xMin, area.yMin - fieldArea.yMin);
+            ushort[] raw = halves;
+            float[] coverHeights = heights;
+            bool convert = readHalves;
+            int texels = resolution * resolution;
+            Task<GroundLightField.Result> work = Task.Run(() =>
+            {
+                if (convert)
+                {
+                    GroundLightField.HalvesToFloats(raw, coverHeights, texels);
+                }
+
+                return GroundLightField.Build(recipe);
+            });
+            while (!work.IsCompleted)
+            {
+                yield return null;
+            }
+
+            recipe.Cover = null;
+            if (mine != generation || field == null)
+            {
+                yield break;
+            }
+
+            if (work.IsFaulted || work.Result == null)
+            {
+                Debug.LogError($"Raid ground light: the field could not be worked out again ({work.Exception?.GetBaseException().Message}); the first stands.", this);
+                yield break;
+            }
+
+            Show(work.Result);
+        }
+        finally
+        {
+            if (mine == generation)
+            {
+                redrawing = false;
+            }
+        }
+    }
+
+    // Binds a built field: its two slices in a new texture (the bound one is unreadable once uploaded), and its night's lift.
+    private void Show(GroundLightField.Result result)
+    {
+        var made = new Texture2DArray(fieldSize, fieldSize, 2, TextureFormat.RGBA32, false, true)
+        {
+            name = "Ground Light", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave,
+        };
+        made.SetPixels32(result.Light, 0);
+        made.SetPixels32(result.Ground, 1);
+        made.Apply(false, true);
+        if (field != null)
+        {
+            Destroy(field);
+        }
+
+        field = made;
+        Shader.SetGlobalTexture(FieldId, field);
+        Shader.SetGlobalVector(RectId, new Vector4(fieldArea.xMin, fieldArea.yMin, 1f / fieldArea.width, result.Lift));
+    }
+
+    // One step of a routine driven by hand rather than nested: false once it ends or throws (logged), so whoever drives it goes on, its
+    // finally blocks run, and a fault never leaves the loading screen up or the redraws stopped for the run.
+    private bool Advance(IEnumerator routine)
+    {
+        try
+        {
+            return routine.MoveNext();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+            return false;
         }
     }
 
@@ -385,13 +505,6 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 continue;
             }
 
-            if (patch.Falls && StillFalling(patch.At, ref patch.Area) && Time.time < patch.GiveUp)
-            {
-                patch.Due = Time.time + FelledRecheck;
-                waiting[i] = patch;
-                continue;
-            }
-
             waiting.RemoveAt(i);
             MarkDirty(patch.Area);
         }
@@ -404,16 +517,13 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         }
     }
 
-    // A felled tree: its patch is drawn again once the tree has come down and lies still (never before: the cover map is kept
-    // all run), covering where it lies as well as where it stood.
+    // A felled tree: its patch is drawn again a while after the cut (Rendering Settings › Felled Redraw Delay), without its crown. The
+    // falling or lying tree itself is never drawn (it has a body: SkyOcclusionMap leaves it out), so there is nothing to wait for.
     private void OnTreeDown(int index)
     {
         if (TreeAt(index, out Vector3 at))
         {
-            waiting.Add(new Waiting
-            {
-                Area = Square(at, FelledReach), At = at, Due = Time.time + settings.FelledRedrawDelay, GiveUp = Time.time + FelledLongest, Falls = true,
-            });
+            waiting.Add(new Waiting { Area = Square(at, FelledReach), Due = Time.time + settings.FelledRedrawDelay });
         }
     }
 
@@ -427,8 +537,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     }
 
     // A painted rock gathered (gone until it grows back) or grown back.
-    private void OnNodeChanged(Vector3 at) =>
-        waiting.Add(new Waiting { Area = Square(at, NodeReach), At = at, Due = Time.time + NodeDelay, GiveUp = 0f });
+    private void OnNodeChanged(Vector3 at) => waiting.Add(new Waiting { Area = Square(at, NodeReach), Due = Time.time + NodeDelay });
 
     private void OnBuildingsChanged() => buildingsChanged = true;
 
@@ -442,31 +551,6 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
         at = terrain.transform.position + Vector3.Scale(terrain.terrainData.GetTreeInstance(index).position, terrain.terrainData.size);
         return true;
-    }
-
-    // Whether the felled copy of a tree that stood at a spot is still coming down or settling; the patch grows to take in where
-    // it lies, trunk and crown.
-    private static bool StillFalling(Vector3 at, ref Rect patch)
-    {
-        bool moving = false;
-        foreach (FelledTree tree in FindObjectsByType<FelledTree>())
-        {
-            Vector3 offset = tree.transform.position - at;
-            if (offset.x * offset.x + offset.z * offset.z > FelledFind * FelledFind)
-            {
-                continue;
-            }
-
-            moving |= !tree.IsLying;
-            foreach (Renderer part in tree.GetComponentsInChildren<Renderer>())
-            {
-                Bounds bounds = part.bounds;
-                patch = Rect.MinMaxRect(Mathf.Min(patch.xMin, bounds.min.x), Mathf.Min(patch.yMin, bounds.min.z),
-                                        Mathf.Max(patch.xMax, bounds.max.x), Mathf.Max(patch.yMax, bounds.max.z));
-            }
-        }
-
-        return moving;
     }
 
     // Buildings that went up, came down or were set down elsewhere since the cover map last saw them: their ground then and now.
@@ -572,16 +656,41 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         dirty.Add(area);
     }
 
-    // Draws a patch of the cover map again and, with a field bound, works the ground's cover out again for the cells well inside
-    // it (the cover test reaches a metre out), on a worker thread.
-    private IEnumerator Redraw(Rect ground)
+    /// <summary>
+    /// The square of cover map to draw again when what stands over <paramref name="changed"/> (metres, x and z) changed: grown by the
+    /// reach of a cell's cover test and a texel, so every cell whose test can see the change is worked out again, and by the inset those
+    /// cells need inside what is drawn. Drawn only over the change itself, a ring of cells round it kept the old cover. Pure, for tests.
+    /// </summary>
+    public static Rect DrawnFor(Rect changed, float metresPerTexel)
+    {
+        float grow = CellInset + CoverTapReach + Mathf.Max(0f, metresPerTexel);
+        return Rect.MinMaxRect(changed.xMin - grow, changed.yMin - grow, changed.xMax + grow, changed.yMax + grow);
+    }
+
+    /// <summary>
+    /// The field cells (first and last, both included) whose centres lie <see cref="CellInset"/> inside a drawn block of the cover map,
+    /// its corner and size in metres from the field's corner, among <paramref name="fieldSize"/> a side of <paramref name="cell"/> metres.
+    /// False when none does. Pure, for tests.
+    /// </summary>
+    public static bool CellsInside(Vector2 corner, Vector2 size, float cell, int fieldSize, out int x0, out int z0, out int x1, out int z1)
+    {
+        x0 = Mathf.Max(0, Mathf.CeilToInt((corner.x + CellInset) / cell - 0.5f));
+        z0 = Mathf.Max(0, Mathf.CeilToInt((corner.y + CellInset) / cell - 0.5f));
+        x1 = Mathf.Min(fieldSize - 1, Mathf.FloorToInt((corner.x + size.x - CellInset) / cell - 0.5f));
+        z1 = Mathf.Min(fieldSize - 1, Mathf.FloorToInt((corner.y + size.y - CellInset) / cell - 0.5f));
+        return x1 >= x0 && z1 >= z0;
+    }
+
+    // Draws a patch of the cover map again (grown: DrawnFor) and, with a field bound, works the ground's cover out again for the cells
+    // well inside it, on a worker thread. rescan: what moves is looked for anew (SkyOcclusionMap.Redraw).
+    private IEnumerator Redraw(Rect ground, bool rescan = false)
     {
         redrawing = true;
         int mine = generation;
         try
         {
-            RectInt texels = cover.TexelsOver(ground);
-            RenderTexture drawn = cover.Redraw(texels);
+            RectInt texels = cover.TexelsOver(DrawnFor(ground, cover.PinnedArea.width / Mathf.Max(1, cover.PinnedResolution)));
+            RenderTexture drawn = cover.Redraw(texels, rescan);
             if (drawn == null)
             {
                 yield break;
@@ -595,7 +704,12 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             }
 
             bool read = false;
-            yield return ReadBack(drawn, ok => read = ok);
+            IEnumerator readBack = ReadBack(drawn, ok => read = ok);
+            while (Advance(readBack))
+            {
+                yield return null;
+            }
+
             Release(drawn);
             if (mine != generation || !read || field == null)
             {
@@ -605,13 +719,10 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             Rect area = cover.PinnedArea;
             float texelsPerMetre = cover.PinnedResolution / area.width;
             float cell = fieldArea.width / fieldSize;
-            // The patch's corner in metres from the field's corner, and the cells whose centres lie 1.5 m inside it.
+            // The block's corner in metres from the field's corner, and the cells whose centres lie far enough inside it.
             var corner = new Vector2(area.xMin + texels.x / texelsPerMetre - fieldArea.xMin, area.yMin + texels.y / texelsPerMetre - fieldArea.yMin);
-            int x0 = Mathf.Max(0, Mathf.CeilToInt((corner.x + 1.5f) / cell - 0.5f));
-            int z0 = Mathf.Max(0, Mathf.CeilToInt((corner.y + 1.5f) / cell - 0.5f));
-            int x1 = Mathf.Min(fieldSize - 1, Mathf.FloorToInt((corner.x + texels.width / texelsPerMetre - 1.5f) / cell - 0.5f));
-            int z1 = Mathf.Min(fieldSize - 1, Mathf.FloorToInt((corner.y + texels.height / texelsPerMetre - 1.5f) / cell - 0.5f));
-            if (x1 < x0 || z1 < z0)
+            if (!CellsInside(corner, new Vector2(texels.width / texelsPerMetre, texels.height / texelsPerMetre), cell, fieldSize,
+                    out int x0, out int z0, out int x1, out int z1))
             {
                 yield break;
             }
@@ -679,15 +790,19 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     }
 
     // What the GPU drew, into the reused buffers: asynchronously as the map's own half floats where the platform can (a worker
-    // thread turns them into heights), else at once as floats. done(false): nothing came back.
+    // thread turns them into heights), else at once as floats. done(false): nothing came back, or a new scene (Clear) came first. The
+    // buffers are the ones current when it was asked for: Clear swaps in empty ones meanwhile, and copying into those threw.
     private IEnumerator ReadBack(RenderTexture texture, Action<bool> done)
     {
-        int count = texture.width * texture.height;
+        int mine = generation;
+        int width = texture.width, height = texture.height;
+        int count = width * height;
         if (heights.Length < count)
         {
             heights = new float[count];
         }
 
+        float[] intoHeights = heights;
         if (SystemInfo.supportsAsyncGPUReadback)
         {
             if (halves.Length < count)
@@ -695,10 +810,17 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 halves = new ushort[count];
             }
 
+            ushort[] intoHalves = halves;
             AsyncGPUReadbackRequest request = AsyncGPUReadback.Request(texture, 0);
             while (!request.done)
             {
                 yield return null;
+            }
+
+            if (mine != generation)
+            {
+                done(false);
+                yield break;
             }
 
             if (!request.hasError)
@@ -706,7 +828,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 NativeArray<ushort> data = request.GetData<ushort>();
                 if (data.Length >= count)
                 {
-                    NativeArray<ushort>.Copy(data, 0, halves, 0, count);
+                    NativeArray<ushort>.Copy(data, 0, intoHalves, 0, count);
                     readHalves = true;
                     done(true);
                     yield break;
@@ -714,19 +836,26 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             }
         }
 
-        if (texture == null || !texture.IsCreated())
+        if (texture == null || !texture.IsCreated() || mine != generation)
         {
             done(false);
             yield break;
         }
 
-        var copy = new Texture2D(texture.width, texture.height, TextureFormat.RFloat, false, true);
-        RenderTexture was = RenderTexture.active;
-        RenderTexture.active = texture;
-        copy.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0, false);
-        RenderTexture.active = was;
-        NativeArray<float>.Copy(copy.GetRawTextureData<float>(), 0, heights, 0, count);
-        Destroy(copy);
+        var copy = new Texture2D(width, height, TextureFormat.RFloat, false, true);
+        try
+        {
+            RenderTexture was = RenderTexture.active;
+            RenderTexture.active = texture;
+            copy.ReadPixels(new Rect(0, 0, width, height), 0, 0, false);
+            RenderTexture.active = was;
+            NativeArray<float>.Copy(copy.GetRawTextureData<float>(), 0, intoHeights, 0, count);
+        }
+        finally
+        {
+            Destroy(copy);
+        }
+
         readHalves = false;
         done(true);
     }

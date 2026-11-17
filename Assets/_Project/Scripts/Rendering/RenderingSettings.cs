@@ -90,8 +90,8 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Degrees: a dawn or dusk whose sun is lower than this gets the whole night's lift, fading to none by the time the sun " +
              "stands 15° up (the day-night profile's Daylight is full). Night always gets it all. How dark the hour is decides, not the clock.")]
     [SerializeField, Range(0f, 15f)] private float liftBelowSun = 10.5f;
-    [Tooltip("Seconds after a tree is felled before its patch of cover is looked at again: drawn once the falling tree has come to " +
-             "rest (it is never drawn itself), at the latest 15 s after the cut.")]
+    [Tooltip("Seconds after a tree is felled before its patch of cover is drawn again, without its crown (the falling tree is never " +
+             "drawn itself: it has a body).")]
     [SerializeField, Min(0f)] private float felledRedrawDelay = 6f;
 
     [Header("Characters")]

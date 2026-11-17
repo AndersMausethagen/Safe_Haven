@@ -201,9 +201,16 @@ public sealed partial class MonsterAI
 
     private bool toppling;
     private bool toppledNow;
+    // Set by Topple round its stagger when the topple is a Topple After strike's (its Open After long), and kept while that topple lasts.
+    private bool toppleForStrike;
+    private bool strikeToppledNow;
     private bool heartStrikeDue;
     private float toppleLength;
     private int toppledFrame = -1;
+    // A boss's new stage began its reel on this frame, its health then this (ReelForStage): the blow that crossed the mark, handled
+    // after it, still wears its poise down.
+    private int stageReelFrame = -1;
+    private float stageReelHealth;
 
     // True when a break of its poise topples it rather than staggering it.
     private bool Topples => definition != null && definition.Topples;
@@ -211,6 +218,16 @@ public sealed partial class MonsterAI
     /// <summary>True while it lies toppled: a long stagger (it is felled too, so it falls, lies and gets up), its heart open to the
     /// Topple Strike. On a friend's copy, while the host's creature lies toppled.</summary>
     public bool IsToppled => toppledNow && CurrentState == State.Staggered;
+
+    /// <summary>
+    /// True while it lies toppled by a Topple After strike (the Heartroot's Take Root), for that strike's Open After rather than its Topple
+    /// Seconds: co-op sends it (CreatureHost.StrikeToppleFlag), so a friend's copy lies exactly as long.
+    /// </summary>
+    public bool IsToppledByStrike => strikeToppledNow && IsToppled;
+
+    // The Open After of a strike under way that ends in a topple (Monster Attack › Topple After), else 0.
+    private float ToppleAfterNow => CurrentState == State.Attacking && attacks != null && attacks.Action != null && attacks.Action.toppleAfter
+        ? attacks.Action.openAfter : 0f;
 
     /// <summary>True on the frame it toppled: the blow that broke it lands with a longer hit stop (CombatFeedback).</summary>
     public bool ToppledThisFrame => toppledFrame == Time.frameCount && IsToppled;
@@ -230,9 +247,18 @@ public sealed partial class MonsterAI
     }
 
     // Down for the topple's length: felled (the knockdown, lying, the get up), its heart open to one strike, its poise grown when a break
-    // brought it down (Monster Definition › Poise Growth: the next needs more).
-    private void Topple(Vector3 blowDirection, float seconds, bool grows)
+    // brought it down (Monster Definition › Poise Growth: the next needs more). One that ends a Topple After strike (forStrike), or comes
+    // while one is under way (a poise break, a stagger, a backstab during the Heartroot's Take Root), lasts that strike's Open After
+    // whatever brought it on: the finale's kill window comes however its hold ends, and every game lies as long (IsToppledByStrike).
+    private void Topple(Vector3 blowDirection, float seconds, bool grows, bool forStrike = false)
     {
+        float strikes = ToppleAfterNow;
+        if (strikes > 0f)
+        {
+            seconds = strikes;
+            forStrike = true;
+        }
+
         if (definition == null || CurrentState == State.Dead || seconds <= 0f || IsUnyielding)
         {
             return;
@@ -240,9 +266,11 @@ public sealed partial class MonsterAI
 
         felling = true;
         toppling = true;
+        toppleForStrike = forStrike;
         Stagger(seconds);
         felling = false;
         toppling = false;
+        toppleForStrike = false;
         if (!IsToppled)
         {
             return;
@@ -288,6 +316,118 @@ public sealed partial class MonsterAI
             combatant.Stats, combatant.Rules, damageable.DamageTakenMultiplier);
         // A finisher's weight (a strong hit's flash, sound and stop), not a backstab's: it isn't a second backstab to answer or remember.
         damageable.ApplyDamage(new DamageInfo(by, null, amount, DamageType.Physical, true, point, direction, 0f, HitTechnique.Finisher));
+    }
+
+    // About to break off the strike under way (a recoil, a backstab, a blow that interrupts it): one that ends in a topple (Topple After)
+    // goes down for its Open After instead, as it would have at its end. Broken off, an opener is spent and its kill window never came.
+    // True when it toppled.
+    private bool ToppleInsteadOfBreakingOff()
+    {
+        if (ToppleAfterNow <= 0f)
+        {
+            return false;
+        }
+
+        Topple(-transform.forward, 0f, false);
+        return IsToppled;
+    }
+
+    /// <summary>
+    /// A boss's new stage (BossEncounter) reels it for <paramref name="seconds"/>. Toppled (the blow that crossed the mark often lands in a
+    /// topple), it stays down at least the reel: begun anew, the reel would stand it up into a plain stagger and end its topple early. The
+    /// blow that crossed the mark is handled after this (Damageable raises HealthChanged before Damaged), and its poise still counts: a
+    /// reel it began doesn't throw it away as a stagger it was already in would.
+    /// </summary>
+    public void ReelForStage(float seconds)
+    {
+        if (definition == null || CurrentState == State.Dead || seconds <= 0f)
+        {
+            return;
+        }
+
+        bool wasStaggered = CurrentState == State.Staggered;
+        if (IsToppled)
+        {
+            StaggerAtLeast(seconds);
+        }
+        else
+        {
+            Stagger(seconds);
+        }
+
+        if (!wasStaggered && CurrentState == State.Staggered && damageable != null)
+        {
+            stageReelFrame = Time.frameCount;
+            stageReelHealth = damageable.CurrentHealth;
+        }
+    }
+
+    // True once, for the blow whose loss of health began a stage's reel just now (ReelForStage, this frame, at this health).
+    private bool TakeStageReel()
+    {
+        bool reel = stageReelFrame == Time.frameCount && damageable != null && Mathf.Approximately(stageReelHealth, damageable.CurrentHealth);
+        stageReelFrame = -1;
+        return reel;
+    }
+
+    /// <summary>
+    /// Its poise broken outright (a hammer's Crush on poise worn low): staggered for <paramref name="staggerSeconds"/>, or, for a creature
+    /// that topples, toppled as any break of its poise topples it (its poise growing for the next). A friend's copy keeps no poise: there
+    /// a creature that topples has the host's game break the real one's (<see cref="RemotePoiseBlow"/>), and the topple comes back in its
+    /// poses; one that doesn't staggers here, which is told to the host as any stagger begun here is.
+    /// </summary>
+    public void Crushed(Vector3 blowDirection, float staggerSeconds)
+    {
+        if (definition == null || CurrentState == State.Dead || IsUnyielding)
+        {
+            return;
+        }
+
+        if (!Topples)
+        {
+            Stagger(staggerSeconds);
+            return;
+        }
+
+        if (IsRemote)
+        {
+            RemotePoiseBlow?.Invoke(this, PoiseBlow.Crush);
+            return;
+        }
+
+        if (CurrentState == State.Staggered)
+        {
+            return;
+        }
+
+        poise?.Break(Time.time);
+        Topple(blowDirection, definition.ToppleSeconds, true);
+    }
+
+    /// <summary>
+    /// Co-op, in the host's game: what a friend's game did to its copy's poise, which it can't work out there (the copy keeps none), done
+    /// to the real creature: a parry's share of its poise (and its reel back), a crush's break. Its state then shows everyone the outcome.
+    /// </summary>
+    public void TakeFriendsPoiseBlow(PoiseBlow blow)
+    {
+        if (IsRemote || definition == null || CurrentState == State.Dead)
+        {
+            return;
+        }
+
+        switch (blow)
+        {
+            case PoiseBlow.Parry:
+                Parried(CombatTechniqueSettings.Current.ParryStagger);
+                break;
+            case PoiseBlow.Crush:
+                if (CurrentState != State.Staggered)
+                {
+                    Crushed(-transform.forward, CombatTechniqueSettings.Current.StaggerSeconds);
+                }
+
+                break;
+        }
     }
 
     // Its poise broke through its raised shield: a longer stagger and the crash of it; enough of them and the shield splinters.

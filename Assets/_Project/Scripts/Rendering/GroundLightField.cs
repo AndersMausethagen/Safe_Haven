@@ -49,6 +49,9 @@ public static class GroundLightField
         public float CoverStrength;
         /// <summary>How much the land's shade darkens (RaidGroundLight › Relief, 0 none).</summary>
         public float Relief;
+        /// <summary>The land's shade factor at each cell from an earlier build of the same ground (<see cref="Result.Relief"/>): reused
+        /// instead of traced again, as it reads no cover (GroundLightMap works the field out again once the map is set up). Null: traced.</summary>
+        public float[] KnownRelief;
         /// <summary>Whether to work the thrown-back light out at all (RaidGroundLight › Bounce above 0).</summary>
         public bool Bounce;
         /// <summary>How much of the night's lift the run's hour gets (<see cref="LiftShare"/>): 1 at night and at a dim dawn or
@@ -76,6 +79,9 @@ public static class GroundLightField
         /// <summary>The ground's light factor (the canopy's shade times the land's) averaged over the map: what the terrain loses
         /// against before the field, which read neither.</summary>
         public float MeanGround = 1f;
+        /// <summary>The land's shade factor at each cell (null when Relief was 0), for a later build of the same ground
+        /// (<see cref="Recipe.KnownRelief"/>).</summary>
+        public float[] Relief;
         public string Timings = "";
     }
 
@@ -100,7 +106,11 @@ public static class GroundLightField
         float[] coarseGround = Shrink(recipe.Ground, size, every);
         float[] relief = null;
         long reliefMs = 0;
-        if (recipe.Relief > 0f)
+        if (recipe.KnownRelief != null && recipe.KnownRelief.Length == count)
+        {
+            relief = recipe.KnownRelief;
+        }
+        else if (recipe.Relief > 0f)
         {
             float[] open = Relief(coarseGround, coarse, coarseCell, recipe.ReliefDirections, recipe.ReliefNearest, recipe.ReliefFarthest);
             relief = every == 1 ? open : Grow(open, coarse, size, every);
@@ -184,6 +194,7 @@ public static class GroundLightField
             result.Ground[i] = new Color32(Byte(cover[i]), 255, 255, 255);
         }
 
+        result.Relief = relief;
         result.Timings = $"relief {reliefMs} ms, cover {coverMs} ms, bounce {bounceMs} ms";
         return result;
     }

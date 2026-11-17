@@ -11,7 +11,7 @@ using UnityEngine.AI;
 /// <para>
 /// Each wall is placed in the scene where it stands when risen (so it is seen and fitted in the Editor); the scene starts with it sunk out of
 /// sight. As its stage begins it warns (dust, a crack, an optional mark on the ground), waits until the boss is off its line, nudges anyone
-/// standing on it aside (never hurt or trapped), then rises with its colliders on and a carving NavMeshObstacle, so creatures walk round
+/// standing on it aside (never hurt or trapped) and, once the nudge is done, rises with its colliders on and a carving NavMeshObstacle, so creatures walk round
 /// by the gaps. A wall stops what flies (a Thornwave's thorns: MonsterProjectile stops on any collider) but not what comes from under or
 /// above (Grasping Roots, eruptions): that rule is the arena's, not this component's.
 /// </para>
@@ -73,9 +73,6 @@ public sealed class RisingGround : MonoBehaviour
     private bool rising;
     private bool sinking;
     private Wall[] walls = new Wall[0];
-    // The warning laid for the wall about to rise, so a sink that cuts the rise short takes it away too.
-    private GameObject warningShown;
-
     // What is known of each wall from where it stands risen, worked out before it is first sunk.
     private sealed class Wall
     {
@@ -85,6 +82,8 @@ public sealed class RisingGround : MonoBehaviour
         public float Depth;
         public bool Up;
         public GameObject Obstacle;
+        // The warning laid for it while it is about to rise, so a sink that cuts the rise short takes it away too.
+        public GameObject Warning;
     }
 
     /// <summary>How many walls stand risen now.</summary>
@@ -147,9 +146,13 @@ public sealed class RisingGround : MonoBehaviour
                 sinking = true;
                 rising = true;
                 StopAllCoroutines();
-                if (warningShown != null)
+                foreach (Wall wall in walls)
                 {
-                    Destroy(warningShown);
+                    if (wall.Warning != null)
+                    {
+                        Destroy(wall.Warning);
+                        wall.Warning = null;
+                    }
                 }
 
                 StartCoroutine(SinkAll());
@@ -165,6 +168,8 @@ public sealed class RisingGround : MonoBehaviour
         }
     }
 
+    // Each wall starts its warning After the one before started, and rises on its own: they don't wait for each other to finish,
+    // so a spoke's walls come up together as the stage's set piece lands, not one after another for half a minute.
     private IEnumerator RiseAll(BossEncounter from)
     {
         for (int i = 0; i < walls.Length; i++)
@@ -175,7 +180,7 @@ public sealed class RisingGround : MonoBehaviour
                 yield return new WaitForSeconds(after);
             }
 
-            yield return Rise(walls[i], from);
+            StartCoroutine(Rise(walls[i], from));
         }
     }
 
@@ -187,25 +192,37 @@ public sealed class RisingGround : MonoBehaviour
         CameraShake.Add(shake * 0.5f);
         if (warningMark != null)
         {
-            warningShown = Instantiate(warningMark, foot, wall.Piece.rotation);
+            wall.Warning = Instantiate(warningMark, foot, wall.Piece.rotation);
         }
 
         yield return new WaitForSeconds(warning);
-        // Never through the boss: it waits until his body is off the line (or he is down).
         float bossRadius = from != null && from.TryGetComponent(out NavMeshAgent bossAgent)
             ? bossAgent.radius * Mathf.Abs(from.transform.lossyScale.x) + 0.5f : 1.5f;
-        while (from != null && from.IsAwake && OnLine(wall, from.transform.position, bossRadius))
+        var nudged = new WaitForSeconds(nudgeSeconds);
+        while (true)
         {
-            yield return new WaitForSeconds(0.25f);
+            // Never through the boss: it waits until his body is off the line (or he is down).
+            while (from != null && from.IsAwake && OnLine(wall, from.transform.position, bossRadius))
+            {
+                yield return new WaitForSeconds(0.25f);
+            }
+
+            if (wall.Warning != null)
+            {
+                Destroy(wall.Warning);
+                wall.Warning = null;
+            }
+
+            // Nudged clear first, and only then up: rising while a body was still being moved off its line, the colliders caught it,
+            // lifted it or shut it in. The crack's dust and sound already said where. The boss stepping back on meanwhile, it waits again.
+            NudgeOff(wall, from != null ? from.transform : null);
+            yield return nudged;
+            if (from == null || !from.IsAwake || !OnLine(wall, from.transform.position, bossRadius))
+            {
+                break;
+            }
         }
 
-        if (warningShown != null)
-        {
-            Destroy(warningShown);
-            warningShown = null;
-        }
-
-        NudgeOff(wall, from != null ? from.transform : null);
         Transform piece = wall.Piece;
         Vector3 low = wall.Rest - LocalUp(piece) * wall.Depth;
         piece.localPosition = low;

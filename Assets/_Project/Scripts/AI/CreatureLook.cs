@@ -80,8 +80,9 @@ public static class CreatureLook
     }
 
     /// <summary>
-    /// How the body glows now: the emission of its first material with an emission map (black when that emission is off, or it has none),
-    /// so a passing glow (a boss's topple) can be put back as it was.
+    /// How the body glows now: the emission colour of its first material with an emission map (black when it has none), so a passing glow
+    /// (a boss's topple) can be put back as it was. Read by the map, as <see cref="Glow"/> lights it: a body's own copy of a material
+    /// doesn't reliably say the keyword is on, and reading black there put a lit body's glow out after its first topple.
     /// </summary>
     public static Color GlowOf(GameObject body)
     {
@@ -96,7 +97,7 @@ public static class CreatureLook
             {
                 if (material != null && material.HasProperty(EmissionMap) && material.GetTexture(EmissionMap) != null)
                 {
-                    return material.IsKeywordEnabled("_EMISSION") ? material.GetColor(EmissionColor) : Color.black;
+                    return material.HasProperty(EmissionColor) ? material.GetColor(EmissionColor) : Color.black;
                 }
             }
         }

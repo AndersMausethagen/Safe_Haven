@@ -51,6 +51,22 @@ public sealed class BossEncounter : MonoBehaviour
     /// <summary>True from its waking until it falls: the bar is up and the fight is on.</summary>
     public bool IsAwake { get; private set; }
 
+    /// <summary>
+    /// True while a friend's copy (co-op) enters a stage only to catch up with the host's fight: built mid-fight it enters every stage it
+    /// missed at once before it is awake, and a jump of health past several marks enters all but the last on the way. What the stage is
+    /// stands (its glow, its rage); what it does as it begins (its line, sound, shake and reel) was the host's game's, long ago, and a reel
+    /// here would be told to the host's game and stagger the real boss mid-fight. Read by <see cref="AnyPhaseEntered"/>'s listeners to
+    /// leave out a set piece in the same way (EruptionRings). Always false on the host's game and alone.
+    /// </summary>
+    public bool IsCatchingUp { get; private set; }
+
+    /// <summary>
+    /// <see cref="IsCatchingUp"/> for the stage at index <paramref name="entering"/> (0 the first) as a boss whose health has just reached
+    /// <paramref name="reached"/> stages enters it: only a friend's copy catches up, every stage while it isn't awake yet (built mid-fight)
+    /// and all but the last of a jump past several marks. Pure, for tests.
+    /// </summary>
+    public static bool CatchesUp(bool copy, bool awake, int entering, int reached) => copy && (!awake || entering + 1 < reached);
+
     /// <summary>Raised as it enters each phase (1 is the first after the opening), on the host and on a friend's copy alike.</summary>
     public event System.Action<BossEncounter, int> PhaseEntered;
 
@@ -138,7 +154,7 @@ public sealed class BossEncounter : MonoBehaviour
             ai.Toppled -= OnToppled;
         }
 
-        heartGlow = null;
+        StopHeartGlow();
         HideBar();
         StopMusic();
     }
@@ -199,12 +215,22 @@ public sealed class BossEncounter : MonoBehaviour
             yield return heartbeat;
         }
 
-        if (health.IsAlive)
+        heartGlow = null;
+        CreatureLook.Glow(gameObject, glowAfterTopple);
+    }
+
+    // Ends the topple's heartbeat, if it beats, and puts back the glow it had: as it dies (before its body goes to the corpse, which the
+    // killing blow's feedback makes after HealthChanged), or as it is switched off or removed mid-beat.
+    private void StopHeartGlow()
+    {
+        if (heartGlow == null)
         {
-            CreatureLook.Glow(gameObject, glowAfterTopple);
+            return;
         }
 
+        StopCoroutine(heartGlow);
         heartGlow = null;
+        CreatureLook.Glow(gameObject, glowAfterTopple);
     }
 
     private void Start()
@@ -419,32 +445,47 @@ public sealed class BossEncounter : MonoBehaviour
             bar.Set(health.HealthFraction);
         }
 
-        // The killing blow ends the fight: no phase is entered on the way down to 0 (its line, shake and reel over the defeat).
+        // The killing blow ends the fight: no phase is entered on the way down to 0 (its line, shake and reel over the defeat). Killed
+        // while it lay toppled, its heart stops beating here, before the body goes to its corpse with the glow mid-beat.
         if (!health.IsAlive)
         {
+            StopHeartGlow();
             return;
         }
 
         int reached = BossDefinition.PhaseAt(health.HealthFraction, definition.Phases);
-        while (phase < reached)
+        bool copy = ai != null && ai.IsRemote;
+        try
         {
-            Enter(definition.Phases[phase]);
-            phase++;
-            ai.SetPhase(phase);
-            Raise(PhaseEntered, this, phase);
-            Raise(AnyPhaseEntered, this, phase);
+            while (phase < reached)
+            {
+                IsCatchingUp = CatchesUp(copy, IsAwake, phase, reached);
+                Enter(definition.Phases[phase], IsCatchingUp);
+                phase++;
+                ai.SetPhase(phase);
+                Raise(PhaseEntered, this, phase);
+                Raise(AnyPhaseEntered, this, phase);
+            }
+        }
+        finally
+        {
+            IsCatchingUp = false;
         }
     }
 
-    private void Enter(BossPhase next)
+    private void Enter(BossPhase next, bool catchingUp)
     {
-        if (!string.IsNullOrWhiteSpace(next.line))
+        if (!catchingUp)
         {
-            GameMessages.Post(next.line, MessageKind.Warning);
+            if (!string.IsNullOrWhiteSpace(next.line))
+            {
+                GameMessages.Post(next.line, MessageKind.Warning);
+            }
+
+            AudioManager.Play(next.Sound, transform.position);
+            CameraShake.Add(0.6f);
         }
 
-        AudioManager.Play(next.Sound, transform.position);
-        CameraShake.Add(0.6f);
         if (next.glow.maxColorComponent > 0f)
         {
             CreatureLook.Glow(gameObject, next.glow);
@@ -458,23 +499,16 @@ public sealed class BossEncounter : MonoBehaviour
             combatant.Stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, next.damageBonus, this));
         }
 
-        if (next.reelSeconds > 0f)
+        // Toppled, it stays down at least the reel; the blow that crossed the mark still wears its poise (MonsterAI.ReelForStage).
+        if (next.reelSeconds > 0f && !catchingUp)
         {
-            // Toppled (the blow that crossed the mark often lands in a topple), it stays down at least the reel: begun anew, the reel
-            // would stand it up into a plain stagger and end its topple early.
-            if (ai.IsToppled)
-            {
-                ai.StaggerAtLeast(next.reelSeconds);
-            }
-            else
-            {
-                ai.Stagger(next.reelSeconds);
-            }
+            ai.ReelForStage(next.reelSeconds);
         }
     }
 
     private void OnDied(Damageable victim, DamageInfo hit)
     {
+        StopHeartGlow();
         HideBar();
         StopMusic();
         IsAwake = false;

@@ -16,7 +16,7 @@ using UnityEngine;
 /// <para>
 /// Where it belongs: on an object in the arena scene. A friend's game (co-op) bursts its own from its copy of the boss, whose phases follow
 /// the host's health, as CollapsingGround does: each game's rings only hurt that game's player (a friend's body in the host's game takes
-/// no damage), so every player sees and dodges their own.
+/// no damage), so every player sees and dodges their own. A copy that arrives with the fight already past the stage bursts nothing.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -86,9 +86,16 @@ public sealed class EruptionRings : MonoBehaviour
 
     private void OnPhase(BossEncounter from, int phase)
     {
-        if (!started && watching != null && from != null && from.Definition == watching && phase >= atPhase && eruption != null)
+        if (started || watching == null || from == null || from.Definition != watching || phase < atPhase || eruption == null)
         {
-            started = true;
+            return;
+        }
+
+        started = true;
+        // A friend's copy built mid-fight enters every stage it missed at once (BossEncounter.IsCatchingUp): the rings burst long ago in
+        // the host's game, so none here, then or later at a friend who came after the stage began.
+        if (!from.IsCatchingUp)
+        {
             StartCoroutine(Burst(from));
         }
     }

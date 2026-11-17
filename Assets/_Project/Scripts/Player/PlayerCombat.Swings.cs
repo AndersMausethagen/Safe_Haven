@@ -716,10 +716,11 @@ public sealed partial class PlayerCombat
             poise * PlayerRiding.ChargePoise(gameObject), technique, critical);
         if (monster != null && target.IsAlive)
         {
-            // Only a blow that struck home crushes: not one it hopped clear of or parried.
+            // Only a blow that struck home crushes: not one it hopped clear of or parried. Its poise breaks as a blow's would: a stagger, or
+            // a topple (its poise growing for the next) for a boss that topples.
             if (crush && !monster.IsStaggered && result.Landed && !result.Parried)
             {
-                monster.Stagger(Rules.StaggerSeconds);
+                monster.Crushed(pending.Direction, Rules.StaggerSeconds);
                 SignatureUsed?.Invoke(WeaponSignature.Crush, monster);
             }
 

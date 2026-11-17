@@ -26,7 +26,8 @@ public sealed partial class MonsterAI
             return;
         }
 
-        if (CurrentState == State.Attacking)
+        // A strike that ends in a topple (Topple After) isn't broken off: it goes down for its Open After.
+        if (CurrentState == State.Attacking && !ToppleInsteadOfBreakingOff())
         {
             attacks.Cancel();
             pose?.CancelAttack();
@@ -72,7 +73,8 @@ public sealed partial class MonsterAI
     private bool SeesBackstabComing()
     {
         float chance = BackstabReadChance;
-        if (chance <= 0f || !(OpenWhileStriking || BackstabsForeknown > 0) || global::Player.Current == null
+        // Rooted in a strike that ends in a topple (Topple After), it doesn't turn: broken off, the strike's topple would never come.
+        if (chance <= 0f || !(OpenWhileStriking || BackstabsForeknown > 0) || ToppleAfterNow > 0f || global::Player.Current == null
             || !global::Player.Current.TryGetComponent(out PlayerCombat swinger) || !swinger.IsWindingUp
             || Mathf.Approximately(swinger.SwingStartTime, lastSwingWatched))
         {

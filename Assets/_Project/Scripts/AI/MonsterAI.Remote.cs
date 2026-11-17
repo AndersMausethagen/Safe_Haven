@@ -11,7 +11,9 @@ using UnityEngine.AI;
 /// What it is told and what it works out: where it is, its state and whom it is after come from the host; whether it is
 /// unaware (an ambush) is read from those (<see cref="IsRemoteUnaware"/>), as its own senses never look. A stagger is the
 /// host's too, shown here when its state says so; one begun here (this player's parry) is told to the host
-/// (<see cref="RemoteStaggered"/>) and stands meanwhile. A charge travels here by itself (<see cref="MonsterMovement.Detached"/>).
+/// (<see cref="RemoteStaggered"/>) and stands meanwhile. What this player's blows do to its poise, which a copy keeps none of (a parry's
+/// share, a crush), is told to the host too (<see cref="RemotePoiseBlow"/>), and a topple comes back as the host's, as long as the host's
+/// lasts. A charge travels here by itself (<see cref="MonsterMovement.Detached"/>).
 /// </para>
 /// </summary>
 public sealed partial class MonsterAI
@@ -43,11 +45,27 @@ public sealed partial class MonsterAI
     private bool suppressed;
     private float remoteStaggerHold = float.NegativeInfinity;
 
+    /// <summary>What a friend's game did to one of the host's creatures' poise that only the host's game can work out (CreaturePoise).</summary>
+    public enum PoiseBlow : byte
+    {
+        /// <summary>A parry of a creature whose Parry Response is Poise Damage: the share of its poise, and its reel back.</summary>
+        Parry = 1,
+        /// <summary>A hammer's Crush on a creature that topples: its poise broken outright.</summary>
+        Crush = 2,
+    }
+
     /// <summary>
     /// Raised in a friend's game when something there staggers one of the host's creatures (this player's parry, a finishing
     /// blow holding it), with the seconds: co-op tells the host's game, which staggers the real one for everybody.
     /// </summary>
     public static event System.Action<MonsterAI, float> RemoteStaggered;
+
+    /// <summary>
+    /// Raised in a friend's game when this player's blow did something to the poise of one of the host's creatures, which a copy keeps
+    /// none of (a parry's share, a crush): co-op tells the host's game (<see cref="TakeFriendsPoiseBlow"/>), whose creature then staggers
+    /// or topples for everybody if it breaks.
+    /// </summary>
+    public static event System.Action<MonsterAI, PoiseBlow> RemotePoiseBlow;
 
     // The host's creature has noticed nobody: it idles or walks its rounds and is after no one. Its awareness itself isn't
     // sent, and this copy's own senses never look, so by them it would count as unaware for good: every blow an ambush.
@@ -160,9 +178,11 @@ public sealed partial class MonsterAI
     /// <param name="waiting">The host's creature is waiting its turn (a ready stance).</param>
     /// <param name="felled">The host's creature is down from a felling blow (a longer stagger, lying and getting up).</param>
     /// <param name="guarding">The host's creature has its weapon raised (light blows from the front are turned aside here too).</param>
+    /// <param name="strikeTopple">The host's creature lies toppled by a Topple After strike (the Heartroot's Take Root): for that strike's
+    /// Open After, not its Topple Seconds (<see cref="IsToppledByStrike"/>).</param>
     public void ApplyRemotePose(double time, Vector3 position, float yaw, float speed, State state, RemoteHunt hunting = RemoteHunt.None,
         float poiseShare = 1f, bool waiting = false, bool felled = false, bool guarding = false, float noticeLevel = 0f, RemoteHunt noticing = RemoteHunt.None,
-        bool marked = false, bool shieldSplintered = false)
+        bool marked = false, bool shieldSplintered = false, bool strikeTopple = false)
     {
         remoteMarked = marked;
         // The host's creature's shield splintered (a friend's blows count toward it there): this copy's goes too.
@@ -195,24 +215,30 @@ public sealed partial class MonsterAI
         bool dead = CurrentState == State.Dead || state == State.Dead;
         // A stagger begun here stands until the host's game has had time to hear of it.
         bool holdsStagger = CurrentState == State.Staggered && state != State.Staggered && Time.time < remoteStaggerHold;
-        if (!dead && !holdsStagger && state != CurrentState && definition != null)
+        // Felled in the host's game, a creature that topples (Monster Definition › Topple Seconds) is toppled, as is one at the end of a
+        // Topple After strike (the host's game says which: strikeTopple).
+        bool toppled = state == State.Staggered && felled && definition != null && (Topples || strikeTopple);
+        // Reeling here already (its own reel, or a stagger the host's game has since turned into a topple): it goes down now, as the host's
+        // has, rather than reeling on until its own stagger ends.
+        bool toppleNow = toppled && CurrentState == State.Staggered && !toppledNow;
+        if (!dead && !holdsStagger && (state != CurrentState || toppleNow) && definition != null)
         {
             if (state == State.Staggered)
             {
                 // The host's creature staggers (its poise broke, someone parried it): shown here as a stagger is, open to the
-                // same blows and out of any strike it was playing, but not told back to the host. Felled, a creature that topples
-                // (Monster Definition › Topple Seconds) is toppled: its own length, its heart open, its bark breaking here too.
-                // A topple that ends a strike this copy is still playing (Topple After: the Heartroot's Take Root) lasts that strike's
-                // Open After, as the host's does; read before the stagger ends the strike.
-                MonsterAttack ending = CurrentState == State.Attacking ? attacks.Action : null;
-                float toppleFor = ending != null && ending.toppleAfter && ending.openAfter > 0f ? ending.openAfter : definition.ToppleSeconds;
-                bool toppled = felled && (Topples || (ending != null && ending.toppleAfter));
+                // same blows and out of any strike it was playing, but not told back to the host. Toppled, its own length, its heart
+                // open, its bark breaking here too; a strike's topple lasts that strike's Open After, as the host's does, whichever
+                // strike this copy is playing or has played (it is told by the host's game, not guessed from the copy's own timing).
+                float toppleFor = strikeTopple ? StrikeToppleSeconds(definition.Attacks, CurrentState == State.Attacking ? attacks.Action : null,
+                    LastAction, definition.ToppleSeconds) : definition.ToppleSeconds;
                 felling = felled;
                 toppling = toppled;
+                toppleForStrike = toppled && strikeTopple;
                 BeginStagger(toppled ? toppleFor
                     : felled ? CombatTechniqueSettings.Current.FelledSeconds : CombatTechniqueSettings.Current.StaggerSeconds);
                 felling = false;
                 toppling = false;
+                toppleForStrike = false;
                 if (toppled)
                 {
                     BeganTopple(toppleFor);
@@ -272,6 +298,31 @@ public sealed partial class MonsterAI
         BeginAttack(action, toTarget.sqrMagnitude > 0.0001f ? toTarget : transform.forward * RemoteAimDistance);
         // The host's creature rolled its string once, at its first blow, and sends only that: its follow-ups play on here as they do there.
         attacks.PlayAsPlanned(followUps, hold);
+    }
+
+    /// <summary>
+    /// How long a Topple After strike's topple lasts (the host's game says its creature lies toppled by one): the Open After of the strike
+    /// a friend's copy is playing (<paramref name="playing"/>) or last played (<paramref name="lastAction"/>, an index into
+    /// <paramref name="attacks"/>) when it is such a strike, else the longest of its kind's, else <paramref name="fallback"/>. Pure, for tests.
+    /// </summary>
+    public static float StrikeToppleSeconds(System.Collections.Generic.IReadOnlyList<MonsterAttack> attacks, MonsterAttack playing, int lastAction, float fallback)
+    {
+        MonsterAttack known = playing ?? (attacks != null && lastAction >= 0 && lastAction < attacks.Count ? attacks[lastAction] : null);
+        if (known != null && known.toppleAfter && known.openAfter > 0f)
+        {
+            return known.openAfter;
+        }
+
+        float longest = 0f;
+        for (int i = 0; attacks != null && i < attacks.Count; i++)
+        {
+            if (attacks[i] != null && attacks[i].toppleAfter)
+            {
+                longest = Mathf.Max(longest, attacks[i].openAfter);
+            }
+        }
+
+        return longest > 0f ? longest : fallback;
     }
 
     /// <summary>

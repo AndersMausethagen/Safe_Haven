@@ -292,16 +292,34 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
     }
 
+    // The world's sounds for the creatures are one-offs (a beacon lit, a wrath's hunt): a quota of their own, so the player's footsteps
+    // and swings never use it up.
+    private const int WorldNoisesPerSecond = 10;
+    private float worldNoiseWindowAt;
+    private int worldNoisesInWindow;
+
     /// <summary>
     /// A sound of the world this player's game made for the creatures (a lit beacon's call, the forest's hunt: CreaturePuppets.Hear),
-    /// sent to the host's creatures as the player's own sounds are (<see cref="NoiseRpc"/>: rate-limited, heard only in the same
-    /// place). Not through PlayerNoise, which would fill the player's stealth meter. Only on the owner's avatar, and not the host's.
+    /// sent to the host's creatures, heard only in the same place (<see cref="WorldNoiseRpc"/>). Reliably and on a quota of its own: a
+    /// one-off that went the player's own sounds' way (unreliable, five a second shared with every step) could be lost, and the call
+    /// with it. Not through PlayerNoise, which would fill the player's stealth meter. Only on the owner's avatar, and not the host's.
     /// </summary>
     public void SendNoise(Vector3 position, float radius)
     {
-        if (IsOwner && IsSpawned)
+        if (!IsOwner || !IsSpawned || IsServer || radius < SentNoiseFrom)
         {
-            OnOwnNoise(position, radius);
+            return;
+        }
+
+        if (Time.unscaledTime >= worldNoiseWindowAt)
+        {
+            worldNoiseWindowAt = Time.unscaledTime + 1f;
+            worldNoisesInWindow = 0;
+        }
+
+        if (++worldNoisesInWindow <= WorldNoisesPerSecond)
+        {
+            WorldNoiseRpc(position, radius);
         }
     }
 
@@ -326,7 +344,13 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
 
     // In the host's game: a friend's sound, heard by the host's creatures if they stand in the same place.
     [Rpc(SendTo.Server, Delivery = RpcDelivery.Unreliable)]
-    private void NoiseRpc(Vector3 position, float radius)
+    private void NoiseRpc(Vector3 position, float radius) => HearFriendsNoise(position, radius);
+
+    // In the host's game: a sound of a friend's world (a beacon's call, a wrath's hunt), sent reliably: the same hearing.
+    [Rpc(SendTo.Server, Delivery = RpcDelivery.Reliable)]
+    private void WorldNoiseRpc(Vector3 position, float radius) => HearFriendsNoise(position, radius);
+
+    private void HearFriendsNoise(Vector3 position, float radius)
     {
         if (!IsOwner && look.Value.Place.Length > 0 && look.Value.Place.Equals(CoopPlace.Key))
         {

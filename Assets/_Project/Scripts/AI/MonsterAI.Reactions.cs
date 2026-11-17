@@ -9,13 +9,21 @@ public sealed partial class MonsterAI
     /// <summary>
     /// Makes it reel for <paramref name="seconds"/>: any attack it was winding up is cancelled (its cooldown still
     /// applies), it stands still and takes extra damage (<see cref="CombatTechniqueSettings.StaggeredDamageTaken"/>).
-    /// Broken poise and parried attacks call this.
+    /// Broken poise and parried attacks call this. In a strike that ends in a topple (Monster Attack › Topple After: the
+    /// Heartroot's Take Root) it is that topple instead, for the strike's Open After.
     /// </summary>
     public void Stagger(float seconds)
     {
         // An Unyielding elite's armour layer takes no stagger until it breaks.
         if (definition == null || CurrentState == State.Dead || seconds <= 0f || IsUnyielding)
         {
+            return;
+        }
+
+        // Cancelled by the stagger, the strike would be spent (an opener) and the kill window it ends in would never come.
+        if (!toppling && ToppleAfterNow > 0f)
+        {
+            Topple(-transform.forward, seconds, false);
             return;
         }
 
@@ -29,7 +37,8 @@ public sealed partial class MonsterAI
     /// <summary>
     /// Its strike was parried (PlayerGuard). By its Parry Response: an ordinary creature staggers for <paramref name="staggerSeconds"/>;
     /// a great beast, boss or elite loses the settings' Parry Poise Share of its poise and reels back a moment, staggering only when
-    /// that breaks it (two parries, or one and some blows). A friend's copy in co-op keeps no poise, so there it only reels.
+    /// that breaks it (two parries, or one and some blows). A friend's copy in co-op keeps no poise: there it reels at once, and the
+    /// host's game is told (<see cref="RemotePoiseBlow"/>), which takes the share off the real one (a break staggers or topples it for everyone).
     /// </summary>
     public void Parried(float staggerSeconds)
     {
@@ -51,8 +60,13 @@ public sealed partial class MonsterAI
                 Stagger(staggerSeconds);
                 break;
             case ParryResponse.PoiseDamage:
+                if (IsRemote)
+                {
+                    RemotePoiseBlow?.Invoke(this, PoiseBlow.Parry);
+                    Recoil(rules.ParryRecoilSeconds);
+                }
                 // A share of its own poise, not of what topples have grown it to: growth makes the next topple take more parries too.
-                if (!IsRemote && poise != null && CurrentState != State.Staggered && poise.Hit(poise.BaseMax * rules.ParryPoiseShare, Time.time))
+                else if (poise != null && CurrentState != State.Staggered && poise.Hit(poise.BaseMax * rules.ParryPoiseShare, Time.time))
                 {
                     if (Topples)
                     {
@@ -76,10 +90,16 @@ public sealed partial class MonsterAI
     }
 
     /// <summary>Reels back a moment: the strike in progress and what would follow it are broken off and it strikes again only after
-    /// <paramref name="seconds"/>, but it isn't staggered (no backstab opening, no extra damage taken).</summary>
+    /// <paramref name="seconds"/>, but it isn't staggered (no backstab opening, no extra damage taken). A strike that ends in a topple
+    /// (Topple After) isn't broken off: it goes down for its Open After.</summary>
     public void Recoil(float seconds)
     {
         if (definition == null || CurrentState == State.Dead || CurrentState == State.Staggered || seconds <= 0f)
+        {
+            return;
+        }
+
+        if (CurrentState == State.Attacking && ToppleInsteadOfBreakingOff())
         {
             return;
         }
@@ -146,6 +166,7 @@ public sealed partial class MonsterAI
         IsFelled = felling;
         // Only a topple's own stagger is a topple: any other (a phase's reel begun anew, a parry) ends one.
         toppledNow = toppling;
+        strikeToppledNow = toppling && toppleForStrike;
         weaponGuardUntil = float.NegativeInfinity;
         // After the state, which clears what the last stagger added.
         SetState(State.Staggered);
@@ -209,6 +230,7 @@ public sealed partial class MonsterAI
 
         // Read before the interrupt, which ends the strike and lets its action go.
         MonsterAttack breaking = CurrentState == State.Attacking ? attacks.Action : null;
+        bool broken = false;
         if (CurrentState == State.Attacking && !IsUnyielding && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))
         {
             pose?.CancelAttack();
@@ -216,11 +238,11 @@ public sealed partial class MonsterAI
             attacks.Delay(CombatTechniqueSettings.Current.InterruptDelay);
             AnyInterrupted?.Invoke(this, damage.Source);
             RaiseInterrupted();
-            // Broken in its wind-up, it pays (Monster Attack › Reel When Broken): it reels, open to blows and backstabs, rather than only
-            // waiting a moment. On a friend's copy the stagger is told to the host (Stagger), which reels for everyone.
-            if (breaking != null && breaking.reelWhenBroken > 0f && CurrentState != State.Dead && !result.Killed)
+            broken = true;
+            // A strike that ends in a topple (Topple After) goes down at once for its Open After, as its end would have had it.
+            if (breaking != null && breaking.toppleAfter && breaking.openAfter > 0f && !result.Killed)
             {
-                StaggerAtLeast(breaking.reelWhenBroken);
+                Topple(-transform.forward, breaking.openAfter, false, true);
             }
         }
 
@@ -230,11 +252,28 @@ public sealed partial class MonsterAI
         }
 
         // A friend's copy of the host's creature (co-op) keeps no poise of its own: the blow goes to the host's game, whose
-        // creature's poise it wears down, and the stagger comes back from there for everyone.
+        // creature's poise it wears down, and the stagger comes back from there for everyone. A boss stage's reel this very blow began
+        // (ReelForStage, raised before this) doesn't keep it from counting: it stays down at least what the reel had left.
         NoteMark(damage);
-        if (!IsRemote && poise != null && CurrentState != State.Staggered && CurrentState != State.Dead && !result.Killed)
+        bool stageReel = TakeStageReel();
+        if (!IsRemote && poise != null && (CurrentState != State.Staggered || stageReel) && CurrentState != State.Dead && !result.Killed)
         {
+            float reelUntil = stageReel ? staggerUntil : float.NegativeInfinity;
             TakeBlowOnPoise(damage, result);
+            if (stageReel && CurrentState == State.Staggered && staggerUntil < reelUntil)
+            {
+                staggerUntil = reelUntil;
+            }
+        }
+
+        // Broken in its wind-up, it pays (Monster Attack › Reel When Broken): it reels, open to blows and backstabs, rather than only
+        // waiting a moment; after the blow's poise, which a reel begun first threw away. A topple that poise brought on stands as it is,
+        // and a stagger it brought on lasts at least the reel. On a friend's copy the stagger is told to the host (Stagger), which reels
+        // for everyone.
+        if (broken && breaking != null && breaking.reelWhenBroken > 0f && !breaking.toppleAfter && CurrentState != State.Dead && !result.Killed
+            && !IsToppled)
+        {
+            StaggerAtLeast(breaking.reelWhenBroken);
         }
 
         NoteLightBlow(damage, result);

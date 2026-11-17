@@ -91,6 +91,40 @@ public sealed class CoopMessageTests
             "message struct (INetworkSerializable) and send it whole (WriteNetworkSerializable, ReadNetworkSerializable):\n" + string.Join("\n", found));
     }
 
+    [Test]
+    public void ThePosesHuntingByte_GivesEachFlagItsOwnBit()
+    {
+        // A creature's pose packs whom it is after and its flags into one byte (CreatureHost.PoseOf): a flag sharing a bit with another,
+        // or with the hunt, would read as the other on a friend's copy (a strike's topple as a splintered shield).
+        byte[] flags =
+        {
+            CreatureHost.WaitingFlag, CreatureHost.FelledFlag, CreatureHost.GuardingFlag, CreatureHost.MarkedFlag,
+            CreatureHost.ShieldBrokenFlag, CreatureHost.StrikeToppleFlag,
+        };
+        int seen = CreatureHost.HuntMask;
+        foreach (byte flag in flags)
+        {
+            Assert.AreEqual(1, CountBits(flag), $"0x{flag:X2} is one bit");
+            Assert.AreEqual(0, seen & flag, $"0x{flag:X2} is its own");
+            seen |= flag;
+        }
+
+        Assert.LessOrEqual((int)MonsterAI.RemoteHunt.Friend, CreatureHost.HuntMask, "whom it hunts fits under the mask");
+        Assert.AreEqual(MonsterAI.PoiseBlow.Parry, (MonsterAI.PoiseBlow)(byte)MonsterAI.PoiseBlow.Parry, "a poise blow goes as a byte");
+        Assert.AreEqual(MonsterAI.PoiseBlow.Crush, (MonsterAI.PoiseBlow)(byte)MonsterAI.PoiseBlow.Crush);
+    }
+
+    private static int CountBits(int value)
+    {
+        int count = 0;
+        for (; value != 0; value &= value - 1)
+        {
+            count++;
+        }
+
+        return count;
+    }
+
     // ---- The round trip
 
     private static object RoundTrip<T>(object value) where T : INetworkSerializable, new()
