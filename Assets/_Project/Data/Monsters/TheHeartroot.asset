@@ -1018,6 +1018,63 @@ MonoBehaviour:
     summonLimit: 4
     lobSeconds: 1.1
     lobScatter: 2
+  - attack: {fileID: 11400000, guid: 3662486d21d9a6f41bdf0bf4376c1054, type: 2}
+    kind: 1
+    damage: 30
+    minimumRange: 4
+    maximumRange: 16
+    priority: 10
+    opener: 0
+    weight: 1.5
+    whenFoe: 6
+    heavy: 0
+    cooldown: 10
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 2
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: 0341f72fdde922a42ab1f9b82b288aba, type: 3}
+    burstCount: 4
+    burstInterval: 0.18
+    projectileSpeed: 11
+    projectileRadius: 0.45
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
   movementTactic: 0
   temperament: 1
   preferredDistance: 7

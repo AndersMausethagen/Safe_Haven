@@ -27,3 +27,10 @@ Each entry says what I did and why, and what to check.
 ### The "interrupted" events in the fight
 - They were the Heartroot's own heavy blows tossing its Rootlings: the ground-impacts rule that a big stomp staggers and nicks the
   slammer's own kind nearby. **Kept as designed**: luring Rootlings next to its slams is a fair trick for the player.
+
+### Thornwave (the Heartroot's stage 2)
+- **Built as data**: a thorn-root projectile (the Root Tangle's lightest LOD, 1,439 tris), four in a quick volley, chosen more at a player
+  who backs off or shoots, stage 2 only. It flies level at 1 m, so the root walls stop it.
+- **Creature bolts now pass through their own kin**, as the player's already passed through companions: the first Thornwaves all died
+  on the Rootlings the Heartroot had just called, standing in the line of fire. This applies to every monster's shots (bog spit,
+  troll stones, wisp bolts): a pack no longer shields the player from its own archers.

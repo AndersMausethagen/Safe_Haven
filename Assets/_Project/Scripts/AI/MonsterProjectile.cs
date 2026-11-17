@@ -63,9 +63,10 @@ public sealed class MonsterProjectile : MonoBehaviour
                 continue;
             }
 
-            // A player's bolt goes past their own side (a companion, a tamed horse, a friend), as their arrows do: one stopped on a
-            // companion's back was a cast wasted for nothing.
-            if (owner != null && owner.Faction.IsPlayerSide() && collider.GetComponentInParent<IDamageable>() is IDamageable body && body.IsAlive
+            // A bolt goes past its own side, as arrows do: a player's past a companion, a tamed horse or a friend (one stopped on a
+            // companion's back was a cast wasted for nothing), and a creature's past its kin (the Heartroot's Thornwave died on the
+            // Rootlings it had just called, 2026-11-17).
+            if (owner != null && collider.GetComponentInParent<IDamageable>() is IDamageable body && body.IsAlive
                 && body.Category == TargetCategory.Creature && owner.Faction.AreAllies(body.Faction))
             {
                 continue;
