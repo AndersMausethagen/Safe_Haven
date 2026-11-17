@@ -161,7 +161,7 @@ Material:
     - _EnableInstancedPerPixelNormal: 1
     - _FootprintDarkening: 0
     - _HeightBlendSharpness: 0
-    - _HeightTransition: 0.85
+    - _HeightTransition: 1
     - _MacroVariation: 0.18
     - _Metallic0: 0
     - _Metallic1: 0

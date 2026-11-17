@@ -222,8 +222,10 @@ MonoBehaviour:
   cliffSlope: {x: 30, y: 42}
   litterLayer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
   litter: 0.35
-  pathFeather: 2.2
-  pathFray: 0.35
+  pathFeather: 3
+  pathFray: 0.25
+  edgeBlend: 0.5
+  shoreMud: 0.7
   openSoil: 0.15
   mossLayer: {fileID: 0}
   noMoss: 0

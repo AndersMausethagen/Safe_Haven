@@ -54,7 +54,7 @@ public static partial class RaidMapGenerator
         System.Func<Vector2, float> wetness = plan.Rivers.Count > 0
             ? spot => Mathf.Max(plan.Wetness(spot, rules.WetReach, rules.DampGround), field.RiverWetness(spot, rules.WetReach))
             : spot => plan.Wetness(spot, rules.WetReach, rules.DampGround);
-        vergeRoom = RaidMapSurface.Paint(data, working, wetness);
+        vergeRoom = RaidMapSurface.Paint(data, working, wetness, field.WaterNear);
         long paint = clock.ElapsedMilliseconds;
         var clearings = new List<RaidMapSurface.Clearing>(plan.Sites.Count);
         foreach (RaidSite site in plan.Sites)

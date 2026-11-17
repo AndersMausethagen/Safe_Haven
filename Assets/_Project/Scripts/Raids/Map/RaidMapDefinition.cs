@@ -121,6 +121,12 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0.3f, 4f)] private float pathFeather = 0.9f;
     [Tooltip("How much noise frays the path's edge into tufts of the forest floor: 1 the old ragged edge, 0 a clean fade.")]
     [SerializeField, Range(0f, 1f)] private float pathFray = 1f;
+    [Tooltip("How much of a path's soft border is painted with the Litter Layer, a step between the path and the floor (gravel, then " +
+             "leaves and dirt, then meadow or moss) instead of the two meeting in a line. 0: none (as before).")]
+    [SerializeField, Range(0f, 1f)] private float edgeBlend;
+    [Tooltip("Ground at the water's edge: the Path Layer (mud, gravel) at the waterline fading up through the Litter Layer into the floor, " +
+             "by how wet the ground is (the fen's and the ponds' wetness), so a shore is a band and not moss meeting water. 0: none (as before).")]
+    [SerializeField, Range(0f, 1f)] private float shoreMud;
     [Tooltip("How much soil shows on open ground away from the trails, where the forest is thin (times how open it is). 0.35 the " +
              "Woods' gravelly openings; low keeps an open valley a meadow, soil only on trails and trodden clearings.")]
     [SerializeField, Range(0f, 1f)] private float openSoil = 0.35f;
@@ -213,6 +219,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float Litter => litter;
     public float PathFeather => pathFeather;
     public float PathFray => pathFray;
+    public float EdgeBlend => edgeBlend;
+    public float ShoreMud => shoreMud;
     public float OpenSoil => openSoil;
     public bool NoMoss => noMoss;
 

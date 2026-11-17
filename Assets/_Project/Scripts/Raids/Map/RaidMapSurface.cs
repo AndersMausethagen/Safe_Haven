@@ -32,7 +32,7 @@ public static class RaidMapSurface
     // Returns where the paths' grassy verge may grow, by alphamap cell (row, column; 255 all of it), for TerrainGrowth.Fill through
     // VergeRoomAt: the paint can't say it, as the path layer is half the paint at a trail's edge but also down the middle of a
     // narrow side path once its border is feathered, and wherever leaves drift over a trail (Docs/SystemReview2_2026-11-17.md S4).
-    public static byte[,] Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null)
+    public static byte[,] Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null, WaterNear water = null)
     {
         int resolution = data.alphamapResolution;
         int layers = data.alphamapLayers;
@@ -43,6 +43,8 @@ public static class RaidMapSurface
 
         // Soil first, on its own, so its border can be feathered: the zones step from forest to path within one cell.
         var soils = new float[resolution, resolution];
+        // The trails alone, feathered as the soil is: Edge Blend's step follows a path's border, not a clearing's or open ground's.
+        var trails = definition.EdgeBlend > 0f ? new float[resolution, resolution] : null;
         var wets = new float[resolution, resolution];
         var verges = new byte[resolution, resolution];
         for (int row = 0; row < resolution; row++)
@@ -57,12 +59,22 @@ public static class RaidMapSurface
                 float wet = wetness != null ? wetness(new Vector2(u * size, v * size)) : 0f;
                 float soil = Mathf.Clamp01(Mathf.Max(path, clearing * 0.55f, (1f - forest) * definition.OpenSoil));
                 soils[row, column] = soil * (1f - 0.6f * wet * (1f - path));
+                if (trails != null)
+                {
+                    trails[row, column] = path;
+                }
+
                 wets[row, column] = wet;
                 verges[row, column] = (byte)Mathf.RoundToInt(VergeRoom(path) * 255f);
             }
         }
 
-        Feather(soils, Mathf.Max(1, Mathf.RoundToInt(definition.PathFeather * resolution / size)));
+        int featherCells = Mathf.Max(1, Mathf.RoundToInt(definition.PathFeather * resolution / size));
+        Feather(soils, featherCells);
+        if (trails != null)
+        {
+            Feather(trails, featherCells);
+        }
 
         for (int row = 0; row < resolution; row++)
         {
@@ -80,6 +92,26 @@ public static class RaidMapSurface
                 float margin = soil * (1f - soil) * 4f;
                 soil = Mathf.Clamp01(soil + ((ragged - 0.5f) * 0.6f + (fine - 0.5f) * 0.4f) * margin * definition.PathFray);
 
+                // The shore (Shore Mud): mud or gravel at the waterline, a damp step of the litter layer a little higher, then the floor.
+                float shoreMud = 0f, shoreDamp = 0f;
+                // By the ground's height over the nearest water (generated maps pass it; damp ground away from water is not a shore):
+                // mud from under the surface to a hand above it, damp to a metre, both fading within a few metres of the edge (a
+                // fen's sheet has no edge: its height alone).
+                if (definition.ShoreMud > 0f && water != null && water(new Vector2(u * size, v * size), ShoreReach, out float level, out float edge))
+                {
+                    float above = data.GetInterpolatedHeight(u, v) - level;
+                    // A fen is a flat sheet with no shore line: much of it lies a hand above its water, so its band is kept to the
+                    // last few centimetres, or the whole moss turns to mud.
+                    bool sheet = float.IsNaN(edge);
+                    float band = sheet ? FenShoreBand : 1f;
+                    float near = sheet ? 1f : 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(ShoreReach * 0.5f, ShoreReach, edge));
+                    shoreMud = (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(ShoreMudTop * 0.3f * band, ShoreMudTop * band, above))) * near;
+                    shoreDamp = (1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(ShoreMudTop * band, ShoreDampTop * band, above))) * near;
+                    shoreMud *= definition.ShoreMud * (0.75f + 0.25f * fine);
+                    shoreDamp *= definition.ShoreMud * (0.6f + 0.4f * ragged);
+                    soil = Mathf.Max(soil, shoreMud);
+                }
+
                 float litter = 0f;
                 if (hasLitter)
                 {
@@ -88,8 +120,24 @@ public static class RaidMapSurface
                     litter = definition.Litter * canopy * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.25f, 0.75f, patch)) * (1f - wet);
                 }
 
+                // The step between path and floor (Edge Blend): where both show, part of each is the litter layer, in drifts.
+                float step = 0f;
+                if (hasLitter)
+                {
+                    if (trails != null)
+                    {
+                        float trail = trails[row, column];
+                        float both = trail * (1f - trail) * 4f;
+                        float drifts = Mathf.PerlinNoise(u * size / EdgeStepNoise + 21.7f, v * size / EdgeStepNoise - 9.3f);
+                        step = definition.EdgeBlend * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.05f, 0.6f, both)) * (0.55f + 0.45f * drifts);
+                    }
+
+                    step = Mathf.Max(step, shoreDamp * (1f - shoreMud));
+                }
+
                 float rest = 1f - rock;
-                float floor = rest * (1f - soil);
+                float onPath = rest * soil * (1f - step);
+                float floor = rest * (1f - soil) * (1f - step);
                 // Leaves drift over the trails in patches, so a path is dirt, needles and leaves, never one bare strip.
                 float drift = 0f;
                 if (hasLitter)
@@ -99,11 +147,11 @@ public static class RaidMapSurface
                 }
 
                 weights[row, column, 2] = rock;
-                weights[row, column, 1] = rest * soil * (1f - drift);
+                weights[row, column, 1] = onPath * (1f - drift);
                 weights[row, column, 0] = floor * (1f - litter);
                 if (hasLitter)
                 {
-                    weights[row, column, 3] = floor * litter + rest * soil * drift;
+                    weights[row, column, 3] = floor * litter + onPath * drift + rest * step;
                 }
             }
         }
@@ -115,6 +163,14 @@ public static class RaidMapSurface
     // From this much of the raw path (before its border is feathered) inward, the verge gives way, to none on a trail's centre line.
     // At a trail's edge line the raw path is a half, so the verge there, and outside it, grows as the paint says.
     private const float VergeInsideFrom = 0.7f;
+
+    // Edge Blend's drifts of litter (metres across).
+    private const float EdgeStepNoise = 5f;
+    // Shore Mud: metres searched for water, and the heights over its surface the mud and the damp step reach.
+    private const float ShoreReach = 5f;
+    private const float ShoreMudTop = 0.35f;
+    private const float ShoreDampTop = 1.1f;
+    private const float FenShoreBand = 0.3f;
 
     /// <summary>
     /// How much of a path's verge may grow (0 to 1) where the trail's own strength, before feathering, is <paramref name="rawPath"/>:

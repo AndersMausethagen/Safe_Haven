@@ -2594,7 +2594,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.30392802, y: 0.48723757, z: -0.1857266, w: -0.79732865}
+  m_LocalRotation: {x: -0.36561394, y: 0.47114474, z: -0.22342211, w: -0.77099395}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3247,7 +3247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TerrainMoss
   mossLayer: {fileID: 8574412962073106934, guid: c565454ffa18bd1429caa8979dcc7aec, type: 2}
   mossShader: {fileID: 4800000, guid: d3c450bff1ad6554199d0e13234c5cfe, type: 3}
-  coverageThreshold: 0.34
+  coverageThreshold: 0.45
   edgeSoftness: 0.14
   shadowColor: {r: 0.065, g: 0.12, b: 0.045, a: 1}
   mossColor: {r: 0.24, g: 0.37, b: 0.095, a: 1}
