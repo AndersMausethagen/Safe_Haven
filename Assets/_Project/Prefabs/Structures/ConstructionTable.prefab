@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 3191324116830362951}
   - component: {fileID: 49339388163947697}
   - component: {fileID: 3005199660752446460}
+  - component: {fileID: 4614590028696474608}
   m_Layer: 0
   m_Name: ConstructionTable
   m_TagString: Untagged
@@ -229,6 +230,19 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1.8675903, z: 0.12699711}
   m_TimeToStationary: 0.5
+--- !u!114 &4614590028696474608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7002535226095337219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e55c632d277e8ff4faf63d483df12a54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SalvageBench
+  menuRange: 6
 --- !u!1001 &3882689674361251180
 PrefabInstance:
   m_ObjectHideFlags: 0

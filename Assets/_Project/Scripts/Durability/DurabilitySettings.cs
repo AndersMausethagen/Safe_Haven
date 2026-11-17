@@ -26,12 +26,16 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
     [SerializeField, Min(0f)] private float fullRepairCostShare = 0.5f;
     [Tooltip("Every material in a repair costs at least this many.")]
     [SerializeField, Min(0)] private int minimumCostPerMaterial = 1;
+    [Tooltip("Breaking gear down at the Workshop (Salvage): the share of its recipe's materials it gives back in full condition, " +
+             "less as it wears. Junk finds give what their item's Breaks Into says instead.")]
+    [SerializeField, Range(0f, 1f)] private float salvageShare = 0.5f;
 
     public float LossOnFailedRaid => lossOnFailedRaid;
     public float WearPerGlancingBlow => wearPerGlancingBlow;
     public CraftingStationType RepairStation => repairStation;
     public float FullRepairCostShare => fullRepairCostShare;
     public int MinimumCostPerMaterial => minimumCostPerMaterial;
+    public float SalvageShare => salvageShare;
 
     /// <summary>How many failed raids a new item survives before it breaks, for the Systems Editor.</summary>
     public int FailedRaidsUntilBroken => lossOnFailedRaid > 0f ? Mathf.CeilToInt(1f / lossOnFailedRaid - 0.0001f) : int.MaxValue;

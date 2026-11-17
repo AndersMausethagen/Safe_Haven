@@ -21,7 +21,7 @@ MonoBehaviour:
   value: 12
   gearScoreOverride: 0
   raidOnly: 0
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 2359d1d73618ff146af4787a74c79b3d, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
   heldPosition: {x: 0, y: 0, z: 0}
@@ -53,6 +53,11 @@ MonoBehaviour:
   armorSlot: 0
   wornLook: {fileID: 0}
   statBonuses: []
+  breaksInto:
+  - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 1
   teachesBuildings: []
   teachesRecipes: []
   experience: 0

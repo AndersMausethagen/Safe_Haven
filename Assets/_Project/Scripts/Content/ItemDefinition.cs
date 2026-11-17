@@ -135,6 +135,11 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Stats added while this item is equipped and not broken: Armor, Max Health, Strength, resistances...")]
     [SerializeField] private List<StatBonus> statBonuses = new List<StatBonus>();
 
+    [Header("Breaking Down")]
+    [Tooltip("What breaking one down at the Workshop gives (Salvage): a junk find's metal, silver or hide. Empty: gear and tools give a " +
+             "share of their recipe (Durability Settings › Salvage Share); anything else can't be broken down.")]
+    [SerializeField] private List<ItemAmount> breaksInto = new List<ItemAmount>();
+
     [Header("Blueprint")]
     [Tooltip("Buildings learned when the player reads this item (right-click). Reading uses it up.")]
     [SerializeField] private List<BuildingDefinition> teachesBuildings = new List<BuildingDefinition>();
@@ -267,6 +272,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public bool IsEquippable => IsArmor || IsWeapon || IsBackpack || IsTool || IsLantern;
     public IReadOnlyList<StatBonus> StatBonuses => statBonuses;
     public IReadOnlyList<BuildingDefinition> TeachesBuildings => teachesBuildings;
+    public IReadOnlyList<ItemAmount> BreaksInto => breaksInto;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public bool IsBlueprint => teachesBuildings.Count > 0 || teachesRecipes.Count > 0;
     public bool IsLearnedAtHome => learnedAtHome;

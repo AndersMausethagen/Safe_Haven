@@ -1970,6 +1970,12 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
   that drops there, tier by tier), Safe Haven › Loot › Write Loot Overview (`Docs/LootTables.md`). Trap: a nested prefab instance
   overrides only the fields it changed, so clearing a base prefab's inline list blanks the rest of its instances' rows (the Fog Bank,
   the Old Smithy Chest had to be restored by hand).
+- **Breaking down** (`Salvage`, `SalvageBench` on the Workshop's prefab beside `RepairBench`; "Break down…" in its menu): an item's
+  `BreaksInto` (junk finds in `Data/Items/Salvage`), or for gear and tools `DurabilitySettings.SalvageShare` of the recipe `Repairs.RecipeFor`
+  finds, times its durability. The page shows what each gives, and what is lost with it, before anything is broken; the output goes
+  through `ItemDelivery` (bag, stash, floor). **What an item is for** (`ItemUses`): the recipes and building levels that take it, worked
+  out from the player's recipe book and shown on the tooltip with what it breaks into and "Only raids give it" (`ItemTooltipView.AppendUses`).
+  A new item from a script: run `ContentDatabase.CollectAll` (the postprocessor's delayed sync may not have run) or saves can't find it.
 - **Rarity and value** live on `ItemDefinition` (Loot header). `Rarity` (in `Items/ItemRarity.cs`) turns a rarity into a
   color, name and pickup sound from `RaritySettingsDefinition`. Slots tint by rarity, tooltips and the message feed
   color names, `AudioManager` plays the pickup sound from the `ItemObtained` event, and `RaidReport` sums value and

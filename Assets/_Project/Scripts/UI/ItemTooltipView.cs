@@ -590,6 +590,8 @@ public sealed class ItemTooltipView : MonoBehaviour
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>Value {item.Value}{(count > 1 ? $"  ({item.Value * count} for the stack)" : "")}</color>");
         }
 
+        AppendUses(builder, item);
+
         if (item.IsTool)
         {
             builder.Append($"\n<color={UIStyle.Current.AccentHex}>{item.ToolType}: gathers up to {Tiers.RichLabel(item.ToolTier)} resources</color>");
@@ -700,6 +702,31 @@ public sealed class ItemTooltipView : MonoBehaviour
         }
 
         return builder.ToString();
+    }
+
+    // What a material or a find is for (ItemUses: the recipes and building levels that take it), what breaking it down at the Workshop
+    // gives, and that only raids give it (loot overhaul, 2026-11-17).
+    private static void AppendUses(StringBuilder builder, ItemDefinition item)
+    {
+        if (item.Category == ItemCategory.Material || item.Category == ItemCategory.Valuable)
+        {
+            PlayerCrafting crafting = Player.Current != null ? Player.Current.GetComponent<PlayerCrafting>() : null;
+            string uses = crafting != null ? ItemUses.Describe(ItemUses.Of(item, crafting.Recipes, crafting.Buildings)) : null;
+            if (uses != null)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{uses}</color>");
+            }
+        }
+
+        if (item.BreaksInto.Count > 0)
+        {
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Breaks down at the Workshop into {AmountText.Describe(item.BreaksInto)}.</color>");
+        }
+
+        if (item.RaidOnly)
+        {
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Only raids give it.</color>");
+        }
     }
 
     private static void Hint(StringBuilder builder, StringBuilder hints, string line)

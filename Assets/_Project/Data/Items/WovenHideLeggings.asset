@@ -15,10 +15,12 @@ MonoBehaviour:
   id: woven_hide_leggings
   displayName: Woven Hide Leggings
   description: Old hide leggings. Armor covers the legs now; worth a little as hide.
-  category: 5
+  category: 2
   tier: 1
   rarity: 0
   value: 9
+  gearScoreOverride: 0
+  raidOnly: 0
   icon: {fileID: 21300000, guid: b0494db28e370bb49962c524252e8e7d, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
@@ -35,9 +37,21 @@ MonoBehaviour:
   healAmount: 0
   hungerRestore: 0
   thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
+  wornLook: {fileID: 0}
   statBonuses:
   - stat: 7
     op: 0
@@ -48,6 +62,23 @@ MonoBehaviour:
   - stat: 10
     op: 0
     value: 0.05
+  breaksInto:
+  - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+    amount: 2
   teachesBuildings: []
   teachesRecipes: []
+  experience: 0
+  learnedAtHome: 0
+  inscription: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
   raidModifier: {fileID: 0}

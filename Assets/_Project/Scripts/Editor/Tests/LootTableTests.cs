@@ -205,6 +205,31 @@ public sealed class LootTableTests
         Assert.IsFalse(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/RoughHide.asset").RaidOnly, "hides come from home's hunting too");
     }
 
+    [Test]
+    public void EveryNewDrop_HasAPurpose()
+    {
+        // "everything should have some purpose": a recipe or a building level uses it, or it breaks down into something. Brukam's tusk,
+        // the Lindorm's scale and the Nykk's mane wait for their creatures (Troll Valley's boss, the Moss Marsh) and their uses with them.
+        var book = AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset");
+        string[] waiting = { "BrukamsTusk", "LindormScale", "NykksMane" };
+        foreach (string folder in new[] { "Parts", "Trophies", "Salvage" })
+        {
+            foreach (ItemDefinition item in All<ItemDefinition>("t:ItemDefinition", $"Assets/_Project/Data/Items/{folder}"))
+            {
+                if (waiting.Contains(item.name))
+                {
+                    continue;
+                }
+
+                bool used = ItemUses.Of(item, book.Recipes, book.Buildings).Count > 0 || item.BreaksInto.Count > 0;
+                Assert.IsTrue(used, $"{item.DisplayName} has no use");
+            }
+        }
+
+        StringAssert.Contains("Hunter's Lodge level 2", ItemUses.Describe(ItemUses.Of(
+            AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/WolfFang.asset"), book.Recipes, book.Buildings)));
+    }
+
     private static bool Uses(SerializedProperty cost, ItemDefinition item) =>
         Enumerable.Range(0, cost.arraySize).Any(i => cost.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue == item);
 
