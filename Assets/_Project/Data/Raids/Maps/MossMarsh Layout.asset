@@ -352,4 +352,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
   - {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
+  - {fileID: 11400000, guid: 354543bfc906ace4d838568849dfadcd, type: 2}
+  - {fileID: 11400000, guid: 7e7af08307696cc45a54d183822f76b8, type: 2}
   campPieces: {x: 1, y: 2}

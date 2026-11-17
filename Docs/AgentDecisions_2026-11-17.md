@@ -88,3 +88,6 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
   Netcode for GameObjects). Revisit with NGO 3.0 / Unity 6.7.
 - **The GPU Resident Drawer is on but probably skips the rocks:** their tessellated shader (`MeshSurface`) lacks DOTS instancing.
   Worth adding once the dressing pass puts more rocks out; a shader change with some risk, so it gets its own measured step.
+- **Two new Marsh set pieces from props made for it and never placed:** "Bog-Iron Bloomery" (the bloomery ruin with stacked peat:
+  bog iron was the marsh's trade) and "The Black Pool Landing" (a hauled-up rowboat, a stretch of boardwalk and the Nøkk's fiddle
+  left on it). Both hold rumours. *Not yet seen in a launched raid* (three seeds didn't pick them); generation tests pass.
