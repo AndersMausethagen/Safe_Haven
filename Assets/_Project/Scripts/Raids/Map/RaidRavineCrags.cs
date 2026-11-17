@@ -87,8 +87,12 @@ public static class RaidRavineCrags
         }
     }
 
-    // Upright, its face towards the ravine, sunk so that a third to a half of it shows out of the wall.
-    private static void SetInWall(Transform holder, CliffKit.Piece piece, float scale, RaycastHit hit, Vector3 outward, System.Random random,
+    /// <summary>
+    /// Sets a piece upright into a wall where a ray along <paramref name="outward"/> (from the open side into the wall, starting at
+    /// <paramref name="from"/>) met it: its face towards the open side, sunk so that a third to a half of it shows, only to look at
+    /// (colliders and nav obstacles off). Also dresses a valley's walls (RaidMapGenerator, Docs/WorldLookPlan_2026-11-17.md B7).
+    /// </summary>
+    public static GameObject SetInWall(Transform holder, CliffKit.Piece piece, float scale, RaycastHit hit, Vector3 outward, System.Random random,
         Dictionary<GameObject, Vector3[]> shapes, TerrainCollider ground, Vector3 from, float reach)
     {
         Vector3 facing = -outward;
@@ -120,6 +124,7 @@ public static class RaidRavineCrags
 
         made.transform.position += facing * (wall + shows - front);
         OnlyToLookAt(made);
+        return made;
     }
 
     // A great block on the ground beside the rim: solid, as any boulder is.

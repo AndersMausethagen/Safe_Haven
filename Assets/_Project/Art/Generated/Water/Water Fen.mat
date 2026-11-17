@@ -40,7 +40,7 @@ Material:
     m_Floats:
     - _Caustics: 0.1
     - _CausticsTiling: 2.5
-    - _Clarity: 0.12
+    - _Clarity: 0.25
     - _CloudReflection: 0.3
     - _Cull: 2
     - _DepthDistance: 0.5
@@ -55,11 +55,11 @@ Material:
     - _NormalStrength: 0
     - _NormalTiling: 3
     - _RainRipples: 1
-    - _Reflection: 0.55
+    - _Reflection: 0.7
     - _Refraction: 0.03
     - _RippleStrength: 1
     - _ScreenReflection: 1
-    - _ShoreFoam: 0.25
+    - _ShoreFoam: 0.03
     - _SkyReflectionFloor: 0
     - _SkySaturation: 0.2
     - _SkyTilt: 0.5
@@ -72,7 +72,7 @@ Material:
     - _DeepColor: {r: 0.01, g: 0.02, b: 0.01, a: 1}
     - _FastColor: {r: 0.75, g: 0.8399999, b: 0.8399999, a: 1}
     - _FlowDirection: {r: 1, g: 0, b: 0, a: 0}
-    - _FoamColor: {r: 0.9, g: 0.93, b: 0.93, a: 1}
-    - _ShallowColor: {r: 0.05, g: 0.08, b: 0.03, a: 1}
+    - _FoamColor: {r: 0.42, g: 0.45, b: 0.3, a: 1}
+    - _ShallowColor: {r: 0.08, g: 0.11, b: 0.04, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

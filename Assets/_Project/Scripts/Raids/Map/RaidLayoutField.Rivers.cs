@@ -128,6 +128,60 @@ public sealed partial class RaidLayoutField
         return Mathf.Min(ground, height);
     }
 
+    /// <summary>
+    /// The water nearest a point (metres from the map's corner) whose edge lies within <paramref name="reach"/> metres: a pond's or a
+    /// river's, else the fen's one sheet. Gives its surface's height above the map's lowest point and the metres from the point to its
+    /// edge (below zero: in it; NaN for the fen, whose edge is wherever the ground dips under it). False when no water is that near. What
+    /// the plants that grow by water height and the stones by the water go by (RaidMapSurface.WaterNear); a pond costs a squared
+    /// distance unless the point is near it.
+    /// </summary>
+    public bool WaterNear(Vector2 point, float reach, out float level, out float edge)
+    {
+        level = 0f;
+        edge = float.PositiveInfinity;
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            float far = pond.Reach + reach;
+            if ((point - pond.Position).sqrMagnitude >= far * far)
+            {
+                continue;
+            }
+
+            float distance = pond.Edge(point);
+            if (distance < reach && distance < edge)
+            {
+                edge = distance;
+                level = pond.Level;
+            }
+        }
+
+        // The river's level is stamped only so far from its line; keep inside that, where the samples are its own.
+        if (riverEdge != null)
+        {
+            float u = point.x / plan.Size, v = point.y / plan.Size;
+            float distance = Sample(riverEdge, u, v);
+            if (distance < Mathf.Min(reach, RiverReachBeyond - 2f * cell) && distance < edge)
+            {
+                edge = distance;
+                level = Sample(riverLevel, u, v);
+            }
+        }
+
+        if (!float.IsPositiveInfinity(edge))
+        {
+            return true;
+        }
+
+        if (rules.Fen.enabled)
+        {
+            level = FenWater;
+            edge = float.NaN;
+            return true;
+        }
+
+        return false;
+    }
+
     /// <summary>How wet the ground is by the rivers at a point (metres from the map's corner): 1 at the water, fading over <paramref name="reach"/>.</summary>
     public float RiverWetness(Vector2 point, float reach)
     {

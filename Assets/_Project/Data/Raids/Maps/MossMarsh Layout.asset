@@ -40,6 +40,7 @@ MonoBehaviour:
   boulderClusters: {x: 2, y: 4}
   boulderClusterSize: {x: 1, y: 3}
   boulderScale: {x: 0.5, y: 1}
+  boulderOutcrops: 0
   lookouts: 1
   lookoutReveal: 70
   largeRegions: {x: 2, y: 3}
@@ -104,7 +105,7 @@ MonoBehaviour:
   - name: Strings and Flarks
     briefing: Long strings of firm peat run across the fen, with black pools between them. Keep to the strings, or wade.
     weight: 3
-    forest: 0.35
+    forest: 0.15
     treeSpacing: 1.4
     treeWeights: []
     ridges: 1
@@ -133,7 +134,7 @@ MonoBehaviour:
   - name: Hummock Fen
     briefing: A maze of tussocks and pools. Many ways round, and the reeds hide what waits in them.
     weight: 2
-    forest: 0.3
+    forest: 0.12
     treeSpacing: 1.3
     treeWeights: []
     ridges: 1
@@ -162,7 +163,7 @@ MonoBehaviour:
   - name: Drowned Wood
     briefing: 'Dead pines stand in the water: more cover for you, and for them.'
     weight: 2
-    forest: 0.9
+    forest: 0.45
     treeSpacing: 0.9
     treeWeights: []
     ridges: 1
@@ -191,7 +192,7 @@ MonoBehaviour:
   - name: Peat Moor
     briefing: Drier ground, with cut banks and peat stacks. You can see a long way, and so can the things on the wing.
     weight: 2
-    forest: 0.2
+    forest: 0.08
     treeSpacing: 1.6
     treeWeights: []
     ridges: 1
@@ -220,7 +221,7 @@ MonoBehaviour:
   - name: Pine Holms
     briefing: 'Rock islands with old pines stand out of the fen: high ground, lookouts, and moonsilver in the rock.'
     weight: 1
-    forest: 0.5
+    forest: 0.3
     treeSpacing: 1.1
     treeWeights: []
     ridges: 1
@@ -331,6 +332,10 @@ MonoBehaviour:
     bridgeDeck: 2
     bossBridge: {fileID: 0}
     bridgeToll: {fileID: 0}
+    wallCrags: 0
+    wallCragReach: 25
+    wallCragSlope: 38
+    wallBlocks: 0.1
   fen:
     enabled: 1
     aboveWater: 0.6
@@ -342,6 +347,7 @@ MonoBehaviour:
     strings: 0.6
     stringSpacing: 16
     water: {fileID: 2100000, guid: 06493279e799f2542bf51a75e9865d39, type: 2}
+    damp: 0.1
   setPieces:
   - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}

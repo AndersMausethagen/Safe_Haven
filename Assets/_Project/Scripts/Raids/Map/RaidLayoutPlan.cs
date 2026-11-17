@@ -131,6 +131,8 @@ public sealed class RaidLayoutBoulder
     public float Turn;
     /// <summary>0-1: which piece of the kit, by weight.</summary>
     public float Pick;
+    /// <summary>A smaller rock hugging its cluster's first one (RaidLayoutRules › Boulder Outcrops): set deeper into the ground.</summary>
+    public bool Outcrop;
 }
 
 /// <summary>A sheer rock spire on a generated map, in metres from the map's south-west corner: too steep to climb, so nothing goes on it.</summary>

@@ -56,6 +56,15 @@ public sealed class WeatherSystem : MonoBehaviour
     /// <summary>How wet the ground is, 0 dry to 1 soaked with full puddles. Lags behind the rain.</summary>
     public float Wetness => wetness;
 
+    /// <summary>
+    /// How wet the ground looks, as the surfaces are told (_SafeHavenWetness): <see cref="Wetness"/>, but never below the climate's
+    /// Ground Wetness Floor, so a marsh's paths shine without rain (Docs/WorldLookPlan_2026-11-17.md B11).
+    /// </summary>
+    public float GroundWetness => LooksWet(wetness, climate != null ? climate.GroundWetnessFloor : 0f);
+
+    /// <summary>The wetness the ground shows: the rain's, or the climate's floor when that is wetter.</summary>
+    public static float LooksWet(float wetness, float floor) => Mathf.Max(Mathf.Clamp01(floor), wetness);
+
     /// <summary>Whether rain falls as snow (a snowing season: <see cref="SetSnowfall"/>).</summary>
     public bool Snowing => snowing;
 
@@ -313,7 +322,7 @@ public sealed class WeatherSystem : MonoBehaviour
         AtmosphereConditions.WeatherWind = Mathf.Max(0f, current.Wind);
         AtmosphereConditions.WeatherMist = Mathf.Clamp01(current.Mist);
         AtmosphereConditions.WeatherRain = Mathf.Clamp01(current.Rain);
-        Shader.SetGlobalFloat(WetnessId, wetness);
+        Shader.SetGlobalFloat(WetnessId, GroundWetness);
         Shader.SetGlobalFloat(SnowId, snow);
         if (wind != null)
         {

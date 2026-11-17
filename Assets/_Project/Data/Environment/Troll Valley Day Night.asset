@@ -18,7 +18,7 @@ MonoBehaviour:
   noonYaw: 320
   noonElevation: 55
   lowestLightAngle: 12
-  sunIntensity: 2
+  sunIntensity: 2.4
   sunIntensityByHeight:
     serializedVersion: 2
     m_Curve:
@@ -274,8 +274,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  shadowFill: 1.35
-  shadowDarkness: 0.8
+  shadowFill: 1.15
+  shadowDarkness: 0.9
   reflection:
     serializedVersion: 2
     m_Curve:

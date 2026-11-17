@@ -9,6 +9,18 @@ public static partial class RaidMapGenerator
 {
     private const float BoulderSink = 0.2f;
 
+    // An outcrop's hugging rocks sit deeper, so they read as the same rock coming out of the ground (RaidLayoutRules › Boulder Outcrops).
+    private const float OutcropSink = 0.3f;
+
+    // Valley wall crags (RaidValleyRule › Wall Crags): how many tries each place gets to land on a face steep enough, how far in front of
+    // the spot the ray into the wall starts and how far it looks, the crag's height as a share of one ledge's face, and the great blocks
+    // at the foot: how far out from it and how wide at most.
+    private const int WallCragTries = 3;
+    private const float WallRayBack = 3f;
+    private const float WallRayReach = 7f;
+    private const float WallBlockOut = 2f;
+    private const float WallBlockWidest = 6f;
+
     private const float LookoutWidest = 5f;
 
     private const float LookoutFromMiddle = 0.85f;
@@ -30,7 +42,8 @@ public static partial class RaidMapGenerator
         }
 
         CliffKit kit = rules.BoulderKit;
-        if ((kit == null || kit.Pieces.Count == 0 || (plan.Boulders.Count == 0 && rules.Lookouts <= 0)) && plan.Landmarks.Count == 0)
+        bool wallCrags = plan.Valley != null && rules.Valley.wallCrags > 0f;
+        if ((kit == null || kit.Pieces.Count == 0 || (plan.Boulders.Count == 0 && rules.Lookouts <= 0 && !wallCrags)) && plan.Landmarks.Count == 0)
         {
             return;
         }
@@ -51,12 +64,113 @@ public static partial class RaidMapGenerator
             CliffKit.Piece piece = PickByShare(kit, boulder.Pick);
             if (piece != null)
             {
-                Boulder(holder, piece, origin + new Vector3(boulder.Position.x, 0f, boulder.Position.y), boulder.Turn, Mathf.Min(boulder.Scale, Widest(piece, BoulderWidest)), terrain, shapes);
+                Boulder(holder, piece, origin + new Vector3(boulder.Position.x, 0f, boulder.Position.y), boulder.Turn, Mathf.Min(boulder.Scale, Widest(piece, BoulderWidest)), terrain, shapes,
+                    boulder.Outcrop ? OutcropSink : BoulderSink);
             }
         }
 
         PlaceLookouts(holder, plan, rules, kit, terrain, shapes);
+        if (wallCrags)
+        {
+            PlaceWallCrags(holder, plan, rules, kit, terrain, shapes);
+        }
     }
+
+    /// <summary>
+    /// Sets the Boulder Kit's rock into a valley's walls (RaidValleyRule › Wall Crags, Docs/WorldLookPlan_2026-11-17.md B7), so from the
+    /// game camera they read as rock rather than smooth painted slopes: about one piece every Wall Crags metres along each wall's foot, on
+    /// faces steeper than Wall Crag Slope within Wall Crag Reach of the floor, set in as RaidRavineCrags sets them into a ravine (stood up,
+    /// mostly buried, no colliders). Now and then a great block lies at the wall's foot, solid like any boulder, but only where a boulder
+    /// may stand (RaidLayoutPlanner.BoulderFits), so it never closes a trail, and under the Boulders holder that ClearBlockedTrails can
+    /// clear. From its own stream: same seed, same crags.
+    /// </summary>
+    private static void PlaceWallCrags(Transform holder, RaidLayoutPlan plan, RaidLayoutRules rules, CliffKit kit, Terrain terrain,
+        Dictionary<GameObject, Vector3[]> shapes)
+    {
+        RaidLayoutValley valley = plan.Valley;
+        RaidValleyRule rule = rules.Valley;
+        if (!terrain.TryGetComponent(out TerrainCollider ground))
+        {
+            return;
+        }
+
+        TerrainData data = terrain.terrainData;
+        Vector3 origin = terrain.transform.position;
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Wall Crags"));
+        float halfWidth = rules.TrailHalfWidth * (plan.Mood != null ? plan.Mood.trails : 1f);
+        int benches = Mathf.Max(1, valley.Benches);
+        int placed = 0, blocks = 0;
+        foreach (int side in new[] { -1, 1 })
+        {
+            Vector2 outward = valley.Across * side;
+            float faceHeight = Mathf.Max(2f, (side > 0 ? valley.LeftWall : valley.RightWall) / benches);
+            float along = Range(random, 0f, rule.wallCrags);
+            for (int guard = 0; along < valley.Length && guard < 4000; guard++)
+            {
+                Vector2 centre = valley.CentreAt(along, out float floorHalf);
+                Vector2 foot = centre + outward * floorHalf;
+                CliffKit.Piece piece = kit.Pick(random);
+                if (piece == null)
+                {
+                    return;
+                }
+
+                // A few tries up the wall for a face (the ledges between are level).
+                for (int tries = 0; tries < WallCragTries; tries++)
+                {
+                    Vector2 spot = foot + outward * Range(random, 0f, rule.wallCragReach);
+                    if (spot.x < 1f || spot.y < 1f || spot.x > plan.Size - 1f || spot.y > plan.Size - 1f
+                        || data.GetSteepness(spot.x / plan.Size, spot.y / plan.Size) < rule.wallCragSlope)
+                    {
+                        continue;
+                    }
+
+                    // Into the wall is up the slope: against the ground's lean, level.
+                    Vector3 normal = data.GetInterpolatedNormal(spot.x / plan.Size, spot.y / plan.Size);
+                    var into = new Vector3(-normal.x, 0f, -normal.z);
+                    if (into.sqrMagnitude < 0.04f)
+                    {
+                        continue;
+                    }
+
+                    into.Normalize();
+                    var at = origin + new Vector3(spot.x, 0f, spot.y);
+                    at.y = terrain.SampleHeight(at) + origin.y + Range(random, 0.2f, 1f);
+                    var ray = new Ray(at - into * WallRayBack, into);
+                    if (!ground.Raycast(ray, out RaycastHit hit, WallRayReach))
+                    {
+                        continue;
+                    }
+
+                    float tall = Mathf.Max(0.5f, Mathf.Max(piece.size.x, Mathf.Max(piece.size.y, piece.size.z)));
+                    float scale = Mathf.Clamp(faceHeight * Range(random, 0.3f, 0.65f) / tall, 0.5f, 4f);
+                    RaidRavineCrags.SetInWall(holder, piece, scale, hit, into, random, shapes, ground, ray.origin, WallRayReach).name = "Wall Crag";
+                    placed++;
+                    break;
+                }
+
+                // Now and then a great block fallen at the foot: solid, so only where a boulder may lie.
+                if (random.NextDouble() < rule.wallBlocks)
+                {
+                    Vector2 block = foot + outward * Range(random, 0f, WallBlockOut);
+                    CliffKit.Piece blockPiece = kit.Pick(random);
+                    float turn = Range(random, 0f, 360f);
+                    if (blockPiece != null && RaidLayoutPlanner.BoulderFits(plan, block, halfWidth))
+                    {
+                        Boulder(holder, blockPiece, origin + new Vector3(block.x, 0f, block.y), turn,
+                            Mathf.Min(Range(random, 0.7f, 1.2f), Widest(blockPiece, WallBlockWidest)), terrain, shapes).name = "Wall Block";
+                        blocks++;
+                    }
+                }
+
+                along += rule.wallCrags * Range(random, 0.7f, 1.3f);
+            }
+        }
+
+        Debug.Log($"Valley walls: {placed} crags, {blocks} blocks.");
+    }
+
+    private static float Range(System.Random random, float min, float max) => min + (float)random.NextDouble() * (max - min);
 
     // Tall things to find the way by, stripped of what could be gathered or used where the rule says so; solid.
     private static void PlaceLandmarks(Transform holder, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain)
@@ -150,7 +264,8 @@ public static partial class RaidMapGenerator
         return false;
     }
 
-    private static GameObject Boulder(Transform holder, CliffKit.Piece piece, Vector3 at, float turn, float scale, Terrain terrain, Dictionary<GameObject, Vector3[]> shapes)
+    private static GameObject Boulder(Transform holder, CliffKit.Piece piece, Vector3 at, float turn, float scale, Terrain terrain, Dictionary<GameObject, Vector3[]> shapes,
+        float sink = BoulderSink)
     {
         at.y = terrain.SampleHeight(at) + terrain.transform.position.y;
         GameObject made = Object.Instantiate(piece.prefab, holder);
@@ -158,7 +273,7 @@ public static partial class RaidMapGenerator
         made.transform.SetPositionAndRotation(at, Quaternion.Euler(0f, turn, 0f) * RaidRavineCrags.StandUp(piece));
         made.transform.localScale = piece.prefab.transform.localScale * scale;
         RaidRavineCrags.Extent(made, piece.prefab, shapes, Vector3.up, out _, out _, out _, out float bottom, out float top);
-        made.transform.position += Vector3.up * (at.y - bottom - (top - bottom) * BoulderSink);
+        made.transform.position += Vector3.up * (at.y - bottom - (top - bottom) * sink);
         return made;
     }
 

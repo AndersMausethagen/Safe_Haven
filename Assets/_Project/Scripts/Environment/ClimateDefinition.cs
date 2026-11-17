@@ -23,11 +23,15 @@ public sealed class ClimateDefinition : ScriptableObject
     [SerializeField, Min(1f)] private float soakSeconds = 75f;
     [Tooltip("Seconds the ground takes to dry again after the rain stops.")]
     [SerializeField, Min(1f)] private float drySeconds = 240f;
+    [Tooltip("How wet the ground looks even when no rain has fallen, 0 to 1 (a marsh: muddy paths shine and puddles sit in the ruts). " +
+             "Only the look: what goes by the rain (grime washed off, footprints) still follows the rain.")]
+    [SerializeField, Range(0f, 1f)] private float groundWetnessFloor;
 
     public WeatherDefinition Start => start;
     public float TransitionSeconds => transitionSeconds;
     public float SoakSeconds => soakSeconds;
     public float DrySeconds => drySeconds;
+    public float GroundWetnessFloor => groundWetnessFloor;
     public IReadOnlyList<Entry> Weathers => weathers;
 
     public void Configure(WeatherDefinition startWeather, float transition, params Entry[] entries)

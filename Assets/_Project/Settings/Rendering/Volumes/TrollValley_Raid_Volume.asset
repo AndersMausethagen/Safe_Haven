@@ -217,7 +217,7 @@ MonoBehaviour:
   active: 1
   density:
     m_OverrideState: 1
-    m_Value: 0.008
+    m_Value: 0.006
   baseHeight:
     m_OverrideState: 1
     m_Value: 0.5
@@ -229,10 +229,10 @@ MonoBehaviour:
     m_Value: 0.9
   albedo:
     m_OverrideState: 1
-    m_Value: {r: 0.9, g: 0.9, b: 0.86, a: 1}
+    m_Value: {r: 0.95, g: 0.93, b: 0.85, a: 1}
   ambient:
     m_OverrideState: 1
-    m_Value: {r: 0.28, g: 0.3, b: 0.3, a: 1}
+    m_Value: {r: 0.32, g: 0.31, b: 0.27, a: 1}
   mainLight:
     m_OverrideState: 1
     m_Value: 1.05
@@ -287,6 +287,12 @@ MonoBehaviour:
   clearing:
     m_OverrideState: 1
     m_Value: 0.45
+  viewClearing:
+    m_OverrideState: 0
+    m_Value: 0.6
+  viewClearingRadius:
+    m_OverrideState: 0
+    m_Value: 4
   maxDistance:
     m_OverrideState: 1
     m_Value: 100

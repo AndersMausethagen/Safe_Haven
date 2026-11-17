@@ -46,6 +46,16 @@ public static class TerrainGrowth
         [Range(0, 3)] public int clearing;
         [Tooltip("How much it loves the wet: towards water and in damp ground its patches spread and thicken. 0: it doesn't care.")]
         [Range(0f, 1f)] public float loveOfWet;
+        [Tooltip("On: it grows only within Above Water of the nearest water's surface (a pond's, a river's or the fen's), on a generated " +
+                 "map. Off, or on a map without that knowledge: wherever its patches say.")]
+        public bool byWater;
+        [Tooltip("With By Water: metres of ground above the water's surface it grows in, least and most. Below zero stands in the " +
+                 "shallows (reeds -0.5 to 0.35, horsetail -0.3 to 0.4, sedge -0.1 to 0.6, marigold 0 to 0.3, cotton grass 0.05 to 0.8).")]
+        public Vector2 aboveWater = new Vector2(0f, 0.5f);
+        [Tooltip("How much it thickens where two kinds of ground meet (a path's verge, the moss's edge, a rock face's foot). 0: it doesn't care.")]
+        [Range(0f, 1f)] public float atEdges;
+        [Tooltip("How much it thickens within 1.5 m of a rock or a boulder, on a generated map. 0: it doesn't care.")]
+        [Range(0f, 1f)] public float nearRocks;
 
         public Plant()
         {
@@ -62,11 +72,30 @@ public static class TerrainGrowth
         }
     }
 
+    /// <summary>
+    /// What a generated map knows about each point beyond its paint, for the plants that care (Docs/WorldLookPlan_2026-11-17.md B5).
+    /// Each is optional; a plant whose condition can't be asked grows as if it had none.
+    /// </summary>
+    public sealed class Surroundings
+    {
+        /// <summary>Metres of ground above the nearest water's surface (below zero: under it); NaN where no water is near.</summary>
+        public Func<Vector3, float> AboveWater;
+        /// <summary>True in water: nothing grows there but the plants whose water band reaches below the surface.</summary>
+        public Func<Vector3, bool> InWater;
+        /// <summary>0 to 1: how near a rock or boulder is (<see cref="NearRocks"/>).</summary>
+        public Func<Vector3, float> NearRocks;
+    }
+
     private const int SeedRange = 10007;
     private const float BareFrom = 0.7f;
     private const float StrayChance = 0.0015f;
     private const float WetSpread = 0.3f;
     private const float WetThickening = 2.5f;
+    // The share of a water band at each end over which a plant thins out, so a band reads as a ragged margin rather than a contour line.
+    private const float BandFade = 0.2f;
+    /// <summary>Metres beyond a rock's edge over which Plant.nearRocks fades out.</summary>
+    public const float RockReach = 1.5f;
+    private const float RockCell = 0.5f;
 
     /// <summary>What a terrain grows when it says nothing else (the World tool's Fill), and what a new raid map starts from.
     /// Glowing plants aren't among them: they are painted by hand here, or named in a raid map's own list.</summary>
@@ -86,10 +115,12 @@ public static class TerrainGrowth
     /// (0 to 1) thickens the plants that love the wet. <paramref name="vergeRoom"/> (0 to 1, all of it when null) is how much of a
     /// ground's verge may grow at a point: the paint alone can't tell a path's edge from other places it is half the paint (the
     /// middle of a narrow, feathered side path; leaves drifting over a trail), so a generated map says where its paths' edges are
-    /// (RaidMapSurface.Paint). Returns the number of cells with growth; 0 when the prototypes are missing.
+    /// (RaidMapSurface.Paint). <paramref name="around"/> tells the plants that grow by water height, at edges or by rocks where those
+    /// are; without it they grow as their patches say. Returns the number of cells with growth; 0 when the prototypes are missing.
     /// </summary>
     public static int Fill(Terrain terrain, IReadOnlyList<Ground> fills, int seed, Func<Vector3, bool> blocked = null,
-        IReadOnlyList<Plant> plants = null, Func<Vector3, float> wetness = null, Func<Vector3, float> vergeRoom = null)
+        IReadOnlyList<Plant> plants = null, Func<Vector3, float> wetness = null, Func<Vector3, float> vergeRoom = null,
+        Surroundings around = null)
     {
         plants ??= DefaultPlants;
         TerrainData data = terrain.terrainData;
@@ -117,11 +148,17 @@ public static class TerrainGrowth
         var plantLayers = new int[plants.Count];
         var plantCells = new int[plants.Count][,];
         bool anyLoveWet = false;
+        Func<Vector3, float> aboveWater = around?.AboveWater;
+        Func<Vector3, bool> inWater = around?.InWater;
+        Func<Vector3, float> nearRocks = around?.NearRocks;
+        // Only a plant that may stand in the shallows lets anything grow in water.
+        bool anyInWater = false;
         for (int k = 0; k < plants.Count; k++)
         {
             plantLayers[k] = Layer(plants[k].prototype);
             plantCells[k] = new int[resolution, resolution];
             anyLoveWet |= plants[k].enabled && plants[k].loveOfWet > 0f;
+            anyInWater |= plants[k].enabled && plantLayers[k] >= 0 && plants[k].byWater && aboveWater != null && plants[k].aboveWater.x < 0f;
         }
 
         var shortCells = new int[resolution, resolution];
@@ -140,9 +177,12 @@ public static class TerrainGrowth
                 float shortAmount = 0f, tallAmount = 0f, bushAmount = 0f, plantAmount = 0f, room = 1f;
                 // Asked once, and only where a ground has a verge.
                 float edge = -1f;
+                // Where two grounds meet, as a quarter of the verge term (4w(1-w) at its most): for the plants that crowd edges.
+                float seam = 0f;
                 for (int l = 0; l < amounts.Length; l++)
                 {
                     float w = weights[az, ax, l];
+                    seam = Mathf.Max(seam, w * (1f - w));
                     shortAmount += w * amounts[l].shortGrass;
                     tallAmount += w * amounts[l].tallGrass;
                     if (amounts[l].verge > 0f)
@@ -180,16 +220,30 @@ public static class TerrainGrowth
                     continue;
                 }
 
+                // In water only what stands in the shallows grows: no grass, no bushes.
+                bool underWater = inWater != null && inWater(point);
+                if (underWater && !anyInWater)
+                {
+                    continue;
+                }
+
                 // Patches: broad noise thins the lawn, a second noise gathers tall grass, rare spots grow bushes.
                 float lawn = Mathf.PerlinNoise(point.x * 0.09f + offset, point.z * 0.09f);
                 float tall = Mathf.PerlinNoise(point.x * 0.16f - offset, point.z * 0.16f + 3.7f);
                 float bush = Mathf.PerlinNoise(point.x * 0.35f + 9.1f, point.z * 0.35f - offset);
                 // Counts per cell, rounded with a little jitter so fractions still grow some clumps.
                 float jitter = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f) * 43758.547f, 1f);
-                shortCells[z, x] = Mathf.FloorToInt(2f * shortAmount * Mathf.Lerp(0.45f, 1f, lawn) + jitter);
-                tallCells[z, x] = Mathf.FloorToInt(tallAmount * Mathf.SmoothStep(0f, 1f, (tall - 0.5f) * 3.5f) + jitter);
-                bushCells[z, x] = bush > 1f - 0.12f * bushAmount && jitter < 0.15f ? 1 : 0;
+                if (!underWater)
+                {
+                    shortCells[z, x] = Mathf.FloorToInt(2f * shortAmount * Mathf.Lerp(0.45f, 1f, lawn) + jitter);
+                    tallCells[z, x] = Mathf.FloorToInt(tallAmount * Mathf.SmoothStep(0f, 1f, (tall - 0.5f) * 3.5f) + jitter);
+                    bushCells[z, x] = bush > 1f - 0.12f * bushAmount && jitter < 0.15f ? 1 : 0;
+                }
+
                 float wet = anyLoveWet && wetness != null ? wetness(point) : 0f;
+                // Asked once per cell, and only of the plants that care: the height over the water and the nearness of rocks.
+                float above = float.NaN, rocky = -1f;
+                bool askedAbove = false;
                 for (int k = 0; k < plants.Count; k++)
                 {
                     Plant plant = plants[k];
@@ -199,16 +253,48 @@ public static class TerrainGrowth
                         continue;
                     }
 
+                    // A plant that grows by water height grows only in its band; in water nothing else does.
+                    float band = 1f;
+                    if (plant.byWater && aboveWater != null)
+                    {
+                        if (!askedAbove)
+                        {
+                            above = aboveWater(point);
+                            askedAbove = true;
+                        }
+
+                        band = InBand(above, plant.aboveWater);
+                        if (band <= 0f)
+                        {
+                            continue;
+                        }
+                    }
+                    else if (underWater)
+                    {
+                        continue;
+                    }
+
                     // Each plant grows in its own patches (noise), thinly, and a few strays scatter everywhere. Wet ground
-                    // spreads the patches and thickens them, for the plants that love it.
+                    // spreads the patches and thickens them, for the plants that love it; so do edges and rocks, for those that crowd them.
                     float scale = 1f / plant.patchSize;
                     float patch = Mathf.PerlinNoise(point.x * scale + 31.7f * (k + 1) + offset, point.z * scale - 17.3f * (k + 1));
                     float roll = Mathf.Repeat(Mathf.Sin(x * 12.9898f + z * 78.233f + (k + 1) * 3.17f) * 43758.547f, 1f);
                     float love = plant.loveOfWet * wet;
+                    if (plant.atEdges > 0f || plant.nearRocks > 0f)
+                    {
+                        if (plant.nearRocks > 0f && rocky < 0f)
+                        {
+                            rocky = nearRocks != null ? Mathf.Clamp01(nearRocks(point)) : 0f;
+                        }
+
+                        float rocks = plant.nearRocks > 0f ? plant.nearRocks * rocky : 0f;
+                        love = Thickening(love, plant.atEdges * 4f * seam, rocks);
+                    }
+
                     float threshold = plant.rarity - love * WetSpread;
                     float thickness = plant.thickness * (1f + love * WetThickening);
-                    bool inPatch = patch > threshold && roll < thickness * plantAmount * Mathf.InverseLerp(threshold, threshold + 0.12f, patch);
-                    plantCells[k][z, x] = inPatch || roll < StrayChance * plantAmount ? 1 : 0;
+                    bool inPatch = patch > threshold && roll < thickness * plantAmount * Mathf.InverseLerp(threshold, threshold + 0.12f, patch) * band;
+                    plantCells[k][z, x] = inPatch || roll < StrayChance * plantAmount * band ? 1 : 0;
                 }
 
                 grown++;
@@ -228,6 +314,76 @@ public static class TerrainGrowth
         }
 
         return grown;
+    }
+
+    /// <summary>
+    /// How much a plant with a water band grows at <paramref name="above"/> metres over the nearest water: 1 inside the band, thinning
+    /// to 0 over the band's outer fifth at each end, and 0 outside it or where no water is near (NaN). Bands below zero stand in water.
+    /// </summary>
+    public static float InBand(float above, Vector2 band)
+    {
+        if (float.IsNaN(above) || above < band.x || above > band.y)
+        {
+            return 0f;
+        }
+
+        float fade = Mathf.Max(0.01f, (band.y - band.x) * BandFade);
+        return Mathf.SmoothStep(0f, 1f, Mathf.Min(above - band.x, band.y - above) / fade);
+    }
+
+    // Wet, edge and rock each thicken a plant (0 to 1); together they add up as chances do, so the sum never passes 1.
+    private static float Thickening(float wet, float edge, float rocks) =>
+        1f - (1f - Mathf.Clamp01(wet)) * (1f - Mathf.Clamp01(edge)) * (1f - Mathf.Clamp01(rocks));
+
+    /// <summary>
+    /// How near a rock is at each point, for <see cref="Plant.nearRocks"/>: 1 at a rock's edge, easing to 0 at <paramref name="reach"/>
+    /// metres beyond it. <paramref name="rocks"/> are (world x, world z, radius in metres); they are stamped once into a grid of half-metre
+    /// cells over the ground from <paramref name="origin"/> across <paramref name="size"/> (x and z), so asking is one lookup. Null when
+    /// there are no rocks.
+    /// </summary>
+    public static Func<Vector3, float> NearRocks(Vector3 origin, Vector2 size, IReadOnlyList<Vector3> rocks, float reach = RockReach)
+    {
+        if (rocks == null || rocks.Count == 0 || size.x <= 0f || size.y <= 0f)
+        {
+            return null;
+        }
+
+        int columns = Mathf.CeilToInt(size.x / RockCell), rows = Mathf.CeilToInt(size.y / RockCell);
+        var near = new byte[rows * columns];
+        reach = Mathf.Max(0.01f, reach);
+        foreach (Vector3 rock in rocks)
+        {
+            float radius = Mathf.Max(0f, rock.z);
+            float x = rock.x - origin.x, z = rock.y - origin.z;
+            float extent = radius + reach;
+            int fromColumn = Mathf.Max(0, Mathf.FloorToInt((x - extent) / RockCell)), toColumn = Mathf.Min(columns - 1, Mathf.FloorToInt((x + extent) / RockCell));
+            int fromRow = Mathf.Max(0, Mathf.FloorToInt((z - extent) / RockCell)), toRow = Mathf.Min(rows - 1, Mathf.FloorToInt((z + extent) / RockCell));
+            for (int row = fromRow; row <= toRow; row++)
+            {
+                for (int column = fromColumn; column <= toColumn; column++)
+                {
+                    float dx = (column + 0.5f) * RockCell - x, dz = (row + 0.5f) * RockCell - z;
+                    float beyond = Mathf.Sqrt(dx * dx + dz * dz) - radius;
+                    if (beyond >= reach)
+                    {
+                        continue;
+                    }
+
+                    var value = (byte)Mathf.RoundToInt(255f * (beyond <= 0f ? 1f : 1f - beyond / reach));
+                    int index = row * columns + column;
+                    if (value > near[index])
+                    {
+                        near[index] = value;
+                    }
+                }
+            }
+        }
+
+        return point =>
+        {
+            int column = (int)((point.x - origin.x) / RockCell), row = (int)((point.z - origin.z) / RockCell);
+            return column < 0 || row < 0 || column >= columns || row >= rows ? 0f : near[row * columns + column] / 255f;
+        };
     }
 
     private static void ClearGrassAroundPlants(IReadOnlyList<Plant> plants, int[][,] plantCells, int[,] shortCells, int[,] tallCells, int resolution)

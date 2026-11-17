@@ -83,7 +83,8 @@ public static partial class RaidMapGenerator
             };
         }
 
-        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight);
+        // Stones by the water (the map's Shore list) go by the field's ponds, rivers and fen.
+        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight, field.WaterNear);
         Object.Destroy(working);
         return $"heights {heights} ms, paint {paint - heights} ms, scatter {clock.ElapsedMilliseconds - paint} ms";
     }

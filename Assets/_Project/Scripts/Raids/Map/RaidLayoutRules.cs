@@ -61,6 +61,9 @@ public sealed class RaidFenRule
     [Min(4f)] public float stringSpacing = 16f;
     [Tooltip("The fen's water. Empty: the rules' Pond Material.")]
     public Material water;
+    [Tooltip("How wet the fen's ground stays where it stands well above the water (0 to 1), for the plants that love the wet. Low keeps " +
+             "reeds and sedge crowding the banks; high spreads them over the whole fen.")]
+    [Range(0f, 1f)] public float damp = 0.25f;
 }
 
 /// <summary>How a Valley map is shaped (RaidLayoutShape.Valley): its floor, its walls and the river down its middle.</summary>
@@ -99,6 +102,16 @@ public sealed class RaidValleyRule
     [Tooltip("What sits at the near end of every other bridge for the whole raid (Troll Valley: the Toll Troll: pay, riddle or fight; " +
              "or ford somewhere else). Empty: the bridges are free.")]
     public RaidEventDefinition bridgeToll;
+    [Tooltip("Metres between the Boulder Kit's rocks set into each wall, along its foot, so the walls read as rock rather than painted " +
+             "slopes. Only to look at: no colliders. 0: bare walls.")]
+    [Min(0f)] public float wallCrags;
+    [Tooltip("How far up a wall its crags go, in metres from its foot across the map. Keep it short: rock far from where anyone walks " +
+             "costs objects and shows only from above.")]
+    [Min(1f)] public float wallCragReach = 25f;
+    [Tooltip("Only faces steeper than this (degrees) get a crag; the ledges between stay bare.")]
+    [Range(10f, 80f)] public float wallCragSlope = 38f;
+    [Tooltip("Chance that a crag's place also has a great block fallen at the wall's foot: solid, kept off trails, clearings and the river.")]
+    [Range(0f, 1f)] public float wallBlocks = 0.1f;
 }
 
 /// <summary>How many sites of one kind a generated map holds, and where they go.</summary>
@@ -306,6 +319,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField] private Vector2Int boulderClusterSize = new Vector2Int(1, 3);
     [Tooltip("Scale of a boulder, least and most.")]
     [SerializeField] private Vector2 boulderScale = new Vector2(0.7f, 1.4f);
+    [Tooltip("A cluster's other boulders hug its first one as smaller rocks sunk deeper, so it reads as one outcrop; off, they lie a few " +
+             "metres apart. Off keeps the Misty Woods' maps as they are.")]
+    [SerializeField] private bool boulderOutcrops;
     [Tooltip("How many of the highest clearings hold a lookout, on a map of the normal size. Looking out reveals the land around.")]
     [SerializeField, Min(0)] private int lookouts;
     [Tooltip("Metres of the map a lookout reveals around it.")]
@@ -528,6 +544,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Vector2Int BoulderClusters => boulderClusters;
     public Vector2Int BoulderClusterSize => boulderClusterSize;
     public Vector2 BoulderScale => boulderScale;
+    public bool BoulderOutcrops => boulderOutcrops;
     public int Lookouts => lookouts;
     public float LookoutReveal => lookoutReveal;
     public float PondDrink => pondDrink;

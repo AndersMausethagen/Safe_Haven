@@ -37,9 +37,10 @@ MonoBehaviour:
   clutterPerSite: {x: 2, y: 5}
   clutterReach: {x: 3.5, y: 8}
   boulderKit: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
-  boulderClusters: {x: 6, y: 10}
-  boulderClusterSize: {x: 1, y: 3}
-  boulderScale: {x: 0.6, y: 1.3}
+  boulderClusters: {x: 10, y: 16}
+  boulderClusterSize: {x: 3, y: 6}
+  boulderScale: {x: 0.5, y: 1.4}
+  boulderOutcrops: 1
   lookouts: 1
   lookoutReveal: 70
   largeRegions: {x: 2, y: 3}
@@ -73,7 +74,7 @@ MonoBehaviour:
   pondDepth: {x: 0.7, y: 1.6}
   pondStretch: 1.6
   pondMaterial: {fileID: 2100000, guid: 2e96d20980d31544abc72c4199c1fec0, type: 2}
-  riverMaterial: {fileID: 2100000, guid: 7b22eab10095b3c439a6f3fe5af05797, type: 2}
+  riverMaterial: {fileID: 2100000, guid: f1eab2947ba8683499ccf63423c4c503, type: 2}
   ravineCrags: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
   waterfallMaterial: {fileID: 2100000, guid: f87133fa09ba1064095ccf2c01546bab, type: 2}
   waterfallPlunge: {fileID: 1748448449348329905, guid: f15946e2dd56dd446b3819890e056a86, type: 3}
@@ -92,7 +93,7 @@ MonoBehaviour:
   - name: Birch Floor
     briefing: Birches crowd the valley floor, and the river runs quiet between them.
     weight: 1
-    forest: 0.95
+    forest: 0.7
     treeSpacing: 1
     treeWeights: []
     ridges: 0.35
@@ -150,7 +151,7 @@ MonoBehaviour:
   - name: The Troll's Road
     briefing: An old road runs up the valley, and the trolls keep its bridges.
     weight: 1
-    forest: 0.6
+    forest: 0.5
     treeSpacing: 1
     treeWeights: []
     ridges: 0.3
@@ -179,7 +180,7 @@ MonoBehaviour:
   - name: River Mist
     briefing: Mist lies along the river all day, and sound carries far on it.
     weight: 1
-    forest: 0.8
+    forest: 0.6
     treeSpacing: 1
     treeWeights: []
     ridges: 0.35
@@ -319,6 +320,10 @@ MonoBehaviour:
     bridgeDeck: 2
     bossBridge: {fileID: 0}
     bridgeToll: {fileID: 11400000, guid: 87c294e152a4f8f4381ce5a1a1de9bdd, type: 2}
+    wallCrags: 3
+    wallCragReach: 25
+    wallCragSlope: 38
+    wallBlocks: 0.1
   fen:
     enabled: 0
     aboveWater: 0.6
@@ -330,6 +335,7 @@ MonoBehaviour:
     strings: 0.6
     stringSpacing: 16
     water: {fileID: 0}
+    damp: 0.25
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   - {fileID: 11400000, guid: 737752e83ca9a444786e0ead8ef9b959, type: 2}

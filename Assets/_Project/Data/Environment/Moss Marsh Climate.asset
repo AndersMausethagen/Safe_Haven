@@ -31,3 +31,4 @@ MonoBehaviour:
   transitionSeconds: 45
   soakSeconds: 75
   drySeconds: 1800
+  groundWetnessFloor: 0.35

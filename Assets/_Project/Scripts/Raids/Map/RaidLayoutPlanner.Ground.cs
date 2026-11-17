@@ -40,6 +40,14 @@ public static partial class RaidLayoutPlanner
 
     private const int BoulderTries = 30;
 
+    // An outcrop's hugging rocks (B4): the gap between them and the first rock's side, their scale, and the half width taken for a first
+    // rock whose piece can't be told.
+    private const float OutcropGapLeast = 0.3f;
+    private const float OutcropGapMost = 1.5f;
+    private const float OutcropScaleLeast = 0.3f;
+    private const float OutcropScaleMost = 0.55f;
+    private const float OutcropUnknownHalf = 1.5f;
+
     // Their tops in the wild ground and off the clearings; trails may climb their outer flanks. From their own stream, so nothing else moves.
     private static void PlaceHills(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
     {
@@ -143,6 +151,12 @@ public static partial class RaidLayoutPlanner
                 }
 
                 int count = random.Next(rules.BoulderClusterSize.x, rules.BoulderClusterSize.y + 1);
+                if (rules.BoulderOutcrops)
+                {
+                    PlaceOutcrop(plan, rules, random, centre, count, halfWidth);
+                    break;
+                }
+
                 for (int k = 0; k < count; k++)
                 {
                     Vector2 spot = k == 0 ? centre : centre + Direction(Range(random, 0f, 360f)) * Range(random, 2f, BoulderSpread);
@@ -163,7 +177,95 @@ public static partial class RaidLayoutPlanner
         }
     }
 
-    private static bool BoulderFits(RaidLayoutPlan plan, Vector2 spot, float halfWidth)
+    // An outcrop (Rules › Boulder Outcrops): the first rock, and the rest hugging it, smaller and set deeper, so a cluster reads as one
+    // piece of the land's rock rather than stones set down apart (Docs/WorldLookPlan_2026-11-17.md B4). Every value is drawn whether or
+    // not a rock fits, so one that doesn't never shifts the next.
+    private static void PlaceOutcrop(RaidLayoutPlan plan, RaidLayoutRules rules, System.Random random, Vector2 centre, int count, float halfWidth)
+    {
+        var main = new RaidLayoutBoulder
+        {
+            Position = centre,
+            Scale = Range(random, rules.BoulderScale.x, rules.BoulderScale.y),
+            Turn = Range(random, 0f, 360f),
+            Pick = (float)random.NextDouble(),
+        };
+        plan.Boulders.Add(main);
+        for (int k = 1; k < count; k++)
+        {
+            Vector2 direction = Direction(Range(random, 0f, 360f));
+            float gap = Range(random, OutcropGapLeast, OutcropGapMost);
+            var hugging = new RaidLayoutBoulder
+            {
+                Position = centre + direction * (HugRadius(rules.BoulderKit, main, direction) + gap),
+                Scale = Range(random, OutcropScaleLeast, OutcropScaleMost),
+                Turn = Range(random, 0f, 360f),
+                Pick = (float)random.NextDouble(),
+                Outcrop = true,
+            };
+            if (BoulderFits(plan, hugging.Position, halfWidth))
+            {
+                plan.Boulders.Add(hugging);
+            }
+        }
+    }
+
+    // How far the first rock reaches from its middle towards a direction: its kit piece's footprint (across its face and its depth, as
+    // RaidMapGenerator stands it) at its scale and turn, taken as an ellipse. Picks the piece as RaidMapGenerator.PickByShare does, with
+    // plain reference tests only, as the planner may run on a worker thread.
+    private static float HugRadius(CliffKit kit, RaidLayoutBoulder main, Vector2 direction)
+    {
+        CliffKit.Piece piece = PieceByShare(kit, main.Pick);
+        if (piece == null)
+        {
+            return OutcropUnknownHalf * main.Scale;
+        }
+
+        float scale = Mathf.Min(main.Scale, RaidMapGenerator.BoulderWidest / Mathf.Max(0.5f, Mathf.Max(piece.size.x, piece.size.z)));
+        float across = Mathf.Max(0.1f, piece.size.x * 0.5f * scale), deep = Mathf.Max(0.1f, piece.size.z * 0.5f * scale);
+        float turn = main.Turn * Mathf.Deg2Rad;
+        // The direction in the turned piece's own frame (a yaw turns +x towards -z in the plan's y).
+        float x = direction.x * Mathf.Cos(turn) - direction.y * Mathf.Sin(turn);
+        float z = direction.x * Mathf.Sin(turn) + direction.y * Mathf.Cos(turn);
+        return 1f / Mathf.Sqrt(x * x / (across * across) + z * z / (deep * deep));
+    }
+
+    private static CliffKit.Piece PieceByShare(CliffKit kit, float share)
+    {
+        if (kit is null)
+        {
+            return null;
+        }
+
+        float total = 0f;
+        foreach (CliffKit.Piece piece in kit.Pieces)
+        {
+            total += !(piece.prefab is null) ? piece.weight : 0f;
+        }
+
+        float roll = share * total;
+        foreach (CliffKit.Piece piece in kit.Pieces)
+        {
+            if (piece.prefab is null)
+            {
+                continue;
+            }
+
+            roll -= piece.weight;
+            if (roll <= 0f)
+            {
+                return piece;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// True when a boulder's middle at <paramref name="spot"/> keeps its distance from every clearing, site, pocket, pond, ravine, spire,
+    /// trail and river: what may stand solid in the wild ground without blocking a way. Also used for the great blocks at a valley wall's
+    /// foot (RaidMapGenerator).
+    /// </summary>
+    internal static bool BoulderFits(RaidLayoutPlan plan, Vector2 spot, float halfWidth)
     {
         foreach (RaidLayoutRoom room in plan.Rooms)
         {

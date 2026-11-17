@@ -224,14 +224,17 @@ MonoBehaviour:
   litter: 0.55
   pathFeather: 2
   pathFray: 0.4
+  openSoil: 0.08
+  mossLayer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
+  noMoss: 0
   growth:
   - layer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
-    shortGrass: 0.65
-    tallGrass: 0.38
+    shortGrass: 0.8
+    tallGrass: 0.45
     bushes: 0.1
     plants: 0.25
     bareAt: 0
-    colour: {r: 0.56, g: 0.6, b: 0.3, a: 1}
+    colour: {r: 0.62, g: 0.6, b: 0.32, a: 1}
     verge: 0
   - layer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
     shortGrass: 0
@@ -265,6 +268,10 @@ MonoBehaviour:
     thickness: 0.55
     clearing: 1
     loveOfWet: 0.3
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Eagle Fern
     enabled: 1
     patchSize: 8
@@ -272,6 +279,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.2
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Wild Fern
     enabled: 1
     patchSize: 7
@@ -279,6 +290,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.4
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Brake Fern
     enabled: 1
     patchSize: 6
@@ -286,6 +301,10 @@ MonoBehaviour:
     thickness: 0.45
     clearing: 1
     loveOfWet: 0.6
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Lake Fern
     enabled: 1
     patchSize: 7
@@ -293,6 +312,10 @@ MonoBehaviour:
     thickness: 0.4
     clearing: 1
     loveOfWet: 0.5
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Small Fern
     enabled: 1
     patchSize: 5
@@ -300,6 +323,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 0
     loveOfWet: 0.3
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Forest Clover
     enabled: 1
     patchSize: 5
@@ -307,6 +334,10 @@ MonoBehaviour:
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.2
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Ground Weed
     enabled: 1
     patchSize: 6
@@ -314,6 +345,10 @@ MonoBehaviour:
     thickness: 0.4
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0
   - prototype: Forest Grass
     enabled: 1
     patchSize: 8
@@ -321,6 +356,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Lake Grass
     enabled: 1
     patchSize: 8
@@ -328,6 +367,10 @@ MonoBehaviour:
     thickness: 0.45
     clearing: 0
     loveOfWet: 0.2
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Wild Flowers
     enabled: 1
     patchSize: 5
@@ -335,6 +378,10 @@ MonoBehaviour:
     thickness: 0.3
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Moss Cushion
     enabled: 1
     patchSize: 6
@@ -342,13 +389,21 @@ MonoBehaviour:
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.8
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0.8
   - prototype: Leaf Litter
-    enabled: 1
+    enabled: 0
     patchSize: 8
     rarity: 0.64
     thickness: 0.4
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Forest Mushrooms
     enabled: 1
     patchSize: 5
@@ -356,48 +411,76 @@ MonoBehaviour:
     thickness: 0.2
     clearing: 0
     loveOfWet: 0.6
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Glow Mushrooms
-    enabled: 1
+    enabled: 0
     patchSize: 5
     rarity: 0.93
     thickness: 0.22
     clearing: 0
     loveOfWet: 1
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Glow Flowers
-    enabled: 1
+    enabled: 0
     patchSize: 6
     rarity: 0.88
     thickness: 0.2
     clearing: 0
     loveOfWet: 0.3
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Needle Debris A
     enabled: 1
     patchSize: 4
-    rarity: 0.5
+    rarity: 0.75
     thickness: 0.55
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Needle Debris B
-    enabled: 1
+    enabled: 0
     patchSize: 5
     rarity: 0.52
     thickness: 0.5
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Needle Debris C
-    enabled: 1
+    enabled: 0
     patchSize: 7
     rarity: 0.58
     thickness: 0.45
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Dry Leaves
     enabled: 1
     patchSize: 6
-    rarity: 0.5
+    rarity: 0.7
     thickness: 0.4
     clearing: 0
     loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Common Fern B
     enabled: 1
     patchSize: 9
@@ -405,6 +488,10 @@ MonoBehaviour:
     thickness: 0.55
     clearing: 1
     loveOfWet: 0.3
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Eagle Fern B
     enabled: 1
     patchSize: 8
@@ -412,6 +499,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.2
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Wild Fern B
     enabled: 1
     patchSize: 7
@@ -419,6 +510,10 @@ MonoBehaviour:
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.4
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0.6
+    nearRocks: 0.7
   - prototype: Forest Clover B
     enabled: 1
     patchSize: 5
@@ -426,6 +521,10 @@ MonoBehaviour:
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.2
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   - prototype: Moss Cushion B
     enabled: 1
     patchSize: 6
@@ -433,6 +532,87 @@ MonoBehaviour:
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.8
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0.8
+  - prototype: Heather
+    enabled: 1
+    patchSize: 6
+    rarity: 0.66
+    thickness: 0.6
+    clearing: 0
+    loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0.5
+  - prototype: Blueberry
+    enabled: 1
+    patchSize: 7
+    rarity: 0.7
+    thickness: 0.5
+    clearing: 1
+    loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
+  - prototype: Lingonberry
+    enabled: 1
+    patchSize: 6
+    rarity: 0.72
+    thickness: 0.5
+    clearing: 0
+    loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
+  - prototype: Yellow Flowers
+    enabled: 1
+    patchSize: 4
+    rarity: 0.74
+    thickness: 0.3
+    clearing: 0
+    loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
+  - prototype: White Flowers
+    enabled: 1
+    patchSize: 4
+    rarity: 0.72
+    thickness: 0.3
+    clearing: 0
+    loveOfWet: 0
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
+  - prototype: Cotton Grass A
+    enabled: 1
+    patchSize: 4
+    rarity: 0.8
+    thickness: 0.4
+    clearing: 0
+    loveOfWet: 0.9
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
+  - prototype: Cotton Grass B
+    enabled: 1
+    patchSize: 4
+    rarity: 0.8
+    thickness: 0.4
+    clearing: 0
+    loveOfWet: 0.9
+    byWater: 0
+    aboveWater: {x: 0, y: 0.5}
+    atEdges: 0
+    nearRocks: 0
   trees:
   - prefab: {fileID: 9151021589558116730, guid: 0a10eabb45908d2459f221815278f8aa, type: 3}
     weight: 3
@@ -445,7 +625,7 @@ MonoBehaviour:
       wet: 0
       edge: 0.2
       nearTrees: 0
-      groves: 0.3
+      groves: 0.6
       room: 1.8
   - prefab: {fileID: 8842390734658243435, guid: 7c9e51b38fbc5c647a4a85593b19315b, type: 3}
     weight: 3
@@ -458,10 +638,10 @@ MonoBehaviour:
       wet: 0
       edge: 0.2
       nearTrees: 0
-      groves: 0.3
+      groves: 0.6
       room: 1.8
   - prefab: {fileID: 5815589224363596077, guid: 6129ca59a0de959419ebf609dbb69b3d, type: 3}
-    weight: 2.2
+    weight: 1.4
     scale: {x: 0.85, y: 1.25}
     fromTier: 0
     toTier: 0
@@ -471,10 +651,10 @@ MonoBehaviour:
       wet: 0
       edge: 0.2
       nearTrees: 0
-      groves: 0.3
+      groves: 0.6
       room: 1.8
   - prefab: {fileID: 2481782460357682015, guid: 93b20c7363fb53145a338059f706c53c, type: 3}
-    weight: 2.2
+    weight: 1.4
     scale: {x: 0.85, y: 1.25}
     fromTier: 0
     toTier: 0
@@ -484,10 +664,10 @@ MonoBehaviour:
       wet: 0
       edge: 0.2
       nearTrees: 0
-      groves: 0.3
+      groves: 0.6
       room: 1.8
   - prefab: {fileID: 4664926423558582574, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
-    weight: 1.4
+    weight: 1.2
     scale: {x: 0.85, y: 1.2}
     fromTier: 0
     toTier: 0
@@ -500,7 +680,7 @@ MonoBehaviour:
       groves: 0.4
       room: 1.4
   - prefab: {fileID: 2536764809155501970, guid: 4d3cb955aa9c9014fba5e5512d3315b0, type: 3}
-    weight: 1
+    weight: 1.2
     scale: {x: 0.85, y: 1.1}
     fromTier: 0
     toTier: 0
@@ -510,10 +690,10 @@ MonoBehaviour:
       wet: -0.5
       edge: 0
       nearTrees: 0
-      groves: 0.6
+      groves: 0.75
       room: 1.8
   - prefab: {fileID: 5667429938717972990, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
-    weight: 0.8
+    weight: 0.3
     scale: {x: 0.85, y: 1.2}
     fromTier: 0
     toTier: 0
@@ -526,7 +706,7 @@ MonoBehaviour:
       groves: 0.3
       room: 1.8
   - prefab: {fileID: 6839028566643895452, guid: cece39637df4fd044ab4df7346499ad8, type: 3}
-    weight: 0.5
+    weight: 0
     scale: {x: 0.8, y: 1.05}
     fromTier: 0
     toTier: 0
@@ -564,9 +744,11 @@ MonoBehaviour:
       nearTrees: 0
       groves: 0.5
       room: 1.5
-  treeSpacing: 3.2
+  treeSpacing: 3.6
   maxTreeSlope: 36
   clearAroundSites: 5
+  treeClumping: 0.75
+  clumpSize: 14
   rocks:
   - prefab: {fileID: 4200787531422230130, guid: bc49fdfbd0c597a43b14ce6bb19fa539, type: 3}
     weight: 2.4
@@ -961,9 +1143,165 @@ MonoBehaviour:
   rockSpacing: 3
   rocksAtCliffs: 0.85
   rocksInForest: 0.75
+  rocksInOpen: 0.08
+  pileChance: 0.5
+  pileStones:
+  - prefab: {fileID: 8202738798707269545, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
+    weight: 0.45
+    scale: {x: 0.5, y: 1}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 35}
+      forest: {x: 0, y: 1}
+      wet: 0.2
+      edge: 0
+      nearTrees: 0
+      groves: 0.5
+      room: 0.6
+  - prefab: {fileID: 7996790799419281867, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
+    weight: 1.2
+    scale: {x: 0.8, y: 1.4}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 45}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.6
+      room: 0
+  - prefab: {fileID: 2862827438135405961, guid: 8b1a211e2606d99409ad613404e2949b, type: 3}
+    weight: 1.2
+    scale: {x: 0.8, y: 1.4}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 45}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.6
+      room: 0
+  shore:
+    stones:
+    - prefab: {fileID: 1404885824269638995, guid: 6684d39ca2e931146a85afd1c43af1d7, type: 3}
+      weight: 1
+      scale: {x: 1.5, y: 3.3000002}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.24
+    - prefab: {fileID: 6328348981546667030, guid: ed939970df0398342b77244b84d79e9f, type: 3}
+      weight: 1
+      scale: {x: 1.322011, y: 2.9084241}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.33
+    - prefab: {fileID: 6718270718539658451, guid: 5c797e0fd38f6ce4cb13dc45a043e98a, type: 3}
+      weight: 1
+      scale: {x: 1.5, y: 3.3000002}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.23
+    - prefab: {fileID: 8056757738587741231, guid: 71a7402c314163746a0caf6f09c6773a, type: 3}
+      weight: 1
+      scale: {x: 1.0224524, y: 2.2493951}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.43
+    - prefab: {fileID: 441103227287321634, guid: 086b79f7b81849d498d19b715da656e1, type: 3}
+      weight: 1
+      scale: {x: 0.5621548, y: 1.2367407}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.79
+    - prefab: {fileID: 8202738798707269545, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
+      weight: 0.45
+      scale: {x: 1, y: 1.8}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 35}
+        forest: {x: 0, y: 1}
+        wet: 0.2
+        edge: 0
+        nearTrees: 0
+        groves: 0.5
+        room: 0.6
+    - prefab: {fileID: 7996790799419281867, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
+      weight: 1.2
+      scale: {x: 0.9, y: 1.8}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 45}
+        forest: {x: 0, y: 1}
+        wet: 0
+        edge: 0
+        nearTrees: 0
+        groves: 0.6
+        room: 0
+    - prefab: {fileID: 2862827438135405961, guid: 8b1a211e2606d99409ad613404e2949b, type: 3}
+      weight: 1.2
+      scale: {x: 0.9, y: 1.8}
+      fromTier: 0
+      toTier: 0
+      habitat:
+        slope: {x: 0, y: 45}
+        forest: {x: 0, y: 1}
+        wet: 0
+        edge: 0
+        nearTrees: 0
+        groves: 0.6
+        room: 0
+    bedSpacing: 2
+    bedChance: 0.8
+    deepest: 0.8
+    proud: {x: 0.1, y: 0.3}
+    bankSpacing: 2.2
+    bankReach: 1.5
+    bankChance: 0.6
+    clumpSize: 6
   undergrowth:
   - prefab: {fileID: 5124537417292197620, guid: 4c161aa370b351143b38c52fe75000e4, type: 3}
-    weight: 2
+    weight: 0.6
     scale: {x: 0.8, y: 1.2}
     fromTier: 0
     toTier: 0
@@ -976,7 +1314,7 @@ MonoBehaviour:
       groves: 0.3
       room: 0.8
   - prefab: {fileID: 3210676774868710642, guid: b000e5843dfdabd4b9bd8d64114173dc, type: 3}
-    weight: 2
+    weight: 0.6
     scale: {x: 0.8, y: 1.3}
     fromTier: 0
     toTier: 0
@@ -1119,7 +1457,7 @@ MonoBehaviour:
       groves: 0
       room: 0
   - prefab: {fileID: 215287014038029075, guid: c67c3f6cb76afa7468e2085a2c922228, type: 3}
-    weight: 0.4
+    weight: 0.8
     scale: {x: 0.8, y: 1.6}
     fromTier: 0
     toTier: 0
@@ -1132,7 +1470,7 @@ MonoBehaviour:
       groves: 0.4
       room: 0
   - prefab: {fileID: 4526530113480679261, guid: 14eda99e96bb4a949919e06ee9eac62b, type: 3}
-    weight: 0.25
+    weight: 0.8
     scale: {x: 0.6, y: 1}
     fromTier: 0
     toTier: 0
@@ -1145,7 +1483,7 @@ MonoBehaviour:
       groves: 0.5
       room: 0
   - prefab: {fileID: 7996790799419281867, guid: 47e918ea29b202f40932c8d13556ade7, type: 3}
-    weight: 0.6
+    weight: 1.2
     scale: {x: 0.9, y: 1.8}
     fromTier: 0
     toTier: 0
@@ -1158,7 +1496,7 @@ MonoBehaviour:
       groves: 0.6
       room: 0
   - prefab: {fileID: 2862827438135405961, guid: 8b1a211e2606d99409ad613404e2949b, type: 3}
-    weight: 0.6
+    weight: 1.2
     scale: {x: 0.9, y: 1.8}
     fromTier: 0
     toTier: 0
@@ -1171,7 +1509,7 @@ MonoBehaviour:
       groves: 0.6
       room: 0
   - prefab: {fileID: 6413797731762803993, guid: cc15417ff40356a4d9383d3f1367deac, type: 3}
-    weight: 0.5
+    weight: 1
     scale: {x: 0.8, y: 1.6}
     fromTier: 0
     toTier: 0

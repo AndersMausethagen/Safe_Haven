@@ -35,6 +35,35 @@ public sealed class RaidMapDefinition : ScriptableObject
         public bool AppearsAt(int tier) => tier <= 0 || ((fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier));
     }
 
+    /// <summary>
+    /// Stones in and beside running and still water (Docs/WorldLookPlan_2026-11-17.md B6): on the shallow bed, standing a little out of
+    /// the water so the water shader rings them with foam where the concept art has it, and in clumps along the banks. An empty list
+    /// places none.
+    /// </summary>
+    [Serializable]
+    public sealed class ShoreRule
+    {
+        [Tooltip("The stones (lake stones, small mossy rocks, pebbles), picked by weight. Empty: no stones by the water. Those with a " +
+                 "capsule collider keep it, so creatures path round them.")]
+        public List<Scatter> stones = new List<Scatter>();
+        [Tooltip("Metres between the spots on a river's or pond's bed where a stone could lie.")]
+        [Min(0.5f)] public float bedSpacing = 2f;
+        [Tooltip("Chance of a stone in each spot of shallow bed; fewer where it is deeper.")]
+        [Range(0f, 1f)] public float bedChance = 0.8f;
+        [Tooltip("Stones lie on the bed only where the water is shallower than this, in metres.")]
+        [Min(0.05f)] public float deepest = 0.8f;
+        [Tooltip("How far a bed stone stands out of the water, least and most, in metres. Foam rings the stones that break the surface.")]
+        public Vector2 proud = new Vector2(0.1f, 0.3f);
+        [Tooltip("Metres between the spots along a bank where a stone could lie.")]
+        [Min(0.5f)] public float bankSpacing = 2.2f;
+        [Tooltip("How far up the bank from the water's edge stones lie, in metres.")]
+        [Min(0f)] public float bankReach = 1.5f;
+        [Tooltip("Chance of a stone in each bank spot inside a clump.")]
+        [Range(0f, 1f)] public float bankChance = 0.6f;
+        [Tooltip("Metres across a clump of bank stones; the bank between clumps stays bare.")]
+        [Min(1f)] public float clumpSize = 6f;
+    }
+
     [Serializable]
     public sealed class SiteRule
     {
@@ -92,6 +121,14 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0.3f, 4f)] private float pathFeather = 0.9f;
     [Tooltip("How much noise frays the path's edge into tufts of the forest floor: 1 the old ragged edge, 0 a clean fade.")]
     [SerializeField, Range(0f, 1f)] private float pathFray = 1f;
+    [Tooltip("How much soil shows on open ground away from the trails, where the forest is thin (times how open it is). 0.35 the " +
+             "Woods' gravelly openings; low keeps an open valley a meadow, soil only on trails and trodden clearings.")]
+    [SerializeField, Range(0f, 1f)] private float openSoil = 0.35f;
+    [Tooltip("The layer TerrainMoss's skin and fronds grow on, on a generated map. Empty: the Forest Layer. The Litter Layer keeps moss " +
+             "to the densest trees. Must be one of this map's layers.")]
+    [SerializeField] private TerrainLayer mossLayer;
+    [Tooltip("No moss skin at all on a generated map (TerrainMoss switched off for the run).")]
+    [SerializeField] private bool noMoss;
 
     [Header("Growth")]
     [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
@@ -107,6 +144,11 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0f, 60f)] private float maxTreeSlope = 32f;
     [Tooltip("Trees keep this far (metres) from every marker, so sites are never inside a trunk.")]
     [SerializeField, Min(0f)] private float clearAroundSites = 5f;
+    [Tooltip("How much trees gather into copses with meadow between (and a few lone trees in it), 0 to 1. 0: spread as the forest's " +
+             "density says. Moves trees rather than adding them; undergrowth follows at half strength.")]
+    [SerializeField, Range(0f, 1f)] private float treeClumping;
+    [Tooltip("Metres across a copse and the meadow beside it.")]
+    [SerializeField, Min(2f)] private float clumpSize = 16f;
 
     [Header("Rocks and logs")]
     [SerializeField] private List<Scatter> rocks = new List<Scatter>();
@@ -115,6 +157,17 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float rocksAtCliffs = 0.5f;
     [Tooltip("Chance of a rock or log in each spot of open forest.")]
     [SerializeField, Range(0f, 1f)] private float rocksInForest = 0.05f;
+    [Tooltip("Chance of a rock in each spot of open ground (thin forest, off trails and clearings). 0: the open stays bare of them.")]
+    [SerializeField, Range(0f, 1f)] private float rocksInOpen;
+    [Tooltip("Chance that a rock with room of 1 m or more becomes a pile: 2-5 Pile Stones round it and a plant at its foot. Pile " +
+             "stones cut no hole in the navmesh.")]
+    [SerializeField, Range(0f, 1f)] private float pileChance;
+    [Tooltip("The small stones a pile is made of (Mossy Rock Small, Grey Rock, Pebbles), by weight, each at its own size (0.3-0.6 suits).")]
+    [SerializeField] private List<Scatter> pileStones = new List<Scatter>();
+
+    [Header("Water's edge")]
+    [Tooltip("Stones on the shallow beds and along the banks of rivers and ponds, on a generated map.")]
+    [SerializeField] private ShoreRule shore = new ShoreRule();
 
     [Header("Undergrowth")]
     [Tooltip("Saplings, shrubs and forest-floor clutter, placed after the trees in the gaps and edges their habitat favours.")]
@@ -160,6 +213,25 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float Litter => litter;
     public float PathFeather => pathFeather;
     public float PathFray => pathFray;
+    public float OpenSoil => openSoil;
+    public bool NoMoss => noMoss;
+
+    /// <summary>
+    /// The layer the moss grows on: Moss Layer when it is one of this map's layers, otherwise the Forest Layer (as before Moss Layer
+    /// existed). Null with <see cref="NoMoss"/>.
+    /// </summary>
+    public TerrainLayer MossLayer
+    {
+        get
+        {
+            if (noMoss)
+            {
+                return null;
+            }
+
+            return mossLayer != null && Array.IndexOf(Layers, mossLayer) >= 0 ? mossLayer : forestLayer;
+        }
+    }
 
     /// <summary>The terrain layers in paint order: forest, path, cliff, then litter when the map has one.</summary>
     public TerrainLayer[] Layers => litterLayer != null
@@ -171,10 +243,16 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float TreeSpacing => treeSpacing;
     public float MaxTreeSlope => maxTreeSlope;
     public float ClearAroundSites => clearAroundSites;
+    public float TreeClumping => treeClumping;
+    public float ClumpSize => clumpSize;
     public IReadOnlyList<Scatter> Rocks => rocks;
     public float RockSpacing => rockSpacing;
     public float RocksAtCliffs => rocksAtCliffs;
     public float RocksInForest => rocksInForest;
+    public float RocksInOpen => rocksInOpen;
+    public float PileChance => pileChance;
+    public IReadOnlyList<Scatter> PileStones => pileStones;
+    public ShoreRule Shore => shore ?? (shore = new ShoreRule());
     public IReadOnlyList<Scatter> Undergrowth => undergrowth;
     public float UndergrowthSpacing => undergrowthSpacing;
     public float UndergrowthChance => undergrowthChance;
@@ -274,6 +352,7 @@ public sealed class RaidMapDefinition : ScriptableObject
         scatterSeed = seed;
         treeSpacing *= mood.treeSpacing;
         rocksInForest = Mathf.Clamp01(rocksInForest * mood.rocks);
+        rocksInOpen = Mathf.Clamp01(rocksInOpen * mood.rocks);
         for (int i = 0; i < trees.Count && i < mood.treeWeights.Count; i++)
         {
             if (trees[i] != null)
@@ -304,6 +383,17 @@ public sealed class RaidMapDefinition : ScriptableObject
             if (scatter != null && !scatter.AppearsAt(tier))
             {
                 scatter.weight = 0f;
+            }
+        }
+
+        foreach (List<Scatter> stones in new[] { pileStones, Shore.stones })
+        {
+            foreach (Scatter scatter in stones)
+            {
+                if (scatter != null && !scatter.AppearsAt(tier))
+                {
+                    scatter.weight = 0f;
+                }
             }
         }
     }

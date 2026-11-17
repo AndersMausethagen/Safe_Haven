@@ -64,9 +64,10 @@ public static class RaidMapBaker
         Transform start = PlaceSites(map, terrain, sites, zonePoints, report);
         SnapToGround(content, terrain);
 
-        if (terrain.TryGetComponent(out TerrainMoss moss))
+        // The moss grows where the map says (its Moss Layer, the forest floor by default); with No Moss the scene's is left as it is.
+        if (!definition.NoMoss && terrain.TryGetComponent(out TerrainMoss moss))
         {
-            moss.Configure(definition.ForestLayer, Shader.Find(MossShaderName));
+            moss.Configure(definition.MossLayer, Shader.Find(MossShaderName));
         }
 
         if (map.NavMesh != null)
@@ -139,7 +140,7 @@ public static class RaidMapBaker
         modifier.area = NotWalkableArea;
         if (!holder.TryGetComponent(out MeshCollider collider)) collider = holder.gameObject.AddComponent<MeshCollider>();
 
-        Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position);
+        Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position, RaidMapSurface.Prisms(definition));
 
         string folder = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(definition)).Replace('\\', '/');
         string path = $"{folder}/{definition.name} Trunks.asset";

@@ -111,7 +111,7 @@ MonoBehaviour:
     lootMultiplier: 1
     enemyDensity: 1
     briefing: Open sky over the moor, the first in a long while. You can see a long way across the fen, and so can the things on the wing.
-    skyCover: 0.4
+    skyCover: 0.5
   - name: Dusk
     hour: 19.4
     chance: 25
@@ -128,10 +128,10 @@ MonoBehaviour:
     skyCover: 0.3
   grade:
     curve: 1
-    exposure: -0.15
-    saturation: 1.08
-    contrast: 1.15
-    filter: {r: 0.95, g: 1, b: 0.9, a: 1}
+    exposure: -0.2
+    saturation: 1.2
+    contrast: 1.1
+    filter: {r: 0.98, g: 1, b: 0.82, a: 1}
   groundLight:
     enabled: 1
     relief: 0.15

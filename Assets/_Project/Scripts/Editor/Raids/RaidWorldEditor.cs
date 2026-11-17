@@ -483,6 +483,9 @@ internal static class RaidWorldEditor
         DrawLayer(data, terrain, "litterLayer", "Litter (optional)", "Needles and leaves in patches under the densest canopy, where the ground is dry.");
         EditorGUILayout.PropertyField(data.FindProperty("litter"), new GUIContent("Litter cover", "How much of the deep forest's floor the litter covers."));
         EditorGUILayout.PropertyField(data.FindProperty("cliffSlope"), new GUIContent("Rock from / full at (°)", "Slopes in degrees where rock starts to show, and where it covers everything."));
+        EditorGUILayout.PropertyField(data.FindProperty("openSoil"), new GUIContent("Soil in the open", data.FindProperty("openSoil").tooltip));
+        EditorGUILayout.PropertyField(data.FindProperty("mossLayer"), new GUIContent("Moss grows on", data.FindProperty("mossLayer").tooltip));
+        EditorGUILayout.PropertyField(data.FindProperty("noMoss"), new GUIContent("No moss", data.FindProperty("noMoss").tooltip));
         EditorGUILayout.HelpBox("Swapped a layer? Its displacement masks are baked from the old one. Open the raid scene, select the terrain and run " +
                                 "Safe Haven › World › Terrain › Enable or Refresh Displacement.", MessageType.None);
         ContentUtility.EndPanel();
@@ -586,6 +589,8 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(map.FindProperty("treeSpacing"), new GUIContent("Spacing (m)", "Metres between trees where the forest is densest."));
         EditorGUILayout.PropertyField(map.FindProperty("maxTreeSlope"), new GUIContent("Steepest slope (°)", "No trees on slopes steeper than this."));
         EditorGUILayout.PropertyField(map.FindProperty("clearAroundSites"), new GUIContent("Clear around sites (m)", "Trees keep this far from every site."));
+        EditorGUILayout.PropertyField(map.FindProperty("treeClumping"), new GUIContent("Clumping", map.FindProperty("treeClumping").tooltip));
+        EditorGUILayout.PropertyField(map.FindProperty("clumpSize"), new GUIContent("Copse size (m)", map.FindProperty("clumpSize").tooltip));
         ContentUtility.EndPanel();
 
         ContentUtility.BeginPanel("Rocks and logs", "Lying about the forest and at the foot of slopes.");
@@ -594,6 +599,23 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(map.FindProperty("rockSpacing"), new GUIContent("Spacing (m)", "Metres between spots where one could lie."));
         EditorGUILayout.PropertyField(map.FindProperty("rocksAtCliffs"), new GUIContent("Chance at slopes"));
         EditorGUILayout.PropertyField(map.FindProperty("rocksInForest"), new GUIContent("Chance in forest"));
+        EditorGUILayout.PropertyField(map.FindProperty("rocksInOpen"), new GUIContent("Chance in the open", map.FindProperty("rocksInOpen").tooltip));
+        EditorGUILayout.PropertyField(map.FindProperty("pileChance"), new GUIContent("Piles", map.FindProperty("pileChance").tooltip));
+        ContentUtility.EndPanel();
+
+        ContentUtility.BeginPanel("Pile stones", "The small stones a pile is made of, round a rock with room of 1 m or more (Rocks and logs › Piles). They don't block the way.");
+        DrawScatter(map.FindProperty("pileStones"), null, false, solid: false);
+        ContentUtility.EndPanel();
+
+        SerializedProperty shore = map.FindProperty("shore");
+        ContentUtility.BeginPanel("Stones by the water", "On the shallow beds of rivers and ponds, standing a little out of the water so foam rings them, and in clumps along the banks.");
+        DrawScatter(shore.FindPropertyRelative("stones"), null, false);
+        EditorGUILayout.Space(4f);
+        foreach (string field in new[] { "bedSpacing", "bedChance", "deepest", "proud", "bankSpacing", "bankReach", "bankChance", "clumpSize" })
+        {
+            EditorGUILayout.PropertyField(shore.FindPropertyRelative(field));
+        }
+
         ContentUtility.EndPanel();
 
         ContentUtility.BeginPanel("Undergrowth", "Saplings, shrubs and forest-floor clutter, placed after the trees in the gaps, edges and spots by trunks their habitat favours. They don't block the way.");
@@ -813,6 +835,14 @@ internal static class RaidWorldEditor
                         EditorGUILayout.PropertyField(plant.FindPropertyRelative("loveOfWet"), new GUIContent("Loves wet"));
                         EditorGUILayout.PropertyField(plant.FindPropertyRelative("patchSize"), new GUIContent("Patch size (m)"));
                         EditorGUILayout.PropertyField(plant.FindPropertyRelative("clearing"), new GUIContent("Clears grass (cells)"));
+                        EditorGUILayout.PropertyField(plant.FindPropertyRelative("atEdges"), new GUIContent("Crowds edges", plant.FindPropertyRelative("atEdges").tooltip));
+                        EditorGUILayout.PropertyField(plant.FindPropertyRelative("nearRocks"), new GUIContent("Crowds rocks", plant.FindPropertyRelative("nearRocks").tooltip));
+                        SerializedProperty byWater = plant.FindPropertyRelative("byWater");
+                        EditorGUILayout.PropertyField(byWater, new GUIContent("By water height", byWater.tooltip));
+                        if (byWater.boolValue)
+                        {
+                            EditorGUILayout.PropertyField(plant.FindPropertyRelative("aboveWater"), new GUIContent("Above water (m)", plant.FindPropertyRelative("aboveWater").tooltip));
+                        }
                     }
                 }
             }
@@ -838,6 +868,11 @@ internal static class RaidWorldEditor
         entry.FindPropertyRelative("thickness").floatValue = plant.thickness;
         entry.FindPropertyRelative("clearing").intValue = plant.clearing;
         entry.FindPropertyRelative("loveOfWet").floatValue = plant.loveOfWet;
+        // A new row copies the last one's values: the plant's own (off by default) replace them.
+        entry.FindPropertyRelative("byWater").boolValue = plant.byWater;
+        entry.FindPropertyRelative("aboveWater").vector2Value = plant.aboveWater;
+        entry.FindPropertyRelative("atEdges").floatValue = plant.atEdges;
+        entry.FindPropertyRelative("nearRocks").floatValue = plant.nearRocks;
     }
 
     private static void DrawAddPlant(RaidMapDefinition map, SerializedProperty plants, TerrainData terrain)
@@ -939,7 +974,7 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(data.FindProperty("waterfallMaterial"), new GUIContent("Waterfall material"));
         EditorGUILayout.PropertyField(data.FindProperty("waterfallPlunge"), new GUIContent("Waterfall plunge"));
         EditorGUILayout.LabelField("Relief (every run)", EditorStyles.boldLabel);
-        foreach (string field in new[] { "hillVariance", "greatHills", "greatHillHeight", "greatHillRadius", "boulderKit", "boulderClusters", "boulderClusterSize", "boulderScale", "lookouts", "lookoutReveal" })
+        foreach (string field in new[] { "hillVariance", "greatHills", "greatHillHeight", "greatHillRadius", "boulderKit", "boulderClusters", "boulderClusterSize", "boulderScale", "boulderOutcrops", "lookouts", "lookoutReveal" })
         {
             EditorGUILayout.PropertyField(data.FindProperty(field));
         }

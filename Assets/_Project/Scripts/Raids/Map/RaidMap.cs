@@ -274,9 +274,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceBridges(this, Layout, rules);
+            // The water's heights, for the plants that grow by them (Dress), from the attempt that is kept.
+            dressField = field;
             times.Append($"ravines and water {step.ElapsedMilliseconds} ms, ");
             step.Restart();
-            if (terrain.TryGetComponent(out TerrainMoss moss))
+            if (!definition.NoMoss && terrain.TryGetComponent(out TerrainMoss moss))
             {
                 moss.Rebuild();
             }
@@ -373,15 +375,22 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private const int MaxPaintResolution = 2048;
     private const int MaxDetailResolution = 4032;
 
-    // The ground the definition asks for, so a designer's change to it needs no rebake. Painting relies on this order of layers.
+    // The ground the definition asks for, so a designer's change to it needs no rebake. Painting relies on this order of layers. The moss
+    // grows where the map says (its Moss Layer, the forest floor by default), or not at all: the Woods' moss skin on a valley meadow made
+    // it read as the Woods (Docs/WorldLookPlan_2026-11-17.md B1).
     private void ApplyGroundLook(TerrainData data)
     {
+        if (terrain.TryGetComponent(out TerrainMoss moss) && definition.NoMoss)
+        {
+            moss.enabled = false;
+        }
+
         if (definition.ForestLayer != null && definition.PathLayer != null && definition.CliffLayer != null)
         {
             data.terrainLayers = definition.Layers;
-            if (terrain.TryGetComponent(out TerrainMoss moss))
+            if (moss != null && !definition.NoMoss)
             {
-                moss.MossLayer = definition.ForestLayer;
+                moss.MossLayer = definition.MossLayer;
             }
         }
 
@@ -391,12 +400,15 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
     }
 
-    // A fen's wetness for what grows on it: soaking at the water's edge, drying to Fen Damp by Fen Dry Above metres over the water, so
-    // reeds and sedge crowd the banks and the strings and hummocks stay mossy (the concept art: clumps by the pools, not a carpet).
-    private const float FenDamp = 0.25f;
+    // A fen's wetness for what grows on it: soaking at the water's edge, drying to the rules' Fen › Damp by Fen Dry Above metres over the
+    // water, so reeds and sedge crowd the banks and the strings and hummocks stay mossy (the concept art: clumps by the pools, not a carpet).
     private const float FenDryAbove = 0.9f;
+    // How far from water's edge a plant that grows by water height still finds it (TerrainGrowth.Plant.byWater).
+    private const float WaterBandReach = 8f;
     // The fen's water level over the terrain's origin, in metres (set when its water is placed); NaN without a fen.
     private float fenLevel = float.NaN;
+    // The kept attempt's field, held from Generate until Dress has asked it where the water stands.
+    private RaidLayoutField dressField;
 
     // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
     // the colour grass takes from the ground, and the surface shader's view of the new paint.
@@ -410,29 +422,58 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         var clock = System.Diagnostics.Stopwatch.StartNew();
         System.Func<Vector3, bool> blocked = TerrainGrowth.UnderTrees(terrain);
         System.Func<Vector3, float> wetness = null;
+        var around = new TerrainGrowth.Surroundings { NearRocks = NearRocks() };
+        int heightSamples = 0;
         if (generatedBy != null && Layout != null)
         {
             Vector3 origin = terrain.transform.position;
             RaidLayoutPlan plan = Layout;
             RaidLayoutRules rules = generatedBy;
-            System.Func<Vector3, bool> underTrees = blocked;
-            blocked = point => underTrees(point) || plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
+            Terrain ground = terrain;
+            // In a pond only the plants that stand in the shallows grow (TerrainGrowth.Fill), so the water is its own test.
+            around.InWater = point => plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
             wetness = point => plan.Wetness(new Vector2(point.x - origin.x, point.z - origin.z), rules.WetReach, rules.DampGround);
+
+            // One height asked of the terrain per cell, shared by the fen's wetness and the plants' water bands, which ask of the same
+            // point in turn.
+            var asked = new Vector3(float.NaN, 0f, float.NaN);
+            float height = 0f;
+            float HeightAt(Vector3 point)
+            {
+                if (point.x != asked.x || point.z != asked.z)
+                {
+                    asked = point;
+                    height = ground.SampleHeight(point);
+                    heightSamples++;
+                }
+
+                return height;
+            }
+
             // A fen has no ponds to be wet from: its ground is wet by how little it stands over the water (the user: "wet soil").
             if (rules.Fen.enabled && !float.IsNaN(fenLevel))
             {
                 System.Func<Vector3, float> ponds = wetness;
-                Terrain ground = terrain;
                 float level = fenLevel;
+                float damp = rules.Fen.damp;
                 wetness = point =>
                 {
-                    float above = ground.SampleHeight(point) - level;
-                    return Mathf.Max(ponds(point), Mathf.Lerp(1f, FenDamp, Mathf.SmoothStep(0f, 1f, above / FenDryAbove)));
+                    float above = HeightAt(point) - level;
+                    return Mathf.Max(ponds(point), Mathf.Lerp(1f, damp, Mathf.SmoothStep(0f, 1f, above / FenDryAbove)));
                 };
+            }
+
+            RaidLayoutField field = dressField;
+            if (field != null && GrowsByWater(definition.Plants))
+            {
+                around.AboveWater = point => field.WaterNear(new Vector2(point.x - origin.x, point.z - origin.z), WaterBandReach, out float level, out _)
+                    ? HeightAt(point) - level
+                    : float.NaN;
             }
         }
 
-        TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness, RaidMapSurface.VergeRoomAt(terrain, vergeRoom));
+        dressField = null;
+        TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness, RaidMapSurface.VergeRoomAt(terrain, vergeRoom), around);
         vergeRoom = null;
         bool grassColour = terrain.TryGetComponent(out GrassTerrainColour colour);
         // The paint as colour: what grass takes on, and on a generated map what the ground light throws back (BuildGroundLight).
@@ -451,7 +492,73 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         terrain.Flush();
-        Debug.Log($"Raid map dressed in {clock.ElapsedMilliseconds} ms.", this);
+        Debug.Log($"Raid map dressed in {clock.ElapsedMilliseconds} ms ({heightSamples} heights asked for wet ground and water bands).", this);
+    }
+
+    private static bool GrowsByWater(IReadOnlyList<TerrainGrowth.Plant> plants)
+    {
+        foreach (TerrainGrowth.Plant plant in plants)
+        {
+            if (plant != null && plant.enabled && plant.byWater)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Where the rocks lie, for the plants that crowd them (TerrainGrowth.Plant.nearRocks): the rocks, pile and shore stones among the
+    // terrain's trees and the boulders and crags beside the map. Null when no plant asks, so nothing is stamped.
+    private System.Func<Vector3, float> NearRocks()
+    {
+        bool wanted = false;
+        foreach (TerrainGrowth.Plant plant in definition.Plants)
+        {
+            wanted |= plant != null && plant.enabled && plant.nearRocks > 0f;
+        }
+
+        if (!wanted)
+        {
+            return null;
+        }
+
+        TerrainData data = terrain.terrainData;
+        Vector3 origin = terrain.transform.position;
+        RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(definition);
+        TreePrototype[] prototypes = data.treePrototypes;
+        var radii = new float[prototypes.Length];
+        for (int i = 0; i < prototypes.Length; i++)
+        {
+            bool rock = i < groups.Length && groups[i] != RaidMapSurface.Group.Tree && groups[i] != RaidMapSurface.Group.Undergrowth;
+            CapsuleCollider shape = rock && prototypes[i].prefab != null ? prototypes[i].prefab.GetComponent<CapsuleCollider>() : null;
+            radii[i] = !rock ? -1f : shape == null ? 0.4f : shape.direction == 1 ? shape.radius : shape.height * 0.5f;
+        }
+
+        var rocks = new List<Vector3>();
+        foreach (TreeInstance tree in data.treeInstances)
+        {
+            if (tree.prototypeIndex < radii.Length && radii[tree.prototypeIndex] >= 0f)
+            {
+                rocks.Add(new Vector3(origin.x + tree.position.x * data.size.x, origin.z + tree.position.z * data.size.z,
+                    radii[tree.prototypeIndex] * tree.widthScale));
+            }
+        }
+
+        Transform boulders = transform.Find(RaidMapGenerator.BouldersName);
+        if (boulders != null)
+        {
+            foreach (Transform boulder in boulders)
+            {
+                Renderer[] renderers = boulder.GetComponentsInChildren<Renderer>();
+                if (renderers.Length == 0) continue;
+                Bounds bounds = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++) bounds.Encapsulate(renderers[i].bounds);
+                rocks.Add(new Vector3(bounds.center.x, bounds.center.z, Mathf.Min(bounds.extents.x, bounds.extents.z)));
+            }
+        }
+
+        return TerrainGrowth.NearRocks(origin, new Vector2(data.size.x, data.size.z), rocks);
     }
 
     // The map's light, worked out once now that everything stands where it will (GroundLightMap): what stands overhead drawn once
@@ -479,7 +586,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             return;
         }
 
-        Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position);
+        // Pile stones lie round a rock without cutting the navmesh (RaidMapSurface.Prisms).
+        Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position, RaidMapSurface.Prisms(definition));
         trunks.sharedMesh = mesh;
         if (generatedTrunks != null)
         {

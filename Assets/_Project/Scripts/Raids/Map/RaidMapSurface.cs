@@ -55,7 +55,7 @@ public static class RaidMapSurface
                 float forest = definition.Strength(RaidZoneRole.Forest, u, v);
                 float clearing = definition.Strength(RaidZoneRole.Clearing, u, v);
                 float wet = wetness != null ? wetness(new Vector2(u * size, v * size)) : 0f;
-                float soil = Mathf.Clamp01(Mathf.Max(path, clearing * 0.55f, (1f - forest) * 0.35f));
+                float soil = Mathf.Clamp01(Mathf.Max(path, clearing * 0.55f, (1f - forest) * definition.OpenSoil));
                 soils[row, column] = soil * (1f - 0.6f * wet * (1f - path));
                 wets[row, column] = wet;
                 verges[row, column] = (byte)Mathf.RoundToInt(VergeRoom(path) * 255f);
@@ -175,17 +175,81 @@ public static class RaidMapSurface
     }
 
     /// <summary>
-    /// Places trees, then undergrowth (saplings, shrubs, clutter), then rocks and logs over the terrain. Each spot is offered
-    /// to every kind of its group, weighted by how well its habitat suits the spot; trunks keep the room their kind needs.
-    /// <paramref name="wetness"/> and <paramref name="inWater"/> take metres from the map's south-west corner. Returns how many trees.
+    /// The water by a spot (metres from the map's south-west corner) within <paramref name="reach"/> metres of its edge: its surface's
+    /// height over the terrain's origin and the metres from the spot to its edge (below zero: in it; NaN where the edge isn't known, as on
+    /// a fen's one sheet). False when no water is that near. RaidLayoutField.WaterNear on a generated map.
+    /// </summary>
+    public delegate bool WaterNear(Vector2 spot, float reach, out float level, out float edge);
+
+    /// <summary>
+    /// What a map's terrain-tree prototype stands for, in the order Scatter registers them (each list without its empty entries):
+    /// trees, undergrowth, rocks and logs, pile stones, then stones by the water.
+    /// </summary>
+    public enum Group : byte
+    {
+        Tree = 0,
+        Undergrowth = 1,
+        Rock = 2,
+        PileStone = 3,
+        ShoreStone = 4,
+    }
+
+    /// <summary>The group of each of the map's terrain-tree prototypes, by prototype index, as Scatter lays them out.</summary>
+    public static Group[] PrototypeGroups(RaidMapDefinition definition)
+    {
+        var groups = new List<Group>();
+        AddGroup(groups, definition.Trees, Group.Tree);
+        AddGroup(groups, definition.Undergrowth, Group.Undergrowth);
+        AddGroup(groups, definition.Rocks, Group.Rock);
+        AddGroup(groups, definition.PileStones, Group.PileStone);
+        AddGroup(groups, definition.Shore.stones, Group.ShoreStone);
+        return groups.ToArray();
+    }
+
+    private static void AddGroup(List<Group> groups, IReadOnlyList<RaidMapDefinition.Scatter> list, Group group)
+    {
+        foreach (RaidMapDefinition.Scatter scatter in list)
+        {
+            if (scatter?.prefab != null)
+            {
+                groups.Add(group);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Which of the map's prototypes get a trunk prism (<see cref="TrunkMesh"/>): all but the pile stones, which lie round a rock
+    /// without changing where creatures can walk.
+    /// </summary>
+    public static bool[] Prisms(RaidMapDefinition definition)
+    {
+        Group[] groups = PrototypeGroups(definition);
+        var prisms = new bool[groups.Length];
+        for (int i = 0; i < groups.Length; i++)
+        {
+            prisms[i] = groups[i] != Group.PileStone;
+        }
+
+        return prisms;
+    }
+
+    /// <summary>
+    /// Places trees, then undergrowth (saplings, shrubs, clutter), then rocks and logs over the terrain, then stones by the water when
+    /// <paramref name="water"/> says where it is. Each spot is offered to every kind of its group, weighted by how well its habitat suits
+    /// the spot; trunks keep the room their kind needs. <paramref name="wetness"/> and <paramref name="inWater"/> take metres from the
+    /// map's south-west corner. Copses, piles and shore stones draw from streams of their own, so at their defaults the forest is the
+    /// same tree for tree. Returns how many trees.
     /// </summary>
     public static int Scatter(TerrainData data, RaidMapDefinition definition, List<Clearing> clearings, out int rockCount,
-        Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null)
+        Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null,
+        WaterNear water = null)
     {
         var prototypes = new List<TreePrototype>();
         Kind[] trees = Kinds(definition.Trees, prototypes);
         Kind[] undergrowth = Kinds(definition.Undergrowth, prototypes);
         Kind[] rocks = Kinds(definition.Rocks, prototypes);
+        Kind[] pileStones = Kinds(definition.PileStones, prototypes);
+        Kind[] shoreStones = Kinds(definition.Shore.stones, prototypes);
         data.treePrototypes = prototypes.ToArray();
         data.RefreshPrototypes();
 
@@ -194,10 +258,39 @@ public static class RaidMapSurface
         var placed = new List<TreeInstance>();
         var trunks = new TrunkGrid(size);
         var weights = new float[Mathf.Max(trees.Length, Mathf.Max(undergrowth.Length, rocks.Length))];
+        float clumping = definition.TreeClumping;
+        Vector2 copses = clumping > 0f ? NoiseOffset(definition.ScatterSeed, "Copses") : Vector2.zero;
+        System.Random piles = definition.PileChance > 0f ? new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Rock Piles")) : null;
 
         RaidScatterHabitat.Spot Read(Vector2 spot, float u, float v) => new RaidScatterHabitat.Spot(spot, data.GetSteepness(u, v),
             definition.Strength(RaidZoneRole.Forest, u, v), wetness != null ? wetness(spot) : 0f, Edge(definition, u, v, size),
             1f - Mathf.Clamp01(trunks.Nearest(spot, NearTreesReach) / NearTreesReach));
+
+        // Where a pile's stones and its plant may go: on the map, off trails, sites and water.
+        bool Free(Vector2 at) => at.x >= 0f && at.y >= 0f && at.x < size && at.y < size
+            && definition.Strength(RaidZoneRole.Path, at.x / size, at.y / size) <= 0.1f
+            && !Blocked(at, clearings, forTrees: false) && (inWater == null || !inWater(at));
+
+        // A few small stones round a rock and a plant at its foot, so it reads as a pile rather than a prop set down on the grass.
+        void AddPile(Vector2 centre, float standing)
+        {
+            int count = piles.Next(PileLeast, PileMost + 1);
+            for (int k = 0; k < count && pileStones.Length > 0; k++)
+            {
+                Vector2 at = centre + Around(piles, standing * 0.5f + Range(piles, 0.2f, 1.2f));
+                int pick = PickByWeight(pileStones, piles);
+                if (pick >= 0 && Free(at))
+                {
+                    placed.Add(MakeInstance(pileStones[pick].Prototype, at.x / size, at.y / size, pileStones[pick].Scatter.scale, piles));
+                }
+            }
+
+            Vector2 foot = centre + Around(piles, standing * 0.5f + Range(piles, 0.3f, 0.8f));
+            if (undergrowth.Length > 0 && Free(foot))
+            {
+                Place(undergrowth, Read(foot, foot.x / size, foot.y / size), piles, weights, trunks, placed, foot.x / size, foot.y / size, false);
+            }
+        }
 
         // Trees: one candidate per cell of a jittered grid; the forest's density decides whether one grows, the habitats which.
         foreach (Vector2 spot in Grid(definition.TreeSpacing, size, random))
@@ -206,7 +299,13 @@ public static class RaidMapSurface
             if (definition.Strength(RaidZoneRole.Path, u, v) > 0.15f || definition.Strength(RaidZoneRole.Clearing, u, v) > 0.3f
                 || data.GetSteepness(u, v) > definition.MaxTreeSlope) continue;
             if (Blocked(spot, clearings, forTrees: true) || (inWater != null && inWater(spot))) continue;
-            if (random.NextDouble() > Mathf.Pow(definition.Strength(RaidZoneRole.Forest, u, v), 1.3f)) continue;
+            float accept = Mathf.Pow(definition.Strength(RaidZoneRole.Forest, u, v), 1.3f);
+            if (clumping > 0f)
+            {
+                accept *= CopseFactor(Copse(spot, definition.ClumpSize, copses), clumping);
+            }
+
+            if (random.NextDouble() > accept) continue;
 
             Place(trees, Read(spot, u, v), random, weights, trunks, placed, u, v, true, treeWeightAt);
         }
@@ -224,13 +323,19 @@ public static class RaidMapSurface
 
                 RaidScatterHabitat.Spot here = Read(spot, u, v);
                 float chance = definition.UndergrowthChance * Mathf.Clamp01(0.1f + here.Forest * 0.8f + here.Edge * 0.6f);
+                if (clumping > 0f)
+                {
+                    chance *= CopseFactor(Copse(spot, definition.ClumpSize, copses), clumping * UndergrowthClumping);
+                }
+
                 if (random.NextDouble() > chance) continue;
 
                 Place(undergrowth, here, random, weights, trunks, placed, u, v, false);
             }
         }
 
-        // Rocks and logs: a coarser grid, most likely at the foot of cliffs, now and then in open forest; which one by habitat.
+        // Rocks and logs: a coarser grid, most likely at the foot of cliffs, now and then in open forest and, where the map wants it, out
+        // in the open; which one by habitat. A big one may become a pile.
         foreach (Vector2 spot in Grid(definition.RockSpacing, size, random))
         {
             float u = spot.x / size, v = spot.y / size;
@@ -239,16 +344,201 @@ public static class RaidMapSurface
 
             float slope = data.GetSteepness(u, v);
             float forest = definition.Strength(RaidZoneRole.Forest, u, v);
-            float chance = slope > 16f && slope < 38f ? definition.RocksAtCliffs : forest > 0.3f ? definition.RocksInForest : 0f;
+            float chance = slope > 16f && slope < 38f ? definition.RocksAtCliffs
+                : forest > 0.3f ? definition.RocksInForest
+                : definition.RocksInOpen > 0f && definition.Strength(RaidZoneRole.Clearing, u, v) < OpenRocksBelowClearing ? definition.RocksInOpen
+                : 0f;
             if (random.NextDouble() > chance) continue;
 
-            Place(rocks, Read(spot, u, v), random, weights, trunks, placed, u, v, false);
+            int chosen = Place(rocks, Read(spot, u, v), random, weights, trunks, placed, u, v, false);
+            if (piles != null && chosen >= 0 && rocks[chosen].Room >= PileFromRoom && piles.NextDouble() < definition.PileChance)
+            {
+                AddPile(spot, rocks[chosen].Room * placed[placed.Count - 1].widthScale);
+            }
         }
 
         rockCount = placed.Count - treeCount;
+        if (water != null && shoreStones.Length > 0)
+        {
+            PlaceShore(data, definition, shoreStones, water, clearings, trunks, placed);
+        }
+
         data.SetTreeInstances(placed.ToArray(), true);
         return treeCount;
     }
+
+    /// <summary>
+    /// The copse mask at a spot (metres from the map's corner): 0 in the meadow between copses, 1 in their hearts. Two octaves of noise
+    /// <paramref name="clumpSize"/> metres across (Docs/WorldLookPlan_2026-11-17.md B3); <paramref name="offset"/> makes each map's its own.
+    /// </summary>
+    public static float Copse(Vector2 spot, float clumpSize, Vector2 offset)
+    {
+        float size = Mathf.Max(1f, clumpSize);
+        float broad = Mathf.PerlinNoise(spot.x / size + offset.x, spot.y / size + offset.y);
+        float fine = Mathf.PerlinNoise(spot.x / (FineCopse * size) - offset.y, spot.y / (FineCopse * size) + offset.x);
+        return Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(CopseFrom, CopseFull, broad * 0.75f + fine * 0.25f));
+    }
+
+    /// <summary>
+    /// What the copse mask multiplies a tree's chance by: exactly 1 without clumping; at full clumping from 0.12 in the meadow (the odd
+    /// lone tree) to 1.72 in a copse's heart, so trees move into copses rather than vanish.
+    /// </summary>
+    public static float CopseFactor(float copse, float clumping) => Mathf.Lerp(1f, LoneTrees + CopseGain * Mathf.Clamp01(copse), Mathf.Clamp01(clumping));
+
+    // Stones on the shallow beds and in clumps along the banks of rivers and ponds (ShoreRule), last of all and from their own stream.
+    // A bed stone is sized to stand a little out of the water, so the water shader's foam rings it (Docs/Water.md).
+    private static void PlaceShore(TerrainData data, RaidMapDefinition definition, Kind[] stones, WaterNear water, List<Clearing> clearings,
+        TrunkGrid trunks, List<TreeInstance> placed)
+    {
+        RaidMapDefinition.ShoreRule rule = definition.Shore;
+        float size = definition.Size;
+        var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Shore Stones"));
+        Vector2 clumps = NoiseOffset(definition.ScatterSeed, "Shore Clumps");
+        var tops = new float[stones.Length];
+        for (int i = 0; i < stones.Length; i++)
+        {
+            tops[i] = PrefabTop(stones[i].Scatter.prefab);
+        }
+
+        bool Free(Vector2 at) => at.x >= 0f && at.y >= 0f && at.x < size && at.y < size
+            && definition.Strength(RaidZoneRole.Path, at.x / size, at.y / size) <= ShorePathClear && !Blocked(at, clearings, forTrees: false);
+
+        void Add(Vector2 at, int pick, TreeInstance stone)
+        {
+            float room = Mathf.Max(stones[pick].Room * stone.widthScale, TrunkClearance);
+            if (trunks.Fits(at, room))
+            {
+                trunks.Add(at, room);
+                placed.Add(stone);
+            }
+        }
+
+        // The bed: only where it is shallow, thinning towards the deep middle.
+        foreach (Vector2 spot in Grid(rule.bedSpacing, size, random))
+        {
+            if (!water(spot, 0f, out float level, out float edge) || float.IsNaN(edge) || edge >= 0f) continue;
+            float u = spot.x / size, v = spot.y / size;
+            float depth = level - data.GetInterpolatedHeight(u, v);
+            if (depth <= 0f || depth > rule.deepest || !Free(spot)) continue;
+            if (random.NextDouble() > rule.bedChance * (1f - BedDeepThins * depth / rule.deepest)) continue;
+
+            int pick = PickByWeight(stones, random);
+            if (pick < 0) return;
+            TreeInstance stone = MakeInstance(stones[pick].Prototype, u, v, stones[pick].Scatter.scale, random);
+            if (tops[pick] > MeasurableTop)
+            {
+                float needed = (depth + Mathf.Lerp(rule.proud.x, rule.proud.y, (float)random.NextDouble())) / tops[pick];
+                if (needed > stone.widthScale * BedTallest) continue;
+                stone.heightScale = Mathf.Clamp(needed, stone.widthScale * BedShortest, stone.widthScale * BedTallest);
+            }
+
+            Add(spot, pick, stone);
+        }
+
+        // The banks: in clumps of noise, from the water's edge up to Bank Reach.
+        foreach (Vector2 spot in Grid(rule.bankSpacing, size, random))
+        {
+            if (!water(spot, rule.bankReach, out _, out float edge) || float.IsNaN(edge) || edge < 0f || edge > rule.bankReach) continue;
+            float clump = Mathf.PerlinNoise(spot.x / rule.clumpSize + clumps.x, spot.y / rule.clumpSize + clumps.y);
+            float chance = rule.bankChance * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(BankClumpFrom, BankClumpFull, clump));
+            if (chance <= 0f || random.NextDouble() > chance || !Free(spot)) continue;
+
+            int pick = PickByWeight(stones, random);
+            if (pick < 0) return;
+            Add(spot, pick, MakeInstance(stones[pick].Prototype, spot.x / size, spot.y / size, stones[pick].Scatter.scale, random));
+        }
+    }
+
+    // How high a prefab reaches above its pivot at scale 1, from its meshes' bounds (the first LOD only), as a terrain tree stands it.
+    private static float PrefabTop(GameObject prefab)
+    {
+        float top = 0f;
+        Matrix4x4 toRoot = prefab.transform.worldToLocalMatrix;
+        foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>())
+        {
+            if (filter.sharedMesh == null || (filter.name.Contains("_LOD") && !filter.name.EndsWith("_LOD0")))
+            {
+                continue;
+            }
+
+            Bounds bounds = filter.sharedMesh.bounds;
+            Matrix4x4 toPrefab = toRoot * filter.transform.localToWorldMatrix;
+            for (int corner = 0; corner < 8; corner++)
+            {
+                var sign = new Vector3((corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f, (corner & 4) == 0 ? -1f : 1f);
+                top = Mathf.Max(top, toPrefab.MultiplyPoint3x4(bounds.center + Vector3.Scale(bounds.extents, sign)).y);
+            }
+        }
+
+        return top;
+    }
+
+    // A kind by weight alone, for stones placed where a rock or the water puts them rather than by habitat; -1 when none has weight.
+    private static int PickByWeight(Kind[] kinds, System.Random random)
+    {
+        float total = 0f;
+        foreach (Kind kind in kinds)
+        {
+            total += Mathf.Max(0f, kind.Scatter.weight);
+        }
+
+        if (total <= 0f)
+        {
+            return -1;
+        }
+
+        double roll = random.NextDouble() * total;
+        int last = -1;
+        for (int i = 0; i < kinds.Length; i++)
+        {
+            float weight = Mathf.Max(0f, kinds[i].Scatter.weight);
+            if (weight <= 0f) continue;
+            last = i;
+            roll -= weight;
+            if (roll < 0d) return i;
+        }
+
+        return last;
+    }
+
+    private static Vector2 Around(System.Random random, float distance)
+    {
+        float angle = (float)random.NextDouble() * Mathf.PI * 2f;
+        return new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance;
+    }
+
+    private static float Range(System.Random random, float min, float max) => min + (float)random.NextDouble() * (max - min);
+
+    // A noise offset of its own for each map and purpose, so copses and clumps never line up with the paint's noise.
+    private static Vector2 NoiseOffset(int seed, string key)
+    {
+        var random = new System.Random(RaidLayout.SeedFor(seed, key));
+        return new Vector2((float)random.NextDouble() * NoiseRange, (float)random.NextDouble() * NoiseRange);
+    }
+
+    // Copses (B3): where the noise reads as meadow and as the heart of a copse, the second octave's share of a copse's size, the meadow's
+    // floor that keeps lone trees in it, and how much a copse's heart gains. Undergrowth follows at half strength.
+    private const float CopseFrom = 0.38f;
+    private const float CopseFull = 0.62f;
+    private const float FineCopse = 0.4f;
+    private const float LoneTrees = 0.12f;
+    private const float CopseGain = 1.6f;
+    private const float UndergrowthClumping = 0.5f;
+    private const float NoiseRange = 1000f;
+    // Rocks in the open (B4) keep off clearings stronger than this; a rock with this much room or more may become a pile of 2-5 stones.
+    private const float OpenRocksBelowClearing = 0.3f;
+    private const float PileFromRoom = 1f;
+    private const int PileLeast = 2;
+    private const int PileMost = 5;
+    // Shore stones (B6): fewer towards the deepest bed; a bed stone's height may be stretched from 0.7 to 1.5 times its width to stand
+    // proud; bank clumps by noise; trails stay clear (fords included).
+    private const float BedDeepThins = 0.6f;
+    private const float BedShortest = 0.7f;
+    private const float BedTallest = 1.5f;
+    private const float MeasurableTop = 0.05f;
+    private const float BankClumpFrom = 0.45f;
+    private const float BankClumpFull = 0.65f;
+    private const float ShorePathClear = 0.05f;
 
     private const float NearTreesReach = 4f;
     private const float EdgeReach = 7f;
@@ -309,9 +599,10 @@ public static class RaidMapSurface
         }
     }
 
-    // Picks a kind by weight × suitability among those with room to stand here, and places it at its own random size.
-    // A tree's weight can come from where it stands (a large map's regions each favour their own trees), by its place in the map's list.
-    private static void Place(Kind[] kinds, in RaidScatterHabitat.Spot spot, System.Random random, float[] weights, TrunkGrid trunks,
+    // Picks a kind by weight × suitability among those with room to stand here, and places it at its own random size; returns which kind
+    // (its index in kinds), or -1 when none had room. A tree's weight can come from where it stands (a large map's regions each favour
+    // their own trees), by its place in the map's list.
+    private static int Place(Kind[] kinds, in RaidScatterHabitat.Spot spot, System.Random random, float[] weights, TrunkGrid trunks,
         List<TreeInstance> placed, float u, float v, bool trunk, Func<Vector2, int, float> weightAt = null)
     {
         float total = 0f;
@@ -327,7 +618,7 @@ public static class RaidMapSurface
 
         if (total <= 0f)
         {
-            return;
+            return -1;
         }
 
         double roll = random.NextDouble() * total;
@@ -349,6 +640,8 @@ public static class RaidMapSurface
         {
             trunks.Add(spot.Position, Mathf.Max(standing, TrunkClearance));
         }
+
+        return chosen;
     }
 
     // How close the forest's edge is: open ground (trail or clearing) within EdgeReach of a spot that is not open itself.
@@ -458,15 +751,18 @@ public static class RaidMapSurface
     /// <summary>
     /// A navmesh bake ignores terrain trees, so creatures would walk through trunks. Every tree and rock with a capsule
     /// collider gets a matching prism in one mesh, for an invisible, not-walkable collider the navmesh cuts around.
+    /// <paramref name="prisms"/> (by prototype, from <see cref="Prisms"/>) leaves out the prototypes marked false, such as pile stones;
+    /// null gives every capsule its prism.
     /// </summary>
-    public static Mesh TrunkMesh(Terrain terrain, Vector3 holderPosition)
+    public static Mesh TrunkMesh(Terrain terrain, Vector3 holderPosition, bool[] prisms = null)
     {
         TerrainData data = terrain.terrainData;
         TreePrototype[] prototypes = data.treePrototypes;
         var shapes = new CapsuleCollider[prototypes.Length];
         for (int i = 0; i < prototypes.Length; i++)
         {
-            shapes[i] = prototypes[i].prefab != null ? prototypes[i].prefab.GetComponent<CapsuleCollider>() : null;
+            bool prism = prisms == null || i >= prisms.Length || prisms[i];
+            shapes[i] = prism && prototypes[i].prefab != null ? prototypes[i].prefab.GetComponent<CapsuleCollider>() : null;
         }
 
         var vertices = new List<Vector3>();
