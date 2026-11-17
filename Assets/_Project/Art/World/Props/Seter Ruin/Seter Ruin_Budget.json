@@ -1,0 +1,18 @@
+{
+ "note": "LOD0 triangles per look, by ingest_generated.py: the top-down view's budget, raised where a decimation would break the shape (shape_limited)",
+ "looks": {
+  "Seter Ruin A": {
+   "source": 29970,
+   "view": 12000,
+   "triangles": 12000,
+   "shape_limited": false,
+   "check": "(deviation 0.1%, silhouette 0.995)",
+   "holes_generated": 0,
+   "holes_filled": 0,
+   "holes": 0,
+   "largest_hole": 0.0,
+   "non_manifold_edges": 12,
+   "unwrap": "regions"
+  }
+ }
+}

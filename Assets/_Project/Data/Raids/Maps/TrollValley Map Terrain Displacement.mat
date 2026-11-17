@@ -142,7 +142,7 @@ Material:
     - _AntiTilingScale: 0.57
     - _CliffBreakup: 0.6
     - _CliffDisplacement: 0.32210526
-    - _CliffHeightMidpoint: 0.33866614
+    - _CliffHeightMidpoint: 0.3380936
     - _CliffNormalStrength: 1
     - _CliffSlopeEnd: 62
     - _CliffSlopeStart: 46

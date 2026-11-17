@@ -1,6 +1,7 @@
 {
   "_notes": [
-    "Creatures that are not humanoids (2026-11-14): no T-pose, no rigger. The giant black widow's body only: its legs are made and walked procedurally in Unity (SpiderLegs), so the generated model must have no legs."
+    "Creatures that are not humanoids (2026-11-14): no T-pose, no rigger. The giant black widow's body only: its legs are made and walked procedurally in Unity (SpiderLegs), so the generated model must have no legs.",
+    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md. The lindorm is only ever seen in part (head and humps out of the water), so these are parts, made to move procedurally."
   ],
   "art": "Assets/_Project/Art/Enemies/Downloaded",
   "common": "Isolated on a plain light grey background, the whole thing visible and centred. Dark realistic Nordic folk-tale style, not cute. Matte, softly lit, no glow, no shadows on the ground.",
@@ -13,6 +14,28 @@
           "key": "A",
           "seed": 8301,
           "prompt": "The body of a giant black widow spider with every leg removed, like a museum specimen without its legs: seen from the side and slightly above. A huge glossy jet-black round abdomen with a vivid red hourglass mark on its underside and a thin red stripe on top, joined by a narrow waist to a smaller black cephalothorax with eight small dark-red glinting eyes in two rows and two curved black fangs, fine short bristles, no legs at all."
+        }
+      ]
+    },
+    {
+      "asset": "LindormHead",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8731,
+          "prompt": "The head and the first stretch of the neck of a lindorm, the great serpent dragon of Norwegian folklore, seen from the side and a little above: a long heavy reptile head with a broad flat skull, a powerful lower jaw with the mouth slightly open showing rows of yellowed fangs, small cold amber eyes under heavy bony brows, a short frill of torn fins behind the jaw, dark olive and bog-brown scales, paler belly scales under the jaw, strands of pondweed caught on it, the neck cut off cleanly behind the head. No legs, no wings."
+        }
+      ]
+    },
+    {
+      "asset": "LindormCoil",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8741,
+          "prompt": "One hump of the long body of a lindorm, the great serpent dragon of Norwegian folklore: a single arched loop of a huge scaled serpent body, as thick as a barrel, rising in an arch and both ends cut off flat at the same level at the bottom, like a coil rising out of water, dark olive and bog-brown scales on the back, a low ragged dorsal fin along the top of the arch, paler belly scales underneath, strands of pondweed caught on it."
         }
       ]
     }

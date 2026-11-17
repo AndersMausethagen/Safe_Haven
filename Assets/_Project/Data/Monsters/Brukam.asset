@@ -1,0 +1,315 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: Brukam
+  m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
+  id: Brukam
+  displayName: Brukam
+  description: The great troll of the stone bridge. Nobody crosses without paying, and nobody has paid enough.
+  combatStats: {fileID: 11400000, guid: 8a3d73a3cf630d34092297ad7b54dd65, type: 2}
+  faction: 1
+  lootTable: {fileID: 11400000, guid: f125345dcaded554498fd63cc93940a5, type: 2}
+  drops:
+    entries: []
+  unlocksRecipes: []
+  animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
+  prefab: {fileID: 9066855856663566298, guid: 08be26668df3ea6479d9d85d65e77f1d, type: 3}
+  experience: 80
+  neverElite: 1
+  attack: {fileID: 11400000, guid: 76995dcb3b55a3c489221f337a8f9b8d, type: 2}
+  attackDamage: 26
+  attackCooldown: 1.2
+  moveSpeed: 2.3
+  detectionRange: 9
+  chaseRange: 26
+  leashRange: 40
+  sightAngle: 100
+  closeSenseRange: 6
+  hearing: 1.8
+  alertness: 0.8
+  huntsHorses: 1
+  frightensHorses: 18
+  attacks:
+  - attack: {fileID: 11400000, guid: 76995dcb3b55a3c489221f337a8f9b8d, type: 2}
+    kind: 0
+    damage: 42
+    minimumRange: 0
+    maximumRange: 4.86
+    priority: 20
+    weight: 1
+    whenFoe: 8
+    heavy: 0
+    cooldown: 2.2
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 0
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 366b223e4e5df8548802df8a32de601e, type: 2}
+    kind: 0
+    damage: 48
+    minimumRange: 0
+    maximumRange: 4.05
+    priority: 15
+    weight: 0.5
+    whenFoe: 1
+    heavy: 1
+    cooldown: 9
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 0
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: c3a3e4a568fba6a45bf4d4e6d507a16d, type: 2}
+    kind: 5
+    damage: 35
+    minimumRange: 5
+    maximumRange: 22
+    priority: 12
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 7
+    interruptible: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: 0e772e2a1f82a9344ae148f75ee14d72, type: 3}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 11
+    chargeDistance: 11
+    exposedSeconds: 2.5
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.2
+    lobScatter: 0
+  - attack: {fileID: 11400000, guid: 57178be927a106b4c8d954833a1a7241, type: 2}
+    kind: 3
+    damage: 13
+    minimumRange: 0
+    maximumRange: 30
+    priority: 30
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 20
+    interruptible: 0
+    sound: {fileID: 11400000, guid: c1175525f1b0594498d28bca626a3c49, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 2
+    belowHealth: 0.5
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 5
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 1
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0.75
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: turns to stone! Only blunt blows crack it now.
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 0
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 0
+  breaksWalls: 1
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0.3
+  hurtMood: 1
+  arrowDodge: 0
+  poise: 220
+  parryResponse: 0
+  openWhileStriking: 0
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
+  hitMaterial: 1
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
+  sizeVariation: 0.08
+  shadeVariation: 0.08
+  portrait: {fileID: 0}
+  journalLore: 'Every bridge in the valley had a troll under it once, the old songs say, and the trolls paid tribute to the biggest of them: the Brukam, who sits on the old stone bridge at the head of the valley and counts what crosses. He swings a pine trunk for a club and throws the bridge''s own stones.'
+  journalAdvice: 'Keep off the line of his sweep and out from under the club when it rises: the slam shakes the ground around it. When he tears a stone from the bridge, get behind cover or keep moving. He tires after a slam; that is the moment. Blunt weapons crack him, blades skid.'
+  journalHabitat: The old stone bridge at the head of Troll Valley
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}
+  hurtSound: {fileID: 11400000, guid: 76d36c0978eeaf04592af855858824db, type: 2}
+  attackSound: {fileID: 11400000, guid: 86c151585ec25ef499099a8e1a09b185, type: 2}

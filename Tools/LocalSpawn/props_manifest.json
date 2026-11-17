@@ -6,7 +6,8 @@
     "width: metres across the widest side in the game; max_height caps a tall look. glow: emission from the albedo ('hue' near a colour), tinted.",
     "The runes are painted pale blue and matte in the concept (a glowing concept makes UltraTex paint flat colour); the game makes them glow from the emission map.",
     "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
-    "2026-11-14: the raids' and items' primitive stand-ins (Cache Crate to Shaman Staff); built into their prefabs by BuildStructureModels.Placeholders, not BuildWorldProps."
+    "2026-11-14: the raids' and items' primitive stand-ins (Cache Crate to Shaman Staff); built into their prefabs by BuildStructureModels.Placeholders, not BuildWorldProps.",
+    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md."
   ],
   "art": "Assets/_Project/Art/World/Props",
   "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
@@ -268,6 +269,180 @@
           "key": "A",
           "seed": 7653,
           "prompt": "A gnarled twisted wooden staff with a forked top, moss and tiny mushrooms growing along it."
+        }
+      ]
+    },
+    {
+      "asset": "Troll Bridge",
+      "width": 14.0,
+      "max_height": 5.0,
+      "texture_size": 4096,
+      "lod0_triangles": 16000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7801,
+          "prompt": "An old Norse stone bridge over a mountain river: a single round arch of rough grey granite blocks laid without mortar, about fourteen metres long and three metres wide, a flat cobbled deck, low uneven parapet walls of stacked stones along both sides, heavy stone abutments at both ends, moss and grey-green lichen in the joints, the deck stones worn smooth down the middle, two old iron rings set into one parapet. Seen from the side and a little above, the whole bridge visible, no water and no ground under it."
+        }
+      ]
+    },
+    {
+      "asset": "Seter Ruin",
+      "width": 6.0,
+      "max_height": 4.0,
+      "texture_size": 4096,
+      "lod0_triangles": 12000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7812,
+          "prompt": "A ruined, long-abandoned mountain summer farm hut (a Norwegian seter): a small log cabin of dark grey weathered timber on a low dry-stone foundation, half of its roof fallen in so the rafters and the dark inside show, the remaining roof covered in a smooth layer of bare dark brown peat earth over birch bark, no grass, no straw, nothing shaggy, the door hanging off one hinge, the top logs of one wall tumbled, a broken wooden milk churn and a fallen fence rail beside it.",
+          "edit": {"model": "qwen-edit-21", "seed": 3, "instruction": "Make this an abandoned ruin: let the left half of the roof collapse into the hut so the bare rafters and the dark inside show, tumble the top logs of the front wall, and make the remaining roof a smooth layer of bare dark brown peat earth with no grass, straw or shaggy fibres. Keep the same hut, timber, stone foundation, milk churn, fence, viewing angle, size and plain light grey background.", "licence": "Qwen Research License (non-commercial): prototype only, remake the concept before release"}
+        }
+      ]
+    },
+    {
+      "asset": "Bone Pile",
+      "width": 2.6,
+      "max_height": 0.9,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7821,
+          "prompt": "A troll's heap of gnawed bones in a low mound: cattle and sheep skulls, broken ribs, cracked thigh bones and a few old antlers piled together, brown and grey with age, some split open for the marrow, on a patch of bare flat rock."
+        }
+      ]
+    },
+    {
+      "asset": "Troll Hoard",
+      "width": 2.2,
+      "max_height": 1.0,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "metal_floor": 0.4,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7831,
+          "prompt": "A troll's hoard heaped on a flat rock: tarnished dark silver coins and twisted arm rings in a low pile, a dented iron-bound wooden chest with its lid open, two old rusted swords and an axe head, a cracked drinking horn and a dull bronze bowl, all darkened and dull with age, nothing shining."
+        }
+      ]
+    },
+    {
+      "asset": "Striding Troll Rock",
+      "width": 4.0,
+      "max_height": 5.5,
+      "texture_size": 4096,
+      "lod0_triangles": 10000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7842,
+          "prompt": "A troll turned to stone by the dawn in the middle of a stride, in the manner of Theodor Kittelsen's and John Bauer's Norwegian trolls, not an ape, not a gorilla, no fur on the body: a small head on huge hunched shoulders, a long drooping hooked nose, huge sticking-out ears, tiny deep-set eyes, a wide lipless mouth with two blunt tusks, lumpy hairless skin as grey and rough as weathered granite: now one weathered grey granite rock, one foot forward in a long stride, one long arm raised across its face against the sunrise, the other hanging to its knee, its nose and ears still clear but worn round, deep cracks through the stone, patches of grey-green moss and orange lichen, on a broken rocky base. All one piece of stone."
+        }
+      ]
+    },
+    {
+      "asset": "Brukam Club",
+      "width": 2.4,
+      "texture_size": 1024,
+      "lod0_triangles": 1500,
+      "lay_flat": true,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7852,
+          "prompt": "A huge crude troll club: a heavy pine trunk, thin and rubbed smooth at the grip end and swelling to a massive knotted head studded with stumps of broken branches, a wide rusted iron band from an old bridge hammered round the head, dark with old stains. Lying flat on its side.",
+          "edit": {"model": "qwen-edit-21", "seed": 3, "instruction": "Make this into a long troll club lying on its side: stretch it into a long tapering pine trunk about three times as long, thin and rubbed smooth at the grip end, swelling to the massive knotted head with the broken branch stumps and the rusted iron band. Keep the same wood, iron band, lighting and plain light grey background.", "licence": "Qwen Research License (non-commercial): prototype only, remake the concept before release"}
+        }
+      ]
+    },
+    {
+      "asset": "Peat Stack",
+      "width": 2.0,
+      "max_height": 1.1,
+      "texture_size": 2048,
+      "lod0_triangles": 4000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7862,
+          "prompt": "A small drying stack of hand-cut peat on a bog: irregular soft-edged sods of black-brown peat, fibrous and crumbly with roots showing, leaned against each other in a loose little stack about knee high with gaps for the wind, some sods fallen at the foot, on a patch of wet brown ground."
+        }
+      ]
+    },
+    {
+      "asset": "Bloomery Ruin",
+      "width": 2.6,
+      "max_height": 1.7,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7872,
+          "prompt": "The weathered ruin of a crude Viking age bloomery for smelting bog iron, centuries old: a low lumpy shaft furnace of rough hand-built clay and fieldstones, knee to waist high, its top broken off and one side collapsed, the clay cracked and baked in uneven red-brown and grey patches, soot-black inside, half sunk in the ground, a low heap of dark lumpy slag beside it and a few rusty brown lumps of bog ore. Ancient and earthy, nothing smooth or modern."
+        }
+      ]
+    },
+    {
+      "asset": "Boardwalk",
+      "width": 4.0,
+      "max_height": 0.6,
+      "texture_size": 2048,
+      "lod0_triangles": 3000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7881,
+          "prompt": "One straight section of an old boardwalk across a bog, four metres long and one metre wide: weathered grey wooden planks laid across two split-log stringers resting on short wooden posts, the plank ends uneven, one plank cracked and one missing, a little green moss on the wood. Both ends cut off square, nothing else around it."
+        }
+      ]
+    },
+    {
+      "asset": "Rowboat",
+      "width": 4.6,
+      "max_height": 1.1,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7891,
+          "prompt": "A small old Norse rowboat (a faering): a light clinker-built hull of overlapping dark tarred oak planks with iron rivets, a raised curved stem and stern, two thwarts across it, wooden tholepins for the oars, worn and weathered, empty. Seen from the side and a little above, the whole boat visible, no water."
+        }
+      ]
+    },
+    {
+      "asset": "Nokk Fiddle",
+      "width": 0.7,
+      "texture_size": 1024,
+      "lod0_triangles": 1500,
+      "lay_flat": true,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7901,
+          "prompt": "An old Hardanger fiddle drowned in a bog for a hundred years: blackened and warped dark wood, the carved scroll head shaped like a horse's head, broken strings curling loose, pale water stains and a few strands of black pondweed caught in the pegs, the mother-of-pearl inlay dull. Lying flat."
+        }
+      ]
+    },
+    {
+      "asset": "Boundary Stone",
+      "width": 0.6,
+      "max_height": 1.0,
+      "texture_size": 1024,
+      "lod0_triangles": 2000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7911,
+          "prompt": "A single old farm boundary stone: a rough grey granite post about a metre tall, roughly squared, with a simple cross cut into its top and a few worn notches on its face, moss on one side and at its foot."
         }
       ]
     }

@@ -37,6 +37,10 @@ CREATURES = {
     "StoneTroll": 3.2,
     "BogTroll": 2.4,
     "TrollRunt": 1.2,
+    # 2026-11-17: Troll Valley's boss and the Moss Marsh's spirits (Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md).
+    "Brukam": 4.6,
+    "NokkOfTheBlackPool": 2.3,
+    "Deildegast": 1.75,
 }
 
 

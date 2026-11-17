@@ -63,6 +63,9 @@ public sealed class RaidValleyRule
     [Min(1f)] public float bridgeLength = 14f;
     [Tooltip("Metres from the bridge prefab's pivot up to its deck.")]
     public float bridgeDeck = 2f;
+    [Tooltip("What the bridge nearest the valley's head becomes (Troll Valley: the Brukam's bridge, GDD §10.7): its guards come out " +
+             "there when the raid begins, and its prefab (a camp, a hoard) stands on the far bank. Empty: every bridge is only a bridge.")]
+    public RaidSetPieceDefinition bossBridge;
 }
 
 /// <summary>How many sites of one kind a generated map holds, and where they go.</summary>

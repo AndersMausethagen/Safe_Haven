@@ -38,7 +38,7 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 2
       probability: 0.5
-      fromTier: 3
+      fromTier: 4
       toTier: 0
       fixedAmount: 0
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}

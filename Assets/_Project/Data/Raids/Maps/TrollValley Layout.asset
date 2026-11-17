@@ -313,14 +313,15 @@ MonoBehaviour:
     tilt: {x: 5, y: 9}
     riverWidth: {x: 6, y: 9}
     riverDepth: {x: 1.5, y: 2}
-    bridges: {x: 0, y: 0}
-    bridgePrefab: {fileID: 0}
+    bridges: {x: 1, y: 2}
+    bridgePrefab: {fileID: 4061861558866804609, guid: cc82a1c8f91775c418652e1e3beca694, type: 3}
     bridgeLength: 14
     bridgeDeck: 2
+    bossBridge: {fileID: 11400000, guid: e16f8a2e97732564cbc0defe7b4a889a, type: 2}
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
-  - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
-  - {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
-  - {fileID: 11400000, guid: ecc457a08ccf79d44ac808eccda7aea0, type: 2}
-  - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
+  - {fileID: 11400000, guid: 737752e83ca9a444786e0ead8ef9b959, type: 2}
+  - {fileID: 11400000, guid: e7f05b2e75065074ab70ab98098e5d1f, type: 2}
+  - {fileID: 11400000, guid: d33a93404c6ff544a9ce1ae48a21504f, type: 2}
+  - {fileID: 11400000, guid: 75d59b538355f46479a7f8f2b499f1fa, type: 2}
   campPieces: {x: 1, y: 2}

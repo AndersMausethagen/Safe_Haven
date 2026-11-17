@@ -2532,7 +2532,7 @@ Light:
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 0.86436, g: 0.864014, b: 0.881886, a: 1}
-  m_Intensity: 1.357
+  m_Intensity: 1.625
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -2541,7 +2541,7 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 0.6425
+    m_Strength: 0.6875
     m_Bias: 0.05
     m_NormalBias: 0.4
     m_NearPlane: 0.2
@@ -6102,7 +6102,7 @@ GameObject:
   - component: {fileID: 931769868}
   - component: {fileID: 931769869}
   m_Layer: 0
-  m_Name: Misty Hollow
+  m_Name: River Haze
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6135,7 +6135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec70857a8e169804bbd0fc4b8cdeb931, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::FogArea
-  density: 0.035
+  density: 0.012
   radius: 20
   height: 2.2
   softness: 0.6
@@ -10395,7 +10395,7 @@ MonoBehaviour:
   m_IsGlobal: 1
   priority: 2
   blendDistance: 0
-  weight: 0.2625
+  weight: 0.1875
   sharedProfile: {fileID: 11400000, guid: 83c925837d620174da51580eaf935bc1, type: 2}
 --- !u!4 &1551466493
 Transform:
@@ -10504,7 +10504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::WeatherSystem
   climate: {fileID: 11400000, guid: ac7d659ceaf4058439f4acebfaf6feaf, type: 2}
-  startWeather: {fileID: 11400000, guid: 82389c433d3a4ad4ba7f2982ac41125f, type: 2}
+  startWeather: {fileID: 11400000, guid: cb567ca6e45752c4aacbce31380b4c62, type: 2}
   changesByItself: 1
   weatherOnlyAtmosphere: 1
   wind: {fileID: 0}

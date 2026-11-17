@@ -4,7 +4,8 @@
     "Concept image and Hunyuan3D + UltraTex model here (generate_gathering.py --group creatures images|3d); then the rig (Make-It-Animatable, D:/ComfyUI/agent/integrations/rigging/rig_mia.py: the 52 Mixamo bones, so they are Humanoids that play MonsterHumanoid's clips), Tools/Blender/folk_creatures.py (height, pivot, check), AgentScripts/BuildCreatureModels.cs (bodies) and AgentScripts/BuildFolkCreatures.cs (definitions, traits).",
     "Front view, full body, T-pose with straight arms and legs a little apart: what the rigger reads best. Dark Nordic folk-tale look, painted and grounded, never cute.",
     "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
-    "2026-11-14, the user: 'add some more monsters by creating them in LocalSpawn ... create a new model for the barklin monsters and replace their model ... create some more different troll monsters, of varying sizes and functionality'. BarkRootling (the Rootling's new body), StoneTroll, BogTroll, TrollRunt. The bulk builders are retired: the Unity side is a targeted script per creature."
+    "2026-11-14, the user: 'add some more monsters by creating them in LocalSpawn ... create a new model for the barklin monsters and replace their model ... create some more different troll monsters, of varying sizes and functionality'. BarkRootling (the Rootling's new body), StoneTroll, BogTroll, TrollRunt. The bulk builders are retired: the Unity side is a targeted script per creature.",
+    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md."
   ],
   "art": "Assets/_Project/Art/Enemies/Downloaded",
   "common": "Full body, seen straight from the front, standing upright in a T-pose with both arms held straight out to the sides at shoulder height, palms down, legs straight and a little apart, the whole figure visible and centred, isolated on a plain light grey background. Dark Nordic folk-tale style, realistic and grounded, not cute. Matte, softly lit, no glow, no shadows on the ground.",
@@ -83,6 +84,40 @@
           "key": "A",
           "seed": 8241,
           "prompt": "A troll runt of Norwegian folklore: a small scrawny young troll about the height of a child, wiry and quick, grey-green warty skin, oversized pointed ears and a long crooked nose, big greedy eyes, a ragged hide loincloth, a stolen sack tied to its back with trinkets poking out, big bare feet with long toes. Mischievous and nasty."
+        }
+      ]
+    },
+    {
+      "asset": "Brukam",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8702,
+          "prompt": "The Brukam, the great bridge troll of Troll Valley, in the manner of Theodor Kittelsen's and John Bauer's Norwegian trolls, not an ape, not a gorilla, no fur on the body: a small head on huge hunched shoulders, a long drooping hooked nose, huge sticking-out ears, tiny deep-set eyes, a wide lipless mouth with two blunt tusks, lumpy hairless skin as grey and rough as weathered granite, with patches of moss and pale lichen growing on him as if he were part of the bridge; very long thick arms with huge hands, a heavy pot belly, short bowed legs and broad flat feet, a tangle of coarse dark hair and a matted beard on the head only, a thick rope belt hung with iron bridge rings and old toll coins on cords, a ragged hide loincloth, an iron ring through one ear. Old, heavy and menacing.",
+          "edit": {"model": "qwen-edit-21", "seed": 3, "instruction": "Turn this creature into a Norwegian troll like those in Theodor Kittelsen's and John Bauer's paintings. Remove all the fur from its body and arms, so its skin is bare, lumpy and grey like weathered granite, with patches of moss and pale lichen growing on it. Give it a small head on its huge shoulders, a long drooping hooked nose, huge sticking-out ears, tiny deep-set eyes, a wide mouth with two blunt tusks and a tangle of coarse dark hair and a matted beard on the head only. Keep exactly the same pose, body size, proportions, framing, the rope belt with iron rings and coins, the ragged loincloth and the plain light grey background.", "licence": "Qwen Research License (non-commercial): prototype only, remake the concept before release"}
+        }
+      ]
+    },
+    {
+      "asset": "NokkOfTheBlackPool",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8711,
+          "prompt": "The Nøkk of the Black Pool, a corrupted water spirit of Norwegian folklore, a drowned and rotting kin of the nøkk: a tall gaunt man-shaped figure with skin black-green and glistening like bog water, cracked and peeling in places to show pale bone-white flesh beneath, long lank black hair heavy with pondweed and duckweed hanging to the waist, a crown of rotting water-lily roots, sunken pale clouded eyes, a wide thin mouth, very long fingers with webbing between them, strands of black weed and a ragged loincloth of rotten reeds, bog moss growing on the shoulders, long bare webbed feet."
+        }
+      ]
+    },
+    {
+      "asset": "Deildegast",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8721,
+          "prompt": "A deildegast of Norwegian folklore, the restless ghost of an old farmer who moved a boundary stone in life: a gaunt, stooped old man, grey and colourless, sunken cheeks and hollow eyes, thin wisps of white hair, a ragged grey homespun coat with a rope belt and torn knee breeches from centuries ago, bare bony feet, bony hands, a face of endless weariness."
         }
       ]
     }

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Brukam's Bridge
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: brukams_bridge
+  displayName: Brukam's Bridge
+  prefab: {fileID: 6871346050539180265, guid: 5ce52d6e7ce29c147951c0cfcee6ce0c, type: 3}
+  radius: 3
+  weight: 0
+  holdsRumours: 0
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 9066855856663566298, guid: 08be26668df3ea6479d9d85d65e77f1d, type: 3}
+    count: 1
+    fromTier: 2

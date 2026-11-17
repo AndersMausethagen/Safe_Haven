@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Troll Ting
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: troll_ting
+  displayName: Troll Ting
+  prefab: {fileID: 8550287200567535590, guid: caedcdc230ec90140b661ce8641c0d2e, type: 3}
+  radius: 12
+  weight: 1
+  holdsRumours: 1
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    count: 3
+    fromTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+    count: 1
+    fromTier: 3

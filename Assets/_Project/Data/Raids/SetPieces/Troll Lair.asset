@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Troll Lair
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: troll_lair
+  displayName: Troll Lair
+  prefab: {fileID: 6461762552518718090, guid: 106ec07e4c8193147bad08097e79ea18, type: 3}
+  radius: 10
+  weight: 1
+  holdsRumours: 0
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    count: 2
+    fromTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+    count: 1
+    fromTier: 2
+  - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+    count: 1
+    fromTier: 4
