@@ -6,7 +6,11 @@ using UnityEngine;
 /// <summary>Raids keep the world's graphical standard: these fail when a generated map would lose what Haven has.</summary>
 public sealed class RaidLookTests
 {
-    private static RaidMapDefinition Map => AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(AssetDatabase.GUIDToAssetPath(AssetDatabase.FindAssets("t:RaidMapDefinition")[0]));
+    // The Misty Woods' map, for what only it is checked on; every raid's own map (each raid scene has one, 2026-11-17) for the rest.
+    private static RaidMapDefinition Map => AssetDatabase.LoadAssetAtPath<RaidMapDefinition>("Assets/_Project/Data/Raids/Maps/MistyWoods Map.asset");
+
+    private static RaidMapDefinition[] Maps => AssetDatabase.FindAssets("t:RaidMapDefinition", new[] { "Assets/_Project/Data/Raids/Maps" })
+        .Select(guid => AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(AssetDatabase.GUIDToAssetPath(guid))).ToArray();
 
     private static int Sum(int[,] cells, int fromColumn, int toColumn)
     {
@@ -25,11 +29,15 @@ public sealed class RaidLookTests
     [Test]
     public void TheRaidTerrain_IsTessellated()
     {
-        Material material = Map.TerrainMaterial;
-        Assert.IsTrue(material.HasProperty("_DisplacementStrength"));
-        Assert.Greater(material.GetFloat("_DisplacementStrength"), 0f);
-        Assert.AreEqual(Map.Layers.Length, material.GetFloat("_DisplacementLayerCount"), "moss, soil, rock and litter, as the map paints them");
-        Assert.IsNotNull(material.GetTexture("_DisplacementMasks"));
+        Assert.GreaterOrEqual(Maps.Length, 2, "the Misty Woods and Troll Valley");
+        foreach (RaidMapDefinition map in Maps)
+        {
+            Material material = map.TerrainMaterial;
+            Assert.IsTrue(material.HasProperty("_DisplacementStrength"), map.name);
+            Assert.Greater(material.GetFloat("_DisplacementStrength"), 0f, map.name);
+            Assert.AreEqual(map.Layers.Length, material.GetFloat("_DisplacementLayerCount"), $"{map.name}: every layer the map paints");
+            Assert.IsNotNull(material.GetTexture("_DisplacementMasks"), map.name);
+        }
     }
 
     [Test]
@@ -76,17 +84,20 @@ public sealed class RaidLookTests
     [Test]
     public void BrownPathsAndRock_StayBare()
     {
-        TerrainGrowth.Ground path = Map.Growth.First(entry => entry.layer == Map.PathLayer);
-        TerrainGrowth.Ground rock = Map.Growth.First(entry => entry.layer == Map.CliffLayer);
-        Assert.AreEqual(0f, path.shortGrass + path.tallGrass + path.bushes + path.plants, "nothing grows on a path");
-        Assert.Greater(path.bareAt, 0f);
-        Assert.Greater(rock.bareAt, 0f);
+        foreach (RaidMapDefinition map in Maps)
+        {
+            TerrainGrowth.Ground path = map.Growth.First(entry => entry.layer == map.PathLayer);
+            TerrainGrowth.Ground rock = map.Growth.First(entry => entry.layer == map.CliffLayer);
+            Assert.AreEqual(0f, path.shortGrass + path.tallGrass + path.bushes + path.plants, $"{map.name}: nothing grows on a path");
+            Assert.Greater(path.bareAt, 0f, map.name);
+            Assert.Greater(rock.bareAt, 0f, map.name);
+        }
     }
 
     [Test]
     public void TheRaidsTrees_MoveInTheWind()
     {
-        foreach (RaidMapDefinition.Scatter tree in Map.Trees)
+        foreach (RaidMapDefinition.Scatter tree in Maps.SelectMany(map => map.Trees))
         {
             foreach (Renderer renderer in tree.prefab.GetComponentsInChildren<Renderer>(true))
             {
@@ -115,14 +126,17 @@ public sealed class RaidLookTests
     [Test]
     public void GroundGrowth_CoversEveryLayerTheMapPaints_WithAColour()
     {
-        foreach (TerrainLayer layer in Map.Layers)
+        foreach (RaidMapDefinition map in Maps)
         {
-            TerrainGrowth.Ground ground = Map.Growth.First(entry => entry.layer == layer);
-            Assert.Greater(ground.colour.maxColorComponent, 0f, layer.name);
-        }
+            foreach (TerrainLayer layer in map.Layers)
+            {
+                TerrainGrowth.Ground ground = map.Growth.First(entry => entry.layer == layer);
+                Assert.Greater(ground.colour.maxColorComponent, 0f, $"{map.name}: {layer.name}");
+            }
 
-        Assert.Greater(Map.Growth.First(entry => entry.layer == Map.ForestLayer).shortGrass, 0.5f, "the forest floor is thick");
-        Assert.AreEqual(0f, Map.Growth.First(entry => entry.layer == Map.CliffLayer).shortGrass, "cliffs are bare");
+            Assert.Greater(map.Growth.First(entry => entry.layer == map.ForestLayer).shortGrass, 0.5f, $"{map.name}: the floor is thick");
+            Assert.AreEqual(0f, map.Growth.First(entry => entry.layer == map.CliffLayer).shortGrass, $"{map.name}: cliffs are bare");
+        }
     }
 
     [Test]

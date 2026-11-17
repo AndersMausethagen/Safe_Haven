@@ -152,6 +152,7 @@ public sealed class BirdTests
 
     [TestCase("Assets/_Project/Scenes/SafeHaven.unity")]
     [TestCase("Assets/_Project/Scenes/Raids/Raid_MistyWoods.unity")]
+    [TestCase("Assets/_Project/Scenes/Raids/Raid_TrollValley.unity")]
     [TestCase("Assets/_Project/Scenes/Prologue_MistyWoods.unity")]
     public void TheScenes_HaveTheirBirds(string scene)
     {

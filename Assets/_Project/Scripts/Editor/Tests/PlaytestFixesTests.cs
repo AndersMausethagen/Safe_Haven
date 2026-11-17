@@ -84,7 +84,10 @@ public sealed class PlaytestFixesTests
     public void ARaidScene_HasTheMenuItsEventsOpen()
     {
         string menu = AssetDatabase.AssetPathToGUID("Assets/_Project/Prefabs/UI/ActionMenuWindow.prefab");
-        StringAssert.Contains(menu, System.IO.File.ReadAllText(RaidScene), "raid events with choices have nothing to open");
+        foreach (string scene in new[] { RaidScene, "Assets/_Project/Scenes/Raids/Raid_TrollValley.unity" })
+        {
+            StringAssert.Contains(menu, System.IO.File.ReadAllText(scene), $"{scene}: raid events with choices have nothing to open");
+        }
     }
 
     [Test]

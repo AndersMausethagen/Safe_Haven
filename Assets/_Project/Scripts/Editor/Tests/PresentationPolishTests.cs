@@ -54,7 +54,7 @@ public sealed class PresentationPolishTests
     {
         SceneTransitionSettings settings = SceneTransitionSettings.Current;
         Assert.IsNotNull(settings.BackgroundArt, "Without a destination of its own, a screen still has a picture.");
-        foreach (string scene in new[] { "Raid_MistyWoods", "SafeHaven", "Prologue_MistyWoods" })
+        foreach (string scene in new[] { "Raid_MistyWoods", "Raid_TrollValley", "SafeHaven", "Prologue_MistyWoods" })
         {
             Assert.AreNotEqual(settings.BackgroundArt, settings.ArtFor(scene), scene);
             Assert.AreNotSame(settings.Tips, settings.TipsFor(scene), scene);

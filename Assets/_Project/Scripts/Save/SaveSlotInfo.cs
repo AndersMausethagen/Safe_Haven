@@ -76,6 +76,8 @@ public sealed class SaveSlotInfo
                 return "The Unquiet Forest";
             case "Raid_MistyWoods":
                 return "Misty Woods";
+            case "Raid_TrollValley":
+                return "Troll Valley";
             default:
                 return string.IsNullOrEmpty(scene) ? "Unknown place" : scene;
         }

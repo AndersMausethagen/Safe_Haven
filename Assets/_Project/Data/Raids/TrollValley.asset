@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Troll Valley
   description: A valley of old stone bridges where the trolls still collect their tolls. Trollstone is found only here.
   tier: 2
-  sceneName: Raid_MistyWoods
+  sceneName: Raid_TrollValley
   locked: 1
   unlockedBy: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
   largeRaid:

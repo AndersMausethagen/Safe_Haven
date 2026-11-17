@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Raids/Raid_MistyWoods.unity
     guid: 90ccd9189a6cb8446bb9c0597aa49cc4
   - enabled: 1
+    path: Assets/_Project/Scenes/Raids/Raid_TrollValley.unity
+    guid: 28c3830ed9b526f43b986ee71f022026
+  - enabled: 1
     path: Assets/_Project/Scenes/RaidResults.unity
     guid: b9bec01c2346e654aba8758c17a0d9f6
   - enabled: 0
