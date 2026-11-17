@@ -71,7 +71,7 @@ public static partial class RaidMapGenerator
             bridge.transform.localScale = Vector3.one * scale;
             if (crossing == head && rule.bossBridge != null)
             {
-                MakeBossBridge(bridge, rule.bossBridge, terrain, origin, crossing, half);
+                MakeBossBridge(bridge, rule.bossBridge, plan, rules, terrain, origin, crossing, half, rule.bridgeDeck * scale);
             }
             else if (rule.bridgeToll != null)
             {
@@ -101,39 +101,74 @@ public static partial class RaidMapGenerator
     // The head bridge's guards wait on its deck; its camp stands on the higher bank, facing the bridge. The site sits on the deck's top
     // (a ray onto the bridge's own collider): at the pivot, under the arch, the guards were found the nearest ground, which was the river
     // bank under the bridge (the Brukam stood in the water, 2026-11-17). Keep the piece's Radius small, so its guard ring stays on the deck.
-    private static void MakeBossBridge(GameObject bridge, RaidSetPieceDefinition piece, Terrain terrain, Vector3 origin, RaidLayoutCrossing crossing, float half)
+    private static void MakeBossBridge(GameObject bridge, RaidSetPieceDefinition piece, RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain,
+        Vector3 origin, RaidLayoutCrossing crossing, float half, float deckAbovePivot)
     {
         bridge.name = piece.DisplayName;
         Physics.SyncTransforms();
-        Vector3 deck = bridge.transform.position;
-        foreach (RaycastHit hit in Physics.RaycastAll(deck + Vector3.up * 30f, Vector3.down, 60f, ~0, QueryTriggerInteraction.Ignore))
+        // Without a hit (a gap in a regenerated deck), the deck's own height, never the pivot under the arch.
+        Vector3 deck = bridge.transform.position + Vector3.up * deckAbovePivot;
+        bool found = false;
+        foreach (RaycastHit hit in Physics.RaycastAll(bridge.transform.position + Vector3.up * 30f, Vector3.down, 60f, ~0, QueryTriggerInteraction.Ignore))
         {
-            if (hit.collider.transform.IsChildOf(bridge.transform) && hit.point.y > deck.y)
+            if (hit.collider.transform.IsChildOf(bridge.transform) && (!found || hit.point.y > deck.y))
             {
                 deck = hit.point;
+                found = true;
             }
+        }
+
+        if (!found)
+        {
+            Debug.LogWarning($"{piece.DisplayName}: no deck under the bridge's middle, the guards wait at its deck height.", bridge);
         }
 
         var ground = new GameObject("Deck");
         ground.transform.SetParent(bridge.transform, false);
         ground.transform.position = deck;
         ground.AddComponent<RaidSetPieceSite>().Bind(piece);
-        if (piece.Prefab == null)
+        if (piece.Prefab == null || !CampSpot(plan, rules, terrain, origin, crossing, half, out Vector2 spot))
         {
             return;
         }
 
-        Vector2 side = crossing.Direction * (half + CampFromBridge);
-        Vector2 far = crossing.Position + side, near = crossing.Position - side;
-        Vector3 Ground(Vector2 point) => RaidMapSurface.Ground(terrain, origin + new Vector3(point.x, 0f, point.y));
-        Vector2 spot = Ground(far).y >= Ground(near).y ? far : near;
         Vector2 toBridge = (crossing.Position - spot).normalized;
-        GameObject camp = Object.Instantiate(piece.Prefab, Ground(spot), Quaternion.LookRotation(new Vector3(toBridge.x, 0f, toBridge.y), Vector3.up), bridge.transform.parent);
+        GameObject camp = Object.Instantiate(piece.Prefab, RaidMapSurface.Ground(terrain, origin + new Vector3(spot.x, 0f, spot.y)),
+            Quaternion.LookRotation(new Vector3(toBridge.x, 0f, toBridge.y), Vector3.up), bridge.transform.parent);
         camp.name = piece.DisplayName + " Camp";
         foreach (Transform part in camp.transform)
         {
             Vector3 at = part.position;
             part.position = new Vector3(at.x, RaidMapSurface.Ground(terrain, at).y, at.z);
         }
+    }
+
+    /// <summary>Metres the boss's camp keeps round its middle (its props reach about this far).</summary>
+    private const float CampRadius = 4.5f;
+
+    // The camp stands beside the trail, along the river from a bridge end, never on the trail itself (review 2026-11-17: straight past the
+    // end it sat on the main way up); the higher bank first, then the other, either side of the trail; it must stand on the valley's floor
+    // and out of the water. No spot: no camp (the boss is still on its bridge).
+    private static bool CampSpot(RaidLayoutPlan plan, RaidLayoutRules rules, Terrain terrain, Vector3 origin, RaidLayoutCrossing crossing, float half, out Vector2 spot)
+    {
+        var along = new Vector2(-crossing.Direction.y, crossing.Direction.x);
+        float aside = rules.TrailHalfWidth * plan.Mood.trails + CampRadius;
+        Vector2 ahead = crossing.Direction * (half + CampFromBridge);
+        float Height(Vector2 point) => RaidMapSurface.Ground(terrain, origin + new Vector3(point.x, 0f, point.y)).y;
+        float first = Height(crossing.Position + ahead) >= Height(crossing.Position - ahead) ? 1f : -1f;
+        foreach (float end in new[] { first, -first })
+        {
+            foreach (float side in new[] { 1f, -1f })
+            {
+                spot = crossing.Position + ahead * end + along * (side * aside);
+                if ((plan.Valley == null || plan.Valley.Holds(spot, CampRadius)) && !plan.InRiver(spot, CampRadius))
+                {
+                    return true;
+                }
+            }
+        }
+
+        spot = default;
+        return false;
     }
 }

@@ -30,12 +30,13 @@ MonoBehaviour:
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   rewardSkill: {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
   defeatLine: 'The Heartroot sinks to its knees, and speaks once, in a voice like the portal''s own: "Hearth-keeper." Then it lies still. What it knew of the forest''s hold is yours now: you have learned Heartroot''s Grasp. And something has opened: the portal can reach Troll Valley.'
+  wakeRange: 0
   wakeSeconds: 3.2
   wakeSound: {fileID: 11400000, guid: 117e6f9038657034bbb7373e39bbd293, type: 2}
   music:
     tracks:
     - clip: {fileID: 8300000, guid: a42d8fa1e22662d4d83591c4bdfb0f30, type: 3}
-      volume: 0
+      volume: 0.8
       startAt: 0
     order: 0
   trophy: {fileID: 4208037901244437991, guid: ab8e47ca6036d17419c93050c9a123a9, type: 3}

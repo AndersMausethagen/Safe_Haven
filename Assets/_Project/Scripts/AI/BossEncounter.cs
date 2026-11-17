@@ -43,10 +43,47 @@ public sealed class BossEncounter : MonoBehaviour
     {
         if (definition != null)
         {
-            bar = BossBar.Show(definition);
-            bar.Set(health.HealthFraction);
-            StartCoroutine(Wake());
+            StartCoroutine(definition.WakeRange > 0f && (ai == null || !ai.IsRemote) ? Dormant() : Begin());
         }
+    }
+
+    // Placed on the map from the start (the Brukam on its bridge, review 2026-11-17): it sits where it is until someone comes within
+    // Wake Range or hurts it; only then its bar, its music and its waking.
+    private System.Collections.IEnumerator Dormant()
+    {
+        float full = health.HealthFraction;
+        float range = definition.WakeRange * definition.WakeRange;
+        while (health.HealthFraction >= full && !Near(range))
+        {
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        yield return Begin();
+    }
+
+    private bool Near(float sqrRange)
+    {
+        if (Player.Current != null && (Player.Current.transform.position - transform.position).sqrMagnitude < sqrRange)
+        {
+            return true;
+        }
+
+        foreach (FriendHitbox friend in FriendHitbox.Active)
+        {
+            if (friend.IsAlive && (friend.transform.position - transform.position).sqrMagnitude < sqrRange)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private System.Collections.IEnumerator Begin()
+    {
+        bar = BossBar.Show(definition);
+        bar.Set(health.HealthFraction);
+        yield return Wake();
     }
 
     // It rises before it fights: the ground shakes, its name goes up and it can't be hurt or do harm. Then it knows where the player is.

@@ -1119,6 +1119,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 17016c6a9718d3448bac1b8554a339e2, type: 2}
   - {fileID: 11400000, guid: 6a0d0fdf47eac744da300d2daa665816, type: 2}
   - {fileID: 11400000, guid: 115647db9b5ff0f46bc496b0532bbcec, type: 2}
+  - {fileID: 11400000, guid: 8505946cc9dbaf24498bf366f32b8405, type: 2}
   residentNotes:
   - who: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
     about: {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}

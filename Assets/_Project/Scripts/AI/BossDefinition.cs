@@ -40,6 +40,10 @@ public sealed class BossDefinition : ScriptableObject
     [SerializeField, TextArea] private string defeatLine;
 
     [Header("Waking")]
+    [Tooltip("Metres within which a player (or a friend) wakes it; anything that hurts it wakes it too. 0: it wakes as soon as it is " +
+             "placed, for a boss brought into its fight (the Heartroot). One standing on the map from the start (the Brukam on its bridge) " +
+             "needs a range, or its bar, music and roar would start the raid wherever the player is.")]
+    [SerializeField, Min(0f)] private float wakeRange;
     [Tooltip("Seconds it takes to rise, while its name is shown. Nothing can hurt it, and it hurts nothing.")]
     [SerializeField, Min(0f)] private float wakeSeconds = 3.2f;
     [SerializeField] private SoundDefinition wakeSound;
@@ -59,6 +63,7 @@ public sealed class BossDefinition : ScriptableObject
     public SkillDefinition RewardSkill => rewardSkill;
     public string DefeatLine => defeatLine;
     public float WakeSeconds => wakeSeconds;
+    public float WakeRange => wakeRange;
     public SoundDefinition WakeSound => wakeSound;
     public MusicPlaylist Music => music;
     public BossTrophy Trophy => trophy;

@@ -194,6 +194,20 @@ public sealed class RaidValleyTests
     }
 
     [Test]
+    public void EveryValley_HasABridgeForTheBrukam_AndAnotherWithAToll()
+    {
+        foreach ((int seed, RaidLayoutPlan plan) in Plans())
+        {
+            int bridged = plan.Crossings.FindAll(c => c.Bridge).Count;
+            Assert.GreaterOrEqual(bridged, 1, $"seed {seed}: no bridge, so no Brukam");
+            if (plan.Crossings.Count >= 2)
+            {
+                Assert.GreaterOrEqual(bridged, 2, $"seed {seed}: a toll bridge besides the Brukam's");
+            }
+        }
+    }
+
+    [Test]
     public void TheSameSeed_MakesTheSameValley()
     {
         foreach (int seed in new[] { 3, 9 })

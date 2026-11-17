@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
   m_Name: Brukam
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDefinition
-  id: Brukam
+  id: brukam
   displayName: Brukam
   description: The great troll of the stone bridge. Nobody crosses without paying, and nobody has paid enough.
   combatStats: {fileID: 11400000, guid: 8a3d73a3cf630d34092297ad7b54dd65, type: 2}
@@ -305,7 +305,7 @@ MonoBehaviour:
   armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.08
-  portrait: {fileID: 0}
+  portrait: {fileID: 21300000, guid: d876a9f34a566ff40b4ff5198ece3363, type: 3}
   journalLore: 'Every bridge in the valley had a troll under it once, the old songs say, and the trolls paid tribute to the biggest of them: the Brukam, who sits on the old stone bridge at the head of the valley and counts what crosses. He swings a pine trunk for a club and throws the bridge''s own stones.'
   journalAdvice: 'Keep off the line of his sweep and out from under the club when it rises: the slam shakes the ground around it. When he tears a stone from the bridge, get behind cover or keep moving. He tires after a slam; that is the moment. Blunt weapons crack him, blades skid.'
   journalHabitat: The old stone bridge at the head of Troll Valley

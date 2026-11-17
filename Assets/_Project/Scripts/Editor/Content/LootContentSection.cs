@@ -158,9 +158,17 @@ public static class LootOverview
             Add(raid.EliteLoot, raid, $"Raid: {raid.DisplayName}'s elites");
         }
 
+        // Only the prefabs that point at a loot table are loaded (their direct dependencies say so), not every prefab with its meshes.
+        var tablePaths = new HashSet<string>(AssetDatabase.FindAssets("t:LootTable").Select(AssetDatabase.GUIDToAssetPath));
         foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs", "Assets/_Project/Data" }))
         {
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            if (!AssetDatabase.GetDependencies(path, true).Any(tablePaths.Contains))
+            {
+                continue;
+            }
+
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (prefab == null)
             {
                 continue;

@@ -64,6 +64,7 @@ MonoBehaviour:
   griefRaids: 2
   bosses:
   - {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
+  - {fileID: 11400000, guid: 9270117f6be16f544877dc59efdbc8e4, type: 2}
   bondRanks:
   - name: Trusted
     raids: 3

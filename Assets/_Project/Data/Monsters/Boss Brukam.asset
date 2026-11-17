@@ -23,19 +23,20 @@ MonoBehaviour:
     glow: {r: 0, g: 0, b: 0, a: 1}
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   - belowHealth: 0.33
-    line: The Brukam roars, and the valley's trolls answer.
+    line: 'The Brukam''s hide greys to stone. Blades skid off it now: bring a hammer.'
     reelSeconds: 2.2
     damageBonus: 0.2
     glow: {r: 0, g: 0, b: 0, a: 1}
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   rewardSkill: {fileID: 11400000, guid: 1ed16a27aed704c4fbcf6235fb0e823d, type: 2}
   defeatLine: 'The Brukam goes down on the stones of his own bridge, and the valley goes quiet. What he knew of weight is yours now: you have learned Mountain Leap.'
+  wakeRange: 22
   wakeSeconds: 3.2
   wakeSound: {fileID: 11400000, guid: 117e6f9038657034bbb7373e39bbd293, type: 2}
   music:
     tracks:
     - clip: {fileID: 8300000, guid: a42d8fa1e22662d4d83591c4bdfb0f30, type: 3}
-      volume: 0
+      volume: 0.8
       startAt: 0
     order: 0
   trophy: {fileID: 0}

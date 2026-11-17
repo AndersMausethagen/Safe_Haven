@@ -188,6 +188,42 @@ MonoBehaviour:
     when: 1
     named: Autumn
     chance: 1.3
+  - creature: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.4
+  - creature: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.6
+  - creature: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0
+  - creature: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.5
+  - creature: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    when: 0
+    named: Dawn
+    chance: 1.4
+  - creature: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
+    when: 0
+    named: Dawn
+    chance: 1.3
+  - creature: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.4
+  - creature: {fileID: 9066855856663566298, guid: 9bb9b3bba4b4e0541b99c1424291cef6, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.5
+  - creature: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    when: 0
+    named: Dawn
+    chance: 0.7
   additions:
   - creature: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}
     when: 0

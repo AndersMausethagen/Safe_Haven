@@ -131,4 +131,44 @@ public sealed class BossTests
         Assert.AreEqual("the_heartroot", prefab.GetComponent<MonsterAI>().Definition.Id);
         Assert.AreEqual("TheHeartrootStats", prefab.GetComponent<MonsterAI>().Definition.CombatStats.name);
     }
+
+    [Test]
+    public void EveryBoss_IsHeard_AndItsAttacksComeWithinItsStages()
+    {
+        // Review 2026-11-17: the Heartroot's and the Brukam's music had volume 0; an attack gated on a stage the fight never reaches is dead.
+        foreach (BossDefinition boss in SettlementSettings.Current.Bosses)
+        {
+            foreach (MusicTrack track in boss.Music.tracks)
+            {
+                Assert.Greater(track.volume, 0f, $"{boss.name}'s music is silent");
+            }
+
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs/Enemies" }))
+            {
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+                BossEncounter encounter = prefab != null ? prefab.GetComponent<BossEncounter>() : null;
+                if (encounter == null || encounter.Definition != boss)
+                {
+                    continue;
+                }
+
+                foreach (MonsterAttack attack in prefab.GetComponent<MonsterAI>().Definition.Attacks)
+                {
+                    Assert.LessOrEqual(attack.fromPhase, boss.Phases.Length, $"{prefab.name}'s {attack.attack?.name} waits for a stage it never reaches");
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void TheBrukam_SleepsOnItsBridge_UntilSomeoneComes_AndTeachesMountainLeap()
+    {
+        var brukam = AssetDatabase.LoadAssetAtPath<BossDefinition>("Assets/_Project/Data/Monsters/Boss Brukam.asset");
+        Assert.Greater(brukam.WakeRange, 0f, "it stands on the map from the start: without a range it wakes the raid wherever the player is");
+        Assert.AreEqual("Mountain Leap", brukam.RewardSkill.DisplayName);
+        Assert.Contains(brukam, (System.Collections.ICollection)new System.Collections.Generic.List<BossDefinition>(SettlementSettings.Current.Bosses));
+        var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset");
+        Assert.IsNotNull(rules.Valley.bossBridge, "the valley's head bridge is the Brukam's");
+        Assert.AreEqual("brukam", rules.Valley.bossBridge.Guards[0].prefab.GetComponent<MonsterAI>().Definition.Id);
+    }
 }
