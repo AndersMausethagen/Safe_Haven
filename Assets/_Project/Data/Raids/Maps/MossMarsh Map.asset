@@ -1241,6 +1241,34 @@ MonoBehaviour:
     bankReach: 1.5
     bankChance: 0.6
     clumpSize: 6
+    bankWidest: 1.2
+  lilyPads:
+    pads:
+    - prefab: {fileID: 6205544886877637201, guid: 60e0e630b6d49f546a2ca4182c201209, type: 3}
+      weight: 3
+      scale: {x: 1.4, y: 2}
+    - prefab: {fileID: 8107888737250392537, guid: 686a8dd9d45bbf746b3080f997d5fa03, type: 3}
+      weight: 3
+      scale: {x: 1.4, y: 2}
+    - prefab: {fileID: 8453008536203755175, guid: 1c9f6c8207e775543ac352ddd33ff627, type: 3}
+      weight: 1.5
+      scale: {x: 1.4, y: 2}
+    - prefab: {fileID: 6301123021910251256, guid: 5ac260964e521514b8d22b9e1a8c651c, type: 3}
+      weight: 1
+      scale: {x: 1.4, y: 2}
+    flower: {fileID: 6108408102449939580, guid: b243202d26201bb43bf1c8fd31fe4639, type: 3}
+    bud: {fileID: 8081223264578873584, guid: f285336505db2984f9182a8cc6f4ade8, type: 3}
+    material: {fileID: 2100000, guid: 05f01da1653c83f4d894314075358902, type: 2}
+    depth: {x: 0.2, y: 0.9}
+    shoreReach: 4
+    trailClearance: 1.5
+    clumpSpacing: 8
+    clumpChance: 0.8
+    patchSize: 30
+    clumpPads: {x: 8, y: 24}
+    flowerChance: 0.083333336
+    budChance: 0.083333336
+    aboveWater: 0.015
   undergrowth:
   - prefab: {fileID: 5124537417292197620, guid: 4c161aa370b351143b38c52fe75000e4, type: 3}
     weight: 2

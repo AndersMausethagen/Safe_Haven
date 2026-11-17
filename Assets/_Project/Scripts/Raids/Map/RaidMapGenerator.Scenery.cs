@@ -20,6 +20,11 @@ public static partial class RaidMapGenerator
     private const float WallRayReach = 7f;
     private const float WallBlockOut = 2f;
     private const float WallBlockWidest = 6f;
+    /// <summary>
+    /// The gentlest face (degrees) a wall crag is set into, whatever the rule's Wall Crag Slope says: a crag has no collider, so on a slope
+    /// the navmesh agent can climb (Agent Slope 45° in ProjectSettings/NavMeshAreas.asset) creatures and the player would walk through it.
+    /// </summary>
+    public const float WallCragLeastSlope = 46f;
 
     private const float LookoutWidest = 5f;
 
@@ -79,7 +84,8 @@ public static partial class RaidMapGenerator
     /// <summary>
     /// Sets the Boulder Kit's rock into a valley's walls (RaidValleyRule › Wall Crags, Docs/WorldLookPlan_2026-11-17.md B7), so from the
     /// game camera they read as rock rather than smooth painted slopes: about one piece every Wall Crags metres along each wall's foot, on
-    /// faces steeper than Wall Crag Slope within Wall Crag Reach of the floor, set in as RaidRavineCrags sets them into a ravine (stood up,
+    /// faces steeper than Wall Crag Slope (and never on ground the navmesh agent can climb, <see cref="WallCragLeastSlope"/>) within Wall
+    /// Crag Reach of the floor, set in as RaidRavineCrags sets them into a ravine (stood up,
     /// mostly buried, no colliders). Now and then a great block lies at the wall's foot, solid like any boulder, but only where a boulder
     /// may stand (RaidLayoutPlanner.BoulderFits), so it never closes a trail, and under the Boulders holder that ClearBlockedTrails can
     /// clear. From its own stream: same seed, same crags.
@@ -99,6 +105,7 @@ public static partial class RaidMapGenerator
         var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Wall Crags"));
         float halfWidth = rules.TrailHalfWidth * (plan.Mood != null ? plan.Mood.trails : 1f);
         int benches = Mathf.Max(1, valley.Benches);
+        float steepEnough = Mathf.Max(rule.wallCragSlope, WallCragLeastSlope);
         int placed = 0, blocks = 0;
         foreach (int side in new[] { -1, 1 })
         {
@@ -120,7 +127,7 @@ public static partial class RaidMapGenerator
                 {
                     Vector2 spot = foot + outward * Range(random, 0f, rule.wallCragReach);
                     if (spot.x < 1f || spot.y < 1f || spot.x > plan.Size - 1f || spot.y > plan.Size - 1f
-                        || data.GetSteepness(spot.x / plan.Size, spot.y / plan.Size) < rule.wallCragSlope)
+                        || data.GetSteepness(spot.x / plan.Size, spot.y / plan.Size) < steepEnough)
                     {
                         continue;
                     }

@@ -263579,6 +263579,12 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
     text: <i>Come and sit by me, little one. There is something I should have told you before you went to that hollow.</i>
     moment: {fileID: 11400000, guid: 44f42630a316f7f4993be640f28deba3, type: 2}
+  - quest: {fileID: 11400000, guid: 1090953ec0461964394a6ccdbe619504, type: 2}
+    text: <i>North of the valley the old road goes on, little one, but I cannot see past its last bridge, at the valley's head. Something sits there that the trolls themselves pay. Go and look, and come home, and I will know the way.</i>
+    moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 5e68f3e2a126b6442ad860bda020e064, type: 2}
+    text: <i>Now I know whose bridge it is. He was old when my stones were raised, and he has never let anyone cross for free. He waits on his own bridge over the gorge now. Go ready, or do not go.</i>
+    moment: {fileID: 0}
   whispers:
   - <i>Every hearth in my light is a little more of the old pact kept.</i>
   - <i>The forest cannot forget a place that someone tends.</i>

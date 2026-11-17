@@ -14,6 +14,7 @@ public sealed class WorldLookGeneratorTests
     private const string WoodsMapPath = "Assets/_Project/Data/Raids/Maps/MistyWoods Map.asset";
     private const string WoodsRulesPath = "Assets/_Project/Data/Raids/Maps/MistyWoods Layout.asset";
     private const string WoodsTerrainPath = "Assets/_Project/Data/Raids/Maps/MistyWoods Map Terrain.asset";
+    private const string ValleyRulesPath = "Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset";
     private const int Zones = 16;
 
     private static RaidMapDefinition WoodsMap => AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(WoodsMapPath);
@@ -104,30 +105,240 @@ public sealed class WorldLookGeneratorTests
     }
 
     [Test]
-    public void PileStones_GetNoTrunkPrism_EverythingElseKeepsItsOwn()
+    public void PileStones_GetATrunkPrismOnlyWhenSolid_EverythingElseKeepsItsOwn()
     {
         RaidMapDefinition map = Object.Instantiate(WoodsMap);
         try
         {
+            GameObject solid = map.Rocks[0].prefab;
+            GameObject soft = map.Undergrowth.Select(scatter => scatter?.prefab).FirstOrDefault(prefab => prefab != null && prefab.GetComponent<Collider>() == null);
+            Assume.That(solid.GetComponent<Collider>(), Is.Not.Null, "the Woods' first rock is solid");
+            Assume.That(soft, Is.Not.Null, "the Woods have undergrowth without a collider");
+
             bool[] before = RaidMapSurface.Prisms(map);
             Assert.IsTrue(before.All(prism => prism), "without piles every capsule cuts the navmesh, as before");
 
+            // An empty row between them: the prototypes skip it, so the second stone must still be judged by its own prefab.
             var so = new SerializedObject(map);
-            AddStone(so.FindProperty("pileStones"), map.Rocks[0].prefab);
-            AddStone(so.FindProperty("shore.stones"), map.Rocks[0].prefab);
+            AddStone(so.FindProperty("pileStones"), solid);
+            AddStone(so.FindProperty("pileStones"), null);
+            AddStone(so.FindProperty("pileStones"), soft);
+            AddStone(so.FindProperty("shore.stones"), solid);
             so.ApplyModifiedPropertiesWithoutUndo();
             RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(map);
             bool[] prisms = RaidMapSurface.Prisms(map);
-            Assert.AreEqual(before.Length + 2, prisms.Length);
+            Assert.AreEqual(before.Length + 3, prisms.Length);
             Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[before.Length]);
-            Assert.IsFalse(prisms[before.Length], "a pile stone leaves the navmesh as it was");
-            Assert.AreEqual(RaidMapSurface.Group.ShoreStone, groups[before.Length + 1]);
-            Assert.IsTrue(prisms[before.Length + 1], "a stone by the water keeps its capsule, so creatures path round it");
+            Assert.IsTrue(prisms[before.Length], "a solid pile stone is cut out of the navmesh, so creatures don't walk into it");
+            Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[before.Length + 1]);
+            Assert.IsFalse(prisms[before.Length + 1], "one everybody walks through leaves the navmesh as it was");
+            Assert.AreEqual(RaidMapSurface.Group.ShoreStone, groups[before.Length + 2]);
+            Assert.IsTrue(prisms[before.Length + 2], "a stone by the water keeps its capsule, so creatures path round it");
         }
         finally
         {
             Object.DestroyImmediate(map);
         }
+    }
+
+    [Test]
+    public void RocksInOpen_StayOffFacesSteeperThanTheCliffBand()
+    {
+        Assert.Greater(RocksOnOpenGround(0.5f), 10, "on flat open ground");
+        Assert.AreEqual(0, RocksOnOpenGround(0.5f, slope: 45f), "none hang off a 45° face");
+    }
+
+    [Test]
+    public void PileStones_KeepOutOfTheRockTheyLieRound()
+    {
+        RaidMapDefinition map = Object.Instantiate(WoodsMap);
+        var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, 30f, map.Size) };
+        try
+        {
+            var so = new SerializedObject(map);
+            so.FindProperty("rocksInOpen").floatValue = 0.6f;
+            so.FindProperty("pileChance").floatValue = 1f;
+            AddStone(so.FindProperty("pileStones"), map.Rocks[0].prefab);
+            so.ApplyModifiedPropertiesWithoutUndo();
+            byte[] none = new byte[Zones * Zones];
+            map.UseGenerated(Zones, none, none, none, new RaidMapMood(), 5);
+            RaidMapSurface.Scatter(data, map, new List<RaidMapSurface.Clearing>(), out _);
+
+            // Each prototype's list entry, in Scatter's order, for the rocks' room.
+            var scatters = new List<RaidMapDefinition.Scatter>();
+            foreach (IReadOnlyList<RaidMapDefinition.Scatter> list in new IReadOnlyList<RaidMapDefinition.Scatter>[] { map.Trees, map.Undergrowth, map.Rocks, map.PileStones, map.Shore.stones })
+            {
+                scatters.AddRange(list.Where(scatter => scatter?.prefab != null));
+            }
+
+            RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(map);
+            TreeInstance[] placed = data.treeInstances;
+            int stones = 0;
+            for (int i = 0; i < placed.Length; i++)
+            {
+                if (groups[placed[i].prototypeIndex] != RaidMapSurface.Group.PileStone) continue;
+                stones++;
+                var at = new Vector2(placed[i].position.x, placed[i].position.z) * map.Size;
+                // Against every rock with room placed before it (later rocks keep their room from trunks only; a rock without room
+                // claims none, as undergrowth doesn't).
+                for (int r = 0; r < i; r++)
+                {
+                    if (groups[placed[r].prototypeIndex] != RaidMapSurface.Group.Rock) continue;
+                    RaidMapDefinition.Scatter rock = scatters[placed[r].prototypeIndex];
+                    float standing = (rock.habitat != null ? rock.habitat.room : 0f) * placed[r].widthScale;
+                    if (standing <= 0f) continue;
+                    float room = Mathf.Max(standing, 0.6f);
+                    float distance = Vector2.Distance(at, new Vector2(placed[r].position.x, placed[r].position.z) * map.Size);
+                    Assert.GreaterOrEqual(distance, (0.6f + room) * 0.5f - 1e-3f, $"pile stone {i} inside rock {r}");
+                }
+            }
+
+            Assume.That(stones, Is.GreaterThan(0), "the Woods' rocks have room for piles");
+        }
+        finally
+        {
+            Object.DestroyImmediate(data);
+            Object.DestroyImmediate(map);
+        }
+    }
+
+    [Test]
+    public void BankStones_WithoutACollider_AreKeptToBankWidest()
+    {
+        GameObject soft = WoodsMap.Undergrowth.Concat(WoodsMap.Rocks).Select(scatter => scatter?.prefab)
+            .FirstOrDefault(prefab => prefab != null && prefab.GetComponent<CapsuleCollider>() == null
+                && RaidMapSurface.PrefabBounds(prefab).size.x > 0.3f);
+        Assume.That(soft, Is.Not.Null, "a prefab without a capsule to stand for a lake stone");
+        Bounds bounds = RaidMapSurface.PrefabBounds(soft);
+        float across = Mathf.Max(bounds.size.x, bounds.size.z);
+
+        float Widest(float bankWidest)
+        {
+            RaidMapDefinition map = Object.Instantiate(WoodsMap);
+            var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, 30f, map.Size) };
+            try
+            {
+                var so = new SerializedObject(map);
+                SerializedProperty stones = so.FindProperty("shore.stones");
+                stones.ClearArray();
+                AddStone(stones, soft);
+                stones.GetArrayElementAtIndex(0).FindPropertyRelative("scale").vector2Value = new Vector2(2f / across, 4f / across);
+                so.FindProperty("shore.bankChance").floatValue = 1f;
+                so.FindProperty("shore.clumpSize").floatValue = 1f;
+                so.FindProperty("shore.bankWidest").floatValue = bankWidest;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                byte[] none = new byte[Zones * Zones];
+                map.UseGenerated(Zones, none, none, none, new RaidMapMood(), 5);
+                // Water west of a line down the map's middle; its bank runs up the east side of it.
+                float shore = map.Size * 0.5f;
+                bool Water(Vector2 spot, float reach, out float level, out float edge)
+                {
+                    level = 0f;
+                    edge = spot.x - shore;
+                    return edge < reach;
+                }
+
+                RaidMapSurface.Scatter(data, map, new List<RaidMapSurface.Clearing>(), out _, water: Water);
+                RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(map);
+                TreeInstance[] bank = data.treeInstances.Where(tree => groups[tree.prototypeIndex] == RaidMapSurface.Group.ShoreStone).ToArray();
+                Assert.Greater(bank.Length, 3, "stones along the bank");
+                return bank.Max(tree => tree.widthScale) * across;
+            }
+            finally
+            {
+                Object.DestroyImmediate(data);
+                Object.DestroyImmediate(map);
+            }
+        }
+
+        Assert.Greater(Widest(0f), 1.9f, "no limit: as big as the list says");
+        Assert.LessOrEqual(Widest(1.2f), 1.2f + 1e-3f, "kept to Bank Widest, so nobody wades through a boulder");
+    }
+
+    [Test]
+    public void AtEdges_DoesNotThickenInsideATrail()
+    {
+        TerrainData data = Object.Instantiate(AssetDatabase.LoadAssetAtPath<TerrainData>(WoodsTerrainPath));
+        var holder = new GameObject("Terrain", typeof(Terrain));
+        try
+        {
+            var terrain = holder.GetComponent<Terrain>();
+            terrain.terrainData = data;
+            Assume.That(data.terrainLayers.Length, Is.GreaterThanOrEqualTo(2));
+            // Two grounds half and half everywhere: a seam all over, as leaves drifting over a trail make one.
+            var weights = new float[data.alphamapHeight, data.alphamapWidth, data.terrainLayers.Length];
+            for (int z = 0; z < data.alphamapHeight; z++)
+            {
+                for (int x = 0; x < data.alphamapWidth; x++)
+                {
+                    weights[z, x, 0] = 0.5f;
+                    weights[z, x, 1] = 0.5f;
+                }
+            }
+
+            data.SetAlphamaps(0, 0, weights);
+            var fills = new[]
+            {
+                new TerrainGrowth.Ground { layer = data.terrainLayers[0], plants = 1f },
+                new TerrainGrowth.Ground { layer = data.terrainLayers[1], plants = 1f },
+            };
+            string name = WoodsMap.Plants.First(plant => plant.enabled && data.detailPrototypes.Any(p => p.prototype != null && p.prototype.name == plant.prototype)).prototype;
+            int layer = System.Array.FindIndex(data.detailPrototypes, p => p.prototype != null && p.prototype.name == name);
+
+            int Grown(float atEdges, System.Func<Vector3, float> vergeRoom)
+            {
+                var plants = new[] { new TerrainGrowth.Plant(name, 6f, 0.85f, 0.5f, 0) { atEdges = atEdges } };
+                TerrainGrowth.Fill(terrain, fills, 3, null, plants, null, vergeRoom);
+                return Sum(data.GetDetailLayer(0, 0, data.detailWidth, data.detailHeight, layer), 0, data.detailWidth);
+            }
+
+            int plain = Grown(0f, null);
+            Assert.Greater(Grown(1f, point => 1f), plain, "at an edge it thickens");
+            Assert.AreEqual(plain, Grown(1f, point => 0f), "inside a trail it grows as if it didn't care for edges");
+        }
+        finally
+        {
+            Object.DestroyImmediate(holder);
+            Object.DestroyImmediate(data);
+        }
+    }
+
+    [Test]
+    public void WallCrags_StayOffSlopesCreaturesClimb()
+    {
+        float climbs = UnityEngine.AI.NavMesh.GetSettingsByID(0).agentSlope;
+        Assert.Greater(RaidMapGenerator.WallCragLeastSlope, climbs, "a crag has no collider: it must not stand where creatures walk");
+    }
+
+    [Test]
+    public void RiverWater_IsInsideTheRiversEdge_AndNowhereOnAMapWithoutOne()
+    {
+        var valley = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(ValleyRulesPath);
+        for (int seed = 1; seed <= 4; seed++)
+        {
+            RaidLayoutPlan plan = RaidLayoutPlanner.Plan(valley, 200f, seed);
+            RaidLayoutField field = RaidLayoutField.Build(plan, valley);
+            RaidLayoutRiver river = plan.Rivers[0];
+            int inside = 0;
+            foreach (Vector2 point in river.Line)
+            {
+                if (point.x < 10f || point.y < 10f || point.x > 190f || point.y > 190f) continue;
+                inside++;
+                Assert.IsTrue(field.InRiverWater(point), $"seed {seed}: on the river's line");
+            }
+
+            Assert.Greater(inside, 0, $"seed {seed}");
+            var far = new Vector2(100f, 100f);
+            if (!plan.InRiver(far, 6f))
+            {
+                Assert.IsFalse(field.InRiverWater(far), $"seed {seed}: dry ground away from it");
+            }
+        }
+
+        var woods = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(WoodsRulesPath);
+        RaidLayoutPlan woodsPlan = RaidLayoutPlanner.Plan(woods, 200f, 1);
+        Assume.That(woodsPlan.Rivers.Count, Is.EqualTo(0));
+        Assert.IsFalse(RaidLayoutField.Build(woodsPlan, woods).InRiverWater(new Vector2(100f, 100f)));
     }
 
     [Test]
@@ -332,12 +543,29 @@ public sealed class WorldLookGeneratorTests
         }
     }
 
-    private static int RocksOnOpenGround(float rocksInOpen)
+    // Rocks on open ground (no forest, trails or clearings), flat or on one even slope of the given degrees rising to the east.
+    private static int RocksOnOpenGround(float rocksInOpen, float slope = 0f)
     {
         RaidMapDefinition map = Object.Instantiate(WoodsMap);
-        var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, 30f, map.Size) };
+        float rise = Mathf.Tan(slope * Mathf.Deg2Rad) * map.Size;
+        var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, Mathf.Max(30f, rise), map.Size) };
         try
         {
+            if (rise > 0f)
+            {
+                int resolution = data.heightmapResolution;
+                var heights = new float[resolution, resolution];
+                for (int z = 0; z < resolution; z++)
+                {
+                    for (int x = 0; x < resolution; x++)
+                    {
+                        heights[z, x] = (float)x / (resolution - 1) * rise / data.size.y;
+                    }
+                }
+
+                data.SetHeights(0, 0, heights);
+            }
+
             var so = new SerializedObject(map);
             so.FindProperty("rocksInOpen").floatValue = rocksInOpen;
             so.ApplyModifiedPropertiesWithoutUndo();

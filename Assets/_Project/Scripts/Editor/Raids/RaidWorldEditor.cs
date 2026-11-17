@@ -603,7 +603,7 @@ internal static class RaidWorldEditor
         EditorGUILayout.PropertyField(map.FindProperty("pileChance"), new GUIContent("Piles", map.FindProperty("pileChance").tooltip));
         ContentUtility.EndPanel();
 
-        ContentUtility.BeginPanel("Pile stones", "The small stones a pile is made of, round a rock with room of 1 m or more (Rocks and logs › Piles). They don't block the way.");
+        ContentUtility.BeginPanel("Pile stones", "The small stones a pile is made of, round a rock with room of 1 m or more (Rocks and logs › Piles). One with a collider blocks the way and creatures path round it; one without is walked through.");
         DrawScatter(map.FindProperty("pileStones"), null, false, solid: false);
         ContentUtility.EndPanel();
 
@@ -611,7 +611,7 @@ internal static class RaidWorldEditor
         ContentUtility.BeginPanel("Stones by the water", "On the shallow beds of rivers and ponds, standing a little out of the water so foam rings them, and in clumps along the banks.");
         DrawScatter(shore.FindPropertyRelative("stones"), null, false);
         EditorGUILayout.Space(4f);
-        foreach (string field in new[] { "bedSpacing", "bedChance", "deepest", "proud", "bankSpacing", "bankReach", "bankChance", "clumpSize" })
+        foreach (string field in new[] { "bedSpacing", "bedChance", "deepest", "proud", "bankSpacing", "bankReach", "bankChance", "clumpSize", "bankWidest" })
         {
             EditorGUILayout.PropertyField(shore.FindPropertyRelative(field));
         }

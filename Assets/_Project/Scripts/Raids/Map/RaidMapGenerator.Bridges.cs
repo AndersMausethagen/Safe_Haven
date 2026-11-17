@@ -69,13 +69,16 @@ public static partial class RaidMapGenerator
                 new Vector3(origin.x + crossing.Position.x, deck - rule.bridgeDeck * scale, origin.z + crossing.Position.y),
                 Quaternion.LookRotation(new Vector3(crossing.Direction.x, 0f, crossing.Direction.y), Vector3.up));
             bridge.transform.localScale = Vector3.one * scale;
+            // Every bridge asks its toll, the head's too: since the Brukam left for his own bridge (2026-11-17) the head keeps only his
+            // old camp across it (The Toll's place), and its toll-taker pays him in turn.
+            if (rule.bridgeToll != null)
+            {
+                AskToll(bridge, rule.bridgeToll, plan, terrain, origin, crossing, half);
+            }
+
             if (crossing == head && rule.bossBridge != null)
             {
                 MakeBossBridge(bridge, rule.bossBridge, plan, rules, terrain, origin, crossing, half, rule.bridgeDeck * scale);
-            }
-            else if (rule.bridgeToll != null)
-            {
-                AskToll(bridge, rule.bridgeToll, plan, terrain, origin, crossing, half);
             }
         }
     }

@@ -274,9 +274,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceBridges(this, Layout, rules);
+            // On the still water, once the ground and the water are where they will stay (their meshes go with the ponds').
+            string lilyPads = RaidMapGenerator.PlaceLilyPads(this, Layout, rules, field, pondMeshes);
             // The water's heights, for the plants that grow by them (Dress), from the attempt that is kept.
             dressField = field;
-            times.Append($"ravines and water {step.ElapsedMilliseconds} ms, ");
+            times.Append($"ravines and water {step.ElapsedMilliseconds} ms ({lilyPads}), ");
             step.Restart();
             if (!definition.NoMoss && terrain.TryGetComponent(out TerrainMoss moss))
             {
@@ -430,8 +432,6 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             RaidLayoutPlan plan = Layout;
             RaidLayoutRules rules = generatedBy;
             Terrain ground = terrain;
-            // In a pond only the plants that stand in the shallows grow (TerrainGrowth.Fill), so the water is its own test.
-            around.InWater = point => plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
             wetness = point => plan.Wetness(new Vector2(point.x - origin.x, point.z - origin.z), rules.WetReach, rules.DampGround);
 
             // One height asked of the terrain per cell, shared by the fen's wetness and the plants' water bands, which ask of the same
@@ -449,6 +449,17 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
                 return height;
             }
+
+            // In water only the plants that stand in the shallows grow (TerrainGrowth.Fill), so the water is its own test: a pond, a
+            // river's bed inside its edge, and a fen's pools, wherever the ground lies under its one sheet (the height is the cell's,
+            // asked once and shared with the wetness and the water bands).
+            RaidLayoutField beds = dressField;
+            float fenSheet = rules.Fen.enabled ? fenLevel : float.NaN;
+            around.InWater = point =>
+            {
+                var spot = new Vector2(point.x - origin.x, point.z - origin.z);
+                return plan.InWater(spot) || (beds != null && beds.InRiverWater(spot)) || (!float.IsNaN(fenSheet) && HeightAt(point) < fenSheet);
+            };
 
             // A fen has no ponds to be wet from: its ground is wet by how little it stands over the water (the user: "wet soil").
             if (rules.Fen.enabled && !float.IsNaN(fenLevel))
@@ -536,7 +547,11 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
 
         var rocks = new List<Vector3>();
-        foreach (TreeInstance tree in data.treeInstances)
+        // The groups follow the prototypes only where Scatter laid them out from this definition, on a generated map: a painted arena's
+        // terrain has its own trees, and a definition borrowed for its plants (an arena using the Valley's map) would read its trunks
+        // as rocks.
+        TreeInstance[] trees = generatedBy != null ? data.treeInstances : System.Array.Empty<TreeInstance>();
+        foreach (TreeInstance tree in trees)
         {
             if (tree.prototypeIndex < radii.Length && radii[tree.prototypeIndex] >= 0f)
             {
@@ -586,7 +601,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             return;
         }
 
-        // Pile stones lie round a rock without cutting the navmesh (RaidMapSurface.Prisms).
+        // Only solid pile stones (with a collider) cut the navmesh (RaidMapSurface.Prisms).
         Mesh mesh = RaidMapSurface.TrunkMesh(terrain, holder.position, RaidMapSurface.Prisms(definition));
         trunks.sharedMesh = mesh;
         if (generatedTrunks != null)

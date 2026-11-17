@@ -55,8 +55,12 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private bool seeksLost;
     [Tooltip("Only while the forest is gathering to push on one of the Haven's lands (Territory). {0} in the briefing is the region.")]
     [SerializeField] private bool forestPushing;
+    [Tooltip("Only while this quest is under way (started, not yet done): a rumour that leads the quest on, such as the hollow it asks " +
+             "for. In co-op the host's quests decide, so friends hear the same rumours. Empty: whatever the quests.")]
+    [SerializeField] private QuestDefinition whileQuest;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    public QuestDefinition WhileQuest => whileQuest;
     public string Briefing => briefing;
     public bool SeeksLost => seeksLost;
     public bool ForestPushing => forestPushing;
@@ -80,10 +84,18 @@ public sealed class RaidRumourDefinition : ScriptableObject
     public ResidentDefinition Seeks => seeks;
     public ResidentDefinition AfterHome => afterHome;
 
-    /// <summary>Whether it can come up for this hour and this state of the game.</summary>
-    public bool CanComeUp(RaidTimeOfDay timeOfDay, IHavenView settlement, PlayerCrafting crafting)
+    /// <summary>
+    /// Whether it can come up for this hour and this state of the game. <paramref name="questsUnderWay"/> are the ids of the quests under
+    /// way (<see cref="RaidRumours.QuestsUnderWay"/>); null: none is, so a rumour that waits on a quest doesn't come up.
+    /// </summary>
+    public bool CanComeUp(RaidTimeOfDay timeOfDay, IHavenView settlement, PlayerCrafting crafting, IReadOnlyList<string> questsUnderWay = null)
     {
         if (site == null || weight <= 0f || settlement.SuccessfulExtractions < afterExtractions)
+        {
+            return false;
+        }
+
+        if (whileQuest != null && !RaidRumours.Contains(questsUnderWay, whileQuest.Id))
         {
             return false;
         }
@@ -134,9 +146,11 @@ public static class RaidRumours
     /// The rumours of a run: as many as the raid's Raid Rumours system asks for, plus what a resident's job adds. Empty for a
     /// raid without one. <paramref name="fromBuildings"/> is what the Haven's buildings add, counted at home
     /// (RaidSession.ExtraRumours); left out, it is counted from the buildings standing now, which only the Haven has.
+    /// <paramref name="questsUnderWay"/> are the ids of the quests under way that a rumour may wait on (RaidSession.QuestsUnderWay: the
+    /// host's, in co-op, so a friend's game picks the same); left out, this player's own, now.
     /// </summary>
     public static List<RaidRumourDefinition> For(RaidDefinition raid, int seed, IHavenView settlement, PlayerCrafting crafting, float rumourScale = 1f,
-        int? fromBuildings = null)
+        int? fromBuildings = null, IReadOnlyList<string> questsUnderWay = null)
     {
         var picked = new List<RaidRumourDefinition>();
         RaidRumoursSystem system = raid != null ? raid.GetSystem<RaidRumoursSystem>() : null;
@@ -146,11 +160,12 @@ public static class RaidRumours
         }
 
         RaidTimeOfDay hour = RaidTimeOfDay.For(raid, seed);
+        questsUnderWay ??= QuestsUnderWay(GameSession.Quests);
         var candidates = new List<RaidRumourDefinition>();
         var weights = new List<float>();
         foreach (RaidRumourDefinition rumour in system.Pool)
         {
-            if (rumour != null && rumour.CanComeUp(hour, settlement, crafting))
+            if (rumour != null && rumour.CanComeUp(hour, settlement, crafting, questsUnderWay))
             {
                 candidates.Add(rumour);
                 weights.Add(rumour.Weight);
@@ -183,6 +198,49 @@ public static class RaidRumours
         }
 
         return picked;
+    }
+
+    /// <summary>
+    /// The ids of the quests under way in <paramref name="quests"/> (started, not yet done or handed in), in id order so a co-op invite
+    /// carries the same list for the same quests. Empty without a log.
+    /// </summary>
+    public static List<string> QuestsUnderWay(QuestLog quests)
+    {
+        var ids = new List<string>();
+        if (quests == null)
+        {
+            return ids;
+        }
+
+        foreach (QuestLog.Entry entry in quests.Entries)
+        {
+            if (entry?.Quest != null && entry.Status == QuestStatus.Active)
+            {
+                ids.Add(entry.Quest.Id);
+            }
+        }
+
+        ids.Sort(StringComparer.Ordinal);
+        return ids;
+    }
+
+    /// <summary>True when <paramref name="ids"/> holds <paramref name="id"/>; false for none.</summary>
+    public static bool Contains(IReadOnlyList<string> ids, string id)
+    {
+        if (ids == null || string.IsNullOrEmpty(id))
+        {
+            return false;
+        }
+
+        for (int i = 0; i < ids.Count; i++)
+        {
+            if (string.Equals(ids[i], id, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

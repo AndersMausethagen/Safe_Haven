@@ -192,4 +192,10 @@ public sealed partial class RaidLayoutField
 
         return 1f - Mathf.Clamp01(Sample(riverEdge, point.x / plan.Size, point.y / plan.Size) / reach);
     }
+
+    /// <summary>
+    /// True inside a river's edge (metres from the map's corner), where its bed lies under its water (RiverCut): one sample of the stamped
+    /// edge, cheap enough to ask for every cell plants grow on. False on a map without rivers.
+    /// </summary>
+    public bool InRiverWater(Vector2 point) => riverEdge != null && Sample(riverEdge, point.x / plan.Size, point.y / plan.Size) < 0f;
 }

@@ -28,3 +28,5 @@ MonoBehaviour:
   untilBeaten: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
   urgent: 1
   seeksLost: 0
+  forestPushing: 0
+  whileQuest: {fileID: 11400000, guid: 5b96808e29f58414c97811c3ec9f1a0a, type: 2}

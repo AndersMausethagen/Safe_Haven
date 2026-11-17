@@ -232,7 +232,9 @@ public static class RaidLauncher
         float extra = ExtraSeconds(sparks) + (isLarge ? raid.LargeRaid.extraSeconds : 0f);
         float cut = ExtractionCut;
         int foretold = HavenReadiness.ForetoldEvents;
-        RaidSession session = Go(raid, modifiers, player, runSeed, difficulty, sparks, isLarge, extra, cut, foretold, CanGoAlong(companion) ? companion : null, 0f);
+        // The quests under way now decide the rumours that wait on one, here and, through the invite, in every friend's game.
+        RaidSession session = Go(raid, modifiers, player, runSeed, difficulty, sparks, isLarge, extra, cut, foretold, CanGoAlong(companion) ? companion : null, 0f,
+            RaidRumours.QuestsUnderWay(GameSession.Quests));
         if (session == null)
         {
             return false;
@@ -274,17 +276,21 @@ public static class RaidLauncher
 
         HavenReadiness.GiveRest(player);
         return Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
-            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed) != null;
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed, invite.questsUnderWay) != null;
     }
 
     /// <summary>The run a friend's invite describes, as <see cref="TryFollow"/> builds it (without going anywhere).</summary>
     public static RaidSession FromInvite(RaidInvite invite, RaidDefinition raid, ContentDatabase content, PlayerSnapshot loadout, string returnScene, float elapsed) =>
         Build(raid, invite.ModifiersFrom(content), loadout, returnScene, invite.seed, invite.DifficultyIn(raid), invite.sparks, invite.large && raid.CanBeLarge,
-            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed);
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed, invite.questsUnderWay);
 
-    /// <summary>Builds a run from everything that decides it. Pure apart from reading the content: launching and following both use it.</summary>
+    /// <summary>
+    /// Builds a run from everything that decides it. Pure apart from reading the content: launching and following both use it.
+    /// <paramref name="questsUnderWay"/> (RaidSession.QuestsUnderWay) is the launcher's quests, or the host's from an invite.
+    /// </summary>
     public static RaidSession Build(RaidDefinition raid, List<RaidModifierDefinition> modifiers, PlayerSnapshot loadout, string returnScene, int runSeed,
-        RaidDifficulty difficulty, int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed)
+        RaidDifficulty difficulty, int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed,
+        IReadOnlyList<string> questsUnderWay = null)
     {
         RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, extraSeconds, RaidTimeOfDay.For(raid, runSeed), difficulty, extractionCut);
         var session = new RaidSession(raid, modifiers, parameters, loadout, returnScene, sparks, runSeed, difficulty)
@@ -293,6 +299,7 @@ public static class RaidLauncher
             IsLarge = large,
             Foretold = RaidForecast.For(raid, runSeed, foretoldEvents),
             ExtraRumours = HavenReadiness.ExtraRumours,
+            QuestsUnderWay = questsUnderWay,
         };
         if (elapsed > 0f)
         {
@@ -304,7 +311,8 @@ public static class RaidLauncher
 
     // Saves, builds the run and loads its scene: the part a launch and a follow share.
     private static RaidSession Go(RaidDefinition raid, List<RaidModifierDefinition> modifiers, GameObject player, int runSeed, RaidDifficulty difficulty,
-        int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed)
+        int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed,
+        IReadOnlyList<string> questsUnderWay)
     {
         // Crafts under way give their materials back before the save and the kit copied for the raid (not when the scene unloads).
         if (player.TryGetComponent(out HandCraftQueue crafts))
@@ -340,7 +348,7 @@ public static class RaidLauncher
 
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
         RaidSession session = Build(raid, modifiers, loadout, SceneManager.GetActiveScene().name, runSeed, difficulty, sparks, large,
-            extraSeconds, extractionCut, foretoldEvents, companion, elapsed);
+            extraSeconds, extractionCut, foretoldEvents, companion, elapsed, questsUnderWay);
         session.GearScoreAtEntry = GearScore.Of(player);
 
         if (raid.LayoutRules != null)

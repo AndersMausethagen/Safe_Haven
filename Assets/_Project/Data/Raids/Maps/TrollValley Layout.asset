@@ -318,7 +318,7 @@ MonoBehaviour:
     bridgePrefab: {fileID: 4061861558866804609, guid: cc82a1c8f91775c418652e1e3beca694, type: 3}
     bridgeLength: 14
     bridgeDeck: 2
-    bossBridge: {fileID: 0}
+    bossBridge: {fileID: 11400000, guid: e39dcd9e03038d54d8c13db859e605d0, type: 2}
     bridgeToll: {fileID: 11400000, guid: 87c294e152a4f8f4381ce5a1a1de9bdd, type: 2}
     wallCrags: 3
     wallCragReach: 25

@@ -25,6 +25,11 @@ public sealed class RaidInvite
     public float totalSeconds;
     /// <summary>Seconds of the run already gone when this was sent (a friend joining while the host is out).</summary>
     public float elapsed;
+    /// <summary>
+    /// The ids of the host's quests under way (RaidSession.QuestsUnderWay): a rumour that waits on a quest goes by the host's, so a
+    /// friend's game picks the same rumours from the same seed.
+    /// </summary>
+    public List<string> questsUnderWay = new List<string>();
 
     public static RaidInvite Of(RaidSession session, float extraSeconds, float extractionCut, int foretoldEvents)
     {
@@ -39,6 +44,7 @@ public sealed class RaidInvite
             extractionCut = extractionCut,
             foretoldEvents = foretoldEvents,
             totalSeconds = session.TotalSeconds,
+            questsUnderWay = new List<string>(session.QuestsUnderWay ?? RaidRumours.QuestsUnderWay(GameSession.Quests)),
         };
         foreach (RaidModifierDefinition modifier in session.Modifiers)
         {

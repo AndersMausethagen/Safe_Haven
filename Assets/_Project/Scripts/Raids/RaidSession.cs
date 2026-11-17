@@ -29,6 +29,13 @@ public sealed class RaidSession
     /// <summary>The rumours the Haven's buildings add (a Watch Post's), counted at home: the raid's scene has none of them.</summary>
     public int ExtraRumours { get; set; }
 
+    /// <summary>
+    /// The ids of the quests under way when the run began, for the rumours that wait on one (RaidRumourDefinition.WhileQuest): the
+    /// launcher's own, or in co-op the host's, from its invite, so every game on the run picks the same rumours. Null (a run made
+    /// another way): this player's own, read when the rumours are picked.
+    /// </summary>
+    public IReadOnlyList<string> QuestsUnderWay { get; set; }
+
     /// <summary>How many bosses fell on this raid, for what those who went along remember.</summary>
     public int BossesBeaten { get; set; }
 

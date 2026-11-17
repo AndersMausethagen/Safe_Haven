@@ -15,7 +15,7 @@ MonoBehaviour:
   boss: {fileID: 11400000, guid: 9270117f6be16f544877dc59efdbc8e4, type: 2}
   arrivalLine: 'Beyond the mist: the Brukam''s bridge.'
   opensWhen:
-    quest: {fileID: 0}
+    quest: {fileID: 11400000, guid: 5e68f3e2a126b6442ad860bda020e064, type: 2}
     requirement: 0
   firstTier: 2
   rematchHours: 24

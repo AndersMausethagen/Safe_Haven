@@ -220,4 +220,8 @@ public sealed partial class RaidLayoutField
 
     /// <summary>The metres from (u, v) to the nearest trail or clearing: 0 or less is open ground.</summary>
     public float OpenDistance(float u, float v) => Sample(openDistance, u, v);
+
+    /// <summary>The metres from (u, v) to the edge of the nearest trail, spur, clearing or pocket, leaving ponds aside (which
+    /// <see cref="OpenDistance"/> counts as open): 0 or less is where the player walks.</summary>
+    public float WalkedDistance(float u, float v) => Mathf.Min(Sample(trailDistance, u, v), Sample(clearDistance, u, v));
 }

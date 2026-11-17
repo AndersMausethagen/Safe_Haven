@@ -108,7 +108,8 @@ public sealed class RaidValleyRule
     [Tooltip("How far up a wall its crags go, in metres from its foot across the map. Keep it short: rock far from where anyone walks " +
              "costs objects and shows only from above.")]
     [Min(1f)] public float wallCragReach = 25f;
-    [Tooltip("Only faces steeper than this (degrees) get a crag; the ledges between stay bare.")]
+    [Tooltip("Only faces steeper than this (degrees) get a crag; the ledges between stay bare. Never below 46°: crags have no " +
+             "colliders, so on a slope creatures can climb (45°) they would be walked through.")]
     [Range(10f, 80f)] public float wallCragSlope = 38f;
     [Tooltip("Chance that a crag's place also has a great block fallen at the wall's foot: solid, kept off trails, clearings and the river.")]
     [Range(0f, 1f)] public float wallBlocks = 0.1f;

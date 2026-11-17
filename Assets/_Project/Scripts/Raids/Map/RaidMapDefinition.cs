@@ -62,6 +62,10 @@ public sealed class RaidMapDefinition : ScriptableObject
         [Range(0f, 1f)] public float bankChance = 0.6f;
         [Tooltip("Metres across a clump of bank stones; the bank between clumps stays bare.")]
         [Min(1f)] public float clumpSize = 6f;
+        [Tooltip("The widest a bank stone without a capsule collider is made, in metres across: one is walked through, so a big one " +
+                 "(a lake stone) is shrunk to this. Stones with a capsule are solid and keep their size; bed stones stand in the water. " +
+                 "0: no limit.")]
+        [Min(0f)] public float bankWidest = 1.2f;
     }
 
     [Serializable]
@@ -165,8 +169,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float rocksInForest = 0.05f;
     [Tooltip("Chance of a rock in each spot of open ground (thin forest, off trails and clearings). 0: the open stays bare of them.")]
     [SerializeField, Range(0f, 1f)] private float rocksInOpen;
-    [Tooltip("Chance that a rock with room of 1 m or more becomes a pile: 2-5 Pile Stones round it and a plant at its foot. Pile " +
-             "stones cut no hole in the navmesh.")]
+    [Tooltip("Chance that a rock with room of 1 m or more becomes a pile: 2-5 Pile Stones round it and a plant at its foot. A pile " +
+             "stone with a collider is solid and cut out of the navmesh, so creatures path round it; one without is walked through.")]
     [SerializeField, Range(0f, 1f)] private float pileChance;
     [Tooltip("The small stones a pile is made of (Mossy Rock Small, Grey Rock, Pebbles), by weight, each at its own size (0.3-0.6 suits).")]
     [SerializeField] private List<Scatter> pileStones = new List<Scatter>();
@@ -174,6 +178,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     [Header("Water's edge")]
     [Tooltip("Stones on the shallow beds and along the banks of rivers and ponds, on a generated map.")]
     [SerializeField] private ShoreRule shore = new ShoreRule();
+    [Tooltip("Lily pads in clumps on ponds and a fen's pools, on a generated map (RaidLilyPads). Empty Pads: none.")]
+    [SerializeField] private RaidLilyPadRule lilyPads = new RaidLilyPadRule();
 
     [Header("Undergrowth")]
     [Tooltip("Saplings, shrubs and forest-floor clutter, placed after the trees in the gaps and edges their habitat favours.")]
@@ -261,6 +267,7 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float PileChance => pileChance;
     public IReadOnlyList<Scatter> PileStones => pileStones;
     public ShoreRule Shore => shore ?? (shore = new ShoreRule());
+    public RaidLilyPadRule LilyPads => lilyPads ?? (lilyPads = new RaidLilyPadRule());
     public IReadOnlyList<Scatter> Undergrowth => undergrowth;
     public float UndergrowthSpacing => undergrowthSpacing;
     public float UndergrowthChance => undergrowthChance;

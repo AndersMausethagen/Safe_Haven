@@ -176,6 +176,62 @@ public sealed class RaidReasonsTests
     }
 
     [Test]
+    public void ARumourThatWaitsOnAQuest_ComesUpOnlyWhileItIsUnderWay_AndByTheQuestsTheRunCarries()
+    {
+        var quest = ScriptableObject.CreateInstance<QuestDefinition>();
+        quest.name = "Test Breathing Hollow";
+        var other = ScriptableObject.CreateInstance<QuestDefinition>();
+        other.name = "Test Other Quest";
+        var site = ScriptableObject.CreateInstance<RaidEventDefinition>();
+        var rumour = ScriptableObject.CreateInstance<RaidRumourDefinition>();
+        var plain = ScriptableObject.CreateInstance<RaidRumourDefinition>();
+        var raid = ScriptableObject.CreateInstance<RaidDefinition>();
+        try
+        {
+            foreach (RaidRumourDefinition each in new[] { rumour, plain })
+            {
+                var so = new SerializedObject(each);
+                so.FindProperty("site").objectReferenceValue = site;
+                so.FindProperty("whileQuest").objectReferenceValue = each == rumour ? quest : null;
+                so.ApplyModifiedPropertiesWithoutUndo();
+            }
+
+            var settlement = new SettlementState();
+            var underWay = new List<string> { quest.Id };
+            Assert.IsTrue(plain.CanComeUp(null, settlement, null), "no quest asked for: as before");
+            Assert.IsFalse(rumour.CanComeUp(null, settlement, null), "no quest under way");
+            Assert.IsFalse(rumour.CanComeUp(null, settlement, null, new List<string> { other.Id }), "another quest under way");
+            Assert.IsTrue(rumour.CanComeUp(null, settlement, null, underWay));
+
+            // Under way is started and not yet done.
+            var log = new QuestLog();
+            Assert.IsEmpty(RaidRumours.QuestsUnderWay(log));
+            log.Restore(quest, QuestStatus.Active, new int[0]);
+            log.Restore(other, QuestStatus.Completed, new int[0]);
+            CollectionAssert.AreEqual(underWay, RaidRumours.QuestsUnderWay(log));
+
+            // The run's quests decide, not this player's: the host's list in a friend's game picks the same rumours from the same seed.
+            var system = new RaidRumoursSystem();
+            system.Configure(new[] { rumour, plain }, 2);
+            raid.EditorSystems.Add(system);
+            for (int seed = 1; seed <= 12; seed++)
+            {
+                List<RaidRumourDefinition> host = RaidRumours.For(raid, seed, settlement, null, 1f, 0, underWay);
+                CollectionAssert.Contains(host, rumour, $"seed {seed}");
+                CollectionAssert.AreEqual(host, RaidRumours.For(raid, seed, settlement, null, 1f, 0, new List<string>(underWay)), $"seed {seed}");
+                CollectionAssert.DoesNotContain(RaidRumours.For(raid, seed, settlement, null, 1f, 0, new List<string>()), rumour, $"seed {seed}");
+            }
+        }
+        finally
+        {
+            foreach (UnityEngine.Object made in new UnityEngine.Object[] { quest, other, site, rumour, plain, raid })
+            {
+                UnityEngine.Object.DestroyImmediate(made);
+            }
+        }
+    }
+
+    [Test]
     public void AMap_HasPlaceForEveryRumour_EvenWithATracker()
     {
         var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(Layout);

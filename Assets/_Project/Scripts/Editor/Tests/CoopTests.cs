@@ -441,7 +441,8 @@ public sealed class CoopTests
         }
 
         RaidDifficulty tier = raid.Difficulties[1];
-        RaidSession host = RaidLauncher.Build(raid, modifiers, null, "SafeHaven", 12345, tier, 2, false, 180f, 0.1f, 1, null, 0f);
+        RaidSession host = RaidLauncher.Build(raid, modifiers, null, "SafeHaven", 12345, tier, 2, false, 180f, 0.1f, 1, null, 0f,
+            new List<string> { "quest_a", "quest_b" });
         RaidInvite invite = WorldTransfer.Unpack<RaidInvite>(WorldTransfer.Pack(RaidInvite.Of(host, 180f, 0.1f, 1)));
         Assert.AreSame(raid, invite.FindRaid(new[] { raid }));
 
@@ -454,6 +455,7 @@ public sealed class CoopTests
         Assert.AreEqual(host.Parameters.LootMultiplier, follower.Parameters.LootMultiplier, 0.001f);
         CollectionAssert.AreEqual(host.Modifiers, follower.Modifiers);
         CollectionAssert.AreEqual(host.Foretold, follower.Foretold, "The same events are foretold, so the same ones happen.");
+        CollectionAssert.AreEqual(host.QuestsUnderWay, follower.QuestsUnderWay, "The host's quests decide the rumours that wait on one.");
         Assert.AreEqual(host.TotalSeconds - 90f, follower.TimeRemaining, 0.001f, "The follower's clock starts where the host's stands.");
     }
 

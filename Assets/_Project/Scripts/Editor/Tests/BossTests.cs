@@ -97,9 +97,12 @@ public sealed class BossTests
         Assert.IsFalse(Rumour.CanComeUp(null, settlement, null), "Not on a first raid");
         settlement.RecordExtraction();
         settlement.RecordExtraction();
-        Assert.IsTrue(Rumour.CanComeUp(null, settlement, null));
+        // It points the way only while The Breathing Hollow is under way (the quest audit, 2026-11-17).
+        var finding = new[] { "thebreathinghollow" };
+        Assert.IsFalse(Rumour.CanComeUp(null, settlement, null, new string[0]), "not before the find step");
+        Assert.IsTrue(Rumour.CanComeUp(null, settlement, null, finding));
         settlement.MarkBossDefeated(Boss.Id);
-        Assert.IsFalse(Rumour.CanComeUp(null, settlement, null), "It is dead");
+        Assert.IsFalse(Rumour.CanComeUp(null, settlement, null, finding), "It is dead");
     }
 
     [Test]
@@ -178,6 +181,6 @@ public sealed class BossTests
         string arena = System.IO.File.ReadAllText("Assets/_Project/Scenes/Raids/" + bridge.SceneName + ".unity");
         Assert.IsTrue(arena.Contains(AssetDatabase.AssetPathToGUID("Assets/_Project/Prefabs/Enemies/Brukam.prefab")), "the Brukam stands in his arena");
         var valley = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset");
-        Assert.IsNull(valley.Valley.bossBridge, "and no longer on a valley bridge");
+        Assert.IsTrue(valley.Valley.bossBridge == null || valley.Valley.bossBridge.Guards.Count == 0, "and no longer on a valley bridge");
     }
 }

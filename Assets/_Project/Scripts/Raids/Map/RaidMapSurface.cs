@@ -274,16 +274,32 @@ public static class RaidMapSurface
     }
 
     /// <summary>
-    /// Which of the map's prototypes get a trunk prism (<see cref="TrunkMesh"/>): all but the pile stones, which lie round a rock
-    /// without changing where creatures can walk.
+    /// Which of the map's prototypes get a trunk prism (<see cref="TrunkMesh"/>): all but the pile stones without a collider. A raid's
+    /// terrain has its tree colliders on, so a pile stone whose prefab has one (Mossy Rock Small's capsule) is solid to the player and
+    /// to creatures alike: without its prism the navmesh would lead creatures into it. One without a collider is walked through by
+    /// everyone and leaves the navmesh as it was.
     /// </summary>
     public static bool[] Prisms(RaidMapDefinition definition)
     {
         Group[] groups = PrototypeGroups(definition);
         var prisms = new bool[groups.Length];
+        int pile = 0;
         for (int i = 0; i < groups.Length; i++)
         {
-            prisms[i] = groups[i] != Group.PileStone;
+            if (groups[i] != Group.PileStone)
+            {
+                prisms[i] = true;
+                continue;
+            }
+
+            // The pile stones' prototypes are their list's entries with a prefab, in order (AddGroup).
+            while (pile < definition.PileStones.Count && definition.PileStones[pile]?.prefab == null)
+            {
+                pile++;
+            }
+
+            prisms[i] = pile < definition.PileStones.Count && definition.PileStones[pile].prefab.GetComponent<Collider>() != null;
+            pile++;
         }
 
         return prisms;
@@ -328,6 +344,7 @@ public static class RaidMapSurface
             && !Blocked(at, clearings, forTrees: false) && (inWater == null || !inWater(at));
 
         // A few small stones round a rock and a plant at its foot, so it reads as a pile rather than a prop set down on the grass.
+        // A stone keeps out of a trunk (and the pile's own rock) as everything else does; asking draws nothing from the stream.
         void AddPile(Vector2 centre, float standing)
         {
             int count = piles.Next(PileLeast, PileMost + 1);
@@ -335,7 +352,7 @@ public static class RaidMapSurface
             {
                 Vector2 at = centre + Around(piles, standing * 0.5f + Range(piles, 0.2f, 1.2f));
                 int pick = PickByWeight(pileStones, piles);
-                if (pick >= 0 && Free(at))
+                if (pick >= 0 && Free(at) && trunks.Fits(at, TrunkClearance))
                 {
                     placed.Add(MakeInstance(pileStones[pick].Prototype, at.x / size, at.y / size, pileStones[pick].Scatter.scale, piles));
                 }
@@ -391,7 +408,8 @@ public static class RaidMapSurface
         }
 
         // Rocks and logs: a coarser grid, most likely at the foot of cliffs, now and then in open forest and, where the map wants it, out
-        // in the open; which one by habitat. A big one may become a pile.
+        // in the open; which one by habitat. A big one may become a pile. Rocks in the open lie on gentle ground only: past the cliffs'
+        // band (38° and up) a rock set on the face hangs off it.
         foreach (Vector2 spot in Grid(definition.RockSpacing, size, random))
         {
             float u = spot.x / size, v = spot.y / size;
@@ -400,9 +418,10 @@ public static class RaidMapSurface
 
             float slope = data.GetSteepness(u, v);
             float forest = definition.Strength(RaidZoneRole.Forest, u, v);
-            float chance = slope > 16f && slope < 38f ? definition.RocksAtCliffs
+            float chance = slope > CliffRocksFrom && slope < CliffRocksTo ? definition.RocksAtCliffs
                 : forest > 0.3f ? definition.RocksInForest
-                : definition.RocksInOpen > 0f && definition.Strength(RaidZoneRole.Clearing, u, v) < OpenRocksBelowClearing ? definition.RocksInOpen
+                : definition.RocksInOpen > 0f && slope <= CliffRocksFrom && definition.Strength(RaidZoneRole.Clearing, u, v) < OpenRocksBelowClearing
+                    ? definition.RocksInOpen
                 : 0f;
             if (random.NextDouble() > chance) continue;
 
@@ -451,9 +470,14 @@ public static class RaidMapSurface
         var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Shore Stones"));
         Vector2 clumps = NoiseOffset(definition.ScatterSeed, "Shore Clumps");
         var tops = new float[stones.Length];
+        // Metres across at scale 1 of the stones with no capsule (walked through as terrain trees), for the banks' Bank Widest; 0 for the
+        // solid ones, which a navmesh prism and their collider keep everyone out of.
+        var hollow = new float[stones.Length];
         for (int i = 0; i < stones.Length; i++)
         {
-            tops[i] = PrefabTop(stones[i].Scatter.prefab);
+            Bounds bounds = PrefabBounds(stones[i].Scatter.prefab);
+            tops[i] = Mathf.Max(0f, bounds.max.y);
+            hollow[i] = stones[i].Scatter.prefab.GetComponent<CapsuleCollider>() == null ? Mathf.Max(bounds.size.x, bounds.size.z) : 0f;
         }
 
         bool Free(Vector2 at) => at.x >= 0f && at.y >= 0f && at.x < size && at.y < size
@@ -501,14 +525,28 @@ public static class RaidMapSurface
 
             int pick = PickByWeight(stones, random);
             if (pick < 0) return;
-            Add(spot, pick, MakeInstance(stones[pick].Prototype, spot.x / size, spot.y / size, stones[pick].Scatter.scale, random));
+            TreeInstance stone = MakeInstance(stones[pick].Prototype, spot.x / size, spot.y / size, stones[pick].Scatter.scale, random);
+            // A bank is walked along, and a stone without a collider is walked through: a big one (a lake stone shared with the Haven,
+            // which has no collider to give) is kept to Bank Widest across, so nobody wades through a boulder. Bed stones stand in the water.
+            if (rule.bankWidest > 0f && hollow[pick] * stone.widthScale > rule.bankWidest)
+            {
+                float shrink = rule.bankWidest / (hollow[pick] * stone.widthScale);
+                stone.widthScale *= shrink;
+                stone.heightScale *= shrink;
+            }
+
+            Add(spot, pick, stone);
         }
     }
 
-    // How high a prefab reaches above its pivot at scale 1, from its meshes' bounds (the first LOD only), as a terrain tree stands it.
-    private static float PrefabTop(GameObject prefab)
+    /// <summary>
+    /// A prefab's extent about its pivot at scale 1, from its meshes' bounds (the first LOD only), as a terrain tree stands it; empty at the
+    /// pivot when it has no mesh. How high a bed stone reaches and how wide a bank stone is (ShoreRule.bankWidest).
+    /// </summary>
+    public static Bounds PrefabBounds(GameObject prefab)
     {
-        float top = 0f;
+        var extent = new Bounds(Vector3.zero, Vector3.zero);
+        bool any = false;
         Matrix4x4 toRoot = prefab.transform.worldToLocalMatrix;
         foreach (MeshFilter filter in prefab.GetComponentsInChildren<MeshFilter>())
         {
@@ -522,11 +560,20 @@ public static class RaidMapSurface
             for (int corner = 0; corner < 8; corner++)
             {
                 var sign = new Vector3((corner & 1) == 0 ? -1f : 1f, (corner & 2) == 0 ? -1f : 1f, (corner & 4) == 0 ? -1f : 1f);
-                top = Mathf.Max(top, toPrefab.MultiplyPoint3x4(bounds.center + Vector3.Scale(bounds.extents, sign)).y);
+                Vector3 point = toPrefab.MultiplyPoint3x4(bounds.center + Vector3.Scale(bounds.extents, sign));
+                if (any)
+                {
+                    extent.Encapsulate(point);
+                }
+                else
+                {
+                    extent = new Bounds(point, Vector3.zero);
+                    any = true;
+                }
             }
         }
 
-        return top;
+        return extent;
     }
 
     // A kind by weight alone, for stones placed where a rock or the water puts them rather than by habitat; -1 when none has weight.
@@ -583,6 +630,9 @@ public static class RaidMapSurface
     private const float NoiseRange = 1000f;
     // Rocks in the open (B4) keep off clearings stronger than this; a rock with this much room or more may become a pile of 2-5 stones.
     private const float OpenRocksBelowClearing = 0.3f;
+    // The slopes (degrees) where rocks lie at the foot of cliffs; rocks in the open keep to ground no steeper than the band's start.
+    private const float CliffRocksFrom = 16f;
+    private const float CliffRocksTo = 38f;
     private const float PileFromRoom = 1f;
     private const int PileLeast = 2;
     private const int PileMost = 5;

@@ -35,6 +35,9 @@ public sealed class CoopWireTests
         // 2026-11-17 (boss review fixes): a friend's parry or crush wears the host's creature's poise (CreaturePoise); a creature's pose says
         // when its topple is a Topple After strike's (a flag in the hunting byte); a friend's world noises go by a reliable RPC.
         [29] = "4ba9741053cf4aa27bcdec5ea5674d39",
+        // 2026-11-17 (quest audit): a raid's invite carries the host's quests under way, for the rumours that wait on one (packed as JSON,
+        // so the fingerprint is the same).
+        [30] = "4ba9741053cf4aa27bcdec5ea5674d39",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

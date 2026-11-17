@@ -287,8 +287,22 @@ public static class TerrainGrowth
                             rocky = nearRocks != null ? Mathf.Clamp01(nearRocks(point)) : 0f;
                         }
 
+                        // Inside a trail every layer meets another too (leaves drifting over it, the middle of a narrow side path
+                        // once feathered), so the seam there is held back by the verge room, as the grassy verge is: the plants
+                        // crowd the trail's edges, not its leaf drifts. Beyond the trails the room is whole and nothing changes.
+                        float seamHere = 0f;
+                        if (plant.atEdges > 0f)
+                        {
+                            if (edge < 0f)
+                            {
+                                edge = vergeRoom != null ? Mathf.Clamp01(vergeRoom(point)) : 1f;
+                            }
+
+                            seamHere = seam * edge;
+                        }
+
                         float rocks = plant.nearRocks > 0f ? plant.nearRocks * rocky : 0f;
-                        love = Thickening(love, plant.atEdges * 4f * seam, rocks);
+                        love = Thickening(love, plant.atEdges * 4f * seamHere, rocks);
                     }
 
                     float threshold = plant.rarity - love * WetSpread;

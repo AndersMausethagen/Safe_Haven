@@ -1,0 +1,96 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: NobodyCrosses
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: nobodycrosses
+  displayName: Nobody Crosses
+  description: The camp at the valley's head is the Brukam's, and he has gone to his own bridge over the gorge beyond it, where the old road runs on to the Moss Marsh. The portal can reach it now. Nobody crosses without paying him, and nobody has ever paid enough. Bring him down.
+  chain: The Hearth and the Door
+  journalNotes: 'Brukam''s Bridge is in the portal''s list now. Beyond its mist there is no way out but through: come ready, fed, with tonics and draughts, and your gear mended. His club sweeps the whole width of the bridge, and the bridge itself will not hold forever. He has a clock: wait too long and he stops playing. If he beats you, you can try again.'
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 1090953ec0461964394a6ccdbe619504, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  closedBy: {fileID: 0}
+  startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
+  onStarted: []
+  objectivesInOrder: 0
+  objectives:
+  - type: 2
+    description: Bring down the Brukam on his bridge
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 11400000, guid: 8505946cc9dbaf24498bf366f32b8405, type: 2}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []
