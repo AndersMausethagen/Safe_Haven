@@ -750,11 +750,6 @@ MonoBehaviour:
       data:
         enabled: 1
         pool:
-        - {fileID: 11400000, guid: 6687458ccdb8cda4f99dd732ac5c7771, type: 2}
-        - {fileID: 11400000, guid: 708a254e7ee8ac44a8a1e638c8e5010f, type: 2}
-        - {fileID: 11400000, guid: 41e1053407fbbfc479b924896108ef07, type: 2}
-        - {fileID: 11400000, guid: b710b538657bbd54c840e6e609c651eb, type: 2}
-        - {fileID: 11400000, guid: 15373f05f33835345be5bf8ffae686a6, type: 2}
         - {fileID: 11400000, guid: 2c13833fea8c2864ba3482ca88853155, type: 2}
         - {fileID: 11400000, guid: a46ac6d53cb567a44a39eebbde9b2003, type: 2}
         - {fileID: 11400000, guid: 4db1a8b60e1233c41932d1e79c395c2a, type: 2}
@@ -764,7 +759,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 7142359f944d1c74c94de742af777d96, type: 2}
         - {fileID: 11400000, guid: 22c617519cf0b6d44a7d47dddda2e47b, type: 2}
         - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
-        - {fileID: 11400000, guid: 43dd06446f4342e4f8f840d218d23a32, type: 2}
         - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
         count: 2
     - rid: 2623125911485546601
