@@ -475,6 +475,23 @@ public sealed class RaidDirector : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Quitting the game from the pause menu mid-raid ends it as a fall (Docs/SystemDesignReview_2026-11-17.md K1): what is carried is
+    /// lost and the gear wears, as if the player had died, and the result is saved before the game goes. Quitting was cheaper than dying,
+    /// and undid a boss encounter's "all in". A crash never comes here: the raid's launch save puts the player back at the portal as they
+    /// set out (the grace for a real crash). Returns false when the raid has already ended.
+    /// </summary>
+    public bool Abandon()
+    {
+        if (!Session.End(RaidOutcome.Died))
+        {
+            return false;
+        }
+
+        Finish();
+        return true;
+    }
+
     private void Finish()
     {
         // Crafts under way give their materials back before the bag is copied for home, as at a launch: one finishing on the way

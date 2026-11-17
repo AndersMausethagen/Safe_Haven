@@ -95,7 +95,7 @@ public sealed class RaidPlan
         Sparks = 0;
         Companion = null;
         Large = false;
-        Seed = FreshSeed(Destination);
+        Seed = PinnedSeed(Destination);
         Large = LargeByDefault(Destination);
         Settle();
         layOutAhead(Destination, Seed, Large);
@@ -230,6 +230,32 @@ public sealed class RaidPlan
         }
 
         return RaidLauncher.TryLaunch(Destination, Player, picked, out problem, Sparks, Seed, Difficulty, Companion, Large);
+    }
+
+    // The briefing is pinned to the turn (Docs/SystemDesignReview_2026-11-17.md K2): reopening the planner showed a new seed each time,
+    // so the hour (night pays more), the rumours and the foretold events could be fished for. A destination keeps its seed until the
+    // territory's turn moves on (at a dawn or a raid's end).
+    private static readonly Dictionary<string, (int turn, int seed)> Pinned = new Dictionary<string, (int turn, int seed)>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetPinned() => Pinned.Clear();
+
+    private static int PinnedSeed(RaidDefinition raid)
+    {
+        if (raid == null)
+        {
+            return FreshSeed(null);
+        }
+
+        int turn = Territory.TurnNow;
+        if (Pinned.TryGetValue(raid.Id, out (int turn, int seed) pinned) && pinned.turn == turn)
+        {
+            return pinned.seed;
+        }
+
+        int seed = FreshSeed(raid);
+        Pinned[raid.Id] = (turn, seed);
+        return seed;
     }
 
     // A run unlike the last one: a different mood or shape, where the raid has more than one.

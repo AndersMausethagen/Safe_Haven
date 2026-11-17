@@ -473,12 +473,22 @@ public sealed class PauseMenu : MonoBehaviour
 
     private void AskQuit()
     {
-        Confirm(GameSession.ActiveRaid != null ? "Quit the game?\nThis raid ends here, and nothing from it comes home. You will be back at the portal as you set out."
+        Confirm(GameSession.ActiveRaid != null ? "Quit the game?\nYou leave this raid as if you had fallen: everything you carry is lost and your gear wears. You will wake at the portal."
             : "Quit the game?\nProgress since your last save will be lost.", "Main Menu", QuitToMainMenu, "Desktop", QuitToDesktop);
+    }
+
+    // A raid left by quitting ends as a fall, saved before the game goes (RaidDirector.Abandon).
+    private static void AbandonRaid()
+    {
+        if (GameSession.ActiveRaid != null && RaidDirector.Current != null)
+        {
+            RaidDirector.Current.Abandon();
+        }
     }
 
     private void QuitToMainMenu()
     {
+        AbandonRaid();
         // Straight to the menu: a guest's visit ends without the trip home (their journey is on disk as last saved).
         if (CoopSession.Current != null)
         {
@@ -493,6 +503,7 @@ public sealed class PauseMenu : MonoBehaviour
 
     private static void QuitToDesktop()
     {
+        AbandonRaid();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else

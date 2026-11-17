@@ -69,6 +69,8 @@ public sealed class HorseMotion : MonoBehaviour
 
     [Tooltip("Metres a second each gait's clip shows at the body's size, walk to sprint (measured from the clips' root motion by BuildHorses).")]
     [SerializeField] private float[] gaitSpeeds = { 1.42f, 3.35f, 5.18f, 7.83f, 10.94f };
+    [Tooltip("Metres creatures in a raid hear each hoofbeat at, walk to sprint: a walk about a sneaking step, a trot a run, a gallop a cart.")]
+    [SerializeField] private float[] hoofNoise = { 2.5f, 6f, 8f, 11f, 13f };
     [Tooltip("Degrees a second its turn on the spot shows (measured from the pack's H_Turn clips by BuildHorses).")]
     [SerializeField, Min(10f)] private float turnInPlaceRate = 84f;
 
@@ -1708,6 +1710,11 @@ public sealed class HorseMotion : MonoBehaviour
             {
                 nextHoof = HoofBeats[Mathf.Clamp(Gait - 1, 0, HoofBeats.Length - 1)];
                 AudioManager.Play(kind.HoovesOn(underfoot), transform.position);
+                // In a raid the creatures hear it too: a gallop carries as far as a cart (Docs/SystemDesignReview_2026-11-17.md K10).
+                if (RaidDirector.Current != null && hoofNoise.Length > 0)
+                {
+                    WorldNoise.Emit(transform.position, hoofNoise[Mathf.Clamp(Gait - 1, 0, hoofNoise.Length - 1)]);
+                }
             }
         }
 

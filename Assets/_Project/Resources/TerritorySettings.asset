@@ -99,7 +99,7 @@ MonoBehaviour:
     task: 0
     taskCount: 8
     tithe:
-    - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
       amount: 1
     - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
       amount: 1
@@ -143,7 +143,7 @@ MonoBehaviour:
     task: 0
     taskCount: 6
     tithe:
-    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+    - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
       amount: 1
     - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
       amount: 2

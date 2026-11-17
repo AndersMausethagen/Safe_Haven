@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
   id: fieldrepairkit
   displayName: Field Repair Kit
-  description: Rivets, thread and a little patience. Mends everything you are wearing by a third, out where it counts.
+  description: Rivets, thread and a little patience. Mends everything you are wearing by a third, wherever you are: cheaper than the smith after a raid that went wrong.
   category: 1
   tier: 3
   rarity: 0

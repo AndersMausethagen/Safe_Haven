@@ -667,4 +667,7 @@ public static class Territory
 
     /// <summary>Renown the Haven's lands bring (HavenRenown).</summary>
     public static int Renown => State.Renown(Settings);
+
+    /// <summary>The territory's turn (a dawn or a raid's end moves it on): what pins a raid's briefing (RaidPlan).</summary>
+    public static int TurnNow => State.Turn;
 }

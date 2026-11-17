@@ -600,7 +600,8 @@ public sealed class TerritoryTests
         {
             var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
             var system = raid.Systems.OfType<RaidRumoursSystem>().FirstOrDefault();
-            if (system != null)
+            // The forest's push is answered in the forest: the Valley and the Marsh are lands of their own (raid identity, 2026-11-17).
+            if (system != null && raid.Land == "forest")
             {
                 Assert.IsTrue(system.Pool.Contains(rumour), $"{raid.name}'s rumours can't answer the forest's push.");
             }
@@ -610,5 +611,19 @@ public sealed class TerritoryTests
             .Select(guid => AssetDatabase.LoadAssetAtPath<LootTable>(AssetDatabase.GUIDToAssetPath(guid)))
             .Any(table => table.Kind != LootTableKind.Creature && table.Drops.Entries.Any(entry => entry.Item == Settings.PactRune));
         Assert.IsTrue(inACache, "Supply caches can hold a Pact Rune (BuildTerritory; a cache builder run since may have dropped it).");
+    }
+
+    [Test]
+    public void NoTithe_GivesWhatOnlyARaidGives()
+    {
+        // Creature parts are raid-only (the user's loot answer; GDD §7.7): a region's tithe gives what grows or is made at home. The
+        // Wolfwood's Wolf Fang and the Fen's Bog Venom came every dawn (Docs/SystemDesignReview_2026-11-17.md K4).
+        foreach (TerritorySettings.RegionInfo region in Settings.Regions)
+        {
+            foreach (ItemAmount given in region.tithe)
+            {
+                Assert.IsFalse(given.Item != null && given.Item.RaidOnly, $"{region.region}'s tithe gives {given.Item?.name}, which only a raid gives");
+            }
+        }
     }
 }

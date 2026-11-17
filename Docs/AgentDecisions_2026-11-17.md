@@ -34,3 +34,28 @@ Each entry says what I did and why, and what to check.
 - **Creature bolts now pass through their own kin**, as the player's already passed through companions: the first Thornwaves all died
   on the Rootlings the Heartroot had just called, standing in the line of fire. This applies to every monster's shots (bog spit,
   troll stones, wisp bolts): a pack no longer shields the player from its own archers.
+
+## The system designer's review (Docs/SystemDesignReview_2026-11-17.md)
+
+### Done
+- **Quitting mid-raid now counts as a fall (K1).** From the pause menu (to the menu or the desktop) the raid ends as a death: what you
+  carry is lost and the gear wears (25% on an expedition, the encounter's 10% on a boss), saved before the game goes; the confirm
+  text says so. A **real crash** never reaches the menu, so it still puts you back at the portal as you set out: that's the grace.
+  Why: quitting was cheaper than dying and gave a free retry of an "all in" boss. *Check:* you may want the crash grace narrower.
+- **The briefing is pinned to the turn (K2).** A destination keeps its seed (hour, rumours, foretold events) until the territory's
+  turn moves on at a dawn or a raid's end, so reopening the planner no longer fishes for a night run or a relic rumour.
+- **No raid-only items in tithes (K4).** The Wolfwood now pays Rough Hide instead of a Wolf Fang, the Drowning Fen Cloudberries
+  instead of Bog Venom; a test keeps raid-only items out of every tithe.
+- **Horses make noise in raids (K10).** Each hoofbeat is heard by creatures: walk 2.5 m, trot 6, canter 8, gallop 11, sprint 13.
+- **The Field Repair Kit says what it does (K5, option a):** "mends everything you are wearing by a third, wherever you are: cheaper
+  than the smith after a raid that went wrong". Light wear in use (option b) is your call (Q4 below).
+- A territory test asked every raid's rumours to answer the forest's push; the Valley and Marsh never could. Scoped to forest raids.
+
+### Left for you (the review's questions; I didn't decide these because you've spoken on them before)
+- **Q2 one death price** (raids 25%, bosses 10%; it suggests 15% for both). You said "rules should stay consistent… we might lower the
+  global cost": your call.
+- **Q3 rematch wait in real or game hours.** You said "24 hours"; I kept real hours.
+- **Q4 light gear wear in use** (Valheim-like), Q5 **empowering carried forward** (reforge at 50%), Q6 **surplus comfort as rested
+  charges**, Q7 **an endgame ladder**: design changes I'd like your yes on. My leanings: Q4 no for now, Q5 yes, Q6 yes, Q7 after the
+  slice playtest.
+- K3 (the strength-limit test counting every meal/tonic slot) is a tuning job that may cut meal numbers: queued.
