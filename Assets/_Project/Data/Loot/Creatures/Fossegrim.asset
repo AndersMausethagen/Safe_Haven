@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Fossegrim
   kind: 0
-  notes: 
+  notes: Its fiddle's strings instead of the Rune Book.
   drops:
     entries:
-    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+    - item: {fileID: 11400000, guid: 5023814a107d1c54a9f8112067a132a0, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
-      maxQuantity: 1
-      probability: 0.15
+      maxQuantity: 2
+      probability: 0.6
       fromTier: 0
       toTier: 0
       fixedAmount: 0

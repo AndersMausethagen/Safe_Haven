@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Old Moss Troll
   kind: 0
-  notes: 
+  notes: 'Trollstone, and its tusk: the trophy that opens a great building tier.'
   drops:
     entries:
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
@@ -25,6 +25,14 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+    - item: {fileID: 11400000, guid: 6261219cf8a21464e85fb1f5dee1d79c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
     - item: {fileID: 0}
       resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
       minQuantity: 9

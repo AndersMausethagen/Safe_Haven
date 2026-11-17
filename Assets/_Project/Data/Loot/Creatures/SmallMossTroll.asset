@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Small Moss Troll
   kind: 0
-  notes: 
+  notes: 'Troll Moss instead of Grey Stone (the clearing is full of stone; it weighed 1.5). Moss isn''t raid-only: it is moss.'
   drops:
     entries:
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    - item: {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 2

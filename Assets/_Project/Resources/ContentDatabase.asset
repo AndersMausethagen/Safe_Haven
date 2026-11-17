@@ -237,6 +237,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8cd8323ae8f4a5f47bc8ea5a708abeb0, type: 2}
   - {fileID: 11400000, guid: 06321fa18cb018b4abc8432713f21aab, type: 2}
   - {fileID: 11400000, guid: 48a214c3d87e0434bb42be0e1a5bcc08, type: 2}
+  - {fileID: 11400000, guid: 0540766d3e030b04fa14088f02d2c425, type: 2}
+  - {fileID: 11400000, guid: 47784c8fa821e504d9388dda49fde2c1, type: 2}
+  - {fileID: 11400000, guid: a740a2c1da7fe61468d2d309b7b21fb0, type: 2}
+  - {fileID: 11400000, guid: 5023814a107d1c54a9f8112067a132a0, type: 2}
+  - {fileID: 11400000, guid: c64928309e5e1174ca29510d8cf2b8ee, type: 2}
+  - {fileID: 11400000, guid: 5ba06c1f22013654e91c4c7947b89f3a, type: 2}
+  - {fileID: 11400000, guid: be33534fe22e92d4da7e71d0c79c6e14, type: 2}
+  - {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
+  - {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+  - {fileID: 11400000, guid: b07b0deedefdd4e4b819b7506154af44, type: 2}
+  - {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+  - {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+  - {fileID: 11400000, guid: eb3d99f0c55775f478920e3c7839296b, type: 2}
+  - {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
+  - {fileID: 11400000, guid: 9faf976b90b38d34fad782fa94d8970b, type: 2}
+  - {fileID: 11400000, guid: 879892b28cd655c4eb0dc5e67595c810, type: 2}
+  - {fileID: 11400000, guid: 4a176d235661eac4ebcf34a19b09bdd7, type: 2}
+  - {fileID: 11400000, guid: 5321f43bf9cf2d34e8b68919356fb88a, type: 2}
+  - {fileID: 11400000, guid: c12e774389f1eb94faae0f0cecc3487d, type: 2}
+  - {fileID: 11400000, guid: 6e9e4593f2cc6c143a0c206f6c4b783a, type: 2}
+  - {fileID: 11400000, guid: 6261219cf8a21464e85fb1f5dee1d79c, type: 2}
+  - {fileID: 11400000, guid: 4c668e5dcc6885548b6d5f316e29c5bd, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:

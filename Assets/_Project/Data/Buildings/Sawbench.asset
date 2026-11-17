@@ -95,6 +95,10 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
       amount: 8
+    - item: {fileID: 11400000, guid: ae6c7de0d93c89244987a34cd2653eb1, type: 2}
+      amount: 8
+    - item: {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
+      amount: 2
     essence: []
     work: 9
     renown: 6
@@ -156,6 +160,8 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
       amount: 12
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      amount: 1
+    - item: {fileID: 11400000, guid: 5321f43bf9cf2d34e8b68919356fb88a, type: 2}
       amount: 1
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}

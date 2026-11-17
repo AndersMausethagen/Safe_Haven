@@ -198,6 +198,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 48eeb7ae63fd12b4b9c58ffa672f4e1a, type: 2}
   - {fileID: 11400000, guid: 3a2e3b67081e2154aada41f460ee7e47, type: 2}
   - {fileID: 11400000, guid: 953816f481864e54984b9205354a252e, type: 2}
+  - {fileID: 11400000, guid: caf15741d0827224bb3ccaeb4f9aaecf, type: 2}
   buildings:
   - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
   - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}

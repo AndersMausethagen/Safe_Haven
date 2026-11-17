@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee41ba8a03a253a4183234e4bd458371, type: 3}
   m_Name: TradeSettings
   m_EditorClassIdentifier: SafeHaven::TradeSettings
+  coinsPerValueFine: 0.1
+  coinsPerValueMasterwork: 0.25
   coin: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
   sales:
   - item: {fileID: 11400000, guid: 10111c97f83125f4180f05e30f25974d, type: 2}
@@ -78,3 +80,13 @@ MonoBehaviour:
     price: 35
     stock: 1
     smithyTier: 4
+  - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+    amount: 2
+    price: 4
+    stock: 2
+    smithyTier: 0
+  - item: {fileID: 11400000, guid: b07b0deedefdd4e4b819b7506154af44, type: 2}
+    amount: 1
+    price: 6
+    stock: 2
+    smithyTier: 2

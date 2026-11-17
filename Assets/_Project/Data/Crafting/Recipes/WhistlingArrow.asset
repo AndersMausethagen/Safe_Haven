@@ -23,7 +23,12 @@ MonoBehaviour:
     amount: 3
   - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
     amount: 1
+  - item: {fileID: 11400000, guid: 5ba06c1f22013654e91c4c7947b89f3a, type: 2}
+    amount: 1
   station: 0
   craftSeconds: 5
   knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 0

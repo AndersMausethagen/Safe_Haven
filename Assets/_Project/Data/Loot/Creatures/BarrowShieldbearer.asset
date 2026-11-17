@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Barrow Shieldbearer
   kind: 0
-  notes: 
+  notes: Grave iron and the goods it was buried with.
   drops:
     entries:
     - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
@@ -22,6 +22,14 @@ MonoBehaviour:
       minQuantity: 1
       maxQuantity: 2
       probability: 0.7
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 8e4b25b050fb23840a86f61b5a5b074c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.4
       fromTier: 0
       toTier: 0
       fixedAmount: 0

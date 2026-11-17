@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Seter Chest
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Seter Chest
+  kind: 1
+  notes: 'Troll Valley''s ruined summer farms: what the dairymaids left when the trolls came.'
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 9faf976b90b38d34fad782fa94d8970b, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.35
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.3
+      fromTier: 2
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.45
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.35
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: bb670a5310dbb494296de3c93180cebd, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.35
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.4
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

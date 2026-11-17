@@ -136,6 +136,8 @@ MonoBehaviour:
       amount: 4
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 1
+    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+      amount: 6
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
@@ -169,6 +171,8 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 3
+    - item: {fileID: 11400000, guid: 4c668e5dcc6885548b6d5f316e29c5bd, type: 2}
+      amount: 1
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 40

@@ -14,14 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Tusse
   kind: 0
-  notes: 
+  notes: Pennies and its trinkets instead of Grey Stone; it also drops whatever it stole (MonsterAI.Thief).
   drops:
     entries:
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
-      maxQuantity: 2
+      maxQuantity: 3
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 879892b28cd655c4eb0dc5e67595c810, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.3
       fromTier: 0
       toTier: 0
       fixedAmount: 0

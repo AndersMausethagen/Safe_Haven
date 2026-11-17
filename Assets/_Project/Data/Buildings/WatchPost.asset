@@ -35,9 +35,24 @@ MonoBehaviour:
     tier: 1
   requiredRank: 0
   modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5
@@ -71,8 +86,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Beacon
     description: A fire you can see from the woods. Now you can choose to go in harder, for more.
     cost:
@@ -80,6 +97,8 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       amount: 6
+    - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+      amount: 3
     essence: []
     work: 10
     renown: 6
@@ -101,8 +120,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes:

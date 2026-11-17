@@ -234,9 +234,9 @@ public static class LootOverview
         var creatures = new Dictionary<string, List<string>>();
         var caches = new Dictionary<string, List<string>>();
         var rows = new Dictionary<string, ItemDropTable>();
-        foreach (RaidSpawnList list in raid.SpawnLists)
+        void Take(IEnumerable<SpawnTable.Entry> entries)
         {
-            foreach (SpawnTable.Entry entry in list.entries)
+            foreach (SpawnTable.Entry entry in entries)
             {
                 if (entry.prefab == null || entry.weight <= 0f || !entry.AppearsAt(tier))
                 {
@@ -245,7 +245,7 @@ public static class LootOverview
 
                 foreach (LootOnDeath body in entry.prefab.GetComponentsInChildren<LootOnDeath>(true))
                 {
-                    if (list.category == SpawnCategory.Enemies || list.category == SpawnCategory.Escalation)
+                    if (body.GetComponentInParent<MonsterAI>(true) != null)
                     {
                         Add(creatures, rows, body.Table != null ? body.Table.DisplayName : body.name, body.Drops, entry.prefab.name);
                     }
@@ -255,6 +255,26 @@ public static class LootOverview
                 {
                     Add(caches, rows, cache.Table != null ? cache.Table.DisplayName : entry.prefab.name, cache.Drops, entry.prefab.name);
                 }
+            }
+        }
+
+        foreach (RaidSpawnList list in raid.SpawnLists)
+        {
+            Take(list.entries);
+        }
+
+        // Roaming creatures: the raid's own spawn tables. The scene's spawn groups are all bound to the lists above, so their own
+        // tables never spawn; what the scene places by hand (an apex) is added at every tier.
+        foreach (SpawnTable table in SpawnTablesOf(raid))
+        {
+            Take(table.Entries);
+        }
+
+        foreach (GameObject placed in PlacedIn(raid))
+        {
+            foreach (LootOnDeath body in placed.GetComponentsInChildren<LootOnDeath>(true))
+            {
+                Add(creatures, rows, (body.Table != null ? body.Table.DisplayName : body.name) + ", placed", body.Drops, placed.name);
             }
         }
 
@@ -276,6 +296,42 @@ public static class LootOverview
         ItemDropTable elites = raid.EliteLoot != null ? raid.EliteLoot.Drops : difficulty.eliteLoot;
         lines.Add($"Elites ({difficulty.eliteCount.x}-{difficulty.eliteCount.y} a run, relic {difficulty.eliteRelicChance:0%}): {Describe(elites, tier, difficulty)}");
         return lines;
+    }
+
+    // Spawn tables the raid asset points at (its roamers).
+    private static IEnumerable<SpawnTable> SpawnTablesOf(RaidDefinition raid)
+    {
+        var found = new HashSet<SpawnTable>();
+        SerializedProperty property = new SerializedObject(raid).GetIterator();
+        while (property.Next(true))
+        {
+            if (property.propertyType == SerializedPropertyType.ObjectReference && property.objectReferenceValue is SpawnTable table)
+            {
+                found.Add(table);
+            }
+        }
+
+        return found;
+    }
+
+    // Creature prefabs the raid scene places by hand (its scene's direct dependencies that are monsters).
+    private static IEnumerable<GameObject> PlacedIn(RaidDefinition raid)
+    {
+        string scene = AssetDatabase.FindAssets(raid.SceneName + " t:Scene").Select(AssetDatabase.GUIDToAssetPath)
+            .FirstOrDefault(path => Path.GetFileNameWithoutExtension(path) == raid.SceneName);
+        if (scene == null)
+        {
+            yield break;
+        }
+
+        foreach (string path in AssetDatabase.GetDependencies(scene, false))
+        {
+            if (path.EndsWith(".prefab") && AssetDatabase.LoadAssetAtPath<GameObject>(path) is GameObject prefab
+                && prefab.GetComponentInChildren<MonsterAI>(true) != null && prefab.GetComponentInChildren<LootOnDeath>(true) != null)
+            {
+                yield return prefab;
+            }
+        }
     }
 
     private static void Add(Dictionary<string, List<string>> into, Dictionary<string, ItemDropTable> rows, string name, ItemDropTable table, string from)

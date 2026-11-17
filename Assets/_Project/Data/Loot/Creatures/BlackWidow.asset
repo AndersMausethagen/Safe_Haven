@@ -14,14 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Black Widow
   kind: 0
-  notes: 
+  notes: Its own silk, keeping a little venom.
   drops:
     entries:
+    - item: {fileID: 11400000, guid: b07b0deedefdd4e4b819b7506154af44, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.6
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
     - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 1
-      probability: 0.7
+      probability: 0.5
       fromTier: 0
       toTier: 0
       fixedAmount: 0

@@ -38,6 +38,19 @@ MonoBehaviour:
   yardSide: 2
   placeInLines: 0
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 4
   outputCapacity: 10
   queueLength: 5
@@ -51,6 +64,10 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 12
+    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+      amount: 3
+    - item: {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+      amount: 4
     essence: []
     work: 8
     renown: 4
@@ -72,6 +89,7 @@ MonoBehaviour:
     extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Master's Shelf
     description: 'What the deep woods ask for: Radiant Draught, Ironbark and Frostward.'
     cost:
@@ -104,6 +122,7 @@ MonoBehaviour:
     extraTonicSlots: 1
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

@@ -14,9 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: The Heartroot
   kind: 0
-  notes: 
+  notes: 'The boss: its own heartwood (once a win) on top of a guardian''s drop, and a boss''s essence.'
   drops:
     entries:
+    - item: {fileID: 11400000, guid: 5321f43bf9cf2d34e8b68919356fb88a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
@@ -24,11 +32,11 @@ MonoBehaviour:
       probability: 1
       fromTier: 0
       toTier: 0
-      fixedAmount: 0
+      fixedAmount: 1
     - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
       resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 4
+      minQuantity: 3
+      maxQuantity: 5
       probability: 1
       fromTier: 0
       toTier: 0
@@ -43,8 +51,8 @@ MonoBehaviour:
       fixedAmount: 0
     - item: {fileID: 0}
       resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 3
-      maxQuantity: 4
+      minQuantity: 8
+      maxQuantity: 12
       probability: 1
       fromTier: 0
       toTier: 0

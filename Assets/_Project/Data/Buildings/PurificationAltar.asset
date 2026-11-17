@@ -36,6 +36,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5
@@ -70,6 +83,7 @@ MonoBehaviour:
     extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Radiant
     description: It hums softly at night, and hardly anything is wasted.
     cost:
@@ -77,6 +91,8 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       amount: 6
+    - item: {fileID: 11400000, guid: c64928309e5e1174ca29510d8cf2b8ee, type: 2}
+      amount: 2
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
@@ -100,6 +116,7 @@ MonoBehaviour:
     extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

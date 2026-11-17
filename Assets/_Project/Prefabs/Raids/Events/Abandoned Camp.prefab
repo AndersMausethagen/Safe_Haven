@@ -152,6 +152,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SupplyCache
       objectReference: {fileID: 0}
+    - target: {fileID: 5350632879990198593, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      propertyPath: table
+      value: 
+      objectReference: {fileID: 11400000, guid: 8cb7624c716e6d449ae8b0bdd09f6d29, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Moss Shaman
   kind: 0
-  notes: 
+  notes: Its staff's living wood instead of the Rune Book (still in barrow chests and packs).
   drops:
     entries:
-    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+    - item: {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 1
-      probability: 0.15
+      probability: 0.6
       fromTier: 0
       toTier: 0
       fixedAmount: 0

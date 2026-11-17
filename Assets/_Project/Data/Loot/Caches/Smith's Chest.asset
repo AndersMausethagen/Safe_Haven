@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Smith's Chest
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Smith's Chest
+  kind: 1
+  notes: Metal by tier, junk that breaks into metal, a smith's tools.
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.45
+      fromTier: 0
+      toTier: 2
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.4
+      fromTier: 2
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.2
+      fromTier: 3
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 0.4
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: eb3d99f0c55775f478920e3c7839296b, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.3
+      fromTier: 0
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 2
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: ab9557872793c7140880753d737120a3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 874fb5b96495c954cbd9144a4eba5231, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 0dfb05089b661eb458b2f970761e95b4, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+      fromTier: 3
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.4
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

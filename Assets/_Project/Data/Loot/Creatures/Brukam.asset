@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Brukam
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Brukam
+  kind: 0
+  notes: "Troll Valley's boss at the stone bridge (GDD \xA710.7): its tusk (the trophy), rare trollstone and what it took from travellers. Its Mountain Leap comes from its boss sigil, not from here."
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 4a176d235661eac4ebcf34a19b09bdd7, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 1
+      fromTier: 3
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+      fromTier: 2
+      toTier: 2
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.6
+      fromTier: 3
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 6
+      maxQuantity: 10
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 874fb5b96495c954cbd9144a4eba5231, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 14
+      maxQuantity: 18
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

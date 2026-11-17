@@ -25,6 +25,8 @@ MonoBehaviour:
     amount: 3
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 2
+  - item: {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
+    amount: 1
   station: 4
   craftSeconds: 20
   knownFromStart: 1

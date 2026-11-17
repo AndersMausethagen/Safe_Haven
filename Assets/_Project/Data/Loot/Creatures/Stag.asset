@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Stag
   kind: 0
-  notes: 
+  notes: Hides, bone and its antler.
   drops:
     entries:
     - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
@@ -38,6 +38,14 @@ MonoBehaviour:
       minQuantity: 2
       maxQuantity: 3
       probability: 0.9
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 47784c8fa821e504d9388dda49fde2c1, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.7
       fromTier: 0
       toTier: 0
       fixedAmount: 0

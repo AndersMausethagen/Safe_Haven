@@ -38,6 +38,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 1
   outputCapacity: 10
   queueLength: 5
@@ -71,8 +84,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Iron-Bound
     description: Iron straps, and every tool has its place on the wall.
     cost:
@@ -102,8 +117,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Master's
     description: 'Heartroot set in the bench: the work comes easier here.'
     cost:
@@ -135,8 +152,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Haven's Own
     description: The best-kept workshop this side of the portal.
     cost:
@@ -146,6 +165,8 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 2
+    - item: {fileID: 11400000, guid: 6261219cf8a21464e85fb1f5dee1d79c, type: 2}
+      amount: 1
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 30
@@ -168,8 +189,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

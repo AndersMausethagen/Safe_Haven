@@ -40,6 +40,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 10
   outputCapacity: 10
   queueLength: 5
@@ -55,6 +68,10 @@ MonoBehaviour:
       amount: 8
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       amount: 4
+    - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
+      amount: 2
     essence: []
     work: 8
     renown: 4
@@ -73,8 +90,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 1
     extraLight: 0
+    extensionSlots: 0
   - title: Smokehouse
     description: 'It keeps the flies off and the deer coming: Elderwood Longbows and more leather from thick hide.'
     cost:
@@ -84,6 +103,8 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
       amount: 4
+    - item: {fileID: 11400000, guid: 47784c8fa821e504d9388dda49fde2c1, type: 2}
+      amount: 2
     essence: []
     work: 10
     renown: 6
@@ -102,8 +123,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Moon Racks
     description: 'Moonsilver wire on the racks: Moonstrung Bows, and game wanders close.'
     cost:
@@ -133,8 +156,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 1
     extraLight: 0
+    extensionSlots: 0
   - title: Troll Hall
     description: 'Horn over the door, and nothing here is afraid any more: Trollhorn Bows.'
     cost:
@@ -142,6 +167,8 @@ MonoBehaviour:
       amount: 8
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 2
+    - item: {fileID: 11400000, guid: c12e774389f1eb94faae0f0cecc3487d, type: 2}
+      amount: 1
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20
@@ -164,8 +191,10 @@ MonoBehaviour:
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

@@ -57,7 +57,7 @@ MonoBehaviour:
     enemyHealth: 1.4
     enemyPower: 1.6
     enemyDensity: 1.15
-    loot: 1.1
+    loot: 1.25
     dropsUpToTier: 0
     briefing: Wolves pounce from a distance and bog things spit in volleys. Root Guardians wake, Moss Shamans call them on. Iron, deepstone and elderwood lie deeper in.
     eliteCount: {x: 1, y: 2}
@@ -73,7 +73,7 @@ MonoBehaviour:
     enemyHealth: 2.3
     enemyPower: 2.85
     enemyDensity: 1.3
-    loot: 1.2
+    loot: 1.5
     dropsUpToTier: 0
     briefing: 'The dead walk: Draugs among the trees. Boars trample, Guardians slam the ground and the great troll charges. Moonsilver can be found here.'
     eliteCount: {x: 2, y: 3}
@@ -89,7 +89,7 @@ MonoBehaviour:
     enemyHealth: 2.8
     enemyPower: 4.05
     enemyDensity: 1.45
-    loot: 1.35
+    loot: 1.8
     dropsUpToTier: 0
     briefing: The woods at their worst. Draugs rally with a war cry, Guardians call up roots and the great troll calls its kin. Its Trollstone is worth taking.
     eliteCount: {x: 3, y: 4}
@@ -244,6 +244,30 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 2
       toTier: 0
+    - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+      weight: 6
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+      weight: 8
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: 76a470aa63338604b9110596e079afc3, type: 3}
+      weight: 3
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
   - name: Resources
     category: 1
     pointGroups:
@@ -395,8 +419,38 @@ MonoBehaviour:
     stage: 1
     huntPlayer: 0
     entries:
-    - prefab: {fileID: 4812547136345430722, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
-      weight: 100
+    - prefab: {fileID: 7486414261448004947, guid: ce8035067680d9140b969163b4eb9784, type: 3}
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1952649773701618592, guid: eccbc85dd8312f441b939168579c56ec, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5968853061259378244, guid: 0f6e101d0c9b8694dba63fbf28daa212, type: 3}
+      weight: 15
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 1137623629352448773, guid: de4075a0b99e4ca41811c5b8719e9635, type: 3}
+      weight: 15
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 7564495384259122330, guid: ba396253cbe8e7c4eab5ed24aa047c05, type: 3}
+      weight: 12
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6835690799674848439, guid: 1e5c84011ee2c924eaa61231f5b9e552, type: 3}
+      weight: 8
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0

@@ -14,6 +14,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::LootTable
   displayName: Troll Valley finds
   kind: 2
-  notes: 'What only this raid holds: rolled with every cache searched here, on top of the cache''s own table.'
+  notes: 'The valley''s own: troll idols, moss, granite, the seters'' junk, trollstone at the top tier.'
   drops:
-    entries: []
+    entries:
+    - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.2
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: b35295da40fa97843a2ce4d780d32456, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 2
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 9faf976b90b38d34fad782fa94d8970b, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.04
+      fromTier: 4
+      toTier: 0
+      fixedAmount: 0

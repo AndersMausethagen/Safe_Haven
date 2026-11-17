@@ -120,6 +120,94 @@ public sealed class LootTableTests
         }
     }
 
+    [Test]
+    public void NoCreature_DropsGreyStoneOrARuneBook()
+    {
+        // The user's call on the loot research (Q4): the troll-folk's Grey Stone and the four creatures' Rune Book go; each has a part of its own.
+        foreach (MonsterDefinition monster in All<MonsterDefinition>("t:MonsterDefinition"))
+        {
+            foreach (ItemDropEntry entry in monster.Drops.Entries)
+            {
+                Assert.IsFalse(entry.Item != null && (entry.Item.name == "GreyStone" || entry.Item.name == "RuneBook"), $"{monster.name} drops {entry.DropName}");
+            }
+        }
+    }
+
+    [Test]
+    public void EveryRaid_HasCacheKindsOfItsOwn()
+    {
+        var kindsByRaid = new Dictionary<RaidDefinition, HashSet<LootTable>>();
+        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition"))
+        {
+            kindsByRaid[raid] = new HashSet<LootTable>(raid.SpawnLists
+                .SelectMany(list => list.entries)
+                .Where(entry => entry.prefab != null)
+                .SelectMany(entry => entry.prefab.GetComponentsInChildren<LootCache>(true))
+                .Select(cache => cache.Table)
+                .Where(table => table != null));
+            Assert.Greater(kindsByRaid[raid].Count, 2, $"{raid.name} places several kinds of cache");
+        }
+
+        foreach (KeyValuePair<RaidDefinition, HashSet<LootTable>> raid in kindsByRaid)
+        {
+            IEnumerable<LootTable> others = kindsByRaid.Where(other => other.Key != raid.Key).SelectMany(other => other.Value);
+            Assert.IsTrue(raid.Value.Except(others).Any() || raid.Key.RegionalLoot.Drops.Entries.Count > 0, $"{raid.Key.name} holds something no other raid does");
+            Assert.IsNotEmpty(raid.Key.RegionalLoot.Drops.Entries, $"{raid.Key.name}'s regional finds");
+        }
+    }
+
+    [Test]
+    public void HigherTiers_GiveMore()
+    {
+        foreach (RaidDefinition raid in All<RaidDefinition>("t:RaidDefinition"))
+        {
+            for (int i = 1; i < raid.Difficulties.Count; i++)
+            {
+                Assert.Greater(raid.Difficulties[i].loot, raid.Difficulties[i - 1].loot, $"{raid.name} tier {raid.Difficulties[i].tier} gives more than the tier below");
+            }
+        }
+    }
+
+    [Test]
+    public void Trophies_AlwaysDrop_OneAtATime_AndOpenAGreatTier()
+    {
+        string[] trophies = { "MossTrollTusk", "StoneTrollKnuckle", "JutulHeartstone", "HeartwoodOfTheFirstGuardian" };
+        var buildings = All<BuildingDefinition>("t:BuildingDefinition").ToList();
+        foreach (string name in trophies)
+        {
+            var trophy = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Trophies/{name}.asset");
+            Assert.IsNotNull(trophy, name);
+            Assert.AreEqual(ItemCategory.Valuable, trophy.Category, $"{name}: no tier cap keeps a trophy back");
+            ItemDropEntry row = All<LootTable>("t:LootTable", "Assets/_Project/Data/Loot/Creatures")
+                .SelectMany(table => table.Drops.Entries).FirstOrDefault(entry => entry.Item == trophy);
+            Assert.IsNotNull(row, $"{name} drops from its creature");
+            Assert.AreEqual(1f, row.Probability, name);
+            Assert.IsTrue(row.FixedAmount, $"{name}: one, at every tier");
+            bool opens = buildings.Any(building => new SerializedObject(building).FindProperty("upgrades") is SerializedProperty upgrades
+                && Enumerable.Range(0, upgrades.arraySize).Any(i => Uses(upgrades.GetArrayElementAtIndex(i).FindPropertyRelative("cost"), trophy)));
+            Assert.IsTrue(opens, $"{name} opens a building tier");
+        }
+    }
+
+    [Test]
+    public void NewParts_AreRaidOnly_WhereTheyComeFromCreatures()
+    {
+        foreach (string name in new[] { "ShamansBurl", "HagsKnot", "BogTrollHide", "FiddleString", "WidowSilk", "MistwingFeathers", "NykksMane" })
+        {
+            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Parts/{name}.asset").RaidOnly, name);
+        }
+
+        foreach (string name in new[] { "WolfFang", "BogVenom", "WispEmber", "GraveIron", "RootlingBark", "BoarTusk" })
+        {
+            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Materials/{name}.asset").RaidOnly, name);
+        }
+
+        Assert.IsFalse(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/RoughHide.asset").RaidOnly, "hides come from home's hunting too");
+    }
+
+    private static bool Uses(SerializedProperty cost, ItemDefinition item) =>
+        Enumerable.Range(0, cost.arraySize).Any(i => cost.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue == item);
+
     private static ItemDropEntry Row(int from, int to, bool fixedAmount = false, ItemDefinition item = null)
     {
         var entry = new ItemDropEntry();
