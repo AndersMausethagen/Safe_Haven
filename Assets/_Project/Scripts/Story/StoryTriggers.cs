@@ -236,6 +236,76 @@ public sealed class WhenObjectHit : StoryTrigger
     public override string FindProblem() => target == null ? "choose what is hit" : null;
 }
 
+/// <summary>
+/// A boss reaching a phase, or falling: a boss encounter's arena changing with the fight (Docs/BossEncounterResearch_2026-11-17.md
+/// §2.3: stones fall at 66%, the canopy closes at 33%), made in the story graph from Set Active, Move Object, Shake Camera and the like.
+/// Fires on a friend's copy of the host's boss too, since its phases follow the host's health.
+/// </summary>
+[Serializable]
+public sealed class WhenBoss : StoryTrigger
+{
+    public enum Moment
+    {
+        [Tooltip("When it enters the phase numbered below (1 is the first after the opening).")]
+        ReachesPhase = 0,
+        [Tooltip("When it falls.")]
+        Falls = 1,
+    }
+
+    [Tooltip("The boss in this scene.")]
+    public BossEncounter boss;
+    public Moment moment = Moment.ReachesPhase;
+    [Tooltip("Reaches Phase: the phase, 1 for the first of its Phases list.")]
+    [Min(1)] public int phase = 1;
+
+    public override string Title => "When Boss";
+
+    public override Action Listen(StoryScript script, Action fire)
+    {
+        if (boss == null)
+        {
+            return null;
+        }
+
+        BossEncounter watched = boss;
+        Action<BossEncounter, int> entered = (_, reached) =>
+        {
+            if (moment == Moment.ReachesPhase && reached == phase)
+            {
+                fire();
+            }
+        };
+        Action<BossEncounter> fell = _ =>
+        {
+            if (moment == Moment.Falls)
+            {
+                fire();
+            }
+        };
+        watched.PhaseEntered += entered;
+        watched.Fell += fell;
+        return () =>
+        {
+            if (watched != null)
+            {
+                watched.PhaseEntered -= entered;
+                watched.Fell -= fell;
+            }
+        };
+    }
+
+    public override string FindProblem()
+    {
+        if (boss == null)
+        {
+            return "choose the boss";
+        }
+
+        int phases = boss.Definition != null ? boss.Definition.Phases.Length : 0;
+        return moment == Moment.ReachesPhase && phase > phases ? $"its boss has {phases} phases, not {phase}" : null;
+    }
+}
+
 [Serializable]
 public sealed class WhenPlayerDoes : StoryTrigger
 {

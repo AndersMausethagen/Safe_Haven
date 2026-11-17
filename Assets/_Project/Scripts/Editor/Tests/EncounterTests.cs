@@ -167,6 +167,33 @@ public sealed class EncounterTests
         Assert.IsFalse(woods.IsEncounter);
     }
 
+    [Test]
+    public void ThePlanner_HidesAnEncounterUntilItsStoryOpensIt_AndOffersNoSparks()
+    {
+        BossEncounterDefinition encounter = Encounter();
+        RaidDefinition raid = Raid(encounter, 2);
+        RaidDefinition woods = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        Assert.AreEqual(2, RaidPlan.Shown(new[] { woods, raid }).Count, "open: shown");
+
+        QuestDefinition quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>(FirstQuestPath());
+        if (GameSession.Quests.StatusOf(quest) != QuestStatus.NotStarted)
+        {
+            Assert.Ignore("the first quest is already under way in a new game");
+        }
+
+        var so = new SerializedObject(encounter);
+        so.FindProperty("opensWhen.quest").objectReferenceValue = quest;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        IReadOnlyList<RaidDefinition> shown = RaidPlan.Shown(new[] { woods, raid });
+        Assert.AreEqual(Cheats.NoRequirements ? 2 : 1, shown.Count, "not yet opened by the story: hidden");
+    }
+
+    [Test]
+    public void WhenBoss_SaysWhatIsMissing()
+    {
+        StringAssert.Contains("boss", new WhenBoss().FindProblem());
+    }
+
     private static string FirstQuestPath()
     {
         foreach (string guid in AssetDatabase.FindAssets("t:QuestDefinition", new[] { "Assets/_Project/Data" }))

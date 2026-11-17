@@ -90,7 +90,9 @@ public sealed partial class RaidPreparationWindow
 
         y = DrawSize(raid, y);
         y = DrawCompanion(y);
-        bool any = modifierContent.sizeDelta.y > 0f;
+        // A boss encounter takes no runes (RaidLauncher drops them): none are offered.
+        bool runes = !raid.IsEncounter;
+        bool any = runes && modifierContent.sizeDelta.y > 0f;
         Stack(modifiersHeading, y, HeadingHeight);
         Stack(modifiersNote, y + 2f, 26f);
         y += HeadingHeight;
@@ -103,7 +105,7 @@ public sealed partial class RaidPreparationWindow
         }
         else
         {
-            noModifiers.text = EmptyBag;
+            noModifiers.text = runes ? EmptyBag : "A boss encounter takes no runes: there is no clock to stretch and no map to read. Come ready: eat, bring tonics and mend your gear.";
             Stack(noModifiers, y, Measure(noModifiers, ColumnWidth));
         }
     }

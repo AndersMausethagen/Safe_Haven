@@ -341,7 +341,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
         plan.Settle();
         string problem = plan.Problem();
         enterButton.interactable = problem == null;
-        enterLabel.text = closed ? "Locked" : "Enter Raid";
+        enterLabel.text = closed ? "Locked" : raid != null && raid.IsEncounter ? "Into the Mist" : "Enter Raid";
 
         titleLabel.text = raid != null ? raid.DisplayName : "The portal is dormant";
         ShowPlace(raid != null ? raid.PlaceArtwork : null);
@@ -394,7 +394,9 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
             RaidDefinition raid = plan.Destinations[i];
             bool shown = i == plan.DestinationIndex;
             tab.Rect.anchoredPosition = new Vector2(Width - Margin - (count - i) * width, tab.Rect.anchoredPosition.y);
-            tab.Label.text = raid.IsLocked ? $"{raid.DisplayName} <size=70%>locked</size>" : raid.DisplayName;
+            tab.Label.text = raid.IsLocked ? $"{raid.DisplayName} <size=70%>locked</size>"
+                : raid.IsEncounter && raid.Encounter.IsBeatenIn(GameSession.Here) ? $"{raid.DisplayName} <size=70%>beaten</size>"
+                : raid.DisplayName;
             tab.Label.color = shown ? style.AccentBright : raid.IsLocked ? style.Inactive : style.Text;
             tab.Label.fontStyle = shown ? FontStyles.Bold : FontStyles.Normal;
             tab.Mark.SetActive(shown);

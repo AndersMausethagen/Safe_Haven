@@ -56,8 +56,29 @@ public sealed class RaidPlan
     /// <summary>A locked place: it can be read about but not planned for (unless the cheat menu lifts requirements).</summary>
     public bool IsClosed => Destination != null && Destination.IsLocked && !Cheats.NoRequirements;
 
-    /// <summary>Portal Sparks can buy time on this run.</summary>
-    public bool SparksUsable => Destination != null && !IsClosed && SparksOffered;
+    /// <summary>Portal Sparks can buy time on this run (never in a boss encounter: it has no raid clock to extend).</summary>
+    public bool SparksUsable => Destination != null && !IsClosed && SparksOffered && !Destination.IsEncounter;
+
+    /// <summary>
+    /// The destinations the planner shows: a boss encounter only once the story has opened it (the research: "its tab is hidden
+    /// until it is open"), unless the cheat menu lifts requirements.
+    /// </summary>
+    public static IReadOnlyList<RaidDefinition> Shown(IReadOnlyList<RaidDefinition> all)
+    {
+        var shown = new List<RaidDefinition>();
+        foreach (RaidDefinition raid in all)
+        {
+            if (raid != null && (!raid.IsEncounter || !raid.IsLocked || Cheats.NoRequirements))
+            {
+                shown.Add(raid);
+            }
+        }
+
+        return shown;
+    }
+
+    /// <summary>True when the destination is a boss encounter whose boss has fallen here: rematches, at any of its tiers.</summary>
+    public bool IsRematch => Destination != null && Destination.IsEncounter && Destination.Encounter.IsBeatenIn(GameSession.Here);
 
     private static bool SparksOffered => SettlementSettings.Current.PortalSpark != null && SettlementSettings.Current.MaxSparksPerRaid > 0;
 
@@ -67,7 +88,7 @@ public sealed class RaidPlan
     {
         Portal = portal;
         Player = player;
-        destinations = portal != null ? portal.Destinations : System.Array.Empty<RaidDefinition>();
+        destinations = Shown(portal != null ? portal.Destinations : System.Array.Empty<RaidDefinition>());
         picked.Clear();
         destinationIndex = 0;
         Difficulty = null;
@@ -140,6 +161,12 @@ public sealed class RaidPlan
         if (raid != null && Difficulty == null)
         {
             Difficulty = raid.DifficultyFor(GearScore.Of(Player));
+        }
+
+        // A boss encounter's first fight is at its own tier, whatever is picked.
+        if (raid != null && raid.IsEncounter)
+        {
+            Difficulty = raid.Encounter.DifficultyFor(raid, IsRematch, Difficulty);
         }
 
         if (!SparksUsable)

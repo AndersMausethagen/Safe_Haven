@@ -164,6 +164,12 @@ public sealed class EncounterArena : MonoBehaviour, ISceneSetup
         }
 
         GameSession.Progress.MarkGateReached(director.Session.Definition.Id);
+        // Co-op: once the host is through, friends can no longer follow into the run.
+        if (CoopSession.Current != null && CoopSession.Current.Raids != null)
+        {
+            CoopSession.Current.Raids.CloseFollowing();
+        }
+
         director.Session.RecordEvent($"Stepped through the mist to {BossName}");
         CameraShake.Add(0.4f);
         GameMessages.Post("The mist closes behind you. There is no way back but through.", MessageKind.Warning);

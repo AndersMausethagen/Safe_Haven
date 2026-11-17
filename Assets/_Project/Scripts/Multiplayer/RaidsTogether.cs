@@ -10,7 +10,7 @@ using UnityEngine;
 /// <item>The host going through the portal sends visiting friends the run (<c>SafeHaven.RaidOpen</c>, a
 /// <see cref="RaidInvite"/>); a friend who joins later hears of it after the Haven (<see cref="TellOfRaidUnderWay"/>).
 /// The portal offers to follow while a minute or more is left (<see cref="RaidToFollow"/>, <see cref="FollowIntoRaid"/>);
-/// the run's end closes it (<c>RaidClosed</c>).</item>
+/// the run's end closes it (<c>RaidClosed</c>), and so does the host sealing a boss encounter's gate (<see cref="CloseFollowing"/>).</item>
 /// <item>Each player's raid ending is news for the others (<c>RaidNews</c>, passed on by the host): who got out, who fell.
 /// Getting out beside a friend, or within the minute after them, pays experience.</item>
 /// </list>
@@ -155,6 +155,20 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
         openRaid = WorldTransfer.Unpack<RaidInvite>(open.Packet);
         openRaidSince = Time.unscaledTime - Mathf.Max(0f, openRaid.elapsed);
         GameMessages.Post($"{HavenVisit.HostName} went through the portal. Use the portal to follow them.");
+    }
+
+    /// <summary>
+    /// The host has stepped through a boss encounter's gate (EncounterArena): friends can no longer follow (the research: "following
+    /// is offered until the gate seals"), and one who joins later isn't told of the run. Those already in it stay.
+    /// </summary>
+    public void CloseFollowing()
+    {
+        hostRaid = null;
+        if (link != null && link.IsHost)
+        {
+            using var writer = CoopLink.Writer(4);
+            link.ToGuests(ClosedMessage, writer);
+        }
     }
 
     // ---- How raids ended
