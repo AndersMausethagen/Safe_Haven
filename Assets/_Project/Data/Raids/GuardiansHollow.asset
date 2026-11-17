@@ -108,19 +108,19 @@ MonoBehaviour:
       entries: []
   eliteAffixes: []
   timesOfDay:
-  - name: Late Afternoon
-    hour: 16.5
+  - name: Midday
+    hour: 12.5
     chance: 100
     lootMultiplier: 1
     enemyDensity: 1
-    briefing: The sun is low and the mist lies thick in the hollows. Something under the roots is breathing.
-    skyCover: 0.6
+    briefing: The sun stands high, but the mist still lies thick in the hollows. Something under the roots is breathing.
+    skyCover: 0.4
   grade:
     curve: 1
-    exposure: -0.9
-    saturation: 1.2
-    contrast: 1.35
-    filter: {r: 0.8, g: 0.98, b: 1, a: 1}
+    exposure: -0.45
+    saturation: 1.15
+    contrast: 1.2
+    filter: {r: 0.92, g: 1, b: 0.95, a: 1}
   groundLight:
     enabled: 1
     relief: 0.4
