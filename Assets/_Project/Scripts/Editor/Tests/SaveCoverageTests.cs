@@ -28,6 +28,8 @@ public sealed class SaveCoverageTests
         // Only real perks and skills are kept on loading, and ranks to the deepest there is: a probe can't invent them.
         ["Progress.perks"] = "ProgressionTests, TechniqueTests (perks a save keeps)",
         ["Progress.skillRanks"] = "EssenceTests (skill ranks)",
+        // A dictionary of real times the probe can't fill.
+        ["Progress.encounterKills"] = "EncounterTests.GatesReachedAndKills_SurviveASave",
     };
 
     private readonly List<(string root, string path, Func<object, object>[] chain, Func<object, bool> holds)> probes =

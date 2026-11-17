@@ -136,12 +136,17 @@ public sealed class RaidHudView : MonoBehaviour
 
         canvas.enabled = true;
         RaidSession session = director.Session;
-        ShowTime(session.TimeRemaining, warningTime, criticalTime);
+        // A boss encounter shows its boss's enrage instead of the raid clock, and what to do instead of the way home until it falls.
+        EncounterArena arena = session.Definition.IsEncounter ? EncounterArena.Current : null;
+        if (arena != null)
+            ShowEncounterTime(arena);
+        else
+            ShowTime(session.TimeRemaining, warningTime, criticalTime);
         ShowRaidName();
         if (session.IsOver)
             timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
         ExtractionPoint target = null;
-        SetText(extractionLabel, session.IsOver ? "" : DescribeExtraction(out target));
+        SetText(extractionLabel, session.IsOver ? "" : arena != null && !arena.BossFallen ? DescribeEncounter(arena) : DescribeExtraction(out target));
         PointArrowAt(target);
         if (session.IsOver)
         {
@@ -299,6 +304,40 @@ public sealed class RaidHudView : MonoBehaviour
         {
             timerLabel.color = remaining <= warning ? warningColor : normalColor;
         }
+    }
+
+    // Nothing before the gate, the time to the enrage during the fight, and "ENRAGED" after it.
+    private void ShowEncounterTime(EncounterArena arena)
+    {
+        if (!arena.IsSealed || arena.BossFallen)
+        {
+            shownSecond = -1;
+            SetText(timerLabel, "");
+            return;
+        }
+
+        if (arena.IsEnraged)
+        {
+            shownSecond = -1;
+            SetText(timerLabel, "ENRAGED");
+            float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 8f);
+            timerLabel.color = Color.Lerp(criticalColor, Color.white, pulse * 0.35f);
+            return;
+        }
+
+        ShowTime(arena.EnrageIn, warningTime, criticalTime);
+    }
+
+    private static string DescribeEncounter(EncounterArena arena)
+    {
+        if (!arena.IsSealed)
+        {
+            return arena.Definition != null ? arena.Definition.ArrivalLine : $"Beyond the mist: {arena.BossName}.";
+        }
+
+        return arena.IsEnraged
+            ? $"<color={UIStyle.Current.DangerHex}>{arena.BossName} is enraged.</color> Bring it down."
+            : $"Bring down {arena.BossName}.";
     }
 
     private string DescribeExtraction(out ExtractionPoint nearest)

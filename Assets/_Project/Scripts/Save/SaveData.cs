@@ -228,6 +228,10 @@ public sealed class ProgressSaveData
     public List<AmountSaveData> creatures = new List<AmountSaveData>();
     /// <summary>The rest of the journal's record. Missing in older saves.</summary>
     public JournalSaveData journal = new JournalSaveData();
+    /// <summary>Boss encounters whose gate was reached, by raid id (later tries start at the rest stone). Missing in older saves.</summary>
+    public List<string> encounterGates = new List<string>();
+    /// <summary>When each boss encounter's boss was last brought down, by raid id (rematches wait). Missing in older saves.</summary>
+    public List<StampSaveData> encounterKills = new List<StampSaveData>();
 }
 
 [Serializable]
@@ -386,6 +390,14 @@ public sealed class AmountSaveData
 {
     public string id;
     public int amount;
+}
+
+/// <summary>A moment of real time for an id, as UTC ticks (DateTime.Ticks).</summary>
+[Serializable]
+public sealed class StampSaveData
+{
+    public string id;
+    public long utcTicks;
 }
 
 [Serializable]

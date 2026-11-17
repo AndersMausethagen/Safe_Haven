@@ -135,6 +135,52 @@ public sealed class CharacterProgress
         }
     }
 
+    private readonly HashSet<string> encounterGates = new HashSet<string>();
+    private readonly Dictionary<string, DateTime> encounterKills = new Dictionary<string, DateTime>();
+
+    /// <summary>Boss encounters (by raid id) whose gate this character has reached: later tries start at its rest stone.</summary>
+    public IEnumerable<string> EncounterGates => encounterGates;
+
+    /// <summary>When this character last brought down each boss encounter's boss (by raid id, UTC): rematches wait a day after.</summary>
+    public IReadOnlyDictionary<string, DateTime> EncounterKills => encounterKills;
+
+    public bool HasReachedGate(string raidId) => !string.IsNullOrEmpty(raidId) && encounterGates.Contains(raidId);
+
+    /// <summary>True the first time this character reaches the encounter's gate.</summary>
+    public bool MarkGateReached(string raidId) => !string.IsNullOrEmpty(raidId) && encounterGates.Add(raidId);
+
+    public DateTime? LastKill(string raidId) =>
+        !string.IsNullOrEmpty(raidId) && encounterKills.TryGetValue(raidId, out DateTime at) ? at : (DateTime?)null;
+
+    public void RecordKill(string raidId, DateTime utc)
+    {
+        if (!string.IsNullOrEmpty(raidId))
+        {
+            encounterKills[raidId] = utc;
+        }
+    }
+
+    public void RestoreEncounters(IEnumerable<string> gates, IEnumerable<KeyValuePair<string, DateTime>> kills)
+    {
+        encounterGates.Clear();
+        encounterKills.Clear();
+        if (gates != null)
+        {
+            encounterGates.UnionWith(gates);
+        }
+
+        if (kills != null)
+        {
+            foreach (KeyValuePair<string, DateTime> kill in kills)
+            {
+                if (!string.IsNullOrEmpty(kill.Key))
+                {
+                    encounterKills[kill.Key] = kill.Value;
+                }
+            }
+        }
+    }
+
     /// <summary>Counts up whenever the choice of perks changes, so what they teach is worked out again (Techniques).</summary>
     [field: NotSaved("a change counter for windows that redraw on it")]
     public int PerkVersion { get; private set; }

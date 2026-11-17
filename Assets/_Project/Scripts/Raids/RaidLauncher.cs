@@ -58,6 +58,13 @@ public static class RaidLauncher
             return $"{raid.DisplayName} can't be reached: its scene isn't in the build.";
         }
 
+        // A boss encounter's rematch waits a day after a kill (the user: "so the player can't spam it").
+        string rematch = CheckRematch(raid, DateTime.UtcNow);
+        if (rematch != null && !Cheats.NoRequirements)
+        {
+            return rematch;
+        }
+
         // The raid sends the player back here, so this scene has to be loadable too.
         if (!Application.CanStreamedLevelBeLoaded(SceneManager.GetActiveScene().name))
         {
@@ -65,6 +72,20 @@ public static class RaidLauncher
         }
 
         return null;
+    }
+
+    /// <summary>Why a boss encounter can't be fought again yet (its boss fell less than Rematch Hours ago), or null.</summary>
+    public static string CheckRematch(RaidDefinition raid, DateTime utcNow)
+    {
+        if (raid == null || !raid.IsEncounter)
+        {
+            return null;
+        }
+
+        TimeSpan wait = raid.Encounter.RematchWait(GameSession.Progress.LastKill(raid.Id), utcNow);
+        return wait > TimeSpan.Zero
+            ? $"{raid.Encounter.BossName} is gone to ground. It can be fought again in {BossEncounterDefinition.Describe(wait)}."
+            : null;
     }
 
     /// <summary>Why the player's gear keeps them out of a tier, or null when it doesn't.</summary>
@@ -145,6 +166,16 @@ public static class RaidLauncher
     {
         problem = CheckLaunch(raid);
         difficulty ??= raid != null ? raid.LowestDifficulty : null;
+        if (raid != null && raid.IsEncounter)
+        {
+            // A boss encounter: the first fight at its own tier, rematches at the chosen one; no Portal Sparks, large maps or raid
+            // modifiers (it has no clock to extend and no map to widen).
+            difficulty = raid.Encounter.DifficultyFor(raid, raid.Encounter.IsBeatenIn(GameSession.Here), difficulty);
+            sparks = 0;
+            large = false;
+            modifierItems = null;
+        }
+
         problem ??= CheckWard(difficulty);
         problem ??= CheckGear(difficulty, player);
         ItemInventory inventory = player != null ? player.GetComponent<ItemInventory>() : null;
@@ -282,13 +313,30 @@ public static class RaidLauncher
         }
 
         SaveGameService.SaveBeforeRaid(raid);
-        if (player.TryGetComponent(out PlayerTransport transport))
+        player.TryGetComponent(out PlayerTransport transport);
+        if (raid.IsEncounter)
         {
-            transport.LeaveForRaid();
-        }
+            // A boss encounter is walked into on foot: the horse and the cart wait at home.
+            if (player.TryGetComponent(out PlayerRiding riding) && riding.Riding != null)
+            {
+                riding.Dismount(thrown: false);
+            }
 
-        // The horse ridden (or one following) goes through too.
-        HorseTravel.LeaveForRaid(player);
+            if (transport != null && transport.Using != null && transport.Using.Driver != null)
+            {
+                transport.Using.Driver.LetGo();
+            }
+        }
+        else
+        {
+            if (transport != null)
+            {
+                transport.LeaveForRaid();
+            }
+
+            // The horse ridden (or one following) goes through too.
+            HorseTravel.LeaveForRaid(player);
+        }
 
         PlayerSnapshot loadout = PlayerSnapshot.Capture(player);
         RaidSession session = Build(raid, modifiers, loadout, SceneManager.GetActiveScene().name, runSeed, difficulty, sparks, large,

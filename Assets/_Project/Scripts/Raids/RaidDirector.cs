@@ -151,8 +151,9 @@ public sealed class RaidDirector : MonoBehaviour
 
         PlayerGathering.Swung += OnSwung;
         GameEvents.Raised += OnGameEvent;
-        // Thresholds the raid starts below (a short test raid) would all fire at once, so they are skipped.
-        foreach (float time in warningTimes)
+        // Thresholds the raid starts below (a short test raid) would all fire at once, so they are skipped. A boss encounter has no
+        // raid clock to warn of: its clock is the boss's enrage (EncounterArena), and its raid time only a hidden safety net.
+        foreach (float time in Session.Definition.IsEncounter ? Array.Empty<float>() : (IEnumerable<float>)warningTimes)
         {
             if (time > 0f && time < Session.TimeRemaining)
             {
@@ -184,6 +185,13 @@ public sealed class RaidDirector : MonoBehaviour
         running = true;
         Creatures.StrengthenAll(true);
         Companions.BringCompanion();
+        if (Session.Definition.IsEncounter)
+        {
+            // A boss encounter: no guards, tolls or elites; the boss waits beyond the gate (EncounterArena).
+            GameMessages.Post(Session.Definition.Encounter.ArrivalLine, MessageKind.Warning);
+            return;
+        }
+
         var pieceRandom = new System.Random(RaidLayout.SeedFor(Session.Seed, "Set Piece Guards"));
         // Following the host (co-op), their game brings the guards from the same seed.
         foreach (RaidSetPieceSite site in CreatureSource.Remote == null ? FindObjectsByType<RaidSetPieceSite>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidSetPieceSite>())
@@ -419,7 +427,9 @@ public sealed class RaidDirector : MonoBehaviour
         // A failed raid keeps knowledge, the safe pocket and the deployed equipment, worn down (GDD §8.3).
         // An extraction reports what wore on the way (glancing blows chip the axe), so worn gear is seen before it breaks.
         var wear = new List<EquipmentWear>();
-        PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, DurabilitySettings.Current.LossOnFailedRaid, wear);
+        // A boss encounter's failure wears the gear by its own share (the user: 10%), an expedition's by the global one.
+        float loss = Session.Definition.IsEncounter ? Session.Definition.Encounter.WearOnFailure : DurabilitySettings.Current.LossOnFailedRaid;
+        PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, loss, wear);
         if (extracted && final != null)
         {
             wear.AddRange(final.WornSince(Session.Loadout));
@@ -444,10 +454,7 @@ public sealed class RaidDirector : MonoBehaviour
         GameSession.SetArrivalPoint(extracted ? PlayerArrivalPoint.Portal : PlayerArrivalPoint.HomePortal);
 
         StopPlayer();
-        GameMessages.Post(extracted
-                ? "Extracted! Heading back with everything you carry."
-                : "The raid is lost. You'll wake at the portal with your gear, but everything else you carried is gone.",
-            extracted ? MessageKind.Gain : MessageKind.Warning);
+        GameMessages.Post(EndLine(extracted), extracted ? MessageKind.Gain : MessageKind.Warning);
         // Started before listeners run, so a faulty one can't leave the player stranded in the raid.
         StartCoroutine(ReturnAfterDelay());
         try
@@ -467,6 +474,25 @@ public sealed class RaidDirector : MonoBehaviour
         // the raids done (quests that count them, their rewards kept waiting for home), the one rescued made a resident, the
         // homecoming (held quests opened), the journal's record. Saved before those, a crash lost them.
         SaveGameService.SaveAtRaidEnd(keeps);
+    }
+
+    private string EndLine(bool extracted)
+    {
+        if (!Session.Definition.IsEncounter)
+        {
+            return extracted
+                ? "Extracted! Heading back with everything you carry."
+                : "The raid is lost. You'll wake at the portal with your gear, but everything else you carried is gone.";
+        }
+
+        EncounterArena arena = EncounterArena.Current;
+        string boss = Session.Definition.Encounter.BossName;
+        if (extracted)
+        {
+            return arena != null && arena.BossFallen ? $"{boss} has fallen. Heading home with everything you carry." : "You turn back before the mist. Heading home.";
+        }
+
+        return $"You fell beyond the mist. You'll wake at the portal with your gear, worn {Mathf.RoundToInt(Session.Definition.Encounter.WearOnFailure * 100f)}%, but everything else you carried is gone.";
     }
 
     // The raid is decided; the player only watches the outcome until the scene changes.

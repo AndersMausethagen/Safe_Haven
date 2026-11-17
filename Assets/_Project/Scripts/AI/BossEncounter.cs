@@ -14,10 +14,48 @@ public sealed class BossEncounter : MonoBehaviour
     private BossBar bar;
     private SceneAudio scene;
     private bool playingMusic;
+    private bool held;
+    // The hold's own invulnerability source: the wake adds and removes one of its own (this).
+    private readonly object holdToken = new object();
     private static readonly int RoarState = Animator.StringToHash("Roar");
 
     public BossDefinition Definition => definition;
     public int Phase => phase;
+
+    /// <summary>True from its waking until it falls: the bar is up and the fight is on.</summary>
+    public bool IsAwake { get; private set; }
+
+    /// <summary>Raised as it enters each phase (1 is the first after the opening), on the host and on a friend's copy alike.</summary>
+    public event System.Action<BossEncounter, int> PhaseEntered;
+
+    /// <summary>Raised once when it falls.</summary>
+    public event System.Action<BossEncounter> Fell;
+
+    /// <summary>
+    /// Keeps it asleep where it stands (no bar, music or waking; untouchable and still) until <see cref="WakeNow"/>: a boss
+    /// encounter's boss waits beyond its gate (EncounterArena). Call before its Start. A friend's copy follows the host's instead.
+    /// </summary>
+    public void Hold() => held = true;
+
+    /// <summary>Ends <see cref="Hold"/>: it wakes now (its bar, music and wake as usual).</summary>
+    public void WakeNow() => held = false;
+
+    /// <summary>Its rage: it hits harder by a share (0.5 = +50%), added to what its phases give. Each call adds more.</summary>
+    public void Enrage(float damage)
+    {
+        if (damage <= 0f || health == null || !health.IsAlive)
+        {
+            return;
+        }
+
+        if (TryGetComponent(out Combatant combatant))
+        {
+            combatant.Stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, damage, this));
+        }
+
+        CameraShake.Add(0.5f);
+        CreatureLook.SetEyes(gameObject, new Color(2.5f, 0.35f, 0.1f));
+    }
 
     private void Awake()
     {
@@ -43,8 +81,33 @@ public sealed class BossEncounter : MonoBehaviour
     {
         if (definition != null)
         {
-            StartCoroutine(definition.WakeRange > 0f && (ai == null || !ai.IsRemote) ? Dormant() : Begin());
+            bool remote = ai != null && ai.IsRemote;
+            StartCoroutine(held && !remote ? Held() : definition.WakeRange > 0f && !remote ? Dormant() : Begin());
         }
+    }
+
+    // Beyond a boss encounter's gate: still and untouchable until the gate seals (EncounterArena calls WakeNow).
+    private System.Collections.IEnumerator Held()
+    {
+        health.AddInvulnerability(holdToken);
+        bool aiWasOn = ai != null && ai.enabled;
+        if (ai != null)
+        {
+            ai.enabled = false;
+        }
+
+        while (held)
+        {
+            yield return null;
+        }
+
+        health.RemoveInvulnerability(holdToken);
+        if (ai != null)
+        {
+            ai.enabled = aiWasOn;
+        }
+
+        yield return Begin();
     }
 
     // Placed on the map from the start (the Brukam on its bridge, review 2026-11-17): it sits where it is until someone comes within
@@ -81,6 +144,7 @@ public sealed class BossEncounter : MonoBehaviour
 
     private System.Collections.IEnumerator Begin()
     {
+        IsAwake = true;
         bar = BossBar.Show(definition);
         bar.Set(health.HealthFraction);
         yield return Wake();
@@ -100,6 +164,11 @@ public sealed class BossEncounter : MonoBehaviour
         // and replaying it here froze the copy (its AI off, so its poses stopped) and made it untouchable for the wake's length.
         if (definition.WakeSeconds <= 0f || (ai != null && ai.IsRemote))
         {
+            if (ai != null && !ai.IsRemote && Player.Current != null)
+            {
+                ai.Engage(Player.Current.Health);
+            }
+
             yield break;
         }
 
@@ -170,6 +239,7 @@ public sealed class BossEncounter : MonoBehaviour
             Enter(definition.Phases[phase]);
             phase++;
             ai.SetPhase(phase);
+            PhaseEntered?.Invoke(this, phase);
         }
     }
 
@@ -203,6 +273,8 @@ public sealed class BossEncounter : MonoBehaviour
     {
         HideBar();
         StopMusic();
+        IsAwake = false;
+        Fell?.Invoke(this);
         if (GameSession.ActiveRaid != null)
         {
             GameSession.ActiveRaid.BossesBeaten++;
@@ -210,7 +282,10 @@ public sealed class BossEncounter : MonoBehaviour
 
         // The boss falls in this player's own Haven's story, on a friend's raid too (co-op): their first win there is what counts. The
         // host's game marks its own boss.
-        bool first = definition != null && GameSession.Home.MarkBossDefeated(definition.Id);
+        // A friend helping on the host's boss encounter whose own story hasn't reached it takes the drops only (the user, 2026-11-17:
+        // "only get the drop, but it helps their quest as well if he is also on it"): their quests count the kill as any other.
+        bool counts = ai == null || !ai.IsRemote || StoryReached();
+        bool first = counts && definition != null && GameSession.Home.MarkBossDefeated(definition.Id);
 
         if (!first)
         {
@@ -227,6 +302,13 @@ public sealed class BossEncounter : MonoBehaviour
         {
             skills.Learn(definition.RewardSkill);
         }
+    }
+
+    // On a boss encounter: whether this player's own story has opened it. Elsewhere (a boss met on an expedition): always.
+    private static bool StoryReached()
+    {
+        BossEncounterDefinition encounter = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.Encounter : null;
+        return encounter == null || encounter.IsOpenBy(GameSession.Quests);
     }
 
     private void HideBar()

@@ -714,6 +714,12 @@ public static class SaveMapper
 
         into.techniquesSeen.AddRange(progress.TechniquesSeen);
         into.raidsVisited.AddRange(progress.RaidsVisited);
+        into.encounterGates.AddRange(progress.EncounterGates);
+        foreach (KeyValuePair<string, DateTime> kill in progress.EncounterKills)
+        {
+            into.encounterKills.Add(new StampSaveData { id = kill.Key, utcTicks = kill.Value.Ticks });
+        }
+
         into.attunedRunes.AddRange(progress.AttunedRunes);
         into.enchantments.AddRange(progress.LearnedEnchantments);
         into.enchantmentsLearned = true;
@@ -794,6 +800,19 @@ public static class SaveMapper
         progress.RestorePlainRuns(runs);
         progress.RestoreTechniquesSeen(saved.techniquesSeen);
         progress.RestoreRaidsVisited(saved.raidsVisited);
+        var kills = new List<KeyValuePair<string, DateTime>>();
+        if (saved.encounterKills != null)
+        {
+            foreach (StampSaveData kill in saved.encounterKills)
+            {
+                if (kill != null && kill.utcTicks > 0 && kill.utcTicks <= DateTime.MaxValue.Ticks)
+                {
+                    kills.Add(new KeyValuePair<string, DateTime>(kill.id, new DateTime(kill.utcTicks, DateTimeKind.Utc)));
+                }
+            }
+        }
+
+        progress.RestoreEncounters(saved.encounterGates, kills);
         progress.RestoreAttunedRunes(saved.attunedRunes);
         progress.RestoreEnchantments(saved.enchantments);
         if (!saved.enchantmentsLearned)

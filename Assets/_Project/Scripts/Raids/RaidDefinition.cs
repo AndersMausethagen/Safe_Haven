@@ -45,6 +45,9 @@ public sealed class RaidDefinition : ScriptableObject
     [SerializeField] private RaidSizeOption largeRaid = new RaidSizeOption();
     [Tooltip("Why a locked destination can't be entered, shown in the planner.")]
     [SerializeField, TextArea] private string lockedText = "The way there is not yet open.";
+    [Tooltip("Set: this raid is a boss encounter, one boss in a small hand-built arena beyond a gate of mist, with no way out but " +
+             "winning or dying (Docs/BossEncounterResearch_2026-11-17.md). Empty: an expedition.")]
+    [SerializeField] private BossEncounterDefinition encounter;
 
     [Header("Briefing (GDD §7.5)")]
     [Tooltip("Enemies the player is told about before entering.")]
@@ -174,7 +177,11 @@ public sealed class RaidDefinition : ScriptableObject
     public string Description => description;
     public int Tier => tier;
     public string SceneName => sceneName;
-    public bool IsLocked => locked && (unlockedBy == null || !GameSession.Here.IsBossDefeated(unlockedBy.Id));
+    public bool IsLocked => (locked && (unlockedBy == null || !GameSession.Here.IsBossDefeated(unlockedBy.Id)))
+                            || (encounter != null && !encounter.IsOpenBy(GameSession.Quests));
+    /// <summary>The boss encounter this raid is, or null for an expedition.</summary>
+    public BossEncounterDefinition Encounter => encounter;
+    public bool IsEncounter => encounter != null;
     public string LockedText => lockedText;
     public RaidSizeOption LargeRaid => largeRaid;
     public bool CanBeLarge => layoutRules != null && largeRaid != null && largeRaid.widthScale > 1f;

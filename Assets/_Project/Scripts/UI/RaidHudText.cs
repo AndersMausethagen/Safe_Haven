@@ -24,7 +24,8 @@ public static class RaidHudText
     /// <summary>An exit on the world map, where there is room for all of it.</summary>
     public static string MapLabel(string exit, ExtractionStatus status, float secondsUntilChange, string cost)
     {
-        string state = status == ExtractionStatus.NotYetOpen ? $", opens in {RaidStats.FormatTime(secondsUntilChange)}"
+        // A way held shut (a boss encounter's, until its boss falls) has no time to it: -1.
+        string state = status == ExtractionStatus.NotYetOpen ? (secondsUntilChange >= 0f ? $", opens in {RaidStats.FormatTime(secondsUntilChange)}" : ", shut")
             : status == ExtractionStatus.Closed ? ", gone dark"
             : secondsUntilChange >= 0f ? $", closes in {RaidStats.FormatTime(secondsUntilChange)}"
             : "";

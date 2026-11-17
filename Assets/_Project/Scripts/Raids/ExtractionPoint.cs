@@ -65,6 +65,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     // What the clock has done to this way out so far (see Status).
     private bool openedOnce;
     private bool closedOnce;
+    // Shut by a boss encounter until its boss falls (EncounterArena), with what the player is told; null when the clock decides.
+    private string heldShut;
 
     /// <summary>Every enabled extraction point in the scene.</summary>
     public static IReadOnlyList<ExtractionPoint> Active => active;
@@ -103,13 +105,30 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     /// <summary>Open, not yet open or closed, by the raid clock. Always open outside a raid. Once open it doesn't close
     /// again before its time, and once closed it stays closed, though a site's choice adds time to the clock.</summary>
     public ExtractionStatus Status => closedOnce ? ExtractionStatus.Closed
+        : heldShut != null ? ExtractionStatus.NotYetOpen
         : ExtractionWindow.StatusAt(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
     public bool IsOpen => Status == ExtractionStatus.Open;
     /// <summary>Seconds until this point opens or closes, or -1 when it won't change again.</summary>
-    public float SecondsUntilChange => closedOnce ? -1f
+    public float SecondsUntilChange => closedOnce || heldShut != null ? -1f
         : ExtractionWindow.SecondsUntilChange(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
 
     public string Verb => "Light the way home";
+
+    /// <summary>True while a boss encounter keeps this way shut (<see cref="HoldShut"/>).</summary>
+    public bool IsHeldShut => heldShut != null;
+
+    /// <summary>Keeps this way home shut whatever the clock says, telling the player why (a boss encounter's, until its boss falls).</summary>
+    public void HoldShut(string reason) => heldShut = string.IsNullOrWhiteSpace(reason) ? "Not yet." : reason;
+
+    /// <summary>Lets the clock decide again: the way opens now if its window is open.</summary>
+    public void Release() => heldShut = null;
+
+    /// <summary>Closes this way home for the rest of the raid (a boss encounter's arrival stone, once the gate seals).</summary>
+    public void Close()
+    {
+        heldShut = null;
+        closedOnce = true;
+    }
 
     /// <summary>A lit beacon blocks lighting it again; that message is a reminder, not a problem.</summary>
     public bool IsNote => IsLit;
@@ -202,7 +221,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         switch (Status)
         {
             case ExtractionStatus.NotYetOpen:
-                reason = $"{displayName} opens in {RaidStats.FormatTime(SecondsUntilChange)}.";
+                reason = heldShut ?? $"{displayName} opens in {RaidStats.FormatTime(SecondsUntilChange)}.";
                 return false;
             case ExtractionStatus.Closed:
                 reason = $"{displayName} has gone dark.";
