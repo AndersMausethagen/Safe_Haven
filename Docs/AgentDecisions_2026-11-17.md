@@ -61,3 +61,6 @@ Each entry says what I did and why, and what to check.
 - K3 (the strength-limit test counting every meal/tonic slot) is a tuning job that may cut meal numbers: queued.
 - **Q5, a first step done:** breaking down an empowered piece now gives back **a quarter of the Purified Essence** its levels cost
   (the salvage text says so). Full reforging onto the next tier's piece is still yours to approve.
+- **Q6 (rested charges) not built:** Well Rested is already given in full at every raid launch (HavenReadiness.GiveRest), so charges
+  would change nothing. Surplus comfort only matters if rest had to be earned (e.g. a night at home between raids): a design choice
+  for you.
