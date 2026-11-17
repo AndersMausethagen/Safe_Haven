@@ -66,6 +66,9 @@ public sealed class RaidValleyRule
     [Tooltip("What the bridge nearest the valley's head becomes (Troll Valley: the Brukam's bridge, GDD §10.7): its guards come out " +
              "there when the raid begins, and its prefab (a camp, a hoard) stands on the far bank. Empty: every bridge is only a bridge.")]
     public RaidSetPieceDefinition bossBridge;
+    [Tooltip("What sits at the near end of every other bridge for the whole raid (Troll Valley: the Toll Troll: pay, riddle or fight; " +
+             "or ford somewhere else). Empty: the bridges are free.")]
+    public RaidEventDefinition bridgeToll;
 }
 
 /// <summary>How many sites of one kind a generated map holds, and where they go.</summary>

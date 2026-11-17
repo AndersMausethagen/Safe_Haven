@@ -73,7 +73,26 @@ public static partial class RaidMapGenerator
             {
                 MakeBossBridge(bridge, rule.bossBridge, terrain, origin, crossing, half);
             }
+            else if (rule.bridgeToll != null)
+            {
+                AskToll(bridge, rule.bridgeToll, plan.Valley, terrain, origin, crossing, half);
+            }
         }
+    }
+
+    /// <summary>Metres past the end of a bridge where its toll-taker sits, on the bank.</summary>
+    private const float TollFromBridge = 2.5f;
+
+    // The toll is asked at the end nearer the valley's mouth: the way a raid comes up the valley.
+    private static void AskToll(GameObject bridge, RaidEventDefinition toll, RaidLayoutValley valley, Terrain terrain, Vector3 origin, RaidLayoutCrossing crossing, float half)
+    {
+        Vector2 side = crossing.Direction * (half + TollFromBridge);
+        Vector2 a = crossing.Position + side, b = crossing.Position - side;
+        Vector2 near = valley.ShareOf(a) <= valley.ShareOf(b) ? a : b;
+        var spot = new GameObject("Toll");
+        spot.transform.SetParent(bridge.transform, true);
+        spot.transform.position = RaidMapSurface.Ground(terrain, origin + new Vector3(near.x, 0f, near.y));
+        spot.AddComponent<RaidBridgeToll>().Bind(toll);
     }
 
     /// <summary>Metres from the end of the boss bridge to its camp on the bank.</summary>

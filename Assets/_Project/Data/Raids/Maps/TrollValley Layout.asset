@@ -313,11 +313,12 @@ MonoBehaviour:
     tilt: {x: 5, y: 9}
     riverWidth: {x: 6, y: 9}
     riverDepth: {x: 1.5, y: 2}
-    bridges: {x: 1, y: 2}
+    bridges: {x: 2, y: 3}
     bridgePrefab: {fileID: 4061861558866804609, guid: cc82a1c8f91775c418652e1e3beca694, type: 3}
     bridgeLength: 14
     bridgeDeck: 2
     bossBridge: {fileID: 11400000, guid: e16f8a2e97732564cbc0defe7b4a889a, type: 2}
+    bridgeToll: {fileID: 11400000, guid: 87c294e152a4f8f4381ce5a1a1de9bdd, type: 2}
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   - {fileID: 11400000, guid: 737752e83ca9a444786e0ead8ef9b959, type: 2}

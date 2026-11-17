@@ -191,6 +191,13 @@ public sealed class RaidDirector : MonoBehaviour
             site.BringGuards(this, pieceRandom);
         }
 
+        // A valley's bridges ask their toll from the start (RaidBridgeToll): the toll-taker's event stands there for the whole raid.
+        RaidEventDirector events = GetComponent<RaidEventDirector>();
+        foreach (RaidBridgeToll toll in events != null && CreatureSource.Remote == null ? FindObjectsByType<RaidBridgeToll>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidBridgeToll>())
+        {
+            events.BeginAt(toll.Event, toll.transform.position);
+        }
+
         Transform start = FindAnyObjectByType<RaidMap>()?.PlayerStart;
         // Following the host, the creatures are the host's (puppets here): the host's game picks its elites.
         if (CreatureSource.Remote == null)

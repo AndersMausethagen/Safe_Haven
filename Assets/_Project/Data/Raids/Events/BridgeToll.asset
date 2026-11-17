@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: BridgeToll
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: BridgeToll
+  displayName: The Bridge Toll
+  weight: 0
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Something sits at the end of the bridge, chin on its fists, and watches you come.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 3364091344855052720, guid: 129b9139513b1754f98d0d115c6ede3d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A troll sits across the end of the bridge. "Toll," it says. "Or riddle. What runs and never walks, has a bed and never sleeps?"
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  onStart: []
+  choices:
+  - label: Pay in silver
+    detail: Three old pennies. It lets you over and tells you what it knows of the valley.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      amount: 3
+    result: It bites each penny, pockets them somewhere in the moss, and points out every way up the valley.
+    outcomes:
+    - rid: 287758281410609273
+    - rid: 287758281410609274
+  - label: Pay in bones
+    detail: Three bones. It likes bones better than silver.
+    cost:
+    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+      amount: 3
+    result: It crunches them thoughtfully and points out every way through the woods.
+    outcomes:
+    - rid: 287758281410609273
+    - rid: 287758281410609274
+  - label: '"A river."'
+    detail: An answer.
+    cost: []
+    result: It laughs until moss falls off it, and tosses you something from its pile.
+    outcomes:
+    - rid: 287758281410609275
+  - label: '"The wind."'
+    detail: An answer.
+    cost: []
+    result: '"No," it says, and stands up.'
+    outcomes:
+    - rid: 287758281410609276
+    - rid: 287758281410609277
+  - label: Walk through it
+    detail: It won't move. Its children might.
+    cost: []
+    result: It whistles through its teeth, and the rocks around you get up.
+    outcomes:
+    - rid: 287758281410609278
+    - rid: 287758281410609279
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609273
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 70
+        showExits: 1
+    - rid: 287758281410609274
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: 30
+    - rid: 287758281410609275
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+          - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 6
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+    - rid: 287758281410609276
+      type: {class: ChangeHealthOutcome, ns: , asm: SafeHaven}
+      data:
+        share: -0.15
+    - rid: 287758281410609277
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+        count: 2
+        radius: 6
+        hunt: 1
+    - rid: 287758281410609278
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+        count: 3
+        radius: 6
+        hunt: 1
+    - rid: 287758281410609279
+      type: {class: MakeNoiseOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 25
