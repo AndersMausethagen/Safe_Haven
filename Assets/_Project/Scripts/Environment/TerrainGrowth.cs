@@ -23,6 +23,9 @@ public static class TerrainGrowth
         [Range(0f, 1f)] public float bareAt;
         [Tooltip("The layer's average colour. Grass takes it on, and a map made while loading can't read it from the texture.")]
         public Color colour;
+        [Tooltip("Extra grass where this layer meets another, thickest half way: a grassy verge along a path's edges (the user, " +
+                 "2026-11-17: \"add some more green grass between the path and the moss\"). 0: none.")]
+        [Range(0f, 1f)] public float verge;
     }
 
     /// <summary>One kind of plant grown in patches of its own, over whatever ground grows plants (Ground.plants).</summary>
@@ -136,6 +139,14 @@ public static class TerrainGrowth
                     float w = weights[az, ax, l];
                     shortAmount += w * amounts[l].shortGrass;
                     tallAmount += w * amounts[l].tallGrass;
+                    if (amounts[l].verge > 0f)
+                    {
+                        // Half path, half moss: the verge, where the trodden edge greens over.
+                        float verge = amounts[l].verge * 4f * w * (1f - w);
+                        shortAmount += verge;
+                        tallAmount += verge * 0.6f;
+                    }
+
                     bushAmount += w * amounts[l].bushes;
                     plantAmount += w * amounts[l].plants;
                     if (amounts[l].bareAt > 0f)
@@ -241,9 +252,24 @@ public static class TerrainGrowth
     }
 
     /// <summary>A top-down colour map of the terrain's paint, for grass to take on (GrassTerrainColour). The caller owns the texture.</summary>
-    public static Texture2D BakeColour(Terrain terrain, IReadOnlyList<Ground> fills)
+    public static Texture2D BakeColour(Terrain terrain, IReadOnlyList<Ground> fills) =>
+        ColourTexture(terrain.terrainData, GroundColours(terrain.terrainData, fills));
+
+    /// <summary>The colour map's texture from <see cref="GroundColours"/>' pixels. The caller owns the texture.</summary>
+    public static Texture2D ColourTexture(TerrainData data, Color32[] pixels)
     {
-        TerrainData data = terrain.terrainData;
+        var texture = new Texture2D(data.alphamapWidth, data.alphamapHeight, TextureFormat.RGBA32, false) { name = data.name + " Colour", wrapMode = TextureWrapMode.Clamp };
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
+        return texture;
+    }
+
+    /// <summary>
+    /// The terrain's paint as colour, one pixel per paint texel (alphamap width × height, row by row from the terrain's corner):
+    /// each layer's Ground › Colour mixed by its weight. What grass takes on, and the colour a raid's ground light throws back.
+    /// </summary>
+    public static Color32[] GroundColours(TerrainData data, IReadOnlyList<Ground> fills)
+    {
         int width = data.alphamapWidth, height = data.alphamapHeight;
         float[,,] weights = data.GetAlphamaps(0, 0, width, height);
         TerrainLayer[] layers = data.terrainLayers;
@@ -273,10 +299,7 @@ public static class TerrainGrowth
             }
         }
 
-        var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { name = data.name + " Colour", wrapMode = TextureWrapMode.Clamp };
-        texture.SetPixels32(pixels);
-        texture.Apply(false, true);
-        return texture;
+        return pixels;
     }
 
     /// <summary>Where trees and rocks stand, as a test for Fill: nothing grows through a trunk or a boulder. Far cheaper than a raycast per cell.</summary>

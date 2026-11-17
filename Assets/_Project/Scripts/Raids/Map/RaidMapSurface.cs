@@ -57,7 +57,7 @@ public static class RaidMapSurface
             }
         }
 
-        Feather(soils, Mathf.Max(1, Mathf.RoundToInt(SoilFeather * resolution / size)));
+        Feather(soils, Mathf.Max(1, Mathf.RoundToInt(definition.PathFeather * resolution / size)));
 
         for (int row = 0; row < resolution; row++)
         {
@@ -73,7 +73,7 @@ public static class RaidMapSurface
                 float ragged = Mathf.PerlinNoise(u * size / EdgeNoise + 11.3f, v * size / EdgeNoise - 5.1f);
                 float fine = Mathf.PerlinNoise(u * size / FineNoise - 2.7f, v * size / FineNoise + 8.9f);
                 float margin = soil * (1f - soil) * 4f;
-                soil = Mathf.Clamp01(soil + ((ragged - 0.5f) * 0.6f + (fine - 0.5f) * 0.4f) * margin);
+                soil = Mathf.Clamp01(soil + ((ragged - 0.5f) * 0.6f + (fine - 0.5f) * 0.4f) * margin * definition.PathFray);
 
                 float litter = 0f;
                 if (hasLitter)
@@ -216,8 +216,6 @@ public static class RaidMapSurface
     private const float LitterPatch = 9f;
     private const float EdgeNoise = 2.5f;
     private const float FineNoise = 0.7f;
-    // Metres over which a path's soil fades into the forest floor (each of two blur passes).
-    private const float SoilFeather = 0.9f;
     private const float PathLitterPatch = 3.5f;
     // The most of a trail that leaf litter covers.
     private const float PathLitter = 0.5f;

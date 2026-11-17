@@ -87,6 +87,11 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField] private TerrainLayer litterLayer;
     [Tooltip("How much of the deep forest's floor the litter covers (0 none, 1 all of it).")]
     [SerializeField, Range(0f, 1f)] private float litter = 0.6f;
+    [Tooltip("Metres over which a path's soil fades into the forest floor (each of two blur passes). Wider is a softer, more gradual " +
+             "edge (the user, 2026-11-17, on the Moss Marsh: \"make the transition between materials more gradient\").")]
+    [SerializeField, Range(0.3f, 4f)] private float pathFeather = 0.9f;
+    [Tooltip("How much noise frays the path's edge into tufts of the forest floor: 1 the old ragged edge, 0 a clean fade.")]
+    [SerializeField, Range(0f, 1f)] private float pathFray = 1f;
 
     [Header("Growth")]
     [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
@@ -153,6 +158,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     public Vector2 CliffSlope => cliffSlope;
     public TerrainLayer LitterLayer => litterLayer;
     public float Litter => litter;
+    public float PathFeather => pathFeather;
+    public float PathFray => pathFray;
 
     /// <summary>The terrain layers in paint order: forest, path, cliff, then litter when the map has one.</summary>
     public TerrainLayer[] Layers => litterLayer != null

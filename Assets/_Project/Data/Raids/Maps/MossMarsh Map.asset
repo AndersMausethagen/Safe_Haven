@@ -222,21 +222,25 @@ MonoBehaviour:
   cliffSlope: {x: 30, y: 42}
   litterLayer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
   litter: 0.35
+  pathFeather: 2.2
+  pathFray: 0.35
   growth:
   - layer: {fileID: 8574412962073106934, guid: ecc08845117d8ff4292ef94943f24cac, type: 2}
-    shortGrass: 0.45
+    shortGrass: 0.55
     tallGrass: 0.6
     bushes: 0.15
     plants: 0.6
     bareAt: 0
     colour: {r: 0.34, g: 0.5, b: 0.2, a: 1}
+    verge: 0
   - layer: {fileID: 8574412962073106934, guid: 089cfd9135814f84a888e75dd12911b5, type: 2}
     shortGrass: 0
     tallGrass: 0
     bushes: 0
     plants: 0
     bareAt: 0.7
-    colour: {r: 0.3, g: 0.26, b: 0.18, a: 1}
+    colour: {r: 0.36, g: 0.45, b: 0.2, a: 1}
+    verge: 0.8
   - layer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
     shortGrass: 0
     tallGrass: 0
@@ -244,6 +248,7 @@ MonoBehaviour:
     plants: 0
     bareAt: 0.45
     colour: {r: 0.46, g: 0.47, b: 0.42, a: 1}
+    verge: 0
   - layer: {fileID: 8574412962073106934, guid: 3b96c3a790a9fa042be3fc24ab00e8df, type: 2}
     shortGrass: 0.3
     tallGrass: 0.35
@@ -251,6 +256,7 @@ MonoBehaviour:
     plants: 0.45
     bareAt: 0
     colour: {r: 0.28, g: 0.3, b: 0.16, a: 1}
+    verge: 0
   plants:
   - prototype: Common Fern
     enabled: 1
