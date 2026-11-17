@@ -82,8 +82,8 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 6
     m_NumAlphaKeys: 2
-  moonColour: {r: 0.7, g: 0.78, b: 1, a: 1}
-  moonIntensity: 1.6
+  moonColour: {r: 0.84, g: 0.87, b: 0.95, a: 1}
+  moonIntensity: 2.3
   moonElevation: 60
   ambientSky:
     serializedVersion: 2
