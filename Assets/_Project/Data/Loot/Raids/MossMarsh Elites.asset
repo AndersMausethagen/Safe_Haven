@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: MossMarsh Elites
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Moss Marsh elites
+  kind: 3
+  notes: 'What the Moss Marsh''s elites carry, by tier: moonsilver and offered blades; at IV scales off the thing in the deep pools (the Lindorm''s, until the Lindorm itself carries them).'
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+      fromTier: 3
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 4
+      maxQuantity: 6
+      probability: 1
+      fromTier: 3
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.5
+      fromTier: 3
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 6e9e4593f2cc6c143a0c206f6c4b783a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 6
+      maxQuantity: 8
+      probability: 1
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.6
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0

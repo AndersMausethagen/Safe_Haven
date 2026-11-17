@@ -1,0 +1,199 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: MossMarsh Map Terrain Displacement
+  m_Shader: {fileID: 4800000, guid: aa59cd2dc74da0a448fab311a279d086, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _TERRAIN_BLEND_HEIGHT
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _CliffAlbedo:
+        m_Texture: {fileID: 2800000, guid: 3b6b13a6dca8e784ab94665253602ba5, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CliffMask:
+        m_Texture: {fileID: 2800000, guid: ec8a2cab88277dd4c9a09d87040d83e4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _CliffNormal:
+        m_Texture: {fileID: 2800000, guid: 8be98d2216a838c448514f490322f2f9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Control:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl0:
+        m_Texture: {fileID: 7476363468667693132, guid: ddd633e9cbc8c464dbad6b182f8a1454, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementControl3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementLayers:
+        m_Texture: {fileID: 2800000, guid: da00bfd127ee6a045baae77056c6c27d, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DisplacementMasks:
+        m_Texture: {fileID: 18700000, guid: a9d6b93687730674d8c716fb497ea231, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FootprintField:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepAlbedo:
+        m_Texture: {fileID: 2800000, guid: 8cd7f139660ea214eba664817dcfcf9d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepMask:
+        m_Texture: {fileID: 2800000, guid: b689bc2e0481aca429aa6b8853c43bf6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SteepNormal:
+        m_Texture: {fileID: 2800000, guid: b8343e0ed8a054146861c57a9c104f3d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TerrainHolesTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AntiTiling: 0.85
+    - _AntiTilingScale: 0.57
+    - _CliffBreakup: 0.6
+    - _CliffDisplacement: 0.32210526
+    - _CliffHeightMidpoint: 0.3380936
+    - _CliffNormalStrength: 1
+    - _CliffSlopeEnd: 62
+    - _CliffSlopeStart: 46
+    - _CliffStrength: 1
+    - _CliffTiling: 4
+    - _DetailFocusFar: 25
+    - _DetailFocusNear: 15
+    - _DisplacementDataVersion: 2
+    - _DisplacementFar: 35
+    - _DisplacementLayerCount: 4
+    - _DisplacementMip: 0
+    - _DisplacementNear: 30.4
+    - _DisplacementNormalStrength: 1
+    - _DisplacementStrength: 0.3
+    - _EnableHeightBlend: 1
+    - _EnableInstancedPerPixelNormal: 1
+    - _FootprintDarkening: 0
+    - _HeightBlendSharpness: 0
+    - _HeightTransition: 0.85
+    - _MacroVariation: 0.18
+    - _Metallic0: 0
+    - _Metallic1: 0
+    - _Metallic2: 0
+    - _Metallic3: 0
+    - _NormalMapStrength: 1
+    - _NumLayersCount: 1
+    - _RockAlwaysFrom: 50
+    - _RockAntiTiling: 1
+    - _RockFromLayers: 0
+    - _Smoothness0: 0.5
+    - _Smoothness1: 0.5
+    - _Smoothness2: 0.5
+    - _Smoothness3: 0.5
+    - _SteepHeightMidpoint: 0.5993997
+    - _SteepNormalStrength: 1
+    - _SteepSlopeEnd: 66
+    - _SteepSlopeStart: 56
+    - _SteepTiling: 7
+    - _SurfaceDebug: 0
+    - _SurfaceOcclusion: 1
+    - _SurfaceSmoothness: 1
+    - _TessellationEdgeLength: 0.02
+    - _TessellationFactor: 16
+    - _TessellationPixels: 10
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _CliffTint: {r: 1, g: 1, b: 1, a: 1}
+    - _DisplacementTerrainSize: {r: 200, g: 200, b: 0.01, a: 0}
+    - _FootprintArea: {r: 0, g: 0, b: 1, a: 0}
+    - _FootprintSettings: {r: 0, g: 0, b: 0, a: 0}
+    - _SteepTint: {r: 1, g: 1, b: 1, a: 1}
+    - _TerrainDetailQuality: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

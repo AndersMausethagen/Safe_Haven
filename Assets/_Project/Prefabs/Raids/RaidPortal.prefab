@@ -361,6 +361,7 @@ MonoBehaviour:
   raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
   otherDestinations:
   - {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}
+  - {fileID: 11400000, guid: 1db618a31f9ad294ba8fe8cc857a15f3, type: 2}
   preparationWindow: {fileID: 0}
   windowRange: 5
   needsRepair: 1

@@ -115,6 +115,45 @@ public sealed class RaidFenTests
     }
 
     [Test]
+    public void TheMossMarsh_IsAFen_WithItsClearingsAboveTheWater_AndNoValley()
+    {
+        var marsh = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/MossMarsh Layout.asset");
+        Assert.IsNotNull(marsh, "the Moss Marsh has no layout");
+        Assert.IsTrue(marsh.Fen.enabled, "the Moss Marsh's layout is not a fen");
+        foreach (RaidShapeRule shape in marsh.Shapes)
+        {
+            Assert.IsFalse(shape.shape == RaidLayoutShape.Valley && shape.weight > 0f, "the Moss Marsh can be laid out as a valley");
+        }
+
+        Assert.Less(marsh.Hills, marsh.Fen.aboveWater, "Hills higher than the fen's Above Water dip trails under it");
+        foreach (int seed in Seeds)
+        {
+            RaidLayoutPlan plan = RaidLayoutPlanner.Plan(marsh, marsh.MapSize, seed);
+            RaidLayoutField field = RaidLayoutField.Build(plan, marsh);
+            int under = 0, all = 0;
+            for (float y = 10f; y < marsh.MapSize - 10f; y += 4f)
+            {
+                for (float x = 10f; x < marsh.MapSize - 10f; x += 4f)
+                {
+                    all++;
+                    if (field.HeightAt(x / marsh.MapSize, y / marsh.MapSize) < field.FenWater)
+                    {
+                        under++;
+                    }
+                }
+            }
+
+            foreach (RaidLayoutRoom room in plan.Rooms)
+            {
+                Assert.Greater(field.HeightAt(room.Position.x / marsh.MapSize, room.Position.y / marsh.MapSize), field.FenWater + 0.15f,
+                    $"seed {seed} ({plan.Shape.shape}): a {room.Role} clearing is in the water");
+            }
+
+            Assert.Greater(under / (float)all, 0.15f, $"seed {seed} ({plan.Shape.shape}): only {under / (float)all:P0} of the marsh is water");
+        }
+    }
+
+    [Test]
     public void TreesAndRocks_KeepOutOfTheWater()
     {
         (int seed, RaidLayoutPlan plan, RaidLayoutField field) = (1, RaidLayoutPlanner.Plan(rules, Size, 1), null);
