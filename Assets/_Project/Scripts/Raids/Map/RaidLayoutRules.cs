@@ -34,6 +34,42 @@ public enum RaidLayoutShape
 }
 
 /// <summary>
+/// What a district of a generated map is for (Docs/WorldDesignReview_2026-11-17.md G1): its role sets how many sites of each kind it
+/// holds, so danger rises from the start towards the apex as in Valheim's distance from the centre. Saved by number in moods and rules.
+/// </summary>
+public enum RaidDistrictRole
+{
+    /// <summary>On a mood: take the role the district's distance from the start gives it.</summary>
+    Any = 0,
+    /// <summary>The start's district: the way in, quieter, resources rather than camps.</summary>
+    Approach = 1,
+    /// <summary>The land between: wild ground, some of everything.</summary>
+    Wild = 2,
+    /// <summary>Where people built: camps, caches and events gather (a mood asks for it; distance never gives it).</summary>
+    Compound = 3,
+    /// <summary>The district round the apex: camps and patrols, the great danger's ground.</summary>
+    Lair = 4,
+}
+
+/// <summary>How much more or less often one kind of site stands in a district (1 as often as anywhere, 0 never).</summary>
+[Serializable]
+public sealed class RaidSiteDensity
+{
+    public RaidSiteKind kind = RaidSiteKind.EnemyCamp;
+    [Tooltip("Weight of this kind in the district against the others' (1: an even share; 3 against 1: three of every four sites).")]
+    [Min(0f)] public float density = 1f;
+}
+
+/// <summary>The site weights of one district role on every map of the rules (RaidLayoutRules › District Roles).</summary>
+[Serializable]
+public sealed class RaidDistrictRule
+{
+    public RaidDistrictRole role = RaidDistrictRole.Lair;
+    [Tooltip("Weights per site kind in districts of this role; a kind not listed weighs 1. Multiplied by the district mood's own.")]
+    public List<RaidSiteDensity> siteDensity = new List<RaidSiteDensity>();
+}
+
+/// <summary>
 /// A fen's ground (the Moss Marsh, Docs/NextRaidResearch_2026-11-17.md §11.3): the trails and clearings stand a little above one water
 /// level, the wild ground between them sinks under it, and hummocks and long peat strings (the Norwegian string bog) rise back out. One
 /// water sheet covers the map (RaidMapGenerator.PlaceFenWater), so its pools are the ground below it. Works with any shape.
@@ -113,6 +149,10 @@ public sealed class RaidValleyRule
     [Range(10f, 80f)] public float wallCragSlope = 38f;
     [Tooltip("Chance that a crag's place also has a great block fallen at the wall's foot: solid, kept off trails, clearings and the river.")]
     [Range(0f, 1f)] public float wallBlocks = 0.1f;
+    [Tooltip("The most trails that cross the river (Docs/WorldDesignReview_2026-11-17.md G8): the short way's crossings first, then the " +
+             "long way's, then the rest; a trail beyond it is dropped unless it is the only way somewhere. Few crossings make the river an " +
+             "edge and each bridge's toll count. 0: no limit (as before).")]
+    [Min(0)] public int maxCrossings;
 }
 
 /// <summary>How many sites of one kind a generated map holds, and where they go.</summary>
@@ -148,6 +188,30 @@ public sealed class RaidLandmarkRule
     [Range(0f, 0.5f)] public float sink = 0.05f;
     [Tooltip("Strip what can be gathered, chopped or used from it, so it is only to see (and bump into).")]
     public bool onlyToSee = true;
+
+    [Header("For a top-down camera (G4)")]
+    [Tooltip("Stands at a node (a clearing three or more trails meet, the hub, the apex), one in each district first, each kind once a " +
+             "map while another is left: the top-down camera sees little of the land, so a landmark has to stand where the ways meet. " +
+             "Off: on a hill top or in the wild ground, as before (Rules › Landmark Count).")]
+    public bool atNodes;
+    [Tooltip("Metres of open ground kept round it at a node (Valheim's ClearArea), so the trunk or rock stands free. 0: none.")]
+    [Min(0f)] public float clearing;
+    [Tooltip("Metres within which the player finds it, and from then on the minimap marks it (60-80, like a lookout's reveal). 0: never marked.")]
+    [Min(0f)] public float revealRadius;
+    [Tooltip("Marked on the minimap from the start, wherever the player is.")]
+    public bool knownAtStart;
+    [Tooltip("The minimap's mark for it. Empty: a dot.")]
+    public Sprite icon;
+    [Tooltip("A sound it makes now and then, heard as far as the sound's Audible Distance (60-100 m suits: falls, a bell, crows, drums). " +
+             "Empty: silent.")]
+    public SoundDefinition sound;
+    [Tooltip("Seconds between its sounds, least and most.")]
+    public Vector2 soundEvery = new Vector2(8f, 20f);
+    [Tooltip("The sound loops for as long as it stands (falls, a fire) instead of now and then.")]
+    public bool soundLoops;
+
+    /// <summary>True when it needs the runtime part (RaidMapLandmark): a minimap mark or a sound.</summary>
+    public bool Marked => revealRadius > 0f || knownAtStart || !(sound is null);
 }
 
 /// <summary>One plan a map can be laid out by, with how likely it is and what the briefing says of it.</summary>
@@ -194,6 +258,16 @@ public sealed class RaidMapMood
     [Min(0f)] public float rivers = 1f;
     [Tooltip("On a Valley map: multiplies the width of the valley floor (a gorge narrows it).")]
     [Min(0.3f)] public float valleyWidth = 1f;
+
+    [Header("As a district (G1)")]
+    [Tooltip("The role this mood's district takes when it isn't the start's (Any: by its distance from the start; the farthest is the Lair).")]
+    public RaidDistrictRole role = RaidDistrictRole.Any;
+    [Tooltip("Weights per site kind in this mood's district against the other districts' (a kind not listed weighs 1). With Rules › " +
+             "District Roles they say where a map's sites go; the map's count of each kind stays the rules'.")]
+    public List<RaidSiteDensity> siteDensity = new List<RaidSiteDensity>();
+
+    /// <summary>This mood's weight for a kind of site (1 when not listed).</summary>
+    public float DensityOf(RaidSiteKind kind) => RaidLayoutRules.DensityIn(siteDensity, kind);
 
     [Header("Cliffs and Ravines")]
     [Tooltip("The raid planner offers a run of this mood as a large raid first. The player can still pick Normal.")]
@@ -336,6 +410,26 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField, Min(1f)] private float regionBlend = 30f;
     [NonSerialized] private bool scaledUp;
 
+    [Header("Districts (normal maps, G1)")]
+    [Tooltip("How many districts a map of the normal size is split into, least and most, each a region with its own mood (2-3 suit 200 m). " +
+             "The start's is the Approach and the one round the apex the Lair. 1: one mood over the whole map (as before).")]
+    [SerializeField] private Vector2Int normalRegions = Vector2Int.one;
+    [Tooltip("Where sites go by district role (Approach, Wild, Compound, Lair): weights per site kind, times the district mood's own. " +
+             "Each kind's count is shared out by these weights, not by area. Empty: every district weighs the same (as before).")]
+    [SerializeField] private List<RaidDistrictRule> districtRoles = new List<RaidDistrictRule>();
+
+    [Header("Trail hierarchy (G5)")]
+    [Tooltip("Multiplies the width of the short and long ways to the exit ahead, which become roads; side trails stay as they are. Paint " +
+             "them with the map's Road Layer. 1: as wide as any trail (as before).")]
+    [SerializeField, Range(0.5f, 2.5f)] private float roadWidth = 1f;
+    [Tooltip("Short flags along the two ways to the exit ahead (cairns, carved posts, rune stones): the minimap shows the way, a flag " +
+             "says you are still on it. Picked at random. Empty: none.")]
+    [SerializeField] private List<GameObject> shortFlags = new List<GameObject>();
+    [Tooltip("Metres walked between two flags, least and most.")]
+    [SerializeField] private Vector2 shortFlagSpacing = new Vector2(100f, 140f);
+    [Tooltip("Metres beyond the trail's edge a flag stands.")]
+    [SerializeField, Min(0f)] private float shortFlagOffset = 1.5f;
+
     [Header("Routes")]
     [Tooltip("Make sure two ways lead to the exit ahead, a short one and a longer one, adding a trail where the map has only one.")]
     [SerializeField] private bool twoRoutes;
@@ -360,6 +454,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField] private List<RaidLandmarkRule> landmarks = new List<RaidLandmarkRule>();
     [Tooltip("How many landmarks, least and most, on a map of the normal size.")]
     [SerializeField] private Vector2Int landmarkCount = Vector2Int.zero;
+    [Tooltip("How many of the landmarks marked At Nodes stand at nodes, least and most, on a map of the normal size: one per district " +
+             "first. Never more than there are such landmarks, until a large map has used them all.")]
+    [SerializeField] private Vector2Int nodeLandmarkCount = new Vector2Int(3, 5);
 
     [Header("Ravine Descents")]
     [Tooltip("What waits on the floor of a ravine with a way down (the mood's Ravine Descents), one site of each.")]
@@ -450,6 +547,7 @@ public sealed class RaidLayoutRules : ScriptableObject
         copy.scaledUp = true;
         copy.surfaceRivers = new Vector2Int(Mathf.RoundToInt(surfaceRivers.x * width), Mathf.RoundToInt(surfaceRivers.y * width));
         copy.landmarkCount = new Vector2Int(Mathf.RoundToInt(landmarkCount.x * area), Mathf.RoundToInt(landmarkCount.y * area));
+        copy.nodeLandmarkCount = new Vector2Int(Mathf.RoundToInt(nodeLandmarkCount.x * area), Mathf.RoundToInt(nodeLandmarkCount.y * area));
         copy.fieldResolution = Mathf.Min(MaxFieldResolution, Mathf.RoundToInt(fieldResolution * width));
         // Ravines and spires stand on the land like clearings do: as many on every square metre.
         foreach (RaidMapMood mood in copy.moods)
@@ -520,9 +618,54 @@ public sealed class RaidLayoutRules : ScriptableObject
     public Material WaterfallMaterial => waterfallMaterial;
     public GameObject WaterfallPlunge => waterfallPlunge;
     public Vector2 HillVariance => hillVariance;
-    /// <summary>How many regions this map has, least and most: the large-map setting on a scaled copy, otherwise one.</summary>
-    public Vector2Int Regions => scaledUp ? largeRegions : Vector2Int.one;
+    /// <summary>How many regions this map has, least and most: the large-map setting on a scaled copy, otherwise the districts (one by default).</summary>
+    public Vector2Int Regions => scaledUp ? largeRegions : new Vector2Int(Mathf.Max(1, normalRegions.x), Mathf.Max(1, normalRegions.y));
     public Vector2Int LargeRegions => largeRegions;
+    /// <summary>How many districts a map of the normal size has, least and most.</summary>
+    public Vector2Int NormalRegions => normalRegions;
+    public IReadOnlyList<RaidDistrictRule> DistrictRoles => districtRoles;
+    public float RoadWidth => roadWidth;
+    public IReadOnlyList<GameObject> ShortFlags => shortFlags;
+    public Vector2 ShortFlagSpacing => shortFlagSpacing;
+    public float ShortFlagOffset => shortFlagOffset;
+    public Vector2Int NodeLandmarkCount => nodeLandmarkCount;
+
+    /// <summary>
+    /// How much a kind of site weighs in a district of this role with this mood: the role's weight (District Roles) times the mood's
+    /// (Mood › Site Density), each 1 when not listed.
+    /// </summary>
+    public float SiteDensity(RaidDistrictRole role, RaidMapMood mood, RaidSiteKind kind)
+    {
+        float weight = mood != null ? mood.DensityOf(kind) : 1f;
+        foreach (RaidDistrictRule rule in districtRoles)
+        {
+            if (rule != null && rule.role == role)
+            {
+                weight *= DensityIn(rule.siteDensity, kind);
+            }
+        }
+
+        return weight;
+    }
+
+    /// <summary>A kind's weight in a list of site densities: the first entry for it, 1 when there is none.</summary>
+    public static float DensityIn(List<RaidSiteDensity> densities, RaidSiteKind kind)
+    {
+        if (densities == null)
+        {
+            return 1f;
+        }
+
+        foreach (RaidSiteDensity density in densities)
+        {
+            if (density != null && density.kind == kind)
+            {
+                return Mathf.Max(0f, density.density);
+            }
+        }
+
+        return 1f;
+    }
     public float RegionBlend => regionBlend;
     public bool TwoRoutes => twoRoutes;
     public bool CampsOnShortRoute => campsOnShortRoute;
@@ -602,6 +745,32 @@ public sealed class RaidLayoutRules : ScriptableObject
         surfaceRivers = rivers;
         surfaceRiverWidth = riverWidth;
         surfaceRiverDepth = riverDepth;
+        landmarks = new List<RaidLandmarkRule>(landmarkRules);
+        landmarkCount = landmarksWanted;
+    }
+
+    /// <summary>Sets up districts on maps of the normal size and their roles' site weights (builders and tests).</summary>
+    public void ConfigureDistricts(Vector2Int normal, IEnumerable<RaidDistrictRule> roles)
+    {
+        normalRegions = normal;
+        districtRoles = new List<RaidDistrictRule>(roles);
+    }
+
+    /// <summary>Sets up the roads and their short flags (builders and tests).</summary>
+    public void ConfigureRoads(float width, IEnumerable<GameObject> flags, Vector2 spacing, float offset)
+    {
+        roadWidth = width;
+        shortFlags = new List<GameObject>(flags);
+        shortFlagSpacing = spacing;
+        shortFlagOffset = offset;
+    }
+
+    /// <summary>Sets how many landmarks stand at nodes (builders and tests).</summary>
+    public void ConfigureNodeLandmarks(Vector2Int count) => nodeLandmarkCount = count;
+
+    /// <summary>Replaces the landmarks alone (builders and tests).</summary>
+    public void ConfigureLandmarks(IEnumerable<RaidLandmarkRule> landmarkRules, Vector2Int landmarksWanted)
+    {
         landmarks = new List<RaidLandmarkRule>(landmarkRules);
         landmarkCount = landmarksWanted;
     }

@@ -68,6 +68,45 @@ public sealed class RaidMapDefinition : ScriptableObject
         [Min(0f)] public float bankWidest = 1.2f;
     }
 
+    /// <summary>
+    /// A hero of the set dressing (Docs/WorldDesignReview_2026-11-17.md G9): one thing per stretch of trail that the screen is composed
+    /// round, a giant tree, an outcrop, a ruin fragment, standing 6-15 m off the trail so it comes into frame before the player reaches it.
+    /// </summary>
+    [Serializable]
+    public sealed class Hero
+    {
+        public GameObject prefab;
+        [Min(0f)] public float weight = 1f;
+        [Tooltip("Smallest and largest size.")]
+        public Vector2 scale = new Vector2(0.9f, 1.15f);
+        [Tooltip("Share of its height sunk into the ground (an object; a terrain tree stands on its pivot).")]
+        [Range(0f, 0.5f)] public float sink = 0.05f;
+        [Tooltip("Metres round it cleared of the trees, undergrowth and rocks already scattered, so it stands free (a giant's own ground).")]
+        [Min(0f)] public float room = 3f;
+        [Tooltip("Always an object, never a terrain tree: for prefabs a terrain can't draw as a tree (several parts, colliders other than " +
+                 "one capsule, things to use). Off: a terrain tree where it stands beyond Hero Object Within of walkable ground.")]
+        public bool alwaysObject;
+        [Tooltip("As an object: strip what can be gathered, chopped or used from it, so it is only to see (and bump into).")]
+        public bool onlyToSee = true;
+    }
+
+    /// <summary>A hero that stands as an object (near walkable ground, or Always Object), for RaidMapGenerator to place after Scatter.</summary>
+    public readonly struct HeroObject
+    {
+        public readonly Hero Hero;
+        public readonly Vector2 Position;
+        public readonly float Turn;
+        public readonly float Scale;
+
+        public HeroObject(Hero hero, Vector2 position, float turn, float scale)
+        {
+            Hero = hero;
+            Position = position;
+            Turn = turn;
+            Scale = scale;
+        }
+    }
+
     [Serializable]
     public sealed class SiteRule
     {
@@ -139,6 +178,12 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField] private TerrainLayer mossLayer;
     [Tooltip("No moss skin at all on a generated map (TerrainMoss switched off for the run).")]
     [SerializeField] private bool noMoss;
+    [Tooltip("Optional: what the roads (the two ways to the exit ahead, RaidLayoutRules › Road Width) are painted with on a generated map: " +
+             "trodden earth or gravel, a causeway's peat. One of this map's layers costs nothing; any other is added as one more layer, " +
+             "and the terrain sits near its texture limit, so prefer swapping one in. Empty: roads look like any trail (as before).")]
+    [SerializeField] private TerrainLayer roadLayer;
+    [Tooltip("How much of a road's soil is the Road Layer, 0 to 1 (the rest stays the Path Layer, for a worn mix).")]
+    [SerializeField, Range(0f, 1f)] private float roadPaint = 0.85f;
 
     [Header("Growth")]
     [Tooltip("Grass, bushes and plants on each painted layer, grown on every map when a raid loads.")]
@@ -187,6 +232,24 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Min(0.5f)] private float undergrowthSpacing = 2.5f;
     [Tooltip("Chance of undergrowth in each spot that suits something.")]
     [SerializeField, Range(0f, 1f)] private float undergrowthChance = 0.5f;
+
+    [Header("Set dressing: heroes and mids (generated maps, G9)")]
+    [Tooltip("At most one per cell near a trail, 6-15 m off it: giant trees, outcrops, ruin fragments. Picked by weight. Empty: none.")]
+    [SerializeField] private List<Hero> heroes = new List<Hero>();
+    [Tooltip("2-4 per cell near a trail, as terrain trees by habitat: boulder clusters, logs, shrub clumps. Empty: none.")]
+    [SerializeField] private List<Scatter> mids = new List<Scatter>();
+    [Tooltip("Metres across a dressing cell: one hero and its mids to each.")]
+    [SerializeField, Min(10f)] private float dressingCell = 30f;
+    [Tooltip("Only cells whose middle lies within this many metres of walkable ground (a trail or clearing) are dressed.")]
+    [SerializeField, Min(1f)] private float dressingReach = 22f;
+    [Tooltip("How far a hero stands from the edge of the trail or clearing, in metres, least and most.")]
+    [SerializeField] private Vector2 heroFromTrail = new Vector2(6f, 15f);
+    [Tooltip("A hero nearer walkable ground than this stands as an object (solid, with its own colliders); farther off, a terrain tree.")]
+    [SerializeField, Min(0f)] private float heroObjectWithin = 10f;
+    [Tooltip("How many mids a cell gets, least and most.")]
+    [SerializeField] private Vector2Int midsPerCell = new Vector2Int(2, 4);
+    [Tooltip("How far a mid stands from the edge of the trail or clearing, in metres, least and most.")]
+    [SerializeField] private Vector2 midFromTrail = new Vector2(1.5f, 12f);
 
     [Header("Sites")]
     [SerializeField] private List<SiteRule> siteRules = new List<SiteRule>();
@@ -247,10 +310,33 @@ public sealed class RaidMapDefinition : ScriptableObject
         }
     }
 
-    /// <summary>The terrain layers in paint order: forest, path, cliff, then litter when the map has one.</summary>
-    public TerrainLayer[] Layers => litterLayer != null
-        ? new[] { forestLayer, pathLayer, cliffLayer, litterLayer }
-        : new[] { forestLayer, pathLayer, cliffLayer };
+    /// <summary>
+    /// The terrain layers in paint order: forest, path, cliff, then litter when the map has one, then the road layer when it is not one of
+    /// those already.
+    /// </summary>
+    public TerrainLayer[] Layers
+    {
+        get
+        {
+            TerrainLayer[] layers = litterLayer != null
+                ? new[] { forestLayer, pathLayer, cliffLayer, litterLayer }
+                : new[] { forestLayer, pathLayer, cliffLayer };
+            if (roadLayer == null || Array.IndexOf(layers, roadLayer) >= 0)
+            {
+                return layers;
+            }
+
+            Array.Resize(ref layers, layers.Length + 1);
+            layers[layers.Length - 1] = roadLayer;
+            return layers;
+        }
+    }
+
+    public TerrainLayer RoadLayer => roadLayer;
+    public float RoadPaint => roadPaint;
+
+    /// <summary>The road layer's place among <see cref="Layers"/>, or -1 without one.</summary>
+    public int RoadLayerIndex => roadLayer == null ? -1 : Array.IndexOf(Layers, roadLayer);
     public IReadOnlyList<TerrainGrowth.Ground> Growth => growth;
     public IReadOnlyList<TerrainGrowth.Plant> Plants => plants.Count > 0 ? plants : TerrainGrowth.DefaultPlants;
     public IReadOnlyList<Scatter> Trees => trees;
@@ -272,6 +358,37 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float UndergrowthSpacing => undergrowthSpacing;
     public float UndergrowthChance => undergrowthChance;
     public int ScatterSeed => scatterSeed;
+    public IReadOnlyList<Hero> Heroes => heroes;
+    public IReadOnlyList<Scatter> Mids => mids;
+    public float DressingCell => dressingCell;
+    public float DressingReach => dressingReach;
+    public Vector2 HeroFromTrail => heroFromTrail;
+    public float HeroObjectWithin => heroObjectWithin;
+    public Vector2Int MidsPerCell => midsPerCell;
+    public Vector2 MidFromTrail => midFromTrail;
+
+#if UNITY_EDITOR
+    /// <summary>Sets up the hero and mid dressing (builders and tests).</summary>
+    public void ConfigureDressing(IEnumerable<Hero> heroList, IEnumerable<Scatter> midList, float cell, float reach, Vector2 heroFrom,
+        float objectWithin, Vector2Int midCount, Vector2 midFrom)
+    {
+        heroes = new List<Hero>(heroList);
+        mids = new List<Scatter>(midList);
+        dressingCell = cell;
+        dressingReach = reach;
+        heroFromTrail = heroFrom;
+        heroObjectWithin = objectWithin;
+        midsPerCell = midCount;
+        midFromTrail = midFrom;
+    }
+
+    /// <summary>Sets the road layer (builders and tests).</summary>
+    public void ConfigureRoad(TerrainLayer layer, float paint)
+    {
+        roadLayer = layer;
+        roadPaint = paint;
+    }
+#endif
 
     /// <summary>The rule for a kind of site; one point exactly on the marker when there is none.</summary>
     public SiteRule RuleFor(RaidSiteKind kind)
@@ -356,13 +473,17 @@ public sealed class RaidMapDefinition : ScriptableObject
     /// Makes this copy of a map paint from generated zones, in the forest of the given mood and raid tier. Only ever for a copy
     /// made at runtime (Instantiate): the asset itself never changes while playing.
     /// </summary>
-    public void UseGenerated(int resolution, byte[] path, byte[] forest, byte[] clearing, RaidMapMood mood, int seed, int tier = 0)
+    public void UseGenerated(int resolution, byte[] path, byte[] forest, byte[] clearing, RaidMapMood mood, int seed, int tier = 0, byte[] road = null)
     {
         zoneResolution = resolution;
         zones.Clear();
         AddGenerated("Path", RaidZoneRole.Path, path, resolution);
         AddGenerated("Forest", RaidZoneRole.Forest, forest, resolution);
         AddGenerated("Clearing", RaidZoneRole.Clearing, clearing, resolution);
+        if (road != null)
+        {
+            AddGenerated("Road", RaidZoneRole.Road, road, resolution);
+        }
         markers.Clear();
         scatterSeed = seed;
         treeSpacing *= mood.treeSpacing;
@@ -401,7 +522,7 @@ public sealed class RaidMapDefinition : ScriptableObject
             }
         }
 
-        foreach (List<Scatter> stones in new[] { pileStones, Shore.stones })
+        foreach (List<Scatter> stones in new[] { pileStones, Shore.stones, mids })
         {
             foreach (Scatter scatter in stones)
             {

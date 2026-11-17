@@ -34,10 +34,22 @@ public sealed class RaidMapMeasure
     public int Spires;
     public int Sites;
     public float NearestSites;
+    /// <summary>Landmarks placed at nodes (G4), short flags beside the roads, and the longest walk along the short way with neither
+    /// within <see cref="SignReach"/> metres: how long the player goes without a sign.</summary>
+    public int NodeLandmarks;
+    public int Flags;
+    public float LongestUnmarked;
+    /// <summary>Valley maps: the river's crossings and how many carry a bridge (G8).</summary>
+    public int Crossings;
+    public int Bridges;
+    /// <summary>The share of the camps standing in the Lair district, on a map with districts (G1); 0 on a map of one.</summary>
+    public float CampsInLair;
     public long PlanMilliseconds;
     public long FieldMilliseconds;
 
     private const float TrailStep = 0.5f;
+    public const float SignReach = 40f;
+    private const float SignStep = 2f;
     private const int HeightSamples = 129;
 
     public static RaidMapMeasure Of(RaidLayoutRules rules, float size, int seed)
@@ -68,6 +80,10 @@ public sealed class RaidMapMeasure
             Landmarks = plan.Landmarks.Count,
             Spires = plan.Spires.Count,
             Sites = plan.Sites.Count,
+            NodeLandmarks = plan.Landmarks.Count(landmark => landmark.Rule >= 0),
+            Flags = plan.Flags.Count,
+            Crossings = plan.Crossings.Count,
+            Bridges = plan.Crossings.Count(crossing => crossing.Bridge),
             PlanMilliseconds = planned,
             FieldMilliseconds = clock.ElapsedMilliseconds - planned,
         };
@@ -100,6 +116,14 @@ public sealed class RaidMapMeasure
             }
         }
 
+        measure.LongestUnmarked = UnmarkedWalk(plan);
+        if (plan.Regions.Count > 1)
+        {
+            List<RaidSite> camps = plan.SitesOf(RaidSiteKind.EnemyCamp);
+            int inLair = camps.Count(camp => plan.Regions[plan.RegionIndexAt(camp.Position * size)].Role == RaidDistrictRole.Lair);
+            measure.CampsInLair = camps.Count > 0 ? inLair / (float)camps.Count : 0f;
+        }
+
         measure.NearestSites = float.MaxValue;
         for (int i = 0; i < plan.Sites.Count; i++)
         {
@@ -113,6 +137,28 @@ public sealed class RaidMapMeasure
     }
 
     private static float RouteLength(RaidLayoutPlan plan, HashSet<int> links) => links.Sum(link => Length(plan.Trails[link]));
+
+    // Walking the short way from the start, the longest stretch with no landmark or flag within SignReach metres.
+    private static float UnmarkedWalk(RaidLayoutPlan plan)
+    {
+        List<Vector2> line = RaidLayoutPlanner.RouteLine(plan, plan.ShortRoute);
+        var signs = plan.Landmarks.Select(landmark => landmark.Position).Concat(plan.Flags.Select(flag => flag.Position)).ToList();
+        float longest = 0f, stretch = 0f;
+        for (int i = 0; i + 1 < line.Count; i++)
+        {
+            float length = Vector2.Distance(line[i], line[i + 1]);
+            int steps = Mathf.Max(1, Mathf.CeilToInt(length / SignStep));
+            for (int k = 0; k < steps; k++)
+            {
+                Vector2 at = Vector2.Lerp(line[i], line[i + 1], k / (float)steps);
+                bool seen = signs.Any(sign => (sign - at).sqrMagnitude < SignReach * SignReach);
+                stretch = seen ? 0f : stretch + length / steps;
+                longest = Mathf.Max(longest, stretch);
+            }
+        }
+
+        return longest;
+    }
 
     private static float Length(List<Vector2> line)
     {
@@ -193,7 +239,13 @@ public sealed class RaidGeneratorReport : EditorWindow
             Row("Ravines (length, ways down), rivers", $"{mood.Average(m => m.Ravines):0.#} ({mood.Average(m => m.RavineLength):0} m, {mood.Average(m => m.Descents):0.#}), {mood.Average(m => m.Rivers):0.#}");
             Row("Hills, boulders, landmarks, spires", $"{mood.Average(m => m.Hills):0.#}, {mood.Average(m => m.Boulders):0.#}, {mood.Average(m => m.Landmarks):0.#}, {mood.Average(m => m.Spires):0.#}");
             Row("Sites, closest two", $"{mood.Average(m => m.Sites):0.#}, {mood.Min(m => m.NearestSites):0.#} m");
-            Row("Regions", $"{mood.Average(m => m.Regions):0.#}");
+            Row("Regions or districts, camps in the Lair", $"{mood.Average(m => m.Regions):0.#}, {mood.Average(m => m.CampsInLair) * 100f:0}%");
+            Row("Node landmarks, flags, longest unmarked walk", $"{mood.Average(m => m.NodeLandmarks):0.#}, {mood.Average(m => m.Flags):0.#}, {mood.Max(m => m.LongestUnmarked):0} m");
+            if (mood.Any(m => m.Crossings > 0))
+            {
+                Row("River crossings (bridges)", $"{mood.Average(m => m.Crossings):0.#} ({mood.Average(m => m.Bridges):0.#}), most {mood.Max(m => m.Crossings)}");
+            }
+
             Row("Plan, field", $"{mood.Average(m => m.PlanMilliseconds):0} ms, {mood.Average(m => m.FieldMilliseconds):0} ms");
             EditorGUILayout.Space();
         }
@@ -249,14 +301,14 @@ public sealed class RaidGeneratorReport : EditorWindow
     /// <summary>Every run, one row each.</summary>
     public static string Csv(IEnumerable<RaidMapMeasure> measures)
     {
-        var csv = new StringBuilder("Seed,Mood,Shape,Regions,Rooms,Links,Loops,DeadEnds,TwoRoutes,ShortRoute,LongRoute,Low,High,SteepestTrail,BiggestStep,Ravines,RavineLength,Descents,Rivers,Hills,Boulders,Landmarks,Spires,Sites,NearestSites,PlanMs,FieldMs\n");
+        var csv = new StringBuilder("Seed,Mood,Shape,Regions,Rooms,Links,Loops,DeadEnds,TwoRoutes,ShortRoute,LongRoute,Low,High,SteepestTrail,BiggestStep,Ravines,RavineLength,Descents,Rivers,Hills,Boulders,Landmarks,Spires,Sites,NearestSites,NodeLandmarks,Flags,LongestUnmarked,Crossings,Bridges,CampsInLair,PlanMs,FieldMs\n");
         foreach (RaidMapMeasure m in measures)
         {
             csv.AppendLine(string.Join(",", new object[]
             {
                 m.Seed, m.Mood, m.Shape, m.Regions, m.Rooms, m.Links, m.Loops, m.DeadEnds, m.TwoRoutes, m.ShortRoute, m.LongRoute, m.LowestGround, m.HighestGround,
                 m.SteepestTrail, m.BiggestStep, m.Ravines, m.RavineLength, m.Descents, m.Rivers, m.Hills, m.Boulders, m.Landmarks, m.Spires, m.Sites, m.NearestSites,
-                m.PlanMilliseconds, m.FieldMilliseconds,
+                m.NodeLandmarks, m.Flags, m.LongestUnmarked, m.Crossings, m.Bridges, m.CampsInLair, m.PlanMilliseconds, m.FieldMilliseconds,
             }.Select(value => System.Convert.ToString(value, CultureInfo.InvariantCulture))));
         }
 

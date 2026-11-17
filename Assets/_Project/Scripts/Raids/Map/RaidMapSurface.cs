@@ -47,12 +47,22 @@ public static class RaidMapSurface
         var trails = definition.EdgeBlend > 0f ? new float[resolution, resolution] : null;
         var wets = new float[resolution, resolution];
         var verges = new byte[resolution, resolution];
+        // Roads (G5): a generated map's two ways to the exit ahead, painted with the Road Layer, feathered as the soil is. Only when the map
+        // has both the layer and the zone, so every other map paints as it did.
+        int roadIndex = definition.RoadLayerIndex;
+        var roads = roadIndex >= 0 && roadIndex < layers && definition.Zones.Exists(zone => zone != null && zone.role == RaidZoneRole.Road)
+            ? new float[resolution, resolution] : null;
         for (int row = 0; row < resolution; row++)
         {
             for (int column = 0; column < resolution; column++)
             {
                 float u = (column + 0.5f) / resolution;
                 float v = (row + 0.5f) / resolution;
+                if (roads != null)
+                {
+                    roads[row, column] = definition.Strength(RaidZoneRole.Road, u, v);
+                }
+
                 float path = definition.Strength(RaidZoneRole.Path, u, v);
                 float forest = definition.Strength(RaidZoneRole.Forest, u, v);
                 float clearing = definition.Strength(RaidZoneRole.Clearing, u, v);
@@ -74,6 +84,11 @@ public static class RaidMapSurface
         if (trails != null)
         {
             Feather(trails, featherCells);
+        }
+
+        if (roads != null)
+        {
+            Feather(roads, featherCells);
         }
 
         for (int row = 0; row < resolution; row++)
@@ -152,6 +167,14 @@ public static class RaidMapSurface
                 if (hasLitter)
                 {
                     weights[row, column, 3] = floor * litter + onPath * drift + rest * step;
+                }
+
+                // A road's soil is the Road Layer (part of it, for a worn mix); the trail's verge, drifts and edge step stay as on any trail.
+                if (roads != null)
+                {
+                    float moved = weights[row, column, 1] * Mathf.Clamp01(roads[row, column]) * definition.RoadPaint;
+                    weights[row, column, 1] -= moved;
+                    weights[row, column, roadIndex] += moved;
                 }
             }
         }
@@ -248,6 +271,10 @@ public static class RaidMapSurface
         Rock = 2,
         PileStone = 3,
         ShoreStone = 4,
+        /// <summary>A hero of the set dressing standing as a terrain tree (RaidMapDefinition › Heroes, G9).</summary>
+        Hero = 5,
+        /// <summary>A mid of the set dressing (RaidMapDefinition › Mids, G9).</summary>
+        Mid = 6,
     }
 
     /// <summary>The group of each of the map's terrain-tree prototypes, by prototype index, as Scatter lays them out.</summary>
@@ -259,8 +286,20 @@ public static class RaidMapSurface
         AddGroup(groups, definition.Rocks, Group.Rock);
         AddGroup(groups, definition.PileStones, Group.PileStone);
         AddGroup(groups, definition.Shore.stones, Group.ShoreStone);
+        foreach (RaidMapDefinition.Hero hero in definition.Heroes)
+        {
+            if (TreeHero(hero))
+            {
+                groups.Add(Group.Hero);
+            }
+        }
+
+        AddGroup(groups, definition.Mids, Group.Mid);
         return groups.ToArray();
     }
+
+    // A hero that may stand as a terrain tree, and so has a prototype of its own.
+    private static bool TreeHero(RaidMapDefinition.Hero hero) => hero?.prefab != null && !hero.alwaysObject;
 
     private static void AddGroup(List<Group> groups, IReadOnlyList<RaidMapDefinition.Scatter> list, Group group)
     {
@@ -311,10 +350,16 @@ public static class RaidMapSurface
     /// the spot; trunks keep the room their kind needs. <paramref name="wetness"/> and <paramref name="inWater"/> take metres from the
     /// map's south-west corner. Copses, piles and shore stones draw from streams of their own, so at their defaults the forest is the
     /// same tree for tree. Returns how many trees.
+    /// <para>
+    /// Last of all, on a generated map (<paramref name="walked"/> given: metres from a spot to walkable ground), the set dressing (G9): each
+    /// <see cref="RaidMapDefinition.DressingCell"/> cell near a trail gets at most one hero, 6-15 m off the trail, and a few mids, from its
+    /// own stream. A hero near walkable ground goes into <paramref name="heroObjects"/> for the caller to stand as an object (solid, as the
+    /// boulders are); farther off it is a terrain tree, as cheap as the forest.
+    /// </para>
     /// </summary>
     public static int Scatter(TerrainData data, RaidMapDefinition definition, List<Clearing> clearings, out int rockCount,
         Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null,
-        WaterNear water = null)
+        WaterNear water = null, Func<Vector2, float> walked = null, List<RaidMapDefinition.HeroObject> heroObjects = null)
     {
         var prototypes = new List<TreePrototype>();
         Kind[] trees = Kinds(definition.Trees, prototypes);
@@ -322,6 +367,19 @@ public static class RaidMapSurface
         Kind[] rocks = Kinds(definition.Rocks, prototypes);
         Kind[] pileStones = Kinds(definition.PileStones, prototypes);
         Kind[] shoreStones = Kinds(definition.Shore.stones, prototypes);
+        // In PrototypeGroups' order: the heroes that may be terrain trees, then the mids.
+        var heroPrototypes = new int[definition.Heroes.Count];
+        for (int i = 0; i < heroPrototypes.Length; i++)
+        {
+            heroPrototypes[i] = -1;
+            if (TreeHero(definition.Heroes[i]))
+            {
+                heroPrototypes[i] = prototypes.Count;
+                prototypes.Add(new TreePrototype { prefab = definition.Heroes[i].prefab });
+            }
+        }
+
+        Kind[] mids = Kinds(definition.Mids, prototypes);
         data.treePrototypes = prototypes.ToArray();
         data.RefreshPrototypes();
 
@@ -438,8 +496,175 @@ public static class RaidMapSurface
             PlaceShore(data, definition, shoreStones, water, clearings, trunks, placed);
         }
 
+        if (walked != null && (mids.Length > 0 || HasHeroes(definition)))
+        {
+            Dress(data, definition, mids, heroPrototypes, clearings, trunks, placed, walked, inWater, heroObjects, Read);
+        }
+
         data.SetTreeInstances(placed.ToArray(), true);
         return treeCount;
+    }
+
+    private static bool HasHeroes(RaidMapDefinition definition)
+    {
+        foreach (RaidMapDefinition.Hero hero in definition.Heroes)
+        {
+            if (hero?.prefab != null && hero.weight > 0f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Set dressing (G9): heroes give each screen near a trail one thing to be composed round, mids fill its middle distance.
+    private const int HeroTries = 8;
+    private const int MidTries = 3;
+    private const float HeroSteepest = 40f;
+    private const float HeroKeepsClear = 1f;
+
+    private static void Dress(TerrainData data, RaidMapDefinition definition, Kind[] mids, int[] heroPrototypes, List<Clearing> clearings,
+        TrunkGrid trunks, List<TreeInstance> placed, Func<Vector2, float> walked, Func<Vector2, bool> inWater,
+        List<RaidMapDefinition.HeroObject> heroObjects, Func<Vector2, float, float, RaidScatterHabitat.Spot> read)
+    {
+        float size = definition.Size;
+        float cell = Mathf.Max(10f, definition.DressingCell);
+        var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Dressing"));
+        var midWeights = new float[Mathf.Max(1, mids.Length)];
+        float heroTotal = 0f;
+        // How far each hero reaches from its pivot at scale 1, any way it is turned: a fallen giant set 6 m off a trail must not lie
+        // across it, so the whole of it keeps a metre clear of walkable ground.
+        var heroReach = new float[definition.Heroes.Count];
+        for (int i = 0; i < heroReach.Length; i++)
+        {
+            RaidMapDefinition.Hero hero = definition.Heroes[i];
+            heroTotal += hero?.prefab != null ? Mathf.Max(0f, hero.weight) : 0f;
+            if (hero?.prefab != null)
+            {
+                Bounds bounds = PrefabBounds(hero.prefab);
+                Vector3 far = new Vector3(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)), 0f,
+                    Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)));
+                heroReach[i] = far.magnitude * hero.prefab.transform.localScale.x;
+            }
+        }
+
+        Vector2 heroFrom = definition.HeroFromTrail;
+        Vector2 midFrom = definition.MidFromTrail;
+        Vector2Int midCount = definition.MidsPerCell;
+        int cells = Mathf.CeilToInt(size / cell);
+        for (int gz = 0; gz < cells; gz++)
+        {
+            for (int gx = 0; gx < cells; gx++)
+            {
+                var centre = new Vector2(Mathf.Min((gx + 0.5f) * cell, size - 1f), Mathf.Min((gz + 0.5f) * cell, size - 1f));
+                if (walked(centre) > definition.DressingReach)
+                {
+                    continue;
+                }
+
+                for (int tries = 0; heroTotal > 0f && tries < HeroTries; tries++)
+                {
+                    var spot = new Vector2((gx + (float)random.NextDouble()) * cell, (gz + (float)random.NextDouble()) * cell);
+                    if (spot.x >= size || spot.y >= size)
+                    {
+                        continue;
+                    }
+
+                    float off = walked(spot);
+                    float u = spot.x / size, v = spot.y / size;
+                    if (off < heroFrom.x || off > heroFrom.y || data.GetSteepness(u, v) > HeroSteepest
+                        || definition.Strength(RaidZoneRole.Path, u, v) > 0.1f || Blocked(spot, clearings, forTrees: true)
+                        || (inWater != null && inWater(spot)))
+                    {
+                        continue;
+                    }
+
+                    int pick = PickHero(definition.Heroes, heroTotal, random);
+                    RaidMapDefinition.Hero hero = definition.Heroes[pick];
+                    TreeInstance instance = MakeInstance(Mathf.Max(0, heroPrototypes[pick]), u, v, hero.scale, random);
+                    if (off - heroReach[pick] * instance.widthScale < HeroKeepsClear)
+                    {
+                        continue;
+                    }
+
+                    float room = Mathf.Max(hero.room * instance.widthScale, TrunkClearance);
+                    ClearAround(placed, spot, room, size);
+                    trunks.Add(spot, room);
+                    if (heroPrototypes[pick] < 0 || off <= definition.HeroObjectWithin)
+                    {
+                        heroObjects?.Add(new RaidMapDefinition.HeroObject(hero, spot, instance.rotation * Mathf.Rad2Deg, instance.widthScale));
+                    }
+                    else
+                    {
+                        placed.Add(instance);
+                    }
+
+                    break;
+                }
+
+                int count = mids.Length > 0 ? random.Next(Mathf.Max(0, midCount.x), Mathf.Max(midCount.x, midCount.y) + 1) : 0;
+                for (int m = 0; m < count; m++)
+                {
+                    for (int tries = 0; tries < MidTries; tries++)
+                    {
+                        var spot = new Vector2((gx + (float)random.NextDouble()) * cell, (gz + (float)random.NextDouble()) * cell);
+                        if (spot.x >= size || spot.y >= size)
+                        {
+                            continue;
+                        }
+
+                        float off = walked(spot);
+                        float u = spot.x / size, v = spot.y / size;
+                        if (off < midFrom.x || off > midFrom.y || definition.Strength(RaidZoneRole.Path, u, v) > 0.1f
+                            || Blocked(spot, clearings, forTrees: false) || (inWater != null && inWater(spot)))
+                        {
+                            continue;
+                        }
+
+                        if (Place(mids, read(spot, u, v), random, midWeights, trunks, placed, u, v, false) >= 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static int PickHero(IReadOnlyList<RaidMapDefinition.Hero> heroes, float total, System.Random random)
+    {
+        double roll = random.NextDouble() * total;
+        int last = 0;
+        for (int i = 0; i < heroes.Count; i++)
+        {
+            RaidMapDefinition.Hero hero = heroes[i];
+            float weight = hero?.prefab != null ? Mathf.Max(0f, hero.weight) : 0f;
+            if (weight <= 0f) continue;
+            last = i;
+            roll -= weight;
+            if (roll < 0d) return i;
+        }
+
+        return last;
+    }
+
+    // Takes what was scattered within the radius (metres) of a spot off the map, so a hero stands on its own ground. Compacts in place.
+    private static void ClearAround(List<TreeInstance> placed, Vector2 spot, float radius, float size)
+    {
+        float squared = radius * radius;
+        int kept = 0;
+        for (int i = 0; i < placed.Count; i++)
+        {
+            TreeInstance tree = placed[i];
+            float dx = tree.position.x * size - spot.x, dz = tree.position.z * size - spot.y;
+            if (dx * dx + dz * dz >= squared)
+            {
+                placed[kept++] = tree;
+            }
+        }
+
+        placed.RemoveRange(kept, placed.Count - kept);
     }
 
     /// <summary>

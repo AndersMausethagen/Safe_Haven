@@ -38,7 +38,7 @@ public static partial class RaidMapGenerator
 
         float reach = rules.TrailHalfWidth * plan.Mood.trails + BoulderWidest * 0.5f + 1f;
         int cleared = 0;
-        foreach (string holderName in new[] { BouldersName, RavinesName })
+        foreach (string holderName in new[] { BouldersName, RavinesName, DressingName })
         {
             Transform holder = map.transform.Find(holderName);
             if (holder == null)

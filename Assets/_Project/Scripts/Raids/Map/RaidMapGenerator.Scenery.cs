@@ -185,8 +185,9 @@ public static partial class RaidMapGenerator
         Vector3 origin = terrain.transform.position;
         foreach (RaidLayoutLandmark landmark in plan.Landmarks)
         {
-            RaidLandmarkRule rule = PickLandmark(rules, landmark.Pick);
-            if (rule == null)
+            // A landmark at a node names its rule; the others are picked by weight among those not kept for nodes.
+            RaidLandmarkRule rule = landmark.Rule >= 0 && landmark.Rule < rules.Landmarks.Count ? rules.Landmarks[landmark.Rule] : PickLandmark(rules, landmark.Pick);
+            if (rule == null || rule.prefab == null)
             {
                 continue;
             }
@@ -208,6 +209,10 @@ public static partial class RaidMapGenerator
             }
 
             made.transform.position += Vector3.up * (at.y - bounds.min.y - bounds.size.y * rule.sink);
+            if (rule.revealRadius > 0f || rule.knownAtStart || rule.sound != null)
+            {
+                made.AddComponent<RaidMapLandmark>().Configure(rule.revealRadius, rule.knownAtStart, rule.icon, rule.sound, rule.soundEvery, rule.soundLoops);
+            }
         }
     }
 
@@ -216,13 +221,13 @@ public static partial class RaidMapGenerator
         float total = 0f;
         foreach (RaidLandmarkRule rule in rules.Landmarks)
         {
-            total += rule != null && rule.prefab != null ? rule.weight : 0f;
+            total += rule != null && rule.prefab != null && !rule.atNodes ? rule.weight : 0f;
         }
 
         float roll = share * total;
         foreach (RaidLandmarkRule rule in rules.Landmarks)
         {
-            if (rule == null || rule.prefab == null)
+            if (rule == null || rule.prefab == null || rule.atNodes)
             {
                 continue;
             }

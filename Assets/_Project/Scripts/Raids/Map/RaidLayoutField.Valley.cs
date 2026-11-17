@@ -30,7 +30,7 @@ public sealed partial class RaidLayoutField
             if (!crossing.Bridge)
             {
                 Stamp(crossing.Position - crossing.Direction * crossing.Reach, crossing.Position + crossing.Direction * crossing.Reach,
-                    trailHalfWidth, fordDistance);
+                    LinkHalfWidth(crossing.Trail, trailHalfWidth), fordDistance);
             }
         }
     }

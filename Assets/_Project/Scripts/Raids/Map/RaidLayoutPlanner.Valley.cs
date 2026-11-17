@@ -289,7 +289,212 @@ public static partial class RaidLayoutPlanner
             plan.Crossings.Add(new RaidLayoutCrossing { Position = crossing, Direction = direction, Reach = reach, Trail = t });
         }
 
+        CapCrossings(plan, rules, attempt);
         ChooseBridges(plan, rules.Valley, attempt);
+    }
+
+    /// <summary>
+    /// At most <paramref name="most"/> crossings (RaidValleyRule.maxCrossings, G8; 0: no limit, as before): with a crossing every few
+    /// clearings the river stops being an edge and a toll stops mattering. The stops stand on alternating banks, so nearly every trail
+    /// crosses and none could go without cutting the map apart: first each bank's clearings are chained along the bank, in order up the
+    /// valley, by trails that keep to it; then the crossings kept are spread along the valley (one near the mouth, one near the head),
+    /// the rest dropped where every clearing still joins the start, and the short and long ways are found again on what is left. Own
+    /// stream ("Crossing Cap"), so the bridges' stream is unchanged.
+    /// </summary>
+    private static void CapCrossings(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        int most = rules.Valley.maxCrossings;
+        if (most <= 0 || plan.Crossings.Count <= most)
+        {
+            return;
+        }
+
+        ChainBanks(plan, rules, attempt);
+
+        // The kept crossings spread along the valley: for each of `most` evenly spaced places, the nearest crossing not yet kept.
+        var keep = new HashSet<int>();
+        for (int k = 0; k < most; k++)
+        {
+            float wanted = (k + 0.5f) / most;
+            int best = -1;
+            float nearest = float.MaxValue;
+            for (int i = 0; i < plan.Crossings.Count; i++)
+            {
+                float off = Mathf.Abs(plan.Valley.ShareOf(plan.Crossings[i].Position) - wanted);
+                if (!keep.Contains(i) && off < nearest)
+                {
+                    nearest = off;
+                    best = i;
+                }
+            }
+
+            if (best >= 0)
+            {
+                keep.Add(best);
+            }
+        }
+
+        var dropped = new HashSet<int>();
+        for (int i = 0; i < plan.Crossings.Count; i++)
+        {
+            int trail = plan.Crossings[i].Trail;
+            if (!keep.Contains(i) && StillJoined(plan, dropped, trail))
+            {
+                dropped.Add(trail);
+            }
+        }
+
+        if (dropped.Count == 0)
+        {
+            return;
+        }
+
+        DropLinks(plan, dropped);
+
+        // The routes ran over trails that may be gone: the short way and a long one are found again (no bypass: a new trail here would
+        // cross the river unshaped).
+        plan.ShortRoute.Clear();
+        plan.LongRoute.Clear();
+        if (plan.MainExit < 0)
+        {
+            return;
+        }
+
+        List<int> shortest = ShortestPath(plan, 0, plan.MainExit, null);
+        if (shortest == null)
+        {
+            return;
+        }
+
+        plan.ShortRoute.UnionWith(shortest);
+        List<int> other = AlternativePath(plan, plan.MainExit, shortest);
+        if (other != null)
+        {
+            plan.LongRoute.UnionWith(other);
+        }
+    }
+
+    // Joins each bank's clearings in order up the valley, where no trail joins them yet, with trails kept on that bank: then the river
+    // can be crossed at a few places only and every clearing still be reached.
+    private static void ChainBanks(RaidLayoutPlan plan, RaidLayoutRules rules, int attempt)
+    {
+        RaidLayoutValley valley = plan.Valley;
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Crossing Cap " + attempt));
+        float clear = RiverClear(plan);
+        foreach (int bank in new[] { -1, 1 })
+        {
+            var rooms = new List<int>();
+            for (int i = 0; i < plan.Rooms.Count; i++)
+            {
+                if (valley.BankOf(plan.Rooms[i].Position) == bank)
+                {
+                    rooms.Add(i);
+                }
+            }
+
+            rooms.Sort((a, b) =>
+            {
+                int up = valley.ShareOf(plan.Rooms[a].Position).CompareTo(valley.ShareOf(plan.Rooms[b].Position));
+                return up != 0 ? up : a.CompareTo(b);
+            });
+
+            for (int i = 0; i + 1 < rooms.Count; i++)
+            {
+                int a = rooms[i], b = rooms[i + 1];
+                if (plan.Links.Contains((a, b)) || plan.Links.Contains((b, a)))
+                {
+                    continue;
+                }
+
+                List<Vector2> trail = Wander(plan.Rooms[a].Position, plan.Rooms[b].Position, rules, plan.Size, random);
+                for (int k = 1; k + 1 < trail.Count; k++)
+                {
+                    trail[k] = KeepOnBank(plan, trail[k], bank, clear);
+                }
+
+                plan.Links.Add((a, b));
+                plan.Trails.Add(trail);
+                plan.Rooms[a].Links++;
+                plan.Rooms[b].Links++;
+            }
+        }
+    }
+
+    // True when every clearing still joins the start along the trails without the dropped ones and this one.
+    private static bool StillJoined(RaidLayoutPlan plan, HashSet<int> dropped, int without)
+    {
+        var reached = new bool[plan.Rooms.Count];
+        var open = new Queue<int>();
+        reached[0] = true;
+        open.Enqueue(0);
+        int count = 1;
+        while (open.Count > 0)
+        {
+            int room = open.Dequeue();
+            for (int link = 0; link < plan.Links.Count; link++)
+            {
+                if (link == without || dropped.Contains(link))
+                {
+                    continue;
+                }
+
+                (int a, int b) = plan.Links[link];
+                int other = a == room ? b : b == room ? a : -1;
+                if (other >= 0 && !reached[other])
+                {
+                    reached[other] = true;
+                    count++;
+                    open.Enqueue(other);
+                }
+            }
+        }
+
+        return count == plan.Rooms.Count;
+    }
+
+    // Takes trails off the map, keeping every list indexed by link (trails, the routes, the crossings) in step.
+    private static void DropLinks(RaidLayoutPlan plan, HashSet<int> dropped)
+    {
+        var newIndex = new int[plan.Links.Count];
+        var links = new List<(int a, int b)>(plan.Links.Count);
+        var trails = new List<List<Vector2>>(plan.Trails.Count);
+        for (int link = 0; link < plan.Links.Count; link++)
+        {
+            if (dropped.Contains(link))
+            {
+                newIndex[link] = -1;
+                plan.Rooms[plan.Links[link].a].Links--;
+                plan.Rooms[plan.Links[link].b].Links--;
+                continue;
+            }
+
+            newIndex[link] = links.Count;
+            links.Add(plan.Links[link]);
+            trails.Add(plan.Trails[link]);
+        }
+
+        plan.Links.Clear();
+        plan.Links.AddRange(links);
+        plan.Trails.Clear();
+        plan.Trails.AddRange(trails);
+        foreach (HashSet<int> route in new[] { plan.ShortRoute, plan.LongRoute })
+        {
+            var kept = new List<int>(route);
+            route.Clear();
+            foreach (int link in kept)
+            {
+                if (newIndex[link] >= 0)
+                {
+                    route.Add(newIndex[link]);
+                }
+            }
+        }
+
+        plan.Crossings.RemoveAll(crossing => newIndex[crossing.Trail] < 0);
+        foreach (RaidLayoutCrossing crossing in plan.Crossings)
+        {
+            crossing.Trail = newIndex[crossing.Trail];
+        }
     }
 
     private static Vector2 KeepOnBank(RaidLayoutPlan plan, Vector2 point, int bank, float clear)

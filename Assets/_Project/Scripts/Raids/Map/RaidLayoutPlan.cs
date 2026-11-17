@@ -273,6 +273,23 @@ public sealed class RaidLayoutPlan
     public readonly List<RaidLayoutCrossing> Crossings = new List<RaidLayoutCrossing>();
     /// <summary>Tall things to find the way by.</summary>
     public readonly List<RaidLayoutLandmark> Landmarks = new List<RaidLayoutLandmark>();
+    /// <summary>Short flags beside the two ways to the exit ahead (RaidLayoutRules › Short Flags), placed last.</summary>
+    public readonly List<RaidLayoutFlag> Flags = new List<RaidLayoutFlag>();
+
+    /// <summary>True when the trail of this link is one of the two ways to the exit ahead: a road (RaidLayoutRules › Road Width).</summary>
+    public bool IsRoad(int link) => ShortRoute.Contains(link) || LongRoute.Contains(link);
+
+    /// <summary>The index of the region a point lies in (as <see cref="MoodAt"/> finds it); 0 on a map of one region.</summary>
+    public int RegionIndexAt(Vector2 point)
+    {
+        if (Regions.Count <= 1)
+        {
+            return 0;
+        }
+
+        Nearest(point, out RaidLayoutRegion first, out _, out _, out _);
+        return Regions.IndexOf(first);
+    }
 
     private const float RegionWarp = 45f;
 
@@ -415,6 +432,8 @@ public sealed class RaidLayoutRegion
     public RaidMapMood Mood;
     /// <summary>How far its land reaches against the others' (distances are divided by it): the start's region reaches furthest.</summary>
     public float Reach = 1f;
+    /// <summary>What the district is for (G1): the start's the Approach, the one round the apex the Lair, unless its mood says otherwise.</summary>
+    public RaidDistrictRole Role = RaidDistrictRole.Approach;
 }
 
 /// <summary>A river across the open land of a generated map, in metres from the map's south-west corner: deep enough to swim, with fords
@@ -458,5 +477,17 @@ public sealed class RaidLayoutLandmark
     public float Scale;
     public float Turn;
     /// <summary>0-1: which of the rules' landmarks, by weight.</summary>
+    public float Pick;
+    /// <summary>The rules' landmark it is, by index, for one placed at a node (RaidLandmarkRule.atNodes); -1: by <see cref="Pick"/>.</summary>
+    public int Rule = -1;
+}
+
+/// <summary>A short flag beside a road (RaidLayoutRules › Short Flags), in metres from the map's south-west corner.</summary>
+public sealed class RaidLayoutFlag
+{
+    public Vector2 Position;
+    /// <summary>Degrees about up: it faces the trail.</summary>
+    public float Turn;
+    /// <summary>0-1: which of the rules' flags.</summary>
     public float Pick;
 }

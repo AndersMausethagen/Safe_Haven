@@ -92,6 +92,9 @@ public static partial class RaidLayoutPlanner
         PlaceRivers(plan, rules, attempt);
         PlaceBoulders(plan, rules, attempt);
         PlaceLandmarks(plan, rules, attempt);
+        // After every step above, each from its own stream, so turning them on never moves what those placed.
+        PlaceNodeLandmarks(plan, rules, attempt);
+        PlaceShortFlags(plan, rules, attempt);
         return plan;
     }
 

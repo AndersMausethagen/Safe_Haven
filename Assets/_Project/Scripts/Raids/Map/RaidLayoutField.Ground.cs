@@ -260,5 +260,35 @@ public sealed partial class RaidLayoutField
         }
     }
 
+    /// <summary>
+    /// Where the roads run (the two ways to the exit ahead, at Road Width), as a zone like <see cref="Zones"/>' path, for the map's Road
+    /// Layer (G5). Worked out only when asked, so a map that paints no roads pays nothing; null when the plan has no routes.
+    /// </summary>
+    public byte[] RoadZone()
+    {
+        if (plan.ShortRoute.Count == 0 && plan.LongRoute.Count == 0)
+        {
+            return null;
+        }
+
+        float[] road = Filled(reach);
+        float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
+        for (int i = 0; i < plan.Trails.Count; i++)
+        {
+            if (plan.IsRoad(i))
+            {
+                StampLine(plan.Trails[i], halfWidth * rules.RoadWidth, road);
+            }
+        }
+
+        var zone = new byte[resolution * resolution];
+        for (int index = 0; index < zone.Length; index++)
+        {
+            zone[index] = Byte(1f - Mathf.SmoothStep(0f, 1f, (road[index] + SoilEdge) / (SoilEdge * 2f)));
+        }
+
+        return zone;
+    }
+
     private static byte Byte(float strength) => (byte)Mathf.RoundToInt(Mathf.Clamp01(strength) * 255f);
 }

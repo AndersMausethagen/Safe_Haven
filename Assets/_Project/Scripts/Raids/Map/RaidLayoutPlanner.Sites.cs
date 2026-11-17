@@ -109,16 +109,30 @@ public static partial class RaidLayoutPlanner
         return from.Count > 0 ? from[from.Count - 1] : null;
     }
 
+    // With districts that weigh differently (G1), each takes up to its share first; what found no room in its own district then goes to
+    // any district that takes the kind at all, so the map's count holds where it can.
     private static void PlaceSites(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSiteQuota quota, System.Random random)
     {
+        DistrictShare districts = ShareOut(plan, rules, quota);
         if (quota.placement == RaidSitePlacement.Room || quota.placement == RaidSitePlacement.DeadEnd)
         {
-            PlaceInRooms(plan, rules, quota, random);
+            PlaceInRooms(plan, rules, quota, random, districts);
         }
 
         for (int tries = 0; tries < SiteTries * quota.count && CountOf(plan, quota.kind) < quota.count; tries++)
         {
-            TryAlongTrail(plan, rules, quota, random);
+            TryAlongTrail(plan, rules, quota, random, districts);
+        }
+
+        if (districts == null || CountOf(plan, quota.kind) >= quota.count)
+        {
+            return;
+        }
+
+        districts.Strict = false;
+        for (int tries = 0; tries < SiteTries * quota.count && CountOf(plan, quota.kind) < quota.count; tries++)
+        {
+            TryAlongTrail(plan, rules, quota, random, districts);
         }
     }
 
@@ -133,7 +147,7 @@ public static partial class RaidLayoutPlanner
         return count;
     }
 
-    private static void PlaceInRooms(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSiteQuota quota, System.Random random)
+    private static void PlaceInRooms(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSiteQuota quota, System.Random random, DistrictShare districts)
     {
         PlaceOverRamps(plan, rules, quota, random);
         // Dead ends first, or only them; what stays unplaced finds a pocket along a trail. Camps take the short way to the exit first and
@@ -169,14 +183,14 @@ public static partial class RaidLayoutPlanner
 
             Vector2 spot = room.Position + Direction(Range(random, 0f, 360f)) * (room.Radius * Range(random, 0f, 0.5f));
             spot = Inside(spot, plan.Size, rules.EdgeMargin);
-            if (CanStand(plan, quota, spot) && PocketFits(plan, rules, spot, quota.clearing))
+            if (CanStand(plan, quota, spot) && PocketFits(plan, rules, spot, quota.clearing) && (districts == null || districts.Takes(plan, quota.kind, spot)))
             {
                 AddSite(plan, quota, spot);
             }
         }
     }
 
-    private static void TryAlongTrail(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSiteQuota quota, System.Random random)
+    private static void TryAlongTrail(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSiteQuota quota, System.Random random, DistrictShare districts)
     {
         if (plan.Trails.Count == 0)
         {
@@ -217,7 +231,7 @@ public static partial class RaidLayoutPlanner
 
         if (quota.placement == RaidSitePlacement.OnPath)
         {
-            if (CanStand(plan, quota, point) && PocketFits(plan, rules, point, quota.clearing))
+            if (CanStand(plan, quota, point) && PocketFits(plan, rules, point, quota.clearing) && (districts == null || districts.Takes(plan, quota.kind, point)))
             {
                 AddSite(plan, quota, point);
             }
@@ -233,7 +247,7 @@ public static partial class RaidLayoutPlanner
         }
 
         if (spot.x < rules.EdgeMargin || spot.y < rules.EdgeMargin || spot.x > plan.Size - rules.EdgeMargin || spot.y > plan.Size - rules.EdgeMargin
-            || !CanStand(plan, quota, spot) || !PocketFits(plan, rules, spot, quota.clearing))
+            || !CanStand(plan, quota, spot) || !PocketFits(plan, rules, spot, quota.clearing) || (districts != null && !districts.Takes(plan, quota.kind, spot)))
         {
             return;
         }

@@ -388,6 +388,7 @@ public sealed class MinimapHud : MonoBehaviour
         }
 
         ReadRaidSites(player, style);
+        ReadLandmarks(player, style);
         ReadQuest(style);
         ReadBreach(style);
         ReadCreatures(player, style);
@@ -428,6 +429,20 @@ public sealed class MinimapHud : MonoBehaviour
             if (site != null && !site.IsResolved && site.IsFoundFrom(from))
             {
                 Add(site.transform, style.EventMark, style.Text, 16f, pinned: true);
+            }
+        }
+    }
+
+    // A generated map's landmarks (RaidMapLandmark, G4): once found they stay marked, pinned to the rim when far, so the way can be
+    // found by them from anywhere on the map.
+    private void ReadLandmarks(Player player, UIStyle style)
+    {
+        Vector3 from = player.transform.position;
+        foreach (RaidMapLandmark landmark in RaidMapLandmark.Active)
+        {
+            if (landmark != null && landmark.CanBeMarked && landmark.IsFoundFrom(from))
+            {
+                Add(landmark.transform, landmark.Icon != null ? landmark.Icon : dot, style.Text, landmark.Icon != null ? 15f : 8f, pinned: true);
             }
         }
     }

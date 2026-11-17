@@ -78,9 +78,9 @@ public sealed partial class RaidLayoutField
     {
         var field = new RaidLayoutField(plan, rules);
         float halfWidth = rules.TrailHalfWidth * plan.Mood.trails;
-        foreach (List<Vector2> trail in plan.Trails)
+        for (int i = 0; i < plan.Trails.Count; i++)
         {
-            field.StampLine(trail, halfWidth, field.trailDistance);
+            field.StampLine(plan.Trails[i], field.LinkHalfWidth(i, halfWidth), field.trailDistance);
         }
 
         foreach (List<Vector2> spur in plan.Spurs)
@@ -156,6 +156,13 @@ public sealed partial class RaidLayoutField
 
         return deepest > 0f ? Mathf.Max(0f, deepest + RavineFloorAbove - (rules.GroundHeight - rules.Hills)) : 0f;
     }
+
+    /// <summary>
+    /// Half the width of a link's trail: wider on the two ways to the exit ahead, which are roads (RaidLayoutRules › Road Width, G5).
+    /// Exactly the trail's width when Road Width is 1, so maps without roads are as they were.
+    /// </summary>
+    private float LinkHalfWidth(int link, float halfWidth) =>
+        rules.RoadWidth != 1f && link >= 0 && plan.IsRoad(link) ? halfWidth * rules.RoadWidth : halfWidth;
 
     private float[] Filled(float value)
     {

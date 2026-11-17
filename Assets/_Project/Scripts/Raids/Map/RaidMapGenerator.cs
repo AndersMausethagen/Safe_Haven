@@ -26,10 +26,12 @@ public static partial class RaidMapGenerator
     /// <summary>
     /// Gives the terrain the plan's heights, paint, trees and rocks. <paramref name="data"/> must be a runtime copy. The field and the heights
     /// can come worked out already (RaidMap does them on a worker thread); returns how long each part took. <paramref name="vergeRoom"/>
-    /// is where the paths' grassy verge may grow, from the paint (RaidMapSurface.Paint), for the grass grown afterwards.
+    /// is where the paths' grassy verge may grow, from the paint (RaidMapSurface.Paint), for the grass grown afterwards. The set dressing's
+    /// heroes that stand as objects are added to <paramref name="heroes"/> for <see cref="PlaceDressing"/>.
     /// </summary>
     public static string ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules,
-        out byte[,] vergeRoom, int tier = 0, RaidLayoutField field = null, float[,] metres = null, float highest = 0f)
+        out byte[,] vergeRoom, int tier = 0, RaidLayoutField field = null, float[,] metres = null, float highest = 0f,
+        List<RaidMapDefinition.HeroObject> heroes = null)
     {
         var clock = System.Diagnostics.Stopwatch.StartNew();
         field ??= RaidLayoutField.Build(plan, rules);
@@ -50,7 +52,9 @@ public static partial class RaidMapGenerator
         // The map's own painting and scattering, on a copy that paints from the generated zones.
         field.Zones(out byte[] path, out byte[] forest, out byte[] clearing);
         RaidMapDefinition working = Object.Instantiate(definition);
-        working.UseGenerated(field.Resolution, path, forest, clearing, plan.Mood, plan.Seed, tier);
+        // Roads are worked out only for a map that paints them (Road Layer, G5).
+        byte[] road = definition.RoadLayer != null ? field.RoadZone() : null;
+        working.UseGenerated(field.Resolution, path, forest, clearing, plan.Mood, plan.Seed, tier, road);
         System.Func<Vector2, float> wetness = plan.Rivers.Count > 0
             ? spot => Mathf.Max(plan.Wetness(spot, rules.WetReach, rules.DampGround), field.RiverWetness(spot, rules.WetReach))
             : spot => plan.Wetness(spot, rules.WetReach, rules.DampGround);
@@ -84,7 +88,11 @@ public static partial class RaidMapGenerator
         }
 
         // Stones by the water (the map's Shore list) go by the field's ponds, rivers and fen.
-        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight, field.WaterNear);
+        // The set dressing (G9) measures from walkable ground; only a map with heroes or mids asks.
+        System.Func<Vector2, float> walked = working.Heroes.Count > 0 || working.Mids.Count > 0
+            ? spot => field.WalkedDistance(spot.x / plan.Size, spot.y / plan.Size)
+            : (System.Func<Vector2, float>)null;
+        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight, field.WaterNear, walked, heroes);
         Object.Destroy(working);
         return $"heights {heights} ms, paint {paint - heights} ms, scatter {clock.ElapsedMilliseconds - paint} ms";
     }

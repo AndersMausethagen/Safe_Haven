@@ -12,6 +12,8 @@ public enum RaidZoneRole
     Clearing = 2,
     /// <summary>Candidate spawn points for the spawn groups whose Zone has this zone's name (ore, herbs, wolves...).</summary>
     Spawn = 3,
+    /// <summary>Roads: the two ways to the exit ahead on a generated map, painted with the map's Road Layer (G5). Never painted by hand.</summary>
+    Road = 4,
 }
 
 /// <summary>

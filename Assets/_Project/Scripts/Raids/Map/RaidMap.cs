@@ -259,13 +259,15 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             (float[,] metres, float highest) = heightsTask.Result;
             times.Append($"heights worked out {step.ElapsedMilliseconds} ms, ");
             step.Restart();
-            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, out vergeRoom, tier, field, metres, highest)).Append(", ");
+            var heroes = new List<RaidMapDefinition.HeroObject>();
+            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, out vergeRoom, tier, field, metres, highest, heroes)).Append(", ");
             terrain.Flush();
             yield return null;
             step.Restart();
             RebuildTrunks();
             rumourSpots.Clear();
             rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
+            RaidMapGenerator.PlaceDressing(this, Layout, rules, heroes);
             times.Append($"content {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);

@@ -9,15 +9,22 @@ using static CodeUI;
 /// </summary>
 public sealed partial class RaidPreparationWindow
 {
-    // A large map's other regions, named after the run's own.
+    // A large map's other regions (or a normal map's other districts, Rules › Normal Regions), named after the run's own.
     private string Beyond(RaidDefinition raid)
     {
-        if (!plan.Large || !raid.CanBeLarge)
+        if (raid.LayoutRules == null)
         {
             return "";
         }
 
-        List<RaidMapMood> moods = RaidLayoutPlanner.RegionMoods(raid.LayoutRules, plan.Seed, raid.LayoutRules.LargeRegions);
+        bool large = plan.Large && raid.CanBeLarge;
+        Vector2Int range = large ? raid.LayoutRules.LargeRegions : raid.LayoutRules.NormalRegions;
+        if (range.y <= 1)
+        {
+            return "";
+        }
+
+        List<RaidMapMood> moods = RaidLayoutPlanner.RegionMoods(raid.LayoutRules, plan.Seed, range);
         if (moods.Count <= 1)
         {
             return "";

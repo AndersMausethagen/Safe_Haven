@@ -55,7 +55,7 @@ public sealed partial class RaidLayoutField
             for (int k = 0; k + 1 < trail.Count; k++)
             {
                 float next = run + Vector2.Distance(trail[k], trail[k + 1]);
-                StampLevel(trail[k], trail[k + 1], halfWidth, run, next, Ramp, id);
+                StampLevel(trail[k], trail[k + 1], LinkHalfWidth(i, halfWidth), run, next, Ramp, id);
                 run = next;
             }
         }
