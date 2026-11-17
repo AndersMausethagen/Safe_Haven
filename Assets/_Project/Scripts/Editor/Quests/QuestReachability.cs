@@ -309,6 +309,19 @@ public static class QuestReachability
         var naturalPaths = new HashSet<string>(ContentAudit.Index()
             .Where(r => r.Kind == "Item" && WorldSources.Any(prefix => r.Field.StartsWith(prefix, System.StringComparison.Ordinal)))
             .Select(r => r.Target));
+        // Kills: a creature's drops live in its Loot Table now (Data/Loot), not its inline list. What a creature gives anywhere counts
+        // (no From Tier, not a raid-only part); a cache's table is luck and doesn't.
+        foreach (MonsterDefinition monster in Load<MonsterDefinition>())
+        {
+            foreach (ItemDropEntry entry in monster.LootTable != null ? monster.LootTable.Drops.Entries : System.Array.Empty<ItemDropEntry>())
+            {
+                if (entry != null && entry.Item != null && entry.FromTier <= 0 && !entry.Item.RaidOnly)
+                {
+                    naturalPaths.Add(AssetDatabase.GetAssetPath(entry.Item));
+                }
+            }
+        }
+
         string scenes = string.Concat(HomeScenes.Where(File.Exists).Select(File.ReadAllText));
         foreach (ItemDefinition item in Load<ItemDefinition>())
         {

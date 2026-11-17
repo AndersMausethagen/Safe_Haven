@@ -13,9 +13,6 @@ using Object = UnityEngine.Object;
 /// </summary>
 public sealed class LootTableSection : ContentSection
 {
-    private LootTable usersFor;
-    private List<(Object owner, string text)> users = new List<(Object, string)>();
-
     public override string Title => "Loot Tables";
     public override string Noun => "Loot Table";
     public override string SidebarGroup => "Loot";
@@ -72,12 +69,7 @@ public sealed class LootTableSection : ContentSection
         LootOverview.DrawTierGrid(table);
         ContentUtility.EndPanel();
 
-        if (usersFor != table)
-        {
-            usersFor = table;
-            users = LootOverview.UsersOf(table);
-        }
-
+        List<(Object owner, string text)> users = LootOverview.UsersOf(table);
         ContentUtility.BeginPanel("Used by", "Click to select it.");
         if (users.Count == 0)
         {
@@ -94,7 +86,7 @@ public sealed class LootTableSection : ContentSection
 
         if (GUILayout.Button("Refresh", GUILayout.Width(80f)))
         {
-            users = LootOverview.UsersOf(table);
+            LootOverview.Invalidate();
         }
 
         ContentUtility.EndPanel();
@@ -109,47 +101,83 @@ public static class LootOverview
 {
     private const string DocPath = "Docs/LootTables.md";
 
+    // Who points at which table, and each raid's lines by tier: built once and dropped whenever the project changes (2026-11-17 review:
+    // scanning every prefab per table on each list rebuild, and the raid lines on every repaint, stalled the Content Editor).
+    private static Dictionary<LootTable, List<(Object owner, string text)>> users;
+    private static readonly Dictionary<(RaidDefinition, int), List<string>> RaidLineCache = new Dictionary<(RaidDefinition, int), List<string>>();
+
+    [InitializeOnLoadMethod]
+    private static void WatchProject() => EditorApplication.projectChanged += Invalidate;
+
+    public static void Invalidate()
+    {
+        users = null;
+        RaidLineCache.Clear();
+    }
+
     /// <summary>Monsters, prefabs and raids that point at the table.</summary>
     public static List<(Object owner, string text)> UsersOf(LootTable table)
     {
-        var found = new List<(Object, string)>();
+        users ??= BuildUsers();
+        return users.TryGetValue(table, out List<(Object, string)> found) ? found : new List<(Object, string)>();
+    }
+
+    private static Dictionary<LootTable, List<(Object owner, string text)>> BuildUsers()
+    {
+        var index = new Dictionary<LootTable, List<(Object, string)>>();
+        void Add(LootTable table, Object owner, string text)
+        {
+            if (table == null)
+            {
+                return;
+            }
+
+            if (!index.TryGetValue(table, out List<(Object, string)> list))
+            {
+                index[table] = list = new List<(Object, string)>();
+            }
+
+            if (!list.Exists(entry => entry.Item1 == owner && entry.Item2 == text))
+            {
+                list.Add((owner, text));
+            }
+        }
+
         foreach (string guid in AssetDatabase.FindAssets("t:MonsterDefinition"))
         {
             var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            if (monster != null && monster.LootTable == table)
+            if (monster != null)
             {
-                found.Add((monster, "Monster: " + ContentUtility.DisplayName(monster)));
+                Add(monster.LootTable, monster, "Monster: " + ContentUtility.DisplayName(monster));
             }
         }
 
         foreach (RaidDefinition raid in Raids())
         {
-            if (raid.RegionalLoot == table)
-            {
-                found.Add((raid, $"Raid: {raid.DisplayName}'s regional loot"));
-            }
-
-            if (raid.EliteLoot == table)
-            {
-                found.Add((raid, $"Raid: {raid.DisplayName}'s elites"));
-            }
+            Add(raid.RegionalLoot, raid, $"Raid: {raid.DisplayName}'s regional loot");
+            Add(raid.EliteLoot, raid, $"Raid: {raid.DisplayName}'s elites");
         }
 
-        string tablePath = AssetDatabase.GetAssetPath(table);
         foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs", "Assets/_Project/Data" }))
         {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            if (!AssetDatabase.GetDependencies(path, false).Contains(tablePath))
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+            if (prefab == null)
             {
                 continue;
             }
 
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            bool cache = prefab.GetComponentsInChildren<LootCache>(true).Any(c => c.Table == table);
-            found.Add((prefab, (cache ? "Cache: " : "Prefab: ") + prefab.name));
+            foreach (LootCache cache in prefab.GetComponentsInChildren<LootCache>(true))
+            {
+                Add(cache.Table, prefab, "Cache: " + prefab.name);
+            }
+
+            foreach (LootOnDeath body in prefab.GetComponentsInChildren<LootOnDeath>(true))
+            {
+                Add(body.Table, prefab, "Prefab: " + prefab.name);
+            }
         }
 
-        return found;
+        return index;
     }
 
     /// <summary>A grid: one row per entry, one column for home and each tier, each cell the average one roll gives.</summary>
@@ -228,6 +256,16 @@ public static class LootOverview
 
     /// <summary>What drops in a raid at one tier: its creatures, caches, regional finds and elites, each with its rows there.</summary>
     public static List<string> RaidLines(RaidDefinition raid, RaidDifficulty difficulty)
+    {
+        if (!RaidLineCache.TryGetValue((raid, difficulty.tier), out List<string> lines))
+        {
+            RaidLineCache[(raid, difficulty.tier)] = lines = BuildRaidLines(raid, difficulty);
+        }
+
+        return lines;
+    }
+
+    private static List<string> BuildRaidLines(RaidDefinition raid, RaidDifficulty difficulty)
     {
         int tier = difficulty.tier;
         var lines = new List<string>();
@@ -379,6 +417,7 @@ public static class LootOverview
     /// <summary>Everything above as Markdown: each raid tier by tier, then every table with its rows by tier.</summary>
     public static string Markdown()
     {
+        Invalidate();
         var text = new StringBuilder();
         text.AppendLine("# Loot tables");
         text.AppendLine();

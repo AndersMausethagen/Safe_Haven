@@ -226,7 +226,7 @@ public sealed class LootTableTests
             }
         }
 
-        StringAssert.Contains("Hunter's Lodge level 2", ItemUses.Describe(ItemUses.Of(
+        StringAssert.Contains("Hunter's Lodge tier II", ItemUses.Describe(ItemUses.Of(
             AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/WolfFang.asset"), book.Recipes, book.Buildings)));
     }
 

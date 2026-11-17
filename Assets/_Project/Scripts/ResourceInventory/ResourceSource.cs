@@ -43,6 +43,9 @@ public sealed class ResourceSource : MonoBehaviour
 
     public ItemDropTable Drops => drops;
 
+    // A yield row can be limited to raid tiers (ItemDropEntry From/To Tier): outside a raid, tier 0.
+    private static int RaidTier => RaidDirector.Current != null ? RaidDirector.Current.Session.Tier : 0;
+
     private void Awake()
     {
         interactable = GetComponent<Interactable>();
@@ -84,7 +87,7 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         var leftBehind = new List<string>();
-        Give(bag, recipient, drops.Roll(), drops.RollResources(), leftBehind);
+        Give(bag, recipient, drops.Roll(RaidTier, 1f), drops.RollResources(RaidTier, 1f), leftBehind);
         ReportLeftBehind(leftBehind);
         AfterHarvest(recipient);
         return true;
@@ -142,7 +145,7 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         var leftBehind = new List<string>();
-        Give(recipient.GetComponentInParent<ItemInventory>(), recipient, extra.Roll(), extra.RollResources(), leftBehind);
+        Give(recipient.GetComponentInParent<ItemInventory>(), recipient, extra.Roll(RaidTier, 1f), extra.RollResources(RaidTier, 1f), leftBehind);
         ReportLeftBehind(leftBehind);
         return true;
     }

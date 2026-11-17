@@ -10,7 +10,8 @@ using UnityEngine;
 /// reported rather than silently lost.
 /// <para>
 /// The loot comes from its Loot Table asset (the creature's own, shared with its MonsterDefinition) when one is set. In a raid the
-/// rows of the raid's tier drop, scaled by the raid's loot multiplier (Fixed Amount rows aren't); at home (where the Haven's portal
+/// rows of the raid's tier drop, scaled by the tier's Loot (not the hour's or the modifiers': the night already doubles essence in
+/// Reaped, 2026-11-17 review), Fixed Amount rows not at all; at home (where the Haven's portal
 /// stands) a creature leaves no Cursed Essence and none of the raid-only parts (GDD §13.5: only raids give them).
 /// </para>
 /// </summary>
@@ -92,7 +93,7 @@ public sealed class LootOnDeath : MonoBehaviour
 
         RaidDirector here = RaidDirector.Current;
         int tier = here != null ? here.Session.Tier : 0;
-        float multiplier = here != null ? here.Parameters.LootMultiplier : 1f;
+        float multiplier = here != null && here.Session.Difficulty != null ? here.Session.Difficulty.loot : 1f;
         bool atHome = KilledAtHome;
         var inventory = taker.GetComponentInParent<ItemInventory>();
         if (inventory != null)

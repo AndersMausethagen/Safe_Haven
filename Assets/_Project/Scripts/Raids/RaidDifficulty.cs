@@ -24,7 +24,7 @@ public sealed class RaidDifficulty
     [Min(0f)] public float enemyPower = 1f;
     [Tooltip("Multiplies how many creatures the raid places.")]
     [Min(0f)] public float enemyDensity = 1f;
-    [Tooltip("Multiplies what caches and events hold.")]
+    [Tooltip("Multiplies what caches and events hold, and what creatures drop (their essence too): higher tiers give more.")]
     [Min(0f)] public float loot = 1f;
     [Tooltip("The highest tier of gear and material that can drop here. 0: one above this tier, so a raid pays for the next tier's gear.")]
     [Min(0)] public int dropsUpToTier;

@@ -82,12 +82,7 @@ public sealed class SalvageBench : MonoBehaviour, IStationMenuExtension
                 () => Salvage.TryBreakDown(user, container, slot, 1, recipes)));
             if (stack.Count > 1)
             {
-                var all = new List<ItemAmount>();
-                foreach (ItemAmount part in yield)
-                {
-                    all.Add(new ItemAmount(part.Item, part.Amount * stack.Count));
-                }
-
+                List<ItemAmount> all = Salvage.YieldOf(stack, stack.Count, recipes, DurabilitySettings.Current);
                 page.Add(new MenuAction($"Break down all {stack.Count} {stack.Item.DisplayName}", "→  " + AmountText.Describe(all), true,
                     () => Salvage.TryBreakDown(user, container, slot, stack.Count, recipes)));
             }

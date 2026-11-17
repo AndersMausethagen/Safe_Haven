@@ -11,7 +11,15 @@ using UnityEngine;
 public static class Salvage
 {
     /// <summary>What breaking one of the stack's items down gives. Empty when it can't be broken down.</summary>
-    public static List<ItemAmount> YieldOf(ItemStack stack, IReadOnlyList<RecipeDefinition> recipes, DurabilitySettings settings)
+    public static List<ItemAmount> YieldOf(ItemStack stack, IReadOnlyList<RecipeDefinition> recipes, DurabilitySettings settings) =>
+        YieldOf(stack, 1, recipes, settings);
+
+    /// <summary>
+    /// What breaking <paramref name="count"/> of the stack's items down gives, worked out on the whole count and rounded down, so a piece
+    /// never gives back its full recipe (2026-11-17 review: rounding a single ingredient's half up refunded rings and amulets in full, a
+    /// free re-roll of their quality and their skill experience).
+    /// </summary>
+    public static List<ItemAmount> YieldOf(ItemStack stack, int count, IReadOnlyList<RecipeDefinition> recipes, DurabilitySettings settings)
     {
         var yield = new List<ItemAmount>();
         if (stack.IsEmpty)
@@ -26,7 +34,7 @@ public static class Salvage
             {
                 if (part.Item != null && part.Amount > 0)
                 {
-                    yield.Add(part);
+                    yield.Add(new ItemAmount(part.Item, part.Amount * count));
                 }
             }
 
@@ -42,8 +50,7 @@ public static class Salvage
         float share = settings.SalvageShare * Mathf.Clamp01(stack.Durability) / Mathf.Max(1, recipe.OutputAmount);
         foreach (ItemAmount part in recipe.ItemCost)
         {
-            // Half a plank rounds up: a piece's smallest part still comes back.
-            int amount = part.Item != null ? Mathf.FloorToInt(part.Amount * share + 0.5f) : 0;
+            int amount = part.Item != null ? Mathf.FloorToInt(part.Amount * share * count + 0.0001f) : 0;
             if (amount > 0)
             {
                 yield.Add(new ItemAmount(part.Item, amount));
@@ -76,8 +83,8 @@ public static class Salvage
     public static bool TryBreakDown(GameObject player, ItemContainer container, int slot, int count, IReadOnlyList<RecipeDefinition> recipes)
     {
         ItemStack stack = container != null ? container.GetSlot(slot) : ItemStack.Empty;
-        List<ItemAmount> yield = YieldOf(stack, recipes, DurabilitySettings.Current);
         count = Mathf.Min(count, stack.Count);
+        List<ItemAmount> yield = YieldOf(stack, count, recipes, DurabilitySettings.Current);
         if (yield.Count == 0 || count <= 0)
         {
             GameMessages.Post("Nothing useful would come of breaking that.", MessageKind.Warning);
@@ -89,9 +96,8 @@ public static class Salvage
         var got = new List<ItemAmount>();
         foreach (ItemAmount part in yield)
         {
-            var made = new ItemAmount(part.Item, part.Amount * count);
-            ItemDelivery.Give(bag, new ItemStack(made.Item, made.Amount, 1f), newFind: false, toStash: true);
-            got.Add(made);
+            ItemDelivery.Give(bag, new ItemStack(part.Item, part.Amount, 1f), newFind: false, toStash: true);
+            got.Add(part);
         }
 
         string what = count > 1 ? $"{count} {stack.Item.DisplayName}" : stack.Item.DisplayName;

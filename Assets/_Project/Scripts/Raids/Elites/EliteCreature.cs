@@ -273,7 +273,6 @@ public sealed class EliteCreature : MonoBehaviour
         GiveInscription(killer, difficulty.tier);
     }
 
-    // The mark's own enchantment, one not yet known first; when its marks' are all known, another elite one of the tier, else a copy.
     // The raid's elite table (rows by tier) when it has one, else the tier's own list.
     private static ItemDropTable EliteLoot(RaidDifficulty difficulty)
     {
@@ -281,6 +280,7 @@ public sealed class EliteCreature : MonoBehaviour
         return table != null ? table.Drops : difficulty.eliteLoot;
     }
 
+    // The mark's own enchantment, one not yet known first; when its marks' are all known, another elite one of the tier, else a copy.
     private void GiveInscription(GameObject killer, int tier)
     {
         if (UnityEngine.Random.value >= EssenceSettings.Current.EliteInscriptionChance(tier))

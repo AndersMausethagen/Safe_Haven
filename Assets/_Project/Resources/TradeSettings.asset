@@ -90,3 +90,8 @@ MonoBehaviour:
     price: 6
     stock: 2
     smithyTier: 2
+  - item: {fileID: 11400000, guid: a740a2c1da7fe61468d2d309b7b21fb0, type: 2}
+    amount: 1
+    price: 5
+    stock: 2
+    smithyTier: 2

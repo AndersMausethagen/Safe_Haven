@@ -10,9 +10,11 @@ using UnityEngine;
 public static class ItemUses
 {
     private static object builtFor;
+    private static object builtForBuildings;
     private static readonly Dictionary<ItemDefinition, List<string>> Uses = new Dictionary<ItemDefinition, List<string>>();
 
-    /// <summary>The recipes and buildings that use the item, by name ("Moss Poultice", "Hunter's Lodge level 2"). Empty when none.</summary>
+    /// <summary>The recipes and buildings that use the item, by name ("Moss Poultice", "Hunter's Lodge tier II", as the build menu names
+    /// a level). Empty when none.</summary>
     public static IReadOnlyList<string> Of(ItemDefinition item, IReadOnlyList<RecipeDefinition> recipes, IReadOnlyList<BuildingDefinition> buildings)
     {
         if (item == null || recipes == null)
@@ -20,13 +22,23 @@ public static class ItemUses
             return System.Array.Empty<string>();
         }
 
-        if (!ReferenceEquals(builtFor, recipes))
+        if (!ReferenceEquals(builtFor, recipes) || !ReferenceEquals(builtForBuildings, buildings))
         {
             Build(recipes, buildings);
             builtFor = recipes;
+            builtForBuildings = buildings;
         }
 
         return Uses.TryGetValue(item, out List<string> found) ? found : (IReadOnlyList<string>)System.Array.Empty<string>();
+    }
+
+    // Domain reload is off in the Editor: a recipe or building cost changed between play sessions must not keep the old lines.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        builtFor = null;
+        builtForBuildings = null;
+        Uses.Clear();
     }
 
     /// <summary>"Used for: A, B, C and 4 more", or null when nothing uses it.</summary>
@@ -71,7 +83,7 @@ public static class ItemUses
                     BuildingLevel upgrade = building.Upgrades[level];
                     foreach (ItemAmount cost in upgrade != null ? upgrade.cost : (IReadOnlyList<ItemAmount>)System.Array.Empty<ItemAmount>())
                     {
-                        Add(cost.Item, $"{building.DisplayName} level {level + 2}");
+                        Add(cost.Item, $"{building.DisplayName} tier {Tiers.ToRoman(level + 2)}");
                     }
                 }
             }

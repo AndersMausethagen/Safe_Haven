@@ -46,7 +46,8 @@ public sealed class GiveLootOutcome : RaidEventOutcome
 
         float multiplier = context.Session.Parameters.LootMultiplier * RaidDirector.StageLootNow;
         ItemInventory bag = context.Player.GetComponent<ItemInventory>();
-        foreach (ItemAmount drop in loot.Roll())
+        // Rows by the raid's tier (From/To Tier); the amount is scaled here with the event's own random, so Fixed Amount isn't read.
+        foreach (ItemAmount drop in loot.Roll(context.Session.Tier, 1f))
         {
             if (!context.Session.Allows(drop.Item))
             {
@@ -63,7 +64,7 @@ public sealed class GiveLootOutcome : RaidEventOutcome
         }
 
         var resources = new List<ResourceAmount>();
-        foreach (ResourceAmount drop in loot.RollResources())
+        foreach (ResourceAmount drop in loot.RollResources(context.Session.Tier, 1f))
         {
             resources.Add(new ResourceAmount(drop.Resource, RaidParameters.ScaleAmount(drop.Amount, multiplier, (float)context.Random.NextDouble())));
         }

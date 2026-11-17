@@ -43,6 +43,28 @@ public sealed class SalvageTests
     }
 
     [Test]
+    public void NoPiece_EverGivesBackItsWholeRecipe()
+    {
+        // Rounding a single ingredient's half up once refunded rings and amulets in full: a free re-roll of their quality (2026-11-17 review).
+        foreach (RecipeDefinition recipe in Recipes)
+        {
+            ItemDefinition made = recipe != null ? recipe.Output : null;
+            if (made == null || (made.Category != ItemCategory.Equipment && made.Category != ItemCategory.Tool) || made.BreaksInto.Count > 0)
+            {
+                continue;
+            }
+
+            foreach (ItemAmount part in recipe.ItemCost.Where(cost => cost.Item != null))
+            {
+                int back = Salvage.YieldOf(new ItemStack(made, 1, 1f), Recipes, DurabilitySettings.Current)
+                    .Where(given => given.Item == part.Item).Sum(given => given.Amount);
+                // What one piece gives back, times the pieces the recipe makes, stays under what the recipe costs.
+                Assert.Less(back * Mathf.Max(1, recipe.OutputAmount), Mathf.Max(1, part.Amount), $"{made.name} gives back all of its {part.Item.name}");
+            }
+        }
+    }
+
+    [Test]
     public void MaterialsAndFood_CantBeBrokenDown()
     {
         Assert.IsEmpty(Salvage.YieldOf(new ItemStack(Item("Materials/IronIngot.asset"), 3), Recipes, DurabilitySettings.Current));

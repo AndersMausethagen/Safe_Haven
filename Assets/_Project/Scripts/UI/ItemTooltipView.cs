@@ -725,7 +725,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.RaidOnly)
         {
-            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Only raids give it.</color>");
+            builder.Append($"\n<color={UIStyle.Current.MutedHex}>Creatures give it only in raids.</color>");
         }
     }
 
