@@ -556,6 +556,131 @@
      "prompt": "A single drooping golden barley ear with long fine awns, seen from the side."
     }
    ]
+  },
+  {
+   "asset": "Horsetail",
+   "sprites": [
+    {
+     "name": "stem_a",
+     "seed": 7105,
+     "prompt": "A single upright field horsetail stem (Equisetum arvense): a slender straight green stem with thin dark rings at each joint, from every joint a whorl of many very thin straight unbranched green needles angled upward, shorter towards the tip, like a tiny green bottlebrush, no leaflets, matte, natural."
+    },
+    {
+     "name": "stem_b",
+     "seed": 7102,
+     "prompt": "A single water horsetail stem (Equisetum fluviatile), a smooth jointed green stem with thin black bands at the joints and short sparse whorls of thin jointed needle branches, a slightly darker green, matte."
+    },
+    {
+     "name": "whorl_a",
+     "seed": 7106,
+     "prompt": "One whorl of a field horsetail seen from straight above: about twenty very thin straight unbranched green needles, each finely jointed, radiating evenly from a small dark ring in the centre like a sparse starburst of green wires, no leaflets, matte."
+    },
+    {
+     "name": "whorl_b",
+     "seed": 7104,
+     "prompt": "A horsetail stem tip seen from straight above: a dense ring of many thin dark green jointed needle branches radiating out from a dark centre, slightly uneven lengths, some tips curving."
+    }
+   ]
+  },
+  {
+   "asset": "Sedge Tussock",
+   "sprites": [
+    {
+     "name": "blades_a",
+     "seed": 7201,
+     "prompt": "A fan of ten long thin arching sedge leaf blades (Carex) rising from one base, deep green, narrow and grass-like with a fine keel, gently curving outwards to fine tips, matte."
+    },
+    {
+     "name": "blades_b",
+     "seed": 7202,
+     "prompt": "A fan of long thin sedge blades from one base, mostly dark green with three dry straw-yellow blades among them, narrow and arching, matte, natural."
+    },
+    {
+     "name": "dead_a",
+     "seed": 7203,
+     "prompt": "A tuft of long thin dry dead sedge blades from one base, pale straw-yellow and light brown, curling and bent over, matte, natural."
+    },
+    {
+     "name": "blades_c",
+     "seed": 7205,
+     "prompt": "A flat fan of about twelve long thin sedge blades from one narrow base, green with brownish withered tips, the outer blades arching outward, matte, natural."
+    }
+   ]
+  },
+  {
+   "asset": "Reeds",
+   "sprites": [
+    {
+     "name": "leaves_a",
+     "seed": 7301,
+     "prompt": "Three long narrow flat cattail leaves rising from one base, tall and strap-like, green, gently twisted and arching near the tips, matte, natural."
+    },
+    {
+     "name": "leaves_b",
+     "seed": 7302,
+     "prompt": "Four long narrow common reed leaf blades on a thin stalk, green turning yellow-brown at the tips, one tip bent over, matte, natural."
+    },
+    {
+     "name": "cattail_a",
+     "seed": 7303,
+     "prompt": "A single cattail (bulrush, Typha) seed head: a tall thin straight green stem topped with a long dark brown velvety cylinder and a thin pale spike above it, matte."
+    },
+    {
+     "name": "cattail_b",
+     "seed": 7304,
+     "prompt": "A single cattail stem with a fat chocolate-brown velvety cylindrical seed head, a short dry straw-coloured spike on top, thin green stalk, matte."
+    }
+   ]
+  },
+  {
+   "asset": "Cotton Grass",
+   "sprites": [
+    {
+     "name": "grass_a",
+     "seed": 7401,
+     "prompt": "A small tuft of thin dark green bog grass blades with reddish-brown tips, fanning out, matte, natural."
+    },
+    {
+     "name": "grass_b",
+     "seed": 7402,
+     "prompt": "A sparse tuft of thin wiry green and straw-coloured grass blades, slightly curved, matte, natural."
+    },
+    {
+     "name": "tuft_a",
+     "seed": 7403,
+     "prompt": "A single cotton grass flower head (Eriophorum): a thin green stalk topped with a fluffy tuft of silky cotton hairs, soft off-white with light grey shading between the hairs."
+    },
+    {
+     "name": "tuft_b",
+     "seed": 7405,
+     "prompt": "Three nodding heads of common cotton grass (Eriophorum angustifolium) hanging from very thin curved green stalks, each head a loose tassel of long fine silky white bristles with soft grey shading, a wild bog plant, not cotton bolls."
+    }
+   ]
+  },
+  {
+   "asset": "Marsh Marigold",
+   "sprites": [
+    {
+     "name": "leaf_a",
+     "seed": 7501,
+     "prompt": "A single marsh marigold leaf (Caltha palustris) seen from above, round kidney-shaped with a deep heart-shaped notch at the stalk and a finely scalloped edge, glossy dark green with fine veins."
+    },
+    {
+     "name": "leaf_b",
+     "seed": 7502,
+     "prompt": "Two overlapping round heart-shaped marsh marigold leaves seen from above, glossy deep green, finely scalloped edges, fine veins."
+    },
+    {
+     "name": "flower_a",
+     "seed": 7503,
+     "prompt": "A single marsh marigold flower (Caltha palustris) seen from straight above, five broad rounded glossy golden-yellow petals like a large buttercup, a ring of many yellow stamens in the centre."
+    },
+    {
+     "name": "flower_b",
+     "seed": 7504,
+     "prompt": "A small cluster of three bright golden-yellow marsh marigold flowers and one round green bud seen from above, glossy rounded petals, short green stalks."
+    }
+   ]
   }
  ]
 }

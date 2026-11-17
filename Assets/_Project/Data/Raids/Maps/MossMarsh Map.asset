@@ -440,6 +440,76 @@ MonoBehaviour:
     thickness: 0.3
     clearing: 0
     loveOfWet: 0.5
+  - prototype: Horsetail A
+    enabled: 1
+    patchSize: 4
+    rarity: 0.8
+    thickness: 0.4
+    clearing: 0
+    loveOfWet: 0.9
+  - prototype: Horsetail B
+    enabled: 1
+    patchSize: 4
+    rarity: 0.86
+    thickness: 0.4
+    clearing: 0
+    loveOfWet: 0.9
+  - prototype: Sedge Tussock A
+    enabled: 1
+    patchSize: 6
+    rarity: 0.8
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.7
+  - prototype: Sedge Tussock B
+    enabled: 1
+    patchSize: 6
+    rarity: 0.86
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.7
+  - prototype: Reeds A
+    enabled: 1
+    patchSize: 5
+    rarity: 0.78
+    thickness: 0.45
+    clearing: 0
+    loveOfWet: 1
+  - prototype: Reeds B
+    enabled: 1
+    patchSize: 5
+    rarity: 0.84
+    thickness: 0.45
+    clearing: 0
+    loveOfWet: 1
+  - prototype: Cotton Grass A
+    enabled: 1
+    patchSize: 5
+    rarity: 0.82
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.6
+  - prototype: Cotton Grass B
+    enabled: 1
+    patchSize: 5
+    rarity: 0.88
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.6
+  - prototype: Marsh Marigold A
+    enabled: 1
+    patchSize: 3.5
+    rarity: 0.8
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.85
+  - prototype: Marsh Marigold B
+    enabled: 1
+    patchSize: 3.5
+    rarity: 0.86
+    thickness: 0.35
+    clearing: 0
+    loveOfWet: 0.85
   trees:
   - prefab: {fileID: 9151021589558116730, guid: 0a10eabb45908d2459f221815278f8aa, type: 3}
     weight: 3

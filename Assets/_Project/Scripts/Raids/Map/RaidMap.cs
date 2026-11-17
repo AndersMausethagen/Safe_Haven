@@ -268,6 +268,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             step.Restart();
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceFenWater(this, Layout, rules, field.FenWater, pondMeshes);
+            fenLevel = rules.Fen.enabled ? field.FenWater : float.NaN;
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceBridges(this, Layout, rules);
@@ -388,8 +389,12 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
         }
     }
 
-    // How wet a fen's ground counts at the least for what grows on it (0 to 1).
-    private const float FenDamp = 0.75f;
+    // A fen's wetness for what grows on it: soaking at the water's edge, drying to Fen Damp by Fen Dry Above metres over the water, so
+    // reeds and sedge crowd the banks and the strings and hummocks stay mossy (the concept art: clumps by the pools, not a carpet).
+    private const float FenDamp = 0.25f;
+    private const float FenDryAbove = 0.9f;
+    // The fen's water level over the terrain's origin, in metres (set when its water is placed); NaN without a fen.
+    private float fenLevel = float.NaN;
 
     // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
     // the colour grass takes from the ground, and the surface shader's view of the new paint.
@@ -411,11 +416,17 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             System.Func<Vector3, bool> underTrees = blocked;
             blocked = point => underTrees(point) || plan.InWater(new Vector2(point.x - origin.x, point.z - origin.z));
             wetness = point => plan.Wetness(new Vector2(point.x - origin.x, point.z - origin.z), rules.WetReach, rules.DampGround);
-            // A fen has no ponds to be wet from: its ground is damp everywhere (the user, 2026-11-17: "wet soil").
-            if (rules.Fen.enabled)
+            // A fen has no ponds to be wet from: its ground is wet by how little it stands over the water (the user: "wet soil").
+            if (rules.Fen.enabled && !float.IsNaN(fenLevel))
             {
                 System.Func<Vector3, float> ponds = wetness;
-                wetness = point => Mathf.Max(ponds(point), FenDamp);
+                Terrain ground = terrain;
+                float level = fenLevel;
+                wetness = point =>
+                {
+                    float above = ground.SampleHeight(point) - level;
+                    return Mathf.Max(ponds(point), Mathf.Lerp(1f, FenDamp, Mathf.SmoothStep(0f, 1f, above / FenDryAbove)));
+                };
             }
         }
 
