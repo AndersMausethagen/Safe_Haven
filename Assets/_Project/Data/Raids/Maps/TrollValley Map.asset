@@ -428,60 +428,73 @@ MonoBehaviour:
     clearing: 0
     loveOfWet: 0.8
   trees:
-  - prefab: {fileID: 8896246634900274262, guid: e7e112141c69cef4bbacdc428bbaf5ce, type: 3}
-    weight: 1.2
-    scale: {x: 0.7, y: 0.95}
-    fromTier: 0
-    toTier: 0
-    habitat:
-      slope: {x: 0, y: 22}
-      forest: {x: 0.55, y: 1}
-      wet: 0.2
-      edge: -0.6
-      nearTrees: 0
-      groves: 0.4
-      room: 3
-  - prefab: {fileID: 2432845718604954315, guid: 59c9184e28e36c94daedba055f6d0418, type: 3}
-    weight: 1.2
-    scale: {x: 0.7, y: 0.95}
-    fromTier: 0
-    toTier: 0
-    habitat:
-      slope: {x: 0, y: 22}
-      forest: {x: 0.55, y: 1}
-      wet: 0.2
-      edge: -0.6
-      nearTrees: 0
-      groves: 0.4
-      room: 3
-  - prefab: {fileID: 6839028566643895452, guid: cece39637df4fd044ab4df7346499ad8, type: 3}
-    weight: 2
+  - prefab: {fileID: 9151021589558116730, guid: 0a10eabb45908d2459f221815278f8aa, type: 3}
+    weight: 3
     scale: {x: 0.8, y: 1.05}
     fromTier: 0
     toTier: 0
     habitat:
-      slope: {x: 0, y: 28}
-      forest: {x: 0.4, y: 1}
+      slope: {x: 0, y: 32}
+      forest: {x: 0.2, y: 1}
       wet: 0
-      edge: -0.3
+      edge: 0.2
       nearTrees: 0
-      groves: 0.5
-      room: 2.4
-  - prefab: {fileID: 6916635119391120721, guid: 0e9e9d7066c78694bb9528709fbfc590, type: 3}
-    weight: 2
+      groves: 0.3
+      room: 1.8
+  - prefab: {fileID: 8842390734658243435, guid: 7c9e51b38fbc5c647a4a85593b19315b, type: 3}
+    weight: 3
     scale: {x: 0.8, y: 1.05}
     fromTier: 0
     toTier: 0
     habitat:
-      slope: {x: 0, y: 30}
-      forest: {x: 0.35, y: 1}
-      wet: -0.3
-      edge: -0.2
+      slope: {x: 0, y: 32}
+      forest: {x: 0.2, y: 1}
+      wet: 0
+      edge: 0.2
       nearTrees: 0
-      groves: 0.5
-      room: 2.3
+      groves: 0.3
+      room: 1.8
+  - prefab: {fileID: 5815589224363596077, guid: 6129ca59a0de959419ebf609dbb69b3d, type: 3}
+    weight: 2.2
+    scale: {x: 0.85, y: 1.25}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 32}
+      forest: {x: 0.2, y: 1}
+      wet: 0
+      edge: 0.2
+      nearTrees: 0
+      groves: 0.3
+      room: 1.8
+  - prefab: {fileID: 2481782460357682015, guid: 93b20c7363fb53145a338059f706c53c, type: 3}
+    weight: 2.2
+    scale: {x: 0.85, y: 1.25}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 32}
+      forest: {x: 0.2, y: 1}
+      wet: 0
+      edge: 0.2
+      nearTrees: 0
+      groves: 0.3
+      room: 1.8
+  - prefab: {fileID: 4664926423558582574, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
+    weight: 1.4
+    scale: {x: 0.85, y: 1.2}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 34}
+      forest: {x: 0.15, y: 1}
+      wet: -0.3
+      edge: 0.2
+      nearTrees: 0
+      groves: 0.4
+      room: 1.4
   - prefab: {fileID: 2536764809155501970, guid: 4d3cb955aa9c9014fba5e5512d3315b0, type: 3}
-    weight: 1.5
+    weight: 1
     scale: {x: 0.85, y: 1.1}
     fromTier: 0
     toTier: 0
@@ -494,7 +507,7 @@ MonoBehaviour:
       groves: 0.6
       room: 1.8
   - prefab: {fileID: 5667429938717972990, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
-    weight: 2.5
+    weight: 0.8
     scale: {x: 0.85, y: 1.2}
     fromTier: 0
     toTier: 0
@@ -506,60 +519,21 @@ MonoBehaviour:
       nearTrees: 0
       groves: 0.3
       room: 1.8
-  - prefab: {fileID: 3226712138437348941, guid: 8c77f9772bf5c4d428ffde22612e5d28, type: 3}
-    weight: 2.5
-    scale: {x: 0.85, y: 1.2}
+  - prefab: {fileID: 6839028566643895452, guid: cece39637df4fd044ab4df7346499ad8, type: 3}
+    weight: 0.5
+    scale: {x: 0.8, y: 1.05}
     fromTier: 0
     toTier: 0
     habitat:
-      slope: {x: 0, y: 32}
-      forest: {x: 0.2, y: 1}
+      slope: {x: 0, y: 28}
+      forest: {x: 0.4, y: 1}
       wet: 0
-      edge: 0.2
+      edge: -0.3
       nearTrees: 0
-      groves: 0.3
-      room: 1.8
-  - prefab: {fileID: 4664926423558582574, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
-    weight: 2
-    scale: {x: 0.85, y: 1.2}
-    fromTier: 0
-    toTier: 0
-    habitat:
-      slope: {x: 0, y: 34}
-      forest: {x: 0.15, y: 1}
-      wet: -0.3
-      edge: 0.2
-      nearTrees: 0
-      groves: 0.4
-      room: 1.4
-  - prefab: {fileID: 8869661558912811196, guid: 0976536dbf8ecfc4189e694d6cefa254, type: 3}
-    weight: 2
-    scale: {x: 0.85, y: 1.2}
-    fromTier: 0
-    toTier: 0
-    habitat:
-      slope: {x: 0, y: 30}
-      forest: {x: 0.2, y: 1}
-      wet: 0.2
-      edge: 0
-      nearTrees: 0
-      groves: 0.3
-      room: 1.9
-  - prefab: {fileID: 6554074881052131378, guid: 97d9b686c0ec3b44794902aef75578ae, type: 3}
-    weight: 2
-    scale: {x: 0.85, y: 1.2}
-    fromTier: 0
-    toTier: 0
-    habitat:
-      slope: {x: 0, y: 30}
-      forest: {x: 0.2, y: 1}
-      wet: 0.2
-      edge: 0
-      nearTrees: 0
-      groves: 0.3
-      room: 1.9
+      groves: 0.5
+      room: 2.4
   - prefab: {fileID: 4444697584306223501, guid: 04a9109d39536f744b86a9dfe80ea9fe, type: 3}
-    weight: 1.5
+    weight: 0.9
     scale: {x: 0.85, y: 1.2}
     fromTier: 0
     toTier: 0
@@ -572,7 +546,7 @@ MonoBehaviour:
       groves: 0.2
       room: 1.2
   - prefab: {fileID: 4397208832055064175, guid: 79e5700236bb6024eb0da41cc302ed71, type: 3}
-    weight: 0.25
+    weight: 0.3
     scale: {x: 0.75, y: 1.05}
     fromTier: 2
     toTier: 0

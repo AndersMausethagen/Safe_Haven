@@ -244,6 +244,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
+            RaidMapGenerator.PlaceBridges(this, Layout, rules);
             times.Append($"ravines and water {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             if (terrain.TryGetComponent(out TerrainMoss moss))
