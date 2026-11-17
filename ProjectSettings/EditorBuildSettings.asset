@@ -21,6 +21,9 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Raids/Raid_MossMarsh.unity
     guid: 3f0b0626eb5afca4da1d3d2f8b31ecf4
   - enabled: 1
+    path: Assets/_Project/Scenes/Raids/Encounter_BrukamsBridge.unity
+    guid: 421c5ff47ccb0a04aa46ce04162ad9d2
+  - enabled: 1
     path: Assets/_Project/Scenes/RaidResults.unity
     guid: b9bec01c2346e654aba8758c17a0d9f6
   - enabled: 0

@@ -54,6 +54,9 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     [Tooltip("While lit, the beacon calls out this far every Call Interval: idle creatures inside come to look. 0 = silent.")]
     [SerializeField, Min(0f)] private float callRadius = 35f;
     [SerializeField, Min(0.5f)] private float callInterval = 5f;
+    [Tooltip("A boss encounter's arrival stone: leaving by it before the gate turns back (RaidDirector.TurnBack): nothing gained and " +
+             "nothing lost, no raid's end, so it can't be farmed as an extraction.")]
+    [SerializeField] private bool turnsBack;
 
     private readonly ExtractionHold hold = new ExtractionHold();
     private Interactable interactable;
@@ -396,6 +399,11 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         if (director == null)
         {
             GameMessages.Post("There is no raid to leave.", MessageKind.Warning);
+            return;
+        }
+
+        if (turnsBack && director.TurnBack(player))
+        {
             return;
         }
 

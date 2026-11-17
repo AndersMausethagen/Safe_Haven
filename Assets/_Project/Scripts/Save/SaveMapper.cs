@@ -803,9 +803,12 @@ public static class SaveMapper
         var kills = new List<KeyValuePair<string, DateTime>>();
         if (saved.encounterKills != null)
         {
+            // A kill stamped more than a minute ahead of now (a clock set back, a save edited or brought from another machine) is
+            // dropped: it would hold the rematch shut by a wait no kill earned.
+            long latest = DateTime.UtcNow.AddMinutes(1).Ticks;
             foreach (StampSaveData kill in saved.encounterKills)
             {
-                if (kill != null && kill.utcTicks > 0 && kill.utcTicks <= DateTime.MaxValue.Ticks)
+                if (kill != null && kill.utcTicks > 0 && kill.utcTicks <= latest)
                 {
                     kills.Add(new KeyValuePair<string, DateTime>(kill.id, new DateTime(kill.utcTicks, DateTimeKind.Utc)));
                 }

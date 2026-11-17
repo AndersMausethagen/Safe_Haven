@@ -7,7 +7,8 @@
     "The runes are painted pale blue and matte in the concept (a glowing concept makes UltraTex paint flat colour); the game makes them glow from the emission map.",
     "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
     "2026-11-14: the raids' and items' primitive stand-ins (Cache Crate to Shaman Staff); built into their prefabs by BuildStructureModels.Placeholders, not BuildWorldProps.",
-    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md."
+    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md.",
+    "2026-11-17, boss encounters (Docs/BossEncounterResearch_2026-11-17.md, the user: \"go for option C\"): Brukam's Bridge arena needs a long straight bridge whose segments fall: Bridge Span (one segment of deck, square broken ends, laid end to end on piers), Bridge Pier, and the Toll Post its gate stands at."
   ],
   "art": "Assets/_Project/Art/World/Props",
   "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow, no light rays, no fog.",
@@ -443,6 +444,49 @@
           "key": "A",
           "seed": 7911,
           "prompt": "A single old farm boundary stone: a rough grey granite post about a metre tall, roughly squared, with a simple cross cut into its top and a few worn notches on its face, moss on one side and at its foot."
+        }
+      ]
+    },
+    {
+      "asset": "Bridge Span",
+      "width": 8.0,
+      "max_height": 1.6,
+      "texture_size": 4096,
+      "lod0_triangles": 12000,
+      "quality": "hero",
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7894,
+          "prompt": "A square, perfectly flat and level platform of old grey cobblestones laid on a thick slab of rough stacked granite blocks about a metre thick, the platform about eight metres wide and eight metres long, a low wall of stacked rough grey stone blocks along two opposite edges, the other two edges open and cut square and rough as if broken off, moss and grey-green lichen in the joints. Seen at a three-quarter angle from above. Flat box shape, no arch, no curve, no hump, no steps, no ramp."
+        }
+      ]
+    },
+    {
+      "asset": "Bridge Pier",
+      "width": 5.0,
+      "max_height": 14.0,
+      "texture_size": 2048,
+      "lod0_triangles": 8000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7875,
+          "prompt": "A massive square bridge pier standing alone, built of many rough uneven grey granite blocks of different sizes laid without mortar, deep dark joints between them, about four metres square at the top and wider at its foot, about fourteen metres tall, a flat level top of large slabs, dark wet stains and green moss near the foot, grey-green lichen higher up. Rough, old and hand-built, not smooth. Nothing on top of it, no bridge, no ground and no water."
+        }
+      ]
+    },
+    {
+      "asset": "Toll Post",
+      "width": 1.6,
+      "max_height": 2.8,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 7886,
+          "prompt": "A troll's toll pole: one single crooked upright pole of dark weathered wood about two and a half metres tall with a forked top, a big horned animal skull fixed in the fork, strings of old copper coins on leather thongs and a few long bones lashed to the pole with rope, a small flat offering stone at its foot with a few coins on it. No crossbar, no sign, nothing else."
         }
       ]
     }

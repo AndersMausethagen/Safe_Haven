@@ -1,0 +1,143 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72e5e4fd746250409a431420bdc103e, type: 3}
+  m_Name: BrukamsBridge
+  m_EditorClassIdentifier: Assembly-CSharp::RaidDefinition
+  id: brukams_bridge
+  displayName: Brukam's Bridge
+  description: Past the head of Troll Valley the old road crosses a gorge on a long stone bridge, and the Brukam has sat on it longer than anyone remembers. Nobody crosses without paying him.
+  land: valley
+  tier: 2
+  sceneName: Encounter_BrukamsBridge
+  locked: 1
+  unlockedBy: {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
+  largeRaid:
+    widthScale: 2
+    extraSeconds: 750
+    extraExits:
+    - Rockfall Gap
+    - Goat Stair
+    - Cold Ford
+  lockedText: The Brukam's bridge lies past Troll Valley's head. The way there opens with the valley's.
+  encounter: {fileID: 11400000, guid: cb2f4e3b183d0fb458814de2afc11e19, type: 2}
+  knownEnemies:
+  - {fileID: 11400000, guid: 8505946cc9dbaf24498bf366f32b8405, type: 2}
+  likelyItems:
+  - {fileID: 11400000, guid: 4a176d235661eac4ebcf34a19b09bdd7, type: 2}
+  likelyResources: []
+  regionalLoot: {fileID: 0}
+  eliteLoot: {fileID: 0}
+  durationSeconds: 3600
+  extractionSeconds: 8
+  lootMultiplier: 1
+  enemyHealthMultiplier: 1
+  enemyPowerMultiplier: 1
+  difficulties:
+  - tier: 2
+    recommendedGearScore: 30
+    minimumGearScore: 15
+    wardLevelNeeded: 1
+    enemyHealth: 1.4
+    enemyPower: 1.6
+    enemyDensity: 1.15
+    loot: 1.25
+    dropsUpToTier: 0
+    briefing: The Brukam at his full strength, for the first time. Learn his sweep and his slam, and when the bridge starts to crack, get off it.
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  - tier: 3
+    recommendedGearScore: 50
+    minimumGearScore: 30
+    wardLevelNeeded: 2
+    enemyHealth: 2.3
+    enemyPower: 2.85
+    enemyDensity: 1.3
+    loot: 1.5
+    dropsUpToTier: 0
+    briefing: 'A rematch: he hits harder, and his hoard holds moonsilver.'
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  - tier: 4
+    recommendedGearScore: 70
+    minimumGearScore: 45
+    wardLevelNeeded: 3
+    enemyHealth: 2.8
+    enemyPower: 4.05
+    enemyDensity: 1.45
+    loot: 1.8
+    dropsUpToTier: 0
+    briefing: He knows every stone of it now. Trollstone in his hoard.
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  eliteAffixes: []
+  timesOfDay:
+  - name: Dusk
+    hour: 19.2
+    chance: 100
+    lootMultiplier: 1
+    enemyDensity: 1
+    briefing: The sun goes down behind the valley wall. On the bridge something huge sits on the stones and waits.
+    skyCover: 0.25
+  grade:
+    curve: 1
+    exposure: -0.3
+    saturation: 1.05
+    contrast: 1.25
+    filter: {r: 1, g: 0.98, b: 0.92, a: 1}
+  layoutRules: {fileID: 0}
+  enemyDensity: 1.5
+  overrideBands: 0
+  nearDistance: 25
+  farDistance: 110
+  spawnLists: []
+  systems: []
+  roaming:
+    table: {fileID: 11400000, guid: 23d26a07c7b831349ac32e4b82b00123, type: 2}
+    firstDelay: 60
+    interval: 20
+    baseAlive: 2
+    perStage: 1
+    perAlarm: 2
+    maxAlive: 8
+    totalLimit: 12
+    minDistance: 35
+    maxDistance: 60
+    despawnDistance: 90
+    campClearance: 20
+    huntSpread: 15
+  stages: []
+  extractedArtwork: {fileID: 21300000, guid: f6200e83d47f53b4a9bb5caaac1e4ce0, type: 3}
+  failedArtwork: {fileID: 21300000, guid: 2d5abc1323296414dbc3f2a04829ebc2, type: 3}
+  extractedMotion: {fileID: 0}
+  failedMotion: {fileID: 0}
+  extractedSound: {fileID: 0}
+  failedSound: {fileID: 0}
+  placeArtwork: {fileID: 21300000, guid: de7ec80d00a4d5f49a908925d1de0e06, type: 3}
+  firstVisitCinematic: {fileID: 0}
+  calmAfterCinematic: 8
+  arrivalEffect: {fileID: 0}
+  arrivalSound: {fileID: 0}
+  references:
+    version: 2
+    RefIds: []

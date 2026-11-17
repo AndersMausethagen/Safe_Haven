@@ -64,6 +64,33 @@ public sealed class BossEncounterDefinition : ScriptableObject
     public IReadOnlyList<ResourceAmount> GateResources => gateResources;
     public IReadOnlyList<ItemAmount> GateItems => gateItems;
     public bool HasGateCost => gateResources.Count > 0 || gateItems.Count > 0;
+
+    /// <summary>What the gate asks, in words ("2× Troll Fat, 1× Brukam's Offering"), or "" when it asks nothing.</summary>
+    public string GatePrice
+    {
+        get
+        {
+            var parts = new List<string>();
+            foreach (ResourceAmount resource in gateResources)
+            {
+                if (resource.Resource != null && resource.Amount > 0)
+                {
+                    parts.Add($"{resource.Amount}× {resource.Resource.DisplayName}");
+                }
+            }
+
+            foreach (ItemAmount item in gateItems)
+            {
+                if (item.Item != null && item.Amount > 0)
+                {
+                    parts.Add($"{item.Amount}× {item.Item.DisplayName}");
+                }
+            }
+
+            return string.Join(", ", parts);
+        }
+    }
+
     public float EnrageSeconds => enrageSeconds;
     public float EnrageDamage => enrageDamage;
     public float EnrageRamp => enrageRamp;
@@ -78,7 +105,8 @@ public sealed class BossEncounterDefinition : ScriptableObject
     public bool IsBeatenIn(IHavenView haven) => boss != null && haven != null && haven.IsBossDefeated(boss.Id);
 
     /// <summary>
-    /// How long until a rematch, from the last kill (UTC) and now (UTC): zero when the boss can be fought, as it can before any kill.
+    /// How long until a rematch, from the last kill (UTC) and now (UTC): zero when the boss can be fought, as it can before any kill,
+    /// and never more than Rematch Hours, so a kill stamped ahead of now (a clock set back) can't hold it shut for longer.
     /// </summary>
     public TimeSpan RematchWait(DateTime? lastKill, DateTime now)
     {
@@ -87,8 +115,38 @@ public sealed class BossEncounterDefinition : ScriptableObject
             return TimeSpan.Zero;
         }
 
-        TimeSpan wait = lastKill.Value.AddHours(rematchHours) - now;
-        return wait > TimeSpan.Zero ? wait : TimeSpan.Zero;
+        // From the time since the kill, not the kill plus the hours: a stamp near the end of time can't overflow the date.
+        TimeSpan longest = TimeSpan.FromHours(rematchHours);
+        TimeSpan wait = longest - (now - lastKill.Value);
+        return wait <= TimeSpan.Zero ? TimeSpan.Zero : wait > longest ? longest : wait;
+    }
+
+    /// <summary>
+    /// What is wrong with this encounter on <paramref name="raid"/> (the raid it hangs on), in words for whoever made it, or null when
+    /// nothing is: no boss chosen, or a first tier the raid doesn't offer (the first fight then quietly takes the tier the player
+    /// picked, <see cref="DifficultyFor"/>).
+    /// </summary>
+    public string Problem(RaidDefinition raid)
+    {
+        if (boss == null)
+        {
+            return "no boss is chosen";
+        }
+
+        if (raid == null)
+        {
+            return null;
+        }
+
+        foreach (RaidDifficulty difficulty in raid.Difficulties)
+        {
+            if (difficulty != null && difficulty.tier == firstTier)
+            {
+                return null;
+            }
+        }
+
+        return $"{raid.DisplayName} offers no tier {Tiers.ToRoman(firstTier)} for the first fight";
     }
 
     /// <summary>The difficulty a launch uses: the first fight's tier until the boss has fallen, then the one the player chose.</summary>

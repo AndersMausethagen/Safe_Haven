@@ -32,7 +32,11 @@ public sealed class RaidDirector : MonoBehaviour
              "goes straight home and sees the report there.")]
     [SerializeField] private string resultsScene = "RaidResults";
 
+    // A boss encounter's one warning before its hidden limit (the research: "The mist is closing in").
+    private const float EncounterLastWarning = 120f;
+
     private readonly List<float> pendingWarnings = new List<float>();
+    private bool turnedBack;
     private GameObject player;
     private Damageable playerHealth;
     private RaidGenerator generator;
@@ -153,7 +157,7 @@ public sealed class RaidDirector : MonoBehaviour
         GameEvents.Raised += OnGameEvent;
         // Thresholds the raid starts below (a short test raid) would all fire at once, so they are skipped. A boss encounter has no
         // raid clock to warn of: its clock is the boss's enrage (EncounterArena), and its raid time only a hidden safety net.
-        foreach (float time in Session.Definition.IsEncounter ? Array.Empty<float>() : (IEnumerable<float>)warningTimes)
+        foreach (float time in Session.Definition.IsEncounter ? new[] { EncounterLastWarning } : (IEnumerable<float>)warningTimes)
         {
             if (time > 0f && time < Session.TimeRemaining)
             {
@@ -317,13 +321,14 @@ public sealed class RaidDirector : MonoBehaviour
 
     private void Update()
     {
-        if (!running || Session.IsOver)
+        if (!running || turnedBack || Session.IsOver)
         {
             return;
         }
 
         bool atZero = Session.TimeRemaining <= Time.deltaTime;
-        bool sheltered = atZero && InOpenExtraction();
+        // A boss encounter's hidden limit never ends a fight that is won: once the boss has fallen it holds at zero.
+        bool sheltered = atZero && (InOpenExtraction() || (EncounterArena.Current != null && EncounterArena.Current.BossFallen));
         if (Session.Tick(Time.deltaTime, sheltered))
         {
             Finish();
@@ -338,7 +343,8 @@ public sealed class RaidDirector : MonoBehaviour
 
         while (pendingWarnings.Count > 0 && Session.TimeRemaining <= pendingWarnings[0])
         {
-            GameMessages.Post($"{RaidStats.FormatTime(pendingWarnings[0])} left! Get to an extraction.", MessageKind.Warning);
+            GameMessages.Post(Session.Definition.IsEncounter ? "The mist is closing in." : $"{RaidStats.FormatTime(pendingWarnings[0])} left! Get to an extraction.",
+                MessageKind.Warning);
             pendingWarnings.RemoveAt(0);
         }
 
@@ -380,6 +386,54 @@ public sealed class RaidDirector : MonoBehaviour
 
         Finish();
         return true;
+    }
+
+    /// <summary>
+    /// Leaves a boss encounter before its gate (its arrival stone): the research's "nothing gained and nothing lost", so this is no
+    /// raid's end. No report, results, experience, homecoming or quest count, which an extraction would give for a walk to the gate and
+    /// back; the run is let go as a quit is (GameSession.AbandonRaid) and the player goes home as they are. False when it can't.
+    /// </summary>
+    public bool TurnBack(GameObject user)
+    {
+        EncounterArena arena = EncounterArena.Current;
+        if (user == null || user != player || turnedBack || Session.IsOver || !Session.Definition.IsEncounter || (arena != null && arena.IsSealed))
+        {
+            return false;
+        }
+
+        turnedBack = true;
+        running = false;
+        if (player.TryGetComponent(out HandCraftQueue crafts))
+        {
+            crafts.Stop();
+        }
+
+        PlayerSnapshot final = PlayerSnapshot.Capture(player);
+        GameSession.AbandonRaid(Session);
+        GameSession.CarryPlayerState(final);
+        GameSession.SetArrivalPoint(PlayerArrivalPoint.Portal);
+        // Co-op: friends can't follow into a run its host has left.
+        if (CoopSession.Current != null && CoopSession.Current.Raids != null)
+        {
+            CoopSession.Current.Raids.CloseFollowing();
+        }
+
+        SaveGameService.SaveAtRaidEnd(final);
+        SaveGameService.SaveOnceHome();
+        StopPlayer();
+        GameMessages.Post(EndLine(true), MessageKind.Gain);
+        StartCoroutine(TurnBackHome());
+        return true;
+    }
+
+    private IEnumerator TurnBackHome()
+    {
+        yield return new WaitForSecondsRealtime(1.5f);
+        string scene = CanLoad(Session.ReturnScene) ? Session.ReturnScene : fallbackReturnScene;
+        if (CanLoad(scene))
+        {
+            SceneLoader.Load(scene, "Back through the portal");
+        }
     }
 
     private void OnSwung(GatheringSwing swing)
@@ -492,7 +546,10 @@ public sealed class RaidDirector : MonoBehaviour
             return arena != null && arena.BossFallen ? $"{boss} has fallen. Heading home with everything you carry." : "You turn back before the mist. Heading home.";
         }
 
-        return $"You fell beyond the mist. You'll wake at the portal with your gear, worn {Mathf.RoundToInt(Session.Definition.Encounter.WearOnFailure * 100f)}%, but everything else you carried is gone.";
+        int worn = Mathf.RoundToInt(Session.Definition.Encounter.WearOnFailure * 100f);
+        string where = Session.Outcome == RaidOutcome.TimeExpired ? "The mist closed over you."
+            : arena != null && arena.IsSealed ? "You fell beyond the mist." : "You fell before the mist.";
+        return $"{where} You'll wake at the portal with your gear, worn {worn}%, but everything else you carried is gone.";
     }
 
     // The raid is decided; the player only watches the outcome until the scene changes.

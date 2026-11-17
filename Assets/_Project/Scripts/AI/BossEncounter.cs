@@ -1,11 +1,23 @@
 using UnityEngine;
 
-/// <summary>A boss in the world: on its prefab beside MonsterAI. Moves the fight through its phases, shows the bar and pays out when it falls.</summary>
+/// <summary>
+/// A boss in the world: on its prefab beside MonsterAI. Moves the fight through its phases, shows the bar and pays out when it falls.
+/// <para>
+/// Whatever else follows a boss (a boss encounter's arena, a story's When Boss, ground that gives way) knows it by its BossDefinition
+/// through the static events (<see cref="Appeared"/>, <see cref="AnyPhaseEntered"/>, <see cref="AnyFell"/>), not by the one placed
+/// in the scene: on a friend's game (co-op) that one is removed as it wakes (MonsterAI) and the host's arrives later as a copy
+/// (CreaturePuppets), which raises them as the placed one would have.
+/// </para>
+/// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI), typeof(Damageable))]
-[OnAFriendsCopy(CopyRule.Same, "the bar, the music and the phases follow the health the host sends; the wake is the host's (skipped on a copy)")]
+[OnAFriendsCopy(CopyRule.Same, "the bar, the music and the phases follow the health the host sends; the wake is the host's (skipped on a copy); " +
+                               "beyond a gate this game hasn't sealed it shows nothing until the gate seals or the host's fight begins")]
 public sealed class BossEncounter : MonoBehaviour
 {
+    /// <summary>A copy's health at or above this share is whole: the host's fight hasn't begun (its health comes as a byte, so 1/255 shows).</summary>
+    private const float Whole = 0.999f;
+
     [SerializeField] private BossDefinition definition;
 
     private MonsterAI ai;
@@ -15,6 +27,8 @@ public sealed class BossEncounter : MonoBehaviour
     private SceneAudio scene;
     private bool playingMusic;
     private bool held;
+    // Woken out of a hold (a boss encounter's gate has sealed): it goes for the nearest at once, even with no wake to play.
+    private bool wokenFromHold;
     // The hold's own invulnerability source: the wake adds and removes one of its own (this).
     private readonly object holdToken = new object();
     private static readonly int RoarState = Animator.StringToHash("Roar");
@@ -28,16 +42,46 @@ public sealed class BossEncounter : MonoBehaviour
     /// <summary>Raised as it enters each phase (1 is the first after the opening), on the host and on a friend's copy alike.</summary>
     public event System.Action<BossEncounter, int> PhaseEntered;
 
-    /// <summary>Raised once when it falls.</summary>
+    /// <summary>Raised once when it falls, after the first win is recorded and its skill given.</summary>
     public event System.Action<BossEncounter> Fell;
 
     /// <summary>
+    /// Raised in each boss's Start, the one placed in a scene and a friend's copy of the host's alike, before it decides how it starts:
+    /// a boss encounter's arena takes it as its own here and holds it (EncounterArena.Adopt). Not raised for a boss of this game's
+    /// own on the host's run, which is being removed.
+    /// </summary>
+    public static event System.Action<BossEncounter> Appeared;
+
+    /// <summary><see cref="PhaseEntered"/> for every boss: match it by its <see cref="Definition"/>.</summary>
+    public static event System.Action<BossEncounter, int> AnyPhaseEntered;
+
+    /// <summary><see cref="Fell"/> for every boss: match it by its <see cref="Definition"/>.</summary>
+    public static event System.Action<BossEncounter> AnyFell;
+
+    // Entering Play doesn't reload scripts in this project: listeners from the last session would hear this one's bosses.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Appeared = null;
+        AnyPhaseEntered = null;
+        AnyFell = null;
+    }
+
+    /// <summary>
+    /// The definition of a boss placed in a scene, read even once it has been removed (a managed field, no call into the engine): on a
+    /// friend's game (co-op) the placed one goes as it wakes and the host's copy stands in, so what points at the placed one matches
+    /// the static events by this. Null when nothing is placed.
+    /// </summary>
+    public static BossDefinition DefinitionOf(BossEncounter placed) => ReferenceEquals(placed, null) ? null : placed.definition;
+
+    /// <summary>
     /// Keeps it asleep where it stands (no bar, music or waking; untouchable and still) until <see cref="WakeNow"/>: a boss
-    /// encounter's boss waits beyond its gate (EncounterArena). Call before its Start. A friend's copy follows the host's instead.
+    /// encounter's boss waits beyond its gate (EncounterArena holds it as it appears). Call before its Start. A friend's copy of the
+    /// host's (co-op) is only kept from showing its bar and playing its music: it moves and strikes as the host's does.
     /// </summary>
     public void Hold() => held = true;
 
-    /// <summary>Ends <see cref="Hold"/>: it wakes now (its bar, music and wake as usual).</summary>
+    /// <summary>Ends <see cref="Hold"/>: it wakes now (its bar, music and wake as usual) and goes for whoever is nearest.</summary>
     public void WakeNow() => held = false;
 
     /// <summary>Its rage: it hits harder by a share (0.5 = +50%), added to what its phases give. Each call adds more.</summary>
@@ -79,11 +123,31 @@ public sealed class BossEncounter : MonoBehaviour
 
     private void Start()
     {
-        if (definition != null)
+        if (definition == null)
         {
-            bool remote = ai != null && ai.IsRemote;
-            StartCoroutine(held && !remote ? Held() : definition.WakeRange > 0f && !remote ? Dormant() : Begin());
+            return;
         }
+
+        bool remote = ai != null && ai.IsRemote;
+        // One of this game's own on the host's run (co-op): it is removed before it thinks (MonsterAI), and the host's comes as a copy.
+        if (!remote && CreatureSource.Remote != null)
+        {
+            return;
+        }
+
+        // Told first, so a boss encounter's arena can take it and hold it before it decides how it starts.
+        Raise(Appeared, this);
+        System.Collections.IEnumerator starting;
+        if (held)
+        {
+            starting = remote ? Following() : Held();
+        }
+        else
+        {
+            starting = definition.WakeRange > 0f && !remote ? Dormant() : Begin();
+        }
+
+        StartCoroutine(starting);
     }
 
     // Beyond a boss encounter's gate: still and untouchable until the gate seals (EncounterArena calls WakeNow).
@@ -107,6 +171,28 @@ public sealed class BossEncounter : MonoBehaviour
             ai.enabled = aiWasOn;
         }
 
+        wokenFromHold = true;
+        yield return Begin();
+    }
+
+    // A friend's copy of the host's boss (co-op) beyond this game's gate, which is still open: no bar and no music until this player
+    // steps through (the arena wakes it) or the host's fight has begun (its health, which follows the host's, drops). It isn't stilled
+    // or made untouchable as a held boss is: it moves and strikes as the host's does (see Wake). Taken back into this game meanwhile
+    // (the host left), it is held as this game's own.
+    private System.Collections.IEnumerator Following()
+    {
+        while (held && health.IsAlive && health.HealthFraction >= Whole)
+        {
+            if (ai != null && !ai.IsRemote)
+            {
+                yield return Held();
+                yield break;
+            }
+
+            yield return null;
+        }
+
+        held = false;
         yield return Begin();
     }
 
@@ -144,6 +230,12 @@ public sealed class BossEncounter : MonoBehaviour
 
     private System.Collections.IEnumerator Begin()
     {
+        // Brought down before it woke (a friend's copy the host's fight ended first, one felled in its sleep): no bar to leave behind.
+        if (!health.IsAlive)
+        {
+            yield break;
+        }
+
         IsAwake = true;
         bar = BossBar.Show(definition);
         bar.Set(health.HealthFraction);
@@ -164,9 +256,15 @@ public sealed class BossEncounter : MonoBehaviour
         // and replaying it here froze the copy (its AI off, so its poses stopped) and made it untouchable for the wake's length.
         if (definition.WakeSeconds <= 0f || (ai != null && ai.IsRemote))
         {
-            if (ai != null && !ai.IsRemote && Player.Current != null)
+            // Out of a hold (a boss encounter's gate has just sealed) it goes for the nearest at once. Elsewhere (an expedition's boss)
+            // it finds the fight by itself, as it always has; a copy is the host's to steer.
+            if (wokenFromHold && ai != null && !ai.IsRemote)
             {
-                ai.Engage(Player.Current.Health);
+                IDamageable target = Nearest();
+                if (target != null)
+                {
+                    ai.Engage(target);
+                }
             }
 
             yield break;
@@ -186,8 +284,19 @@ public sealed class BossEncounter : MonoBehaviour
         yield return new WaitForSeconds(definition.WakeSeconds);
         health.RemoveInvulnerability(this);
         ai.enabled = true;
-        IDamageable nearest = Player.Current != null ? Player.Current.Health : null;
-        float best = Player.Current != null ? (Player.Current.transform.position - transform.position).sqrMagnitude : float.MaxValue;
+        IDamageable nearest = Nearest();
+        if (nearest != null)
+        {
+            ai.Engage(nearest);
+        }
+    }
+
+    // The nearest of the player and the friends still standing (co-op): whom it goes for as it wakes.
+    private IDamageable Nearest()
+    {
+        Player player = Player.Current;
+        IDamageable nearest = player != null ? player.Health : null;
+        float best = player != null ? (player.transform.position - transform.position).sqrMagnitude : float.MaxValue;
         foreach (FriendHitbox friend in FriendHitbox.Active)
         {
             float distance = (friend.transform.position - transform.position).sqrMagnitude;
@@ -198,10 +307,7 @@ public sealed class BossEncounter : MonoBehaviour
             }
         }
 
-        if (nearest != null)
-        {
-            ai.Engage(nearest);
-        }
+        return nearest;
     }
 
     private void StopMusic()
@@ -239,7 +345,8 @@ public sealed class BossEncounter : MonoBehaviour
             Enter(definition.Phases[phase]);
             phase++;
             ai.SetPhase(phase);
-            PhaseEntered?.Invoke(this, phase);
+            Raise(PhaseEntered, this, phase);
+            Raise(AnyPhaseEntered, this, phase);
         }
     }
 
@@ -274,20 +381,26 @@ public sealed class BossEncounter : MonoBehaviour
         HideBar();
         StopMusic();
         IsAwake = false;
-        Fell?.Invoke(this);
         if (GameSession.ActiveRaid != null)
         {
             GameSession.ActiveRaid.BossesBeaten++;
         }
 
-        // The boss falls in this player's own Haven's story, on a friend's raid too (co-op): their first win there is what counts. The
-        // host's game marks its own boss.
-        // A friend helping on the host's boss encounter whose own story hasn't reached it takes the drops only (the user, 2026-11-17:
-        // "only get the drop, but it helps their quest as well if he is also on it"): their quests count the kill as any other.
-        bool counts = ai == null || !ai.IsRemote || StoryReached();
-        bool first = counts && definition != null && GameSession.Home.MarkBossDefeated(definition.Id);
+        RecordTheWin();
+        // Told last, each listener on its own (Raise): what they open (the way home, an arena's story) can't cost the first win or
+        // its skill, as it could when they were told first.
+        Raise(Fell, this);
+        Raise(AnyFell, this);
+    }
 
-        if (!first)
+    // The boss falls in this player's own Haven's story, on a friend's raid too (co-op): their first win there is what counts.
+    private void RecordTheWin()
+    {
+        // A friend on the host's run (HavenVisit: still so once the host has left and the copy became this game's own) whose own
+        // story hasn't opened the encounter takes the drops only (the user, 2026-11-17: "only get the drop, but it helps their quest
+        // as well if he is also on it"): their quests count the kill as any other. The host, or a player alone, always counts.
+        bool counts = !HavenVisit.IsVisiting || StoryReached();
+        if (!counts || definition == null || !GameSession.Home.MarkBossDefeated(definition.Id))
         {
             return;
         }
@@ -317,6 +430,47 @@ public sealed class BossEncounter : MonoBehaviour
         {
             Destroy(bar.gameObject);
             bar = null;
+        }
+    }
+
+    // Each listener on its own: one that throws is logged, and the others still hear it and the boss's own work goes on.
+    private static void Raise(System.Action<BossEncounter> listeners, BossEncounter boss)
+    {
+        if (listeners == null)
+        {
+            return;
+        }
+
+        foreach (System.Delegate listener in listeners.GetInvocationList())
+        {
+            try
+            {
+                ((System.Action<BossEncounter>)listener)(boss);
+            }
+            catch (System.Exception problem)
+            {
+                Debug.LogException(problem, boss);
+            }
+        }
+    }
+
+    private static void Raise(System.Action<BossEncounter, int> listeners, BossEncounter boss, int reached)
+    {
+        if (listeners == null)
+        {
+            return;
+        }
+
+        foreach (System.Delegate listener in listeners.GetInvocationList())
+        {
+            try
+            {
+                ((System.Action<BossEncounter, int>)listener)(boss, reached);
+            }
+            catch (System.Exception problem)
+            {
+                Debug.LogException(problem, boss);
+            }
         }
     }
 }

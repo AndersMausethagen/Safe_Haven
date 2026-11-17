@@ -194,15 +194,17 @@ public sealed class RaidValleyTests
     }
 
     [Test]
-    public void EveryValley_HasABridgeForTheBrukam_AndAnotherWithAToll()
+    public void EveryValley_HasTollBridges_AndTheBrukamHasLeftForHisOwnBridge()
     {
+        // The Brukam fights in his own encounter now (Brukam's Bridge, 2026-11-17): every valley bridge asks its toll.
+        Assert.IsNull(Rules.Valley.bossBridge, "the Brukam is back on a valley bridge");
         foreach ((int seed, RaidLayoutPlan plan) in Plans())
         {
             int bridged = plan.Crossings.FindAll(c => c.Bridge).Count;
-            Assert.GreaterOrEqual(bridged, 1, $"seed {seed}: no bridge, so no Brukam");
+            Assert.GreaterOrEqual(bridged, 1, $"seed {seed}: no bridge, so no toll");
             if (plan.Crossings.Count >= 2)
             {
-                Assert.GreaterOrEqual(bridged, 2, $"seed {seed}: a toll bridge besides the Brukam's");
+                Assert.GreaterOrEqual(bridged, 2, $"seed {seed}: two toll bridges");
             }
         }
     }

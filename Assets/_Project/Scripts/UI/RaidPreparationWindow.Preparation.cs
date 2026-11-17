@@ -130,6 +130,8 @@ public sealed partial class RaidPreparationWindow
     {
         UIStyle style = UIStyle.Current;
         int score = GearScore.Of(plan.Player);
+        // A boss encounter's first fight is at its own tier (RaidPlan.Settle): the other tiers wait for the rematches, so they can't be picked.
+        bool fixedTier = raid.IsEncounter && !plan.IsRematch;
         y = Stack(tierHeading, y, HeadingHeight);
         for (int i = 0; i < raid.Difficulties.Count; i++)
         {
@@ -140,7 +142,9 @@ public sealed partial class RaidPreparationWindow
             Color dim = style.Muted;
             dim.a = 0.5f;
             button.Label.text = Tiers.ToRoman(tier.tier);
-            button.Label.color = shown ? Tiers.ColorOf(tier.tier) : (score >= tier.minimumGearScore && RaidLauncher.CheckWard(tier) == null) || Cheats.NoRequirements ? style.Text : dim;
+            button.Label.color = shown ? Tiers.ColorOf(tier.tier) : fixedTier ? dim
+                : (score >= tier.minimumGearScore && RaidLauncher.CheckWard(tier) == null) || Cheats.NoRequirements ? style.Text : dim;
+            button.Button.interactable = shown || !fixedTier;
             button.Mark.SetActive(shown);
             var rect = (RectTransform)button.Button.transform;
             rect.anchoredPosition = new Vector2(rect.anchoredPosition.x, -y);
@@ -156,6 +160,12 @@ public sealed partial class RaidPreparationWindow
 
         y += 54f;
         tierBriefing.text = plan.Difficulty != null ? plan.Difficulty.briefing : "";
+        if (fixedTier && plan.Difficulty != null)
+        {
+            tierBriefing.text = $"<color={style.AccentHex}>The first fight is at tier {Tiers.ToRoman(plan.Difficulty.tier)}. Once it is won, rematches at any tier.</color>\n\n"
+                                + tierBriefing.text;
+        }
+
         // What the time at home came to, at the door to the next raid.
         if (ExperienceTracker.SinceLastRaid() is string grown)
         {
@@ -183,13 +193,52 @@ public sealed partial class RaidPreparationWindow
     private void DrawFigures(RaidDefinition raid, RaidTimeOfDay timeOfDay)
     {
         RaidParameters rules = plan.Rules(timeOfDay);
-        ShowFigure(Figure.Time, RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration, true);
+        BossEncounterDefinition encounter = raid.Encounter;
+        // A boss encounter's raid time is only a hidden safety net (RaidDirector) and it has no elites: its clock is the enrage, and
+        // in the elites' place stands what the gate asks.
+        NameFigure(Figure.Time, encounter != null ? "Enrages after" : null, null);
+        NameFigure(Figure.Elites, encounter != null ? "The gate asks" : null, encounter != null ? "Bags" : null);
+        if (encounter != null)
+        {
+            figures[(int)Figure.Time].text = RaidStats.FormatTime(encounter.EnrageSeconds);
+            figures[(int)Figure.Time].color = UIStyle.Current.Text;
+        }
+        else
+        {
+            ShowFigure(Figure.Time, RaidStats.FormatTime(rules.Duration), raid, rules, RaidStat.Duration, true);
+        }
+
         ShowFigure(Figure.Extraction, $"{rules.ExtractionTime:0.#}s", raid, rules, RaidStat.ExtractionTime, false);
         ShowFigure(Figure.Loot, $"×{rules.LootMultiplier:0.##}", raid, rules, RaidStat.LootQuantity, true);
         ShowFigure(Figure.EnemyHealth, $"×{rules.EnemyHealthMultiplier:0.##}", raid, rules, RaidStat.EnemyHealth, false);
         ShowFigure(Figure.EnemyPower, $"×{rules.EnemyPowerMultiplier:0.##}", raid, rules, RaidStat.EnemyPower, false);
-        figures[(int)Figure.Elites].text = DescribeElites(plan.Difficulty);
+        string price = encounter != null ? encounter.GatePrice : null;
+        // A long price is set smaller so it fits its column; the gate's own menu says it in full.
+        figures[(int)Figure.Elites].text = encounter == null ? DescribeElites(plan.Difficulty)
+            : price.Length == 0 ? "Nothing" : price.Length > 14 ? $"<size=60%>{price}</size>" : price;
         figures[(int)Figure.Elites].color = UIStyle.Current.Text;
+    }
+
+    // The figures' names (made by Building), found once: a boss encounter renames two and puts them back for an expedition.
+    private TMP_Text[] figureNames;
+
+    private void NameFigure(Figure figure, string name, string icon)
+    {
+        if (figureNames == null)
+        {
+            figureNames = new TMP_Text[FigureNames.Length];
+            for (int i = 0; i < FigureNames.Length; i++)
+            {
+                Transform found = stats.transform.Find(FigureNames[i] + " Label");
+                figureNames[i] = found != null ? found.GetComponent<TMP_Text>() : null;
+            }
+        }
+
+        int at = (int)figure;
+        if (figureNames[at] != null)
+        {
+            figureNames[at].text = HearthKit.InlineIcon(icon ?? FigureIcons[at]) + " " + (name ?? FigureNames[at]);
+        }
     }
 
     // Against the raid's base rules: green where the choices made here help, amber where they make it harder.

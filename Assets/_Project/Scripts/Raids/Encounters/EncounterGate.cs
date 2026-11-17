@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// The gate of mist in a boss encounter's arena (EncounterArena): using it shows what lies beyond, what the gate asks, and what is at
 /// stake (what a failure takes, and the wear on the gear), then the player steps through or turns back. Once through, the mist is
-/// sealed behind them.
+/// sealed behind them. A friend following the host (co-op) is asked nothing: the run is the host's (EncounterArena.AsksPrice).
 /// <para>
 /// Where it belongs: on the gate's object, beside an Interactable (a short use, not deactivated on completion), referenced by the
 /// scene's EncounterArena.
@@ -12,6 +12,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
 [OnAFriendsCopy(CopyRule.Same, "each player steps through their own game's gate")]
+[InAFriendsHaven(HavenUse.NotInAHaven, "a boss encounter's gate: each player steps through their own game's")]
 public sealed class EncounterGate : MonoBehaviour, IInteractionCondition, IInteractionVerb
 {
     [SerializeField, Min(1f)] private float menuRange = 6f;
@@ -76,14 +77,19 @@ public sealed class EncounterGate : MonoBehaviour, IInteractionCondition, IInter
                 .Append($", and your gear wears {Mathf.RoundToInt(wear * 100f)}%.");
         }
 
-        string cost = encounter != null && encounter.HasGateCost ? Price(encounter) : "";
-        if (cost.Length > 0)
+        string cost = encounter != null ? encounter.GatePrice : "";
+        if (cost.Length > 0 && !arena.AsksPrice)
+        {
+            string host = string.IsNullOrEmpty(HavenVisit.HostName) ? "your friend" : HavenVisit.HostName;
+            body.Append($"\nThe gate asks nothing of you: you follow {host}.");
+        }
+        else if (cost.Length > 0)
         {
             body.Append("\nThe gate asks: ").Append(cost).Append('.');
         }
 
         page.Body = body.ToString();
-        bool canPay = encounter == null || !encounter.HasGateCost || MaterialPool.For(user).CanAfford(encounter.GateResources, encounter.GateItems, out _);
+        bool canPay = !arena.AsksPrice || MaterialPool.For(user).CanAfford(encounter.GateResources, encounter.GateItems, out _);
         page.Add(new MenuAction(Verb, canPay ? null : "You don't have what the gate asks.", canPay, () =>
         {
             if (arena.Enter(user, out string problem))
@@ -97,27 +103,5 @@ public sealed class EncounterGate : MonoBehaviour, IInteractionCondition, IInter
         }));
         page.Add(new MenuAction("Not yet", null, true, () => ActionMenuWindow.Current.Close()));
         return page;
-    }
-
-    private static string Price(BossEncounterDefinition encounter)
-    {
-        var parts = new System.Collections.Generic.List<string>();
-        foreach (ResourceAmount resource in encounter.GateResources)
-        {
-            if (resource.Resource != null && resource.Amount > 0)
-            {
-                parts.Add($"{resource.Amount}× {resource.Resource.DisplayName}");
-            }
-        }
-
-        foreach (ItemAmount item in encounter.GateItems)
-        {
-            if (item.Item != null && item.Amount > 0)
-            {
-                parts.Add($"{item.Amount}× {item.Item.DisplayName}");
-            }
-        }
-
-        return string.Join(", ", parts);
     }
 }

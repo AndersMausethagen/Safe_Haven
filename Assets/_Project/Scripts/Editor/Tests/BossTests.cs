@@ -161,14 +161,21 @@ public sealed class BossTests
     }
 
     [Test]
-    public void TheBrukam_SleepsOnItsBridge_UntilSomeoneComes_AndTeachesMountainLeap()
+    public void TheBrukam_FightsInHisOwnEncounter_AndTeachesMountainLeap()
     {
         var brukam = AssetDatabase.LoadAssetAtPath<BossDefinition>("Assets/_Project/Data/Monsters/Boss Brukam.asset");
-        Assert.Greater(brukam.WakeRange, 0f, "it stands on the map from the start: without a range it wakes the raid wherever the player is");
+        Assert.Greater(brukam.WakeRange, 0f, "placed anywhere outside an arena, it must still sleep until someone comes");
         Assert.AreEqual("Mountain Leap", brukam.RewardSkill.DisplayName);
         Assert.Contains(brukam, (System.Collections.ICollection)new System.Collections.Generic.List<BossDefinition>(SettlementSettings.Current.Bosses));
-        var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset");
-        Assert.IsNotNull(rules.Valley.bossBridge, "the valley's head bridge is the Brukam's");
-        Assert.AreEqual("brukam", rules.Valley.bossBridge.Guards[0].prefab.GetComponent<MonsterAI>().Definition.Id);
+        // Since 2026-11-17 (the user: move him out of the expeditions): Brukam's Bridge, a boss encounter, is where he is fought.
+        var bridge = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/BrukamsBridge.asset");
+        Assert.IsNotNull(bridge, "Brukam's Bridge");
+        Assert.IsTrue(bridge.IsEncounter);
+        Assert.AreEqual(brukam, bridge.Encounter.Boss);
+        Assert.AreEqual(2, bridge.Encounter.FirstTier);
+        string arena = System.IO.File.ReadAllText("Assets/_Project/Scenes/Raids/" + bridge.SceneName + ".unity");
+        Assert.IsTrue(arena.Contains(AssetDatabase.AssetPathToGUID("Assets/_Project/Prefabs/Enemies/Brukam.prefab")), "the Brukam stands in his arena");
+        var valley = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset");
+        Assert.IsNull(valley.Valley.bossBridge, "and no longer on a valley bridge");
     }
 }

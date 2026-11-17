@@ -239,7 +239,8 @@ public sealed class WhenObjectHit : StoryTrigger
 /// <summary>
 /// A boss reaching a phase, or falling: a boss encounter's arena changing with the fight (Docs/BossEncounterResearch_2026-11-17.md
 /// §2.3: stones fall at 66%, the canopy closes at 33%), made in the story graph from Set Active, Move Object, Shake Camera and the like.
-/// Fires on a friend's copy of the host's boss too, since its phases follow the host's health.
+/// Fires on a friend's copy of the host's boss too, since its phases follow the host's health: the boss is known by its BossDefinition
+/// (BossEncounter.AnyPhaseEntered, AnyFell), as the one placed in the scene is removed on a friend's game and the copy comes later.
 /// </summary>
 [Serializable]
 public sealed class WhenBoss : StoryTrigger
@@ -252,7 +253,7 @@ public sealed class WhenBoss : StoryTrigger
         Falls = 1,
     }
 
-    [Tooltip("The boss in this scene.")]
+    [Tooltip("The boss in this scene. Known by its Boss Definition: on a friend's game (co-op) the host's copy fires it too.")]
     public BossEncounter boss;
     public Moment moment = Moment.ReachesPhase;
     [Tooltip("Reaches Phase: the phase, 1 for the first of its Phases list.")]
@@ -262,35 +263,33 @@ public sealed class WhenBoss : StoryTrigger
 
     public override Action Listen(StoryScript script, Action fire)
     {
-        if (boss == null)
+        // Read as it starts listening, even if the placed boss is already gone (a friend's game removes it as it wakes).
+        BossDefinition watched = BossEncounter.DefinitionOf(boss);
+        if (watched == null)
         {
             return null;
         }
 
-        BossEncounter watched = boss;
-        Action<BossEncounter, int> entered = (_, reached) =>
+        Action<BossEncounter, int> entered = (from, reached) =>
         {
-            if (moment == Moment.ReachesPhase && reached == phase)
+            if (moment == Moment.ReachesPhase && reached == phase && from != null && from.Definition == watched)
             {
                 fire();
             }
         };
-        Action<BossEncounter> fell = _ =>
+        Action<BossEncounter> fell = from =>
         {
-            if (moment == Moment.Falls)
+            if (moment == Moment.Falls && from != null && from.Definition == watched)
             {
                 fire();
             }
         };
-        watched.PhaseEntered += entered;
-        watched.Fell += fell;
+        BossEncounter.AnyPhaseEntered += entered;
+        BossEncounter.AnyFell += fell;
         return () =>
         {
-            if (watched != null)
-            {
-                watched.PhaseEntered -= entered;
-                watched.Fell -= fell;
-            }
+            BossEncounter.AnyPhaseEntered -= entered;
+            BossEncounter.AnyFell -= fell;
         };
     }
 
