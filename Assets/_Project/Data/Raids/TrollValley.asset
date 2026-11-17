@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaidDefinition
   id: troll_valley
   displayName: Troll Valley
-  description: A valley of old stone bridges where the trolls still collect their tolls. Trollstone is found only here.
+  description: A long valley of old stone bridges where the trolls still take their tolls. Trolls of every size live here, and at its deepest Trollstone is to be had.
+  land: valley
   tier: 2
   sceneName: Raid_TrollValley
   locked: 1
@@ -29,16 +30,19 @@ MonoBehaviour:
   lockedText: The way to Troll Valley lies beyond the Misty Woods. Something old in the deep woods holds it shut.
   knownEnemies:
   - {fileID: 11400000, guid: 1fc74e15f41da234fb9eeedcfe1067f0, type: 2}
-  - {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
-  - {fileID: 11400000, guid: 6831da450ee487246b0f7f72b7e0272f, type: 2}
-  - {fileID: 11400000, guid: 2f66a8d86463697438ce75621f51e12d, type: 2}
-  - {fileID: 11400000, guid: 916ab17a0415c3041aec1267259d1567, type: 2}
+  - {fileID: 11400000, guid: 115647db9b5ff0f46bc496b0532bbcec, type: 2}
+  - {fileID: 11400000, guid: efec82f82582b384488065be866d4133, type: 2}
+  - {fileID: 11400000, guid: 7ce5d475ba0399244b71229bd35fb4e7, type: 2}
+  - {fileID: 11400000, guid: 17016c6a9718d3448bac1b8554a339e2, type: 2}
+  - {fileID: 11400000, guid: 6a0d0fdf47eac744da300d2daa665816, type: 2}
+  - {fileID: 11400000, guid: 1b300b39eae1aab41825ab3729aebe31, type: 2}
+  - {fileID: 11400000, guid: 8505946cc9dbaf24498bf366f32b8405, type: 2}
   likelyItems:
-  - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
-  - {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
-  - {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
-  - {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
-  - {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+  - {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+  - {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+  - {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
+  - {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+  - {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
   likelyResources:
   - {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
   - {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
@@ -59,7 +63,7 @@ MonoBehaviour:
     enemyDensity: 1.15
     loot: 1.25
     dropsUpToTier: 0
-    briefing: Wolves pounce from a distance and bog things spit in volleys. Root Guardians wake, Moss Shamans call them on. Iron, deepstone and elderwood lie deeper in.
+    briefing: Runts and the tusse rob the bridges; small trolls and the trollkjerring hold the lairs. Iron lies in the scree, and the seters still hold what the dairymaids left.
     eliteCount: {x: 1, y: 2}
     eliteAffixes: 1
     hunterEliteChance: 0
@@ -75,7 +79,7 @@ MonoBehaviour:
     enemyDensity: 1.3
     loot: 1.5
     dropsUpToTier: 0
-    briefing: 'The dead walk: Draugs among the trees. Boars trample, Guardians slam the ground and the great troll charges. Moonsilver can be found here.'
+    briefing: Stone trolls stand on the bridges and the hoards hold moonsilver. Some of the stones on the slopes are not stones. The Brukam waits at the last bridge.
     eliteCount: {x: 2, y: 3}
     eliteAffixes: 1
     hunterEliteChance: 0.15
@@ -91,7 +95,7 @@ MonoBehaviour:
     enemyDensity: 1.45
     loot: 1.8
     dropsUpToTier: 0
-    briefing: The woods at their worst. Draugs rally with a war cry, Guardians call up roots and the great troll calls its kin. Its Trollstone is worth taking.
+    briefing: The trolls gather at the ting by night and a berg-jutul walks the valley. The hoards hold Trollstone, and so do the elites.
     eliteCount: {x: 3, y: 4}
     eliteAffixes: 2
     hunterEliteChance: 0.25
@@ -160,104 +164,14 @@ MonoBehaviour:
     stage: 1
     huntPlayer: 0
     entries:
-    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
-      weight: 6
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 1
-    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
-      weight: 14
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
     - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 34
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
-    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
-      weight: 4
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
-      weight: 2
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 4
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
-      weight: 3
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
-      weight: 2
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
-      weight: 16
-      maxPerGroup: 2
-      minPerGroup: 1
-      fromTier: 3
-      toTier: 0
-    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
-      weight: 12
-      maxPerGroup: 2
-      minPerGroup: 1
-      fromTier: 3
-      toTier: 0
-    - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
-      weight: 8
-      maxPerGroup: 1
-      minPerGroup: 1
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
-      weight: 6
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
-      weight: 1
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
-      weight: 1
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
-      weight: 1
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
-      weight: 6
-      maxPerGroup: 2
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
     - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
-      weight: 8
+      weight: 12
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -268,8 +182,14 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 0
       toTier: 0
+    - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+      weight: 8
+      maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
     - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
-      weight: 2
+      weight: 4
       maxPerGroup: 1
       minPerGroup: 0
       fromTier: 3
@@ -277,6 +197,66 @@ MonoBehaviour:
     - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 4
       maxPerGroup: 2
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 4584692032328657812, guid: 64cf9de042e1bc142907212054f70f50, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      weight: 4
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+      weight: 3
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      weight: 3
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
+      weight: 2
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      weight: 2
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 3
+      toTier: 0
+    - prefab: {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+      weight: 1
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+      weight: 1
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
+      weight: 2
+      maxPerGroup: 1
       minPerGroup: 0
       fromTier: 2
       toTier: 0
@@ -295,7 +275,7 @@ MonoBehaviour:
     huntPlayer: 0
     entries:
     - prefab: {fileID: 948381022197778722, guid: 15b33c21de24fb7418664d30fe242c26, type: 3}
-      weight: 30
+      weight: 18
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -307,13 +287,13 @@ MonoBehaviour:
       fromTier: 0
       toTier: 3
     - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
-      weight: 6
+      weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 2
       toTier: 0
     - prefab: {fileID: 8682228126172116304, guid: 3e31e979ada082348a0ae00bacfea168, type: 3}
-      weight: 4
+      weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -343,13 +323,13 @@ MonoBehaviour:
       fromTier: 2
       toTier: 0
     - prefab: {fileID: 6821748221057059875, guid: 363571da353f0c9429cec15d631d1da9, type: 3}
-      weight: 1
+      weight: 0
       maxPerGroup: 2
       minPerGroup: 0
       fromTier: 2
       toTier: 0
     - prefab: {fileID: 6865268627933171699, guid: 879636884ea876843960148e835a6af2, type: 3}
-      weight: 1
+      weight: 0
       maxPerGroup: 2
       minPerGroup: 0
       fromTier: 2
@@ -361,7 +341,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 9111748613750876259, guid: 4cff8733c679b964f97f5aa116eda933, type: 3}
-      weight: 6
+      weight: 9
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -415,7 +395,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 7424242661901594498, guid: 415fc92bb3a4e3c4892211c08f38f779, type: 3}
-      weight: 2
+      weight: 3
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -478,27 +458,27 @@ MonoBehaviour:
     stage: 1
     huntPlayer: 0
     entries:
-    - prefab: {fileID: 6552391252369855886, guid: 1d252d78608fdb1418d14fbb401b04e9, type: 3}
-      weight: 25
-      maxPerGroup: 2
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
-    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
-      weight: 25
-      maxPerGroup: 2
-      minPerGroup: 0
-      fromTier: 0
-      toTier: 0
     - prefab: {fileID: 3285891926514676715, guid: c4de1540097fc0849803d24d39735751, type: 3}
-      weight: 25
-      maxPerGroup: 2
+      weight: 30
+      maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 6328468425548948482, guid: f68eee4888e0624488d803cca7ceac64, type: 3}
-      weight: 25
-      maxPerGroup: 2
+      weight: 30
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 4438480868590446949, guid: 692cc71abea731f41bfdced13178f974, type: 3}
+      weight: 20
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 6552391252369855886, guid: 1d252d78608fdb1418d14fbb401b04e9, type: 3}
+      weight: 10
+      maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
       toTier: 0
@@ -513,48 +493,36 @@ MonoBehaviour:
     stage: 1
     huntPlayer: 0
     entries:
-    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 40
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
-      toTier: 2
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
       weight: 30
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 2
-      toTier: 3
-    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
-      weight: 20
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+      weight: 15
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 3
+      fromTier: 2
       toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+    - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
       weight: 10
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 4
       toTier: 0
-    - prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}
-      weight: 5
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 10
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 4
+      fromTier: 0
       toTier: 0
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 30
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 1
-    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
-      weight: 25
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 2
   - name: Hunters
     category: 3
     pointGroups:
@@ -566,51 +534,33 @@ MonoBehaviour:
     stage: 2
     huntPlayer: 1
     entries:
-    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
-      weight: 50
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+      weight: 40
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
-      toTier: 3
-    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
-      weight: 25
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 2
-    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
-      weight: 25
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+      weight: 20
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 30
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 1
-    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
       weight: 20
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 1
-      toTier: 2
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+      weight: 15
+      maxPerGroup: 0
+      minPerGroup: 0
+      fromTier: 0
+      toTier: 0
     - prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}
-      weight: 2
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: c0e33cebb61125d4ba5a3326b87987f6, type: 3}
-      weight: 2
-      maxPerGroup: 1
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}
-      weight: 2
-      maxPerGroup: 1
+      weight: 3
+      maxPerGroup: 0
       minPerGroup: 0
       fromTier: 2
       toTier: 0
@@ -625,36 +575,30 @@ MonoBehaviour:
     stage: 3
     huntPlayer: 1
     entries:
-    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 40
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
-      toTier: 2
-    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
-      weight: 30
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 2
-      toTier: 3
-    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
       weight: 30
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
-    - prefab: {fileID: 6176781864247096722, guid: a8ac1434006f7a44fb55b3c510633858, type: 3}
-      weight: 30
+    - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+      weight: 20
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 1
-      toTier: 2
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 25
+      fromTier: 2
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+      weight: 20
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 1
-      toTier: 1
+      fromTier: 0
+      toTier: 0
   - name: East Beacon Alarm
     category: 3
     pointGroups:
@@ -666,42 +610,24 @@ MonoBehaviour:
     stage: 1
     huntPlayer: 1
     entries:
-    - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
       weight: 40
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
-      toTier: 3
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 20
+      toTier: 0
+    - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+      weight: 30
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 2
-      toTier: 2
-    - prefab: {fileID: 9066855856663566298, guid: 6e4b724e33048b246a0b54c712d80b6f, type: 3}
+      fromTier: 0
+      toTier: 0
+    - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
       weight: 20
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 3
       toTier: 0
-    - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
-      weight: 20
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 4
-      toTier: 0
-    - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
-      weight: 30
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 1
-    - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
-      weight: 15
-      maxPerGroup: 0
-      minPerGroup: 0
-      fromTier: 1
-      toTier: 2
   systems:
   - rid: 287757967972106337
   - rid: 287757967972106340
@@ -709,7 +635,7 @@ MonoBehaviour:
   - rid: 287758281410609374
   - rid: 2623125911485546601
   roaming:
-    table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+    table: {fileID: 11400000, guid: 23d26a07c7b831349ac32e4b82b00123, type: 2}
     firstDelay: 60
     interval: 20
     baseAlive: 2
@@ -723,21 +649,21 @@ MonoBehaviour:
     campClearance: 20
     huntSpread: 15
   stages:
-  - displayName: The Mist Stirs
+  - displayName: Stones Stir
     startsAtSecondsLeft: 480
-    message: 'The mist thickens. Something out there has caught your scent. The woods give more to those who stay: loot +25%.'
+    message: 'Stones shift on the slopes: the valley has heard you. It gives more to those who stay: loot +25%.'
     enemyHealthBonus: 0.1
     enemyPowerBonus: 0.1
     lootBonus: 0.25
-  - displayName: The Hunt
+  - displayName: The Trolls Wake
     startsAtSecondsLeft: 240
-    message: 'Howls echo through the trees. The hunt has begun! The woods give more to those who stay: loot +50%.'
+    message: 'Something big is walking down the valley. The trolls are awake. It gives more to those who stay: loot +50%.'
     enemyHealthBonus: 0.2
     enemyPowerBonus: 0.2
     lootBonus: 0.5
-  - displayName: Collapse
+  - displayName: Rockfall
     startsAtSecondsLeft: 60
-    message: 'The woods are collapsing! Get out now! The woods give more to those who stay: loot +80%.'
+    message: 'Rocks are coming down the valley walls! Get out now! It gives more to those who stay: loot +80%.'
     enemyHealthBonus: 0.35
     enemyPowerBonus: 0.35
     lootBonus: 0.8
@@ -760,7 +686,7 @@ MonoBehaviour:
       data:
         enabled: 1
         settings:
-          table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+          table: {fileID: 11400000, guid: 23d26a07c7b831349ac32e4b82b00123, type: 2}
           firstDelay: 60
           interval: 20
           baseAlive: 2
@@ -791,7 +717,7 @@ MonoBehaviour:
           huntInterval: 20
           huntRadius: 60
           wrathGroups: 3
-          wrathTable: {fileID: 11400000, guid: 14f76a7cd21202c4f9876929a83f6ca9, type: 2}
+          wrathTable: {fileID: 11400000, guid: 3053dc54cd1cfcd499aca898418c563e, type: 2}
           maxWraths: 1
     - rid: 287758281410609305
       type: {class: RaidEventsSystem, ns: , asm: SafeHaven}
@@ -803,12 +729,9 @@ MonoBehaviour:
           - {fileID: 11400000, guid: 99222c7a39ea478488c1567cd06e9ca6, type: 2}
           - {fileID: 11400000, guid: eac64687f931d7c4784a86ae8f83b987, type: 2}
           - {fileID: 11400000, guid: 1f5a45a9b02364c46a8f908efeb0de22, type: 2}
-          - {fileID: 11400000, guid: 96cb078123957d84a8fb85a77ce918bf, type: 2}
-          - {fileID: 11400000, guid: 0d4d797da4e8c0d4387a4cca400ce33a, type: 2}
           - {fileID: 11400000, guid: ab909f1e102c2d446b08c2c49295dcb2, type: 2}
           - {fileID: 11400000, guid: ef827d0bb7f46d447b0d6be2e2c6783c, type: 2}
           - {fileID: 11400000, guid: e8fa9dbe99dd2df4a800731b224f1dfd, type: 2}
-          - {fileID: 11400000, guid: a3cb2529bab49724cb72ddb15212b062, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
@@ -835,7 +758,6 @@ MonoBehaviour:
         - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
         - {fileID: 11400000, guid: 43dd06446f4342e4f8f840d218d23a32, type: 2}
         - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
-        - {fileID: 11400000, guid: 6827256faa99ab141a0ae1829d0d9a88, type: 2}
         count: 2
     - rid: 2623125911485546601
       type: {class: TerrainEventsSystem, ns: , asm: SafeHaven}

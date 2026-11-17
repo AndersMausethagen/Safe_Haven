@@ -101,7 +101,7 @@ public sealed partial class RaidPreparationWindow
         hourChip = new Chip("Hour", part, style);
         moodChip = new Chip("Forest", part, style);
         Hover(hourChip.Root, () => tooltip.Show("The hour", style.Accent, hourDetail));
-        Hover(moodChip.Root, () => tooltip.Show("The forest", style.Accent, moodDetail));
+        Hover(moodChip.Root, () => tooltip.Show(moodTitle ?? "The forest", style.Accent, moodDetail));
         dangersHeading = Heading("Known dangers", part, Margin, 0f, ColumnWidth, style);
         dangersLabel = Paragraph("Dangers", part, Margin, 0f, ColumnWidth, 30f, 18f, style.Text);
         findsHeading = Heading("Likely finds", part, Margin, 0f, ColumnWidth, style);

@@ -137,7 +137,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Smith's Chest (Smith's Chest): Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (20%), Charcoal 2-4 (40%), Broken Sickle 1 (25%), Copper Band 1 (6%), Round Shield 1 (6%), Field Repair Kit 1 (15%), Old Silver Penny 1-3 (40%), Cursed Essence 1-2 (30%)
 - Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
 - Only here, with every cache (Misty Woods finds): Heart of the Forest 1 (2%), Huldra Silk 1 (5%), Elderwood 1 (6%), Wisp Ember 1 (10%), Rootling Bark 1-2 (15%), Pact Rune 1 (3%)
-- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (25%), Cursed Essence 6-8
+- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (10%), Cursed Essence 6-8
 
 ## Troll Valley
 
@@ -154,14 +154,10 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
-- Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
 - Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
-- Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
-- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
@@ -193,15 +189,12 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Blackened Barding 1 (20%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
-- Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
 - Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
-- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
 - Stone Troll (StoneTroll): Stone-troll Knuckle 1, Cursed Essence 9-12
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
@@ -233,15 +226,12 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Fire Knight (Undead Knight Fire): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Blackened Barding 1 (20%), Cursed Essence 4-6
 - Forest-Bitten Wolf (WolfPack, Wolf Den, ForestBittenWolf): Rough Hide 1-2, Bone 1 (50%), Wolf Fang 1 (25%), Cursed Essence 1-2 (80%)
 - Fossegrim (Fossegrim): Fiddle String 1-2 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
-- Ice Knight (Undead Knight Ice): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Silvered Barding 1 (20%), Cursed Essence 4-6
 - Marsh Light (MarshLight): Wisp Ember 1 (60%), Cursed Essence 1-2 (80%)
 - Mistwing (Mistwing): Mistwing Feathers 2-3, Bone 1 (50%), Cursed Essence 1-2
 - Moss Shaman (MossShaman): Shaman's Burl 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Root Guardian (RootGuardian): Guardian Heartroot 1, Hardwood 2-4, Thick Hide 1-2 (50%), Cursed Essence 3-4
-- Rootling (RootlingSwarm): Rootling Bark 1-2 (80%), Cursed Essence 1 (30%)
 - Small Moss Troll (SmallMossTroll): Troll Moss 1-2, Cursed Essence 1-2
 - Stone Troll (StoneTroll): Trollstone 2-3, Stone-troll Knuckle 1, Cursed Essence 9-12
-- Toxic Knight (Undead Knight Toxic): Grave Iron 2-3 (90%), Old Silver Penny 2-4 (70%), Painted Barding 1 (20%), Cursed Essence 4-6
 - Troll Runt (TrollRunt): Old Silver Penny 1-2 (60%), Nettle Cord 1-2 (25%), Linen 1 (20%), Copper Ingot 1 (15%), Cursed Essence 1-2
 - Trollkjerring (Trollkjerring): Hag's Knot 1 (60%), Old Silver Penny 1-2 (50%), Cursed Essence 3-4
 - Tusse (Tusse): Old Silver Penny 1-3, Tusse's Trinket 1 (30%), Cursed Essence 1-2
@@ -255,7 +245,7 @@ Written from the game's data by Safe Haven › Loot › Write Loot Overview; edi
 - Traveller's Pack (Traveller's Pack, Abandoned Camp): Linen 1-3 (40%), Nettle Cord 1-3 (40%), Waterskin 1 (30%), Barley 1-2 (30%), Healing Draught 1 (35%), Old Silver Penny 1-4 (55%), Rune Book 1 (12%), Norn's Hourglass 1 (6%), Rune of Plenty 1 (5%), Pact Rune 1 (4%), Copper Band 1 (4%), Cursed Essence 1-2 (30%)
 - Troll Hoard (Troll Hoard): Old Silver Penny 4-10, Gilded Troll Idol 1 (25%), Tusse's Trinket 1-2 (30%), Granite 2-4 (50%), Iron Ingot 1-2 (40%), Moonsilver Ingot 1 (25%), Trollstone 1 (20%), Heart of the Forest 1 (5%), Round Shield 1 (10%), Copper Band 1 (10%), Cured Leather Cap 1 (8%), Bone 2-4 (50%), Cursed Essence 2-4
 - Only here, with every cache (Troll Valley finds): Gilded Troll Idol 1 (6%), Troll Moss 1-2 (20%), Granite 1-3 (25%), Broken Sickle 1 (8%), Old Churn 1 (8%), Trollstone 1 (4%)
-- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (25%), Cursed Essence 6-8
+- Elites (3-4 a run, relic 15%): Moonsilver Ore 3-5, Trollstone 1 (40%), Cursed Essence 6-8, Granite 3-5
 
 ## Creature tables
 
@@ -334,7 +324,7 @@ Troll Valley's boss at the stone bridge (GDD §10.7): its tusk (the trophy), rar
 | Drop | Amount | Chance | Tiers | Home |
 |---|---|---|---|---|
 | Brukam's Tusk ◆ | 1 (fixed) | 100% | any | no |
-| Trollstone ◆ | 2-3 | 100% | III-V | no |
+| Trollstone ◆ | 2-3 | 100% | IV-V | no |
 | Iron Ingot | 2-4 | 100% | II-II | no |
 | Moonsilver Ingot | 1-2 | 60% | III-V | no |
 | Old Silver Penny | 6-10 | 100% | any | yes |
@@ -399,7 +389,7 @@ Its fiddle's strings instead of the Rune Book.
 | Drop | Amount | Chance | Tiers | Home |
 |---|---|---|---|---|
 | Cursed Essence | 1-2 | 80% | any | no |
-| Huldra Silk ◆ | 1 | 30% | any | no |
+| Huldra Silk | 1 | 30% | any | yes |
 | Healing Salve | 1 | 15% | any | yes |
 
 ### Ice Knight
@@ -587,7 +577,6 @@ Pennies and its trinkets instead of Grey Stone; it also drops whatever it stole 
 |---|---|---|---|---|
 | Boar Meat | 2-3 | 100% | any | yes |
 | Rough Hide | 1-2 | 80% | any | yes |
-| Boar Tusk ◆ | 1 | 35% | any | no |
 
 ## Cache tables
 
@@ -614,7 +603,7 @@ The side cache the Brukam fight tempts the player with as time runs low (GDD §1
 |---|---|---|---|---|
 | Old Silver Penny | 10-20 | 100% | any | yes |
 | Gilded Troll Idol | 1 | 60% | any | yes |
-| Trollstone ◆ | 1-2 | 50% | III-V | no |
+| Trollstone ◆ | 1-2 | 50% | IV-V | no |
 | Moonsilver Ingot | 1-2 | 100% | III-V | no |
 | Iron Ingot | 2-4 | 100% | II-II | no |
 | Heart of the Forest | 1 | 10% | any | yes |
@@ -830,7 +819,7 @@ The Woods' own: the Heart of the Forest (the forest wants it back), the huldra's
 | Drop | Amount | Chance | Tiers | Home |
 |---|---|---|---|---|
 | Heart of the Forest | 1 | 2% | any | yes |
-| Huldra Silk ◆ | 1 | 5% | II-V | no |
+| Huldra Silk | 1 | 5% | II-V | no |
 | Elderwood | 1 | 6% | II-V | no |
 | Wisp Ember ◆ | 1 | 10% | II-V | no |
 | Rootling Bark ◆ | 1-2 | 15% | any | no |
@@ -876,7 +865,7 @@ What killing an elite gives on top of the creature's own drop, each tier its own
 | Moonsilver Ore | 2-4 | 100% | III-III | no |
 | Cursed Essence | 4-6 | 100% | III-III | no |
 | Moonsilver Ore | 3-5 | 100% | IV-IV | no |
-| Trollstone ◆ | 1 | 25% | IV-IV | no |
+| Trollstone ◆ | 1 | 10% | IV-IV | no |
 | Cursed Essence | 6-8 | 100% | IV-IV | no |
 
 ### Troll Valley elites
@@ -890,8 +879,9 @@ What killing an elite gives on top of the creature's own drop, each tier its own
 | Moonsilver Ore | 2-4 | 100% | III-III | no |
 | Cursed Essence | 4-6 | 100% | III-III | no |
 | Moonsilver Ore | 3-5 | 100% | IV-IV | no |
-| Trollstone ◆ | 1 | 25% | IV-IV | no |
+| Trollstone ◆ | 1 | 40% | IV-IV | no |
 | Cursed Essence | 6-8 | 100% | IV-IV | no |
+| Granite | 3-5 | 100% | IV-IV | no |
 
 ## Other tables
 

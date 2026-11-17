@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0350d03674ebe14c9eefa590636a638, type: 3}
+  m_Name: TrollValley_Roamers
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnTable
+  entries:
+  - prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}
+    weight: 3
+    maxPerGroup: 0
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+    weight: 2
+    maxPerGroup: 3
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}
+    weight: 1
+    maxPerGroup: 0
+    minPerGroup: 0
+    fromTier: 2
+    toTier: 0
+  - prefab: {fileID: 6267209934607442583, guid: 76a470aa63338604b9110596e079afc3, type: 3}
+    weight: 1
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: 4c1fb50f1f901d64cbdea567d9d9aff6, type: 3}
+    weight: 0.6
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 2
+    toTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
+    weight: 0.8
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 2
+    toTier: 0
+  - prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+    weight: 0.5
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 3
+    toTier: 0
+  - prefab: {fileID: 9066855856663566298, guid: 9bb9b3bba4b4e0541b99c1424291cef6, type: 3}
+    weight: 0.25
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 3
+    toTier: 0
+  - prefab: {fileID: 3643037256157110189, guid: 19eccf1f7288cf14cba8e4fbb26eb7f8, type: 3}
+    weight: 0.5
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 0
+    toTier: 0
+  - prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
+    weight: 0.3
+    maxPerGroup: 1
+    minPerGroup: 0
+    fromTier: 2
+    toTier: 0

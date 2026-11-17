@@ -151,6 +151,7 @@ public sealed partial class RaidPreparationWindow : MonoBehaviour
     private Chip moodChip;
     private string hourDetail;
     private string moodDetail;
+    private string moodTitle;
     private TMP_Text dangersHeading;
     private TMP_Text dangersLabel;
     private TMP_Text findsHeading;

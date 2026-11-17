@@ -66,6 +66,7 @@ public sealed partial class RaidPreparationWindow
             (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, plan.Seed);
             moodChip.Show(mood.name, x, chips);
             moodDetail = $"{mood.briefing} {shape.briefing}{Beyond(raid)}{RoutesLine(raid)}";
+            moodTitle = "The " + raid.Land;
             anyChip = true;
         }
 

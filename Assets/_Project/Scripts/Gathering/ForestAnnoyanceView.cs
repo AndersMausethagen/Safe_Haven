@@ -49,19 +49,21 @@ public sealed class ForestAnnoyanceView : MonoBehaviour
         }
 
         fill.anchorMax = new Vector2(annoyance.Fill, 1f);
+        // The raid's own word for itself: the valley's trolls hear the noise, not "the forest" (each raid its own biome, 2026-11-17).
+        string land = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.Land : "forest";
         switch (annoyance.Level)
         {
             case AnnoyanceLevel.Calm:
                 fillImage.color = CalmColor;
-                label.text = "The forest is watching";
+                label.text = $"The {land} is watching";
                 break;
             case AnnoyanceLevel.Stirring:
                 fillImage.color = StirringColor;
-                label.text = "The forest stirs";
+                label.text = $"The {land} stirs";
                 break;
             default:
                 fillImage.color = AngryColor;
-                label.text = "The forest is angry";
+                label.text = $"The {land} is angry";
                 break;
         }
     }

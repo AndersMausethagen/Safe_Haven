@@ -221,118 +221,118 @@ MonoBehaviour:
   cliffLayer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
   cliffSlope: {x: 30, y: 42}
   litterLayer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
-  litter: 0.4
+  litter: 0.55
   growth:
   - layer: {fileID: 8574412962073106934, guid: 2fb57ea72bc32794bb6fd218883deb3f, type: 2}
-    shortGrass: 0.85
-    tallGrass: 0.3
+    shortGrass: 0.65
+    tallGrass: 0.38
     bushes: 0.1
-    plants: 0.35
+    plants: 0.25
     bareAt: 0
-    colour: {r: 0.26823956, g: 0.28028744, b: 0.13749045, a: 1}
+    colour: {r: 0.56, g: 0.6, b: 0.3, a: 1}
   - layer: {fileID: 8574412962073106934, guid: 89a3ba6919e572f4588c50d066b5a88a, type: 2}
     shortGrass: 0
     tallGrass: 0
     bushes: 0
     plants: 0
     bareAt: 0.8
-    colour: {r: 0.33656594, g: 0.27527586, b: 0.20968173, a: 1}
+    colour: {r: 0.56, g: 0.5, b: 0.4, a: 1}
   - layer: {fileID: 8574412962073106934, guid: 7eaeb7ebb68372d4ab7073d49f2b140f, type: 2}
     shortGrass: 0
     tallGrass: 0
     bushes: 0
     plants: 0
     bareAt: 0.45
-    colour: {r: 0.26552883, g: 0.23852414, b: 0.17994933, a: 1}
+    colour: {r: 0.52, g: 0.5, b: 0.43, a: 1}
   - layer: {fileID: 8574412962073106934, guid: a400704fa4dd8ab429ab87933ed8a2bc, type: 2}
     shortGrass: 0.2
     tallGrass: 0.1
     bushes: 0.05
     plants: 0.25
     bareAt: 0
-    colour: {r: 0.3147018, g: 0.27543533, b: 0.23527575, a: 1}
+    colour: {r: 0.64, g: 0.56, b: 0.32, a: 1}
   plants:
   - prototype: Common Fern
     enabled: 1
     patchSize: 9
-    rarity: 0.6
+    rarity: 0.93
     thickness: 0.55
     clearing: 1
     loveOfWet: 0.3
   - prototype: Eagle Fern
     enabled: 1
     patchSize: 8
-    rarity: 0.62
+    rarity: 0.93
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.2
   - prototype: Wild Fern
     enabled: 1
     patchSize: 7
-    rarity: 0.64
+    rarity: 0.93
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.4
   - prototype: Brake Fern
     enabled: 1
     patchSize: 6
-    rarity: 0.68
+    rarity: 0.93
     thickness: 0.45
     clearing: 1
     loveOfWet: 0.6
   - prototype: Lake Fern
     enabled: 1
     patchSize: 7
-    rarity: 0.7
+    rarity: 0.93
     thickness: 0.4
     clearing: 1
     loveOfWet: 0.5
   - prototype: Small Fern
     enabled: 1
     patchSize: 5
-    rarity: 0.66
+    rarity: 0.93
     thickness: 0.5
     clearing: 0
     loveOfWet: 0.3
   - prototype: Forest Clover
     enabled: 1
     patchSize: 5
-    rarity: 0.66
+    rarity: 0.93
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.2
   - prototype: Ground Weed
     enabled: 1
     patchSize: 6
-    rarity: 0.7
+    rarity: 0.5
     thickness: 0.4
     clearing: 0
     loveOfWet: 0
   - prototype: Forest Grass
     enabled: 1
     patchSize: 8
-    rarity: 0.62
+    rarity: 0.5
     thickness: 0.5
     clearing: 0
     loveOfWet: 0
   - prototype: Lake Grass
     enabled: 1
     patchSize: 8
-    rarity: 0.68
+    rarity: 0.5
     thickness: 0.45
     clearing: 0
     loveOfWet: 0.2
   - prototype: Wild Flowers
     enabled: 1
     patchSize: 5
-    rarity: 0.74
+    rarity: 0.5
     thickness: 0.3
     clearing: 0
     loveOfWet: 0
   - prototype: Moss Cushion
     enabled: 1
     patchSize: 6
-    rarity: 0.6
+    rarity: 0.93
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.8
@@ -346,21 +346,21 @@ MonoBehaviour:
   - prototype: Forest Mushrooms
     enabled: 1
     patchSize: 5
-    rarity: 0.76
+    rarity: 0.93
     thickness: 0.2
     clearing: 0
     loveOfWet: 0.6
   - prototype: Glow Mushrooms
     enabled: 1
     patchSize: 5
-    rarity: 0.74
+    rarity: 0.93
     thickness: 0.22
     clearing: 0
     loveOfWet: 1
   - prototype: Glow Flowers
     enabled: 1
     patchSize: 6
-    rarity: 0.72
+    rarity: 0.88
     thickness: 0.2
     clearing: 0
     loveOfWet: 0.3
@@ -388,42 +388,42 @@ MonoBehaviour:
   - prototype: Dry Leaves
     enabled: 1
     patchSize: 6
-    rarity: 0.6
+    rarity: 0.5
     thickness: 0.4
     clearing: 0
     loveOfWet: 0
   - prototype: Common Fern B
     enabled: 1
     patchSize: 9
-    rarity: 0.6
+    rarity: 0.93
     thickness: 0.55
     clearing: 1
     loveOfWet: 0.3
   - prototype: Eagle Fern B
     enabled: 1
     patchSize: 8
-    rarity: 0.62
+    rarity: 0.93
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.2
   - prototype: Wild Fern B
     enabled: 1
     patchSize: 7
-    rarity: 0.64
+    rarity: 0.93
     thickness: 0.5
     clearing: 1
     loveOfWet: 0.4
   - prototype: Forest Clover B
     enabled: 1
     patchSize: 5
-    rarity: 0.66
+    rarity: 0.93
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.2
   - prototype: Moss Cushion B
     enabled: 1
     patchSize: 6
-    rarity: 0.6
+    rarity: 0.93
     thickness: 0.6
     clearing: 0
     loveOfWet: 0.8

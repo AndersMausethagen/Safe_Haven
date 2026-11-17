@@ -28,6 +28,9 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("Shown in the UI. Falls back to the asset name when empty.")]
     [SerializeField] private string displayName;
     [SerializeField, TextArea] private string description;
+    [Tooltip("What the place is, in the UI's words, lower case: \"the forest stirs\" on the gathering-noise meter, \"The forest\" over the " +
+             "briefing's mood. Each raid its own: forest, valley, fen, mountain.")]
+    [SerializeField] private string land = "forest";
     [Tooltip("How dangerous and rewarding the raid is, shown to the player.")]
     [SerializeField, Range(1, Tiers.Max)] private int tier = 1;
 
@@ -167,6 +170,7 @@ public sealed class RaidDefinition : ScriptableObject
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
+    public string Land => string.IsNullOrWhiteSpace(land) ? "forest" : land;
     public string Description => description;
     public int Tier => tier;
     public string SceneName => sceneName;

@@ -61,7 +61,7 @@ MonoBehaviour:
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 1
-      probability: 0.25
+      probability: 0.4
       fromTier: 4
       toTier: 4
       fixedAmount: 0
@@ -69,6 +69,14 @@ MonoBehaviour:
       resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
       minQuantity: 6
       maxQuantity: 8
+      probability: 1
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
       probability: 1
       fromTier: 4
       toTier: 4
