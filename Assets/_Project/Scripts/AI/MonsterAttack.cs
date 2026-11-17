@@ -48,6 +48,10 @@ public sealed class MonsterAttack
     [Min(0f)] public float minimumRange;
     [Min(0.1f)] public float maximumRange = 2f;
     public int priority;
+    [Tooltip("A stage's opener (a boss's set piece as a phase begins): used once, as soon as its From Phase has begun and it reaches, " +
+             "and never again; its Cooldown isn't used, and it is never the answer to a backstab. Give it the highest priority, no weight, " +
+             "and a Maximum Range that reaches anywhere in the arena. Broken off before it lands, it is spent all the same.")]
+    public bool opener;
     [Tooltip("0: chosen by priority alone, as always. Above 0: when the highest-priority ready action has a weight, every ready action with " +
              "a weight (and no weightless one above it) is a candidate, picked by chance in proportion to these, so a fight doesn't run in " +
              "the same order every time. The action just used counts half; cooldowns are kept.")]
@@ -60,6 +64,10 @@ public sealed class MonsterAttack
     public bool heavy;
     [Min(0f)] public float cooldown = 1f;
     public bool interruptible;
+    [Tooltip("Seconds it reels when a blow breaks it off in its wind-up: open to blows and backstabs, as a staggered creature is, so " +
+             "breaking a blue (Interruptible) strike pays instead of only stopping it (the Heartroot's Regrowth, its Call Roots). " +
+             "0: it only waits a moment before its next strike, as always.")]
+    [Min(0f)] public float reelWhenBroken;
     [Tooltip("Plays as this action starts, instead of the creature's Attack Sound: a howl, a call to the ground. Empty: the creature's own.")]
     public SoundDefinition sound;
     [Tooltip("How much a shot or a charge aims ahead of a moving target. 0: where it stands, so walking sideways is safe. 1: fully ahead. Keep it low: a dodge must still work.")]
@@ -68,6 +76,9 @@ public sealed class MonsterAttack
     [Range(0, Tiers.Max)] public int fromTier;
     [Tooltip("For a boss: only from this stage of its fight on. 0 is from the start.")]
     [Min(0)] public int fromPhase;
+    [Tooltip("For a boss: no longer used from this stage of its fight on, so each stage is its own (the Heartroot's Call Roots and " +
+             "Thornwave sink with its walls at stage 3: 2). Stages count as From Phase does. 0: used to the end.")]
+    [Min(0)] public int untilPhase;
     [Tooltip("Only once its own health is down to this share: a last resort, a creature hardening or calling for help when hurt. 1: always.")]
     [Range(0f, 1f)] public float belowHealth = 1f;
     [Tooltip("Left on the ground where its shot or lob lands, or along a charge's path: a pool of bile, a web, a trail of fire " +
@@ -78,6 +89,9 @@ public sealed class MonsterAttack
     [Tooltip("Seconds it reels afterwards, spent by it and open to blows as a staggered creature is (the Heartroot after it " +
              "calls up its roots). 0: none.")]
     [Min(0f)] public float openAfter;
+    [Tooltip("Its Open After is a topple: it goes down for that long (Knockdown, Down, Get Up), its heart open to the Topple Strike and a " +
+             "piece of its armour breaking as a topple's does (the Heartroot at the end of its Hollow's Hold: the kill window). Needs Open After.")]
+    public bool toppleAfter;
     [Header("Melee: combos and held blows")]
     [Tooltip("Strikes that can follow this one, in order. Each is aimed anew, with its own wind-up and warning.")]
     public AttackDefinition[] followUps;
@@ -143,9 +157,18 @@ public sealed class MonsterAttack
 
     public bool IsAvailable(float distance, float now, float readyAt, bool isLeader, int tier = 0, int phase = 0, float health = 1f)
     {
-        return attack != null && KnownAt(tier) && fromPhase <= phase && distance >= minimumRange && distance <= maximumRange
+        return attack != null && KnownAt(tier) && InPhase(phase) && distance >= minimumRange && distance <= maximumRange
             && now >= readyAt && (!packLeaderOnly || isLeader) && WhenHurt(health);
     }
+
+    /// <summary>Whether a boss at this stage of its fight uses it: from its From Phase on, and before its Until Phase (0: to the end).</summary>
+    public bool InPhase(int phase) => fromPhase <= phase && (untilPhase <= 0 || phase < untilPhase);
+
+    /// <summary>
+    /// When it can be used again after it ends at <paramref name="now"/> (it landed, or was broken off): its cooldown, scaled; never for an
+    /// opener, which is spent once used. Pure, for tests.
+    /// </summary>
+    public float ReadyAfter(float now, float cooldownScale = 1f) => opener ? float.PositiveInfinity : now + cooldown * cooldownScale;
 
     /// <summary>Whether its own health (a share) is low enough for it. Entries saved before Below Health existed read 0: always.</summary>
     public bool WhenHurt(float health) => belowHealth <= 0f || belowHealth >= 1f || health <= belowHealth + 1e-4f;

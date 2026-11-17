@@ -88,3 +88,13 @@ MonoBehaviour:
     - When the bridge starts to crack, get off the stones that shake.
     - 'A fall into the gorge doesn''t kill: the river throws you up on the far bank, hurt.'
     - Wait too long and he stops playing. The fight has a clock.
+  - scene: Encounter_GuardiansHollow
+    art: {fileID: 21300000, guid: 39b3f070ceb162144a176a8ff6f9008f, type: 3}
+    tips:
+    - 'Beyond the mist there is no way back but through. Come ready: eat, bring tonics and draughts, and mend your gear.'
+    - Parry the Heartroot's slams and flails. Every parry and heavy blow shakes its footing, and enough of them bring it down.
+    - 'When it falls, get behind it: its heart lies open for a moment.'
+    - A purple warning can't be blocked. Roll out of it.
+    - When it glows blue it is calling or mending. Hit it then and it reels.
+    - Its black sap rots the blood. An Antidote clears it.
+    - Wait too long and it stops holding back. The fight has a clock.

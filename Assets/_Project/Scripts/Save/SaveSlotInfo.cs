@@ -83,6 +83,8 @@ public sealed class SaveSlotInfo
                 return "Moss Marsh";
             case "Encounter_BrukamsBridge":
                 return "Brukam's Bridge";
+            case "Encounter_GuardiansHollow":
+                return "Guardian's Hollow";
             default:
                 return string.IsNullOrEmpty(scene) ? "Unknown place" : scene;
         }

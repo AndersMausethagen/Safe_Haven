@@ -11,7 +11,8 @@ using UnityEngine;
 /// draws its weapon when it spots someone (Draw).
 /// </para>
 /// <para>
-/// Answering back (phase C): felled, it falls, lies ("Down") and gets up ("Get Up") as its stagger ends; its weapon guard ("Guarding",
+/// Answering back (phase C): felled, it falls, lies ("Down") and gets up ("Get Up") as its stagger ends, as a boss does when it topples
+/// (staying down while a stage's reel lengthens the topple); its weapon guard ("Guarding",
 /// the "Guard" state) jolts when a blow is turned aside ("Guard Hit" on the arms layer), as its shield does ("Block Hit"); badly hurt it
 /// cries out ("Roar"); an Unyielding elite doesn't flinch.
 /// </para>
@@ -238,10 +239,19 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
         if (getUpAt >= 0f && Time.time >= getUpAt)
         {
-            getUpAt = -1f;
-            if (ai.CurrentState == MonsterAI.State.Staggered && animator.isHuman && animator.HasState(0, GetUpStateHash))
+            // A topple made longer while it lies (a boss's stage reel lands in it): it stays down until near the new end.
+            float later = Time.time + ai.StaggerSecondsLeft - GetUpSeconds;
+            if (ai.IsToppled && later > Time.time + 0.05f)
             {
-                animator.CrossFadeInFixedTime(GetUpStateHash, 0.2f, 0, 0f);
+                getUpAt = later;
+            }
+            else
+            {
+                getUpAt = -1f;
+                if (ai.CurrentState == MonsterAI.State.Staggered && animator.isHuman && animator.HasState(0, GetUpStateHash))
+                {
+                    animator.CrossFadeInFixedTime(GetUpStateHash, 0.2f, 0, 0f);
+                }
             }
         }
 
@@ -414,7 +424,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         lastBlowAt = Time.time;
         lastBlowFells = (damage.Technique & HitTechnique.Charged) != 0 || damage.Poise >= maxPoise * 0.75f;
         // A blow that staggered it already (the AI heard it first): a felling blow knocks it down. Never a great beast, boss or elite,
-        // which only stagger (MonsterAI.TakeBlowOnPoise).
+        // which only stagger (MonsterAI.TakeBlowOnPoise) unless they topple, and a topple is already down (OnStaggered: IsFelled).
         if (ai.CurrentState == MonsterAI.State.Staggered && lastBlowFells && !result.Killed && !ai.IsHeavyweight)
         {
             KnockDown(ai.StaggerSecondsLeft);
@@ -486,7 +496,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private void OnStaggered(float seconds)
     {
         // Felled (MonsterAI.IsFelled: caught reeling by a weighty blow, or a charged or crushing one broke it): down, not just reeling.
-        if (ai.IsFelled || (lastBlowFells && Time.time - lastBlowAt < 0.05f))
+        // A great beast, boss or elite goes down only when the AI says so: a boss's topple (Monster Definition › Topple Seconds), never a
+        // plain stagger after a weighty blow, which would lie it down for a stagger's length.
+        if (ai.IsFelled || (!ai.IsHeavyweight && lastBlowFells && Time.time - lastBlowAt < 0.05f))
         {
             KnockDown(seconds);
             return;

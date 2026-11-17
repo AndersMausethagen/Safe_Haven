@@ -12,7 +12,9 @@ public sealed class BossTests
     [TestCase(0.6f, 1)]
     [TestCase(0.34f, 1)]
     [TestCase(0.2f, 2)]
-    [TestCase(0.01f, 2)]
+    [TestCase(0.13f, 2)]
+    [TestCase(0.11f, 3)]
+    [TestCase(0.01f, 3)]
     public void TheFightMovesOnAsItsHealthFalls(float health, int phase)
     {
         Assert.AreEqual(phase, BossDefinition.PhaseAt(health, Boss.Phases));
@@ -21,7 +23,7 @@ public sealed class BossTests
     [Test]
     public void AHugeBlowCanOnlyGoForwardThroughThePhases()
     {
-        Assert.AreEqual(2, BossDefinition.PhaseAt(0.05f, Boss.Phases), "A blow past two marks reaches the last");
+        Assert.AreEqual(3, BossDefinition.PhaseAt(0.05f, Boss.Phases), "A blow past every mark reaches the last (the Hollow's Hold)");
     }
 
     [Test]

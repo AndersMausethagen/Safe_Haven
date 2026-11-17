@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: whatbreathesundertheroots
   displayName: What Breathes Under the Roots
-  description: 'The roots that closed the road, the roots that choked the portal''s stones, the roots in the breach''s dead: one thing is pushing them. Something old breathes under them in a hollow deep in the Misty Woods. It will not wake for steel. Carry an ember from your own hearth to it, wake it, and bring it down.'
+  description: 'The breathing hollow is found, and the portal can reach it now: Guardian''s Hollow, deep in the Misty Woods. Something old breathes under the roots there. It will not wake for steel. Carry an ember from your own hearth to it, wake it, and bring it down.'
   chain: The Hearth and the Door
-  journalNotes: 'Make the ember at any campfire, from three sticks. The portal''s briefing tells you when the hollow can be found: it marks the place for the whole raid. The Heartroot fights in three stages, and it can be fought again on a later raid if it beats you; what you learned of it stays learned.
+  journalNotes: 'Make the ember at any campfire, from three sticks. Guardian''s Hollow is in the portal''s list now. Beyond the mist there is no way out but through: come ready, fed, with tonics and draughts, and your gear mended. The Heartroot fights in three stages and it has a clock: wait too long and it stops holding back. If it beats you, you can try again.
 
 
     It is the forest''s guardian, or it was. Nobody at home is sure which.'
@@ -26,8 +26,7 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
-  - {fileID: 11400000, guid: c52d9c22e1f9f5d4099a9125d93cca82, type: 2}
+  - {fileID: 11400000, guid: 5b96808e29f58414c97811c3ec9f1a0a, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}

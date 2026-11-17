@@ -252,6 +252,13 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>Raised when a blow breaks off any monster's wind-up, with who struck it (game-wide feedback: the spark, the tally).</summary>
     public static event Action<MonsterAI, Combatant> AnyInterrupted;
 
+    /// <summary>Raised when it topples (MonsterAI.Answers: Monster Definition › Topple Seconds, or a strike's Topple After), with how long it
+    /// lies: its bark breaks (CreatureWounds), a boss's heart glows and its line goes up (BossEncounter). On a friend's copy too.</summary>
+    public event Action<float> Toppled;
+
+    /// <summary><see cref="Toppled"/> for every monster (game-wide: the playtest log's topples).</summary>
+    public static event Action<MonsterAI, float> AnyToppled;
+
     /// <summary>A great beast, boss or elite: not Open While Striking, made an elite, or in a boss fight. A parry doesn't floor it and a
     /// heavy blow doesn't break off its strike.</summary>
     public bool IsHeavyweight
@@ -310,8 +317,15 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
 
     public bool CanBeFinished => definition != null && definition.CanBeFinished;
 
-    /// <summary>The fight has reached this stage, and it knows the attacks that go with it (BossEncounter).</summary>
-    public void SetPhase(int phase) => attacks.Phase = phase;
+    /// <summary>
+    /// The fight has reached this stage, and it knows the attacks that go with it (BossEncounter). Its poise is its own again: what its
+    /// topples grew it by (Monster Definition › Poise Growth) is for one stage only.
+    /// </summary>
+    public void SetPhase(int phase)
+    {
+        attacks.Phase = phase;
+        poise?.ResetGrowth();
+    }
 
     public State CurrentState { get; private set; } = State.Idle;
     public MonsterDefinition Definition => definition;
@@ -408,8 +422,9 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         positioning = new MonsterPositioning(transform, movement, senses, definition);
         attacks = new MonsterAttacks(transform, definition, combatant, movement, targetLayers);
         CombatTechniqueSettings technique = CombatTechniqueSettings.Current;
+        // A boss's poise can wait longer before it comes back (Monster Definition › Poise Recovery Delay), so it builds across exchanges.
         poise = new PoiseMeter(definition.Poise > 0f ? definition.Poise : technique.DefaultPoise,
-            technique.PoiseRecoveryDelay, technique.PoiseRecoveryPerSecond);
+            definition.PoiseRecoveryDelay > 0f ? definition.PoiseRecoveryDelay : technique.PoiseRecoveryDelay, technique.PoiseRecoveryPerSecond);
         if (definition.Attack == null && definition.Attacks.Count == 0 && combatant.Faction != Faction.Neutral)
         {
             Debug.LogWarning($"{definition.DisplayName} has no attack, so it chases but never attacks.", this);

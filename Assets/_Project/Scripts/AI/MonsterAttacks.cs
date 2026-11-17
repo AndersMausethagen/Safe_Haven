@@ -148,14 +148,20 @@ public sealed class MonsterAttacks
 
     /// <summary>The strike that reaches <paramref name="distance"/>, spent or not, or -1: what it wheels round into when it answers a
     /// backstab. The blow it was knocked out of has just gone on cooldown, and that mustn't leave it with nothing to answer with.</summary>
-    public int ChooseAnswer(float distance)
+    public int ChooseAnswer(float distance) => SelectAnswer(definition.Attacks, distance, Phase, RaidTier);
+
+    /// <summary>
+    /// <see cref="ChooseAnswer"/>, pure for tests: the highest-priority strike of this stage that reaches, ready or not. Never an opener: a
+    /// stage's set piece comes once, and its high priority would otherwise make it the answer to every backstab after it.
+    /// </summary>
+    public static int SelectAnswer(IReadOnlyList<MonsterAttack> actions, float distance, int phase, int tier)
     {
-        IReadOnlyList<MonsterAttack> actions = definition.Attacks;
         int chosen = -1;
         for (int i = 0; i < actions.Count; i++)
         {
             MonsterAttack candidate = actions[i];
-            if (candidate != null && candidate.Strikes && candidate.fromPhase <= Phase && candidate.KnownAt(RaidTier) && distance >= candidate.minimumRange && distance <= candidate.maximumRange
+            if (candidate != null && candidate.Strikes && !candidate.opener && candidate.InPhase(phase) && candidate.KnownAt(tier)
+                && distance >= candidate.minimumRange && distance <= candidate.maximumRange
                 && (chosen < 0 || candidate.priority > actions[chosen].priority))
             {
                 chosen = i;
@@ -274,8 +280,9 @@ public sealed class MonsterAttacks
         for (int i = 0; i < attacks.Count; i++)
         {
             MonsterAttack candidate = attacks[i];
-            // What it can't use at all yet (as IsAvailable: its phase, its tier, Below Health, the pack leader's own) is no reason to stand.
-            if (candidate == null || !candidate.Strikes || candidate.fromPhase > phase || !candidate.KnownAt(tier) || !candidate.WhenHurt(health)
+            // What it can't use at all yet, or any more (as IsAvailable: its phase, its tier, Below Health, the pack leader's own), is no
+            // reason to stand.
+            if (candidate == null || !candidate.Strikes || !candidate.InPhase(phase) || !candidate.KnownAt(tier) || !candidate.WhenHurt(health)
                 || (candidate.packLeaderOnly && !isLeader))
             {
                 continue;
@@ -285,6 +292,12 @@ public sealed class MonsterAttacks
             if (inRange && now >= cooldowns[i])
             {
                 return true;
+            }
+
+            // A stage's opener is a set piece, not the strike it walks up with.
+            if (candidate.opener)
+            {
+                continue;
             }
 
             if (candidate.kind == MonsterAttackKind.Charge)
@@ -421,7 +434,7 @@ public sealed class MonsterAttacks
     {
         if (action != null && actionIndex >= 0)
         {
-            readyAt[actionIndex] = Time.time + action.cooldown * CooldownScale;
+            readyAt[actionIndex] = action.ReadyAfter(Time.time, CooldownScale);
         }
 
         action = null;
@@ -869,7 +882,7 @@ public sealed class MonsterAttacks
     // The action is over: its cooldown starts and the next strike may follow shortly. Always false (the strike ended).
     private bool Finish()
     {
-        readyAt[actionIndex] = Time.time + action.cooldown * CooldownScale;
+        readyAt[actionIndex] = action.ReadyAfter(Time.time, CooldownScale);
         nextAttackTime = Time.time + 0.15f;
         action = null;
         actionIndex = -1;

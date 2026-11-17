@@ -79,6 +79,31 @@ public static class CreatureLook
         }
     }
 
+    /// <summary>
+    /// How the body glows now: the emission of its first material with an emission map (black when that emission is off, or it has none),
+    /// so a passing glow (a boss's topple) can be put back as it was.
+    /// </summary>
+    public static Color GlowOf(GameObject body)
+    {
+        foreach (Renderer renderer in body.GetComponentsInChildren<Renderer>(true))
+        {
+            if (!IsBody(renderer))
+            {
+                continue;
+            }
+
+            foreach (Material material in renderer.sharedMaterials)
+            {
+                if (material != null && material.HasProperty(EmissionMap) && material.GetTexture(EmissionMap) != null)
+                {
+                    return material.IsKeywordEnabled("_EMISSION") ? material.GetColor(EmissionColor) : Color.black;
+                }
+            }
+        }
+
+        return Color.black;
+    }
+
     public static void SetEyes(GameObject body, Color colour)
     {
         foreach (Renderer renderer in body.GetComponentsInChildren<Renderer>(true))

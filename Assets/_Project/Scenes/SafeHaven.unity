@@ -263570,8 +263570,11 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
     text: <i>The light that reached her reached other things as well. They are on the old path now, testing me. Prepare yourself. When you are ready, tell me, and I will let them come.</i>
     moment: {fileID: 0}
+  - quest: {fileID: 11400000, guid: 5b96808e29f58414c97811c3ec9f1a0a, type: 2}
+    text: <i>Something breathes under the roots, little one. I feel it turn over in its sleep, deep in the Misty Woods, but I cannot see where. Find it for me. Walk into its hollow and come home, and I will know the way.</i>
+    moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
-    text: '<i>Now the woods have told me. Something breathes under the roots, little one, in a hollow deep in the Misty Woods: a guardian, as old as my stones. It will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore.</i>'
+    text: '<i>Now I know the way. It is a guardian, as old as my stones, and it will not wake for steel. Take an ember from your own fire to it. That, it cannot ignore. And come ready, little one: beyond my mist there is no turning back.</i>'
     moment: {fileID: 0}
   - quest: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
     text: <i>Come and sit by me, little one. There is something I should have told you before you went to that hollow.</i>

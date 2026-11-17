@@ -43,81 +43,32 @@ MonoBehaviour:
   huntsHorses: 1
   frightensHorses: 0
   attacks:
-  - attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
+  - attack: {fileID: 11400000, guid: e037e659b8313ce45b50986650d8838f, type: 2}
     kind: 0
-    damage: 55.2
+    damage: 44
     minimumRange: 0
-    maximumRange: 2.0400002
-    priority: 12
-    weight: 0
-    whenFoe: 0
-    heavy: 0
-    cooldown: 1.1
-    interruptible: 0
-    sound: {fileID: 0}
-    leadTarget: 0
-    fromTier: 0
-    fromPhase: 2
-    belowHealth: 1
-    hazardPrefab: {fileID: 0}
-    hazardEvery: 0
-    openAfter: 0
-    followUps: []
-    comboChance: 0.5
-    comboGap: 0.2
-    comboFromTier: 0
-    holdChance: 0
-    holdSeconds: 0.45
-    projectilePrefab: {fileID: 0}
-    burstCount: 1
-    burstInterval: 0
-    projectileSpeed: 0
-    projectileRadius: 0
-    chargeSpeed: 0
-    chargeDistance: 0
-    exposedSeconds: 0
-    leapHeight: 0
-    buffRadius: 0
-    buffSeconds: 0
-    damageBonus: 0
-    packLeaderOnly: 0
-    selfOnly: 0
-    healShare: 0
-    speedBonus: 0
-    hasteBonus: 0
-    toughness: 0
-    alertsOthers: 0
-    foeStatus: {fileID: 0}
-    foePull: 0
-    announce: 
-    summonPrefab: {fileID: 0}
-    summonCount: 0
-    summonRadius: 0
-    summonLimit: 0
-    lobSeconds: 1.1
-    lobScatter: 2
-  - attack: {fileID: 11400000, guid: c866deecfbabf0a459e469b04f3856f7, type: 2}
-    kind: 0
-    damage: 48
-    minimumRange: 0
-    maximumRange: 2.0400002
+    maximumRange: 2.3
     priority: 10
-    weight: 0
+    opener: 0
+    weight: 3
     whenFoe: 0
     heavy: 0
-    cooldown: 1.8
+    cooldown: 3
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
-    comboChance: 0.5
-    comboGap: 0.2
+    comboChance: 0
+    comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
     holdSeconds: 0.45
@@ -149,28 +100,33 @@ MonoBehaviour:
     summonLimit: 0
     lobSeconds: 1.1
     lobScatter: 2
-  - attack: {fileID: 11400000, guid: 1f6c9861d61de264185ac536010f1378, type: 2}
+  - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
     kind: 0
-    damage: 64.8
+    damage: 34
     minimumRange: 0
-    maximumRange: 3.6
-    priority: 15
-    weight: 0
+    maximumRange: 2.6
+    priority: 10
+    opener: 0
+    weight: 2.5
     whenFoe: 0
-    heavy: 1
-    cooldown: 7
+    heavy: 0
+    cooldown: 5
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
-    fromPhase: 1
+    fromPhase: 0
+    untilPhase: 1
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
-    followUps: []
-    comboChance: 0.5
-    comboGap: 0.2
+    toppleAfter: 0
+    followUps:
+    - {fileID: 11400000, guid: 2c6a1fa64b23d9347bdd00af396f2083, type: 2}
+    comboChance: 1
+    comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
     holdSeconds: 0.45
@@ -202,28 +158,32 @@ MonoBehaviour:
     summonLimit: 0
     lobSeconds: 1.1
     lobScatter: 2
-  - attack: {fileID: 11400000, guid: 45c1f4c4e91021a40ba94d2eb49722ff, type: 2}
-    kind: 4
-    damage: 0
-    minimumRange: 2
-    maximumRange: 11
-    priority: 22
-    weight: 0
-    whenFoe: 0
+  - attack: {fileID: 11400000, guid: 8b8fb1c1cf4eb1d418ec703c81e62251, type: 2}
+    kind: 0
+    damage: 25
+    minimumRange: 3.5
+    maximumRange: 9
+    priority: 10
+    opener: 0
+    weight: 2
+    whenFoe: 6
     heavy: 0
-    cooldown: 16
-    interruptible: 1
-    sound: {fileID: 11400000, guid: d56aff94114ed014e9497a0af503bc0f, type: 2}
+    cooldown: 9
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
-    fromPhase: 1
-    belowHealth: 1
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 0.95
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
-    openAfter: 4
+    openAfter: 0
+    toppleAfter: 0
     followUps: []
-    comboChance: 0.5
-    comboGap: 0.2
+    comboChance: 0
+    comboGap: 0.3
     comboFromTier: 0
     holdChance: 0
     holdSeconds: 0.45
@@ -248,32 +208,36 @@ MonoBehaviour:
     alertsOthers: 0
     foeStatus: {fileID: 0}
     foePull: 0
-    announce: calls up its roots, and its heart lies open!
-    summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
-    summonCount: 2
-    summonRadius: 3
-    summonLimit: 4
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
     lobSeconds: 1.1
     lobScatter: 2
-  - attack: {fileID: 11400000, guid: d5262ca714b907d48b6b366d7c707bdb, type: 2}
+  - attack: {fileID: 11400000, guid: ec517eb1764eab644afa3dd22f15556f, type: 2}
     kind: 5
-    damage: 42
-    minimumRange: 3
+    damage: 34
+    minimumRange: 4
     maximumRange: 18
-    priority: 20
-    weight: 0
-    whenFoe: 0
+    priority: 10
+    opener: 0
+    weight: 1.5
+    whenFoe: 6
     heavy: 0
     cooldown: 11
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0.5
     fromTier: 0
     fromPhase: 0
-    belowHealth: 1
+    untilPhase: 0
+    belowHealth: 0.97
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -308,25 +272,373 @@ MonoBehaviour:
     summonLimit: 4
     lobSeconds: 1
     lobScatter: 2.5
+  - attack: {fileID: 11400000, guid: bda696c62e232594a9300471c41dfe88, type: 2}
+    kind: 0
+    damage: 30
+    minimumRange: 0
+    maximumRange: 3
+    priority: 10
+    opener: 0
+    weight: 0.6
+    whenFoe: 8
+    heavy: 0
+    cooldown: 6
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: f32e46b509dc9dd4dad36e1d0e1ec153, type: 2}
+    kind: 4
+    damage: 0
+    minimumRange: 0
+    maximumRange: 30
+    priority: 22
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 22
+    interruptible: 1
+    reelWhenBroken: 2.5
+    sound: {fileID: 11400000, guid: d56aff94114ed014e9497a0af503bc0f, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 2
+    belowHealth: 0.85
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 3
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: calls up its roots, and its heart lies open!
+    summonPrefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 3
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: c80bd2e5c156c29499534bfe375edbc7, type: 2}
+    kind: 0
+    damage: 56
+    minimumRange: 0
+    maximumRange: 40
+    priority: 40
+    opener: 1
+    weight: 0
+    whenFoe: 0
+    heavy: 1
+    cooldown: 9999
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 2
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 2.5
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: ded5c36ea12f75e47aaac3b533258edc, type: 2}
+    kind: 0
+    damage: 56
+    minimumRange: 0
+    maximumRange: 2.8
+    priority: 10
+    opener: 0
+    weight: 1.5
+    whenFoe: 1
+    heavy: 1
+    cooldown: 7
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 1.2
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0.4
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
+    kind: 0
+    damage: 34
+    minimumRange: 0
+    maximumRange: 2.6
+    priority: 10
+    opener: 0
+    weight: 2.5
+    whenFoe: 0
+    heavy: 0
+    cooldown: 5
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 2
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps:
+    - {fileID: 11400000, guid: 2c6a1fa64b23d9347bdd00af396f2083, type: 2}
+    - {fileID: 11400000, guid: ded5c36ea12f75e47aaac3b533258edc, type: 2}
+    comboChance: 0.7
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 2262720174b6c014c9279cb8f0154559, type: 2}
+    kind: 0
+    damage: 60
+    minimumRange: 0
+    maximumRange: 3.6
+    priority: 10
+    opener: 0
+    weight: 1
+    whenFoe: 0
+    heavy: 1
+    cooldown: 12
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 1.5
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
   - attack: {fileID: 11400000, guid: 0ea8338d7bde79e45b359467a33d0f0e, type: 2}
     kind: 3
     damage: 8
     minimumRange: 0
     maximumRange: 30
     priority: 30
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
-    cooldown: 30
+    cooldown: 35
     interruptible: 1
+    reelWhenBroken: 3
     sound: {fileID: 11400000, guid: 90f7fbf1f37808648ba96b97f965e1e6, type: 2}
     leadTarget: 0
     fromTier: 0
-    fromPhase: 2
+    fromPhase: 1
+    untilPhase: 2
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -347,7 +659,7 @@ MonoBehaviour:
     damageBonus: 0
     packLeaderOnly: 0
     selfOnly: 1
-    healShare: 0.12
+    healShare: 0.08
     speedBonus: 0
     hasteBonus: 0
     toughness: 0
@@ -355,6 +667,351 @@ MonoBehaviour:
     foeStatus: {fileID: 0}
     foePull: 0
     announce: draws sap from the deep roots and mends. Strike it to break the draw!
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: e037e659b8313ce45b50986650d8838f, type: 2}
+    kind: 0
+    damage: 44
+    minimumRange: 0
+    maximumRange: 2.3
+    priority: 10
+    opener: 0
+    weight: 1.5
+    whenFoe: 0
+    heavy: 0
+    cooldown: 4
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 1
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0.35
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: df0493656ad4c2e44b2ca7938fd999f6, type: 2}
+    kind: 5
+    damage: 22
+    minimumRange: 0
+    maximumRange: 40
+    priority: 40
+    opener: 1
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 9999
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0.5
+    fromTier: 0
+    fromPhase: 2
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 7922212942557804517, guid: 6654f1dd376368841b016d8049a0c17b, type: 3}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 6
+    burstInterval: 0.3
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.2
+    lobScatter: 4
+  - attack: {fileID: 11400000, guid: df0493656ad4c2e44b2ca7938fd999f6, type: 2}
+    kind: 5
+    damage: 22
+    minimumRange: 0
+    maximumRange: 16
+    priority: 10
+    opener: 0
+    weight: 1.5
+    whenFoe: 0
+    heavy: 0
+    cooldown: 14
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0.5
+    fromTier: 0
+    fromPhase: 2
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 7922212942557804517, guid: 6654f1dd376368841b016d8049a0c17b, type: 3}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 4
+    burstInterval: 0.45
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.2
+    lobScatter: 2.5
+  - attack: {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
+    kind: 0
+    damage: 34
+    minimumRange: 0
+    maximumRange: 2.6
+    priority: 10
+    opener: 0
+    weight: 2.5
+    whenFoe: 0
+    heavy: 0
+    cooldown: 5
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 2
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps:
+    - {fileID: 11400000, guid: 2c6a1fa64b23d9347bdd00af396f2083, type: 2}
+    - {fileID: 11400000, guid: fc04e0fb92cf2094a8f44b7d7a8774ae, type: 2}
+    - {fileID: 11400000, guid: ded5c36ea12f75e47aaac3b533258edc, type: 2}
+    comboChance: 0.5
+    comboGap: 0.3
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0
+    projectileSpeed: 0
+    projectileRadius: 0
+    chargeSpeed: 0
+    chargeDistance: 0
+    exposedSeconds: 0
+    leapHeight: 0
+    buffRadius: 0
+    buffSeconds: 0
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 0
+    summonRadius: 0
+    summonLimit: 0
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 0ea8338d7bde79e45b359467a33d0f0e, type: 2}
+    kind: 3
+    damage: 8
+    minimumRange: 0
+    maximumRange: 30
+    priority: 30
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 25
+    interruptible: 1
+    reelWhenBroken: 3
+    sound: {fileID: 11400000, guid: 90f7fbf1f37808648ba96b97f965e1e6, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 2
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 6
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 1
+    healShare: 0.08
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: draws sap from the deep roots and mends. Strike it to break the draw!
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: a726a6748051fe6428075fb65ef601f7, type: 2}
+    kind: 3
+    damage: 8
+    minimumRange: 0
+    maximumRange: 40
+    priority: 40
+    opener: 1
+    weight: 0
+    whenFoe: 0
+    heavy: 1
+    cooldown: 9999
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 11400000, guid: 90f7fbf1f37808648ba96b97f965e1e6, type: 2}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 3
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 5
+    toppleAfter: 1
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 6
+    damageBonus: 0
+    packLeaderOnly: 0
+    selfOnly: 1
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: drives its roots into the hollow, and the whole floor rises against you!
     summonPrefab: {fileID: 0}
     summonCount: 2
     summonRadius: 3
@@ -393,8 +1050,14 @@ MonoBehaviour:
   hurtBelow: 0
   hurtMood: 0
   arrowDodge: 0
-  poise: 320
+  poise: 450
   parryResponse: 0
+  poiseRecoveryDelay: 5
+  toppleSeconds: 3
+  poiseGrowth: 0.3
+  toppleStrike: 0.02
+  toppleBreaksArmour: 1
+  toppleSound: {fileID: 11400000, guid: bd4c0f66bb9194e408eb044199ed92c1, type: 2}
   openWhileStriking: 0
   parriesBackstabs: 0
   shieldArc: 0
@@ -409,8 +1072,8 @@ MonoBehaviour:
   limpBelow: 0.3
   limpSpeed: 0.75
   bleedTrailBelow: 0.5
-  armourChips: 0
-  armourPerChip: 0.12
+  armourChips: 4
+  armourPerChip: 0.1
   chipFromShare: 0.07
   armourParts: []
   sizeVariation: 0

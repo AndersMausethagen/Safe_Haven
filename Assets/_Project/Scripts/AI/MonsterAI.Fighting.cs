@@ -270,10 +270,18 @@ public sealed partial class MonsterAI
             }
 
             SetState(State.Chasing);
-            // Spent by it (Open After): it reels a while, open to blows, as a staggered creature is.
+            // Spent by it (Open After): it reels a while, open to blows, as a staggered creature is; or, with Topple After, it goes down
+            // for that long (the Heartroot's Hollow's Hold ends in its kill window).
             if (doing != null && doing.openAfter > 0f && CurrentState != State.Dead)
             {
-                StaggerAtLeast(doing.openAfter);
+                if (doing.toppleAfter)
+                {
+                    Topple(-transform.forward, doing.openAfter, false);
+                }
+                else
+                {
+                    StaggerAtLeast(doing.openAfter);
+                }
             }
 
             return;

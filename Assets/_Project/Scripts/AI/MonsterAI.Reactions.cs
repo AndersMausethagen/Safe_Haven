@@ -51,9 +51,17 @@ public sealed partial class MonsterAI
                 Stagger(staggerSeconds);
                 break;
             case ParryResponse.PoiseDamage:
-                if (!IsRemote && poise != null && CurrentState != State.Staggered && poise.Hit(poise.Max * rules.ParryPoiseShare, Time.time))
+                // A share of its own poise, not of what topples have grown it to: growth makes the next topple take more parries too.
+                if (!IsRemote && poise != null && CurrentState != State.Staggered && poise.Hit(poise.BaseMax * rules.ParryPoiseShare, Time.time))
                 {
-                    Stagger(staggerSeconds);
+                    if (Topples)
+                    {
+                        Topple(-transform.forward, definition.ToppleSeconds, true);
+                    }
+                    else
+                    {
+                        Stagger(staggerSeconds);
+                    }
                 }
                 else
                 {
@@ -98,7 +106,14 @@ public sealed partial class MonsterAI
 
         if (poise.Hit(amount * MarkScale, Time.time))
         {
-            Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+            if (Topples)
+            {
+                Topple(-transform.forward, definition.ToppleSeconds, true);
+            }
+            else
+            {
+                Stagger(CombatTechniqueSettings.Current.StaggerSeconds);
+            }
         }
     }
 
@@ -129,6 +144,8 @@ public sealed partial class MonsterAI
         staggerUntil = Time.time + seconds;
         pose?.Stagger(Time.time, seconds);
         IsFelled = felling;
+        // Only a topple's own stagger is a topple: any other (a phase's reel begun anew, a parry) ends one.
+        toppledNow = toppling;
         weaponGuardUntil = float.NegativeInfinity;
         // After the state, which clears what the last stagger added.
         SetState(State.Staggered);
@@ -190,6 +207,8 @@ public sealed partial class MonsterAI
             pose.Hit(damage.Direction, strong ? Mathf.Max(1f, weight) : weight, Time.time);
         }
 
+        // Read before the interrupt, which ends the strike and lets its action go.
+        MonsterAttack breaking = CurrentState == State.Attacking ? attacks.Action : null;
         if (CurrentState == State.Attacking && !IsUnyielding && attacks.TryInterrupt(result.HealthLost, BreaksThrough(damage)))
         {
             pose?.CancelAttack();
@@ -197,6 +216,12 @@ public sealed partial class MonsterAI
             attacks.Delay(CombatTechniqueSettings.Current.InterruptDelay);
             AnyInterrupted?.Invoke(this, damage.Source);
             RaiseInterrupted();
+            // Broken in its wind-up, it pays (Monster Attack › Reel When Broken): it reels, open to blows and backstabs, rather than only
+            // waiting a moment. On a friend's copy the stagger is told to the host (Stagger), which reels for everyone.
+            if (breaking != null && breaking.reelWhenBroken > 0f && CurrentState != State.Dead && !result.Killed)
+            {
+                StaggerAtLeast(breaking.reelWhenBroken);
+            }
         }
 
         if ((damage.Technique & HitTechnique.Backstab) != 0)

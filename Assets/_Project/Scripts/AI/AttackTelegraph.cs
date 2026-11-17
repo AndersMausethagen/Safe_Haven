@@ -284,10 +284,11 @@ public sealed class AttackTelegraph : MonoBehaviour
         return true;
     }
 
-    // The ring at its feet while its blow is spent: from the body's edge out by Opening Reach, shrinking in as the opening closes.
+    // The ring at its feet while its blow is spent, or while it lies toppled (a boss's poise broken): from the body's edge out by Opening
+    // Reach, shrinking in as the opening closes.
     private void UpdateOpening()
     {
-        bool open = ai.TryGetOpening(out float left, out float length);
+        bool open = ai.TryGetOpening(out float left, out float length) || ai.TryGetToppleOpening(out left, out length);
         if (!open)
         {
             if (opening != null && opening.gameObject.activeSelf)

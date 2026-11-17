@@ -26,22 +26,11 @@ MonoBehaviour:
   artwork: {fileID: 21300000, guid: 047582d5994612e47be72d74a4306f7f, type: 3}
   onStart: []
   choices:
-  - label: Wake it
-    detail: 'Lay a Hearth Ember in the split: only a hearth''s fire wakes it. A fight to the end, in three stages. Beating it teaches you what it knows, for good.'
-    cost:
-    - item: {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
-      amount: 1
-    result: You lay the ember in the split of the stump. The breathing stops. Then the stump opens, and something stands up out of it.
-    outcomes:
-    - rid: 2623125862064848931
+  - label: Lay your hand on the split
+    detail: 'Feel what sleeps in it. Steel won''t wake it, and here nothing will: the portal has to learn the way first.'
+    cost: []
+    result: The wood is warm under your hand, and it moves, slow as sleep. Something in there knows you are there. Get home with the way, and the portal will remember it.
+    outcomes: []
   references:
     version: 2
-    RefIds:
-    - rid: 2623125862064848931
-      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
-      data:
-        prefabs:
-        - {fileID: 9066855856663566298, guid: cb1948ff0636dbc47a1c17a2ab2c8d6b, type: 3}
-        count: 1
-        radius: 2.5
-        hunt: 1
+    RefIds: []

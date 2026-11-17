@@ -20,4 +20,7 @@ MonoBehaviour:
   holdsRumours: 1
   alwaysThere: 1
   moods: []
-  guards: []
+  guards:
+  - prefab: {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+    count: 2
+    fromTier: 1

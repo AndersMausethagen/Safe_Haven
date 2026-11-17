@@ -200,10 +200,23 @@ public sealed partial class MonsterAI
             if (state == State.Staggered)
             {
                 // The host's creature staggers (its poise broke, someone parried it): shown here as a stagger is, open to the
-                // same blows and out of any strike it was playing, but not told back to the host.
+                // same blows and out of any strike it was playing, but not told back to the host. Felled, a creature that topples
+                // (Monster Definition › Topple Seconds) is toppled: its own length, its heart open, its bark breaking here too.
+                // A topple that ends a strike this copy is still playing (Topple After: the Heartroot's Take Root) lasts that strike's
+                // Open After, as the host's does; read before the stagger ends the strike.
+                MonsterAttack ending = CurrentState == State.Attacking ? attacks.Action : null;
+                float toppleFor = ending != null && ending.toppleAfter && ending.openAfter > 0f ? ending.openAfter : definition.ToppleSeconds;
+                bool toppled = felled && (Topples || (ending != null && ending.toppleAfter));
                 felling = felled;
-                BeginStagger(felled ? CombatTechniqueSettings.Current.FelledSeconds : CombatTechniqueSettings.Current.StaggerSeconds);
+                toppling = toppled;
+                BeginStagger(toppled ? toppleFor
+                    : felled ? CombatTechniqueSettings.Current.FelledSeconds : CombatTechniqueSettings.Current.StaggerSeconds);
                 felling = false;
+                toppling = false;
+                if (toppled)
+                {
+                    BeganTopple(toppleFor);
+                }
             }
             else if (CurrentState != State.Attacking && state != State.Attacking)
             {

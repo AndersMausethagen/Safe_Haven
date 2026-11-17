@@ -249,6 +249,12 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             // A dagger's nick and a warhammer's blow don't land alike; the attack's Impact says how they differ.
             extra *= impact;
             float stop = (result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra;
+            // The blow that toppled a boss (MonsterAI heard it first) holds twice as long: the moment the work paid off.
+            if (!result.Killed && victim.TryGetComponent(out MonsterAI toppled) && toppled.ToppledThisFrame)
+            {
+                stop *= 2f;
+            }
+
             HitStop(stop);
             CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
             // The struck body shudders through the moment; hosting co-op, time can't stop, so its animation holds and the swing slows.

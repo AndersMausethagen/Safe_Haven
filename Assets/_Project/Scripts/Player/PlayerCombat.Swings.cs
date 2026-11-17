@@ -736,6 +736,12 @@ public sealed partial class PlayerCombat
         }
         if (backstab)
         {
+            // A toppled boss's first backstab strikes its heart too (Monster Definition › Topple Strike): a blow of its own, after this one.
+            if (result.Landed && !result.Parried && target.IsAlive)
+            {
+                backstabbed.HeartStrike(combatant, pending.Hit.Point, pending.Direction);
+            }
+
             Backstabbed?.Invoke(target);
         }
     }

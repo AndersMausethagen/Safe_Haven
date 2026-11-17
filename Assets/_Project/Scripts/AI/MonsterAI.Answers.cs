@@ -6,6 +6,8 @@ using UnityEngine;
 /// crushing one breaks their poise); a shield that breaks under a stagger and splinters after two; the armed dead raising their weapon
 /// against a flurry of light blows and answering a third into it; turning when badly hurt (fury, desperation, a cry as the cowardly run);
 /// the nimble stepping aside from a bow held past its perfect release; and what elite affixes add (Unyielding, Watchful, Relentless).
+/// A boss that topples (Monster Definition › Topple Seconds; Docs/HeartrootBossReview_2026-11-17.md C2) goes down whenever its poise breaks,
+/// its poise growing for the next, and its first backstab while down strikes its heart (<see cref="HeartStrike"/>).
 /// Part of MonsterAI, in its own file.
 /// </summary>
 public sealed partial class MonsterAI
@@ -134,7 +136,7 @@ public sealed partial class MonsterAI
     private static int RaidTierNow => GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Tier : 0;
 
     // A blow wore its poise down: a stagger when it breaks; felled when a weighty blow catches it reeling (that breaks what is left) or a
-    // charged or crushing blow breaks it; a longer stagger when it breaks through a raised shield.
+    // charged or crushing blow breaks it; a longer stagger when it breaks through a raised shield; toppled, for one that topples.
     private void TakeBlowOnPoise(in DamageInfo damage, DamageResult result)
     {
         if (IsUnyielding)
@@ -164,6 +166,14 @@ public sealed partial class MonsterAI
             return;
         }
 
+        // A boss that topples (Monster Definition › Topple Seconds) goes down at every break, great beast or not: the payoff for the
+        // parries and heavy blows that wore it down.
+        if (Topples)
+        {
+            Topple(damage.Direction, definition.ToppleSeconds, true);
+            return;
+        }
+
         bool fells = !IsHeavyweight && ((damage.Technique & HitTechnique.Charged) != 0 || hit >= poise.Max * FellingPoiseShare || (reeling && weighty));
         if (fells)
         {
@@ -182,6 +192,102 @@ public sealed partial class MonsterAI
         Stagger(CombatTechniqueSettings.Current.FelledSeconds);
         felling = false;
         pose?.Hit(blowDirection, 1.2f, Time.time);
+    }
+
+    // ----- Topples (Docs/HeartrootBossReview_2026-11-17.md C2) -----
+
+    // A shake as it goes down, as strong as a stage changing (the review's C9).
+    private const float ToppleShake = 0.6f;
+
+    private bool toppling;
+    private bool toppledNow;
+    private bool heartStrikeDue;
+    private float toppleLength;
+    private int toppledFrame = -1;
+
+    // True when a break of its poise topples it rather than staggering it.
+    private bool Topples => definition != null && definition.Topples;
+
+    /// <summary>True while it lies toppled: a long stagger (it is felled too, so it falls, lies and gets up), its heart open to the
+    /// Topple Strike. On a friend's copy, while the host's creature lies toppled.</summary>
+    public bool IsToppled => toppledNow && CurrentState == State.Staggered;
+
+    /// <summary>True on the frame it toppled: the blow that broke it lands with a longer hit stop (CombatFeedback).</summary>
+    public bool ToppledThisFrame => toppledFrame == Time.frameCount && IsToppled;
+
+    /// <summary>Height of its chest above its feet, in metres: where its bark breaks and its topple is heard.</summary>
+    public float ChestHeight => reelingTell != null ? reelingTell.ChestHeight : 1.1f;
+
+    /// <summary>
+    /// The topple as an opening: true while it lies toppled, with the seconds left and in all, so the pale green opening ring shows at its
+    /// feet (AttackTelegraph) as it does after a strike.
+    /// </summary>
+    public bool TryGetToppleOpening(out float left, out float length)
+    {
+        left = StaggerSecondsLeft;
+        length = Mathf.Max(toppleLength, left);
+        return IsToppled && left > 0f && length > 0f;
+    }
+
+    // Down for the topple's length: felled (the knockdown, lying, the get up), its heart open to one strike, its poise grown when a break
+    // brought it down (Monster Definition › Poise Growth: the next needs more).
+    private void Topple(Vector3 blowDirection, float seconds, bool grows)
+    {
+        if (definition == null || CurrentState == State.Dead || seconds <= 0f || IsUnyielding)
+        {
+            return;
+        }
+
+        felling = true;
+        toppling = true;
+        Stagger(seconds);
+        felling = false;
+        toppling = false;
+        if (!IsToppled)
+        {
+            return;
+        }
+
+        if (grows)
+        {
+            poise?.Grow(definition.PoiseGrowth);
+        }
+
+        pose?.Hit(blowDirection, 1.2f, Time.time);
+        BeganTopple(seconds);
+    }
+
+    // What every game shows of a topple, the host's and a friend's copy alike: the heart opens to one strike, the crack and the shake,
+    // and those listening hear of it (its bark breaking, a boss's glow and line).
+    private void BeganTopple(float seconds)
+    {
+        toppleLength = seconds;
+        heartStrikeDue = true;
+        toppledFrame = Time.frameCount;
+        CameraShake.Add(ToppleShake);
+        AudioManager.Play(definition.ToppleSound, transform.position + Vector3.up * ChestHeight);
+        Toppled?.Invoke(seconds);
+        AnyToppled?.Invoke(this, seconds);
+    }
+
+    /// <summary>
+    /// The heart strike (Monster Definition › Topple Strike): the first backstab <paramref name="by"/> lands while it lies toppled strikes its
+    /// heart too, a blow of its own worth that share of its full health whatever its armour (sent as the damage that comes to that after
+    /// its defenses: DamageCalculator.BeforeDefenses, so a friend's game sending it to the host lands the same). Later backstabs of the
+    /// same topple add nothing. Call after the backstab has landed (PlayerCombat), never from inside a blow's handling.
+    /// </summary>
+    public void HeartStrike(Combatant by, Vector3 point, Vector3 direction)
+    {
+        if (!IsToppled || !heartStrikeDue || definition.ToppleStrike <= 0f || damageable == null || !damageable.IsAlive || combatant == null)
+        {
+            return;
+        }
+
+        heartStrikeDue = false;
+        float amount = DamageCalculator.BeforeDefenses(definition.ToppleStrike * damageable.MaxHealth, DamageType.Physical, StrikeKind.None,
+            combatant.Stats, combatant.Rules, damageable.DamageTakenMultiplier);
+        // A finisher's weight (a strong hit's flash, sound and stop), not a backstab's: it isn't a second backstab to answer or remember.
+        damageable.ApplyDamage(new DamageInfo(by, null, amount, DamageType.Physical, true, point, direction, 0f, HitTechnique.Finisher));
     }
 
     // Its poise broke through its raised shield: a longer stagger and the crash of it; enough of them and the shield splinters.

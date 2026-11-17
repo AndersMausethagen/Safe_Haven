@@ -8,6 +8,11 @@ using UnityEngine;
 /// in the scene: on a friend's game (co-op) that one is removed as it wakes (MonsterAI) and the host's arrives later as a copy
 /// (CreaturePuppets), which raises them as the placed one would have.
 /// </para>
+/// <para>
+/// Its topples (Docs/HeartrootBossReview_2026-11-17.md C2, C9): the bar's poise strip follows its poise every frame, a topple posts its
+/// line and makes its heart glow, pulsing, until it rises (Boss Definition › Topples), and a stage that begins while it lies toppled
+/// keeps it down at least the stage's reel rather than standing it up into a plain one.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(MonsterAI), typeof(Damageable))]
@@ -32,6 +37,13 @@ public sealed class BossEncounter : MonoBehaviour
     // The hold's own invulnerability source: the wake adds and removes one of its own (this).
     private readonly object holdToken = new object();
     private static readonly int RoarState = Animator.StringToHash("Roar");
+    // The heart's pulse while it lies toppled: a beat this long, the dim beat at this share of Topple Glow.
+    private const float HeartbeatSeconds = 0.3f;
+    private const float HeartbeatDim = 0.35f;
+    private readonly WaitForSeconds heartbeat = new WaitForSeconds(HeartbeatSeconds);
+    private Coroutine heartGlow;
+    // The glow to put back when it rises: its body's as the topple began, or its new stage's if one began meanwhile.
+    private Color glowAfterTopple;
 
     public BossDefinition Definition => definition;
     public int Phase => phase;
@@ -111,14 +123,88 @@ public sealed class BossEncounter : MonoBehaviour
     {
         health.HealthChanged += OnHealthChanged;
         health.Died += OnDied;
+        if (ai != null)
+        {
+            ai.Toppled += OnToppled;
+        }
     }
 
     private void OnDisable()
     {
         health.HealthChanged -= OnHealthChanged;
         health.Died -= OnDied;
+        if (ai != null)
+        {
+            ai.Toppled -= OnToppled;
+        }
+
+        heartGlow = null;
         HideBar();
         StopMusic();
+    }
+
+    // The poise strip under its health: how near its next topple (or stagger) is, pulsing when near; toppled, the time it has left down.
+    private void Update()
+    {
+        if (bar == null || ai == null)
+        {
+            return;
+        }
+
+        PoiseMeter meter = ai.Poise;
+        if (meter == null || !GameOptions.PoiseBars.On)
+        {
+            bar.HidePoise();
+            return;
+        }
+
+        if (ai.TryGetToppleOpening(out float left, out float length))
+        {
+            bar.SetPoise(left / length, BossBar.PoiseLook.Toppled);
+        }
+        else
+        {
+            bar.SetPoise(meter.Fraction, ai.IsReeling ? BossBar.PoiseLook.Reeling : BossBar.PoiseLook.Steady);
+        }
+    }
+
+    // It toppled (MonsterAI.Toppled, on a friend's copy too): its line, and its heart glowing while it lies.
+    private void OnToppled(float seconds)
+    {
+        if (definition == null || health == null || !health.IsAlive)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(definition.ToppleLine))
+        {
+            GameMessages.Post(definition.ToppleLine, MessageKind.Gain);
+        }
+
+        if (definition.ToppleGlow.maxColorComponent > 0f && heartGlow == null)
+        {
+            glowAfterTopple = CreatureLook.GlowOf(gameObject);
+            heartGlow = StartCoroutine(HeartGlow());
+        }
+    }
+
+    // A heartbeat of light (Boss Definition › Topple Glow) for as long as it lies toppled, a stage's reel included; then the glow it had.
+    private System.Collections.IEnumerator HeartGlow()
+    {
+        bool bright = false;
+        while (ai != null && ai.IsToppled && health.IsAlive)
+        {
+            bright = !bright;
+            CreatureLook.Glow(gameObject, bright ? definition.ToppleGlow : definition.ToppleGlow * HeartbeatDim);
+            yield return heartbeat;
+        }
+
+        if (health.IsAlive)
+        {
+            CreatureLook.Glow(gameObject, glowAfterTopple);
+        }
+
+        heartGlow = null;
     }
 
     private void Start()
@@ -363,6 +449,8 @@ public sealed class BossEncounter : MonoBehaviour
         {
             CreatureLook.Glow(gameObject, next.glow);
             CreatureLook.SetEyes(gameObject, next.glow * 2f);
+            // Begun while its heart glows from a topple: this is the glow it rises with.
+            glowAfterTopple = next.glow;
         }
 
         if (next.damageBonus > 0f && TryGetComponent(out Combatant combatant))
@@ -372,7 +460,16 @@ public sealed class BossEncounter : MonoBehaviour
 
         if (next.reelSeconds > 0f)
         {
-            ai.Stagger(next.reelSeconds);
+            // Toppled (the blow that crossed the mark often lands in a topple), it stays down at least the reel: begun anew, the reel
+            // would stand it up into a plain stagger and end its topple early.
+            if (ai.IsToppled)
+            {
+                ai.StaggerAtLeast(next.reelSeconds);
+            }
+            else
+            {
+                ai.Stagger(next.reelSeconds);
+            }
         }
     }
 

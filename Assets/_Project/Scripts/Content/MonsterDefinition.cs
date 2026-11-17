@@ -148,6 +148,26 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
              "Open While Striking) loses part of its poise instead (Combat Technique Settings › Parry Poise Share) and staggers only " +
              "when that breaks it. Recoil: it only reels back a moment, its strike broken off.")]
     [SerializeField] private ParryResponse parryResponse = ParryResponse.Auto;
+    [Tooltip("Seconds without a blow before its poise starts coming back. 0: the game-wide Poise Recovery Delay (Combat Technique " +
+             "Settings). A boss's waits longer, so its poise builds across exchanges and parries and heavy blows add up to a topple.")]
+    [SerializeField, Min(0f)] private float poiseRecoveryDelay;
+
+    [Header("Topple (bosses)")]
+    [Tooltip("Seconds it lies when its poise breaks: it topples (Knockdown, Down, Get Up) instead of staggering, open to blows and " +
+             "backstabs all the while, the payoff for parries and heavy blows (Docs/HeartrootBossReview_2026-11-17.md C2). " +
+             "0: no topple, a break staggers it as always.")]
+    [SerializeField, Min(0f)] private float toppleSeconds;
+    [Tooltip("Each topple makes the next need this share of its poise more (0.3: 30% more each time), so topples can't be chained. " +
+             "Back to its own poise at each stage of a boss's fight. 0: every topple takes the same.")]
+    [SerializeField, Range(0f, 2f)] private float poiseGrowth;
+    [Tooltip("The heart strike: the first backstab while it lies toppled costs it this share of its full health on top, whatever its " +
+             "armour (0.02 is 2%). Each player's game gives one a topple. 0: none.")]
+    [SerializeField, Range(0f, 0.2f)] private float toppleStrike;
+    [Tooltip("Each topple breaks one of its Armour Chips off (bark splitting from the Heartroot), however light the blow that floored " +
+             "it; a heavy enough blow still breaks one too.")]
+    [SerializeField] private bool toppleBreaksArmour;
+    [Tooltip("Plays as it topples: a crack and a groan. Empty: none.")]
+    [SerializeField] private SoundDefinition toppleSound;
 
     [Header("Backstabs and guarding")]
     [Tooltip("A blow from behind in the middle of its strike is a backstab. Off for great beasts and bosses: they have to be staggered first. Elites never are, whatever this says.")]
@@ -266,6 +286,16 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     /// <summary>Its poise, or 0 when it uses the game-wide default.</summary>
     public float Poise => poise;
     public ParryResponse ParryResponse => parryResponse;
+    /// <summary>Seconds before its poise comes back, or 0 for the game-wide delay.</summary>
+    public float PoiseRecoveryDelay => poiseRecoveryDelay;
+    /// <summary>Seconds it lies toppled when its poise breaks; 0 when it doesn't topple (it staggers).</summary>
+    public float ToppleSeconds => toppleSeconds;
+    /// <summary>True when a break of its poise topples it rather than staggering it.</summary>
+    public bool Topples => toppleSeconds > 0f;
+    public float PoiseGrowth => poiseGrowth;
+    public float ToppleStrike => toppleStrike;
+    public bool ToppleBreaksArmour => toppleBreaksArmour;
+    public SoundDefinition ToppleSound => toppleSound;
     public bool OpenWhileStriking => openWhileStriking;
     public bool ParriesBackstabs => parriesBackstabs;
     public float ShieldArc => shieldArc;

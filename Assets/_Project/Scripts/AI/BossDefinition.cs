@@ -39,6 +39,14 @@ public sealed class BossDefinition : ScriptableObject
     [Tooltip("Written on the screen when it falls.")]
     [SerializeField, TextArea] private string defeatLine;
 
+    [Header("Topples")]
+    [Tooltip("Written on the screen each time it topples (its Monster Definition › Topple Seconds), so the opening is read: \"The " +
+             "Heartroot topples! Its heart lies open!\". Empty: none.")]
+    [SerializeField] private string toppleLine;
+    [Tooltip("How its body glows while it lies toppled, pulsing like a heartbeat, so the opening shows in the dark; its stage's glow comes " +
+             "back as it rises. Only where its material has an emission map. Black: no change.")]
+    [SerializeField, ColorUsage(false, true)] private Color toppleGlow = Color.black;
+
     [Header("Waking")]
     [Tooltip("Metres within which a player (or a friend) wakes it; anything that hurts it wakes it too. 0: it wakes as soon as it is " +
              "placed, for a boss brought into its fight (the Heartroot). One standing on the map from the start (the Brukam on its bridge) " +
@@ -62,6 +70,8 @@ public sealed class BossDefinition : ScriptableObject
     public BossPhase[] Phases => phases;
     public SkillDefinition RewardSkill => rewardSkill;
     public string DefeatLine => defeatLine;
+    public string ToppleLine => toppleLine;
+    public Color ToppleGlow => toppleGlow;
     public float WakeSeconds => wakeSeconds;
     public float WakeRange => wakeRange;
     public SoundDefinition WakeSound => wakeSound;

@@ -24,6 +24,9 @@ EditorBuildSettings:
     path: Assets/_Project/Scenes/Raids/Encounter_BrukamsBridge.unity
     guid: 421c5ff47ccb0a04aa46ce04162ad9d2
   - enabled: 1
+    path: Assets/_Project/Scenes/Raids/Encounter_GuardiansHollow.unity
+    guid: 964995ab1f530c94d8491790ed829a53
+  - enabled: 1
     path: Assets/_Project/Scenes/RaidResults.unity
     guid: b9bec01c2346e654aba8758c17a0d9f6
   - enabled: 0

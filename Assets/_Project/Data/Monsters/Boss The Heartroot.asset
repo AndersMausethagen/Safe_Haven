@@ -18,18 +18,26 @@ MonoBehaviour:
   phases:
   - belowHealth: 0.66
     line: The ground shakes. Roots begin to tear free.
-    reelSeconds: 1.8
+    reelSeconds: 2.5
     damageBonus: 0.1
     glow: {r: 0.275, g: 1.32, b: 0.22000001, a: 1}
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   - belowHealth: 0.33
     line: The old heart splits, and what is in it is angry.
-    reelSeconds: 2.2
+    reelSeconds: 2.5
     damageBonus: 0.2
     glow: {r: 0.55, g: 2.64, b: 0.44000003, a: 1}
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
+  - belowHealth: 0.12
+    line: 'The Heartroot drives its roots into the hollow. The ground comes for you: stay close to it.'
+    reelSeconds: 0.2
+    damageBonus: 0
+    glow: {r: 0.8, g: 3.2, b: 0.6, a: 1}
+    sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   rewardSkill: {fileID: 11400000, guid: ea2ebfef3d35eae42a29237e4b273b5d, type: 2}
   defeatLine: 'The Heartroot sinks to its knees, and speaks once, in a voice like the portal''s own: "Hearth-keeper." Then it lies still. What it knew of the forest''s hold is yours now: you have learned Heartroot''s Grasp. And something has opened: the portal can reach Troll Valley.'
+  toppleLine: The Heartroot topples! Its heart lies open.
+  toppleGlow: {r: 2.4, g: 1.2, b: 0.3, a: 1}
   wakeRange: 0
   wakeSeconds: 3.2
   wakeSound: {fileID: 11400000, guid: 117e6f9038657034bbb7373e39bbd293, type: 2}

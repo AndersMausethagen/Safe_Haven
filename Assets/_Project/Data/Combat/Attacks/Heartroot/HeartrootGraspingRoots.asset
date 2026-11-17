@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5517319b40a047489a8fdcb2b152b82, type: 3}
+  m_Name: HeartrootGraspingRoots
+  m_EditorClassIdentifier: Assembly-CSharp::AttackDefinition
+  displayName: Grasping Roots
+  damageType: 0
+  strike: 1
+  baseDamage: 0
+  weaponDamageRatio: 1
+  powerScaling: 1
+  structureDamageMultiplier: 1.5
+  canCrit: 1
+  range: 9
+  arc: 14
+  maxTargets: 3
+  hitDelay: 1.1
+  recoveryTime: 2
+  poiseDamage: 10
+  impact: 1
+  lunge: 0
+  staminaCost: -1
+  appliesStatus: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
+  statusChance: 1
+  groundImpact: {fileID: 11400000, guid: 9a6ef17a731a1864aa5bb2ada841a1ec, type: 2}
+  unblockable: 1
+  pull: 3
+  windupMove: -1
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
+  animationState: Strike Claw
+  animationSpeed: 0.6545455
+  strikeSpeed: 0.6545455
+  strikeLead: 0
+  followThroughSpeed: 0.7
+  growsFromLight: 1
+  swingSound: {fileID: 0}
+  hitSound: {fileID: 0}
+  slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
+  slashSweep: 0
+  slashTilt: -62.045216

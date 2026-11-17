@@ -19,6 +19,8 @@ MonoBehaviour:
   tier: 2
   rarity: 0
   value: 10
+  gearScoreOverride: 0
+  raidOnly: 0
   icon: {fileID: 21300000, guid: 382828b3bb6a86045a5d89fcf2edd0f6, type: 3}
   prefab: {fileID: 0}
   heldModel: {fileID: 0}
@@ -35,16 +37,39 @@ MonoBehaviour:
   healAmount: 10
   hungerRestore: 0
   thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
   boonBonuses: []
   boonSeconds: 0
   tonic: 1
   cures:
   - {fileID: 11400000, guid: 5e5542ad4304a994f97fcb8f9b6e0f46, type: 2}
+  - {fileID: 11400000, guid: 003cca2f5c2c2ec47a622a4e72f5f60c, type: 2}
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
   carryCapacityBonus: 0
   bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
   armorSlot: 0
+  wornLook: {fileID: 0}
   statBonuses: []
+  breaksInto: []
   teachesBuildings: []
   teachesRecipes: []
   experience: 0
+  learnedAtHome: 0
+  inscription: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
   raidModifier: {fileID: 0}

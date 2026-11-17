@@ -4,6 +4,10 @@ using UnityEngine;
 /// A creature's hurts show (2026-11-14): badly hurt it limps (slower, so a hurt one can be run down); hurt enough it leaves
 /// a trail of blood as it goes, which can be followed to where it fled; an armoured one has pieces of its armour broken off
 /// by heavy blows, each one taking some of its armour with it (MonsterDefinition › Wounds). Added by MonsterAI.
+/// <para>
+/// A boss whose bark no single blow could chip loses a piece each time it topples instead (Monster Definition › Topple Breaks Armour;
+/// Docs/HeartrootBossReview_2026-11-17.md C2): breaking its poise is what wears its armour away.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class CreatureWounds : MonoBehaviour
@@ -39,6 +43,11 @@ public sealed class CreatureWounds : MonoBehaviour
             health.Damaged += OnDamaged;
             health.HealthChanged += OnHealthChanged;
         }
+
+        if (ai != null)
+        {
+            ai.Toppled += OnToppled;
+        }
     }
 
     private void OnDisable()
@@ -47,6 +56,11 @@ public sealed class CreatureWounds : MonoBehaviour
         {
             health.Damaged -= OnDamaged;
             health.HealthChanged -= OnHealthChanged;
+        }
+
+        if (ai != null)
+        {
+            ai.Toppled -= OnToppled;
         }
     }
 
@@ -84,12 +98,28 @@ public sealed class CreatureWounds : MonoBehaviour
             return;
         }
 
-        // A piece breaks off: shards fly, the piece itself falls away when the model names one, and it is that much less protected.
+        BreakPiece(damage.HitPoint, damage.Direction);
+    }
+
+    // It toppled: a piece of its bark splits off at its chest, whatever the blow that floored it.
+    private void OnToppled(float seconds)
+    {
+        if (definition == null || !definition.ToppleBreaksArmour || chipsLeft <= 0 || combatant == null || health == null || !health.IsAlive)
+        {
+            return;
+        }
+
+        BreakPiece(transform.position + Vector3.up * ai.ChestHeight, -transform.forward);
+    }
+
+    // A piece breaks off: shards fly, the piece itself falls away when the model names one, and it is that much less protected.
+    private void BreakPiece(Vector3 at, Vector3 blowDirection)
+    {
         int chip = definition.ArmourChips - chipsLeft;
         chipsLeft--;
         if (chip < definition.ArmourParts.Count && !string.IsNullOrWhiteSpace(definition.ArmourParts[chip]))
         {
-            ArmourDebris.BreakOff(transform, definition.ArmourParts[chip], damage.Direction);
+            ArmourDebris.BreakOff(transform, definition.ArmourParts[chip], blowDirection);
         }
 
         float armour = combatant.Stats.Get(StatType.Armor);
@@ -97,10 +127,10 @@ public sealed class CreatureWounds : MonoBehaviour
         WoundSettings settings = WoundSettings.Current;
         if (settings.ArmourShards != null)
         {
-            PrefabPool.Spawn(settings.ArmourShards, damage.HitPoint, Quaternion.LookRotation(-damage.Direction.sqrMagnitude > 1e-4f ? -damage.Direction : Vector3.forward));
+            PrefabPool.Spawn(settings.ArmourShards, at, Quaternion.LookRotation(blowDirection.sqrMagnitude > 1e-4f ? -blowDirection : Vector3.forward));
         }
 
-        AudioManager.Play(settings.ArmourChipSound, damage.HitPoint);
+        AudioManager.Play(settings.ArmourChipSound, at);
     }
 
     private void Update()

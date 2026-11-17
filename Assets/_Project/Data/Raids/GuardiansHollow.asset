@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c72e5e4fd746250409a431420bdc103e, type: 3}
+  m_Name: GuardiansHollow
+  m_EditorClassIdentifier: Assembly-CSharp::RaidDefinition
+  id: guardians_hollow
+  displayName: Guardian's Hollow
+  description: Deep in the Misty Woods a ring of dead trees closes round a hollow where nothing grows, and something old breathes under the roots.
+  land: forest
+  tier: 1
+  sceneName: Encounter_GuardiansHollow
+  locked: 0
+  unlockedBy: {fileID: 0}
+  largeRaid:
+    widthScale: 2
+    extraSeconds: 750
+    extraExits:
+    - Split Birch
+    - Old Cairn
+    - Drowned Stones
+  lockedText: The way to the hollow isn't known yet.
+  encounter: {fileID: 11400000, guid: 77d4631128af6f948b517bdda00dcde0, type: 2}
+  knownEnemies:
+  - {fileID: 11400000, guid: d0d3ffee305a6ca489fca58781bf31c1, type: 2}
+  likelyItems:
+  - {fileID: 11400000, guid: 5321f43bf9cf2d34e8b68919356fb88a, type: 2}
+  likelyResources: []
+  regionalLoot: {fileID: 0}
+  eliteLoot: {fileID: 0}
+  durationSeconds: 3600
+  extractionSeconds: 8
+  lootMultiplier: 1
+  enemyHealthMultiplier: 1
+  enemyPowerMultiplier: 1
+  difficulties:
+  - tier: 1
+    recommendedGearScore: 10
+    minimumGearScore: 0
+    wardLevelNeeded: 0
+    enemyHealth: 1
+    enemyPower: 1
+    enemyDensity: 1
+    loot: 1
+    dropsUpToTier: 0
+    briefing: The first fight with the Heartroot. Parry its flail, dodge the roots, and drink while it calls its children.
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  - tier: 2
+    recommendedGearScore: 30
+    minimumGearScore: 15
+    wardLevelNeeded: 1
+    enemyHealth: 1.5
+    enemyPower: 1.6
+    enemyDensity: 1.15
+    loot: 1.25
+    dropsUpToTier: 0
+    briefing: 'A rematch: it hits harder, and its heartwood is richer.'
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  - tier: 3
+    recommendedGearScore: 50
+    minimumGearScore: 30
+    wardLevelNeeded: 2
+    enemyHealth: 2.5
+    enemyPower: 2.85
+    enemyDensity: 1.3
+    loot: 1.5
+    dropsUpToTier: 0
+    briefing: It knows you now. Its roots reach further.
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  - tier: 4
+    recommendedGearScore: 70
+    minimumGearScore: 45
+    wardLevelNeeded: 3
+    enemyHealth: 3.2
+    enemyPower: 4.05
+    enemyDensity: 1.45
+    loot: 1.8
+    dropsUpToTier: 0
+    briefing: The old guardian at its worst.
+    eliteCount: {x: 0, y: 0}
+    eliteAffixes: 0
+    hunterEliteChance: 0
+    eliteRelicChance: 0
+    eliteLoot:
+      entries: []
+  eliteAffixes: []
+  timesOfDay:
+  - name: Late Afternoon
+    hour: 16.5
+    chance: 100
+    lootMultiplier: 1
+    enemyDensity: 1
+    briefing: The sun is low and the mist lies thick in the hollows. Something under the roots is breathing.
+    skyCover: 0.6
+  grade:
+    curve: 1
+    exposure: -0.9
+    saturation: 1.2
+    contrast: 1.35
+    filter: {r: 0.8, g: 0.98, b: 1, a: 1}
+  groundLight:
+    enabled: 1
+    relief: 0.4
+    bounce: 0.6
+    bounceTint: {r: 0.8, g: 1, b: 0.9, a: 1}
+  layoutRules: {fileID: 0}
+  enemyDensity: 1.5
+  overrideBands: 0
+  nearDistance: 25
+  farDistance: 110
+  spawnLists: []
+  systems: []
+  roaming:
+    table: {fileID: 11400000, guid: 55a919693f726634aa952bc05b8ac3a3, type: 2}
+    firstDelay: 60
+    interval: 20
+    baseAlive: 2
+    perStage: 1
+    perAlarm: 2
+    maxAlive: 8
+    totalLimit: 12
+    minDistance: 35
+    maxDistance: 60
+    despawnDistance: 90
+    campClearance: 20
+    huntSpread: 15
+  stages: []
+  extractedArtwork: {fileID: 21300000, guid: 786f93cddb4331440b663cf22a598b74, type: 3}
+  failedArtwork: {fileID: 21300000, guid: 43ac7cd0af4fd014f9a41fc33140dfb8, type: 3}
+  extractedMotion: {fileID: 32900000, guid: ca5e747e87ae5c04887644897655f20a, type: 3}
+  failedMotion: {fileID: 32900000, guid: 6dfca22e3f85b89488b22b676cdfcc83, type: 3}
+  extractedSound: {fileID: 8300000, guid: 2e8e6b142e12583459fc59db01a49e37, type: 3}
+  failedSound: {fileID: 8300000, guid: 67855d961bca5f84aad80b9bb81e8c68, type: 3}
+  placeArtwork: {fileID: 21300000, guid: 8b26dcac07882c744ac57d8cae8286c2, type: 3}
+  firstVisitCinematic: {fileID: 11400000, guid: ffd539bcbac3f6b4f8654a96cbce9849, type: 2}
+  calmAfterCinematic: 8
+  arrivalEffect: {fileID: 5995523188953507264, guid: 50dfbb6cc2742904dbedfe5b683543c9, type: 3}
+  arrivalSound: {fileID: 11400000, guid: d67d31b9bdbcfc34d9e3c51817bf8cd2, type: 2}
+  references:
+    version: 2
+    RefIds: []

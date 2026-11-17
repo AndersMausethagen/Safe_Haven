@@ -109,4 +109,23 @@ public static class DamageCalculator
         // A hit that did damage keeps doing a little, but never more than it arrived with.
         return Mathf.Max(result, Mathf.Min(amount, rules.MinimumDamage));
     }
+
+    /// <summary>
+    /// The damage to send so that the defender loses <paramref name="wanted"/> after its armour, resistances and Damage Taken multiplier: a
+    /// blow measured by what it costs rather than by what it carries. A toppled boss's heart strike is a share of its health whatever its
+    /// bark has left (Monster Definition › Topple Strike), and sent this way it lands the same in a friend's game, whose blows reach the
+    /// host's creature before its defenses. <paramref name="wanted"/> itself when its defenses stop everything.
+    /// </summary>
+    public static float BeforeDefenses(float wanted, DamageType type, StrikeKind strike, StatSheet defender, CombatRules rules, float takenMultiplier = 1f)
+    {
+        if (wanted <= 0f)
+        {
+            return 0f;
+        }
+
+        // Defenses scale a blow alike at any size (but for the Minimum Damage floor), so one large probe measures what gets through.
+        const float Probe = 1000f;
+        float through = Mitigate(Probe, type, strike, defender, rules) / Probe * Mathf.Max(0f, takenMultiplier);
+        return through > 0.001f ? wanted / through : wanted;
+    }
 }
