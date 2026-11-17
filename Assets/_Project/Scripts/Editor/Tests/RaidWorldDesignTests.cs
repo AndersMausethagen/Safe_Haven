@@ -60,7 +60,8 @@ public sealed class RaidWorldDesignTests
     public void TheRaidsRules_AtTheNewDefaults_PlanAsTheyDid()
     {
         // Every new setting written out at its default onto a copy: the plan and its heights must not move (the Woods' are also golden).
-        foreach (string path in new[] { WoodsRulesPath, ValleyRulesPath, MarshRulesPath })
+        // The Woods only: the Valley and the Marsh use the new settings since 2026-11-17, so their assets aren't at the defaults.
+        foreach (string path in new[] { WoodsRulesPath })
         {
             RaidLayoutRules asset = Load(path);
             RaidLayoutRules copy = Object.Instantiate(asset);

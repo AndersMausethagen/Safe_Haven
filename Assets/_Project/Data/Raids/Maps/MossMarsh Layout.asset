@@ -45,6 +45,30 @@ MonoBehaviour:
   lookoutReveal: 70
   largeRegions: {x: 2, y: 3}
   regionBlend: 30
+  normalRegions: {x: 2, y: 3}
+  districtRoles:
+  - role: 1
+    siteDensity:
+    - kind: 3
+      density: 0.5
+    - kind: 7
+      density: 0.6
+    - kind: 4
+      density: 1.5
+  - role: 4
+    siteDensity:
+    - kind: 3
+      density: 2.5
+    - kind: 7
+      density: 1.5
+    - kind: 4
+      density: 0.6
+  roadWidth: 1.6
+  shortFlags:
+  - {fileID: 5247349096305433117, guid: 169de01e057a8b8458f1cfeb3775e60d, type: 3}
+  - {fileID: 6012554784338750228, guid: 91c13810d6b672843897bfdb7d40e430, type: 3}
+  shortFlagSpacing: {x: 100, y: 140}
+  shortFlagOffset: 1.5
   twoRoutes: 1
   campsOnShortRoute: 1
   surfaceRivers: {x: 0, y: 0}
@@ -58,12 +82,68 @@ MonoBehaviour:
     scale: {x: 1.6, y: 2.1}
     sink: 0.02
     onlyToSee: 1
+    atNodes: 0
+    clearing: 0
+    revealRadius: 0
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
   - prefab: {fileID: 8565077372226898001, guid: 7b6e33233f2f82c4883bc305b27b3661, type: 3}
     weight: 0.8
     scale: {x: 0.9, y: 1.15}
     sink: 0.04
     onlyToSee: 1
+    atNodes: 0
+    clearing: 0
+    revealRadius: 0
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
+  - prefab: {fileID: 2950290045911184316, guid: 4126dd27acb5df145a49235dd0ec8fde, type: 3}
+    weight: 1
+    scale: {x: 1, y: 1}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
+  - prefab: {fileID: 3962568519174778497, guid: 00a2eedf4d471cd4292c182b7baeebf6, type: 3}
+    weight: 1
+    scale: {x: 1, y: 1}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
+  - prefab: {fileID: 8372047739636933966, guid: 904b298403b6f304b9fdef0e3fff2def, type: 3}
+    weight: 1
+    scale: {x: 1, y: 1}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
   landmarkCount: {x: 1, y: 2}
+  nodeLandmarkCount: {x: 3, y: 4}
   descentSites: 0400000005000000i
   mapSize: 200
   forestDensity: 0.49600002
@@ -117,6 +197,8 @@ MonoBehaviour:
     boulders: 0.5
     rivers: 1
     valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -146,6 +228,8 @@ MonoBehaviour:
     boulders: 0.3
     rivers: 1
     valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -175,6 +259,8 @@ MonoBehaviour:
     boulders: 0.5
     rivers: 1
     valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -204,6 +290,8 @@ MonoBehaviour:
     boulders: 0.3
     rivers: 1
     valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -233,6 +321,8 @@ MonoBehaviour:
     boulders: 1.6
     rivers: 1
     valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -336,6 +426,7 @@ MonoBehaviour:
     wallCragReach: 25
     wallCragSlope: 38
     wallBlocks: 0.1
+    maxCrossings: 0
   fen:
     enabled: 1
     aboveWater: 0.6

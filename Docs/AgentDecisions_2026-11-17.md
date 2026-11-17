@@ -103,3 +103,20 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
 - **What's left:** the charged strike itself is fast by design. If it still feels like a snap in your hands, the next lever is the
   charged clip's strike speed, or a separate speed parameter for the upper-body layer (one speed drives every swing state, so a held
   charge at speed 0 can freeze a blow still blending out on another layer). *Please play a few charged chains and tell me.*
+
+### The generator steps, switched on for the Valley and the Marsh
+- Code (off by default, the Woods' pinned layouts unchanged): districts with roles (the start's is the Approach with more resources
+  and fewer camps; the one nearest the apex is the Lair with 2.5× the camps), landmarks at trail junctions (one per district, each a
+  different kind, found onto the minimap within 70 m), short flags along both main routes every 100-140 m, roads (the two routes
+  wider), a cap on the Valley's river crossings (3: two bridges and a ford, every clearing still joined), and a hero/mid dressing pass.
+- **Troll Valley:** 2 districts; landmarks the Sleeping Troll Rock, the Lookout Cairn and Wayfarer's Stones; flags cairns, field
+  stones and boundary stones; roads ×1.3; at most 3 crossings; heroes Mountainside Crag, a large Lichen Boulder and Scots pines; mids
+  from its own rocks and undergrowth.
+- **Moss Marsh:** 2-3 districts; landmarks Drowned Stones, Wayfarer's Stones and a lone holm pine; flags boundary stones and carved
+  posts; roads ×1.6 (the causeway feel); heroes Scots pines and a Lichen Boulder.
+- **The Woods:** not switched on yet: it would re-pin the golden layout tests, and the Woods is the most-played raid. A decision
+  for you, or for after you've seen the Valley and Marsh with it.
+- Barriers with gaps and compounds (the review's G2 and G3), extraction kinds, Valley benches and cirques, the Marsh causeway and
+  holms: not built yet.
+- **Seen in a launched Valley** (the stone troll landmark by the start, a busier lair). Not yet seen: the Marsh with it.
+- **Placeholders I noticed:** the Forward Camp and the Toll Troll still use primitive placeholder models (grey cubes, green spheres).
