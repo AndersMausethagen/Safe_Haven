@@ -17,23 +17,9 @@ MonoBehaviour:
   description: 'A Draug that still remembers its shield wall. Nothing gets through from the front: get behind it, wait for it to strike, or break the guard with something heavy.'
   combatStats: {fileID: 11400000, guid: cf1d47e3323d5c543a63e8c1c4b508b4, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: ad3e81620e0843e46819f9b26e5c1ca9, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.7
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 7112812444035070341, guid: e6646a32ac93d664c950e5e95fd45e0e, type: 3}

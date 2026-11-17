@@ -42,7 +42,7 @@ public class CliCommandTests
     [Test]
     public void StructsPrintReferenceFirstAndSkipBlanks()
     {
-        string drops = ContentCliCommands.Content("monster", "ForestBittenWolf", "drops");
+        string drops = ContentCliCommands.Content("LootTable", "ForestBittenWolf", "drops");
         StringAssert.Contains("{RoughHide ", drops);
         StringAssert.DoesNotContain("resource=-", drops);
     }

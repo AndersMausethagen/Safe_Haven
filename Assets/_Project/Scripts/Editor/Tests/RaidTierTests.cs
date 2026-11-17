@@ -589,10 +589,11 @@ public sealed class RaidTierTests
     public void HigherTiers_HaveMoreElites_WithMoreAffixes_AndBetterLoot()
     {
         RaidDifficulty before = null;
+        ItemDropTable EliteLoot(RaidDifficulty tier) => Raid.EliteLoot != null ? Raid.EliteLoot.Drops : tier.eliteLoot;
         foreach (RaidDifficulty tier in Raid.Difficulties)
         {
             Assert.Greater(tier.eliteCount.y, 0, $"tier {tier.tier} has elites");
-            Assert.IsNotEmpty(tier.eliteLoot.Entries, $"and a reason to kill them at tier {tier.tier}");
+            Assert.IsTrue(EliteLoot(tier).Entries.Any(entry => entry.AppearsAt(tier.tier)), $"and a reason to kill them at tier {tier.tier}");
             if (before != null)
             {
                 Assert.GreaterOrEqual(tier.eliteCount.y, before.eliteCount.y);
@@ -605,7 +606,7 @@ public sealed class RaidTierTests
         Assert.Greater(Raid.Difficulties[3].eliteAffixes, Raid.Difficulties[0].eliteAffixes);
         foreach (RaidDifficulty tier in Raid.Difficulties)
         {
-            foreach (ItemDropEntry entry in tier.eliteLoot.Entries)
+            foreach (ItemDropEntry entry in EliteLoot(tier).Entries.Where(entry => entry.AppearsAt(tier.tier)))
             {
                 Assert.IsTrue(entry.Item == null || tier.Allows(entry.Item), $"tier {tier.tier} elites can't promise {entry.DropName}, as the tier wouldn't hand it over");
             }

@@ -1,0 +1,251 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Supply Cache
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Supply Cache
+  kind: 1
+  notes: 'The one cache table every raid used until the themed caches: kept for the Abandoned Camp and the Wolf Den until those get their own kind.'
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.2
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.4
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 27fde3f1b72a3684f98c0af7230e1848, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.12
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 0.4
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.2
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.45
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 1
+      maxQuantity: 3
+      probability: 0.45
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: 3d259ba2e9b280c4388c17af0308cc69, type: 2}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.25
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: a167bc765cfa5094491385117d4c09e9, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: c16c6e5687072684f98624510f9c6be6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 4
+      probability: 0.55
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.18
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 6a6c76b4e635d9e48be91d875f758c4a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: a4cc7c6eae3ec054e96d9d14549906e3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.015
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.12
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: e562a89aa50aaad4e8e01141f4286a98, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.3
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3b62415dd6630ea4ca86bcf751d2891a, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.15
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 62524af394010894c92b8227da600ceb, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: ab9557872793c7140880753d737120a3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.06
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 197836aae9a387a4e9df44734dcdcfcb, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 874fb5b96495c954cbd9144a4eba5231, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: c9c58cc9c8a25eb4787a64e96598e266, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.05
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

@@ -204,6 +204,12 @@ public sealed class RaidSection : ContentSection
                 DrawSpawnTab(raid, SpawnCategory.Resources, scene);
                 break;
             case "Loot & Events":
+                ContentUtility.BeginPanel("Loot here", "What only this raid holds (rolled with every cache searched here) and what its elites " +
+                                                       "give, as Loot Tables (Data/Loot). Below: everything that drops here, tier by tier.");
+                Field("regionalLoot");
+                Field("eliteLoot");
+                LootOverview.DrawRaid(raid);
+                ContentUtility.EndPanel();
                 DrawSpawnTab(raid, SpawnCategory.LootAndEvents, scene);
                 break;
             case "Escalation":

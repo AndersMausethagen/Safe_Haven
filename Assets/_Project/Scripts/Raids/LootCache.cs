@@ -8,6 +8,10 @@ using UnityEngine;
 /// table once, scaled by the raid's loot modifier, and hands the player what fits: items to the bag, resources to the
 /// resource bars. Whatever doesn't fit stays inside for another search; once empty it shows its empty look and can't be
 /// searched again. The Interactable beside it must be Work, not Use, and must not deactivate on completion.
+/// <para>
+/// What it holds is its Loot Table asset (a kind of cache: a hunter's cache, a barrow chest, a troll's hoard) when one is set, plus
+/// the raid's own Regional Loot, rolled at the raid's tier: the same kind of chest holds different things in different raids.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
@@ -15,6 +19,8 @@ using UnityEngine;
 [InAFriendsHaven(HavenUse.NotInAHaven, "a raid's cache, personal loot")]
 public sealed class LootCache : MonoBehaviour, IInteractionVerb
 {
+    [Tooltip("What this kind of cache holds (Data/Loot/Caches). Empty: the inline Drops list below.")]
+    [SerializeField] private LootTable table;
     [SerializeField] private ItemDropTable drops = new ItemDropTable();
     [Tooltip("Pins in its lock, each a press of the lockpicking bar. 0: no lock, as on a fallen traveller's pack.")]
     [SerializeField, Range(0, 6)] private int lockPins = 3;
@@ -34,7 +40,8 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private bool unlocked;
     private bool forced;
 
-    public ItemDropTable Drops => drops;
+    public ItemDropTable Drops => table != null ? table.Drops : drops;
+    public LootTable Table => table;
     public bool IsEmpty => rolled && contents.Count == 0 && resourceContents.Count == 0;
     public int LockPins => lockPins;
 
@@ -165,27 +172,28 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
 
         holdsRelic = RaidDirector.Current != null && Random.value < RelicSettings.Current.CacheChance * multiplier;
         holdsInscription = RaidDirector.Current != null && Random.value < EssenceSettings.Current.CacheInscriptionChance * multiplier;
-        foreach (ItemAmount drop in drops.Roll())
+        int tier = RaidDirector.Current != null ? RaidDirector.Current.Session.Tier : 0;
+        LootTable regional = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.RegionalLoot : null;
+        var items = Drops.Roll(tier, multiplier);
+        if (regional != null)
+        {
+            regional.Drops.Roll(tier, multiplier, items);
+        }
+
+        foreach (ItemAmount drop in items)
         {
             if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item) || !RaidDirector.Current.Session.Allows(drop.Item)))
             {
                 continue;
             }
 
-            int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, Random.value);
-            if (amount > 0)
-            {
-                contents.Add(new ItemAmount(drop.Item, amount));
-            }
+            contents.Add(drop);
         }
 
-        foreach (ResourceAmount drop in drops.RollResources())
+        Drops.RollResources(tier, multiplier, resourceContents);
+        if (regional != null)
         {
-            int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, Random.value);
-            if (amount > 0)
-            {
-                resourceContents.Add(new ResourceAmount(drop.Resource, amount));
-            }
+            regional.Drops.RollResources(tier, multiplier, resourceContents);
         }
     }
 

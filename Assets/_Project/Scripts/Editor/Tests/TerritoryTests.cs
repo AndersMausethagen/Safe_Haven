@@ -606,10 +606,9 @@ public sealed class TerritoryTests
             }
         }
 
-        var cache = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Raids/SupplyCache.prefab").GetComponentInChildren<LootCache>(true);
-        var so = new SerializedObject(cache);
-        SerializedProperty entries = so.FindProperty("drops").FindPropertyRelative("entries");
-        Assert.IsTrue(Enumerable.Range(0, entries.arraySize).Any(i => entries.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue == Settings.PactRune),
-            "Supply caches can hold a Pact Rune (BuildTerritory; a cache builder run since may have dropped it).");
+        bool inACache = AssetDatabase.FindAssets("t:LootTable", new[] { "Assets/_Project/Data/Loot" })
+            .Select(guid => AssetDatabase.LoadAssetAtPath<LootTable>(AssetDatabase.GUIDToAssetPath(guid)))
+            .Any(table => table.Kind != LootTableKind.Creature && table.Drops.Entries.Any(entry => entry.Item == Settings.PactRune));
+        Assert.IsTrue(inACache, "Supply caches can hold a Pact Rune (BuildTerritory; a cache builder run since may have dropped it).");
     }
 }

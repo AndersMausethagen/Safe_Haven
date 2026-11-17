@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: WildBoar
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Wild Boar
+  kind: 0
+  notes: 
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 0.8
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.35
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

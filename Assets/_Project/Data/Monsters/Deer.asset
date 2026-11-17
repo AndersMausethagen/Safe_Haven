@@ -17,18 +17,9 @@ MonoBehaviour:
   description: 'A hind of the Haven''s meadows. She lifts her head at a snapped twig and is gone before you have taken three steps: come at her low and from downwind, or bring a bow.'
   combatStats: {fileID: 11400000, guid: d4eae43a13b614548a5123f671d3559a, type: 2}
   faction: 2
+  lootTable: {fileID: 11400000, guid: a2a9e5bc473dde0449628321615c3674, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.7
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: e44f2410d268b844f9a3457d98632f14, type: 2}
   prefab: {fileID: 521656396065286680, guid: 448df709229bff54d8d806dc72659cb7, type: 3}
@@ -45,6 +36,8 @@ MonoBehaviour:
   closeSenseRange: 4.5
   hearing: 1.3
   alertness: 1.2
+  huntsHorses: 1
+  frightensHorses: 0
   attacks: []
   movementTactic: 0
   temperament: 5
@@ -62,9 +55,24 @@ MonoBehaviour:
   idleSleepAttention: 0.3
   timid: 1
   boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0.4
+  breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 40
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -73,6 +81,16 @@ MonoBehaviour:
   bloodColor: {r: 0.32, g: 0.015, b: 0.02, a: 0.95}
   ragdollOnDeath: 1
   fallsByAnimation: 1
+  canBeSmashed: 0
+  canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: f84aa2f6a275e6a4a8fe1fd44eca2b18, type: 3}

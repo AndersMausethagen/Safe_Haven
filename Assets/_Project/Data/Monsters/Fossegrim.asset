@@ -17,23 +17,9 @@ MonoBehaviour:
   description: The spirit of the falls. It keeps its distance and plays.
   combatStats: {fileID: 11400000, guid: 84c5ec628c931df489b5d1fdfee34933, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: b58b221b3173aa34d868c91fe43b30a3, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.15
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 3
-      maxQuantity: 4
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 3643037256157110189, guid: 19eccf1f7288cf14cba8e4fbb26eb7f8, type: 3}

@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A scrawny young troll with quick hands and a sack. It snatches what it can from your pack and runs; it only fights when cornered.
   combatStats: {fileID: 11400000, guid: 356184f36b2d30c4a8ce0021ff055d04, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 5b00d0b078e0ab34796ca03a0cfbaa0e, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}

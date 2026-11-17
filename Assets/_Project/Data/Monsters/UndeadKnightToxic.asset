@@ -17,28 +17,9 @@ MonoBehaviour:
   description: A dead rider out of the bog, its horse grown through with glowing green rot. Its blade poisons. Holy light and fire undo it.
   combatStats: {fileID: 11400000, guid: 1675c95a0df4f7043816be1054668087, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 1652f7b3454b76c488a6896e9d5b399a, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 0.9
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 4
-      probability: 0.7
-    - item: {fileID: 11400000, guid: 511a30132e62d4841b52c35b90981e16, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.2
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 4
-      maxQuantity: 6
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 9066855856663566298, guid: ff93697190dd6f94cb20e5981aed0b02, type: 3}

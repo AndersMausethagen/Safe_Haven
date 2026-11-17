@@ -247,7 +247,7 @@ public sealed class EliteCreature : MonoBehaviour
         var bag = killer.GetComponentInParent<ItemInventory>();
         if (bag != null)
         {
-            List<ItemAmount> items = difficulty.eliteLoot.Roll();
+            List<ItemAmount> items = EliteLoot(difficulty).Roll(difficulty.tier, 1f);
             items.RemoveAll(drop => !difficulty.Allows(drop.Item));
             ItemGrantResult result = bag.Give(items);
             if (result.HasOverflow)
@@ -257,7 +257,7 @@ public sealed class EliteCreature : MonoBehaviour
             }
         }
 
-        List<ResourceAmount> overflow = LootGrant.GiveResources(killer, difficulty.eliteLoot.RollResources());
+        List<ResourceAmount> overflow = LootGrant.GiveResources(killer, EliteLoot(difficulty).RollResources(difficulty.tier, 1f));
         if (overflow.Count > 0)
         {
             GameMessages.Post("Can't carry more: " + AmountText.Describe(overflow) + " left behind.", MessageKind.Warning);
@@ -274,6 +274,13 @@ public sealed class EliteCreature : MonoBehaviour
     }
 
     // The mark's own enchantment, one not yet known first; when its marks' are all known, another elite one of the tier, else a copy.
+    // The raid's elite table (rows by tier) when it has one, else the tier's own list.
+    private static ItemDropTable EliteLoot(RaidDifficulty difficulty)
+    {
+        LootTable table = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.EliteLoot : null;
+        return table != null ? table.Drops : difficulty.eliteLoot;
+    }
+
     private void GiveInscription(GameObject killer, int tier)
     {
         if (UnityEngine.Random.value >= EssenceSettings.Current.EliteInscriptionChance(tier))

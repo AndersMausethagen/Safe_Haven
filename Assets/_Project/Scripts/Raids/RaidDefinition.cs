@@ -51,6 +51,14 @@ public sealed class RaidDefinition : ScriptableObject
     [Tooltip("Essences the player can expect to find.")]
     [SerializeField] private ResourceDefinition[] likelyResources = new ResourceDefinition[0];
 
+    [Header("Loot")]
+    [Tooltip("What only this raid holds (Data/Loot/Raids): rolled on top of each cache's own table whenever a cache is searched here, " +
+             "so the same chest gives different things in different places, as Valheim's biomes and ARC Raiders' maps do.")]
+    [SerializeField] private LootTable regionalLoot;
+    [Tooltip("What killing an elite here gives on top of the creature's drop (Data/Loot/Raids), rows limited by tier. Empty: each " +
+             "tier's own Elite loot list.")]
+    [SerializeField] private LootTable eliteLoot;
+
     [Header("Base Rules")]
     [Tooltip("Seconds the player has to extract before the raid collapses (GDD §7.3: 12 minutes). Portal Sparks add more.")]
     [SerializeField, Min(RaidParameters.MinimumDuration)] private float durationSeconds = 720f;
@@ -168,6 +176,8 @@ public sealed class RaidDefinition : ScriptableObject
     public bool CanBeLarge => layoutRules != null && largeRaid != null && largeRaid.widthScale > 1f;
     public MonsterDefinition[] KnownEnemies => knownEnemies;
     public ItemDefinition[] LikelyItems => likelyItems;
+    public LootTable RegionalLoot => regionalLoot;
+    public LootTable EliteLoot => eliteLoot;
     public ResourceDefinition[] LikelyResources => likelyResources;
     /// <summary>Danger stages, the earliest (most time left) first.</summary>
     public IReadOnlyList<RaidStage> Stages => stages;

@@ -17,23 +17,9 @@ MonoBehaviour:
   description: The dead of the barrows, still in their mail. Slow, patient and hard to stop; its touch is grave-cold. Old stories say fire ends them.
   combatStats: {fileID: 11400000, guid: c29bad7300c63a74ca18ade20a30dd5c, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: e08f09335b64bc04fbdbe2359407c6c2, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.7
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}

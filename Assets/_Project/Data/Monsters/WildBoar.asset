@@ -17,23 +17,9 @@ MonoBehaviour:
   description: A boar of the deep woods, untouched by the blight. It roots about in the litter and runs from you, tusks and all. The best meat there is.
   combatStats: {fileID: 11400000, guid: 87fdab9bc717da747920e1401004e376, type: 2}
   faction: 2
+  lootTable: {fileID: 11400000, guid: 9f6f5357d46380c4384b142315320df6, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.8
-    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.35
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 8653230728158633359, guid: e880d4ea2b9be22409acdbd5bf1e6f9e, type: 3}
@@ -75,7 +61,18 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0.4
+  breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 40
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -86,6 +83,14 @@ MonoBehaviour:
   fallsByAnimation: 0
   canBeSmashed: 1
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: 07e4276df2c8dad45a0cd63ac96041ac, type: 3}

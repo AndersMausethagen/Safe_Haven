@@ -1009,25 +1009,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b469681a4982704096d644d9891ad75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootOnDeath
+  table: {fileID: 11400000, guid: e08f09335b64bc04fbdbe2359407c6c2, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.7
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 3
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
+    entries: []
   unlocksRecipes: []
   relicChance: 0
+  inscriptions: []
 --- !u!114 &1291413385866200264
 MonoBehaviour:
   m_ObjectHideFlags: 0

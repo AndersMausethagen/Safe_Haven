@@ -17,23 +17,9 @@ MonoBehaviour:
   description: A forest spirit in the shape of a beautiful woman, with a hollow back like a rotten tree. Never follow her into the trees.
   combatStats: {fileID: 11400000, guid: 0041bfbbc54f5b842b538338d5148d23, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 878922dcc08ef6240a646f1249b4128a, type: 2}
   drops:
-    entries:
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.8
-    - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.3
-    - item: {fileID: 11400000, guid: 7400170a621d51d43a051a8899ec5b20, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.15
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 1361258407523271697, guid: 280a30c33cf4c3444a326b93e937de36, type: 3}

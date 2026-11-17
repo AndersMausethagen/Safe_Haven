@@ -149,6 +149,7 @@ public static class MonsterPrefabBuilder
         {
             var definitionData = new SerializedObject(definition);
             data.CopyFromSerializedProperty(definitionData.FindProperty("drops"));
+            data.FindProperty("table").objectReferenceValue = definitionData.FindProperty("lootTable").objectReferenceValue;
             data.CopyFromSerializedProperty(definitionData.FindProperty("unlocksRecipes"));
         });
 

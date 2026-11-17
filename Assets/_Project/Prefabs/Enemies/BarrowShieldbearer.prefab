@@ -150,6 +150,14 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 22100000, guid: f9168d2b60100554b85f679a0415a10e, type: 2}
+    - target: {fileID: 4212281576510312025, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: table
+      value: 
+      objectReference: {fileID: 11400000, guid: ad3e81620e0843e46819f9b26e5c1ca9, type: 2}
+    - target: {fileID: 4212281576510312025, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: drops.entries.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4852245321055086106, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       propertyPath: baseStats
       value: 

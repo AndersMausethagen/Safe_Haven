@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A troll of the high scree, its hide grown into granite. Slow, and every blow of its fists breaks something. Blades skid on it; a hammer cracks it.
   combatStats: {fileID: 11400000, guid: 0e03193915b462647889a59f9058a8e7, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: c6a8e769d13e3334ba8a9e3616815bcc, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 9
-      maxQuantity: 12
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}

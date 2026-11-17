@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: Fog Bank Cache
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Fog Bank Cache
+  kind: 1
+  notes: 'What the Fog Bank site''s cache holds: wisp embers, runestones, moonsilver and pennies.'
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: cbe9df10f8fa88f47be2f012ec678577, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.5
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 3
+      probability: 0.6
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 6
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

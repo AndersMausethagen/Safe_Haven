@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A low-flying forest creature. Dodge its committed charge and strike during its two-second landing.
   combatStats: {fileID: 11400000, guid: 441526584e8c6a846950ee1a352c85a1, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: c6a7692af51bc534fba760e38c0a9f45, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}

@@ -407,11 +407,10 @@ public sealed class ProgressionTests
         Assert.Greater(book.Experience, 0);
         Assert.IsTrue(book.IsUsable);
         Assert.IsFalse(book.IsBlueprint);
-        var cache = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Raids/SupplyCache.prefab").GetComponentInChildren<LootCache>(true);
-        string drops = new SerializedObject(cache).FindProperty("drops").FindPropertyRelative("entries").arraySize > 0
-            ? EditorJsonUtility.ToJson(cache)
-            : "";
-        StringAssert.Contains(AssetDatabase.AssetPathToGUID("Assets/_Project/Data/Items/RuneBook.asset"), drops);
+        bool inACache = AssetDatabase.FindAssets("t:LootTable", new[] { "Assets/_Project/Data/Loot/Caches" })
+            .Select(guid => AssetDatabase.LoadAssetAtPath<LootTable>(AssetDatabase.GUIDToAssetPath(guid)))
+            .Any(table => table.Drops.Entries.Any(entry => entry.Item == book));
+        Assert.IsTrue(inACache, "a kind of supply cache holds Rune Books");
     }
 
     private static LoadedGame RoundTrip(SaveData data)

@@ -17,28 +17,9 @@ MonoBehaviour:
   description: A wolf maddened by the forest's curse. Fast and relentless, it hunts in packs. Watch for the lunge.
   combatStats: {fileID: 11400000, guid: 020d590cc80a9c643a862e68bdc3bdea, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: ce8b069f2cb8dee4cb88e47f7f080247, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.5
-    - item: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.25
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.8
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}

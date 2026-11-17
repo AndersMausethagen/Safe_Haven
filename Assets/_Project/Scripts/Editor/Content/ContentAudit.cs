@@ -24,7 +24,7 @@ public static class ContentAudit
 
     private static readonly string[] ItemSources =
     {
-        "RecipeDefinition.output", "LootCache.drops", "LootOnDeath.drops", "MonsterDefinition.drops", "ResourceSource.drops",
+        "RecipeDefinition.output", "LootCache.drops", "LootOnDeath.drops", "MonsterDefinition.drops", "ResourceSource.drops", "LootTable.drops",
         "GatheringNodeDefinition.yields", "GatheringNodeDefinition.burstYields", "ChoppableTree.wood", "TreeChoppingSettings.woodByTier",
         "TreeChoppingSettings.limbingItem", "FishingSettings.fish", "FireflyProfile.catchable", "HavenRequestDefinition.reward",
         "QuestDefinition.rewardItems", "RaidDefinition.difficulties[].eliteLoot", "RaidEventDefinition.choices[].outcomes",

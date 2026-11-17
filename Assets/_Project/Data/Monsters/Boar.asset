@@ -17,33 +17,9 @@ MonoBehaviour:
   description: A wild boar from the edge of the woods. It will let you pass at a distance. Step too close and it comes straight at you, and stands blown and open when the charge is spent.
   combatStats: {fileID: 11400000, guid: b1c8d43eb3789f74694060203712643d, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 692359b2e66939141899682c5147ccc5, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.8
-    - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.4
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.5
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.6
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 3664732680575138757, guid: ea26cd939baa8e846a78b1a37fb9d6c2, type: 3}

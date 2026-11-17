@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45433c01f10bce649b57ee8746e0f6b5, type: 3}
+  m_Name: TrollValley Elites
+  m_EditorClassIdentifier: SafeHaven::LootTable
+  displayName: Troll Valley elites
+  kind: 3
+  notes: 'What killing an elite gives on top of the creature''s own drop, each tier its own rows: the prize of the tier (what the next tier''s gear is made from) and essence.'
+  drops:
+    entries:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+      fromTier: 2
+      toTier: 2
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 3
+      maxQuantity: 4
+      probability: 1
+      fromTier: 2
+      toTier: 2
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 2
+      maxQuantity: 4
+      probability: 1
+      fromTier: 3
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 4
+      maxQuantity: 6
+      probability: 1
+      fromTier: 3
+      toTier: 3
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 3
+      maxQuantity: 5
+      probability: 1
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.25
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0
+    - item: {fileID: 0}
+      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+      minQuantity: 6
+      maxQuantity: 8
+      probability: 1
+      fromTier: 4
+      toTier: 4
+      fixedAmount: 0

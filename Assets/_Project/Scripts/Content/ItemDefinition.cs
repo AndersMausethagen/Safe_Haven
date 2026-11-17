@@ -47,6 +47,8 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0)] private int value = 1;
     [Tooltip("This piece's gear score, for what the rules get wrong (a torch or a fishing rod is no weapon). 0: worked out from its tier, slot and rarity.")]
     [SerializeField, Min(0)] private int gearScoreOverride;
+    [Tooltip("Only raids give it (GDD §13.5): a creature's own part. A creature killed at home leaves its meat, hide and bone but not this.")]
+    [SerializeField] private bool raidOnly;
 
     [Header("Appearance")]
     [Tooltip("Picture shown in inventories and tooltips.")]
@@ -189,6 +191,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public int Tier => tier;
     public ItemRarity Rarity => rarity;
     public int Value => value;
+    public bool RaidOnly => raidOnly;
     public int GearScoreOverride => gearScoreOverride;
     public Sprite Icon => icon;
     public GameObject Prefab => prefab;

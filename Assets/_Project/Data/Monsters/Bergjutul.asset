@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A giant of the mountain, made of its stone.
   combatStats: {fileID: 11400000, guid: 3dd137bc23017724e93ade50b95ad993, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 135fa68c628876e41b600cddda2b9b55, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 1
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 9
-      maxQuantity: 12
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 9066855856663566298, guid: 9bb9b3bba4b4e0541b99c1424291cef6, type: 3}
@@ -390,6 +381,14 @@ MonoBehaviour:
   flankSpread: 0
   breaksWalls: 1
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 450
   parryResponse: 0
   openWhileStriking: 0
@@ -409,6 +408,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: e2341c1edb7399046aaef05e6d041dc6, type: 3}

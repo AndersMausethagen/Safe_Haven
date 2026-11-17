@@ -393,7 +393,17 @@ internal static class RaidTierEditor
 
             using (new EditorGUI.IndentLevelScope())
             {
-                EditorGUILayout.PropertyField(row.FindPropertyRelative("eliteLoot"), new GUIContent("Elite loot", TooltipOf("eliteLoot")), true);
+                if (raid.EliteLoot != null)
+                {
+                    // The raid's elite table holds every tier's rows (Loot & Events tab); this tier's own list is no longer rolled.
+                    int tier = row.FindPropertyRelative("tier").intValue;
+                    EditorGUILayout.LabelField("Elite loot", $"{LootOverview.Describe(raid.EliteLoot.Drops, tier)} (from {raid.EliteLoot.DisplayName})",
+                        ContentUtility.WrappedMiniLabel);
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(row.FindPropertyRelative("eliteLoot"), new GUIContent("Elite loot", TooltipOf("eliteLoot")), true);
+                }
             }
 
             EditorGUILayout.Space(3f);

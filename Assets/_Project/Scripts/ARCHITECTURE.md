@@ -1958,6 +1958,18 @@ Everything is added to what was there: the home spots by the portal, first-of-ki
   carried into a raid (`PlayerSnapshot.AfterFailedRaid`) and what an order takes. Rewards, refunds, finds and moved gear
   arrive through `ItemDelivery.Give`: bag, then the stash at home, then the feet; ItemObtained only for a new find. Quest rewards too (`QuestManager.GiveRewards`; resources past what is carried go to the stash at home).
 
+- **Loot tables are assets** (`LootTable`, `Data/Loot`, 2026-11-17; Docs/LootAndDropsResearch_2026-11-17.md): one per creature
+  (its `MonsterDefinition.LootTable` and its prefab's `LootOnDeath` point at the same one, so the journal can't lie), per kind of
+  cache (`LootCache.table`), and per raid: `RaidDefinition.RegionalLoot` (what only that raid holds, rolled with every cache searched
+  there) and `EliteLoot` (rows by tier; each tier's inline Elite loot only when a raid has none). `ItemDropEntry` rows carry From/To
+  Tier (a row with a From Tier never drops outside a raid) and Fixed Amount (a trophy the raid's `LootMultiplier` leaves alone);
+  `ItemDropTable.Roll(tier, multiplier)` applies both. Creature drops scale with the tier's loot multiplier like caches do. Killed at
+  home (`LootOnDeath.KilledAtHome`: the Haven's portal stands, no raid), a creature keeps its Cursed Essence and every
+  `ItemDefinition.RaidOnly` part. The inline `drops` lists remain for what has no table (the test dummy, the prologue's own chest).
+  Editing: the Content Editor's **Loot Tables** (one-line rows, a per-tier grid, who uses it), a raid's **Loot & Events** tab (all
+  that drops there, tier by tier), Safe Haven › Loot › Write Loot Overview (`Docs/LootTables.md`). Trap: a nested prefab instance
+  overrides only the fields it changed, so clearing a base prefab's inline list blanks the rest of its instances' rows (the Fog Bank,
+  the Old Smithy Chest had to be restored by hand).
 - **Rarity and value** live on `ItemDefinition` (Loot header). `Rarity` (in `Items/ItemRarity.cs`) turns a rarity into a
   color, name and pickup sound from `RaritySettingsDefinition`. Slots tint by rarity, tooltips and the message feed
   color names, `AudioManager` plays the pickup sound from the `ItemObtained` event, and `RaidReport` sums value and

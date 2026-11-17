@@ -18,15 +18,32 @@ public sealed class ItemDropEntry
     [SerializeField, Min(0)] private int maxQuantity = 1;
     [Tooltip("Chance from 0 to 1 that this entry drops at all. 1 always drops.")]
     [SerializeField, Range(0f, 1f)] private float probability = 1f;
+    [Tooltip("The lowest raid tier this drops at. 0: any tier, and outside raids too; a row with a From Tier never drops outside a raid.")]
+    [SerializeField, Range(0, Tiers.Max)] private int fromTier;
+    [Tooltip("The highest raid tier this drops at. 0: no limit.")]
+    [SerializeField, Range(0, Tiers.Max)] private int toTier;
+    [Tooltip("Never scaled by the raid's loot multiplier: a trophy stays one trophy at every tier.")]
+    [SerializeField] private bool fixedAmount;
 
     public ItemDefinition Item => item;
     public ResourceDefinition Resource => item == null ? resource : null;
     public int MinQuantity => minQuantity;
     public int MaxQuantity => maxQuantity;
     public float Probability => probability;
+    public int FromTier => fromTier;
+    public int ToTier => toTier;
+    public bool FixedAmount => fixedAmount;
     /// <summary>The item or resource dropped, for display and lookups.</summary>
     public UnityEngine.Object Drop => item != null ? item : resource;
     public string DropName => item != null ? item.DisplayName : resource != null ? resource.DisplayName : "nothing";
+
+    /// <summary>
+    /// Whether this row can drop at a raid tier; tier 0 is outside a raid, where only rows without a From Tier drop.
+    /// </summary>
+    public bool AppearsAt(int tier) => tier <= 0 ? fromTier <= 0 : (fromTier <= 0 || tier >= fromTier) && (toTier <= 0 || tier <= toTier);
+
+    /// <summary>The average amount one roll gives, chance included, before any multiplier.</summary>
+    public float AverageAmount => probability * (Mathf.Min(minQuantity, maxQuantity) + Mathf.Max(minQuantity, maxQuantity)) * 0.5f;
 
     /// <summary>Rolls the chance and then the quantity of an item entry. Returns false when nothing drops.</summary>
     public bool TryRoll(out ItemAmount drop)
@@ -66,10 +83,18 @@ public sealed class ItemDropEntry
         return quantity > 0;
     }
 
+    /// <summary>A rolled quantity scaled by a raid's loot multiplier, unless the row keeps a fixed amount.</summary>
+    public int Scaled(int quantity, float multiplier, float roll) =>
+        fixedAmount || Mathf.Approximately(multiplier, 1f) ? quantity : RaidParameters.ScaleAmount(quantity, multiplier, roll);
+
     public void Validate()
     {
         minQuantity = Mathf.Max(0, minQuantity);
         maxQuantity = Mathf.Max(minQuantity, maxQuantity);
+        if (toTier > 0 && fromTier > toTier)
+        {
+            toTier = fromTier;
+        }
     }
 }
 
@@ -84,30 +109,47 @@ public sealed class ItemDropTable
 
     public IReadOnlyList<ItemDropEntry> Entries => entries;
 
-    /// <summary>Rolls the item lines.</summary>
-    public List<ItemAmount> Roll()
+    /// <summary>Rolls the item lines that drop outside a raid (those without a From Tier), unscaled.</summary>
+    public List<ItemAmount> Roll() => Roll(0, 1f);
+
+    /// <summary>Rolls the resource lines that drop outside a raid (those without a From Tier), unscaled.</summary>
+    public List<ResourceAmount> RollResources() => RollResources(0, 1f);
+
+    /// <summary>
+    /// Rolls the item lines that drop at a raid tier (0: outside a raid), each amount scaled by the multiplier unless its row keeps a
+    /// fixed amount. Adds to <paramref name="results"/> when given, so several tables can roll into one list.
+    /// </summary>
+    public List<ItemAmount> Roll(int tier, float multiplier, List<ItemAmount> results = null)
     {
-        var results = new List<ItemAmount>();
+        results ??= new List<ItemAmount>();
         foreach (ItemDropEntry entry in entries)
         {
-            if (entry != null && entry.TryRoll(out ItemAmount drop))
+            if (entry != null && entry.AppearsAt(tier) && entry.TryRoll(out ItemAmount drop))
             {
-                results.Add(drop);
+                int amount = entry.Scaled(drop.Amount, multiplier, Random.value);
+                if (amount > 0)
+                {
+                    results.Add(new ItemAmount(drop.Item, amount));
+                }
             }
         }
 
         return results;
     }
 
-    /// <summary>Rolls the resource lines.</summary>
-    public List<ResourceAmount> RollResources()
+    /// <summary>The resource lines that drop at a raid tier, as <see cref="Roll(int, float, List{ItemAmount})"/>.</summary>
+    public List<ResourceAmount> RollResources(int tier, float multiplier, List<ResourceAmount> results = null)
     {
-        var results = new List<ResourceAmount>();
+        results ??= new List<ResourceAmount>();
         foreach (ItemDropEntry entry in entries)
         {
-            if (entry != null && entry.TryRoll(out ResourceAmount drop))
+            if (entry != null && entry.AppearsAt(tier) && entry.TryRoll(out ResourceAmount drop))
             {
-                results.Add(drop);
+                int amount = entry.Scaled(drop.Amount, multiplier, Random.value);
+                if (amount > 0)
+                {
+                    results.Add(new ResourceAmount(drop.Resource, amount));
+                }
             }
         }
 

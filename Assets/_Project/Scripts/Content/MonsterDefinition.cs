@@ -21,7 +21,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private CombatStatsDefinition combatStats;
     [Tooltip("Enemy monsters attack the Player faction, Player monsters attack Enemies, Neutral monsters never attack.")]
     [SerializeField] private Faction faction = Faction.Enemy;
-    [Tooltip("Items the player receives for killing it: hides, bones, trophies.")]
+    [Tooltip("What it drops (Data/Loot/Creatures), shared with its prefab's LootOnDeath, so the journal shows what really drops.")]
+    [SerializeField] private LootTable lootTable;
+    [Tooltip("The old inline table, used only while no Loot Table is set.")]
     [SerializeField] private ItemDropTable drops = new ItemDropTable();
     [Tooltip("Recipes the player learns for killing it. Use this on bosses to unlock the next tier of crafting.")]
     [SerializeField] private List<RecipeDefinition> unlocksRecipes = new List<RecipeDefinition>();
@@ -224,7 +226,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public GameObject Prefab => prefab;
     public CombatStatsDefinition CombatStats => combatStats;
     public Faction Faction => faction;
-    public ItemDropTable Drops => drops;
+    public ItemDropTable Drops => lootTable != null ? lootTable.Drops : drops;
+    public LootTable LootTable => lootTable;
     public int Experience => experience;
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
     public RuntimeAnimatorController AnimatorController => animatorController;

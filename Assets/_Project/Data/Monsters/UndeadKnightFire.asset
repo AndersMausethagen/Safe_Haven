@@ -17,28 +17,9 @@ MonoBehaviour:
   description: A dead rider in blackened plate on a horse that smoulders from within. Its blade burns. Frost undoes it; fire only feeds it.
   combatStats: {fileID: 11400000, guid: baa74508df7772347b2e6ce0d4f5c8b8, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: d75600e79102eaf4c874ddf8fb6b3c5c, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 3
-      probability: 0.9
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 2
-      maxQuantity: 4
-      probability: 0.7
-    - item: {fileID: 11400000, guid: 3f950e6fa86a6c14d8e1581ceac6b8d6, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.2
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 4
-      maxQuantity: 6
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 9066855856663566298, guid: 0230b887012da994e940392a83defd0a, type: 3}

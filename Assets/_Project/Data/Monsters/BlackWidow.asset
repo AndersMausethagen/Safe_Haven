@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A spider the size of a cart, black as tar, with a red hourglass on its back. It webs what it can't reach and bites what it can, and its bite burns in the blood.
   combatStats: {fileID: 11400000, guid: 776e9d70bca337d4f98624ff0e9aafc2, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 09ba64d60faeea149ac4d60f97b93a70, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.7
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.9
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
@@ -54,6 +45,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 2.6
     priority: 20
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 2.2
     interruptible: 1
     sound: {fileID: 0}
@@ -104,6 +98,9 @@ MonoBehaviour:
     minimumRange: 4
     maximumRange: 13
     priority: 15
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 8
     interruptible: 0
     sound: {fileID: 0}
@@ -154,6 +151,9 @@ MonoBehaviour:
     minimumRange: 4
     maximumRange: 9
     priority: 12
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 10
     interruptible: 0
     sound: {fileID: 0}
@@ -221,6 +221,15 @@ MonoBehaviour:
   canBeFinished: 0
   flankSpread: 0
   breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 70
   parryResponse: 0
   openWhileStriking: 1
@@ -240,6 +249,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.12
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 5ea01bd5f20097642a2b542ee827ade7, type: 3}

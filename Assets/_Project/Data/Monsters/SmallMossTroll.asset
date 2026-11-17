@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A small forest troll. Dodge its three stones, then close in during recovery.
   combatStats: {fileID: 11400000, guid: f42ebc920fa44714a89c73ce2d7cb640, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 16b032eb8872a424f88f245162adaaf7, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 51388376d31e4294bb24b0004412608d, type: 2}
   prefab: {fileID: 6267209934607442583, guid: bb37a42ef72f5274d807155e3d054529, type: 3}

@@ -17,23 +17,9 @@ MonoBehaviour:
   description: 'An old troll with a staff of living wood. It doesn''t want to fight you: it wants the ground to. Rootlings rise wherever it points. Kill it first, if you can reach it.'
   combatStats: {fileID: 11400000, guid: 9feced56207df704e8442128dac96f23, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 88795396e78be9e46a96c69242b991bc, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.15
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 3
-      maxQuantity: 4
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 3643037256157110189, guid: 8af413a8c10dbdc4f89f0537152651dc, type: 3}
@@ -59,6 +45,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 2
     priority: 30
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 2
     interruptible: 1
     sound: {fileID: 0}
@@ -109,6 +98,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 14
     priority: 25
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 14
     interruptible: 1
     sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
@@ -159,6 +151,9 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 12
     priority: 20
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 18
     interruptible: 1
     sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
@@ -209,6 +204,9 @@ MonoBehaviour:
     minimumRange: 2.2
     maximumRange: 14
     priority: 10
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 2.4
     interruptible: 0
     sound: {fileID: 0}
@@ -259,6 +257,9 @@ MonoBehaviour:
     minimumRange: 2.2
     maximumRange: 14
     priority: 15
+    weight: 0
+    whenFoe: 0
+    heavy: 0
     cooldown: 10
     interruptible: 0
     sound: {fileID: 0}
@@ -326,6 +327,15 @@ MonoBehaviour:
   canBeFinished: 0
   flankSpread: 0
   breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 60
   parryResponse: 0
   openWhileStriking: 1
@@ -345,6 +355,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.05
   shadeVariation: 0.08
   portrait: {fileID: 21300000, guid: 4732eee119f22d84cbb751b8016a7e05, type: 3}

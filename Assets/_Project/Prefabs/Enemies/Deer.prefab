@@ -170,20 +170,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b469681a4982704096d644d9891ad75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::LootOnDeath
+  table: {fileID: 11400000, guid: a2a9e5bc473dde0449628321615c3674, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 1
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.7
+    entries: []
   unlocksRecipes: []
   relicChance: 0
+  inscriptions: []
 --- !u!114 &8600280865431137050
 MonoBehaviour:
   m_ObjectHideFlags: 0

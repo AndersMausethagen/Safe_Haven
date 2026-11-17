@@ -8,11 +8,18 @@ using UnityEngine;
 /// killer with an inventory (the player) collects anything; what falls to someone on the player's side who carries no bag
 /// (a companion, a spike trap, a watch post's archer) is the player's haul (<see cref="TakerOf"/>). Whatever doesn't fit is
 /// reported rather than silently lost.
+/// <para>
+/// The loot comes from its Loot Table asset (the creature's own, shared with its MonsterDefinition) when one is set. In a raid the
+/// rows of the raid's tier drop, scaled by the raid's loot multiplier (Fixed Amount rows aren't); at home (where the Haven's portal
+/// stands) a creature leaves no Cursed Essence and none of the raid-only parts (GDD §13.5: only raids give them).
+/// </para>
 /// </summary>
 [RequireComponent(typeof(Damageable))]
 [OnAFriendsCopy(CopyRule.Same, "personal loot: each game rolls its own")]
 public sealed class LootOnDeath : MonoBehaviour
 {
+    [Tooltip("What it drops (Data/Loot). Empty: the inline Drops list below.")]
+    [SerializeField] private LootTable table;
     [SerializeField] private ItemDropTable drops = new ItemDropTable();
     [Tooltip("Recipes the killer learns, for bosses that unlock new crafting.")]
     [SerializeField] private List<RecipeDefinition> unlocksRecipes = new List<RecipeDefinition>();
@@ -24,13 +31,17 @@ public sealed class LootOnDeath : MonoBehaviour
 
     private Damageable damageable;
 
-    public ItemDropTable Drops => drops;
+    public ItemDropTable Drops => table != null ? table.Drops : drops;
+    public LootTable Table => table;
 
     /// <summary>
     /// This creature leaves no Cursed Essence: what is killed outside a raid (home's night prowlers) doesn't pay in what only
     /// raids should give (GDD §13.5).
     /// </summary>
     public bool WithholdsEssence { get; set; }
+
+    /// <summary>Killed at home: in the Haven, not in a raid. What only raids give stays on the body.</summary>
+    public static bool KilledAtHome => GameSession.ActiveRaid == null && RaidDirector.Current == null && HomePortal.Current != null;
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
     public IReadOnlyList<EnchantmentDefinition> Inscriptions => inscriptions;
 
@@ -79,13 +90,22 @@ public sealed class LootOnDeath : MonoBehaviour
             return;
         }
 
+        RaidDirector here = RaidDirector.Current;
+        int tier = here != null ? here.Session.Tier : 0;
+        float multiplier = here != null ? here.Parameters.LootMultiplier : 1f;
+        bool atHome = KilledAtHome;
         var inventory = taker.GetComponentInParent<ItemInventory>();
         if (inventory != null)
         {
-            List<ItemAmount> items = drops.Roll();
+            List<ItemAmount> items = Drops.Roll(tier, multiplier);
             if (GameSession.ActiveRaid != null)
             {
                 items.RemoveAll(drop => !GameSession.ActiveRaid.Allows(drop.Item));
+            }
+
+            if (atHome)
+            {
+                items.RemoveAll(drop => drop.Item.RaidOnly);
             }
 
             ItemGrantResult result = inventory.Give(items);
@@ -98,8 +118,8 @@ public sealed class LootOnDeath : MonoBehaviour
 
         if (taker.GetComponentInParent<ResourceInventory>() != null)
         {
-            List<ResourceAmount> rolled = drops.RollResources();
-            if (WithholdsEssence)
+            List<ResourceAmount> rolled = Drops.RollResources(tier, multiplier);
+            if (WithholdsEssence || atHome)
             {
                 rolled.RemoveAll(entry => entry.Resource == SettlementSettings.Current.CursedEssence);
             }

@@ -2972,8 +2972,12 @@ PrefabInstance:
       value: SupplyCache
       objectReference: {fileID: 0}
     - target: {fileID: 5350632879990198593, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
+      propertyPath: table
+      value: 
+      objectReference: {fileID: 11400000, guid: 7cb1c2f4a37322045920058307cce7ed, type: 2}
+    - target: {fileID: 5350632879990198593, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       propertyPath: drops.entries.Array.size
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5350632879990198593, guid: ba6f34ca967a1d043bcee3331d85f1a1, type: 3}
       propertyPath: drops.entries.Array.data[0].item

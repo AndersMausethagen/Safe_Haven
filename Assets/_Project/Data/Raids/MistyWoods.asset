@@ -44,6 +44,8 @@ MonoBehaviour:
   likelyResources:
   - {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
   - {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+  regionalLoot: {fileID: 11400000, guid: 5ee01dfbedc6b1141be1248b29f3ce7e, type: 2}
+  eliteLoot: {fileID: 11400000, guid: 823d166042b4c4b4cb51e9da2312f5bb, type: 2}
   durationSeconds: 720
   extractionSeconds: 30
   lootMultiplier: 1
@@ -65,17 +67,7 @@ MonoBehaviour:
     hunterEliteChance: 0
     eliteRelicChance: 0
     eliteLoot:
-      entries:
-      - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
-        resource: {fileID: 0}
-        minQuantity: 3
-        maxQuantity: 5
-        probability: 1
-      - item: {fileID: 0}
-        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-        minQuantity: 2
-        maxQuantity: 3
-        probability: 1
+      entries: []
   - tier: 2
     recommendedGearScore: 30
     minimumGearScore: 15
@@ -91,17 +83,7 @@ MonoBehaviour:
     hunterEliteChance: 0
     eliteRelicChance: 0.05
     eliteLoot:
-      entries:
-      - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
-        resource: {fileID: 0}
-        minQuantity: 3
-        maxQuantity: 5
-        probability: 1
-      - item: {fileID: 0}
-        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-        minQuantity: 3
-        maxQuantity: 4
-        probability: 1
+      entries: []
   - tier: 3
     recommendedGearScore: 50
     minimumGearScore: 30
@@ -117,17 +99,7 @@ MonoBehaviour:
     hunterEliteChance: 0.15
     eliteRelicChance: 0.1
     eliteLoot:
-      entries:
-      - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
-        resource: {fileID: 0}
-        minQuantity: 2
-        maxQuantity: 4
-        probability: 1
-      - item: {fileID: 0}
-        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-        minQuantity: 4
-        maxQuantity: 6
-        probability: 1
+      entries: []
   - tier: 4
     recommendedGearScore: 70
     minimumGearScore: 45
@@ -143,22 +115,7 @@ MonoBehaviour:
     hunterEliteChance: 0.25
     eliteRelicChance: 0.15
     eliteLoot:
-      entries:
-      - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
-        resource: {fileID: 0}
-        minQuantity: 3
-        maxQuantity: 5
-        probability: 1
-      - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
-        resource: {fileID: 0}
-        minQuantity: 1
-        maxQuantity: 1
-        probability: 0.25
-      - item: {fileID: 0}
-        resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-        minQuantity: 6
-        maxQuantity: 8
-        probability: 1
+      entries: []
   eliteAffixes:
   - {fileID: 11400000, guid: d036cc7f16338cf4db6914042a96d47d, type: 2}
   - {fileID: 11400000, guid: ed7b957a7b9f7034aad0fbfeeaa94edc, type: 2}

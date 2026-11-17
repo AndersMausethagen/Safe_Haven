@@ -17,18 +17,9 @@ MonoBehaviour:
   description: A fox, about from dusk. It keeps to the edges of things and slips off between the rocks at the first sight of you.
   combatStats: {fileID: 11400000, guid: 54d137d079f5aa04a825519d92577d99, type: 2}
   faction: 2
+  lootTable: {fileID: 11400000, guid: 28d8189d841afc9418e60c2738a0f9c4, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.9
-    - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.4
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 9100000, guid: 272fd6ea81787ae46aa927a707d0e63c, type: 2}
   prefab: {fileID: 5304832244727438513, guid: d77378d760129e84293e440d8b7bfe2b, type: 3}
@@ -70,7 +61,18 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0.4
+  breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 40
+  parryResponse: 0
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -81,6 +83,14 @@ MonoBehaviour:
   fallsByAnimation: 1
   canBeSmashed: 1
   canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.08
   shadeVariation: 0.12
   portrait: {fileID: 21300000, guid: 310729cc44d02cc45a8934cd3853a9ac, type: 3}

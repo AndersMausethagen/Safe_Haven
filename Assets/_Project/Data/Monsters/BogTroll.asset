@@ -17,23 +17,9 @@ MonoBehaviour:
   description: A long, wet troll of the meres, more frog than man about the mouth. It keeps its distance and spits bog-venom, and shoves hard when you close in.
   combatStats: {fileID: 11400000, guid: 976da372810926e44895f08537685bdb, type: 2}
   faction: 1
+  lootTable: {fileID: 11400000, guid: 02cb6780db849df4d9aa57737bf19bd3, type: 2}
   drops:
-    entries:
-    - item: {fileID: 11400000, guid: 67c64a707cfb7bb4dbb4695008c9df54, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 1
-      probability: 0.15
-    - item: {fileID: 11400000, guid: 3bc6e2e24b1b9d74baa393728cf8b617, type: 2}
-      resource: {fileID: 0}
-      minQuantity: 1
-      maxQuantity: 2
-      probability: 0.5
-    - item: {fileID: 0}
-      resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
-      minQuantity: 3
-      maxQuantity: 4
-      probability: 1
+    entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
   prefab: {fileID: 3643037256157110189, guid: d94956478a8532d4bbe4d3da4f3f3bd5, type: 3}
@@ -61,6 +47,7 @@ MonoBehaviour:
     priority: 20
     weight: 1
     whenFoe: 0
+    heavy: 0
     cooldown: 2
     interruptible: 1
     sound: {fileID: 0}
@@ -113,6 +100,7 @@ MonoBehaviour:
     priority: 15
     weight: 0
     whenFoe: 0
+    heavy: 0
     cooldown: 3.5
     interruptible: 1
     sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
@@ -165,6 +153,7 @@ MonoBehaviour:
     priority: 25
     weight: 0.6
     whenFoe: 6
+    heavy: 0
     cooldown: 9
     interruptible: 0
     sound: {fileID: 0}
@@ -217,6 +206,7 @@ MonoBehaviour:
     priority: 18
     weight: 0
     whenFoe: 0
+    heavy: 0
     cooldown: 10
     interruptible: 0
     sound: {fileID: 0}
@@ -285,6 +275,14 @@ MonoBehaviour:
   flankSpread: 0
   breaksWalls: 0
   spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
   poise: 60
   parryResponse: 0
   openWhileStriking: 1
@@ -304,6 +302,7 @@ MonoBehaviour:
   armourChips: 0
   armourPerChip: 0.12
   chipFromShare: 0.07
+  armourParts: []
   sizeVariation: 0.06
   shadeVariation: 0.1
   portrait: {fileID: 21300000, guid: b666b4e08fa07cb4bad353b6d4ff7e01, type: 3}
