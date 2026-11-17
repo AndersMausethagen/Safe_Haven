@@ -30,6 +30,8 @@ Shader "Safe Haven/Terrain Moss"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        // A raid's ground light, as the terrain under the moss gets it (nothing elsewhere).
+        #include "Assets/_Project/Shaders/GroundLight.hlsl"
         TEXTURE2D(_Control); SAMPLER(sampler_Control);
         TEXTURE2D(_Holes); SAMPLER(sampler_Holes);
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
@@ -147,6 +149,10 @@ Shader "Safe Haven/Terrain Moss"
             half3 packed = SAMPLE_TEXTURE2D(_PackedMap, sampler_PackedMap, textureUV).rgb;
             surface.smoothness = lerp(_Smoothness, 1 - packed.g, _UsePacked);
             surface.occlusion = lerp(lerp(0.8, 1.0, input.height), packed.r, _UsePacked);
+            // The canopy's and the land's shade and the light thrown back from sunlit ground, as on the terrain it grows on, so the
+            // moss doesn't light up against a darker floor (GroundLight.hlsl; nothing without a field).
+            GroundLightApply(GroundLightOnGround(input.positionWS), surface.occlusion, lighting.bakedGI);
+            lighting.bakedGI += GroundLightBounce(input.positionWS, lighting.normalWS);
             surface.normalTS = half3(0, 0, 1);
             half4 color = UniversalFragmentPBR(lighting, surface);
             color.rgb = MixFog(color.rgb, input.fog);

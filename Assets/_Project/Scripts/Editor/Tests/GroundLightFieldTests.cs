@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using UnityEditor;
 using UnityEngine;
 
 /// <summary>
@@ -179,11 +180,11 @@ public sealed class GroundLightFieldTests
     [Test]
     public void Build_AtNight_LiftsTheLandsShadeBackToItsAverage()
     {
-        var recipe = new GroundLightField.Recipe { Size = Size, Cell = Cell, Ground = Pit(), Relief = 1f, Dark = true, NightLiftMost = 2f };
+        var recipe = new GroundLightField.Recipe { Size = Size, Cell = Cell, Ground = Pit(), Relief = 1f, Dim = 1f, NightLiftMost = 2f };
         GroundLightField.Result night = GroundLightField.Build(recipe);
         Assert.Less(night.MeanGround, 1f);
         Assert.AreEqual(1f / night.MeanGround, night.Lift, 1e-4f);
-        recipe.Dark = false;
+        recipe.Dim = 0f;
         Assert.AreEqual(1f, GroundLightField.Build(recipe).Lift, "no lift by day");
     }
 
@@ -203,7 +204,7 @@ public sealed class GroundLightFieldTests
         var recipe = new GroundLightField.Recipe
         {
             Size = Size, Cell = Cell, Ground = Level(), Cover = cover, CoverSize = Size, CoverSide = Size * Cell, CoverStrength = 0.35f,
-            Dark = true, NightLiftMost = 1.5f,
+            Dim = 1f, NightLiftMost = 1.5f,
         };
         GroundLightField.Result night = GroundLightField.Build(recipe);
         Assert.Less(night.MeanGround, 0.95f);
@@ -217,7 +218,7 @@ public sealed class GroundLightFieldTests
     public void Build_WithNothingSet_ReproducesTodaysLight()
     {
         // A raid's Ground Light left as it comes: no relief, no bounce, no cover. Every texel reads back as "no change".
-        var recipe = new GroundLightField.Recipe { Size = Size, Cell = Cell, Ground = Pit(), Albedo = new Vector3[Size * Size], Dark = true };
+        var recipe = new GroundLightField.Recipe { Size = Size, Cell = Cell, Ground = Pit(), Albedo = new Vector3[Size * Size], Dim = 1f };
         GroundLightField.Result result = GroundLightField.Build(recipe);
         Assert.AreEqual(1f, result.Lift);
         for (int i = 0; i < Size * Size; i++)
@@ -294,5 +295,162 @@ public sealed class GroundLightFieldTests
         Assert.AreEqual(101.25f, ground[0], 1e-4f, "cell centre 2.5 m in: a quarter of the way to the next post (0.5), of 10 m");
         Assert.Less(ground[0], ground[3]);
         Assert.AreEqual(ground[0], ground[3 * 4], 1e-5f, "level north to south");
+    }
+
+    [Test]
+    public void SplitIndirect_ADarkeningFactor_IsOcclusionAlone_AsBeforeTheField()
+    {
+        // Without a field, or wherever the field darkens: exactly `occlusion *= factor`, the indirect light untouched.
+        foreach (float factor in new[] { 1f, 0.8f, 0.35f, 0f })
+        {
+            GroundLightField.SplitIndirect(factor, out float onOcclusion, out float onIndirect);
+            Assert.AreEqual(factor, onOcclusion);
+            Assert.AreEqual(1f, onIndirect);
+        }
+    }
+
+    [Test]
+    public void SplitIndirect_TheNightsLift_SurvivesURPsOcclusionClamp()
+    {
+        // URP's lit shaders take min(SSAO, occlusion): without SSAO (1) a factor above 1 on occlusion was thrown away and open ground
+        // lost its lift. Split, the lift rides on the indirect light, and what comes out is the factor whole.
+        const float ssao = 1f;
+        foreach (float factor in new[] { 1.14f, 1.5f, 0.9f })
+        {
+            GroundLightField.SplitIndirect(factor, out float onOcclusion, out float onIndirect);
+            float clamped = Mathf.Min(ssao, onOcclusion);
+            Assert.AreEqual(factor, clamped * onIndirect, 1e-6f, $"factor {factor}");
+            Assert.LessOrEqual(onOcclusion, 1f);
+        }
+    }
+
+    [Test]
+    public void SplitIndirect_MatchesTheShader()
+    {
+        string shader = System.IO.File.ReadAllText("Assets/_Project/Shaders/GroundLight.hlsl");
+        StringAssert.Contains("occlusion *= min(factor, 1.0);", shader);
+        StringAssert.Contains("bakedGI *= max(factor, 1.0);", shader);
+        StringAssert.Contains("lerp(1.0, 0.1, saturate(normalWS.y))", shader, "the bounce's facing, as BounceFacing");
+    }
+
+    [Test]
+    public void EveryShader_PutsTheFieldOnThroughGroundLightApply()
+    {
+        // A factor written straight into occlusion would lose the night's lift to URP's clamp again.
+        var straight = new System.Text.RegularExpressions.Regex(
+            @"occlusion\s*\*?=\s*(SkyAmbient|SkyAmbientAtLeastCover|GroundLightOnGround|GroundLightRelief)\s*\(");
+        var found = new System.Collections.Generic.List<string>();
+        foreach (string path in System.IO.Directory.GetFiles("Assets/_Project/Shaders", "*.*", System.IO.SearchOption.AllDirectories))
+        {
+            if (!path.EndsWith(".shader") && !path.EndsWith(".hlsl"))
+            {
+                continue;
+            }
+
+            string[] lines = System.IO.File.ReadAllLines(path);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (straight.IsMatch(lines[i]))
+                {
+                    found.Add($"{path}:{i + 1}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(found);
+    }
+
+    [Test]
+    public void BounceFacing_LevelGroundIsBarelyTintedByItself()
+    {
+        Assert.AreEqual(0.1f, GroundLightField.BounceFacing(1f), 1e-6f, "level open ground");
+        Assert.AreEqual(1f, GroundLightField.BounceFacing(0f), 1e-6f, "a wall, a trunk");
+        Assert.AreEqual(1f, GroundLightField.BounceFacing(-1f), 1e-6f, "the underside of a branch or an overhang");
+        Assert.Greater(GroundLightField.BounceFacing(0.5f), GroundLightField.BounceFacing(0.9f), "a slope more than level ground");
+    }
+
+    [Test]
+    public void LiftShare_FollowsHowDarkItIs_NotTheClock()
+    {
+        const float below = 10.5f;
+        Assert.AreEqual(1f, GroundLightField.LiftShare(1f, 0f, below), "night");
+        Assert.AreEqual(0f, GroundLightField.LiftShare(0f, 1f, below), "the sun 15° up or more");
+        Assert.AreEqual(1f, GroundLightField.LiftShare(0.2f, 0.49f, below), 1e-6f, "a dim dawn (the sun 7° up)");
+        Assert.AreEqual(1f, GroundLightField.LiftShare(0.05f, 0.65f, below), 1e-6f, "dusk (the sun 10° up): as before, all of it");
+        float halfway = GroundLightField.LiftShare(0f, 0.85f, below);
+        Assert.Greater(halfway, 0.3f);
+        Assert.Less(halfway, 0.7f, "a lowish sun gets some");
+        Assert.AreEqual(1f, GroundLightField.LiftShare(0f, 0.99f, 15f), "a full 15° threshold: any sun below 15° gets it all");
+        Assert.AreEqual(0f, GroundLightField.LiftShare(0f, 1f, 15f));
+    }
+
+    [Test]
+    public void LiftAt_TakesItsShareOfTheNightsLift()
+    {
+        Assert.AreEqual(1f, GroundLightField.LiftAt(0.8f, 1.5f, 0f), "by day no lift");
+        Assert.AreEqual(1.25f, GroundLightField.LiftAt(0.8f, 1.5f, 1f), 1e-5f, "at night all of it");
+        Assert.AreEqual(1.125f, GroundLightField.LiftAt(0.8f, 1.5f, 0.5f), 1e-5f, "half of it");
+    }
+
+    [Test]
+    public void TheRaidsDawnGetsTheLift_AsDuskAndNightDo()
+    {
+        // The raids' own skies and hours: a dawn at 6.4-6.6 has the sun 5-7° up, dimmer than the dusk at 19.2 that was lifted.
+        float below = RenderingSettings.Current.LiftBelowSun;
+        foreach (string sky in new[] { "Troll Valley", "Moss Marsh", "Misty Woods" })
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<DayNightProfile>($"Assets/_Project/Data/Environment/{sky} Day Night.asset");
+            Assert.IsNotNull(profile, sky);
+            float Share(float hour)
+            {
+                DayNightState state = profile.Evaluate(hour);
+                return GroundLightField.LiftShare(state.Night, state.IsMoon ? 0f : state.Daylight, below);
+            }
+
+            Assert.AreEqual(1f, Share(6.6f), 1e-4f, $"{sky} at dawn");
+            Assert.AreEqual(1f, Share(19.2f), 1e-4f, $"{sky} at dusk");
+            Assert.AreEqual(1f, Share(23.5f), 1e-4f, $"{sky} at night");
+            Assert.AreEqual(0f, Share(11f), 1e-4f, $"{sky} by day");
+        }
+    }
+
+    [Test]
+    public void HalfToFloat_ReadsTheCoverMapsHalvesAsUnityDoes()
+    {
+        for (int bits = 0; bits <= ushort.MaxValue; bits++)
+        {
+            float got = GroundLightField.HalfToFloat((ushort)bits);
+            if ((bits & 0x7C00) == 0)
+            {
+                // Zero and the subnormals (far below any height that matters): the mantissa in 2^-24ths, exactly.
+                float exact = (bits & 0x3FF) / 16777216f * ((bits & 0x8000) != 0 ? -1f : 1f);
+                Assert.AreEqual(exact, got, $"0x{bits:X4}");
+                continue;
+            }
+
+            float expected = Mathf.HalfToFloat((ushort)bits);
+            if (float.IsNaN(expected))
+            {
+                Assert.IsTrue(float.IsNaN(got), $"0x{bits:X4}");
+                continue;
+            }
+
+            Assert.AreEqual(expected, got, $"0x{bits:X4}");
+        }
+
+        Assert.AreEqual(-1000f, GroundLightField.HalfToFloat(Mathf.FloatToHalf(-1000f)), "the map's clear value: nothing stands here");
+    }
+
+    [Test]
+    public void AddSetup_OutsideASceneSetup_IsRefused()
+    {
+        Assert.IsFalse(SceneTransition.IsBusy);
+        Assert.IsFalse(SceneTransition.AddSetup(new NoSetup()), "nothing is still to come: the caller does its work now");
+    }
+
+    private sealed class NoSetup : ISceneSetup
+    {
+        public int SetupOrder => 0;
+        public System.Collections.IEnumerator Setup() { yield break; }
     }
 }

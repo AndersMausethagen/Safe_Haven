@@ -324,7 +324,10 @@ Shader "Safe Haven/Tree Wind"
             #if defined(_LIGHT_COOKIES)
                 shadow *= SampleMainLightCookie(input.positionWS).r; // passing cloud shadows
             #endif
-            half3 light = input.ambient * SkyAmbient(input.positionWS) + GroundLightBounce(input.positionWS, input.normalWS * faceSign)
+            // As the lit path has it (GroundLightApply): the sky's light times the whole factor, night lift included, and the
+            // thrown-back light dimmed only by its darkening part.
+            half sky = SkyAmbient(input.positionWS);
+            half3 light = input.ambient * sky + GroundLightBounce(input.positionWS, input.normalWS * faceSign) * min(sky, 1.0)
                 + input.sun * shadow;
             #if defined(_ADDITIONAL_LIGHTS)
                 half3 normal = normalize(input.normalWS) * faceSign;
@@ -436,7 +439,7 @@ Shader "Safe Haven/Tree Wind"
                 surface.occlusion = lerp(surface.occlusion, mossMask.g, cover);
             #endif
             surface.albedo = SnowOn(surface.albedo, normalize(input.normalWS) * faceSign, input.uv);
-            surface.occlusion *= SkyAmbient(lighting.positionWS);
+            GroundLightApply(SkyAmbient(lighting.positionWS), surface.occlusion, lighting.bakedGI);
             lighting.bakedGI += GroundLightBounce(lighting.positionWS, lighting.normalWS);
             #if defined(_ALPHATEST_ON)
                 SurfaceWet(surface.albedo, surface.smoothness, lighting.normalWS, lighting.positionWS, 0.4);

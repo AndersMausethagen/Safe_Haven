@@ -9,7 +9,8 @@ using Object = UnityEngine.Object;
 
 /// <summary>
 /// A step that prepares a freshly loaded scene while the loading screen still covers it, such as generating a raid's
-/// layout. Put it on any MonoBehaviour in the scene. Steps run in <see cref="SetupOrder"/> (lowest first), after every
+/// layout. Put it on any MonoBehaviour in the scene, or add it while the scene is being set up (SceneTransition.AddSetup).
+/// Steps run in <see cref="SetupOrder"/> (lowest first), after every
 /// object in the scene has woken up (Awake) and before anything in it starts (Start). A step may yield to spread heavy
 /// work over several frames; gameplay waits for <see cref="SceneTransition.WhenReady"/> before it begins.
 /// </summary>
@@ -28,6 +29,9 @@ public interface ISceneSetup
 public static class SceneTransition
 {
     private static readonly List<Action> waitingForReady = new List<Action>();
+    // The steps of the scene being set up now and the one running (AddSetup); null between setups.
+    private static List<ISceneSetup> runningSteps;
+    private static int runningStep;
     private static Runner runner;
     private static string preloadedScene;
     private static AsyncOperation preloaded;
@@ -102,6 +106,33 @@ public static class SceneTransition
     public static void CancelWhenReady(Action action)
     {
         waitingForReady.Remove(action);
+    }
+
+    /// <summary>
+    /// Adds a step to the scene being set up now, behind the loading screen, to run after every step still to come of its
+    /// <see cref="ISceneSetup.SetupOrder"/> or lower: for work that must see what later steps place, from an object that isn't
+    /// in the scene (GroundLightMap draws the cover again once caches and resource nodes are in). Returns false when no scene
+    /// is being set up, so there is nothing still to come.
+    /// </summary>
+    public static bool AddSetup(ISceneSetup step)
+    {
+        if (step == null || !IsBusy || runningSteps == null)
+        {
+            return false;
+        }
+
+        int at = runningSteps.Count;
+        for (int i = runningStep + 1; i < runningSteps.Count; i++)
+        {
+            if (runningSteps[i].SetupOrder > step.SetupOrder)
+            {
+                at = i;
+                break;
+            }
+        }
+
+        runningSteps.Insert(at, step);
+        return true;
     }
 
     private static bool Begin(string scene, int buildIndex, string caption)
@@ -201,6 +232,7 @@ public static class SceneTransition
     private static void MarkReady(Scene scene)
     {
         IsBusy = false;
+        runningSteps = null;
         var actions = new List<Action>(waitingForReady);
         waitingForReady.Clear();
         foreach (Action action in actions)
@@ -230,6 +262,7 @@ public static class SceneTransition
     private static void ResetForNewPlaySession()
     {
         waitingForReady.Clear();
+        runningSteps = null;
         SceneReady = null;
         runner = null;
         preloaded = null;
@@ -402,12 +435,14 @@ public static class SceneTransition
         }
 
         // Steps are driven by hand rather than as nested coroutines, so a step that doesn't yield finishes this frame and
-        // the next one starts straight away, all before the scene's Start.
+        // the next one starts straight away, all before the scene's Start. A step may add another as it runs (AddSetup).
         private IEnumerator RunSetups(List<ISceneSetup> steps)
         {
             setupProgress = 0f;
+            runningSteps = steps;
             for (int i = 0; i < steps.Count; i++)
             {
+                runningStep = i;
                 IEnumerator routine;
                 try
                 {
@@ -441,6 +476,11 @@ public static class SceneTransition
                 }
 
                 setupProgress = (i + 1f) / steps.Count;
+            }
+
+            if (runningSteps == steps)
+            {
+                runningSteps = null;
             }
 
             setupProgress = 1f;

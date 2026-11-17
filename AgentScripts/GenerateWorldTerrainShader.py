@@ -464,10 +464,12 @@ CALL = """
 
 # A generated raid's ground light field (GroundLight.hlsl, GroundLightMap): the canopy's and the land's shade on the ground, and
 # light thrown back from sunlit ground. One texture array read with URP's shared linear-clamp sampler (the terrain is near its
-# 64 textures and the four-layer pass at 14 of 16 samplers). Without a field (the Haven, the prologue) both lines change nothing.
+# 64 textures and the four-layer pass at 14 of 16 samplers). The night's lift can take the factor above 1, which URP's occlusion
+# would clamp away (GroundLightApply puts that part on bakedGI). Without a field (the Haven, the prologue) both lines change nothing.
 GROUND_LIGHT = """    InitializeBakedGIData(IN, inputData);
-    // A raid's ground light (GroundLight.hlsl): the canopy's and the land's shade, and light thrown back from sunlit ground.
-    occlusion *= GroundLightOnGround(IN.positionWS);
+    // A raid's ground light (GroundLight.hlsl): the canopy's and the land's shade (the night's lift on the indirect light), and light
+    // thrown back from sunlit ground.
+    GroundLightApply(GroundLightOnGround(IN.positionWS), occlusion, inputData.bakedGI);
     inputData.bakedGI += GroundLightBounce(IN.positionWS, inputData.normalWS);
 """
 

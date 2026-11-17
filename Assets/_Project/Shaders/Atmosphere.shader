@@ -159,7 +159,7 @@ Shader "Hidden/Safe Haven/Atmosphere"
             #pragma fragment FragMarch
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            // A raid's ground light (GroundLightAir): mist under the canopy and down in hollows gets less of the sky's light. 1 elsewhere.
+            // A raid's ground light (GroundLightAirAbove): mist under the canopy and down in hollows gets less of the sky's light. 1 elsewhere.
             #include "Assets/_Project/Shaders/SkyOcclusion.hlsl"
 
             // Ground height under a point, from FogGround's baked height field.
@@ -468,7 +468,13 @@ Shader "Hidden/Safe Haven/Atmosphere"
                         {
                             float shadow = lerp(1.0, occlusion, GetMainLightShadowParams().x);
                             float3 directLight = sunLight * shadow + LocalLights(p) * _FogParams1.y;
-                            float air = GroundLightAir(p);
+                            // The land's shade fades out with height over the ground (mist high above a ravine isn't
+                            // shaded like its floor); 1 without a field, and no ground sample then.
+                            float air = 1.0;
+                            UNITY_BRANCH if (_GroundLightRect.w > 0.0)
+                            {
+                                air = GroundLightAirAbove(p, _HasFogGround > 0.0 ? p.y - GroundHeight(p.xz) : 0.0);
+                            }
                             float3 scatter = ((_FogAmbient.rgb * air + directLight) * _FogAlbedo.rgb * fogDensity
                                 + mistTintDensity * directLight + mistSkyDensity * air) / density;
                             float stepTransmittance = exp(-density * stepLength);

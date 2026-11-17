@@ -892,7 +892,7 @@ Shader "Safe Haven/Mossy Stone ASE"
 						SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
 						SurfaceWet(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS, 1.0);
 					#endif
-					surfaceData.occlusion *= SkyAmbient(inputData.positionWS);
+					GroundLightApply(SkyAmbient(inputData.positionWS), surfaceData.occlusion, inputData.bakedGI);
 					inputData.bakedGI += GroundLightBounce(inputData.positionWS, inputData.normalWS);
 					ASE_LIGHT_ACCUM4 color = UniversalFragmentPBR( inputData, surfaceData);
 				#endif

@@ -51,8 +51,9 @@ public static class GroundLightField
         public float Relief;
         /// <summary>Whether to work the thrown-back light out at all (RaidGroundLight › Bounce above 0).</summary>
         public bool Bounce;
-        /// <summary>Dusk or night: the field keeps the map's average light as it was without the land's shade.</summary>
-        public bool Dark;
+        /// <summary>How much of the night's lift the run's hour gets (<see cref="LiftShare"/>): 1 at night and at a dim dawn or
+        /// dusk, when the field keeps the map's average light as it was without it; 0 by day.</summary>
+        public float Dim;
         public float NightLiftMost = 1.5f;
         public int ReliefDirections = 12;
         public float ReliefNearest = 1.5f;
@@ -70,7 +71,7 @@ public static class GroundLightField
         public Color32[] Light;
         /// <summary>Slice 1: r the cover's shade factor at ground level (the terrain's).</summary>
         public Color32[] Ground;
-        /// <summary>What the field's shade is multiplied by at this hour (above 1 only at dusk and night).</summary>
+        /// <summary>What the field's shade is multiplied by at this hour (above 1 only at dim hours: dawn, dusk, night).</summary>
         public float Lift = 1f;
         /// <summary>The ground's light factor (the canopy's shade times the land's) averaged over the map: what the terrain loses
         /// against before the field, which read neither.</summary>
@@ -126,7 +127,7 @@ public static class GroundLightField
         });
         long coverMs = clock.ElapsedMilliseconds;
 
-        // The night's lift: the terrain read no shade before the field and what stands on it only the canopy's, so at dusk and night
+        // The night's lift: the terrain read no shade before the field and what stands on it only the canopy's, so at dim hours
         // everything the field shades is lifted until the ground's average is what it was (one lift for all, so grass and the
         // ground it grows on stay alike).
         double sum = 0;
@@ -136,7 +137,7 @@ public static class GroundLightField
         }
 
         result.MeanGround = (float)(sum / count);
-        result.Lift = recipe.Dark ? NightLift(result.MeanGround, recipe.NightLiftMost) : 1f;
+        result.Lift = LiftAt(result.MeanGround, recipe.NightLiftMost, recipe.Dim);
 
         clock.Restart();
         float[] red = null, green = null, blue = null;
@@ -257,12 +258,84 @@ public static class GroundLightField
     public static float ReliefFactor(float open, float strength) => 1f - Mathf.Clamp01(strength) * (1f - Mathf.Clamp01(open));
 
     /// <summary>
-    /// The night's lift: at dusk and night the field's shade is spread round its average instead of only taking light away, so
+    /// The night's lift: at dim hours the field's shade is spread round its average instead of only taking light away, so
     /// the ground as a whole is no darker than before the field (the user: the night must not get darker). Capped at
     /// <paramref name="most"/>.
     /// </summary>
     public static float NightLift(float meanFactor, float most) =>
         meanFactor <= 0f ? Mathf.Max(1f, most) : Mathf.Clamp(1f / meanFactor, 1f, Mathf.Max(1f, most));
+
+    /// <summary>The lift at an hour that gets <paramref name="share"/> (0-1, <see cref="LiftShare"/>) of the night's.</summary>
+    public static float LiftAt(float meanFactor, float most, float share) =>
+        1f + (NightLift(meanFactor, most) - 1f) * Mathf.Clamp01(share);
+
+    /// <summary>
+    /// GroundLight.hlsl's GroundLightApply: how a factor on a surface's indirect light is put on, since URP takes the lower of the
+    /// surface's occlusion and SSAO (so occlusion can't go above 1): the darkening part on occlusion, what lies above 1 (the night's
+    /// lift) on the indirect diffuse light. Their product is always the factor.
+    /// </summary>
+    public static void SplitIndirect(float factor, out float onOcclusion, out float onIndirect)
+    {
+        onOcclusion = Mathf.Min(factor, 1f);
+        onIndirect = Mathf.Max(factor, 1f);
+    }
+
+    /// <summary>GroundLight.hlsl's GroundLightBounce: how much of the thrown-back light a surface facing this way takes (its
+    /// normal's height, -1 to 1): all of it facing sideways or down, a tenth facing the sky, so level ground isn't tinted by itself.</summary>
+    public static float BounceFacing(float normalY) => Mathf.Lerp(1f, 0.1f, Mathf.Clamp01(normalY));
+
+    /// <summary>The day-night profile's Daylight is full once the sun stands this many degrees up (DayNightProfile.Evaluate).</summary>
+    public const float DaylightFullDegrees = 15f;
+
+    /// <summary>
+    /// How much of the night's lift an hour gets, by how dark it is rather than by the clock: all of it at night
+    /// (<paramref name="night"/>: the profile's Night, 0-1) and while the sun is lower than <paramref name="fullBelowDegrees"/>,
+    /// fading to none by the time it stands 15° up (<paramref name="daylight"/>: the profile's Daylight, 0 at night and 1 from
+    /// 15°). So a dim dawn is lifted as a dusk is, and a bright evening isn't.
+    /// </summary>
+    public static float LiftShare(float night, float daylight, float fullBelowDegrees)
+    {
+        float full = Mathf.Clamp(fullBelowDegrees, 0f, DaylightFullDegrees) / DaylightFullDegrees;
+        daylight = Mathf.Clamp01(daylight);
+        float low = full >= 1f ? (daylight < 1f ? 1f : 0f) : 1f - SmoothStep(full, 1f, daylight);
+        return Mathf.Clamp01(Mathf.Max(night, low));
+    }
+
+    /// <summary>The value of a 16-bit (half) float, as the cover map is drawn and read back. Plain arithmetic: safe on a worker thread.</summary>
+    public static float HalfToFloat(ushort half)
+    {
+        uint sign = (uint)(half & 0x8000) << 16;
+        uint exponent = (uint)(half >> 10) & 0x1F;
+        uint mantissa = (uint)half & 0x3FF;
+        var bits = new FloatBits();
+        if (exponent == 0)
+        {
+            // Zero, or too small for the half's exponent: the mantissa counts 2^-24ths.
+            float tiny = mantissa * 5.9604644775390625e-8f;
+            return sign != 0 ? -tiny : tiny;
+        }
+
+        bits.Int = exponent == 31
+            ? sign | 0x7F800000u | (mantissa << 13)
+            : sign | ((exponent + 112u) << 23) | (mantissa << 13);
+        return bits.Float;
+    }
+
+    /// <summary>The first <paramref name="count"/> half floats as floats, into <paramref name="floats"/> (a worker thread's job).</summary>
+    public static void HalvesToFloats(ushort[] halves, float[] floats, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            floats[i] = HalfToFloat(halves[i]);
+        }
+    }
+
+    [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Explicit)]
+    private struct FloatBits
+    {
+        [System.Runtime.InteropServices.FieldOffset(0)] public uint Int;
+        [System.Runtime.InteropServices.FieldOffset(0)] public float Float;
+    }
 
     /// <summary>
     /// SkyOcclusion.hlsl's cover test for a point on the ground, worked out on the CPU for the terrain: five taps a metre apart

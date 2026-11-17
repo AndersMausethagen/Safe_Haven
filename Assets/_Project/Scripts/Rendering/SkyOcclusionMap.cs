@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -33,7 +34,8 @@ public sealed class SkyOcclusionMap : MonoBehaviour
     private Rect pinnedArea;
     private float pinnedFloor;
     private float pinnedTop;
-    private readonly List<SkinnedMeshRenderer> hidden = new List<SkinnedMeshRenderer>();
+    private readonly List<Renderer> hidden = new List<Renderer>();
+    private readonly List<Renderer> parts = new List<Renderer>();
 
     /// <summary>How much cover dims indirect light in this scene (0-1), as bound.</summary>
     public float Strength => strength;
@@ -244,8 +246,8 @@ public sealed class SkyOcclusionMap : MonoBehaviour
     }
 
     // One draw of a block of the pinned map: level of detail chosen as the follow map would (an orthographic camera picks it by
-    // its view's size), every painted tree in it drawn however far the camera stands, and people and creatures (skinned meshes)
-    // left out: they are not cover, and one standing there at load would leave a dark spot for the whole run.
+    // its view's size), every painted tree in it drawn however far the camera stands, and whatever moves or doesn't last left
+    // out (HideMoving): it is not cover, and one standing there at load would leave a dark spot for the whole run.
     private void DrawOnce(float halfHeight, float farthest)
     {
         KeepTerrainResources();
@@ -262,15 +264,7 @@ public sealed class SkyOcclusionMap : MonoBehaviour
                 terrains[i].treeDistance = Mathf.Max(treeDistances[i], farthest + 20f);
             }
 
-            foreach (SkinnedMeshRenderer skinned in FindObjectsByType<SkinnedMeshRenderer>())
-            {
-                if (!skinned.forceRenderingOff)
-                {
-                    skinned.forceRenderingOff = true;
-                    hidden.Add(skinned);
-                }
-            }
-
+            HideMoving();
             above.Render();
         }
         finally
@@ -284,15 +278,61 @@ public sealed class SkyOcclusionMap : MonoBehaviour
                 }
             }
 
-            foreach (SkinnedMeshRenderer skinned in hidden)
+            foreach (Renderer part in hidden)
             {
-                if (skinned != null)
+                if (part != null)
                 {
-                    skinned.forceRenderingOff = false;
+                    part.forceRenderingOff = false;
                 }
             }
 
             hidden.Clear();
+        }
+    }
+
+    // Switched off for one pinned draw: people and creatures (skinned meshes), and the whole of anything that walks (a character
+    // controller, a navmesh agent, an animator: with the weapon, the hat or the pack it carries), anything with a body (a felled
+    // tree falling or lying, a cart, a boat, thrown, broken and chopped pieces, a ragdoll) and things dropped on the ground.
+    private void HideMoving()
+    {
+        foreach (SkinnedMeshRenderer skinned in FindObjectsByType<SkinnedMeshRenderer>())
+        {
+            Hide(skinned);
+        }
+
+        HideUnder(FindObjectsByType<Rigidbody>());
+        HideUnder(FindObjectsByType<CharacterController>());
+        HideUnder(FindObjectsByType<NavMeshAgent>());
+        HideUnder(FindObjectsByType<Animator>());
+        HideUnder(FindObjectsByType<DroppedItem>());
+    }
+
+    private void HideUnder<T>(T[] roots) where T : Component
+    {
+        foreach (T root in roots)
+        {
+            if (root == null)
+            {
+                continue;
+            }
+
+            root.GetComponentsInChildren(false, parts);
+            foreach (Renderer part in parts)
+            {
+                Hide(part);
+            }
+        }
+
+        parts.Clear();
+    }
+
+    // Only what is drawn now, so what something else switched off stays off afterwards.
+    private void Hide(Renderer part)
+    {
+        if (part != null && !part.forceRenderingOff)
+        {
+            part.forceRenderingOff = true;
+            hidden.Add(part);
         }
     }
 

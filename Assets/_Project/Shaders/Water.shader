@@ -435,7 +435,8 @@ Shader "Safe Haven/Water"
                 }
 
                 Light sun = GetMainLight(TransformWorldToShadowCoord(positionWS));
-                // A pond under trees sees little sky (a raid's ground light; 1 elsewhere): its light and reflected sky dim.
+                // A pond under trees sees little sky (a raid's ground light; 1 elsewhere): its light and reflected sky dim, and the
+                // night's lift never makes it lighter than before the field.
                 half airLight = GroundLightAir(positionWS);
                 half3 ambient = SampleSH(surfaceNormal) * airLight;
                 half3 light = sun.color * sun.shadowAttenuation * (0.35 + 0.65 * saturate(dot(surfaceNormal, sun.direction))) + ambient;

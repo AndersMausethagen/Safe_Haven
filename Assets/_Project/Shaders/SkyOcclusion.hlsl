@@ -53,15 +53,17 @@ half SkyAmbient(float3 positionWS)
 }
 
 // For characters: the field only ever lifts them (the night's lift), never darkens them below the cover alone, so the player
-// stays as readable at night as before the field.
+// stays as readable at night as before the field. Above 1 on open ground at night: put it on with GroundLightApply.
 half SkyAmbientAtLeastCover(float3 positionWS)
 {
     return SkyCoverAmbient(positionWS) * max(1.0, GroundLightRelief(positionWS));
 }
 
 // Water and mist, which read no sky map elsewhere: on a raid map with a field, the canopy over the point (one tap: the mist
-// marches many points a pixel) and the land's shade. 1 without a field, so the Haven's water and mist are as they were.
-half GroundLightAir(float3 positionWS)
+// marches many points a pixel) and the land's shade, which fades out over GROUND_LIGHT_AIR_FADE metres above the ground
+// (aboveGround, in metres). The dim hour's lift only gives back what they lose there and never makes them lighter than
+// before the field: lit air reads as milky at night. 1 without a field, so the Haven's water and mist are as they were.
+half GroundLightAirAbove(float3 positionWS, float aboveGround)
 {
     UNITY_BRANCH if (_GroundLightRect.w <= 0.0)
     {
@@ -76,6 +78,13 @@ half GroundLightAir(float3 positionWS)
         cover = lerp(1.0 - 0.65 * saturate(_SkyOcclusionRect.w), 1.0, 1.0 - smoothstep(0.4, 2.0, above));
     }
 
-    return cover * GroundLightRelief(positionWS);
+    half relief = lerp(GroundLightAt(positionWS, 0).a, 1.0, saturate(aboveGround / GROUND_LIGHT_AIR_FADE));
+    return min(cover * relief * _GroundLightRect.w, 1.0);
+}
+
+// The same at the ground (a water surface).
+half GroundLightAir(float3 positionWS)
+{
+    return GroundLightAirAbove(positionWS, 0.0);
 }
 #endif

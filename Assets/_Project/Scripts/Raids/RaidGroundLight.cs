@@ -14,8 +14,8 @@ public sealed class RaidGroundLight
              "mist (not only what stands on the ground), and Relief and Bounce below apply. Off: as before the field.")]
     [SerializeField] private bool enabled;
     [Tooltip("How much hollows, ravines, cliff feet and valley walls darken the ground they hide the sky from (0 none, 1 fully). " +
-             "At dusk and night the ground's average light is kept as before the field (Rendering Settings › Night Lift Most), so " +
-             "nights don't get darker.")]
+             "At night and at a dim dawn or dusk the ground's average light is kept as before the field (Rendering Settings › Night " +
+             "Lift Most, Lift Below Sun), so nights don't get darker.")]
     [SerializeField, Range(0f, 1f)] private float relief;
     [Tooltip("How strongly sunlit ground nearby lights what stands in shade (0 none). Follows the sun or moon as it is, so clouds " +
              "and night dim it by themselves.")]

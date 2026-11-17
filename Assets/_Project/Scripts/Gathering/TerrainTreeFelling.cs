@@ -67,6 +67,9 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     /// <summary>Raised with a tree's index when it is felled or broken down.</summary>
     public event System.Action<int> TreeDown;
 
+    /// <summary>Raised with a tree's index when it grows back where it was felled.</summary>
+    public event System.Action<int> TreeBack;
+
     /// <summary>The terrain's own runtime copy of its data, made now if it hasn't been: what trees may be added to.</summary>
     public TerrainData OwnedData()
     {
@@ -536,6 +539,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         {
             terrain.terrainData.SetTreeInstance(index, felled[index].tree);
             felled.Remove(index);
+            TreeBack?.Invoke(index);
         }
     }
 

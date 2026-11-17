@@ -52,6 +52,12 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Raised with where a painted resource stands when it is gathered (gone until it grows back) and when it grows back: what
+    /// stands there has changed (GroundLightMap draws the cover there again).
+    /// </summary>
+    public event System.Action<Vector3> NodeChanged;
+
     /// <summary>True when painting this prefab makes something to gather: a resource node that isn't a tree.</summary>
     public static bool IsGatherable(GameObject prefab) =>
         prefab != null && prefab.GetComponent<ResourceNode>() != null && prefab.GetComponent<ChoppableTree>() == null;
@@ -154,9 +160,18 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         copy.transform.localScale = new Vector3(painted.widthScale, painted.heightScale, painted.widthScale);
         var stand = new Stand { Node = copy.GetComponent<ResourceNode>(), Use = copy.GetComponent<Interactable>(), Renderers = copy.GetComponentsInChildren<Renderer>(true), Original = painted };
         SetDrawn(stand, false);
+        Vector3 at = positions[index];
         stand.Node.Swung += (_, __) => Draw(index, stand, true);
-        stand.Node.Harvested += () => Draw(index, stand, true);
-        stand.Node.Regrown += () => Draw(index, stand, false);
+        stand.Node.Harvested += () =>
+        {
+            Draw(index, stand, true);
+            NodeChanged?.Invoke(at);
+        };
+        stand.Node.Regrown += () =>
+        {
+            Draw(index, stand, false);
+            NodeChanged?.Invoke(at);
+        };
         stands[index] = stand;
     }
 

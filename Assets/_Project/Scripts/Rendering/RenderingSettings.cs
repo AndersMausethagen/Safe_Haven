@@ -84,10 +84,14 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField] private Vector2 reliefReach = new Vector2(1.5f, 30f);
     [Tooltip("Metres the light thrown back from sunlit ground spreads into the shade round it.")]
     [SerializeField, Range(1f, 16f)] private float bounceSpread = 6f;
-    [Tooltip("At dusk and night the field keeps the ground's average light as it was before it (under canopy and in hollows darker, " +
-             "open ground lighter), so nights never get darker on the whole; lifting by at most this much (1: no lift).")]
+    [Tooltip("At night and at a dim dawn or dusk the field keeps the ground's average light as it was before it (under canopy and " +
+             "in hollows darker, open ground lighter), so nights never get darker on the whole; lifting by at most this much (1: no lift).")]
     [SerializeField, Range(1f, 2f)] private float nightLiftMost = 1.5f;
-    [Tooltip("Seconds after a tree is felled before the cover over it is drawn again (the falling tree has landed).")]
+    [Tooltip("Degrees: a dawn or dusk whose sun is lower than this gets the whole night's lift, fading to none by the time the sun " +
+             "stands 15° up (the day-night profile's Daylight is full). Night always gets it all. How dark the hour is decides, not the clock.")]
+    [SerializeField, Range(0f, 15f)] private float liftBelowSun = 10.5f;
+    [Tooltip("Seconds after a tree is felled before its patch of cover is looked at again: drawn once the falling tree has come to " +
+             "rest (it is never drawn itself), at the latest 15 s after the cut.")]
     [SerializeField, Min(0f)] private float felledRedrawDelay = 6f;
 
     [Header("Characters")]
@@ -203,6 +207,7 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public Vector2 ReliefReach => reliefReach;
     public float BounceSpread => bounceSpread;
     public float NightLiftMost => nightLiftMost;
+    public float LiftBelowSun => liftBelowSun;
     public float FelledRedrawDelay => felledRedrawDelay;
     public float RimStrength => rimStrength;
     public float RimSharpness => rimSharpness;
