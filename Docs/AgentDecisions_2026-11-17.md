@@ -91,3 +91,15 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
 - **Two new Marsh set pieces from props made for it and never placed:** "Bog-Iron Bloomery" (the bloomery ruin with stacked peat:
   bog iron was the marsh's trade) and "The Black Pool Landing" (a hauled-up rowboat, a stretch of boardwalk and the Nøkk's fiddle
   left on it). Both hold rumours. *Not yet seen in a launched raid* (three seeds didn't pick them); generation tests pass.
+
+## Smoother player animation (you: "doing charge attacks in sequence is glitchy. it snaps in between states")
+- **Measured first:** a probe held and released charged attacks three times in a row and logged the arm, spine and hip turn per
+  frame with every animation layer's state. The jumps sat at three handovers whose blends were far too short: a new swing's blend in
+  (0.06 s), the planted heavy handing over to the whole body for its strike (0.07 s), and a full charge let go into the charged blow
+  (0.04 s). At a normal frame rate that is two to four frames between quite different poses.
+- **Changed:** those blends to 0.10, 0.12 and 0.12 s. They are only the look: when a blow lands is the combat code's, so damage and
+  cadence don't change, except that a charged blow released from a full hold now lands 0.12 s after the release (it waited for its
+  0.04 s blend before), so the blow never lands mid-blend. Combat tests pass.
+- **What's left:** the charged strike itself is fast by design. If it still feels like a snap in your hands, the next lever is the
+  charged clip's strike speed, or a separate speed parameter for the upper-body layer (one speed drives every swing state, so a held
+  charge at speed 0 can freeze a blow still blending out on another layer). *Please play a few charged chains and tell me.*

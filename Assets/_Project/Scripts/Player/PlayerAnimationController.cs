@@ -55,7 +55,10 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private static readonly int ParryStateHash = Animator.StringToHash("Parry");
     private static readonly int GuardBreakStateHash = Animator.StringToHash("Guard Break");
     private static readonly int KnockbackStateHash = Animator.StringToHash("Knockback");
-    private const float ActionFade = 0.06f;
+    // A swing's blend in from whatever came before. 0.06 s was two to four frames between very different poses, which snapped when
+    // swings followed each other (the user, 2026-11-17: "it snaps in between states and does not flow well"). Only the look: when a
+    // blow lands is PlayerCombat's.
+    private const float ActionFade = 0.1f;
     // A heavy swing grows out of the light one its press began, so that blend is long enough not to read as a restart.
     private const float HeavyFade = 0.16f;
     // A charged attack let go from the hold is already at the top of its backswing: a short blend, done before its blow.
@@ -66,7 +69,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private const float RushFade = 0.1f;
     // How long before it lands a planted heavy swing brings the legs in, and how fast.
     private const float PlantedStrikeLead = 0.12f;
-    private const float PlantedStrikeFade = 0.07f;
+    private const float PlantedStrikeFade = 0.12f;
     // Moving faster than this, a swing belongs on the arms only, so the legs can walk.
     private const float ArmsOnlySpeed = 0.5f;
     private const float WalkOutFade = 0.12f;

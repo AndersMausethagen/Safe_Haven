@@ -80,7 +80,8 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private const float LungeSeconds = 0.12f;
     /// <summary>The least time a charged attack let go from the hold (ChargedFromHold) takes to land: the animation's blend into it
     /// (PlayerAnimationController) is this long, so the blow never lands mid-blend.</summary>
-    internal const float ChargedReleaseSeconds = 0.04f;
+    /// (0.04 s snapped from the held heavy's pose to the charged one's backswing, 2026-11-17: now long enough to read as one motion.)
+    internal const float ChargedReleaseSeconds = 0.12f;
     // How close a lunge stops before the target's edge.
     private const float LungeStandOff = 0.8f;
 
