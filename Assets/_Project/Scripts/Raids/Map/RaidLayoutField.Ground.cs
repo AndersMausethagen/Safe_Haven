@@ -39,6 +39,12 @@ public sealed partial class RaidLayoutField
     /// </summary>
     public bool KeepsClear(Vector2 point)
     {
+        // Nothing grows or lies in a fen's open water (a drowned pine is a set piece's, not the scatter's).
+        if (rules.Fen.enabled && HeightAt(point.x / plan.Size, point.y / plan.Size) < FenWater + FenDryAbove)
+        {
+            return true;
+        }
+
         if (ravineEdge != null && Sample(ravineEdge, point.x / plan.Size, point.y / plan.Size) < KeepClearBeyond + RaidLayoutRavine.RagReach)
         {
             return true;
@@ -149,6 +155,12 @@ public sealed partial class RaidLayoutField
         float rim = Mathf.SmoothStep(0f, 1f, 1f - edge / rules.RimWidth) * rules.RimHeight;
         float level = levelHeight != null ? Sample(levelHeight, u, v) : 0f;
         float valley = valleyBeyond != null ? ValleyAt(x, y, u, v) : 0f;
+        if (rules.Fen.enabled)
+        {
+            // A fen turns the ridges over: the wild ground sinks under the water instead of rising (RaidLayoutField.Fen).
+            return ground + FenAt(x, y, open) + rough * FenRoughShare + rim + level + valley + lift;
+        }
+
         return ground + ridge + rough + rim + level + valley + lift;
     }
 

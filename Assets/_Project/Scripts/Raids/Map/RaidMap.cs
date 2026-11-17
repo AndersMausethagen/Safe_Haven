@@ -242,6 +242,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             times.Append($"content {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
+            RaidMapGenerator.PlaceFenWater(this, Layout, rules, field.FenWater, pondMeshes);
             RaidMapGenerator.PlaceRavines(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceRivers(this, Layout, rules, pondMeshes);
             RaidMapGenerator.PlaceBridges(this, Layout, rules);

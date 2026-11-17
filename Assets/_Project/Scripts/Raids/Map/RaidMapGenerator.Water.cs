@@ -45,6 +45,48 @@ public static partial class RaidMapGenerator
     /// Lays the plan's ponds on the map, in place of an earlier attempt's. Kept out of the map's Content, which is snapped to the
     /// ground. <paramref name="meshes"/> holds the meshes made, for whoever owns the map to destroy.
     /// </summary>
+    public const string FenWaterName = "Fen Water";
+
+    /// <summary>Metres the fen's water sheet reaches past the map's edge, so no gap shows at the rim.</summary>
+    private const float FenSheetBeyond = 20f;
+
+    /// <summary>
+    /// A fen map's water (RaidLayoutRules › Fen): one still sheet over the whole map at the fen's water level, so the sunken wild ground is
+    /// its pools and the trails, clearings, hummocks and strings stand out of it. One sheet, not hundreds of ponds: one draw call.
+    /// </summary>
+    public static void PlaceFenWater(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, float level, List<Mesh> meshes)
+    {
+        Transform old = map.transform.Find(FenWaterName);
+        if (old != null)
+        {
+            old.SetParent(null);
+            Object.Destroy(old.gameObject);
+        }
+
+        Material material = rules.Fen.water != null ? rules.Fen.water : rules.PondMaterial;
+        if (!rules.Fen.enabled || material == null)
+        {
+            return;
+        }
+
+        var water = new GameObject(FenWaterName);
+        water.transform.SetParent(map.transform, false);
+        water.transform.position = map.Terrain.transform.position + new Vector3(plan.Size * 0.5f, level, plan.Size * 0.5f);
+        float half = plan.Size * 0.5f + FenSheetBeyond;
+        var mesh = new Mesh { name = FenWaterName };
+        mesh.vertices = new[] { new Vector3(-half, 0f, -half), new Vector3(-half, 0f, half), new Vector3(half, 0f, half), new Vector3(half, 0f, -half) };
+        mesh.uv = new[] { new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(1f, 0f) };
+        mesh.triangles = new[] { 0, 1, 2, 0, 2, 3 };
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        meshes.Add(mesh);
+        water.AddComponent<MeshFilter>().sharedMesh = mesh;
+        var renderer = water.AddComponent<MeshRenderer>();
+        renderer.sharedMaterial = material;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        water.AddComponent<WaterSurface>().IsStill = true;
+    }
+
     public static void PlacePonds(RaidMap map, RaidLayoutPlan plan, RaidLayoutRules rules, List<Mesh> meshes)
     {
         Transform old = map.transform.Find(PondsName);

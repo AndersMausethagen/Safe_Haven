@@ -111,6 +111,10 @@ public sealed partial class RaidLayoutField
         }
 
         field.lift = LiftFor(plan, rules);
+        if (rules.Fen.enabled)
+        {
+            field.BuildFen();
+        }
         if (plan.Valley != null)
         {
             clock.Restart();

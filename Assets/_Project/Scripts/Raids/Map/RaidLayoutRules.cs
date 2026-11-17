@@ -33,6 +33,36 @@ public enum RaidLayoutShape
     Valley = 4,
 }
 
+/// <summary>
+/// A fen's ground (the Moss Marsh, Docs/NextRaidResearch_2026-11-17.md §11.3): the trails and clearings stand a little above one water
+/// level, the wild ground between them sinks under it, and hummocks and long peat strings (the Norwegian string bog) rise back out. One
+/// water sheet covers the map (RaidMapGenerator.PlaceFenWater), so its pools are the ground below it. Works with any shape.
+/// </summary>
+[Serializable]
+public sealed class RaidFenRule
+{
+    [Tooltip("On: the fen's ground, the wild ground sunk under one water level. Off: it rises in ridges between the trails, as in the Woods.")]
+    public bool enabled;
+    [Tooltip("Metres the trails and clearings stand above the water. Keep Hills smaller than this, or a trail dips under.")]
+    [Min(0.1f)] public float aboveWater = 0.6f;
+    [Tooltip("Metres the wild ground sinks below the water at its deepest.")]
+    [Min(0f)] public float sink = 1.2f;
+    [Tooltip("Metres from a trail's or clearing's edge to the fen's deepest: the bank down into the water.")]
+    [Min(0.5f)] public float sinkWidth = 7f;
+    [Tooltip("Share of the wild ground that stands above the water as hummocks, 0 to 1.")]
+    [Range(0f, 1f)] public float hummocks = 0.3f;
+    [Tooltip("Metres across a patch of hummocks.")]
+    [Min(1f)] public float hummockScale = 7f;
+    [Tooltip("Metres a hummock or a string stands above the water.")]
+    [Min(0f)] public float hummockHeight = 0.35f;
+    [Tooltip("How strongly long strings of firmer peat cross the fen, 0 (none) to 1.")]
+    [Range(0f, 1f)] public float strings = 0.6f;
+    [Tooltip("Metres between the strings.")]
+    [Min(4f)] public float stringSpacing = 16f;
+    [Tooltip("The fen's water. Empty: the rules' Pond Material.")]
+    public Material water;
+}
+
 /// <summary>How a Valley map is shaped (RaidLayoutShape.Valley): its floor, its walls and the river down its middle.</summary>
 [Serializable]
 public sealed class RaidValleyRule
@@ -376,6 +406,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Header("Valley (the Valley shape)")]
     [SerializeField] private RaidValleyRule valley = new RaidValleyRule();
 
+    [Header("Fen (any shape)")]
+    [SerializeField] private RaidFenRule fen = new RaidFenRule();
+
     [Header("Set Pieces")]
     [Tooltip("The authored places a run can have. Every rumour site that has room gets one, as do a few camps.")]
     [SerializeField] private List<RaidSetPieceDefinition> setPieces = new List<RaidSetPieceDefinition>();
@@ -437,6 +470,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     public IReadOnlyList<RaidSetPieceDefinition> SetPieces => setPieces;
     /// <summary>How a map of the Valley shape is laid out.</summary>
     public RaidValleyRule Valley => valley;
+    public RaidFenRule Fen => fen;
     public Vector2Int CampPieces => campPieces;
 
     public Vector2Int Rooms => rooms;
