@@ -407,7 +407,8 @@ public sealed class PrologueMeadowTests
         var raid = AssetDatabase.LoadAssetAtPath<DayNightProfile>("Assets/_Project/Data/Environment/Misty Woods Day Night.asset");
         var forest = AssetDatabase.LoadAssetAtPath<DayNightProfile>(Root + "Prologue Forest Night.asset");
         Assert.NotNull(forest);
-        Assert.AreEqual(1.6f, raid.Evaluate(23f).LightIntensity, 0.01f, "The raid's own night isn't touched.");
+        // The raids' moon was raised to a pale white light (the user, 2026-11-17: "not too dark... a pale, white light"), 1.6 -> 2.3.
+        Assert.AreEqual(2.3f, raid.Evaluate(23f).LightIntensity, 0.01f, "The raid's own night isn't touched by the prologue.");
         Assert.Greater(forest.Evaluate(23f).LightIntensity, raid.Evaluate(23f).LightIntensity);
         Assert.Greater(forest.Evaluate(23f).AmbientSky.b, raid.Evaluate(23f).AmbientSky.b);
         Assert.AreEqual(raid.Evaluate(11f).LightIntensity, forest.Evaluate(11f).LightIntensity, 0.01f, "Only the night changes.");

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TheHeartroot
   m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
   id: rumour.theheartroot
-  displayName: The Heartroot's Hollow
+  displayName: The Breathing Hollow
   weight: 0
   earliestSeconds: 30
   latestSecondsLeft: 60

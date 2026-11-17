@@ -29,7 +29,9 @@ MonoBehaviour:
     glow: {r: 0, g: 0, b: 0, a: 1}
     sound: {fileID: 11400000, guid: 7a7933cc7f7f0ad4aaf1e1190ea7248a, type: 2}
   rewardSkill: {fileID: 11400000, guid: 1ed16a27aed704c4fbcf6235fb0e823d, type: 2}
-  defeatLine: 'The Brukam goes down on the stones of his own bridge, and the valley goes quiet. What he knew of weight is yours now: you have learned Mountain Leap.'
+  defeatLine: 'The Brukam goes down on the stones of his own bridge, and the valley goes quiet. What he knew of weight is yours now: you have learned Mountain Leap. And the road beyond his bridge is open: the portal can reach the Moss Marsh.'
+  toppleLine: 
+  toppleGlow: {r: 0, g: 0, b: 0, a: 1}
   wakeRange: 22
   wakeSeconds: 3.2
   wakeSound: {fileID: 11400000, guid: 117e6f9038657034bbb7373e39bbd293, type: 2}

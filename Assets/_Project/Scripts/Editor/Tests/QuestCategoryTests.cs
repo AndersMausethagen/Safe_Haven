@@ -59,8 +59,9 @@ public sealed class QuestCategoryTests
     public void AtHome_OnlyTheStoryIsGold()
     {
         string[] gold = Quests.Where(q => q.Rank == QuestRank.MainStory && !q.Chain.StartsWith("Prologue")).Select(q => q.name).ToArray();
+        // The Breathing Hollow (2026-11-17): the find step on an expedition before the Heartroot's encounter opens.
         CollectionAssert.AreEquivalent(new[] { "Awakening", "FirstCamp", "RootboundStones", "AwakeningThePortal", "ThroughThePortal", "TheWeakeningWard",
-            "WhatBreathesUnderTheRoots", "TheRoadNorth" }, gold);
+            "TheBreathingHollow", "WhatBreathesUnderTheRoots", "TheRoadNorth" }, gold);
         Assert.AreEqual(11, Quests.Count(q => q.Rank == QuestRank.Rescue), "one rescue for each of the lost expedition");
         Assert.IsTrue(Quests.Where(q => q.Chain == "Hands at Home").All(q => q.Rank == QuestRank.Haven), "work at home is a Haven quest");
     }

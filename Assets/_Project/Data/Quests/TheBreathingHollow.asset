@@ -56,12 +56,12 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
-  closedBy: {fileID: 0}
+  closedBy: {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
   startDelay: 0
   startsInAFight: 0
   startsWithoutWaiting: 0
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 10
     description: Find the breathing hollow in the Misty Woods
@@ -77,6 +77,30 @@ MonoBehaviour:
     questEvent: {fileID: 0}
     person: {fileID: 0}
     target: {fileID: 11400000, guid: 34a2ee3aa4a635f4e9b6e0671013fd4f, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 5
+    description: Get home alive with the way
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
     job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1

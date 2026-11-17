@@ -103,6 +103,37 @@ public sealed class HomeStoryTests
         Assert.AreEqual(QuestRank.Rescue, Quest("AStrangerInTheMist").Rank);
     }
 
+    // The Heartroot left the Woods' expeditions (2026-11-17, Docs/HeartrootEncounterDesign_2026-11-17.md): an expedition finds
+    // its hollow and brings the way home, then What Breathes opens the encounter. A Reach Place counts on entering the zone, so
+    // the coming home is its own step. A save already on or past What Breathes never gets the find step.
+    [Test]
+    public void TheBreathingHollow_IsFoundOnAnExpedition_AndBroughtHome()
+    {
+        QuestDefinition find = Quest("TheBreathingHollow"), wake = Quest("WhatBreathesUnderTheRoots");
+        Assert.AreEqual(QuestRank.MainStory, find.Rank);
+        CollectionAssert.AreEquivalent(new[] { Quest("TheWeakeningWard"), Quest("BringBjarneHome") }, find.Prerequisites);
+        CollectionAssert.AreEqual(new[] { find }, wake.Prerequisites);
+        CollectionAssert.AreEqual(new[] { ObjectiveType.ReachPlace, ObjectiveType.CompleteRaids }, find.Objectives.Select(o => o.Type).ToArray());
+        Assert.IsTrue(find.ObjectivesInOrder, "the way counts once it is brought home");
+        Assert.IsTrue(find.Objectives[0].CountAlreadyOwned, "a find made before the quest counts");
+
+        var woods = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        Assert.AreEqual(1, find.Objectives[1].Progress(new GameEvent(GameEventKind.RaidFinished, woods, 1, null, RaidOutcome.Extracted, 600f)));
+        Assert.AreEqual(0, find.Objectives[1].Progress(new GameEvent(GameEventKind.RaidFinished, woods, 1, null, RaidOutcome.Died, 600f)),
+            "falling out there brings nothing home");
+
+        var hollow = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/GuardiansHollow.asset");
+        Assert.AreEqual(wake, hollow.Encounter.OpensWhen.Quest);
+        Assert.AreEqual(QuestGate.Requirement.Started, hollow.Encounter.OpensWhen.Requirement);
+        Assert.AreNotEqual(woods.FirstVisitCinematic, hollow.FirstVisitCinematic, "the Woods' first-raid film is not the hollow's");
+
+        var log = new QuestLog();
+        foreach (QuestDefinition before in find.Prerequisites) log.Restore(before, QuestStatus.Completed, new int[before.Objectives.Count]);
+        log.Restore(wake, QuestStatus.Active, new int[wake.Objectives.Count]);
+        Assert.IsFalse(log.TryStart(find), "a save already on What Breathes");
+        Assert.IsTrue(hollow.Encounter.IsOpenBy(log), "and its encounter is open");
+    }
+
     // What used to stand before the portal is optional now, beside the story.
     [Test]
     public void TheFirstDays_AreHavenQuests_BesideTheStory()

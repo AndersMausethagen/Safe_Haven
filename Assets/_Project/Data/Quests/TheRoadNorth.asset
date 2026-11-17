@@ -16,7 +16,10 @@ MonoBehaviour:
   displayName: The Road North
   description: The Heartroot is still, and the roots have gone quiet. The portal has something to tell you about what you brought down, and about what lies north of it.
   chain: The Hearth and the Door
-  journalNotes: 'Whatever the portal says, the road north to Troll Valley is open now: choose it in the raid planner.'
+  journalNotes: 'Whatever the portal says, the road north to Troll Valley is open now: choose it in the raid planner.
+
+
+    Brukam''s Bridge, past the valley''s head, is in the planner too. The Moss Marsh lies beyond it, and nobody crosses while the Brukam sits there.'
   rank: 0
   availableObjective: 
   announceStart: 1
@@ -48,8 +51,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 4
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -73,11 +82,18 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

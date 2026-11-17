@@ -45,19 +45,23 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 4.86
     priority: 20
+    opener: 0
     weight: 1
     whenFoe: 8
     heavy: 0
     cooldown: 2.2
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -98,19 +102,23 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 4.05
     priority: 15
+    opener: 0
     weight: 0.5
     whenFoe: 1
     heavy: 1
     cooldown: 9
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -151,19 +159,23 @@ MonoBehaviour:
     minimumRange: 5
     maximumRange: 22
     priority: 12
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 7
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 1
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -204,19 +216,23 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 30
     priority: 30
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 20
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 11400000, guid: c1175525f1b0594498d28bca626a3c49, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 2
+    untilPhase: 0
     belowHealth: 0.5
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
@@ -285,6 +301,12 @@ MonoBehaviour:
   arrowDodge: 0
   poise: 220
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 0
   parriesBackstabs: 0
   shieldArc: 0
@@ -308,7 +330,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: d876a9f34a566ff40b4ff5198ece3363, type: 3}
   journalLore: 'Every bridge in the valley had a troll under it once, the old songs say, and the trolls paid tribute to the biggest of them: the Brukam, who sits on the old stone bridge at the head of the valley and counts what crosses. He swings a pine trunk for a club and throws the bridge''s own stones.'
   journalAdvice: 'Keep off the line of his sweep and out from under the club when it rises: the slam shakes the ground around it. When he tears a stone from the bridge, get behind cover or keep moving. He tires after a slam; that is the moment. Blunt weapons crack him, blades skid.'
-  journalHabitat: The old stone bridge at the head of Troll Valley
+  journalHabitat: His own bridge over the gorge, past the head of Troll Valley
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a540cb0eee3423e41a5a77294fb8408a, type: 2}
   hurtSound: {fileID: 11400000, guid: 76d36c0978eeaf04592af855858824db, type: 2}

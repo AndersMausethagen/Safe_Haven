@@ -48,7 +48,7 @@ MonoBehaviour:
     - The great stones of the valley were trolls once, caught by the dawn. Not all of them are sleeping.
     - Trolls see poorly but hear well. A quiet step gets you past most of them.
     - A troll's blow breaks bones. Parry it and it staggers, which is when it is worth hitting.
-    - Something walks the valley's head that is bigger than any troll. Best not wake it.
+    - Past the valley's head the Brukam sits on his own bridge. Go to him ready, or not at all.
     - An exit has to be lit, then held. Light one with time to spare.
   - scene: SafeHaven
     art: {fileID: 21300000, guid: d2b678a6222f9854aaff042948eef105, type: 3}

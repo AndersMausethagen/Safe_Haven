@@ -1080,7 +1080,7 @@ MonoBehaviour:
   shadeVariation: 0
   portrait: {fileID: 21300000, guid: 1f56c95d2bef296448cb6503a55551f3, type: 3}
   journalLore: The first of the guardians, grown old and vast under its hollow. It was set here to keep the forest. Nobody has told it the forest is gone.
-  journalAdvice: 'It wakes slowly, and the fight changes as it goes on: it learns new things at each stage. Roots rise at its call, so don''t stand still, and bring food. What it gives when it falls is knowledge, and you keep that even if you die on the way home.'
+  journalAdvice: 'It wakes slowly, and the fight changes as it goes on: it learns new things at each stage. Parries and heavy blows shake its footing, and enough of them floor it: get behind it then, where its heart lies open. Roots rise at its call, so don''t stand still. Its black sap rots the blood: bring an Antidote, and food. What it gives when it falls is knowledge, and you keep that even if you die on the way home.'
   journalHabitat: Under its hollow, at the heart of the Misty Woods
   journalKillsToKnow: 1
   deathSound: {fileID: 11400000, guid: c1b20528b0c96cd42914b3230c77041e, type: 2}
