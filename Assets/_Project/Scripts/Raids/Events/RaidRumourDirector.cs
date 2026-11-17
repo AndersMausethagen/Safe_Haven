@@ -13,7 +13,9 @@ public sealed class RaidRumourDirector : MonoBehaviour
 {
     private const float FarFrom = 60f;
     private const float FarTo = 130f;
-    private const float BeaconShowsWithin = 40f;
+
+    /// <summary>Metres within which a rumour's beacon shows and its site counts as found; a standing site's too (RaidEventDirector.Stand).</summary>
+    public const float BeaconShowsWithin = 40f;
 
     private RaidDirector director;
     private RaidEventDirector events;

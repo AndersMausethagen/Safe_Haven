@@ -2,13 +2,31 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Finding places in a running raid: on the ground, walkable, out of the player's sight and with a way to the player.
-/// Shared by what appears during a raid (RoamingSpawner, RaidEventDirector).
+/// Finding places in a running raid: on the ground, walkable, out of the water, out of the player's sight and with a way to the
+/// player. Shared by what appears during a raid (RoamingSpawner, RaidEventDirector, SpawnCreaturesOutcome).
 /// </summary>
 public static class RaidSpots
 {
     private const float GroundProbeHeight = 60f;
     private const float NavMeshSnap = 4f;
+
+    /// <summary>Metres of water over the ground that still count as dry enough to put something there: a puddle, a fen's wet edge.</summary>
+    public const float DeepestWading = 0.3f;
+
+    // The water is looked for from this far above the ground, and as far again above that: a surface only counts what lies within its
+    // own Depth below it (2 m), and a fen's pools and the valley's river run deeper. On a bridge's deck the water lies below: dry.
+    private const float WaterProbeLift = 2f;
+
+    /// <summary>
+    /// False when the ground at <paramref name="point"/> lies under more than <see cref="DeepestWading"/> of open water. The Moss
+    /// Marsh's water is one sheet with no collider and the valley's river has none either: the NavMesh runs on the sunken ground
+    /// beneath them, so sites and creatures were put in the pools (review 2026-11-17, R5). Cheap (a lookup over the water surfaces):
+    /// for spawning, not for every frame. Frozen water is ground.
+    /// </summary>
+    public static bool IsDryEnough(Vector3 point)
+    {
+        return !WaterSurface.TryFind(point + Vector3.up * WaterProbeLift, WaterProbeLift * 2f, out float surface) || surface - point.y <= DeepestWading;
+    }
 
     private static readonly RaycastHit[] SightHits = new RaycastHit[16];
 
@@ -64,8 +82,8 @@ public static class RaidSpots
     }
 
     /// <summary>
-    /// A walkable spot between the two distances from <paramref name="from"/>, out of sight and with a complete path back
-    /// to it. False when none turned up in <paramref name="attempts"/> tries.
+    /// A walkable spot between the two distances from <paramref name="from"/>, out of the water (<see cref="IsDryEnough"/>), out of
+    /// sight and with a complete path back to it. False when none turned up in <paramref name="attempts"/> tries.
     /// </summary>
     public static bool TryFindSpot(Vector3 from, float minDistance, float maxDistance, System.Random random, NavMeshPath path, out Vector3 spot, int attempts = 16)
     {
@@ -87,7 +105,7 @@ public static class RaidSpots
 
             Vector3 flat = hit.position - from;
             flat.y = 0f;
-            if (flat.magnitude < minDistance || IsVisible(hit.position)
+            if (flat.magnitude < minDistance || !IsDryEnough(hit.position) || IsVisible(hit.position)
                 || !NavMesh.CalculatePath(hit.position, start.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
             {
                 continue;

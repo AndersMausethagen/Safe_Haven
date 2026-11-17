@@ -66,6 +66,7 @@ public sealed class SaveSlotInfo
         return slot == SaveStorage.DefaultSlot ? "Journey 1" : slot.Replace('_', ' ');
     }
 
+    /// <summary>What a save calls the scene it was made in. A new raid's scene needs a line here (SaveTests checks every raid's).</summary>
     public static string PlaceName(string scene)
     {
         switch (scene)
@@ -78,6 +79,10 @@ public sealed class SaveSlotInfo
                 return "Misty Woods";
             case "Raid_TrollValley":
                 return "Troll Valley";
+            case "Raid_MossMarsh":
+                return "Moss Marsh";
+            case "Encounter_BrukamsBridge":
+                return "Brukam's Bridge";
             default:
                 return string.IsNullOrEmpty(scene) ? "Unknown place" : scene;
         }

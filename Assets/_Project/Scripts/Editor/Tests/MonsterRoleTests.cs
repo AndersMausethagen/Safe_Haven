@@ -53,4 +53,22 @@ public sealed class MonsterRoleTests
             Assert.AreSame(monster.CombatStats, used, $"{monster.name}'s prefab fights with {(used != null ? used.name : "nothing")}");
         }
     }
+
+    [Test]
+    public void NoTwoMonsters_ShareAStatsAsset()
+    {
+        // Review 2026-11-17 (R9): the Tusse fought with the Small Moss Troll's stats, so a retune of one changed the other.
+        var owners = new System.Collections.Generic.Dictionary<Object, string>();
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets("t:MonsterDefinition"))
+        {
+            var monster = UnityEditor.AssetDatabase.LoadAssetAtPath<MonsterDefinition>(UnityEditor.AssetDatabase.GUIDToAssetPath(guid));
+            if (monster.CombatStats == null)
+            {
+                continue;
+            }
+
+            Assert.IsFalse(owners.TryGetValue(monster.CombatStats, out string other), $"{monster.name} and {other} share {monster.CombatStats.name}");
+            owners[monster.CombatStats] = monster.name;
+        }
+    }
 }

@@ -6,7 +6,8 @@ using UnityEngine;
 /// <summary>
 /// The fen's ground (RaidLayoutRules › Fen, the Moss Marsh), on plans and height fields only: every clearing and trail stands above the
 /// one water level, a good share of the wild ground lies under it, hummocks and strings rise back out of it, and the same seed gives the
-/// same fen. Run on a copy of the Woods' rules with the fen turned on; the Woods' own maps are pinned by RaidLayoutGoldenTests.
+/// same fen. Run on a copy of the Woods' rules with the fen turned on; the Woods' own maps are pinned by RaidLayoutGoldenTests. Also
+/// that what appears during a raid keeps out of the water (RaidSpots.IsDryEnough, on a stand-in water sheet).
 /// </summary>
 public sealed class RaidFenTests
 {
@@ -98,6 +99,31 @@ public sealed class RaidFenTests
             Assert.Greater(share, 0.12f, $"seed {seed}: only {share:P0} of the fen is water (the Woods' rules: many trails, little wild ground)");
             Assert.Less(share, 0.85f, $"seed {seed}: {share:P0} of the fen is water: nowhere to stand");
             Assert.Greater(above, all / 20, $"seed {seed}: no hummocks or strings above the water away from the clearings");
+        }
+    }
+
+    [Test]
+    public void WhatAppearsDuringARaid_KeepsOutOfTheWater()
+    {
+        // The fen's sheet has no collider and the NavMesh runs on the sunken ground under it (review 2026-11-17, R5): event sites, roamers
+        // and event creatures ask RaidSpots.IsDryEnough. A stand-in sheet far from anything in the open scene, its top at 1.1 m.
+        GameObject water = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        try
+        {
+            water.transform.position = new Vector3(10000f, 1f, 10000f);
+            water.transform.localScale = new Vector3(20f, 0.2f, 20f);
+            WaterSurface surface = water.AddComponent<WaterSurface>();
+            Assert.IsTrue(RaidSpots.IsDryEnough(new Vector3(10000f, 1f, 10000f)), "a hand's depth: a wet edge, still ground");
+            Assert.IsFalse(RaidSpots.IsDryEnough(new Vector3(10000f, 0.5f, 10000f)), "0.6 m under");
+            Assert.IsFalse(RaidSpots.IsDryEnough(new Vector3(10003f, -2.5f, 9996f)), "deeper than the surface's own Depth");
+            Assert.IsTrue(RaidSpots.IsDryEnough(new Vector3(10000f, 1.6f, 10000f)), "above it, on a bridge's deck");
+            Assert.IsTrue(RaidSpots.IsDryEnough(new Vector3(10030f, 0f, 10000f)), "beside it");
+            surface.SetFrozen(true);
+            Assert.IsTrue(RaidSpots.IsDryEnough(new Vector3(10000f, 0.5f, 10000f)), "ice is ground");
+        }
+        finally
+        {
+            Object.DestroyImmediate(water);
         }
     }
 

@@ -4,8 +4,8 @@ using UnityEngine.AI;
 
 /// <summary>
 /// Adds roaming creatures around the player while a raid runs, on top of the seeded camps (the raid's Roaming Spawns system, RoamingSpawnsSystem).
-/// Each appears out of sight, between the near and far distance from the player, away from other creatures and only
-/// where it can walk to the player, then wanders to a spot near them and looks around. How many may be out at once
+/// Each appears out of sight, between the near and far distance from the player, out of the water, away from other creatures and
+/// only where it can walk to the player, then wanders to a spot near them and looks around. How many may be out at once
 /// grows with the danger stage and with extraction alarms; a raid has a total budget so roamers can't be farmed.
 /// Roamers that lose the player (idle and far away, out of sight) are removed and refunded to the budget, so the
 /// pressure follows the player instead of piling up where they no longer are. Pauses while the raid has as many creatures
@@ -228,7 +228,7 @@ public sealed class RoamingSpawner : MonoBehaviour
             }
 
             Vector3 point = hit.position;
-            if (Flat(point - player) < settings.MinDistance || RaidSpots.IsVisible(point) || NearCreature(point, settings.CampClearance)
+            if (Flat(point - player) < settings.MinDistance || !RaidSpots.IsDryEnough(point) || RaidSpots.IsVisible(point) || NearCreature(point, settings.CampClearance)
                 || !NavMesh.CalculatePath(point, playerHit.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
             {
                 continue;

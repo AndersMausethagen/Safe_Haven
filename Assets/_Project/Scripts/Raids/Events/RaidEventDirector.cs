@@ -6,6 +6,12 @@ using UnityEngine.AI;
 /// Makes things happen during a raid: when the time comes it picks an event from the raid's pool (RaidEventPicker), puts
 /// its site somewhere out of sight, warns the player and carries out what it does at once. Choices are made at the site
 /// (RaidEventSite). Reports each event for the playtest log and the raid summary. Installed by RaidEventsSystem.
+/// <para>
+/// Three kinds of site: the raid's own events (<see cref="OpenSites"/>), the briefing's rumours (<see cref="PinnedSites"/>, placed
+/// by RaidRumourDirector) and sites that stand where the map put them (<see cref="StandingSites"/>: a valley's bridge tolls). A
+/// standing site is part of the place, not news: it waits quietly, its beacon hidden like a rumour's, and its event begins (the
+/// warning, its sound, the raid's log) only when the player first comes upon it (review 2026-11-17, R1).
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class RaidEventDirector : MonoBehaviour
@@ -14,6 +20,10 @@ public sealed class RaidEventDirector : MonoBehaviour
 
     private readonly List<RaidEventSite> open = new List<RaidEventSite>();
     private readonly List<RaidEventSite> pinned = new List<RaidEventSite>();
+    private readonly List<RaidEventSite> standing = new List<RaidEventSite>();
+    // Standing sites the player hasn't come upon yet, with what their events need once they do.
+    private readonly List<(RaidEventSite site, RaidEventDefinition definition, RaidEventContext context)> unmet =
+        new List<(RaidEventSite, RaidEventDefinition, RaidEventContext)>();
     private readonly HashSet<RaidEventDefinition> used = new HashSet<RaidEventDefinition>();
     private RaidEventSettings settings;
     private RaidDirector director;
@@ -31,6 +41,12 @@ public sealed class RaidEventDirector : MonoBehaviour
     /// <summary>The rumours' sites, for the HUD: they wait all raid and don't count against the raid's events.</summary>
     public IReadOnlyList<RaidEventSite> PinnedSites => pinned;
 
+    /// <summary>
+    /// Sites that stand all raid where the map put them (a valley's bridge tolls), for the HUD: not rumours, so neither counted nor
+    /// marked as one. A map shows one once the player has come upon it (<see cref="RaidEventSite.IsFoundFrom"/>).
+    /// </summary>
+    public IReadOnlyList<RaidEventSite> StandingSites => standing;
+
     /// <summary>How many events have begun this raid.</summary>
     public int Happened => used.Count;
 
@@ -44,12 +60,18 @@ public sealed class RaidEventDirector : MonoBehaviour
 
     private void Update()
     {
-        if (settings == null || !director.IsRunning || director.Player == null || Time.time < nextThink)
+        if (!director.IsRunning || director.Player == null || Time.time < nextThink)
         {
             return;
         }
 
         nextThink = Time.time + ThinkInterval;
+        MeetStanding(director.Player.transform.position);
+        if (settings == null)
+        {
+            return;
+        }
+
         RaidSession session = director.Session;
         random ??= new System.Random(session.Seed ^ 0x52414944);
         if (nextEventAt < 0f)
@@ -112,32 +134,94 @@ public sealed class RaidEventDirector : MonoBehaviour
         Place(definition, position, pinned);
     }
 
+    /// <summary>
+    /// Stands an event's site where the map put it, facing <paramref name="facing"/>, for the whole raid: a valley's bridge toll
+    /// (RaidBridgeToll). Quietly: no warning, sound or log line now, not a rumour, and its beacon is hidden beyond a rumour's
+    /// distance (<see cref="RaidRumourDirector.BeaconShowsWithin"/>). Its event begins when the player first comes that close.
+    /// </summary>
+    public void Stand(RaidEventDefinition definition, Vector3 position, Quaternion facing)
+    {
+        random ??= new System.Random(director.Session.Seed ^ 0x52414944);
+        if (definition.SitePrefab == null)
+        {
+            Debug.LogError($"{definition.DisplayName}: a standing event needs a site prefab to stand there.", definition);
+            return;
+        }
+
+        used.Add(definition);
+        RaidEventContext context = ContextAt(position);
+        RaidEventSite site = Spawn(definition, context, facing);
+        if (site == null)
+        {
+            return;
+        }
+
+        site.HideBeaconBeyond(RaidRumourDirector.BeaconShowsWithin);
+        standing.Add(site);
+        unmet.Add((site, definition, context));
+    }
+
+    // A standing site's event begins once the player comes upon it: within its hidden beacon's distance. One already done when next
+    // looked at (a choice made between two looks) has its choice in the log already, so it is let go without a word.
+    private void MeetStanding(Vector3 player)
+    {
+        for (int i = unmet.Count - 1; i >= 0; i--)
+        {
+            (RaidEventSite site, RaidEventDefinition definition, RaidEventContext context) = unmet[i];
+            if (site == null || site.IsResolved)
+            {
+                unmet.RemoveAt(i);
+            }
+            else if (site.IsFoundFrom(player))
+            {
+                unmet.RemoveAt(i);
+                Announce(definition, context);
+            }
+        }
+    }
+
     private void Place(RaidEventDefinition definition, Vector3 position, List<RaidEventSite> sites)
     {
-        var context = new RaidEventContext
-        {
-            Session = director.Session,
-            Director = director,
-            Player = director.Player,
-            Position = position,
-            Random = random,
-        };
-
+        RaidEventContext context = ContextAt(position);
         used.Add(definition);
         if (definition.SitePrefab != null)
         {
-            GameObject placed = Instantiate(definition.SitePrefab, position, Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f), Container());
-            if (placed.TryGetComponent(out RaidEventSite site))
+            RaidEventSite site = Spawn(definition, context, Quaternion.Euler(0f, (float)random.NextDouble() * 360f, 0f));
+            if (site != null)
             {
-                site.Bind(definition, context);
                 sites.Add(site);
-            }
-            else
-            {
-                Debug.LogError($"{definition.DisplayName}: its site prefab has no RaidEventSite.", placed);
             }
         }
 
+        Announce(definition, context);
+    }
+
+    private RaidEventContext ContextAt(Vector3 position) => new RaidEventContext
+    {
+        Session = director.Session,
+        Director = director,
+        Player = director.Player,
+        Position = position,
+        Random = random,
+    };
+
+    // The event's site, bound to it; null (with an error) when its prefab has no RaidEventSite.
+    private RaidEventSite Spawn(RaidEventDefinition definition, RaidEventContext context, Quaternion facing)
+    {
+        GameObject placed = Instantiate(definition.SitePrefab, context.Position, facing, Container());
+        if (!placed.TryGetComponent(out RaidEventSite site))
+        {
+            Debug.LogError($"{definition.DisplayName}: its site prefab has no RaidEventSite.", placed);
+            return null;
+        }
+
+        site.Bind(definition, context);
+        return site;
+    }
+
+    // The event begins: what it does at once, its warning and sound, and its line in the raid's log and the game's events.
+    private void Announce(RaidEventDefinition definition, RaidEventContext context)
+    {
         foreach (RaidEventOutcome outcome in definition.OnStart)
         {
             outcome?.Apply(context);
@@ -150,7 +234,7 @@ public sealed class RaidEventDirector : MonoBehaviour
 
         if (definition.WarningSound != null)
         {
-            AudioManager.Play(definition.WarningSound, position);
+            AudioManager.Play(definition.WarningSound, context.Position);
         }
 
         director.Session.RecordEvent(definition.DisplayName);

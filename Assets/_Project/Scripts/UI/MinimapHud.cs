@@ -421,6 +421,15 @@ public sealed class MinimapHud : MonoBehaviour
                 Add(site.transform, style.EventMark, style.Text, 16f, pinned: true);
             }
         }
+
+        // A standing site (a bridge's toll) is part of the place, not a rumour: marked once the player has come upon it.
+        foreach (RaidEventSite site in events.StandingSites)
+        {
+            if (site != null && !site.IsResolved && site.IsFoundFrom(from))
+            {
+                Add(site.transform, style.EventMark, style.Text, 16f, pinned: true);
+            }
+        }
     }
 
     private static bool Found(Vector3 position, ExplorationMap explored) => explored == null || explored.ExploredAt(position) >= 0.5f;

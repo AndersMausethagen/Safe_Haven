@@ -164,7 +164,7 @@ public sealed class ApplyStatusOutcome : RaidEventOutcome
     }
 }
 
-/// <summary>Creatures appear around the event's place, with the raid's strength, hunting the player if it says so.</summary>
+/// <summary>Creatures appear around the event's place, on dry ground, with the raid's strength, hunting the player if it says so.</summary>
 [Serializable]
 public sealed class SpawnCreaturesOutcome : RaidEventOutcome
 {
@@ -186,9 +186,7 @@ public sealed class SpawnCreaturesOutcome : RaidEventOutcome
 
         for (int i = 0; i < count; i++)
         {
-            float angle = (float)context.Random.NextDouble() * Mathf.PI * 2f;
-            Vector3 point = context.Position + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
-            if (!NavMesh.SamplePosition(RaidSpots.Grounded(point), out NavMeshHit hit, 6f, NavMesh.AllAreas))
+            if (!TryFindGround(context, out Vector3 ground))
             {
                 continue;
             }
@@ -198,16 +196,37 @@ public sealed class SpawnCreaturesOutcome : RaidEventOutcome
             // Co-op, on the host's run: the host's game makes them, after this player.
             if (CreatureSource.Remote != null)
             {
-                CreatureSource.Remote.Spawn(prefab, hit.position, yaw, hunt);
+                CreatureSource.Remote.Spawn(prefab, ground, yaw, hunt);
                 continue;
             }
 
-            GameObject root = Object.Instantiate(prefab, hit.position, Quaternion.Euler(0f, yaw, 0f));
+            GameObject root = Object.Instantiate(prefab, ground, Quaternion.Euler(0f, yaw, 0f));
             if (context.Director != null)
             {
                 context.Director.Creatures.Prepare(root, hunt);
             }
         }
+    }
+
+    // Tries a few places round the site for one creature: walkable and out of the water (RaidSpots.IsDryEnough). A site beside water
+    // (a bridge's toll by the river, a wagon on the fen) still raises its creatures from the dry side instead of losing them.
+    private const int GroundTries = 4;
+
+    private bool TryFindGround(RaidEventContext context, out Vector3 ground)
+    {
+        for (int attempt = 0; attempt < GroundTries; attempt++)
+        {
+            float angle = (float)context.Random.NextDouble() * Mathf.PI * 2f;
+            Vector3 point = context.Position + new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius;
+            if (NavMesh.SamplePosition(RaidSpots.Grounded(point), out NavMeshHit hit, 6f, NavMesh.AllAreas) && RaidSpots.IsDryEnough(hit.position))
+            {
+                ground = hit.position;
+                return true;
+            }
+        }
+
+        ground = default;
+        return false;
     }
 }
 

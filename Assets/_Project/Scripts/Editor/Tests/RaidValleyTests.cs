@@ -210,6 +210,43 @@ public sealed class RaidValleyTests
     }
 
     [Test]
+    public void EveryToll_SitsOnTheBankTheWayUpComesFrom()
+    {
+        // The valley's bend chose the bank (review 2026-11-17, R4): on some stretches the player crossed the whole bridge before the toll.
+        // Walking the short way from the start to the main way out, each toll bridge on it is met on the bank the walk comes from.
+        int met = 0;
+        foreach ((int seed, RaidLayoutPlan plan) in Plans())
+        {
+            List<int> way = plan.MainExit >= 0 ? RaidLayoutPlanner.ShortestPath(plan, 0, plan.MainExit, null) : null;
+            if (way == null)
+            {
+                continue;
+            }
+
+            int room = 0;
+            foreach (int link in way)
+            {
+                (int a, int b) = plan.Links[link];
+                int next = a == room ? b : a;
+                RaidLayoutCrossing bridge = plan.Crossings.Find(c => c.Bridge && c.Trail == link);
+                if (bridge != null)
+                {
+                    met++;
+                    Assert.AreEqual(room, RaidLayoutPlanner.ArrivalRoom(plan, bridge), $"seed {seed}: the walk comes to the bridge from clearing {room}");
+                    Vector2 toll = RaidMapGenerator.TollSpot(plan, bridge, 6f);
+                    Assert.AreEqual(plan.Valley.BankOf(plan.Rooms[room].Position), plan.Valley.BankOf(toll), $"seed {seed}: the toll waits on the near bank");
+                    Assert.AreNotEqual(plan.Valley.BankOf(plan.Rooms[next].Position), plan.Valley.BankOf(toll), $"seed {seed}: not across the river");
+                    Assert.AreEqual(6f + 2.5f, Vector2.Distance(toll, bridge.Position), 0.01f, $"seed {seed}: just past the bridge's end");
+                }
+
+                room = next;
+            }
+        }
+
+        Assert.Greater(met, 0, "some short way crosses a toll bridge");
+    }
+
+    [Test]
     public void TheSameSeed_MakesTheSameValley()
     {
         foreach (int seed in new[] { 3, 9 })

@@ -303,6 +303,47 @@ public static partial class RaidLayoutPlanner
         return AwayFromWater(plan, kept, bank, ValleyRiverBank);
     }
 
+    /// <summary>
+    /// The clearing a raid comes to a crossing from: of the two its trail joins, the shorter walk from the start along the trails (the
+    /// way up the valley), so that end of the crossing is the one met first. If both are as far, the one nearer the valley's mouth.
+    /// </summary>
+    public static int ArrivalRoom(RaidLayoutPlan plan, RaidLayoutCrossing crossing)
+    {
+        (int a, int b) = plan.Links[crossing.Trail];
+        // The start is the first clearing (RaidLayoutPlan.Start).
+        float toA = WalkBetween(plan, 0, a);
+        float toB = WalkBetween(plan, 0, b);
+        if (!Mathf.Approximately(toA, toB))
+        {
+            return toA < toB ? a : b;
+        }
+
+        return plan.Valley == null || plan.Valley.ShareOf(plan.Rooms[a].Position) <= plan.Valley.ShareOf(plan.Rooms[b].Position) ? a : b;
+    }
+
+    // Metres of trail on the shortest walk between two clearings; float.MaxValue when no trail leads there.
+    private static float WalkBetween(RaidLayoutPlan plan, int from, int to)
+    {
+        if (from == to)
+        {
+            return 0f;
+        }
+
+        List<int> links = ShortestPath(plan, from, to, null);
+        if (links == null)
+        {
+            return float.MaxValue;
+        }
+
+        float metres = 0f;
+        foreach (int link in links)
+        {
+            metres += Length(plan.Trails[link]);
+        }
+
+        return metres;
+    }
+
     // The short way's crossings get the bridges first (a guard stands on each: the quick way is the watched one), then any, never two
     // close together.
     private static void ChooseBridges(RaidLayoutPlan plan, RaidValleyRule rule, int attempt)

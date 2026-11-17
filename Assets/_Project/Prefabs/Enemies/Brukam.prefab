@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Combatant
   faction: 1
-  baseStats: {fileID: 11400000, guid: 0e03193915b462647889a59f9058a8e7, type: 2}
+  baseStats: {fileID: 11400000, guid: 8a3d73a3cf630d34092297ad7b54dd65, type: 2}
   rules: {fileID: 0}
   priorityTarget: 0
 --- !u!114 &5779955224618096036

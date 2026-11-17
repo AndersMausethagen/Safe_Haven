@@ -75,7 +75,7 @@ public static partial class RaidMapGenerator
             }
             else if (rule.bridgeToll != null)
             {
-                AskToll(bridge, rule.bridgeToll, plan.Valley, terrain, origin, crossing, half);
+                AskToll(bridge, rule.bridgeToll, plan, terrain, origin, crossing, half);
             }
         }
     }
@@ -83,16 +83,35 @@ public static partial class RaidMapGenerator
     /// <summary>Metres past the end of a bridge where its toll-taker sits, on the bank.</summary>
     private const float TollFromBridge = 2.5f;
 
-    // The toll is asked at the end nearer the valley's mouth: the way a raid comes up the valley.
-    private static void AskToll(GameObject bridge, RaidEventDefinition toll, RaidLayoutValley valley, Terrain terrain, Vector3 origin, RaidLayoutCrossing crossing, float half)
+    // The toll is asked at the end a raid comes to first along the trails, its back to the bridge, watching the player come.
+    private static void AskToll(GameObject bridge, RaidEventDefinition toll, RaidLayoutPlan plan, Terrain terrain, Vector3 origin, RaidLayoutCrossing crossing, float half)
     {
-        Vector2 side = crossing.Direction * (half + TollFromBridge);
-        Vector2 a = crossing.Position + side, b = crossing.Position - side;
-        Vector2 near = valley.ShareOf(a) <= valley.ShareOf(b) ? a : b;
+        Vector2 near = TollSpot(plan, crossing, half);
+        Vector2 toComer = (near - crossing.Position).normalized;
         var spot = new GameObject("Toll");
         spot.transform.SetParent(bridge.transform, true);
-        spot.transform.position = RaidMapSurface.Ground(terrain, origin + new Vector3(near.x, 0f, near.y));
+        spot.transform.SetPositionAndRotation(RaidMapSurface.Ground(terrain, origin + new Vector3(near.x, 0f, near.y)),
+            Quaternion.LookRotation(new Vector3(toComer.x, 0f, toComer.y), Vector3.up));
         spot.AddComponent<RaidBridgeToll>().Bind(toll);
+    }
+
+    /// <summary>
+    /// Where a bridge's toll-taker sits, in metres from the map's corner: <see cref="TollFromBridge"/> past the end of the bridge
+    /// (<paramref name="half"/> metres from its middle) on the bank the trail comes from on the way up (RaidLayoutPlanner.ArrivalRoom).
+    /// The valley's bend used to choose it (review 2026-11-17, R4): both ends sit almost as far up the valley, so on some stretches
+    /// the player crossed the whole bridge before meeting the toll.
+    /// </summary>
+    internal static Vector2 TollSpot(RaidLayoutPlan plan, RaidLayoutCrossing crossing, float half)
+    {
+        Vector2 side = crossing.Direction * (half + TollFromBridge);
+        Vector2 ahead = crossing.Position + side, behind = crossing.Position - side;
+        if (plan.Valley == null)
+        {
+            return behind;
+        }
+
+        int bank = plan.Valley.BankOf(plan.Rooms[RaidLayoutPlanner.ArrivalRoom(plan, crossing)].Position);
+        return plan.Valley.BankOf(ahead) == bank ? ahead : behind;
     }
 
     /// <summary>Metres from the end of the boss bridge to its camp on the bank.</summary>

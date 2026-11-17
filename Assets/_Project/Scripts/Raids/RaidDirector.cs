@@ -203,11 +203,19 @@ public sealed class RaidDirector : MonoBehaviour
             site.BringGuards(this, pieceRandom);
         }
 
-        // A valley's bridges ask their toll from the start (RaidBridgeToll): the toll-taker's event stands there for the whole raid.
-        RaidEventDirector events = GetComponent<RaidEventDirector>();
-        foreach (RaidBridgeToll toll in events != null && CreatureSource.Remote == null ? FindObjectsByType<RaidBridgeToll>(FindObjectsInactive.Exclude) : System.Array.Empty<RaidBridgeToll>())
+        // A valley's bridges ask their toll from the start (RaidBridgeToll): the toll-taker sits there for the whole raid, quietly, until
+        // the player comes upon it (RaidEventDirector.Stand). In every game, a friend's following the host too (review 2026-11-17, R2):
+        // event sites are each player's own, as random events and rumours are, and what walking through one wakes is asked of the host's
+        // game (SpawnCreaturesOutcome). Only the guards above are the host's to bring.
+        if (TryGetComponent(out RaidEventDirector events))
         {
-            events.BeginAt(toll.Event, toll.transform.position);
+            foreach (RaidBridgeToll toll in FindObjectsByType<RaidBridgeToll>(FindObjectsInactive.Exclude))
+            {
+                if (toll.Event != null)
+                {
+                    events.Stand(toll.Event, toll.transform.position, toll.transform.rotation);
+                }
+            }
         }
 
         Transform start = FindAnyObjectByType<RaidMap>()?.PlayerStart;

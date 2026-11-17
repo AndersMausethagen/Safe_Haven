@@ -435,6 +435,15 @@ public sealed class WorldMapHud : MonoBehaviour
             }
         }
 
+        // A standing site (a bridge's toll) is part of the place, not a rumour: marked once the player has come upon it.
+        foreach (RaidEventSite site in events.StandingSites)
+        {
+            if (site != null && !site.IsResolved && site.IsFoundFrom(from))
+            {
+                ShowMark(used++, site.transform.position, style.Text, style.EventMark, site.DisplayName, width, height);
+            }
+        }
+
         return used;
     }
 

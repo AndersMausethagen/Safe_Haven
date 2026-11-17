@@ -403,6 +403,28 @@ public sealed class SaveTests
     }
 
     [Test]
+    public void EveryRaidsScene_HasItsPlaceName()
+    {
+        // A save made in a raid's scene names the raid, not the scene (review 2026-11-17, R10: the Moss Marsh and Brukam's Bridge didn't).
+        int raids = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition"))
+        {
+            var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (raid == null || string.IsNullOrEmpty(raid.SceneName))
+            {
+                continue;
+            }
+
+            raids++;
+            Assert.AreEqual(raid.DisplayName, SaveSlotInfo.PlaceName(raid.SceneName), raid.name);
+        }
+
+        Assert.GreaterOrEqual(raids, 4, "the Misty Woods, Troll Valley, the Moss Marsh and Brukam's Bridge");
+        Assert.AreEqual("Moss Marsh", SaveSlotInfo.PlaceName("Raid_MossMarsh"));
+        Assert.AreEqual("Brukam's Bridge", SaveSlotInfo.PlaceName("Encounter_BrukamsBridge"));
+    }
+
+    [Test]
     public void Storage_ReportsAMissingSave()
     {
         var storage = new SaveStorage(folder);

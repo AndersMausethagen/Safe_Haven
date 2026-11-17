@@ -231,6 +231,47 @@ public sealed class LootTableTests
             AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/WolfFang.asset"), book.Recipes, book.Buildings)));
     }
 
+    [Test]
+    public void ABarrowChest_GivesItsBarrowGoodsAndGraveIron_WithTheStartingSmithy()
+    {
+        // The 11-02 Smithy cap holds back gear only (review 2026-11-17, R6): a cache's finds and junk answer to the raid tier's drop cap.
+        var chest = AssetDatabase.LoadAssetAtPath<LootTable>("Assets/_Project/Data/Loot/Caches/Barrow Chest.asset");
+        int noSmithy = new SettlementState().SmithyTier;
+        foreach (string wanted in new[] { "BarrowGoods", "GraveIron" })
+        {
+            ItemDefinition item = chest.Drops.Entries.Select(entry => entry.Item).FirstOrDefault(each => each != null && each.name == wanted);
+            Assert.IsNotNull(item, $"the Barrow Chest holds {wanted}");
+            Assert.Greater(item.Tier, 2, $"{wanted} is above the old cap, or this test proves nothing");
+            Assert.IsFalse(LootCache.IsAboveThePlayer(item, noSmithy), $"{wanted} before the Smithy stands");
+            Assert.IsFalse(LootCache.IsAboveThePlayer(item, 1), $"{wanted} with the first Smithy");
+        }
+    }
+
+    [Test]
+    public void ACache_StillHoldsBackGear_TheSmithyIsTiersFromMaking()
+    {
+        var made = new List<Object>();
+        try
+        {
+            foreach (ItemCategory category in new[] { ItemCategory.Equipment, ItemCategory.Tool, ItemCategory.Material, ItemCategory.Valuable })
+            {
+                var item = ScriptableObject.CreateInstance<ItemDefinition>();
+                made.Add(item);
+                var so = new SerializedObject(item);
+                so.FindProperty("category").intValue = (int)category;
+                so.FindProperty("tier").intValue = 4;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                bool gear = category == ItemCategory.Equipment || category == ItemCategory.Tool;
+                Assert.AreEqual(gear, LootCache.IsAboveThePlayer(item, 1), $"tier 4 {category} with the first Smithy");
+                Assert.IsFalse(LootCache.IsAboveThePlayer(item, 3), $"tier 4 {category}, a tier ahead of the Smithy");
+            }
+        }
+        finally
+        {
+            made.ForEach(each => Object.DestroyImmediate(each));
+        }
+    }
+
     private static bool Uses(SerializedProperty cost, ItemDefinition item) =>
         Enumerable.Range(0, cost.arraySize).Any(i => cost.GetArrayElementAtIndex(i).FindPropertyRelative("item").objectReferenceValue == item);
 

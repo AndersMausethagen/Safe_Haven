@@ -6,7 +6,8 @@ using UnityEngine;
 /// resources ... like Arc raiders"). A junk find gives what its item Breaks Into (a broken sickle its iron, barrow goods their silver
 /// and grave iron). Gear and tools without that give a share of the recipe that makes them (DurabilitySettings › Salvage Share), less
 /// as they wear, so found gear, unwanted relics and outgrown kit have a way out. What it gives is always shown before anything is
-/// broken (SalvageBench). Whatever comes out goes to the bag, then the stash, then the floor (ItemDelivery).
+/// broken (SalvageBench). Whatever comes out goes to the bag, then the stash (at home only: not in a friend's Haven), then the floor
+/// (ItemDelivery).
 /// </summary>
 public static class Salvage
 {
@@ -94,14 +95,23 @@ public static class Salvage
         container.RemoveAt(slot, count);
         var bag = player != null ? player.GetComponent<ItemInventory>() : null;
         var got = new List<ItemAmount>();
+        // What the bag can't take goes to the stash at home only, as quest rewards do: in a friend's Haven the stash is the host's
+        // (review 2026-11-17, R7), so it lands at the player's feet there.
+        bool atHome = RaidDirector.Current == null && !HavenVisit.IsVisiting;
+        bool fell = false;
         foreach (ItemAmount part in yield)
         {
-            ItemDelivery.Give(bag, new ItemStack(part.Item, part.Amount, 1f), newFind: false, toStash: true);
+            fell |= ItemDelivery.Give(bag, new ItemStack(part.Item, part.Amount, 1f), newFind: false, toStash: atHome).Fell;
             got.Add(part);
         }
 
         string what = count > 1 ? $"{count} {stack.Item.DisplayName}" : stack.Item.DisplayName;
         GameMessages.Post($"Broke down {what}: {AmountText.Describe(got)}.", MessageKind.Gain);
+        if (fell)
+        {
+            GameMessages.Post("No room for all of it: the rest lies at your feet.", MessageKind.Warning);
+        }
+
         return true;
     }
 

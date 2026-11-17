@@ -93,11 +93,13 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             LiftLid(searcher);
         }
 
+        // A relic or an inscription is something: "Nothing useful inside" only when the cache gave nothing at all (review 2026-11-17, R3).
+        bool gaveSomething = false;
         if (holdsRelic)
         {
             holdsRelic = false;
             RaidDirector raid = RaidDirector.Current;
-            RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier);
+            gaveSomething |= !RelicSettings.Grant(searcher, new System.Random(Random.Range(0, int.MaxValue)), raid.Session.Tier).IsEmpty;
         }
 
         if (holdsInscription)
@@ -107,11 +109,11 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
             EnchantmentDefinition found = Inscriptions.Pick(Inscriptions.Pool(EnchantmentSource.Found, tier), searcher, new System.Random(Random.Range(0, int.MaxValue)));
             if (found != null)
             {
-                Inscriptions.Grant(searcher, found, "a supply cache");
+                gaveSomething |= !Inscriptions.Grant(searcher, found, "a supply cache").IsEmpty;
             }
         }
 
-        if (contents.Count == 0 && resourceContents.Count == 0)
+        if (!gaveSomething && contents.Count == 0 && resourceContents.Count == 0)
         {
             GameMessages.Post("Nothing useful inside.");
         }
@@ -182,7 +184,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
 
         foreach (ItemAmount drop in items)
         {
-            if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item) || !RaidDirector.Current.Session.Allows(drop.Item)))
+            if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item, GameSession.Here.SmithyTier) || !RaidDirector.Current.Session.Allows(drop.Item)))
             {
                 continue;
             }
@@ -197,11 +199,18 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         }
     }
 
-    // A cache can't hand over what the Smithy is tiers away from using: metal and gear come at most a tier ahead of it.
-    private static bool IsAboveThePlayer(ItemDefinition item)
+    /// <summary>
+    /// True when a cache holds this back from a player whose Smithy stands at <paramref name="smithyTier"/>: gear (equipment and tools)
+    /// the Smithy is tiers away from making comes at most a tier ahead of it (and up to tier 2 before it stands). Materials, salvage,
+    /// parts, trophies, relics and other finds aren't the forge's to hold back: the raid tier's own drop cap governs them
+    /// (RaidDifficulty.dropsUpToTier, RaidSession.Allows), as it does for creatures' drops. The cap dates from 2026-11-02 and was meant
+    /// for metal and gear; once the loot overhaul made its raid parts and junk tier 3 to 5 Materials, it kept a Barrow Chest's Barrow
+    /// Goods and Grave Iron out until Copper Fire (review 2026-11-17, R6).
+    /// </summary>
+    internal static bool IsAboveThePlayer(ItemDefinition item, int smithyTier)
     {
-        bool ladder = item.Category == ItemCategory.Material || item.Category == ItemCategory.Equipment || item.Category == ItemCategory.Tool;
-        return ladder && item.Tier > Mathf.Max(MostEarlyTier, GameSession.Here.SmithyTier + 1);
+        bool gear = item.Category == ItemCategory.Equipment || item.Category == ItemCategory.Tool;
+        return gear && item.Tier > Mathf.Max(MostEarlyTier, smithyTier + 1);
     }
 
     private void ShowState()
