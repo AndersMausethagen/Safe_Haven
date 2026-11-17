@@ -206,7 +206,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         if (Time.time >= nextCallAt)
         {
             nextCallAt = Time.time + callInterval;
-            WorldNoise.Emit(transform.position, callRadius);
+            // Shared: on a co-op friend's game the creatures are the host's, and the call must reach them there.
+            WorldNoise.EmitShared(transform.position, callRadius);
         }
 
         if (state == ExtractionHoldState.Done)

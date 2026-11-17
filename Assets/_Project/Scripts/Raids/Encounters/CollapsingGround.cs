@@ -104,7 +104,7 @@ public sealed class CollapsingGround : MonoBehaviour
     private IEnumerator Crack(Transform piece)
     {
         AudioManager.Play(crackSound, piece.position);
-        Burst(piece);
+        Burst(BoundsOf(piece).center);
         CameraShake.Add(0.3f);
         Vector3 rest = piece.localPosition;
         float until = Time.time + warning;
@@ -138,7 +138,8 @@ public sealed class CollapsingGround : MonoBehaviour
         obstacle.carveOnlyStationary = false;
 
         AudioManager.Play(fallSound, piece.position);
-        Burst(piece);
+        // Where it stood, measured before its colliders went off: a disabled collider's bounds are empty at the world's origin.
+        Burst(bounds.center);
         CameraShake.Add(0.7f);
         StartCoroutine(Drop(piece));
     }
@@ -158,11 +159,11 @@ public sealed class CollapsingGround : MonoBehaviour
         piece.gameObject.SetActive(false);
     }
 
-    private void Burst(Transform piece)
+    private void Burst(Vector3 at)
     {
         if (dust != null)
         {
-            Destroy(Instantiate(dust, BoundsOf(piece).center, Quaternion.identity), 8f);
+            Destroy(Instantiate(dust, at, Quaternion.identity), 8f);
         }
     }
 

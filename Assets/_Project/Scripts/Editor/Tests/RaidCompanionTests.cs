@@ -131,4 +131,27 @@ public sealed class RaidCompanionTests
         Assert.IsNull(SettlementSettings.Current.RaidCompanionPrefab.GetComponentInChildren<Animator>(true), "The model comes from the person");
         Assert.IsTrue(SettlementSettings.Current.RaidCompanionPrefab.gameObject.activeSelf, "It has to wake when it arrives");
     }
+
+    // Review 2026-11-17 (S6): with nowhere for the companion to stand beside the player, they stayed at home, and the summary
+    // still said "Gunnar made it home."
+    [Test]
+    public void ACompanionWhoNeverWalkedIn_IsntReportedAsHome()
+    {
+        var raid = ScriptableObject.CreateInstance<RaidDefinition>();
+        made.Add(raid);
+        RaidModifierDefinition[] none = new RaidModifierDefinition[0];
+        var session = new RaidSession(raid, none, RaidParameters.Calculate(raid, none), null, "SafeHaven") { Companion = Person("gunnar") };
+        // Inactive, so nothing of the director runs: only its session is wanted.
+        var holder = new GameObject("Raid");
+        holder.SetActive(false);
+        made.Add(holder);
+        RaidDirector director = holder.AddComponent<RaidDirector>();
+        typeof(RaidDirector).GetProperty(nameof(RaidDirector.Session)).SetValue(director, session);
+        RaidReport report = RaidReport.Create(session, null, null);
+
+        new RaidCompanions(director).Settle(report, true);
+
+        Assert.IsNull(report.Companion, "they never left home, so the summary says nothing of them");
+        Assert.IsFalse(report.CompanionLost, "nor are they lost");
+    }
 }

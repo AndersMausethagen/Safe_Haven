@@ -199,6 +199,31 @@ public sealed class CoopHomeTests
         Leave();
     }
 
+    // Review 2026-11-17 (S5): on a raid followed with the host the Haven one stands in is still the host's, and every skill's
+    // experience was boosted by the host's mentor buildings (the raid summary and the caches' forge cap read it the same way).
+    [Test]
+    public void OnAFollowedRaid_TheMentorBoostIsTheGuestsOwnHavens()
+    {
+        var skill = AssetDatabase.LoadAssetAtPath<ProficiencyDefinition>("Assets/_Project/Data/Proficiencies/Archery.asset");
+        Assert.IsNotNull(skill);
+        Assert.IsNotNull(skill.Mentor, "a skill with a mentor building");
+        GameSession.StartNewGame();
+        try
+        {
+            float without = ExperienceTracker.Boost(skill);
+            GameSession.Home.NoteBuilt(skill.Mentor, 3);
+            Assert.Greater(ExperienceTracker.Boost(skill), without, "at home, one's own mentor building boosts the skill");
+
+            // Now the Haven stood in (the one with the building) is the host's, and the guest's own has none.
+            Visit(new SettlementState());
+            Assert.AreEqual(without, ExperienceTracker.Boost(skill), 1e-5f);
+        }
+        finally
+        {
+            Leave();
+        }
+    }
+
     [Test]
     public void ABorrowedSettlement_SaysSoWhenChanged()
     {

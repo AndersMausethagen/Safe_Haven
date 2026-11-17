@@ -530,8 +530,9 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         // After Ended: someone rescued has come home and taught what they know, so their workplace answers nothing now.
+        // Against one's own Haven (Home): on a raid followed with the host (co-op) the Haven one stands in is still the host's.
         HavenAnswers.Fill(Report, player != null ? player.GetComponent<PlayerCrafting>() : null,
-            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), GameSession.Here);
+            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName), GameSession.Home);
         // Written now, before the results screen (a crash or a quit there lost the haul), and once all of the raid's end is counted:
         // the raids done (quests that count them, their rewards kept waiting for home), the one rescued made a resident, the
         // homecoming (held quests opened), the journal's record. Saved before those, a crash lost them.

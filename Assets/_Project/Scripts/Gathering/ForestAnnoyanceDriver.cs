@@ -3,7 +3,9 @@ using UnityEngine;
 /// <summary>
 /// Runs a raid's ForestAnnoyance: feeds it the player's gathering swings and makes the forest answer. Stirring and
 /// above raise the RoamingSpawner's cap and pace; Angry periodically wakes and sends creatures around the player toward
-/// them; Wrath spawns one wave. Added and configured by ForestAnnoyanceSystem; the raid HUD shows its meter.
+/// them; Wrath spawns one wave. On a co-op friend's game the host's game makes and runs the creatures, so the wave is asked
+/// of it (RoamingSpawner) and the hunts are sent there as a sound (IRaidCreatureSource.Hear). Added and configured by
+/// ForestAnnoyanceSystem; the raid HUD shows its meter.
 /// </summary>
 [RequireComponent(typeof(RaidDirector))]
 public sealed class ForestAnnoyanceDriver : MonoBehaviour
@@ -118,6 +120,8 @@ public sealed class ForestAnnoyanceDriver : MonoBehaviour
         }
 
         Hunt();
+        // The wrath's hunt is this round's: the next comes a whole interval later, even when the wrath came straight from Stirring.
+        nextHunt = Time.time + Annoyance.Settings.HuntInterval;
     }
 
     private void Hunt()
@@ -129,6 +133,14 @@ public sealed class ForestAnnoyanceDriver : MonoBehaviour
 
         Vector3 player = director.Player.transform.position;
         float radius = Annoyance.Settings.HuntRadius;
+        // Co-op, on the host's run: the creatures here are the host's, run by the host's game, so waking and sending them here
+        // moves none. The hunt goes there as a sound round this player that wakes sleepers and draws whoever hears it.
+        if (CreatureSource.Remote != null)
+        {
+            CreatureSource.Remote.Hear(player, radius);
+            return;
+        }
+
         if (sleep == null)
         {
             sleep = GetComponent<CreatureSleep>();

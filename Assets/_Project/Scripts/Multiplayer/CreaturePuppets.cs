@@ -8,7 +8,8 @@ using UnityEngine.SceneManagement;
 /// A friend's side of raid creatures in co-op (<see cref="CoopCreatures"/>): on the host's run this game makes no
 /// creatures of its own (<see cref="FromHost"/>) and shows the host's as puppets (<see cref="MonsterAI.MakeRemote"/>):
 /// built from what the host says, moved, struck with and killed by its word, and this player's blows sent to it. What
-/// this player wakes (an extraction alarm, an event's creatures) is asked of the host (<see cref="IRaidCreatureSource"/>).
+/// this player wakes (an extraction alarm, an event's creatures, the forest's wrath) is asked of the host, and the world's
+/// sounds for the creatures (a beacon's call) are heard there (<see cref="IRaidCreatureSource"/>).
 /// If the host leaves the run first, the puppets become this game's own creatures. Plain C#.
 /// </summary>
 public sealed class CreaturePuppets : IRaidCreatureSource
@@ -408,19 +409,78 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         return true;
     }
 
-    /// <summary>A creature an event made for this player: the host's game makes it, by prefab id.</summary>
+    /// <summary>
+    /// A creature an event (or the forest's wrath) made for this player: the host's game makes it, by prefab id. A pack whose root
+    /// carries no id of its own (the Misty Woods' WolfPack, the wrath's table there) is asked for member by member, each where it
+    /// stands in the pack, turned with it; before, the whole wave was refused.
+    /// </summary>
     public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
     {
-        string prefabId = prefab != null && prefab.TryGetComponent(out SaveableEntity entity) ? entity.PrefabId : null;
-        if (link == null || string.IsNullOrEmpty(prefabId))
+        if (link == null || prefab == null)
         {
-            Debug.LogWarning($"Co-op: '{(prefab != null ? prefab.name : "nothing")}' has no prefab id, so the host's game can't make it for this player.");
             return;
         }
 
+        string prefabId = prefab.TryGetComponent(out SaveableEntity entity) ? entity.PrefabId : null;
+        if (!string.IsNullOrEmpty(prefabId))
+        {
+            Call(prefabId, position, yaw, hunt);
+        }
+        else if (!CallMembers(prefab, position, yaw, hunt))
+        {
+            Debug.LogWarning($"Co-op: '{prefab.name}' has no prefab id, so the host's game can't make it for this player.");
+        }
+    }
+
+    // The creatures of a pack prefab, each by its own prefab id. False when none has one.
+    private bool CallMembers(GameObject pack, Vector3 position, float yaw, bool hunt)
+    {
+        bool any = false;
+        Quaternion turn = Quaternion.Euler(0f, yaw, 0f);
+        foreach (SaveableEntity member in pack.GetComponentsInChildren<SaveableEntity>(true))
+        {
+            Transform above = member.transform.parent;
+            // A member's own saved parts (inside another member) aren't creatures of their own.
+            if (string.IsNullOrEmpty(member.PrefabId) || above == null || above.GetComponentInParent<SaveableEntity>(true) != null
+                || member.GetComponentInChildren<MonsterAI>(true) == null)
+            {
+                continue;
+            }
+
+            Vector3 offset = pack.transform.InverseTransformPoint(member.transform.position);
+            Call(member.PrefabId, position + turn * offset, yaw + member.transform.localEulerAngles.y, hunt);
+            any = true;
+        }
+
+        return any;
+    }
+
+    private void Call(string prefabId, Vector3 position, float yaw, bool hunt)
+    {
         using var writer = CoopLink.Writer(32 + prefabId.Length * 2);
         writer.WriteNetworkSerializable(new CreatureCallMessage { PrefabId = prefabId, Position = position, Yaw = yaw, Hunt = hunt });
         link.ToHost(CoopCreatures.CallMessage, writer);
+    }
+
+    /// <summary>
+    /// A sound of this world meant for the creatures (a lit beacon's call, an event's noise, the forest's hunt): the host's
+    /// creatures hear it, sent by this player's avatar the way their own sounds go (NetworkPlayerAvatar.SendNoise).
+    /// </summary>
+    public void Hear(Vector3 position, float radius)
+    {
+        if (link == null || !FromHost)
+        {
+            return;
+        }
+
+        foreach (NetworkPlayerAvatar avatar in NetworkPlayerAvatar.All)
+        {
+            if (avatar != null && avatar.IsOwner)
+            {
+                avatar.SendNoise(position, radius);
+                return;
+            }
+        }
     }
 
     // This player staggered their copy of one of the host's creatures: the host's game staggers the real one.

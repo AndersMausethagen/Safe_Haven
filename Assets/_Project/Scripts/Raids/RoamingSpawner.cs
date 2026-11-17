@@ -110,7 +110,7 @@ public sealed class RoamingSpawner : MonoBehaviour
     /// <summary>
     /// Spawns up to <paramref name="groups"/> groups at once around the player, ignoring the alive cap and the raid's budget
     /// (but not the global creature limit), all hunting the player. Uses the given table, or the roaming table when null.
-    /// Returns how many groups appeared.
+    /// Returns how many groups appeared (on a co-op friend's game, how many were asked of the host's game, which makes them).
     /// </summary>
     public int SpawnWave(int groups, SpawnTable table)
     {
@@ -243,7 +243,16 @@ public sealed class RoamingSpawner : MonoBehaviour
 
             Vector3 facing = player - point;
             facing.y = 0f;
-            GameObject root = Instantiate(prefab, point, facing.sqrMagnitude > 0.01f ? Quaternion.LookRotation(facing) : Quaternion.identity, Container());
+            Quaternion turn = facing.sqrMagnitude > 0.01f ? Quaternion.LookRotation(facing) : Quaternion.identity;
+            // Co-op, on the host's run (only the forest's wrath gets here: Update makes none): the host's game makes them and
+            // sends them after this player, as an event's creatures are. Made here, they were removed as they woke.
+            if (CreatureSource.Remote != null)
+            {
+                CreatureSource.Remote.Spawn(prefab, point, turn.eulerAngles.y, true);
+                return true;
+            }
+
+            GameObject root = Instantiate(prefab, point, turn, Container());
             director.Creatures.Prepare(root, false);
             roots.Add(root);
 

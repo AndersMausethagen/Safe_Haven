@@ -146,7 +146,8 @@ public sealed class RaidHudView : MonoBehaviour
         if (session.IsOver)
             timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
         ExtractionPoint target = null;
-        SetText(extractionLabel, session.IsOver ? "" : arena != null && !arena.BossFallen ? DescribeEncounter(arena) : DescribeExtraction(out target));
+        // A lit way out comes first even before the boss falls: turning back at the arrival stone shows its hold, not the arrival line.
+        SetText(extractionLabel, session.IsOver ? "" : arena != null && !arena.BossFallen && !AnyLit() ? DescribeEncounter(arena) : DescribeExtraction(out target));
         PointArrowAt(target);
         if (session.IsOver)
         {
@@ -326,6 +327,21 @@ public sealed class RaidHudView : MonoBehaviour
         }
 
         ShowTime(arena.EnrageIn, warningTime, criticalTime);
+    }
+
+    // A way out being held (or waiting for the player to come back into its circle).
+    private static bool AnyLit()
+    {
+        IReadOnlyList<ExtractionPoint> points = ExtractionPoint.Active;
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (points[i] != null && points[i].IsLit)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static string DescribeEncounter(EncounterArena arena)

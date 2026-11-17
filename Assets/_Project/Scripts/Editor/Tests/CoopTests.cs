@@ -10,6 +10,42 @@ public sealed class CoopTests
     private static PoseSnapshot At(double time, float x, float yaw = 0f) =>
         new PoseSnapshot { Time = time, Position = new Vector3(x, 0f, 0f), Yaw = yaw };
 
+    // Review 2026-11-17 (S8): a friend's lit beacon called none of the host's creatures; its call reached only this game's, which on
+    // the host's run are the host's puppets. A world sound for the creatures goes where they are made too.
+    [Test]
+    public void AWorldSound_OnTheHostsRun_IsHeardWhereTheCreaturesAreMade()
+    {
+        var host = new HearsSounds();
+        CreatureSource.Remote = host;
+        try
+        {
+            WorldNoise.EmitShared(new Vector3(1f, 2f, 3f), 35f);
+            WorldNoise.EmitShared(Vector3.zero, 0f);
+        }
+        finally
+        {
+            CreatureSource.Remote = null;
+        }
+
+        Assert.AreEqual(1, host.Heard.Count, "the beacon's call, and nothing for a silent one");
+        Assert.AreEqual(new Vector4(1f, 2f, 3f, 35f), host.Heard[0]);
+        WorldNoise.EmitShared(Vector3.zero, 35f);
+        Assert.AreEqual(1, host.Heard.Count, "in one's own game it is heard here only");
+    }
+
+    private sealed class HearsSounds : IRaidCreatureSource
+    {
+        public readonly List<Vector4> Heard = new List<Vector4>();
+
+        public bool Wake(SpawnGroup group) => true;
+
+        public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
+        {
+        }
+
+        public void Hear(Vector3 position, float radius) => Heard.Add(new Vector4(position.x, position.y, position.z, radius));
+    }
+
     [Test]
     public void Poses_AreDrawnBetweenTheTwoAroundTheMoment()
     {

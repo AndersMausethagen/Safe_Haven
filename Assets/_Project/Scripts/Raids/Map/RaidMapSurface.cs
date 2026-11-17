@@ -29,7 +29,10 @@ public static class RaidMapSurface
     // Layer 0 forest floor (moss), 1 path soil, 2 cliff rock, 3 litter (when the map has it). Rock follows the slope; soil
     // follows the paths and clearings and gives way to moss on wet ground; litter lies in patches under the densest canopy,
     // where it is dry; moss covers the rest.
-    public static void Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null)
+    // Returns where the paths' grassy verge may grow, by alphamap cell (row, column; 255 all of it), for TerrainGrowth.Fill through
+    // VergeRoomAt: the paint can't say it, as the path layer is half the paint at a trail's edge but also down the middle of a
+    // narrow side path once its border is feathered, and wherever leaves drift over a trail (Docs/SystemReview2_2026-11-17.md S4).
+    public static byte[,] Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null)
     {
         int resolution = data.alphamapResolution;
         int layers = data.alphamapLayers;
@@ -41,6 +44,7 @@ public static class RaidMapSurface
         // Soil first, on its own, so its border can be feathered: the zones step from forest to path within one cell.
         var soils = new float[resolution, resolution];
         var wets = new float[resolution, resolution];
+        var verges = new byte[resolution, resolution];
         for (int row = 0; row < resolution; row++)
         {
             for (int column = 0; column < resolution; column++)
@@ -54,6 +58,7 @@ public static class RaidMapSurface
                 float soil = Mathf.Clamp01(Mathf.Max(path, clearing * 0.55f, (1f - forest) * 0.35f));
                 soils[row, column] = soil * (1f - 0.6f * wet * (1f - path));
                 wets[row, column] = wet;
+                verges[row, column] = (byte)Mathf.RoundToInt(VergeRoom(path) * 255f);
             }
         }
 
@@ -104,6 +109,40 @@ public static class RaidMapSurface
         }
 
         data.SetAlphamaps(0, 0, weights);
+        return verges;
+    }
+
+    // From this much of the raw path (before its border is feathered) inward, the verge gives way, to none on a trail's centre line.
+    // At a trail's edge line the raw path is a half, so the verge there, and outside it, grows as the paint says.
+    private const float VergeInsideFrom = 0.7f;
+
+    /// <summary>
+    /// How much of a path's verge may grow (0 to 1) where the trail's own strength, before feathering, is <paramref name="rawPath"/>:
+    /// all of it at and beyond the trail's edge, none inside the trail, so a narrow side path's middle and leaves on a trail stay
+    /// bare of it.
+    /// </summary>
+    public static float VergeRoom(float rawPath) => 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(VergeInsideFrom, 1f, rawPath));
+
+    /// <summary>
+    /// <see cref="Paint"/>'s verge room as TerrainGrowth.Fill asks for it, by world point over the terrain it was painted on (not
+    /// turned since). Null when there is none, and Fill then lets every verge grow as the paint says.
+    /// </summary>
+    public static Func<Vector3, float> VergeRoomAt(Terrain terrain, byte[,] room)
+    {
+        if (terrain == null || room == null)
+        {
+            return null;
+        }
+
+        Vector3 origin = terrain.transform.position;
+        Vector3 extent = terrain.terrainData.size;
+        int rows = room.GetLength(0), columns = room.GetLength(1);
+        return point =>
+        {
+            int column = Mathf.Clamp((int)((point.x - origin.x) / extent.x * columns), 0, columns - 1);
+            int row = Mathf.Clamp((int)((point.z - origin.z) / extent.z * rows), 0, rows - 1);
+            return room[row, column] / 255f;
+        };
     }
 
     // Two box blurs of the given radius (cells) along each axis: close to a gaussian, at four cheap passes.

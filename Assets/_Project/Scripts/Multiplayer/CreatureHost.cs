@@ -548,6 +548,13 @@ public sealed class CreatureHost
     /// <summary>Metres from a friend's body within which they may ask for creatures (an event, a beacon: where they stand).</summary>
     private const float CallReach = 60f;
 
+    /// <summary>
+    /// Metres from a friend's body within which a creature they call may be made: the forest's wrath places its packs out of sight
+    /// up to the roaming spawns' far distance (60 m on every raid), snapped to the navmesh, and the friend's body here runs a little
+    /// behind where they are, so the plain reach turned some of them away.
+    /// </summary>
+    private const float SpawnCallReach = 75f;
+
     // A friend lit an extraction beacon on this run: its alarm group is filled here and hunts them.
     private void OnWake(ulong sender, FastBufferReader reader)
     {
@@ -570,7 +577,8 @@ public sealed class CreatureHost
         director.Creatures.Wake(group, friend);
     }
 
-    // An event a friend set off made creatures: made here, by prefab id, and sent after them if they hunt.
+    // An event a friend set off (or the forest's wrath at their gathering) made creatures: made here, by prefab id, and sent after
+    // them if they hunt.
     private void OnCall(ulong sender, FastBufferReader reader)
     {
         reader.ReadNetworkSerializable(out CreatureCallMessage call);
@@ -580,7 +588,7 @@ public sealed class CreatureHost
         bool hunt = call.Hunt;
         FriendHitbox friend = FriendOnThisRun(sender);
         RaidDirector director = RaidDirector.Current;
-        if (friend == null || director == null || (position - friend.transform.position).sqrMagnitude > CallReach * CallReach)
+        if (friend == null || director == null || (position - friend.transform.position).sqrMagnitude > SpawnCallReach * SpawnCallReach)
         {
             return;
         }

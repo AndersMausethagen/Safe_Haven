@@ -334,6 +334,10 @@ public sealed class RaidGenerationTests
         public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
         {
         }
+
+        public void Hear(Vector3 position, float radius)
+        {
+        }
     }
 
     private SpawnGroup Group(SpawnTable table, int min, int max, Vector3 origin, float spacing)
@@ -392,6 +396,7 @@ public sealed class RaidGenerationTests
     {
         public bool Wake(SpawnGroup group) => true;
         public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt) { }
+        public void Hear(Vector3 position, float radius) { }
     }
 
     [Test]

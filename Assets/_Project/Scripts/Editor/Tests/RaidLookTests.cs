@@ -139,6 +139,58 @@ public sealed class RaidLookTests
         }
     }
 
+    // Review 2026-11-17 (S4): the grassy verge peaked wherever the path was half the paint, which with the 2 m feather is also the
+    // middle of a side path, and where leaves drift, the middle of a trail. A generated map says where its paths' edges are.
+    [Test]
+    public void TheVerge_GrowsAtAPathsEdge_NotInsideIt()
+    {
+        Assert.AreEqual(1f, RaidMapSurface.VergeRoom(0f), 1e-5f, "beyond the trail");
+        Assert.AreEqual(1f, RaidMapSurface.VergeRoom(0.5f), 1e-5f, "on its edge line, as the paint says");
+        Assert.AreEqual(0f, RaidMapSurface.VergeRoom(1f), 1e-5f, "inside it");
+        Assert.Less(RaidMapSurface.VergeRoom(0.987f), 0.02f, "the middle of the narrowest side path (1.3 m half-wide)");
+
+        var source = AssetDatabase.LoadAssetAtPath<TerrainData>("Assets/_Project/Data/Raids/Maps/MistyWoods Map Terrain.asset");
+        TerrainData data = Object.Instantiate(source);
+        var holder = new GameObject("Terrain", typeof(Terrain));
+        try
+        {
+            var terrain = holder.GetComponent<Terrain>();
+            terrain.terrainData = data;
+            // Half path, half moss everywhere: where the verge grows the most.
+            var weights = new float[data.alphamapHeight, data.alphamapWidth, data.terrainLayers.Length];
+            var room = new byte[data.alphamapHeight, data.alphamapWidth];
+            for (int z = 0; z < data.alphamapHeight; z++)
+            {
+                for (int x = 0; x < data.alphamapWidth; x++)
+                {
+                    weights[z, x, 0] = 0.5f;
+                    weights[z, x, 1] = 0.5f;
+                    room[z, x] = 255;
+                }
+            }
+
+            data.SetAlphamaps(0, 0, weights);
+            int layer = System.Array.FindIndex(data.detailPrototypes, prototype => prototype.prototype.name == "Short Grass");
+            int Grass() => Sum(data.GetDetailLayer(0, 0, data.detailWidth, data.detailHeight, layer), 0, data.detailWidth);
+
+            TerrainGrowth.Fill(terrain, Map.Growth, 1);
+            int asPainted = Grass();
+            TerrainGrowth.Fill(terrain, Map.Growth, 1, null, null, null, RaidMapSurface.VergeRoomAt(terrain, room));
+            Assert.AreEqual(asPainted, Grass(), "at an edge the verge grows as the paint says");
+
+            System.Array.Clear(room, 0, room.Length);
+            TerrainGrowth.Fill(terrain, Map.Growth, 1, null, null, null, RaidMapSurface.VergeRoomAt(terrain, room));
+            int inside = Grass();
+            Assert.Less(inside, asPainted, "inside a trail no verge grows");
+            Assert.Greater(inside, 0, "the moss in the paint still grows its own grass");
+        }
+        finally
+        {
+            Object.DestroyImmediate(holder);
+            Object.DestroyImmediate(data);
+        }
+    }
+
     [Test]
     public void Growth_FollowsTheGround_AndKeepsOutOfWhatStandsThere()
     {

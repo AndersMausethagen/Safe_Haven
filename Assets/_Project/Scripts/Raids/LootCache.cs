@@ -184,7 +184,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
 
         foreach (ItemAmount drop in items)
         {
-            if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item, GameSession.Here.SmithyTier) || !RaidDirector.Current.Session.Allows(drop.Item)))
+            if (RaidDirector.Current != null && (IsAboveThePlayer(drop.Item, GameSession.Home.SmithyTier) || !RaidDirector.Current.Session.Allows(drop.Item)))
             {
                 continue;
             }

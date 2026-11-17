@@ -40,6 +40,8 @@ public sealed class RaidCompanions
         if (!NavMesh.SamplePosition(beside, out NavMeshHit hit, 8f, NavMesh.AllAreas))
         {
             Debug.LogWarning($"Nowhere for {session.Companion.DisplayName} to stand; they stayed at home.", raid);
+            // Told, not only logged: before, they simply never appeared, and the summary said they had made it home.
+            GameMessages.Post($"{session.Companion.DisplayName} found no way in beside you and stayed at home.", MessageKind.Warning);
             return;
         }
 
@@ -83,11 +85,16 @@ public sealed class RaidCompanions
         }
     }
 
-    /// <summary>The raid has ended: the companion's bond grows (or they are lost), and the lost one comes home or stays lost.</summary>
+    /// <summary>
+    /// The raid has ended: the companion's bond grows (or they are lost), and the lost one comes home or stays lost. One who
+    /// never walked in (nowhere to stand beside the player, or the raid over before it began) stayed at home: the summary says
+    /// nothing of them, where it said they had made it home.
+    /// </summary>
     public void Settle(RaidReport report, bool extracted)
     {
         RaidSession session = raid.Session;
-        if (session.Companion != null)
+        // Walked in: set once they stood beside the player (a plain reference test, so it holds even if their body has gone since).
+        if (session.Companion != null && !ReferenceEquals(Companion, null))
         {
             report.Companion = session.Companion;
             // Down when the raid ends is as lost as bleeding out: nobody went back for them.

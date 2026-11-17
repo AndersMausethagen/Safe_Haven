@@ -190,11 +190,12 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
 
     /// <summary>
     /// What a skill's experience is multiplied by beyond the action itself: its mentor building's tiers at home
-    /// (SettlementState remembers them on raids too) and the player's Experience Gain (rested, the sauna).
+    /// (SettlementState remembers them on raids too) and the player's Experience Gain (rested, the sauna). Home is one's own
+    /// Haven (GameSession.Home): on a raid followed with the host (co-op), the Haven one stands in is still the host's.
     /// </summary>
     public static float Boost(ProficiencyDefinition skill)
     {
-        float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Here.BuiltTier(skill.Mentor)) : 0f;
+        float mentor = skill != null && skill.Mentor != null ? Rules.MentorBonus(GameSession.Home.BuiltTier(skill.Mentor)) : 0f;
         float gain = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats.Get(StatType.ExperienceGain) : 0f;
         return Mathf.Max(0f, 1f + mentor + gain);
     }

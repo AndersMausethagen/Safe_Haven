@@ -94,5 +94,9 @@ public sealed class LevelSpawnerTests
         public void Spawn(GameObject prefab, Vector3 position, float yaw, bool hunt)
         {
         }
+
+        public void Hear(Vector3 position, float radius)
+        {
+        }
     }
 }

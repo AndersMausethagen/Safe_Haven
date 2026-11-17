@@ -122,7 +122,32 @@ public static partial class RaidMapGenerator
         foreach (ChoppableTree tree in made.GetComponentsInChildren<ChoppableTree>(true)) Object.DestroyImmediate(tree);
         foreach (ResourceNode node in made.GetComponentsInChildren<ResourceNode>(true)) Object.DestroyImmediate(node);
         foreach (ResourceSource source in made.GetComponentsInChildren<ResourceSource>(true)) Object.DestroyImmediate(source);
-        foreach (Interactable interactable in made.GetComponentsInChildren<Interactable>(true)) Object.DestroyImmediate(interactable);
+        foreach (Interactable interactable in made.GetComponentsInChildren<Interactable>(true))
+        {
+            // What needs it goes first (a carved stone's reading), or Unity refuses to remove it and logs an error.
+            foreach (MonoBehaviour user in interactable.GetComponents<MonoBehaviour>())
+            {
+                if (user != interactable && Requires(user.GetType(), typeof(Interactable)))
+                {
+                    Object.DestroyImmediate(user);
+                }
+            }
+
+            Object.DestroyImmediate(interactable);
+        }
+    }
+
+    private static bool Requires(System.Type type, System.Type component)
+    {
+        foreach (RequireComponent need in type.GetCustomAttributes(typeof(RequireComponent), true))
+        {
+            if (need.m_Type0 == component || need.m_Type1 == component || need.m_Type2 == component)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static GameObject Boulder(Transform holder, CliffKit.Piece piece, Vector3 at, float turn, float scale, Terrain terrain, Dictionary<GameObject, Vector3[]> shapes)

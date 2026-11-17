@@ -292,6 +292,19 @@ public sealed class NetworkPlayerAvatar : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// A sound of the world this player's game made for the creatures (a lit beacon's call, the forest's hunt: CreaturePuppets.Hear),
+    /// sent to the host's creatures as the player's own sounds are (<see cref="NoiseRpc"/>: rate-limited, heard only in the same
+    /// place). Not through PlayerNoise, which would fill the player's stealth meter. Only on the owner's avatar, and not the host's.
+    /// </summary>
+    public void SendNoise(Vector3 position, float radius)
+    {
+        if (IsOwner && IsSpawned)
+        {
+            OnOwnNoise(position, radius);
+        }
+    }
+
     private void OnOwnNoise(Vector3 position, float radius)
     {
         if (IsServer || radius < SentNoiseFrom)

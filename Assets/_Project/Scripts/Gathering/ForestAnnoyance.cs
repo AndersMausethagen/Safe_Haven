@@ -83,7 +83,8 @@ public sealed class ForestAnnoyanceSettings
 /// <summary>
 /// The forest's annoyance as plain logic: swings raise it, quiet lowers it after a delay, thresholds set the level.
 /// Reaching the wrath threshold fires one wave (up to the raid's limit) and drops back to the angry threshold; with no
-/// waves left it is capped there. Driven by ForestAnnoyanceDriver.
+/// waves left it is capped there. The wrath is a moment, not a level to stay at: after it the forest is Angry again without
+/// that being announced as a change (it would read as a second warning and send a second hunt). Driven by ForestAnnoyanceDriver.
 /// </summary>
 public sealed class ForestAnnoyance
 {
@@ -135,6 +136,9 @@ public sealed class ForestAnnoyance
                 Value = settings.AngryAt;
                 SetLevel(AnnoyanceLevel.Wrath);
                 Wrath?.Invoke();
+                // Settles back quietly: "The forest is angry" right after "The forest's wrath is upon you!" read as a new warning,
+                // and the driver hunted a second time two frames after the wrath's own hunt (Docs/SystemReview2_2026-11-17.md S2).
+                Level = LevelFor(Value);
             }
             else
             {

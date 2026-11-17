@@ -83,10 +83,13 @@ public static class TerrainGrowth
     /// <summary>
     /// Replaces the grass, bush and listed plant layers with growth by ground layer. Other details are kept. Nothing grows where
     /// <paramref name="blocked"/> says so. <paramref name="plants"/> defaults to <see cref="DefaultPlants"/>; <paramref name="wetness"/>
-    /// (0 to 1) thickens the plants that love the wet. Returns the number of cells with growth; 0 when the prototypes are missing.
+    /// (0 to 1) thickens the plants that love the wet. <paramref name="vergeRoom"/> (0 to 1, all of it when null) is how much of a
+    /// ground's verge may grow at a point: the paint alone can't tell a path's edge from other places it is half the paint (the
+    /// middle of a narrow, feathered side path; leaves drifting over a trail), so a generated map says where its paths' edges are
+    /// (RaidMapSurface.Paint). Returns the number of cells with growth; 0 when the prototypes are missing.
     /// </summary>
     public static int Fill(Terrain terrain, IReadOnlyList<Ground> fills, int seed, Func<Vector3, bool> blocked = null,
-        IReadOnlyList<Plant> plants = null, Func<Vector3, float> wetness = null)
+        IReadOnlyList<Plant> plants = null, Func<Vector3, float> wetness = null, Func<Vector3, float> vergeRoom = null)
     {
         plants ??= DefaultPlants;
         TerrainData data = terrain.terrainData;
@@ -133,7 +136,10 @@ public static class TerrainGrowth
             {
                 float u = (x + 0.5f) / resolution, v = (z + 0.5f) / resolution;
                 int ax = Mathf.Min((int)(u * alphaWidth), alphaWidth - 1), az = Mathf.Min((int)(v * alphaHeight), alphaHeight - 1);
+                var point = new Vector3(origin.x + u * data.size.x, 0f, origin.z + v * data.size.z);
                 float shortAmount = 0f, tallAmount = 0f, bushAmount = 0f, plantAmount = 0f, room = 1f;
+                // Asked once, and only where a ground has a verge.
+                float edge = -1f;
                 for (int l = 0; l < amounts.Length; l++)
                 {
                     float w = weights[az, ax, l];
@@ -141,8 +147,13 @@ public static class TerrainGrowth
                     tallAmount += w * amounts[l].tallGrass;
                     if (amounts[l].verge > 0f)
                     {
+                        if (edge < 0f)
+                        {
+                            edge = vergeRoom != null ? Mathf.Clamp01(vergeRoom(point)) : 1f;
+                        }
+
                         // Half path, half moss: the verge, where the trodden edge greens over.
-                        float verge = amounts[l].verge * 4f * w * (1f - w);
+                        float verge = amounts[l].verge * 4f * w * (1f - w) * edge;
                         shortAmount += verge;
                         tallAmount += verge * 0.6f;
                     }
@@ -164,7 +175,6 @@ public static class TerrainGrowth
                     continue;
                 }
 
-                var point = new Vector3(origin.x + u * data.size.x, 0f, origin.z + v * data.size.z);
                 if (blocked != null && blocked(point))
                 {
                     continue;

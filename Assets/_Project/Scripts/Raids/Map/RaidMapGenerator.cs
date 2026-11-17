@@ -25,10 +25,11 @@ public static partial class RaidMapGenerator
 
     /// <summary>
     /// Gives the terrain the plan's heights, paint, trees and rocks. <paramref name="data"/> must be a runtime copy. The field and the heights
-    /// can come worked out already (RaidMap does them on a worker thread); returns how long each part took.
+    /// can come worked out already (RaidMap does them on a worker thread); returns how long each part took. <paramref name="vergeRoom"/>
+    /// is where the paths' grassy verge may grow, from the paint (RaidMapSurface.Paint), for the grass grown afterwards.
     /// </summary>
-    public static string ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules, int tier = 0,
-        RaidLayoutField field = null, float[,] metres = null, float highest = 0f)
+    public static string ShapeGround(RaidMapDefinition definition, TerrainData data, RaidLayoutPlan plan, RaidLayoutRules rules,
+        out byte[,] vergeRoom, int tier = 0, RaidLayoutField field = null, float[,] metres = null, float highest = 0f)
     {
         var clock = System.Diagnostics.Stopwatch.StartNew();
         field ??= RaidLayoutField.Build(plan, rules);
@@ -53,7 +54,7 @@ public static partial class RaidMapGenerator
         System.Func<Vector2, float> wetness = plan.Rivers.Count > 0
             ? spot => Mathf.Max(plan.Wetness(spot, rules.WetReach, rules.DampGround), field.RiverWetness(spot, rules.WetReach))
             : spot => plan.Wetness(spot, rules.WetReach, rules.DampGround);
-        RaidMapSurface.Paint(data, working, wetness);
+        vergeRoom = RaidMapSurface.Paint(data, working, wetness);
         long paint = clock.ElapsedMilliseconds;
         var clearings = new List<RaidMapSurface.Clearing>(plan.Sites.Count);
         foreach (RaidSite site in plan.Sites)

@@ -240,7 +240,8 @@ public sealed class MakeNoiseOutcome : RaidEventOutcome
 
     public override void Apply(RaidEventContext context)
     {
-        WorldNoise.Emit(context.Position, radius);
+        // Shared: on a co-op friend's game the creatures that should come are the host's.
+        WorldNoise.EmitShared(context.Position, radius);
     }
 }
 

@@ -48,6 +48,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private Texture2D generatedColour;
     // The paint as colour from Dress, held until the ground light has been worked out.
     private Color32[] groundColours;
+    // Where the generated paths' grassy verge may grow (RaidMapSurface.Paint), held from the paint until Dress grows the grass.
+    private byte[,] vergeRoom;
 
     public RaidMapDefinition Definition => definition;
     public Terrain Terrain => terrain;
@@ -257,7 +259,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             (float[,] metres, float highest) = heightsTask.Result;
             times.Append($"heights worked out {step.ElapsedMilliseconds} ms, ");
             step.Restart();
-            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, tier, field, metres, highest)).Append(", ");
+            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, out vergeRoom, tier, field, metres, highest)).Append(", ");
             terrain.Flush();
             yield return null;
             step.Restart();
@@ -430,7 +432,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             }
         }
 
-        TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness);
+        TerrainGrowth.Fill(terrain, definition.Growth, seed, blocked, definition.Plants, wetness, RaidMapSurface.VergeRoomAt(terrain, vergeRoom));
+        vergeRoom = null;
         bool grassColour = terrain.TryGetComponent(out GrassTerrainColour colour);
         // The paint as colour: what grass takes on, and on a generated map what the ground light throws back (BuildGroundLight).
         Color32[] colours = grassColour || generatedBy != null ? TerrainGrowth.GroundColours(terrain.terrainData, definition.Growth) : null;

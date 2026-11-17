@@ -445,6 +445,25 @@ public sealed class GatheringMinigameTests
         Assert.AreEqual(1f, annoyance.Fill, 1e-5f);
     }
 
+    // Review 2026-11-17 (S2): the swing that tipped an angry forest into its wrath also said "The forest is angry" again, and the
+    // driver hunted a second time two frames after the wrath's own hunt: falling back to Angry was told as a change of its own.
+    [Test]
+    public void AWrathIsToldOnce_ThenTheForestIsAngryAgainQuietly()
+    {
+        var annoyance = new ForestAnnoyance(new ForestAnnoyanceSettings());
+        var levels = new List<AnnoyanceLevel>();
+        annoyance.LevelChanged += levels.Add;
+        annoyance.Add(annoyance.Settings.AngryAt);
+        CollectionAssert.AreEqual(new[] { AnnoyanceLevel.Angry }, levels);
+
+        annoyance.Add(annoyance.Settings.WrathAt);
+        CollectionAssert.AreEqual(new[] { AnnoyanceLevel.Angry, AnnoyanceLevel.Wrath }, levels, "no second Angry after the wrath");
+        Assert.AreEqual(AnnoyanceLevel.Angry, annoyance.Level, "the forest is still angry");
+
+        annoyance.Tick(1000f);
+        Assert.AreEqual(AnnoyanceLevel.Calm, levels[levels.Count - 1], "calming down is still told");
+    }
+
     [Test]
     public void BestToolIndexPicksTheHighestUnbrokenTool()
     {
