@@ -212,6 +212,11 @@ public static partial class RaidLayoutPlanner
     // On a map with terraces, a site's level pocket keeps clear of ramps and of what stands on another level, or a cliff would cut it.
     private static bool PocketFits(RaidLayoutPlan plan, RaidLayoutRules rules, Vector2 spot, float radius)
     {
+        if (plan.Valley != null && !ValleyHolds(plan, spot, radius))
+        {
+            return false;
+        }
+
         if (!plan.HasTerraces || radius <= 0f)
         {
             return true;

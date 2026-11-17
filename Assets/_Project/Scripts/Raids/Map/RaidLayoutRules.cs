@@ -26,6 +26,43 @@ public enum RaidLayoutShape
     Spine = 2,
     /// <summary>A tangle of short trails with many ways round.</summary>
     Thicket = 3,
+    /// <summary>
+    /// A long valley between high walls with a river down its middle (RaidLayoutRules › Valley): the start at its mouth, the main way
+    /// out at its head, clearings on alternating banks, so every way up crosses the river at a ford or a bridge.
+    /// </summary>
+    Valley = 4,
+}
+
+/// <summary>How a Valley map is shaped (RaidLayoutShape.Valley): its floor, its walls and the river down its middle.</summary>
+[Serializable]
+public sealed class RaidValleyRule
+{
+    [Tooltip("How wide the valley floor is from wall foot to wall foot, in metres, least and most (times the mood's Valley Width).")]
+    public Vector2 floorWidth = new Vector2(70f, 90f);
+    [Tooltip("How high the walls rise above the floor, in metres, least and most; each side rolls its own.")]
+    public Vector2 wallHeight = new Vector2(18f, 24f);
+    [Tooltip("Metres across which a wall climbs from its foot to its top.")]
+    [Min(4f)] public float wallRun = 26f;
+    [Tooltip("How many ledges a wall climbs in: steep faces of scree and rock with level benches between.")]
+    [Range(1, 5)] public int benches = 3;
+    [Tooltip("How far the valley swings from side to side, in metres, least and most.")]
+    public Vector2 meander = new Vector2(10f, 20f);
+    [Tooltip("Metres from one bend of the valley to the next, least and most.")]
+    public Vector2 bendLength = new Vector2(110f, 160f);
+    [Tooltip("How far the floor climbs from the mouth to the head, in metres, least and most: the river runs down it.")]
+    public Vector2 tilt = new Vector2(5f, 9f);
+    [Tooltip("How wide the river is, in metres, least and most.")]
+    public Vector2 riverWidth = new Vector2(6f, 9f);
+    [Tooltip("How deep the river is in its middle, in metres, least and most (fords are shallower: Rules › Ford Depth).")]
+    public Vector2 riverDepth = new Vector2(1.5f, 2.0f);
+    [Tooltip("How many of the trails' river crossings carry a bridge, least and most; the rest are fords. The short way gets them first.")]
+    public Vector2Int bridges = new Vector2Int(1, 2);
+    [Tooltip("The bridge laid over a crossing: its deck along local Z, its length Bridge Length, its deck top at Bridge Deck above its pivot.")]
+    public GameObject bridgePrefab;
+    [Tooltip("Metres the bridge prefab spans along its local Z at scale 1.")]
+    [Min(1f)] public float bridgeLength = 14f;
+    [Tooltip("Metres from the bridge prefab's pivot up to its deck.")]
+    public float bridgeDeck = 2f;
 }
 
 /// <summary>How many sites of one kind a generated map holds, and where they go.</summary>
@@ -105,6 +142,8 @@ public sealed class RaidMapMood
     [Min(0f)] public float boulders = 1f;
     [Tooltip("Multiplies how many rivers cross the open land (Rules › Surface Rivers).")]
     [Min(0f)] public float rivers = 1f;
+    [Tooltip("On a Valley map: multiplies the width of the valley floor (a gorge narrows it).")]
+    [Min(0.3f)] public float valleyWidth = 1f;
 
     [Header("Cliffs and Ravines")]
     [Tooltip("The raid planner offers a run of this mood as a large raid first. The player can still pick Normal.")]
@@ -328,6 +367,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Tooltip("Spawn groups placed by hand on the painted map, and the kind of site that takes them here.")]
     [SerializeField] private List<RaidGroupRule> groups = new List<RaidGroupRule>();
 
+    [Header("Valley (the Valley shape)")]
+    [SerializeField] private RaidValleyRule valley = new RaidValleyRule();
+
     [Header("Set Pieces")]
     [Tooltip("The authored places a run can have. Every rumour site that has room gets one, as do a few camps.")]
     [SerializeField] private List<RaidSetPieceDefinition> setPieces = new List<RaidSetPieceDefinition>();
@@ -387,6 +429,8 @@ public sealed class RaidLayoutRules : ScriptableObject
     }
 
     public IReadOnlyList<RaidSetPieceDefinition> SetPieces => setPieces;
+    /// <summary>How a map of the Valley shape is laid out.</summary>
+    public RaidValleyRule Valley => valley;
     public Vector2Int CampPieces => campPieces;
 
     public Vector2Int Rooms => rooms;

@@ -31,6 +31,12 @@ public static partial class RaidLayoutPlanner
 
     private static void PlaceRooms(RaidLayoutPlan plan, RaidLayoutRules rules, System.Random random, out List<int> spine)
     {
+        if (plan.Valley != null)
+        {
+            PlaceValleyRooms(plan, rules, out spine);
+            return;
+        }
+
         float size = plan.Size;
         float margin = rules.EdgeMargin + rules.RoomRadius.y * 0.5f;
         var centre = new Vector2(size * 0.5f, size * 0.5f);
@@ -191,7 +197,7 @@ public static partial class RaidLayoutPlanner
                 Join(spine[i], spine[(i + 1) % spine.Count]);
             }
         }
-        else if (plan.Shape.shape == RaidLayoutShape.Spine)
+        else if (plan.Shape.shape == RaidLayoutShape.Spine || plan.Shape.shape == RaidLayoutShape.Valley)
         {
             for (int i = 0; i + 1 < spine.Count; i++)
             {

@@ -148,7 +148,8 @@ public sealed partial class RaidLayoutField
         float edge = Mathf.Min(x, Mathf.Min(y, Mathf.Min(plan.Size - x, plan.Size - y)));
         float rim = Mathf.SmoothStep(0f, 1f, 1f - edge / rules.RimWidth) * rules.RimHeight;
         float level = levelHeight != null ? Sample(levelHeight, u, v) : 0f;
-        return ground + ridge + rough + rim + level + lift;
+        float valley = valleyBeyond != null ? ValleyAt(x, y, u, v) : 0f;
+        return ground + ridge + rough + rim + level + valley + lift;
     }
 
     /// <summary>The heights as a terrain takes them (rows from the south, 0–1 of the map's height).</summary>

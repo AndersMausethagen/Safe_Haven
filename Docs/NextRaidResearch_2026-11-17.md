@@ -11,6 +11,18 @@ Nothing in the project was changed.
 
 ---
 
+## Decisions (the user, 2026-11-17)
+
+1. **Order: Troll Valley, then the Moss Marsh, then the Frost Peaks last** ("wait, no. Peaks last!").
+2. **Names:** "Moss Marsh" for the raid, "the Drowning Fen" for its heart.
+3. **The Nøkk is the boss, the Lindorm the apex.**
+4. **The boss is not the Haven's Nøkk** but a more corrupted version of it.
+5. **The utburd stays as written.**
+6. **Soaked:** yes, add the status.
+7. **New drops come alongside** the existing ones, not instead of them.
+8. **The rowboat:** yes, a real tool.
+9. Make the props and the extra monsters the raids need with LocalSpawn.
+
 ## The short answer
 
 - **Next: the Moss Marsh, a tier III raid** (it offers tiers III and IV).

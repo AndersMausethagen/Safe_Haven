@@ -106,7 +106,7 @@ public sealed partial class RaidLayoutField
 
         float half = Mathf.Max(0.5f, Sample(riverHalf, u, v));
         float level = Sample(riverLevel, u, v);
-        float ford = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(Sample(trailDistance, u, v) / RiverFordFade));
+        float ford = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(Sample(fordDistance ?? trailDistance, u, v) / RiverFordFade));
         float bank = RiverBank + RiverFordBank * ford;
         if (edge >= bank)
         {

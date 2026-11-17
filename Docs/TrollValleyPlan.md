@@ -3,6 +3,17 @@
 The user: "create the world generator for the troll valley raid. you decide the creative direction, how its build,
 whats in the biome and what creatures. but the name should give you a hint". Not built yet; this is the plan.
 
+## Progress
+
+- **Step 0, done (2026-11-17):** `RaidLayoutGoldenTests` pins the Misty Woods' plans and heights for seeds 1-5 and a large map.
+- **Step 1, done:** `Raid_TrollValley.unity` with its own map, terrain, mist, climate, day-night, birds and navmesh; the Woods'
+  quests and story stay in the Woods; a Berg-jutul walks the apex round (`RaidSceneRigTests`).
+- **Step 3, built (not yet seen in a launched raid):** the Valley shape (ARCHITECTURE › Generated raid maps), Troll Valley's rules
+  set to it with five valley moods (Birch Floor, Scree and Stone, The Troll's Road, River Mist, Gorge Narrows), 6-8 stops and about
+  two thirds of the Woods' sites; `RaidValleyTests`. Bridges are off (every crossing a ford) until the bridge model is in (step 4).
+- **Art in progress:** birches (`Art/Vegetation/Birch`) for the look pass; LocalSpawn models for the Brukam, his bridge, club, hoard
+  and bones, a seter ruin and a striding troll stone (props/creatures manifests).
+
 ## Creative direction
 
 A long glacial **U-valley** of old Norway. A meandering river with gravel bars, cotton grass and wet meadow runs along the

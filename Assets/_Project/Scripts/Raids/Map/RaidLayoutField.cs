@@ -40,6 +40,10 @@ public sealed partial class RaidLayoutField
     private float[] riverHalf;
     private float[] riverLevel;
     private float[] riverDepth;
+    // On a Valley map: how far each spot lies beyond the floor's edge (below zero: on the floor), and the trails at fords only (a
+    // bridged crossing keeps the river deep under it).
+    private float[] valleyBeyond;
+    private float[] fordDistance;
     private float lift;
     private readonly System.Text.StringBuilder timings = new System.Text.StringBuilder();
 
@@ -107,6 +111,12 @@ public sealed partial class RaidLayoutField
         }
 
         field.lift = LiftFor(plan, rules);
+        if (plan.Valley != null)
+        {
+            clock.Restart();
+            field.BuildValley(halfWidth);
+            field.timings.Append($"valley {clock.ElapsedMilliseconds} ms, ");
+        }
 
         // Ponds lie on open ground: the ridges keep back and the forest thins, though only trails and clearings are soil.
         foreach (RaidLayoutPond pond in plan.Ponds)

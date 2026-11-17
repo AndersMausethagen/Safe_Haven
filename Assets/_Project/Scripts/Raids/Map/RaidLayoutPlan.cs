@@ -265,6 +265,10 @@ public sealed class RaidLayoutPlan
     public readonly HashSet<int> LongRoute = new HashSet<int>();
     /// <summary>The rivers across the open land.</summary>
     public readonly List<RaidLayoutRiver> Rivers = new List<RaidLayoutRiver>();
+    /// <summary>On a map of the Valley shape, the valley (its river is the first of <see cref="Rivers"/>); null on any other.</summary>
+    public RaidLayoutValley Valley;
+    /// <summary>Where trails cross the valley's river, at fords and bridges.</summary>
+    public readonly List<RaidLayoutCrossing> Crossings = new List<RaidLayoutCrossing>();
     /// <summary>Tall things to find the way by.</summary>
     public readonly List<RaidLayoutLandmark> Landmarks = new List<RaidLayoutLandmark>();
 

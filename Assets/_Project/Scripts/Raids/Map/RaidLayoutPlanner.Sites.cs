@@ -227,6 +227,11 @@ public static partial class RaidLayoutPlanner
 
         Vector2 side = Vector2.Perpendicular((trail[at + 1] - trail[at]).normalized) * (random.Next(2) == 0 ? -1f : 1f);
         Vector2 spot = point + side * Range(random, quota.offPath.x, quota.offPath.y);
+        if (plan.Valley != null && plan.Valley.BankOf(spot) != plan.Valley.BankOf(point))
+        {
+            return; // a side trail never wades the valley's river
+        }
+
         if (spot.x < rules.EdgeMargin || spot.y < rules.EdgeMargin || spot.x > plan.Size - rules.EdgeMargin || spot.y > plan.Size - rules.EdgeMargin
             || !CanStand(plan, quota, spot) || !PocketFits(plan, rules, spot, quota.clearing))
         {

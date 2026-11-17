@@ -51,10 +51,16 @@ public static partial class RaidLayoutPlanner
             NoiseOffset = new Vector2((float)random.NextDouble() * 1000f, (float)random.NextDouble() * 1000f),
         };
 
+        if (plan.Shape.shape == RaidLayoutShape.Valley)
+        {
+            PlaceValley(plan, rules, attempt);
+        }
+
         PlaceRooms(plan, rules, random, out List<int> spine);
         JoinRooms(plan, rules, random, spine);
         PlaceRegions(plan, rules, attempt);
         EnsureRoutes(plan, rules, attempt);
+        ShapeCrossings(plan, rules, attempt);
         AssignLevels(plan, rules);
         PlaceHills(plan, rules, attempt);
         ApexByHeight(plan, rules);

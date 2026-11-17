@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59f20d78bb4bfcc489c3cc1a088c0af5, type: 3}
   m_Name: TrollValley Layout
   m_EditorClassIdentifier: SafeHaven::RaidLayoutRules
-  rooms: {x: 9, y: 12}
+  rooms: {x: 6, y: 8}
   exitRooms: 3
   roomSeparation: 34
   roomRadius: {x: 8, y: 14}
@@ -30,9 +30,12 @@ MonoBehaviour:
   rimHeight: 12.150001
   rimWidth: 12
   hillVariance: {x: 0.6, y: 1.9}
-  greatHills: {x: 2, y: 4}
+  greatHills: {x: 0, y: 0}
   greatHillHeight: {x: 4, y: 9}
   greatHillRadius: {x: 22, y: 42}
+  siteClutter: []
+  clutterPerSite: {x: 2, y: 5}
+  clutterReach: {x: 3.5, y: 8}
   boulderKit: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
   boulderClusters: {x: 6, y: 10}
   boulderClusterSize: {x: 1, y: 3}
@@ -43,7 +46,7 @@ MonoBehaviour:
   regionBlend: 30
   twoRoutes: 1
   campsOnShortRoute: 1
-  surfaceRivers: {x: 0, y: 1}
+  surfaceRivers: {x: 0, y: 0}
   surfaceRiverWidth: {x: 5, y: 8}
   surfaceRiverDepth: {x: 1.3, y: 1.9}
   fordDepth: 0.45
@@ -65,7 +68,7 @@ MonoBehaviour:
   forestDensity: 0.49600002
   forestPatches: 28
   fieldResolution: 200
-  ponds: {x: 0, y: 1}
+  ponds: {x: 0, y: 0}
   pondRadius: {x: 3.5, y: 11}
   pondDepth: {x: 0.7, y: 1.6}
   pondStretch: 1.6
@@ -81,49 +84,26 @@ MonoBehaviour:
   wetReach: 12
   dampGround: 0.45
   shapes:
-  - shape: 0
+  - shape: 4
     weight: 1
-    loopChance: 0.12
-    briefing: The trails all meet at one great clearing.
-  - shape: 1
-    weight: 1
-    loopChance: 0.08
-    briefing: The trails run in a ring around wild ground nobody crosses.
-  - shape: 2
-    weight: 1
-    loopChance: 0.12
-    briefing: One long trail runs through it, with paths branching off.
-  - shape: 3
-    weight: 1
-    loopChance: 0.4
-    briefing: The trails tangle, and there is always another way round.
+    loopChance: 0.55
+    briefing: 'The valley runs one way: up from its mouth to its head, and the river comes down it. Every way up crosses the water.'
   moods:
-  - name: Windthrow
-    briefing: 'A storm has been through: dead trunks and fallen logs, and long views.'
+  - name: Birch Floor
+    briefing: Birches crowd the valley floor, and the river runs quiet between them.
     weight: 1
-    forest: 0.7
+    forest: 0.95
     treeSpacing: 1
-    treeWeights:
-    - 0.4
-    - 0.4
-    - 0.8
-    - 0.8
-    - 0.6
-    - 1
-    - 1
-    - 1
-    - 1
-    - 1
-    - 2
-    - 4
-    ridges: 1
+    treeWeights: []
+    ridges: 0.35
     rooms: 1
     trails: 1
-    rocks: 4
+    rocks: 1.2
     fogBanks: 0
     hills: 1
-    boulders: 1
-    rivers: 0.7
+    boulders: 1.2
+    rivers: 0
+    valleyWidth: 1
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -138,20 +118,108 @@ MonoBehaviour:
     spires: {x: 0, y: 0}
     spireHeight: {x: 9, y: 16}
     spireRadius: {x: 3, y: 7}
-  - name: The Hollows
-    briefing: The land folds into steep hollows, and the mist lies in them.
+  - name: Scree and Stone
+    briefing: 'Rockfalls have filled the valley: scree, great stones and few trees.'
     weight: 1
-    forest: 0.9
+    forest: 0.45
     treeSpacing: 1
     treeWeights: []
-    ridges: 1.7
+    ridges: 0.5
     rooms: 1
-    trails: 0.9
+    trails: 1
+    rocks: 2.5
+    fogBanks: 0
+    hills: 1
+    boulders: 2.2
+    rivers: 0
+    valleyWidth: 0.9
+    largeByDefault: 0
+    terraces: 0
+    terraceHeight: 7
+    terraceScale: 110
+    ravines: {x: 0, y: 0}
+    ravineLength: {x: 60, y: 150}
+    ravineWidth: {x: 9, y: 13}
+    ravineDepth: {x: 14, y: 20}
+    riverChance: 0.6
+    ravineMist: 1
+    ravineDescents: 0
+    spires: {x: 0, y: 0}
+    spireHeight: {x: 9, y: 16}
+    spireRadius: {x: 3, y: 7}
+  - name: The Troll's Road
+    briefing: An old road runs up the valley, and the trolls keep its bridges.
+    weight: 1
+    forest: 0.6
+    treeSpacing: 1
+    treeWeights: []
+    ridges: 0.3
+    rooms: 1
+    trails: 1.15
+    rocks: 1.2
+    fogBanks: 0
+    hills: 1
+    boulders: 1.4
+    rivers: 0
+    valleyWidth: 1.05
+    largeByDefault: 0
+    terraces: 0
+    terraceHeight: 7
+    terraceScale: 110
+    ravines: {x: 0, y: 0}
+    ravineLength: {x: 60, y: 150}
+    ravineWidth: {x: 9, y: 13}
+    ravineDepth: {x: 14, y: 20}
+    riverChance: 0.6
+    ravineMist: 1
+    ravineDescents: 0
+    spires: {x: 0, y: 0}
+    spireHeight: {x: 9, y: 16}
+    spireRadius: {x: 3, y: 7}
+  - name: River Mist
+    briefing: Mist lies along the river all day, and sound carries far on it.
+    weight: 1
+    forest: 0.8
+    treeSpacing: 1
+    treeWeights: []
+    ridges: 0.35
+    rooms: 1
+    trails: 1
     rocks: 1
     fogBanks: 3
     hills: 1
-    boulders: 1
-    rivers: 1.5
+    boulders: 1.2
+    rivers: 0
+    valleyWidth: 1.1
+    largeByDefault: 0
+    terraces: 0
+    terraceHeight: 7
+    terraceScale: 110
+    ravines: {x: 0, y: 0}
+    ravineLength: {x: 60, y: 150}
+    ravineWidth: {x: 9, y: 13}
+    ravineDepth: {x: 14, y: 20}
+    riverChance: 0.6
+    ravineMist: 1
+    ravineDescents: 0
+    spires: {x: 0, y: 0}
+    spireHeight: {x: 9, y: 16}
+    spireRadius: {x: 3, y: 7}
+  - name: Gorge Narrows
+    briefing: 'The valley narrows to a gorge: steep walls and little room between them.'
+    weight: 1
+    forest: 0.5
+    treeSpacing: 1
+    treeWeights: []
+    ridges: 0.4
+    rooms: 1
+    trails: 1
+    rocks: 1.8
+    fogBanks: 0
+    hills: 1
+    boulders: 1.5
+    rivers: 0
+    valleyWidth: 0.72
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -169,7 +237,7 @@ MonoBehaviour:
   sites:
   - kind: 10
     placement: 3
-    count: 3
+    count: 2
     separation: 45
     fromStart: 65
     offPath: {x: 12, y: 20}
@@ -178,7 +246,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 8
     placement: 3
-    count: 5
+    count: 3
     separation: 28
     fromStart: 35
     offPath: {x: 11, y: 18}
@@ -187,7 +255,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 3
     placement: 0
-    count: 9
+    count: 6
     separation: 24
     fromStart: 42
     offPath: {x: 10, y: 16}
@@ -196,7 +264,7 @@ MonoBehaviour:
     overlooksRamps: 1
   - kind: 6
     placement: 0
-    count: 6
+    count: 4
     separation: 26
     fromStart: 30
     offPath: {x: 8, y: 12}
@@ -205,7 +273,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 4
     placement: 2
-    count: 14
+    count: 9
     separation: 17
     fromStart: 14
     offPath: {x: 9, y: 15}
@@ -214,7 +282,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 5
     placement: 2
-    count: 12
+    count: 8
     separation: 16
     fromStart: 20
     offPath: {x: 10, y: 17}
@@ -223,7 +291,7 @@ MonoBehaviour:
     overlooksRamps: 0
   - kind: 7
     placement: 1
-    count: 10
+    count: 6
     separation: 20
     fromStart: 45
     offPath: {x: 9, y: 16}
@@ -235,6 +303,20 @@ MonoBehaviour:
     site: 3
   - group: Mistwings
     site: 3
+  valley:
+    floorWidth: {x: 70, y: 90}
+    wallHeight: {x: 18, y: 24}
+    wallRun: 26
+    benches: 3
+    meander: {x: 10, y: 20}
+    bendLength: {x: 110, y: 160}
+    tilt: {x: 5, y: 9}
+    riverWidth: {x: 6, y: 9}
+    riverDepth: {x: 1.5, y: 2}
+    bridges: {x: 0, y: 0}
+    bridgePrefab: {fileID: 0}
+    bridgeLength: 14
+    bridgeDeck: 2
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
