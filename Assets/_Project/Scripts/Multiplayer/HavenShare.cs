@@ -318,11 +318,20 @@ public sealed class HavenShare : ICoopPart, IDisposable
     /// </summary>
     public void EndVisit(bool travel)
     {
-        if (travel && HavenVisit.IsVisiting && GameSession.ActiveRaid != null)
+        // A raid decided but not yet left (the few seconds before the results) counts as under way: the character then still
+        // stands with the whole bag, not with what the raid let them keep, and going home from there undid a fall.
+        if (travel && HavenVisit.IsVisiting && (GameSession.ActiveRaid != null || RaidDirector.Current != null))
         {
             homeAfterRaid = true;
             GameMessages.Post("You'll head home once this raid is over.");
             return;
+        }
+
+        // Leaving without the trip home (to the main menu) mid-raid: the raid ends first, as a quit does, and is written as this
+        // player's own journey while the visit still knows it; ended afterwards, its save wrote the host's Haven over theirs.
+        if (!travel && HavenVisit.IsVisiting && RaidDirector.Current != null)
+        {
+            RaidDirector.Current.Abandon();
         }
 
         homeAfterRaid = false;
@@ -332,7 +341,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
     /// <summary>A scene with a player in it: back from the raid a session ended during, now home. True when it left for home.</summary>
     public bool HeadHomeIfDue()
     {
-        if (!homeAfterRaid || GameSession.ActiveRaid != null)
+        if (!homeAfterRaid || GameSession.ActiveRaid != null || RaidDirector.Current != null)
         {
             return false;
         }

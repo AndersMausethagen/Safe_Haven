@@ -305,21 +305,52 @@ public sealed class CreaturePuppets : IRaidCreatureSource
         }
 
         var chosen = new List<EliteAffixDefinition>();
+        string lostName = null;
+        int lostRank = 1;
+        LostOneSettings lostOnes = LostOneSettings.Current;
         foreach (string name in names.Split('|'))
         {
+            // One of the host's Lost: its rank and name come first (LostOne.Pack), its traits from the Lost's own list.
+            if (LostOne.TryUnpack(name, out string title, out int rank))
+            {
+                lostName = title;
+                lostRank = rank;
+                continue;
+            }
+
+            EliteAffixDefinition found = null;
             foreach (EliteAffixDefinition affix in run.Definition.EliteAffixes)
             {
                 if (affix != null && affix.name == name)
                 {
-                    chosen.Add(affix);
+                    found = affix;
                     break;
                 }
             }
+
+            if (found == null)
+            {
+                found = lostOnes.FindTrait(name);
+            }
+
+            if (found != null)
+            {
+                chosen.Add(found);
+            }
         }
 
-        if (chosen.Count > 0)
+        if (chosen.Count == 0 && lostName == null)
         {
-            EliteCreature.Make(puppet, chosen, run.Difficulty, director.HealthMultiplier, director.PowerMultiplier);
+            return;
+        }
+
+        EliteCreature elite = EliteCreature.Make(puppet, chosen, run.Difficulty, director.HealthMultiplier, director.PowerMultiplier);
+        if (lostName != null)
+        {
+            // Its strikes play out here on this player, so they are as hard as its rank makes them; its health is the host's word.
+            LostOneSettings.Rank row = lostOnes.RankAt(lostRank);
+            elite.Strengthen(row.health, row.damage, director.HealthMultiplier, director.PowerMultiplier);
+            elite.Rename(lostName, LostOne.LabelFor(lostName, chosen, null, lostOnes.LabelColour));
         }
     }
 

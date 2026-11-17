@@ -182,24 +182,41 @@ public static class SaveGameService
     /// </summary>
     public static void SaveAtRaidEnd(PlayerSnapshot keeps)
     {
-        if (!ShouldAutosave || keeps == null || CurrentSlot == null || HavenVisit.IsVisiting)
+        if (!ShouldAutosave || keeps == null || CurrentSlot == null)
         {
             return;
         }
 
         try
         {
-            SaveData data = SaveMapper.ToSaveData(keeps, GameSession.Stash, HavenVisit.HavenScene, null, DateTime.UtcNow,
-                GameSession.World, GameSession.Quests, GameSession.HereItself, GameSession.Playtest, GameSession.Progress);
-            data.displayName = CurrentName;
-            data.appearance = GameSession.Appearance.Clone();
+            // A guest (following the host) writes their own journey with the character as the raid left it, never the host's
+            // world they stand in: skipping the save left the launch save, and a quit or crash after a fall undid it.
+            SaveData data = FromKept(keeps);
+            if (HavenVisit.IsVisiting)
+            {
+                data = HavenVisit.ForOwnSave(data);
+            }
+
             data.raidUnderWay = null;
+            data.arriving = Arriving();
             Storage.Write(CurrentSlot, data);
         }
         catch (Exception exception)
         {
             Debug.LogWarning("Couldn't save the raid's end: " + exception.Message);
         }
+    }
+
+    /// <summary>The game as a raid's end leaves it: the character as <paramref name="keeps"/> (what the raid let them keep), home
+    /// in the Haven, at the portal.</summary>
+    public static SaveData FromKept(PlayerSnapshot keeps)
+    {
+        SaveData data = SaveMapper.ToSaveData(keeps, GameSession.Stash, HavenVisit.HavenScene, null, DateTime.UtcNow,
+            GameSession.World, GameSession.Quests, GameSession.HereItself, GameSession.Playtest, GameSession.Progress);
+        data.displayName = CurrentName;
+        data.appearance = GameSession.Appearance.Clone();
+        data.raidUnderWay = null;
+        return data;
     }
 
     /// <summary>Saves as soon as the player stands somewhere that can be saved: home from a raid, past its results screen.</summary>
@@ -331,7 +348,55 @@ public static class SaveGameService
         data.displayName = CurrentName;
         data.appearance = GameSession.Appearance.Clone();
         data.raidUnderWay = raidUnderWay;
+        data.arriving = Arriving();
         return data;
+    }
+
+    // The horse and the cart on their way home (from a raid's end until they are set down): kept in the save, they are not lost to a
+    // quit or a crash in between. Never a guest's: what they lead stays in the host's Haven.
+    private static ArrivingSaveData Arriving()
+    {
+        var arriving = new ArrivingSaveData();
+        if (HavenVisit.IsVisiting)
+        {
+            return arriving;
+        }
+
+        if (HorseTravel.OnItsWayHome(out string horse, out string state, out float health))
+        {
+            arriving.horse = horse;
+            arriving.horseState = state;
+            arriving.horseHealth = health;
+        }
+
+        if (GameSession.PeekTransport(out GameSession.CarriedTransport cart) && cart.Definition != null && cart.Definition.Prefab != null)
+        {
+            arriving.cart = cart.Definition.Prefab.PrefabId;
+            arriving.cartState = cart.State;
+        }
+
+        return arriving;
+    }
+
+    // A loaded save's horse and cart still on their way home arrive in the scene it goes to.
+    private static void SendOnTheirWay(ArrivingSaveData arriving)
+    {
+        if (arriving == null || arriving.IsEmpty)
+        {
+            return;
+        }
+
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        if (!string.IsNullOrEmpty(arriving.horse))
+        {
+            HorseTravel.ComeHome(arriving.horse, arriving.horseState, arriving.horseHealth);
+        }
+
+        SaveableEntity cart = !string.IsNullOrEmpty(arriving.cart) && content != null ? content.FindPrefab(arriving.cart) : null;
+        if (cart != null && cart.TryGetComponent(out Transport transport) && transport.Definition != null)
+        {
+            GameSession.CarryTransport(new GameSession.CarriedTransport(transport.Definition, arriving.cartState));
+        }
     }
 
     /// <summary>
@@ -529,6 +594,7 @@ public static class SaveGameService
         }
 
         GameSession.LoadGame(game);
+        SendOnTheirWay(data.arriving);
         CurrentSlot = slot;
         CurrentName = SaveSlotInfo.NameFor(slot, data);
         Go(scene, notice, "Returning to your journey");

@@ -398,9 +398,24 @@ public sealed partial class PlayerCombat : MonoBehaviour
             health.Evaded += OnEvaded;
             health.Damaged += OnHurt;
             health.Guarded += OnGuarded;
+            health.Died += OnDied;
         }
 
         mode.Attach(this);
+    }
+
+    // Fallen: the swing under way, its blows still to land and any press waiting are all gone. A blow landing after death dealt
+    // damage, and one that felled a boss counted its win on a raid already lost.
+    private void OnDied(Damageable victim, DamageInfo killingBlow)
+    {
+        EndSwing();
+        EndFinish();
+        pendingHits.Clear();
+        queuedKind = SwingKind.None;
+        pressTime = -1f;
+        heldEarlyPress = false;
+        attackHeld = false;
+        forcedAttack = null;
     }
 
     private void OnDisable()
@@ -427,6 +442,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
             health.Evaded -= OnEvaded;
             health.Damaged -= OnHurt;
             health.Guarded -= OnGuarded;
+            health.Died -= OnDied;
         }
 
         mode.Detach();

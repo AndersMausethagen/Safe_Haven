@@ -453,7 +453,8 @@ public sealed class CreatureHost
     private static byte HealthByte(Hosted hosted) =>
         hosted.Health != null ? (byte)Mathf.Clamp(Mathf.CeilToInt(hosted.Health.CurrentHealth / hosted.Health.MaxHealth * 255f), 0, 255) : (byte)255;
 
-    // An elite's affixes by name ("Frenzied|Ironhide"), or empty for a plain creature.
+    // An elite's affixes by name ("Frenzied|Ironhide"), or empty for a plain creature. One of the Lost goes first with its rank and name
+    // ("~3~Halvard Hollow-Eyed|Frenzied", LostOne.Pack), so a friend's copy is as strong and called the same.
     private static string AffixesOf(MonsterAI creature)
     {
         if (!creature.TryGetComponent(out EliteCreature elite))
@@ -462,6 +463,11 @@ public sealed class CreatureHost
         }
 
         var names = new List<string>();
+        if (creature.TryGetComponent(out LostOne lost) && lost.Record != null)
+        {
+            names.Add(LostOne.Pack(lost.Record));
+        }
+
         foreach (EliteAffixDefinition affix in elite.Affixes)
         {
             if (affix != null)

@@ -12,6 +12,7 @@ public static class HitDetector
     private const float CenterHeight = 1f;
 
     private static readonly Collider[] Overlaps = new Collider[64];
+    private static readonly RaycastHit[] Between = new RaycastHit[16];
     private static readonly System.Comparison<Hit> ByDistance = (a, b) => a.Distance.CompareTo(b.Distance);
 
     public readonly struct Hit
@@ -67,6 +68,11 @@ public static class HitDetector
                 continue;
             }
 
+            if (distance > 0.05f && Walled(center, point, target))
+            {
+                continue;
+            }
+
             results.Add(new Hit(target, point, distance));
         }
 
@@ -76,6 +82,36 @@ public static class HitDetector
         {
             results.RemoveRange(attack.MaxTargets, results.Count - attack.MaxTargets);
         }
+    }
+
+    // Scenery between the blow and the target (a palisade, a gate, an arena's root wall, a hill) takes it: a blow was a sphere and a
+    // cone, and trolls and the player hit each other through walls. Creatures and players in between don't stop it (a sweep through a
+    // crowd), nor does the target's own body.
+    private static bool Walled(Vector3 from, Vector3 to, IDamageable target)
+    {
+        Vector3 way = to - from;
+        float length = way.magnitude;
+        if (length < 0.05f)
+        {
+            return false;
+        }
+
+        int count = Physics.RaycastNonAlloc(from, way / length, Between, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            Collider wall = Between[i].collider;
+            // The living (creatures, companions, villagers, horses, players) walk on agents or controllers.
+            if (wall == null || wall.GetComponentInParent<IDamageable>() == target || wall.GetComponentInParent<MonsterAI>() != null
+                || wall.GetComponentInParent<UnityEngine.AI.NavMeshAgent>() != null || wall.GetComponentInParent<CharacterController>() != null
+                || wall.GetComponentInParent<NetworkPlayerAvatar>() != null)
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>Fills results with the living, hostile targets within <paramref name="radius"/> of the path from <paramref name="start"/> to

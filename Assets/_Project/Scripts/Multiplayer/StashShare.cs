@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 /// <summary>
@@ -164,6 +165,14 @@ public sealed class StashShare
             return false;
         }
 
+        // A move made here since the last look and not yet sent: taken on now, the snapshot wiped it, so a take was never sent (the
+        // item stayed in both the stash and the bag) or a deposit vanished. The next look sends it, and the host answers with a
+        // snapshot that includes it.
+        if (hasCopy && HasUnsent(stash))
+        {
+            return false;
+        }
+
         stash.Items.Clear();
         SaveMapper.ReadSlots(snapshot.stash.items ?? new List<SlotSaveData>(), stash.Items, content, new List<string>());
         var keep = new HashSet<string>();
@@ -190,6 +199,10 @@ public sealed class StashShare
         hasCopy = true;
         return true;
     }
+
+    private bool HasUnsent(StashStorage stash) =>
+        Differences(itemsBefore, Count(SaveMapper.ToSlots(stash.Items))).Any()
+        || Differences(resourcesBefore, Count(Amounts(stash.Resources))).Any();
 
     /// <summary>What this guest put in or took out since the last look, numbered, or null when nothing.</summary>
     public Change CollectChange(StashStorage stash)

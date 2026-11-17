@@ -9,7 +9,8 @@ Make-It-Animatable rigged them (52 Mixamo bones, T-pose rest):
 - exported as Assets/_Project/Art/Enemies/Downloaded/<Name>/<Name>.fbx with its BaseColor and Normal maps beside it, and a
   front/side preview render to Tools/Blender/folk_creatures_<Name>.png.
 
-Run from the project root, after rigging (rigged FBX at Tools/LocalSpawn/Creatures/<Name>/A/rigged.fbx):
+Run from the project root, after rigging (rigged FBX at Tools/LocalSpawn/Creatures/<Name>/A/rigged.fbx, or <asset>/<look>/ for a
+creature given as (height, asset, look)):
   "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe" -b --factory-startup --python Tools/Blender/folk_creatures.py -- . [Name ...]
 """
 import glob
@@ -41,7 +42,20 @@ CREATURES = {
     "Brukam": 4.6,
     "NokkOfTheBlackPool": 2.3,
     "Deildegast": 1.75,
+    # 2026-11-17: the Lost, the nemesis bodies; two looks of each armour grade, so each is (height, source asset, look).
+    "LostClothA": (1.8, "LostCloth", "A"),
+    "LostClothB": (1.72, "LostCloth", "B"),
+    "LostLeatherA": (1.84, "LostLeather", "A"),
+    "LostLeatherB": (1.86, "LostLeather", "B"),
+    "LostMailA": (1.86, "LostMail", "A"),
+    "LostMailB": (1.9, "LostMail", "B"),
 }
+
+
+def spec(name):
+    """(height, source asset, look): a plain height means the creature's own folder and look A."""
+    entry = CREATURES[name]
+    return (entry, name, "A") if isinstance(entry, (int, float)) else entry
 
 
 def clean_skin(mesh, armature):
@@ -129,7 +143,8 @@ def clean_skin(mesh, armature):
 
 
 def make(name):
-    rigged = os.path.join(SOURCE, name, "A", "rigged.fbx")
+    height, source, look = spec(name)
+    rigged = os.path.join(SOURCE, source, look, "rigged.fbx")
     if not os.path.exists(rigged):
         print(f"[folk] {name}: no rig yet at {rigged}")
         return
@@ -151,7 +166,7 @@ def make(name):
     bpy.context.view_layer.update()
     corners = [mesh.matrix_world @ v.co for v in mesh.data.vertices]
     low, high = min(c.z for c in corners), max(c.z for c in corners)
-    scale = CREATURES[name] / max(1e-3, high - low)
+    scale = height / max(1e-3, high - low)
     armature.scale = tuple(s * scale for s in armature.scale)
     bpy.context.view_layer.update()
     corners = [mesh.matrix_world @ v.co for v in mesh.data.vertices]
@@ -175,12 +190,12 @@ def make(name):
                              axis_forward='-Z', axis_up='Y', bake_space_transform=False, object_types={'MESH', 'ARMATURE'},
                              add_leaf_bones=False, bake_anim=False, mesh_smooth_type='FACE', use_mesh_modifiers=False,
                              path_mode='STRIP', embed_textures=False)
-    model = os.path.join(SOURCE, name, "A", "model")
+    model = os.path.join(SOURCE, source, look, "model")
     for kind in ("BaseColor", "Normal"):
         found = glob.glob(os.path.join(model, f"*_{kind}.png"))
         if found:
             shutil.copyfile(found[0], os.path.join(folder, f"{name}_{kind}.png"))
-    print(f"[folk] {name}: {len(mesh.data.polygons)} faces, {len(armature.data.bones)} bones, {CREATURES[name]} m, "
+    print(f"[folk] {name}: {len(mesh.data.polygons)} faces, {len(armature.data.bones)} bones, {height} m, "
           f"{crumbs} loose verts removed, {fixed} unweighted verts weighted")
     preview(name, mesh, folder)
 
@@ -198,7 +213,7 @@ def preview(name, mesh, folder):
         material.node_tree.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
     mesh.data.materials.clear()
     mesh.data.materials.append(material)
-    height = CREATURES[name]
+    height = spec(name)[0]
     side = bpy.data.objects.new("Side", mesh.data)
     side.matrix_world = mesh.matrix_world.copy()
     scene.collection.objects.link(side)

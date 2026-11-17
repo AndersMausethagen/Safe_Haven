@@ -1,0 +1,17 @@
+{
+  "_note": "The Lost (2026-11-17): garments as their own meshes for Unity Cloth (the user: 'separate the armor or cloth only, not the limbs. and give it realistic physics'). Boxes are concept pixels (1024x1024).",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "skirt",
+      "box": [
+        320,
+        405,
+        690,
+        705
+      ],
+      "keep": "the skirt of overlapping blackened leather lamellar plates laced with cord, from the wide belt with its iron buckle down to the lowest row of plates, the belt at the top, as a garment on its own: no body, no legs, no arms, no hands, the garment hollow inside where the body was, seen straight from the front",
+      "seed": 1
+    }
+  ]
+}

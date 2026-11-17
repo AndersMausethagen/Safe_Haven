@@ -102,6 +102,15 @@ public sealed class DroppedItem : MonoBehaviour, ISaveable, IInteractionName, II
             return null;
         }
 
+        // More than one stack's worth goes down as several: a drop holds one slot, and the rest was cut off while the message said it
+        // lay at the player's feet (90 pennies salvaged into a full bag left 50).
+        int most = stack.IsEmpty ? 0 : Mathf.Max(1, stack.Item.MaximumStack);
+        while (most > 0 && stack.Count > most)
+        {
+            Drop(user, stack.WithCount(most));
+            stack = stack.WithCount(stack.Count - most);
+        }
+
         Quaternion facing = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
         var dropped = SaveableEntity.Spawn(settings.Prefab, FindSpot(user, settings), facing).GetComponent<DroppedItem>();
         dropped.Hold(stack);

@@ -124,7 +124,8 @@ public static class AltarWork
                     Done = level <= stack.Empower,
                 };
                 offer.Problem = offer.Done ? "It already holds this." : level > stack.Empower + 1 ? $"Reach +{stack.Empower + 1} first." : Missing(user, offer.Cost);
-                offer.Apply = () => Empower(user, held, level, offer.Cost);
+                ItemDefinition priced = stack.Item;
+                offer.Apply = () => Empower(user, held, priced, level, offer.Cost);
                 subject.Offers.Add(offer);
             }
 
@@ -134,10 +135,12 @@ public static class AltarWork
         return subjects;
     }
 
-    private static void Empower(GameObject user, Held held, int level, RepairCost cost)
+    // The piece priced is the one worked: the window reads the slot again only twice a second, and a piece swapped into it meanwhile
+    // was empowered at the old piece's price, or had its carving replaced unseen.
+    private static void Empower(GameObject user, Held held, ItemDefinition priced, int level, RepairCost cost)
     {
         ItemStack stack = held.Stack;
-        if (stack.IsEmpty || stack.Empower != level - 1 || !MaterialPool.For(user).TrySpend(cost.Resources, cost.Items))
+        if (stack.IsEmpty || stack.Item != priced || stack.Empower != level - 1 || !MaterialPool.For(user).TrySpend(cost.Resources, cost.Items))
         {
             return;
         }
@@ -228,7 +231,9 @@ public static class AltarWork
             : !known ? $"Not known yet. {enchantment.SourceHint}."
             : !canCarve ? skillProblem
             : Missing(user, offer.Cost);
-        offer.Apply = () => Enchant(user, held, enchantment, offer.Cost);
+        ItemDefinition pricedPiece = stack.Item;
+        EnchantmentDefinition carries = stack.Enchantment;
+        offer.Apply = () => Enchant(user, held, pricedPiece, carries, enchantment, offer.Cost);
         return offer;
     }
 
@@ -263,10 +268,10 @@ public static class AltarWork
         return carrier.IsEmpty ? "" : $"Counts once: your {carrier.DisplayName} already gives it.";
     }
 
-    private static void Enchant(GameObject user, Held held, EnchantmentDefinition enchantment, RepairCost cost)
+    private static void Enchant(GameObject user, Held held, ItemDefinition priced, EnchantmentDefinition carried, EnchantmentDefinition enchantment, RepairCost cost)
     {
         ItemStack stack = held.Stack;
-        if (stack.IsEmpty || !enchantment.Fits(stack.Item) || !GameSession.Progress.Knows(enchantment)
+        if (stack.IsEmpty || stack.Item != priced || stack.Enchantment != carried || !enchantment.Fits(stack.Item) || !GameSession.Progress.Knows(enchantment)
             || !Inscriptions.CanCarve(enchantment, out bool byCarver, out _) || !MaterialPool.For(user).TrySpend(cost.Resources, cost.Items))
         {
             return;

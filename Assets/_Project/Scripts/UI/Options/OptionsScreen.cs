@@ -79,6 +79,7 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void OnDisable()
     {
+        InputRebinds.CancelListening();
         if (GameInput.Pause != null) GameInput.Pause.performed -= OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed -= OnBackPressed;
         PadTabs.Unregister(this);
@@ -94,7 +95,14 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void OnBackPressed(InputAction.CallbackContext context)
     {
-        if (window.activeSelf && !InputRebinds.IsListening)
+        // Back while a key is awaited stops the wait: a pad player on a keyboard row could press nothing that ended it.
+        if (InputRebinds.IsListening)
+        {
+            InputRebinds.CancelListening();
+            return;
+        }
+
+        if (window.activeSelf)
         {
             Close();
         }
@@ -102,6 +110,8 @@ public sealed class OptionsScreen : MonoBehaviour
 
     public void Close()
     {
+        // Leaving while a key is awaited binds nothing, and gives gameplay its input back.
+        InputRebinds.CancelListening();
         // Leaving with the question open keeps what the player can evidently see.
         confirmUntil = -1f;
         confirmBar.SetActive(false);

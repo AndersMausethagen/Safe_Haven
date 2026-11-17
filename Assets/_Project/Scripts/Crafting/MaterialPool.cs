@@ -85,13 +85,24 @@ public sealed class MaterialPool
             return true;
         }
 
+        // Summed per thing: a cost listing the same thing twice (a gate's Oak ×12 and ×4) was checked line by line, and paid only
+        // what there was.
         if (resources != null)
         {
+            var needed = new Dictionary<ResourceDefinition, int>();
             foreach (ResourceAmount cost in resources)
             {
-                if (cost.Resource != null && Have(cost.Resource) < cost.Amount)
+                if (cost.Resource != null)
                 {
-                    missing = $"Not enough {cost.Resource.DisplayName} ({Have(cost.Resource)}/{cost.Amount}).";
+                    needed[cost.Resource] = (needed.TryGetValue(cost.Resource, out int had) ? had : 0) + cost.Amount;
+                }
+            }
+
+            foreach (KeyValuePair<ResourceDefinition, int> need in needed)
+            {
+                if (Have(need.Key) < need.Value)
+                {
+                    missing = $"Not enough {need.Key.DisplayName} ({Have(need.Key)}/{need.Value}).";
                     return false;
                 }
             }
@@ -99,11 +110,20 @@ public sealed class MaterialPool
 
         if (items != null)
         {
+            var needed = new Dictionary<ItemDefinition, int>();
             foreach (ItemAmount cost in items)
             {
-                if (cost.Item != null && Have(cost.Item) < cost.Amount)
+                if (cost.Item != null)
                 {
-                    missing = $"Not enough {cost.Item.DisplayName} ({Have(cost.Item)}/{cost.Amount}).";
+                    needed[cost.Item] = (needed.TryGetValue(cost.Item, out int had) ? had : 0) + cost.Amount;
+                }
+            }
+
+            foreach (KeyValuePair<ItemDefinition, int> need in needed)
+            {
+                if (Have(need.Key) < need.Value)
+                {
+                    missing = $"Not enough {need.Key.DisplayName} ({Have(need.Key)}/{need.Value}).";
                     return false;
                 }
             }

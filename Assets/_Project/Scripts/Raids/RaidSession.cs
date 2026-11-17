@@ -39,6 +39,10 @@ public sealed class RaidSession
     /// <summary>How many bosses fell on this raid, for what those who went along remember.</summary>
     public int BossesBeaten { get; set; }
 
+    /// <summary>A friend's boss encounter followed while this player's own rematch still waits (RaidLauncher.TryFollow): they help,
+    /// but the boss drops nothing for them, or taking turns hosting would farm it once a day per friend.</summary>
+    public bool BossLootWithheld { get; set; }
+
     /// <summary>The player chose a large raid: a bigger map with more on it (RaidDefinition › Large Raid).</summary>
     public bool IsLarge { get; set; }
 

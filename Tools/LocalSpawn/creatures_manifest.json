@@ -5,7 +5,8 @@
     "Front view, full body, T-pose with straight arms and legs a little apart: what the rigger reads best. Dark Nordic folk-tale look, painted and grounded, never cute.",
     "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
     "2026-11-14, the user: 'add some more monsters by creating them in LocalSpawn ... create a new model for the barklin monsters and replace their model ... create some more different troll monsters, of varying sizes and functionality'. BarkRootling (the Rootling's new body), StoneTroll, BogTroll, TrollRunt. The bulk builders are retired: the Unity side is a targeted script per creature.",
-    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md."
+    "2026-11-17, the user: 'Create props and aditional monsters you need with LocalSpawn' for Troll Valley (the Brukam bridge troll boss, his bridge, club, hoard and bones, a ruined seter, a petrified troll) and the Moss Marsh after it (the corrupted Nøkk of the Black Pool, the deildegast, the lindorm's head and coils, boardwalk, peat, bloomery, rowboat, fiddle, boundary stone). Docs/TrollValleyPlan.md, Docs/NextRaidResearch_2026-11-17.md.",
+    "2026-11-17, the user: 'use localspawn to create several versions of the lost. its humanoids, half-dead looking. Maybe viking style armor. ranging from cloth, to leather to mail ... they should share animations of the player and attack in a similar fashion'. LostCloth, LostLeather, LostMail: the nemesis Lost Ones' bodies (heavier armour at higher ranks). Empty hands: the weapon is the game's, held like the player's."
   ],
   "art": "Assets/_Project/Art/Enemies/Downloaded",
   "common": "Full body, seen straight from the front, standing upright in a T-pose with both arms held straight out to the sides at shoulder height, palms down, legs straight and a little apart, the whole figure visible and centred, isolated on a plain light grey background. Dark Nordic folk-tale style, realistic and grounded, not cute. Matte, softly lit, no glow, no shadows on the ground.",
@@ -118,6 +119,54 @@
           "key": "A",
           "seed": 8721,
           "prompt": "A deildegast of Norwegian folklore, the restless ghost of an old farmer who moved a boundary stone in life: a gaunt, stooped old man, grey and colourless, sunken cheeks and hollow eyes, thin wisps of white hair, a ragged grey homespun coat with a rope belt and torn knee breeches from centuries ago, bare bony feet, bony hands, a face of endless weariness."
+        }
+      ]
+    },
+    {
+      "asset": "LostCloth",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8811,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A gaunt man with a tangled beard, dressed only in rotted homespun cloth: a torn knee-length wool tunic in faded undyed brown and grey, a frayed hood with a short shoulder cape, a rope belt with a small knife sheath, wool leg wraps bound with strips of cloth, worn leather turnshoes. Mould and lichen at the hems, loose threads hanging. Both hands open and empty, no weapon, no shield, nothing held."
+        },
+        {
+          "key": "B",
+          "seed": 8812,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A gaunt woman with long loose grey-streaked hair, dressed in a rotted Norse apron dress over a long linen underdress gone grey with damp, two tarnished oval brooches with a broken bead string between them, a frayed wool shawl over the shoulders, a rope belt, worn turnshoes. Torn hems, mould and lichen on the cloth. Both hands open and empty, no weapon, no shield, nothing held."
+        }
+      ]
+    },
+    {
+      "asset": "LostLeather",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8821,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A lean warrior in hardened leather armour cracked and blackened with age: a lamellar cuirass of overlapping stiff hide plates laced with cord over a stained padded gambeson, leather bracers, a wide belt with an iron buckle, a short patchy wet fur collar, wool trousers with leg wraps, leather boots, a simple rounded leather cap. Both hands open and empty, no weapon, no shield, nothing held."
+        },
+        {
+          "key": "B",
+          "seed": 8822,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A broad-shouldered hunter in weathered leather and hide: a sleeveless studded leather jerkin over a torn wool tunic, a wolf-pelt draped over one shoulder gone grey and matted, leather vambraces, a belt with pouches, wrapped legs and hide boots, a braided beard with iron rings. Both hands open and empty, no weapon, no shield, nothing held."
+        }
+      ]
+    },
+    {
+      "asset": "LostMail",
+      "texture_size": 2048,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 8831,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A warrior in a knee-length coat of rusted iron chain mail over a dirty padded gambeson, the rings broken in places and red with rust, a rusted round iron helmet with a nasal guard, a leather belt, leather boots, a short tattered dark cloak to the waist pinned at the shoulder with a tarnished bronze brooch. Both hands open and empty, no weapon, no shield, nothing held."
+        },
+        {
+          "key": "B",
+          "seed": 8832,
+          "prompt": "One of the Lost, a Viking-age settler of the clearing taken by the mist long ago and half dead now, still whole but not alive: grey-blue mist-pale skin, sunken cheeks, clouded milky-white eyes, cracked lips, dark veins at the temples and throat, damp matted hair. A war-leader of the old settlers: a rusted mail byrnie to the thighs, a rusted iron spectacle helm with round eye guards and a hanging mail curtain, a heavy matted bear-fur mantle over the shoulders only to the waist, tarnished silver arm rings, a wide leather belt with a bronze buckle, leather boots. Both hands open and empty, no weapon, no shield, nothing held."
         }
       ]
     }

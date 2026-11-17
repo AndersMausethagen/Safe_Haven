@@ -38,6 +38,9 @@ public sealed class CoopWireTests
         // 2026-11-17 (quest audit): a raid's invite carries the host's quests under way, for the rumours that wait on one (packed as JSON,
         // so the fingerprint is the same).
         [30] = "4ba9741053cf4aa27bcdec5ea5674d39",
+        // 2026-11-17 (the Lost): a creature's spawn carries one of the Lost's rank and name before its affixes ("~3~Halvard Hollow-Eyed|
+        // Frenzied", packed in the string, so the fingerprint is the same), and its traits may come from the Lost's own list.
+        [31] = "4ba9741053cf4aa27bcdec5ea5674d39",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>

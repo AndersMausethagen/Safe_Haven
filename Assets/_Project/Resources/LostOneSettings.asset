@@ -1,0 +1,180 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ffa11137678624649b123ffbe1a0d467, type: 3}
+  m_Name: LostOneSettings
+  m_EditorClassIdentifier: SafeHaven::LostOneSettings
+  enabled: 1
+  storyGate:
+    quest: {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
+    requirement: 1
+  minimumExtractions: 3
+  rosterSize: 3
+  homecomingsBeforeANewOne: 2
+  chanceByTier:
+  - 0.2
+  - 0.25
+  - 0.3
+  - 0.35
+  chancePerRank: 0.05
+  mostChance: 0.6
+  rankWeight: 0.5
+  fallbackBody: {fileID: 11400000, guid: 18c8362f09cf64a468e9ae4ae6d4422b, type: 2}
+  bodyGrades:
+  - name: Cloth
+    fromRank: 1
+    bodies:
+    - {fileID: 11400000, guid: cc704f6c703e01c40a09b077bbf35abd, type: 2}
+    - {fileID: 11400000, guid: 73bdb28636411b942b9f4444e26ef8e5, type: 2}
+  - name: Leather
+    fromRank: 3
+    bodies:
+    - {fileID: 11400000, guid: 127ff97036562ec4b89304830b2de401, type: 2}
+    - {fileID: 11400000, guid: be28571d176fa6b4091407383fc6c9ae, type: 2}
+  - name: Mail
+    fromRank: 5
+    bodies:
+    - {fileID: 11400000, guid: f365d8b0e5038d5469ac1e9827e26343, type: 2}
+    - {fileID: 11400000, guid: 38ccacc65765d674eb19ba4da13849dd, type: 2}
+  nearestToStart: 60
+  furthestFromStart: 120
+  scentAfter: {x: 40, y: 90}
+  steerEvery: 8
+  scentError: 14
+  huntPace: 0.85
+  fleeBelow: 0.3
+  fleeSeconds: 3
+  fleeDistance: 25
+  vanishEffect: {fileID: 0}
+  vanishSound: {fileID: 0}
+  scentSound: {fileID: 0}
+  labelColour: {r: 0.78, g: 0.86, b: 0.95, a: 1}
+  ranks:
+  - title: Newly Lost
+    health: 1.2
+    damage: 1.1
+    traits: 1
+  - title: Hungering
+    health: 1.3
+    damage: 1.15
+    traits: 2
+  - title: Hunting
+    health: 1.4
+    damage: 1.2
+    traits: 3
+  - title: Dreaded
+    health: 1.5
+    damage: 1.25
+    traits: 4
+  - title: Bane of the Flame
+    health: 1.6
+    damage: 1.3
+    traits: 5
+  traits:
+  - {fileID: 11400000, guid: ed7b957a7b9f7034aad0fbfeeaa94edc, type: 2}
+  - {fileID: 11400000, guid: caa853b23129c8b41a07ed7428d908a5, type: 2}
+  - {fileID: 11400000, guid: d036cc7f16338cf4db6914042a96d47d, type: 2}
+  - {fileID: 11400000, guid: 4872bd8eac9ec8c4695c4f8d544d05fe, type: 2}
+  - {fileID: 11400000, guid: 64d24d4180baec546ae6b6b280ffea7c, type: 2}
+  - {fileID: 11400000, guid: 520af21933d01a643a52cf7f7640310f, type: 2}
+  - {fileID: 11400000, guid: 0c3eecf17dc4e8d4b8c7a83d9839609c, type: 2}
+  - {fileID: 11400000, guid: 5e9df453a8dc51342b46feca7e830b58, type: 2}
+  - {fileID: 11400000, guid: 20158eb0ae9165e478d19e1d76a9d553, type: 2}
+  - {fileID: 11400000, guid: 29a05817c019ef543a47b1510137e8a5, type: 2}
+  scarPerEscape: 0.1
+  mostScar: 0.5
+  carriedCap: 4
+  essenceAtRest: 10
+  essencePerRank: 5
+  insightAtRest: 60
+  insightPerRank: 30
+  givenNames:
+  - Halvard
+  - Ketil
+  - Ragnhild
+  - Torgeir
+  - Aslaug
+  - Gudrun
+  - Eyvind
+  - Solveig
+  - Ulf
+  - Hallgerd
+  - Orm
+  - Thora
+  - Grim
+  - Borghild
+  - Arnulf
+  - Helga
+  - Steinar
+  - Vemund
+  - Gyda
+  - Kolbein
+  - Svanhild
+  - Hakon
+  - Dagny
+  - Ottar
+  epithets:
+  - Hollow-Eyed
+  - the Unburied
+  - Ash-Handed
+  - Rime-Bearded
+  - Grey-Mouthed
+  - Long-Fingered
+  - the Cold
+  - Barrow-Walker
+  - Bone-Thin
+  - Black-Tongued
+  - the Weeping
+  - Ember-Hungry
+  - Moss-Skinned
+  - Crook-Backed
+  - the Unremembered
+  - Wolf-Fed
+  pastLives:
+  - once the Haven's smith
+  - once a charcoal-burner on the ridge
+  - once the miller at the stream
+  - once a fisher of the black meres
+  - once the one who kept the hearth
+  - once the herder at the high seter
+  - once a weaver who sang at the loom
+  - once the village midwife
+  - once a hunter who never missed
+  - once the one who rang the dusk bell
+  - once a tanner by the bog
+  - once a woodcutter who went out for one more load
+  - once the cooper
+  - once the beekeeper
+  - once a carver of the waystones
+  - once the brewer of the Haven's ale
+  - once the watch on the north path
+  scentLines:
+  - '{name} has caught your scent.'
+  - Somewhere in the mist, {name} has caught your scent.
+  - The mist stirs. {name} has caught your scent.
+  sightLines:
+  - '{name}, {past}, has found you. It has not forgotten the flame you carry.'
+  - '{name} knows you, Keeper of the Flame.'
+  - It was {past}. Now it is {name}, and it wants the flame.
+  killLines:
+  - '{name} stands over the Keeper and takes what you carried.'
+  - '{name} has what you carried now. It will be stronger for it.'
+  fleeLines:
+  - '{name} draws back into the mist. It will remember this.'
+  - '{name} melts into the mist, wounded. It will be back.'
+  restLines:
+  - '{name} is laid to rest. It was {past}, and now it is quiet.'
+  - '{name} falls and stays down. The mist has let it go.'
+  learnedLine: 'You have seen through {name}: it is {trait}.'
+  briefingLine: 'The mist is restless: {name} walks {raid}.'
+  briefingCarriesLine: It still carries what it took from you.
+  journalIntro: It was {past}. The mist took the rest of it, and left only a hunger for the flame you keep.
+  epitaph: Laid to rest in {raid}. It was {past}, and now it is quiet.

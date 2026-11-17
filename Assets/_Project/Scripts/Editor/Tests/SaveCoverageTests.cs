@@ -30,6 +30,8 @@ public sealed class SaveCoverageTests
         ["Progress.skillRanks"] = "EssenceTests (skill ranks)",
         // A dictionary of real times the probe can't fill.
         ["Progress.encounterKills"] = "EncounterTests.GatesReachedAndKills_SurviveASave",
+        // Stacks of real items the probe can't invent.
+        ["Progress.LostOnes.records[0].Carried"] = "LostOneTests.TheRoster_SurvivesASave (what it carries, wear and all)",
     };
 
     private readonly List<(string root, string path, Func<object, object>[] chain, Func<object, bool> holds)> probes =
@@ -267,6 +269,8 @@ public sealed class SaveCoverageTests
             .Invoke(typeof(SettlementState).GetField("vacantJobs", Fields).GetValue(settlement), new object[] { job });
         progress.Journal.Restore(new List<string>(), new List<string>(), new List<string>(), new List<string>(),
             new List<RaidRecord> { new RaidRecord { Lines = new List<string>() } }, null);
+        // One of the Lost, whose own fields are then probed.
+        progress.LostOnes.Add(new LostOneRecord());
     }
 
     private static IEnumerable<T> Assets<T>() where T : UnityEngine.Object =>

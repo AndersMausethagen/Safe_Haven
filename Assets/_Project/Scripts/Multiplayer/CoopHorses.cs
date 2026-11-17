@@ -1070,6 +1070,12 @@ public sealed class CoopHorses : ICoopPart
             Horse horse = entry.Horse;
             if (horse != null && horse.IsTamed && horse.OwnerId == owner && horse.TryGetComponent(out SaveableEntity saved) && saved.IsPersistent)
             {
+                // Off it first: the host riding the guest's horse as it went home was left aboard nothing, unable to move.
+                if (horse.Rider != null && horse.Rider.Riding == horse)
+                {
+                    horse.Rider.Dismount(thrown: false);
+                }
+
                 saved.MarkDestroyed();
                 Object.Destroy(horse.gameObject);
             }

@@ -275,8 +275,16 @@ public static class RaidLauncher
         }
 
         HavenReadiness.GiveRest(player);
-        return Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
-            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed, invite.questsUnderWay) != null;
+        // Their own rematch still waiting: they may help, but the boss drops nothing for them (BossLootWithheld).
+        bool withheld = CheckRematch(raid, DateTime.UtcNow) != null && !Cheats.NoRequirements;
+        RaidSession followed = Go(raid, invite.ModifiersFrom(content), player, invite.seed, difficulty, invite.sparks, invite.large && raid.CanBeLarge,
+            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed, invite.questsUnderWay);
+        if (followed != null)
+        {
+            followed.BossLootWithheld = withheld;
+        }
+
+        return followed != null;
     }
 
     /// <summary>The run a friend's invite describes, as <see cref="TryFollow"/> builds it (without going anywhere).</summary>

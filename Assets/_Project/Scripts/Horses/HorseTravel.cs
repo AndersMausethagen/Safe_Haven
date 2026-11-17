@@ -170,6 +170,17 @@ public sealed class HorseTravel : MonoBehaviour
                 horse.SetStabled("");
             }
 
+            // A tied horse comes home whatever happens, but its saddlebags are carried things like any: a fall loses them, as it
+            // loses a cart's load. Kept, loot stuffed into a tied horse's bags slipped past the failed raid.
+            if (!extracted && horse.Cargo != null && horse.Cargo.CountItems() > 0)
+            {
+                horse.Cargo.Clear();
+                if (report != null)
+                {
+                    report.TransportLine = Join(report.TransportLine, $"What {horse.HorseName} carried is lost.");
+                }
+            }
+
             pending = new Carried(entity.PrefabId, horse.CaptureState(), horse.Health.HealthFraction, ridden && extracted);
             pendingWorld = GameSession.World;
         }
@@ -180,6 +191,23 @@ public sealed class HorseTravel : MonoBehaviour
         }
 
         IsTied = false;
+    }
+
+    /// <summary>The horse on its way home, for a save written before it is set down (SaveGameService). False with none.</summary>
+    public static bool OnItsWayHome(out string prefabId, out string state, out float health)
+    {
+        bool any = pending.HasValue && pendingWorld == GameSession.World;
+        prefabId = any ? pending.Value.PrefabId : null;
+        state = any ? pending.Value.State : null;
+        health = any ? pending.Value.Health : 1f;
+        return any;
+    }
+
+    /// <summary>A loaded save's horse that was on its way home: it arrives in the scene the save goes to, beside the player.</summary>
+    public static void ComeHome(string prefabId, string state, float health)
+    {
+        pending = new Carried(prefabId, state, health, false);
+        pendingWorld = GameSession.World;
     }
 
     /// <summary>Ties the raid's horse at the portal it came through (or unties it): safe there, and home whatever happens.</summary>
@@ -287,9 +315,11 @@ public sealed class HorseTravel : MonoBehaviour
             PlayerRiding.For(player.gameObject).Mount(horse, animate: false);
         }
 
-        // The save on coming home was written before the horse was here.
+        // The save on coming home was written before the horse was here. A frame on, once its Start has run: saved in the frame
+        // it was spawned, its components were left out (SaveableEntity before Start), and it loaded back wild and nameless.
         if (!raid)
         {
+            yield return null;
             SaveGameService.SaveAfterArrival();
         }
     }

@@ -37,6 +37,24 @@ public sealed class SaveData
     public CharacterAppearance appearance = new CharacterAppearance();
     /// <summary>The raid this save was made on the way into, by name. Loaded with this still set, that raid never came home. Empty in other saves.</summary>
     public string raidUnderWay;
+    /// <summary>A horse or cart on its way home from a raid when this was written (the raid's end, before it was set down at home):
+    /// it arrives once the save is loaded. Empty in other saves.</summary>
+    public ArrivingSaveData arriving = new ArrivingSaveData();
+}
+
+/// <summary>What came out of a raid with the player and has not yet been set down at home: the horse (its prefab id, its state and
+/// health) and the cart (its prefab id and state, cargo and all). Written at the raid's end, a quit or a crash on the results screen
+/// lost them: they had left the Haven's world at the launch and lived only in memory.</summary>
+[Serializable]
+public sealed class ArrivingSaveData
+{
+    public string horse;
+    public string horseState;
+    public float horseHealth = 1f;
+    public string cart;
+    public string cartState;
+
+    public bool IsEmpty => string.IsNullOrEmpty(horse) && string.IsNullOrEmpty(cart);
 }
 
 /// <summary>A PlaytestRun.</summary>
@@ -232,6 +250,41 @@ public sealed class ProgressSaveData
     public List<string> encounterGates = new List<string>();
     /// <summary>When each boss encounter's boss was last brought down, by raid id (rematches wait). Missing in older saves.</summary>
     public List<StampSaveData> encounterKills = new List<StampSaveData>();
+    /// <summary>The character's Lost (CharacterProgress.LostOnes). Missing in older saves: none has risen yet.</summary>
+    public LostRosterSaveData lostOnes = new LostRosterSaveData();
+}
+
+/// <summary>A character's Lost as saved (LostOneRoster).</summary>
+[Serializable]
+public sealed class LostRosterSaveData
+{
+    public int seed;
+    public int homecomings;
+    public int risen;
+    public List<LostOneSaveData> records = new List<LostOneSaveData>();
+}
+
+/// <summary>One of the Lost as saved (LostOneRecord): traits by affix asset name, what it carries slot by slot.</summary>
+[Serializable]
+public sealed class LostOneSaveData
+{
+    public string id;
+    public string givenName;
+    public string epithet;
+    public string pastLife;
+    public int rank = 1;
+    public List<string> traits = new List<string>();
+    public List<string> learned = new List<string>();
+    public List<SlotSaveData> carried = new List<SlotSaveData>();
+    public int kills;
+    public int escapes;
+    public int raidsMet;
+    /// <summary>LostOneStatus: 0 walking, 1 laid to rest.</summary>
+    public int status;
+    public bool met;
+    public int restedAtHomecoming;
+    public string lastSeenIn;
+    public string epitaph;
 }
 
 [Serializable]

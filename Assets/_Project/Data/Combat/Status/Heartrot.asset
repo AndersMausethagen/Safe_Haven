@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Heartrot
   description: The Heartroot's black sap in the blood. Health drains for a long while unless an antidote clears it.
   color: {r: 0.42, g: 0.3, b: 0.18, a: 1}
-  icon: {fileID: 21300000, guid: c37877ee2a74160468d27999d2fd5bc0, type: 3}
+  icon: {fileID: 21300000, guid: 8bf00e2d604f14d4fb772796ab426f83, type: 3}
   seconds: 15
   damagePerSecond: 3
   damageType: 3

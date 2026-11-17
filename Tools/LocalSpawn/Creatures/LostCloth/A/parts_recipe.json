@@ -1,0 +1,17 @@
+{
+  "_note": "The Lost (2026-11-17): garments as their own meshes for Unity Cloth (the user: 'separate the armor or cloth only, not the limbs. and give it realistic physics'). Boxes are concept pixels (1024x1024).",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "skirt",
+      "box": [
+        320,
+        405,
+        680,
+        805
+      ],
+      "keep": "the lower half of the rotted homespun wool tunic from the twisted rope belt down to its torn, ragged hem, the rope belt and its hanging knife sheath at the top, as a garment on its own: no body, no legs, no arms, no hands, the garment hollow inside where the body was, seen straight from the front",
+      "seed": 1
+    }
+  ]
+}

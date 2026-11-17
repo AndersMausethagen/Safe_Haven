@@ -195,6 +195,12 @@ public sealed class EncounterArena : MonoBehaviour, ISceneSetup
         {
             problem = "Only you can step through for yourself.";
         }
+        // On a friend's game the boss is the host's copy, sent only near the host's own: with none yet (the host far off, or gone
+        // home), stepping through sealed the friend in with no boss, the way home shut until the clock ran out.
+        else if (adopted == null && FollowsAHost)
+        {
+            problem = $"{BossName} hasn't stirred yet. Wait for your friends.";
+        }
         else if (pays && !MaterialPool.For(user).CanAfford(Definition.GateResources, Definition.GateItems, out string missing))
         {
             problem = missing;

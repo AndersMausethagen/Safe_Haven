@@ -22,6 +22,10 @@ public sealed partial class PlayerCombat
     // How far behind its body a blink lands, and how close the spot must be clear.
     private const float BlinkGap = 0.9f;
     private const float BlinkClearance = 0.35f;
+    // How far above or below where the player stands the blink may land.
+    private const float BlinkStep = 1.2f;
+    private static readonly Collider[] BlinkColliders = new Collider[16];
+    private static readonly RaycastHit[] BlinkHits = new RaycastHit[16];
 
     private int momentum;
     private float momentumAt = float.NegativeInfinity;
@@ -71,11 +75,61 @@ public sealed partial class PlayerCombat
 
     private int MaxRhythm => Has(WeaponSignature.Flurry) ? Mathf.Max(FlurryRhythm, Rules.MaxRhythm) : Rules.MaxRhythm;
 
+    // Scenery, not the player and not a creature (the enemy blinked behind stands right there).
+    private bool BlinkSolid(Collider other) =>
+        other != null && !other.isTrigger && !other.transform.IsChildOf(transform) && other.GetComponentInParent<MonsterAI>() == null;
+
+    private bool BlinkBlocked(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (BlinkSolid(BlinkColliders[i]))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool BlinkSightBlocked(Vector3 a, Vector3 b)
+    {
+        Vector3 way = b - a;
+        int count = Physics.RaycastNonAlloc(a, way.normalized, BlinkHits, way.magnitude, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (BlinkSolid(BlinkHits[i].collider))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool BlinkGround(Vector3 spot, float standing, out float ground)
+    {
+        ground = standing;
+        float best = float.PositiveInfinity;
+        Vector3 top = new Vector3(spot.x, standing + BlinkStep + 0.5f, spot.z);
+        int count = Physics.RaycastNonAlloc(top, Vector3.down, BlinkHits, BlinkStep * 2f + 0.5f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            if (BlinkSolid(BlinkHits[i].collider) && BlinkHits[i].distance < best)
+            {
+                best = BlinkHits[i].distance;
+                ground = BlinkHits[i].point.y;
+            }
+        }
+
+        return !float.IsPositiveInfinity(best);
+    }
+
     // Blink Behind: at once to the back of the enemy in focus, facing it, if it is within reach and there is room. False: the art strikes
     // where it stands.
     private bool BlinkBehindFocus(float reach)
     {
-        if (focusTarget == null || !focusTarget.HasFocus || focusTarget.Target == null)
+        if (focusTarget == null || !focusTarget.HasFocus || focusTarget.Target == null || (movement != null && movement.IsSeated))
         {
             return false;
         }
@@ -90,10 +144,21 @@ public sealed partial class PlayerCombat
 
         float body = enemy.TryGetComponent(out CapsuleCollider capsule) ? capsule.radius * Mathf.Max(enemy.transform.lossyScale.x, enemy.transform.lossyScale.z) : 0.5f;
         Vector3 spot = DodgeRules.SpotBehind(at, enemy.transform.forward, body + BlinkGap);
-        spot.y = from.y;
         float height = controller != null ? controller.height : 1.8f;
-        if (Physics.CheckCapsule(spot + Vector3.up * (BlinkClearance + 0.05f), spot + Vector3.up * (height - BlinkClearance), BlinkClearance,
-                hitLayers & ~(1 << gameObject.layer), QueryTriggerInteraction.Ignore))
+        // The ground there, not the height left behind: on a slope the spot was in the hill or in the air.
+        if (!BlinkGround(spot, from.y, out float ground))
+        {
+            return false;
+        }
+
+        spot.y = ground;
+        // Room to stand, and a clear way round the enemy. Everything is on one layer here, so the player's own colliders and creatures
+        // are told apart by who they belong to: a layer mask that left out the player's layer left out the whole world, and the
+        // blink went into rocks, walls and through gates.
+        Vector3 chest = Vector3.up * (height * 0.6f);
+        if (BlinkBlocked(Physics.OverlapCapsuleNonAlloc(spot + Vector3.up * (BlinkClearance + 0.05f), spot + Vector3.up * (height - BlinkClearance),
+                BlinkClearance, BlinkColliders, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            || BlinkSightBlocked(from + chest, spot + chest) || BlinkSightBlocked(at + chest, spot + chest))
         {
             return false;
         }

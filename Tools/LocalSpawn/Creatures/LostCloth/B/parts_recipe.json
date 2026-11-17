@@ -1,0 +1,17 @@
+{
+  "_note": "The Lost (2026-11-17): garments as their own meshes for Unity Cloth (the user: 'separate the armor or cloth only, not the limbs. and give it realistic physics'). Boxes are concept pixels (1024x1024).",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "garment",
+      "box": [
+        295,
+        215,
+        735,
+        910
+      ],
+      "keep": "the whole rotted linen dress with its wide torn sleeves, from the neckline down to its torn hem at the ankles, the twisted rope belt at the waist, without the fur shawl, as a garment on its own: no body, no head, no arms, no hands, no legs, the garment hollow inside where the body was, seen straight from the front",
+      "seed": 1
+    }
+  ]
+}

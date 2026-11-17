@@ -13,8 +13,8 @@ using UnityEngine.SceneManagement;
 /// to the full-screen results (RaidResultsScreen) and from there home. The clock only starts once the scene is generated
 /// and the loading screen lifts (SceneTransition.WhenReady). A scene played straight from the
 /// editor runs a test raid from the fallback definition. Systems in the raid read its rules through <see cref="Current"/>.
-/// Its parts: <see cref="RaidCreatures"/> (the creatures' strength, hunting and waking) and <see cref="RaidCompanions"/>
-/// (who came along and the lost one).
+/// Its parts: <see cref="RaidCreatures"/> (the creatures' strength, hunting and waking), <see cref="RaidCompanions"/>
+/// (who came along and the lost one) and <see cref="RaidLostOnes"/> (one of the Lost walking the raid).
 /// </summary>
 [DisallowMultipleComponent]
 [DefaultExecutionOrder(-50)]
@@ -56,6 +56,9 @@ public sealed class RaidDirector : MonoBehaviour
 
     /// <summary>The raid's creatures readied: strength, hunting, waiting groups woken.</summary>
     public RaidCreatures Creatures { get; private set; }
+
+    /// <summary>The one of the Lost walking this raid, if any, and what becomes of it.</summary>
+    public RaidLostOnes LostOnes { get; private set; }
 
     public RaidSession Session { get; private set; }
     public RaidParameters Parameters => Session.Parameters;
@@ -115,6 +118,7 @@ public sealed class RaidDirector : MonoBehaviour
         Current = this;
         Companions = new RaidCompanions(this);
         Creatures = new RaidCreatures(this);
+        LostOnes = new RaidLostOnes(this);
 
         // The raid's own systems (roaming spawns and the like, set up in the Systems Editor) are added here; every raid
         // scene also sleeps far idle creatures (global raid rules).
@@ -223,6 +227,8 @@ public sealed class RaidDirector : MonoBehaviour
         if (CreatureSource.Remote == null)
         {
             RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
+            // One of this character's Lost, when the run's seed says one walks it (the briefing told the same).
+            LostOnes.Summon(start != null ? start.position : (Vector3?)null);
         }
         if (NightSettings.IsDark)
         {
@@ -485,7 +491,9 @@ public sealed class RaidDirector : MonoBehaviour
     {
         if (!Session.End(RaidOutcome.Died))
         {
-            return false;
+            // Fallen and watching friends (co-op): the fall is decided but not yet counted or saved. Quitting then skipped it,
+            // and reloading put the player back at the portal with everything.
+            return Report == null && CoopSpectate.FinishNow();
         }
 
         Finish();
@@ -523,6 +531,8 @@ public sealed class RaidDirector : MonoBehaviour
         HorseTravel.LeaveRaid(Report, extracted);
 
         Companions.Settle(Report, extracted);
+        // A Lost One that brought the player down takes the most valuable of what the death took; new ones rise at the homecoming.
+        LostOnes.Settle(final, keeps);
         ExperienceTracker.SettleRaid(Report, extracted);
         GameSession.EndRaid(Report);
         // Saved again once home; and below, before the results screen (a crash there lost the haul).

@@ -266,6 +266,13 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
 
         nextCheck = Time.time + 2f;
         TakeInLoaded();
+        // The stable's days (meals, foaling) run in its owner's game: on a guest's they ran too, foaling the host's mare a second
+        // time for the guest and taking the trough's meals twice.
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
         float hour = PlantedTrees.Today * 24f;
         if (lastHour < 0f)
         {
@@ -479,7 +486,7 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         Vector3 at = stall >= 0 ? stalls[stall].position : DoorPosition;
         SaveableEntity made = SaveableEntity.Spawn(prefab, at, stall >= 0 ? stalls[stall].rotation : transform.rotation);
         Horse foal = made.GetComponent<Horse>();
-        foal.BeBorn(HorseBreeding.Foal(mare.Stats, sire, mare.Definition, settings, random), stall >= 0 ? Id : "");
+        foal.BeBorn(HorseBreeding.Foal(mare.Stats, sire, mare.Definition, settings, random), stall >= 0 ? Id : "", mare);
         if (stall >= 0)
         {
             Put(foal, stall);

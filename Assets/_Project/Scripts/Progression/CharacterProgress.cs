@@ -5,8 +5,8 @@ using System.Collections.Generic;
 /// The player's permanent growth: experience in each skill (woodcutting, melee...; levels and bonuses follow from it,
 /// see LevelingSettings), the perk chosen at each skill milestone, unspent Insight (experience from quests, raids and
 /// discoveries, put into a skill of the player's choice), the ranks spells have been deepened to at the altar (GDD §16.4),
-/// the items crafted at least once (for first-craft Insight), the experience stones already touched and the journal's
-/// record. Lives in GameSession (it belongs to the game, not to the player object, so it survives every scene change) and
+/// the items crafted at least once (for first-craft Insight), the experience stones already touched, the journal's
+/// record and the character's Lost (LostOneRoster). Lives in GameSession (it belongs to the game, not to the player object, so it survives every scene change) and
 /// is saved by SaveMapper. Plain C#, so the rules are testable; the numbers come from LevelingSettings.
 /// </summary>
 public sealed class CharacterProgress
@@ -423,6 +423,9 @@ public sealed class CharacterProgress
 
     /// <summary>The rest of what the journal keeps.</summary>
     public JournalRecord Journal { get; } = new JournalRecord();
+
+    /// <summary>This character's Lost: the mist-taken settlers who hunt the Keeper, walking or laid to rest (LostOneRules).</summary>
+    public LostOneRoster LostOnes { get; } = new LostOneRoster();
 
     public IReadOnlyDictionary<string, int> Creatures => creatures;
 

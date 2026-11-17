@@ -139,6 +139,28 @@ public sealed class EliteCreature : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Multiplies its own bonuses by more, kept through every rescale after (a stage, the dark): a Lost One's rank and scars
+    /// (RaidLostOnes). Folded into its shares, so they multiply the affixes' and the raid's rather than add to them. Heals it to full.
+    /// </summary>
+    public void Strengthen(float health, float damage, float healthScale, float powerScale)
+    {
+        healthShare = (1f + healthShare) * Mathf.Max(0.1f, health) - 1f;
+        damageShare = (1f + damageShare) * Mathf.Max(0f, damage) - 1f;
+        Rescale(healthScale, powerScale);
+        Health.Heal(Health.MaxHealth);
+    }
+
+    /// <summary>A name of its own in place of the affixes' (a Lost One): what messages call it, and what its label reads (rich text).</summary>
+    public void Rename(string title, string labelText)
+    {
+        Title = title;
+        if (label != null)
+        {
+            label.text = labelText;
+        }
+    }
+
     private void BuildMarks()
     {
         var name = new System.Text.StringBuilder();

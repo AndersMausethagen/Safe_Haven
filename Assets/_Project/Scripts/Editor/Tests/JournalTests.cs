@@ -14,9 +14,17 @@ public sealed class JournalTests
     public void EveryCreature_IsListed_WithSomethingToSay()
     {
         var listed = Settings.Creatures.ToList();
+        // The Lost Ones' bodies are kept in the journal's own page for them (The Lost: each one by name), not as creatures.
+        var lost = Resources.Load<LostOneSettings>(LostOneSettings.ResourceName).BodyGrades.SelectMany(grade => grade.bodies).ToList();
         foreach (string guid in AssetDatabase.FindAssets("t:MonsterDefinition"))
         {
             var creature = AssetDatabase.LoadAssetAtPath<MonsterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (lost.Contains(creature))
+            {
+                Assert.IsNotEmpty(creature.JournalLore, creature.name);
+                continue;
+            }
+
             CollectionAssert.Contains(listed, creature, $"{creature.name} isn't in the journal.");
             Assert.IsNotEmpty(creature.JournalLore, creature.name);
             Assert.IsNotEmpty(creature.JournalAdvice, creature.name);

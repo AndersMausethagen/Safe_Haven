@@ -82,7 +82,11 @@ public sealed partial class RaidPreparationWindow
         List<RaidEventDefinition> foretold = closed ? new List<RaidEventDefinition>() : RaidForecast.For(raid, plan.Seed, HavenReadiness.ForetoldEvents);
         List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, plan.Seed, GameSession.Here, plan.Player != null ? plan.Player.GetComponent<PlayerCrafting>() : null, plan.Large ? raid.LargeRaid.widthScale : 1f);
         List<string> asked = closed ? new List<string>() : HavenRequestBoard.BriefingLines(plan.Player);
-        int lines = rumours.Count + foretold.Count + asked.Count;
+        // One of the Lost already met, walking this run (the same seed decides it in the raid): told first, as the worst news is.
+        string restless = closed ? null : LostOneRules.BriefingLine(RaidLostOnes.ForRun(raid, plan.Seed, plan.Difficulty != null ? plan.Difficulty.tier : raid.Tier),
+            raid.DisplayName, LostOneSettings.Current);
+        int first = restless != null ? 1 : 0;
+        int lines = first + rumours.Count + foretold.Count + asked.Count;
         while (rumourLines.Count < lines)
         {
             rumourLines.Add(AddRumourLine());
@@ -94,9 +98,11 @@ public sealed partial class RaidPreparationWindow
             line.Rect.gameObject.SetActive(i < lines);
             if (i < lines)
             {
-                line.Label.text = i < rumours.Count ? rumours[i].BriefingFor(GameSession.Here)
-                    : i < rumours.Count + foretold.Count ? $"Seen from the Watch Post: {foretold[i - rumours.Count].DisplayName}."
-                    : asked[i - rumours.Count - foretold.Count];
+                int at = i - first;
+                line.Label.text = at < 0 ? restless
+                    : at < rumours.Count ? rumours[at].BriefingFor(GameSession.Here)
+                    : at < rumours.Count + foretold.Count ? $"Seen from the Watch Post: {foretold[at - rumours.Count].DisplayName}."
+                    : asked[at - rumours.Count - foretold.Count];
                 float height = Measure(line.Label, ColumnWidth - 16f);
                 line.Label.rectTransform.sizeDelta = new Vector2(ColumnWidth - 16f, height);
                 y = Stack(line.Rect, y, height, 6f);

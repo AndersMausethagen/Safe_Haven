@@ -1,0 +1,28 @@
+{
+  "_note": "The Lost (2026-11-17): garments as their own meshes for Unity Cloth (the user: 'separate the armor or cloth only, not the limbs. and give it realistic physics'). Boxes are concept pixels (1024x1024).",
+  "concept": "concept.png",
+  "parts": [
+    {
+      "name": "garment",
+      "box": [
+        340,
+        200,
+        690,
+        820
+      ],
+      "keep": "the whole rusted iron chain mail coat from the shoulders down to its hem at the knees, the leather belt with its buckle, without the cloak, as a garment on its own: no body, no head, no arms, no hands, no legs, the garment hollow inside where the body was, seen straight from the front",
+      "seed": 1
+    },
+    {
+      "name": "helm",
+      "box": [
+        415,
+        25,
+        615,
+        195
+      ],
+      "keep": "the rusted round iron helmet with its nasal guard, as an object on its own: no head, no face, no hair, the helmet hollow inside where the head was, seen straight from the front",
+      "seed": 1
+    }
+  ]
+}

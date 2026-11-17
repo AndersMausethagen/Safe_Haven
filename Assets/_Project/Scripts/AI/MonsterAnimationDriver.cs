@@ -37,6 +37,9 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [SerializeField, Range(0f, 1f)] private float flinchShare = 0.04f;
     [Tooltip("For a body with one stride clip: the speed in m/s its feet keep up with at normal playback. Faster or slower plays it faster or slower, so the feet don't slide. Used when the controller has a StrideRate parameter.")]
     [SerializeField, Min(0.1f)] private float strideSpeed = 2f;
+    [Tooltip("Swings as the player does (the Lost Ones, once settlers): a strike fitted to a player's clip (CombatClipKit.FitAttack) builds up at its " +
+             "Animation Speed, strikes at Strike Speed for the Strike Lead before the blow, and plays out at Follow Through Speed. Off: one speed throughout.")]
+    [SerializeField] private bool swingsLikeThePlayer;
 
     /// <summary>The bool a controller has when it has a clip for grazing and sleeping.</summary>
     public const string RestingParameter = "Resting";
@@ -100,6 +103,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private int flinchLayer = -1;
     private int releaseHash;
     private float releaseAt = -1f;
+    // A swing fitted as the player's are (CombatClipKit.FitAttack), on a body that swings like the player (swingsLikeThePlayer): built
+    // up at its Animation Speed, struck at Strike Speed for the Strike Lead before the blow, played out at Follow Through Speed, so the
+    // blade meets the target as the hit lands.
+    private float strikePhaseAt = -1f, followPhaseAt = -1f;
+    private float strikePhaseSpeed = 1f, followPhaseSpeed = 1f;
     private Vector3 lastPosition;
 
     private Damageable health;
@@ -211,6 +219,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             return;
         }
 
+        UpdateSwingPhases();
         if (releaseAt >= 0f)
         {
             if (ai.IsHoldingStrike)
@@ -308,6 +317,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private void OnAttackStarted()
     {
         releaseAt = -1f;
+        strikePhaseAt = followPhaseAt = -1f;
         AttackDefinition attack = ai.CurrentAttack;
         if (animator != null && animator.isHuman && attack != null)
         {
@@ -325,6 +335,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
                     float lead = attack.StrikeLead > 0f ? attack.StrikeLead : DefaultReleaseLead;
                     releaseAt = Time.time + Mathf.Max(0f, attack.HitDelay - lead);
                 }
+                else if (swingsLikeThePlayer && own && attack.StrikeLead > 0f && attack.StrikeSpeed > 0f)
+                {
+                    strikePhaseSpeed = attack.StrikeSpeed;
+                    followPhaseSpeed = attack.FollowThroughSpeed > 0f ? attack.FollowThroughSpeed : 1f;
+                    strikePhaseAt = Time.time + Mathf.Max(0f, attack.HitDelay - attack.StrikeLead);
+                    followPhaseAt = Time.time + attack.HitDelay;
+                }
 
                 return;
             }
@@ -334,6 +351,34 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         {
             animator.SetFloat(ActionSpeedHash, 1f);
             animator.SetTrigger(attackHash);
+        }
+    }
+
+    // The strike's quicker part, then its follow-through, on time; a held wind-up (holdChance) pushes both back as it pushes the hit.
+    private void UpdateSwingPhases()
+    {
+        if (strikePhaseAt < 0f && followPhaseAt < 0f)
+        {
+            return;
+        }
+
+        if (ai.IsHoldingStrike)
+        {
+            strikePhaseAt = strikePhaseAt >= 0f ? strikePhaseAt + Time.deltaTime : strikePhaseAt;
+            followPhaseAt = followPhaseAt >= 0f ? followPhaseAt + Time.deltaTime : followPhaseAt;
+            return;
+        }
+
+        if (strikePhaseAt >= 0f && Time.time >= strikePhaseAt)
+        {
+            strikePhaseAt = -1f;
+            animator.SetFloat(ActionSpeedHash, strikePhaseSpeed);
+        }
+
+        if (followPhaseAt >= 0f && Time.time >= followPhaseAt)
+        {
+            followPhaseAt = -1f;
+            animator.SetFloat(ActionSpeedHash, followPhaseSpeed);
         }
     }
 
@@ -363,6 +408,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private void OnInterrupted()
     {
         releaseAt = -1f;
+        strikePhaseAt = followPhaseAt = -1f;
         interruptedFrame = Time.frameCount;
         if (animator == null || !animator.isHuman || !animator.enabled)
         {
@@ -519,6 +565,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
 
         bool body = animator != null && animator.isHuman && animator.enabled;
+        if (previous == MonsterAI.State.Attacking)
+        {
+            strikePhaseAt = followPhaseAt = -1f;
+        }
+
         // A channel broken off before it let go (a rout, a recoil) mustn't loop on.
         if (previous == MonsterAI.State.Attacking && releaseAt >= 0f)
         {

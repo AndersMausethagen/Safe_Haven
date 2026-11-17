@@ -145,3 +145,48 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
   rest with an epitaph, and a new one may rise. A journal page keeps them; the briefing warns when one walks the raid you're
   planning. They start after The Weakening Ward and a few extractions; never in boss fights or the prologue.
 - **Being built** (code by an agent; data, the Draug body and Play checks by me). Status below when done.
+- **Code done** (untested in Play yet): `Scripts/Raids/Lost/` (settings, roster in the save, rules, the creature's hunt and flight,
+  the raid part), a journal tab "The Lost" (hidden until you meet one), the briefing line, co-op copies named (wire format 31).
+  Ranks: Newly Lost, Hungering, Hunting, Dreaded, Bane of the Flame; each rise adds a trait. Rank 5 is about 7x a body's health
+  because traits compound: tune in `LostOneSettings` if too strong.
+- **Their bodies** (you: "several versions of the lost ... half-dead ... viking style armor ... cloth, to leather to mail"): six
+  from LocalSpawn, two per armour grade: cloth (a settler man, a settler woman), leather (lamellar, a hide-and-fur hunter), mail
+  (a nasal helm, a war-leader in a spectacle helm and bear mantle). Cloth at ranks 1-2, leather 3-4, mail 5: a Lost One that rises
+  shows its new armour next time, and keeps its face. Empty hands: they hold a game weapon and play **the player's own sword
+  clips**, with the player's rhythm (slow build-up, quick strike: a new opt-in on the monster animation driver, so the other
+  monsters, the Heartroot included, are unchanged).
+- **Cloth and armour as their own meshes with physics** (you: "separate the armor or cloth only, not the limbs. and give it
+  realistic physics"): each body's skirt or hem (and the two mail helmets) made as separate parts with LocalSpawn's parts tools,
+  then Unity Cloth on the hanging ones, pinned at the belt, free at the hem, colliding with the legs. Only one Lost walks a raid,
+  so the cloth's cost is one creature's.
+- **Subagents:** after your note I let the running ones finish and start no new ones; reviews are mine for now.
+
+## Bug hunt, round 1 (3 agents: raids/saves/co-op, combat/items, Haven/progression) — fixes
+All read-only hunts; I re-read each and fixed it. Compiled; the edit-mode test run comes when Unity reopens.
+- **Co-op guest endings:** quitting to the menu or desktop while watching friends after a fall skipped the fall (and a guest's
+  save then got the host's Haven written over their own); "Leave Session" in the seconds before the results kept a failed raid's
+  bag; a guest's raid end was never saved. Now the fall is counted and saved first, the leave waits for the raid, and a guest's
+  raid end is written to their own journey.
+- **Guest stash:** quick moves in the host's stash could duplicate or lose items (a snapshot wiped an unsent move). Fixed.
+- **Carts and horses:** the save after coming home ran before their state was set (an empty cart, a wild horse on reload): it now
+  waits a frame. A horse or cart on its way home (a quit or crash on the results screen, or quitting with a horse tied at the
+  portal) is now written into the save and arrives after loading. A guest's cart stays in the host's Haven (it was duplicated).
+  A tied horse comes home whatever happens, but loot in its bags is lost on a fall, like a cart's load.
+- **Drops:** what a guest dropped after the host left the raid could never be picked up. Fixed.
+- **Bosses:** following a friend into a boss you beat less than 24 h ago lets you help but gives you no drops; a guest can't seal
+  themselves into the arena before the host's boss has come; a swing landing after you died can't kill the boss and count a win.
+- **Combat:** the dagger's Blink Behind could land in walls, rocks or the hillside (it now checks the ground, room and a clear
+  way); a swing kept going after death; a rush refused for want of stamina stopped the dodge dead; **melee blows went through
+  walls** (palisades, gates, the Heartroot's root walls): scenery between the blow and the target now stops it (creatures in
+  between don't).
+- **Items:** five Kitchen recipes ate a whole Waterskin (now 10-25 water, like Stewed Berries); a cost listing the same thing twice
+  (the palisade gate's Oak 12 + 4) was under-charged; a big overflow dropped on the ground was cut to one stack; the altar could
+  empower a piece swapped into the slot at the old piece's price.
+- **Haven:** a guest's game foaled the host's mare (a free foal); a story saved mid-way (F5 in Eirik's duel) never came back:
+  a once-only story now counts as done only when it finishes; the host riding a guest's horse was stuck when the guest left;
+  selling a horse deleted its saddle, barding and bags (now refused until they're off); handing over a request paid in full for
+  less when workers took from the stash meanwhile.
+- **Left for a later round (medium):** the same item picked up by two players in a shared Haven; a guest's changes to the host's
+  horse while the host is away; options rebinding hard to back out of; the recipe search letting keys through; a guest finishing
+  the host's scaffolds without asking; buffered presses skipping the swim/boat checks; a scene change breaking off leaving the
+  menu frozen.

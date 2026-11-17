@@ -12,6 +12,13 @@ public sealed partial class PlayerCombat
     private bool Begin(SwingKind kind, ChainPress judge)
     {
         queuedKind = SwingKind.None;
+        // A press held over from a swing or a dodge fires later than it was made: by then the player may be swimming, at the oars or
+        // at work, where a new swing is refused (the state machine's own gate, which a fresh press passes through).
+        if ((health != null && !health.IsAlive) || (stateMachine != null && !stateMachine.CanStartAttack))
+        {
+            return false;
+        }
+
         // The weapon is out on a throw (a spear toss): nothing to swing until it is back in the hand. And an art waits out its
         // cooldown, so a second press mid-throw doesn't strike again.
         if (WeaponInFlight || (kind == SwingKind.Art && Time.time < artReadyAt))
@@ -80,11 +87,6 @@ public sealed partial class PlayerCombat
                 attack = CounterIsReady && weapon != null && weapon.CounterAttack != null ? weapon.CounterAttack
                     : weapon != null && weapon.BackstepAttack != null && IsBackstep() ? weapon.BackstepAttack
                     : weapon != null ? weapon.RushAttack : null;
-                if (dodge != null)
-                {
-                    dodge.CutShort();
-                }
-
                 break;
             default:
                 step = ComboRules.NextStep(lastStep, chain, judge, fumbled);
@@ -114,6 +116,13 @@ public sealed partial class PlayerCombat
         {
             forcedAttack = null;
             return false;
+        }
+
+        // Only a rush that is paid for cuts the dodge short: refused for want of stamina, it stopped the roll dead inside the blow
+        // being escaped.
+        if (kind == SwingKind.Rush && dodge != null)
+        {
+            dodge.CutShort();
         }
 
         LastSwingStaminaPaid = stamina != null && owed > 0f ? stamina.Scaled(owed) : 0f;

@@ -671,6 +671,7 @@ public static class SaveMapper
         }
         loaded.Settlement = ReadSettlement(data.settlement, content, loaded.MissingContent);
         loaded.Progress = ReadProgress(data.progress);
+        ReadLostOnes(data.progress?.lostOnes, loaded.Progress.LostOnes, content, loaded.MissingContent);
         if (!string.IsNullOrEmpty(data.playtest?.runId))
         {
             loaded.Playtest = new PlaytestRun(data.playtest.runId, data.playtest.playedSeconds, data.playtest.sessions);
@@ -753,6 +754,94 @@ public static class SaveMapper
         {
             into.journal.raids.Add(new RaidRecordSaveData { raid = raid.Raid, outcome = raid.Outcome, seconds = raid.Seconds, value = raid.Value, broughtDownBy = raid.BroughtDownBy ?? "", lines = new List<string>(raid.Lines) });
         }
+
+        WriteLostOnes(progress.LostOnes, into.lostOnes = new LostRosterSaveData());
+    }
+
+    private static void WriteLostOnes(LostOneRoster roster, LostRosterSaveData into)
+    {
+        into.seed = roster.Seed;
+        into.homecomings = roster.Homecomings;
+        into.risen = roster.Risen;
+        foreach (LostOneRecord record in roster.All)
+        {
+            var saved = new LostOneSaveData
+            {
+                id = record.Id ?? "",
+                givenName = record.GivenName ?? "",
+                epithet = record.Epithet ?? "",
+                pastLife = record.PastLife ?? "",
+                rank = record.Rank,
+                traits = new List<string>(record.Traits),
+                learned = new List<string>(record.Learned),
+                kills = record.Kills,
+                escapes = record.Escapes,
+                raidsMet = record.RaidsMet,
+                status = (int)record.Status,
+                met = record.Met,
+                restedAtHomecoming = record.RestedAtHomecoming,
+                lastSeenIn = record.LastSeenIn ?? "",
+                epitaph = record.Epitaph ?? "",
+            };
+            for (int i = 0; i < record.Carried.Count; i++)
+            {
+                if (!record.Carried[i].IsEmpty)
+                {
+                    saved.carried.Add(ToSlot(i, record.Carried[i]));
+                }
+            }
+
+            into.records.Add(saved);
+        }
+    }
+
+    // What a Lost One carries is read as the bag is (items that no longer exist are dropped and listed missing); the rest is words and
+    // numbers, kept as written (a trait no longer listed is only left out when it walks).
+    private static void ReadLostOnes(LostRosterSaveData saved, LostOneRoster into, IContentLookup content, List<string> missing)
+    {
+        if (saved == null)
+        {
+            return;
+        }
+
+        var records = new List<LostOneRecord>();
+        foreach (LostOneSaveData entry in saved.records ?? new List<LostOneSaveData>())
+        {
+            if (entry == null)
+            {
+                continue;
+            }
+
+            var record = new LostOneRecord
+            {
+                Id = entry.id ?? "",
+                GivenName = entry.givenName ?? "",
+                Epithet = entry.epithet ?? "",
+                PastLife = entry.pastLife ?? "",
+                Rank = entry.rank,
+                Kills = entry.kills,
+                Escapes = entry.escapes,
+                RaidsMet = entry.raidsMet,
+                Status = (LostOneStatus)entry.status,
+                Met = entry.met,
+                RestedAtHomecoming = entry.restedAtHomecoming,
+                LastSeenIn = entry.lastSeenIn ?? "",
+                Epitaph = entry.epitaph ?? "",
+            };
+            record.Traits.AddRange(entry.traits ?? new List<string>());
+            record.Learned.AddRange(entry.learned ?? new List<string>());
+            foreach (SlotSaveData slot in entry.carried ?? new List<SlotSaveData>())
+            {
+                if (TryReadStack(slot, content, missing, out ItemStack stack))
+                {
+                    record.Carried.Add(stack);
+                }
+            }
+
+            records.Add(record);
+        }
+
+        into.Restore(records, saved.seed, saved.homecomings, saved.risen);
     }
 
     // Perks that no longer exist are dropped (their milestone waits for a new choice). A save from before skills turns
@@ -901,15 +990,11 @@ public static class SaveMapper
     {
         foreach (SlotSaveData slot in slots)
         {
-            ItemDefinition item = Resolve(content.FindItem(slot.item), "item", slot.item, missing);
-            if (item == null || slot.count <= 0)
+            if (!TryReadStack(slot, content, missing, out ItemStack stack))
             {
                 continue;
             }
 
-            EnchantmentDefinition enchantment = string.IsNullOrEmpty(slot.enchantment) ? null
-                : Resolve(EssenceSettings.Current.FindEnchantment(slot.enchantment), "enchantment", slot.enchantment, missing);
-            var stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment, (ItemQuality)Math.Max(0, Math.Min(slot.quality, 2)), slot.maker, slot.size);
             if (into.IsValid(slot.slot) && into.GetSlot(slot.slot).IsEmpty)
             {
                 into.SetSlot(slot.slot, stack);
@@ -921,6 +1006,22 @@ public static class SaveMapper
         }
 
         return into;
+    }
+
+    // One saved stack with its wear and essence work, or false when its item no longer exists (listed missing) or it holds none.
+    private static bool TryReadStack(SlotSaveData slot, IContentLookup content, List<string> missing, out ItemStack stack)
+    {
+        stack = ItemStack.Empty;
+        ItemDefinition item = Resolve(content.FindItem(slot.item), "item", slot.item, missing);
+        if (item == null || slot.count <= 0)
+        {
+            return false;
+        }
+
+        EnchantmentDefinition enchantment = string.IsNullOrEmpty(slot.enchantment) ? null
+            : Resolve(EssenceSettings.Current.FindEnchantment(slot.enchantment), "enchantment", slot.enchantment, missing);
+        stack = new ItemStack(item, slot.count, 1f - slot.wear, slot.empower, enchantment, (ItemQuality)Math.Max(0, Math.Min(slot.quality, 2)), slot.maker, slot.size);
+        return true;
     }
 
     /// <summary>

@@ -1,0 +1,343 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: LostClothB
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: LostClothB
+  displayName: One of the Lost
+  description: A settler of the clearing the mist took long ago, half dead and still armed. It hunts the keeper of the flame.
+  combatStats: {fileID: 11400000, guid: 8321df0812fa27649975160ad590b5b8, type: 2}
+  faction: 1
+  lootTable: {fileID: 11400000, guid: e08f09335b64bc04fbdbe2359407c6c2, type: 2}
+  drops:
+    entries: []
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 9066855856663566298, guid: 1f1572f0e5dfe0e4980c2a61e4cb9e49, type: 3}
+  experience: 0
+  neverElite: 0
+  attack: {fileID: 11400000, guid: 7c51c0a6123522543bd74150b578d845, type: 2}
+  attackDamage: 9.6
+  attackCooldown: 0.6
+  moveSpeed: 2.8
+  detectionRange: 9
+  chaseRange: 16
+  leashRange: 22
+  sightAngle: 100
+  closeSenseRange: 3
+  hearing: 1.1
+  alertness: 0.8
+  huntsHorses: 1
+  frightensHorses: 12
+  attacks:
+  - attack: {fileID: 11400000, guid: 3b79044bc9471ea438c5a265fc2b42a4, type: 2}
+    kind: 0
+    damage: 24
+    minimumRange: 0
+    maximumRange: 2.2
+    priority: 10
+    opener: 0
+    weight: 1
+    whenFoe: 0
+    heavy: 0
+    cooldown: 1
+    interruptible: 1
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps:
+    - {fileID: 11400000, guid: 2cbc653ff5f6b2149991652f3875d2df, type: 2}
+    comboChance: 0.45
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0.3
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 3b79044bc9471ea438c5a265fc2b42a4, type: 2}
+    kind: 0
+    damage: 24
+    minimumRange: 0
+    maximumRange: 2.2
+    priority: 15
+    opener: 0
+    weight: 0.8
+    whenFoe: 0
+    heavy: 0
+    cooldown: 7
+    interruptible: 1
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 0.3
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps:
+    - {fileID: 11400000, guid: 2cbc653ff5f6b2149991652f3875d2df, type: 2}
+    - {fileID: 11400000, guid: a8dfd939c7f87144180d0eabcfb8fd2b, type: 2}
+    comboChance: 1
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 12
+    projectileRadius: 0.15
+    chargeSpeed: 12
+    chargeDistance: 8
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 6de32dbc497e17e49b175c26b8d7673f, type: 2}
+    kind: 2
+    damage: 34
+    minimumRange: 3
+    maximumRange: 8
+    priority: 20
+    opener: 0
+    weight: 0.6
+    whenFoe: 6
+    heavy: 1
+    cooldown: 9
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 8
+    projectileRadius: 0.15
+    chargeSpeed: 8
+    chargeDistance: 6
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: b10452188c668ff4c9c4702d42caa28c, type: 2}
+    kind: 0
+    damage: 42
+    minimumRange: 0
+    maximumRange: 2.6
+    priority: 12
+    opener: 0
+    weight: 0.5
+    whenFoe: 0
+    heavy: 1
+    cooldown: 6
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 11400000, guid: 386140d225406a44dbe57a23d03a0ff7, type: 2}
+    leadTarget: 0
+    fromTier: 4
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0.4
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 8
+    projectileRadius: 0.15
+    chargeSpeed: 8
+    chargeDistance: 6
+    exposedSeconds: 2
+    leapHeight: 0
+    buffRadius: 13
+    buffSeconds: 10
+    damageBonus: 0.15
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 7
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 6
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.35
+  idleGrazeChance: 0
+  idleSleepChance: 0
+  idleSleepAttention: 0.3
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 1
+  flankSpread: 0.5
+  breaksWalls: 0
+  spottedPause: 0.55
+  guardAfterBlows: 3
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0.3
+  hurtMood: 2
+  arrowDodge: 0
+  poise: 140
+  parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
+  openWhileStriking: 1
+  parriesBackstabs: 1
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.03, g: 0.025, b: 0.03, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
+  hitMaterial: 2
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 3
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts:
+  - Pauldron.001
+  - Pauldron
+  - Helm,Nasal,Rim
+  sizeVariation: 0.03
+  shadeVariation: 0.08
+  portrait: {fileID: 0}
+  journalLore: 'Settlers of the clearing before you, taken by the mist and not let go. Something of who they were is left: their names, their gear, the way they swung a sword. The rest is hunger for the flame you keep.'
+  journalAdvice: 'It fights as you do: a cut, a second, a finishing blow. Read the wind-up, step out of the chain, and strike when the finisher misses. Wounded, it runs into the mist and comes back stronger. Fire was always their fear.'
+  journalHabitat: Wherever the keeper walks
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: bcd71f943ff486449a5096064ea50c03, type: 2}
+  hurtSound: {fileID: 11400000, guid: 98120c428fb09cc46a6ef3c5133e921e, type: 2}
+  attackSound: {fileID: 11400000, guid: e5b4ec0e77fbe874bbcab6134ff131df, type: 2}

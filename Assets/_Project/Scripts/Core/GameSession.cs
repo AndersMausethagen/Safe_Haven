@@ -112,6 +112,13 @@ public static class GameSession
     /// <summary>Hands a cart to the next scene; the player there takes it up on arrival (PlayerTransport).</summary>
     public static void CarryTransport(CarriedTransport carried) => pendingTransport = carried;
 
+    /// <summary>The cart on its way to the next scene, without taking it (a save written before it is set down). False with none.</summary>
+    public static bool PeekTransport(out CarriedTransport carried)
+    {
+        carried = pendingTransport ?? default;
+        return pendingTransport.HasValue;
+    }
+
     /// <summary>Returns the cart handed over by the previous scene, once.</summary>
     public static bool TakeCarriedTransport(out CarriedTransport carried)
     {

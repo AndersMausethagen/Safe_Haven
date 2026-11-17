@@ -587,5 +587,18 @@ public sealed class KitSearchGuard : MonoBehaviour
         }
     }
 
+    private TMP_InputField field;
+
+    // Followed every frame as well: after Enter or Escape the field stays selected, so clicking back into it raised no select and
+    // the letters typed moved the player.
+    private void Update()
+    {
+        field ??= GetComponent<TMP_InputField>();
+        if (field != null)
+        {
+            Typing(field.isFocused);
+        }
+    }
+
     private void OnDisable() => Typing(false);
 }

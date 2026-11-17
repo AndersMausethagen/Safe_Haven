@@ -65,21 +65,23 @@ half SkyAmbientAtLeastCover(float3 positionWS)
 // before the field: lit air reads as milky at night. 1 without a field, so the Haven's water and mist are as they were.
 half GroundLightAirAbove(float3 positionWS, float aboveGround)
 {
-    UNITY_BRANCH if (_GroundLightRect.w <= 0.0)
+    // One result and one return: a value returned from inside a [branch] is "potentially uninitialized" to FXC.
+    half air = 1.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0)
     {
-        return 1.0;
+        half cover = 1.0;
+        if (_SkyOcclusionRect.w > 0.0)
+        {
+            float2 uv = saturate((positionWS.xz - _SkyOcclusionRect.xy) * _SkyOcclusionRect.z);
+            float above = SAMPLE_TEXTURE2D_LOD(_SkyOcclusionMap, sampler_LinearClamp, uv, 0).r - positionWS.y;
+            cover = lerp(1.0 - 0.65 * saturate(_SkyOcclusionRect.w), 1.0, 1.0 - smoothstep(0.4, 2.0, above));
+        }
+
+        half relief = lerp(GroundLightAt(positionWS, 0).a, 1.0, saturate(aboveGround / GROUND_LIGHT_AIR_FADE));
+        air = min(cover * relief * _GroundLightRect.w, 1.0);
     }
 
-    half cover = 1.0;
-    if (_SkyOcclusionRect.w > 0.0)
-    {
-        float2 uv = saturate((positionWS.xz - _SkyOcclusionRect.xy) * _SkyOcclusionRect.z);
-        float above = SAMPLE_TEXTURE2D_LOD(_SkyOcclusionMap, sampler_LinearClamp, uv, 0).r - positionWS.y;
-        cover = lerp(1.0 - 0.65 * saturate(_SkyOcclusionRect.w), 1.0, 1.0 - smoothstep(0.4, 2.0, above));
-    }
-
-    half relief = lerp(GroundLightAt(positionWS, 0).a, 1.0, saturate(aboveGround / GROUND_LIGHT_AIR_FADE));
-    return min(cover * relief * _GroundLightRect.w, 1.0);
+    return air;
 }
 
 // The same at the ground (a water surface).

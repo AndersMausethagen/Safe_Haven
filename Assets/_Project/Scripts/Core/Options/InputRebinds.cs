@@ -231,6 +231,8 @@ public static class InputRebinds
             .WithExpectedControlType("Button")
             .WithBindingGroup(scheme)
             .WithCancelingThrough("<Keyboard>/escape")
+            // A click is the player reaching for Back, not the key wanted: bound, it swapped Attack onto the old key.
+            .WithControlsExcluding("<Mouse>/leftButton")
             .WithControlsExcluding("<Pointer>/position")
             .WithControlsExcluding("<Pointer>/delta")
             .OnMatchWaitForAnother(0.1f);
@@ -257,6 +259,16 @@ public static class InputRebinds
                 done?.Invoke(null);
             })
             .Start();
+    }
+
+    /// <summary>Stops waiting for a key, binding nothing (the options closed, Back clicked, or a pad player stuck on a keyboard
+    /// row). Gameplay input comes back.</summary>
+    public static void CancelListening()
+    {
+        if (operation != null)
+        {
+            operation.Cancel();
+        }
     }
 
     private static void Finish()

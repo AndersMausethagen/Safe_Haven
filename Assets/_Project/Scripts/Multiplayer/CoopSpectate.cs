@@ -88,6 +88,18 @@ public static class CoopSpectate
         }
     }
 
+    /// <summary>Stops watching and lets the raid end for this player now (quitting while watching). False when not watching.</summary>
+    public static bool FinishNow()
+    {
+        if (!IsWatching)
+        {
+            return false;
+        }
+
+        End();
+        return true;
+    }
+
     private static void End()
     {
         Action finishing = finish;

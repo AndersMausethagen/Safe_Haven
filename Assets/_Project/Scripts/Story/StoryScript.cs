@@ -31,6 +31,9 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
     [SerializeField] private bool logSteps;
 
     private readonly HashSet<string> fired = new HashSet<string>();
+    // Once-only triggers whose run is still going: not saved as fired until it ends, so a save made mid-story (F5 during a spar or a
+    // Wait) starts it again on loading, rather than leaving it half done for good (Eirik's lesson never came back to its duel).
+    private readonly HashSet<string> unfinished = new HashSet<string>();
     private readonly List<Action> stopListening = new List<Action>();
     private readonly Dictionary<string, StoryNode> byId = new Dictionary<string, StoryNode>();
     private int running;
@@ -214,9 +217,18 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
         }
 
         fired.Add(trigger.id);
+        if (trigger.once)
+        {
+            unfinished.Add(trigger.id);
+        }
+
         Log(trigger);
         NodeStarted?.Invoke(trigger);
         FollowLinks(trigger, 0);
+        if (running == 0)
+        {
+            unfinished.Clear();
+        }
     }
 
     /// <summary>Runs the story from <paramref name="node"/> (testing a branch from the graph window).</summary>
@@ -268,6 +280,10 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
         finally
         {
             running--;
+            if (running == 0)
+            {
+                unfinished.Clear();
+            }
         }
     }
 
@@ -292,7 +308,7 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
 
     // ----- Saving -----
 
-    public string CaptureState() => string.Join(",", fired);
+    public string CaptureState() => string.Join(",", unfinished.Count == 0 ? fired : fired.Where(id => !unfinished.Contains(id)));
 
     public void RestoreState(string state)
     {

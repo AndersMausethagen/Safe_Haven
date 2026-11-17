@@ -27,24 +27,27 @@ half4 GroundLightAt(float3 positionWS, uint slice)
 // without a field.
 half GroundLightRelief(float3 positionWS)
 {
-    UNITY_BRANCH if (_GroundLightRect.w <= 0.0)
+    // One result and one return: a value returned from inside a [branch] is "potentially uninitialized" to FXC.
+    half relief = 1.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0)
     {
-        return 1.0;
+        relief = GroundLightAt(positionWS, 0).a * _GroundLightRect.w;
     }
 
-    return GroundLightAt(positionWS, 0).a * _GroundLightRect.w;
+    return relief;
 }
 
 // The ground itself (the terrain, the moss on it): the canopy's shade and the land's together, as SkyAmbient gives what stands on
 // it, the lift included. 1 without.
 half GroundLightOnGround(float3 positionWS)
 {
-    UNITY_BRANCH if (_GroundLightRect.w <= 0.0)
+    half light = 1.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0)
     {
-        return 1.0;
+        light = GroundLightAt(positionWS, 1).r * GroundLightAt(positionWS, 0).a * _GroundLightRect.w;
     }
 
-    return GroundLightAt(positionWS, 1).r * GroundLightAt(positionWS, 0).a * _GroundLightRect.w;
+    return light;
 }
 
 // Puts a factor on a surface's indirect light. URP's lit shaders take the lower of the surface's occlusion and SSAO
@@ -63,12 +66,13 @@ void GroundLightApply(half factor, inout half occlusion, inout half3 bakedGI)
 // moon as it is now, so clouds and night dim it. 0 without.
 half3 GroundLightBounce(float3 positionWS, half3 normalWS)
 {
-    UNITY_BRANCH if (_GroundLightRect.w <= 0.0)
+    half3 bounce = 0.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0)
     {
-        return 0.0;
+        half3 thrown = GroundLightAt(positionWS, 0).rgb;
+        bounce = thrown * thrown * _GroundLightBounce.rgb * _MainLightColor.rgb * lerp(1.0, 0.1, saturate(normalWS.y));
     }
 
-    half3 thrown = GroundLightAt(positionWS, 0).rgb;
-    return thrown * thrown * _GroundLightBounce.rgb * _MainLightColor.rgb * lerp(1.0, 0.1, saturate(normalWS.y));
+    return bounce;
 }
 #endif

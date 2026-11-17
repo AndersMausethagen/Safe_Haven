@@ -7,8 +7,8 @@ using UnityEngine.UI;
 using static CodeUI;
 
 /// <summary>
-/// The journal (J, or from the Escape menu): the backstory (with the cinematics reached, to watch again), the quests in more depth than the tracker has room for, the creatures met, how things work and the
-/// raids behind you, one tab each. It reads and shows; JournalContent decides what there is to say. Built in code for every scene with a player
+/// The journal (J, or from the Escape menu): the backstory (with the cinematics reached, to watch again), the quests in more depth than the tracker has room for, the creatures met, how things work, the
+/// raids behind you and the Lost who hunt you (once one is met: until then its tab isn't there), one tab each. It reads and shows; JournalContent decides what there is to say. Built in code for every scene with a player
 /// (ExperienceTracker).
 /// </summary>
 public sealed class JournalWindow : MonoBehaviour
@@ -20,19 +20,20 @@ public sealed class JournalWindow : MonoBehaviour
         Creatures,
         Mechanics,
         Raids,
+        Lost,
     }
 
     private const float Width = 1400f;
     private const float Height = 840f;
     private const float TabBarHeight = 56f;
-    private const float TabWidth = 190f;
+    private const float TabWidth = 170f;
     private const float Margin = 44f;
     private const float ScreenMargin = 24f;
     // Long reading wants a wide column; a creature has a picture to show.
     private const float ReadingWidth = 800f;
     private const float PortraitSize = 190f;
 
-    private static readonly Tab[] Tabs = { Tab.Backstory, Tab.Quests, Tab.Creatures, Tab.Mechanics, Tab.Raids };
+    private static readonly Tab[] Tabs = { Tab.Backstory, Tab.Quests, Tab.Creatures, Tab.Mechanics, Tab.Raids, Tab.Lost };
 
     private sealed class TabView
     {
@@ -79,18 +80,24 @@ public sealed class JournalWindow : MonoBehaviour
         Current = this;
         GameInput.KeysChanged += OnKeysChanged;
         PadTabs.Register(this, () => window != null && window.IsOpen, StepTab,
-            () => tabViews.ConvertAll(view => (RectTransform)view.Button.transform));
+            () => tabViews.FindAll(view => IsOffered(view.Tab)).ConvertAll(view => (RectTransform)view.Button.transform));
     }
 
-    // LB and RB on a controller (PadTabs).
+    // LB and RB on a controller (PadTabs), over the tabs there are.
     private void StepTab(int direction)
     {
-        int at = tabViews.FindIndex(view => view.Tab == shown);
-        if (tabViews.Count > 0)
+        List<TabView> offered = tabViews.FindAll(view => IsOffered(view.Tab));
+        int at = offered.FindIndex(view => view.Tab == shown);
+        if (offered.Count > 0)
         {
-            Show(tabViews[PadTabs.Next(Mathf.Max(0, at), tabViews.Count, direction)].Tab);
+            Show(offered[PadTabs.Next(Mathf.Max(0, at), offered.Count, direction)].Tab);
         }
     }
+
+    // The Lost's tab waits for the first of them met, so it gives nothing away before.
+    private static bool IsOffered(Tab tab) => tab != Tab.Lost || GameSession.Progress.LostOnes.AnyMet;
+
+    private static string TabName(Tab tab) => tab == Tab.Lost ? "The Lost" : tab.ToString();
 
     private void OnDisable()
     {
@@ -127,7 +134,7 @@ public sealed class JournalWindow : MonoBehaviour
         for (int i = 0; i < Tabs.Length; i++)
         {
             Tab tab = Tabs[i];
-            Button button = AddTab(tab.ToString(), panel, Margin + i * (TabWidth + 8f), 8f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
+            Button button = AddTab(TabName(tab), panel, Margin + i * (TabWidth + 8f), 8f, TabWidth, 44f, style, out TMP_Text label, out Image underline);
             button.onClick.AddListener(() => Show(tab));
             // Creatures have a portrait; the backstory and mechanics pages a painting, wide, with the page's name beside it.
             bool painted = tab == Tab.Backstory || tab == Tab.Mechanics;
@@ -153,6 +160,8 @@ public sealed class JournalWindow : MonoBehaviour
                 return "No quests yet. Someone will want something soon enough.";
             case Tab.Raids:
                 return "You haven't been through the portal yet. Every raid you go on is written down here.";
+            case Tab.Lost:
+                return "None of the Lost has found you yet.";
             default:
                 return "Nothing written yet.";
         }
@@ -190,10 +199,12 @@ public sealed class JournalWindow : MonoBehaviour
 
     private void Show(Tab tab)
     {
-        shown = tab;
+        shown = IsOffered(tab) ? tab : Tab.Backstory;
+        tab = shown;
         UIStyle style = UIStyle.Current;
         foreach (TabView view in tabViews)
         {
+            view.Button.gameObject.SetActive(IsOffered(view.Tab));
             bool on = view.Tab == tab;
             // Framed tabs (CodeUI.AddTab): the one shown in bright gold, bold, in its gold rim.
             view.Label.color = on ? style.AccentBright : style.Text;
@@ -226,6 +237,8 @@ public sealed class JournalWindow : MonoBehaviour
                 return JournalContent.Mechanics(settings, log, progress, out summary);
             case Tab.Raids:
                 return JournalContent.Raids(progress, out summary);
+            case Tab.Lost:
+                return LostOneJournal.Shelves(LostOneSettings.Current, progress, out summary);
             default:
                 return JournalContent.Backstory(settings, log, progress, out summary, Watch, WatchBlocked());
         }
@@ -279,7 +292,7 @@ public sealed class JournalWindow : MonoBehaviour
                 }
             }
 
-            view.Label.text = unread > 0 ? $"{view.Tab}  <color={accent}>{unread}</color>" : view.Tab.ToString();
+            view.Label.text = unread > 0 ? $"{TabName(view.Tab)}  <color={accent}>{unread}</color>" : TabName(view.Tab);
         }
     }
 }

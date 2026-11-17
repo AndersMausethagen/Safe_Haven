@@ -256,6 +256,46 @@ public sealed class LockpickingPage : SystemsPage
     }
 }
 
+/// <summary>The Lost: named, mist-taken settlers who hunt the Keeper and grow when they win (LostOneSettings).</summary>
+public sealed class LostOnesPage : SystemsPage
+{
+    public override string Title => "The Lost";
+    public override string Group => "World";
+    public override string Help => "Named settlers the mist took, who hunt the Keeper. Once the story gate is met and enough raids have come home, a few rise " +
+                                   "(a roster per character). Each raid may have one walk it, an elite with its own name, chosen from the run's seed so the " +
+                                   "briefing can tell it once it has been met. Killing the player raises it a rank and it keeps the best of what the death " +
+                                   "took; wounded below the flee line it runs into the mist, to come back scarred, and the player sees through one of its " +
+                                   "traits; laid to rest, it drops what it carried. Bodies by rank (cloth, leather, mail), the Draug while a grade is empty.";
+
+    public override void Draw()
+    {
+        var settings = Settings<LostOneSettings>(LostOneSettings.ResourceName);
+        if (settings == null)
+        {
+            return;
+        }
+
+        SettingsPanel(settings, "The Lost", "Resources/LostOneSettings");
+        BeginDerived();
+        for (int tier = 1; tier <= Tiers.Max; tier++)
+        {
+            Derived($"Chance one walks a tier {Tiers.ToRoman(tier)} raid", $"{settings.ChanceFor(tier, 1):P0} at rank I, {settings.ChanceFor(tier, settings.MaxRank):P0} at rank {Tiers.ToRoman(settings.MaxRank)}");
+        }
+
+        for (int rank = 1; rank <= settings.MaxRank; rank++)
+        {
+            LostOneSettings.Rank row = settings.RankAt(rank);
+            MonsterDefinition body = settings.BodyFor(new LostOneRecord { Id = "lost-1", Rank = rank });
+            Derived($"Rank {Tiers.ToRoman(rank)} ({row.title})",
+                $"health ×{row.health:0.##}, damage ×{row.damage:0.##} on top of {row.traits} trait(s); walks as {(body != null ? body.DisplayName : "nothing: no body set")}");
+        }
+
+        Derived("Scars", $"+{settings.ScarPerEscape:P0} health per escape, at most +{settings.MostScar:P0}");
+        Derived("Traits to choose from", settings.Traits.Count == 0 ? "none: add elite affixes" : settings.Traits.Count.ToString());
+        EndDerived();
+    }
+}
+
 /// <summary>The timed swing minigame for axe, pickaxe and sickle gathering.</summary>
 public sealed class GatheringMinigamePage : SystemsPage
 {

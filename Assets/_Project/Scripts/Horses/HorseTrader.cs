@@ -46,7 +46,10 @@ public static class HorseTrader
 
             Horse chosen = horse;
             int price = Mathf.RoundToInt(PriceOf(horse.Stats, horse.Definition) * settings.TradeSellShare);
-            page.Add(new MenuAction($"Sell {horse.HorseName}", $"{price} {coin}. It goes with the caravan for good", !HavenVisit.IsVisiting,
+            // Its gear and bags are the player's, not part of the price: sold with them, they went with the caravan for nothing.
+            bool geared = horse.Saddle != null || horse.Armour != null || (horse.Cargo != null && horse.Cargo.CountItems() > 0);
+            page.Add(new MenuAction($"Sell {horse.HorseName}", geared ? "Take off its saddle and barding and empty its bags first"
+                    : $"{price} {coin}. It goes with the caravan for good", !HavenVisit.IsVisiting && !geared,
                 () => Sell(chosen, price)) { HostOnly = true });
         }
 

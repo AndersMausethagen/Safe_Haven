@@ -701,7 +701,7 @@ that part directly (`director.Creatures.Wake(...)`, `director.Companions.Compani
 
 | Owner | Its parts |
 |---|---|
-| `RaidDirector` (the raid's life: clock, stages, ending) | `RaidCreatures` (strength, hunting, alarms), `RaidCompanions` (who came along, the lost one) |
+| `RaidDirector` (the raid's life: clock, stages, ending) | `RaidCreatures` (strength, hunting, alarms), `RaidCompanions` (who came along, the lost one), `RaidLostOnes` (one of the Lost walking the raid) |
 | `Construction` (level, work, payment, saving) | `ConstructionLook` (rising, scaffold, dressing, dust), `ConstructionUpgradeOffer` |
 | `HomePortal` (the ward and the voice) | `HomePortalMenu` (what using it offers) |
 | `PlayerCombat` (the swing state machine) | `MeleeTargeting` (aim assist, what can be finished), `PlayerCombatMode` (Combat and Exploration) |
@@ -788,6 +788,43 @@ reviews). When adding something, go through these, and the tests say when one is
 - **Sleep:** `CreatureSleep` (auto-added by `RaidDirector`) disables AI, animation driver, Animator and NavMeshAgent of
   idle, non-roaming creatures beyond 85 m and wakes them within 70 m or when hit (the attacker is engaged). Creatures
   are not pooled (low spawn rate, lots of state to reset); see "Pooling".
+
+## The Lost: named hunters who grow (2026-11-17)
+
+A nemesis system. The Lost are settlers the mist took and forgot so completely that nothing is left of them but a hunger for the flame,
+and so for its Keeper (the player). Each character has a few (`CharacterProgress.LostOnes`, a `LostOneRoster` of `LostOneRecord`s,
+saved in `ProgressSaveData.lostOnes`; older saves load with none). Tuning, names and every line said: `Resources/LostOneSettings`
+(`LostOneSettings`, Systems Editor › World › The Lost). The rules are plain C# in `LostOneRules` (tested in `LostOneTests`).
+
+- **Rising:** once the story gate (Story Gate: The Weakening Ward, completed) is met and the Haven has enough successful extractions,
+  each raid's end (a homecoming, `RaidLostOnes.Settle`) fills the roster to its size. A new one is born from the roster's seed and its
+  number: a given name none of the Lost has had, an epithet and a past life ("once the Haven's smith"), rank 1 and its first traits
+  (elite affixes from Settings › Traits usable at its rank as a tier, kept by asset name). One laid to rest holds its place open for
+  Homecomings Before A New One.
+- **Walking a raid:** `RaidLostOnes.ForRun(raid, seed, tier)` picks one walking (higher ranks likelier) and rolls the tier's chance (more
+  for a higher rank), from `RaidLayout.SeedFor(seed, "The Lost")`: the briefing (`RaidPreparationWindow.Briefing`) and the raid
+  (`RaidDirector.BeginRaid` → `RaidLostOnes.Summon`, after the elites) get the same answer. Never in a boss encounter or the prologue,
+  never two, never when following the host. The briefing names it only once it has been met.
+- **In the raid:** its body is a `MonsterDefinition` from Settings › Body Grades for its rank (cloth, leather, mail), the same place in
+  each grade's list for the same Lost One (from its id), else the Fallback Body (the Draug). It appears out of sight 60–120 m from the
+  start, strengthened as the raid's creatures are, made an elite with its traits (`EliteCreature.Make`), then by its rank and scars
+  (`EliteCreature.Strengthen`, folded into the elite's shares so they multiply) under its own name (`EliteCreature.Rename`; the label
+  shows its traits in their colours once seen through, "?" until then). `LostOne` (on the creature) catches the scent after a while,
+  then turns towards the player every few seconds (`MonsterAI.Roam` to a point near them) whenever it isn't already on them; it hunts
+  only the player (`PlayerOnly`) and never sleeps (`KeepAwake`).
+- **What becomes of it:** met (it set on the player, or a blow passed between them) it is in the journal. Wounded below Flee Below
+  (once a raid, never at the highest rank) it runs, unhurt, and the mist takes it (`Vanish`, no loot): an escape (it comes back with a
+  scar, +health) and one of its traits learned. Laid to rest, it drops what it carried as `DroppedItem`s where it fell (carried out like
+  any find), pays its rest's Cursed Essence and Insight on top of the elite's loot, and every trait is known. If it kills the player
+  (the blow, or the last blow before bleeding out in co-op), the raid's end raises it a rank, gives it the traits its rank has room for,
+  and it keeps the most valuable stacks the death took (`LostOneRules.TakenStacks`: held at the end, less what comes home; wear and
+  essence work kept). Each of these is a line in the raid's report and journal (`RaidSession.RecordEvent`).
+- **Journal:** the "The Lost" tab (`LostOneJournal`), shown once one has been met: walking and laid to rest, rank, what has been seen
+  through, what it carries, what has passed between you, its epitaph.
+- **Co-op:** the host's game decides and spawns; `LostOne` is HostOnly. Friends' copies get its rank and name packed before the
+  affixes in `CreatureSpawn.Affixes` (`LostOne.Pack`: "~3~Halvard Hollow-Eyed|Frenzied", wire format 31) and are made the same elite,
+  as hard-hitting as its rank, under its name (`CreaturePuppets.MakeElite`). Each character's Lost are their own: a friend's death to
+  it changes no roster, and a friend's raid end only brings their own homecoming.
 
 ## Raid events: warnings, sites and choices
 

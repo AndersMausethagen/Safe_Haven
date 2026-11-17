@@ -160,7 +160,12 @@ public sealed class HavenRequestBoard : MonoBehaviour
             : request.IsOrder ? "The plainest piece that will do, from your bag or the stash" : "From your bag or the stash";
         page.Add(new MenuAction($"Hand over {what}", detail, ready, () =>
         {
-            Answer(request, bag, spoken: true);
+            if (!Answer(request, bag, spoken: true))
+            {
+                afterAnswer?.Invoke();
+                return;
+            }
+
             string thanks = string.IsNullOrEmpty(request.Thanks) ? "Thank you." : request.Thanks;
             if (DialogueBox.Current != null)
             {
@@ -194,8 +199,16 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
     /// <summary>Takes what was asked for (from the bag first, then the stash) and gives the reward. <paramref name="spoken"/>: handed
     /// over in talk, where the asker says their thanks (no message of it).</summary>
-    public static void Answer(HavenRequestDefinition request, ItemInventory bag, bool spoken = false)
+    public static bool Answer(HavenRequestDefinition request, ItemInventory bag, bool spoken = false)
     {
+        // Counted again now: the button was made when the page opened, and workers take from the stash meanwhile. Short, it took
+        // what was left and paid the whole reward.
+        if (AtHome(request, bag) < request.Count)
+        {
+            GameMessages.Post($"There aren't {request.Count} {request.WantedName} at home any more.", MessageKind.Warning);
+            return false;
+        }
+
         // Every bare piece, bag then stash, goes before any the player has empowered or enchanted: an order is answered on its
         // own, so it must not take a worked spare from the bag while a plain one waits in the stash.
         int left = request.Count;
@@ -254,6 +267,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         Vector3 at = bag != null ? bag.transform.position : Vector3.zero;
         AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.QuestCompleted : null, at);
+        return true;
     }
 
     private static void Give(ItemDefinition item, int count, ItemInventory bag, List<string> given)

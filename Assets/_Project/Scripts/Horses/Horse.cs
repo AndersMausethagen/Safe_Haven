@@ -280,11 +280,19 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         Changed?.Invoke(this);
     }
 
-    /// <summary>A foal born in the player's stable: theirs from the start, a little fond of them already.</summary>
-    public void BeBorn(HorseStats stats, string stable)
+    /// <summary>A foal born in the player's stable: its mother's owner's from the start (the player's, for one of theirs), a little
+    /// fond of them already.</summary>
+    public void BeBorn(HorseStats stats, string stable, Horse mother = null)
     {
         State = Mode.Tamed;
-        BelongTo(GameSession.Playtest.Id, GameSession.Appearance != null ? GameSession.Appearance.DisplayName : "");
+        if (mother != null && !string.IsNullOrEmpty(mother.OwnerId))
+        {
+            BelongTo(mother.OwnerId, mother.OwnerName);
+        }
+        else
+        {
+            BelongTo(GameSession.Playtest.Id, GameSession.Appearance != null ? GameSession.Appearance.DisplayName : "");
+        }
         BornOn = PlantedTrees.Today;
         Bond = 30f;
         LastCared = BornOn;

@@ -261,6 +261,14 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler, IPlayerActivity
         }
 
         Transport transport = Using;
+        // A visitor's cart stays in the host's Haven, as their horse does (HorseTravel.LeaveForRaid): taken through, its removal
+        // never reached the host (the raid is under way by then), and extracting with it set down a second cart with the same load.
+        if (HavenVisit.IsVisiting)
+        {
+            transport.Driver.LetGo();
+            return;
+        }
+
         GameSession.CarryTransport(new GameSession.CarriedTransport(transport.Definition, transport.CaptureState()));
         transport.Driver.LetGo();
         transport.Remove();
@@ -358,10 +366,18 @@ public sealed class PlayerTransport : MonoBehaviour, IHauler, IPlayerActivity
             haulable.Take(this);
         }
 
-        // Home again: the save on coming home was written before the cart and its load were set down.
+        // Home again: the save on coming home was written before the cart and its load were set down. A frame on, once its
+        // Start has run: saved in the frame it was spawned, its components were left out (SaveableEntity before Start) and
+        // the cart loaded back empty.
         if (RaidDirector.Current == null)
         {
-            SaveGameService.SaveAfterArrival();
+            StartCoroutine(SaveOnceSetDown());
         }
+    }
+
+    private static System.Collections.IEnumerator SaveOnceSetDown()
+    {
+        yield return null;
+        SaveGameService.SaveAfterArrival();
     }
 }

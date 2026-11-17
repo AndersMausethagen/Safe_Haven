@@ -22,6 +22,8 @@ public sealed class CoopDrops : ICoopPart, IDisposable
 
     private readonly Dictionary<string, DroppedItem> drops = new Dictionary<string, DroppedItem>();
     private readonly Dictionary<string, ulong> claimedBy = new Dictionary<string, ulong>();
+    // Drops picked up to the last item: a late claim for one is never granted.
+    private readonly HashSet<string> gone = new HashSet<string>();
     private CoopLink link;
 
     private NetworkManager network => link?.Network;
@@ -113,6 +115,7 @@ public sealed class CoopDrops : ICoopPart, IDisposable
     {
         drops.Clear();
         claimedBy.Clear();
+        gone.Clear();
     }
 
     /// <summary>
@@ -202,7 +205,11 @@ public sealed class CoopDrops : ICoopPart, IDisposable
     {
         reader.ReadNetworkSerializable(out DropIdMessage claim);
         string id = claim.Id;
-        bool free = drops.TryGetValue(id, out DroppedItem item) && item != null && !claimedBy.ContainsKey(id);
+        KeepToThisScene();
+        // A drop the host doesn't know lies where the host isn't (it left the raid first, or never came that way): the first claim
+        // takes it. Denied, as before, it could never be picked up.
+        bool known = drops.TryGetValue(id, out DroppedItem item);
+        bool free = !claimedBy.ContainsKey(id) && !gone.Contains(id) && (!known || item != null);
         using var writer = new FastBufferWriter(128, Allocator.Temp);
         writer.WriteNetworkSerializable(new DropIdMessage { Id = id });
         if (free)
@@ -244,6 +251,11 @@ public sealed class CoopDrops : ICoopPart, IDisposable
             Apply(item, id, left);
         }
 
+        if (string.IsNullOrEmpty(left))
+        {
+            gone.Add(id);
+        }
+
         claimedBy.Remove(id);
         Broadcast(id, left, sender);
     }
@@ -255,6 +267,7 @@ public sealed class CoopDrops : ICoopPart, IDisposable
         if (string.IsNullOrEmpty(left))
         {
             drops.Remove(id);
+            gone.Add(id);
         }
 
         Broadcast(id, left, except);

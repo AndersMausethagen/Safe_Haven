@@ -91,6 +91,12 @@ public sealed class LootOnDeath : MonoBehaviour
             return;
         }
 
+        if (GameSession.ActiveRaid != null && GameSession.ActiveRaid.BossLootWithheld && GetComponentInParent<BossEncounter>() != null)
+        {
+            GameMessages.Post("You fought it too lately: the spoils are your friends' this time.", MessageKind.Info);
+            return;
+        }
+
         RaidDirector here = RaidDirector.Current;
         int tier = here != null ? here.Session.Tier : 0;
         float multiplier = here != null && here.Session.Difficulty != null ? here.Session.Difficulty.loot : 1f;
