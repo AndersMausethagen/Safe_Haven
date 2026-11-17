@@ -39,6 +39,17 @@ Shader "Safe Haven/Tree Wind"
         _MossTiling ("Moss Tiling (UV0)", Float) = 4
         _MossAmount ("Moss Amount", Range(0, 1)) = 1
         _MossRemap ("Moss Starts / Full (surface facing up, -1..1)", Vector) = (0, 0.5, 0, 0)
+        [Header(Other Bark at the Foot)]
+        [Toggle(_FOOT_BARK)] _FootBark ("Other Bark at the Foot (an old birch's black base)", Float) = 0
+        [NoScaleOffset] _FootMap ("Foot Bark Colour", 2D) = "white" {}
+        [Normal][NoScaleOffset] _FootNormal ("Foot Bark Normal", 2D) = "bump" {}
+        _FootColor ("Foot Bark Tint", Color) = (1, 1, 1, 1)
+        _FootTiling ("Foot Tiling (UV0)", Float) = 1
+        _FootHeight ("Covers All Up To / Pale Cracks Clear By (object units above the root)", Vector) = (2, 5, 0, 0)
+        _FootRagged ("Black Cracks Reach Higher By (object units)", Float) = 1.5
+        _FootUneven ("Edge Higher on One Side Than Another By (object units)", Float) = 0
+        _FootTrunk ("Only Within This Far of the Trunk's Axis (object units; 0: everywhere)", Float) = 0
+        _FootDarkRange ("Foot Bark Darkest / Palest (display brightness, ~10th and 90th percentile)", Vector) = (0.07, 0.52, 0, 0)
         [Header(Wind)]
         _WindStrength ("Wind Strength", Range(0, 2)) = 1
         _TreeHeight ("Tree Height (object units)", Float) = 10
@@ -62,6 +73,8 @@ Shader "Safe Haven/Tree Wind"
         TEXTURE2D(_MossMap); SAMPLER(sampler_MossMap);
         TEXTURE2D(_MossNormal);
         TEXTURE2D(_MossMask);
+        TEXTURE2D(_FootMap); SAMPLER(sampler_FootMap);
+        TEXTURE2D(_FootNormal);
         CBUFFER_START(UnityPerMaterial)
             float4 _BaseMap_ST;
             half4 _BaseColor;
@@ -70,6 +83,9 @@ Shader "Safe Haven/Tree Wind"
             half4 _MossColor;
             float4 _MossRemap;
             float _MossTiling, _MossAmount, _Smoothness;
+            half4 _FootColor;
+            float4 _FootHeight, _FootDarkRange;
+            float _FootTiling, _FootRagged, _FootUneven, _FootTrunk;
             half4 _EmissionColor;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ (world), moss displacement, moss speed
@@ -374,6 +390,34 @@ Shader "Safe Haven/Tree Wind"
                 surface.smoothness = 1.0 - mask.g * _Roughness;
                 surface.occlusion = lerp(1.0, mask.r, _OcclusionStrength);
             #endif
+            #if defined(_FOOT_BARK)
+                // Another bark at the foot of the trunk (an old birch's black, cracked plates), giving way to the tree's own
+                // bark with height above the root. The foot bark's black cracks reach highest, its plates less far and its pale
+                // patches end lowest, so the edge breaks up into black fissures on white bark, thinning out upwards as on a real
+                // birch, instead of a line round the trunk.
+                float2 footUV = input.uv * _FootTiling;
+                half3 foot = SAMPLE_TEXTURE2D(_FootMap, sampler_FootMap, footUV).rgb * _FootColor.rgb;
+                // How dark each texel is within the foot bark's own spread (display brightness, so the share covered falls
+                // off evenly with height): its darkest tenth reaches the full Ragged height, its palest tenth ends lowest.
+                half brightness = sqrt(max(dot(foot, half3(0.299, 0.587, 0.114)), 0.0));
+                half footDark = saturate((_FootDarkRange.y - brightness) / max(_FootDarkRange.y - _FootDarkRange.x, 0.01));
+                float3 objectPosition = TransformWorldToObject(input.positionWS);
+                float aboveRoot = objectPosition.y;
+                // Higher on one side of the trunk than the other (as bark weathers on the wetter side), with a gentle wave
+                // round it, so the edge never runs level round the trunk.
+                float2 around = objectPosition.xz / max(length(objectPosition.xz), 0.001);
+                aboveRoot += (dot(around, float2(0.8, 0.6)) + 0.35 * sin(atan2(around.y, around.x) * 3.0)) * _FootUneven;
+                // Limbs reaching out from the trunk keep their own bark: each unit out past the trunk counts as three higher,
+                // so the cracks thin out along a limb as they do up the trunk (a fade there greyed the bark instead).
+                aboveRoot += _FootTrunk > 0.0 ? max(length(objectPosition.xz) - _FootTrunk, 0.0) * 3.0 : 0.0;
+                half footCover = 1.0 - smoothstep(_FootHeight.x, max(_FootHeight.y, _FootHeight.x + 0.01),
+                    aboveRoot - footDark * _FootRagged);
+
+                half3 footNormal = ToWorldNormal(input, faceSign, UnpackNormal(SAMPLE_TEXTURE2D(_FootNormal, sampler_FootMap, footUV)));
+                lighting.normalWS = normalize(lerp(lighting.normalWS, footNormal, footCover));
+                surface.albedo = lerp(surface.albedo, foot, footCover);
+                surface.smoothness *= 1.0 - 0.6 * footCover;
+            #endif
             #if defined(_MOSS_COVER)
                 // Moss on whatever faces up (the tops of branches and the upper side of a leaning trunk), with a ragged
                 // edge from the moss's own occlusion: the covering the SeedMesh shaders give these trees.
@@ -467,6 +511,7 @@ Shader "Safe Haven/Tree Wind"
             #pragma shader_feature_local _FAST_LEAF_LIGHTING
             #pragma shader_feature_local_fragment _MASK_HDRP
             #pragma shader_feature_local_fragment _MOSS_COVER
+            #pragma shader_feature_local_fragment _FOOT_BARK
             #pragma multi_compile_instancing
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog
