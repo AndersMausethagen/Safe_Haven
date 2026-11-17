@@ -108,6 +108,9 @@ public sealed class RaidReport
     /// <summary>What became of a cart in the raid, in a sentence. Empty when there was none.</summary>
     /// <summary>What killed the player, when something did.</summary>
     public string BroughtDownBy { get; set; }
+
+    /// <summary>How to face what brought the player down (its journal advice), shown under it on the death screen. Not saved.</summary>
+    public string KillerAdvice { get; set; }
     public string TransportLine { get; set; } = "";
     public bool TransportHome { get; set; }
     /// <summary>Who went along, or null.</summary>

@@ -304,6 +304,23 @@ public sealed partial class MonsterAI
     {
         if (MonsterAttacks.IsRanged(kind))
         {
+            // A shot from out of frame waits the same beat a blow does, so it comes from where it can be read (research G1).
+            CombatTechniqueSettings shotRules = CombatTechniqueSettings.Current;
+            if (IsAtThePlayer && OffScreen(shotRules))
+            {
+                shotOffScreenSince = shotOffScreenSince >= 0f ? shotOffScreenSince : Time.time;
+                if (Time.time < shotOffScreenSince + shotRules.OffScreenWait)
+                {
+                    MarkWaiting();
+                    movement.TurnTowards(toTarget);
+                    return true;
+                }
+            }
+            else
+            {
+                shotOffScreenSince = -1f;
+            }
+
             return IsAtThePlayer && WaitsToShoot(toTarget);
         }
 
@@ -387,7 +404,9 @@ public sealed partial class MonsterAI
 
     private float offScreenSince = -1f;
 
-    // Behind the local player's camera, past Off Screen Angle (flat). Only for this game's own player.
+    // Out of the local player's view: its body (at chest height) outside the screen's edges, by the camera's real viewport
+    // (Docs/GameDesignResearch_2026-11-17.md G1: an angle from the camera counted creatures ahead of or behind the player as on
+    // screen from a top-down view). Only for this game's own player. Off Screen Angle stays as the test for a camera without a view.
     private bool OffScreen(CombatTechniqueSettings rules)
     {
         Camera view = Camera.main;
@@ -396,11 +415,21 @@ public sealed partial class MonsterAI
             return false;
         }
 
+        Vector3 seen = view.WorldToViewportPoint(transform.position + Vector3.up * 1.2f);
+        if (seen.z > 0f)
+        {
+            return seen.x < -OffScreenMargin || seen.x > 1f + OffScreenMargin || seen.y < -OffScreenMargin || seen.y > 1f + OffScreenMargin;
+        }
+
         Vector3 look = view.transform.forward, to = transform.position - view.transform.position;
         look.y = 0f;
         to.y = 0f;
         return look.sqrMagnitude > 0.001f && to.sqrMagnitude > 0.001f && Vector3.Angle(look, to) > rules.OffScreenAngle;
     }
+
+    // How far past the screen's edge (a share of the screen) a body still counts as seen: its outline shows a little beyond its centre.
+    private const float OffScreenMargin = 0.02f;
+    private float shotOffScreenSince = -1f;
 
     // Sideways around the target, eyes on it, drifting to the distance it waits at.
     private void Circle(Vector3 toTarget, float distance)

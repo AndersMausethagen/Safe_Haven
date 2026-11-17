@@ -33,9 +33,13 @@ public static class CreatureRecords
     }
 
     /// <summary>What brought the player down since this was last asked, by name. Null when nothing has.</summary>
-    public static string TakeKillerName()
+    public static string TakeKillerName() => TakeKillerName(out _);
+
+    /// <summary>The same, with the killer's journal advice (how to face it), for the death screen (research G3). Null advice when it has none.</summary>
+    public static string TakeKillerName(out string advice)
     {
         string name = lastKiller != null ? lastKiller.DisplayName : null;
+        advice = lastKiller != null && !string.IsNullOrWhiteSpace(lastKiller.JournalAdvice) ? lastKiller.JournalAdvice : null;
         lastKiller = null;
         return name;
     }

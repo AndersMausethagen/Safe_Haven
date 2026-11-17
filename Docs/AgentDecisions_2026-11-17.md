@@ -120,3 +120,20 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
   holms: not built yet.
 - **Seen in a launched Valley** (the stone troll landmark by the start, a busier lair). Not yet seen: the Marsh with it.
 - **Placeholders I noticed:** the Forward Camp and the Toll Troll still use primitive placeholder models (grey cubes, green spheres).
+
+## The game design research (Docs/GameDesignResearch_2026-11-17.md)
+
+### Done
+- **No blows or shots from out of frame (G1):** "off screen" is now the camera's real viewport (with a 2% margin), not a 70° angle
+  from the camera that counted creatures ahead of or behind the player as seen. Archers, spitters and throwers now also wait their
+  beat while out of frame before they fire at you.
+- **The death screen teaches (G3):** under "Brought down by a …" it shows that creature's journal advice (how to face it).
+
+### Not done, and why
+- **G2 fight camera** (keep the exploring distance in a fight): it changes how every fight feels; the research lists it for you (D2).
+- **W3 weather in the briefing:** the weather evolves through a seeded state machine during the raid; foretelling the first weather
+  needs a deterministic "opening weather" call. A medium job, queued.
+- **Its questions for you (§8):** D1 spare the gear wear on a journey's first failed raid; D2 the fight camera; D3 the five Old Ways
+  as folk laws every creature obeys (steel, fire, daylight, bells, naming); D4 a personal Tale per bond rank; D5 bonuses for a
+  second player (solo unchanged); D6 a combat speed assist. Also "Hearth's Grace" (a falling damage-taken assist, logged as an assist)
+  and colour-free telegraph rims for colour-blind players: worth doing; queued after your answers.

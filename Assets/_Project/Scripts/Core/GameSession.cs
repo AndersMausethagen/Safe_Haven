@@ -148,7 +148,9 @@ public static class GameSession
     public static void EndRaid(RaidReport report)
     {
         ActiveRaid = null;
-        report.BroughtDownBy = report.Outcome == RaidOutcome.Died ? CreatureRecords.TakeKillerName() : null;
+        string advice = null;
+        report.BroughtDownBy = report.Outcome == RaidOutcome.Died ? CreatureRecords.TakeKillerName(out advice) : null;
+        report.KillerAdvice = advice;
         pendingReport = report;
     }
 
