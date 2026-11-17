@@ -28,6 +28,10 @@ Answers to §8's first five questions (6 to 9 are still open):
 4. **Yes:** the Rime-jutul is the Frost Peaks' "mountain ruler", and the antlered Jaw-keeper a toll-taker who is never fought.
 5. **Yes:** the Jaw-keeper's toll is a companion's memory, which comes back at the First Hearth.
 
+- **Q6–9 (the user, 2026-11-17 evening):** 6. a simpler apex for the Peaks first (The Ride later); 7. yes, Sigrun is rescued in the
+  Peaks by the red thread and teaches the fur gear; 8. yes, the Peaks at tiers IV and V once the Trollstone kit is measured; 9. yes,
+  one knight per raid: Fire in the Valley, Toxic in the Marsh, Ice in the Peaks.
+
 ## The short answer
 
 - **Troll Valley is still mostly the Misty Woods in its data.** The scene, valley shape, themed caches and the Brukam's table are its own,
