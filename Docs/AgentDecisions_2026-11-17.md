@@ -137,3 +137,11 @@ crossing cap, the dressing pass, then compounds and barriers); I'll set the per-
   as folk laws every creature obeys (steel, fire, daylight, bells, naming); D4 a personal Tale per bond rank; D5 bonuses for a
   second player (solo unchanged); D6 a combat speed assist. Also "Hearth's Grace" (a falling damage-taken assist, logged as an assist)
   and colour-free telegraph rims for colour-blind players: worth doing; queued after your answers.
+
+## The Lost: a nemesis system (you: "named enemies that improve… one of the lost… trying his best to kill the keeper of the flame")
+- **Design:** a few named, mist-taken earlier settlers ("Halvard Hollow-Eyed, once the Haven's smith") walk the raids and hunt you.
+  Kill you, and one rises a rank, takes a new trait (the elite traits we have) and **carries what you lost**. Wound one and it flees
+  into the mist, back next time scarred, and you learn one of its traits. Kill it for good and it drops what it took, is laid to
+  rest with an epitaph, and a new one may rise. A journal page keeps them; the briefing warns when one walks the raid you're
+  planning. They start after The Weakening Ward and a few extractions; never in boss fights or the prologue.
+- **Being built** (code by an agent; data, the Draug body and Play checks by me). Status below when done.
