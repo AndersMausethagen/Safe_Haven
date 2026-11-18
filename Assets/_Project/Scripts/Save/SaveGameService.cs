@@ -683,7 +683,7 @@ public static class SaveGameService
     }
 
     // The load's own hold on the player's controls while the next scene comes up (PlayerControl).
-    private static readonly object Loading = new object();
+    private static readonly LeaseKey Loading = new LeaseKey("a load");
 
     private static bool CanLoad(string scene) => !string.IsNullOrEmpty(scene) && Application.CanStreamedLevelBeLoaded(scene);
 

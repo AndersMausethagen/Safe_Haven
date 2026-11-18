@@ -116,6 +116,12 @@ public sealed class LeaseWatch
         }
     }
 
+    // What holds it, said so it can be found: a component by its own kind ("PlayerArmature's PlayerEncumbrance": every one on the player
+    // read "PlayerArmature" before), a key by its name (LeaseKey: a plain new object() read "Object").
     private static string NameOf(object thing) =>
-        thing is Object unity ? (unity != null ? unity.name : "(destroyed)") : thing is System.Type type ? type.Name : thing?.GetType().Name ?? "nothing";
+        thing is Component part ? (part != null ? $"{part.name}'s {part.GetType().Name}" : "(destroyed)")
+        : thing is Object unity ? (unity != null ? unity.name : "(destroyed)")
+        : thing is System.Type type ? type.Name
+        : thing is LeaseKey key ? key.ToString()
+        : thing?.GetType().Name ?? "nothing";
 }

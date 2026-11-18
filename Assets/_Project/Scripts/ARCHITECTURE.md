@@ -760,6 +760,8 @@ reviews). When adding something, go through these, and the tests say when one is
   a `public static void ForgetGame()` that `GameSession.Reset` calls, or the next game started or loaded in one sitting keeps it
   (`SharedStateTests`; `QuitToMenuLiveTests` plays the way out).
 - A Play-mode test that fails on errors listens through `LiveTestErrors` (every thread: the renderer logs from its jobs).
+- A lease (invulnerability, a hold, a speed) owned by a static class or a moment: a `LeaseKey` with a name, never `new object()`, so
+  LeaseWatch's Stuck rows say what held it (`SharedStateTests`).
 - Time away (home while on a raid): stamped with `DayNightCycle.AwayStamp` beside `DayNightCycle.Run`, read back with
   `SecondsAwaySince`; game time, never a saved state's own clock (`SharedStateTests`).
 

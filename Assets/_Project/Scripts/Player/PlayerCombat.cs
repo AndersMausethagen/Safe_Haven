@@ -207,7 +207,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private float heavyHitSafeUntil = float.NegativeInfinity;
     private bool heavyHitSafe;
     // Key for the flinch's slowdown, separate from the swing's own.
-    private static readonly object Flinch = new object();
+    private static readonly LeaseKey Flinch = new LeaseKey("a flinch");
 
     public WeaponDefinition Weapon
     {

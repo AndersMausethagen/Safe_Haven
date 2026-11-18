@@ -17,7 +17,7 @@ using Object = UnityEngine.Object;
 public static class PlaytestCliCommands
 {
     private const string Tag = "safehaven";
-    private static readonly object CliInvulnerability = new object();
+    private static readonly LeaseKey CliInvulnerability = new LeaseKey("an agent probe from the command line");
 
     [CliCommand("sh_player", "Summarise the player: scene, raid, health, needs, stats, bag, pocket, gear, essences and quests.", Tags = new[] { Tag })]
     public static string Player()

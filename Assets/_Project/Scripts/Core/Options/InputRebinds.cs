@@ -29,7 +29,7 @@ public readonly struct RebindRow
 public static class InputRebinds
 {
     // Who holds the gameplay keys while a new key is chosen (GameInput.SuspendGameplay).
-    private static readonly object RebindOwner = new object();
+    private static readonly LeaseKey RebindOwner = new LeaseKey("a key being rebound");
 
     private const string Key = "SafeHaven.Bindings";
 

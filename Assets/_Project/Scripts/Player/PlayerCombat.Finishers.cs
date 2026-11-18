@@ -61,7 +61,7 @@ public sealed partial class PlayerCombat
     }
 
     // Its own key: the heavy-hit and knockdown safety use the combat's, and ending a swing must not strip those.
-    private static readonly object FinishKey = new object();
+    private static readonly LeaseKey FinishKey = new LeaseKey("a finishing blow");
 
     // True from a finishing blow's start until EndFinish, even if the creature is destroyed meanwhile (then "finishing" reads null).
     private bool finishUnderWay;

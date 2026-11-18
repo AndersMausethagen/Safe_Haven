@@ -17,7 +17,7 @@ public static class CoopSpectate
     private static float since;
     private static readonly List<NetworkPlayerAvatar> standing = new List<NetworkPlayerAvatar>();
     // The watching's own hold on the fallen player's controls (PlayerControl), and whose they are.
-    private static readonly object Watching = new object();
+    private static readonly LeaseKey Watching = new LeaseKey("watching a friend");
     private static GameObject held;
 
     /// <summary>True while this player, fallen, is watching their friends.</summary>

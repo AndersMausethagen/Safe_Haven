@@ -235,6 +235,14 @@ From the playtest logs read as data (1,470 runs scanned for once-only events rep
   was reached still finishes; the playtest logger wrote every telling. Written once a rank now.
 - Found by that test: the voice player, asked outside Play, made its DontDestroyOnLoad host, threw, and left the host in the open
   scene. It says nothing outside Play.
+- **LeaseWatch couldn't say what it had found**: 111 of its 115 Stuck rows read "held by Object" (a plain `new object()` key) or
+  "held by PlayerArmature" (any component on the player). A component is told by its kind now ("PlayerArmature's PlayerDodge"), and
+  the ten static owners of a lease are `LeaseKey`s with a name ("a finishing blow", "an agent probe from the command line");
+  `SharedStateTests.ALeasesOwner_HasAName`. From the rows that could be read: the 80 "Object" ones sat in agent probes standing
+  still, so the CLI's invulnerability; the next playtest's rows will say.
+- **Kills with no creature** (16) and **"Destroyed" with nothing** (23): deaths of what has no definition (a companion, a traveller, a
+  wild horse, the prologue's training dummy) and the Haven's breakables. A kill quest with no creature set counts by side, and only
+  the dummy is on the enemies' (Eirik's lesson comes before any quest that counts kills), so none counts today.
 
 Scanned across all runtime scripts and found clean, so not made into tests:
 

@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public static class RaidLauncher
 {
     // The launch's own hold on the player's controls while the raid's scene loads (PlayerControl).
-    private static readonly object Launching = new object();
+    private static readonly LeaseKey Launching = new LeaseKey("a raid's launch");
 
     /// <summary>Why the raid can't start right now, in words for the player, or null when it can.</summary>
     public static string CheckLaunch(RaidDefinition raid)

@@ -16,7 +16,7 @@ public static class Cheats
     private const float KillReach = 45f;
     private const int FarAway = 1000;
 
-    private static readonly object Source = new object();
+    private static readonly LeaseKey Source = new LeaseKey("the cheat menu");
 
     /// <summary>Raised with a cheat's name each time one is used.</summary>
     public static event Action<string> Used;

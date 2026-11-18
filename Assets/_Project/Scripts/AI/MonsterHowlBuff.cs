@@ -25,7 +25,7 @@ public sealed class MonsterHowlBuff : MonoBehaviour
     /// rather than stack, as they always have; a salve, a tune or stone skin each keep their own beside it.</summary>
     public object Key { get; private set; } = Rally;
 
-    private static readonly object Rally = new object();
+    private static readonly LeaseKey Rally = new LeaseKey("a rally call");
 
     /// <summary>The buff on <paramref name="creature"/> for <paramref name="call"/>, added if it has none yet.</summary>
     public static MonsterHowlBuff For(GameObject creature, MonsterAttack call)

@@ -54,6 +54,30 @@ public sealed class LeaseWatchTests
         }
     }
 
+    [Test]
+    public void AHolder_IsToldByWhatItIs_NotOnlyWhereItIs()
+    {
+        // The playtests' Stuck rows read "held by Object" (80) and "held by PlayerArmature" (31): nothing to go on.
+        var watch = new LeaseWatch();
+        var player = new GameObject("PlayerArmature");
+        try
+        {
+            Component part = player.AddComponent<BoxCollider>();
+            var key = new LeaseKey("a finishing blow");
+            var body = new object();
+            watch.Judge(LeaseWatch.Kind.Invulnerable, body, new object[] { part, key }, 0f);
+            watch.Judge(LeaseWatch.Kind.Invulnerable, body, new object[] { part, key }, 30f);
+            var found = (System.Collections.Generic.List<string>)typeof(LeaseWatch).GetField("found",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(watch);
+            Assert.IsTrue(found.Exists(leak => leak.Contains("held by PlayerArmature's BoxCollider")), string.Join("\n", found));
+            Assert.IsTrue(found.Exists(leak => leak.Contains("held by a finishing blow")), string.Join("\n", found));
+        }
+        finally
+        {
+            Object.DestroyImmediate(player);
+        }
+    }
+
     // What Judge has found so far of invulnerability and keys held off, read without Look (which looks at the running game, where
     // other tests may have left things).
     private static int Found(LeaseWatch watch) =>

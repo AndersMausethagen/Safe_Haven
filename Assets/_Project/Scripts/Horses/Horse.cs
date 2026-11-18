@@ -53,7 +53,7 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
 
     private static readonly List<Horse> all = new List<Horse>();
     // What keeps a puppet unhurt here (the stable keeps its own hold).
-    private static readonly object PuppetHold = new object();
+    private static readonly LeaseKey PuppetHold = new LeaseKey("a friend's copy of a horse");
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
     private static readonly int BaseMapId = Shader.PropertyToID("_BaseMap");
     private float roughMetres;

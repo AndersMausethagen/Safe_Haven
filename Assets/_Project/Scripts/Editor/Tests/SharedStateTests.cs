@@ -427,6 +427,30 @@ public sealed class SharedStateTests
             "DayNightCycle.Run and read DayNightCycle.SecondsAwaySince");
     }
 
+    // Plain object keys that own no lease, and why.
+    private static readonly Dictionary<string, string> UnnamedKeys = new Dictionary<string, string>
+    {
+        ["UI/ResourceInventoryPanel.cs"] = "the bag window's tabs (all, other): keys of a list, never a lease's owner",
+    };
+
+    [Test]
+    public void ALeasesOwner_HasAName()
+    {
+        // LeaseWatch tells a lease held too long by its owner's name; a plain new object() read "Object" (80 of the playtests' Stuck
+        // rows), so nobody could tell an agent's probe from a finishing blow left on. A static owner is a LeaseKey with a name.
+        var unnamed = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (!UnnamedKeys.ContainsKey(file) && Regex.IsMatch(source, @"static\s+readonly\s+object\s+\w+\s*=\s*new\s+object\s*\(\s*\)"))
+            {
+                unnamed.Add(file);
+            }
+        }
+
+        CollectionAssert.IsEmpty(unnamed, "a static key made as new object(): make it a LeaseKey with a name (or list it if it owns no lease)");
+    }
+
     // Text fields typed in where no gameplay key can act, and why.
     private static readonly Dictionary<string, string> UnguardedFields = new Dictionary<string, string>
     {
