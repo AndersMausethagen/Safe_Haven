@@ -7,9 +7,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// The Haven's ground light field (SceneGroundLight, the overhaul): the scene carries it with no light thrown back (its hours turn), and
-/// its shores come from its own water (ShoreGrid): ground under a pond's surface is water, a cell a few metres off has the pond's surface
-/// and its distance, and beyond the reach none.
+/// The painted scenes' ground light field (SceneGroundLight, the overhaul): the Haven and the prologue carry it with no light thrown
+/// back (their hours turn), its shores come from the scene's own water (ShoreGrid): ground under a pond's surface is water, a cell a
+/// few metres off has the pond's surface and its distance, and beyond the reach none. Over several terrains (the prologue's meadow and
+/// forest) their heights are laid on one grid (FieldGround.Across).
 /// </summary>
 public sealed class SceneGroundLightTests
 {
@@ -33,13 +34,44 @@ public sealed class SceneGroundLightTests
     }
 
     [Test]
-    public void TheHavenCarriesItsField()
+    public void SeveralTerrains_AreLaidOnOneGrid()
     {
-        Scene scene = EditorSceneManager.OpenScene("Assets/_Project/Scenes/SafeHaven.unity", OpenSceneMode.Additive);
+        // A 100 m terrain at height 0 (flat at 10 m) and beside it, east, a 50 m one sunk 7 m (flat at 2 m above its base), as the
+        // prologue's meadow and forest lie.
+        var low = new float[33, 33];
+        var high = new float[33, 33];
+        for (int z = 0; z < 33; z++) for (int x = 0; x < 33; x++) { high[z, x] = 0.1f; low[z, x] = 0.02f; }
+        var pieces = new List<FieldGround.Piece>
+        {
+            new FieldGround.Piece { Heights = high, Resolution = 33, Position = new Vector3(0f, 0f, 0f), Size = new Vector3(100f, 100f, 100f) },
+            new FieldGround.Piece { Heights = low, Resolution = 33, Position = new Vector3(100f, -7f, 0f), Size = new Vector3(50f, 100f, 100f) },
+        };
+        FieldGround ground = FieldGround.Across(pieces, 151);
+        Assert.AreEqual(150f, ground.Size.x, 1e-3f, "a square over both: 150 m");
+        Assert.AreEqual(150f, ground.Size.z, 1e-3f);
+        Assert.AreEqual(Vector3.zero.x, ground.Origin.x);
+        Assert.AreEqual(-5f, ground.Lowest, 1e-3f, "the sunk terrain's ground: -7 + 2");
+        Assert.AreEqual(10f, ground.Highest, 1e-3f);
+        float At(float x, float z) => ground.Origin.y + ground.Heights[Mathf.RoundToInt(z), Mathf.RoundToInt(x)] * ground.Size.y;
+        Assert.AreEqual(10f, At(50f, 50f), 1e-3f, "on the first terrain: its ground");
+        Assert.AreEqual(-5f, At(125f, 50f), 1e-3f, "on the second: its own, in world heights");
+        Assert.AreEqual(10f, At(50f, 140f), 1e-3f, "off both (north of the first): the nearest one's edge, not a pit");
+    }
+
+    [Test]
+    public void TheHavenCarriesItsField() => CarriesItsField("Assets/_Project/Scenes/SafeHaven.unity", 1);
+
+    [Test]
+    public void ThePrologueCarriesItsField_OverBothTerrains() => CarriesItsField("Assets/_Project/Scenes/Prologue_MistyWoods.unity", 2);
+
+    private static void CarriesItsField(string path, int terrains)
+    {
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
         try
         {
             SceneGroundLight[] found = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<SceneGroundLight>(true)).ToArray();
             Assert.AreEqual(1, found.Length, "one per scene");
+            Assert.AreEqual(terrains, found[0].Terrains().Count(t => t.gameObject.scene == scene), "the terrains it lies over");
             Assert.IsTrue(found[0].Look.Enabled);
             Assert.AreEqual(0f, found[0].Look.Bounce, "its hours turn: no light thrown back from one hour's sun");
             Assert.Greater(found[0].Look.Sunflecks, 0f, "sun through the crowns");

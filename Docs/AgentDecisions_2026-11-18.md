@@ -417,3 +417,14 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   as they were. One material for every scene. Seen in the Haven at 07:00, 12:00 and 19:00, authored against blended.
 - The ambient light and the per-raid grades are unchanged (the research's "feed DayNightCycle's ambient probe" would retune every
   scene's light: not done).
+
+## The prologue's ground light field (you: "are all scenes set to the same standard?")
+
+The prologue was the one game scene without the ground light field: it has two terrains (the 300 x 200 m meadow and the 200 x 200 m
+forest, sunk 7 m) and the field covered one. Now `SceneGroundLight` lays every terrain in its scene on one grid (`FieldGround.Across`,
+1025 samples a side over the 500 m square that holds both; a point on neither takes the nearest edge), and the field, the shores and
+the night lift read that grid. Felled trees and gathered rocks redraw their patch on whichever terrain they are. The rocks' feet
+(GroundBlend.hlsl, one heightmap) read the terrain under the player, switching as they cross, and a rock on the other terrain is
+left as it is instead of reading the wrong heights. The Haven and the raids go through the same path with their one terrain, as
+before. Seen in Play (isolated saves) at 08:30 in the forest, at the seam and in the meadow, the field on and off: the canopy's shade
+and sunflecks under the forest, no band at the seam, the open meadow unchanged.

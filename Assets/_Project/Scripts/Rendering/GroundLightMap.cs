@@ -94,8 +94,13 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     // from the finished map's cover.
     private GroundLightField.Recipe rebuild;
     private Terrain terrain;
-    private TerrainTreeFelling felling;
-    private TerrainNodeHarvesting harvesting;
+    // Every terrain the field lies over tells it of felled trees and gathered rocks on it (the prologue has two).
+    private readonly List<(TerrainTreeFelling felling, Action<int> down, Action<int> back)> fellings = new List<(TerrainTreeFelling, Action<int>, Action<int>)>();
+    private readonly List<TerrainNodeHarvesting> harvestings = new List<TerrainNodeHarvesting>();
+    // The terrains a field lies over, and the one whose heightmap is bound for the rocks' feet (the player's: GroundBlend.hlsl
+    // reads one heightmap).
+    private readonly List<Terrain> over = new List<Terrain>();
+    private float nextBlendCheck;
     private bool redrawing;
     // The block of the cover map being read back now, released with the readback or by Clear.
     private RenderTexture reading;
@@ -150,19 +155,26 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         waiting.Clear();
         standing.Clear();
         buildingsChanged = false;
-        if (felling != null)
+        foreach ((TerrainTreeFelling felling, Action<int> down, Action<int> back) in fellings)
         {
-            felling.TreeDown -= OnTreeDown;
-            felling.TreeBack -= OnTreeBack;
-            felling = null;
+            if (felling != null)
+            {
+                felling.TreeDown -= down;
+                felling.TreeBack -= back;
+            }
         }
 
-        if (harvesting != null)
+        fellings.Clear();
+        foreach (TerrainNodeHarvesting harvesting in harvestings)
         {
-            harvesting.NodeChanged -= OnNodeChanged;
-            harvesting = null;
+            if (harvesting != null)
+            {
+                harvesting.NodeChanged -= OnNodeChanged;
+            }
         }
 
+        harvestings.Clear();
+        over.Clear();
         terrain = null;
         living = false;
         cycle = null;
@@ -188,7 +200,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     /// point (metres from the terrain's corner) lies under water. Logs what each step took.
     /// </summary>
     public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water, Func<Vector2, Vector2> shoreAt = null,
-        RaidGroundLight lookOverride = null, bool livingHours = false)
+        RaidGroundLight lookOverride = null, bool livingHours = false, FieldGround across = null, IReadOnlyList<Terrain> alsoOver = null)
     {
         Clear();
         living = livingHours;
@@ -206,15 +218,17 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             var times = new System.Text.StringBuilder();
             terrain = mapTerrain;
             TerrainData data = terrain.terrainData;
-            Vector3 origin = terrain.transform.position;
-            Vector3 dataSize = data.size;
+            // One terrain's own heights, or several laid on one grid (FieldGround.Across, from SceneGroundLight): then the field's
+            // corner and size are the grid's, and "metres from the corner" (shoreAt, water) count from it.
+            FieldGround ground = across ?? FieldGround.Of(terrain);
+            Vector3 origin = ground.Origin;
+            Vector3 dataSize = ground.Size;
             float side = Mathf.Max(dataSize.x, dataSize.z);
             var map = new Rect(origin.x, origin.z, side, side);
             float margin = side * MarginShare;
             var area = new Rect(map.xMin - margin, map.yMin - margin, side + 2f * margin, side + 2f * margin);
             int coverSize = Resolution(area.width, settings.GroundCoverTexel, 2048);
-            Bounds bounds = data.bounds;
-            RenderTexture drawn = cover.Pin(area, coverSize, origin.y + bounds.min.y - 10f, origin.y + bounds.max.y + 150f);
+            RenderTexture drawn = cover.Pin(area, coverSize, ground.Lowest - 10f, ground.Highest + 150f);
             if (drawn == null)
             {
                 yield break;
@@ -223,15 +237,21 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             reading = drawn;
             times.Append($"cover drawn once {step.ElapsedMilliseconds} ms ({coverSize}² over {area.width:0} m), ");
             SeeBuildings();
-            if (terrain.TryGetComponent(out felling))
+            over.Add(terrain);
+            if (alsoOver != null)
             {
-                felling.TreeDown += OnTreeDown;
-                felling.TreeBack += OnTreeBack;
+                foreach (Terrain also in alsoOver)
+                {
+                    if (also != null && also != terrain && !over.Contains(also))
+                    {
+                        over.Add(also);
+                    }
+                }
             }
 
-            if (terrain.TryGetComponent(out harvesting))
+            foreach (Terrain each in over)
             {
-                harvesting.NodeChanged += OnNodeChanged;
+                Watch(each);
             }
 
             // Caches and resource nodes are placed after the map (RaidGenerator): once every setup step is done, the map is drawn
@@ -263,8 +283,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             step.Restart();
             int size = Resolution(side, settings.GroundLightCell, 1024);
             float cell = side / size;
-            int heightResolution = data.heightmapResolution;
-            float[,] terrainHeights = data.GetHeights(0, 0, heightResolution, heightResolution);
+            int heightResolution = ground.Resolution;
+            float[,] terrainHeights = ground.Heights;
             int colourWidth = data.alphamapWidth, colourHeight = data.alphamapHeight;
             Vector3 toward = TowardLight(out float hour, out float dim);
             ushort[] raw = halves;
@@ -282,7 +302,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 TowardLight = toward,
                 CoverStrength = cover.Strength,
                 Relief = look.Relief,
-                Bounce = look.Bounce > 0f && groundColours != null && groundColours.Length == colourWidth * colourHeight,
+                // The paint's colours are one terrain's: no bounce over several.
+                Bounce = look.Bounce > 0f && across == null && groundColours != null && groundColours.Length == colourWidth * colourHeight,
                 Dim = dim,
                 NightLiftMost = settings.NightLiftMost,
                 ReliefDirections = settings.ReliefDirections,
@@ -505,6 +526,34 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         BindHeightmap();
     }
 
+    // Over several terrains, the one under the player is the one whose heightmap the rocks' feet read (GroundBlend.hlsl, which has
+    // room for one): rocks near the player sit in the right ground, rocks on another terrain are left as they are.
+    private void FollowThePlayersGround()
+    {
+        Transform player = Player.Current != null ? Player.Current.transform : null;
+        if (player == null)
+        {
+            return;
+        }
+
+        Vector3 at = player.position;
+        foreach (Terrain each in over)
+        {
+            if (each == null || each.terrainData == null || each == terrain)
+            {
+                continue;
+            }
+
+            Vector3 corner = each.GetPosition(), size = each.terrainData.size;
+            if (at.x >= corner.x && at.x <= corner.x + size.x && at.z >= corner.z && at.z <= corner.z + size.z)
+            {
+                terrain = each;
+                BindHeightmap();
+                return;
+            }
+        }
+    }
+
     // The terrain's heightmap for GroundBlend.hlsl: uv = (xz - corner) * (resolution - 1) / (resolution * size) + half a texel, as the
     // terrain's samples sit on its corners.
     private void BindHeightmap()
@@ -563,6 +612,12 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
     private void LateUpdate()
     {
+        if (over.Count > 1 && Time.unscaledTime >= nextBlendCheck)
+        {
+            nextBlendCheck = Time.unscaledTime + 0.5f;
+            FollowThePlayersGround();
+        }
+
         if (living && field != null && Time.unscaledTime >= nextLift)
         {
             nextLift = Time.unscaledTime + 1f;
@@ -603,18 +658,36 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
     // A felled tree: its patch is drawn again a while after the cut (Rendering Settings › Felled Redraw Delay), without its crown. The
     // falling or lying tree itself is never drawn (it has a body: SkyOcclusionMap leaves it out), so there is nothing to wait for.
-    private void OnTreeDown(int index)
+    private void Watch(Terrain on)
     {
-        if (TreeAt(index, out Vector3 at))
+        if (on.TryGetComponent(out TerrainTreeFelling felling))
+        {
+            Action<int> down = index => OnTreeDown(on, index);
+            Action<int> back = index => OnTreeBack(on, index);
+            felling.TreeDown += down;
+            felling.TreeBack += back;
+            fellings.Add((felling, down, back));
+        }
+
+        if (on.TryGetComponent(out TerrainNodeHarvesting harvesting))
+        {
+            harvesting.NodeChanged += OnNodeChanged;
+            harvestings.Add(harvesting);
+        }
+    }
+
+    private void OnTreeDown(Terrain on, int index)
+    {
+        if (TreeAt(on, index, out Vector3 at))
         {
             waiting.Add(new Waiting { Area = Square(at, FelledReach), Due = Time.time + settings.FelledRedrawDelay });
         }
     }
 
     // A tree growing back where it was felled: its crown shades the ground again.
-    private void OnTreeBack(int index)
+    private void OnTreeBack(Terrain on, int index)
     {
-        if (TreeAt(index, out Vector3 at))
+        if (TreeAt(on, index, out Vector3 at))
         {
             MarkDirty(Square(at, FelledReach));
         }
@@ -625,15 +698,15 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
     private void OnBuildingsChanged() => buildingsChanged = true;
 
-    private bool TreeAt(int index, out Vector3 at)
+    private static bool TreeAt(Terrain on, int index, out Vector3 at)
     {
         at = default;
-        if (terrain == null || terrain.terrainData == null || index < 0 || index >= terrain.terrainData.treeInstanceCount)
+        if (on == null || on.terrainData == null || index < 0 || index >= on.terrainData.treeInstanceCount)
         {
             return false;
         }
 
-        at = terrain.transform.position + Vector3.Scale(terrain.terrainData.GetTreeInstance(index).position, terrain.terrainData.size);
+        at = on.transform.position + Vector3.Scale(on.terrainData.GetTreeInstance(index).position, on.terrainData.size);
         return true;
     }
 

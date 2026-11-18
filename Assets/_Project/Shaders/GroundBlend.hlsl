@@ -26,6 +26,13 @@ void GroundBlend(inout half3 albedo, inout half smoothness, inout half occlusion
         return;
     }
 
+    // Off the bound terrain (in a scene of several GroundLightMap binds the player's): no ground of its own to blend into.
+    float2 onTerrain = (positionWS.xz - _GroundBlendPlace.xy) * _GroundBlendPlace.zw;
+    UNITY_BRANCH if (any(onTerrain < 0.0) || any(onTerrain > 1.0))
+    {
+        return;
+    }
+
     float above = positionWS.y - GroundBlendHeight(positionWS);
     // The band grows with how far the thing stands out of the ground (its renderer's bounds), up to 30 cm: a quarter of a stone's
     // height, so a pebble keeps its read (a fixed band hid them) and a boulder sits deep in the soil. Bounds unset: a waist-high rock's.
