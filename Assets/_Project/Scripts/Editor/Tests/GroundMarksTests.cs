@@ -111,4 +111,19 @@ public sealed class GroundMarksTests
         Assert.IsNotNull(shader);
         Assert.IsFalse(ShaderUtil.ShaderHasError(shader));
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md 3.2: contact shadows are on the game's renderer, compile, and are a Graphics option, on.
+    [Test]
+    public void ContactShadowsAreOnTheRendererAndAnOption()
+    {
+        var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/_Project/Settings/Rendering/PC_Renderer.asset");
+        ContactShadowsFeature feature = renderer.rendererFeatures.OfType<ContactShadowsFeature>().FirstOrDefault();
+        Assert.IsNotNull(feature);
+        Assert.IsTrue(feature.isActive);
+        Shader shader = Shader.Find("Hidden/Safe Haven/Contact Shadows");
+        Assert.IsNotNull(shader);
+        Assert.IsFalse(ShaderUtil.ShaderHasError(shader));
+        CollectionAssert.Contains(GameOptions.Graphics, GameOptions.ContactShadows);
+        Assert.AreEqual(1f, GameOptions.ContactShadows.Default, "on by default: the game as designed");
+    }
 }

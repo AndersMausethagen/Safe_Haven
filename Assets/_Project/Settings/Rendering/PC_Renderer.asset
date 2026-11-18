@@ -1,5 +1,23 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-7009008587739118823
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccda394965315674994fec25953ea5c7, type: 3}
+  m_Name: Contact Shadows
+  m_EditorClassIdentifier: SafeHaven::ContactShadowsFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: fd2e6c3bf250cae438c3162c9eec30c2, type: 3}
+  strength: 0.55
+  length: 0.6
+  thickness: 0.35
+  reach: 60
 --- !u!114 &-6831963361569781261
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -47,7 +65,8 @@ MonoBehaviour:
   - {fileID: 5474396184367094398}
   - {fileID: 3167078257296711087}
   - {fileID: 36791788889593609}
-  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84baf9d0826e5b8f32b09576ae3efb58200l
+  - {fileID: -7009008587739118823}
+  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84baf9d0826e5b8f32b09576ae3efb5820019c32524d3ffba9el
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   m_AssetVersion: 3

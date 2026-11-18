@@ -371,3 +371,12 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   are untouched: only the terrain's heights change, as with Cliff Roughness. Goldens, reachability, valley, fen, compound and world
   design tests pass. Load: +81 ms for the heights (behind the loading screen).
 - Seen in a launched Valley: the wall's face reads as ribs and channels running down it instead of one smooth bulge.
+
+### Batch 14: contact shadows (3.2)
+- **The small shadows the sun's shadow map misses from up here** (`ContactShadowsFeature`, `Shaders/ContactShadows.shader`): each
+  sunlit ground pixel marches the depth buffer 0.6 m toward the sun; if something stands in the way it darkens by 0.55 (the sky
+  still lights it). Only the ground takes them (within 20 cm of the terrain): leaves shading leaves would darken every plant. Options ›
+  Graphics › Contact Shadows (on). Written from the long-known depth-march technique: Bend Studio's code was not used (its licence
+  could not be confirmed).
+- Seen in a launched Valley, A/B with time frozen and the cloud shadows paused (they had moved between shots and looked like the
+  effect): the low plants and clumps sit in their own shade, the ground reads more grounded. Cost within noise (300-frame medians).

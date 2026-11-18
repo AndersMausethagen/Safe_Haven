@@ -86,8 +86,11 @@ public static class GroundMarks
 
     private static Terrain TerrainUnder(Vector3 at)
     {
-        foreach (Terrain terrain in Terrain.activeTerrains)
+        // Terrains.Active: cached per frame (Terrain.activeTerrains makes a new array each call).
+        System.Collections.Generic.IReadOnlyList<Terrain> terrains = Terrains.Active;
+        for (int i = 0; i < terrains.Count; i++)
         {
+            Terrain terrain = terrains[i];
             if (terrain == null || terrain.terrainData == null)
             {
                 continue;
