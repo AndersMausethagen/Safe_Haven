@@ -365,6 +365,14 @@ public sealed class RaidLayoutRules : ScriptableObject
              "jagged relief on steep ground (cliff faces and lips, ravine and valley walls, river banks), none on trails, clearings or " +
              "level ground. By the water's edge it only lifts the ground, so a shore turns ragged without opening holes. 0: smooth, as before.")]
     [SerializeField, Min(0f)] private float cliffRoughness = 1.2f;
+    [Tooltip("Gullies down the walls (Docs/LookAndFeelResearch_2026-11-18.md 4.1): metres of channels carved along each face's fall " +
+             "line, broken and offset as runnels are, on steep ground only (as Cliff Roughness: never on trails or clearings, never down " +
+             "into water). 0: none.")]
+    [SerializeField, Min(0f)] private float cliffGullies;
+    [Tooltip("Talus at the cliffs' feet: metres of scree heaped against the foot of a face more than 50° steep, thinning out over " +
+             "Talus Reach. Deposit only, so the cliffs above keep their shape; never on trails, clearings or by water. 0: none.")]
+    [SerializeField, Min(0f)] private float talus;
+    [SerializeField, Min(1f)] private float talusReach = 4.5f;
     [Tooltip("How high the land rises at the map's edge, in metres, so nobody sees a wall.")]
     [SerializeField, Min(0f)] private float rimHeight = 9f;
     [Tooltip("How far in from the edge it starts rising, in metres.")]
@@ -613,6 +621,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     public float RidgeWidth => ridgeWidth;
     public float Roughness => roughness;
     public float CliffRoughness => cliffRoughness;
+    public float CliffGullies => cliffGullies;
+    public float Talus => talus;
+    public float TalusReach => talusReach;
     public float RimHeight => rimHeight;
     public float RimWidth => rimWidth;
     public float ForestDensity => forestDensity;

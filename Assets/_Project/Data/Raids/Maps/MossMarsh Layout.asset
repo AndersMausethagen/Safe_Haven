@@ -28,6 +28,9 @@ MonoBehaviour:
   ridgeWidth: 12.8
   roughness: 1.2
   cliffRoughness: 0.6
+  cliffGullies: 0.35
+  talus: 0.3
+  talusReach: 4.5
   rimHeight: 12.150001
   rimWidth: 12
   hillVariance: {x: 0.8, y: 1.2}

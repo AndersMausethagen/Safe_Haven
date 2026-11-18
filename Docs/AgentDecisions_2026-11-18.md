@@ -359,3 +359,15 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - **So:** grass under TAA, STP or DLAA keeps softening when it sways; 4x MSAA stays the default (the research's step 2). Giving grass
   motion vectors means drawing it through our own instanced path instead of Unity's detail renderer: a large job (L), and Unity 6.7's
   GTAO wants it too. **Left for later, with 6.7.**
+
+### Batch 13: gullies and scree (4.1, parts 3 and 4)
+- **Gullies down the walls** (Layout Rules › Cliff Gullies): channels carved along each face's fall line, broken into runnels that
+  start and stop (the erosion filter's idea: noise whose stripes follow the slope, two octaves; written here from the idea, not its
+  MPL code). On steep ground only, never on trails, clearings or down into water, like Cliff Roughness.
+- **Scree at the cliffs' feet** (Layout Rules › Talus, Talus Reach): rubble heaped against the foot of any face over 50° that stands
+  1.5 m above, thinning out over 4.5 m. Deposit only (thermal erosion would flatten the cliffs: the known trap); never on trails,
+  clearings or by water.
+- Valley 0.55 m gullies / 0.8 m talus, Woods 0.5 / 0.5, Marsh 0.35 / 0.3. The field's own heights (placement, the golden layouts)
+  are untouched: only the terrain's heights change, as with Cliff Roughness. Goldens, reachability, valley, fen, compound and world
+  design tests pass. Load: +81 ms for the heights (behind the loading screen).
+- Seen in a launched Valley: the wall's face reads as ribs and channels running down it instead of one smooth bulge.

@@ -44,7 +44,29 @@ public sealed class RaidRoughCliffsTests
 
             Assert.Greater(walkable, 100, $"seed {seed}: the check saw the trails");
             Assert.Greater(moved, 0.4f, $"seed {seed}: somewhere steep was carved");
-            Assert.LessOrEqual(moved, rules.CliffRoughness * 1.3f, $"seed {seed}: never more than the rule's metres (and a little for the shore)");
+            Assert.LessOrEqual(moved, rules.CliffRoughness * 1.3f + rules.CliffGullies + rules.Talus * 1.25f,
+                $"seed {seed}: never more than the rules' metres (and a little for the shore and the rubble)");
         }
+    }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md 4.1: gullies run down the fall line (they vary across a face, not along it).
+    [Test]
+    public void GulliesRunDownTheFallLine()
+    {
+        var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(ValleyRules);
+        Assert.Greater(rules.CliffGullies, 0f, "the Valley's walls are gullied");
+        Assert.Greater(rules.Talus, 0f, "and scree lies at their feet");
+        RaidLayoutField field = RaidLayoutField.Build(RaidLayoutPlanner.Plan(rules, 200f, 4), rules);
+        // A face rising to the east: the fall line runs east-west, so channels vary north-south.
+        float along = 0f, across = 0f;
+        for (int i = 0; i < 400; i++)
+        {
+            float x = 40f + (i % 20) * 0.37f, y = 40f + (i / 20) * 0.41f;
+            along += Mathf.Abs(field.Gullies(x + 0.3f, y, 1f, 0f) - field.Gullies(x, y, 1f, 0f));
+            across += Mathf.Abs(field.Gullies(x, y + 0.3f, 1f, 0f) - field.Gullies(x, y, 1f, 0f));
+        }
+
+        Assert.Greater(across, along * 2f, "channels change across the face far more than down it");
+        Assert.AreEqual(0f, field.Gullies(10f, 10f, 0f, 0f), "level ground: none");
     }
 }

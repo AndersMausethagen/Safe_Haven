@@ -186,7 +186,7 @@ public sealed partial class RaidLayoutField
 
             rowHighest[row] = top;
         });
-        if (rules.CliffRoughness > 0f)
+        if (rules.CliffRoughness > 0f || rules.CliffGullies > 0f || rules.Talus > 0f)
         {
             Roughen(heights, rowHighest);
         }
@@ -227,6 +227,8 @@ public sealed partial class RaidLayoutField
         float step = plan.Size / (size - 1f);
         float amount = rules.CliffRoughness;
         var original = (float[,])heights.Clone();
+        // The talus needs every cell's slope first: where the faces are that scree falls from.
+        float[,] slopes = rules.Talus > 0f ? Slopes(original, step) : null;
         System.Threading.Tasks.Parallel.For(1, size - 1, row =>
         {
             float top = rowHighest[row];
@@ -240,7 +242,9 @@ public sealed partial class RaidLayoutField
                 float x = column * step, y = row * step;
                 // A shore however gentle: the last metres of a bank into the water and the first out of it.
                 float shore = ShoreShare(new Vector2(x, y), u, v);
-                if (steep <= 0.001f && shore <= 0.001f)
+                // Scree against a cliff's foot (the cell itself not a face): how near the face above, 0 none.
+                float foot = slopes != null && steep < 0.6f ? CliffFoot(slopes, original, row, column, step) : 0f;
+                if (steep <= 0.001f && shore <= 0.001f && foot <= 0.001f)
                 {
                     continue;
                 }
@@ -260,9 +264,23 @@ public sealed partial class RaidLayoutField
                 float grit = Noise(x, y, RoughGrit, 227f);
                 float carve = fold * 0.6f + grain * 0.3f + grit * 0.1f;
                 float jag = (RoughRaise - carve * RoughCarve) * amount * steep * away;
-                if (jag < 0f && NearWater(new Vector2(x, y), u, v))
+                // Gullies down the face's fall line (its gradient), broken and offset.
+                if (rules.CliffGullies > 0f && steep > 0.001f)
+                {
+                    jag -= Gullies(x, y, dx, dy) * rules.CliffGullies * steep * away;
+                }
+
+                bool byWater = NearWater(new Vector2(x, y), u, v);
+                if (jag < 0f && byWater)
                 {
                     jag = 0f;
+                }
+
+                // Scree heaped at the foot, rough as rubble; never by water (it would dam a river or fill a pool's edge).
+                if (foot > 0.001f && !byWater)
+                {
+                    float rubble = 0.75f + 0.5f * Noise(x, y, RoughGrit * 1.3f, 251f);
+                    jag += rules.Talus * foot * rubble * away;
                 }
 
                 // The shoreline breaks up: ridged patches of bank lifted into spurs and shelves of ground at the water's edge, and the
@@ -281,6 +299,127 @@ public sealed partial class RaidLayoutField
 
             rowHighest[row] = top;
         });
+    }
+
+    // Gullies: two octaves of channels across the fall line, each from a grid of cells whose own offset and phase break them into
+    // runnels that start and stop (the idea of Rune Skovbo Johansen's erosion filter, 2026: noise whose stripes follow the slope, so
+    // no simulation; written here from that idea). Metres between channels and the cells' size.
+    private const float GullySpacing = 2.4f;
+    private const float GullyCell = 5f;
+    private const float FineGullySpacing = 1.1f;
+    private const float FineGullyCell = 2.5f;
+
+    /// <summary>How deep the gullies are at a point (0-1) on a face whose gradient (uphill) is (<paramref name="gx"/>,
+    /// <paramref name="gy"/>): channels running down the fall line. Pure arithmetic on the plan's seed.</summary>
+    public float Gullies(float x, float y, float gx, float gy)
+    {
+        float length = Mathf.Sqrt(gx * gx + gy * gy);
+        if (length < 1e-4f)
+        {
+            return 0f;
+        }
+
+        // Across the fall line: stripes that vary across it and run along it are channels down the face.
+        float ax = -gy / length, ay = gx / length;
+        float coarse = Channels(x, y, ax, ay, GullySpacing, GullyCell, 263f);
+        float fine = Channels(x, y, ax, ay, FineGullySpacing, FineGullyCell, 271f);
+        return Mathf.Clamp01(coarse * 0.75f + fine * 0.35f);
+    }
+
+    private float Channels(float x, float y, float ax, float ay, float spacing, float cell, float salt)
+    {
+        int cx = Mathf.FloorToInt(x / cell), cy = Mathf.FloorToInt(y / cell);
+        float total = 0f, weights = 0f;
+        for (int j = -1; j <= 1; j++)
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                int gx = cx + i, gy = cy + j;
+                float centreX = (gx + 0.5f + (CellHash(gx, gy, salt) - 0.5f) * 0.8f) * cell;
+                float centreY = (gy + 0.5f + (CellHash(gx, gy, salt + 17f) - 0.5f) * 0.8f) * cell;
+                float phase = CellHash(gx, gy, salt + 31f) * Mathf.PI * 2f;
+                float ox = x - centreX, oy = y - centreY;
+                float weight = Mathf.Exp(-(ox * ox + oy * oy) / (cell * cell * 0.45f));
+                total += Mathf.Cos((ox * ax + oy * ay) / spacing * Mathf.PI * 2f + phase) * weight;
+                weights += weight;
+            }
+        }
+
+        float wave = weights > 1e-6f ? total / weights : 0f;
+        // The troughs are the channels: narrow and sharp-bottomed, the ribs between them left.
+        float trough = Mathf.Clamp01(-wave);
+        return trough * trough * (3f - 2f * trough);
+    }
+
+    private float CellHash(int x, int y, float salt)
+    {
+        float h = Mathf.Sin(x * 127.1f + y * 311.7f + salt + plan.NoiseOffset.x * 0.013f) * 43758.5453f;
+        return h - Mathf.Floor(h);
+    }
+
+    // Each cell's slope in degrees, from the heights.
+    private static float[,] Slopes(float[,] heights, float step)
+    {
+        int size = heights.GetLength(0);
+        var slopes = new float[size, size];
+        System.Threading.Tasks.Parallel.For(1, size - 1, row =>
+        {
+            for (int column = 1; column < size - 1; column++)
+            {
+                float dx = (heights[row, column + 1] - heights[row, column - 1]) / (2f * step);
+                float dy = (heights[row + 1, column] - heights[row - 1, column]) / (2f * step);
+                slopes[row, column] = Mathf.Atan(Mathf.Sqrt(dx * dx + dy * dy)) * Mathf.Rad2Deg;
+            }
+        });
+        return slopes;
+    }
+
+    // A face steeper than this sheds scree; it must stand this many metres above the cell.
+    private const float TalusFace = 50f;
+    private const float TalusFaceAbove = 1.5f;
+
+    // How near a cliff's foot a cell is (1 at the face, 0 at Talus Reach or with none above): eight ways out, a step at a time.
+    private float CliffFoot(float[,] slopes, float[,] heights, int row, int column, float step)
+    {
+        int size = slopes.GetLength(0);
+        float reach = rules.TalusReach;
+        int steps = Mathf.Max(1, Mathf.CeilToInt(reach / step));
+        float here = heights[row, column];
+        float nearest = float.MaxValue;
+        for (int way = 0; way < 8; way++)
+        {
+            int ox = way == 0 || way == 4 ? 0 : way < 4 ? 1 : -1;
+            int oy = way == 2 || way == 6 ? 0 : way > 2 && way < 6 ? -1 : 1;
+            float stride = ox != 0 && oy != 0 ? 1.4142f : 1f;
+            for (int k = 1; k <= steps; k++)
+            {
+                int r = row + oy * k, c = column + ox * k;
+                if (r < 1 || c < 1 || r >= size - 1 || c >= size - 1)
+                {
+                    break;
+                }
+
+                float distance = k * step * stride;
+                if (distance >= nearest || distance > reach)
+                {
+                    break;
+                }
+
+                if (slopes[r, c] > TalusFace && heights[r, c] > here + TalusFaceAbove)
+                {
+                    nearest = distance;
+                    break;
+                }
+            }
+        }
+
+        if (nearest > reach)
+        {
+            return 0f;
+        }
+
+        float share = 1f - nearest / reach;
+        return share * share;
     }
 
     // The shoreline pass: metres of bank lifted at most (a share of Cliff Roughness), the patches' size, and how far either side of the
