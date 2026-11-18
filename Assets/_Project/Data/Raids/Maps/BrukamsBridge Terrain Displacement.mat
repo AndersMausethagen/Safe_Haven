@@ -178,9 +178,14 @@ Material:
     - _Smoothness3: 0.5
     - _SteepHeightMidpoint: 0.5993997
     - _SteepNormalStrength: 1
-    - _SteepSlopeEnd: 66
-    - _SteepSlopeStart: 56
+    - _SteepSlopeEnd: 48
+    - _SteepSlopeStart: 40
     - _SteepTiling: 7
+    - _StrataSeam: 0.8
+    - _StrataSlope: 44
+    - _StrataSpacing: 2.2
+    - _StrataStrength: 0.35
+    - _StrataWarp: 2.5
     - _SurfaceDebug: 0
     - _SurfaceOcclusion: 1
     - _SurfaceSmoothness: 1

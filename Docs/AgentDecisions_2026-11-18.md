@@ -102,6 +102,9 @@ sandstone. The photo is licensed stock: used only as a description, never as an 
   above, face jutting over the drop: new LocalSpawn models, then a generator pass.
 - **A lone stunted pine** at some rim spots; **lichen on top faces** of the ledges; a lower, warmer sun at some Valley hours.
 
+- **Brukam's Bridge** got the same layered rock and cliff rock from 40° (its own terrain material): seen from the approach, the
+  walls round the arrival ground read as stacked beds. The approach ground itself is bare and flat: worth dressing some day.
+
 ### Step 2, done: lone pines on the rims
 - A hero can stand **At Rims**: its own pass over the whole map finds a cliff's lip (near-level ground with a face steeper than 48°
   dropping at least 1.2 m within 3 m) and stands one there in a share of 36 m cells, off trails, clearings and water. Troll Valley:
@@ -117,3 +120,8 @@ sandstone. The photo is licensed stock: used only as a description, never as an 
 ### For you
 - **The sun:** the Valley's most common hour is 11 (60% of runs), with short shadows; dawn and evening (30%) already have the
   photo's low light. Moving the main hour to mid-afternoon (about 15) would make long shadows the usual look. Your call.
+
+## Seen at last: the Moss Marsh with the generator steps and its two new set pieces
+- Launched (seed 2, Hummock Fen): four landmarks, three short flags, the Bog-Iron Bloomery (ruin, peat stacks, a black widow on
+  guard) and the Black Pool Landing. **One oddity:** the Landing's boardwalk and hauled-up rowboat stood on dry grass, not by the
+  pool: set pieces go to rumour sites, and nothing yet asks for one by water. A "by water" placement for such pieces would fix it.
