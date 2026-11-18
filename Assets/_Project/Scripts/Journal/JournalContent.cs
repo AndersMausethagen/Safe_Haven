@@ -242,7 +242,7 @@ public static class JournalContent
         var text = new StringBuilder();
         if (!string.IsNullOrEmpty(raid.BroughtDownBy))
         {
-            text.Append($"Brought down by a {raid.BroughtDownBy}.\n\n");
+            text.Append($"Brought down by {CreatureRecords.ByWhom(raid.BroughtDownBy)}.\n\n");
         }
 
         foreach (string line in raid.Lines)

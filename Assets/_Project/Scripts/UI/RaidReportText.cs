@@ -30,7 +30,7 @@ public static class RaidReportText
         var builder = new StringBuilder();
         if (!string.IsNullOrEmpty(report.BroughtDownBy))
         {
-            builder.Append($"<b><color={Loss}>Brought down by a {report.BroughtDownBy}.</color></b>\n");
+            builder.Append($"<b><color={Loss}>Brought down by {CreatureRecords.ByWhom(report.BroughtDownBy)}.</color></b>\n");
             // How to face it, from its journal (research G3): a death that teaches.
             if (!string.IsNullOrEmpty(report.KillerAdvice))
             {

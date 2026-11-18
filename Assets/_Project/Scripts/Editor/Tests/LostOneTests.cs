@@ -322,6 +322,15 @@ public sealed class LostOneTests
     }
 
     [Test]
+    public void TheDeathScreen_NamesALostOne_AndAKindOfCreatureAsBefore()
+    {
+        Assert.AreEqual("a Draug", CreatureRecords.ByWhom("Draug"), "a kind of creature, and every record kept before");
+        Assert.AreEqual("Halvard Hollow-Eyed, one of the Lost",
+            CreatureRecords.ByWhom($"{CreatureRecords.OwnNameMark}Halvard Hollow-Eyed, one of the Lost"), "a person, by name, without \"a\"");
+        Assert.IsNull(CreatureRecords.ByWhom(null));
+    }
+
+    [Test]
     public void TheRoster_SurvivesASave()
     {
         var lookup = new Lookup();

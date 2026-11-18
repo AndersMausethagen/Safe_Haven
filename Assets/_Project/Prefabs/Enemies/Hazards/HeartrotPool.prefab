@@ -50,7 +50,7 @@ MonoBehaviour:
   damagePerSecond: 0
   damageType: 0
   tick: 0.5
-  color: {r: 0.22, g: 0.14, b: 0.08, a: 0.85}
+  color: {r: 0.28, g: 0.31, b: 0.05, a: 0.9}
   effectPrefab: {fileID: 0}
   element: 2
   burnsInto: {fileID: 0}

@@ -151,10 +151,14 @@ public sealed class EliteCreature : MonoBehaviour
         Health.Heal(Health.MaxHealth);
     }
 
+    /// <summary>True once it carries a name of its own (<see cref="Rename"/>: a Lost One), a person's name rather than a kind of creature.</summary>
+    public bool HasOwnName { get; private set; }
+
     /// <summary>A name of its own in place of the affixes' (a Lost One): what messages call it, and what its label reads (rich text).</summary>
     public void Rename(string title, string labelText)
     {
         Title = title;
+        HasOwnName = !string.IsNullOrWhiteSpace(title);
         if (label != null)
         {
             label.text = labelText;

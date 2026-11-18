@@ -5152,6 +5152,61 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2513730614705602555, guid: e828f36e891eb7b43994e0594fe3d138, type: 3}
   m_PrefabInstance: {fileID: 659732414}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &664187680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 664187681}
+  - component: {fileID: 664187682}
+  m_Layer: 0
+  m_Name: Rot Drips
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &664187681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 664187680}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 64, y: 18.75969, z: 100}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 792927705}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &664187682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 664187680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989213cb7dbfd204aa818e119deb8cd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ArenaHazardDrops
+  centre: {fileID: 0}
+  boss: {fileID: 749573324}
+  radius: 16.2
+  places: 12
+  stride: 5
+  interval: 8
+  warningSeconds: 2
+  drip: {fileID: 11400000, guid: d3702dd14a8e0f849b88621e90e3a221, type: 2}
+  damage: 10
+  poolPrefab: {fileID: 7922212942557804517, guid: fcf124e5a1a5b2f47b22b913ebd013ad, type: 3}
+  strandPrefab: {fileID: 0}
 --- !u!1 &724080605
 GameObject:
   m_ObjectHideFlags: 0
@@ -5655,6 +5710,7 @@ Transform:
   - {fileID: 1646319273}
   - {fileID: 495001444}
   - {fileID: 724080606}
+  - {fileID: 664187681}
   m_Father: {fileID: 1410623291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &812827443

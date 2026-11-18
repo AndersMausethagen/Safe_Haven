@@ -261,4 +261,65 @@ public sealed class BossToppleTests
         EruptionRings.RingPoints(Vector3.zero, 1f, eruption, 0.3f, 0f, points);
         Assert.AreEqual(3, points.Count, "a small ring still has three");
     }
+
+    // ----- C8: the rot drips at the rage -----
+
+    [Test]
+    public void TheRotDrips_KeepAFixedOrder_FarApart_OnEveryPlaceOfTheRing()
+    {
+        var seen = new HashSet<Vector3Int>();
+        Vector3 last = ArenaHazardDrops.DropPoint(0, Vector3.zero, 18f, 12, 5);
+        for (int i = 0; i < 12; i++)
+        {
+            Vector3 at = ArenaHazardDrops.DropPoint(i, Vector3.zero, 18f, 12, 5);
+            Assert.AreEqual(18f, at.magnitude, 1e-3f, "on its ring");
+            Assert.IsTrue(seen.Add(Vector3Int.RoundToInt(at * 10f)), "twelve drops, twelve places");
+            if (i > 0)
+            {
+                Assert.Greater(Vector3.Distance(at, last), 18f, "each lands across the ring from the last");
+            }
+
+            last = at;
+        }
+
+        Assert.AreEqual(ArenaHazardDrops.DropPoint(3, Vector3.zero, 18f, 12, 5), ArenaHazardDrops.DropPoint(15, Vector3.zero, 18f, 12, 5),
+            "then round again in the same order");
+    }
+
+    [Test]
+    public void TheRotDrips_InGuardiansHollow_LieOnTheFloor_OutsideTheFightingRing()
+    {
+        var scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/_Project/Scenes/Raids/Encounter_GuardiansHollow.unity",
+            UnityEditor.SceneManagement.OpenSceneMode.Additive);
+        try
+        {
+            ArenaHazardDrops drops = null;
+            Terrain ground = null;
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                drops = drops != null ? drops : root.GetComponentInChildren<ArenaHazardDrops>(true);
+                ground = ground != null ? ground : root.GetComponentInChildren<Terrain>(true);
+            }
+
+            Assert.IsNotNull(drops, "the hollow drips at the rage");
+            Assert.IsNotNull(drops.PoolPrefab, "and leaves pools");
+            Assert.IsNotNull(ground);
+            Assert.IsTrue(drops.PoolPrefab.TryGetComponent(out GroundHazard pool));
+            // The built floor is flat to about 17.5 m and the bowl's wall rises from 18 m (the design drew a 20 m floor): the drops keep to
+            // its edge, so the ring the fight is fought in (inside 14.5 m) stays clean.
+            Assert.GreaterOrEqual(drops.Radius - pool.Radius, 14.5f, "the fighting ring stays clean");
+            Vector3 middle = drops.Centre;
+            float floor = ground.SampleHeight(middle);
+            for (int i = 0; i < drops.Places; i++)
+            {
+                Vector3 at = ArenaHazardDrops.DropPoint(i, middle, drops.Radius, drops.Places, drops.Stride);
+                Vector3 outer = middle + (at - middle).normalized * (drops.Radius + pool.Radius);
+                Assert.Less(ground.SampleHeight(outer) - floor, 0.35f, $"drop {i}'s pool lies on the floor, not under the bowl's wall (a flat disc is hidden there)");
+            }
+        }
+        finally
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.CloseScene(scene, true);
+        }
+    }
 }

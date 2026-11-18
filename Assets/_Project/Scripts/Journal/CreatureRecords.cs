@@ -7,7 +7,12 @@ using UnityEngine;
 /// </summary>
 public static class CreatureRecords
 {
+    /// <summary>Marks a killer's name that is a person's own (a Lost One's), so it is said without "a" (<see cref="ByWhom"/>).</summary>
+    public const char OwnNameMark = '~';
+
     private static MonsterDefinition lastKiller;
+    // A killer with a name of its own (a Lost One), marked: said in place of its kind.
+    private static string lastKillerName;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Listen()
@@ -17,10 +22,29 @@ public static class CreatureRecords
         Damageable.AnyDied -= OnAnyDied;
         Damageable.AnyDied += OnAnyDied;
         lastKiller = null;
+        lastKillerName = null;
     }
 
     /// <summary>Forgets what brought the player down in the game being played (a new game, or a load: GameSession).</summary>
-    public static void ForgetGame() => lastKiller = null;
+    public static void ForgetGame()
+    {
+        lastKiller = null;
+        lastKillerName = null;
+    }
+
+    /// <summary>
+    /// How the death screen and the journal say who brought the player down, from a kept name: "a Draug", or, for one with a name of
+    /// its own (marked with <see cref="OwnNameMark"/>), "Halvard Hollow-Eyed, one of the Lost". Records from before have no mark.
+    /// </summary>
+    public static string ByWhom(string broughtDownBy)
+    {
+        if (string.IsNullOrEmpty(broughtDownBy))
+        {
+            return broughtDownBy;
+        }
+
+        return broughtDownBy[0] == OwnNameMark ? broughtDownBy.Substring(1) : $"a {broughtDownBy}";
+    }
 
     /// <summary>The player and this creature have seen each other.</summary>
     public static void NoteMet(MonsterDefinition creature)
@@ -38,9 +62,10 @@ public static class CreatureRecords
     /// <summary>The same, with the killer's journal advice (how to face it), for the death screen (research G3). Null advice when it has none.</summary>
     public static string TakeKillerName(out string advice)
     {
-        string name = lastKiller != null ? lastKiller.DisplayName : null;
+        string name = lastKillerName ?? (lastKiller != null ? lastKiller.DisplayName : null);
         advice = lastKiller != null && !string.IsNullOrWhiteSpace(lastKiller.JournalAdvice) ? lastKiller.JournalAdvice : null;
         lastKiller = null;
+        lastKillerName = null;
         return name;
     }
 
@@ -68,6 +93,7 @@ public static class CreatureRecords
         if (Player.Current != null && victim == Player.Current.Health)
         {
             lastKiller = null;
+            lastKillerName = null;
         }
 
         if (blow.Source == null)
@@ -80,6 +106,12 @@ public static class CreatureRecords
             if (blow.Source.TryGetComponent(out MonsterAI killer) && killer.Definition != null)
             {
                 lastKiller = killer.Definition;
+                // One of the Lost is named, on the host's game and on a friend's copy alike (both carry its name on the elite).
+                if (blow.Source.TryGetComponent(out EliteCreature elite) && elite.HasOwnName)
+                {
+                    lastKillerName = $"{OwnNameMark}{elite.Title}, one of the Lost";
+                }
+
                 int before = JournalContent.KnowledgeOf(lastKiller, GameSession.Progress);
                 GameSession.Progress.Journal.NoteKilledBy(lastKiller.Id);
                 if (JournalContent.KnowledgeOf(lastKiller, GameSession.Progress) > before)

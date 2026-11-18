@@ -27,6 +27,8 @@ public static class GearBalance
         public float Resist;
         /// <summary>The enchantment counted on each piece of the stacked kit, for the window.</summary>
         public readonly List<EnchantmentDefinition> Enchantments = new List<EnchantmentDefinition>();
+        /// <summary>The meals and tonics a stacked kit eats, best first (StackedKitOf): what to tune when it reaches too far.</summary>
+        public readonly List<ItemDefinition> Food = new List<ItemDefinition>();
         /// <summary>The Melee skill's damage bonus at the level expected for the tier, already in Damage.</summary>
         public float SkillDamage;
         public readonly List<ItemDefinition> Pieces = new List<ItemDefinition>();
@@ -159,7 +161,24 @@ public static class GearBalance
     /// <summary>Everything within reach by the end of the tier, food and rest included: the tier mastered.</summary>
     public static Kit MasteredKitOf(int tier, IReadOnlyList<ItemDefinition> gear) => StackedKitOf(tier, gear, true, tier, true);
 
-    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables)
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables) =>
+        StackedKitOf(tier, gear, enchanted, reached, consumables, FoodSlots.Base);
+
+    /// <summary>Which meal and tonic slots a stacked kit eats in.</summary>
+    public enum FoodSlots
+    {
+        /// <summary>Survival Settings' own (two meals, one tonic): what the reach bound has held since 2026-11-15.</summary>
+        Base,
+        /// <summary>
+        /// Every slot the game can give (PlayerBoons: the Kitchen's and Cauldron's upgrades, and the Third Plate and Second Vial techniques
+        /// once their skills reach them): four meals and three tonics at the top (system review K3).
+        /// </summary>
+        Every,
+        /// <summary>The base and one more of each, as the GDD words the tonic's ("from the Master's Shelf or the Second Vial").</summary>
+        OneMoreOfEach,
+    }
+
+    public static Kit StackedKitOf(int tier, IReadOnlyList<ItemDefinition> gear, bool enchanted, int reached, bool consumables, FoodSlots slots)
     {
         Kit plain = KitOf(tier, gear);
         var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
@@ -250,13 +269,26 @@ public static class GearBalance
                     .ThenBy(item => item.name, StringComparer.Ordinal).First();
                 Take(pick.BoonBonuses, totals);
                 left.Remove(pick);
+                kit.Food.Add(pick);
             }
         }
 
         if (consumables)
         {
-            Eat(false, survival != null ? survival.MealSlots : 2);
-            Eat(true, survival != null ? survival.TonicSlots : 1);
+            int extraMeals = MostFromBuildings(upgrade => upgrade.extraMealSlots) + (TechniqueWithin(PerkTechnique.ThirdPlate, skills, level) ? 1 : 0);
+            int extraTonics = MostFromBuildings(upgrade => upgrade.extraTonicSlots) + (TechniqueWithin(PerkTechnique.SecondVial, skills, level) ? 1 : 0);
+            if (slots == FoodSlots.Base)
+            {
+                extraMeals = extraTonics = 0;
+            }
+            else if (slots == FoodSlots.OneMoreOfEach)
+            {
+                extraMeals = Mathf.Min(1, extraMeals);
+                extraTonics = Mathf.Min(1, extraTonics);
+            }
+
+            Eat(false, (survival != null ? survival.MealSlots : 2) + extraMeals);
+            Eat(true, (survival != null ? survival.TonicSlots : 1) + extraTonics);
             // Well Rested (Docs/BaseProgression.md › Endurance): +10% health.
             totals.HealthShare += WellRestedHealth;
         }
@@ -307,6 +339,32 @@ public static class GearBalance
 
     /// <summary>The health share Well Rested adds (Docs/BaseProgression.md › Endurance).</summary>
     public const float WellRestedHealth = 0.1f;
+
+    /// <summary>What every building's upgrades give at their top level, together (SettlementState.UpgradeBonus for a Haven with everything built).</summary>
+    private static int MostFromBuildings(Func<BuildingLevel, int> bonus)
+    {
+        int total = 0;
+        foreach (string id in AssetDatabase.FindAssets("t:BuildingDefinition"))
+        {
+            var building = AssetDatabase.LoadAssetAtPath<BuildingDefinition>(AssetDatabase.GUIDToAssetPath(id));
+            if (building == null)
+            {
+                continue;
+            }
+
+            foreach (BuildingLevel upgrade in building.Upgrades)
+            {
+                total += upgrade != null ? bonus(upgrade) : 0;
+            }
+        }
+
+        return total;
+    }
+
+    /// <summary>True when a perk teaching <paramref name="technique"/> sits at a milestone of some skill by <paramref name="level"/>.</summary>
+    private static bool TechniqueWithin(PerkTechnique technique, IEnumerable<ProficiencyDefinition> skills, int level) =>
+        skills.Any(skill => skill.Milestones.Any(milestone => milestone.level <= level
+            && ((milestone.first != null && milestone.first.Technique == technique) || (milestone.second != null && milestone.second.Technique == technique))));
 
     /// <summary>Hits a kit needs to kill a creature of this health and armor.</summary>
     public static float HitsToKill(Kit kit, float health, float armor, float healthScale) =>

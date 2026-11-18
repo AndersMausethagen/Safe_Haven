@@ -200,6 +200,24 @@ public sealed class RaidTierTests
         }
     }
 
+    // The same bound with every meal and tonic slot the game can give (system review K3: four meals, three tonics at the top). The kit
+    // reaches past it at tiers III-V (x1.84 toughness, x1.57 damage at the top), so slots or food numbers must change: that is the user's
+    // call (Docs/AgentDecisions_2026-11-18.md › K3). Until then this test says how far it reaches instead of failing the run.
+    [Test, Ignore("K3: awaiting the user's call on meal and tonic slots or food numbers (Docs/AgentDecisions_2026-11-18.md)")]
+    public void AFullyStackedKit_WithEveryFoodSlot_StaysWithinTheTiersReach()
+    {
+        List<ItemDefinition> gear = GearBalance.AllGear();
+        foreach (RaidDifficulty tier in Raid.Difficulties)
+        {
+            GearBalance.Kit kit = GearBalance.KitOf(tier.tier, gear);
+            GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear, false, tier.tier, true, GearBalance.FoodSlots.Every);
+            Assert.That(stacked.Toughness / kit.Toughness, Is.LessThanOrEqualTo(StackedToughnessReach),
+                $"tier {tier.tier}: stacked toughness {stacked.Toughness:0} against the kit's {kit.Toughness:0} ({string.Join(", ", stacked.Food)})");
+            Assert.That(stacked.Damage / kit.Damage, Is.LessThanOrEqualTo(StackedDamageReach),
+                $"tier {tier.tier}: stacked damage {stacked.Damage:0.0} against the kit's {kit.Damage:0.0} ({string.Join(", ", stacked.Food)})");
+        }
+    }
+
     // Enchantments have a budget of their own on top of everything else (Docs/EnchantingResearch.md #1, the user: "limit enchants"): the
     // best fitting one on each piece of the tier's kit, each counted once, adds at most this much. Great enchantments' verbs are left
     // out, as attack speed and sustain are; their numbers count.
