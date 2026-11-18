@@ -85,10 +85,10 @@ PROPERTIES = """
         _SteepHeightMidpoint("Cliff Rock Relief Midpoint (set by Enable or Refresh Displacement)", Range(0, 1)) = 0.5
         _RockAntiTiling("Hide Rock Repetition (cracks no longer repeat every tile)", Range(0, 1)) = 1
         [Header(Layered rock on cliff faces)]
-        _StrataStrength("Layered Rock (0: off)", Range(0, 0.6)) = 0
-        _StrataSpacing("Bed Height (metres)", Range(0.3, 6)) = 1.4
-        _StrataWarp("Beds Wander (metres up and down)", Range(0, 6)) = 1.5
-        _StrataSeam("Seam Under Each Bed", Range(0, 1)) = 0.5
+        _StrataStrength("Layered Rock (0: off)", Range(0, 0.6)) = 0.35
+        _StrataSpacing("Bed Height (metres)", Range(0.3, 6)) = 2.2
+        _StrataWarp("Beds Wander (metres up and down)", Range(0, 6)) = 2.5
+        _StrataSeam("Seam Under Each Bed", Range(0, 1)) = 0.8
         _StrataSlope("Beds From (degrees)", Range(20, 80)) = 44
 
         [Header(Breaking up tiling)]
@@ -232,7 +232,8 @@ void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalM
 
 // Layered rock (2026-11-18, the user's cliff-edge reference): on faces steeper than Beds From, the rock steps in horizontal beds by
 // world height, each bed a shade of its own, the lines bent by broad noise so they wander along a wall, with a dark seam under each
-// bed's lip where the softer layer below has worn back. Off at 0 (every terrain but those that ask for it).
+// bed's lip where the softer layer below has worn back. On by default for every cliff and ravine (the user, 2026-11-18: "that layered
+// rock looks much better. add that as the default"); a material sets Layered Rock 0 to turn it off.
 void WorldStrata(float3 p, float slope, inout half3 colour, inout half4 mask)
 {
     if (_StrataStrength <= 0)

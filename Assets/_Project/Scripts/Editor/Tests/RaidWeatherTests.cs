@@ -65,9 +65,12 @@ public sealed class RaidWeatherTests
 
         string snow = RaidWeather.BriefingLine(rain, true, perception);
         StringAssert.Contains("Snow", snow, "rain in a snowing season falls as snow");
-        StringAssert.DoesNotContain("carry", snow, "snow muffles nothing (PlayerNoise reads rain alone)");
+        StringAssert.Contains("carry", snow, "falling snow muffles steps as rain does (PlayerNoise reads the weather's rain)");
+        StringAssert.Contains("cold", snow);
 
-        StringAssert.Contains("Little can be seen", RaidWeather.BriefingLine(Weather("Fog", 0f, 2.2f), false, perception));
+        string fog = RaidWeather.BriefingLine(Weather("Fog", 0f, 2.2f), false, perception);
+        StringAssert.Contains("Little can be seen", fog);
+        StringAssert.Contains("Creatures see less far", fog, "dense fog shortens their sight (AtmosphereConditions.SightScale)");
         StringAssert.Contains("Lightning", RaidWeather.BriefingLine(Weather("Storm", 1f, 2.2f, 0.4f, 4f), false, perception));
         string clear = RaidWeather.BriefingLine(Weather("Clear", 0f), false, perception);
         StringAssert.DoesNotContain("carry", clear);

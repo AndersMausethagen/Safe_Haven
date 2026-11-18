@@ -50,6 +50,26 @@ public static partial class RaidLayoutPlanner
     // A compound keeps this far from the start's middle, so the first steps are never into a walled yard.
     private const float CompoundFromStart = 45f;
 
+    // A compound keeps this far (metres beyond its own Radius) from any site already in its clearing, so a camp, cache or story site
+    // never ends up inside its ruin (review 2026-11-18).
+    private const float CompoundFromSite = 2f;
+
+    // Metres beyond the ring kept clear for it as a pocket.
+    private const float CompoundRingKeep = 1.5f;
+
+    private static bool HoldsASite(RaidLayoutPlan plan, Vector2 middle, float keep)
+    {
+        foreach (RaidSite site in plan.Sites)
+        {
+            if (site.Kind != RaidSiteKind.None && (site.Position * plan.Size - middle).sqrMagnitude < keep * keep)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // A compound's wall stands round at least this share of its ring, or the clearing isn't one for a compound.
     private const float CompoundLeastWall = 0.45f;
 
@@ -90,14 +110,15 @@ public static partial class RaidLayoutPlanner
                 RaidLayoutRoom room = plan.Rooms[index];
                 float ring = room.Radius * piece.WallAt;
                 if ((room.Role != RaidRoomRole.Plain && room.Role != RaidRoomRole.Hub) || ring < piece.Radius + 1.5f
-                    || Vector2.Distance(room.Position, plan.Start.Position) < CompoundFromStart || TakenByAPiece(plan, room.Position, ring))
+                    || Vector2.Distance(room.Position, plan.Start.Position) < CompoundFromStart || TakenByAPiece(plan, room.Position, ring)
+                    || HoldsASite(plan, room.Position, piece.Radius + CompoundFromSite))
                 {
                     continue;
                 }
 
                 var compound = new RaidLayoutPiece { Definition = piece, Position = room.Position, Turn = Range(random, 0f, 360f), WallRadius = ring };
                 CompoundOpenings(plan, room.Position, ring, piece.ExtraOpenings, random, compound.Openings);
-                CompoundWall(plan, compound);
+                CompoundWall(plan, rules, compound);
                 // A hub with many ways in leaves stubs of wall, not a yard: such a clearing is passed over.
                 int whole = Mathf.Max(6, Mathf.RoundToInt(2f * Mathf.PI * ring / piece.PieceLength));
                 if (compound.Wall.Count < whole * CompoundLeastWall)
@@ -106,16 +127,86 @@ public static partial class RaidLayoutPlanner
                 }
 
                 plan.Pieces.Add(compound);
-                used.Add(piece);
+                // The yard and its ring, so what is placed after (boulders, ponds, landmarks) keeps off the wall.
+                plan.Pockets.Add((room.Position, ring + CompoundRingKeep));
                 found = true;
                 break;
             }
 
-            if (!found)
+            // No clearing has room (Troll Valley's are small and full): a yard of its own just off a trail, a side path to its one gate.
+            if (!found && !YardOffATrail(plan, rules, piece, random))
             {
                 return;
             }
+
+            used.Add(piece);
         }
+    }
+
+    // A yard off a trail: its ring this far round (metres), its middle this far beyond the trail's edge, and so many tries.
+    private const float YardRing = 9.5f;
+    private const float YardFromTrail = 3f;
+    private const int YardTries = 80;
+
+    /// <summary>
+    /// A compound standing in a yard of its own beside a trail (review 2026-11-18: no Valley clearing had room once its sites and trails
+    /// were kept clear): its middle Yard Ring + the trail's half width + Yard From Trail off a trail's side, clear of every other trail,
+    /// clearing, site and piece, on the trail's own bank of a valley's river, joined to the trail by a side path through its gate. False
+    /// when no try fits.
+    /// </summary>
+    private static bool YardOffATrail(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSetPieceDefinition piece, System.Random random)
+    {
+        if (plan.Trails.Count == 0)
+        {
+            return false;
+        }
+
+        float ring = Mathf.Max(YardRing, piece.Radius + 1.5f);
+        float half = rules.TrailHalfWidth * (plan.Mood != null ? plan.Mood.trails : 1f);
+        float margin = rules.EdgeMargin + ring + CompoundRingKeep;
+        for (int tries = 0; tries < YardTries; tries++)
+        {
+            List<Vector2> trail = plan.Trails[random.Next(plan.Trails.Count)];
+            if (trail.Count < 2 || OnRamp(plan, trail))
+            {
+                continue;
+            }
+
+            int at = random.Next(trail.Count - 1);
+            Vector2 point = Vector2.Lerp(trail[at], trail[at + 1], Range(random, 0.2f, 0.8f));
+            Vector2 side = Vector2.Perpendicular((trail[at + 1] - trail[at]).normalized) * (random.Next(2) == 0 ? -1f : 1f);
+            Vector2 spot = point + side * (ring + half + YardFromTrail);
+            if (spot.x < margin || spot.y < margin || spot.x > plan.Size - margin || spot.y > plan.Size - margin
+                || Vector2.Distance(spot, plan.Start.Position) < CompoundFromStart
+                || (plan.Valley != null && plan.Valley.BankOf(spot) != plan.Valley.BankOf(point))
+                || LineWithin(plan.Trails, spot, ring + half + 1f) || LineWithin(plan.Spurs, spot, ring + half)
+                || plan.InRiver(spot, ring + CompoundRingKeep) || plan.InWater(spot) || TakenByAPiece(plan, spot, ring)
+                || HoldsASite(plan, spot, ring + CompoundFromSite) || !PocketFits(plan, rules, spot, ring + CompoundRingKeep))
+            {
+                continue;
+            }
+
+            bool clear = true;
+            foreach (RaidLayoutRoom room in plan.Rooms)
+            {
+                clear &= Vector2.Distance(room.Position, spot) >= room.Radius + ring + CompoundRingKeep;
+            }
+
+            if (!clear)
+            {
+                continue;
+            }
+
+            plan.Spurs.Add(new List<Vector2> { point, spot });
+            var compound = new RaidLayoutPiece { Definition = piece, Position = spot, Turn = Range(random, 0f, 360f), WallRadius = ring };
+            CompoundOpenings(plan, spot, ring, piece.ExtraOpenings, random, compound.Openings);
+            CompoundWall(plan, rules, compound);
+            plan.Pieces.Add(compound);
+            plan.Pockets.Add((spot, ring + CompoundRingKeep));
+            return true;
+        }
+
+        return false;
     }
 
     private static bool TakenByAPiece(RaidLayoutPlan plan, Vector2 middle, float ring)
@@ -210,17 +301,28 @@ public static partial class RaidLayoutPlanner
         }
     }
 
-    // A wall piece keeps this far (metres, edge to trail's middle) from any trail or side path, beyond the openings themselves: a trail
-    // that meets the ring at a slant runs along it for a while.
-    private const float WallFromTrail = 2.2f;
+    // A wall piece keeps this far (metres) beyond a trail's or side path's edge, its own half depth included: a trail that meets the ring
+    // at a slant runs along it for a while (review 2026-11-18: measured from the trail's middle, pieces stood on the path).
+    private const float WallBeyondTrail = 1f;
+
+    // A side path's width as a share of a trail's (RaidLayoutField.SpurWidth).
+    private const float SpurShare = 0.6f;
+
+    /// <summary>How far a compound's wall piece keeps from a trail's middle (its half width in this mood, plus a margin) and from a side path's.</summary>
+    public static (float trail, float spur) WallClearance(RaidLayoutPlan plan, RaidLayoutRules rules)
+    {
+        float half = rules.TrailHalfWidth * (plan.Mood != null ? plan.Mood.trails : 1f);
+        return (half + WallBeyondTrail, half * SpurShare + WallBeyondTrail);
+    }
 
     /// <summary>
     /// Where a compound's wall pieces stand (<see cref="RaidLayoutPiece.Wall"/>): evenly round its ring, one every Piece Length, leaving
-    /// out each that comes within half the Opening Width of an opening or within <see cref="WallFromTrail"/> of a trail or side path along
+    /// out each that comes within half the Opening Width of an opening or within <see cref="WallClearance"/> of a trail or side path along
     /// its whole length. The generator lays these, leaving out only what falls in water or on a steep bank.
     /// </summary>
-    public static void CompoundWall(RaidLayoutPlan plan, RaidLayoutPiece compound)
+    public static void CompoundWall(RaidLayoutPlan plan, RaidLayoutRules rules, RaidLayoutPiece compound)
     {
+        (float fromTrail, float fromSpur) = WallClearance(plan, rules);
         compound.Wall.Clear();
         RaidSetPieceDefinition definition = compound.Definition;
         float radius = compound.WallRadius;
@@ -243,7 +345,7 @@ public static partial class RaidLayoutPlanner
             var outward = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
             var along = new Vector2(-outward.y, outward.x);
             Vector2 middle = compound.Position + outward * radius, half = along * (definition.PieceLength * 0.5f);
-            if (NearALine(plan.Trails, middle - half, middle + half) || NearALine(plan.Spurs, middle - half, middle + half))
+            if (NearALine(plan.Trails, middle - half, middle + half, fromTrail) || NearALine(plan.Spurs, middle - half, middle + half, fromSpur))
             {
                 continue;
             }
@@ -252,13 +354,13 @@ public static partial class RaidLayoutPlanner
         }
     }
 
-    private static bool NearALine(List<List<Vector2>> lines, Vector2 from, Vector2 to)
+    private static bool NearALine(List<List<Vector2>> lines, Vector2 from, Vector2 to, float keep)
     {
         foreach (List<Vector2> line in lines)
         {
             for (int i = 0; i + 1 < line.Count; i++)
             {
-                if (SegmentsApart(from, to, line[i], line[i + 1]) < WallFromTrail)
+                if (SegmentsApart(from, to, line[i], line[i + 1]) < keep)
                 {
                     return true;
                 }

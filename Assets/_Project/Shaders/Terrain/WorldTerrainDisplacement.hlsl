@@ -190,7 +190,7 @@ float2 WorldRock(float2 uv, float slope)
 // the ground layers do, each projection is sampled twice, as it is and turned 63 degrees and resized, and slow noise in
 // the rock's own space picks between them. The colour, normals and the tessellated relief all use the same choice.
 float _RockAntiTiling;
-// Layered rock on cliff faces (WorldStrata, in the generated passes): off at 0.
+// Layered rock on cliff faces (WorldStrata, in the generated passes): on by default (the shader properties), off at 0.
 float _StrataStrength, _StrataSpacing, _StrataWarp, _StrataSeam, _StrataSlope;
 static const float2x2 WorldRockTurn = float2x2(0.4536, -0.8912, 0.8912, 0.4536);
 

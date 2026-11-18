@@ -125,3 +125,39 @@ sandstone. The photo is licensed stock: used only as a description, never as an 
 - Launched (seed 2, Hummock Fen): four landmarks, three short flags, the Bog-Iron Bloomery (ruin, peat stacks, a black widow on
   guard) and the Black Pool Landing. **One oddity:** the Landing's boardwalk and hauled-up rowboat stood on dry grass, not by the
   pool: set pieces go to rumour sites, and nothing yet asks for one by water. A "by water" placement for such pieces would fix it.
+
+## Your next message (look and feel research, rough edges, layered rock as the default)
+
+### Layered rock is the default for every cliff and ravine
+- The terrain shader's Layered Rock is on by default (0.35, beds of 2.2 m) for every World terrain: the Haven, the prologue, the
+  Woods, the Marsh, Guardian's Hollow and whatever the World Builder makes next. A material sets Layered Rock 0 to turn it off. The
+  Valley and Brukam's Bridge keep their own values (and cliff rock from 40°); the other biomes keep their own rock textures.
+- **Seen:** the Woods' cliffs (lichen rock with beds). The Haven's cliffs read only faintly layered: its rock texture there is a
+  pebbly one. Worth giving the Haven a cliff rock texture of its own if you want the beds to show there too.
+
+### Rough, jagged cliffs and river banks
+- New rule, Cliff Roughness: the finished heights are carved on steep ground (gullies and notched lips) and shores break up into
+  spurs and bays; trails, clearings and level ground never move (a test holds that). Troll Valley 1.5 m, the Woods 1.2 m, the Marsh
+  0.6 m; new rules start at 1.2 m.
+- **A first try** raised the noise as much as it cut it: the Woods' cliff tops grew a saw blade of spikes. Now it mostly carves.
+- **Seen** in launched raids (Valley seed 25, Woods seed 3): walls break into ledges and overhang shadows; the Valley river's
+  shoreline wanders from above; the Woods' lip is notched, not spiked. The Haven (its own World Builder) and the hand-painted boss
+  arenas aren't roughened: the Haven would need its builder changed and the world regenerated.
+
+### Fixes from the code review (one subagent, read-only)
+- Compound walls kept clearance from a trail's middle, not its edge, so pieces stood on the path: now from the edge (trail half
+  width per mood, side paths narrower) plus a metre. A compound could take a clearing holding a camp or story site: no more. Later
+  passes didn't know the ring: the yard is now a pocket, and node landmarks keep off the ring.
+- Fixing those left Troll Valley no room at all for a compound (0 in 40 runs, its clearings small and full, its floor narrow), so the
+  compound moved to the **Moss Marsh: the Bloomery Yard** (the Bog-Iron Bloomery and its guards in a skigard fence), in a clearing
+  or a yard of its own beside a trail with a gate and a back way; about a third of Marsh runs. The Valley's Seter Yard is kept for
+  when its clearings have room (Compounds 0).
+- Rim pines now keep clear of trails and other heroes and stand as objects near walkable ground, like the other heroes.
+- The weather line keeps "your steps carry X% as far" in snow (the noise rule applies to falling snow too), and fog now says
+  creatures see less far in it (already true: their sight reads the fog's density).
+- The Heartroot's drips: drops still falling are called off and the rot pools dry up when the boss falls; the ring's centre is fixed
+  in the scene.
+
+### Look and feel research
+- `Docs/LookAndFeelResearch_2026-11-18.md`: what exists, what the screenshots show, each area (rendering, terrain, water, VFX,
+  audio, UX, lighting) with gain, cost and risk, a ranked top 15 and data-only quick wins. Nothing from it is built yet: your pick.

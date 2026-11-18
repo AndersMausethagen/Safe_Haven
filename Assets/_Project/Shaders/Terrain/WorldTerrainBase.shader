@@ -64,10 +64,10 @@ Shader "Hidden/Safe Haven/Terrain/Base"
         _SteepHeightMidpoint("Cliff Rock Relief Midpoint (set by Enable or Refresh Displacement)", Range(0, 1)) = 0.5
         _RockAntiTiling("Hide Rock Repetition (cracks no longer repeat every tile)", Range(0, 1)) = 1
         [Header(Layered rock on cliff faces)]
-        _StrataStrength("Layered Rock (0: off)", Range(0, 0.6)) = 0
-        _StrataSpacing("Bed Height (metres)", Range(0.3, 6)) = 1.4
-        _StrataWarp("Beds Wander (metres up and down)", Range(0, 6)) = 1.5
-        _StrataSeam("Seam Under Each Bed", Range(0, 1)) = 0.5
+        _StrataStrength("Layered Rock (0: off)", Range(0, 0.6)) = 0.35
+        _StrataSpacing("Bed Height (metres)", Range(0.3, 6)) = 2.2
+        _StrataWarp("Beds Wander (metres up and down)", Range(0, 6)) = 2.5
+        _StrataSeam("Seam Under Each Bed", Range(0, 1)) = 0.8
         _StrataSlope("Beds From (degrees)", Range(20, 80)) = 44
 
         [Header(Breaking up tiling)]

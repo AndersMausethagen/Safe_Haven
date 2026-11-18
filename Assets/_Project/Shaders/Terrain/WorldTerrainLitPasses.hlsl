@@ -254,7 +254,8 @@ void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalM
 
 // Layered rock (2026-11-18, the user's cliff-edge reference): on faces steeper than Beds From, the rock steps in horizontal beds by
 // world height, each bed a shade of its own, the lines bent by broad noise so they wander along a wall, with a dark seam under each
-// bed's lip where the softer layer below has worn back. Off at 0 (every terrain but those that ask for it).
+// bed's lip where the softer layer below has worn back. On by default for every cliff and ravine (the user, 2026-11-18: "that layered
+// rock looks much better. add that as the default"); a material sets Layered Rock 0 to turn it off.
 void WorldStrata(float3 p, float slope, inout half3 colour, inout half4 mask)
 {
     if (_StrataStrength <= 0)

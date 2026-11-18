@@ -27,6 +27,7 @@ MonoBehaviour:
   ridgeHeight: 7
   ridgeWidth: 16
   roughness: 1.2
+  cliffRoughness: 1.2
   rimHeight: 9
   rimWidth: 12
   hillVariance: {x: 0.6, y: 1.9}
@@ -46,10 +47,17 @@ MonoBehaviour:
   boulderClusters: {x: 6, y: 10}
   boulderClusterSize: {x: 1, y: 3}
   boulderScale: {x: 0.6, y: 1.3}
+  boulderOutcrops: 0
   lookouts: 1
   lookoutReveal: 70
   largeRegions: {x: 2, y: 3}
   regionBlend: 30
+  normalRegions: {x: 1, y: 1}
+  districtRoles: []
+  roadWidth: 1
+  shortFlags: []
+  shortFlagSpacing: {x: 100, y: 140}
+  shortFlagOffset: 1.5
   twoRoutes: 1
   campsOnShortRoute: 1
   surfaceRivers: {x: 0, y: 1}
@@ -63,12 +71,29 @@ MonoBehaviour:
     scale: {x: 1.6, y: 2.1}
     sink: 0.02
     onlyToSee: 1
+    atNodes: 0
+    clearing: 0
+    revealRadius: 0
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
   - prefab: {fileID: 8565077372226898001, guid: 7b6e33233f2f82c4883bc305b27b3661, type: 3}
     weight: 0.8
     scale: {x: 0.9, y: 1.15}
     sink: 0.04
     onlyToSee: 1
+    atNodes: 0
+    clearing: 0
+    revealRadius: 0
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
   landmarkCount: {x: 1, y: 2}
+  nodeLandmarkCount: {x: 3, y: 5}
   descentSites: 0400000005000000i
   mapSize: 200
   forestDensity: 0.8
@@ -121,6 +146,9 @@ MonoBehaviour:
     hills: 1
     boulders: 1
     rivers: 1
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -161,6 +189,9 @@ MonoBehaviour:
     hills: 1
     boulders: 1
     rivers: 0.7
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -189,6 +220,9 @@ MonoBehaviour:
     hills: 1
     boulders: 1
     rivers: 1.5
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -217,6 +251,9 @@ MonoBehaviour:
     hills: 1
     boulders: 1
     rivers: 1.2
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -257,6 +294,9 @@ MonoBehaviour:
     hills: 1
     boulders: 1
     rivers: 0.6
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -297,6 +337,9 @@ MonoBehaviour:
     hills: 1.5
     boulders: 1.8
     rivers: 0
+    valleyWidth: 1
+    role: 0
+    siteDensity: []
     largeByDefault: 1
     terraces: 3
     terraceHeight: 7
@@ -380,6 +423,39 @@ MonoBehaviour:
     site: 3
   - group: Mistwings
     site: 3
+  valley:
+    floorWidth: {x: 70, y: 90}
+    wallHeight: {x: 18, y: 24}
+    wallRun: 26
+    benches: 3
+    meander: {x: 10, y: 20}
+    bendLength: {x: 110, y: 160}
+    tilt: {x: 5, y: 9}
+    riverWidth: {x: 6, y: 9}
+    riverDepth: {x: 1.5, y: 2}
+    bridges: {x: 1, y: 2}
+    bridgePrefab: {fileID: 0}
+    bridgeLength: 14
+    bridgeDeck: 2
+    bossBridge: {fileID: 0}
+    bridgeToll: {fileID: 0}
+    wallCrags: 0
+    wallCragReach: 25
+    wallCragSlope: 38
+    wallBlocks: 0.1
+    maxCrossings: 0
+  fen:
+    enabled: 0
+    aboveWater: 0.6
+    sink: 1.2
+    sinkWidth: 7
+    hummocks: 0.3
+    hummockScale: 7
+    hummockHeight: 0.35
+    strings: 0.6
+    stringSpacing: 16
+    water: {fileID: 0}
+    damp: 0.25
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}
@@ -388,3 +464,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   - {fileID: 11400000, guid: ea87a51a33af07646be878c32e34697e, type: 2}
   campPieces: {x: 1, y: 2}
+  compounds: {x: 0, y: 0}

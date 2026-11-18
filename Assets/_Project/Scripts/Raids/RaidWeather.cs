@@ -44,15 +44,22 @@ public static class RaidWeather
         WeatherState state = weather.State;
         string name = snowing && state.Rain >= TellsRain ? "Snow" : weather.DisplayName;
         var line = new System.Text.StringBuilder($"The sky as you go: {name}.");
-        if (state.Rain >= TellsRain && !snowing && perception != null)
+        if (state.Rain >= TellsRain && perception != null)
         {
+            // Falling snow muffles steps as rain does (PlayerNoise reads the weather's rain either way).
             float carry = PerceptionRules.RainNoiseScale(state.Rain, perception);
             line.Append($" Your steps carry {carry:P0} as far");
             line.Append(state.Rain > Drowns ? ", and fire won't take." : ".");
         }
-        else if (state.Rain >= TellsRain && snowing)
+
+        if (state.Rain >= TellsRain && snowing)
         {
             line.Append(" The cold bites in the open.");
+        }
+
+        if (state.Fog >= TellsFog)
+        {
+            line.Append(" Creatures see less far in it.");
         }
 
         if (state.Mist >= TellsMist || state.Fog >= TellsFog)

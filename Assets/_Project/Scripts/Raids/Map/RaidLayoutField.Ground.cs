@@ -186,6 +186,11 @@ public sealed partial class RaidLayoutField
 
             rowHighest[row] = top;
         });
+        if (rules.CliffRoughness > 0f)
+        {
+            Roughen(heights, rowHighest);
+        }
+
         highest = 0f;
         foreach (float top in rowHighest)
         {
@@ -193,6 +198,140 @@ public sealed partial class RaidLayoutField
         }
 
         return heights;
+    }
+
+    // Rough cliffs: from this slope (degrees) the relief starts, and from RoughFullSlope it is whole; none within RoughClearOfWalked metres
+    // of a trail or clearing, coming in over RoughWalkedRamp more; by water (a river or pond, within RoughShore metres of its edge) it only
+    // lifts. Its noise: a ridged fold every RoughFold metres, a finer one every RoughGrain, and grit every RoughGrit.
+    private const float RoughFromSlope = 24f;
+    private const float RoughFullSlope = 42f;
+    private const float RoughClearOfWalked = 1.5f;
+    private const float RoughWalkedRamp = 2.5f;
+    private const float RoughShore = 3f;
+    private const float RoughFold = 7f;
+    private const float RoughGrain = 2.6f;
+    private const float RoughGrit = 1.1f;
+    // Of Cliff Roughness: the most cut (carve 1) and the most raised (carve 0).
+    private const float RoughCarve = 1.25f;
+    private const float RoughRaise = 0.3f;
+
+    /// <summary>
+    /// Jagged relief on steep ground (Layout Rules › Cliff Roughness, the user's "unnaturally smooth" cliff edges and river banks): read from
+    /// the finished heights, so it follows every cliff the field makes (terrace cliffs, ravine and valley walls, banks), a ridged noise
+    /// added by how steep each spot is. Never on trails, clearings or level ground, so nothing walkable moves; only upward beside water. The
+    /// field's own heights (HeightAt, which placement and the golden tests read) are left as they are.
+    /// </summary>
+    private void Roughen(float[,] heights, float[] rowHighest)
+    {
+        int size = heights.GetLength(0);
+        float step = plan.Size / (size - 1f);
+        float amount = rules.CliffRoughness;
+        var original = (float[,])heights.Clone();
+        System.Threading.Tasks.Parallel.For(1, size - 1, row =>
+        {
+            float top = rowHighest[row];
+            for (int column = 1; column < size - 1; column++)
+            {
+                float dx = (original[row, column + 1] - original[row, column - 1]) / (2f * step);
+                float dy = (original[row + 1, column] - original[row - 1, column]) / (2f * step);
+                float slope = Mathf.Atan(Mathf.Sqrt(dx * dx + dy * dy)) * Mathf.Rad2Deg;
+                float steep = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(RoughFromSlope, RoughFullSlope, slope));
+                float u = column / (size - 1f), v = row / (size - 1f);
+                float x = column * step, y = row * step;
+                // A shore however gentle: the last metres of a bank into the water and the first out of it.
+                float shore = ShoreShare(new Vector2(x, y), u, v);
+                if (steep <= 0.001f && shore <= 0.001f)
+                {
+                    continue;
+                }
+
+                float walked = WalkedDistance(u, v);
+                float away = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((walked - RoughClearOfWalked) / RoughWalkedRamp));
+                if (away <= 0.001f)
+                {
+                    continue;
+                }
+
+                // Carved, as erosion carves a cliff: sharp gullies down the faces and notches bitten out of the lip (ridged noise taken away),
+                // with only small bumps raised. A first try raised the ridges as much as it cut and stood a saw blade of spikes along every
+                // lip (seen in the Woods, 2026-11-18).
+                float fold = 1f - Mathf.Abs(2f * Noise(x, y, RoughFold, 211f) - 1f);
+                float grain = 1f - Mathf.Abs(2f * Noise(x, y, RoughGrain, 223f) - 1f);
+                float grit = Noise(x, y, RoughGrit, 227f);
+                float carve = fold * 0.6f + grain * 0.3f + grit * 0.1f;
+                float jag = (RoughRaise - carve * RoughCarve) * amount * steep * away;
+                if (jag < 0f && NearWater(new Vector2(x, y), u, v))
+                {
+                    jag = 0f;
+                }
+
+                // The shoreline breaks up: ridged patches of bank lifted into spurs and shelves of ground at the water's edge, and the
+                // bays between left as they are, so the line wanders in and out and never opens a hole beside the water.
+                if (shore > 0.001f)
+                {
+                    float patch = Mathf.Max(0f, (1f - Mathf.Abs(2f * Noise(x, y, ShorePatch, 239f) - 1f)) - 0.35f) / 0.65f;
+                    float bump = Mathf.Max(0f, grain - 0.4f) / 0.6f;
+                    jag = Mathf.Max(jag, (patch * 0.75f + bump * 0.25f) * amount * ShoreLift * shore * away);
+                }
+
+                float height = original[row, column] + jag;
+                heights[row, column] = height;
+                top = Mathf.Max(top, height);
+            }
+
+            rowHighest[row] = top;
+        });
+    }
+
+    // The shoreline pass: metres of bank lifted at most (a share of Cliff Roughness), the patches' size, and how far either side of the
+    // water's edge it reaches: into the water (a spur of bank) and up the bank.
+    private const float ShoreLift = 0.7f;
+    private const float ShorePatch = 4.5f;
+    private const float ShoreInto = 1.2f;
+    private const float ShoreUp = 2.5f;
+
+    // How much a spot is shore (0-1): most at a river's or pond's edge, fading ShoreInto metres into the water and ShoreUp up the bank.
+    private float ShoreShare(Vector2 point, float u, float v)
+    {
+        float best = 0f;
+        if (riverEdge != null)
+        {
+            best = Mathf.Max(best, ShoreAt(Sample(riverEdge, u, v)));
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            float far = pond.Reach + ShoreUp;
+            if ((point - pond.Position).sqrMagnitude < far * far)
+            {
+                best = Mathf.Max(best, ShoreAt(pond.Edge(point)));
+            }
+        }
+
+        return best;
+    }
+
+    private static float ShoreAt(float edge) =>
+        edge < 0f ? Mathf.Clamp01(1f + edge / ShoreInto) : Mathf.Clamp01(1f - edge / ShoreUp);
+
+    // Within RoughShore metres of a river's or a pond's edge (the fen's sheet covers whatever dips under it, so it needs no care).
+    private bool NearWater(Vector2 point, float u, float v)
+    {
+        if (riverEdge != null && Sample(riverEdge, u, v) < RoughShore)
+        {
+            return true;
+        }
+
+        foreach (RaidLayoutPond pond in plan.Ponds)
+        {
+            float far = pond.Reach + RoughShore;
+            if ((point - pond.Position).sqrMagnitude < far * far && pond.Edge(point) < RoughShore)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Heights in metres as 0-1 of a terrain this many metres high, in place.</summary>

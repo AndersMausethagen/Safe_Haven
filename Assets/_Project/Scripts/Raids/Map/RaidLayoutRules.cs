@@ -361,6 +361,10 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField, Min(1f)] private float ridgeWidth = 16f;
     [Tooltip("Roughness of the wild ground, in metres.")]
     [SerializeField, Min(0f)] private float roughness = 1.2f;
+    [Tooltip("Rough cliffs (the user, 2026-11-18: \"the edges of cliffs and along the river look unnaturally smooth\"): metres of " +
+             "jagged relief on steep ground (cliff faces and lips, ravine and valley walls, river banks), none on trails, clearings or " +
+             "level ground. By the water's edge it only lifts the ground, so a shore turns ragged without opening holes. 0: smooth, as before.")]
+    [SerializeField, Min(0f)] private float cliffRoughness = 1.2f;
     [Tooltip("How high the land rises at the map's edge, in metres, so nobody sees a wall.")]
     [SerializeField, Min(0f)] private float rimHeight = 9f;
     [Tooltip("How far in from the edge it starts rising, in metres.")]
@@ -608,6 +612,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     public float RidgeHeight => ridgeHeight;
     public float RidgeWidth => ridgeWidth;
     public float Roughness => roughness;
+    public float CliffRoughness => cliffRoughness;
     public float RimHeight => rimHeight;
     public float RimWidth => rimWidth;
     public float ForestDensity => forestDensity;

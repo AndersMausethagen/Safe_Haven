@@ -23,12 +23,13 @@ public sealed class LobStrike : MonoBehaviour
     private MaterialPropertyBlock block;
     private Transform thrown;
 
-    /// <summary>Throws one: from <paramref name="origin"/>, landing at <paramref name="point"/> after the action's Lob Seconds.</summary>
-    public static void Throw(Combatant by, MonsterAttack lob, Vector3 origin, Vector3 point, LayerMask targetLayers)
+    /// <summary>Throws one: from <paramref name="origin"/>, landing at <paramref name="point"/> after the action's Lob Seconds. The lob in
+    /// flight (null when it can't be thrown), for a thrower that may call it off.</summary>
+    public static LobStrike Throw(Combatant by, MonsterAttack lob, Vector3 origin, Vector3 point, LayerMask targetLayers)
     {
         if (by == null || lob == null || lob.attack == null)
         {
-            return;
+            return null;
         }
 
         if (NavMesh.SamplePosition(point, out NavMeshHit ground, 4f, NavMesh.AllAreas))
@@ -44,6 +45,7 @@ public sealed class LobStrike : MonoBehaviour
         strike.layers = targetLayers;
         strike.from = origin;
         strike.Build();
+        return strike;
     }
 
     private void Build()

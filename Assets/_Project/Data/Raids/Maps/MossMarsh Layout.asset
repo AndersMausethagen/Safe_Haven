@@ -27,6 +27,7 @@ MonoBehaviour:
   ridgeHeight: 10.849999
   ridgeWidth: 12.8
   roughness: 1.2
+  cliffRoughness: 0.6
   rimHeight: 12.150001
   rimWidth: 12
   hillVariance: {x: 0.8, y: 1.2}
@@ -445,4 +446,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e433b9e888e511d4c8743cc6a40c672a, type: 2}
   - {fileID: 11400000, guid: 354543bfc906ace4d838568849dfadcd, type: 2}
   - {fileID: 11400000, guid: 7e7af08307696cc45a54d183822f76b8, type: 2}
+  - {fileID: 11400000, guid: 7e3697fa977f7a54ca6dd68031122ea7, type: 2}
   campPieces: {x: 1, y: 2}
+  compounds: {x: 1, y: 1}

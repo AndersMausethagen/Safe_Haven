@@ -43,8 +43,11 @@ public sealed class ArenaHazardDrops : MonoBehaviour
     private Vector3 home;
     private bool hasHome;
     private bool dripping;
+    private bool done;
     private float nextDropAt;
     private int dropped;
+    // What is still falling, called off when the boss falls (review 2026-11-18: rot kept landing on the player looting the kill).
+    private readonly System.Collections.Generic.List<LobStrike> falling = new System.Collections.Generic.List<LobStrike>();
 
     public float Radius => radius;
 
@@ -67,7 +70,13 @@ public sealed class ArenaHazardDrops : MonoBehaviour
     private void Update()
     {
         EncounterArena arena = EncounterArena.Current;
-        if (arena == null || drip == null || arena.BossFallen || !arena.IsEnraged || RaidDirector.Current == null || !RaidDirector.Current.IsRunning)
+        if (arena != null && arena.BossFallen && dripping && !done)
+        {
+            Dry();
+            return;
+        }
+
+        if (done || arena == null || drip == null || arena.BossFallen || !arena.IsEnraged || RaidDirector.Current == null || !RaidDirector.Current.IsRunning)
         {
             return;
         }
@@ -93,7 +102,39 @@ public sealed class ArenaHazardDrops : MonoBehaviour
         Vector3 middle = centre != null ? centre.position : hasHome ? home : maker.transform.position;
         Vector3 at = DropPoint(dropped++, middle, radius, places, stride);
         Vector3 from = strandPrefab != null ? at + Vector3.up * 8f : at;
-        LobStrike.Throw(combatant, Blow(), from, at, ai.TargetLayers);
+        falling.RemoveAll(lob => lob == null);
+        LobStrike thrown = LobStrike.Throw(combatant, Blow(), from, at, ai.TargetLayers);
+        if (thrown != null)
+        {
+            falling.Add(thrown);
+        }
+    }
+
+    // The boss has fallen: no drop still falling lands, and the rot it left dries up.
+    private void Dry()
+    {
+        done = true;
+        foreach (LobStrike lob in falling)
+        {
+            if (lob != null)
+            {
+                Destroy(lob.gameObject);
+            }
+        }
+
+        falling.Clear();
+        if (poolPrefab == null)
+        {
+            return;
+        }
+
+        foreach (GroundHazard pool in FindObjectsByType<GroundHazard>(FindObjectsInactive.Exclude))
+        {
+            if (pool != null && pool.name.StartsWith(poolPrefab.name, System.StringComparison.Ordinal))
+            {
+                Destroy(pool.gameObject);
+            }
+        }
     }
 
     // One drop as a lob (LobStrike): its ring, damage, warning and pool.

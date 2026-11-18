@@ -657,8 +657,8 @@ public static class RaidMapSurface
 
     /// <summary>
     /// Heroes At Rims (the user's cliff-edge picture, 2026-11-18: a lone pine on the very edge): over the whole map, one cell in Rim Hero
-    /// Chance gets one, at a lip found in it (<see cref="IsRim"/>), kept off trails, clearings and water, standing as an object as the other
-    /// heroes do near walkable ground. From its own stream, after the rest: turning it on moves nothing else.
+    /// Chance gets one, at a lip found in it (<see cref="IsRim"/>), kept off trails, clearings and water, clear of walkable ground and other
+    /// heroes, and standing as an object near walkable ground (Hero Object Within) as the other heroes do. From its own stream, after the rest: turning it on moves nothing else.
     /// </summary>
     private static void DressRims(TerrainData data, RaidMapDefinition definition, int[] heroPrototypes, float[] heroReach, float rimTotal,
         List<Clearing> clearings, TrunkGrid trunks, List<TreeInstance> placed, Func<Vector2, float> walked, Func<Vector2, bool> inWater,
@@ -695,10 +695,17 @@ public static class RaidMapSurface
                     int pick = PickHero(definition.Heroes, rimTotal, random, true);
                     RaidMapDefinition.Hero hero = definition.Heroes[pick];
                     TreeInstance instance = MakeInstance(Mathf.Max(0, heroPrototypes[pick]), u, v, hero.scale, random);
+                    float off = walked(spot);
                     float room = Mathf.Max(hero.room * instance.widthScale, TrunkClearance);
+                    // As the other heroes: the whole of it a metre clear of walkable ground, and not inside another hero's room.
+                    if (off - heroReach[pick] * instance.widthScale < HeroKeepsClear || !trunks.Fits(spot, room))
+                    {
+                        continue;
+                    }
+
                     ClearAround(placed, spot, room, size);
                     trunks.Add(spot, room);
-                    if (heroPrototypes[pick] < 0)
+                    if (heroPrototypes[pick] < 0 || off <= definition.HeroObjectWithin)
                     {
                         heroObjects?.Add(new RaidMapDefinition.HeroObject(hero, spot, instance.rotation * Mathf.Rad2Deg, instance.widthScale));
                     }

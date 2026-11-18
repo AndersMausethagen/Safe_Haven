@@ -5196,7 +5196,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989213cb7dbfd204aa818e119deb8cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::ArenaHazardDrops
-  centre: {fileID: 0}
+  centre: {fileID: 664187681}
   boss: {fileID: 749573324}
   radius: 16.2
   places: 12

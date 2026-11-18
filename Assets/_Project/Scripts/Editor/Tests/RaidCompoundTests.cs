@@ -5,12 +5,14 @@ using UnityEngine;
 
 /// <summary>
 /// Compounds (Docs/WorldDesignReview_2026-11-17.md G3): set pieces that take a clearing of their own and ring its yard with wall pieces.
-/// On plans only (no terrain): a compound stands in a plain clearing away from the start, every way in is left open so no wall piece ever
-/// stands on a trail or a side path, a yard has a back opening too, and the Woods (whose layouts are pinned) have none.
+/// On plans only (no terrain): a compound stands in a plain clearing or a yard of its own beside a trail, away from the start and from any
+/// site, every way in is left open so no wall piece ever stands on a trail or a side path (past its edge), a yard has a back opening too,
+/// and the Woods (whose layouts are pinned) have none.
 /// </summary>
 public sealed class RaidCompoundTests
 {
-    private const string ValleyRules = "Assets/_Project/Data/Raids/Maps/TrollValley Layout.asset";
+    // The Moss Marsh has compounds (its Bloomery Yard); Troll Valley's clearings and floor were too full for one (2026-11-18).
+    private const string MarshRules = "Assets/_Project/Data/Raids/Maps/MossMarsh Layout.asset";
     private const string WoodsRules = "Assets/_Project/Data/Raids/Maps/MistyWoods Layout.asset";
     private const float Size = 200f;
 
@@ -31,29 +33,48 @@ public sealed class RaidCompoundTests
     }
 
     [Test]
-    public void TheValley_OftenHasACompound_InAPlainClearing_AwayFromTheStart()
+    public void TheMarsh_OftenHasACompound_InAClearingOrAYardOfItsOwn_AwayFromTheStart()
     {
         int found = 0;
-        foreach ((int seed, RaidLayoutPlan plan, RaidLayoutPiece compound) in Compounds(ValleyRules, 40))
+        foreach ((int seed, RaidLayoutPlan plan, RaidLayoutPiece compound) in Compounds(MarshRules, 40))
         {
             found++;
+            // In a clearing's middle (never the start's, an exit's or the apex's), or in a yard of its own beside a trail.
             RaidLayoutRoom room = plan.Rooms.Find(each => each.Position == compound.Position);
-            Assert.IsNotNull(room, $"seed {seed}: it takes a clearing's middle");
-            Assert.That(room.Role == RaidRoomRole.Plain || room.Role == RaidRoomRole.Hub, $"seed {seed}: never the start, an exit or the apex's");
+            if (room != null)
+            {
+                Assert.That(room.Role == RaidRoomRole.Plain || room.Role == RaidRoomRole.Hub, $"seed {seed}: never the start, an exit or the apex's");
+            }
+            else
+            {
+                Assert.IsTrue(plan.Spurs.Exists(spur => spur[spur.Count - 1] == compound.Position), $"seed {seed}: a yard beside a trail has its side path");
+                foreach (RaidLayoutRoom other in plan.Rooms)
+                {
+                    Assert.Greater(Vector2.Distance(other.Position, compound.Position), other.Radius + compound.WallRadius, $"seed {seed}: the yard keeps off clearings");
+                }
+            }
+
             Assert.Greater(compound.WallRadius, compound.Definition.Radius, $"seed {seed}: the piece fits inside its ring");
             Assert.Greater(Vector2.Distance(compound.Position, plan.Start.Position), 40f, $"seed {seed}: not where the run begins");
+            foreach (RaidSite site in plan.Sites)
+            {
+                Assert.GreaterOrEqual(Vector2.Distance(site.Position * plan.Size, compound.Position), compound.Definition.Radius,
+                    $"seed {seed}: a {site.Kind} site stands inside the compound's ruin");
+            }
         }
 
-        Assert.GreaterOrEqual(found, 4, "a compound on a share of Valley runs (a fifth, as the valley is planned)");
+        Assert.GreaterOrEqual(found, 6, "a compound on a share of Marsh runs (not where its Bloomery already stands for a rumour)");
     }
 
     [Test]
     public void NoWallPiece_StandsOnATrailOrASidePath_AndEveryYardHasABackWay()
     {
-        foreach ((int seed, RaidLayoutPlan plan, RaidLayoutPiece compound) in Compounds(ValleyRules, 40))
+        foreach ((int seed, RaidLayoutPlan plan, RaidLayoutPiece compound) in Compounds(MarshRules, 40))
         {
             RaidSetPieceDefinition definition = compound.Definition;
             float radius = compound.WallRadius;
+            var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(MarshRules);
+            float trailHalf = rules.TrailHalfWidth * plan.Mood.trails;
             int whole = Mathf.Max(6, Mathf.RoundToInt(2f * Mathf.PI * radius / definition.PieceLength));
             Assert.GreaterOrEqual(compound.Wall.Count, whole * 0.45f, $"seed {seed}: a yard with a wall round most of it, not stubs");
             foreach (float angle in compound.Wall)
@@ -64,9 +85,15 @@ public sealed class RaidCompoundTests
                 Vector2 middle = compound.Position + outward * radius;
                 for (float share = -0.5f; share <= 0.5f; share += 0.125f)
                 {
-                    foreach (List<Vector2> line in Lines(plan))
+                    Vector2 at = middle + along * definition.PieceLength * share;
+                    foreach (List<Vector2> trail in plan.Trails)
                     {
-                        Assert.Greater(Distance(line, middle + along * definition.PieceLength * share), 2f, $"seed {seed}: a wall piece at {angle:0}° stands on a way in");
+                        Assert.Greater(Distance(trail, at), trailHalf + 0.5f, $"seed {seed}: a wall piece at {angle:0}° stands on a trail (past its edge)");
+                    }
+
+                    foreach (List<Vector2> spur in plan.Spurs)
+                    {
+                        Assert.Greater(Distance(spur, at), trailHalf * 0.6f + 0.5f, $"seed {seed}: a wall piece at {angle:0}° stands on a side path");
                     }
                 }
             }

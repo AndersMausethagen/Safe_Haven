@@ -377,7 +377,8 @@ public static partial class RaidLayoutPlanner
 
         foreach (RaidLayoutPiece piece in plan.Pieces)
         {
-            if (Vector2.Distance(piece.Position, spot) < piece.Definition.Radius + keep)
+            // A compound's ring reaches past its piece (review 2026-11-18: a landmark could stand on the wall).
+            if (Vector2.Distance(piece.Position, spot) < Mathf.Max(piece.Definition.Radius, piece.WallRadius + 1.5f) + keep)
             {
                 return false;
             }
