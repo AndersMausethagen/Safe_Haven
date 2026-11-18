@@ -11,6 +11,7 @@ Shader "Safe Haven/Terrain Moss"
         [Normal] _BumpMap ("Moss Normal", 2D) = "bump" {}
         _PackedMap ("AO Roughness Height", 2D) = "white" {}
         _TextureSize ("Texture Size (metres)", Float) = 1.5
+        _HexTiling ("Hex Tiling (breaks up the repeat; 0 off)", Range(0, 1)) = 1
         [HideInInspector] _UseTextures ("Texture Influence", Float) = 0
         [HideInInspector] _UseNormal ("Normal Strength", Float) = 0
         [HideInInspector] _UsePacked ("Use Packed Map", Float) = 0
@@ -32,6 +33,7 @@ Shader "Safe Haven/Terrain Moss"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         // A raid's ground light, as the terrain under the moss gets it (nothing elsewhere).
         #include "Assets/_Project/Shaders/GroundLight.hlsl"
+        #include "Assets/_Project/Shaders/HexTiling.hlsl"
         TEXTURE2D(_Control); SAMPLER(sampler_Control);
         TEXTURE2D(_Holes); SAMPLER(sampler_Holes);
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
@@ -43,6 +45,7 @@ Shader "Safe Haven/Terrain Moss"
             float _PatternScale, _Smoothness, _Threshold, _Softness;
             float _Tufts, _DrawDistance, _WindResponse;
             float _TextureSize, _UseTextures, _UseNormal, _UsePacked;
+            float _HexTiling;
         CBUFFER_END
         float4 _SafeHavenWind; // horizontal direction XZ, displacement, speed
         float _SafeHavenWindGusts;
@@ -107,15 +110,51 @@ Shader "Safe Haven/Terrain Moss"
                 clip(fade - Hash(floor(input.positionWS.xz * 100.0)) - 0.001);
             }
         }
-        half3 MossNormal(Varyings input)
+        // The moss's textures over the world, hex-tiled (HexTiling.hlsl) so the repeat doesn't show from above: one frame for all
+        // three maps, its weights from the base colour's samples. Hex Tiling 0: the plain single sample.
+        struct MossMaps
+        {
+            half3 baseColor;
+            half3 normalTS;
+            half3 packed;
+        };
+        MossMaps SampleMoss(float3 positionWS)
+        {
+            MossMaps maps;
+            float2 uv = positionWS.xz / max(0.1, _TextureSize);
+            UNITY_BRANCH if (_HexTiling > 0.001)
+            {
+                HexTiles t = HexFrame(uv, _HexTiling);
+                half3 c1 = HEX_SAMPLE(_BaseMap, sampler_BaseMap, t, uv1, turn1).rgb;
+                half3 c2 = HEX_SAMPLE(_BaseMap, sampler_BaseMap, t, uv2, turn2).rgb;
+                half3 c3 = HEX_SAMPLE(_BaseMap, sampler_BaseMap, t, uv3, turn3).rgb;
+                float3 w = HexWeights(t, c1, c2, c3);
+                maps.baseColor = c1 * w.x + c2 * w.y + c3 * w.z;
+                maps.normalTS = HexNormal(TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), t, w, _UseNormal);
+                maps.packed = HEX_SAMPLE(_PackedMap, sampler_PackedMap, t, uv1, turn1).rgb * w.x
+                    + HEX_SAMPLE(_PackedMap, sampler_PackedMap, t, uv2, turn2).rgb * w.y
+                    + HEX_SAMPLE(_PackedMap, sampler_PackedMap, t, uv3, turn3).rgb * w.z;
+            }
+            else
+            {
+                maps.baseColor = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv).rgb;
+                maps.normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv), _UseNormal);
+                maps.packed = SAMPLE_TEXTURE2D(_PackedMap, sampler_PackedMap, uv).rgb;
+            }
+
+            return maps;
+        }
+        half3 MossNormalFrom(Varyings input, half3 mapped)
         {
             half3 normal = NormalizeNormalPerPixel(input.normalWS);
             half3 axis = abs(normal.z) < 0.99 ? half3(0, 0, 1) : half3(0, 1, 0);
             half3 tangent = normalize(cross(normal, axis));
             half3 bitangent = cross(tangent, normal);
-            float2 uv = input.positionWS.xz / max(0.1, _TextureSize);
-            half3 mapped = UnpackNormalScale(SAMPLE_TEXTURE2D(_BumpMap, sampler_BumpMap, uv), _UseNormal);
             return normalize(tangent * mapped.x + bitangent * mapped.y + normal * mapped.z);
+        }
+        half3 MossNormal(Varyings input)
+        {
+            return MossNormalFrom(input, SampleMoss(input.positionWS).normalTS);
         }
         half4 MossFragment(Varyings input) : SV_Target
         {
@@ -125,15 +164,15 @@ Shader "Safe Haven/Terrain Moss"
             float variation = saturate(Noise(p) * 0.65 + Noise(p * 5.7) * 0.35);
             half3 albedo = lerp(_ShadowColor.rgb, _MossColor.rgb, variation);
             albedo = lerp(albedo, _TipColor.rgb, input.height * 0.65);
-            float2 textureUV = input.positionWS.xz / max(0.1, _TextureSize);
-            half3 textured = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, textureUV).rgb;
+            MossMaps maps = SampleMoss(input.positionWS);
+            half3 textured = maps.baseColor;
             // Preserve palette controls as a tint while letting authored texture detail carry the surface.
             textured *= _MossColor.rgb / half3(0.22, 0.34, 0.09);
             textured = lerp(textured, textured * 1.25, input.height * 0.6);
             albedo = lerp(albedo, textured, _UseTextures);
             InputData lighting = (InputData)0;
             lighting.positionWS = input.positionWS;
-            lighting.normalWS = MossNormal(input);
+            lighting.normalWS = MossNormalFrom(input, maps.normalTS);
             lighting.viewDirectionWS = GetWorldSpaceNormalizeViewDir(input.positionWS);
             #if defined(_MAIN_LIGHT_SHADOWS_SCREEN)
                 lighting.shadowCoord = ComputeScreenPos(TransformWorldToHClip(input.positionWS));
@@ -146,7 +185,7 @@ Shader "Safe Haven/Terrain Moss"
             SurfaceData surface = (SurfaceData)0;
             surface.albedo = albedo;
             surface.alpha = 1;
-            half3 packed = SAMPLE_TEXTURE2D(_PackedMap, sampler_PackedMap, textureUV).rgb;
+            half3 packed = maps.packed;
             surface.smoothness = lerp(_Smoothness, 1 - packed.g, _UsePacked);
             surface.occlusion = lerp(lerp(0.8, 1.0, input.height), packed.r, _UsePacked);
             // The canopy's and the land's shade and the light thrown back from sunlit ground, as on the terrain it grows on, so the

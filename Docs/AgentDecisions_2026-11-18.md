@@ -289,3 +289,11 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   almost nothing showed); a run that turns rainy has no sun, so test on a fresh clear run.
 - Seen in a launched Woods at 11:00 in clear weather: soft patches of sun in the crowns' shadows, subtle in the misty grade (0.55
   read as nothing, now 0.9). **Tune it in each raid's Look if you want them stronger.**
+
+### Batch 9: the moss's repeat broken up (4.5)
+- **Hex-tiling** (Mikkelsen 2022, `Shaders/HexTiling.hlsl`) on the moss skin's colour, normal and packed maps: each corner of a
+  triangle grid gets its own offset and turn, blended with the brighter sample winning a little, so the repeat breaks up without
+  washing grey. Terrain Moss › Hex Tiling (1 by default, 0 the old single sample).
+- Seen in a launched Woods: from above, the moss's woven-looking repeat is gone and it reads organic; close up no seams.
+- Cost: 9 texture samples instead of 3 on the moss. Timed over 300 frames twice in the Editor: 0.2 and 1.6 ms more, inside its
+  ±2 ms noise. If a build profile shows it, it can go behind the graphics options.

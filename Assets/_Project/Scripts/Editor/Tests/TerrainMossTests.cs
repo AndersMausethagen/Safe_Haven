@@ -329,4 +329,16 @@ public sealed class TerrainMossTests
         created.Add(value);
         return value;
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md 4.5: the moss's textures are hex-tiled by default, so their repeat doesn't show from above.
+    [Test]
+    public void TheMossIsHexTiledByDefault()
+    {
+        Shader shader = Shader.Find("Safe Haven/Terrain Moss");
+        Assert.IsNotNull(shader);
+        Assert.IsFalse(UnityEditor.ShaderUtil.ShaderHasError(shader));
+        int index = shader.FindPropertyIndex("_HexTiling");
+        Assert.GreaterOrEqual(index, 0, "the slider exists");
+        Assert.AreEqual(1f, shader.GetPropertyDefaultFloatValue(index), "on by default: the game as designed");
+    }
 }
