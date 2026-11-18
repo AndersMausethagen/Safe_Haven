@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Backstab Hit
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Backstab Hit
+  caption: 
   clips:
   - {fileID: 8300000, guid: c5259fa3bc0270c4aa915008f4e0a734, type: 3}
   - {fileID: 8300000, guid: 6df1285669fb6aa47acd9cfba8f18f2e, type: 3}
+  - {fileID: 8300000, guid: c0fe380ec01c1a640948895c837618ee, type: 3}
   channel: 2
   volume: 0.85
   volumeVariation: 0.1
@@ -26,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 2
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

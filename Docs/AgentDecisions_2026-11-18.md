@@ -297,3 +297,14 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - Seen in a launched Woods: from above, the moss's woven-looking repeat is gone and it reads organic; close up no seams.
 - Cost: 9 texture samples instead of 3 on the moss. Timed over 300 frames twice in the Editor: 0.2 and 1.6 ms more, inside its
   ±2 ms noise. If a build profile shows it, it can go behind the graphics options.
+
+### Batch 10: the combat sound audit (A6)
+- **Audited 119 sounds** the combat, monsters, weapons and the game's settings play. The hits, swings, blocks, parries, staggers and
+  deaths already had 3-9 takes with ±5-8% pitch. Too few: Backstab Hit, Perfect Dodge, Ice Crack, Impact Quake (a boss toppling) and
+  six creature calls (Shaman Call, Huldra Call, Light Splits, Wing Alarm, Stone Skin, Root Regrowth) had two takes, Gore Splash one.
+- **A third take each** (two for Gore Splash) from `Tools/Audio/variations.py`: one take's attack spliced onto another's body and
+  tail, resampled a few percent, the tone tilted a couple of dB, matched in loudness to its sources. Measured: loudness within 0.01
+  RMS of the sources, no more tonal than they are (no whistles).
+- Left as they are on purpose: cues that tell you something (Counter Ready, Out of Stamina, Bow Full Draw) and the single stingers
+  (quests, breaches, crafting milestones), which should sound the same every time. `CombatSoundTests` guards the twenty repeated
+  ones. **Unheard by you.**

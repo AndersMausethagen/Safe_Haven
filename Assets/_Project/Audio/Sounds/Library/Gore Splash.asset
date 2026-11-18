@@ -13,8 +13,11 @@ MonoBehaviour:
   m_Name: Gore Splash
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Gore Splash
+  caption: 
   clips:
   - {fileID: 8300000, guid: 327ea95c0016e694f82aee2ee7a75e0c, type: 3}
+  - {fileID: 8300000, guid: f961cf3402d2c7b4da793b44a98378e7, type: 3}
+  - {fileID: 8300000, guid: ecbd3d4856d68a34c864ab060d82f015, type: 3}
   channel: 2
   volume: 0.6
   volumeVariation: 0.1
@@ -25,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 3
   minimumGap: 0.03
   priority: 1
+  takesTheMix: 0

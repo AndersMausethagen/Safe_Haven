@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Perfect Dodge
   m_EditorClassIdentifier: SafeHaven::SoundDefinition
   displayName: Perfect Dodge
+  caption: 
   clips:
   - {fileID: 8300000, guid: c3546235535fb664cb1542ef0bc22b13, type: 3}
   - {fileID: 8300000, guid: 4f651e465c8b2234fb3c308c6d8e4273, type: 3}
+  - {fileID: 8300000, guid: 61f61370d203bd941b822c0233bfddef, type: 3}
   channel: 2
   volume: 0.77
   volumeVariation: 0.1
@@ -26,3 +28,4 @@ MonoBehaviour:
   maxAtOnce: 1
   minimumGap: 0.03
   priority: 2
+  takesTheMix: 0
