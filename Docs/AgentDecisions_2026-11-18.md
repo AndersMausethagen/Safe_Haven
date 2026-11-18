@@ -81,3 +81,23 @@ Until you choose, the old test (base slots) still holds, and a second test with 
 - New plain wall pieces for raids (the Haven's without their building, health and save parts): `Prefabs/Raids/Compounds/Wall -
   Skigard`, `Wall - Dry-stone`, `Wall - Palisade`. The Woods and the Marsh have no compounds yet (the Woods' layouts are pinned; the
   Marsh's Peat Cutters' Camp is still to make).
+
+## Your cliff-edge picture (you: "like this picture for example. can we achieve something closer to this?")
+What makes the photo read as rock: a hard lip that overhangs with a dark underside, stacked beds in the walls, lichen on the tops
+only, a lone pine on the edge, low sun. Kept: Nordic stone and colours (grey rock, ochre lichen, birch and pine), not red
+sandstone. The photo is licensed stock: used only as a description, never as an input.
+
+### Step 1, done: layered rock on the Valley's walls
+- **Cliff rock from 40°** (was 56°) on Troll Valley's terrain: its walls fall mostly between 36° and 56°, which showed the pebbly
+  "volcanic mossy rocks" texture and read as stacked gravel. Now they read as solid stone with cracks.
+- **Layered beds** (new in the terrain shader generator, `WorldStrata`, off by default so every other terrain is unchanged): on faces
+  steeper than 44° the rock steps in beds about 2.2 m high by world height, each its own shade and a little warmer or cooler, the
+  lines wandering a few metres along a wall, a soft shadowed recess under each bed's lip and a lit edge above it. Troll Valley's
+  material: Layered Rock 0.35, Bed Height 2.2, Seam 0.8, Wander 2.5. A first try with thin seams read as ruled lines from the game
+  camera and was replaced.
+- Seen in a launched Valley (seed 25) at eye height, from the game camera and close by (pictures sent).
+
+### Next
+- **Rim ledges:** flat-topped rock slabs along cliff tops (valley benches, shelves, the Brukam's gorge), top flush with the ground
+  above, face jutting over the drop: new LocalSpawn models, then a generator pass.
+- **A lone stunted pine** at some rim spots; **lichen on top faces** of the ledges; a lower, warmer sun at some Valley hours.

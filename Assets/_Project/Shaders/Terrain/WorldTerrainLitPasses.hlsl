@@ -252,6 +252,46 @@ void WorldTriplanarRock(TEXTURE2D_PARAM(colourMap, smp), TEXTURE2D_PARAM(normalM
     normal = normalize(tX.zyx * blend.x + tY.xzy * blend.y + tZ.xyz * blend.z);
 }
 
+// Layered rock (2026-11-18, the user's cliff-edge reference): on faces steeper than Beds From, the rock steps in horizontal beds by
+// world height, each bed a shade of its own, the lines bent by broad noise so they wander along a wall, with a dark seam under each
+// bed's lip where the softer layer below has worn back. Off at 0 (every terrain but those that ask for it).
+void WorldStrata(float3 p, float slope, inout half3 colour, inout half4 mask)
+{
+    if (_StrataStrength <= 0)
+    {
+        return;
+    }
+
+    half face = saturate((slope - _StrataSlope) / 14.0);
+    if (face <= 0.001)
+    {
+        return;
+    }
+
+    // The beds' lines wander: broadly along a wall (a few metres up and down) and a little at arm's length, so no line is ruled.
+    float y = p.y + (WorldCliffNoise(p * float3(0.035, 0.015, 0.035)) - 0.5) * 2.0 * _StrataWarp
+                  + (WorldCliffNoise(p * float3(0.35, 0.2, 0.35) + 3.7) - 0.5) * 0.25 * _StrataSpacing;
+    // Beds of uneven height: a slow wave stretches some and squeezes others (it never turns back, so the beds keep their order).
+    float spacing = max(_StrataSpacing, 0.05);
+    y += sin(y * 0.41 / spacing) * spacing * 0.35;
+    float bed = y / spacing;
+    float index = floor(bed);
+    float within = bed - index;
+    float tone = frac(sin(index * 12.9898 + 4.1414) * 43758.5453);
+    float hue = frac(sin(index * 78.233 + 1.73) * 43758.5453);
+    float worn = frac(sin(index * 39.425 + 8.11) * 43758.5453);
+    // Each bed a shade of its own, a little warmer or cooler; broad steps, the way beds read from far off.
+    half shade = lerp(1.0 - _StrataStrength, 1.0 + _StrataStrength * 0.45, tone);
+    half3 tint = lerp(half3(1.05, 1.0, 0.92), half3(0.94, 0.98, 1.05), hue);
+    // Under each bed's lip a soft recess in shadow, as deep as the bed is worn (some hardly at all); just above it the lip catches the light.
+    half width = lerp(0.12, 0.3, worn);
+    half recess = smoothstep(1.0 - width, 1.0, within) * lerp(0.35, 1.0, worn) * _StrataSeam;
+    half lip = (1.0 - smoothstep(0.0, 0.12, within)) * _StrataSeam * 0.35;
+    half3 bedColour = tint * shade * (1.0 - recess * 0.6) * (1.0 + lip);
+    colour *= lerp(half3(1, 1, 1), bedColour, face);
+    mask.g *= lerp(1.0, 1.0 - recess * 0.45, face); // the recess holds shadow
+}
+
 // Rock on steep ground: rocky ground (the Rock textures) and, on the steepest, cliff rock (the Cliff Rock textures).
 // Where it goes comes from WorldRock: the painted Rocky and Cliff layers (Rock From Painted Layers, so painting another
 // ground over them replaces them), or the slope, with a noisy edge either way.
@@ -305,6 +345,7 @@ void WorldCliffs(Varyings IN, inout InputData inputData, inout half3 albedo, ino
         rockNormal = only ? steepNormal : normalize(lerp(rockNormal, steepNormal, steep));
     }
 
+    WorldStrata(p, slope, colour, mask);
     albedo = lerp(albedo, colour, w);
     metallic = lerp(metallic, mask.r, w);
     occlusion = lerp(occlusion, mask.g, w);
