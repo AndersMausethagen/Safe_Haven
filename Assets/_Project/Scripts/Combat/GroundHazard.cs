@@ -345,7 +345,8 @@ public sealed class GroundHazard : MonoBehaviour
 
     private void MakeDisc()
     {
-        Material material = CombatFeelSettings.Current.TelegraphMaterial;
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        Material material = GroundMarks.MaterialFor(feel);
         if (material == null)
         {
             return;
@@ -354,13 +355,16 @@ public sealed class GroundHazard : MonoBehaviour
         var part = new GameObject("Disc", typeof(MeshFilter), typeof(MeshRenderer));
         part.transform.SetParent(transform, false);
         part.transform.localPosition = Vector3.up * 0.05f;
-        part.transform.localScale = new Vector3(radius, 1f, radius);
-        part.GetComponent<MeshFilter>().sharedMesh = AttackTelegraph.FanFor(360f);
+        part.transform.localScale = GroundMarks.Scale(radius);
+        part.GetComponent<MeshFilter>().sharedMesh = GroundMarks.FanFor(feel, 360f);
         disc = part.GetComponent<MeshRenderer>();
         disc.sharedMaterial = material;
         disc.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         disc.receiveShadows = false;
         block = new MaterialPropertyBlock();
+        GroundMarks.BindGround(transform.position);
+        // Hatched: harm no guard stops, as an unblockable strike's fill; stay out.
+        GroundMarks.Shape(block, 360f, 0f, 0.06f, GroundMarks.Pattern.Hatched, 0.6f);
         Paint(0f);
     }
 
@@ -376,7 +380,7 @@ public sealed class GroundHazard : MonoBehaviour
         float fade = Mathf.Clamp01((seconds - age) / 1f);
         Color now = shown;
         now.a *= grow * fade;
-        disc.transform.localScale = new Vector3(radius * Mathf.Lerp(0.5f, 1f, grow), 1f, radius * Mathf.Lerp(0.5f, 1f, grow));
+        disc.transform.localScale = GroundMarks.Scale(radius * Mathf.Lerp(0.5f, 1f, grow));
         block.SetColor(BaseColorId, now);
         block.SetColor(ColorId, now);
         disc.SetPropertyBlock(block);

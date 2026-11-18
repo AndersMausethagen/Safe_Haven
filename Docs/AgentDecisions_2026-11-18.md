@@ -220,3 +220,17 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   spruce was muffled); the reverb lets go when there is no player (the menu after dying in water played under water); the shore's
   band fades with distance from the water (it ended in a line 3 m out on gentle banks: seen fixed at the Valley river); the beds
   hold for cinematics and give way to speech as fast as the music.
+
+### Batch 3: warnings on the ground, readable without colour; fog for the eye; the boss stop
+- **Warnings lie on the ground (V1).** Every warning drawn on the ground (a strike's area and fill, the heavy edge, the opening ring,
+  a lob's landing, hazards, the Hunter's Mark, the backstab zone) is projected onto whatever is under it, so it follows a slope or a
+  step instead of clipping into the ground or floating over a hollow. A bright rim, a fill dim at its middle and glowing at its front,
+  a flash as the hit lands. Characters and tall rocks inside it are left clean. Seen in a launched Valley: a troll's swipe on the
+  slope by the river and its charge lane running behind the player's legs.
+- **Kind without colour (A3, U5).** A solid rim is an ordinary strike, a dashed rim one any blow breaks off, hatched one no guard stops
+  (unblockable fills and hazards). Colour still says it too.
+- **Options › Accessibility:** High-Contrast Warnings (off: wider, brighter rims with a dark line inside; seen) and Fog Amount
+  (40-100%, full by default): only the drawn fog and mist thin, creatures see through the fog as authored.
+- **Boss stop (V6).** The blow that fells a boss holds 0.45 s (other kills 0.12 s) under Hit Stop, and the picture streaks out from it
+  for 0.4 s under Screen Flashes; an elite felled by a heavy blow or a finisher gets half the streak. Not seen yet (no boss felled in a
+  probe); hosting co-op, time can't stop, so only the streak plays.

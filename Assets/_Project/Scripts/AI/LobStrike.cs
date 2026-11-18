@@ -53,11 +53,14 @@ public sealed class LobStrike : MonoBehaviour
         startedAt = Time.time;
         CombatFeelSettings feel = CombatFeelSettings.Current;
         float radius = action.attack.Range;
-        if (feel.TelegraphMaterial != null)
+        if (GroundMarks.MaterialFor(feel) != null)
         {
+            GroundMarks.BindGround(transform.position);
             Color fillColor = action.attack.Unblockable ? feel.UnblockableColor : feel.TelegraphFillColor;
-            Part("Area", feel, feel.TelegraphAreaColor, 0.06f, radius);
-            fillRenderer = Part("Fill", feel, fillColor, 0.07f, radius);
+            Part("Area", feel, feel.TelegraphAreaColor, 0.06f, radius, GroundMarks.Pattern.Solid, 0.07f, 0.5f, 0f);
+            fillRenderer = Part("Fill", feel, fillColor, 0.07f, radius,
+                action.attack.Unblockable ? GroundMarks.Pattern.Hatched : GroundMarks.Pattern.Solid, 0f, 0.25f, 1f);
+            fillRenderer.sortingOrder = 1;
             fill = fillRenderer.transform;
             block = new MaterialPropertyBlock();
         }
@@ -80,18 +83,20 @@ public sealed class LobStrike : MonoBehaviour
         }
     }
 
-    private Renderer Part(string partName, CombatFeelSettings feel, Color color, float height, float radius)
+    private Renderer Part(string partName, CombatFeelSettings feel, Color color, float height, float radius, GroundMarks.Pattern pattern,
+        float rim, float gradient, float front)
     {
         var part = new GameObject(partName, typeof(MeshFilter), typeof(MeshRenderer));
         part.transform.SetParent(transform, false);
         part.transform.localPosition = Vector3.up * height;
-        part.transform.localScale = new Vector3(radius, 1f, radius);
-        part.GetComponent<MeshFilter>().sharedMesh = AttackTelegraph.FanFor(360f);
+        part.transform.localScale = GroundMarks.Scale(radius);
+        part.GetComponent<MeshFilter>().sharedMesh = GroundMarks.FanFor(feel, 360f);
         var renderer = part.GetComponent<MeshRenderer>();
-        renderer.sharedMaterial = feel.TelegraphMaterial;
+        renderer.sharedMaterial = GroundMarks.MaterialFor(feel);
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
         var colorBlock = new MaterialPropertyBlock();
+        GroundMarks.Shape(colorBlock, 360f, 0f, rim, pattern, gradient, front);
         colorBlock.SetColor(BaseColorId, color);
         colorBlock.SetColor(ColorId, color);
         renderer.SetPropertyBlock(colorBlock);

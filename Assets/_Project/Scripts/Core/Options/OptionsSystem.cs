@@ -30,6 +30,7 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
         DisplayOptions.Apply();
         GraphicsOptions.Apply();
         ApplyLook();
+        GroundMarks.SetHighContrast(GameOptions.HighContrastWarnings.On);
         GameOption.AnyChanged += OnChanged;
         Player.Spawned += ApplyAssists;
     }
@@ -89,6 +90,10 @@ public sealed class OptionsSystem : MonoBehaviour, IGameSystem
         else if (option == GameOptions.UiScale)
         {
             UIRoot.ApplyScaleEverywhere();
+        }
+        else if (option == GameOptions.HighContrastWarnings)
+        {
+            GroundMarks.SetHighContrast(option.On);
         }
         else if (option == GameOptions.VSync || option == GameOptions.FrameLimit)
         {

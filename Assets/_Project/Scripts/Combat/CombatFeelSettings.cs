@@ -23,6 +23,14 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0f)] private float hitStopWhenHurt = 0.06f;
     [Tooltip("Game speed during a hit stop. 0 freezes completely.")]
     [SerializeField, Range(0f, 1f)] private float hitStopTimeScale = 0.05f;
+    [Tooltip("The blow that fells a boss holds this long (\"boss stop\", Docs/LookAndFeelResearch_2026-11-18.md V6), at Boss Stop Speed: " +
+             "the moment the fight was for. Under Options › Hit Stop.")]
+    [SerializeField, Min(0f)] private float bossStopSeconds = 0.45f;
+    [SerializeField, Range(0f, 1f)] private float bossStopTimeScale = 0.03f;
+    [Tooltip("The picture streaks out from a boss's killing blow (a share of the screen at its strongest; ImpactBlurFeature), easing out " +
+             "over Impact Blur Seconds. Half as much on an elite felled by a heavy blow or a finisher. Under Options › Screen Flashes. 0: none.")]
+    [SerializeField, Range(0f, 0.2f)] private float impactBlurStrength = 0.06f;
+    [SerializeField, Min(0f)] private float impactBlurSeconds = 0.4f;
     [Tooltip("Metres the struck body shudders side to side for the hit stop (times the blow's weight), shrinking as it ends. Hosting " +
              "co-op, where time can't stop for everyone, the struck body's animation holds still instead and the attacker's slows. 0: no shudder.")]
     [SerializeField, Range(0f, 0.2f)] private float victimShake = 0.045f;
@@ -77,6 +85,10 @@ public sealed class CombatFeelSettings : ScriptableObject
     [Header("Attack telegraphs")]
     [Tooltip("Transparent unlit material for the ground markers. Its color is replaced by the colors below.")]
     [SerializeField] private Material telegraphMaterial;
+    [Tooltip("The warnings drawn on the ground itself (Shaders/GroundTelegraph.shader, GroundMarks): a strike's area and fill, a lob's " +
+             "landing, a hazard, the opening ring, the Hunter's Mark and the backstab zone lie over slopes and steps, with a bright rim, a " +
+             "gradient and a pattern per kind. Empty: the flat fans drawn with Telegraph Material.")]
+    [SerializeField] private Material groundMarkMaterial;
     [Tooltip("The full area the attack will hit.")]
     [SerializeField] private Color telegraphAreaColor = new Color(1f, 0.25f, 0.15f, 0.18f);
     [Tooltip("Grows over the area as the attack winds up; when it fills the area, the hit lands.")]
@@ -294,6 +306,10 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float HitStopOnKill => hitStopOnKill;
     public float HitStopWhenHurt => hitStopWhenHurt;
     public float HitStopTimeScale => hitStopTimeScale;
+    public float BossStopSeconds => bossStopSeconds;
+    public float BossStopTimeScale => bossStopTimeScale;
+    public float ImpactBlurStrength => impactBlurStrength;
+    public float ImpactBlurSeconds => impactBlurSeconds;
     public float ShakeOnHit => shakeOnHit;
     public float ShakeOnCrit => shakeOnCrit;
     public float ShakeOnKill => shakeOnKill;
@@ -319,6 +335,7 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float KnockbackDistanceCrit => knockbackDistanceCrit;
     public float KnockbackSeconds => knockbackSeconds;
     public Material TelegraphMaterial => telegraphMaterial;
+    public Material GroundMarkMaterial => groundMarkMaterial;
     public Color TelegraphAreaColor => telegraphAreaColor;
     public Color TelegraphFillColor => telegraphFillColor;
     public float TelegraphLinger => telegraphLinger;

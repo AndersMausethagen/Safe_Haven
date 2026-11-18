@@ -45,6 +45,10 @@ public sealed class AttackTelegraph : MonoBehaviour
     private MeshFilter fillFilter;
     private MeshRenderer fillRenderer;
     private MaterialPropertyBlock block;
+    private MeshRenderer areaRenderer;
+    private MaterialPropertyBlock areaBlock;
+    private MeshRenderer edgeRenderer;
+    private MaterialPropertyBlock edgeBlock;
     private AttackDefinition attack;
     private float startTime;
     private float hideAt = -1f;
@@ -120,13 +124,20 @@ public sealed class AttackTelegraph : MonoBehaviour
         startTime = Time.time;
         hideAt = -1f;
         cued = false;
-        areaFilter.sharedMesh = fillFilter.sharedMesh = FanFor(attack.Arc);
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        areaFilter.sharedMesh = fillFilter.sharedMesh = GroundMarks.FanFor(feel, attack.Arc);
         float range = ai.ActiveAction != null && ai.ActiveAction.kind == MonsterAttackKind.Charge
             ? ai.ActiveAction.chargeDistance : attack.Range;
-        marker.localScale = Vector3.one * range;
+        // y stays 1: a projected mark's reach up and down is in metres (the flat fans don't care).
+        marker.localScale = GroundMarks.Scale(range);
+        GroundMarks.BindGround(transform.position);
         marker.gameObject.SetActive(true);
         // The AI's own rule (an Unyielding elite's strikes break off for nothing until its layer breaks, whatever the strike allows).
         interruptible = ai.AnyBlowBreaksStrike;
+        // Its kind without its colour: a dashed rim for a strike any blow breaks off, a hatched fill for one no guard stops.
+        GroundMarks.Shape(areaBlock, attack.Arc, 0f, 0.07f, interruptible ? GroundMarks.Pattern.Dashed : GroundMarks.Pattern.Solid, 0.5f);
+        areaRenderer.SetPropertyBlock(areaBlock);
+        GroundMarks.Shape(block, attack.Arc, 0f, 0f, attack.Unblockable ? GroundMarks.Pattern.Hatched : GroundMarks.Pattern.Solid, 0.25f, 1f);
         // A shot leaves the hand and a charge starts its rush at Hit Delay: contact comes later, by the flight or the run, so the
         // moment before Hit Delay is no time to parry them (a guard raised on that cue blocks instead).
         cuesParry = ai.ActiveAction == null || (ai.ActiveAction.kind != MonsterAttackKind.Charge && !MonsterAttacks.IsRanged(ai.ActiveAction.kind));
@@ -147,7 +158,9 @@ public sealed class AttackTelegraph : MonoBehaviour
             return;
         }
 
-        edgeFilter.sharedMesh = BandFor(attack.Arc, feel.HeavyEdgeWidth);
+        edgeFilter.sharedMesh = GroundMarks.BandFor(feel, attack.Arc, feel.HeavyEdgeWidth);
+        GroundMarks.Shape(edgeBlock, attack.Arc, 1f - feel.HeavyEdgeWidth, 0f, GroundMarks.Pattern.Solid, 0f);
+        edgeRenderer.SetPropertyBlock(edgeBlock);
         if (feel.HeavyWindupSound != null)
         {
             AudioManager.Play(feel.HeavyWindupSound, transform.position);
@@ -236,6 +249,9 @@ public sealed class AttackTelegraph : MonoBehaviour
             color.a = Mathf.Min(1f, color.a * 1.8f);
         }
 
+        // The hit lands: a flash over the filled area, fading over the linger.
+        float linger = feel.TelegraphLinger;
+        GroundMarks.Flash(block, progress >= 1f && hideAt >= 0f ? (linger > 0f ? (hideAt - Time.time) / linger : 1f) : 0f);
         block.SetColor(BaseColorId, color);
         block.SetColor(ColorId, color);
         fillRenderer.SetPropertyBlock(block);
@@ -258,7 +274,7 @@ public sealed class AttackTelegraph : MonoBehaviour
         }
 
         CombatFeelSettings feel = CombatFeelSettings.Current;
-        if (feel.TelegraphMaterial == null)
+        if (GroundMarks.MaterialFor(feel) == null)
         {
             if (!warnedNoMaterial)
             {
@@ -272,13 +288,15 @@ public sealed class AttackTelegraph : MonoBehaviour
         // Kept out of the monster's hierarchy so the monster's scale can't change the marker's size.
         marker = new GameObject($"{name} Attack Telegraph").transform;
         block = new MaterialPropertyBlock();
-        areaFilter = CreatePart("Area", marker, feel, feel.TelegraphAreaColor, out _);
-        fillFilter = CreatePart("Fill", marker, feel, feel.TelegraphFillColor, out fillRenderer);
+        areaFilter = CreatePart("Area", marker, feel, feel.TelegraphAreaColor, out areaRenderer, out areaBlock);
+        fillFilter = CreatePart("Fill", marker, feel, feel.TelegraphFillColor, out fillRenderer, out _);
         fill = fillFilter.transform;
-        // Slightly above the area so the two never fight over the same pixels.
+        // Slightly above the area so the two never fight over the same pixels, and drawn after it.
         fill.localPosition = Vector3.up * 0.01f;
-        edgeFilter = CreatePart("Heavy Edge", marker, feel, feel.HeavyEdgeColor, out _);
+        fillRenderer.sortingOrder = 1;
+        edgeFilter = CreatePart("Heavy Edge", marker, feel, feel.HeavyEdgeColor, out edgeRenderer, out edgeBlock);
         edgeFilter.transform.localPosition = Vector3.up * 0.02f;
+        edgeRenderer.sortingOrder = 2;
         edgeFilter.gameObject.SetActive(false);
         marker.gameObject.SetActive(false);
         return true;
@@ -302,7 +320,8 @@ public sealed class AttackTelegraph : MonoBehaviour
         CombatFeelSettings feel = CombatFeelSettings.Current;
         if (opening == null)
         {
-            if (feel.TelegraphMaterial == null)
+            Material material = GroundMarks.MaterialFor(feel);
+            if (material == null)
             {
                 return;
             }
@@ -310,18 +329,21 @@ public sealed class AttackTelegraph : MonoBehaviour
             opening = new GameObject($"{name} Opening").transform;
             var filter = opening.gameObject.AddComponent<MeshFilter>();
             openingRenderer = opening.gameObject.AddComponent<MeshRenderer>();
-            openingRenderer.sharedMaterial = feel.TelegraphMaterial;
+            openingRenderer.sharedMaterial = material;
             openingRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             openingRenderer.receiveShadows = false;
             openingBlock = new MaterialPropertyBlock();
             // Opening Width wide at its widest; it narrows a little with the ring as it closes.
-            filter.sharedMesh = BandFor(360f, feel.OpeningWidth / (bodyRadius + feel.OpeningWidth + feel.OpeningReach));
+            float width = feel.OpeningWidth / (bodyRadius + feel.OpeningWidth + feel.OpeningReach);
+            filter.sharedMesh = GroundMarks.BandFor(feel, 360f, width);
+            GroundMarks.Shape(openingBlock, 360f, 1f - width, 0.04f, GroundMarks.Pattern.Solid, 0f);
         }
 
         float share = Mathf.Clamp01(left / length);
         float radius = bodyRadius + feel.OpeningWidth + feel.OpeningReach * share;
+        GroundMarks.BindGround(transform.position);
         opening.SetPositionAndRotation(transform.position + Vector3.up * (groundOffset + 0.005f), Quaternion.identity);
-        opening.localScale = Vector3.one * radius;
+        opening.localScale = GroundMarks.Scale(radius);
         Color color = feel.OpeningColor;
         color.a *= Mathf.Lerp(0.35f, 1f, share);
         openingBlock.SetColor(BaseColorId, color);
@@ -333,16 +355,17 @@ public sealed class AttackTelegraph : MonoBehaviour
         }
     }
 
-    private MeshFilter CreatePart(string partName, Transform parent, CombatFeelSettings feel, Color color, out MeshRenderer meshRenderer)
+    private MeshFilter CreatePart(string partName, Transform parent, CombatFeelSettings feel, Color color, out MeshRenderer meshRenderer,
+        out MaterialPropertyBlock colorBlock)
     {
         var part = new GameObject(partName);
         part.transform.SetParent(parent, false);
         var filter = part.AddComponent<MeshFilter>();
         meshRenderer = part.AddComponent<MeshRenderer>();
-        meshRenderer.sharedMaterial = feel.TelegraphMaterial;
+        meshRenderer.sharedMaterial = GroundMarks.MaterialFor(feel);
         meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         meshRenderer.receiveShadows = false;
-        var colorBlock = new MaterialPropertyBlock();
+        colorBlock = new MaterialPropertyBlock();
         colorBlock.SetColor(BaseColorId, color);
         colorBlock.SetColor(ColorId, color);
         meshRenderer.SetPropertyBlock(colorBlock);

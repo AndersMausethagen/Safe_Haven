@@ -62,22 +62,27 @@ public sealed partial class MonsterAI
         bool marked = IsMarked;
         if (marked && markRing == null)
         {
-            Material material = CombatFeelSettings.Current.TelegraphMaterial;
+            CombatFeelSettings feel = CombatFeelSettings.Current;
+            Material material = GroundMarks.MaterialFor(feel);
             if (material == null)
             {
                 return;
             }
 
+            GroundMarks.BindGround(transform.position);
             markRing = new GameObject("Hunter's Mark");
             markRing.transform.SetParent(transform, false);
             markRing.transform.localPosition = Vector3.up * 0.08f;
             float radius = TryGetComponent(out UnityEngine.AI.NavMeshAgent agent) ? agent.radius + 0.25f : 0.8f;
-            markRing.transform.localScale = Vector3.one * radius / Mathf.Max(0.1f, transform.lossyScale.x);
-            markRing.AddComponent<MeshFilter>().sharedMesh = AttackTelegraph.BandFor(360f, 0.08f);
+            // Its radius across and 1 up whatever the creature's own scale (a projected mark reaches up and down in metres).
+            Vector3 scale = transform.lossyScale;
+            markRing.transform.localScale = new Vector3(radius / Mathf.Max(0.1f, scale.x), 1f / Mathf.Max(0.1f, scale.y), radius / Mathf.Max(0.1f, scale.z));
+            markRing.AddComponent<MeshFilter>().sharedMesh = GroundMarks.BandFor(feel, 360f, 0.08f);
             var renderer = markRing.AddComponent<MeshRenderer>();
             renderer.sharedMaterial = material;
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             var block = new MaterialPropertyBlock();
+            GroundMarks.Shape(block, 360f, 0.92f, 0f, GroundMarks.Pattern.Solid, 0f);
             block.SetColor("_BaseColor", CombatFeelSettings.Current.HuntersMarkColor);
             block.SetColor("_Color", CombatFeelSettings.Current.HuntersMarkColor);
             renderer.SetPropertyBlock(block);

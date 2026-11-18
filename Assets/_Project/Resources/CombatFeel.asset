@@ -40,6 +40,7 @@ MonoBehaviour:
   highGroundPerMetre: 0.03
   highGroundMost: 0.25
   telegraphMaterial: {fileID: 2100000, guid: f9bd178c025c9844d939f9ad1a38402f, type: 2}
+  groundMarkMaterial: {fileID: 2100000, guid: 7c9219c74b1d2254ca1a1038b52088c7, type: 2}
   telegraphAreaColor: {r: 1, g: 0.25, b: 0.15, a: 0.18}
   telegraphFillColor: {r: 1, g: 0.3, b: 0.1, a: 0.45}
   telegraphLinger: 0.1
@@ -57,6 +58,7 @@ MonoBehaviour:
   reelingSwayRate: 0.9
   reelingBarColor: {r: 1, g: 0.55, b: 0.15, a: 1}
   furyEffect: {fileID: 5697260504565289270, guid: ea417f5788ec80b4c9b4b074524ffb57, type: 3}
+  huntersMarkColor: {r: 0.55, g: 1, b: 0.75, a: 0.55}
   dodgeTrailColor:
     serializedVersion: 2
     key0: {r: 0.6, g: 0.85, b: 1, a: 0.55}

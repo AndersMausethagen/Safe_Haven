@@ -935,6 +935,9 @@ Content: `AgentScripts/BuildRaidLayout.cs`, then `AgentScripts/BuildRaidWater.cs
 
 Content: `AgentScripts/BuildRendering.cs`, `BuildWeatherSurfaces.cs`, `BuildDecals.cs` (textures from `Tools/Decals/decals.py`);
 numbers in `Resources/RenderingSettings`. `WorldRendering` (an `IGameSystem`) owns the runtime parts and re-binds them per scene.
+- **Impact blur.** `ImpactBlurFeature` (on PC_Renderer, after the tonemap): a radial blur out from a boss's killing blow
+  (`ImpactBlur.Play`, from `CombatFeedback` with the "boss stop", CombatFeel › Boss Stop and Impact Blur), enqueued only while one
+  plays; scaled by Options › Screen Flashes. Shader `Shaders/ImpactBlur.shader`.
 - **Tonemapping.** `FilmicTonemapping` (a volume override) with `TonemapFeature` after the Atmosphere feature: Khronos PBR Neutral
   or AgX before URP's post-processing, so a volume using it sets URP's Tonemapping to None and Bloom's threshold is in screen range.
   The Haven's base volume uses Neutral. Each raid's `RaidDefinition` › Look › Grade (`RaidGrade`) is applied by `RaidGradeVolume`, a
@@ -1450,6 +1453,16 @@ raid, spawn, world).
 - `CameraShake` is added to the scene's Cinemachine camera automatically. Other systems may call `CameraShake.Add` too.
 - `AttackTelegraph` (on monster prefabs) draws the attack's range and arc from its `AttackDefinition` and fills it
   over the wind-up (`HitDelay`); when it is full, the hit lands.
+- **Warnings on the ground** (`GroundMarks`, `Shaders/GroundTelegraph.shader`; Docs/LookAndFeelResearch_2026-11-18.md V1): a strike's
+  area, fill and heavy edge, a spent foe's opening ring, a lob's landing (`LobStrike`), a hazard (`GroundHazard`), the Hunter's Mark and
+  the backstab zone are each a box (`GroundMarks.Box`, x and z the radius, y ±2.5 m) whose shader reads the scene depth and paints the
+  shape onto the surface inside it, so it lies over slopes and steps. Steep surfaces fade out, and what stands more than half a metre
+  over the terrain under the mark (characters, tall rocks) never takes it (`GroundMarks.BindGround` binds that terrain's heightmap).
+  The shape rides on the property block (`GroundMarks.Shape`): arc, ring, rim in metres, gradient, a fill's glowing front, the hit's
+  flash, and a pattern so colour never carries the kind alone: solid rim (ordinary), dashed rim (any blow breaks it off), hatched
+  (no guard stops it: unblockable fills, hazards). Options › High-Contrast Warnings widens the rims with a dark line inside. Without
+  CombatFeel › Ground Mark Material, or on a pipeline with no depth texture, the flat fans of before (`AttackTelegraph.FanFor`/`BandFor`,
+  Telegraph Material) are drawn.
 - `PlayerDodge` dashes through `PlayerMovement.Dash`, makes the player's `Damageable` invulnerable for a moment
   (`AddInvulnerability` / `RemoveInvulnerability`, which can stack). A hit avoided this way raises `Damageable.Evaded`.
 - Effects, sounds and the rest of the feedback are listed under "Combat technique" below; see [combat](../../../Docs/Combat.md).

@@ -46,7 +46,8 @@ MonoBehaviour:
   - {fileID: 8954078253120216104}
   - {fileID: 5474396184367094398}
   - {fileID: 3167078257296711087}
-  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84baf9d0826e5b8f32bl
+  - {fileID: 36791788889593609}
+  m_RendererFeatureMap: ad6b866f10d7b46cf349261b85fd2fa128dc4700bb46437c7e5af43853f6f84baf9d0826e5b8f32b09576ae3efb58200l
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   m_AssetVersion: 3
@@ -75,6 +76,20 @@ MonoBehaviour:
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
   m_TileOnlyMode: 0
+--- !u!114 &36791788889593609
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae4c493e3d5de284983235d6664fef56, type: 3}
+  m_Name: Impact Blur
+  m_EditorClassIdentifier: SafeHaven::ImpactBlurFeature
+  m_Active: 1
+  shader: {fileID: 4800000, guid: f886ee3133dafe746be47aa20eaf526a, type: 3}
 --- !u!114 &3167078257296711087
 MonoBehaviour:
   m_ObjectHideFlags: 1

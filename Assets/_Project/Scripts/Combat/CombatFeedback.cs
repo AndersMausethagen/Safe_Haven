@@ -256,6 +256,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             }
 
             HitStop(stop);
+            if (result.Killed)
+            {
+                GreatBlow(victim, damage);
+            }
+
             CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
             // The struck body shudders through the moment; hosting co-op, time can't stop, so its animation holds and the swing slows.
             if (!result.Killed && GameOptions.HitStop.On)
@@ -267,6 +272,21 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                     HitShake.Slow(playerCombat.GetComponentInChildren<Animator>(), stop, 0.15f);
                 }
             }
+        }
+    }
+
+    // The "boss stop" (Docs/LookAndFeelResearch_2026-11-18.md V6): the blow that fells a boss holds far longer than any other and the
+    // picture streaks out from it; an elite felled by a heavy blow or a finisher gets half the streak and no longer hold.
+    private void GreatBlow(Damageable victim, in DamageInfo damage)
+    {
+        if (victim.TryGetComponent(out BossEncounter _))
+        {
+            SlowTime(feel.BossStopTimeScale, feel.BossStopSeconds);
+            ImpactBlur.Play(damage.HitPoint, feel.ImpactBlurStrength, feel.ImpactBlurSeconds);
+        }
+        else if ((damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher)) != 0 && victim.TryGetComponent(out MonsterAI felled) && felled.IsElite)
+        {
+            ImpactBlur.Play(damage.HitPoint, feel.ImpactBlurStrength * 0.5f, feel.ImpactBlurSeconds * 0.75f);
         }
     }
 

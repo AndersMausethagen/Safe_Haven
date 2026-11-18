@@ -160,7 +160,15 @@ public static class GameOptions
     public static readonly GameOption TimingHelp = GameOption.Choice("TimingHelp", "Parry and Dodge Timing",
         "How long the moment to parry lasts, and how long a dodge carries you through a blow.", 0, "Normal", "Longer", "Much Longer");
 
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, SkillBarSize, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp };
+    // Docs/LookAndFeelResearch_2026-11-18.md U5: warnings that read on any ground, and fog thinned for the eye only.
+    public static readonly GameOption HighContrastWarnings = GameOption.Toggle("HighContrastWarnings", "High-Contrast Warnings",
+        "Attack warnings and hazards on the ground get wider, brighter rims with a dark line inside, so they stand out on any ground.", false);
+    public static readonly GameOption FogAmount = GameOption.Slider("FogAmount", "Fog Amount",
+        "How thick the fog and mist look. Only what you see changes: creatures see through the fog as they always do.", 1f, 0.4f, 1f, 0.05f);
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, SkillBarSize, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp, HighContrastWarnings, FogAmount };
+
+    /// <summary>The share of the fog and mist that is drawn (Fog Amount): 0.4 to 1.</summary>
+    public static float FogShown => UnityEngine.Mathf.Clamp(FogAmount.Value, 0.4f, 1f);
 
     /// <summary>The share of a blow that reaches the player.</summary>
     public static float DamageTakenShare => DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;
