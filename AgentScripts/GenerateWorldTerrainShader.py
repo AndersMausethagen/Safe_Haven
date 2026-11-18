@@ -503,6 +503,8 @@ CALL = """
 #ifndef TERRAIN_SPLAT_BASEPASS
     WorldCliffs(IN, inputData, albedo, smoothness, metallic, occlusion);
 #endif
+    // The highlight spread where the normal turns within a pixel (SpecularAA.hlsl): no glitter on far rock; before the wet sheen.
+    smoothness = SpecularAntiAlias(smoothness, inputData.normalWS);
     half skySheen;
     WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
     WorldFrost(IN, albedo, smoothness);
@@ -656,7 +658,7 @@ def main():
     # Instancing is resolved once in the control vertex, before interpolation by the domain shader.
     passes = re.sub(r"    TerrainInstancing\([^;]+;\n", "", passes)
     anchor = passes.index("struct Varyings")
-    passes = passes[:anchor] + '#include "WorldTerrainDisplacement.hlsl"\n#include "Assets/_Project/Shaders/GroundLight.hlsl"\n\n' + passes[anchor:]
+    passes = passes[:anchor] + '#include "WorldTerrainDisplacement.hlsl"\n#include "Assets/_Project/Shaders/GroundLight.hlsl"\n#include "Assets/_Project/Shaders/SpecularAA.hlsl"\n\n' + passes[anchor:]
     anchor = passes.find("void InitializeInputData(")
     end = passes.find("\n}\n", anchor) + 3
     passes = passes[:end] + FUNCTIONS + passes[end:]

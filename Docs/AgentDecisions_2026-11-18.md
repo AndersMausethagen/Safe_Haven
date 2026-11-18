@@ -261,3 +261,11 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   afternoon sun throws a shadow far, so flights are now aimed so the shadow crosses the view, and the first shape read as a
   triangle and got long bent wings, a head and a tail); the Marsh's midge columns (too dark at first: they now catch the sun) and
   dragonflies (first drawn as a cyan bar, now lying flat). The Woods' motes and moths are not seen yet.
+
+### Batch 6: specular anti-aliasing (3.4)
+- **Rock highlights spread where the normal turns within a pixel** (`Shaders/SpecularAA.hlsl`, HDRP's variance 0.1 and threshold
+  0.2), on the terrain (generator) and Mesh Surface rocks, before wetness raises smoothness so wet rock keeps its sheen. A global
+  `_SafeHavenSpecularAAOff` (1) turns it off for comparisons.
+- Measured in a launched Valley at 15:00 with time frozen: it changes only the rock faces, slightly (mean 0.2 of 255). That dry
+  afternoon light hardly glitters to begin with, so the sparkle it is for (`g7_*` shots) was not reproduced; watch for it in a
+  wet or low-sun run.

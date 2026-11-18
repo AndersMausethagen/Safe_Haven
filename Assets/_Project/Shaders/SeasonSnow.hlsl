@@ -68,6 +68,10 @@ half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
         // A raid's light thrown back from sunlit ground near by (GroundLight.hlsl; none elsewhere).
         inputData.bakedGI += GroundLightBounce(inputData.positionWS, inputData.normalWS);
     #endif
+    #if defined(SAFE_HAVEN_SPECULAR_AA_INCLUDED)
+        // The highlight spread where the normal turns within a pixel (SpecularAA.hlsl), before wetness raises the smoothness.
+        surfaceData.smoothness = SpecularAntiAlias(surfaceData.smoothness, inputData.normalWS);
+    #endif
     #if defined(SAFE_HAVEN_GROUND_BLEND_INCLUDED)
         // A rock's foot in the ground's colour, a contact band and a shore's wetness (GroundBlend.hlsl: MeshSurface's forward pass).
         GroundBlend(surfaceData.albedo, surfaceData.smoothness, surfaceData.occlusion, inputData.positionWS);

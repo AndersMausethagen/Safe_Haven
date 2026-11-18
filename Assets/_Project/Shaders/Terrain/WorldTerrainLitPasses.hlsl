@@ -18,6 +18,7 @@ struct Attributes
 
 #include "WorldTerrainDisplacement.hlsl"
 #include "Assets/_Project/Shaders/GroundLight.hlsl"
+#include "Assets/_Project/Shaders/SpecularAA.hlsl"
 
 struct Varyings
 {
@@ -893,6 +894,8 @@ void SplatmapFragment(
 #ifndef TERRAIN_SPLAT_BASEPASS
     WorldCliffs(IN, inputData, albedo, smoothness, metallic, occlusion);
 #endif
+    // The highlight spread where the normal turns within a pixel (SpecularAA.hlsl): no glitter on far rock; before the wet sheen.
+    smoothness = SpecularAntiAlias(smoothness, inputData.normalWS);
     half skySheen;
     WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
     WorldFrost(IN, albedo, smoothness);
