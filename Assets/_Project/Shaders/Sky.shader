@@ -13,6 +13,8 @@ Shader "Safe Haven/Sky"
         _DayZenith ("Day Zenith", Color) = (0.22, 0.42, 0.78, 1)
         _DayHorizon ("Day Horizon", Color) = (0.68, 0.79, 0.9, 1)
         _DayBrightness ("Day Brightness", Range(0, 4)) = 1.35
+        _PhysicalSky ("Physical Sky (0 the colours above, 1 the atmosphere's own)", Range(0, 1)) = 0.6
+        _PhysicalExposure ("Physical Sky Exposure", Range(0.1, 20)) = 3
         _SunsetColour ("Sunset Glow", Color) = (1.0, 0.45, 0.18, 1)
         _SunsetStrength ("Sunset Strength", Range(0, 4)) = 1.6
         _SunSize ("Sun Size (degrees)", Range(0.2, 5)) = 1.4
@@ -59,6 +61,7 @@ Shader "Safe Haven/Sky"
                 half4 _CloudLit, _CloudShade, _OvercastColour, _StormColour, _LightningColour, _GroundColour;
                 float _DayBrightness, _SunsetStrength, _SunSize, _SunGlow, _SunDisc, _StarDensity, _StarBrightness, _GalaxyBrightness;
                 float _MoonBrightness, _MoonSize, _CloudScale, _CloudSoftness, _HorizonFog;
+                float _PhysicalSky, _PhysicalExposure;
             CBUFFER_END
 
             // SkyDome: toward the sun and moon (below the horizon when down), the moon's phase (0 new, 0.5 full).
@@ -95,6 +98,80 @@ Shader "Safe Haven/Sky"
                 p = frac(p * float3(0.1031, 0.1030, 0.0973));
                 p += dot(p, p.yxz + 33.33);
                 return frac((p.xxy + p.yxx) * p.zyx);
+            }
+
+            // The atmosphere's own light (Docs/LookAndFeelResearch_2026-11-18.md L2): single scattering of the sun's light by the air
+            // (Rayleigh: blue overhead, the horizon paler, the low sun's light reddened through the long path) and by haze (Mie: the bright
+            // glow round the sun), marched through a planet's atmosphere: 12 steps along the view and 6 toward the sun. Written from the
+            // textbook model (Nishita 1993; the constants as Bruneton's), not from any published shader. Units of the sun's light: the
+            // exposure brings it to the authored gradient's range. Only sky pixels pay it (the top-down camera sees little of them; the
+            // reflection probe and the cinematics see more).
+            #define SKY_EARTH 6360e3
+            #define SKY_TOP 6420e3
+            static const float3 SkyRayleigh = float3(5.8e-6, 13.5e-6, 33.1e-6);
+            static const float SkyMie = 21e-6;
+            static const float SkyRayleighHeight = 7994.0;
+            static const float SkyMieHeight = 1200.0;
+            static const float SkyMieG = 0.76;
+
+            // Where a ray from inside a sphere of this radius (round the planet's centre) leaves it.
+            float SkyExit(float3 origin, float3 direction, float radius)
+            {
+                float b = dot(origin, direction);
+                float c = dot(origin, origin) - radius * radius;
+                float d = b * b - c;
+                return d < 0.0 ? 0.0 : -b + sqrt(d);
+            }
+
+            half3 Atmosphere(float3 direction, float3 sun)
+            {
+                float3 origin = float3(0.0, SKY_EARTH + 2.0, 0.0);
+                // Below the horizon the view is cut at the ground; the sky just above it is what the horizon shows.
+                direction = normalize(float3(direction.x, max(direction.y, 0.002), direction.z));
+                float length_ = SkyExit(origin, direction, SKY_TOP);
+                float step = length_ / 12.0;
+                float3 rayleigh = 0, mie = 0;
+                float depthR = 0, depthM = 0;
+                [loop] for (int i = 0; i < 12; i++)
+                {
+                    float3 p = origin + direction * (step * (i + 0.5));
+                    float h = length(p) - SKY_EARTH;
+                    float densityR = exp(-h / SkyRayleighHeight) * step;
+                    float densityM = exp(-h / SkyMieHeight) * step;
+                    depthR += densityR;
+                    depthM += densityM;
+                    // Toward the sun: how much air its light came through to reach here (none at all when the planet is in the way).
+                    float lightLength = SkyExit(p, sun, SKY_TOP);
+                    float lightStep = lightLength / 6.0;
+                    float lightR = 0, lightM = 0;
+                    bool blocked = false;
+                    [loop] for (int j = 0; j < 6; j++)
+                    {
+                        float3 q = p + sun * (lightStep * (j + 0.5));
+                        float hq = length(q) - SKY_EARTH;
+                        if (hq < 0.0)
+                        {
+                            blocked = true;
+                            break;
+                        }
+
+                        lightR += exp(-hq / SkyRayleighHeight) * lightStep;
+                        lightM += exp(-hq / SkyMieHeight) * lightStep;
+                    }
+
+                    if (!blocked)
+                    {
+                        float3 through = exp(-(SkyRayleigh * (depthR + lightR) + SkyMie * 1.1 * (depthM + lightM)));
+                        rayleigh += through * densityR;
+                        mie += through * densityM;
+                    }
+                }
+
+                float mu = dot(direction, sun);
+                float phaseR = 3.0 / (16.0 * PI) * (1.0 + mu * mu);
+                float g2 = SkyMieG * SkyMieG;
+                float phaseM = 3.0 / (8.0 * PI) * ((1.0 - g2) * (1.0 + mu * mu)) / ((2.0 + g2) * pow(max(1.0 + g2 - 2.0 * SkyMieG * mu, 1e-4), 1.5));
+                return (half3)((rayleigh * SkyRayleigh * phaseR + mie * SkyMie * phaseM) * _PhysicalExposure);
             }
 
             // Points of light: one chance in a few cells holds a star, of its own brightness and twinkle.
@@ -161,12 +238,20 @@ Shader "Safe Haven/Sky"
 
                 // The gradient, day and night, and the glow round a low sun.
                 half3 day = lerp(_DayHorizon.rgb, _DayZenith.rgb, pow(height, 0.45)) * _DayBrightness;
+                // The atmosphere's own colours blended in: a low sun's light reddens through the air by itself, the haze glows round it.
+                half physical = _PhysicalSky * smoothstep(-0.12, 0.02, sun.y);
+                UNITY_BRANCH if (physical > 0.001)
+                {
+                    day = lerp(day, Atmosphere(direction, sun) * _DayBrightness, physical);
+                }
+
                 half3 dark = lerp(_NightHorizon.rgb, _NightZenith.rgb, pow(height, 0.6));
                 half3 sky = lerp(dark, day, daylight);
                 float towardSun = saturate(dot(direction, sun) * 0.5 + 0.5);
                 float lowSun = (1.0 - saturate(abs(sun.y) / 0.4)) * smoothstep(-0.3, 0.0, sun.y);
                 float glow = max(_SkyState.z, lowSun);
-                sky += _SunsetColour.rgb * _SunsetStrength * glow * pow(towardSun, 4.0) * pow(1.0 - height, 3.0);
+                // The painted sunset glow gives way to the atmosphere's as much as the atmosphere is used (both would double it).
+                sky += _SunsetColour.rgb * _SunsetStrength * glow * pow(towardSun, 4.0) * pow(1.0 - height, 3.0) * (1.0 - physical * 0.75);
                 sky = lerp(sky, sky * lerp(1.0, 0.55, glow), saturate(1.0 - towardSun) * glow * 0.6); // the far side dims
 
                 // Night: stars and the galaxy, faint at dusk.

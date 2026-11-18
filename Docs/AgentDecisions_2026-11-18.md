@@ -408,3 +408,12 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   plops in the morning lake, and the Woods' air life. No ground light field there: it has two terrains and the field covers one.
 - **Not done:** new MOSS beds made for the Haven: making them needs the Editor closed (the model takes 11 GB) and closing it was refused
   this time. The prompts are in `Tools/Audio/biome_moss.py` (haven_bed_day, haven_bed_night) for when you allow it.
+
+### The sky (L2)
+- **The atmosphere's own light blended into the sky** (Sky › Physical Sky 0.6, Exposure 3): single scattering by the air and haze
+  marched through a planet's atmosphere per sky pixel (the textbook model; no published shader used), so dawn and dusk are a deep
+  blue above with the warmth on the horizon toward the sun (the authored gradient had washed the whole sky lilac-pink), and noon has
+  a darker zenith over a paler horizon. The painted sunset glow gives way to it as much as it is used; night, stars and the moon are
+  as they were. One material for every scene. Seen in the Haven at 07:00, 12:00 and 19:00, authored against blended.
+- The ambient light and the per-raid grades are unchanged (the research's "feed DayNightCycle's ambient probe" would retune every
+  scene's light: not done).

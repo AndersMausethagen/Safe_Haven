@@ -136,4 +136,14 @@ public sealed class GroundMarksTests
         CollectionAssert.Contains(GameOptions.Graphics, GameOptions.ContactShadows);
         Assert.AreEqual(1f, GameOptions.ContactShadows.Default, "on by default: the game as designed");
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md L2: the sky blends in the atmosphere's own light, and compiles.
+    [Test]
+    public void TheSkyBlendsInTheAtmosphere()
+    {
+        var sky = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Settings/Rendering/Sky.mat");
+        Assert.IsFalse(ShaderUtil.ShaderHasError(sky.shader));
+        Assert.That(sky.GetFloat("_PhysicalSky"), Is.InRange(0.3f, 0.9f), "the authored colours keep a say");
+        Assert.Greater(sky.GetFloat("_PhysicalExposure"), 0f);
+    }
 }

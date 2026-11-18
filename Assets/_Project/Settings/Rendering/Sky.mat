@@ -32,6 +32,8 @@ Material:
     - _HorizonFog: 0.75
     - _MoonBrightness: 2.2
     - _MoonSize: 3.2
+    - _PhysicalExposure: 3
+    - _PhysicalSky: 0.6
     - _StarBrightness: 6
     - _StarDensity: 170
     - _SunDisc: 2
