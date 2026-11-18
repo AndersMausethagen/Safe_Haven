@@ -233,6 +233,8 @@ public sealed class CinematicScreen : MonoBehaviour
         source.spatialBlend = 0f;
         // The game is paused while this plays, and a paused game hushes the world's sounds.
         source.ignoreListenerPause = true;
+        // Its own mix: never in the place's reverb (AudioSpace).
+        source.bypassReverbZones = true;
         return source;
     }
 

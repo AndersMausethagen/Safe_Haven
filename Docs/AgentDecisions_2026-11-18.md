@@ -180,3 +180,43 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - **Dark plants:** measured: not dark textures and no black fringes (the textures are dilated); in the new afternoon light they read
   dark green, their rims are their own shadows (sharper with the cascades). No data change.
 - **The unused legacy Post Processing package** is removed (nothing used it).
+
+### Batch 2: the place's sound, wet shores, rocks sitting in the ground, bed ledges
+- **Each raid sounds like its own place (A1).** MOSS-SoundEffect v2 (LocalSpawn's foley model) made the sounds, `Tools/Audio/biome_moss.py`
+  (prompts, generation, then loops, cuts and steps in Python; rerun with `--process` only to redo the cutting). A bed for day and one
+  for night per biome, each from two takes panned left and right for a real stereo field and crossfaded to loop: the Woods' wind high
+  in the spruce, the Valley's breeze over stone with the river far below, the Marsh's midges and reeds by day and its frogs by night.
+  `AmbienceBed` (Audio) fades its layers by the hour and the rain (insects and frogs go quiet in rain). It replaces the old Scene Music
+  ambience track in the three raids and both arenas (Brukam's Bridge has the Valley's beds, Guardian's Hollow the Woods'). Two takes
+  (a creak and a woodpecker) were thrown out: they held a pure tone.
+- **Sounds from where they belong.** `PlacedAmbience` gains the nearest cliff (scree trickling, a raven off the wall) and trees (a
+  woodpecker, a trunk creaking, an owl at night) beside the still water it had (a bittern, a plop, bubbles in the Marsh). The Marsh's
+  fen is one sheet of water laid under the whole map, so a still-water sound comes from the nearest place its water shows, never
+  from under your feet.
+- **Foley.** Footsteps in mud, bog and peat and on gravel, scree and shingle (`AudioSettings` footstep surfaces, by the ground's
+  layer name); walking through reeds, sedge, horsetail, ferns, bushes, tall grass or cotton grass rustles (`Plant Rustle`, two or more
+  such plants under the foot).
+- **The space a sound is heard in (A2-A4), with no mixer.** One reverb zone rides on the listener: the raid's place (Woods Forest,
+  Valley Mountains, Marsh Plain, Brukam's gorge Quarry, the Hollow Forest), kept low under the sound; a room under a roof; muffled
+  while swimming. Every effect voice now gets a low-pass that closes with distance (far is dull, near bright), further and 4 dB
+  quieter when the ground or a building stands between it and the ears: a troll behind the ridge sounds behind it. Music, beds and
+  the interface are untouched.
+- **Wet shores (4.6).** A band a hand's breadth above every pond, pool and river is darker and glossier on the terrain and on rocks.
+  The ground light field holds the nearest water as metres above or below its own ground (6 cm steps; over the map's heights a byte
+  stepped 20 cm). Seen at the Valley river: the band follows both banks, wide on the gentle one, narrow under the steep one.
+- **Rocks sit in the ground (4.3).** A rock's or log's foot takes the ground's colour, a little darker (damp soil), with a contact
+  shadow. It reads the terrain's own 16-bit heightmap: the first try read the light field's byte heights, which on a bank were a
+  metre off and tinted whole rocks. The band is a quarter of how far the thing stands out of the ground, up to 30 cm, so pebbles
+  keep their read (a fixed band hid them from the game camera).
+- **Bed ledges.** The layered rock's beds are tessellated out near the player (Bed Ledges, now 0.2 m; a material sets 0 to turn
+  them off). The first version jumped out at each bed line and streaked the rock down the riser; now each bed ramps back out over
+  its top 30% and the texture stretches 1.3 times at most, only on undersides the game camera never sees. Seen close up and from
+  the game camera: soft stepped beds, no streaks.
+- **Unheard by you:** all of the sound above. The beds play at the scenes' levels (checked in a launched Valley: day 0.75, night 0;
+  the reverb in place).
+- **Fixed after the code review (one subagent, read-only):** music, beds, voices, the interface and cinematics bypass the place's
+  reverb (Unity sends every source into its one reverb unless it bypasses it: swimming had put the music under water); a tree's trunk
+  no longer counts as the ground between a sound and you (Unity reports a trunk as the terrain's collider, so every sound behind a
+  spruce was muffled); the reverb lets go when there is no player (the menu after dying in water played under water); the shore's
+  band fades with distance from the water (it ended in a line 3 m out on gentle banks: seen fixed at the Valley river); the beds
+  hold for cinematics and give way to speech as fast as the music.

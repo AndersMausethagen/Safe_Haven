@@ -181,12 +181,87 @@ public sealed class PlayerAudio : MonoBehaviour
         Vector3 position = foot != null ? foot.position : transform.position;
         AudioManager.Play(SurfaceSound(position), position);
         water?.SplashFootstep(position);
+        Rustle(position);
         if (movement != null && movement.IsGrounded && !movement.IsDashing && movement.HorizontalSpeed >= MinimumMovingSpeed)
         {
             fallbackLeft = !fallbackLeft;
             Vector3 plantedAt = foot != null ? position : position + transform.right * (fallbackLeft ? -0.1f : 0.1f);
             FootPlanted?.Invoke(plantedAt, transform.forward);
         }
+    }
+
+    // Foley (Docs/LookAndFeelResearch_2026-11-18.md A1): tall plants brush the legs with the step, in the reeds and the ferns.
+    private void Rustle(Vector3 position)
+    {
+        AudioSettingsDefinition sounds = AudioManager.Sounds;
+        if (sounds == null || sounds.PlantRustle == null || (movement != null && movement.HorizontalSpeed < MinimumMovingSpeed))
+        {
+            return;
+        }
+
+        if (Physics.Raycast(position + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 2f, ~0, QueryTriggerInteraction.Ignore)
+            && hit.collider is TerrainCollider && hit.collider.TryGetComponent(out Terrain terrain)
+            && PlantsUnder(terrain, hit.point, sounds.RustlingPlants) >= sounds.RustleFrom)
+        {
+            AudioManager.Play(sounds.PlantRustle, position + Vector3.up * 0.5f);
+        }
+    }
+
+    // The detail prototypes whose names hold one of the words, cached per terrain data (its prototypes are read once).
+    private static TerrainData rustleData;
+    private static string rustleWords;
+    private static bool[] rustling;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetRustle()
+    {
+        rustleData = null;
+        rustleWords = null;
+        rustling = null;
+    }
+
+    /// <summary>How many detail plants whose prototype names hold one of <paramref name="words"/> (comma separated) grow in the cell at <paramref name="point"/>.</summary>
+    public static int PlantsUnder(Terrain terrain, Vector3 point, string words)
+    {
+        TerrainData data = terrain.terrainData;
+        if (data == null || data.detailResolution <= 0 || string.IsNullOrWhiteSpace(words))
+        {
+            return 0;
+        }
+
+        if (rustleData != data || rustleWords != words || rustling == null)
+        {
+            DetailPrototype[] prototypes = data.detailPrototypes;
+            string[] wanted = words.Split(',');
+            rustling = new bool[prototypes.Length];
+            for (int i = 0; i < prototypes.Length; i++)
+            {
+                string name = prototypes[i].prototype != null ? prototypes[i].prototype.name
+                    : prototypes[i].prototypeTexture != null ? prototypes[i].prototypeTexture.name : "";
+                foreach (string word in wanted)
+                {
+                    string w = word.Trim();
+                    rustling[i] |= w.Length > 0 && name.IndexOf(w, System.StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+            }
+
+            rustleData = data;
+            rustleWords = words;
+        }
+
+        Vector3 local = point - terrain.transform.position;
+        int x = Mathf.Clamp(Mathf.FloorToInt(local.x / data.size.x * data.detailWidth), 0, data.detailWidth - 1);
+        int z = Mathf.Clamp(Mathf.FloorToInt(local.z / data.size.z * data.detailHeight), 0, data.detailHeight - 1);
+        int total = 0;
+        for (int layer = 0; layer < rustling.Length; layer++)
+        {
+            if (rustling[layer])
+            {
+                total += data.GetDetailLayer(x, z, 1, 1, layer)[0, 0];
+            }
+        }
+
+        return total;
     }
 
     /// <summary>The footstep for the ground at <paramref name="position"/>.</summary>

@@ -269,13 +269,8 @@ void WorldStrata(float3 p, float slope, inout half3 colour, inout half4 mask)
         return;
     }
 
-    // The beds' lines wander: broadly along a wall (a few metres up and down) and a little at arm's length, so no line is ruled.
-    float y = p.y + (WorldCliffNoise(p * float3(0.035, 0.015, 0.035)) - 0.5) * 2.0 * _StrataWarp
-                  + (WorldCliffNoise(p * float3(0.35, 0.2, 0.35) + 3.7) - 0.5) * 0.25 * _StrataSpacing;
-    // Beds of uneven height: a slow wave stretches some and squeezes others (it never turns back, so the beds keep their order).
-    float spacing = max(_StrataSpacing, 0.05);
-    y += sin(y * 0.41 / spacing) * spacing * 0.35;
-    float bed = y / spacing;
+    // Where the beds lie (WorldTerrainDisplacement.hlsl: the same function pushes their ledges out, so paint and shape agree).
+    float bed = WorldStrataCoordinate(p);
     float index = floor(bed);
     float within = bed - index;
     float tone = frac(sin(index * 12.9898 + 4.1414) * 43758.5453);
@@ -390,6 +385,10 @@ float2 WorldRainRings(float2 p, float time)
 void WorldWetness(Varyings IN, inout InputData inputData, inout half3 albedo, inout half smoothness, inout half metallic, inout half occlusion, out half skySheen)
 {
     skySheen = 0;
+    // A wet band along every shore, rain or none (the raids' ground light field holds the nearest water's surface).
+    half shoreWet = GroundLightShoreWet(IN.positionWS);
+    albedo *= 1.0 - 0.3 * shoreWet;
+    smoothness = lerp(smoothness, max(smoothness, 0.5), shoreWet);
     half wetness = _SafeHavenWetness;
     if (wetness <= 0.001)
     {

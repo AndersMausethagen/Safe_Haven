@@ -69,6 +69,7 @@ Shader "Hidden/Safe Haven/Terrain/Add"
         _StrataWarp("Beds Wander (metres up and down)", Range(0, 6)) = 2.5
         _StrataSeam("Seam Under Each Bed", Range(0, 1)) = 0.8
         _StrataSlope("Beds From (degrees)", Range(20, 80)) = 44
+        _StrataRelief("Bed Ledges (metres, tessellated near the player)", Range(0, 1)) = 0.2
 
         [Header(Breaking up tiling)]
         _AntiTiling("Hide Repetition", Range(0, 1)) = 0

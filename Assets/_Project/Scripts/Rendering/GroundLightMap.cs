@@ -25,6 +25,18 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 {
     private static readonly int FieldId = Shader.PropertyToID("_GroundLightField");
     private static readonly int RectId = Shader.PropertyToID("_GroundLightRect");
+    // Slice 1's height range (x lowest, y range, z 1 while a field with heights is bound, w the water's reach): GroundLight.hlsl reads the
+    // ground and the water.
+    private static readonly int HeightsId = Shader.PropertyToID("_GroundLightHeights");
+    // The terrain's own heightmap (16-bit, a texel in 0.4 m) and where it lies: what a rock's foot blends into (GroundBlend.hlsl); the
+    // field's ground is a byte over the map's heights in coarser cells, which on a bank reads a metre off.
+    private static readonly int GroundHeightmapId = Shader.PropertyToID("_GroundBlendHeightmap");
+    private static readonly int GroundPlaceId = Shader.PropertyToID("_GroundBlendPlace");
+    private static readonly int GroundScaleId = Shader.PropertyToID("_GroundBlendScale");
+    // A heightmap texture holds the terrain's 0-1 heights as 0 to this (Unity's kMaxHeight).
+    private const float HeightmapTop = 32766f / 65535f;
+    /// <summary>Metres from a cell to the water's edge within which its shore is wet (RaidMap's water level lookup).</summary>
+    public const float ShoreReach = 5f;
     private static readonly int BounceId = Shader.PropertyToID("_GroundLightBounce");
 
     /// <summary>Metres round a felled or regrown tree drawn again: its crown.</summary>
@@ -69,6 +81,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     private Rect fieldArea;
     private int fieldSize;
     private float[] fieldGround;
+    private float[] fieldWater;
+    private float[] fieldNear;
+    private float fieldLowest, fieldHighest = 1f;
     private float coverStrength;
     // The first build's recipe (its ground, colours and land's shade), kept until the late setup step has worked the field out again
     // from the finished map's cover.
@@ -145,6 +160,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
         terrain = null;
         fieldGround = null;
+        fieldWater = null;
+        fieldNear = null;
         rebuild = null;
         halves = Array.Empty<ushort>();
         heights = Array.Empty<float>();
@@ -163,7 +180,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     /// <paramref name="groundColours"/> is the paint as colour (TerrainGrowth.GroundColours); <paramref name="water"/> says whether a
     /// point (metres from the terrain's corner) lies under water. Logs what each step took.
     /// </summary>
-    public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water)
+    public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water, Func<Vector2, Vector2> shoreAt = null)
     {
         Clear();
         if (settings == null || !settings.GroundLight || cover == null || !cover.CanDraw || mapTerrain == null || mapTerrain.terrainData == null)
@@ -276,6 +293,10 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 }
 
                 recipe.Ground = GroundHeights(terrainHeights, heightResolution, size, cell, dataSize, origin.y);
+                if (shoreAt != null)
+                {
+                    recipe.Water = WaterLevels(shoreAt, size, cell, origin.y, out recipe.WaterNear);
+                }
                 if (recipe.Bounce)
                 {
                     recipe.Albedo = GroundAlbedo(groundColours, colourWidth, colourHeight, size, cell, dataSize, water);
@@ -305,6 +326,10 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             fieldArea = map;
             fieldSize = size;
             fieldGround = recipe.Ground;
+            fieldWater = recipe.Water;
+            fieldNear = recipe.WaterNear;
+            fieldLowest = result.LowestHeight;
+            fieldHighest = result.HighestHeight;
             coverStrength = recipe.CoverStrength;
             Color tint = look.BounceTint.linear * look.Bounce;
             Shader.SetGlobalVector(BounceId, new Vector4(tint.r, tint.g, tint.b, 0f));
@@ -466,6 +491,49 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         field = made;
         Shader.SetGlobalTexture(FieldId, field);
         Shader.SetGlobalVector(RectId, new Vector4(fieldArea.xMin, fieldArea.yMin, 1f / fieldArea.width, result.Lift));
+        Shader.SetGlobalVector(HeightsId, new Vector4(result.LowestHeight, result.HighestHeight - result.LowestHeight, 1f, GroundLightField.WaterReach));
+        BindHeightmap();
+    }
+
+    // The terrain's heightmap for GroundBlend.hlsl: uv = (xz - corner) * (resolution - 1) / (resolution * size) + half a texel, as the
+    // terrain's samples sit on its corners.
+    private void BindHeightmap()
+    {
+        TerrainData data = terrain != null ? terrain.terrainData : null;
+        if (data == null || data.heightmapTexture == null)
+        {
+            Shader.SetGlobalVector(GroundScaleId, Vector4.zero);
+            return;
+        }
+
+        Vector3 corner = terrain.GetPosition();
+        Vector3 size = data.size;
+        float resolution = data.heightmapResolution;
+        Shader.SetGlobalTexture(GroundHeightmapId, data.heightmapTexture);
+        Shader.SetGlobalVector(GroundPlaceId, new Vector4(corner.x, corner.z, (resolution - 1f) / (resolution * size.x), (resolution - 1f) / (resolution * size.z)));
+        Shader.SetGlobalVector(GroundScaleId, new Vector4(corner.y, size.y / HeightmapTop, 0.5f / resolution, 1f));
+    }
+
+    /// <summary>The water surface nearest each cell centre (world metres; NaN where none lies within <see cref="ShoreReach"/>) and how
+    /// near its edge is (1 at it or in the water, 0 at Shore Reach; 1 where the edge is unknown, as the fen's), from the map's own lookup:
+    /// <paramref name="shoreAt"/> takes metres from the terrain's corner and gives (the surface in metres above its lowest point, metres
+    /// to its edge), x NaN for none. Plain arithmetic, for the worker thread.</summary>
+    public static float[] WaterLevels(Func<Vector2, Vector2> shoreAt, int size, float cell, float baseHeight, out float[] near)
+    {
+        var levels = new float[size * size];
+        near = new float[size * size];
+        for (int z = 0; z < size; z++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                Vector2 shore = shoreAt(new Vector2((x + 0.5f) * cell, (z + 0.5f) * cell));
+                int index = z * size + x;
+                levels[index] = float.IsNaN(shore.x) ? float.NaN : baseHeight + shore.x;
+                near[index] = float.IsNaN(shore.y) ? 1f : Mathf.Clamp01(1f - shore.y / ShoreReach);
+            }
+        }
+
+        return levels;
     }
 
     // One step of a routine driven by hand rather than nested: false once it ends or throws (logged), so whoever drives it goes on, its
@@ -729,6 +797,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
             int width = x1 - x0 + 1, height = z1 - z0 + 1;
             float[] groundHeights = fieldGround;
+            float[] waterLevels = fieldWater;
+            float[] waterNear = fieldNear;
+            float lowest = fieldLowest, highest = fieldHighest;
             int size = fieldSize;
             float strength = coverStrength;
             int blockWidth = texels.width, blockHeight = texels.height;
@@ -750,7 +821,10 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                         int cx = x0 + x, cz = z0 + z;
                         float factor = GroundLightField.CoverAt(coverHeights, blockWidth, blockHeight, corner, texelsPerMetre,
                             (cx + 0.5f) * cell, (cz + 0.5f) * cell, groundHeights[cz * size + cx], strength);
-                        pixels[z * width + x] = new Color32(GroundLightField.Byte(factor), 255, 255, 255);
+                        // Slice 1's height, water and its nearness (green, blue, alpha) as the whole field wrote them: only the cover's shade is redrawn.
+                        int index = cz * size + cx;
+                        pixels[z * width + x] = GroundLightField.GroundTexel(GroundLightField.Byte(factor), groundHeights[index], waterLevels,
+                            waterNear, index, lowest, highest);
                     }
                 }
 
@@ -953,6 +1027,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     private void Unbind()
     {
         Shader.SetGlobalVector(RectId, Vector4.zero);
+        Shader.SetGlobalVector(HeightsId, Vector4.zero);
+        Shader.SetGlobalVector(GroundScaleId, Vector4.zero);
+        Shader.SetGlobalTexture(GroundHeightmapId, Texture2D.blackTexture);
         Shader.SetGlobalVector(BounceId, Vector4.zero);
         if (placeholder != null)
         {

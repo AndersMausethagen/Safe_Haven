@@ -208,8 +208,14 @@ public sealed class MistyWoodsForestTests
             // The flies buzzing past were taken out (the user, 2026-11-15: loud, starting and stopping abruptly).
             Assert.IsFalse(roots.Any(r => r.GetComponentsInChildren<AmbientOneShots>(true).Any(a => a.name == "Forest Flies")), "no flies buzzing past");
 
+            // The forest's own beds underneath (Docs/LookAndFeelResearch_2026-11-18.md A1: the wind in the spruce by day, the still night),
+            // in place of the pack's recorded wind every raid shared; the Scene Music ambience is left empty so two beds never stack.
+            AmbienceBed bed = roots.Select(r => r.GetComponentInChildren<AmbienceBed>(true)).FirstOrDefault(b => b != null);
+            Assert.IsNotNull(bed, "the forest's beds underneath");
+            CollectionAssert.IsSupersetOf(bed.Layers.Where(l => l.sound != null).Select(l => l.sound.name).ToList(), new[] { "Woods Bed Day", "Woods Bed Night" });
+            Assert.IsTrue(bed.Layers.All(l => l.sound != null && l.sound.HasClips), "every layer plays");
             SceneAudio audio = roots.Select(r => r.GetComponentInChildren<SceneAudio>(true)).First(a => a != null);
-            Assert.IsTrue(audio.Ambience.tracks.Any(t => t.clip != null && t.clip.name == "Forest_Background_wind_1"), "the recorded forest wind underneath");
+            Assert.IsFalse(audio.Ambience.tracks.Any(t => t.clip != null), "no second bed from the scene's music");
         }
         finally
         {

@@ -68,6 +68,10 @@ half4 SeasonSnowFragmentPBR(InputData inputData, SurfaceData surfaceData)
         // A raid's light thrown back from sunlit ground near by (GroundLight.hlsl; none elsewhere).
         inputData.bakedGI += GroundLightBounce(inputData.positionWS, inputData.normalWS);
     #endif
+    #if defined(SAFE_HAVEN_GROUND_BLEND_INCLUDED)
+        // A rock's foot in the ground's colour, a contact band and a shore's wetness (GroundBlend.hlsl: MeshSurface's forward pass).
+        GroundBlend(surfaceData.albedo, surfaceData.smoothness, surfaceData.occlusion, inputData.positionWS);
+    #endif
     #if defined(_SEASON_SNOW)
         SeasonSnow(surfaceData.albedo, surfaceData.smoothness, inputData.normalWS, inputData.positionWS);
         #if defined(SAFE_HAVEN_SURFACE_WETNESS)

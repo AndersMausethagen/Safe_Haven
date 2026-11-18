@@ -34,6 +34,8 @@ public static class VoicePlayer
             source.spatialBlend = 0f;
             // A conversation can hold the game still, and a held game hushes the world's sounds.
             source.ignoreListenerPause = true;
+            // A voice is heard as close and dry, never in the place's reverb (AudioSpace).
+            source.bypassReverbZones = true;
         }
 
         source.clip = recording;

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Footstep Gravel
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Footstep Gravel
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 9fe0b8dab6bbfc54580b1aa48dfaa04d, type: 3}
+  - {fileID: 8300000, guid: 61d8a3e5465fcb4419e98833e241d10b, type: 3}
+  - {fileID: 8300000, guid: 4b196a03d3facf04da3869d340d266fd, type: 3}
+  - {fileID: 8300000, guid: c508d77080f924f44bc9bd9dbbfbcfb0, type: 3}
+  - {fileID: 8300000, guid: 55060f6dc010f184caee6a4dbbcb5641, type: 3}
+  - {fileID: 8300000, guid: aa5bf477dd4f6f94598af3bd2e1e314f, type: 3}
+  - {fileID: 8300000, guid: d75e19306218b314a83f80fcd5144df4, type: 3}
+  - {fileID: 8300000, guid: 7e29d264b97be7443bfce903b8227d99, type: 3}
+  - {fileID: 8300000, guid: 20a5d058eb16bf8419e2fdc6ae8e8fc6, type: 3}
+  channel: 2
+  volume: 0.5
+  volumeVariation: 0.15
+  pitchRange: {x: 0.92, y: 1.08}
+  positional: 1
+  fullVolumeDistance: 2
+  audibleDistance: 14
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 0
+  takesTheMix: 0

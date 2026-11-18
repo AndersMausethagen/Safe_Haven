@@ -181,6 +181,7 @@ Material:
     - _SteepSlopeEnd: 48
     - _SteepSlopeStart: 40
     - _SteepTiling: 7
+    - _StrataRelief: 0.2
     - _StrataSeam: 0.8
     - _StrataSlope: 44
     - _StrataSpacing: 2.2

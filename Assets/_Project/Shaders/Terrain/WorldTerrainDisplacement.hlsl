@@ -191,7 +191,7 @@ float2 WorldRock(float2 uv, float slope)
 // the rock's own space picks between them. The colour, normals and the tessellated relief all use the same choice.
 float _RockAntiTiling;
 // Layered rock on cliff faces (WorldStrata, in the generated passes): on by default (the shader properties), off at 0.
-float _StrataStrength, _StrataSpacing, _StrataWarp, _StrataSeam, _StrataSlope;
+float _StrataStrength, _StrataSpacing, _StrataWarp, _StrataSeam, _StrataSlope, _StrataRelief;
 static const float2x2 WorldRockTurn = float2x2(0.4536, -0.8912, 0.8912, 0.4536);
 
 float WorldRockHash(float3 p)
@@ -210,6 +210,47 @@ float WorldRockNoise(float3 p)
                      lerp(WorldRockHash(i + float3(0, 1, 0)), WorldRockHash(i + float3(1, 1, 0)), f.x), f.y),
                 lerp(lerp(WorldRockHash(i + float3(0, 0, 1)), WorldRockHash(i + float3(1, 0, 1)), f.x),
                      lerp(WorldRockHash(i + float3(0, 1, 1)), WorldRockHash(i + float3(1, 1, 1)), f.x), f.y), f.z);
+}
+
+// The layered rock's bed coordinate at a world point (its whole part names the bed, its fraction how far up it the point is): shared
+// by WorldStrata's colour (the generated passes) and the ledges below, so what is painted and what juts out line up. The lines
+// wander broadly along a wall and a little at arm's length; a slow wave makes the beds uneven without ever turning back.
+float WorldStrataCoordinate(float3 p)
+{
+    float spacing = max(_StrataSpacing, 0.05);
+    float y = p.y + (WorldRockNoise(p * float3(0.035, 0.015, 0.035)) - 0.5) * 2.0 * _StrataWarp
+                  + (WorldRockNoise(p * float3(0.35, 0.2, 0.35) + 3.7) - 0.5) * 0.25 * spacing;
+    y += sin(y * 0.41 / spacing) * spacing * 0.35;
+    return y / spacing;
+}
+
+// How far a bed's face stands out at a point (metres before Bed Ledges): its lip at the foot of each bed juts, the recess just
+// under the bed above cuts in, as in Docs/LookAndFeelResearch_2026-11-18.md 4.2. Pure, so the colour's lip and recess match it.
+float WorldStrataLedge(float within)
+{
+    // Out at the bed's foot (its lip over the bed below), back into the face up the bed, then out again to the next lip over the bed's
+    // top 30%: never a jump. A riser of no height left one tessellated triangle across it and the rock's side projection streaked down
+    // it; ramped like this the texture stretches 1.3 times at most (at 0.2 m) and only on the underside, which the game camera never sees.
+    float back = smoothstep(0.0, 0.7, within);
+    float ahead = smoothstep(0.7, 1.0, within);
+    return lerp(1.0, -0.85, back) + ahead * 1.85;
+}
+
+// The beds' ledges, out along the face's own level direction (never up or down, so a lip overhangs its recess), on faces past
+// Beds From where the rock is drawn, near the player only (the caller's focus fade).
+float3 WorldStrataOffset(float3 positionOS, float3 normalOS, float2 uv)
+{
+    if (_StrataRelief <= 0 || _StrataStrength <= 0 || _CliffStrength <= 0) return 0;
+    float3 n = normalize(TransformObjectToWorldNormal(normalOS));
+    float slope = degrees(acos(saturate(n.y)));
+    float face = saturate((slope - _StrataSlope) / 14.0);
+    if (face <= 0.001) return 0;
+    float w = WorldRock(uv, slope).x;
+    float3 world = TransformObjectToWorld(positionOS);
+    float bed = WorldStrataCoordinate(world);
+    float2 level = n.xz / max(length(n.xz), 1e-4);
+    float push = WorldStrataLedge(frac(bed)) * _StrataRelief * face * w;
+    return TransformWorldToObjectDir(float3(level.x, 0, level.y), false) * push;
 }
 
 // The second sample's coordinates: turned and a little over half the size, offset so the two never line up.
@@ -271,6 +312,7 @@ void WorldDisplace(inout float4 positionOS, float3 normalOS, float2 uv)
     }
 
     positionOS.xyz += normalize(normalOS) * WorldCliffOffset(original, normalOS, uv) * fade;
+    positionOS.xyz += WorldStrataOffset(original, normalOS, uv) * fade;
 }
 
 // Fragment-only helpers stay separate from the domain displacement so texture derivatives are valid.
@@ -386,7 +428,7 @@ bool WorldPatchCulled(InputPatch<WorldControlPoint, 3> patch)
     float3 b = TransformObjectToWorld(patch[1].positionOS.xyz);
     float3 c = TransformObjectToWorld(patch[2].positionOS.xyz);
     // Displacement and rock relief can lift a point off the flat triangle; keep anything that close to the edge.
-    float margin = 2.0 + max(_CliffDisplacement, 0.0);
+    float margin = 2.0 + max(_CliffDisplacement, 0.0) + max(_StrataRelief, 0.0);
     float4x4 vp = UNITY_MATRIX_VP;
     float4 planes[4] = { vp[3] + vp[0], vp[3] - vp[0], vp[3] + vp[1], vp[3] - vp[1] };
     [unroll]

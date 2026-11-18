@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Woods Owl
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Woods Owl
+  caption: An owl hoots
+  clips:
+  - {fileID: 8300000, guid: 6defdf3d8a5af1a4aa30aed8e5b9ed0b, type: 3}
+  - {fileID: 8300000, guid: 1b3bb4052fd1a6246871db687d1a4ae7, type: 3}
+  - {fileID: 8300000, guid: f599c8ba0d003c6428abdcfc8f201303, type: 3}
+  channel: 2
+  volume: 0.45
+  volumeVariation: 0.15
+  pitchRange: {x: 0.95, y: 1.05}
+  positional: 1
+  fullVolumeDistance: 8
+  audibleDistance: 60
+  maxAtOnce: 2
+  minimumGap: 0.03
+  priority: 0
+  takesTheMix: 0

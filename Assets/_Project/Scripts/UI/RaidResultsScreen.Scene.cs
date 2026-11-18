@@ -38,6 +38,7 @@ public sealed partial class RaidResultsScreen
                 placeSound.playOnAwake = false;
                 placeSound.loop = true;
                 placeSound.spatialBlend = 0f;
+                placeSound.bypassReverbZones = true;
             }
 
             placeSound.clip = sound;

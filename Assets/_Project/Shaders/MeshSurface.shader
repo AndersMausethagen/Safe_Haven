@@ -80,6 +80,7 @@ Shader "Safe Haven/Mesh Surface (Tessellated)"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define SEASON_SNOW_WRAP_PBR
             #include "Assets/_Project/Shaders/SurfaceWetness.hlsl"
+            #include "Assets/_Project/Shaders/GroundBlend.hlsl"
             #include "Assets/_Project/Shaders/SeasonSnow.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitForwardPass.hlsl"
             #define MESH_FORWARD

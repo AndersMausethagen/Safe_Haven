@@ -57,6 +57,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
                 sources[i].playOnAwake = false;
                 sources[i].spatialBlend = 0f;
                 sources[i].ignoreListenerPause = true;
+                // Flat: kept out of the place's reverb (AudioSpace), which is for the world's sounds.
+                sources[i].bypassReverbZones = true;
             }
         }
 
@@ -201,6 +203,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
     private readonly Dictionary<SoundDefinition, AudioClip> lastClip = new Dictionary<SoundDefinition, AudioClip>();
     private AudioSettingsDefinition settings;
     private AudioListener ears;
+    // The place's reverb and each voice's distance and occlusion (Docs/LookAndFeelResearch_2026-11-18.md A2-A4).
+    private AudioSpace space;
     private LoopLayer music;
     private LoopLayer ambience;
     private WorldAudio world;
@@ -354,8 +358,10 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         source.volume = sound.PickVolume() * ChannelVolume(sound.Channel) * world * room;
         source.pitch = sound.PickPitch();
         source.spatialBlend = sound.Positional ? 1f : 0f;
-        // Sounds with a place are in the world, and stop when it does. The rest are the interface and warnings.
+        // Sounds with a place are in the world, and stop when it does. The rest are the interface and warnings, and flat: out of the
+        // place's reverb (set on every start, as a pooled voice plays both kinds).
         source.ignoreListenerPause = !sound.Positional;
+        source.bypassReverbZones = !sound.Positional;
         source.rolloffMode = AudioRolloffMode.Linear;
         source.minDistance = sound.FullVolumeDistance;
         source.maxDistance = sound.AudibleDistance;
@@ -377,6 +383,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         music = new LoopLayer(gameObject, AudioChannel.Music);
         ambience = new LoopLayer(gameObject, AudioChannel.Ambience);
         world = new WorldAudio(gameObject);
+        space = new AudioSpace(transform);
         var head = new GameObject("Ears");
         head.transform.SetParent(transform, false);
         ears = head.AddComponent<AudioListener>();
@@ -410,6 +417,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         WatchPlayer(Player.Current != null ? Player.Current.Health : null);
         UseEars(Player.Current != null);
         world.OnSceneEntered();
+        space?.Clear();
         if (Player.Current != null && !Player.Current.TryGetComponent(out PlayerAudio _))
         {
             Player.Current.gameObject.AddComponent<PlayerAudio>();
@@ -457,6 +465,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
 
         if (player == null)
         {
+            space?.Clear();
             return;
         }
 
@@ -465,6 +474,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         forward.y = 0f;
         Quaternion facing = forward.sqrMagnitude > 0.001f ? Quaternion.LookRotation(forward) : Quaternion.identity;
         ears.transform.SetPositionAndRotation(player.transform.position + Vector3.up * EarHeight, facing);
+        space?.Update(ears.transform.position);
     }
 
     // A scene brings its own listener on its camera. Only one may listen, and with no player it has to be the camera's.
@@ -666,6 +676,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         source.pitch *= PitchForSize(size);
         source.volume *= VolumeForSize(size);
         source.clip = clip;
+        AudioSpace.Shape(source, sound, position, EarPosition);
         source.Play();
         SoundCaptions.Heard(sound, position);
         if (sound.TakesTheMix && clip != null)
@@ -722,6 +733,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
             host.transform.SetParent(transform, false);
             var created = host.AddComponent<AudioSource>();
             created.playOnAwake = false;
+            // Shaped as each sound starts (AudioSpace.Shape): air with distance, a wall between, swimming.
+            host.AddComponent<AudioLowPassFilter>().cutoffFrequency = AudioSpace.OpenCutoff;
             pool.Add(created);
             return created;
         }

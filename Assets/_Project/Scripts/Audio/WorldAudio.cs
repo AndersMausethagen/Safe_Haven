@@ -42,6 +42,8 @@ public sealed class WorldAudio
         source.loop = true;
         source.spatialBlend = 0f;
         source.ignoreListenerPause = true;
+        // Flat weather and water beds: kept out of the place's reverb (AudioSpace).
+        source.bypassReverbZones = true;
         return source;
     }
 

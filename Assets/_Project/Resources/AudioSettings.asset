@@ -30,12 +30,12 @@ MonoBehaviour:
   musicVolume: 0.6
   ambienceVolume: 0.7
   effectsVolume: 0.9
+  voiceVolume: 1
   musicWhileSpeaking: 0.35
   ambienceWhileSpeaking: 0.55
   backgroundWhileSpeaking: 0.5
   dipSeconds: 0.3
   returnSeconds: 1.4
-  weaponDrawn: 1
   enemyChasingPlayer: 1
   recentDamageSeconds: 6
   combatLingerSeconds: 5
@@ -56,6 +56,10 @@ MonoBehaviour:
   playerHurt: {fileID: 11400000, guid: ee2cf50028890584ca318923714b8b41, type: 2}
   outOfStamina: {fileID: 11400000, guid: a968997479556a84eb50c3a892605866, type: 2}
   footstepSurfaces:
+  - layerWords: mud, bog, peat, marsh
+    sound: {fileID: 11400000, guid: 0f309f2732a129c49a64f11a63a298d0, type: 2}
+  - layerWords: gravel, scree, shingle
+    sound: {fileID: 11400000, guid: 07fc300bf387f4b4eb63046f49e80f18, type: 2}
   - layerWords: grass, meadow, lawn
     sound: {fileID: 11400000, guid: 8851c665265695547b86b6c392a07373, type: 2}
   - layerWords: forest, moss, leaves, needles, soil
@@ -74,6 +78,9 @@ MonoBehaviour:
   footstepSnow: {fileID: 11400000, guid: f5fe1a97432b6994496c6c3a24fb74dd, type: 2}
   snowForSnowSteps: 0.3
   footstepIce: {fileID: 11400000, guid: 488d32823e1af5c489a226f537f328e3, type: 2}
+  plantRustle: {fileID: 11400000, guid: 160656ac50196314290f00059584d973, type: 2}
+  rustlingPlants: reed, sedge, horsetail, fern, bush, tall grass, cotton
+  rustleFrom: 2
   iceBreak: {fileID: 11400000, guid: 2fe3340deb71b3f42b1e6ccc959f1484, type: 2}
   land: {fileID: 11400000, guid: f128174308231b54ca039cf243fc0567, type: 2}
   strideLength: 1.4

@@ -526,6 +526,54 @@ public sealed class GroundLightFieldTests
     }
 
     [Test]
+    public void TheShoresWaterIsHeldToCentimetresOfItsGround()
+    {
+        // A raid's heights (Troll Valley, seed 21): a byte over them steps 0.19 m, too coarse for a band a hand's breadth wide.
+        const float lowest = 3.78f, highest = 53.44f;
+        foreach (float ground in new[] { 3.78f, 6.21f, 10.6f, 41.3f, 53.44f })
+        {
+            byte g = GroundLightField.HeightByte(ground, lowest, highest);
+            Assert.AreEqual(ground, GroundLightField.HeightFrom(g, lowest, highest), (highest - lowest) / 255f * 0.51f, "the ground to a byte");
+            foreach (float offset in new[] { -3f, -0.6f, -0.13f, 0f, 0.13f, 0.4f, 2.5f, 7.9f })
+            {
+                byte b = GroundLightField.WaterByte(ground + offset, g, lowest, highest);
+                Assert.Greater(b, 0, "0 stays for no water near");
+                Assert.AreEqual(ground + offset, GroundLightField.WaterFrom(b, g, lowest, highest), GroundLightField.WaterReach / 254f * 1.01f,
+                    $"water {offset} m from ground {ground} m: to the step over ± the reach, not over the map's heights");
+            }
+        }
+
+        byte at10 = GroundLightField.HeightByte(10f, lowest, highest);
+        Assert.AreEqual(255, GroundLightField.WaterByte(10f + 30f, at10, lowest, highest), "far above: clamped");
+        Assert.AreEqual(1, GroundLightField.WaterByte(10f - 30f, at10, lowest, highest), "far below: clamped, still water");
+        Assert.Less(GroundLightField.WaterFrom(0, at10, lowest, highest), 10f - GroundLightField.WaterReach,
+            "no water reads as below the farthest down, so a band filtered toward it fades out");
+    }
+
+    [Test]
+    public void TheShoresBandFadesWithDistanceFromTheWater()
+    {
+        // A pond whose edge lies along x = 1 m: in it, at its edge, and further out to Shore Reach and beyond.
+        float[] levels = GroundLightMap.WaterLevels(point => point.x - 1f > GroundLightMap.ShoreReach ? new Vector2(float.NaN, float.NaN)
+            : new Vector2(2f, point.x - 1f), 8, 1f, 10f, out float[] near);
+        Assert.AreEqual(12f, levels[0], 1e-4f, "its surface in world metres");
+        Assert.AreEqual(1f, near[0], 1e-4f, "in the water: as near as can be");
+        Assert.AreEqual(1f - 1.5f / GroundLightMap.ShoreReach, near[2], 1e-4f, "1.5 m out");
+        Assert.Less(near[5], near[3], "further out, less");
+        Assert.IsTrue(float.IsNaN(levels[7]), "beyond the reach: no water near");
+        float[] fen = GroundLightMap.WaterLevels(point => new Vector2(1f, float.NaN), 2, 1f, 0f, out float[] fenNear);
+        Assert.AreEqual(1f, fenNear[3], "the fen's edge is unknown: the height band alone decides");
+
+        Color32 shore = GroundLightField.GroundTexel(200, 11.8f, levels, near, 2, 0f, 50f);
+        Assert.AreEqual(200, shore.r, "the cover's shade as given");
+        Assert.AreEqual(GroundLightField.Byte(near[2]), shore.a, "its nearness in alpha");
+        Assert.Greater(shore.b, 0);
+        Color32 dry = GroundLightField.GroundTexel(200, 11.8f, levels, near, 7, 0f, 50f);
+        Assert.AreEqual(0, dry.b, "no water near");
+        Assert.AreEqual(255, dry.a);
+    }
+
+    [Test]
     public void AddSetup_OutsideASceneSetup_IsRefused()
     {
         Assert.IsFalse(SceneTransition.IsBusy);

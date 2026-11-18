@@ -96,6 +96,12 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField, Range(0f, 1f)] private float snowForSnowSteps = 0.3f;
     [Tooltip("Steps on frozen water.")]
     [SerializeField] private SoundDefinition footstepIce;
+    [Tooltip("Foley: plants brushing the legs as the player walks through tall ones (reeds, sedge, ferns), with each step. Empty: none.")]
+    [SerializeField] private SoundDefinition plantRustle;
+    [Tooltip("Words in the names of the terrain's detail plants that rustle (reed, sedge, fern...).")]
+    [SerializeField] private string rustlingPlants = "reed, sedge, horsetail, fern, bush, tall grass, cotton";
+    [Tooltip("How many of those plants in the step's cell before they rustle.")]
+    [SerializeField, Min(1)] private int rustleFrom = 2;
     [Tooltip("Breaking the night's ice on a well in winter.")]
     [SerializeField] private SoundDefinition iceBreak;
     [SerializeField] private SoundDefinition land;
@@ -211,6 +217,9 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition FootstepSnow => footstepSnow;
     public float SnowForSnowSteps => snowForSnowSteps;
     public SoundDefinition FootstepIce => footstepIce;
+    public SoundDefinition PlantRustle => plantRustle;
+    public string RustlingPlants => rustlingPlants;
+    public int RustleFrom => rustleFrom;
     public SoundDefinition IceBreak => iceBreak;
 
     public void ConfigureWinterSteps(SoundDefinition snow, SoundDefinition ice, SoundDefinition breaking)

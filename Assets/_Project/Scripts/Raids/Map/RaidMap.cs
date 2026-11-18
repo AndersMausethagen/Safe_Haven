@@ -280,6 +280,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             string lilyPads = RaidMapGenerator.PlaceLilyPads(this, Layout, rules, field, pondMeshes);
             // The water's heights, for the plants that grow by them (Dress), from the attempt that is kept.
             dressField = field;
+            shoreField = field;
             times.Append($"ravines and water {step.ElapsedMilliseconds} ms ({lilyPads}), ");
             step.Restart();
             if (!definition.NoMoss && terrain.TryGetComponent(out TerrainMoss moss))
@@ -413,6 +414,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
     private float fenLevel = float.NaN;
     // The kept attempt's field, held from Generate until Dress has asked it where the water stands.
     private RaidLayoutField dressField;
+    // The same field, kept until the ground light is built (the shores' wet band reads its water), as Dress lets go of dressField.
+    private RaidLayoutField shoreField;
 
     // What this run's ground looks like, from what it was painted with. Done once, on the map that was kept: grass and plants,
     // the colour grass takes from the ground, and the surface shader's view of the new paint.
@@ -592,7 +595,13 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
 
         RaidLayoutPlan plan = Layout;
         System.Func<Vector2, bool> water = plan != null ? plan.InWater : (System.Func<Vector2, bool>)null;
-        yield return GroundLightMap.Current.Build(terrain, colours, water);
+        // The nearest water's surface, for the wet band along every shore (the field's slice 1 blue).
+        RaidLayoutField field = shoreField;
+        shoreField = null;
+        System.Func<Vector2, Vector2> shoreAt = field == null ? (System.Func<Vector2, Vector2>)null
+            : point => field.WaterNear(point, GroundLightMap.ShoreReach, out float level, out float edge)
+                ? new Vector2(level, edge) : new Vector2(float.NaN, float.NaN);
+        yield return GroundLightMap.Current.Build(terrain, colours, water, shoreAt);
     }
 
     private void RebuildTrunks()

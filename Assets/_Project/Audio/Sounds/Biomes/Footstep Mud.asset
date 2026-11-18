@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Footstep Mud
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Footstep Mud
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 3eb776c945a914546bd980522c2ab6db, type: 3}
+  - {fileID: 8300000, guid: 2ea92213c4604034688e2dafe2ccf16b, type: 3}
+  - {fileID: 8300000, guid: 95cf72b1935496543a013e1889b1b7d8, type: 3}
+  - {fileID: 8300000, guid: 085f030a38c264c4b9c26e6225ff25ed, type: 3}
+  channel: 2
+  volume: 0.55
+  volumeVariation: 0.15
+  pitchRange: {x: 0.92, y: 1.08}
+  positional: 1
+  fullVolumeDistance: 2
+  audibleDistance: 14
+  maxAtOnce: 3
+  minimumGap: 0.03
+  priority: 0
+  takesTheMix: 0

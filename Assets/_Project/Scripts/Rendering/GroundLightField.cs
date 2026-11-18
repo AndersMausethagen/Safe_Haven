@@ -33,6 +33,12 @@ public static class GroundLightField
         public float Cell;
         /// <summary>The ground's height at each cell centre, in world metres.</summary>
         public float[] Ground;
+        /// <summary>The surface of the water nearest each cell (a river's, a pond's, the fen's), in world metres, or NaN where none is near:
+        /// for the wet band along every shore. Null: none anywhere.</summary>
+        public float[] Water;
+        /// <summary>How near each cell is to that water's edge, 1 at it and 0 at GroundLightMap.ShoreReach (slice 1's alpha), so the
+        /// band fades out with distance instead of ending in a line where the lookup stops on a gentle shore. Null: 1 everywhere.</summary>
+        public float[] WaterNear;
         /// <summary>The cover map (SkyOcclusionMap): the height of whatever stands highest at each texel, in world metres; far below the
         /// ground where nothing does. Null: no cover (nothing stands anywhere).</summary>
         public float[] Cover;
@@ -72,8 +78,13 @@ public static class GroundLightField
     {
         /// <summary>Slice 0: rgb the light thrown back (square root, so dim light keeps its steps), a the land's shade factor.</summary>
         public Color32[] Light;
-        /// <summary>Slice 1: r the cover's shade factor at ground level (the terrain's).</summary>
+        /// <summary>Slice 1: r the cover's shade factor at ground level (the terrain's); g the ground's height over
+        /// <see cref="LowestHeight"/> to <see cref="HighestHeight"/>; b the nearest water's surface as metres above or below that ground
+        /// (± <see cref="WaterReach"/>; 0: none), so a shore's wet band is placed to centimetres (Docs/LookAndFeelResearch_2026-11-18.md 4.6);
+        /// a how near that water's edge is (<see cref="Recipe.WaterNear"/>), 255 where no water is near.</summary>
         public Color32[] Ground;
+        public float LowestHeight;
+        public float HighestHeight = 1f;
         /// <summary>What the field's shade is multiplied by at this hour (above 1 only at dim hours: dawn, dusk, night).</summary>
         public float Lift = 1f;
         /// <summary>The ground's light factor (the canopy's shade times the land's) averaged over the map: what the terrain loses
@@ -188,10 +199,13 @@ public static class GroundLightField
         }
 
         long bounceMs = clock.ElapsedMilliseconds;
+        HeightRange(recipe.Ground, recipe.Water, out float lowest, out float highest);
+        result.LowestHeight = lowest;
+        result.HighestHeight = highest;
         for (int i = 0; i < count; i++)
         {
             result.Light[i] = new Color32(Root(red, i), Root(green, i), Root(blue, i), Byte(relief != null ? relief[i] : 1f));
-            result.Ground[i] = new Color32(Byte(cover[i]), 255, 255, 255);
+            result.Ground[i] = GroundTexel(Byte(cover[i]), recipe.Ground[i], recipe.Water, recipe.WaterNear, i, lowest, highest);
         }
 
         result.Relief = relief;
@@ -520,6 +534,65 @@ public static class GroundLightField
 
     /// <summary>A byte for a 0-1 value, as the shader reads it back (255 is exactly 1).</summary>
     public static byte Byte(float value) => (byte)Mathf.RoundToInt(Mathf.Clamp01(value) * 255f);
+
+    /// <summary>The lowest and highest of the ground's and the water's heights (the range slice 1's g and b are written over).</summary>
+    public static void HeightRange(float[] ground, float[] water, out float lowest, out float highest)
+    {
+        lowest = float.MaxValue;
+        highest = float.MinValue;
+        foreach (float height in ground)
+        {
+            lowest = Mathf.Min(lowest, height);
+            highest = Mathf.Max(highest, height);
+        }
+
+        if (water != null)
+        {
+            foreach (float level in water)
+            {
+                if (!float.IsNaN(level))
+                {
+                    lowest = Mathf.Min(lowest, level);
+                    highest = Mathf.Max(highest, level);
+                }
+            }
+        }
+
+        if (highest <= lowest)
+        {
+            highest = lowest + 1f;
+        }
+    }
+
+    /// <summary>A height as slice 1's green: 0-255 over the range.</summary>
+    public static byte HeightByte(float height, float lowest, float highest) => Byte((height - lowest) / (highest - lowest));
+
+    /// <summary>Metres the water's surface is held above or below a cell's ground (slice 1's blue): a byte over the whole map's heights
+    /// steps a fifth of a metre, too coarse for a band a hand's breadth wide; over ± this it steps 6 cm. A surface further off is clamped
+    /// (it only ever lies under deep water or high above it, where no band is drawn).</summary>
+    public const float WaterReach = 8f;
+
+    /// <summary>A water surface as slice 1's blue: metres from the cell's ground as its green reads back, 1-255 over ± <see cref="WaterReach"/>,
+    /// 0 kept for "no water near" (it reads as the farthest below, so a band filtered toward it fades out).</summary>
+    public static byte WaterByte(float level, byte ground, float lowest, float highest) =>
+        (byte)Mathf.Clamp(1 + Mathf.RoundToInt(Mathf.Clamp01((level - HeightFrom(ground, lowest, highest) + WaterReach) / (2f * WaterReach)) * 254f), 1, 255);
+
+    /// <summary>Slice 1's texel at a cell: the cover's shade (r) as given, the ground's height (g), the nearest water (b, 0 for none)
+    /// and how near its edge is (a, 255 with none). The whole field and a patch redraw both write it this way.</summary>
+    public static Color32 GroundTexel(byte cover, float groundHeight, float[] water, float[] near, int index, float lowest, float highest)
+    {
+        byte ground = HeightByte(groundHeight, lowest, highest);
+        bool wet = water != null && !float.IsNaN(water[index]);
+        return new Color32(cover, ground, wet ? WaterByte(water[index], ground, lowest, highest) : (byte)0,
+            wet && near != null ? Byte(near[index]) : (byte)255);
+    }
+
+    /// <summary>A height back from slice 1's green (as the shaders read it: GroundLight.hlsl).</summary>
+    public static float HeightFrom(byte ground, float lowest, float highest) => lowest + ground / 255f * (highest - lowest);
+
+    /// <summary>A water surface back from slice 1's blue and green (as GroundLight.hlsl reads it), for tests.</summary>
+    public static float WaterFrom(byte water, byte ground, float lowest, float highest) =>
+        HeightFrom(ground, lowest, highest) + (water - 1) / 254f * 2f * WaterReach - WaterReach;
 
     /// <summary>A grid shrunk <paramref name="every"/> × <paramref name="every"/> cells to one (a part block at the far edges): their
     /// average, or their highest. With every 1, the grid itself.</summary>

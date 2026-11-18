@@ -5,7 +5,7 @@ using UnityEngine;
 /// A sound that tells the player where something is, from where it is: wind over the nearest ridge above them, creaking
 /// from a stand of dead trees, a howl from the way the creatures live, a song over still water at night (the Nøkk). Each
 /// is played now and then from that place, so the world can be read by ear as well as from the map. Nothing near: nothing
-/// is played. Hours are a curve, as AmbientOneShots'.
+/// is played. Hours are a curve, as AmbientOneShots'. Cliffs (scree) and any trees (creaks) too, since 2026-11-18 (the biome beds).
 /// <para>Where it belongs: one per kind of sound, in a scene (set up for the Haven world by BuildLivingWorld).</para>
 /// </summary>
 public sealed class PlacedAmbience : MonoBehaviour
@@ -20,6 +20,10 @@ public sealed class PlacedAmbience : MonoBehaviour
         SpawnZone,
         [Tooltip("The nearest still water (a pond, the lake).")]
         StillWater,
+        [Tooltip("The nearest steep face of ground (a cliff, a valley wall, a ravine's side): scree trickling, a stone falling.")]
+        Cliff,
+        [Tooltip("The nearest tree of any kind (a painted terrain tree): a trunk creaking, drips from the canopy.")]
+        Trees,
     }
 
     [SerializeField] private Source source;
@@ -31,7 +35,12 @@ public sealed class PlacedAmbience : MonoBehaviour
     [SerializeField, Min(5f)] private float searchRadius = 40f;
 
     private const float CellSize = 32f;
+    // A face this steep (degrees) is a cliff; looked for this many metres apart round the player.
+    private const float CliffSlope = 45f;
+    private const float CliffStep = 4f;
     private readonly Dictionary<Vector2Int, List<Vector3>> deadTrees = new Dictionary<Vector2Int, List<Vector3>>();
+    // Generated raid maps paint their trees during loading, after Start: the index is made when first needed, and again if the trees change.
+    private int indexedTrees = -1;
     private MobSpawnZone[] zones;
     private float due;
 
@@ -47,11 +56,7 @@ public sealed class PlacedAmbience : MonoBehaviour
     private void Start()
     {
         due = Time.time + Random.Range(every.x, every.y);
-        if (source == Source.DeadTrees)
-        {
-            IndexDeadTrees();
-        }
-        else if (source == Source.SpawnZone)
+        if (source == Source.SpawnZone)
         {
             zones = FindObjectsByType<MobSpawnZone>();
         }
@@ -84,9 +89,12 @@ public sealed class PlacedAmbience : MonoBehaviour
             case Source.Ridge:
                 return HighGround(at, out from);
             case Source.DeadTrees:
-                return NearestDeadTree(at, out from);
+            case Source.Trees:
+                return NearestTree(at, out from);
             case Source.SpawnZone:
                 return TowardsCreatures(at, out from);
+            case Source.Cliff:
+                return NearestCliff(at, out from);
             default:
                 return StillWater(at, out from);
         }
@@ -122,7 +130,7 @@ public sealed class PlacedAmbience : MonoBehaviour
         return found;
     }
 
-    private void IndexDeadTrees()
+    private void IndexTrees()
     {
         Terrain terrain = Terrain.activeTerrain;
         if (terrain == null || terrain.terrainData == null)
@@ -131,11 +139,18 @@ public sealed class PlacedAmbience : MonoBehaviour
         }
 
         TerrainData data = terrain.terrainData;
+        if (data.treeInstanceCount == indexedTrees)
+        {
+            return;
+        }
+
+        indexedTrees = data.treeInstanceCount;
+        deadTrees.Clear();
         TreePrototype[] prototypes = data.treePrototypes;
         var dead = new bool[prototypes.Length];
         for (int i = 0; i < prototypes.Length; i++)
         {
-            dead[i] = prototypes[i].prefab != null && prototypes[i].prefab.name.Contains("Dead");
+            dead[i] = prototypes[i].prefab != null && (source == Source.Trees || prototypes[i].prefab.name.Contains("Dead"));
         }
 
         Vector3 origin = terrain.transform.position, size = data.size;
@@ -157,9 +172,10 @@ public sealed class PlacedAmbience : MonoBehaviour
         }
     }
 
-    private bool NearestDeadTree(Vector3 at, out Vector3 from)
+    private bool NearestTree(Vector3 at, out Vector3 from)
     {
         from = default;
+        IndexTrees();
         float best = searchRadius * searchRadius;
         int reach = Mathf.CeilToInt(searchRadius / CellSize);
         var centre = new Vector2Int(Mathf.FloorToInt(at.x / CellSize), Mathf.FloorToInt(at.z / CellSize));
@@ -220,11 +236,57 @@ public sealed class PlacedAmbience : MonoBehaviour
         return found;
     }
 
+    // The nearest steep face round the player, near its foot, where scree runs down: looked for along 16 ways out to the search radius.
+    private bool NearestCliff(Vector3 at, out Vector3 from)
+    {
+        from = default;
+        Terrain terrain = Terrain.activeTerrain;
+        if (terrain == null || terrain.terrainData == null)
+        {
+            return false;
+        }
+
+        TerrainData data = terrain.terrainData;
+        Vector3 origin = terrain.transform.position, size = data.size;
+        float best = float.MaxValue;
+        bool found = false;
+        for (int i = 0; i < 16; i++)
+        {
+            float angle = i * Mathf.PI / 8f;
+            for (float distance = 6f; distance <= searchRadius; distance += CliffStep)
+            {
+                float x = at.x + Mathf.Cos(angle) * distance, z = at.z + Mathf.Sin(angle) * distance;
+                float u = (x - origin.x) / size.x, v = (z - origin.z) / size.z;
+                if (u < 0f || v < 0f || u > 1f || v > 1f)
+                {
+                    break;
+                }
+
+                if (data.GetSteepness(u, v) >= CliffSlope)
+                {
+                    if (distance < best)
+                    {
+                        best = distance;
+                        var point = new Vector3(x, 0f, z);
+                        point.y = terrain.SampleHeight(point) + origin.y + 1f;
+                        from = point;
+                        found = true;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
     private bool StillWater(Vector3 at, out Vector3 from)
     {
         from = default;
         float best = searchRadius * searchRadius;
         bool found = false;
+        Terrain terrain = Terrain.activeTerrain;
         foreach (WaterSurface water in WaterSurface.Surfaces)
         {
             if (water == null || !water.IsStill || water.IsFrozen)
@@ -233,6 +295,11 @@ public sealed class PlacedAmbience : MonoBehaviour
             }
 
             Vector3 point = water.NearestPoint(at);
+            if (Buried(terrain, point) && !OpenWaterNear(water, terrain, at, out point))
+            {
+                continue;
+            }
+
             float squared = (point - at).sqrMagnitude;
             if (squared < best)
             {
@@ -244,4 +311,41 @@ public sealed class PlacedAmbience : MonoBehaviour
 
         return found;
     }
+
+    // A sheet laid under the whole map (the Moss Marsh's fen) lies under the ground in most places, so its nearest point is often below
+    // the listener's feet: the sound comes from the nearest place where its water shows instead, along 16 directions.
+    private bool OpenWaterNear(WaterSurface water, Terrain terrain, Vector3 at, out Vector3 open)
+    {
+        open = default;
+        float best = float.MaxValue;
+        bool found = false;
+        for (int i = 0; i < 16; i++)
+        {
+            float angle = i * Mathf.PI / 8f;
+            for (float distance = CliffStep; distance <= searchRadius; distance += CliffStep)
+            {
+                Vector3 point = water.NearestPoint(new Vector3(at.x + Mathf.Cos(angle) * distance, at.y, at.z + Mathf.Sin(angle) * distance));
+                if (Buried(terrain, point))
+                {
+                    continue;
+                }
+
+                float squared = (point - at).sqrMagnitude;
+                if (squared < best)
+                {
+                    best = squared;
+                    open = point;
+                    found = true;
+                }
+
+                break;
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>Whether the ground stands over a water surface's point (the water doesn't show there). Pure, for tests.</summary>
+    public static bool Buried(Terrain terrain, Vector3 point) =>
+        terrain != null && terrain.SampleHeight(point) + terrain.transform.position.y > point.y + 0.05f;
 }

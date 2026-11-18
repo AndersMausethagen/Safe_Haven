@@ -13,6 +13,7 @@
 TEXTURE2D_ARRAY(_GroundLightField);
 float4 _GroundLightRect;   // x min, z min, 1 / size, the dim hour's lift (above 0 while a field is bound; 1 by day)
 float4 _GroundLightBounce; // rgb: the raid's bounce tint × strength, times the sun's (or moon's) light as it is now
+float4 _GroundLightHeights; // slice 1's g and b: x the lowest height, y the range (metres), z 1 while a field with heights is bound, w the water's reach
 
 // Metres above the ground over which the land's shade fades out of the air: mist high over a ravine sees the sky its floor doesn't.
 #define GROUND_LIGHT_AIR_FADE 20.0
@@ -59,6 +60,28 @@ void GroundLightApply(half factor, inout half occlusion, inout half3 bakedGI)
 {
     occlusion *= min(factor, 1.0);
     bakedGI *= max(factor, 1.0);
+}
+
+// How wet a shore is at a point (0-1; Docs/LookAndFeelResearch_2026-11-18.md 4.6): a band darker and glossier for a hand's breadth
+// above the nearest water, as real banks are. Slice 1's blue holds the water's surface as metres from the cell's ground (its green), ± w
+// (0 where none is near); both filter linearly, so their sum is the flat surface between cells too. 0 without a field.
+half GroundLightShoreWet(float3 positionWS)
+{
+    half wet = 0.0;
+    UNITY_BRANCH if (_GroundLightHeights.z > 0.5)
+    {
+        half4 ground = GroundLightAt(positionWS, 1);
+        UNITY_BRANCH if (ground.b > 0.003)
+        {
+            float level = _GroundLightHeights.x + ground.g * _GroundLightHeights.y
+                + (ground.b * 255.0 - 1.0) / 254.0 * 2.0 * _GroundLightHeights.w - _GroundLightHeights.w;
+            float above = positionWS.y - level;
+            // Fading out with distance from the water's edge (slice 1's alpha), so a gentle shore's band ends softly, not in a line.
+            wet = (1.0 - smoothstep(0.2, 0.75, above)) * step(-0.6, above) * smoothstep(0.15, 0.65, ground.a);
+        }
+    }
+
+    return wet;
 }
 
 // Light thrown back from sunlit ground near by, to add to a surface's indirect diffuse light (bakedGI): most on what faces
