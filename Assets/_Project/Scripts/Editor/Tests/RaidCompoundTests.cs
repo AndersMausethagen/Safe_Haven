@@ -153,4 +153,24 @@ public sealed class RaidCompoundTests
 
         return best;
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md L5: a light at both ends of every run of wall (where a way in begins), none along a run.
+    [Test]
+    public void GateLightsStandAtTheEndsOfEachRunOfWall()
+    {
+        // Two runs, 0-48 and 120-168, a piece every 24 degrees.
+        var angles = new List<float> { 0f, 24f, 48f, 120f, 144f, 168f };
+        List<(int index, int side)> ends = RaidMapGenerator.WallEnds(angles, 24f);
+        CollectionAssert.AreEquivalent(new[] { (0, -1), (2, 1), (3, -1), (5, 1) }, ends);
+        Assert.IsEmpty(RaidMapGenerator.WallEnds(new List<float> { 0f, 90f, 180f, 270f }, 90f), "a whole ring: no gate");
+        CollectionAssert.AreEquivalent(new[] { (0, -1), (0, 1) }, RaidMapGenerator.WallEnds(new List<float> { 10f }, 24f), "one piece alone: both ends");
+        CollectionAssert.AreEquivalent(new[] { (0, -1), (1, 1) }, RaidMapGenerator.WallEnds(new List<float> { 350f, 14f }, 24f), "a run across 0 degrees");
+
+        foreach (string name in new[] { "Bloomery Yard", "Seter Yard" })
+        {
+            var yard = AssetDatabase.LoadAssetAtPath<RaidSetPieceDefinition>("Assets/_Project/Data/Raids/SetPieces/" + name + ".asset");
+            Assert.IsNotNull(yard.GateLight, name + " lights its gates");
+            Assert.IsNotNull(yard.GateLight.GetComponent<NightFlame>(), "lit at dusk, out at dawn");
+        }
+    }
 }

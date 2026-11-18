@@ -60,6 +60,7 @@ public static partial class RaidMapGenerator
         Vector3 origin = terrain.transform.position;
         TerrainData data = terrain.terrainData;
         float radius = piece.WallRadius;
+        var placed = new List<(float angle, Transform made)>();
         foreach (float angle in piece.Wall)
         {
             float rad = angle * Mathf.Deg2Rad;
@@ -82,7 +83,70 @@ public static partial class RaidMapGenerator
             // Local X along the ring, local Z outward.
             GameObject made = Object.Instantiate(kind, at, Quaternion.LookRotation(new Vector3(outward.x, 0f, outward.y), Vector3.up), holder);
             made.name = kind.name;
+            placed.Add((angle, made.transform));
         }
+
+        PlaceGateLights(piece, placed);
+    }
+
+    /// <summary>
+    /// The compound's gate lights (Docs/LookAndFeelResearch_2026-11-18.md L5): on the end post of every run of wall, where a way in
+    /// begins (the ring leaves pieces out at its openings and wherever a trail or a steep bank comes, so the gaps are where the way in
+    /// really is), turned in toward the yard. A piece's local X runs along the ring with the angle going down (its local Z is outward),
+    /// so a run's end at its larger angle is that piece's -X end.
+    /// </summary>
+    private static void PlaceGateLights(RaidLayoutPiece piece, List<(float angle, Transform made)> placed)
+    {
+        RaidSetPieceDefinition definition = piece.Definition;
+        if (definition.GateLight == null || placed.Count == 0 || piece.WallRadius <= 0f)
+        {
+            return;
+        }
+
+        float half = definition.PieceLength * 0.5f;
+        float step = definition.PieceLength / piece.WallRadius * Mathf.Rad2Deg;
+        Vector3 at = definition.GateLightAt;
+        var angles = new List<float>(placed.Count);
+        foreach ((float angle, Transform _) in placed)
+        {
+            angles.Add(angle);
+        }
+
+        foreach ((int index, int side) in WallEnds(angles, step))
+        {
+            Transform wall = placed[index].made;
+            // side 1: the run ends at the piece's larger angle, its -X end.
+            float end = side > 0 ? -(half - at.x) : half - at.x;
+            Vector3 position = wall.TransformPoint(new Vector3(end, at.y, -at.z));
+            GameObject light = Object.Instantiate(definition.GateLight, position, Quaternion.LookRotation(-wall.forward, Vector3.up), wall);
+            light.name = definition.GateLight.name;
+        }
+    }
+
+    /// <summary>The ends of a ring's runs of wall: each piece (by index) with no neighbour a step further round on that side (1: at a
+    /// larger angle, -1: at a smaller), angles in degrees. A whole ring has none. Pure, for tests.</summary>
+    public static List<(int index, int side)> WallEnds(IReadOnlyList<float> angles, float step)
+    {
+        var ends = new List<(int, int)>();
+        for (int i = 0; i < angles.Count; i++)
+        {
+            foreach (int side in new[] { -1, 1 })
+            {
+                bool neighbour = false;
+                for (int k = 0; k < angles.Count && !neighbour; k++)
+                {
+                    float delta = Mathf.DeltaAngle(angles[i], angles[k]) * side;
+                    neighbour = k != i && delta > step * 0.5f && delta < step * 1.5f;
+                }
+
+                if (!neighbour)
+                {
+                    ends.Add((i, side));
+                }
+            }
+        }
+
+        return ends;
     }
 
     /// <summary>True when <paramref name="angle"/> (degrees) lies within <paramref name="clear"/> of any opening. Pure, for tests.</summary>

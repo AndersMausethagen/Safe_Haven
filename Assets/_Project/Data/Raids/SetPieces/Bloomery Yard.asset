@@ -28,3 +28,5 @@ MonoBehaviour:
   wallAt: 0.85
   openingWidth: 4.5
   extraOpenings: 1
+  gateLight: {fileID: 8643427449616740615, guid: 70d2a8234d6511f458956968b556eb45, type: 3}
+  gateLightAt: {x: 0.15, y: 1.35, z: 0.16}

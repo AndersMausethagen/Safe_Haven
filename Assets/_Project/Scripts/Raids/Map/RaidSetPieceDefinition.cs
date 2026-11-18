@@ -59,6 +59,12 @@ public sealed class RaidSetPieceDefinition : ScriptableObject
     [SerializeField, Min(1.5f)] private float openingWidth = 4.5f;
     [Tooltip("Openings beyond the ways in, away from them (a back gate), so a yard is never a trap with one door.")]
     [SerializeField, Min(0)] private int extraOpenings = 1;
+    [Tooltip("A light on the wall's end post either side of every way in, lit at dusk (a NightFlame, e.g. Parts/Wall Torch): at night a " +
+             "yard stands out warm against the cold moonlit land and its gates show where to go in (Docs/LookAndFeelResearch_2026-11-18.md " +
+             "L5). Empty: none.")]
+    [SerializeField] private GameObject gateLight;
+    [Tooltip("Where on the end post: metres in from the wall piece's end, up from its foot, and in from its face toward the yard.")]
+    [SerializeField] private Vector3 gateLightAt = new Vector3(0.15f, 1.35f, 0.16f);
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -74,6 +80,8 @@ public sealed class RaidSetPieceDefinition : ScriptableObject
     public float WallAt => wallAt;
     public float OpeningWidth => openingWidth;
     public int ExtraOpenings => extraOpenings;
+    public GameObject GateLight => gateLight;
+    public Vector3 GateLightAt => gateLightAt;
 
     /// <summary>Whether it belongs on a map of this mood.</summary>
     public bool Suits(string mood) => moods.Count == 0 || moods.Contains(mood);

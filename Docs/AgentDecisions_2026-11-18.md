@@ -269,3 +269,13 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - Measured in a launched Valley at 15:00 with time frozen: it changes only the rock faces, slightly (mean 0.2 of 255). That dry
   afternoon light hardly glitters to begin with, so the sparkle it is for (`g7_*` shots) was not reproduced; watch for it in a
   wet or low-sun run.
+
+### Batch 7: compounds light their gates at night (L5)
+- **A torch on the end post of every run of wall** (a set piece's Gate Light, the buildings' Wall Torch: lit at dusk, out at dawn,
+  each at its own moment), turned in toward the yard. The ends of the runs, not the planned openings: the ring also leaves pieces out
+  where a trail or a steep bank comes, so the gaps are where the way in really is (the first try looked near the openings and found
+  nothing: the Bloomery's wall stood 45° from its gates). The Bloomery Yard and the Seter Yard both have it.
+- Seen in a launched Marsh at night (seed 7): two torches 18 m apart at the Bloomery's way in, on the skigard's end posts; from the
+  game camera the flames mark the gate, the light a modest pool (range 6.4 m: the buildings' torch, unchanged).
+- **L4 (mist darker under the canopy)** was already in place: the mist's sky light is cut by the canopy and the land's shade
+  (`GroundLightAirAbove`, from the ground light field step). Nothing changed.
