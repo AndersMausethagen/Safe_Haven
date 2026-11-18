@@ -435,6 +435,8 @@ public sealed class PlayerCameraController : MonoBehaviour
         bool action = style == CameraStyle.Action;
         CameraPointer.UsesScreenCenter = action;
         actionWeight = Mathf.MoveTowards(actionWeight, action ? 1f : 0f, Time.unscaledDeltaTime / settings.StyleTransitionTime);
+        // The sun's shadow cascades follow where the camera looks: near ones over the shoulder and in cinematics, the top-down set otherwise.
+        GraphicsOptions.UseNearShadows(actionWeight > 0.5f || InGameCinematic.IsPlaying || CinematicScreen.IsPlaying);
         UpdateCursor(action);
     }
 

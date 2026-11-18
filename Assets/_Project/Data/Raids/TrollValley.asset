@@ -122,11 +122,11 @@ MonoBehaviour:
     briefing: First light on the river. The trolls are slow to wake, and some of them are still stone.
     skyCover: 0.25
   - name: Day
-    hour: 11
+    hour: 15
     chance: 60
     lootMultiplier: 1
     enemyDensity: 1
-    briefing: Clear cold air down the valley. You can see a long way, and so can they.
+    briefing: Low afternoon sun across the valley. The stones throw long shadows, and you can see a long way, and so can they.
     skyCover: 0.25
   - name: Dusk
     hour: 19.2

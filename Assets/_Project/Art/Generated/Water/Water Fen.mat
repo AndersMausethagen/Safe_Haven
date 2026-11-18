@@ -59,7 +59,7 @@ Material:
     - _Refraction: 0.03
     - _RippleStrength: 1
     - _ScreenReflection: 1
-    - _ShoreFoam: 0.03
+    - _ShoreFoam: 0
     - _SkyReflectionFloor: 0
     - _SkySaturation: 0.2
     - _SkyTilt: 0.5

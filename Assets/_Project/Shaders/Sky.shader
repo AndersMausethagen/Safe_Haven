@@ -206,7 +206,9 @@ Shader "Safe Haven/Sky"
                     float facing = pow(towardSun, 2.0);
                     float silver = pow(saturate(dot(direction, light)), 6.0) * (1.0 - thickness) * 1.2;
                     half3 litColour = lerp(_CloudLit.rgb * _SkySunColour.rgb * 1.25, _MoonColour.rgb * 0.07, night);
-                    litColour = lerp(litColour, litColour * _SunsetColour.rgb * 1.6, glow * (0.25 + 0.75 * facing));
+                    // The sunset's warmth only on the clouds toward the sun and low in the sky (Docs/LookAndFeelResearch_2026-11-18.md L2: salmon
+                    // clouds overhead in a blue sky read synthetic); those away from it stay the sun's own white.
+                    litColour = lerp(litColour, litColour * _SunsetColour.rgb * 1.6, glow * facing * lerp(1.0, 0.45, saturate(up * 2.5)));
                     half3 shade = _CloudShade.rgb * lerp(day, dark * 3.0, night) * lerp(1.0, 0.7, glow * (1.0 - facing));
                     cloudColour = lerp(shade, litColour, lit) + litColour * silver;
                     // Heavy weather closes the gaps into one grey sheet, darker in a storm.

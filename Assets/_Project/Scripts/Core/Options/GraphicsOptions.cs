@@ -25,6 +25,13 @@ public static class GraphicsOptions
     private static readonly float[] ShadowDistanceShare = { 0.5f, 0.7f, 1f, 1f };
     // High and Ultra keep the pipeline's own four (sharper near the player over the same distance).
     private static readonly int[] ShadowCascades = { 1, 2, 4, 4 };
+    // The sun's cascades fitted to where the camera looks (Docs/LookAndFeelResearch_2026-11-18.md 3.1). The top-down view sees the
+    // ground 16-30 m from the lens, so the pipeline asset's own splits (0.24 / 0.42 / 0.66 of 50 m) give that ground its own cascades;
+    // a camera close to what it looks at (over the shoulder, a cinematic) takes these near splits instead, the asset's before 2026-11-18.
+    private static readonly Vector3 NearSplits4 = new Vector3(0.08f, 0.22f, 0.48f);
+    private static readonly Vector2 NearSplits3 = new Vector2(0.1f, 0.3f);
+    private const float NearSplit2 = 0.3f;
+    private static bool nearShadows;
     private static readonly float[] FogShare = { 0.5f, 0.75f, 1f };
     private static readonly float[] LodShare = { 0.6f, 0.8f, 1f };
     private static readonly int[] MipLimit = { 2, 1, 0 };
@@ -121,6 +128,7 @@ public static class GraphicsOptions
             : Mathf.Min(ShadowResolution[shadows], authored.mainLightShadowmapResolution);
         runtime.shadowDistance = authored.shadowDistance * ShadowDistanceShare[shadows];
         runtime.shadowCascadeCount = Mathf.Min(ShadowCascades[shadows], authored.shadowCascadeCount);
+        ApplySplits();
         runtime.additionalLightsShadowmapResolution = AdditionalShadowAtlas[shadows];
 
         if (occlusion != null)
@@ -132,6 +140,31 @@ public static class GraphicsOptions
         QualitySettings.lodBias = authoredLodBias * LodShare[GameOptions.ViewDistance.Index];
         QualitySettings.globalTextureMipmapLimit = Mathf.Max(authoredMipLimit, MipLimit[GameOptions.TextureQuality.Index]);
         ApplyToScene();
+    }
+
+    /// <summary>
+    /// Shadow cascades for a camera close to what it shows (true: over the shoulder, a cinematic) or for the top-down view (false, the
+    /// pipeline asset's own splits). Called by the camera as its style changes; cheap to call every frame.
+    /// </summary>
+    public static void UseNearShadows(bool near)
+    {
+        if (near == nearShadows)
+        {
+            return;
+        }
+
+        nearShadows = near;
+        if (Start())
+        {
+            ApplySplits();
+        }
+    }
+
+    private static void ApplySplits()
+    {
+        runtime.cascade2Split = nearShadows ? NearSplit2 : authored.cascade2Split;
+        runtime.cascade3Split = nearShadows ? NearSplits3 : authored.cascade3Split;
+        runtime.cascade4Split = nearShadows ? NearSplits4 : authored.cascade4Split;
     }
 
     // Below 100% Render Scale the chosen upscaler brings the picture up. DLSS and FSR 2 rebuild it from several frames, and

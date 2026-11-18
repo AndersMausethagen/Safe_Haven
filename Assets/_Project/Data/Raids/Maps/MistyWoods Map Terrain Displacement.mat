@@ -181,6 +181,11 @@ Material:
     - _SteepSlopeEnd: 66
     - _SteepSlopeStart: 56
     - _SteepTiling: 7
+    - _StrataSeam: 0.8
+    - _StrataSlope: 44
+    - _StrataSpacing: 2.2
+    - _StrataStrength: 0.35
+    - _StrataWarp: 2.5
     - _SurfaceDebug: 0
     - _SurfaceOcclusion: 1
     - _SurfaceSmoothness: 1

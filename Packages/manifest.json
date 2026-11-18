@@ -2,8 +2,8 @@
   "dependencies": {
     "com.community.netcode.transport.steamnetworkingsockets": "https://github.com/Unity-Technologies/multiplayer-community-contributions.git?path=/Transports/com.community.netcode.transport.steamnetworkingsockets#0fab638470379ace12b0149dfb41c043d23dbce5",
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity",
-    "com.rlabrecque.steamworks.net": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.165.0",
     "com.ramenvr.aura-unity": "https://github.com/ramenvr/AuraForUnityPlugin.git",
+    "com.rlabrecque.steamworks.net": "https://github.com/rlabrecque/Steamworks.NET.git?path=/com.rlabrecque.steamworks.net#2025.165.0",
     "com.unity.ai.navigation": "2.0.15",
     "com.unity.cinemachine": "6.6.0",
     "com.unity.cloud.gltfast": "6.20.0",
@@ -18,7 +18,6 @@
     "com.unity.multiplayer.playmode": "3.0.0",
     "com.unity.netcode.gameobjects": "2.13.3",
     "com.unity.pipeline": "0.9.1-exp.1",
-    "com.unity.postprocessing": "3.5.4",
     "com.unity.render-pipelines.universal": "17.6.0",
     "com.unity.splines": "2.8.4",
     "com.unity.test-framework": "1.8.0",

@@ -161,3 +161,22 @@ sandstone. The photo is licensed stock: used only as a description, never as an 
 ### Look and feel research
 - `Docs/LookAndFeelResearch_2026-11-18.md`: what exists, what the screenshots show, each area (rendering, terrain, water, VFX,
   audio, UX, lighting) with gain, cost and risk, a ranked top 15 and data-only quick wins. Nothing from it is built yet: your pick.
+
+## The look and feel work (you: "i agree with it. do all suggestions it presented. create folley and ambience with the localspawns model that best fits the task. wait until 6.7 with the new gpu methods.")
+Order: the data quick wins, then terrain, water, ambience and foley, the mixer, VFX, UX, lighting; terrain texture arrays last (the
+riskiest). GTAO, URP's SSR and Surface Cache GI wait for 6.7 LTS. Sound: MOSS-SoundEffect v2 (the better foley model) for one-shots;
+beds from two MOSS takes panned left and right for a natural stereo field, cut to loop.
+
+### Batch 1: the quick wins
+- **Shadows:** the sun's cascades are fitted to the top-down view (0.24 / 0.42 / 0.66 of 50 m: the play area gets cascades of its
+  own); over the shoulder and in cinematics the near splits swap in. Seen in a launched Valley: crisp shadows under plants and stones.
+- **Valley river:** reflection 0.8 -> 0.3, clearer (2.6 m), less murk, shore foam 0.12 -> 0.03, caustics up, a warmer shallow colour:
+  from above it reads as clear water over its bed, not a grey canal.
+- **Marsh pools:** the milky halo was the shore foam: off (0.03 -> 0). Seen at the Black Pool Landing.
+- **Troll Valley's main hour 11:00 -> 15:00** ("Low afternoon sun ... long shadows"), still called Day so the conditions that ask for
+  day still hold.
+- **Clouds:** the pink ones in the shots were dusk runs (19.2), right for dusk; now only clouds toward the sun warm up at sunset.
+- **Brukam's mist curtain:** an ellipsoid of mist (thinning to its tips) instead of a box that stopped dead (the lozenge).
+- **Dark plants:** measured: not dark textures and no black fringes (the textures are dilated); in the new afternoon light they read
+  dark green, their rims are their own shadows (sharper with the cascades). No data change.
+- **The unused legacy Post Processing package** is removed (nothing used it).
