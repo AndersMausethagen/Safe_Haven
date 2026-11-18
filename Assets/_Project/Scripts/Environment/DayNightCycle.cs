@@ -19,8 +19,19 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
     // disk" (another run: no way to know how long it was). With the game's world: a save made earlier in the same run and
     // loaded again is a new world, and must not count the real time since it was made as time away.
     private static readonly string Process = System.Guid.NewGuid().ToString("N");
-    /// <summary>This run of the game with this world (see above): what else counts real time away by (ResourceNode's regrowth).</summary>
+    /// <summary>This run of the game with this world (see above): what else counts time away by (ResourceNode's regrowth).</summary>
     public static string Run => Process + "." + System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(GameSession.World);
+
+    /// <summary>
+    /// Now, on the clock all time away is counted on, for a saved state to keep with its <see cref="Run"/>: game time
+    /// (Time.timeAsDouble), on across scene loads and still while paused. In real time an hour in the pause menu on a raid was two
+    /// dawns at home; the day was moved to game time and the nodes' regrowth wasn't, so they still grew back in it (SharedStateTests).
+    /// </summary>
+    public static double AwayStamp => Time.timeAsDouble;
+
+    /// <summary>Game seconds since <paramref name="stamp"/> (an <see cref="AwayStamp"/> kept with <paramref name="run"/>), or 0 when it
+    /// was made in another run: from disk, or a friend's game, there is no knowing how long it was.</summary>
+    public static float SecondsAwaySince(string run, double stamp) => run == Run ? Mathf.Max(0f, (float)(AwayStamp - stamp)) : 0f;
 
     [SerializeField] private DayNightProfile profile;
     [Tooltip("The scene's directional light: the sun by day, the moon by night.")]
@@ -132,11 +143,11 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
 
     int ISharedState.SharedMark => 0;
 
-    // Time away is counted in game time (Time.timeAsDouble: on across scene loads, still while paused). Counted in real time, an hour
+    // Time away is counted in game time (AwayStamp: on across scene loads, still while paused). Counted in real time, an hour
     // in the pause menu on a raid was two dawns at home: two territory turns, two days passed, nodes grown back.
     public string CaptureState() =>
         string.Join("|", (fadeElapsed >= 0f ? fadeTo : hour).ToString("R", CultureInfo.InvariantCulture), Run,
-            Time.timeAsDouble.ToString("R", CultureInfo.InvariantCulture));
+            AwayStamp.ToString("R", CultureInfo.InvariantCulture));
 
     public void RestoreState(string state)
     {
@@ -147,10 +158,10 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
         }
 
         float away = 0f;
-        if (parts.Length >= 3 && parts[1] == Run && clockRuns && profile != null
+        if (parts.Length >= 3 && clockRuns && profile != null
             && double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out double then))
         {
-            away = (float)(Time.timeAsDouble - then) * 24f / (profile.DayLengthMinutes * 60f);
+            away = SecondsAwaySince(parts[1], then) * 24f / (profile.DayLengthMinutes * 60f);
         }
 
         Hour = saved + Mathf.Max(0f, away);

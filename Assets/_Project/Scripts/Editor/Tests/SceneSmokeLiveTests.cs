@@ -32,7 +32,8 @@ public sealed class SceneSmokeLiveTests
         "Assets/_Project/Data/Raids/GuardiansHollow.asset",
     };
 
-    private readonly List<string> problems = new List<string>();
+    // From any thread: listening on the main thread's log alone, this passed with the renderer's errors in the console (LiveTestErrors).
+    private LiveTestErrors problems;
     private string folder;
     private string where = "";
 
@@ -41,7 +42,7 @@ public sealed class SceneSmokeLiveTests
     {
         LogAssert.ignoreFailingMessages = true;
         yield return new EnterPlayMode();
-        Application.logMessageReceived += Heard;
+        problems = new LiveTestErrors(() => where);
         folder = Path.Combine(Path.GetTempPath(), "SafeHavenSceneSmoke_" + Guid.NewGuid().ToString("N"));
         SaveGameService.Storage = new SaveStorage(folder);
 
@@ -97,13 +98,15 @@ public sealed class SceneSmokeLiveTests
             yield return Wait(3f);
         }
 
-        CollectionAssert.IsEmpty(problems, "errors and exceptions on the way:\n" + string.Join("\n\n", problems.Distinct()));
+        List<string> heard = problems.All;
+        CollectionAssert.IsEmpty(heard, "errors and exceptions on the way:\n" + string.Join("\n\n", heard));
     }
 
     [UnityTearDown]
     public IEnumerator PutThingsBack()
     {
-        Application.logMessageReceived -= Heard;
+        problems?.Dispose();
+        problems = null;
         if (Application.isPlaying)
         {
             Cheats.SetInvincible(false);
@@ -117,14 +120,6 @@ public sealed class SceneSmokeLiveTests
         if (folder != null && Directory.Exists(folder))
         {
             Directory.Delete(folder, true);
-        }
-    }
-
-    private void Heard(string message, string stack, LogType type)
-    {
-        if (type == LogType.Exception || type == LogType.Error || type == LogType.Assert)
-        {
-            problems.Add($"[{where}] {type}: {message}\n{string.Join("\n", stack.Split('\n').Take(6))}");
         }
     }
 

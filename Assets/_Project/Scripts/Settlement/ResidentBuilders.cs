@@ -22,6 +22,10 @@ public sealed class ResidentBuilders : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => worked.Clear();
 
+    /// <summary>Forgets who built while the player was away in the game being played (a new game, or a load: GameSession): a raid
+    /// left by the menu named the old game's builders in the next game's message home.</summary>
+    public static void ForgetGame() => worked.Clear();
+
     /// <summary>
     /// How many who live here build (their job is one of HomeLifeSettings › Builders) and are at home to do it: not
     /// <paramref name="away"/> (who went along on the raid), nor anyone whose work is paused.

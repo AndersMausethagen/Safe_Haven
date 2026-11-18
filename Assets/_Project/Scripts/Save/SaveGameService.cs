@@ -219,7 +219,8 @@ public static class SaveGameService
         return data;
     }
 
-    /// <summary>Saves as soon as the player stands somewhere that can be saved: home from a raid, past its results screen.</summary>
+    /// <summary>Saves as soon as the player stands somewhere that can be saved: home from a raid, past its results screen. One
+    /// save waits, however often it is asked for.</summary>
     public static void SaveOnceHome()
     {
         if (!ShouldAutosave)
@@ -227,21 +228,37 @@ public static class SaveGameService
             return;
         }
 
-        void OnReady(Scene scene)
-        {
-            if (CheckSave() != null)
-            {
-                return;
-            }
+        SceneTransition.SceneReady -= SaveOnReady;
+        SceneTransition.SceneReady += SaveOnReady;
+        IsSaveWaitingForHome = true;
+    }
 
-            SceneTransition.SceneReady -= OnReady;
-            if (!TrySave(out string problem))
-            {
-                Debug.LogWarning("Couldn't save on coming home: " + problem);
-            }
+    /// <summary>True while a save waits for the player to stand somewhere it can be made (SaveOnceHome).</summary>
+    public static bool IsSaveWaitingForHome { get; private set; }
+
+    /// <summary>
+    /// Forgets the save waiting for home when another journey begins (a save loaded, a new game): it belonged to the one left. Quit
+    /// to the menu from a raid, it waited through the menu (no player there) and was then written in the next game played. Not on
+    /// TryPlay, which goes on with the same journey: coming home from a friend's Haven, it is what saves the guest's own.
+    /// </summary>
+    private static void ForgetWaitingSave()
+    {
+        SceneTransition.SceneReady -= SaveOnReady;
+        IsSaveWaitingForHome = false;
+    }
+
+    private static void SaveOnReady(Scene scene)
+    {
+        if (CheckSave() != null)
+        {
+            return;
         }
 
-        SceneTransition.SceneReady += OnReady;
+        ForgetWaitingSave();
+        if (!TrySave(out string problem))
+        {
+            Debug.LogWarning("Couldn't save on coming home: " + problem);
+        }
     }
 
     /// <summary>Saves again once what came home with the player (a cart, a horse) has been set down, after the save on
@@ -593,6 +610,7 @@ public static class SaveGameService
             game.Pose = null;
         }
 
+        ForgetWaitingSave();
         GameSession.LoadGame(game);
         SendOnTheirWay(data.arriving);
         CurrentSlot = slot;
@@ -619,6 +637,7 @@ public static class SaveGameService
             return false;
         }
 
+        ForgetWaitingSave();
         GameSession.StartNewGame(look);
         CurrentSlot = null;
         CurrentName = null;
@@ -683,5 +702,6 @@ public static class SaveGameService
         CurrentSlot = null;
         CurrentName = null;
         raidUnderWay = null;
+        IsSaveWaitingForHome = false;
     }
 }

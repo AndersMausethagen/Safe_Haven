@@ -13,7 +13,9 @@ using UnityEngine.InputSystem;
 /// <list type="bullet">
 /// <item>where the player is (at home, on a raid, in a friend's Haven): asked of <see cref="Place"/>, not built from its parts;</item>
 /// <item>the player's controls: held in an owner's name through <see cref="PlayerControl"/>, never switched by hand;</item>
-/// <item>a stack: copied from itself (<see cref="ItemStack.WithCount"/> and the other With*), never re-made from its item.</item>
+/// <item>a stack: copied from itself (<see cref="ItemStack.WithCount"/> and the other With*), never re-made from its item;</item>
+/// <item>what a game being played keeps in statics: forgotten when another begins (every ForgetGame called by GameSession);</item>
+/// <item>time away: counted on the day's own clock (<see cref="DayNightCycle.SecondsAwaySince"/>), never on one a saved state picks.</item>
 /// </list>
 /// </summary>
 public sealed class SharedStateTests
@@ -370,6 +372,59 @@ public sealed class SharedStateTests
         CollectionAssert.IsEmpty(tested.Except(LoadsTestedOnly.Keys).ToList(), "pass SceneLoader.Load's ifItFails: a load can also break off after it " +
             "started, and undoing only a refusal left a player frozen at the portal with a raid that never came");
         CollectionAssert.IsEmpty(LoadsTestedOnly.Keys.Except(tested).ToList(), "these no longer test a load's result: take them off the list");
+    }
+
+    // ----- What a game being played keeps in statics -----
+
+    [Test]
+    public void EveryForgetGame_IsCalledWhenAnotherGameBegins()
+    {
+        // A static outlives a scene and is not reset by quitting to the menu (only by starting the program, or Play in the Editor,
+        // where the bugs therefore never showed): a game left by the menu kept its quest clock, its builders' names and its rowing
+        // lesson into the next game played. What belongs to the game is forgotten in a ForgetGame, called by GameSession.Reset.
+        string session = File.ReadAllText("Assets/_Project/Scripts/Core/GameSession.cs");
+        var unwired = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            foreach (Match forget in Regex.Matches(source, @"public\s+static\s+void\s+ForgetGame\s*\(\s*\)"))
+            {
+                MatchCollection classes = Regex.Matches(source.Substring(0, forget.Index), @"\bclass\s+(\w+)");
+                string owner = classes.Count > 0 ? classes[classes.Count - 1].Groups[1].Value : Path.GetFileNameWithoutExtension(path);
+                if (!Regex.IsMatch(session, @"\b" + owner + @"\.ForgetGame\s*\(\s*\)"))
+                {
+                    unwired.Add(owner + " (" + Path.GetFileName(path) + ")");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(unwired, "a ForgetGame no one calls: add it to GameSession.Reset, or the next game played keeps it");
+    }
+
+    [Test]
+    public void TimeAway_IsCountedOnTheDaysOwnClock()
+    {
+        // The day was moved to game time (an hour in the pause menu on a raid was two dawns at home) and the nodes' regrowth, which
+        // worked out its own time away, kept real time: the pause menu still grew every node back. One clock, DayNightCycle's.
+        var ownClocks = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (file == "Environment/DayNightCycle.cs" || !source.Contains("CaptureState("))
+            {
+                continue;
+            }
+
+            foreach (string line in source.Split('\n'))
+            {
+                if (Regex.IsMatch(CodePart(line), @"\bTime\.(?:realtimeSinceStartup\w*|timeAsDouble|unscaledTime\w*)"))
+                {
+                    ownClocks.Add(file + ": " + line.Trim());
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(ownClocks, "a saved state counting time on a clock of its own: keep DayNightCycle.AwayStamp with " +
+            "DayNightCycle.Run and read DayNightCycle.SecondsAwaySince");
     }
 
     // Text fields typed in where no gameplay key can act, and why.

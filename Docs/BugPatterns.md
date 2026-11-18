@@ -208,3 +208,44 @@ collect, where its quality is made); a lost asker's order was answered from the 
 comes down); saplings planted after the first never reached the other game (restores merge, planting only in one's own Haven); home time
 ran on in the pause menu (time away is game time); a strong rally call never ended near an elite; cancelling took a worker's craft;
 renown went by list order; crows due in a fight never came; a thief with loot could be tidied away.
+
+## Sixth round: kinds no round had scanned, and the evidence the game leaves (2026-11-18, evening)
+
+The user: "look for more bugs and pattern". Done without a fan-out of agents (the user's limit until 21:20): each kind of mistake
+scanned across all runtime scripts at once, then the evidence real runs leave (1,470 playtest logs' Stuck rows, the Editor's console
+from the day's test runs) followed to its cause in Play mode.
+
+| Pattern | What it broke | The one fix |
+|---|---|---|
+| **A game left by the menu hands its statics to the next.** A static is reset when the program starts (and when Play starts in the Editor, where every test is a fresh start, so no test ever saw it), not when the player quits to the menu and starts or loads another game in one sitting. `GameSession.Reset` already forgot three systems' state, each added after its own bug | the prologue's hold left by the menu kept its clock: the next game's tracker showed "0:00" on that quest; the raid's save for home, waiting for a scene with a player, waited through the menu and was then written in the next game (a new game's first save made at once); the builders' names in the next game's message home were the left game's; a new game was never told how to row | each a `ForgetGame` called by `GameSession.Reset` (QuestTimers, ResidentBuilders, Rowboat), and the prologue clears its own clock when it goes however it goes. The save for home belongs to the journey: forgotten when a save is loaded or a game begins, kept through `TryPlay` (coming home from a friend's Haven, it is what saves the guest's own Haven), and one waits however often it is asked for. `SharedStateTests.EveryForgetGame_IsCalledWhenAnotherGameBegins` fails on a ForgetGame no one calls; `QuitToMenuLiveTests` plays the way out: a raid left by the pause menu's Quit (saved as a fall, the save for home waiting), a new game (no clock, nothing written), the left journey loaded (home, at the portal), failing on any error from any thread |
+| **A check that can't hear what it is for.** `SceneSmokeLiveTests` listened on the main thread's log (`Application.logMessageReceived`, which Unity raises for main-thread messages only), and the renderer also logs from its culling jobs | the day's whole-suite run passed while the GPU Resident Drawer's "invalid Batch, Mesh, or Material ID" was logged at the end of the raids it played | `LiveTestErrors` hears every thread, and what isn't the game's is listed with its reason beside it. The one listed, measured in Play mode: the Resident Drawer's own check comes only as a raid's scene unloads behind the loading screen (a raid's creatures' skins, the Marsh's lily pads); never at a kill, a corpse sinking or being capped, nor at a scene load of the Haven's own with corpses lying in it |
+| **One rule in two places, again: time away.** The day clock and the nodes' regrowth each worked out their own "time away", and their shared `Run` even named the other | round 5 moved the day to game time (an hour in the pause menu on a raid was two dawns at home); the regrowth kept real time, so the pause menu still grew every node in the Haven back | `DayNightCycle.AwayStamp` and `SecondsAwaySince(run, stamp)`, the one clock both read; `SharedStateTests.TimeAway_IsCountedOnTheDaysOwnClock` fails on a saved state reading a clock of its own (real time, `timeAsDouble`, unscaled time); `DayNightSaveTests` |
+
+Also fixed: a raid companion's bond was written to one's own Haven and read back, a line later, from the Haven one stands in
+(`RaidCompanions`). Out of reach today (a guest following a host brings no companion), and one co-op feature away from an exception
+at the raid's end; both reads are `Home` now.
+
+Scanned across all runtime scripts and found clean, so not made into tests:
+
+- **Written to one's own Haven, read from the one stood in** (every file using both `GameSession.Home` and `Here`, 19): each runs only
+  at home or only in the game that keeps the Haven (`HavenDecisions`, the systems that stand down in a friend's Haven), where the two
+  are the same, apart from the companion above.
+- **Logic that differs in a build** (`Application.isEditor`, `#if UNITY_EDITOR` in runtime code): Steam, cheats, a slot made by an
+  autosave and the Quit button, all meant.
+
+- **Numbers written and read in the player's language** (a Norwegian machine writes 1,5): every save string, playtest row and parse is invariant.
+- **Enum values shifting under saved data** (Unity and JsonUtility store an enum as its number, so one inserted mid-list re-labels
+  every asset and save after it): every commit's enums compared before and after across all 616 commits. Three shifts, all in
+  runtime-only enums (a window's tab, a horse's idle).
+- **Triggers that never see the exit** (OnTriggerExit isn't called for a destroyed or disabled object): zones go by distance here;
+  three triggers, none counting.
+- **Random picks that never reach the last** (`Range(0, Count - 1)`): every hit picks a segment (`at`, `at + 1`), as it should.
+- **A registry changed while it is walked** (a trap's foreach over `MonsterAI.Active` killing what it walks): a death takes nothing
+  out of the registry at once, and a breach's next wave comes from a coroutine.
+- **A lease held by an owner that is gone** (invulnerability, a floor, speed): LeaseWatch's Stuck rows in 1,470 runs: none "held by
+  something gone". 80 are agent probes' own invulnerability, 13 the probes standing still, 2 a cinematic longer than LeaseWatch's
+  20 s (CinematicView lets go in OnDestroy too).
+- **The Lost**: a downed player (co-op) is held at 1 health, never "killed", and one bleeding out is counted as its kill only when its
+  blow was the last that hurt; the briefing and the raid agree from the seed.
+- **Quitting mid-raid**: the raid ends as a fall and is saved before the game goes; the raid's own way to the results screen, refused
+  while the menu loads, dies with its scene.

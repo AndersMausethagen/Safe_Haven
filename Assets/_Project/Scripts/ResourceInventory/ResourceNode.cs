@@ -67,7 +67,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
     {
         return JsonUtility.ToJson(new SavedNode
         {
-            depleted = IsDepleted, respawnRemaining = RespawnRemaining, run = DayNightCycle.Run, savedAt = Time.realtimeSinceStartupAsDouble,
+            depleted = IsDepleted, respawnRemaining = RespawnRemaining, run = DayNightCycle.Run, savedAt = DayNightCycle.AwayStamp,
         });
     }
 
@@ -78,8 +78,9 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         {
             // Home from a raid in the same run, the time away counts, as it does for the clock, the days and the saplings: the node
             // had exactly as long to go as when the player left. From disk (or a friend's game) there's no knowing how long it was.
-            float away = saved.run == DayNightCycle.Run ? (float)(Time.realtimeSinceStartupAsDouble - saved.savedAt) : 0f;
-            respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - Mathf.Max(0f, away));
+            // On the day's own clock (game time): in real time, an hour in the pause menu on a raid grew every node back.
+            float away = DayNightCycle.SecondsAwaySince(saved.run, saved.savedAt);
+            respawnAt = Time.time + Mathf.Max(0f, saved.respawnRemaining - away);
             SetPresent(false);
         }
         else if (IsDepleted)

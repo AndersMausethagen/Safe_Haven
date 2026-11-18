@@ -50,7 +50,8 @@ public sealed class RaidCompanions
 
         Companion = Companion.SpawnForRaid(prefab, session.Companion, hit.position);
         Companion.FormationOffset = new Vector3(2f, 0f, -3f);
-        ResidentRecord record = GameSession.Here.Find(session.Companion);
+        // One's own companion, from one's own Haven: on a raid followed with a host, the Haven here is still the host's.
+        ResidentRecord record = GameSession.Home.Find(session.Companion);
         companionRank = record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null;
         Toughen(Companion, companionRank);
     }
@@ -111,8 +112,9 @@ public sealed class RaidCompanions
             {
                 bool rose = GameSession.Home.RecordRaidAlong(session.Companion, SettlementSettings.Current.BondRanks, extracted, session.BossesBeaten,
                     Companion.TimesHelpedUp, session.TimeRemaining, Companion.Kills, SettlementSettings.Current.MemoryReturnsEvery);
-                ResidentRecord record = GameSession.Here.Find(session.Companion);
-                report.CompanionNewRank = rose ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
+                // Read back from where it was written (Home): from the Haven here, a guest's would be the host's record, or none.
+                ResidentRecord record = GameSession.Home.Find(session.Companion);
+                report.CompanionNewRank = rose && record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks)?.name : null;
             }
         }
 

@@ -54,6 +54,18 @@ public sealed class DayNightSaveTests
     }
 
     [Test]
+    public void TimeAway_IsGameTime_AndOnlyInTheSameRun()
+    {
+        // The one clock time away is counted on (the day, the nodes' regrowth): a stamp from this run gives the game seconds since,
+        // one from another run (from disk, a friend's game) nothing.
+        double then = DayNightCycle.AwayStamp - 30.0;
+        Assert.AreEqual(30f, DayNightCycle.SecondsAwaySince(DayNightCycle.Run, then), 0.01f);
+        Assert.AreEqual(0f, DayNightCycle.SecondsAwaySince(new string('0', 32), then));
+        Assert.AreEqual(0f, DayNightCycle.SecondsAwaySince(DayNightCycle.Run, DayNightCycle.AwayStamp + 5.0), "never less than nothing");
+        Assert.AreEqual(Time.timeAsDouble, DayNightCycle.AwayStamp, 0.01, "game time: still while paused, unlike real time");
+    }
+
+    [Test]
     public void TheHavensClockIsSaved()
     {
         string scene = System.IO.File.ReadAllText("Assets/_Project/Scenes/SafeHaven.unity");

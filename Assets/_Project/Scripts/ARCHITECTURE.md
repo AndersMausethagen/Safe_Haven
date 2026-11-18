@@ -756,6 +756,12 @@ reviews). When adding something, go through these, and the tests say when one is
 - An item given: `ItemInventory.Give(item, n, cause)` has no default cause; say why it came (the compiler asks).
 - "Near the player" on a raid: `RaidPlayers` (friends too). Anything every game works out from the seed never depends on positions.
 - One's own values (pocket, journal, quests about one's stash) read `GameSession.Home`, not `Here`.
+- Something of the game being played kept in a static (it outlives a scene, and quitting to the menu doesn't reset it): forgotten in
+  a `public static void ForgetGame()` that `GameSession.Reset` calls, or the next game started or loaded in one sitting keeps it
+  (`SharedStateTests`; `QuitToMenuLiveTests` plays the way out).
+- A Play-mode test that fails on errors listens through `LiveTestErrors` (every thread: the renderer logs from its jobs).
+- Time away (home while on a raid): stamped with `DayNightCycle.AwayStamp` beside `DayNightCycle.Run`, read back with
+  `SecondsAwaySince`; game time, never a saved state's own clock (`SharedStateTests`).
 
 ## Scene changes, raid results and raid layouts
 

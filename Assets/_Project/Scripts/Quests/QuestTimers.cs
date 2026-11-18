@@ -74,6 +74,17 @@ public static class QuestTimers
         return quest != null;
     }
 
+    /// <summary>Forgets the clocks of the game being played (a new game, or a load: GameSession): a game left in the middle of a
+    /// timed moment kept its clock into the next one.</summary>
+    public static void ForgetGame()
+    {
+        if (clocks.Count > 0)
+        {
+            clocks.Clear();
+            Changed?.Invoke();
+        }
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void Reset()
     {

@@ -149,6 +149,9 @@ public sealed class PrologueDirector : MonoBehaviour
             health.Died -= OnPlayerDied;
             health.RemoveInvulnerability(this);
         }
+        // Left in the middle of a timed chapter (quit to the menu during the hold), its clock went on showing "0:00" in the tracker
+        // of the next game played, until that chapter's own clock was set again.
+        if (chapter != null) QuestTimers.Clear(chapter.Quest);
         if (Current == this) Current = null;
     }
 
