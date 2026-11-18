@@ -283,7 +283,7 @@ public static class SceneTransition
         private const float LoadShare = 0.85f;
 
         private LoadingScreen screen;
-        private PlayerInputHandler stoppedInput;
+        private GameObject stoppedPlayer;
         private float setupProgress;
 
         private void Awake()
@@ -550,21 +550,17 @@ public static class SceneTransition
         // The player stays in the old scene until the new one is shown, so keep them still meanwhile.
         private void StopPlayer()
         {
-            stoppedInput = null;
-            if (Player.Current != null && Player.Current.TryGetComponent(out PlayerInputHandler input) && input.enabled)
-            {
-                input.enabled = false;
-                stoppedInput = input;
-            }
+            stoppedPlayer = Player.Current != null ? Player.Current.gameObject : null;
+            PlayerControl.Hold(stoppedPlayer, this);
         }
 
-        // Only what the transition stopped itself: a player stopped for a reason of its own, such as a raid ending, stays stopped.
+        // Only the transition's own hold: a player stopped for a reason of its own, such as a raid ending, stays stopped.
         private void ResumePlayer()
         {
-            if (stoppedInput != null)
+            if (stoppedPlayer != null)
             {
-                stoppedInput.enabled = true;
-                stoppedInput = null;
+                PlayerControl.Release(stoppedPlayer, this);
+                stoppedPlayer = null;
             }
         }
     }

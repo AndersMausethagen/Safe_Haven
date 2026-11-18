@@ -42,7 +42,7 @@ public sealed class LootOnDeath : MonoBehaviour
     public bool WithholdsEssence { get; set; }
 
     /// <summary>Killed at home: in the Haven, not in a raid. What only raids give stays on the body.</summary>
-    public static bool KilledAtHome => GameSession.ActiveRaid == null && RaidDirector.Current == null && HomePortal.Current != null;
+    public static bool KilledAtHome => Place.InAHaven;
     public IReadOnlyList<RecipeDefinition> UnlocksRecipes => unlocksRecipes;
     public IReadOnlyList<EnchantmentDefinition> Inscriptions => inscriptions;
 

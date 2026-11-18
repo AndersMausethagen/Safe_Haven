@@ -452,7 +452,10 @@ public sealed partial class SkillsWindow : MonoBehaviour
     }
 
     // Free, but only at home: a change of mind needs a quiet place.
-    private static bool AtHome => HomePortal.Current != null;
+    // "At home, beside the portal" (CharacterProgress.CanChoose): one's own Haven, inside its ward, as stacking onto the chests asks.
+    // Any scene with a portal passed before, from anywhere in it, a friend's Haven too.
+    private static bool AtHome => Place.AtHome && HomePortal.Current != null && Player.Current != null
+        && HomePortal.Current.Contains(Player.Current.transform.position);
 
     private void Refresh()
     {

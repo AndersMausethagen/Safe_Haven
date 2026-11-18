@@ -223,11 +223,12 @@ public sealed class NokkenEncounter : MonoBehaviour
         health.ApplyDamage(new DamageInfo(null, null, amount, DamageType.Physical, false, at, at - surfaceAt));
     }
 
+    // The grab's own hold (PlayerControl): the raid's end or a co-op fall during the grab still holds the controls after it.
     private void SetInput(bool on)
     {
-        if (fishing.TryGetComponent(out PlayerInputHandler input))
+        if (fishing != null)
         {
-            input.enabled = on;
+            PlayerControl.Set(fishing.gameObject, this, !on);
         }
     }
 

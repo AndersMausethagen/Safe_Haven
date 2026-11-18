@@ -477,13 +477,20 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     }
 
     /// <summary>Co-op, pure: the same saved state, marked to come home (it grazes near the portal when next loaded).</summary>
-    public static string ComingHome(string state)
+    public static string ComingHome(string state, float dayShift = 0f)
     {
         Saved saved = string.IsNullOrEmpty(state) ? null : JsonUtility.FromJson<Saved>(state);
         if (saved == null)
         {
             return state;
         }
+
+        // Its day stamps into the home Haven's count (a stamp never set keeps its "never" value).
+        saved.lastCared += dayShift;
+        saved.lastGroomed = saved.lastGroomed > -99f ? saved.lastGroomed + dayShift : saved.lastGroomed;
+        saved.bornOn = saved.bornOn >= 0f ? Mathf.Max(0f, saved.bornOn + dayShift) : saved.bornOn;
+        saved.withFoalSince = saved.withFoalSince >= 0f ? Mathf.Max(0f, saved.withFoalSince + dayShift) : saved.withFoalSince;
+        saved.lastFoaled = saved.lastFoaled > -99f ? saved.lastFoaled + dayShift : saved.lastFoaled;
 
         saved.arriving = true;
         saved.stabledIn = "";

@@ -97,7 +97,7 @@ public static class Salvage
         var got = new List<ItemAmount>();
         // What the bag can't take goes to the stash at home only, as quest rewards do: in a friend's Haven the stash is the host's
         // (review 2026-11-17, R7), so it lands at the player's feet there.
-        bool atHome = RaidDirector.Current == null && !HavenVisit.IsVisiting;
+        bool atHome = Place.AtHome;
         bool fell = false;
         foreach (ItemAmount part in yield)
         {

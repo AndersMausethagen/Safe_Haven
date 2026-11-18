@@ -41,6 +41,10 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
     private struct Saved
     {
         public List<SlotSaveData> slots;
+        /// <summary>Whose it is (their journey's id, as a horse's): empty for the Haven's own.</summary>
+        public string owner;
+        /// <summary>Brought home from a friend's Haven: set down near the portal when next loaded.</summary>
+        public bool arriving;
     }
 
     [SerializeField] private TransportDefinition definition;
@@ -79,8 +83,21 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
     public Interactable Interactable => interactable;
     public ItemContainer Cargo { get; private set; }
 
-    /// <summary>Set down from this player's own kit while playing (not saved): in a friend's Haven, theirs to open and pack.</summary>
-    public bool SetDownByThisPlayer { get; set; }
+    // Whose it is: set down from a player's own kit, saved with it (a scene reload after a raid made a guest's own cart the host's).
+    private string ownerId = "";
+    private bool arriving;
+
+    private static string ThisPlayer => GameSession.Playtest != null ? GameSession.Playtest.Id ?? "" : "";
+
+    /// <summary>Set down from this player's own kit: in a friend's Haven, theirs to open and pack. Saved with the cart.</summary>
+    public bool SetDownByThisPlayer
+    {
+        get => !string.IsNullOrEmpty(ownerId) && ownerId == ThisPlayer;
+        set => ownerId = value ? ThisPlayer : "";
+    }
+
+    /// <summary>This player's to open and pack: their own, or the Haven's own while they are at home.</summary>
+    public bool IsMine => string.IsNullOrEmpty(ownerId) ? !HavenVisit.IsVisiting : ownerId == ThisPlayer;
     public Rigidbody Body { get; private set; }
     public ITransportDriver Driver { get; private set; }
     public float Weight => Cargo.CurrentWeight;
@@ -126,7 +143,25 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
         safePosition = transform.position;
     }
 
-    private void Start() => TransportHud.Create();
+    private void Start()
+    {
+        TransportHud.Create();
+        if (arriving)
+        {
+            ArriveHome();
+        }
+    }
+
+    // Brought home from a friend's Haven (HavenVisit): set down on the ground near the portal, wherever the save had it.
+    private void ArriveHome()
+    {
+        arriving = false;
+        if (HomePortal.Current != null && TransportDeployment.FindGroundAround(HomePortal.Current.transform, out Vector3 at))
+        {
+            Body.position = at;
+            transform.position = at;
+        }
+    }
 
     private void OnDisable()
     {
@@ -218,7 +253,7 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
         }
 
         // A friend's Haven: their carts are their stores. Opening one takes the stash's yes; packing one away is theirs alone.
-        bool theirs = HavenVisit.IsVisiting && !SetDownByThisPlayer;
+        bool theirs = HavenVisit.IsVisiting && !IsMine;
         page.Add(new MenuAction("Open the cargo", "Move things between it and your bag", true, () =>
         {
             if (!theirs || !HavenVisit.StoresNeedAsking())
@@ -285,11 +320,38 @@ public sealed class Transport : MonoBehaviour, ISaveable, ICargoHold
 
     string ISaveable.SaveKey => "transport";
 
-    public string CaptureState() => JsonUtility.ToJson(new Saved { slots = SaveMapper.ToSlots(Cargo) });
+    public string CaptureState() => JsonUtility.ToJson(new Saved { slots = SaveMapper.ToSlots(Cargo), owner = ownerId, arriving = arriving });
+
+    /// <summary>Co-op, pure: whose a saved cart's state says it is. Empty for the Haven's own.</summary>
+    public static string OwnerIn(string state)
+    {
+        if (string.IsNullOrEmpty(state))
+        {
+            return "";
+        }
+
+        Saved saved = JsonUtility.FromJson<Saved>(state);
+        return saved.owner ?? "";
+    }
+
+    /// <summary>Co-op, pure: the same saved state, marked to come home (set down near the portal when next loaded).</summary>
+    public static string ComingHome(string state)
+    {
+        if (string.IsNullOrEmpty(state))
+        {
+            return state;
+        }
+
+        Saved saved = JsonUtility.FromJson<Saved>(state);
+        saved.arriving = true;
+        return JsonUtility.ToJson(saved);
+    }
 
     public void RestoreState(string state)
     {
         Saved saved = JsonUtility.FromJson<Saved>(state);
+        ownerId = saved.owner ?? "";
+        arriving = saved.arriving;
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         if (saved.slots != null && content != null)
         {

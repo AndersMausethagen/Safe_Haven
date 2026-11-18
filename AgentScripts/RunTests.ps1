@@ -6,7 +6,9 @@ Runs Unity tests through the unity CLI without the "Scene(s) Have Been Modified"
 The World Builder dirties SafeHaven after the Editor starts and after feature-field changes. A test run then waits on
 Unity's native save dialog and every CLI command times out until someone answers it. This script:
   1. answers that dialog with Save if it is already up (a stuck earlier run);
-  2. saves open scenes that are dirty (refuses in Play mode: stop Play first);
+  2. saves open scenes that are dirty (refuses in Play mode: stop Play first). An Untitled scene with changes can't be saved
+     without a file dialog (which stalls the Editor like the other): the run stops and says so, unless -DiscardUntitled
+     (a test's leftover, such as an Untitled scene from a run cut off by a recompile) reopens the Haven in its place;
   3. runs the tests, clicking Save on the dialog if it appears anyway, and reports any other Editor dialog it sees;
   4. prints the CLI's output and the totals from TestResults.xml.
 
@@ -22,7 +24,8 @@ param(
     [switch]$All,
     [int]$Timeout = 300,
     [ValidateSet('EditMode', 'PlayMode')][string]$Mode = 'EditMode',
-    [string]$Project = 'D:/Safe Haven/Safe Haven'
+    [string]$Project = 'D:/Safe Haven/Safe Haven',
+    [switch]$DiscardUntitled
 )
 
 if (-not $All -and [string]::IsNullOrWhiteSpace($Filter)) { Write-Output '[RunTests] Name a -Filter (a class, or "A;B"), or -All.'; exit 2 }
@@ -67,6 +70,13 @@ public static class SafeHavenDialogs
                 if (save != IntPtr.Zero) { SendMessage(save, ButtonClick, IntPtr.Zero, IntPtr.Zero); seen.Add("clicked Save on: " + title); }
                 else seen.Add("no Save button on: " + title);
             }
+            else if (title == "Save Scene")
+            {
+                // The file dialog for an Untitled scene (from Save on the dialog above, or a save of open scenes): it waits for a
+                // file name nobody will type. Closed, the save is cancelled.
+                SendMessage(window, 0x0010, IntPtr.Zero, IntPtr.Zero);
+                seen.Add("closed the Save Scene file dialog (an Untitled scene can't be saved here: see -DiscardUntitled)");
+            }
             else
             {
                 seen.Add("other Editor dialog open: " + title);
@@ -103,19 +113,32 @@ Start-Sleep -Milliseconds 500
 
 # 2. Save dirty scenes so the runner has nothing to ask about.
 $probe = Join-Path $env:TEMP 'SafeHavenRunTests_SaveScenes.cs'
+$discard = if ($DiscardUntitled) { 'true' } else { 'false' }
 @'
 if (UnityEditor.EditorApplication.isPlaying) return "playing";
+bool discard = DISCARD;
 var dirty = new System.Collections.Generic.List<string>();
+bool untitled = false;
 for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++)
 {
     var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
-    if (scene.isDirty) dirty.Add(scene.name);
+    if (!scene.isDirty) continue;
+    // An Untitled scene has no file: saving it opens a file dialog, which stalls the Editor.
+    if (string.IsNullOrEmpty(scene.path)) { untitled = true; continue; }
+    UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+    dirty.Add(scene.name);
 }
-if (dirty.Count > 0) UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
-return dirty.Count == 0 ? "clean" : "saved " + string.Join(", ", dirty);
-'@ | Set-Content -Path $probe -Encoding utf8
+if (untitled && !discard) return "untitled";
+if (untitled) UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/_Project/Scenes/SafeHaven.unity", UnityEditor.SceneManagement.OpenSceneMode.Single);
+string said = dirty.Count == 0 ? "clean" : "saved " + string.Join(", ", dirty);
+return untitled ? said + "; discarded an Untitled scene (reopened the Haven)" : said;
+'@.Replace('DISCARD', $discard) | Set-Content -Path $probe -Encoding utf8
 $saved = & $unity command script eval_file --no-banner -- --file $probe 2>&1 | Out-String
 if ($saved -match '"result":"playing"') { Write-Output '[RunTests] The Editor is in Play mode: stop Play first.'; exit 2 }
+if ($saved -match '"result":"untitled"') {
+    Write-Output '[RunTests] An Untitled scene has unsaved changes, and saving it would wait on a file dialog. Save it under a name, or pass -DiscardUntitled when it is a leftover of a test run.'
+    exit 2
+}
 if ($saved -match '"result":"([^"]*)"') { Write-Output "[RunTests] scenes: $($Matches[1])" } else { Write-Output "[RunTests] scene check failed: $saved" }
 
 # 3. Run the tests, watching for the dialog while they run. The CLI's filter takes one name (a class, or any part of a

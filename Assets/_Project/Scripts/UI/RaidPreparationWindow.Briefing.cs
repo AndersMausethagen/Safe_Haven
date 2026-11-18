@@ -89,8 +89,8 @@ public sealed partial class RaidPreparationWindow
         string restless = closed ? null : LostOneRules.BriefingLine(RaidLostOnes.ForRun(raid, plan.Seed, plan.Difficulty != null ? plan.Difficulty.tier : raid.Tier),
             raid.DisplayName, LostOneSettings.Current);
         // Then the sky the run opens in and what it does (research W3), as the raid will begin in it (RaidWeather, the same seed).
-        string sky = closed ? null : RaidWeather.BriefingLine(RaidWeather.Opening(raid, plan.Seed),
-            WeatherSystem.Active != null && WeatherSystem.Active.Snowing, PerceptionSettings.Current);
+        // No snow: the Haven's winter snows, a raid doesn't (RaidSky sets no snowfall), and a rainy opening was briefed as snow.
+        string sky = closed ? null : RaidWeather.BriefingLine(RaidWeather.Opening(raid, plan.Seed), false, PerceptionSettings.Current);
         headLines.Clear();
         if (restless != null) headLines.Add(restless);
         if (sky != null) headLines.Add(sky);

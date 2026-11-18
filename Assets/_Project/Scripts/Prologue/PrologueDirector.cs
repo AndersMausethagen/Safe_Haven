@@ -451,8 +451,8 @@ public sealed class PrologueDirector : MonoBehaviour
         health.AddInvulnerability(this);
         ClearEnemies();
         portalVisual.SetActive(true);
-        PlayerInputHandler input = Player.Current.GetComponent<PlayerInputHandler>();
-        input.enabled = false;
+        GameObject held = Player.Current.gameObject;
+        PlayerControl.Hold(held, this);
         if (ActionMenuWindow.Current != null) ActionMenuWindow.Current.Close();
         Rumble(0.65f);
         GameMessages.Post(overwhelmed ? definition.OverwhelmedText : definition.SurvivedText);
@@ -478,7 +478,7 @@ public sealed class PrologueDirector : MonoBehaviour
             Debug.LogError("The prologue could not start its home transition.", this);
             GameMessages.Post("The return to Safe Haven failed. Reload the last checkpoint.", MessageKind.Warning);
             health.RemoveInvulnerability(this);
-            input.enabled = true;
+            PlayerControl.Release(held, this);
             ending = false;
             ready = false;
         }

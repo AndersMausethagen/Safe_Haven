@@ -94,7 +94,7 @@ public static class SaveGameService
         }
 
         // The raid's scene stays a moment after its outcome (ActiveRaid is cleared then): a save there would start a raid.
-        if (GameSession.ActiveRaid != null || RaidDirector.Current != null)
+        if (Place.OnRaid)
         {
             return RaidRefusal;
         }
@@ -150,7 +150,7 @@ public static class SaveGameService
             return "Let the scene finish first.";
         }
 
-        return GameSession.ActiveRaid != null || RaidDirector.Current != null ? RaidRefusal : null;
+        return Place.OnRaid ? RaidRefusal : null;
     }
 
     /// <summary>
@@ -629,11 +629,8 @@ public static class SaveGameService
     private static void Go(string scene, string notice, string caption)
     {
         // The player stays in the old scene until the new one is ready, so keep them still meanwhile.
-        PlayerInputHandler input = null;
-        if (Player.Current != null && Player.Current.TryGetComponent(out input))
-        {
-            input.enabled = false;
-        }
+        GameObject held = Player.Current != null ? Player.Current.gameObject : null;
+        PlayerControl.Hold(held, Loading);
 
         loading = true;
         void OnAbandoned()
@@ -646,10 +643,7 @@ public static class SaveGameService
             }
 
             loading = false;
-            if (input != null)
-            {
-                input.enabled = true;
-            }
+            PlayerControl.Release(held, Loading);
         }
 
         void OnLoaded(Scene loaded, LoadSceneMode mode)
@@ -674,12 +668,12 @@ public static class SaveGameService
             SceneManager.sceneLoaded -= pendingArrival;
             pendingArrival = null;
             loading = false;
-            if (input != null)
-            {
-                input.enabled = true;
-            }
+            PlayerControl.Release(held, Loading);
         }
     }
+
+    // The load's own hold on the player's controls while the next scene comes up (PlayerControl).
+    private static readonly object Loading = new object();
 
     private static bool CanLoad(string scene) => !string.IsNullOrEmpty(scene) && Application.CanStreamedLevelBeLoaded(scene);
 

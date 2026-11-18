@@ -153,3 +153,30 @@ purpose).
 
 Still a source scan, so still a map: a rule can miss a write through a method it can't follow, and a name used by two types
 in one file. When it flags something safe, the fix is a line in its allow-list with the reason, never a weaker rule.
+
+## Fourth round: state with one owner (2026-11-18)
+
+The user, after the bug hunter's three rounds of 2026-11-18: "look for patterns in the bugs. can we create better code so these
+bugs dont happen again? better than hard coding fixes on each bug individually". Of the 16 bugs those rounds fixed one by one,
+most were the same few mistakes. The worst kind was one piece of shared state with no owner, which every system that needed it
+pieced together or switched by itself. The fixes below give each kind of state one owner, and `SharedStateTests` fails on
+code that goes around it.
+
+| Pattern | The bugs it made | Now |
+|---|---|---|
+| **"Where am I" built by hand.** About 250 checks put "at home", "on a raid" or "in a friend's Haven" together from `GameSession.ActiveRaid`, `RaidDirector.Current`, `HavenVisit.IsVisiting` and `HomePortal.Current`; "at home" alone had four meanings | a guest's cargo went into a stash that wasn't theirs and was lost (CargoWindow); rewards held for home were paid in the host's Haven (QuestManager); a raid set out but not yet loaded counted as home | `Core/Place.cs`: each meaning said once (`OnRaid`, `InRaidScene`, `RaidRunning`, `RaidDecided`, `AtHome`, `InFriendsHaven`, `FollowingAHost`, `InAHaven`, `StashUsable`). 21 files moved to it. A line combining two of the parts fails the test, apart from three listed with their reasons (none of them asks where the player is) |
+| **A shared switch with no owner.** Ten systems turned `PlayerInputHandler` off and on themselves, each guessing whether it was theirs to turn back on | the Nøkken's grab gave full controls back to a downed player, or to one whose raid had just ended; a cinematic that started while a scene change held the controls didn't take them, and the change handed them back in the middle of it | `Player/PlayerControl.cs`: `Hold(player, owner)`, `Release`, `Set`, `HeldOn`, `HeldBy`. The controls come back only when nobody holds them, and a destroyed holder lets go by itself. All ten moved to it (cinematics, scene changes, the Nøkken, being downed, watching friends, the prologue's ending, a raid's end, a launch, loading, home revival). A write to `.enabled` on the handler anywhere else fails the test |
+| **A copy that drops fields.** A stack re-made from its item (`new ItemStack(stack.Item, n)`) loses whatever the constructor isn't given | round 1's `ItemContainer` copy; this round found four more: splitting a stack lost one half's size and an inscribed stack's inscription; merging two stacks lost the inscription; picking up blank parchment topped up an inscribed stack and made it blank; the horse lure's food | Copied from itself (`WithCount`, `WithSize`...). Plain pieces join only stacks of the same kind (`ItemStack.StacksWith`, the one rule). A `new ItemStack(x.Item, ...)` where `x` is a stack fails the test |
+| Saved-state gaps | a station's worker crafts; whose a cart is | fixed one by one (round 1's `[NotSaved]` guard covers the settlement, quests, progress and ISaveables' own state; these two lived outside it) |
+| Two clocks | a horse brought home from a friend's Haven kept stamps on the host's days | `HavenVisit` shifts them on the one path between Havens (`Horse.ComingHome(state, dayShift)`) |
+| Ownership by kind | horses came home from a friend's Haven, carts stayed in the host's world | both carry their owner in their saved state and come home the same way (`Transport.OwnerIn`, `ComingHome`) |
+| Derived state not worked out again, a partial result told as whole | the run's seed after the destination changed, the rally key, a stone's watch after its push was settled; the tithe's report | fixed one by one: too different in shape for one rule |
+
+Also from the bug hunter's fourth round (all low): an extension that already holds one of a station's slots keeps it, so a new
+one in reach takes only a free slot (`StationExtensions`; ids are random, not the order of placing; after a reload the order is by id again);
+perks change only at home inside the ward (`SkillsWindow`; any scene with a portal passed before, a friend's Haven too); a meal
+eaten for its boon on a full belly no longer says "You're not hungry." (`PlayerNeeds.WouldHelp`, one rule for both).
+
+`RunTests.ps1` learned one trap more: an Untitled scene with changes (a run cut off by a recompile leaves one) can't be saved
+without a file dialog, which stalls the Editor like the save prompt. The script now stops and says so, or, with
+`-DiscardUntitled`, reopens the Haven in its place; a "Save Scene" file dialog seen during a run is closed and reported.

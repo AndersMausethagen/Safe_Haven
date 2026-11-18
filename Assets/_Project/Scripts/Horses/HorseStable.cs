@@ -220,6 +220,7 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     private void Put(Horse horse, int stall)
     {
         kept[stall] = horse;
+        fedUntil[stall] = 0f; // a meal is the horse's that ate it, not the stall's
         horse.SetStabled(Id);
         horse.Motion.Stall(true, stalls[stall].position, stalls[stall].rotation);
     }
@@ -231,6 +232,7 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
             if (kept[i] == horse)
             {
                 kept[i] = null;
+                fedUntil[i] = 0f;
             }
         }
     }
@@ -296,7 +298,10 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
                 continue;
             }
 
-            // A meal from the trough when the last one has worn off: while fed, it mends twice as fast and grows fonder.
+            // A meal from the trough when the last one has worn off: while fed, it mends twice as fast and grows fonder, for the
+            // hours a meal covered (coming home after a day, one meal gave the doubling for the whole day).
+            float elapsed = Mathf.Min(hours, 24f);
+            float covered = Mathf.Clamp(fedUntil[i] - (hour - elapsed), 0f, elapsed);
             if (fedUntil[i] <= hour)
             {
                 ItemDefinition meal = TakeMeal();
@@ -304,16 +309,16 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
                 {
                     fedUntil[i] = hour + settings.TroughMealHours;
                     horse.Befriend(meal.HorseTreat * 0.5f);
+                    covered = Mathf.Max(covered, Mathf.Min(1f, elapsed)); // it ate as the last meal wore off, within the hour
                 }
             }
 
-            bool fed = fedUntil[i] > hour;
-            float mend = settings.StableHealPerHour * Mathf.Min(hours, 24f) * (fed ? 2f : 1f);
+            float mend = settings.StableHealPerHour * (elapsed + covered);
             horse.Health.Heal(horse.Health.MaxHealth * mend);
             horse.Stamina = horse.MaxStamina;
-            if (fed)
+            if (covered > 0f)
             {
-                horse.Befriend(settings.TroughBondPerHour * Mathf.Min(hours, 24f));
+                horse.Befriend(settings.TroughBondPerHour * covered);
             }
         }
 

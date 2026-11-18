@@ -136,7 +136,8 @@ public sealed class PlayerEating : MonoBehaviour
             Techniques.Used(PerkTechnique.SpareDose);
         }
 
-        if (needs != null && (item.HungerRestore > 0f || item.ThirstRestore > 0f))
+        // Only when it feeds: a meal eaten on a full belly for its boon said "You're not hungry." beside the boon's gain.
+        if (needs != null && needs.WouldHelp(item.HungerRestore, item.ThirstRestore))
         {
             needs.TryConsume(item.DisplayName, item.HungerRestore, item.ThirstRestore);
         }

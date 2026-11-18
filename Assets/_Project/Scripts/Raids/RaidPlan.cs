@@ -113,6 +113,8 @@ public sealed class RaidPlan
     {
         destinationIndex = index;
         Difficulty = null;
+        // Its own seed: every other destination planned, briefed and launched on the first one's.
+        Seed = PinnedSeed(Destination);
         Large = LargeByDefault(Destination);
         layOutAhead(Destination, Seed, Large);
     }

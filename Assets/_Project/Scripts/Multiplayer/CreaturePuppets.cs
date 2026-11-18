@@ -276,7 +276,7 @@ public sealed class CreaturePuppets : IRaidCreatureSource
             ai.MakeRemote();
             // As strong as this raid makes its creatures, at its stage: the strikes play out here, so what they do to this
             // player is worked out from this copy's stats. Unreadied, a tier IV creature hit a friend as a tier I one does.
-            if (GameSession.ActiveRaid != null && RaidDirector.Current != null)
+            if (Place.InRaidScene)
             {
                 RaidDirector.Current.Creatures.Prepare(copy, false);
             }

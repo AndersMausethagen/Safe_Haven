@@ -485,7 +485,7 @@ public sealed class PauseMenu : MonoBehaviour
     // A raid left by quitting ends as a fall, saved before the game goes (RaidDirector.Abandon).
     private static void AbandonRaid()
     {
-        if (GameSession.ActiveRaid != null && RaidDirector.Current != null)
+        if (Place.InRaidScene)
         {
             RaidDirector.Current.Abandon();
         }

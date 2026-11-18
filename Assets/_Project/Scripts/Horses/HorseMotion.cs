@@ -1433,7 +1433,7 @@ public sealed class HorseMotion : MonoBehaviour
         ItemStack food = lure.Stack;
         if (food.Count > 1)
         {
-            lure.Hold(new ItemStack(food.Item, food.Count - 1));
+            lure.Hold(food.WithCount(food.Count - 1));
         }
         else
         {

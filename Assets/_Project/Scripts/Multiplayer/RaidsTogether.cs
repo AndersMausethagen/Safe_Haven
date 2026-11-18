@@ -84,7 +84,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     public RaidDefinition RaidToFollow(IEnumerable<RaidDefinition> destinations, out float secondsLeft)
     {
         secondsLeft = 0f;
-        if (openRaid == null || link == null || link.IsHost || !HavenVisit.IsVisiting || GameSession.ActiveRaid != null)
+        if (openRaid == null || link == null || link.IsHost || !Place.InFriendsHaven)
         {
             return null;
         }

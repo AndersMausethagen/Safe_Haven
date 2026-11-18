@@ -28,7 +28,7 @@ public sealed class CinematicView : MonoBehaviour
     private CanvasGroup hint;
     private bool hideHud;
     private readonly List<Canvas> hidden = new List<Canvas>();
-    private PlayerInputHandler input;
+    private GameObject heldPlayer;
     private Damageable health;
     private bool ending;
     private float endAt;
@@ -90,14 +90,9 @@ public sealed class CinematicView : MonoBehaviour
 
         if (holdPlayer && Player.Current != null)
         {
-            if (Player.Current.TryGetComponent(out input) && input.enabled)
-            {
-                input.enabled = false;
-            }
-            else
-            {
-                input = null;
-            }
+            // Held in the cinematic's own name: a scene change or a fall holding them too keeps them held after it.
+            heldPlayer = Player.Current.gameObject;
+            PlayerControl.Hold(heldPlayer, this);
 
             health = Player.Current.Health;
             if (health != null)
@@ -168,10 +163,10 @@ public sealed class CinematicView : MonoBehaviour
         }
 
         ShowHud();
-        if (input != null)
+        if (heldPlayer != null)
         {
-            input.enabled = true;
-            input = null;
+            PlayerControl.Release(heldPlayer, this);
+            heldPlayer = null;
         }
 
         if (health != null)
@@ -223,7 +218,7 @@ public sealed class CinematicView : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (input != null) input.enabled = true;
+        if (heldPlayer != null) PlayerControl.Release(heldPlayer, this);
         if (health != null) health.RemoveInvulnerability(this);
         ShowHud();
         if (topBar != null) Destroy(topBar.root.gameObject);

@@ -122,6 +122,8 @@ public static class StationExtensions
 
         dirty = false;
         served.Clear();
+        // Who held a slot until now keeps it: a new extension in reach takes a free slot, never a working one's place.
+        var held = new HashSet<BuildingObject>(serving.Keys);
         serving.Clear();
         var waiting = new Dictionary<BuildingObject, List<BuildingObject>>();
         foreach (BuildingObject extension in BuildingObject.Active)
@@ -148,8 +150,13 @@ public static class StationExtensions
 
         foreach (KeyValuePair<BuildingObject, List<BuildingObject>> entry in waiting)
         {
-            // In the order they were placed (ids are stable and the same on every machine): first come, first served.
-            entry.Value.Sort((a, b) => string.CompareOrdinal(a.Id ?? a.name, b.Id ?? b.name));
+            // First those already serving (a new one never pushes out one that has worked for days), then by id: ids are random,
+            // not the order of placing, but the same on every machine and after loading, so the choice is too.
+            entry.Value.Sort((a, b) =>
+            {
+                int kept = held.Contains(b).CompareTo(held.Contains(a));
+                return kept != 0 ? kept : string.CompareOrdinal(a.Id ?? a.name, b.Id ?? b.name);
+            });
             int slots = Slots(entry.Key);
             var used = new List<BuildingObject>();
             foreach (BuildingObject extension in entry.Value)

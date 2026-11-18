@@ -739,6 +739,14 @@ reviews). When adding something, go through these, and the tests say when one is
 - Something coming to the player: its `ArrivalCause`; what counts arrivals asks `ArrivalCauses.IsNewlyHad` (`QuestCoopTests`).
 - The settlement: `GameSession.Here` to read the Haven one stands in, `GameSession.Home` to change one's own; never the old
   `GameSession.Settlement` (`ConventionTests`).
+- Where the player is: ask `Place` (`OnRaid`, `InRaidScene`, `RaidRunning`, `RaidDecided`, `AtHome`, `InFriendsHaven`,
+  `FollowingAHost`, `InAHaven`, `StashUsable`), or add a meaning there; a line putting two of its parts together
+  (`GameSession.ActiveRaid`, `RaidDirector.Current`, `HavenVisit.IsVisiting`, `HavenVisit.MayUseStash`, `HomePortal.Current`)
+  fails unless it is listed with its reason (`SharedStateTests`).
+- The player's controls: held in an owner's name, `PlayerControl.Hold(player, this)` / `Release` / `Set`; they come back when
+  nobody holds them, and a destroyed holder lets go. Never `PlayerInputHandler.enabled = ...` (`SharedStateTests`).
+- A stack: copied from itself (`stack.WithCount(n)`, `WithSize`, `WithDurability`...), never re-made from its item
+  (`new ItemStack(stack.Item, ...)` dropped its inscription and size) (`SharedStateTests`).
 
 ## Scene changes, raid results and raid layouts
 

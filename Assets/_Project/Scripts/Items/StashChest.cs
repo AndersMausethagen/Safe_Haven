@@ -235,7 +235,7 @@ public sealed class StashChest : MonoBehaviour, ISaveable
     private void OnUsed()
     {
         // A friend's stash takes their yes; then their stash is sent over, and what is put in or taken goes back (StashShare).
-        if (HavenVisit.IsVisiting && !HavenVisit.MayUseStash)
+        if (!Place.StashUsable)
         {
             if (CoopSession.Current != null)
             {

@@ -46,15 +46,11 @@ public sealed class HomeRevival : MonoBehaviour
     private IEnumerator Revive(GameObject player)
     {
         var animation = player.GetComponent<PlayerAnimationController>();
-        var input = player.GetComponent<PlayerInputHandler>();
         if (animation != null)
         {
             animation.SetDead(true);
         }
-        if (input != null)
-        {
-            input.enabled = false;
-        }
+        PlayerControl.Hold(player, this);
 
         GameMessages.Post(fallenText, MessageKind.Warning);
         yield return new WaitForSeconds(delay);
@@ -81,9 +77,6 @@ public sealed class HomeRevival : MonoBehaviour
         {
             animation.SetDead(false);
         }
-        if (input != null)
-        {
-            input.enabled = true;
-        }
+        PlayerControl.Release(player, this);
     }
 }

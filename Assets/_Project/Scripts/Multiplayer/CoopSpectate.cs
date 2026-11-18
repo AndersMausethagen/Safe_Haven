@@ -16,6 +16,9 @@ public static class CoopSpectate
     private static int watching;
     private static float since;
     private static readonly List<NetworkPlayerAvatar> standing = new List<NetworkPlayerAvatar>();
+    // The watching's own hold on the fallen player's controls (PlayerControl), and whose they are.
+    private static readonly object Watching = new object();
+    private static GameObject held;
 
     /// <summary>True while this player, fallen, is watching their friends.</summary>
     public static bool IsWatching => finish != null;
@@ -35,10 +38,8 @@ public static class CoopSpectate
         watching = 0;
         since = Time.unscaledTime;
         // Nothing else acts for the fallen player; only the two keys watching needs stay on.
-        if (Player.Current != null && Player.Current.TryGetComponent(out PlayerInputHandler input))
-        {
-            input.enabled = false;
-        }
+        held = Player.Current != null ? Player.Current.gameObject : null;
+        PlayerControl.Hold(held, Watching);
 
         GameInput.Interact?.Enable();
         GameInput.Dodge?.Enable();
@@ -105,6 +106,8 @@ public static class CoopSpectate
         Action finishing = finish;
         finish = null;
         Watched = null;
+        PlayerControl.Release(held, Watching);
+        held = null;
         if (PlayerCameraController.Current != null)
         {
             PlayerCameraController.Current.Watch(null);
@@ -135,6 +138,7 @@ public static class CoopSpectate
     {
         finish = null;
         Watched = null;
+        held = null;
         standing.Clear();
         since = 0f;
         watching = 0;

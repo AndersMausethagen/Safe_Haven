@@ -11,6 +11,9 @@ using UnityEngine.SceneManagement;
 /// </summary>
 public static class RaidLauncher
 {
+    // The launch's own hold on the player's controls while the raid's scene loads (PlayerControl).
+    private static readonly object Launching = new object();
+
     /// <summary>Why the raid can't start right now, in words for the player, or null when it can.</summary>
     public static string CheckLaunch(RaidDefinition raid)
     {
@@ -369,10 +372,7 @@ public static class RaidLauncher
         GameSession.CarryPlayerState(loadout);
 
         // The player stays in this scene until the raid scene has loaded, so keep them from wandering off meanwhile.
-        if (player.TryGetComponent(out PlayerInputHandler input))
-        {
-            input.enabled = false;
-        }
+        PlayerControl.Hold(player, Launching);
 
         if (!SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}"))
         {
@@ -380,10 +380,7 @@ public static class RaidLauncher
             // a player frozen at the portal with a raid that never comes.
             GameSession.AbandonRaid(session);
             GameSession.TakePlayerState();
-            if (input != null)
-            {
-                input.enabled = true;
-            }
+            PlayerControl.Release(player, Launching);
 
             GameMessages.Post("The way didn't open. Try the portal again.", MessageKind.Warning);
             return null;

@@ -276,7 +276,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
         float hour = told.Hour;
         string weatherName = told.Weather;
         // A raid keeps its own hour and weather (from its seed), wherever the host is.
-        DayNightCycle clock = HavenVisit.IsVisiting && GameSession.ActiveRaid == null ? ClockHere() : null;
+        DayNightCycle clock = Place.InFriendsHaven ? ClockHere() : null;
         if (clock == null)
         {
             return;
@@ -320,7 +320,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
     {
         // A raid decided but not yet left (the few seconds before the results) counts as under way: the character then still
         // stands with the whole bag, not with what the raid let them keep, and going home from there undid a fall.
-        if (travel && HavenVisit.IsVisiting && (GameSession.ActiveRaid != null || RaidDirector.Current != null))
+        if (travel && Place.FollowingAHost)
         {
             homeAfterRaid = true;
             GameMessages.Post("You'll head home once this raid is over.");
@@ -341,7 +341,7 @@ public sealed class HavenShare : ICoopPart, IDisposable
     /// <summary>A scene with a player in it: back from the raid a session ended during, now home. True when it left for home.</summary>
     public bool HeadHomeIfDue()
     {
-        if (!homeAfterRaid || GameSession.ActiveRaid != null || RaidDirector.Current != null)
+        if (!homeAfterRaid || Place.OnRaid)
         {
             return false;
         }

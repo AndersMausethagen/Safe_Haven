@@ -139,7 +139,7 @@ public sealed class FrameBenchmark : MonoBehaviour
             yield break;
         }
 
-        while (GameSession.ActiveRaid == null || RaidDirector.Current == null || Player.Current == null || SceneTransition.IsBusy)
+        while (!Place.InRaidScene || Player.Current == null || SceneTransition.IsBusy)
         {
             yield return null;
         }

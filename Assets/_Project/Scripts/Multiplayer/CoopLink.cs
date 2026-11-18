@@ -178,7 +178,7 @@ public static class CoopPlace
         // are "SafeHaven" by name): the host's creatures told meanwhile were dropped or built into the scene going away, and the
         // place never changing on arrival, the host never told them again.
         bool arrived = !SceneTransition.IsBusy
-                       && !(CoopSession.Current != null && !CoopSession.Current.IsHost && !HavenVisit.IsVisiting && GameSession.ActiveRaid == null);
+                       && !(CoopSession.Current != null && !CoopSession.Current.IsHost && Place.AtHome);
         if (active == scene && run == seed && arrived == wasArrived && text.Length > 0)
         {
             return;

@@ -57,7 +57,7 @@ public sealed class EncounterArena : MonoBehaviour, ISceneSetup
     /// True on a friend's game on the host's run (co-op: a guest who followed the host in, and still so if the host has since left):
     /// the run, and the gate's offering, are the host's.
     /// </summary>
-    public static bool FollowsAHost => HavenVisit.IsVisiting && GameSession.ActiveRaid != null;
+    public static bool FollowsAHost => Place.FollowingAHost;
 
     /// <summary>The encounter's rules, from the raid being played; null in a scene played without one.</summary>
     public BossEncounterDefinition Definition { get; private set; }

@@ -609,10 +609,7 @@ public sealed class RaidDirector : MonoBehaviour
             stateMachine.EndInteraction();
         }
 
-        if (player.TryGetComponent(out PlayerInputHandler input))
-        {
-            input.enabled = false;
-        }
+        PlayerControl.Hold(player, this);
 
         // The report is written: nothing may change the outcome now. A blow would kill an extracted player under
         // "Extracted!", and an event's choices still open would apply to a raid that has ended.

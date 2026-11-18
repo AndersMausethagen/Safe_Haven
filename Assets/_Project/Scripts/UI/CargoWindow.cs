@@ -278,8 +278,9 @@ public sealed class CargoWindow : MonoBehaviour
             bagValue.text = carried != null ? HearthKit.ToneNumbers($"{carried.CurrentWeight:0} / {carried.WeightCapacity:0} weight") : "";
         }
 
-        // Storage only exists at home, and the load still has to be brought to it.
-        bool atHome = RaidDirector.Current == null;
+        // Storage only exists at home, and the load still has to be brought to it. In a friend's Haven only with the host's leave to use
+        // their stash: without it the stash is the host's as it came, and what was sent there was lost.
+        bool atHome = Place.StashUsable;
         bool inReach = atHome && StashChest.AnyWithin(transport.transform.position, TransportSettings.Current.StorageReach);
         storageButton.gameObject.SetActive(atHome);
         storageButton.interactable = inReach && transport.Cargo.CountItems() > 0;

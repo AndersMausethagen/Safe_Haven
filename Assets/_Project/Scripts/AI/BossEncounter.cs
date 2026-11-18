@@ -531,7 +531,7 @@ public sealed class BossEncounter : MonoBehaviour
         // story hasn't opened the encounter takes the drops only (the user, 2026-11-17: "only get the drop, but it helps their quest
         // as well if he is also on it"): their quests count the kill as any other. The host, or a player alone, always counts.
         // A raid already decided (the player fell, the clock ran out) wins nothing, whatever lands afterwards.
-        if (RaidDirector.Current != null && RaidDirector.Current.Session.IsOver && RaidDirector.Current.Session.Outcome != RaidOutcome.Extracted)
+        if (Place.RaidDecided && RaidDirector.Current.Session.Outcome != RaidOutcome.Extracted)
         {
             return;
         }

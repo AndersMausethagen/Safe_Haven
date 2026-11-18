@@ -12,7 +12,7 @@ public static class StashQuickStack
     public static bool CanStack(GameObject player)
     {
         return player != null && HomePortal.Current != null && HomePortal.Current.Contains(player.transform.position)
-            && StashChest.SlotsStanding() >= 0 && !(HavenVisit.IsVisiting && !HavenVisit.MayUseStash);
+            && StashChest.SlotsStanding() >= 0 && Place.StashUsable;
     }
 
     /// <summary>Stacks the bag onto what the chests hold and says what happened. Returns how many items moved.</summary>

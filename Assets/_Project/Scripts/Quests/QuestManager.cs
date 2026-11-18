@@ -241,7 +241,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
     /// <summary>At home: not on a raid (nor in its scene after the extraction, whose results are still showing), not in a
     /// friend's Haven. Held quests begin only here.</summary>
-    private static bool AtHome => GameSession.ActiveRaid == null && RaidDirector.Current == null && !HavenVisit.IsVisiting;
+    private static bool AtHome => Place.AtHome;
 
     // A held quest begins only at home, within this homecoming's share, or when nothing of its kind is under way.
     private bool MayStartHeld(QuestDefinition quest)
@@ -573,7 +573,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         SpaceWaitingFrom(Time.time);
         string rewards;
         // Once a raid is decided, what the player takes home is already settled, so rewards wait until they arrive.
-        if (RaidDirector.Current != null && RaidDirector.Current.Session.IsOver && quest.DescribeRewards().Length > 0)
+        if (Place.RaidDecided && quest.DescribeRewards().Length > 0)
         {
             log.HoldRewards(quest);
             rewards = "rewards waiting at home";
@@ -612,7 +612,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         ResourceStorage storage = player.Resources.Storage;
         // As every reward arrives (ItemDelivery): the bag, then the stash at home, then the ground at the player's feet. The rewards of a
         // quest done on a raid are paid on coming home, into a bag full of the raid's loot, and were lost there.
-        bool atHome = RaidDirector.Current == null && !HavenVisit.IsVisiting;
+        bool atHome = Place.AtHome;
         foreach (ItemAmount reward in quest.RewardItems)
         {
             if (reward.Item != null && reward.Amount > 0

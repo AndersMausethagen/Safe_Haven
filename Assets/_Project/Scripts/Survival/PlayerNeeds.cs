@@ -98,10 +98,12 @@ public sealed class PlayerNeeds : MonoBehaviour
     /// Eats or drinks something that restores the given amounts. Refuses (returns false, with a message) when neither meter
     /// would rise, so food isn't wasted.
     /// </summary>
+    /// <summary>Whether eating or drinking this much would do anything: it feeds a hunger or quenches a thirst that isn't full.</summary>
+    public bool WouldHelp(float hungerAmount, float thirstAmount) => (hungerAmount > 0f && !Hunger.IsFull) || (thirstAmount > 0f && !Thirst.IsFull);
+
     public bool TryConsume(string name, float hungerAmount, float thirstAmount)
     {
-        bool helps = (hungerAmount > 0f && !Hunger.IsFull) || (thirstAmount > 0f && !Thirst.IsFull);
-        if (!helps)
+        if (!WouldHelp(hungerAmount, thirstAmount))
         {
             GameMessages.Post(hungerAmount > 0f && thirstAmount > 0f ? "You're not hungry or thirsty." : hungerAmount > 0f ? "You're not hungry." : "You're not thirsty.",
                 MessageKind.Warning);

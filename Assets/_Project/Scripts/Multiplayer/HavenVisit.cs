@@ -111,6 +111,9 @@ public static class HavenVisit
         }
 
         SceneSaveData home = null;
+        // A horse's days (cared for, groomed, born, in foal) were counted in the host's Haven: moved to the player's own count, or its
+        // bond wore away on arriving (home days ahead) or it was groomed "today" for days (behind).
+        int dayShift = (kept.settlement != null ? kept.settlement.daysPassed : 0) - (now.settlement != null ? now.settlement.daysPassed : 0);
         foreach (EntitySaveData entity in there.entities)
         {
             ComponentSaveData horse = entity.destroyed || entity.components == null ? null : entity.components.Find(component => component.key == "horse");
@@ -132,7 +135,31 @@ public static class HavenVisit
 
             EntitySaveData copy = JsonUtility.FromJson<EntitySaveData>(JsonUtility.ToJson(entity));
             copy.spawned = true;
-            copy.components.Find(component => component.key == "horse").state = Horse.ComingHome(horse.state);
+            copy.components.Find(component => component.key == "horse").state = Horse.ComingHome(horse.state, dayShift);
+            home.entities.RemoveAll(other => other.id == copy.id);
+            home.entities.Add(copy);
+        }
+
+        // Their own carts too (set down from their kit here, with whatever is in them): left behind, they stayed in the host's world.
+        foreach (EntitySaveData entity in there.entities)
+        {
+            ComponentSaveData cart = entity.destroyed || entity.components == null ? null : entity.components.Find(component => component.key == "transport");
+            if (cart == null || Transport.OwnerIn(cart.state) != owner)
+            {
+                continue;
+            }
+
+            kept.world ??= new System.Collections.Generic.List<SceneSaveData>();
+            home ??= kept.world.Find(scene => scene.scene == HavenScene);
+            if (home == null)
+            {
+                home = new SceneSaveData { scene = HavenScene };
+                kept.world.Add(home);
+            }
+
+            EntitySaveData copy = JsonUtility.FromJson<EntitySaveData>(JsonUtility.ToJson(entity));
+            copy.spawned = true;
+            copy.components.Find(component => component.key == "transport").state = Transport.ComingHome(cart.state);
             home.entities.RemoveAll(other => other.id == copy.id);
             home.entities.Add(copy);
         }

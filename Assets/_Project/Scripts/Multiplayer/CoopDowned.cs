@@ -33,7 +33,6 @@ public sealed class CoopDowned : ICoopPart, IDisposable
     private PlayerMovement movement;
     private PlayerStealth stealth;
     private PlayerInteractor interactor;
-    private PlayerInputHandler input;
     private bool holding;
     private bool struckDown;
     private float bleedOutAt;
@@ -332,12 +331,16 @@ public sealed class CoopDowned : ICoopPart, IDisposable
 
         holding = false;
         struckDown = false;
+        if (player != null)
+        {
+            PlayerControl.Release(player.gameObject, this);
+        }
+
         player = now;
         health = now != null ? now.GetComponent<Damageable>() : null;
         movement = now != null ? now.GetComponent<PlayerMovement>() : null;
         stealth = now != null ? now.GetComponent<PlayerStealth>() : null;
         interactor = now != null ? now.GetComponent<PlayerInteractor>() : null;
-        input = now != null ? now.GetComponent<PlayerInputHandler>() : null;
         if (health != null)
         {
             health.Damaged += OnDamaged;
@@ -425,15 +428,17 @@ public sealed class CoopDowned : ICoopPart, IDisposable
             return;
         }
 
-        if (input != null)
-        {
-            input.enabled = acting;
-        }
+        PlayerControl.Set(player.gameObject, this, !acting);
 
-        // The handler switches the whole Player map off with it: moving stays on, to crawl.
+        // The handler switches the whole Player map off with it: moving stays on, to crawl. Up again while something else still
+        // holds the controls (a cinematic, a scene change): the crawl's own key goes off with the rest.
         if (!acting && GameInput.Move != null)
         {
             GameInput.Move.Enable();
+        }
+        else if (acting && GameInput.Move != null && PlayerControl.HeldOn(player.gameObject))
+        {
+            GameInput.Move.Disable();
         }
 
         if (!acting && movement != null)

@@ -350,6 +350,9 @@ public static class Territory
         MaterialPool.For(user).TrySpend(new List<ResourceAmount>(), new[] { new ItemAmount(Settings.PactRune, 1) });
 
     /// <summary>A watch held at a stone (StoneDefence).</summary>
+    /// <summary>Whether a push on <paramref name="region"/> is still to come (a stone's watch is for it).</summary>
+    public static bool PushOn(string region) => State != null && State.Incursion != null && State.Incursion.Region == region;
+
     public static void Defended(string region)
     {
         bool wasSecure = StandingOf(region) == RegionStanding.Secure;
@@ -526,6 +529,7 @@ public static class Territory
     private static string Tithe()
     {
         var sent = new List<string>();
+        bool full = false;
         foreach (WorldAtlas.Region region in Claimable)
         {
             TerritorySettings.RegionInfo info = Settings.Info(region.name);
@@ -536,14 +540,32 @@ public static class Territory
 
             foreach (ItemAmount gift in info.tithe)
             {
-                if (gift.Item != null && gift.Amount > 0 && GameSession.Stash.Items.Add(gift.Item, gift.Amount) > 0)
+                if (gift.Item == null || gift.Amount <= 0)
                 {
-                    sent.Add($"{gift.Amount} {gift.Item.DisplayName}");
+                    continue;
+                }
+
+                // What fitted: a full stash took fewer (or none), and the line named the whole gift.
+                int added = GameSession.Stash.Items.Add(gift.Item, gift.Amount);
+                if (added > 0)
+                {
+                    sent.Add($"{added} {gift.Item.DisplayName}");
+                }
+
+                if (added < gift.Amount)
+                {
+                    full = true;
                 }
             }
         }
 
-        return sent.Count > 0 ? "From the Haven's secure lands, to the stash: " + string.Join(", ", sent) + "." : null;
+        string told = sent.Count > 0 ? "From the Haven's secure lands, to the stash: " + string.Join(", ", sent) + "." : null;
+        if (full)
+        {
+            told = (told != null ? told + " " : "") + "The stash had no room for the rest of the lands' gifts.";
+        }
+
+        return told;
     }
 
     // ----- Tasks -----

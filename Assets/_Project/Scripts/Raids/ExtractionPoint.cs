@@ -341,7 +341,7 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 
     private void AnnounceChange(ExtractionStatus status)
     {
-        if (RaidDirector.Current == null || RaidDirector.Current.Session.IsOver)
+        if (!Place.RaidRunning)
         {
             return;
         }

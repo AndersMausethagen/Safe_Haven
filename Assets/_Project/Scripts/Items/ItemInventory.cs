@@ -508,7 +508,7 @@ public sealed class ItemInventory : MonoBehaviour
 
         var needs = GetComponent<PlayerNeeds>();
         bool heals = item.HealAmount > 0f && health.CurrentHealth < health.MaxHealth;
-        bool feeds = needs != null && ((item.HungerRestore > 0f && !needs.Hunger.IsFull) || (item.ThirstRestore > 0f && !needs.Thirst.IsFull));
+        bool feeds = needs != null && needs.WouldHelp(item.HungerRestore, item.ThirstRestore);
         // A meal's bonuses are worth eating for on a full belly: that is the meal before a raid.
         bool helps = item.HasBoon || (item.Cures.Count > 0 && Cures(item));
         if (!heals && !feeds && !helps)

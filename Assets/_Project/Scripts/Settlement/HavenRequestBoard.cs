@@ -99,7 +99,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
 
         nextCheck = Time.time + checkEvery;
         Player player = Player.Current;
-        if (player == null || RaidDirector.Current != null || HavenVisit.IsVisiting)
+        if (player == null || !Place.AtHome)
         {
             return;
         }
@@ -146,7 +146,7 @@ public sealed class HavenRequestBoard : MonoBehaviour
     public static void AddHandIn(MenuPage page, ResidentDefinition asker, GameObject player, DialogueSpeaker speaker, System.Action afterAnswer)
     {
         HavenRequestDefinition request = AskedBy(asker);
-        if (request == null || RaidDirector.Current != null || HavenVisit.IsVisiting)
+        if (request == null || !Place.AtHome)
         {
             return;
         }

@@ -107,6 +107,14 @@ public sealed class StoneDefence : MonoBehaviour
             return;
         }
 
+        // The push it was for already decided (a dawn came during the watch and settled it): beating the last of them then won
+        // nothing and said nothing.
+        if (!Territory.PushOn(stone.Region))
+        {
+            End(false, "Dawn came while you watched, and the push was settled with it. The watch is over.");
+            return;
+        }
+
         if (attackers.Count == 0)
         {
             End(true, null);

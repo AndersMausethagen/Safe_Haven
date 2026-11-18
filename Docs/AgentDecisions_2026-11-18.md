@@ -440,3 +440,51 @@ follows the day and fades at night. The option scales it live (within a second, 
 reads as a slight warm-green lift on stone, logs and walls facing sunlit ground, nothing on open ground (a flat surface takes a
 tenth). Cost: 0.86 s more behind the loading screen, about as much again in the late redraw. The prologue has none: over its two
 terrains there is no one colour map.
+
+## The rigs and animations (you: "a technical pass on all animations and the riggs. Are the skeletons on all configured correctly and have the correct size? are there tearing and wrong stretches in the mesh?")
+
+**How it was checked.** A rig audit (Safe Haven › Characters › Rig Audit, `RigAudit`) takes every rigged prefab (221 skinned meshes,
+each distinct body once), checks its avatar, bone scales and weights, measures its height in the rest pose, then plays up to 14 of its
+controller's clips at 4 times each and bakes the mesh: every edge's stretch against the mesh as modelled (scale cancelled) and every
+seam (vertices that share a place) for opening. The worst poses were rendered from the baked mesh to see what a number looks like
+(`RigAudit.Snapshot`, with a close-up on the named bone). `RigAuditTests` keeps it: avatars valid, every vertex weighted, people
+1.6-2 m, no seam opening over 2 cm (jaws open on purpose), nothing stretched like a left-behind part.
+
+**Configured correctly:** every humanoid avatar is valid; no unweighted vertices, no unevenly scaled bones. The deer, stag, fox and
+pony are generic rigs without an avatar, which plays their clips fine.
+
+**Sizes (rest pose, to the top of hair or ears):** the player and residents 1.85-1.91 m, the Lost 1.72-1.90, the Draug 1.57,
+wolves and boars about 0.95, deer 1.54 and the stag 1.87 with antlers, horses 2.06-2.46 to the ears; the trolls from the Troll Runt
+0.98 m through the Bog Troll 2.08, the Stone Troll 2.69 and the Berg-jutul 2.91 to Brukam 4.60 and the Old Moss Troll 5.00. All
+believable. One for you: the women residents are as tall as the men (1.85 m: one body height for both).
+
+**Tearing found and fixed (`RigWeightFixes`, made as the model is imported, so a re-export keeps it):**
+- The Draug and the Barrow Shieldbearer: 72 vertices on the rig's root ("Main"), which a humanoid clip never moves, stayed where the
+  standing body had been as it lay down or rose again: a pole and a ring stood out of the body (stretched 113 times). They move with
+  the hips now (worst stretch 24, the pole gone).
+- The generated bodies (Make-It-Animatable rigs): skirts and loincloths tore into wedges and spikes between the legs in lunges and runs.
+  The weights of the waist and leg bones are smoothed over the band where the waist gives way to the thighs, every vertex sharing a
+  place left with the same weights (no seam opens). Worst stretch: the Lost Leathers 73 → 10 and 36 → 9, the Lost Mails 71 → 21 and
+  43 → 22, the Fossegrim 37 → 17, the Bog Troll 50 → 21, the Trollkjerring 32 → 20, Brukam 19 → 14. Seen before and after in close-ups:
+  the mail skirt's wedge smaller, the grass skirt's spikes short.
+- Tried and dropped: moving the both-legs share to the hips. It didn't touch the worst triangles (waist to thigh, not leg to leg) and
+  opened seams.
+
+**Left:** the Troll Runt and the Lost Cloth B stretch at the feet (outside the band), and the mail skirts still fan a little in a deep
+lunge; a weight pass in Blender would do more for these generated bodies than smoothing can. The pony's chest has slivers where the
+foreleg swings, which don't show. The Draug's jaw opens 8 cm in its two-handed swing, as meant.
+
+## Bugs by pattern: state with one owner (you: "look for patterns in the bugs. can we create better code so these bugs dont happen again? better than hard coding fixes on each bug individually")
+
+Written up as the fourth round in Docs/BugPatterns.md. Choices I made that you may want to change:
+- **Perks change only inside your own ward.** The refusal already said "at home, beside the portal"; the code let them change in any
+  scene with a portal, from anywhere in it, and in a friend's Haven. Now: your own Haven, inside the ward (as stacking onto the chests
+  asks). If you'd rather have anywhere in your own Haven, it is one line in `SkillsWindow.AtHome`.
+- **Plain pieces no longer join an inscribed stack.** Picking up blank parchment topped up a stack of inscribed parchment and made it all
+  blank; they now take a slot of their own (the one stacking rule, `ItemStack.StacksWith`).
+- **An extension that holds a station's slot keeps it.** A new one in reach takes only a free slot. Not saved: after a reload the
+  slots go by id again, which can swap which one works when a station has more extensions in reach than slots.
+- **The controls are held by name.** A cinematic, scene change, the Nøkken, being downed, watching friends, the prologue's end, a raid's
+  end, a launch, loading and home revival each hold them in their own name; they come back when none hold them. Nothing should feel
+  different, except that an overlap no longer gives them back early (a downed player stays down through the Nøkken's grab).
+- An Untitled scene left by a cut-off test run was discarded (Don't Save), not saved: it held only the test's leftovers.

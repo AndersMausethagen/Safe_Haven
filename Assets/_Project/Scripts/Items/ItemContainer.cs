@@ -358,12 +358,15 @@ public sealed class ItemContainer
         int start = Mathf.Max(0, first);
         int end = Mathf.Min(OpenEnd, first + count);
         int remaining = amount;
+        // Plain pieces join plain stacks only (ItemStack.SameKind): topping up a Fine stack, or one with a maker's name, made all of it
+        // plain. The stack is grown from itself (WithCount), never re-made from its item.
+        var plain = new ItemStack(item, 1);
         for (int i = start; i < end && remaining > 0; i++)
         {
-            if (IsUnlocked(i) && slots[i].Item == item && slots[i].SpaceLeft > 0)
+            if (IsUnlocked(i) && slots[i].StacksWith(plain) && slots[i].SpaceLeft > 0)
             {
                 int added = Mathf.Min(slots[i].SpaceLeft, remaining);
-                Set(i, new ItemStack(item, slots[i].Count + added).WithSize(Mathf.Max(slots[i].Size, size)));
+                Set(i, slots[i].WithCount(slots[i].Count + added).WithSize(Mathf.Max(slots[i].Size, size)));
                 remaining -= added;
             }
         }
@@ -636,7 +639,7 @@ public sealed class ItemContainer
                 return false;
             }
 
-            target.Set(to, new ItemStack(destination.Item, destination.Count + moved).WithSize(Mathf.Max(destination.Size, source.Size)));
+            target.Set(to, destination.WithCount(destination.Count + moved).WithSize(Mathf.Max(destination.Size, source.Size)));
             Set(from, source.WithCount(source.Count - moved));
             StackMoved?.Invoke(from, target, to);
             return true;
@@ -672,8 +675,9 @@ public sealed class ItemContainer
 
         ItemStack stack = slots[index];
         int half = stack.Count / 2;
-        Set(index, new ItemStack(stack.Item, stack.Count - half));
-        Set(empty, new ItemStack(stack.Item, half).WithSize(stack.Size));
+        // Both halves are the stack itself (its quality, maker, empowering and size), in two counts.
+        Set(index, stack.WithCount(stack.Count - half));
+        Set(empty, stack.WithCount(half));
         return true;
     }
 
