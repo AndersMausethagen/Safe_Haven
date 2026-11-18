@@ -142,7 +142,11 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 
         if (swings > 0 && blows < swings)
         {
-            notch ??= TreeNotch.Open(transform, TrunkCentre + Vector3.up * ChopHeight, TrunkRadius, rules.CutFace);
+            if (notch == null)
+            {
+                notch = TreeNotch.Open(transform, TrunkCentre + Vector3.up * ChopHeight, TrunkRadius, rules.CutFace);
+            }
+
             notch.Widen(Mathf.Min(blows / swings, 1f), from);
         }
     }

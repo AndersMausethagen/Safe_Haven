@@ -885,6 +885,11 @@ in `Prefabs/Raids/Events` are static scenery for the Event Sites spawn list; the
   "Map Content" (points, exits, quest zones, story objects, trunks) around the centre, rebuilds moss, updates the
   NavMesh and places the player. `fixedQuarterTurns` forces a turn for testing. Everything that must turn with the
   map goes under Map Content.
+- **The NavMesh in a build reads collider copies:** the update is built from the physics colliders, and in a player the
+  runtime builder skips a mesh collider whose model isn't Read/Write. `NavMeshColliderCopies` (Resources) holds readable
+  copies of those collider meshes only (render meshes stay unreadable, `ModelBudgetTests`); `NavMeshColliderCopies.Update`
+  collects the sources as NavMeshSurface does (its internal `CollectSources`, by reflection) and swaps them in. After
+  importing a model with a collider run **Safe Haven > Navigation > Gather Collider Copies**; `EngineHazardTests` says when.
 - **Forest kit:** placeholder low-poly spruces, pine, dead spruce, boulders and log from **Safe Haven > Raids > Build
   Forest Kit** (`ForestKitBuilder`, `Art/Forest`). Replace a prefab's mesh/material to upgrade the art; rebake.
 - **Event sites:** "Event Sites" fills magenta markers from `MistyWoods_Events` (Wolf Den, Spirit Spring, Ore Collapse,

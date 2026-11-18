@@ -109,7 +109,10 @@ public sealed class KitBarFill : MonoBehaviour
         if (pulse > 0f)
         {
             pulse = Mathf.Max(0f, pulse - dt * 2.5f);
-            material?.SetFloat(PulseId, pulse * pulse);
+            if (material != null)
+            {
+                material.SetFloat(PulseId, pulse * pulse);
+            }
         }
 
         Vector2 size = rect.rect.size;

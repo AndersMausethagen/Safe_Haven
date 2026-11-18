@@ -408,7 +408,8 @@ public static class Territory
     public static void PlaceFound(WorldAtlas.Place place)
     {
         ExperienceTracker.GrantInsight(Settings.FindInsight);
-        string region = Atlas?.RegionAt(new Vector3(place.at.x, 0f, place.at.y))?.name;
+        WorldAtlas atlas = Atlas;
+        string region = atlas != null ? atlas.RegionAt(new Vector3(place.at.x, 0f, place.at.y))?.name : null;
         if (!State.IsClaimed(region))
         {
             return;

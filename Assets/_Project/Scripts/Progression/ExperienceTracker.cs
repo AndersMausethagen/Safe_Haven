@@ -45,7 +45,11 @@ public sealed class ExperienceTracker : MonoBehaviour, IGameSystem
     public static ExperienceTracker Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        SpendingInsight = false;
+    }
 
     /// <summary>Raised with a skill and the level it reached, and whether that level is a milestone (the HUD's banner).</summary>
     public static event Action<ProficiencyDefinition, int, bool> LevelReached;

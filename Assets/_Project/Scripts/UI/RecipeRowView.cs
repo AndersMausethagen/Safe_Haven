@@ -107,7 +107,7 @@ public sealed class RecipeRowView : MonoBehaviour, IPointerClickHandler, IPointe
         // Hearthline 3: the chosen recipe framed in gold.
         if (rim == null)
         {
-            rim = background.gameObject.GetComponent<Outline>() ?? background.gameObject.AddComponent<Outline>();
+            rim = background.TryGetComponent(out Outline had) ? had : background.gameObject.AddComponent<Outline>();
             rim.effectDistance = new Vector2(1.2f, -1.2f);
         }
 

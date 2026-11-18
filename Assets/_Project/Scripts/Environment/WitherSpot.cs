@@ -17,7 +17,11 @@ public sealed class WitherSpot : MonoBehaviour
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => active.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        active.Clear();
+        lastFrame = -1;
+    }
     private static readonly Vector4[] spots = new Vector4[Max];
     private static int lastFrame = -1;
 

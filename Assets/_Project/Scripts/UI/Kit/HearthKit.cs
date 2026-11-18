@@ -334,14 +334,14 @@ public static class HearthKit
     public static void Dress(RectTransform panel)
     {
         UIStyle style = UIStyle.Current;
-        Image surface = panel.GetComponent<Image>() ?? panel.gameObject.AddComponent<Image>();
+        Image surface = panel.TryGetComponent(out Image had) ? had : panel.gameObject.AddComponent<Image>();
         surface.color = style.Panel;
         if (style.PanelMaterial != null && surface.sprite == null)
         {
             surface.material = style.PanelMaterial;
         }
 
-        Outline rim = panel.GetComponent<Outline>() ?? panel.gameObject.AddComponent<Outline>();
+        Outline rim = panel.TryGetComponent(out Outline hadRim) ? hadRim : panel.gameObject.AddComponent<Outline>();
         rim.effectColor = Faded(style.Accent, 0.55f);
         rim.effectDistance = new Vector2(1.5f, -1.5f);
         Corners(panel);

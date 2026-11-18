@@ -51,6 +51,8 @@ public sealed class HorseTravel : MonoBehaviour
         pendingWorld = null;
         InRaid = null;
         IsTied = false;
+        ArrivedAt = Vector3.zero;
+        current = null;
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

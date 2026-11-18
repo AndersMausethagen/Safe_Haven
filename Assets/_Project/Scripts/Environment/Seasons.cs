@@ -125,4 +125,14 @@ public sealed class Seasons : MonoBehaviour
             weather.SetClimate(season.climate);
         }
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Active = null;
+        Fireflies = 1f;
+        RiverRise = 0f;
+        Today = null;
+    }
 }

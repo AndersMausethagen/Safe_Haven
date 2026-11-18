@@ -211,7 +211,7 @@ public sealed class RaidLandmarkRule
     public bool soundLoops;
 
     /// <summary>True when it needs the runtime part (RaidMapLandmark): a minimap mark or a sound.</summary>
-    public bool Marked => revealRadius > 0f || knownAtStart || !(sound is null);
+    public bool Marked => revealRadius > 0f || knownAtStart || sound != null;
 }
 
 /// <summary>One plan a map can be laid out by, with how likely it is and what the briefing says of it.</summary>

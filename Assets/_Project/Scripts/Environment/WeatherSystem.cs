@@ -128,6 +128,14 @@ public sealed class WeatherSystem : MonoBehaviour
         }
     }
 
+    // Entering Play doesn't reload scripts in this project. The scene's weather enables again as Play starts (measured: edit-mode
+    // registrations come back), so a stale one from the last session goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Active = null;
+    }
+
     private void OnDisable()
     {
         if (Active == this)

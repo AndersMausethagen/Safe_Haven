@@ -83,7 +83,10 @@ public sealed class PlayerWarmth : MonoBehaviour
         boons = GetComponent<PlayerBoons>();
         combatant = GetComponent<Combatant>();
         // A chill doesn't outlast a reload: the cold has to get in again.
-        boons?.End(ChillId);
+        if (boons != null)
+        {
+            boons.End(ChillId);
+        }
     }
 
     private void Update()
@@ -115,13 +118,21 @@ public sealed class PlayerWarmth : MonoBehaviour
         if (!chilled && exposure >= 1f)
         {
             chilled = true;
-            boons?.Add(ChillId, "Chilled", Chill, 36000f, false);
+            if (boons != null)
+            {
+                boons.Add(ChillId, "Chilled", Chill, 36000f, false);
+            }
+
             GameMessages.Post("The cold has got into you. Warm yourself at a fire or a hearth.");
         }
         else if (chilled && exposure <= 0.2f)
         {
             chilled = false;
-            boons?.End(ChillId);
+            if (boons != null)
+            {
+                boons.End(ChillId);
+            }
+
             GameMessages.Post("You're warm again.");
         }
     }

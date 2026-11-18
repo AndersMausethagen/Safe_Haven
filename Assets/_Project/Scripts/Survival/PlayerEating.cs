@@ -88,7 +88,11 @@ public sealed class PlayerEating : MonoBehaviour
         eating = item;
         from = container;
         doneAt = Time.time + Rules.EatSeconds;
-        movement?.SetSpeedScale(this, Rules.EatMoveSpeed);
+        if (movement != null)
+        {
+            movement.SetSpeedScale(this, Rules.EatMoveSpeed);
+        }
+
         Started?.Invoke(item);
         return true;
     }
@@ -213,7 +217,11 @@ public sealed class PlayerEating : MonoBehaviour
             healPerSecond = 0f;
         }
 
-        movement?.SetSpeedScale(this, 1f);
+        if (movement != null)
+        {
+            movement.SetSpeedScale(this, 1f);
+        }
+
         Ended?.Invoke(item, eaten);
     }
 

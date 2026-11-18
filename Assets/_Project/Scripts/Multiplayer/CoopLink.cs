@@ -198,5 +198,7 @@ public static class CoopPlace
         text = string.Empty;
         key = default;
         seed = 0;
+        scene = default;
+        wasArrived = false;
     }
 }

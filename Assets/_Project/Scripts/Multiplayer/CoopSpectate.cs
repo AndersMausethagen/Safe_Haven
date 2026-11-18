@@ -136,5 +136,7 @@ public static class CoopSpectate
         finish = null;
         Watched = null;
         standing.Clear();
+        since = 0f;
+        watching = 0;
     }
 }

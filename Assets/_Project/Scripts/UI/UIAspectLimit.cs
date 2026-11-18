@@ -29,7 +29,11 @@ public sealed class UIAspectLimit : MonoBehaviour
 
     private void Apply()
     {
-        self ??= (RectTransform)transform;
+        if (self == null)
+        {
+            self = (RectTransform)transform;
+        }
+
         var parent = self.parent as RectTransform;
         if (parent == null)
         {

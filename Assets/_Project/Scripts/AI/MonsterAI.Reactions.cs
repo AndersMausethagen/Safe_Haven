@@ -363,7 +363,11 @@ public sealed partial class MonsterAI
         SetState(State.Dead);
         reelingTell?.Clear();
         ClearAnswers();
-        pack?.MemberFell(this);
+        if (pack != null)
+        {
+            pack.MemberFell(this);
+        }
+
         ShakeTheOthers(killingBlow, wasStaggered);
         // Its death cry carries: others near enough come to see what happened (a big creature's further).
         if (!IsRemote)

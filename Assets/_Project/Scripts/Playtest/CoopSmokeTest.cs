@@ -280,4 +280,13 @@ public sealed class CoopSmokeTest : MonoBehaviour
         Debug.Log($"Co-op smoke test ({role}): {string.Join(" / ", report)}");
         Application.Quit(passed ? 0 : 1);
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        folder = null;
+        read = false;
+        role = null;
+    }
 }

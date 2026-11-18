@@ -148,4 +148,11 @@ public sealed class SoundCaptions : MonoBehaviour, IGameSystem
             lines[i].Label.rectTransform.anchoredPosition = new Vector2(0f, (lines.Count - 1 - i) * LineHeight);
         }
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        instance = null;
+    }
 }

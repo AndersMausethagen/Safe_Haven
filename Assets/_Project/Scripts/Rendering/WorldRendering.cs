@@ -72,7 +72,11 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
 
     public void OnSceneEntered(Scene scene)
     {
-        sky?.Bind();
+        if (sky != null)
+        {
+            sky.Bind();
+        }
+
         // Painted trees sway in their vertices (Tree Wind's motion vectors): their own pass, not the camera's guess, so
         // TAA and STP don't smear them.
         foreach (Terrain terrain in Terrain.activeTerrains)
@@ -81,15 +85,34 @@ public sealed class WorldRendering : MonoBehaviour, IGameSystem
         }
 
         lights.Rescan();
-        reflections?.Refresh();
-        wear?.Clear();
+        if (reflections != null)
+        {
+            reflections.Refresh();
+        }
+
+        if (wear != null)
+        {
+            wear.Clear();
+        }
+
         RaidDefinition raid = GameSession.ActiveRaid?.Definition;
         raidGrade.Apply(raid != null ? raid.Grade : null);
         // Each raid's hour may set its own (RaidTimeOfDay › Sky Cover); otherwise the one strength for all raids.
         RaidTimeOfDay hour = GameSession.ActiveRaid?.TimeOfDay;
         // No ground light field until a generated raid map builds one, and the sky map follows the player until that map pins it.
-        groundLight?.Clear();
-        occlusion?.Bind(raid == null ? 1f : hour != null && hour.skyCover >= 0f ? hour.skyCover : settings.SkyOcclusionInRaids);
-        clouds?.Bind(RenderSettings.sun, raid == null || settings.CloudShadowsInRaids);
+        if (groundLight != null)
+        {
+            groundLight.Clear();
+        }
+
+        if (occlusion != null)
+        {
+            occlusion.Bind(raid == null ? 1f : hour != null && hour.skyCover >= 0f ? hour.skyCover : settings.SkyOcclusionInRaids);
+        }
+
+        if (clouds != null)
+        {
+            clouds.Bind(RenderSettings.sun, raid == null || settings.CloudShadowsInRaids);
+        }
     }
 }

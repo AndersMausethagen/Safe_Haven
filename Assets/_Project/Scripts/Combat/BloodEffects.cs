@@ -299,4 +299,11 @@ public sealed class BloodEffects : MonoBehaviour
 
     /// <summary>False until Build Blood and Markers has given the prefab its pool system.</summary>
     public bool HasPools => pools != null;
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        instance = null;
+    }
 }

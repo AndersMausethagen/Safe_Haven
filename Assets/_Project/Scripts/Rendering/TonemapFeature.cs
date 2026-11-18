@@ -28,7 +28,13 @@ public sealed class TonemapFeature : ScriptableRendererFeature
             return;
         }
 
-        material = CoreUtils.CreateEngineMaterial(shader);
+        // Create runs again on every change to the renderer (OnValidate): the material is made once (EngineHazardTests).
+        if (material == null || material.shader != shader)
+        {
+            CoreUtils.Destroy(material);
+            material = CoreUtils.CreateEngineMaterial(shader);
+        }
+
         pass = new TonemapPass(material) { renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing };
     }
 

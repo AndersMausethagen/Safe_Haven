@@ -123,6 +123,8 @@ public static class ImpactBlur
     {
         strength = 0f;
         seconds = 0f;
+        centre = Vector2.zero;
+        startedAt = 0f;
     }
 
     /// <summary>Streaks the picture away from <paramref name="worldPoint"/> by <paramref name="amount"/> (a share of the screen at its

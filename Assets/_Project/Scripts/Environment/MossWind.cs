@@ -130,4 +130,12 @@ public sealed class MossWind : MonoBehaviour
         Shader.SetGlobalFloat(GustId, gust);
         Shader.SetGlobalFloat(TreeId, tree);
     }
+
+    // Entering Play doesn't reload scripts in this project. The scene's wind enables again as Play starts (measured: edit-mode
+    // registrations come back), so a stale one from the last session goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        active = null;
+    }
 }

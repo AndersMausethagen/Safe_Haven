@@ -670,7 +670,8 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             yield break;
         }
 
-        AsyncOperation building = navMesh.UpdateNavMesh(navMesh.navMeshData);
+        // Through the collider copies: in a build the runtime builder can't read the colliders' meshes themselves.
+        AsyncOperation building = NavMeshColliderCopies.Update(navMesh);
         while (building != null && !building.isDone)
         {
             yield return null;

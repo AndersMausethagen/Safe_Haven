@@ -165,4 +165,11 @@ public sealed class Festivals : MonoBehaviour
 
         return at;
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Place = Vector3.zero;
+    }
 }

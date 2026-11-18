@@ -973,4 +973,12 @@ public sealed class DialogueBox : MonoBehaviour
         text.textWrappingMode = TextWrappingModes.Normal;
         return text;
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        clickFrame = -1;
+        current = null;
+    }
 }

@@ -37,7 +37,15 @@ public sealed class UIBlurFeature : ScriptableRendererFeature
             return;
         }
 
-        material = CoreUtils.CreateEngineMaterial(shader);
+        // Create runs again on every change to the renderer (OnValidate): the material is made once, the old pass's copy and
+        // targets let go (EngineHazardTests).
+        if (material == null || material.shader != shader)
+        {
+            CoreUtils.Destroy(material);
+            material = CoreUtils.CreateEngineMaterial(shader);
+        }
+
+        pass?.Dispose();
         pass = new BlurPass(material, resolution) { renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing };
     }
 
@@ -150,5 +158,12 @@ public sealed class UIBlurFeature : ScriptableRendererFeature
                     Blitter.BlitTexture(context.cmd, d.source, new Vector4(1f, 1f, 0f, 0f), d.material, d.pass));
             }
         }
+    }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        Wanted = false;
     }
 }

@@ -180,7 +180,11 @@ public sealed class PlayerAudio : MonoBehaviour
         lastStep = Time.time;
         Vector3 position = foot != null ? foot.position : transform.position;
         AudioManager.Play(SurfaceSound(position), position);
-        water?.SplashFootstep(position);
+        if (water != null)
+        {
+            water.SplashFootstep(position);
+        }
+
         Rustle(position);
         if (movement != null && movement.IsGrounded && !movement.IsDashing && movement.HorizontalSpeed >= MinimumMovingSpeed)
         {

@@ -73,7 +73,17 @@ public sealed class CheatWindow : MonoBehaviour
     public static CheatWindow Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        amount = 10;
+        lastTab = default;
+        raidLarge = null;
+        raidMood = null;
+        raidShape = null;
+        spawnCount = 1;
+        toStash = false;
+    }
 
     /// <summary>Opens the menu, or closes it. Does nothing where there is no player, or while the Escape menu has the game paused.</summary>
     public static void Toggle()

@@ -1216,7 +1216,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         // A friend's game runs it: its gear fell there (and comes to this game as the dropped items it left).
         if (IsPuppet)
         {
-            Motion?.Die();
+            if (Motion != null)
+            {
+                Motion.Die();
+            }
+
             Changed?.Invoke(this);
             return;
         }
@@ -1256,7 +1260,11 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
             GameMessages.Post($"{HorseName} is dead.", MessageKind.Warning);
         }
 
-        Motion?.Die();
+        if (Motion != null)
+        {
+            Motion.Die();
+        }
+
         Changed?.Invoke(this);
     }
 

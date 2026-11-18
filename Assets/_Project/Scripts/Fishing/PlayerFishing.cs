@@ -198,7 +198,11 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
 
                 State = Phase.Charging;
                 chargeStarted = Time.time;
-                poses?.BeginCast();
+                if (poses != null)
+                {
+                    poses.BeginCast();
+                }
+
                 break;
             case Phase.Waiting:
                 EndLine("You reel in. The bait is gone.");
@@ -258,10 +262,18 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         {
             case Phase.Charging:
                 FaceCursor();
-                poses?.HoldCast(true, FishingSettings.Current.CastHoldPoint);
+                if (poses != null)
+                {
+                    poses.HoldCast(true, FishingSettings.Current.CastHoldPoint);
+                }
+
                 break;
             case Phase.Casting:
-                poses?.HoldCast(false, FishingSettings.Current.CastHoldPoint);
+                if (poses != null)
+                {
+                    poses.HoldCast(false, FishingSettings.Current.CastHoldPoint);
+                }
+
                 if (poses == null || poses.CastFlicked(FishingSettings.Current.CastReleasePoint) || Time.time - castReleasedAt > CastTimeout)
                 {
                     Throw();
@@ -358,12 +370,19 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         biteAt = cast.LandsAt + Random.Range(settings.BiteWait.x, settings.BiteWait.y) / Mathf.Max(0.1f, lure * favour * quick);
         State = Phase.Waiting;
         // A fish in sight near the float comes to it (and what is right under it scatters).
-        FishInTheWater.Current?.Attract(new Vector3(target.x, height, target.z), baitEase);
+        if (FishInTheWater.Current != null)
+        {
+            FishInTheWater.Current.Attract(new Vector3(target.x, height, target.z), baitEase);
+        }
+
         look.Show();
         look.Tick(cast, State, 0f);
         // The float stays in the picture while it is out, so a bite is seen wherever the line was cast.
         closeUp = look.Bobber;
-        PlayerCameraController.Current?.KeepInView(closeUp);
+        if (PlayerCameraController.Current != null)
+        {
+            PlayerCameraController.Current.KeepInView(closeUp);
+        }
     }
 
     private void Bite()
@@ -384,7 +403,11 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         {
             State = Phase.Grabbed;
             look.Hide();
-            poses?.EndFishing();
+            if (poses != null)
+            {
+                poses.EndFishing();
+            }
+
             movement.SetSpeedScale(this, 1f);
             NokkenEncounter.Begin(this, cast.Landing, cast.WaterHeight, () =>
             {
@@ -424,12 +447,19 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         lastMood = Fight.Current;
         State = Phase.Reeling;
         movement.FacingLocked = true;
-        poses?.SetFishingPose(FishingPose.Fighting);
+        if (poses != null)
+        {
+            poses.SetFishingPose(FishingPose.Fighting);
+        }
+
         AudioManager.Play(settings.SplashSound, cast.Landing);
         look.Splash(cast.Landing, 0f);
         CameraShake.Add(0.12f);
         closeUp = look.Bobber;
-        PlayerCameraController.Current?.BeginCloseUp(closeUp);
+        if (PlayerCameraController.Current != null)
+        {
+            PlayerCameraController.Current.BeginCloseUp(closeUp);
+        }
     }
 
     private void UpdateFight(float seconds)
@@ -451,7 +481,10 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
             transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, 240f * seconds);
         }
 
-        poses?.SetFishingPose(FishingPose.Fighting, mood == FishFight.Mood.Running ? 1.35f : Held ? 1f : 0.7f);
+        if (poses != null)
+        {
+            poses.SetFishingPose(FishingPose.Fighting, mood == FishFight.Mood.Running ? 1.35f : Held ? 1f : 0.7f);
+        }
 
         if (mood != lastMood)
         {
@@ -599,7 +632,11 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         landingLetGo = false;
         landingLetGoAt = -1f;
         heldUpAt = -1f;
-        poses?.SetFishingPose(haul ? FishingPose.Haul : FishingPose.Catch);
+        if (poses != null)
+        {
+            poses.SetFishingPose(haul ? FishingPose.Haul : FishingPose.Catch);
+        }
+
         AudioManager.Play(settings.SplashSound, fishAt);
         look.Splash(fishAt, 0f);
     }
@@ -636,7 +673,10 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
         {
             landingLetGo = true;
             landingLetGoAt = Time.time;
-            poses?.EndFishing();
+            if (poses != null)
+            {
+                poses.EndFishing();
+            }
         }
 
         bool done = landingLetGo && (haul ? Time.time - landingLetGoAt > 0.55f : share < 0f || share >= 0.93f);
@@ -694,12 +734,20 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
     public void EndLine(string message)
     {
         look?.Hide();
-        FishInTheWater.Current?.Release();
+        if (FishInTheWater.Current != null)
+        {
+            FishInTheWater.Current.Release();
+        }
+
         Fight = null;
         hooked = null;
         if (closeUp != null)
         {
-            PlayerCameraController.Current?.EndCloseUp(closeUp);
+            if (PlayerCameraController.Current != null)
+            {
+                PlayerCameraController.Current.EndCloseUp(closeUp);
+            }
+
             closeUp = null;
         }
 
@@ -709,7 +757,11 @@ public sealed class PlayerFishing : MonoBehaviour, IPlayerActivity
             movement.FacingLocked = false;
         }
 
-        poses?.EndFishing();
+        if (poses != null)
+        {
+            poses.EndFishing();
+        }
+
         if (State != Phase.Grabbed)
         {
             State = Rod != null ? Phase.Ready : Phase.None;

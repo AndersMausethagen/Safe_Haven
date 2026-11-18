@@ -33,6 +33,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     {
         Fans.Clear();
         Bands.Clear();
+        warnedNoMaterial = false;
     }
 
     [Tooltip("Height of the marker above the monster's feet, so it doesn't flicker into the ground.")]

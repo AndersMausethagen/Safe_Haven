@@ -179,4 +179,11 @@ public sealed partial class RecipeBrowser
     }
 
     private int AmountToMake => Mathf.Max(1, amount);
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        favourites = null;
+    }
 }

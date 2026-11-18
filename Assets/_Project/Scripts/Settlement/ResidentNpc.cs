@@ -203,7 +203,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     }
 
     /// <summary>What they do with their hands at work.</summary>
-    public EmoteDefinition WorkGesture => Job?.WorkGesture;
+    public EmoteDefinition WorkGesture => Job != null ? Job.WorkGesture : null;
 
     /// <summary>The job they hold now, or null.</summary>
     public JobDefinition Job => resident != null ? GameSession.Here.Find(resident)?.Job : null;

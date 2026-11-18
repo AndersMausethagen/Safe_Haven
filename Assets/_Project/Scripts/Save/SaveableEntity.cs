@@ -39,7 +39,11 @@ public sealed class SaveableEntity : MonoBehaviour
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => live.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        live.Clear();
+        pendingSpawnId = null;
+    }
     private static string pendingSpawnId;
 
     private ISaveable[] saveables = Array.Empty<ISaveable>();

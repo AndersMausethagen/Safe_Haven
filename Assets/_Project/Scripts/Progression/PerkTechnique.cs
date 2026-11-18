@@ -163,5 +163,6 @@ public static class Techniques
     {
         known.Clear();
         forProgress = null;
+        forVersion = -1;
     }
 }

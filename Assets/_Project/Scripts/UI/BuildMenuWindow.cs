@@ -97,7 +97,11 @@ public sealed class BuildMenuWindow : MonoBehaviour
     public static BuildMenuWindow Current { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Current = null;
+    private static void ResetForNewPlaySession()
+    {
+        Current = null;
+        lastTab = BuildCategory.Stations;
+    }
 
     public bool IsOpen => window != null && window.IsOpen;
 

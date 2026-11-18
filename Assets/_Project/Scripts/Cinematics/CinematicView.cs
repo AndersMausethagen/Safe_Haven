@@ -274,6 +274,7 @@ public sealed class CinematicView : MonoBehaviour
         alive = 0;
         keptBrain = null;
         AtmosphereFeature.WarScale = 1f;
+        keptBlend = default;
     }
 
     private void BuildScreen(bool letterbox, bool skippable)

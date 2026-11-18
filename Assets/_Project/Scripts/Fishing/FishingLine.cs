@@ -180,7 +180,11 @@ public sealed class FishingLine
     /// model's longest side away from the grip. A fixed spot by the shoulder only while no rod is shown.</summary>
     public Vector3 RodTip()
     {
-        held ??= angler.GetComponent<HeldItemView>();
+        if (held == null)
+        {
+            held = angler.GetComponent<HeldItemView>();
+        }
+
         GameObject rod = held != null ? held.ShownModel : null;
         if (rod == null)
         {

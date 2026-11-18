@@ -61,7 +61,10 @@ public sealed class SkillWindow : MonoBehaviour, IItemSlotHandler
 
         CancelDrag();
         hovered = null;
-        tooltip?.Hide();
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     private void Update()

@@ -42,7 +42,11 @@ public sealed class UITabHover : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     private void Paint()
     {
-        label ??= GetComponentInChildren<TMP_Text>(true);
+        if (label == null)
+        {
+            label = GetComponentInChildren<TMP_Text>(true);
+        }
+
         if (line == null)
         {
             Transform found = transform.Find("Line");

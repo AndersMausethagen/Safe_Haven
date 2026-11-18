@@ -423,12 +423,14 @@ public static class GameInput
     // Lookups are by name, and some actions are read every frame, so each is found once per asset.
     private static readonly Dictionary<string, InputAction> Found = new Dictionary<string, InputAction>();
     private static InputActionAsset foundIn;
+    private static InputActionMap foundFirstMap;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
         Found.Clear();
         foundIn = null;
+        foundFirstMap = null;
         Suspended.Clear();
         Suspenders.Clear();
         PressedBy.Clear();
@@ -438,10 +440,15 @@ public static class GameInput
     private static InputAction Find(string path, bool quiet = false)
     {
         InputActionAsset asset = InputSystem.actions;
-        if (asset != foundIn)
+        // The same asset can be given new maps (the Input System reloads the project-wide actions around Play and its test
+        // fixture): actions cached from the old ones never resolve again, and every key label threw (TutorialTests after
+        // InputActionsTests and a Play session, in a whole-suite run).
+        InputActionMap first = asset != null && asset.actionMaps.Count > 0 ? asset.actionMaps[0] : null;
+        if (asset != foundIn || first != foundFirstMap)
         {
             Found.Clear();
             foundIn = asset;
+            foundFirstMap = first;
         }
 
         if (Found.TryGetValue(path, out InputAction cached))

@@ -697,5 +697,6 @@ public static class SaveGameService
         storage = null;
         CurrentSlot = null;
         CurrentName = null;
+        raidUnderWay = null;
     }
 }

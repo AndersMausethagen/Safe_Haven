@@ -27,7 +27,7 @@ public sealed class ConventionTests
         ["MeshSurface.materials"] = "goes with MeshSurface.all",
     };
 
-    private static IEnumerable<(string path, string source)> RuntimeScripts()
+    internal static IEnumerable<(string path, string source)> RuntimeScripts()
     {
         foreach (string file in Directory.GetFiles("Assets/_Project/Scripts", "*.cs", SearchOption.AllDirectories))
         {
@@ -39,10 +39,10 @@ public sealed class ConventionTests
         }
     }
 
-    private static string WithoutComments(string source) => Regex.Replace(source, @"^\s*//.*$", "", RegexOptions.Multiline);
+    internal static string WithoutComments(string source) => Regex.Replace(source, @"^\s*//.*$", "", RegexOptions.Multiline);
 
     // What runs when Play starts: the bodies of the SubsystemRegistration hooks, and of the methods they call in the same file.
-    private static string ResetCode(string source)
+    internal static string ResetCode(string source)
     {
         var code = new List<string>();
         int at = 0;
@@ -66,7 +66,7 @@ public sealed class ConventionTests
     }
 
     // The body after a method's parameter list: "=> ...;" or a braced block.
-    private static string MethodBody(string source, int from)
+    internal static string MethodBody(string source, int from)
     {
         int start = from;
         while (start < source.Length && char.IsWhiteSpace(source[start]))
@@ -92,7 +92,7 @@ public sealed class ConventionTests
         return string.Empty;
     }
 
-    private static string TypeAt(string source, int position, string path)
+    internal static string TypeAt(string source, int position, string path)
     {
         string type = null;
         foreach (Match declaration in TypeDeclaration.Matches(source))

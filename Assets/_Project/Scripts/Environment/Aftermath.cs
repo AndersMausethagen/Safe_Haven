@@ -68,7 +68,10 @@ public sealed class Aftermath : MonoBehaviour
             // Only while nothing is fighting there: crows don't land in a fight.
             if (!MonsterAI.AnyHuntingPlayerSide())
             {
-                Birds.Current?.LandAt(crows[i].at);
+                if (Birds.Current != null)
+                {
+                    Birds.Current.LandAt(crows[i].at);
+                }
             }
 
             crows.RemoveAt(i);

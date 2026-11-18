@@ -134,7 +134,13 @@ public sealed class CommandWheel : MonoBehaviour
         ShowPage("Windows");
     }
 
-    private static void Request(UIWindowId window) => UIStateManager.Current?.RequestToggle(window);
+    private static void Request(UIWindowId window)
+    {
+        if (UIStateManager.Current != null)
+        {
+            UIStateManager.Current.RequestToggle(window);
+        }
+    }
 
     // What a controller has no button for. The consumables are on the quickbar (hold RB), the windows on View.
     private void BuildPadActions()
@@ -143,7 +149,7 @@ public sealed class CommandWheel : MonoBehaviour
         Player player = Player.Current;
         PlayerRiding riding = player != null && player.TryGetComponent(out PlayerRiding found) ? found : null;
         bool mounted = riding != null && riding.IsRiding;
-        choices.Add(new Choice("Light", () => GetComponent<PlayerInputHandler>()?.ToggleLight()));
+        choices.Add(new Choice("Light", () => { if (TryGetComponent(out PlayerInputHandler input)) input.ToggleLight(); }));
         choices.Add(new Choice(mounted ? "Get down" : "Whistle", () => GameInput.Press(GameInput.Whistle)));
         if (StashQuickStack.CanStack(player != null ? player.gameObject : null))
         {

@@ -89,6 +89,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         {
             equipment.Changed += OnEquipmentChanged;
         }
+
         var resources = inventory.GetComponent<ResourceInventory>();
         storage = resources != null ? resources.Storage : null;
 
@@ -204,7 +205,10 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
 
         CancelDrag();
         hovered = null;
-        tooltip?.Hide();
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     private void Update()

@@ -209,4 +209,15 @@ public static class JournalNotices
     }
 
     private static void Post(string message) => GameMessages.Post(GameInput.WithRebinds(message));
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        combat = null;
+        dodge = null;
+        guard = null;
+        health = null;
+        stamina = null;
+    }
 }

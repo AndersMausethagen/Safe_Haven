@@ -40,7 +40,11 @@ public static class WaterRipples
     public static int PendingStamps => Pending.Count;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Release();
+    private static void ResetForNewPlaySession()
+    {
+        Release();
+        origin = Vector2.zero;
+    }
 
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoadMethod]

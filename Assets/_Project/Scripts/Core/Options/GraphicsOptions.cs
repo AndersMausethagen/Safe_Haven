@@ -179,7 +179,11 @@ public static class GraphicsOptions
         float scale = GameOptions.RenderScale.Value;
         if (choice == DlssChoice && DlssAvailable())
         {
-            dlssOptions ??= NewOptions<DLSSOptions>(UpscalerNames[DlssChoice]);
+            if (dlssOptions == null)
+            {
+                dlssOptions = NewOptions<DLSSOptions>(UpscalerNames[DlssChoice]);
+            }
+
             dlssOptions.dlssQualityMode = scale >= 0.999f ? UnityEngine.NVIDIA.DLSSQuality.DLAA
                 : scale >= 0.7f ? UnityEngine.NVIDIA.DLSSQuality.MaximumQuality
                 : scale >= 0.55f ? UnityEngine.NVIDIA.DLSSQuality.Balanced
@@ -191,7 +195,11 @@ public static class GraphicsOptions
         }
         else if (choice == Fsr2Choice && Fsr2Available())
         {
-            fsr2Options ??= NewOptions<FSR2Options>(UpscalerNames[Fsr2Choice]);
+            if (fsr2Options == null)
+            {
+                fsr2Options = NewOptions<FSR2Options>(UpscalerNames[Fsr2Choice]);
+            }
+
             fsr2Options.fsr2QualityMode = scale >= 0.7f ? UnityEngine.AMD.FSR2Quality.Quality
                 : scale >= 0.55f ? UnityEngine.AMD.FSR2Quality.Balanced
                 : scale >= 0.45f ? UnityEngine.AMD.FSR2Quality.Performance
@@ -364,5 +372,10 @@ public static class GraphicsOptions
         occlusion = null;
         AuthoredTerrains.Clear();
         AuthoredCameras.Clear();
+        ActiveUpscaler = "";
+        authoredLodBias = 0f;
+        authoredMipLimit = 0;
+        nearShadows = false;
+        occlusionWasOn = false;
     }
 }

@@ -593,7 +593,11 @@ public sealed class KitSearchGuard : MonoBehaviour
     // the letters typed moved the player.
     private void Update()
     {
-        field ??= GetComponent<TMP_InputField>();
+        if (field == null)
+        {
+            field = GetComponent<TMP_InputField>();
+        }
+
         if (field != null)
         {
             Typing(field.isFocused);

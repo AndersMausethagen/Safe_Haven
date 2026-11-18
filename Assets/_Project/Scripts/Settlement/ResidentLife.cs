@@ -411,7 +411,11 @@ public sealed class ResidentLife : MonoBehaviour
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => OutingSpots.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        OutingSpots.Clear();
+        outingSpotsScene = default;
+    }
     private static UnityEngine.SceneManagement.Scene outingSpotsScene;
 
     private bool GoingOut(float hour, out Vector3 to, out Quaternion facingThere)

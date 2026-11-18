@@ -76,4 +76,13 @@ public static class CameraPointer
         point = plane.ClosestPointOnPlane(ray.GetPoint(maxDistance));
         return true;
     }
+
+    // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession()
+    {
+        PadTarget = null;
+        Reach = 14f;
+        UsesScreenCenter = false;
+    }
 }

@@ -273,6 +273,7 @@ public static class SceneTransition
         preloaded = null;
         preloadedScene = null;
         IsBusy = false;
+        runningStep = 0;
     }
 
     /// <summary>Hosts the transition coroutines and the loading screen. Lives across scene loads.</summary>

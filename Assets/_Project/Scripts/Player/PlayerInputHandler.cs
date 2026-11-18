@@ -93,7 +93,11 @@ public sealed class PlayerInputHandler : MonoBehaviour
 
     private void OnDisable()
     {
-        commandWheel?.Cancel();
+        if (commandWheel != null)
+        {
+            commandWheel.Cancel();
+        }
+
         GamePause.Changed -= OnPauseChanged;
         BackHandlers.Unregister(CancelInteraction);
         Subscribe(false);
@@ -110,7 +114,10 @@ public sealed class PlayerInputHandler : MonoBehaviour
     {
         if (!enable)
         {
-            commandWheel?.Cancel();
+            if (commandWheel != null)
+            {
+                commandWheel.Cancel();
+            }
         }
 
         InputActionMap map = GameInput.PlayerMap;

@@ -176,6 +176,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         volumes.Clear();
         musicHolds.Clear();
         hushedUntil = float.NegativeInfinity;
+        dipLevel = 0f;
+        masterVolume = 1f;
     }
 
     private static readonly HashSet<object> musicHolds = new HashSet<object>();

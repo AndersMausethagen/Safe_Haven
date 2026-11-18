@@ -72,7 +72,11 @@ public sealed class WoundTending : MonoBehaviour
         if (health == null || !health.IsAlive)
         {
             doneAt = -1f;
-            spot?.SetAvailable(false);
+            if (spot != null)
+            {
+                spot.SetAvailable(false);
+            }
+
             return;
         }
 
@@ -101,7 +105,10 @@ public sealed class WoundTending : MonoBehaviour
             doneAt = Time.time + care.BandageSeconds;
         }
 
-        spot?.SetAvailable(health.HealthFraction < care.TendBelow);
+        if (spot != null)
+        {
+            spot.SetAvailable(health.HealthFraction < care.TendBelow);
+        }
     }
 
     /// <summary>True when a living creature that would attack the player's side is within <paramref name="metres"/>.</summary>
