@@ -15,6 +15,7 @@ public sealed class CombatSwingTimingTests
         List<(AttackDefinition attack, UnityEngine.AnimationClip clip)> swings = CombatSwingTiming.PlayerSwings();
         Assert.Greater(swings.Count, 40, "the player's swings were found");
         var problems = new List<string>();
+        int measuredSwings = 0;
         foreach ((AttackDefinition attack, UnityEngine.AnimationClip clip) in swings)
         {
             if (!CombatSwingTiming.TryTime(attack, clip, out CombatSwingTiming.Timing measured))
@@ -22,6 +23,7 @@ public sealed class CombatSwingTimingTests
                 continue;
             }
 
+            measuredSwings++;
             float hit = attack.HitDelay;
             float lead = UnityEngine.Mathf.Min(attack.StrikeLead, hit);
             float clipAtHit = attack.AnimationSpeed * (hit - lead) + attack.StrikeSpeed * lead;
@@ -43,6 +45,9 @@ public sealed class CombatSwingTimingTests
             }
         }
 
+        // TryTime gives up on a swing it can't measure (no player rig, no hand bone, a near-instant hit), and gives up on every
+        // one at once if the rig is gone: counting the swings found would then pass having judged none.
+        Assert.Greater(measuredSwings, swings.Count / 2, $"only {measuredSwings} of {swings.Count} swings could be measured");
         Assert.IsEmpty(problems, string.Join("\n", problems));
     }
 

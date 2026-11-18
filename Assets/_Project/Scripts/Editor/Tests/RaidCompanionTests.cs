@@ -105,18 +105,6 @@ public sealed class RaidCompanionTests
     }
 
     [Test]
-    public void ABadLookingLossIsStillInTheSaveFormat()
-    {
-        var data = new SettlementSaveData();
-        data.fallen.Add(new FallenSaveData { id = "sigrid", where = "The Misty Woods", atExtraction = 3 });
-        data.vacantJobs.Add("smith");
-        SettlementSaveData back = JsonUtility.FromJson<SettlementSaveData>(JsonUtility.ToJson(data));
-        Assert.AreEqual("sigrid", back.fallen[0].id);
-        Assert.AreEqual(3, back.fallen[0].atExtraction);
-        Assert.AreEqual("smith", back.vacantJobs[0]);
-    }
-
-    [Test]
     public void TheExpeditionCanGoAlong()
     {
         foreach (string name in new[] { "Sigrid", "Eirik", "Runa" })

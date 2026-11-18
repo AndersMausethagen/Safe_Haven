@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -142,10 +144,30 @@ public sealed class TreeImpactTests
         Assert.IsTrue(Rules.StrikeSound.HasClips && Rules.CrushSound.HasClips);
     }
 
+    // A falling tree finds a standing one by any solid collider under its ChoppableTree (TreeImpacts' overlap), so every choppable
+    // tree must carry one: every prefab of the kind, not one spruce.
     [Test]
     public void EveryChoppableTree_CanBeMet()
     {
-        var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Environment/World/Norway Spruce A.prefab");
-        Assert.IsNotNull(prefab.GetComponent<CapsuleCollider>(), "a falling tree finds a standing one by its trunk");
+        var unmet = new List<string>();
+        int trees = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project" }))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null || prefab.GetComponent<ChoppableTree>() == null || path.EndsWith("TerrainTreeProxy.prefab"))
+            {
+                continue;
+            }
+
+            trees++;
+            if (!prefab.GetComponentsInChildren<Collider>(true).Any(collider => !collider.isTrigger))
+            {
+                unmet.Add(path);
+            }
+        }
+
+        Assert.Greater(trees, 5, "the choppable trees were found");
+        Assert.IsEmpty(unmet, "no solid collider, so a falling tree passes through them:\n" + string.Join("\n", unmet));
     }
 }

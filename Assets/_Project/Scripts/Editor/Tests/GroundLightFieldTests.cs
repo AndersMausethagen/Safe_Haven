@@ -325,15 +325,6 @@ public sealed class GroundLightFieldTests
     }
 
     [Test]
-    public void SplitIndirect_MatchesTheShader()
-    {
-        string shader = System.IO.File.ReadAllText("Assets/_Project/Shaders/GroundLight.hlsl");
-        StringAssert.Contains("occlusion *= min(factor, 1.0);", shader);
-        StringAssert.Contains("bakedGI *= max(factor, 1.0);", shader);
-        StringAssert.Contains("lerp(1.0, 0.1, saturate(normalWS.y))", shader, "the bounce's facing, as BounceFacing");
-    }
-
-    [Test]
     public void EveryShader_PutsTheFieldOnThroughGroundLightApply()
     {
         // A factor written straight into occlusion would lose the night's lift to URP's clamp again.

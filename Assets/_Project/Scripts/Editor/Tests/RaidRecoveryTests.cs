@@ -44,10 +44,10 @@ public sealed class RaidRecoveryTests
     [Test]
     public void LoadingARaidThatNeverCameHomeSaysWhatHappened()
     {
+        // It names the raid and says something other than a plain load does (its wording is free to change).
         string notice = SaveGameService.NoticeFor(new SaveData { raidUnderWay = "The Misty Woods" }, 0);
         StringAssert.Contains("The Misty Woods", notice);
-        StringAssert.Contains("cut short", notice);
-        StringAssert.Contains("Nothing from that raid came home", notice);
+        Assert.AreNotEqual(SaveGameService.NoticeFor(new SaveData(), 0), notice);
     }
 
     [Test]
@@ -60,9 +60,21 @@ public sealed class RaidRecoveryTests
     [Test]
     public void OutsidePlayNothingIsAutosaved()
     {
-        string slot = SaveGameService.CurrentSlot;
-        SaveGameService.SaveBeforeRaid(ScriptableObject.CreateInstance<RaidDefinition>());
-        SaveGameService.SaveOnceHome();
-        Assert.AreEqual(slot, SaveGameService.CurrentSlot);
+        SaveStorage before = SaveGameService.Storage;
+        var raid = ScriptableObject.CreateInstance<RaidDefinition>();
+        try
+        {
+            // This test's own folder: a save made by mistake would land here, not in the player's saves.
+            SaveGameService.Storage = storage;
+            SaveGameService.SaveBeforeRaid(raid);
+            SaveGameService.SaveOnceHome();
+            Assert.IsFalse(SaveGameService.IsSaveWaitingForHome, "no save waits to be made at home");
+            Assert.IsEmpty(Directory.GetFiles(folder), "nothing was written");
+        }
+        finally
+        {
+            SaveGameService.Storage = before;
+            Object.DestroyImmediate(raid);
+        }
     }
 }

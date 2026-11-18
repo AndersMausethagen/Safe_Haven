@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -162,25 +163,27 @@ public sealed class PrologueMeadowTests
 
     // ----- Chapters -----
 
+    // Which chapter is which is the prologue's own data. The rule: loading in the middle of a walk the story leads starts it again
+    // from where it set out (the chapter before it), and nobody is at rest on the road.
     [Test]
-    public void StoryChapters_SayWhereTheyAreAndWhatTheCompanionsDo()
+    public void ALedWalk_RestartsFromWhereItSetOut()
     {
-        PrologueChapter morning = Definition.Chapters[0], road = Definition.Chapters[1];
-        Assert.AreSame(Quest("MorningCamp"), morning.Quest);
-        Assert.AreEqual(PrologueSite.Meadow, morning.Checkpoint);
-        Assert.AreEqual(PrologueCompanions.StandStill, morning.Companions);
-        Assert.IsTrue(morning.AtRest, "There is time to talk by the fire.");
+        PrologueChapter[] chapters = Definition.Chapters;
+        int walks = 0;
+        for (int i = 1; i < chapters.Length; i++)
+        {
+            if (chapters[i].Companions != PrologueCompanions.StoryLeads)
+            {
+                continue;
+            }
 
-        Assert.AreSame(Quest("RoadToForest"), road.Quest);
-        Assert.AreEqual(PrologueSite.Meadow, road.Checkpoint, "Loading in the middle of the walk starts it again from the camp.");
-        Assert.AreEqual(PrologueCompanions.StoryLeads, road.Companions);
-        Assert.IsFalse(road.AtRest);
+            walks++;
+            string name = chapters[i].Quest != null ? chapters[i].Quest.name : $"chapter {i}";
+            Assert.AreEqual(chapters[i - 1].Checkpoint, chapters[i].Checkpoint, $"{name}: a walk checkpoints where it set out");
+            Assert.IsFalse(chapters[i].AtRest, $"{name}: nobody rests on the road");
+        }
 
-        PrologueChapter shelter = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.FindShelter);
-        Assert.AreEqual(PrologueSite.Forest, shelter.Checkpoint);
-        Assert.AreEqual(PrologueCompanions.Follow, shelter.Companions);
-        CollectionAssert.AreEqual(new[] { Quest("RoadToForest") }, shelter.Quest.Prerequisites, "the shelter follows the road: no stop at the tree line");
-        Assert.IsNull(Quest("TreeLine"), "the weapon is chosen before the road now");
+        Assert.Greater(walks, 0, "the story leads the expedition somewhere");
     }
 
     [Test]
@@ -197,21 +200,31 @@ public sealed class PrologueMeadowTests
         }
     }
 
+    // Read from the story the player answers, not from a list of items beside it: every answer hands over a weapon of its own, each a
+    // tier one weapon, each in the content database (or a save can't find it again).
     [Test]
     public void WeaponChoice_OffersEveryTierOneWeaponType()
     {
-        var names = new[] { "Items/Weapons/WornSword", "Items/WoodsmansAxe", "Items/Weapons/FireHardenedSpear", "Items/Weapons/KnottedClub", "Items/CrudeWoodenBow" };
-        foreach (string name in names)
+        var scene = EditorSceneManager.OpenPreviewScene(ScenePath);
+        try
         {
-            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/" + name + ".asset");
-            Assert.NotNull(item, name);
-            Assert.NotNull(item.Weapon, name);
-            Assert.AreEqual(1, new SerializedObject(item).FindProperty("tier").intValue, name);
+            StoryScript story = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true))
+                .Single(s => s.name == "Story - Choose a Weapon");
+            ChoiceNode choice = story.Nodes.OfType<ChoiceNode>().Single();
+            List<ItemDefinition> weapons = story.Nodes.OfType<GiveItemsNode>().SelectMany(node => node.items)
+                .Select(given => given.Item).Where(item => item != null && item.Weapon != null).Distinct().ToList();
+            var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
+            Assert.GreaterOrEqual(weapons.Count, choice.answers.Count, "every answer hands over a weapon of its own");
+            foreach (ItemDefinition weapon in weapons)
+            {
+                Assert.AreEqual(1, weapon.Tier, $"{weapon.name}: the choice is between tier one weapons");
+                Assert.IsTrue(database.Items.Contains(weapon), $"{weapon.name} must be in the content database, or saves can't find it");
+            }
         }
-
-        var sword = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Weapons/WornSword.asset");
-        var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
-        Assert.IsTrue(database.Items.Contains(sword), "New items must be in the content database, or saves can't find them.");
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(scene);
+        }
     }
 
     // ----- Playtest fixes -----
@@ -338,14 +351,14 @@ public sealed class PrologueMeadowTests
         Assert.GreaterOrEqual(pack.BagSlotBonus, 16);
     }
 
+    // The wood is cut with a real tool, and the fighting axe keeps the id saves know it by, whatever it is called on screen.
     [Test]
-    public void WoodQuest_GivesATool_AndTheFightingAxeDoesNotPretend()
+    public void TheHatchetCutsWood_AndTheFightingAxeKeepsItsSaveId()
     {
         var hatchet = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StoneHatchet.asset");
         Assert.AreEqual(ToolType.Axe, hatchet.ToolType);
         Assert.GreaterOrEqual(hatchet.ToolTier, 1);
         var axe = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WoodsmansAxe.asset");
-        Assert.AreEqual("Hand Axe", axe.DisplayName);
         Assert.AreEqual("woodsmans_axe", axe.Id, "Saves know it by this.");
     }
 
@@ -407,8 +420,8 @@ public sealed class PrologueMeadowTests
         var raid = AssetDatabase.LoadAssetAtPath<DayNightProfile>("Assets/_Project/Data/Environment/Misty Woods Day Night.asset");
         var forest = AssetDatabase.LoadAssetAtPath<DayNightProfile>(Root + "Prologue Forest Night.asset");
         Assert.NotNull(forest);
-        // The raids' moon was raised to a pale white light (the user, 2026-11-17: "not too dark... a pale, white light"), 1.6 -> 2.3.
-        Assert.AreEqual(2.3f, raid.Evaluate(23f).LightIntensity, 0.01f, "The raid's own night isn't touched by the prologue.");
+        // The raid's own night is the raid's to tune (the user, 2026-11-17: "not too dark... a pale, white light"); the prologue's
+        // forest only has to stay brighter than it, and the same by day.
         Assert.Greater(forest.Evaluate(23f).LightIntensity, raid.Evaluate(23f).LightIntensity);
         Assert.Greater(forest.Evaluate(23f).AmbientSky.b, raid.Evaluate(23f).AmbientSky.b);
         Assert.AreEqual(raid.Evaluate(11f).LightIntensity, forest.Evaluate(11f).LightIntensity, 0.01f, "Only the night changes.");
@@ -486,30 +499,9 @@ public sealed class PrologueMeadowTests
         }
     }
 
-    // The hunt went back to "two blight boar" after a Data rebuild (2026-11-14): only BuildPrologueBoar knew it was one Boar.
-    [Test]
-    public void TheHunt_IsOneOrdinaryBoar()
-    {
-        QuestDefinition hunt = Quest("HuntForThePot");
-        var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/Boar.asset");
-        Assert.AreEqual(1, hunt.Objectives.Count);
-        Assert.AreEqual(monster, new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("monster").objectReferenceValue);
-        Assert.AreEqual(1, hunt.Objectives[0].Amount);
-        StringAssert.DoesNotContain("blight", (hunt.Description + new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue).ToLowerInvariant());
-
-        var scene = EditorSceneManager.OpenPreviewScene(ScenePath);
-        try
-        {
-            MobSpawnZone zone = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Meadow Boars");
-            Assert.AreEqual(new Vector2Int(1, 1), new SerializedObject(zone).FindProperty("count").vector2IntValue);
-            Assert.AreEqual("ExpeditionBoar", zone.Entries[0].prefab.name);
-        }
-        finally
-        {
-            EditorSceneManager.ClosePreviewScene(scene);
-        }
-    }
-
+    // What the prologue's beats must keep, whatever their lines, names of prefabs or how many there are: fights are fights and talks
+    // are talks, nobody sets off unarmed, the road's fight is won before the walk goes on, what is found is read by the narrator, the
+    // troll walks slow and its blow is wired. Each story's own soundness is SavedScene_HasTheMeadowAndEverythingTheStoryNeeds.
     [Test]
     public void SavedScene_HasTheNewBeats()
     {
@@ -518,64 +510,42 @@ public sealed class PrologueMeadowTests
         {
             var roots = scene.GetRootGameObjects();
             var stories = roots.SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
-            foreach (string name in new[] { "Story - The Old Troll Returns", "Story - The Handcart", "Story - The Road Behind", "Story - A Lesson from Eirik",
-                "Story - A Moment of Warmth", "Story - They Remember", "Story - What Sigrid Knows", "Story - The Stone by the Lake", "Story - A Name Gone Missing",
-                "Story - Choose a Weapon" })
-            {
-                StoryScript story = stories.SingleOrDefault(s => s.name == name);
-                Assert.NotNull(story, name);
-                Assert.IsEmpty(story.FindProblems(), name);
-                Assert.NotNull(story.GetComponent<SaveableEntity>(), name);
-            }
+            StoryScript Story(string name) => stories.Single(s => s.name == name);
 
-            Assert.AreEqual(2, stories.Single(s => s.name == "Story - The Road East").Nodes.OfType<WalkPartyNode>().Count(), "The walk stops at the cart.");
-            StoryScript intro = stories.Single(s => s.name == "Story - The Morning Fire");
-            Assert.IsTrue(intro.Nodes.OfType<SayNode>().Any(n => n.line.Contains("Ingrid") && n.line.Contains("Liv")), "The player learns who they are looking for.");
-            Assert.AreEqual(3, intro.Nodes.OfType<ChoiceNode>().Single().answers.Count, "Why the player came.");
             // Around a fight a word from someone is enough: these speak in asides and never turn the camera.
             foreach (string fight in new[] { "Story - The Old Troll", "Story - The Old Troll Returns", "Story - Rootlings on the Road", "Story - Troll Ambush", "Story - The Road East" })
-                Assert.IsTrue(stories.Single(s => s.name == fight).IsFight, fight);
+            {
+                Assert.IsTrue(Story(fight).IsFight, fight);
+            }
 
-            // Step 2 of Docs/QuestRedesign.md: armed before the road, a fight at the cart in daylight, a name gone missing by
-            // the fire, and Sigrid's hand on the stone before the player's.
-            StoryScript walk = stories.Single(s => s.name == "Story - The Road East");
-            MobSpawnZone wolves = roots.SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Wolves on the Road");
-            Assert.AreEqual("ExpeditionWolf", wolves.Entries[0].prefab.name);
-            SpawnEnemiesNode roadFight = walk.Nodes.OfType<SpawnEnemiesNode>().Single();
-            Assert.AreSame(wolves, roadFight.zone);
-            Assert.IsTrue(roadFight.waitUntilDefeated, "the party walks on when the wolves are down");
+            Assert.IsFalse(Story("Story - Choose a Weapon").IsFight, "choosing is a conversation");
+            Assert.IsFalse(Story("Story - The Morning Fire").IsFight, "a conversation by the fire stays one");
+
+            StoryScript walk = Story("Story - The Road East");
             var chosen = AssetDatabase.LoadAssetAtPath<GameEventDefinition>(Root + "Events/WeaponChosen.asset");
             Assert.IsTrue(walk.Nodes.OfType<WaitForEventNode>().Any(n => n.questEvent == chosen && n.orAfterSeconds == 0f), "nobody sets off until the player is armed");
-            StoryScript weapon = stories.Single(s => s.name == "Story - Choose a Weapon");
-            Assert.AreSame(Quest("RoadToForest"), weapon.Nodes.OfType<WhenQuest>().Single().quest, "the weapon is chosen as the party sets out");
-            Assert.AreEqual(5, weapon.Nodes.OfType<ChoiceNode>().Single().answers.Count);
-            Assert.IsFalse(weapon.IsFight, "choosing is a conversation");
-            StoryScript missing = stories.Single(s => s.name == "Story - A Name Gone Missing");
-            Assert.IsTrue(missing.Nodes.OfType<SayNode>().Any(n => n.line == "Liv." && !n.aside), "nobody should miss it: it is said in the box");
-            StoryScript stones = stories.Single(s => s.name == "Story - What Sigrid Knows");
-            Assert.IsTrue(stones.Nodes.OfType<SayNode>().Any(n => n.line.Contains("will not wake for me")));
-            Assert.AreSame(Definition.PortalReachedEvent, stones.Nodes.OfType<WhenQuestEvent>().Single().questEvent, "it starts when the stones are reached: there is no quest to accept there");
-            StoryScript rest = stories.Single(s => s.name == "Story - A Moment of Warmth");
-            Assert.IsTrue(rest.Nodes.OfType<CheckQuestNode>().Any(n => n.quest == Quest("BerriesForThePot")), "whoever went for berries is waited for");
-            Assert.IsFalse(stories.Single(s => s.name == "Story - The Morning Fire").IsFight, "a conversation by the fire stays one");
-            CreatureHuntsNode troll = stories.Single(s => s.name == "Story - The Old Troll").Nodes.OfType<CreatureHuntsNode>().Single();
+            SpawnEnemiesNode roadFight = walk.Nodes.OfType<SpawnEnemiesNode>().Single();
+            Assert.IsNotNull(roadFight.zone, "the road's fight has creatures to make");
+            Assert.IsTrue(roadFight.waitUntilDefeated, "the party walks on when the fight is won");
+            MobSpawnZone rootlings = roots.SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Rootlings on the Road");
+            Assert.AreNotEqual(roadFight.zone.Entries[0].prefab, rootlings.Entries[0].prefab, "not the same creatures twice on one road");
+
+            Assert.AreSame(Definition.PortalReachedEvent, Story("Story - What Sigrid Knows").Nodes.OfType<WhenQuestEvent>().Single().questEvent,
+                "it starts when the stones are reached: there is no quest to accept there");
+            CreatureHuntsNode troll = Story("Story - The Old Troll").Nodes.OfType<CreatureHuntsNode>().Single();
             Assert.Less(troll.walkSpeed, 0.5f, "The old troll walks to the camp, slow and heavy.");
             Assert.Greater(troll.stayWithin, 0f, "It stays at the camp and doesn't chase the party up the path.");
-            InvokeEventNode swing = stories.Single(s => s.name == "Story - The Old Troll Returns").Nodes.OfType<InvokeEventNode>().Single();
-            Assert.AreEqual(1, swing.response.GetPersistentEventCount(), "The troll's blow is wired to its animator.");
+            InvokeEventNode swing = Story("Story - The Old Troll Returns").Nodes.OfType<InvokeEventNode>().Single();
+            Assert.Greater(swing.response.GetPersistentEventCount(), 0, "The troll's blow is wired to its animator.");
 
             var behind = roots.SelectMany(r => r.GetComponentsInChildren<Transform>(true)).Single(t => t.name == "The Road Behind");
             Assert.IsFalse(behind.gameObject.activeSelf, "The way back only closes once the player is inside.");
-            MobSpawnZone road = roots.SelectMany(r => r.GetComponentsInChildren<MobSpawnZone>(true)).Single(z => z.name == "Rootlings on the Road");
-            Assert.AreEqual("ExpeditionRootling", road.Entries[0].prefab.name, "Not wolves again: the camp has those.");
             foreach (string found in new[] { "Story - The Stone by the Lake", "Story - The Handcart" })
             {
-                SayNode reading = stories.Single(s => s.name == found).Nodes.OfType<SayNode>().First();
+                SayNode reading = Story(found).Nodes.OfType<SayNode>().First();
                 Assert.AreEqual("Narrator", reading.speaker.Describe(), "What the player finds isn't the player talking: " + found);
             }
 
-            QuestGiver sigrid = roots.SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>(true)).Single(c => c.Resident.DisplayName == "Sigrid").GetComponent<QuestGiver>();
-            CollectionAssert.AreEqual(new[] { Quest("MorningCamp"), Quest("RoadToForest") }, sigrid.Offers.Select(o => o.Quest), "Sigrid briefs twice; the night starts the rest");
             Assert.IsFalse(roots.SelectMany(r => r.GetComponentsInChildren<QuestWaypoint>(true)).Any(w => w.Quest == null), "no mark for a quest that is gone");
         }
         finally
@@ -583,8 +553,6 @@ public sealed class PrologueMeadowTests
             EditorSceneManager.ClosePreviewScene(scene);
         }
     }
-
-    // ----- The saved scene -----
 
     [Test]
     public void SavedScene_HasTheMeadowAndEverythingTheStoryNeeds()

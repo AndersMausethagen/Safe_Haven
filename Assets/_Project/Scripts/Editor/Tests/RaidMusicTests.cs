@@ -12,20 +12,15 @@ public sealed class RaidMusicTests
     [Test]
     public void AHushSilencesTheExploringMusicButNotAFight()
     {
-        var defaults = ScriptableObject.CreateInstance<AudioSettingsDefinition>();
-        try
-        {
-            MusicChoice calm = MusicRules.Choose(null, defaults, AudioMood.Exploring, float.PositiveInfinity, true);
-            Assert.IsNull(calm.Playlist, "hushed: the ambience alone");
-            StringAssert.Contains("Hushed", calm.Reason);
-            MusicChoice fight = MusicRules.Choose(null, defaults, AudioMood.Combat, float.PositiveInfinity, true);
-            Assert.AreEqual(MusicRules.Choose(null, defaults, AudioMood.Combat, float.PositiveInfinity).Playlist, fight.Playlist,
-                "a fight's music plays through the hush");
-        }
-        finally
-        {
-            Object.DestroyImmediate(defaults);
-        }
+        // The game's own default music, which has tracks for both moods: with empty playlists every choice is no music, and a hush
+        // that silenced fights too would still pass.
+        var defaults = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);
+        Assert.IsTrue(defaults.DefaultExploring.HasTracks && defaults.DefaultCombat.HasTracks, "default exploring and combat music to choose from");
+        Assert.IsNotNull(MusicRules.Choose(null, defaults, AudioMood.Exploring, float.PositiveInfinity).Playlist, "unhushed, the exploring music plays");
+        Assert.IsNull(MusicRules.Choose(null, defaults, AudioMood.Exploring, float.PositiveInfinity, true).Playlist, "hushed: the ambience alone");
+        MusicChoice fight = MusicRules.Choose(null, defaults, AudioMood.Combat, float.PositiveInfinity, true);
+        Assert.IsNotNull(fight.Playlist, "a fight's music plays through the hush");
+        Assert.AreEqual(MusicRules.Choose(null, defaults, AudioMood.Combat, float.PositiveInfinity).Playlist, fight.Playlist);
     }
 
     [Test]
@@ -46,14 +41,14 @@ public sealed class RaidMusicTests
     public void EachStageBeginsWithItsStingerAndTheHuntHushes(string raid)
     {
         var definition = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/" + raid + ".asset");
-        Assert.AreEqual(3, definition.Stages.Count);
+        Assert.GreaterOrEqual(definition.Stages.Count, 2, $"{raid} has a hunt after its first stage");
         for (int i = 0; i < definition.Stages.Count; i++)
         {
             Assert.IsNotNull(definition.Stages[i].Stinger, $"{raid} stage {i + 1} has a stinger");
             Assert.AreEqual(AudioChannel.Music, definition.Stages[i].Stinger.Channel, "under the music slider");
         }
 
-        Assert.AreEqual(60f, definition.Stages[1].HushSeconds, "the quiet before the hunt");
-        Assert.AreEqual(0f, definition.Stages[2].HushSeconds, "the last stage has its final stretch music");
+        Assert.Greater(definition.Stages[1].HushSeconds, 0f, "the quiet before the hunt");
+        Assert.AreEqual(0f, definition.Stages[definition.Stages.Count - 1].HushSeconds, "the last stage has its final stretch music");
     }
 }

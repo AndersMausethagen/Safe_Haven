@@ -221,18 +221,6 @@ public sealed class StrikeRulesTests
     }
 
     [Test]
-    public void GreatBeasts_AreOnlyOpenWhenStaggered()
-    {
-        foreach (string name in new[] { "OldMossTroll", "RootGuardian", "Huldra" })
-        {
-            Assert.IsFalse(UnityEditor.AssetDatabase.LoadAssetAtPath<MonsterDefinition>($"Assets/_Project/Data/Monsters/{name}.asset").OpenWhileStriking, name);
-        }
-
-        Assert.IsTrue(UnityEditor.AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/Draug.asset").OpenWhileStriking);
-        Assert.Greater(UnityEditor.AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/BarrowShieldbearer.asset").ShieldArc, 0f);
-    }
-
-    [Test]
     public void TargetRules_PreferWhatIsNearTheAim_AndHoldOn()
     {
         float nearAim = TargetRules.Score(5f, 3f, 9f);

@@ -220,7 +220,7 @@ public sealed class GatheringMinigameTests
         node.Swung += (result, from) => swung = result;
         node.Harvested += () => harvested++;
         node.NotifySwing(SwingResult.Critical, Vector3.zero);
-        Invoke(node, "OnGathered");
+        interactable.Completed.Invoke(); // the gather finishing, as the player's interaction ends it
 
         Assert.AreEqual(SwingResult.Critical, swung);
         Assert.AreEqual(1, harvested);
@@ -540,8 +540,12 @@ public sealed class GatheringMinigameTests
         Assert.IsTrue(weights.IsComplete, "two criticals and a glancing blow finish a four-swing node");
         Assert.AreEqual(3, weights.SwingsDone);
 
-        Assert.AreEqual(2f, GatheringMinigameSettings.Current.ProgressFor(SwingResult.Critical), 1e-4f, "playtest: a critical cuts twice as deep");
-        Assert.AreEqual(0.5f, GatheringMinigameSettings.Current.ProgressFor(SwingResult.Glancing), 1e-4f, "and a glancing blow half");
+        // The shipped weights keep their order, whatever they are tuned to: a critical cuts deeper than a normal swing, a glancing
+        // blow less, and none cuts nothing.
+        GatheringMinigameSettings shipped = GatheringMinigameSettings.Current;
+        Assert.Greater(shipped.ProgressFor(SwingResult.Critical), shipped.ProgressFor(SwingResult.Normal));
+        Assert.Greater(shipped.ProgressFor(SwingResult.Normal), shipped.ProgressFor(SwingResult.Glancing));
+        Assert.Greater(shipped.ProgressFor(SwingResult.Glancing), 0f);
     }
 
     private static GatheringSession Session(int swings, float jitter, float criticalWidth = 0.1f, float perCombo = 0f, int maxCombo = 0)

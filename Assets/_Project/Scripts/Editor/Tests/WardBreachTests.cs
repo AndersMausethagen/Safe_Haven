@@ -124,12 +124,16 @@ public sealed class WardBreachTests
     {
         var palisade = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Structures/Palisade.prefab");
         GameObject wall = Object.Instantiate(palisade);
+        var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        BuildingObject building = wall.GetComponent<BuildingObject>();
+        Assert.IsNotNull(building, "the palisade is a building");
         try
         {
             var health = wall.GetComponent<Damageable>();
-            typeof(Damageable).GetMethod("Awake", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(health, null);
+            typeof(Damageable).GetMethod("Awake", flags)?.Invoke(health, null);
             health.Heal(health.MaxHealth);
-            health.HealthFloor = 1f;
+            // The floor comes from the building itself as it is enabled in a scene (BuildingObject), as in play: not set here.
+            typeof(BuildingObject).GetMethod("OnEnable", flags).Invoke(building, null);
             health.ApplyDamage(new DamageInfo(null, null, 1000000f, DamageType.Physical, false, Vector3.zero, Vector3.up));
             Assert.IsTrue(health.IsAlive);
             Assert.IsTrue(health.IsBroken);
@@ -141,6 +145,7 @@ public sealed class WardBreachTests
         }
         finally
         {
+            typeof(BuildingObject).GetMethod("OnDisable", flags).Invoke(building, null);
             Object.DestroyImmediate(wall);
         }
     }

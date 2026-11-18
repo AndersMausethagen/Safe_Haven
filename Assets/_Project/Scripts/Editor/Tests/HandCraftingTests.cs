@@ -21,13 +21,17 @@ public sealed class HandCraftingTests
     [Test]
     public void HandCrafts_TakeTheirTime()
     {
+        // The order the user set (a weapon takes longest, a small weapon or tool half that, a salve less, arrows least), not the
+        // seconds themselves, which are HandCraftingSettings' to tune.
         HandCraftingSettings rules = HandCraftingSettings.Current;
-        Assert.AreEqual(20f, rules.SecondsFor(Load<RecipeDefinition>("StoneAxe")), "a two-handed weapon");
-        Assert.AreEqual(20f, rules.SecondsFor(Load<RecipeDefinition>("CrudeWoodenBow")), "a bow");
-        Assert.AreEqual(10f, rules.SecondsFor(Load<RecipeDefinition>("WoodsmansAxe")), "a one-handed weapon");
-        Assert.AreEqual(10f, rules.SecondsFor(Load<RecipeDefinition>("StoneHatchet")), "a tool");
-        Assert.AreEqual(5f, rules.SecondsFor(Load<RecipeDefinition>("HealingSalve")), "a salve");
-        Assert.Less(rules.SecondsFor(Load<RecipeDefinition>("CrudeStoneArrow")), 5f, "a bundle of arrows is quick");
+        float twoHanded = rules.SecondsFor(Load<RecipeDefinition>("StoneAxe"));
+        Assert.AreEqual(twoHanded, rules.SecondsFor(Load<RecipeDefinition>("CrudeWoodenBow")), "a bow takes as long as a two-handed weapon");
+        float oneHanded = rules.SecondsFor(Load<RecipeDefinition>("WoodsmansAxe"));
+        Assert.Less(oneHanded, twoHanded, "a one-handed weapon is quicker");
+        Assert.AreEqual(oneHanded, rules.SecondsFor(Load<RecipeDefinition>("StoneHatchet")), "a tool takes as long as a one-handed weapon");
+        float salve = rules.SecondsFor(Load<RecipeDefinition>("HealingSalve"));
+        Assert.Less(salve, oneHanded, "a salve is quicker still");
+        Assert.Less(rules.SecondsFor(Load<RecipeDefinition>("CrudeStoneArrow")), salve, "a bundle of arrows is quickest");
         Assert.Less(rules.WalkShare, 1f, "the player walks slower while crafting");
     }
 

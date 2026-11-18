@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -54,10 +56,6 @@ public sealed class PrologueVegetationTests
             Assert.Greater(crown, 0.9f, prototype.prefab.name + ": the crown must bend.");
         }
         Assert.GreaterOrEqual(animated, 5);
-        Assert.AreEqual("Mossy Boulder A", Terrain.treePrototypes[5].prefab.name);
-        Assert.IsFalse(Sways(Terrain.treePrototypes[5].prefab), "Rocks must not sway.");
-        Assert.AreEqual("Rotten Log A", Terrain.treePrototypes[7].prefab.name);
-        Assert.IsFalse(Sways(Terrain.treePrototypes[7].prefab), "Fallen logs must stay still.");
     }
 
     private static bool Sways(GameObject prefab)
@@ -83,19 +81,67 @@ public sealed class PrologueVegetationTests
         }
     }
 
+    // Sampled along the route the party really walks (the scene's Walk Party nodes, with points between their stops), not at points
+    // written down beside it: a route moved in the scene would leave fixed points checking empty ground.
     [Test]
     public void StoryRouteCampAndPortal_RemainFreeOfDetails()
     {
-        int resolution = Terrain.detailResolution;
-        foreach (var prototype in Terrain.detailPrototypes.Select((p, index) => index))
+        TerrainData data = Terrain;
+        var scene = EditorSceneManager.OpenPreviewScene("Assets/_Project/Scenes/Prologue_MistyWoods.unity");
+        try
         {
-            int[,] cells = Terrain.GetDetailLayer(0, 0, resolution, resolution, prototype);
-            foreach (float z in new[] { -50f, -40f, -27f, -10f, 7f })
+            GameObject[] roots = scene.GetRootGameObjects();
+            Terrain forest = roots.SelectMany(r => r.GetComponentsInChildren<Terrain>(true)).Single(t => t.terrainData == data);
+            var route = new List<Vector3>();
+            foreach (WalkPartyNode walk in roots.SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).SelectMany(s => s.Nodes).OfType<WalkPartyNode>())
             {
-                int x = Mathf.FloorToInt(100f / Terrain.size.x * resolution);
-                int y = Mathf.FloorToInt((z + 100f) / Terrain.size.z * resolution);
-                Assert.AreEqual(0, cells[y, x], "Keep the story route readable.");
+                if (walk.route == null)
+                {
+                    continue;
+                }
+
+                Vector3? last = null;
+                foreach (Transform stop in walk.route)
+                {
+                    for (float t = 0.25f; last.HasValue && t < 1f; t += 0.25f)
+                    {
+                        route.Add(Vector3.Lerp(last.Value, stop.position, t));
+                    }
+
+                    route.Add(stop.position);
+                    last = stop.position;
+                }
             }
+
+            int resolution = data.detailResolution;
+            int[][,] layers = Enumerable.Range(0, data.detailPrototypes.Length).Select(layer => data.GetDetailLayer(0, 0, resolution, resolution, layer)).ToArray();
+            var grown = new List<string>();
+            int sampled = 0;
+            foreach (Vector3 at in route)
+            {
+                Vector3 local = at - forest.transform.position;
+                if (local.x < 0f || local.z < 0f || local.x >= data.size.x || local.z >= data.size.z)
+                {
+                    continue; // on the meadow's terrain, not the forest's
+                }
+
+                sampled++;
+                int x = Mathf.FloorToInt(local.x / data.size.x * resolution), y = Mathf.FloorToInt(local.z / data.size.z * resolution);
+                for (int layer = 0; layer < layers.Length; layer++)
+                {
+                    if (layers[layer][y, x] > 0)
+                    {
+                        grown.Add($"{data.detailPrototypes[layer].prototype.name} at {at}");
+                    }
+                }
+            }
+
+            Assert.Greater(sampled, 0, "the party's walk crosses the forest");
+            Assert.IsEmpty(grown, "Keep the story route readable:\n" + string.Join("\n", grown));
+        }
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(scene);
         }
     }
 }

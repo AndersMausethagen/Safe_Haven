@@ -97,21 +97,65 @@ public sealed class CombatMovesetTests
         }
     }
 
+    /// <summary>Every state on a controller, on every layer and in every sub-state machine (an override plays its base's states).</summary>
+    private static HashSet<string> AllStates(RuntimeAnimatorController controller)
+    {
+        var names = new HashSet<string>();
+        if (controller is AnimatorOverrideController overriding)
+        {
+            controller = overriding.runtimeAnimatorController;
+        }
+
+        void Collect(AnimatorStateMachine machine)
+        {
+            names.UnionWith(machine.states.Select(state => state.state.name));
+            foreach (ChildAnimatorStateMachine child in machine.stateMachines)
+            {
+                Collect(child.stateMachine);
+            }
+        }
+
+        if (controller is AnimatorController editable)
+        {
+            foreach (AnimatorControllerLayer layer in editable.layers)
+            {
+                Collect(layer.stateMachine);
+            }
+        }
+
+        return names;
+    }
+
+    // Judged creature by creature against the controller that creature plays (its own, or the shared one), from the attacks its
+    // definition lists: not by guessing from a state's name whose attack it is.
     [Test]
     public void MonsterStrikesPlayStatesTheControllerHas()
     {
-        HashSet<string> states = States(CombatAnimationSetup.MonsterControllerPath, null);
-        foreach (string guid in AssetDatabase.FindAssets("t:AttackDefinition"))
+        HashSet<string> shared = AllStates(AssetDatabase.LoadAssetAtPath<AnimatorController>(CombatAnimationSetup.MonsterControllerPath));
+        var missing = new List<string>();
+        int judged = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:MonsterDefinition"))
         {
-            var attack = AssetDatabase.LoadAssetAtPath<AttackDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            string path = AssetDatabase.GetAssetPath(attack);
-            bool isPlayers = path.Contains("/Combos/") || attack.AnimationState == null || attack.AnimationState.Length == 0
-                             || States(CombatAnimationSetup.PlayerControllerPath, CombatAnimationSetup.FullBodyLayer).Contains(attack.AnimationState);
-            if (!isPlayers)
+            var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (monster == null)
             {
-                Assert.IsTrue(states.Contains(attack.AnimationState), $"{attack.name} plays '{attack.AnimationState}', which is on neither controller");
+                continue;
+            }
+
+            HashSet<string> states = monster.AnimatorController != null ? AllStates(monster.AnimatorController) : shared;
+            IEnumerable<AttackDefinition> attacks = monster.Attacks.Select(entry => entry.attack).Append(monster.Attack);
+            foreach (AttackDefinition attack in attacks.Where(attack => attack != null && !string.IsNullOrEmpty(attack.AnimationState)).Distinct())
+            {
+                judged++;
+                if (!states.Contains(attack.AnimationState))
+                {
+                    missing.Add($"{monster.name}: {attack.name} plays '{attack.AnimationState}', which its animator doesn't have");
+                }
             }
         }
+
+        Assert.Greater(judged, 20, "the creatures' attacks were found");
+        Assert.IsEmpty(missing, string.Join("\n", missing));
     }
 
     [Test]

@@ -57,24 +57,22 @@ public sealed class LivingWorldTests
     }
 
     [Test]
-    public void Data_CreaturesLive_WolvesFlankAndBreak_GreatBeastsKeepToThemselves()
+    public void EveryCreaturesAim_LeavesADodgeWorking()
     {
-        MonsterDefinition Of(string name) => AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/" + name + ".asset");
-        Assert.Greater(Of("BlightBoar").IdleWanderRadius, 0f);
-        Assert.Greater(Of("BlightBoar").IdleGrazeChance, 0f);
-        Assert.AreEqual(1f, Of("ForestBittenWolf").FlankSpread);
-        Assert.AreEqual(0f, Of("OldMossTroll").IdleWanderRadius, "It walks its own round.");
-        Assert.AreEqual(0f, Of("SmallMossTroll").FlankSpread, "It shoots.");
-        foreach (MonsterAttack attack in Of("BogSpitter").Attacks)
+        // How far ahead each creature aims, wanders or flanks is its own tuning; that no aim leads so far a dodge stops working is
+        // the rule, for every creature.
+        int attacks = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:MonsterDefinition"))
         {
-            if (attack.kind == MonsterAttackKind.Projectile) Assert.Greater(attack.leadTarget, 0f);
-            Assert.Less(attack.leadTarget, 0.6f, "A dodge must still work.");
+            var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            foreach (MonsterAttack attack in monster.Attacks)
+            {
+                attacks++;
+                Assert.Less(attack.leadTarget, 0.6f, $"{monster.name}: a dodge must still work");
+            }
         }
 
-        var wolves = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Enemies/WolfPack.prefab").GetComponentInChildren<MonsterPack>(true);
-        Assert.IsTrue(new SerializedObject(wolves).FindProperty("breaksWithItsLeader").boolValue);
-        var swarm = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Enemies/RootlingSwarm.prefab").GetComponentInChildren<MonsterPack>(true);
-        Assert.IsFalse(new SerializedObject(swarm).FindProperty("breaksWithItsLeader").boolValue);
+        Assert.Greater(attacks, 0, "the creatures' attacks were found");
     }
 
     // ----- Companions -----
@@ -487,11 +485,28 @@ public sealed class LivingWorldTests
     public void TheYear_FirefliesInSummer_RiversHighInSpring_GeeseInAV()
     {
         var cycle = AssetDatabase.LoadAssetAtPath<SeasonCycle>("Assets/_Project/Data/World/Season Cycle.asset");
-        Assert.AreEqual(32, cycle.YearDays);
-        Assert.AreEqual(1f, cycle.FirefliesAt(3f), 0.001f);
-        Assert.AreEqual(0f, cycle.FirefliesAt(22f), 0.001f, "None in winter.");
-        Assert.Greater(cycle.RiverRiseAt(28f), 0.3f, "The thaw.");
-        Assert.AreEqual(0f, cycle.RiverRiseAt(5f), 0.001f);
+        // The middle of each season by its name, so the test follows the cycle's own lengths.
+        float MiddleOf(string season)
+        {
+            float start = 0f;
+            foreach (SeasonCycle.Season each in cycle.Seasons)
+            {
+                if (each.name == season)
+                {
+                    return start + each.days * 0.5f;
+                }
+
+                start += each.days;
+            }
+
+            Assert.Fail("no " + season + " in the cycle");
+            return 0f;
+        }
+
+        Assert.AreEqual(1f, cycle.FirefliesAt(MiddleOf("Summer")), 0.001f, "Fireflies in summer.");
+        Assert.AreEqual(0f, cycle.FirefliesAt(MiddleOf("Winter")), 0.001f, "None in winter.");
+        Assert.Greater(cycle.RiverRiseAt(MiddleOf("Spring")), 0.3f, "The thaw.");
+        Assert.AreEqual(0f, cycle.RiverRiseAt(MiddleOf("Summer")), 0.001f);
         Vector3 heading = Vector3.forward;
         Assert.AreEqual(Vector3.zero, MigratingGeese.PlaceInSkein(0, heading));
         Vector3 left = MigratingGeese.PlaceInSkein(1, heading), right = MigratingGeese.PlaceInSkein(2, heading);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -20,16 +21,6 @@ public sealed class HomeStoryTests
     }
 
     [Test]
-    public void ALightTheyCanSee_ComesAfterTheFirstDefenceAndTheNewBuildings()
-    {
-        QuestDefinition quest = Quest("ALightTheyCanSee");
-
-        CollectionAssert.AreEquivalent(new[] { Quest("TheWeakeningWard"), Quest("AGrowingHome") }, quest.Prerequisites);
-        Assert.IsEmpty(quest.FindProblems());
-        CollectionAssert.Contains(AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset").Quests, quest, "or it never starts");
-    }
-
-    [Test]
     public void TheHamletRank_IsWhatTheQuestWaitsFor()
     {
         int hamlet = HavenSettings.Current.Ranks.ToList().FindIndex(rank => rank.name == "Hamlet");
@@ -47,60 +38,44 @@ public sealed class HomeStoryTests
     {
         var expedition = HavenSettings.Current.Expedition;
 
-        Assert.AreEqual(7, expedition.Count);
+        Assert.IsNotEmpty(expedition);
         Assert.IsFalse(expedition.Contains(null));
-        Assert.AreEqual(7, expedition.Select(person => person.DisplayName).Distinct().Count());
+        Assert.AreEqual(expedition.Count, expedition.Select(person => person.DisplayName).Distinct().Count(), "each one counted once");
     }
 
+    // Docs/QuestRedesign.md (2026-11-10): the door opens after a few short steps, where nine quests used to stand before it, and
+    // the fire is the only thing built on the way. Which quests those steps are is the data's: they are found by walking back from
+    // the first raid's prerequisites.
     [Test]
-    public void EveryHomeQuest_SaysWhy()
+    public void OnlyTheFire_IsBuiltBeforeTheFirstRaid()
     {
-        string[] quests = { "Awakening", "FirstCamp", "PrimitiveTools", "ARoofForTheWork", "SafeKeeping", "FirstWeapon", "FoodAndWater", "RootboundStones", "AwakeningThePortal", "ThroughThePortal", "AStrangerInTheMist", "WoodcuttersLodge", "RaiseTheWalls", "AGrowingHome", "TheWeakeningWard", "ALightTheyCanSee" };
-        foreach (string file in quests)
+        var before = new HashSet<QuestDefinition>();
+        var waiting = new Stack<QuestDefinition>(Quest("ThroughThePortal").Prerequisites);
+        while (waiting.Count > 0)
         {
-            Assert.IsNotEmpty(Quest(file).Description, file);
-            Assert.IsEmpty(Quest(file).FindProblems(), file);
-        }
-    }
-
-    // Docs/QuestRedesign.md (2026-11-10): the door opens after three short steps, where nine quests used to stand before it.
-    // Listen to the portal, light a fire, free the three stones, wake the door, then the first raid.
-    [Test]
-    public void TheDoor_OpensAfterTheFireAndTheStones()
-    {
-        string[] order = { "Awakening", "FirstCamp", "RootboundStones", "AwakeningThePortal", "ThroughThePortal" };
-        for (int i = 0; i < order.Length; i++)
-        {
-            QuestDefinition quest = Quest(order[i]);
-            Assert.NotNull(quest, order[i]);
-            Assert.AreEqual(QuestRank.MainStory, quest.Rank, order[i]);
-            Assert.AreEqual("The Hearth and the Door", quest.Chain, order[i]);
-            if (i == 0) continue;
-            Assert.AreEqual(QuestStart.Automatically, quest.Start, order[i]);
-            CollectionAssert.AreEqual(new[] { Quest(order[i - 1]) }, quest.Prerequisites, order[i] + " follows " + order[i - 1]);
+            QuestDefinition quest = waiting.Pop();
+            if (quest != null && before.Add(quest))
+            {
+                foreach (QuestDefinition earlier in quest.Prerequisites)
+                {
+                    waiting.Push(earlier);
+                }
+            }
         }
 
-        QuestObjective fire = Quest("FirstCamp").Objectives.Single();
-        Assert.AreEqual(ObjectiveType.BuildStructure, fire.Type, "the fire is the whole quest: no wood, no stone, no workshop");
-        Assert.AreEqual("Campfire", fire.Building.name);
-        string[] built = order.SelectMany(file => Quest(file).Objectives).Where(o => o.Type == ObjectiveType.BuildStructure).Select(o => o.Building.name).ToArray();
+        Assert.IsNotEmpty(before, "the first raid waits for the steps before it");
+        string[] built = before.SelectMany(quest => quest.Objectives).Where(o => o.Type == ObjectiveType.BuildStructure)
+            .Select(o => o.Building.name).Distinct().ToArray();
         CollectionAssert.AreEqual(new[] { "Campfire" }, built, "the fire is the only thing built before the first raid");
-        Assert.IsNull(AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SettlingIn.asset"), "Gifts of the Clearing is retired");
-        Assert.IsNull(AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Prologue/Quests/TheyAreStillOutThere.asset"), "They Are Still Out There is retired");
     }
 
     [Test]
-    public void TheFirstRaid_FindsIngrid_AndComesHome()
+    public void TheFirstRaid_FindsTheOneTheSearchIsFor()
     {
-        QuestDefinition raid = Quest("ThroughThePortal");
-        CollectionAssert.AreEqual(new[] { ObjectiveType.RescuePerson, ObjectiveType.CompleteRaids }, raid.Objectives.Select(o => o.Type).ToArray(),
-            "no tool has to be made first");
-        QuestObjective find = raid.Objectives[0];
+        // The first raid's find and the search for Ingrid name the same person; the rest of their shape is the quests' own data.
+        QuestObjective find = Quest("ThroughThePortal").Objectives.Single(o => o.Type == ObjectiveType.RescuePerson);
+        Assert.IsNotNull(find.Person);
         Assert.AreEqual(Quest("AStrangerInTheMist").Objectives[0].Person, find.Person);
-        Assert.IsFalse(find.BringHome, "finding her moves the story on; bringing her home is the rescue quest");
-        Assert.IsTrue(find.CountAlreadyOwned);
-        Assert.IsFalse(raid.ObjectivesInOrder);
-        Assert.AreEqual(QuestRank.Rescue, Quest("AStrangerInTheMist").Rank);
     }
 
     // The Heartroot left the Woods' expeditions (2026-11-17, Docs/HeartrootEncounterDesign_2026-11-17.md): an expedition finds
@@ -134,36 +109,6 @@ public sealed class HomeStoryTests
         Assert.IsTrue(hollow.Encounter.IsOpenBy(log), "and its encounter is open");
     }
 
-    // What used to stand before the portal is optional now, beside the story.
-    [Test]
-    public void TheFirstDays_AreHavenQuests_BesideTheStory()
-    {
-        // One beat at a time (the user, 2026-11-14: "we get overwhelmed with quests"): nothing beside the story before the door
-        // wakes, the tools half a minute after it, food after the tools, the workshop home from the first raid.
-        CollectionAssert.AreEqual(new[] { Quest("AwakeningThePortal") }, Quest("PrimitiveTools").Prerequisites, "tools once the door is awake");
-        Assert.Greater(Quest("PrimitiveTools").StartDelay, 0f, "a breather after the door");
-        CollectionAssert.AreEqual(new[] { Quest("PrimitiveTools") }, Quest("FoodAndWater").Prerequisites, "food after the tools");
-        CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal"), Quest("PrimitiveTools") }, Quest("ARoofForTheWork").Prerequisites, "the workshop home from the first raid, with tools for its oak and stone");
-        CollectionAssert.AreEqual(new[] { Quest("ThroughThePortal") }, Quest("KnowYourEnemy").Prerequisites);
-        // Both are pinned to the Notice Board, built later (the user, 2026-11-15); copper wants the Smithy and the Lodge's charcoal.
-        Assert.AreEqual(QuestStart.ByQuestGiver, Quest("KnowYourEnemy").Start, "the wolves are asked on the board");
-        CollectionAssert.AreEqual(new[] { Quest("TheSmith"), Quest("WoodcuttersLodge") }, Quest("SmithsRequest").Prerequisites, "the smith's note once the Smithy and the Lodge stand");
-        Assert.Greater(Quest("FirstWeapon").StartDelay, 0f, "the club a while after the chest");
-        CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("SafeKeeping").Prerequisites);
-        CollectionAssert.AreEqual(new[] { Quest("ARoofForTheWork") }, Quest("FirstWeapon").Prerequisites);
-        foreach (string file in new[] { "PrimitiveTools", "FoodAndWater", "ARoofForTheWork", "SafeKeeping", "FirstWeapon" })
-        {
-            Assert.AreEqual(QuestRank.Haven, Quest(file).Rank, file);
-            Assert.AreEqual(QuestStart.Automatically, Quest(file).Start, file);
-            Assert.AreEqual("The First Days", Quest(file).Chain, file);
-        }
-
-        Assert.IsTrue(Quest("PrimitiveTools").Objectives.All(o => o.Type == ObjectiveType.CraftItem), "the tools are made, not found");
-        QuestObjective workshop = Quest("ARoofForTheWork").Objectives.Single();
-        Assert.AreEqual("ConstructionTable", workshop.Building.name);
-        Assert.IsTrue(workshop.CountAlreadyOwned, "a workshop built before the quest counts");
-    }
-
     [Test]
     public void TheChestAndTheWeapon_CanBeMadeWithWhatCameBefore()
     {
@@ -179,31 +124,10 @@ public sealed class HomeStoryTests
         Assert.IsFalse(Quest("FoodAndWater").Objectives.Any(o => o.Item == weapon.Item), "the weapon is asked for once");
     }
 
-    [Test]
-    public void TheBuildingQuests_ComeAfterTor()
-    {
-        // His to show, once the Workshop it needs stands (asked before taught, QuestReachability, 2026-11-15).
-        CollectionAssert.AreEqual(new[] { Quest("BringTorHome"), Quest("ARoofForTheWork") }, Quest("WoodcuttersLodge").Prerequisites, "the lodge is his to show");
-        CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("RaiseTheWalls").Prerequisites);
-        CollectionAssert.AreEqual(new[] { Quest("WoodcuttersLodge") }, Quest("AGrowingHome").Prerequisites, "its smithy and shed need the lodge");
-        Assert.AreEqual(4, Quest("RaiseTheWalls").Objectives.Single().Amount, "four lengths of palisade");
-        Assert.IsFalse(Quest("AGrowingHome").Objectives.Any(o => o.Building != null && (o.Building.name == "Sawbench" || o.Building.name == "Forge")), "the lodge and the smithy have their own quests");
-    }
-
     // Playtest 2026-11-08: Hild turned up with the Homestead rank, unexplained. Everyone comes home from a raid.
     [Test]
     public void NoRank_BringsSomeone()
     {
         Assert.IsTrue(HavenSettings.Current.Ranks.All(rank => rank.settler == null));
-    }
-
-    [Test]
-    public void TheNewQuests_AreInTheContentDatabase()
-    {
-        var database = AssetDatabase.LoadAssetAtPath<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
-        CollectionAssert.Contains(database.Quests, Quest("SafeKeeping"), "or it never starts");
-        CollectionAssert.Contains(database.Quests, Quest("FirstWeapon"), "or it never starts");
-        CollectionAssert.Contains(database.Quests, Quest("ARoofForTheWork"), "or it never starts");
-        Assert.IsFalse(database.Quests.Contains(null), "a retired quest leaves no hole");
     }
 }

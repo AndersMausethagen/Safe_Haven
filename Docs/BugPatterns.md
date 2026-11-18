@@ -281,3 +281,41 @@ Scanned across all runtime scripts and found clean, so not made into tests:
   blow was the last that hurt; the briefing and the raid agree from the seed.
 - **Quitting mid-raid**: the raid ends as a fall and is saved before the game goes; the raid's own way to the results screen, refused
   while the menu loads, dies with its scene.
+
+## The tests themselves: green that proves nothing (2026-11-18, night)
+
+The user: "i feel most test positives are fake positives. is there anything we can do to the test to reduce the amount of tests and
+reduce the amount of false positives?" The evening's evidence agreed: the suite (about 2,070 test methods) stayed green through every
+bug of the sixth round, all of which were found by reading code by kind, the playtest logs and Play-mode probes; and two checks were
+green while blind (the smoke test's listener, and a guard the test framework never ran).
+
+Two agents read every test (241 files) against one question: would it turn red if what it names broke for a player? 1,874 would;
+194 (9%) wouldn't, or would turn red for nothing:
+
+| Kind | How many | What it looked like | Done |
+|---|---|---|---|
+| **Mirror** | 85 | data copied into the test: exact prerequisite lists, the rescue order, recipe ingredients, counts ("27 places", "7 torches"), tuning values. Red on every design or balance edit, catching nothing the audits don't | deleted, or kept as the rule they hid, on the shipped data ("every boss steps through each stage as its health falls", "the rescues form one chain from Ingrid") |
+| **Weak** | 35 | real, but blind to the likely break: "survives a save" through JsonUtility instead of SaveMapper; fresh code defaults instead of the shipped asset; "Every..." over a hand-picked list; a cap tested by reading the cap | rewritten through the real path (SaveMapper, the Resources assets, every asset of the kind, a ninth item refused), or deleted where SaveCoverageTests already round-trips every saved field |
+| **Brittle** | 35 | exact wording, a private field read by reflection, a folder name, HLSL lines: red on a harmless refactor | the behaviour kept through public API, the pin dropped |
+| **Vacuous** | 29 | could pass on nothing: loops over assets with no count (all eight model budget tests at once if a folder moved), `Assume` that quietly skips, `x == null || ...`, an `[Ignore]`, a tautology | a count of what was actually checked, Assert for Assume, the precondition set up; pure tautologies deleted |
+| **Redundant** | 10 | the same behaviour asserted twice | deleted |
+
+56 tests deleted, 122 rewritten. The guards' own blind spots, fixed by hand: GameLoopLiveTests listened for main-thread exceptions only
+(now `LiveTestErrors`); LeaseWatchTests read a private list through a wording filter, so a reworded report made "nothing found" pass
+(now `LeaseWatch.Found` and holders the test names); SaveCoverageTests counted components it skipped among those it probed; the "made in
+code" rule saw `new Material` but not `renderer.materials`, which copies them (CreatureLook listed, open).
+
+Widening a test can make a new false alarm: the first run after the rewrite turned three red for nothing, each a rule run over every asset that holds only for some. The builder's completeness check run on every creature (a prefab's agent speed, which play sets from the data); every skill's tutorial page, though some also wait for a quest or a technique (Guard and Parry, the parry); every sky's day and night, though the prologue's night at noon is dark by day on purpose. Each now covers exactly what the rule is about, the exceptions listed with their reason.
+
+**Every guard is seen to fail.** `GuardCanaryTests` plants each source-scanning guard's bad case as one more runtime script
+(`ConventionTests.Planted`) and requires it red with the plant and green without (19 guards, one test; checked by blinding one).
+`AuditCanaryTests` plants faulty assets for the content and quest audits (a recipe nothing teaches and with no id, a quest outside the
+content database) and requires each audit to name them. A guard that can't fail looks exactly like a clean codebase.
+
+Kept on purpose, though they turn red on intended change: `RaidLayoutGoldenTests` (the Misty Woods maps pinned while other raids are
+built), `WeaponIdentityTests.EachFamilyKeepsItsPace` (a deliberate damage-per-second lock), tests of the user's own written lines.
+
+Left: `CliCommandTests.HealthRunsEveryPage` (needs Health to return a count), `JournalTests.Eyes_...` (ignores errors until CreatureLook
+stops copying materials), `CoopWireTests`' fingerprint (hashes field names: a rename turns it red, a reorder of NetworkSerialize's calls,
+which does break the wire, doesn't), the "made in code" rule's file-wide `Destroy(` (one Destroy anywhere clears every made thing in the
+file), and "a friend's copy doesn't tick its status", now untested (no public path to it).

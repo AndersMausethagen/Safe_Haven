@@ -44,30 +44,29 @@ public sealed class TutorialTests
         }
     }
 
-    [TestCase("woodcutting", "Woodcutting")]
-    [TestCase("mining", "Mining")]
-    [TestCase("foraging", "Foraging")]
-    [TestCase("fishing", "Fishing")]
-    [TestCase("archery", "Archery")]
-    [TestCase("sneaking", "Sneaking")]
-    [TestCase("melee", "Swings and Chains")]
-    [TestCase("runecraft", "Abilities")]
-    [TestCase("construction", "Building")]
-    public void TryingASkill_OpensItsTutorial_Once(string skillId, string title)
+    // Every Mechanics page a skill opens, in a fresh game each: which skill opens which page is the journal's data.
+    [Test]
+    public void TryingASkill_OpensItsTutorial_Once()
     {
-        ProficiencyDefinition skill = LevelingSettings.Current.FindSkill(skillId);
-        Assert.IsNotNull(skill, skillId);
-        JournalPage page = Settings.Mechanics.First(p => p.title == title);
-        Assert.AreEqual(skill, page.unlockedBySkill, $"{title} opens when {skillId} is first tried.");
-        Assert.IsFalse(JournalContent.IsUnlocked(page, GameSession.Quests, GameSession.Progress), "Hidden before it is tried.");
+        // Pages the skill alone opens: one that also waits for a quest, a creature met, someone home, a technique tried (Guard and Parry:
+        // the parry) or a find in a raid opens when those are done too (JournalContent.IsUnlocked), which a fresh game hasn't.
+        var pages = Settings.Mechanics.Where(p => p.unlockedBySkill != null && p.unlockedByQuest == null && p.unlockedByCreature == null
+            && p.unlockedByResident == null && string.IsNullOrEmpty(p.unlockedByTechnique) && !p.foundInRaids).ToList();
+        Assert.IsNotEmpty(pages, "pages that open when a skill is first tried");
+        foreach (JournalPage page in pages)
+        {
+            GameSession.StartNewGame();
+            ProficiencyDefinition skill = page.unlockedBySkill;
+            Assert.IsFalse(JournalContent.IsUnlocked(page, GameSession.Quests, GameSession.Progress), $"{page.title}: hidden before {skill.name} is tried.");
 
-        JournalNotices.Tried(skill);
-        Assert.IsTrue(JournalContent.IsUnlocked(page, GameSession.Quests, GameSession.Progress));
-        CollectionAssert.Contains(Tutorials.Pending, page, "It waits as a tutorial.");
-        int waiting = Tutorials.Pending.Count;
+            JournalNotices.Tried(skill);
+            Assert.IsTrue(JournalContent.IsUnlocked(page, GameSession.Quests, GameSession.Progress), page.title);
+            CollectionAssert.Contains(Tutorials.Pending, page, $"{page.title} waits as a tutorial.");
+            int waiting = Tutorials.Pending.Count;
 
-        JournalNotices.Tried(skill);
-        Assert.AreEqual(waiting, Tutorials.Pending.Count, "Trying it again opens nothing new.");
+            JournalNotices.Tried(skill);
+            Assert.AreEqual(waiting, Tutorials.Pending.Count, $"{page.title}: trying {skill.name} again opens nothing new.");
+        }
     }
 
     [Test]

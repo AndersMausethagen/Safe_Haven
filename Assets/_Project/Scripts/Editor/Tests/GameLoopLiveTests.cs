@@ -23,7 +23,10 @@ public sealed class GameLoopLiveTests
     private const string Haven = "SafeHaven";
     private const string RaidPath = "Assets/_Project/Data/Raids/MistyWoods.asset";
 
-    private readonly List<string> exceptions = new List<string>();
+    // Errors and exceptions from any thread (LiveTestErrors): it heard only the main thread's exceptions, so an error logged on the way
+    // (or the renderer's) passed (the test audit of 2026-11-18).
+    private LiveTestErrors problems;
+    private string where = "a new game";
     private string folder;
 
     [UnityTest, Timeout(600000)]
@@ -36,7 +39,7 @@ public sealed class GameLoopLiveTests
         // Entered from the runner's own empty scene: opening the Haven in the Editor rebuilds its scatter (scene churn).
         LogAssert.ignoreFailingMessages = true;
         yield return new EnterPlayMode();
-        Application.logMessageReceived += Heard;
+        problems = new LiveTestErrors(() => where);
         folder = Path.Combine(Path.GetTempPath(), "SafeHavenGameLoop_" + Guid.NewGuid().ToString("N"));
         SaveGameService.Storage = new SaveStorage(folder);
 
@@ -49,6 +52,7 @@ public sealed class GameLoopLiveTests
         Cheats.SetInvincible(true);
 
         // Into the Misty Woods.
+        where = raid.name;
         Assert.IsTrue(Cheats.StartRaid(raid, out string launched), "the raid: " + launched);
         // A new character's first raid opens with its cinematic (The Misty Woods): seen to play, then ended as a player skips it.
         // Left to play out, the raid waited on it and the test on the clock (failed once right after an Editor restart).
@@ -65,6 +69,7 @@ public sealed class GameLoopLiveTests
         yield return Wait(1f);
 
         // Out, through the results screen as the player goes, and home.
+        where = "home from " + raid.name;
         Assert.AreEqual("Extracted.", Cheats.ExtractFromRaid());
         yield return Until(() => Object.FindAnyObjectByType<RaidResultsScreen>() != null && !SceneTransition.IsBusy, 60f, "no results screen");
         yield return Wait(1f);
@@ -80,14 +85,16 @@ public sealed class GameLoopLiveTests
         Assert.IsTrue(SaveGameService.TryReadSave(out SaveData saved, out problem), "the save: " + problem);
         Assert.AreEqual(extractions + 1, saved.settlement.successfulExtractions, "and the save made at home counts it");
         Assert.AreEqual(Haven, saved.scene, "saved at home");
-        CollectionAssert.IsEmpty(exceptions, "nothing threw on the way");
+        List<string> heard = problems.All;
+        CollectionAssert.IsEmpty(heard, "nothing threw or logged an error on the way:\n" + string.Join("\n\n", heard));
         CollectionAssert.AreEquivalent(playersSaves, PlayersSaves(), "the player's own saves are untouched");
     }
 
     [UnityTearDown]
     public IEnumerator PutThingsBack()
     {
-        Application.logMessageReceived -= Heard;
+        problems?.Dispose();
+        problems = null;
         if (Application.isPlaying)
         {
             Cheats.SetInvincible(false);
@@ -102,14 +109,6 @@ public sealed class GameLoopLiveTests
         if (folder != null && Directory.Exists(folder))
         {
             Directory.Delete(folder, true);
-        }
-    }
-
-    private void Heard(string message, string stack, LogType type)
-    {
-        if (type == LogType.Exception)
-        {
-            exceptions.Add(message + "\n" + stack);
         }
     }
 

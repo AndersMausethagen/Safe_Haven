@@ -43,21 +43,15 @@ public sealed class SiteMarkTests
         }
     }
 
+    // That the journal keeps it through a save is SaveCoverageTests' (every saved field of CharacterProgress, through SaveMapper).
     [Test]
-    public void AWorldStoneThoughtAbout_StaysNoticed_AfterALoad()
+    public void AWorldStoneThoughtAbout_IsNoticedOnce()
     {
         var progress = new CharacterProgress();
         const string key = "SafeHaven/Rune Stone/12,-40";
         Assert.IsFalse(progress.Journal.HasNoticed(key));
         Assert.IsTrue(progress.Journal.NoteNoticed(key));
         Assert.IsFalse(progress.Journal.NoteNoticed(key), "Noticed once.");
-        var saved = new ProgressSaveData();
-        const System.Reflection.BindingFlags Hidden = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
-        typeof(SaveMapper).GetMethod("WriteProgress", Hidden).Invoke(null, new object[] { progress, saved });
-        ProgressSaveData read = JsonUtility.FromJson<ProgressSaveData>(JsonUtility.ToJson(saved));
-        var loaded = (CharacterProgress)typeof(SaveMapper).GetMethod("ReadProgress", Hidden).Invoke(null, new object[] { read });
-        Assert.IsTrue(loaded.Journal.HasNoticed(key), "The thought isn't thought again after loading.");
-        Assert.IsFalse(((CharacterProgress)typeof(SaveMapper).GetMethod("ReadProgress", Hidden).Invoke(null, new object[] { new ProgressSaveData() })).Journal.HasNoticed(key),
-            "An older save has noticed nothing.");
+        Assert.IsTrue(progress.Journal.HasNoticed(key), "The thought isn't thought again.");
     }
 }

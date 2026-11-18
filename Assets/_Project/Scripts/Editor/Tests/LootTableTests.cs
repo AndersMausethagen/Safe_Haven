@@ -52,13 +52,6 @@ public sealed class LootTableTests
     }
 
     [Test]
-    public void TheBlightBoar_DropsTheBoneItsPageShows()
-    {
-        var boar = AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/BlightBoar.asset");
-        Assert.IsTrue(boar.Drops.Entries.Any(entry => entry.Item != null && entry.Item.name == "Bone"));
-    }
-
-    [Test]
     public void EveryRaid_HasItsOwnRegionalAndEliteTables()
     {
         var regional = new HashSet<LootTable>();
@@ -188,22 +181,6 @@ public sealed class LootTableTests
                 && Enumerable.Range(0, upgrades.arraySize).Any(i => Uses(upgrades.GetArrayElementAtIndex(i).FindPropertyRelative("cost"), trophy)));
             Assert.IsTrue(opens, $"{name} opens a building tier");
         }
-    }
-
-    [Test]
-    public void NewParts_AreRaidOnly_WhereTheyComeFromCreatures()
-    {
-        foreach (string name in new[] { "ShamansBurl", "HagsKnot", "BogTrollHide", "FiddleString", "WidowSilk", "MistwingFeathers", "NykksMane" })
-        {
-            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Parts/{name}.asset").RaidOnly, name);
-        }
-
-        foreach (string name in new[] { "WolfFang", "BogVenom", "WispEmber", "GraveIron", "RootlingBark", "BoarTusk" })
-        {
-            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Materials/{name}.asset").RaidOnly, name);
-        }
-
-        Assert.IsFalse(AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/RoughHide.asset").RaidOnly, "hides come from home's hunting too");
     }
 
     [Test]

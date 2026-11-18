@@ -46,7 +46,28 @@ public sealed class QuickItemsTests
         Assert.IsFalse(plain.IsUsable);
         Assert.IsFalse(quick.Toggle(plain), "only things the bag can use");
         Assert.AreEqual(1, quick.Items.Count);
-        Assert.AreEqual(8, QuickItems.Capacity);
+
+        // Up to its capacity: one usable item more than it holds is refused, and nothing is pushed off for it.
+        var full = new QuickItems();
+        List<ItemDefinition> usable = new List<ItemDefinition>();
+        foreach (string guid in AssetDatabase.FindAssets("t:ItemDefinition"))
+        {
+            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (item != null && item.IsUsable && !usable.Contains(item) && usable.Count <= QuickItems.Capacity)
+            {
+                usable.Add(item);
+            }
+        }
+
+        Assert.AreEqual(QuickItems.Capacity + 1, usable.Count, "enough usable items to overfill the quickbar");
+        for (int i = 0; i < QuickItems.Capacity; i++)
+        {
+            Assert.IsTrue(full.Toggle(usable[i]), usable[i].name);
+        }
+
+        Assert.IsFalse(full.Toggle(usable[QuickItems.Capacity]), "the one past the capacity is refused");
+        Assert.AreEqual(QuickItems.Capacity, full.Items.Count);
+        CollectionAssert.AreEqual(usable.GetRange(0, QuickItems.Capacity), full.Items, "the first ones keep their places");
     }
 
     // The user, 2026-11-15: with keys 1-5 full, new consumables went nowhere; they take the next empty slot of 1-9, however

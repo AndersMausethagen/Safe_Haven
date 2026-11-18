@@ -131,11 +131,4 @@ public sealed class MistyWoodsCinematicTests
         Assert.That(half, Is.InRange(0.3f, 0.7f));
         Assert.AreEqual(0f, ArrivalMist.Thickness(21.5f, 1.5f, 0.6f, 6f, 14f), 0.001f);
     }
-
-    [Test]
-    public void OutsideARaid_ThereIsNoArrivalCalm()
-    {
-        Assert.IsNull(RaidDirector.Current);
-        Assert.IsFalse(RaidDirector.IsArrivalCalm);
-    }
 }

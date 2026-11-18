@@ -18,22 +18,9 @@ public sealed class FirstActTests
     [Test]
     public void TheAct_EndsAtTheHeartroot_AndGoesOnNorth()
     {
+        // What the hunt and the road north ask for and open. Their order among the other quests, and that they can start at all,
+        // are QuestAudit's and QuestReachability's (QuestAuditTests).
         QuestDefinition hunt = Quest("WhatBreathesUnderTheRoots"), road = Quest("TheRoadNorth");
-        // And once Bjarne is home: its rumour needs two extractions, so it no longer starts a raid early (2026-11-15). Since its own
-        // encounter (Guardian's Hollow, 2026-11-17) the hollow is found first (The Breathing Hollow), then the hunt.
-        QuestDefinition hollow = Quest("TheBreathingHollow");
-        CollectionAssert.AreEqual(new[] { Quest("TheWeakeningWard"), Quest("BringBjarneHome") }, hollow.Prerequisites, "after the first breach, when the roots have been seen in the dead");
-        CollectionAssert.AreEqual(new[] { hollow }, hunt.Prerequisites, "the hollow found, then the hunt");
-        CollectionAssert.AreEqual(new[] { hunt }, road.Prerequisites);
-        foreach (QuestDefinition quest in new[] { hunt, road })
-        {
-            Assert.AreEqual(QuestRank.MainStory, quest.Rank, quest.name);
-            Assert.AreEqual("The Hearth and the Door", quest.Chain, quest.name);
-            Assert.AreEqual(QuestStart.Automatically, quest.Start, quest.name);
-            Assert.IsNotEmpty(quest.JournalNotes, quest.name);
-            Assert.IsEmpty(quest.FindProblems(), quest.name);
-        }
-
         var heartroot = Load<MonsterDefinition>("Assets/_Project/Data/Monsters/TheHeartroot.asset");
         QuestObjective kill = hunt.Objectives.Single(o => o.Type == ObjectiveType.KillMonster);
         Assert.AreSame(heartroot, new SerializedObject(hunt).FindProperty("objectives").GetArrayElementAtIndex(hunt.Objectives.ToList().IndexOf(kill)).FindPropertyRelative("monster").objectReferenceValue);
@@ -63,33 +50,11 @@ public sealed class FirstActTests
         var hollowGate = Load<BossEncounterDefinition>("Assets/_Project/Data/Raids/Encounters/Guardian's Hollow Encounter.asset");
         Assert.AreEqual(1, hollowGate.GateItems.Count);
         Assert.AreSame(ember, hollowGate.GateItems[0].Item);
-        StringAssert.Contains("Hearth Ember", hollowGate.GatePrice, "the price is said plainly");
+        StringAssert.Contains(ember.DisplayName, hollowGate.GatePrice, "the price is said plainly");
         Assert.IsEmpty(Load<RaidEventDefinition>("Assets/_Project/Data/Raids/Rumours/Events/TheHeartroot.asset").Choices.Single().cost, "the stump asks nothing");
-        StringAssert.Contains("steel", Load<RaidRumourDefinition>("Assets/_Project/Data/Raids/Rumours/TheHeartroot.asset").Briefing, "the briefing hints at it");
 
         var database = Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");
         CollectionAssert.Contains(database.Items, ember, "or saves can't find it");
-        CollectionAssert.Contains(database.Quests, Quest("WhatBreathesUnderTheRoots"));
-        CollectionAssert.Contains(database.Quests, Quest("TheRoadNorth"));
-    }
-
-    [Test]
-    public void ItsLastWord_IsForThePlayer_AndTheTrophyGoesToTheFire()
-    {
-        var boss = Load<BossDefinition>("Assets/_Project/Data/Monsters/Boss The Heartroot.asset");
-        StringAssert.Contains("Hearth-keeper", boss.DefeatLine);
-        Assert.IsFalse(boss.HomeLines.Any(l => l.Contains("away from the fire")), "the twist asks for it by the fire");
-    }
-
-    [Test]
-    public void TheyRemember_TheNightTheDoorBroke()
-    {
-        StringAssert.Contains("came for the door", Load<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset").WelcomeLine);
-        StringAssert.Contains("didn't know its name", Load<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset").WelcomeLine, "the first sight of what the forgotten become");
-        StringAssert.Contains("Bjarne's hammer", Load<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset").WelcomeLine, "she still points to the next rescue");
-        StringAssert.Contains("roots had moved it", Load<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Bjarne.asset").WelcomeLine);
-        StringAssert.Contains("saw", Load<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Bjarne.asset").WelcomeLine, "he points to Tor");
-        StringAssert.Contains("breathes", Load<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Tor.asset").WelcomeLine, "he points to the hollow");
     }
 
     [Test]

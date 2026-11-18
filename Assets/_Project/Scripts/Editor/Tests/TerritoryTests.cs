@@ -140,13 +140,11 @@ public sealed class TerritoryTests
 
         settlement.Territory.Weaken(Settings);
         settlement.Territory.CountTask(Region, 99, Settings);
-        const BindingFlags Hidden = BindingFlags.NonPublic | BindingFlags.Static;
-        var saved = new SettlementSaveData();
-        typeof(SaveMapper).GetMethod("WriteTerritory", Hidden).Invoke(null, new object[] { settlement.Territory });
-        saved.territory = (TerritorySaveData)typeof(SaveMapper).GetMethod("WriteTerritory", Hidden).Invoke(null, new object[] { settlement.Territory });
-        var read = JsonUtility.FromJson<TerritorySaveData>(JsonUtility.ToJson(saved.territory));
-        var loaded = new TerritoryState();
-        typeof(SaveMapper).GetMethod("ReadTerritory", Hidden).Invoke(null, new object[] { read, loaded });
+        // Through the save the game writes and reads, not SaveMapper's private helpers (SaveCoverageTests leaves the lands to this).
+        SaveData saved = SaveMapper.ToSaveData(null, null, "SafeHaven", null, System.DateTime.UtcNow, settlement: settlement);
+        LoadedGame game = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(saved)),
+            Resources.Load<ContentDatabase>(ContentDatabase.ResourceName));
+        TerritoryState loaded = game.Settlement.Territory;
         Assert.IsTrue(loaded.IsClaimed(Region));
         Assert.AreEqual(settlement.Territory.HoldOf(Region), loaded.HoldOf(Region), 0.01f);
         Assert.AreEqual(settlement.Territory.Turn, loaded.Turn);
@@ -505,33 +503,19 @@ public sealed class TerritoryTests
     }
 
     [Test]
-    public void AVisitor_KeepsTheirStoryForTheirOwnPortal_AndIsntPointedAtTheHostsStones()
+    public void AVisitor_IsntPointedAtTheHostsStones()
     {
         GameSession.StartNewGame();
-        QuestDefinition cold = Settings.UnlockedBy;
-        var moment = AssetDatabase.LoadAssetAtPath<GameEventDefinition>("Assets/_Project/Data/Quests/Events/ColdStonesMoment.asset");
-        var portalObject = new GameObject("Portal");
         var stone = (GameObject)PrefabUtility.InstantiatePrefab(Settings.StonePrefab);
         try
         {
-            var portal = portalObject.AddComponent<HomePortal>();
-            var so = new SerializedObject(portal);
-            SerializedProperty whispers = so.FindProperty("questWhispers");
-            whispers.arraySize = 1;
-            whispers.GetArrayElementAtIndex(0).FindPropertyRelative("quest").objectReferenceValue = cold;
-            whispers.GetArrayElementAtIndex(0).FindPropertyRelative("moment").objectReferenceValue = moment;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            GameSession.Quests.TryStart(cold);
-            MethodInfo pending = typeof(HomePortal).GetMethod("PendingMoment", BindingFlags.NonPublic | BindingFlags.Instance);
-            Assert.AreEqual(moment, pending.Invoke(portal, null), "at home the portal has its conversation to give");
-
+            GameSession.Quests.TryStart(Settings.UnlockedBy);
             var boundary = stone.GetComponent<BoundaryStone>();
             typeof(BoundaryStone).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(boundary, null);
             boundary.Configure(Region);
             Assert.IsTrue(stone.GetComponent<QuestWaypoint>().enabled, "an unlit stone of one's own shows the way");
 
             Visiting(true);
-            Assert.IsNull(pending.Invoke(portal, null), "a friend's portal doesn't spend it: their stories don't play there");
             boundary.Configure(Region);
             Assert.IsFalse(stone.GetComponent<QuestWaypoint>().enabled, "the host's stones aren't the visitor's to light");
         }
@@ -539,7 +523,6 @@ public sealed class TerritoryTests
         {
             Visiting(false);
             HavenVisit.Forget();
-            Object.DestroyImmediate(portalObject);
             Object.DestroyImmediate(stone);
             GameSession.StartNewGame();
         }

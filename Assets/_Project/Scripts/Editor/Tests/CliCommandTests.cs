@@ -35,15 +35,17 @@ public class CliCommandTests
     {
         string listing = ContentCliCommands.Content("item", "IronOre", "weight,maximumStack");
         StringAssert.Contains("IronOre", listing);
-        StringAssert.Contains("weight=2", listing);
+        StringAssert.Contains("weight=", listing);
         StringAssert.Contains("maximumStack=", listing);
     }
 
     [Test]
     public void StructsPrintReferenceFirstAndSkipBlanks()
     {
+        // The wolf's own first item drop, whatever it is today: a struct is printed starting with what it refers to.
+        ItemDropEntry first = System.Linq.Enumerable.First(CliLookup.Find<LootTable>("ForestBittenWolf").Drops.Entries, entry => entry.Item != null);
         string drops = ContentCliCommands.Content("LootTable", "ForestBittenWolf", "drops");
-        StringAssert.Contains("{RoughHide ", drops);
+        StringAssert.Contains("{" + first.Item.name + " ", drops);
         StringAssert.DoesNotContain("resource=-", drops);
     }
 

@@ -70,7 +70,7 @@ public class PaintedIconTests
     public void EveryListedEssence_ShowsItsPainting()
     {
         HashSet<string> ids = Ids("Tools/LocalSpawn/resource_icons.json");
-        Assert.AreEqual(6, ids.Count);
+        Assert.IsNotEmpty(ids, "the essences listed to paint");
         var resources = AssetDatabase.FindAssets("t:ResourceDefinition").Select(AssetDatabase.GUIDToAssetPath)
             .Select(AssetDatabase.LoadAssetAtPath<ResourceDefinition>).Where(r => r != null && ids.Contains(r.Id)).ToList();
         Assert.AreEqual(ids.Count, resources.Count, "Every listed id is a resource.");

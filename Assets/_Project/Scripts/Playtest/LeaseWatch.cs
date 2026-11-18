@@ -40,6 +40,9 @@ public sealed class LeaseWatch
     private readonly List<(Kind, object, object)> gone = new List<(Kind, object, object)>();
     private readonly List<string> found = new List<string>();
 
+    /// <summary>What Judge and Look have found since the last look (LeaseWatchTests read it here, not through reflection).</summary>
+    public IReadOnlyList<string> Found => found;
+
     /// <summary>The leaks found since the last look, each told once. <paramref name="now"/> is unscaled time.</summary>
     public IReadOnlyList<string> Look(float now)
     {

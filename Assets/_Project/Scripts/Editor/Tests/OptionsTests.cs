@@ -137,6 +137,11 @@ public sealed class OptionsTests
     [Test]
     public void ScreenShakeOffAddsNone()
     {
+        // With shake on, a blow is felt: without this half, a CameraShake that never shook would pass as well.
+        GameOptions.ScreenShake.Value = 1f;
+        CameraShake.Add(0.5f);
+        Assert.GreaterOrEqual(CameraShake.Trauma, 0.45f, "shake on: a blow shakes the view");
+
         GameOptions.ScreenShake.Value = 0f;
         float start = CameraShake.Trauma;
         CameraShake.Add(0.5f);
@@ -225,8 +230,7 @@ public sealed class OptionsTests
     public void UltraShadows_AreTheDefault()
     {
         // The ground's own relief shadows only resolve in an 8K sun shadow map at the usual top-down zoom (2026-11-09).
-        Assert.AreEqual(4, GameOptions.Shadows.Choices.Length);
-        Assert.AreEqual("Ultra", GameOptions.Shadows.Choices[3]);
-        Assert.AreEqual(3f, GameOptions.Shadows.Default);
+        // The top choice is the default, however many choices there are and whatever they are called.
+        Assert.AreEqual(GameOptions.Shadows.Choices.Length - 1, GameOptions.Shadows.Default, 1e-4f);
     }
 }

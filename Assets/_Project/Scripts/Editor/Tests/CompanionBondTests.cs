@@ -81,18 +81,15 @@ public sealed class CompanionBondTests
     }
 
     [Test]
-    public void TheBondIsInTheSaveFormat()
-    {
-        var saved = new ResidentSaveData { id = "x", raidsAlong = 5, killsAlong = 12, timesHelpedUp = 2, memory = (int)CompanionMemory.BossBeaten };
-        ResidentSaveData back = JsonUtility.FromJson<ResidentSaveData>(JsonUtility.ToJson(saved));
-        Assert.AreEqual(5, back.raidsAlong);
-        Assert.AreEqual((int)CompanionMemory.BossBeaten, back.memory);
-    }
-
-    [Test]
     public void TheDataIsThere()
     {
-        Assert.AreEqual(2, SettlementSettings.Current.BondRanks.Count);
+        IReadOnlyList<CompanionBondRank> ranks = SettlementSettings.Current.BondRanks;
+        Assert.IsNotEmpty(ranks);
+        for (int i = 1; i < ranks.Count; i++)
+        {
+            Assert.Greater(ranks[i].raids, ranks[i - 1].raids, $"{ranks[i].name} takes more raids together than {ranks[i - 1].name}");
+        }
+
         Assert.IsNotEmpty(SettlementSettings.Current.MemoryLines);
         var sigrid = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Sigrid.asset");
         Assert.IsNotEmpty(sigrid.MemoryLines);

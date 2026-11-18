@@ -1,57 +1,10 @@
 using NUnit.Framework;
-using TMPro;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public sealed class EnvironmentHudTests
 {
-    [Test]
-    public void ClockTypography_EnlargesExistingLabelsWithoutShrinkingAuthoredSizes()
-    {
-        var root = new GameObject("test clock", typeof(RectTransform), typeof(EnvironmentHudView));
-        try
-        {
-            TMP_Text CreateLabel(string name, float fontSize, Vector2 size)
-            {
-                var child = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
-                child.transform.SetParent(root.transform, false);
-                var label = child.GetComponent<TMP_Text>();
-                label.fontSize = fontSize;
-                label.rectTransform.sizeDelta = size;
-                return label;
-            }
-
-            TMP_Text time = CreateLabel("time", 14f, Vector2.zero);
-            TMP_Text weather = CreateLabel("weather", 22f, Vector2.zero);
-            TMP_Text smallPhase = CreateLabel("small phase", 12f, new Vector2(50f, 24f));
-            TMP_Text largePhase = CreateLabel("large phase", 19f, new Vector2(85f, 40f));
-            var data = new SerializedObject(root.GetComponent<EnvironmentHudView>());
-            data.FindProperty("timeLabel").objectReferenceValue = time;
-            data.FindProperty("weatherLabel").objectReferenceValue = weather;
-            SerializedProperty phases = data.FindProperty("phaseLabels");
-            phases.arraySize = 2;
-            phases.GetArrayElementAtIndex(0).objectReferenceValue = smallPhase;
-            phases.GetArrayElementAtIndex(1).objectReferenceValue = largePhase;
-            data.ApplyModifiedPropertiesWithoutUndo();
-
-            typeof(EnvironmentHudView).GetMethod("ApplyTypography",
-                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
-                .Invoke(root.GetComponent<EnvironmentHudView>(), null);
-
-            Assert.AreEqual(18f, time.fontSize);
-            Assert.AreEqual(22f, weather.fontSize);
-            Assert.AreEqual(15f, smallPhase.fontSize);
-            Assert.AreEqual(new Vector2(68f, 36f), smallPhase.rectTransform.sizeDelta);
-            Assert.AreEqual(19f, largePhase.fontSize);
-            Assert.AreEqual(new Vector2(85f, 40f), largePhase.rectTransform.sizeDelta);
-        }
-        finally
-        {
-            Object.DestroyImmediate(root);
-        }
-    }
-
     [TestCase(0f, "Night")]
     [TestCase(5.999f, "Night")]
     [TestCase(6f, "Dawn")]
@@ -127,7 +80,6 @@ public sealed class EnvironmentHudTests
         try
         {
             var track = go.AddComponent<EnvironmentTimelineGraphic>();
-            Assert.IsNotNull(go.GetComponent<CanvasRenderer>(), "required for the track to actually be visible");
             ((RectTransform)go.transform).sizeDelta = new Vector2(480f, 10f);
             track.SetTime(12f, 6f, 20f);
             Assert.AreEqual(0.5f, track.NormalizedHour);
@@ -147,21 +99,6 @@ public sealed class EnvironmentHudTests
         {
             Object.DestroyImmediate(go);
             Object.DestroyImmediate(mesh);
-        }
-    }
-
-    [Test]
-    public void WeatherIcon_RequiresCanvasRenderer()
-    {
-        var go = new GameObject("test weather icon", typeof(RectTransform));
-        try
-        {
-            go.AddComponent<WeatherIconGraphic>();
-            Assert.IsNotNull(go.GetComponent<CanvasRenderer>(), "required for the weather icon to actually be visible");
-        }
-        finally
-        {
-            Object.DestroyImmediate(go);
         }
     }
 }

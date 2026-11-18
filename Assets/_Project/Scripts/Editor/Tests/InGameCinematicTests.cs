@@ -71,10 +71,4 @@ public sealed class InGameCinematicTests
             Object.DestroyImmediate(go);
         }
     }
-
-    [Test]
-    public void TheFogOfWar_IsWhole_OutsideACinematic()
-    {
-        Assert.AreEqual(1f, AtmosphereFeature.WarScale);
-    }
 }

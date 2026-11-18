@@ -35,7 +35,6 @@ public sealed class FeltProblemsTests
     private static T Asset<T>(string path) where T : Object => AssetDatabase.LoadAssetAtPath<T>("Assets/_Project/" + path + ".asset");
     private static ItemDefinition Material(string name) => Asset<ItemDefinition>("Data/Items/Materials/" + name);
     private static BuildingDefinition Building(string name) => Asset<BuildingDefinition>("Data/Buildings/" + name);
-    private static QuestDefinition Quest(string name) => Asset<QuestDefinition>("Data/Quests/" + name);
     private static ContentDatabase Content => Asset<ContentDatabase>("Resources/ContentDatabase");
     private static ResidentDefinition Person(string name) => Content.Residents.First(person => person != null && person.name == name);
 
@@ -304,37 +303,5 @@ public sealed class FeltProblemsTests
         Assert.AreEqual("Raise the Woodcutter's Lodge to Tier II ({key:Haven})", lodgeII.Describe());
         Assert.IsNull(lodgeII.FindProblem());
         Assert.IsNotNull(QuestObjective.Upgrade(Building("Sawbench"), 99).FindProblem(), "no such tier");
-    }
-
-    // ----- The quests that use them -----
-
-    [Test]
-    public void ASafePlace_AsksForSomethingInTheChest_AfterBuildingIt()
-    {
-        QuestDefinition quest = Quest("SafeKeeping");
-        Assert.IsTrue(quest.ObjectivesInOrder);
-        CollectionAssert.AreEqual(new[] { ObjectiveType.BuildStructure, ObjectiveType.StoreItem }, quest.Objectives.Select(o => o.Type).ToArray());
-        Assert.IsEmpty(quest.FindProblems());
-    }
-
-    [Test]
-    public void TheSmith_AsksForARepair()
-    {
-        QuestDefinition quest = Quest("TheSmith");
-        Assert.IsTrue(quest.Objectives.Any(o => o.Type == ObjectiveType.RepairItem));
-        Assert.IsEmpty(quest.FindProblems());
-    }
-
-    [Test]
-    public void HeavyLoads_RaisesTheLodgeFirst()
-    {
-        QuestDefinition quest = Quest("HeavyLoads");
-        Assert.IsTrue(quest.ObjectivesInOrder);
-        QuestObjective first = quest.Objectives[0];
-        Assert.AreEqual(ObjectiveType.UpgradeBuilding, first.Type);
-        Assert.AreEqual(Building("Sawbench"), first.Building);
-        Assert.AreEqual(2, first.Tier);
-        Assert.IsTrue(first.CountAlreadyOwned, "a lodge raised before the quest counts");
-        Assert.IsEmpty(quest.FindProblems());
     }
 }

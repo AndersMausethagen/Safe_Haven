@@ -204,7 +204,6 @@ public sealed class CombatTechniqueTests
         {
             Assert.IsTrue(step.HasClips, step.name);
             Assert.LessOrEqual(step.Volume, 0.35f, $"{step.name} is meant to be barely heard");
-            Assert.IsTrue(step.Clips.All(c => AssetDatabase.GetAssetPath(c).Contains("Safe Haven Footsteps")), $"{step.name} uses the soft steps");
         }
     }
 

@@ -40,16 +40,17 @@ public sealed class TreeChoppingTests
     }
 
     [Test]
-    public void EveryTreeCanBeFelledAndOakWoodIsNowWood()
+    public void EveryTreeCanBeFelled_AndTerrainTreesHaveAStandIn()
     {
         PrefabCatalog.Refresh();
-        foreach (string path in PrefabCatalog.All.Where(e => e.Category == "Trees").Select(e => e.Path))
+        List<string> trees = PrefabCatalog.All.Where(e => e.Category == "Trees").Select(e => e.Path).ToList();
+        Assert.IsNotEmpty(trees, "the catalogue's trees were found");
+        foreach (string path in trees)
         {
             var tree = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             Assert.IsTrue(tree.GetComponent<ChoppableTree>() != null || tree.GetComponent<ResourceNode>() != null, $"{path} can't be felled");
         }
 
-        Assert.AreEqual("Wood", AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/OakWood.asset").DisplayName);
         GameObject proxy = Rules.TerrainTreeProxy;
         Assert.IsNotNull(proxy, "terrain trees get a stand-in");
         Assert.AreEqual(ToolType.Axe, proxy.GetComponent<ResourceNode>().Definition.GatherTool);

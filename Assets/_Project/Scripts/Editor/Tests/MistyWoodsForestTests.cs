@@ -107,8 +107,10 @@ public sealed class MistyWoodsForestTests
     [Test]
     public void TreesSway_WithWindWeightsBakedInEveryLevel()
     {
+        int swaying = 0;
         foreach (RaidMapDefinition.Scatter tree in Map.Trees.Concat(Map.Undergrowth).Where(s => s.prefab.GetComponentInChildren<Renderer>().sharedMaterial.shader.name == VegetationPackConverter.WindShader))
         {
+            swaying++;
             Assert.IsNotNull(tree.prefab.GetComponent<LODGroup>(), tree.prefab.name);
             foreach (MeshFilter filter in tree.prefab.GetComponentsInChildren<MeshFilter>(true))
             {
@@ -136,6 +138,9 @@ public sealed class MistyWoodsForestTests
                 }
             }
         }
+
+        // Only trees on the wind shader are judged: with none on it (a shader renamed or swapped) the checks above saw nothing.
+        Assert.Greater(swaying, 0, $"no tree of the Misty Woods uses {VegetationPackConverter.WindShader}");
     }
 
     [Test]
@@ -264,12 +269,14 @@ public sealed class MistyWoodsForestTests
     [Test]
     public void EveryTreeTallerThanAPerson_CanBeFelled_WithATrunkItsOwnSize()
     {
+        int tall = 0;
         foreach (RaidMapDefinition.Scatter scatter in Map.Trees.Concat(Map.Undergrowth))
         {
             if (scatter.prefab.GetComponentInChildren<Renderer>().sharedMaterial.shader.name != VegetationPackConverter.WindShader) continue;
             // The wind material holds the true height; renderer bounds are padded for sway.
             float height = scatter.prefab.GetComponentInChildren<Renderer>().sharedMaterial.GetFloat("_TreeHeight") * scatter.scale.y;
             if (height < 5f) continue;
+            tall++;
             Assert.IsNotNull(scatter.prefab.GetComponent<ChoppableTree>(), $"{scatter.prefab.name} stands {height:0} m: it must fell");
             var trunk = scatter.prefab.GetComponent<CapsuleCollider>();
             Assert.IsNotNull(trunk, scatter.prefab.name);
@@ -279,6 +286,10 @@ public sealed class MistyWoodsForestTests
                 Assert.IsNotNull(scatter.prefab.GetComponent<TreeLeafLook>(), $"{scatter.prefab.name} drops its own leaves");
             }
         }
+
+        // The filters above skip what isn't on the wind shader or reads under 5 m: a renamed shader or height property
+        // (GetFloat gives 0) would skip every tree, so some must have been judged.
+        Assert.Greater(tall, 0, "no tall tree was found to judge");
     }
 
     [Test]
@@ -327,10 +338,11 @@ public sealed class MistyWoodsForestTests
     }
 
     [Test]
-    public void Ground_HasFourDisplacedLayers_WithHeightInTheMask()
+    public void Ground_DisplacesEveryLayer_WithHeightInTheMask()
     {
-        Assert.AreEqual(4, Map.Layers.Length);
-        Assert.AreEqual(4f, Map.TerrainMaterial.GetFloat("_DisplacementLayerCount"));
+        // How many layers is the map's to choose; the material must displace as many as the map paints.
+        Assert.Greater(Map.Layers.Length, 0);
+        Assert.AreEqual(Map.Layers.Length, Map.TerrainMaterial.GetFloat("_DisplacementLayerCount"), 1e-4f);
         foreach (TerrainLayer layer in Map.Layers)
         {
             Assert.IsNotNull(layer.normalMapTexture, layer.name);

@@ -1,17 +1,41 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine;
 
 /// <summary>The Haven's decisions (HavenDecisions): found by their attribute, made at home, and what a visitor paid comes back.</summary>
 public sealed class HavenDecisionsTests
 {
+    // A caller names its decision as text (HavenDecisions.Do("ward.raise", ...)), and the name is what reaches the host: a misspelt
+    // or renamed one would be refused there. So every name a script asks for must be one a [HavenDecision] declares.
     [Test]
     public void EveryDecision_IsFoundByItsName()
     {
-        foreach (string name in new[] { "ward.raise", "portal.improve", "altar.purify", "resident.pause", "resident.job" })
+        var asked = new Regex(@"HavenDecisions\.(?:Do|Make)\(\s*""([^""]+)""");
+        var unknown = new List<string>();
+        int found = 0;
+        foreach (string file in Directory.GetFiles("Assets/_Project/Scripts", "*.cs", SearchOption.AllDirectories))
         {
-            Assert.IsTrue(HavenDecisions.All.ContainsKey(name), $"'{name}' is a Haven decision");
+            string path = file.Replace('\\', '/');
+            if (path.Contains("/Editor/"))
+            {
+                continue;
+            }
+
+            string code = Regex.Replace(File.ReadAllText(path), @"^\s*//.*$", "", RegexOptions.Multiline);
+            foreach (Match call in asked.Matches(code))
+            {
+                found++;
+                if (!HavenDecisions.All.ContainsKey(call.Groups[1].Value))
+                {
+                    unknown.Add($"{Path.GetFileName(path)}: '{call.Groups[1].Value}'");
+                }
+            }
         }
+
+        Assert.Greater(found, 5, "the decisions the scripts ask for were found");
+        Assert.IsEmpty(unknown, "asked for, but no [HavenDecision] has the name:\n" + string.Join("\n", unknown));
     }
 
     [Test]

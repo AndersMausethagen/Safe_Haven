@@ -27,15 +27,10 @@ public sealed class GoreTests
         }
     }
 
+    // Which creatures can be smashed is each one's own flag (data); that a smash or a sever can happen, and never always, is the rule.
     [Test]
-    public void SmallCreatures_CanBeSmashed_AndTheChancesAreSet()
+    public void TheSmashAndSeverChances_AreSet()
     {
-        foreach (string small in new[] { "Rootling", "ForestBittenWolf", "Boar", "SmallMossTroll" })
-        {
-            Assert.IsTrue(AssetDatabase.LoadAssetAtPath<MonsterDefinition>($"Assets/_Project/Data/Monsters/{small}.asset").CanBeSmashed, small);
-        }
-
-        Assert.IsFalse(AssetDatabase.LoadAssetAtPath<MonsterDefinition>("Assets/_Project/Data/Monsters/OldMossTroll.asset").CanBeSmashed, "not a giant");
         CombatFeelSettings feel = CombatFeelSettings.Current;
         Assert.That(feel.SmashChance, Is.InRange(0.05f, 0.95f));
         Assert.That(feel.SeverChance, Is.InRange(0.05f, 0.95f));

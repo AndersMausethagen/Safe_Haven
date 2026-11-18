@@ -12,17 +12,21 @@ public sealed class RaidSetPieceTests
     [Test]
     public void EveryRumourSiteStandsInASetPiece()
     {
+        int sites = 0;
         for (int seed = 1; seed <= 12; seed++)
         {
             RaidLayoutPlan plan = RaidLayoutPlanner.Plan(Rules, Size, seed);
             foreach (RaidSite site in plan.SitesOf(RaidSiteKind.Rumour))
             {
+                sites++;
                 Vector2 spot = site.Position * Size;
                 RaidLayoutPiece piece = plan.Pieces.Find(one => Vector2.Distance(one.Position, spot) < 0.01f);
                 Assert.IsNotNull(piece, $"Seed {seed}: a rumour stands in the open");
                 Assert.IsTrue(piece.Definition.HoldsRumours, $"Seed {seed}");
             }
         }
+
+        Assert.Greater(sites, 0, "the maps placed rumour sites to check");
     }
 
     [Test]

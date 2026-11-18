@@ -298,23 +298,52 @@ public sealed class ContentExpansionTests
 
     // ----- The content itself -----
 
+    // The creatures MonsterPrefabBuilder made, whose prefabs its FindProblems describes.
+    private static readonly System.Collections.Generic.HashSet<string> BuiltByTheMonsterBuilder =
+        new System.Collections.Generic.HashSet<string> { "MarshLight", "Draug", "BogSpitter", "BlightBoar", "Rootling", "MossShaman" };
+
+    // Every creature with a body, not a list of the ones added at one time: a prefab nobody looked at again is the one that breaks.
     [Test]
     public void EveryCreatureIsSetUp()
     {
-        foreach (string file in new[] { "MarshLight", "Draug", "BogSpitter", "BlightBoar", "Rootling", "MossShaman" })
+        var problems = new List<string>();
+        int creatures = 0;
+        foreach (MonsterDefinition monster in All<MonsterDefinition>().Where(found => found != null && found.Prefab != null))
         {
-            var monster = AssetDatabase.LoadAssetAtPath<MonsterDefinition>($"Assets/_Project/Data/Monsters/{file}.asset");
-            Assert.IsNotNull(monster, file);
-            Assert.IsNotNull(monster.Prefab, file);
-            CollectionAssert.IsEmpty(MonsterPrefabBuilder.FindProblems(monster.Prefab, monster), file);
-            Assert.IsNotEmpty(monster.Attacks, file);
+            creatures++;
+            // The builder's own check, on the creatures it built: on every creature it told what play never reads (a prefab's agent speed,
+            // which MonsterMovement sets from the data; an animator on the spider, which walks on IK legs).
+            if (BuiltByTheMonsterBuilder.Contains(monster.name))
+            {
+                problems.AddRange(MonsterPrefabBuilder.FindProblems(monster.Prefab, monster).Select(problem => $"{monster.name}: {problem}"));
+            }
+            // Something that hunts needs something to hit with: its list of attacks, or the single attack older creatures keep.
+            if (monster.Faction == Faction.Enemy && !monster.Timid && monster.Attack == null && monster.Attacks.Count == 0)
+            {
+                problems.Add($"{monster.name} hunts with nothing to strike");
+            }
+
             foreach (MonsterAttack action in monster.Attacks)
             {
-                Assert.IsNotNull(action.attack, file);
-                Assert.IsTrue(action.kind != MonsterAttackKind.Projectile || action.projectilePrefab != null, file + " needs a projectile");
-                Assert.IsTrue(action.kind != MonsterAttackKind.Summon || action.summonPrefab != null, file + " needs a summon");
+                if (action.attack == null)
+                {
+                    problems.Add($"{monster.name} has an attack without its definition");
+                }
+
+                if (action.kind == MonsterAttackKind.Projectile && action.projectilePrefab == null)
+                {
+                    problems.Add($"{monster.name} needs a projectile");
+                }
+
+                if (action.kind == MonsterAttackKind.Summon && action.summonPrefab == null)
+                {
+                    problems.Add($"{monster.name} needs a summon");
+                }
             }
         }
+
+        Assert.Greater(creatures, 10, "the creatures were found");
+        Assert.IsEmpty(problems, string.Join("\n", problems));
     }
 
     [Test]
@@ -335,50 +364,6 @@ public sealed class ContentExpansionTests
     }
 
     [Test]
-    public void EveryStationHasABuildingAndEveryRecipeAStation()
-    {
-        var stations = new HashSet<CraftingStationType>(All<BuildingDefinition>().Select(building => building.Station));
-        foreach (RecipeDefinition recipe in All<RecipeDefinition>())
-        {
-            if (recipe.Station != CraftingStationType.None && recipe.Station != CraftingStationType.Portal)
-            {
-                Assert.IsTrue(stations.Contains(recipe.Station), $"{recipe.name}: nothing builds {recipe.Station}");
-            }
-        }
-    }
-
-    [Test]
-    public void EveryIngredientCanBeGot()
-    {
-        var sources = new HashSet<ItemDefinition>();
-        foreach (GatheringNodeDefinition node in AssetDatabase.FindAssets("t:GatheringNodeDefinition").Select(guid =>
-                     AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(guid))))
-        {
-            sources.UnionWith(node.Yields.Entries.Select(entry => entry.Item).Where(item => item != null));
-        }
-
-        foreach (MonsterDefinition monster in All<MonsterDefinition>())
-        {
-            sources.UnionWith(monster.Drops.Entries.Select(entry => entry.Item).Where(item => item != null));
-        }
-
-        foreach (RecipeDefinition recipe in All<RecipeDefinition>())
-        {
-            if (recipe.Output != null)
-            {
-                sources.Add(recipe.Output);
-            }
-        }
-
-        foreach (string name in new[] { "CuredLeather", "BoarTusk", "BogVenom", "WispEmber", "GraveIron", "RootlingBark", "Chanterelle", "WildTurnip", "Barley", "Cloudberries", "Honey", "BoarMeat" })
-        {
-            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Materials/{name}.asset");
-            Assert.IsNotNull(item, name);
-            Assert.IsTrue(sources.Contains(item), name + " comes from nothing");
-        }
-    }
-
-    [Test]
     public void EveryNewThingHasAnIconAndAUniqueId()
     {
         List<ItemDefinition> items = All<ItemDefinition>().ToList();
@@ -392,14 +377,6 @@ public sealed class ContentExpansionTests
         CollectionAssert.IsEmpty(duplicates);
         var recipes = All<RecipeDefinition>().GroupBy(recipe => recipe.Id).Where(group => group.Count() > 1).Select(group => group.Key).ToList();
         CollectionAssert.IsEmpty(recipes);
-    }
-
-    [Test]
-    public void HeavyArmourMakesAHeavyDodgeAndLeatherStaysLight()
-    {
-        float Load(params string[] files) => files.Sum(file => AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/Armor/{file}.asset").Weight);
-        Assert.Less(Load("CuredLeatherCap", "CuredLeatherJack", "CuredLeatherGloves", "CuredLeatherBoots", "CuredLeatherBelt"), 6f);
-        Assert.Greater(Load("IronMailHelm", "IronMailHauberk", "IronMailGauntlets", "IronMailBoots", "IronMailBelt"), 13f);
     }
 
     // Docs/PlayerStatsResearch.md #6: light means quickstep and sneaking, heavy means barging and armour. The archer's leather stays

@@ -35,35 +35,6 @@ public sealed class FoundationTests
         Assert.IsTrue(day1.Any(recipe => recipe.Output.Category == ItemCategory.Consumable), "something to heal with");
     }
 
-    [TestCase("IronOreNode")]
-    [TestCase("HardwoodNode")]
-    [TestCase("FlaxNode")]
-    [TestCase("GraniteNode")]
-    [TestCase("MoonsilverOreNode")]
-    [TestCase("CopperOreNode")]
-    public void ARaid_HoldsTheMaterialsTheLadderNeeds(string prefab)
-    {
-        RaidSpawnList resources = MistyWoods.SpawnLists.First(list => list.name == "Resources");
-        Assert.IsTrue(resources.entries.Any(entry => entry.prefab != null && entry.prefab.name == prefab), prefab);
-    }
-
-    [Test]
-    public void Bjarne_CanBeFound_OnceIngridIsHome()
-    {
-        RaidRumourDefinition rumour = All<RaidRumourDefinition>().First(one => one.name == "Bjarne");
-        Assert.IsTrue(MistyWoods.GetSystem<RaidRumoursSystem>().Pool.Contains(rumour));
-        Assert.IsTrue(rumour.Urgent);
-        var settlement = new SettlementState();
-        for (int i = 0; i < 3; i++)
-        {
-            settlement.RecordExtraction();
-        }
-
-        Assert.IsFalse(rumour.CanComeUp(null, settlement, null), "Ingrid comes home first (Docs/RescueOrder.md)");
-        settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset"));
-        Assert.IsTrue(rumour.CanComeUp(null, settlement, null), "no Smithy needed: his rescue opens it");
-    }
-
     [Test]
     public void TheNextPersonInTheOrder_IsSoughtBeforeAnyRumourByChance()
     {

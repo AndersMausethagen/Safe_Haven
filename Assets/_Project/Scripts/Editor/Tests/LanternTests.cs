@@ -43,13 +43,14 @@ public sealed class LanternTests
     }
 
     [Test]
-    public void TheLantern_IsMadeByHand_FromSixSticksAndAFirefly()
+    public void TheLantern_IsMadeByHand_FromSticksAndAFirefly()
     {
+        // What it is made of; how many is the recipe's to tune.
         var recipe = AssetDatabase.LoadAssetAtPath<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/PrimitiveFireflyLantern.asset");
         Assert.AreSame(Lantern, recipe.Output);
         Assert.IsTrue(recipe.IsHandcrafted && recipe.KnownFromStart);
-        Assert.AreEqual(6, recipe.ItemCost.Single(c => c.Item.name == "Sticks").Amount);
-        Assert.AreEqual(1, recipe.ItemCost.Single(c => c.Item == Firefly).Amount);
+        Assert.IsTrue(recipe.ItemCost.Any(c => c.Item != null && c.Item.name == "Sticks" && c.Amount > 0), "sticks");
+        Assert.IsTrue(recipe.ItemCost.Any(c => c.Item == Firefly && c.Amount > 0), "a firefly");
         var book = AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset");
         Assert.Contains(recipe, book.Recipes.ToList());
     }

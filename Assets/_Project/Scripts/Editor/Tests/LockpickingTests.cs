@@ -164,9 +164,9 @@ public sealed class LockpickingTests
         AnimatorState sneak = layer.stateMachine.states.Select(s => s.state).First(s => s.name == "Sneak");
         var tree = (BlendTree)sneak.motion;
         Assert.AreEqual("Speed", tree.blendParameter);
-        CollectionAssert.AreEqual(new[] { "Idle_Stealth", "Walk_Stealth_Forward" }, tree.children.Select(c => c.motion.name.Replace("Armature|", "")).ToArray(),
-            "the modular human pack's stealth clips");
-        Assert.IsTrue(tree.children.All(c => ((AnimationClip)c.motion).isLooping), "both loop");
+        // Which crouch clips stays the animators' choice: a still crouch and a moving one, by speed, both looping.
+        Assert.GreaterOrEqual(tree.children.Length, 2, "a crouch standing and a crouch walking");
+        Assert.IsTrue(tree.children.All(c => c.motion is AnimationClip clip && clip.isLooping), "both loop");
         Assert.IsTrue(sneak.transitions.Any(t => t.destinationState.name == "Empty" && t.conditions.Any(c => c.parameter == "Sneaking")));
     }
 }

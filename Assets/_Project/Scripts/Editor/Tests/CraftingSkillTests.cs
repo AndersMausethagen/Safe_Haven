@@ -32,15 +32,18 @@ public sealed class CraftingSkillTests
     [Test]
     public void EveryKindOfGoods_TrainsACraftingSkill()
     {
+        // Which skill a kind of goods trains is the skills' own data (Crafts); that none is made for nothing is the rule.
         LevelingSettings settings = LevelingSettings.Current;
-        Assert.AreEqual("weaponcrafting", settings.SkillCrafting(CraftedGoods.Weapons).Id);
-        Assert.AreEqual("weaponcrafting", settings.SkillCrafting(CraftedGoods.Tools).Id);
-        Assert.AreEqual("weaponcrafting", settings.SkillCrafting(CraftedGoods.Arrows).Id);
-        Assert.AreEqual("armorcrafting", settings.SkillCrafting(CraftedGoods.Armor).Id);
-        Assert.AreEqual("cooking", settings.SkillCrafting(CraftedGoods.Meals).Id);
-        Assert.AreEqual("alchemy", settings.SkillCrafting(CraftedGoods.Tonics).Id);
-        Assert.AreEqual("construction", settings.SkillCrafting(CraftedGoods.Materials).Id, "refining trains the builder");
-        Assert.AreSame(settings.FindSkill("construction"), settings.SkillTrainedBy(ProficiencyTraining.Construction), "and so does building");
+        foreach (CraftedGoods goods in System.Enum.GetValues(typeof(CraftedGoods)))
+        {
+            if (goods != CraftedGoods.None)
+            {
+                Assert.IsNotNull(settings.SkillCrafting(goods), $"{goods} trains no skill");
+            }
+        }
+
+        Assert.AreSame(settings.SkillCrafting(CraftedGoods.Materials), settings.SkillTrainedBy(ProficiencyTraining.Construction),
+            "refining and building train the same skill");
     }
 
     [Test]

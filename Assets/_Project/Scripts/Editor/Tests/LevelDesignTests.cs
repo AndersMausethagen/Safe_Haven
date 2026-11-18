@@ -60,7 +60,7 @@ public sealed class LevelDesignTests
     {
         FlatTerrain();
         var rocks = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Art/Forest/Prefabs/Boulder A.prefab");
-        Assume.That(rocks, Is.Not.Null, "the forest kit's boulder");
+        Assert.IsNotNull(rocks, "the forest kit's boulder");
         var palette = ScriptableObject.CreateInstance<ScatterPalette>();
         palette.name = "test rocks";
         palette.spacing = 3f;

@@ -56,11 +56,18 @@ public sealed class ModelBudgetTests
     /// shape check, then take them off this list.</summary>
     private static readonly HashSet<string> KnownDense = new HashSet<string> { "FallenLogNode", "GreatBoulderNode", "OldStumpNode" };
 
-    private static IEnumerable<GameObject> NodesWithLods() =>
-        AssetDatabase.FindAssets("t:Prefab", new[] { Nodes })
+    // Every budget check below runs over these: if the folder moved or the nodes lost their LOD groups, each would pass on
+    // nothing, so finding none is a failure of its own.
+    private static List<GameObject> NodesWithLods()
+    {
+        List<GameObject> nodes = AssetDatabase.FindAssets("t:Prefab", new[] { Nodes })
             .Select(AssetDatabase.GUIDToAssetPath)
             .Select(AssetDatabase.LoadAssetAtPath<GameObject>)
-            .Where(go => go != null && go.GetComponentInChildren<LODGroup>(true) != null);
+            .Where(go => go != null && go.GetComponentInChildren<LODGroup>(true) != null)
+            .ToList();
+        Assert.Greater(nodes.Count, 0, $"no node prefab with a LOD group under {Nodes}");
+        return nodes;
+    }
 
     private static Level Measure(LOD lod)
     {

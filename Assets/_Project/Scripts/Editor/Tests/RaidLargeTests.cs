@@ -16,7 +16,7 @@ public sealed class RaidLargeTests
     public void MistyWoodsCanBeLarge()
     {
         Assert.IsTrue(Misty.CanBeLarge);
-        Assert.AreEqual(Width, Misty.LargeRaid.widthScale);
+        Assert.Greater(Misty.LargeRaid.widthScale, 1f, "a large map is wider than the normal one");
         Assert.Greater(Misty.LargeRaid.extraSeconds, 0f);
     }
 

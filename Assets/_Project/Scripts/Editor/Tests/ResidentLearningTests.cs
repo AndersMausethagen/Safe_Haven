@@ -17,11 +17,15 @@ public sealed class ResidentLearningTests
     public void Workers_RiseInRank_ByTheCraftsTheyMake()
     {
         SettlementSettings settings = SettlementSettings.Current;
-        Assert.AreEqual("Novice", settings.RankFor(0).name);
+        // The ranks' names and thresholds are the settings' own; the rule is that a beginner works at the station's own pace and
+        // more work done never makes anyone slower, up to a master who is faster.
         Assert.AreEqual(1f, settings.RankFor(0).speed);
-        Assert.AreEqual("Journeyman", settings.RankFor(30).name);
-        Assert.AreEqual("Master", settings.RankFor(1000).name);
-        Assert.Greater(settings.RankFor(70).speed, settings.RankFor(30).speed);
+        for (int work = 10; work <= 1000; work += 10)
+        {
+            Assert.GreaterOrEqual(settings.RankFor(work).speed, settings.RankFor(work - 10).speed, $"slower at {work} work done");
+        }
+
+        Assert.Greater(settings.RankFor(1000).speed, settings.RankFor(0).speed);
 
         var settlement = new SettlementState();
         JobDefinition smith = Job("Smith");
@@ -76,12 +80,5 @@ public sealed class ResidentLearningTests
         ResidentRecord read = loaded.Settlement.Find(Bjarne);
         Assert.AreEqual(42, read.WorkDone);
         Assert.IsTrue(read.TaughtSinceRaid);
-    }
-
-    [Test]
-    public void TheJobsTeach_MeleeAndSneakingToo()
-    {
-        Assert.AreEqual("melee", Job("Warden").Teaches.Id);
-        Assert.AreEqual("sneaking", Job("Tracker").Teaches.Id);
     }
 }

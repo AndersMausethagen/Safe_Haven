@@ -28,12 +28,12 @@ public sealed class RaidTests
 
         RaidParameters rules = RaidParameters.Calculate(raid, new RaidModifierDefinition[0]);
 
-        // GDD §7.3: 12 minutes.
-        Assert.AreEqual(720f, rules.Duration);
-        Assert.AreEqual(5f, rules.ExtractionTime);
-        Assert.AreEqual(1f, rules.LootMultiplier);
-        Assert.AreEqual(1f, rules.EnemyHealthMultiplier);
-        Assert.AreEqual(1f, rules.EnemyPowerMultiplier);
+        // Whatever the raid's own values are (GDD §7.3's 12 minutes is RaidDefinition's to keep), they come through unchanged.
+        Assert.AreEqual(raid.GetBase(RaidStat.Duration), rules.Duration);
+        Assert.AreEqual(raid.GetBase(RaidStat.ExtractionTime), rules.ExtractionTime);
+        Assert.AreEqual(raid.GetBase(RaidStat.LootQuantity), rules.LootMultiplier);
+        Assert.AreEqual(raid.GetBase(RaidStat.EnemyHealth), rules.EnemyHealthMultiplier);
+        Assert.AreEqual(raid.GetBase(RaidStat.EnemyPower), rules.EnemyPowerMultiplier);
     }
 
     [Test]

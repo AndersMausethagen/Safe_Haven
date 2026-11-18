@@ -72,8 +72,11 @@ public sealed class SwimmingTests
     [Test]
     public void Swimming_ExhaustedIsSlowerThanFresh()
     {
-        Assert.Less(settings.SwimSpeed * settings.ExhaustedSwimSpeed, settings.SwimSpeed);
-        Assert.Greater(settings.ExhaustedSwimSpeed, 0f, "Out of stamina the player still swims: they never drown.");
+        // The shipped tuning, not the fresh defaults the other tests here use to test the rules themselves.
+        var shipped = UnityEditor.AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
+        Assert.IsNotNull(shipped, "Data/Player/PlayerMovementSettings");
+        Assert.Less(shipped.SwimSpeed * shipped.ExhaustedSwimSpeed, shipped.SwimSpeed);
+        Assert.Greater(shipped.ExhaustedSwimSpeed, 0f, "Out of stamina the player still swims: they never drown.");
     }
 
     [Test]

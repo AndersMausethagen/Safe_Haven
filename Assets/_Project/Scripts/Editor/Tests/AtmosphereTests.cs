@@ -113,8 +113,6 @@ public sealed class AtmosphereTests
             var storm = AssetDatabase.LoadAssetAtPath<WeatherDefinition>(WeatherSetup.WeatherFolder + "/Storm.asset");
             Assert.IsNotNull(mistWeather);
             Assert.IsNotNull(storm);
-            Assert.AreEqual(new Vector2(2.45f, 0.875f), mist.Wind);
-            Assert.AreEqual(3.5f, mist.FlowStretch);
             system.SetWeather(mistWeather, 0f);
             float calmSpeed = mist.Wind.magnitude * AtmosphereConditions.WeatherWind;
             Assert.Greater(calmSpeed, 0.7f);

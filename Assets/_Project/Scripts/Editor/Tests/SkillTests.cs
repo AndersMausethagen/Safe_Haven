@@ -24,16 +24,6 @@ public sealed class SkillTests
     }
 
     [Test]
-    public void LoadoutHasFiveEmptySlots()
-    {
-        var loadout = new SkillLoadout();
-        Assert.AreEqual(9, SkillLoadout.SlotCount);
-        Assert.AreEqual(0, loadout.FirstEmptySlot());
-        Assert.IsNull(loadout.Get(4));
-        Assert.IsNull(loadout.Get(5));
-    }
-
-    [Test]
     public void ASlotHoldsAnItemOrASkill_AndEachIsInOneSlotAtMost()
     {
         var loadout = new SkillLoadout();

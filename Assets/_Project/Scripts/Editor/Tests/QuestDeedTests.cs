@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
@@ -187,11 +188,14 @@ public sealed class QuestDeedTests
     [Test]
     public void NoQuestOrSceneStillUsesAPerPersonEvent()
     {
-        // The deeds replaced these; a Quest Event per person, place or traveller must not come back.
-        foreach (string gone in new[] { "TalkedToSigrid", "TalkedToPortal", "TravelerFreed", "TravelerRescued", "AlchemistHired", "ReachedWesternBeacon" })
-        {
-            CollectionAssert.IsEmpty(AssetDatabase.FindAssets(gone + " t:GameEventDefinition"), gone);
-        }
+        // The deeds (talked to, reached, used, freed, rescued, hired) replaced a Quest Event per person, place or traveller: none of
+        // those may come back under any name of that kind, not only the six the change removed.
+        string[] deedLike = { "TalkedTo", "Reached", "Used", "Freed", "Rescued", "Hired", "Traveler", "Traveller" };
+        List<string> perPerson = AssetDatabase.FindAssets("t:GameEventDefinition")
+            .Select(guid => System.IO.Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(guid)))
+            .Where(name => deedLike.Any(prefix => name.StartsWith(prefix, System.StringComparison.Ordinal)))
+            .ToList();
+        CollectionAssert.IsEmpty(perPerson, "count these as deeds (QuestObjective.Deed), not a Quest Event each");
     }
 
     // ----- helpers

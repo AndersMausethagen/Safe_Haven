@@ -61,6 +61,15 @@ public sealed class ArtRuneTests
         Assert.IsNotNull(weapon.ComboStep(0).CastProjectile, "its light swing casts a bolt");
         Assert.Greater(weapon.HeavyAttack.CastCount, 1, "held, it fans bolts");
         Assert.IsNotNull(weapon.WeaponArt.CastHazard, "its art binds the ground");
+        // Measured against the spear as it is tuned today (the Iron Spear's weapon), not a copy of its number.
+        var spear = AssetDatabase.LoadAssetAtPath<WeaponDefinition>("Assets/_Project/Data/Combat/Weapons/Spear.asset");
+        Assert.IsNotNull(spear, "the spear");
+        Assert.Less(Pace(weapon), Pace(spear), "from range it hits slower than the spear, the slowest one-handed reach");
+    }
+
+    // Damage share per second of recovery over a weapon's light combo.
+    private static float Pace(WeaponDefinition weapon)
+    {
         float pace = 0f, time = 0f;
         foreach (AttackDefinition attack in weapon.Combo)
         {
@@ -68,6 +77,6 @@ public sealed class ArtRuneTests
             time += attack.RecoveryTime;
         }
 
-        Assert.Less(pace / time, 1.43f, "from range it hits slower than the spear, the slowest one-handed reach");
+        return pace / time;
     }
 }

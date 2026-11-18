@@ -486,14 +486,16 @@ public sealed class SharedStateTests
             player.AddComponent<PlayerInputHandler>();
             object downed = new object();
             object cinematic = new object();
+            // The actions load in edit mode (TutorialTests): without this, every assert below passed with nothing loaded (the test audit).
+            Assert.IsNotNull(GameInput.Move, "the move action is loaded");
             PlayerControl.Hold(player, downed, PlayerControl.Kept.Move);
-            Assert.IsTrue(GameInput.Move == null || GameInput.Move.enabled, "down: the crawl's key works");
+            Assert.IsTrue(GameInput.Move.enabled, "down: the crawl's key works");
 
             PlayerControl.Hold(player, cinematic);
-            Assert.IsTrue(GameInput.Move == null || !GameInput.Move.enabled, "a cinematic holds too: no crawling under it");
+            Assert.IsFalse(GameInput.Move.enabled, "a cinematic holds too: no crawling under it");
 
             PlayerControl.Release(player, cinematic);
-            Assert.IsTrue(GameInput.Move == null || GameInput.Move.enabled, "the cinematic is over: crawling again");
+            Assert.IsTrue(GameInput.Move.enabled, "the cinematic is over: crawling again");
         }
         finally
         {

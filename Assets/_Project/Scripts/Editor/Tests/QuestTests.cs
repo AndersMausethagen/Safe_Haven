@@ -162,8 +162,12 @@ public sealed class QuestTests
         QuestDefinition b = Quest("b", QuestObjective.Create(ObjectiveType.KillMonster, 1));
         SetField(a, "prerequisites", new List<QuestDefinition> { b });
         SetField(b, "prerequisites", new List<QuestDefinition> { a });
+        // The same shape without the loop: whatever a quest with a prerequisite is told, the loop is told on top (not its wording).
+        QuestDefinition d = Quest("d", QuestObjective.Create(ObjectiveType.KillMonster, 1));
+        QuestDefinition e = Quest("e", QuestObjective.Create(ObjectiveType.KillMonster, 1));
+        SetField(d, "prerequisites", new List<QuestDefinition> { e });
 
-        CollectionAssert.Contains(a.FindProblems(), "Its prerequisites lead back to itself, so it can never start.");
+        Assert.Greater(a.FindProblems().Count, d.FindProblems().Count, "a loop of prerequisites, so it can never start, is reported");
     }
 
     [Test]
@@ -536,11 +540,22 @@ public sealed class QuestTests
     {
         var campfire = Create<BuildingDefinition>("campfire");
         QuestObjective build = QuestObjective.Create(ObjectiveType.BuildStructure, 1, campfire);
-        Assert.IsFalse(build.CountAlreadyOwned);
-        SetField(build, "countAlreadyOwned", true);
-        Assert.IsTrue(build.CountAlreadyOwned);
-        Assert.AreEqual(ObjectiveType.BuildStructure, build.Type);
-        Assert.AreSame(campfire, build.Building);
+        // A campfire already standing (registered as the game registers a building it enables).
+        BuildingObject standing = Created(new GameObject("Campfire")).AddComponent<BuildingObject>();
+        var data = new UnityEditor.SerializedObject(standing);
+        data.FindProperty("definition").objectReferenceValue = campfire;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        typeof(BuildingObject).GetMethod("OnEnable", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(standing, null);
+        try
+        {
+            Assert.AreEqual(0, build.Owned(null, new QuestLog()), "not asked to: what stood before the quest doesn't count");
+            SetField(build, "countAlreadyOwned", true);
+            Assert.AreEqual(1, build.Owned(null, new QuestLog()), "asked to: the campfire already standing counts");
+        }
+        finally
+        {
+            typeof(BuildingObject).GetMethod("OnDisable", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(standing, null);
+        }
     }
 
     [Test]

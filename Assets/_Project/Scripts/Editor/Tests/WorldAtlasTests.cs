@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -30,7 +29,7 @@ public sealed class WorldAtlasTests
     public void EveryPlace_HasItsOwnName_AndStandsInARegion()
     {
         WorldAtlas atlas = Haven;
-        Assert.AreEqual(27, atlas.Places.Count, "The recipe asks for 27 places.");
+        Assert.IsNotEmpty(atlas.Places, "how many is the recipe's; that the atlas holds them all is TheAtlas_IsTheWorldThatWasGenerated");
         CollectionAssert.AllItemsAreUnique(atlas.Places.Select(p => p.id));
         CollectionAssert.AllItemsAreUnique(atlas.Places.Select(p => p.name));
         foreach (WorldAtlas.Place place in atlas.Places)
@@ -53,19 +52,15 @@ public sealed class WorldAtlasTests
         }
     }
 
+    // That the journal keeps it through a save is SaveCoverageTests' (every saved field of CharacterProgress, through SaveMapper).
     [Test]
-    public void AFoundPlace_IsFoundOnce_AndSurvivesASave()
+    public void AFoundPlace_IsFoundOnce()
     {
         var progress = new CharacterProgress();
         string id = Haven.Places[0].id;
         Assert.IsFalse(progress.Journal.HasDiscovered(id));
         Assert.IsTrue(progress.Journal.NoteDiscovered(id));
         Assert.IsFalse(progress.Journal.NoteDiscovered(id), "Found once.");
-        var saved = new ProgressSaveData();
-        const BindingFlags Hidden = BindingFlags.NonPublic | BindingFlags.Static;
-        typeof(SaveMapper).GetMethod("WriteProgress", Hidden).Invoke(null, new object[] { progress, saved });
-        ProgressSaveData read = JsonUtility.FromJson<ProgressSaveData>(JsonUtility.ToJson(saved));
-        var loaded = (CharacterProgress)typeof(SaveMapper).GetMethod("ReadProgress", Hidden).Invoke(null, new object[] { read });
-        Assert.IsTrue(loaded.Journal.HasDiscovered(id));
+        Assert.IsTrue(progress.Journal.HasDiscovered(id));
     }
 }

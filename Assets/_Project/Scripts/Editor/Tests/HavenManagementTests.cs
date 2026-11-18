@@ -127,21 +127,29 @@ public sealed class HavenManagementTests
         var building = ScriptableObject.CreateInstance<BuildingDefinition>();
         created.Add(building);
 
-        Assert.AreEqual("Nobody here knows how yet.", HavenBuildings.HowToUnlock(building, null, null));
+        Assert.IsFalse(string.IsNullOrWhiteSpace(HavenBuildings.HowToUnlock(building, null, null)), "it still says something");
     }
 
     [Test]
     public void EveryBuildingThatStartsLocked_SaysHowToUnlockIt()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        // What a building nobody teaches is told, whatever its words: no locked building in the menu may get that answer.
+        var untaught = ScriptableObject.CreateInstance<BuildingDefinition>();
+        created.Add(untaught);
+        string nobody = HavenBuildings.HowToUnlock(untaught, null, content);
+        int locked = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:BuildingDefinition"))
         {
             var building = AssetDatabase.LoadAssetAtPath<BuildingDefinition>(AssetDatabase.GUIDToAssetPath(guid));
             if (building.ShowInBuildMenu && !building.KnownFromStart)
             {
-                Assert.AreNotEqual("Nobody here knows how yet.", HavenBuildings.HowToUnlock(building, null, content), building.name);
+                locked++;
+                Assert.AreNotEqual(nobody, HavenBuildings.HowToUnlock(building, null, content), building.name);
             }
         }
+
+        Assert.Greater(locked, 0, "locked buildings were found");
     }
 
     [Test]

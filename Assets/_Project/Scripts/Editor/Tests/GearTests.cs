@@ -107,22 +107,6 @@ public sealed class GearTests
     }
 
     [Test]
-    public void SevenArmorSlotsAreInUse()
-    {
-        int worn = 0;
-        foreach (GearSlot slot in System.Enum.GetValues(typeof(GearSlot)))
-        {
-            bool armor = slot < GearSlot.MainHand;
-            if (armor && !GearSlots.IsRetired(slot))
-            {
-                worn++;
-            }
-        }
-
-        Assert.AreEqual(7, worn);
-    }
-
-    [Test]
     public void Unequip_PutsTheItemBackInTheBag_OrRefusesWhenItIsFull()
     {
         ItemDefinition cap = Armor("cap", ArmorSlot.Head);

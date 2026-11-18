@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
@@ -97,8 +98,11 @@ public sealed class EarlyStorageTests
         BuildingDefinition chest = book.Buildings.FirstOrDefault(b => b != null && b.name == "SmallChest");
         Assert.IsNotNull(chest, "in the build menu");
         Assert.IsTrue(chest.KnownFromStart);
-        CollectionAssert.AreEquivalent(new[] { "OakWood", "Sticks" }, chest.ConstructionItems.Select(c => c.Item.name));
-        Assert.AreEqual(12, chest.Prefab.GetComponent<StashChest>().StashSlots);
+        // Cheap: built from what the first tools gather, whatever the amounts are tuned to.
+        Assert.IsNotEmpty(chest.ConstructionItems);
+        Assert.IsTrue(chest.ConstructionItems.All(c => c.Item != null && c.Item.Tier <= 1),
+            "built from tier 0 and 1 materials: " + string.Join(", ", chest.ConstructionItems.Select(c => c.Item != null ? c.Item.name : "nothing")));
+        Assert.Greater(chest.Prefab.GetComponent<StashChest>().StashSlots, 0);
         Assert.IsNotNull(chest.Icon);
     }
 
@@ -109,7 +113,17 @@ public sealed class EarlyStorageTests
         RecipeDefinition recipe = book.Recipes.FirstOrDefault(r => r != null && r.Output != null && r.Output.name == "BarkPack");
         Assert.IsNotNull(recipe);
         Assert.IsTrue(recipe.IsHandcrafted && recipe.KnownFromStart);
-        CollectionAssert.AreEquivalent(new[] { "Sticks", "NettleFiber" }, recipe.ItemCost.Select(c => c.Item.name));
+        // Raw: every ingredient is picked or cut from a gathering node, nothing that has to be made first.
+        var gathered = new HashSet<ItemDefinition>(AssetDatabase.FindAssets("t:GatheringNodeDefinition")
+            .Select(guid => AssetDatabase.LoadAssetAtPath<GatheringNodeDefinition>(AssetDatabase.GUIDToAssetPath(guid)))
+            .Where(node => node != null)
+            .SelectMany(node => node.Yields.Entries.Select(entry => entry.Item)));
+        Assert.IsNotEmpty(recipe.ItemCost);
+        foreach (ItemAmount cost in recipe.ItemCost)
+        {
+            Assert.IsTrue(cost.Item != null && gathered.Contains(cost.Item), $"{(cost.Item != null ? cost.Item.name : "nothing")} isn't gathered raw");
+        }
+
         Assert.IsTrue(recipe.Output.IsBackpack);
         var satchel = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/WovenSatchel.asset");
         Assert.Less(recipe.Output.CarryCapacityBonus, satchel.CarryCapacityBonus, "the satchel is still the better pack");

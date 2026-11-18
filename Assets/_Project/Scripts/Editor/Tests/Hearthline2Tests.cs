@@ -33,10 +33,9 @@ public sealed class Hearthline2Tests
     {
         var renderer = AssetDatabase.LoadAssetAtPath<ScriptableRendererData>("Assets/_Project/Settings/Rendering/PC_Renderer.asset");
         Assert.IsTrue(renderer.rendererFeatures.OfType<UIBlurFeature>().Any(), "the backdrop blur is on the PC renderer");
-        foreach (string guid in AssetDatabase.FindAssets("t:AudioSettingsDefinition"))
-        {
-            var sounds = AssetDatabase.LoadAssetAtPath<AudioSettingsDefinition>(AssetDatabase.GUIDToAssetPath(guid));
-            Assert.IsNotNull(sounds.Hover, "the hover tick");
-        }
+        // The sounds the game loads (AudioManager's), not whatever a search turns up: a search that finds nothing checks nothing.
+        var sounds = Resources.Load<AudioSettingsDefinition>(AudioSettingsDefinition.ResourceName);
+        Assert.IsNotNull(sounds, "Resources/" + AudioSettingsDefinition.ResourceName);
+        Assert.IsNotNull(sounds.Hover, "the hover tick");
     }
 }

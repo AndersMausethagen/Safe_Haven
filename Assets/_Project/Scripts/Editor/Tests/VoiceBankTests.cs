@@ -135,17 +135,6 @@ public class VoiceBankTests
     }
 
     [Test]
-    public void TheGamesBank_KeepsEachRecordingInItsSpeakersFolder_UnderTheLinesOwnName()
-    {
-        foreach (VoiceLine line in Shipped().Lines)
-        {
-            string path = AssetDatabase.GetAssetPath(line.clip);
-            StringAssert.EndsWith($"/{VoiceBank.Id(line.speaker, line.text)}.wav", path, $"{line.speaker}: {line.text}");
-            StringAssert.StartsWith("Assets/_Project/Audio/Voice/Dialogue/", path);
-        }
-    }
-
-    [Test]
     public void TheGamesBank_SpeaksForThePortalAndTheExpedition()
     {
         var speakers = new HashSet<string>(Shipped().Lines.Select(line => line.speaker));

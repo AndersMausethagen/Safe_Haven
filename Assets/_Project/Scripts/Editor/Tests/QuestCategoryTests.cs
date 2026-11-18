@@ -56,17 +56,6 @@ public sealed class QuestCategoryTests
     }
 
     [Test]
-    public void AtHome_OnlyTheStoryIsGold()
-    {
-        string[] gold = Quests.Where(q => q.Rank == QuestRank.MainStory && !q.Chain.StartsWith("Prologue")).Select(q => q.name).ToArray();
-        // The Breathing Hollow and The Toll (2026-11-17): the find steps on an expedition before each boss's encounter opens.
-        CollectionAssert.AreEquivalent(new[] { "Awakening", "FirstCamp", "RootboundStones", "AwakeningThePortal", "ThroughThePortal", "TheWeakeningWard",
-            "TheBreathingHollow", "WhatBreathesUnderTheRoots", "TheRoadNorth", "TheToll", "NobodyCrosses" }, gold);
-        Assert.AreEqual(11, Quests.Count(q => q.Rank == QuestRank.Rescue), "one rescue for each of the lost expedition");
-        Assert.IsTrue(Quests.Where(q => q.Chain == "Hands at Home").All(q => q.Rank == QuestRank.Haven), "work at home is a Haven quest");
-    }
-
-    [Test]
     public void Kinds_HaveAnOrderAndAName()
     {
         QuestRank[] order = { QuestRank.MainStory, QuestRank.Rescue, QuestRank.Haven, QuestRank.SideQuest, QuestRank.Optional };

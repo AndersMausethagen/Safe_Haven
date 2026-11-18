@@ -30,7 +30,6 @@ public sealed class HavenHomeTests
 
         var muchNearer = new[] { House("hut", 30f, 1), House("cottage", 5f, 1) };
         Assert.AreEqual("cottage", HomeRules.Assign(muchNearer, people, MoveFor)[0], "25 m nearer their work: they move");
-        Assert.AreEqual(MoveFor, HomeLifeSettings.Current.MoveHomeFor, 0.001f, "Resources/HomeLifeSettings › Move Home For");
     }
 
     [Test]
@@ -158,12 +157,6 @@ public sealed class HavenHomeTests
         var friends = new SettlementState();
         friends.TakeOn(back);
         Assert.AreEqual("spawned-hut", friends.Find(bjarne).Home);
-    }
-
-    [Test]
-    public void ChoosingAHome_IsAHavenDecision()
-    {
-        Assert.IsTrue(HavenDecisions.All.ContainsKey("resident.home"), "made where the Haven is kept, so a visitor's choice goes to the host");
     }
 
     [Test]

@@ -257,22 +257,33 @@ public sealed class RaidReasonsTests
         }
     }
 
+    // Every blueprint a raid can hand over, found through what the raid's events and rumours reference (not a list of the six there
+    // were): it is read at home, and it teaches something not known from the start.
     [Test]
     public void WhatRaidsTeach_HasToReachHomeFirst()
     {
-        foreach (string file in new[] { "WainwrightsLedger", "BathhousePlans", "MoonsilverFolio", "SwarmInASkep", "PouchOfWildSeed", "ElderSapling" })
+        var reached = new HashSet<string>();
+        foreach (string kind in new[] { "t:RaidEventDefinition", "t:RaidRumourDefinition" })
         {
-            var item = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/{file}.asset");
-            Assert.IsTrue(item.IsLearnedAtHome, file);
-            Assert.IsTrue(item.IsBlueprint, file);
+            foreach (string guid in AssetDatabase.FindAssets(kind))
+            {
+                reached.UnionWith(AssetDatabase.GetDependencies(AssetDatabase.GUIDToAssetPath(guid), true));
+            }
+        }
+
+        List<ItemDefinition> blueprints = reached.Select(AssetDatabase.LoadAssetAtPath<ItemDefinition>).Where(item => item != null && item.IsBlueprint).ToList();
+        Assert.IsNotEmpty(blueprints, "the raids hand over blueprints");
+        foreach (ItemDefinition item in blueprints)
+        {
+            Assert.IsTrue(item.IsLearnedAtHome, $"{item.name} is read at home");
             foreach (BuildingDefinition building in item.TeachesBuildings)
             {
-                Assert.IsFalse(building.KnownFromStart, $"{file} must teach something new");
+                Assert.IsFalse(building.KnownFromStart, $"{item.name} must teach something new");
             }
 
             foreach (RecipeDefinition recipe in item.TeachesRecipes)
             {
-                Assert.IsFalse(recipe.KnownFromStart, $"{file} must teach something new");
+                Assert.IsFalse(recipe.KnownFromStart, $"{item.name} must teach something new");
             }
         }
     }
@@ -298,7 +309,8 @@ public sealed class RaidReasonsTests
         settlement.AddResident(Person("Bjarne"));
         Assert.AreEqual(0f, settlement.JobBonus(job => job.GearRepairDiscount));
         settlement.AssignJob(Person("Bjarne"), smith);
-        Assert.AreEqual(0.5f, settlement.JobBonus(job => job.GearRepairDiscount), 0.001f);
+        Assert.Greater(smith.GearRepairDiscount, 0f, "the smith's job is worth having");
+        Assert.AreEqual(smith.GearRepairDiscount, settlement.JobBonus(job => job.GearRepairDiscount), 0.001f, "his whole discount, while he holds the job");
     }
 
     [Test]

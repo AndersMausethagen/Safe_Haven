@@ -38,7 +38,7 @@ public sealed class CoopCompanionTests
     public void AFriendsCompanion_IsDrawnAsTheyAre_AndCanBeHelpedUp()
     {
         var sigrid = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(SigridPath);
-        Assume.That(sigrid != null && sigrid.Model != null && sigrid.RaidCompanion != null, "Sigrid can come along");
+        Assert.IsTrue(sigrid != null && sigrid.Model != null && sigrid.RaidCompanion != null, "Sigrid can come along");
         int helped = 0;
         var friend = new RemoteCompanion(null, () => helped++, 2f);
         var content = new Lookup { Resident = sigrid };

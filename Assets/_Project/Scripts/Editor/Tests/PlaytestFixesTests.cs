@@ -1,9 +1,9 @@
-using System.Collections;
-using System.Reflection;
+using System.Collections.Generic;
 using NUnit.Framework;
-using TMPro;
+using Unity.Collections;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>What a playtest found broken, kept from breaking again.</summary>
 public sealed class PlaytestFixesTests
@@ -14,55 +14,47 @@ public sealed class PlaytestFixesTests
     public void NoMeshOfOurs_HasAVertexWithoutANormal()
     {
         // Such a vertex lights as NaN, and bloom spreads that over the screen as a huge flickering light.
+        // Read through MeshData, which in the Editor reads a mesh imported without Read/Write too: nearly all our models are, and
+        // mesh.normals would have skipped them.
+        var broken = new List<string>();
+        int judged = 0;
         foreach (string guid in AssetDatabase.FindAssets("t:Mesh", new[] { "Assets/_Project" }))
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(path))
             {
-                if (asset is Mesh mesh && mesh.isReadable)
+                if (!(asset is Mesh mesh))
                 {
-                    foreach (Vector3 normal in mesh.normals)
+                    continue;
+                }
+
+                using (Mesh.MeshDataArray meshes = Mesh.AcquireReadOnlyMeshData(mesh))
+                {
+                    Mesh.MeshData data = meshes[0];
+                    if (!data.HasVertexAttribute(VertexAttribute.Normal))
                     {
-                        Assert.Greater(normal.sqrMagnitude, 0.5f, $"{path}: {mesh.name}");
+                        continue;
+                    }
+
+                    judged++;
+                    using (var normals = new NativeArray<Vector3>(data.vertexCount, Allocator.Temp))
+                    {
+                        data.GetNormals(normals);
+                        for (int i = 0; i < normals.Length; i++)
+                        {
+                            if (!(normals[i].sqrMagnitude > 0.5f))
+                            {
+                                broken.Add($"{path}: {mesh.name}, vertex {i}");
+                                break;
+                            }
+                        }
                     }
                 }
             }
         }
-    }
 
-    [Test]
-    public void TheCommandWheel_ShowsItsChoices()
-    {
-        var holder = new GameObject("Wheel");
-        try
-        {
-            var wheel = holder.AddComponent<CommandWheel>();
-            const BindingFlags inside = BindingFlags.NonPublic | BindingFlags.Instance;
-            typeof(CommandWheel).GetMethod("BuildView", inside).Invoke(wheel, null);
-            System.Type choice = typeof(CommandWheel).GetNestedType("Choice", BindingFlags.NonPublic);
-            var choices = (IList)typeof(CommandWheel).GetField("choices", inside).GetValue(wheel);
-            // Every argument, as reflection doesn't fill in a constructor's defaults (label, select, opens, dimmed).
-            choices.Add(System.Activator.CreateInstance(choice, "Follow", null, null, false));
-            typeof(CommandWheel).GetMethod("ShowPage", inside).Invoke(wheel, new object[] { "Choose" });
-
-            var root = (GameObject)typeof(CommandWheel).GetField("root", inside).GetValue(wheel);
-            Assert.IsTrue(wheel.IsOpen);
-            bool found = false;
-            foreach (TMP_Text text in root.GetComponentsInChildren<TMP_Text>(true))
-            {
-                found |= text.text == "Follow";
-            }
-
-            Assert.IsTrue(found);
-            Assert.IsTrue(CommandWheel.IsHeld, "the camera has to let go of the cursor");
-            wheel.Cancel();
-            Assert.IsFalse(CommandWheel.IsHeld);
-            Object.DestroyImmediate(root);
-        }
-        finally
-        {
-            Object.DestroyImmediate(holder);
-        }
+        Assert.Greater(judged, 50, "the project's meshes were read");
+        Assert.IsEmpty(broken, "vertices without a normal:\n" + string.Join("\n", broken));
     }
 
     [Test]

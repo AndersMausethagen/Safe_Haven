@@ -58,7 +58,8 @@ public sealed class GeneratedObjectsTests
     [Test]
     public void ARebuild_KeepsWhatCameOutTheSame()
     {
-        Assume.That(prefab != null && prefab.GetComponent<SaveableEntity>() != null, "A saveable prefab to build with");
+        // An Assert, not an Assume: a moved fixture must turn the test red, not quietly skip it.
+        Assert.IsTrue(prefab != null && prefab.GetComponent<SaveableEntity>() != null, $"A saveable prefab to build with at {NodePath}");
         Transform old = Root("Generated").transform;
         Transform oldBushes = Container(old, "Bushes");
         GameObject same = Node(oldBushes, new Vector3(1f, 0f, 1f), true);
@@ -95,7 +96,7 @@ public sealed class GeneratedObjectsTests
     [Test]
     public void AnOverrideMakesItAnotherObject()
     {
-        Assume.That(prefab != null, "A prefab to build with");
+        Assert.IsNotNull(prefab, $"A prefab to build with at {NodePath}");
         Transform root = Root("Generated").transform;
         GameObject a = Node(root, Vector3.one, false);
         GameObject b = Node(root, Vector3.one, false);

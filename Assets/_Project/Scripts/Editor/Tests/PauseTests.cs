@@ -75,11 +75,14 @@ public sealed class PauseTests
     [Test]
     public void HitStopLeavesSharedTimeAlone()
     {
-        Assume.That(GameOptions.HitStop.On, "the player's options have hit-stop off");
+        // Hit-stop on for the test whatever this machine's options say, and the player's choice put back after.
+        float hitStopBefore = GameOptions.HitStop.Value;
+        GameOptions.HitStop.Value = 1f;
         // Not initialised: that would subscribe to game-wide events, and edit mode never calls OnDestroy to let go.
         var feedback = new GameObject("feedback").AddComponent<CombatFeedback>();
         try
         {
+            Assert.IsTrue(GameOptions.HitStop.On);
             // Hosting friends in co-op: the world they fight in runs on this game's time.
             GamePause.TimeIsShared = true;
             feedback.SlowTime(0.05f, 1f);
@@ -93,6 +96,7 @@ public sealed class PauseTests
         finally
         {
             UnityEngine.Object.DestroyImmediate(feedback.gameObject);
+            GameOptions.HitStop.Value = hitStopBefore;
         }
     }
 

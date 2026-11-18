@@ -108,6 +108,8 @@ public sealed class SaveCoverageTests
         // A state can say the thing is gone (a drop picked up): its Destroy complains outside Play, which is no failure here.
         UnityEngine.TestTools.LogAssert.ignoreFailingMessages = true;
         var tried = new HashSet<Type>();
+        // Read back, not only found: a component whose state isn't JSON is skipped, and counted in `tried` (the test audit of 2026-11-18).
+        int probed = 0;
         var lost = new List<string>();
         var couldNot = new List<string>();
         foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/_Project/Prefabs" }))
@@ -157,6 +159,7 @@ public sealed class SaveCoverageTests
                             continue;
                         }
 
+                        probed++;
                         string changed = Probed(written, field => WrittenFresh.Contains($"{type.Name}.{field}"));
                         saveable.RestoreState(changed);
                         string back = saveable.CaptureState();
@@ -181,6 +184,7 @@ public sealed class SaveCoverageTests
         }
 
         Assert.Greater(tried.Count, 3, "saved components were found to try");
+        Assert.Greater(probed, 3, "and that many were written, changed and read back");
         Assert.IsEmpty(couldNot, "these couldn't be saved and restored outside Play: make CaptureState/RestoreState work without Awake, or name the test that covers them in ComponentsCheckedElsewhere");
         Assert.IsEmpty(lost, "restored with these changed, the component saved them differently: read back what CaptureState writes (or clamp on purpose and say so here)");
     }

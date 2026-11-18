@@ -23,8 +23,8 @@ public sealed class WeatherTests
     {
         var profile = ScriptableObject.CreateInstance<FireflyProfile>();
 
-        Assert.AreEqual(8, profile.CountFor(0f, 0f));
-        Assert.AreEqual(130, profile.CountFor(1f, 0f));
+        // How many is the profile's to tune; far more by night than by day, and rain sends most of them in.
+        Assert.Greater(profile.CountFor(1f, 0f), profile.CountFor(0f, 0f) * 4);
         Assert.Less(profile.CountFor(1f, 1f), profile.CountFor(1f, 0f) / 4);
         Object.DestroyImmediate(profile);
     }
@@ -84,30 +84,45 @@ public sealed class WeatherTests
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // Skies whose day is made dark on purpose, and why: the day and night rules below don't hold for them.
+    private static readonly Dictionary<string, string> MadeDarkByDay = new Dictionary<string, string>
+    {
+        ["Prologue Forest Night"] = "the prologue's night at noon: the day dies hours early, so its midday is darker than its night",
+    };
+
+    // Over the skies the game plays (every Day Night profile asset), not a fresh profile's defaults: the sun by day, a readable moon
+    // by night, light gone at the horizon, and an evening sun high enough not to graze flat ground. Their tuning is each sky's own.
     [Test]
     public void Profile_SunByDayMoonByNight()
     {
-        DayNightProfile profile = Asset<DayNightProfile>();
-        DayNightState noon = profile.Evaluate(13f);
-        Assert.IsFalse(noon.IsMoon);
-        Assert.AreEqual(55f, noon.LightRotation.eulerAngles.x, 0.5f, "the sun is at its noon height");
-        Assert.AreEqual(2.3f, noon.LightIntensity, 0.05f);
-        Assert.AreEqual(1f, noon.Daylight, 1e-4f);
-        Assert.AreEqual(0f, noon.Night, 1e-3f);
+        int skies = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:DayNightProfile", new[] { "Assets/_Project/Data" }))
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<DayNightProfile>(AssetDatabase.GUIDToAssetPath(guid));
+            skies++;
+            if (MadeDarkByDay.ContainsKey(profile.name))
+            {
+                continue;
+            }
 
-        DayNightState midnight = profile.Evaluate(24f);
-        Assert.IsTrue(midnight.IsMoon);
-        Assert.AreEqual(1f, midnight.Night, 1e-3f);
-        Assert.Greater(midnight.LightIntensity, 0.3f, "moonlight keeps the night readable");
-        Assert.Less(midnight.AmbientSky.grayscale, noon.AmbientSky.grayscale * 0.6f);
+            float middayHour = (profile.Sunrise + profile.Sunset) * 0.5f;
+            float midnightHour = (profile.Sunrise + profile.Sunset + 24f) * 0.5f % 24f;
+            DayNightState noon = profile.Evaluate(middayHour);
+            Assert.IsFalse(noon.IsMoon, profile.name);
+            Assert.AreEqual(1f, noon.Daylight, 1e-4f, profile.name);
+            Assert.AreEqual(0f, noon.Night, 1e-3f, profile.name);
 
-        Assert.AreEqual(0f, profile.Evaluate(profile.Sunrise).LightIntensity, 1e-3f, "the light fades out at the horizon");
-        Assert.Greater(profile.Evaluate(19.5f).GoldenHour, 0.9f);
-        Assert.Greater(profile.Evaluate(6.5f).FogDensity, noon.FogDensity, "morning mist");
-        DayNightState evening = profile.Evaluate(19.5f);
-        Assert.GreaterOrEqual(evening.LightRotation.eulerAngles.x, 12f, "the evening light never grazes flat ground");
-        Assert.Greater(evening.LightIntensity, 1f, "golden hour is still well lit");
-        Assert.Greater(evening.LightColour.g, 0.6f, "warm gold, not deep orange");
+            DayNightState midnight = profile.Evaluate(midnightHour);
+            Assert.IsTrue(midnight.IsMoon, profile.name);
+            Assert.AreEqual(1f, midnight.Night, 1e-3f, profile.name);
+            Assert.Greater(midnight.LightIntensity, 0.3f, $"{profile.name}: moonlight keeps the night readable");
+            Assert.Less(midnight.AmbientSky.grayscale, noon.AmbientSky.grayscale * 0.6f, profile.name);
+
+            Assert.AreEqual(0f, profile.Evaluate(profile.Sunrise).LightIntensity, 1e-3f, $"{profile.name}: the light fades out at the horizon");
+            Assert.GreaterOrEqual(profile.Evaluate(profile.Sunset - 0.5f).LightRotation.eulerAngles.x, 12f, $"{profile.name}: the evening light never grazes flat ground");
+        }
+
+        Assert.Greater(skies, 3, "the game's skies were found");
     }
 
     [Test]

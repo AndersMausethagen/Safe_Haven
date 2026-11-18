@@ -144,18 +144,19 @@ public sealed class HorseTests
         Assert.IsNotNull(kind.Barley);
         var saddle = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/HideSaddle.asset");
         Assert.IsTrue(saddle.IsSaddle);
-        Assert.AreEqual(8, saddle.SaddleSlots);
+        Assert.Greater(saddle.SaddleSlots, 0, "a saddle carries something");
         var recipe = AssetDatabase.LoadAssetAtPath<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/HideSaddle.asset");
         Assert.AreEqual(CraftingStationType.Workbench, recipe.Station, "made at the Workshop");
         Assert.AreEqual(saddle, recipe.Output);
-        Assert.AreEqual(10, recipe.ItemCost[0].Amount);
-        Assert.AreEqual("Rough Hide", recipe.ItemCost[0].Item.DisplayName);
         var lasso = AssetDatabase.LoadAssetAtPath<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/Lasso.asset");
         Assert.AreEqual(kind.Lasso, lasso.Output);
-        foreach ((string file, int slots) in new[] { ("LeatherSaddle", 12), ("ReinforcedSaddle", 16) })
+        // Each better saddle carries more than the one before (how many is the items' to tune).
+        int before = saddle.SaddleSlots;
+        foreach (string file in new[] { "LeatherSaddle", "ReinforcedSaddle" })
         {
             var bigger = AssetDatabase.LoadAssetAtPath<ItemDefinition>($"Assets/_Project/Data/Items/{file}.asset");
-            Assert.AreEqual(slots, bigger.SaddleSlots, file);
+            Assert.Greater(bigger.SaddleSlots, before, file);
+            before = bigger.SaddleSlots;
             Assert.IsNotNull(AssetDatabase.LoadAssetAtPath<RecipeDefinition>($"Assets/_Project/Data/Crafting/Recipes/{file}.asset"), file + " can be made");
         }
 

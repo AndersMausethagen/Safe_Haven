@@ -7,23 +7,37 @@ public sealed class BossTests
     private static BossDefinition Boss => AssetDatabase.LoadAssetAtPath<BossDefinition>("Assets/_Project/Data/Monsters/Boss The Heartroot.asset");
     private static RaidRumourDefinition Rumour => AssetDatabase.LoadAssetAtPath<RaidRumourDefinition>("Assets/_Project/Data/Raids/Rumours/TheHeartroot.asset");
 
-    [TestCase(1f, 0)]
-    [TestCase(0.7f, 0)]
-    [TestCase(0.6f, 1)]
-    [TestCase(0.34f, 1)]
-    [TestCase(0.2f, 2)]
-    [TestCase(0.13f, 2)]
-    [TestCase(0.11f, 3)]
-    [TestCase(0.01f, 3)]
-    public void TheFightMovesOnAsItsHealthFalls(float health, int phase)
-    {
-        Assert.AreEqual(phase, BossDefinition.PhaseAt(health, Boss.Phases));
-    }
-
+    // A rule over every boss rather than one boss's marks: whole it fights its first stage, each stage comes in turn as its health
+    // falls and none goes back, and a blow past every mark reaches the last (the Heartroot's Hollow's Hold).
     [Test]
-    public void AHugeBlowCanOnlyGoForwardThroughThePhases()
+    public void EveryBossFight_MovesOnThroughEachStage_AsItsHealthFalls()
     {
-        Assert.AreEqual(3, BossDefinition.PhaseAt(0.05f, Boss.Phases), "A blow past every mark reaches the last (the Hollow's Hold)");
+        int staged = 0;
+        foreach (BossDefinition boss in SettlementSettings.Current.Bosses)
+        {
+            BossPhase[] phases = boss.Phases;
+            if (phases == null || phases.Length == 0)
+            {
+                continue;
+            }
+
+            staged++;
+            Assert.AreEqual(0, BossDefinition.PhaseAt(1f, phases), $"{boss.name}: whole, its first stage");
+            var seen = new System.Collections.Generic.HashSet<int>();
+            int last = 0;
+            for (float health = 1f; health > 0f; health -= 0.005f)
+            {
+                int phase = BossDefinition.PhaseAt(health, phases);
+                Assert.GreaterOrEqual(phase, last, $"{boss.name}: at {health:0.000} it went back a stage");
+                seen.Add(phase);
+                last = phase;
+            }
+
+            Assert.AreEqual(phases.Length, BossDefinition.PhaseAt(0.0001f, phases), $"{boss.name}: a blow past every mark reaches the last");
+            Assert.AreEqual(phases.Length + 1, seen.Count, $"{boss.name}: every stage comes in turn");
+        }
+
+        Assert.Greater(staged, 0, "a boss with stages was checked");
     }
 
     [Test]
@@ -55,8 +69,17 @@ public sealed class BossTests
     [Test]
     public void BeatingTheHeartrootOpensTrollValley()
     {
-        var saved = GameSession.Here;
-        Assert.IsTrue(saved.IsBossDefeated(Boss.Id) || Valley.IsLocked, "Shut until then");
+        GameSession.StartNewGame();
+        try
+        {
+            Assert.IsTrue(Valley.IsLocked, "Shut until then");
+            GameSession.Home.MarkBossDefeated(Boss.Id);
+            Assert.IsFalse(Valley.IsLocked, "Open once the Heartroot falls");
+        }
+        finally
+        {
+            GameSession.StartNewGame();
+        }
     }
 
     [Test]
@@ -71,8 +94,9 @@ public sealed class BossTests
     }
 
     [Test]
-    public void TheBossIsRememberedAcrossASave()
+    public void TheLastBossBeaten_IsNoted_WithTheRaidItFellOn()
     {
+        // What a save keeps of it is SaveCoverageTests' (every saved field of SettlementState through SaveMapper).
         var settlement = new SettlementState();
         settlement.RecordExtraction();
         settlement.MarkBossDefeated("x");
@@ -106,18 +130,10 @@ public sealed class BossTests
     }
 
     [Test]
-    public void TheRumourIsInThePoolAndAsksForTheHollow()
-    {
-        var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
-        CollectionAssert.Contains(raid.GetSystem<RaidRumoursSystem>().Pool, Rumour);
-        Assert.AreEqual("Guardian's Hollow", Rumour.SetPiece.DisplayName);
-        Assert.IsTrue(Rumour.SetPiece.AlwaysThere);
-    }
-
-    [Test]
     public void EveryMapHasTheHollow()
     {
         var rules = AssetDatabase.LoadAssetAtPath<RaidLayoutRules>("Assets/_Project/Data/Raids/Maps/MistyWoods Layout.asset");
+        Assert.IsTrue(Rumour.SetPiece.AlwaysThere, "the hollow stands on every map, not only when its rumour comes up");
         for (int seed = 1; seed <= 10; seed++)
         {
             RaidLayoutPlan plan = RaidLayoutPlanner.Plan(rules, 500f, seed);

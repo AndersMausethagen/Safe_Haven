@@ -36,12 +36,6 @@ public sealed class FishSizeTests
         Assert.That(FishSizes.Eased(0.7f, 0.5f), Is.EqualTo(0.7f), "A small fish is small whatever the bait.");
         Assert.That(FishSizes.BiteWillingness(120f, 0f), Is.LessThan(FishSizes.BiteWillingness(40f, 0f)), "Big fish are wary.");
         Assert.That(FishSizes.BiteWillingness(120f, 0.35f), Is.GreaterThan(FishSizes.BiteWillingness(120f, 0f)), "Good bait brings them on.");
-
-        var tuning = new FishingSettings.FightTuning();
-        var small = new FishFight(tuning, 0.5f, 0.5f, 1f, 9f, 3, FishSizes.Difficulty(30f));
-        var big = new FishFight(tuning, 0.5f, 0.5f, 1f, 9f, 3, FishSizes.Difficulty(110f));
-        Assert.That(big, Is.Not.Null);
-        Assert.That(small, Is.Not.Null);
     }
 
     [Test]

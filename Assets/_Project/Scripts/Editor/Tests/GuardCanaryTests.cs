@@ -54,6 +54,8 @@ public sealed class GuardCanaryTests
 
         yield return ("a mesh made and never destroyed", engine.WhatIsMadeInCode_IsDestroyedByItsOwner,
             "public class Planted { UnityEngine.Mesh mesh = new Mesh(); }");
+        yield return ("a renderer's materials copied by reading them", engine.WhatIsMadeInCode_IsDestroyedByItsOwner,
+            "public class Planted { void F(UnityEngine.Renderer renderer) { var copies = renderer.materials; } }");
         yield return ("a subscription to a longer-lived system never undone", engine.EverySubscriptionToALongerLivedSystem_IsUndone,
             "public class Planted { void OnEnable() { QuestManager.Current.Changed += OnChanged; } void OnChanged() { } }");
     }

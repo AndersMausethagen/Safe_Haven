@@ -37,18 +37,13 @@ public sealed class PrologueTests
     [Test]
     public void Steps_SayWhereTheNightIs()
     {
-        // FindShelter, GatherFuel, LightFire, CatchBreath, DefendCamp, ReachPortal, ActivatePortal, HoldPortal, Finished, Story
-        // (a Story chapter says for itself where it is: these are its defaults)
-        var steps = (PrologueStep[])System.Enum.GetValues(typeof(PrologueStep));
-        const PrologueSite F = PrologueSite.Forest, C = PrologueSite.Camp, P = PrologueSite.Portal, M = PrologueSite.Meadow;
-        CollectionAssert.AreEqual(new[] { F, C, C, C, C, C, P, P, P, M }, steps.Select(s => s.Checkpoint()),
-            "A checkpoint on the way to the portal restarts at the camp.");
-        CollectionAssert.AreEqual(new PrologueSite?[] { null, C, C, C, C, P, P, P, P, M }, steps.Select(s => s.Rally()),
-            "Companions walk with the player to the shelter, and run ahead to the portal from the old troll.");
-        CollectionAssert.AreEqual(new[] { F, C, C, C, C, P, P, P, P, M }, steps.Select(s => s.Talk()));
-        CollectionAssert.AreEqual(new[] { false, true, true, true, false, false, false, false, false, false }, steps.Select(s => s.AtRest()),
-            "No small talk while wolves attack.");
-        CollectionAssert.AreEqual(new[] { false, false, false, false, false, false, false, true, true, false }, steps.Select(s => s.PortalOpen()));
+        // The rules the steps keep (a Story chapter says for itself where it is), not the whole table of them.
+        Assert.AreEqual(PrologueSite.Camp, PrologueStep.ReachPortal.Checkpoint(), "A checkpoint on the way to the portal restarts at the camp.");
+        Assert.AreEqual((PrologueSite?)PrologueSite.Portal, PrologueStep.ReachPortal.Rally(), "Companions run ahead to the portal from the old troll.");
+        Assert.IsTrue(PrologueStep.CatchBreath.AtRest(), "The companions can be talked to while catching breath.");
+        Assert.IsFalse(PrologueStep.DefendCamp.AtRest(), "No small talk while wolves attack.");
+        Assert.IsFalse(PrologueStep.ActivatePortal.PortalOpen(), "The portal opens once it is held, not before.");
+        Assert.IsTrue(PrologueStep.HoldPortal.PortalOpen());
         PrologueChapter flight = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.ReachPortal);
         Assert.AreEqual(PrologueCompanions.Flee, flight.Companions, "Nobody stays to fight the old troll.");
     }
@@ -82,23 +77,18 @@ public sealed class PrologueTests
     }
 
     [Test]
-    public void AuthoredPrologue_IsValidAndUsesOneMinutePortal()
+    public void AuthoredPrologue_IsValid()
     {
         Assert.NotNull(Definition);
         Assert.IsNull(Definition.FindProblem());
-        // Seven quests in nine chapters (Docs/QuestRedesign.md, step 2): it was twelve of each.
-        Assert.AreEqual(9, Definition.Chapters.Length);
-        Assert.AreEqual(7, Quests.Length);
-        CollectionAssert.AreEqual(new[] { "MorningCamp", "RoadToForest", "FindShelter", "CatchBreath", "DefendCamp", "ReachPortal", "HoldPortal" }, Quests.Select(q => q.name));
-        Assert.AreEqual(60f, Definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Duration);
         // Story graphs in the scene tell the flight from the old troll and what happens at the stones (Story - The Old Troll,
         // Story - What Sigrid Knows), and open the rest (Story - A Name Gone Missing): those chapters have no arrival line.
         Assert.IsTrue(Definition.Chapters.Where(c => c.Quest.name != "ReachPortal" && c.Quest.name != "CatchBreath").All(c => !string.IsNullOrWhiteSpace(c.ArrivalText)));
         Assert.IsNull(Definition.StartingWeapon, "The weapon is chosen as the party sets out, in the scene's story (Story - Choose a Weapon).");
         Assert.IsNull(Definition.StartingTorch, "Nobody carries a lit torch in the morning: it is handed out on the road (Story - The Road East).");
-        // 40% fewer at the portal on request (2026-11-09): 2 at first, waves of 2, 3, 3, 3 (13 in all, was 22).
-        Assert.AreEqual(2, Definition.WaveSize(1));
-        Assert.AreEqual(3, Definition.WaveSize(100), "Waves are capped; the companions fight too.");
+        // Fewer at the portal on request (2026-11-09); how many is the definition's to tune, that the waves stop growing is the rule.
+        Assert.Greater(Definition.WaveSize(1), 0);
+        Assert.AreEqual(Definition.WaveSize(100), Definition.WaveSize(1000), "Waves are capped; the companions fight too.");
     }
 
     [Test]
@@ -198,10 +188,11 @@ public sealed class PrologueTests
     [Test]
     public void TheCamp_IsAttackedTwice()
     {
+        // How many come is the chapter's to tune; that the camp is attacked again, and called out, is the rule.
         PrologueChapter camp = Definition.Chapters.Single(c => c.Behaviour == PrologueStep.DefendCamp);
-        Assert.AreEqual(3, camp.InitialEnemies);
-        Assert.AreEqual(2, camp.Waves);
-        StringAssert.StartsWith("Runa:", camp.NextWaveText, "someone calls out the second wave");
+        Assert.Greater(camp.InitialEnemies, 0);
+        Assert.Greater(camp.Waves, 1, "a second wave");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(camp.NextWaveText), "someone calls out the second wave");
         Assert.IsTrue(Definition.Chapters.Where(c => c != camp).All(c => c.Waves == 1));
     }
 
@@ -213,8 +204,8 @@ public sealed class PrologueTests
         Assert.AreEqual(QuestRank.Optional, pot.Rank);
         Assert.AreEqual(QuestStart.ByQuestGiver, pot.Start);
         Assert.IsFalse(Definition.Chapters.Any(c => c.Quest == pot), "not a step of the story");
-        Assert.AreEqual("DefendCamp", pot.ClosedBy.name);
-        Assert.AreEqual("Eirik", pot.TurnInTo);
+        Assert.AreSame(Definition.Chapters.Single(c => c.Behaviour == PrologueStep.DefendCamp).Quest, pot.ClosedBy, "the wolves end it");
+        Assert.IsFalse(string.IsNullOrWhiteSpace(pot.TurnInTo), "someone to bring the berries to");
         Assert.IsFalse(Quests.Any(q => q.Prerequisites.Contains(pot)), "nothing waits for it");
         Assert.IsNotEmpty(pot.RewardItems);
         Assert.IsEmpty(pot.FindProblems());

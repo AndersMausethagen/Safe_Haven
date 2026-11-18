@@ -1,7 +1,5 @@
 using System.Linq;
 using NUnit.Framework;
-using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public sealed class GroundPaintTests
@@ -16,11 +14,8 @@ public sealed class GroundPaintTests
         Assert.NotNull(layer, name);
         Assert.NotNull(layer.diffuseTexture);
         Assert.NotNull(layer.normalMapTexture);
+        // The packed mask map is what the terrain draws; the source files it was packed from are the art folder's business.
         Assert.NotNull(layer.maskMapTexture, "occlusion, height (for height blending) and smoothness");
-        foreach (string map in new[] { "_Height.png", "_AO.jpg", "_Roughness.jpg" })
-        {
-            Assert.NotNull(AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Project/Art/Terrain/World/{name}/{name}{map}"), name + map);
-        }
     }
 
     [TestCase("Haven Meadow")]

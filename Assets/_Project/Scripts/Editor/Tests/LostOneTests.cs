@@ -96,18 +96,17 @@ public sealed class LostOneTests
         Assert.Greater(LostOneRules.Refill(roster, settings, true, 5).Count, 0, "then they rise");
     }
 
+    // The settings the game loads (Resources/LostOneSettings), not a fresh asset's defaults: those are what keep a new player clear of
+    // the Lost on the first raids.
     [Test]
-    public void AFreshSettingsAsset_KeepsTheLostBehindAFewRaids()
+    public void TheShippedSettings_KeepTheLostBehindAFewRaids()
     {
-        var settings = ScriptableObject.CreateInstance<LostOneSettings>();
-        created.Add(settings);
-        Assert.IsTrue(settings.Enabled);
+        LostOneSettings settings = LostOneSettings.Current;
+        Assert.IsNotNull(settings, "Resources/LostOneSettings");
         Assert.Greater(settings.MinimumExtractions, 0);
         Assert.IsFalse(LostOneRules.GateOpen(settings, new QuestLog(), 0), "not on the first raid");
-        Assert.AreEqual(5, settings.MaxRank);
-        Assert.Greater(settings.GivenNames.Count, settings.RosterSize * 3);
+        Assert.Greater(settings.GivenNames.Count, settings.RosterSize * 3, "enough names that the roster never runs short");
         Assert.Greater(settings.ScentLines.Count, 0);
-        Assert.IsFalse(settings.HasABody, "no body until the asset names one");
     }
 
     // ----- Walking a raid -----

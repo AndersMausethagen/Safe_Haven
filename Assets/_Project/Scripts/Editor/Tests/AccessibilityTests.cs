@@ -120,6 +120,10 @@ public sealed class AccessibilityTests
     [Test]
     public void AssistsAreOffByDefaultAndSayWhatTheyDo()
     {
+        // The defaults as shipped: the game as designed, no help until the player asks for it.
+        Assert.AreEqual(0f, GameOptions.DamageTaken.Default, "Damage Taken starts at Normal");
+        Assert.AreEqual(0f, GameOptions.TimingHelp.Default, "Parry and Dodge Timing starts at Normal");
+
         float damage = GameOptions.DamageTaken.Value;
         float timing = GameOptions.TimingHelp.Value;
         try

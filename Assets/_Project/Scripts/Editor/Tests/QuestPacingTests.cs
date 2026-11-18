@@ -249,18 +249,31 @@ public sealed class QuestPacingTests
     {
         var log = new QuestLog();
         var quest = Quest("reward", QuestStart.ByQuestGiver);
+        var data = new SerializedObject(quest);
+        data.FindProperty("id").stringValue = "reward";
+        data.ApplyModifiedPropertiesWithoutUndo();
         log.Restore(quest, QuestStatus.Completed, new int[0]);
         log.HoldRewards(quest);
 
-        var saved = new System.Collections.Generic.List<QuestSaveData>();
-        typeof(SaveMapper).GetMethod("WriteQuests", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
-            .Invoke(null, new object[] { log, saved });
-        Assert.IsTrue(saved[0].rewardsWaiting);
+        // Through the save the game writes and reads, not its private helpers (SaveCoverageTests leaves the quest log's entries to this).
+        SaveData saved = SaveMapper.ToSaveData(null, null, "SafeHaven", null, System.DateTime.UtcNow, quests: log);
+        LoadedGame loaded = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(saved)), new OneQuest(quest));
+        CollectionAssert.AreEqual(new[] { quest }, loaded.Quests.TakeWaitingRewards());
+        Assert.IsEmpty(loaded.Quests.TakeWaitingRewards(), "given once");
+    }
 
-        var loaded = new QuestLog();
-        loaded.Restore(quest, (QuestStatus)saved[0].status, saved[0].counts, saved[0].rewardsWaiting);
-        CollectionAssert.AreEqual(new[] { quest }, loaded.TakeWaitingRewards());
-        Assert.IsEmpty(loaded.TakeWaitingRewards(), "given once");
+    /// <summary>Content that knows one quest, for a save to find it by its id.</summary>
+    private sealed class OneQuest : IContentLookup
+    {
+        private readonly QuestDefinition quest;
+        public OneQuest(QuestDefinition quest) => this.quest = quest;
+        public QuestDefinition FindQuest(string id) => quest != null && quest.Id == id ? quest : null;
+        public ItemDefinition FindItem(string id) => null;
+        public ResourceDefinition FindResource(string id) => null;
+        public RecipeDefinition FindRecipe(string id) => null;
+        public BuildingDefinition FindBuilding(string id) => null;
+        public ResidentDefinition FindResident(string id) => null;
+        public JobDefinition FindJob(string id) => null;
     }
 
     [Test]

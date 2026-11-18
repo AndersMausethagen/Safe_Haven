@@ -233,7 +233,7 @@ public sealed class DynamicQuestTests
             var components = preview.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Component>(true)).ToArray();
             var audio = components.OfType<SceneAudio>().Single();
             Assert.IsTrue(new SerializedObject(audio).FindProperty("startSilent").boolValue);
-            Assert.AreEqual(7, components.OfType<ExpeditionTorch>().Count());
+            Assert.Greater(components.OfType<ExpeditionTorch>().Count(), 0, "the expedition carries its own torches");
             Assert.IsFalse(components.OfType<Player>().Single().GetComponentsInChildren<ExpeditionTorch>(true).Any());
             var definition = AssetDatabase.LoadAssetAtPath<PrologueDefinition>("Assets/_Project/Data/Prologue/ForestPrologue.asset");
             var hold = definition.Chapters.Single(c => c.Behaviour == PrologueStep.HoldPortal).Quest;

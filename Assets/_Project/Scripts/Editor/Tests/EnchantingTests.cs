@@ -258,22 +258,4 @@ public sealed class EnchantingTests
     }
 
     // ----- Liv -----
-
-    [Test]
-    public void LivsQuests_TeachEnchanting_InOrder()
-    {
-        string[] chain = { "TheRuneScholar", "TheOldMarks", "Rubbings", "MarksOfTheMarked", "AHandForTheShelf", "TheGreatWork" };
-        for (int i = 1; i < chain.Length; i++)
-        {
-            var quest = AssetDatabase.LoadAssetAtPath<QuestDefinition>($"Assets/_Project/Data/Quests/{chain[i]}.asset");
-            Assert.IsNotNull(quest, chain[i]);
-            Assert.AreEqual(chain[i - 1], quest.Prerequisites.Single().name, chain[i]);
-            Assert.IsEmpty(quest.FindProblems(), chain[i]);
-            Assert.AreEqual(QuestRank.Haven, quest.Rank);
-        }
-
-        var first = AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/TheOldMarks.asset");
-        StringAssert.Contains("carved stones", first.JournalNotes, "her lesson says where enchantments are found");
-        Assert.IsTrue(first.Objectives.Any(o => o.Type == ObjectiveType.EnchantItem));
-    }
 }

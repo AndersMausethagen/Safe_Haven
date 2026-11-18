@@ -29,17 +29,4 @@ public sealed class DockTests
 
         Assert.Less(settings.CraftWork(CraftedGoods.Catch), settings.CatchWork, "a net brings in less than a fish landed by hand");
     }
-
-    [Test]
-    public void TheFisher_WorksTheDock_AndTeachesFishing()
-    {
-        var fisher = AssetDatabase.LoadAssetAtPath<JobDefinition>("Assets/_Project/Data/Settlement/Fisher.asset");
-        Assert.IsNotNull(fisher);
-        Assert.AreEqual("Dock", fisher.Workplace.DisplayName);
-        Assert.AreEqual("fishing", fisher.Teaches.Id);
-        Assert.GreaterOrEqual(fisher.WorkOrders.Count, 2);
-        Assert.IsTrue(fisher.WorkOrders.All(order => order.recipe.Station == CraftingStationType.Dock));
-        var gunnar = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Gunnar.asset");
-        CollectionAssert.Contains(gunnar.Jobs.ToList(), fisher, "someone can take it");
-    }
 }

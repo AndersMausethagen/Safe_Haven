@@ -42,14 +42,4 @@ public sealed class FinishingBlowTests
         Assert.AreEqual(1f, spot.x, 0.001f);
         Assert.AreEqual(2.05f, spot.z, 0.001f);
     }
-
-    [TestCase("Draug", true)]
-    [TestCase("BarrowShieldbearer", true)]
-    [TestCase("ForestBittenWolf", false)]
-    [TestCase("SmallMossTroll", false)]
-    public void OnlyThePersonShapedTakeOne(string monster, bool can)
-    {
-        var definition = AssetDatabase.LoadAssetAtPath<MonsterDefinition>($"Assets/_Project/Data/Monsters/{monster}.asset");
-        Assert.AreEqual(can, definition.CanBeFinished);
-    }
 }

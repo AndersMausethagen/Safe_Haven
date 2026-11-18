@@ -501,8 +501,10 @@ public sealed class Example
 
     // ---------------------------------------------------------------- 4. made objects destroyed
 
+    // Reading a renderer's material(s) makes a copy too, the renderer's own (the test audit of 2026-11-18: the rule saw only `new`).
     private static readonly Regex Making =
-        new Regex(@"\bnew\s+(Material|Mesh|Texture2D|Texture3D|Texture2DArray|RenderTexture|Cubemap|ComputeBuffer|GraphicsBuffer)\s*[({]|\bCoreUtils\.CreateEngineMaterial\s*\(|\bSprite\.Create\s*\(");
+        new Regex(@"\bnew\s+(Material|Mesh|Texture2D|Texture3D|Texture2DArray|RenderTexture|Cubemap|ComputeBuffer|GraphicsBuffer)\s*[({]|\bCoreUtils\.CreateEngineMaterial\s*\(|\bSprite\.Create\s*\(" +
+            @"|\b\w*[Rr]enderer\w*\s*\.\s*materials?\b(?!\s*=[^=])");
 
     private static readonly Regex LettingGo =
         new Regex(@"\bDestroy(?:Immediate)?\s*\(|\bCoreUtils\.Destroy\s*\(|\.Release\s*\(\s*\)|\.Dispose\s*\(\s*\)|ReleaseTemporary\s*\(");
@@ -518,6 +520,9 @@ public sealed class Example
         // Destroying them with the character drew severed and smashed pieces with destroyed materials (the GPU Resident Drawer's
         // "invalid Material ID", found by SceneSmokeLiveTests in a rainy Moss Marsh).
         ["CharacterWetness.cs"] = "a death ragdoll's pieces take the wet copies (DeathRagdoll) and may outlive the character: the scene's unload frees them",
+        // Open (Docs/BugPatterns.md, sixth round): property blocks can't switch Glow's emission keyword or keep Tint's multiplying, so the
+        // change needs its own look in the game.
+        ["CreatureLook.cs"] = "a creature's renderer.materials copies, freed only when its scene goes: OPEN, to be replaced with a look in the game",
     };
 
     [Test]

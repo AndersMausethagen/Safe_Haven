@@ -136,17 +136,6 @@ public sealed class TransportTests
     }
 
     [Test]
-    public void NoCargoNearby_LeavesThePoolAsItWas()
-    {
-        ItemDefinition plank = Stone(1f);
-        var bag = new ItemContainer(2, 1);
-        bag.Add(plank, 2);
-        var pool = new MaterialPool(null, bag);
-        Assert.AreEqual(2, pool.Have(plank));
-        Assert.IsTrue(pool.TrySpend(null, new[] { new ItemAmount(plank, 2) }));
-    }
-
-    [Test]
     public void RaidHud_SaysWhetherACartComesHome()
     {
         StringAssert.Contains("Comes home", TransportHud.RaidLine(true, 40f, 12f), "the hands always bring it");

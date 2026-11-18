@@ -101,22 +101,23 @@ public sealed class SurvivalTests
         Assert.IsTrue(needs.TryConsume("Water", 0f, 10f), "Drinking still helps while thirsty.");
     }
 
-    // Playtest 2026-11-05: one waterskin holds up to 100 water, drunk from and refilled at any water.
+    // Playtest 2026-11-05: one waterskin holds its water (100 then), drunk from and refilled at any water. How much is the item's.
     [Test]
-    public void Waterskin_HoldsAHundredWater_EachOneItsOwn()
+    public void Waterskin_HoldsItsWater_EachOneItsOwn()
     {
         ItemDefinition skin = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Waterskin.asset");
         Assert.IsTrue(skin.HoldsWater);
-        Assert.AreEqual(100f, skin.WaterCapacity);
+        Assert.Greater(skin.WaterCapacity, 0f);
         Assert.IsFalse(skin.Stackable, "each skin keeps its own level");
         Assert.IsTrue(skin.IsUsable, "right-click drinks from it");
 
         var full = new ItemStack(skin, 1);
-        Assert.AreEqual(100f, full.Water, 0.01f, "a new skin comes full");
-        ItemStack sipped = full.WithWater(40f);
-        Assert.AreEqual(40f, sipped.Water, 0.01f);
+        Assert.AreEqual(skin.WaterCapacity, full.Water, 0.01f, "a new skin comes full");
+        float sip = skin.WaterCapacity * 0.4f;
+        ItemStack sipped = full.WithWater(sip);
+        Assert.AreEqual(sip, sipped.Water, 0.01f);
         var reloaded = new ItemStack(skin, 1, sipped.Durability);
-        Assert.AreEqual(40f, reloaded.Water, 0.01f, "the level is kept the way saves and moves keep a stack");
+        Assert.AreEqual(sip, reloaded.Water, 0.01f, "the level is kept the way saves and moves keep a stack");
     }
 
     [Test]

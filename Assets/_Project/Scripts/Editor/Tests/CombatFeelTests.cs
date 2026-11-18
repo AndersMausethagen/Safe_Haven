@@ -81,18 +81,13 @@ public sealed class CombatFeelTests
     }
 
     [Test]
-    public void DodgeDefaults_GiveInvulnerabilityAndFitInsideTheCooldown()
+    public void TheDodge_GivesInvulnerabilityAndFitsInsideItsCooldown()
     {
-        var settings = ScriptableObject.CreateInstance<PlayerMovementSettings>();
-        try
-        {
-            Assert.Greater(settings.DodgeInvulnerability, 0f);
-            Assert.Greater(settings.DodgeCooldown, settings.DodgeDuration, "Dodges can't chain into permanent movement.");
-            Assert.Greater(settings.DodgeDistance / settings.DodgeDuration, settings.MoveSpeed, "A dodge is faster than running.");
-        }
-        finally
-        {
-            Object.DestroyImmediate(settings);
-        }
+        // The tuning the player gets (the shipped settings asset), not a fresh object's code defaults.
+        var settings = UnityEditor.AssetDatabase.LoadAssetAtPath<PlayerMovementSettings>("Assets/_Project/Data/Player/PlayerMovementSettings.asset");
+        Assert.IsNotNull(settings, "Data/Player/PlayerMovementSettings");
+        Assert.Greater(settings.DodgeInvulnerability, 0f);
+        Assert.Greater(settings.DodgeCooldown, settings.DodgeDuration, "Dodges can't chain into permanent movement.");
+        Assert.Greater(settings.DodgeDistance / settings.DodgeDuration, settings.MoveSpeed, "A dodge is faster than running.");
     }
 }

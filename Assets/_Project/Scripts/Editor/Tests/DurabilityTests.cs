@@ -134,9 +134,18 @@ public sealed class DurabilityTests
     public void Settings_CountFailedRaidsUntilNewGearBreaks()
     {
         DurabilitySettings settings = Create<DurabilitySettings>("durability");
+        int RaidsAt(float loss)
+        {
+            var data = new SerializedObject(settings);
+            data.FindProperty("lossOnFailedRaid").floatValue = loss;
+            data.ApplyModifiedPropertiesWithoutUndo();
+            return settings.FailedRaidsUntilBroken;
+        }
 
-        // Default: 25% per failed raid.
-        Assert.AreEqual(4, settings.FailedRaidsUntilBroken);
+        // 25% a raid is four exactly; 30% leaves a tenth after three, so the fourth breaks it (rounded up, never down).
+        Assert.AreEqual(4, RaidsAt(0.25f));
+        Assert.AreEqual(4, RaidsAt(0.3f));
+        Assert.AreEqual(int.MaxValue, RaidsAt(0f), "no wear: never breaks");
     }
 
     // ----- Repairs -----

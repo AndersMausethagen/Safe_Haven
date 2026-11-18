@@ -24,14 +24,6 @@ public sealed class NightTests
     }
 
     [Test]
-    public void AKillAtNight_ReapsTwiceTheEssence()
-    {
-        float find = NightSettings.Current.EssenceAt(1f) - 1f;
-        Assert.AreEqual(4, GearPower.Reaped(2, find, 0f));
-        Assert.AreEqual(2, GearPower.Reaped(1, find, 0f));
-    }
-
-    [Test]
     public void NightProwlers_GrowWithEveryBreach_UpToALimit()
     {
         NightSettings settings = NightSettings.Current;

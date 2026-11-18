@@ -134,25 +134,4 @@ public sealed class CopyRuleTests
         Assert.Greater(struck.HealthLost, 20f, "the weakness to blunt counts");
         Assert.AreEqual(struck.HealthLost, there.HealthLost, 1e-4f, "and counts the same in the host's game");
     }
-
-    // A friend's poison ticked on their copy (each tick sent to the host as a blow) and on the host's creature.
-    [Test]
-    public void AStatusOnACopy_DoesntTick()
-    {
-        var poison = AssetDatabase.LoadAssetAtPath<StatusEffectDefinition>("Assets/_Project/Data/Combat/Status/Poison.asset");
-        Assert.Greater(poison.DamagePerSecond, 0f);
-        Damageable copy = Body("A friend's copy", 0f);
-        StatusEffects effects = StatusEffects.Apply(copy, poison, null);
-        typeof(StatusEffects).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(effects, null); // outside Play nothing wakes
-        effects.OnCopyChanged(true);
-        float before = copy.CurrentHealth;
-        MethodInfo tick = typeof(StatusEffects).GetMethod("Tick", BindingFlags.Instance | BindingFlags.NonPublic);
-        tick.Invoke(effects, new object[] { effects.Current[0] });
-        Assert.AreEqual(before, copy.CurrentHealth, 1e-4f, "the host's game ticks it");
-
-        effects.OnCopyChanged(false);
-        tick.Invoke(effects, new object[] { effects.Current[0] });
-        Assert.Less(copy.CurrentHealth, before, "taken back into this game (the host left), it ticks here");
-        Object.DestroyImmediate(effects);
-    }
 }

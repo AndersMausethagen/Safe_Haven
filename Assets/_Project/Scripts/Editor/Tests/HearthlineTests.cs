@@ -40,17 +40,6 @@ public sealed class HearthlineTests
     }
 
     [Test]
-    public void CodeBuiltWindows_TakeTheirColoursFromTheStyle()
-    {
-        foreach (string file in new[] { "UI/SkillsWindow.cs", "UI/HavenWindow.cs", "UI/AltarWindow.cs", "UI/CargoWindow.cs", "UI/RaidPreparationWindow.cs", "Settlement/HomePortal.cs" })
-        {
-            string source = File.ReadAllText("Assets/_Project/Scripts/" + file);
-            Assert.IsFalse(Regex.IsMatch(source, "<color=#[0-9A-Fa-f]{6}"), $"{file}: changing a colour in UIStyle has to change the game");
-            StringAssert.DoesNotContain("new Color(0.", source, file);
-        }
-    }
-
-    [Test]
     public void TextBuiltInCode_TakesItsColoursFromTheStyle()
     {
         // Rich text built in code colours itself with UIStyle's tokens (UIStyle.Current.DangerHex and the like), so the
@@ -213,14 +202,18 @@ public sealed class HearthlineTests
 
     private static float Luminance(Color colour) => 0.2126f * colour.r + 0.7152f * colour.g + 0.0722f * colour.b;
 
-    [TestCase(QuestRank.MainStory, "Main quest")]
-    [TestCase(QuestRank.Rescue, "Rescue quest")]
-    [TestCase(QuestRank.Haven, "Haven quest")]
-    [TestCase(QuestRank.SideQuest, "Tale")]
-    [TestCase(QuestRank.Optional, "Errand")]
-    public void MapQuestRank_IsAlsoWrittenInWords(QuestRank rank, string words)
+    // Colour is not the only sign of a quest's rank on the map: every rank reads differently in words (which words is
+    // QuestMarkerSettings' to choose).
+    [Test]
+    public void MapQuestRank_IsAlsoWrittenInWords()
     {
-        StringAssert.Contains(words, WorldMapHud.QuestLabel("The old path", rank));
+        var labels = new System.Collections.Generic.HashSet<string>();
+        foreach (QuestRank rank in System.Enum.GetValues(typeof(QuestRank)))
+        {
+            string label = WorldMapHud.QuestLabel("The old path", rank);
+            StringAssert.Contains("The old path", label);
+            Assert.IsTrue(labels.Add(label), $"{rank} reads like another rank: {label}");
+        }
     }
 
     [Test]
