@@ -3,12 +3,15 @@ using UnityEngine;
 using static CodeUI;
 
 /// <summary>
-/// The left column, which reads: this run's hour and map (with a large map's other regions and a long way round), its
-/// rumours, what the Watch Post foretold and what the Haven asked for, the known dangers and the likely finds. Part of
+/// The left column, which reads: this run's hour and map (with a large map's other regions and a long way round), the sky
+/// it opens in, its rumours, what the Watch Post foretold and what the Haven asked for, the known dangers and the likely finds. Part of
 /// RaidPreparationWindow, in its own file.
 /// </summary>
 public sealed partial class RaidPreparationWindow
 {
+    // The lines told before the rumours: a Lost One walking the run, then the sky.
+    private readonly List<string> headLines = new List<string>(2);
+
     // A large map's other regions (or a normal map's other districts, Rules › Normal Regions), named after the run's own.
     private string Beyond(RaidDefinition raid)
     {
@@ -85,7 +88,13 @@ public sealed partial class RaidPreparationWindow
         // One of the Lost already met, walking this run (the same seed decides it in the raid): told first, as the worst news is.
         string restless = closed ? null : LostOneRules.BriefingLine(RaidLostOnes.ForRun(raid, plan.Seed, plan.Difficulty != null ? plan.Difficulty.tier : raid.Tier),
             raid.DisplayName, LostOneSettings.Current);
-        int first = restless != null ? 1 : 0;
+        // Then the sky the run opens in and what it does (research W3), as the raid will begin in it (RaidWeather, the same seed).
+        string sky = closed ? null : RaidWeather.BriefingLine(RaidWeather.Opening(raid, plan.Seed),
+            WeatherSystem.Active != null && WeatherSystem.Active.Snowing, PerceptionSettings.Current);
+        headLines.Clear();
+        if (restless != null) headLines.Add(restless);
+        if (sky != null) headLines.Add(sky);
+        int first = headLines.Count;
         int lines = first + rumours.Count + foretold.Count + asked.Count;
         while (rumourLines.Count < lines)
         {
@@ -99,7 +108,7 @@ public sealed partial class RaidPreparationWindow
             if (i < lines)
             {
                 int at = i - first;
-                line.Label.text = at < 0 ? restless
+                line.Label.text = at < 0 ? headLines[i]
                     : at < rumours.Count ? rumours[at].BriefingFor(GameSession.Here)
                     : at < rumours.Count + foretold.Count ? $"Seen from the Watch Post: {foretold[at - rumours.Count].DisplayName}."
                     : asked[at - rumours.Count - foretold.Count];

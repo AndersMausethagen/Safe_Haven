@@ -89,6 +89,12 @@ public sealed class RaidDefinition : ScriptableObject
              "scene's own hour. Night is darker for the player and the monsters alike, and should pay more.")]
     [SerializeField] private List<RaidTimeOfDay> timesOfDay = new List<RaidTimeOfDay>();
 
+    [Header("Weather")]
+    [Tooltip("The raid's weather (its scene's climate): each run opens in a weather picked from it by the run's seed, told in the " +
+             "briefing and set on the raid's weather as it loads, so friends on the run (co-op) share it. Empty: the scene's own " +
+             "climate and start weather, and the briefing says nothing of the sky (a boss arena).")]
+    [SerializeField] private ClimateDefinition climate;
+
     [Header("Look")]
     [Tooltip("This raid's colour grade over its scene's volumes: the filmic curve and how much darker and greyer than home.")]
     [SerializeField] private RaidGrade grade = new RaidGrade();
@@ -196,6 +202,8 @@ public sealed class RaidDefinition : ScriptableObject
     /// <summary>Danger stages, the earliest (most time left) first.</summary>
     public IReadOnlyList<RaidStage> Stages => stages;
     public IReadOnlyList<RaidTimeOfDay> TimesOfDay => timesOfDay;
+    /// <summary>The raid's weather, or null for the scene's own (RaidWeather).</summary>
+    public ClimateDefinition Climate => climate;
     public RaidLayoutRules LayoutRules => layoutRules;
     public RaidGrade Grade => grade;
     public RaidGroundLight GroundLight => groundLight;

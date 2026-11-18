@@ -126,6 +126,7 @@ MonoBehaviour:
     enemyDensity: 1.3
     briefing: 'Lights over the water, and the fen gives up its dead: more of them, and stronger. They carry twice the Cursed Essence.'
     skyCover: 0.3
+  climate: {fileID: 11400000, guid: c8e81df09c6a0784185bfeedc9e9ede6, type: 2}
   grade:
     curve: 1
     exposure: -0.2

@@ -1126,6 +1126,12 @@ The first fence, built by the player from the start (Sticks and Oak Wood, no wor
   (`SetRandomSeed`, `RaidLayout.SeedFor(seed, "Weather")`), so every game on one run (co-op) has the same weather; lightning
   draws from its own random, as it draws every frame and frame rates differ. Night shortens monster sight (`AtmosphereConditions.Night`,
   `PerceptionSettings.SightAtNight`).
+- **Weather foretold (2026-11-18, research W3):** `RaidDefinition` › Weather › Climate (its scene's climate; a boss arena has none).
+  `RaidWeather.Opening(raid, seed)` picks the weather a run opens in from it by the climate's chances (`RaidLayout.SeedFor(seed,
+  "Opening Weather")`); the briefing tells it first after a Lost One (`RaidWeather.BriefingLine`, whose numbers read
+  `PerceptionRules.RainNoiseScale` and the wet-ground fire rule), and `RaidSky` sets the climate and starts the run in it
+  (`WeatherSystem.StartIn`: the ground as wet as its rain). The sky then turns by itself as before. `RaidWeatherTests` holds the
+  climate a raid foretells to the one its scene uses.
 - **The apex:** the Old Moss Troll (Content Editor › Monsters; built by `AgentScripts/BuildOldMossTroll.cs`) stands under
   Map Content › Apex in Misty Woods with a `MonsterPatrol` round of four waypoints looping around the Hollow Oak. Weak
   eyes (9 m, 100°), a 6 m nose (close sense) and keen ears (×1.8); 1400 health, poise 450, a 1 s sweep and a 1.3 s

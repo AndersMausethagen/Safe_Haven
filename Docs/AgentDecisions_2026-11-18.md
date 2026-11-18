@@ -45,3 +45,17 @@ change the data. The choices:
 - **b)** The extra slots hold food at half strength (a fuller belly): every source keeps its worth, and less trimming is needed.
 - **c)** One extra of each at most (the GDD's wording), plus a smaller trim at tier IV.
 Until you choose, the old test (base slots) still holds, and a second test with every slot is skipped with this reason. My lean: **b**.
+
+## Done (continued)
+
+### The weather foretold in the briefing (research W3)
+- The briefing now says the sky a run opens in and what it does, from the rules themselves: "The sky as you go: Rain. Your steps
+  carry 60% as far, and fire won't take. It may turn." (rain in a snowing season is "Snow: the cold bites in the open"; fog and mist
+  "little can be seen far off"; storms "lightning").
+- **The raid really opens in it** (seeded like the hour, so friends share it): before, every run opened in its scene's start
+  weather (the Woods always in Mist). Now the climate's chances pick it: the Woods about half Mist, a third Breezy + Mist, a sixth
+  Rain + Mist, 5% Storm; the Valley mostly Clear, Breezy or Valley Haze, 8% Rain; the Marsh Fen Haze, Mist, Clear and 19% rain.
+  Boss arenas keep their one fixed look. Checked in Play: the planner showed the line, and a run launched from it opened in Rain +
+  Mist with the ground already wet.
+- **Not built (the research's other weather rules):** fog shortening sight for both sides, a storm's thunder masking the beacon,
+  snow leaving tracks for hunters. The line only names what the game does today.

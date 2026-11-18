@@ -294,9 +294,22 @@ public sealed class WeatherSystem : MonoBehaviour
         timeLeft = Duration(weather);
     }
 
-    private void Begin()
+    /// <summary>
+    /// Starts over in <paramref name="opening"/> at once, as if the scene had begun in it (the ground as wet as its rain), for its own
+    /// time before the climate picks again: a raid's run opening in its foretold weather (RaidWeather). Null: the start weather.
+    /// Seed first (<see cref="SetRandomSeed"/>), so how long it lasts follows the run too.
+    /// </summary>
+    public void StartIn(WeatherDefinition opening)
     {
-        weather = startWeather != null ? startWeather : climate != null ? climate.Start : null;
+        Begin(opening);
+        Changed?.Invoke(weather);
+    }
+
+    private void Begin() => Begin(null);
+
+    private void Begin(WeatherDefinition opening)
+    {
+        weather = opening != null ? opening : startWeather != null ? startWeather : climate != null ? climate.Start : null;
         current = from = weather != null ? weather.State : WeatherState.Clear;
         blend = 1f;
         flash = 0f;

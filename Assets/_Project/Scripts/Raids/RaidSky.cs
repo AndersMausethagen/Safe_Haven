@@ -39,7 +39,18 @@ public sealed class RaidSky : MonoBehaviour, ISceneSetup
 
         if (run != null && weather != null)
         {
+            // The raid's own climate, and the weather the briefing foretold for this run (RaidWeather): every game on the run the same.
+            if (run.Definition != null && run.Definition.Climate != null)
+            {
+                weather.SetClimate(run.Definition.Climate);
+            }
+
             weather.SetRandomSeed(RaidLayout.SeedFor(run.Seed, "Weather"));
+            WeatherDefinition opening = RaidWeather.Opening(run.Definition, run.Seed);
+            if (opening != null)
+            {
+                weather.StartIn(opening);
+            }
         }
 
         if (cycle == null)
