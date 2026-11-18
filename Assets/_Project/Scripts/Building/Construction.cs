@@ -173,6 +173,14 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             return false;
         }
 
+        // A friend's scaffold is theirs to raise unless they said yes to building (as placing, moving and upgrading are): a guest
+        // finished it unasked, and the host's game never heard it was done (homes, yards and Build objectives stayed behind).
+        if (Player.IsPlayer(user) && HavenVisit.IsVisiting && !HavenVisit.MayBuild)
+        {
+            reason = HavenVisit.Refusal;
+            return false;
+        }
+
         if (Paid)
         {
             return true;

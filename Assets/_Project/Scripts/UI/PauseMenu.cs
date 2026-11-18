@@ -90,6 +90,11 @@ public sealed class PauseMenu : MonoBehaviour
         bound = true;
     }
 
+    private void OnDestroy()
+    {
+        SceneTransition.Abandoned -= OnLeavingAbandoned;
+    }
+
     private void OnDisable()
     {
         // Never leave the game paused by a menu that is gone (for example when its scene unloads).
@@ -517,6 +522,24 @@ public sealed class PauseMenu : MonoBehaviour
         confirmPrimaryButton.interactable = false;
         confirmSecondaryButton.interactable = false;
         confirmCancelButton.interactable = false;
+        SceneTransition.Abandoned -= OnLeavingAbandoned;
+        SceneTransition.Abandoned += OnLeavingAbandoned;
+        Refresh();
+    }
+
+    // The way out broke off and the game goes on here: the menu works again.
+    private void OnLeavingAbandoned()
+    {
+        SceneTransition.Abandoned -= OnLeavingAbandoned;
+        if (this == null)
+        {
+            return;
+        }
+
+        leaving = false;
+        confirmPrimaryButton.interactable = true;
+        confirmSecondaryButton.interactable = true;
+        confirmCancelButton.interactable = true;
         Refresh();
     }
 }

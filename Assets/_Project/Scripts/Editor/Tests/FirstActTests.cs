@@ -19,8 +19,11 @@ public sealed class FirstActTests
     public void TheAct_EndsAtTheHeartroot_AndGoesOnNorth()
     {
         QuestDefinition hunt = Quest("WhatBreathesUnderTheRoots"), road = Quest("TheRoadNorth");
-        // And once Bjarne is home: its rumour needs two extractions, so it no longer starts a raid early (2026-11-15).
-        CollectionAssert.AreEqual(new[] { Quest("TheWeakeningWard"), Quest("BringBjarneHome") }, hunt.Prerequisites, "after the first breach, when the roots have been seen in the dead");
+        // And once Bjarne is home: its rumour needs two extractions, so it no longer starts a raid early (2026-11-15). Since its own
+        // encounter (Guardian's Hollow, 2026-11-17) the hollow is found first (The Breathing Hollow), then the hunt.
+        QuestDefinition hollow = Quest("TheBreathingHollow");
+        CollectionAssert.AreEqual(new[] { Quest("TheWeakeningWard"), Quest("BringBjarneHome") }, hollow.Prerequisites, "after the first breach, when the roots have been seen in the dead");
+        CollectionAssert.AreEqual(new[] { hollow }, hunt.Prerequisites, "the hollow found, then the hunt");
         CollectionAssert.AreEqual(new[] { hunt }, road.Prerequisites);
         foreach (QuestDefinition quest in new[] { hunt, road })
         {
@@ -55,11 +58,13 @@ public sealed class FirstActTests
         Assert.IsTrue(recipe.KnownFromStart, "a fire is all it asks");
         Assert.AreEqual(Load<RecipeDefinition>("Assets/_Project/Data/Crafting/Recipes/StewedBerries.asset").Station, recipe.Station, "made at a campfire");
 
-        var site = Load<RaidEventDefinition>("Assets/_Project/Data/Raids/Rumours/Events/TheHeartroot.asset");
-        RaidEventChoice wake = site.Choices.Single();
-        Assert.AreEqual(1, wake.cost.Count);
-        Assert.AreSame(ember, wake.cost[0].Item);
-        StringAssert.Contains("Hearth Ember", wake.detail, "the price is said plainly");
+        // Since Guardian's Hollow (2026-11-17) the ember is the gate's price into the Heartroot's own arena; the stump in the Woods
+        // only shows the way (the portal has to learn it first).
+        var hollowGate = Load<BossEncounterDefinition>("Assets/_Project/Data/Raids/Encounters/Guardian's Hollow Encounter.asset");
+        Assert.AreEqual(1, hollowGate.GateItems.Count);
+        Assert.AreSame(ember, hollowGate.GateItems[0].Item);
+        StringAssert.Contains("Hearth Ember", hollowGate.GatePrice, "the price is said plainly");
+        Assert.IsEmpty(Load<RaidEventDefinition>("Assets/_Project/Data/Raids/Rumours/Events/TheHeartroot.asset").Choices.Single().cost, "the stump asks nothing");
         StringAssert.Contains("steel", Load<RaidRumourDefinition>("Assets/_Project/Data/Raids/Rumours/TheHeartroot.asset").Briefing, "the briefing hints at it");
 
         var database = Load<ContentDatabase>("Assets/_Project/Resources/ContentDatabase.asset");

@@ -190,3 +190,23 @@ All read-only hunts; I re-read each and fixed it. Compiled; the edit-mode test r
   horse while the host is away; options rebinding hard to back out of; the recipe search letting keys through; a guest finishing
   the host's scaffolds without asking; buffered presses skipping the swim/boat checks; a scene change breaking off leaving the
   menu frozen.
+
+## The Lost, finished for a first look (2026-11-18, past midnight)
+- **Seen in a raid** (Troll Valley at midday, a probe camera on each; pictures sent): six bodies stand in your one-handed sword
+  stance and swing your own sword chain (cut, second cut, finisher; the heavy overhead; the rush) with a slow, readable wind-up
+  and your quick strike. Light cuts can be broken off by a blow; the heavy and the rush can't.
+- **Their garments are separate meshes with cloth physics** (Unity Cloth): skirts, the settler woman's dress, the leather coat,
+  the mail coat and tunic; the two mail helmets are separate too (so a rank's helm could later be knocked off or swapped). How it
+  swings in motion is for you to judge: only stills were checked.
+- **Fixed after the first look:** the Draug's sword was a greatsword in their hands (now 0.95 m), the mail read black (less metal).
+- **Settings:** they start after The Weakening Ward and 3 extractions; the first raid after that has none (a new one rises at a
+  homecoming). Not yet met by a hand-played character, so the chance, hunting and fleeing numbers are first guesses.
+- **Left:** a portrait per body for the Lost journal page; a cheat-menu "summon a Lost One" for testing; the death screen still
+  names the body ("One of the Lost"), not its name.
+
+## Bug hunt, round 1, the rest
+- Also fixed: a guest finishing the host's scaffolds without the host's yes; a scene change that broke off left the pause menu
+  frozen and every later load refused (now both undo themselves); the full test run found tonight's own gaps (shader warnings in
+  the ground light, the Heartrot icon, Troll Valley and Marsh set-piece parts in the props folder) and they are fixed.
+- **Not fixed, co-op only, both need two players timing it on purpose:** the same Haven item picked up by two players at once,
+  and a guest emptying a host's horse's bags while the host is away (the items come back). Logged for the co-op pass.

@@ -636,9 +636,26 @@ public static class SaveGameService
         }
 
         loading = true;
+        void OnAbandoned()
+        {
+            SceneTransition.Abandoned -= OnAbandoned;
+            if (pendingArrival != null)
+            {
+                SceneManager.sceneLoaded -= pendingArrival;
+                pendingArrival = null;
+            }
+
+            loading = false;
+            if (input != null)
+            {
+                input.enabled = true;
+            }
+        }
+
         void OnLoaded(Scene loaded, LoadSceneMode mode)
         {
             SceneManager.sceneLoaded -= OnLoaded;
+            SceneTransition.Abandoned -= OnAbandoned;
             pendingArrival = null;
             loading = false;
             // Posted once the loading screen has lifted, so the player sees it.
@@ -650,8 +667,10 @@ public static class SaveGameService
 
         pendingArrival = OnLoaded;
         SceneManager.sceneLoaded += pendingArrival;
+        SceneTransition.Abandoned += OnAbandoned;
         if (!SceneLoader.Load(scene, caption))
         {
+            SceneTransition.Abandoned -= OnAbandoned;
             SceneManager.sceneLoaded -= pendingArrival;
             pendingArrival = null;
             loading = false;

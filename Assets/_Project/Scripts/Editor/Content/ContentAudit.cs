@@ -45,6 +45,8 @@ public static class ContentAudit
         "EssenceSettings.blankParchment",
         // A comfort bought for a house from a resident's window (HomeLife.Furnish).
         "HomeLifeSettings.comforts[].cost[].item",
+        // A boss encounter's gate takes its price (the Hearth Ember into Guardian's Hollow).
+        "BossEncounterDefinition.gateItems[].item",
     };
 
     private static readonly string[] ItemNeither =
@@ -78,7 +80,9 @@ public static class ContentAudit
 
     private static readonly string[] MonsterAsks = { "QuestDefinition.objectives", "JournalSettings.", "RaidDefinition.knownEnemies" };
     // Wildlife.senses: scenery game borrows a huntable kind's senses (2026-11-16), which neither asks for that creature nor makes it.
-    private static readonly string[] MonsterNeither = { "MonsterAI.definition", "CheatSettings.creatures", "Wildlife.senses" };
+    // LostOneSettings: the bodies the Lost Ones walk in (by rank, and the fallback), which neither asks for a creature nor makes one
+    // anywhere but in a raid a Lost One walks.
+    private static readonly string[] MonsterNeither = { "MonsterAI.definition", "CheatSettings.creatures", "Wildlife.senses", "LostOneSettings.fallbackBody", "LostOneSettings.bodyGrades[].bodies[]" };
 
     private static readonly string[] Scenes = { "Assets/_Project/Scenes/SafeHaven.unity", "Assets/_Project/Scenes/Prologue_MistyWoods.unity" };
 

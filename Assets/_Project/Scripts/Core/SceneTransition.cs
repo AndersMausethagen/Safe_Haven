@@ -45,6 +45,11 @@ public static class SceneTransition
     /// <summary>Raised when a scene is loaded and set up, as the loading screen starts to fade away.</summary>
     public static event Action<Scene> SceneReady;
 
+    /// <summary>Raised when a scene change broke off before its scene was ready and the game goes on where it stands: what got
+    /// ready for the trip (a load's flag, the pause menu's leaving) undoes itself, or every later load was refused and the menu
+    /// stayed frozen.</summary>
+    public static event Action Abandoned;
+
     /// <summary>Loads a scene behind the loading screen. Returns false if a scene change is already under way.</summary>
     /// <param name="caption">Shown on the loading screen, e.g. "Entering the Misty Woods". Null shows "Loading".</param>
     public static bool Load(string scene, string caption = null)
@@ -317,6 +322,7 @@ public static class SceneTransition
                     ResumePlayer();
                     screen.Hide();
                     MarkReady(SceneManager.GetActiveScene());
+                    Abandoned?.Invoke();
                 }
             }
         }
