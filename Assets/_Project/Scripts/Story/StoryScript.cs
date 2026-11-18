@@ -206,6 +206,14 @@ public sealed class StoryScript : MonoBehaviour, ISaveable, ISharedState
         stopListening.Clear();
         StopAllCoroutines();
         running = 0;
+        // A once-only story cut off here (its run's finally never comes) may play again, as a save made now already says
+        // (CaptureState leaves unfinished ones out). Left in, the next story to finish cleared them and they were saved as done.
+        foreach (string cut in unfinished)
+        {
+            fired.Remove(cut);
+        }
+
+        unfinished.Clear();
     }
 
     /// <summary>Starts the story from a trigger, unless it is once-only and has fired before.</summary>

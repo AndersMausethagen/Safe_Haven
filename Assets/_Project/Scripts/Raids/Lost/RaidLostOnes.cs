@@ -229,7 +229,10 @@ public sealed class RaidLostOnes
         }
 
         roster.Homecomings++;
-        bool open = LostOneRules.GateOpen(settings, GameSession.Quests, GameSession.Home.SuccessfulExtractions);
+        // This run's extraction is counted at home after the raid's end is told (RaidFinished), so it is added here: the third
+        // homecoming opened the gate only at the fourth.
+        int extractions = GameSession.Home.SuccessfulExtractions + (raid.Session != null && raid.Session.Outcome == RaidOutcome.Extracted ? 1 : 0);
+        bool open = LostOneRules.GateOpen(settings, GameSession.Quests, extractions);
         LostOneRules.Refill(roster, settings, open, RaidSession.NewSeed());
     }
 

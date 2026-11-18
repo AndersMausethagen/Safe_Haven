@@ -182,7 +182,8 @@ public sealed class StationQueue
     /// <summary>The tier of the station working this queue, kept up by the station. Stations that aren't buildings have no limit.</summary>
     public int Tier { get; set; } = Tiers.Max;
 
-    /// <summary>How many crafts in the queue a worker started, so they aren't announced one by one. Not saved: at worst one is announced.</summary>
+    /// <summary>How many crafts in the queue a worker started: they aren't announced one by one, and they are the worker's work, not the
+    /// player's practice (SettlementSystem). Saved with the station.</summary>
     public int WorkerCrafts { get; set; }
 
     /// <summary>

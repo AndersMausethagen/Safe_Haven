@@ -637,7 +637,7 @@ public sealed class ItemContainer
             }
 
             target.Set(to, new ItemStack(destination.Item, destination.Count + moved).WithSize(Mathf.Max(destination.Size, source.Size)));
-            Set(from, new ItemStack(source.Item, source.Count - moved));
+            Set(from, source.WithCount(source.Count - moved));
             StackMoved?.Invoke(from, target, to);
             return true;
         }

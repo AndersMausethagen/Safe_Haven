@@ -400,7 +400,8 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>Ends the raid as extracted, if it is still running and the user is the player. Called by extraction points.</summary>
     public bool Extract(GameObject user)
     {
-        if (user == null || user != player || !Session.End(RaidOutcome.Extracted))
+        // A downed player can't leave (co-op): helped up first, or the raid is lost.
+        if (user == null || user != player || CoopDowned.IsDown || !Session.End(RaidOutcome.Extracted))
         {
             return false;
         }
@@ -417,7 +418,7 @@ public sealed class RaidDirector : MonoBehaviour
     public bool TurnBack(GameObject user)
     {
         EncounterArena arena = EncounterArena.Current;
-        if (user == null || user != player || turnedBack || Session.IsOver || !Session.Definition.IsEncounter || (arena != null && arena.IsSealed))
+        if (user == null || user != player || CoopDowned.IsDown || turnedBack || Session.IsOver || !Session.Definition.IsEncounter || (arena != null && arena.IsSealed))
         {
             return false;
         }

@@ -402,7 +402,10 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         // Quests begin once there is a player to receive them, not in the menu.
         if (Player.Current != null)
         {
-            foreach (QuestDefinition quest in Log.TakeWaitingRewards())
+            // Rewards waiting for home are paid at home: a guest back in the host's Haven after a raid lost what didn't fit (the
+            // overflow fell into the host's world or was thrown away). They stay saved until the player's own Haven.
+            IReadOnlyList<QuestDefinition> waiting = AtHome ? (IReadOnlyList<QuestDefinition>)Log.TakeWaitingRewards() : Array.Empty<QuestDefinition>();
+            foreach (QuestDefinition quest in waiting)
             {
                 string rewards = GiveRewards(quest);
                 GameMessages.Post($"Rewards for {quest.DisplayName}: {rewards}", MessageKind.Gain);

@@ -206,7 +206,9 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         }
 
         GameObject player = HolderCandidate();
-        bool inside = player != null && Inside(player.transform.position);
+        // Down in co-op, waiting for a friend: no hold. It filled for a downed player, who then extracted with the whole bag instead of
+        // bleeding out (and died on screen a moment later, as the downed state saw the raid over).
+        bool inside = player != null && !CoopDowned.IsDown && Inside(player.transform.position);
         ExtractionHoldState state = hold.Tick(Time.deltaTime, inside, IsContested(), contestedHoldRate);
         if (state != lastHoldState)
         {

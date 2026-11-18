@@ -158,6 +158,8 @@ public sealed class StationSaveData
     public string output;
     public bool outputIsResource;
     public int outputAmount;
+    /// <summary>How many of the queued crafts a worker started (StationQueue.WorkerCrafts).</summary>
+    public int workerCrafts;
 }
 
 [Serializable]

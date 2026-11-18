@@ -288,6 +288,7 @@ public static class SaveMapper
                 output = queue.Output is IStackDefinition made ? made.Id : "",
                 outputIsResource = queue.Output is ResourceDefinition,
                 outputAmount = queue.OutputAmount,
+                workerCrafts = queue.WorkerCrafts,
             };
             foreach (StationQueue.Job job in queue.Jobs)
             {
@@ -424,6 +425,7 @@ public static class SaveMapper
 
             var queue = new StationQueue(entry.id, (CraftingStationType)entry.type, entry.capacity, entry.maxQueued);
             queue.Restore(jobs, entry.progress, output, entry.outputAmount);
+            queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
             into.Add(queue);
         }
     }
