@@ -330,3 +330,15 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   at 48° the cliff leans in more and its near rock bulges toward the lens, the trees show a little more of their height; relief
   reads a little better, and tall things near the camera loom. Shots: fov_40.png / fov_48.png (sent with this note). If you like it,
   it is Player Camera Settings › Explore › Field of View 48 and Min/Max Distance × 0.82.
+
+### Batch 11: the music follows the raid (A5, GameDesignResearch T1)
+- **A stinger as each danger stage begins** (RaidStage › Stinger, all three raids): a lone horn far off and its answer as the land
+  stirs; two horns nearer and lower over a frame drum as the hunt begins; three horns, the drum twice and a bow's scrape at the
+  last stage. Made in `Tools/Audio/raid_music.py` with the War Horn's lip-reed model (low notes and membranes: no whistles; energy
+  above 2 kHz is thousandths of a percent, as the War Horn's). They take the mix (music dips under them).
+- **The quiet before the hunt:** the second stage hushes the exploring music for 60 s (RaidStage › Hush Seconds), leaving the
+  ambience, so footfalls and crows are the music; a fight's music still plays, and the final stretch keeps its music. Seen in a
+  launched Valley: the stage began, the trolls it woke came (combat music), and once they were gone the music read "Hushed".
+- **The held beacon's heartbeat:** a frame-drum "lub-dub" while the circle is held, from 1.3 s apart as it is lit to 0.55 s as it
+  fills (eased), four takes; it drops out while something contests the circle (Extraction Point › Heartbeat, on the prefab).
+- Per-raid music sets stay your later plan; these cues are shared until then. **Unheard by you.**

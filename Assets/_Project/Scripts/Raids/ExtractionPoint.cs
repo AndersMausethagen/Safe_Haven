@@ -54,6 +54,11 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     [Tooltip("While lit, the beacon calls out this far every Call Interval: idle creatures inside come to look. 0 = silent.")]
     [SerializeField, Min(0f)] private float callRadius = 35f;
     [SerializeField, Min(0.5f)] private float callInterval = 5f;
+    [Tooltip("A frame drum's heartbeat while the circle is held (Docs/GameDesignResearch_2026-11-17.md T1), quickening as it fills from " +
+             "Heartbeat Slowest to Heartbeat Fastest seconds between beats; it drops out while something contests the circle. Empty: none.")]
+    [SerializeField] private SoundDefinition heartbeat;
+    [SerializeField, Min(0.2f)] private float heartbeatSlowest = 1.3f;
+    [SerializeField, Min(0.2f)] private float heartbeatFastest = 0.55f;
     [Tooltip("A boss encounter's arrival stone: leaving by it before the gate turns back (RaidDirector.TurnBack): nothing gained and " +
              "nothing lost, no raid's end, so it can't be farmed as an extraction.")]
     [SerializeField] private bool turnsBack;
@@ -62,6 +67,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     private Interactable interactable;
     private ExtractionStatus lastStatus;
     private ExtractionHoldState lastHoldState = ExtractionHoldState.Unlit;
+    private float nextBeatAt;
+
+    /// <summary>Seconds between the held beacon's heartbeats when it is <paramref name="fill"/> full: slow at first, quickening as the
+    /// way home nears (eased, so the last stretch races). Pure, for tests.</summary>
+    public static float HeartbeatInterval(float fill, float slowest, float fastest) =>
+        Mathf.Lerp(slowest, fastest, Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(fill)));
     private bool alarmRaised;
     private bool extracted;
     private float nextCallAt;
@@ -201,6 +212,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         {
             AnnounceHold(state);
             lastHoldState = state;
+        }
+
+        if (heartbeat != null && state == ExtractionHoldState.Holding && Time.time >= nextBeatAt)
+        {
+            nextBeatAt = Time.time + HeartbeatInterval(hold.Fraction, heartbeatSlowest, heartbeatFastest);
+            AudioManager.Play(heartbeat, transform.position);
         }
 
         if (Time.time >= nextCallAt)

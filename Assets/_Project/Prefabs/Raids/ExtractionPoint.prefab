@@ -418,8 +418,13 @@ MonoBehaviour:
   alarm: {fileID: 0}
   alarmMessage: The beacon's light draws the forest's attention!
   holdRadius: 5
+  contestedHoldRate: 0.5
   callRadius: 35
   callInterval: 5
+  heartbeat: {fileID: 11400000, guid: 21c86e508c18c4c49a4a4f726972c14e, type: 2}
+  heartbeatSlowest: 1.3
+  heartbeatFastest: 0.55
+  turnsBack: 0
 --- !u!1001 &2643005597952840684
 PrefabInstance:
   m_ObjectHideFlags: 0

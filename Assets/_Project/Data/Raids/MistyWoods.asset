@@ -693,18 +693,24 @@ MonoBehaviour:
     enemyHealthBonus: 0.1
     enemyPowerBonus: 0.1
     lootBonus: 0.25
+    stinger: {fileID: 11400000, guid: 75f048dfbeb27824687fe5ca42ac7969, type: 2}
+    hushSeconds: 0
   - displayName: The Hunt
     startsAtSecondsLeft: 240
     message: 'Howls echo through the trees. The hunt has begun! The woods give more to those who stay: loot +50%.'
     enemyHealthBonus: 0.2
     enemyPowerBonus: 0.2
     lootBonus: 0.5
+    stinger: {fileID: 11400000, guid: 5dc5baf7267168540be520f2ab81edb4, type: 2}
+    hushSeconds: 60
   - displayName: Collapse
     startsAtSecondsLeft: 60
     message: 'The woods are collapsing! Get out now! The woods give more to those who stay: loot +80%.'
     enemyHealthBonus: 0.35
     enemyPowerBonus: 0.35
     lootBonus: 0.8
+    stinger: {fileID: 11400000, guid: a1c5c2cc7d8214b43ae0dc5991300736, type: 2}
+    hushSeconds: 0
   extractedArtwork: {fileID: 21300000, guid: 786f93cddb4331440b663cf22a598b74, type: 3}
   failedArtwork: {fileID: 21300000, guid: 43ac7cd0af4fd014f9a41fc33140dfb8, type: 3}
   extractedMotion: {fileID: 32900000, guid: ca5e747e87ae5c04887644897655f20a, type: 3}

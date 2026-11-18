@@ -172,7 +172,7 @@ public static class MusicRules
 {
     // Event music first (unless it lets fights interrupt it, as a place's mood music does); then a fight's combat music, even in a scene kept silent (the prologue's quiet forest); a
     // silence holds only while nobody fights.
-    public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft)
+    public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft, bool hushed = false)
     {
         bool overridden = scene != null && scene.MusicOverridden;
         bool combatAllowed = scene == null || scene.CombatMusic;
@@ -202,6 +202,9 @@ public static class MusicRules
         if (overridden)
             return new MusicChoice(null, "Quest/event: silence");
 
+        // A new danger stage holds the exploring music's breath for a while (RaidStage › Hush Seconds): the ambience alone.
+        if (hushed)
+            return new MusicChoice(null, "Hushed: a new stage begins");
         if (scene != null && scene.Exploring.HasTracks)
         {
             return new MusicChoice(scene.Exploring, "Scene: exploring");

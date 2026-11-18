@@ -175,12 +175,25 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         Current = null;
         volumes.Clear();
         musicHolds.Clear();
+        hushedUntil = float.NegativeInfinity;
     }
 
     private static readonly HashSet<object> musicHolds = new HashSet<object>();
 
     /// <summary>True while something that brings its own score (a cinematic) has asked the scene's music and ambience to stay out.</summary>
     public static bool MusicHeld => musicHolds.Count > 0;
+
+    private static float hushedUntil = float.NegativeInfinity;
+
+    /// <summary>Holds the exploring music's breath for <paramref name="seconds"/> of real time (a raid's new stage, RaidStage › Hush
+    /// Seconds): the ambience alone. A fight's music, the final stretch and event music are untouched. 0 does nothing.</summary>
+    public static void HushExploring(float seconds)
+    {
+        if (seconds > 0f)
+        {
+            hushedUntil = Mathf.Max(hushedUntil, Time.unscaledTime + seconds);
+        }
+    }
 
     /// <summary>Fades the scene's music and ambience out until <see cref="ReleaseMusic"/> is called with the same owner.</summary>
     public static void HoldMusic(object owner)
@@ -418,6 +431,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         UseEars(Player.Current != null);
         world.OnSceneEntered();
         space?.Clear();
+        hushedUntil = float.NegativeInfinity;
         if (Player.Current != null && !Player.Current.TryGetComponent(out PlayerAudio _))
         {
             Player.Current.gameObject.AddComponent<PlayerAudio>();
@@ -432,7 +446,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         if (!sceneUnloading)
         {
             float raidTimeLeft = RaidDirector.Current != null ? RaidDirector.Current.Session.TimeRemaining : float.PositiveInfinity;
-            MusicChoice choice = MusicHeld ? new MusicChoice(null, "Held: a cinematic is playing") : MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft);
+            MusicChoice choice = MusicHeld ? new MusicChoice(null, "Held: a cinematic is playing")
+                : MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft, Time.unscaledTime < hushedUntil);
             MusicReason = choice.Reason;
             music.Switch(choice.Playlist);
             if (restartCombatMusic && choice.IsCombat)

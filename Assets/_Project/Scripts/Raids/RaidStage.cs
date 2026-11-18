@@ -22,6 +22,12 @@ public sealed class RaidStage
     [Tooltip("Extra loot while this stage lasts: what caches and events hold, and the essence creatures drop. 0.25 is +25%. " +
              "What staying on is worth, against the stronger creatures.")]
     [SerializeField, Min(0f)] private float lootBonus;
+    [Header("Music (Docs/GameDesignResearch_2026-11-17.md T1)")]
+    [Tooltip("Played as the stage begins: a horn far off as the mist stirs, nearer and lower as the hunt begins. Empty: none.")]
+    [SerializeField] private SoundDefinition stinger;
+    [Tooltip("Seconds the exploring music holds its breath after the stage begins, leaving the ambience: the quiet before the hunt, " +
+             "so footfalls and crows are the music. A fight's music still plays. 0: none.")]
+    [SerializeField, Min(0f)] private float hushSeconds;
 
     public RaidStage() { }
 
@@ -35,6 +41,8 @@ public sealed class RaidStage
     }
 
     public string DisplayName => displayName;
+    public SoundDefinition Stinger => stinger;
+    public float HushSeconds => hushSeconds;
     public float StartsAtSecondsLeft => startsAtSecondsLeft;
     public string Message => message;
     public float EnemyHealthBonus => enemyHealthBonus;

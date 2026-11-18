@@ -377,6 +377,13 @@ public sealed class RaidDirector : MonoBehaviour
         if (stage != null)
         {
             GameMessages.Post(string.IsNullOrWhiteSpace(stage.Message) ? $"{stage.DisplayName}." : stage.Message, MessageKind.Warning);
+            // The music follows the danger (T1): the stage's stinger, and a hush of the exploring music after it.
+            if (stage.Stinger != null)
+            {
+                AudioManager.Play(stage.Stinger, transform.position);
+            }
+
+            AudioManager.HushExploring(stage.HushSeconds);
         }
 
         if (generator != null)
