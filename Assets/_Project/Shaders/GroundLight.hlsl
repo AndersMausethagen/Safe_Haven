@@ -142,6 +142,8 @@ half3 GroundLightSunflecks(float3 positionWS)
         {
             float4 coord = TransformWorldToShadowCoord(positionWS);
             half shade = 1.0 - SAMPLE_TEXTURE2D_SHADOW(_MainLightShadowmapTexture, sampler_LinearClampCompare, coord.xyz);
+            // As URP's own: nothing past the shadows' reach (its coordinate there is meaningless), and fading out with the shadows.
+            shade = BEYOND_SHADOW_FAR(coord) ? 0.0 : shade * _MainLightShadowParams.x * (1.0 - GetMainLightShadowFade(positionWS));
             UNITY_BRANCH if (shade > 0.01)
             {
                 // Stretched along the sun's way, more the lower it stands.

@@ -56,7 +56,6 @@ public sealed class BackstabMarker : MonoBehaviour
         block.SetColor(BaseColorId, color);
         block.SetColor(ColorId, color);
         Vector3 at = transform.position + Vector3.up * Lift;
-        GroundMarks.BindGround(at);
         Vector3 forward = transform.forward;
         forward.y = 0f;
         Quaternion behind = Quaternion.LookRotation(forward.sqrMagnitude > 1e-4f ? -forward.normalized : Vector3.back, Vector3.up);
@@ -70,6 +69,7 @@ public sealed class BackstabMarker : MonoBehaviour
         };
         float arc = CombatTechniqueSettings.Current.BackstabArc;
         GroundMarks.Shape(block, arc, 0f, 0.05f, GroundMarks.Pattern.Solid, 0.4f);
+        GroundMarks.Ground(block, transform.position);
         Graphics.RenderMesh(draw, GroundMarks.FanFor(feel, arc), 0, Matrix4x4.TRS(at, behind, GroundMarks.Scale(radius)));
     }
 }

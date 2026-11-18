@@ -55,7 +55,6 @@ public sealed class LobStrike : MonoBehaviour
         float radius = action.attack.Range;
         if (GroundMarks.MaterialFor(feel) != null)
         {
-            GroundMarks.BindGround(transform.position);
             Color fillColor = action.attack.Unblockable ? feel.UnblockableColor : feel.TelegraphFillColor;
             Part("Area", feel, feel.TelegraphAreaColor, 0.06f, radius, GroundMarks.Pattern.Solid, 0.07f, 0.5f, 0f);
             fillRenderer = Part("Fill", feel, fillColor, 0.07f, radius,
@@ -97,6 +96,7 @@ public sealed class LobStrike : MonoBehaviour
         renderer.receiveShadows = false;
         var colorBlock = new MaterialPropertyBlock();
         GroundMarks.Shape(colorBlock, 360f, 0f, rim, pattern, gradient, front);
+        GroundMarks.Ground(colorBlock, transform.position);
         colorBlock.SetColor(BaseColorId, color);
         colorBlock.SetColor(ColorId, color);
         renderer.SetPropertyBlock(colorBlock);

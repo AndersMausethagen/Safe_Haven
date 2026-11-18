@@ -28,7 +28,12 @@ public sealed class ImpactBlurFeature : ScriptableRendererFeature
             return;
         }
 
-        material = CoreUtils.CreateEngineMaterial(shader);
+        // Create runs again on every change in the Editor: one material, not one more each time.
+        if (material == null || material.shader != shader)
+        {
+            CoreUtils.Destroy(material);
+            material = CoreUtils.CreateEngineMaterial(shader);
+        }
         pass = new BlurPass(material) { renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing };
     }
 

@@ -219,7 +219,15 @@ public sealed class AmbientLife : MonoBehaviour
     private void RefreshColumns(Live swarm, Vector3 centre)
     {
         float reach = swarm.swarm.radius;
-        swarm.columns.RemoveAll(c => (new Vector2(c.x - centre.x, c.z - centre.z)).sqrMagnitude > reach * reach * 1.4f);
+        // Columns the view has left behind go (a loop: a RemoveAll lambda would allocate its closure each frame).
+        for (int i = swarm.columns.Count - 1; i >= 0; i--)
+        {
+            Vector3 c = swarm.columns[i];
+            if (new Vector2(c.x - centre.x, c.z - centre.z).sqrMagnitude > reach * reach * 1.4f)
+            {
+                swarm.columns.RemoveAt(i);
+            }
+        }
         if (Time.time > swarm.columnsAt)
         {
             swarm.columnsAt = Time.time + 30f;

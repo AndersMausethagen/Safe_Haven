@@ -34,6 +34,7 @@ public sealed class GroundMarksTests
         Assert.AreEqual(new Vector3(2f, 2f * GroundMarks.Reach, 2f), box.bounds.size);
         Assert.AreEqual(Vector3.zero, box.bounds.center);
         Assert.AreEqual(new Vector3(3f, 1f, 3f), GroundMarks.Scale(3f), "x and z the radius, y 1: the reach stays in metres");
+        Assert.AreEqual(14f * 0.3f, GroundMarks.Scale(14f).y * GroundMarks.Reach, 1e-4f, "a large mark reaches further up and down");
         // Every face wound outward (the shader draws the far ones).
         Vector3[] vertices = box.vertices;
         int[] triangles = box.triangles;
@@ -78,6 +79,15 @@ public sealed class GroundMarksTests
             Assert.AreEqual(32f / (33f * 32f), place.z, 1e-6f, "uv per metre, samples on the corners");
             GroundMarks.BindGround(new Vector3(-500f, 0f, -500f));
             Assert.AreEqual(0f, Shader.GetGlobalVector("_GroundMarkScale").w, "no terrain under it: unbound");
+
+            // Each mark its own: one standing on the terrain tests against it, one on a bridge 15 m up only by the slope.
+            var onGround = new MaterialPropertyBlock();
+            GroundMarks.Ground(onGround, new Vector3(110f, 5.1f, 210f));
+            Assert.AreEqual(1f, onGround.GetVector("_GroundMarkScale").w, "on the terrain: its heightmap");
+            Assert.AreEqual(100f, onGround.GetVector("_GroundMarkPlace").x, 1e-4f);
+            var onBridge = new MaterialPropertyBlock();
+            GroundMarks.Ground(onBridge, new Vector3(110f, 20f, 210f));
+            Assert.AreEqual(0f, onBridge.GetVector("_GroundMarkScale").w, "on a bridge: not tested against the gorge below");
         }
         finally
         {

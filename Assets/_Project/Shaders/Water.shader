@@ -671,7 +671,7 @@ Shader "Safe Haven/Water"
                 // Floating bits, under the foam: carried by the current (cross-faded phases where it turns along the mesh), else drifting
                 // with the wind. Not on falls.
                 half bits = 0;
-                half tone = 0;
+                half3 floatTint = _FloatingColor.rgb;
                 if (_Floating > 0.001 && steep < 0.5)
                 {
                     float2 windDir = dot(_SafeHavenWind.xy, _SafeHavenWind.xy) > 1e-4 ? normalize(_SafeHavenWind.xy) : float2(0.6, 0.8);
@@ -686,15 +686,20 @@ Shader "Safe Haven/Water"
                         half b0 = FloatingBits(positionWS.xz - carried * cycle * t0, tone0);
                         half b1 = FloatingBits(positionWS.xz - carried * cycle * t1 + 17.3, tone1);
                         bits = lerp(b1, b0, w0);
-                        tone = w0 > 0.5 ? tone0 : tone1;
+                        half3 tint0 = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone0);
+                        half3 tint1 = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone1);
+                        half share0 = b0 * w0, share1 = b1 * (1.0 - w0);
+                        floatTint = (tint0 * share0 + tint1 * share1) / max(share0 + share1, 1e-3);
                     }
                     else
                     {
+                        half tone;
                         bits = FloatingBits(positionWS.xz - carried * time, tone);
+                        floatTint = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone);
                     }
 
                     bits *= 1.0 - white;
-                    half3 floating = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone) * foamLight;
+                    half3 floating = floatTint * foamLight;
                     colour = lerp(colour, floating, bits);
                     #if defined(SAFE_HAVEN_WATER_SIMPLE)
                         alpha = saturate(alpha + bits);

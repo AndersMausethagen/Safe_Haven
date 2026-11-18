@@ -362,9 +362,9 @@ public sealed class GroundHazard : MonoBehaviour
         disc.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         disc.receiveShadows = false;
         block = new MaterialPropertyBlock();
-        GroundMarks.BindGround(transform.position);
         // Hatched: harm no guard stops, as an unblockable strike's fill; stay out.
         GroundMarks.Shape(block, 360f, 0f, 0.06f, GroundMarks.Pattern.Hatched, 0.6f);
+        GroundMarks.Ground(block, transform.position);
         Paint(0f);
     }
 

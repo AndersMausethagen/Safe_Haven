@@ -53,9 +53,43 @@ public static class GroundMarks
         Shader.SetGlobalVector(GroundScaleId, Vector4.zero);
     }
 
-    /// <summary>The terrain under a mark about to show, for the shader: what stands more than half a metre above its ground (a
-    /// character, a tall rock's top) never takes the mark, only the ground and what lies low on it. Cheap when it is the terrain bound
-    /// last; with no terrain under the point, only the slope keeps marks off what stands.</summary>
+    /// <summary>A mark's own ground, on its property block: the terrain under <paramref name="at"/> (the mark's centre), so what stands
+    /// more than half a metre above it (a character, a tall rock's top) never takes the mark. Only when the mark stands on that
+    /// terrain: on a bridge, a rock top or a raised floor (its centre well off the terrain), only the slope keeps it off what stands,
+    /// as before. Per mark, so two terrains or a bridge never mislead another mark.</summary>
+    public static void Ground(MaterialPropertyBlock block, Vector3 at)
+    {
+        Terrain terrain = TerrainUnder(at);
+        Texture heightmap = terrain != null && terrain.terrainData != null ? terrain.terrainData.heightmapTexture : null;
+        if (heightmap == null || Mathf.Abs(at.y - (terrain.SampleHeight(at) + terrain.GetPosition().y)) > OnTerrainWithin)
+        {
+            block.SetVector(GroundScaleId, Vector4.zero);
+            return;
+        }
+
+        GroundOf(terrain, out Vector4 place, out Vector4 scale);
+        block.SetTexture(HeightmapId, heightmap);
+        block.SetVector(PlaceId, place);
+        block.SetVector(GroundScaleId, scale);
+    }
+
+    // A mark whose centre is this many metres off the terrain stands on something else (a bridge, a rock, a floor).
+    private const float OnTerrainWithin = 0.75f;
+
+    // Where a terrain's heightmap lies, for the shaders: uv = (xz - corner) * (resolution - 1) / (resolution * size) + half a texel,
+    // as the terrain's samples sit on its corners; heights from its base by metres per heightmap unit.
+    private static void GroundOf(Terrain terrain, out Vector4 place, out Vector4 scale)
+    {
+        TerrainData data = terrain.terrainData;
+        Vector3 corner = terrain.GetPosition();
+        Vector3 size = data.size;
+        float resolution = data.heightmapResolution;
+        place = new Vector4(corner.x, corner.z, (resolution - 1f) / (resolution * size.x), (resolution - 1f) / (resolution * size.z));
+        scale = new Vector4(corner.y, size.y / HeightmapTop, 0.5f / resolution, 1f);
+    }
+
+    /// <summary>The terrain under the camera's view, as globals: what the contact shadows read (ContactShadowsFeature: only the ground
+    /// takes them). Cheap when it is the terrain bound last; none under the point unbinds it. Marks carry their own (<see cref="Ground"/>).</summary>
     public static void BindGround(Vector3 at)
     {
         Terrain terrain = TerrainUnder(at);
@@ -74,14 +108,10 @@ public static class GroundMarks
             return;
         }
 
-        TerrainData data = terrain.terrainData;
-        Vector3 corner = terrain.GetPosition();
-        Vector3 size = data.size;
-        float resolution = data.heightmapResolution;
+        GroundOf(terrain, out Vector4 place, out Vector4 scale);
         Shader.SetGlobalTexture(HeightmapId, heightmap);
-        // As the terrain's samples sit on its corners: uv = (xz - corner) * (resolution - 1) / (resolution * size) + half a texel.
-        Shader.SetGlobalVector(PlaceId, new Vector4(corner.x, corner.z, (resolution - 1f) / (resolution * size.x), (resolution - 1f) / (resolution * size.z)));
-        Shader.SetGlobalVector(GroundScaleId, new Vector4(corner.y, size.y / HeightmapTop, 0.5f / resolution, 1f));
+        Shader.SetGlobalVector(PlaceId, place);
+        Shader.SetGlobalVector(GroundScaleId, scale);
     }
 
     private static Terrain TerrainUnder(Vector3 at)
@@ -122,8 +152,9 @@ public static class GroundMarks
     /// <summary>A band's mesh (an arc's outer edge, a ring): the box when projected, else the flat band.</summary>
     public static Mesh BandFor(CombatFeelSettings feel, float arc, float width) => Projected(feel) ? Box : AttackTelegraph.BandFor(arc, width);
 
-    /// <summary>The scale a mark of this radius takes: x and z the radius, y 1 (the box's reach is in metres).</summary>
-    public static Vector3 Scale(float radius) => new Vector3(radius, 1f, radius);
+    /// <summary>The scale a mark of this radius takes: x and z the radius; y 1 (the box's reach, <see cref="Reach"/> metres up and down)
+    /// until the radius is large, then a share of it, so a 14 m fan on a slope keeps its far end (it drops 3.75 m over 14 m at 15°).</summary>
+    public static Vector3 Scale(float radius) => new Vector3(radius, Mathf.Max(1f, 0.3f * radius / Reach), radius);
 
     /// <summary>A mark's shape on its property block (the projected shader reads it; the flat fans ignore it). <paramref name="inner"/>
     /// is the ring's inner edge as a share of the radius (0: a fan or disc), <paramref name="rim"/> the bright rim in metres (0: none),

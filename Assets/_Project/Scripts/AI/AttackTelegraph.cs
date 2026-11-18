@@ -130,7 +130,9 @@ public sealed class AttackTelegraph : MonoBehaviour
             ? ai.ActiveAction.chargeDistance : attack.Range;
         // y stays 1: a projected mark's reach up and down is in metres (the flat fans don't care).
         marker.localScale = GroundMarks.Scale(range);
-        GroundMarks.BindGround(transform.position);
+        GroundMarks.Ground(areaBlock, transform.position);
+        GroundMarks.Ground(block, transform.position);
+        GroundMarks.Ground(edgeBlock, transform.position);
         marker.gameObject.SetActive(true);
         // The AI's own rule (an Unyielding elite's strikes break off for nothing until its layer breaks, whatever the strike allows).
         interruptible = ai.AnyBlowBreaksStrike;
@@ -341,7 +343,7 @@ public sealed class AttackTelegraph : MonoBehaviour
 
         float share = Mathf.Clamp01(left / length);
         float radius = bodyRadius + feel.OpeningWidth + feel.OpeningReach * share;
-        GroundMarks.BindGround(transform.position);
+        GroundMarks.Ground(openingBlock, transform.position);
         opening.SetPositionAndRotation(transform.position + Vector3.up * (groundOffset + 0.005f), Quaternion.identity);
         opening.localScale = GroundMarks.Scale(radius);
         Color color = feel.OpeningColor;

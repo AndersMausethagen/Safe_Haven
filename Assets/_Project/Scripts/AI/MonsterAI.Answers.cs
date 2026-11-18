@@ -69,7 +69,6 @@ public sealed partial class MonsterAI
                 return;
             }
 
-            GroundMarks.BindGround(transform.position);
             markRing = new GameObject("Hunter's Mark");
             markRing.transform.SetParent(transform, false);
             markRing.transform.localPosition = Vector3.up * 0.08f;
@@ -83,6 +82,7 @@ public sealed partial class MonsterAI
             renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             var block = new MaterialPropertyBlock();
             GroundMarks.Shape(block, 360f, 0.92f, 0f, GroundMarks.Pattern.Solid, 0f);
+            GroundMarks.Ground(block, transform.position);
             block.SetColor("_BaseColor", CombatFeelSettings.Current.HuntersMarkColor);
             block.SetColor("_Color", CombatFeelSettings.Current.HuntersMarkColor);
             renderer.SetPropertyBlock(block);

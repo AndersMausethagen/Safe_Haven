@@ -41,7 +41,7 @@ HexTiles HexFrame(float2 uv, float turnStrength)
     HexTiles t;
     t.dx = ddx(uv);
     t.dy = ddy(uv);
-    float2 skewed = mul(float2x2(1.0, 0.0, -0.57735027, 1.15470054), uv * 2.0 * sqrt(3.0));
+    float2 skewed = mul(float2x2(1.0, -0.57735027, 0.0, 1.15470054), uv * 2.0 * sqrt(3.0));
     int2 base = int2(floor(skewed));
     float3 f = float3(frac(skewed), 0.0);
     f.z = 1.0 - f.x - f.y;
@@ -66,8 +66,7 @@ HexTiles HexFrame(float2 uv, float turnStrength)
 float3 HexWeights(HexTiles t, half3 c1, half3 c2, half3 c3)
 {
     float3 luma = float3(dot(c1, half3(0.299, 0.587, 0.114)), dot(c2, half3(0.299, 0.587, 0.114)), dot(c3, half3(0.299, 0.587, 0.114)));
-    float3 w = t.weights * lerp(1.0, luma, 0.6);
-    w = pow(max(w, 1e-5), 7.0);
+    float3 w = lerp(1.0, luma, 0.6) * pow(max(t.weights, 1e-5), 7.0);
     return w / dot(w, 1.0);
 }
 

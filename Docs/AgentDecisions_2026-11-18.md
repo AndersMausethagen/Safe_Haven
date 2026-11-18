@@ -380,3 +380,10 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   could not be confirmed).
 - Seen in a launched Valley, A/B with time frozen and the cloud shadows paused (they had moved between shots and looked like the
   effect): the low plants and clumps sit in their own shade, the ground reads more grounded. Cost within noise (300-frame medians).
+- **Fixed after the second code review (one subagent, read-only, batches 3-12):** ground warnings on a bridge, a rock top or the second
+  of two terrains vanished (they tested against the gorge's heightmap 15 m below): each mark now carries its own ground and tests
+  it only when it stands on that terrain; a large mark's reach up and down grows with it (a 14 m fan on a slope kept its far end);
+  the sunflecks keep URP's shadow guards (none past the shadows' reach, faded with them: they had flickered on far canopy ground at
+  Low shadows); hex-tiling's skew and weights now match the reference (seams softer, the moss not brighter); a floating bit no longer
+  changes colour mid-fade; no per-frame closure in the ambient life; no material leaked when a renderer feature is created again.
+  Seen after the fixes: a rock troll's unblockable strike lying over a rocky slope, the moss from above.
