@@ -35,11 +35,12 @@ public sealed class RaidGroundLight
 
     public RaidGroundLight() { }
 
-    public RaidGroundLight(bool enabled, float relief, float bounce, Color bounceTint)
+    public RaidGroundLight(bool enabled, float relief, float bounce, Color bounceTint, float sunflecks = 0f)
     {
         this.enabled = enabled;
         this.relief = relief;
         this.bounce = bounce;
         this.bounceTint = bounceTint;
+        this.sunflecks = sunflecks;
     }
 }

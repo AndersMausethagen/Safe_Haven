@@ -180,7 +180,7 @@ public sealed class AmbientLife : MonoBehaviour
     // Keeps a swarm at its count round the view.
     private void Keep(Live swarm, Vector3 centre, float night, float rain)
     {
-        int missing = AmbientLifeProfile.CountFor(swarm.swarm, night, rain) - swarm.system.particleCount;
+        int missing = AmbientLifeProfile.CountFor(swarm.swarm, night, rain, Seasons.Fireflies) - swarm.system.particleCount;
         if (missing <= 0)
         {
             return;

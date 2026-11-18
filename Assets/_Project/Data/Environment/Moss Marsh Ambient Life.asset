@@ -23,6 +23,7 @@ MonoBehaviour:
     byDay: 90
     byNight: 50
     inRain: 0.1
+    summer: 1
     radius: 16
     wander: 0.45
     wanderFrequency: 3
@@ -45,6 +46,7 @@ MonoBehaviour:
     byDay: 5
     byNight: 0
     inRain: 0
+    summer: 1
     radius: 14
     wander: 2.6
     wanderFrequency: 0.7
@@ -67,6 +69,7 @@ MonoBehaviour:
     byDay: 30
     byNight: 0
     inRain: 0.2
+    summer: 1
     radius: 18
     wander: 0.3
     wanderFrequency: 0.8

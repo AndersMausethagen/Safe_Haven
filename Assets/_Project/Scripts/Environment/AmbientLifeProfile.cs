@@ -42,6 +42,9 @@ public sealed class AmbientLifeProfile : ScriptableObject
         [Min(0)] public int byNight;
         [Tooltip("The share left in full rain.")]
         [Range(0f, 1f)] public float inRain = 0.2f;
+        [Tooltip("Summer's life (insects, pollen, fluff): fewer as the year turns, as the fireflies are (Seasons; none in deep winter). " +
+                 "Off: all year (dust, leaves).")]
+        public bool summer;
         [Tooltip("Metres round the view they are kept in.")]
         [Min(1f)] public float radius = 16f;
         [Tooltip("How far each wanders by itself (metres a second), and how quickly it changes its mind.")]
@@ -93,8 +96,9 @@ public sealed class AmbientLifeProfile : ScriptableObject
         birds = flying ?? new Birds();
     }
 
-    /// <summary>How many of a swarm should be up at this darkness (0 day, 1 night) and rain (0-1). Pure, for tests.</summary>
-    public static int CountFor(Swarm swarm, float night, float rain)
+    /// <summary>How many of a swarm should be up at this darkness (0 day, 1 night), rain (0-1) and share of summer's life (Seasons;
+    /// 1 where there are no seasons). Pure, for tests.</summary>
+    public static int CountFor(Swarm swarm, float night, float rain, float summerShare = 1f)
     {
         if (swarm == null || swarm.gusts)
         {
@@ -102,6 +106,11 @@ public sealed class AmbientLifeProfile : ScriptableObject
         }
 
         float count = Mathf.Lerp(swarm.byDay, swarm.byNight, Mathf.Clamp01(night)) * Mathf.Lerp(1f, swarm.inRain, Mathf.Clamp01(rain));
+        if (swarm.summer)
+        {
+            count *= Mathf.Clamp01(summerShare);
+        }
+
         return Mathf.RoundToInt(count);
     }
 }

@@ -1,0 +1,138 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b684ea249be974cbc0bd19eabab532, type: 3}
+  m_Name: Haven Ambient Life
+  m_EditorClassIdentifier: SafeHaven::AmbientLifeProfile
+  swarms:
+  - name: Pollen and Fluff
+    material: {fileID: 2100000, guid: cc02644db33215c41b89d906179acd64, type: 2}
+    colour: {r: 1, g: 0.98, b: 0.88, a: 0.7}
+    colour2: {r: 0.99, g: 0.93, b: 0.72, a: 0.55}
+    size: {x: 0.025, y: 0.05}
+    height: {x: 0.4, y: 3}
+    life: {x: 6, y: 10}
+    byDay: 30
+    byNight: 0
+    inRain: 0.15
+    summer: 1
+    radius: 18
+    wander: 0.3
+    wanderFrequency: 0.35
+    withWind: 0.45
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    lieFlat: 0
+    spin: 0
+    gusts: 0
+    gustEvery: {x: 6, y: 14}
+    perGust: 24
+  - name: Dust Motes
+    material: {fileID: 2100000, guid: 25b42231470e51f4dae46decd64a3122, type: 2}
+    colour: {r: 1, g: 0.95, b: 0.82, a: 0.5}
+    colour2: {r: 1, g: 0.9, b: 0.72, a: 0.3}
+    size: {x: 0.02, y: 0.04}
+    height: {x: 0.6, y: 4}
+    life: {x: 6, y: 11}
+    byDay: 35
+    byNight: 0
+    inRain: 0.1
+    summer: 0
+    radius: 14
+    wander: 0.12
+    wanderFrequency: 0.25
+    withWind: 0.05
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    lieFlat: 0
+    spin: 0
+    gusts: 0
+    gustEvery: {x: 6, y: 14}
+    perGust: 24
+  - name: Butterflies
+    material: {fileID: 2100000, guid: 8325dbcb351fa3c408142cc3168e709f, type: 2}
+    colour: {r: 0.98, g: 0.96, b: 0.86, a: 1}
+    colour2: {r: 0.98, g: 0.86, b: 0.35, a: 1}
+    size: {x: 0.06, y: 0.09}
+    height: {x: 0.3, y: 1.6}
+    life: {x: 6, y: 11}
+    byDay: 7
+    byNight: 0
+    inRain: 0
+    summer: 1
+    radius: 16
+    wander: 1.6
+    wanderFrequency: 1.8
+    withWind: 0.1
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    lieFlat: 0
+    spin: 900
+    gusts: 0
+    gustEvery: {x: 6, y: 14}
+    perGust: 24
+  - name: Moths
+    material: {fileID: 2100000, guid: cc02644db33215c41b89d906179acd64, type: 2}
+    colour: {r: 0.92, g: 0.88, b: 0.78, a: 0.85}
+    colour2: {r: 0.8, g: 0.76, b: 0.66, a: 0.8}
+    size: {x: 0.04, y: 0.07}
+    height: {x: 0.2, y: 1.4}
+    life: {x: 4, y: 8}
+    byDay: 0
+    byNight: 12
+    inRain: 0.2
+    summer: 1
+    radius: 18
+    wander: 1.4
+    wanderFrequency: 2.2
+    withWind: 0
+    place: 2
+    columns: 0
+    columnRadius: 0.6
+    lieFlat: 0
+    spin: 0
+    gusts: 0
+    gustEvery: {x: 6, y: 14}
+    perGust: 24
+  - name: Birch Leaves in the Gust
+    material: {fileID: 2100000, guid: 8325dbcb351fa3c408142cc3168e709f, type: 2}
+    colour: {r: 0.62, g: 0.66, b: 0.22, a: 0.95}
+    colour2: {r: 0.78, g: 0.62, b: 0.2, a: 0.9}
+    size: {x: 0.05, y: 0.08}
+    height: {x: 0.2, y: 2}
+    life: {x: 4, y: 6}
+    byDay: 30
+    byNight: 0
+    inRain: 0.2
+    summer: 0
+    radius: 18
+    wander: 0.35
+    wanderFrequency: 0.8
+    withWind: 0.3
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    lieFlat: 0
+    spin: 330
+    gusts: 1
+    gustEvery: {x: 9, y: 18}
+    perGust: 14
+  birds:
+    enabled: 1
+    shadowMaterial: {fileID: 2100000, guid: 9cb13a4146ed9594e8a8454a883b38b9, type: 2}
+    every: {x: 30, y: 80}
+    altitude: {x: 24, y: 38}
+    speed: {x: 8, y: 12}
+    span: 1.7
+    mostInFlock: 3

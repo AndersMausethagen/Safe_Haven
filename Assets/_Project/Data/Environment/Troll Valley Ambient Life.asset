@@ -23,6 +23,7 @@ MonoBehaviour:
     byDay: 40
     byNight: 4
     inRain: 0.15
+    summer: 1
     radius: 18
     wander: 0.35
     wanderFrequency: 0.35
@@ -30,7 +31,7 @@ MonoBehaviour:
     place: 0
     columns: 0
     columnRadius: 0.6
-    stretch: 0
+    lieFlat: 0
     spin: 0
     gusts: 0
     gustEvery: {x: 6, y: 14}
@@ -45,6 +46,7 @@ MonoBehaviour:
     byDay: 30
     byNight: 0
     inRain: 0.2
+    summer: 0
     radius: 18
     wander: 0.3
     wanderFrequency: 0.8
@@ -52,7 +54,7 @@ MonoBehaviour:
     place: 0
     columns: 0
     columnRadius: 0.6
-    stretch: 0
+    lieFlat: 0
     spin: 30
     gusts: 1
     gustEvery: {x: 6, y: 12}
@@ -67,6 +69,7 @@ MonoBehaviour:
     byDay: 30
     byNight: 0
     inRain: 0.2
+    summer: 1
     radius: 18
     wander: 0.3
     wanderFrequency: 0.8
@@ -74,7 +77,7 @@ MonoBehaviour:
     place: 0
     columns: 0
     columnRadius: 0.6
-    stretch: 0
+    lieFlat: 0
     spin: 300
     gusts: 1
     gustEvery: {x: 8, y: 16}

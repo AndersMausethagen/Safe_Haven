@@ -387,3 +387,24 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   Low shadows); hex-tiling's skew and weights now match the reference (seams softer, the moss not brighter); a floating bit no longer
   changes colour mid-fade; no per-frame closure in the ambient life; no material leaked when a renderer feature is created again.
   Seen after the fixes: a rock troll's unblockable strike lying over a rocky slope, the moss from above.
+
+## Your next message ("do all this tuning on all scenes if it isnt. haven scene should also get a overhaul")
+
+### The Haven's overhaul and the prologue
+- **The ground light field in the Haven** (`SceneGroundLight`): built behind the loading screen from the Haven's terrain and its own
+  water (`ShoreGrid`: its ponds, tarns, lake, bog and rivers laid on a grid, shores spread out by distance). The Haven gets what the
+  raids got: wet sand and banks at every pond and river, rocks and logs sitting in the ground, the canopy's shade on the ground under
+  its trees (objects there already had it; the ground was lighter than what stood on it) and sun through the crowns. Its hours turn,
+  so no light is thrown back from one hour's sun, and the night's lift follows the clock. Relief kept gentle (0.25): the open Haven
+  is unchanged (the portal clearing measured the same), under trees it is about 4% darker. Load: about 4 s more behind the loading
+  screen (a 2048² cover over the whole 1 km Haven, read back once).
+- **Its sound:** the Haven keeps its own breeze; the forest's still night lies under it after dark; a woodpecker from its trees, ravens
+  off the terraces by day, plops in the ponds; the forest's reverb outdoors (a roof's room inside was already there).
+- **Its air:** pollen and fluff, dust motes in the sun, butterflies, moths at the lights at night, birch leaves in the gusts, a big
+  bird's shadow now and then. Insects, pollen and fluff thin out as the year turns (as the fireflies do), in every scene.
+- **Its water:** the ponds and tarns carry a few fallen leaves, the bog duckweed and rising gas (`Water Still (Haven)`, `Water Bog
+  (Haven)`); the Haven generator keeps a bog's own material through a regeneration.
+- **The prologue:** the Misty Woods' beds, owl, woodpecker and creaking trees in place of the shared wind loop, the forest's reverb,
+  plops in the morning lake, and the Woods' air life. No ground light field there: it has two terrains and the field covers one.
+- **Not done:** new MOSS beds made for the Haven: making them needs the Editor closed (the model takes 11 GB) and closing it was refused
+  this time. The prompts are in `Tools/Audio/biome_moss.py` (haven_bed_day, haven_bed_night) for when you allow it.

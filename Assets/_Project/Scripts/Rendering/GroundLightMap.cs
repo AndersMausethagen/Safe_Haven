@@ -84,6 +84,11 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     private float[] fieldWater;
     private float[] fieldNear;
     private float fieldLowest, fieldHighest = 1f;
+    // A scene whose hours turn (SceneGroundLight): the night's lift follows the clock, from the ground's mean light the field found.
+    private bool living;
+    private float fieldMean = 1f;
+    private float nextLift;
+    private DayNightCycle cycle;
     private float coverStrength;
     // The first build's recipe (its ground, colours and land's shade), kept until the late setup step has worked the field out again
     // from the finished map's cover.
@@ -159,6 +164,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         }
 
         terrain = null;
+        living = false;
+        cycle = null;
         fieldGround = null;
         fieldWater = null;
         fieldNear = null;
@@ -180,9 +187,11 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     /// <paramref name="groundColours"/> is the paint as colour (TerrainGrowth.GroundColours); <paramref name="water"/> says whether a
     /// point (metres from the terrain's corner) lies under water. Logs what each step took.
     /// </summary>
-    public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water, Func<Vector2, Vector2> shoreAt = null)
+    public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water, Func<Vector2, Vector2> shoreAt = null,
+        RaidGroundLight lookOverride = null, bool livingHours = false)
     {
         Clear();
+        living = livingHours;
         if (settings == null || !settings.GroundLight || cover == null || !cover.CanDraw || mapTerrain == null || mapTerrain.terrainData == null)
         {
             yield break;
@@ -228,7 +237,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             // Caches and resource nodes are placed after the map (RaidGenerator): once every setup step is done, the map is drawn
             // again, still behind the loading screen (Setup). Outside a scene's setup nothing is still to come.
             drawnAgainLater = SceneTransition.AddSetup(this);
-            RaidGroundLight look = GameSession.ActiveRaid?.Definition != null ? GameSession.ActiveRaid.Definition.GroundLight : null;
+            RaidGroundLight look = lookOverride ?? (GameSession.ActiveRaid?.Definition != null ? GameSession.ActiveRaid.Definition.GroundLight : null);
             if (look == null || !look.Enabled)
             {
                 Release(drawn);
@@ -476,6 +485,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     // Binds a built field: its two slices in a new texture (the bound one is unreadable once uploaded), and its night's lift.
     private void Show(GroundLightField.Result result)
     {
+        fieldMean = result.MeanGround;
         var made = new Texture2DArray(fieldSize, fieldSize, 2, TextureFormat.RGBA32, false, true)
         {
             name = "Ground Light", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear, hideFlags = HideFlags.HideAndDontSave,
@@ -553,6 +563,12 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
     private void LateUpdate()
     {
+        if (living && field != null && Time.unscaledTime >= nextLift)
+        {
+            nextLift = Time.unscaledTime + 1f;
+            LiveLift();
+        }
+
         if (cover == null || !cover.Pinned)
         {
             enabled = false;
@@ -932,6 +948,25 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
         readHalves = false;
         done(true);
+    }
+
+    // The night's lift at the clock's hour now, in a scene whose hours turn: as dark as it is, the ground lifted back to its mean.
+    private void LiveLift()
+    {
+        if (cycle == null)
+        {
+            cycle = FindAnyObjectByType<DayNightCycle>();
+        }
+
+        if (cycle == null || cycle.Profile == null)
+        {
+            return;
+        }
+
+        DayNightState state = cycle.Profile.Evaluate(cycle.Hour);
+        float dim = GroundLightField.LiftShare(state.Night, state.IsMoon ? 0f : state.Daylight, settings.LiftBelowSun);
+        Shader.SetGlobalVector(RectId, new Vector4(fieldArea.xMin, fieldArea.yMin, 1f / fieldArea.width,
+            GroundLightField.LiftAt(fieldMean, settings.NightLiftMost, dim)));
     }
 
     // Towards the sun (or the moon) at the run's hour, as the scene's day/night profile will set it (RaidSky sets the hour after

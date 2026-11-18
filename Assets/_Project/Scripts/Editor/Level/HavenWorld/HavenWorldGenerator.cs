@@ -84,6 +84,7 @@ public static class HavenWorldGenerator
         WorldLook.EnsureAll();
         var templates = new Templates(LiveFeatures());
         Material still = StillWater();
+        Material bog = StillWater(true);
         var made = new GameObject("World (generated)").transform;
         MakeFeatures(plan, templates, made);
         ClearOld(made);
@@ -95,7 +96,7 @@ public static class HavenWorldGenerator
         Paint(plan, terrain, heights);
         report.Append($"paint {clock.ElapsedMilliseconds} ms; ");
         Transform content = ContentRoot();
-        MakeWater(plan, terrain, still, content);
+        MakeWater(plan, terrain, still, content, bog);
         int trees = Woods(plan, terrain);
         report.Append($"woods {trees} trees {clock.ElapsedMilliseconds} ms; ");
         int grass = GrassSetup.FillByGround(terrain, GrassSetup.EnsureAssets(), GrassSetup.DefaultFill(terrain.terrainData), recipe.seed);
@@ -125,17 +126,25 @@ public static class HavenWorldGenerator
         data.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static Material StillWater()
+    // The still water's look as the scene has it now (kept through a regeneration): the ponds' and lakes', and the bog's own (it may carry
+    // duckweed and rising gas the clear ponds don't); the bog falls back to the ponds'.
+    private static Material StillWater(bool bog = false)
     {
+        Material any = null;
         foreach (WaterSurface water in Object.FindObjectsByType<WaterSurface>(FindObjectsInactive.Include))
         {
             if (water.IsStill && water.TryGetComponent(out MeshRenderer renderer) && renderer.sharedMaterial != null)
             {
-                return renderer.sharedMaterial;
+                if ((water.name == "Bog") == bog)
+                {
+                    return renderer.sharedMaterial;
+                }
+
+                any = any != null ? any : renderer.sharedMaterial;
             }
         }
 
-        return AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Generated/Water/Water Still.mat");
+        return any != null ? any : AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Generated/Water/Water Still.mat");
     }
 
     // The world's features, its water and woods are regenerated; the gameplay stays (05 Gameplay, 06 Story & Events, the overgrowth).
@@ -411,7 +420,7 @@ public static class HavenWorldGenerator
 
     // ----- Water -----
 
-    private static void MakeWater(HavenWorldPlan plan, Terrain terrain, Material material, Transform content)
+    private static void MakeWater(HavenWorldPlan plan, Terrain terrain, Material material, Transform content, Material bogMaterial = null)
     {
         var holder = new GameObject("Water").transform;
         holder.SetParent(content, false);
@@ -460,7 +469,7 @@ public static class HavenWorldGenerator
                 gone[i] = outward * (far + 4.5f);
             }
 
-            Water(holder, "Bog", plan.BogCentre, plan.BogLevel, shore, whole, gone, material, false);
+            Water(holder, "Bog", plan.BogCentre, plan.BogLevel, shore, whole, gone, bogMaterial != null ? bogMaterial : material, false);
         }
     }
 
@@ -1059,7 +1068,7 @@ public static class HavenWorldGenerator
             Object.DestroyImmediate(water.gameObject);
         }
 
-        MakeWater(plan, terrain, StillWater(), content);
+        MakeWater(plan, terrain, StillWater(), content, StillWater(true));
         foreach (string name in new[] { "Points of Interest", "Spawn Zones", "Resources", "Mountain Rocks", "Glades", "Along the Way", "Wildlife" })
         {
             Transform old = content.Find(name);

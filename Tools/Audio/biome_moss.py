@@ -64,6 +64,13 @@ SOUNDS = {
                    "A frog jumping into still pond water, one small wet plop and splash, close"),
     "marsh_bubbles": ("Moss Marsh", "shot", 5, 3,
                       "Marsh gas bubbles rising and popping slowly at the surface of a muddy bog pool, wet gurgles, close"),
+    # The Haven (the overhaul, 2026-11-18): a sheltered clearing, lighter and greener than the raids, its hours turning.
+    "haven_bed_day": ("Haven", "bed", 30, 2,
+                      "Ambience of a sheltered northern meadow clearing by day in summer: a soft breeze through birch leaves and long "
+                      "grass, a few small birds singing far off in the trees, a brook murmuring in the distance, calm and safe, field recording"),
+    "haven_bed_night": ("Haven", "bed", 30, 2,
+                        "Ambience of a quiet northern forest clearing at night: still cool air, the faintest breeze in the leaves, a "
+                        "distant brook murmuring, deep calm, no insects, no birds, field recording"),
     # Foley: steps the ground had none of, and plants against the legs.
     "steps_mud": ("Foley", "steps", 14, 2,
                   "Footsteps of one person walking slowly through deep wet mud and peat bog, squelching steps, boots, close"),

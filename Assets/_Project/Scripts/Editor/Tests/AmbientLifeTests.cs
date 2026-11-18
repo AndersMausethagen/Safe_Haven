@@ -25,6 +25,10 @@ public sealed class AmbientLifeTests
         Assert.AreEqual(0, AmbientLifeProfile.CountFor(new AmbientLifeProfile.Swarm { gusts = true, byDay = 30 }, 0f, 0f),
             "a gust's debris comes with the gust, not kept at a count");
         Assert.AreEqual(0, AmbientLifeProfile.CountFor(null, 0f, 0f));
+        var summer = new AmbientLifeProfile.Swarm { byDay = 20, summer = true };
+        Assert.AreEqual(20, AmbientLifeProfile.CountFor(summer, 0f, 0f), "no seasons: all of summer's life");
+        Assert.AreEqual(5, AmbientLifeProfile.CountFor(summer, 0f, 0f, 0.25f), "late in the year: a quarter");
+        Assert.AreEqual(20, AmbientLifeProfile.CountFor(new AmbientLifeProfile.Swarm { byDay = 20 }, 0f, 0f, 0f), "dust and leaves all year");
     }
 
     [TestCase("Misty Woods Ambient Life", "Dust Motes", "Moths")]
@@ -52,6 +56,8 @@ public sealed class AmbientLifeTests
     [TestCase("Assets/_Project/Scenes/Raids/Raid_MossMarsh.unity", "Moss Marsh Ambient Life")]
     [TestCase("Assets/_Project/Scenes/Raids/Encounter_BrukamsBridge.unity", "Troll Valley Ambient Life")]
     [TestCase("Assets/_Project/Scenes/Raids/Encounter_GuardiansHollow.unity", "Misty Woods Ambient Life")]
+    [TestCase("Assets/_Project/Scenes/SafeHaven.unity", "Haven Ambient Life")]
+    [TestCase("Assets/_Project/Scenes/Prologue_MistyWoods.unity", "Misty Woods Ambient Life")]
     public void EachRaidSceneHasItsBiomesLife(string scenePath, string profileName)
     {
         Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
