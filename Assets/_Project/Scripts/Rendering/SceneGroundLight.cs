@@ -7,17 +7,18 @@ using UnityEngine;
 /// The ground light field for a painted scene (the Haven; Docs/LookAndFeelResearch_2026-11-18.md, the Haven's overhaul): what a generated
 /// raid's map builds as it loads (GroundLightMap), worked out here behind the loading screen from the scene's own terrain and water: the
 /// land's shade in hollows, the canopy's shade on the ground, wet shores at every pond, tarn and river, rocks sitting in the ground and
-/// sun through the crowns. The scene's hours go on turning, so nothing in it is tied to one hour: no light thrown back from sunlit ground
-/// (that follows the sun's place), and the night's lift follows the clock (GroundLightMap › living hours).
+/// sun through the crowns. The scene's hours go on turning, so nothing in it is tied to one hour: the light thrown back from sunlit ground
+/// is the ground's colour (its colour map, GrassTerrainColour) times how much of the day's sun reaches it, lit by the sun as it is now
+/// (Graphics › Haven Sun Bounce), and the night's lift follows the clock (GroundLightMap › living hours).
 /// <para>Where it belongs: one per painted scene. Over several terrains (the prologue's meadow and forest) the field lies over all of
-/// them, their heights laid on one grid (FieldGround.Across). Its look is set here (Relief, Sunflecks; Bounce stays 0).</para>
+/// them, their heights laid on one grid (FieldGround.Across), without bounce (the colour maps are one terrain's). Its look is set here.</para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class SceneGroundLight : MonoBehaviour, ISceneSetup
 {
     [Tooltip("The scene's terrain. Empty: every terrain in this scene, the field over all of them.")]
     [SerializeField] private Terrain terrain;
-    [Tooltip("The field's look. Bounce is ignored: a scene whose hours turn throws back no light from one hour's sun.")]
+    [Tooltip("The field's look. Bounce is the day's: what sunlit ground throws back as the sun goes over (one terrain with a colour map).")]
     [SerializeField] private RaidGroundLight look = new RaidGroundLight(true, 0.25f, 0f, Color.white, 0.6f);
 
     /// <summary>After the scene's content (buildings from the save, resource nodes) and before the field's own late redraw.</summary>
@@ -93,9 +94,53 @@ public sealed class SceneGroundLight : MonoBehaviour, ISceneSetup
         }
 
         (FieldGround laid, ShoreGrid shores) = laying.Result;
-        var scene = new RaidGroundLight(true, look.Relief, 0f, Color.white, look.Sunflecks);
-        yield return map.Build(ground, null, null, shores != null ? shores.At : (System.Func<Vector2, Vector2>)null, scene, true,
-            terrains.Count > 1 ? laid : null, terrains);
+        // The ground's colours for the light it throws back: the terrain's colour map, read back once (one terrain only).
+        Color32[] colours = null;
+        Vector2Int colourSize = default;
+        if (terrains.Count == 1 && look.Bounce > 0f && ground.TryGetComponent(out GrassTerrainColour paint) && paint.ColourMap != null)
+        {
+            colours = ReadBack(paint.ColourMap, ColourSide, out colourSize);
+        }
+
+        var scene = new RaidGroundLight(true, look.Relief, colours != null ? look.Bounce : 0f, look.BounceTint, look.Sunflecks);
+        System.Func<Vector2, bool> underWater = null;
+        if (shores != null)
+        {
+            underWater = point =>
+            {
+                Vector2 shore = shores.At(point);
+                return !float.IsNaN(shore.x) && shore.y <= 0f;
+            };
+        }
+
+        yield return map.Build(ground, colours, underWater, shores != null ? shores.At : (System.Func<Vector2, Vector2>)null, scene, true,
+            terrains.Count > 1 ? laid : null, terrains, colourSize);
+    }
+
+    /// <summary>The side the colour map is read back at: finer than the field's bounce needs (it spreads over metres).</summary>
+    public const int ColourSide = 512;
+
+    // A colour map, readable or not, copied down to side x side through the GPU and read back (sRGB, as a raid's paint colours are).
+    private static Color32[] ReadBack(Texture source, int side, out Vector2Int size)
+    {
+        RenderTexture target = RenderTexture.GetTemporary(side, side, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        RenderTexture before = RenderTexture.active;
+        var copy = new Texture2D(side, side, TextureFormat.RGBA32, false, false);
+        try
+        {
+            Graphics.Blit(source, target);
+            RenderTexture.active = target;
+            copy.ReadPixels(new Rect(0, 0, side, side), 0, 0, false);
+            copy.Apply(false);
+            size = new Vector2Int(side, side);
+            return copy.GetPixels32();
+        }
+        finally
+        {
+            RenderTexture.active = before;
+            RenderTexture.ReleaseTemporary(target);
+            Destroy(copy);
+        }
     }
 
     /// <summary>Samples a side of the grid that several terrains are laid on (0.5 m apart over the prologue's 500 m).</summary>

@@ -48,6 +48,9 @@ public static class GameOptions
     public static readonly GameOption AmbientOcclusion = GameOption.Toggle("AmbientOcclusion", "Ambient Occlusion", "Soft shade where things meet the ground.", true);
     public static readonly GameOption ContactShadows = GameOption.Toggle("ContactShadows", "Contact Shadows",
         "The small shadows the sun's shadows miss from up here: under pebbles, grass clumps, feet and logs.", true);
+    // The user (2026-11-17): the Haven gets the raids' sun bounce too, "as a toggle in the graphics options if possible".
+    public static readonly GameOption HavenSunBounce = GameOption.Toggle("HavenSunBounce", "Haven Sun Bounce",
+        "In the Haven, sunlit ground throws a little of its light back into the shade around it, following the sun through the day.", true);
     public static readonly GameOption VolumetricFog = GameOption.Choice("VolumetricFog", "Volumetric Fog", "Detail of the fog and light shafts. Costly in the raid forests.", 2, "Low", "Medium", "High");
     public static readonly GameOption TerrainDetail = GameOption.Choice("TerrainDetail", "Terrain Detail", "How much the ground's surface is shaped by its stones and roots.", 3, "Off", "Low", "Balanced", "Ultra");
     public static readonly GameOption GroundImpacts = GameOption.Choice("GroundImpacts", "Ground Impacts", "Heavy blows blow the grass flat, throw up dust and leave marks in the ground for a while. Low leaves out the flying stones, leaves and most marks.", 2, "Off", "Low", "High");
@@ -103,7 +106,7 @@ public static class GameOptions
     }
 
     public static readonly IReadOnlyList<GameOption> Graphics = new[]
-        { Preset, RenderScale, Upscaling, AntiAliasing, Shadows, AmbientOcclusion, ContactShadows, VolumetricFog, TerrainDetail, GroundImpacts, GrassDensity, ViewDistance, TextureQuality };
+        { Preset, RenderScale, Upscaling, AntiAliasing, Shadows, AmbientOcclusion, ContactShadows, HavenSunBounce, VolumetricFog, TerrainDetail, GroundImpacts, GrassDensity, ViewDistance, TextureQuality };
 
     // ----- Graphics: look -----
 

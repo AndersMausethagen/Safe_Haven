@@ -51,6 +51,11 @@ public static class GroundLightField
         public Vector3[] Albedo;
         /// <summary>Unit vector towards the sun (or the moon) at the run's hour.</summary>
         public Vector3 TowardLight = Vector3.up;
+        /// <summary>For a scene whose hours turn (the Haven): the sun's way across the day, each unit vector with its weight (how strong
+        /// the sun is then). The thrown-back light is then the ground's colour times how much of the day's sun reaches it, and the shader
+        /// lights it with the sun as it is. Null: the one <see cref="TowardLight"/>.</summary>
+        public Vector3[] DayLights;
+        public float[] DayWeights;
         /// <summary>How much cover dims indirect light (SkyOcclusionMap's strength, 0-1).</summary>
         public float CoverStrength;
         /// <summary>How much the land's shade darkens (RaidGroundLight › Relief, 0 none).</summary>
@@ -165,7 +170,10 @@ public static class GroundLightField
         if (recipe.Bounce && recipe.Albedo != null && recipe.Albedo.Length == count)
         {
             // Whatever stands in a coarse cell shades it: the highest, not the average.
-            float[] lit = SunLight(coarseGround, Shrink(tops, size, every, true), coarse, coarseCell, recipe.TowardLight, recipe.SunReach);
+            float[] coarseTops = Shrink(tops, size, every, true);
+            float[] lit = recipe.DayLights != null && recipe.DayLights.Length > 0
+                ? DayLight(coarseGround, coarseTops, coarse, coarseCell, recipe.DayLights, recipe.DayWeights, recipe.SunReach)
+                : SunLight(coarseGround, coarseTops, coarse, coarseCell, recipe.TowardLight, recipe.SunReach);
             var albedo = new float[3][];
             for (int c = 0; c < 3; c++)
             {
@@ -388,6 +396,40 @@ public static class GroundLightField
     /// ground or anything standing towards the light within <paramref name="reach"/> metres, or under something standing over it.
     /// <paramref name="tops"/> holds the highest of the ground and whatever stands on it.
     /// </summary>
+    /// <summary>How much of the day's sun reaches each cell: <see cref="SunLight"/> for each of the sun's places, weighted (a weight of
+    /// 0 or below is left out).</summary>
+    public static float[] DayLight(float[] ground, float[] tops, int size, float cell, Vector3[] towardLights, float[] weights, float reach = 60f)
+    {
+        var day = new float[size * size];
+        float total = 0f;
+        for (int d = 0; d < towardLights.Length; d++)
+        {
+            float weight = weights != null && d < weights.Length ? weights[d] : 1f;
+            if (weight <= 0f)
+            {
+                continue;
+            }
+
+            float[] lit = SunLight(ground, tops, size, cell, towardLights[d], reach);
+            for (int i = 0; i < day.Length; i++)
+            {
+                day[i] += lit[i] * weight;
+            }
+
+            total += weight;
+        }
+
+        if (total > 0f)
+        {
+            for (int i = 0; i < day.Length; i++)
+            {
+                day[i] /= total;
+            }
+        }
+
+        return day;
+    }
+
     public static float[] SunLight(float[] ground, float[] tops, int size, float cell, Vector3 towardLight, float reach = 60f)
     {
         var lit = new float[size * size];

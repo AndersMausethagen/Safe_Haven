@@ -428,3 +428,15 @@ the night lift read that grid. Felled trees and gathered rocks redraw their patc
 left as it is instead of reading the wrong heights. The Haven and the raids go through the same path with their one terrain, as
 before. Seen in Play (isolated saves) at 08:30 in the forest, at the seam and in the meadow, the field on and off: the canopy's shade
 and sunflecks under the forest, no band at the seam, the open meadow unchanged.
+
+## The Haven's sun bounce, as a graphics option (your decision of 2026-11-17: "sun bounce too, as a toggle in the graphics options if possible")
+
+Built as **Graphics › Haven Sun Bounce** (on by default; the raids' bounce is always on). A raid's bounce is worked out for its one
+hour; the Haven's hours turn, so its field stores the ground's colour (the terrain's colour map, read back once at 512²) times how
+much of the **day's** sun reaches each spot (`GroundLightField.DayLight`: the sun's place at 07, 09, 11, 12:30, 14, 16 and 18 from the
+Haven's day/night profile, each weighted by how strong the sun is then), and the shaders light it with the sun as it is now, so it
+follows the day and fades at night. The option scales it live (within a second, no rebuild). Strength 1.2 with a pale green tint
+(0.95, 1, 0.85), the Valley's strength: at 0.8 it lifted the portal's stone by about one level of 255, which nobody would see; 1.2
+reads as a slight warm-green lift on stone, logs and walls facing sunlit ground, nothing on open ground (a flat surface takes a
+tenth). Cost: 0.86 s more behind the loading screen, about as much again in the late redraw. The prologue has none: over its two
+terrains there is no one colour map.

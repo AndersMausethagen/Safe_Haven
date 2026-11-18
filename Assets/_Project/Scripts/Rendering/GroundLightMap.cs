@@ -87,6 +87,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     // A scene whose hours turn (SceneGroundLight): the night's lift follows the clock, from the ground's mean light the field found.
     private bool living;
     private float fieldMean = 1f;
+    // The thrown-back light's tint × strength and the sunflecks, as bound; in a scene whose hours turn the bounce follows the
+    // Haven Sun Bounce option (GameOptions), checked with the night's lift.
+    private Vector4 bounceBound;
     private float nextLift;
     private DayNightCycle cycle;
     private float coverStrength;
@@ -200,7 +203,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     /// point (metres from the terrain's corner) lies under water. Logs what each step took.
     /// </summary>
     public IEnumerator Build(Terrain mapTerrain, Color32[] groundColours, Func<Vector2, bool> water, Func<Vector2, Vector2> shoreAt = null,
-        RaidGroundLight lookOverride = null, bool livingHours = false, FieldGround across = null, IReadOnlyList<Terrain> alsoOver = null)
+        RaidGroundLight lookOverride = null, bool livingHours = false, FieldGround across = null, IReadOnlyList<Terrain> alsoOver = null,
+        Vector2Int colourSize = default)
     {
         Clear();
         living = livingHours;
@@ -285,7 +289,9 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             float cell = side / size;
             int heightResolution = ground.Resolution;
             float[,] terrainHeights = ground.Heights;
-            int colourWidth = data.alphamapWidth, colourHeight = data.alphamapHeight;
+            // The ground's colours come at the paint's size (a raid's), or at their own (a painted scene's colour map, read back).
+            int colourWidth = colourSize.x > 0 ? colourSize.x : data.alphamapWidth;
+            int colourHeight = colourSize.y > 0 ? colourSize.y : data.alphamapHeight;
             Vector3 toward = TowardLight(out float hour, out float dim);
             ushort[] raw = halves;
             float[] coverHeights = heights;
@@ -311,6 +317,12 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
                 ReliefFarthest = settings.ReliefReach.y,
                 BounceSpread = settings.BounceSpread,
             };
+            if (living && recipe.Bounce)
+            {
+                // A scene whose hours turn: the light thrown back from what the day's sun reaches, lit by the sun as it is now.
+                DayLights(out recipe.DayLights, out recipe.DayWeights);
+            }
+
             times.Append($"terrain read {step.ElapsedMilliseconds} ms, ");
 
             // The arithmetic off the main thread, so the loading screen keeps moving.
@@ -362,7 +374,8 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             fieldHighest = result.HighestHeight;
             coverStrength = recipe.CoverStrength;
             Color tint = look.BounceTint.linear * look.Bounce;
-            Shader.SetGlobalVector(BounceId, new Vector4(tint.r, tint.g, tint.b, look.Sunflecks));
+            bounceBound = new Vector4(tint.r, tint.g, tint.b, look.Sunflecks);
+            BindBounce();
             Show(result);
             // Worked out again by the late setup step from the finished map's cover (Setup), the land's shade kept.
             recipe.KnownRelief = result.Relief;
@@ -1040,6 +1053,40 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         float dim = GroundLightField.LiftShare(state.Night, state.IsMoon ? 0f : state.Daylight, settings.LiftBelowSun);
         Shader.SetGlobalVector(RectId, new Vector4(fieldArea.xMin, fieldArea.yMin, 1f / fieldArea.width,
             GroundLightField.LiftAt(fieldMean, settings.NightLiftMost, dim)));
+        BindBounce();
+    }
+
+    // In a scene whose hours turn the thrown-back light is the player's choice (Graphics › Haven Sun Bounce); a raid's always shows.
+    private void BindBounce()
+    {
+        bool shown = !living || GameOptions.HavenSunBounce.On;
+        Shader.SetGlobalVector(BounceId, shown ? bounceBound : new Vector4(0f, 0f, 0f, bounceBound.w));
+    }
+
+    // The sun's way across the scene's day (its day/night profile), each place weighted by how strong the sun is there; none at night.
+    private void DayLights(out Vector3[] directions, out float[] weights)
+    {
+        if (cycle == null)
+        {
+            cycle = FindAnyObjectByType<DayNightCycle>();
+        }
+
+        float[] hours = { 7f, 9f, 11f, 12.5f, 14f, 16f, 18f };
+        directions = new Vector3[hours.Length];
+        weights = new float[hours.Length];
+        for (int i = 0; i < hours.Length; i++)
+        {
+            if (cycle == null || cycle.Profile == null)
+            {
+                directions[i] = Vector3.up;
+                weights[i] = i == 3 ? 1f : 0f;
+                continue;
+            }
+
+            DayNightState state = cycle.Profile.Evaluate(hours[i]);
+            directions[i] = -(state.LightRotation * Vector3.forward);
+            weights[i] = state.IsMoon ? 0f : state.Daylight * state.LightIntensity;
+        }
     }
 
     // Towards the sun (or the moon) at the run's hour, as the scene's day/night profile will set it (RaidSky sets the hour after

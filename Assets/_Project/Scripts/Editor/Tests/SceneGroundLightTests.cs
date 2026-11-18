@@ -59,12 +59,40 @@ public sealed class SceneGroundLightTests
     }
 
     [Test]
-    public void TheHavenCarriesItsField() => CarriesItsField("Assets/_Project/Scenes/SafeHaven.unity", 1);
+    public void TheDaysLight_IsTheSunsPlacesWeighted()
+    {
+        // Flat ground 16 cells of 1 m with a wall 10 m high along x = 8: the morning sun (from +x) is blocked west of it, the evening
+        // sun (from -x) east of it. Over the day, each side gets about half; a weight of 0 (night) adds nothing.
+        const int size = 16;
+        var ground = new float[size * size];
+        var tops = new float[size * size];
+        for (int z = 0; z < size; z++)
+        {
+            tops[z * size + 8] = 10f;
+        }
+
+        Vector3 morning = new Vector3(1f, 0.5f, 0f).normalized, evening = new Vector3(-1f, 0.5f, 0f).normalized;
+        float[] westMorning = GroundLightField.SunLight(ground, tops, size, 1f, morning);
+        float[] day = GroundLightField.DayLight(ground, tops, size, 1f, new[] { morning, evening, Vector3.down }, new[] { 1f, 1f, 0f });
+        int west = 8 * size + 5, east = 8 * size + 11;
+        Assert.Less(westMorning[west], 0.5f, "the wall shades the morning sun west of it");
+        float open = GroundLightField.SunLight(ground, tops, size, 1f, evening)[west]; // the evening's sun there, unblocked
+        Assert.Greater(open, 0.3f);
+        Assert.AreEqual(open * 0.5f, day[west], 0.02f, "over the day, half the sun: the evening's, not the morning's");
+        Assert.AreEqual(open * 0.5f, day[east], 0.02f, "and east of the wall, the morning's");
+        CollectionAssert.Contains(GameOptions.Graphics, GameOptions.HavenSunBounce, "a graphics option");
+        Assert.AreEqual(1f, GameOptions.HavenSunBounce.Default, "on by default: the game as designed");
+    }
 
     [Test]
-    public void ThePrologueCarriesItsField_OverBothTerrains() => CarriesItsField("Assets/_Project/Scenes/Prologue_MistyWoods.unity", 2);
+    public void TheHavenCarriesItsField() => CarriesItsField("Assets/_Project/Scenes/SafeHaven.unity", 1, true);
 
-    private static void CarriesItsField(string path, int terrains)
+    [Test]
+    public void ThePrologueCarriesItsField_OverBothTerrains() => CarriesItsField("Assets/_Project/Scenes/Prologue_MistyWoods.unity", 2, false);
+
+    // The Haven throws light back from the day's sun (the user, 2026-11-17: "sun bounce too, as a toggle in the graphics options"):
+    // from its terrain's colour map. Over the prologue's two terrains there is no one colour map, so none.
+    private static void CarriesItsField(string path, int terrains, bool bounces)
     {
         Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Additive);
         try
@@ -73,7 +101,13 @@ public sealed class SceneGroundLightTests
             Assert.AreEqual(1, found.Length, "one per scene");
             Assert.AreEqual(terrains, found[0].Terrains().Count(t => t.gameObject.scene == scene), "the terrains it lies over");
             Assert.IsTrue(found[0].Look.Enabled);
-            Assert.AreEqual(0f, found[0].Look.Bounce, "its hours turn: no light thrown back from one hour's sun");
+            if (bounces)
+            {
+                Assert.That(found[0].Look.Bounce, Is.InRange(0.3f, 1.2f), "light thrown back from the day's sun, about the raids'");
+                Terrain ground = found[0].Terrains()[0];
+                Assert.IsTrue(ground.TryGetComponent(out GrassTerrainColour paint) && paint.ColourMap != null, "the ground's colours come from its colour map");
+            }
+
             Assert.Greater(found[0].Look.Sunflecks, 0f, "sun through the crowns");
             Assert.That(found[0].Look.Relief, Is.InRange(0.05f, 0.4f), "a gentle land's shade: the Haven stays light");
         }
