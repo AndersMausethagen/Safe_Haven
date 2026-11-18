@@ -560,6 +560,9 @@ public sealed class QuestTests
         // The playtests of 2026-11-14 and 11-15 freed Ingrid three times on one raid: her interaction stayed on after the first.
         var resident = UnityEditor.AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset");
         Assert.IsNotNull(resident);
+        // Her thanks build the dialogue box on first use (DialogueBox.Current), and its portrait camera: left in the open scene, they
+        // came back into the next Play-mode test without their wiring and threw every frame (SceneSmokeLiveTests).
+        var rootsBefore = new HashSet<GameObject>(UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects());
         var body = new GameObject("Traveller");
         int freed = 0;
         void Count(GameEvent gameEvent) => freed += gameEvent.Kind == GameEventKind.PersonFreed ? 1 : 0;
@@ -582,7 +585,18 @@ public sealed class QuestTests
         finally
         {
             GameEvents.Raised -= Count;
-            Object.DestroyImmediate(body);
+            var made = new List<Object>();
+            foreach (GameObject root in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                if (!rootsBefore.Contains(root))
+                {
+                    made.Add(root);
+                }
+            }
+
+            // The portrait first: the box's OnDestroy would Destroy it, which edit mode refuses.
+            made.Sort((a, b) => (a.name.Contains("Portrait") ? 0 : 1).CompareTo(b.name.Contains("Portrait") ? 0 : 1));
+            TestCleanup.Destroy(made);
         }
     }
 

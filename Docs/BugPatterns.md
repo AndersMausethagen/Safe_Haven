@@ -244,6 +244,17 @@ From the playtest logs read as data (1,470 runs scanned for once-only events rep
   wild horse, the prologue's training dummy) and the Haven's breakables. A kill quest with no creature set counts by side, and only
   the dummy is on the enemies' (Eirik's lesson comes before any quest that counts kills), so none counts today.
 
+**What a test leaves in the open scene comes back into the next Play-mode test.** The whole suite failed once on this round's own new
+test: freeing a traveller in edit mode thanked the player through `DialogueBox.Current`, which builds the dialogue box and its portrait
+camera on first use. Left in the runner's scene, they came back into the smoke test's Play mode without their wiring (private fields
+aren't serialized) and threw every frame. The second time (a bare Main Camera left by a test once took over Play). The test removes
+what it made.
+
+Left open (needs a look in the game, so not done blind): `CreatureLook` reads `renderer.materials` (three places), which copies every
+material of every creature it touches ("Wolf Main (Instance)"); the copies are never destroyed and are freed only when the raid's
+scene goes. Round 3's "made in code" rule looks for `new Material`, not for this getter. Material property blocks would change
+nothing on screen and copy nothing, but the eyes need checking close up after.
+
 Scanned across all runtime scripts and found clean, so not made into tests:
 
 - **Written to one's own Haven, read from the one stood in** (every file using both `GameSession.Home` and `Here`, 19): each runs only
