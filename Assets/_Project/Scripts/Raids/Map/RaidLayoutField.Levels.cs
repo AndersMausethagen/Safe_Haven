@@ -12,9 +12,16 @@ public sealed partial class RaidLayoutField
 
     private const float LevelBlend = 9f;
 
+    // A rise between two places from CliffFrom blends ever more steeply, and from CliffFull it is a cliff. For terraces lower than that
+    // (low shelves, Docs/WorldDesignReview_2026-11-17.md G7: 1.5-3 m in the Valley's stony moods) both scale down with the step, so one
+    // level's rise is still a cliff, not a 9 m slope. A 7 m terrace (the Woods' Gorges) keeps these as they were.
     private const float CliffFrom = 2.5f;
 
     private const float CliffFull = 4.5f;
+
+    private float CliffStart => Mathf.Min(CliffFrom, plan.TerraceHeight * 0.45f);
+
+    private float CliffSharp => Mathf.Min(CliffFull, plan.TerraceHeight * 0.85f);
 
     // Every trail, spur, clearing and pocket has a height: a clearing its level's, a trail climbing from one end's to the other's (a ramp
     // that eases in and out between the clearings' edges), a spur or pocket the height where it starts. The wild ground takes the height
@@ -155,7 +162,7 @@ public sealed partial class RaidLayoutField
         }
 
         float rise = Mathf.Abs(nearHeight[index] - otherHeight[index]);
-        float width = Mathf.Lerp(LevelBlend, 0.05f, Mathf.InverseLerp(CliffFrom, CliffFull, rise));
+        float width = Mathf.Lerp(LevelBlend, 0.05f, Mathf.InverseLerp(CliffStart, CliffSharp, rise));
         float near = Mathf.SmoothStep(0f, 1f, 0.5f + (otherDistance[index] - nearDistance[index]) / width);
         return Mathf.Lerp(otherHeight[index], nearHeight[index], near);
     }

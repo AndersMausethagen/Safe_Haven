@@ -50,7 +50,8 @@ Until you choose, the old test (base slots) still holds, and a second test with 
 
 ### The weather foretold in the briefing (research W3)
 - The briefing now says the sky a run opens in and what it does, from the rules themselves: "The sky as you go: Rain. Your steps
-  carry 60% as far, and fire won't take. It may turn." (rain in a snowing season is "Snow: the cold bites in the open"; fog and mist
+  carry 79% as far, and fire won't take. It may turn." (rain muffles steps only a little today: Perception Settings › Noise In Rain
+  0.7 at full rain) (rain in a snowing season is "Snow: the cold bites in the open"; fog and mist
   "little can be seen far off"; storms "lightning").
 - **The raid really opens in it** (seeded like the hour, so friends share it): before, every run opened in its scene's start
   weather (the Woods always in Mist). Now the climate's chances pick it: the Woods about half Mist, a third Breezy + Mist, a sixth
@@ -59,3 +60,11 @@ Until you choose, the old test (base slots) still holds, and a second test with 
   Mist with the ground already wet.
 - **Not built (the research's other weather rules):** fog shortening sight for both sides, a storm's thunder masking the beacon,
   snow leaving tracks for hunters. The line only names what the game does today.
+
+### Low rock shelves in the Valley's stony moods (world review G7)
+- Scree and Stone and Gorge Narrows stand on two levels 3 m apart (terraces 2, 60 m patches). The height field made a one-level
+  rise below 4.5 m into a 9 m slope, not a step; its cliff thresholds now scale down with a low terrace, so 3 m is a shelf. A 7 m
+  terrace (the Woods' Gorges) keeps its numbers: the Woods' pinned layouts are unchanged (golden tests pass).
+- **Rare in practice:** in a narrow valley, clearings and trails sit too close to have a cliff between, so they share a level; about
+  6 seeds in 400 raise two or more clearings. Seen in a launched Valley (seed 19): a raised clearing with a ramp up and rock at the
+  step. Making shelves common needs the planner to leave room for them (its shared-level groups): not done.
