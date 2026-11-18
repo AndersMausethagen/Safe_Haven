@@ -8,6 +8,8 @@
 //   Faster and steeper water turns whiter, murkier and foamier.
 // - Foam where the bed or a stone comes near the surface, trailing downstream behind stones (upstream depth taps),
 //   on fast or falling water, and around WaterInteractor foam spots (_WaterFoamSpots: x, z, radius, strength).
+// - Foam streaks drawn out along a river's current (its mesh UV runs along it), where it runs fast (Docs/LookAndFeelResearch_2026-11-18.md W2).
+// - Floating bits (W5): duckweed or leaves, procedural, in drifts, carried by the current or the wind; slow bubble rings in still pools.
 // - Ripples from the player and splashing stones (the WaterRipples height field: _WaterRippleTex / _WaterRippleRect),
 //   rain rings (_SafeHavenRain) and wind chop (MossWind's _SafeHavenWind).
 // Without the camera depth / opaque textures (e.g. the Mobile renderer) WaterSurface turns on SAFE_HAVEN_WATER_SIMPLE:
@@ -54,6 +56,15 @@ Shader "Safe Haven/Water"
         _FoamTrail ("Foam Trail Behind Stones (metres)", Range(0, 4)) = 1.2
         _SpeedFoam ("Foam from Speed", Range(0, 1)) = 0.5
         _FallFoam ("Foam on Steep Water", Range(0, 1)) = 0.85
+        _FoamStreaks ("Foam Streaks Along the Current (rivers)", Range(0, 1)) = 0
+        [Header(Floating)]
+        _Floating ("Floating Bits (duckweed, leaves; 0 none)", Range(0, 1)) = 0
+        _FloatingColor ("Floating Colour", Color) = (0.3, 0.42, 0.1, 1)
+        _FloatingColor2 ("Floating Colour (second)", Color) = (0.45, 0.52, 0.14, 1)
+        _FloatingSize ("Floating Bit Size (metres)", Range(0.02, 0.4)) = 0.07
+        _FloatingLong ("Floating Bit Length (1 round, more for leaves)", Range(1, 3)) = 1
+        _FloatingPatches ("Floating Drift Size (metres)", Range(1, 30)) = 5
+        _Bubbles ("Bubbles Rising (rings in still water)", Range(0, 1)) = 0
         [Header(Underwater)]
         [NoScaleOffset] _CausticsMap ("Caustics", 2D) = "black" {}
         _Caustics ("Caustics Strength", Range(0, 2)) = 0.6
@@ -108,6 +119,8 @@ Shader "Safe Haven/Water"
                 float _Reflection, _Refraction, _FlowSpeed, _FallSpeed, _FallTiling, _VertexAlpha, _Cull, _SteepFaces;
                 float _FoamTiling, _ShoreFoam, _FoamTrail, _SpeedFoam, _FallFoam, _Caustics, _CausticsTiling;
                 float _RippleStrength, _RainRipples, _FlowFromMesh;
+                half4 _FloatingColor, _FloatingColor2;
+                float _FoamStreaks, _Floating, _FloatingSize, _FloatingLong, _FloatingPatches, _Bubbles;
             CBUFFER_END
             // Ripple height field (WaterRipples): R = height. UV = (xz - rect.xy) * rect.z; rect.w = one texel in UV.
             TEXTURE2D(_WaterRippleTex); SAMPLER(sampler_WaterRippleTex);
@@ -283,6 +296,64 @@ Shader "Safe Haven/Water"
                 return ripples;
             }
 
+            // Duckweed or leaves afloat (W5): one bit to a cell (tighter as the amount rises), each its own place, size, turn and shade,
+            // only in drifts of slow noise with open water between. p in metres; tone picks between the two colours.
+            half FloatingBits(float2 p, out half tone)
+            {
+                tone = 0;
+                float size = max(_FloatingSize, 0.01);
+                float cell = size * lerp(3.2, 1.3, saturate(_Floating));
+                float2 g = p / cell;
+                float2 id = floor(g);
+                half best = 0;
+                [unroll] for (int y = -1; y <= 1; y++)
+                {
+                    [unroll] for (int x = -1; x <= 1; x++)
+                    {
+                        float2 c = id + float2(x, y);
+                        float h1 = frac(sin(dot(c, float2(127.1, 311.7))) * 43758.5453);
+                        float h2 = frac(sin(dot(c, float2(269.5, 183.3))) * 43758.5453);
+                        float h3 = frac(sin(dot(c, float2(419.2, 371.9))) * 43758.5453);
+                        float2 d = (g - c - float2(h1, h2)) * cell;
+                        float angle = h3 * 6.2831853;
+                        float sn, cs;
+                        sincos(angle, sn, cs);
+                        float2 turned = float2(d.x * cs - d.y * sn, d.x * sn + d.y * cs);
+                        half bit;
+                        if (_FloatingLong > 1.05)
+                        {
+                            // A leaf: pointed at both ends, its own size, some sodden (darker, half sunk).
+                            float r = size * lerp(0.45, 1.1, h3) * 0.5;
+                            float along = turned.y / (r * _FloatingLong);
+                            float edge = abs(turned.x) - r * saturate(1.0 - along * along);
+                            bit = (1.0 - smoothstep(-r * 0.3, 0.0, edge)) * step(abs(along), 1.0) * lerp(0.5, 1.0, h1);
+                        }
+                        else
+                        {
+                            float r = size * lerp(0.6, 1.0, h3) * 0.5;
+                            bit = 1.0 - smoothstep(r * 0.7, r, length(turned));
+                        }
+
+                        if (bit > best)
+                        {
+                            best = bit;
+                            tone = h2;
+                        }
+                    }
+                }
+
+                float2 q = p / max(_FloatingPatches, 0.5);
+                half drift = SeasonSnowNoise(q) * 0.7 + SeasonSnowNoise(q * 2.3 + 3.1) * 0.3;
+                half from = lerp(0.66, 0.4, saturate(_Floating));
+                half bits = best * smoothstep(from, from + lerp(0.14, 0.15, saturate(_Floating)), drift);
+                // A thick drift (duckweed above half) closes into a mat at its heart, the loose bits round its edge; a few leaves never do.
+                half mat = smoothstep(from + 0.14, from + 0.26, drift) * saturate((_Floating - 0.4) * 2.5);
+                // Torn and uneven: open water shows through a mat in specks, its shade wanders.
+                mat *= smoothstep(0.28, 0.55, SeasonSnowNoise(p * 1.7 + 4.3) * 0.65 + SeasonSnowNoise(p * 4.1 + 1.9) * 0.35);
+                tone = lerp(tone, SeasonSnowNoise(p * 0.9 + 7.7), mat);
+                return max(bits, mat * lerp(0.65, 1.0, best));
+            }
+
             // Tangent-space ripples of steep water along the mesh UV: long streaks running down at the fall speed.
             half3 FallRipples(float2 uv, float speed, float time, half strength)
             {
@@ -421,6 +492,11 @@ Shader "Safe Haven/Water"
                     {
                         slope += RainRings(positionWS.xz, time, _SafeHavenRain) * (_RainRipples * 0.6);
                     }
+                    if (_Bubbles > 0.001 && flatSpeed < 0.05)
+                    {
+                        // Gas rising in a still pool: a ring now and then, slow and few (the rain's rings, sparse).
+                        slope += RainRings(positionWS.xz * 0.8 + 11.3, time * 0.45, _Bubbles * 0.12) * 0.45;
+                    }
                     ripples.xy -= slope;
                     half3 flatNormal = normalize(half3(ripples.x, ripples.z, ripples.y));
                     normal = flatNormal;
@@ -547,6 +623,21 @@ Shader "Safe Haven/Water"
                     foamFlat = lerp(f1, f0, 1.0 - abs(1.0 - 2.0 * t0));
                 }
                 half pattern = foamFlat.r;
+                // Streaks drawn out along a river's current where it runs fast (W2): its mesh UV runs along it (x across, y down the run,
+                // in metres), so the foam is stretched five times along the flow and carried at the local speed in two cross-faded phases.
+                half streak = 0;
+                if (_FoamStreaks > 0.001 && _FlowFromMesh > 0.5 && flatSpeed > 0.4 && steep < 0.5)
+                {
+                    float cycle = 3.0;
+                    float t0 = frac(time / cycle);
+                    float t1 = frac(time / cycle + 0.5);
+                    float2 streakUV = float2(input.uv.x, input.uv.y * 0.2) / max(_FoamTiling, 0.05);
+                    float run = flatSpeed * cycle * 0.2 / max(_FoamTiling, 0.05);
+                    half s0 = SAMPLE_TEXTURE2D(_FoamMap, sampler_FoamMap, streakUV - float2(0, run * t0)).r;
+                    half s1 = SAMPLE_TEXTURE2D(_FoamMap, sampler_FoamMap, streakUV - float2(0, run * t1) + 0.5).r;
+                    half s = lerp(s1, s0, 1.0 - abs(1.0 - 2.0 * t0));
+                    streak = smoothstep(0.55, 0.8, s) * saturate((flatSpeed - 0.5) / 2.0) * _FoamStreaks;
+                }
                 shore = 1.0 - saturate(shoreDepth / max(_ShoreFoam * lerp(0.3, 1.6, foamFlat.g), 0.01)); // uneven foam line
                 if (steep > 0.01)
                 {
@@ -562,7 +653,7 @@ Shader "Safe Haven/Water"
                     half near = saturate(1.0 - distance(positionWS.xz, spot.xy) / max(spot.z, 1e-3));
                     spots += near * near * spot.w;
                 }
-                half mask = saturate(shore * shore * shore * 0.5 + trail * 0.7 + spots + rippleFoam
+                half mask = saturate(shore * shore * shore * 0.5 + trail * 0.7 + spots + rippleFoam + streak * 0.7
                                      + _SpeedFoam * saturate((flatSpeed - 1.0) / 3.0) * 0.45 * (1.0 - steep)
                                      + _FallFoam * steep * 0.9);
                 mask *= lerp(0.75, 1.25, foamFlat.g); // break up the edges
@@ -577,6 +668,38 @@ Shader "Safe Haven/Water"
                 #endif
                 half3 colour = lerp(water, reflection, fresnel * _Reflection * (1.0 - white * 0.5)) + glint * (1.0 - white);
                 half3 foamLight = sun.color * sun.shadowAttenuation * saturate(dot(surfaceNormal, sun.direction)) * 0.8 + ambient;
+                // Floating bits, under the foam: carried by the current (cross-faded phases where it turns along the mesh), else drifting
+                // with the wind. Not on falls.
+                half bits = 0;
+                half tone = 0;
+                if (_Floating > 0.001 && steep < 0.5)
+                {
+                    float2 windDir = dot(_SafeHavenWind.xy, _SafeHavenWind.xy) > 1e-4 ? normalize(_SafeHavenWind.xy) : float2(0.6, 0.8);
+                    float2 carried = flatSpeed > 0.02 ? input.flow * 0.85 : windDir * 0.035;
+                    if (_FlowFromMesh > 0.5 && flatSpeed > 0.02)
+                    {
+                        float cycle = 7.0;
+                        float t0 = frac(time / cycle);
+                        float t1 = frac(time / cycle + 0.5);
+                        half w0 = 1.0 - abs(1.0 - 2.0 * t0);
+                        half tone0, tone1;
+                        half b0 = FloatingBits(positionWS.xz - carried * cycle * t0, tone0);
+                        half b1 = FloatingBits(positionWS.xz - carried * cycle * t1 + 17.3, tone1);
+                        bits = lerp(b1, b0, w0);
+                        tone = w0 > 0.5 ? tone0 : tone1;
+                    }
+                    else
+                    {
+                        bits = FloatingBits(positionWS.xz - carried * time, tone);
+                    }
+
+                    bits *= 1.0 - white;
+                    half3 floating = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone) * foamLight;
+                    colour = lerp(colour, floating, bits);
+                    #if defined(SAFE_HAVEN_WATER_SIMPLE)
+                        alpha = saturate(alpha + bits);
+                    #endif
+                }
                 colour = lerp(colour, _FoamColor.rgb * foamLight, foam);
                 #if defined(SAFE_HAVEN_WATER_SIMPLE)
                     alpha = saturate(alpha + foam + fresnel * 0.5);

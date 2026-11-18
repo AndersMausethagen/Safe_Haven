@@ -62,6 +62,26 @@ void GroundLightApply(half factor, inout half occlusion, inout half3 bakedGI)
     bakedGI *= max(factor, 1.0);
 }
 
+// The surface of the water at or near a point (world metres), where a raid's field holds one (slice 1's blue, within Shore Reach of
+// an edge and everywhere inside the water): what a warning over a pool lies on (GroundTelegraph.shader). False elsewhere.
+bool GroundLightWaterLevel(float3 positionWS, out float level)
+{
+    level = 0.0;
+    bool found = false;
+    UNITY_BRANCH if (_GroundLightHeights.z > 0.5)
+    {
+        half4 ground = GroundLightAt(positionWS, 1);
+        if (ground.b > 0.003)
+        {
+            level = _GroundLightHeights.x + ground.g * _GroundLightHeights.y
+                + (ground.b * 255.0 - 1.0) / 254.0 * 2.0 * _GroundLightHeights.w - _GroundLightHeights.w;
+            found = true;
+        }
+    }
+
+    return found;
+}
+
 // How wet a shore is at a point (0-1; Docs/LookAndFeelResearch_2026-11-18.md 4.6): a band darker and glossier for a hand's breadth
 // above the nearest water, as real banks are. Slice 1's blue holds the water's surface as metres from the cell's ground (its green), ± w
 // (0 where none is near); both filter linearly, so their sum is the flat surface between cells too. 0 without a field.

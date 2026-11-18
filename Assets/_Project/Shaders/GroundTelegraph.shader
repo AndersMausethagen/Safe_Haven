@@ -42,6 +42,7 @@ Shader "Safe Haven/Ground Telegraph"
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
+            #include "Assets/_Project/Shaders/GroundLight.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _BaseColor;
@@ -88,12 +89,28 @@ Shader "Safe Haven/Ground Telegraph"
                     raw = lerp(UNITY_NEAR_CLIP_VALUE, 1, raw);
                 #endif
                 float3 world = ComputeWorldSpacePosition(screenUV, raw, UNITY_MATRIX_I_VP);
-                float3 local = TransformWorldToObject(world);
-                float r = length(local.xz);
                 // The surface's slope, from the depth itself: ground and rock tops take the mark, legs and walls don't.
                 float3 facing = normalize(cross(ddy(world), ddx(world)));
                 half level = smoothstep(0.35, 0.65, abs(facing.y));
-                UNITY_BRANCH if (_GroundMarkScale.w > 0.5)
+                // Under water (the depth holds the bed: water writes none) a raid's field knows the surface: the mark lies on the water
+                // where the eye meets it, so a lob into a pool is drawn on the pool, not shifted and cut off on its bed.
+                float waterLevel;
+                bool onWater = false;
+                if (GroundLightWaterLevel(world, waterLevel) && world.y < waterLevel - 0.03)
+                {
+                    float3 eye = GetCameraPositionWS();
+                    float3 ray = world - eye;
+                    if (ray.y < -1e-4)
+                    {
+                        world = eye + ray * saturate((waterLevel - eye.y) / ray.y);
+                        onWater = true;
+                        level = 1.0;
+                    }
+                }
+
+                float3 local = TransformWorldToObject(world);
+                float r = length(local.xz);
+                UNITY_BRANCH if (_GroundMarkScale.w > 0.5 && !onWater)
                 {
                     float2 heightUV = (world.xz - _GroundMarkPlace.xy) * _GroundMarkPlace.zw + _GroundMarkScale.z;
                     float ground = _GroundMarkScale.x + SAMPLE_TEXTURE2D_LOD(_GroundMarkHeightmap, sampler_GroundMark_linear_clamp, heightUV, 0).r * _GroundMarkScale.y;

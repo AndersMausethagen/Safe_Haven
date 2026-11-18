@@ -210,4 +210,53 @@ public sealed class WaterTests
         Assert.AreEqual(1f, maps[16, 16, 0] + maps[16, 16, 1], 1e-3f);
         Assert.AreEqual(1f, maps[4, 4, 0], 1e-3f, "outside keeps its layer");
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md W3: a river runs faster where it narrows or falls, slower at its banks, faster round the
+    // outside of a bend; the strip's flow (uv2) carries it, which the shader whitens, streaks and clouds.
+    [Test]
+    public void ARiverRunsFasterWhereItNarrowsOrFallsAndRoundTheOutsideOfABend()
+    {
+        var line = new List<Vector2>();
+        for (int i = 0; i < 21; i++)
+        {
+            line.Add(new Vector2(0f, i * 2f));
+        }
+
+        // Narrow in the middle (1 m half width against 3), falling over the last stretch (10 cm a metre).
+        float[] along = RaidMapGenerator.FlowAlong(line, i => i >= 8 && i <= 12 ? 1f : 3f, i => i >= 16 ? 10f - (i - 16) * 0.2f : 10f);
+        Assert.Greater(along[10], along[3] * 1.4f, "faster through the neck");
+        Assert.Greater(along[18], along[3] * 1.4f, "faster where it falls");
+        Assert.AreEqual(1f, along[3], 0.05f, "its everyday speed where it is its usual width on the level");
+        Assert.Less(Mathf.Abs(along[9] - along[8]), 0.25f, "eased: never a jump");
+
+        Assert.AreEqual(0.55f, RaidMapGenerator.FlowAcross(1f, 0f), 1e-4f, "slower at the bank");
+        Assert.AreEqual(1f, RaidMapGenerator.FlowAcross(0f, 0.5f), 1e-4f, "the middle runs at its speed whatever the bend");
+        Assert.Greater(RaidMapGenerator.FlowAcross(0.5f, 0.3f), RaidMapGenerator.FlowAcross(-0.5f, 0.3f), "turning left, the right (outside) runs faster");
+
+        var bend = new List<Vector2> { new Vector2(0f, 0f), new Vector2(0f, 2f), new Vector2(0f, 4f), new Vector2(-1f, 5.7f), new Vector2(-2.5f, 7f), new Vector2(-4.5f, 7.6f) };
+        Assert.Greater(RaidMapGenerator.Bends(bend)[3], 0f, "a left turn bends above zero");
+
+        Mesh strip = RaidMapGenerator.WaterStrip(line, i => 3f, i => 10f, i => 3f, 1f, out _);
+        created.Add(strip);
+        float middle = strip.uv2[10 * 5 + 2].magnitude, bank = strip.uv2[10 * 5 + 0].magnitude;
+        Assert.Greater(middle, bank * 1.5f, "the strip carries it: the middle runs faster than the banks");
+    }
+
+    // W2, W5: the raids' waters carry their own life: streaks on the rivers, duckweed and bubbles in the marsh, a few leaves in the woods.
+    [Test]
+    public void EachRaidsWaterCarriesItsOwnLife()
+    {
+        Material Load(string name) => AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Art/Generated/Water/" + name + ".mat");
+        Assert.Greater(Load("Water River (Valley)").GetFloat("_FoamStreaks"), 0.3f, "the Valley's river streaks");
+        Assert.Greater(Load("Water River (World)").GetFloat("_FoamStreaks"), 0.3f);
+        Assert.Greater(Load("Water Fen").GetFloat("_Floating"), 0.4f, "duckweed on the fen");
+        Assert.Greater(Load("Water Fen").GetFloat("_Bubbles"), 0f, "and gas rising");
+        Assert.Greater(Load("Water Still (Woods)").GetFloat("_FloatingLong"), 1.05f, "leaves in the woods' ponds, pointed");
+        Assert.AreEqual(0f, Load("Water Still").GetFloat("_Floating"), "the Haven's and the Valley's ponds stay clear");
+        Assert.IsFalse(ShaderUtil.ShaderHasError(Load("Water Fen").shader));
+        Object Layout(string name) => AssetDatabase.LoadMainAssetAtPath("Assets/_Project/Data/Raids/Maps/" + name + " Layout.asset");
+        Assert.AreEqual(Load("Water Still (Marsh)"), new SerializedObject(Layout("MossMarsh")).FindProperty("pondMaterial").objectReferenceValue);
+        Assert.AreEqual(Load("Water Still (Woods)"), new SerializedObject(Layout("MistyWoods")).FindProperty("pondMaterial").objectReferenceValue);
+        Assert.AreEqual(Load("Water Still"), new SerializedObject(Layout("TrollValley")).FindProperty("pondMaterial").objectReferenceValue);
+    }
 }

@@ -306,6 +306,84 @@ public static partial class RaidMapGenerator
         }
     }
 
+    /// <summary>How fast a river runs at each point of its line, as a share of its everyday speed (Docs/LookAndFeelResearch_2026-11-18.md
+    /// W3): faster where it narrows (the same water through less width) and where it falls, slower where it spreads into a pool; eased
+    /// over five points so it never jumps. Pure, for tests.</summary>
+    public static float[] FlowAlong(List<Vector2> line, System.Func<int, float> half, System.Func<int, float> height)
+    {
+        int count = line.Count;
+        var widths = new float[count];
+        for (int i = 0; i < count; i++)
+        {
+            widths[i] = Mathf.Max(0.1f, half(i));
+        }
+
+        var sorted = (float[])widths.Clone();
+        System.Array.Sort(sorted);
+        float typical = sorted[count / 2];
+        var raw = new float[count];
+        for (int i = 0; i < count; i++)
+        {
+            float narrows = Mathf.Clamp(Mathf.Pow(typical / widths[i], 0.8f), 0.6f, 1.7f);
+            int a = Mathf.Max(i - 1, 0), b = Mathf.Min(i + 1, count - 1);
+            float length = Vector2.Distance(line[a], line[b]);
+            float grade = length > 0.01f ? (height(a) - height(b)) / length : 0f;
+            raw[i] = narrows * (1f + Mathf.Clamp(grade * 20f, 0f, 1.2f));
+        }
+
+        return Eased(raw, 2);
+    }
+
+    /// <summary>How sharply a line turns at each point (radians per metre, above zero turning left, whose outside is on the right),
+    /// eased over five points. Pure, for tests.</summary>
+    public static float[] Bends(List<Vector2> line)
+    {
+        int count = line.Count;
+        var raw = new float[count];
+        for (int i = 1; i + 1 < count; i++)
+        {
+            Vector2 before = line[i] - line[i - 1], after = line[i + 1] - line[i];
+            float length = (before.magnitude + after.magnitude) * 0.5f;
+            if (length < 0.01f)
+            {
+                continue;
+            }
+
+            Vector2 d0 = before.normalized, d1 = after.normalized;
+            raw[i] = Mathf.Asin(Mathf.Clamp(d0.x * d1.y - d0.y * d1.x, -1f, 1f)) / length;
+        }
+
+        return Eased(raw, 2);
+    }
+
+    /// <summary>A river's speed across it (<paramref name="across"/> -1 the left bank, 1 the right): slower at the banks, faster round the
+    /// outside of a bend (<paramref name="bend"/>: the turn's sharpness times the river's half width, above zero turning left).
+    /// Pure, for tests.</summary>
+    public static float FlowAcross(float across, float bend)
+    {
+        float banks = Mathf.Lerp(0.55f, 1f, 1f - across * across);
+        return banks * (1f + Mathf.Clamp(bend * across, -0.35f, 0.35f));
+    }
+
+    private static float[] Eased(float[] values, int reach)
+    {
+        var eased = new float[values.Length];
+        for (int i = 0; i < values.Length; i++)
+        {
+            float sum = 0f;
+            int n = 0;
+            for (int k = Mathf.Max(0, i - reach); k <= Mathf.Min(values.Length - 1, i + reach); k++)
+            {
+                sum += values[k];
+                n++;
+            }
+
+            eased[i] = sum / n;
+        }
+
+        return eased;
+    }
+
     /// <summary>
     /// A strip of running water along a line, as the World Builder lays a river: rows across the line, uv in metres, the flow in uv2 (the
     /// material reads it from the mesh), and the centre line for WaterSurface (half widths from <paramref name="waterHalf"/>). Each end runs on
@@ -320,6 +398,9 @@ public static partial class RaidMapGenerator
         var uv = new Vector2[vertices.Length];
         var flow = new Vector2[vertices.Length];
         centreline = new Vector4[rows];
+        // How fast it runs along its line and across it (W3): the shader whitens, streaks and clouds faster water.
+        float[] along = FlowAlong(line, waterHalf, height);
+        float[] bends = Bends(line);
         float run = 0f;
         Vector2 previous = line[0];
         for (int i = 0; i < rows; i++)
@@ -345,7 +426,7 @@ public static partial class RaidMapGenerator
                 int at = i * RiverAcross + k;
                 vertices[at] = centre + right * (across * extent);
                 uv[at] = new Vector2(across * extent, run);
-                flow[at] = direction * RiverSpeed * speed;
+                flow[at] = direction * (RiverSpeed * speed * along[source] * FlowAcross(across, bends[source] * waterHalf(source)));
             }
 
             centreline[i] = new Vector4(centre.x, centre.y, centre.z, waterHalf(source) * narrows);

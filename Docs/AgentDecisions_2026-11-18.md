@@ -234,3 +234,16 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - **Boss stop (V6).** The blow that fells a boss holds 0.45 s (other kills 0.12 s) under Hit Stop, and the picture streaks out from it
   for 0.4 s under Screen Flashes; an elite felled by a heavy blow or a finisher gets half the streak. Not seen yet (no boss felled in a
   probe); hosting co-op, time can't stop, so only the streak plays.
+
+### Batch 4: water that moves and carries things
+- **Speed by shape (W3).** A river strip's flow now runs faster through a neck and down a fall, slower at its banks and in pools,
+  faster round the outside of a bend; the water shader already whitens, clouds and foams faster water.
+- **Foam where the current puts it (W2).** Streaks drawn out along the current (the river mesh's own along-the-run coordinates, so a
+  curve never swirls them), densest mid-river where it runs fastest. The shared river's even shore foam is down to a thin line
+  (0.3 -> 0.1), the Valley's was cut in batch 1. Seen in the launched Valley from the game camera: the river reads as moving water.
+- **Things afloat (W5).** Procedural, no textures: the Marsh's fen and pools carry duckweed in drifts that close into torn mats at
+  their heart, with slow gas rings rising; the Woods' ponds and the forest streams carry a few fallen leaves (pointed, varied, some
+  sodden). The Haven's and the Valley's ponds stay clear (each raid's ponds have their own material now). Seen close up and from the
+  game camera in launched Marsh and Woods raids; the first duckweed read as neon dots and was darkened and drawn into mats.
+- **Warnings over water.** A lob ring or hazard over a pool lies on the water's surface (the raid's ground light field knows it),
+  not on the bed below. Seen at the Marsh: a lob into the fen.

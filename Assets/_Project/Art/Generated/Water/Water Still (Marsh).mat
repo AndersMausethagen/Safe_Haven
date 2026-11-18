@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Water Still (Marsh)
+  m_Shader: {fileID: 4800000, guid: 26dbbca5309feec4f810d20c0153b943, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords:
+  - _VERTEXALPHA_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _CausticsMap:
+        m_Texture: {fileID: 2800000, guid: 3390084d0d5f99941a8400fc21d84f04, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FoamMap:
+        m_Texture: {fileID: 2800000, guid: 7fc320b19d59a0d409a18a379e11e1d6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 62ccbfed4a2f1ed40a8d22871bcac8b4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Bubbles: 0.6
+    - _Caustics: 0.6
+    - _CausticsTiling: 2.5
+    - _Clarity: 0.41
+    - _CloudReflection: 1
+    - _Cull: 2
+    - _DepthDistance: 1.27
+    - _FallFoam: 0.85
+    - _FallSpeed: 6
+    - _FallTiling: 2
+    - _Floating: 0.55
+    - _FloatingLong: 1
+    - _FloatingPatches: 4
+    - _FloatingSize: 0.05
+    - _FlowFromMesh: 0
+    - _FlowSpeed: 0
+    - _FoamStreaks: 0
+    - _FoamTiling: 2
+    - _FoamTrail: 1.2
+    - _Murk: 0.6
+    - _NormalStrength: 0
+    - _NormalTiling: 3
+    - _RainRipples: 1
+    - _Reflection: 0.8
+    - _Refraction: 0.03
+    - _RippleStrength: 1
+    - _ScreenReflection: 1
+    - _ShoreFoam: 0.25
+    - _SkyReflectionFloor: 0.08
+    - _SkySaturation: 0.5
+    - _SkyTilt: 0.5
+    - _Smoothness: 0.93
+    - _SpeedFoam: 0.5
+    - _SteepFaces: 0
+    - _VertexAlpha: 1
+    - _WindRipples: 1
+    m_Colors:
+    - _DeepColor: {r: 0.02, g: 0.079999976, b: 0.09999997, a: 1}
+    - _FastColor: {r: 0.75, g: 0.8399999, b: 0.8399999, a: 1}
+    - _FloatingColor: {r: 0.15, g: 0.23, b: 0.05, a: 1}
+    - _FloatingColor2: {r: 0.25, g: 0.32, b: 0.08, a: 1}
+    - _FlowDirection: {r: 1, g: 0, b: 0, a: 0}
+    - _FoamColor: {r: 0.9, g: 0.93, b: 0.93, a: 1}
+    - _ShallowColor: {r: 0.109989434, g: 0.23584908, b: 0.09233714, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -38,6 +38,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Bubbles: 0.5
     - _Caustics: 0.1
     - _CausticsTiling: 2.5
     - _Clarity: 0.25
@@ -47,8 +48,13 @@ Material:
     - _FallFoam: 0.85
     - _FallSpeed: 6
     - _FallTiling: 2
+    - _Floating: 0.6
+    - _FloatingLong: 1
+    - _FloatingPatches: 6
+    - _FloatingSize: 0.05
     - _FlowFromMesh: 0
     - _FlowSpeed: 0
+    - _FoamStreaks: 0
     - _FoamTiling: 2
     - _FoamTrail: 1.2
     - _Murk: 0.9
@@ -71,6 +77,8 @@ Material:
     m_Colors:
     - _DeepColor: {r: 0.01, g: 0.02, b: 0.01, a: 1}
     - _FastColor: {r: 0.75, g: 0.8399999, b: 0.8399999, a: 1}
+    - _FloatingColor: {r: 0.15, g: 0.23, b: 0.05, a: 1}
+    - _FloatingColor2: {r: 0.25, g: 0.32, b: 0.08, a: 1}
     - _FlowDirection: {r: 1, g: 0, b: 0, a: 0}
     - _FoamColor: {r: 0.42, g: 0.45, b: 0.3, a: 1}
     - _ShallowColor: {r: 0.08, g: 0.11, b: 0.04, a: 1}

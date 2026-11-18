@@ -154,7 +154,7 @@ MonoBehaviour:
   pondRadius: {x: 3.5, y: 11}
   pondDepth: {x: 0.7, y: 1.6}
   pondStretch: 1.6
-  pondMaterial: {fileID: 2100000, guid: 2e96d20980d31544abc72c4199c1fec0, type: 2}
+  pondMaterial: {fileID: 2100000, guid: ffa85e5306129f647b697725c152e4aa, type: 2}
   riverMaterial: {fileID: 2100000, guid: 7b22eab10095b3c439a6f3fe5af05797, type: 2}
   ravineCrags: {fileID: 11400000, guid: 09d68cb9a41a99f4cbf14c7093db892d, type: 2}
   waterfallMaterial: {fileID: 2100000, guid: f87133fa09ba1064095ccf2c01546bab, type: 2}
