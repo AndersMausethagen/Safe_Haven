@@ -132,7 +132,8 @@ public sealed class PrologueDirector : MonoBehaviour
     private bool GiveStartingItem(ItemDefinition item)
     {
         if (item == null) return true;
-        if (Player.Current.GetComponent<ItemInventory>().Give(item, 1) == 1) return true;
+        // Found, as it always arrived (the prologue's first steps may count what comes to hand).
+        if (Player.Current.GetComponent<ItemInventory>().Give(item, 1, ArrivalCause.Found) == 1) return true;
         ready = false;
         Debug.LogError("The expedition starting loadout does not fit in the player's bag: " + item.DisplayName, this);
         GameMessages.Post("The expedition's starting equipment could not be granted. Check the starting loadout.", MessageKind.Warning);
@@ -473,14 +474,20 @@ public sealed class PrologueDirector : MonoBehaviour
             CinematicScreen.Play(definition.EndingCinematic, () => told = true);
             while (!told) yield return null;
         }
-        if (!SceneLoader.Load(definition.HomeScene, "Beside the old portal"))
+        // However it fails, refused now or broken off on the way (the ending then kept the player held and unhurt for good).
+        SceneLoader.Load(definition.HomeScene, "Beside the old portal", ifItFails: () =>
         {
-            Debug.LogError("The prologue could not start its home transition.", this);
+            Debug.LogError("The prologue could not make its home transition.", this);
             GameMessages.Post("The return to Safe Haven failed. Reload the last checkpoint.", MessageKind.Warning);
+            if (this == null)
+            {
+                return;
+            }
+
             health.RemoveInvulnerability(this);
             PlayerControl.Release(held, this);
             ending = false;
             ready = false;
-        }
+        });
     }
 }

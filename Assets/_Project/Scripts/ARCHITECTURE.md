@@ -747,6 +747,15 @@ reviews). When adding something, go through these, and the tests say when one is
   nobody holds them, and a destroyed holder lets go. Never `PlayerInputHandler.enabled = ...` (`SharedStateTests`).
 - A stack: copied from itself (`stack.WithCount(n)`, `WithSize`, `WithDurability`...), never re-made from its item
   (`new ItemStack(stack.Item, ...)` dropped its inscription and size) (`SharedStateTests`).
+- The Player map's keys: switched only by `GameInput.SetPlayerKeys`; a hold keeps a few with `PlayerControl.Kept`, a suspension its own
+  key with `SuspendGameplay(owner, keep)` (`SharedStateTests`).
+- A save slot: `SaveMapper.SlotOf(stack)` or `slot.With(slot, count)`, never field by field (`SharedStateTests`).
+- A scene load that can fail: `SceneLoader.Load(scene, caption, ifItFails)`, one cleanup for a refusal and a later break-off
+  (`SharedStateTests`).
+- A text field: `KitSearchGuard.On(field)` (or a suspension of its own) (`SharedStateTests`).
+- An item given: `ItemInventory.Give(item, n, cause)` has no default cause; say why it came (the compiler asks).
+- "Near the player" on a raid: `RaidPlayers` (friends too). Anything every game works out from the seed never depends on positions.
+- One's own values (pocket, journal, quests about one's stash) read `GameSession.Home`, not `Here`.
 
 ## Scene changes, raid results and raid layouts
 

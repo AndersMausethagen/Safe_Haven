@@ -633,9 +633,9 @@ public static class SaveGameService
         PlayerControl.Hold(held, Loading);
 
         loading = true;
+        // However the load fails (refused now, or broken off later): SceneLoader.Load's ifItFails.
         void OnAbandoned()
         {
-            SceneTransition.Abandoned -= OnAbandoned;
             if (pendingArrival != null)
             {
                 SceneManager.sceneLoaded -= pendingArrival;
@@ -649,7 +649,6 @@ public static class SaveGameService
         void OnLoaded(Scene loaded, LoadSceneMode mode)
         {
             SceneManager.sceneLoaded -= OnLoaded;
-            SceneTransition.Abandoned -= OnAbandoned;
             pendingArrival = null;
             loading = false;
             // Posted once the loading screen has lifted, so the player sees it.
@@ -661,15 +660,7 @@ public static class SaveGameService
 
         pendingArrival = OnLoaded;
         SceneManager.sceneLoaded += pendingArrival;
-        SceneTransition.Abandoned += OnAbandoned;
-        if (!SceneLoader.Load(scene, caption))
-        {
-            SceneTransition.Abandoned -= OnAbandoned;
-            SceneManager.sceneLoaded -= pendingArrival;
-            pendingArrival = null;
-            loading = false;
-            PlayerControl.Release(held, Loading);
-        }
+        SceneLoader.Load(scene, caption, ifItFails: OnAbandoned);
     }
 
     // The load's own hold on the player's controls while the next scene comes up (PlayerControl).

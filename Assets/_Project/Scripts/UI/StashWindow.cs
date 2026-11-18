@@ -403,7 +403,9 @@ public sealed partial class StashWindow : MonoBehaviour
     {
         int moved = GameSession.Stash.StoreResources(carried, player);
         moved += GameSession.Stash.StoreMaterials(bag.Container, player, chest.Block);
-        GameMessages.Post(moved > 0 ? $"Stored {moved} materials." : "You carry no materials.", moved > 0 ? MessageKind.Info : MessageKind.Warning);
+        // Nothing moved is no materials or no room in this chest's block: said as either, not always "you carry none".
+        GameMessages.Post(moved > 0 ? $"Stored {moved} materials." : "Nothing stored: you carry no materials, or this chest has no room for them.",
+            moved > 0 ? MessageKind.Info : MessageKind.Warning);
     }
 
     private void TakeResources()

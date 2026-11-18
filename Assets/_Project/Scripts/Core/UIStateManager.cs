@@ -143,7 +143,11 @@ public sealed class UIStateManager : MonoBehaviour
             var conflicts = new List<UIWindow>();
             foreach (UIWindow other in openWindows)
             {
-                if (other != window && (window.Id == UIWindowId.Skills || other.Id == UIWindowId.Skills))
+                // A conversation and the pause menu aren't put away by the skill book: closed, a conversation ended as if the player
+                // had walked away (a quest offered was turned down). It hides under the book as under the bag (HudGivesWay.Covered).
+                if (other != window && (window.Id == UIWindowId.Skills || other.Id == UIWindowId.Skills)
+                    && other.Id != UIWindowId.Dialogue && other.Id != UIWindowId.PauseMenu
+                    && window.Id != UIWindowId.Dialogue && window.Id != UIWindowId.PauseMenu)
                 {
                     conflicts.Add(other);
                 }

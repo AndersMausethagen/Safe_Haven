@@ -94,13 +94,13 @@ public sealed class PlayerNeeds : MonoBehaviour
         ApplyEffects();
     }
 
+    /// <summary>Whether eating or drinking this much would do anything: it feeds a hunger or quenches a thirst that isn't full.</summary>
+    public bool WouldHelp(float hungerAmount, float thirstAmount) => (hungerAmount > 0f && !Hunger.IsFull) || (thirstAmount > 0f && !Thirst.IsFull);
+
     /// <summary>
     /// Eats or drinks something that restores the given amounts. Refuses (returns false, with a message) when neither meter
     /// would rise, so food isn't wasted.
     /// </summary>
-    /// <summary>Whether eating or drinking this much would do anything: it feeds a hunger or quenches a thirst that isn't full.</summary>
-    public bool WouldHelp(float hungerAmount, float thirstAmount) => (hungerAmount > 0f && !Hunger.IsFull) || (thirstAmount > 0f && !Thirst.IsFull);
-
     public bool TryConsume(string name, float hungerAmount, float thirstAmount)
     {
         if (!WouldHelp(hungerAmount, thirstAmount))

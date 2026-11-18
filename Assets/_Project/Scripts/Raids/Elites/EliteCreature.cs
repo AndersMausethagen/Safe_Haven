@@ -275,7 +275,7 @@ public sealed class EliteCreature : MonoBehaviour
         {
             List<ItemAmount> items = EliteLoot(difficulty).Roll(difficulty.tier, 1f);
             items.RemoveAll(drop => !difficulty.Allows(drop.Item));
-            ItemGrantResult result = bag.Give(items);
+            ItemGrantResult result = bag.Give(items, ArrivalCause.Found);
             if (result.HasOverflow)
             {
                 GameMessages.Post("Bag full, left behind: " + AmountText.Describe(result.Overflow), MessageKind.Warning);

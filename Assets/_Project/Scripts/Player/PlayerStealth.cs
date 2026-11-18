@@ -11,6 +11,7 @@ public sealed class PlayerStealth : MonoBehaviour
 {
     private PlayerMovement movement;
     private PlayerDodge dodge;
+    private PlayerStateMachine state;
     private Damageable health;
     private Combatant combatant;
     private bool sneakRequested;
@@ -26,8 +27,9 @@ public sealed class PlayerStealth : MonoBehaviour
     /// <summary>True while a veil (Veil) hides the player.</summary>
     public bool IsVeiled => Time.time < veiledUntil;
 
-    /// <summary>True while the player sneaks (held, and not dodging).</summary>
-    public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging);
+    /// <summary>True while the player sneaks (held, and not dodging). Never in the saddle: the stick click that gallops a horse is the
+    /// sneak's on a controller, and a galloping rider was seen as one sneaking, near-invisible.</summary>
+    public bool IsSneaking => sneakRequested && (dodge == null || !dodge.IsDodging) && (state == null || !state.IsAboard);
 
     private float cover = 1f;
     private float coverReadAt = -1f;
@@ -95,6 +97,7 @@ public sealed class PlayerStealth : MonoBehaviour
 
         movement = GetComponent<PlayerMovement>();
         dodge = GetComponent<PlayerDodge>();
+        state = GetComponent<PlayerStateMachine>();
         health = GetComponent<Damageable>();
         combatant = GetComponent<Combatant>();
     }

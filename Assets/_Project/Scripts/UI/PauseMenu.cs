@@ -356,7 +356,7 @@ public sealed class PauseMenu : MonoBehaviour
         }
 
         // Sessions open and close at home: a raid is no place to start one.
-        bool canChange = !leaving && GameSession.ActiveRaid == null;
+        bool canChange = !leaving && !Place.OnRaid;
         bool invite = coop.IsHost && coop.ViaSteam;
         coopButton.gameObject.SetActive(!coop.IsActive || invite);
         coopButton.interactable = canChange || invite;

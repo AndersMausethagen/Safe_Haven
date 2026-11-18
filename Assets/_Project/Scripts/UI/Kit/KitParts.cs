@@ -547,12 +547,7 @@ public sealed class KitSearch
         Field.targetGraphic = fill;
         Field.lineType = TMP_InputField.LineType.SingleLine;
         Field.onValueChanged.AddListener(value => Changed?.Invoke(value));
-        var guard = box.gameObject.AddComponent<KitSearchGuard>();
-        Field.onSelect.AddListener(_ => guard.Typing(true));
-        Field.onDeselect.AddListener(_ => guard.Typing(false));
-        // Enter and Escape end the typing without a deselect (TMP keeps the field selected): every gameplay key stayed off
-        // until the next click.
-        Field.onEndEdit.AddListener(_ => guard.Typing(false));
+        KitSearchGuard.On(Field);
     }
 
     private static void Fill(RectTransform rect)
@@ -568,6 +563,21 @@ public sealed class KitSearch
 public sealed class KitSearchGuard : MonoBehaviour
 {
     private bool suspended;
+
+    /// <summary>
+    /// Guards a text field the game makes: every one is (SharedStateTests). A search box made by hand without it (the cheat window's)
+    /// left the keys on while typing: "v" in "silver" flipped the camera's style.
+    /// </summary>
+    public static KitSearchGuard On(TMP_InputField field)
+    {
+        var guard = field.gameObject.AddComponent<KitSearchGuard>();
+        field.onSelect.AddListener(_ => guard.Typing(true));
+        field.onDeselect.AddListener(_ => guard.Typing(false));
+        // Enter and Escape end the typing without a deselect (TMP keeps the field selected): every gameplay key stayed off
+        // until the next click.
+        field.onEndEdit.AddListener(_ => guard.Typing(false));
+        return guard;
+    }
 
     public void Typing(bool typing)
     {

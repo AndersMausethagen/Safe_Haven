@@ -347,7 +347,8 @@ public sealed class StationWindow : MonoBehaviour
             progressLabel.text = $"<b>{queue.Current.DisplayName}</b>  ·  {ItemTooltipView.FormatSeconds(queue.CurrentRemaining)} left";
         }
 
-        cancelButton.interactable = queue.CanCancelLast;
+        // The host's queue in a friend's Haven: greyed, as StationCrafting refuses it (HavenVisit's one rule), not lit and refused.
+        cancelButton.interactable = queue.CanCancelLast && !HavenVisit.IsHostsToDecide;
         PlaceOutputUnderQueue();
     }
 
@@ -397,8 +398,9 @@ public sealed class StationWindow : MonoBehaviour
         outputLabel.text = thing != null
             ? $"Output  <color=#{Muted}>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
             : $"Output  <color=#{Muted}>empty (holds {queue.Capacity})</color>";
-        collectButton.interactable = thing != null;
-        collectLabel.text = thing != null ? $"Collect {queue.OutputAmount} {name}" : "Nothing to collect";
+        collectButton.interactable = thing != null && !HavenVisit.IsHostsToDecide;
+        collectLabel.text = thing == null ? "Nothing to collect"
+            : HavenVisit.IsHostsToDecide ? $"{(string.IsNullOrEmpty(HavenVisit.HostName) ? "Your friend" : HavenVisit.HostName)}'s to collect" : $"Collect {queue.OutputAmount} {name}";
         // While it holds the queue up, collecting is the one thing to do.
         UIRole.Kind role = queue.Blocked ? UIRole.Kind.PrimaryButton : UIRole.Kind.Button;
         if (collectRole != null && collectRole.Role != role)
@@ -482,6 +484,12 @@ public sealed class StationWindow : MonoBehaviour
 
     private void Collect()
     {
+        // The output slot clicked in a friend's Haven: said whose it is, not shaken as if the bag were full.
+        if (station != null && HavenVisit.LeftToHost())
+        {
+            return;
+        }
+
         if (station != null)
         {
             int taken = StationCrafting.Collect(user, station.Queue);

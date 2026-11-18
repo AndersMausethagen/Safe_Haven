@@ -327,6 +327,16 @@ public sealed class HavenShare : ICoopPart, IDisposable
             return;
         }
 
+        // No character in this scene to take home (the raid's results, a scene still loading): ended here, the visit sent home the
+        // character as it was when the visit began (the haul, the learning, the quests gone), and the save once home wrote that
+        // over the raid's end. Gone home from the next scene with a player in it (HeadHomeIfDue).
+        if (travel && HavenVisit.IsVisiting && Player.Current == null)
+        {
+            homeAfterRaid = true;
+            GameMessages.Post("You'll head home as soon as you are back on your feet.");
+            return;
+        }
+
         // Leaving without the trip home (to the main menu) mid-raid: the raid ends first, as a quit does, and is written as this
         // player's own journey while the visit still knows it; ended afterwards, its save wrote the host's Haven over theirs.
         if (!travel && HavenVisit.IsVisiting && RaidDirector.Current != null)

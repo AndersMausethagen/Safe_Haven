@@ -107,6 +107,16 @@ public sealed class HavenRequestBoard : MonoBehaviour
         ItemInventory bag = player.GetComponent<ItemInventory>();
         foreach (HavenRequestDefinition request in Standing())
         {
+            // Someone's ask whose asker is gone (lost on a raid) comes down: it was answered at once from the bag and the stash, a
+            // worked piece too, and it held the board's one place for an order until they were found again (then they may ask anew).
+            if (request.Asker != null && !HandedIn(request))
+            {
+                GameSession.Home.RemoveRequest(request.Id);
+                told.Remove(request.Id);
+                GameMessages.Post($"{request.AskerName}'s ask comes down from the board: they are not here to take it.", MessageKind.Info);
+                continue;
+            }
+
             if (AtHome(request, bag) < request.Count)
             {
                 told.Remove(request.Id);
@@ -114,8 +124,8 @@ public sealed class HavenRequestBoard : MonoBehaviour
             }
 
             // An ask of someone living here is handed to them (AddHandIn: talk to them), so nothing worked on is taken unasked and
-            // the giving is a moment the player sees; they are told once that it is ready. The Haven's own asks (no asker, or one
-            // no longer here) are answered at once, as before.
+            // the giving is a moment the player sees; they are told once that it is ready. The Haven's own asks (no asker) are
+            // answered at once.
             if (HandedIn(request))
             {
                 if (told.Add(request.Id))

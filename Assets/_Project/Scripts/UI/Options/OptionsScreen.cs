@@ -439,9 +439,10 @@ public sealed class OptionsScreen : MonoBehaviour
 
                 break;
             case 1:
+                // Everything the tab shows (GameOptions.Graphics, the look, the frame rate): listed by hand, it missed the three
+                // that aren't in a preset (contact shadows, the Haven's sun bounce, ground impacts). Then the preset over its members.
+                ResetAll(GameOptions.Graphics);
                 ResetAll(GameOptions.Look);
-                GameOptions.Upscaling.ResetToDefault();
-                GameOptions.Preset.ResetToDefault();
                 GameOptions.ApplyPreset(GameOptions.PresetUltra);
                 GameOptions.VSync.ResetToDefault();
                 GameOptions.FrameLimit.ResetToDefault();

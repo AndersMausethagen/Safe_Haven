@@ -65,6 +65,24 @@ public sealed class SaveableEntity : MonoBehaviour
     public bool HasStarted => started;
     /// <summary>True for objects created while playing (placed buildings, dropped items), recreated from their prefab.</summary>
     public bool IsSpawned => spawned;
+
+    private const string SpawnedPrefix = "spawned-";
+
+    /// <summary>
+    /// When an object placed while playing was placed (UTC ticks, read from its id), or 0 for the scene's own and for ones placed before
+    /// ids said so (2026-11-18): sorted by this and then by id, the first placed comes first, the same after loading and on every machine.
+    /// </summary>
+    public static long PlacedAt(string id)
+    {
+        const int at = 8;   // SpawnedPrefix.Length
+        if (string.IsNullOrEmpty(id) || id.Length < at + 17 || id[at + 16] != '-' || !id.StartsWith(SpawnedPrefix, StringComparison.Ordinal))
+        {
+            return 0L;
+        }
+
+        return long.TryParse(id.Substring(at, 16), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture,
+            out long ticks) ? ticks : 0L;
+    }
     /// <summary>True once it is gone for good (died, picked up, taken down), even before Unity has removed it.</summary>
     public bool IsGone => destroyed;
 
@@ -95,7 +113,8 @@ public sealed class SaveableEntity : MonoBehaviour
         }
 
         // Awake runs inside Instantiate, so the id is handed over through a static that Awake picks up.
-        pendingSpawnId = existingId ?? "spawned-" + Guid.NewGuid().ToString("N");
+        // The placing time leads a new id (PlacedAt), so what was placed first can be told after loading and on every machine.
+        pendingSpawnId = existingId ?? SpawnedPrefix + DateTime.UtcNow.Ticks.ToString("x16") + "-" + Guid.NewGuid().ToString("N");
         try
         {
             SaveableEntity copy = sceneAnchor != null ? Instantiate(prefab, position, rotation, sceneAnchor) : Instantiate(prefab, position, rotation);

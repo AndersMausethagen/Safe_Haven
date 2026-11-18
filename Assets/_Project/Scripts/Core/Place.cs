@@ -14,10 +14,10 @@ public static class Place
     public static bool InRaidScene => GameSession.ActiveRaid != null && RaidDirector.Current != null;
 
     /// <summary>The raid is on and still open: nothing has decided its end.</summary>
-    public static bool RaidRunning => RaidDirector.Current != null && !RaidDirector.Current.Session.IsOver;
+    public static bool RaidRunning => RaidDirector.Current != null && !RaidDirector.Current.IsDecided;
 
-    /// <summary>The raid's end is decided (extracted, lost, out of time): what is taken home is settled.</summary>
-    public static bool RaidDecided => RaidDirector.Current != null && RaidDirector.Current.Session.IsOver;
+    /// <summary>The raid's end is decided (extracted, lost, out of time, or turned back from): what is taken home is settled.</summary>
+    public static bool RaidDecided => RaidDirector.Current != null && RaidDirector.Current.IsDecided;
 
     /// <summary>In one's own Haven (or the prologue's camp): no raid, no visit.</summary>
     public static bool AtHome => !OnRaid && !HavenVisit.IsVisiting;

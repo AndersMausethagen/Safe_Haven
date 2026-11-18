@@ -28,8 +28,9 @@ public static class HavenVisit
     /// <summary>True while this player is a guest in a friend's Haven.</summary>
     public static bool IsVisiting { get; private set; }
 
-    /// <summary>True while a guest stands in the host's Haven itself (a visit goes on through a raid followed with the host).</summary>
-    public static bool InHostsHaven => IsVisiting && GameSession.ActiveRaid == null;
+    /// <summary>True while a guest stands in the host's Haven itself (a visit goes on through a raid followed with the host). The same
+    /// as Place.InFriendsHaven: its own "no raid" left out the seconds a followed raid is decided, so everything there stopped counting.</summary>
+    public static bool InHostsHaven => Place.InFriendsHaven;
 
     /// <summary>The host's name, while visiting.</summary>
     public static string HostName { get; private set; } = string.Empty;
@@ -305,9 +306,13 @@ public static class HavenVisit
     /// ward, the altar, trades and the workshops' queues. A guest's copy of the settlement only mirrors the host's
     /// (<see cref="HavenSync"/>), so such a change would be undone at the host's next word.
     /// </summary>
+    /// <summary>The same rule as <see cref="LeftToHost"/>, asked quietly: for a window to grey what the host decides, rather than light it
+    /// and refuse when it is pressed.</summary>
+    public static bool IsHostsToDecide => IsVisiting;
+
     public static bool LeftToHost()
     {
-        if (!IsVisiting)
+        if (!IsHostsToDecide)
         {
             return false;
         }

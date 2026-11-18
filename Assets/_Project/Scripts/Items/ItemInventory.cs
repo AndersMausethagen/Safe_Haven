@@ -69,17 +69,18 @@ public sealed class ItemInventory : MonoBehaviour
                 // Laid out at its full size, so improving the portal only has to unlock slots.
                 int most = safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(int.MaxValue);
                 safePocket = new ItemContainer(most, 1);
-                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Here.PortalLevel));
+                safePocket.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel));
             }
 
             return safePocket;
         }
     }
 
-    /// <summary>Opens the slots the portal's improvements have earned since the pocket was made.</summary>
+    /// <summary>Opens the slots the portal's improvements have earned since the pocket was made: one's own portal's (Home), also on a
+    /// raid followed from a friend's Haven, where Here is the host's and a guest's pocket grew or shrank to theirs.</summary>
     public void RefreshPocket()
     {
-        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Here.PortalLevel));
+        SafePocket?.SetUnlockedSlots(safePocketSlots + SettlementSettings.Current.ExtraPocketSlotsAt(GameSession.Home.PortalLevel));
     }
 
     public float CarryWeight => carryWeight;
@@ -111,11 +112,12 @@ public sealed class ItemInventory : MonoBehaviour
         SyncCarried(announce: false);
     }
 
-    /// <summary>Adds as many as fit and returns how many arrived. <paramref name="cause"/> says why (ItemObtained carries it).</summary>
-    public int Give(ItemDefinition item, int amount, ArrivalCause cause = ArrivalCause.Found) => Give(item, amount, 0f, cause);
+    /// <summary>Adds as many as fit and returns how many arrived. <paramref name="cause"/> says why (ItemObtained carries it): a caller
+    /// always says, as there is no default to forget (a recovered arrow came as Found, a new find, and farmed collect quests).</summary>
+    public int Give(ItemDefinition item, int amount, ArrivalCause cause) => Give(item, amount, 0f, cause);
 
     /// <summary>The same, for a fish of a length (centimetres), which the bag shows (ItemStack.Size).</summary>
-    public int Give(ItemDefinition item, int amount, float size, ArrivalCause cause = ArrivalCause.Found)
+    public int Give(ItemDefinition item, int amount, float size, ArrivalCause cause)
     {
         int added = Container.Add(item, amount, size);
         if (added > 0)
@@ -248,13 +250,13 @@ public sealed class ItemInventory : MonoBehaviour
         ConsumableArrived?.Invoke(item);
     }
 
-    /// <summary>Offers several items and reports what was stored and what did not fit.</summary>
-    public ItemGrantResult Give(IReadOnlyList<ItemAmount> items)
+    /// <summary>Offers several items and reports what was stored and what did not fit. <paramref name="cause"/>: why they came.</summary>
+    public ItemGrantResult Give(IReadOnlyList<ItemAmount> items, ArrivalCause cause)
     {
         var result = new ItemGrantResult();
         foreach (ItemAmount entry in items)
         {
-            result.Record(entry.Item, entry.Amount, Give(entry.Item, entry.Amount));
+            result.Record(entry.Item, entry.Amount, Give(entry.Item, entry.Amount, cause));
         }
 
         return result;
@@ -390,8 +392,9 @@ public sealed class ItemInventory : MonoBehaviour
     // A sapling goes into the ground a step in front of the player, at home only.
     private bool Plant(ItemContainer from, int slot, ItemDefinition item)
     {
+        // One's own Haven only: in a friend's the sapling went into a copy that is thrown away when the visit ends.
         PlantedTrees home = PlantedTrees.Current;
-        if (home == null)
+        if (home == null || !Place.AtHome)
         {
             GameMessages.Post($"A {item.DisplayName.ToLowerInvariant()} only takes root at home, in Safe Haven.", MessageKind.Warning);
             return false;

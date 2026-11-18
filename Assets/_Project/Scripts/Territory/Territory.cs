@@ -349,10 +349,10 @@ public static class Territory
     private static bool SpendRune(GameObject user) =>
         MaterialPool.For(user).TrySpend(new List<ResourceAmount>(), new[] { new ItemAmount(Settings.PactRune, 1) });
 
-    /// <summary>A watch held at a stone (StoneDefence).</summary>
     /// <summary>Whether a push on <paramref name="region"/> is still to come (a stone's watch is for it).</summary>
     public static bool PushOn(string region) => State != null && State.Incursion != null && State.Incursion.Region == region;
 
+    /// <summary>A watch held at a stone (StoneDefence).</summary>
     public static void Defended(string region)
     {
         bool wasSecure = StandingOf(region) == RegionStanding.Secure;

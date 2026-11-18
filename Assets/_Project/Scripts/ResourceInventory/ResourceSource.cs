@@ -186,7 +186,7 @@ public sealed class ResourceSource : MonoBehaviour
         {
             if (bag != null)
             {
-                ItemGrantResult result = bag.Give(items);
+                ItemGrantResult result = bag.Give(items, ArrivalCause.Found);
                 if (result.HasOverflow)
                 {
                     leftBehind.Add(AmountText.Describe(result.Overflow));

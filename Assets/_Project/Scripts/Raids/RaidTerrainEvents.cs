@@ -42,6 +42,8 @@ public sealed class RaidTerrainEvents : MonoBehaviour
 
     private TerrainEventsSystem settings;
     private RaidDirector director;
+    private bool rocksFell;
+    private bool mistThickened;
 
     public void Configure(TerrainEventsSystem system, RaidDirector owner)
     {
@@ -49,6 +51,16 @@ public sealed class RaidTerrainEvents : MonoBehaviour
         director = owner;
         director.StageChanged += OnStage;
     }
+
+    // A raid joined inside a stage (a guest following late, a short test raid) jumps to it without StageChanged: what the stages so far
+    // did to the land is done here too, the same rocks from the same seed. Before, a late guest's map had no rocks where the host's did.
+    private void Start() => SceneTransition.WhenReady(() =>
+    {
+        if (this != null && director != null && director.StageIndex > 0)
+        {
+            OnStage(director.StageIndex, null);
+        }
+    });
 
     private void OnDestroy()
     {
@@ -66,13 +78,16 @@ public sealed class RaidTerrainEvents : MonoBehaviour
             return;
         }
 
-        if (stage == settings.RockfallStage)
+        // Once each, at their stage or any later one reached first.
+        if (!rocksFell && settings.RockfallStage > 0 && stage >= settings.RockfallStage)
         {
+            rocksFell = true;
             Rockfall(map);
         }
 
-        if (stage == settings.MistStage)
+        if (!mistThickened && settings.MistStage > 0 && stage >= settings.MistStage)
         {
+            mistThickened = true;
             ThickenMist(map);
         }
     }
@@ -152,7 +167,10 @@ public sealed class RaidTerrainEvents : MonoBehaviour
         }
     }
 
-    // Where a trail crosses a ravine on a neck whose trail isn't needed: without its link every exit can still be reached from the start.
+    // Where a trail crosses a ravine on a neck whose trail isn't needed: without its link every room can still be reached from the start,
+    // so nobody is shut in wherever they stand (a friend in a dead-end clearing, a cache across the gorge). Only exits kept reachable,
+    // the only way back from such a clearing could close with a player in it. Not by where the players stand: every game works the
+    // rockfall out alike from the seed, so it can't depend on positions.
     private static List<(Vector2 at, int link)> ClosableNecks(RaidLayoutPlan plan)
     {
         var necks = new List<(Vector2, int)>();
@@ -210,7 +228,7 @@ public sealed class RaidTerrainEvents : MonoBehaviour
 
         for (int i = 0; i < plan.Rooms.Count; i++)
         {
-            if (plan.Rooms[i].Role == RaidRoomRole.Exit && !reached[i])
+            if (!reached[i])
             {
                 return false;
             }

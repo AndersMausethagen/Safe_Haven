@@ -198,12 +198,12 @@ public static class CraftedWork
         if (!item.HasDurability)
         {
             int extra = UnityEngine.Random.value < ExtraChance(Of(item), maker) ? 1 : 0;
-            if (extra > 0)
+            int arrived = bag.Give(item, amount + extra, ArrivalCause.Crafted);
+            // Told once it is in the bag: told before, it was often lost for want of room (the queue checked room for the craft alone).
+            if (extra > 0 && arrived > amount)
             {
                 GameMessages.Post($"A little extra: +1 {item.DisplayName}", MessageKind.Gain);
             }
-
-            int arrived = bag.Give(item, amount + extra, ArrivalCause.Crafted);
             if (arrived > 0)
             {
                 Made?.Invoke(item, arrived, ItemQuality.Plain, item.DisplayName);

@@ -111,8 +111,17 @@ public static class Salvage
         ResourceDefinition purified = SettlementSettings.Current != null ? SettlementSettings.Current.PurifiedEssence : null;
         if (refund > 0 && purified != null && player != null)
         {
-            MaterialPool.For(player).Add(purified, refund);
-            GameMessages.Post($"{refund} {purified.DisplayName} drawn back out of its empowering.", MessageKind.Gain);
+            // What was taken in, not what was asked: carried essence is capped (in a friend's Haven it is all there is).
+            int drawn = MaterialPool.For(player).Add(purified, refund);
+            if (drawn > 0)
+            {
+                GameMessages.Post($"{drawn} {purified.DisplayName} drawn back out of its empowering.", MessageKind.Gain);
+            }
+
+            if (drawn < refund)
+            {
+                GameMessages.Post($"No room for {refund - drawn} {purified.DisplayName}: it fades.", MessageKind.Warning);
+            }
         }
 
         string what = count > 1 ? $"{count} {stack.Item.DisplayName}" : stack.Item.DisplayName;

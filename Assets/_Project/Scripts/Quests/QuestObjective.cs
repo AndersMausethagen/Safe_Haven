@@ -430,7 +430,13 @@ public sealed class QuestObjective
             case ObjectiveType.ReachHavenRank:
                 return GameSession.Home.HavenRank >= Rank ? 1 : 0; // the player's own Haven's rank, also on a friend's raid
             case ObjectiveType.StoreItem:
-                // Already in the stash (an older save, or put away before the quest): it is safe, which is the point.
+                // Already in the stash (an older save, or put away before the quest): it is safe, which is the point. One's own stash
+                // only: a guest's game holds the host's here, also on a raid followed with them (one's own waits in the kept home game).
+                if (HavenVisit.IsVisiting)
+                {
+                    return 0;
+                }
+
                 StashStorage stash = GameSession.Stash;
                 return stash == null ? 0 : item != null ? stash.Items.Count(item) : stash.Items.CountItems();
             case ObjectiveType.UpgradeBuilding:

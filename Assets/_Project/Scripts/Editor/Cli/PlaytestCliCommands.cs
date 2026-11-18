@@ -125,7 +125,7 @@ public static class PlaytestCliCommands
         }
 
         int accepted = to == "bag" && RequirePlayer().TryGetComponent(out ItemInventory inventory)
-            ? inventory.Give(item, amount)
+            ? inventory.Give(item, amount, ArrivalCause.Found)
             : container.Add(item, amount);
         string refused = accepted < amount ? $" ({amount - accepted} didn't fit)" : "";
         return $"{item.name} +{accepted}{refused} -> {container.Count(item)} in {to}, weight {container.CurrentWeight:0.#}";

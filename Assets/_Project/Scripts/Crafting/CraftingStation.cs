@@ -200,16 +200,8 @@ public sealed class CraftingStation : MonoBehaviour
                 return null;
             }
 
-            foreach (ResidentRecord resident in GameSession.Here.Residents)
-            {
-                if (resident.Job != null && resident.Job.Workplace == building.Definition
-                    && (string.IsNullOrEmpty(resident.WorkQueue) || resident.WorkQueue == Id))
-                {
-                    return resident;
-                }
-            }
-
-            return null;
+            // The one rule (SettlementState.WorkerAt by station): its speed and its worker's learning ask the same.
+            return GameSession.Here.WorkerAt(Id, type);
         }
     }
 
@@ -223,7 +215,7 @@ public sealed class CraftingStation : MonoBehaviour
             if (queue != null)
             {
                 // The building's level, and the rank of the resident who works here.
-                queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(type);
+                queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(Id, type);
                 queue.Tier = Tier;
                 // Kept on the queue so its worker's luck holds during raids, when no station is loaded.
                 queue.ExtraChance = Extensions(extension => extension.extraChance);

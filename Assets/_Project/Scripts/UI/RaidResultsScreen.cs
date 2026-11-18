@@ -267,10 +267,15 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
 
     private void Continue()
     {
-        if (SceneLoader.Load(destination, extracted ? "Home to Safe Haven" : "Waking at the portal"))
+        // Off while the way home loads, and back on if it breaks off: the results scene has no other way out.
+        continueButton.interactable = false;
+        SceneLoader.Load(destination, extracted ? "Home to Safe Haven" : "Waking at the portal", ifItFails: () =>
         {
-            continueButton.interactable = false;
-        }
+            if (continueButton != null)
+            {
+                continueButton.interactable = true;
+            }
+        });
     }
 
     private static bool CanLoad(string scene) => !string.IsNullOrEmpty(scene) && Application.CanStreamedLevelBeLoaded(scene);

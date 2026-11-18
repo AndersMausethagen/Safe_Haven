@@ -383,6 +383,12 @@ public sealed class BossEncounter : MonoBehaviour
         }
 
         health.AddInvulnerability(this);
+        // Asleep in the raid's eyes (CreatureSleep, a friend nearer than the host): its body is woken there, not by the AI alone.
+        if (RaidDirector.Current != null && RaidDirector.Current.TryGetComponent(out CreatureSleep sleep))
+        {
+            sleep.WakeNow(ai);
+        }
+
         ai.enabled = false;
         AudioManager.Play(definition.WakeSound, transform.position);
         CameraShake.Add(0.8f);

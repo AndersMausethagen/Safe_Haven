@@ -24,12 +24,17 @@ public sealed class CreatureSleep : MonoBehaviour
 
     private readonly Dictionary<MonsterAI, Sleeper> sleepers = new Dictionary<MonsterAI, Sleeper>();
     private readonly List<MonsterAI> scratch = new List<MonsterAI>();
+    private readonly List<Vector3> players = new List<Vector3>();
     private RaidDirector director;
     private float nextCheck;
 
     public int SleepingCount => sleepers.Count;
 
     public bool IsAsleep(MonsterAI ai) => ai != null && sleepers.ContainsKey(ai);
+
+    /// <summary>Wakes <paramref name="ai"/> if this has it asleep: what wakes a creature itself (a boss rising) asks here, as its body
+    /// (agent, animator) is this one's to switch. A boss woken by setting its AI on stood up frozen, its agent and animation still off.</summary>
+    public void WakeNow(MonsterAI ai) => Wake(ai, null);
 
     private void Awake()
     {
@@ -71,7 +76,9 @@ public sealed class CreatureSleep : MonoBehaviour
         }
         nextCheck = Time.time + CheckInterval;
 
-        Vector3 player = director.Player.transform.position;
+        // Every player up on this raid, friends too (RaidPlayers): by the host's own alone, a guest exploring apart walked past
+        // camps asleep around them.
+        RaidPlayers.Positions(director.Player, players);
         RaidGlobalSettings rules = RaidGlobalSettings.Current;
         float sleepSqr = rules.SleepDistance * rules.SleepDistance;
         float wakeSqr = rules.WakeDistance * rules.WakeDistance;
@@ -84,7 +91,7 @@ public sealed class CreatureSleep : MonoBehaviour
             {
                 sleepers.Remove(ai);
             }
-            else if (ai.KeepAwake || FlatSqr(ai.transform.position - player) < wakeSqr)
+            else if (ai.KeepAwake || RaidPlayers.NearestFlatSqr(players, ai.transform.position) < wakeSqr)
             {
                 Wake(ai, null);
             }
@@ -93,7 +100,7 @@ public sealed class CreatureSleep : MonoBehaviour
         foreach (MonsterAI ai in MonsterAI.All)
         {
             if (ai != null && ai.enabled && !sleepers.ContainsKey(ai) && ai.CurrentState == MonsterAI.State.Idle
-                && !ai.IsRoaming && !ai.KeepAwake && FlatSqr(ai.transform.position - player) > sleepSqr)
+                && !ai.IsRoaming && !ai.KeepAwake && RaidPlayers.NearestFlatSqr(players, ai.transform.position) > sleepSqr)
             {
                 Sleep(ai);
             }

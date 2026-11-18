@@ -38,7 +38,9 @@ public static class ItemDrag
         int from = Index;
         if (!target.IsUnlocked(index))
         {
-            GameMessages.Post("That slot is locked. Carry a bigger backpack to use it.", MessageKind.Warning);
+            // A bag's slots open with a bigger backpack; a chest's, a pocket's and others' by their own rules.
+            bool bag = Player.Current != null && Player.Current.Bag != null && target == Player.Current.Bag.Container;
+            GameMessages.Post(bag ? "That slot is locked. Carry a bigger backpack to use it." : "That slot is locked.", MessageKind.Warning);
             return false;
         }
 

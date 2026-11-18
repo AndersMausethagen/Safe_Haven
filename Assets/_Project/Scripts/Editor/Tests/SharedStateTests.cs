@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// The fourth round of guards (Docs/BugPatterns.md): bugs that came from state no one owned, put together again at each place
@@ -109,6 +110,11 @@ public sealed class SharedStateTests
                 names.Add(declared.Groups[1].Value);
             }
 
+            foreach (Match declared in Regex.Matches(source, @"<PlayerInputHandler>\s*\(\s*out\s+var\s+(\w+)"))
+            {
+                names.Add(declared.Groups[1].Value);
+            }
+
             string[] lines = source.Split('\n');
             for (int i = 0; i < lines.Length; i++)
             {
@@ -125,11 +131,40 @@ public sealed class SharedStateTests
             "what another still held (a downed player with full controls, a cinematic the scene change ended)");
     }
 
+    // The Player map's keys as they are now, put back afterwards: holding the controls switches them (GameInput.SetPlayerKeys), and in
+    // edit mode no OnEnable gives them back, so a test left them off for every test after it.
+    private static System.Action KeepPlayerMap()
+    {
+        InputActionMap map = GameInput.PlayerMap;
+        if (map == null)
+        {
+            return () => { };
+        }
+
+        bool[] on = map.actions.Select(action => action.enabled).ToArray();
+        return () =>
+        {
+            GameInput.SetPlayerKeys(false);
+            for (int i = 0; i < on.Length && i < map.actions.Count; i++)
+            {
+                if (on[i])
+                {
+                    map.actions[i].Enable();
+                }
+                else
+                {
+                    map.actions[i].Disable();
+                }
+            }
+        };
+    }
+
     [Test]
     public void TheControls_ComeBack_OnlyWhenNobodyHoldsThem()
     {
         var player = new GameObject("Held Player");
         var cinematic = new GameObject("A Cinematic");
+        System.Action putBack = KeepPlayerMap();
         try
         {
             PlayerInputHandler input = player.AddComponent<PlayerInputHandler>();
@@ -160,6 +195,8 @@ public sealed class SharedStateTests
             {
                 Object.DestroyImmediate(cinematic);
             }
+
+            putBack();
         }
     }
 
@@ -184,6 +221,12 @@ public sealed class SharedStateTests
                 names.Add(declared.Groups[1].Value);
             }
 
+            // var locals that are stacks: from a slot, a lure's or a drop's stack.
+            foreach (Match declared in Regex.Matches(source, @"\bvar\s+(\w+)\s*=\s*[^;\n]*(?:GetSlot\s*\(|\.Stack\b)"))
+            {
+                names.Add(declared.Groups[1].Value);
+            }
+
             string[] lines = source.Split('\n');
             for (int i = 0; i < lines.Length; i++)
             {
@@ -194,6 +237,11 @@ public sealed class SharedStateTests
                     {
                         remade.Add($"{file}:{i + 1}: {code.Trim()}");
                     }
+                }
+
+                if (Regex.IsMatch(code, @"new\s+ItemStack\s*\([^,;]*GetSlot\s*\([^)]*\)\s*\.\s*Item\s*,"))
+                {
+                    remade.Add($"{file}:{i + 1}: {code.Trim()}");
                 }
             }
         }
@@ -240,6 +288,137 @@ public sealed class SharedStateTests
         {
             Object.DestroyImmediate(parchment);
             Object.DestroyImmediate(enchantment);
+        }
+    }
+
+    // ----- Fifth round: one switch for the Player map, one copy of a save slot, one cleanup for a failed load, a guard on every text field -----
+
+    [Test]
+    public void ThePlayerMap_IsSwitchedOnlyByGameInput()
+    {
+        var switched = new List<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (file == "Core/GameInput.cs")
+            {
+                continue;
+            }
+
+            string[] lines = source.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string code = CodePart(lines[i]);
+                if (Regex.IsMatch(code, @"GameInput\.\w+\s*\??\s*\.\s*(Enable|Disable)\s*\(\s*\)"))
+                {
+                    switched.Add($"{file}:{i + 1}: {code.Trim()}");
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(switched, "the Player map's keys are switched in one place (GameInput.SetPlayerKeys; a hold keeps a few through " +
+            "PlayerControl.Kept, a suspension through SuspendGameplay(owner, keep)): switched by hand, the Nøkken's struggle key was off for the whole grab");
+    }
+
+    // Slots made field by field where the save mapper doesn't (and why).
+    private static readonly Dictionary<string, string> SlotsMadeByHand = new Dictionary<string, string>
+    {
+        ["Multiplayer/StashShare.cs"] = "FromKey: a slot read back from a kind's key, every field the key holds",
+    };
+
+    [Test]
+    public void ASaveSlot_IsMadeBySaveMapper_OrCopiedWithWith()
+    {
+        var madeByHand = new HashSet<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (file != "Save/SaveMapper.cs" && file != "Save/SaveData.cs" && Regex.IsMatch(source, @"new\s+SlotSaveData\s*(\{|\()"))
+            {
+                madeByHand.Add(file);
+            }
+        }
+
+        CollectionAssert.IsEmpty(madeByHand.Except(SlotsMadeByHand.Keys).ToList(), "a slot comes from SaveMapper.SlotOf(stack) or slot.With(slot, count): " +
+            "made field by field, a co-op stash change left out the fish's size");
+        CollectionAssert.IsEmpty(SlotsMadeByHand.Keys.Except(madeByHand).ToList(), "these no longer make slots by hand: take them off the list");
+    }
+
+    // A load whose result is tested without ifItFails, and why that is enough.
+    private static readonly Dictionary<string, string> LoadsTestedOnly = new Dictionary<string, string>
+    {
+        ["UI/PauseMenu.cs"] = "the menu's leaving undoes itself on SceneTransition.Abandoned (OnLeavingAbandoned), raised on every break-off",
+    };
+
+    [Test]
+    public void ALoadThatCanFail_SaysWhatUndoesIt()
+    {
+        var tested = new HashSet<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            foreach (string line in source.Split('\n'))
+            {
+                string code = CodePart(line);
+                if (Regex.IsMatch(code, @"if\s*\(\s*!?\s*SceneLoader\.Load\(") && !code.Contains("ifItFails"))
+                {
+                    tested.Add(file);
+                }
+            }
+        }
+
+        CollectionAssert.IsEmpty(tested.Except(LoadsTestedOnly.Keys).ToList(), "pass SceneLoader.Load's ifItFails: a load can also break off after it " +
+            "started, and undoing only a refusal left a player frozen at the portal with a raid that never came");
+        CollectionAssert.IsEmpty(LoadsTestedOnly.Keys.Except(tested).ToList(), "these no longer test a load's result: take them off the list");
+    }
+
+    // Text fields typed in where no gameplay key can act, and why.
+    private static readonly Dictionary<string, string> UnguardedFields = new Dictionary<string, string>
+    {
+        ["UI/Options/CharacterCreationScreen.cs"] = "the main menu's new game: no player, no gameplay keys",
+    };
+
+    [Test]
+    public void EveryTextField_HoldsTheGameplayKeysWhileTyped()
+    {
+        var unguarded = new HashSet<string>();
+        foreach ((string path, string source) in ConventionTests.RuntimeScripts())
+        {
+            string file = path.Substring("Assets/_Project/Scripts/".Length);
+            if (source.Contains("AddComponent<TMP_InputField>") && !source.Contains("KitSearchGuard") && !source.Contains("SuspendGameplay"))
+            {
+                unguarded.Add(file);
+            }
+        }
+
+        CollectionAssert.IsEmpty(unguarded.Except(UnguardedFields.Keys).ToList(), "guard a text field (KitSearchGuard.On(field), or SuspendGameplay while typing): " +
+            "the cheat window's search flipped the camera at every \"v\"");
+        CollectionAssert.IsEmpty(UnguardedFields.Keys.Except(unguarded).ToList(), "these are guarded now: take them off the list");
+    }
+
+    [Test]
+    public void AHoldsKeptKeys_WorkOnlyWhileEveryHolderKeepsThem()
+    {
+        var player = new GameObject("Held Player");
+        System.Action putBack = KeepPlayerMap();
+        try
+        {
+            player.AddComponent<PlayerInputHandler>();
+            object downed = new object();
+            object cinematic = new object();
+            PlayerControl.Hold(player, downed, PlayerControl.Kept.Move);
+            Assert.IsTrue(GameInput.Move == null || GameInput.Move.enabled, "down: the crawl's key works");
+
+            PlayerControl.Hold(player, cinematic);
+            Assert.IsTrue(GameInput.Move == null || !GameInput.Move.enabled, "a cinematic holds too: no crawling under it");
+
+            PlayerControl.Release(player, cinematic);
+            Assert.IsTrue(GameInput.Move == null || GameInput.Move.enabled, "the cinematic is over: crawling again");
+        }
+        finally
+        {
+            Object.DestroyImmediate(player);
+            putBack();
         }
     }
 

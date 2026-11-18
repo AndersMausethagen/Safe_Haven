@@ -176,6 +176,9 @@ public static class SaveMapper
         return slots;
     }
 
+    /// <summary>A stack as save data, in no slot (-1): everything about the piece, as a save keeps it.</summary>
+    public static SlotSaveData SlotOf(ItemStack stack) => ToSlot(-1, stack);
+
     private static SlotSaveData ToSlot(int index, ItemStack stack)
     {
         return new SlotSaveData

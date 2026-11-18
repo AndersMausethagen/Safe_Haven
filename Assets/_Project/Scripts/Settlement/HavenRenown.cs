@@ -27,7 +27,9 @@ public static class HavenRenown
         HavenSettings settings = HavenSettings.Current;
         parts?.Clear();
         int total = 0;
-        var seen = new Dictionary<BuildingDefinition, int>();
+        // Each kind's best (with its upgrades) counts in full and the others at the repeat share, whatever order they stand in: by list
+        // order, moving a level-3 house (off and on again, so last) behind a level-1 one lowered the renown.
+        var kinds = new Dictionary<BuildingDefinition, List<(float worth, string title)>>();
         foreach (BuildingObject building in BuildingObject.Active)
         {
             BuildingDefinition definition = building.Definition;
@@ -42,17 +44,27 @@ public static class HavenRenown
                 continue;
             }
 
-            seen.TryGetValue(definition, out int before);
-            seen[definition] = before + 1;
-            float worth = definition.Renown + (construction != null ? construction.Sum(level => level.renown) : 0f);
-            int renown = Mathf.RoundToInt(before == 0 ? worth : worth * settings.RepeatShare);
-            if (renown <= 0)
+            if (!kinds.TryGetValue(definition, out List<(float worth, string title)> standing))
             {
-                continue;
+                kinds[definition] = standing = new List<(float worth, string title)>();
             }
 
-            total += renown;
-            parts?.Add(new Part(construction != null ? construction.Title : definition.DisplayName, renown));
+            standing.Add((definition.Renown + (construction != null ? construction.Sum(level => level.renown) : 0f),
+                construction != null ? construction.Title : definition.DisplayName));
+        }
+
+        foreach (List<(float worth, string title)> standing in kinds.Values)
+        {
+            standing.Sort((a, b) => b.worth.CompareTo(a.worth));
+            for (int i = 0; i < standing.Count; i++)
+            {
+                int renown = Mathf.RoundToInt(i == 0 ? standing[i].worth : standing[i].worth * settings.RepeatShare);
+                if (renown > 0)
+                {
+                    total += renown;
+                    parts?.Add(new Part(standing[i].title, renown));
+                }
+            }
         }
 
         int clearing = Mathf.RoundToInt(Overgrowth.ClearedShare * settings.ClearingRenown);

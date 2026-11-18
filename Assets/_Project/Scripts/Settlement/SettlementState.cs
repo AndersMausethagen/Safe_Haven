@@ -741,12 +741,26 @@ public sealed class SettlementState : IHavenView
         Changed?.Invoke();
     }
 
-    /// <summary>The resident whose job works at this kind of station, if one does.</summary>
-    public ResidentRecord WorkerAt(CraftingStationType station)
+    /// <summary>The resident whose job works at this kind of station, if one does (the first; one station: WorkerAt(id, kind)).</summary>
+    public ResidentRecord WorkerAt(CraftingStationType station) => WorkerAt(null, station);
+
+    /// <summary>
+    /// Who works at the station <paramref name="stationId"/>: a resident whose job's workplace is of its kind and whose own station it
+    /// is (HavenHomes: the one nearest their home), or of its kind before that is known. Null id: anyone of its kind. The one rule for
+    /// a station's worker, its speed and its worker's learning: three, they disagreed (two fishers at two docks, and only the first
+    /// ever learned; a second Smithy with nobody ran at the first smith's speed).
+    /// </summary>
+    public ResidentRecord WorkerAt(string stationId, CraftingStationType station)
     {
+        if (station == CraftingStationType.None)
+        {
+            return null;
+        }
+
         foreach (ResidentRecord record in residents)
         {
-            if (record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station && station != CraftingStationType.None)
+            if (record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station
+                && (stationId == null || string.IsNullOrEmpty(record.WorkQueue) || record.WorkQueue == stationId))
             {
                 return record;
             }
@@ -756,9 +770,12 @@ public sealed class SettlementState : IHavenView
     }
 
     /// <summary>How much faster a station works for the rank of the resident who works there (1 with nobody).</summary>
-    public float WorkerSpeed(CraftingStationType station)
+    public float WorkerSpeed(CraftingStationType station) => WorkerSpeed(null, station);
+
+    /// <summary>The same, for the station <paramref name="stationId"/> and its own worker.</summary>
+    public float WorkerSpeed(string stationId, CraftingStationType station)
     {
-        ResidentRecord worker = WorkerAt(station);
+        ResidentRecord worker = WorkerAt(stationId, station);
         return worker != null ? SettlementSettings.Current.RankFor(worker.WorkDone).speed : 1f;
     }
 

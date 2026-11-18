@@ -55,7 +55,7 @@ public sealed class GiveLootOutcome : RaidEventOutcome
             }
 
             int amount = RaidParameters.ScaleAmount(drop.Amount, multiplier, (float)context.Random.NextDouble());
-            int given = amount > 0 && bag != null ? bag.Give(drop.Item, amount) : 0;
+            int given = amount > 0 && bag != null ? bag.Give(drop.Item, amount, ArrivalCause.Found) : 0;
             if (given < amount)
             {
                 GameMessages.Post($"Bag full, left behind: {amount - given} {drop.Item.DisplayName}", MessageKind.Warning);
@@ -124,9 +124,12 @@ public sealed class ChangeTimeOutcome : RaidEventOutcome
 
     public override void Apply(RaidEventContext context)
     {
-        context.Session.AddTime(seconds);
-        GameMessages.Post(seconds >= 0f ? $"+{RaidStats.FormatTime(seconds)} on the clock." : $"-{RaidStats.FormatTime(-seconds)} lost.",
-            seconds >= 0f ? MessageKind.Gain : MessageKind.Warning);
+        // What the clock really took: "-0:45 lost" at 30 s left took 15 s, and at 8 s none.
+        float changed = context.Session.AddTime(seconds);
+        string said = changed > 0.5f ? $"+{RaidStats.FormatTime(changed)} on the clock."
+            : changed < -0.5f ? $"-{RaidStats.FormatTime(-changed)} lost."
+            : "The mist presses close, but it can take no more of your time.";
+        GameMessages.Post(said, changed >= 0f ? MessageKind.Gain : MessageKind.Warning);
     }
 }
 

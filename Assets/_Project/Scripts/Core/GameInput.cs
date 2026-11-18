@@ -131,6 +131,19 @@ public static class GameInput
     /// <param name="owner">Who asks (the window typing, the rebind): the keys come back only once every owner has resumed. One
     /// shared switch let any resume turn everything back on: the world map closing gave the keys back under a horse's name being
     /// typed, and the letters opened windows behind it.</param>
+    /// <summary>The same, keeping <paramref name="keep"/> working meanwhile (the world map's own key, which also closes it): kept here,
+    /// with the suspension, so whatever switches the Player map meanwhile (a pause, a hold) can't switch it off.</summary>
+    public static void SuspendGameplay(object owner, InputAction keep)
+    {
+        if (owner != null && keep != null)
+        {
+            KeptBy[owner] = keep;
+        }
+
+        SuspendGameplay(owner);
+        ApplyPlayerKeys();
+    }
+
     public static void SuspendGameplay(object owner)
     {
         if (owner == null || !Suspenders.Add(owner) || Suspenders.Count > 1)
@@ -140,17 +153,25 @@ public static class GameInput
 
         foreach (InputActionMap map in InputSystem.actions.actionMaps)
         {
-            if (map.enabled && map.name != "UI")
+            // The Player map is SetPlayerKeys' own: it stays off while suspended and comes back as it was asked for.
+            if (map.enabled && map.name != "UI" && map.name != "Player")
             {
                 Suspended.Add(map);
                 map.Disable();
             }
         }
+
+        ApplyPlayerKeys();
     }
 
     /// <summary>Gives back what <see cref="SuspendGameplay"/> took for <paramref name="owner"/>, once no other owner holds it.</summary>
     public static void ResumeGameplay(object owner)
     {
+        if (owner != null && KeptBy.Remove(owner) && Suspenders.Count > 1)
+        {
+            ApplyPlayerKeys();
+        }
+
         if (owner == null || !Suspenders.Remove(owner) || Suspenders.Count > 0)
         {
             return;
@@ -162,6 +183,67 @@ public static class GameInput
         }
 
         Suspended.Clear();
+        ApplyPlayerKeys();
+    }
+
+    // ----- The Player map's keys, switched in one place (Docs/BugPatterns.md, fifth round) -----
+
+    private static bool playerKeysAll;
+    private static readonly List<InputAction> PlayerKeysSome = new List<InputAction>();
+    // Keys a suspension keeps working (SuspendGameplay(owner, keep)), by who suspended.
+    private static readonly Dictionary<object, InputAction> KeptBy = new Dictionary<object, InputAction>();
+
+    /// <summary>
+    /// Which of the Player map's keys work: all (<paramref name="all"/>: the input handler, unpaused), only <paramref name="some"/> (a
+    /// hold on the controls that keeps a few: crawling while down, watching friends, the Nøkken's struggle), or none. The only place
+    /// the map is switched: before, the handler, the gameplay suspension and two holds each switched it, and the last undid the others'
+    /// reasons (the map came back on under a name being typed; the Nøkken's struggle key was off for the whole grab, so it was never
+    /// escaped). Applied unless gameplay is suspended, and again when it resumes.
+    /// </summary>
+    public static void SetPlayerKeys(bool all, IReadOnlyList<InputAction> some = null)
+    {
+        playerKeysAll = all;
+        PlayerKeysSome.Clear();
+        for (int i = 0; some != null && i < some.Count; i++)
+        {
+            if (some[i] != null)
+            {
+                PlayerKeysSome.Add(some[i]);
+            }
+        }
+
+        ApplyPlayerKeys();
+    }
+
+    private static void ApplyPlayerKeys()
+    {
+        InputActionMap map = PlayerMap;
+        if (map == null)
+        {
+            return;
+        }
+
+        if (playerKeysAll && !IsGameplaySuspended)
+        {
+            map.Enable();
+            return;
+        }
+
+        map.Disable();
+        if (IsGameplaySuspended)
+        {
+            foreach (InputAction kept in KeptBy.Values)
+            {
+                kept?.Enable();
+            }
+
+            return;
+        }
+
+        foreach (InputAction action in PlayerKeysSome)
+        {
+            action.Enable();
+        }
     }
 
     /// <summary>True while anything has the gameplay keys suspended.</summary>
@@ -434,6 +516,9 @@ public static class GameInput
         Suspended.Clear();
         Suspenders.Clear();
         PressedBy.Clear();
+        playerKeysAll = false;
+        PlayerKeysSome.Clear();
+        KeptBy.Clear();
     }
 
     // Quiet when only looking: a key token's action is searched for in each map in turn.

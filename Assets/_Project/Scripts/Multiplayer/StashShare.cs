@@ -91,7 +91,7 @@ public sealed class StashShare
 
             if (kind.count > 0)
             {
-                var stack = new List<SlotSaveData> { new SlotSaveData { slot = -1, item = kind.item, count = kind.count, wear = kind.wear, empower = kind.empower, enchantment = kind.enchantment, quality = kind.quality, maker = kind.maker } };
+                var stack = new List<SlotSaveData> { kind.With(-1, kind.count) };
                 int before = stash.Items.Count(item);
                 SaveMapper.ReadSlots(stack, stash.Items, content, new List<string>());
                 if (stash.Items.Count(item) - before < kind.count)
@@ -144,16 +144,7 @@ public sealed class StashShare
         return count;
     }
 
-    private static SlotSaveData KindOf(ItemStack stack) => new SlotSaveData
-    {
-        item = stack.Item.Id,
-        count = stack.Count,
-        wear = 1f - stack.Durability,
-        empower = stack.Empower,
-        enchantment = stack.Enchantment != null ? stack.Enchantment.Id : "",
-        quality = (int)stack.Quality,
-        maker = stack.Maker,
-    };
+    private static SlotSaveData KindOf(ItemStack stack) => SaveMapper.SlotOf(stack);
 
     // ---- Guest
 
@@ -240,9 +231,9 @@ public sealed class StashShare
 
     // ---- Counting by kind
 
-    // An item's kind: what it is and its condition, to the tenth of a percent of wear.
+    // An item's kind: what it is and its condition, to the tenth of a percent of wear, and a fish's length to the millimetre.
     private static string Key(SlotSaveData slot) =>
-        $"{slot.item}|{Mathf.RoundToInt(slot.wear * 1000f)}|{slot.empower}|{slot.enchantment ?? ""}|{slot.quality}|{(slot.maker ?? "").Replace("|", "/")}";
+        $"{slot.item}|{Mathf.RoundToInt(slot.wear * 1000f)}|{slot.empower}|{slot.enchantment ?? ""}|{slot.quality}|{(slot.maker ?? "").Replace("|", "/")}|{Mathf.RoundToInt(slot.size * 10f)}";
 
     private static SlotSaveData FromKey(string key)
     {
@@ -256,6 +247,7 @@ public sealed class StashShare
             enchantment = parts.Length > 3 ? parts[3] : "",
             quality = parts.Length > 4 ? int.Parse(parts[4]) : 0,
             maker = parts.Length > 5 ? parts[5] : "",
+            size = parts.Length > 6 ? int.Parse(parts[6]) / 10f : 0f,
         };
     }
 

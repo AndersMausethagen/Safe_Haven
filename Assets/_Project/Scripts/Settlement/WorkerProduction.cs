@@ -141,10 +141,12 @@ public static class WorkerProduction
         }
     }
 
-    // Anything finished at their station goes to the stash, whoever asked for it. What won't fit stays in the slot.
+    // Anything finished at their station goes to the stash, whoever asked for it, but gear: a piece is made by whoever collects it
+    // (StationCrafting.Collect, CraftedWork: its quality, condition and maker rolled there). Carried as it lay in the slot, every piece
+    // ordered at a staffed station came Plain, nameless and new, and Fine or Masterwork could never be made there. What won't fit stays.
     private static void Carry(StationQueue queue, StashStorage stash)
     {
-        if (queue.Output is ItemDefinition item && queue.OutputAmount > 0)
+        if (queue.Output is ItemDefinition item && queue.OutputAmount > 0 && !item.KeepsCondition && !item.HasDurability)
         {
             queue.TakeOutput(stash.Items.Add(item, queue.OutputAmount));
         }

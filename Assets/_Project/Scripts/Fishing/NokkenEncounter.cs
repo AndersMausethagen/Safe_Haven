@@ -81,7 +81,8 @@ public sealed class NokkenEncounter : MonoBehaviour
         }
 
         SetInput(false);
-        GameMessages.Post(first ? "Nøkken! The water spirit has you. Hammer SPACE to break free!" : "The Nøkken! Hammer SPACE!", MessageKind.Warning);
+        GameMessages.Post(GameInput.Keys(first ? "Nøkken! The water spirit has you. Hammer {key:Dodge} to break free!" : "The Nøkken! Hammer {key:Dodge}!"),
+            MessageKind.Warning);
         nextHurt = Time.time + 1f;
     }
 
@@ -223,12 +224,13 @@ public sealed class NokkenEncounter : MonoBehaviour
         health.ApplyDamage(new DamageInfo(null, null, amount, DamageType.Physical, false, at, at - surfaceAt));
     }
 
-    // The grab's own hold (PlayerControl): the raid's end or a co-op fall during the grab still holds the controls after it.
+    // The grab's own hold (PlayerControl), keeping Dodge for the struggle: held without it, the struggle key was off for the whole grab
+    // and the Nøkken was never escaped. The raid's end or a co-op fall during the grab still holds the controls after it.
     private void SetInput(bool on)
     {
         if (fishing != null)
         {
-            PlayerControl.Set(fishing.gameObject, this, !on);
+            PlayerControl.Set(fishing.gameObject, this, !on, PlayerControl.Kept.Dodge);
         }
     }
 

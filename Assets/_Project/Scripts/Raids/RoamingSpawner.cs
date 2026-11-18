@@ -181,6 +181,8 @@ public sealed class RoamingSpawner : MonoBehaviour
                 // A pack's root stays where it spawned; its members are where the group really is.
                 position += ai.transform.position;
                 busy |= ai.CurrentState == MonsterAI.State.Chasing || ai.CurrentState == MonsterAI.State.Attacking || ai.CurrentState == MonsterAI.State.Staggered;
+                // A thief running with what it took is busy too (it flees as Idle): tidied away, the stack went with it, untold.
+                busy |= ai.IsFleeing || !ai.Loot.IsEmpty;
                 idle |= ai.CurrentState == MonsterAI.State.Idle;
             }
 

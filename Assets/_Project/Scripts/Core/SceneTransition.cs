@@ -52,19 +52,41 @@ public static class SceneTransition
 
     /// <summary>Loads a scene behind the loading screen. Returns false if a scene change is already under way.</summary>
     /// <param name="caption">Shown on the loading screen, e.g. "Entering the Misty Woods". Null shows "Loading".</param>
-    public static bool Load(string scene, string caption = null)
+    /// <param name="ifItFails">Called however this load fails: refused now, or broken off before its scene is ready (SceneLoader.Load).</param>
+    public static bool Load(string scene, string caption = null, Action ifItFails = null)
     {
         if (string.IsNullOrEmpty(scene))
         {
             throw new ArgumentException("A scene name is required.", nameof(scene));
         }
 
-        return Begin(scene, -1, caption);
+        return Begin(scene, -1, caption, ifItFails);
     }
 
-    public static bool Load(int buildIndex, string caption = null)
+    public static bool Load(int buildIndex, string caption = null, Action ifItFails = null)
     {
-        return Begin(null, buildIndex, caption);
+        return Begin(null, buildIndex, caption, ifItFails);
+    }
+
+    // What the load under way undoes if it breaks off (its caller's ifItFails), until its scene is ready.
+    private static Action failing;
+
+    // A load broke off before its scene was ready: the game goes on where it stands, and what got ready for it undoes itself.
+    private static void BrokeOff()
+    {
+        Action failed = failing;
+        failing = null;
+        MarkReady(SceneManager.GetActiveScene());
+        try
+        {
+            failed?.Invoke();
+        }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception);
+        }
+
+        Abandoned?.Invoke();
     }
 
     /// <summary>
@@ -140,16 +162,18 @@ public static class SceneTransition
         return true;
     }
 
-    private static bool Begin(string scene, int buildIndex, string caption)
+    private static bool Begin(string scene, int buildIndex, string caption, Action ifItFails)
     {
         if (IsBusy)
         {
             Debug.LogWarning($"A scene change is already under way; ignoring the request to load '{scene ?? buildIndex.ToString()}'.");
+            ifItFails?.Invoke();
             return false;
         }
 
         IsBusy = true;
         generation++;
+        failing = ifItFails;
         GetRunner().StartTransition(scene, buildIndex, caption);
         return true;
     }
@@ -237,6 +261,7 @@ public static class SceneTransition
     private static void MarkReady(Scene scene)
     {
         IsBusy = false;
+        failing = null;
         runningSteps = null;
         var actions = new List<Action>(waitingForReady);
         waitingForReady.Clear();
@@ -273,6 +298,7 @@ public static class SceneTransition
         preloaded = null;
         preloadedScene = null;
         IsBusy = false;
+        failing = null;
         runningStep = 0;
     }
 
@@ -322,8 +348,7 @@ public static class SceneTransition
                     SceneLoader.CancelLeaving();
                     ResumePlayer();
                     screen.Hide();
-                    MarkReady(SceneManager.GetActiveScene());
-                    Abandoned?.Invoke();
+                    BrokeOff();
                 }
             }
         }
@@ -374,7 +399,8 @@ public static class SceneTransition
                 ResumePlayer();
                 yield return Fade(0f, settings.FadeInSeconds);
                 screen.Hide();
-                MarkReady(SceneManager.GetActiveScene());
+                // Broken off like any other (it never said so: a load's hold on the controls, the pause menu's leaving, stayed).
+                BrokeOff();
                 yield break;
             }
 

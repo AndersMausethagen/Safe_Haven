@@ -488,3 +488,19 @@ Written up as the fourth round in Docs/BugPatterns.md. Choices I made that you m
   end, a launch, loading and home revival each hold them in their own name; they come back when none hold them. Nothing should feel
   different, except that an overlap no longer gives them back early (a downed player stays down through the Nøkken's grab).
 - An Untitled scene left by a cut-off test run was discarded (Don't Save), not saved: it held only the test's leftovers.
+
+## Five more bug hunters (you: "have several more agents look for bugs. you analyse them, look for patterns and fix bad checks etc")
+
+The patterns and fixes are the fifth round in Docs/BugPatterns.md. Choices I made that change how something plays:
+- **Gear ordered at a staffed station waits in the output slot** for you to collect, where its quality, condition and maker are made.
+  Workers carry everything else to the stash as before. Before, they carried gear too, always Plain, so Fine or better could never be made
+  at a station with a worker.
+- **An ask whose asker is lost comes down from the board**, with a line saying so. Before, it was answered at once from your bag and stash
+  (a worked piece too) and held the board's one place for an order. Found again, they may ask anew.
+- **Saplings take root only in your own Haven.** In a friend's they went into a copy thrown away when the visit ended.
+- **A rockfall closes only a crossing that leaves every clearing reachable**, not just every exit. Maps whose only loops are elsewhere
+  may get fewer rockfalls; no one can be shut in.
+- **Time away from home counts game time**, so the pause menu on a raid no longer passes Haven days.
+- **Turning back from a boss encounter is a settled end**: nothing in the 1.5 s after it can turn it into a death.
+- **Crows wait for a fight to end** before landing on the dead (up to two minutes).
+- **The Nøkken's struggle** now works: Dodge stays live while it holds you (the message names your Dodge key, pad too).

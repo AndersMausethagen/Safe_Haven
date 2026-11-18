@@ -8,7 +8,7 @@ using UnityEngine;
 /// <see cref="CombatTechniqueSettings"/> (Eating and drinking); ItemInventory.Use sends food and drink here.
 /// </summary>
 [RequireComponent(typeof(Damageable))]
-public sealed class PlayerEating : MonoBehaviour
+public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
 {
     private Damageable health;
     private PlayerMovement movement;
@@ -53,8 +53,22 @@ public sealed class PlayerEating : MonoBehaviour
         boons = GetComponent<PlayerBoons>();
     }
 
+    /// <summary>Death alone (PlayerInterrupts tells every activity of it); a blow that gets through or a dodge stop it here.</summary>
+    public PlayerInterrupt EndsOn => PlayerInterrupt.None;
+
+    // Fallen (by a blow, or by poison or fire, which don't stop a meal while alive): nothing is eaten by the dead, and what was to
+    // come of the last meal goes with them. Before, a meal went on after death over time: used up on the body, hunger filled, its boon
+    // given, and healing after waking.
+    public void Interrupt(PlayerInterrupt reason)
+    {
+        Stop(false);
+        healLeft = 0f;
+        healPerSecond = 0f;
+    }
+
     private void OnEnable()
     {
+        PlayerInterrupts.For(gameObject).Add(this);
         health.Damaged += OnDamaged;
         if (dodge != null)
         {
@@ -64,6 +78,11 @@ public sealed class PlayerEating : MonoBehaviour
 
     private void OnDisable()
     {
+        if (TryGetComponent(out PlayerInterrupts interrupts))
+        {
+            interrupts.Remove(this);
+        }
+
         health.Damaged -= OnDamaged;
         if (dodge != null)
         {

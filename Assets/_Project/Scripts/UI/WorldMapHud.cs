@@ -257,10 +257,9 @@ public sealed class WorldMapHud : MonoBehaviour
             }
         }
 
-        GameInput.SuspendGameplay(this);
+        // M stays live while the rest of play waits, so the key that opened the map also closes it: kept by the suspension itself.
+        GameInput.SuspendGameplay(this, keep: GameInput.WorldMap);
         suspendedGameplay = true;
-        // M stays live while the rest of play waits, so the key that opened the map also closes it.
-        GameInput.WorldMap?.Enable();
     }
 
     private void Close()

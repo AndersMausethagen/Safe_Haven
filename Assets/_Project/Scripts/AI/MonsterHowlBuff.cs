@@ -63,12 +63,21 @@ public sealed class MonsterHowlBuff : MonoBehaviour
 
     private void Apply(float bonus, float healShare, float speedBonus, float hasteBonus, float toughness, float seconds)
     {
-        // Plain howls refresh rather than stack, so a refresh keeps the stronger bonus and the later end: a Rallying elite's aura
-        // (1.5 s at its bonus, every second) cut a kin's 10 s call short, and lowered a boss's bigger call to the aura's.
+        // Plain howls refresh rather than stack. A weaker call while a stronger one holds is let be: the stronger runs its own time,
+        // and the weaker (a Rallying elite's aura, 1.5 s every second) takes over when it is done. The same call again keeps the later
+        // end. Before, the aura cut a kin's 10 s call short and lowered a boss's bigger call to its own; then, keeping the stronger
+        // bonus with the aura's renewed time, a big call near an elite never ended.
         if (Key == Rally && IsActive)
         {
-            bonus = Mathf.Max(bonus, Bonus);
-            seconds = Mathf.Max(seconds, expiresAt - Time.time);
+            if (bonus < Bonus - 0.0001f)
+            {
+                return;
+            }
+
+            if (bonus <= Bonus + 0.0001f)
+            {
+                seconds = Mathf.Max(seconds, expiresAt - Time.time);
+            }
         }
 
         Clear();

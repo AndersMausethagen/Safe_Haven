@@ -8,6 +8,9 @@ using UnityEngine;
 /// </summary>
 public sealed class Aftermath : MonoBehaviour
 {
+    // How long crows due at a body wait for a fight there to end before they go elsewhere.
+    private const float CrowsWaitSeconds = 120f;
+
     [Tooltip("Metres round the body the grass lies flat, and for how many seconds.")]
     [SerializeField, Min(0.3f)] private float flattened = 1.8f;
     [SerializeField, Min(5f)] private float lasts = 150f;
@@ -65,13 +68,16 @@ public sealed class Aftermath : MonoBehaviour
                 continue;
             }
 
-            // Only while nothing is fighting there: crows don't land in a fight.
-            if (!MonsterAI.AnyHuntingPlayerSide())
+            // Only while nothing is fighting there: crows don't land in a fight, they wait for it to end (dropped while it went on,
+            // crows due in a fight never came). A fight that outlasts their patience sends them off.
+            if (MonsterAI.AnyHuntingPlayerSide() && Time.time < crows[i].when + CrowsWaitSeconds)
             {
-                if (Birds.Current != null)
-                {
-                    Birds.Current.LandAt(crows[i].at);
-                }
+                continue;
+            }
+
+            if (!MonsterAI.AnyHuntingPlayerSide() && Birds.Current != null)
+            {
+                Birds.Current.LandAt(crows[i].at);
             }
 
             crows.RemoveAt(i);

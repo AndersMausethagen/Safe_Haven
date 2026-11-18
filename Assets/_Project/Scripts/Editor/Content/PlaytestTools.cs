@@ -36,7 +36,7 @@ public static class PlaytestTools
         {
             case ItemDefinition item:
                 any = true;
-                DrawGive(host, item.DisplayName, count => player.Bag.Give(item, count), item.MaximumStack);
+                DrawGive(host, item.DisplayName, count => player.Bag.Give(item, count, ArrivalCause.Found), item.MaximumStack);
                 break;
             case ResourceDefinition resource:
                 any = true;
@@ -127,7 +127,7 @@ public static class PlaytestTools
 
                 foreach (ItemAmount cost in recipe.ItemCost)
                 {
-                    missing += cost.Item != null ? cost.Amount - bag.Give(cost.Item, cost.Amount) : 0;
+                    missing += cost.Item != null ? cost.Amount - bag.Give(cost.Item, cost.Amount, ArrivalCause.Found) : 0;
                 }
 
                 host.Notify(missing == 0 ? $"Ingredients for {recipe.DisplayName} given." : $"Ingredients given; {missing} didn't fit.");
@@ -153,7 +153,7 @@ public static class PlaytestTools
         {
             if (GUILayout.Button($"Give 1 {item.DisplayName} (take it to a raid portal)"))
             {
-                host.Notify(player.Bag.Give(item, 1) > 0 ? $"Gave {item.DisplayName}." : "The bag is full.");
+                host.Notify(player.Bag.Give(item, 1, ArrivalCause.Found) > 0 ? $"Gave {item.DisplayName}." : "The bag is full.");
             }
         }
     }

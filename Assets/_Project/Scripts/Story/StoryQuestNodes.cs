@@ -83,7 +83,7 @@ public sealed class GiveItemsNode : StoryNode
     {
         if (context.Player != null && context.Player.Bag != null)
         {
-            ItemGrantResult result = context.Player.Bag.Give(items);
+            ItemGrantResult result = context.Player.Bag.Give(items, ArrivalCause.Rewarded);
             if (result.HasOverflow)
             {
                 GameMessages.Post($"Can't carry it all: {AmountText.Describe(result.Overflow)} left behind.", MessageKind.Warning);

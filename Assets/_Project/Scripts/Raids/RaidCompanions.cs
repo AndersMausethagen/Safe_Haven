@@ -10,10 +10,13 @@ using UnityEngine.AI;
 public sealed class RaidCompanions
 {
     private readonly RaidDirector raid;
+    private CompanionBondRank companionRank;
 
     public RaidCompanions(RaidDirector raid)
     {
         this.raid = raid;
+        // Same lifetime as the raid: kept up with each danger stage, as the enemies are (Creatures).
+        raid.StageChanged += OnStageChanged;
     }
 
     /// <summary>Who came along on this raid, once they have walked in.</summary>
@@ -48,7 +51,8 @@ public sealed class RaidCompanions
         Companion = Companion.SpawnForRaid(prefab, session.Companion, hit.position);
         Companion.FormationOffset = new Vector3(2f, 0f, -3f);
         ResidentRecord record = GameSession.Here.Find(session.Companion);
-        Toughen(Companion, record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null);
+        companionRank = record != null ? CompanionBond.RankFor(record.RaidsAlong, SettlementSettings.Current.BondRanks) : null;
+        Toughen(Companion, companionRank);
     }
 
     /// <summary>Whoever is lost longest stands here, waiting, as a rumour said they would.</summary>
@@ -138,7 +142,7 @@ public sealed class RaidCompanions
 
     // Fights grow with the raid's tier and so do they: their health keeps up with what the enemies deal (Power), their
     // blows with what the enemies can take (Health), so they stay as much help as they are in the first.
-    private void Toughen(Companion who, CompanionBondRank rank)
+    private void Toughen(Companion who, CompanionBondRank rank, bool fill = true)
     {
         StatSheet stats = who.GetComponent<Combatant>().Stats;
         float tougher = rank != null ? rank.healthBonus : 0f;
@@ -146,6 +150,33 @@ public sealed class RaidCompanions
         stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, raid.PowerMultiplier * (1f + tougher) - 1f, raid));
         stats.AddModifier(new StatModifier(StatType.DamageBonus, StatModifierOp.Flat, raid.HealthMultiplier * (1f + harder) - 1f, raid));
         Damageable body = who.GetComponent<Damageable>();
-        body.Heal(body.MaxHealth);
+        if (fill)
+        {
+            body.Heal(body.MaxHealth);
+        }
+    }
+
+    // Each danger stage: toughened again to the raid's rules now (they were set once, at the start, while every stage made the enemies
+    // stronger; one lost and found late came stronger than the one who walked in). Only the extra health is given, not a full heal.
+    private void OnStageChanged(int stage, RaidStage _)
+    {
+        Retoughen(Companion, companionRank);
+        Retoughen(LostOne, null);
+    }
+
+    private void Retoughen(Companion who, CompanionBondRank rank)
+    {
+        if (who == null || !who.TryGetComponent(out Damageable body) || !body.IsAlive)
+        {
+            return;
+        }
+
+        float before = body.MaxHealth;
+        who.GetComponent<Combatant>().Stats.RemoveModifiersFrom(raid);
+        Toughen(who, rank, fill: false);
+        if (body.MaxHealth > before)
+        {
+            body.Heal(body.MaxHealth - before);
+        }
     }
 }

@@ -37,12 +37,9 @@ public static class CoopSpectate
         finish = finishRaid;
         watching = 0;
         since = Time.unscaledTime;
-        // Nothing else acts for the fallen player; only the two keys watching needs stay on.
+        // Nothing else acts for the fallen player; only the two keys watching needs stay on (while nothing else holds them).
         held = Player.Current != null ? Player.Current.gameObject : null;
-        PlayerControl.Hold(held, Watching);
-
-        GameInput.Interact?.Enable();
-        GameInput.Dodge?.Enable();
+        PlayerControl.Hold(held, Watching, PlayerControl.Kept.Interact | PlayerControl.Kept.Dodge);
         Point();
         GameMessages.Post("You fell. Watching your friends: Dodge for the next, Interact to head home.", MessageKind.Warning);
         return true;
@@ -106,14 +103,16 @@ public static class CoopSpectate
         Action finishing = finish;
         finish = null;
         Watched = null;
-        PlayerControl.Release(held, Watching);
-        held = null;
         if (PlayerCameraController.Current != null)
         {
             PlayerCameraController.Current.Watch(null);
         }
 
+        // The raid's end takes the controls first (RaidDirector.StopPlayer), then the watching lets go: given back between the two,
+        // the whole map came on for a moment.
         finishing?.Invoke();
+        PlayerControl.Release(held, Watching);
+        held = null;
     }
 
     // Friends on this run who are up and about.

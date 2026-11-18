@@ -374,19 +374,19 @@ public static class RaidLauncher
         // The player stays in this scene until the raid scene has loaded, so keep them from wandering off meanwhile.
         PlayerControl.Hold(player, Launching);
 
-        if (!SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}"))
+        // However the load fails (CheckLaunch rules out a refusal; a load can still break off on the way): no raid under way, the
+        // controls back, rather than a player frozen at the portal with a raid that never comes and saving refused.
+        bool failed = false;
+        SceneLoader.Load(raid.SceneName, $"Through the portal: {raid.DisplayName}", ifItFails: () =>
         {
-            // The load didn't start (CheckLaunch rules this out; a safety net): no raid under way, the controls back, rather than
-            // a player frozen at the portal with a raid that never comes.
+            failed = true;
             GameSession.AbandonRaid(session);
             GameSession.TakePlayerState();
             PlayerControl.Release(player, Launching);
-
             GameMessages.Post("The way didn't open. Try the portal again.", MessageKind.Warning);
-            return null;
-        }
+        });
 
-        return session;
+        return failed ? null : session;
     }
 
     // Entering Play doesn't reload scripts in this project: what a session left in the statics goes (EngineHazardTests).

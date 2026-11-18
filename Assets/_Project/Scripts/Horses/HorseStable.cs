@@ -35,6 +35,8 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     private readonly ItemContainer trough = new ItemContainer(4, 1);
     // The in-game hour each stall's horse is fed until.
     private readonly float[] fedUntil = new float[8];
+    // Who stood in each stall when saved (their save ids): a loaded horse goes back to its own stall, with its meal.
+    private string[] savedStalls;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => all.Clear();
@@ -217,10 +219,14 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         Release(horse, stable != null ? stable.DoorPosition : horse.transform.position + horse.transform.forward * 3f);
     }
 
-    private void Put(Horse horse, int stall)
+    private void Put(Horse horse, int stall, bool keepMeal = false)
     {
         kept[stall] = horse;
-        fedUntil[stall] = 0f; // a meal is the horse's that ate it, not the stall's
+        if (!keepMeal)
+        {
+            fedUntil[stall] = 0f; // a meal is the horse's that ate it, not the stall's
+        }
+
         horse.SetStabled(Id);
         horse.Motion.Stall(true, stalls[stall].position, stalls[stall].rotation);
     }
@@ -243,6 +249,22 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
     {
         horse.SetStabled("");
         horse.Motion.Stall(false, at, horse.transform.rotation);
+    }
+
+    // The stall the save had this horse in, while it is free.
+    private int OwnStall(Horse horse)
+    {
+        string id = horse.SaveId;
+        for (int i = 0; savedStalls != null && !string.IsNullOrEmpty(id) && i < savedStalls.Length && i < Stalls; i++)
+        {
+            if (savedStalls[i] == id && (kept[i] == null || !kept[i].IsAlive || kept[i].StabledIn != Id))
+            {
+                kept[i] = null;
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private int FreeStall()
@@ -372,14 +394,27 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
         public System.Collections.Generic.List<SlotSaveData> trough = new System.Collections.Generic.List<SlotSaveData>();
         public float lastHour = -1f;
         public float[] fedUntil;
+        /// <summary>Who stood in each stall (save ids; empty for none).</summary>
+        public string[] horses;
     }
 
     string ISaveable.SaveKey => "stable";
 
     public string CaptureState() => JsonUtility.ToJson(new Saved
     {
-        trough = SaveMapper.ToSlots(trough), lastHour = lastHour, fedUntil = (float[])fedUntil.Clone(),
+        trough = SaveMapper.ToSlots(trough), lastHour = lastHour, fedUntil = (float[])fedUntil.Clone(), horses = StallIds(),
     });
+
+    private string[] StallIds()
+    {
+        var ids = new string[kept.Length];
+        for (int i = 0; i < kept.Length; i++)
+        {
+            ids[i] = kept[i] != null ? kept[i].SaveId : "";
+        }
+
+        return ids;
+    }
 
     public void RestoreState(string state)
     {
@@ -398,6 +433,8 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
             {
                 fedUntil[i] = saved.fedUntil[i];
             }
+
+            savedStalls = saved.horses;
         }
     }
 
@@ -412,10 +449,13 @@ public sealed class HorseStable : MonoBehaviour, ISaveable, ICargoHold
             }
 
             Forget(horse);
-            int stall = FreeStall();
+            // Its own stall, as saved, keeps its meal (Put clears a meal for a horse new to the stall: on every load each horse lost
+            // the hours it had been fed).
+            int own = OwnStall(horse);
+            int stall = own >= 0 ? own : FreeStall();
             if (stall >= 0)
             {
-                Put(horse, stall);
+                Put(horse, stall, keepMeal: stall == own);
             }
             else
             {

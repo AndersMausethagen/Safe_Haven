@@ -132,9 +132,11 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
 
     int ISharedState.SharedMark => 0;
 
+    // Time away is counted in game time (Time.timeAsDouble: on across scene loads, still while paused). Counted in real time, an hour
+    // in the pause menu on a raid was two dawns at home: two territory turns, two days passed, nodes grown back.
     public string CaptureState() =>
         string.Join("|", (fadeElapsed >= 0f ? fadeTo : hour).ToString("R", CultureInfo.InvariantCulture), Run,
-            Time.realtimeSinceStartupAsDouble.ToString("R", CultureInfo.InvariantCulture));
+            Time.timeAsDouble.ToString("R", CultureInfo.InvariantCulture));
 
     public void RestoreState(string state)
     {
@@ -148,7 +150,7 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
         if (parts.Length >= 3 && parts[1] == Run && clockRuns && profile != null
             && double.TryParse(parts[2], NumberStyles.Float, CultureInfo.InvariantCulture, out double then))
         {
-            away = (float)(Time.realtimeSinceStartupAsDouble - then) * 24f / (profile.DayLengthMinutes * 60f);
+            away = (float)(Time.timeAsDouble - then) * 24f / (profile.DayLengthMinutes * 60f);
         }
 
         Hour = saved + Mathf.Max(0f, away);

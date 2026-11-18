@@ -143,8 +143,16 @@ public sealed class CoopDowned : ICoopPart, IDisposable
             return;
         }
 
+        // The raid's end is settled (time ran out, the host extracted): up again, quietly. Killed after it, past the end's own
+        // safety, a guest died under the outcome already told, and every listener to a death heard one.
+        if (!Place.RaidRunning)
+        {
+            StandUp(null, quiet: true);
+            return;
+        }
+
         aloneSince = friendStanding ? -1f : aloneSince < 0f ? Time.time : aloneSince;
-        if (Time.time >= bleedOutAt || (aloneSince >= 0f && Time.time - aloneSince >= AloneSeconds) || GameSession.ActiveRaid == null)
+        if (Time.time >= bleedOutAt || (aloneSince >= 0f && Time.time - aloneSince >= AloneSeconds))
         {
             Die();
         }
@@ -428,18 +436,9 @@ public sealed class CoopDowned : ICoopPart, IDisposable
             return;
         }
 
-        PlayerControl.Set(player.gameObject, this, !acting);
-
-        // The handler switches the whole Player map off with it: moving stays on, to crawl. Up again while something else still
-        // holds the controls (a cinematic, a scene change): the crawl's own key goes off with the rest.
-        if (!acting && GameInput.Move != null)
-        {
-            GameInput.Move.Enable();
-        }
-        else if (acting && GameInput.Move != null && PlayerControl.HeldOn(player.gameObject))
-        {
-            GameInput.Move.Disable();
-        }
+        // Moving stays on, to crawl, unless something else holds the controls too (a cinematic, the raid's end): PlayerControl keeps
+        // a key working only while every holder keeps it.
+        PlayerControl.Set(player.gameObject, this, !acting, PlayerControl.Kept.Move);
 
         if (!acting && movement != null)
         {

@@ -152,8 +152,11 @@ public sealed class StationQueue
         return added;
     }
 
-    /// <summary>True when the last craft in the queue hasn't been started, so it can be cancelled and refunded.</summary>
-    public bool CanCancelLast => jobs.Count > 1 || (jobs.Count == 1 && (jobs[0].Count > 1 || (Progress <= 0f && !Blocked)));
+    /// <summary>True when the last craft in the queue hasn't been started and is the player's, so it can be cancelled and refunded. A
+    /// worker's (they queue only on an idle station, so theirs come first) is theirs: cancelled, the player was refunded what the worker
+    /// took from the stash, and their own next order was counted as the worker's.</summary>
+    public bool CanCancelLast => QueuedCount > WorkerCrafts
+        && (jobs.Count > 1 || (jobs.Count == 1 && (jobs[0].Count > 1 || (Progress <= 0f && !Blocked))));
 
     /// <summary>Removes the last unstarted craft and returns its recipe so the caller can refund it; null when none.</summary>
     public RecipeDefinition CancelLast()

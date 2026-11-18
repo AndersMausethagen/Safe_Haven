@@ -30,7 +30,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
     private readonly MultiplayerSettings settings;
     private readonly Action followed;
     // By client id, not the name shown: two players called "Wanderer" took each other's news and counted once together.
-    private readonly Dictionary<ulong, (RaidOutcome outcome, string raid, float at)> news = new Dictionary<ulong, (RaidOutcome, string, float)>();
+    private readonly Dictionary<ulong, (RaidOutcome outcome, string raid, float at, string who)> news = new Dictionary<ulong, (RaidOutcome, string, float, string)>();
     private CoopLink link;
     private RaidInvite openRaid;
     private float openRaidSince;
@@ -238,7 +238,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
             link.ToGuests(NewsMessage, writer, sender);
         }
 
-        news[told.WhoId] = ((RaidOutcome)told.Outcome, told.Raid, Time.unscaledTime);
+        news[told.WhoId] = ((RaidOutcome)told.Outcome, told.Raid, Time.unscaledTime, told.Who);
         switch ((RaidOutcome)told.Outcome)
         {
             case RaidOutcome.Extracted:
@@ -292,7 +292,7 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
             }
         }
 
-        foreach (KeyValuePair<ulong, (RaidOutcome outcome, string raid, float at)> heard in news)
+        foreach (KeyValuePair<ulong, (RaidOutcome outcome, string raid, float at, string who)> heard in news)
         {
             if (heard.Value.outcome == RaidOutcome.Extracted && heard.Value.raid == raid && Time.unscaledTime - heard.Value.at <= TogetherSeconds)
             {
@@ -303,8 +303,15 @@ public sealed class RaidsTogether : ICoopPart, IDisposable
         int friends = Mathf.Min(3, together.Count);
         if (friends > 0 && settings != null && settings.TogetherExperience > 0)
         {
+            // By name (kept by client id since two "Wanderer"s counted once, and then the message said "1, 2").
+            var names = new List<string>();
+            foreach (ulong id in together)
+            {
+                names.Add(news.TryGetValue(id, out var heard) && !string.IsNullOrEmpty(heard.who) ? heard.who : NetworkPlayerAvatar.NameOf(id));
+            }
+
             ExperienceTracker.GrantInsight(settings.TogetherExperience * friends);
-            GameMessages.Post($"Out together with {string.Join(", ", together)}: +{settings.TogetherExperience * friends} experience.", MessageKind.Gain);
+            GameMessages.Post($"Out together with {string.Join(", ", names)}: +{settings.TogetherExperience * friends} experience.", MessageKind.Gain);
         }
     }
 }

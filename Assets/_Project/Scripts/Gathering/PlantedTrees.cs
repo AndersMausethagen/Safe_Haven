@@ -299,28 +299,57 @@ public sealed class PlantedTrees : MonoBehaviour, ISaveable
 
     public string CaptureState() => planted.Count > 0 ? JsonUtility.ToJson(new State { trees = planted }) : null;
 
+    // Two planted trees closer than this are the same one (positions come back from JSON to the last digit, or near it).
+    private const float SameSpot = 0.05f;
+
     public void RestoreState(string json)
     {
-        // Put back once: a second restore (a friend's Haven in co-op) would plant them all twice.
-        if (string.IsNullOrEmpty(json) || planted.Count > 0)
+        State state = string.IsNullOrEmpty(json) ? null : JsonUtility.FromJson<State>(json);
+        if (state == null || state.trees == null)
         {
             return;
         }
 
-        State state = JsonUtility.FromJson<State>(json);
-        if (state == null)
-        {
-            return;
-        }
-
+        // Loading puts every tree in. A later restore is a friend's game keeping this copy in step (HavenSync shares the whole state
+        // each time it changes): a tree not standing here yet goes in, none twice. Restored only once, every sapling the other game
+        // planted after the first never showed here.
         foreach (Planted tree in state.trees)
         {
-            int prototype = PrototypeNamed(tree.prototype);
+            int prototype = Standing(tree.position) ? -1 : PrototypeNamed(tree.prototype);
             if (prototype >= 0)
             {
                 planted.Add(tree);
                 Add(tree, prototype);
             }
         }
+
+        // A guest's copy of the host's Haven (only its owner plants there, ItemInventory.Plant): a tree the host no longer has came
+        // down there, so it comes down here too.
+        if (!Place.InFriendsHaven || terrain == null)
+        {
+            return;
+        }
+
+        TerrainData data = terrain.terrainData;
+        for (int i = planted.Count - 1; i >= 0; i--)
+        {
+            Planted mine = planted[i];
+            if (state.trees.Exists(tree => (tree.position - mine.position).sqrMagnitude < SameSpot * SameSpot))
+            {
+                continue;
+            }
+
+            if (mine.index >= 0 && mine.index < data.treeInstanceCount)
+            {
+                TreeInstance instance = data.GetTreeInstance(mine.index);
+                instance.heightScale = 0f;
+                instance.widthScale = 0f;
+                data.SetTreeInstance(mine.index, instance);
+            }
+
+            planted.RemoveAt(i);
+        }
     }
+
+    private bool Standing(Vector3 position) => planted.Exists(tree => (tree.position - position).sqrMagnitude < SameSpot * SameSpot);
 }

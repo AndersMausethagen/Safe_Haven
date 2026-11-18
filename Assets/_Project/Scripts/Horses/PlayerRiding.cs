@@ -413,6 +413,12 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
         {
             GetDown(horse, ground);
         }
+        else if (ReferenceEquals(Riding, horse))
+        {
+            // The horse went while it was got down from (sold, gone home with a friend, its taming given up): the rider still gets
+            // down. Before, nothing did, and they were left aboard nothing, their body switched off, unable to move.
+            LeaveSaddle(null, ground);
+        }
     }
 
     private void GetDown(Horse horse, Vector3 at)
@@ -422,8 +428,18 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
             return;
         }
 
+        LeaveSaddle(horse, at);
+    }
+
+    // Getting down, the horse's half only while there is a horse: the rider's half needs none.
+    private void LeaveSaddle(Horse horse, Vector3 at)
+    {
         Riding = null;
-        horse.Rider = null;
+        if (horse != null)
+        {
+            horse.Rider = null;
+        }
+
         LeftSaddleFrame = Time.frameCount;
         if (PlayerCameraController.Current != null)
         {
@@ -432,15 +448,19 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
         }
 
         stateMachine.CanFightAboard = false;
-        CountRidden(horse, force: true);
-        horse.Motion.EndRidden();
+        if (horse != null)
+        {
+            CountRidden(horse, force: true);
+            horse.Motion.EndRidden();
+        }
+
         movement.StandAt(at);
         if (holding == null)
         {
             stateMachine.SetAboard(false);
         }
 
-        if (horse.Taming != null)
+        if (horse != null && horse.Taming != null)
         {
             horse.Taming.OnRiderLeft();
         }
@@ -519,6 +539,12 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
 
     private void Update()
     {
+        // Ridden, and the horse is gone (destroyed in the saddle, not while getting down): down where the rider is.
+        if (!ReferenceEquals(Riding, null) && Riding == null && this.moving == null)
+        {
+            LeaveSaddle(null, transform.position);
+        }
+
         if (holding != null && !feetFree)
         {
             Vector3 toward = holding.transform.position - transform.position;

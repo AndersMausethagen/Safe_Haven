@@ -50,7 +50,9 @@ public interface IHavenView
     ResidentRecord Find(ResidentDefinition resident);
     bool HasResident(ResidentDefinition resident);
     ResidentRecord WorkerAt(CraftingStationType station);
+    ResidentRecord WorkerAt(string stationId, CraftingStationType station);
     float WorkerSpeed(CraftingStationType station);
+    float WorkerSpeed(string stationId, CraftingStationType station);
     bool HasWorker(JobDefinition job);
     List<JobDefinition> JobsOpenTo(ResidentDefinition resident);
     IReadOnlyList<JobDefinition> VacantJobs { get; }

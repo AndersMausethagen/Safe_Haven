@@ -129,7 +129,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
         var leftOver = new List<ItemAmount>();
         foreach (ItemAmount entry in contents)
         {
-            int given = bag.Give(entry.Item, entry.Amount);
+            int given = bag.Give(entry.Item, entry.Amount, ArrivalCause.Found);
             if (given < entry.Amount)
             {
                 leftOver.Add(new ItemAmount(entry.Item, entry.Amount - given));

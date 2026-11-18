@@ -325,9 +325,11 @@ public sealed class PortalWindow : MonoBehaviour
         step = -1;
         string pinned = GameSession.Progress.Journal.PinnedQuest;
         QuestLog.Entry best = null;
+        // The tracker's top quest (QuestTrackerView.InTrackerOrder): by quest-log order, an errand taken before the main story showed
+        // here while the tracker showed the story on top.
         foreach (QuestLog.Entry entry in GameSession.Quests.Entries)
         {
-            if (entry.Status != QuestStatus.Active)
+            if (entry.Status != QuestStatus.Active || entry.Quest == null)
             {
                 continue;
             }
@@ -336,7 +338,7 @@ public sealed class PortalWindow : MonoBehaviour
             {
                 if (entry.IsObjectiveOpen(i))
                 {
-                    if (best == null || entry.Quest.Id == pinned)
+                    if (best == null || QuestTrackerView.InTrackerOrder(entry, best, pinned) < 0)
                     {
                         best = entry;
                         step = i;
@@ -344,11 +346,6 @@ public sealed class PortalWindow : MonoBehaviour
 
                     break;
                 }
-            }
-
-            if (best != null && best.Quest.Id == pinned)
-            {
-                break;
             }
         }
 

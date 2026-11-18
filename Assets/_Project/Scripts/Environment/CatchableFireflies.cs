@@ -200,7 +200,7 @@ public sealed class CatchableFireflies : MonoBehaviour
             return;
         }
 
-        if (bag.Give(profile.Catchable, 1) < 1)
+        if (bag.Give(profile.Catchable, 1, ArrivalCause.Found) < 1)
         {
             GameMessages.Post($"No room for the {profile.Catchable.DisplayName.ToLowerInvariant()}. It drifts away.", MessageKind.Warning);
         }

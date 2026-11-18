@@ -136,7 +136,7 @@ public sealed class ArrowProjectile : MonoBehaviour
         Player player = Player.Current;
         if (player != null && player.Bag != null && Random.value < arrow.RecoverChance)
         {
-            player.Bag.Give(item, 1);
+            player.Bag.Give(item, 1, ArrivalCause.Refunded); // one's own arrow back, never a find (collect quests were farmed)
         }
     }
 
@@ -386,7 +386,7 @@ public sealed class ArrowProjectile : MonoBehaviour
             return false;
         }
 
-        return player.Bag.Give(item, 1) > 0;
+        return player.Bag.Give(item, 1, ArrivalCause.Refunded) > 0; // one's own arrow back, never a find
     }
 
     // The tip sits this far ahead of the arrow's pivot (+Z), measured from its meshes once.

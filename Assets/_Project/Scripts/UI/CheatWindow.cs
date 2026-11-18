@@ -321,6 +321,7 @@ public sealed class CheatWindow : MonoBehaviour
         search.placeholder = hint;
         search.lineType = TMP_InputField.LineType.SingleLine;
         search.onValueChanged.AddListener(_ => LayOutItems());
+        KitSearchGuard.On(search);
 
         float x = Margin + 344f;
         foreach (int value in Amounts)

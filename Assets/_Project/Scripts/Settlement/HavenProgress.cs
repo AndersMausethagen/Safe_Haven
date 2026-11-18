@@ -150,9 +150,11 @@ public sealed class HavenProgress : MonoBehaviour
 
         PurificationAltar.NoteBest();
 
+        // Staffed ones (made, so the worker can start), and any with a queue already: a station whose worker left kept working the
+        // player's orders at the staffed speed until its window was opened.
         foreach (CraftingStation station in CraftingStation.Active)
         {
-            if (station.HasWorker && station.Usable)
+            if (station.Usable && (station.HasWorker || GameSession.HereItself.Workshops.Find(station.Id) != null))
             {
                 _ = station.Queue;
             }

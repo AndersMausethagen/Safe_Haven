@@ -184,7 +184,7 @@ public sealed class CoopSmokeTest : MonoBehaviour
 
         step = "laying a rune";
         TerritorySettings settings = TerritorySettings.Current;
-        Player.Current.Bag.Give(settings.PactRune, 1);
+        Player.Current.Bag.Give(settings.PactRune, 1, ArrivalCause.Found);
         Territory.Offer(Region, Player.Current.gameObject);
         Check(Player.Current.Bag.CountCarried(settings.PactRune) == 0, "the rune was laid (spent)");
         yield return Wait(5f);

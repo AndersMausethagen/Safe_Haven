@@ -115,7 +115,7 @@ public sealed class LootOnDeath : MonoBehaviour
                 items.RemoveAll(drop => drop.Item.RaidOnly);
             }
 
-            ItemGrantResult result = inventory.Give(items);
+            ItemGrantResult result = inventory.Give(items, ArrivalCause.Found);
             if (result.HasOverflow)
             {
                 GameMessages.Post("Bag full, left behind: " + AmountText.Describe(result.Overflow), MessageKind.Warning);

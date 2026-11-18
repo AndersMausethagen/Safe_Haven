@@ -321,9 +321,10 @@ public static class JournalContent
         return slain >= 1 ? 1 : 0;
     }
 
+    // One's own people (Home): in a friend's Haven, or on a raid followed from it, the host's unlocked a guest's pages, which hid again at home.
     private static bool IsHome(ResidentDefinition who)
     {
-        foreach (ResidentRecord record in GameSession.Here.Residents)
+        foreach (ResidentRecord record in GameSession.Home.Residents)
         {
             if (record.Resident == who)
             {

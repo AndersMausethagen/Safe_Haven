@@ -120,18 +120,8 @@ public sealed class PlayerInputHandler : MonoBehaviour
             }
         }
 
-        InputActionMap map = GameInput.PlayerMap;
-        if (map != null)
-        {
-            if (enable)
-            {
-                map.Enable();
-            }
-            else
-            {
-                map.Disable();
-            }
-        }
+        // Through GameInput, the map's one switch: it stays off while gameplay is suspended (a name typed), and comes back with it.
+        GameInput.SetPlayerKeys(enable);
 
         if (enable)
         {
@@ -339,6 +329,13 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         if (context.performed && (PadInWindow(context) || ItemInventoryWindow.ClaimsKeys))
+        {
+            return;
+        }
+
+        // In the saddle the key is the horse's (a stick click gallops, Ctrl walks it): every canter flipped sneaking, still on after
+        // getting down, slowed.
+        if (stateMachine != null && stateMachine.IsAboard)
         {
             return;
         }

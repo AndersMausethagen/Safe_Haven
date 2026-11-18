@@ -410,6 +410,9 @@ public sealed class RaidDirector : MonoBehaviour
         return true;
     }
 
+    /// <summary>The raid's end is settled: ended (extracted, lost, out of time) or turned back from (TurnBack). Place asks this.</summary>
+    public bool IsDecided => Session.IsOver || turnedBack;
+
     /// <summary>
     /// Leaves a boss encounter before its gate (its arrival stone): the research's "nothing gained and nothing lost", so this is no
     /// raid's end. No report, results, experience, homecoming or quest count, which an extraction would give for a walk to the gate and
@@ -454,8 +457,21 @@ public sealed class RaidDirector : MonoBehaviour
         string scene = CanLoad(Session.ReturnScene) ? Session.ReturnScene : fallbackReturnScene;
         if (CanLoad(scene))
         {
-            SceneLoader.Load(scene, "Back through the portal");
+            SceneLoader.Load(scene, "Back through the portal", ifItFails: () => TryAgain(TurnBackHome()));
         }
+    }
+
+    // A way out of a raid whose end is settled that failed (refused, or broken off on the way): tried again, or the player stayed held in
+    // a finished raid for good, with nothing to press.
+    private void TryAgain(IEnumerator leaving)
+    {
+        if (this == null)
+        {
+            return;
+        }
+
+        GameMessages.Post("The way didn't open. Trying again...", MessageKind.Warning);
+        StartCoroutine(leaving);
     }
 
     private void OnSwung(GatheringSwing swing)
@@ -497,6 +513,13 @@ public sealed class RaidDirector : MonoBehaviour
     /// </summary>
     public bool Abandon()
     {
+        // Turned back already (saved, on the way home): a quit in those seconds isn't a fall. Before, a guest leaving to the menu then
+        // ended the run as a death, worn and emptied, over the turn-back's own save.
+        if (turnedBack)
+        {
+            return false;
+        }
+
         if (!Session.End(RaidOutcome.Died))
         {
             // Fallen and watching friends (co-op): the fall is decided but not yet counted or saved. Quitting then skipped it,
@@ -631,7 +654,8 @@ public sealed class RaidDirector : MonoBehaviour
         // The results screen reads the report and sends the player on to the return scene from there.
         if (CanLoad(resultsScene))
         {
-            SceneLoader.Load(resultsScene, Report != null && Report.Extracted ? "Counting the haul" : "The raid is lost");
+            SceneLoader.Load(resultsScene, Report != null && Report.Extracted ? "Counting the haul" : "The raid is lost",
+                ifItFails: () => TryAgain(ReturnAfterDelay()));
             yield break;
         }
 
@@ -645,12 +669,12 @@ public sealed class RaidDirector : MonoBehaviour
 
         if (CanLoad(scene))
         {
-            SceneLoader.Load(scene);
+            SceneLoader.Load(scene, ifItFails: () => TryAgain(ReturnAfterDelay()));
         }
         else if (SceneManager.sceneCountInBuildSettings > 0)
         {
             Debug.LogError($"The fallback return scene '{fallbackReturnScene}' isn't in Build Settings either; loading the first scene in the build.", this);
-            SceneLoader.Load(0);
+            SceneLoader.Load(0, ifItFails: () => TryAgain(ReturnAfterDelay()));
         }
         else
         {

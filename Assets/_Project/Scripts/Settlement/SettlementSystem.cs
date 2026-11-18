@@ -108,7 +108,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     // one more out of what they make.
     private static void WorkerLearned(StationQueue station, RecipeDefinition recipe)
     {
-        ResidentRecord worker = GameSession.Here.WorkerAt(station.Type);
+        // This station's own worker (two fishers at two docks: each learns at their own).
+        ResidentRecord worker = GameSession.Here.WorkerAt(station.StationId, station.Type);
         if (worker == null)
         {
             return;

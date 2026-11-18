@@ -210,7 +210,7 @@ public sealed class ExperienceHud : MonoBehaviour
         {
             // At home and out of a fight, the world holds its breath a moment as a milestone lands. Not in a world shared with
             // friends (hosting): it would slow their creatures and residents too (hit-stop skips it the same way).
-            if (GameSession.ActiveRaid == null && !GamePause.TimeIsShared && Player.Current != null
+            if (!Place.OnRaid && !GamePause.TimeIsShared && Player.Current != null
                 && (Player.Current.Stealth == null || !Player.Current.Stealth.IsFighting))
             {
                 slowUntil = Time.unscaledTime + SlowSeconds;

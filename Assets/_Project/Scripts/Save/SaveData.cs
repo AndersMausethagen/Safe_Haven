@@ -438,6 +438,18 @@ public sealed class SlotSaveData
     public string maker;
     /// <summary>A caught fish's length in cm (the biggest of the stack). Missing in older saves, and 0 for everything else.</summary>
     public float size;
+
+    /// <summary>
+    /// The same piece in another slot and count, every other field kept (a field added later too). Copied by hand, a co-op stash change
+    /// left out the fish's size (SharedStateTests: a slot is copied with this or made by SaveMapper.SlotOf, never field by field).
+    /// </summary>
+    public SlotSaveData With(int slot, int count)
+    {
+        var copy = (SlotSaveData)MemberwiseClone();
+        copy.slot = slot;
+        copy.count = count;
+        return copy;
+    }
 }
 
 [Serializable]

@@ -85,6 +85,13 @@ public sealed class HorseWhistle : MonoBehaviour
             return coming;
         }
 
+        // It heard but can't come (held by a friend's game, hitched, no way to here): said so, not "too far off to hear" at 5 m.
+        if (coming != null)
+        {
+            GameMessages.Post($"{coming.HorseName} hears you and lifts its head, but can't come to you from where it is.", MessageKind.Info);
+            return null;
+        }
+
         if (nearest == null)
         {
             GameMessages.Post("You whistle. No horse of yours is out to hear it.", MessageKind.Info);

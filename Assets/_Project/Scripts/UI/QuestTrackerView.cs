@@ -92,7 +92,7 @@ public sealed class QuestTrackerView : MonoBehaviour
 
         // The main story on top, then rescues, the haven, tales and errands.
         string pinned = GameSession.Progress.Journal.PinnedQuest;
-        active.Sort((a, b) => (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : ByRankThenName(a.Quest, b.Quest));
+        active.Sort((a, b) => InTrackerOrder(a, b, pinned));
         int hidden = OnePerKind(active, pinned);
         available.Sort(ByRankThenName);
         // What the waypoint arrow may lead to: what is shown here (it led to a quest hidden behind another of its colour).
@@ -235,6 +235,11 @@ public sealed class QuestTrackerView : MonoBehaviour
     }
 
     /// <summary>The tracker's order: by kind (QuestMarkerSettings.RankOrder), then by name.</summary>
+    /// <summary>The tracker's order of quests under way: the pinned one first, then the main story, rescues, the Haven, tales and errands.
+    /// What else shows "the quest in hand" (the portal's window) orders by this, so the two never name different quests.</summary>
+    public static int InTrackerOrder(QuestLog.Entry a, QuestLog.Entry b, string pinned) =>
+        (a.Quest.Id == pinned) != (b.Quest.Id == pinned) ? (a.Quest.Id == pinned ? -1 : 1) : ByRankThenName(a.Quest, b.Quest);
+
     public static int ByRankThenName(QuestDefinition a, QuestDefinition b)
     {
         int byRank = QuestMarkerSettings.RankOrder(a.Rank).CompareTo(QuestMarkerSettings.RankOrder(b.Rank));
