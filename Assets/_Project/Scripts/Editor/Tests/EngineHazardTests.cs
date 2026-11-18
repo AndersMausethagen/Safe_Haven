@@ -53,7 +53,10 @@ public sealed class EngineHazardTests
             }
         }
 
-        return scripts;
+        // A guard's canary (GuardCanaryTests) adds its bad case for the length of one run.
+        return ConventionTests.Planted.Count == 0
+            ? scripts
+            : scripts.Concat(ConventionTests.Planted.Select(planted => (planted.path, CodeOnly(planted.source)))).ToList();
     }
 
     /// <summary>The code of a C# source: comments gone, string and character literals emptied (their quotes kept).</summary>

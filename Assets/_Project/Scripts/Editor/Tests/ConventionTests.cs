@@ -37,7 +37,18 @@ public sealed class ConventionTests
                 yield return (path, WithoutComments(File.ReadAllText(path)));
             }
         }
+
+        foreach ((string path, string source) planted in Planted)
+        {
+            yield return (planted.path, WithoutComments(planted.source));
+        }
     }
+
+    /// <summary>
+    /// Scripts that exist only while a guard's canary runs (GuardCanaryTests): each guard reads them as one more runtime script, and must
+    /// fail on its bad case. A scan that matches nothing passes for ever, as a guard nobody ran did (Docs/BugPatterns.md, sixth round).
+    /// </summary>
+    internal static readonly List<(string path, string source)> Planted = new List<(string path, string source)>();
 
     internal static string WithoutComments(string source) => Regex.Replace(source, @"^\s*//.*$", "", RegexOptions.Multiline);
 
