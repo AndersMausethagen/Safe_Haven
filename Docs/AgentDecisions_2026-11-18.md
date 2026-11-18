@@ -324,3 +324,9 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   2. Lighter litter under the canopy (the biome a step brighter, the figures as they are).
   3. Leave it: the player reads by shape, colour and motion, and the fights by their ground warnings (batch 3).
   Recommended: 1, limited to raids and to the dark (scaled by how little sky and sun reach the player).
+
+### The camera FOV experiment (U2): your eye decides, nothing changed
+- The explore view (40° at 20 m) against 48° from 16.5 m (the same ground covered), from the game camera's angle at the Valley wall:
+  at 48° the cliff leans in more and its near rock bulges toward the lens, the trees show a little more of their height; relief
+  reads a little better, and tall things near the camera loom. Shots: fov_40.png / fov_48.png (sent with this note). If you like it,
+  it is Player Camera Settings › Explore › Field of View 48 and Min/Max Distance × 0.82.
