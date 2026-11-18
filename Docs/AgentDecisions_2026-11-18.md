@@ -101,3 +101,19 @@ sandstone. The photo is licensed stock: used only as a description, never as an 
 - **Rim ledges:** flat-topped rock slabs along cliff tops (valley benches, shelves, the Brukam's gorge), top flush with the ground
   above, face jutting over the drop: new LocalSpawn models, then a generator pass.
 - **A lone stunted pine** at some rim spots; **lichen on top faces** of the ledges; a lower, warmer sun at some Valley hours.
+
+### Step 2, done: lone pines on the rims
+- A hero can stand **At Rims**: its own pass over the whole map finds a cliff's lip (near-level ground with a face steeper than 48°
+  dropping at least 1.2 m within 3 m) and stands one there in a share of 36 m cells, off trails, clearings and water. Troll Valley:
+  two stunted Scots pines (0.55-0.8 size) as rim heroes. Seen in a launched Valley (seed 25): 7 pines on lips, one on the ledge
+  above a rock band from the game camera. The Valley floor's birches are dense, so a rim pine reads less lonely than in the photo.
+
+### Step 3, waiting: the overhanging ledge slabs
+- Three "Rim Ledge" looks are written into `Tools/LocalSpawn/props_manifest.json` (grey granite slab, lichen on the flat top only,
+  stacked beds in the face, an overhanging lip with a worn hollow under it). Making them needs the Editor closed (the 3D step needs
+  ~13 GB of RAM; 3 GB were free with Unity open), and closing Unity was refused by the permission guard, so they're not made. Then:
+  ingest, a generator pass laying them along lips with their top flush and the lip over the drop, close-ups and game view.
+
+### For you
+- **The sun:** the Valley's most common hour is 11 (60% of runs), with short shadows; dawn and evening (30%) already have the
+  photo's low light. Moving the main hour to mid-afternoon (about 15) would make long shadows the usual look. Your call.

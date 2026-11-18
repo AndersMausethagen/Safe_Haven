@@ -1629,6 +1629,7 @@ MonoBehaviour:
     room: 3
     alwaysObject: 1
     onlyToSee: 1
+    atRims: 0
   - prefab: {fileID: 7810725117079759313, guid: 75f39e11fceba884d824fd4b239861a6, type: 3}
     weight: 1
     scale: {x: 1.2, y: 1.6}
@@ -1636,6 +1637,7 @@ MonoBehaviour:
     room: 3
     alwaysObject: 1
     onlyToSee: 1
+    atRims: 0
   - prefab: {fileID: 8372047739636933966, guid: 904b298403b6f304b9fdef0e3fff2def, type: 3}
     weight: 1
     scale: {x: 1, y: 1.2}
@@ -1643,6 +1645,7 @@ MonoBehaviour:
     room: 3
     alwaysObject: 1
     onlyToSee: 1
+    atRims: 0
   - prefab: {fileID: 2408711775195427255, guid: 44f27b25762228b4fb447f248a34b0ed, type: 3}
     weight: 1
     scale: {x: 1, y: 1.2}
@@ -1650,6 +1653,23 @@ MonoBehaviour:
     room: 3
     alwaysObject: 1
     onlyToSee: 1
+    atRims: 0
+  - prefab: {fileID: 8372047739636933966, guid: 904b298403b6f304b9fdef0e3fff2def, type: 3}
+    weight: 1
+    scale: {x: 0.55, y: 0.8}
+    sink: 0.05
+    room: 2
+    alwaysObject: 1
+    onlyToSee: 1
+    atRims: 1
+  - prefab: {fileID: 2408711775195427255, guid: 44f27b25762228b4fb447f248a34b0ed, type: 3}
+    weight: 1
+    scale: {x: 0.55, y: 0.8}
+    sink: 0.05
+    room: 2
+    alwaysObject: 1
+    onlyToSee: 1
+    atRims: 1
   mids:
   - prefab: {fileID: 4200787531422230130, guid: bc49fdfbd0c597a43b14ce6bb19fa539, type: 3}
     weight: 2.4
@@ -1735,6 +1755,8 @@ MonoBehaviour:
   heroObjectWithin: 10
   midsPerCell: {x: 2, y: 4}
   midFromTrail: {x: 1.5, y: 12}
+  rimHeroCell: 36
+  rimHeroChance: 0.45
   siteRules:
   - kind: 3
     pointsPerSite: 3

@@ -88,6 +88,9 @@ public sealed class RaidMapDefinition : ScriptableObject
         public bool alwaysObject;
         [Tooltip("As an object: strip what can be gathered, chopped or used from it, so it is only to see (and bump into).")]
         public bool onlyToSee = true;
+        [Tooltip("Stands only at a cliff's lip, anywhere on the map: level ground with a steep drop just beyond (a lone pine on the edge, " +
+                 "the user's cliff-edge picture, 2026-11-18). Placed by its own pass (Rim Heroes), never near trails as the others are.")]
+        public bool atRims;
     }
 
     /// <summary>A hero that stands as an object (near walkable ground, or Always Object), for RaidMapGenerator to place after Scatter.</summary>
@@ -250,6 +253,10 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField] private Vector2Int midsPerCell = new Vector2Int(2, 4);
     [Tooltip("How far a mid stands from the edge of the trail or clearing, in metres, least and most.")]
     [SerializeField] private Vector2 midFromTrail = new Vector2(1.5f, 12f);
+    [Tooltip("Heroes At Rims: metres across a cell, one at most to each, on the lip of a cliff found in it.")]
+    [SerializeField, Min(10f)] private float rimHeroCell = 36f;
+    [Tooltip("Heroes At Rims: the chance a cell with a lip gets one.")]
+    [SerializeField, Range(0f, 1f)] private float rimHeroChance = 0.45f;
 
     [Header("Sites")]
     [SerializeField] private List<SiteRule> siteRules = new List<SiteRule>();
@@ -364,6 +371,8 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float DressingReach => dressingReach;
     public Vector2 HeroFromTrail => heroFromTrail;
     public float HeroObjectWithin => heroObjectWithin;
+    public float RimHeroCell => rimHeroCell;
+    public float RimHeroChance => rimHeroChance;
     public Vector2Int MidsPerCell => midsPerCell;
     public Vector2 MidFromTrail => midFromTrail;
 

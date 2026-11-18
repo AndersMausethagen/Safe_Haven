@@ -536,10 +536,20 @@ public static class RaidMapSurface
         // How far each hero reaches from its pivot at scale 1, any way it is turned: a fallen giant set 6 m off a trail must not lie
         // across it, so the whole of it keeps a metre clear of walkable ground.
         var heroReach = new float[definition.Heroes.Count];
+        float rimTotal = 0f;
         for (int i = 0; i < heroReach.Length; i++)
         {
             RaidMapDefinition.Hero hero = definition.Heroes[i];
-            heroTotal += hero?.prefab != null ? Mathf.Max(0f, hero.weight) : 0f;
+            float weight = hero?.prefab != null ? Mathf.Max(0f, hero.weight) : 0f;
+            if (hero != null && hero.atRims)
+            {
+                rimTotal += weight;
+            }
+            else
+            {
+                heroTotal += weight;
+            }
+
             if (hero?.prefab != null)
             {
                 Bounds bounds = PrefabBounds(hero.prefab);
@@ -580,7 +590,7 @@ public static class RaidMapSurface
                         continue;
                     }
 
-                    int pick = PickHero(definition.Heroes, heroTotal, random);
+                    int pick = PickHero(definition.Heroes, heroTotal, random, false);
                     RaidMapDefinition.Hero hero = definition.Heroes[pick];
                     TreeInstance instance = MakeInstance(Mathf.Max(0, heroPrototypes[pick]), u, v, hero.scale, random);
                     if (off - heroReach[pick] * instance.widthScale < HeroKeepsClear)
@@ -630,16 +640,120 @@ public static class RaidMapSurface
                 }
             }
         }
+
+        if (rimTotal > 0f)
+        {
+            DressRims(data, definition, heroPrototypes, heroReach, rimTotal, clearings, trunks, placed, walked, inWater, heroObjects);
+        }
     }
 
-    private static int PickHero(IReadOnlyList<RaidMapDefinition.Hero> heroes, float total, System.Random random)
+    // A rim: ground near level (no steeper than RimFlattest) with a drop beyond, a probe RimProbe metres off finding a face steeper than RimFace
+    // at least RimDrop lower. Tries a spot this many times a cell.
+    private const float RimFlattest = 20f;
+    private const float RimFace = 48f;
+    private const float RimProbe = 3f;
+    private const float RimDrop = 1.2f;
+    private const int RimTries = 14;
+
+    /// <summary>
+    /// Heroes At Rims (the user's cliff-edge picture, 2026-11-18: a lone pine on the very edge): over the whole map, one cell in Rim Hero
+    /// Chance gets one, at a lip found in it (<see cref="IsRim"/>), kept off trails, clearings and water, standing as an object as the other
+    /// heroes do near walkable ground. From its own stream, after the rest: turning it on moves nothing else.
+    /// </summary>
+    private static void DressRims(TerrainData data, RaidMapDefinition definition, int[] heroPrototypes, float[] heroReach, float rimTotal,
+        List<Clearing> clearings, TrunkGrid trunks, List<TreeInstance> placed, Func<Vector2, float> walked, Func<Vector2, bool> inWater,
+        List<RaidMapDefinition.HeroObject> heroObjects)
+    {
+        float size = definition.Size;
+        float cell = Mathf.Max(10f, definition.RimHeroCell);
+        var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Rim Heroes"));
+        int cells = Mathf.CeilToInt(size / cell);
+        for (int gz = 0; gz < cells; gz++)
+        {
+            for (int gx = 0; gx < cells; gx++)
+            {
+                if (random.NextDouble() > definition.RimHeroChance)
+                {
+                    continue;
+                }
+
+                for (int tries = 0; tries < RimTries; tries++)
+                {
+                    var spot = new Vector2((gx + (float)random.NextDouble()) * cell, (gz + (float)random.NextDouble()) * cell);
+                    if (spot.x < 2f || spot.y < 2f || spot.x >= size - 2f || spot.y >= size - 2f)
+                    {
+                        continue;
+                    }
+
+                    float u = spot.x / size, v = spot.y / size;
+                    if (!IsRim(data, size, spot) || definition.Strength(RaidZoneRole.Path, u, v) > 0.1f || walked(spot) < 2f
+                        || Blocked(spot, clearings, forTrees: true) || (inWater != null && inWater(spot)))
+                    {
+                        continue;
+                    }
+
+                    int pick = PickHero(definition.Heroes, rimTotal, random, true);
+                    RaidMapDefinition.Hero hero = definition.Heroes[pick];
+                    TreeInstance instance = MakeInstance(Mathf.Max(0, heroPrototypes[pick]), u, v, hero.scale, random);
+                    float room = Mathf.Max(hero.room * instance.widthScale, TrunkClearance);
+                    ClearAround(placed, spot, room, size);
+                    trunks.Add(spot, room);
+                    if (heroPrototypes[pick] < 0)
+                    {
+                        heroObjects?.Add(new RaidMapDefinition.HeroObject(hero, spot, instance.rotation * Mathf.Rad2Deg, instance.widthScale));
+                    }
+                    else
+                    {
+                        placed.Add(instance);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// True when <paramref name="spot"/> (metres on a terrain <paramref name="size"/> across) is a cliff's lip: its own ground no steeper than
+    /// <see cref="RimFlattest"/>, and in one of eight directions, <see cref="RimProbe"/> metres off, a face steeper than <see cref="RimFace"/>
+    /// whose ground lies at least <see cref="RimDrop"/> lower. Reads only the terrain's heights.
+    /// </summary>
+    public static bool IsRim(TerrainData data, float size, Vector2 spot)
+    {
+        float u = spot.x / size, v = spot.y / size;
+        if (data.GetSteepness(u, v) > RimFlattest)
+        {
+            return false;
+        }
+
+        float here = data.GetInterpolatedHeight(u, v);
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * Mathf.PI * 0.25f;
+            Vector2 probe = spot + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * RimProbe;
+            float pu = probe.x / size, pv = probe.y / size;
+            if (pu < 0f || pv < 0f || pu > 1f || pv > 1f)
+            {
+                continue;
+            }
+
+            if (data.GetSteepness(pu, pv) >= RimFace && here - data.GetInterpolatedHeight(pu, pv) >= RimDrop)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static int PickHero(IReadOnlyList<RaidMapDefinition.Hero> heroes, float total, System.Random random, bool atRims)
     {
         double roll = random.NextDouble() * total;
         int last = 0;
         for (int i = 0; i < heroes.Count; i++)
         {
             RaidMapDefinition.Hero hero = heroes[i];
-            float weight = hero?.prefab != null ? Mathf.Max(0f, hero.weight) : 0f;
+            float weight = hero?.prefab != null && hero.atRims == atRims ? Mathf.Max(0f, hero.weight) : 0f;
             if (weight <= 0f) continue;
             last = i;
             roll -= weight;

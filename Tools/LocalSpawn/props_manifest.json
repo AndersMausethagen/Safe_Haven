@@ -1,5 +1,6 @@
 {
   "_notes": [
+    "2026-11-18, the user's cliff-edge picture ('can we achieve something closer to this?'): Rim Ledge, flat-topped slabs of layered grey stone that form a cliff's lip and jut out over the drop, lichen on the top only. Nordic stone, not the photo's sandstone; the photo is licensed stock and never an input.",
     "World props the user asked for (2026-11-13): interesting, unique things to place around the world, 'for example magical stones with blue, glowing runes'.",
     "Made like the gathering nodes: concept image, Hunyuan3D shape + UltraTex texture, Tools/Blender/ingest_generated.py (atlas, LODs, collider, height/moss masks, glow), then AgentScripts/BuildWorldProps.cs.",
     "Run: D:\\ComfyUI\\.venv\\Scripts\\python.exe Tools/LocalSpawn/generate_gathering.py --group props [images|3d|ingest|all] [asset ...] (Unity closed for 3d).",
@@ -487,6 +488,30 @@
           "key": "A",
           "seed": 7886,
           "prompt": "A troll's toll pole: one single crooked upright pole of dark weathered wood about two and a half metres tall with a forked top, a big horned animal skull fixed in the fork, strings of old copper coins on leather thongs and a few long bones lashed to the pole with rope, a small flat offering stone at its foot with a few coins on it. No crossbar, no sign, nothing else."
+        }
+      ]
+    },
+    {
+      "asset": "Rim Ledge",
+      "width": 6.0,
+      "max_height": 2.4,
+      "texture_size": 2048,
+      "lod0_triangles": 6000,
+      "looks": [
+        {
+          "key": "A",
+          "seed": 18101,
+          "prompt": "A single huge slab of weathered grey Nordic granite that forms the very edge of a cliff, seen as one loose piece: a broad, almost level flat top with crusty patches of ochre-yellow and pale grey-green lichen on the top surface only, the front face made of three horizontal stacked beds of rock of different thickness, the top bed jutting forward as an overhanging lip with a dark worn hollow underneath it, a few straight vertical cracks running down through the beds. Hard, angular, solid rock with fine grain, no pebbles, no grass, no moss carpet, no tree, no soil. One solid stone."
+        },
+        {
+          "key": "B",
+          "seed": 18102,
+          "prompt": "A single huge slab of weathered grey Nordic granite that forms the very edge of a cliff, seen as one loose piece: a broad, almost level flat top with crusty patches of ochre-yellow and pale grey-green lichen on the top surface only, the front face made of four horizontal stacked beds of rock of different thickness, the top bed jutting forward as an overhanging lip with a dark worn hollow underneath it, split into two big blocks by one deep crack, the left block a little lower, and a small broken corner at one end. Hard, angular, solid rock with fine grain, no pebbles, no grass, no moss carpet, no tree, no soil. One solid stone."
+        },
+        {
+          "key": "C",
+          "seed": 18103,
+          "prompt": "A single huge slab of weathered grey Nordic granite that forms the very edge of a cliff, seen as one loose piece: a broad, almost level flat top with crusty patches of ochre-yellow and pale grey-green lichen on the top surface only, the front face made of two thick horizontal stacked beds of rock of different thickness, the top bed jutting forward as an overhanging lip with a dark worn hollow underneath it, long and low, the lip overhanging far at the middle, the ends worn rounder. Hard, angular, solid rock with fine grain, no pebbles, no grass, no moss carpet, no tree, no soil. One solid stone."
         }
       ]
     }
