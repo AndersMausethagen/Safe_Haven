@@ -916,6 +916,8 @@ void SplatmapFragment(
     // A raid's ground light (GroundLight.hlsl): the canopy's and the land's shade (the night's lift on the indirect light), and light
     // thrown back from sunlit ground.
     GroundLightApply(GroundLightOnGround(IN.positionWS), occlusion, inputData.bakedGI);
+    // Sun through gaps in the canopy on the shaded ground (GroundLight.hlsl; a raid's Sunflecks, none elsewhere).
+    inputData.bakedGI += GroundLightSunflecks(IN.positionWS);
     inputData.bakedGI += GroundLightBounce(IN.positionWS, inputData.normalWS);
 
 #ifdef TERRAIN_GBUFFER

@@ -12,7 +12,7 @@
 // canopy's shade leaves the ground itself (for the terrain, which can't afford to read the sky map).
 TEXTURE2D_ARRAY(_GroundLightField);
 float4 _GroundLightRect;   // x min, z min, 1 / size, the dim hour's lift (above 0 while a field is bound; 1 by day)
-float4 _GroundLightBounce; // rgb: the raid's bounce tint × strength, times the sun's (or moon's) light as it is now
+float4 _GroundLightBounce; // rgb: the raid's bounce tint × strength, times the sun's (or moon's) light as it is now; w its sunflecks
 float4 _GroundLightHeights; // slice 1's g and b: x the lowest height, y the range (metres), z 1 while a field with heights is bound, w the water's reach
 
 // Metres above the ground over which the land's shade fades out of the air: mist high over a ravine sees the sky its floor doesn't.
@@ -103,6 +103,62 @@ half GroundLightShoreWet(float3 positionWS)
 
     return wet;
 }
+
+float GroundLightHash(float2 p)
+{
+    return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453);
+}
+
+float GroundLightNoise(float2 p)
+{
+    float2 i = floor(p);
+    float2 f = frac(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return lerp(lerp(GroundLightHash(i), GroundLightHash(i + float2(1, 0)), f.x),
+                lerp(GroundLightHash(i + float2(0, 1)), GroundLightHash(i + float2(1, 1)), f.x), f.y);
+}
+
+#if defined(UNIVERSAL_SHADOWS_INCLUDED)
+// Sunflecks (Docs/LookAndFeelResearch_2026-11-18.md L3): spots of sun through gaps in a crown on the ground its shadow falls on,
+// drifting a little as the leaves move. A dense crown's shadow is one even shade (tree shadows come from a lighter level of the
+// tree), so inside the sun's shadow (one hard tap of its shadow map: the shadow map is bound wherever this is called) the spots
+// let some sun through, where the field says a canopy stands toward the sun (slice 1's red, up-sun of the point: a crown's shadow
+// falls away from it), not in a cliff's or a building's shadow. The main light's colour (sun or moon, clouds and all) × the raid's
+// Sunflecks (_GroundLightBounce.w), to add to a surface's indirect light. Spots are longer along the sun's way across the ground.
+// 0 without a field, sunflecks or a sun.
+half3 GroundLightSunflecks(float3 positionWS)
+{
+    half3 light = 0.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0 && _GroundLightBounce.w > 0.0 && _MainLightPosition.y > 0.05)
+    {
+        float2 toSun = _MainLightPosition.xz;
+        float across = length(toSun);
+        toSun = across > 1e-3 ? toSun / across : float2(1, 0);
+        // The crown that shades a point stands up-sun of it: the canopy here or 4 or 9 metres toward the sun.
+        half canopy = 1.0 - GroundLightAt(positionWS, 1).r;
+        canopy = max(canopy, 1.0 - GroundLightAt(positionWS + float3(toSun.x, 0, toSun.y) * 4.0, 1).r);
+        canopy = max(canopy, 1.0 - GroundLightAt(positionWS + float3(toSun.x, 0, toSun.y) * 9.0, 1).r);
+        UNITY_BRANCH if (canopy > 0.06)
+        {
+            float4 coord = TransformWorldToShadowCoord(positionWS);
+            half shade = 1.0 - SAMPLE_TEXTURE2D_SHADOW(_MainLightShadowmapTexture, sampler_LinearClampCompare, coord.xyz);
+            UNITY_BRANCH if (shade > 0.01)
+            {
+                // Stretched along the sun's way, more the lower it stands.
+                float stretch = lerp(1.0, 2.2, saturate(across));
+                float2 q = float2(dot(positionWS.xz, toSun) / stretch, dot(positionWS.xz, float2(-toSun.y, toSun.x)));
+                float t = _Time.y;
+                float2 sway = float2(sin(t * 0.37), cos(t * 0.29)) * 0.22;
+                float n = GroundLightNoise(q * 1.25 + sway) * 0.62 + GroundLightNoise(q * 2.9 - sway * 1.6 + 17.0) * 0.38;
+                half fleck = smoothstep(0.6, 0.7, n);
+                light = _MainLightColor.rgb * (_GroundLightBounce.w * fleck * shade * smoothstep(0.06, 0.3, canopy));
+            }
+        }
+    }
+
+    return light;
+}
+#endif
 
 // Light thrown back from sunlit ground near by, to add to a surface's indirect diffuse light (bakedGI): most on what faces
 // sideways or down, little on what faces the sky (level ground would otherwise be tinted by its own light). It follows the sun or

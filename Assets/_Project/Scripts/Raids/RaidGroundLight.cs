@@ -22,11 +22,16 @@ public sealed class RaidGroundLight
     [SerializeField, Range(0f, 4f)] private float bounce;
     [Tooltip("The colour that thrown-back light takes on over the ground's own (white: the ground's colour as it is).")]
     [SerializeField] private Color bounceTint = Color.white;
+    [Tooltip("Sunflecks: spots of sun through gaps in the canopy on the shaded ground under the trees, drifting a little as the leaves " +
+             "move (Docs/LookAndFeelResearch_2026-11-18.md L3), as a share of the sun's light. Under a dense crown the sun's shadow is one " +
+             "even shade (tree shadows come from a lighter level of the trees). 0: none.")]
+    [SerializeField, Range(0f, 1.5f)] private float sunflecks;
 
     public bool Enabled => enabled;
     public float Relief => relief;
     public float Bounce => bounce;
     public Color BounceTint => bounceTint;
+    public float Sunflecks => sunflecks;
 
     public RaidGroundLight() { }
 

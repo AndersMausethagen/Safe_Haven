@@ -279,3 +279,13 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   game camera the flames mark the gate, the light a modest pool (range 6.4 m: the buildings' torch, unchanged).
 - **L4 (mist darker under the canopy)** was already in place: the mist's sky light is cut by the canopy and the land's shade
   (`GroundLightAirAbove`, from the ground light field step). Nothing changed.
+
+### Batch 8: sunflecks under the canopy (L3)
+- **Spots of sun through the crowns** on the shaded forest floor (terrain, moss skin and plants), drifting a little as the leaves
+  move, longer along the sun's way. Only inside the sun's own shadow and only where the field says a crown stands up-sun (so a
+  cliff's or a building's shadow stays whole), so they follow the real crowns' shadows; none under overcast or at night. A raid's
+  Look › Ground Light › Sunflecks: Woods and Hollow 0.9, Marsh 0.6, Valley 0.45 (Brukam's Bridge has no field, so none there).
+- Traps found: the field's canopy marks the ground straight under each crown, while its shadow falls toward the sun (first try:
+  almost nothing showed); a run that turns rainy has no sun, so test on a fresh clear run.
+- Seen in a launched Woods at 11:00 in clear weather: soft patches of sun in the crowns' shadows, subtle in the misty grade (0.55
+  read as nothing, now 0.9). **Tune it in each raid's Look if you want them stronger.**

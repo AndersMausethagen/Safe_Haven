@@ -332,7 +332,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
             fieldHighest = result.HighestHeight;
             coverStrength = recipe.CoverStrength;
             Color tint = look.BounceTint.linear * look.Bounce;
-            Shader.SetGlobalVector(BounceId, new Vector4(tint.r, tint.g, tint.b, 0f));
+            Shader.SetGlobalVector(BounceId, new Vector4(tint.r, tint.g, tint.b, look.Sunflecks));
             Show(result);
             // Worked out again by the late setup step from the finished map's cover (Setup), the land's shade kept.
             recipe.KnownRelief = result.Relief;

@@ -573,6 +573,21 @@ public sealed class GroundLightFieldTests
         Assert.AreEqual(255, dry.a);
     }
 
+    // Docs/LookAndFeelResearch_2026-11-18.md L3: the forests get sunflecks, strongest in the Woods' and the Hollow's crowns; the
+    // shaders that light the forest floor (terrain, moss, plants) all take them.
+    [Test]
+    public void TheForestsGetSunflecks()
+    {
+        float Flecks(string raid) => AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/" + raid + ".asset").GroundLight.Sunflecks;
+        Assert.Greater(Flecks("MistyWoods"), 0.5f);
+        Assert.Greater(Flecks("GuardiansHollow"), 0.5f);
+        Assert.Greater(Flecks("MistyWoods"), Flecks("TrollValley"), "the dense forest more than the open valley's stands");
+        foreach (string shader in new[] { "Assets/_Project/Shaders/Terrain/WorldTerrainLitPasses.hlsl", "Assets/_Project/Shaders/TerrainMoss.shader", "Assets/_Project/Shaders/Grass.shader" })
+        {
+            StringAssert.Contains("GroundLightSunflecks(", System.IO.File.ReadAllText(shader), shader);
+        }
+    }
+
     [Test]
     public void AddSetup_OutsideASceneSetup_IsRefused()
     {

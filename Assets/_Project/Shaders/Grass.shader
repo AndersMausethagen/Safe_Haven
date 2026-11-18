@@ -397,6 +397,8 @@ Shader "Safe Haven/Grass"
                 data.occlusion = 1.0;
                 GroundLightApply(SkyAmbient(input.positionWS), data.occlusion, lighting.bakedGI);
                 lighting.bakedGI += GroundLightBounce(input.positionWS, lighting.normalWS);
+                // Sun through gaps in the canopy falls on the plants under the trees as on the ground (GroundLight.hlsl).
+                lighting.bakedGI += GroundLightSunflecks(input.positionWS);
                 data.normalTS = half3(0, 0, 1);
                 SurfaceWet(data.albedo, data.smoothness, lighting.normalWS, input.positionWS, 0.5);
                 half4 colour = UniversalFragmentPBR(lighting, data);

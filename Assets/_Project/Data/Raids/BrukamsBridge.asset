@@ -99,12 +99,19 @@ MonoBehaviour:
     enemyDensity: 1
     briefing: The sun goes down behind the valley wall. On the bridge something huge sits on the stones and waits.
     skyCover: 0.25
+  climate: {fileID: 0}
   grade:
     curve: 1
     exposure: -0.3
     saturation: 1.05
     contrast: 1.25
     filter: {r: 1, g: 0.98, b: 0.92, a: 1}
+  groundLight:
+    enabled: 0
+    relief: 0
+    bounce: 0
+    bounceTint: {r: 1, g: 1, b: 1, a: 1}
+    sunflecks: 0.45
   layoutRules: {fileID: 0}
   enemyDensity: 1.5
   overrideBands: 0

@@ -153,6 +153,8 @@ Shader "Safe Haven/Terrain Moss"
             // moss doesn't light up against a darker floor (GroundLight.hlsl; nothing without a field).
             GroundLightApply(GroundLightOnGround(input.positionWS), surface.occlusion, lighting.bakedGI);
             lighting.bakedGI += GroundLightBounce(input.positionWS, lighting.normalWS);
+            // Sun through gaps in the canopy on the moss as on the ground it covers (GroundLight.hlsl).
+            lighting.bakedGI += GroundLightSunflecks(input.positionWS);
             surface.normalTS = half3(0, 0, 1);
             half4 color = UniversalFragmentPBR(lighting, surface);
             color.rgb = MixFog(color.rgb, input.fog);
