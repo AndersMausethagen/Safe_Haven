@@ -350,3 +350,12 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   the lens and turning with it, so streaks cross the view whatever the camera does.
 - Puddles on the terrain already ring under the rain (the generator's WorldRainRings): nothing to add.
 - Seen in a launched rainy Valley from the game camera: faint slanted streaks across the frame, splashes thick round the player.
+
+### Grass motion vectors (3.3): Unity's detail renderer doesn't draw them, so MSAA stays the default
+- **Tested:** a MotionVectors pass on `Grass.shader` (tagged AlwaysRenderMotionVectors, as Tree Wind is), with a debug switch that
+  wrote a huge velocity. Under TAA with time frozen, the switch changed the picture no more than TAA's own jitter between two
+  identical frames (0.46% of pixels against 0.50%): the terrain's detail renderer never calls the pass. Reverted (an unused pass only
+  adds shader variants).
+- **So:** grass under TAA, STP or DLAA keeps softening when it sways; 4x MSAA stays the default (the research's step 2). Giving grass
+  motion vectors means drawing it through our own instanced path instead of Unity's detail renderer: a large job (L), and Unity 6.7's
+  GTAO wants it too. **Left for later, with 6.7.**
