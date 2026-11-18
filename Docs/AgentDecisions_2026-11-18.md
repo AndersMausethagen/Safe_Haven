@@ -308,3 +308,19 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - Left as they are on purpose: cues that tell you something (Counter Ready, Out of Stamina, Bow Full Draw) and the single stingers
   (quests, breaches, crafting milestones), which should sound the same every time. `CombatSoundTests` guards the twenty repeated
   ones. **Unheard by you.**
+
+### The value check (U4): figures don't stand out by value in the dark raids. Your call
+- **Measured** on game-camera shots in grayscale (the player's lit part against the ground round them, linear luminance):
+  Valley by day 1.3:1, the Woods by day 1.2-1.4:1, a night Marsh by the gate torches 2.1:1. The guideline for large shapes is 3:1.
+  The figures read by shape and colour, not by value; in the Woods the brightest things on screen are a pale boulder and the
+  glow mushrooms, so the eye goes there before the player.
+- **Why the existing helpers don't fix it:** the character rim (0.2, +80% at night) is lit by the sky and the sun, both dark under
+  the canopy; the player's fill light hangs 5 m off with a point light's falloff, so its 0.9 arrives as about 0.04 (it was meant to
+  "lift the figures a little" in the Woods: measured, doubling or even tripling it changed nothing). With the falloff removed it
+  works, but at its strength it lifts the figure only to 1.4:1: the Woods' dark grade and mist compress the range.
+- **Not changed** (it would change the Woods' mood; your eye decides). Options:
+  1. A real figure light in dark places: the fill without the falloff at about 2-3 (figures visibly brighter than the litter, as
+     in Diablo; the Woods less murky around the fight).
+  2. Lighter litter under the canopy (the biome a step brighter, the figures as they are).
+  3. Leave it: the player reads by shape, colour and motion, and the fights by their ground warnings (batch 3).
+  Recommended: 1, limited to raids and to the dark (scaled by how little sky and sun reach the player).
