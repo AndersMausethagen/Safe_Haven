@@ -35,7 +35,68 @@ public static partial class RaidMapGenerator
             }
 
             made.AddComponent<RaidSetPieceSite>().Bind(piece.Definition);
+            if (piece.Definition.OwnsClearing && piece.WallRadius > 0f)
+            {
+                PlaceCompoundWall(made.transform, piece, plan, terrain);
+            }
         }
+    }
+
+    // A compound's wall leaves no piece on ground steeper than this (a wall up a bank floats or buries itself).
+    private const float CompoundWallSteepest = 30f;
+
+    /// <summary>
+    /// A compound's ring (Docs/WorldDesignReview_2026-11-17.md G3): its wall pieces where the plan put them (RaidLayoutPlanner.CompoundWall:
+    /// clear of its openings and of every trail), each along the ring, on the ground, and none in water or on a steep bank. Solid, so the navmesh built after the map's content leaves the ways in as chokepoints. From the
+    /// map's seed: same seed, same wall.
+    /// </summary>
+    private static void PlaceCompoundWall(Transform compound, RaidLayoutPiece piece, RaidLayoutPlan plan, Terrain terrain)
+    {
+        RaidSetPieceDefinition definition = piece.Definition;
+        var holder = new GameObject("Wall").transform;
+        holder.SetParent(compound, false);
+        holder.rotation = Quaternion.identity;
+        var random = new System.Random(RaidLayout.SeedFor(plan.Seed, "Compound Wall " + piece.Position));
+        Vector3 origin = terrain.transform.position;
+        TerrainData data = terrain.terrainData;
+        float radius = piece.WallRadius;
+        foreach (float angle in piece.Wall)
+        {
+            float rad = angle * Mathf.Deg2Rad;
+            var outward = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+            Vector2 spot = piece.Position + outward * radius;
+            if (spot.x < 1f || spot.y < 1f || spot.x > plan.Size - 1f || spot.y > plan.Size - 1f || plan.InRiver(spot, 0.5f) || plan.InWater(spot)
+                || data.GetSteepness(spot.x / plan.Size, spot.y / plan.Size) > CompoundWallSteepest)
+            {
+                continue;
+            }
+
+            GameObject kind = definition.WallPieces[random.Next(definition.WallPieces.Count)];
+            if (kind == null)
+            {
+                continue;
+            }
+
+            var at = origin + new Vector3(spot.x, 0f, spot.y);
+            at.y = terrain.SampleHeight(at) + origin.y;
+            // Local X along the ring, local Z outward.
+            GameObject made = Object.Instantiate(kind, at, Quaternion.LookRotation(new Vector3(outward.x, 0f, outward.y), Vector3.up), holder);
+            made.name = kind.name;
+        }
+    }
+
+    /// <summary>True when <paramref name="angle"/> (degrees) lies within <paramref name="clear"/> of any opening. Pure, for tests.</summary>
+    public static bool CompoundOpenAt(float angle, IReadOnlyList<float> openings, float clear)
+    {
+        foreach (float opening in openings)
+        {
+            if (Mathf.Abs(Mathf.DeltaAngle(angle, opening)) < clear)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private const string ClutterName = "Clutter";

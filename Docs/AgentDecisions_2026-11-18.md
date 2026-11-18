@@ -68,3 +68,16 @@ Until you choose, the old test (base slots) still holds, and a second test with 
 - **Rare in practice:** in a narrow valley, clearings and trails sit too close to have a cliff between, so they share a level; about
   6 seeds in 400 raise two or more clearings. Seen in a launched Valley (seed 19): a raised clearing with a ramp up and rock at the
   step. Making shelves common needs the planner to leave room for them (its shared-level groups): not done.
+
+### Compounds (world review G3), first: the Valley's Seter Yard
+- A set piece can now own a clearing (Owns Clearing): it stands at the clearing's middle and a ring of wall pieces runs round its
+  yard, open wherever a trail or side path crosses (and one back way more), each piece kept 2 m clear of any trail. The planner
+  prefers the clearings with the fewest ways in (chokepoints), never the start's, an exit's or the apex's, and passes over a
+  clearing that would leave less than 45% of its ring standing (stubs, not a yard). Walls are solid: the navmesh built after the
+  content leaves the openings as the ways in.
+- **Troll Valley: one Seter Yard** (the Ruined Seter's ruin and guards in a dry-stone fold) on about a fifth of runs. Valley
+  clearings are small and crossed by side paths, so a fold stands round about half its yard: a broken fold, which suits a ruin.
+  Seen in a launched Valley (seed 25) from the game camera and close by.
+- New plain wall pieces for raids (the Haven's without their building, health and save parts): `Prefabs/Raids/Compounds/Wall -
+  Skigard`, `Wall - Dry-stone`, `Wall - Palisade`. The Woods and the Marsh have no compounds yet (the Woods' layouts are pinned; the
+  Marsh's Peat Cutters' Camp is still to make).

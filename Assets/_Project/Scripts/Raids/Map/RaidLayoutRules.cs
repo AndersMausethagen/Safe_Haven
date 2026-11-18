@@ -528,6 +528,9 @@ public sealed class RaidLayoutRules : ScriptableObject
     [SerializeField] private List<RaidSetPieceDefinition> setPieces = new List<RaidSetPieceDefinition>();
     [Tooltip("How many of the map's camps are one, least and most.")]
     [SerializeField] private Vector2Int campPieces = new Vector2Int(1, 2);
+    [Tooltip("How many compounds a map has, least and most (world review G3): set pieces that take a clearing of their own and ring its " +
+             "yard with walls, their ways in left open. Picked from Set Pieces with Owns Clearing. 0: none.")]
+    [SerializeField] private Vector2Int compounds = Vector2Int.zero;
 
     /// <summary>
     /// A copy of these rules for a map this many times wider: as much on each square metre, so four times as many clearings and sites on
@@ -540,6 +543,7 @@ public sealed class RaidLayoutRules : ScriptableObject
         copy.rooms = new Vector2Int(Mathf.RoundToInt(rooms.x * area), Mathf.RoundToInt(rooms.y * area));
         copy.ponds = new Vector2Int(Mathf.RoundToInt(ponds.x * area), Mathf.RoundToInt(ponds.y * area));
         copy.campPieces = new Vector2Int(Mathf.RoundToInt(campPieces.x * area), Mathf.RoundToInt(campPieces.y * area));
+        copy.compounds = new Vector2Int(Mathf.RoundToInt(compounds.x * area), Mathf.RoundToInt(compounds.y * area));
         copy.exitRooms = Mathf.RoundToInt(exitRooms * width);
         copy.greatHills = new Vector2Int(Mathf.RoundToInt(greatHills.x * area), Mathf.RoundToInt(greatHills.y * area));
         copy.boulderClusters = new Vector2Int(Mathf.RoundToInt(boulderClusters.x * area), Mathf.RoundToInt(boulderClusters.y * area));
@@ -587,6 +591,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     public RaidValleyRule Valley => valley;
     public RaidFenRule Fen => fen;
     public Vector2Int CampPieces => campPieces;
+    public Vector2Int Compounds => compounds;
 
     public Vector2Int Rooms => rooms;
     public int ExitRooms => exitRooms;

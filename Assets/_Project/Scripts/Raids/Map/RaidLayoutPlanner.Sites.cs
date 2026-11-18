@@ -43,6 +43,300 @@ public static partial class RaidLayoutPlanner
         {
             AddPiece(plan, rules, camps[index], false, used, random);
         }
+
+        PlaceCompounds(plan, rules, seed, attempt, used);
+    }
+
+    // A compound keeps this far from the start's middle, so the first steps are never into a walled yard.
+    private const float CompoundFromStart = 45f;
+
+    // A compound's wall stands round at least this share of its ring, or the clearing isn't one for a compound.
+    private const float CompoundLeastWall = 0.45f;
+
+    // Extra openings keep at least this far (degrees) from every way in.
+    private const float ExtraOpeningApart = 50f;
+
+    /// <summary>
+    /// Compounds (Docs/WorldDesignReview_2026-11-17.md G3): set pieces that take a whole clearing (Owns Clearing), a plain clearing or hub
+    /// with room for the piece inside its ring, away from the start and from any piece already placed. Its ring gets an opening wherever a
+    /// trail or a side path crosses it (<see cref="CompoundOpenings"/>), so whatever the clearing holds (a camp, a cache) stays reachable
+    /// and its ways in become chokepoints. From their own stream, after everything else in a clearing, so turning them on moves nothing.
+    /// </summary>
+    private static void PlaceCompounds(RaidLayoutPlan plan, RaidLayoutRules rules, int seed, int attempt, List<RaidSetPieceDefinition> used)
+    {
+        if (rules.Compounds.y <= 0)
+        {
+            return;
+        }
+
+        var random = new System.Random(RaidLayout.SeedFor(seed, "Compounds " + attempt));
+        int wanted = random.Next(rules.Compounds.x, rules.Compounds.y + 1);
+        // The clearings with the fewest ways in first: a yard with one or two gates is a chokepoint, a hub with four is a sieve.
+        List<int> shuffled = RaidLayout.PickIndices(random, plan.Rooms.Count, plan.Rooms.Count);
+        var order = new List<int>(shuffled);
+        order.Sort((a, b) => plan.Rooms[a].Links != plan.Rooms[b].Links ? plan.Rooms[a].Links.CompareTo(plan.Rooms[b].Links)
+            : shuffled.IndexOf(a).CompareTo(shuffled.IndexOf(b)));
+        for (int placed = 0; placed < wanted; placed++)
+        {
+            RaidSetPieceDefinition piece = PickCompound(rules, plan, used, random);
+            if (piece is null)
+            {
+                return;
+            }
+
+            bool found = false;
+            foreach (int index in order)
+            {
+                RaidLayoutRoom room = plan.Rooms[index];
+                float ring = room.Radius * piece.WallAt;
+                if ((room.Role != RaidRoomRole.Plain && room.Role != RaidRoomRole.Hub) || ring < piece.Radius + 1.5f
+                    || Vector2.Distance(room.Position, plan.Start.Position) < CompoundFromStart || TakenByAPiece(plan, room.Position, ring))
+                {
+                    continue;
+                }
+
+                var compound = new RaidLayoutPiece { Definition = piece, Position = room.Position, Turn = Range(random, 0f, 360f), WallRadius = ring };
+                CompoundOpenings(plan, room.Position, ring, piece.ExtraOpenings, random, compound.Openings);
+                CompoundWall(plan, compound);
+                // A hub with many ways in leaves stubs of wall, not a yard: such a clearing is passed over.
+                int whole = Mathf.Max(6, Mathf.RoundToInt(2f * Mathf.PI * ring / piece.PieceLength));
+                if (compound.Wall.Count < whole * CompoundLeastWall)
+                {
+                    continue;
+                }
+
+                plan.Pieces.Add(compound);
+                used.Add(piece);
+                found = true;
+                break;
+            }
+
+            if (!found)
+            {
+                return;
+            }
+        }
+    }
+
+    private static bool TakenByAPiece(RaidLayoutPlan plan, Vector2 middle, float ring)
+    {
+        foreach (RaidLayoutPiece other in plan.Pieces)
+        {
+            float keep = ring + Mathf.Max(other.WallRadius, other.Definition is null ? 0f : other.Definition.Radius);
+            if ((other.Position - middle).sqrMagnitude < keep * keep)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // By weight among the compounds that suit the mood, one not on this map yet first; never one whose model already stands on the map
+    // (a compound made from a rumour's set piece, the Ruined Seter as the Seter Yard, would show the same ruin twice).
+    private static RaidSetPieceDefinition PickCompound(RaidLayoutRules rules, RaidLayoutPlan plan, List<RaidSetPieceDefinition> used, System.Random random)
+    {
+        string mood = plan.Mood != null ? plan.Mood.name : "";
+        var fresh = new List<RaidSetPieceDefinition>();
+        var any = new List<RaidSetPieceDefinition>();
+        foreach (RaidSetPieceDefinition piece in rules.SetPieces)
+        {
+            if (piece is null || piece.Prefab is null || !piece.OwnsClearing || piece.Weight <= 0f || !piece.Suits(mood) || piece.WallPieces.Count == 0
+                || plan.Pieces.Exists(placed => ReferenceEquals(placed.Definition.Prefab, piece.Prefab)))
+            {
+                continue;
+            }
+
+            any.Add(piece);
+            if (!used.Contains(piece))
+            {
+                fresh.Add(piece);
+            }
+        }
+
+        List<RaidSetPieceDefinition> from = fresh.Count > 0 ? fresh : any;
+        float total = 0f;
+        foreach (RaidSetPieceDefinition piece in from)
+        {
+            total += piece.Weight;
+        }
+
+        float roll = (float)random.NextDouble() * total;
+        foreach (RaidSetPieceDefinition piece in from)
+        {
+            roll -= piece.Weight;
+            if (roll <= 0f)
+            {
+                return piece;
+            }
+        }
+
+        return from.Count > 0 ? from[from.Count - 1] : null;
+    }
+
+    /// <summary>
+    /// Where a compound's ring of <paramref name="ring"/> metres about <paramref name="middle"/> must stay open: every place a trail or a
+    /// side path crosses it (in degrees, as Atan2 on the map), then <paramref name="extra"/> more, each well away from those. Into
+    /// <paramref name="into"/>, cleared first.
+    /// </summary>
+    public static void CompoundOpenings(RaidLayoutPlan plan, Vector2 middle, float ring, int extra, System.Random random, List<float> into)
+    {
+        into.Clear();
+        foreach (List<Vector2> trail in plan.Trails)
+        {
+            Crossings(trail, middle, ring, into);
+        }
+
+        foreach (List<Vector2> spur in plan.Spurs)
+        {
+            Crossings(spur, middle, ring, into);
+        }
+
+        int ways = into.Count;
+        for (int i = 0, tries = 0; i < extra && tries < 40; tries++)
+        {
+            float angle = Range(random, -180f, 180f);
+            bool apart = true;
+            foreach (float other in into)
+            {
+                apart &= Mathf.Abs(Mathf.DeltaAngle(angle, other)) >= ExtraOpeningApart;
+            }
+
+            if (apart || (ways == 0 && into.Count == 0))
+            {
+                into.Add(angle);
+                i++;
+            }
+        }
+    }
+
+    // A wall piece keeps this far (metres, edge to trail's middle) from any trail or side path, beyond the openings themselves: a trail
+    // that meets the ring at a slant runs along it for a while.
+    private const float WallFromTrail = 2.2f;
+
+    /// <summary>
+    /// Where a compound's wall pieces stand (<see cref="RaidLayoutPiece.Wall"/>): evenly round its ring, one every Piece Length, leaving
+    /// out each that comes within half the Opening Width of an opening or within <see cref="WallFromTrail"/> of a trail or side path along
+    /// its whole length. The generator lays these, leaving out only what falls in water or on a steep bank.
+    /// </summary>
+    public static void CompoundWall(RaidLayoutPlan plan, RaidLayoutPiece compound)
+    {
+        compound.Wall.Clear();
+        RaidSetPieceDefinition definition = compound.Definition;
+        float radius = compound.WallRadius;
+        if (definition is null || radius <= 0f)
+        {
+            return;
+        }
+
+        int count = Mathf.Max(6, Mathf.RoundToInt(2f * Mathf.PI * radius / definition.PieceLength));
+        float clear = (definition.OpeningWidth * 0.5f + definition.PieceLength * 0.5f) / radius * Mathf.Rad2Deg;
+        for (int i = 0; i < count; i++)
+        {
+            float angle = (i + 0.5f) / count * 360f - 180f;
+            if (RaidMapGenerator.CompoundOpenAt(angle, compound.Openings, clear))
+            {
+                continue;
+            }
+
+            float rad = angle * Mathf.Deg2Rad;
+            var outward = new Vector2(Mathf.Cos(rad), Mathf.Sin(rad));
+            var along = new Vector2(-outward.y, outward.x);
+            Vector2 middle = compound.Position + outward * radius, half = along * (definition.PieceLength * 0.5f);
+            if (NearALine(plan.Trails, middle - half, middle + half) || NearALine(plan.Spurs, middle - half, middle + half))
+            {
+                continue;
+            }
+
+            compound.Wall.Add(angle);
+        }
+    }
+
+    private static bool NearALine(List<List<Vector2>> lines, Vector2 from, Vector2 to)
+    {
+        foreach (List<Vector2> line in lines)
+        {
+            for (int i = 0; i + 1 < line.Count; i++)
+            {
+                if (SegmentsApart(from, to, line[i], line[i + 1]) < WallFromTrail)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    // The least distance between two segments (zero when they cross).
+    private static float SegmentsApart(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    {
+        float Cross(Vector2 u, Vector2 v) => u.x * v.y - u.y * v.x;
+        Vector2 r = b - a, s = d - c;
+        float denominator = Cross(r, s);
+        if (Mathf.Abs(denominator) > 1e-6f)
+        {
+            float t = Cross(c - a, s) / denominator, u = Cross(c - a, r) / denominator;
+            if (t >= 0f && t <= 1f && u >= 0f && u <= 1f)
+            {
+                return 0f;
+            }
+        }
+
+        return Mathf.Min(Mathf.Min(PointToSegment(a, c, d), PointToSegment(b, c, d)), Mathf.Min(PointToSegment(c, a, b), PointToSegment(d, a, b)));
+    }
+
+    private static float PointToSegment(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float t = ab.sqrMagnitude > 1e-6f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
+        return Vector2.Distance(p, a + ab * t);
+    }
+
+    // Each segment that has one end inside the circle and the other outside crosses it once: where, as an angle.
+    private static void Crossings(List<Vector2> line, Vector2 middle, float radius, List<float> into)
+    {
+        for (int i = 0; i + 1 < line.Count; i++)
+        {
+            Vector2 a = line[i] - middle, b = line[i + 1] - middle;
+            bool aIn = a.sqrMagnitude < radius * radius, bIn = b.sqrMagnitude < radius * radius;
+            if (aIn == bIn)
+            {
+                // Both outside can still cut through the ring twice (a trail passing across the yard).
+                if (!aIn && SegmentCutsCircle(a, b, radius, out float first, out float second))
+                {
+                    into.Add(AngleOf(Vector2.Lerp(a, b, first)));
+                    into.Add(AngleOf(Vector2.Lerp(a, b, second)));
+                }
+
+                continue;
+            }
+
+            SegmentCutsCircle(a, b, radius, out float t0, out float t1);
+            float t = aIn ? t1 : t0;
+            into.Add(AngleOf(Vector2.Lerp(a, b, t)));
+        }
+    }
+
+    private static float AngleOf(Vector2 offset) => Mathf.Atan2(offset.y, offset.x) * Mathf.Rad2Deg;
+
+    // Where the segment a→b meets the circle about the origin, as shares of its length (first ≤ second); false when it misses or only
+    // meets it beyond its ends.
+    private static bool SegmentCutsCircle(Vector2 a, Vector2 b, float radius, out float first, out float second)
+    {
+        Vector2 d = b - a;
+        float qa = Vector2.Dot(d, d), qb = 2f * Vector2.Dot(a, d), qc = Vector2.Dot(a, a) - radius * radius;
+        float disc = qb * qb - 4f * qa * qc;
+        first = second = 0f;
+        if (qa < 1e-6f || disc < 0f)
+        {
+            return false;
+        }
+
+        float root = Mathf.Sqrt(disc);
+        first = (-qb - root) / (2f * qa);
+        second = (-qb + root) / (2f * qa);
+        return first >= 0f && second <= 1f;
     }
 
     private static void AddPiece(RaidLayoutPlan plan, RaidLayoutRules rules, RaidSite site, bool forRumour, List<RaidSetPieceDefinition> used, System.Random random)
@@ -72,7 +366,7 @@ public static partial class RaidLayoutPlanner
         foreach (RaidSetPieceDefinition piece in rules.SetPieces)
         {
             // Reference checks only: a run can be laid out off the main thread, where Unity's own null check can't run.
-            if (piece is null || piece.Prefab is null || piece.Weight <= 0f || !piece.Suits(mood) || (forRumour && !piece.HoldsRumours))
+            if (piece is null || piece.Prefab is null || piece.Weight <= 0f || piece.OwnsClearing || !piece.Suits(mood) || (forRumour && !piece.HoldsRumours))
             {
                 continue;
             }

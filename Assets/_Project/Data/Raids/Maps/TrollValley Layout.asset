@@ -434,4 +434,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e7f05b2e75065074ab70ab98098e5d1f, type: 2}
   - {fileID: 11400000, guid: d33a93404c6ff544a9ce1ae48a21504f, type: 2}
   - {fileID: 11400000, guid: 75d59b538355f46479a7f8f2b499f1fa, type: 2}
+  - {fileID: 11400000, guid: 8aa0ae14acd28e94fa62c50b924b4399, type: 2}
   campPieces: {x: 1, y: 2}
+  compounds: {x: 1, y: 1}

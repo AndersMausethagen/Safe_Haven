@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29829ad09c7ec8b4a88f9fd809bb3633, type: 3}
+  m_Name: Seter Yard
+  m_EditorClassIdentifier: SafeHaven::RaidSetPieceDefinition
+  id: seter_yard
+  displayName: Seter Yard
+  prefab: {fileID: 5270727196529157776, guid: ea7b7c7832982c047abd8e7bc4324fe7, type: 3}
+  radius: 7
+  weight: 1
+  holdsRumours: 0
+  alwaysThere: 0
+  moods: []
+  guards:
+  - prefab: {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+    count: 2
+    fromTier: 0
+  - prefab: {fileID: 6267209934607442583, guid: 76a470aa63338604b9110596e079afc3, type: 3}
+    count: 1
+    fromTier: 2
+  ownsClearing: 1
+  wallPieces:
+  - {fileID: 4769544115753050704, guid: de423cd51ffe3814aaaa1dc4b716ae09, type: 3}
+  pieceLength: 4
+  wallAt: 0.85
+  openingWidth: 4.5
+  extraOpenings: 1
