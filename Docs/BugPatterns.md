@@ -225,6 +225,17 @@ Also fixed: a raid companion's bond was written to one's own Haven and read back
 (`RaidCompanions`). Out of reach today (a guest following a host brings no companion), and one co-op feature away from an exception
 at the raid's end; both reads are `Home` now.
 
+From the playtest logs read as data (1,470 runs scanned for once-only events repeated in a session, and negative amounts):
+
+- **Ingrid freed three times on one raid** (the user's runs of 11-14 and 11-15): a rescued traveller's interaction stayed on once she
+  followed (only an event's spawned traveller had it switched off, a line after), so pressing it again said her thanks again and raised
+  her freeing and its story event again, with "free" still offered over her. Freed once now, and the interaction goes
+  (`QuestTests.ATraveller_IsFreedOnce_AndIsNotOfferedFreeingAgain`).
+- **The Haven's rank, a row every 2 s** (219 in one session): HavenProgress tells the rank again on purpose, so a quest begun after it
+  was reached still finishes; the playtest logger wrote every telling. Written once a rank now.
+- Found by that test: the voice player, asked outside Play, made its DontDestroyOnLoad host, threw, and left the host in the open
+  scene. It says nothing outside Play.
+
 Scanned across all runtime scripts and found clean, so not made into tests:
 
 - **Written to one's own Haven, read from the one stood in** (every file using both `GameSession.Home` and `Here`, 19): each runs only

@@ -15,10 +15,17 @@ public static class VoicePlayer
     /// <summary>Seconds of the line still to be heard.</summary>
     public static float SecondsLeft => IsSpeaking && source.clip != null ? Mathf.Max(0f, source.clip.length - source.time) : 0f;
 
-    /// <summary>Says a line, ending the one before it. False when the line has no recording (nothing is heard).</summary>
+    /// <summary>Says a line, ending the one before it. False when the line has no recording (nothing is heard), and outside Play.</summary>
     public static bool Say(string speaker, string line)
     {
         Stop();
+        // Its voice lives across scenes (DontDestroyOnLoad), which only Play has: outside it the host was made, the call threw and
+        // the host stayed in the open scene.
+        if (!Application.isPlaying)
+        {
+            return false;
+        }
+
         AudioClip recording = VoiceBank.Current.Find(speaker, line);
         if (recording == null)
         {

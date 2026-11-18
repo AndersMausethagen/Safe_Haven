@@ -169,6 +169,19 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 
     private void OnFreed()
     {
+        // Freed once. The interaction stayed on after it (only an event's spawned traveller had it switched off): pressing it again
+        // on someone already following said their thanks again and raised their freeing and its story event again (seen in the
+        // playtests, 2026-11-14 and 11-15: Ingrid freed three times on one raid), with "free" still offered over them.
+        if (state == State.Following)
+        {
+            return;
+        }
+
+        if (interactable != null)
+        {
+            interactable.enabled = false;
+        }
+
         state = State.Following;
         // At the player's side now: the map needn't point at them, and the way out is what to look for.
         foreach (QuestWaypoint mark in GetComponentsInChildren<QuestWaypoint>(true))

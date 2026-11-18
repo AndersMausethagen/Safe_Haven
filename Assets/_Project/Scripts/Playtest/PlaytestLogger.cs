@@ -20,6 +20,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private string path;
     private bool createdFile;
     private bool hadGameplay;
+    // The highest Haven rank written in this run (OnGameEvent).
+    private int rankWritten;
 
     public void Initialise(PlaytestSettings settings)
     {
@@ -211,6 +213,18 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private void OnGameEvent(GameEvent gameEvent)
     {
         EnsureRun();
+        // The Haven's rank is told again every 2 s (HavenProgress, so a quest begun after it was reached still finishes): written once
+        // a rank. Every telling was a row, 1,800 an hour at home (219 in one session of 2026-11-15), padding the logs read for balance.
+        if (gameEvent.Kind == GameEventKind.HavenRankReached)
+        {
+            if (gameEvent.Amount <= rankWritten)
+            {
+                return;
+            }
+
+            rankWritten = gameEvent.Amount;
+        }
+
         hadGameplay = true;
         if (gameEvent.Kind == GameEventKind.Killed && gameEvent.Origin != null && Player.IsPlayer(gameEvent.Origin))
         {
@@ -248,6 +262,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         EndSession();
         run = current;
         hadGameplay = false;
+        rankWritten = 0;
         try
         {
             Directory.CreateDirectory(PlaytestLog.Folder);

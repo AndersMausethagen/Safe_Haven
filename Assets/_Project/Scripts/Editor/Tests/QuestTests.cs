@@ -554,6 +554,38 @@ public sealed class QuestTests
         Assert.IsFalse(fields.ContainsKey(typeof(GameEventListener)), "Listeners react to events; they don't raise them.");
     }
 
+    [Test]
+    public void ATraveller_IsFreedOnce_AndIsNotOfferedFreeingAgain()
+    {
+        // The playtests of 2026-11-14 and 11-15 freed Ingrid three times on one raid: her interaction stayed on after the first.
+        var resident = UnityEditor.AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset");
+        Assert.IsNotNull(resident);
+        var body = new GameObject("Traveller");
+        int freed = 0;
+        void Count(GameEvent gameEvent) => freed += gameEvent.Kind == GameEventKind.PersonFreed ? 1 : 0;
+        GameEvents.Raised += Count;
+        try
+        {
+            var traveller = body.AddComponent<RescuableTraveler>();
+            var interactable = body.GetComponent<Interactable>();
+            SetField(traveller, "interactable", interactable);
+            SetField(traveller, "resident", resident);
+            MethodInfo onFreed = typeof(RescuableTraveler).GetMethod("OnFreed", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            onFreed.Invoke(traveller, null);
+            onFreed.Invoke(traveller, null);
+
+            Assert.AreEqual(1, freed, "freed once, however often the interaction is pressed");
+            Assert.IsTrue(traveller.IsFollowing);
+            Assert.IsFalse(interactable.enabled, "nothing to free any more: the interaction is off");
+        }
+        finally
+        {
+            GameEvents.Raised -= Count;
+            Object.DestroyImmediate(body);
+        }
+    }
+
     // ----- Whole quest flow -----
 
     [Test]
