@@ -11,7 +11,7 @@ using UnityEngine;
 /// </summary>
 public sealed class LiveTestErrors : IDisposable
 {
-    /// <summary>The start of a message that is not the game's, and why.</summary>
+    /// <summary>The start of a message that is not the game's while a scene changes (SceneTransition.IsBusy), and why.</summary>
     public static readonly Dictionary<string, string> NotTheGames = new Dictionary<string, string>
     {
         ["A BatchDrawCommand was submitted with an invalid Batch, Mesh, or Material ID"] =
@@ -52,7 +52,9 @@ public sealed class LiveTestErrors : IDisposable
             return;
         }
 
-        if (NotTheGames.Keys.Any(start => message.StartsWith(start, StringComparison.Ordinal)))
+        // Only while a scene changes, as its reason says: the same message mid-raid (a creature's mesh or material gone while drawn) is
+        // the game's, and is told (the review of 2026-11-18).
+        if (SceneTransition.IsBusy && NotTheGames.Keys.Any(start => message.StartsWith(start, StringComparison.Ordinal)))
         {
             return;
         }

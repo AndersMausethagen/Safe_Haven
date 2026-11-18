@@ -61,11 +61,10 @@ public sealed class Rowboat : MonoBehaviour, ITransportDriver
 
     public bool IsHeldBy(GameObject user) => rower != null && rower.gameObject == user;
 
+    // Told once a run of the program, not once a game: forgotten with the game (GameSession.Reset), it came back after every visit to a
+    // friend's Haven and every load (the review of 2026-11-18), which is far more often than a second new game in one sitting.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => taught = false;
-
-    /// <summary>A new game or a loaded one (GameSession) is told how to row again: once a game, not once a run of the program.</summary>
-    public static void ForgetGame() => taught = false;
 
     private void Awake()
     {

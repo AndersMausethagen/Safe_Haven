@@ -236,12 +236,12 @@ public static class GameSession
         // loading another save posted the old run's territory news in the loaded Haven.
         // Every ForgetGame in the game is called here (SharedStateTests): a system holding something of the game being played,
         // kept in a static that outlives a scene, writes one and adds it below. A static is not reset by quitting to the menu: only
-        // starting the program again (or Play in the Editor) does that.
+        // starting the program again (or Play in the Editor) does that. These run on every load, co-op's TryPlay too (into a friend's
+        // Haven and home again): what must outlive a visit doesn't belong here (the rowing hint came back after every visit).
         global::Territory.ForgetGame();
         CreatureRecords.ForgetGame();
         CorruptionNights.ForgetGame();
         QuestTimers.ForgetGame();
-        Rowboat.ForgetGame();
         ResidentBuilders.ForgetGame();
     }
 }

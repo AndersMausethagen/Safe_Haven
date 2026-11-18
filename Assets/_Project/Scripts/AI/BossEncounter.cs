@@ -35,7 +35,7 @@ public sealed class BossEncounter : MonoBehaviour
     // Woken out of a hold (a boss encounter's gate has sealed): it goes for the nearest at once, even with no wake to play.
     private bool wokenFromHold;
     // The hold's own invulnerability source: the wake adds and removes one of its own (this).
-    private readonly object holdToken = new object();
+    private readonly LeaseKey holdToken = new LeaseKey("a boss held before its fight");
     private static readonly int RoarState = Animator.StringToHash("Roar");
     // The heart's pulse while it lies toppled: a beat this long, the dim beat at this share of Topple Glow.
     private const float HeartbeatSeconds = 0.3f;

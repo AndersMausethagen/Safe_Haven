@@ -15,7 +15,7 @@ using Object = UnityEngine.Object;
 /// The way out of a game in Play mode (Docs/BugPatterns.md, sixth round): a raid left from the pause menu's "Quit to main menu", then a
 /// new game, then the save that quit wrote loaded. In the Editor every test starts the program's statics afresh, so a game left by the
 /// menu never handed anything on to the next one there; a player does it in one sitting. What the game left kept into the next was the
-/// bug: a quest clock, a save waiting for home that was then written into the next game, the builders' names, the rowing lesson.
+/// bug: a quest clock, a save waiting for home that was then written into the next game and the builders' names. Each is checked here.
 /// Fails on any error or exception on the way, those from the renderer's own threads too (LiveTestErrors). About three minutes.
 /// </summary>
 public sealed class QuitToMenuLiveTests
@@ -61,8 +61,10 @@ public sealed class QuitToMenuLiveTests
         yield return Until(Running, 90f, "the raid never started");
         RaidDirector.Current.Session.AddTime(900f);
         yield return Wait(2f);
-        // A timed moment under way as the player leaves (the prologue's hold is one).
+        // A timed moment under way as the player leaves (the prologue's hold is one), and someone who built at home meanwhile.
         QuestTimers.Set(timed, 60f);
+        var builders = (List<ResidentDefinition>)typeof(ResidentBuilders).GetField("worked", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
+        builders.Add(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset"));
 
         where = raid.name + " (quit to the menu)";
         var pause = Object.FindAnyObjectByType<PauseMenu>(FindObjectsInactive.Include);
@@ -84,6 +86,7 @@ public sealed class QuitToMenuLiveTests
         yield return Until(() => In(Haven), 120f, "the next new game never loaded");
         yield return Wait(3f);
         Assert.IsFalse(QuestTimers.TryGet(timed, out _), "the left game's quest clock is forgotten");
+        CollectionAssert.IsEmpty(builders, "the left game's builders aren't named in the next game's message home");
         CollectionAssert.AreEquivalent(savesBefore, Directory.GetFiles(folder),
             "nothing of the left game was saved in the new one (its save for home waited through the menu and wrote the new game)");
 

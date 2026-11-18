@@ -442,13 +442,14 @@ public sealed class SharedStateTests
         foreach ((string path, string source) in ConventionTests.RuntimeScripts())
         {
             string file = path.Substring("Assets/_Project/Scripts/".Length);
-            if (!UnnamedKeys.ContainsKey(file) && Regex.IsMatch(source, @"static\s+readonly\s+object\s+\w+\s*=\s*new\s+object\s*\(\s*\)"))
+            // A field, static or not (a boss's hold was one); a local `var source = new object()` keys stat changes, which no one watches.
+            if (!UnnamedKeys.ContainsKey(file) && Regex.IsMatch(source, @"\breadonly\s+object\s+\w+\s*=\s*new\s+object\s*\(\s*\)"))
             {
                 unnamed.Add(file);
             }
         }
 
-        CollectionAssert.IsEmpty(unnamed, "a static key made as new object(): make it a LeaseKey with a name (or list it if it owns no lease)");
+        CollectionAssert.IsEmpty(unnamed, "a key field made as new object(): make it a LeaseKey with a name (or list it if it owns no lease)");
     }
 
     // Text fields typed in where no gameplay key can act, and why.
