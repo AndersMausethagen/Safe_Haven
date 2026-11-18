@@ -24,6 +24,17 @@ public sealed class RainEffect : MonoBehaviour
     [SerializeField, Min(1f)] private float height = 12f;
     [Tooltip("Sideways speed (m/s) the wind gives the rain at the Moss Wind's usual strength.")]
     [SerializeField, Min(0f)] private float windSlant = 3f;
+    [Header("Read from above (Docs/LookAndFeelResearch_2026-11-18.md V3)")]
+    [Tooltip("The share of the splashes that land within Near Reach of the player, where the eye is: from 20 m up the streaks barely " +
+             "read, the ground boiling with splashes does.")]
+    [SerializeField, Range(0f, 1f)] private float nearShare = 0.5f;
+    [SerializeField, Min(1f)] private float nearReach = 6f;
+    [Tooltip("Streaks falling close in front of the camera, a thin sheet of rain between it and the ground (a copy of the drops, " +
+             "fainter and shorter), per second in a downpour. 0: none.")]
+    [SerializeField, Min(0f)] private float sheetPerSecond = 220f;
+    [Tooltip("Metres in front of the camera the sheet falls, and how wide, tall and deep it is.")]
+    [SerializeField, Min(0.5f)] private float sheetDistance = 5f;
+    [SerializeField] private Vector3 sheetSize = new Vector3(9f, 6f, 5f);
 
     private static readonly int RainId = Shader.PropertyToID("_SafeHavenRain");
     private static readonly int WindId = Shader.PropertyToID("_SafeHavenWind");
@@ -35,6 +46,7 @@ public sealed class RainEffect : MonoBehaviour
     private float splashCarry;
     private float splashReach;
     private ParticleSystem.EmitParams splashAt;
+    private ParticleSystem sheet;
 
     public float Intensity => intensity;
 
@@ -62,6 +74,7 @@ public sealed class RainEffect : MonoBehaviour
             splashes.Play();
         }
         SetRate(flakes, asSnow ? intensity * flakesPerSecond : 0f);
+        SetRate(sheet, rainfall * sheetPerSecond);
     }
 
     public void Configure(ParticleSystem snowflakes, float perSecond, float drift)
@@ -106,6 +119,13 @@ public sealed class RainEffect : MonoBehaviour
             Splash(ground);
         }
 
+        if (sheet != null)
+        {
+            // Just in front of the lens, turned with it: the sheet is seen falling across the view whatever the camera does.
+            Transform view = camera.transform;
+            sheet.transform.SetPositionAndRotation(view.position + view.forward * sheetDistance, Quaternion.Euler(0f, view.eulerAngles.y, 0f));
+        }
+
         if (flakes != null && asSnow)
         {
             flakes.transform.position = ground + Vector3.up * height;
@@ -135,6 +155,12 @@ public sealed class RainEffect : MonoBehaviour
             emission.rateOverTime = 0f;
         }
 
+        if (sheet == null && drops != null && sheetPerSecond > 0f)
+        {
+            sheet = MakeSheet(drops);
+            SetRate(sheet, (asSnow ? 0f : intensity) * sheetPerSecond);
+        }
+
         drips = GetComponent<RainDrips>();
         if (drips == null)
         {
@@ -143,17 +169,55 @@ public sealed class RainEffect : MonoBehaviour
         }
     }
 
+    // The sheet: a copy of the drops, a few metres in front of the camera, fainter, thinner and short-lived, in its own space so it
+    // stays with the lens.
+    private ParticleSystem MakeSheet(ParticleSystem source)
+    {
+        ParticleSystem made = Instantiate(source, transform);
+        made.name = "Rain Sheet";
+        made.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        ParticleSystem.MainModule main = made.main;
+        main.simulationSpace = ParticleSystemSimulationSpace.Local;
+        main.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
+        main.startSizeMultiplier = source.main.startSizeMultiplier * 0.6f;
+        Color colour = source.main.startColor.color;
+        colour.a *= 0.35f;
+        main.startColor = colour;
+        main.maxParticles = Mathf.CeilToInt(sheetPerSecond * 0.6f) + 16;
+        ParticleSystem.ShapeModule shape = made.shape;
+        shape.enabled = true;
+        shape.shapeType = ParticleSystemShapeType.Box;
+        shape.position = new Vector3(0f, sheetSize.y * 0.5f, 0f);
+        shape.scale = sheetSize;
+        shape.rotation = Vector3.zero;
+        // No splashes or collisions of its own: the ground's are the splashes'.
+        ParticleSystem.CollisionModule collision = made.collision;
+        collision.enabled = false;
+        ParticleSystem.SubEmittersModule subs = made.subEmitters;
+        subs.enabled = false;
+        return made;
+    }
+
+    /// <summary>Where a splash lands, as an offset from the view's middle: a share within <paramref name="near"/> metres of the player
+    /// (who stands near the middle), the rest anywhere within <paramref name="reach"/>. Pure but for its random numbers.</summary>
+    public static Vector2 SplashOffset(Vector2 player, float share, float near, float reach)
+    {
+        return Random.value < share ? player + Random.insideUnitCircle * near : Random.insideUnitCircle * reach;
+    }
+
     // Each drop's splash where it really lands: on a roof, a rock, a cart or the ground, never under a roof or on water
-    // (which rings instead).
+    // (which rings instead). Half of them near the player, where the eye is.
     private void Splash(Vector3 ground)
     {
         splashCarry += splashRate * Time.deltaTime;
         int count = Mathf.Min((int)splashCarry, 24);
         splashCarry -= (int)splashCarry;
         float reach = splashReach > 0f ? splashReach : 18f;
+        Player player = Player.Current;
+        Vector2 nearPlayer = player != null ? new Vector2(player.transform.position.x - ground.x, player.transform.position.z - ground.z) : Vector2.zero;
         for (int i = 0; i < count; i++)
         {
-            Vector2 offset = Random.insideUnitCircle * reach;
+            Vector2 offset = SplashOffset(nearPlayer, player != null ? nearShare : 0f, nearReach, reach);
             var from = new Vector3(ground.x + offset.x, ground.y + 30f, ground.z + offset.y);
             if (Physics.Raycast(from, Vector3.down, out RaycastHit hit, 60f, SplashLayers, QueryTriggerInteraction.Ignore))
             {

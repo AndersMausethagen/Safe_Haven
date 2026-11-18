@@ -305,4 +305,24 @@ public sealed class WeatherTests
         Assert.IsNotNull(weather.FindProperty("overcastVolume").objectReferenceValue);
         Assert.AreEqual(3, rig.GetComponentsInChildren<Volume>().Length);
     }
+
+    // Docs/LookAndFeelResearch_2026-11-18.md V3: from 20 m up the streaks barely read, so a share of the splashes lands round the player.
+    [Test]
+    public void ShareOfTheSplashesLandsRoundThePlayer()
+    {
+        var player = new Vector2(3f, -2f);
+        for (int i = 0; i < 200; i++)
+        {
+            Assert.LessOrEqual(Vector2.Distance(RainEffect.SplashOffset(player, 1f, 6f, 18f), player), 6.001f, "all of them near: within Near Reach");
+            Assert.LessOrEqual(RainEffect.SplashOffset(player, 0f, 6f, 18f).magnitude, 18.001f, "none near: anywhere in the view's reach");
+        }
+
+        int near = 0;
+        for (int i = 0; i < 2000; i++)
+        {
+            near += Vector2.Distance(RainEffect.SplashOffset(player, 0.5f, 6f, 18f), player) <= 6f ? 1 : 0;
+        }
+
+        Assert.That(near / 2000f, Is.InRange(0.5f, 0.62f), "half go near, and a few of the rest land there too");
+    }
 }

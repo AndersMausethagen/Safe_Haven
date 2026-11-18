@@ -342,3 +342,11 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
 - **The held beacon's heartbeat:** a frame-drum "lub-dub" while the circle is held, from 1.3 s apart as it is lit to 0.55 s as it
   fills (eased), four takes; it drops out while something contests the circle (Extraction Point › Heartbeat, on the prefab).
 - Per-raid music sets stay your later plan; these cues are shared until then. **Unheard by you.**
+
+### Batch 12: rain read from above (V3)
+- **Half the splashes land within 6 m of the player** (Rain Effect › Near Share, Near Reach), where the eye is: the ground round
+  the player boils with them; the rest still spread over the view.
+- **A thin sheet of rain in front of the camera** (Rain Effect › Sheet): a fainter, shorter copy of the drops falling 5 m in front of
+  the lens and turning with it, so streaks cross the view whatever the camera does.
+- Puddles on the terrain already ring under the rain (the generator's WorldRainRings): nothing to add.
+- Seen in a launched rainy Valley from the game camera: faint slanted streaks across the frame, splashes thick round the player.
