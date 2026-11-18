@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b684ea249be974cbc0bd19eabab532, type: 3}
+  m_Name: Troll Valley Ambient Life
+  m_EditorClassIdentifier: SafeHaven::AmbientLifeProfile
+  swarms:
+  - name: Pollen and Fluff
+    material: {fileID: 2100000, guid: cc02644db33215c41b89d906179acd64, type: 2}
+    colour: {r: 1, g: 0.97, b: 0.86, a: 0.7}
+    colour2: {r: 0.98, g: 0.92, b: 0.7, a: 0.55}
+    size: {x: 0.025, y: 0.06}
+    height: {x: 0.4, y: 3.2}
+    life: {x: 6, y: 10}
+    byDay: 40
+    byNight: 4
+    inRain: 0.15
+    radius: 18
+    wander: 0.35
+    wanderFrequency: 0.35
+    withWind: 0.55
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    stretch: 0
+    spin: 0
+    gusts: 0
+    gustEvery: {x: 6, y: 14}
+    perGust: 24
+  - name: Dust in the Gust
+    material: {fileID: 2100000, guid: cc02644db33215c41b89d906179acd64, type: 2}
+    colour: {r: 0.72, g: 0.64, b: 0.5, a: 0.22}
+    colour2: {r: 0.62, g: 0.56, b: 0.44, a: 0.16}
+    size: {x: 0.18, y: 0.45}
+    height: {x: 0.05, y: 0.7}
+    life: {x: 4, y: 6}
+    byDay: 30
+    byNight: 0
+    inRain: 0.2
+    radius: 18
+    wander: 0.3
+    wanderFrequency: 0.8
+    withWind: 0.3
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    stretch: 0
+    spin: 30
+    gusts: 1
+    gustEvery: {x: 6, y: 12}
+    perGust: 26
+  - name: Grass Seed in the Gust
+    material: {fileID: 2100000, guid: 8325dbcb351fa3c408142cc3168e709f, type: 2}
+    colour: {r: 0.7, g: 0.62, b: 0.38, a: 0.9}
+    colour2: {r: 0.58, g: 0.52, b: 0.3, a: 0.85}
+    size: {x: 0.03, y: 0.05}
+    height: {x: 0.1, y: 1.2}
+    life: {x: 4, y: 6}
+    byDay: 30
+    byNight: 0
+    inRain: 0.2
+    radius: 18
+    wander: 0.3
+    wanderFrequency: 0.8
+    withWind: 0.3
+    place: 0
+    columns: 0
+    columnRadius: 0.6
+    stretch: 0
+    spin: 300
+    gusts: 1
+    gustEvery: {x: 8, y: 16}
+    perGust: 14
+  birds:
+    enabled: 1
+    shadowMaterial: {fileID: 2100000, guid: 9cb13a4146ed9594e8a8454a883b38b9, type: 2}
+    every: {x: 25, y: 65}
+    altitude: {x: 22, y: 36}
+    speed: {x: 8, y: 12}
+    span: 1.9
+    mostInFlock: 2

@@ -247,3 +247,17 @@ beds from two MOSS takes panned left and right for a natural stereo field, cut t
   game camera in launched Marsh and Woods raids; the first duckweed read as neon dots and was darkened and drawn into mats.
 - **Warnings over water.** A lob ring or hazard over a pool lies on the water's surface (the raid's ground light field knows it),
   not on the bed below. Seen at the Marsh: a lob into the fen.
+
+### Batch 5: life in the air (V2, V4)
+- **Each raid's air has its own life** (`AmbientLife`, a profile per biome; Brukam's Bridge has the Valley's, Guardian's Hollow the
+  Woods'). **Woods:** dust motes that shine only where a shaft of sun reaches them, moths round the lights at night, needles and twigs
+  a gust carries. **Valley:** pollen and seed fluff drifting on the breeze, dust and grass seed lifted by gusts, and now and then a big
+  bird's shadow (one or two) sliding over the ground: scale from above; the bird flies too high to see. **Marsh:** midges in glittering
+  columns over open water, dragonflies (four clear wings, seen lying flat from above), cotton grass fluff in the gusts. Fewer at night
+  or in rain as each swarm says (moths only at night).
+- **Gusts as one event (V4):** debris comes in a wave from upwind at the speed the grass's gust waves roll, so wind reads across the
+  frame.
+- Seen in launched raids: the Valley's pollen and a bird's shadow crossing the clearing (the first ones landed 50 m off: the
+  afternoon sun throws a shadow far, so flights are now aimed so the shadow crosses the view, and the first shape read as a
+  triangle and got long bent wings, a head and a tail); the Marsh's midge columns (too dark at first: they now catch the sun) and
+  dragonflies (first drawn as a cyan bar, now lying flat). The Woods' motes and moths are not seen yet.
