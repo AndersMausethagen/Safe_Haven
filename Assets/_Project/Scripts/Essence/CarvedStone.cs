@@ -28,6 +28,9 @@ public sealed class CarvedStone : MonoBehaviour, IInteractionName
 
     public bool IsRead => read;
 
+    /// <summary>What reading it counts as for quests (the quest tracker asks whether a quest's stone is in this raid).</summary>
+    public QuestTargetDefinition QuestTarget => questTarget;
+
     /// <summary>The tier its marks belong to: its own, or the raid's.</summary>
     public int Tier => tier > 0 ? tier : RaidDirector.Current != null ? RaidDirector.Current.Session.Tier : 1;
 

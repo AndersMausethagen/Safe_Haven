@@ -60,7 +60,15 @@ public sealed class QuestTrackerView : MonoBehaviour
             nextTick = Time.time + 1f;
             Refresh();
         }
+        else if (onARaid && Time.time >= nextRaidLook)
+        {
+            // Someone a raid's event brings in later (a stranger to talk to) makes their quest one that can be done here.
+            nextRaidLook = Time.time + 5f;
+            Refresh();
+        }
     }
+
+    private float nextRaidLook;
 
     public void Refresh()
     {
@@ -183,16 +191,60 @@ public sealed class QuestTrackerView : MonoBehaviour
             return false;
         }
 
+        HashSet<Object> here = null;
         for (int i = 0; i < entry.Counts.Length; i++)
         {
             QuestObjective objective = entry.Quest.Objectives[i];
-            if (entry.IsObjectiveOpen(i) && (objective.CanProgressOnARaid || (objective.Type == ObjectiveType.QuestEvent && HasWaypointHere(entry.Quest))))
+            if (!entry.IsObjectiveOpen(i))
+            {
+                continue;
+            }
+
+            // Talking to someone, using or reaching something: only where they are. "Listen to the portal" showed on every raid,
+            // the portal being at home (the HUD review of 2026-11-18).
+            bool deed = objective.Type == ObjectiveType.TalkTo || objective.Type == ObjectiveType.UseObject || objective.Type == ObjectiveType.ReachPlace;
+            if (deed)
+            {
+                here ??= DeedTargetsHere();
+                if (objective.DeedTarget != null && here.Contains(objective.DeedTarget) || HasWaypointHere(entry.Quest))
+                {
+                    return true;
+                }
+            }
+            else if (objective.CanProgressOnARaid || (objective.Type == ObjectiveType.QuestEvent && HasWaypointHere(entry.Quest)))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // Whom one can talk to and what one can use or reach in the scenes loaded now: everything that raises those deeds.
+    private static HashSet<Object> DeedTargetsHere()
+    {
+        var found = new HashSet<Object>();
+        foreach (Talkable talkable in Object.FindObjectsByType<Talkable>(FindObjectsSortMode.None))
+        {
+            if (talkable.QuestIdentity != null) found.Add(talkable.QuestIdentity);
+        }
+
+        foreach (HomePortal portal in Object.FindObjectsByType<HomePortal>(FindObjectsSortMode.None))
+        {
+            if (portal.QuestTarget != null) found.Add(portal.QuestTarget);
+        }
+
+        foreach (CarvedStone stone in Object.FindObjectsByType<CarvedStone>(FindObjectsSortMode.None))
+        {
+            if (stone.QuestTarget != null) found.Add(stone.QuestTarget);
+        }
+
+        foreach (GameEventTrigger trigger in Object.FindObjectsByType<GameEventTrigger>(FindObjectsSortMode.None))
+        {
+            if (trigger.Target != null) found.Add(trigger.Target);
+        }
+
+        return found;
     }
 
     private static bool HasWaypointHere(QuestDefinition quest)

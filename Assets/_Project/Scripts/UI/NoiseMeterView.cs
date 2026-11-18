@@ -37,9 +37,21 @@ public sealed class NoiseMeterView : MonoBehaviour
         return view;
     }
 
+    // Whether something hostile is near enough to hear the player at their loudest, looked at twice a second.
+    private bool heardNearby;
+    private float nextNearbyLook;
+
     private void Update()
     {
-        bool visible = noise != null && (RaidDirector.Current != null || MonsterAI.Active.Count > 0);
+        // During raids, and at home only near something that could hear (as the summary says): it counted any creature anywhere in the
+        // scene, so the Haven's wildlife kept "Silent" on screen all day (the HUD review of 2026-11-18).
+        if (noise != null && RaidDirector.Current == null && Time.unscaledTime >= nextNearbyLook)
+        {
+            nextNearbyLook = Time.unscaledTime + 0.5f;
+            heardNearby = AnyHostileWithin(noise.transform.position, PerceptionSettings.Current.NoiseMeterMax);
+        }
+
+        bool visible = noise != null && (RaidDirector.Current != null || heardNearby);
         if (panel.activeSelf != visible)
         {
             panel.SetActive(visible);
@@ -115,5 +127,21 @@ public sealed class NoiseMeterView : MonoBehaviour
         label.rectTransform.anchoredPosition = new Vector2(0f, 14f);
 
         panel.SetActive(false);
+    }
+
+    /// <summary>True when a living creature hostile to the player stands within <paramref name="reach"/> metres of <paramref name="at"/>.</summary>
+    public static bool AnyHostileWithin(Vector3 at, float reach)
+    {
+        float most = reach * reach;
+        foreach (MonsterAI monster in MonsterAI.Active)
+        {
+            if (monster != null && monster.CurrentState != MonsterAI.State.Dead && (monster.transform.position - at).sqrMagnitude <= most
+                && monster.TryGetComponent(out Damageable body) && body.Faction.WillAttack(Faction.Player))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
