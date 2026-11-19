@@ -203,6 +203,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.85
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -234,6 +235,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.85
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -265,6 +267,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.85
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -296,6 +299,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.85
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -327,6 +331,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.85
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -443,6 +448,12 @@ MonoBehaviour:
     stringSpacing: 16
     water: {fileID: 2100000, guid: 06493279e799f2542bf51a75e9865d39, type: 2}
     damp: 0.1
+  barriers:
+    edgeFrom: 12
+    siteRoom: 9
+    gapEvery: {x: 45, y: 75}
+    gapWidth: {x: 5, y: 8}
+    shortest: 24
   setPieces:
   - {fileID: 11400000, guid: 597468cf871861d42a719da44dba108a, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}

@@ -275,6 +275,10 @@ public sealed class RaidLayoutPlan
     public readonly List<RaidLayoutLandmark> Landmarks = new List<RaidLayoutLandmark>();
     /// <summary>Short flags beside the two ways to the exit ahead (RaidLayoutRules › Short Flags), placed last.</summary>
     public readonly List<RaidLayoutFlag> Flags = new List<RaidLayoutFlag>();
+    /// <summary>The walled runs of the wild ground's band (RaidLayoutRules › Barriers, G2), each a line from one gap to the next; placed after the flags.</summary>
+    public readonly List<RaidLayoutBarrier> Barriers = new List<RaidLayoutBarrier>();
+    /// <summary>The middles of the band's gaps: the ways through (for the report and the tests).</summary>
+    public readonly List<Vector2> BarrierGaps = new List<Vector2>();
 
     /// <summary>True when the trail of this link is one of the two ways to the exit ahead: a road (RaidLayoutRules › Road Width).</summary>
     public bool IsRoad(int link) => ShortRoute.Contains(link) || LongRoute.Contains(link);
@@ -490,4 +494,28 @@ public sealed class RaidLayoutFlag
     public float Turn;
     /// <summary>0-1: which of the rules' flags.</summary>
     public float Pick;
+}
+
+/// <summary>
+/// A walled run of the wild ground's band (RaidLayoutRules › Barriers, G2), in metres from the map's south-west corner: a line about two
+/// metres between points, from one gap to the next. RaidMapGenerator stands it as solid colliders and the map's Barrier Dressing grows on it.
+/// </summary>
+public sealed class RaidLayoutBarrier
+{
+    public readonly List<Vector2> Points = new List<Vector2>();
+
+    /// <summary>Metres along the run.</summary>
+    public float Length
+    {
+        get
+        {
+            float length = 0f;
+            for (int i = 1; i < Points.Count; i++)
+            {
+                length += Vector2.Distance(Points[i - 1], Points[i]);
+            }
+
+            return length;
+        }
+    }
 }

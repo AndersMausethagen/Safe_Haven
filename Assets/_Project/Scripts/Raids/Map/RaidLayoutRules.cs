@@ -102,6 +102,31 @@ public sealed class RaidFenRule
     [Range(0f, 1f)] public float damp = 0.25f;
 }
 
+/// <summary>
+/// Edges in the wild ground (Docs/WorldDesignReview_2026-11-17.md G2): the wild ground deep between the trails is walled off by a band of
+/// thicket, windthrow or rock that can only be crossed at gaps, so a map no longer plays like one open square. The band runs where the
+/// ground is Edge From metres from anything walkable (trails, clearings, sites, pockets, water), so it never closes a trail or a site and
+/// everything walkable stays joined; every run of it has gaps. A district's mood says how much of its band is walled (Mood › Barrier).
+/// The planner draws the band (RaidLayoutPlan.Barriers); the map stands it as solid colliders (RaidMapGenerator.PlaceBarriers) dressed
+/// with the map's Barrier Dressing (RaidMapDefinition).
+/// </summary>
+[Serializable]
+public sealed class RaidBarrierRule
+{
+    [Tooltip("Metres from the nearest walkable ground (a trail's or clearing's edge, a site's room) at which the band runs. Sites are " +
+             "kept clear by Site Room whatever it is; nearer than the heroes' Hero From Trail (up to 15 m) and the band runs through " +
+             "some of them (solid either way). Lower gives more wall: the Woods 11 m, the Marsh 12 m.")]
+    [Min(4f)] public float edgeFrom = 16f;
+    [Tooltip("Metres of room round each site counted as walkable ground, so the band goes round a camp or a cache, never through it.")]
+    [Min(0f)] public float siteRoom = 9f;
+    [Tooltip("Metres of wall between two gaps, least and most. Every run gets at least one gap, however short.")]
+    public Vector2 gapEvery = new Vector2(45f, 75f);
+    [Tooltip("Metres across a gap, least and most: room for two to pass, and for a creature that follows.")]
+    public Vector2 gapWidth = new Vector2(5f, 8f);
+    [Tooltip("Lines of the band shorter than this many metres are left out (a little deep ground needs no wall).")]
+    [Min(0f)] public float shortest = 24f;
+}
+
 /// <summary>How a Valley map is shaped (RaidLayoutShape.Valley): its floor, its walls and the river down its middle.</summary>
 [Serializable]
 public sealed class RaidValleyRule
@@ -268,6 +293,11 @@ public sealed class RaidMapMood
 
     /// <summary>This mood's weight for a kind of site (1 when not listed).</summary>
     public float DensityOf(RaidSiteKind kind) => RaidLayoutRules.DensityIn(siteDensity, kind);
+
+    [Header("Edges (G2)")]
+    [Tooltip("Share of the wild ground's band in this mood's district that is walled, 0 (open forest, as before) to 1 (every line of it, " +
+             "with its gaps). Rules › Barriers says where the band runs.")]
+    [Range(0f, 1f)] public float barrier;
 
     [Header("Cliffs and Ravines")]
     [Tooltip("The raid planner offers a run of this mood as a large raid first. The player can still pick Normal.")]
@@ -535,6 +565,10 @@ public sealed class RaidLayoutRules : ScriptableObject
     [Header("Fen (any shape)")]
     [SerializeField] private RaidFenRule fen = new RaidFenRule();
 
+    [Header("Edges in the wild ground (G2)")]
+    [Tooltip("Where the band of thicket or rock runs and how its gaps fall. It stands only in districts whose mood has a Barrier above 0.")]
+    [SerializeField] private RaidBarrierRule barriers = new RaidBarrierRule();
+
     [Header("Set Pieces")]
     [Tooltip("The authored places a run can have. Every rumour site that has room gets one, as do a few camps.")]
     [SerializeField] private List<RaidSetPieceDefinition> setPieces = new List<RaidSetPieceDefinition>();
@@ -602,6 +636,7 @@ public sealed class RaidLayoutRules : ScriptableObject
     /// <summary>How a map of the Valley shape is laid out.</summary>
     public RaidValleyRule Valley => valley;
     public RaidFenRule Fen => fen;
+    public RaidBarrierRule Barriers => barriers;
     public Vector2Int CampPieces => campPieces;
     public Vector2Int Compounds => compounds;
 
@@ -784,6 +819,19 @@ public sealed class RaidLayoutRules : ScriptableObject
         shortFlags = new List<GameObject>(flags);
         shortFlagSpacing = spacing;
         shortFlagOffset = offset;
+    }
+
+    /// <summary>Sets up the edges in the wild ground (builders and tests): the band's rule, and every mood's share of it walled.</summary>
+    public void ConfigureBarriers(RaidBarrierRule rule, float moodBarrier)
+    {
+        barriers = rule;
+        foreach (RaidMapMood mood in moods)
+        {
+            if (mood != null)
+            {
+                mood.barrier = moodBarrier;
+            }
+        }
     }
 
     /// <summary>Sets how many landmarks stand at nodes (builders and tests).</summary>

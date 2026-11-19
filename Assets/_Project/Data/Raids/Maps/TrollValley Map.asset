@@ -1757,6 +1757,127 @@ MonoBehaviour:
   midFromTrail: {x: 1.5, y: 12}
   rimHeroCell: 36
   rimHeroChance: 0.45
+  barrierDressing:
+  - prefab: {fileID: 4200787531422230130, guid: bc49fdfbd0c597a43b14ce6bb19fa539, type: 3}
+    weight: 2
+    scale: {x: 0.3, y: 0.5}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 14, y: 60}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.5
+      room: 2
+  - prefab: {fileID: 4237860249142595434, guid: 4c9c9f757a967c94886f0660215672dd, type: 3}
+    weight: 2
+    scale: {x: 0.4, y: 0.7}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 14, y: 60}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.5
+      room: 1.8
+  - prefab: {fileID: 6169844609837343291, guid: e863dbb3d056d05408c8e93b57a199f5, type: 3}
+    weight: 1.5
+    scale: {x: 0.4, y: 0.75}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 12, y: 60}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.5
+      room: 1.6
+  - prefab: {fileID: 2328331747743255017, guid: 5b6d15c1030189942828345e8cce07b2, type: 3}
+    weight: 2
+    scale: {x: 0.35, y: 0.55}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 8, y: 50}
+      forest: {x: 0, y: 1}
+      wet: -0.3
+      edge: 0
+      nearTrees: 0
+      groves: 0.5
+      room: 1.2
+  - prefab: {fileID: 1691094038086875444, guid: bcad94848be6f3a4c8408c17949d0df7, type: 3}
+    weight: 1
+    scale: {x: 0.9, y: 1.6}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 30}
+      forest: {x: 0.2, y: 1}
+      wet: 0.3
+      edge: 0
+      nearTrees: 0
+      groves: 0.4
+      room: 0.8
+  - prefab: {fileID: 6402175209233936230, guid: bdf05487b8001f54682844fcadd20419, type: 3}
+    weight: 1
+    scale: {x: 0.6, y: 0.9}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 16, y: 60}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.6
+      room: 3
+  - prefab: {fileID: 8510317241581660097, guid: fd06a8d202338424da460e879826927e, type: 3}
+    weight: 1
+    scale: {x: 0.5, y: 0.8}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 16, y: 60}
+      forest: {x: 0, y: 1}
+      wet: 0
+      edge: 0
+      nearTrees: 0
+      groves: 0.6
+      room: 3
+  - prefab: {fileID: 6017839548146343879, guid: 2d40a8c3acc57954f88c5c77a63d9dfc, type: 3}
+    weight: 1.5
+    scale: {x: 0.8, y: 1.1}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 32}
+      forest: {x: 0, y: 0.9}
+      wet: 0
+      edge: 0.6
+      nearTrees: -0.4
+      groves: 0.3
+      room: 1
+  - prefab: {fileID: 5902797484319364536, guid: 30f3bb3fbf95cf641bfdb06b4a167fd0, type: 3}
+    weight: 1
+    scale: {x: 0.8, y: 1.2}
+    fromTier: 0
+    toTier: 0
+    habitat:
+      slope: {x: 0, y: 25}
+      forest: {x: 0, y: 1}
+      wet: 0.6
+      edge: 0.3
+      nearTrees: 0
+      groves: 0.6
+      room: 0.6
+  barrierSpacing: 1.4
+  barrierDepth: 1.6
+  barrierInWater: 0
   siteRules:
   - kind: 3
     pointsPerSite: 3

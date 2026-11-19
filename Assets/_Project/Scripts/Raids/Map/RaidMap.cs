@@ -268,6 +268,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             rumourSpots.Clear();
             rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
             RaidMapGenerator.PlaceDressing(this, Layout, rules, heroes);
+            RaidMapGenerator.PlaceBarriers(this, Layout);
             times.Append($"content {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);
@@ -301,7 +302,21 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
                 reachable = RaidMapGenerator.ExitsReachable(this, Layout);
             }
 
+            // The wild ground's walls (G2) can cut off ground that was reached only through what they ring: opened where the navmesh says so.
+            int opened = reachable ? RaidMapGenerator.OpenWalledPockets(this, Layout) : 0;
+            if (opened > 0)
+            {
+                RebuildTrunks();
+                Physics.SyncTransforms();
+                yield return RebuildNavMesh();
+                reachable = RaidMapGenerator.ExitsReachable(this, Layout);
+            }
+
             times.Append($"navmesh {step.ElapsedMilliseconds} ms");
+            if (Layout.Barriers.Count > 0)
+            {
+                times.Append($" (walls: {Layout.Barriers.Count} runs, {Layout.BarrierGaps.Count} gaps, {opened} opened)");
+            }
             if (reachable)
             {
                 Debug.Log($"Raid map generated from seed {seed}: {Layout.Shape.shape}, {Layout.Mood.name}{RegionNames(Layout)}, {Layout.Rooms.Count} clearings, " +

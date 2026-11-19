@@ -971,6 +971,32 @@ Content: `AgentScripts/BuildRaidLayout.cs`, then `AgentScripts/BuildRaidWater.cs
 
 **Compounds (2026-11-18, world review G3).** A set piece with Owns Clearing (`RaidSetPieceDefinition`), placed by `RaidLayoutPlanner.PlaceCompounds` (Layout Rules › Compounds): in a plain clearing with no site in it, or else in a yard of its own beside a trail (`YardOffATrail`, joined by a side path through its gate), never near the start. Its ring of solid wall pieces (`CompoundWall`) leaves an opening at every trail and side path crossing (`CompoundOpenings`) plus a back way, each piece clear of every trail's edge; the yard is a pocket, so later passes keep off the wall. The generator lays the pieces off water and steep banks (`PlaceCompoundWall`). The Moss Marsh has the Bloomery Yard (the Bog-Iron Bloomery in a skigard fence) on about a third of runs; Troll Valley's clearings and floor are too full for one (its Seter Yard is kept, Compounds 0); the Woods' pinned layouts have none. Plain raid wall pieces: `Prefabs/Raids/Compounds/Wall - *`. Tests: `RaidCompoundTests`.
 
+**Edges in the wild ground (2026-11-19, world review G2).** The wild ground deep between the trails is walled off by a band that can only
+be crossed at gaps, so a map no longer plays like one open square. `RaidLayoutPlanner.Barriers` (plain C#, last, its own stream): the
+walkable ground (trails at their width, roads wider, spurs, clearings, pockets, sites with Site Room, ponds, rivers and the map's margin)
+is stamped on a 2 m grid, a chamfer distance transform gives each cell its metres from it, the Edge From level is traced by marching
+squares and joined into lines, and each line (in a district whose `RaidMapMood` › Barrier walls it) is cut into runs with a gap every
+Gap Every metres, at least one a line; points in ravines, on spires or up a valley's walls carry no wall (`RaidLayoutPlan.Barriers`,
+`BarrierGaps`). The margin counts as walkable so the band only rings deep ground inside the map: without it, deep ground running out
+to the edge became thin dead-end strips by the rim. `RaidMapGenerator.PlaceBarriers` stands each run as tall box colliders (draw
+nothing; the navmesh is built round them); `RaidMapSurface` grows the map's Barrier Dressing thick along them (`Group.Barrier`
+prototypes, after the mids; every piece keeps its whole reach inside its run, as a lying log is a disc on the navmesh and one by a run's
+end closed the gap; a kind too long for its spot is picked again), and clears every tree and rock within 3.5 m of a gap's middle,
+so a gap shows as an opening. A ring starts and ends in the middle of its first gap (else its first and last runs met as one wall
+with the dressing kept back there: a hidden wall), and a gap is moved on (`FitGap`) off a ravine's lip, a great boulder or a
+landmark. After the navmesh, `RaidMapGenerator.OpenWalledPockets` tries spots 5 and 11 m either side of every run, every 8 m, and
+opens a run in the middle of a stretch with two or more spots that can't be walked to from the nearest clearing (a ring cutting off
+a strip between itself and the rim or a slope; at most 8 a map), then the trunks and navmesh are rebuilt; the generation log line says "walls: runs, gaps, opened". Data: Layout Rules ›
+Edges (Edge From 11 m in the Woods, 12 m in the Marsh, 16 m in the Valley, whose floor is nearly all within reach of a trail, so it
+gets almost none), each mood's Barrier (Woods: Old Growth and Windthrow 1, Hollows and Cedar Ridge 0.8, Open Glades and Gorges 0;
+Marsh 0.85; Valley 0.6-1), Map › Barrier Dressing (Woods: young cedar, saplings, shrubs, logs, boulders; Marsh: dead cedar, young
+birch, snags, logs, may stand in water; Valley: boulders, outcrops, bushy cedar). Measured: Marsh about 240 m of wall a 200 m map,
+Woods about 130 m, Valley a few metres; a launched Woods seed 4 reached 95.3% of its navmesh samples with walls (3 opened) against
+96.3% without, the rest by the map's corners. Open: the band doesn't yet read as an edge from the game camera in the Woods (dense forest already) or the Marsh: it needs
+an edge piece of its own (stacked windthrow, bramble, a ground mark). Tests: `RaidBarrierTests`. The Misty Woods took districts, node
+landmarks, roads, short flags, heroes and mids the same day (its golden layouts re-pinned; `RaidLayoutGoldenTests.BeforeWorldDesign`
+keeps the old ones for the at-defaults check).
+
 ## World rendering: light, weather on surfaces, decals
 
 Content: `AgentScripts/BuildRendering.cs`, `BuildWeatherSurfaces.cs`, `BuildDecals.cs` (textures from `Tools/Decals/decals.py`);

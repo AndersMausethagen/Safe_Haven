@@ -92,7 +92,7 @@ public static partial class RaidMapGenerator
         System.Func<Vector2, float> walked = working.Heroes.Count > 0 || working.Mids.Count > 0
             ? spot => field.WalkedDistance(spot.x / plan.Size, spot.y / plan.Size)
             : (System.Func<Vector2, float>)null;
-        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight, field.WaterNear, walked, heroes);
+        RaidMapSurface.Scatter(data, working, clearings, out _, wetness, keepClear, treeWeight, field.WaterNear, walked, heroes, plan.Barriers, plan.BarrierGaps);
         Object.Destroy(working);
         return $"heights {heights} ms, paint {paint - heights} ms, scatter {clock.ElapsedMilliseconds - paint} ms";
     }

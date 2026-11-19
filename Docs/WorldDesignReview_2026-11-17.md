@@ -10,6 +10,13 @@ docs, the memory notes on art, budgets and rendering; the planner, field, Layout
 planned 6 seeds per raid at 200 and 400 m and drew previews (scratchpad `...\scratchpad\wdr\`, which a reboot can clear); and
 today's launched-raid shots (`tv_edge2`, `marsh_lily1`, `lf_woodsday`, `bb4`, `gh18`, `siteshots`). Nothing else was changed.
 
+**Status 2026-11-19:** built and on for the Valley and the Marsh since 11-17: G1 districts, G4 node landmarks and short flags, G5 roads,
+G8 the Valley's crossing cap, G9 heroes and mids; G3 compounds (Seter Yard, Bloomery Yard) and G7 low shelves since 11-18. On 11-19 the
+Misty Woods took G1, G4, G5 and G9 too (golden layouts re-pinned), and **G2 edges were built** (`RaidLayoutPlanner.Barriers`, see
+ARCHITECTURE "Edges in the wild ground"): on in the Woods and the Marsh, almost nothing in the Valley (its floor is all within reach of
+a trail). Still open: the band's look (it doesn't read as an edge yet), G6 extraction kinds, G10 Marsh shapes, the Valley's bench path
+and cirques, and checking §8's targets with the Raid Generator Report.
+
 **Already done:** commit `2bef4560` built the WorldLookPlan's A2-A18, B1-B7, B11 and B13, and lily pads (B9) came later. Still
 open: B8 (paint layers), B10 (boardwalks), B12 (river steps), assets C1-C7, and step 9 (the Brukam's Bridge arena). This review is
 about **structure**, which that plan didn't cover.

@@ -16,18 +16,30 @@ public sealed class RaidLayoutGoldenTests
 
     private static RaidLayoutRules Rules => AssetDatabase.LoadAssetAtPath<RaidLayoutRules>(RulesPath);
 
-    // seed → fingerprint of a map of the normal size.
+    // seed → fingerprint of a map of the normal size. Re-pinned 2026-11-19 when the Woods took the world-design steps (districts,
+    // node landmarks, roads, short flags: Docs/WorldDesignReview_2026-11-17.md G1, G4, G5), as the Valley and the Marsh had since 11-17.
     private static readonly Dictionary<int, string> Normal = new Dictionary<int, string>
+    {
+        { 1, "baee74446977477c" },
+        { 2, "93faae140242d0a2" },
+        { 3, "86094a9a308abd8d" },
+        { 4, "55c863f294f4227b" },
+        { 5, "10d1ea1442a14e02" },
+    };
+
+    private const int LargeSeed = 3;
+    private const string Large = "d9b1246ed16013be";
+
+    /// <summary>
+    /// The Woods' fingerprints before the world-design steps (pinned until 2026-11-19): its rules with every one of those settings put
+    /// back at its default must still plan these, so the new steps change nothing where they are off (RaidWorldDesignTests).
+    /// </summary>
+    public static readonly IReadOnlyDictionary<int, string> BeforeWorldDesign = new Dictionary<int, string>
     {
         { 1, "ad3ec333877f84fe" },
         { 2, "1fd5904b03377ef1" },
         { 3, "82a41d31334b1d37" },
-        { 4, "a92ec778e0b5adb6" },
-        { 5, "5ad386e00788a450" },
     };
-
-    private const int LargeSeed = 3;
-    private const string Large = "326f26f228a8d883";
 
     [Test]
     public void MistyWoods_NormalMaps_AreUnchanged()

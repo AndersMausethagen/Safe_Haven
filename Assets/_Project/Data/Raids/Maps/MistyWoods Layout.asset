@@ -55,10 +55,29 @@ MonoBehaviour:
   lookoutReveal: 70
   largeRegions: {x: 2, y: 3}
   regionBlend: 30
-  normalRegions: {x: 1, y: 1}
-  districtRoles: []
-  roadWidth: 1
-  shortFlags: []
+  normalRegions: {x: 2, y: 2}
+  districtRoles:
+  - role: 1
+    siteDensity:
+    - kind: 3
+      density: 0.5
+    - kind: 7
+      density: 0.6
+    - kind: 4
+      density: 1.5
+  - role: 4
+    siteDensity:
+    - kind: 3
+      density: 2.5
+    - kind: 7
+      density: 1.5
+    - kind: 4
+      density: 0.6
+  roadWidth: 1.25
+  shortFlags:
+  - {fileID: 6012554784338750228, guid: 91c13810d6b672843897bfdb7d40e430, type: 3}
+  - {fileID: 5247349096305433117, guid: 169de01e057a8b8458f1cfeb3775e60d, type: 3}
+  - {fileID: 2269726820070725017, guid: cac709e05e0b120449586c0237e3cb09, type: 3}
   shortFlagSpacing: {x: 100, y: 140}
   shortFlagOffset: 1.5
   twoRoutes: 1
@@ -95,8 +114,47 @@ MonoBehaviour:
     sound: {fileID: 0}
     soundEvery: {x: 8, y: 20}
     soundLoops: 0
+  - prefab: {fileID: 6380532574696431489, guid: e651b2a31d734734f8a1ce0e56180ff3, type: 3}
+    weight: 1
+    scale: {x: 1, y: 1}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
+  - prefab: {fileID: 753853000388544552, guid: 57caefaa61c0de94b81f7cf499a12fa9, type: 3}
+    weight: 1
+    scale: {x: 1, y: 1}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
+  - prefab: {fileID: 8896246634900274262, guid: e7e112141c69cef4bbacdc428bbaf5ce, type: 3}
+    weight: 1
+    scale: {x: 1.1, y: 1.3}
+    sink: 0.05
+    onlyToSee: 1
+    atNodes: 1
+    clearing: 5
+    revealRadius: 70
+    knownAtStart: 0
+    icon: {fileID: 0}
+    sound: {fileID: 0}
+    soundEvery: {x: 8, y: 20}
+    soundLoops: 0
   landmarkCount: {x: 1, y: 2}
-  nodeLandmarkCount: {x: 3, y: 5}
+  nodeLandmarkCount: {x: 3, y: 4}
   descentSites: 0400000005000000i
   mapSize: 200
   forestDensity: 0.8
@@ -152,6 +210,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 1
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -195,6 +254,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 1
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -226,6 +286,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.8
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -257,6 +318,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -300,6 +362,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0.8
     largeByDefault: 0
     terraces: 0
     terraceHeight: 7
@@ -343,6 +406,7 @@ MonoBehaviour:
     valleyWidth: 1
     role: 0
     siteDensity: []
+    barrier: 0
     largeByDefault: 1
     terraces: 3
     terraceHeight: 7
@@ -459,6 +523,12 @@ MonoBehaviour:
     stringSpacing: 16
     water: {fileID: 0}
     damp: 0.25
+  barriers:
+    edgeFrom: 11
+    siteRoom: 9
+    gapEvery: {x: 45, y: 75}
+    gapWidth: {x: 5, y: 8}
+    shortest: 24
   setPieces:
   - {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
   - {fileID: 11400000, guid: e7a15e046a003a348a556a72b6944648, type: 2}

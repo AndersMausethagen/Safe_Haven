@@ -95,6 +95,7 @@ public static partial class RaidLayoutPlanner
         // After every step above, each from its own stream, so turning them on never moves what those placed.
         PlaceNodeLandmarks(plan, rules, attempt);
         PlaceShortFlags(plan, rules, attempt);
+        PlaceBarriers(plan, rules, attempt);
         return plan;
     }
 

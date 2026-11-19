@@ -96,9 +96,18 @@ public sealed class RaidGorgesTests
     [Test]
     public void OtherMoods_HaveNoCliffs_ButStillHillsAndBoulders()
     {
-        foreach (int seed in SeedsOf(Rules, false, 4))
+        // Since 2026-11-19 a normal Woods map has two districts, and the other one may be The Gorges, which brings its ravines with it (as
+        // a large map's regions do): only runs with no district of cliffs are checked here.
+        int checkedRuns = 0;
+        foreach (int seed in SeedsOf(Rules, false, 12))
         {
             RaidLayoutPlan plan = RaidLayoutPlanner.Plan(Rules, Size, seed);
+            if (plan.Regions.Exists(region => region.Mood != null && region.Mood.HasCliffs))
+            {
+                continue;
+            }
+
+            checkedRuns++;
             Assert.AreEqual(0, plan.Ravines.Count, $"seed {seed}");
             Assert.AreEqual(0, plan.Spires.Count, $"seed {seed}");
             foreach (RaidLayoutRoom room in plan.Rooms)
@@ -108,6 +117,8 @@ public sealed class RaidGorgesTests
 
             AssertTrailsWalkable(plan, RaidLayoutField.Build(plan, Rules), seed);
         }
+
+        Assert.GreaterOrEqual(checkedRuns, 4, "enough runs without a district of cliffs to check");
     }
 
     [Test]

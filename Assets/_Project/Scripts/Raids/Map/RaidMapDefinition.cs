@@ -258,6 +258,18 @@ public sealed class RaidMapDefinition : ScriptableObject
     [Tooltip("Heroes At Rims: the chance a cell with a lip gets one.")]
     [SerializeField, Range(0f, 1f)] private float rimHeroChance = 0.45f;
 
+    [Header("Edges: the band's dressing (generated maps, G2)")]
+    [Tooltip("What grows thick along the walled runs of the wild ground's band (RaidLayoutRules › Barriers), as terrain trees picked by " +
+             "weight: windthrow, young spruce, boulders, dead trees. The band is solid by its own colliders; this is what it looks like. " +
+             "Empty: the band stands bare (still solid).")]
+    [SerializeField] private List<Scatter> barrierDressing = new List<Scatter>();
+    [Tooltip("Metres along a run between two picks of the dressing (two each, either side of the line).")]
+    [SerializeField, Min(0.5f)] private float barrierSpacing = 1.4f;
+    [Tooltip("Metres either side of the run's line the dressing spreads over.")]
+    [SerializeField, Min(0f)] private float barrierDepth = 1.6f;
+    [Tooltip("The dressing may stand in water (a drowned wood in the Marsh). Off: it keeps out of ponds and rivers.")]
+    [SerializeField] private bool barrierInWater;
+
     [Header("Sites")]
     [SerializeField] private List<SiteRule> siteRules = new List<SiteRule>();
     [Tooltip("Seed for scattering trees and rocks. Change it for a different forest from the same images.")]
@@ -373,6 +385,19 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float HeroObjectWithin => heroObjectWithin;
     public float RimHeroCell => rimHeroCell;
     public float RimHeroChance => rimHeroChance;
+    public IReadOnlyList<Scatter> BarrierDressing => barrierDressing;
+    public float BarrierSpacing => barrierSpacing;
+    public float BarrierDepth => barrierDepth;
+    public bool BarrierInWater => barrierInWater;
+
+    /// <summary>Sets up the band's dressing (builders and tests).</summary>
+    public void ConfigureBarrierDressing(IEnumerable<Scatter> dressing, float spacing, float depth, bool inWater)
+    {
+        barrierDressing = new List<Scatter>(dressing);
+        barrierSpacing = spacing;
+        barrierDepth = depth;
+        barrierInWater = inWater;
+    }
     public Vector2Int MidsPerCell => midsPerCell;
     public Vector2 MidFromTrail => midFromTrail;
 

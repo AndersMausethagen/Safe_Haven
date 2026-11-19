@@ -275,6 +275,8 @@ public static class RaidMapSurface
         Hero = 5,
         /// <summary>A mid of the set dressing (RaidMapDefinition › Mids, G9).</summary>
         Mid = 6,
+        /// <summary>What grows on the wild ground's band (RaidMapDefinition › Barrier Dressing, G2).</summary>
+        Barrier = 7,
     }
 
     /// <summary>The group of each of the map's terrain-tree prototypes, by prototype index, as Scatter lays them out.</summary>
@@ -295,6 +297,7 @@ public static class RaidMapSurface
         }
 
         AddGroup(groups, definition.Mids, Group.Mid);
+        AddGroup(groups, definition.BarrierDressing, Group.Barrier);
         return groups.ToArray();
     }
 
@@ -359,7 +362,8 @@ public static class RaidMapSurface
     /// </summary>
     public static int Scatter(TerrainData data, RaidMapDefinition definition, List<Clearing> clearings, out int rockCount,
         Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null,
-        WaterNear water = null, Func<Vector2, float> walked = null, List<RaidMapDefinition.HeroObject> heroObjects = null)
+        WaterNear water = null, Func<Vector2, float> walked = null, List<RaidMapDefinition.HeroObject> heroObjects = null,
+        IReadOnlyList<RaidLayoutBarrier> barriers = null, IReadOnlyList<Vector2> barrierGaps = null)
     {
         var prototypes = new List<TreePrototype>();
         Kind[] trees = Kinds(definition.Trees, prototypes);
@@ -380,6 +384,7 @@ public static class RaidMapSurface
         }
 
         Kind[] mids = Kinds(definition.Mids, prototypes);
+        Kind[] barrierKinds = Kinds(definition.BarrierDressing, prototypes);
         data.treePrototypes = prototypes.ToArray();
         data.RefreshPrototypes();
 
@@ -499,6 +504,20 @@ public static class RaidMapSurface
         if (walked != null && (mids.Length > 0 || HasHeroes(definition)))
         {
             Dress(data, definition, mids, heroPrototypes, clearings, trunks, placed, walked, inWater, heroObjects, Read);
+        }
+
+        if (barriers != null && barriers.Count > 0 && barrierKinds.Length > 0)
+        {
+            DressBarriers(data, definition, barrierKinds, barriers, clearings, trunks, placed, inWater);
+        }
+
+        // The band's gaps stand clear of the forest's own trees and rocks too: nothing closes a way through, and it shows as an opening.
+        if (barrierGaps != null)
+        {
+            foreach (Vector2 gap in barrierGaps)
+            {
+                ClearAround(placed, gap, BarrierGapClear, size);
+            }
         }
 
         data.SetTreeInstances(placed.ToArray(), true);
@@ -645,6 +664,142 @@ public static class RaidMapSurface
         {
             DressRims(data, definition, heroPrototypes, heroReach, rimTotal, clearings, trunks, placed, walked, inWater, heroObjects);
         }
+    }
+
+    // The band's dressing (G2): steeper than this and a rock or log set on it hangs off the face; keeps this far from a trunk already standing.
+    private const float BarrierSteepest = 38f;
+    // Upright pieces up to just past what the navmesh walks (45°): steeper ground is an edge of its own, gentler ground gets its thicket.
+    private const float BarrierUprightSteepest = 46f;
+    private const float BarrierTrunkClearance = 0.3f;
+    // Metres a piece of the dressing keeps back from either end of its run, past its own reach: the gap stays open.
+    private const float BarrierGapKeep = 0.5f;
+    // Metres round a gap's middle kept clear of every tree and rock.
+    private const float BarrierGapClear = 3.5f;
+
+    /// <summary>
+    /// Grows the map's Barrier Dressing thick along every walled run of the band (RaidMapGenerator stands the run's colliders; this makes it
+    /// read as thicket, windthrow or rock from the game camera): every Barrier Spacing metres along it, two picks by weight within Barrier
+    /// Depth either side, off trails, clearings and sites, off faces too steep to hold them (lying pieces 38°, upright ones 46°, past what can be walked) and,
+    /// unless the map allows it, out of the water.
+    /// They don't keep room from each other (a tangle overlaps) and leave the forest's trunks as they are. From its own stream, last.
+    /// </summary>
+    private static void DressBarriers(TerrainData data, RaidMapDefinition definition, Kind[] kinds, IReadOnlyList<RaidLayoutBarrier> barriers,
+        List<Clearing> clearings, TrunkGrid trunks, List<TreeInstance> placed, Func<Vector2, bool> inWater)
+    {
+        float size = definition.Size;
+        float spacing = Mathf.Max(0.5f, definition.BarrierSpacing);
+        float depth = definition.BarrierDepth;
+        var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Barrier Dressing"));
+        // How far each kind reaches from its pivot, any way it is turned. A fallen cedar is a dozen metres long, and the navmesh takes a
+        // lying log as a disc that wide (RaidMap's trunk prisms): one set near a run's end closed the gap beside it (seen in a launched
+        // Misty Woods, 2026-11-19). So every piece keeps its whole reach within its run.
+        var reach = new float[kinds.Length];
+        // Upright pieces (saplings, bushes, dead trees) stand on any slope that can be walked; lying ones (logs, boulders) only where
+        // they don't hang off a face. In the Woods the band runs where the ground between the trails rises into ridges.
+        var steepest = new float[kinds.Length];
+        for (int i = 0; i < kinds.Length; i++)
+        {
+            GameObject prefab = kinds[i].Scatter.prefab;
+            Bounds bounds = PrefabBounds(prefab);
+            reach[i] = Mathf.Max(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)), Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)))
+                       * prefab.transform.localScale.x;
+            steepest[i] = bounds.size.y > Mathf.Max(bounds.size.x, bounds.size.z) ? BarrierUprightSteepest : BarrierSteepest;
+        }
+
+        foreach (RaidLayoutBarrier run in barriers)
+        {
+            float length = run.Length, passed = 0f;
+            for (int i = 1; i < run.Points.Count; i++)
+            {
+                Vector2 a = run.Points[i - 1], b = run.Points[i];
+                float step = Vector2.Distance(a, b);
+                if (step < 1e-4f)
+                {
+                    continue;
+                }
+
+                Vector2 along = (b - a) / step, across = Vector2.Perpendicular(along);
+                for (float at = (float)random.NextDouble() * spacing; at < step; at += spacing)
+                {
+                    for (int k = 0; k < 2; k++)
+                    {
+                        float shift = at + Range(random, -0.3f, 0.3f) * spacing;
+                        Vector2 spot = a + along * shift + across * Range(random, -depth, depth);
+                        float fromStart = passed + shift;
+                        // A kind too long for where it would stand in its run is picked again (a short run takes the small ones).
+                        int pick = -1;
+                        float scale = 1f;
+                        for (int again = 0; again < 3; again++)
+                        {
+                            pick = PickByWeight(kinds, random);
+                            scale = pick >= 0 ? Mathf.Max(kinds[pick].Scatter.scale.x, kinds[pick].Scatter.scale.y) : 1f;
+                            if (pick < 0 || (fromStart - reach[pick] * scale >= BarrierGapKeep && fromStart + reach[pick] * scale <= length - BarrierGapKeep))
+                            {
+                                break;
+                            }
+                        }
+
+                        float u = spot.x / size, v = spot.y / size;
+                        if (pick < 0 || fromStart - reach[pick] * scale < BarrierGapKeep || fromStart + reach[pick] * scale > length - BarrierGapKeep
+                            || spot.x < 0f || spot.y < 0f || spot.x >= size || spot.y >= size
+                            || definition.Strength(RaidZoneRole.Path, u, v) > 0.1f || Blocked(spot, clearings, forTrees: false)
+                            || data.GetSteepness(u, v) > steepest[pick] || !trunks.Fits(spot, BarrierTrunkClearance)
+                            || (!definition.BarrierInWater && inWater != null && inWater(spot)))
+                        {
+                            continue;
+                        }
+
+                        placed.Add(MakeInstance(kinds[pick].Prototype, u, v, kinds[pick].Scatter.scale, random));
+                    }
+                }
+
+                passed += step;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Takes the band's dressing away round a spot (metres from the map's corner), where a wall is opened after the navmesh found ground it
+    /// cut off (RaidMapGenerator.OpenWalledPockets): every Barrier Dressing piece reaching within <paramref name="radius"/> of it. Returns
+    /// how many went. Only on a generated map, whose prototypes are the definition's (PrototypeGroups).
+    /// </summary>
+    public static int ClearBarrierDressing(TerrainData data, RaidMapDefinition definition, Vector2 centre, float radius)
+    {
+        Group[] groups = PrototypeGroups(definition);
+        TreePrototype[] prototypes = data.treePrototypes;
+        var reach = new float[prototypes.Length];
+        for (int i = 0; i < prototypes.Length && i < groups.Length; i++)
+        {
+            if (groups[i] == Group.Barrier && prototypes[i].prefab != null)
+            {
+                Bounds bounds = PrefabBounds(prototypes[i].prefab);
+                reach[i] = Mathf.Max(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)), Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)))
+                           * prototypes[i].prefab.transform.localScale.x;
+            }
+        }
+
+        TreeInstance[] trees = data.treeInstances;
+        var kept = new List<TreeInstance>(trees.Length);
+        float size = definition.Size;
+        foreach (TreeInstance tree in trees)
+        {
+            int index = tree.prototypeIndex;
+            bool band = index >= 0 && index < groups.Length && index < prototypes.Length && groups[index] == Group.Barrier;
+            if (band && Vector2.Distance(new Vector2(tree.position.x * size, tree.position.z * size), centre) - reach[index] * tree.widthScale < radius)
+            {
+                continue;
+            }
+
+            kept.Add(tree);
+        }
+
+        int removed = trees.Length - kept.Count;
+        if (removed > 0)
+        {
+            data.SetTreeInstances(kept.ToArray(), true);
+        }
+
+        return removed;
     }
 
     // A rim: ground near level (no steeper than RimFlattest) with a drop beyond, a probe RimProbe metres off finding a face steeper than RimFace

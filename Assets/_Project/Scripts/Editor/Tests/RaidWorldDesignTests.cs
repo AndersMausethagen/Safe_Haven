@@ -56,42 +56,76 @@ public sealed class RaidWorldDesignTests
         }
     }
 
+    /// <summary>
+    /// A copy of the Woods' rules with every world-design setting put back at its default (one district, no roles, no roads or flags, no
+    /// landmark at a node, no crossing cap): the Woods as it planned before 2026-11-19, the plain map the tests compare against.
+    /// </summary>
+    private static RaidLayoutRules PlainWoods()
+    {
+        RaidLayoutRules copy = Object.Instantiate(Load(WoodsRulesPath));
+        copy.ConfigureDistricts(Vector2Int.one, new RaidDistrictRule[0]);
+        copy.ConfigureRoads(1f, new GameObject[0], new Vector2(100f, 140f), 1.5f);
+        copy.ConfigureLandmarks(copy.Landmarks.Where(rule => !rule.atNodes).ToList(), copy.LandmarkCount);
+        copy.ConfigureNodeLandmarks(new Vector2Int(3, 5));
+        copy.Valley.maxCrossings = 0;
+        copy.ConfigureBarriers(new RaidBarrierRule(), 0f);
+        return copy;
+    }
+
     [Test]
     public void TheRaidsRules_AtTheNewDefaults_PlanAsTheyDid()
     {
-        // Every new setting written out at its default onto a copy: the plan and its heights must not move (the Woods' are also golden).
-        // The Woods only: the Valley and the Marsh use the new settings since 2026-11-17, so their assets aren't at the defaults.
-        foreach (string path in new[] { WoodsRulesPath })
+        // Every new setting put back at its default: the Woods must plan exactly the maps pinned before it took the new steps.
+        RaidLayoutRules copy = PlainWoods();
+        try
         {
-            RaidLayoutRules asset = Load(path);
-            RaidLayoutRules copy = Object.Instantiate(asset);
-            try
+            foreach (KeyValuePair<int, string> before in RaidLayoutGoldenTests.BeforeWorldDesign)
             {
-                copy.ConfigureDistricts(Vector2Int.one, new RaidDistrictRule[0]);
-                copy.ConfigureRoads(1f, new GameObject[0], new Vector2(100f, 140f), 1.5f);
-                copy.ConfigureNodeLandmarks(new Vector2Int(3, 5));
-                copy.Valley.maxCrossings = 0;
-                foreach (int seed in new[] { 1, 2, 3 })
-                {
-                    Assert.AreEqual(RaidLayoutGoldenTests.Fingerprint(asset, Size, seed), RaidLayoutGoldenTests.Fingerprint(copy, Size, seed), $"{path}, seed {seed}");
-                    RaidLayoutPlan plan = RaidLayoutPlanner.Plan(copy, Size, seed);
-                    Assert.AreEqual(1, Mathf.Max(1, plan.Regions.Count), $"{path}, seed {seed}: one district");
-                    Assert.IsEmpty(plan.Flags);
-                    Assert.IsFalse(plan.Landmarks.Any(landmark => landmark.Rule >= 0), "no landmark at a node without a rule for one");
-                }
-            }
-            finally
-            {
-                Object.DestroyImmediate(copy);
+                Assert.AreEqual(before.Value, RaidLayoutGoldenTests.Fingerprint(copy, Size, before.Key), $"seed {before.Key}");
+                RaidLayoutPlan plan = RaidLayoutPlanner.Plan(copy, Size, before.Key);
+                Assert.AreEqual(1, Mathf.Max(1, plan.Regions.Count), $"seed {before.Key}: one district");
+                Assert.IsEmpty(plan.Flags);
+                Assert.IsFalse(plan.Landmarks.Any(landmark => landmark.Rule >= 0), "no landmark at a node without a rule for one");
+                Assert.IsEmpty(plan.Barriers, "no walls in the wild ground");
             }
         }
+        finally
+        {
+            Object.DestroyImmediate(copy);
+        }
+    }
+
+    [Test]
+    public void TheWoods_UsesTheWorldDesignSteps()
+    {
+        // The Woods took the steps on 2026-11-19 (the user: "go ahead"): districts, node landmarks, roads and flags, heroes and mids.
+        RaidLayoutRules woods = Load(WoodsRulesPath);
+        RaidMapDefinition map = AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(WoodsMapPath);
+        Assert.AreEqual(new Vector2Int(2, 2), woods.NormalRegions);
+        Assert.IsTrue(woods.DistrictRoles.Any(rule => rule.role == RaidDistrictRole.Approach) && woods.DistrictRoles.Any(rule => rule.role == RaidDistrictRole.Lair));
+        Assert.Greater(woods.RoadWidth, 1f);
+        Assert.IsNotEmpty(woods.ShortFlags);
+        Assert.GreaterOrEqual(woods.Landmarks.Count(rule => rule.atNodes && rule.Marked), 3);
+        Assert.IsNotEmpty(map.Heroes);
+        Assert.IsNotEmpty(map.Mids);
+        int placed = 0, flags = 0;
+        foreach (int seed in new[] { 1, 2, 3, 4 })
+        {
+            RaidLayoutPlan plan = RaidLayoutPlanner.Plan(woods, Size, seed);
+            Assert.AreEqual(2, plan.Regions.Count, $"seed {seed}: two districts");
+            placed += plan.Landmarks.Count(landmark => landmark.Rule >= 0);
+            flags += plan.Flags.Count;
+        }
+
+        Assert.GreaterOrEqual(placed, 4, "landmarks at the nodes");
+        Assert.GreaterOrEqual(flags, 4, "flags along the routes");
     }
 
     // ----- G1: districts -----
 
     private static RaidLayoutRules WoodsWithDistricts()
     {
-        RaidLayoutRules rules = Object.Instantiate(Load(WoodsRulesPath));
+        RaidLayoutRules rules = PlainWoods();
         rules.ConfigureDistricts(new Vector2Int(2, 2), new[]
         {
             new RaidDistrictRule { role = RaidDistrictRole.Approach, siteDensity = new List<RaidSiteDensity>
@@ -132,7 +166,7 @@ public sealed class RaidWorldDesignTests
     public void Districts_ShareSitesByRole_NotByArea_AndKeepTheMapsCounts()
     {
         RaidLayoutRules rules = WoodsWithDistricts();
-        RaidLayoutRules plain = Load(WoodsRulesPath);
+        RaidLayoutRules plain = PlainWoods();
         try
         {
             int campsInLair = 0, campsInApproach = 0, campsWith = 0, campsWithout = 0, resourcesInLair = 0, resourcesInApproach = 0;
@@ -165,6 +199,7 @@ public sealed class RaidWorldDesignTests
         finally
         {
             Object.DestroyImmediate(rules);
+            Object.DestroyImmediate(plain);
         }
     }
 
@@ -191,7 +226,7 @@ public sealed class RaidWorldDesignTests
 
     private static RaidLayoutRules WoodsWithNodeLandmarks(bool districts)
     {
-        RaidLayoutRules rules = districts ? WoodsWithDistricts() : Object.Instantiate(Load(WoodsRulesPath));
+        RaidLayoutRules rules = districts ? WoodsWithDistricts() : PlainWoods();
         var landmarks = new List<RaidLandmarkRule>(rules.Landmarks);
         GameObject prefab = rules.Landmarks[0].prefab;
         for (int i = 0; i < 3; i++)
@@ -242,7 +277,7 @@ public sealed class RaidWorldDesignTests
     [Test]
     public void NodeLandmarks_MoveNothingPlacedBefore_AndRepeatForTheSeed()
     {
-        RaidLayoutRules plain = Load(WoodsRulesPath);
+        RaidLayoutRules plain = PlainWoods();
         RaidLayoutRules rules = WoodsWithNodeLandmarks(districts: false);
         try
         {
@@ -262,13 +297,14 @@ public sealed class RaidWorldDesignTests
         finally
         {
             Object.DestroyImmediate(rules);
+            Object.DestroyImmediate(plain);
         }
     }
 
     [Test]
     public void ShortFlags_LineBothRoutes_BesideTheTrail_AtTheirSpacing()
     {
-        RaidLayoutRules plain = Load(WoodsRulesPath);
+        RaidLayoutRules plain = PlainWoods();
         RaidLayoutRules rules = Object.Instantiate(plain);
         rules.ConfigureRoads(1f, new[] { plain.Landmarks[0].prefab }, new Vector2(100f, 140f), 1.5f);
         try
@@ -298,6 +334,7 @@ public sealed class RaidWorldDesignTests
         finally
         {
             Object.DestroyImmediate(rules);
+            Object.DestroyImmediate(plain);
         }
     }
 
@@ -330,7 +367,7 @@ public sealed class RaidWorldDesignTests
     [Test]
     public void Roads_WidenOnlyTheTwoRoutes_AndTheirZoneFollowsThem()
     {
-        RaidLayoutRules plain = Load(WoodsRulesPath);
+        RaidLayoutRules plain = PlainWoods();
         RaidLayoutRules rules = Object.Instantiate(plain);
         rules.ConfigureRoads(1.6f, new GameObject[0], new Vector2(100f, 140f), 1.5f);
         try
@@ -372,6 +409,7 @@ public sealed class RaidWorldDesignTests
         finally
         {
             Object.DestroyImmediate(rules);
+            Object.DestroyImmediate(plain);
         }
     }
 
@@ -503,7 +541,13 @@ public sealed class RaidWorldDesignTests
         var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, 30f, map.Size) };
         try
         {
-            if (dressed)
+            if (!dressed)
+            {
+                // The Woods' own heroes and mids since 2026-11-19: off, for the undressed map.
+                map.ConfigureDressing(new RaidMapDefinition.Hero[0], new RaidMapDefinition.Scatter[0], 30f, 22f, new Vector2(6f, 15f), 10f,
+                    new Vector2Int(2, 4), new Vector2(1.5f, 12f));
+            }
+            else
             {
                 RaidMapDefinition.Scatter rock = map.Rocks[0];
                 map.ConfigureDressing(new[] { new RaidMapDefinition.Hero { prefab = rock.prefab, weight = 1f, scale = new Vector2(1f, 1.2f), room = 3f } },
