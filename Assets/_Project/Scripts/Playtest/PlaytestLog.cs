@@ -65,6 +65,8 @@ public static class PlaytestLog
     public const string LookoutUsed = "LookoutUsed";
     /// <summary>A thing left at a place taken (subject the place, amount how many, detail the item).</summary>
     public const string PlaceFindTaken = "PlaceFindTaken";
+    /// <summary>A stage revealed a cache (subject Glint or Hoard, amount metres from the player, detail the stage).</summary>
+    public const string StageReveal = "StageReveal";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
     /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>

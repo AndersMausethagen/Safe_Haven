@@ -668,6 +668,9 @@ MonoBehaviour:
     lootBonus: 0.25
     stinger: {fileID: 11400000, guid: 75f048dfbeb27824687fe5ca42ac7969, type: 2}
     hushSeconds: 0
+    reveal: 1
+    revealLoot: 1.5
+    revealCache: {fileID: 1952649773701618592, guid: eccbc85dd8312f441b939168579c56ec, type: 3}
   - displayName: The Trolls Wake
     startsAtSecondsLeft: 240
     message: 'Something big is walking down the valley. The trolls are awake. It gives more to those who stay: loot +50%.'
@@ -676,6 +679,9 @@ MonoBehaviour:
     lootBonus: 0.5
     stinger: {fileID: 11400000, guid: 5dc5baf7267168540be520f2ab81edb4, type: 2}
     hushSeconds: 60
+    reveal: 2
+    revealLoot: 1.8
+    revealCache: {fileID: 7806521821678079949, guid: a9e1cf99f46a88d4da4f4b4c1715d4dd, type: 3}
   - displayName: Rockfall
     startsAtSecondsLeft: 60
     message: 'Rocks are coming down the valley walls! Get out now! It gives more to those who stay: loot +80%.'
@@ -684,6 +690,9 @@ MonoBehaviour:
     lootBonus: 0.8
     stinger: {fileID: 11400000, guid: a1c5c2cc7d8214b43ae0dc5991300736, type: 2}
     hushSeconds: 0
+    reveal: 0
+    revealLoot: 1.5
+    revealCache: {fileID: 0}
   extractedArtwork: {fileID: 21300000, guid: f6200e83d47f53b4a9bb5caaac1e4ce0, type: 3}
   failedArtwork: {fileID: 21300000, guid: 2d5abc1323296414dbc3f2a04829ebc2, type: 3}
   extractedMotion: {fileID: 0}

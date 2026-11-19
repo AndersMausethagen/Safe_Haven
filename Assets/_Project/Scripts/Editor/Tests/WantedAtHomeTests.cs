@@ -79,4 +79,34 @@ public sealed class WantedAtHomeTests
             Object.DestroyImmediate(player);
         }
     }
+
+    // A reason to stay (§4): a stage that reveals a cache has one to place, a real Loot Cache.
+    [Test]
+    public void EveryStageReveal_HasACacheToPlace()
+    {
+        int reveals = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition", new[] { "Assets/_Project/Data" }))
+        {
+            var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (raid == null || raid.Stages == null)
+            {
+                continue;
+            }
+
+            foreach (RaidStage stage in raid.Stages)
+            {
+                if (stage == null || stage.Reveal == RaidStage.RevealKind.None)
+                {
+                    continue;
+                }
+
+                reveals++;
+                Assert.IsNotNull(stage.RevealCache, $"{raid.name} › {stage.DisplayName}: a reveal with no cache");
+                Assert.IsNotNull(stage.RevealCache.GetComponent<LootCache>(), $"{raid.name} › {stage.DisplayName}: {stage.RevealCache.name} is no Loot Cache");
+                Assert.GreaterOrEqual(stage.RevealLoot, 1f);
+            }
+        }
+
+        Assert.Greater(reveals, 0, "the raids reveal something to stay for");
+    }
 }

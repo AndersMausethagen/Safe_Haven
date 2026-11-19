@@ -42,6 +42,9 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
 
     public ItemDropTable Drops => table != null ? table.Drops : drops;
     public LootTable Table => table;
+
+    /// <summary>How much more it holds than its table (a cache a stage revealed, StageReveal): 1 for none.</summary>
+    public float ExtraLoot { get; set; } = 1f;
     public bool IsEmpty => rolled && contents.Count == 0 && resourceContents.Count == 0;
     public int LockPins => lockPins;
 
@@ -166,7 +169,7 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private void Fill()
     {
         rolled = true;
-        float multiplier = RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier * RaidDirector.StageLootNow : 1f;
+        float multiplier = (RaidDirector.Current != null ? RaidDirector.Current.Parameters.LootMultiplier * RaidDirector.StageLootNow : 1f) * ExtraLoot;
         if (RaidDirector.Current != null)
         {
             JournalNotices.RollForFind();

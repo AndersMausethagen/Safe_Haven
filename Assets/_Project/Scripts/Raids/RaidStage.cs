@@ -10,6 +10,16 @@ using UnityEngine;
 [Serializable]
 public sealed class RaidStage
 {
+    /// <summary>What the stage shows the player to stay for (StageReveal).</summary>
+    public enum RevealKind
+    {
+        None,
+        /// <summary>A cache glints beyond the player: the first temptation.</summary>
+        Glint,
+        /// <summary>A hoard lies open further on: the last.</summary>
+        Hoard,
+    }
+
     [SerializeField] private string displayName = "Stage";
     [Tooltip("The stage begins when this many seconds are left on the raid clock.")]
     [SerializeField, Min(1f)] private float startsAtSecondsLeft = 180f;
@@ -28,6 +38,13 @@ public sealed class RaidStage
     [Tooltip("Seconds the exploring music holds its breath after the stage begins, leaving the ambience: the quiet before the hunt, " +
              "so footfalls and crows are the music. A fight's music still plays. 0: none.")]
     [SerializeField, Min(0f)] private float hushSeconds;
+    [Tooltip("A cache this stage reveals 70-140 m from the player, away from the exits, marked on the minimap (StageReveal): a reason " +
+             "to stay (Docs/SystemsGapReview_2026-11-19.md §4). None: nothing.")]
+    [SerializeField] private RevealKind reveal;
+    [Tooltip("How much more the revealed cache holds: 1.5 is +50%, on top of the stage's own loot.")]
+    [SerializeField, Min(1f)] private float revealLoot = 1.5f;
+    [Tooltip("The cache placed (a prefab with a Loot Cache).")]
+    [SerializeField] private GameObject revealCache;
 
     public RaidStage() { }
 
@@ -48,6 +65,9 @@ public sealed class RaidStage
     public float EnemyHealthBonus => enemyHealthBonus;
     public float EnemyPowerBonus => enemyPowerBonus;
     public float LootBonus => lootBonus;
+    public RevealKind Reveal => reveal;
+    public float RevealLoot => revealLoot;
+    public GameObject RevealCache => revealCache;
 
     public void SetLootBonus(float bonus) => lootBonus = Mathf.Max(0f, bonus);
 }

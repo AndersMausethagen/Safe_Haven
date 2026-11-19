@@ -695,6 +695,9 @@ MonoBehaviour:
     lootBonus: 0.25
     stinger: {fileID: 11400000, guid: 75f048dfbeb27824687fe5ca42ac7969, type: 2}
     hushSeconds: 0
+    reveal: 1
+    revealLoot: 1.5
+    revealCache: {fileID: 1952649773701618592, guid: eccbc85dd8312f441b939168579c56ec, type: 3}
   - displayName: The Hunt
     startsAtSecondsLeft: 240
     message: 'Howls echo through the trees. The hunt has begun! The woods give more to those who stay: loot +50%.'
@@ -703,6 +706,9 @@ MonoBehaviour:
     lootBonus: 0.5
     stinger: {fileID: 11400000, guid: 5dc5baf7267168540be520f2ab81edb4, type: 2}
     hushSeconds: 60
+    reveal: 2
+    revealLoot: 1.8
+    revealCache: {fileID: 7806521821678079949, guid: a9e1cf99f46a88d4da4f4b4c1715d4dd, type: 3}
   - displayName: Collapse
     startsAtSecondsLeft: 60
     message: 'The woods are collapsing! Get out now! The woods give more to those who stay: loot +80%.'
@@ -711,6 +717,9 @@ MonoBehaviour:
     lootBonus: 0.8
     stinger: {fileID: 11400000, guid: a1c5c2cc7d8214b43ae0dc5991300736, type: 2}
     hushSeconds: 0
+    reveal: 0
+    revealLoot: 1.5
+    revealCache: {fileID: 0}
   extractedArtwork: {fileID: 21300000, guid: 786f93cddb4331440b663cf22a598b74, type: 3}
   failedArtwork: {fileID: 21300000, guid: 43ac7cd0af4fd014f9a41fc33140dfb8, type: 3}
   extractedMotion: {fileID: 32900000, guid: ca5e747e87ae5c04887644897655f20a, type: 3}

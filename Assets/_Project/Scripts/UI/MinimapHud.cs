@@ -439,6 +439,15 @@ public sealed class MinimapHud : MonoBehaviour
             }
         }
 
+        // A cache a stage revealed (StageReveal): gold on the rim until it is opened.
+        foreach (LootCache revealed in StageReveal.Sites)
+        {
+            if (revealed != null && !revealed.IsEmpty)
+            {
+                Add(revealed.transform, style.RumourMark, style.Accent, 17f, pinned: true);
+            }
+        }
+
         // A standing site (a bridge's toll) is part of the place, not a rumour: marked once the player has come upon it.
         foreach (RaidEventSite site in events.StandingSites)
         {

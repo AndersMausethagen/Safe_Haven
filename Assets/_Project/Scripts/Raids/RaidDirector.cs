@@ -139,6 +139,11 @@ public sealed class RaidDirector : MonoBehaviour
         {
             gameObject.AddComponent<GatheringNoise>();
         }
+
+        if (!TryGetComponent(out StageReveal _))
+        {
+            gameObject.AddComponent<StageReveal>();
+        }
     }
 
     private void Start()
