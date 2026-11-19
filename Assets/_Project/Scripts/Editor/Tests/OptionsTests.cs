@@ -51,6 +51,19 @@ public sealed class OptionsTests
         Assert.AreEqual(0.75f, option.Value, 0.001f);
     }
 
+    // DLSS under any MSAA drew a black world with only the UI on top (the user's build, 2026-11-19): DLSS and FSR 2 take MSAA off.
+    [Test]
+    public void DlssAndFsr2RunWithoutMsaa()
+    {
+        for (int choice = 0; choice <= 4; choice++)
+        {
+            Assert.AreEqual(1, GraphicsOptions.MsaaSamplesFor(choice, true), $"anti-aliasing choice {choice} under DLSS or FSR 2");
+        }
+
+        Assert.AreEqual(new[] { 1, 2, 4, 8, 1 }, Enumerable.Range(0, 5).Select(c => GraphicsOptions.MsaaSamplesFor(c, false)).ToArray(),
+            "without them every choice keeps its own samples");
+    }
+
     [Test]
     public void AChangeIsReportedOnce()
     {

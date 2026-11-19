@@ -53,6 +53,13 @@ public static class GraphicsOptions
     /// <summary>The upscaler in use after the last Apply (Options shows when DLSS or FSR 2 can't run here).</summary>
     public static string ActiveUpscaler { get; private set; } = "";
 
+    /// <summary>True after the last Apply when DLSS or FSR 2 runs: they do the anti-aliasing, and MSAA is off under them.</summary>
+    public static bool OwnAntiAliasing { get; private set; }
+
+    /// <summary>The MSAA samples for an Anti-Aliasing choice: none under an upscaler that does its own anti-aliasing.</summary>
+    public static int MsaaSamplesFor(int antiAliasingChoice, bool upscalerAntiAliases) =>
+        upscalerAntiAliases ? 1 : MsaaSamples[Mathf.Clamp(antiAliasingChoice, 0, MsaaSamples.Length - 1)];
+
     private static readonly Dictionary<Camera, AntialiasingMode> AuthoredCameras = new Dictionary<Camera, AntialiasingMode>();
     private static readonly Dictionary<Terrain, (float density, float distance)> AuthoredTerrains = new Dictionary<Terrain, (float, float)>();
 
@@ -120,7 +127,9 @@ public static class GraphicsOptions
 
         runtime.renderScale = Mathf.Min(GameOptions.RenderScale.Value, authored.renderScale);
         ApplyUpscaler();
-        runtime.msaaSampleCount = MsaaSamples[GameOptions.AntiAliasing.Index];
+        // DLSS and FSR 2 smooth edges themselves, and under MSAA they draw nothing at all: the world went black, only the UI
+        // left, with any MSAA (2x, 4x or 8x; the user's build, 2026-11-19). STP copes, so only these two turn MSAA off.
+        runtime.msaaSampleCount = MsaaSamplesFor(GameOptions.AntiAliasing.Index, OwnAntiAliasing);
 
         int shadows = GameOptions.Shadows.Index;
         runtime.mainLightShadowmapResolution = shadows >= UltraShadows
@@ -215,9 +224,11 @@ public static class GraphicsOptions
         }
 
         ActiveUpscaler = runtime.upscalerName;
+        OwnAntiAliasing = ActiveUpscaler == UpscalerNames[DlssChoice] || ActiveUpscaler == UpscalerNames[Fsr2Choice];
 #else
         runtime.upscalingFilter = scaled ? Upscalers[choice] : authored.upscalingFilter;
         ActiveUpscaler = runtime.upscalingFilter.ToString();
+        OwnAntiAliasing = false;
 #endif
     }
 
@@ -373,6 +384,7 @@ public static class GraphicsOptions
         AuthoredTerrains.Clear();
         AuthoredCameras.Clear();
         ActiveUpscaler = "";
+        OwnAntiAliasing = false;
         authoredLodBias = 0f;
         authoredMipLimit = 0;
         nearShadows = false;

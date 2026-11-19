@@ -46,7 +46,7 @@ public static class GameOptions
         "and FSR 2 (AMD, most cards, DirectX 12 or Vulkan only) rebuild a sharp picture from several frames, often a big gain in " +
         "frame rate; with them Render Scale picks the quality: 100% DLAA (DLSS) or Quality, 75% Quality, 60% Balanced, 50% " +
         "Performance. Where they can't run, STP is used.", 1, "Bilinear", "FSR", "STP", "DLSS", "FSR 2");
-    public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher MSAA costs more; TAA also smooths shimmering grass, leaves and fine detail, a little softer in motion.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA", "TAA");
+    public static readonly GameOption AntiAliasing = GameOption.Choice("AntiAliasing", "Anti-Aliasing", "Smooths jagged edges. Higher MSAA costs more; TAA also smooths shimmering grass, leaves and fine detail, a little softer in motion. With DLSS or FSR 2 Upscaling they smooth the edges themselves and this is not used.", 2, "Off", "2x MSAA", "4x MSAA", "8x MSAA", "TAA");
     // Ultra (2026-11-09): an 8K sun shadow map. At the usual top-down zoom a 4K map was too coarse for the ground's own
     // relief (stones, roots, clumps a few centimetres high): its shadows only showed when zoomed in.
     public static readonly GameOption Shadows = GameOption.Choice("Shadows", "Shadows", "Sharpness and reach of shadows. Ultra is the game as it was made: the ground's own small shadows show at every zoom. High uses less video memory.", 3, "Low", "Medium", "High", "Ultra");
