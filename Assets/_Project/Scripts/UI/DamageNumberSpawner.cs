@@ -72,8 +72,40 @@ public sealed class DamageNumberSpawner : MonoBehaviour
             return;
         }
 
-        PrefabPool.Spawn(prefab, SpawnPoint(), Quaternion.identity).Show(result);
+        DamageNumber.Kind kind = KindOf(gameObject, info.Source != null ? info.Source.gameObject : null, Player.Current != null ? Player.Current.gameObject : null);
+        float share = result.Damage / damageable.MaxHealth;
+        // Blows of one kind in quick succession (a staff's fan, a flurry, a sweep's ticks) count up in one number.
+        if (lastNumber != null && lastNumber.Owner == this && lastNumber.isActiveAndEnabled && lastKind == kind
+            && Time.unscaledTime - lastNumberAt < MergeSeconds)
+        {
+            lastNumber.Add(result, share);
+            lastNumberAt = Time.unscaledTime;
+            return;
+        }
+
+        lastNumber = PrefabPool.Spawn(prefab, SpawnPoint(), Quaternion.identity);
+        lastNumber.Show(result, kind, share, this);
+        lastKind = kind;
+        lastNumberAt = Time.unscaledTime;
     }
+
+    /// <summary>Whose blow a number over <paramref name="target"/> shows: the player struck (Taken), the player's own blow (Mine), or
+    /// someone else's.</summary>
+    public static DamageNumber.Kind KindOf(GameObject target, GameObject source, GameObject localPlayer)
+    {
+        if (target != null && Player.IsPlayer(target))
+        {
+            return DamageNumber.Kind.Taken;
+        }
+
+        return source != null && localPlayer != null && source.transform.root == localPlayer.transform.root
+            ? DamageNumber.Kind.Mine : DamageNumber.Kind.Others;
+    }
+
+    private const float MergeSeconds = 0.25f;
+    private DamageNumber lastNumber;
+    private DamageNumber.Kind lastKind;
+    private float lastNumberAt = float.NegativeInfinity;
 
     /// <summary>Floats a word over the target, such as "Dodged".</summary>
     public void ShowText(string text, Color color)

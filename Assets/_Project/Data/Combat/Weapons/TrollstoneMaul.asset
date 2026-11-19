@@ -45,11 +45,13 @@ MonoBehaviour:
   drawMoveSpeed: 0.55
   perfectReleaseSeconds: 0.2
   perfectReleaseDamage: 1.25
+  drawWeight: 1
+  escapeShotFocus: 0
   aimSpread: 0.5
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}
   drawSound: {fileID: 0}
   fullDrawSound: {fileID: 0}
-  swingSound: {fileID: 11400000, guid: 51662adc6a4b3a3438d04910bf5892fc, type: 2}
+  swingSound: {fileID: 11400000, guid: 7d430ee8087e7824dbdd743821e2ac22, type: 2}
   hitSound: {fileID: 11400000, guid: d35929fdaefdd164d8047ffebb5d331d, type: 2}
   hitEffect: {fileID: 0}

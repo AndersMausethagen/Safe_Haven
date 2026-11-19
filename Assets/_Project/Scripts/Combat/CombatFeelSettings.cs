@@ -187,6 +187,33 @@ public sealed class CombatFeelSettings : ScriptableObject
              "(timing a moving thing to a mark is a far better skill than reacting). Its alpha and width (a share of the radius).")]
     [SerializeField, Range(0f, 1f)] private float parryLineAlpha = 0.35f;
     [SerializeField, Range(0.005f, 0.2f)] private float parryLineWidth = 0.04f;
+    [Header("The blow that ends a fight (Docs/CombatFeelReview_2026-11-19.md §8)")]
+    [Tooltip("The player's kill of the last hostile after the player's side within Fight Hold Range, in a fight of at least Fight Won " +
+             "Foes foes or Fight Won Seconds: after its stop, the game slows to this for Last Kill Slow Seconds (real time), the sting " +
+             "plays and the fight is over at once instead of after the quiet stretch. Not for a boss (its own stop) or wildlife.")]
+    [SerializeField, Range(0.05f, 1f)] private float lastKillSlowScale = 0.3f;
+    [SerializeField, Min(0f)] private float lastKillSlowSeconds = 0.35f;
+    [SerializeField, Min(1)] private int fightWonFoes = 2;
+    [SerializeField, Min(0f)] private float fightWonSeconds = 4f;
+    [Tooltip("Heard as the last foe falls: one low drum stroke and a breath of wind.")]
+    [SerializeField] private SoundDefinition fightWonSound;
+    [Header("A charge you can feel building (§11)")]
+    [Tooltip("Heard while a heavy is held to charge, from the player, stopped when it is let go or broken off.")]
+    [SerializeField] private SoundDefinition chargeRiseSound;
+    [Tooltip("The weapon's light while charging: from Charge Light Low at the least charge to Charge Light High at full, its range " +
+             "from Charge Light Range Low to High; it flickers at full.")]
+    [SerializeField] private Color chargeLightLow = new Color(1f, 0.62f, 0.3f);
+    [SerializeField] private Color chargeLightHigh = new Color(1f, 0.9f, 0.7f);
+    [SerializeField, Min(0f)] private float chargeLightRangeLow = 1.1f;
+    [SerializeField, Min(0f)] private float chargeLightRangeHigh = 1.8f;
+    [SerializeField, Min(0f)] private float chargeLightIntensityLow = 0.3f;
+    [SerializeField, Min(0f)] private float chargeLightIntensityHigh = 2f;
+    [Header("A camera kick along big blows (§15)")]
+    [Tooltip("The player's heavy, finisher and art landings push the frame along the blow by this many metres per Impact (a hammer's " +
+             "heavy 0.09 m), once a swing, and shake this share as hard as before (the push carries them, not a rattle). A heavy " +
+             "strike taken (Impact from Heavy Impact) pushes it the way the blow went.")]
+    [SerializeField, Range(0f, 0.2f)] private float kickPerImpact = 0.05f;
+    [SerializeField, Range(0f, 1f)] private float kickShakeShare = 0.6f;
     [Tooltip("Where a lobbed boulder or a burst of roots lands. Empty: the structure-hit dust.")]
     [SerializeField] private GameObject landingEffect;
 
@@ -417,6 +444,20 @@ public sealed class CombatFeelSettings : ScriptableObject
     public SoundDefinition ParryCueSound => parryCueSound;
     public float ParryLineAlpha => parryLineAlpha;
     public float ParryLineWidth => parryLineWidth;
+    public float LastKillSlowScale => lastKillSlowScale;
+    public float LastKillSlowSeconds => lastKillSlowSeconds;
+    public int FightWonFoes => fightWonFoes;
+    public float FightWonSeconds => fightWonSeconds;
+    public SoundDefinition FightWonSound => fightWonSound;
+    public SoundDefinition ChargeRiseSound => chargeRiseSound;
+    public Color ChargeLightLow => chargeLightLow;
+    public Color ChargeLightHigh => chargeLightHigh;
+    public float ChargeLightRangeLow => chargeLightRangeLow;
+    public float ChargeLightRangeHigh => chargeLightRangeHigh;
+    public float ChargeLightIntensityLow => chargeLightIntensityLow;
+    public float ChargeLightIntensityHigh => chargeLightIntensityHigh;
+    public float KickPerImpact => kickPerImpact;
+    public float KickShakeShare => kickShakeShare;
     public Material SlashMaterial => slashMaterial;
     public float SlashSeconds => slashSeconds;
     public float SlashHeight => slashHeight;

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0de871765cd6fce4c8fed103ef0082e3, type: 3}
+  m_Name: Blunt Swing
+  m_EditorClassIdentifier: SafeHaven::SoundDefinition
+  displayName: Blunt Swing
+  caption: 
+  clips:
+  - {fileID: 8300000, guid: 8162f880a1f443e42ad1ed4334f30468, type: 3}
+  - {fileID: 8300000, guid: abcaa1e4722652f4b9afa315638a494e, type: 3}
+  - {fileID: 8300000, guid: 9b85998317b756b419555de167a718c7, type: 3}
+  channel: 2
+  volume: 0.74
+  volumeVariation: 0.1
+  pitchRange: {x: 0.94, y: 1.06}
+  positional: 1
+  fullVolumeDistance: 3
+  audibleDistance: 22
+  maxAtOnce: 2
+  minimumGap: 0.05
+  priority: 1
+  takesTheMix: 0

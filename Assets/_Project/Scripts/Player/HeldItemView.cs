@@ -146,7 +146,9 @@ public sealed class HeldItemView : MonoBehaviour
         // A counter ready (after a parry or a perfect dodge) lights the weapon in the counter's own pale steel for as long as it lasts:
         // the window was a sound alone, with nothing to say how long it stays (Docs/CombatFeelReview_2026-11-19.md §7).
         bool counter = current != null && current.activeInHierarchy && artCombat != null && artCombat.CounterIsReady;
-        if (!ArtReady && !counter)
+        // A heavy held to charge glows hotter as it fills (§11): letting go early or late was a blind count.
+        bool charging = current != null && current.activeInHierarchy && artCombat != null && artCombat.IsCharging;
+        if (!ArtReady && !counter && !charging)
         {
             if (artLight != null && artLight.enabled) artLight.enabled = false;
             return;
@@ -169,6 +171,18 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         artLight.enabled = true;
+        artLight.range = 1.1f;
+        if (charging)
+        {
+            CombatFeelSettings feel = CombatFeelSettings.Current;
+            float charge = artCombat.Charge;
+            artLight.color = Color.Lerp(feel.ChargeLightLow, feel.ChargeLightHigh, charge);
+            artLight.range = Mathf.Lerp(feel.ChargeLightRangeLow, feel.ChargeLightRangeHigh, charge);
+            float flicker = charge >= 1f ? 0.8f + 0.2f * Mathf.PerlinNoise(Time.unscaledTime * 24f, 0.5f) : 1f;
+            artLight.intensity = Mathf.Lerp(feel.ChargeLightIntensityLow, feel.ChargeLightIntensityHigh, charge) * flicker;
+            return;
+        }
+
         if (counter)
         {
             artLight.color = CounterReadyColour;

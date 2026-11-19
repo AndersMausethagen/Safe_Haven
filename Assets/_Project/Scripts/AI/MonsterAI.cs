@@ -162,11 +162,15 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// True while a monster within <paramref name="range"/> of <paramref name="point"/> chases or attacks the player or
     /// anyone on their side: a companion, a friend, or (in a friend's game) whoever the host's creature is after.
     /// </summary>
-    public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range)
+    public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range) => AnyHuntingPlayerSideWithin(point, range, null);
+
+    /// <summary>As above, leaving one creature out (the one just felled, still counted until its death is heard).</summary>
+    public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range, MonsterAI except)
     {
         foreach (MonsterAI monster in active)
         {
-            if (monster != null && monster.IsHuntingPlayerSide && (monster.transform.position - point).sqrMagnitude <= range * range)
+            if (monster != null && monster != except && monster.CurrentState != State.Dead && monster.IsHuntingPlayerSide
+                && (monster.transform.position - point).sqrMagnitude <= range * range)
             {
                 return true;
             }

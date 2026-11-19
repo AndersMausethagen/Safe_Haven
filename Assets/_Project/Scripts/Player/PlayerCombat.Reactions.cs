@@ -180,4 +180,7 @@ public sealed partial class PlayerCombat
     public void KeepInCombat() => EnterCombat();
 
     private void EnterCombat() => mode.Enter();
+
+    /// <summary>The fight is won: the game leaves Combat now (CombatFeedback, the last foe near felled).</summary>
+    public void EndFight() => mode?.EndNow();
 }

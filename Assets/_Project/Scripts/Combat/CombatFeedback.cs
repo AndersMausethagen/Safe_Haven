@@ -34,6 +34,16 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     // The player's swing whoosh, waiting for the moment the weapon moves (Combat Feel › Swing Sound Lead), and which swing it is for.
     private SoundDefinition pendingSwingSound;
     private float pendingSwingStart;
+    // A slow that waits for the stop running now (the last kill of a fight), real seconds; below 0 none.
+    private float thenScale = -1f;
+    private float thenSeconds;
+    // The fight under way (§8): the foes the player struck or was struck by, since its first blow; a gap of quiet starts another.
+    private readonly System.Collections.Generic.HashSet<Damageable> fightFoes = new System.Collections.Generic.HashSet<Damageable>();
+    private float fightBeganAt;
+    private float lastFightBlowAt = float.NegativeInfinity;
+    private const float FightGapSeconds = 5f;
+    // The riser under a heavy held to charge (§11), on a voice of its own so it can stop the moment the charge does.
+    private AudioSource chargeVoice;
 
     public static CombatFeedback Current { get; private set; }
 
@@ -106,14 +116,67 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>Slows the game once the stop running now has ended (at once when none runs): a beat after a blow, not a longer freeze
+    /// (SlowTime keeps the slowest of overlapping requests).</summary>
+    public void SlowTimeAfterStop(float scale, float seconds)
+    {
+        if (hitStopUntil < 0f)
+        {
+            SlowTime(scale, seconds);
+            return;
+        }
+
+        thenScale = scale;
+        thenSeconds = seconds;
+    }
+
     private void Update()
     {
         if (hitStopUntil >= 0f && Time.unscaledTime >= hitStopUntil)
         {
+            float then = thenScale;
             EndHitStop();
+            if (then > 0f)
+            {
+                SlowTime(then, thenSeconds);
+            }
         }
 
         PlayPendingSwingSound();
+        UpdateChargeSound();
+    }
+
+    private void UpdateChargeSound()
+    {
+        bool charging = playerCombat != null && playerCombat.IsCharging && feel.ChargeRiseSound != null && feel.ChargeRiseSound.HasClips;
+        if (!charging)
+        {
+            if (chargeVoice != null && chargeVoice.isPlaying)
+            {
+                chargeVoice.Stop();
+            }
+
+            return;
+        }
+
+        if (chargeVoice == null)
+        {
+            chargeVoice = gameObject.AddComponent<AudioSource>();
+            chargeVoice.playOnAwake = false;
+        }
+
+        if (!chargeVoice.isPlaying && playerCombat.Charge < 0.5f)
+        {
+            AudioManager.Configure(chargeVoice, feel.ChargeRiseSound);
+            chargeVoice.clip = feel.ChargeRiseSound.PickClip();
+            chargeVoice.loop = false;
+            // The player's own, so flat, but part of the world: it waits with it through a pause.
+            chargeVoice.spatialBlend = 0f;
+            chargeVoice.ignoreListenerPause = false;
+            // From where the charge stands, if it began during a stop or a pause.
+            chargeVoice.time = Mathf.Min(chargeVoice.clip.length - 0.01f, playerCombat.Charge * CombatTechniqueSettings.Current.HeavyChargeSeconds);
+            chargeVoice.Play();
+        }
     }
 
     // The whoosh comes Swing Sound Lead before the blow, timed from the swing's own clock (PlayerCombat.TimeToHit), so a swing that
@@ -151,6 +214,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         hitStopUntil = -1f;
         hitStopScale = 1f;
+        thenScale = -1f;
         // The pause owns time while it is frozen and restores it itself.
         if (!GamePause.IsTimeFrozen)
         {
@@ -227,12 +291,17 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         if (Player.Current != null && victim == Player.Current.Health)
         {
+            NoteFoe(damage.Source != null ? damage.Source.GetComponent<Damageable>() : null);
             if (!result.Blocked)
             {
                 // By the blow's own Impact: a rootling's grasp and a troll's stomp landed alike, and a wolf's nip shook the screen harder
                 // than the player's own kills (Docs/CombatFeelReview_2026-11-19.md §3).
                 HitStop(feel.HitStopWhenHurt * impact);
                 CameraShake.Add(feel.ShakeWhenHurt * impact);
+                if (impact >= feel.HeavyImpact)
+                {
+                    CameraShake.Kick(damage.Direction, feel.KickPerImpact * impact);
+                }
                 if (playerCombat != null && playerCombat.IsPushingThrough)
                 {
                     // Taken on the swing: it goes on.
@@ -264,11 +333,23 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             }
 
             float trauma = (result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra;
+            // A big blow pushes the frame along itself, once a swing, and rattles it less (§15).
+            if ((damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.WeaponArt)) != 0)
+            {
+                trauma *= feel.KickShakeShare;
+                if (!InTheSameSwing(damage.Technique))
+                {
+                    CameraShake.Kick(damage.Direction, feel.KickPerImpact * impact);
+                }
+            }
+
             stop = SwingStop(stop, damage.Technique, ref trauma);
             HitStop(stop);
+            NoteFoe(victim);
             if (result.Killed)
             {
                 GreatBlow(victim, damage);
+                FightWon(victim);
             }
 
             CameraShake.Add(trauma);
@@ -295,6 +376,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     private int swingTargets;
     private const float SwingMergeSeconds = 0.4f;
 
+    // A further body of the swing whose first already had its stop.
+    private bool InTheSameSwing(HitTechnique technique) => playerCombat != null && (technique & (HitTechnique.Melee | HitTechnique.Spell)) != 0
+        && Mathf.Approximately(playerCombat.SwingStartTime, swingKey) && Time.unscaledTime - swingStopBegan < SwingMergeSeconds;
+
     private float SwingStop(float stop, HitTechnique technique, ref float trauma)
     {
         bool swing = playerCombat != null && (technique & (HitTechnique.Melee | HitTechnique.Spell)) != 0;
@@ -317,6 +402,54 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         swingFirstStop = stop;
         swingTargets = 0;
         return stop;
+    }
+
+    private void NoteFoe(Damageable foe)
+    {
+        if (foe == null || !foe.TryGetComponent(out MonsterAI _))
+        {
+            return;
+        }
+
+        if (Time.time - lastFightBlowAt > FightGapSeconds)
+        {
+            fightFoes.Clear();
+            fightBeganAt = Time.time;
+        }
+
+        lastFightBlowAt = Time.time;
+        fightFoes.Add(foe);
+    }
+
+    /// <summary>Whether a player's kill ends a fight worth marking (§8): <paramref name="foes"/> struck, or it lasted
+    /// <paramref name="seconds"/>, and nothing else hostile hunts the player's side near.</summary>
+    public static bool EndsAFight(int foes, float seconds, bool othersHunting, CombatFeelSettings feel) =>
+        !othersHunting && (foes >= feel.FightWonFoes || seconds >= feel.FightWonSeconds);
+
+    // The blow that ends the fight (Docs/CombatFeelReview_2026-11-19.md §8): nothing marked the moment the danger ended, and the fight
+    // stayed on for the quiet stretch after it. A boss has its own stop; wildlife isn't a fight.
+    private void FightWon(Damageable victim)
+    {
+        if (!victim.TryGetComponent(out MonsterAI monster) || victim.TryGetComponent(out BossEncounter _) || !victim.Faction.WillAttack(Faction.Player))
+        {
+            return;
+        }
+
+        Vector3 at = Player.Current != null ? Player.Current.transform.position : victim.transform.position;
+        bool others = MonsterAI.AnyHuntingPlayerSideWithin(at, CombatTechniqueSettings.Current.FightHoldRange, monster);
+        if (!EndsAFight(fightFoes.Count, Time.time - fightBeganAt, others, feel))
+        {
+            return;
+        }
+
+        fightFoes.Clear();
+        lastFightBlowAt = float.NegativeInfinity;
+        SlowTimeAfterStop(feel.LastKillSlowScale, feel.LastKillSlowSeconds);
+        AudioManager.Play(feel.FightWonSound, at);
+        if (playerCombat != null)
+        {
+            playerCombat.EndFight();
+        }
     }
 
     // The "boss stop" (Docs/LookAndFeelResearch_2026-11-18.md V6): the blow that fells a boss holds far longer than any other and the
@@ -483,7 +616,7 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     {
         Vector3 chest = monster.transform.position + Vector3.up * 1.2f;
         Spawn(feel.ParryEffect, chest, monster.transform.forward);
-        AudioManager.Play(Sounds != null ? Sounds.Block : null, chest);
+        AudioManager.Play(Sounds != null ? Sounds.Interrupt : null, chest);
         Callout(monster, feel.InterruptText);
         if (by != null && Player.IsPlayer(by.gameObject))
         {

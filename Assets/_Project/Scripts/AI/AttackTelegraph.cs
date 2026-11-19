@@ -26,6 +26,11 @@ public sealed class AttackTelegraph : MonoBehaviour
     // One unit-radius fan per arc, shared by every monster; and one band (an arc's outer edge, or a ring) per arc and width.
     private static readonly Dictionary<int, Mesh> Fans = new Dictionary<int, Mesh>();
     private static readonly Dictionary<(int, int), Mesh> Bands = new Dictionary<(int, int), Mesh>();
+    // The strikes winding up at this game's player, for the warnings at the screen's edge (OffScreenWarnings).
+    private static readonly List<AttackTelegraph> atThePlayer = new List<AttackTelegraph>();
+
+    /// <summary>The strikes winding up at this game's player now (a few at most).</summary>
+    public static IReadOnlyList<AttackTelegraph> AtThePlayer => atThePlayer;
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -33,6 +38,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     {
         Fans.Clear();
         Bands.Clear();
+        atThePlayer.Clear();
         warnedNoMaterial = false;
     }
 
@@ -101,6 +107,7 @@ public sealed class AttackTelegraph : MonoBehaviour
 
     private void OnDestroy()
     {
+        atThePlayer.Remove(this);
         if (marker != null)
         {
             Destroy(marker.gameObject);
@@ -152,9 +159,37 @@ public sealed class AttackTelegraph : MonoBehaviour
         cuesParry = ai.ActiveAction == null || (ai.ActiveAction.kind != MonsterAttackKind.Charge && !MonsterAttacks.IsRanged(ai.ActiveAction.kind));
         ShowHeavy();
         PlanParryCue();
+        if (atMe && !atThePlayer.Contains(this))
+        {
+            atThePlayer.Add(this);
+        }
+        else if (!atMe)
+        {
+            atThePlayer.Remove(this);
+        }
+
         Place();
         UpdateFill(0f);
     }
+
+    /// <summary>True while its strike winds up and hasn't landed.</summary>
+    public bool IsWarning => marker != null && marker.gameObject.activeSelf && attack != null && hideAt < 0f;
+
+    /// <summary>How far its wind-up has gone, 0-1 (the fill).</summary>
+    public float Progress => attack == null ? 0f : attack.HitDelay > 0f ? Mathf.Clamp01((Time.time - startTime) / attack.HitDelay) : 1f;
+
+    /// <summary>Its strike's tier colour: no guard stops it, any blow breaks it off, or an ordinary one.</summary>
+    public Color WarningColor
+    {
+        get
+        {
+            CombatFeelSettings feel = CombatFeelSettings.Current;
+            return attack != null && attack.Unblockable ? feel.UnblockableColor : interruptible ? feel.InterruptibleColor : feel.TelegraphFillColor;
+        }
+    }
+
+    /// <summary>True when its strike is a great blow (the dark edge).</summary>
+    public bool WarnsHeavy => edgeFilter != null && edgeFilter.gameObject.activeSelf;
 
     /// <summary>
     /// When a strike's parry cue comes, on its own clock (Docs/CombatFeelReview_2026-11-19.md §2): <paramref name="lead"/> before its parry
@@ -331,6 +366,7 @@ public sealed class AttackTelegraph : MonoBehaviour
     private void Hide()
     {
         hideAt = -1f;
+        atThePlayer.Remove(this);
         if (marker != null)
         {
             marker.gameObject.SetActive(false);

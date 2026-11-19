@@ -124,6 +124,20 @@ MonoBehaviour:
   parryCueSound: {fileID: 11400000, guid: 53285bd0383044b40ae1f577a530c777, type: 2}
   parryLineAlpha: 0.35
   parryLineWidth: 0.04
+  lastKillSlowScale: 0.3
+  lastKillSlowSeconds: 0.35
+  fightWonFoes: 2
+  fightWonSeconds: 4
+  fightWonSound: {fileID: 11400000, guid: dd308a0a3a9b9e2408b36349dcb72add, type: 2}
+  chargeRiseSound: {fileID: 11400000, guid: c8ef4efeed75acb488bb0413ef0451de, type: 2}
+  chargeLightLow: {r: 1, g: 0.62, b: 0.3, a: 1}
+  chargeLightHigh: {r: 1, g: 0.9, b: 0.7, a: 1}
+  chargeLightRangeLow: 1.1
+  chargeLightRangeHigh: 1.8
+  chargeLightIntensityLow: 0.3
+  chargeLightIntensityHigh: 2
+  kickPerImpact: 0.05
+  kickShakeShare: 0.6
   landingEffect: {fileID: 0}
   slashMaterial: {fileID: 2100000, guid: da6ce870da817894b98a9f869375c163, type: 2}
   slashSeconds: 0.2

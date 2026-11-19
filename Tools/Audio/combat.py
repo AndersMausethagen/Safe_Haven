@@ -54,6 +54,30 @@ def axe_swing(rng):
     return darken(air + 0.6 * whoosh(length, 90, 300, 1.0, rng, peak=0.5), weight=2)
 
 
+def thrust_swing(rng):
+    """A dagger's stab or a spear's thrust (Docs/CombatFeelReview_2026-11-19.md §10): short and narrow, rising, ending sharp."""
+    length = rng.uniform(0.16, 0.2)
+    t = times(length)
+    x = t / length
+    air = sweep(pink(len(t), rng), 1200 + 2800 * x ** 1.5, 6) * x ** 1.2 * np.clip((1 - x) / 0.08, 0, 1)
+    return darken(air / max(1e-9, np.abs(air).max()) + 0.25 * cloth(length, rng, 2200), top=-3, weight=2)
+
+
+def blunt_swing(rng):
+    """A hammer, club or maul: a slow heavy mass, low and fluttering as it turns over."""
+    length = rng.uniform(0.48, 0.52)
+    air = whoosh(length, 70, 600, 1.0, rng, peak=0.6, flutter=0.9, flutter_rate=18)
+    return darken(air + 0.7 * whoosh(length, 50, 160, 1.0, rng, peak=0.6), weight=3)
+
+
+def great_blade_swing(rng):
+    """A greatsword: the axe's body of air and a long steel edge singing over it."""
+    length = rng.uniform(0.5, 0.56)
+    air = whoosh(length, 140, 1500, 1.2, rng, peak=0.5, flutter=0.5, flutter_rate=22)
+    edge = whoosh(length, 3000, 4500, 10, rng, peak=0.55) * 0.18
+    return darken(air + 0.5 * whoosh(length, 90, 300, 1.0, rng, peak=0.5) + edge, weight=2)
+
+
 def punch_swing(rng):
     length = rng.uniform(0.2, 0.25)
     return darken(whoosh(length, 300, 1300, 1.2, rng, peak=0.55) + 0.4 * cloth(length, rng, 1500))
@@ -200,6 +224,35 @@ def parry_cue(rng):
     return strike(modes, seconds, 0.00018, rng)
 
 
+def interrupt_break(rng):
+    """A strike broken off (§10): a dry crack, not the clang of a guard, and its gear rattling as the body is thrown off its blow."""
+    seconds = 0.3
+    t = times(seconds)
+    crack = band(white(len(t), rng), 900, 5200) * decay(t, 0.006) + 0.6 * band(pink(len(t), rng), 300, 1400) * decay(t, 0.02)
+    fall = place(blank(seconds), rattle(rng, 0.2, 5) * 0.45, 0.02)
+    return darken(crack / max(1e-9, np.abs(crack).max()) + fall + thump(rng, seconds, 70, 160, 0.04) * 0.35, top=-3, weight=2)
+
+
+def charge_rise(rng):
+    """A heavy held to charge (§11): air and grip tightening for 0.95 s, so letting go early or late is heard, not counted."""
+    seconds = 0.95
+    t = times(seconds)
+    x = t / seconds
+    air = sweep(pink(len(t), rng), 200 + 1600 * x ** 1.3, 3) * (0.25 + 0.75 * x ** 1.5)
+    creak = scatter(seconds, 7, lambda: chip(rng, 300, 900, 0.05), rng, early=0.8) * 0.2
+    hum = np.sin(TAU * np.cumsum(90 + 60 * x) / RATE) * x ** 2 * 0.2
+    return fade_end(air / max(1e-9, np.abs(air).max()) * 0.8 + creak + hum, 0.05)
+
+
+def fight_won(rng):
+    """The last foe of a fight down (§8): one low drum stroke and a long breath of wind after it. One take: a beat, not a variation."""
+    seconds = 1.6
+    t = times(seconds)
+    stroke = drum(rng.uniform(62, 68), seconds, rng, tension=0.08) * 0.9
+    breath = band(pink(len(t), rng), 180, 900) * bump(t, 0.12, 0.45, 0.5) * 0.35
+    return darken(fade_end(stroke + breath, 0.3), top=-6, weight=3)
+
+
 def guard_break(rng):
     seconds = 1.2
     split = strike(wood(rng.uniform(150, 200), rng, damp=0.1, count=16), seconds, 0.0012, rng)
@@ -257,9 +310,11 @@ def land(rng):
 # Which recipe, how many variants and the file name's stem; anything played from a fixed point on screen stays stereo.
 SOUNDS = [
     ("Swing", swing, 4, True), ("Heavy Swing", heavy_swing, 3, True), ("Axe Swing", axe_swing, 3, True), ("Punch Swing", punch_swing, 4, True),
+    ("Thrust Swing", thrust_swing, 4, True), ("Blunt Swing", blunt_swing, 3, True), ("Great Blade Swing", great_blade_swing, 3, True),
     ("Dodge", dodge, 4, True), ("Perfect Dodge", perfect_dodge, 2, False),
     ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Stab Hit", stab_hit, 5, True), ("Blunt Hit", blunt_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
     ("Block", block, 5, True), ("Parry", parry, 5, True), ("Parry Cue", parry_cue, 1, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True), ("Heavy Windup", heavy_windup, 3, True),
+    ("Interrupt Break", interrupt_break, 4, True), ("Charge Rise", charge_rise, 1, False), ("Fight Won", fight_won, 1, False),
     ("Player Hurt", player_hurt, 6, False), ("Land", land, 4, True),
 ]
 

@@ -67,6 +67,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [Tooltip("A hit on a building or other structure.")]
     [SerializeField] private SoundDefinition structureHit;
     [SerializeField] private SoundDefinition block;
+    [Tooltip("A monster's strike broken off by a blow: a dry crack, not the guard's clang (empty: Block).")]
+    [SerializeField] private SoundDefinition interrupt;
     [SerializeField] private SoundDefinition parry;
     [SerializeField] private SoundDefinition guardBreak;
     [SerializeField] private SoundDefinition stagger;
@@ -201,6 +203,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition CriticalHit => criticalHit;
     public SoundDefinition StructureHit => structureHit;
     public SoundDefinition Block => block;
+    public SoundDefinition Interrupt => interrupt != null ? interrupt : block;
     public SoundDefinition Parry => parry;
     public SoundDefinition GuardBreak => guardBreak;
     public SoundDefinition Stagger => stagger;

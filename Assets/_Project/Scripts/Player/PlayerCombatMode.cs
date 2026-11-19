@@ -63,6 +63,15 @@ public sealed class PlayerCombatMode
         }
     }
 
+    /// <summary>The fight is won (CombatFeedback: the last foe near fell): back to Exploration now, not after the quiet stretch.</summary>
+    public void EndNow()
+    {
+        if (gameState != null && gameState.CurrentState == GameState.Combat)
+        {
+            gameState.TrySetState(GameState.Exploration);
+        }
+    }
+
     /// <summary>A blow landed: the fight goes on.</summary>
     public void NoteActivity() => lastActivityTime = clock();
 

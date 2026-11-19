@@ -15,6 +15,43 @@ public sealed class CameraShake : CinemachineExtension
 {
     private static float trauma;
     private static float lastDecayTime;
+    // The kick (Docs/CombatFeelReview_2026-11-19.md §15): a push of the frame along a blow, in metres, and when it began (real time).
+    private static Vector3 kick;
+    private static float kickAt = float.NegativeInfinity;
+    private const float KickRise = 0.03f;
+    private const float KickReturn = 0.12f;
+
+    /// <summary>Pushes the frame along <paramref name="worldDirection"/> by <paramref name="metres"/>: up in 30 ms, sprung back over
+    /// 120 ms, on real time so it plays through the hit stop. A push rather than a rattle, for a big blow's direction (Vlambeer's
+    /// screen kick). Under the Screen Shake slider; a new kick replaces one still under way.</summary>
+    public static void Kick(Vector3 worldDirection, float metres)
+    {
+        worldDirection.y = 0f;
+        if (metres <= 0f || worldDirection.sqrMagnitude < 1e-6f)
+        {
+            return;
+        }
+
+        kick = worldDirection.normalized * (metres * GameOptions.ScreenShake.Value);
+        kickAt = Time.unscaledTime;
+    }
+
+    /// <summary>The share of a kick's push at <paramref name="age"/> seconds: rising to 1 over the rise, eased back to 0 over the return.</summary>
+    public static float KickShare(float age)
+    {
+        if (age < 0f || age >= KickRise + KickReturn)
+        {
+            return 0f;
+        }
+
+        if (age < KickRise)
+        {
+            return age / KickRise;
+        }
+
+        float back = (age - KickRise) / KickReturn;
+        return 1f - back * back * (3f - 2f * back);
+    }
 
     /// <summary>Current shake strength, 0-1.</summary>
     public static float Trauma
@@ -54,6 +91,8 @@ public sealed class CameraShake : CinemachineExtension
     {
         trauma = 0f;
         lastDecayTime = 0f;
+        kick = Vector3.zero;
+        kickAt = float.NegativeInfinity;
     }
 
     private static void Decay()
@@ -72,6 +111,13 @@ public sealed class CameraShake : CinemachineExtension
         }
 
         Decay();
+        float kicked = KickShare(Time.unscaledTime - kickAt);
+        if (kicked > 0f)
+        {
+            // Along the blow on the ground, which from above is along the screen.
+            state.PositionCorrection += kick * kicked;
+        }
+
         if (trauma <= 0f)
         {
             return;

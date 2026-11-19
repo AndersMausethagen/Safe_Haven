@@ -47,6 +47,7 @@ MonoBehaviour:
   criticalHit: {fileID: 11400000, guid: 6080932eb3ce77d419e9d16afe9c65df, type: 2}
   structureHit: {fileID: 11400000, guid: c976c43373ecc004ba5149ddf6b2b63e, type: 2}
   block: {fileID: 11400000, guid: 12b799f741ae69d49b5f46d6ce4c9d39, type: 2}
+  interrupt: {fileID: 11400000, guid: a12bf9803ec17f5488b43c7ea3be15c7, type: 2}
   parry: {fileID: 11400000, guid: 70b62faa0747e1f4b9c4ab6fb9e1d207, type: 2}
   guardBreak: {fileID: 11400000, guid: 2c8a54e87063e6c458ad38dc0ac47ca9, type: 2}
   stagger: {fileID: 11400000, guid: 5ed1cc8158792214c81701d7d75f4317, type: 2}
