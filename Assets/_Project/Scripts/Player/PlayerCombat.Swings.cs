@@ -101,6 +101,9 @@ public sealed partial class PlayerCombat
         }
 
         MonsterAI toFinish = kind == SwingKind.Light || kind == SwingKind.Rush ? FindFinishable() : null;
+        // A finishing blow that takes a chain swing's place keeps the chain where it was: the next press goes on to the swing after
+        // (the user, 2026-11-19: hitting an enemy seemed to reset the combo, as breaking its poise turned the next press into this).
+        int finishKeepsStep = toFinish != null && kind == SwingKind.Light ? step : -1;
         if (toFinish != null)
         {
             // The weapon's own rush: same numbers and time as any, so a finishing blow changes the moment and not the balance.
@@ -150,6 +153,10 @@ public sealed partial class PlayerCombat
 
         bool finisher = kind == SwingKind.Light && chain > 1 && step == chain - 1;
         lastStep = kind == SwingKind.Rush || kind == SwingKind.GuardCounter ? 0 : kind == SwingKind.Light && !finisher ? step : -1;
+        if (finishKeepsStep >= 0)
+        {
+            lastStep = chain > 1 && finishKeepsStep < chain - 1 ? finishKeepsStep : -1;
+        }
 
         activeKind = kind;
         activeAttack = attack;
@@ -380,6 +387,7 @@ public sealed partial class PlayerCombat
         }
 
         float elapsed = ActiveElapsed;
+        UpdateHop(elapsed, hitAt);
         if (hitPending && elapsed < hitAt - activeLungeLead)
         {
             TrackFocus();
@@ -427,8 +435,19 @@ public sealed partial class PlayerCombat
             && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, LungeSeconds);
         if (!waits)
         {
+            if (charging)
+            {
+                // Let go (or full): the feet keep the swing's own share again for its strike.
+                movement.SetSpeedScale(this, activeWindupMove);
+            }
+
             charging = false;
             return false;
+        }
+
+        if (!charging)
+        {
+            movement.SetSpeedScale(this, Rules.ChargeMoveSpeed);
         }
 
         charging = true;
@@ -439,6 +458,7 @@ public sealed partial class PlayerCombat
         if (chargeHeld >= most)
         {
             charging = false;
+            movement.SetSpeedScale(this, activeWindupMove);
             ChargeFull?.Invoke();
             // Held to the full: the weapon's charged attack, its strongest blow, instead of the heavy (Hades II's Omega moves).
             if (weapon != null && weapon.ChargedAttack != null)
@@ -776,9 +796,45 @@ public sealed partial class PlayerCombat
         movement.SetSpeedScale(this, speed);
     }
 
+    // A leaping swing (Attack Definition › Hop): the body rises over the wind-up and lands HopLanding seconds after the blow. The rig's
+    // hips are lifted after the animation each frame (LateUpdate), so the whole body leaves the ground; the collider stays.
+    private const float HopLanding = 0.14f;
+    private Transform hopHips;
+    private float hopLift;
+
+    private void UpdateHop(float elapsed, float hitAt)
+    {
+        float hop = activeAttack != null ? activeAttack.Hop : 0f;
+        if (hop <= 0f)
+        {
+            hopLift = 0f;
+            return;
+        }
+
+        if (hopHips == null)
+        {
+            Animator animator = GetComponentInChildren<Animator>();
+            hopHips = animator != null && animator.isHuman ? animator.GetBoneTransform(HumanBodyBones.Hips) : null;
+        }
+
+        float t = Mathf.Clamp01(elapsed / Mathf.Max(0.05f, hitAt + HopLanding / Mathf.Max(0.01f, activeSpeed)));
+        hopLift = hop * Mathf.Sin(Mathf.PI * t);
+    }
+
+    private void EndHop() => hopLift = 0f;
+
+    private void LateUpdate()
+    {
+        if (hopLift > 0f && hopHips != null)
+        {
+            hopHips.position += Vector3.up * hopLift;
+        }
+    }
+
     private void EndSwing()
     {
         EndFinish();
+        EndHop();
         GiveBodiesBack();
         // A swing lost before its blow (a flinch, a dodge) stops its step into it: a dash or leap mustn't slide on.
         if (activeKind != SwingKind.None && hitPending)

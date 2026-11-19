@@ -196,6 +196,11 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
 
         float cost = BlockCost(damage);
+        if (!IsGuarding && combat != null && combat.InGuardPoint)
+        {
+            return GuardPoint(damage, cost, out letThrough);
+        }
+
         GuardOutcome outcome = GuardRules.Resolve(IsGuarding, Time.time - raisedAt, transform.forward, damage.Direction,
             Rules.BlockArc, Rules.ParryWindow * GameOptions.TimingShare, stamina != null ? stamina.Current : float.PositiveInfinity,
             stamina != null ? stamina.Scaled(cost) : cost);
@@ -233,6 +238,30 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
 
         return outcome;
+    }
+
+    // A guard point: the shield on the arm takes a blow from the front mid-swing, the swing going on. Never a parry, and never a broken
+    // guard: short of the stamina for it the blow simply lands, as on anyone mid-swing.
+    private GuardOutcome GuardPoint(in DamageInfo damage, float cost, out float letThrough)
+    {
+        letThrough = 1f;
+        GuardOutcome outcome = GuardRules.Resolve(true, float.PositiveInfinity, transform.forward, damage.Direction, Rules.BlockArc, 0f,
+            stamina != null ? stamina.Current : float.PositiveInfinity, stamina != null ? stamina.Scaled(cost) : cost);
+        if (outcome != GuardOutcome.Blocked)
+        {
+            return GuardOutcome.None;
+        }
+
+        letThrough = Mathf.Clamp01(LetThrough * Rules.GuardPointLetThrough);
+        if (stamina != null)
+        {
+            stamina.TrySpend(cost);
+        }
+
+        blockedAt = Time.time;
+        KnockBackWithShield(damage);
+        Blocked?.Invoke(damage);
+        return GuardOutcome.Blocked;
     }
 
     // A shield takes a blow with weight behind it (No Rest for the Wicked's Breach: shields deal poise on block): the attacker loses the

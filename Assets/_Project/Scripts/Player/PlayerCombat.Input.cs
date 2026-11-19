@@ -35,15 +35,17 @@ public sealed partial class PlayerCombat
 
                 return;
             }
-            else if (HasShield)
+            // With a shield, out of the guard the weapon's art when Focus will pay for it and it's ready (the user, 2026-11-19: the
+            // shield took the sword's special away), else the bash.
+            else if (HasShield && !(ArtReadyFromGuard()))
             {
                 Request(SwingKind.ShieldBash, ChainPress.Late);
                 return;
             }
             else
             {
-                // Without a shield, attacking drops the guard into an art, paid in Focus: the attuned rune's (ArtRunes) when there
-                // is one, else the weapon's own; a plain swing when Focus is short.
+                // Attacking drops the guard into an art, paid in Focus: the attuned rune's (ArtRunes) when there is one, else the
+                // weapon's own; a plain swing when Focus is short (without a shield).
                 artFromRune = ArtRunes.For(weapon) != null;
                 if (CanAffordArt)
                 {
@@ -139,6 +141,13 @@ public sealed partial class PlayerCombat
             return true;
         }
 
+        // A press that still chains on from the last swing is the chain's next swing, walked or not: walking out of a swing and
+        // pressing again made a rush and started the chain over (the user, 2026-11-19; 77 rushes in 751 swings of their playtest).
+        if (lastStep >= 0 && JudgePress() != ChainPress.Late)
+        {
+            return false;
+        }
+
         return StrikeRules.IsRunningAttack(runningFor, Rules.RushRunSeconds, Vector3.Angle(movement.HorizontalVelocity, movement.AimDirection), Rules.RushRunAngle);
     }
 
@@ -151,6 +160,16 @@ public sealed partial class PlayerCombat
     private ItemDefinition ArtRune => artFromRune ? ArtRunes.For(weapon) : null;
     private AttackDefinition ArtAttack => ArtRune != null ? ArtRune.RuneArt : weapon != null ? weapon.WeaponArt : null;
     private float ArtFocus => ArtRune != null ? ArtRune.RuneFocus : weapon != null ? weapon.WeaponArtFocus : 0f;
+
+    // Whether attacking out of the guard would start an art now: one to strike, Focus for it, and off its cooldown.
+    private bool ArtReadyFromGuard()
+    {
+        bool fromRune = artFromRune;
+        artFromRune = ArtRunes.For(weapon) != null;
+        bool ready = CanAffordArt && !ArtCoolingDown;
+        artFromRune = fromRune;
+        return ready;
+    }
 
     private bool HasGuardCounter => (HasShield && Shield != null && Shield.OwnGuardCounter != null) || (weapon != null && weapon.GuardCounterAttack != null);
 

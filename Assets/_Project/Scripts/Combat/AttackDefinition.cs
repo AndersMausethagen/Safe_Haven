@@ -52,6 +52,10 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Range(0.25f, 3f)] private float impact = 1f;
     [Tooltip("Metres the attacker steps forward into the blow, ending as it lands (toward a target within reach).")]
     [SerializeField, Min(0f)] private float lunge;
+    [Tooltip("Metres the body leaves the ground over the wind-up, landing just after the blow (a leaping spin). Only the model rises: " +
+             "the feet's collider stays, so nothing is jumped over. 0: on the ground (the user, 2026-11-19: the sword's last swing " +
+             "barely left the ground).")]
+    [SerializeField, Min(0f)] private float hop;
     [Tooltip("Stamina the player pays for it. Below 0 uses the player's normal attack cost.")]
     [SerializeField] private float staminaCost = -1f;
 
@@ -161,6 +165,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float PoiseDamage => poiseDamage;
     public float Impact => impact;
     public float Lunge => lunge;
+    public float Hop => hop;
     /// <summary>Its own stamina cost, or null for the player's normal attack cost (PlayerCombat.StaminaCostOf resolves it). A placeholder
     /// is never handed out as a number (Docs/BugPatterns.md, guard 4: "-1, the default" was read as a cost of -1).</summary>
     public float? OwnStaminaCost => staminaCost >= 0f ? staminaCost : (float?)null;

@@ -246,6 +246,14 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// <summary>True while the swing in progress hasn't landed yet (it can still be lost or turned into another).</summary>
     public bool IsWindingUp => activeKind != SwingKind.None && hitPending;
 
+    /// <summary>
+    /// A shield on the arm guards the swing (guard points, CombatTechniqueSettings › Shield Guard Points): while a melee swing winds
+    /// up to its hit or a heavy is held charging, the shield takes a blow from the front. Not an art, a thrown weapon or a bow.
+    /// </summary>
+    public bool InGuardPoint => Rules.ShieldGuardPoints && Shield != null && hitPending && weapon != null && !weapon.TakesAttackInput
+                                && (activeKind == SwingKind.Light || activeKind == SwingKind.Heavy || activeKind == SwingKind.Rush
+                                    || activeKind == SwingKind.ShieldBash || activeKind == SwingKind.GuardCounter);
+
     /// <summary>The attack of the swing in progress, or null.</summary>
     public AttackDefinition ActiveAttack => activeAttack;
 
@@ -265,7 +273,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     public bool ChargedFromHold { get; private set; }
 
     /// <summary>Share of walking speed the swing in progress keeps while it winds up (0: planted).</summary>
-    public float WindupMoveShare => IsWindingUp ? activeWindupMove : 0f;
+    public float WindupMoveShare => !IsWindingUp ? 0f : charging ? Rules.ChargeMoveSpeed : activeWindupMove;
 
     /// <summary>True while the swing steps into its blow (a rush all through its wind-up): the legs are the clip's own then.</summary>
     public bool IsSteppingIn => IsWindingUp && activeLunge > 0f && !stepPending;

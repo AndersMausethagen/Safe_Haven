@@ -32,6 +32,9 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "their own (AttackDefinition › Movement). 0 plants the feet, so the whole body swings; above 0 a swing walked through plays " +
              "on the arms over the walking legs. Heavy swings, rushes and arts stay planted unless the attack says otherwise.")]
     [SerializeField, Range(0f, 1f)] private float windupMoveSpeed;
+    [Tooltip("Share of walking speed kept while a heavy is held charging (the user, 2026-11-19: let me move slowly while charging); the " +
+             "charge plays on the arms over walking legs. 0 plants the feet, as before.")]
+    [SerializeField, Range(0f, 1f)] private float chargeMoveSpeed = 0.3f;
     [Tooltip("Movement speed from Move After Contact to the end of the swing, and the same after a heavy swing, as a share of normal, " +
              "for attacks that don't set their own. 0 keeps the player planted and facing the blow until the swing ends. Above 0, walking " +
              "off lets the arms finish the swing over the legs; the next attack still waits for the swing's recovery.")]
@@ -208,6 +211,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Header("Guard and parry (hold the guard button)")]
     [Tooltip("Width in degrees in front of the player that the guard covers.")]
     [SerializeField, Range(30f, 360f)] private float blockArc = 140f;
+    [Tooltip("Guard points (Monster Hunter's lance and charge blade): with a shield on the arm, a blow from the front that lands while " +
+             "a swing winds up or a heavy charges is blocked by the shield, and the swing goes on (the user, 2026-11-19). Off: only " +
+             "the raised guard blocks.")]
+    [SerializeField] private bool shieldGuardPoints = true;
+    [Tooltip("Times the shield's share let through a guard point lets through (a guard point is a glancing block, not a braced one).")]
+    [SerializeField, Range(1f, 4f)] private float guardPointLetThrough = 1.6f;
     [Tooltip("A hit within this many seconds of raising the guard is parried.")]
     [SerializeField, Range(0f, 0.5f)] private float parryWindow = 0.15f;
     [Tooltip("After lowering the guard it can't go up again for this long, so tapping it isn't a free parry.")]
@@ -345,6 +354,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public bool EarlyPressFumbles => earlyPressFumbles;
     public bool DodgeCancelsWindup => dodgeCancelsWindup;
     public float WindupMoveSpeed => windupMoveSpeed;
+    public float ChargeMoveSpeed => chargeMoveSpeed;
     public float SwingMoveSpeed => swingMoveSpeed;
     public float HeavyMoveSpeed => heavyMoveSpeed;
     public float WindupTurnRate => windupTurnRate;
@@ -417,6 +427,8 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float ReadTurnSpeed => readTurnSpeed;
     public float ParriedFlinchSeconds => parriedFlinchSeconds;
     public float BlockArc => blockArc;
+    public bool ShieldGuardPoints => shieldGuardPoints;
+    public float GuardPointLetThrough => guardPointLetThrough;
     [Header("Finishing blow")]
     [Tooltip("How the stab looks. Only its animation is used: the numbers and timing are the weapon's own rush, so a finishing blow doesn't change the balance.")]
     [SerializeField] private AttackDefinition finishStab;

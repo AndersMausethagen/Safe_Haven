@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Shield Bash
   damageType: 0
   strike: 1
-  baseDamage: 12
-  weaponDamageRatio: 0
+  baseDamage: 8
+  weaponDamageRatio: 0.6
   powerScaling: 1
   structureDamageMultiplier: 0.5
   canCrit: 1
@@ -25,17 +25,37 @@ MonoBehaviour:
   maxTargets: 2
   hitDelay: 0.29629633
   recoveryTime: 0.5962963
-  poiseDamage: 30
-  impact: 1.1
+  poiseDamage: 60
+  impact: 1.6
   lunge: 0.8
+  hop: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
+  groundImpact: {fileID: 0}
+  unblockable: 0
+  pull: 0
+  windupMove: -1
+  afterContactMove: -1
+  windupTurnRate: -1
+  moveAt: -1
+  lungeShare: -1
+  motion: 0
+  motionDistance: 3.5
+  alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: Shield Bash
   animationSpeed: 0.76935476
   strikeSpeed: 1.35
   strikeLead: 0.06666667
   followThroughSpeed: 1
+  growsFromLight: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}
