@@ -48,7 +48,10 @@ public sealed partial class MonsterAI
 
         if (senses.Look(elapsed))
         {
+            // Spotted with its own eyes: only this raises an alarm, never being sent by another's call (alarms set off no chain).
+            spottedWithOwnEyes = true;
             SetTarget(senses.Spotted, senses.SpottedCollider);
+            spottedWithOwnEyes = false;
             return;
         }
 
@@ -185,10 +188,12 @@ public sealed partial class MonsterAI
         ? new Vector2Int(pack.GetHashCode(), 0)
         : new Vector2Int(Mathf.FloorToInt(transform.position.x / 20f), Mathf.FloorToInt(transform.position.z / 20f) + 100000);
 
+    private bool spottedWithOwnEyes;
+
     private void PlanAlarm()
     {
         alarmAction = -1;
-        if (IsRemote || definition == null || (pack != null && !pack.IsLeader(this) && PackHasCaller()))
+        if (!spottedWithOwnEyes || IsRemote || definition == null || (pack != null && !pack.IsLeader(this) && PackHasCaller()))
         {
             return;
         }
@@ -202,7 +207,7 @@ public sealed partial class MonsterAI
         for (int i = 0; i < definition.Attacks.Count; i++)
         {
             MonsterAttack action = definition.Attacks[i];
-            if (action != null && action.onSpotted && action.kind == MonsterAttackKind.Howl && (!action.packLeaderOnly || IsHowler))
+            if (action != null && action.onSpotted && action.kind == MonsterAttackKind.Howl && attacks.CanUse(i, IsHowler))
             {
                 alarmAction = i;
                 alarmsRaised[group] = Time.time;

@@ -130,7 +130,7 @@ public sealed partial class MonsterAI
         foreach (Vector3 point in AttackTurns.SearchPoints(lastKnownTargetPosition, lastSeenTargetVelocity, more, share, random))
         {
             Vector3 spot = InvestigationSpot(point);
-            if (movement.TryFindGround(spot, 3f, out Vector3 ground) && targeting.CanReach(ground))
+            if (movement.TryFindGround(spot, 3f, out Vector3 ground) && (searchPoints.Count > 0 || targeting.CanReach(ground)))
             {
                 searchPoints.Add(ground);
             }
@@ -141,6 +141,11 @@ public sealed partial class MonsterAI
     {
         bool fresh = CurrentState != State.Investigating;
         searchingLostTarget = lostTarget || (!fresh && searchingLostTarget);
+        if (!lostTarget)
+        {
+            // Something new to go and see: the sweep along the lost target's way gives way to it.
+            searchPoint = searchPoints.Count;
+        }
         searchUntil = -1f;
         investigateGiveUpAt = Time.time + PerceptionSettings.Current.MaxInvestigateSeconds;
         movement.RepathNow();
@@ -185,8 +190,9 @@ public sealed partial class MonsterAI
         PerceptionSettings rules = PerceptionSettings.Current;
         if (senses.IsSeeingSomething)
         {
-            // Another glimpse: go there instead of searching here.
+            // Another glimpse: go there instead of searching here, and the sweep with it.
             searchUntil = -1f;
+            searchPoint = searchPoints.Count;
         }
 
         if (searchUntil < 0f)

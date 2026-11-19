@@ -70,6 +70,23 @@ public sealed class MonsterAttacks
     /// <summary>The action of the current strike, or null for the definition's plain attack.</summary>
     public MonsterAttack Action => action;
 
+    /// <summary>True while the call being raised is an alarm (Docs/EnemyAIReview_2026-11-19.md §8): only then does it carry Alarm Radius.</summary>
+    public bool RaisingAlarm { get; set; }
+
+    /// <summary>Whether an action may be used now by its own rules (its tier, phase, health and cooldown), wherever the foe stands: the
+    /// alarm call on spotting, which isn't a blow and so has no reach to keep to.</summary>
+    public bool CanUse(int index, bool isLeader)
+    {
+        if (index < 0 || index >= definition.Attacks.Count || definition.Attacks[index] == null)
+        {
+            return false;
+        }
+
+        MonsterAttack candidate = definition.Attacks[index];
+        float inReach = Mathf.Max(candidate.minimumRange, Mathf.Min(candidate.maximumRange, candidate.minimumRange + 0.1f));
+        return candidate.IsAvailable(inReach, Time.time, readyAt[index], isLeader, RaidTier, Phase, HealthShare);
+    }
+
     /// <summary>The attack of the current strike. Its Hit Delay is the wind-up before the hit.</summary>
     public AttackDefinition Attack => action == null ? definition.Attack : Blow > 0 ? action.followUps[Blow - 1] : action.attack;
 
@@ -333,6 +350,11 @@ public sealed class MonsterAttacks
     /// attack.</summary>
     public void Begin(int index, Vector3 toTarget)
     {
+        // Only the call raised on spotting is an alarm; MonsterAI sets RaisingAlarm just before it, and anything else clears it.
+        if (index < 0 || definition.Attacks[index] == null || !definition.Attacks[index].onSpotted)
+        {
+            RaisingAlarm = false;
+        }
         actionIndex = index;
         action = index >= 0 ? definition.Attacks[index] : null;
         heldChoice = -1;
@@ -717,10 +739,12 @@ public sealed class MonsterAttacks
 
         Component foe = Target as Component;
         // A raised alarm carries further than the call's rally (§8).
-        float alertReach = action.onSpotted ? Mathf.Max(action.buffRadius, action.alarmRadius) : action.buffRadius;
+        bool alarm = action.onSpotted && RaisingAlarm;
+        RaisingAlarm = false;
+        float alertReach = alarm ? Mathf.Max(action.buffRadius, action.alarmRadius) : action.buffRadius;
         if (action.alertsOthers && foe != null)
         {
-            if (action.onSpotted)
+            if (alarm)
             {
                 PlaytestLogger.Note(PlaytestLog.EnemyAI, "Alarm", 0, self.name);
             }

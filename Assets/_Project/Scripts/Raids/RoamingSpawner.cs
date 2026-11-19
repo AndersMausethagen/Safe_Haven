@@ -56,6 +56,8 @@ public sealed class RoamingSpawner : MonoBehaviour
 
     // The raid's pacing (Docs/EnemyAIReview_2026-11-19.md §9; Warframe, Left 4 Dead): after a hard fight the roamers hold off for a breather.
     private readonly RaidIntensity intensity = new RaidIntensity();
+    // Only a fight near the player counts toward the pacing: a hunter far off, or one stuck where it can't reach, is no fight.
+    private const float PacingReach = 30f;
 
     /// <summary>The pacing's phase now, for tests and the log.</summary>
     public RaidIntensity.Phase PacingPhase => intensity.Now;
@@ -74,7 +76,9 @@ public sealed class RoamingSpawner : MonoBehaviour
 
     private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
     {
-        if (director != null && director.Player != null && victim.gameObject == director.Player && !result.Blocked)
+        // This game's player, or a friend's body in the host's game: every player's fight counts.
+        if (director != null && director.Player != null && (victim.gameObject == director.Player || victim.GetComponent<FriendHitbox>() != null)
+            && !result.Blocked)
         {
             intensity.Hurt(result.Damage / Mathf.Max(1f, victim.MaxHealth));
         }
@@ -91,7 +95,7 @@ public sealed class RoamingSpawner : MonoBehaviour
     private void Pace(float seconds, Vector3 player)
     {
         RaidIntensity.Phase was = intensity.Now;
-        RaidIntensity.Phase now = intensity.Tick(seconds, MonsterAI.CountHuntingPlayerSide(), player, Time.time, random);
+        RaidIntensity.Phase now = intensity.Tick(seconds, MonsterAI.CountHuntingPlayerSide(player, PacingReach), player, Time.time, random);
         if (now == was)
         {
             return;

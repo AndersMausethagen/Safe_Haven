@@ -24,6 +24,10 @@ public sealed class RaidIntensity
     private const float QuietAfter = 4f;
     private const float FallPerSecond = 8f;
     private const float RelaxTravel = 40f;
+    // Never far over the peak (a long fight doesn't buy a long silence), and a fade that ends whatever happens.
+    private const float MostScore = PeakAt * 1.2f;
+    private const float LongestFade = 45f;
+    private float fadeUntil;
 
     private float quietFor;
     private float phaseUntil;
@@ -38,13 +42,13 @@ public sealed class RaidIntensity
     /// <summary>A blow on the player that took <paramref name="healthShare"/> of their health.</summary>
     public void Hurt(float healthShare)
     {
-        Score += 100f * Mathf.Max(0f, healthShare);
+        Score = Mathf.Min(MostScore, Score + 100f * Mathf.Max(0f, healthShare));
         quietFor = 0f;
     }
 
     public void Kill()
     {
-        Score += 8f;
+        Score = Mathf.Min(MostScore, Score + 8f);
         quietFor = 0f;
     }
 
@@ -53,7 +57,7 @@ public sealed class RaidIntensity
     {
         if (hunting > 0)
         {
-            Score += Mathf.Min(10f, 2f * hunting) * seconds;
+            Score = Mathf.Min(MostScore, Score + Mathf.Min(10f, 2f * hunting) * seconds);
             quietFor = 0f;
         }
         else
@@ -80,11 +84,12 @@ public sealed class RaidIntensity
                 if (now >= phaseUntil)
                 {
                     Now = Phase.Fade;
+                    fadeUntil = now + LongestFade;
                 }
 
                 break;
             case Phase.Fade:
-                if (Score < FadeBelow)
+                if (Score < FadeBelow || now >= fadeUntil)
                 {
                     Now = Phase.Relax;
                     phaseUntil = now + 15f + (float)(random != null ? random.NextDouble() : 0.5) * 15f;

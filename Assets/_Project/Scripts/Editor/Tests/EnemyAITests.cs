@@ -104,4 +104,22 @@ public sealed class EnemyAITests
         Assert.AreEqual(RaidIntensity.Phase.Build, pacing.Now, "40 m of travel ends it early");
         Assert.IsTrue(pacing.AllowsRoamers);
     }
+
+    // The review of 2026-11-19: a hunter stuck where it can't reach kept the score up, and the fade held the roamers off for good.
+    [Test]
+    public void TheFade_EndsEvenWhileAFightGoesOn()
+    {
+        var pacing = new RaidIntensity();
+        var random = new System.Random(2);
+        float now = 0f;
+        pacing.Hurt(5f);
+        Assert.LessOrEqual(pacing.Score, RaidIntensity.PeakAt * 1.2f + 0.01f, "the score is capped near the peak");
+        pacing.Tick(0.5f, 4, Vector3.zero, now += 0.5f, random);
+        for (int i = 0; i < 60 && pacing.Now != RaidIntensity.Phase.Relax; i++)
+        {
+            pacing.Tick(1f, 4, Vector3.zero, now += 1f, random);
+        }
+
+        Assert.AreEqual(RaidIntensity.Phase.Relax, pacing.Now, "within the fade's longest, whatever the score");
+    }
 }

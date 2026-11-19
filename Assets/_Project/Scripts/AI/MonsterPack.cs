@@ -130,7 +130,8 @@ public sealed class MonsterPack : MonoBehaviour
     {
         foreach (MonsterAI member in members)
         {
-            if (member != null && member.isActiveAndEnabled && member.Target != target)
+            // One holding a grudge against a companion keeps it (MonsterAI.TakeGrudge).
+            if (member != null && member.isActiveAndEnabled && member.Target != target && !member.HoldsGrudgeNow)
             {
                 member.Engage(target);
             }

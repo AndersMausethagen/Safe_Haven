@@ -44,7 +44,10 @@ public sealed partial class MonsterAI
         return true;
     }
 
-    private void SetTarget(IDamageable newTarget, Collider hitCollider)
+    private void SetTarget(IDamageable newTarget, Collider hitCollider) => SetTarget(newTarget, hitCollider, true);
+
+    // alertPack false: a target of its own (a grudge), not one its pack shares.
+    private void SetTarget(IDamageable newTarget, Collider hitCollider, bool alertPack)
     {
         target = newTarget;
         targetComponent = (Component)newTarget;
@@ -72,7 +75,7 @@ public sealed partial class MonsterAI
 
         RefreshAmbush();
         // Raising the alarm, the pack waits for the call: break it and only the suspicion spreads (§8).
-        if (pack != null && !RaisesAlarm)
+        if (alertPack && pack != null && !RaisesAlarm)
         {
             pack.Alert(newTarget);
         }
@@ -80,6 +83,8 @@ public sealed partial class MonsterAI
 
     private void ClearTarget()
     {
+        // A call planned for a target it no longer has is never raised later at someone else.
+        alarmAction = -1;
         target = null;
         targetComponent = null;
         targetCollider = null;
