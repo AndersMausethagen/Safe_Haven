@@ -32,11 +32,16 @@ public static class RaidMapSurface
     // Returns where the paths' grassy verge may grow, by alphamap cell (row, column; 255 all of it), for TerrainGrowth.Fill through
     // VergeRoomAt: the paint can't say it, as the path layer is half the paint at a trail's edge but also down the middle of a
     // narrow side path once its border is feathered, and wherever leaves drift over a trail (Docs/SystemReview2_2026-11-17.md S4).
-    public static byte[,] Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null, WaterNear water = null)
+    // On a generated map with walls (G2), <paramref name="barriers"/> and <paramref name="gaps"/> paint the gaps' game trails (Barrier Gap
+    // Trail); without them, or at 0, nothing changes.
+    public static byte[,] Paint(TerrainData data, RaidMapDefinition definition, Func<Vector2, float> wetness = null, WaterNear water = null,
+        IReadOnlyList<RaidLayoutBarrier> barriers = null, IReadOnlyList<Vector2> gaps = null)
     {
         int resolution = data.alphamapResolution;
         int layers = data.alphamapLayers;
         bool hasLitter = definition.LitterLayer != null && layers >= 4;
+        float[,] gapTrails = definition.BarrierGapTrail > 0f && barriers != null && gaps != null && gaps.Count > 0
+            ? GapTrails(resolution, definition.Size, barriers, gaps) : null;
         var weights = new float[resolution, resolution, layers];
         Vector2 cliff = definition.CliffSlope;
         float size = definition.Size;
@@ -169,6 +174,23 @@ public static class RaidMapSurface
                     weights[row, column, 3] = floor * litter + onPath * drift + rest * step;
                 }
 
+                // A gap's game trail: a narrow line of the path's soil worn through the floor, broken here and there.
+                if (gapTrails != null && gapTrails[row, column] > 0f)
+                {
+                    float worn = gapTrails[row, column] * definition.BarrierGapTrail * (0.55f + 0.45f * fine);
+                    float fromFloor = weights[row, column, 0] * worn;
+                    float fromLitter = hasLitter ? weights[row, column, 3] * worn : 0f;
+                    weights[row, column, 0] -= fromFloor;
+                    if (hasLitter)
+                    {
+                        weights[row, column, 3] -= fromLitter;
+                    }
+
+                    weights[row, column, 1] += fromFloor + fromLitter;
+                    // The verge's grass grows thickest half way onto a path: it would close a trail this narrow.
+                    verges[row, column] = (byte)Mathf.Min(verges[row, column], Mathf.RoundToInt((1f - gapTrails[row, column]) * 255f));
+                }
+
                 // A road's soil is the Road Layer (part of it, for a worn mix); the trail's verge, drifts and edge step stay as on any trail.
                 if (roads != null)
                 {
@@ -181,6 +203,91 @@ public static class RaidMapSurface
 
         data.SetAlphamaps(0, 0, weights);
         return verges;
+    }
+
+    // A gap's game trail: metres either side of the gap's middle along it, half its width, and its soft edge.
+    private const float GapTrailReach = 10f;
+    private const float GapTrailHalf = 0.6f;
+    private const float GapTrailFade = 0.7f;
+    // Metres of a run's end its bearing is read over (a traced outline's last 2 m step can lie 45 degrees off it).
+    private const float GapTrailBearing = 6f;
+
+    /// <summary>
+    /// The gaps' game trails, by alphamap cell: from each gap's middle, a straight line GapTrailReach metres either way across the band
+    /// (square to the end of the run nearest it, which points along the band there), so it leads from the walkable side in.
+    /// </summary>
+    private static float[,] GapTrails(int resolution, float size, IReadOnlyList<RaidLayoutBarrier> barriers, IReadOnlyList<Vector2> gaps)
+    {
+        var trails = new float[resolution, resolution];
+        foreach (Vector2 gap in gaps)
+        {
+            Vector2 along = Vector2.zero;
+            float nearest = float.MaxValue;
+            foreach (RaidLayoutBarrier run in barriers)
+            {
+                int count = run.Points.Count;
+                if (count < 2)
+                {
+                    continue;
+                }
+
+                float start = (run.Points[0] - gap).sqrMagnitude, end = (run.Points[count - 1] - gap).sqrMagnitude;
+                float length = run.Length, reach = Mathf.Min(GapTrailBearing, length);
+                if (start < nearest)
+                {
+                    nearest = start;
+                    along = run.Points[0] - PointAlong(run, reach, out _);
+                }
+
+                if (end < nearest)
+                {
+                    nearest = end;
+                    along = run.Points[count - 1] - PointAlong(run, length - reach, out _);
+                }
+            }
+
+            if (along.sqrMagnitude < 1e-6f)
+            {
+                continue;
+            }
+
+            Vector2 across = Vector2.Perpendicular(along.normalized);
+            StampSegment(trails, resolution, size, gap - across * GapTrailReach, gap + across * GapTrailReach, GapTrailHalf, GapTrailFade);
+        }
+
+        return trails;
+    }
+
+    // Raises every cell within half + fade metres of the segment a-b to 1 inside half, fading to 0 at the edge (the most of what is there).
+    private static void StampSegment(float[,] values, int resolution, float size, Vector2 a, Vector2 b, float half, float fade)
+    {
+        float cell = size / resolution;
+        float reach = half + fade;
+        int fromColumn = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.x, b.x) - reach) / cell));
+        int toColumn = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.x, b.x) + reach) / cell));
+        int fromRow = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(a.y, b.y) - reach) / cell));
+        int toRow = Mathf.Min(resolution - 1, Mathf.CeilToInt((Mathf.Max(a.y, b.y) + reach) / cell));
+        Vector2 segment = b - a;
+        float lengthSquared = Mathf.Max(segment.sqrMagnitude, 1e-6f);
+        for (int row = fromRow; row <= toRow; row++)
+        {
+            for (int column = fromColumn; column <= toColumn; column++)
+            {
+                var point = new Vector2((column + 0.5f) * cell, (row + 0.5f) * cell);
+                float t = Mathf.Clamp01(Vector2.Dot(point - a, segment) / lengthSquared);
+                float distance = Vector2.Distance(point, a + segment * t);
+                if (distance >= reach)
+                {
+                    continue;
+                }
+
+                float value = 1f - Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(half, reach, distance));
+                if (value > values[row, column])
+                {
+                    values[row, column] = value;
+                }
+            }
+        }
     }
 
     // From this much of the raw path (before its border is feathered) inward, the verge gives way, to none on a trail's centre line.
@@ -298,6 +405,7 @@ public static class RaidMapSurface
 
         AddGroup(groups, definition.Mids, Group.Mid);
         AddGroup(groups, definition.BarrierDressing, Group.Barrier);
+        AddGroup(groups, definition.BarrierEnds, Group.Barrier);
         return groups.ToArray();
     }
 
@@ -363,7 +471,7 @@ public static class RaidMapSurface
     public static int Scatter(TerrainData data, RaidMapDefinition definition, List<Clearing> clearings, out int rockCount,
         Func<Vector2, float> wetness = null, Func<Vector2, bool> inWater = null, Func<Vector2, int, float> treeWeightAt = null,
         WaterNear water = null, Func<Vector2, float> walked = null, List<RaidMapDefinition.HeroObject> heroObjects = null,
-        IReadOnlyList<RaidLayoutBarrier> barriers = null, IReadOnlyList<Vector2> barrierGaps = null)
+        IReadOnlyList<RaidLayoutBarrier> barriers = null, IReadOnlyList<Vector2> barrierGaps = null, List<LogObject> barrierLogs = null)
     {
         var prototypes = new List<TreePrototype>();
         Kind[] trees = Kinds(definition.Trees, prototypes);
@@ -385,6 +493,9 @@ public static class RaidMapSurface
 
         Kind[] mids = Kinds(definition.Mids, prototypes);
         Kind[] barrierKinds = Kinds(definition.BarrierDressing, prototypes);
+        // The band's logs are laid as objects (LogObject), so they take no prototype.
+        Kind[] logKinds = Kinds(definition.BarrierLogs, null);
+        Kind[] endKinds = Kinds(definition.BarrierEnds, prototypes);
         data.treePrototypes = prototypes.ToArray();
         data.RefreshPrototypes();
 
@@ -504,6 +615,11 @@ public static class RaidMapSurface
         if (walked != null && (mids.Length > 0 || HasHeroes(definition)))
         {
             Dress(data, definition, mids, heroPrototypes, clearings, trunks, placed, walked, inWater, heroObjects, Read);
+        }
+
+        if (barriers != null && barriers.Count > 0 && (logKinds.Length > 0 || endKinds.Length > 0))
+        {
+            LayWindthrow(data, definition, logKinds, endKinds, barriers, clearings, trunks, placed, inWater, barrierLogs, heroObjects);
         }
 
         if (barriers != null && barriers.Count > 0 && barrierKinds.Length > 0)
@@ -756,6 +872,375 @@ public static class RaidMapSurface
                 passed += step;
             }
         }
+    }
+
+    /// <summary>
+    /// A log of the band's windthrow, laid as an object (RaidMapGenerator.PlaceBarriers) and not as a terrain tree: the band runs over the
+    /// slopes between the trails (in a launched Misty Woods its median slope was 35°, a rise of 1.75 m along an 8 m log), and a terrain
+    /// tree stands level. In metres from the map's south-west corner; <see cref="Axis"/> is the way its length (the prefab's X) lies.
+    /// </summary>
+    public readonly struct LogObject
+    {
+        public readonly GameObject Prefab;
+        public readonly Vector2 Position;
+        public readonly Vector2 Axis;
+        public readonly float Half;
+        public readonly float Scale;
+
+        public LogObject(GameObject prefab, Vector2 position, Vector2 axis, float half, float scale)
+        {
+            Prefab = prefab;
+            Position = position;
+            Axis = axis;
+            Half = half;
+            Scale = scale;
+        }
+    }
+
+    // Windthrow (the band's look): a log is tilted to the ground, so it keeps to ground whose ends differ by at most LogTilt degrees along
+    // it, no steeper than LogSteepest, and whose middle lies at most LogDip below the line between its ends (it would hang over a hollow)
+    // or LogCrest above it (a crest showing through it: the log lies on the line between its ends, so more would sink its middle).
+    private const float LogTilt = 28f;
+    private const float LogSteepest = 50f;
+    private const float LogDip = 0.45f;
+    private const float LogCrest = 0.35f;
+    private const int LogTries = 5;
+    // From this try on, only logs no longer than this (half, metres) are picked: uneven ground takes the short ones.
+    private const int LogShortFrom = 2;
+    private const float LogShortHalf = 2.2f;
+    // The logs lie in two rows either side of the run's line, this share of Barrier Depth off it (stacked windthrow, not a fence).
+    private static readonly float[] LogRows = { -0.45f, 0.45f };
+    // Metres a run is walked on when no log fits where it stands.
+    private const float LogMissStep = 1.5f;
+    // A crossed log lies this many degrees off the one under it, and keeps within this much of the line either way.
+    private static readonly Vector2 LogCrossTurn = new Vector2(25f, 50f);
+    private const float LogCrossAcross = 2.6f;
+    // Metres round a log (or a post) its own footprint is cleared of what grew before it: a trunk lies where the tree stood.
+    private const float LogClear = 0.4f;
+    // Metres a post stands back from its run's end, past its keep and its reach.
+    private const float PostBack = 0.2f;
+
+    /// <summary>
+    /// The band's windthrow and posts (Barrier Logs, Barrier Ends; 2026-11-19, so the band reads as an edge from the game camera and not
+    /// as more forest). Along every run, logs laid end to end turned with it (Barrier Log Turn off its line), now and then another crossed
+    /// over one (Barrier Log Cross); a post at both ends, beside the gaps. Each keeps its whole reach within its run as the rest of the
+    /// dressing does, so nothing closes a gap; logs keep to ground level enough along their length, off trails, clearings and, unless the
+    /// map allows it, water. Whatever grew where a log or post lies goes (a trunk lies where the tree stood), and each goes into the trunk
+    /// grid, so the thicket grown after keeps off it. The posts are terrain trees; the logs go into <paramref name="logObjects"/> to be laid
+    /// as objects tilted to the ground (none without it). From its own stream.
+    /// </summary>
+    private static void LayWindthrow(TerrainData data, RaidMapDefinition definition, Kind[] logs, Kind[] ends,
+        IReadOnlyList<RaidLayoutBarrier> barriers, List<Clearing> clearings, TrunkGrid trunks, List<TreeInstance> placed, Func<Vector2, bool> inWater,
+        List<LogObject> logObjects, IReadOnlyList<RaidMapDefinition.HeroObject> heroObjects)
+    {
+        float size = definition.Size;
+        float depth = definition.BarrierDepth;
+        float maxTurn = definition.BarrierLogTurn * Mathf.Deg2Rad;
+        var random = new System.Random(RaidLayout.SeedFor(definition.ScatterSeed, "Windthrow"));
+        var logHalf = new Vector2[logs.Length];
+        for (int i = 0; i < logs.Length; i++)
+        {
+            Bounds bounds = PrefabBounds(logs[i].Scatter.prefab);
+            float scale = logs[i].Scatter.prefab.transform.localScale.x;
+            logHalf[i] = new Vector2(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)) * scale,
+                Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)) * scale);
+        }
+
+        var endReach = new float[ends.Length];
+        for (int i = 0; i < ends.Length; i++)
+        {
+            Bounds bounds = PrefabBounds(ends[i].Scatter.prefab);
+            endReach[i] = Mathf.Max(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)), Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)))
+                          * ends[i].Scatter.prefab.transform.localScale.x;
+        }
+
+        // What grew before this pass may be cleared from under a log; what it lays itself stays (a crossed log lies over its partner).
+        int before = placed.Count;
+        var cleared = new bool[before];
+
+        bool OnMap(Vector2 spot) => spot.x >= 0f && spot.y >= 0f && spot.x < size && spot.y < size;
+        bool Ground(Vector2 spot) => OnMap(spot) && definition.Strength(RaidZoneRole.Path, spot.x / size, spot.y / size) <= 0.1f
+                                     && !Blocked(spot, clearings, forTrees: false) && (definition.BarrierInWater || inWater == null || !inWater(spot));
+        float Height(Vector2 spot) => data.GetInterpolatedHeight(spot.x / size, spot.y / size);
+
+        // A hero standing as an object (a cedar giant, an outcrop) is no terrain tree to clear: a piece keeps its room clear of it.
+        bool ClearOfHeroes(Vector2 a, Vector2 b, float halfWidth)
+        {
+            if (heroObjects == null)
+            {
+                return true;
+            }
+
+            foreach (RaidMapDefinition.HeroObject hero in heroObjects)
+            {
+                float room = (hero.Hero != null ? hero.Hero.room : 1f) * hero.Scale + halfWidth;
+                Vector2 segment = b - a;
+                float t = segment.sqrMagnitude > 1e-6f ? Mathf.Clamp01(Vector2.Dot(hero.Position - a, segment) / segment.sqrMagnitude) : 0f;
+                if (Vector2.Distance(hero.Position, a + segment * t) < room)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool LogFits(Vector2 spot, Vector2 axis, float half, float halfWidth)
+        {
+            Vector2 a = spot - axis * half, b = spot + axis * half;
+            if (!Ground(spot) || !Ground(a) || !Ground(b) || data.GetSteepness(spot.x / size, spot.y / size) > LogSteepest
+                || !ClearOfHeroes(a, b, halfWidth))
+            {
+                return false;
+            }
+
+            float ha = Height(a), hb = Height(b);
+            float above = Height(spot) - (ha + hb) * 0.5f;
+            return Mathf.Abs(ha - hb) <= Mathf.Tan(LogTilt * Mathf.Deg2Rad) * half * 2f && above >= -LogDip && above <= LogCrest;
+        }
+
+        // Clears what grew before inside a footprint (a box along the axis, or a disc with a zero axis) and records the piece as trunks.
+        void Lay(TreeInstance? instance, Vector2 spot, Vector2 axis, float half, float halfWidth)
+        {
+            Vector2 side = Vector2.Perpendicular(axis);
+            float reach = half + halfWidth + LogClear;
+            for (int i = 0; i < before; i++)
+            {
+                if (cleared[i])
+                {
+                    continue;
+                }
+
+                var at = new Vector2(placed[i].position.x * size, placed[i].position.z * size) - spot;
+                if (at.sqrMagnitude > reach * reach)
+                {
+                    continue;
+                }
+
+                cleared[i] = axis == Vector2.zero
+                    ? at.magnitude <= half + LogClear
+                    : Mathf.Abs(Vector2.Dot(at, axis)) <= half + LogClear && Mathf.Abs(Vector2.Dot(at, side)) <= halfWidth + LogClear;
+            }
+
+            if (instance.HasValue)
+            {
+                placed.Add(instance.Value);
+            }
+
+            if (axis == Vector2.zero)
+            {
+                trunks.Add(spot, half);
+                return;
+            }
+
+            for (float along = -half; along <= half; along += 1f)
+            {
+                trunks.Add(spot + axis * along, halfWidth * 2f);
+            }
+        }
+
+        foreach (RaidLayoutBarrier run in barriers)
+        {
+            float length = run.Length;
+            float first = BarrierGapKeep, last = length - BarrierGapKeep;
+
+            // The posts: one at each end, standing back from its gap by its own reach.
+            for (int end = 0; end < 2 && ends.Length > 0; end++)
+            {
+                int pick = PickByWeight(ends, random);
+                if (pick < 0)
+                {
+                    break;
+                }
+
+                float scale = Range(random, ends[pick].Scatter.scale.x, ends[pick].Scatter.scale.y);
+                float reach = endReach[pick] * scale;
+                float at = end == 0 ? first + reach + PostBack : last - reach - PostBack;
+                if ((end == 0 && at + reach > length * 0.5f) || (end == 1 && at - reach < length * 0.5f))
+                {
+                    continue;
+                }
+
+                Vector2 spot = PointAlong(run, at, out _);
+                if (!Ground(spot) || data.GetSteepness(spot.x / size, spot.y / size) > BarrierUprightSteepest || !ClearOfHeroes(spot, spot, reach))
+                {
+                    continue;
+                }
+
+                Lay(MakeInstance(ends[pick].Prototype, spot.x / size, spot.y / size, new Vector2(scale, scale), random), spot, Vector2.zero, reach, reach);
+                if (end == 0)
+                {
+                    first = at + reach;
+                }
+                else
+                {
+                    last = at - reach;
+                }
+            }
+
+            if (logs.Length == 0 || logObjects == null)
+            {
+                continue;
+            }
+
+            // The logs, end to end from one post to the other in each row, each a little over the one before.
+            foreach (float row in LogRows)
+            {
+                float next = first + Range(random, 0f, 2f);
+                while (next < last)
+                {
+                    bool laid = false;
+                    for (int tries = 0; tries < LogTries && !laid; tries++)
+                    {
+                        int pick = tries >= LogShortFrom ? PickShort(logs, logHalf, random) : PickByWeight(logs, random);
+                        if (pick < 0)
+                        {
+                            break;
+                        }
+
+                        float scale = Range(random, logs[pick].Scatter.scale.x, logs[pick].Scatter.scale.y);
+                        float turn = Range(random, -maxTurn, maxTurn);
+                        float half = logHalf[pick].x * scale, halfWidth = logHalf[pick].y * scale;
+                        float reach = half * Mathf.Abs(Mathf.Cos(turn)) + halfWidth * Mathf.Abs(Mathf.Sin(turn));
+                        float centre = next + reach;
+                        if (centre + reach > last)
+                        {
+                            continue;
+                        }
+
+                        Vector2 line = PointAlong(run, centre, out Vector2 along);
+                        Vector2 spot = line + Vector2.Perpendicular(along) * ((row + Range(random, -0.15f, 0.15f)) * depth);
+                        float yaw = Mathf.Atan2(-along.y, along.x) + turn;
+                        // Turned by yaw about up, a prefab's X lies along (cos, -sin) in x and z.
+                        var axis = new Vector2(Mathf.Cos(yaw), -Mathf.Sin(yaw));
+                        if (!LogFits(spot, axis, half, halfWidth))
+                        {
+                            continue;
+                        }
+
+                        Lay(null, spot, axis, half, halfWidth);
+                        logObjects.Add(new LogObject(logs[pick].Scatter.prefab, spot, axis, half, scale));
+                        laid = true;
+                        next = centre + reach * Range(random, 0.7f, 1f);
+
+                        if (random.NextDouble() >= definition.BarrierLogCross)
+                        {
+                            continue;
+                        }
+
+                        // Another laid over it: shorter ones fit, as it must keep near the line and inside the run.
+                        int over = PickByWeight(logs, random);
+                        float overScale = over >= 0 ? Range(random, logs[over].Scatter.scale.x, logs[over].Scatter.scale.y) : 1f;
+                        float overTurn = Range(random, LogCrossTurn.x, LogCrossTurn.y) * Mathf.Deg2Rad * (random.NextDouble() < 0.5 ? -1f : 1f);
+                        if (over < 0)
+                        {
+                            continue;
+                        }
+
+                        float overHalf = logHalf[over].x * overScale, overWidth = logHalf[over].y * overScale;
+                        float overYaw = yaw + overTurn;
+                        var overAxis = new Vector2(Mathf.Cos(overYaw), -Mathf.Sin(overYaw));
+                        float overAlong = overHalf * Mathf.Abs(Vector2.Dot(overAxis, along)) + overWidth * Mathf.Abs(Vector2.Dot(Vector2.Perpendicular(overAxis), along));
+                        float overAcross = overHalf * Mathf.Abs(Vector2.Dot(overAxis, Vector2.Perpendicular(along)))
+                                           + overWidth * Mathf.Abs(Vector2.Dot(Vector2.Perpendicular(overAxis), Vector2.Perpendicular(along)));
+                        float overAt = centre + Range(random, -0.4f, 0.4f) * half;
+                        Vector2 overSpot = PointAlong(run, overAt, out _) + (spot - line);
+                        if (overAt - overAlong < first || overAt + overAlong > last || overAcross + (spot - line).magnitude > LogCrossAcross
+                            || !LogFits(overSpot, overAxis, overHalf, overWidth))
+                        {
+                            continue;
+                        }
+
+                        Lay(null, overSpot, overAxis, overHalf, overWidth);
+                        logObjects.Add(new LogObject(logs[over].Scatter.prefab, overSpot, overAxis, overHalf, overScale));
+                    }
+
+                    if (!laid)
+                    {
+                        next += LogMissStep;
+                    }
+                }
+            }
+        }
+
+        // What lay under a log or a post goes from the forest and from the trunks the thicket keeps off.
+        int kept = 0;
+        for (int i = 0; i < placed.Count; i++)
+        {
+            if (i < before && cleared[i])
+            {
+                continue;
+            }
+
+            placed[kept++] = placed[i];
+        }
+
+        placed.RemoveRange(kept, placed.Count - kept);
+    }
+
+    // A log no longer than LogShortHalf, by weight; any by weight when there is none that short.
+    private static int PickShort(Kind[] logs, Vector2[] halves, System.Random random)
+    {
+        float total = 0f;
+        for (int i = 0; i < logs.Length; i++)
+        {
+            if (halves[i].x <= LogShortHalf)
+            {
+                total += Mathf.Max(0f, logs[i].Scatter.weight);
+            }
+        }
+
+        if (total <= 0f)
+        {
+            return PickByWeight(logs, random);
+        }
+
+        double roll = random.NextDouble() * total;
+        for (int i = 0; i < logs.Length; i++)
+        {
+            if (halves[i].x > LogShortHalf)
+            {
+                continue;
+            }
+
+            roll -= Mathf.Max(0f, logs[i].Scatter.weight);
+            if (roll <= 0)
+            {
+                return i;
+            }
+        }
+
+        return logs.Length - 1;
+    }
+
+    /// <summary>The point <paramref name="distance"/> metres along a run from its start, and the run's way there.</summary>
+    private static Vector2 PointAlong(RaidLayoutBarrier run, float distance, out Vector2 direction)
+    {
+        direction = Vector2.right;
+        if (run.Points.Count == 0)
+        {
+            return Vector2.zero;
+        }
+
+        for (int i = 1; i < run.Points.Count; i++)
+        {
+            Vector2 a = run.Points[i - 1], b = run.Points[i];
+            float step = Vector2.Distance(a, b);
+            if (step < 1e-4f)
+            {
+                continue;
+            }
+
+            direction = (b - a) / step;
+            if (distance <= step)
+            {
+                return a + direction * Mathf.Max(0f, distance);
+            }
+
+            distance -= step;
+        }
+
+        return run.Points[run.Points.Count - 1];
     }
 
     /// <summary>
@@ -1175,6 +1660,7 @@ public static class RaidMapSurface
         public float Room => Scatter.habitat != null ? Scatter.habitat.room : 0f;
     }
 
+    // Without prototypes (null) the kinds are for objects and take none (Prototype -1).
     private static Kind[] Kinds(IReadOnlyList<RaidMapDefinition.Scatter> list, List<TreePrototype> prototypes)
     {
         var kinds = new List<Kind>();
@@ -1182,8 +1668,8 @@ public static class RaidMapSurface
         {
             RaidMapDefinition.Scatter scatter = list[i];
             if (scatter?.prefab == null) continue;
-            kinds.Add(new Kind(prototypes.Count, scatter, i));
-            prototypes.Add(new TreePrototype { prefab = scatter.prefab });
+            kinds.Add(new Kind(prototypes?.Count ?? -1, scatter, i));
+            prototypes?.Add(new TreePrototype { prefab = scatter.prefab });
         }
 
         return kinds.ToArray();

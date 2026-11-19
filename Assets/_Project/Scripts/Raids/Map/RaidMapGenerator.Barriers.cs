@@ -23,8 +23,15 @@ public static partial class RaidMapGenerator
     // Metres each piece runs past its ends, so a bend in the run leaves no slit between two pieces.
     private const float BarrierOverlap = 0.35f;
 
-    /// <summary>Stands the plan's walled runs as colliders. Nothing (no holder) when the plan has none.</summary>
-    public static void PlaceBarriers(RaidMap map, RaidLayoutPlan plan)
+    /// <summary>Metres a windthrow log is sunk into the ground below where its line meets it.</summary>
+    private const float LogSink = 0.08f;
+    public const string LogPrefix = "Log ";
+
+    /// <summary>
+    /// Stands the plan's walled runs as colliders, and lays the band's windthrow <paramref name="logs"/> (RaidMapSurface.Scatter's) along
+    /// them as objects, each tilted to the ground under it. Nothing (no holder) when the plan has none.
+    /// </summary>
+    public static void PlaceBarriers(RaidMap map, RaidLayoutPlan plan, IReadOnlyList<RaidMapSurface.LogObject> logs = null)
     {
         Transform old = map.transform.Find(BarriersName);
         if (old != null)
@@ -61,6 +68,45 @@ public static partial class RaidMapGenerator
                 from = to;
             }
         }
+
+        if (logs == null)
+        {
+            return;
+        }
+
+        int laid = 0;
+        foreach (RaidMapSurface.LogObject log in logs)
+        {
+            if (log.Prefab != null)
+            {
+                LayLog(holder, terrain, origin, log, laid++);
+            }
+        }
+    }
+
+    // A log along its axis from one end's ground to the other's, rolled to the slope across it (a crest under it shows through, within
+    // RaidMapSurface's LogCrest, rather than lifting its ends off the ground).
+    private static void LayLog(Transform holder, Terrain terrain, Vector3 origin, RaidMapSurface.LogObject log, int index)
+    {
+        Vector3 centre = RaidMapSurface.Ground(terrain, origin + new Vector3(log.Position.x, 0f, log.Position.y));
+        Vector3 a = RaidMapSurface.Ground(terrain, origin + new Vector3(log.Position.x - log.Axis.x * log.Half, 0f, log.Position.y - log.Axis.y * log.Half));
+        Vector3 b = RaidMapSurface.Ground(terrain, origin + new Vector3(log.Position.x + log.Axis.x * log.Half, 0f, log.Position.y + log.Axis.y * log.Half));
+        Vector3 along = (b - a).normalized;
+        TerrainData data = terrain.terrainData;
+        Vector3 normal = data.GetInterpolatedNormal((centre.x - origin.x) / data.size.x, (centre.z - origin.z) / data.size.z);
+        Vector3 up = Vector3.ProjectOnPlane(normal, along);
+        if (up.sqrMagnitude < 1e-4f)
+        {
+            up = Vector3.up;
+        }
+
+        // LookRotation's right is up x forward, so this forward puts the prefab's X along the log.
+        Quaternion turn = Quaternion.LookRotation(Vector3.Cross(along, up.normalized), up.normalized);
+        Vector3 at = (a + b) * 0.5f;
+        at.y -= LogSink;
+        GameObject made = Object.Instantiate(log.Prefab, at, turn, holder);
+        made.transform.localScale = log.Prefab.transform.localScale * log.Scale;
+        made.name = LogPrefix + index + " " + log.Prefab.name;
     }
 
     // Opening walled pockets: every PocketStep metres along each run, a spot either side at each of PocketOffsets metres off it is tried;
@@ -200,6 +246,18 @@ public static partial class RaidMapGenerator
             foreach (Transform piece in holder)
             {
                 var flat = new Vector2(piece.position.x - origin.x, piece.position.z - origin.z);
+                if (piece.name.StartsWith(LogPrefix))
+                {
+                    // A log reaching into the opening goes (its whole length, as it may lie along the run).
+                    if (piece.gameObject.activeSelf && LogReaches(piece, origin, wall, OpeningHalf))
+                    {
+                        piece.gameObject.SetActive(false);
+                        Object.Destroy(piece.gameObject);
+                    }
+
+                    continue;
+                }
+
                 if (Vector2.Distance(flat, wall) < OpeningHalf + BarrierPiece * 0.5f + BarrierOverlap && piece.TryGetComponent(out Collider collider))
                 {
                     collider.enabled = false;
@@ -208,6 +266,19 @@ public static partial class RaidMapGenerator
         }
 
         return openings.Count;
+    }
+
+    // Whether a laid log comes within radius metres of a spot: its drawn extent along its own X, as a segment, against the spot.
+    private static bool LogReaches(Transform log, Vector3 origin, Vector2 spot, float radius)
+    {
+        Bounds bounds = RaidMapSurface.PrefabBounds(log.gameObject);
+        float half = Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)) * log.lossyScale.x;
+        float width = Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)) * log.lossyScale.x;
+        var centre = new Vector2(log.position.x - origin.x, log.position.z - origin.z);
+        var axis = new Vector2(log.right.x, log.right.z);
+        axis = axis.sqrMagnitude > 1e-6f ? axis.normalized : Vector2.right;
+        float t = Mathf.Clamp(Vector2.Dot(spot - centre, axis), -half, half);
+        return Vector2.Distance(spot, centre + axis * t) < radius + width;
     }
 
     // One opening in the middle of a stretch of a run that had enough unreached spots beside it.

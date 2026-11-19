@@ -269,6 +269,20 @@ public sealed class RaidMapDefinition : ScriptableObject
     [SerializeField, Min(0f)] private float barrierDepth = 1.6f;
     [Tooltip("The dressing may stand in water (a drowned wood in the Marsh). Off: it keeps out of ponds and rivers.")]
     [SerializeField] private bool barrierInWater;
+    [Tooltip("Windthrow: lying trunks laid end to end along every walled run, turned with it, now and then one crossed over another, so " +
+             "the band reads as a line of fallen trees from the game camera, not as more forest. A log's length must be along its " +
+             "prefab's X (as every log's is). Picked by weight, laid before the rest of the dressing, which then keeps off them. Empty: none.")]
+    [SerializeField] private List<Scatter> barrierLogs = new List<Scatter>();
+    [Tooltip("Degrees a log may turn off its run's line, either way.")]
+    [SerializeField, Range(0f, 45f)] private float barrierLogTurn = 12f;
+    [Tooltip("The chance a log gets another laid over it at 25-50 degrees (a tangle, not a fence).")]
+    [SerializeField, Range(0f, 1f)] private float barrierLogCross = 0.35f;
+    [Tooltip("At both ends of every run, beside its gap: a stump, snag or root plate standing as the way through's post. Picked by weight. " +
+             "Empty: none.")]
+    [SerializeField] private List<Scatter> barrierEnds = new List<Scatter>();
+    [Tooltip("How much of a gap's game trail is painted with the Path Layer: a narrow worn line across the band through the gap, so a way " +
+             "through shows before you reach it. 0: none (as before).")]
+    [SerializeField, Range(0f, 1f)] private float barrierGapTrail;
 
     [Header("Sites")]
     [SerializeField] private List<SiteRule> siteRules = new List<SiteRule>();
@@ -389,6 +403,11 @@ public sealed class RaidMapDefinition : ScriptableObject
     public float BarrierSpacing => barrierSpacing;
     public float BarrierDepth => barrierDepth;
     public bool BarrierInWater => barrierInWater;
+    public IReadOnlyList<Scatter> BarrierLogs => barrierLogs;
+    public float BarrierLogTurn => barrierLogTurn;
+    public float BarrierLogCross => barrierLogCross;
+    public IReadOnlyList<Scatter> BarrierEnds => barrierEnds;
+    public float BarrierGapTrail => barrierGapTrail;
 
     /// <summary>Sets up the band's dressing (builders and tests).</summary>
     public void ConfigureBarrierDressing(IEnumerable<Scatter> dressing, float spacing, float depth, bool inWater)
@@ -397,6 +416,16 @@ public sealed class RaidMapDefinition : ScriptableObject
         barrierSpacing = spacing;
         barrierDepth = depth;
         barrierInWater = inWater;
+    }
+
+    /// <summary>Sets up the band's windthrow, its posts and its ground (builders and tests).</summary>
+    public void ConfigureBarrierEdge(IEnumerable<Scatter> logs, float logTurn, float logCross, IEnumerable<Scatter> ends, float gapTrail)
+    {
+        barrierLogs = new List<Scatter>(logs);
+        barrierLogTurn = logTurn;
+        barrierLogCross = logCross;
+        barrierEnds = new List<Scatter>(ends);
+        barrierGapTrail = gapTrail;
     }
     public Vector2Int MidsPerCell => midsPerCell;
     public Vector2 MidFromTrail => midFromTrail;

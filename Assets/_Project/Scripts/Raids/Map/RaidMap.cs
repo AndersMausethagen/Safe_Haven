@@ -260,7 +260,9 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             times.Append($"heights worked out {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             var heroes = new List<RaidMapDefinition.HeroObject>();
-            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, out vergeRoom, tier, field, metres, highest, heroes)).Append(", ");
+            var barrierLogs = new List<RaidMapSurface.LogObject>();
+            times.Append(RaidMapGenerator.ShapeGround(definition, turnedData, Layout, rules, out vergeRoom, tier, field, metres, highest, heroes, barrierLogs))
+                .Append(", ");
             terrain.Flush();
             yield return null;
             step.Restart();
@@ -268,7 +270,7 @@ public sealed class RaidMap : MonoBehaviour, ISceneSetup
             rumourSpots.Clear();
             rumourSpots.AddRange(RaidMapGenerator.PlaceContent(this, Layout, rules));
             RaidMapGenerator.PlaceDressing(this, Layout, rules, heroes);
-            RaidMapGenerator.PlaceBarriers(this, Layout);
+            RaidMapGenerator.PlaceBarriers(this, Layout, barrierLogs);
             times.Append($"content {step.ElapsedMilliseconds} ms, ");
             step.Restart();
             RaidMapGenerator.PlacePonds(this, Layout, rules, pondMeshes);

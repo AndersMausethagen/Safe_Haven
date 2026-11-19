@@ -992,8 +992,15 @@ gets almost none), each mood's Barrier (Woods: Old Growth and Windthrow 1, Hollo
 Marsh 0.85; Valley 0.6-1), Map › Barrier Dressing (Woods: young cedar, saplings, shrubs, logs, boulders; Marsh: dead cedar, young
 birch, snags, logs, may stand in water; Valley: boulders, outcrops, bushy cedar). Measured: Marsh about 240 m of wall a 200 m map,
 Woods about 130 m, Valley a few metres; a launched Woods seed 4 reached 95.3% of its navmesh samples with walls (3 opened) against
-96.3% without, the rest by the map's corners. Open: the band doesn't yet read as an edge from the game camera in the Woods (dense forest already) or the Marsh: it needs
-an edge piece of its own (stacked windthrow, bramble, a ground mark). Tests: `RaidBarrierTests`. The Misty Woods took districts, node
+96.3% without, the rest by the map's corners. **Its look (2026-11-19):** the thicket alone read as more forest, so each run gets windthrow
+(Map › Barrier Logs: `RaidMapSurface.LayWindthrow`): logs and long rocks (the prefab's X is their length) laid end to end in two rows
+along it, turned with it (Barrier Log Turn), some crossed (Barrier Log Cross), each whole inside its run; they stand as objects
+(`LogObject`, laid by `PlaceBarriers`/`LayLog` tilted to the ground under them, since the band runs over slopes of about 35°, where a
+level terrain tree hangs in the air), clear the terrain trees under them and keep off hero objects. A post (Barrier Ends: stumps,
+snags, terrain trees) stands by each gap, and a gap gets a narrow game trail across the band (Barrier Gap Trail, the Path Layer, the
+verge kept off it). A painted strip of litter along the band was tried and dropped: it read as a trail beside the wall. Woods: grey
+boulders and rock outcrops at half size with fallen trunks; Marsh: rotten logs (they read poorly in its black water; its dead snags
+do more). Openings made by `OpenWalledPockets` take the logs away but get no trail or post. Tests: `RaidBarrierTests`. The Misty Woods took districts, node
 landmarks, roads, short flags, heroes and mids the same day (its golden layouts re-pinned; `RaidLayoutGoldenTests.BeforeWorldDesign`
 keeps the old ones for the at-defaults check).
 

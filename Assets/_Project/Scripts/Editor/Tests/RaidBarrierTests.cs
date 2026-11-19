@@ -299,6 +299,118 @@ public sealed class RaidBarrierTests
         }
     }
 
+    [Test]
+    public void TheWindthrow_LiesAlongTheRun_InsideIt_WithAPostAtEachEnd()
+    {
+        RaidMapDefinition map = Object.Instantiate(AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(WoodsMapPath));
+        var data = new TerrainData { heightmapResolution = 33, size = new Vector3(map.Size, 30f, map.Size) };
+        try
+        {
+            Assert.IsNotEmpty(map.BarrierLogs, "the Woods lays windthrow along its walls");
+            Assert.IsNotEmpty(map.BarrierEnds, "and stands a post by each gap");
+            map.ConfigureDressing(new RaidMapDefinition.Hero[0], new RaidMapDefinition.Scatter[0], 30f, 22f, new Vector2(6f, 15f), 10f,
+                new Vector2Int(2, 4), new Vector2(1.5f, 12f));
+            const int zones = 16;
+            map.UseGenerated(zones, new byte[zones * zones], Enumerable.Repeat((byte)90, zones * zones).ToArray(), new byte[zones * zones], new RaidMapMood(), 21);
+            var run = new RaidLayoutBarrier();
+            for (float x = 40f; x <= 160f; x += 2f)
+            {
+                run.Points.Add(new Vector2(x, 100f));
+            }
+
+            var logs = new List<RaidMapSurface.LogObject>();
+            RaidMapSurface.Scatter(data, map, new List<RaidMapSurface.Clearing>(), out _, barriers: new[] { run }, barrierLogs: logs);
+            // Two rows along 120 m of flat ground, logs and rocks 3-9 m long, each a little over the one before.
+            Assert.Greater(logs.Count, 20, "laid end to end along 120 m");
+            float maxTurn = map.BarrierLogTurn + 50f;
+            foreach (RaidMapSurface.LogObject log in logs)
+            {
+                Bounds bounds = RaidMapSurface.PrefabBounds(log.Prefab);
+                float width = Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)) * log.Prefab.transform.localScale.x * log.Scale;
+                float along = log.Half * Mathf.Abs(log.Axis.x) + width * Mathf.Abs(log.Axis.y);
+                Assert.GreaterOrEqual(log.Position.x - along, 40f + 0.5f - 0.01f, $"{log.Prefab.name} keeps inside the run's start, off its gap");
+                Assert.LessOrEqual(log.Position.x + along, 160f - 0.5f + 0.01f, $"{log.Prefab.name} keeps inside the run's end, off its gap");
+                Assert.AreEqual(100f, log.Position.y, 0.6f * map.BarrierDepth + 0.01f, "in a row by the run's line");
+                Assert.GreaterOrEqual(Mathf.Abs(log.Axis.x), Mathf.Cos(maxTurn * Mathf.Deg2Rad) - 0.01f, "turned with the run (or crossed over one)");
+            }
+
+            Assert.Greater(logs.Count(log => Mathf.Abs(log.Axis.x) >= Mathf.Cos(map.BarrierLogTurn * Mathf.Deg2Rad) - 0.01f), logs.Count / 2,
+                "most lie along the run");
+
+            RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(map);
+            var posts = new HashSet<int>();
+            for (int i = 0; i < groups.Length; i++)
+            {
+                if (groups[i] == RaidMapSurface.Group.Barrier && map.BarrierEnds.Any(end => end.prefab == data.treePrototypes[i].prefab))
+                {
+                    posts.Add(i);
+                }
+            }
+
+            TreeInstance[] standing = data.treeInstances.Where(tree => posts.Contains(tree.prototypeIndex)).ToArray();
+            float[] postsAt = standing.Select(tree => tree.position.x * map.Size).ToArray();
+            Assert.IsTrue(postsAt.Any(x => x < 45f) && postsAt.Any(x => x > 155f), $"a post by each end (at {string.Join(", ", postsAt)})");
+            foreach (TreeInstance post in standing)
+            {
+                GameObject prefab = data.treePrototypes[post.prototypeIndex].prefab;
+                Bounds bounds = RaidMapSurface.PrefabBounds(prefab);
+                float reach = Mathf.Max(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)), Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)))
+                              * prefab.transform.localScale.x * post.widthScale;
+                float x = post.position.x * map.Size;
+                Assert.GreaterOrEqual(x - reach, 40f + 0.5f - 0.01f, $"{prefab.name} stands inside the run, off its gap");
+                Assert.LessOrEqual(x + reach, 160f - 0.5f + 0.01f, $"{prefab.name} stands inside the run, off its gap");
+            }
+        }
+        finally
+        {
+            Object.DestroyImmediate(data);
+            Object.DestroyImmediate(map);
+        }
+    }
+
+    [Test]
+    public void AGap_GetsAGameTrailAcrossTheBand()
+    {
+        RaidMapDefinition map = Object.Instantiate(AssetDatabase.LoadAssetAtPath<RaidMapDefinition>(WoodsMapPath));
+        var data = new TerrainData { heightmapResolution = 33, alphamapResolution = 128, size = new Vector3(map.Size, 30f, map.Size) };
+        try
+        {
+            Assert.Greater(map.BarrierGapTrail, 0f, "the Woods paints its gaps' game trails");
+            data.terrainLayers = map.Layers;
+            const int zones = 16;
+            map.UseGenerated(zones, new byte[zones * zones], Enumerable.Repeat((byte)90, zones * zones).ToArray(), new byte[zones * zones], new RaidMapMood(), 21);
+            // Two runs along z = 100 with a gap at x = 100 between them.
+            var left = new RaidLayoutBarrier();
+            var right = new RaidLayoutBarrier();
+            for (float x = 40f; x <= 96f; x += 2f) left.Points.Add(new Vector2(x, 100f));
+            for (float x = 104f; x <= 160f; x += 2f) right.Points.Add(new Vector2(x, 100f));
+            var runs = new[] { left, right };
+            var gap = new Vector2(100f, 100f);
+
+            float PathAt(Vector2 spot)
+            {
+                float cell = map.Size / data.alphamapResolution;
+                return data.GetAlphamaps(Mathf.FloorToInt(spot.x / cell), Mathf.FloorToInt(spot.y / cell), 1, 1)[0, 0, 1];
+            }
+
+            RaidMapSurface.Paint(data, map, barriers: runs, gaps: new List<Vector2>());
+            float inWithout = PathAt(gap + Vector2.up * 6f), outWithout = PathAt(gap - Vector2.up * 6f);
+            float besideWithout = PathAt(new Vector2(70f, 106f));
+            RaidMapSurface.Paint(data, map, barriers: runs, gaps: new[] { gap });
+            Assert.Greater(PathAt(gap + Vector2.up * 6f) - inWithout, 0.2f, "soil worn across the band, 6 m in from the gap");
+            Assert.Greater(PathAt(gap - Vector2.up * 6f) - outWithout, 0.2f, "and 6 m out");
+            Assert.AreEqual(besideWithout, PathAt(new Vector2(70f, 106f)), 0.01f, "nothing beside a run away from its gap");
+            byte[,] verges = RaidMapSurface.Paint(data, map, barriers: runs, gaps: new[] { gap });
+            float vergeCell = map.Size / data.alphamapResolution;
+            Assert.Less(verges[Mathf.FloorToInt((gap.y + 6f) / vergeCell), Mathf.FloorToInt(gap.x / vergeCell)], 128, "the verge's grass keeps off the trail");
+        }
+        finally
+        {
+            Object.DestroyImmediate(data);
+            Object.DestroyImmediate(map);
+        }
+    }
+
     private static int Index(Vector2 point, int cells, float cell) =>
         Mathf.Clamp(Mathf.FloorToInt(point.y / cell), 0, cells - 1) * cells + Mathf.Clamp(Mathf.FloorToInt(point.x / cell), 0, cells - 1);
 
