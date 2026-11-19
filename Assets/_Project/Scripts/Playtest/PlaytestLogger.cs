@@ -23,8 +23,23 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     // The highest Haven rank written in this run (OnGameEvent).
     private int rankWritten;
 
+    private static PlaytestLogger instance;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => instance = null;
+
+    /// <summary>Writes a row of the game's own (a place found, a region entered, a lookout used), when runs are logged.</summary>
+    public static void Note(string eventName, string subject, int amount = 0, string detail = "")
+    {
+        if (instance != null)
+        {
+            instance.Write(eventName, subject, amount, detail);
+        }
+    }
+
     public void Initialise(PlaytestSettings settings)
     {
+        instance = this;
         // The two-copy co-op test (CoopSmokeTest) isn't a playtest: its runs would read as two short human ones.
         logging = settings.LogRuns && !CoopSmokeTest.IsRunning;
         Cheats.Used += OnCheat;
@@ -67,6 +82,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     private float nextXpRow = 60f;
     // Seconds between position samples in a raid (heatmaps).
     private const float PositionEvery = 2f;
+    private const float HomePositionEvery = 5f;
     private float nextPosition;
 
     private void OnGained(ProficiencyDefinition skill, int amount)
@@ -196,11 +212,14 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             current.PlayedSeconds += Time.unscaledDeltaTime;
         }
 
-        if (RaidDirector.Current != null && Player.Current != null && current.PlayedSeconds >= nextPosition)
+        // Where the player walks: every 2 s on a raid, every 5 s at home (Docs/HavenExplorationReview_2026-11-19.md §0: nothing said
+        // where anyone went in the Haven).
+        if (Player.Current != null && current.PlayedSeconds >= nextPosition)
         {
-            nextPosition = current.PlayedSeconds + PositionEvery;
+            bool raid = RaidDirector.Current != null;
+            nextPosition = current.PlayedSeconds + (raid ? PositionEvery : HomePositionEvery);
             Vector3 at = Player.Current.transform.position;
-            Write(PlaytestLog.Position, $"{at.x:0};{at.z:0}", 0, RaidDirector.Current.Session.Definition.Id);
+            Write(PlaytestLog.Position, $"{at.x:0};{at.z:0}", 0, raid ? RaidDirector.Current.Session.Definition.Id : "home");
         }
 
         if (current.PlayedSeconds >= nextXpRow)
@@ -385,6 +404,11 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
     private void OnDestroy()
     {
+        if (instance == this)
+        {
+            instance = null;
+        }
+
         Cheats.Used -= OnCheat;
         GameEvents.Raised -= OnGameEvent;
         ExperienceTracker.LevelReached -= OnLevelReached;

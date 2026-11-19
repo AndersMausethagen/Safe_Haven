@@ -48,7 +48,10 @@ MonoBehaviour:
   taskRest: 1
   heldRenown: 6
   secureRenown: 12
-  findInsight: 25
+  findInsight: 10
+  findInsightMetres: 15
+  knownLandRenown: 1
+  knownLandMost: 30
   unlockedBy: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
   unlockedWhen: {fileID: 11400000, guid: c2d9213512795eb438f011f5cbb433ab, type: 2}
   stonesObjective: 2
@@ -61,8 +64,8 @@ MonoBehaviour:
   regions:
   - region: Ravenwood
     description: Old pines north of the meadows, where the ravens sit and watch the road. The tarn lies at its edge.
-    danger: 1
-    gives: Softwood, berries, game
+    danger: 2
+    gives: Hardwood, iron, stone, game
     task: 0
     taskCount: 6
     tithe:
@@ -94,8 +97,8 @@ MonoBehaviour:
       amount: 2
   - region: The Wolfwood
     description: 'Where the cursed packs den: the Wolf Den is here, and the Old Barrow. Few go in, and fewer come out the same.'
-    danger: 3
-    gives: Fangs, thick hides, grave iron
+    danger: 2
+    gives: Fangs, hides; the Wolf Den and the Old Barrow
     task: 0
     taskCount: 8
     tithe:
@@ -127,8 +130,8 @@ MonoBehaviour:
       amount: 2
   - region: Greyfell
     description: 'The mountain: bare benches of rock climbing to the highest ground in the land. Ore in the cliffs, and the wind.'
-    danger: 2
-    gives: Stone, granite, copper and iron ore
+    danger: 1
+    gives: Stone, granite, copper and iron ore. Nothing lives up there but the wind.
     task: 1
     taskCount: 10
     tithe:

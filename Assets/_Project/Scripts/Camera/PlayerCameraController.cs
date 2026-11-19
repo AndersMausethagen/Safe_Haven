@@ -175,7 +175,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
         else
         {
-            closeness[source] = Mathf.Clamp(scale, 0.3f, 1.5f);
+            closeness[source] = Mathf.Clamp(scale, 0.3f, 2f);
         }
     }
 

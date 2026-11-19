@@ -9,6 +9,26 @@ using UnityEngine;
 /// </summary>
 public static class HavenRenown
 {
+    /// <summary>Renown for the Haven's places found (of its atlas), at the settings' rate and cap.</summary>
+    public static int KnownLand(JournalRecord journal, WorldAtlas atlas, TerritorySettings settings)
+    {
+        if (journal == null || atlas == null || settings == null)
+        {
+            return 0;
+        }
+
+        int found = 0;
+        foreach (WorldAtlas.Place place in atlas.Places)
+        {
+            if (journal.HasDiscovered(place.id))
+            {
+                found++;
+            }
+        }
+
+        return Mathf.Min(found * settings.KnownLandRenown, settings.KnownLandMost);
+    }
+
     public readonly struct Part
     {
         public readonly string Label;
@@ -89,6 +109,14 @@ public static class HavenRenown
         {
             total += orders;
             parts?.Add(new Part("Good work for its people", orders));
+        }
+
+        // The land known: its keeper's finds round it, a little each (Docs/HavenExplorationReview_2026-11-19.md §6).
+        int known = KnownLand(GameSession.Progress.Journal, WorldAtlas.For("SafeHaven"), TerritorySettings.Current);
+        if (known > 0)
+        {
+            total += known;
+            parts?.Add(new Part("The land known round it", known));
         }
 
         int lands = Territory.Renown;

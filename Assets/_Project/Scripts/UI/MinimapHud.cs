@@ -404,6 +404,7 @@ public sealed class MinimapHud : MonoBehaviour
 
         ReadRaidSites(player, style);
         ReadLandmarks(player, style);
+        ReadHavenPlaces(player, style);
         ReadQuest(style);
         ReadBreach(style);
         ReadCreatures(player, style);
@@ -458,6 +459,46 @@ public sealed class MinimapHud : MonoBehaviour
             if (landmark != null && landmark.CanBeMarked && landmark.IsFoundFrom(from))
             {
                 Add(landmark.transform, landmark.Icon != null ? landmark.Icon : dot, style.Text, landmark.Icon != null ? 15f : 8f, pinned: true);
+            }
+        }
+    }
+
+    // The Haven's named places (Docs/HavenExplorationReview_2026-11-19.md §3): the minimap showed none. A found one (or one seen from a
+    // lookout, fainter) is marked, kept on the rim within Known Rim; an unfound one close by gets a faint rumour mark on the rim its way,
+    // two at most and none in a fight: the top-down short flag. Not on a raid (its own landmarks).
+    private const float KnownRim = 150f;
+    private const float HintRim = 70f;
+    private const int MostHints = 2;
+
+    private void ReadHavenPlaces(Player player, UIStyle style)
+    {
+        WorldAtlas atlas = PlaceDiscovery.Current != null ? PlaceDiscovery.Current.Atlas : null;
+        if (atlas == null || RaidDirector.Current != null)
+        {
+            return;
+        }
+
+        JournalRecord journal = GameSession.Progress.Journal;
+        Vector3 from = player.transform.position;
+        var here = new Vector2(from.x, from.z);
+        bool fight = HudRules.InAFight;
+        int hints = 0;
+        foreach (WorldAtlas.Place place in atlas.Places)
+        {
+            float distance = Vector2.Distance(place.at, here);
+            bool found = journal.HasDiscovered(place.id);
+            if ((found || journal.HasSeen(place.id)) && distance <= KnownRim)
+            {
+                Color colour = style.Muted;
+                colour.a *= found ? 1f : 0.55f;
+                Add(null, style.EventMark, colour, found ? 11f : 9f, pinned: true).Position = new Vector3(place.at.x, from.y, place.at.y);
+            }
+            else if (!found && !fight && hints < MostHints && distance <= HintRim)
+            {
+                hints++;
+                Color colour = style.Muted;
+                colour.a *= 0.6f;
+                Add(null, style.RumourMark, colour, 12f, pinned: true).Position = new Vector3(place.at.x, from.y, place.at.y);
             }
         }
     }

@@ -1,0 +1,162 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 161571b58ff05204dbb721f9b8e8c0a0, type: 3}
+  m_Name: HavenPlaceVerbs
+  m_EditorClassIdentifier: SafeHaven::HavenPlaceVerbs
+  kinds:
+  - kind: Wayfarer's Stones
+    thoughts:
+    - Four stones leaning together, worn smooth where hands rested on them. Travellers stopped here, once.
+    - 'A line is cut into the tallest: a road, running toward the clearing. Toward the portal.'
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Island Stones
+    thoughts:
+    - Stones out in the water, set there on purpose. Whoever raised them wanted them hard to reach.
+    - Moss on the landward side only. Whatever they were for, they faced the shore.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Drowned Stones
+    thoughts:
+    - Half of them under the water now. The lake has come up since they were set.
+    - The water here is too still. Something about it makes me want to keep walking.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Fisher's Rest
+    thoughts:
+    - Old drying poles, and a fire-ring black with fish fat. They ate well here, for a while.
+    - A net, rotted to strings on its pegs. Nobody came back for it.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Mother Maple
+    thoughts:
+    - The oldest tree I've seen this side of the portal. Its roots have swallowed a stone wall whole.
+    - Scratches in the bark at head height, in rows. Someone was counting something, a long time ago.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Shepherd's Fold
+    thoughts:
+    - A ring of low walls for sheep. No sheep now; the grass has the place.
+    - The gate faces the clearing. They brought the flock in toward the light at night.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Ruined Watchtower
+    thoughts:
+    - Someone watched the woods from here. The top has come down, but the stair still climbs.
+    - Arrow-slits on the forest side only. They knew which way it would come from.
+    lookout: 1
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Standing Stones
+    thoughts:
+    - A ring of standing stones, older than anything else out here. The carvings are worn almost flat.
+    - Nothing grows inside the ring. Not moss, not grass.
+    lookout: 1
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Lookout Cairn
+    thoughts:
+    - A cairn on the height, stacked by many hands, one stone at a time.
+    - From up here the whole land lies open. Worth the climb.
+    lookout: 1
+    sound: {fileID: 11400000, guid: ae7d1e20fc649884f98a6aeaf01cfdb0, type: 2}
+    soundWhen: 1
+    soundEvery: {x: 18, y: 35}
+  - kind: Old Barrow
+    thoughts:
+    - A long mound, grassed over, with a stone door in its side. A grave for someone who mattered.
+    - The door was shut from the outside. And sealed again since, by someone else.
+    lookout: 0
+    sound: {fileID: 11400000, guid: b088b17493cbde14da489f03fe9e5818, type: 2}
+    soundWhen: 1
+    soundEvery: {x: 10, y: 25}
+  - kind: Burnt Farmstead
+    thoughts:
+    - The hearthstone is cracked right through. Somebody tried to keep this fire going after the roof was gone.
+    - No bones. Whoever lived here walked away from it, or was taken.
+    lookout: 0
+    sound: {fileID: 11400000, guid: b088b17493cbde14da489f03fe9e5818, type: 2}
+    soundWhen: 1
+    soundEvery: {x: 12, y: 28}
+  - kind: Wolf Den
+    thoughts:
+    - A den under the rock-fall. The smell alone says keep back.
+    - Gnawed bones at its mouth. Not all of them deer.
+    lookout: 0
+    sound: {fileID: 11400000, guid: fd5c81c010255f543a1cc32216f4df89, type: 2}
+    soundWhen: 2
+    soundEvery: {x: 30, y: 60}
+  - kind: Old Quarry
+    thoughts:
+    - Old cuttings in the rock, the marks of the wedges still in the stone. Masons worked here.
+    - Some of the cut blocks were never carried away. As if they stopped in the middle of a day.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Elder Cedar
+    thoughts:
+    - A cedar older than the Haven. The air is cooler under it, and quiet.
+    - 'Small things tucked into the bark: a bead, a twist of cloth. Offerings, or thanks.'
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  - kind: Woodland Camp
+    thoughts:
+    - 'A camp in the trees: a fire-ring, a lean-to rotted down to its frame.'
+    - They left in a hurry. The pot is still on its hook.
+    lookout: 0
+    sound: {fileID: 0}
+    soundWhen: 0
+    soundEvery: {x: 12, y: 25}
+  finds:
+  - placeId: haven.old_quarry.0
+    name: Cut stone
+    verb: Take
+    item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 6
+    taken: Squared blocks, cut and never carried home. They'll do for the altar.
+    offset: {x: 3, y: -7}
+    marker: {fileID: 8491787878828813412, guid: 2b081355250a38947ac96f5b8c5c7f50, type: 3}
+    markerScale: 0.55
+    markerTurn: 25
+  - placeId: haven.old_quarry.1
+    name: Cut granite
+    verb: Take
+    item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+    amount: 4
+    taken: Granite, dressed on every face. Whoever cut this meant to build something that would last.
+    offset: {x: 3, y: -7}
+    marker: {fileID: 8491787878828813412, guid: 2b081355250a38947ac96f5b8c5c7f50, type: 3}
+    markerScale: 0.55
+    markerTurn: 25
+  lookoutReveal: 110
+  lookoutSees: 180
+  lookoutInsight: 30
+  lookoutViewRadius: 6
+  lookoutViewDistance: 1.9
+  lookoutViewTilt: -16

@@ -27,6 +27,7 @@ public sealed class JournalRecord
     private readonly HashSet<string> tried = new HashSet<string>();
     private readonly HashSet<string> discovered = new HashSet<string>();
     private readonly HashSet<string> noticed = new HashSet<string>();
+    private readonly HashSet<string> seen = new HashSet<string>();
     private readonly List<RaidRecord> raids = new List<RaidRecord>();
     private readonly Dictionary<string, float> biggestFish = new Dictionary<string, float>();
 
@@ -42,6 +43,8 @@ public sealed class JournalRecord
     /// <summary>The world's curious places the player has stopped to think about (CuriousPlace keys), so a thought isn't
     /// thought again after a load.</summary>
     public IEnumerable<string> Noticed => noticed;
+    /// <summary>Named places seen from a lookout and not yet walked to (WorldAtlas.Place ids): on the map in grey.</summary>
+    public IEnumerable<string> Seen => seen;
     public IReadOnlyList<RaidRecord> Raids => raids;
 
     /// <summary>The biggest of each kind of fish caught (item id to centimetres), for the journal's fishing page.</summary>
@@ -78,6 +81,9 @@ public sealed class JournalRecord
     public bool HasDiscovered(string placeId) => placeId != null && discovered.Contains(placeId);
     /// <summary>True the first time a place is found.</summary>
     public bool NoteDiscovered(string placeId) => placeId != null && discovered.Add(placeId);
+    public bool HasSeen(string placeId) => placeId != null && seen.Contains(placeId);
+    /// <summary>True the first time a place is seen from afar (a lookout).</summary>
+    public bool NoteSeen(string placeId) => placeId != null && seen.Add(placeId);
     public bool HasNoticed(string placeKey) => placeKey != null && noticed.Contains(placeKey);
     /// <summary>True the first time a curious place is noticed.</summary>
     public bool NoteNoticed(string placeKey) => placeKey != null && noticed.Add(placeKey);
@@ -86,6 +92,12 @@ public sealed class JournalRecord
     {
         noticed.Clear();
         noticed.UnionWith(saved ?? new string[0]);
+    }
+
+    public void RestoreSeen(IEnumerable<string> saved)
+    {
+        seen.Clear();
+        seen.UnionWith(saved ?? new string[0]);
     }
 
     /// <summary>True the first time a page is told about.</summary>

@@ -115,6 +115,7 @@ public sealed class RegionTitleHud : MonoBehaviour
 
         bool first = shownRegion == null;
         shownRegion = here;
+        PlaytestLogger.Note(PlaytestLog.RegionEntered, here, 0, first ? "arrived" : "");
         // Not on arriving: the player knows they are home.
         if (first)
         {

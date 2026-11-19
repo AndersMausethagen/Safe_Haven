@@ -751,6 +751,7 @@ public static class SaveMapper
         into.journal.tried.AddRange(journal.Tried);
         into.journal.discovered.AddRange(journal.Discovered);
         into.journal.noticed.AddRange(journal.Noticed);
+        into.journal.seen.AddRange(journal.Seen);
         foreach (KeyValuePair<string, float> fish in journal.BiggestFish)
         {
             into.journal.biggestFish.Add(new AmountSaveData { id = fish.Key, amount = (int)Math.Round(fish.Value * 10f) });
@@ -940,6 +941,7 @@ public static class SaveMapper
         progress.Journal.Restore(journal.read ?? new List<string>(), journal.announced ?? new List<string>(), journal.found ?? new List<string>(), journal.killedBy ?? new List<string>(), raids, string.IsNullOrEmpty(journal.pinned) ? null : journal.pinned,
             journal.tried ?? new List<string>(), journal.discovered ?? new List<string>());
         progress.Journal.RestoreNoticed(journal.noticed);
+        progress.Journal.RestoreSeen(journal.seen);
         foreach (AmountSaveData fish in journal.biggestFish ?? new List<AmountSaveData>())
         {
             progress.Journal.NoteCatch(fish.id, fish.amount / 10f, out _);

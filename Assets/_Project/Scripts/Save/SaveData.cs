@@ -304,6 +304,8 @@ public sealed class JournalSaveData
     public List<string> discovered = new List<string>();
     /// <summary>The world's curious places already thought about (CuriousPlace). Missing in older saves.</summary>
     public List<string> noticed = new List<string>();
+    /// <summary>Named places seen from a lookout (on the map in grey until walked to). Missing in older saves.</summary>
+    public List<string> seen = new List<string>();
     /// <summary>The biggest of each kind of fish caught, in cm (id, amount as cm x 10). Missing in older saves.</summary>
     public List<AmountSaveData> biggestFish = new List<AmountSaveData>();
 }

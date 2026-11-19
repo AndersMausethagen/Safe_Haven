@@ -54,6 +54,8 @@ public sealed class WorldMapHud : MonoBehaviour
     private static readonly Color BorderColour = new Color(1f, 1f, 1f, 1f);
     private static readonly Color RegionColour = new Color(0.19f, 0.15f, 0.115f, 0.82f);
     private static readonly Color PlaceColour = new Color(0.30f, 0.17f, 0.09f, 1f);
+    // Seen from a lookout, not yet walked to: the same ink, faded (Docs/HavenExplorationReview_2026-11-19.md §1).
+    private static readonly Color SeenColour = new Color(0.30f, 0.26f, 0.22f, 0.55f);
     private static readonly Color PlayerColour = new Color(0.62f, 0.14f, 0.09f, 1f);
     private const float PlaceLabelWide = 150f;
     private const float PlaceLabelHigh = 17f;
@@ -654,7 +656,10 @@ public sealed class WorldMapHud : MonoBehaviour
             // Held lands in the accent, the one the forest pushes on in warning, the wild as the map's own ink.
             bool pushed = lands.Incursion != null && lands.Incursion.Region == name;
             regionLabels[i].color = pushed ? style.Warning : lands.IsClaimed(name) ? style.Accent : RegionColour;
-            regionLabels[i].text = pushed ? name.ToUpperInvariant() + "  !" : name.ToUpperInvariant();
+            // What is left to find there, once one of its places is (§6): the map keeps a ledger.
+            int all = Territory.PlacesIn(name).Count, found = all > 0 ? Territory.PlacesFound(name) : 0;
+            string ledger = found > 0 ? $"  {found}/{all}" : "";
+            regionLabels[i].text = (pushed ? name.ToUpperInvariant() + "  !" : name.ToUpperInvariant()) + ledger;
         }
 
         foreach ((string region, RectTransform root) in stoneMarks)
@@ -689,15 +694,19 @@ public sealed class WorldMapHud : MonoBehaviour
         foreach ((WorldAtlas.Place place, RectTransform root) in placeMarks)
         {
             bool found = record.HasDiscovered(place.id);
-            if (root.gameObject.activeSelf != found)
+            bool seen = !found && record.HasSeen(place.id);
+            if (root.gameObject.activeSelf != (found || seen))
             {
-                root.gameObject.SetActive(found);
+                root.gameObject.SetActive(found || seen);
             }
 
-            if (!found)
+            if (!found && !seen)
             {
                 continue;
             }
+
+            root.GetChild(0).GetComponent<Image>().color = found ? PlaceColour : SeenColour;
+            root.GetChild(1).GetComponent<TMP_Text>().color = found ? PlaceColour : SeenColour;
 
             root.anchoredPosition = OnMap(place.at, width, height);
             // A name that would print over one already placed goes above its star instead, then further out.

@@ -119,8 +119,13 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     [Header("What holding gives")]
     [SerializeField, Min(0)] private int heldRenown = 6;
     [SerializeField, Min(0)] private int secureRenown = 12;
-    [Tooltip("Insight for each named place found.")]
-    [SerializeField, Min(0)] private int findInsight = 25;
+    [Tooltip("Insight for each named place found, plus one for each Find Insight Metres it lies from the portal (Docs/" +
+             "HavenExplorationReview_2026-11-19.md §6: a place 575 m out paid what one in the meadows did): 18 in the meadows, 48 at 575 m.")]
+    [SerializeField, Min(0)] private int findInsight = 10;
+    [SerializeField, Min(1f)] private float findInsightMetres = 15f;
+    [Tooltip("Renown for the land known: this much for each named place found, to at most Known Land Most.")]
+    [SerializeField, Min(0)] private int knownLandRenown = 1;
+    [SerializeField, Min(0)] private int knownLandMost = 30;
 
     [Header("The story (the portal's word after the third raid: Docs/Territory.md)")]
     [Tooltip("The quest that opens the stones: until it starts, every stone is cold. Empty: open from the start.")]
@@ -187,6 +192,11 @@ public sealed class TerritorySettings : GameSettings<TerritorySettings>
     public int HeldRenown => heldRenown;
     public int SecureRenown => secureRenown;
     public int FindInsight => findInsight;
+    public int KnownLandRenown => knownLandRenown;
+    public int KnownLandMost => knownLandMost;
+
+    /// <summary>Insight for finding a place <paramref name="metres"/> from the portal.</summary>
+    public int FindInsightAt(float metres) => findInsight + Mathf.RoundToInt(Mathf.Max(0f, metres) / findInsightMetres);
     public IReadOnlyList<RegionInfo> Regions => regions;
 
     /// <summary>What is written of a region, or null for one not described (the Haven's own meadows).</summary>

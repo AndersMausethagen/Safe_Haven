@@ -410,7 +410,8 @@ public static class Territory
     /// <summary>A named place found (PlaceDiscovery): Insight, and a firmer hold on its region if it is the Haven's.</summary>
     public static void PlaceFound(WorldAtlas.Place place)
     {
-        ExperienceTracker.GrantInsight(Settings.FindInsight);
+        // The portal stands at the world's origin (the Haven rework centred the terrain on it).
+        ExperienceTracker.GrantInsight(Settings.FindInsightAt(place.at.magnitude));
         WorldAtlas atlas = Atlas;
         string region = atlas != null ? atlas.RegionAt(new Vector3(place.at.x, 0f, place.at.y))?.name : null;
         if (!State.IsClaimed(region))

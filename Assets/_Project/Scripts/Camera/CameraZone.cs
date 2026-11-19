@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// A place that changes how the camera frames the player while they are in it: a box (its Size, turned with the object)
@@ -15,7 +15,7 @@ public sealed class CameraZone : MonoBehaviour
     [Tooltip("Metres inside the edge over which it fades in: walking in, the camera changes gradually.")]
     [SerializeField, Min(0f)] private float softEdge = 4f;
     [Tooltip("The camera's distance as a share of the usual: 0.7 comes 30% closer, 1.2 goes out.")]
-    [SerializeField, Range(0.3f, 1.5f)] private float distance = 0.75f;
+    [SerializeField, Range(0.3f, 2f)] private float distance = 0.75f;
     [Tooltip("Degrees added to the camera's pitch: negative looks flatter across the ground (faces show), positive more from above.")]
     [SerializeField, Range(-30f, 30f)] private float tilt = -8f;
     [Tooltip("Seconds the change takes as the player walks in or out.")]
@@ -32,7 +32,7 @@ public sealed class CameraZone : MonoBehaviour
     public float Distance
     {
         get => distance;
-        set => distance = Mathf.Clamp(value, 0.3f, 1.5f);
+        set => distance = Mathf.Clamp(value, 0.3f, 2f);
     }
 
     public float Tilt

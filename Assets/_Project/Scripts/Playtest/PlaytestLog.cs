@@ -57,6 +57,14 @@ public static class PlaytestLog
     /// <summary>Where the player stands in a raid, every few seconds (subject: x;z in metres; detail: the raid): for heatmaps of where
     /// players really go (Docs/WorldDesignReview_2026-11-17.md).</summary>
     public const string Position = "Position";
+    /// <summary>A named place found (subject its id, amount metres from the portal, detail its region).</summary>
+    public const string PlaceFound = "PlaceFound";
+    /// <summary>A region of the Haven's land walked into (subject its name).</summary>
+    public const string RegionEntered = "RegionEntered";
+    /// <summary>A lookout looked out from (subject its place, amount the places it marked, detail first or again).</summary>
+    public const string LookoutUsed = "LookoutUsed";
+    /// <summary>A thing left at a place taken (subject the place, amount how many, detail the item).</summary>
+    public const string PlaceFindTaken = "PlaceFindTaken";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
     /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>

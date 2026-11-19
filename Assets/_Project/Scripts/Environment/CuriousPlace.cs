@@ -31,6 +31,7 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
     [SerializeField, Min(0.1f)] private float easeSeconds = 1.2f;
 
     private int next;
+    private bool remember;
     private float holdUntil = -1f;
     private float weight;
     private Interactable interactable;
@@ -40,6 +41,17 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
 
     /// <summary>What it says, for the builder and tests.</summary>
     public IReadOnlyList<string> Thoughts => thoughts;
+
+    /// <summary>Sets it up from code (a Haven place's thoughts, HavenPlaceVerbs). <paramref name="remembered"/>: kept in the character's
+    /// journal across loads, as a stone's are, though it has nothing to press.</summary>
+    public void Configure(string shownName, string[] lines, float radius, bool remembered)
+    {
+        placeName = shownName ?? "";
+        thoughts = lines ?? System.Array.Empty<string>();
+        noticeRadius = Mathf.Max(1f, radius);
+        remember = remembered;
+        key = null;
+    }
 
     // Made once: built anew it was two strings a frame for every such place.
     private string key;
@@ -101,7 +113,7 @@ public sealed class CuriousPlace : MonoBehaviour, IInteractionName, IInteraction
     }
 
     // The world's stones are the character's to remember; a raid site only this session.
-    private bool Remembered => interactable != null && GameSession.Progress != null;
+    private bool Remembered => (interactable != null || remember) && GameSession.Progress != null;
 
     private bool WasNoticed() => Remembered ? GameSession.Progress.Journal.HasNoticed(Key) : Noticed.Contains(Key);
 
