@@ -321,9 +321,18 @@ public sealed class InGameCinematic : MonoBehaviour
         return float.NegativeInfinity;
     }
 
-    /// <summary>Which way the game's camera faces now, about up (0 north): what Game View shots are framed in.</summary>
+    /// <summary>
+    /// Which way the player's view faces, about up (0 north): what Game View shots are framed in. The player camera's own orbit,
+    /// not Camera.main, which shows whatever the brain blends (a cinematic gliding out, a conversation's close-up, a shake).
+    /// The main camera only where there is no player camera (the editor's previews).
+    /// </summary>
     public static float GameViewYaw()
     {
+        if (PlayerCameraController.Current != null)
+        {
+            return PlayerCameraController.Current.ViewYaw;
+        }
+
         Camera main = Camera.main;
         return main != null ? main.transform.eulerAngles.y : 0f;
     }
@@ -392,8 +401,9 @@ public sealed class InGameCinematic : MonoBehaviour
 
             CameraShot.Anchor at = CameraShot.Anchor.Of(shot.subject);
             CameraShot.Anchor looked = shot.lookAt != null ? CameraShot.Anchor.Of(shot.lookAt) : at;
-            CameraShot.Pose start = shot.Evaluate(at, looked, 0f, GameViewYaw());
-            CameraShot.Pose end = shot.Evaluate(at, looked, 1f, GameViewYaw());
+            float frameYaw = playing == this ? viewYaw : GameViewYaw();
+            CameraShot.Pose start = shot.Evaluate(at, looked, 0f, frameYaw);
+            CameraShot.Pose end = shot.Evaluate(at, looked, 1f, frameYaw);
             Gizmos.color = new Color(1f, 0.75f, 0.3f);
             Gizmos.DrawLine(start.Position, end.Position);
             Gizmos.DrawWireSphere(start.Position, 0.25f);

@@ -355,7 +355,7 @@ public sealed class DialogueBox : MonoBehaviour
         Sprite still = speaker.Portrait != null ? speaker.Portrait : PaintedPortraitOf(speaker.Model);
         if (bubbled)
         {
-            bubble.Show(speaker.Name, line, shownOver, still);
+            bubble.Show(speaker.Name, lineLabel.text, shownOver, still);
             activeLine = bubble.Line;
             activeHint = bubble.Hint;
         }

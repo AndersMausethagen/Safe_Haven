@@ -92,6 +92,8 @@ public sealed class SpeechBubble : MonoBehaviour
         portraitFrame.gameObject.SetActive(pictured);
         portraitImage.sprite = portrait;
         portraitFrame.anchoredPosition = new Vector2(PaddingX, -PaddingTop);
+        // The hint keeps to the text's column, off the painting.
+        hintLabel.rectTransform.sizeDelta = new Vector2(Mathf.Min(160f, width), HintHeight);
         group.alpha = 1f;
         Place();
     }

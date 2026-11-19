@@ -29,6 +29,10 @@ public sealed class PlayerCameraController : MonoBehaviour
     /// <summary>The scene's player camera rig, while it is enabled; null in scenes without one.</summary>
     public static PlayerCameraController Current { get; private set; }
 
+    /// <summary>The way the player's own view faces about up (their orbit), without a conversation's close-up, a shake or a
+    /// cinematic's camera: what a cinematic's Game View shots are framed in.</summary>
+    public float ViewYaw => yaw;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 

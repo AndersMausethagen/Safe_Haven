@@ -636,6 +636,7 @@ public sealed class PrologueMeadowTests
             Assert.IsNotNull(tell, "Sigrid's topic raises it");
             Assert.AreEqual("CatchBreath", tell.onlyDuring?.name, "offered only during the rest");
             Assert.IsTrue(warmth.Nodes.OfType<RaiseQuestEventNode>().Any(n => n.questEvent == rested), "it ends the rest");
+            Assert.IsNotEmpty(warmth.Nodes.OfType<WaitNode>(), "a breath before the wolves");
             Assert.IsTrue(warmth.Nodes.OfType<WaitNode>().All(w => w.seconds <= 10f), "the wolves come soon after, not on a long clock");
             foreach (QuestGiver giver in givers)
             {
