@@ -31,6 +31,9 @@ public sealed class PlayerMovementSettings : ScriptableObject
     [SerializeField, Min(0f)] private float dodgeInvulnerability = 0.28f;
     [Tooltip("Seconds from the start of a dodge until the next one.")]
     [SerializeField, Min(0f)] private float dodgeCooldown = 0.9f;
+    [Tooltip("A dodge pressed this close to the cooldown's end is kept and goes the moment it ends; one pressed earlier is refused with " +
+             "a sound. It was dropped silently (Docs/CombatFeelReview_2026-11-19.md §6).")]
+    [SerializeField, Range(0f, 0.5f)] private float dodgeCooldownBuffer = 0.2f;
 
     [Tooltip("Per game state multipliers. A state without an entry uses 1.")]
     [SerializeField] private GameStateModifier[] stateModifiers =
@@ -81,6 +84,7 @@ public sealed class PlayerMovementSettings : ScriptableObject
     public float DodgeDuration => dodgeDuration;
     public float DodgeInvulnerability => dodgeInvulnerability;
     public float DodgeCooldown => dodgeCooldown;
+    public float DodgeCooldownBuffer => dodgeCooldownBuffer;
 
     [Header("Water (wading and swimming, see PlayerSwimming)")]
     [Tooltip("Water this deep at the feet (metres) starts to slow the player.")]

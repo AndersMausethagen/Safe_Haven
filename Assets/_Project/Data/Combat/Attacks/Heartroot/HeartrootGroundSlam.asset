@@ -26,14 +26,14 @@ MonoBehaviour:
   hitDelay: 1.15
   recoveryTime: 1.9
   poiseDamage: 10
-  impact: 1
+  impact: 2
   lunge: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
   groundImpact: {fileID: 11400000, guid: ed7f5e7bd82a4b044a56c77f7d0d3761, type: 2}
   unblockable: 0
-  pull: 0
+  pull: -1
   windupMove: -1
   afterContactMove: -1
   windupTurnRate: -1

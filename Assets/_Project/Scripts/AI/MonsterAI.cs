@@ -131,6 +131,11 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     // Close strikes at the player don't start together: shared by every monster.
     private static float nextTurnAt;
 
+    /// <summary>No close strike at the player starts before <paramref name="until"/> (game time): the player flinching, with nothing
+    /// to answer a blow with (PlayerCombat; Docs/CombatFeelReview_2026-11-19.md §5). In co-op the host's creatures go by the host's own
+    /// flinch only.</summary>
+    public static void HoldTurns(float until) => nextTurnAt = Mathf.Max(nextTurnAt, until);
+
     private MonsterIdleLife idleLife;
     private MonsterIdleDriver idleDriver;
     private MonsterPositioning positioning;

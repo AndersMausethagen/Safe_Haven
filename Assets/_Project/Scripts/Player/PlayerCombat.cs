@@ -313,7 +313,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);
 
     /// <summary>A dodge can't cut a swing short before it lands (unless the settings allow it): swings are commitments.</summary>
-    public bool CanDodge => !IsFlinching && (activeKind == SwingKind.None || !hitPending || Rules.DodgeCancelsWindup);
+    public bool CanDodge => (!IsFlinching || InCuttableFlinchTail) && (activeKind == SwingKind.None || !hitPending || Rules.DodgeCancelsWindup);
 
     /// <summary>True for a moment after a hit got through: the player reels and can't act.</summary>
     public bool IsFlinching => Time.time < flinchUntil;

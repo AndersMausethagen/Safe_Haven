@@ -62,6 +62,12 @@ public sealed class AttackTelegraph : MonoBehaviour
     private MeshRenderer openingRenderer;
     private MaterialPropertyBlock openingBlock;
     private float bodyRadius = 0.5f;
+    private MeshFilter lineFilter;
+    private MeshRenderer lineRenderer;
+    private MaterialPropertyBlock lineBlock;
+    // When this strike's glint and ting come (its own clock, which stops while it holds), and whether it is aimed at this game's player.
+    private float cueAt;
+    private bool atMe;
 
     private void Awake()
     {
@@ -145,8 +151,60 @@ public sealed class AttackTelegraph : MonoBehaviour
         // moment before Hit Delay is no time to parry them (a guard raised on that cue blocks instead).
         cuesParry = ai.ActiveAction == null || (ai.ActiveAction.kind != MonsterAttackKind.Charge && !MonsterAttacks.IsRanged(ai.ActiveAction.kind));
         ShowHeavy();
+        PlanParryCue();
         Place();
         UpdateFill(0f);
+    }
+
+    /// <summary>
+    /// When a strike's parry cue comes, on its own clock (Docs/CombatFeelReview_2026-11-19.md §2): <paramref name="lead"/> before its parry
+    /// window opens when it is aimed at this game's player and there is room for that, else as the window opens. A strike that may hold
+    /// its wind-up never cues before its hold point, so a hold still baits a guard. Below 0: no cue (no window to cue).
+    /// </summary>
+    public static float ParryCueAt(float hitDelay, float window, float lead, bool atMe, bool mayHold)
+    {
+        if (window <= 0f || hitDelay <= window)
+        {
+            return -1f;
+        }
+
+        float at = hitDelay - window - (atMe && hitDelay > window + lead ? lead : 0f);
+        // Just past the hold point: the strike's clock stands still there while it holds.
+        return mayHold ? Mathf.Max(at, hitDelay * MonsterAttacks.HoldAtShare + 0.02f) : at;
+    }
+
+    /// <summary>Where the fill stands, as a share of the strike's reach, in the middle of its parry window: the parry line's radius.</summary>
+    public static float ParryLineAt(float hitDelay, float window) => hitDelay > 0f ? Mathf.Clamp01(1f - window * 0.5f / hitDelay) : 1f;
+
+    // The parry line and the lead cue: only on a strike that can be parried and is aimed at this game's player, so a crowd doesn't fill
+    // with lines and tings; another's strike still glints as its window opens.
+    private void PlanParryCue()
+    {
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
+        Player me = Player.Current;
+        atMe = me != null && me.Health != null && ReferenceEquals(ai.Target, me.Health);
+        bool parriable = cuesParry && !attack.Unblockable;
+        bool mayHold = ai.ActiveAction != null && ai.ActiveAction.kind == MonsterAttackKind.Melee && ai.ActiveAction.holdChance > 0f
+            && ai.ActiveAction.attack == attack;
+        cueAt = parriable ? ParryCueAt(attack.HitDelay, window, feel.ParryCueLead, atMe, mayHold) : -1f;
+        bool line = parriable && atMe && feel.ParryLineAlpha > 0f && attack.HitDelay > window + feel.ParryCueLead;
+        lineFilter.gameObject.SetActive(line);
+        if (!line)
+        {
+            return;
+        }
+
+        lineFilter.sharedMesh = GroundMarks.BandFor(feel, attack.Arc, feel.ParryLineWidth);
+        float radius = ParryLineAt(attack.HitDelay, window);
+        lineFilter.transform.localScale = new Vector3(radius, 1f, radius);
+        GroundMarks.Ground(lineBlock, transform.position);
+        GroundMarks.Shape(lineBlock, attack.Arc, 1f - feel.ParryLineWidth, 0f, GroundMarks.Pattern.Solid, 0f);
+        Color color = feel.ParryCueColor;
+        color.a = feel.ParryLineAlpha;
+        lineBlock.SetColor(BaseColorId, color);
+        lineBlock.SetColor(ColorId, color);
+        lineRenderer.SetPropertyBlock(lineBlock);
     }
 
     // A heavy strike's dark edge round its area, and the low swell under its wind-up.
@@ -209,20 +267,30 @@ public sealed class AttackTelegraph : MonoBehaviour
         UpdateParryCue(elapsed);
     }
 
-    // The last moment before the hit is the time to raise the guard: the fill turns the parry color and the attacker glints.
+    // The last moment before the hit is the time to raise the guard: the fill turns the parry color as the window opens. The attacker glints
+    // (and, at this game's player, tings) a little before that, at cueAt, since nobody reacts inside the window itself.
     private void UpdateParryCue(float elapsed)
     {
-        float window = CombatTechniqueSettings.Current.ParryWindow * GameOptions.TimingShare;
-        if (cued || !cuesParry || attack.Unblockable || window <= 0f || attack.HitDelay <= window || elapsed < attack.HitDelay - window || elapsed >= attack.HitDelay)
+        if (elapsed >= attack.HitDelay && lineFilter.gameObject.activeSelf)
+        {
+            lineFilter.gameObject.SetActive(false);
+        }
+
+        if (cued || cueAt < 0f || ai.IsHoldingStrike || elapsed < cueAt || elapsed >= attack.HitDelay)
         {
             return;
         }
 
         cued = true;
-        GameObject glint = CombatFeelSettings.Current.ParryCueEffect;
-        if (glint != null)
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        if (feel.ParryCueEffect != null)
         {
-            PrefabPool.Spawn(glint, transform.position + Vector3.up * 1.6f, Quaternion.identity);
+            PrefabPool.Spawn(feel.ParryCueEffect, transform.position + Vector3.up * 1.6f, Quaternion.identity);
+        }
+
+        if (atMe && feel.ParryCueSound != null)
+        {
+            AudioManager.Play(feel.ParryCueSound, transform.position + Vector3.up * 1.6f);
         }
     }
 
@@ -301,6 +369,11 @@ public sealed class AttackTelegraph : MonoBehaviour
         edgeFilter.transform.localPosition = Vector3.up * 0.02f;
         edgeRenderer.sortingOrder = 2;
         edgeFilter.gameObject.SetActive(false);
+        // Above the fill, so the front is seen to cross it.
+        lineFilter = CreatePart("Parry Line", marker, feel, feel.ParryCueColor, out lineRenderer, out lineBlock);
+        lineFilter.transform.localPosition = Vector3.up * 0.03f;
+        lineRenderer.sortingOrder = 3;
+        lineFilter.gameObject.SetActive(false);
         marker.gameObject.SetActive(false);
         return true;
     }

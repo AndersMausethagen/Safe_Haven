@@ -29,6 +29,9 @@ public sealed class HitReaction : MonoBehaviour
 
     private readonly List<Renderer> renderers = new List<Renderer>();
     private MaterialPropertyBlock block;
+    // Each renderer's own property block while the flash is on, put back when it ends (an elite's ring keeps its colour).
+    private readonly Dictionary<Renderer, MaterialPropertyBlock> ownBlocks = new Dictionary<Renderer, MaterialPropertyBlock>();
+    private bool flashing;
     private NavMeshAgent agent;
     private Damageable health;
     private Vector3 baseScale;
@@ -73,20 +76,62 @@ public sealed class HitReaction : MonoBehaviour
             punchStart = now;
         }
 
-        float distance = (result.IsCritical || result.Killed ? feel.KnockbackDistanceCrit : feel.KnockbackDistance) * knockbackScale;
+        float distance = KnockbackFor(damage, result, this) * knockbackScale;
         if (distance > 0f && agent != null && health != null && health.IsAlive)
         {
             Vector3 direction = damage.Direction;
             direction.y = 0f;
             if (direction.sqrMagnitude > 0.0001f)
             {
-                knockbackVelocity = direction.normalized * (distance / feel.KnockbackSeconds);
-                knockbackUntil = Time.time + feel.KnockbackSeconds;
+                float seconds = KnockbackSecondsFor(distance);
+                knockbackVelocity = direction.normalized * (distance / seconds);
+                knockbackUntil = Time.time + seconds;
             }
         }
 
         enabled = true;
     }
+
+    /// <summary>
+    /// How far a blow shoves the body it lands on, in metres, before the body's own Knockback Scale: by the blow's weight (its Impact,
+    /// to the power 1.5), its technique and the body (Docs/CombatFeelReview_2026-11-19.md §4). It was 0.35 m, or 0.8 m on a critical,
+    /// whatever struck what: a dagger's sure critical shoved a troll further than a warhammer's heavy shoved a rootling. A dagger's stab
+    /// now moves a body about 0.18 m, a sword's slash 0.35, a hammer's heavy 1.0, its charged blow or art up to Knockback Most; a
+    /// heavyweight takes Knockback Heavyweight Share of it and a boss nothing. The chasm's push off an edge reads the same rule.
+    /// </summary>
+    public static float KnockbackFor(in DamageInfo damage, in DamageResult result, Component target)
+    {
+        CombatFeelSettings feel = CombatFeelSettings.Current;
+        if (feel == null)
+        {
+            return 0f;
+        }
+
+        if (target != null && target.TryGetComponent(out BossEncounter _))
+        {
+            return 0f;
+        }
+
+        float impact = damage.Attack != null ? damage.Attack.Impact : 1f;
+        HitTechnique kind = damage.Technique;
+        bool art = (kind & HitTechnique.WeaponArt) != 0;
+        bool heavy = (kind & (HitTechnique.Heavy | HitTechnique.Finisher)) != 0;
+        float technique = art ? feel.KnockbackArt : heavy ? feel.KnockbackHeavy
+            : (kind & (HitTechnique.Counter | HitTechnique.GuardCounter)) != 0 ? feel.KnockbackCounter : 1f;
+        float metres = feel.KnockbackDistance * Mathf.Pow(Mathf.Max(0f, impact), 1.5f) * technique * (result.IsCritical ? feel.KnockbackCritShare : 1f);
+        // A heavy that isn't charged keeps the body near enough for its follow-up to reach (a chain's step closes about a metre).
+        float most = heavy && !art && impact < 2f ? Mathf.Min(1f, feel.KnockbackMost) : feel.KnockbackMost;
+        metres = Mathf.Min(metres, most);
+        if (target != null && target.TryGetComponent(out MonsterAI monster) && monster.IsHeavyweight)
+        {
+            metres *= feel.KnockbackHeavyweightShare;
+        }
+
+        return metres;
+    }
+
+    /// <summary>How long a shove of <paramref name="metres"/> takes: a short shove snaps, a long one carries.</summary>
+    public static float KnockbackSecondsFor(float metres) => 0.10f + 0.05f * metres;
 
     private void Initialise()
     {
@@ -102,8 +147,10 @@ public sealed class HitReaction : MonoBehaviour
         foreach (Renderer candidate in GetComponentsInChildren<Renderer>(true))
         {
             // Effects and ground markers (telegraphs, trails, particles) shouldn't flash with the body.
+            // Nor an outline's copies or a label's text (the elite's name), which flashed white too.
             if (candidate is ParticleSystemRenderer || candidate is TrailRenderer || candidate is LineRenderer
-                || candidate.GetComponentInParent<AttackTelegraph>() != null)
+                || candidate.GetComponentInParent<AttackTelegraph>() != null || OutlineCopies.IsCopy(candidate)
+                || candidate.GetComponent<TMPro.TMP_Text>() != null)
             {
                 continue;
             }
@@ -230,6 +277,23 @@ public sealed class HitReaction : MonoBehaviour
 
             if (on)
             {
+                // Its own block first (an elite's affix ring takes its colour from one), kept to put back: clearing it left the ring
+                // in the telegraph material's colour after the first blow (Docs/CombatFeelReview_2026-11-19.md §13).
+                if (!flashing && target.HasPropertyBlock())
+                {
+                    if (!ownBlocks.TryGetValue(target, out MaterialPropertyBlock own))
+                    {
+                        own = new MaterialPropertyBlock();
+                        ownBlocks[target] = own;
+                    }
+
+                    target.GetPropertyBlock(own);
+                }
+                else if (!flashing)
+                {
+                    ownBlocks.Remove(target);
+                }
+
                 block.Clear();
                 block.SetColor(BaseColorId, color);
                 block.SetColor(ColorId, color);
@@ -238,8 +302,10 @@ public sealed class HitReaction : MonoBehaviour
             }
             else
             {
-                target.SetPropertyBlock(null);
+                target.SetPropertyBlock(ownBlocks.TryGetValue(target, out MaterialPropertyBlock own) ? own : null);
             }
         }
+
+        flashing = on;
     }
 }

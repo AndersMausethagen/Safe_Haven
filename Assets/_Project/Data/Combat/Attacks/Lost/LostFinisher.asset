@@ -26,7 +26,7 @@ MonoBehaviour:
   hitDelay: 0.8
   recoveryTime: 1.4
   poiseDamage: 22
-  impact: 1.15
+  impact: 1.3
   lunge: 1.5
   staminaCost: -1
   appliesStatus: {fileID: 0}

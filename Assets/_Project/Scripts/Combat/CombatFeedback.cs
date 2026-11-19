@@ -170,8 +170,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         HitReaction.For(victim).Play(damage, result);
         bool structure = victim.Category == TargetCategory.Structure;
+        // The guard counter ("a hard answer") is a strong blow too: it landed like a light one (Docs/CombatFeelReview_2026-11-19.md §7).
         bool strong = result.IsCritical
-            || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter | HitTechnique.Backstab | HitTechnique.WeaponArt)) != 0;
+            || (damage.Technique & (HitTechnique.Heavy | HitTechnique.Finisher | HitTechnique.Counter | HitTechnique.Backstab | HitTechnique.WeaponArt
+                | HitTechnique.GuardCounter)) != 0;
         float impact = damage.Attack != null ? damage.Attack.Impact : 1f;
         float force = StrikeRules.HitForce(result.Damage / victim.MaxHealth, impact, strong, result.Killed);
         if (!result.Blocked)
@@ -227,8 +229,10 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
         {
             if (!result.Blocked)
             {
-                HitStop(feel.HitStopWhenHurt);
-                CameraShake.Add(feel.ShakeWhenHurt);
+                // By the blow's own Impact: a rootling's grasp and a troll's stomp landed alike, and a wolf's nip shook the screen harder
+                // than the player's own kills (Docs/CombatFeelReview_2026-11-19.md §3).
+                HitStop(feel.HitStopWhenHurt * impact);
+                CameraShake.Add(feel.ShakeWhenHurt * impact);
                 if (playerCombat != null && playerCombat.IsPushingThrough)
                 {
                     // Taken on the swing: it goes on.
@@ -243,25 +247,31 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
 
         if (damage.Source != null && Player.IsPlayer(damage.Source.gameObject))
         {
-            float extra = (damage.Technique & (HitTechnique.Backstab | HitTechnique.WeaponArt)) != 0 ? 1.75f
-                : (damage.Technique & (HitTechnique.Heavy | HitTechnique.Counter)) != 0 ? 1.5f
+            float technique = (damage.Technique & (HitTechnique.Backstab | HitTechnique.WeaponArt)) != 0 ? 1.75f
+                : (damage.Technique & (HitTechnique.Heavy | HitTechnique.Counter | HitTechnique.GuardCounter)) != 0 ? 1.5f
                 : (damage.Technique & HitTechnique.Finisher) != 0 ? 1.25f : 1f;
             // A dagger's nick and a warhammer's blow don't land alike; the attack's Impact says how they differ.
-            extra *= impact;
-            float stop = (result.Killed ? feel.HitStopOnKill : strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra;
+            float extra = technique * impact;
+            // A kill takes the kill's stop and at most a finisher's technique on top: an art's or a backstab's kill multiplied twice
+            // (455 ms per body for the hammer art).
+            float stop = result.Killed ? feel.HitStopOnKill * Mathf.Min(technique, 1.25f) * impact
+                : (strong ? feel.HitStopOnCrit : feel.HitStopOnHit) * extra;
+            stop = Mathf.Min(stop, result.Killed ? feel.KillStopCeiling : feel.StopCeiling);
             // The blow that toppled a boss (MonsterAI heard it first) holds twice as long: the moment the work paid off.
             if (!result.Killed && victim.TryGetComponent(out MonsterAI toppled) && toppled.ToppledThisFrame)
             {
                 stop *= 2f;
             }
 
+            float trauma = (result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra;
+            stop = SwingStop(stop, damage.Technique, ref trauma);
             HitStop(stop);
             if (result.Killed)
             {
                 GreatBlow(victim, damage);
             }
 
-            CameraShake.Add((result.Killed ? feel.ShakeOnKill : strong ? feel.ShakeOnCrit : feel.ShakeOnHit) * extra);
+            CameraShake.Add(trauma);
             // The struck body shudders through the moment; hosting co-op, time can't stop, so its animation holds and the swing slows.
             if (!result.Killed && GameOptions.HitStop.On)
             {
@@ -273,6 +283,40 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 }
             }
         }
+    }
+
+    // One stop per swing (Docs/CombatFeelReview_2026-11-19.md §1): each body a sweep reached started a freeze of its own after the last
+    // had ended, so a pack strobed (up to 4 × 455 ms for the hammer art). The first body of a swing (or of a cast's fan) gets its stop;
+    // each further one lengthens that stop by Extra Target Share of it, to at most Most Per Swing, and adds that share of its shake.
+    // Arrows and thrown weapons land seconds apart and keep one each. Returns the stop to ask for now.
+    private float swingKey = float.NaN;
+    private float swingStopBegan;
+    private float swingFirstStop;
+    private int swingTargets;
+    private const float SwingMergeSeconds = 0.4f;
+
+    private float SwingStop(float stop, HitTechnique technique, ref float trauma)
+    {
+        bool swing = playerCombat != null && (technique & (HitTechnique.Melee | HitTechnique.Spell)) != 0;
+        if (!swing)
+        {
+            return stop;
+        }
+
+        float key = playerCombat.SwingStartTime;
+        if (Mathf.Approximately(key, swingKey) && Time.unscaledTime - swingStopBegan < SwingMergeSeconds)
+        {
+            swingTargets++;
+            float merged = swingFirstStop * Mathf.Min(1f + feel.ExtraTargetShare * swingTargets, feel.MostPerSwing);
+            trauma *= feel.ExtraTargetShare;
+            return swingStopBegan + merged - Time.unscaledTime;
+        }
+
+        swingKey = key;
+        swingStopBegan = Time.unscaledTime;
+        swingFirstStop = stop;
+        swingTargets = 0;
+        return stop;
     }
 
     // The "boss stop" (Docs/LookAndFeelResearch_2026-11-18.md V6): the blow that fells a boss holds far longer than any other and the
@@ -378,11 +422,19 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
             case GuardOutcome.Blocked:
                 Spawn(feel.BlockEffect, point, -damage.Direction);
                 AudioManager.Play(Sounds != null ? Sounds.Block : null, point);
-                HitStop(feel.HitStopOnHit);
-                CameraShake.Add(feel.ShakeOnHit);
+                // Only a block the player is in stops time: a companion's block across the clearing froze the player's fight too.
+                bool playersBlock = Player.Current != null && (victim == Player.Current.Health
+                    || (damage.Source != null && Player.IsPlayer(damage.Source.gameObject)));
+                if (playersBlock)
+                {
+                    HitStop(feel.HitStopOnHit);
+                    CameraShake.Add(feel.ShakeOnHit);
+                }
+
                 break;
             case GuardOutcome.Parried:
-                if (Player.Current != null && victim == Player.Current.Health)
+                bool playerParried = Player.Current != null && victim == Player.Current.Health;
+                if (playerParried)
                 {
                     ControllerRumble.Pulse(ControllerSettings.Current.ParryPulse);
                 }
@@ -391,6 +443,11 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
                 AudioManager.Play(Sounds != null ? Sounds.Parry : null, point);
                 CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
                 SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
+                // The player's parry lands as hard as a heavy blow; a monster's parry of the player keeps the small hitch above.
+                if (playerParried)
+                {
+                    HitStop(rules.ParryStop);
+                }
                 CameraShake.Add(feel.ShakeOnCrit);
                 Callout(victim, feel.ParryText);
                 // The flash is the player's reward; a monster's parry is the player's bad luck.
@@ -585,6 +642,8 @@ public sealed class CombatFeedback : MonoBehaviour, IGameSystem
     {
         CombatTechniqueSettings rules = CombatTechniqueSettings.Current;
         SlowTime(rules.SlowMotionScale, rules.SlowMotionSeconds);
+        // A beat of weight, as a parry: it landed lighter than a jab.
+        HitStop(rules.PerfectDodgeStop);
         Spawn(feel.PerfectDodgeEffect, playerCombat.transform.position + Vector3.up * 0.05f, Vector3.forward);
         AudioManager.Play(Sounds != null ? Sounds.PerfectDodge : null, playerCombat.transform.position);
         Callout(playerCombat, feel.PerfectDodgeText);

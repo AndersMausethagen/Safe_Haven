@@ -192,6 +192,14 @@ def parry(rng):
     return darken(mix, top=-2, weight=2)
 
 
+def parry_cue(rng):
+    """The moment to raise the guard, heard a breath before it (Docs/CombatFeelReview_2026-11-19.md §2): two small bright iron partials
+    that die in 70 ms, so it never reads as a parry itself. One take only: a cue must sound the same every time."""
+    seconds = 0.3
+    modes = [(2400.0, 1.0, 0.07), (2400.0 * 1.0016, 0.55, 0.06), (3600.0, 0.6, 0.05), (3600.0 * 1.0021, 0.35, 0.045)]
+    return strike(modes, seconds, 0.00018, rng)
+
+
 def guard_break(rng):
     seconds = 1.2
     split = strike(wood(rng.uniform(150, 200), rng, damp=0.1, count=16), seconds, 0.0012, rng)
@@ -251,7 +259,7 @@ SOUNDS = [
     ("Swing", swing, 4, True), ("Heavy Swing", heavy_swing, 3, True), ("Axe Swing", axe_swing, 3, True), ("Punch Swing", punch_swing, 4, True),
     ("Dodge", dodge, 4, True), ("Perfect Dodge", perfect_dodge, 2, False),
     ("Hit", hit, 8, True), ("Critical Hit", critical_hit, 5, True), ("Axe Hit", axe_hit, 5, True), ("Stab Hit", stab_hit, 5, True), ("Blunt Hit", blunt_hit, 5, True), ("Punch Hit", punch_hit, 5, True), ("Glancing Blow", glancing_blow, 4, True),
-    ("Block", block, 5, True), ("Parry", parry, 5, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True), ("Heavy Windup", heavy_windup, 3, True),
+    ("Block", block, 5, True), ("Parry", parry, 5, True), ("Parry Cue", parry_cue, 1, True), ("Guard Break", guard_break, 4, True), ("Stagger", stagger, 4, True), ("Heavy Windup", heavy_windup, 3, True),
     ("Player Hurt", player_hurt, 6, False), ("Land", land, 4, True),
 ]
 

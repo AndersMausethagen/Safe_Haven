@@ -78,7 +78,8 @@ public sealed class RaidChasm : MonoBehaviour
         }
 
         CombatFeelSettings feel = CombatFeelSettings.Current;
-        float push = (result.IsCritical ? feel.KnockbackDistanceCrit : feel.KnockbackDistance) * reaction.KnockbackScale + EdgeGive;
+        // By the same rule as the shove itself (HitReaction.KnockbackFor): a hammer's heavy sends a body over, a dagger's stab hardly.
+        float push = HitReaction.KnockbackFor(hit, result, body) * reaction.KnockbackScale + EdgeGive;
         Vector3 direction = Vector3.ProjectOnPlane(hit.Direction, Vector3.up);
         if (direction.sqrMagnitude < 0.01f && hit.Source != null)
         {

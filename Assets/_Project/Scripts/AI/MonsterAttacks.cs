@@ -36,7 +36,7 @@ public sealed class MonsterAttacks
     private float trailTravelled;
     private readonly Damageable health;
     // A held wind-up stops here in its fill, before the end, so the blow is plainly still to come.
-    private const float HoldAtShare = 0.6f;
+    public const float HoldAtShare = 0.6f;
 
     /// <summary>The stage of a boss's fight: what it knows so far.</summary>
     public int Phase { get; set; }

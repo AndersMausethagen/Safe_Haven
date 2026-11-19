@@ -21,6 +21,11 @@ public sealed partial class PlayerCombat
         }
 
         lastDodgeDirection = direction;
+        // Out of the flinch's tail (CanDodge let it through): the dodge ends it.
+        if (IsFlinching && flinchCuttable)
+        {
+            flinchUntil = Time.time;
+        }
 
         EndSwing();
         queuedKind = SwingKind.None;
@@ -79,6 +84,7 @@ public sealed partial class PlayerCombat
         pressTime = -1f;
         flinchUntil = Time.time + seconds;
         flinchGraceUntil = flinchUntil + Rules.FlinchGrace;
+        StartFlinch(cuttable: !floored);
         movement.SetSpeedScale(Flinch, floored ? 0f : 0.25f);
         if (floored)
         {
@@ -119,9 +125,26 @@ public sealed partial class PlayerCombat
         pressTime = -1f;
         flinchUntil = Time.time + seconds;
         flinchGraceUntil = flinchUntil + Rules.FlinchGrace;
+        StartFlinch(cuttable: true);
         movement.SetSpeedScale(Flinch, 0.25f);
         Flinched?.Invoke(seconds, lostSwing);
     }
+
+    // A flinch nothing can answer was the pack's free blow (Docs/CombatFeelReview_2026-11-19.md §5): a second wolf's bite landed inside
+    // the 0.45 s when neither dodge nor guard works. No new strike at the player starts until it is over (and Flinch Turn Grace after),
+    // and a dodge may cut a plain flinch short from Flinch Dodge After into it (not a knockdown, nor a parry thrown back: Rebuff).
+    private float flinchStartedAt = float.NegativeInfinity;
+    private bool flinchCuttable;
+
+    private void StartFlinch(bool cuttable)
+    {
+        flinchStartedAt = Time.time;
+        flinchCuttable = cuttable;
+        MonsterAI.HoldTurns(flinchUntil + Rules.FlinchTurnGrace);
+    }
+
+    /// <summary>True in a flinch's tail that a dodge may cut short.</summary>
+    private bool InCuttableFlinchTail => IsFlinching && flinchCuttable && Time.time >= flinchStartedAt + Rules.FlinchDodgeAfter;
 
     /// <summary>Thrown back by a monster's parry of the blow that just landed. The swing has already been spent, so it plays out.</summary>
     public void Rebuff(float seconds)
@@ -129,6 +152,7 @@ public sealed partial class PlayerCombat
         queuedKind = SwingKind.None;
         pressTime = -1f;
         flinchUntil = Time.time + seconds;
+        flinchCuttable = false;
         movement.SetSpeedScale(Flinch, 0.25f);
         Flinched?.Invoke(seconds, false);
     }

@@ -26,7 +26,7 @@ MonoBehaviour:
   hitDelay: 0.5
   recoveryTime: 0.9
   poiseDamage: 10
-  impact: 1
+  impact: 0.7
   lunge: 0
   staminaCost: -1
   appliesStatus: {fileID: 11400000, guid: 89bc0b3576e7cde40a48a2c27f924015, type: 2}
@@ -54,6 +54,7 @@ MonoBehaviour:
   strikeSpeed: 1
   strikeLead: 0
   followThroughSpeed: 1
+  growsFromLight: 1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

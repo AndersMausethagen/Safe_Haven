@@ -249,6 +249,18 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
              "short: a beat of weight, not slow motion.")]
     [SerializeField, Range(0.05f, 1f)] private float slowMotionScale = 0.4f;
     [SerializeField, Min(0f)] private float slowMotionSeconds = 0.09f;
+    [Tooltip("The player's parry holds this long, at the hit stop's speed: the hardest thing in the game landed lighter than a jab " +
+             "(Docs/CombatFeelReview_2026-11-19.md §7). A monster's parry of the player keeps the hitch above.")]
+    [SerializeField, Min(0f)] private float parryStop = 0.12f;
+    [Tooltip("A perfect dodge's stop, on top of the hitch.")]
+    [SerializeField, Min(0f)] private float perfectDodgeStop = 0.08f;
+
+    [Header("Flinch fairness (Docs/CombatFeelReview_2026-11-19.md §5)")]
+    [Tooltip("When the player flinches, no strike at them starts until the flinch is over and this long after: a second bite landed " +
+             "inside it, when nothing could answer it.")]
+    [SerializeField, Min(0f)] private float flinchTurnGrace = 0.2f;
+    [Tooltip("A dodge cuts a flinch short from this far into it (not a knockdown, nor a parry thrown back).")]
+    [SerializeField, Min(0f)] private float flinchDodgeAfter = 0.25f;
 
     [Header("Focus (earned by fighting well, spent on skills)")]
     [SerializeField, Min(1f)] private float focusMax = 100f;
@@ -429,6 +441,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float CounterDamageMultiplier => counterDamageMultiplier;
     public float SlowMotionScale => slowMotionScale;
     public float SlowMotionSeconds => slowMotionSeconds;
+    public float ParryStop => parryStop;
+    public float PerfectDodgeStop => perfectDodgeStop;
+    public float FlinchTurnGrace => flinchTurnGrace;
+    public float FlinchDodgeAfter => flinchDodgeAfter;
     public float FocusMax => focusMax;
     public float FocusPerHit => focusPerHit;
     public float FocusOnParry => focusOnParry;

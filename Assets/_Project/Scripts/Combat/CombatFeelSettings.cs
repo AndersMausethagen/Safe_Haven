@@ -23,6 +23,16 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0f)] private float hitStopWhenHurt = 0.06f;
     [Tooltip("Game speed during a hit stop. 0 freezes completely.")]
     [SerializeField, Range(0f, 1f)] private float hitStopTimeScale = 0.05f;
+    [Header("One stop per swing (Docs/CombatFeelReview_2026-11-19.md §1)")]
+    [Tooltip("Each further body one swing reaches lengthens its stop by this share of the first, instead of starting a stop of its own: " +
+             "a sweep through a pack strobed, one freeze per body.")]
+    [SerializeField, Range(0f, 1f)] private float extraTargetShare = 0.15f;
+    [Tooltip("The most a swing's stop grows with more bodies, as a multiple of its first.")]
+    [SerializeField, Min(1f)] private float mostPerSwing = 1.45f;
+    [Tooltip("No blow of the player's holds longer than this (Street Fighter V's heaviest is about 0.25 s). Not a boss's fall or topple.")]
+    [SerializeField, Min(0f)] private float stopCeiling = 0.25f;
+    [Tooltip("No killing blow holds longer than this.")]
+    [SerializeField, Min(0f)] private float killStopCeiling = 0.30f;
     [Tooltip("The blow that fells a boss holds this long (\"boss stop\", Docs/LookAndFeelResearch_2026-11-18.md V6), at Boss Stop Speed: " +
              "the moment the fight was for. Under Options › Hit Stop.")]
     [SerializeField, Min(0f)] private float bossStopSeconds = 0.45f;
@@ -68,11 +78,21 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField, Min(0.05f)] private float hitRecoilSeconds = 0.28f;
 
     [Header("Knockback (monsters on the NavMesh)")]
-    [Tooltip("Meters a monster is pushed by a normal hit.")]
+    [Tooltip("Meters a monster is pushed by a blow of Impact 1 with no technique (a sword's slash). Every blow is pushed by its weight: " +
+             "this × Impact^1.5 × its technique (HitReaction.KnockbackFor; Docs/CombatFeelReview_2026-11-19.md §4).")]
     [SerializeField, Min(0f)] private float knockbackDistance = 0.35f;
-    [Tooltip("Meters a monster is pushed by a critical or killing hit.")]
-    [SerializeField, Min(0f)] private float knockbackDistanceCrit = 0.8f;
-    [SerializeField, Min(0.01f)] private float knockbackSeconds = 0.12f;
+    [Tooltip("A critical's push, as a multiple.")]
+    [SerializeField, Min(1f)] private float knockbackCritShare = 1.2f;
+    [Tooltip("A heavy's or a finisher's push, as a multiple.")]
+    [SerializeField, Min(1f)] private float knockbackHeavy = 1.5f;
+    [Tooltip("A weapon art's push, as a multiple.")]
+    [SerializeField, Min(1f)] private float knockbackArt = 2f;
+    [Tooltip("A counter's or a guard counter's push, as a multiple.")]
+    [SerializeField, Min(1f)] private float knockbackCounter = 1.3f;
+    [Tooltip("What a heavyweight (a great beast, an elite, anything in a boss fight) takes of it. A boss itself is never pushed.")]
+    [SerializeField, Range(0f, 1f)] private float knockbackHeavyweightShare = 0.35f;
+    [Tooltip("No blow pushes further (a heavy that isn't charged at most 1 m, so its follow-up still reaches).")]
+    [SerializeField, Min(0f)] private float knockbackMost = 1.6f;
 
     [Header("High ground (arrows and thrown missiles, for the player and creatures alike)")]
     [Tooltip("Metres the shooter must stand above the target before a missile hits harder.")]
@@ -156,6 +176,17 @@ public sealed class CombatFeelSettings : ScriptableObject
     [SerializeField] private GameObject perfectDodgeEffect;
     [Tooltip("Small glint on an attacker at the parry moment.")]
     [SerializeField] private GameObject parryCueEffect;
+    [Header("A parry cue to act on (Docs/CombatFeelReview_2026-11-19.md §2)")]
+    [Tooltip("The glint and its sound come this long before the parry window opens, on a strike at the player: the window (0.15 s) is " +
+             "shorter than anyone reacts to a light (180-250 ms), a little longer than to a sound. A strike that may hold never cues " +
+             "before its hold point. The window itself is unchanged.")]
+    [SerializeField, Range(0f, 0.3f)] private float parryCueLead = 0.12f;
+    [Tooltip("Heard with the lead cue: a short bright ting, quieter than a parry.")]
+    [SerializeField] private SoundDefinition parryCueSound;
+    [Tooltip("A thin line on a strike's warning where its fill stands in the middle of the parry window: press as the front crosses it " +
+             "(timing a moving thing to a mark is a far better skill than reacting). Its alpha and width (a share of the radius).")]
+    [SerializeField, Range(0f, 1f)] private float parryLineAlpha = 0.35f;
+    [SerializeField, Range(0.005f, 0.2f)] private float parryLineWidth = 0.04f;
     [Tooltip("Where a lobbed boulder or a burst of roots lands. Empty: the structure-hit dust.")]
     [SerializeField] private GameObject landingEffect;
 
@@ -306,6 +337,10 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float HitStopOnKill => hitStopOnKill;
     public float HitStopWhenHurt => hitStopWhenHurt;
     public float HitStopTimeScale => hitStopTimeScale;
+    public float ExtraTargetShare => extraTargetShare;
+    public float MostPerSwing => mostPerSwing;
+    public float StopCeiling => stopCeiling;
+    public float KillStopCeiling => killStopCeiling;
     public float BossStopSeconds => bossStopSeconds;
     public float BossStopTimeScale => bossStopTimeScale;
     public float ImpactBlurStrength => impactBlurStrength;
@@ -326,14 +361,18 @@ public sealed class CombatFeelSettings : ScriptableObject
     public float HitRecoilShove => hitRecoilShove;
     public float HitRecoilSeconds => hitRecoilSeconds;
     public float KnockbackDistance => knockbackDistance;
+    public float KnockbackCritShare => knockbackCritShare;
+    public float KnockbackHeavy => knockbackHeavy;
+    public float KnockbackArt => knockbackArt;
+    public float KnockbackCounter => knockbackCounter;
+    public float KnockbackHeavyweightShare => knockbackHeavyweightShare;
+    public float KnockbackMost => knockbackMost;
 
     /// <summary>How much harder a missile hits from this many metres above its target: a damage multiplier, 1 or more.</summary>
     public float HighGround(float above) => 1f + Mathf.Clamp((above - highGroundFrom) * highGroundPerMetre, 0f, highGroundMost);
 
     /// <summary>The high ground multiplier for a missile from <paramref name="shooter"/> striking <paramref name="target"/> (1 without settings).</summary>
     public static float HighGroundFor(Vector3 shooter, Vector3 target) => Current != null ? Current.HighGround(shooter.y - target.y) : 1f;
-    public float KnockbackDistanceCrit => knockbackDistanceCrit;
-    public float KnockbackSeconds => knockbackSeconds;
     public Material TelegraphMaterial => telegraphMaterial;
     public Material GroundMarkMaterial => groundMarkMaterial;
     public Color TelegraphAreaColor => telegraphAreaColor;
@@ -374,6 +413,10 @@ public sealed class CombatFeelSettings : ScriptableObject
     public GameObject StaggerEffect => staggerEffect;
     public GameObject PerfectDodgeEffect => perfectDodgeEffect;
     public GameObject ParryCueEffect => parryCueEffect;
+    public float ParryCueLead => parryCueLead;
+    public SoundDefinition ParryCueSound => parryCueSound;
+    public float ParryLineAlpha => parryLineAlpha;
+    public float ParryLineWidth => parryLineWidth;
     public Material SlashMaterial => slashMaterial;
     public float SlashSeconds => slashSeconds;
     public float SlashHeight => slashHeight;

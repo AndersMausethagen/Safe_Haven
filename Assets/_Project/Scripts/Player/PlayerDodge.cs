@@ -60,6 +60,7 @@ public sealed class PlayerDodge : MonoBehaviour
     // A dodge pressed during a swing's wind-up waits this long for the swing to land.
     private const float DodgeBuffer = 0.35f;
     private float bufferedUntil = -1f;
+    private float nextRefusedSoundAt;
 
     private float dashEndsAt = float.NegativeInfinity;
 
@@ -136,7 +137,7 @@ public sealed class PlayerDodge : MonoBehaviour
         GiveBodiesBack();
     }
 
-    private void OnDodgeRequested() => TryDodge();
+    private void OnDodgeRequested() => TryDodge(pressed: true);
 
     // A dodge that earned its backstab pays back part of what it cost.
     private void OnBackstabbed(IDamageable target)
@@ -151,11 +152,28 @@ public sealed class PlayerDodge : MonoBehaviour
     }
 
     /// <summary>Dodges if alive, free to move, off cooldown and able to pay the full stamina cost. Returns true when the dodge started.</summary>
-    public bool TryDodge()
+    public bool TryDodge(bool pressed = false)
     {
         PlayerMovementSettings settings = movement.Settings;
-        if (settings == null || !health.IsAlive || !stateMachine.CanMove || IsDodging || Time.time < readyAt || settings.DodgeDistance <= 0f)
+        if (settings == null || !health.IsAlive || !stateMachine.CanMove || settings.DodgeDistance <= 0f)
         {
+            return false;
+        }
+
+        // Pressed while the last one cools down: kept when the cooldown is nearly over, so it goes the moment it ends; refused with a
+        // sound otherwise, so the press isn't simply lost (Docs/CombatFeelReview_2026-11-19.md §6).
+        if (IsDodging || Time.time < readyAt)
+        {
+            if (readyAt - Time.time <= settings.DodgeCooldownBuffer)
+            {
+                bufferedUntil = Mathf.Max(bufferedUntil, readyAt + 0.05f);
+            }
+            else if (pressed && Time.time >= nextRefusedSoundAt)
+            {
+                nextRefusedSoundAt = Time.time + 0.25f;
+                AudioManager.Play(AudioManager.Sounds != null ? AudioManager.Sounds.OutOfStamina : null, transform.position);
+            }
+
             return false;
         }
 

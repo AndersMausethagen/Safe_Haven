@@ -17,11 +17,19 @@ MonoBehaviour:
   hitStopOnKill: 0.13
   hitStopWhenHurt: 0.07
   hitStopTimeScale: 0.05
+  extraTargetShare: 0.15
+  mostPerSwing: 1.45
+  stopCeiling: 0.25
+  killStopCeiling: 0.3
+  bossStopSeconds: 0.45
+  bossStopTimeScale: 0.03
+  impactBlurStrength: 0.06
+  impactBlurSeconds: 0.4
   victimShake: 0.045
   shakeOnHit: 0.15
   shakeOnCrit: 0.3
   shakeOnKill: 0.45
-  shakeWhenHurt: 0.55
+  shakeWhenHurt: 0.4
   shakeMaxOffset: 0.35
   shakeMaxRoll: 2.5
   shakeFrequency: 22
@@ -34,8 +42,12 @@ MonoBehaviour:
   hitRecoilShove: 0.14
   hitRecoilSeconds: 0.28
   knockbackDistance: 0.35
-  knockbackDistanceCrit: 0.8
-  knockbackSeconds: 0.12
+  knockbackCritShare: 1.2
+  knockbackHeavy: 1.5
+  knockbackArt: 2
+  knockbackCounter: 1.3
+  knockbackHeavyweightShare: 0.35
+  knockbackMost: 1.6
   highGroundFrom: 1.5
   highGroundPerMetre: 0.03
   highGroundMost: 0.25
@@ -108,6 +120,10 @@ MonoBehaviour:
   staggerEffect: {fileID: 3448059979457001899, guid: 14ad6f4879c11a64da0187a81c7a5b91, type: 3}
   perfectDodgeEffect: {fileID: 1787437530139827587, guid: 86a01c434ea7768488bace9e1a63ad52, type: 3}
   parryCueEffect: {fileID: 2567207178870873406, guid: 3c1734e30b572104ea3954b443333234, type: 3}
+  parryCueLead: 0.12
+  parryCueSound: {fileID: 11400000, guid: 53285bd0383044b40ae1f577a530c777, type: 2}
+  parryLineAlpha: 0.35
+  parryLineWidth: 0.04
   landingEffect: {fileID: 0}
   slashMaterial: {fileID: 2100000, guid: da6ce870da817894b98a9f869375c163, type: 2}
   slashSeconds: 0.2

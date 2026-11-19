@@ -143,7 +143,10 @@ public sealed class HeldItemView : MonoBehaviour
         WeaponDefinition weapon = artCombat != null ? artCombat.Weapon : null;
         ArtReady = current != null && current.activeInHierarchy && weapon != null && weapon.WeaponArt != null && !weapon.TakesAttackInput
             && artFocus != null && artFocus.CanSpend(weapon.WeaponArtFocus) && weapon.WeaponArtFocus > 0f;
-        if (!ArtReady)
+        // A counter ready (after a parry or a perfect dodge) lights the weapon in the counter's own pale steel for as long as it lasts:
+        // the window was a sound alone, with nothing to say how long it stays (Docs/CombatFeelReview_2026-11-19.md §7).
+        bool counter = current != null && current.activeInHierarchy && artCombat != null && artCombat.CounterIsReady;
+        if (!ArtReady && !counter)
         {
             if (artLight != null && artLight.enabled) artLight.enabled = false;
             return;
@@ -166,8 +169,20 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         artLight.enabled = true;
+        if (counter)
+        {
+            artLight.color = CounterReadyColour;
+            artLight.intensity = CounterReadyIntensity * (0.75f + 0.25f * Mathf.Sin(Time.unscaledTime * 8f * 2f * Mathf.PI));
+            return;
+        }
+
+        artLight.color = ArtReadyColour;
         artLight.intensity = ArtReadyIntensity * (0.55f + 0.45f * Mathf.Sin(Time.time * 4f));
     }
+
+    // The counter's own colour (its slash is tinted so: CombatFeedback), brighter than the art's glow, pulsing quickly while it lasts.
+    private static readonly Color CounterReadyColour = new Color(0.55f, 0.85f, 1f, 1f);
+    private const float CounterReadyIntensity = 1.4f;
 
     // Only touches the materials when what is in the hand, or what was done to it, has changed.
     private void UpdateGlow()
