@@ -79,6 +79,11 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
         }
 
         int given = player.Bag.Give(find.item, find.amount, ArrivalCause.Found);
+        if (find.questTarget != null)
+        {
+            QuestDeeds.Raise(GameEventKind.Used, find.questTarget, player.gameObject);
+        }
+
         PlaytestLogger.Note(PlaytestLog.PlaceFindTaken, place.id, given, find.item.Id);
         if (!string.IsNullOrEmpty(find.taken) && DialogueBox.Current != null && !DialogueBox.IsSpeaking)
         {

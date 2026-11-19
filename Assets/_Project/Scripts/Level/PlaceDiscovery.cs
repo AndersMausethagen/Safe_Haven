@@ -11,6 +11,8 @@ public sealed class PlaceDiscovery : MonoBehaviour
 
     private WorldAtlas atlas;
     private float nextCheck;
+    // The places with a quest target the player stands in now: reaching one counts each time they walk in (a quest begun after the find).
+    private readonly System.Collections.Generic.HashSet<string> inside = new System.Collections.Generic.HashSet<string>();
 
     public static PlaceDiscovery Current { get; private set; }
 
@@ -61,9 +63,24 @@ public sealed class PlaceDiscovery : MonoBehaviour
         Vector3 at = Player.Current.transform.position;
         var here = new Vector2(at.x, at.z);
         JournalRecord record = GameSession.Progress.Journal;
+        HavenPlaceVerbs verbs = HavenPlaceVerbs.Current;
         foreach (WorldAtlas.Place place in atlas.Places)
         {
-            if ((place.at - here).sqrMagnitude <= place.radius * place.radius && record.NoteDiscovered(place.id))
+            bool within = (place.at - here).sqrMagnitude <= place.radius * place.radius;
+            QuestTargetDefinition target = verbs != null ? verbs.TargetOf(place.id) : null;
+            if (target != null)
+            {
+                if (within && inside.Add(place.id))
+                {
+                    QuestDeeds.Raise(GameEventKind.Reached, target, Player.Current.gameObject);
+                }
+                else if (!within)
+                {
+                    inside.Remove(place.id);
+                }
+            }
+
+            if (within && record.NoteDiscovered(place.id))
             {
                 WorldAtlas.Region region = atlas.RegionAt(new Vector3(place.at.x, 0f, place.at.y));
                 string where = region != null ? $", {region.name}" : "";

@@ -284,6 +284,40 @@ public static class QuestChecklist
         EditorUtility.SetDirty(quest);
     }
 
+    // Where the Haven's place layer stands a target: reached at a place (its Targets), used as a thing left there (its Finds).
+    private static string HavenPlaceStands(QuestTargetDefinition thing, ObjectiveType type)
+    {
+        HavenPlaceVerbs verbs = HavenPlaceVerbs.Current;
+        if (verbs == null)
+        {
+            return null;
+        }
+
+        if (type == ObjectiveType.ReachPlace)
+        {
+            foreach (HavenPlaceVerbs.PlaceTarget entry in verbs.Targets)
+            {
+                if (entry != null && entry.target == thing)
+                {
+                    return "the place " + entry.placeId;
+                }
+            }
+        }
+
+        if (type == ObjectiveType.UseObject)
+        {
+            foreach (HavenPlaceVerbs.Find find in verbs.Finds)
+            {
+                if (find != null && find.questTarget == thing)
+                {
+                    return $"{find.name} at {find.placeId}";
+                }
+            }
+        }
+
+        return null;
+    }
+
     // A deed's person, place or thing: is anything in a scene it? If not, what can be put there.
     private static QuestCheck TargetCheck(QuestObjective deed, string line)
     {
@@ -308,6 +342,13 @@ public static class QuestChecklist
         }
 
         var thing = (QuestTargetDefinition)target;
+        // A Haven place or a thing left at one (Resources/HavenPlaceVerbs) is stood at runtime at its atlas place: no scene object.
+        string stood = HavenPlaceStands(thing, deed.Type);
+        if (stood != null)
+        {
+            return new QuestCheck(QuestCheck.State.Done, $"{line} In the game: {stood} (Haven Place Verbs).");
+        }
+
         var check = new QuestCheck(QuestCheck.State.Missing, $"{line} Nothing in a scene is {thing.DisplayName} yet:");
         switch (deed.Type)
         {

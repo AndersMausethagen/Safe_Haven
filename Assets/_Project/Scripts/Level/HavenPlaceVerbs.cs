@@ -54,10 +54,22 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         [Min(0.05f)] public float markerScale = 1f;
         [Tooltip("Degrees it is turned about the vertical.")]
         public float markerTurn;
+        [Tooltip("Taking it counts as using this, for quests (Use Object).")]
+        public QuestTargetDefinition questTarget;
+    }
+
+    [Serializable]
+    public sealed class PlaceTarget
+    {
+        [Tooltip("The place (WorldAtlas.Place.id).")]
+        public string placeId;
+        [Tooltip("Walking into it counts as reaching this, for quests (Reach Place).")]
+        public QuestTargetDefinition target;
     }
 
     [SerializeField] private List<Kind> kinds = new List<Kind>();
     [SerializeField] private List<Find> finds = new List<Find>();
+    [SerializeField] private List<PlaceTarget> targets = new List<PlaceTarget>();
     [Header("Lookouts")]
     [Tooltip("Metres of fog lifted round a lookout.")]
     [SerializeField, Min(10f)] private float lookoutReveal = 110f;
@@ -72,6 +84,21 @@ public sealed class HavenPlaceVerbs : ScriptableObject
 
     public IReadOnlyList<Kind> Kinds => kinds;
     public IReadOnlyList<Find> Finds => finds;
+    public IReadOnlyList<PlaceTarget> Targets => targets;
+
+    /// <summary>What reaching a place counts as for quests, or null.</summary>
+    public QuestTargetDefinition TargetOf(string placeId)
+    {
+        foreach (PlaceTarget entry in targets)
+        {
+            if (entry != null && entry.placeId == placeId)
+            {
+                return entry.target;
+            }
+        }
+
+        return null;
+    }
     public float LookoutReveal => lookoutReveal;
     public float LookoutSees => lookoutSees;
     public int LookoutInsight => lookoutInsight;
