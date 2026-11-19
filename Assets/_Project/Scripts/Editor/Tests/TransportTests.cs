@@ -315,7 +315,7 @@ public sealed class TransportTests
             var recipe = AssetDatabase.LoadAssetAtPath<RecipeDefinition>($"Assets/_Project/Data/Crafting/Recipes/{name}.asset");
             Assert.AreEqual(CraftingStationType.Wainwright, recipe.Station, name);
             Assert.AreEqual(Authored(name).Kit, recipe.Output, name);
-            Assert.IsTrue(recipe.ItemCost.Any(cost => cost.Item != null && cost.Item.name == "OakPlank"), $"{name} is made of planks");
+            Assert.IsTrue(recipe.ItemCost.Any(cost => cost.Item != null && (cost.Item.name == "RoughPlank" || cost.Item.name == "OakPlank")), $"{name} is made of planks");
         }
     }
 

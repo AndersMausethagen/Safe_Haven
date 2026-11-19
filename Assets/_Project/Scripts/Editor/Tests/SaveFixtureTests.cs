@@ -17,6 +17,7 @@ public sealed class SaveFixtureTests
     // Content removed from the game on purpose since a fixture was made, and why: its loss from old saves is accepted.
     private static readonly Dictionary<string, string> RemovedOnPurpose = new Dictionary<string, string>
     {
+        ["quest 'prologue.berries'"] = "Berries for the Pot, cut from the prologue's shelter at the user's word (2026-11-19).",
     };
 
     private static IEnumerable<string> Fixtures() =>
@@ -45,7 +46,9 @@ public sealed class SaveFixtureTests
         LoadedGame reloaded = SaveMapper.FromSaveData(again, content);
         Assert.AreEqual(Count(saved.settlement?.residents), loaded.Settlement.Residents.Count, "every resident");
         Assert.AreEqual(loaded.Settlement.Residents.Count, reloaded.Settlement.Residents.Count);
-        Assert.AreEqual(Count(saved.quests), loaded.Quests.Entries.Count(), "every quest");
+        // Every quest, but those taken out of the game on purpose (RemovedOnPurpose), which a load drops.
+        int removedQuests = saved.quests != null ? saved.quests.Count(entry => entry != null && RemovedOnPurpose.ContainsKey($"quest '{entry.id}'")) : 0;
+        Assert.AreEqual(Count(saved.quests) - removedQuests, loaded.Quests.Entries.Count(), "every quest");
         Assert.AreEqual(loaded.Quests.Entries.Count(), reloaded.Quests.Entries.Count());
         Assert.AreEqual(saved.settlement != null ? saved.settlement.successfulExtractions : 0, loaded.Settlement.SuccessfulExtractions, "the raids come home");
         Assert.AreEqual(loaded.Settlement.SuccessfulExtractions, reloaded.Settlement.SuccessfulExtractions);
