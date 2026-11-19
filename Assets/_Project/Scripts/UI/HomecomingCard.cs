@@ -89,7 +89,8 @@ public sealed class HomecomingCard : MonoBehaviour
         float age = Time.unscaledTime - shownAt;
         float alpha = age < 0f ? 0f : age < Fade ? age / Fade : age < holdFor ? 1f : Mathf.Clamp01(1f - (age - holdFor) / Fade);
         // Out of the way of a window or a conversation.
-        bool busy = (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || DialogueBox.IsSpeaking;
+        bool busy = (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || DialogueBox.IsSpeaking
+            || Player.Current == null || RaidDirector.Current != null;
         group.alpha = busy ? 0f : alpha;
     }
 }

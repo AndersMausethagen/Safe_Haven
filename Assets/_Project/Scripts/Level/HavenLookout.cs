@@ -71,7 +71,7 @@ public sealed class HavenLookout : MonoBehaviour, IInteractionName, IInteraction
                     continue;
                 }
 
-                if (journal.NoteSeen(other.id))
+                if (!journal.HasDiscovered(other.id) && journal.NoteSeen(other.id))
                 {
                     newlySeen++;
                 }
@@ -95,10 +95,24 @@ public sealed class HavenLookout : MonoBehaviour, IInteractionName, IInteraction
         ExperienceTracker.GrantInsight(verbs.LookoutInsight);
         string seen = newlySeen > 0 ? $" {newlySeen} place{(newlySeen == 1 ? "" : "s")} marked on your map." : "";
         GameMessages.Post($"From up here the land lies open.{seen}", MessageKind.Info);
-        if (unfound != null && DialogueBox.Current != null && !DialogueBox.IsSpeaking)
+        if (unfound != null)
         {
-            DialogueBox.Current.Bark(DialogueSpeaker.Player(),
-                $"<i>{Sightline(unfound)} To the {HavenPlaceVerbs.Compass(place.at, unfound.at)}. I haven't been there yet.</i>", null);
+            StartCoroutine(SayWhenFree($"<i>{Sightline(unfound)} To the {HavenPlaceVerbs.Compass(place.at, unfound.at)}. I haven't been there yet.</i>"));
+        }
+    }
+
+    // Said once the line being spoken (the place's own thought, often) is done: pressing during it lost the first look's hint for good.
+    private System.Collections.IEnumerator SayWhenFree(string line)
+    {
+        float giveUp = Time.unscaledTime + 15f;
+        while ((DialogueBox.Current == null || DialogueBox.IsSpeaking) && Time.unscaledTime < giveUp)
+        {
+            yield return null;
+        }
+
+        if (DialogueBox.Current != null && !DialogueBox.IsSpeaking)
+        {
+            DialogueBox.Current.Bark(DialogueSpeaker.Player(), line, null);
         }
     }
 

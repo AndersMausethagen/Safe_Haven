@@ -120,7 +120,8 @@ public sealed class HitReaction : MonoBehaviour
             : (kind & (HitTechnique.Counter | HitTechnique.GuardCounter)) != 0 ? feel.KnockbackCounter : 1f;
         float metres = feel.KnockbackDistance * Mathf.Pow(Mathf.Max(0f, impact), 1.5f) * technique * (result.IsCritical ? feel.KnockbackCritShare : 1f);
         // A heavy that isn't charged keeps the body near enough for its follow-up to reach (a chain's step closes about a metre).
-        float most = heavy && !art && impact < 2f ? Mathf.Min(1f, feel.KnockbackMost) : feel.KnockbackMost;
+        bool charged = (kind & HitTechnique.Charged) != 0;
+        float most = heavy && !art && !charged ? Mathf.Min(1f, feel.KnockbackMost) : feel.KnockbackMost;
         metres = Mathf.Min(metres, most);
         if (target != null && target.TryGetComponent(out MonsterAI monster) && monster.IsHeavyweight)
         {

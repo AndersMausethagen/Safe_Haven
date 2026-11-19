@@ -24,6 +24,23 @@ public static class WantedAtHome
     {
         GameEvents.Raised -= OnRaised;
         GameEvents.Raised += OnRaised;
+        Construction.Finished -= OnFinished;
+        Construction.Finished += OnFinished;
+    }
+
+    // A level finished in the player's own Haven is done with: its key goes, so it neither counts on a raid nor holds a slot.
+    private static void OnFinished(Construction construction)
+    {
+        if (construction == null || HavenVisit.IsVisiting || GameSession.Progress == null
+            || construction.Definition == null)
+        {
+            return;
+        }
+
+        for (int tier = 1; tier <= construction.Level; tier++)
+        {
+            GameSession.Progress.RemoveTracked(BuildingKey(construction.Definition, tier));
+        }
     }
 
     // On a raid, a wanted material picked up says how far it has come: "Copper Ore 7/10 for the Smithy II". None once it is all home.
@@ -119,7 +136,9 @@ public static class WantedAtHome
 
             BuildingDefinition building = content.FindBuilding(parts[1]);
             BuildingLevel level = building != null ? building.UpgradeTo(tier) : null;
-            if (level == null || BuildingUnlocks.HighestTier(building) >= tier)
+            // What stands is read from the scene, so only at the player's own home; elsewhere a built level was dropped when it finished.
+            bool ownHome = Place.AtHome && !HavenVisit.IsVisiting;
+            if (level == null || (ownHome && BuildingUnlocks.HighestTier(building) >= tier))
             {
                 continue;
             }

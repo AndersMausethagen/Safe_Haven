@@ -72,4 +72,15 @@ public sealed class CombatWeightTests
         // The line sits where the fill stands mid-window: 0.9 of the reach for the cleave.
         Assert.AreEqual(0.9f, AttackTelegraph.ParryLineAt(0.75f, window), 1e-4f);
     }
+
+    // A charged heavy (its own flag) shoves to the most; an uncharged one keeps the body within its follow-up's reach.
+    [Test]
+    public void AChargedHeavy_ShovesFurtherThanAnUnchargedOne()
+    {
+        float uncharged = Shove(1.8f, HitTechnique.Melee | HitTechnique.Heavy);
+        float charged = Shove(1.8f, HitTechnique.Melee | HitTechnique.Heavy | HitTechnique.Charged);
+        Assert.LessOrEqual(uncharged, 1f + 1e-4f);
+        Assert.Greater(charged, uncharged, "a sword's charged heavy (Impact 1.8) was capped at 1 m");
+        Assert.LessOrEqual(charged, CombatFeelSettings.Current.KnockbackMost + 1e-4f);
+    }
 }

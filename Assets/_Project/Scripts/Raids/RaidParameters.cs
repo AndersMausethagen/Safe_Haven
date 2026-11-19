@@ -41,8 +41,10 @@ public sealed class RaidParameters
 
     /// <summary>The rules with the modifiers applied, plus extra seconds bought with Portal Sparks (GDD §7.3).</summary>
     public static RaidParameters Calculate(RaidDefinition raid, IEnumerable<RaidModifierDefinition> modifiers, float extraSeconds,
-        RaidTimeOfDay timeOfDay = null, RaidDifficulty difficulty = null, float extractionCut = 0f)
+        RaidTimeOfDay timeOfDay = null, RaidDifficulty difficulty = null, float extractionCut = 0f, float lengthShare = -1f)
     {
+        // Below 0: this game's own Raid Length (Accessibility). A friend following a raid runs on the host's clock instead (RaidLauncher).
+        float length = lengthShare < 0f ? GameOptions.RaidLengthShare : lengthShare;
         var effects = new List<RaidStatModifier>();
         if (extractionCut > 0f)
         {
@@ -66,9 +68,9 @@ public sealed class RaidParameters
         }
 
         // Accessibility › Raid Length: more time on the clock, shown in the briefing's rules as the rest are.
-        if (GameOptions.RaidLengthShare > 1f)
+        if (length > 1f)
         {
-            effects.Add(new RaidStatModifier(RaidStat.Duration, StatModifierOp.Percent, GameOptions.RaidLengthShare - 1f));
+            effects.Add(new RaidStatModifier(RaidStat.Duration, StatModifierOp.Percent, length - 1f));
         }
 
         // The hour's reward works like a modifier, so it shows in the briefing's rules.

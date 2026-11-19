@@ -179,14 +179,21 @@ public sealed class HavenPlaceVerbs : ScriptableObject
         var holder = new GameObject(place.id);
         holder.transform.SetParent(stood.transform, false);
         holder.transform.position = at;
+        // The thought first: a CuriousPlace answers the Interactable it finds as it wakes, and a lookout's press is the look out, not
+        // "Look closer". A place with more to think than its first thought gets "Look closer" of its own.
+        if (kind.thoughts.Length > 0)
+        {
+            if (!kind.lookout && kind.thoughts.Length > 1)
+            {
+                holder.AddComponent<Interactable>().Configure(InteractionAnimation.GatherLow, 0f, 4f, false, InteractionKind.Use);
+            }
+
+            holder.AddComponent<CuriousPlace>().Configure(place.name, kind.thoughts, Mathf.Clamp(place.radius * 0.5f, 7f, 12f), remembered: true);
+        }
+
         if (kind.lookout)
         {
             HavenLookout.AddTo(holder, place, verbs);
-        }
-
-        if (kind.thoughts.Length > 0)
-        {
-            holder.AddComponent<CuriousPlace>().Configure(place.name, kind.thoughts, Mathf.Clamp(place.radius * 0.5f, 7f, 12f), remembered: true);
         }
 
         if (kind.sound != null)

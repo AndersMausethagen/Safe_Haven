@@ -291,9 +291,24 @@ public static class RaidLauncher
     }
 
     /// <summary>The run a friend's invite describes, as <see cref="TryFollow"/> builds it (without going anywhere).</summary>
-    public static RaidSession FromInvite(RaidInvite invite, RaidDefinition raid, ContentDatabase content, PlayerSnapshot loadout, string returnScene, float elapsed) =>
-        Build(raid, invite.ModifiersFrom(content), loadout, returnScene, invite.seed, invite.DifficultyIn(raid), invite.sparks, invite.large && raid.CanBeLarge,
-            invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, elapsed, invite.questsUnderWay);
+    public static RaidSession FromInvite(RaidInvite invite, RaidDefinition raid, ContentDatabase content, PlayerSnapshot loadout, string returnScene, float elapsed)
+    {
+        // The host's clock: this game's own Raid Length left out, then the total set to the host's (which carries theirs and any time
+        // events added), so both clocks end together.
+        RaidSession session = Build(raid, invite.ModifiersFrom(content), loadout, returnScene, invite.seed, invite.DifficultyIn(raid), invite.sparks,
+            invite.large && raid.CanBeLarge, invite.extraSeconds, invite.extractionCut, invite.foretoldEvents, null, 0f, invite.questsUnderWay, lengthShare: 1f);
+        if (invite.totalSeconds > 0f)
+        {
+            session.AddTime(invite.totalSeconds - session.TotalSeconds);
+        }
+
+        if (elapsed > 0f)
+        {
+            session.Tick(elapsed);
+        }
+
+        return session;
+    }
 
     /// <summary>
     /// Builds a run from everything that decides it. Pure apart from reading the content: launching and following both use it.
@@ -301,9 +316,9 @@ public static class RaidLauncher
     /// </summary>
     public static RaidSession Build(RaidDefinition raid, List<RaidModifierDefinition> modifiers, PlayerSnapshot loadout, string returnScene, int runSeed,
         RaidDifficulty difficulty, int sparks, bool large, float extraSeconds, float extractionCut, int foretoldEvents, ResidentDefinition companion, float elapsed,
-        IReadOnlyList<string> questsUnderWay = null)
+        IReadOnlyList<string> questsUnderWay = null, float lengthShare = -1f)
     {
-        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, extraSeconds, RaidTimeOfDay.For(raid, runSeed), difficulty, extractionCut);
+        RaidParameters parameters = RaidParameters.Calculate(raid, modifiers, extraSeconds, RaidTimeOfDay.For(raid, runSeed), difficulty, extractionCut, lengthShare);
         var session = new RaidSession(raid, modifiers, parameters, loadout, returnScene, sparks, runSeed, difficulty)
         {
             Companion = companion,

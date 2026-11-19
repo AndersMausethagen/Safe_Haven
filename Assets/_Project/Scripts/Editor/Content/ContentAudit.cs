@@ -31,6 +31,8 @@ public static class ContentAudit
         "RelicSettings.gear", "TerritorySettings.regions[].tithe", "TradeSettings.offers", "TransportDefinition.kit",
         "WaterSource.fillItem", "SurvivalSettings.openWaterFillItem", "PrologueDefinition.startingArmor", "PrologueDefinition.startingBackpack", "PrologueDefinition.sticks",
         "PrologueDefinition.stones", "ItemWorldObject.definition", "RaidLayoutRules.pondFillItem",
+        // What is left to take once at a Haven place (PlaceFind).
+        "HavenPlaceVerbs.finds[].item",
         // Inscriptions are made by drops, caches and rubbings from the one item (Inscriptions.Make).
         "EssenceSettings.inscription",
     };

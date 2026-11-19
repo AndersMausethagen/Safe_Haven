@@ -59,7 +59,19 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     public bool CanInteract(GameObject user, out string reason)
     {
         reason = null;
-        return find != null && Player.Current != null && user == Player.Current.gameObject;
+        if (find == null || Player.Current == null || user != Player.Current.gameObject)
+        {
+            return false;
+        }
+
+        // Taken whole or not at all: a full bag lost the stack for good, and the quest still counted it.
+        if (Player.Current.Bag.Container.SpaceFor(find.item) < find.amount)
+        {
+            reason = $"Your bag has no room for {find.amount} {find.item.DisplayName}.";
+            return false;
+        }
+
+        return true;
     }
 
     private void OnDestroy()
@@ -73,7 +85,8 @@ public sealed class PlaceFind : MonoBehaviour, IInteractionName, IInteractionVer
     private void OnTaken()
     {
         Player player = Player.Current;
-        if (find == null || player == null || !GameSession.Progress.MarkStoneUsed(TakenKey(place.id, find.item.Id)))
+        if (find == null || player == null || player.Bag.Container.SpaceFor(find.item) < find.amount
+            || !GameSession.Progress.MarkStoneUsed(TakenKey(place.id, find.item.Id)))
         {
             return;
         }

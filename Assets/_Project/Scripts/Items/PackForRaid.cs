@@ -13,7 +13,8 @@ public static class PackForRaid
 {
     /// <summary>Whether a stack belongs to the kit a raid set out with: anything to use (a consumable), or on the quickbar.</summary>
     public static bool IsKit(ItemStack stack, QuickItems quick) =>
-        !stack.IsEmpty && stack.Item != null && (stack.Item.Category == ItemCategory.Consumable || (quick != null && quick.Contains(stack.Item)));
+        !stack.IsEmpty && stack.Item != null && !stack.Item.IsEquippable && !stack.Item.IsBlueprint
+        && (stack.Item.Category == ItemCategory.Consumable || (quick != null && quick.Contains(stack.Item)));
 
     /// <summary>The kit in a bag: item id to how many.</summary>
     public static Dictionary<string, int> KitOf(ItemContainer bag, QuickItems quick)

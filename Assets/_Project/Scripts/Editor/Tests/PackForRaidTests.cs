@@ -50,4 +50,17 @@ public sealed class PackForRaidTests
         Assert.AreEqual(8, stash.Count(bandage));
         Assert.IsEmpty(shortfall);
     }
+
+    // The review of 2026-11-19: a spare weapon on the quickbar was taken for kit and pulled from the stash.
+    [Test]
+    public void GearOnTheQuickbar_IsNeverKit()
+    {
+        ItemDefinition gauntlets = Item("Armor/CopperScaleGauntlets");
+        Assert.IsTrue(gauntlets.IsEquippable);
+        var bag = new ItemContainer(6, 2);
+        bag.Add(gauntlets, 1);
+        var quick = new QuickItems();
+        quick.Restore(new[] { gauntlets });
+        Assert.IsEmpty(PackForRaid.KitOf(bag, quick));
+    }
 }

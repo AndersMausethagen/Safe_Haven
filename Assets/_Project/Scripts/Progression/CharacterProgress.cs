@@ -477,6 +477,9 @@ public sealed class CharacterProgress
 
     public bool IsTracked(string key) => key != null && tracked.Contains(key);
 
+    /// <summary>Stops tracking a target (built, so done). True when it was tracked.</summary>
+    public bool RemoveTracked(string key) => key != null && tracked.Remove(key);
+
     /// <summary>Tracks a target, or stops tracking it; tracking more than <paramref name="most"/> lets the oldest go. True when tracked now.</summary>
     public bool ToggleTracked(string key, int most)
     {

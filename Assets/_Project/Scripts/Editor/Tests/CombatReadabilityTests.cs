@@ -108,4 +108,24 @@ public sealed class CombatReadabilityTests
             GameOptions.RaidLength.Value = was;
         }
     }
+
+    // A friend following a raid runs on the host's clock, whatever their own Raid Length (the review of 2026-11-19).
+    [Test]
+    public void AFollower_RunsOnTheHostsClock()
+    {
+        RaidDefinition raid = UnityEditor.AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        float was = GameOptions.RaidLength.Value;
+        try
+        {
+            GameOptions.RaidLength.Value = 2f;
+            var invite = new RaidInvite { raid = raid.Id, seed = 7, totalSeconds = 777f };
+            RaidSession follower = RaidLauncher.FromInvite(invite, raid, content, null, "SafeHaven", 0f);
+            Assert.AreEqual(777f, follower.TotalSeconds, 0.5f, "the host's total, not this game's +50%");
+        }
+        finally
+        {
+            GameOptions.RaidLength.Value = was;
+        }
+    }
 }
