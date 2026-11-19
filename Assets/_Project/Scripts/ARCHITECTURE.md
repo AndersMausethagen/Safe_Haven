@@ -2403,6 +2403,17 @@ speaks: the morning introductions (`Cinematic - The Morning Fire`, under Morning
 BuildPrologueMeadow.MorningIntroductions`) hold a shot of Sigrid, Eirik and Runa in turn, without holding the player or taking
 the skip key (the conversation does both).
 
+**Framing for a top-down game (2026-11-19, the user: low shots showed terrain never made to be seen from there; smooth glides between
+shots made players dizzy).** Shots use `CameraShot.Space.GameView`: offsets in the player's own camera direction as the cinematic
+starts (x screen-right, y up, z up the screen), so the map keeps the way it lies on screen and nothing swings round. The game's slant
+a little closer than play: about (0, 6.6, -5) on a speaker, (0, 9, -7) on the party, 15-26 m up for places and the troll (its back
+toward the camp is the frame when it walks away from the camera; tall trees block a low one). Between shots a hard cut (Blend In 0);
+only the way in and out of play glides (about a second), and a shot's own move is a slow push-in or a sideways drift, never a turn.
+Into the Trees: the tree line, the way in through the forest's wall, the crag ridge, the storm over the crag ring (markers "Into the
+Trees - ... (camera)"), the road walked, Sigrid; The Forest Closes In cues shots 4 and 6. Rules from game camera practice: John
+Nesky's "50 Game Camera Mistakes" (GDC 2014: sharp swings and wild moves cause simulation sickness) and Adam Thiery's camera talk
+(cuts add rhythm and drop needless transitions).
+
 **The old troll** has two: at the night camp (`Cinematic - The Old Troll Comes`, under Intro Moments) it breaks out of the
 trees, roars and goes for the fire; at the stones (`Cinematic - The Old Troll Returns`, Morning Moments) it comes down the low
 ground east of the crag, roars, and its fist still lands as the minute runs out. Both stories are built by

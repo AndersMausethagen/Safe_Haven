@@ -10674,14 +10674,14 @@ MonoBehaviour:
     seconds: 3
     subject: {fileID: 1803281364}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 3.2, z: 0}
-    space: 0
-    startOffset: {x: -3.5, y: 1.4, z: 12}
-    endOffset: {x: -2.8, y: 1.3, z: 10.5}
-    followSubject: 0
-    startFieldOfView: 46
+    lookOffset: {x: 0, y: 0, z: -3}
+    space: 2
+    startOffset: {x: 0, y: 26, z: -15}
+    endOffset: {x: 0, y: 24, z: -13.5}
+    followSubject: 1
+    startFieldOfView: 44
     endFieldOfView: 42
-    ease: 2
+    ease: 1
     blendIn: 0
     holdUntilCued: 0
     rumble: 0
@@ -10689,19 +10689,19 @@ MonoBehaviour:
     seconds: 2.8
     subject: {fileID: 1803281364}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 4.3, z: 0.6}
-    space: 0
-    startOffset: {x: 3, y: 2.6, z: 8.5}
-    endOffset: {x: 2.2, y: 2.4, z: 7}
+    lookOffset: {x: 0, y: 2, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 16, z: -7.5}
+    endOffset: {x: 0, y: 14.5, z: -6.8}
     followSubject: 1
-    startFieldOfView: 46
-    endFieldOfView: 36
-    ease: 2
+    startFieldOfView: 42
+    endFieldOfView: 38
+    ease: 1
     blendIn: 0
     holdUntilCued: 0
-    rumble: 0
-  blendIn: 0.7
-  blendOut: 1.1
+    rumble: 0.12
+  blendIn: 0.5
+  blendOut: 0.9
   letterbox: 1
   hideHud: 1
   holdPlayer: 1
@@ -15432,14 +15432,14 @@ MonoBehaviour:
     seconds: 3.4
     subject: {fileID: 1803281364}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 3.2, z: 0}
-    space: 0
-    startOffset: {x: -3.5, y: 1.4, z: 12}
-    endOffset: {x: -2.8, y: 1.3, z: 10.5}
+    lookOffset: {x: 0, y: 0, z: 7}
+    space: 2
+    startOffset: {x: 0, y: 21, z: -13}
+    endOffset: {x: 0, y: 19, z: -11.5}
     followSubject: 0
-    startFieldOfView: 46
-    endFieldOfView: 42
-    ease: 2
+    startFieldOfView: 42
+    endFieldOfView: 40
+    ease: 1
     blendIn: 0
     holdUntilCued: 0
     rumble: 0
@@ -15447,34 +15447,34 @@ MonoBehaviour:
     seconds: 3
     subject: {fileID: 1803281364}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 4.3, z: 0.6}
-    space: 0
-    startOffset: {x: 3, y: 2.6, z: 8.5}
-    endOffset: {x: 2.2, y: 2.4, z: 7}
+    lookOffset: {x: 0, y: 2, z: 4}
+    space: 2
+    startOffset: {x: 0, y: 16, z: -7.5}
+    endOffset: {x: 0, y: 14.5, z: -6.8}
     followSubject: 1
-    startFieldOfView: 46
-    endFieldOfView: 36
-    ease: 2
+    startFieldOfView: 42
+    endFieldOfView: 38
+    ease: 1
     blendIn: 0
     holdUntilCued: 0
-    rumble: 0
+    rumble: 0.12
   - name: It goes for the fire
     seconds: 3.2
     subject: {fileID: 1803281364}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 3.4, z: 2}
-    space: 0
-    startOffset: {x: -10, y: 4.5, z: 3}
-    endOffset: {x: -9.5, y: 4.8, z: 5}
+    lookOffset: {x: 0, y: 0, z: 7}
+    space: 2
+    startOffset: {x: 0, y: 19, z: -12}
+    endOffset: {x: 0, y: 19, z: -12}
     followSubject: 1
-    startFieldOfView: 46
-    endFieldOfView: 44
-    ease: 0
+    startFieldOfView: 42
+    endFieldOfView: 42
+    ease: 1
     blendIn: 0
     holdUntilCued: 0
     rumble: 0
-  blendIn: 0.9
-  blendOut: 1.4
+  blendIn: 0.6
+  blendOut: 1
   letterbox: 1
   hideHud: 1
   holdPlayer: 1
@@ -16043,6 +16043,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5021852649732126360, guid: 3aef93e36f6ba2d47881b1e5a3973be6, type: 3}
   m_PrefabInstance: {fileID: 322536143}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &323162153
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 323162154}
+  m_Layer: 0
+  m_Name: Into the Trees - The Way In (camera)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &323162154
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323162153}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -90, y: 13.179733, z: -12}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1673818619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &323220051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67019,7 +67050,7 @@ MonoBehaviour:
         id: 45fbf237223f42c2885c9f36f7f239b4
         position: {x: 340, y: 60}
         cinematic: {fileID: 1922524715}
-        shot: 3
+        shot: 4
     - rid: 2623126109533504223
       type: {class: LightningNode, ns: , asm: SafeHaven}
       data:
@@ -67086,7 +67117,7 @@ MonoBehaviour:
         id: c8beda30fd5441999daa1db064010619
         position: {x: 940, y: 60}
         cinematic: {fileID: 1922524715}
-        shot: 5
+        shot: 6
     - rid: 2623126109533504231
       type: {class: SayNode, ns: , asm: SafeHaven}
       data:
@@ -77682,6 +77713,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4372996382443577661, guid: 933b567e87ebb924e8bef15c8ff7774f, type: 3}
   m_PrefabInstance: {fileID: 1304680101}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1306672846
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1306672847}
+  m_Layer: 0
+  m_Name: Into the Trees - The Crag Ring (camera)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1306672847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1306672846}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 11.826603, z: 35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1673818619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1308365959
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -99764,6 +99826,9 @@ Transform:
   - {fileID: 1061907992}
   - {fileID: 1816468901}
   - {fileID: 1914506083}
+  - {fileID: 323162154}
+  - {fileID: 1808421706}
+  - {fileID: 1306672847}
   m_Father: {fileID: 1478527750}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1674546877
@@ -105994,6 +106059,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6019229117598303775, guid: df77ff73be9c21847a23fdc3d788f28c, type: 3}
   m_PrefabInstance: {fileID: 1808401158}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1808421705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1808421706}
+  m_Layer: 0
+  m_Name: Into the Trees - The Ridge (camera)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1808421706
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808421705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -50, y: 14.791103, z: 26}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1673818619}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1810413729
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -107531,64 +107627,64 @@ MonoBehaviour:
     seconds: 3
     subject: {fileID: 983162859}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.55, z: 0}
-    space: 0
-    startOffset: {x: 0.9, y: 1.8, z: 3.4}
-    endOffset: {x: 0.71999997, y: 1.7, z: 2.8}
+    lookOffset: {x: 0, y: 1.3, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 6.6, z: -5}
+    endOffset: {x: 0, y: 6.1, z: -4.6}
     followSubject: 1
-    startFieldOfView: 34
-    endFieldOfView: 30
-    ease: 2
-    blendIn: 0.9
+    startFieldOfView: 36
+    endFieldOfView: 34
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
   - name: Eirik
     seconds: 3
     subject: {fileID: 810501267}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.55, z: 0}
-    space: 0
-    startOffset: {x: -0.9, y: 1.8, z: 3.4}
-    endOffset: {x: -0.71999997, y: 1.7, z: 2.8}
+    lookOffset: {x: 0, y: 1.3, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 6.6, z: -5}
+    endOffset: {x: 0, y: 6.1, z: -4.6}
     followSubject: 1
-    startFieldOfView: 34
-    endFieldOfView: 30
-    ease: 2
-    blendIn: 0.9
+    startFieldOfView: 36
+    endFieldOfView: 34
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
   - name: Runa
     seconds: 3
     subject: {fileID: 334759803}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.55, z: 0}
-    space: 0
-    startOffset: {x: 0.9, y: 1.8, z: 3.4}
-    endOffset: {x: 0.71999997, y: 1.7, z: 2.8}
+    lookOffset: {x: 0, y: 1.3, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 6.6, z: -5}
+    endOffset: {x: 0, y: 6.1, z: -4.6}
     followSubject: 1
-    startFieldOfView: 34
-    endFieldOfView: 30
-    ease: 2
-    blendIn: 0.9
+    startFieldOfView: 36
+    endFieldOfView: 34
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
   - name: Sigrid asks
     seconds: 3
     subject: {fileID: 983162859}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.55, z: 0}
-    space: 0
-    startOffset: {x: -1.1, y: 1.8, z: 3.4}
-    endOffset: {x: -0.88000005, y: 1.7, z: 2.8}
+    lookOffset: {x: 0, y: 1.3, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 6.6, z: -5}
+    endOffset: {x: 0, y: 6.1, z: -4.6}
     followSubject: 1
-    startFieldOfView: 34
-    endFieldOfView: 30
-    ease: 2
-    blendIn: 0.9
+    startFieldOfView: 36
+    endFieldOfView: 34
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
-  blendIn: 1.2
-  blendOut: 1.4
+  blendIn: 1
+  blendOut: 1.2
   letterbox: 1
   hideHud: 1
   holdPlayer: 0
@@ -112110,83 +112206,98 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::InGameCinematic
   shots:
-  - name: Walking to the trees
-    seconds: 5
+  - name: The tree line
+    seconds: 4
     subject: {fileID: 983162859}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.4, z: 0}
-    space: 0
-    startOffset: {x: 1.2, y: 1.8, z: 9}
-    endOffset: {x: 0.8, y: 1.6, z: 6.5}
+    lookOffset: {x: 0, y: 1.2, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 9, z: -7}
+    endOffset: {x: 0, y: 8, z: -6.2}
     followSubject: 1
-    startFieldOfView: 40
+    startFieldOfView: 38
     endFieldOfView: 36
     ease: 1
     blendIn: 0
     holdUntilCued: 0
     rumble: 0
-  - name: The forest ahead
-    seconds: 5
-    subject: {fileID: 983162859}
-    lookAt: {fileID: 350545041}
-    lookOffset: {x: 0, y: 4, z: 0}
-    space: 0
-    startOffset: {x: 1.4, y: 2.4, z: -4.5}
-    endOffset: {x: 1, y: 2.8, z: -6.5}
-    followSubject: 1
-    startFieldOfView: 42
-    endFieldOfView: 46
+  - name: The way in
+    seconds: 3.5
+    subject: {fileID: 323162154}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 0, z: 3}
+    space: 2
+    startOffset: {x: 0, y: 21, z: -15}
+    endOffset: {x: 0, y: 18, z: -12.8}
+    followSubject: 0
+    startFieldOfView: 40
+    endFieldOfView: 38
     ease: 1
-    blendIn: 1.2
+    blendIn: 0
+    holdUntilCued: 0
+    rumble: 0
+  - name: The ridge
+    seconds: 4.5
+    subject: {fileID: 1808421706}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 0, z: 0}
+    space: 2
+    startOffset: {x: -4, y: 16, z: -11.5}
+    endOffset: {x: 4, y: 16, z: -11.5}
+    followSubject: 0
+    startFieldOfView: 40
+    endFieldOfView: 40
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
-  - name: The storm comes
+  - name: The storm over the crags
     seconds: 4.5
-    subject: {fileID: 349249106}
+    subject: {fileID: 1306672847}
     lookAt: {fileID: 0}
-    lookOffset: {x: 14, y: 16, z: -2}
-    space: 1
-    startOffset: {x: -12, y: 1.8, z: 3}
-    endOffset: {x: -10, y: 1.5, z: 2}
+    lookOffset: {x: 0, y: 0, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 23, z: -16}
+    endOffset: {x: 0, y: 20, z: -14}
     followSubject: 0
-    startFieldOfView: 50
-    endFieldOfView: 44
-    ease: 2
-    blendIn: 1.4
+    startFieldOfView: 42
+    endFieldOfView: 40
+    ease: 1
+    blendIn: 0
     holdUntilCued: 0
     rumble: 0.08
-  - name: Down the road into the forest
+  - name: Down the road
     seconds: 8.5
-    subject: {fileID: 1816468901}
-    lookAt: {fileID: 1914506083}
-    lookOffset: {x: 0, y: 1.8, z: 0}
-    space: 1
-    startOffset: {x: -19.3, y: 10.8, z: 1.4}
-    endOffset: {x: 15.3, y: 1.7, z: -1.1}
-    followSubject: 0
-    startFieldOfView: 48
-    endFieldOfView: 42
+    subject: {fileID: 983162859}
+    lookAt: {fileID: 0}
+    lookOffset: {x: 0, y: 1, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 12, z: -9}
+    endOffset: {x: 0, y: 11, z: -8.2}
+    followSubject: 1
+    startFieldOfView: 40
+    endFieldOfView: 38
     ease: 1
-    blendIn: 1.6
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
   - name: Sigrid sends you on
     seconds: 4
     subject: {fileID: 983162859}
     lookAt: {fileID: 0}
-    lookOffset: {x: 0, y: 1.55, z: 0}
-    space: 0
-    startOffset: {x: -1, y: 1.8, z: 3.6}
-    endOffset: {x: -0.8, y: 1.7, z: 3}
+    lookOffset: {x: 0, y: 1.3, z: 0}
+    space: 2
+    startOffset: {x: 0, y: 6.6, z: -5}
+    endOffset: {x: 0, y: 6.1, z: -4.6}
     followSubject: 1
-    startFieldOfView: 34
-    endFieldOfView: 30
-    ease: 2
-    blendIn: 1
+    startFieldOfView: 36
+    endFieldOfView: 34
+    ease: 1
+    blendIn: 0
     holdUntilCued: 1
     rumble: 0
-  blendIn: 1.2
-  blendOut: 1.4
+  blendIn: 1
+  blendOut: 1.2
   letterbox: 1
   hideHud: 1
   holdPlayer: 1

@@ -24,6 +24,21 @@ public sealed class InGameCinematicTests
         Assert.That(Vector3.Distance(shot.Evaluate(facing, facing, 0.5f).Position, new Vector3(0f, 3f, -5f)), Is.LessThan(0.001f));
     }
 
+    // A top-down game's cinematic frames in the player's own view: the map keeps the way it lies on screen (the user, 2026-11-19).
+    [Test]
+    public void OffsetsInTheGameView_TurnWithThePlayersCamera_NotTheSubject()
+    {
+        var shot = new CameraShot { space = CameraShot.Space.GameView, startOffset = new Vector3(0f, 8f, -6f), endOffset = new Vector3(0f, 8f, -6f),
+            lookOffset = Vector3.zero };
+        var troll = new CameraShot.Anchor(new Vector3(10f, 0f, 0f), 200f);
+        // The player's camera faces east (yaw 90): six metres back from the view is six metres west, whichever way the troll faces.
+        CameraShot.Pose pose = shot.Evaluate(troll, troll, 0f, 90f);
+        Assert.That(Vector3.Distance(pose.Position, new Vector3(4f, 8f, 0f)), Is.LessThan(0.001f));
+        Vector3 forward = pose.Rotation * Vector3.forward;
+        Assert.That(Vector3.Angle(new Vector3(forward.x, 0f, forward.z), Vector3.right), Is.LessThan(0.5f), "looking the way the player was");
+        Assert.That(Vector3.Angle(forward, Vector3.down), Is.LessThan(45f), "from above, not across the ground");
+    }
+
     [Test]
     public void AShot_MovesFromStartToEnd_WithItsFieldOfView()
     {

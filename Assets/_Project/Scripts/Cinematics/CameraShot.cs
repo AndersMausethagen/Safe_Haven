@@ -16,6 +16,10 @@ public sealed class CameraShot
         SubjectFacing,
         [Tooltip("Offsets in world directions from the subject (x east, y up, z north).")]
         World,
+        [Tooltip("Offsets in the player's own view as the cinematic starts: x to the screen's right, y up, z up the screen (into it). " +
+                 "(0, 8, -6) is the game's slant a little closer than play. The map keeps the way it lies on screen, so a top-down " +
+                 "game's cinematic doesn't swing the world round (the user, 2026-11-19).")]
+        GameView,
     }
 
     public enum Ease
@@ -93,19 +97,25 @@ public sealed class CameraShot
     /// <summary>
     /// The camera <paramref name="progress"/> (0..1) through the shot. <paramref name="stand"/> is where the camera's offsets
     /// are measured from (the subject now, or where it was when the shot began); <paramref name="looked"/> is where the
-    /// look point is measured from (the subject now, or Look At).
+    /// look point is measured from (the subject now, or Look At). <paramref name="viewYaw"/> is the way the player's camera
+    /// faced as the cinematic began, for <see cref="Space.GameView"/>.
     /// </summary>
-    public Pose Evaluate(Anchor stand, Anchor looked, float progress)
+    public Pose Evaluate(Anchor stand, Anchor looked, float progress, float viewYaw = 0f)
     {
         float t = Eased(ease, Mathf.Clamp01(progress));
-        Quaternion frame = space == Space.SubjectFacing ? Quaternion.Euler(0f, stand.Yaw, 0f) : Quaternion.identity;
+        Quaternion frame = FrameOf(stand.Yaw, viewYaw);
         Vector3 position = stand.Position + frame * Vector3.Lerp(startOffset, endOffset, t);
-        Quaternion lookFrame = space == Space.SubjectFacing ? Quaternion.Euler(0f, looked.Yaw, 0f) : Quaternion.identity;
+        Quaternion lookFrame = FrameOf(looked.Yaw, viewYaw);
         Vector3 point = looked.Position + lookFrame * lookOffset;
         Vector3 view = point - position;
         Quaternion rotation = view.sqrMagnitude > 1e-6f ? Quaternion.LookRotation(view, Vector3.up) : frame;
         return new Pose(position, rotation, Mathf.Lerp(startFieldOfView, endFieldOfView, t));
     }
+
+    // The turn the offsets are measured in.
+    private Quaternion FrameOf(float subjectYaw, float viewYaw) =>
+        space == Space.SubjectFacing ? Quaternion.Euler(0f, subjectYaw, 0f) :
+        space == Space.GameView ? Quaternion.Euler(0f, viewYaw, 0f) : Quaternion.identity;
 
     public static float Eased(Ease ease, float t)
     {

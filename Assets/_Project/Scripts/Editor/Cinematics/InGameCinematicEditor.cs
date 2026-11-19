@@ -65,7 +65,7 @@ public sealed class InGameCinematicEditor : Editor
 
         CameraShot.Anchor at = CameraShot.Anchor.Of(subject);
         CameraShot.Anchor looked = shot.lookAt != null ? CameraShot.Anchor.Of(shot.lookAt) : at;
-        CameraShot.Pose pose = shot.Evaluate(at, looked, progress);
+        CameraShot.Pose pose = shot.Evaluate(at, looked, progress, InGameCinematic.GameViewYaw());
         view.cameraSettings.fieldOfView = pose.FieldOfView;
         view.orthographic = false;
         // The Scene view orbits a pivot at its size's distance ahead: put the pivot ahead of the camera.

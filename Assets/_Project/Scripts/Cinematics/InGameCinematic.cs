@@ -158,6 +158,8 @@ public sealed class InGameCinematic : MonoBehaviour
     private int cueTo = -1;
     private CameraShot.Pose? glideFrom;
     private CameraShot.Pose? lastPose;
+    // The way the player's camera faced as it began (CameraShot.Space.GameView).
+    private float viewYaw;
     // The subject as the camera follows it: eased, its height and turning more than its going.
     private Vector3 steadyAt;
     private Vector3 steadyVelocity;
@@ -171,6 +173,7 @@ public sealed class InGameCinematic : MonoBehaviour
     {
         playing = this;
         skip.Reset();
+        viewYaw = GameViewYaw();
         view = CinematicView.Begin(letterbox, hideHud, holdPlayer, skippable, blendIn);
         Reveal();
         lastPose = null;
@@ -262,7 +265,7 @@ public sealed class InGameCinematic : MonoBehaviour
         CameraShot.Anchor now = Steady(CameraShot.Anchor.Of(subject));
         CameraShot.Anchor stand = shot.followSubject ? now : fixedStand;
         CameraShot.Anchor looked = shot.lookAt != null ? CameraShot.Anchor.Of(shot.lookAt) : now;
-        CameraShot.Pose pose = shot.Evaluate(stand, looked, progress);
+        CameraShot.Pose pose = shot.Evaluate(stand, looked, progress, viewYaw);
         Vector3 position = pose.Position;
         // Lifted over rising ground, eased too, or the camera would bump over every hummock under it.
         float lift = Mathf.Max(0f, GroundUnder(position) + 0.4f - position.y);
@@ -316,6 +319,13 @@ public sealed class InGameCinematic : MonoBehaviour
         }
 
         return float.NegativeInfinity;
+    }
+
+    /// <summary>Which way the game's camera faces now, about up (0 north): what Game View shots are framed in.</summary>
+    public static float GameViewYaw()
+    {
+        Camera main = Camera.main;
+        return main != null ? main.transform.eulerAngles.y : 0f;
     }
 
     private static Transform SubjectOf(CameraShot shot)
@@ -382,8 +392,8 @@ public sealed class InGameCinematic : MonoBehaviour
 
             CameraShot.Anchor at = CameraShot.Anchor.Of(shot.subject);
             CameraShot.Anchor looked = shot.lookAt != null ? CameraShot.Anchor.Of(shot.lookAt) : at;
-            CameraShot.Pose start = shot.Evaluate(at, looked, 0f);
-            CameraShot.Pose end = shot.Evaluate(at, looked, 1f);
+            CameraShot.Pose start = shot.Evaluate(at, looked, 0f, GameViewYaw());
+            CameraShot.Pose end = shot.Evaluate(at, looked, 1f, GameViewYaw());
             Gizmos.color = new Color(1f, 0.75f, 0.3f);
             Gizmos.DrawLine(start.Position, end.Position);
             Gizmos.DrawWireSphere(start.Position, 0.25f);
