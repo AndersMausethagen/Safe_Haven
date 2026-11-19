@@ -61,6 +61,10 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 
     public ResidentDefinition Resident => resident;
     public bool IsFollowing => state == State.Following;
+
+    /// <summary>Still where they were found, waiting to be freed: no creature hunts them and nothing hurts them (the user, 2026-11-19:
+    /// a rescuable was killed before the player got there). Once freed they are fair game, and are kept close.</summary>
+    public bool IsWaiting => state != State.Following && state != State.Fallen;
     // Hidden until freed: the player doesn't know who it is yet.
     public string InteractionName => resident == null ? null : IsFollowing ? resident.DisplayName : "Someone hiding";
 
@@ -115,6 +119,10 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         if (health != null)
         {
             health.Died += OnFell;
+            if (IsWaiting)
+            {
+                health.AddInvulnerability(this);
+            }
         }
 
         ListenToRaid();
@@ -183,6 +191,11 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
 
         state = State.Following;
+        if (health != null)
+        {
+            health.RemoveInvulnerability(this);
+        }
+
         // At the player's side now: the map needn't point at them, and the way out is what to look for.
         foreach (QuestWaypoint mark in GetComponentsInChildren<QuestWaypoint>(true))
         {

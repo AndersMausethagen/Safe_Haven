@@ -68,6 +68,47 @@ public sealed class RaidRumourDirector : MonoBehaviour
             {
                 site.PlaceName = PieceAt(spot)?.DisplayName ?? "";
                 site.HideBeaconBeyond(BeaconShowsWithin);
+                PointTheWay(site, rumours[i].Seeks);
+            }
+        }
+    }
+
+    /// <summary>
+    /// A rumour that seeks someone whose rescue is under way points the way on screen as Ingrid's own traveler does: the quest's
+    /// waypoint, at the middle of the map's search area until the site is found, then on the site (the user, 2026-11-19: every
+    /// rescue quest should say roughly where to look; Bjarne's only stood at his forge once found).
+    /// </summary>
+    private void PointTheWay(RaidEventSite site, ResidentDefinition person)
+    {
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
+        if (person == null || log == null)
+        {
+            return;
+        }
+
+        foreach (QuestLog.Entry entry in log.Entries)
+        {
+            if (entry.Status != QuestStatus.Active || entry.Quest == null)
+            {
+                continue;
+            }
+
+            IReadOnlyList<QuestObjective> objectives = entry.Quest.Objectives;
+            for (int o = 0; o < objectives.Count; o++)
+            {
+                if (objectives[o].Type != ObjectiveType.RescuePerson || objectives[o].Person != person)
+                {
+                    continue;
+                }
+
+                var mark = new GameObject("Rescue Waypoint - " + person.DisplayName);
+                mark.SetActive(false);
+                mark.transform.SetParent(site.transform, false);
+                var waypoint = mark.AddComponent<QuestWaypoint>();
+                waypoint.Configure(entry.Quest, o + 1, person.DisplayName + ", somewhere near");
+                mark.AddComponent<RescueWaypointFollower>().Bind(site, waypoint, person.DisplayName);
+                mark.SetActive(true);
+                return;
             }
         }
     }

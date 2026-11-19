@@ -65,6 +65,12 @@ public sealed class MonsterTargeting
             return false;
         }
 
+        // Someone waiting to be rescued is left alone until the player frees them (RescuableTraveler.IsWaiting).
+        if (component.TryGetComponent(out RescuableTraveler stranded) && stranded.IsWaiting)
+        {
+            return false;
+        }
+
         return candidate.IsAlive && side.Faction.WillAttack(candidate.Faction);
     }
 

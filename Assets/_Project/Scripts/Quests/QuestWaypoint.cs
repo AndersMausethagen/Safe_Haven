@@ -36,6 +36,8 @@ public sealed class QuestWaypoint : MonoBehaviour
     public static IReadOnlyList<QuestWaypoint> Active => active;
 
     public QuestDefinition Quest => quest;
+    /// <summary>The objective (1 is the first) it shows for; 0 for the whole quest.</summary>
+    public int Objective => objective;
     public string Label => string.IsNullOrWhiteSpace(label) && quest != null ? quest.DisplayName : label;
 
     /// <summary>Sets the waypoint up (editor tools).</summary>
