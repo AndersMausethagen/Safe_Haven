@@ -45,25 +45,31 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 1.7
     priority: 20
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 1.4
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps:
     - {fileID: 11400000, guid: ead5f29d54ed4ef4a978deb82a7a8b18, type: 2}
     comboChance: 0.45
     comboGap: 0.2
     comboFromTier: 2
     holdChance: 0.25
+    breakAway: 3
+    breakAwaySeconds: {x: 0.6, y: 1}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -99,24 +105,30 @@ MonoBehaviour:
     minimumRange: 3
     maximumRange: 10
     priority: 15
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 7
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
     burstCount: 1
@@ -180,6 +192,12 @@ MonoBehaviour:
   arrowDodge: 0.3
   poise: 0
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0

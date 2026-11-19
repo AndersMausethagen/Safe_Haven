@@ -166,6 +166,14 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField] private Vector2 circleSeconds = new Vector2(0.8f, 1.6f);
     [Tooltip("Metres from the player it circles at.")]
     [SerializeField, Min(0f)] private float circleDistance = 3.5f;
+    [Header("Fair turns (Docs/EnemyAIReview_2026-11-19.md §2)")]
+    [Tooltip("Of those ready to strike the player, the one ranked highest goes: seconds waited, plus Front Bonus inside the player's " +
+             "guard arc (half of Front Arc either side of where they face), plus On Screen Bonus in view, less Last Striker Penalty for " +
+             "the one that struck last.")]
+    [SerializeField, Min(0f)] private float frontBonus = 0.6f;
+    [SerializeField, Range(10f, 180f)] private float frontHalfArc = 70f;
+    [SerializeField, Min(0f)] private float onScreenBonus = 0.3f;
+    [SerializeField, Min(0f)] private float lastStrikerPenalty = 1f;
     [Tooltip("Share of its speed it circles at.")]
     [SerializeField, Range(0.1f, 1f)] private float circleSpeed = 0.6f;
 
@@ -389,6 +397,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float OffScreenWait => offScreenWait;
     public float AttackTurnSpacing => attackTurnSpacing;
     public Vector2 CircleSeconds => circleSeconds;
+    public float FrontBonus => frontBonus;
+    public float FrontHalfArc => frontHalfArc;
+    public float OnScreenBonus => onScreenBonus;
+    public float LastStrikerPenalty => lastStrikerPenalty;
     public float CircleDistance => circleDistance;
     public float CircleSpeed => circleSpeed;
     public float AnswerDelay => answerDelay;

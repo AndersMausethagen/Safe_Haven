@@ -18,6 +18,8 @@ public sealed class MonsterPack : MonoBehaviour
     private MonsterAI[] members;
     private int startCount;
     private bool broken;
+    private bool leaderMarked;
+    private const float LeaderScale = 1.1f;
 
     /// <summary>Whether a pack breaks, with this many of it left of its whole.</summary>
     public static bool Breaks(int left, int whole, bool leaderFell, bool breaksWithLeader, float atLosses)
@@ -55,13 +57,23 @@ public sealed class MonsterPack : MonoBehaviour
         }
 
         broken = true;
+        int crying = 0;
         foreach (MonsterAI member in members)
         {
             if (member != null && member != fallen)
             {
-                member.Rout(fleeSeconds);
+                // One after another, so a pack's yelps are heard as a pack breaking, not one sound.
+                member.Rout(fleeSeconds, 0.15f * crying++);
             }
         }
+
+        // Said once a pack, so the player knows what they did (Halo, F.E.A.R.: show the group's decision).
+        if (crying > 0 && Player.Current != null && Vector3.Distance(Player.Current.transform.position, transform.position) < 40f)
+        {
+            GameMessages.Post("The pack breaks!", MessageKind.Info);
+        }
+
+        PlaytestLogger.Note(PlaytestLog.EnemyAI, "Rout", crying, fallen != null && fallen.Definition != null ? fallen.Definition.name : name);
     }
 
     private void Awake()
@@ -72,6 +84,14 @@ public sealed class MonsterPack : MonoBehaviour
             int seed = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed : 1;
             seed = RaidLayout.SeedFor(seed, $"{transform.position.x:F2},{transform.position.z:F2}");
             optionalMember.SetActive(new System.Random(seed).Next(2) == 1);
+        }
+
+        // The one that leads stands out (§3): a little bigger and paler, so "bring down the one that howls" can be acted on.
+        if (leader != null && !leaderMarked)
+        {
+            leaderMarked = true;
+            leader.transform.localScale *= LeaderScale;
+            CreatureLook.Tint(leader.gameObject, new Color(1.15f, 1.12f, 1.08f, 1f));
         }
 
         startCount = 0;

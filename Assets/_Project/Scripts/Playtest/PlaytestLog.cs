@@ -67,6 +67,9 @@ public static class PlaytestLog
     public const string PlaceFindTaken = "PlaceFindTaken";
     /// <summary>A stage revealed a cache (subject Glint or Hoard, amount metres from the player, detail the stage).</summary>
     public const string StageReveal = "StageReveal";
+    /// <summary>A creature's group behaviour (subject what: BreakAway, Rout, Flank, Alarm, SearchPoint, Intensity.Peak, Intensity.Relax;
+    /// detail the creature or the stage).</summary>
+    public const string EnemyAI = "EnemyAI";
     public const string SceneEntered = "SceneEntered";
     public const string PlayerDied = "PlayerDied";
     /// <summary>A skill reached a level: subject the skill's id, amount the level, detail "insight" when Insight raised it.</summary>

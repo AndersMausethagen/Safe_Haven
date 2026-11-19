@@ -63,6 +63,51 @@ public static class AttackTurns
         return target + new Vector3(Mathf.Sin(heading), 0f, Mathf.Cos(heading)) * Mathf.Max(standOff, distance * 0.75f);
     }
 
+    /// <summary>
+    /// Who of those ready goes first (Docs/EnemyAIReview_2026-11-19.md §2): the turn went to whichever creature's Update ran first, so
+    /// the same one tended to win and the one that had just struck went again. Now: the seconds it has waited, plus Front Bonus inside
+    /// the target's guard arc (blows come from where a guard works), plus On Screen Bonus in view, less Last Striker Penalty for the one
+    /// that struck last. The highest goes.
+    /// </summary>
+    public static float Rank(float waited, bool inFront, bool onScreen, bool struckLast, float frontBonus, float onScreenBonus, float lastPenalty) =>
+        Mathf.Max(0f, waited) + (inFront ? frontBonus : 0f) + (onScreen ? onScreenBonus : 0f) - (struckLast ? lastPenalty : 0f);
+
+    /// <summary>True when <paramref name="self"/> stands inside the guard arc of a target facing <paramref name="facing"/> (half-arc in
+    /// degrees).</summary>
+    public static bool InFront(Vector3 self, Vector3 target, Vector3 facing, float halfArc)
+    {
+        Vector3 to = self - target;
+        to.y = 0f;
+        facing.y = 0f;
+        return to.sqrMagnitude > 0.0001f && facing.sqrMagnitude > 0.0001f && Vector3.Angle(facing, to) <= halfArc;
+    }
+
+    /// <summary>
+    /// Where a creature runs after its strike (§1, bite and break away): <paramref name="metres"/> from the target, swung 50-70° round from
+    /// where it struck, on the side away from the nearest other attacker (<paramref name="other"/>, or <paramref name="side"/> when alone).
+    /// Hit and run instead of standing at the player's feet and striking on cooldown.
+    /// </summary>
+    public static Vector3 BreakAwaySpot(Vector3 self, Vector3 target, Vector3? other, float metres, float side, float swing = 60f)
+    {
+        Vector3 from = self - target;
+        from.y = 0f;
+        if (from.sqrMagnitude < 0.0001f)
+        {
+            from = Vector3.back;
+        }
+
+        float bearing = Mathf.Atan2(from.x, from.z) * Mathf.Rad2Deg;
+        if (other.HasValue)
+        {
+            Vector3 theirs = other.Value - target;
+            float delta = Mathf.DeltaAngle(bearing, Mathf.Atan2(theirs.x, theirs.z) * Mathf.Rad2Deg);
+            side = delta > 0f ? -1f : 1f;
+        }
+
+        float heading = (bearing + Mathf.Sign(side == 0f ? 1f : side) * Mathf.Clamp(swing, 50f, 70f)) * Mathf.Deg2Rad;
+        return target + new Vector3(Mathf.Sin(heading), 0f, Mathf.Cos(heading)) * Mathf.Max(0.5f, metres);
+    }
+
     /// <summary>Where to walk next while circling: a step around the target on <paramref name="side"/> (1 or -1), corrected toward the
     /// distance it waits at.</summary>
     public static Vector3 CircleSpot(Vector3 position, Vector3 toTarget, float side, float distance)

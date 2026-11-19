@@ -45,24 +45,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 10
     priority: 20
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 14
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 11400000, guid: d2b68a9637836884a89327fada25cb8c, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -98,24 +104,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 1.53
     priority: 10
+    opener: 0
     weight: 1
     whenFoe: 0
     heavy: 0
     cooldown: 1
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 3.5
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -151,24 +163,30 @@ MonoBehaviour:
     minimumRange: 3.5
     maximumRange: 10
     priority: 15
+    opener: 0
     weight: 0.6
     whenFoe: 6
     heavy: 0
     cooldown: 7
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0.35
     fromTier: 2
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -232,6 +250,12 @@ MonoBehaviour:
   arrowDodge: 0
   poise: 0
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -254,7 +278,7 @@ MonoBehaviour:
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 3d1695c02a14ecf4bb127f270293a6cc, type: 3}
   journalLore: Runa says these were ordinary wolves once. The curse got into them through the prey they ate, and they kept the pack and lost the fear of fire. They hunt the same paths your people must walk home.
-  journalAdvice: They come in packs and take turns at you, so keep them in front of you and watch for the lunge. A tier II wolf learns to pounce. Parry the bite, and don't chase one that backs away, as that is how the others get behind you.
+  journalAdvice: They come in packs and take turns at you, so keep them in front of you and watch for the lunge. A tier II wolf learns to pounce. Parry the bite, and don't chase one that backs away, as that is how the others get behind you. Bring down the one that howls, the biggest of them, and the rest will run.
   journalHabitat: The paths of the Misty Woods and Troll Valley, in packs
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: 32f397f6c4f79ca459a23ff2f1b6bb8e, type: 2}

@@ -105,6 +105,13 @@ public sealed class MonsterAttack
     [Range(0, Tiers.Max)] public int comboFromTier;
     [Tooltip("Chance it holds the wind-up before letting the blow go, tracking its target meanwhile: a roll on reflex comes too soon.")]
     [Range(0f, 1f)] public float holdChance;
+    [Header("Melee: after the blow (Docs/EnemyAIReview_2026-11-19.md §1)")]
+    [Tooltip("Metres it runs off from its target once this strike is over, landed or not, swung round to the side away from the others, " +
+             "then holds ready: hit and run, not standing at the target's feet striking on cooldown. 0: it stays.")]
+    [Min(0f)] public float breakAway;
+    [Tooltip("Seconds it holds off after breaking away before it may start another close strike (least and most). A leap or charge it " +
+             "now has room for is allowed.")]
+    public Vector2 breakAwaySeconds = new Vector2(0.8f, 1.4f);
     [Tooltip("Seconds it holds for. Its warning stops filling as long.")]
     [Min(0f)] public float holdSeconds = 0.45f;
     [Header("Projectiles")]

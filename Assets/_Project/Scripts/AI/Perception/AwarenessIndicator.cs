@@ -59,7 +59,12 @@ public sealed class AwarenessIndicator : MonoBehaviour
     {
         PerceptionSettings rules = PerceptionSettings.Current;
         bool visible = rules.ShowIndicators && monster != null && monster.CurrentState != MonsterAI.State.Dead;
-        if (visible && Time.time < spottedUntil)
+        if (visible && monster.IsRoutedNow)
+        {
+            // Beaten: running from its broken pack (Docs/EnemyAIReview_2026-11-19.md §3).
+            Show("\u25BC", new Color(0.7f, 0.7f, 0.7f, 0.85f), 0.8f);
+        }
+        else if (visible && Time.time < spottedUntil)
         {
             Show("!", rules.SpottedColor);
         }

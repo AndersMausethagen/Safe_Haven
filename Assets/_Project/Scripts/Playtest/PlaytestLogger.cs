@@ -341,8 +341,32 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         }
 
         string by = damage.Source != null ? (damage.Source.TryGetComponent(out MonsterAI monster) && monster.Definition != null ? monster.Definition.name : damage.Source.name) : "unknown";
-        Write(PlaytestLog.Hurt, by, Mathf.RoundToInt(result.Damage), $"{(damage.Attack != null ? damage.Attack.name : "-")} {damage.Type}{(result.Blocked ? " blocked" : "")}");
+        Write(PlaytestLog.Hurt, by, Mathf.RoundToInt(result.Damage), $"{(damage.Attack != null ? damage.Attack.name : "-")} {damage.Type}{(result.Blocked ? " blocked" : "")}"
+            + WhereFrom(damage, health));
     }
+
+    /// <summary>Where a blow came from (Docs/EnemyAIReview_2026-11-19.md §0), appended to the Hurt row so old readers still work: " from
+    /// front|side|back" (front within the guard's 70° either side of facing, back beyond 110°), " offscreen" when the striker was out of
+    /// view, and " crowd N", the creatures after the player within 8 m.</summary>
+    public static string WhereFrom(in DamageInfo damage, Damageable victim)
+    {
+        if (damage.Source == null || victim == null)
+        {
+            return "";
+        }
+
+        Vector3 to = damage.Source.transform.position - victim.transform.position;
+        to.y = 0f;
+        Vector3 facing = victim.transform.forward;
+        facing.y = 0f;
+        string side = to.sqrMagnitude < 0.0001f ? "front" : FromSide(Vector3.Angle(facing, to));
+        bool offscreen = damage.Source.TryGetComponent(out MonsterAI monster) && monster.IsOffScreenForLocalPlayer;
+        int crowd = MonsterAI.CountAt(victim, victim.transform.position, 8f);
+        return $" from {side}{(offscreen ? " offscreen" : "")} crowd {crowd}";
+    }
+
+    /// <summary>front, side or back, by the angle between the player's facing and the striker.</summary>
+    public static string FromSide(float angle) => angle <= 70f ? "front" : angle >= 110f ? "back" : "side";
 
     private void Write(string eventName, string subject, int amount = 0, string detail = "")
     {

@@ -45,24 +45,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 1.5
     priority: 10
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 1.8
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 2.5
+    breakAwaySeconds: {x: 0.5, y: 0.9}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -126,6 +132,12 @@ MonoBehaviour:
   arrowDodge: 0
   poise: 10
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
