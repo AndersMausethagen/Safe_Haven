@@ -166,7 +166,11 @@ public static class GameOptions
     public static readonly GameOption RarityLetters = GameOption.Toggle("RarityLetters", "Rarity Letters",
         "Adds a letter to item slots for how rare the item is, so it doesn't rest on the colour of the frame.", false);
     public static readonly GameOption DamageTaken = GameOption.Choice("DamageTaken", "Damage Taken",
-        "How much of a blow reaches you. Raids still end, and what you lose in them is still lost.", 0, "Normal", "75%", "50%");
+        "How much of a blow reaches you. Grows With Falls starts at 90% and takes 2% off for each raid you fall in, down to 50%. Raids " +
+        "still end, and what you lose in them is still lost.", 0, "Normal", "75%", "50%", "Grows With Falls");
+    public static readonly GameOption RaidLength = GameOption.Choice("RaidLength", "Raid Length",
+        "More time on every raid's clock, for a slower pace. The danger stages count the time left, so they come as late before the end " +
+        "as ever. Hosting friends, your setting is the raid's.", 0, "Normal", "+25%", "+50%");
     public static readonly GameOption TimingHelp = GameOption.Choice("TimingHelp", "Parry and Dodge Timing",
         "How long the moment to parry lasts, and how long a dodge carries you through a blow.", 0, "Normal", "Longer", "Much Longer");
 
@@ -175,19 +179,27 @@ public static class GameOptions
         "Attack warnings and hazards on the ground get wider, brighter rims with a dark line inside, so they stand out on any ground.", false);
     public static readonly GameOption FogAmount = GameOption.Slider("FogAmount", "Fog Amount",
         "How thick the fog and mist look. Only what you see changes: creatures see through the fog as they always do.", 1f, 0.4f, 1f, 0.05f);
-    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, SkillBarSize, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, TimingHelp, HighContrastWarnings, FogAmount };
+    public static readonly IReadOnlyList<GameOption> Accessibility = new[] { UiScale, SkillBarSize, ScreenShake, HitStop, ScreenFlash, TextSpeed, LargeTimer, AlwaysShowVitals, VitalsOverPlayer, SoundCaptions, RarityLetters, DamageTaken, RaidLength, TimingHelp, HighContrastWarnings, FogAmount };
 
     /// <summary>The share of the fog and mist that is drawn (Fog Amount): 0.4 to 1.</summary>
     public static float FogShown => UnityEngine.Mathf.Clamp(FogAmount.Value, 0.4f, 1f);
 
     /// <summary>The share of a blow that reaches the player.</summary>
-    public static float DamageTakenShare => DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;
+    public static float DamageTakenShare => DamageTaken.Index == 3 ? FallsShare(GameSession.Progress != null ? GameSession.Progress.Falls : 0)
+        : DamageTaken.Index == 2 ? 0.5f : DamageTaken.Index == 1 ? 0.75f : 1f;
+
+    /// <summary>Grows With Falls (Docs/SystemsGapReview_2026-11-19.md §7a; Hades' God Mode, gentler): 90%, 2% less for each fall, to 50%.</summary>
+    public static float FallsShare(int falls) => UnityEngine.Mathf.Max(0.5f, 0.9f - 0.02f * UnityEngine.Mathf.Max(0, falls));
+
+    /// <summary>How many times longer every raid's clock runs (Raid Length).</summary>
+    public static float RaidLengthShare => RaidLength.Index == 2 ? 1.5f : RaidLength.Index == 1 ? 1.25f : 1f;
 
     /// <summary>How many times longer the parry window and a dodge's protection last.</summary>
     public static float TimingShare => TimingHelp.Index == 2 ? 2f : TimingHelp.Index == 1 ? 1.5f : 1f;
 
     /// <summary>The assists in use, in words for the playtest log. Empty with none.</summary>
-    public static string AssistsInUse => DamageTaken.Index == 0 && TimingHelp.Index == 0 ? "" : $"damage taken {DamageTakenShare:0.##}, timing {TimingShare:0.##}";
+    public static string AssistsInUse => DamageTaken.Index == 0 && TimingHelp.Index == 0 && RaidLength.Index == 0 ? ""
+        : $"damage taken {DamageTakenShare:0.##}, timing {TimingShare:0.##}, raid length {RaidLengthShare:0.##}";
 
     /// <summary>Letters per second for dialogue, from a base speed. Infinity shows lines at once.</summary>
     public static float DialogueLettersPerSecond(float normal)

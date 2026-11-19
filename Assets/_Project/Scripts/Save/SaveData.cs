@@ -248,6 +248,8 @@ public sealed class ProgressSaveData
     public List<string> tracked = new List<string>();
     /// <summary>What the last raid set out with (PackForRaid): id and how many. Missing in older saves.</summary>
     public List<AmountSaveData> setOut = new List<AmountSaveData>();
+    /// <summary>Raids fallen in (Damage Taken › Grows With Falls). Missing in older saves.</summary>
+    public int falls;
     /// <summary>Creatures met, by id, with how many were slain: the journal's record. Missing in older saves.</summary>
     public List<AmountSaveData> creatures = new List<AmountSaveData>();
     /// <summary>The rest of the journal's record. Missing in older saves.</summary>

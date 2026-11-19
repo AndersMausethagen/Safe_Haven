@@ -499,6 +499,13 @@ public sealed class CharacterProgress
         return true;
     }
 
+    /// <summary>Raids the player has fallen in (Damage Taken › Grows With Falls).</summary>
+    public int Falls { get; private set; }
+
+    public void NoteFall() => Falls++;
+
+    public void RestoreFalls(int falls) => Falls = Math.Max(0, falls);
+
     /// <summary>What the last raid set out with (PackForRaid), item id to how many.</summary>
     public IReadOnlyDictionary<string, int> SetOut => setOut;
 

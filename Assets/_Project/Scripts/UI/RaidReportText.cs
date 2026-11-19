@@ -37,6 +37,12 @@ public static class RaidReportText
                 builder.Append($"<i>{report.KillerAdvice}</i>\n");
             }
 
+            // The last blows that mattered (RecentBlows): what to do differently.
+            if (report.LastBlows != null && report.LastBlows.Count > 0)
+            {
+                builder.Append($"<size=85%>The last blows: {string.Join("; ", report.LastBlows)}.</size>\n");
+            }
+
             builder.Append('\n');
         }
 

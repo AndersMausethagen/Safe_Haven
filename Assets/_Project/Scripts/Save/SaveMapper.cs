@@ -738,6 +738,7 @@ public static class SaveMapper
         into.crafted.AddRange(progress.CraftedItems);
         into.stones.AddRange(progress.UsedStones);
         into.tracked.AddRange(progress.Tracked);
+        into.falls = progress.Falls;
         foreach (KeyValuePair<string, int> kit in progress.SetOut)
         {
             into.setOut.Add(new AmountSaveData { id = kit.Key, amount = kit.Value });
@@ -892,6 +893,7 @@ public static class SaveMapper
 
         progress.Restore(experience, perks, insight, saved.crafted, saved.stones, skillRanks);
         progress.RestoreTracked(saved.tracked);
+        progress.RestoreFalls(saved.falls);
         var setOut = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData kit in saved.setOut ?? new List<AmountSaveData>())
         {

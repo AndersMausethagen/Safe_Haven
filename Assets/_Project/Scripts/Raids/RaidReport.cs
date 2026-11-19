@@ -111,6 +111,9 @@ public sealed class RaidReport
 
     /// <summary>How to face what brought the player down (its journal advice), shown under it on the death screen. Not saved.</summary>
     public string KillerAdvice { get; set; }
+
+    /// <summary>The last blows that mattered before the player fell (RecentBlows), oldest first; empty when they didn't. Not saved.</summary>
+    public System.Collections.Generic.List<string> LastBlows { get; set; } = new System.Collections.Generic.List<string>();
     public string TransportLine { get; set; } = "";
     public bool TransportHome { get; set; }
     /// <summary>Who went along, or null.</summary>

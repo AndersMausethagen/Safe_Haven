@@ -149,6 +149,7 @@ public static class GameSession
     {
         ActiveRaid = raid;
         pendingReport = null;
+        RecentBlows.Clear();
     }
 
     /// <summary>Closes the active raid and keeps its report until Safe Haven shows it.</summary>
@@ -158,6 +159,13 @@ public static class GameSession
         string advice = null;
         report.BroughtDownBy = report.Outcome == RaidOutcome.Died ? CreatureRecords.TakeKillerName(out advice) : null;
         report.KillerAdvice = advice;
+        report.LastBlows = report.Outcome == RaidOutcome.Died ? RecentBlows.Take() : new System.Collections.Generic.List<string>();
+        RecentBlows.Clear();
+        if (report.Outcome == RaidOutcome.Died && Progress != null)
+        {
+            // Counted for Damage Taken › Grows With Falls.
+            Progress.NoteFall();
+        }
         pendingReport = report;
     }
 

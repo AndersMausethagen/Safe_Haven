@@ -65,6 +65,12 @@ public sealed class RaidParameters
             effects.Add(new RaidStatModifier(RaidStat.Duration, StatModifierOp.Flat, extraSeconds));
         }
 
+        // Accessibility › Raid Length: more time on the clock, shown in the briefing's rules as the rest are.
+        if (GameOptions.RaidLengthShare > 1f)
+        {
+            effects.Add(new RaidStatModifier(RaidStat.Duration, StatModifierOp.Percent, GameOptions.RaidLengthShare - 1f));
+        }
+
         // The hour's reward works like a modifier, so it shows in the briefing's rules.
         if (timeOfDay != null && !Mathf.Approximately(timeOfDay.lootMultiplier, 1f))
         {

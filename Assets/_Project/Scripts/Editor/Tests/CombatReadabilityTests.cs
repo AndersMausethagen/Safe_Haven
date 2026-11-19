@@ -68,4 +68,44 @@ public sealed class CombatReadabilityTests
         Assert.Less(midway, 1f);
         Assert.AreEqual(0f, CameraShake.KickShare(0.2f), "gone after 150 ms");
     }
+
+    // Failure that teaches (Docs/SystemsGapReview_2026-11-19.md §7a).
+    [Test]
+    public void ADeath_KeepsItsLastThreeBlows()
+    {
+        RecentBlows.Clear();
+        RecentBlows.Note("one");
+        RecentBlows.Note("two");
+        RecentBlows.Note("three");
+        RecentBlows.Note("four");
+        CollectionAssert.AreEqual(new[] { "two", "three", "four" }, RecentBlows.Take(), "the oldest goes");
+        Assert.IsEmpty(RecentBlows.Take(), "taken once");
+    }
+
+    [Test]
+    public void GrowsWithFalls_EasesTwoPercentAFall_ToHalf()
+    {
+        Assert.AreEqual(0.9f, GameOptions.FallsShare(0), 1e-4f);
+        Assert.AreEqual(0.86f, GameOptions.FallsShare(2), 1e-4f);
+        Assert.AreEqual(0.5f, GameOptions.FallsShare(40), 1e-4f, "never below half");
+    }
+
+    [Test]
+    public void RaidLength_LengthensTheClock()
+    {
+        RaidDefinition raid = UnityEditor.AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
+        Assert.IsNotNull(raid);
+        float was = GameOptions.RaidLength.Value;
+        try
+        {
+            GameOptions.RaidLength.Value = 0f;
+            float normal = RaidParameters.Calculate(raid, (System.Collections.Generic.IEnumerable<RaidModifierDefinition>)null).Duration;
+            GameOptions.RaidLength.Value = 1f;
+            Assert.AreEqual(normal * 1.25f, RaidParameters.Calculate(raid, (System.Collections.Generic.IEnumerable<RaidModifierDefinition>)null).Duration, 1f, "+25%");
+        }
+        finally
+        {
+            GameOptions.RaidLength.Value = was;
+        }
+    }
 }
