@@ -66,6 +66,12 @@ public sealed class MinimapHud : MonoBehaviour
 
     public static MinimapHud Current { get; private set; }
 
+    /// <summary>The minimap's top and centre, in canvas units from the bottom-right corner, at the size it is drawn now (the region's
+    /// name sits over it: RegionTitleHud).</summary>
+    public Vector2 TopCentre => settings != null
+        ? new Vector2(-Margin - settings.Size * HudRules.MinimapScale * 0.5f, Margin + settings.Size * HudRules.MinimapScale)
+        : new Vector2(-Margin - 118f, Margin + 236f);
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
@@ -149,6 +155,9 @@ public sealed class MinimapHud : MonoBehaviour
         pointer = MakeSprite(Arrowhead);
 
         disc = CodeUI.Box("Disc", root, new Vector2(1f, 0f), Vector2.one * settings.Size, new Vector2(-Margin - settings.Size * 0.5f, Margin + settings.Size * 0.5f));
+        // Held by its corner, so it grows and shrinks into it (HudRules.MinimapScale): the same place at full size.
+        disc.pivot = new Vector2(1f, 0f);
+        disc.anchoredPosition = new Vector2(-Margin, Margin);
         ground = disc.gameObject.AddComponent<RawImage>();
         ground.raycastTarget = false;
         material = new Material(settings.Material);
@@ -227,6 +236,8 @@ public sealed class MinimapHud : MonoBehaviour
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
         group.alpha = shown ? 1f : 0f;
+        // A quarter smaller on a Contextual or Minimal HUD: a third of the screen's height at 720p (the HUD review of 2026-11-18).
+        disc.localScale = Vector3.one * HudRules.MinimapScale;
         TakesWheel = shown && Mouse.current != null && RectTransformUtility.RectangleContainsScreenPoint(disc, Mouse.current.position.ReadValue(), null);
         if (!shown)
         {

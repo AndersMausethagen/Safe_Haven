@@ -164,6 +164,10 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
         string reason = null;
         IsReady = working || interactor.CanInteractWith(Target, out reason);
         bool note = !IsReady && Target.TryGetComponent(out IInteractionNote source) && source.IsNote;
+        // Only out of reach, on a Contextual HUD (HudRules): its name in the soft colour and nothing more. "Move closer to interact" in
+        // red sat over the portal from across the clearing (the HUD review of 2026-11-18); a real refusal still says what is missing.
+        bool onlyFar = !IsReady && !working && reason == PlayerInteractor.TooFar && !HudRules.ShowsEverything;
+        note |= onlyFar;
         Color color = IsReady ? readyColor : note ? noteColor : blockedColor;
         if (orb != null)
         {
@@ -193,7 +197,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
             }
             else
             {
-                SetText(status, string.IsNullOrEmpty(reason) ? "Cannot interact." : reason);
+                SetText(status, onlyFar ? "" : string.IsNullOrEmpty(reason) ? "Cannot interact." : reason);
             }
         }
     }

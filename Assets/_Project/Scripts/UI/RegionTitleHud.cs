@@ -84,6 +84,12 @@ public sealed class RegionTitleHud : MonoBehaviour
         // Out of the way while a window is up, as the minimap is.
         bool covered = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         corner.enabled = !covered;
+        // Over the minimap at the size it is drawn now (HudRules.MinimapScale); a copy of its size here floated a quarter above it.
+        if (MinimapHud.Current != null)
+        {
+            Vector2 top = MinimapHud.Current.TopCentre;
+            corner.rectTransform.anchoredPosition = new Vector2(top.x, top.y + 8f + 13f);
+        }
         float since = Time.time - shownAt;
         titleGroup.alpha = covered ? 0f
             : since < FadeSeconds ? since / FadeSeconds

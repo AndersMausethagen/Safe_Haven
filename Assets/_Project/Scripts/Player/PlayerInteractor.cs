@@ -104,6 +104,9 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
         return Current != null ? Current : FindNearest();
     }
 
+    /// <summary>The reason given when the target is only out of reach (the interaction marker says no more than its name then).</summary>
+    public const string TooFar = "Move closer to interact.";
+
     /// <summary>Read-only readiness, including the player's state, reach and the target's tool requirements.</summary>
     public bool CanInteractWith(Interactable target, out string blockedReason)
     {
@@ -139,7 +142,7 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
 
         if (target.DistanceFrom(transform.position) > target.Range)
         {
-            blockedReason = "Move closer to interact.";
+            blockedReason = TooFar;
             return false;
         }
 

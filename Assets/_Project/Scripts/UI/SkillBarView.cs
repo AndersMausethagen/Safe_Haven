@@ -29,6 +29,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         public Image flash;
 
         [NonSerialized] public float flashUntil = -1f;
+        [NonSerialized] public CanvasGroup fade;
         [NonSerialized] public Color flashColor;
         [NonSerialized] public int shownSeconds = -1;
         [NonSerialized] public int shownCount = -1;
@@ -275,6 +276,9 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
             return;
         }
 
+        // Empty slots, in a Contextual HUD, only while something could go into them (dragged, or the skills window open): four empty
+        // frames sat beside five filled ones all game (the HUD review of 2026-11-18). Faded, not removed, so every key keeps its place.
+        bool showEmpty = HudRules.ShowsEverything || ItemDrag.Active || SkillsWindow.IsOpen;
         for (int i = 0; i < slots.Length; i++)
         {
             UpdateSlot(slots[i], skills.Loadout.Get(i));
@@ -283,7 +287,26 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
             {
                 OnSlotChanged(i);
             }
+
+            FadeEmpty(slots[i], showEmpty || item != null || skills.Loadout.Get(i) != null);
         }
+    }
+
+    private static void FadeEmpty(Slot slot, bool shown)
+    {
+        if (slot?.view == null)
+        {
+            return;
+        }
+
+        if (slot.fade == null && !slot.view.TryGetComponent(out slot.fade))
+        {
+            slot.fade = slot.view.gameObject.AddComponent<CanvasGroup>();
+        }
+
+        slot.fade.alpha = Mathf.MoveTowards(slot.fade.alpha, shown ? 1f : 0f, 6f * Time.unscaledDeltaTime);
+        // Still a drop target while dragging (showEmpty), so a faded slot never takes a click it can't be seen to.
+        slot.fade.blocksRaycasts = shown;
     }
 
     private void UpdateSlot(Slot slot, SkillDefinition skill)

@@ -45,13 +45,15 @@ public sealed class NoiseMeterView : MonoBehaviour
     {
         // During raids, and at home only near something that could hear (as the summary says): it counted any creature anywhere in the
         // scene, so the Haven's wildlife kept "Silent" on screen all day (the HUD review of 2026-11-18).
-        if (noise != null && RaidDirector.Current == null && Time.unscaledTime >= nextNearbyLook)
+        if (noise != null && Time.unscaledTime >= nextNearbyLook)
         {
             nextNearbyLook = Time.unscaledTime + 0.5f;
             heardNearby = AnyHostileWithin(noise.transform.position, PerceptionSettings.Current.NoiseMeterMax);
         }
 
-        bool visible = noise != null && (RaidDirector.Current != null || heardNearby);
+        // On a raid: all of it on a Full HUD; otherwise while sneaking or with something near enough to hear (HudRules).
+        bool onARaid = RaidDirector.Current != null;
+        bool visible = noise != null && (heardNearby || (onARaid && (HudRules.ShowsEverything || noise.IsSneaking)));
         if (panel.activeSelf != visible)
         {
             panel.SetActive(visible);

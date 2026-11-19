@@ -319,6 +319,16 @@ may sit below y = 0 once the builder has made room for a river bed: compare terr
 
 ### Hearthline: one style for all the UI
 
+**The HUD shows what matters (2026-11-18, the user: "right now its cluttered").** Options › Gameplay › HUD: Full (everything all the
+time, as before), Contextual (the default) and Minimal. A HUD piece asks `UI/HudRules` (`ShowsEverything`, `IsMinimal`, `InAFight`,
+`MinimapScale`), never the option. On Contextual: the vitals go when everything is full and quiet (hunger and thirst only below 60% or
+just after a meal), the day's timeline only from two hours before dusk and an hour and a half before dawn (and over the world map),
+empty skill-bar slots only while something could go into them, the experience strip while it has something to say, the noise meter
+near something hostile or while sneaking, the tutorials as an unframed "book 4 (T)", the minimap three-quarters size (the region's
+name reads `MinimapHud.TopCentre`), the quest list as the quest on top in full and the rest by title (Minimal: the top one alone), an
+interaction marker out of reach as its name only. On every density: a message repeated while it is up is one line counted ("×2"), and
+floating words and numbers close together step upwards. A new HUD piece decides its Contextual rule here and asks `HudRules`.
+
 `UI/UIStyle` (`Resources/UIStyle`, Systems Editor › Settings › UI Style) holds the fonts and colours. Prefabs and scenes carry a
 `UIRole` (window, inset, slot, button, primary button), which colours them from it on waking, so a colour changed there reaches the
 whole game with nothing to re-run; code-built UI reads the style directly. `UIStyle.OnWorld` sets up text that sits on the world, with

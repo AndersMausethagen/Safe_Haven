@@ -21,7 +21,12 @@ public static class GameOptions
     public static readonly GameOption MinimapDistance = GameOption.Choice("MinimapDistance", "Minimap Distance",
         "How far around you the minimap reaches. The mouse wheel over the minimap changes it too.", 2, "Hidden", "30 m", "50 m", "75 m", "110 m");
 
-    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance };
+    // The HUD review of 2026-11-18 (the user: "right now its cluttered"): what the screen shows when nothing is happening (HudRules).
+    public static readonly GameOption Hud = GameOption.Choice("Hud", "HUD",
+        "Full shows everything all the time. Contextual shows bars, meters and the day's timeline when they matter, and the rest small. " +
+        "Minimal also keeps the quest list to the quest you follow.", 1, "Full", "Contextual", "Minimal");
+
+    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud };
 
     /// <summary>The minimap's reach in metres for each Minimap Distance (0 for Hidden).</summary>
     public static readonly float[] MinimapReaches = { 0f, 30f, 50f, 75f, 110f };

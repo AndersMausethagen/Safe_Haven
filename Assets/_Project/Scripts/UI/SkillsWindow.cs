@@ -70,6 +70,9 @@ public sealed partial class SkillsWindow : MonoBehaviour
 
     public static SkillsWindow Current { get; private set; }
 
+    /// <summary>True while the skills window is open (the skill bar shows its empty slots then, to be filled).</summary>
+    public static bool IsOpen => Current != null && Current.window != null && Current.window.IsOpen;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => Current = null;
 

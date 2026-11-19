@@ -15,6 +15,9 @@ public sealed class MessageFeedView : MonoBehaviour
     {
         public TMP_Text Label;
         public float ShownAt;
+        // The message as posted, and how many times it came while still on screen ("×2").
+        public string Text;
+        public int Times;
     }
 
     [Tooltip("Text used as a template for each line. It is hidden itself.")]
@@ -156,6 +159,23 @@ public sealed class MessageFeedView : MonoBehaviour
 
     public void Show(string text, MessageKind kind)
     {
+        // The same words again while they are still up: one line, counted. Two wolves howling wrote the same sentence twice, one
+        // above the other (the HUD review of 2026-11-18).
+        for (int i = lines.Count - 1; i >= 0; i--)
+        {
+            if (lines[i].Text == text && lines[i].Label != null)
+            {
+                Line again = lines[i];
+                again.Times++;
+                again.ShownAt = Time.unscaledTime;
+                again.Label.text = $"{text}  ×{again.Times}";
+                again.Label.transform.SetAsLastSibling();
+                lines.RemoveAt(i);
+                lines.Add(again);
+                return;
+            }
+        }
+
         if (lines.Count >= maxLines)
         {
             Destroy(lines[0].Label.gameObject);
@@ -168,7 +188,7 @@ public sealed class MessageFeedView : MonoBehaviour
         label.alignment = following ? TextAlignmentOptions.Left : lineTemplate.alignment;
         label.color = kind == MessageKind.Gain ? gainColor : kind == MessageKind.Warning ? warningColor : infoColor;
         label.transform.SetAsLastSibling();
-        lines.Add(new Line { Label = label, ShownAt = Time.unscaledTime });
+        lines.Add(new Line { Label = label, ShownAt = Time.unscaledTime, Text = text, Times = 1 });
     }
 
     // Beside the player while they are on screen; at the resting place (lifted above an open dialogue box) otherwise.

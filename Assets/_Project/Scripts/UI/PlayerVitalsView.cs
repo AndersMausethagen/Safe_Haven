@@ -390,8 +390,14 @@ public sealed class PlayerVitalsView : MonoBehaviour
         DrainTrail(focus);
         if (bound != null && bound.Needs != null)
         {
+            float hungerWas = hunger.target, thirstWas = thirst.target;
             SetTarget(hunger, bound.Needs.Hunger.Current, bound.Needs.Hunger.Max, snap: true);
             SetTarget(thirst, bound.Needs.Thirst.Current, bound.Needs.Thirst.Max, snap: true);
+            // Eaten or drunk: shown for a moment, so the meal is seen to count (they fall slowly all day, which says nothing).
+            if (hunger.target > hungerWas + 0.01f || thirst.target > thirstWas + 0.01f)
+            {
+                needsFedAt = Time.unscaledTime;
+            }
         }
 
         UpdateQuiet();
@@ -412,12 +418,54 @@ public sealed class PlayerVitalsView : MonoBehaviour
     {
         if (group != null && bound != null)
         {
-            group.alpha = Mathf.MoveTowards(group.alpha, IsQuiet ? QuietAlpha : 1f, QuietFadePerSecond * Time.unscaledDeltaTime);
+            // Contextual and Minimal (HudRules): quiet is gone, not dim. At 40% the four full bars still read as on, and were a good
+            // part of a screen cluttered with nothing happening (the HUD review of 2026-11-18).
+            float quiet = HudRules.ShowsEverything ? QuietAlpha : 0f;
+            group.alpha = Mathf.MoveTowards(group.alpha, IsQuiet ? quiet : 1f, QuietFadePerSecond * Time.unscaledDeltaTime);
+        }
+
+        UpdateNeedsRows();
+    }
+
+    // Hunger and thirst, labels and bars, when the vitals are up for something else: shown when one is getting low (below Needs
+    // Shown Below), just after a meal or a drink, or always on a Full HUD or with Always Show Vitals.
+    private const float NeedsShownBelow = 0.6f;
+    private CanvasGroup[] needsRows;
+    private float needsFedAt = float.NegativeInfinity;
+
+    private void UpdateNeedsRows()
+    {
+        if (bound == null || bound.Needs == null)
+        {
+            return;
+        }
+
+        needsRows ??= Rows("Hunger Bar", "Hunger Label", "Thirst Bar", "Thirst Label");
+        bool shown = HudRules.ShowsEverything || GameOptions.AlwaysShowVitals.On || hunger.target < NeedsShownBelow || thirst.target < NeedsShownBelow
+            || Time.unscaledTime < needsFedAt + QuietAfterSeconds;
+        foreach (CanvasGroup row in needsRows)
+        {
+            row.alpha = Mathf.MoveTowards(row.alpha, shown ? 1f : 0f, QuietFadePerSecond * Time.unscaledDeltaTime);
         }
     }
 
+    // The prefab's parts by name, each given a CanvasGroup of its own to fade.
+    private CanvasGroup[] Rows(params string[] names)
+    {
+        var rows = new System.Collections.Generic.List<CanvasGroup>();
+        foreach (Transform part in GetComponentsInChildren<Transform>(true))
+        {
+            if (System.Array.IndexOf(names, part.name) >= 0)
+            {
+                rows.Add(part.TryGetComponent(out CanvasGroup existing) ? existing : part.gameObject.AddComponent<CanvasGroup>());
+            }
+        }
+
+        return rows.ToArray();
+    }
+
     // A refused action, a cooling dodge or a fight all count as something going on.
-    private bool IsQuiet => !GameOptions.AlwaysShowVitals.On
+    private bool IsQuiet => !GameOptions.AlwaysShowVitals.On && !HudRules.ShowsEverything
         && Time.unscaledTime >= lastActiveAt + QuietAfterSeconds && flashUntil < 0f
         && health.target >= FullShare && stamina.target >= FullShare
         && (bound.Needs == null || (hunger.target >= NeedsInHandShare && thirst.target >= NeedsInHandShare))

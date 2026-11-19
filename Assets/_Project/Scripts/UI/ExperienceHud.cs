@@ -301,7 +301,6 @@ public sealed class ExperienceHud : MonoBehaviour
         float shown = Time.unscaledTime - bannerAt;
         banner.alpha = shown >= bannerFor ? 0f : Mathf.Clamp01(shown / 0.25f) * Mathf.Clamp01((bannerFor - shown) / 0.6f);
 
-        group.alpha = GamePause.IsPaused ? 0f : 1f;
         LevelingSettings settings = LevelingSettings.Current;
         CharacterProgress progress = GameSession.Progress;
         int needed = 0;
@@ -349,6 +348,10 @@ public sealed class ExperienceHud : MonoBehaviour
         level.color = points > 0 ? Color.Lerp(Gold, Color.white, UIMotion.Breath(0.8f) * 0.6f) : Gold;
 
         float age = Time.unscaledTime - gainAt;
+        // In a Contextual HUD (HudRules) only while it has something to say: something to spend (N), experience just earned, the raid's
+        // bonus waiting for the way home, a level's banner. "Skills" sat under the bar all game (the HUD review of 2026-11-18).
+        bool says = HudRules.ShowsEverything || points > 0 || held > 0 || age < GainSeconds * 3f || shown < bannerFor;
+        group.alpha = GamePause.IsPaused ? 0f : Mathf.MoveTowards(group.alpha, says ? 1f : 0f, 2f * Time.unscaledDeltaTime);
         gain.gameObject.SetActive(age < GainSeconds);
         if (age < GainSeconds)
         {

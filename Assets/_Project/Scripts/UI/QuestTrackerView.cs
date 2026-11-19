@@ -49,9 +49,10 @@ public sealed class QuestTrackerView : MonoBehaviour
     private void Update()
     {
         bool onARaid = RaidDirector.Current != null;
-        if (onARaid != wasOnARaid)
+        if (onARaid != wasOnARaid || HudRules.Current != writtenFor)
         {
             wasOnARaid = onARaid;
+            writtenFor = HudRules.Current;
             Refresh();
         }
 
@@ -69,6 +70,7 @@ public sealed class QuestTrackerView : MonoBehaviour
     }
 
     private float nextRaidLook;
+    private HudRules.Density writtenFor = (HudRules.Density)(-1);
 
     public void Refresh()
     {
@@ -118,14 +120,22 @@ public sealed class QuestTrackerView : MonoBehaviour
         panel.SetActive(active.Count + available.Count + atHome > 0);
         var builder = new StringBuilder();
         timed = false;
-        for (int q = 0; q < active.Count && q < maxQuests; q++)
+        // A Contextual HUD (HudRules): the quest on top in full, its finished and not-yet-open steps left out; the rest by their titles.
+        // Minimal: the quest on top alone. Three quests with every step stood down the right edge (the HUD review of 2026-11-18).
+        bool everything = HudRules.ShowsEverything;
+        int limit = HudRules.IsMinimal ? 1 : maxQuests;
+        for (int q = 0; q < active.Count && q < limit; q++)
         {
             QuestLog.Entry entry = active[q];
-            builder.Append(q > 0 ? "\n\n" : "").Append(Title(entry.Quest));
+            builder.Append(q > 0 ? (everything ? "\n\n" : "\n") : "").Append(Title(entry.Quest));
             if (QuestTimers.TryGet(entry.Quest, out float left))
             {
                 timed = true;
                 builder.Append($"  <color={Muted}>{(int)left / 60}:{(int)left % 60:00}</color>");
+            }
+            if (q > 0 && !everything)
+            {
+                continue;
             }
             if (entry.Status == QuestStatus.ReadyToTurnIn)
             {
@@ -138,33 +148,37 @@ public sealed class QuestTrackerView : MonoBehaviour
                 string line = objective.Amount > 1 ? $"{objective.Describe()}  {entry.Counts[i]}/{objective.Amount}" : objective.Describe();
                 if (entry.IsObjectiveDone(i))
                 {
-                    builder.Append($"\n<color={Done}>• {line}  (done)</color>");
+                    if (everything) builder.Append($"\n<color={Done}>• {line}  (done)</color>");
                 }
                 else if (entry.IsObjectiveOpen(i))
                 {
                     builder.Append("\n• ").Append(line);
                 }
-                else
+                else if (everything)
                 {
                     builder.Append($"\n<color={Muted}>• {line}</color>");
                 }
             }
         }
 
-        int shown = Mathf.Min(active.Count, maxQuests);
+        int shown = Mathf.Min(active.Count, limit);
         foreach (QuestDefinition quest in available)
         {
-            if (shown >= maxQuests) break;
+            if (shown >= limit) break;
             bool waiting = manager.IsWaiting(quest);
             string instruction = waiting && DialogueBox.IsSpeaking
                 ? "Finish the conversation to continue." : quest.AvailableObjective;
-            builder.Append(shown > 0 ? "\n\n" : "").Append(Title(quest))
-                .Append("\n• ").Append(instruction);
+            builder.Append(shown > 0 ? (everything ? "\n\n" : "\n") : "").Append(Title(quest));
+            if (shown == 0 || everything)
+            {
+                builder.Append("\n• ").Append(instruction);
+            }
+
             timed |= waiting;
             shown++;
         }
 
-        int more = hidden + Mathf.Max(0, active.Count + available.Count - maxQuests);
+        int more = hidden + Mathf.Max(0, active.Count + available.Count - limit);
         if (more > 0)
         {
             builder.Append($"\n\n<color={Muted}>+{more} more in the journal</color>");

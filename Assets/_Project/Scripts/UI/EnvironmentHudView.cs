@@ -65,6 +65,7 @@ public sealed class EnvironmentHudView : MonoBehaviour
         float sunrise = cycle.Profile.Sunrise;
         float sunset = cycle.Profile.Sunset;
         float hour = cycle.Hour;
+        ShowTimeline(HudRules.ShowsEverything || TimeMatters(hour, sunrise, sunset) || WorldMapHud.IsOpen);
         timeline.SetTime(hour, sunrise, sunset);
         if (sunrise != lastSunrise || sunset != lastSunset)
         {
@@ -102,6 +103,32 @@ public sealed class EnvironmentHudView : MonoBehaviour
 
         // During a blend, describe the conditions actually visible, not the destination forecast.
         weatherIcon.SetWeather(weather.Current, cycle.IsNight);
+    }
+
+    // The day's timeline and its five phase labels: in a Contextual HUD only while the time is about to matter (HudRules). All day
+    // it spread across the top of the screen, a time behind the portal (the HUD review of 2026-11-18); the clock and the weather stay.
+    private bool timelineShown = true;
+
+    private void ShowTimeline(bool shown)
+    {
+        if (shown == timelineShown)
+        {
+            return;
+        }
+
+        timelineShown = shown;
+        timeline.gameObject.SetActive(shown);
+        foreach (TMP_Text label in phaseLabels)
+        {
+            label.gameObject.SetActive(shown);
+        }
+    }
+
+    /// <summary>Two hours before nightfall until it falls, and an hour and a half before dawn: when the time is worth planning by.</summary>
+    public static bool TimeMatters(float hour, float sunrise, float sunset)
+    {
+        hour = Mathf.Repeat(hour, 24f);
+        return (hour >= sunset - 2f && hour < sunset) || (hour >= sunrise - 1.5f && hour < sunrise);
     }
 
     public static string FormatHour(float hour)

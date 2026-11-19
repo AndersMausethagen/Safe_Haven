@@ -38,6 +38,39 @@ public sealed class TutorialNoticeHud : MonoBehaviour
     private RectTransform line;
     private CanvasGroup lineFade;
     private TMP_Text lineText;
+    private Image lineBackground;
+    private GameObject lineRim;
+    private Material lineMaterial;
+    private HudRules.Density styledFor = (HudRules.Density)(-1);
+    private int styledCount = -1;
+
+    // The line once the card has gone: a framed box with a sentence on a Full HUD; in a Contextual one the book, the count and the
+    // key, unframed (it stayed mid-screen at the right edge as a box all game: the HUD review of 2026-11-18). Clickable either way:
+    // the background is only made clear.
+    private void StyleLine(int count)
+    {
+        styledFor = HudRules.Current;
+        styledCount = count;
+        bool framed = HudRules.ShowsEverything;
+        lineBackground.color = framed ? HearthKit.Faded(UIStyle.Current.Panel, 0.88f) : Color.clear;
+        lineRim.SetActive(framed);
+        // Unframed it lies on the ground like the rest of the frameless HUD, so it takes that soft shadow: without it "4 (T)" was
+        // lost on the Haven's sunlit grass.
+        if (lineMaterial == null)
+        {
+            lineMaterial = lineText.fontSharedMaterial;
+        }
+        if (framed)
+        {
+            lineText.fontSharedMaterial = lineMaterial;
+        }
+        else
+        {
+            UIStyle.Current.OnWorld(lineText);
+        }
+        lineText.text = HearthKit.InlineIcon("Book") + "  " + GameInput.WithRebinds(!framed ? $"{count}  ({{key:Tutorial}})"
+            : count > 1 ? $"{count} unread tutorials  ·  ({{key:Tutorial}})" : "1 unread tutorial  ·  ({key:Tutorial})");
+    }
     private float shownUntil;
 
     public static TutorialNoticeHud Current { get; private set; }
@@ -140,9 +173,9 @@ public sealed class TutorialNoticeHud : MonoBehaviour
 
         // The small line left at the edge once the card has faded: how many wait, and the key.
         line = Box("Unread", root, new Vector2(1f, 0.5f), new Vector2(LineWidth, LineHeight), new Vector2(-EdgeGap - LineWidth * 0.5f, RaisedBy - CardHeight * 0.5f + LineHeight * 0.5f));
-        Image lineBackground = HearthKit.Sliced(line.gameObject.AddComponent<Image>(), style.Card, 2f);
+        lineBackground = HearthKit.Sliced(line.gameObject.AddComponent<Image>(), style.Card, 2f);
         lineBackground.color = HearthKit.Faded(style.Panel, 0.88f);
-        HearthKit.Rim(line, 0.45f, 2f);
+        lineRim = HearthKit.Rim(line, 0.45f, 2f).gameObject;
         var lineButton = line.gameObject.AddComponent<Button>();
         lineButton.targetGraphic = lineBackground;
         lineButton.onClick.AddListener(TutorialWindow.ShowPending);
@@ -161,6 +194,11 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         if (card == null)
         {
             return;
+        }
+
+        if (styledFor != HudRules.Current && styledCount > 0)
+        {
+            StyleLine(styledCount);
         }
 
         // Out of the way while a window is up (the tutorial itself, the bag, a station...), back when it closes. The card only for a
@@ -215,7 +253,7 @@ public sealed class TutorialNoticeHud : MonoBehaviour
         thumb.enabled = newest.art != null;
         thumbGlyph.text = newest.art == null && !string.IsNullOrEmpty(newest.title) ? newest.title.Substring(0, 1) : "";
         hint.text = GameInput.WithRebinds("Press ({key:Tutorial}) or click to read");
-        lineText.text = HearthKit.InlineIcon("Book") + "  " + GameInput.WithRebinds(count > 1 ? $"{count} unread tutorials  ·  ({{key:Tutorial}})" : "1 unread tutorial  ·  ({key:Tutorial})");
+        StyleLine(count);
         // A new one brings the card back, quickly, for a while.
         if (count > shownCount)
         {

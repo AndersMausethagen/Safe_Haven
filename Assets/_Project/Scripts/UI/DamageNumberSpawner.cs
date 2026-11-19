@@ -78,15 +78,38 @@ public sealed class DamageNumberSpawner : MonoBehaviour
     /// <summary>Floats a word over the target, such as "Dodged".</summary>
     public void ShowText(string text, Color color)
     {
-        if (prefab != null)
+        if (prefab == null)
         {
-            PrefabPool.Spawn(prefab, SpawnPoint(), Quaternion.identity).ShowText(text, color);
+            return;
         }
+
+        // The same word again at once (two wolves' blows dodged together): one is read, two drawn over each other are not.
+        if (text == lastWord && Time.unscaledTime - lastWordAt < SameWordSeconds)
+        {
+            return;
+        }
+
+        lastWord = text;
+        lastWordAt = Time.unscaledTime;
+        PrefabPool.Spawn(prefab, SpawnPoint(), Quaternion.identity).ShowText(text, color);
     }
+
+    // What floats up close together steps upwards instead of landing on what is already there ("DDodged": the HUD review of
+    // 2026-11-18); the sideways spread alone left them over each other.
+    private const float StackSeconds = 0.6f;
+    private const float StackStep = 0.35f;
+    private const int MostStacked = 3;
+    private const float SameWordSeconds = 0.35f;
+    private float lastSpawnAt = float.NegativeInfinity;
+    private int stacked;
+    private string lastWord;
+    private float lastWordAt = float.NegativeInfinity;
 
     private Vector3 SpawnPoint()
     {
+        stacked = Time.unscaledTime - lastSpawnAt < StackSeconds ? (stacked + 1) % (MostStacked + 1) : 0;
+        lastSpawnAt = Time.unscaledTime;
         Vector2 offset = Random.insideUnitCircle * spread;
-        return transform.position + Vector3.up * height + new Vector3(offset.x, 0f, offset.y);
+        return transform.position + Vector3.up * (height + stacked * StackStep) + new Vector3(offset.x, 0f, offset.y);
     }
 }
