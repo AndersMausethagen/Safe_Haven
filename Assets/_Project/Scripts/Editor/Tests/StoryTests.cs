@@ -244,7 +244,7 @@ public sealed class StoryTests
         try
         {
             StoryScript[] stories = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<StoryScript>(true)).ToArray();
-            CollectionAssert.IsSubsetOf(new[] { "Story - Choose a Weapon", "Story - Eirik's Waterskin", "Story - Troll Ambush", "Story - The Old Troll" },
+            CollectionAssert.IsSubsetOf(new[] { "Story - Choose a Weapon", "Story - The Old Troll" },
                 stories.Select(s => s.name).ToArray());
             foreach (StoryScript story in stories)
             {

@@ -196,19 +196,14 @@ public sealed class PrologueTests
         Assert.IsTrue(Definition.Chapters.Where(c => c != camp).All(c => c.Waves == 1));
     }
 
-    // Eirik's errand during the rest: it gates nothing, and the wolves end it.
+    // The user (2026-11-19): no berries at the shelter; the fire stays, and the rest lasts until the player tells Sigrid.
     [Test]
-    public void TheBerries_AreAnErrand()
+    public void TheShelter_HasNoBerryErrand_AndTheRestWaitsForSigrid()
     {
-        var pot = AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/BerriesForThePot.asset");
-        Assert.AreEqual(QuestRank.Optional, pot.Rank);
-        Assert.AreEqual(QuestStart.ByQuestGiver, pot.Start);
-        Assert.IsFalse(Definition.Chapters.Any(c => c.Quest == pot), "not a step of the story");
-        Assert.AreSame(Definition.Chapters.Single(c => c.Behaviour == PrologueStep.DefendCamp).Quest, pot.ClosedBy, "the wolves end it");
-        Assert.IsFalse(string.IsNullOrWhiteSpace(pot.TurnInTo), "someone to bring the berries to");
-        Assert.IsFalse(Quests.Any(q => q.Prerequisites.Contains(pot)), "nothing waits for it");
-        Assert.IsNotEmpty(pot.RewardItems);
-        Assert.IsEmpty(pot.FindProblems());
+        Assert.IsNull(AssetDatabase.LoadAssetAtPath<QuestDefinition>(Root + "/Quests/BerriesForThePot.asset"), "the berry errand is gone");
+        Assert.IsNotNull(Definition.Chapters.Single(c => c.Behaviour == PrologueStep.LightFire).Quest, "the fire is still built");
+        var rest = Definition.Chapters.Single(c => c.Quest.name == "CatchBreath").Quest;
+        StringAssert.Contains("Sigrid", rest.Objectives[0].Describe(), "the objective says who to tell");
     }
 
     [Test]

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: prologue.catchbreath
   displayName: A Moment of Warmth
-  description: A fire at last. Sit a while and talk to the others. It won't last.
+  description: A fire at last. Sit a while and talk to the others. When you are ready to go on, tell Sigrid. It won't last.
   chain: Prologue - The Unquiet Forest
   journalNotes: If you have anything to ask anyone, this is when to do it. They are more honest around a fire.
   rank: 0
@@ -48,14 +48,19 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 3
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 6
-    description: Rest by the fire, and talk with the others
+    description: Rest by the fire, talk with the others, and tell Sigrid when you are ready
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -74,11 +79,18 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

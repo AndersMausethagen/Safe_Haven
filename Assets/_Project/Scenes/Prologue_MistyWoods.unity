@@ -16757,19 +16757,24 @@ MonoBehaviour:
   - question: Where did you learn to shoot like that?
     answer: Poaching on the jarl's land. You learn to hit with the first arrow when the second one brings the wardens.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: What did you see out there?
     answer: Troll tracks. Small ones, the moss kind. They never come this far down. Something is pushing everything out of the high woods, and it is big.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Any advice for the dark?
     answer: Walk where the moss is thick; it's quieter. Keep your back to the fire, never your face. And if you hear something heavy breathing, don't run until I say so.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   morningTopics:
   - question: What have the tracks told you?
     answer: Deer, boar, wolf, all running west out of the trees, out here where they don't belong. Nothing sleeps in the open unless it is afraid to sleep at home.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Why did you come along?
     answer: Someone is paying. And I would rather know what is coming out of there than wait for it to find me.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   alchemist: 0
   lowHealth: 0.5
   healShare: 0.35
@@ -45197,514 +45202,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::StoryScript
   nodes:
-  - rid: 2623126109533504063
-  - rid: 2623126109533504064
-  - rid: 2623126109533504065
-  - rid: 2623126109533504066
-  - rid: 2623126109533504067
-  - rid: 2623126109533504068
-  - rid: 2623126109533504069
-  - rid: 2623126109533504070
-  - rid: 2623126109533504071
-  - rid: 2623126109533504072
-  - rid: 2623126109533504073
-  - rid: 2623126109533504074
-  - rid: 2623126109533504075
-  - rid: 2623126109533504076
-  - rid: 2623126109533504077
-  - rid: 2623126109533504078
-  - rid: 2623126109533504079
-  - rid: 2623126109533504080
-  - rid: 2623126109533504081
-  - rid: 2623126109533504082
-  - rid: 2623126109533504083
-  - rid: 2623126109533504084
-  - rid: 2623126109533504085
-  - rid: 2623126109533504086
-  - rid: 2623126109533504087
-  - rid: 2623126109533504088
-  - rid: 2623126109533504089
-  - rid: 2623126109533504090
-  - rid: 2623126109533504091
-  - rid: 2623126109533504092
-  - rid: 2623126109533504093
-  - rid: 2623126109533504094
-  - rid: 2623126109533504095
-  - rid: 2623126109533504096
-  - rid: 2623126109533504097
-  - rid: 2623126109533504098
-  - rid: 2623126109533504099
-  - rid: 2623126109533504100
-  - rid: 2623126109533504101
-  - rid: 2623126109533504102
   - rid: 2623126109533504103
   - rid: 2623126109533504104
-  - rid: 2623126109533504105
   - rid: 2623126109533504106
   - rid: 2623126109533504107
   - rid: 2623126109533504108
-  - rid: 2623126109533504109
-  - rid: 2623126109533504110
-  - rid: 2623126109533504111
+  - rid: 2623126229659680875
   links:
-  - from: 425a1eec58374aa3a77c55581db059d3
-    output: 0
-    to: f73760def9ed4721bf292c86a57c01ef
-  - from: f73760def9ed4721bf292c86a57c01ef
-    output: 0
-    to: fdd0864d0bd1486285205b566655318a
-  - from: fdd0864d0bd1486285205b566655318a
-    output: 0
-    to: b2c5b07185064979a258208506167343
-  - from: b2c5b07185064979a258208506167343
-    output: 1
-    to: 5b4cce0a46264e07bc99a0c3f3141139
-  - from: b2c5b07185064979a258208506167343
-    output: 0
-    to: 5467b8655be941769862a5f292832d22
-  - from: 5467b8655be941769862a5f292832d22
-    output: 1
-    to: 55a8204421e74aed9728c8d339561a0c
-  - from: 55a8204421e74aed9728c8d339561a0c
-    output: 0
-    to: d30f919b65824ee29856f9e512fc28aa
-  - from: b2c5b07185064979a258208506167343
-    output: 2
-    to: 0e444c16983d413d83f3f010e5ed3459
-  - from: 0e444c16983d413d83f3f010e5ed3459
-    output: 1
-    to: bb48cb16f5c54595bdd611feb059d2ab
-  - from: bb48cb16f5c54595bdd611feb059d2ab
-    output: 0
-    to: fcefb9af8a8e426d940cbbcda81b2dbe
-  - from: 5b4cce0a46264e07bc99a0c3f3141139
-    output: 0
-    to: 70f2aecc8b2c458ca01220a3e5f4a344
-  - from: 70f2aecc8b2c458ca01220a3e5f4a344
-    output: 1
-    to: 1222f6eed3d14c8ea0263021b7e5c182
-  - from: 1222f6eed3d14c8ea0263021b7e5c182
-    output: 0
-    to: 3dc21ff58e284ce5951917b59009797e
-  - from: ec76e9a8cb6c40408d768a5595bff8fc
-    output: 0
-    to: b0caaf6cbc0a448e87e4549ce165a392
-  - from: b0caaf6cbc0a448e87e4549ce165a392
-    output: 0
-    to: 2ee9fb5b265c4f2bbf3c7f40416296aa
-  - from: 2ee9fb5b265c4f2bbf3c7f40416296aa
-    output: 1
-    to: 6730a185d91546d995fa3af3ec38abc6
-  - from: 6730a185d91546d995fa3af3ec38abc6
-    output: 0
-    to: a5850ec5c1064c3db28f31293adfd1a1
-  - from: d836f462842c4d1e8658ad55754ee097
-    output: 0
-    to: bf01f2e9c838420882a1f5fd2aa31285
-  - from: bf01f2e9c838420882a1f5fd2aa31285
-    output: 1
-    to: 10dd9c2d4c064af3b96d19008768be1a
-  - from: 10dd9c2d4c064af3b96d19008768be1a
-    output: 0
-    to: 9db91e535cf44a2b84491622abe922d1
-  - from: 9db91e535cf44a2b84491622abe922d1
-    output: 0
-    to: 2b2f82dac1134f4e96f78d432977d9ef
-  - from: 2b2f82dac1134f4e96f78d432977d9ef
-    output: 1
-    to: 16e2d965945e480d9c49995c829157af
-  - from: 16e2d965945e480d9c49995c829157af
-    output: 0
-    to: bd5f636089934dd9bd02e84e611547ef
-  - from: 9db91e535cf44a2b84491622abe922d1
-    output: 2
-    to: 3175e75ac9dc4101861a99d31d048636
-  - from: 3175e75ac9dc4101861a99d31d048636
-    output: 1
-    to: b2da29338c7e4852a018e93a4cc192ab
-  - from: b2da29338c7e4852a018e93a4cc192ab
-    output: 0
-    to: 146daac04fa540ff858f5bfaaafb25d6
-  - from: d9d4ce4d61cc43c38001a20f002ea392
-    output: 0
-    to: a69d39c4ba834c96b12c8ac30ef1385b
-  - from: a69d39c4ba834c96b12c8ac30ef1385b
-    output: 1
-    to: e732d6214cab428aa9bb7752200068ed
-  - from: e732d6214cab428aa9bb7752200068ed
-    output: 0
-    to: ca59f222516945a6977205be8d86c35a
-  - from: ca59f222516945a6977205be8d86c35a
-    output: 0
-    to: d2faacb5fa78420d8ab7409e90463836
-  - from: d2faacb5fa78420d8ab7409e90463836
-    output: 1
-    to: 84773c4ee979450296ea3bd6b2a8e7e1
-  - from: 84773c4ee979450296ea3bd6b2a8e7e1
-    output: 0
-    to: 781e5f2d0cb144cba148af422279a3bd
-  - from: ca59f222516945a6977205be8d86c35a
-    output: 2
-    to: 7c95c0215fe04c598832e469b9f9fb43
-  - from: 7c95c0215fe04c598832e469b9f9fb43
-    output: 1
-    to: ab35b09881844fe892997c23d07a05a7
-  - from: ab35b09881844fe892997c23d07a05a7
-    output: 0
-    to: 31785193ab5841eabaa17d5e7b3af3e8
-  - from: 878d28c5c2ad4c49abe0b599833f6380
-    output: 0
-    to: fb9d27956b6c4dd684d1333766043ed5
   - from: fb9d27956b6c4dd684d1333766043ed5
     output: 1
     to: 629399107bf14e5eae1db8548fafb6bc
-  - from: 629399107bf14e5eae1db8548fafb6bc
-    output: 0
-    to: 05e82bbb44124f439593d5e90f355f1b
-  - from: 05e82bbb44124f439593d5e90f355f1b
-    output: 0
-    to: 724a521d82de4377905163bb67660a0f
   - from: 724a521d82de4377905163bb67660a0f
     output: 1
     to: ec0da67ccc6c43b89d32e36505ca8483
   - from: ec0da67ccc6c43b89d32e36505ca8483
     output: 0
     to: fef66cb708ca4a0899566175158feb70
-  - from: 05e82bbb44124f439593d5e90f355f1b
-    output: 2
-    to: b2289b81f115435fb05c196bb87a3b2a
-  - from: b2289b81f115435fb05c196bb87a3b2a
-    output: 1
-    to: 229fc0f01e0945a0af027921383924e3
-  - from: 229fc0f01e0945a0af027921383924e3
+  - from: 629399107bf14e5eae1db8548fafb6bc
     output: 0
-    to: 9afcc0719ba4426aa6ed31b5ae3daee0
+    to: 724a521d82de4377905163bb67660a0f
+  - from: d7875f3ede344a6db6ebe6d58718443f
+    output: 0
+    to: fb9d27956b6c4dd684d1333766043ed5
   logSteps: 0
   references:
     version: 2
     RefIds:
-    - rid: 2623126109533504063
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 425a1eec58374aa3a77c55581db059d3
-        position: {x: 40, y: 60}
-        once: 0
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-        when: 0
-        alsoAfterLoading: 1
-    - rid: 2623126109533504064
-      type: {class: WaitForEventNode, ns: , asm: SafeHaven}
-      data:
-        id: f73760def9ed4721bf292c86a57c01ef
-        position: {x: 340, y: 60}
-        questEvent: {fileID: 11400000, guid: 37aaf30196600b248981ee89fdb7e2e2, type: 2}
-        orAfterSeconds: 40
-    - rid: 2623126109533504065
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: fdd0864d0bd1486285205b566655318a
-        position: {x: 640, y: 60}
-        seconds: 50
-    - rid: 2623126109533504066
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: b2c5b07185064979a258208506167343
-        position: {x: 940, y: 60}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-    - rid: 2623126109533504067
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 5b4cce0a46264e07bc99a0c3f3141139
-        position: {x: 1240, y: 60}
-        seconds: 150
-    - rid: 2623126109533504068
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 5467b8655be941769862a5f292832d22
-        position: {x: 1240, y: 230}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504069
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 55a8204421e74aed9728c8d339561a0c
-        position: {x: 1540, y: 60}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504070
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: d30f919b65824ee29856f9e512fc28aa
-        position: {x: 1840, y: 60}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504071
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 0e444c16983d413d83f3f010e5ed3459
-        position: {x: 1240, y: 400}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504072
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: bb48cb16f5c54595bdd611feb059d2ab
-        position: {x: 1540, y: 230}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504073
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: fcefb9af8a8e426d940cbbcda81b2dbe
-        position: {x: 1840, y: 230}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504074
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 70f2aecc8b2c458ca01220a3e5f4a344
-        position: {x: 1540, y: 400}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504075
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 1222f6eed3d14c8ea0263021b7e5c182
-        position: {x: 1840, y: 400}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504076
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 3dc21ff58e284ce5951917b59009797e
-        position: {x: 2140, y: 60}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504077
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: ec76e9a8cb6c40408d768a5595bff8fc
-        position: {x: 40, y: 230}
-        once: 0
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-        when: 1
-        alsoAfterLoading: 0
-    - rid: 2623126109533504078
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: b0caaf6cbc0a448e87e4549ce165a392
-        position: {x: 340, y: 230}
-        seconds: 9
-    - rid: 2623126109533504079
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 2ee9fb5b265c4f2bbf3c7f40416296aa
-        position: {x: 640, y: 230}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504080
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 6730a185d91546d995fa3af3ec38abc6
-        position: {x: 940, y: 230}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504081
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: a5850ec5c1064c3db28f31293adfd1a1
-        position: {x: 1240, y: 570}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504082
-      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
-      data:
-        id: d836f462842c4d1e8658ad55754ee097
-        position: {x: 40, y: 400}
-        once: 0
-        deed:
-          type: 9
-          description: 
-          amount: 1
-          item: {fileID: 0}
-          resource: {fileID: 0}
-          monster: {fileID: 0}
-          faction: 1
-          building: {fileID: 0}
-          raid: {fileID: 0}
-          mustExtract: 1
-          withinMinutes: 0
-          questEvent: {fileID: 0}
-          person: {fileID: 11400000, guid: 4260d606f7c62c042b848adc806c44d3, type: 2}
-          target: {fileID: 0}
-          job: {fileID: 0}
-          breach: {fileID: 0}
-          rank: 1
-          tier: 2
-          bringHome: 0
-          countAlreadyOwned: 0
-          enchantment: {fileID: 0}
-          greatOnly: 0
-          onlySource: 0
-          source: 2
-    - rid: 2623126109533504083
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: bf01f2e9c838420882a1f5fd2aa31285
-        position: {x: 340, y: 400}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504084
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: 10dd9c2d4c064af3b96d19008768be1a
-        position: {x: 640, y: 400}
-        seconds: 9
-    - rid: 2623126109533504085
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 9db91e535cf44a2b84491622abe922d1
-        position: {x: 940, y: 400}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-    - rid: 2623126109533504086
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 2b2f82dac1134f4e96f78d432977d9ef
-        position: {x: 1240, y: 740}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504087
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 16e2d965945e480d9c49995c829157af
-        position: {x: 1540, y: 570}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504088
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: bd5f636089934dd9bd02e84e611547ef
-        position: {x: 1840, y: 570}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504089
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 3175e75ac9dc4101861a99d31d048636
-        position: {x: 1240, y: 910}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504090
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: b2da29338c7e4852a018e93a4cc192ab
-        position: {x: 1540, y: 740}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504091
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 146daac04fa540ff858f5bfaaafb25d6
-        position: {x: 1840, y: 740}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504092
-      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
-      data:
-        id: d9d4ce4d61cc43c38001a20f002ea392
-        position: {x: 40, y: 570}
-        once: 0
-        deed:
-          type: 9
-          description: 
-          amount: 1
-          item: {fileID: 0}
-          resource: {fileID: 0}
-          monster: {fileID: 0}
-          faction: 1
-          building: {fileID: 0}
-          raid: {fileID: 0}
-          mustExtract: 1
-          withinMinutes: 0
-          questEvent: {fileID: 0}
-          person: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}
-          target: {fileID: 0}
-          job: {fileID: 0}
-          breach: {fileID: 0}
-          rank: 1
-          tier: 2
-          bringHome: 0
-          countAlreadyOwned: 0
-          enchantment: {fileID: 0}
-          greatOnly: 0
-          onlySource: 0
-          source: 2
-    - rid: 2623126109533504093
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: a69d39c4ba834c96b12c8ac30ef1385b
-        position: {x: 340, y: 570}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504094
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: e732d6214cab428aa9bb7752200068ed
-        position: {x: 640, y: 570}
-        seconds: 9
-    - rid: 2623126109533504095
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: ca59f222516945a6977205be8d86c35a
-        position: {x: 940, y: 570}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-    - rid: 2623126109533504096
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: d2faacb5fa78420d8ab7409e90463836
-        position: {x: 1240, y: 1080}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504097
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 84773c4ee979450296ea3bd6b2a8e7e1
-        position: {x: 1540, y: 910}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504098
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 781e5f2d0cb144cba148af422279a3bd
-        position: {x: 1840, y: 910}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504099
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 7c95c0215fe04c598832e469b9f9fb43
-        position: {x: 1240, y: 1250}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504100
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: ab35b09881844fe892997c23d07a05a7
-        position: {x: 1540, y: 1080}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504101
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 31785193ab5841eabaa17d5e7b3af3e8
-        position: {x: 1840, y: 1080}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504102
-      type: {class: WhenPlayerDid, ns: , asm: SafeHaven}
-      data:
-        id: 878d28c5c2ad4c49abe0b599833f6380
-        position: {x: 40, y: 740}
-        once: 0
-        deed:
-          type: 9
-          description: 
-          amount: 1
-          item: {fileID: 0}
-          resource: {fileID: 0}
-          monster: {fileID: 0}
-          faction: 1
-          building: {fileID: 0}
-          raid: {fileID: 0}
-          mustExtract: 1
-          withinMinutes: 0
-          questEvent: {fileID: 0}
-          person: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-          target: {fileID: 0}
-          job: {fileID: 0}
-          breach: {fileID: 0}
-          rank: 1
-          tier: 2
-          bringHome: 0
-          countAlreadyOwned: 0
-          enchantment: {fileID: 0}
-          greatOnly: 0
-          onlySource: 0
-          source: 2
     - rid: 2623126109533504103
       type: {class: CheckQuestNode, ns: , asm: SafeHaven}
       data:
@@ -45716,13 +45239,7 @@ MonoBehaviour:
       data:
         id: 629399107bf14e5eae1db8548fafb6bc
         position: {x: 640, y: 740}
-        seconds: 9
-    - rid: 2623126109533504105
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 05e82bbb44124f439593d5e90f355f1b
-        position: {x: 940, y: 740}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
+        seconds: 5
     - rid: 2623126109533504106
       type: {class: CheckQuestNode, ns: , asm: SafeHaven}
       data:
@@ -45741,24 +45258,13 @@ MonoBehaviour:
         id: fef66cb708ca4a0899566175158feb70
         position: {x: 1840, y: 1250}
         quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
-    - rid: 2623126109533504109
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
+    - rid: 2623126229659680875
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
       data:
-        id: b2289b81f115435fb05c196bb87a3b2a
-        position: {x: 1240, y: 1590}
-        quest: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
-    - rid: 2623126109533504110
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 229fc0f01e0945a0af027921383924e3
-        position: {x: 1540, y: 1420}
-        questEvent: {fileID: 11400000, guid: 84bdc29fd2b08244590c6231422d7c78, type: 2}
-    - rid: 2623126109533504111
-      type: {class: StartQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 9afcc0719ba4426aa6ed31b5ae3daee0
-        position: {x: 1840, y: 1420}
-        quest: {fileID: 11400000, guid: 2f76858ea1c6b6043bdee39be76ef0b1, type: 2}
+        id: d7875f3ede344a6db6ebe6d58718443f
+        position: {x: 40, y: 740}
+        once: 1
+        questEvent: {fileID: 11400000, guid: 32708fa86b722be4bb9f72950ea604f6, type: 2}
 --- !u!114 &807010517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45965,7 +45471,6 @@ Transform:
   m_Children:
   - {fileID: 114983145}
   - {fileID: 985677806}
-  - {fileID: 1636096862}
   - {fileID: 249268673}
   - {fileID: 1002744720}
   - {fileID: 374729879}
@@ -45992,19 +45497,24 @@ MonoBehaviour:
   - question: How long have you been a soldier?
     answer: Twenty winters in the shield wall at Granheim. I stopped counting the fights a long time ago. I still count the friends.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Why did you join the expedition?
     answer: My sister's farm is two valleys from here. Her dogs ran into these woods last month and never came back. Someone has to walk in front. Better me than you.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Do you trust Sigrid?
     answer: I trust that she wants to get out of here alive. That is enough for tonight. But watch her hands when she talks about the stones. She knows more than she says.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   morningTopics:
   - question: What do you think we will find?
     answer: Wolves, probably. Perhaps a witch, perhaps a sick troll. It is usually less than the stories and more than you packed for. Four friends, if we are lucky. Bjarne owes me money.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Have you been in that forest before?
     answer: Once, as a boy, with my sister. Spruce, moss, the quiet you get in old woods. Nothing in it frightened me but the dark. I would like that to still be true.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   alchemist: 0
   lowHealth: 0.5
   healShare: 0.35
@@ -46194,12 +45704,6 @@ MonoBehaviour:
     waitingText: 'Dummy first, then me. Watch my shoulders: the blow is coming when they drop.'
     askText: Show me how to use this.
     thanksText: You'll do. Better than most I have trained, worse than you will be. Take these; you will want them.
-  - quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-    text: Dry bread, unless you fancy a walk. There are berry bushes in the clearing west of the shelter. Pick five and stew them over the fire; take my waterskin for the pot. Be quick about it. I do not like how quiet it is.
-    acceptText: I'll get them.
-    waitingText: Five berries from the clearing to the west, then the pot. My waterskin is in your pack.
-    askText: Is there anything to eat?
-    thanksText: Hot food. You have just made three friends for life. Take these, in case the night is not done with us.
   speakerName: Eirik
   portrait: {fileID: 0}
   dialogueCameraDistance: 0.65
@@ -52181,7 +51685,6 @@ Transform:
   m_Children:
   - {fileID: 351156311}
   - {fileID: 1464162918}
-  - {fileID: 1901900327}
   m_Father: {fileID: 1500380933}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &914216670
@@ -56025,8 +55528,6 @@ Transform:
   m_Children:
   - {fileID: 1201455676}
   - {fileID: 1416806798}
-  - {fileID: 1503720727}
-  - {fileID: 1569805110}
   - {fileID: 1803281364}
   - {fileID: 864501000}
   - {fileID: 716558346}
@@ -56325,25 +55826,36 @@ MonoBehaviour:
   - question: Why did the villages send you?
     answer: They did not send me. They asked for someone who could read the old marks, and I was the only one who answered. Draw your own conclusions. Everyone else does.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: What do the runes on your staff say?
     answer: Words for things your tongue has no names for. Most of them mean wait. One of them means open. Pray we only need the first kind.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Do you know what is doing this to the forest?
     answer: 'I know what it feels like: a door left open in winter. Someone opened it on purpose. Whether they meant to let something in or out... that is what we came to find.'
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Eirik says to watch your hands around those stones.
     answer: Eirik sees a great deal for a man who pretends not to. Yes. I have seen stones like these before, and I know what they do. Ask me again when you have to touch one.
     raises: {fileID: 11400000, guid: 82ba4d914072adf478d4fa857f205026, type: 2}
+    onlyDuring: {fileID: 0}
+  - question: I'm rested. Do we go on?
+    answer: Not in this dark. Ingrid's party went in on a night like this and did not come out. We sleep in turns, and at first light we... Quiet. Listen.
+    raises: {fileID: 11400000, guid: 32708fa86b722be4bb9f72950ea604f6, type: 2}
+    onlyDuring: {fileID: 11400000, guid: b2306560eba5c594886d38a592bdb05d, type: 2}
   morningTopics:
   - question: What are we actually looking for?
     answer: The cause. Trolls do not leave their crags for no reason, and wolves do not forget fire. Something in that forest has changed, and the villages want it named before it reaches their doors.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Who went ahead?
     answer: 'Ingrid, Bjarne, Tor and Liv. An alchemist, a smith, a carpenter and a scholar: the ones who can make sense of what they find. I sent them on two days ago to look over the old road. It was a short job.'
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   - question: Why does it take someone who reads runes?
     answer: Because the only old things out there are stones and roots, and the marks on them are older than any village. Whatever is wrong, I expect to find it written down.
     raises: {fileID: 0}
+    onlyDuring: {fileID: 0}
   alchemist: 1
   lowHealth: 0.5
   healShare: 0.35
@@ -69896,7 +69408,6 @@ Transform:
   - {fileID: 229058070}
   - {fileID: 972437387}
   - {fileID: 1915190751}
-  - {fileID: 1308209543}
   m_Father: {fileID: 981106771}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1201464238
@@ -78171,55 +77682,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4372996382443577661, guid: 933b567e87ebb924e8bef15c8ff7774f, type: 3}
   m_PrefabInstance: {fileID: 1304680101}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1308209542
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1308209543}
-  - component: {fileID: 1308209544}
-  m_Layer: 0
-  m_Name: Quest Waypoint - Berries for the Pot 1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1308209543
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308209542}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1201455676}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1308209544
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308209542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
-  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-  objective: 1
-  label: Berries
-  when: 0
-  untilGathered: {fileID: 0}
 --- !u!1001 &1308365959
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -85251,17 +84713,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
---- !u!114 &1416806797 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4428770297748371014, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
-  m_PrefabInstance: {fileID: 1416806796}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c73904d3801ccee4aba129e47e1b5e4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::MobSpawnZone
 --- !u!4 &1416806798 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7147372502583846198, guid: eefa6649a4b17b24fa8383ad769dab93, type: 3}
@@ -90661,98 +90112,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 43599481577565383, guid: 7a69d1e42a50043469c59a9b5e184d8b, type: 3}
   m_PrefabInstance: {fileID: 1502456771}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1503720726
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1503720727}
-  - component: {fileID: 1503720729}
-  - component: {fileID: 1503720728}
-  m_Layer: 0
-  m_Name: Story - Eirik's Waterskin
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1503720727
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1503720726}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 981106771}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1503720728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1503720726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 287758218191175998
-  - rid: 287758218191175999
-  links:
-  - from: 2f7f362aef624bbfb77f305d787297da
-    output: 0
-    to: 18caa251fd3849d89f80866f00a45a14
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 287758218191175998
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 2f7f362aef624bbfb77f305d787297da
-        position: {x: 40, y: 60}
-        once: 1
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-        when: 0
-        alsoAfterLoading: 0
-    - rid: 287758218191175999
-      type: {class: GiveItemsNode, ns: , asm: SafeHaven}
-      data:
-        id: 18caa251fd3849d89f80866f00a45a14
-        position: {x: 340, y: 60}
-        items:
-        - item: {fileID: 11400000, guid: 79744f7a29634cb408f4829b51ec5918, type: 2}
-          amount: 1
-        equip: 0
---- !u!114 &1503720729
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1503720726}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: cbe9758f1a62441ab4e80b186a356bae
-  prefabId: 
-  saveTransform: 1
-  saveActiveState: 1
-  rememberDestruction: 1
-  saveComponents: 1
 --- !u!1001 &1505961569
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -94897,182 +94256,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6011518332016051090, guid: 325b5fb486ccc734098a5bd35f6e7fec, type: 3}
   m_PrefabInstance: {fileID: 1569157360}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1569805109
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1569805110}
-  - component: {fileID: 1569805112}
-  - component: {fileID: 1569805111}
-  m_Layer: 0
-  m_Name: Story - Troll Ambush
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1569805110
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569805109}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 981106771}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1569805111
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569805109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 287758218191175989
-  - rid: 287758218191175990
-  - rid: 287758218191175991
-  - rid: 287758218191175992
-  - rid: 287758218191175993
-  - rid: 287758218191175994
-  - rid: 287758218191175995
-  - rid: 287758218191175996
-  - rid: 287758218191175997
-  links:
-  - from: f8e0756b9fcb416aa153c77dd66f1bb6
-    output: 0
-    to: 54586ec6723a4cc4993635b78e385392
-  - from: 54586ec6723a4cc4993635b78e385392
-    output: 1
-    to: 33a20f758bd34564adada680cdf96849
-  - from: 33a20f758bd34564adada680cdf96849
-    output: 1
-    to: eccb8cd4b99d4dce910b9dfac7096072
-  - from: eccb8cd4b99d4dce910b9dfac7096072
-    output: 0
-    to: c55320e6897842c2add749bd2c86b10e
-  - from: 961bb4754c244470b5b241ae4927bd70
-    output: 0
-    to: 8fe77923f6e4420385c5b4122369f7f4
-  - from: c55320e6897842c2add749bd2c86b10e
-    output: 0
-    to: ff22dafecfa04322a82416b310000a76
-  - from: ff22dafecfa04322a82416b310000a76
-    output: 0
-    to: e8b946b7d40c4a1d8a49b19591fc0569
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 287758218191175989
-      type: {class: WhenPlayerNear, ns: , asm: SafeHaven}
-      data:
-        id: f8e0756b9fcb416aa153c77dd66f1bb6
-        position: {x: 40, y: 60}
-        once: 0
-        place: {fileID: 1201455676}
-        radius: 7
-    - rid: 287758218191175990
-      type: {class: HasHappenedNode, ns: , asm: SafeHaven}
-      data:
-        id: 54586ec6723a4cc4993635b78e385392
-        position: {x: 340, y: 60}
-        questEvent: {fileID: 11400000, guid: f544ff0162e4f174a8d91b7d7dc42b37, type: 2}
-    - rid: 287758218191175991
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 33a20f758bd34564adada680cdf96849
-        position: {x: 640, y: 60}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-    - rid: 287758218191175992
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: eccb8cd4b99d4dce910b9dfac7096072
-        position: {x: 940, y: 60}
-        questEvent: {fileID: 11400000, guid: f544ff0162e4f174a8d91b7d7dc42b37, type: 2}
-    - rid: 287758218191175993
-      type: {class: WaitNode, ns: , asm: SafeHaven}
-      data:
-        id: c55320e6897842c2add749bd2c86b10e
-        position: {x: 1240, y: 60}
-        seconds: 2.5
-    - rid: 287758218191175994
-      type: {class: SpawnEnemiesNode, ns: , asm: SafeHaven}
-      data:
-        id: ff22dafecfa04322a82416b310000a76
-        position: {x: 1540, y: 60}
-        zone: {fileID: 1416806797}
-        waitUntilDefeated: 0
-        orAfterSeconds: 300
-    - rid: 287758218191175995
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: e8b946b7d40c4a1d8a49b19591fc0569
-        position: {x: 1540, y: 230}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Down! Moss trolls in the bushes, the small kind. Don't let them get behind you!
-        afterFightPause: 1
-        aside: 0
-    - rid: 287758218191175996
-      type: {class: WhenZoneCleared, ns: , asm: SafeHaven}
-      data:
-        id: 961bb4754c244470b5b241ae4927bd70
-        position: {x: 40, y: 230}
-        once: 1
-        zone: {fileID: 1416806797}
-    - rid: 287758218191175997
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 8fe77923f6e4420385c5b4122369f7f4
-        position: {x: 340, y: 230}
-        speaker:
-          player: 0
-          name: Runa
-          model: {fileID: 334759803}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: Small ones never come alone and never come this far down. Something up in the high woods is scaring them. Finish the berries and get back to the fire.
-        afterFightPause: 1
-        aside: 0
---- !u!114 &1569805112
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1569805109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::SaveableEntity
-  id: e2fcad5ba41a4c7d9ee0e2ec45330a66
-  prefabId: 
-  saveTransform: 1
-  saveActiveState: 1
-  rememberDestruction: 1
-  saveComponents: 1
 --- !u!1001 &1573948950
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -98789,55 +97972,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5558004381216643557, guid: 4d769df415f73634593100fa03bd9c51, type: 3}
   m_PrefabInstance: {fileID: 1634773937}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1636096861
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1636096862}
-  - component: {fileID: 1636096863}
-  m_Layer: 0
-  m_Name: Quest Waypoint - Berries for the Pot (ReadyToTurnIn)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1636096862
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1636096861}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 810501267}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1636096863
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1636096861}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
-  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-  objective: 0
-  label: Eirik
-  when: 1
-  untilGathered: {fileID: 0}
 --- !u!1 &1637241714
 GameObject:
   m_ObjectHideFlags: 0
@@ -106187,6 +105321,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1004316743}
     m_Modifications:
+    - target: {fileID: 122925947729143532, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 1515336047843890794, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -106203,6 +105341,10 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 2613896693989446942, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 3064912245817638084, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -106215,6 +105357,26 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 3921524447659352161, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037763264150570909, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4073572021666667867, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4154759021515096755, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 4410167708660342641, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5021624148766679122, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -106223,7 +105385,15 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 5527482339574167621, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5856674489412910907, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6020488024583323401, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -106311,6 +105481,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6879164003379396746, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 6885907144287303402, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -106324,6 +105498,14 @@ PrefabInstance:
       value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 7133733821410538048, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7391514708111042076, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7558323350804465574, guid: 5cee4a0c0de6b6c4f9484157396c7511, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -111004,10 +110186,6 @@ MonoBehaviour:
   - rid: 2623126109533504043
   - rid: 2623126109533504044
   - rid: 2623126109533504045
-  - rid: 2623126109533504046
-  - rid: 2623126109533504047
-  - rid: 2623126109533504048
-  - rid: 2623126109533504049
   links:
   - from: cfc4e86404ab4e22b6decabd8c606215
     output: 0
@@ -111063,15 +110241,6 @@ MonoBehaviour:
   - from: 12b8218f8d074030ba8e89d1667865f6
     output: 2
     to: c81efae1ff454cb6b297584a37038352
-  - from: 11a5839eda284a3888c0374aa0de31f3
-    output: 0
-    to: 0d92ff39bf3b4f01a9f559072e33b36a
-  - from: 0d92ff39bf3b4f01a9f559072e33b36a
-    output: 2
-    to: f5599ec13e1c41dbbb898b6c34a7b1fa
-  - from: f5599ec13e1c41dbbb898b6c34a7b1fa
-    output: 0
-    to: 9521ce0773fe44c68be0c6581a499f7c
   logSteps: 0
   references:
     version: 2
@@ -111252,44 +110421,6 @@ MonoBehaviour:
           voice: {fileID: 0}
           voiceFrom: {fileID: 0}
         line: And the kindling you cut this morning is dry in your pack. We only need stones.
-        afterFightPause: 0
-        aside: 1
-    - rid: 2623126109533504046
-      type: {class: WhenQuest, ns: , asm: SafeHaven}
-      data:
-        id: 11a5839eda284a3888c0374aa0de31f3
-        position: {x: 40, y: 400}
-        once: 1
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-        when: 0
-        alsoAfterLoading: 0
-    - rid: 2623126109533504047
-      type: {class: CheckQuestNode, ns: , asm: SafeHaven}
-      data:
-        id: 0d92ff39bf3b4f01a9f559072e33b36a
-        position: {x: 340, y: 1080}
-        quest: {fileID: 11400000, guid: ee58d4932a0cf6648ad82ee55f48f193, type: 2}
-    - rid: 2623126109533504048
-      type: {class: QuestProgressNode, ns: , asm: SafeHaven}
-      data:
-        id: f5599ec13e1c41dbbb898b6c34a7b1fa
-        position: {x: 640, y: 1080}
-        quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-        objective: 1
-        amount: 3
-    - rid: 2623126109533504049
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 9521ce0773fe44c68be0c6581a499f7c
-        position: {x: 940, y: 1080}
-        speaker:
-          player: 0
-          name: Eirik
-          model: {fileID: 810501267}
-          portrait: {fileID: 0}
-          voice: {fileID: 0}
-          voiceFrom: {fileID: 0}
-        line: I salted what was left of your fish, so we need fewer berries. Two handfuls will do.
         afterFightPause: 0
         aside: 1
 --- !u!114 &1894348895
@@ -111816,55 +110947,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 606097936442374510, guid: 9e17c4ae208a7d24b8a851b80f6014fd, type: 3}
   m_PrefabInstance: {fileID: 1901749970}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1901900326
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1901900327}
-  - component: {fileID: 1901900328}
-  m_Layer: 0
-  m_Name: Quest Waypoint - Berries for the Pot 2
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1901900327
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901900326}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 913407437}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1901900328
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901900326}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b33558da32530e547ac0e3c72d87df24, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::QuestWaypoint
-  quest: {fileID: 11400000, guid: 83fc380c709c01a4383dfa7c9300d48a, type: 2}
-  objective: 2
-  label: Campfire
-  when: 0
-  untilGathered: {fileID: 0}
 --- !u!1001 &1902100784
 PrefabInstance:
   m_ObjectHideFlags: 0

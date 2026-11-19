@@ -11,6 +11,21 @@ public sealed class CompanionTopic
     [TextArea(2, 5)] public string answer;
     [Tooltip("Raised when the player asks it, for a story to remember. Optional.")]
     public GameEventDefinition raises;
+    [Tooltip("Offered only while this quest is under way (Sigrid's \"I'm ready to go on\" in A Moment of Warmth). Empty: whenever the " +
+             "camp's topics are.")]
+    public QuestDefinition onlyDuring;
+
+    /// <summary>Whether it may be asked now: no quest to wait for, or that quest under way.</summary>
+    public bool OfferedNow()
+    {
+        if (onlyDuring == null)
+        {
+            return true;
+        }
+
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
+        return log != null && log.StatusOf(onlyDuring) == QuestStatus.Active;
+    }
 }
 
 /// <summary>
@@ -138,7 +153,7 @@ public sealed class PrologueCompanion : MonoBehaviour, IConversationTopics, IQue
         if (expedition == null || !expedition.AtRest) return;
         foreach (CompanionTopic topic in talk == PrologueSite.Meadow ? morningTopics : campTopics)
         {
-            if (asked.Contains(topic) || string.IsNullOrWhiteSpace(topic.question)) continue;
+            if (asked.Contains(topic) || string.IsNullOrWhiteSpace(topic.question) || !topic.OfferedNow()) continue;
             CompanionTopic chosen = topic;
             page.Add(new MenuAction(chosen.question, null, true, () =>
             {

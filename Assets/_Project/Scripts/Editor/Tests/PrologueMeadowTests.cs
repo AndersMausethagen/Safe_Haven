@@ -457,8 +457,8 @@ public sealed class PrologueMeadowTests
         Assert.IsNotNull(new QuestProgressNode().FindProblem());
         Assert.IsNotNull(new WhenObjectHit().FindProblem());
         Assert.IsNotNull(new DespawnEnemiesNode().FindProblem());
-        Assert.IsNull(new QuestProgressNode { quest = Quest("BerriesForThePot"), objective = 1 }.FindProblem());
-        Assert.IsNotNull(new QuestProgressNode { quest = Quest("BerriesForThePot"), objective = 9 }.FindProblem());
+        Assert.IsNull(new QuestProgressNode { quest = Quest("FishForBreakfast"), objective = 1 }.FindProblem());
+        Assert.IsNotNull(new QuestProgressNode { quest = Quest("FishForBreakfast"), objective = 9 }.FindProblem());
     }
 
     [Test]
@@ -513,7 +513,7 @@ public sealed class PrologueMeadowTests
             StoryScript Story(string name) => stories.Single(s => s.name == name);
 
             // Around a fight a word from someone is enough: these speak in asides and never turn the camera.
-            foreach (string fight in new[] { "Story - The Old Troll", "Story - The Old Troll Returns", "Story - Rootlings on the Road", "Story - Troll Ambush", "Story - The Road East" })
+            foreach (string fight in new[] { "Story - The Old Troll", "Story - The Old Troll Returns", "Story - Rootlings on the Road", "Story - The Road East" })
             {
                 Assert.IsTrue(Story(fight).IsFight, fight);
             }
@@ -620,7 +620,23 @@ public sealed class PrologueMeadowTests
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("HuntForThePot"))), "Runa offers the hunt.");
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("FishForBreakfast"))), "Eirik offers the fishing.");
             Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("WoodForTheRoad"))), "Eirik offers the wood.");
-            Assert.IsTrue(givers.Any(g => g.SideOffers.Any(o => o.Quest == Quest("BerriesForThePot"))), "Eirik offers the berries, by the forest fire.");
+            Assert.IsFalse(givers.Any(g => g.SideOffers.Any(o => o.Quest == null)), "no offer of a quest that is gone (the berries)");
+
+            // The wolves come only once the player tells Sigrid they are ready (the user, 2026-11-19): talking to the others, or
+            // asking Sigrid anything else, doesn't set them off, and no clock does.
+            StoryScript warmth = stories.Single(s => s.name == "Story - A Moment of Warmth");
+            var rested = AssetDatabase.LoadAssetAtPath<GameEventDefinition>(Root + "Events/Rested.asset");
+            StoryNode[] triggers = warmth.Nodes.Where(n => n.IsTrigger).ToArray();
+            Assert.AreEqual(1, triggers.Length, "one way in");
+            var ready = triggers[0] as WhenQuestEvent;
+            Assert.IsNotNull(ready?.questEvent, "it waits for a story event");
+            CompanionTopic tell = roots.SelectMany(r => r.GetComponentsInChildren<PrologueCompanion>(true)).Where(c => c.name.StartsWith("Sigrid"))
+                .SelectMany(c => (CompanionTopic[])typeof(PrologueCompanion).GetField("campTopics", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(c))
+                .SingleOrDefault(t => t.raises == ready.questEvent);
+            Assert.IsNotNull(tell, "Sigrid's topic raises it");
+            Assert.AreEqual("CatchBreath", tell.onlyDuring?.name, "offered only during the rest");
+            Assert.IsTrue(warmth.Nodes.OfType<RaiseQuestEventNode>().Any(n => n.questEvent == rested), "it ends the rest");
+            Assert.IsTrue(warmth.Nodes.OfType<WaitNode>().All(w => w.seconds <= 10f), "the wolves come soon after, not on a long clock");
             foreach (QuestGiver giver in givers)
             {
                 var parts = giver.GetComponents<IConversationTopics>().ToList();
