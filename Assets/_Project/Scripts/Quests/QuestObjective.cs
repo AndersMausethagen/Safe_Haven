@@ -51,6 +51,8 @@ public enum ObjectiveType
     LearnEnchantment = 20,
     /// <summary>Hand X inscriptions to someone who carves (Liv): to the person named, or anyone.</summary>
     GiveInscription = 21,
+    /// <summary>Empower X pieces of gear at the altar (Purified Essence into a level), or one kind of item.</summary>
+    EmpowerItem = 22,
 }
 
 /// <summary>
@@ -122,7 +124,7 @@ public sealed class QuestObjective
     public bool CanProgressOnARaid => type != ObjectiveType.CraftItem && type != ObjectiveType.BuildStructure && type != ObjectiveType.QuestEvent
         && type != ObjectiveType.AssignJob && type != ObjectiveType.ReachHavenRank && type != ObjectiveType.StoreItem
         && type != ObjectiveType.RepairItem && type != ObjectiveType.UpgradeBuilding && type != ObjectiveType.EnchantItem
-        && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription;
+        && type != ObjectiveType.LearnEnchantment && type != ObjectiveType.GiveInscription && type != ObjectiveType.EmpowerItem;
     public int Amount => Mathf.Max(1, amount);
     public bool CountAlreadyOwned => countAlreadyOwned && Array.IndexOf(FieldsOf(type), nameof(countAlreadyOwned)) >= 0;
     public ItemDefinition Item => item;
@@ -262,6 +264,8 @@ public sealed class QuestObjective
                 return new[] { nameof(enchantment), nameof(greatOnly), nameof(onlySource), nameof(source) };
             case ObjectiveType.GiveInscription:
                 return new[] { nameof(person) };
+            case ObjectiveType.EmpowerItem:
+                return new[] { nameof(item) };
             default:
                 return Array.Empty<string>();
         }
@@ -304,6 +308,7 @@ public sealed class QuestObjective
         // What the player learns is their own, wherever they read it.
         [ObjectiveType.LearnEnchantment] = true,
         [ObjectiveType.GiveInscription] = false,
+        [ObjectiveType.EmpowerItem] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
@@ -378,6 +383,8 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.Upgraded && Is(building, gameEvent.Subject, false) && gameEvent.Amount >= Tier ? 1 : 0;
             case ObjectiveType.EnchantItem:
                 return gameEvent.Kind == GameEventKind.Enchanted && EnchantmentCounts(gameEvent.Subject) ? 1 : 0;
+            case ObjectiveType.EmpowerItem:
+                return gameEvent.Kind == GameEventKind.Empowered && Is(item, gameEvent.Subject, false) ? 1 : 0;
             case ObjectiveType.LearnEnchantment:
                 return gameEvent.Kind == GameEventKind.EnchantmentLearned && EnchantmentCounts(gameEvent.Subject)
                        && (!onlySource || (gameEvent.Subject is EnchantmentDefinition learned && learned.Source == source)) ? 1 : 0;
@@ -539,6 +546,8 @@ public sealed class QuestObjective
             case ObjectiveType.RepairItem:
                 string bench = DurabilitySettings.Current != null ? DurabilitySettings.Current.RepairStation.DisplayName() : "Workshop";
                 return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
+            case ObjectiveType.EmpowerItem:
+                return item != null ? $"Empower your {Name(item)} at the altar" : Amount == 1 ? "Empower a piece of gear at the altar" : $"Empower {count} pieces of gear at the altar";
             case ObjectiveType.EnchantItem:
                 string carved = enchantment != null ? enchantment.DisplayName : greatOnly ? "a great enchantment" : "an enchantment";
                 return Amount == 1 ? $"Carve {carved} into your gear at the altar" : $"Carve {carved} into {count} pieces of gear at the altar";

@@ -66,10 +66,19 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         GameSession.Here.Changed -= GoToWork;
     }
 
+    private QuestGiver questGiver;
+
     /// <summary>Sets who this is and where their home spot is. Called by ResidentSpawner.</summary>
     public void Bind(ResidentDefinition who)
     {
         resident = who;
+        // Their quests at home, if they give any: a quest giver on them, speaking first in their conversation.
+        if (who.QuestLine != null && who.QuestLine.Count > 0)
+        {
+            questGiver = TryGetComponent(out QuestGiver existing) ? existing : gameObject.AddComponent<QuestGiver>();
+            questGiver.UseQuestLine(who.QuestLine, who.QuestLineDone, true);
+        }
+
         homePosition = transform.position;
         homeRotation = transform.rotation;
         name = who.DisplayName;
@@ -214,6 +223,12 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         if (resident == null)
         {
             return;
+        }
+
+        // Their quest speaks first: what they ask, or what they say as it is handed in, before who they are.
+        if (questGiver != null)
+        {
+            questGiver.AddTopicsForOwner(page, speaker, afterAnswer);
         }
 
         JobDefinition current = GameSession.Here.Find(resident)?.Job;

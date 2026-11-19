@@ -117,6 +117,12 @@ public static class QuestChecklist
                 if (QuestSceneIndex.HasGiver(quest) || QuestSceneIndex.IsStartedByStory(quest))
                 {
                     string by = string.Join(", ", QuestSceneIndex.UsesOf(quest).Where(u => u.Role == QuestSceneRole.Gives || u.Role == QuestSceneRole.Starts).Select(u => u.Describe()).Distinct());
+                    ResidentDefinition resident = QuestSceneIndex.GivingResident(quest);
+                    if (resident != null)
+                    {
+                        by = string.IsNullOrEmpty(by) ? $"{resident.DisplayName}'s quest line at home" : $"{by}, {resident.DisplayName}'s quest line at home";
+                    }
+
                     checks.Add(new QuestCheck(QuestCheck.State.Done, $"Offered by {by}."));
                 }
                 else

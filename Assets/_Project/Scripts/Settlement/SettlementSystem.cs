@@ -77,6 +77,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         if (finished > 0 && settings.PurifiedEssence != null)
         {
             int made = GameSession.Stash.Resources.Add(settings.PurifiedEssence, settlement.PurifiedFrom(finished * settings.PurifiedPerBatch));
+            // Made at the altar, as a station makes its work: a quest to purify counts it (Craft Item, the Purified Essence).
+            GameEvents.Raise(new GameEvent(GameEventKind.Crafted, settings.PurifiedEssence, made));
             GameMessages.Post($"The altar purified {made} {settings.PurifiedEssence.DisplayName} into storage.", MessageKind.Gain);
         }
     }

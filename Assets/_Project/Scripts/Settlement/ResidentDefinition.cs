@@ -46,6 +46,14 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     [Tooltip("Jobs they can be given at home. The first is suggested.")]
     [SerializeField] private JobDefinition[] jobs = new JobDefinition[0];
 
+    [Header("Their quests at home")]
+    [Tooltip("Quests they give once home, one after another (a QuestGiver's ordered offers: Start By Quest Giver, the next needing the one " +
+             "before): Ingrid's The Alchemist and what she teaches at the altar after it. Their lines lead the conversation and the ! " +
+             "shows over them. Empty: none.")]
+    [SerializeField] private QuestOffer[] questLine = new QuestOffer[0];
+    [Tooltip("Said when the last of their quests is handed in.")]
+    [SerializeField, TextArea] private string questLineDone;
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string QuestId => Id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -58,6 +66,8 @@ public sealed class ResidentDefinition : ScriptableObject, IQuestTarget
     public FightLines FightLines => fightLines;
     public GameObject Model => model;
     public CompanionDefinition RaidCompanion => raidCompanion;
+    public System.Collections.Generic.IReadOnlyList<QuestOffer> QuestLine => questLine;
+    public string QuestLineDone => questLineDone;
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> MemoryLines => memoryLines;
     public System.Collections.Generic.IReadOnlyList<CompanionMemoryLines> ReturningLines => returningLines;
     public JobDefinition[] Jobs => jobs;

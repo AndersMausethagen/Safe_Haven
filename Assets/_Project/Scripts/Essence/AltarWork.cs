@@ -148,6 +148,7 @@ public static class AltarWork
         held.Container.SetSlot(held.Slot, stack.WithEmpower(level));
         // Work at the altar is Runecraft's practice (Docs/EnchantingResearch.md #4).
         Inscriptions.Practise(stack.Item.Tier, EssenceSettings.Current.EmpowerWork);
+        GameEvents.Raise(new GameEvent(GameEventKind.Empowered, stack.Item, level, user));
         Finished(user, $"{stack.Item.DisplayName} is empowered to +{level}.");
     }
 

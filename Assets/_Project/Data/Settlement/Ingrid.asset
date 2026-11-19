@@ -32,3 +32,29 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: e9a34a9ca91ab4946b93ffe90aebd8c1, type: 2}
+    text: 'You came back for me. I won''t forget it. Let me be useful: give me the Alchemist''s work, and raise me an altar of rough stone where I can cleanse what the forest leaves on you. I''ll show you where.'
+    acceptText: I'll raise it.
+    waitingText: Six rough stone blocks and the life in four orbs. The Workshop squares the stone. Tell me when it stands.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: a6828c2d25f6b8e41b89a27e94d1fd80, type: 2}
+    text: 'It stands. It''s crooked, and it''s ours. Now the part that matters: bring me the Cursed Essence the woods leave on everything you kill, and we''ll make it clean.'
+    acceptText: Show me.
+    waitingText: Set it in the basin and leave it to me; it takes a while. Come back when there's some of it clean in the store.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: d1cd1e12e7d99414ea3e75c867fa6f79, type: 2}
+    text: Clean. Feel how quiet it is? That is what the old ways spend. Bring me your blade, or whatever keeps you alive out there, and we'll give it some to drink. I've put a little by for the first.
+    acceptText: Here.
+    waitingText: At the altar, choose Empower. It shows you the price before you pay it.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 5e236adcdcadc1c41a2b281830598ef3, type: 2}
+    text: 'It remembers now. One more thing, and then you know what I know: a mark, cut deep, that the forest can''t easily undo. You know a few of the safe ones already, if you look.'
+    acceptText: Teach me.
+    waitingText: At the altar, choose Enchant. One mark to a piece. The cursed ones can wait until you know what they cost.
+    askText: 
+    thanksText: 
+  questLineDone: That's all of it. My grandmother would be appalled, and proud. Keep bringing me the curse; I'll keep it clean.

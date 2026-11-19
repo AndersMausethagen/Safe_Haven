@@ -63,6 +63,8 @@ public enum GameEventKind
     InscriptionGiven = 27,
     /// <summary>An inscription was found: a drop, a cache, a rubbing. Subject: the EnchantmentDefinition; Amount: its tier.</summary>
     InscriptionFound = 28,
+    /// <summary>A piece of gear was empowered at the altar. Subject: the ItemDefinition; Amount: the level it reached.</summary>
+    Empowered = 29,
 }
 
 /// <summary>

@@ -197,7 +197,27 @@ public static class QuestSceneIndex
             }
         }
 
-        return false;
+        return GivingResident(quest) != null;
+    }
+
+    /// <summary>The resident whose quest line at home offers it (ResidentDefinition › Quest Line: a QuestGiver made on them), or null.</summary>
+    public static ResidentDefinition GivingResident(QuestDefinition quest)
+    {
+        if (quest == null)
+        {
+            return null;
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:ResidentDefinition"))
+        {
+            var resident = AssetDatabase.LoadAssetAtPath<ResidentDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (resident != null && resident.QuestLine != null && System.Linq.Enumerable.Any(resident.QuestLine, offer => offer != null && offer.Quest == quest))
+            {
+                return resident;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>Saved scene and prefab objects that are this person, place or thing for quests.</summary>

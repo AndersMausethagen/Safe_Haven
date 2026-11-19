@@ -104,6 +104,36 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     public string DisplayName => talkable != null ? talkable.SpeakerName : SpeakerName;
 
     public IReadOnlyList<QuestOffer> Offers => offers;
+
+    /// <summary>
+    /// Speaks only when its owner asks (a resident at home: ResidentNpc puts the quest's line first, before who they are), not as one
+    /// of the Talkable's topics in component order.
+    /// </summary>
+    public bool SpeaksThroughOwner { get; private set; }
+    private bool askedByOwner;
+
+    /// <summary>Gives it an owner's quest line at runtime (a resident's ResidentDefinition › Quest Line).</summary>
+    public void UseQuestLine(IEnumerable<QuestOffer> line, string handedIn, bool throughOwner)
+    {
+        offers = new List<QuestOffer>(line).ToArray();
+        turnInText = handedIn;
+        SpeaksThroughOwner = throughOwner;
+        Refresh();
+    }
+
+    /// <summary>The owner's turn to let it speak (see <see cref="SpeaksThroughOwner"/>).</summary>
+    public void AddTopicsForOwner(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
+    {
+        askedByOwner = true;
+        try
+        {
+            AddTopics(page, speaker, afterAnswer);
+        }
+        finally
+        {
+            askedByOwner = false;
+        }
+    }
     public IReadOnlyList<QuestOffer> SideOffers => sideOffers;
     public QuestDefinition Quest => offer != null ? offer.Quest : quest;
     public QuestGiverState State => state;
@@ -424,6 +454,11 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
     /// <summary>Adds the giver's line (when nothing before it spoke) and its quest answers to a Talkable's conversation.</summary>
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
+        if (SpeaksThroughOwner && !askedByOwner)
+        {
+            return;
+        }
+
         MenuPage mine = BuildDialoguePage();
         if (string.IsNullOrWhiteSpace(page.Body))
         {
