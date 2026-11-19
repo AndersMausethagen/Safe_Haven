@@ -115,7 +115,8 @@ public sealed class OffScreenWarnings : MonoBehaviour
 
         for (int i = index; i < arrows.Length; i++)
         {
-            if (arrows[i].gameObject.activeSelf)
+            // On a scene's unload the arrows' canvas can go first (an exception in the playtest build, twice, 2026-11-19).
+            if (arrows[i] != null && arrows[i].gameObject.activeSelf)
             {
                 arrows[i].gameObject.SetActive(false);
             }

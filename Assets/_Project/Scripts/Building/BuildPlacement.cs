@@ -268,6 +268,90 @@ public static class BuildPlacement
     /// Lays pieces of pieceLength end to end from start towards end: as many as fit best, at least one and at most
     /// maxPieces. Fills centers (on the ground) and returns the direction, or zero when start and end are the same.
     /// </summary>
+    /// <summary>
+    /// Lays pieces along a drawn path (the cursor's way while a line is dragged: a curved wall), end to end: each piece a chord from
+    /// where the last ended to the point a piece's length further along the path, so a bend is a run of short turns with no gaps
+    /// (a tight bend overlaps a little). A last stretch shorter than half a piece is left. Directions are flat.
+    /// </summary>
+    public static void LayPath(IReadOnlyList<Vector3> path, float pieceLength, int maxPieces, List<Vector3> centers, List<Vector3> directions)
+    {
+        centers.Clear();
+        directions.Clear();
+        if (path == null || path.Count < 2 || pieceLength <= 0f)
+        {
+            return;
+        }
+
+        Vector3 from = path[0];
+        int segment = 1;
+        Vector3 walked = path[0];
+        while (centers.Count < Mathf.Max(1, maxPieces))
+        {
+            // A piece's length further along the path from where the last piece ended.
+            float left = pieceLength;
+            Vector3 at = walked;
+            bool reached = false;
+            while (segment < path.Count)
+            {
+                Vector3 step = path[segment] - at;
+                step.y = 0f;
+                float length = step.magnitude;
+                if (length >= left)
+                {
+                    at += step / Mathf.Max(1e-5f, length) * left;
+                    reached = true;
+                    break;
+                }
+
+                left -= length;
+                at = new Vector3(path[segment].x, at.y, path[segment].z);
+                segment++;
+            }
+
+            if (!reached && left > pieceLength * 0.5f)
+            {
+                break;
+            }
+
+            Vector3 chord = at - from;
+            chord.y = 0f;
+            if (chord.sqrMagnitude < 1e-4f)
+            {
+                break;
+            }
+
+            centers.Add(from + chord * 0.5f);
+            directions.Add(chord.normalized);
+            from = at;
+            walked = at;
+            if (!reached)
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>The farthest any point of <paramref name="path"/> lies off the straight line from its first point to <paramref name="end"/>, flat.</summary>
+    public static float Bend(IReadOnlyList<Vector3> path, Vector3 end)
+    {
+        if (path == null || path.Count == 0)
+        {
+            return 0f;
+        }
+
+        Vector2 a = new Vector2(path[0].x, path[0].z), b = new Vector2(end.x, end.z);
+        Vector2 ab = b - a;
+        float most = 0f;
+        foreach (Vector3 point in path)
+        {
+            Vector2 p = new Vector2(point.x, point.z);
+            float t = ab.sqrMagnitude > 1e-6f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude) : 0f;
+            most = Mathf.Max(most, Vector2.Distance(p, a + ab * t));
+        }
+
+        return most;
+    }
+
     public static Vector3 LayLine(Vector3 start, Vector3 end, float pieceLength, int maxPieces, List<Vector3> centers)
     {
         centers.Clear();

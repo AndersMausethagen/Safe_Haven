@@ -59,6 +59,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
         }
 
         ItemUseBar.For(gameObject);
+        StationProgressBars.For(gameObject);
         StowedWeaponView.For(gameObject);
 
         if (!TryGetComponent(out EnemyVisibility _))

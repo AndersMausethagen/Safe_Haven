@@ -153,4 +153,43 @@ public sealed class BuildPlacementTests
 
         Assert.That(pivot, Is.EqualTo(new Vector3(4f, 0f, 5f)));
     }
+
+    // A wall drawn round a curve follows it (the user, 2026-11-19: dragged walls came out as squares): pieces end to end along the
+    // drawn way, each turned a little from the last, with no gap between them.
+    [Test]
+    public void LayPath_FollowsADrawnCurve_PieceEndToPieceStart()
+    {
+        var path = new List<Vector3>();
+        for (int degrees = 0; degrees <= 90; degrees += 5)
+        {
+            float a = degrees * Mathf.Deg2Rad;
+            path.Add(new Vector3(Mathf.Cos(a) * 10f, 0f, Mathf.Sin(a) * 10f));
+        }
+
+        var centers = new List<Vector3>();
+        var directions = new List<Vector3>();
+        BuildPlacement.LayPath(path, 2f, 50, centers, directions);
+        // A quarter circle of radius 10 is 15.7 m: seven 2 m pieces and a last one over the 1.7 m left (more than half a piece).
+        Assert.AreEqual(8, centers.Count);
+        Vector3 end = path[0];
+        for (int i = 0; i < centers.Count; i++)
+        {
+            Vector3 start = centers[i] - directions[i] * 1f;
+            if (i < centers.Count - 1)
+            {
+                Assert.Less(Vector3.Distance(start, end), 0.05f, $"piece {i} starts where the last ended");
+            }
+
+            end = centers[i] + directions[i] * 1f;
+            Assert.AreEqual(10f, new Vector2(centers[i].x, centers[i].z).magnitude, 0.2f, "on the drawn curve");
+            if (i > 0)
+            {
+                float turn = Vector3.Angle(directions[i - 1], directions[i]);
+                Assert.That(turn, Is.InRange(5f, 20f), "each a little turned from the last, not a square corner");
+            }
+        }
+
+        Assert.Greater(BuildPlacement.Bend(path, path[path.Count - 1]), 2f, "a curve reads as bent");
+        Assert.Less(BuildPlacement.Bend(new List<Vector3> { Vector3.zero, new Vector3(5f, 0f, 0.2f) }, new Vector3(10f, 0f, 0f)), 0.5f, "a straight drag doesn't");
+    }
 }

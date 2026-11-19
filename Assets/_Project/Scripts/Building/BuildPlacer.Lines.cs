@@ -49,6 +49,10 @@ public sealed partial class BuildPlacer
         other.Definition != null && other.Definition.PlaceInLines && placing.PlaceInLines
         && Mathf.Abs(BuildPlacement.PieceLength(other.LocalBounds) - BuildPlacement.PieceLength(LocalBounds)) < 0.25f;
 
+    // Metres the cursor moves before its way gets another point, and how far the way must bend off the straight line to be a curve.
+    private const float PathStep = 0.6f;
+    private const float PathBend = 1f;
+
     private void UpdateLine(Vector3 cursor, bool free)
     {
         Vector3 end = cursor;
@@ -76,7 +80,25 @@ public sealed partial class BuildPlacer
 
         bool alongX = BuildPlacement.RunsAlongX(LocalBounds);
         lineDirections.Clear();
-        if (lineRound && HomePortal.Current != null)
+        // The cursor's way, a point every PathStep metres: bent more than PathBend off the straight line, the wall follows it.
+        Vector3 last = linePath.Count > 0 ? linePath[linePath.Count - 1] : lineStart;
+        Vector3 moved = cursor - last;
+        moved.y = 0f;
+        if (linePath.Count == 0 || moved.magnitude >= PathStep)
+        {
+            linePath.Add(cursor);
+        }
+
+        bool curved = !lineRound && linePath.Count > 2 && BuildPlacement.Bend(linePath, joined ? end : cursor) > Mathf.Max(PathBend, length * 0.3f);
+        if (curved)
+        {
+            // To the cursor (or the free end it joins), so the last piece ends where it is drawn to.
+            int keep = linePath.Count;
+            linePath.Add(joined ? end : cursor);
+            BuildPlacement.LayPath(linePath, length, maxLinePieces, lineCenters, lineDirections);
+            linePath.RemoveRange(keep, linePath.Count - keep);
+        }
+        else if (lineRound && HomePortal.Current != null)
         {
             // To the end it was dragged to: a free end of the fence it joins (closing a ring), else the cursor.
             BuildPlacement.LayArc(HomePortal.Current.transform.position, lineStart, joined ? end : cursor, length, maxLinePieces, lineCenters, lineDirections);

@@ -65,6 +65,8 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
 
     private readonly List<Vector3> lineCenters = new List<Vector3>();
     private readonly List<Vector3> lineDirections = new List<Vector3>();
+    // The cursor's way while a line is dragged: a path that bends lays the wall along it (a curved wall), a straight one snaps as before.
+    private readonly List<Vector3> linePath = new List<Vector3>();
     // A line bent round the portal (scroll while dragging a line), so a fence can follow the ward's circle.
     private bool lineRound;
     private readonly List<ResourceAmount> scaledResources = new List<ResourceAmount>();
@@ -306,7 +308,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         else
         {
             hint.Append($"Place the {building.DisplayName}: left-click to build");
-            hint.Append(building.PlaceInLines ? ", or drag to build a line (scroll while dragging to bend it round the portal)." : ".");
+            hint.Append(building.PlaceInLines ? ", or drag to build a line: it follows the way you draw, curves too (scroll while dragging to bend it round the portal)." : ".");
         }
         if (building.YardDepth > 0f)
         {
@@ -432,6 +434,8 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             pressPoint = point;
             pressYaw = pieceYaw;
             lineStart = !free && TryFindLineEnd(cursor, null, out Vector3 end) ? end : free ? cursor : Grid(cursor);
+            linePath.Clear();
+            linePath.Add(lineStart);
             return;
         }
 
