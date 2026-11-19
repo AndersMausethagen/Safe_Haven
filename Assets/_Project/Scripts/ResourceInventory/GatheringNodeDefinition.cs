@@ -19,6 +19,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [Tooltip("Progression tier. Higher tiers need better tools and grow in more dangerous places.")]
     [SerializeField, Range(Tiers.Min, Tiers.Max)] private int tier = 1;
+    [Tooltip("How often a random spawn point of its kind becomes this node, against the others it could be (RandomResourceNode): 2 is " +
+             "twice as often as a node at 1. Raids pick from their own weighted lists.")]
+    [SerializeField, Min(0f)] private float spawnWeight = 1f;
 
     [Header("Yield")]
     [Tooltip("What one gather gives. Items go to the bag, essences to the essence bars.")]
@@ -75,6 +78,7 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public string Id => string.IsNullOrWhiteSpace(id) ? MakeId(name) : id.Trim();
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public int Tier => tier;
+    public float SpawnWeight => spawnWeight;
 
     public IReadOnlyList<string> InSeasons => inSeasons;
 

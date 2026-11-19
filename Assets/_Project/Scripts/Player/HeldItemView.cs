@@ -274,7 +274,7 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         ItemStack weapon = equipment.MainHand;
-        return weapon.IsEmpty || weapon.IsBroken ? null : weapon.Item;
+        return weapon.IsEmpty || weapon.IsBroken || equipment.IsSheathed ? null : weapon.Item;
     }
 
     /// <summary>Puts <paramref name="item"/>'s model in the hand (nothing for null or an item without a model).</summary>

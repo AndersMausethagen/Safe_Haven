@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: OakPlank
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
   id: planks
-  displayName: 
+  displayName: Fine Plank
   output: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
   outputResource: {fileID: 0}
   outputAmount: 2
@@ -24,4 +24,7 @@ MonoBehaviour:
   station: 7
   craftSeconds: 4
   knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 0

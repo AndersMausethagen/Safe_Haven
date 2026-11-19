@@ -58,7 +58,34 @@ public sealed class RandomResourceNode : MonoBehaviour
         var random = stablePick
             ? new System.Random(Mathf.RoundToInt(at.x * 10f) * 73856093 ^ Mathf.RoundToInt(at.z * 10f) * 19349663)
             : new System.Random(System.Environment.TickCount ^ transform.position.GetHashCode());
-        Spawned = Become(candidates[random.Next(candidates.Count)]);
+        Spawned = Become(candidates[Pick(candidates, random.NextDouble())]);
+    }
+
+    /// <summary>Which of <paramref name="from"/> a roll in [0, 1) picks, by each node's Spawn Weight (all at 0: evenly).</summary>
+    public static int Pick(IReadOnlyList<GatheringNodeDefinition> from, double roll)
+    {
+        float total = 0f;
+        foreach (GatheringNodeDefinition node in from)
+        {
+            total += Mathf.Max(0f, node.SpawnWeight);
+        }
+
+        if (total <= 0f)
+        {
+            return Mathf.Min(from.Count - 1, (int)(roll * from.Count));
+        }
+
+        double left = roll * total;
+        for (int i = 0; i < from.Count; i++)
+        {
+            left -= Mathf.Max(0f, from[i].SpawnWeight);
+            if (left < 0d)
+            {
+                return i;
+            }
+        }
+
+        return from.Count - 1;
     }
 
     /// <summary>The nodes that match: those with a world prefab, of the kind and within the tiers (all of them for an

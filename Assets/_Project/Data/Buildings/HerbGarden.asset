@@ -21,7 +21,7 @@ MonoBehaviour:
   prefab: {fileID: 1073840259321300473, guid: cc3c0114ee97c5c4380d6883b6b9a6fc, type: 3}
   constructionCost: []
   constructionItems:
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 4
   - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
     amount: 2

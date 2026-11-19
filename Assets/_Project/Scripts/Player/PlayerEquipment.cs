@@ -36,6 +36,11 @@ public sealed class PlayerEquipment : MonoBehaviour
     private PlayerCombat combat;
     private Combatant combatant;
     private bool restoring;
+    // Put away with Z with no other weapon to take out: it stays in its slot, worn on the body, and the hands fight bare.
+    private bool sheathed;
+
+    /// <summary>The main-hand weapon is put away (Z) but still in its slot: worn on the body, the hands empty.</summary>
+    public bool IsSheathed => sheathed && !MainHand.IsEmpty;
 
     /// <summary>The worn gear, slot by slot.</summary>
     public GearSet Gear => gear;
@@ -231,13 +236,21 @@ public sealed class PlayerEquipment : MonoBehaviour
     /// <summary>
     /// Swaps the weapon in hand for the one held before it (Z), such as the axe and the bow. The first time, or when that
     /// one is no longer in the bag, it takes out the next weapon in the bag; with no other weapon it puts the one in hand
-    /// away (fists), and the next press takes it out again. Not mid-swing. The torch keeps its own key (ToggleTorch).
+    /// away (fists) and keeps it in its slot (the user, 2026-11-19: not into the bag), and the next press takes it out
+    /// again. Not mid-swing. The torch keeps its own key (ToggleTorch).
     /// </summary>
     public bool SwapWeapon()
     {
         if (combat != null && combat.IsAttacking)
         {
             return false;
+        }
+
+        if (IsSheathed)
+        {
+            SetSheathed(false);
+            GameMessages.Post($"Took out {MainHand.Item.DisplayName}.");
+            return true;
         }
 
         ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
@@ -255,8 +268,9 @@ public sealed class PlayerEquipment : MonoBehaviour
             return EquipFromBag(next);
         }
 
-        if (held != null && Unequip(GearSlot.MainHand))
+        if (held != null)
         {
+            SetSheathed(true);
             GameMessages.Post($"Put away {held.DisplayName}.");
             return true;
         }
@@ -271,12 +285,18 @@ public sealed class PlayerEquipment : MonoBehaviour
 
     private static bool IsSwappable(ItemDefinition item) => item != null && item.IsWeapon && item.Weapon.Kind != WeaponKind.Torch && !item.Weapon.IsShield;
 
-    /// <summary>The weapon put away and still carried, worn on the body (StowedWeaponView): the two-handed one put away
-    /// for the torch, else the one Z would take out again (the weapon held before this one). Null when there is none.</summary>
+    /// <summary>The weapon put away and still carried, worn on the body (StowedWeaponView): the main-hand one sheathed in
+    /// its slot, the two-handed one put away for the torch, else the one Z would take out again (the weapon held before
+    /// this one). Null when there is none.</summary>
     public ItemDefinition Stowed
     {
         get
         {
+            if (IsSheathed)
+            {
+                return MainHand.Item;
+            }
+
             ItemDefinition held = MainHand.IsEmpty ? null : MainHand.Item;
             foreach (ItemDefinition candidate in new[] { stowedWeapon, previousWeapon })
             {
@@ -290,6 +310,18 @@ public sealed class PlayerEquipment : MonoBehaviour
         }
     }
 
+    private void SetSheathed(bool on)
+    {
+        if (sheathed == on)
+        {
+            return;
+        }
+
+        sheathed = on;
+        ApplyWeapon();
+        Changed?.Invoke();
+    }
+
     // Remembers the weapon put away whenever the main hand changes (equipping goes through an empty hand: old, none, new).
     private void TrackHeldWeapon()
     {
@@ -298,6 +330,9 @@ public sealed class PlayerEquipment : MonoBehaviour
         {
             return;
         }
+
+        // Another weapon in the slot (or none) is taken out as usual: being put away belongs to the one that was.
+        sheathed = false;
 
         if (IsSwappable(heldWeapon) && !restoring)
         {
@@ -427,7 +462,7 @@ public sealed class PlayerEquipment : MonoBehaviour
         }
 
         ItemStack stack = MainHand;
-        WeaponDefinition weapon = !stack.IsEmpty && stack.Item.IsWeapon && !stack.IsBroken ? stack.Item.Weapon : unarmed;
+        WeaponDefinition weapon = !stack.IsEmpty && stack.Item.IsWeapon && !stack.IsBroken && !IsSheathed ? stack.Item.Weapon : unarmed;
         if (combatant != null)
         {
             combatant.StrikeOverride = weapon != null ? weapon.StrikeOverride : StrikeKind.None;

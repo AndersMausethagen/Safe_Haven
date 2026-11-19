@@ -20,6 +20,9 @@ public sealed class GatheringToolProfile
     [SerializeField, Range(0.01f, 0.5f)] private float criticalZoneWidth = 0.08f;
     [Tooltip("Scales this tool's noise radius and the forest annoyance of each swing. 1 = as set below/on the raid.")]
     [SerializeField, Range(0f, 2f)] private float loudness = 1f;
+    [Tooltip("Shows the timing bar for this tool even with hold to raise, whose cue is the glint on the tool: a small tool's glint " +
+             "(the sickle in a plant) is no cue to see (the user, 2026-11-19: flax had no bar to show when to press).")]
+    [SerializeField] private bool showBar;
 
     public GatheringToolProfile()
     {
@@ -39,6 +42,7 @@ public sealed class GatheringToolProfile
     public float NormalZoneWidth => normalZoneWidth;
     public float CriticalZoneWidth => criticalZoneWidth;
     public float Loudness => loudness;
+    public bool ShowBar => showBar;
 }
 
 /// <summary>

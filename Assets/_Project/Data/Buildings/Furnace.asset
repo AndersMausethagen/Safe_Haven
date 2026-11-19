@@ -23,7 +23,7 @@ MonoBehaviour:
   constructionItems:
   - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
     amount: 8
-  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+  - item: {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
     amount: 8
   - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
     amount: 24
@@ -32,9 +32,25 @@ MonoBehaviour:
   sortOrder: 4
   requires: []
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 1.5
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 3
   outputCapacity: 10
   queueLength: 5
@@ -62,11 +78,14 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Master's
     description: A bellows that breathes on its own.
     cost:
@@ -88,11 +107,14 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

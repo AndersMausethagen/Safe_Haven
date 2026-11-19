@@ -426,9 +426,19 @@ public sealed class GearTests
             Assert.AreSame(axe, equipment.MainHand.Item);
 
             Assert.IsTrue(equipment.SwapWeapon());
-            Assert.IsTrue(equipment.MainHand.IsEmpty, "the only weapon is put away (fists)");
+            // Put away, it stays in the weapon slot (the user, 2026-11-19), worn on the body, and the hands fight bare.
+            Assert.AreSame(axe, equipment.MainHand.Item, "still in its slot");
+            Assert.IsTrue(equipment.IsSheathed);
+            Assert.AreEqual(0, bag.Count(axe), "not in the bag");
+            Assert.AreSame(axe, equipment.Stowed, "worn on the body");
+            PlayerCombat fighting = user.GetComponent<PlayerCombat>();
+            if (fighting != null)
+            {
+                Assert.AreNotSame(axe.Weapon, fighting.Weapon, "the hands fight bare");
+            }
             Assert.IsTrue(equipment.SwapWeapon());
             Assert.AreSame(axe, equipment.MainHand.Item, "and taken out again");
+            Assert.IsFalse(equipment.IsSheathed);
         }
         finally
         {

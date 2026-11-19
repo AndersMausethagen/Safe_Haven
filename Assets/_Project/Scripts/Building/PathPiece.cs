@@ -15,6 +15,9 @@ using UnityEngine.Rendering.Universal;
 public sealed class PathPiece : MonoBehaviour
 {
     private const float Depth = 1.6f;
+    // On terrain the decal lies along the ground's slope, this deep (half above, half below): URP's angle fade needs decal layers,
+    // which are off, so a deeper box printed the path on whoever stood on it (the user, 2026-11-19), up to their waist.
+    private const float GroundDepth = 0.5f;
     private static readonly List<PathPiece> all = new List<PathPiece>();
 
     private BuildingObject building;
@@ -84,14 +87,71 @@ public sealed class PathPiece : MonoBehaviour
         holder.transform.localPosition = new Vector3(bounds.center.x, bounds.min.y + Depth * 0.4f, bounds.center.z);
         // Looking down; the texture's length (u) along the piece.
         holder.transform.localRotation = Quaternion.LookRotation(Vector3.down, alongX ? Vector3.forward : Vector3.left);
+        float depth = Depth;
+        if (AlongTheGround(holder.transform, length, out float bulge))
+        {
+            depth = GroundDepth + bulge * 2f;
+        }
+
         decal = holder.AddComponent<DecalProjector>();
         decal.material = look;
         decal.scaleMode = DecalScaleMode.ScaleInvariant;
-        decal.size = new Vector3(length, width, Depth);
+        decal.size = new Vector3(length, width, depth);
         decal.pivot = Vector3.zero;
         decal.drawDistance = 90f;
         decal.fadeFactor = 1f;
         decal.startAngleFade = 50f;
         decal.endAngleFade = 75f;
+    }
+
+    /// <summary>
+    /// Lays the decal's holder along the terrain under the piece: its middle on the line between the ground at its two ends, its
+    /// length (x) tilted with that line, projecting down square to it. <paramref name="bulge"/> is how far the ground at its middle
+    /// lies off that line, for the box's depth. False off terrain: the holder stays as it was, level.
+    /// </summary>
+    private bool AlongTheGround(Transform holder, float length, out float bulge)
+    {
+        bulge = 0f;
+        Vector3 along = holder.right;
+        along.y = 0f;
+        if (along.sqrMagnitude < 1e-6f)
+        {
+            return false;
+        }
+
+        along.Normalize();
+        Vector3 middle = holder.position;
+        float half = length * 0.5f;
+        if (!GroundAt(middle - along * half, out float low) || !GroundAt(middle + along * half, out float high) || !GroundAt(middle, out float centre))
+        {
+            return false;
+        }
+
+        Vector3 a = new Vector3(middle.x, low, middle.z) - along * half;
+        Vector3 b = new Vector3(middle.x, high, middle.z) + along * half;
+        Vector3 line = (b - a).normalized;
+        Vector3 up = Vector3.ProjectOnPlane(Vector3.up, line).normalized;
+        Vector3 down = -up;
+        // LookRotation's right is up x forward: this up keeps the decal's length (x) along the line.
+        holder.SetPositionAndRotation((a + b) * 0.5f, Quaternion.LookRotation(down, Vector3.Cross(down, line)));
+        bulge = Mathf.Abs(centre - (low + high) * 0.5f);
+        return true;
+    }
+
+    private static bool GroundAt(Vector3 point, out float height)
+    {
+        foreach (Terrain terrain in Terrain.activeTerrains)
+        {
+            Vector3 local = point - terrain.transform.position;
+            Vector3 size = terrain.terrainData.size;
+            if (local.x >= 0f && local.z >= 0f && local.x <= size.x && local.z <= size.z)
+            {
+                height = terrain.SampleHeight(point) + terrain.transform.position.y;
+                return true;
+            }
+        }
+
+        height = 0f;
+        return false;
     }
 }

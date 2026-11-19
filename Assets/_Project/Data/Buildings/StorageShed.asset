@@ -25,7 +25,7 @@ MonoBehaviour:
     amount: 12
   - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
     amount: 8
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 20
   showInBuildMenu: 1
   knownFromStart: 1
@@ -34,9 +34,25 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
     tier: 1
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 1.5
   yardSide: 1
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5
@@ -46,7 +62,7 @@ MonoBehaviour:
   - title: Sturdy
     description: Shelves up to the rafters.
     cost:
-    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
       amount: 16
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 12
@@ -64,17 +80,20 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   - title: Grand
     description: A loft for everything that doesn't fit.
     cost:
-    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
       amount: 28
-    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    - item: {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
       amount: 8
     essence: []
     work: 9
@@ -90,11 +109,14 @@ MonoBehaviour:
     extraLogs: 0
     teachesRecipes: []
     requires: []
+    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
+    extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
+    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

@@ -9,7 +9,9 @@ public sealed partial class RaidLayoutField
 {
     private const float DescentLip = 0.3f;
 
-    private const float DescentSlope = 2.6f;
+    // Metres of way down per metre of drop: 3.4 is a mean of about 16 degrees, its eased middle about 24 (2.6 was 21 and 30, hard to
+    // walk down, the user found, 2026-11-19).
+    private const float DescentSlope = 3.4f;
 
     private const float DescentShortest = 25f;
 
@@ -53,6 +55,9 @@ public sealed partial class RaidLayoutField
 
     private const float Talus = 0.7f;
 
+    // Metres past a way down's foot over which its smooth floor gives way to the bed's rubble.
+    private const float DescentEase = 6f;
+
     // A ravine's rim is the ground along its line before the cut. Its floor lies at least its depth below that and only ever falls, gently,
     // from the higher end, so a river runs the whole way down it; where the land rises over it, the ravine is deeper.
     private void BuildRavines()
@@ -65,6 +70,7 @@ public sealed partial class RaidLayoutField
         ravineEdge = Filled(Far);
         ravineHalf = new float[resolution * resolution];
         ravineFloor = new float[resolution * resolution];
+        ravineDescent = new float[resolution * resolution];
         foreach (RaidLayoutRavine ravine in plan.Ravines)
         {
             int count = ravine.Line.Count;
@@ -112,22 +118,32 @@ public sealed partial class RaidLayoutField
                 floor[i] = Mathf.Max(RavineFloorLowest, floor[i]);
             }
 
-            if (ravine.Descent)
-            {
-                SlopeIn(ravine, rim, floor);
-            }
-
+            float descent = ravine.Descent ? SlopeIn(ravine, rim, floor) : 0f;
             ravine.Rim = rim;
             ravine.Floor = floor;
+            // The way down's share of each point: whole along the slope, easing out past its foot.
+            var smooth = new float[count];
+            float along = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                if (i > 0)
+                {
+                    along += Vector2.Distance(ravine.Line[i - 1], ravine.Line[i]);
+                }
+
+                smooth[i] = descent > 0f ? 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((along - descent) / DescentEase)) : 0f;
+            }
+
             for (int i = 0; i + 1 < count; i++)
             {
-                StampRavine(ravine.Line[i], ravine.Line[i + 1], ravine.HalfWidths[i], ravine.HalfWidths[i + 1], floor[i], floor[i + 1]);
+                StampRavine(ravine.Line[i], ravine.Line[i + 1], ravine.HalfWidths[i], ravine.HalfWidths[i + 1], floor[i], floor[i + 1], smooth[i], smooth[i + 1]);
             }
         }
     }
 
-    // The open end's floor rises to just under the rim, steady enough to walk (about 21 degrees), and the cascades there are gone.
-    private static void SlopeIn(RaidLayoutRavine ravine, float[] rim, float[] floor)
+    // The open end's floor rises to just under the rim, steady enough to walk (about 16 degrees), and the cascades there are gone.
+    // Returns the metres along the ravine the slope runs.
+    private static float SlopeIn(RaidLayoutRavine ravine, float[] rim, float[] floor)
     {
         int count = floor.Length;
         float total = 0f;
@@ -162,9 +178,10 @@ public sealed partial class RaidLayoutField
         }
 
         ravine.Cascades.RemoveAll(at => at < foot);
+        return run;
     }
 
-    private void StampRavine(Vector2 from, Vector2 to, float halfFrom, float halfTo, float floorFrom, float floorTo)
+    private void StampRavine(Vector2 from, Vector2 to, float halfFrom, float halfTo, float floorFrom, float floorTo, float smoothFrom = 0f, float smoothTo = 0f)
     {
         float extent = Mathf.Max(halfFrom, halfTo) + RavineReachBeyond;
         int xMin = Mathf.Max(0, Mathf.FloorToInt((Mathf.Min(from.x, to.x) - extent) / cell));
@@ -187,6 +204,7 @@ public sealed partial class RaidLayoutField
                     ravineEdge[index] = edge;
                     ravineHalf[index] = half;
                     ravineFloor[index] = Mathf.Lerp(floorFrom, floorTo, t);
+                    ravineDescent[index] = Mathf.Lerp(smoothFrom, smoothTo, t);
                 }
             }
         }
@@ -225,7 +243,12 @@ public sealed partial class RaidLayoutField
         float floorHalf = Mathf.Max(0.5f, half - wall);
         float across = Mathf.Clamp01((edge + half) / floorHalf);
         float rubble = Mathf.Max(0f, Noise(x, y, RubbleScale, 457f) - 0.5f) * 2f * Rubble + across * across * across * Talus;
-        float floor = Sample(ravineFloor, u, v) - RavineBed * (1f - across * across) + rubble;
+        // On the way down the floor is smooth (the user, 2026-11-19: the rubble and the bed's dip made it hard to walk, and stuck),
+        // the talus only against the walls.
+        float descent = Sample(ravineDescent, u, v);
+        float smoothBed = across * across * across * Talus * Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(0.6f, 1f, across));
+        rubble = Mathf.Lerp(rubble, smoothBed, descent);
+        float floor = Sample(ravineFloor, u, v) - RavineBed * (1f - across * across) * (1f - descent) + rubble;
         float cut = Mathf.Min(ground, Mathf.Lerp(floor, ground, rise));
         float neck = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((Sample(trailDistance, u, v) - NeckShoulder) / NeckRamp));
         return Mathf.Lerp(ground, cut, neck);

@@ -36,6 +36,8 @@ public sealed partial class RaidLayoutField
     private float[] ravineEdge;
     private float[] ravineHalf;
     private float[] ravineFloor;
+    // How much of each cell lies on a ravine's way down (its sloped-in open end), 0 to 1: the floor there is smooth to walk.
+    private float[] ravineDescent;
     private float[] riverEdge;
     private float[] riverHalf;
     private float[] riverLevel;

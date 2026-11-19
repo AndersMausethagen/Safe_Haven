@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: StoneBlock
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
   id: stone_bricks
-  displayName: 
+  displayName: Fine Stone Block
   output: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
   outputResource: {fileID: 0}
   outputAmount: 2
@@ -24,4 +24,7 @@ MonoBehaviour:
   station: 1
   craftSeconds: 5
   knownFromStart: 1
+  minimumStationTier: 2
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 1

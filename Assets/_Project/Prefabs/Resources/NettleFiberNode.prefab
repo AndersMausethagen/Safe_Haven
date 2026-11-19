@@ -78,9 +78,12 @@ MonoBehaviour:
     entries:
     - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
       resource: {fileID: 0}
-      minQuantity: 3
-      maxQuantity: 5
+      minQuantity: 4
+      maxQuantity: 7
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
   grantOnInteractionComplete: 1
 --- !u!114 &4426314959129535651
 MonoBehaviour:
@@ -108,7 +111,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SaveableEntity
-  id: 
+  id: 6cce0118311e44b9bf937f38d8a241d9
   prefabId: bf3e16d3faa3743469e7a3d035690749
   saveTransform: 1
   saveActiveState: 1

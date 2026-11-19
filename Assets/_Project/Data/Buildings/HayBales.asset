@@ -25,7 +25,7 @@ MonoBehaviour:
     amount: 6
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 1
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 2
   showInBuildMenu: 1
   knownFromStart: 1
@@ -40,6 +40,19 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 1
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5

@@ -15,13 +15,17 @@ MonoBehaviour:
   id: nettlefiber
   displayName: Nettle Fiber
   tier: 1
+  spawnWeight: 3
   yields:
     entries:
     - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
       resource: {fileID: 0}
-      minQuantity: 3
-      maxQuantity: 5
+      minQuantity: 4
+      maxQuantity: 7
       probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0
   gatherTool: 3
   requiredToolTier: 1
   gatherAnimation: 2

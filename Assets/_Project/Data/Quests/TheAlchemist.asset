@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: thealchemist
   displayName: The Alchemist
-  description: 'Ingrid brought two things home: a healer''s hands and the old ways of cleansing cursed things. Give her the Alchemist''s work and build the Purification Altar she showed you ({key:Build}): 6 Stone Blocks and 4 Life Orbs. The Workshop squares Grey Stone into blocks (4 make 2), and the rootbound stones in the meadows still hold orbs. Her Cauldron brews healing draughts.'
+  description: 'Ingrid brought two things home: a healer''s hands and the old ways of cleansing cursed things. Give her the Alchemist''s work and build the Purification Altar she showed you ({key:Build}): 6 Rough Stone Blocks and 4 Life Orbs. The Workshop knocks Grey Stone into rough blocks (3 make 2), and the rootbound stones in the meadows still hold orbs. Her Cauldron brews healing draughts.'
   chain: Hands at Home
   journalNotes: Ingrid knows the old ways of cleansing cursed things and is cagey about where she learned them. Give her a job from the H window. Cursed Essence is useless raw; the altar is where it starts to pay.
   rank: 4

@@ -21,7 +21,7 @@ MonoBehaviour:
   prefab: {fileID: 1399229161357316344, guid: 4c4f3fbd1b6867c4aa264df73f121497, type: 3}
   constructionCost: []
   constructionItems:
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 6
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 4
@@ -30,9 +30,25 @@ MonoBehaviour:
   sortOrder: 15
   requires: []
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 12
   outputCapacity: 10
   queueLength: 5

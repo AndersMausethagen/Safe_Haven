@@ -18,17 +18,18 @@ public sealed class RaidLayoutGoldenTests
 
     // seed → fingerprint of a map of the normal size. Re-pinned 2026-11-19 when the Woods took the world-design steps (districts,
     // node landmarks, roads, short flags: Docs/WorldDesignReview_2026-11-17.md G1, G4, G5), as the Valley and the Marsh had since 11-17.
+    // Seed 3 and the large map again the same day: their ravine's way down was smoothed (no rubble or bed dip on the slope) and made longer.
     private static readonly Dictionary<int, string> Normal = new Dictionary<int, string>
     {
         { 1, "baee74446977477c" },
         { 2, "93faae140242d0a2" },
-        { 3, "86094a9a308abd8d" },
+        { 3, "794c7a57676256ef" },
         { 4, "55c863f294f4227b" },
         { 5, "10d1ea1442a14e02" },
     };
 
     private const int LargeSeed = 3;
-    private const string Large = "d9b1246ed16013be";
+    private const string Large = "2fb833b7a4f75133";
 
     /// <summary>
     /// The Woods' fingerprints before the world-design steps (pinned until 2026-11-19): its rules with every one of those settings put
@@ -38,7 +39,7 @@ public sealed class RaidLayoutGoldenTests
     {
         { 1, "ad3ec333877f84fe" },
         { 2, "1fd5904b03377ef1" },
-        { 3, "82a41d31334b1d37" },
+        { 3, "479a80ac8574a2ce" }, // re-pinned 2026-11-19 with the smoothed, longer ravine way down
     };
 
     [Test]

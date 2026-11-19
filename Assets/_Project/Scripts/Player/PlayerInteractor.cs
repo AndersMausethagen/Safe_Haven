@@ -252,8 +252,85 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
             }
         }
 
+        // Between several in reach, the one under the mouse (the user, 2026-11-19); a pad keeps the nearest.
+        if (nearestInReach && !GameInput.UsingGamepad)
+        {
+            Interactable pointed = Pointed(origin, candidates, held);
+            if (pointed != null)
+            {
+                nearest = pointed;
+            }
+        }
+
         // What is in the hands is always nearest, so it only answers when nothing else in reach does: a cart can be
         // wheeled up to a chest or the portal and used without dropping it.
         return held != null && !nearestInReach ? held : nearest;
     }
+
+    // Pixels (at 1080 high) from the cursor a thing's middle may be on screen to count as pointed at, without a collider under it.
+    private const float PointedPixels = 56f;
+    private const float PointedRayLength = 120f;
+    private static readonly RaycastHit[] pointedHits = new RaycastHit[16];
+
+    /// <summary>
+    /// The candidate in reach that the cursor is over: one whose collider the cursor's ray meets first, else the one whose
+    /// middle is nearest the cursor on screen within <see cref="PointedPixels"/>. Null when the cursor is over none of them.
+    /// </summary>
+    private Interactable Pointed(Vector3 origin, List<Interactable> candidates, Interactable held)
+    {
+        Camera view = Camera.main;
+        if (view == null)
+        {
+            return null;
+        }
+
+        Vector2 cursor = GameInput.PointerPosition;
+        Ray ray = view.ScreenPointToRay(cursor);
+        int count = Physics.RaycastNonAlloc(ray, pointedHits, PointedRayLength, ~0, QueryTriggerInteraction.Collide);
+        Interactable hitFirst = null;
+        float hitDistance = float.MaxValue;
+        for (int i = 0; i < count; i++)
+        {
+            Interactable owner = pointedHits[i].collider != null ? pointedHits[i].collider.GetComponentInParent<Interactable>() : null;
+            if (owner != null && pointedHits[i].distance < hitDistance && InReach(owner, origin, candidates, held))
+            {
+                hitFirst = owner;
+                hitDistance = pointedHits[i].distance;
+            }
+        }
+
+        if (hitFirst != null)
+        {
+            return hitFirst;
+        }
+
+        float limit = PointedPixels * Screen.height / 1080f;
+        Interactable closest = null;
+        float closestPixels = limit * limit;
+        foreach (Interactable candidate in candidates)
+        {
+            if (!InReach(candidate, origin, candidates, held))
+            {
+                continue;
+            }
+
+            Vector3 screen = view.WorldToScreenPoint(candidate.transform.position + Vector3.up * 0.5f);
+            if (screen.z <= 0f)
+            {
+                continue;
+            }
+
+            float pixels = ((Vector2)screen - cursor).sqrMagnitude;
+            if (pixels < closestPixels)
+            {
+                closestPixels = pixels;
+                closest = candidate;
+            }
+        }
+
+        return closest;
+    }
+
+    private static bool InReach(Interactable candidate, Vector3 origin, List<Interactable> candidates, Interactable held) =>
+        candidate != null && candidate != held && candidate.IsAvailable && candidates.Contains(candidate) && candidate.DistanceFrom(origin) <= candidate.Range;
 }

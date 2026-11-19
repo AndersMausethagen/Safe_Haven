@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.smith
   displayName: A Smith's Hearth
-  description: 'Bjarne mends what the woods break, at half the cost, and smelts the copper you bring him. Give him the Smith''s work, and raise the Smithy he showed you ({key:Build}). It wants Stone Blocks and planks: rough planks from the Workshop will do until Tor is home, and charcoal smoulders out of oak by the fire. At Tier II it makes copper tools.'
+  description: Bjarne mends what the woods break, at half the cost, and smelts the copper you bring him. Give him the Smith's work, and raise the Smithy he showed you ({key:Build}). It wants rough stone blocks and rough planks, both from the Workshop, and charcoal smoulders out of oak by the fire. At Tier II it makes copper tools.
   chain: Hands at Home
   journalNotes: With Bjarne at the Smithy, repairs cost half as much and copper ore becomes ingots while you are away. At Tier II the Smithy makes copper tools.
   rank: 4

@@ -23,7 +23,7 @@ MonoBehaviour:
   - resource: {fileID: 11400000, guid: 6d764d1847a8e4b4dade94e4406968b5, type: 2}
     amount: 8
   constructionItems:
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 8
   showInBuildMenu: 1
   knownFromStart: 0

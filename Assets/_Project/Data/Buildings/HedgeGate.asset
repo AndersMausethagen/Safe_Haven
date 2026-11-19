@@ -25,7 +25,7 @@ MonoBehaviour:
     amount: 6
   - item: {fileID: 11400000, guid: 9fd41ebfb0b7848419e49298716c7565, type: 2}
     amount: 2
-  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 2
   showInBuildMenu: 1
   knownFromStart: 1

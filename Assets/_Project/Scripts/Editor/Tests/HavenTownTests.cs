@@ -337,7 +337,7 @@ public sealed class HavenTownTests
         Assert.Greater(stone.PathSpeed, dirt.PathSpeed);
         Assert.IsTrue(stone.Paved && !dirt.Paved);
         Assert.IsEmpty(dirt.ConstructionItems.Where(cost => cost.Amount > 0), "a dirt path costs nothing");
-        Assert.IsTrue(stone.ConstructionItems.Any(cost => cost.Item != null && cost.Item.name == "StoneBlock"), "stone bricks: the Stone Block");
+        Assert.IsTrue(stone.ConstructionItems.Any(cost => cost.Item != null && cost.Item.name == "RoughStoneBlock"), "stone bricks: the Rough Stone Block");
         Assert.IsNotNull(dirt.PathDecal);
         Assert.IsNotNull(stone.PathDecal);
         Assert.AreEqual(BuildCategory.Walls, BuildCategories.Of(dirt), "drawn like fences, on the same tab");

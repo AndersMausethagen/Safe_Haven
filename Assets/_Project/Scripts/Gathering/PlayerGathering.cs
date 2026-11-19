@@ -86,7 +86,7 @@ public sealed class PlayerGathering : MonoBehaviour
     private void Start()
     {
         // With hold to raise the cue is the glint on the tool; the bar shows only if the settings ask for it.
-        barView = TimingBarView.Attach(() => GatheringMinigameSettings.Current.ShowTimingBar ? Session : null);
+        barView = TimingBarView.Attach(() => GatheringMinigameSettings.Current.ShowTimingBar || (profile != null && profile.ShowBar) ? Session : null);
     }
 
     private void OnDestroy()

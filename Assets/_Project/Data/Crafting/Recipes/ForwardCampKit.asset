@@ -21,7 +21,7 @@ MonoBehaviour:
   itemCost:
   - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
     amount: 4
-  - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+  - item: {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
     amount: 2
   - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
     amount: 1
@@ -29,4 +29,6 @@ MonoBehaviour:
   craftSeconds: 24
   knownFromStart: 1
   minimumStationTier: 4
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 140
