@@ -43,4 +43,36 @@ public sealed class SpeechBubbleTests
         bubble.Hide();
         Assert.IsFalse(bubble.IsShown || bubble.gameObject.activeSelf);
     }
+
+    // The speaker's painted portrait beside the line (the user, 2026-11-19), and none for someone without one.
+    [Test]
+    public void APortrait_SitsBesideTheLine_AndTheBubbleMakesRoomForIt()
+    {
+        SpeechBubble bubble = SpeechBubble.Create(canvas.transform);
+        var box = (RectTransform)bubble.transform.GetChild(0);
+        var texture = new Texture2D(8, 8);
+        Sprite face = Sprite.Create(texture, new Rect(0f, 0f, 8f, 8f), Vector2.one * 0.5f);
+        try
+        {
+            bubble.Show("Sigrid", "Short.", speaker.transform);
+            Vector2 plain = box.sizeDelta;
+            Assert.IsFalse(bubble.HasPortrait, "no picture, no frame");
+
+            bubble.Show("Sigrid", "Short.", speaker.transform, face);
+            Assert.IsTrue(bubble.HasPortrait);
+            Assert.Greater(box.sizeDelta.x, plain.x + 60f, "wider by the portrait");
+            Assert.GreaterOrEqual(box.sizeDelta.y, 84f, "tall enough for it");
+            Image painting = box.Find("Portrait/Painting").GetComponent<Image>();
+            Assert.AreSame(face, painting.sprite);
+            Assert.Greater(bubble.Line.rectTransform.anchoredPosition.x, 84f, "the line starts right of the portrait");
+
+            bubble.Show("Eirik", "Short.", speaker.transform);
+            Assert.IsFalse(bubble.HasPortrait, "the next speaker without one shows none");
+        }
+        finally
+        {
+            Object.DestroyImmediate(face);
+            Object.DestroyImmediate(texture);
+        }
+    }
 }

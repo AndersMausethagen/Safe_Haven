@@ -23,6 +23,9 @@ public sealed class SpeechBubble : MonoBehaviour
     private const float ScreenMargin = 16f;
     private const float AboveHead = 0.45f;
     private const float TailSize = 14f;
+    // The speaker's painted portrait beside the line (the user, 2026-11-19: "a picture of the one talking ... with the 2D artwork").
+    private const float PortraitSize = 84f;
+    private const float PortraitGap = 12f;
 
     private RectTransform area;
     private RectTransform bubble;
@@ -31,6 +34,8 @@ public sealed class SpeechBubble : MonoBehaviour
     private TMP_Text nameLabel;
     private TMP_Text lineLabel;
     private TMP_Text hintLabel;
+    private RectTransform portraitFrame;
+    private Image portraitImage;
     private Transform speaker;
     private Transform head;
     private float headHeight;
@@ -54,9 +59,12 @@ public sealed class SpeechBubble : MonoBehaviour
         return bubble;
     }
 
+    /// <summary>Whether the last line shown has a portrait beside it.</summary>
+    public bool HasPortrait => portraitFrame != null && portraitFrame.gameObject.activeSelf;
+
     /// <summary>Shows <paramref name="line"/> by <paramref name="speakerName"/> over <paramref name="over"/>, sized to the
-    /// text (wrapped at a comfortable width).</summary>
-    public void Show(string speakerName, string line, Transform over)
+    /// text (wrapped at a comfortable width), with <paramref name="portrait"/> framed on its left when given.</summary>
+    public void Show(string speakerName, string line, Transform over, Sprite portrait = null)
     {
         speaker = over;
         FindHead(over);
@@ -72,12 +80,18 @@ public sealed class SpeechBubble : MonoBehaviour
         float width = Mathf.Clamp(Mathf.Max(natural, nameWidth), MinWidth - PaddingX * 2f, MaxLineWidth);
         float lineHeight = lineLabel.GetPreferredValues(lineLabel.text, width, 0f).y;
         float top = nameLabel.gameObject.activeSelf ? NameHeight : 0f;
-        float height = PaddingTop + top + lineHeight + HintHeight + PaddingBottom;
-        bubble.sizeDelta = new Vector2(width + PaddingX * 2f, height);
+        bool pictured = portrait != null;
+        float left = PaddingX + (pictured ? PortraitSize + PortraitGap : 0f);
+        float height = Mathf.Max(PaddingTop + top + lineHeight + HintHeight + PaddingBottom,
+            pictured ? PaddingTop + PortraitSize + PaddingBottom : 0f);
+        bubble.sizeDelta = new Vector2(width + left + PaddingX, height);
         nameLabel.rectTransform.sizeDelta = new Vector2(width, NameHeight);
-        nameLabel.rectTransform.anchoredPosition = new Vector2(PaddingX, -PaddingTop);
+        nameLabel.rectTransform.anchoredPosition = new Vector2(left, -PaddingTop);
         lineLabel.rectTransform.sizeDelta = new Vector2(width, lineHeight);
-        lineLabel.rectTransform.anchoredPosition = new Vector2(PaddingX, -PaddingTop - top);
+        lineLabel.rectTransform.anchoredPosition = new Vector2(left, -PaddingTop - top);
+        portraitFrame.gameObject.SetActive(pictured);
+        portraitImage.sprite = portrait;
+        portraitFrame.anchoredPosition = new Vector2(PaddingX, -PaddingTop);
         group.alpha = 1f;
         Place();
     }
@@ -208,6 +222,16 @@ public sealed class SpeechBubble : MonoBehaviour
         var tailRim = tail.gameObject.AddComponent<Outline>();
         tailRim.effectColor = HearthKit.Faded(style.Accent, 0.8f);
         tailRim.effectDistance = new Vector2(1.5f, -1.5f);
+
+        // The portrait: the painting in a rimmed frame at the top left, on a dark inset so a narrow picture doesn't show the panel.
+        portraitFrame = Rect("Portrait", bubble, new Vector2(0f, 1f), new Vector2(PortraitSize, PortraitSize));
+        portraitFrame.pivot = new Vector2(0f, 1f);
+        portraitFrame.gameObject.AddComponent<Image>().color = style.Inset;
+        RectTransform painting = Rect("Painting", portraitFrame, new Vector2(0.5f, 0.5f), new Vector2(PortraitSize - 4f, PortraitSize - 4f));
+        portraitImage = painting.gameObject.AddComponent<Image>();
+        portraitImage.preserveAspect = true;
+        HearthKit.Rim(portraitFrame, 0.9f, 1.2f);
+        portraitFrame.gameObject.SetActive(false);
 
         nameLabel = Text("Name", bubble, 18f, style.Accent, TextAlignmentOptions.TopLeft);
         style.Title(nameLabel);

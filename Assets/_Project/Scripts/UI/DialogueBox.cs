@@ -351,9 +351,11 @@ public sealed class DialogueBox : MonoBehaviour
         lineLabel.text = GameInput.WithRebinds(line ?? "");
         shownOver = Over(speaker);
         bool bubbled = shownOver != null;
+        // A resident speaks with their painted portrait; anyone else without a picture of their own is filmed live (in the box).
+        Sprite still = speaker.Portrait != null ? speaker.Portrait : PaintedPortraitOf(speaker.Model);
         if (bubbled)
         {
-            bubble.Show(speaker.Name, line, shownOver);
+            bubble.Show(speaker.Name, line, shownOver, still);
             activeLine = bubble.Line;
             activeHint = bubble.Hint;
         }
@@ -375,8 +377,6 @@ public sealed class DialogueBox : MonoBehaviour
             window.Open();
         }
 
-        // A resident speaks with their painted portrait; anyone else without a picture of their own is filmed live.
-        Sprite still = speaker.Portrait != null ? speaker.Portrait : PaintedPortraitOf(speaker.Model);
         bool live = still == null && speaker.Model != null && !bubbled;
         portrait.gameObject.SetActive(live);
         picture.gameObject.SetActive(!live && !bubbled && still != null);
