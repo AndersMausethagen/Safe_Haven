@@ -117,6 +117,12 @@ public sealed class WorldLookGeneratorTests
 
             bool[] before = RaidMapSurface.Prisms(map);
             Assert.IsTrue(before.All(prism => prism), "without piles every capsule cuts the navmesh, as before");
+            RaidMapSurface.Group[] groupsBefore = RaidMapSurface.PrototypeGroups(map);
+            Assume.That(groupsBefore, Has.None.EqualTo(RaidMapSurface.Group.PileStone).And.None.EqualTo(RaidMapSurface.Group.ShoreStone),
+                "the Woods have no pile or shore stones of their own");
+            // Pile and shore stones come after the trees, undergrowth and rocks; heroes, mids and edge dressing follow them.
+            int at = groupsBefore.Count(group => group == RaidMapSurface.Group.Tree || group == RaidMapSurface.Group.Undergrowth
+                                                 || group == RaidMapSurface.Group.Rock);
 
             // An empty row between them: the prototypes skip it, so the second stone must still be judged by its own prefab.
             var so = new SerializedObject(map);
@@ -128,12 +134,13 @@ public sealed class WorldLookGeneratorTests
             RaidMapSurface.Group[] groups = RaidMapSurface.PrototypeGroups(map);
             bool[] prisms = RaidMapSurface.Prisms(map);
             Assert.AreEqual(before.Length + 3, prisms.Length);
-            Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[before.Length]);
-            Assert.IsTrue(prisms[before.Length], "a solid pile stone is cut out of the navmesh, so creatures don't walk into it");
-            Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[before.Length + 1]);
-            Assert.IsFalse(prisms[before.Length + 1], "one everybody walks through leaves the navmesh as it was");
-            Assert.AreEqual(RaidMapSurface.Group.ShoreStone, groups[before.Length + 2]);
-            Assert.IsTrue(prisms[before.Length + 2], "a stone by the water keeps its capsule, so creatures path round it");
+            Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[at]);
+            Assert.IsTrue(prisms[at], "a solid pile stone is cut out of the navmesh, so creatures don't walk into it");
+            Assert.AreEqual(RaidMapSurface.Group.PileStone, groups[at + 1]);
+            Assert.IsFalse(prisms[at + 1], "one everybody walks through leaves the navmesh as it was");
+            Assert.AreEqual(RaidMapSurface.Group.ShoreStone, groups[at + 2]);
+            Assert.IsTrue(prisms[at + 2], "a stone by the water keeps its capsule, so creatures path round it");
+            Assert.IsTrue(prisms.Skip(at + 3).All(prism => prism), "what follows the stones (heroes, mids, edge dressing) keeps its capsules");
         }
         finally
         {
