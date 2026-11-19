@@ -243,5 +243,6 @@ public static class GameSession
         CorruptionNights.ForgetGame();
         QuestTimers.ForgetGame();
         ResidentBuilders.ForgetGame();
+        Homecoming.ForgetGame();
     }
 }

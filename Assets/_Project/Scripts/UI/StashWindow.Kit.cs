@@ -88,6 +88,8 @@ public sealed partial class StashWindow
         GridButton(bagGrid, bag, "Sort", "Stats", 104f, 0f, () => Sort(bag.Container));
         GridButton(bagGrid, bag, "Store all", "Lock", 132f, 112f, StoreAll);
         GridButton(stashGrid, stash, "Sort", "Stats", 104f, 0f, () => Sort(stash.Container, stash.First, stash.Count));
+        // Last raid's draughts, food and arrows again, from the stash into the bag (PackForRaid).
+        GridButton(stashGrid, stash, "Pack as last time", "Bags", 196f, 112f, () => PackForRaid.Pack(player));
 
         foreach (TMP_Text label in GetComponentsInChildren<TMP_Text>(true))
         {

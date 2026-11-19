@@ -85,6 +85,11 @@ public sealed partial class RaidPreparationWindow
         List<RaidEventDefinition> foretold = closed ? new List<RaidEventDefinition>() : RaidForecast.For(raid, plan.Seed, HavenReadiness.ForetoldEvents);
         List<RaidRumourDefinition> rumours = closed ? new List<RaidRumourDefinition>() : RaidRumours.For(raid, plan.Seed, GameSession.Here, plan.Player != null ? plan.Player.GetComponent<PlayerCrafting>() : null, plan.Large ? raid.LargeRaid.widthScale : 1f);
         List<string> asked = closed ? new List<string>() : HavenRequestBoard.BriefingLines(plan.Player);
+        string wanted = closed || plan.Player == null ? null : WantedAtHome.BriefingLine(plan.Player.GetComponent<Player>(), raid);
+        if (wanted != null)
+        {
+            asked.Add(wanted);
+        }
         // One of the Lost already met, walking this run (the same seed decides it in the raid): told first, as the worst news is.
         string restless = closed ? null : LostOneRules.BriefingLine(RaidLostOnes.ForRun(raid, plan.Seed, plan.Difficulty != null ? plan.Difficulty.tier : raid.Tier),
             raid.DisplayName, LostOneSettings.Current);

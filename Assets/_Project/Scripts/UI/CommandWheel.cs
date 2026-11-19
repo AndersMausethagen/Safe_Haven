@@ -154,6 +154,7 @@ public sealed class CommandWheel : MonoBehaviour
         if (StashQuickStack.CanStack(player != null ? player.gameObject : null))
         {
             choices.Add(new Choice("Stack onto chests", () => StashQuickStack.Stack(player.gameObject)));
+            choices.Add(new Choice("Pack as last time", () => PackForRaid.Pack(player.gameObject)));
         }
         if (mounted)
         {

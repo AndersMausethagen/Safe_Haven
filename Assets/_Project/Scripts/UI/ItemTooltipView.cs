@@ -716,6 +716,13 @@ public sealed class ItemTooltipView : MonoBehaviour
             {
                 builder.Append($"\n<color={UIStyle.Current.AccentHex}>{uses}</color>");
             }
+
+            // What the next step at home still needs (WantedAtHome: the portal's next tier and the levels tracked).
+            string wanted = WantedAtHome.LineFor(item, Player.Current);
+            if (wanted != null)
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>{wanted}</color>");
+            }
         }
 
         if (item.BreaksInto.Count > 0)

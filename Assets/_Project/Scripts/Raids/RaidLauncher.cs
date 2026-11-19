@@ -331,6 +331,8 @@ public static class RaidLauncher
             crafts.Stop();
         }
 
+        // What the player sets out with, for Pack as Last Time at home (PackForRaid), kept in the save written now.
+        PackForRaid.Remember(player);
         SaveGameService.SaveBeforeRaid(raid);
         player.TryGetComponent(out PlayerTransport transport);
         if (raid.IsEncounter)

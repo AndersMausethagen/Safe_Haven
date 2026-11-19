@@ -16,6 +16,10 @@ public sealed class CharacterProgress
     private readonly Dictionary<string, int> skillRanks = new Dictionary<string, int>();
     private readonly HashSet<string> crafted = new HashSet<string>();
     private readonly HashSet<string> stones = new HashSet<string>();
+    // What the player is gathering for (WantedAtHome): "building:<id>:<tier>", at most WantedAtHome.MostTracked, oldest first.
+    private readonly List<string> tracked = new List<string>();
+    // What the last raid set out with (PackForRaid): item id to how many.
+    private readonly Dictionary<string, int> setOut = new Dictionary<string, int>();
     // Creatures met, by id, with how many the player's side has slain: the journal's record.
     private readonly Dictionary<string, int> creatures = new Dictionary<string, int>();
 
@@ -467,6 +471,62 @@ public sealed class CharacterProgress
     public bool MarkStoneUsed(string stoneId) => !string.IsNullOrEmpty(stoneId) && stones.Add(stoneId);
 
     public bool HasUsedStone(string stoneId) => stones.Contains(stoneId);
+
+    /// <summary>The targets tracked (WantedAtHome keys), oldest first.</summary>
+    public IReadOnlyList<string> Tracked => tracked;
+
+    public bool IsTracked(string key) => key != null && tracked.Contains(key);
+
+    /// <summary>Tracks a target, or stops tracking it; tracking more than <paramref name="most"/> lets the oldest go. True when tracked now.</summary>
+    public bool ToggleTracked(string key, int most)
+    {
+        if (string.IsNullOrEmpty(key))
+        {
+            return false;
+        }
+
+        if (tracked.Remove(key))
+        {
+            return false;
+        }
+
+        tracked.Add(key);
+        while (tracked.Count > Math.Max(1, most))
+        {
+            tracked.RemoveAt(0);
+        }
+
+        return true;
+    }
+
+    /// <summary>What the last raid set out with (PackForRaid), item id to how many.</summary>
+    public IReadOnlyDictionary<string, int> SetOut => setOut;
+
+    public void SetOutKit(IEnumerable<KeyValuePair<string, int>> kit)
+    {
+        setOut.Clear();
+        if (kit == null)
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, int> entry in kit)
+        {
+            if (!string.IsNullOrEmpty(entry.Key) && entry.Value > 0)
+            {
+                setOut[entry.Key] = entry.Value;
+            }
+        }
+    }
+
+    public void RestoreTracked(IEnumerable<string> saved)
+    {
+        tracked.Clear();
+        if (saved != null)
+        {
+            tracked.AddRange(saved);
+        }
+    }
 
     /// <summary>Puts back saved progress (loading).</summary>
     public void Restore(IEnumerable<KeyValuePair<string, int>> savedExperience, IEnumerable<string> savedPerks, int savedInsight,

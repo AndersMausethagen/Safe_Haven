@@ -132,6 +132,10 @@ public static class HavenBuildings
             bool affordable = pool == null || pool.CanAfford(resources, items);
             bool open = BuildingUnlocks.IsOpen(building.UpgradeTo(next.Level + 1));
             entry.Actions.Add(new HavenAction(!open ? "Not open yet" : affordable ? "Upgrade" : "Not enough materials", () => chosen.TryOrderUpgrade(player), open && affordable, closesWindow: false));
+            // What it still needs, marked as wanted wherever it is found (WantedAtHome).
+            int tier = next.Level + 1;
+            bool tracked = GameSession.Progress.IsTracked(WantedAtHome.BuildingKey(building, tier));
+            entry.Actions.Add(new HavenAction(tracked ? "Stop tracking" : "Track", () => WantedAtHome.Toggle(building, tier), true, closesWindow: false, primary: false));
         }
         else if (builder != null && crafting != null && crafting.IsKnown(building))
         {

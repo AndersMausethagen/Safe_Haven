@@ -44,7 +44,11 @@ public sealed class HavenProgress : MonoBehaviour
         HavenHud.Create();
         HavenWindow.Create();
         KeepTrackOfBuildings();
-        TellWhatWorkersMade();
+        // Home from a raid: one card of what the Haven has for the player (Homecoming); else the workers' line as before.
+        if (!Homecoming.Tell())
+        {
+            TellWhatWorkersMade();
+        }
         clearedQuarter = Mathf.FloorToInt(Overgrowth.ClearedShare * 4f + 0.001f);
         Count(false);
     }

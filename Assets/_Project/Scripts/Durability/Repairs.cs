@@ -112,12 +112,19 @@ public static class Repairs
     }
 
     /// <summary>Repairs the stack in a slot to full, paying the cost. Returns false, with a message, when it can't.</summary>
-    public static bool TryRepair(GameObject player, ItemContainer container, int slot, IReadOnlyList<RecipeDefinition> recipes)
+    public static bool TryRepair(GameObject player, ItemContainer container, int slot, IReadOnlyList<RecipeDefinition> recipes) =>
+        TryRepair(player, container, slot, recipes, quiet: false);
+
+    private static bool TryRepair(GameObject player, ItemContainer container, int slot, IReadOnlyList<RecipeDefinition> recipes, bool quiet)
     {
         string problem = Check(player, container, slot, recipes);
         if (problem != null)
         {
-            GameMessages.Post(problem, MessageKind.Warning);
+            if (!quiet)
+            {
+                GameMessages.Post(problem, MessageKind.Warning);
+            }
+
             return false;
         }
 
@@ -129,8 +136,63 @@ public static class Repairs
         }
 
         container.SetDurability(slot, 1f);
-        GameMessages.Post($"{stack.Item.DisplayName} repaired.", MessageKind.Gain);
+        if (!quiet)
+        {
+            GameMessages.Post($"{stack.Item.DisplayName} repaired.", MessageKind.Gain);
+        }
+
         GameEvents.Raise(new GameEvent(GameEventKind.Repaired, stack.Item, 1, player));
         return true;
+    }
+
+    /// <summary>The worn things a player has, in the order they are mended: what is worn on the body first, then the bag, then the safe
+    /// pocket.</summary>
+    public static List<(ItemContainer container, int slot)> Worn(GameObject player)
+    {
+        var worn = new List<(ItemContainer, int)>();
+        if (player == null)
+        {
+            return worn;
+        }
+
+        PlayerEquipment equipment = player.GetComponent<PlayerEquipment>();
+        ItemInventory inventory = player.GetComponent<ItemInventory>();
+        foreach (ItemContainer container in new[] { equipment != null ? equipment.Gear.Slots : null, inventory != null ? inventory.Container : null,
+                     inventory != null ? inventory.SafePocket : null })
+        {
+            if (container == null)
+            {
+                continue;
+            }
+
+            for (int i = 0; i < container.SlotCount; i++)
+            {
+                if (container.GetSlot(i).IsDamaged)
+                {
+                    worn.Add((container, i));
+                }
+            }
+        }
+
+        return worn;
+    }
+
+    /// <summary>Mends everything worn, in the order worn, as far as the materials go (Docs/SystemsGapReview_2026-11-19.md §3: the
+    /// bench listed pieces one by one). Says how many were mended; returns that.</summary>
+    public static int MendAll(GameObject player, IReadOnlyList<RecipeDefinition> recipes)
+    {
+        List<(ItemContainer container, int slot)> worn = Worn(player);
+        int mended = 0;
+        foreach ((ItemContainer container, int slot) in worn)
+        {
+            if (TryRepair(player, container, slot, recipes, quiet: true))
+            {
+                mended++;
+            }
+        }
+
+        GameMessages.Post(mended == worn.Count ? $"Mended all {mended}." : $"Mended {mended} of {worn.Count}: the rest wants more materials.",
+            mended > 0 ? MessageKind.Gain : MessageKind.Warning);
+        return mended;
     }
 }

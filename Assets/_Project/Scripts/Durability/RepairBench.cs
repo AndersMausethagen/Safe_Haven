@@ -68,6 +68,14 @@ public sealed class RepairBench : MonoBehaviour, IStationMenuExtension
             return page;
         }
 
+        // Everything at once, first, when there is more than one thing worn.
+        int worn = Repairs.Worn(user).Count;
+        if (worn > 1)
+        {
+            page.Add(new MenuAction($"Mend everything worn ({worn})", "In the order worn, as far as the materials go", true,
+                () => Repairs.MendAll(user, crafting.Recipes)));
+        }
+
         AddDamaged(page, user, inventory.Container, crafting.Recipes);
         AddDamaged(page, user, inventory.SafePocket, crafting.Recipes);
         PlayerEquipment equipment = user.GetComponent<PlayerEquipment>();

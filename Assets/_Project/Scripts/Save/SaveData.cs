@@ -244,6 +244,10 @@ public sealed class ProgressSaveData
     public List<AmountSaveData> skillRanks = new List<AmountSaveData>();
     public List<string> crafted = new List<string>();
     public List<string> stones = new List<string>();
+    /// <summary>What the player is gathering for (WantedAtHome keys). Missing in older saves.</summary>
+    public List<string> tracked = new List<string>();
+    /// <summary>What the last raid set out with (PackForRaid): id and how many. Missing in older saves.</summary>
+    public List<AmountSaveData> setOut = new List<AmountSaveData>();
     /// <summary>Creatures met, by id, with how many were slain: the journal's record. Missing in older saves.</summary>
     public List<AmountSaveData> creatures = new List<AmountSaveData>();
     /// <summary>The rest of the journal's record. Missing in older saves.</summary>
