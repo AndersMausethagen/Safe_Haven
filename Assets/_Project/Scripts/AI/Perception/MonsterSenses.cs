@@ -180,6 +180,14 @@ public sealed class MonsterSenses
 
     /// <summary>A clear path for a shot: no wall, and no other creature in the way. Hearing keeps HasClearPathTo, so a
     /// crowd never muffles noise.</summary>
+    /// <summary>Whether a shot from <paramref name="from"/> (a spot on the ground it might move to) would reach <paramref name="position"/>.</summary>
+    public bool HasClearShotFrom(Vector3 from, Vector3 position)
+    {
+        PerceptionSettings rules = PerceptionSettings.Current;
+        Vector3 eye = from + (Eye(rules) - self.position), point = position + Vector3.up * rules.TargetHeight;
+        return HasLineOfSight(eye, point, self) && !CreatureInTheWay(eye, point);
+    }
+
     public bool HasClearShotTo(Vector3 position)
     {
         PerceptionSettings rules = PerceptionSettings.Current;

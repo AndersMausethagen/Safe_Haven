@@ -58,6 +58,10 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Min(0f)] private float searchSeconds = 6f;
     [Tooltip("Seconds it may walk toward a spot before it gives up and searches where it is.")]
     [SerializeField, Min(1f)] private float maxInvestigateSeconds = 15f;
+    [Tooltip("A search for a target it lost (not a noise): seconds in all, over its first guess and up to two more points ahead along " +
+             "where the target was going (Docs/EnemyAIReview_2026-11-19.md §5), looking Sweep Look Seconds at each but the last.")]
+    [SerializeField, Min(1f)] private float lostSearchSeconds = 20f;
+    [SerializeField, Min(0.5f)] private float sweepLookSeconds = 2f;
     [Tooltip("Movement speed while going to check something, as a share of its normal speed.")]
     [SerializeField, Range(0.2f, 1f)] private float investigateSpeedScale = 0.55f;
     [Tooltip("Degrees per second it turns while looking around.")]
@@ -196,6 +200,8 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float LoseTrackSeconds => loseTrackSeconds;
     public float SearchSeconds => searchSeconds;
     public float MaxInvestigateSeconds => maxInvestigateSeconds;
+    public float LostSearchSeconds => lostSearchSeconds;
+    public float SweepLookSeconds => sweepLookSeconds;
     public float InvestigateSpeedScale => investigateSpeedScale;
     public float LookAroundSpeed => lookAroundSpeed;
     public float LostTrackAwareness => Mathf.Max(lostTrackAwareness, suspiciousAt);

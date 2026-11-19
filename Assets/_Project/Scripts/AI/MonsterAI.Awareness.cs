@@ -73,6 +73,8 @@ public sealed partial class MonsterAI
         {
             lastSeenTargetAt = Time.time;
             lastKnownTargetPosition = targetComponent.transform.position;
+            // The way it was going, as last seen: a search goes on from there, never from where it really is now.
+            lastSeenTargetVelocity = attacks != null ? attacks.TargetVelocity : Vector3.zero;
             senses.Awareness.Alert(lastKnownTargetPosition);
             ScanForNearerTarget();
             return;
@@ -173,6 +175,59 @@ public sealed partial class MonsterAI
         return indicator;
     }
 
+    // The alarm (Docs/EnemyAIReview_2026-11-19.md §8): which of its calls it raises on spotting the player, if one is ready and its group
+    // hasn't called in the last 20 s. Its group then waits for the call instead of coming at once.
+    private int alarmAction = -1;
+    private static readonly System.Collections.Generic.Dictionary<Vector2Int, float> alarmsRaised = new System.Collections.Generic.Dictionary<Vector2Int, float>();
+    private const float AlarmGroupSeconds = 20f;
+
+    private Vector2Int AlarmGroup => pack != null
+        ? new Vector2Int(pack.GetHashCode(), 0)
+        : new Vector2Int(Mathf.FloorToInt(transform.position.x / 20f), Mathf.FloorToInt(transform.position.z / 20f) + 100000);
+
+    private void PlanAlarm()
+    {
+        alarmAction = -1;
+        if (IsRemote || definition == null || (pack != null && !pack.IsLeader(this) && PackHasCaller()))
+        {
+            return;
+        }
+
+        Vector2Int group = AlarmGroup;
+        if (alarmsRaised.TryGetValue(group, out float at) && Time.time - at < AlarmGroupSeconds)
+        {
+            return;
+        }
+
+        for (int i = 0; i < definition.Attacks.Count; i++)
+        {
+            MonsterAttack action = definition.Attacks[i];
+            if (action != null && action.onSpotted && action.kind == MonsterAttackKind.Howl && (!action.packLeaderOnly || IsHowler))
+            {
+                alarmAction = i;
+                alarmsRaised[group] = Time.time;
+                return;
+            }
+        }
+    }
+
+    // A pack whose leader can raise the alarm leaves it to the leader.
+    private bool PackHasCaller()
+    {
+        foreach (MonsterAttack action in definition.Attacks)
+        {
+            if (action != null && action.onSpotted && action.packLeaderOnly)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>True while it is about to raise the alarm, or raising it: its pack waits for the call.</summary>
+    private bool RaisesAlarm => alarmAction >= 0;
+
     // It has just spotted (or been set on) a target: the "!", a sound when it's the player, and a call that sends idle
     // monsters nearby to look.
     private void OnSpotted()
@@ -187,6 +242,7 @@ public sealed partial class MonsterAI
         {
             CreatureRecords.NoteMet(definition);
             NoteSpottedPlayer();
+            PlanAlarm();
         }
 
         if (global::Player.IsPlayer(targetComponent.gameObject) && Time.time >= nextSpottedSoundAt)

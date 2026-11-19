@@ -108,6 +108,43 @@ public static class AttackTurns
         return target + new Vector3(Mathf.Sin(heading), 0f, Mathf.Cos(heading)) * Mathf.Max(0.5f, metres);
     }
 
+    /// <summary>
+    /// Where a creature that lost its target looks (Docs/EnemyAIReview_2026-11-19.md §5): first ahead of where it last saw it, along the
+    /// way it was going (<paramref name="velocity"/> × 1.5 s, at most 8 m further); then <paramref name="more"/> points 5-9 m further on,
+    /// within 50° either side of that heading, turned by <paramref name="share"/> (its place among the pack searching the same ground:
+    /// 0, then one side, then the other), so a pack spreads instead of stacking. Not where the target is: where it was going.
+    /// </summary>
+    public static List<Vector3> SearchPoints(Vector3 lastKnown, Vector3 velocity, int more, int share, System.Random random)
+    {
+        var points = new List<Vector3>();
+        velocity.y = 0f;
+        Vector3 ahead = Vector3.ClampMagnitude(velocity * 1.5f, 8f);
+        Vector3 first = lastKnown + ahead;
+        points.Add(first);
+        if (velocity.sqrMagnitude < 0.25f)
+        {
+            return points;
+        }
+
+        float heading = Mathf.Atan2(velocity.x, velocity.z) * Mathf.Rad2Deg + (share == 0 ? 0f : (share % 2 == 1 ? 35f : -35f));
+        Vector3 from = first;
+        for (int i = 0; i < more; i++)
+        {
+            float turn = heading + ((float)random.NextDouble() * 100f - 50f);
+            float step = 5f + (float)random.NextDouble() * 4f;
+            from += new Vector3(Mathf.Sin(turn * Mathf.Deg2Rad), 0f, Mathf.Cos(turn * Mathf.Deg2Rad)) * step;
+            points.Add(from);
+        }
+
+        return points;
+    }
+
+    /// <summary>
+    /// How good a spot is for a shooter to move to between shots (§6): higher ground pays (a point a metre, at most 2), standing within
+    /// 3 m of another shooter costs 2. Spots with no clear shot, in water or past its leash are left out before scoring.
+    /// </summary>
+    public static float ScoreSpot(float heightGain, bool nearAnotherShooter) => Mathf.Clamp(heightGain, 0f, 2f) - (nearAnotherShooter ? 2f : 0f);
+
     /// <summary>Where to walk next while circling: a step around the target on <paramref name="side"/> (1 or -1), corrected toward the
     /// distance it waits at.</summary>
     public static Vector3 CircleSpot(Vector3 position, Vector3 toTarget, float side, float distance)

@@ -164,6 +164,21 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// </summary>
     public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range) => AnyHuntingPlayerSideWithin(point, range, null);
 
+    /// <summary>How many creatures are chasing or striking the player's side now (the raid's pacing, RaidIntensity).</summary>
+    public static int CountHuntingPlayerSide()
+    {
+        int count = 0;
+        foreach (MonsterAI monster in active)
+        {
+            if (monster != null && monster.CurrentState != State.Dead && monster.IsHuntingPlayerSide)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     /// <summary>As above, leaving one creature out (the one just felled, still counted until its death is heard).</summary>
     public static bool AnyHuntingPlayerSideWithin(Vector3 point, float range, MonsterAI except)
     {
@@ -845,5 +860,10 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     {
         nextSpottedSoundAt = 0f;
         nextTurnAt = 0f;
+        searched.Clear();
+        flankers.Clear();
+        standing.Clear();
+        grudges.Clear();
+        alarmsRaised.Clear();
     }
 }

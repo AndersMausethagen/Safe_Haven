@@ -291,6 +291,7 @@ public sealed partial class PlayerCombat
 
         AttackDefinition looks = toFinish != null && Rules.FinishStab != null ? Rules.FinishStab : attack;
         current = new SwingInfo(kind, looks, step, chain, rhythm, activeSpeed, technique, activeDirection);
+        landedThisSwing = -1;
         SwingStarted?.Invoke(current);
         if (kind == SwingKind.ShieldBash)
         {
@@ -393,6 +394,7 @@ public sealed partial class PlayerCombat
         {
             hitPending = false;
             int hits = LandSwing();
+            landedThisSwing = hits;
             SwingLanded?.Invoke(current, hits);
         }
 

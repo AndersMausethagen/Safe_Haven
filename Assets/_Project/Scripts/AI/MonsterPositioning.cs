@@ -60,6 +60,55 @@ public sealed class MonsterPositioning
         return shotIsClear;
     }
 
+    /// <summary>
+    /// A better spot to shoot from (Docs/EnemyAIReview_2026-11-19.md §6): six on the ring of <paramref name="distance"/> round the target,
+    /// within 60° of where it stands now; those in water or past its leash left out; scored by height gained and by keeping clear of other
+    /// shooters (AttackTurns.ScoreSpot); the best three tried for a clear shot, the first with one taken. False when none would do.
+    /// </summary>
+    public bool FindShotSpot(Vector3 target, float distance, Vector3 home, float leash, MonsterAI owner, out Vector3 spot)
+    {
+        spot = self.position;
+        Vector3 from = self.position - target;
+        from.y = 0f;
+        float bearing = from.sqrMagnitude > 0.01f ? Mathf.Atan2(from.x, from.z) * Mathf.Rad2Deg : 0f;
+        var candidates = new List<(Vector3 point, float score)>(6);
+        for (int i = 0; i < 6; i++)
+        {
+            float turn = (bearing + Mathf.Lerp(-60f, 60f, i / 5f)) * Mathf.Deg2Rad;
+            Vector3 point = target + new Vector3(Mathf.Sin(turn), 0f, Mathf.Cos(turn)) * Mathf.Max(2f, distance);
+            if (!movement.TryFindGround(point, 2f, out Vector3 ground) || !RaidSpots.IsDryEnough(ground)
+                || (leash > 0f && Vector3.Distance(home, ground) > leash) || (ground - self.position).sqrMagnitude < 2f)
+            {
+                continue;
+            }
+
+            bool crowded = false;
+            foreach (MonsterAI other in MonsterAI.Active)
+            {
+                if (other != owner && other.Definition != null && other.Definition.MovementTactic == MonsterMovementTactic.KeepDistance
+                    && (other.transform.position - ground).sqrMagnitude < 9f)
+                {
+                    crowded = true;
+                    break;
+                }
+            }
+
+            candidates.Add((ground, AttackTurns.ScoreSpot(ground.y - self.position.y, crowded)));
+        }
+
+        candidates.Sort((a, b) => b.score.CompareTo(a.score));
+        for (int i = 0; i < candidates.Count && i < 3; i++)
+        {
+            if (senses.HasClearShotFrom(candidates[i].point, target))
+            {
+                spot = candidates[i].point;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>Round to where there is a line, and a little closer, instead of shooting the trees.</summary>
     public void WalkToALine(Vector3 target, Vector3 toTarget, float distance)
     {

@@ -88,7 +88,9 @@ MonoBehaviour:
     speedBonus: 0
     hasteBonus: 0
     toughness: 0
-    alertsOthers: 0
+    alertsOthers: 1
+    onSpotted: 1
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -148,6 +150,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -207,6 +211,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -238,6 +244,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 1
+  flanksFromTier: 1
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0
   guardAfterBlows: 0

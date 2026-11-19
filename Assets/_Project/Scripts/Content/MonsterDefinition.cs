@@ -115,6 +115,12 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool canBeFinished;
     [Tooltip("How much it spreads out around its target with others of its side, so a group surrounds rather than clumps. 0: straight at it. 1: the widest flank.")]
     [SerializeField, Range(0f, 1f)] private float flankSpread;
+    [Tooltip("From this raid tier on (1 = always, 0 = never), one of its kind may flank a player who turtles behind the guard or stands " +
+             "still while others are at them: it goes round behind with a growl and takes the next turn (Docs/EnemyAIReview_2026-11-19.md §4). " +
+             "Moving, dodging or turning to face it ends it.")]
+    [SerializeField, Min(0)] private int flanksFromTier;
+    [Tooltip("Heard as it goes round to flank. Empty: its attack sound.")]
+    [SerializeField] private SoundDefinition flankSound;
     [Tooltip("When it attacks the Haven (ward breaches, corruption nights) it goes for walls and buildings, walls first, and " +
              "pays people no mind until one hurts it. For the big trolls, which come to tear the place down.")]
     [SerializeField] private bool breaksWalls;
@@ -327,6 +333,8 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float IdleSleepChance => idleSleepChance;
     public float IdleSleepAttention => idleSleepAttention;
     public float FlankSpread => flankSpread;
+    public int FlanksFromTier => flanksFromTier;
+    public SoundDefinition FlankSound => flankSound;
     /// <summary>At the Haven it goes for walls and buildings before people (HomeAssault).</summary>
     public bool BreaksWalls => breaksWalls;
     public bool CanBeFinished => canBeFinished;

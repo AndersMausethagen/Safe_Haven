@@ -143,6 +143,11 @@ public sealed class MonsterAttack
     [Range(0f, 0.95f)] public float toughness;
     [Tooltip("Every creature of its side within Buff Radius learns where its foe is and comes (a mistwing's screech).")]
     public bool alertsOthers;
+    [Tooltip("Raise the alarm (Docs/EnemyAIReview_2026-11-19.md §8): the first of its group to spot the player calls this before it fights, " +
+             "once a group in 20 s, and its group waits for the call. Completed, every creature of its side within Alarm Radius comes; " +
+             "broken (make it Interruptible), only the suspicion of its spotting spreads. Turns an alarm into something to answer.")]
+    public bool onSpotted;
+    [Min(1f)] public float alarmRadius = 18f;
     [Tooltip("Laid on its foe when the foe is within Buff Radius and in sight (a huldra's call).")]
     public StatusEffectDefinition foeStatus;
     [Tooltip("Metres its foe is drawn toward it, with Foe Status (negative: thrown away).")]

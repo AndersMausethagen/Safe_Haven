@@ -68,6 +68,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0.3
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -127,6 +129,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -184,6 +188,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -241,6 +247,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0.4
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -292,6 +300,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 1
   flankSpread: 0.5
+  flanksFromTier: 2
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0.55
   guardAfterBlows: 3

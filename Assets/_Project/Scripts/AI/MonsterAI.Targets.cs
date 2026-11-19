@@ -16,6 +16,12 @@ public sealed partial class MonsterAI
             return;
         }
 
+        // Holding a grudge against a companion that struck it: the player doesn't pull it back until the grudge is done.
+        if (HoldsGrudge)
+        {
+            return;
+        }
+
         if (targeting.TryFindBetter(target, DistanceToTarget(), senses, home, Relentless, out IDamageable better, out Collider betterCollider))
         {
             SetTarget(better, betterCollider);
@@ -65,7 +71,8 @@ public sealed partial class MonsterAI
         }
 
         RefreshAmbush();
-        if (pack != null)
+        // Raising the alarm, the pack waits for the call: break it and only the suspicion spreads (§8).
+        if (pack != null && !RaisesAlarm)
         {
             pack.Alert(newTarget);
         }

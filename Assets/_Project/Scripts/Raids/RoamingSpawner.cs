@@ -54,6 +54,61 @@ public sealed class RoamingSpawner : MonoBehaviour
         random = new System.Random();
     }
 
+    // The raid's pacing (Docs/EnemyAIReview_2026-11-19.md §9; Warframe, Left 4 Dead): after a hard fight the roamers hold off for a breather.
+    private readonly RaidIntensity intensity = new RaidIntensity();
+
+    /// <summary>The pacing's phase now, for tests and the log.</summary>
+    public RaidIntensity.Phase PacingPhase => intensity.Now;
+
+    private void OnEnable()
+    {
+        Damageable.AnyDamaged += OnAnyDamaged;
+        Damageable.AnyDied += OnAnyDied;
+    }
+
+    private void OnDisable()
+    {
+        Damageable.AnyDamaged -= OnAnyDamaged;
+        Damageable.AnyDied -= OnAnyDied;
+    }
+
+    private void OnAnyDamaged(Damageable victim, DamageInfo damage, DamageResult result)
+    {
+        if (director != null && director.Player != null && victim.gameObject == director.Player && !result.Blocked)
+        {
+            intensity.Hurt(result.Damage / Mathf.Max(1f, victim.MaxHealth));
+        }
+    }
+
+    private void OnAnyDied(Damageable victim, DamageInfo blow)
+    {
+        if (victim != null && victim.TryGetComponent(out MonsterAI _) && blow.Source != null && blow.Source.Faction.IsPlayerSide())
+        {
+            intensity.Kill();
+        }
+    }
+
+    private void Pace(float seconds, Vector3 player)
+    {
+        RaidIntensity.Phase was = intensity.Now;
+        RaidIntensity.Phase now = intensity.Tick(seconds, MonsterAI.CountHuntingPlayerSide(), player, Time.time, random);
+        if (now == was)
+        {
+            return;
+        }
+
+        if (now == RaidIntensity.Phase.Peak)
+        {
+            PlaytestLogger.Note(PlaytestLog.EnemyAI, "Intensity.Peak", Mathf.RoundToInt(intensity.Score), director.Session.Definition.Id);
+        }
+        else if (now == RaidIntensity.Phase.Relax)
+        {
+            // Said, so the breather is the woods' and not a hidden hand.
+            GameMessages.Post("The woods go quiet.", MessageKind.Info);
+            PlaytestLogger.Note(PlaytestLog.EnemyAI, "Intensity.Relax", Mathf.RoundToInt(intensity.Score), director.Session.Definition.Id);
+        }
+    }
+
     private void Update()
     {
         RoamingSpawnSettings settings = Settings;
@@ -63,8 +118,10 @@ public sealed class RoamingSpawner : MonoBehaviour
             return;
         }
 
+        float thought = Mathf.Clamp(Time.time - (nextThink - ThinkInterval), 0f, ThinkInterval * 2f);
         nextThink = Time.time + ThinkInterval;
         Vector3 player = director.Player.transform.position;
+        Pace(thought, player);
         Tidy(settings, player);
 
         if (director.Session.Elapsed < settings.FirstDelay)
@@ -78,7 +135,7 @@ public sealed class RoamingSpawner : MonoBehaviour
         }
 
         int cap = settings.AliveCap(director.StageIndex, director.Creatures.AlarmsRaised, director.Session.Definition.SessionEnemyDensity) + ExtraCap;
-        if (Time.time >= nextSpawn && AliveCount < cap && spent < settings.TotalLimit && !AtGlobalLimit())
+        if (intensity.AllowsRoamers && Time.time >= nextSpawn && AliveCount < cap && spent < settings.TotalLimit && !AtGlobalLimit())
         {
             // A failed placement retries on the next think rather than waiting a whole interval.
             if (TrySpawn(settings, player, null))
@@ -205,7 +262,7 @@ public sealed class RoamingSpawner : MonoBehaviour
 
             AliveCount += alive;
             // Idle roamers look around where they stopped for a while before heading for the player again.
-            if (!busy && idle && Flat(position - player) > settings.HuntSpread && Time.time >= nextHunt[root])
+            if (!busy && idle && intensity.AllowsRoamers && Flat(position - player) > settings.HuntSpread && Time.time >= nextHunt[root])
             {
                 Hunt(root, player, settings);
             }

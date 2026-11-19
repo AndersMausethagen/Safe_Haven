@@ -361,6 +361,13 @@ public sealed partial class PlayerCombat : MonoBehaviour
     public event Action<WeaponDefinition> WeaponChanged;
 
     private SwingInfo current;
+    // How many the swing under way struck: -1 before its blow lands.
+    private int landedThisSwing = -1;
+
+    /// <summary>In the recovery of a heavy, charged or art swing that struck nothing (Docs/EnemyAIReview_2026-11-19.md, a committed
+    /// whiff): from tier II, a creature standing ready takes the opening at once.</summary>
+    public bool IsSpent => IsAttacking && !hitPending && landedThisSwing == 0
+        && (current.Technique & (HitTechnique.Heavy | HitTechnique.Charged | HitTechnique.WeaponArt)) != 0;
 
     private CombatTechniqueSettings Rules => CombatTechniqueSettings.Current;
 

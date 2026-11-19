@@ -103,8 +103,38 @@ public sealed partial class MonsterAI
             LostTrackOfPlayer?.Invoke(this);
         }
 
-        senses.Awareness.LoseTrack(lastKnownTargetPosition, PerceptionSettings.Current.LostTrackAwareness);
+        PlanSearch();
+        senses.Awareness.LoseTrack(searchPoints.Count > 0 ? searchPoints[0] : lastKnownTargetPosition, PerceptionSettings.Current.LostTrackAwareness);
         BeginInvestigate(true);
+        investigateGiveUpAt = Time.time + PerceptionSettings.Current.LostSearchSeconds;
+    }
+
+    // The search after losing a target (Docs/EnemyAIReview_2026-11-19.md §5): its points ahead along the target's way, each kept
+    // reachable and inside its leash; a third searcher of the same ground and later stays at the first and looks along the way.
+    private Vector3 lastSeenTargetVelocity;
+    private readonly System.Collections.Generic.List<Vector3> searchPoints = new System.Collections.Generic.List<Vector3>();
+    private int searchPoint;
+    private static readonly System.Collections.Generic.Dictionary<Vector2Int, (int claims, float at)> searched =
+        new System.Collections.Generic.Dictionary<Vector2Int, (int, float)>();
+
+    private void PlanSearch()
+    {
+        searchPoints.Clear();
+        searchPoint = 0;
+        Vector3 guess = lastKnownTargetPosition + Vector3.ClampMagnitude(new Vector3(lastSeenTargetVelocity.x, 0f, lastSeenTargetVelocity.z) * 1.5f, 8f);
+        var bucket = new Vector2Int(Mathf.FloorToInt(guess.x / 6f), Mathf.FloorToInt(guess.z / 6f));
+        int share = searched.TryGetValue(bucket, out var claim) && Time.time - claim.at < 10f ? claim.claims : 0;
+        searched[bucket] = (share + 1, Time.time);
+        int more = share >= 2 ? 0 : 2;
+        var random = new System.Random(GetHashCode() ^ Mathf.RoundToInt(Time.time * 10f));
+        foreach (Vector3 point in AttackTurns.SearchPoints(lastKnownTargetPosition, lastSeenTargetVelocity, more, share, random))
+        {
+            Vector3 spot = InvestigationSpot(point);
+            if (movement.TryFindGround(spot, 3f, out Vector3 ground) && targeting.CanReach(ground))
+            {
+                searchPoints.Add(ground);
+            }
+        }
     }
 
     private void BeginInvestigate(bool lostTarget)
@@ -161,20 +191,32 @@ public sealed partial class MonsterAI
 
         if (searchUntil < 0f)
         {
-            Vector3 spot = InvestigationSpot(senses.Awareness.Stimulus);
+            bool sweeping = searchingLostTarget && searchPoint < searchPoints.Count;
+            Vector3 spot = sweeping ? searchPoints[searchPoint] : InvestigationSpot(senses.Awareness.Stimulus);
             if (HorizontalDistance(spot) > ArriveDistance && Time.time < investigateGiveUpAt && movement.MoveTo(spot))
             {
                 return;
             }
 
             movement.Stop();
-            searchUntil = Time.time + rules.SearchSeconds;
+            // A short look at each point of a sweep but the last, which gets the whole look.
+            bool more = searchingLostTarget && searchPoint + 1 < searchPoints.Count;
+            searchUntil = Time.time + (more ? rules.SweepLookSeconds : rules.SearchSeconds);
             lookDirection = UnityEngine.Random.value < 0.5f ? -1f : 1f;
         }
 
         transform.Rotate(0f, lookDirection * rules.LookAroundSpeed * Time.deltaTime, 0f);
         if (Time.time >= searchUntil)
         {
+            if (searchingLostTarget && searchPoint + 1 < searchPoints.Count && Time.time < investigateGiveUpAt)
+            {
+                searchPoint++;
+                searchUntil = -1f;
+                movement.RepathNow();
+                PlaytestLogger.Note(PlaytestLog.EnemyAI, "SearchPoint", searchPoint, definition != null ? definition.name : name);
+                return;
+            }
+
             EndInvestigation();
         }
     }

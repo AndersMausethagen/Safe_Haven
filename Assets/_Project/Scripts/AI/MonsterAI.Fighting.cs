@@ -139,7 +139,32 @@ public sealed partial class MonsterAI
             return;
         }
 
+        // The alarm goes first, before any blow, when it can be raised (§8).
+        if (alarmAction >= 0)
+        {
+            int call = alarmAction;
+            alarmAction = -1;
+            if (attacks.IsReady && call < definition.Attacks.Count)
+            {
+                movement.Stop();
+                SetState(State.Chasing);
+                BeginAttack(call, toTarget);
+                return;
+            }
+
+            // The call wasn't ready: its pack comes at once, as it did before.
+            if (pack != null && target != null)
+            {
+                pack.Alert(target);
+            }
+        }
+
         if (Time.time < breakingAwayUntil && BreaksAway(toTarget, distance))
+        {
+            return;
+        }
+
+        if (Flanks(toTarget))
         {
             return;
         }
@@ -213,6 +238,10 @@ public sealed partial class MonsterAI
                 else if (distance > definition.PreferredDistance + definition.DistanceTolerance)
                 {
                     movement.MoveTo(targetComponent.transform.position);
+                }
+                else if (relocatePending || relocating)
+                {
+                    Relocate(toTarget);
                 }
                 else
                 {
@@ -322,6 +351,12 @@ public sealed partial class MonsterAI
                 StartBreakAway(doing);
             }
 
+            // A shooter moves on after its shot (§6), instead of standing as a turret.
+            if (doing != null && MonsterAttacks.IsRanged(doing.kind) && definition.MovementTactic == MonsterMovementTactic.KeepDistance)
+            {
+                relocatePending = true;
+            }
+
             return;
         }
 
@@ -379,7 +414,10 @@ public sealed partial class MonsterAI
 
         // Off screen it waits its moment: nobody else closing in, and a beat since it got there, so blows come from where
         // they can be read (anti-overwhelm 3, 2026-11-14).
-        AttackTurn turn = AttackTurns.Decide(closingIn, rules.AttackersAtOnce, Time.time, nextTurnAt);
+        // A committed whiff (a heavy that struck nothing), from tier II: the one standing ready takes the opening without waiting for the
+        // spacing or its rank; the limit of how many at once still holds.
+        bool punish = RaidTierNow >= WhiffPunishFromTier && targetComponent.TryGetComponent(out PlayerCombat foeCombat) && foeCombat.IsSpent;
+        AttackTurn turn = AttackTurns.Decide(closingIn, rules.AttackersAtOnce, Time.time, punish ? 0f : nextTurnAt);
         if (turn == AttackTurn.Strike && OffScreen(rules))
         {
             offScreenSince = offScreenSince >= 0f ? offScreenSince : Time.time;
@@ -394,7 +432,7 @@ public sealed partial class MonsterAI
         }
 
         // Of those ready, the one ranked highest goes; the rest stand ready (Docs/EnemyAIReview_2026-11-19.md §2, fair turns).
-        if (turn == AttackTurn.Strike && !HasTheTurn(rules))
+        if (turn == AttackTurn.Strike && !punish && !HasTheTurn(rules))
         {
             turn = AttackTurn.StandReady;
         }
@@ -547,7 +585,8 @@ public sealed partial class MonsterAI
 
     private float TurnRank(CombatTechniqueSettings rules)
     {
-        bool front = targetComponent != null
+        // A flanker in place ranks as if in front: it is there to take the next turn.
+        bool front = IsFlankerInPlace || targetComponent != null
             && AttackTurns.InFront(transform.position, targetComponent.transform.position, targetComponent.transform.forward, rules.FrontHalfArc);
         return AttackTurns.Rank(Time.time - readySince, front, !OffScreen(rules), StruckLast(), rules.FrontBonus, rules.OnScreenBonus,
             rules.LastStrikerPenalty);
@@ -650,18 +689,217 @@ public sealed partial class MonsterAI
         return true;
     }
 
+    // Straight back, else 45° to either side (§6: against a rock it simply stopped). With none of them open for Cornered Seconds it
+    // stops trying, and fights where it stands.
+    private const int WhiffPunishFromTier = 2;
+
+    // ---- The flanker (Docs/EnemyAIReview_2026-11-19.md §4): one at most per target, only while the target is passive (the guard held a
+    // while, or standing still) and two or more of those that flank are at it. It goes round behind with a growl and then ranks as if in
+    // front, so it takes the next turn; the target moving, dodging or turning to face it ends the role.
+    private static readonly System.Collections.Generic.Dictionary<IDamageable, (MonsterAI who, float until, Vector3 anchor)> flankers =
+        new System.Collections.Generic.Dictionary<IDamageable, (MonsterAI, float, Vector3)>();
+    private static readonly System.Collections.Generic.Dictionary<IDamageable, (Vector3 at, float since)> standing =
+        new System.Collections.Generic.Dictionary<IDamageable, (Vector3, float)>();
+    private const float FlankBehind = 3.5f;
+    private const float FlankHolds = 4f;
+    private bool flankInPlace;
+
+    private bool IsFlankerInPlace => flankInPlace && target != null && flankers.TryGetValue(target, out var role) && role.who == this;
+
+    private bool CanFlank => definition.FlanksFromTier > 0 && Mathf.Max(1, RaidTierNow) >= definition.FlanksFromTier && OpenWhileStriking;
+
+    /// <summary>Whether a target is passive: its guard up at least <paramref name="guardedFor"/>... or it has stood within half a metre for 2 s.</summary>
+    public static bool IsPassive(float guardedFor, float stillFor) => guardedFor >= 1.2f || stillFor >= 2f;
+
+    private bool Flanks(Vector3 toTarget)
+    {
+        if (!CanFlank || !IsAtThePlayer || target == null)
+        {
+            flankInPlace = false;
+            return false;
+        }
+
+        Vector3 at = targetComponent.transform.position;
+        float now = Time.time;
+        if (!standing.TryGetValue(target, out var still) || (at - still.at).sqrMagnitude > 0.25f)
+        {
+            standing[target] = still = (at, now);
+        }
+
+        if (flankers.TryGetValue(target, out var role) && (role.who == null || now > role.until || role.who.target != target))
+        {
+            flankers.Remove(target);
+            role = default;
+        }
+
+        Vector3 behind = at - targetComponent.transform.forward * FlankBehind;
+        if (role.who == this)
+        {
+            bool dodging = targetComponent.TryGetComponent(out PlayerDodge dodge) && dodge.IsDodging;
+            bool faced = flankInPlace && AttackTurns.InFront(transform.position, at, targetComponent.transform.forward, CombatTechniqueSettings.Current.FrontHalfArc);
+            if ((at - role.anchor).sqrMagnitude > 2.25f || dodging || faced)
+            {
+                flankers.Remove(target);
+                flankInPlace = false;
+                return false;
+            }
+
+            Vector3 left = behind - transform.position;
+            left.y = 0f;
+            if (left.magnitude > 1f && movement.TryFindGround(behind, 1.5f, out Vector3 ground))
+            {
+                SetState(State.Chasing);
+                flankInPlace = false;
+                movement.MoveTo(ground);
+                return true;
+            }
+
+            flankInPlace = true;
+            return false;
+        }
+
+        flankInPlace = false;
+        if (role.who != null || CurrentState == State.Attacking)
+        {
+            return false;
+        }
+
+        float guarded = targetComponent.TryGetComponent(out PlayerGuard guard) ? guard.GuardedFor : 0f;
+        if (!IsPassive(guarded, now - still.since))
+        {
+            return false;
+        }
+
+        // Two or more that flank at it, and this the one with the shortest way round.
+        int flankersAtIt = 0;
+        float mine = (behind - transform.position).sqrMagnitude;
+        foreach (MonsterAI other in active)
+        {
+            if (other == null || other.target != target || other.CurrentState == State.Dead || !other.CanFlank)
+            {
+                continue;
+            }
+
+            flankersAtIt++;
+            if (other != this && other.CurrentState != State.Attacking && (behind - other.transform.position).sqrMagnitude < mine)
+            {
+                return false;
+            }
+        }
+
+        if (flankersAtIt < 2)
+        {
+            return false;
+        }
+
+        flankers[target] = (this, now + FlankHolds, at);
+        AudioManager.Play(definition.FlankSound != null ? definition.FlankSound : definition.AttackSound, transform.position);
+        PlaytestLogger.Note(PlaytestLog.EnemyAI, "Flank", 0, definition.name);
+        return false;
+    }
+
+    // ---- A grudge (Docs/EnemyAIReview_2026-11-19.md §7): one waiting its turn at the player that a companion strikes turns on that
+    // companion for a while, one at a time for each companion, instead of circling the player while it is cut.
+    private static readonly System.Collections.Generic.Dictionary<Combatant, MonsterAI> grudges = new System.Collections.Generic.Dictionary<Combatant, MonsterAI>();
+    private float grudgeUntil = -1f;
+    private Combatant grudgeAgainst;
+    private const float GrudgeSeconds = 4f;
+    private const float GrudgeReach = 6f;
+
+    private bool HoldsGrudge => Time.time < grudgeUntil && grudgeAgainst != null
+        && (grudgeAgainst.transform.position - transform.position).sqrMagnitude <= GrudgeReach * GrudgeReach;
+
+    // Called from a blow taken: true when it turned on its striker.
+    private bool TakeGrudge(Combatant attacker, IDamageable attackerTarget)
+    {
+        if (attacker == null || attackerTarget == null || global::Player.IsPlayer(attacker.gameObject) || attacker.GetComponent<FriendHitbox>() != null
+            || !(IsWaitingTurn || circling || Time.time < breakingAwayUntil) || !IsAtThePlayer
+            || (attacker.transform.position - transform.position).sqrMagnitude > GrudgeReach * GrudgeReach)
+        {
+            return false;
+        }
+
+        if (grudges.TryGetValue(attacker, out MonsterAI holder) && holder != null && holder != this && holder.HoldsGrudge)
+        {
+            return false;
+        }
+
+        grudges[attacker] = this;
+        grudgeAgainst = attacker;
+        grudgeUntil = Time.time + GrudgeSeconds;
+        circling = false;
+        breakingAwayUntil = -1f;
+        spottingByBlow = true;
+        SetTarget(attackerTarget, null);
+        spottingByBlow = false;
+        return true;
+    }
+
     private void Retreat(Vector3 toTarget, float distance)
     {
         Vector3 away = toTarget.sqrMagnitude > 0.001f ? -toTarget.normalized : -transform.forward;
-        Vector3 destination = transform.position + away * Mathf.Max(2f, distance);
-        if (movement.TryFindGround(destination, 2f, out Vector3 ground)
-            && (Relentless || IsRouted || Leash <= 0f || Vector3.Distance(home, ground) <= Leash))
-        {
-            movement.MoveTo(ground);
-        }
-        else
+        if (Time.time < corneredUntil)
         {
             movement.Stop();
+            movement.TurnTowards(toTarget);
+            return;
         }
+
+        foreach (float turn in RetreatTurns)
+        {
+            Vector3 way = Quaternion.Euler(0f, turn, 0f) * away;
+            Vector3 destination = transform.position + way * Mathf.Max(2f, distance);
+            if (movement.TryFindGround(destination, 2f, out Vector3 ground) && HorizontalDistance(ground) > 1f
+                && (Relentless || IsRouted || Leash <= 0f || Vector3.Distance(home, ground) <= Leash))
+            {
+                retreatBlockedSince = -1f;
+                movement.MoveTo(ground);
+                return;
+            }
+        }
+
+        movement.Stop();
+        retreatBlockedSince = retreatBlockedSince < 0f ? Time.time : retreatBlockedSince;
+        if (Time.time - retreatBlockedSince > CorneredAfter)
+        {
+            // Cornered: it gives up backing off for a while; a creature with a close strike uses it when the foe comes in.
+            corneredUntil = Time.time + 4f;
+            retreatBlockedSince = -1f;
+        }
+    }
+
+    private static readonly float[] RetreatTurns = { 0f, -45f, 45f };
+    private const float CorneredAfter = 1.5f;
+    private float retreatBlockedSince = -1f;
+    private float corneredUntil = -1f;
+
+    // Between shots (§6): one move to a better spot on its ring round the target, chosen once, walked to facing the target.
+    private bool relocatePending;
+    private bool relocating;
+    private Vector3 relocateTo;
+    private float relocateGiveUpAt;
+
+    private void Relocate(Vector3 toTarget)
+    {
+        if (relocatePending)
+        {
+            relocatePending = false;
+            relocating = positioning.FindShotSpot(targetComponent.transform.position, definition.PreferredDistance, home,
+                Relentless ? 0f : Leash, this, out relocateTo);
+            relocateGiveUpAt = Time.time + 4f;
+        }
+
+        Vector3 left = relocateTo - transform.position;
+        left.y = 0f;
+        if (!relocating || left.magnitude < 0.8f || Time.time > relocateGiveUpAt)
+        {
+            relocating = false;
+            MarkWaiting();
+            movement.Stop();
+            movement.TurnTowards(toTarget);
+            return;
+        }
+
+        movement.Strafe(relocateTo, toTarget);
     }
 }

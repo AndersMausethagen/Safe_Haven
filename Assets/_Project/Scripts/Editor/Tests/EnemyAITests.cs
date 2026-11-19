@@ -44,4 +44,64 @@ public sealed class EnemyAITests
         Assert.AreEqual("side", PlaytestLogger.FromSide(90f));
         Assert.AreEqual("back", PlaytestLogger.FromSide(170f));
     }
+
+    // §5: a search goes where the player was going, not where they are, and a pack spreads out over it.
+    [Test]
+    public void ASearch_GoesAheadAlongTheWay_AndAPackSpreads()
+    {
+        Vector3 lastKnown = new Vector3(10f, 0f, 10f), going = new Vector3(4f, 0f, 0f); // east at 4 m/s
+        var points = AttackTurns.SearchPoints(lastKnown, going, 2, 0, new System.Random(3));
+        Assert.AreEqual(3, points.Count, "a first guess and two more");
+        Assert.AreEqual(16f, points[0].x, 0.01f, "1.5 s ahead along the way: 6 m east");
+        Assert.Greater(points[2].x, points[0].x, "the sweep goes on ahead, not back");
+        Assert.AreEqual(lastKnown, AttackTurns.SearchPoints(lastKnown, Vector3.zero, 2, 0, new System.Random(3))[0],
+            "standing still: where it was last seen");
+        Vector3 second = AttackTurns.SearchPoints(lastKnown, going, 2, 1, new System.Random(3))[1];
+        Vector3 third = AttackTurns.SearchPoints(lastKnown, going, 2, 2, new System.Random(3))[1];
+        Assert.Greater(Vector3.Distance(second, third), 2f, "two searchers of the same ground take different ways");
+    }
+
+    // §6: a shooter between shots prefers higher ground and keeps clear of the other shooters.
+    [Test]
+    public void AShooter_PrefersHighGround_AwayFromOtherShooters()
+    {
+        Assert.Greater(AttackTurns.ScoreSpot(1.5f, false), AttackTurns.ScoreSpot(0f, false));
+        Assert.Greater(AttackTurns.ScoreSpot(0f, false), AttackTurns.ScoreSpot(1.5f, true), "a crowded rise loses to an open flat spot");
+        Assert.AreEqual(2f, AttackTurns.ScoreSpot(9f, false), 1e-4f, "height pays up to 2");
+    }
+
+    // §4: a flanker comes only for a player who turtles or stands still.
+    [Test]
+    public void AFlanker_ComesOnlyForAPassivePlayer()
+    {
+        Assert.IsTrue(MonsterAI.IsPassive(1.5f, 0f), "the guard held a while");
+        Assert.IsTrue(MonsterAI.IsPassive(0f, 2.5f), "standing still");
+        Assert.IsFalse(MonsterAI.IsPassive(0.5f, 1f), "moving, guarding now and then");
+    }
+
+    // §9: the pacing builds, peaks, fades, gives a breather, and builds again; only the build sends roamers.
+    [Test]
+    public void ThePacing_GivesABreatherAfterAHardFight()
+    {
+        var pacing = new RaidIntensity();
+        var random = new System.Random(1);
+        float now = 0f;
+        Assert.IsTrue(pacing.AllowsRoamers);
+        pacing.Hurt(0.6f);
+        pacing.Hurt(0.5f);
+        Assert.AreEqual(RaidIntensity.Phase.Peak, pacing.Tick(0.5f, 3, Vector3.zero, now += 0.5f, random), "110 from the blows taken: the peak");
+        Assert.IsFalse(pacing.AllowsRoamers);
+        pacing.Tick(7f, 0, Vector3.zero, now += 7f, random);
+        Assert.AreEqual(RaidIntensity.Phase.Fade, pacing.Now, "after its hold, it fades");
+        for (int i = 0; i < 40 && pacing.Now == RaidIntensity.Phase.Fade; i++)
+        {
+            pacing.Tick(1f, 0, Vector3.zero, now += 1f, random);
+        }
+
+        Assert.AreEqual(RaidIntensity.Phase.Relax, pacing.Now, "quiet long enough: the breather");
+        Assert.IsFalse(pacing.AllowsRoamers, "no roamers in the breather");
+        pacing.Tick(1f, 0, new Vector3(50f, 0f, 0f), now += 1f, random);
+        Assert.AreEqual(RaidIntensity.Phase.Build, pacing.Now, "40 m of travel ends it early");
+        Assert.IsTrue(pacing.AllowsRoamers);
+    }
 }

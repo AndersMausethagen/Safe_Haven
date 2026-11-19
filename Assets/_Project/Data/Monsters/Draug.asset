@@ -45,25 +45,31 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 2.2
     priority: 10
+    opener: 0
     weight: 1
     whenFoe: 0
     heavy: 0
     cooldown: 1
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0.3
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -84,6 +90,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -99,19 +107,23 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 2.2
     priority: 15
+    opener: 0
     weight: 0.8
     whenFoe: 0
     heavy: 0
     cooldown: 7
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 0.3
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps:
     - {fileID: 11400000, guid: a10375394108bdb429cfd7e30282c60b, type: 2}
     - {fileID: 11400000, guid: 7c51c0a6123522543bd74150b578d845, type: 2}
@@ -119,6 +131,8 @@ MonoBehaviour:
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -139,6 +153,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -154,24 +170,30 @@ MonoBehaviour:
     minimumRange: 3
     maximumRange: 8
     priority: 20
+    opener: 0
     weight: 0.6
     whenFoe: 6
     heavy: 1
     cooldown: 9
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -192,6 +214,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -207,24 +231,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 9
     priority: 25
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 22
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 11400000, guid: 386140d225406a44dbe57a23d03a0ff7, type: 2}
     leadTarget: 0
     fromTier: 4
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -244,7 +274,9 @@ MonoBehaviour:
     speedBonus: 0
     hasteBonus: 0
     toughness: 0
-    alertsOthers: 0
+    alertsOthers: 1
+    onSpotted: 1
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -276,6 +308,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 1
   flankSpread: 0.5
+  flanksFromTier: 2
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0.55
   guardAfterBlows: 3
@@ -288,6 +322,12 @@ MonoBehaviour:
   arrowDodge: 0
   poise: 140
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0

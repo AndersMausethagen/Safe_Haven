@@ -716,12 +716,19 @@ public sealed class MonsterAttacks
         }
 
         Component foe = Target as Component;
+        // A raised alarm carries further than the call's rally (§8).
+        float alertReach = action.onSpotted ? Mathf.Max(action.buffRadius, action.alarmRadius) : action.buffRadius;
         if (action.alertsOthers && foe != null)
         {
+            if (action.onSpotted)
+            {
+                PlaytestLogger.Note(PlaytestLog.EnemyAI, "Alarm", 0, self.name);
+            }
+
             foreach (MonsterAI other in MonsterAI.Active)
             {
                 if (other.transform != self && other.CurrentState != MonsterAI.State.Dead && other.TryGetComponent(out Combatant side)
-                    && side.Faction == combatant.Faction && Vector3.Distance(self.position, other.transform.position) <= action.buffRadius
+                    && side.Faction == combatant.Faction && Vector3.Distance(self.position, other.transform.position) <= alertReach
                     && !(other.Target is Component busy && busy != null))
                 {
                     other.Engage(Target);

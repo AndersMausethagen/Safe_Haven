@@ -45,24 +45,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 2
     priority: 30
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 2
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -83,6 +89,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -98,24 +106,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 14
     priority: 25
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 14
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -136,6 +150,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -151,24 +167,30 @@ MonoBehaviour:
     minimumRange: 0
     maximumRange: 12
     priority: 20
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 18
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 11400000, guid: 41a93b938caf2804b8402f7ac5c7a1cd, type: 2}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -188,7 +210,9 @@ MonoBehaviour:
     speedBonus: 0
     hasteBonus: 0
     toughness: 0
-    alertsOthers: 0
+    alertsOthers: 1
+    onSpotted: 1
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -204,24 +228,30 @@ MonoBehaviour:
     minimumRange: 2.2
     maximumRange: 14
     priority: 10
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 2.4
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0.3
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
     burstCount: 1
@@ -242,6 +272,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -257,24 +289,30 @@ MonoBehaviour:
     minimumRange: 2.2
     maximumRange: 14
     priority: 15
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 10
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0.3
     fromTier: 3
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 4774033439812504928, guid: f88eca45a0f3397429ff4fa29af1b9ae, type: 3}
     burstCount: 3
@@ -295,6 +333,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -326,6 +366,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  flanksFromTier: 0
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0
   guardAfterBlows: 0
@@ -338,6 +380,12 @@ MonoBehaviour:
   arrowDodge: 0
   poise: 60
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 1
   shieldArc: 0
