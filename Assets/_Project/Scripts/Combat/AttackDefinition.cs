@@ -134,6 +134,10 @@ public sealed class AttackDefinition : ScriptableObject
              "had got, when it is the same motion going on. Off for a heavy that is another motion altogether (the fists' high kick " +
              "after a punch): it starts from its first frame at its own pace, instead of crawling through the last of its wind-up.")]
     [SerializeField] private bool growsFromLight = true;
+    [Tooltip("Seconds the swing blends in over, from whatever pose comes before it (the stance's ready pose, the chain's swing before " +
+             "it, the guard). Measured and written by Safe Haven › Tools › Fit Attack Blends (AttackFlow): long enough that no " +
+             "way into it moves the body faster than the swing itself does, and over before its strike. 0: the usual short blend.")]
+    [SerializeField, Min(0f)] private float blendIn;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -199,6 +203,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float StrikeLead => strikeLead;
     public float FollowThroughSpeed => followThroughSpeed;
     public bool GrowsFromLight => growsFromLight;
+    public float BlendIn => blendIn;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;

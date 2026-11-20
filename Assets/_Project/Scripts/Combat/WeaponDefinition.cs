@@ -25,6 +25,9 @@ public sealed class WeaponDefinition : ScriptableObject
     [SerializeField] private string displayName;
     [Tooltip("Selects the combat idle, attack animation and arm pose.")]
     [SerializeField] private WeaponStance stance = WeaponStance.OneHanded;
+    [Tooltip("The pose it stands ready and guards in, when it isn't the stance's own: the staff stands with the staff upright " +
+             "(its spells start from there), not in a one-handed sword's ready pose.")]
+    [SerializeField] private WeaponReadyPose readyPose = WeaponReadyPose.Stance;
     [SerializeField] private WeaponKind kind;
     [Tooltip("How its blows land whatever its moves say: Blunt for a club that swings like a sword. None: each attack's own kind.")]
     [SerializeField] private StrikeKind strikeOverride;
@@ -126,6 +129,7 @@ public sealed class WeaponDefinition : ScriptableObject
 
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public WeaponStance Stance => stance;
+    public WeaponReadyPose ReadyPose => readyPose;
     public WeaponKind Kind => kind;
     public bool IsBow => kind == WeaponKind.Bow;
     public bool IsFishingRod => kind == WeaponKind.FishingRod;

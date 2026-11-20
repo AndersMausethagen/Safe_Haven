@@ -28,6 +28,7 @@ MonoBehaviour:
   poiseDamage: 25
   impact: 0.85
   lunge: 0.3
+  hop: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
@@ -42,11 +43,20 @@ MonoBehaviour:
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: KI Front Kick
   animationSpeed: 0.7424243
   strikeSpeed: 1.5
   strikeLead: 0.08
   followThroughSpeed: 1.8
+  growsFromLight: 1
+  blendIn: 0.1
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0}

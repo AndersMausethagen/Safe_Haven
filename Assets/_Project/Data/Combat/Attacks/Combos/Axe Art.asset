@@ -28,6 +28,7 @@ MonoBehaviour:
   poiseDamage: 45
   impact: 1.5
   lunge: 0.8
+  hop: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
@@ -42,11 +43,20 @@ MonoBehaviour:
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0
+  castProjectile: {fileID: 0}
+  castCount: 1
+  castSpread: 12
+  castSpeed: 18
+  castRadius: 0.3
+  castRange: 16
+  castHazard: {fileID: 0}
   animationState: Whirlwind
   animationSpeed: 1
   strikeSpeed: 1
   strikeLead: 0
   followThroughSpeed: 1
+  growsFromLight: 1
+  blendIn: 0.16
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.62, b: 0.3, a: 0.95}

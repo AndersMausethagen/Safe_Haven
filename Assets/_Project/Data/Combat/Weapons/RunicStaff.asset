@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Runic Staff
   stance: 1
+  readyPose: 1
   kind: 0
   strikeOverride: 0
   damage: 14
@@ -45,6 +46,8 @@ MonoBehaviour:
   drawMoveSpeed: 0.55
   perfectReleaseSeconds: 0.2
   perfectReleaseDamage: 1.25
+  drawWeight: 1
+  escapeShotFocus: 0
   aimSpread: 0.5
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}

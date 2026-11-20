@@ -201,11 +201,16 @@ public sealed partial class PlayerAnimationController
         float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom);
         SetFloat(ActionSpeedHash, actionSpeed);
         float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
-        // A chain's next swing starts while the last is mid-follow-through, often from another pack's ready pose: 0.1 s snapped the
-        // arms across (technical animation audit, 2026-11-20). Blend for up to ChainFade, done by half-way to the blow.
+        // Each swing blends in over its measured Blend In (AttackFlow: no way into it moves the body faster than the swing itself,
+        // and it is over before the strike), the user's "every attack transitions smoothly and fits in a chain" (2026-11-20).
+        // Without one, up to ChainFade, done by half-way to the blow.
         if (!fromHold)
         {
-            fade = Mathf.Max(fade, Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / Mathf.Max(0.01f, swing.Speed)));
+            float speed = Mathf.Max(0.01f, swing.Speed);
+            // Never into the strike, not even the usual short blend (the fists' cross has 0.08 s).
+            float beforeStrike = AttackFlowRules.BlendRoom(swing.Attack.HitDelay, swing.Attack.StrikeLead) / speed;
+            float wanted = swing.Attack.BlendIn > 0f ? swing.Attack.BlendIn / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
+            fade = Mathf.Min(Mathf.Max(fade, wanted), beforeStrike);
         }
 
         // Swing states run at speed 1 times ActionSpeed (PlayerAnimator.controller), so the clip point is start / actionSpeed in.

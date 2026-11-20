@@ -83,6 +83,9 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
 
     // Equipment.
     private static readonly int WeaponStanceHash = Animator.StringToHash("WeaponStance");
+    private static readonly int ReadyPoseHash = Animator.StringToHash("ReadyPose");
+    /// <summary>ReadyPose for a weapon with a pose of its own (WeaponReadyPose.Staff); otherwise it is the stance.</summary>
+    public const float StaffReadyPose = 5f;
     private static readonly int CarryHash = Animator.StringToHash("Carry");
     private static readonly int LeftHandedHash = Animator.StringToHash("LeftHanded");
 
@@ -397,6 +400,9 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         }
 
         SetFloat(WeaponStanceHash, (float)weaponStance);
+        // The pose it stands ready and guards in: the stance's, or the weapon's own (the staff).
+        WeaponDefinition weapon = combat != null ? combat.Weapon : null;
+        SetFloat(ReadyPoseHash, weapon != null && weapon.ReadyPose == WeaponReadyPose.Staff ? StaffReadyPose : (float)weaponStance);
         SetInt(CarryHash, (int)carryPose);
         SetBool(LeftHandedHash, leftHanded);
     }

@@ -28,6 +28,7 @@ MonoBehaviour:
   poiseDamage: 40
   impact: 1.2
   lunge: 0.45
+  hop: 0
   staminaCost: -1
   appliesStatus: {fileID: 0}
   statusChance: 1
@@ -54,6 +55,8 @@ MonoBehaviour:
   strikeSpeed: 1.25
   strikeLead: 0.09333335
   followThroughSpeed: 1.3
+  growsFromLight: 1
+  blendIn: 0.26
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}
