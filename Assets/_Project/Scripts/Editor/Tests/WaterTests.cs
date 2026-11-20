@@ -74,6 +74,47 @@ public sealed class WaterTests
         Assert.Less(ReadHeights().Max(Mathf.Abs), 0.05f, "the waves fade");
     }
 
+    private static Color[] ReadField()
+    {
+        RenderTexture texture = WaterRipples.Texture;
+        var read = new Texture2D(texture.width, texture.height, TextureFormat.RGBAFloat, false, true);
+        RenderTexture active = RenderTexture.active;
+        RenderTexture.active = texture;
+        read.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+        RenderTexture.active = active;
+        Color[] field = read.GetPixels();
+        Object.DestroyImmediate(read);
+        return field;
+    }
+
+    // The user, 2026-11-20: the leaves on the water should move with physics. What floats is shoved from under the feet and carried
+    // out by the waves (the drift, B and A, in metres), on both sides alike, and settles back once the water is still.
+    [Test]
+    public void FloatingThings_ArePushedAwayByTheWaves_AndSettleBack()
+    {
+        int n = WaterRipples.Resolution, centre = n / 2;
+        WaterRipples.AddStamp(Vector3.zero, 0.5f, 0.5f);
+        WaterRipples.Run(1, Vector3.zero);
+        Color[] shoved = ReadField();
+        int east = centre * n + centre + 3, west = centre * n + centre - 3, north = (centre + 3) * n + centre;
+        Assert.Greater(shoved[east].b, 0.01f, "shoved east on the east side of the feet");
+        Assert.Less(shoved[west].b, -0.01f, "and west on the west side");
+        Assert.Greater(shoved[north].a, 0.01f, "and north on the north side");
+
+        WaterRipples.Run(40, Vector3.zero);
+        Color[] carried = ReadField();
+        int ring = centre * n + centre + 12; // about 1.1 m out, beyond the stamp
+        Assert.AreEqual(0f, shoved[ring].b, 1e-4f, "untouched before the wave came");
+        Assert.Greater(carried[ring].b, 1e-3f, "carried outward as the wave passed");
+
+        for (int i = 0; i < 40; i++)
+        {
+            WaterRipples.Run(30, Vector3.zero);
+        }
+
+        Assert.Less(ReadField().Max(c => Mathf.Abs(c.b) + Mathf.Abs(c.a)), carried.Max(c => Mathf.Abs(c.b) + Mathf.Abs(c.a)) * 0.3f, "settled back");
+    }
+
     [Test]
     public void Ripples_FollowTheCentreOnTheTexelGrid()
     {

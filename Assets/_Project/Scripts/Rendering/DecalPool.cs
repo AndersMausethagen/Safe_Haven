@@ -42,6 +42,8 @@ public sealed class DecalPool : MonoBehaviour
             projector.drawDistance = 80f;
             projector.startAngleFade = 60f;
             projector.endAngleFade = 85f;
+            // Blood and footprints are pressed onto the ground: they leave whoever stands in them alone.
+            GroundDecals.Paint(projector);
             marks.Add(new Mark { Projector = projector });
         }
 

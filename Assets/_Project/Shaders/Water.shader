@@ -296,16 +296,30 @@ Shader "Safe Haven/Water"
                 return ripples;
             }
 
+            // How far the waves and the feet have pushed what floats at a world point (WaterRipples' drift, metres), faded out at
+            // the edge of the field round the player.
+            float2 FloatDrift(float2 xz)
+            {
+                float2 uv = (xz - _WaterRippleRect.xy) * _WaterRippleRect.z;
+                float edge = saturate(min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)) * 12.0);
+                return edge > 0 ? SAMPLE_TEXTURE2D_LOD(_WaterRippleTex, sampler_WaterRippleTex, uv, 0).ba * edge : 0;
+            }
+
             // Duckweed or leaves afloat (W5): one bit to a cell (tighter as the amount rises), each its own place, size, turn and shade,
-            // only in drifts of slow noise with open water between. p in metres; tone picks between the two colours.
-            half FloatingBits(float2 p, out half tone)
+            // only in drifts of slow noise with open water between. p in metres, as carried by the current; carry = world - p; tone
+            // picks between the two colours. Pushed (WaterRipples' drift), each bit moves whole by the drift at its own middle, so
+            // it keeps its shape (the user, 2026-11-20: pushed per pixel, the leaves stretched into rings).
+            half FloatingBits(float2 p, float2 carry, out half tone)
             {
                 tone = 0;
                 float size = max(_FloatingSize, 0.01);
                 float cell = size * lerp(3.2, 1.3, saturate(_Floating));
-                float2 g = p / cell;
+                bool drifted = _WaterRippleOn > 0.5;
+                float2 search = drifted ? p - FloatDrift(p + carry) : p;
+                float2 g = search / cell;
                 float2 id = floor(g);
                 half best = 0;
+                float2 bestHome = search;
                 [unroll] for (int y = -1; y <= 1; y++)
                 {
                     [unroll] for (int x = -1; x <= 1; x++)
@@ -314,7 +328,8 @@ Shader "Safe Haven/Water"
                         float h1 = frac(sin(dot(c, float2(127.1, 311.7))) * 43758.5453);
                         float h2 = frac(sin(dot(c, float2(269.5, 183.3))) * 43758.5453);
                         float h3 = frac(sin(dot(c, float2(419.2, 371.9))) * 43758.5453);
-                        float2 d = (g - c - float2(h1, h2)) * cell;
+                        float2 home = (c + float2(h1, h2)) * cell;
+                        float2 d = p - (drifted ? home + FloatDrift(home + carry) : home);
                         float angle = h3 * 6.2831853;
                         float sn, cs;
                         sincos(angle, sn, cs);
@@ -338,19 +353,23 @@ Shader "Safe Haven/Water"
                         {
                             best = bit;
                             tone = h2;
+                            bestHome = home;
                         }
                     }
                 }
 
-                float2 q = p / max(_FloatingPatches, 0.5);
+                // Whether a bit lies in a drift is read where it came from, once for the whole bit, so a pushed one isn't cut off.
+                float2 q = bestHome / max(_FloatingPatches, 0.5);
                 half drift = SeasonSnowNoise(q) * 0.7 + SeasonSnowNoise(q * 2.3 + 3.1) * 0.3;
                 half from = lerp(0.66, 0.4, saturate(_Floating));
                 half bits = best * smoothstep(from, from + lerp(0.14, 0.15, saturate(_Floating)), drift);
+                float2 qMat = search / max(_FloatingPatches, 0.5);
+                half driftMat = SeasonSnowNoise(qMat) * 0.7 + SeasonSnowNoise(qMat * 2.3 + 3.1) * 0.3;
                 // A thick drift (duckweed above half) closes into a mat at its heart, the loose bits round its edge; a few leaves never do.
-                half mat = smoothstep(from + 0.14, from + 0.26, drift) * saturate((_Floating - 0.4) * 2.5);
+                half mat = smoothstep(from + 0.14, from + 0.26, driftMat) * saturate((_Floating - 0.4) * 2.5);
                 // Torn and uneven: open water shows through a mat in specks, its shade wanders.
-                mat *= smoothstep(0.28, 0.55, SeasonSnowNoise(p * 1.7 + 4.3) * 0.65 + SeasonSnowNoise(p * 4.1 + 1.9) * 0.35);
-                tone = lerp(tone, SeasonSnowNoise(p * 0.9 + 7.7), mat);
+                mat *= smoothstep(0.28, 0.55, SeasonSnowNoise(search * 1.7 + 4.3) * 0.65 + SeasonSnowNoise(search * 4.1 + 1.9) * 0.35);
+                tone = lerp(tone, SeasonSnowNoise(search * 0.9 + 7.7), mat);
                 return max(bits, mat * lerp(0.65, 1.0, best));
             }
 
@@ -676,6 +695,7 @@ Shader "Safe Haven/Water"
                 {
                     float2 windDir = dot(_SafeHavenWind.xy, _SafeHavenWind.xy) > 1e-4 ? normalize(_SafeHavenWind.xy) : float2(0.6, 0.8);
                     float2 carried = flatSpeed > 0.02 ? input.flow * 0.85 : windDir * 0.035;
+                    float2 at = positionWS.xz;
                     if (_FlowFromMesh > 0.5 && flatSpeed > 0.02)
                     {
                         float cycle = 7.0;
@@ -683,8 +703,8 @@ Shader "Safe Haven/Water"
                         float t1 = frac(time / cycle + 0.5);
                         half w0 = 1.0 - abs(1.0 - 2.0 * t0);
                         half tone0, tone1;
-                        half b0 = FloatingBits(positionWS.xz - carried * cycle * t0, tone0);
-                        half b1 = FloatingBits(positionWS.xz - carried * cycle * t1 + 17.3, tone1);
+                        half b0 = FloatingBits(at - carried * cycle * t0, carried * cycle * t0, tone0);
+                        half b1 = FloatingBits(at - carried * cycle * t1 + 17.3, carried * cycle * t1 - 17.3, tone1);
                         bits = lerp(b1, b0, w0);
                         half3 tint0 = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone0);
                         half3 tint1 = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone1);
@@ -694,7 +714,7 @@ Shader "Safe Haven/Water"
                     else
                     {
                         half tone;
-                        bits = FloatingBits(positionWS.xz - carried * time, tone);
+                        bits = FloatingBits(at - carried * time, carried * time, tone);
                         floatTint = lerp(_FloatingColor.rgb, _FloatingColor2.rgb, tone);
                     }
 

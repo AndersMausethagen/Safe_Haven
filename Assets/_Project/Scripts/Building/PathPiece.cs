@@ -102,6 +102,7 @@ public sealed class PathPiece : MonoBehaviour
         decal.fadeFactor = 1f;
         decal.startAngleFade = 50f;
         decal.endAngleFade = 75f;
+        GroundDecals.Paint(decal);
     }
 
     /// <summary>

@@ -17,6 +17,7 @@ public sealed class GroundRing : MonoBehaviour
     private void Start()
     {
         var decal = GetComponent<DecalProjector>();
+        GroundDecals.Paint(decal);
         float radius = Mathf.Max(decal.size.x, decal.size.y) * 0.5f;
         Vector3 centre = transform.position;
         float low = float.MaxValue, high = float.MinValue;

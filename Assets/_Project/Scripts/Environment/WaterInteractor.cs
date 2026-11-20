@@ -51,6 +51,10 @@ public sealed class WaterInteractor : MonoBehaviour
     private bool hasLast;
     private bool inWater;
     private float pending;
+    // How far it moved (x, z) since its last stamp: what floats under it is dragged along (WaterRipples' drift).
+    private Vector3 pendingMoved;
+    // Its wake a share stronger than the Moving rate (a swimmer's bow: PlayerSwimming).
+    private float wake = 1f;
     private float spotStrength;
     private float surface;
 
@@ -91,6 +95,13 @@ public sealed class WaterInteractor : MonoBehaviour
     }
 
     public Vector3 Point => transform.TransformPoint(offset);
+
+    /// <summary>How much stronger than walking its wake is while it moves through the water (1 as made; a swimmer's is more).</summary>
+    public float Wake
+    {
+        get => wake;
+        set => wake = Mathf.Max(0f, value);
+    }
 
     public bool InWater => inWater;
 
@@ -237,6 +248,7 @@ public sealed class WaterInteractor : MonoBehaviour
         if (!wet)
         {
             pending = 0f;
+            pendingMoved = Vector3.zero;
             inWater = false;
             return;
         }
@@ -249,7 +261,12 @@ public sealed class WaterInteractor : MonoBehaviour
         }
 
         inWater = true;
-        pending += (kind == Kind.Constant ? ChurnRipples : horizontal * MoveRipples) * ripples * deltaTime;
+        pending += (kind == Kind.Constant ? ChurnRipples : horizontal * MoveRipples * wake) * ripples * deltaTime;
+        if (kind == Kind.Moving && inWater)
+        {
+            // At most a sprint: a jump of the point itself (a teleport, the swimmer's point moving to the chest) drags nothing.
+            pendingMoved += Vector3.ClampMagnitude(new Vector3(velocity.x, 0f, velocity.z), 8f) * deltaTime;
+        }
         if (stepping && pending > 1e-4f)
         {
             Vector3 at = point;
@@ -261,8 +278,9 @@ public sealed class WaterInteractor : MonoBehaviour
                 size = radius * 0.35f;
             }
 
-            WaterRipples.AddStamp(at, size, pending);
+            WaterRipples.AddStamp(at, size, pending, pendingMoved);
             pending = 0f;
+            pendingMoved = Vector3.zero;
         }
 
         spotStrength = kind == Kind.Constant ? foam : foam * Mathf.Clamp01(horizontal / 3f);

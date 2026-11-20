@@ -603,6 +603,7 @@ public static class GroundImpacts
             projector.size = new Vector3(size, size, 2f);
             projector.pivot = Vector3.zero;
             projector.fadeFactor = 1f;
+            GroundDecals.Paint(projector);
             decals.Add(new DecalState { Projector = projector, Born = Time.time, Lasts = lasts });
         }
 

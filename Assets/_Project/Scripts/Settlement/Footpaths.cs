@@ -188,6 +188,7 @@ public sealed class Footpaths : MonoBehaviour
             decal.size = new Vector3(DecalSize, DecalSize, 1.6f);
             decal.pivot = Vector3.zero;
             decal.drawDistance = 70f;
+            GroundDecals.Paint(decal);
             decals.Add(decal);
         }
 

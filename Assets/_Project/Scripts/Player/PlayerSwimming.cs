@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 /// <summary>
@@ -10,7 +10,7 @@ using UnityEngine;
 /// up under them near the bank.
 /// <para>
 /// The water is found through <see cref="WaterSurface"/> (ponds and rivers, not waterfalls); the numbers are in
-/// PlayerMovementSettings › Water. Runs before PlayerMovement so this frame's speed and float height are used.
+/// PlayerMovementSettings â€º Water. Runs before PlayerMovement so this frame's speed and float height are used.
 /// </para>
 /// </summary>
 [DisallowMultipleComponent]
@@ -23,10 +23,23 @@ public sealed class PlayerSwimming : MonoBehaviour
     private const float StandMargin = 0.1f;
     // Out of the water this much shallower than Swim Depth stands the player even without the bottom (a failsafe).
     private const float LeaveMargin = 0.5f;
+    // Swimming, the body lies along the surface: its ripples (and what they push aside, the leaves and duckweed) come from the
+    // chest at the surface and are this wide, not the feet's (the user, 2026-11-20: swimming through the leaves should move them).
+    private const float SwimmingRippleRadius = 0.75f;
+    // And a swimmer's wake is this much stronger than wading's: a bow wave, not footsteps. Each stroke's hand going into the
+    // water ripples and splashes as a footstep does.
+    private const float SwimmingWake = 1.8f;
+    private const float StrokeEntry = 0.03f;
 
     private PlayerMovement movement;
     private PlayerStateMachine stateMachine;
     private PlayerStamina stamina;
+    private WaterInteractor ripples;
+    private Transform chest;
+    private Transform leftHand, rightHand;
+    private float leftWasOver, rightWasOver;
+    private Vector3 wadingOffset;
+    private float wadingRadius;
 
     /// <summary>True while swimming (deep water); false wading or on land.</summary>
     public bool IsSwimming { get; private set; }
@@ -47,6 +60,18 @@ public sealed class PlayerSwimming : MonoBehaviour
         movement = GetComponent<PlayerMovement>();
         stateMachine = GetComponent<PlayerStateMachine>();
         stamina = GetComponent<PlayerStamina>();
+        ripples = GetComponentInChildren<WaterInteractor>();
+        if (ripples != null)
+        {
+            wadingOffset = ripples.Offset;
+            wadingRadius = ripples.Radius;
+        }
+
+        Animator animator = GetComponentInChildren<Animator>();
+        bool human = animator != null && animator.isHuman;
+        chest = human ? animator.GetBoneTransform(HumanBodyBones.Chest) : null;
+        leftHand = human ? animator.GetBoneTransform(HumanBodyBones.LeftHand) : null;
+        rightHand = human ? animator.GetBoneTransform(HumanBodyBones.RightHand) : null;
     }
 
     private void OnDisable()
@@ -91,6 +116,32 @@ public sealed class PlayerSwimming : MonoBehaviour
         {
             stamina.Drain(stamina.SwimCostPerSecond * movement.InputMagnitude * Time.deltaTime);
         }
+
+        if (IsSwimming && ripples != null && chest != null)
+        {
+            // The chest at the surface (the ripples sense the water within their radius of it).
+            Vector3 atSurface = new Vector3(chest.position.x, SurfaceHeight, chest.position.z);
+            ripples.Offset = ripples.transform.InverseTransformPoint(atSurface);
+            Stroke(leftHand, ref leftWasOver);
+            Stroke(rightHand, ref rightWasOver);
+        }
+    }
+
+    // A hand coming down through the surface: a ripple and a splash where it goes in.
+    private void Stroke(Transform hand, ref float wasOver)
+    {
+        if (hand == null)
+        {
+            return;
+        }
+
+        float over = hand.position.y - SurfaceHeight;
+        if (wasOver > StrokeEntry && over <= StrokeEntry)
+        {
+            ripples.SplashFootstep(new Vector3(hand.position.x, SurfaceHeight, hand.position.z));
+        }
+
+        wasOver = over;
     }
 
     /// <summary>Whether the player swims this frame: from <paramref name="swimDepth"/> of water at the feet; a swimmer
@@ -115,6 +166,16 @@ public sealed class PlayerSwimming : MonoBehaviour
 
         IsSwimming = swimming;
         stateMachine.SetSwimming(swimming);
+        if (ripples != null)
+        {
+            ripples.Radius = swimming ? SwimmingRippleRadius : wadingRadius;
+            ripples.Wake = swimming ? SwimmingWake : 1f;
+            leftWasOver = rightWasOver = 0f;
+            if (!swimming)
+            {
+                ripples.Offset = wadingOffset;
+            }
+        }
         if (!swimming)
         {
             movement.StopFloating();

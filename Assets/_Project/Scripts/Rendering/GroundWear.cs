@@ -75,13 +75,13 @@ public sealed class GroundWear : MonoBehaviour
         // Trampled ground: a thin box down onto the ground round the footprint, so the building's own floors and benches stay
         // clean; its walls are spared by the angle fade.
         Add(root, settings.TrampledDecal, foot + Vector3.down * 0.1f, Quaternion.LookRotation(Vector3.down, Vector3.forward),
-            new Vector3(bounds.size.x * scale.x + margin * 2f, bounds.size.z * scale.z + margin * 2f, 0.8f), 40f, 70f);
+            new Vector3(bounds.size.x * scale.x + margin * 2f, bounds.size.z * scale.z + margin * 2f, 0.8f), 40f, 70f, true);
 
         if (definition.Station == CraftingStationType.Campfire && settings.ScorchDecal != null)
         {
             float across = Mathf.Max(1.6f, Mathf.Min(bounds.size.x, bounds.size.z) * 1.3f);
             Add(root, settings.ScorchDecal, foot + Vector3.down * 0.1f, Quaternion.LookRotation(Vector3.down, Vector3.forward),
-                new Vector3(across, across, 0.8f), 40f, 70f);
+                new Vector3(across, across, 0.8f), 40f, 70f, true);
         }
 
         // Grime up the foot of the walls: one thin slab on each side, round the wall's face, so it catches the wall and a
@@ -98,13 +98,13 @@ public sealed class GroundWear : MonoBehaviour
                 float reach = side < 2 ? half.z : half.x;
                 Vector3 at = foot + outward * (reach + 0.02f) + Vector3.up * (height * 0.5f - 0.05f);
                 Add(root, settings.GrimeDecal, at, Quaternion.LookRotation(-outward, Vector3.up),
-                    new Vector3(along + 0.2f, height, 0.2f), 50f, 80f);
+                    new Vector3(along + 0.2f, height, 0.2f), 50f, 80f, false);
             }
         }
     }
 
     private static void Add(Transform root, Material material, Vector3 localPosition, Quaternion localRotation, Vector3 size,
-        float fadeStart, float fadeEnd)
+        float fadeStart, float fadeEnd, bool onGround)
     {
         var go = new GameObject(material.name);
         go.transform.SetParent(root, false);
@@ -117,5 +117,10 @@ public sealed class GroundWear : MonoBehaviour
         projector.drawDistance = 70f;
         projector.startAngleFade = fadeStart;
         projector.endAngleFade = fadeEnd;
+        // Trampled ground and scorch paint only the ground (GroundDecals); the grime is for the wall, so it keeps Default.
+        if (onGround)
+        {
+            GroundDecals.Paint(projector);
+        }
     }
 }
