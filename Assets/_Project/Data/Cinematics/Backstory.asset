@@ -17,7 +17,7 @@ MonoBehaviour:
   shots:
   - name: A Small Fire
     arrives: 2
-    arriveSeconds: 1.2
+    arriveSeconds: 0.72
     layers:
     - name: Far
       kind: 0
@@ -40,18 +40,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.093669504
+          time: 0.047507804
           value: 0
           inSlope: -0
-          outSlope: 10.675833
+          outSlope: 21.049173
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.18733901
+          time: 0.09501561
           value: 1
-          inSlope: 10.675833
+          inSlope: 21.049173
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -108,18 +108,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.093669504
+          time: 0.047507804
           value: 0
           inSlope: -0
-          outSlope: 10.675833
+          outSlope: 21.049173
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.18733901
+          time: 0.09501561
           value: 1
-          inSlope: 10.675833
+          inSlope: 21.049173
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -176,18 +176,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.093669504
+          time: 0.047507804
           value: 0
           inSlope: -0
-          outSlope: 10.675833
+          outSlope: 21.049173
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.18733901
+          time: 0.09501561
           value: 1
-          inSlope: 10.675833
+          inSlope: 21.049173
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -238,33 +238,33 @@ MonoBehaviour:
           time: 0
           value: 0
           inSlope: 0
-          outSlope: 40.034374
+          outSlope: 78.934395
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.024978535
+          time: 0.012668749
           value: 1
-          inSlope: 40.034374
+          inSlope: 78.934395
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.093669504
+          time: 0.047507804
           value: 1
           inSlope: -0
-          outSlope: -6.4055004
+          outSlope: -12.629505
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.18733901
+          time: 0.09501561
           value: 0.4
-          inSlope: -6.4055004
+          inSlope: -12.629505
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -321,27 +321,27 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.21231754
+          time: 0.10768437
           value: 0
           inSlope: -0
-          outSlope: 59.31017
+          outSlope: 41.762978
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.22917806
+          time: 0.13162902
           value: 1
-          inSlope: 59.31017
-          outSlope: -22.241325
+          inSlope: 41.762978
+          outSlope: -15.661115
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.2741394
+          time: 0.19548143
           value: 0
-          inSlope: -22.241325
+          inSlope: -15.661115
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -398,27 +398,27 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.24041839
+          time: 0.14759211
           value: 0
           inSlope: -0
-          outSlope: 59.310223
+          outSlope: 41.762962
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.2572789
+          time: 0.17153677
           value: 1
-          inSlope: 59.310223
-          outSlope: -22.241318
+          inSlope: 41.762962
+          outSlope: -15.661115
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.30224025
+          time: 0.23538919
           value: 0
-          inSlope: -22.241318
+          inSlope: -15.661115
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -475,27 +475,27 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.26851925
+          time: 0.18749991
           value: 0
           inSlope: -0
-          outSlope: 59.31017
+          outSlope: 41.762962
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.28537977
+          time: 0.21144457
           value: 1
-          inSlope: 59.31017
-          outSlope: -22.241318
+          inSlope: 41.762962
+          outSlope: -15.661107
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.33034113
+          time: 0.27529702
           value: 0
-          inSlope: -22.241318
+          inSlope: -15.661107
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -641,37 +641,37 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 6a6d550ee35a17a4682cd9416be046e3, type: 3}
       subtitle: A fire is a small thing, little one.
-      pauseBefore: 3.4
+      pauseBefore: 1.2142489
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 499b24f841ac97f49987db4cb8ea2854, type: 3}
       subtitle: Until it is all that stands between home and the dark.
-      pauseBefore: 5.38
+      pauseBefore: 3.2280002
       secondsWithoutVoice: 2.5
-    holdAfter: 1
+    holdAfter: 0.6
     sounds:
     - clip: {fileID: 8300000, guid: f08f68683ae63934fabad8b506b52a8f, type: 3}
-      at: 1.3
+      at: 0.4642716
       volume: 0.32
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: ff8fb2148df581d46ad295c86acf945f, type: 3}
-      at: 1.5
+      at: 0.535698
       volume: 0.32
       loop: 1
       fade: 1.2
     - clip: {fileID: 8300000, guid: 121404ad52412b340afee6cb09e898f7, type: 3}
-      at: 2.4
+      at: 0.8571169
       volume: 0.22
       loop: 1
       fade: 3
     - clip: {fileID: 8300000, guid: d6d1e09caac9f9146bad6c07a26db6fb, type: 3}
-      at: 3.3
+      at: 1.1785357
       volume: 0.25
       loop: 0
       fade: 0.1
   - name: The Bargain
     arrives: 1
-    arriveSeconds: 2.2
+    arriveSeconds: 1.32
     layers:
     - name: Far
       kind: 0
@@ -788,34 +788,34 @@ MonoBehaviour:
           time: 0
           value: 0.35
           inSlope: 0
-          outSlope: 2.6
+          outSlope: 2.7916
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.25
+          time: 0.23284137
           value: 1
-          inSlope: 2.6
-          outSlope: -2.4
+          inSlope: 2.7916
+          outSlope: -2.7153485
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.5
+          time: 0.4538075
           value: 0.4
-          inSlope: -2.4
-          outSlope: 2.4
+          inSlope: -2.7153485
+          outSlope: 2.313861
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.75
+          time: 0.7131144
           value: 1
-          inSlope: 2.4
-          outSlope: -2
+          inSlope: 2.313861
+          outSlope: -1.7428548
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -823,7 +823,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.5
-          inSlope: -2
+          inSlope: -1.7428548
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1060,17 +1060,17 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 2a5cb7200f5077b459e4b91a8aaec424, type: 3}
       subtitle: Your people made a bargain with the woods.
-      pauseBefore: 3
+      pauseBefore: 1.914
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: ed6ee76e5a019a649993513addb44a78, type: 3}
       subtitle: They would leave it room to live.
-      pauseBefore: 4.34
+      pauseBefore: 2.604
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 23a0ca3c53932bb47b37180580c8b423, type: 3}
       subtitle: Its guardians would hold the older hunger beyond the trees.
-      pauseBefore: 0.6
+      pauseBefore: 0.36
       secondsWithoutVoice: 2.5
-    holdAfter: 0.9
+    holdAfter: 0.54
     sounds:
     - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 0
@@ -1078,23 +1078,23 @@ MonoBehaviour:
       loop: 1
       fade: 1.5
     - clip: {fileID: 8300000, guid: abbb49de8e0306f44807c0280fe52ee7, type: 3}
-      at: 1.2
+      at: 0.7656
       volume: 0.14
       loop: 0
       fade: 0.3
     - clip: {fileID: 8300000, guid: 0349f31f793db2f43b85c009ecdc4899, type: 3}
-      at: 5.4
+      at: 4.279567
       volume: 0.12
       loop: 0
       fade: 0.3
     - clip: {fileID: 8300000, guid: ba3050625acb031479912eaf9d6e96c8, type: 3}
-      at: 9.6
+      at: 6.7995667
       volume: 0.12
       loop: 0
       fade: 0.3
   - name: The Ward
     arrives: 1
-    arriveSeconds: 1.8
+    arriveSeconds: 1.08
     layers:
     - name: Far
       kind: 0
@@ -1267,28 +1267,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.41477072
+          time: 0.431296
           value: 0.1
           inSlope: -0
-          outSlope: 9.999996
+          outSlope: 8.046528
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.50477076
+          time: 0.5431455
           value: 1
-          inSlope: 9.999996
-          outSlope: -2.8125005
+          inSlope: 8.046528
+          outSlope: -3.9601803
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6647707
+          time: 0.65677667
           value: 0.55
-          inSlope: -2.8125005
-          outSlope: -0.14915168
+          inSlope: -3.9601803
+          outSlope: -0.14567778
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1296,7 +1296,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.5
-          inSlope: -0.14915168
+          inSlope: -0.14567778
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1344,19 +1344,19 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8345895
+          time: 0.84462297
           value: 0.2
           inSlope: -0
-          outSlope: 29.430357
+          outSlope: 23.681248
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8617723
+          time: 0.878405
           value: 1
-          inSlope: 29.430357
-          outSlope: -1.4468879
+          inSlope: 23.681248
+          outSlope: -1.644804
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1364,7 +1364,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.8
-          inSlope: -1.4468879
+          inSlope: -1.644804
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1412,19 +1412,19 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8345895
+          time: 0.84462297
           value: 0.2
           inSlope: -0
-          outSlope: 29.430357
+          outSlope: 23.681248
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8617723
+          time: 0.878405
           value: 1
-          inSlope: 29.430357
-          outSlope: -1.4468879
+          inSlope: 23.681248
+          outSlope: -1.644804
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1432,7 +1432,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.8
-          inSlope: -1.4468879
+          inSlope: -1.644804
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1480,28 +1480,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.80740666
+          time: 0.8108409
           value: 0
           inSlope: -0
-          outSlope: 45.98501
+          outSlope: 37.00198
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8291529
+          time: 0.8378665
           value: 1
-          inSlope: 45.98501
-          outSlope: -10.869169
+          inSlope: 37.00198
+          outSlope: -8.745912
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.88895506
+          time: 0.9121869
           value: 0.35
-          inSlope: -10.869169
-          outSlope: -0.45026797
+          inSlope: -8.745912
+          outSlope: -0.5693911
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1509,7 +1509,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.3
-          inSlope: -0.45026797
+          inSlope: -0.5693911
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1557,28 +1557,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7802239
+          time: 0.77705896
           value: 0
           inSlope: -0
-          outSlope: 45.98501
+          outSlope: 37.00198
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8019701
+          time: 0.80408454
           value: 1
-          inSlope: 45.98501
-          outSlope: -10.869169
+          inSlope: 37.00198
+          outSlope: -8.745912
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8617723
+          time: 0.878405
           value: 0.35
-          inSlope: -10.869169
-          outSlope: -0.36172187
+          inSlope: -8.745912
+          outSlope: -0.41120088
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1586,7 +1586,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.3
-          inSlope: -0.36172187
+          inSlope: -0.41120088
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1634,28 +1634,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7530411
+          time: 0.74327695
           value: 0
           inSlope: -0
-          outSlope: 45.98501
+          outSlope: 37.00198
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7747873
+          time: 0.77030253
           value: 1
-          inSlope: 45.98501
-          outSlope: -10.869169
+          inSlope: 37.00198
+          outSlope: -8.745912
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8345895
+          time: 0.84462297
           value: 0.35
-          inSlope: -10.869169
-          outSlope: -0.30227813
+          inSlope: -8.745912
+          outSlope: -0.3217978
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1663,7 +1663,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.3
-          inSlope: -0.30227813
+          inSlope: -0.3217978
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1711,28 +1711,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.72585833
+          time: 0.709495
           value: 0
           inSlope: -0
-          outSlope: 45.98501
+          outSlope: 37.00198
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.74760455
+          time: 0.7365206
           value: 1
-          inSlope: 45.98501
-          outSlope: -10.869169
+          inSlope: 37.00198
+          outSlope: -8.745912
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8074067
+          time: 0.810841
           value: 0.35
-          inSlope: -10.869169
-          outSlope: -0.25961438
+          inSlope: -8.745912
+          outSlope: -0.26432785
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1740,7 +1740,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.3
-          inSlope: -0.25961438
+          inSlope: -0.26432785
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -1788,28 +1788,28 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6986755
+          time: 0.67571294
           value: 0
           inSlope: -0
-          outSlope: 45.98501
+          outSlope: 37.00198
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.72042173
+          time: 0.7027385
           value: 1
-          inSlope: 45.98501
-          outSlope: -10.869169
+          inSlope: 37.00198
+          outSlope: -8.745912
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7802239
+          time: 0.77705896
           value: 0.35
-          inSlope: -10.869169
-          outSlope: -0.2275042
+          inSlope: -8.745912
+          outSlope: -0.22427447
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
@@ -1817,7 +1817,7 @@ MonoBehaviour:
         - serializedVersion: 3
           time: 1
           value: 0.3
-          inSlope: -0.2275042
+          inSlope: -0.22427447
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2054,17 +2054,17 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 4d6782210c2502a4987cf92b81d75f52, type: 3}
       subtitle: Beside my stones, they kept a hearth.
-      pauseBefore: 1.81
+      pauseBefore: 1.086
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 210566a1653d48f45beafa7a9b06aa44, type: 3}
       subtitle: Their flame fed my ward.
-      pauseBefore: 0.7
+      pauseBefore: 0.5519593
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 7c3cc4e1128d40f40a2ce3570b2b2a57, type: 3}
       subtitle: My ward kept the night from their doors.
-      pauseBefore: 2.04
+      pauseBefore: 0.9167938
       secondsWithoutVoice: 2.5
-    holdAfter: 1.3
+    holdAfter: 0.78000003
     sounds:
     - clip: {fileID: 8300000, guid: ff8fb2148df581d46ad295c86acf945f, type: 3}
       at: 0
@@ -2077,18 +2077,18 @@ MonoBehaviour:
       loop: 1
       fade: 1.5
     - clip: {fileID: 8300000, guid: 3ef06b8f8d20d364db95db894f825dc1, type: 3}
-      at: 0.7
+      at: 0.42
       volume: 0.16
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: d6d1e09caac9f9146bad6c07a26db6fb, type: 3}
-      at: 5.8871202
+      at: 5.01508
       volume: 0.3
       loop: 0
       fade: 0.1
   - name: The Years
     arrives: 1
-    arriveSeconds: 1.8
+    arriveSeconds: 1.08
     layers:
     - name: Summer
       kind: 0
@@ -2161,18 +2161,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.32
+          time: 0.2978576
           value: 0
           inSlope: -0
-          outSlope: 6.25
+          outSlope: 4.415549
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.48
+          time: 0.52433
           value: 1
-          inSlope: 6.25
+          inSlope: 4.415549
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2229,18 +2229,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.64
+          time: 0.6942623
           value: 0
           inSlope: -0
-          outSlope: 6.249999
+          outSlope: 7.359248
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8
+          time: 0.8301458
           value: 1
-          inSlope: 6.249999
+          inSlope: 7.359248
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2297,36 +2297,36 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.36
+          time: 0.35447574
           value: 0
           inSlope: -0
-          outSlope: 8.333335
+          outSlope: 5.887399
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.48
+          time: 0.52433
           value: 1
-          inSlope: 8.333335
+          inSlope: 5.887399
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.66
+          time: 0.71124774
           value: 1
           inSlope: -0
-          outSlope: -10.000004
+          outSlope: -11.774799
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.76
+          time: 0.7961749
           value: 0
-          inSlope: -10.000004
+          inSlope: -11.774799
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2383,18 +2383,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.68
+          time: 0.7282332
           value: 0
           inSlope: -0
-          outSlope: 7.142858
+          outSlope: 8.410568
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.82
+          time: 0.84713125
           value: 1
-          inSlope: 7.142858
+          inSlope: 8.410568
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2490,43 +2490,43 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 238380594abe2f141a44b6a0c7bad4fc, type: 3}
       subtitle: For generations, each kept their part.
-      pauseBefore: 2.74
+      pauseBefore: 1.644
       secondsWithoutVoice: 2.5
-    holdAfter: 4.6
+    holdAfter: 2.76
     sounds:
     - clip: {fileID: 8300000, guid: c802fdaca99e9e848ae4ee64a6751508, type: 3}
-      at: 0.6
+      at: 0.36
       volume: 0.13
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: abbb49de8e0306f44807c0280fe52ee7, type: 3}
-      at: 2.6
+      at: 1.56
       volume: 0.11
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: f2bf1e8f53cb00f4aadd054c2f5427bb, type: 3}
-      at: 4.20126
+      at: 3.1052601
       volume: 0.12
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: 6b56ed5467c367f43bbd3ad001942e32, type: 3}
-      at: 5.0015
+      at: 3.9055004
       volume: 0.12
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: ada1efc531a590943bf4047e6f288f3d, type: 3}
-      at: 5.6016803
+      at: 4.4262085
       volume: 0.1
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
-      at: 6.60198
+      at: 5.026388
       volume: 0.2
       loop: 1
       fade: 1.2
   - name: The Fire Dies
     arrives: 1
-    arriveSeconds: 2.2
+    arriveSeconds: 1.32
     layers:
     - name: Far
       kind: 0
@@ -2649,18 +2649,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6280347
+          time: 0.7070503
           value: 0
           inSlope: -0
-          outSlope: 14.285716
+          outSlope: 17.075579
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6980347
+          time: 0.7656135
           value: 1
-          inSlope: 14.285716
+          inSlope: 17.075579
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2767,18 +2767,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6280347
+          time: 0.7070503
           value: 0
           inSlope: -0
-          outSlope: 14.285716
+          outSlope: 17.075579
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6980347
+          time: 0.7656135
           value: 1
-          inSlope: 14.285716
+          inSlope: 17.075579
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2879,33 +2879,33 @@ MonoBehaviour:
           time: 0
           value: 1
           inSlope: 0
-          outSlope: -0.31845373
+          outSlope: -0.2828653
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6280347
+          time: 0.7070503
           value: 0.8
-          inSlope: -0.31845373
-          outSlope: -21.666687
+          inSlope: -0.2828653
+          outSlope: -23.623432
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6580347
+          time: 0.7345654
           value: 0.15
-          inSlope: -21.666687
-          outSlope: -2.9999995
+          inSlope: -23.623432
+          outSlope: -3.8649702
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7080347
+          time: 0.7733755
           value: 0
-          inSlope: -2.9999995
+          inSlope: -3.8649702
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -2962,27 +2962,27 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6580347
+          time: 0.7345654
           value: 0
           inSlope: -0
-          outSlope: 100.0001
+          outSlope: 128.83253
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6680347
+          time: 0.7423274
           value: 1
-          inSlope: 100.0001
-          outSlope: -14.285716
+          inSlope: 128.83253
+          outSlope: -18.404608
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.73803467
+          time: 0.7966616
           value: 0
-          inSlope: -14.285716
+          inSlope: -18.404608
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -3033,24 +3033,24 @@ MonoBehaviour:
           time: 0
           value: 0.6
           inSlope: 0
-          outSlope: -0.1519677
+          outSlope: -0.13613495
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6580347
+          time: 0.7345654
           value: 0.5
-          inSlope: -0.1519677
-          outSlope: -4.1666665
+          inSlope: -0.13613495
+          outSlope: -5.368012
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7780347
+          time: 0.82770973
           value: 0
-          inSlope: -4.1666665
+          inSlope: -5.368012
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -3196,9 +3196,9 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: b291693000cac2e468f0073179062dda, type: 3}
       subtitle: Then, one winter, the fire died.
-      pauseBefore: 1.4
+      pauseBefore: 0.84000003
       secondsWithoutVoice: 2.5
-    holdAfter: 2.5
+    holdAfter: 1.5
     sounds:
     - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 0
@@ -3206,7 +3206,7 @@ MonoBehaviour:
       loop: 1
       fade: 1.5
     - clip: {fileID: 8300000, guid: f474a3a9d7c79ef48bdf770cddfd6049, type: 3}
-      at: 4.4720416
+      at: 3.8720417
       volume: 0.5
       loop: 0
       fade: 0.02
@@ -3524,13 +3524,13 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 978a93e08a9304b46846284980cdef78, type: 3}
       subtitle: The ward thinned.
-      pauseBefore: 0.6
+      pauseBefore: 0.36
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 195e67a8d9ecfb842b069a94cf5542c9, type: 3}
       subtitle: The old road began to turn.
-      pauseBefore: 0.8
+      pauseBefore: 0.48000002
       secondsWithoutVoice: 2.5
-    holdAfter: 1
+    holdAfter: 0.6
     sounds:
     - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
       at: 0
@@ -3538,7 +3538,7 @@ MonoBehaviour:
       loop: 1
       fade: 1
     - clip: {fileID: 8300000, guid: 835c0134f02d9904693338e52ff6b12d, type: 3}
-      at: 2.2
+      at: 1.8341668
       volume: 0.28
       loop: 0
       fade: 0.2
@@ -3806,22 +3806,22 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 88b431d0a7d8f784c90ac8ea0cb6a36a, type: 3}
       subtitle: The lost were still out there.
-      pauseBefore: 0.6
+      pauseBefore: 0.36
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: dfae0a61e0937ce48a2d7c99b23982bf, type: 3}
       subtitle: But little by little, the way to them was forgotten.
-      pauseBefore: 0.7
+      pauseBefore: 0.42000002
       secondsWithoutVoice: 2.5
-    holdAfter: 1.2
+    holdAfter: 0.72
     sounds:
     - clip: {fileID: 8300000, guid: 472eedd262c69694a98e11e14897ecc3, type: 3}
-      at: 0.2
+      at: 0.12
       volume: 0.22
       loop: 1
       fade: 0.8
   - name: The Clearing
     arrives: 1
-    arriveSeconds: 1.8
+    arriveSeconds: 1.08
     layers:
     - name: Far
       kind: 0
@@ -3888,69 +3888,69 @@ MonoBehaviour:
           time: 0
           value: 1
           inSlope: 0
-          outSlope: -6.8750005
+          outSlope: -8.459365
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.08
+          time: 0.0650167
           value: 0.45
-          inSlope: -6.8750005
-          outSlope: 6.111111
+          inSlope: -8.459365
+          outSlope: 5.064964
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.17
+          time: 0.17360583
           value: 1
-          inSlope: 6.111111
-          outSlope: -4.6153846
+          inSlope: 5.064964
+          outSlope: -4.234585
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.3
+          time: 0.31529623
           value: 0.4
-          inSlope: -4.6153846
-          outSlope: 3.0000007
+          inSlope: -4.234585
+          outSlope: 2.676402
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.45
+          time: 0.4834324
           value: 0.85
-          inSlope: 3.0000007
-          outSlope: -3.2352939
+          inSlope: 2.676402
+          outSlope: -3.105474
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.62
+          time: 0.66053903
           value: 0.3
-          inSlope: -3.2352939
-          outSlope: 0.9806775
+          inSlope: -3.105474
+          outSlope: 1.0925995
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.82394063
+          time: 0.8435887
           value: 0.5
-          inSlope: 0.9806775
-          outSlope: -8.333333
+          inSlope: 1.0925995
+          outSlope: -6.906768
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.88394064
+          time: 0.9159815
           value: 0
-          inSlope: -8.333333
+          inSlope: -6.906768
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4146,24 +4146,24 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 84465004a4ddb9146ad90d171ce6a307, type: 3}
       subtitle: I held one clearing for as long as I could.
-      pauseBefore: 0.9
+      pauseBefore: 0.54
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: c18e7508966acf543b92f7efe4acb77a, type: 3}
       subtitle: A hundred winters passed.
-      pauseBefore: 0.8
+      pauseBefore: 0.48000002
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 52b85b5395a42f34ab13d388bf9f4b13, type: 3}
       subtitle: My light grew thin.
-      pauseBefore: 0.8
+      pauseBefore: 0.48000002
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 3c7a1d77da7b23846b1173948d8dd59f, type: 3}
       subtitle: Then I slept.
-      pauseBefore: 1.8
+      pauseBefore: 1.08
       secondsWithoutVoice: 2.5
-    holdAfter: 1.6
+    holdAfter: 0.96000004
     sounds:
     - clip: {fileID: 8300000, guid: 59204797eea32644aa66b3eb86231d89, type: 3}
-      at: 3.5860424
+      at: 3.2260425
       volume: 0.32
       loop: 0
       fade: 0.5
@@ -4174,7 +4174,7 @@ MonoBehaviour:
       fade: 1.5
   - name: The First Four
     arrives: 1
-    arriveSeconds: 1.8
+    arriveSeconds: 1.08
     layers:
     - name: Far
       kind: 0
@@ -4297,18 +4297,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.54024637
+          time: 0.55797637
           value: 0
           inSlope: -0
-          outSlope: 33.333366
+          outSlope: 28.49222
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.57024634
+          time: 0.59307367
           value: 1
-          inSlope: 33.333366
+          inSlope: 28.49222
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4365,18 +4365,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.5302464
+          time: 0.54692316
           value: 1
           inSlope: -0
-          outSlope: -28.571455
+          outSlope: -24.813301
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.56524634
+          time: 0.5872241
           value: 0
-          inSlope: -28.571455
+          inSlope: -24.813301
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4433,18 +4433,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.68993413
+          time: 0.72470737
           value: 0
           inSlope: -0
-          outSlope: 33.333366
+          outSlope: 47.487167
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7199341
+          time: 0.7457657
           value: 1
-          inSlope: 33.333366
+          inSlope: 47.487167
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4501,18 +4501,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.67993414
+          time: 0.7176879
           value: 1
           inSlope: -0
-          outSlope: -28.571455
+          outSlope: -40.70322
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7149341
+          time: 0.742256
           value: 0
-          inSlope: -28.571455
+          inSlope: -40.70322
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4569,18 +4569,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.81039023
+          time: 0.8391672
           value: 0
           inSlope: -0
-          outSlope: 33.333366
+          outSlope: 28.49222
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8403902
+          time: 0.8742645
           value: 1
-          inSlope: 33.333366
+          inSlope: 28.49222
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4637,18 +4637,18 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.80039024
+          time: 0.82746804
           value: 1
           inSlope: -0
-          outSlope: -28.571455
+          outSlope: -24.421871
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.8353902
+          time: 0.86841494
           value: 0
-          inSlope: -28.571455
+          inSlope: -24.421871
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -4894,30 +4894,30 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: c72938ea78e72b94784c1f7c0eab0c55, type: 3}
       subtitle: Much later, four walked the old road to learn what had changed.
-      pauseBefore: 0.9
+      pauseBefore: 0.54
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 739dc573aa356df42b18c80713c69d23, type: 3}
       subtitle: Their lights went in.
-      pauseBefore: 0.8
+      pauseBefore: 0.48000002
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: f621775972508d24295d4390e3f5dafd, type: 3}
       subtitle: None came back.
-      pauseBefore: 0.8
+      pauseBefore: 0.48000002
       secondsWithoutVoice: 2.5
-    holdAfter: 1.4
+    holdAfter: 0.84000003
     sounds:
     - clip: {fileID: 8300000, guid: 526b8e5b2f6a215439d83f455182c2ce, type: 3}
-      at: 5.8603334
+      at: 5.180333
       volume: 0.3
       loop: 0
       fade: 0.02
     - clip: {fileID: 8300000, guid: 526b8e5b2f6a215439d83f455182c2ce, type: 3}
-      at: 7.4681673
+      at: 6.688167
       volume: 0.3
       loop: 0
       fade: 0.02
     - clip: {fileID: 8300000, guid: 526b8e5b2f6a215439d83f455182c2ce, type: 3}
-      at: 8.762016
+      at: 7.7620163
       volume: 0.3
       loop: 0
       fade: 0.02
@@ -4927,32 +4927,32 @@ MonoBehaviour:
       loop: 1
       fade: 1.2
     - clip: {fileID: 8300000, guid: a0c5a172b64fee94f8c4da1a07092ad3, type: 3}
-      at: 0.6
+      at: 0.36
       volume: 0.2
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: fa48f07b33ba76741873f7ef96013678, type: 3}
-      at: 1.3
+      at: 0.94
       volume: 0.17
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: c189cfebc66c4d444a6cfb5e677c44f2, type: 3}
-      at: 2
+      at: 1.64
       volume: 0.14
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: 2881f253488ad9a42b776aff565e4db0, type: 3}
-      at: 2.7
+      at: 2.3400002
       volume: 0.11000001
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: a0c5a172b64fee94f8c4da1a07092ad3, type: 3}
-      at: 3.4
+      at: 3.0400002
       volume: 0.080000006
       loop: 0
       fade: 0.05
     - clip: {fileID: 8300000, guid: fa48f07b33ba76741873f7ef96013678, type: 3}
-      at: 4.1
+      at: 3.7399998
       volume: 0.050000004
       loop: 0
       fade: 0.05
@@ -5370,30 +5370,30 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 0fadf7ed7eda0a0499b9a9e30e6f267d, type: 3}
       subtitle: Four more prepared to follow.
-      pauseBefore: 2.21
+      pauseBefore: 1.3260001
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 28566468336520b4db67dcdfed25f2ba, type: 3}
       subtitle: One of them was you.
-      pauseBefore: 0.7
+      pauseBefore: 0.42000002
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: f5822a83098242f4199600c36e46d53a, type: 3}
       subtitle: Why you came is yours to say.
-      pauseBefore: 2.43
+      pauseBefore: 1.8993754
       secondsWithoutVoice: 2.5
-    holdAfter: 1
+    holdAfter: 0.6
     sounds:
     - clip: {fileID: 8300000, guid: ba3050625acb031479912eaf9d6e96c8, type: 3}
-      at: 0.2
+      at: 0.12000001
       volume: 0.22
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: c802fdaca99e9e848ae4ee64a6751508, type: 3}
-      at: 2.4
+      at: 1.5160002
       volume: 0.18
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: abbb49de8e0306f44807c0280fe52ee7, type: 3}
-      at: 5.2
+      at: 4.0360003
       volume: 0.16
       loop: 0
       fade: 0.2
@@ -5409,7 +5409,7 @@ MonoBehaviour:
       fade: 2
   - name: The Road East
     arrives: 1
-    arriveSeconds: 1.8
+    arriveSeconds: 1.08
     layers:
     - name: Far
       kind: 0
@@ -5582,27 +5582,27 @@ MonoBehaviour:
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.6714236
+          time: 0.6857462
           value: 0
           inSlope: -0
-          outSlope: 8.333333
+          outSlope: 6.9638467
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.7914236
+          time: 0.829345
           value: 1
-          inSlope: 8.333333
-          outSlope: -5.5555553
+          inSlope: 6.9638467
+          outSlope: -6.6605673
           tangentMode: 69
           weightedMode: 0
           inWeight: 0
           outWeight: 0
         - serializedVersion: 3
-          time: 0.9714236
+          time: 0.97948235
           value: 0
-          inSlope: -5.5555553
+          inSlope: -6.6605673
           outSlope: 0
           tangentMode: 69
           weightedMode: 0
@@ -5698,13 +5698,13 @@ MonoBehaviour:
     lines:
     - voice: {fileID: 8300000, guid: 6a9c06fe94c240140a7063472cd7c614, type: 3}
       subtitle: At dawn, you will take the old road east.
-      pauseBefore: 4.73
+      pauseBefore: 3.6977115
       secondsWithoutVoice: 2.5
     - voice: {fileID: 8300000, guid: 07f0dafe37149264a823ec31d2a013ab, type: 3}
       subtitle: The woods have already begun to change.
-      pauseBefore: 0.7
+      pauseBefore: 0.42000002
       secondsWithoutVoice: 2.5
-    holdAfter: 2.2
+    holdAfter: 1.32
     sounds:
     - clip: {fileID: 8300000, guid: ff8fb2148df581d46ad295c86acf945f, type: 3}
       at: 0
@@ -5712,17 +5712,17 @@ MonoBehaviour:
       loop: 1
       fade: 1
     - clip: {fileID: 8300000, guid: 0349f31f793db2f43b85c009ecdc4899, type: 3}
-      at: 0.5
+      at: 0.3908786
       volume: 0.18
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: abbb49de8e0306f44807c0280fe52ee7, type: 3}
-      at: 3.8
+      at: 2.9706771
       volume: 0.14
       loop: 0
       fade: 0.2
     - clip: {fileID: 8300000, guid: f4175db67e0b26c4c8e7f78933ac81cb, type: 3}
-      at: 8.756875
+      at: 7.4445868
       volume: 0.35
       loop: 0
       fade: 0.2
@@ -5731,13 +5731,13 @@ MonoBehaviour:
     fromShot: 0
     delay: 0
     toShot: 3
-    startAt: 21.35
+    startAt: 27.1
     volume: 0.6
     fadeIn: 1.2
     fadeOut: 2.5
   - clip: {fileID: 8300000, guid: d33bd38e4b80c7b44b05a8bbae974df8, type: 3}
     fromShot: 5
-    delay: 0.6
+    delay: 0.36
     toShot: 8
     startAt: 0
     volume: 0.34
@@ -5747,7 +5747,7 @@ MonoBehaviour:
     fromShot: 9
     delay: 0
     toShot: 10
-    startAt: 61
+    startAt: 56
     volume: 0.6
     fadeIn: 0.5
     fadeOut: 2

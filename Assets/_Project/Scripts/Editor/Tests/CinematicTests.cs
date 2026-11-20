@@ -255,14 +255,20 @@ public sealed class CinematicTests
     // Where a phrase of Nightsong's violin enters, in seconds of the track (measured: Docs/BackstoryCinematic.md, As built).
     private static readonly float[] NightsongViolin = { 23.15f, 31.14f, 38.77f, 45.42f, 54.43f, 61.61f, 68.23f, 76.28f, 85.14f };
 
-    // The violin comes in between the lines, never under one (the user, 2026-11-16: "I really like that violin sound that comes
-    // in between the dialogue. try and time it with that"). A line spoken again at another length must keep it so.
+    // The violin comes in between the lines (the user, 2026-11-16: "I really like that violin sound that comes in between the
+    // dialogue. try and time it with that"). Since 2026-11-20 the pauses are 40% shorter (the user: "too slow"), which the
+    // violin's 6-9 s phrases can't all fit round: the user chose the full cut with 7 of the 9 entries kept clear, the other
+    // two under a line where the music dips. A line spoken again at another length must keep at least that many clear.
+    private const int ViolinEntriesKeptClear = 7;
+
     [Test]
     public void TheBackstory_LeavesRoomForNightsongsViolin()
     {
         CinematicDefinition backstory = Backstory;
         var timeline = new CinematicTimeline(backstory);
         int heard = 0;
+        int clear = 0;
+        var covered = new List<string>();
         foreach (CinematicMusic cue in backstory.Music.Where(cue => cue.clip != null && cue.clip.name.Contains("Nightsong")))
         {
             foreach (float entry in NightsongViolin.Where(entry => entry >= cue.startAt))
@@ -274,14 +280,20 @@ public sealed class CinematicTests
                 }
 
                 heard++;
-                foreach (CinematicTimeline.SpokenLine line in timeline.Lines)
+                CinematicTimeline.SpokenLine[] under = timeline.Lines.Where(line => line.Start < at + 1.5f && line.End > at - 0.2f).ToArray();
+                if (under.Length == 0)
                 {
-                    Assert.IsFalse(line.Start < at + 1.5f && line.End > at - 0.2f, $"\"{line.Line.subtitle}\" is said as the violin comes in at {at:0.0} s");
+                    clear++;
+                }
+                else
+                {
+                    covered.Add($"\"{under[0].Line.subtitle}\" at {at:0.0} s");
                 }
             }
         }
 
         Assert.GreaterOrEqual(heard, 6, "the violin comes in under the warm shots and the morning");
+        Assert.GreaterOrEqual(clear, ViolinEntriesKeptClear, "said as the violin comes in: " + string.Join(", ", covered));
     }
 
     [Test]

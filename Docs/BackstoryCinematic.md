@@ -137,6 +137,10 @@ Sound: Fire crackle joins the morning ambience. Cut directly into gameplay.
 
 - **Length:** 2:06 (target 1:35). The narration is 62 s; the portal's voice speaks briskly (about 190 words a minute), so
   the quiet comes from the pauses between lines. It was 1:45 until the violin was given room (below).
+  **2026-11-20: 1:41.** The user found it too slow: every gap (pauses, holds, dissolves) is 40% shorter, the lines
+  unchanged. Sounds, layer fades and music entries were moved with the line they sit on (a cue inside a line keeps its
+  offset into it; one in a gap keeps its share of the gap), so the rune rings, ward lines, lanterns and shadow still land
+  on their words.
 - **Voice:** your lines word for word, one clip a sentence, in the portal's own voice (Qwen3-TTS, `portal_g_mysterious`, as
   its dialogue at home), best of three takes each (all 78 takes said their words). `Tools/Audio/opening_voice.py`.
 - **Paintings:** LocalSpawn's Safe Haven styles, as the other cinematics (`Tools/LocalSpawn/generate_backstory.py`).
@@ -175,6 +179,10 @@ Sound: Fire crackle joins the morning ambience. Cut directly into gameplay.
   entry until 1.6 s into it; a line may run on over a phrase's tail, where the music dips under the voice. The second
   Nightsong starts 61 s in, so a phrase enters 0.6 s after the cut to the morning fire. `CinematicTests.TheBackstory_
   LeavesRoomForNightsongsViolin` keeps it so when a line is spoken again.
+  **Since 2026-11-20** the violin's 6-9 s phrases can't all fit round the shorter pauses; the user chose the full cut:
+  Nightsong now starts 27.10 s in (first cue) and 56.00 s in (shots 10-11), and 7 of the 9 entries heard land between
+  lines, the other two under a line where the music dips. The first phrase no longer enters as the fire catches. The
+  test keeps at least 7 clear.
 - **Made sounds:** stone hum, its pulse, the hum slowing to silence, the ember's hiss, a lantern going out, the shadow
   (`Tools/Audio/opening_cinematic.py`). The fire, wind, birds, creaks and footsteps are the game's own.
 - **How it was put together:** the asset (`Data/Cinematics/Backstory.asset`) was written once by a one-off script from
