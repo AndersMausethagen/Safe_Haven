@@ -1,0 +1,7 @@
+root children 29, lookouts 6, thoughts 27, beacons 6, finds 2
+at the cairn: ground 21.9, focus haven.lookout_cairn.1, explored 100 m off 0.00
+looked: insight 8 -> 31, seen 0 -> 3 (haven.wayfarer_s_stones.1 haven.ruined_watchtower.1 haven.lookout_cairn.0 ), explored 100 m off 0.37
+looked again: insight 31 -> 31
+at haven.old_quarry.0 Cut stone: focus haven.old_quarry.0 Cut stone, stone in bag 0
+took: stone in bag 0 -> 6, find still active False, used True
+done

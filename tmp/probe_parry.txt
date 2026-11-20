@@ -1,0 +1,10 @@
+attack DraugLunge delay 1.00 cueAt -1.000 atMe True line False scale 1.000 range 6.00 holding False hold 0
+attack DraugCleave delay 0.75 cueAt 0.480 atMe True line True scale 0.900 range 2.30 holding False hold 0.3
+  shot at 0.419
+  cued at 0.572 (to contact 0.178)
+attack DraugBackswing delay 0.55 cueAt 0.280 atMe True line True scale 0.864 range 2.30 holding False hold 0.3
+  cued at 0.319 (to contact 0.231)
+attack DraugCleave delay 0.75 cueAt 0.480 atMe True line True scale 0.900 range 2.30 holding False hold 0.3
+slash impact 1 expected 0.350 x scale -> moved 0.330; stop 0.029s
+three hits at once: stop 0.094s (ceiling 0.25)
+done

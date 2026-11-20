@@ -1,0 +1,3 @@
+just spotted: caller doing Chasing first strike '', the others: Idle/Idle targets False/False
+after the call: first strike was 'DraugWarCry', the others engaged True/True at 18.0
+done

@@ -15,10 +15,7 @@ MonoBehaviour:
   displayName: Thrust Swing
   caption: 
   clips:
-  - {fileID: 8300000, guid: cfc2991a9cc26034899d74bbe313ef87, type: 3}
-  - {fileID: 8300000, guid: cea2e6b46daf5eb40815191eb714ffc3, type: 3}
-  - {fileID: 8300000, guid: a8257079e61085348b3d18060572a9ec, type: 3}
-  - {fileID: 8300000, guid: 3ed30630628f70f468c86648833c42e2, type: 3}
+  - {fileID: 8300000, guid: 5324a3855cdfaaf48a06fcbf28656fc0, type: 3}
   channel: 2
   volume: 0.74
   volumeVariation: 0.1

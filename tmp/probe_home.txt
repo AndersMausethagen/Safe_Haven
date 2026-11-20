@@ -1,0 +1,5 @@
+want Copper Ingot 0/12 for Smithy II
+want Stone Block 0/8 for Smithy II
+want Oak Plank 0/8 for Smithy II
+card: Your people made 4 Stone Block.
+done

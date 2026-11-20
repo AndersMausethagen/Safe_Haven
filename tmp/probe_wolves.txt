@@ -1,0 +1,3 @@
+40 s, 3 wolves: strikes started 35 by ForestBittenWolf(Clone)=13 ForestBittenWolf(Clone)=11 ForestBittenWolf(Clone)=11 
+shortest gaps 0.36 median 0.97; share of samples within 1.6 m 11%
+done

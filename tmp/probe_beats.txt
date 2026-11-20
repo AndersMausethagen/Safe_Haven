@@ -1,0 +1,7 @@
+engaged: state Exploration a hunting True b True
+first kill: state Combat slowest 0.05
+last kill: state Exploration timeScale over 1.2 s: 0.05 0.05 0.30 0.30 0.30 0.30 0.30 0.30 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00 
+numbers before 0 after three blows 1: 10/0.0122 
+behind viewport (0.50, -0.14, 13.96)
+strike 0.50 at viewport (0.53, 0.08, 15.65) offscreen False chevrons shown 0
+done

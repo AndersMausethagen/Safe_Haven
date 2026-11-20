@@ -1,0 +1,5 @@
+flanker taken at 13.7
+flank: role seen True, a wolf stood behind (angle 180°)
+search: state Investigating, points from the start (9,-1) (14,4) (13,2)  (east is (1.00, 0.00, 0.00))
+spitter: 4 shots, from 3.9,0.0 7.0,-2.4 5.2,1.2 7.1,-2.4 
+done

@@ -1,0 +1,5 @@
+left 1369, stage 1
+now 484 left, stage 1, sites 1
+after: 484 left, stage 1 (The Mist Stirs), sites 1
+  Traveller's Pack(Clone) 95 m from the player, 71 m from the nearest exit, extra loot 1.5, locked False
+done
