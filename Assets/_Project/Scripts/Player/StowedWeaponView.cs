@@ -19,6 +19,7 @@ public sealed class StowedWeaponView : MonoBehaviour
     private ItemDefinition shown;
     private GameObject model;
     private float nextCheck;
+    private bool wasMoving;
     private readonly Dictionary<ItemDefinition, GameObject> made = new Dictionary<ItemDefinition, GameObject>();
 
     /// <summary>The weapon worn on the body now (null when nothing is put away).</summary>
@@ -46,10 +47,13 @@ public sealed class StowedWeaponView : MonoBehaviour
 
     private void Update()
     {
-        if (Time.unscaledTime < nextCheck || equipment == null)
+        // Every frame while the hand reaches (the worn model changes over at its grab, with the hand's), else now and then.
+        if (equipment == null || (Time.unscaledTime < nextCheck && !equipment.HandMoving && !wasMoving))
         {
             return;
         }
+
+        wasMoving = equipment.HandMoving;
 
         nextCheck = Time.unscaledTime + CheckEvery;
         ItemDefinition wanted = equipment.StowedShown;

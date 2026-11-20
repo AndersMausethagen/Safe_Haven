@@ -270,7 +270,7 @@ public static class CombatSwingTiming
             return null;
         }
 
-        GameObject rig = Object.Instantiate(source.gameObject);
+        GameObject rig = CombatAnimationSetup.BareRig(source);
         rig.hideFlags = HideFlags.HideAndDontSave;
         try
         {

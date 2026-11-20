@@ -273,6 +273,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (equipment != null)
         {
             equipment.WeaponMoving += OnWeaponMoving;
+            equipment.HandMoveCancelled += OnHandMoveCancelled;
         }
 
         if (guard != null)
@@ -335,6 +336,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (equipment != null)
         {
             equipment.WeaponMoving -= OnWeaponMoving;
+            equipment.HandMoveCancelled -= OnHandMoveCancelled;
         }
 
         if (guard != null)

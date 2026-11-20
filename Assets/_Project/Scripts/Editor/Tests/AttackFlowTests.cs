@@ -83,21 +83,4 @@ public sealed class AttackFlowTests
         Assert.Greater(AttackFlow.Distance(plain, mirrored), 1f, "a right-handed slash mirrored is a left-handed one");
         Assert.AreEqual(0f, AttackFlow.Distance(plain, plain), 1e-5f);
     }
-
-    // The fists stand in the UAL punches' own guard (where the jab starts and the hook's recovery ends), keeping the idle's breathing.
-    [Test]
-    public void TheFistsReadyPose_IsThePunchesGuard()
-    {
-        var ready = AssetDatabase.LoadAssetAtPath<AnimationClip>(AttackFlow.FistsReadyPath);
-        Assert.IsNotNull(ready, AttackFlow.FistsReadyPath);
-        Assert.IsTrue(ready.isLooping);
-        AnimationClip jab = AssetDatabase.LoadAllAssetsAtPath("Assets/Quaternius/Universal Animation Library/UAL1_Standard.fbx")
-            .OfType<AnimationClip>().First(c => c.name == "Punch_Jab");
-        AnimationClip idle = AssetDatabase.LoadAllAssetsAtPath("Assets/Kevin Iglesias/Human Animations/Animations/Male/Combat/HumanM@CombatIdle01.fbx")
-            .OfType<AnimationClip>().First(c => !c.name.StartsWith("__"));
-        float fromReady = AttackFlow.Distance(AttackFlow.Pose(ready, ready.length * 0.25f, false), AttackFlow.Pose(jab, 0f, false));
-        float fromIdle = AttackFlow.Distance(AttackFlow.Pose(idle, idle.length * 0.25f, false), AttackFlow.Pose(jab, 0f, false));
-        Assert.Less(fromReady, 0.6f, "the jab starts from the fists' ready pose");
-        Assert.Greater(fromIdle, fromReady * 2f, "the plain KI idle is the pose it replaced");
-    }
 }

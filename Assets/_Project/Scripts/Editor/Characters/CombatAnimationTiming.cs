@@ -13,6 +13,48 @@ public static partial class CombatAnimationSetup
     private const float SampleStep = 1f / 60f;
 
     /// <summary>Times (seconds into the clip) where the hand's speed peaks, fastest first, at least 0.2 s apart.</summary>
+    /// <summary>
+    /// A copy of the player's rig with no scripts on it, for sampling clips. A plain copy woke the player's own components (Awake took
+    /// Player.Current, and destroying the copy cleared it for the rest of a Play session): it is made under an inactive parent, its
+    /// scripts removed before anything wakes, then let go. The caller destroys it.
+    /// </summary>
+    public static GameObject BareRig(Animator source)
+    {
+        var holder = new GameObject("Bare Rig Holder") { hideFlags = HideFlags.HideAndDontSave };
+        holder.SetActive(false);
+        GameObject rig = Object.Instantiate(source.gameObject, holder.transform);
+        // Scripts another one requires (RequireComponent) go after it.
+        var scripts = new List<MonoBehaviour>(rig.GetComponentsInChildren<MonoBehaviour>(true));
+        while (scripts.Count > 0)
+        {
+            MonoBehaviour free = scripts.Find(script => !scripts.Exists(other => other != script && other.gameObject == script.gameObject && Requires(other, script)));
+            free = free != null ? free : scripts[0];
+            scripts.Remove(free);
+            Object.DestroyImmediate(free);
+        }
+
+        rig.transform.SetParent(null, false);
+        Object.DestroyImmediate(holder);
+        rig.hideFlags = HideFlags.HideAndDontSave;
+        return rig;
+    }
+
+    private static bool Requires(Component by, Component what)
+    {
+        foreach (RequireComponent need in by.GetType().GetCustomAttributes(typeof(RequireComponent), true))
+        {
+            foreach (System.Type type in new[] { need.m_Type0, need.m_Type1, need.m_Type2 })
+            {
+                if (type != null && type.IsInstanceOfType(what))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static List<float> ContactTimes(AnimationClip clip, HumanBodyBones hand = HumanBodyBones.RightHand, int max = 3)
     {
         var peaks = new List<float>();
@@ -23,8 +65,7 @@ public static partial class CombatAnimationSetup
             return peaks;
         }
 
-        GameObject rig = Object.Instantiate(source.gameObject);
-        rig.hideFlags = HideFlags.HideAndDontSave;
+        GameObject rig = BareRig(source);
         try
         {
             var animator = rig.GetComponent<Animator>();
@@ -85,8 +126,7 @@ public static partial class CombatAnimationSetup
             return 0.3f;
         }
 
-        GameObject rig = Object.Instantiate(source.gameObject);
-        rig.hideFlags = HideFlags.HideAndDontSave;
+        GameObject rig = BareRig(source);
         try
         {
             var animator = rig.GetComponent<Animator>();
@@ -142,8 +182,7 @@ public static partial class CombatAnimationSetup
             return false;
         }
 
-        GameObject rig = Object.Instantiate(source.gameObject);
-        rig.hideFlags = HideFlags.HideAndDontSave;
+        GameObject rig = BareRig(source);
         try
         {
             var animator = rig.GetComponent<Animator>();
@@ -188,8 +227,7 @@ public static partial class CombatAnimationSetup
             return Vector3.zero;
         }
 
-        GameObject rig = Object.Instantiate(source.gameObject);
-        rig.hideFlags = HideFlags.HideAndDontSave;
+        GameObject rig = BareRig(source);
         try
         {
             var animator = rig.GetComponent<Animator>();

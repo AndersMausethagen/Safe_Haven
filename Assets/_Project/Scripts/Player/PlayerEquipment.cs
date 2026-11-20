@@ -98,22 +98,54 @@ public sealed class PlayerEquipment : MonoBehaviour
     private float handChangesAt = -1f;
     private bool handHidesNew;
     private ItemDefinition stowedBefore;
+    private ItemDefinition handBefore;
 
     /// <summary>Put away as far as what is shown goes: the model leaves the hand (or comes to it) at the hand's grab, a moment
     /// after the gameplay changed over (IsSheathed).</summary>
     public bool ShowsSheathed => Time.time < handChangesAt && !handHidesNew ? !IsSheathed : IsSheathed;
 
-    /// <summary>A weapon just taken out of the bag isn't in the hand until the hand has reached for it.</summary>
-    public bool HandWeaponHidden => handHidesNew && Time.time < handChangesAt;
+    /// <summary>The next weapon from the bag isn't in the hand until the hand has reached the back or hip for it: until then the
+    /// hand still holds the one it had (verification 2026-11-20: it vanished at the press). False when nothing overrides the hand.</summary>
+    public bool TryHandOverride(out ItemDefinition held)
+    {
+        held = handHidesNew && Time.time < handChangesAt ? handBefore : null;
+        return handHidesNew && Time.time < handChangesAt;
+    }
+
+    /// <summary>The hand is reaching to take out or put away a weapon (the shown models change over at its grab).</summary>
+    public bool HandMoving => Time.time < handChangesAt;
 
     /// <summary>The weapon worn on the body as shown: what was worn until the hand's grab, then Stowed.</summary>
     public ItemDefinition StowedShown => Time.time < handChangesAt ? stowedBefore : Stowed;
 
     public float DrawPace => drawPace;
 
-    // The hand reaches for a weapon (taking it out, or the next from the bag) or puts it away: the model changes over at the grab.
-    private void StartHandMove(bool puttingAway, WeaponDefinition weapon, ItemDefinition wornBefore, bool hideNew)
+    /// <summary>Raised when a reach is called off by a press that undoes it: the arm goes back to what it was doing.</summary>
+    public event Action HandMoveCancelled;
+
+    // What the hand shows now (as HeldItemView shows it), for telling a press that only undoes a reach.
+    private ItemDefinition ShownInHand()
     {
+        if (TryHandOverride(out ItemDefinition old))
+        {
+            return old;
+        }
+
+        return MainHand.IsEmpty || MainHand.IsBroken || ShowsSheathed ? null : MainHand.Item;
+    }
+
+    // The reach is called off: what is shown already matches the gameplay again.
+    private void EndHandMove()
+    {
+        handChangesAt = -1f;
+        handHidesNew = false;
+        HandMoveCancelled?.Invoke();
+    }
+
+    // The hand reaches for a weapon (taking it out, or the next from the bag) or puts it away: the model changes over at the grab.
+    private void StartHandMove(bool puttingAway, WeaponDefinition weapon, ItemDefinition wornBefore, bool hideNew, ItemDefinition heldBefore = null)
+    {
+        handBefore = heldBefore;
         bool back = StowedWeaponSettings.WornOnBack(weapon) ?? false;
         float grab = puttingAway ? (back ? sheatheBack : sheatheHip) : (back ? drawGrabBack : drawGrabHip);
         stowedBefore = wornBefore;
@@ -286,10 +318,22 @@ public sealed class PlayerEquipment : MonoBehaviour
             return false;
         }
 
+        // A press while the hand is still reaching is never lost (quick input comes first): what it shows now is noted, and a press
+        // that only undoes the reach (put away, then out again; swapped, then back) just cancels it (EndHandMove).
+        ItemDefinition shownBefore = HandMoving ? ShownInHand() : null;
+        bool wasMoving = HandMoving;
+
         if (IsSheathed)
         {
             ItemDefinition worn = Stowed;
             SetSheathed(false);
+            if (wasMoving && shownBefore == MainHand.Item)
+            {
+                EndHandMove();
+                GameMessages.Post($"Took out {MainHand.Item.DisplayName}.");
+                return true;
+            }
+
             StartHandMove(false, MainHand.Item.Weapon, worn, false);
             GameMessages.Post($"Took out {MainHand.Item.DisplayName}.");
             return true;
@@ -308,10 +352,15 @@ public sealed class PlayerEquipment : MonoBehaviour
         if (next != null)
         {
             ItemDefinition worn = Stowed;
+            ItemDefinition was = MainHand.IsEmpty ? null : MainHand.Item;
             bool equipped = EquipFromBag(next);
-            if (equipped && next.IsWeapon)
+            if (equipped && wasMoving && shownBefore == next)
             {
-                StartHandMove(false, next.Weapon, worn, true);
+                EndHandMove();
+            }
+            else if (equipped && next.IsWeapon)
+            {
+                StartHandMove(false, next.Weapon, worn, true, was);
             }
 
             return equipped;
@@ -321,6 +370,13 @@ public sealed class PlayerEquipment : MonoBehaviour
         {
             ItemDefinition worn = Stowed;
             SetSheathed(true);
+            if (wasMoving && shownBefore == null)
+            {
+                EndHandMove();
+                GameMessages.Post($"Put away {held.DisplayName}.");
+                return true;
+            }
+
             StartHandMove(true, held.Weapon, worn, false);
             GameMessages.Post($"Put away {held.DisplayName}.");
             return true;

@@ -283,9 +283,26 @@ public sealed partial class PlayerAnimationController
         }
 
         int state = puttingAway ? (onBack ? SheatheBackStateHash : SheatheHipStateHash) : (onBack ? DrawBackStateHash : DrawHipStateHash);
-        if (HasUpperState(state) && animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash == EmptyStateHash)
+        int now = animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash;
+        bool free = now == EmptyStateHash || now == DrawHipStateHash || now == DrawBackStateHash || now == SheatheHipStateHash || now == SheatheBackStateHash;
+        if (HasUpperState(state) && free)
         {
             animator.CrossFadeInFixedTime(state, 0.1f, upperBodyLayer, 0f);
+        }
+    }
+
+    // A press undid the reach: the arm leaves the draw or put-away at once.
+    private void OnHandMoveCancelled()
+    {
+        if (upperBodyLayer < 0)
+        {
+            return;
+        }
+
+        int now = animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash;
+        if (now == DrawHipStateHash || now == DrawBackStateHash || now == SheatheHipStateHash || now == SheatheBackStateHash)
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, 0.1f, upperBodyLayer);
         }
     }
 

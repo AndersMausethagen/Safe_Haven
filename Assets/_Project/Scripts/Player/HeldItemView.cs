@@ -274,8 +274,14 @@ public sealed class HeldItemView : MonoBehaviour
         }
 
         ItemStack weapon = equipment.MainHand;
-        // The model comes to the hand (or leaves it) as the hand reaches the hip or the back (PlayerEquipment.ShowsSheathed).
-        return weapon.IsEmpty || weapon.IsBroken || equipment.ShowsSheathed || equipment.HandWeaponHidden ? null : weapon.Item;
+        // The model comes to the hand (or leaves it) as the hand reaches the hip or the back (PlayerEquipment.ShowsSheathed); the
+        // next weapon from the bag takes the old one's place at the grab.
+        if (equipment.TryHandOverride(out ItemDefinition stillHeld))
+        {
+            return stillHeld;
+        }
+
+        return weapon.IsEmpty || weapon.IsBroken || equipment.ShowsSheathed ? null : weapon.Item;
     }
 
     /// <summary>Puts <paramref name="item"/>'s model in the hand (nothing for null or an item without a model).</summary>

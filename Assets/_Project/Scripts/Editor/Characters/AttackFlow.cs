@@ -19,7 +19,6 @@ using UnityEngine;
 public static class AttackFlow
 {
     public const string ControllerPath = "Assets/_Project/Animation/Controllers/PlayerAnimator.controller";
-    public const string FistsReadyPath = "Assets/_Project/Animation/Generated/Fists Ready.anim";
     private const string FullBodyLayer = "Combat Full Body";
     private const int MuscleCount = 55;
     private static readonly int[] SideMuscles = { 1, 2, 4, 5, 7, 8, 10, 11, 13, 14, 20 };
@@ -67,7 +66,9 @@ public static class AttackFlow
     {
         public AnimatorController Controller;
         public readonly Dictionary<string, AnimatorState> FullBody = new Dictionary<string, AnimatorState>();
-        public BlendTree ReadyTree, GuardTree;
+        public BlendTree ReadyTree, GuardTree, CombatLocomotion;
+        public AnimationClip ExploringIdle;
+        public readonly Dictionary<string, AnimationClip> Holds = new Dictionary<string, AnimationClip>();
         public readonly Dictionary<AnimationClip, AnimationCurve[]> Curves = new Dictionary<AnimationClip, AnimationCurve[]>();
     }
 
@@ -94,6 +95,8 @@ public static class AttackFlow
             float ready = ReadyPoseValue(weapon);
             float[] readyPose = TreePose(context, context.ReadyTree, ready);
             float[] guardPose = TreePose(context, context.GuardTree, ready);
+            float[] exploringPose = ExploringPose(context, weapon);
+            float[] walkingPose = WalkingPose(context, weapon);
             if (readyPose == null)
             {
                 continue;
@@ -152,6 +155,15 @@ public static class AttackFlow
                 Out(fromReady);
             }
 
+            // The first swing of a fight starts from the exploring pose (the fight begins with it); a swing started on the move from
+            // the combat walk's upper body (it plays on Upper Body over the walking legs).
+            if (combo.Count > 0)
+            {
+                Into("exploring", exploringPose, combo[0]);
+                Into("walking", walkingPose, combo[0]);
+            }
+
+            Into("exploring", exploringPose, weapon.HeavyAttack);
             Into("guard", guardPose, weapon.GuardCounterAttack);
             Into("guard", guardPose, weapon.CounterAttack);
             Out(weapon.GuardCounterAttack);
@@ -194,6 +206,21 @@ public static class AttackFlow
                 if (layer.name == "Upper Body" && state.state.name == "Guard")
                 {
                     context.GuardTree = state.state.motion as BlendTree;
+                }
+
+                if (layer.name == "Base" && state.state.name == "Idle")
+                {
+                    context.ExploringIdle = state.state.motion as AnimationClip;
+                }
+
+                if (layer.name == "Base" && state.state.name == "Combat Locomotion")
+                {
+                    context.CombatLocomotion = state.state.motion as BlendTree;
+                }
+
+                if (layer.name == "Arms" && state.state.motion is AnimationClip hold)
+                {
+                    context.Holds[state.state.name] = hold;
                 }
             }
         }
@@ -260,6 +287,45 @@ public static class AttackFlow
         }
 
         return sum;
+    }
+
+    // Exploring: the plain idle's body, its arms the carry hold for the weapon (the Arms layer's, out of a fight).
+    private static float[] ExploringPose(Context context, WeaponDefinition weapon)
+    {
+        if (context.ExploringIdle == null)
+        {
+            return null;
+        }
+
+        float[] pose = Pose(context, context.ExploringIdle, context.ExploringIdle.length * 0.25f, false);
+        string hold = weapon.ReadyPose == WeaponReadyPose.Staff ? "Hold Staff"
+            : weapon.Stance == WeaponStance.TwoHanded ? "Hold Two Handed" : weapon.Stance == WeaponStance.Polearm ? "Hold Polearm" : null;
+        if (hold != null && context.Holds.TryGetValue(hold, out AnimationClip clip))
+        {
+            float[] arms = Pose(context, clip, clip.length * 0.25f, false);
+            for (int i = 37; i < MuscleCount; i++)
+            {
+                pose[i] = arms[i];
+            }
+        }
+
+        return pose;
+    }
+
+    // Walking in a fight: the stance's combat strafe walking forward (Combat Locomotion > Combat Legs > Combat Strafe).
+    private static float[] WalkingPose(Context context, WeaponDefinition weapon)
+    {
+        BlendTree legs = context.CombatLocomotion?.children.Select(c => c.motion as BlendTree)
+            .FirstOrDefault(tree => tree != null && tree.name.EndsWith(weapon.Stance.ToString()));
+        BlendTree strafe = legs?.children.Select(c => c.motion as BlendTree).FirstOrDefault(tree => tree != null && tree.name.StartsWith("Combat Strafe"));
+        if (strafe == null)
+        {
+            return null;
+        }
+
+        ChildMotion forward = strafe.children.Where(c => c.motion is AnimationClip && c.position.y > 0.5f && Mathf.Abs(c.position.x) < 0.1f)
+            .OrderBy(c => c.position.y).FirstOrDefault();
+        return forward.motion is AnimationClip walk ? Pose(context, walk, walk.length * 0.25f, forward.mirror) : null;
     }
 
     // The tree child at a ReadyPose value (a step tree: the nearest threshold).
@@ -432,58 +498,5 @@ public static class AttackFlow
 
         report.Insert(0, $"{links.Count} ways into attacks, {links.Count(l => !l.Smooth)} not smooth; {settles.Count} ways out, {settles.Count(s => !s.Smooth)} not smooth");
         return string.Join("\n", report);
-    }
-
-    /// <summary>
-    /// The fists' ready pose: the UAL punches all start from (and Melee_Hook_Rec ends in) one guard, which the KI combat idle isn't
-    /// (a jab has under a tenth of a second to blend in). This is the KI idle with its body and arms moved onto that guard, so it keeps
-    /// the idle's breathing. Written once; run again after changing either clip.
-    /// </summary>
-    public static AnimationClip MakeFistsReady(AnimationClip idle, AnimationClip guard, float guardTime)
-    {
-        var clip = new AnimationClip { name = "Fists Ready" };
-        float[] target = Pose(guard, guardTime, false);
-        string[] names = HumanTrait.MuscleName;
-        foreach (EditorCurveBinding binding in AnimationUtility.GetCurveBindings(idle))
-        {
-            AnimationCurve curve = AnimationUtility.GetEditorCurve(idle, binding);
-            int index = binding.type == typeof(Animator) ? System.Array.IndexOf(names, binding.propertyName) : -1;
-            bool moved = index >= 0 && index < MuscleCount && !(index >= 15 && index < 37);
-            if (moved && curve.length > 0)
-            {
-                float mean = 0f;
-                const int Samples = 24;
-                for (int i = 0; i < Samples; i++)
-                {
-                    mean += curve.Evaluate(idle.length * i / Samples);
-                }
-
-                float offset = target[index] - mean / Samples;
-                Keyframe[] keys = curve.keys;
-                for (int k = 0; k < keys.Length; k++)
-                {
-                    keys[k].value += offset;
-                }
-
-                curve.keys = keys;
-            }
-
-            AnimationUtility.SetEditorCurve(clip, binding, curve);
-        }
-
-        AnimationClipSettings settings = AnimationUtility.GetAnimationClipSettings(idle);
-        settings.loopTime = true;
-        AnimationUtility.SetAnimationClipSettings(clip, settings);
-        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(FistsReadyPath));
-        AnimationClip existing = AssetDatabase.LoadAssetAtPath<AnimationClip>(FistsReadyPath);
-        if (existing != null)
-        {
-            EditorUtility.CopySerialized(clip, existing);
-            AssetDatabase.SaveAssetIfDirty(existing);
-            return existing;
-        }
-
-        AssetDatabase.CreateAsset(clip, FistsReadyPath);
-        return clip;
     }
 }

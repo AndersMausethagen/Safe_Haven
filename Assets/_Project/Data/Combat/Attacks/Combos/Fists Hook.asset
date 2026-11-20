@@ -50,11 +50,11 @@ MonoBehaviour:
   castRadius: 0.3
   castRange: 16
   castHazard: {fileID: 0}
-  animationState: Punch Hook
-  animationSpeed: 0.72289157
-  strikeSpeed: 1.25
-  strikeLead: 0.09333333
-  followThroughSpeed: 1
+  animationState: KI Punch Quick
+  animationSpeed: 0.48
+  strikeSpeed: 0.48
+  strikeLead: 0
+  followThroughSpeed: 1.3
   growsFromLight: 1
   blendIn: 0.1
   swingSound: {fileID: 0}
