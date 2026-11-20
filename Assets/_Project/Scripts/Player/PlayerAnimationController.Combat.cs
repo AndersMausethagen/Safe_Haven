@@ -254,7 +254,21 @@ public sealed partial class PlayerAnimationController
         }
     }
 
-    private void OnParried(DamageInfo damage) => CrossFadeUpper(ParryStateHash, 0.04f);
+    // A shield parries with the shield; a weapon with the stance's own deflection (Parry Weapon), not a shield's motion.
+    private void OnParried(DamageInfo damage) =>
+        CrossFadeUpper(combat != null && !combat.HasShield && HasUpperState(ParryWeaponStateHash) ? ParryWeaponStateHash : ParryStateHash, 0.04f);
+
+    // A blow taken on the guard shows: the arms give with it and come back to the guard (nothing played before, audit 2026-11-20).
+    private void OnBlocked(DamageInfo damage)
+    {
+        int hit = combat != null && combat.HasShield ? GuardShieldHitStateHash : GuardHitStateHash;
+        if (HasUpperState(hit))
+        {
+            CrossFadeUpper(hit, 0.05f);
+        }
+    }
+
+    private bool HasUpperState(int hash) => upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, hash);
 
     // The dodge the gear allows (quickstep, roll, heavy roll) plays with the whole body; anything on the other layers stops.
     private void OnDodgeStarted(DodgeStyle style, DodgeShape shape)
@@ -276,7 +290,34 @@ public sealed partial class PlayerAnimationController
         }
     }
 
-    private void OnGuardBroken(float seconds) => CrossFadeUpper(GuardBreakStateHash, 0.05f);
+    // Guard broken: the stagger (Idle_Shield_Break, about 1 s), then dazed (Guard Stunned) for as long as the stun lasts, so
+    // the body doesn't stand ready while the player still can't act.
+    private float guardStunnedUntil = float.NegativeInfinity;
+
+    private void OnGuardBroken(float seconds)
+    {
+        guardStunnedUntil = Time.time + seconds;
+        CrossFadeUpper(GuardBreakStateHash, 0.05f);
+    }
+
+    private void UpdateGuardStun()
+    {
+        if (upperBodyLayer < 0 || animator.IsInTransition(upperBodyLayer))
+        {
+            return;
+        }
+
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
+        bool stunned = Time.time < guardStunnedUntil;
+        if (state.shortNameHash == GuardBreakStateHash && state.normalizedTime >= 0.85f && stunned && HasUpperState(GuardStunnedStateHash))
+        {
+            animator.CrossFadeInFixedTime(GuardStunnedStateHash, 0.2f, upperBodyLayer);
+        }
+        else if (state.shortNameHash == GuardStunnedStateHash && !stunned)
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, 0.2f, upperBodyLayer);
+        }
+    }
 
     // A skill plays its own state (a cast, a dash, a spin) where it has one; else the weapon stance's old attack.
     private void OnSkillCast(int slot, SkillDefinition skill)

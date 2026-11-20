@@ -55,6 +55,10 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private static readonly int ParryStateHash = Animator.StringToHash("Parry");
     private static readonly int GuardBreakStateHash = Animator.StringToHash("Guard Break");
     private static readonly int KnockbackStateHash = Animator.StringToHash("Knockback");
+    private static readonly int GuardHitStateHash = Animator.StringToHash("Guard Hit");
+    private static readonly int GuardShieldHitStateHash = Animator.StringToHash("Guard Shield Hit");
+    private static readonly int ParryWeaponStateHash = Animator.StringToHash("Parry Weapon");
+    private static readonly int GuardStunnedStateHash = Animator.StringToHash("Guard Stunned");
     // A swing's blend in from whatever came before. 0.06 s was two to four frames between very different poses, which snapped when
     // swings followed each other (the user, 2026-11-17: "it snaps in between states and does not flow well"). Only the look: when a
     // blow lands is PlayerCombat's.
@@ -259,6 +263,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         {
             guard.GuardChanged += OnGuardChanged;
             guard.Parried += OnParried;
+            guard.Blocked += OnBlocked;
             guard.Broken += OnGuardBroken;
         }
 
@@ -315,6 +320,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         {
             guard.GuardChanged -= OnGuardChanged;
             guard.Parried -= OnParried;
+            guard.Blocked -= OnBlocked;
             guard.Broken -= OnGuardBroken;
         }
 
@@ -334,6 +340,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         UpdateTurn(deltaTime);
         UpdateAirborne(deltaTime);
         ResolveHitReaction();
+        UpdateGuardStun();
         UpdateSwingSpeed();
         WalkOutOfSwing();
     }
