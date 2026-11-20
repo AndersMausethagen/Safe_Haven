@@ -83,6 +83,12 @@ public sealed class MonsterMovement
     {
         if (Time.time < nextRepathTime)
         {
+            // A plain walk faces its way again at once, also between repaths (Strafe turns it off again after this).
+            if (agent != null)
+            {
+                agent.updateRotation = true;
+            }
+
             return true;
         }
 

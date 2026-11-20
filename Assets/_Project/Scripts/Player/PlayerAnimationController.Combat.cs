@@ -302,14 +302,23 @@ public sealed partial class PlayerAnimationController
 
     private void UpdateGuardStun()
     {
-        if (upperBodyLayer < 0 || animator.IsInTransition(upperBodyLayer))
+        if (upperBodyLayer < 0)
         {
             return;
         }
 
+        bool changing = animator.IsInTransition(upperBodyLayer);
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(upperBodyLayer);
         bool stunned = Time.time < guardStunnedUntil;
-        if (state.shortNameHash == GuardBreakStateHash && state.normalizedTime >= 0.85f && stunned && HasUpperState(GuardStunnedStateHash))
+        // Leaving Guard Break by its own exit (to Empty) while still stunned is caught too: a long frame could jump past 0.85.
+        bool breakEnding = state.shortNameHash == GuardBreakStateHash
+                           && (changing ? animator.GetNextAnimatorStateInfo(upperBodyLayer).shortNameHash == EmptyStateHash : state.normalizedTime >= 0.85f);
+        if (changing && !breakEnding)
+        {
+            return;
+        }
+
+        if (breakEnding && stunned && HasUpperState(GuardStunnedStateHash))
         {
             animator.CrossFadeInFixedTime(GuardStunnedStateHash, 0.2f, upperBodyLayer);
         }
@@ -404,17 +413,16 @@ public sealed partial class PlayerAnimationController
                 return;
             }
         }
-        else if (flinched && !hit && !lostSwing && attacking)
-        {
-            // Thrown back by a parry after the blow was spent (Rebuff): the swing plays out.
-            return;
-        }
-
+        // Thrown back by a monster's parry (Rebuff: flinched, unhurt, the swing spent) shows too: the stance's flinch over the
+        // swing's tail, so being parried reads.
         PlayHitReaction(share);
     }
 
     private void PlayHitReaction(float share)
     {
+        // A planted heavy lost to this blow would otherwise be released to Empty later this LateUpdate (UpdateSwingSpeed), over
+        // the flinch (seen in Play, 2026-11-20).
+        plantedSwing = 0;
         if (share >= KnockbackShare && upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, KnockbackStateHash))
         {
             CrossFadeUpper(KnockbackStateHash, 0.05f);
