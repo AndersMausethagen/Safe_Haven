@@ -2812,3 +2812,9 @@ From the user's list after their 72-minute run.
 - **Options save on request** (`OptionsDraft`): rows edit a draft; Save Changes applies it (a preset before its members), Discard
   forgets it, and leaving with changes asks Save and Leave / Leave Without Saving / Keep Editing. A details panel explains the row in
   focus (now, saved, default). Keys still change at once.
+- **One building per quest** (`QuestDefinition › Unlocks Buildings`, `BuildingGate`; the approved Docs/QuestFlowReview_2026-11-20.md):
+  a building a quest lists is learned when that quest starts (announced) and no other way before; residents' and jobs' teaching is
+  filtered through `BuildingGate.Open`, and `QuestReachability` counts a quest's own start as teaching. Every rescued person has a
+  quest line of two or more in `ResidentDefinition › Quest Line`; the rescues follow one another (Docs/RescueOrder.md, 2026-11-21).
+- **The homecoming hold** counts only quests begun at this homecoming (`QuestManager.startedInHomecoming`), and the tracker puts a
+  quest a person gives first within its colour (`ResidentQuests.IsGivenByAPerson`).

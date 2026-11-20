@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: 226878f3b74cac74f92744bfe07aca7f, type: 3}
   rescueLine: Took you long enough. How many are behind you?
   arrivalLine: Show me the wall. Then show me where it's weakest.
-  welcomeLine: 
+  welcomeLine: Three days I held that clearing. At night something in Granheim mail walked the edge and never came in. I knew the walk. I couldn't give it a name, and I know every man I stood beside.
   fallenLine: Go. I've held worse.
   fightLines:
     spotted:
@@ -52,3 +52,17 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: f918ba89b7b235448905310320940c70, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: f2e1f14cdaba5e04489fb71d9fe5ccb3, type: 2}
+    text: I kept watch for the expedition until there was nothing left to watch. Let me do it here. A post with a view of the old path, and the ward holds longer when it breaks.
+    acceptText: I'll build you a post.
+    waitingText: A Watch Post where I can see the old path. It wants Tor's lodge standing first.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: a362bac9b0bcd234f9541c6db47d3732, type: 2}
+    text: When the ward breaks they come through the gaps. Spikes in the gaps, three at least, and we hold the next one together.
+    acceptText: Spikes in the gaps.
+    waitingText: Three spike traps where they'll come through. Then hold the next breach.
+    askText: 
+    thanksText: 
+  questLineDone: 

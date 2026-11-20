@@ -32,3 +32,29 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
+    text: Logs are just weight until somebody cuts them true. Give me the Carpenter's work and a lodge by the trees, and I'll keep you in planks while you're out there.
+    acceptText: A lodge it is.
+    waitingText: The Woodcutter's Lodge, near the trees. Then cut me eight fine planks, so you see what it does.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: d215378a9433ba6498ac63dfe30d9cc4, type: 2}
+    text: The ward keeps out the worst. Not all of it. Four lengths of palisade between the fire and the trees, and we sleep better.
+    acceptText: Four lengths.
+    waitingText: Four palisade pieces. Drag them out in a line; they go up like anything else.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
+    text: More will come through that door, and they'll need a roof and somewhere to set down what they carry. A storage shed and a hut.
+    acceptText: A shed and a hut.
+    waitingText: A Storage Shed and a Hut.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 8de8a5d687692334d85f5fe6c7d944c3, type: 2}
+    text: Ore weighs more than any pack. Raise my lodge a tier and I'll draw you a yard for carts. Barrows first.
+    acceptText: Show me carts.
+    waitingText: My lodge at Tier II, then the Wainwright's Yard, then a barrow from it.
+    askText: 
+    thanksText: 
+  questLineDone: 

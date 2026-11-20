@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: de06220de1b83e44ca9b6909382d71c8, type: 3}
   rescueLine: Mind the coping. It's the only level thing for a mile.
   arrivalLine: Whoever laid this hearth had never met a level. I'll stay.
-  welcomeLine: 
+  welcomeLine: Your hearth isn't level, your footings are soft and your walls are wood. Who cut these blocks? Not bad. I'll cut them from now on.
   fallenLine: I can't go on... come back for me.
   fightLines:
     spotted: []
@@ -32,3 +32,17 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: a27b02dff679e08448ddebf15ec9fa94, type: 2}
+    text: Wood burns. Stone remembers. Give me the Mason's work and a better workshop, and I'll show you a cottage with a proper hearth.
+    acceptText: Stone, then.
+    waitingText: Bjarne's Smithy standing, the Workshop at Tier II, then a Cottage.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: e849154c379290b49953300c228f2b24, type: 2}
+    text: Palisades burn. Granite doesn't. Raise the workshop again, cut four blocks, and put up four lengths of stone wall.
+    acceptText: Walls that don't burn.
+    waitingText: The Workshop at Tier III, four Granite Blocks, and four lengths of Stone Wall.
+    askText: 
+    thanksText: 
+  questLineDone: 

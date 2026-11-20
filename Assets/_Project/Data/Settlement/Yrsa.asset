@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: 6dcc86f101c2d2d4b8dc9818d1af5cc3, type: 3}
   rescueLine: Mind the pot. If you've come to eat, you'll carry.
   arrivalLine: Show me your kitchen. No, on second thought, show me what you eat.
-  welcomeLine: 
+  welcomeLine: Your fire's too small to cook on and too big to hide. Good. A fire is how lost people find a table.
   fallenLine: I can't go on... come back for me.
   fightLines:
     spotted: []
@@ -33,3 +33,17 @@ MonoBehaviour:
   jobs:
   - {fileID: 11400000, guid: c25a410fc86afd841890a87ffb27e6ea, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: f3c54bb743041a946b1f9c5e830b8dff, type: 2}
+    text: I cooked for a jarl once. He never thanked me either. A kitchen and the Cook's work, and you'll go out there fed properly.
+    acceptText: A kitchen.
+    waitingText: The Kitchen. Bjarne's Smithy has to stand first, for the pots.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 571e6ab5abe7e304dbc8874605ee77f4, type: 2}
+    text: Berries keep you walking. A meal keeps you fighting. Cook a broth at the Kitchen and eat it before you go through.
+    acceptText: A broth, then.
+    waitingText: A Forager's Broth from the Kitchen. Eat it before the portal.
+    askText: 
+    thanksText: 
+  questLineDone: 

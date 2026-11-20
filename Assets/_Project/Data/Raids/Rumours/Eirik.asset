@@ -29,3 +29,4 @@ MonoBehaviour:
   urgent: 1
   seeksLost: 0
   forestPushing: 0
+  whileQuest: {fileID: 11400000, guid: 8405c6b53bec41a4fbed383421c499ef, type: 2}

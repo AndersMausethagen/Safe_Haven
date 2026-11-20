@@ -309,7 +309,15 @@ public sealed class QuestTrackerView : MonoBehaviour
     public static int ByRankThenName(QuestDefinition a, QuestDefinition b)
     {
         int byRank = QuestMarkerSettings.RankOrder(a.Rank).CompareTo(QuestMarkerSettings.RankOrder(b.Rank));
-        return byRank != 0 ? byRank : string.CompareOrdinal(a.DisplayName, b.DisplayName);
+        if (byRank != 0)
+        {
+            return byRank;
+        }
+
+        // Within a colour, what a person gives comes first (the quest flow review's C3): "The Alchemist" was hidden behind the
+        // portal's "A ..." quests, which sorted ahead by name.
+        bool aPerson = ResidentQuests.IsGivenByAPerson(a), bPerson = ResidentQuests.IsGivenByAPerson(b);
+        return aPerson != bPerson ? (aPerson ? -1 : 1) : string.CompareOrdinal(a.DisplayName, b.DisplayName);
     }
 
     private static string Title(QuestDefinition quest)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -59,4 +60,37 @@ public static class ResidentQuests
     }
 
     private static QuestLog Log => QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
+
+    private static HashSet<QuestDefinition> givenByPeople;
+
+    // Entering Play doesn't reload scripts in this project: the set is made again each session.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => givenByPeople = null;
+
+    /// <summary>True when <paramref name="quest"/> is in some resident's Quest Line: a person gives it (the tracker puts it first).</summary>
+    public static bool IsGivenByAPerson(QuestDefinition quest)
+    {
+        if (quest == null)
+        {
+            return false;
+        }
+
+        if (givenByPeople == null || !Application.isPlaying)
+        {
+            givenByPeople = new HashSet<QuestDefinition>();
+            ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+            foreach (ResidentDefinition person in content != null ? content.Residents : (IReadOnlyList<ResidentDefinition>)System.Array.Empty<ResidentDefinition>())
+            {
+                foreach (QuestOffer offer in person != null && person.QuestLine != null ? person.QuestLine : (IReadOnlyList<QuestOffer>)System.Array.Empty<QuestOffer>())
+                {
+                    if (offer != null && offer.Quest != null)
+                    {
+                        givenByPeople.Add(offer.Quest);
+                    }
+                }
+            }
+        }
+
+        return givenByPeople.Contains(quest);
+    }
 }

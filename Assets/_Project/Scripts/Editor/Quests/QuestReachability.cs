@@ -236,8 +236,11 @@ public static class QuestReachability
             reach.Recipes.Add(recipe);
         }
 
+        // A quest's own start teaches what it introduces (BuildingGate), as do the quests done before it.
+        reach.Known.UnionWith(quest.UnlocksBuildings.Where(b => b != null));
         foreach (QuestDefinition done in reach.Done)
         {
+            reach.Known.UnionWith(done.UnlocksBuildings.Where(b => b != null));
             foreach (RecipeDefinition recipe in done.RewardRecipes.Where(r => r != null))
             {
                 reach.Recipes.Add(recipe);
@@ -280,7 +283,8 @@ public static class QuestReachability
         {
             foreach (JobDefinition job in objective.Person.Jobs.Where(j => j != null))
             {
-                reach.Known.UnionWith(job.TeachesBuildings.Where(b => b != null));
+                // Not what a quest introduces: that waits for its quest (BuildingGate), counted above when it has started.
+                reach.Known.UnionWith(job.TeachesBuildings.Where(b => b != null && BuildingGate.IntroducedBy(b).Count == 0));
                 reach.Recipes.UnionWith(job.TeachesRecipes.Where(r => r != null));
             }
         }

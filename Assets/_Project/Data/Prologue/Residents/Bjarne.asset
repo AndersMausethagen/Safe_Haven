@@ -32,3 +32,23 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: 26c34c56b5f966642ba1377c4e221cd7, type: 2}
+    text: You found me. Then let me earn my bread. Give me the Smith's work and a Smithy, and nothing you carry out there stays broken for long.
+    acceptText: The Smithy, then.
+    waitingText: A Smithy, and the Smith's work. Then bring me something worn and see what half the cost looks like.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: dc7284442b3534a4bb1979c2330f6a5a, type: 2}
+    text: There's copper in these woods, and charcoal in any oak you leave smouldering by the fire. Bring me ore and coal, and we'll smelt three ingots.
+    acceptText: Three ingots.
+    waitingText: Copper ore and charcoal. Three ingots at the Smithy. Leave oak in the campfire for the coal.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: b056baccfd41442478d4f5da5ea2d76a, type: 2}
+    text: 'Copper wants a hotter fire than this hearth gives. Raise the Smithy a tier and make yourself a copper pick: the deep ore won''t come out for stone.'
+    acceptText: A hotter fire.
+    waitingText: The Smithy at Tier II, then a Copper Pickaxe from it.
+    askText: 
+    thanksText: 
+  questLineDone: 

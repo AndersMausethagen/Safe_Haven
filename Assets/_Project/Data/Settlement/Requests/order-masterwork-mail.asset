@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
   id: order-masterwork-mail
   asker: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-  ask: 'For the children''s first raid, one day: a Masterwork scale hauberk. Nothing less.'
+  ask: 'For whoever goes through next, one day: a Masterwork scale hauberk. Nothing less.'
   thanks: Nothing less. Thank you.
   wanted: {fileID: 11400000, guid: 53b374f7c3d91a84abb900c212290128, type: 2}
   count: 1

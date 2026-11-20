@@ -15,9 +15,9 @@ MonoBehaviour:
   id: cleansingthecurse
   displayName: Cleansing the Curse
   description: The altar stands, and Ingrid wants to show you why it matters. Bring the Cursed Essence the woods leave on everything you kill and set it in the basin; she tends it while it works, and what comes out is Purified Essence, the one thing the old ways spend.
-  chain: Hands at Home
+  chain: Ingrid
   journalNotes: 'Use the altar and choose Purify: two Cursed Essence a batch. It only works while Ingrid has the Alchemist''s work, and a batch takes a while; it lands in your storage. Bring her the first of it.'
-  rank: 1
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -55,9 +55,9 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 4
     description: Purify Cursed Essence at the altar until you have 3 Purified Essence
@@ -83,6 +83,7 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings: []
   turnInToGiver: 1
   turnInTo: Ingrid
   rewardItems:

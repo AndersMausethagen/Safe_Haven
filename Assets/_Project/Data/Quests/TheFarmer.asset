@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.farmer
   displayName: Good Dirt
-  description: 'Asa grows what you can''t gather. Give her the Farmer''s work and lay out a Farm Plot ({key:Build}). She weaves too: as a Weaver she runs a Tailor''s Shop, and iron gear will want its linen.'
-  chain: Hands at Home
+  description: 'Asa grows what you can''t gather. Speak to her, give her the Farmer''s work and lay out a Farm Plot ({key:Build}): it grows while you are away.'
+  chain: Asa
   journalNotes: 'Crops grow while you are away, like everything else your people tend. Asa weaves too: give her the Weaver''s work instead and she runs the Tailor''s Shop.'
   rank: 4
   availableObjective: 
@@ -24,9 +24,8 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: f0b5dc009594d6740a78f57136d0d7dd, type: 2}
-  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -56,10 +55,34 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
+  - type: 9
+    description: Speak to Asa
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 13
     description: Give Asa the Farmer's work
     amount: 1
@@ -75,6 +98,30 @@ MonoBehaviour:
     person: {fileID: 0}
     target: {fileID: 0}
     job: {fileID: 11400000, guid: 42d876bf3cb45f84088e94fc709b0672, type: 2}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 7
+    description: 'Build a Workshop (build menu: {key:Build})'
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
     tier: 2
@@ -108,6 +155,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings:
+  - {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

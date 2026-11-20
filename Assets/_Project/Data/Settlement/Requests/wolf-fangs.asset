@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::HavenRequestDefinition
   id: wolf-fangs
   asker: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
-  ask: The wolves grow bold. Bring me their fangs and the children will sleep.
+  ask: The wolves grow bold. Bring me their fangs and we'll all sleep.
   thanks: One for every door. Let them see.
   wanted: {fileID: 11400000, guid: 5148bc82bfb79f94ca5482ed8e4ea69f, type: 2}
   count: 6

@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: e7660c02df638bc46bcd176886f9751e, type: 3}
   rescueLine: Took you long enough. That boar's been lying on me since yesterday.
   arrivalLine: You've been frightening my deer. Least you can do is give me a roof.
-  welcomeLine: 
+  welcomeLine: Twenty years I never lost a path in these woods. This year the paths started moving. Then the deer stopped running from me and started running from something else.
   fallenLine: I can't go on... come back for me.
   fightLines:
     spotted: []
@@ -33,3 +33,23 @@ MonoBehaviour:
   jobs:
   - {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
   - {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: a2c8684a2832f0c43b9d3c55f3682754, type: 2}
+    text: Boars come to the edge of the light at dusk. Bring me their hides and give me a lodge to cure them in, and you'll have leather that turns a tooth.
+    acceptText: Hides and a lodge.
+    waitingText: Four rough hides from the boars outside the light, and a Hunter's Lodge.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: bcfcd3deb7d403642871b260752b6eae, type: 2}
+    text: A raw hide rots. Cure four at the lodge and you'll see why the old hunters lived longer than the brave ones.
+    acceptText: Four, cured.
+    waitingText: Cure four leathers at the Hunter's Lodge.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 8c87695da6d1abb40bbe4e4d4e6ea378, type: 2}
+    text: There's still water by the Haven. Fish it, if you like. Build a dock first, and don't say the name of the thing in the deep. It listens.
+    acceptText: A dock. No names.
+    waitingText: A Dock on the still water, and one fish from it.
+    askText: 
+    thanksText: 
+  questLineDone: 

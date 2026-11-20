@@ -87,3 +87,26 @@ of a raid taught only the raid's player, after their state had been taken home, 
 - [AllThings.How: Valheim progression](https://allthings.how/valheim-progression-guide-every-biome-boss-and-key-drop/)
 - [Supercraft: Valheim boss order and gear](https://supercraft.host/wiki/valheim/progression_guide_boss_order_gear/)
 - [Twinfinite: Dragon Quest Builders 2 tips](https://twinfinite.net/guides/dragon-quest-builders-2-tips-and-tricks-for-beginners/3/)
+
+## 2026-11-21: one person at a time (the user's rule, with the approved quest flow review)
+
+"Block new rescues until we've completed the quests of the current NPC. So we must build that one's building first and learn a new
+mechanic. After that, we get a quest to rescue the next NPC." Each Bring X Home quest now also waits for the person before's core quest,
+and each rescue rumour comes up only while its Bring X Home quest is under way (`RaidRumourDefinition › While Quest`):
+
+| Next rescue | Waits for |
+|---|---|
+| Bjarne | Ingrid's Cleansing the Curse (the altar built and used) |
+| Tor | Bjarne's A Smith's Hearth |
+| Eirik | Tor's The Woodcutter's Lodge |
+| Yrsa | Eirik's The Watch |
+| Gunnar | Yrsa's Show Me Your Kitchen |
+| Liv | Gunnar's Hides and Hooks |
+| Asa | Liv's Runes for the Road |
+| Runa | Asa's Good Dirt |
+| Hild | Runa's Eyes in the Woods |
+| Sigrid | Hild's Stone on Stone |
+
+When a rescue quest starts, a big notice names the person, with their portrait, and where to look (`BigNotice.ForRescue`). Each person's
+first quest starts at the rescue, opens on "Speak to <them>" in their own words (`ResidentDefinition › Quest Line`) and teaches their
+workplace as it starts (`QuestDefinition › Unlocks Buildings`, `BuildingGate`); their second trade's building comes with a later quest.

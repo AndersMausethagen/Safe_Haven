@@ -15,7 +15,7 @@ MonoBehaviour:
   id: work.heavy_loads
   displayName: Heavy Loads
   description: 'Copper ore and planks weigh more than any pack can take home. Tor knows carts: raise his Woodcutter''s Lodge to Tier II and he plans a Wainwright''s Yard, where barrows, handcarts and a rowboat are built.'
-  chain: Hands at Home
+  chain: Tor
   journalNotes: Carts carry what a pack can't. The Wainwright's Yard wants Tor's lodge at Tier II first; he will tell you so, more than once.
   rank: 4
   availableObjective: 
@@ -23,9 +23,9 @@ MonoBehaviour:
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
+  - {fileID: 11400000, guid: b95103f99c217d3489eb46bd97d706d8, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -48,8 +48,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 1
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -73,6 +79,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 7
     description: 'Build a Wainwright''s Yard (build menu: {key:Build})'
     amount: 1
@@ -93,6 +103,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 4
     description: Make a Wheelbarrow at the Wainwright's Yard
     amount: 1
@@ -113,11 +127,20 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings:
+  - {fileID: 11400000, guid: e26a3ab6b257d3942925a533c5c2ebda, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

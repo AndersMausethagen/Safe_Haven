@@ -94,6 +94,12 @@ public sealed class QuestDefinition : ScriptableObject
     [SerializeField] private bool objectivesInOrder;
     [SerializeField] private List<QuestObjective> objectives = new List<QuestObjective>();
 
+    [Header("Teaches when it starts")]
+    [Tooltip("Buildings learned the moment this quest starts, announced across the screen (Docs/QuestFlowReview_2026-11-20.md rule 3: " +
+             "one building per quest, learned when the quest that introduces it starts). A building listed here is learned no other way " +
+             "until one of the quests listing it has started (BuildingGate): a rescue or a job no longer teaches it first.")]
+    [SerializeField] private List<BuildingDefinition> unlocksBuildings = new List<BuildingDefinition>();
+
     [Header("Finishing")]
     [Tooltip("Off: the quest completes the moment its objectives are done. On: the player must return to a Quest Giver for this " +
              "quest to hand it in; rewards and the completion event wait until then.")]
@@ -153,6 +159,7 @@ public sealed class QuestDefinition : ScriptableObject
     public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
+    public IReadOnlyList<BuildingDefinition> UnlocksBuildings => unlocksBuildings;
     public IReadOnlyList<EnchantmentDefinition> RewardEnchantments => rewardEnchantments;
     public ResidentDefinition RewardWorkFor => rewardWorkFor;
     public int RewardWork => rewardWork;

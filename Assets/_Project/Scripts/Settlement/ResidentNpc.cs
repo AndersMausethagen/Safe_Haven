@@ -397,7 +397,8 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         {
             if (job != null)
             {
-                crafting.UnlockBuildings(job.TeachesBuildings, announce);
+                // A workplace a quest introduces waits for that quest (BuildingGate): Ingrid's Cauldron for her third.
+                crafting.UnlockBuildings(BuildingGate.Open(job.TeachesBuildings), announce);
             }
         }
     }
@@ -414,6 +415,8 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             return;
         }
 
+        // What started quests teach (a save from before a quest listed its building) comes quietly too.
+        BuildingGate.TeachStarted(user);
         foreach (ResidentRecord record in GameSession.Here.Residents)
         {
             // Someone home whose quest line never started (an older save, or a rescue before 2026-11-20): it starts now, and what
@@ -444,7 +447,7 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;
         if (crafting != null)
         {
-            crafting.UnlockBuildings(job.TeachesBuildings);
+            crafting.UnlockBuildings(BuildingGate.Open(job.TeachesBuildings));
             crafting.Unlock(job.TeachesRecipes);
         }
 

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: work.hunter
   displayName: Hides and Hooks
-  description: 'Gunnar cures hides into leather. Give him the Hunter''s work and build him a Hunter''s Lodge ({key:Build}). He knows the water as well as the woods: as a Fisher he runs a Dock.'
-  chain: Hands at Home
+  description: Gunnar cures hides into leather. Speak to him, give him the Hunter's work, bring him four Rough Hides from the boars outside the light, and build him a Hunter's Lodge ({key:Build}).
+  chain: Gunnar
   journalNotes: Gunnar cures hides into leather while you raid. As a Fisher instead, he works the Dock.
   rank: 4
   availableObjective: 
@@ -24,9 +24,8 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 243140468b973e440ac441a6ef36f475, type: 2}
-  - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -56,10 +55,34 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
+  - type: 9
+    description: Speak to Gunnar
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 11400000, guid: 9f83966b2e3c8fe42a58fd9d130cb08e, type: 2}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 13
     description: Give Gunnar the Hunter's work
     amount: 1
@@ -75,6 +98,30 @@ MonoBehaviour:
     person: {fileID: 0}
     target: {fileID: 0}
     job: {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 0
+    description: 'Bring 4 Rough Hides: the boars at the edge of the light'
+    amount: 4
+    item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
     breach: {fileID: 0}
     rank: 1
     tier: 2
@@ -108,6 +155,8 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings:
+  - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

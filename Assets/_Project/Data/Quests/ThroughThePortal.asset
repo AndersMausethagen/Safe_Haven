@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: through_the_portal
   displayName: Into the Misty Woods
-  description: 'Sigrid''s voice came through the stones: Ingrid is hurt, and close. Step through the portal, find her, and reach an extraction point before the portal closes. What you wear comes home with you whatever happens. What you carry is lost if you fall.'
+  description: 'Sigrid''s voice came through the stones: Ingrid is hurt, and close. Step through the portal and reach an extraction point before it closes. What you wear comes home with you whatever happens. What you carry is lost if you fall.'
   chain: The Hearth and the Door
   journalNotes: 'Your first raid. Put anything precious in your safe pocket, and turn back earlier than feels necessary. A hatchet and a pick let you bring hardwood and ore home as well as people.
 
@@ -51,31 +51,17 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
-  - type: 12
-    description: Find Ingrid in the Misty Woods
-    amount: 1
-    item: {fileID: 0}
-    resource: {fileID: 0}
-    monster: {fileID: 0}
-    faction: 1
-    building: {fileID: 0}
-    raid: {fileID: 0}
-    mustExtract: 1
-    withinMinutes: 0
-    questEvent: {fileID: 0}
-    person: {fileID: 11400000, guid: 272895da9ba7e784b8a97bcd2be637c8, type: 2}
-    target: {fileID: 0}
-    job: {fileID: 0}
-    breach: {fileID: 0}
-    rank: 1
-    tier: 2
-    bringHome: 0
-    countAlreadyOwned: 1
   - type: 5
     description: Extract from the Misty Woods
     amount: 1
@@ -96,6 +82,11 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems:
@@ -105,6 +96,9 @@ MonoBehaviour:
   - resource: {fileID: 11400000, guid: 7c3265a359bc4024c824268926942039, type: 2}
     amount: 1
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

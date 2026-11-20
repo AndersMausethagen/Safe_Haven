@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: f0b5dc009594d6740a78f57136d0d7dd, type: 2}
+  - {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -48,8 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -73,6 +80,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 12
     description: Bring Runa home safely
     amount: 1
@@ -93,11 +104,19 @@ MonoBehaviour:
     tier: 2
     bringHome: 1
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

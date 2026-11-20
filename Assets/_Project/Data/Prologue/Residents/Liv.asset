@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: a68b4df3b2228c44aa638d42833cedec, type: 3}
   rescueLine: The stones broke along a line. A line! Do you understand what that means?
   arrivalLine: Your ward is a promise too. Did anyone tell you?
-  welcomeLine: 
+  welcomeLine: The stones broke along a line, straight as a chalk mark. Stones don't break straight. Somebody drew that line, and I want to know who.
   fallenLine: Write it down. Somebody has to write it down.
   fightLines:
     spotted: []
@@ -32,3 +32,17 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: e68d6cc3611cddc4ab1e165871f1a4ae, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: 933d1de4d30ba9449985ab8bd2757b7e, type: 2}
+    text: Runes aren't magic. They're promises the woods remember. Give me the work, and at Ingrid's cauldron I'll show you how to cut one for the road.
+    acceptText: Show me.
+    waitingText: Cut a Wayfinder Rune at the Cauldron. Ingrid will lend it.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: 5715fae8bad44dd4b84dbdb44b2d7c38, type: 2}
+    text: Ingrid showed you the safe marks. I'll show you where new ones come from. Ask me how, then cut your first at the altar.
+    acceptText: Teach me the marks.
+    waitingText: Ask me about enchanting, then carve a mark at the Purification Altar.
+    askText: 
+    thanksText: 
+  questLineDone: 

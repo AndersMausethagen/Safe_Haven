@@ -50,6 +50,22 @@ public sealed class FeltProblemsTests
         return crafting;
     }
 
+    // Someone brought home with their quest line under way: what their quests introduce is learned (ResidentQuests, BuildingGate), as
+    // a rescue and their offers do in play.
+    private void HomeAndAtWork(ResidentDefinition person)
+    {
+        ResidentQuests.StartFirst(person, player, false);
+        foreach (QuestOffer offer in person.QuestLine)
+        {
+            if (offer?.Quest != null)
+            {
+                GameSession.Quests.TryStart(offer.Quest, prerequisitesAside: true);
+            }
+        }
+
+        ResidentNpc.TeachWhatTheyKnow(person, player, false);
+    }
+
     private RaidSession Session()
     {
         var raid = ScriptableObject.CreateInstance<RaidDefinition>();
@@ -71,7 +87,7 @@ public sealed class FeltProblemsTests
         Assert.AreEqual(Person("Bjarne"), who[0].Person);
         Assert.AreEqual("Bring Bjarne home: the Smith knows how.", who[0].HowTo());
 
-        ResidentNpc.TeachWhatTheyKnow(Person("Bjarne"), player, false);
+        HomeAndAtWork(Person("Bjarne"));
         HavenAnswers.WhoCouldUse(Material("CopperOre"), crafting, Content, settlement, out unusable);
         Assert.IsFalse(unusable, "his Smithy smelts it");
     }
@@ -90,7 +106,7 @@ public sealed class FeltProblemsTests
         Assert.LessOrEqual(who.Count, 2, "the summary names two at most");
         Assert.IsTrue(who.All(answer => answer.Person != null && !answer.PersonIsHome), "someone still out there knows");
 
-        ResidentNpc.TeachWhatTheyKnow(who[0].Person, player, false);
+        HomeAndAtWork(who[0].Person);
         HavenAnswers.WhoCouldUse(Material("ThickHide"), crafting, Content, settlement, out unusable);
         Assert.IsFalse(unusable, "the first named is enough");
     }
@@ -116,7 +132,7 @@ public sealed class FeltProblemsTests
         Assert.AreEqual(Person("Tor"), carrier.Person);
         Assert.AreEqual(Building("WainwrightsYard"), carrier.Building);
 
-        ResidentNpc.TeachWhatTheyKnow(Person("Tor"), player, false);
+        HomeAndAtWork(Person("Tor"));
         carrier = HavenAnswers.CarrierFor(crafting, Content, settlement);
         Assert.IsNull(carrier.Person, "the player knows the Yard now: nobody to fetch");
         Assert.AreEqual("", carrier.HowTo());

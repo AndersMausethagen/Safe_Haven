@@ -65,7 +65,8 @@ public static class ContentAudit
 
     private static readonly string[] RecipeNeither = { "RecipeBook.recipes", "JobDefinition.workOrders" };
 
-    private static readonly string[] BuildingTeachers = { "ItemDefinition.teachesBuildings", "JobDefinition.teachesBuildings" };
+    // A quest's Unlocks Buildings teaches them as it starts (BuildingGate, the quest flow review's C2).
+    private static readonly string[] BuildingTeachers = { "ItemDefinition.teachesBuildings", "JobDefinition.teachesBuildings", "QuestDefinition.unlocksBuildings" };
 
     private static readonly string[] BuildingNeither =
     {

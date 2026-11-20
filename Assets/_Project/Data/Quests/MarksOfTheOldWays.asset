@@ -15,9 +15,9 @@ MonoBehaviour:
   id: marksoftheoldways
   displayName: Marks of the Old Ways
   description: 'The last of what Ingrid''s grandmother taught her: a mark cut into gear at the altar holds a blessing as long as the gear holds together. She knows a few of the safe ones, and so do you, once you look.'
-  chain: Hands at Home
+  chain: Ingrid
   journalNotes: 'At the altar choose Enchant: each piece of gear takes one mark. The ones you know are listed; the rest are found in the woods as inscriptions (Liv reads them, if she''s home). Purified marks are safe; cursed ones are stronger and always take a price.'
-  rank: 1
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
@@ -55,9 +55,9 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 19
     description: Carve a mark into a piece of gear at the altar
@@ -83,6 +83,7 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings: []
   turnInToGiver: 1
   turnInTo: Ingrid
   rewardItems: []

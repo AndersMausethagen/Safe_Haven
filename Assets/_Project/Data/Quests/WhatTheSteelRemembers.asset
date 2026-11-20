@@ -15,15 +15,15 @@ MonoBehaviour:
   id: whatthesteelremembers
   displayName: What the Steel Remembers
   description: 'Purified Essence is not for hoarding. Ingrid says a blade that has drunk it remembers every blow it struck: bring your weapon, or anything you wear into the woods, and empower it at the altar.'
-  chain: Hands at Home
+  chain: Ingrid
   journalNotes: 'At the altar choose Empower: a piece of gear in your bag or worn takes a level for Purified Essence, and every level makes it a little better at what it does. Nothing is wasted: the price is shown before you pay. Ingrid has put a little essence by for the first.'
-  rank: 1
+  rank: 4
   availableObjective: 
   announceStart: 1
   announceCompletion: 1
   showTimerInHud: 0
   prerequisites:
-  - {fileID: 11400000, guid: a6828c2d25f6b8e41b89a27e94d1fd80, type: 2}
+  - {fileID: 11400000, guid: bba613affc1beea4d871324fd9ca269b, type: 2}
   startedFirst: []
   start: 2
   startEvent: {fileID: 0}
@@ -55,9 +55,9 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 22
     description: Empower a piece of gear at the altar
@@ -83,6 +83,7 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings: []
   turnInToGiver: 1
   turnInTo: Ingrid
   rewardItems: []

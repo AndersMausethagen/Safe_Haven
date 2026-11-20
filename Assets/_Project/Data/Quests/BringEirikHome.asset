@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 443ebd34d5dd1174088e0e4c3deaf1d2, type: 2}
+  - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -48,8 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -73,6 +80,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 12
     description: Bring Eirik home safely
     amount: 1
@@ -93,11 +104,19 @@ MonoBehaviour:
     tier: 2
     bringHome: 1
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

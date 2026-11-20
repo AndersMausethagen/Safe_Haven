@@ -55,29 +55,43 @@ public sealed class RescueOrderTests
         RaidTimeOfDay day = Enumerable.Range(1, 500).Select(seed => RaidTimeOfDay.For(Woods, seed)).First(hour => hour != null && !hour.IsDark);
         var settlement = new SettlementState();
         settlement.RecordExtraction();
-        Assert.IsFalse(tor.CanComeUp(day, settlement, null), "Bjarne isn't home yet");
+        // The user (2026-11-21): the next person can be found only once the last one's work is learned. Tor's rumour waits for his
+        // rescue quest, which waits for Bjarne's first quest (Bring Tor Home's prerequisites).
+        QuestDefinition rescueQuest = new SerializedObject(tor).FindProperty("whileQuest").objectReferenceValue as QuestDefinition;
+        Assert.IsNotNull(rescueQuest, "Tor's rumour waits for his rescue quest");
+        Assert.IsTrue(rescueQuest.Prerequisites.Any(q => q != null && q.name == "TheSmith"), "which waits for Bjarne's first quest");
+        string[] underWay = { rescueQuest.Id };
+        Assert.IsFalse(tor.CanComeUp(day, settlement, null, underWay), "Bjarne isn't home yet");
         settlement.AddResident(Person("Bjarne"));
-        Assert.IsTrue(tor.CanComeUp(day, settlement, null));
+        Assert.IsFalse(tor.CanComeUp(day, settlement, null), "Bjarne is home, but his work isn't learned: Tor's quest hasn't begun");
+        Assert.IsTrue(tor.CanComeUp(day, settlement, null, underWay));
         settlement.AddResident(Person("Tor"));
-        Assert.IsFalse(tor.CanComeUp(day, settlement, null), "nobody is sought who has come home");
+        Assert.IsFalse(tor.CanComeUp(day, settlement, null, underWay), "nobody is sought who has come home");
     }
 
+    // A rescue starts the person's first quest, which opens their workplace (ResidentQuests, BuildingGate). A second trade's workplace
+    // (Gunnar's Dock) waits for the quest of his that introduces it.
     [Test]
-    public void ARescue_TeachesTheirWorkplaces()
+    public void ARescue_OpensTheWorkplaceOfTheirFirstQuest_AndNoMore()
     {
+        GameSession.StartNewGame();
         var player = new GameObject("Player");
         try
         {
             PlayerCrafting crafting = player.AddComponent<PlayerCrafting>();
             Assert.IsFalse(crafting.IsKnown(Building("Forge")));
             ResidentNpc.TeachWhatTheyKnow(Person("Bjarne"), player);
+            Assert.IsFalse(crafting.IsKnown(Building("Forge")), "not before his first quest has begun");
+            Assert.IsTrue(ResidentQuests.StartFirst(Person("Bjarne"), player, false));
             Assert.IsTrue(crafting.IsKnown(Building("Forge")));
-            ResidentNpc.TeachWhatTheyKnow(Person("Gunnar"), player);
-            Assert.IsTrue(crafting.IsKnown(Building("TanningRack")) && crafting.IsKnown(Building("Dock")), "every job they can do");
+            ResidentQuests.StartFirst(Person("Gunnar"), player, false);
+            Assert.IsTrue(crafting.IsKnown(Building("TanningRack")), "his first quest's lodge");
+            Assert.IsFalse(crafting.IsKnown(Building("Dock")), "the Dock waits for the quest that introduces it");
         }
         finally
         {
             Object.DestroyImmediate(player);
+            GameSession.StartNewGame();
         }
     }
 }

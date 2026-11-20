@@ -259,9 +259,12 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         return GameSession.Here.HeldQuestsStarted < StoryPacingSettings.Current.NewPerHomecoming || !AnyUnderWay(quest.Rank);
     }
 
-    // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses.
+    // Which kinds have a quest under way, worked out again only after a quest starts, completes or lapses. Only quests begun at this
+    // homecoming count (the quest flow review's C4): one left open for a whole raid (Strength for the Road, 43 minutes in the 11-20 run)
+    // held every quest of its colour behind it. Kept in memory: after a load none counts, so one more may begin.
     private readonly bool[] underWay = new bool[8];
     private bool underWayKnown;
+    private readonly Dictionary<QuestDefinition, int> startedInHomecoming = new Dictionary<QuestDefinition, int>();
 
     private bool AnyUnderWay(QuestRank rank)
     {
@@ -271,7 +274,8 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
             foreach (QuestLog.Entry entry in Log.Entries)
             {
                 if (entry.Quest != null && (int)entry.Quest.Rank < underWay.Length
-                    && (entry.Status == QuestStatus.Active || entry.Status == QuestStatus.ReadyToTurnIn))
+                    && (entry.Status == QuestStatus.Active || entry.Status == QuestStatus.ReadyToTurnIn)
+                    && startedInHomecoming.TryGetValue(entry.Quest, out int homecoming) && homecoming == GameSession.Home.HeldQuestsHomecoming)
                 {
                     underWay[(int)entry.Quest.Rank] = true;
                 }
@@ -369,6 +373,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
 
         Unbind();
         waiting.Clear();
+        startedInHomecoming.Clear();
         underWayKnown = false;
         heldSpacedUntil = float.NegativeInfinity;
         log = GameSession.Quests;
@@ -511,6 +516,9 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private void OnQuestStarted(QuestDefinition quest)
     {
         underWayKnown = false;
+        startedInHomecoming[quest] = GameSession.Home.HeldQuestsHomecoming;
+        // What it introduces is learned now, announced across the screen (BigNotice): one building per quest.
+        BuildingGate.TeachOnStart(quest, Player.Current != null ? Player.Current.gameObject : null);
         if (quest.AnnounceStart)
             GameMessages.Post(QuestMarkerSettings.NewQuestText(quest), MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));

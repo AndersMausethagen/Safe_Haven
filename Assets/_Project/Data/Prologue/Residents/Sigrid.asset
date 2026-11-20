@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: d44ee5592bb9a2c4aa2953eb4fab1ad7, type: 3}
   rescueLine: You came back. I told them you would.
   arrivalLine: Seven went in. Tell me who's home.
-  welcomeLine: 
+  welcomeLine: I heard your fire before I saw it. Every night a little louder. I knew it was one of mine. Nobody else in a hundred years would be fool enough to light one.
   fallenLine: Don't you stop for me. That's an order.
   fightLines:
     spotted:
@@ -52,3 +52,17 @@ MonoBehaviour:
   returningLines: []
   jobs:
   - {fileID: 11400000, guid: 4c4fcc29299e0dd4b9ba5cfd68e28c5b, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: 5c1ab1fafa323bd469319b7535534bc8, type: 2}
+    text: I led seven into those woods. I'll not lose the ones who came back. Give me the Leader's work and raise a banner where everyone can see it.
+    acceptText: A banner.
+    waitingText: The Haven Banner, where all of us can see it.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: ebf2e33146efeff4e9095b88c2fcb5ae, type: 2}
+    text: Seven went in. Ask them what they remember of the woods, each of them. I need to know what I'm not being told.
+    acceptText: I'll ask.
+    waitingText: Ingrid, Bjarne, Tor, Liv, Eirik and Runa. Ask each of them.
+    askText: 
+    thanksText: 
+  questLineDone: 

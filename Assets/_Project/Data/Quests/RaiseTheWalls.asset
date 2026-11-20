@@ -15,7 +15,7 @@ MonoBehaviour:
   id: raisethewalls
   displayName: Raise the Walls
   description: The ward keeps the worst of the forest out, but not everything. Put up four lengths of palisade between the fire and the trees ({key:Build}).
-  chain: Hands at Home
+  chain: Tor
   journalNotes: Wood against the dark. It will not stop the old ones, but it tells the small ones where the Haven begins.
   rank: 4
   availableObjective: 
@@ -25,7 +25,7 @@ MonoBehaviour:
   prerequisites:
   - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
   startedFirst: []
-  start: 0
+  start: 2
   startEvent: {fileID: 0}
   startWhen:
     type: 0
@@ -48,10 +48,16 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 0
+  objectivesInOrder: 1
   objectives:
   - type: 7
     description: 
@@ -73,11 +79,19 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

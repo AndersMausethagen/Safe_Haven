@@ -531,12 +531,6 @@ MonoBehaviour:
     waitingText: The note is still pinned there. Two wolves, it says.
     askText: 
     thanksText: 
-  - quest: {fileID: 11400000, guid: b056baccfd41442478d4f5da5ea2d76a, type: 2}
-    text: '"To whoever comes after: this hearth wants copper, and hands that can work it. Smelt ingots and make a pickaxe." - the last smith. Bjarne found it in the old hearth stones and pinned it here.'
-    acceptText: I'll work the copper.
-    waitingText: Copper ingots, and a pickaxe made from them.
-    askText: 
-    thanksText: 
   sideOffers: []
   speakerName: Notice Board
   portrait: {fileID: 0}

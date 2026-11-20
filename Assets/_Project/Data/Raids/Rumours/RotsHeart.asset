@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RotsHeart
   m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
   id: rumour.rotsheart
-  briefing: 'The forest is gathering against {0}. Something out here feeds it: a heart of black wood, Runa says. Burn it out and the push on {0} falters.'
+  briefing: 'The forest is gathering against {0}. Something out here feeds it: a heart of black wood, the portal says. Burn it out and the push on {0} falters.'
   site: {fileID: 11400000, guid: 3456070923cb2674daba2e7f6b42fba7, type: 2}
   setPiece: {fileID: 0}
   weight: 3
@@ -29,3 +29,4 @@ MonoBehaviour:
   urgent: 1
   seeksLost: 0
   forestPushing: 1
+  whileQuest: {fileID: 0}

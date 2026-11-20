@@ -36,23 +36,31 @@ public sealed class QuestCategoryTests
         }
     }
 
-    // The rule that opens the door early: tools, food, the workshop, tales and errands help, and never gate.
+    // The rule that opens the door early: tools, food, the workshop, tales and errands help, and never gate. One exception, the user's
+    // (2026-11-21): the next rescue waits for the person before to have learned their work, so a quest a person gives may stand before
+    // a Rescue quest (never before the main story).
     [Test]
     public void NothingOptional_StandsBeforeTheStoryOrARescue()
     {
+        int personGates = 0;
         foreach (QuestDefinition quest in Quests.Where(q => q.Rank == QuestRank.MainStory || q.Rank == QuestRank.Rescue))
         {
             var seen = new HashSet<QuestDefinition>();
-            var open = new Stack<QuestDefinition>(quest.Prerequisites);
+            // Each quest before it, and whether the way to it went through a rescue (a person's work may stand only behind one).
+            var open = new Stack<(QuestDefinition before, bool viaRescue)>(quest.Prerequisites.Select(q => (q, quest.Rank == QuestRank.Rescue)));
             while (open.Count > 0)
             {
-                QuestDefinition before = open.Pop();
+                (QuestDefinition before, bool viaRescue) = open.Pop();
                 if (!seen.Add(before)) continue;
-                Assert.IsTrue(before.Rank == QuestRank.MainStory || before.Rank == QuestRank.Rescue,
+                bool aPersonsWork = viaRescue && ResidentQuests.IsGivenByAPerson(before);
+                personGates += aPersonsWork ? 1 : 0;
+                Assert.IsTrue(before.Rank == QuestRank.MainStory || before.Rank == QuestRank.Rescue || aPersonsWork,
                     $"{quest.name} waits for {before.name}, which is a {QuestMarkerSettings.RankName(before.Rank).ToLowerInvariant()}");
-                foreach (QuestDefinition earlier in before.Prerequisites) open.Push(earlier);
+                foreach (QuestDefinition earlier in before.Prerequisites) open.Push((earlier, viaRescue || before.Rank == QuestRank.Rescue));
             }
         }
+
+        Assert.Greater(personGates, 0, "the rescues wait for the person before's work (the exception is in use)");
     }
 
     [Test]

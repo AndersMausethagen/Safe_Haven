@@ -17,7 +17,8 @@ public sealed class IngridQuestLineTests
     [Test]
     public void HerLine_IsTheAlchemist_ThenTheAltarsThreeLessons_EachGivenAndHandedInByHer()
     {
-        string[] expected = { "TheAlchemist", "CleansingTheCurse", "WhatTheSteelRemembers", "MarksOfTheOldWays" };
+        // The approved quest flow (Docs/QuestFlowReview_2026-11-20.md §5.3): the Cauldron's draughts come third.
+        string[] expected = { "TheAlchemist", "CleansingTheCurse", "ADraughtForTheRoad", "WhatTheSteelRemembers", "MarksOfTheOldWays" };
         CollectionAssert.AreEqual(expected, Ingrid.QuestLine.Select(offer => offer.Quest != null ? offer.Quest.name : null).ToArray());
         QuestDefinition before = null;
         foreach (QuestOffer offer in Ingrid.QuestLine)
@@ -68,6 +69,7 @@ public sealed class IngridQuestLineTests
         Assert.AreEqual(QuestStatus.ReadyToTurnIn, log.StatusOf(cleanse), "the altar's batches count as made");
 
         log.ForceComplete(cleanse);
+        log.ForceComplete(Quest("ADraughtForTheRoad"));
         Assert.IsTrue(log.TryStart(empower));
         var sword = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Weapons/CopperSword.asset");
         log.Handle(new GameEvent(GameEventKind.Repaired, sword, 1));

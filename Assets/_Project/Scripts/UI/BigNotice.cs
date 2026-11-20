@@ -7,7 +7,8 @@ using UnityEngine.UI;
 /// The big notice across the upper middle of the screen, for news the player must not miss (the user, 2026-11-20): a building
 /// learned ("a large notification on the screen, with the building's picture, name and where to find it", from PlayerCrafting's
 /// BuildingLearned) and hunger ("tell the player that his character is hungry and must find something to eat", from PlayerNeeds'
-/// Alerted). A kit card with the picture on the left, a kicker, the name in the title face, a line, and where to go. Several take
+/// Alerted), and someone out there who can be found (the user, 2026-11-21: "make it clear to a player that a new NPC can be found":
+/// a Rescue quest starting, with the person's portrait). A kit card with the picture on the left, a kicker, the name in the title face, a line, and where to go. Several take
 /// their turn. A notice waits while a conversation or a window covers the screen, so a building taught in a talk shows after it.
 /// Runs by itself from the first scene and only listens.
 /// </summary>
@@ -55,6 +56,7 @@ public sealed class BigNotice : MonoBehaviour
     private TMP_Text where;
     private Image rim;
     private float shownFor = -1f;
+    private QuestLog watched;
 
     /// <summary>The notice up now, or null: for tests and probes.</summary>
     public static string ShownTitle => current != null && current.shownFor >= 0f ? current.title.text : null;
@@ -106,6 +108,58 @@ public sealed class BigNotice : MonoBehaviour
     {
         PlayerCrafting.BuildingLearned -= OnBuildingLearned;
         PlayerNeeds.Alerted -= OnNeedAlert;
+        Watch(null);
+    }
+
+    // A new or loaded game replaces the quest log: the notice follows it.
+    private void Watch(QuestLog log)
+    {
+        if (log == watched)
+        {
+            return;
+        }
+
+        if (watched != null)
+        {
+            watched.Started -= OnQuestStarted;
+        }
+
+        watched = log;
+        if (watched != null)
+        {
+            watched.Started += OnQuestStarted;
+        }
+    }
+
+    private static void OnQuestStarted(QuestDefinition quest)
+    {
+        if (quest != null && quest.Rank == QuestRank.Rescue && !HavenVisit.InHostsHaven)
+        {
+            Show(ForRescue(quest));
+        }
+    }
+
+    /// <summary>What the notice says when someone can be found: their portrait, who they are, and where to look.</summary>
+    public static Notice ForRescue(QuestDefinition quest)
+    {
+        ResidentDefinition person = null;
+        string step = null;
+        foreach (QuestObjective objective in quest.Objectives)
+        {
+            if (objective != null && objective.Type == ObjectiveType.RescuePerson && objective.Person != null)
+            {
+                person = objective.Person;
+                step = objective.Describe();
+                break;
+            }
+        }
+
+        string who = person != null ? person.DisplayName : quest.DisplayName;
+        // "Find Bjarne in the Misty Woods": the step names where.
+        string where = string.IsNullOrWhiteSpace(step) ? "Look for them out in the woods" : step.TrimEnd('.');
+        return new Notice(person != null ? person.Portrait : null, "Eye", "Someone can be found", who,
+            FirstSentence(person != null && !string.IsNullOrWhiteSpace(person.Description) ? person.Description : quest.Description),
+            $"{where}: the portal's briefing shows where. Bring them home.");
     }
 
     private static void OnBuildingLearned(BuildingDefinition building)
@@ -194,6 +248,7 @@ public sealed class BigNotice : MonoBehaviour
 
     private void Update()
     {
+        Watch(GameSession.Quests);
         bool covered = DialogueBox.IsOpen || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || GamePause.IsPaused;
         if (shownFor < 0f)
         {

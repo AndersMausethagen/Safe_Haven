@@ -15,7 +15,7 @@ MonoBehaviour:
   id: haven.cut_stone
   displayName: Cut Stone
   description: The altar wants squared stone, and squaring it is slow work. The portal remembers masons cutting it in the north of Ravenwood, past the Charcoal Camp, and says some of it may still be stacked where they left it. Walk out to the Old Quarry and see.
-  chain: 
+  chain: Ingrid
   journalNotes: The Old Quarry lies about 290 m north of the portal, past the Charcoal Camp. The masons who worked it left in the middle of a day.
   rank: 4
   availableObjective: 
@@ -55,7 +55,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
-  startsWithoutWaiting: 0
+  startsWithoutWaiting: 1
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -107,6 +107,7 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 0
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

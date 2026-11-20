@@ -72,10 +72,13 @@ public sealed class HomeStoryTests
     [Test]
     public void TheFirstRaid_FindsTheOneTheSearchIsFor()
     {
-        // The first raid's find and the search for Ingrid name the same person; the rest of their shape is the quests' own data.
-        QuestObjective find = Quest("ThroughThePortal").Objectives.Single(o => o.Type == ObjectiveType.RescuePerson);
+        // Finding Ingrid is her rescue quest's alone (the quest flow review's A10: Into the Misty Woods asked it twice); that quest is
+        // under way before the first raid, so the first raid's find counts for it.
+        Assert.IsFalse(Quest("ThroughThePortal").Objectives.Any(o => o.Type == ObjectiveType.RescuePerson), "the first raid is the extraction");
+        QuestDefinition search = Quest("AStrangerInTheMist");
+        QuestObjective find = search.Objectives.First(o => o.Type == ObjectiveType.RescuePerson);
         Assert.IsNotNull(find.Person);
-        Assert.AreEqual(Quest("AStrangerInTheMist").Objectives[0].Person, find.Person);
+        Assert.IsFalse(search.Prerequisites.Contains(Quest("ThroughThePortal")), "the search begins before the first raid, not after it");
     }
 
     // The Heartroot left the Woods' expeditions (2026-11-17, Docs/HeartrootEncounterDesign_2026-11-17.md): an expedition finds

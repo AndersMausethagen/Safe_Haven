@@ -18,7 +18,7 @@ MonoBehaviour:
   portrait: {fileID: 21300000, guid: 00080c620758e334298ab876619b788e, type: 3}
   rescueLine: You're not from the village. Doesn't matter. Help me with this sack.
   arrivalLine: There's good dirt under all this moss. Who's been using it?
-  welcomeLine: 
+  welcomeLine: I'm from past the ridge. I walked home last spring and the road went somewhere else, and my village wasn't at the end of it.
   fallenLine: I can't go on... come back for me.
   fightLines:
     spotted: []
@@ -33,3 +33,17 @@ MonoBehaviour:
   jobs:
   - {fileID: 11400000, guid: 42d876bf3cb45f84088e94fc709b0672, type: 2}
   - {fileID: 11400000, guid: cdd8fcb3acc60ec45854efd2eb13a408, type: 2}
+  questLine:
+  - quest: {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
+    text: You gather what the woods drop. I grow what they won't. Give me the Farmer's work and a plot of turned earth, and it grows while you're away.
+    acceptText: A plot.
+    waitingText: A Farm Plot. Turn the earth somewhere it gets the sun.
+    askText: 
+    thanksText: 
+  - quest: {fileID: 11400000, guid: b82ec5eb9e9b7df43872b74101d604da, type: 2}
+    text: Iron chafes. It wants linen under it. Build me a tailor's shop by Gunnar's lodge and I'll weave it, four bolts to start.
+    acceptText: Linen, then.
+    waitingText: The Tailor's Shop at Tier II, four Linen, and the Weaver's work for me.
+    askText: 
+    thanksText: 
+  questLineDone: 

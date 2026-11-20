@@ -24,6 +24,7 @@ MonoBehaviour:
   showTimerInHud: 0
   prerequisites:
   - {fileID: 11400000, guid: 243140468b973e440ac441a6ef36f475, type: 2}
+  - {fileID: 11400000, guid: a2c8684a2832f0c43b9d3c55f3682754, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -55,6 +56,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -106,6 +108,7 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

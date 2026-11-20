@@ -7,7 +7,8 @@ using Object = UnityEngine.Object;
 
 /// <summary>
 /// A rescued resident's quest line starts at the rescue, and their workplace is learned only once its first quest has started
-/// (ResidentQuests, the user 2026-11-20). Checked on every shipped resident that has a quest line.
+/// (ResidentQuests, the user 2026-11-20); a building a later quest introduces waits for that quest (BuildingGate, the approved quest
+/// flow review). Checked on every shipped resident that has a quest line.
 /// </summary>
 public sealed class ResidentQuestsTests
 {
@@ -73,7 +74,9 @@ public sealed class ResidentQuestsTests
             Assert.AreEqual(QuestStatus.Active, GameSession.Quests.StatusOf(first));
             foreach (BuildingDefinition place in places)
             {
-                Assert.IsTrue(crafting.IsKnown(place), $"{person.name}'s {place.name} is learned with {first.name}");
+                // What the first quest introduces (or nothing does) comes now; what a later quest of theirs introduces waits for it.
+                bool now = BuildingGate.IntroducedBy(place).Count == 0 || BuildingGate.IntroducedBy(place).Contains(first);
+                Assert.AreEqual(now, crafting.IsKnown(place), $"{person.name}'s {place.name} " + (now ? "is learned with " + first.name : "waits for its own quest"));
                 checkedPlaces++;
             }
 
@@ -96,13 +99,46 @@ public sealed class ResidentQuestsTests
         Assert.AreEqual(QuestStatus.Active, GameSession.Quests.StatusOf(ResidentQuests.FirstQuest(person)));
     }
 
+    // Every rescued person starts a quest chain (the user, 2026-11-20): a line of two or more, the first introducing their workplace.
     [Test]
-    public void SomeoneWithoutAQuestLine_TeachesAtOnce()
+    public void EveryoneRescued_HasAQuestChain()
     {
-        ResidentDefinition person = Content.Residents.FirstOrDefault(p => p != null && ResidentQuests.FirstQuest(p) == null && Workplaces(p).Count > 0);
-        Assert.IsNotNull(person, "a resident without a quest line who teaches a workplace");
-        PlayerCrafting crafting = NewPlayer();
-        ResidentNpc.TeachWhatTheyKnow(person, player, false);
-        Assert.IsTrue(Workplaces(person).All(crafting.IsKnown));
+        int people = 0;
+        foreach (ResidentDefinition person in Content.Residents.Where(p => p != null && p.Jobs.Length > 0))
+        {
+            Assert.GreaterOrEqual(person.QuestLine.Count(offer => offer?.Quest != null), 2, person.name + " has a chain of their own");
+            Assert.IsTrue(person.QuestLine.All(offer => offer?.Quest != null && !string.IsNullOrWhiteSpace(offer.Text)), person.name + " says what each quest wants");
+            people++;
+        }
+
+        Assert.Greater(people, 5);
+    }
+
+    [Test]
+    public void ALaterTrade_IsLearnedWithItsQuest_NotWithTheJob()
+    {
+        int checkedPlaces = 0;
+        foreach (ResidentDefinition person in WithQuestLines())
+        {
+            foreach (BuildingDefinition place in Workplaces(person))
+            {
+                QuestDefinition introducing = BuildingGate.IntroducedBy(place).FirstOrDefault();
+                if (introducing == null || introducing == ResidentQuests.FirstQuest(person))
+                {
+                    continue;
+                }
+
+                GameSession.StartNewGame();
+                PlayerCrafting crafting = NewPlayer();
+                ResidentQuests.StartFirst(person, player, false);
+                Assert.IsFalse(crafting.IsKnown(place), $"{place.name} waits for {introducing.name}");
+                Assert.IsTrue(GameSession.Quests.TryStart(introducing, prerequisitesAside: true));
+                ResidentNpc.TeachWhatTheyKnow(person, player, false);
+                Assert.IsTrue(crafting.IsKnown(place), $"{place.name} comes with {introducing.name}");
+                checkedPlaces++;
+            }
+        }
+
+        Assert.Greater(checkedPlaces, 0, "a second trade was checked (the Cauldron, the Dock, the Yard)");
     }
 }
