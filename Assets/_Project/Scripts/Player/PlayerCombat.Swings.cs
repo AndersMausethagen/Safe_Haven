@@ -973,11 +973,14 @@ public sealed partial class PlayerCombat
 
     private static float RecoverAt(AttackDefinition attack, float speed) => (attack != null ? attack.RecoveryTime : FallbackRecoveryTime) / speed;
 
-    /// <summary>Ends the current swing if its hit has already landed (raising the guard cuts the follow-through short).</summary>
-    public void CancelRecovery()
+    /// <summary>The guard going up ends the current swing where it gives way to the guard (CanGuardFrom): its follow-through cut
+    /// short, a light wind-up broken off, a heavy still held let go.</summary>
+    public void GiveWayToGuard()
     {
-        // A swing past its blow, or a heavy still held (broken off unstruck: what it cost stays spent).
-        if (activeKind != SwingKind.None && (!hitPending || BreaksOffIntoGuard))
+        // Past its blow, a heavy still held, or a wind-up whose cancels take the guard (broken off unstruck: what it cost stays spent).
+        // No Cancel Lockout as a dodge out of a wind-up gets: the guard's own Whiff Relock already keeps a tap fishing for a parry
+        // down, and a lockout would eat the counter out of a blow caught on the raised guard.
+        if (activeKind != SwingKind.None && (BreaksOffIntoGuard || CancelsNow(SwingCancels.Guard)))
         {
             if (charging)
             {
@@ -987,6 +990,10 @@ public sealed partial class PlayerCombat
 
             EndSwing();
             queuedKind = SwingKind.None;
+            // The attack press still held is spent with it, as a dodge spends it (review 2026-11-20: held on, it turned into a heavy
+            // under the raised guard at the hold threshold).
+            pressTime = -1f;
+            heavyAfterLight = false;
         }
     }
 

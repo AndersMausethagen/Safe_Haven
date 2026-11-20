@@ -113,7 +113,8 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         }
     }
 
-    // When the button went down: a press during a held charge breaks the charge off (PlayerCombat.CanGuardFrom).
+    // When the button went down: a press during a wind-up that gives way to the guard (a light swing, a held charge) breaks it off
+    // (PlayerCombat.CanGuardFrom); one held since before the attack doesn't.
     private float heldSince = float.NegativeInfinity;
 
     // A dodge drops the guard; holding the button raises it again once the dodge is over.
@@ -129,7 +130,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
         {
             if (combat != null)
             {
-                combat.CancelRecovery();
+                combat.GiveWayToGuard();
             }
             SetGuarding(true);
         }

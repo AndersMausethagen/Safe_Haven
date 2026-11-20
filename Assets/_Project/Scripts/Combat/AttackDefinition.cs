@@ -93,6 +93,15 @@ public sealed class AttackDefinition : ScriptableObject
              "uses the settings' Lunge Share. A rush steps all through its wind-up.")]
     [SerializeField, Range(-1f, 1f)] private float lungeShare = -1f;
 
+    [Header("Cancels (player)")]
+    [Tooltip("Off: what Combat Technique Settings › Cancels gives this kind of swing. On: Windup Cancels and Recovery Cancels below.")]
+    [SerializeField] private bool ownCancels;
+    [Tooltip("What breaks this swing off before its blow lands (it deals no damage; its stamina stays spent). A guard held since " +
+             "before the swing (attacking out of it) never does.")]
+    [SerializeField] private SwingCancels windupCancels = SwingCancels.Dodge;
+    [Tooltip("What cuts its follow-through short once the blow has landed.")]
+    [SerializeField] private SwingCancels recoveryCancels = SwingCancels.Dodge | SwingCancels.Guard;
+
     [Header("How a weapon art moves (player)")]
     [Tooltip("None: an ordinary swing. Dash Through: the player dashes Motion Distance through enemies, striking all along the way, and " +
              "ends past them (behind for a backstab). Blink Behind: steps at once to the back of the enemy in focus within Motion Distance, " +
@@ -200,6 +209,9 @@ public sealed class AttackDefinition : ScriptableObject
     public float? OwnWindupTurnRate => windupTurnRate >= 0f ? windupTurnRate : (float?)null;
     public float? OwnMoveAt => moveAt >= 0f ? moveAt : (float?)null;
     public float? OwnLungeShare => lungeShare >= 0f ? lungeShare : (float?)null;
+    /// <summary>Cancels (player): its own, or null for the settings' by kind (SwingMotion resolves them).</summary>
+    public SwingCancels? OwnWindupCancels => ownCancels ? windupCancels : (SwingCancels?)null;
+    public SwingCancels? OwnRecoveryCancels => ownCancels ? recoveryCancels : (SwingCancels?)null;
     public ArtMotion Motion => motion;
     public float MotionDistance => motionDistance;
     public bool AlwaysCritical => alwaysCritical;
@@ -245,6 +257,14 @@ public sealed class AttackDefinition : ScriptableObject
         windupTurnRate = turnRate;
         moveAt = moveAfter;
         lungeShare = lungeLeadShare;
+    }
+
+    /// <summary>Gives the attack its own cancels (editor setup and tests).</summary>
+    public void ConfigureCancels(SwingCancels windup, SwingCancels recovery)
+    {
+        ownCancels = true;
+        windupCancels = windup;
+        recoveryCancels = recovery;
     }
 
     /// <summary>Sets how the wind-up plays (editor setup and tests).</summary>

@@ -40,6 +40,9 @@ MonoBehaviour:
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
+  ownCancels: 1
+  windupCancels: 1
+  recoveryCancels: 3
   motion: 0
   motionDistance: 3.5
   alwaysCritical: 0

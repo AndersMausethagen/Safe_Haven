@@ -1670,7 +1670,11 @@ The player is no super soldier: combat is about reading the enemy and committing
   from, so swapping a clip changes no damage per second. `CombatMovesetTests` guards states and shape. Humanoid monsters: `MonsterAnimationDriver`
   crossfades `AttackDefinition.AnimationState` at `AnimationSpeed` (fitted to `HitDelay`) and flinches through a `Hit` state.
 - **Getting out and flinch:** a dodge cuts a swing short, during the wind-up too (`DodgeCancelsWindup`; the swing is
-  lost, and attacking is locked for `CancelLockout` unless it was a charging heavy); how the player moves while swinging is
+  lost, and attacking is locked for `CancelLockout` unless it was a charging heavy). What breaks a swing off is a per-move
+  cancel table (`SwingCancels`, 2026-11-20, after God of War): `AttackDefinition › Cancels` or the settings' by kind
+  (`SwingMotion.WindupCancels`/`RecoveryCancels`): a light gives way to a dodge or a guard pressed in its wind-up
+  (`PlayerCombat.CanGuardFrom`, `GiveWayToGuard`; a guard held since before the attack doesn't), a heavy and the rest only to
+  the dodge, each combo's finisher commits (dodge only), and every follow-through to either; how the player moves while swinging is
   `SwingMotion`'s (see "Combat rework" below); a hit that gets through while winding up loses the swing and staggers
   the player (`Flinched`), or floors them when it is worth `KnockdownShare` of their health.
 - **Guard and parry** (`PlayerGuard`, an `IHitGuard` that `Damageable` asks before applying a hit; `GuardRules`):

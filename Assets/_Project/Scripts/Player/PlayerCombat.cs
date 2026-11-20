@@ -324,22 +324,27 @@ public sealed partial class PlayerCombat : MonoBehaviour
     // The swing's own clock: stopped while it charges (chargeHeld, then heldPastFull once full) or waits for the hold to be told.
     private float ActiveElapsed => Time.time - activeStartTime - chargeHeld - heldPastFull - holdWaited;
 
-    /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
-    public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);
-
     /// <summary>
-    /// The guard can go up for a press made at <paramref name="pressedAt"/>: whenever <see cref="CanGuard"/>, and also to break off a
-    /// heavy swing being held (charging, or winding up to it) when the guard was pressed after the attack was (the user, 2026-11-20:
-    /// blocking out of a charge played the held blow out at speed and then jumped to the block). A guard held since before the attack
-    /// (attacking out of the guard, both buttons held) leaves it alone. Any other swing still commits until its blow.
+    /// The guard can go up for a press made at <paramref name="pressedAt"/>, not while flinching: with no swing going; in a swing's
+    /// follow-through when its recovery cancels allow it; and in its wind-up when its wind-up cancels allow it (a light swing by
+    /// default, the per-move cancel table, the user 2026-11-20) or to break off a heavy swing being held (charging, or winding up to
+    /// it; the user, 2026-11-20: blocking out of a charge played the held blow out at speed and then jumped to the block). A wind-up is
+    /// only broken off by a press made after the attack's: a guard held since before it (attacking out of the guard, both buttons held)
+    /// leaves it alone.
     /// </summary>
-    public bool CanGuardFrom(float pressedAt) => CanGuard || (!IsFlinching && BreaksOffIntoGuard && pressedAt > attackPressedAt);
+    public bool CanGuardFrom(float pressedAt) => !IsFlinching && (activeKind == SwingKind.None
+        || (hitPending ? (BreaksOffIntoGuard || CancelsNow(SwingCancels.Guard)) && pressedAt > attackPressedAt : CancelsNow(SwingCancels.Guard)));
 
     // A heavy swing still held before its blow: charging at the top of its wind-up, or on its way there.
     private bool BreaksOffIntoGuard => charging || (activeKind == SwingKind.Heavy && hitPending && attackHeld && (activeTechnique & HitTechnique.Charged) == 0);
 
-    /// <summary>A dodge can't cut a swing short before it lands (unless the settings allow it): swings are commitments.</summary>
-    public bool CanDodge => (!IsFlinching || InCuttableFlinchTail) && (activeKind == SwingKind.None || !hitPending || Rules.DodgeCancelsWindup);
+    // Whether the swing going now gives way to this: its wind-up's cancels before the blow, its recovery's after (the per-move cancel
+    // table, SwingMotion).
+    private bool CancelsNow(SwingCancels what) => activeKind == SwingKind.None
+        || ((hitPending ? SwingMotion.WindupCancels(activeAttack, activeKind, Rules) : SwingMotion.RecoveryCancels(activeAttack, Rules)) & what) != 0;
+
+    /// <summary>A dodge gets out of a swing when its cancels allow it (by default all through it: Dodge Cancels Windup).</summary>
+    public bool CanDodge => (!IsFlinching || InCuttableFlinchTail) && CancelsNow(SwingCancels.Dodge);
 
     /// <summary>True for a moment after a hit got through: the player reels and can't act.</summary>
     public bool IsFlinching => Time.time < flinchUntil;

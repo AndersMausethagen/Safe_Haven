@@ -28,6 +28,15 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("On: a dodge can cut a swing short while it winds up (it then deals no damage; its stamina is spent). Off: " +
              "a swing can only be dodged out of once it has landed, so every swing is a commitment.")]
     [SerializeField] private bool dodgeCancelsWindup = true;
+    [Tooltip("What breaks a light swing off before its blow, for attacks that don't set their own (AttackDefinition › Cancels). A guard " +
+             "pressed in its wind-up raises at once (God of War: block and roll cancel a quick blow before it lands).")]
+    [SerializeField] private SwingCancels lightWindupCancels = SwingCancels.Dodge | SwingCancels.Guard;
+    [Tooltip("The same for a heavy swing: a roll gets out, a block doesn't (a heavy still held breaks off into the guard either way).")]
+    [SerializeField] private SwingCancels heavyWindupCancels = SwingCancels.Dodge;
+    [Tooltip("The same for the rest: arts, rushes, shield bashes and counters out of the guard.")]
+    [SerializeField] private SwingCancels otherWindupCancels = SwingCancels.Dodge;
+    [Tooltip("What cuts a swing's follow-through short once its blow has landed, for attacks that don't set their own.")]
+    [SerializeField] private SwingCancels recoveryCancels = SwingCancels.Dodge | SwingCancels.Guard;
     [Tooltip("Movement speed from the start of a light swing until its blow lands, as a share of normal, for attacks that don't set " +
              "their own (AttackDefinition › Movement). 0 plants the feet, so the whole body swings; above 0 a swing walked through plays " +
              "on the arms over the walking legs. Heavy swings, rushes and arts stay planted unless the attack says otherwise.")]
@@ -42,7 +51,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [SerializeField, Range(0f, 1f)] private float heavyMoveSpeed;
     [Tooltip("Degrees per second a swing turns toward where the player aims early in its wind-up, when no enemy is in focus (No Rest " +
              "for the Wicked's \"change targets during attack windups\"). An attack can set its own (Movement › Windup Turn Rate). 0: aimed only as it starts.")]
-    [SerializeField, Min(0f)] private float windupTurnRate = 150f;
+    [SerializeField, Min(0f)] private float windupTurnRate = 300f;
     [Tooltip("Share of the wind-up, from its start, in which the blow may still turn toward the aim. It never turns once it steps in.")]
     [SerializeField, Range(0f, 1f)] private float windupTurnShare = 0.6f;
     [Tooltip("Seconds after a blow lands before the player walks and turns again (the arms finish the swing). An attack can set its own.")]
@@ -356,6 +365,10 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float RhythmSpeedPerStack => rhythmSpeedPerStack;
     public bool EarlyPressFumbles => earlyPressFumbles;
     public bool DodgeCancelsWindup => dodgeCancelsWindup;
+    public SwingCancels LightWindupCancels => lightWindupCancels;
+    public SwingCancels HeavyWindupCancels => heavyWindupCancels;
+    public SwingCancels OtherWindupCancels => otherWindupCancels;
+    public SwingCancels RecoveryCancels => recoveryCancels;
     public float WindupMoveSpeed => windupMoveSpeed;
     public float ChargeMoveSpeed => chargeMoveSpeed;
     public float SwingMoveSpeed => swingMoveSpeed;

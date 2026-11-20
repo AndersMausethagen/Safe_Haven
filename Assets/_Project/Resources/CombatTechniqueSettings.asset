@@ -20,10 +20,15 @@ MonoBehaviour:
   rhythmSpeedPerStack: 0
   earlyPressFumbles: 0
   dodgeCancelsWindup: 1
+  lightWindupCancels: 3
+  heavyWindupCancels: 1
+  otherWindupCancels: 1
+  recoveryCancels: 3
   windupMoveSpeed: 0.6
+  chargeMoveSpeed: 0.3
   swingMoveSpeed: 0.7
   heavyMoveSpeed: 0.2
-  windupTurnRate: 150
+  windupTurnRate: 300
   windupTurnShare: 0.6
   moveAfterContact: 0.1
   lungeShare: 0.33
@@ -39,6 +44,7 @@ MonoBehaviour:
   showComboHud: 0
   heavyHoldSeconds: 0.22
   heavyChargeSeconds: 0.9
+  heldChargeDrain: 6
   heavyChargeDamage: 1.4
   heavyChargePoise: 1.5
   rushAfterDodgeSeconds: 0.3
@@ -74,6 +80,10 @@ MonoBehaviour:
   attackTurnSpacing: 0.35
   circleSeconds: {x: 0.8, y: 1.6}
   circleDistance: 3.5
+  frontBonus: 0.6
+  frontHalfArc: 70
+  onScreenBonus: 0.3
+  lastStrikerPenalty: 1
   circleSpeed: 0.6
   answerDelay: 0.3
   answerStrikeChance: 0.65
@@ -89,6 +99,8 @@ MonoBehaviour:
   readTurnSpeed: 1440
   parriedFlinchSeconds: 0.55
   blockArc: 140
+  shieldGuardPoints: 1
+  guardPointLetThrough: 1.6
   parryWindow: 0.15
   guardRelock: 0.3
   blockStaminaPerDamage: 0.8
@@ -108,6 +120,10 @@ MonoBehaviour:
   counterDamageMultiplier: 1.3
   slowMotionScale: 0.4
   slowMotionSeconds: 0.09
+  parryStop: 0.12
+  perfectDodgeStop: 0.08
+  flinchTurnGrace: 0.2
+  flinchDodgeAfter: 0.25
   focusMax: 100
   focusPerHit: 8
   focusOnParry: 18

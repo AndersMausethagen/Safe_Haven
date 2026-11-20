@@ -425,6 +425,9 @@ public sealed class MovementAndCombatPage : SystemsPage
             }
 
             Derived("Swings", technique.DodgeCancelsWindup ? "can be dodged out of at any time" : "are commitments: no dodging until they land");
+            Derived("Broken off before the blow by", $"light: {Cancels(SwingMotion.WindupCancels(null, SwingKind.Light, technique))}; " +
+                $"heavy: {Cancels(SwingMotion.WindupCancels(null, SwingKind.Heavy, technique))}; others: {Cancels(SwingMotion.WindupCancels(null, SwingKind.Art, technique))}; " +
+                $"after it: {Cancels(technique.RecoveryCancels)} (unless an attack sets its own)");
             Derived("Focus", $"a parry is worth {technique.FocusOnParry / Mathf.Max(0.01f, technique.FocusPerHit):0.#} hits, a perfect dodge " +
                 $"{technique.FocusOnPerfectDodge / Mathf.Max(0.01f, technique.FocusPerHit):0.#}; it drains after {technique.FocusHoldSeconds:0} s without a gain");
             Derived("Eating", $"{technique.EatSeconds:0.#} s, interrupted by hits and dodges; healing arrives over {technique.HealOverSeconds:0} s");
@@ -434,6 +437,9 @@ public sealed class MovementAndCombatPage : SystemsPage
         SettingsPanel(Settings<CombatFeelSettings>(CombatFeelSettings.ResourceName), "Combat feel", "Resources/CombatFeel: hit stop, shake, flashes, effects, slash arcs, vignette");
         SettingsPanel(AssetDatabase.LoadAssetAtPath<PlayerCameraSettings>("Assets/_Project/Data/Camera/PlayerCameraSettings.asset"), "Camera", "Data/Camera/PlayerCameraSettings");
     }
+
+    private static string Cancels(SwingCancels cancels) => cancels == SwingCancels.None ? "nothing"
+        : cancels == (SwingCancels.Dodge | SwingCancels.Guard) ? "dodge or guard" : cancels == SwingCancels.Dodge ? "dodge" : "guard";
 }
 
 /// <summary>

@@ -41,6 +41,19 @@ public static class SwingMotion
     public static float TurnRate(AttackDefinition attack, CombatTechniqueSettings rules) =>
         (attack != null ? attack.OwnWindupTurnRate : null) ?? rules.WindupTurnRate;
 
+    /// <summary>What breaks the swing off before its blow: the attack's own cancels, or the settings' for its kind. Dodge Cancels
+    /// Windup off takes the dodge out of every one.</summary>
+    public static SwingCancels WindupCancels(AttackDefinition attack, SwingKind kind, CombatTechniqueSettings rules)
+    {
+        SwingCancels cancels = (attack != null ? attack.OwnWindupCancels : null)
+            ?? (kind == SwingKind.Light ? rules.LightWindupCancels : kind == SwingKind.Heavy ? rules.HeavyWindupCancels : rules.OtherWindupCancels);
+        return rules.DodgeCancelsWindup ? cancels : cancels & ~SwingCancels.Dodge;
+    }
+
+    /// <summary>What cuts the swing's follow-through short once its blow has landed.</summary>
+    public static SwingCancels RecoveryCancels(AttackDefinition attack, CombatTechniqueSettings rules) =>
+        (attack != null ? attack.OwnRecoveryCancels : null) ?? rules.RecoveryCancels;
+
     /// <summary>Seconds after the swing starts (at its speed) when the player walks and turns again: a moment after the blow, never after
     /// the swing has recovered.</summary>
     public static float MoveAt(AttackDefinition attack, float hitAt, float recoverAt, float speed, CombatTechniqueSettings rules)

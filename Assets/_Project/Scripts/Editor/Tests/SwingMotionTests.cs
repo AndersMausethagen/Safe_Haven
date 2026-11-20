@@ -93,6 +93,40 @@ public sealed class SwingMotionTests
         Assert.AreEqual(90f, SwingMotion.TurnRate(Attack(turn: 90f), rules));
     }
 
+    // The per-move cancel table (the user, 2026-11-20, after God of War): a light gives way to a block or a roll before its blow, a
+    // heavy only to the roll, an attack can say for itself, and Dodge Cancels Windup off still takes the roll out of all of them.
+    [Test]
+    public void ALightGivesWayToTheGuard_AHeavyOnlyToTheDodge_AnAttackCanSayItsOwn()
+    {
+        AttackDefinition plain = Attack(), committed = Attack();
+        committed.ConfigureCancels(SwingCancels.Dodge, SwingCancels.Dodge);
+        Assert.AreEqual(SwingCancels.Dodge | SwingCancels.Guard, SwingMotion.WindupCancels(plain, SwingKind.Light, rules));
+        Assert.AreEqual(SwingCancels.Dodge, SwingMotion.WindupCancels(plain, SwingKind.Heavy, rules));
+        Assert.AreEqual(SwingCancels.Dodge, SwingMotion.WindupCancels(plain, SwingKind.Art, rules));
+        Assert.AreEqual(SwingCancels.Dodge, SwingMotion.WindupCancels(committed, SwingKind.Light, rules), "its own: a finisher commits");
+        Assert.AreEqual(SwingCancels.Dodge | SwingCancels.Guard, SwingMotion.RecoveryCancels(plain, rules));
+        Assert.AreEqual(SwingCancels.Dodge, SwingMotion.RecoveryCancels(committed, rules));
+        var data = new SerializedObject(rules);
+        data.FindProperty("dodgeCancelsWindup").boolValue = false;
+        data.ApplyModifiedPropertiesWithoutUndo();
+        Assert.AreEqual(SwingCancels.Guard, SwingMotion.WindupCancels(plain, SwingKind.Light, rules), "no rolling out of a wind-up");
+        Assert.AreEqual(SwingCancels.None, SwingMotion.WindupCancels(committed, SwingKind.Light, rules));
+    }
+
+    // The left hand slides along the haft toward the right as a big swing carries its hold out of reach, and only as far as it must.
+    [Test]
+    public void TheLeftHandSlidesDownTheHandle_OnlyAsFarAsTheReachMakesIt()
+    {
+        Vector3 shoulder = Vector3.zero, toward = Vector3.left;
+        Assert.AreEqual(new Vector3(0.5f, 0f, 0f), TwoHandGrip.WithinReach(new Vector3(0.5f, 0f, 0f), toward, 0.3f, shoulder, 0.6f), "in reach: kept");
+        Vector3 slid = TwoHandGrip.WithinReach(new Vector3(0.8f, 0f, 0f), toward, 0.3f, shoulder, 0.6f);
+        Assert.AreEqual(0.6f, slid.x, 1e-4f, "slid to the edge of the reach, no further");
+        Vector3 far = TwoHandGrip.WithinReach(new Vector3(1.2f, 0f, 0f), toward, 0.3f, shoulder, 0.6f);
+        Assert.AreEqual(0.9f, far.x, 1e-4f, "out of reach even slid: as near as the slide goes (the hand then lets go)");
+        Vector3 aside = TwoHandGrip.WithinReach(new Vector3(0.3f, 0.8f, 0f), toward, 0.5f, shoulder, 0.6f);
+        Assert.AreEqual(0f, aside.x, 1e-4f, "past the shoulder's side: the nearest point on the slide");
+    }
+
     [Test]
     public void Mashing_IsDropped_OnlyPressesNearTheChainPointAreKept()
     {
