@@ -4,7 +4,9 @@ using UnityEngine;
 /// Puts the left hand on a two-handed weapon. The clips were made for other weapons, so the left hand would otherwise follow its own
 /// path beside the handle: after the animation has posed the body, this bends the left arm so the palm closes on the handle, a set
 /// distance along it from the right hand (the weapon's Second Hand Distance), with the fingers wrapped across it. It lets go, with a
-/// short fade, for what doesn't hold the weapon that way: a dodge, gathering or other work, eating, swimming.
+/// short fade, for what doesn't hold the weapon that way: gathering or other work, eating, swimming. It holds on through a dodge
+/// (each stance dodges with its own two-handed clip; letting go popped the hand off the haft and back each time, audit 2026-11-20),
+/// and lets go anyway where the clip carries the handle out of reach.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerCombat))]
@@ -74,7 +76,7 @@ public sealed class TwoHandGrip : MonoBehaviour
         {
             WeaponDefinition weapon = combat.Weapon;
             return weapon != null && weapon.Kind == WeaponKind.Melee && weapon.RequiresBothHands && held.Shown != null && held.ShownModel != null
-                   && stateMachine.CurrentState != PlayerState.Interacting && !movement.IsDashing && (eating == null || !eating.IsEating)
+                   && stateMachine.CurrentState != PlayerState.Interacting && (eating == null || !eating.IsEating)
                    && (swimming == null || !swimming.IsSwimming) && (health == null || health.IsAlive);
         }
     }

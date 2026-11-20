@@ -44,7 +44,8 @@ public static partial class CombatAnimationSetup
 
     // The spin is one quick turn of the body on a loop: three turns, the swing's second landing the blow.
     private const string WhirlwindState = "Whirlwind";
-    private const float WhirlwindTurns = 3f;
+    // 4.5 turns last the axe art's whole recovery (3 left the player standing locked for 0.4 s; audit 2026-11-20).
+    private const float WhirlwindTurns = 4.5f;
 
     private static IEnumerable<Action> StylizedActions() =>
         StylizedStates.Select(s => new Action(s.state, Stylized(s.clip), "Empty", s.state == WhirlwindState ? WhirlwindTurns : 1f));

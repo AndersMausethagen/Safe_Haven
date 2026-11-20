@@ -807,9 +807,16 @@ public sealed partial class PlayerCombat
         float hop = activeAttack != null ? activeAttack.Hop : 0f;
         if (hop <= 0f)
         {
-            hopLift = 0f;
+            // A hop broken off is still coming down (LateUpdate).
+            if (hopDropSpeed <= 0f)
+            {
+                hopLift = 0f;
+            }
+
             return;
         }
+
+        hopDropSpeed = 0f;
 
         if (hopHips == null)
         {
@@ -821,10 +828,31 @@ public sealed partial class PlayerCombat
         hopLift = hop * Mathf.Sin(Mathf.PI * t);
     }
 
-    private void EndHop() => hopLift = 0f;
+    // A hop cut off mid-air (a flinch, a knockdown, a dodge) comes down over HopDropSeconds instead of dropping the hips up
+    // to 0.9 m in one frame (technical animation audit, 2026-11-20).
+    private const float HopDropSeconds = 0.15f;
+    private float hopDropSpeed;
+
+    private void EndHop()
+    {
+        hopDropSpeed = hopLift > 0f ? hopLift / HopDropSeconds : 0f;
+        if (hopDropSpeed <= 0f)
+        {
+            hopLift = 0f;
+        }
+    }
 
     private void LateUpdate()
     {
+        if (hopDropSpeed > 0f)
+        {
+            hopLift = Mathf.MoveTowards(hopLift, 0f, hopDropSpeed * Time.deltaTime);
+            if (hopLift <= 0f)
+            {
+                hopDropSpeed = 0f;
+            }
+        }
+
         if (hopLift > 0f && hopHips != null)
         {
             hopHips.position += Vector3.up * hopLift;

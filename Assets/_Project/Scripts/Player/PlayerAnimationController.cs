@@ -67,6 +67,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private const float GrownLegsFade = 0.25f;
     // Out of a dodge the body is already moving, so a rush attack needn't snap into its first frame.
     private const float RushFade = 0.1f;
+    private const float ChainFade = 0.18f;
     // How long before it lands a planted heavy swing brings the legs in, and how fast.
     private const float PlantedStrikeLead = 0.12f;
     private const float PlantedStrikeFade = 0.12f;
@@ -219,6 +220,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
             combat.SwingLanded += OnSwingLanded;
             combat.WeaponChanged += OnWeaponChanged;
             combat.KnockedDown += OnKnockedDown;
+            combat.Flinched += OnFlinched;
         }
 
         if (interactor != null)
@@ -276,6 +278,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         {
             combat.SwingStarted -= OnSwingStarted;
             combat.KnockedDown -= OnKnockedDown;
+            combat.Flinched -= OnFlinched;
             combat.SwingLanded -= OnSwingLanded;
             combat.WeaponChanged -= OnWeaponChanged;
         }
@@ -330,6 +333,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         UpdateLocomotion(deltaTime);
         UpdateTurn(deltaTime);
         UpdateAirborne(deltaTime);
+        ResolveHitReaction();
         UpdateSwingSpeed();
         WalkOutOfSwing();
     }

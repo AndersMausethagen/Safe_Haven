@@ -21,7 +21,8 @@ public sealed partial class PlayerAnimationController
         SetFloat(MoveXHash, local.x, speedDampTime, deltaTime);
         SetFloat(MoveZHash, local.z, speedDampTime, deltaTime);
 
-        SetFloat(MotionSpeedHash, MotionSpeed(local));
+        // Damped as the direction is: raw, a turn from forward to back played the forward run up to 1.6x fast for a few frames.
+        SetFloat(MotionSpeedHash, MotionSpeed(local), speedDampTime, deltaTime);
         UpdateSwingLegs(deltaTime);
         SetBool(HasMoveInputHash, !swim && movement.InputMagnitude > MoveInputThreshold);
         // Off in the air, in the water and in death, where Base's own poses have to show.

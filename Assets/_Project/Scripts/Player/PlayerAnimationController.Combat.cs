@@ -44,12 +44,18 @@ public sealed partial class PlayerAnimationController
         float clipTime = clips.Length > 0 ? state.normalizedTime * clips[0].clip.length : 0f;
         if (fullBodyLayer >= 0 && animator.HasState(fullBodyLayer, plantedSwing))
         {
-            animator.CrossFadeInFixedTime(plantedSwing, PlantedStrikeFade, fullBodyLayer, clipTime);
+            // ActionSpeed was just set for this frame (UpdateSwingSpeed), and the offset is read at that speed.
+            animator.CrossFadeInFixedTime(plantedSwing, PlantedStrikeFade, fullBodyLayer, StateTime(clipTime, animator.GetFloat(ActionSpeedHash)));
             animator.CrossFadeInFixedTime(EmptyStateHash, PlantedStrikeFade, upper);
         }
 
         plantedSwing = 0;
     }
+
+    // CrossFadeInFixedTime's offset is in the state's own seconds, which run at its speed: a point of the clip at clipSeconds
+    // is clipSeconds / speed into the state (measured: 0.3 at ActionSpeed 0.5 landed 0.15 s into the clip). Passing clip seconds
+    // had planted heavies drop back towards the start of their wind-up at the strike (technical animation audit, 2026-11-20).
+    private static float StateTime(float clipSeconds, float speed) => clipSeconds / Mathf.Max(0.01f, speed);
 
     // A heavy swing lost before it struck (a flinch): the arms mustn't stay standing at the top of its wind-up.
     private void ReleasePlantedSwing()
@@ -192,9 +198,18 @@ public sealed partial class PlayerAnimationController
             striking = combat.TimeToHit <= charged.StrikeLead + 0.005f;
         }
 
-        SetFloat(ActionSpeedHash, striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom));
+        float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom);
+        SetFloat(ActionSpeedHash, actionSpeed);
         float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
-        animator.CrossFadeInFixedTime(hash, fade, layer, start);
+        // A chain's next swing starts while the last is mid-follow-through, often from another pack's ready pose: 0.1 s snapped the
+        // arms across (technical animation audit, 2026-11-20). Blend for up to ChainFade, done by half-way to the blow.
+        if (!fromHold)
+        {
+            fade = Mathf.Max(fade, Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / Mathf.Max(0.01f, swing.Speed)));
+        }
+
+        // Swing states run at speed 1 times ActionSpeed (PlayerAnimator.controller), so the clip point is start / actionSpeed in.
+        animator.CrossFadeInFixedTime(hash, fade, layer, start > 0f ? StateTime(start, actionSpeed) : 0f);
         // Grown out of a light swing, the legs leave its stance for the planted heavy's slowly, so the hips don't twitch.
         float othersFade = grownFrom > 0f ? GrownLegsFade : fade;
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
@@ -221,6 +236,12 @@ public sealed partial class PlayerAnimationController
         SetBool(GuardingHash, guarding);
         if (guarding)
         {
+            // A Hit trigger left from a blow the guard state couldn't take would fire a late flinch once it ends.
+            if (parameters.Contains(HitHash))
+            {
+                animator.ResetTrigger(HitHash);
+            }
+
             // Straight into the guard, cutting off whatever swing was ending.
             CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
             foreach (int other in new[] { attackArmsLayer, fullBodyLayer })
@@ -290,7 +311,14 @@ public sealed partial class PlayerAnimationController
         SetTrigger(HitHash);
     }
 
-    // A flinch on every hit that hurts; the killing blow is left to whatever handles death.
+    // What a hit asks of the animation, gathered from Damageable.Damaged and PlayerCombat.Flinched (which come in either order
+    // from the same blow) and played in LateUpdate (ResolveHitReaction).
+    private float pendingHitShare = -1f;
+    private bool pendingFlinch;
+    private bool pendingFlinchLostSwing;
+    private bool pendingKnockdown;
+
+    // A hit that hurts; the killing blow is left to whatever handles death.
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
         if (result.Damage <= 0f || result.Killed || result.Blocked || damage.IsOverTime)
@@ -298,8 +326,55 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
-        if (health != null && result.Damage >= health.MaxHealth * KnockbackShare && upperBodyLayer >= 0
-            && animator.HasState(upperBodyLayer, KnockbackStateHash))
+        pendingHitShare = Mathf.Max(pendingHitShare, health != null && health.MaxHealth > 0f ? result.Damage / health.MaxHealth : 0f);
+    }
+
+    private void OnFlinched(float seconds, bool lostSwing)
+    {
+        pendingFlinch = true;
+        pendingFlinchLostSwing |= lostSwing;
+    }
+
+    // The flinch is the gameplay's (PlayerCombat.Flinched): a hit that doesn't flinch (a scratch, pushing through, the grace
+    // after a flinch, a ward) used to play one anyway and cut the swing that went on landing (technical animation audit,
+    // 2026-11-20). Now such a hit only shows on an idle or walking body; a swing, dodge or knockdown in progress is left alone.
+    private void ResolveHitReaction()
+    {
+        bool hit = pendingHitShare >= 0f;
+        bool flinched = pendingFlinch;
+        bool lostSwing = pendingFlinchLostSwing;
+        float share = Mathf.Max(0f, pendingHitShare);
+        bool knockedDown = pendingKnockdown;
+        pendingHitShare = -1f;
+        pendingFlinch = false;
+        pendingFlinchLostSwing = false;
+        pendingKnockdown = false;
+        if ((!hit && !flinched) || knockedDown)
+        {
+            return;
+        }
+
+        bool attacking = combat != null && combat.IsAttacking;
+        if (combat != null && !flinched)
+        {
+            bool fullBodyBusy = fullBodyLayer >= 0 && animator.GetCurrentAnimatorStateInfo(fullBodyLayer).shortNameHash != EmptyStateHash;
+            if (attacking || fullBodyBusy || (dodge != null && dodge.IsDodging))
+            {
+                return;
+            }
+        }
+        else if (flinched && !hit && !lostSwing && attacking)
+        {
+            // Thrown back by a parry after the blow was spent (Rebuff): the swing plays out.
+            return;
+        }
+
+        PlayHitReaction(share);
+    }
+
+    private void PlayHitReaction(float share)
+    {
+        if (share >= KnockbackShare && upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, KnockbackStateHash))
         {
             CrossFadeUpper(KnockbackStateHash, 0.05f);
             return;
@@ -320,6 +395,7 @@ public sealed partial class PlayerAnimationController
     // Floored by a huge blow (PlayerCombat: Knockdown Share): the whole body goes down and gets up again.
     private void OnKnockedDown(float seconds)
     {
+        pendingKnockdown = true;
         int state = Animator.StringToHash("Knockdown");
         if (fullBodyLayer < 0 || !animator.HasState(fullBodyLayer, state))
         {
