@@ -174,10 +174,16 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private bool counterLunges;
     // How long a heavy swing has waited at the top of its wind-up; the swing's clock stands still meanwhile.
     private float chargeHeld;
+    private float heldPastFull;
+
+    // A charge held on past full (the blink): it is kept, at a stamina cost, but no longer guards or shrugs off blows (review 2026-11-20:
+    // held without end, the heavy's armour and a shield's guard point made a stance that lasted as long as the stamina did).
+    private bool HeldPastFull => charging && heldPastFull > 0f;
     // Seconds the light swing a press began has waited at the top of its swing for the hold to decide (WaitsForHold).
     private float holdWaited;
     private bool waitingForHold;
     private bool charging;
+    private float attackPressedAt = float.NegativeInfinity;
     private bool attackHeld;
     // How long the player has been running, for the running attack.
     private float runningFor;
@@ -250,7 +256,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     /// A shield on the arm guards the swing (guard points, CombatTechniqueSettings › Shield Guard Points): while a melee swing winds
     /// up to its hit or a heavy is held charging, the shield takes a blow from the front. Not an art, a thrown weapon or a bow.
     /// </summary>
-    public bool InGuardPoint => Rules.ShieldGuardPoints && Shield != null && hitPending && weapon != null && !weapon.TakesAttackInput
+    public bool InGuardPoint => Rules.ShieldGuardPoints && Shield != null && hitPending && !HeldPastFull && weapon != null && !weapon.TakesAttackInput
                                 && (activeKind == SwingKind.Light || activeKind == SwingKind.Heavy || activeKind == SwingKind.Rush
                                     || activeKind == SwingKind.ShieldBash || activeKind == SwingKind.GuardCounter);
 
@@ -315,10 +321,22 @@ public sealed partial class PlayerCombat : MonoBehaviour
     private Collider finishingCollider;
     private CharacterController controller;
 
-    private float ActiveElapsed => Time.time - activeStartTime - chargeHeld - holdWaited;
+    // The swing's own clock: stopped while it charges (chargeHeld, then heldPastFull once full) or waits for the hold to be told.
+    private float ActiveElapsed => Time.time - activeStartTime - chargeHeld - heldPastFull - holdWaited;
 
     /// <summary>The guard can go up when no swing is going or the current one has already landed, and not while flinching.</summary>
     public bool CanGuard => !IsFlinching && (activeKind == SwingKind.None || !hitPending);
+
+    /// <summary>
+    /// The guard can go up for a press made at <paramref name="pressedAt"/>: whenever <see cref="CanGuard"/>, and also to break off a
+    /// heavy swing being held (charging, or winding up to it) when the guard was pressed after the attack was (the user, 2026-11-20:
+    /// blocking out of a charge played the held blow out at speed and then jumped to the block). A guard held since before the attack
+    /// (attacking out of the guard, both buttons held) leaves it alone. Any other swing still commits until its blow.
+    /// </summary>
+    public bool CanGuardFrom(float pressedAt) => CanGuard || (!IsFlinching && BreaksOffIntoGuard && pressedAt > attackPressedAt);
+
+    // A heavy swing still held before its blow: charging at the top of its wind-up, or on its way there.
+    private bool BreaksOffIntoGuard => charging || (activeKind == SwingKind.Heavy && hitPending && attackHeld && (activeTechnique & HitTechnique.Charged) == 0);
 
     /// <summary>A dodge can't cut a swing short before it lands (unless the settings allow it): swings are commitments.</summary>
     public bool CanDodge => (!IsFlinching || InCuttableFlinchTail) && (activeKind == SwingKind.None || !hitPending || Rules.DodgeCancelsWindup);
@@ -327,7 +345,7 @@ public sealed partial class PlayerCombat : MonoBehaviour
     public bool IsFlinching => Time.time < flinchUntil;
 
     /// <summary>True in the wind-up of a heavy swing with a weapon heavy enough to trade blows: hits hurt less and don't knock it out.</summary>
-    public bool IsPushingThrough => hitPending && Weapon != null && Weapon.HeavySwingArmor > 0f
+    public bool IsPushingThrough => hitPending && !HeldPastFull && Weapon != null && Weapon.HeavySwingArmor > 0f
         && (activeKind == SwingKind.Heavy
             // A greatsword's Hyper Armour: its finisher and charged blows push through as its heavy does.
             || (Weapon.Signature == WeaponSignature.HyperArmour && (activeTechnique & (HitTechnique.Finisher | HitTechnique.Charged)) != 0));

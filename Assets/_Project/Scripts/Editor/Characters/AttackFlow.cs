@@ -110,7 +110,9 @@ public static class AttackFlow
                 }
 
                 // Out of the guard a swing picks up part way into its wind-up (Out Of Guard Start).
-                float pop = Distance(pose, from == "guard" ? GuardStartPose(context, to, to.FromGuardStart) : StartPose(context, to));
+                // Out of a heavy (a heavy chain) it picks up at the frame nearest where that heavy ended (From Heavy Start).
+                float pop = Distance(pose, from == "guard" ? GuardStartPose(context, to, to.FromGuardStart)
+                    : from.EndsWith(HeavyChain) ? GuardStartPose(context, to, to.FromHeavyStart) : StartPose(context, to));
                 links.Add(new Link(weapon.name, from, to, pop, AttackFlowRules.BlendNeeded(pop, WindupRate(context, to), StrikeRate(context, to)),
                     AttackFlowRules.BlendRoom(to.HitDelay, to.StrikeLead)));
             }
@@ -126,7 +128,9 @@ public static class AttackFlow
             }
 
             IReadOnlyList<AttackDefinition> combo = weapon.Combo;
-            AttackDefinition heavyAfterLight = weapon.HeavyFollowUp != null ? weapon.HeavyFollowUp : weapon.HeavyAttack;
+            // A light swing that lands ends a heavy chain (PlayerCombat.EndSwing): the heavy after it is the weapon's heavy, never its
+            // follow-up, which only follows a heavy (the heavy chain, measured below).
+            AttackDefinition heavyAfterLight = weapon.HeavyAttack;
             for (int i = 0; i < combo.Count; i++)
             {
                 AttackDefinition swing = combo[i];
@@ -165,6 +169,15 @@ public static class AttackFlow
             }
 
             Into("exploring", exploringPose, weapon.HeavyAttack);
+            foreach ((AttackDefinition heavy, AttackDefinition next) in HeavyChainLinks(weapon))
+            {
+                if (Playable(context, heavy))
+                {
+                    Into(heavy.name + HeavyChain, HandoffPose(context, heavy), next);
+                }
+
+                Out(next);
+            }
             Into("guard", guardPose, weapon.GuardCounterAttack);
             Into("guard", guardPose, weapon.CounterAttack);
             // A weapon with no counter of its own answers a parry with the chain's first swing: out of the guard.
@@ -293,34 +306,90 @@ public static class AttackFlow
 
             foreach (AttackDefinition attack in new[] { weapon.GuardCounterAttack, weapon.CounterAttack, weapon.Combo.Count > 0 && weapon.CounterAttack == null ? weapon.Combo[0] : null })
             {
-                if (!Playable(context, attack))
-                {
-                    continue;
-                }
+                ScoreStarts(context, guard, ready, attack, dips);
+            }
+        }
 
-                if (!dips.TryGetValue(attack, out float[] worst))
-                {
-                    worst = new float[7];
-                    dips[attack] = worst;
-                }
+        return PickStarts(dips);
+    }
 
-                // A start is allowed when its blend in keeps the rule and isn't longer than the first frame's by more than two frames (or
-                // 0.12 s): a smaller dip isn't worth a slower swing. Disallowed starts count as no better than the first frame.
-                float windupRate = WindupRate(context, attack), strikeRate = StrikeRate(context, attack);
-                float room = AttackFlowRules.BlendRoom(attack.HitDelay, attack.StrikeLead);
-                float firstNeed = AttackFlowRules.BlendNeeded(Distance(guard, StartPose(context, attack)), windupRate, strikeRate);
-                float firstDip = Dip(guard, StartPose(context, attack), ready);
-                for (int step = 0; step < worst.Length; step++)
+    /// <summary>The suffix of a heavy chain's way in ("Sword Heavy (heavy chain)").</summary>
+    public const string HeavyChain = " (heavy chain)";
+
+    /// <summary>A weapon's heavy chain: its heavy into its follow-up and back, or into itself again when it has none.</summary>
+    public static IEnumerable<(AttackDefinition heavy, AttackDefinition next)> HeavyChainLinks(WeaponDefinition weapon)
+    {
+        if (weapon.HeavyAttack == null)
+        {
+            yield break;
+        }
+
+        yield return (weapon.HeavyAttack, weapon.HeavyFollowUp != null ? weapon.HeavyFollowUp : weapon.HeavyAttack);
+        if (weapon.HeavyFollowUp != null)
+        {
+            yield return (weapon.HeavyFollowUp, weapon.HeavyAttack);
+        }
+    }
+
+    /// <summary>For every heavy a heavy chain starts: the From Heavy Start (0 to 0.6, in tenths) that dips least from where the heavy
+    /// before it ended toward the ready pose, the worst over the weapons that use it (the user, 2026-11-20: "two heavy attacks should
+    /// chain, making the second start from where the first one ends").</summary>
+    public static Dictionary<AttackDefinition, float> HeavyStarts()
+    {
+        Context context = Load();
+        var dips = new Dictionary<AttackDefinition, float[]>();
+        foreach (WeaponDefinition weapon in MeleeWeapons())
+        {
+            float[] ready = TreePose(context, context.ReadyTree, ReadyPoseValue(weapon));
+            if (ready == null)
+            {
+                continue;
+            }
+
+            foreach ((AttackDefinition heavy, AttackDefinition next) in HeavyChainLinks(weapon))
+            {
+                if (Playable(context, heavy))
                 {
-                    float[] start = GuardStartPose(context, attack, step / 10f);
-                    float need = AttackFlowRules.BlendNeeded(Distance(guard, start), windupRate, strikeRate);
-                    // Up to two frames' more blend is worth the dip it saves (the greataxe's opener: 0.20 -> 0.22 s halves it).
-                    bool allowed = step == 0 || (need <= room && need <= Mathf.Max(firstNeed + GuardStartSlack, 0.12f));
-                    worst[step] = Mathf.Max(worst[step], allowed ? Dip(guard, start, ready) : firstDip + 1f);
+                    ScoreStarts(context, HandoffPose(context, heavy), ready, next, dips);
                 }
             }
         }
 
+        return PickStarts(dips);
+    }
+
+    // Each start of an attack (tenths of its wind-up) out of a pose: how far the blend from that pose dips toward the ready pose, the
+    // worst over every way it is scored. A start is allowed when its blend in keeps the rule and isn't longer than the first frame's by
+    // more than two frames (or 0.12 s): a smaller dip isn't worth a slower swing. Disallowed starts count as no better than the first.
+    private static void ScoreStarts(Context context, float[] from, float[] ready, AttackDefinition attack, Dictionary<AttackDefinition, float[]> dips)
+    {
+        if (from == null || !Playable(context, attack))
+        {
+            return;
+        }
+
+        if (!dips.TryGetValue(attack, out float[] worst))
+        {
+            worst = new float[7];
+            dips[attack] = worst;
+        }
+
+        float windupRate = WindupRate(context, attack), strikeRate = StrikeRate(context, attack);
+        float room = AttackFlowRules.BlendRoom(attack.HitDelay, attack.StrikeLead);
+        float firstNeed = AttackFlowRules.BlendNeeded(Distance(from, StartPose(context, attack)), windupRate, strikeRate);
+        float firstDip = Dip(from, StartPose(context, attack), ready);
+        for (int step = 0; step < worst.Length; step++)
+        {
+            float[] start = GuardStartPose(context, attack, step / 10f);
+            float need = AttackFlowRules.BlendNeeded(Distance(from, start), windupRate, strikeRate);
+            // Up to two frames' more blend is worth the dip it saves (the greataxe's opener: 0.20 -> 0.22 s halves it).
+            bool allowed = step == 0 || (need <= room && need <= Mathf.Max(firstNeed + GuardStartSlack, 0.12f));
+            worst[step] = Mathf.Max(worst[step], allowed ? Dip(from, start, ready) : firstDip + 1f);
+        }
+    }
+
+    private static Dictionary<AttackDefinition, float> PickStarts(Dictionary<AttackDefinition, float[]> dips)
+    {
         var best = new Dictionary<AttackDefinition, float>();
         foreach (KeyValuePair<AttackDefinition, float[]> entry in dips)
         {
@@ -542,17 +611,21 @@ public static class AttackFlow
     public static string Bake()
     {
         var report = new List<string>();
-        foreach (KeyValuePair<AttackDefinition, float> start in GuardStarts())
+        foreach ((string field, string what, Dictionary<AttackDefinition, float> starts) in new[]
+                 { ("fromGuardStart", "out of the guard", GuardStarts()), ("fromHeavyStart", "out of a heavy", HeavyStarts()) })
         {
-            var guardData = new SerializedObject(start.Key);
-            SerializedProperty share = guardData.FindProperty("fromGuardStart");
-            if (!Mathf.Approximately(share.floatValue, start.Value))
+            foreach (KeyValuePair<AttackDefinition, float> start in starts)
             {
-                share.floatValue = start.Value;
-                guardData.ApplyModifiedPropertiesWithoutUndo();
-                EditorUtility.SetDirty(start.Key);
-                AssetDatabase.SaveAssetIfDirty(start.Key);
-                report.Add($"{start.Key.name}: out of the guard from {start.Value:0.0} of its wind-up");
+                var startData = new SerializedObject(start.Key);
+                SerializedProperty share = startData.FindProperty(field);
+                if (!Mathf.Approximately(share.floatValue, start.Value))
+                {
+                    share.floatValue = start.Value;
+                    startData.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(start.Key);
+                    AssetDatabase.SaveAssetIfDirty(start.Key);
+                    report.Add($"{start.Key.name}: {what} from {start.Value:0.0} of its wind-up");
+                }
             }
         }
 

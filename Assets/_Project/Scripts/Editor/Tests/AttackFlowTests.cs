@@ -53,6 +53,18 @@ public sealed class AttackFlowTests
         Assert.IsEmpty(stale, "run Safe Haven › Tools › Fit Attack Blends\n" + string.Join("\n", stale));
     }
 
+    // Two heavies in a row flow as a chain's light swings do (the user, 2026-11-20): the second picks up where the first ended.
+    [Test]
+    public void OutOfAHeavy_TheNextHeavyPicksUpWhereItDipsLeast()
+    {
+        Dictionary<AttackDefinition, float> best = AttackFlow.HeavyStarts();
+        Assert.Greater(best.Count, 5, "heavies a heavy chain starts");
+        string[] stale = best.Where(entry => Mathf.Abs(entry.Key.FromHeavyStart - entry.Value) > 0.001f)
+            .Select(entry => $"{entry.Key.name}: out of a heavy from {entry.Key.FromHeavyStart:0.0}, measured best {entry.Value:0.0}").ToArray();
+        Assert.IsEmpty(stale, "run Safe Haven › Tools › Fit Attack Blends\n" + string.Join("\n", stale));
+        Assert.IsTrue(AttackFlow.Links().Any(link => link.From.EndsWith(AttackFlow.HeavyChain)), "heavy chains are measured ways in");
+    }
+
     // The dip measure can fail: a blend that passes through the ready pose dips by the whole way, one that moves away from it not at all.
     [Test]
     public void TheDip_IsTheDropTowardTheReadyPose()

@@ -16,15 +16,15 @@ MonoBehaviour:
   damageType: 0
   strike: 3
   baseDamage: 0
-  weaponDamageRatio: 1
+  weaponDamageRatio: 0.919
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
   range: 3.2
   arc: 40
   maxTargets: 2
-  hitDelay: 0.4444446
-  recoveryTime: 0.79444456
+  hitDelay: 0.38
+  recoveryTime: 0.73
   poiseDamage: 10
   impact: 0.9
   lunge: 0.9
@@ -51,7 +51,7 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Attack Polearm
-  animationSpeed: 0.80696195
+  animationSpeed: 0.9883725
   strikeSpeed: 1.25
   strikeLead: 0.09333341
   followThroughSpeed: 1.3
@@ -60,6 +60,7 @@ MonoBehaviour:
   blendInFromReady: 0.1
   fromGuardStart: 0.5
   blendInFromGuard: 0.1
+  fromHeavyStart: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

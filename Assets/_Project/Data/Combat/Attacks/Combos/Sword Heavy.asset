@@ -16,15 +16,15 @@ MonoBehaviour:
   damageType: 0
   strike: 2
   baseDamage: 0
-  weaponDamageRatio: 2.2
+  weaponDamageRatio: 1.335
   powerScaling: 1
   structureDamageMultiplier: 1
   canCrit: 1
   range: 2.6
   arc: 120
   maxTargets: 3
-  hitDelay: 0.5714288
-  recoveryTime: 1.0714288
+  hitDelay: 0.45
+  recoveryTime: 0.65
   poiseDamage: 40
   impact: 1.3
   lunge: 0.45
@@ -51,15 +51,16 @@ MonoBehaviour:
   castRange: 16
   castHazard: {fileID: 0}
   animationState: Sword Heavy
-  animationSpeed: 0.7383966
+  animationSpeed: 1.0101016
   strikeSpeed: 1.25
   strikeLead: 0.12000015
-  followThroughSpeed: 1.0999998
+  followThroughSpeed: 1.3
   growsFromLight: 1
-  blendIn: 0
+  blendIn: 0.2
   blendInFromReady: 0.14
   fromGuardStart: 0
   blendInFromGuard: 0
+  fromHeavyStart: 0.6
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

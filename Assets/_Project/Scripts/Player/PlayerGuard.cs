@@ -103,7 +103,18 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     }
 
     // With a bow the guard button aims instead (PlayerArchery).
-    private void OnGuardRequested(bool raised) => held = raised && (combat == null || combat.Weapon == null || !combat.Weapon.TakesAttackInput);
+    private void OnGuardRequested(bool raised)
+    {
+        bool wasHeld = held;
+        held = raised && (combat == null || combat.Weapon == null || !combat.Weapon.TakesAttackInput);
+        if (held && !wasHeld)
+        {
+            heldSince = Time.time;
+        }
+    }
+
+    // When the button went down: a press during a held charge breaks the charge off (PlayerCombat.CanGuardFrom).
+    private float heldSince = float.NegativeInfinity;
 
     // A dodge drops the guard; holding the button raises it again once the dodge is over.
     private void OnDodged(Vector3 direction) => SetGuarding(false);
@@ -112,7 +123,7 @@ public sealed class PlayerGuard : MonoBehaviour, IHitGuard
     {
         bool stunned = IsStunned;
         bool canRaise = !stunned && stateMachine.CanMove && (dodge == null || !dodge.IsDodging)
-                        && (combat == null || combat.CanGuard) && (eating == null || !eating.IsEating)
+                        && (combat == null || combat.CanGuardFrom(heldSince)) && (eating == null || !eating.IsEating)
                         && Time.time - loweredAt >= relockFor;
         if (held && !IsGuarding && canRaise)
         {

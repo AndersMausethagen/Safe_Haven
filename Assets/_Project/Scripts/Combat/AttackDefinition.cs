@@ -147,6 +147,10 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField, Range(0f, 0.6f)] private float fromGuardStart;
     [Tooltip("The blend in out of the guard (after a parry or a block), measured apart from the ready pose's so neither slows the other.")]
     [SerializeField, Min(0f)] private float blendInFromGuard;
+    [Tooltip("Started straight out of a heavy swing (a heavy chain: the heavy, then its follow-up, or the heavy again): the share of its " +
+             "wind-up it skips, to pick up at the frame nearest where that heavy ended, as a chain's light swings flow one into the next " +
+             "(the user, 2026-11-20). The rest plays slower by as much, so the blow lands on time. Measured by Fit Attack Blends.")]
+    [SerializeField, Range(0f, 0.6f)] private float fromHeavyStart;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -216,6 +220,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float BlendInFromReady => blendInFromReady;
     public float FromGuardStart => fromGuardStart;
     public float BlendInFromGuard => blendInFromGuard;
+    public float FromHeavyStart => fromHeavyStart;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;

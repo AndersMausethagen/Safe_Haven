@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public sealed partial class PlayerAnimationController
 {
+    // The swing started before this one was a plain heavy (not a charged release): a heavy chain picks up where it ended.
+    private bool lastWasPlainHeavy;
+
     // A swing's shape: a slow build-up, a fast strike, and it stands at the top of its wind-up while a heavy swing charges.
     private void UpdateSwingSpeed()
     {
@@ -72,7 +75,8 @@ public sealed partial class PlayerAnimationController
         }
 
         plantedSwing = 0;
-        if (dodge == null || !dodge.IsDodging)
+        // Broken off into the guard: the guard has the upper body now (OnGuardChanged), it isn't faded out under it.
+        if ((dodge == null || !dodge.IsDodging) && (guard == null || !guard.IsGuarding))
         {
             SetFloat(ActionSpeedHash, 1f);
             if (animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash != KnockbackStateHash)
@@ -176,6 +180,8 @@ public sealed partial class PlayerAnimationController
         int hash = string.IsNullOrEmpty(stateName) ? 0 : Animator.StringToHash(stateName);
         int layer = onTheRun && attackArmsLayer >= 0 ? MovingSwingLayer(hash) : standing;
         plantedSwing = 0;
+        bool afterPlainHeavy = lastWasPlainHeavy;
+        lastWasPlainHeavy = swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0;
         // A charged blow is already past its charge: it strikes with the whole body (it may leap).
         if (swing.Kind == SwingKind.Heavy && (swing.Technique & HitTechnique.Charged) == 0 && hash != 0 && upperBodyLayer >= 0
             && animator.HasState(upperBodyLayer, hash))
@@ -203,8 +209,12 @@ public sealed partial class PlayerAnimationController
         // so the arms go on rising instead of dropping back to the first frame. Out of the guard (after a parry or a block) a swing
         // picks up as far in as its Out Of Guard Start says, at the frame nearest the guard. Either way the rest of the wind-up plays
         // slower by as much (grownFrom), so the blow lands on time.
+        // Straight out of a heavy (a heavy chain), it picks up at the frame nearest where that heavy ended (From Heavy Start).
         bool grown = swing.Kind == SwingKind.Heavy && combat != null && combat.HeavyGrownFrom > 0f;
-        grownFrom = grown ? combat.HeavyGrownFrom : OutOfTheGuard() ? swing.Attack.FromGuardStart : 0f;
+        bool outOfHeavy = swing.Kind == SwingKind.Heavy && lastWasPlainHeavy && SwingShowing();
+        grownFrom = grown ? combat.HeavyGrownFrom : OutOfTheGuard() ? swing.Attack.FromGuardStart
+            : outOfHeavy ? swing.Attack.FromHeavyStart : 0f;
+
         float start = 0f;
         if (grownFrom > 0f)
         {
@@ -331,8 +341,9 @@ public sealed partial class PlayerAnimationController
                 equipment.FinishHandMove();
             }
 
-            // Straight into the guard, cutting off whatever swing was ending (Full Body handed over in CrossFadeUpper).
-            CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
+            // Straight into the guard, cutting off whatever swing was ending (Full Body handed over in CrossFadeUpper): the block is up
+            // at once in play, but a follow-through it cuts eases over 0.15 s rather than snapping (the user, 2026-11-20).
+            CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, SwingShowing() ? 0.15f : 0.08f);
             if (attackArmsLayer >= 0 && animator.HasState(attackArmsLayer, EmptyStateHash) && LayerBusy(attackArmsLayer))
             {
                 animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, attackArmsLayer);

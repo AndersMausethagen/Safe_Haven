@@ -69,6 +69,7 @@ public sealed partial class PlayerCombat
         }
 
         attackHeld = true;
+        attackPressedAt = Time.time;
         if (WantsRush())
         {
             pressTime = -1f;
@@ -92,6 +93,7 @@ public sealed partial class PlayerCombat
         pressTime = taken && hasHeavy ? Time.time : -1f;
         heldEarlyPress = !taken && IsAttacking;
         heavyStarted = false;
+        heavyAfterLight = false;
     }
 
     // Holding the button through a swing keeps the chain going: the press it began with was too early to keep, so it is made
@@ -204,8 +206,25 @@ public sealed partial class PlayerCombat
         Request(SwingKind.Art, ChainPress.Late);
     }
 
+    // A heavy that is another motion than the light swing (Grows From Light off: the fists' high kick) follows the light one instead
+    // of replacing it mid-wind-up: asked for as soon as the light one can be chained from, kept until then.
+    private bool heavyAfterLight;
+
     private void UpdateHeldPress()
     {
+        // Only behind the light swing it follows: once that is gone (guarded out of, swapped, a flinch, a dodge) it is dropped
+        // (review 2026-11-20: a guard raised over the punch's recovery still kicked).
+        if (heavyAfterLight && (activeKind != SwingKind.Light || (guard != null && guard.IsGuarding)))
+        {
+            heavyAfterLight = false;
+        }
+
+        if (heavyAfterLight && BufferOpen(SwingKind.Heavy))
+        {
+            heavyAfterLight = false;
+            Request(SwingKind.Heavy, ChainPress.Late);
+        }
+
         if (pressTime < 0f || heavyStarted)
         {
             return;
@@ -222,6 +241,12 @@ public sealed partial class PlayerCombat
         bool turn = weapon != null && activeKind == SwingKind.Light && activeStartTime >= pressTime && hitPending && (activeTechnique & HitTechnique.Counter) == 0;
         heavyStarted = true;
         pressTime = -1f;
+        if (turn && (weapon.HeavyAttack == null || !weapon.HeavyAttack.GrowsFromLight))
+        {
+            // Another motion: the light swing lands, then the heavy one (a punch, then the kick).
+            heavyAfterLight = true;
+            return;
+        }
         if (turn)
         {
             float credit = CostOf(SwingKind.Light, activeAttack);
@@ -246,8 +271,12 @@ public sealed partial class PlayerCombat
             return;
         }
 
-        // A light swing that has already landed (or a press buffered behind another swing): the heavy one follows.
-        Request(SwingKind.Heavy, ChainPress.Late);
+        // A light swing that has already landed (or a press buffered behind another swing): the heavy one follows, kept until the
+        // swing can be chained from if it can't yet (it used to be dropped).
+        if (!Request(SwingKind.Heavy, ChainPress.Late) && IsAttacking)
+        {
+            heavyAfterLight = true;
+        }
     }
 
     // Kept for gamepads and scripts that ask for a bash directly.

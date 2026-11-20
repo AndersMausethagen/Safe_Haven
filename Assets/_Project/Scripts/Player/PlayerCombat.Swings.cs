@@ -89,6 +89,9 @@ public sealed partial class PlayerCombat
                     : weapon != null ? weapon.RushAttack : null;
                 break;
             default:
+                // A light swing ends a heavy chain: grown into a heavy it is the weapon's heavy, not its follow-up.
+                lastHeavyEndedAt = float.NegativeInfinity;
+                lastHeavyWasFollowUp = false;
                 step = ComboRules.NextStep(lastStep, chain, judge, fumbled);
                 attack = weapon != null ? weapon.ComboStep(step) : null;
                 if (CounterIsReady && weapon != null && weapon.CounterAttack != null)
@@ -236,6 +239,7 @@ public sealed partial class PlayerCombat
         // afterwards left the whoosh scheduled after the blow, so it never played).
         activeStartTime = Time.time - (ChargedFromHold && attack != null ? ChargedWindupSkipped(attack, activeSpeed) : 0f);
         chargeHeld = 0f;
+        heldPastFull = 0f;
         holdWaited = 0f;
         waitingForHold = false;
         charging = false;
@@ -279,6 +283,14 @@ public sealed partial class PlayerCombat
             {
                 PassThroughBodies();
             }
+        }
+
+        // A leaping swing begun on the move (the sword's finisher walked into) is swung over the walking legs: no leap on top of the walk,
+        // which lifted the player off the ground mid-stride (the user, 2026-11-20: "makes him float"). Its lunge still closes the gap.
+        activeHop = attack != null ? attack.Hop : 0f;
+        if (activeHop > 0f && movement.MovementInput.sqrMagnitude >= 0.01f && !travels && kind == SwingKind.Light)
+        {
+            activeHop = 0f;
         }
 
         feetReleased = false;
@@ -417,6 +429,32 @@ public sealed partial class PlayerCombat
         {
             SwingKind next = queuedKind;
             ChainPress judge = queuedJudge;
+            // Pressed again during a heavy and still held past a click as it recovers: the heavy chain goes on from where this one
+            // ended (its follow-up, or the heavy again), not through a light swing that then grows (the user, 2026-11-20: "two heavy
+            // attacks should chain, making the second start from where the first one ends").
+            // A press too fresh to tell a tap from a hold waits for it (at most Heavy Hold Seconds, the hold that makes a heavy anywhere
+            // else; after a heavy there is no quick chain to slow).
+            bool heavyChain = next == SwingKind.Light && activeKind == SwingKind.Heavy && !hitPending && attackHeld && pressTime >= 0f
+                && !heavyStarted && (activeTechnique & HitTechnique.Charged) == 0;
+            if (heavyChain && Time.time - pressTime < Rules.HeavyHoldSeconds)
+            {
+                return;
+            }
+
+            if (heavyChain)
+            {
+                heavyStarted = true;
+                pressTime = -1f;
+                EndSwing();
+                // Refused (the stamina short for a heavy), the light swing the press asked for still comes.
+                if (!Begin(SwingKind.Heavy, ChainPress.Late))
+                {
+                    Begin(SwingKind.Light, judge);
+                }
+
+                return;
+            }
+
             EndSwing();
             if (next != SwingKind.None)
             {
@@ -425,23 +463,35 @@ public sealed partial class PlayerCombat
         }
     }
 
-    // A heavy swing held on waits at the top of its wind-up, where its strike would begin, and everything about it stands
-    // still until the button is let go or the charge is full. True while it waits.
+    // A heavy swing held on waits at the top of its wind-up, where its strike would begin, and everything about it stands still for as
+    // long as the button is held (the user, 2026-11-20: "hold a charging attack for as long as he wants"). Full after Heavy Charge
+    // Seconds (the blink); held past that it costs Held Charge Drain a second, and run dry it strikes. Let go full: the weapon's
+    // charged attack, its strongest blow (Hades II's Omega moves); let go sooner, the heavy. True while it waits.
     private bool UpdateCharge(float hitAt)
     {
         float most = Rules.HeavyChargeSeconds;
-        bool waits = activeKind == SwingKind.Heavy && hitPending && attackHeld && most > 0f && chargeHeld < most
+        bool full = most > 0f && chargeHeld >= most;
+        bool spent = full && stamina != null && stamina.IsEmpty;
+        // Once at the top it stays there while held: re-judging the clock each frame let it slip a frame on and back (a flicker).
+        bool waits = activeKind == SwingKind.Heavy && hitPending && attackHeld && most > 0f && !spent
             && (activeTechnique & HitTechnique.Charged) == 0
-            && ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, LungeSeconds);
+            && (charging || ActiveElapsed >= hitAt - Mathf.Max(activeAttack.StrikeLead, LungeSeconds));
         if (!waits)
         {
+            bool wasCharging = charging;
             if (charging)
             {
-                // Let go (or full): the feet keep the swing's own share again for its strike.
+                // Let go (or run dry): the feet keep the swing's own share again for its strike.
                 movement.SetSpeedScale(this, activeWindupMove);
             }
 
             charging = false;
+            if (wasCharging && full && weapon != null && weapon.ChargedAttack != null && hitPending && activeKind == SwingKind.Heavy)
+            {
+                ReleaseCharged();
+                return true;
+            }
+
             return false;
         }
 
@@ -451,24 +501,33 @@ public sealed partial class PlayerCombat
         }
 
         charging = true;
-        chargeHeld = Mathf.Min(most, chargeHeld + Time.deltaTime);
-        TrackFocus();
-        // A charging blow can be aimed as it is held.
-        TrackAim(ActiveElapsed, hitAt, true);
-        if (chargeHeld >= most)
+        if (full)
         {
-            charging = false;
-            movement.SetSpeedScale(this, activeWindupMove);
-            ChargeFull?.Invoke();
-            // Held to the full: the weapon's charged attack, its strongest blow, instead of the heavy (Hades II's Omega moves).
-            if (weapon != null && weapon.ChargedAttack != null)
+            heldPastFull += Time.deltaTime;
+        }
+
+        chargeHeld = Mathf.Min(most, chargeHeld + Time.deltaTime);
+        if (stamina != null)
+        {
+            if (full)
             {
-                ReleaseCharged();
-                return true;
+                stamina.Drain(Rules.HeldChargeDrain * Time.deltaTime);
+            }
+            else
+            {
+                stamina.HoldRegeneration();
             }
         }
 
-        return charging;
+        TrackFocus();
+        // A charging blow can be aimed as it is held.
+        TrackAim(ActiveElapsed, hitAt, true);
+        if (!full && chargeHeld >= most)
+        {
+            ChargeFull?.Invoke();
+        }
+
+        return true;
     }
 
     // A press still held may yet become the heavy one: the light swing it began waits at the top of its swing until the hold decides.
@@ -480,8 +539,11 @@ public sealed partial class PlayerCombat
     private bool WaitsForHold(float hitAt)
     {
         // Only once the press has outlasted a click (HoldTellSeconds): a tap on a fast weapon (fists, dagger) whose blow comes
-        // before then strikes on time, rather than waiting for the finger to lift (review 2026-11-16: up to 0.07 s late).
+        // before then strikes on time, rather than waiting for the finger to lift (review 2026-11-16: up to 0.07 s late). And only
+        // for a heavy that grows out of the light swing: one that is another motion (the fists' high kick) doesn't hold a punch half
+        // thrown and then start over (the user, 2026-11-20: "weird timing on unarmed charged"); the punch lands and the kick follows.
         waitingForHold = activeKind == SwingKind.Light && hitPending && attackHeld && pressTime >= 0f && !heavyStarted
+            && weapon != null && weapon.HeavyAttack != null && weapon.HeavyAttack.GrowsFromLight
             && activeStartTime >= pressTime && (activeTechnique & HitTechnique.Counter) == 0
             && Time.time - pressTime >= HoldTellSeconds
             && Time.time - pressTime < Rules.HeavyHoldSeconds + 0.05f
@@ -801,10 +863,11 @@ public sealed partial class PlayerCombat
     private const float HopLanding = 0.14f;
     private Transform hopHips;
     private float hopLift;
+    private float activeHop;
 
     private void UpdateHop(float elapsed, float hitAt)
     {
-        float hop = activeAttack != null ? activeAttack.Hop : 0f;
+        float hop = activeAttack != null ? activeHop : 0f;
         if (hop <= 0f)
         {
             // A hop broken off is still coming down (LateUpdate).
@@ -873,7 +936,7 @@ public sealed partial class PlayerCombat
         activeMotion = ArtMotion.None;
         if (activeKind != SwingKind.None)
         {
-            lastStartTime = activeStartTime + chargeHeld + holdWaited;
+            lastStartTime = activeStartTime + chargeHeld + heldPastFull + holdWaited;
             lastHitAt = HitAt(activeAttack, activeSpeed);
             lastRecoverAt = RecoverAt(activeAttack, activeSpeed);
             // A heavy that landed can be followed by the heavy follow-up; any other swing that landed ends that chain.
@@ -899,6 +962,7 @@ public sealed partial class PlayerCombat
         activeWindupMove = 0f;
         charging = false;
         chargeHeld = 0f;
+        heldPastFull = 0f;
         holdWaited = 0f;
         waitingForHold = false;
         movement.FacingLocked = false;
@@ -912,8 +976,15 @@ public sealed partial class PlayerCombat
     /// <summary>Ends the current swing if its hit has already landed (raising the guard cuts the follow-through short).</summary>
     public void CancelRecovery()
     {
-        if (activeKind != SwingKind.None && !hitPending)
+        // A swing past its blow, or a heavy still held (broken off unstruck: what it cost stays spent).
+        if (activeKind != SwingKind.None && (!hitPending || BreaksOffIntoGuard))
         {
+            if (charging)
+            {
+                charging = false;
+                movement.SetSpeedScale(this, 1f);
+            }
+
             EndSwing();
             queuedKind = SwingKind.None;
         }

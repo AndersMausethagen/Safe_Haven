@@ -78,9 +78,12 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     [Tooltip("Holding attack this long turns the light swing the press started into the heavy attack. Keep it shorter " +
              "than the quickest light swing's Hit Delay (about 0.28 s), or holding gives a light swing and then a heavy one.")]
     [SerializeField, Range(0.1f, 1f)] private float heavyHoldSeconds = 0.22f;
-    [Tooltip("Held on past that, the heavy swing waits at the top of its wind-up and charges, for at most this long; letting go " +
-             "strikes. 0 turns charging off.")]
+    [Tooltip("Held on past that, the heavy swing waits at the top of its wind-up and charges; after this long it is full (the blink) " +
+             "and letting go strikes the weapon's charged attack. 0 turns charging off.")]
     [SerializeField, Min(0f)] private float heavyChargeSeconds = 0.9f;
+    [Tooltip("Held on past full, a charge can be kept for as long as the player likes, at this much stamina a second (the user, " +
+             "2026-11-20: \"hold a charging attack for as long as he wants, it could slowly start draining stamina\"). Run dry, it strikes.")]
+    [SerializeField, Min(0f)] private float heldChargeDrain = 6f;
     [Tooltip("Damage of a fully charged heavy swing, as a multiplier.")]
     [SerializeField, Min(1f)] private float heavyChargeDamage = 1.4f;
     [Tooltip("Poise damage of a fully charged heavy swing, as a multiplier.")]
@@ -375,6 +378,7 @@ public sealed class CombatTechniqueSettings : GameSettings<CombatTechniqueSettin
     public float HeavyChargeSeconds => heavyChargeSeconds;
     public float HeavyChargeDamage => heavyChargeDamage;
     public float HeavyChargePoise => heavyChargePoise;
+    public float HeldChargeDrain => heldChargeDrain;
     public float RushAfterDodgeSeconds => rushAfterDodgeSeconds;
     public float RushRunShare => rushRunShare;
     public float RushRunSeconds => rushRunSeconds;

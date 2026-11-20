@@ -113,6 +113,9 @@ public sealed class PlayerStamina : MonoBehaviour
         }
     }
 
+    /// <summary>Holds off regeneration without spending (a charge being held: the body is working, it doesn't catch its breath).</summary>
+    public void HoldRegeneration() => regenAt = Mathf.Max(regenAt, Time.time + (settings != null ? settings.AttackRegenDelay : 0f));
+
     /// <summary>Empties the pool whatever the scales say (a broken guard).</summary>
     public void Exhaust()
     {
