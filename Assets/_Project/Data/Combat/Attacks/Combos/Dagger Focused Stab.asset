@@ -50,12 +50,12 @@ MonoBehaviour:
   castRadius: 0.3
   castRange: 16
   castHazard: {fileID: 0}
-  animationState: 1H Stab
-  animationSpeed: 0.64285713
-  strikeSpeed: 1.25
-  strikeLead: 0.06666666
+  animationState: KI 1H Overhead
+  animationSpeed: 1.6481489
+  strikeSpeed: 1
+  strikeLead: 0.12
   followThroughSpeed: 1.3
-  growsFromLight: 1
+  growsFromLight: 0
   blendIn: 0
   blendInFromReady: 0.1
   swingSound: {fileID: 0}

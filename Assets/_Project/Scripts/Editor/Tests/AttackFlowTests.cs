@@ -25,21 +25,47 @@ public sealed class AttackFlowTests
     [Test]
     public void EveryAttack_BlendsInAsMeasured()
     {
-        // Each of an attack's two blends (from the ready pose, and in a chain) is what its ways in of that kind need.
+        // Each of an attack's three blends (from the ready pose, out of the guard, in a chain) is what its ways in of that kind need.
         var stale = new List<string>();
         foreach (IGrouping<AttackDefinition, AttackFlow.Link> into in AttackFlow.Links().GroupBy(link => link.To))
         {
-            AttackFlow.Link[] ready = into.Where(AttackFlow.IsFromReady).ToArray();
-            AttackFlow.Link[] chain = into.Where(link => !AttackFlow.IsFromReady(link)).ToArray();
-            float wantReady = ready.Length > 0 ? AttackFlow.BlendFor(ready) : 0f;
-            float wantChain = chain.Length > 0 ? AttackFlow.BlendFor(chain) : 0f;
-            if (Mathf.Abs(into.Key.BlendInFromReady - wantReady) > 0.006f || Mathf.Abs(into.Key.BlendIn - wantChain) > 0.006f)
+            foreach ((string context, float baked) in new[] { ("ready", into.Key.BlendInFromReady), ("guard", into.Key.BlendInFromGuard), ("chain", into.Key.BlendIn) })
             {
-                stale.Add($"{into.Key.name}: from ready {into.Key.BlendInFromReady:0.00} s (wants {wantReady:0.00}), in a chain {into.Key.BlendIn:0.00} s (wants {wantChain:0.00})");
+                AttackFlow.Link[] ways = into.Where(link => AttackFlow.ContextOf(link) == context).ToArray();
+                float wanted = ways.Length > 0 ? AttackFlow.BlendFor(ways) : 0f;
+                if (Mathf.Abs(baked - wanted) > 0.006f)
+                {
+                    stale.Add($"{into.Key.name}: {context} {baked:0.00} s, wants {wanted:0.00} s");
+                }
             }
         }
 
         Assert.IsEmpty(stale, "run Safe Haven › Tools › Fit Attack Blends\n" + string.Join("\n", stale));
+    }
+
+    [Test]
+    public void OutOfTheGuard_SwingsPickUpWhereTheyDipLeast()
+    {
+        Dictionary<AttackDefinition, float> best = AttackFlow.GuardStarts();
+        Assert.Greater(best.Count, 5, "attacks a press out of the guard starts");
+        string[] stale = best.Where(entry => Mathf.Abs(entry.Key.FromGuardStart - entry.Value) > 0.001f)
+            .Select(entry => $"{entry.Key.name}: out of the guard from {entry.Key.FromGuardStart:0.0}, measured best {entry.Value:0.0}").ToArray();
+        Assert.IsEmpty(stale, "run Safe Haven › Tools › Fit Attack Blends\n" + string.Join("\n", stale));
+    }
+
+    // The dip measure can fail: a blend that passes through the ready pose dips by the whole way, one that moves away from it not at all.
+    [Test]
+    public void TheDip_IsTheDropTowardTheReadyPose()
+    {
+        var ready = new float[55];
+        var raised = new float[55];
+        var other = new float[55];
+        raised[48] = 1f;
+        other[48] = -1f;
+        Assert.AreEqual(1f, AttackFlow.Dip(raised, other, ready), 0.001f, "through the ready pose");
+        var higher = new float[55];
+        higher[48] = 2f;
+        Assert.AreEqual(0f, AttackFlow.Dip(raised, higher, ready), 0.001f, "away from it");
     }
 
     // Two kinds of way in, measured apart: an opener from the ready pose needs less than the chain's worst link into it, often.

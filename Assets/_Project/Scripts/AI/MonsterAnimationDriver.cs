@@ -60,6 +60,10 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private const float StrafeRingBack = 2.37f;
     private const float SlowestStride = 0.5f;
     private const float FastestStride = 2.2f;
+    // A small body may stride faster still (a Tusse at 0.39 of a man, chasing at 4.4 m/s, glided at 2.2: its legs cover 3.5 m/s):
+    // the cap grows as the body shrinks, FastestStride / sqrt(size), to MostStride.
+    private const float MostStride = 3.5f;
+    private float Fastest => bodyScale >= 1f ? FastestStride : Mathf.Min(MostStride, FastestStride / Mathf.Sqrt(Mathf.Max(0.05f, bodyScale)));
     private static readonly int LocomotionRateHash = Animator.StringToHash("LocomotionRate");
     private static readonly int StrafeRateHash = Animator.StringToHash("StrafeRate");
     private bool hasLocomotionRate;
@@ -348,13 +352,13 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (speed <= WalkThreshold)
         {
             // From the idle (rate 1: its breathing at its own pace) to the walk's own rate at the walk threshold.
-            return Mathf.Clamp(Mathf.Lerp(1f, WalkThreshold / walkClipSpeed, speed / WalkThreshold), SlowestStride, FastestStride);
+            return Mathf.Clamp(Mathf.Lerp(1f, WalkThreshold / walkClipSpeed, speed / WalkThreshold), SlowestStride, Fastest);
         }
 
         float feet = speed < RunThreshold
             ? Mathf.Lerp(walkClipSpeed, runClipSpeed, (speed - WalkThreshold) / (RunThreshold - WalkThreshold))
             : runClipSpeed;
-        return Mathf.Clamp(speed / feet, SlowestStride, FastestStride);
+        return Mathf.Clamp(speed / feet, SlowestStride, Fastest);
     }
 
     // The Ready tree's rings: walk strafes (about 0.8 m/s, 1.333 s cycles) and run strafes (4.74 forward and to the sides, 2.37 back,
@@ -364,7 +368,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     private const float StrafeWalkCycle = 1.333f;
     private const float StrafeRunCycle = 0.667f;
 
-    private static float StrafeRate(Vector2 local)
+    private float StrafeRate(Vector2 local)
     {
         float speed = local.magnitude;
         if (speed <= StrafeWalkRing)
@@ -376,7 +380,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         float w = Mathf.Clamp01((speed - StrafeWalkRing) / Mathf.Max(0.1f, run - StrafeWalkRing));
         float stride = Mathf.Lerp(StrafeWalkRing * StrafeWalkCycle, run * StrafeRunCycle, w);
         float cycle = Mathf.Lerp(StrafeWalkCycle, StrafeRunCycle, w);
-        return Mathf.Clamp(speed / (stride / cycle), SlowestStride, FastestStride);
+        return Mathf.Clamp(speed / (stride / cycle), SlowestStride, Fastest);
     }
 
     private void CacheParameters()

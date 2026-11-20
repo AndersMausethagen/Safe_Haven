@@ -200,8 +200,11 @@ public sealed partial class PlayerAnimationController
 
         swingSpeed = swing.Speed;
         // Grown out of the light swing its press began: take up the heavy clip as far into its wind-up as the light one had got,
-        // so the arms go on rising instead of dropping back to the first frame.
-        grownFrom = swing.Kind == SwingKind.Heavy && combat != null ? combat.HeavyGrownFrom : 0f;
+        // so the arms go on rising instead of dropping back to the first frame. Out of the guard (after a parry or a block) a swing
+        // picks up as far in as its Out Of Guard Start says, at the frame nearest the guard. Either way the rest of the wind-up plays
+        // slower by as much (grownFrom), so the blow lands on time.
+        bool grown = swing.Kind == SwingKind.Heavy && combat != null && combat.HeavyGrownFrom > 0f;
+        grownFrom = grown ? combat.HeavyGrownFrom : OutOfTheGuard() ? swing.Attack.FromGuardStart : 0f;
         float start = 0f;
         if (grownFrom > 0f)
         {
@@ -250,20 +253,21 @@ public sealed partial class PlayerAnimationController
             float beforeStrike = AttackFlowRules.BlendRoom(swing.Attack.HitDelay, swing.Attack.StrikeLead) / speed;
             // The blend AttackFlow measured for the way in it is: from the chain's swing before it, or from the ready pose (a guard,
             // the exploring or walking pose). A grown heavy takes up the light swing's pose, the same motion: a heavy's short blend.
-            float measured = grownFrom > 0f ? 0f : SwingShowing() ? swing.Attack.BlendIn : swing.Attack.BlendInFromReady;
-            if (measured <= 0f && grownFrom <= 0f)
+            float measured = grown ? 0f : SwingShowing() ? swing.Attack.BlendIn
+                : OutOfTheGuard() && swing.Attack.BlendInFromGuard > 0f ? swing.Attack.BlendInFromGuard : swing.Attack.BlendInFromReady;
+            if (measured <= 0f && !grown)
             {
                 measured = swing.Attack.BlendIn;
             }
 
-            float wanted = grownFrom > 0f ? HeavyFade : measured > 0f ? measured / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
+            float wanted = grown ? HeavyFade : measured > 0f ? measured / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
             fade = Mathf.Min(Mathf.Max(fade, wanted), beforeStrike);
         }
 
         // Swing states run at speed 1 times ActionSpeed (PlayerAnimator.controller), so the clip point is start / actionSpeed in.
         float offset = start > 0f ? StateTime(start, actionSpeed) : 0f;
         // Grown out of a light swing, the legs leave its stance for the planted heavy's over GrownLegsFade, so the hips don't twitch.
-        float othersFade = grownFrom > 0f ? GrownLegsFade : fade;
+        float othersFade = grown ? GrownLegsFade : fade;
         // Hand-overs that never show the ready pose between (PlayerAnimationController.Layers).
         if (layer == fullBodyLayer)
         {
@@ -280,6 +284,22 @@ public sealed partial class PlayerAnimationController
                 }
             }
         }
+    }
+
+    // The guard (or its parry, or a blow taken on it) is showing on the upper body: a swing now starts out of the guard.
+    private bool OutOfTheGuard()
+    {
+        if (upperBodyLayer < 0)
+        {
+            return false;
+        }
+
+        // Blending into one counts too: right after a parry the upper body is still on its way into it, slowed by the parry's
+        // hit-stop (seen in the probe, 2026-11-20).
+        bool Guarded(int state) => state == GuardStateHash || state == GuardShieldStateHash || state == ParryStateHash || state == ParryWeaponStateHash
+                                   || state == GuardHitStateHash || state == GuardShieldHitStateHash;
+        return Guarded(animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash)
+               || (animator.IsInTransition(upperBodyLayer) && Guarded(animator.GetNextAnimatorStateInfo(upperBodyLayer).shortNameHash));
     }
 
     // The wind-up plays slower so it can be read; from the hit on, the strike plays at its own speed and snaps through.

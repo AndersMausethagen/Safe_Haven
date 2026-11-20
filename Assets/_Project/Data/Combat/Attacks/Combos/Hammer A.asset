@@ -58,6 +58,8 @@ MonoBehaviour:
   growsFromLight: 1
   blendIn: 0.1
   blendInFromReady: 0.14
+  fromGuardStart: 0.6
+  blendInFromGuard: 0.15
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.95, b: 0.85, a: 0.8}

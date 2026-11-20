@@ -50,14 +50,14 @@ MonoBehaviour:
   castRadius: 0.3
   castRange: 16
   castHazard: {fileID: 0}
-  animationState: 2H Drive
-  animationSpeed: 0.85227305
-  strikeSpeed: 1.25
-  strikeLead: 0.10666676
-  followThroughSpeed: 1.0714309
-  growsFromLight: 1
+  animationState: KI 2H Diagonal
+  animationSpeed: 1.5357147
+  strikeSpeed: 1
+  strikeLead: 0.12
+  followThroughSpeed: 1.3
+  growsFromLight: 0
   blendIn: 0
-  blendInFromReady: 0.1
+  blendInFromReady: 0.11
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.55, b: 0.25, a: 0.95}

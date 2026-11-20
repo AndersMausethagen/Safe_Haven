@@ -141,6 +141,12 @@ public sealed class AttackDefinition : ScriptableObject
     [Tooltip("The same from the ready pose, the guard, the exploring or walking pose: the swing that starts a fight or a chain. " +
              "Measured apart (the review, 2026-11-20: the worst way in, often a chain's wrap, slowed the commonest).")]
     [SerializeField, Min(0f)] private float blendInFromReady;
+    [Tooltip("Started out of the guard (a press after a parry or a block): the share of its wind-up it skips, to pick up at the frame " +
+             "nearest the guard instead of dropping to the ready pose it starts from (the review, 2026-11-20: a 1.1-1.8 dip). The rest of " +
+             "the wind-up plays slower by as much, so the blow lands as it always does. Measured by Fit Attack Blends (AttackFlow).")]
+    [SerializeField, Range(0f, 0.6f)] private float fromGuardStart;
+    [Tooltip("The blend in out of the guard (after a parry or a block), measured apart from the ready pose's so neither slows the other.")]
+    [SerializeField, Min(0f)] private float blendInFromGuard;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -208,6 +214,8 @@ public sealed class AttackDefinition : ScriptableObject
     public bool GrowsFromLight => growsFromLight;
     public float BlendIn => blendIn;
     public float BlendInFromReady => blendInFromReady;
+    public float FromGuardStart => fromGuardStart;
+    public float BlendInFromGuard => blendInFromGuard;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;
