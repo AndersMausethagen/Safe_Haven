@@ -419,6 +419,18 @@ public static class AttackFlow
 
     // ---------------------------------------------------------------- baking
 
+    /// <summary>A way in from a still pose (the ready pose, the guard, exploring, walking), not from a swing before it.</summary>
+    public static bool IsFromReady(Link link) => link.From == "ready" || link.From == "guard" || link.From == "exploring" || link.From == "walking";
+
+    /// <summary>The blend that serves every one of these ways in: the longest any needs (at least 0.1 s), rounded up, never past
+    /// the room before the strike.</summary>
+    public static float BlendFor(IReadOnlyCollection<Link> ways)
+    {
+        float need = ways.Max(l => l.Need);
+        float room = ways.Min(l => l.Room);
+        return Mathf.Min(Mathf.Ceil(Mathf.Max(need, 0.1f) * 100f - 0.001f) / 100f, Mathf.Floor(room * 100f + 0.001f) / 100f);
+    }
+
     [MenuItem("Safe Haven/Tools/Fit Attack Blends")]
     private static void BakeFromMenu() => Debug.Log(Bake());
 
@@ -439,22 +451,32 @@ public static class AttackFlow
             report.Add("NOT SMOOTH " + settle);
         }
 
+        // Two blends per attack, for the two kinds of way in (the review, 2026-11-20: one worst case, often a chain's wrap, slowed
+        // the commonest): from the ready pose, the guard, the exploring or walking pose (Blend In From Ready), and from the chain's
+        // swing before it (Blend In). PlayerAnimationController picks by what is showing as the swing starts.
         foreach (IGrouping<AttackDefinition, Link> into in links.GroupBy(l => l.To))
         {
             AttackDefinition attack = into.Key;
-            float need = into.Max(l => l.Need);
-            float room = into.Min(l => l.Room);
-            // Rounded up to what it needs, never past the room before the strike.
-            float blend = Mathf.Min(Mathf.Ceil(Mathf.Max(need, 0.1f) * 100f - 0.001f) / 100f, Mathf.Floor(room * 100f + 0.001f) / 100f);
             var data = new SerializedObject(attack);
-            SerializedProperty field = data.FindProperty("blendIn");
-            if (!Mathf.Approximately(field.floatValue, blend))
+            bool changed = false;
+            foreach ((string field, bool fromReady) in new[] { ("blendIn", false), ("blendInFromReady", true) })
             {
-                field.floatValue = blend;
+                Link[] ways = into.Where(l => IsFromReady(l) == fromReady).ToArray();
+                float blend = ways.Length == 0 ? 0f : BlendFor(ways);
+                SerializedProperty property = data.FindProperty(field);
+                if (!Mathf.Approximately(property.floatValue, blend))
+                {
+                    property.floatValue = blend;
+                    changed = true;
+                    report.Add($"{attack.name}: {(fromReady ? "from ready" : "in a chain")} {blend:0.00} s");
+                }
+            }
+
+            if (changed)
+            {
                 data.ApplyModifiedPropertiesWithoutUndo();
                 EditorUtility.SetDirty(attack);
                 AssetDatabase.SaveAssetIfDirty(attack);
-                report.Add($"{attack.name}: blend in {blend:0.00} s");
             }
         }
 

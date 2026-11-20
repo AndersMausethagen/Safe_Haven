@@ -138,6 +138,9 @@ public sealed class AttackDefinition : ScriptableObject
              "it, the guard). Measured and written by Safe Haven › Tools › Fit Attack Blends (AttackFlow): long enough that no " +
              "way into it moves the body faster than the swing itself does, and over before its strike. 0: the usual short blend.")]
     [SerializeField, Min(0f)] private float blendIn;
+    [Tooltip("The same from the ready pose, the guard, the exploring or walking pose: the swing that starts a fight or a chain. " +
+             "Measured apart (the review, 2026-11-20: the worst way in, often a chain's wrap, slowed the commonest).")]
+    [SerializeField, Min(0f)] private float blendInFromReady;
 
     [Header("Sound and Effects")]
     [Tooltip("Plays as the swing starts. Empty uses the weapon's, then the game-wide swing sound.")]
@@ -204,6 +207,7 @@ public sealed class AttackDefinition : ScriptableObject
     public float FollowThroughSpeed => followThroughSpeed;
     public bool GrowsFromLight => growsFromLight;
     public float BlendIn => blendIn;
+    public float BlendInFromReady => blendInFromReady;
     public SoundDefinition SwingSound => swingSound;
     public SoundDefinition HitSound => hitSound;
     public Color SlashColor => slashColor;

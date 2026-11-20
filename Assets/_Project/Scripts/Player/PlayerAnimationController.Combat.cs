@@ -28,7 +28,7 @@ public sealed partial class PlayerAnimationController
         // A slow wind-up gathers itself: faster at first, slowing into the top of the backswing, the same frame at the strike (SwingWindup).
         if (windupSpan > 0f)
         {
-            windup = SwingWindup.Speed(windup, attack.AnimationSpeed, 1f - Mathf.Max(0f, combat.TimeToHit - attack.StrikeLead) / windupSpan);
+            windup = SwingWindup.Speed(windup, windup, 1f - Mathf.Max(0f, combat.TimeToHit - attack.StrikeLead) / windupSpan);
         }
 
         float speed = combat.IsHoldingSwing ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : windup;
@@ -51,8 +51,8 @@ public sealed partial class PlayerAnimationController
         if (fullBodyLayer >= 0 && animator.HasState(fullBodyLayer, plantedSwing))
         {
             // ActionSpeed was just set for this frame (UpdateSwingSpeed), and the offset is read at that speed.
-            animator.CrossFadeInFixedTime(plantedSwing, PlantedStrikeFade, fullBodyLayer, StateTime(clipTime, animator.GetFloat(ActionSpeedHash)));
-            animator.CrossFadeInFixedTime(EmptyStateHash, PlantedStrikeFade, upper);
+            // The upper body stays on the same swing until the whole body covers it (PlayerAnimationController.Layers).
+            IntoFullBody(plantedSwing, PlantedStrikeFade, StateTime(clipTime, animator.GetFloat(ActionSpeedHash)));
         }
 
         plantedSwing = 0;
@@ -89,8 +89,13 @@ public sealed partial class PlayerAnimationController
     // is the legs' own.
     private void WalkOutOfSwing()
     {
-        if (combat == null || movement.HorizontalSpeed <= ArmsOnlySpeed
-            || fullBodyLayer < 0 || attackArmsLayer < 0 || animator.IsInTransition(fullBodyLayer))
+        if (combat == null || movement.HorizontalSpeed <= ArmsOnlySpeed || fullBodyLayer < 0 || attackArmsLayer < 0)
+        {
+            return;
+        }
+
+        // Settling back to the ready pose (its exit to Empty, up to 0.45 s) is walked out of too; another change on the way isn't.
+        if (animator.IsInTransition(fullBodyLayer) && animator.GetNextAnimatorStateInfo(fullBodyLayer).shortNameHash != EmptyStateHash)
         {
             return;
         }
@@ -113,12 +118,25 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
+        // Once per swing: during the hand-over (Full Body on its way to Empty) the arms already play it.
+        bool leaving = animator.IsInTransition(fullBodyLayer);
         if (isSwing)
         {
-            animator.CrossFadeInFixedTime(swing.shortNameHash, WalkOutFade, MovingSwingLayer(swing.shortNameHash), swing.normalizedTime * swing.length);
+            int moving = MovingSwingLayer(swing.shortNameHash);
+            bool handedOver = animator.GetCurrentAnimatorStateInfo(moving).shortNameHash == swing.shortNameHash
+                              || (animator.IsInTransition(moving) && animator.GetNextAnimatorStateInfo(moving).shortNameHash == swing.shortNameHash);
+            if (!handedOver)
+            {
+                UnderFullBody(moving, swing.shortNameHash, WalkOutFade, swing.normalizedTime * swing.length, WalkOutFade);
+            }
+
+            return;
         }
 
-        animator.CrossFadeInFixedTime(EmptyStateHash, WalkOutFade, fullBodyLayer);
+        if (!leaving)
+        {
+            animator.CrossFadeInFixedTime(EmptyStateHash, WalkOutFade, fullBodyLayer);
+        }
     }
 
     // A swing over walking legs plays on the Upper Body layer (Human Body Upper Mask: spine, chest, head and arms), as the pack's author
@@ -204,13 +222,21 @@ public sealed partial class PlayerAnimationController
             striking = combat.TimeToHit <= charged.StrikeLead + 0.005f;
         }
 
-        // The wind-up's span, for its shape (SwingWindup); a charged release is past its wind-up.
-        windupSpan = !fromHold && combat != null && SwingWindup.Strength(swing.Attack.AnimationSpeed) > 0f
+        // The wind-up's span, for its shape (SwingWindup), judged at the speed it really plays (a grown heavy's rest is slower); a
+        // charged release is past its wind-up.
+        float effectiveWindup = swing.Attack.AnimationSpeed * (1f - grownFrom);
+        windupSpan = !fromHold && combat != null && SwingWindup.Strength(effectiveWindup) > 0f
             ? Mathf.Max(0.01f, combat.TimeToHit - swing.Attack.StrikeLead) : 0f;
-        float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom);
+        float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : effectiveWindup * swing.Speed;
         if (!striking && windupSpan > 0f)
         {
-            actionSpeed = SwingWindup.Speed(actionSpeed, swing.Attack.AnimationSpeed, 0f);
+            actionSpeed = SwingWindup.Speed(actionSpeed, effectiveWindup, 0f);
+        }
+
+        // Taking a weapon out or putting it away gives way to a swing: the weapon shows in the hand now (review 2026-11-20).
+        if (equipment != null)
+        {
+            equipment.FinishHandMove();
         }
         SetFloat(ActionSpeedHash, actionSpeed);
         float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
@@ -222,19 +248,36 @@ public sealed partial class PlayerAnimationController
             float speed = Mathf.Max(0.01f, swing.Speed);
             // Never into the strike, not even the usual short blend (the fists' cross has 0.08 s).
             float beforeStrike = AttackFlowRules.BlendRoom(swing.Attack.HitDelay, swing.Attack.StrikeLead) / speed;
-            float wanted = swing.Attack.BlendIn > 0f ? swing.Attack.BlendIn / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
+            // The blend AttackFlow measured for the way in it is: from the chain's swing before it, or from the ready pose (a guard,
+            // the exploring or walking pose). A grown heavy takes up the light swing's pose, the same motion: a heavy's short blend.
+            float measured = grownFrom > 0f ? 0f : SwingShowing() ? swing.Attack.BlendIn : swing.Attack.BlendInFromReady;
+            if (measured <= 0f && grownFrom <= 0f)
+            {
+                measured = swing.Attack.BlendIn;
+            }
+
+            float wanted = grownFrom > 0f ? HeavyFade : measured > 0f ? measured / speed : Mathf.Min(ChainFade, 0.5f * swing.Attack.HitDelay / speed);
             fade = Mathf.Min(Mathf.Max(fade, wanted), beforeStrike);
         }
 
         // Swing states run at speed 1 times ActionSpeed (PlayerAnimator.controller), so the clip point is start / actionSpeed in.
-        animator.CrossFadeInFixedTime(hash, fade, layer, start > 0f ? StateTime(start, actionSpeed) : 0f);
-        // Grown out of a light swing, the legs leave its stance for the planted heavy's slowly, so the hips don't twitch.
+        float offset = start > 0f ? StateTime(start, actionSpeed) : 0f;
+        // Grown out of a light swing, the legs leave its stance for the planted heavy's over GrownLegsFade, so the hips don't twitch.
         float othersFade = grownFrom > 0f ? GrownLegsFade : fade;
-        foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
+        // Hand-overs that never show the ready pose between (PlayerAnimationController.Layers).
+        if (layer == fullBodyLayer)
         {
-            if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
+            IntoFullBody(hash, fade, offset);
+        }
+        else
+        {
+            UnderFullBody(layer, hash, fade, offset, othersFade);
+            foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
             {
-                animator.CrossFadeInFixedTime(EmptyStateHash, othersFade, other);
+                if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash) && LayerBusy(other))
+                {
+                    animator.CrossFadeInFixedTime(EmptyStateHash, othersFade, other);
+                }
             }
         }
     }
@@ -260,14 +303,16 @@ public sealed partial class PlayerAnimationController
                 animator.ResetTrigger(HitHash);
             }
 
-            // Straight into the guard, cutting off whatever swing was ending.
-            CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
-            foreach (int other in new[] { attackArmsLayer, fullBodyLayer })
+            if (equipment != null)
             {
-                if (other >= 0 && animator.HasState(other, EmptyStateHash))
-                {
-                    animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, other);
-                }
+                equipment.FinishHandMove();
+            }
+
+            // Straight into the guard, cutting off whatever swing was ending (Full Body handed over in CrossFadeUpper).
+            CrossFadeUpper(combat != null && combat.HasShield ? GuardShieldStateHash : GuardStateHash, 0.08f);
+            if (attackArmsLayer >= 0 && animator.HasState(attackArmsLayer, EmptyStateHash) && LayerBusy(attackArmsLayer))
+            {
+                animator.CrossFadeInFixedTime(EmptyStateHash, 0.08f, attackArmsLayer);
             }
         }
     }
@@ -283,11 +328,10 @@ public sealed partial class PlayerAnimationController
         }
 
         int state = puttingAway ? (onBack ? SheatheBackStateHash : SheatheHipStateHash) : (onBack ? DrawBackStateHash : DrawHipStateHash);
-        int now = animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash;
-        bool free = now == EmptyStateHash || now == DrawHipStateHash || now == DrawBackStateHash || now == SheatheHipStateHash || now == SheatheBackStateHash;
-        if (HasUpperState(state) && free)
+        if (HasUpperState(state))
         {
-            animator.CrossFadeInFixedTime(state, 0.1f, upperBodyLayer, 0f);
+            // Over a swing's tail on Full Body too, which used to hide the reach (review 2026-11-20).
+            UnderFullBody(upperBodyLayer, state, 0.1f, 0f, 0.15f);
         }
     }
 
@@ -331,14 +375,7 @@ public sealed partial class PlayerAnimationController
         }
 
         SetFloat(ActionSpeedHash, shape.animationSpeed * (dodge != null ? dodge.AnimationPace : 1f));
-        animator.CrossFadeInFixedTime(hash, 0.04f, fullBodyLayer, 0f);
-        foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
-        {
-            if (other >= 0 && animator.HasState(other, EmptyStateHash))
-            {
-                animator.CrossFadeInFixedTime(EmptyStateHash, 0.04f, other);
-            }
-        }
+        IntoFullBody(hash, 0.04f, 0f);
     }
 
     // Guard broken: the stagger (Idle_Shield_Break, about 1 s), then dazed (Guard Stunned) for as long as the stun lasts, so
@@ -392,13 +429,13 @@ public sealed partial class PlayerAnimationController
         if (state != 0 && layer >= 0 && animator.HasState(layer, state))
         {
             SetFloat(ActionSpeedHash, skill.AnimationSpeed);
-            animator.CrossFadeInFixedTime(state, ActionFade, layer, 0f);
-            foreach (int other in new[] { upperBodyLayer, attackArmsLayer, fullBodyLayer })
+            if (layer == fullBodyLayer)
             {
-                if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash))
-                {
-                    animator.CrossFadeInFixedTime(EmptyStateHash, ActionFade, other);
-                }
+                IntoFullBody(state, ActionFade, 0f);
+            }
+            else
+            {
+                animator.CrossFadeInFixedTime(state, ActionFade, layer, 0f);
             }
 
             return;
@@ -420,6 +457,9 @@ public sealed partial class PlayerAnimationController
     private bool pendingKnockdown;
 
     // A hit that hurts; the killing blow is left to whatever handles death.
+    private int flinchPlayedFrame = -1;
+    private float flinchPlayedShare;
+
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
         if (result.Damage <= 0f || result.Killed || result.Blocked || damage.IsOverTime)
@@ -427,13 +467,31 @@ public sealed partial class PlayerAnimationController
             return;
         }
 
-        pendingHitShare = Mathf.Max(pendingHitShare, health != null && health.MaxHealth > 0f ? result.Damage / health.MaxHealth : 0f);
+        float share = health != null && health.MaxHealth > 0f ? result.Damage / health.MaxHealth : 0f;
+        // The flinch for this blow already played (Flinched came first): a blow heavy enough for the knockback upgrades it.
+        if (flinchPlayedFrame == Time.frameCount)
+        {
+            if (share >= KnockbackShare && flinchPlayedShare < KnockbackShare)
+            {
+                flinchPlayedShare = share;
+                PlayHitReaction(share);
+            }
+
+            return;
+        }
+
+        pendingHitShare = Mathf.Max(pendingHitShare, share);
     }
 
+    // The gameplay flinch plays at once, in the frame the blow lands: in LateUpdate it came a frame late, into the hit-stop, and
+    // crept in for some five frames (review 2026-11-20). Hits that don't flinch wait for LateUpdate (ResolveHitReaction).
     private void OnFlinched(float seconds, bool lostSwing)
     {
         pendingFlinch = true;
         pendingFlinchLostSwing |= lostSwing;
+        flinchPlayedShare = Mathf.Max(0f, pendingHitShare);
+        ResolveHitReaction();
+        flinchPlayedFrame = Time.frameCount;
     }
 
     // The flinch is the gameplay's (PlayerCombat.Flinched): a hit that doesn't flinch (a scratch, pushing through, the grace
@@ -503,14 +561,7 @@ public sealed partial class PlayerAnimationController
         }
 
         SetFloat(ActionSpeedHash, 1f);
-        animator.CrossFadeInFixedTime(state, 0.06f, fullBodyLayer, 0f);
-        foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
-        {
-            if (other >= 0 && animator.HasState(other, EmptyStateHash))
-            {
-                animator.CrossFadeInFixedTime(EmptyStateHash, 0.06f, other);
-            }
-        }
+        IntoFullBody(state, 0.06f, 0f);
     }
 
     // A dodge cancels the swing in gameplay, so a swing still waiting for the animator shouldn't play afterwards.

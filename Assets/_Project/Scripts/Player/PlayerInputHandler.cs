@@ -384,7 +384,7 @@ public sealed class PlayerInputHandler : MonoBehaviour
     {
         if (equipment != null && !PadBusy(context))
         {
-            equipment.SwapWeapon();
+            equipment.RequestSwap();
         }
     }
 

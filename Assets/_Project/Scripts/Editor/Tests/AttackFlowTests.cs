@@ -25,12 +25,30 @@ public sealed class AttackFlowTests
     [Test]
     public void EveryAttack_BlendsInAsMeasured()
     {
-        string[] stale = AttackFlow.Links()
-            .GroupBy(link => link.To)
-            .Where(into => into.Key.BlendIn + 0.006f < Mathf.Min(into.Max(l => l.Need), into.Min(l => l.Room)) || into.Key.BlendIn > into.Min(l => l.Room) + 0.006f)
-            .Select(into => $"{into.Key.name}: blend in {into.Key.BlendIn:0.00} s, needs {into.Max(l => l.Need):0.00} s within {into.Min(l => l.Room):0.00} s")
-            .ToArray();
+        // Each of an attack's two blends (from the ready pose, and in a chain) is what its ways in of that kind need.
+        var stale = new List<string>();
+        foreach (IGrouping<AttackDefinition, AttackFlow.Link> into in AttackFlow.Links().GroupBy(link => link.To))
+        {
+            AttackFlow.Link[] ready = into.Where(AttackFlow.IsFromReady).ToArray();
+            AttackFlow.Link[] chain = into.Where(link => !AttackFlow.IsFromReady(link)).ToArray();
+            float wantReady = ready.Length > 0 ? AttackFlow.BlendFor(ready) : 0f;
+            float wantChain = chain.Length > 0 ? AttackFlow.BlendFor(chain) : 0f;
+            if (Mathf.Abs(into.Key.BlendInFromReady - wantReady) > 0.006f || Mathf.Abs(into.Key.BlendIn - wantChain) > 0.006f)
+            {
+                stale.Add($"{into.Key.name}: from ready {into.Key.BlendInFromReady:0.00} s (wants {wantReady:0.00}), in a chain {into.Key.BlendIn:0.00} s (wants {wantChain:0.00})");
+            }
+        }
+
         Assert.IsEmpty(stale, "run Safe Haven › Tools › Fit Attack Blends\n" + string.Join("\n", stale));
+    }
+
+    // Two kinds of way in, measured apart: an opener from the ready pose needs less than the chain's worst link into it, often.
+    [Test]
+    public void ReadyAndChainWaysIn_AreTold()
+    {
+        List<AttackFlow.Link> links = AttackFlow.Links();
+        Assert.IsTrue(links.Any(AttackFlow.IsFromReady), "ways in from the ready pose");
+        Assert.IsTrue(links.Any(link => !AttackFlow.IsFromReady(link)), "ways in from a swing");
     }
 
     [Test]

@@ -57,6 +57,7 @@ MonoBehaviour:
   followThroughSpeed: 1.0077518
   growsFromLight: 0
   blendIn: 0.23
+  blendInFromReady: 0.14
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0}

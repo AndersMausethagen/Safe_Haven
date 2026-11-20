@@ -73,7 +73,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     // A charged attack let go from the hold is already at the top of its backswing: a short blend, done before its blow.
     private const float ChargedReleaseFade = PlayerCombat.ChargedReleaseSeconds;
     // How slowly the light swing's legs give way when a held press grows it into the planted heavy one.
-    private const float GrownLegsFade = 0.25f;
+    // (0.25 read late: the heavy reached half weight 8-11 frames after the grow, review 2026-11-20.)
+    private const float GrownLegsFade = 0.18f;
     // Out of a dodge the body is already moving, so a rush attack needn't snap into its first frame.
     private const float RushFade = 0.1f;
     private const float ChainFade = 0.18f;
@@ -357,6 +358,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     // After PlayerMovement.Update so the animation sees this frame's movement.
     private void LateUpdate()
     {
+        ClearUnderFullBody();
+        ApplyPendingEquipment();
         UpdateWorkSwing();
         float deltaTime = Time.deltaTime;
         UpdateLocomotion(deltaTime);
@@ -382,12 +385,9 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (upperBodyLayer >= 0 && animator.HasState(upperBodyLayer, hash))
         {
             SetFloat(ActionSpeedHash, 1f);
-            animator.CrossFadeInFixedTime(hash, fade, upperBodyLayer, 0f);
-            // The full-body layer sits above it, so a swing still playing there would hide the reaction.
-            if (fullBodyLayer >= 0 && animator.HasState(fullBodyLayer, EmptyStateHash))
-            {
-                animator.CrossFadeInFixedTime(EmptyStateHash, fade, fullBodyLayer);
-            }
+            // The full-body layer sits above it: a swing still playing there is handed over, the reaction going in beneath it while
+            // only the swing fades (PlayerAnimationController.Layers).
+            UnderFullBody(upperBodyLayer, hash, fade, 0f, fade);
         }
     }
 
@@ -402,9 +402,23 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         ApplyGameState(current);
     }
 
+    // A weapon taken out or put away by hand (Z) changes the stance's pose at the hand's grab, not at the press: it snapped the
+    // ready pose 2.7-3.0 in one frame (review 2026-11-20). Otherwise the next LateUpdate.
+    private bool equipmentPending;
+
     private void OnWeaponChanged(WeaponDefinition weapon)
     {
-        WeaponStance = weapon != null ? weapon.Stance : WeaponStance.Unarmed;
+        weaponStance = weapon != null ? weapon.Stance : WeaponStance.Unarmed;
+        equipmentPending = true;
+    }
+
+    private void ApplyPendingEquipment()
+    {
+        if (equipmentPending && (equipment == null || !equipment.HandMoving))
+        {
+            equipmentPending = false;
+            ApplyEquipment();
+        }
     }
 
     private void ApplyGameState(GameState state)

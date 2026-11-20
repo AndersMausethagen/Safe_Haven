@@ -115,6 +115,52 @@ public sealed class PlayerEquipment : MonoBehaviour
     /// <summary>The hand is reaching to take out or put away a weapon (the shown models change over at its grab).</summary>
     public bool HandMoving => Time.time < handChangesAt;
 
+    /// <summary>A swing or the guard starts mid-reach: what is shown catches up with the gameplay now (the swing was swung with an
+    /// empty hand, or the punch thrown holding the sword, review 2026-11-20).</summary>
+    public void FinishHandMove()
+    {
+        if (HandMoving)
+        {
+            handChangesAt = -1f;
+            handHidesNew = false;
+        }
+    }
+
+    // Z pressed mid-swing waits for the swing to recover, a moment (it was dropped).
+    private const float SwapBufferSeconds = 0.6f;
+    private float swapQueuedUntil = -1f;
+
+    /// <summary>The weapon key (Z): swaps now, or as soon as the swing in progress has recovered.</summary>
+    public void RequestSwap()
+    {
+        if (combat != null && combat.IsAttacking)
+        {
+            swapQueuedUntil = Time.time + SwapBufferSeconds;
+            return;
+        }
+
+        swapQueuedUntil = -1f;
+        SwapWeapon();
+    }
+
+    private void Update()
+    {
+        if (swapQueuedUntil < 0f)
+        {
+            return;
+        }
+
+        if (Time.time > swapQueuedUntil)
+        {
+            swapQueuedUntil = -1f;
+        }
+        else if (combat == null || !combat.IsAttacking)
+        {
+            swapQueuedUntil = -1f;
+            SwapWeapon();
+        }
+    }
+
     /// <summary>The weapon worn on the body as shown: what was worn until the hand's grab, then Stowed.</summary>
     public ItemDefinition StowedShown => Time.time < handChangesAt ? stowedBefore : Stowed;
 
@@ -469,6 +515,11 @@ public sealed class PlayerEquipment : MonoBehaviour
     /// </summary>
     public void Restore(IReadOnlyList<PlayerSnapshot.SlotRecord> records, bool captured, int legacyWeaponSlot = -1)
     {
+        // A reach under way when a save loads shows nothing of the weapons before it.
+        handChangesAt = -1f;
+        handHidesNew = false;
+        handBefore = null;
+        swapQueuedUntil = -1f;
         restoring = true;
         try
         {
