@@ -13,11 +13,15 @@ public sealed partial class PlayerAnimationController
 
     private void UpdateLocomotion(float deltaTime)
     {
-        // Swimming is posed by PlayerSwimAnimation over the standing idle, so the legs don't walk under the water.
+        // Swimming plays the Swim state (Stylized Idle_Swim and Swim_* on MoveX/MoveZ), PlayerSwimAnimation placing the body in the
+        // water; on a controller without it, PlayerSwimAnimation poses the swimmer over the standing idle. The legs don't walk.
         bool swim = IsSwimming;
+        bool swimClips = swim && HasSwimState;
         SetFloat(SpeedHash, swim ? 0f : movement.HorizontalSpeed, speedDampTime, deltaTime);
+        SetBool(SwimmingHash, swim);
+        UpdateArmsInWater(swim, deltaTime);
 
-        Vector3 local = swim ? Vector3.zero : movement.LocalVelocity;
+        Vector3 local = swim && !swimClips ? Vector3.zero : movement.LocalVelocity;
         SetFloat(MoveXHash, local.x, speedDampTime, deltaTime);
         SetFloat(MoveZHash, local.z, speedDampTime, deltaTime);
 
@@ -31,6 +35,46 @@ public sealed partial class PlayerAnimationController
     }
 
     private bool IsSwimming => swimming != null && swimming.IsSwimming;
+
+    private static readonly int SwimmingHash = Animator.StringToHash("Swimming");
+    private static readonly int SwimStateHash = Animator.StringToHash("Swim");
+    /// <summary>The controller swims with clips (its Swim state), so PlayerSwimAnimation only places the body.</summary>
+    public bool HasSwimState => animator != null && animator.HasState(0, SwimStateHash);
+
+    // The weapon-holding arm layers let the swim's arms show (the held model is hidden in the water, HeldItemView).
+    private static readonly string[] HoldingLayers = { "Arms", "Arm Left", "Arm Right", "Hands" };
+    private int[] holdingLayers;
+    private float[] holdingWeights;
+    private float inWater;
+
+    private void UpdateArmsInWater(bool swim, float deltaTime)
+    {
+        if (holdingLayers == null)
+        {
+            holdingLayers = new int[HoldingLayers.Length];
+            holdingWeights = new float[HoldingLayers.Length];
+            for (int i = 0; i < HoldingLayers.Length; i++)
+            {
+                holdingLayers[i] = animator.GetLayerIndex(HoldingLayers[i]);
+                holdingWeights[i] = holdingLayers[i] >= 0 ? animator.GetLayerWeight(holdingLayers[i]) : 0f;
+            }
+        }
+
+        float was = inWater;
+        inWater = Mathf.MoveTowards(inWater, swim && HasSwimState ? 1f : 0f, 4f * deltaTime);
+        if (Mathf.Approximately(was, inWater) && inWater <= 0f)
+        {
+            return;
+        }
+
+        for (int i = 0; i < holdingLayers.Length; i++)
+        {
+            if (holdingLayers[i] >= 0)
+            {
+                animator.SetLayerWeight(holdingLayers[i], holdingWeights[i] * (1f - inWater));
+            }
+        }
+    }
 
     // Seconds the attack pack's legs stay after a swing ends, while its arms finish over them (WalkOutOfSwing), and how fast the
     // legs change over.

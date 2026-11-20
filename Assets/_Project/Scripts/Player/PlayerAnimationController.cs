@@ -59,6 +59,11 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private static readonly int GuardShieldHitStateHash = Animator.StringToHash("Guard Shield Hit");
     private static readonly int ParryWeaponStateHash = Animator.StringToHash("Parry Weapon");
     private static readonly int GuardStunnedStateHash = Animator.StringToHash("Guard Stunned");
+    private static readonly int DrawHipStateHash = Animator.StringToHash("Draw Hip");
+    private static readonly int DrawBackStateHash = Animator.StringToHash("Draw Back");
+    private static readonly int SheatheHipStateHash = Animator.StringToHash("Sheathe Hip");
+    private static readonly int SheatheBackStateHash = Animator.StringToHash("Sheathe Back");
+    private PlayerEquipment equipment;
     // A swing's blend in from whatever came before. 0.06 s was two to four frames between very different poses, which snapped when
     // swings followed each other (the user, 2026-11-17: "it snaps in between states and does not flow well"). Only the look: when a
     // blow lands is PlayerCombat's.
@@ -153,6 +158,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
     private int plantedSwing;
     // How far into its wind-up a heavy swing grown out of a light one started (PlayerCombat.HeavyGrownFrom); 0 for any other swing.
     private float grownFrom;
+    // Seconds the current swing's wind-up lasts as it started (0: not shaped), for SwingWindup.
+    private float windupSpan;
 
     public WeaponStance WeaponStance
     {
@@ -193,6 +200,7 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         dodge = GetComponent<PlayerDodge>();
         skills = GetComponent<PlayerSkills>();
         guard = GetComponent<PlayerGuard>();
+        equipment = GetComponent<PlayerEquipment>();
         eating = GetComponent<PlayerEating>();
         swimming = GetComponent<PlayerSwimming>();
         stealth = GetComponent<PlayerStealth>();
@@ -262,6 +270,11 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
             skills.SkillCast += OnSkillCast;
         }
 
+        if (equipment != null)
+        {
+            equipment.WeaponMoving += OnWeaponMoving;
+        }
+
         if (guard != null)
         {
             guard.GuardChanged += OnGuardChanged;
@@ -317,6 +330,11 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
         if (skills != null)
         {
             skills.SkillCast -= OnSkillCast;
+        }
+
+        if (equipment != null)
+        {
+            equipment.WeaponMoving -= OnWeaponMoving;
         }
 
         if (guard != null)

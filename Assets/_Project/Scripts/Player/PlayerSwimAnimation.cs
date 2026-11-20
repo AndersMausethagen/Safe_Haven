@@ -78,6 +78,7 @@ public sealed class PlayerSwimAnimation : MonoBehaviour
         }
 
         hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+        clips = GetComponent<PlayerAnimationController>();
         neck = animator.GetBoneTransform(HumanBodyBones.Neck);
         neck = neck != null ? neck : animator.GetBoneTransform(HumanBodyBones.Head);
         Find(leftArm, HumanBodyBones.LeftUpperArm, HumanBodyBones.LeftLowerArm, HumanBodyBones.LeftHand);
@@ -105,6 +106,12 @@ public sealed class PlayerSwimAnimation : MonoBehaviour
 
         float wanted = Mathf.Clamp01(movement.HorizontalSpeed / Mathf.Max(0.1f, swimming.SwimSpeed));
         pace = Mathf.MoveTowards(pace, wanted, 2f * deltaTime);
+        if (clips != null && clips.HasSwimState)
+        {
+            PlaceInTheWater();
+            return;
+        }
+
         phase = Mathf.Repeat(phase + deltaTime / Mathf.Lerp(treadCycle, strokeCycle, pace), 1f);
         float wave = Mathf.Sin(phase * 2f * Mathf.PI);
 
@@ -125,6 +132,29 @@ public sealed class PlayerSwimAnimation : MonoBehaviour
         PoseArm(leftArm, torso, phase, -1f, wave);
         PoseLeg(rightLeg, torso, phase, 1f);
         PoseLeg(leftLeg, torso, Mathf.Repeat(phase + 0.5f, 1f), -1f);
+    }
+
+    // The swim clips carry the hips about 0.25 m higher than standing (made for a body held up by the water): treading water the
+    // hips stay where a standing body's are, as the water holds the player; swimming they come up to Swim Hips Depth under the
+    // surface, lying in it. The clips do the strokes.
+    private PlayerAnimationController clips;
+    private float standingHips = -1f;
+
+    private void PlaceInTheWater()
+    {
+        float treading = transform.position.y + (standingHips > 0f ? standingHips : 0.95f);
+        float target = Mathf.Lerp(treading, swimming.SurfaceHeight - swimHipsDepth, pace);
+        hips.position += Vector3.up * ((target - hips.position.y) * weight);
+    }
+
+    // The standing hips' height over the feet, learnt while on land, for treading water.
+    private void Update()
+    {
+        if (hips != null && swimming != null && !swimming.IsSwimming && movement != null && movement.IsGrounded && movement.HorizontalSpeed < 0.2f)
+        {
+            float height = hips.position.y - transform.position.y;
+            standingHips = standingHips < 0f ? height : Mathf.Lerp(standingHips, height, 0.05f);
+        }
     }
 
     private void PoseArm(Limb arm, Quaternion torso, float at, float side, float wave)

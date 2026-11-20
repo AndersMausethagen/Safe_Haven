@@ -11,7 +11,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class StowedWeaponView : MonoBehaviour
 {
-    private const float CheckEvery = 0.2f;
+    // Often enough that the worn model changes over with the hand's grab (PlayerEquipment.StowedShown).
+    private const float CheckEvery = 0.05f;
 
     private PlayerEquipment equipment;
     private Animator animator;
@@ -51,7 +52,7 @@ public sealed class StowedWeaponView : MonoBehaviour
         }
 
         nextCheck = Time.unscaledTime + CheckEvery;
-        ItemDefinition wanted = equipment.Stowed;
+        ItemDefinition wanted = equipment.StowedShown;
         if (wanted != null && StowedWeaponSettings.WornOnBack(wanted.Weapon) == null)
         {
             wanted = null;

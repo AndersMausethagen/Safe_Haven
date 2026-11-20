@@ -82,6 +82,46 @@ public sealed class PlayerEquipment : MonoBehaviour
     /// <summary>Raised after any gear slot changes: equipped, unequipped, worn down or repaired.</summary>
     public event Action Changed;
 
+    /// <summary>Raised as the weapon is put away (true) or taken out (false) by hand, and whether it is worn on the back: the
+    /// animation plays the reach (PlayerAnimationController), while the model changes over at the hand's grab (ShowsSheathed).</summary>
+    public event Action<bool, bool> WeaponMoving;
+
+    // The hand reaches the hip or the back this far into KI's (un)sheathe clips as played (measured on the player's rig at the
+    // worn positions, StowedWeaponSettings, 2026-11-20), at DrawPace.
+    [Header("Drawing and putting away")]
+    [SerializeField, Min(0f)] private float drawGrabHip = 0.354f;
+    [SerializeField, Min(0f)] private float drawGrabBack = 0.416f;
+    [SerializeField, Min(0f)] private float sheatheHip = 0.33f;
+    [SerializeField, Min(0f)] private float sheatheBack = 0.318f;
+    [Tooltip("How fast the draw and put-away clips play (PlayerAnimator.controller's Draw / Sheathe states play at this speed).")]
+    [SerializeField, Min(0.1f)] private float drawPace = 1.25f;
+    private float handChangesAt = -1f;
+    private bool handHidesNew;
+    private ItemDefinition stowedBefore;
+
+    /// <summary>Put away as far as what is shown goes: the model leaves the hand (or comes to it) at the hand's grab, a moment
+    /// after the gameplay changed over (IsSheathed).</summary>
+    public bool ShowsSheathed => Time.time < handChangesAt && !handHidesNew ? !IsSheathed : IsSheathed;
+
+    /// <summary>A weapon just taken out of the bag isn't in the hand until the hand has reached for it.</summary>
+    public bool HandWeaponHidden => handHidesNew && Time.time < handChangesAt;
+
+    /// <summary>The weapon worn on the body as shown: what was worn until the hand's grab, then Stowed.</summary>
+    public ItemDefinition StowedShown => Time.time < handChangesAt ? stowedBefore : Stowed;
+
+    public float DrawPace => drawPace;
+
+    // The hand reaches for a weapon (taking it out, or the next from the bag) or puts it away: the model changes over at the grab.
+    private void StartHandMove(bool puttingAway, WeaponDefinition weapon, ItemDefinition wornBefore, bool hideNew)
+    {
+        bool back = StowedWeaponSettings.WornOnBack(weapon) ?? false;
+        float grab = puttingAway ? (back ? sheatheBack : sheatheHip) : (back ? drawGrabBack : drawGrabHip);
+        stowedBefore = wornBefore;
+        handHidesNew = hideNew;
+        handChangesAt = Time.time + grab / drawPace;
+        WeaponMoving?.Invoke(puttingAway, back);
+    }
+
     private ItemInventory Inventory => inventory != null ? inventory : inventory = GetComponent<ItemInventory>();
 
     private void Awake()
@@ -248,7 +288,9 @@ public sealed class PlayerEquipment : MonoBehaviour
 
         if (IsSheathed)
         {
+            ItemDefinition worn = Stowed;
             SetSheathed(false);
+            StartHandMove(false, MainHand.Item.Weapon, worn, false);
             GameMessages.Post($"Took out {MainHand.Item.DisplayName}.");
             return true;
         }
@@ -265,12 +307,21 @@ public sealed class PlayerEquipment : MonoBehaviour
 
         if (next != null)
         {
-            return EquipFromBag(next);
+            ItemDefinition worn = Stowed;
+            bool equipped = EquipFromBag(next);
+            if (equipped && next.IsWeapon)
+            {
+                StartHandMove(false, next.Weapon, worn, true);
+            }
+
+            return equipped;
         }
 
         if (held != null)
         {
+            ItemDefinition worn = Stowed;
             SetSheathed(true);
+            StartHandMove(true, held.Weapon, worn, false);
             GameMessages.Post($"Put away {held.DisplayName}.");
             return true;
         }

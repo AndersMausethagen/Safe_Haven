@@ -25,6 +25,12 @@ public sealed partial class PlayerAnimationController
         // A heavy swing grown out of a light one started part way into its wind-up clip: the rest of the wind-up plays slower by as
         // much, so the strike frame still meets the blow.
         float windup = attack.AnimationSpeed * (1f - grownFrom);
+        // A slow wind-up gathers itself: faster at first, slowing into the top of the backswing, the same frame at the strike (SwingWindup).
+        if (windupSpan > 0f)
+        {
+            windup = SwingWindup.Speed(windup, attack.AnimationSpeed, 1f - Mathf.Max(0f, combat.TimeToHit - attack.StrikeLead) / windupSpan);
+        }
+
         float speed = combat.IsHoldingSwing ? 0f : combat.TimeToHit <= attack.StrikeLead ? attack.StrikeSpeed : windup;
         SetFloat(ActionSpeedHash, speed * swingSpeed);
         if (plantedSwing != 0 && !combat.IsCharging && combat.TimeToHit <= Mathf.Max(attack.StrikeLead, PlantedStrikeLead))
@@ -198,7 +204,14 @@ public sealed partial class PlayerAnimationController
             striking = combat.TimeToHit <= charged.StrikeLead + 0.005f;
         }
 
+        // The wind-up's span, for its shape (SwingWindup); a charged release is past its wind-up.
+        windupSpan = !fromHold && combat != null && SwingWindup.Strength(swing.Attack.AnimationSpeed) > 0f
+            ? Mathf.Max(0.01f, combat.TimeToHit - swing.Attack.StrikeLead) : 0f;
         float actionSpeed = striking ? swing.Attack.StrikeSpeed * swing.Speed : swing.Attack.AnimationSpeed * swing.Speed * (1f - grownFrom);
+        if (!striking && windupSpan > 0f)
+        {
+            actionSpeed = SwingWindup.Speed(actionSpeed, swing.Attack.AnimationSpeed, 0f);
+        }
         SetFloat(ActionSpeedHash, actionSpeed);
         float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
         // Each swing blends in over its measured Blend In (AttackFlow: no way into it moves the body faster than the swing itself,
@@ -260,6 +273,22 @@ public sealed partial class PlayerAnimationController
     }
 
     // A shield parries with the shield; a weapon with the stance's own deflection (Parry Weapon), not a shield's motion.
+    // Taking a weapon out or putting it away: the right hand reaches the hip or the back (KI's (un)sheathe clips on the upper body),
+    // the model changing over at its grab (PlayerEquipment). Not over a swing, a guard or a flinch.
+    private void OnWeaponMoving(bool puttingAway, bool onBack)
+    {
+        if (upperBodyLayer < 0 || (combat != null && combat.IsAttacking) || (guard != null && guard.IsGuarding))
+        {
+            return;
+        }
+
+        int state = puttingAway ? (onBack ? SheatheBackStateHash : SheatheHipStateHash) : (onBack ? DrawBackStateHash : DrawHipStateHash);
+        if (HasUpperState(state) && animator.GetCurrentAnimatorStateInfo(upperBodyLayer).shortNameHash == EmptyStateHash)
+        {
+            animator.CrossFadeInFixedTime(state, 0.1f, upperBodyLayer, 0f);
+        }
+    }
+
     private void OnParried(DamageInfo damage) =>
         CrossFadeUpper(combat != null && !combat.HasShield && HasUpperState(ParryWeaponStateHash) ? ParryWeaponStateHash : ParryStateHash, 0.04f);
 
