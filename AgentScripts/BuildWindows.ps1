@@ -32,7 +32,8 @@ $start = Get-Date
 # No double quotes in the code: Windows PowerShell 5.1 strips them from a native command's arguments.
 $answer = & $unity command script eval --no-banner --timeout 7200 --code 'SafeHavenBuild.BuildWindows(); return 7;' 2>&1 | Out-String
 $written = (Test-Path $data) -and ((Get-Item $data).LastWriteTime -gt $start)
-if ($answer -match '"result":7' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
+# Unity CLI 1.0 prints the eval's value itself (7); earlier versions a JSON object with "result":7.
+if ($answer -match '"result":7' -or $answer -match '(?m)^\s*7\s*$' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
     Write-Output "[Build] Windows build done in $([math]::Round(((Get-Date) - $start).TotalMinutes, 1)) min: $Project/Build/Windows/Safe Haven.exe"
     exit 0
 }

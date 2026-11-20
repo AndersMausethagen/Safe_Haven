@@ -133,13 +133,17 @@ if (untitled) UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/_
 string said = dirty.Count == 0 ? "clean" : "saved " + string.Join(", ", dirty);
 return untitled ? said + "; discarded an Untitled scene (reopened the Haven)" : said;
 '@.Replace('DISCARD', $discard) | Set-Content -Path $probe -Encoding utf8
-$saved = & $unity command script eval_file --no-banner -- --file $probe 2>&1 | Out-String
-if ($saved -match '"result":"playing"') { Write-Output '[RunTests] The Editor is in Play mode: stop Play first.'; exit 2 }
-if ($saved -match '"result":"untitled"') {
+# Unity CLI 1.0 (pipeline package 1.0): `script eval --file`, printing the eval's value itself; before it, `script eval_file`
+# printed a JSON object with the value as "result". Both are read.
+$saved = & $unity command script eval --no-banner --file $probe 2>&1 | Out-String
+$said = if ($saved -match '"result":"([^"]*)"') { $Matches[1] } else { (@($saved -split "`r?`n" | Where-Object { $_.Trim() }) | Select-Object -Last 1) -as [string] }
+$said = if ($said) { $said.Trim() } else { '' }
+if ($said -eq 'playing') { Write-Output '[RunTests] The Editor is in Play mode: stop Play first.'; exit 2 }
+if ($said -eq 'untitled') {
     Write-Output '[RunTests] An Untitled scene has unsaved changes, and saving it would wait on a file dialog. Save it under a name, or pass -DiscardUntitled when it is a leftover of a test run.'
     exit 2
 }
-if ($saved -match '"result":"([^"]*)"') { Write-Output "[RunTests] scenes: $($Matches[1])" } else { Write-Output "[RunTests] scene check failed: $saved" }
+if ($said -match '^(clean|saved)') { Write-Output "[RunTests] scenes: $said" } else { Write-Output "[RunTests] scene check failed: $saved" }
 
 # 3. Run the tests, watching for the dialog while they run. The CLI's filter takes one name (a class, or any part of a
 # test's full name), so "A;B" runs each in turn and the script exits non-zero if any run failed or did not finish.
@@ -149,8 +153,12 @@ $failedRuns = 0
 $names = if ($All) { @('') } else { @($Filter -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ }) }
 foreach ($name in $names) {
     $before = if (Test-Path $results) { (Get-Item $results).LastWriteTime } else { [datetime]::MinValue }
-    $arguments = if ($All) { @('command', 'test', 'run', '--mode', $Mode, '--no-banner', '--timeout', "$Timeout") }
-        else { @('command', 'test', 'run', '--mode', $Mode, '--filter', "`"$name`"", '--no-banner', '--timeout', "$Timeout") }
+    # Unity CLI 1.0 names the modes editor / playmode (Play mode tests also need --async-tests).
+    $cliMode = if ($Mode -eq 'PlayMode') { 'playmode' } else { 'editor' }
+    $arguments = @('command', 'test', 'run', '--mode', $cliMode)
+    if ($Mode -eq 'PlayMode') { $arguments += '--async-tests' }
+    if (-not $All) { $arguments += @('--filter', "`"$name`"") }
+    $arguments += @('--no-banner', '--timeout', "$Timeout")
     $run = Start-Process -FilePath $unity -ArgumentList $arguments -NoNewWindow -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
     $reported = @{}
     while (-not $run.HasExited) {
