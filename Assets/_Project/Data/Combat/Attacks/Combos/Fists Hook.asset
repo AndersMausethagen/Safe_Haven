@@ -35,8 +35,8 @@ MonoBehaviour:
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: 0
-  windupMove: 0.6
-  afterContactMove: 0.6
+  windupMove: 0.8
+  afterContactMove: 0.8
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1

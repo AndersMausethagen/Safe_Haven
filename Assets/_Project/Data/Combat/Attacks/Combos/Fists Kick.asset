@@ -35,8 +35,8 @@ MonoBehaviour:
   groundImpact: {fileID: 0}
   unblockable: 0
   pull: -0.8
-  windupMove: 0.5
-  afterContactMove: 0.6
+  windupMove: 0.8
+  afterContactMove: 0.8
   windupTurnRate: -1
   moveAt: -1
   lungeShare: -1
@@ -57,6 +57,10 @@ MonoBehaviour:
   followThroughSpeed: 1.8
   growsFromLight: 1
   blendIn: 0.1
+  blendInFromReady: 0
+  fromGuardStart: 0
+  blendInFromGuard: 0
+  fromHeavyStart: 0
   swingSound: {fileID: 0}
   hitSound: {fileID: 0}
   slashColor: {r: 1, g: 0.8, b: 0.45, a: 0}
