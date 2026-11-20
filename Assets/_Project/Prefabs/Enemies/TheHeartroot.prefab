@@ -380,6 +380,9 @@ MonoBehaviour:
   speedDampTime: 0.1
   flinchShare: 0.04
   strideSpeed: 2
+  swingsLikeThePlayer: 0
+  walkClipSpeed: 1.17
+  runClipSpeed: 1.17
 --- !u!114 &165592971757474411
 MonoBehaviour:
   m_ObjectHideFlags: 0

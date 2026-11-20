@@ -400,6 +400,9 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
     /// <summary>Horizontal movement speed in meters per second, for animation.</summary>
     public float Speed => IsRemote ? remoteSpeed : movement != null ? movement.Speed : 0f;
 
+    /// <summary>Walking one way while facing another (circling, a caster relocating), for the animation's strafe.</summary>
+    public bool IsStrafing => !IsRemote && movement != null && movement.IsStrafing;
+
     /// <summary>Raised when the state changes. Arguments: previous state, new state.</summary>
     public event Action<State, State> StateChanged;
 
@@ -421,6 +424,8 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         damageable = GetComponent<Damageable>();
         var agent = GetComponent<NavMeshAgent>();
         movement = new MonsterMovement(transform, agent, repathInterval, turnSpeed);
+        Animator body = GetComponentInChildren<Animator>();
+        movement.FacesTravelWhenStrafing = body != null && !body.isHuman;
         pack = GetComponentInParent<MonsterPack>();
         targeting.Bind(transform, definition, combatant, damageable, agent, targetLayers);
         Transform visual = transform.Find("Model");

@@ -105,13 +105,34 @@ public sealed class MonsterMovement
         return agent.SetDestination(destination);
     }
 
+    /// <summary>True while it walks one way looking another (Strafe), until the next plain MoveTo repath or Stop.</summary>
+    public bool IsStrafing => hasAsked && agent != null && !agent.updateRotation;
+
     /// <summary>Walks toward <paramref name="destination"/> looking along <paramref name="facing"/> instead of where it goes.</summary>
     public void Strafe(Vector3 destination, Vector3 facing)
     {
         MoveTo(destination);
         agent.updateRotation = false;
+        if (FacesTravelWhenStrafing)
+        {
+            // A four-legged body has no sidestep: it trots round in an arc, looking along its way and a little in at the foe.
+            Vector3 travel = destination - self.position;
+            travel.y = 0f;
+            facing.y = 0f;
+            if (travel.sqrMagnitude > 0.04f && facing.sqrMagnitude > 0.0001f)
+            {
+                facing = Vector3.Slerp(travel.normalized, facing.normalized, StrafeLookIn);
+            }
+        }
+
         TurnTowards(facing);
     }
+
+    /// <summary>Set for a body without strafe clips (the beasts' Generic rigs): it faces where it goes when circling, turned
+    /// StrafeLookIn of the way toward what it watches, instead of sliding sideways on a forward gait (audit 2026-11-20).</summary>
+    public bool FacesTravelWhenStrafing { get; set; }
+
+    private const float StrafeLookIn = 0.3f;
 
     public void Stop()
     {

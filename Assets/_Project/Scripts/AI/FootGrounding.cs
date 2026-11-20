@@ -64,6 +64,12 @@ public sealed class FootGrounding : MonoBehaviour
 
     // Runs after MonsterAI's LateUpdate, whose body language (MonsterPose) places the body each frame; this adds its
     // correction on top of that, so the pose's recoil, lean and lift (a flyer's hover, a leap) all still show.
+    private static readonly int UngroundedTag = Animator.StringToHash("Ungrounded");
+
+    private bool InUngroundedState() =>
+        animator.enabled && (animator.GetCurrentAnimatorStateInfo(0).tagHash == UngroundedTag
+                             || (animator.IsInTransition(0) && animator.GetNextAnimatorStateInfo(0).tagHash == UngroundedTag));
+
     private void LateUpdate()
     {
         if (left == null || right == null || home == null || transform.parent != home)
@@ -77,7 +83,9 @@ public sealed class FootGrounding : MonoBehaviour
         bool dead = monster != null && monster.CurrentState == MonsterAI.State.Dead;
         bool free = !animator.enabled || monster == null || monster.CurrentState == MonsterAI.State.Hopping;
         float target = 0f;
-        if (dead || (monster != null && monster.IsResting))
+        // Falling, lying and getting up (MonsterHumanoid's states tagged Ungrounded): the soles aren't under the body, so
+        // grounding them pulled a felled body into the ground mid-fall (audit 2026-11-20); the correction holds as it was.
+        if (dead || (monster != null && monster.IsResting) || InUngroundedState())
         {
             // Dead: it falls where it stood, and the death clip or the ragdoll takes it from there. Resting (grazing,
             // asleep): a curled-up body doesn't rest on its soles, and the rest clip is made to the standing pose, so it

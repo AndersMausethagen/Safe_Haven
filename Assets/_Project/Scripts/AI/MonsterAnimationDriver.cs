@@ -40,12 +40,37 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
     [Tooltip("Swings as the player does (the Lost Ones, once settlers): a strike fitted to a player's clip (CombatClipKit.FitAttack) builds up at its " +
              "Animation Speed, strikes at Strike Speed for the Strike Lead before the blow, and plays out at Follow Through Speed. Off: one speed throughout.")]
     [SerializeField] private bool swingsLikeThePlayer;
+    [Tooltip("Humanoid bodies: how fast the feet of this body's walk and run clips move at normal playback, in metres per second of a " +
+             "human-sized body (the body's size is divided out). MonsterHumanoid's own KI walk and run: 1.86 and 4.08. A body whose " +
+             "override plays other clips (a zombie's shamble, a treant's stride) says what they cover, so the feet keep up with the ground.")]
+    [SerializeField, Min(0.1f)] private float walkClipSpeed = WalkThreshold;
+    [SerializeField, Min(0.1f)] private float runClipSpeed = RunThreshold;
 
     /// <summary>The bool a controller has when it has a clip for grazing and sleeping.</summary>
     public const string RestingParameter = "Resting";
 
     private static readonly int RestingHash = Animator.StringToHash(RestingParameter);
     private static readonly int StrideRateHash = Animator.StringToHash("StrideRate");
+    // Humanoid locomotion (technical animation audit, 2026-11-20): Speed and MoveX/MoveZ are fed per body size (a Tusse at 0.44 of a man
+    // glided 2.5 times over the ground, Brukam at 2.3 trod a treadmill), Locomotion's thresholds are its clips' feet speeds, and
+    // LocomotionRate / StrafeRate play the stride faster or slower where the clips alone can't keep up.
+    private const float WalkThreshold = 1.86f;
+    private const float RunThreshold = 4.08f;
+    private const float StrafeRingForward = 4.74f;
+    private const float StrafeRingBack = 2.37f;
+    private const float SlowestStride = 0.5f;
+    private const float FastestStride = 2.2f;
+    private static readonly int LocomotionRateHash = Animator.StringToHash("LocomotionRate");
+    private static readonly int StrafeRateHash = Animator.StringToHash("StrafeRate");
+    private bool hasLocomotionRate;
+    private bool hasStrafeRate;
+    private float bodyScale = 1f;
+    // Charges move the body with NavMeshAgent.Move, which the agent's velocity (ai.Speed) doesn't count: a charging boar slid along in
+    // its idle. The speed fed is also what the body actually covered (as KnightSteed does).
+    private const float MostMeasuredSpeed = 15f;
+    private Vector3 speedProbe;
+    private bool speedProbed;
+    private int strikeStateHash;
     private bool hasResting;
     private bool hasStride;
 
@@ -128,6 +153,8 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         health = GetComponent<Damageable>();
         animator = animator != null ? animator : GetComponentInChildren<Animator>();
         CacheParameters();
+        // A humanoid's clips move a human-sized body: its own size scales what they cover.
+        bodyScale = animator != null && animator.isHuman ? Mathf.Max(0.05f, animator.humanScale * animator.transform.lossyScale.y) : 1f;
     }
 
     private void OnEnable()
@@ -180,14 +207,20 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
 
         // Story movement owns locomotion while the AI is disabled.
+        float speed = MovedSpeed();
         if (ai.enabled && hasSpeed)
         {
-            animator.SetFloat(speedHash, ai.Speed, speedDampTime, Time.deltaTime);
+            animator.SetFloat(speedHash, speed / bodyScale, speedDampTime, Time.deltaTime);
+        }
+
+        if (hasLocomotionRate && ai.enabled)
+        {
+            animator.SetFloat(LocomotionRateHash, LocomotionRate(speed / bodyScale));
         }
 
         if (hasStride && ai.enabled)
         {
-            animator.SetFloat(StrideRateHash, ai.Speed > 0.2f ? Mathf.Clamp(ai.Speed / strideSpeed, 0.5f, 2.5f) : 1f);
+            animator.SetFloat(StrideRateHash, speed > 0.2f ? Mathf.Clamp(speed / strideSpeed, 0.5f, 2.5f) : 1f);
         }
 
         if (hasResting)
@@ -266,18 +299,68 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
 
         if (hasReady)
         {
-            animator.SetBool(ReadyHash, ai.IsWaitingTurn);
+            // Facing one way and moving another (circling, a caster's relocation) is a strafe, not a forward walk slid sideways.
+            animator.SetBool(ReadyHash, ai.IsWaitingTurn || (ai.IsStrafing && ai.CurrentState == MonsterAI.State.Chasing));
         }
 
         if (hasMove && Time.deltaTime > 0f)
         {
             // From how it actually moved, so a friend's copy (moved by the host's poses) steps the same way.
-            Vector3 local = transform.InverseTransformDirection((transform.position - lastPosition) / Time.deltaTime);
+            Vector3 local = transform.InverseTransformDirection((transform.position - lastPosition) / Time.deltaTime) / bodyScale;
             animator.SetFloat(MoveXHash, local.x, MoveDampTime, Time.deltaTime);
             animator.SetFloat(MoveZHash, local.z, MoveDampTime, Time.deltaTime);
+            if (hasStrafeRate)
+            {
+                animator.SetFloat(StrafeRateHash, StrafeRate(new Vector2(local.x, local.z)));
+            }
         }
 
         lastPosition = transform.position;
+    }
+
+    private float MovedSpeed()
+    {
+        Vector3 here = transform.position;
+        float measured = 0f;
+        if (speedProbed && Time.deltaTime > 0f)
+        {
+            Vector3 step = here - speedProbe;
+            step.y = 0f;
+            measured = Mathf.Min(MostMeasuredSpeed, step.magnitude / Time.deltaTime);
+        }
+
+        speedProbe = here;
+        speedProbed = true;
+        return Mathf.Max(ai.Speed, measured);
+    }
+
+    // Locomotion blends idle, walk (at WalkThreshold) and run (at RunThreshold): the feet cover what the blended clips do, scaled by
+    // this rate, so it is the speed over what they cover. Below the walk, idle and walk share the stride, so the walk clip's own speed
+    // against its threshold is the rate; past the run, the run is played faster.
+    private float LocomotionRate(float speed)
+    {
+        if (speed <= WalkThreshold)
+        {
+            return Mathf.Clamp(WalkThreshold / walkClipSpeed, SlowestStride, FastestStride);
+        }
+
+        float feet = speed < RunThreshold
+            ? Mathf.Lerp(walkClipSpeed, runClipSpeed, (speed - WalkThreshold) / (RunThreshold - WalkThreshold))
+            : runClipSpeed;
+        return Mathf.Clamp(speed / feet, SlowestStride, FastestStride);
+    }
+
+    // The Ready tree's outer ring is its run strafes (4.74 forward and to the sides, 2.37 back): beyond it the stride plays faster.
+    private static float StrafeRate(Vector2 local)
+    {
+        float speed = local.magnitude;
+        if (speed < 0.01f)
+        {
+            return 1f;
+        }
+
+        float ring = Mathf.Lerp(StrafeRingForward, StrafeRingBack, Mathf.Clamp01(-local.y / speed));
+        return Mathf.Clamp(speed / ring, 1f, FastestStride);
     }
 
     private void CacheParameters()
@@ -308,6 +391,11 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
 
         hasMove = hasMoveX && hasMoveZ;
+        foreach (AnimatorControllerParameter parameter in animator.parameters)
+        {
+            hasLocomotionRate |= parameter.nameHash == LocomotionRateHash && parameter.type == AnimatorControllerParameterType.Float;
+            hasStrafeRate |= parameter.nameHash == StrafeRateHash && parameter.type == AnimatorControllerParameterType.Float;
+        }
         flinchLayer = animator.GetLayerIndex(FlinchLayerName);
     }
 
@@ -328,6 +416,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             {
                 animator.SetFloat(ActionSpeedHash, own ? attack.AnimationSpeed : 1f);
                 animator.CrossFadeInFixedTime(state, StrikeFade, 0, 0f);
+                strikeStateHash = state;
                 int release = Animator.StringToHash(name + " Release");
                 if (animator.HasState(0, release))
                 {
@@ -347,12 +436,23 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
             }
         }
 
+        // A howl or a summon with no call to play stands and calls (the bite at the air read wrong, audit 2026-11-20).
+        MonsterAttack calling = ai.ActiveAction;
+        if (calling != null && (calling.kind == MonsterAttackKind.Howl || calling.kind == MonsterAttackKind.Summon)
+            && (attack == null || string.IsNullOrEmpty(attack.AnimationState)))
+        {
+            return;
+        }
+
         if (hasAttack)
         {
             animator.SetFloat(ActionSpeedHash, 1f);
             animator.SetTrigger(attackHash);
+            strikeStateHash = AttackStateHash;
         }
     }
+
+    private static readonly int AttackStateHash = Animator.StringToHash("Attack");
 
     // The strike's quicker part, then its follow-through, on time; a held wind-up (holdChance) pushes both back as it pushes the hit.
     private void UpdateSwingPhases()
@@ -557,6 +657,28 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         }
     }
 
+    // The AI is free again before many strike clips end (Lost Rush: free at 1.3 s, clip to 5 s; stomps 2.4 s against 3.2 s), and a body
+    // moving off while the clip plays out glides in its strike pose: the legs take over as it recovers. A stagger, a hop or death
+    // play their own.
+    private const float StrikeTailFade = 0.25f;
+
+    private void HandStrikeTailToLegs(bool body, MonsterAI.State current)
+    {
+        int strike = strikeStateHash;
+        strikeStateHash = 0;
+        if (!body || strike == 0 || current == MonsterAI.State.Staggered || current == MonsterAI.State.Dead
+            || current == MonsterAI.State.Hopping || current == MonsterAI.State.Attacking || !animator.HasState(0, LocomotionStateHash))
+        {
+            return;
+        }
+
+        AnimatorStateInfo now = animator.IsInTransition(0) ? animator.GetNextAnimatorStateInfo(0) : animator.GetCurrentAnimatorStateInfo(0);
+        if (now.shortNameHash == strike || (releaseHash != 0 && now.shortNameHash == releaseHash))
+        {
+            animator.CrossFadeInFixedTime(LocomotionStateHash, StrikeTailFade, 0, 0f);
+        }
+    }
+
     private void OnStateChanged(MonsterAI.State previous, MonsterAI.State current)
     {
         if (current == MonsterAI.State.Dead && hasDead)
@@ -568,6 +690,7 @@ public sealed class MonsterAnimationDriver : MonoBehaviour
         if (previous == MonsterAI.State.Attacking)
         {
             strikePhaseAt = followPhaseAt = -1f;
+            HandStrikeTailToLegs(animator != null && animator.enabled, current);
         }
 
         // A channel broken off before it let go (a rout, a recoil) mustn't loop on.

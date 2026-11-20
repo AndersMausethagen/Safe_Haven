@@ -746,6 +746,11 @@ public sealed class Example
         foreach (UnityEditor.Animations.ChildAnimatorState state in machine.states)
         {
             into.Add(state.state.name);
+            // A state's tag is looked up by name too (AnimatorStateInfo.IsTag / tagHash).
+            if (!string.IsNullOrEmpty(state.state.tag))
+            {
+                into.Add(state.state.tag);
+            }
         }
 
         foreach (UnityEditor.Animations.ChildAnimatorStateMachine child in machine.stateMachines)

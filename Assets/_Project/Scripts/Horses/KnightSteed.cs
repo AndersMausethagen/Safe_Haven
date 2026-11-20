@@ -96,9 +96,20 @@ public sealed class KnightSteed : MonoBehaviour
         }
     }
 
+    private const float HitReactShare = 0.05f;
+    private const int ReactsBelowGait = 3;
+
     private void OnDamaged(DamageInfo damage, DamageResult result)
     {
         if (steed == null || health == null || !health.IsAlive)
+        {
+            return;
+        }
+
+        // Its hit reactions run 1.4-2.2 s: a scratch, or any blow at a canter or faster, plays none, so it doesn't rear back in
+        // place while the knight rides on at full speed (audit 2026-11-20).
+        bool weighty = (damage.Technique & (HitTechnique.Heavy | HitTechnique.Charged | HitTechnique.Finisher)) != 0;
+        if ((result.Damage < health.MaxHealth * HitReactShare && !weighty) || steed.GetFloat(GaitId) >= ReactsBelowGait - 0.5f)
         {
             return;
         }
