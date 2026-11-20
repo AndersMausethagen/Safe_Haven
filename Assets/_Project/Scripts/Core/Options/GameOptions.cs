@@ -26,7 +26,11 @@ public static class GameOptions
         "Full shows everything all the time. Contextual shows bars, meters and the day's timeline when they matter, and the rest small. " +
         "Minimal also keeps the quest list to the quest you follow.", 1, "Full", "Contextual", "Minimal");
 
-    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud };
+    // The user (2026-11-20): "Player should auto drink from water containers when less than 80% thirst" (ItemInventory.AutoDrink).
+    public static readonly GameOption AutoDrink = GameOption.Toggle("AutoDrink", "Auto-Drink",
+        "Drink from your waterskin by yourself when thirst falls below 80%.", true);
+
+    public static readonly IReadOnlyList<GameOption> Gameplay = new[] { DamageNumbers, AutoGather, AutoDrink, ToggleSneak, FocusTarget, PoiseBars, Blood, MinimapDistance, Hud };
 
     /// <summary>The minimap's reach in metres for each Minimap Distance (0 for Hidden).</summary>
     public static readonly float[] MinimapReaches = { 0f, 30f, 50f, 75f, 110f };
@@ -90,15 +94,22 @@ public static class GameOptions
         }
     }
 
+    /// <summary>What <paramref name="preset"/> sets <paramref name="member"/> (an index into PresetMembers) to; NaN for Custom.</summary>
+    public static float PresetValue(int preset, int member) =>
+        preset >= 0 && preset < PresetValues.Length && member >= 0 && member < PresetMembers.Count ? PresetValues[preset][member] : float.NaN;
+
     /// <summary>The preset the members add up to, or Custom.</summary>
-    public static int MatchingPreset()
+    public static int MatchingPreset() => MatchingPreset(option => option.Value);
+
+    /// <summary>The preset the members would add up to with the values <paramref name="valueOf"/> gives (the Options screen's draft).</summary>
+    public static int MatchingPreset(System.Func<GameOption, float> valueOf)
     {
         for (int preset = 0; preset < PresetValues.Length; preset++)
         {
             bool same = true;
             for (int i = 0; i < PresetMembers.Count && same; i++)
             {
-                same = UnityEngine.Mathf.Approximately(PresetMembers[i].Value, PresetValues[preset][i]);
+                same = UnityEngine.Mathf.Approximately(valueOf(PresetMembers[i]), PresetValues[preset][i]);
             }
 
             if (same)

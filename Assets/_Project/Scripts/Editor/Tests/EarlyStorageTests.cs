@@ -79,6 +79,45 @@ public sealed class EarlyStorageTests
         Assert.AreEqual(2, bag.Count(stew), "what the bars hold stays with the player");
     }
 
+    [Test]
+    public void StoreInChests_PutsMaterialsAwayEvenWhenNoChestHoldsThemYet()
+    {
+        small = Chest("Small", 12);
+        StashChest smallChest = small.GetComponent<StashChest>();
+        var sticks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Sticks.asset");
+        var stew = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/StewedBerries.asset");
+        Assert.AreEqual(ItemCategory.Material, sticks.Category);
+        Assert.AreNotEqual(ItemCategory.Material, stew.Category);
+        var bag = new ItemContainer(4, 1);
+        bag.Add(sticks, 3);
+        bag.Add(stew, 2);
+        Assert.IsTrue(GameSession.Stash.HasSomethingToStore(bag, null), "a material is something to store");
+
+        int moved = GameSession.Stash.StackOnStored(bag, null) + GameSession.Stash.StoreMaterials(bag, null, null);
+        Assert.AreEqual(3, moved);
+        Assert.AreEqual(3, Held(smallChest, sticks), "the material went into the chest with room");
+        Assert.AreEqual(2, bag.Count(stew), "food no chest holds stays with the player");
+        Assert.IsFalse(GameSession.Stash.HasSomethingToStore(bag, null), "nothing left the prompt would offer");
+    }
+
+    // Taking a building down (BuildingDemolition) never loses what a chest holds: as in Palworld, empty it first.
+    [Test]
+    public void AChestWithThingsInIt_IsNotTakenDown()
+    {
+        small = Chest("Small", 12);
+        StashChest chest = small.GetComponent<StashChest>();
+        BuildingObject building = small.AddComponent<BuildingObject>();
+        var data = new SerializedObject(building);
+        data.FindProperty("definition").objectReferenceValue =
+            AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/SmallChest.asset");
+        data.ApplyModifiedPropertiesWithoutUndo();
+        Assert.IsNull(BuildingDemolition.WhyNot(building), "an empty chest can go");
+
+        var sticks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Sticks.asset");
+        GameSession.Stash.Items.AddWithin(sticks, 3, 0f, chest.FirstSlot, StashStorage.ChestSlots);
+        Assert.IsNotNull(BuildingDemolition.WhyNot(building), "with things in it, it stays");
+    }
+
     private static int Held(StashChest chest, ItemDefinition item)
     {
         int count = 0;

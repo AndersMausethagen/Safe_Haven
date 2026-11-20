@@ -210,7 +210,8 @@ public sealed class CharacterCreationScreen : MonoBehaviour
 
     private void BuildNameRow(Transform list)
     {
-        RectTransform control = OptionsWidgets.LabelledRow(list, "Name", "What people will call you. Leave it empty to be the Wanderer.", ShowHelp);
+        RectTransform control = OptionsWidgets.LabelledRow(list, new OptionsFocus { Name = "Name", Help = "What people will call you. Leave it empty to be the Wanderer." },
+            ShowFocus, out _);
         RectTransform field = OptionsWidgets.Rect("Name", control);
         OptionsWidgets.Stretch(field, Vector2.zero, new Vector2(-64f, 0f));
         var background = field.gameObject.AddComponent<Image>();
@@ -237,11 +238,11 @@ public sealed class CharacterCreationScreen : MonoBehaviour
 
     private void Choice(Transform list, string label, string help, Func<string[]> names, Func<int> get, Action<int> set)
     {
-        refreshers.Add(OptionsWidgets.ChoiceRow(list, label, help, names, get, i =>
+        refreshers.Add(OptionsWidgets.ChoiceRow(list, new OptionsFocus { Name = label, Help = help }, names, get, i =>
         {
             set(i);
             Changed();
-        }, ShowHelp));
+        }, ShowFocus));
     }
 
     private static string[] Labels(IReadOnlyList<NamedMaterial> options) => options.Select(o => o.label).ToArray();
@@ -251,6 +252,8 @@ public sealed class CharacterCreationScreen : MonoBehaviour
     private static string[] Labels(IReadOnlyList<ColouredPart> options) => options.Select(o => o.label).ToArray();
 
     private void ShowHelp(string line) => helpLine.text = line;
+
+    private void ShowFocus(OptionsFocus focus) => ShowHelp(focus != null ? focus.Help : "");
 
     // ----- Changing the look -----
 

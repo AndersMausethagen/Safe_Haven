@@ -153,7 +153,7 @@ public sealed class CommandWheel : MonoBehaviour
         choices.Add(new Choice(mounted ? "Get down" : "Whistle", () => GameInput.Press(GameInput.Whistle)));
         if (StashQuickStack.CanStack(player != null ? player.gameObject : null))
         {
-            choices.Add(new Choice("Stack onto chests", () => StashQuickStack.Stack(player.gameObject)));
+            choices.Add(new Choice("Store in chests", () => StashQuickStack.Stack(player.gameObject)));
             choices.Add(new Choice("Pack as last time", () => PackForRaid.Pack(player.gameObject)));
         }
         if (mounted)

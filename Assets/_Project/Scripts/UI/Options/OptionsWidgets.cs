@@ -14,21 +14,6 @@ public sealed class OptionsHover : MonoBehaviour, IPointerEnterHandler, ISelectH
     public void OnSelect(BaseEventData eventData) => Entered?.Invoke();
 }
 
-/// <summary>Says when a slider is let go, for settings that move the slider itself if applied while dragging (the UI size).</summary>
-public sealed class OptionsSliderGrip : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
-{
-    public bool IsHeld { get; private set; }
-    public Action Released;
-
-    public void OnPointerDown(PointerEventData eventData) => IsHeld = true;
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        IsHeld = false;
-        Released?.Invoke();
-    }
-}
-
 /// <summary>
 /// Shrinks a fixed-size, centred window until it fits inside its parent (the screen) with a margin; never enlarges it.
 /// The canvas follows the UI size option by shrinking its reference height (1080 units at 1x, 720 at 1.5x), so a
@@ -81,7 +66,7 @@ public sealed class FitInsideParent : MonoBehaviour
 public static class OptionsWidgets
 {
     public const float RowHeight = 54f;
-    private const float LabelWidth = 430f;
+    private const float LabelWidth = 360f;
 
     public static Color Panel => UIStyle.Current.Panel;
     public static Color Rim => UIStyle.Current.Rim;
@@ -171,22 +156,35 @@ public static class OptionsWidgets
         Stretch((RectTransform)Text("Text", row, line, 20f, Muted).transform, new Vector2(4f, 0f));
     }
 
-    /// <summary>A row with a label on the left; the control goes in the returned rectangle on the right.</summary>
-    public static RectTransform LabelledRow(Transform content, string label, string help, Action<string> showHelp)
+    /// <summary>
+    /// A row with a label on the left and a gold bar at its edge while it has an unsaved change; the control goes in the returned rectangle
+    /// on the right. <paramref name="markPending"/> lights the bar and the label (the row's refresh calls it).
+    /// </summary>
+    public static RectTransform LabelledRow(Transform content, OptionsFocus focus, Action<OptionsFocus> show, out Action<bool> markPending)
     {
-        RectTransform row = NewRow(content, label, RowHeight);
+        RectTransform row = NewRow(content, focus.Name, RowHeight);
         var hover = row.gameObject.AddComponent<OptionsHover>();
-        hover.Entered = () => showHelp(help);
+        hover.Entered = () => show(focus);
         // Pointer events need something to land on.
         row.gameObject.AddComponent<Image>().color = Color.clear;
-        TMP_Text text = Text("Label", row, label, 23f, Body);
-        Place((RectTransform)text.transform, new Vector2(0f, 0.5f), new Vector2(LabelWidth, RowHeight), new Vector2(4f, 0f));
+        RectTransform bar = Place(Rect("Changed", row), new Vector2(0f, 0.5f), new Vector2(5f, RowHeight - 14f), Vector2.zero);
+        var barImage = bar.gameObject.AddComponent<Image>();
+        barImage.color = UIStyle.Current.Accent;
+        barImage.raycastTarget = false;
+        TMP_Text text = Text("Label", row, focus.Name, 23f, Body);
+        Place((RectTransform)text.transform, new Vector2(0f, 0.5f), new Vector2(LabelWidth, RowHeight), new Vector2(16f, 0f));
         ((RectTransform)text.transform).pivot = new Vector2(0f, 0.5f);
         RectTransform control = Rect("Control", row);
         control.anchorMin = new Vector2(0f, 0f);
         control.anchorMax = new Vector2(1f, 1f);
-        control.offsetMin = new Vector2(LabelWidth + 20f, 6f);
+        control.offsetMin = new Vector2(LabelWidth + 24f, 6f);
         control.offsetMax = new Vector2(-12f, -6f);
+        markPending = pending =>
+        {
+            bar.gameObject.SetActive(pending);
+            text.color = pending ? UIStyle.Current.Accent : Body;
+        };
+        markPending(false);
         return control;
     }
 
@@ -201,33 +199,36 @@ public static class OptionsWidgets
     }
 
     /// <summary>On/Off, as one button.</summary>
-    public static Action ToggleRow(Transform content, GameOption option, Action<string> showHelp)
+    public static Action ToggleRow(Transform content, OptionsFocus focus, Func<bool> get, Action<bool> set, Action<OptionsFocus> show)
     {
-        RectTransform control = LabelledRow(content, option.Label, option.Help, showHelp);
+        RectTransform control = LabelledRow(content, focus, show, out Action<bool> markPending);
         TMP_Text label = null;
         Image image = null;
         Button button = Button("Toggle", control, "", 22f, () =>
         {
-            option.Value = option.On ? 0f : 1f;
+            set(!get());
             Refresh();
+            show(focus);
         }, out label);
         Stretch((RectTransform)button.transform);
         image = button.GetComponent<Image>();
         void Refresh()
         {
-            label.text = option.ValueText;
-            image.color = option.On ? new Color(1.5f, 1.4f, 1f, 1f) : Color.white;
+            bool on = get();
+            label.text = on ? "On" : "Off";
+            image.color = on ? new Color(1.5f, 1.4f, 1f, 1f) : Color.white;
+            markPending(focus.IsPending);
         }
 
-        WatchSelection(button, showHelp, option.Help);
+        WatchSelection(button, show, focus);
         Refresh();
         return Refresh;
     }
 
     /// <summary>A value with arrows either side; clicking the middle goes on to the next.</summary>
-    public static Action ChoiceRow(Transform content, string name, string help, Func<string[]> names, Func<int> get, Action<int> set, Action<string> showHelp)
+    public static Action ChoiceRow(Transform content, OptionsFocus focus, Func<string[]> names, Func<int> get, Action<int> set, Action<OptionsFocus> show)
     {
-        RectTransform control = LabelledRow(content, name, help, showHelp);
+        RectTransform control = LabelledRow(content, focus, show, out Action<bool> markPending);
         TMP_Text label = null;
         void Step(int by)
         {
@@ -236,6 +237,7 @@ public static class OptionsWidgets
             {
                 set((get() + by + all.Length) % all.Length);
                 Refresh();
+                show(focus);
             }
         }
 
@@ -250,24 +252,19 @@ public static class OptionsWidgets
         {
             string[] all = names();
             int index = get();
-            label.text = index >= 0 && index < all.Length ? all[index] : "–";
+            label.text = index >= 0 && index < all.Length ? all[index] : "-";
+            markPending(focus.IsPending);
         }
 
-        WatchSelection(middle, showHelp, help);
+        WatchSelection(middle, show, focus);
         Refresh();
         return Refresh;
     }
 
-    public static Action OptionChoiceRow(Transform content, GameOption option, Action<string> showHelp)
+    public static Action SliderRow(Transform content, OptionsFocus focus, float min, float max, float step, Func<float> get, Action<float> set,
+        Func<float, string> describe, Action<OptionsFocus> show)
     {
-        return ChoiceRow(content, option.Label, option.Help, () => option.Choices, () => option.Index, index => option.Value = index, showHelp);
-    }
-
-    /// <param name="onRelease">Apply only when the slider is let go.</param>
-    public static Action SliderRow(Transform content, string name, string help, float min, float max, float step, Func<float> get, Action<float> set, Func<float, string> describe,
-        Action<string> showHelp, bool onRelease = false)
-    {
-        RectTransform control = LabelledRow(content, name, help, showHelp);
+        RectTransform control = LabelledRow(content, focus, show, out Action<bool> markPending);
         RectTransform area = Rect("Slider", control);
         Stretch(area, Vector2.zero, new Vector2(-96f, 0f));
         TMP_Text value = Text("Value", control, "", 22f, Body, TextAlignmentOptions.MidlineRight);
@@ -304,63 +301,77 @@ public static class OptionsWidgets
         colours.pressedColor = Title;
         slider.colors = colours;
 
-        OptionsSliderGrip grip = area.gameObject.AddComponent<OptionsSliderGrip>();
         float Snap(float raw) => step > 0f ? Mathf.Clamp(min + Mathf.Round((raw - min) / step) * step, min, max) : raw;
         void Refresh()
         {
             float current = get();
             slider.SetValueWithoutNotify(current);
             value.text = describe(current);
+            markPending(focus.IsPending);
         }
 
+        // Only the draft changes while dragging (OptionsDraft): nothing is applied until Save, so every step can show at once.
         slider.onValueChanged.AddListener(raw =>
         {
             float snapped = Snap(raw);
             value.text = describe(snapped);
-            if (!onRelease || !grip.IsHeld)
-            {
-                set(snapped);
-            }
+            set(snapped);
+            markPending(focus.IsPending);
+            show(focus);
         });
-        grip.Released = () =>
-        {
-            if (onRelease)
-            {
-                set(Snap(slider.value));
-            }
-        };
-        WatchSelection(slider, showHelp, help);
+        WatchSelection(slider, show, focus);
         Refresh();
         return Refresh;
     }
 
-    public static Action OptionSliderRow(Transform content, GameOption option, Action<string> showHelp, bool onRelease = false)
+    /// <summary>
+    /// The right row for a setting, editing <paramref name="draft"/>. <paramref name="set"/> replaces the plain draft change (the quality
+    /// preset sets its members too).
+    /// </summary>
+    public static Action Row(Transform content, GameOption option, OptionsDraft draft, Action<OptionsFocus> show, Action<float> set = null)
     {
-        return SliderRow(content, option.Label, option.Help, option.Min, option.Max, option.Step, () => option.Value, value => option.Value = value, value => Describe(option, value),
-            showHelp, onRelease);
-    }
-
-    private static string Describe(GameOption option, float value)
-    {
-        return Mathf.Approximately(option.Min, -option.Max) ? (value > 0f ? "+" : "") + Mathf.RoundToInt(value * 100f) : Mathf.RoundToInt(value * 100f) + "%";
-    }
-
-    /// <summary>The right row for the setting.</summary>
-    public static Action Row(Transform content, GameOption option, Action<string> showHelp)
-    {
+        OptionsFocus focus = OptionsFocus.For(option, draft);
+        Action<float> change = set ?? (value => draft.Set(option, value));
         switch (option.Kind)
         {
             case OptionKind.Toggle:
-                return ToggleRow(content, option, showHelp);
+                return ToggleRow(content, focus, () => draft.On(option), on => change(on ? 1f : 0f), show);
             case OptionKind.Choice:
-                return OptionChoiceRow(content, option, showHelp);
+                return ChoiceRow(content, focus, () => option.Choices, () => draft.Index(option), index => change(index), show);
             default:
-                return OptionSliderRow(content, option, showHelp, option == GameOptions.UiScale);
+                return SliderRow(content, focus, option.Min, option.Max, option.Step, () => draft.Get(option), change, option.TextFor, show);
         }
     }
 
-    private static void WatchSelection(Selectable selectable, Action<string> showHelp, string help)
+    private static void WatchSelection(Selectable selectable, Action<OptionsFocus> show, OptionsFocus focus)
     {
-        selectable.gameObject.AddComponent<OptionsHover>().Entered = () => showHelp(help);
+        selectable.gameObject.AddComponent<OptionsHover>().Entered = () => show(focus);
     }
+}
+
+/// <summary>What the Options screen's details panel says of the row in focus: its name, what it does, its value now, saved and by default.</summary>
+public sealed class OptionsFocus
+{
+    public string Name;
+    public string Help;
+    /// <summary>The value as it would be saved now (with an unsaved change, that one).</summary>
+    public Func<string> Value;
+    /// <summary>The value as it is saved.</summary>
+    public Func<string> Saved;
+    /// <summary>The value it has out of the box; null when there is none to give (a key, the window).</summary>
+    public string Default;
+    public Func<bool> Pending;
+
+    public bool IsPending => Pending != null && Pending();
+
+    /// <summary>The focus of a GameOption row, read through the draft.</summary>
+    public static OptionsFocus For(GameOption option, OptionsDraft draft) => new OptionsFocus
+    {
+        Name = option.Label,
+        Help = option.Help,
+        Value = () => option.TextFor(draft.Get(option)),
+        Saved = () => option.ValueText,
+        Default = option.TextFor(option.Default),
+        Pending = () => draft.IsChanged(option),
+    };
 }

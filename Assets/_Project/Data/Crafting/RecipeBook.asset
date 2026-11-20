@@ -200,6 +200,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 953816f481864e54984b9205354a252e, type: 2}
   - {fileID: 11400000, guid: caf15741d0827224bb3ccaeb4f9aaecf, type: 2}
   - {fileID: 11400000, guid: 4cda2d5ba6498214caf8089ead0dab2d, type: 2}
+  - {fileID: 11400000, guid: 17ce4866c58f58a46af4c93719c4e368, type: 2}
+  - {fileID: 11400000, guid: 98f69c87c791af9489f7b6ff169220b0, type: 2}
   buildings:
   - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
   - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}

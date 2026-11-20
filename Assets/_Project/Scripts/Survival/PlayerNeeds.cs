@@ -1,6 +1,15 @@
 using System;
 using UnityEngine;
 
+/// <summary>What PlayerNeeds tells the screen about, beyond a line in the message feed (BigNotice).</summary>
+public enum NeedAlert
+{
+    /// <summary>Hunger fell to Survival Settings › Low Warning: find something to eat.</summary>
+    Hungry,
+    /// <summary>Hunger ran out: stamina is weakened until the player eats.</summary>
+    Starving,
+}
+
 /// <summary>
 /// The player's hunger and thirst (GDD §11). Both drain all the time, faster during raids, and are restored by eating and
 /// drinking (consumable items, edible resources, a water source). Running out never kills: hunger at zero lowers maximum
@@ -20,6 +29,15 @@ public sealed class PlayerNeeds : MonoBehaviour
     private NeedMeter thirst;
     private bool warnedHungry;
     private bool warnedThirsty;
+    private bool warnedStarving;
+
+    /// <summary>Raised when hunger crosses a line the player must see (the user, 2026-11-20: "tell the player that his character is
+    /// hungry and must find something to eat"). BigNotice shows it for the local player.</summary>
+    public static event Action<PlayerNeeds, NeedAlert> Alerted;
+
+    // Entering Play doesn't reload scripts in this project: listeners of the last session go with it.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => Alerted = null;
     private float appliedMax = 1f;
     private float appliedRegen = 1f;
 
@@ -71,6 +89,7 @@ public sealed class PlayerNeeds : MonoBehaviour
         Thirst.Set(thirstValue);
         warnedHungry = Hunger.Fraction <= settings.LowWarning;
         warnedThirsty = Thirst.Fraction <= settings.LowWarning;
+        warnedStarving = Hunger.IsEmpty;
         Changed?.Invoke();
     }
 
@@ -114,6 +133,7 @@ public sealed class PlayerNeeds : MonoBehaviour
         float drank = Thirst.Restore(thirstAmount);
         warnedHungry &= Hunger.Fraction <= settings.LowWarning;
         warnedThirsty &= Thirst.Fraction <= settings.LowWarning;
+        warnedStarving &= Hunger.IsEmpty;
         GameMessages.Post($"{name}: " + ItemTooltipView.DescribeRestores(0f, ate, drank).Replace("Restores ", "+").TrimEnd('.'), MessageKind.Gain);
         ApplyEffects();
         Changed?.Invoke();
@@ -125,7 +145,15 @@ public sealed class PlayerNeeds : MonoBehaviour
         if (!warnedHungry && Hunger.Fraction <= settings.LowWarning)
         {
             warnedHungry = true;
-            GameMessages.Post("You're getting hungry. Eat something soon.", MessageKind.Warning);
+            GameMessages.Post("You're hungry. Find something to eat.", MessageKind.Warning);
+            Alerted?.Invoke(this, NeedAlert.Hungry);
+        }
+
+        if (!warnedStarving && Hunger.IsEmpty)
+        {
+            warnedStarving = true;
+            GameMessages.Post("You're starving: your stamina is weakened until you eat.", MessageKind.Warning);
+            Alerted?.Invoke(this, NeedAlert.Starving);
         }
 
         if (!warnedThirsty && Thirst.Fraction <= settings.LowWarning)

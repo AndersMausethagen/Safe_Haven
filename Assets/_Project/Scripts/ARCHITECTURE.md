@@ -2789,3 +2789,26 @@ Stewed Berries takes 10 of a waterskin's 100 through every existing cost path. `
 (`ItemInventory.ConsumableArrived`, checked once a frame so moving stacks doesn't count, quiet while a bag is put back:
 `BeginRestore`/`EndRestore`) takes the next empty slot of 1-9 (`PlayerSkills`); its slots catch a consumable dragged from the
 bag, only while the bag is open. Hovering an essence in the bag shows `ResourceDefinition.Uses`.
+
+## Playtest list 2026-11-20
+
+From the user's list after their 72-minute run.
+- **Store in chests** (`StashQuickStack`, key Stack On Stored, V): Palworld's Easy Bulk Storage. Inside the ward with a chest standing,
+  the bag tops up what the chests already hold, then every material left goes into any chest with room. `HavenHud` shows the key in
+  the bottom-right corner above the minimap whenever there is something to store (`StashStorage.HasSomethingToStore`); the bag window
+  has a Store button there too.
+- **Auto-drink** (`ItemInventory.AutoDrink`, once a second): below Survival Settings › Auto Drink Below (80%) a carried water
+  container is drunk from. Options › Gameplay › Auto-Drink turns it off.
+- **Big notices** (`BigNotice`): a card across the upper middle for a building learned (`PlayerCrafting.BuildingLearned`: picture,
+  name, what it is for, its build menu tab) and for hunger (`PlayerNeeds.Alerted`: Hungry at Low Warning, Starving at 0). They wait
+  while a conversation or window covers the screen.
+- **A rescued resident's first quest** (`ResidentQuests`): the first quest of `ResidentDefinition › Quest Line` starts at the rescue
+  whatever its prerequisites (`QuestLog.TryStart(quest, prerequisitesAside)`); their workplaces are taught only once it has started
+  (`ResidentQuests.MayTeach` in `ResidentNpc.TeachWhatTheyKnow`). The giver says the offer's words while no step is done yet.
+- **Taking a building down** (`BuildingDemolition`, build menu › Manage › Take down): refunds the building and every level paid for;
+  refused for a chest with items in it, a station with work or output in it, a ruin the Haven came with, during a breach or as a visitor.
+- **Fences and walls keep placing** after each run while another piece can be paid for (`BuildPlacer.ConfirmLine`).
+- **Skill bar reorder**: drag one bar slot onto another while the bag, character screen or skill book is open (`SkillBarView`).
+- **Options save on request** (`OptionsDraft`): rows edit a draft; Save Changes applies it (a preset before its members), Discard
+  forgets it, and leaving with changes asks Save and Leave / Leave Without Saving / Keep Editing. A details panel explains the row in
+  focus (now, saved, default). Keys still change at once.

@@ -56,19 +56,53 @@ public sealed class StashStorage
     }
 
     /// <summary>Moves every material in the bag here, leaving food, tools and gear. Returns how many arrived; what doesn't fit stays in the bag.</summary>
-    public int StoreMaterials(ItemContainer bag, GameObject by = null, int block = -1)
+    public int StoreMaterials(ItemContainer bag, GameObject by = null, int block = -1) => StoreMaterials(bag, null, by, block);
+
+    /// <summary>The same, leaving what <paramref name="keep"/> says to keep (what is on the skill bar or the quickbar).</summary>
+    public int StoreMaterials(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by, int block = -1)
     {
         int moved = 0;
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
-            if (!stack.IsEmpty && stack.Item.Category == ItemCategory.Material)
+            if (!stack.IsEmpty && stack.Item.Category == ItemCategory.Material && (keep == null || !keep(stack)))
             {
                 moved += Store(bag, i, by, block);
             }
         }
 
         return moved;
+    }
+
+    /// <summary>
+    /// Whether <see cref="StackOnStored"/> or <see cref="StoreMaterials(ItemContainer, System.Func{ItemStack, bool}, GameObject, int)"/>
+    /// would move anything from <paramref name="bag"/>: a material, or a stack an open chest already holds. Room isn't checked.
+    /// </summary>
+    public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep)
+    {
+        for (int i = 0; bag != null && i < bag.SlotCount; i++)
+        {
+            ItemStack stack = bag.GetSlot(i);
+            if (stack.IsEmpty || !stack.Item.Stackable || (keep != null && keep(stack)))
+            {
+                continue;
+            }
+
+            if (stack.Item.Category == ItemCategory.Material)
+            {
+                return true;
+            }
+
+            for (int block = 0; block < MaxChests; block++)
+            {
+                if (BlockHolds(block, stack.Item))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -98,6 +98,60 @@ public sealed class OptionsTests
         Assert.AreEqual("50%", GameOptions.ScreenShake.ValueText);
     }
 
+    // The user (2026-11-20): settings change only when saved. The Options screen edits a draft; nothing reaches the setting before Apply.
+    [Test]
+    public void ADraftChangesNothingUntilItIsSaved()
+    {
+        GameOption option = GameOptions.ScreenShake;
+        option.Value = 1f;
+        var draft = new OptionsDraft();
+        draft.Set(option, 0.25f);
+        Assert.AreEqual(1f, option.Value, 0.001f, "still the saved value");
+        Assert.AreEqual(0.25f, draft.Get(option), 0.001f, "the screen shows the new one");
+        Assert.IsTrue(draft.IsChanged(option));
+        Assert.AreEqual(1, draft.Count);
+
+        draft.Set(option, 1f);
+        Assert.IsFalse(draft.HasChanges, "set back to what is saved, it is no change");
+
+        draft.Set(option, 0.5f);
+        draft.Discard();
+        Assert.AreEqual(1f, option.Value, 0.001f, "discarded");
+        Assert.IsFalse(draft.HasChanges);
+
+        draft.Set(option, 0.5f);
+        draft.Apply();
+        Assert.AreEqual(0.5f, option.Value, 0.001f, "saved");
+        Assert.IsFalse(draft.HasChanges, "nothing left unsaved after saving");
+    }
+
+    [Test]
+    public void ADraftAppliesItsFirstChangesFirst()
+    {
+        var draft = new OptionsDraft();
+        var applied = new List<string>();
+        draft.Set("member", "Member", () => 0f, value => applied.Add("member"), 1f);
+        draft.Set("preset", "Preset", () => 0f, value => applied.Add("preset"), 1f, first: true);
+        draft.Set("other", "Other", () => 0f, value => applied.Add("other"), 1f);
+        CollectionAssert.AreEqual(new[] { "Member", "Preset", "Other" }, draft.Labels(), "listed in the order changed");
+        draft.Apply();
+        CollectionAssert.AreEqual(new[] { "preset", "member", "other" }, applied, "the preset before the settings it sets");
+    }
+
+    [Test]
+    public void TheDraftFindsThePresetItsValuesMatch()
+    {
+        var draft = new OptionsDraft();
+        for (int i = 0; i < GameOptions.PresetMembers.Count; i++)
+        {
+            draft.Set(GameOptions.PresetMembers[i], GameOptions.PresetValue(GameOptions.PresetLow, i));
+        }
+
+        Assert.AreEqual(GameOptions.PresetLow, GameOptions.MatchingPreset(draft.Get));
+        draft.Set(GameOptions.GrassDensity, 0.55f);
+        Assert.AreEqual(GameOptions.PresetCustom, GameOptions.MatchingPreset(draft.Get));
+    }
+
     [Test]
     public void TheDefaultsAreTheGameAsMade()
     {

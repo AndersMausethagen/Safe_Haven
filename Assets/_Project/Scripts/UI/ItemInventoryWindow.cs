@@ -215,6 +215,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
     {
         ClaimsKeys = hovered != null && dragFrom < 0;
         UpdateLayout();
+        UpdateStoreButton();
         Vector2 pointer = GameInput.PointerPosition;
         tooltip.Follow(pointer);
         if (hovered != null && dragFrom < 0 && QuickKeyPressed())

@@ -553,7 +553,7 @@ public static class Cheats
             return "They are already home.";
         }
 
-        ResidentNpc.TeachWhatTheyKnow(person, Player.Current != null ? Player.Current.gameObject : null);
+        ResidentQuests.StartFirst(person, Player.Current != null ? Player.Current.gameObject : null);
         return Did("Bring home", $"{person.DisplayName} is home.");
     }
 

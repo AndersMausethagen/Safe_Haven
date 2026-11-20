@@ -10,6 +10,8 @@ using UnityEngine.UI;
 /// slots are the same ItemSlotView cells the bag and skill window use; this view only feeds them. Casting is input ->
 /// PlayerSkills and arranging skills is the skill window; the one change made here is a consumable dragged from the bag
 /// and dropped on a slot (the user, 2026-11-15). Its size is the Skill Bar Size option (GameOptions.SkillBarSize).
+/// Its slots can also be reordered by dragging one onto another (the user, 2026-11-20), while the bag, the character screen or the
+/// skill book is open (the bar takes no clicks in play): the two swap (SkillLoadout.Move).
 /// <para>
 /// Where it belongs: the SkillHUD prefab, placed in every gameplay scene. It finds the player through Player.Current /
 /// Player.Spawned, so it needs no scene references.
@@ -47,6 +49,9 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
     private ItemInventory inventory;
     private Vector3 baseScale;
     private bool baseScaleKnown;
+    // A slot of this bar being dragged onto another (-1: none), and the icon that follows the pointer meanwhile.
+    private int dragFrom = -1;
+    private Image dragGhost;
 
     private void OnEnable()
     {
@@ -72,6 +77,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         Player.Spawned -= Bind;
         GameInput.KeysChanged -= OnKeysChanged;
         GameOption.AnyChanged -= OnOptionChanged;
+        EndBarDrag();
         Unbind();
     }
 
@@ -99,6 +105,18 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
 
     public void OnSlotDropped(ItemSlotView target)
     {
+        if (skills != null && target != null && dragFrom >= 0)
+        {
+            int from = dragFrom;
+            EndBarDrag();
+            if (skills.Loadout.Move(from, target.Index))
+            {
+                GameMessages.Post($"Moved to {PlayerInputHandler.SkillKeyLabel(target.Index)} on the skill bar.", MessageKind.Info);
+            }
+
+            return;
+        }
+
         if (skills == null || !ItemDrag.Active || target == null)
         {
             return;
@@ -128,16 +146,63 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
     {
     }
 
+    // ----- Reordering the bar by dragging one of its slots onto another -----
+
     public void OnSlotDragStarted(ItemSlotView slot, PointerEventData eventData)
     {
+        if (skills == null || slot == null || skills.Loadout.IsEmpty(slot.Index))
+        {
+            return;
+        }
+
+        dragFrom = slot.Index;
+        SkillDefinition skill = skills.Loadout.Get(slot.Index);
+        ItemDefinition item = skills.Loadout.GetItem(slot.Index);
+        Sprite sprite = skill != null ? skill.Icon : item != null ? item.Icon : null;
+        if (dragGhost == null)
+        {
+            var go = new GameObject("Skill Bar Drag", typeof(RectTransform));
+            go.transform.SetParent(transform, false);
+            dragGhost = go.AddComponent<Image>();
+            dragGhost.raycastTarget = false;
+            dragGhost.preserveAspect = true;
+            var ghostRect = (RectTransform)go.transform;
+            // Anchored at the bar's pivot, so a point local to the bar is where the ghost goes.
+            ghostRect.anchorMin = ghostRect.anchorMax = ((RectTransform)transform).pivot;
+            ghostRect.sizeDelta = ((RectTransform)slot.transform).rect.size * 0.9f;
+        }
+
+        dragGhost.sprite = sprite;
+        dragGhost.color = new Color(1f, 1f, 1f, 0.8f);
+        dragGhost.transform.SetAsLastSibling();
+        dragGhost.gameObject.SetActive(sprite != null);
+        OnSlotDragged(eventData);
     }
 
     public void OnSlotDragged(PointerEventData eventData)
     {
+        if (dragFrom < 0 || dragGhost == null || eventData == null)
+        {
+            return;
+        }
+
+        var parent = (RectTransform)dragGhost.transform.parent;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, eventData.position, eventData.pressEventCamera, out Vector2 local))
+        {
+            ((RectTransform)dragGhost.transform).anchoredPosition = local;
+        }
     }
 
-    public void OnSlotDragEnded()
+    // Let go anywhere else: nothing moves.
+    public void OnSlotDragEnded() => EndBarDrag();
+
+    private void EndBarDrag()
     {
+        dragFrom = -1;
+        if (dragGhost != null)
+        {
+            dragGhost.gameObject.SetActive(false);
+        }
     }
 
     public void OnSlotHovered(ItemSlotView slot)
@@ -360,7 +425,7 @@ public sealed class SkillBarView : MonoBehaviour, IItemSlotHandler
         }
 
         UIStateManager ui = UIStateManager.Current;
-        bool bagOpen = ui != null && (ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character));
+        bool bagOpen = ui != null && (ui.IsOpen(UIWindowId.Items) || ui.IsOpen(UIWindowId.Character) || ui.IsOpen(UIWindowId.Skills));
         bool hide = HudGivesWay.Covered && !bagOpen;
         float target = hide ? 0f : 1f;
         if (group.alpha != target)

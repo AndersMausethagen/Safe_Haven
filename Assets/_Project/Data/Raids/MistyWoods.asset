@@ -224,13 +224,13 @@ MonoBehaviour:
       weight: 8
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 0
+      fromTier: 2
       toTier: 0
     - prefab: {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
       weight: 6
       maxPerGroup: 0
       minPerGroup: 0
-      fromTier: 0
+      fromTier: 2
       toTier: 0
     - prefab: {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       weight: 4
@@ -262,6 +262,12 @@ MonoBehaviour:
       minPerGroup: 0
       fromTier: 2
       toTier: 0
+    - prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
+      weight: 8
+      maxPerGroup: 1
+      minPerGroup: 0
+      fromTier: 1
+      toTier: 1
   - name: Resources
     category: 1
     pointGroups:

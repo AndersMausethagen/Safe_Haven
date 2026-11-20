@@ -393,6 +393,12 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 }, closesMenu: true, quest: offeredQuest, does: QuestAnswer.HandsIn));
             }
         }
+        else if (state == QuestGiverState.InProgress && offer != null && !string.IsNullOrWhiteSpace(offer.Text) && NothingDoneYet(offeredQuest))
+        {
+            // Started without this conversation (a rescued resident's first quest starts at the rescue, ResidentQuests): until a step is
+            // done, the giver still says what the offer would have, so the player learns what they can help with.
+            page.Body = offer.Text;
+        }
         else if (state != QuestGiverState.None)
         {
             page.Body = state == QuestGiverState.Done ? Line(afterLines) :
@@ -400,6 +406,27 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 waitingLines.HasAny ? Line(waitingLines) : DefaultWaitingText;
         }
         return page;
+    }
+
+    // True while no step of an active quest has counted anything yet.
+    private static bool NothingDoneYet(QuestDefinition quest)
+    {
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
+        QuestLog.Entry entry = log != null && quest != null ? log.Get(quest) : null;
+        if (entry == null || entry.Counts == null)
+        {
+            return true;
+        }
+
+        foreach (int count in entry.Counts)
+        {
+            if (count > 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private QuestOffer FollowingOffer()

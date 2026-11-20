@@ -26,6 +26,12 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     [Tooltip("The player is warned when a meter falls to this fraction.")]
     [SerializeField, Range(0f, 1f)] private float lowWarning = 0.25f;
 
+    [Header("Drinking")]
+    [Tooltip("Below this fraction of thirst the player drinks by themselves from a water container they carry (a waterskin), as much " +
+             "as thirst lacks (the user, 2026-11-20: \"auto drink when less than 80% thirst\"). 0 turns it off. Options › Gameplay › " +
+             "Auto-Drink can switch it off for a player.")]
+    [SerializeField, Range(0f, 1f)] private float autoDrinkBelow = 0.8f;
+
     [Header("When starving (hunger at 0)")]
     [Tooltip("Maximum stamina is multiplied by this.")]
     [SerializeField, Range(0.1f, 1f)] private float starvingMaxStamina = 0.75f;
@@ -68,6 +74,7 @@ public sealed class SurvivalSettings : GameSettings<SurvivalSettings>
     public float ThirstPerMinute => thirstPerMinute;
     public float RaidMultiplier => raidMultiplier;
     public float LowWarning => lowWarning;
+    public float AutoDrinkBelow => autoDrinkBelow;
     public float StarvingMaxStamina => starvingMaxStamina;
     public float StarvingRegeneration => starvingRegeneration;
     public float ParchedCombatRegeneration => parchedCombatRegeneration;

@@ -383,11 +383,12 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     /// <summary>
     /// Someone brought home shows the player how to build where they work: the buildings of every job they can do, so a rescue
     /// opens a workplace (Docs/RescueOrder.md). Giving them the job teaches the same again, for a co-op friend who wasn't there.
+    /// Someone with a quest line teaches it only once its first quest has started (ResidentQuests.MayTeach, the user 2026-11-20).
     /// </summary>
     public static void TeachWhatTheyKnow(ResidentDefinition resident, GameObject user, bool announce = true)
     {
         var crafting = user != null ? user.GetComponent<PlayerCrafting>() : null;
-        if (crafting == null || resident == null)
+        if (crafting == null || resident == null || !ResidentQuests.MayTeach(resident))
         {
             return;
         }
@@ -415,6 +416,15 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
         foreach (ResidentRecord record in GameSession.Here.Residents)
         {
+            // Someone home whose quest line never started (an older save, or a rescue before 2026-11-20): it starts now, and what
+            // they teach comes with it, announced; everyone else's is taught quietly, as it always was.
+            QuestDefinition first = ResidentQuests.FirstQuest(record.Resident);
+            if (first != null && !ResidentQuests.MayTeach(record.Resident))
+            {
+                ResidentQuests.StartFirst(record.Resident, user);
+                continue;
+            }
+
             TeachWhatTheyKnow(record.Resident, user, false);
         }
     }

@@ -160,9 +160,15 @@ public sealed class QuestLog
         quest != null && quest.ClosedBy != null && StatusOf(quest.ClosedBy) != QuestStatus.NotStarted;
 
     /// <summary>Starts the quest if it hasn't started, its prerequisites are done and it isn't closed. Returns true when it started.</summary>
-    public bool TryStart(QuestDefinition quest)
+    public bool TryStart(QuestDefinition quest) => TryStart(quest, false);
+
+    /// <summary>
+    /// The same, with its prerequisites set aside when <paramref name="prerequisitesAside"/>: a rescued resident's first quest starts at
+    /// the rescue whatever stands before it (ResidentQuests).
+    /// </summary>
+    public bool TryStart(QuestDefinition quest, bool prerequisitesAside)
     {
-        if (quest == null || StatusOf(quest) != QuestStatus.NotStarted || !PrerequisitesMet(quest) || IsClosed(quest))
+        if (quest == null || StatusOf(quest) != QuestStatus.NotStarted || (!prerequisitesAside && !PrerequisitesMet(quest)) || IsClosed(quest))
         {
             return false;
         }

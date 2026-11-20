@@ -89,23 +89,33 @@ public sealed class GameOption
     public string ChoiceName => Choices != null ? Choices[Mathf.Clamp(Index, 0, Choices.Length - 1)] : "";
 
     /// <summary>The value as the player reads it: "On", "High", "85%".</summary>
-    public string ValueText
+    public string ValueText => TextFor(Value);
+
+    /// <summary>Any value of this setting as the player reads it (the Options screen shows unsaved ones and the default).</summary>
+    public string TextFor(float raw)
     {
-        get
+        float value = Clean(raw);
+        switch (Kind)
         {
-            switch (Kind)
-            {
-                case OptionKind.Toggle:
-                    return On ? "On" : "Off";
-                case OptionKind.Choice:
-                    return ChoiceName;
-                default:
-                    return format == "%"
-                        ? Mathf.RoundToInt(Value * 100f).ToString(CultureInfo.InvariantCulture) + "%"
-                        : Value.ToString("0.##", CultureInfo.InvariantCulture);
-            }
+            case OptionKind.Toggle:
+                return value > 0.5f ? "On" : "Off";
+            case OptionKind.Choice:
+                return Choices != null ? Choices[Mathf.Clamp(Mathf.RoundToInt(value), 0, Choices.Length - 1)] : "";
+            default:
+                if (format == "%")
+                {
+                    return Mathf.RoundToInt(value * 100f).ToString(CultureInfo.InvariantCulture) + "%";
+                }
+
+                // A slider either side of nothing (Brightness) reads as a signed amount: "+25", "-10", "0".
+                return Mathf.Approximately(Min, -Max)
+                    ? (value > 0f ? "+" : "") + Mathf.RoundToInt(value * 100f).ToString(CultureInfo.InvariantCulture)
+                    : value.ToString("0.##", CultureInfo.InvariantCulture);
         }
     }
+
+    /// <summary>The value this setting would take if set to <paramref name="raw"/>: clamped to its range and snapped to its step.</summary>
+    public float Cleaned(float raw) => Clean(raw);
 
     public void ResetToDefault() => Value = Default;
 

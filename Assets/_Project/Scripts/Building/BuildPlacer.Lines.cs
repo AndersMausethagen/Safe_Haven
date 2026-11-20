@@ -190,6 +190,16 @@ public sealed partial class BuildPlacer
             GameEvents.Raise(new GameEvent(GameEventKind.Built, building, standing, gameObject));
         }
 
+        // Fences, walls and paths are laid one run after another (the user, 2026-11-20: "do not cancel the placement after we place
+        // 1 fence"): placing goes on while another piece can be paid for, until right-click or Escape ends it.
+        if (CanAfford(building, 1, out _))
+        {
+            lineRound = false;
+            linePath.Clear();
+            ghost.Show(1);
+            return;
+        }
+
         Cancel();
     }
 }

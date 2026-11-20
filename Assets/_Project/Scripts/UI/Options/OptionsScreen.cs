@@ -7,30 +7,67 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// The Options screen, opened from the Escape menu and the main menu: Gameplay, Graphics, Audio, Controls and
-/// Accessibility. It is drawn from the settings themselves (GameOptions, AudioManager, CameraPreferences, InputRebinds) and
-/// holds no game rules. Changes apply at once and are remembered in PlayerPrefs. A change to the window asks to be kept
-/// within ten seconds and otherwise goes back, so a resolution the screen can't show can't strand the player. Built in code
-/// when first opened in a scene; Escape or the gamepad's back button close it.
+/// The Options screen, opened from the Escape menu and the main menu: Gameplay, Graphics, Audio, Controls and Accessibility. It is drawn
+/// from the settings themselves (GameOptions, AudioManager, CameraPreferences, DisplayOptions, InputRebinds) and holds no game rules.
+/// <para>
+/// Changes wait (the user, 2026-11-20: "Give us the option to Save changes and not automatically change settings when we press the
+/// button. Prompt the player that he has unsaved settings"): every row edits an <see cref="OptionsDraft"/>; a changed row is marked in
+/// gold and the header counts what is unsaved; Save Changes applies it all, Discard forgets it, and leaving with changes asks Save,
+/// Leave Without Saving or Keep Editing. Keys are the one exception: a new key is kept as soon as it is pressed, as the Controls tab says.
+/// The panel on the right explains the row in focus: what it does, its value now, saved and by default.
+/// </para>
+/// <para>
+/// A saved change to the window asks to be kept within ten seconds and otherwise goes back, so a resolution the screen can't show can't
+/// strand the player. Built in code when first opened in a scene; Escape or the gamepad's back button close it (or the question).
+/// </para>
 /// </summary>
 public sealed class OptionsScreen : MonoBehaviour
 {
     private const float ConfirmSeconds = 10f;
-    private const float KeyColumn = 210f;
+    private const float KeyColumn = 180f;
+    private const float PanelWidth = 1280f;
+    private const float PanelHeight = 900f;
+    private const float DetailsWidth = 400f;
+    private const float Margin = 36f;
+    private const float ListTop = 150f;
+    private const float ListBottom = 96f;
+
+    private const string DisplayModeKey = "display.mode";
+    private const string ResolutionKey = "display.resolution";
 
     private static readonly string[] TabNames = { "Gameplay", "Graphics", "Audio", "Controls", "Accessibility" };
+
+    private static readonly string[] TabIntros =
+    {
+        "How the game plays: the camera, help with gathering and drinking, and what the screen shows while you play.",
+        "The window and how the world is drawn. Ultra is the game as it was made; lower settings run faster on slower machines.",
+        "How loud each part of the game is.",
+        "How the camera turns, and every key. A new key is kept as soon as you press it; everything else waits for Save Changes.",
+        "Sizes, motion, timing and assists, for an easier or clearer game.",
+    };
 
     private static OptionsScreen current;
     private static int closedFrame = -1;
 
+    private readonly OptionsDraft draft = new OptionsDraft();
     private readonly List<Action> refreshers = new List<Action>();
     private readonly List<(Button button, TMP_Text label)> tabs = new List<(Button, TMP_Text)>();
     private GameObject window;
     private RectTransform content;
     private ScrollRect scroll;
-    private TMP_Text helpLine;
+    private TMP_Text status;
+    private TMP_Text detailName;
+    private TMP_Text detailValue;
+    private TMP_Text detailHelp;
+    private Button saveButton;
+    private TMP_Text saveLabel;
+    private Button discardButton;
     private GameObject confirmBar;
     private TMP_Text confirmText;
+    private GameObject askBox;
+    private TMP_Text askText;
+    private Button askSave;
+    private OptionsFocus focused;
     private int tab;
     private Action closed;
     private float confirmUntil = -1f;
@@ -41,6 +78,9 @@ public sealed class OptionsScreen : MonoBehaviour
     /// <summary>True while the screen is up, or was until this frame: the same Escape press must not close the menu under it.</summary>
     public static bool HasEscape => (current != null && current.window.activeSelf) || closedFrame == Time.frameCount;
 
+    /// <summary>The changes not saved yet on the open screen (0 when it is closed): for tests and probes.</summary>
+    public static int UnsavedChanges => current != null ? current.draft.Count : 0;
+
     /// <summary>Shows the screen. <paramref name="onClosed"/> runs when it goes away.</summary>
     public static void Open(Action onClosed = null)
     {
@@ -50,8 +90,11 @@ public sealed class OptionsScreen : MonoBehaviour
         }
 
         current.closed = onClosed;
+        current.draft.Discard();
+        current.askBox.SetActive(false);
         current.window.SetActive(true);
         current.ShowTab(current.tab);
+        current.ShowStatus();
     }
 
     private static void Create()
@@ -73,7 +116,8 @@ public sealed class OptionsScreen : MonoBehaviour
     {
         if (GameInput.Pause != null) GameInput.Pause.performed += OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed += OnBackPressed;
-        PadTabs.Register(this, () => window != null && window.activeSelf, direction => ShowTab(PadTabs.Next(tab, tabs.Count, direction)),
+        draft.Changed += OnDraftChanged;
+        PadTabs.Register(this, () => window != null && window.activeSelf && !askBox.activeSelf, direction => ShowTab(PadTabs.Next(tab, tabs.Count, direction)),
             () => tabs.ConvertAll(entry => (RectTransform)entry.button.transform));
     }
 
@@ -82,6 +126,7 @@ public sealed class OptionsScreen : MonoBehaviour
         InputRebinds.CancelListening();
         if (GameInput.Pause != null) GameInput.Pause.performed -= OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed -= OnBackPressed;
+        draft.Changed -= OnDraftChanged;
         PadTabs.Unregister(this);
     }
 
@@ -102,19 +147,42 @@ public sealed class OptionsScreen : MonoBehaviour
             return;
         }
 
-        if (window.activeSelf)
+        if (!window.activeSelf)
         {
-            Close();
+            return;
         }
+
+        // Back with the question up is "Keep Editing".
+        if (askBox.activeSelf)
+        {
+            KeepEditing();
+            return;
+        }
+
+        Close();
     }
 
+    /// <summary>Closes the screen, or, with unsaved changes, asks first whether to save them.</summary>
     public void Close()
     {
         // Leaving while a key is awaited binds nothing, and gives gameplay its input back.
         InputRebinds.CancelListening();
-        // Leaving with the question open keeps what the player can evidently see.
+        if (draft.HasChanges)
+        {
+            AskBeforeLeaving();
+            return;
+        }
+
+        Leave();
+    }
+
+    private void Leave()
+    {
+        // Leaving with the window's question open keeps what the player can evidently see.
         confirmUntil = -1f;
         confirmBar.SetActive(false);
+        askBox.SetActive(false);
+        draft.Discard();
         PlayerPrefs.Save();
         window.SetActive(false);
         closedFrame = Time.frameCount;
@@ -137,6 +205,7 @@ public sealed class OptionsScreen : MonoBehaviour
             writtenCountdown = countdown;
             confirmText.text = $"Keep these display settings? Going back in {countdown} s.";
         }
+
         if (left <= 0f)
         {
             RevertDisplay();
@@ -147,33 +216,38 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void Build(Transform root)
     {
+        UIStyle style = UIStyle.Current;
         RectTransform dim = OptionsWidgets.Rect("Dim", root);
         OptionsWidgets.Stretch(dim);
         dim.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
         window = dim.gameObject;
 
-        RectTransform panel = OptionsWidgets.Place(OptionsWidgets.Rect("Panel", dim), new Vector2(0.5f, 0.5f), new Vector2(1280f, 900f), Vector2.zero);
+        RectTransform panel = OptionsWidgets.Place(OptionsWidgets.Rect("Panel", dim), new Vector2(0.5f, 0.5f), new Vector2(PanelWidth, PanelHeight), Vector2.zero);
         panel.gameObject.AddComponent<FitInsideParent>();
         panel.gameObject.AddComponent<Image>().color = OptionsWidgets.Panel;
         var rim = panel.gameObject.AddComponent<Outline>();
         rim.effectColor = OptionsWidgets.WindowRim;
         rim.effectDistance = new Vector2(2f, -2f);
-        HearthlineArt.AddFrame(panel, UIStyle.Current, RaidDirector.Current != null);
+        HearthlineArt.AddFrame(panel, style, RaidDirector.Current != null);
 
         TMP_Text title = OptionsWidgets.Text("Title", panel, "Options", 38f, OptionsWidgets.Title);
-        OptionsWidgets.Place((RectTransform)title.transform, new Vector2(0f, 1f), new Vector2(400f, 56f), new Vector2(36f, -22f));
+        OptionsWidgets.Place((RectTransform)title.transform, new Vector2(0f, 1f), new Vector2(400f, 56f), new Vector2(Margin, -22f));
         title.fontStyle = FontStyles.Bold;
+        status = OptionsWidgets.Text("Status", panel, "", 22f, OptionsWidgets.Muted, TextAlignmentOptions.MidlineRight);
+        OptionsWidgets.Place((RectTransform)status.transform, new Vector2(1f, 1f), new Vector2(560f, 56f), new Vector2(-Margin, -22f));
 
         for (int i = 0; i < TabNames.Length; i++)
         {
             int index = i;
             Button button = OptionsWidgets.Button(TabNames[i], panel, TabNames[i], 22f, () => ShowTab(index), out TMP_Text label);
-            OptionsWidgets.Place((RectTransform)button.transform, new Vector2(0f, 1f), new Vector2(232f, 48f), new Vector2(36f + i * 244f, -88f));
+            OptionsWidgets.Place((RectTransform)button.transform, new Vector2(0f, 1f), new Vector2(232f, 48f), new Vector2(Margin + i * 244f, -88f));
             tabs.Add((button, label));
         }
 
+        // The list on the left, the details of the row in focus on the right.
+        float listRight = Margin + DetailsWidth + 24f;
         RectTransform view = OptionsWidgets.Rect("View", panel);
-        OptionsWidgets.Stretch(view, new Vector2(36f, 132f), new Vector2(-36f, -150f));
+        OptionsWidgets.Stretch(view, new Vector2(Margin, ListBottom), new Vector2(-listRight, -ListTop));
         view.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.001f);
         view.gameObject.AddComponent<RectMask2D>();
         content = OptionsWidgets.Rect("Content", view);
@@ -195,37 +269,102 @@ public sealed class OptionsScreen : MonoBehaviour
         scroll.horizontal = false;
         scroll.movementType = ScrollRect.MovementType.Clamped;
         scroll.scrollSensitivity = 40f;
-        scroll.verticalScrollbar = ScrollBar(panel);
+        scroll.verticalScrollbar = ScrollBar(panel, listRight);
         scroll.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
 
-        helpLine = OptionsWidgets.Text("Help", panel, "", 21f, OptionsWidgets.Muted);
-        OptionsWidgets.Place((RectTransform)helpLine.transform, new Vector2(0f, 0f), new Vector2(1208f, 54f), new Vector2(36f, 76f));
+        BuildDetails(panel);
 
         Button reset = OptionsWidgets.Button("Reset", panel, "Reset This Tab", 22f, ResetTab, out _);
-        OptionsWidgets.Place((RectTransform)reset.transform, new Vector2(0f, 0f), new Vector2(240f, 50f), new Vector2(36f, 20f));
+        OptionsWidgets.Place((RectTransform)reset.transform, new Vector2(0f, 0f), new Vector2(220f, 50f), new Vector2(Margin, 26f));
         Button back = OptionsWidgets.Button("Back", panel, "Back", 22f, Close, out _);
-        OptionsWidgets.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(240f, 50f), new Vector2(-36f, 20f));
+        OptionsWidgets.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(170f, 50f), new Vector2(-Margin, 26f));
+        saveButton = OptionsWidgets.Button("Save", panel, "Save Changes", 22f, Save, out saveLabel);
+        OptionsWidgets.Place((RectTransform)saveButton.transform, new Vector2(1f, 0f), new Vector2(240f, 50f), new Vector2(-Margin - 182f, 26f));
+        discardButton = OptionsWidgets.Button("Discard", panel, "Discard", 22f, Discard, out _);
+        OptionsWidgets.Place((RectTransform)discardButton.transform, new Vector2(1f, 0f), new Vector2(170f, 50f), new Vector2(-Margin - 434f, 26f));
 
-        RectTransform bar = OptionsWidgets.Place(OptionsWidgets.Rect("Confirm", panel), new Vector2(0.5f, 0f), new Vector2(700f, 50f), new Vector2(0f, 20f));
+        RectTransform bar = OptionsWidgets.Place(OptionsWidgets.Rect("Confirm", panel), new Vector2(0.5f, 0f), new Vector2(760f, 50f), new Vector2(-60f, ListBottom - 60f));
+        bar.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
         confirmBar = bar.gameObject;
         confirmText = OptionsWidgets.Text("Text", bar, "", 20f, OptionsWidgets.Title);
-        OptionsWidgets.Stretch((RectTransform)confirmText.transform, Vector2.zero, new Vector2(-220f, 0f));
+        OptionsWidgets.Stretch((RectTransform)confirmText.transform, new Vector2(12f, 0f), new Vector2(-220f, 0f));
         Button keep = OptionsWidgets.Button("Keep", bar, "Keep", 20f, KeepDisplay, out _);
         OptionsWidgets.Place((RectTransform)keep.transform, new Vector2(1f, 0.5f), new Vector2(100f, 44f), new Vector2(-110f, 0f));
         Button revert = OptionsWidgets.Button("Revert", bar, "Revert", 20f, RevertDisplay, out _);
         OptionsWidgets.Place((RectTransform)revert.transform, new Vector2(1f, 0.5f), new Vector2(100f, 44f), Vector2.zero);
         confirmBar.SetActive(false);
+
+        BuildQuestion(panel);
         window.SetActive(false);
     }
 
-    private static Scrollbar ScrollBar(RectTransform panel)
+    private void BuildDetails(RectTransform panel)
+    {
+        UIStyle style = UIStyle.Current;
+        RectTransform box = OptionsWidgets.Rect("Details", panel);
+        box.anchorMin = new Vector2(1f, 0f);
+        box.anchorMax = new Vector2(1f, 1f);
+        box.pivot = new Vector2(1f, 0.5f);
+        box.offsetMin = new Vector2(-Margin - DetailsWidth, ListBottom);
+        box.offsetMax = new Vector2(-Margin, -ListTop);
+        box.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
+        detailName = OptionsWidgets.Text("Name", box, "", 28f, OptionsWidgets.Title, TextAlignmentOptions.TopLeft);
+        detailName.fontStyle = FontStyles.Bold;
+        OptionsWidgets.Place((RectTransform)detailName.transform, new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 76f), new Vector2(20f, -18f));
+        detailValue = OptionsWidgets.Text("Value", box, "", 20f, style.Accent, TextAlignmentOptions.TopLeft);
+        OptionsWidgets.Place((RectTransform)detailValue.transform, new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 96f), new Vector2(20f, -96f));
+        RectTransform rule = OptionsWidgets.Place(OptionsWidgets.Rect("Rule", box), new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 2f), new Vector2(20f, -196f));
+        rule.gameObject.AddComponent<Image>().color = HearthKit.Faded(style.Accent, 0.35f);
+        detailHelp = OptionsWidgets.Text("Help", box, "", 21f, OptionsWidgets.Body, TextAlignmentOptions.TopLeft);
+        RectTransform help = (RectTransform)detailHelp.transform;
+        help.anchorMin = new Vector2(0f, 0f);
+        help.anchorMax = new Vector2(1f, 1f);
+        help.offsetMin = new Vector2(20f, 18f);
+        help.offsetMax = new Vector2(-20f, -212f);
+    }
+
+    // "You have unsaved changes": Save and Leave, Leave Without Saving, Keep Editing.
+    private void BuildQuestion(RectTransform panel)
+    {
+        RectTransform shade = OptionsWidgets.Rect("Unsaved Question", panel);
+        OptionsWidgets.Stretch(shade);
+        shade.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
+        askBox = shade.gameObject;
+        RectTransform box = OptionsWidgets.Place(OptionsWidgets.Rect("Box", shade), new Vector2(0.5f, 0.5f), new Vector2(760f, 330f), Vector2.zero);
+        box.gameObject.AddComponent<Image>().color = OptionsWidgets.Panel;
+        var outline = box.gameObject.AddComponent<Outline>();
+        outline.effectColor = UIStyle.Current.Accent;
+        outline.effectDistance = new Vector2(2f, -2f);
+        TMP_Text heading = OptionsWidgets.Text("Heading", box, "Unsaved changes", 32f, OptionsWidgets.Title, TextAlignmentOptions.TopLeft);
+        heading.fontStyle = FontStyles.Bold;
+        OptionsWidgets.Place((RectTransform)heading.transform, new Vector2(0f, 1f), new Vector2(700f, 48f), new Vector2(30f, -24f));
+        askText = OptionsWidgets.Text("Text", box, "", 22f, OptionsWidgets.Body, TextAlignmentOptions.TopLeft);
+        OptionsWidgets.Place((RectTransform)askText.transform, new Vector2(0f, 1f), new Vector2(700f, 150f), new Vector2(30f, -80f));
+        askSave = OptionsWidgets.Button("Save", box, "Save and Leave", 21f, () =>
+        {
+            Save();
+            Leave();
+        }, out _);
+        OptionsWidgets.Place((RectTransform)askSave.transform, new Vector2(0f, 0f), new Vector2(220f, 50f), new Vector2(30f, 26f));
+        Button leave = OptionsWidgets.Button("Leave", box, "Leave Without Saving", 21f, () =>
+        {
+            draft.Discard();
+            Leave();
+        }, out _);
+        OptionsWidgets.Place((RectTransform)leave.transform, new Vector2(0.5f, 0f), new Vector2(250f, 50f), new Vector2(0f, 26f));
+        Button keep = OptionsWidgets.Button("Keep Editing", box, "Keep Editing", 21f, KeepEditing, out _);
+        OptionsWidgets.Place((RectTransform)keep.transform, new Vector2(1f, 0f), new Vector2(220f, 50f), new Vector2(-30f, 26f));
+        askBox.SetActive(false);
+    }
+
+    private static Scrollbar ScrollBar(RectTransform panel, float listRight)
     {
         RectTransform track = OptionsWidgets.Rect("Scrollbar", panel);
         track.anchorMin = new Vector2(1f, 0f);
         track.anchorMax = new Vector2(1f, 1f);
         track.pivot = new Vector2(1f, 0.5f);
-        track.offsetMin = new Vector2(-46f, 132f);
-        track.offsetMax = new Vector2(-34f, -150f);
+        track.offsetMin = new Vector2(-listRight - 12f, ListBottom);
+        track.offsetMax = new Vector2(-listRight, -ListTop);
         track.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
         RectTransform area = OptionsWidgets.Rect("Area", track);
         OptionsWidgets.Stretch(area);
@@ -240,6 +379,139 @@ public sealed class OptionsScreen : MonoBehaviour
         return bar;
     }
 
+    // ----- The draft: what is changed, saving it, forgetting it -----
+
+    private void OnDraftChanged()
+    {
+        ShowStatus();
+        ShowDetails();
+    }
+
+    private void ShowStatus()
+    {
+        UIStyle style = UIStyle.Current;
+        int count = draft.Count;
+        status.text = count == 0 ? "All changes saved" : $"{count} unsaved change{(count == 1 ? "" : "s")}";
+        status.color = count == 0 ? OptionsWidgets.Muted : style.Accent;
+        saveButton.interactable = count > 0;
+        discardButton.interactable = count > 0;
+        saveLabel.text = count > 0 ? $"Save Changes ({count})" : "Save Changes";
+        saveLabel.color = count > 0 ? style.Accent : OptionsWidgets.Muted;
+    }
+
+    private void Save()
+    {
+        if (!draft.HasChanges)
+        {
+            return;
+        }
+
+        bool display = draft.IsChanged(DisplayModeKey) || draft.IsChanged(ResolutionKey);
+        if (display && confirmUntil < 0f)
+        {
+            keptMode = DisplayOptions.Mode;
+            keptResolution = DisplayOptions.Resolution;
+        }
+
+        draft.Apply();
+        if (display)
+        {
+            DisplayOptions.Apply();
+            // The Editor's Game view doesn't change size, so there is nothing to confirm.
+            if (!Application.isEditor)
+            {
+                confirmUntil = Time.unscaledTime + ConfirmSeconds;
+                confirmBar.SetActive(true);
+            }
+        }
+
+        PlayerPrefs.Save();
+        RefreshRows();
+        ShowStatus();
+    }
+
+    private void Discard()
+    {
+        draft.Discard();
+        RefreshRows();
+    }
+
+    private void AskBeforeLeaving()
+    {
+        List<string> names = draft.Labels();
+        const int shown = 6;
+        string list = string.Join(", ", names.GetRange(0, Mathf.Min(shown, names.Count)));
+        if (names.Count > shown)
+        {
+            list += $" and {names.Count - shown} more";
+        }
+
+        askText.text = $"You changed {names.Count} setting{(names.Count == 1 ? "" : "s")}: <color={UIStyle.Current.AccentHex}>{list}</color>.\n\n" +
+                       "Save them before you leave?";
+        askBox.SetActive(true);
+        askBox.transform.SetAsLastSibling();
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(askSave.gameObject);
+        }
+    }
+
+    private void KeepEditing()
+    {
+        askBox.SetActive(false);
+        if (EventSystem.current != null && tab >= 0 && tab < tabs.Count)
+        {
+            EventSystem.current.SetSelectedGameObject(tabs[tab].button.gameObject);
+        }
+    }
+
+    // ----- The details panel -----
+
+    private void Focus(OptionsFocus focus)
+    {
+        focused = focus;
+        ShowDetails();
+    }
+
+    private void ShowDetails()
+    {
+        if (detailName == null)
+        {
+            return;
+        }
+
+        if (focused == null)
+        {
+            detailName.text = TabNames[Mathf.Clamp(tab, 0, TabNames.Length - 1)];
+            detailValue.text = "";
+            detailHelp.text = TabIntros[Mathf.Clamp(tab, 0, TabIntros.Length - 1)] +
+                              "\n\nPoint at a setting to read what it does. Changed settings turn gold and wait until you press Save Changes.";
+            return;
+        }
+
+        detailName.text = focused.Name;
+        string now = focused.Value != null ? focused.Value() : "";
+        string saved = focused.Saved != null ? focused.Saved() : now;
+        var lines = new List<string>();
+        if (focused.IsPending)
+        {
+            lines.Add($"New: <b>{now}</b>  <size=80%>(not saved)</size>");
+            lines.Add($"<color={UIStyle.Current.MutedHex}>Saved: {saved}</color>");
+        }
+        else if (!string.IsNullOrEmpty(now))
+        {
+            lines.Add($"Now: <b>{now}</b>");
+        }
+
+        if (!string.IsNullOrEmpty(focused.Default))
+        {
+            lines.Add($"<color={UIStyle.Current.MutedHex}>Default: {focused.Default}</color>");
+        }
+
+        detailValue.text = string.Join("\n", lines);
+        detailHelp.text = focused.Help ?? "";
+    }
+
     // ----- Tabs -----
 
     private void ShowTab(int index)
@@ -252,7 +524,7 @@ public sealed class OptionsScreen : MonoBehaviour
         }
 
         Clear();
-        ShowHelp("");
+        focused = null;
         switch (index)
         {
             case 0:
@@ -272,6 +544,7 @@ public sealed class OptionsScreen : MonoBehaviour
                 break;
         }
 
+        ShowDetails();
         scroll.verticalNormalizedPosition = 1f;
         if (EventSystem.current != null)
         {
@@ -294,8 +567,61 @@ public sealed class OptionsScreen : MonoBehaviour
     {
         foreach (GameOption option in options)
         {
-            refreshers.Add(OptionsWidgets.Row(content, option, ShowHelp));
+            refreshers.Add(OptionsWidgets.Row(content, option, draft, Focus, SetterFor(option)));
         }
+    }
+
+    // The quality preset sets its members in the draft; a member changed by hand moves the preset to the one it now matches (Custom),
+    // as OptionsSystem does for saved values.
+    private Action<float> SetterFor(GameOption option)
+    {
+        if (option == GameOptions.Preset)
+        {
+            return value =>
+            {
+                SetPresetInDraft(Mathf.RoundToInt(value));
+                RefreshRows();
+            };
+        }
+
+        if (IsPresetMember(option))
+        {
+            return value =>
+            {
+                draft.Set(option, value);
+                draft.Set(GameOptions.Preset, GameOptions.MatchingPreset(draft.Get), first: true);
+                RefreshRows();
+            };
+        }
+
+        return null;
+    }
+
+    private void SetPresetInDraft(int preset)
+    {
+        draft.Set(GameOptions.Preset, preset, first: true);
+        if (preset == GameOptions.PresetCustom)
+        {
+            return;
+        }
+
+        for (int i = 0; i < GameOptions.PresetMembers.Count; i++)
+        {
+            draft.Set(GameOptions.PresetMembers[i], GameOptions.PresetValue(preset, i));
+        }
+    }
+
+    private static bool IsPresetMember(GameOption option)
+    {
+        foreach (GameOption member in GameOptions.PresetMembers)
+        {
+            if (member == option)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void RefreshRows()
@@ -304,20 +630,35 @@ public sealed class OptionsScreen : MonoBehaviour
         {
             refresh();
         }
+
+        ShowDetails();
     }
 
-    private void ShowHelp(string line)
+    // A setting kept outside GameOptions (the camera, the window, a volume), edited through the draft by a name.
+    private Action Choice(string key, string name, string help, Func<string[]> names, Func<int> saved, Action<int> apply, string defaultName = null)
     {
-        helpLine.text = line;
+        var focus = new OptionsFocus
+        {
+            Name = name,
+            Help = help,
+            Value = () => NameAt(names(), Mathf.RoundToInt(draft.Get(key, () => saved()))),
+            Saved = () => NameAt(names(), saved()),
+            Default = defaultName,
+            Pending = () => draft.IsChanged(key),
+        };
+        return OptionsWidgets.ChoiceRow(content, focus, names, () => Mathf.RoundToInt(draft.Get(key, () => saved())),
+            index => draft.Set(key, name, () => saved(), value => apply(Mathf.RoundToInt(value)), index), Focus);
     }
+
+    private static string NameAt(string[] names, int index) => names != null && index >= 0 && index < names.Length ? names[index] : "-";
 
     private void BuildGameplay()
     {
         OptionsWidgets.Section(content, "Camera");
-        refreshers.Add(OptionsWidgets.ChoiceRow(content, "Camera Style", "The style the camera key switches between. Both work everywhere.",
-            () => new[] { CameraStyleRules.Label(CameraStyle.TopDown), CameraStyleRules.Label(CameraStyle.Action) },
-            () => CameraPreferences.Chosen == CameraStyle.Action ? 1 : 0,
-            index => CameraPreferences.Chosen = index == 1 ? CameraStyle.Action : CameraStyle.TopDown, ShowHelp));
+        string[] styles = { CameraStyleRules.Label(CameraStyle.TopDown), CameraStyleRules.Label(CameraStyle.Action) };
+        refreshers.Add(Choice("camera.style", "Camera Style", "The style the camera key switches between. Both work everywhere.", () => styles,
+            () => CameraPreferences.Chosen == CameraStyle.Action ? 1 : 0, index => CameraPreferences.Chosen = index == 1 ? CameraStyle.Action : CameraStyle.TopDown,
+            styles[0]));
         var choices = new string[3];
         for (int i = 0; i < choices.Length; i++)
         {
@@ -327,8 +668,8 @@ public sealed class OptionsScreen : MonoBehaviour
         for (int i = 0; i < CameraStyleRules.ContextCount; i++)
         {
             var context = (CameraContext)i;
-            refreshers.Add(OptionsWidgets.ChoiceRow(content, context.ToString(), $"Always use one style in this situation: {context}, whatever the camera key says.", () => choices,
-                () => (int)CameraPreferences.GetOverride(context), index => CameraPreferences.SetOverride(context, (CameraStyleOverride)index), ShowHelp));
+            refreshers.Add(Choice("camera.override." + i, context.ToString(), $"Always use one style in this situation: {context}, whatever the camera key says.",
+                () => choices, () => (int)CameraPreferences.GetOverride(context), index => CameraPreferences.SetOverride(context, (CameraStyleOverride)index), choices[0]));
         }
 
         OptionsWidgets.Section(content, "Play");
@@ -338,8 +679,8 @@ public sealed class OptionsScreen : MonoBehaviour
     private void BuildGraphics()
     {
         OptionsWidgets.Section(content, "Display");
-        refreshers.Add(OptionsWidgets.ChoiceRow(content, "Display Mode", "How the game fills the screen.", () => DisplayOptions.ModeNames, () => DisplayOptions.Mode,
-            index => ChangeDisplay(() => DisplayOptions.Mode = index), ShowHelp));
+        refreshers.Add(Choice(DisplayModeKey, "Display Mode", "How the game fills the screen. A new mode asks to be kept after you save it.",
+            () => DisplayOptions.ModeNames, () => DisplayOptions.Mode, index => DisplayOptions.Mode = index));
         List<Vector2Int> sizes = DisplayOptions.Resolutions();
         var names = new string[sizes.Count];
         for (int i = 0; i < names.Length; i++)
@@ -347,8 +688,14 @@ public sealed class OptionsScreen : MonoBehaviour
             names[i] = $"{sizes[i].x} x {sizes[i].y}";
         }
 
-        refreshers.Add(OptionsWidgets.ChoiceRow(content, "Resolution", "The size of the picture on screen.", () => names, () => sizes.IndexOf(DisplayOptions.Resolution),
-            index => ChangeDisplay(() => DisplayOptions.Resolution = sizes[index]), ShowHelp));
+        refreshers.Add(Choice(ResolutionKey, "Resolution", "The size of the picture on screen. A new size asks to be kept after you save it.", () => names,
+            () => sizes.IndexOf(DisplayOptions.Resolution), index =>
+            {
+                if (index >= 0 && index < sizes.Count)
+                {
+                    DisplayOptions.Resolution = sizes[index];
+                }
+            }));
         Rows(new[] { GameOptions.VSync, GameOptions.FrameLimit });
 
         OptionsWidgets.Section(content, "Quality");
@@ -360,25 +707,45 @@ public sealed class OptionsScreen : MonoBehaviour
     private void BuildAudio()
     {
         OptionsWidgets.Section(content, "Volume");
-        Volume("Master Volume", "Everything together.", () => AudioManager.MasterVolume, value => AudioManager.MasterVolume = value);
-        Volume("Music", "The score.", () => AudioManager.GetVolume(AudioChannel.Music), value => AudioManager.SetVolume(AudioChannel.Music, value));
-        Volume("Ambience", "Wind, rain, water and the forest.", () => AudioManager.GetVolume(AudioChannel.Ambience), value => AudioManager.SetVolume(AudioChannel.Ambience, value));
-        Volume("Sound Effects", "Fights, footsteps, work and the interface.", () => AudioManager.GetVolume(AudioChannel.Effects), value => AudioManager.SetVolume(AudioChannel.Effects, value));
-        Volume("Voice", "The storyteller.", () => AudioManager.GetVolume(AudioChannel.Voice), value => AudioManager.SetVolume(AudioChannel.Voice, value));
+        AudioSettingsDefinition sounds = AudioManager.Sounds;
+        Volume("audio.master", "Master Volume", "Everything together.", () => AudioManager.MasterVolume, value => AudioManager.MasterVolume = value,
+            sounds != null ? sounds.MasterVolume : -1f);
+        Channel(AudioChannel.Music, "Music", "The score.");
+        Channel(AudioChannel.Ambience, "Ambience", "Wind, rain, water and the forest.");
+        Channel(AudioChannel.Effects, "Sound Effects", "Fights, footsteps, work and the interface.");
+        Channel(AudioChannel.Voice, "Voice", "The storyteller and the people of the Haven.");
         OptionsWidgets.Section(content, "Other");
         Rows(new[] { GameOptions.MuteUnfocused });
     }
 
-    private void Volume(string name, string help, Func<float> get, Action<float> set)
+    private void Channel(AudioChannel channel, string name, string help)
     {
-        refreshers.Add(OptionsWidgets.SliderRow(content, name, help, 0f, 1f, 0.01f, get, set, value => Mathf.RoundToInt(value * 100f) + "%", ShowHelp));
+        AudioSettingsDefinition sounds = AudioManager.Sounds;
+        Volume("audio." + channel, name, help, () => AudioManager.GetVolume(channel), value => AudioManager.SetVolume(channel, value),
+            sounds != null ? sounds.DefaultVolume(channel) : -1f);
+    }
+
+    private void Volume(string key, string name, string help, Func<float> saved, Action<float> apply, float byDefault)
+    {
+        string Percent(float value) => Mathf.RoundToInt(value * 100f) + "%";
+        var focus = new OptionsFocus
+        {
+            Name = name,
+            Help = help,
+            Value = () => Percent(draft.Get(key, saved)),
+            Saved = () => Percent(saved()),
+            Default = byDefault >= 0f ? Percent(byDefault) : null,
+            Pending = () => draft.IsChanged(key),
+        };
+        refreshers.Add(OptionsWidgets.SliderRow(content, focus, 0f, 1f, 0.01f, () => draft.Get(key, saved),
+            value => draft.Set(key, name, saved, apply, value), Percent, Focus));
     }
 
     private void BuildControls()
     {
         OptionsWidgets.Section(content, "Camera");
         Rows(GameOptions.Controls);
-        OptionsWidgets.Note(content, "Below: keyboard and mouse on the left, gamepad on the right. Pick one, then press the new key. Escape cancels.");
+        OptionsWidgets.Note(content, "Keys: keyboard and mouse on the left, gamepad on the right. Pick one, then press the new key: it is kept at once.");
         string section = null;
         foreach (RebindRow row in InputRebinds.Rows)
         {
@@ -394,14 +761,20 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void KeyRow(RebindRow row)
     {
-        RectTransform control = OptionsWidgets.LabelledRow(content, row.Label, "Pick a key, then press the new one. If it's in use, the two swap.", ShowHelp);
-        Action keyboard = KeyButton(control, row, GameInput.KeyboardMouse, new Vector2(0f, 0.5f), new Vector2(0f, 0f));
-        Action gamepad = KeyButton(control, row, GameInput.Gamepad, new Vector2(0f, 0.5f), new Vector2(KeyColumn + 12f, 0f));
+        var focus = new OptionsFocus
+        {
+            Name = row.Label,
+            Help = "Pick a key, then press the new one. If it's in use, the two swap. A new key is kept at once.",
+            Value = () => $"{InputRebinds.Describe(row, GameInput.KeyboardMouse)}  /  {InputRebinds.Describe(row, GameInput.Gamepad)}",
+        };
+        RectTransform control = OptionsWidgets.LabelledRow(content, focus, Focus, out _);
+        Action keyboard = KeyButton(control, row, GameInput.KeyboardMouse, new Vector2(0f, 0.5f), new Vector2(0f, 0f), focus);
+        Action gamepad = KeyButton(control, row, GameInput.Gamepad, new Vector2(0f, 0.5f), new Vector2(KeyColumn + 12f, 0f), focus);
         refreshers.Add(keyboard);
         refreshers.Add(gamepad);
     }
 
-    private Action KeyButton(RectTransform control, RebindRow row, string scheme, Vector2 anchor, Vector2 position)
+    private Action KeyButton(RectTransform control, RebindRow row, string scheme, Vector2 anchor, Vector2 position, OptionsFocus focus)
     {
         TMP_Text label = null;
         Button button = OptionsWidgets.Button(scheme, control, "", 21f, () =>
@@ -414,99 +787,78 @@ public sealed class OptionsScreen : MonoBehaviour
             label.text = "Press a key...";
             InputRebinds.Listen(row, scheme, note =>
             {
-                ShowHelp(note ?? "");
+                focused = new OptionsFocus { Name = focus.Name, Help = note ?? focus.Help, Value = focus.Value };
                 RefreshRows();
             });
         }, out label);
         OptionsWidgets.Place((RectTransform)button.transform, anchor, new Vector2(KeyColumn, 42f), position);
         button.interactable = InputRebinds.HasBinding(row, scheme);
+        button.gameObject.AddComponent<OptionsHover>().Entered = () => Focus(focus);
         void Refresh() => label.text = InputRebinds.Describe(row, scheme);
         Refresh();
         return Refresh;
     }
 
+    // Reset puts the tab's defaults in the draft, to be saved like any change. The keys are the exception: they go back at once.
     private void ResetTab()
     {
         switch (tab)
         {
             case 0:
-                ResetAll(GameOptions.Gameplay);
-                CameraPreferences.Chosen = CameraStyle.TopDown;
+                DraftDefaults(GameOptions.Gameplay);
+                draft.Set("camera.style", "Camera Style", () => CameraPreferences.Chosen == CameraStyle.Action ? 1 : 0,
+                    value => CameraPreferences.Chosen = value > 0.5f ? CameraStyle.Action : CameraStyle.TopDown, 0f);
                 for (int i = 0; i < CameraStyleRules.ContextCount; i++)
                 {
-                    CameraPreferences.SetOverride((CameraContext)i, 0);
+                    var context = (CameraContext)i;
+                    draft.Set("camera.override." + i, context.ToString(), () => (int)CameraPreferences.GetOverride(context),
+                        value => CameraPreferences.SetOverride(context, (CameraStyleOverride)Mathf.RoundToInt(value)), 0f);
                 }
 
                 break;
             case 1:
-                // Everything the tab shows (GameOptions.Graphics, the look, the frame rate): listed by hand, it missed the three
-                // that aren't in a preset (contact shadows, the Haven's sun bounce, ground impacts). Then the preset over its members.
-                ResetAll(GameOptions.Graphics);
-                ResetAll(GameOptions.Look);
-                GameOptions.ApplyPreset(GameOptions.PresetUltra);
-                GameOptions.VSync.ResetToDefault();
-                GameOptions.FrameLimit.ResetToDefault();
+                // Everything the tab shows (the quality settings, the look, the frame rate), then the preset over its members.
+                DraftDefaults(GameOptions.Graphics);
+                DraftDefaults(GameOptions.Look);
+                SetPresetInDraft(GameOptions.PresetUltra);
+                DraftDefaults(new[] { GameOptions.VSync, GameOptions.FrameLimit });
                 break;
             case 2:
-                ResetAudio();
+                DraftDefaults(new[] { GameOptions.MuteUnfocused });
+                AudioSettingsDefinition sounds = AudioManager.Sounds;
+                if (sounds != null)
+                {
+                    draft.Set("audio.master", "Master Volume", () => AudioManager.MasterVolume, value => AudioManager.MasterVolume = value, sounds.MasterVolume);
+                    foreach (AudioChannel channel in Enum.GetValues(typeof(AudioChannel)))
+                    {
+                        AudioChannel each = channel;
+                        draft.Set("audio." + each, each.ToString(), () => AudioManager.GetVolume(each), value => AudioManager.SetVolume(each, value),
+                            sounds.DefaultVolume(each));
+                    }
+                }
+
                 break;
             case 3:
-                ResetAll(GameOptions.Controls);
+                DraftDefaults(GameOptions.Controls);
                 InputRebinds.ResetAll();
                 break;
             default:
-                ResetAll(GameOptions.Accessibility);
+                DraftDefaults(GameOptions.Accessibility);
                 break;
         }
 
         RefreshRows();
     }
 
-    private static void ResetAll(IEnumerable<GameOption> options)
+    private void DraftDefaults(IEnumerable<GameOption> options)
     {
         foreach (GameOption option in options)
         {
-            option.ResetToDefault();
+            draft.Set(option, option.Default, option == GameOptions.Preset);
         }
     }
 
-    private static void ResetAudio()
-    {
-        GameOptions.MuteUnfocused.ResetToDefault();
-        AudioSettingsDefinition sounds = AudioManager.Sounds;
-        if (sounds == null)
-        {
-            return;
-        }
-
-        AudioManager.MasterVolume = sounds.MasterVolume;
-        foreach (AudioChannel channel in Enum.GetValues(typeof(AudioChannel)))
-        {
-            AudioManager.SetVolume(channel, sounds.DefaultVolume(channel));
-        }
-    }
-
-    // ----- The window: a change has to be kept, or it goes back -----
-
-    private void ChangeDisplay(Action change)
-    {
-        if (confirmUntil < 0f)
-        {
-            keptMode = DisplayOptions.Mode;
-            keptResolution = DisplayOptions.Resolution;
-        }
-
-        change();
-        DisplayOptions.Apply();
-        // The Editor's Game view doesn't change size, so there is nothing to confirm.
-        if (!Application.isEditor)
-        {
-            confirmUntil = Time.unscaledTime + ConfirmSeconds;
-            confirmBar.SetActive(true);
-        }
-
-        RefreshRows();
-    }
+    // ----- The window: a saved change has to be kept, or it goes back -----
 
     private void KeepDisplay()
     {

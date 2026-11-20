@@ -77,6 +77,8 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
     private bool picking;
     // Picking a building to upgrade or repair rather than to move.
     private bool upgrading;
+    // Picking a building to take down (BuildingDemolition).
+    private bool demolishing;
     private BuildGhost ghost;
     private float yaw;
     private Camera view;
@@ -272,6 +274,21 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         }
     }
 
+    /// <summary>Lets the player click a building they built to take it down, getting back what it cost (BuildingDemolition).</summary>
+    public void PickToDemolish()
+    {
+        if (!HavenTravel.IsOpen)
+        {
+            GameMessages.Post("Not while the ward is breached.", MessageKind.Warning);
+            return;
+        }
+
+        if (!HavenVisit.IsVisiting && AllowsChanges)
+        {
+            BeginPicking(false, true);
+        }
+    }
+
     /// <summary>The turn that points a piece's front (+Z) at the camera, on the rotation step.</summary>
     private float FacingCamera()
     {
@@ -300,7 +317,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         {
             PadFamily pad = InputDevices.Family;
             hint.Append($"Place the {building.DisplayName}: {GameInput.KeyLabel(GameInput.BuildPlace)} to build");
-            hint.Append(building.PlaceInLines ? ", or hold it and walk to build a line" : "");
+            hint.Append(building.PlaceInLines ? ", or hold it and walk to build a line, as many as you like" : "");
             hint.Append(CameraPointer.UsesScreenCenter ? ". Aim with the camera" : ". The right stick moves the spot");
             hint.Append($", {ControllerGlyphs.For("<Gamepad>/leftShoulder", pad)} {ControllerGlyphs.For("<Gamepad>/rightShoulder", pad)} turn it");
             hint.Append($" (hold {GameInput.KeyLabel(GameInput.BuildFineRotate)} for small turns, {GameInput.KeyLabel(GameInput.BuildFreePlace)} to place freely), {GameInput.KeyLabel(GameInput.Back)} cancels.");
@@ -308,7 +325,8 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         else
         {
             hint.Append($"Place the {building.DisplayName}: left-click to build");
-            hint.Append(building.PlaceInLines ? ", or drag to build a line: it follows the way you draw, curves too (scroll while dragging to bend it round the portal)." : ".");
+            hint.Append(building.PlaceInLines ? ", or drag to build a line: it follows the way you draw, curves too (scroll while dragging to bend it round the portal). " +
+                "Keep placing as many as you like; right-click stops." : ".");
         }
         if (building.YardDepth > 0f)
         {
@@ -318,20 +336,22 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         GameMessages.Post(hint.ToString());
     }
 
-    private void BeginPicking(bool toUpgrade)
+    private void BeginPicking(bool toUpgrade, bool toDemolish = false)
     {
         Cancel();
         picking = true;
         upgrading = toUpgrade;
+        demolishing = toDemolish;
         IsBusy = true;
+        string what = toDemolish ? "take it down (everything it cost comes back)" : toUpgrade ? "upgrade or repair it" : "move it";
         if (InputDevices.UsingGamepad)
         {
             string choose = $"{(CameraPointer.UsesScreenCenter ? "Aim at" : "Move the spot onto")} a building and press {GameInput.KeyLabel(GameInput.BuildPlace)}";
-            GameMessages.Post($"{choose} to {(toUpgrade ? "upgrade or repair it" : "move it")}. {GameInput.KeyLabel(GameInput.Back)} cancels.");
+            GameMessages.Post($"{choose} to {what}. {GameInput.KeyLabel(GameInput.Back)} cancels.");
             return;
         }
 
-        GameMessages.Post(toUpgrade ? "Click a building to upgrade or repair it. Right-click to cancel." : "Click a building to move it. Right-click to cancel.");
+        GameMessages.Post($"Click a building to {what}. Right-click to cancel.");
     }
 
     private void Update()
@@ -476,7 +496,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             }
         }
 
-        if (upgrading)
+        if (upgrading || demolishing)
         {
             if (building == null || building.Definition == null)
             {
@@ -484,8 +504,17 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
                 return;
             }
 
+            bool demolish = demolishing;
             Cancel();
-            ConstructionUpgradeOffer.Show(building, gameObject);
+            if (demolish)
+            {
+                BuildingDemolition.Ask(building, gameObject);
+            }
+            else
+            {
+                ConstructionUpgradeOffer.Show(building, gameObject);
+            }
+
             return;
         }
 
@@ -695,6 +724,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         placing = null;
         picking = false;
         upgrading = false;
+        demolishing = false;
         if (IsBusy)
         {
             endedFrame = Time.frameCount;

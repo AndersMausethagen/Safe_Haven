@@ -33,3 +33,11 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+    - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 2
+      probability: 1
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 0

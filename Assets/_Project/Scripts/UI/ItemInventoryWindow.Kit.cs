@@ -12,6 +12,24 @@ public sealed partial class ItemInventoryWindow
 {
     private bool kitBuilt;
     private KitButton sortButton;
+    private KitButton storeButton;
+    private float nextStoreCheck;
+
+    // The Store button shows only where it works: at home, inside the ward, with a chest standing. Checked a few times a second.
+    private void UpdateStoreButton()
+    {
+        if (storeButton == null || Time.unscaledTime < nextStoreCheck)
+        {
+            return;
+        }
+
+        nextStoreCheck = Time.unscaledTime + 0.25f;
+        bool show = inventory != null && StashQuickStack.CanStack(inventory.gameObject);
+        if (storeButton.Rect.gameObject.activeSelf != show)
+        {
+            storeButton.Rect.gameObject.SetActive(show);
+        }
+    }
     private readonly List<RectTransform> below = new List<RectTransform>();
     private float lifted;
 
@@ -105,6 +123,15 @@ public sealed partial class ItemInventoryWindow
         button.anchorMin = button.anchorMax = new Vector2(0f, 1f);
         button.pivot = new Vector2(1f, 0f);
         button.anchoredPosition = new Vector2(cellsRight, 6f);
+        // Palworld's Easy Bulk Storage (the user, 2026-11-20): at home, the whole bag to the chests from here (StashQuickStack).
+        storeButton = new KitButton(grid, 0f, 0f, 170f, 32f, _ => StashQuickStack.Stack(inventory.gameObject), KitButtonShape.Compact);
+        storeButton.Bind(new MenuAction($"Store in chests ({GameInput.KeyLabel(GameInput.StackOnStored)})", "Materials and what your chests hold", true, null) { Icon = "Lock" });
+        RectTransform store = storeButton.Rect;
+        store.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        store.anchorMin = store.anchorMax = new Vector2(0f, 1f);
+        store.pivot = new Vector2(1f, 0f);
+        store.anchoredPosition = new Vector2(cellsRight - 112f, 6f);
+        store.gameObject.SetActive(false);
         Compact(container, slots);
     }
 

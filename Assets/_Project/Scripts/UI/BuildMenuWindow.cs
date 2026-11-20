@@ -57,6 +57,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
     {
         public BuildingDefinition Building;
         public bool ToUpgrade;
+        public bool ToDemolish;
         public string Title;
         public string Line;
         public Image Frame;
@@ -262,6 +263,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
             {
                 AddCard(new Card { ToUpgrade = true, Title = "Upgrade or repair", Line = "Make something better, or bring a ruin back." });
                 AddCard(new Card { ToUpgrade = false, Title = "Move", Line = "Pick up something you built and place it again, for free." });
+                AddCard(new Card { ToDemolish = true, Title = "Take down", Line = "Remove something you built. Everything it cost comes back." });
             }
         }
         else
@@ -313,7 +315,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
         else
         {
             TMP_Text glyph = Label("Glyph", go.transform, 0f, 10f, CardSize, 96f, 54f, style.Accent, TextAlignmentOptions.Center);
-            glyph.text = card.Building != null ? Initials(card.Title) : card.ToUpgrade ? "\u25B2" : "\u21C4";
+            glyph.text = card.Building != null ? Initials(card.Title) : ManageGlyph(card);
         }
 
         card.Name = Label("Name", go.transform, 6f, 106f, CardSize - 12f, 24f, 17f, style.Text, TextAlignmentOptions.Center);
@@ -325,6 +327,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
         Shrink(card.Cost, 11f);
         cards.Add(card);
     }
+
+    // The Manage cards' marks: up for upgrade, a cross for taking down, arrows for moving.
+    private static string ManageGlyph(Card card) => card.ToDemolish ? "×" : card.ToUpgrade ? "▲" : "⇄";
 
     private static void Shrink(TMP_Text text, float smallest)
     {
@@ -428,10 +433,12 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailName.text = card.Title;
         if (card.Building == null)
         {
-            detailGlyph.text = card.ToUpgrade ? "\u25B2" : "\u21C4";
+            detailGlyph.text = ManageGlyph(card);
             detailKind.text = "Manage";
             detailTags.text = "";
-            detailText.text = card.ToUpgrade
+            detailText.text = card.ToDemolish
+                ? "Click a building you have built to take it down. Everything it cost, its upgrades too, comes back to your bag (or your chests when the bag is full). Empty a chest first."
+                : card.ToUpgrade
                 ? "Click a building you have built to see what its next level costs and brings, or walk up to a ruin to repair it."
                 : "Click a building you have built to pick it up, then place it somewhere else. Moving costs nothing.";
             buildLabel.text = "Choose a building";
@@ -665,7 +672,15 @@ public sealed class BuildMenuWindow : MonoBehaviour
         if (card.Building == null)
         {
             window.Close();
-            builder.PickBuilding(card.ToUpgrade);
+            if (card.ToDemolish)
+            {
+                builder.PickToDemolish();
+            }
+            else
+            {
+                builder.PickBuilding(card.ToUpgrade);
+            }
+
             return;
         }
 

@@ -198,6 +198,46 @@ public sealed class ItemInventory : MonoBehaviour
         {
             SyncCarried(announce: true);
         }
+
+        if (Time.time >= nextAutoDrink)
+        {
+            nextAutoDrink = Time.time + AutoDrinkSeconds;
+            AutoDrink();
+        }
+    }
+
+    private const float AutoDrinkSeconds = 1f;
+    private float nextAutoDrink;
+    private PlayerNeeds autoDrinkNeeds;
+
+    /// <summary>
+    /// Drinks by itself (the user, 2026-11-20): with thirst under Survival Settings › Auto Drink Below, the first water container
+    /// carried that has water in it (the bag, then the pocket) is drunk from, as much as thirst lacks, as a use from the bar would.
+    /// Not while dead, eating, or with Options › Gameplay › Auto-Drink off. Returns true when something was drunk.
+    /// </summary>
+    public bool AutoDrink()
+    {
+        float below = SurvivalSettings.Current.AutoDrinkBelow;
+        autoDrinkNeeds = autoDrinkNeeds != null ? autoDrinkNeeds : GetComponent<PlayerNeeds>();
+        if (below <= 0f || !GameOptions.AutoDrink.On || autoDrinkNeeds == null || autoDrinkNeeds.Thirst.Fraction >= below
+            || (TryGetComponent(out Damageable health) && !health.IsAlive) || (TryGetComponent(out PlayerEating eating) && eating.IsEating))
+        {
+            return false;
+        }
+
+        foreach (ItemContainer from in new[] { container, safePocket })
+        {
+            for (int slot = 0; from != null && slot < from.SlotCount; slot++)
+            {
+                ItemStack stack = from.GetSlot(slot);
+                if (!stack.IsEmpty && stack.Item.HoldsWater && stack.Water >= 0.5f)
+                {
+                    return DrinkFrom(from, slot, stack);
+                }
+            }
+        }
+
+        return false;
     }
 
     private void SyncCarried(bool announce)

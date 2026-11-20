@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 4965007540447521164}
   - component: {fileID: 239340218030652128}
   - component: {fileID: 8806706885187054915}
+  - component: {fileID: 1921290882288130757}
   m_Layer: 0
   m_Name: Fence Section
   m_TagString: Untagged
@@ -214,3 +215,21 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.58, z: 0.017499998}
   m_TimeToStationary: 0.5
+--- !u!114 &1921290882288130757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7160763822417819799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b469681a4982704096d644d9891ad75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::LootOnDeath
+  table: {fileID: 11400000, guid: c449a4c070a77dc49ac9bd17be0d1151, type: 2}
+  drops:
+    entries: []
+  unlocksRecipes: []
+  relicChance: 0
+  inscriptions: []

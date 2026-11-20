@@ -6,6 +6,10 @@ using UnityEngine.UI;
 /// Safe Haven's standing at the top of the screen while at home: its rank, renown towards the next rank on a thin bar,
 /// "+6 Renown" rising when something is built, upgraded or cleared, and a banner across the screen when a new rank is
 /// reached. Built in code by HavenProgress; it only reads it and GameSession.Here.
+/// <para>
+/// Also the store prompt (the user, 2026-11-20, "the same way Palworld does it"): in the bottom-right corner, above the minimap, the key
+/// that sends the bag to the chests (StashQuickStack) shows whenever the player is inside the ward with something the chests would take.
+/// </para>
 /// </summary>
 public sealed class HavenHud : MonoBehaviour
 {
@@ -16,6 +20,10 @@ public sealed class HavenHud : MonoBehaviour
     private const float BadgeWidth = 390f;
     private const float GainY = -14f;
     private const float StandingSeconds = 0.5f;
+    private const float StoreCheckSeconds = 0.4f;
+    private const float StoreWidth = 250f;
+    private const float StoreHeight = 44f;
+    private const float StoreMargin = 26f;
 
     private TMP_Text badge;
     private TMP_Text standing;
@@ -30,6 +38,11 @@ public sealed class HavenHud : MonoBehaviour
     private float nextStanding;
     private int shownGain;
     private int writtenGain = -1;
+    private RectTransform storePrompt;
+    private CanvasGroup storeGroup;
+    private TMP_Text storeKey;
+    private float nextStoreCheck;
+    private bool storeWanted;
 
     public static HavenHud Current { get; private set; }
 
@@ -89,6 +102,58 @@ public sealed class HavenHud : MonoBehaviour
             RectTransform line = Rect("Line", plate, new Vector2(0.5f, y), new Vector2(460f, 1f), Vector2.zero);
             line.gameObject.AddComponent<Image>().color = Gold;
         }
+
+        BuildStorePrompt(root);
+    }
+
+    // A dark card with a gold rim: the key in a keycap, then what it does.
+    private void BuildStorePrompt(Transform root)
+    {
+        UIStyle style = UIStyle.Current;
+        storePrompt = Rect("Store Prompt", root, new Vector2(1f, 0f), new Vector2(StoreWidth, StoreHeight), Vector2.zero);
+        storePrompt.pivot = new Vector2(1f, 0f);
+        storeGroup = storePrompt.gameObject.AddComponent<CanvasGroup>();
+        storeGroup.alpha = 0f;
+        storeGroup.blocksRaycasts = false;
+        Image card = HearthKit.Sliced(storePrompt.gameObject.AddComponent<Image>(), style.Card, 1.2f);
+        card.color = HearthKit.Faded(style.Inset, 0.92f);
+        card.raycastTarget = false;
+        HearthKit.Rim(storePrompt, 0.45f);
+        RectTransform cap = Rect("Key", storePrompt, new Vector2(0f, 0.5f), new Vector2(46f, 30f), new Vector2(31f, 0f));
+        Image capFace = HearthKit.Sliced(cap.gameObject.AddComponent<Image>(), style.Card, 1.2f);
+        capFace.color = HearthKit.Faded(Gold, 0.18f);
+        capFace.raycastTarget = false;
+        HearthKit.Rim(cap, 0.8f);
+        storeKey = Label(cap, "Key Label", new Vector2(0.5f, 0.5f), new Vector2(46f, 30f), Vector2.zero, 18f, Gold, TextAlignmentOptions.Center, true);
+        TMP_Text what = Label(storePrompt, "Label", new Vector2(0f, 0.5f), new Vector2(StoreWidth - 70f, 30f), new Vector2(62f + (StoreWidth - 70f) * 0.5f, 0f), 18f, Body, TextAlignmentOptions.Left);
+        what.text = "Store in chests";
+    }
+
+    // Shown while the bag holds something the chests would take (StashQuickStack.HasSomethingToStore), above the minimap so the two
+    // never cover each other whatever the HUD size option makes the map.
+    private void UpdateStorePrompt(bool windows)
+    {
+        if (storePrompt == null)
+        {
+            return;
+        }
+
+        if (Time.unscaledTime >= nextStoreCheck)
+        {
+            nextStoreCheck = Time.unscaledTime + StoreCheckSeconds;
+            Player player = Player.Current;
+            storeWanted = player != null && StashQuickStack.HasSomethingToStore(player.gameObject);
+            if (storeWanted)
+            {
+                storeKey.text = GameInput.KeyLabel(GameInput.StackOnStored);
+                float map = MinimapSettings.Current != null ? MinimapSettings.Current.Size * HudRules.MinimapScale : 220f;
+                // Clear of the place name the minimap shows above itself (Haven Meadows).
+                storePrompt.anchoredPosition = new Vector2(-StoreMargin, StoreMargin + map + 62f);
+            }
+        }
+
+        float target = storeWanted && !windows && !BuildPlacer.IsBusy ? 1f : 0f;
+        storeGroup.alpha = Mathf.MoveTowards(storeGroup.alpha, target, Time.unscaledDeltaTime * 4f);
     }
 
     private void OnEnable() => Current = this;
@@ -119,6 +184,7 @@ public sealed class HavenHud : MonoBehaviour
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         group.alpha = GamePause.IsPaused ? 0f : 1f;
         badge.transform.parent.gameObject.SetActive(!windows);
+        UpdateStorePrompt(windows);
         if (Time.unscaledTime >= nextStanding)
         {
             DrawStanding();
