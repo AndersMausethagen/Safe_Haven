@@ -1051,6 +1051,19 @@ MonoBehaviour:
   flinchShare: 0.04
   strideSpeed: 2
   swingsLikeThePlayer: 0
+  strikeClips:
+  - state: Strike Chop
+    windupEnd: 0.317
+    contact: 0.383
+    length: 1.533
+  - state: Strike Lunge
+    windupEnd: 0.133
+    contact: 0.233
+    length: 0.933
+  - state: Strike Wide
+    windupEnd: 0.483
+    contact: 0.583
+    length: 1.8
   walkClipSpeed: 0.66
   runClipSpeed: 3.5
 --- !u!114 &165592971757474411

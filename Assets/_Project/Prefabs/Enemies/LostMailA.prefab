@@ -262,6 +262,33 @@ MonoBehaviour:
   flinchShare: 0.04
   strideSpeed: 2
   swingsLikeThePlayer: 1
+  strikeClips:
+  - state: Strike Chop
+    windupEnd: 0.283
+    contact: 0.383
+    length: 0.933
+  - state: Sword A
+    windupEnd: 0.133
+    contact: 0.217
+    length: 0.433
+  - state: Sword B
+    windupEnd: 0.133
+    contact: 0.217
+    length: 0.533
+  - state: Sword Counter
+    windupEnd: 0.2
+    contact: 0.283
+    length: 1.567
+  - state: Sword Finisher
+    windupEnd: 0.55
+    contact: 0.65
+    length: 2
+  - state: Sword Heavy
+    windupEnd: 0.333
+    contact: 0.483
+    length: 1.033
+  walkClipSpeed: 1.86
+  runClipSpeed: 4.08
 --- !u!114 &165592971757474411
 MonoBehaviour:
   m_ObjectHideFlags: 0

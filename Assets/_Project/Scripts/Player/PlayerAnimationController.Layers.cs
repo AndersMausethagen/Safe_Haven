@@ -19,6 +19,21 @@ public sealed partial class PlayerAnimationController
 {
     private readonly List<int> clearWhenCovered = new List<int>();
     private int clearArmedFrame = -1;
+    private PoseInertializer inertia;
+
+    // A hand-over's blend. Moving into moving (a chain's next swing, walking out of a swing) with the body's PoseInertializer on: the
+    // state switches at once and the pose shown coasts on and eases into the new one over the same time, carrying on the way it moved.
+    // Otherwise (a start from a still pose measured smoother as a crossfade, PoseInertializer), the crossfade.
+    private float Blend(float fade, bool fromMotion = false)
+    {
+        if (fromMotion && fade > 0f && inertia != null && inertia.Ready)
+        {
+            inertia.Begin(fade);
+            return 0f;
+        }
+
+        return fade;
+    }
 
     // A layer showing something (a state, or on its way somewhere).
     private bool LayerBusy(int layer) =>
@@ -26,9 +41,9 @@ public sealed partial class PlayerAnimationController
 
     /// <summary>Plays <paramref name="state"/> on Combat Full Body over <paramref name="fade"/>; the swing layers below it are cleared
     /// once it covers them.</summary>
-    private void IntoFullBody(int state, float fade, float stateTimeOffset)
+    private void IntoFullBody(int state, float fade, float stateTimeOffset, bool fromMotion = false)
     {
-        animator.CrossFadeInFixedTime(state, fade, fullBodyLayer, stateTimeOffset);
+        animator.CrossFadeInFixedTime(state, Blend(fade, fromMotion), fullBodyLayer, stateTimeOffset);
         foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
         {
             if (other >= 0 && other != fullBodyLayer && LayerBusy(other) && !clearWhenCovered.Contains(other))
@@ -43,19 +58,19 @@ public sealed partial class PlayerAnimationController
     /// <summary>Plays <paramref name="state"/> on a layer under Combat Full Body: with Full Body showing, the state goes in at once
     /// beneath it and Full Body fades out over <paramref name="fullBodyFade"/>; otherwise an ordinary crossfade over
     /// <paramref name="fade"/>.</summary>
-    private void UnderFullBody(int layer, int state, float fade, float stateTimeOffset, float fullBodyFade)
+    private void UnderFullBody(int layer, int state, float fade, float stateTimeOffset, float fullBodyFade, bool fromMotion = false)
     {
         clearWhenCovered.Remove(layer);
         if (fullBodyLayer >= 0 && layer != fullBodyLayer && LayerBusy(fullBodyLayer))
         {
             animator.PlayInFixedTime(state, layer, stateTimeOffset);
-            animator.CrossFadeInFixedTime(EmptyStateHash, fullBodyFade, fullBodyLayer);
+            animator.CrossFadeInFixedTime(EmptyStateHash, Blend(fullBodyFade, fromMotion), fullBodyLayer);
             // Full Body is leaving: nothing waits to be covered by it.
             clearWhenCovered.Clear();
             return;
         }
 
-        animator.CrossFadeInFixedTime(state, fade, layer, stateTimeOffset);
+        animator.CrossFadeInFixedTime(state, Blend(fade, fromMotion), layer, stateTimeOffset);
     }
 
     // Start of LateUpdate (the animator has run this frame's crossfades): the layers under a Full Body action that now covers them

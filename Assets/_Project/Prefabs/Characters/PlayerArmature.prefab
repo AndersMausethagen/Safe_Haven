@@ -9036,6 +9036,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4696338133587050836}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7662376231344091493}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1512935349698343659}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &5943822763764690748 stripped
 GameObject:
@@ -9320,6 +9326,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEquipment
   unarmed: {fileID: 11400000, guid: 65a651b8b5f68cb44ba6e82c5abb2349, type: 2}
+  drawGrabHip: 0.354
+  drawGrabBack: 0.416
+  sheatheHip: 0.33
+  sheatheBack: 0.318
+  drawPace: 1.25
 --- !u!114 &4462326017290934803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9870,6 +9881,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e16e8e3415bf80e4795a8f32599a92c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::PlayerRegain
+--- !u!114 &7662376231344091493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bfeb5390dddc584597ae6a693f5c745, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PoseInertializer
+  longestBlend: 0.5
+--- !u!114 &1512935349698343659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5943822763764690748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fec8257e7bd356f47a29efdd246e327e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::PlayerFootLock
+  downHeight: 0.05
+  liftSpeed: 0.35
+  releaseDistance: 0.22
+  releaseTurn: 40
+  standingSpeed: 0.45
+  fadeRate: 10
 --- !u!4 &6428716820787852678 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3893294197879345259, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}

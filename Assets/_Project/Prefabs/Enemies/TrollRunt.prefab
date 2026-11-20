@@ -212,6 +212,18 @@ MonoBehaviour:
   speedDampTime: 0.1
   flinchShare: 0.04
   strideSpeed: 2
+  swingsLikeThePlayer: 0
+  strikeClips:
+  - state: Strike Claw
+    windupEnd: 0.167
+    contact: 0.5
+    length: 0.7
+  - state: Throw
+    windupEnd: 0.2
+    contact: 0.3
+    length: 0.667
+  walkClipSpeed: 1.86
+  runClipSpeed: 4.08
 --- !u!114 &7171220024288944625
 MonoBehaviour:
   m_ObjectHideFlags: 0

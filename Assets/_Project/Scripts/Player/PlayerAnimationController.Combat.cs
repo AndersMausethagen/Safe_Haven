@@ -127,7 +127,7 @@ public sealed partial class PlayerAnimationController
                               || (animator.IsInTransition(moving) && animator.GetNextAnimatorStateInfo(moving).shortNameHash == swing.shortNameHash);
             if (!handedOver)
             {
-                UnderFullBody(moving, swing.shortNameHash, WalkOutFade, swing.normalizedTime * swing.length, WalkOutFade);
+                UnderFullBody(moving, swing.shortNameHash, WalkOutFade, swing.normalizedTime * swing.length, WalkOutFade, true);
             }
 
             return;
@@ -135,7 +135,7 @@ public sealed partial class PlayerAnimationController
 
         if (!leaving)
         {
-            animator.CrossFadeInFixedTime(EmptyStateHash, WalkOutFade, fullBodyLayer);
+            animator.CrossFadeInFixedTime(EmptyStateHash, Blend(WalkOutFade, true), fullBodyLayer);
         }
     }
 
@@ -243,6 +243,8 @@ public sealed partial class PlayerAnimationController
         }
         SetFloat(ActionSpeedHash, actionSpeed);
         float fade = fromHold ? ChargedReleaseFade : swing.Kind == SwingKind.Heavy ? HeavyFade : swing.Kind == SwingKind.Rush ? RushFade : ActionFade;
+        // From a swing still showing (a chain's next step, a heavy grown from the light): moving into moving, blended by coasting.
+        bool chained = false;
         // Each swing blends in over its measured Blend In (AttackFlow: no way into it moves the body faster than the swing itself,
         // and it is over before the strike), the user's "every attack transitions smoothly and fits in a chain" (2026-11-20).
         // Without one, up to ChainFade, done by half-way to the blow.
@@ -253,7 +255,8 @@ public sealed partial class PlayerAnimationController
             float beforeStrike = AttackFlowRules.BlendRoom(swing.Attack.HitDelay, swing.Attack.StrikeLead) / speed;
             // The blend AttackFlow measured for the way in it is: from the chain's swing before it, or from the ready pose (a guard,
             // the exploring or walking pose). A grown heavy takes up the light swing's pose, the same motion: a heavy's short blend.
-            float measured = grown ? 0f : SwingShowing() ? swing.Attack.BlendIn
+            chained = SwingShowing();
+            float measured = grown ? 0f : chained ? swing.Attack.BlendIn
                 : OutOfTheGuard() && swing.Attack.BlendInFromGuard > 0f ? swing.Attack.BlendInFromGuard : swing.Attack.BlendInFromReady;
             if (measured <= 0f && !grown)
             {
@@ -271,16 +274,16 @@ public sealed partial class PlayerAnimationController
         // Hand-overs that never show the ready pose between (PlayerAnimationController.Layers).
         if (layer == fullBodyLayer)
         {
-            IntoFullBody(hash, fade, offset);
+            IntoFullBody(hash, fade, offset, chained);
         }
         else
         {
-            UnderFullBody(layer, hash, fade, offset, othersFade);
+            UnderFullBody(layer, hash, fade, offset, othersFade, chained);
             foreach (int other in new[] { upperBodyLayer, attackArmsLayer })
             {
                 if (other >= 0 && other != layer && animator.HasState(other, EmptyStateHash) && LayerBusy(other))
                 {
-                    animator.CrossFadeInFixedTime(EmptyStateHash, othersFade, other);
+                    animator.CrossFadeInFixedTime(EmptyStateHash, Blend(othersFade, chained), other);
                 }
             }
         }

@@ -162,6 +162,58 @@ PrefabInstance:
       propertyPath: baseStats
       value: 
       objectReference: {fileID: 11400000, guid: cf1d47e3323d5c543a63e8c1c4b508b4, type: 2}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[0].state
+      value: Strike Chop
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[1].state
+      value: Strike Lunge
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[2].state
+      value: Strike Wide
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[0].length
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[1].length
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[2].length
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[0].contact
+      value: 0.267
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[1].contact
+      value: 0.233
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[2].contact
+      value: 0.583
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[0].windupEnd
+      value: 0.183
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[1].windupEnd
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5252362024859246381, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+      propertyPath: strikeClips.Array.data[2].windupEnd
+      value: 0.483
+      objectReference: {fileID: 0}
     - target: {fileID: 5457787183531467037, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
       propertyPath: turnSpeed
       value: 240

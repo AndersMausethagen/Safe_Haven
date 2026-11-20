@@ -135,69 +135,12 @@ public static class CombatSwingTiming
     public static bool TryTime(AttackDefinition attack, AnimationClip clip, out Timing timing)
     {
         timing = default;
-        if (attack == null || clip == null || attack.HitDelay < 0.08f)
+        if (attack == null || clip == null || attack.HitDelay < 0.08f || !TryPhases(clip, out float windupEnd, out float contact, out float settle))
         {
             return false;
         }
 
-        // The weapon hand: the right, but for a clip made for the off hand.
-        HumanBodyBones hand = clip.name.Contains("_Off") || clip.name.EndsWith("_L") ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand;
-        float[] speeds = HandSpeeds(clip, hand);
-        if (speeds == null)
-        {
-            return false;
-        }
-
-        float contact = CombatAnimationSetup.DrivenContact(clip, hand);
-        int c = Mathf.Clamp(Mathf.RoundToInt(contact / Step), 0, speeds.Length - 1);
-        // The swing's own top speed is at or just before the contact.
-        float peak = 0f;
-        for (int i = Mathf.Max(0, c - 4); i <= c; i++)
-        {
-            peak = Mathf.Max(peak, speeds[i]);
-        }
-
-        // The wind-up ends where the swing's drive begins: walking back from the contact while the hand keeps getting slower (the foot
-        // of the drive, the top of the backswing), but no further than where it falls under a fifth of the swing's top speed, so a
-        // clip that starts from a still pose doesn't count its whole raise as the swing.
-        // From the swing's top speed (the contact lies on or just past it).
-        int top = c;
-        for (int i = Mathf.Max(0, c - Mathf.RoundToInt(0.25f / Step)); i <= c; i++)
-        {
-            if (speeds[i] > speeds[top])
-            {
-                top = i;
-            }
-        }
-
-        peak = speeds[top];
-        int a = top;
-        while (a > 1 && speeds[a - 1] <= speeds[a])
-        {
-            a--;
-        }
-
-        int slow = top;
-        while (slow > 0 && speeds[slow] >= peak * 0.2f)
-        {
-            slow--;
-        }
-
-        a = Mathf.Max(a, slow);
-
-        int f = c + 3;
-        while (f < speeds.Length - 1 && speeds[f] >= peak * 0.2f)
-        {
-            f++;
-        }
-
-        float windupEnd = a * Step, settle = Mathf.Min(clip.length, f * Step);
         float swing = Mathf.Max(0.05f, contact - windupEnd);
-        if (contact <= 0.02f || peak <= 0.01f)
-        {
-            return false;
-        }
-
         float hit = attack.HitDelay;
         float tail = clip.length - contact;
         float chain = attack.RecoveryTime - hit;
@@ -258,6 +201,90 @@ public static class CombatSwingTiming
             Strained = strained,
         };
         return true;
+    }
+
+    /// <summary>
+    /// Where a monster's strike clip's wind-up ends (the top of the backswing) and its blow meets, in clip seconds, on the player's rig,
+    /// by whichever hand swings harder (a shield bash, a left claw: monster clips aren't named for the hand, review 2026-11-20). For
+    /// MonsterStrikeFit. False when it has no clear swing.
+    /// </summary>
+    public static bool TryMeasureEitherHand(AnimationClip clip, out float windupEnd, out float contact)
+    {
+        bool right = TryPhases(clip, HumanBodyBones.RightHand, out windupEnd, out contact, out _, out float rightPeak);
+        if (TryPhases(clip, HumanBodyBones.LeftHand, out float leftWindup, out float leftContact, out _, out float leftPeak) && (!right || leftPeak > rightPeak))
+        {
+            windupEnd = leftWindup;
+            contact = leftContact;
+            return true;
+        }
+
+        return right;
+    }
+
+    // The player's swings: the weapon hand, the right but for a clip made for the off hand.
+    private static bool TryPhases(AnimationClip clip, out float windupEnd, out float contact, out float settle) =>
+        TryPhases(clip, clip != null && (clip.name.Contains("_Off") || clip.name.EndsWith("_L")) ? HumanBodyBones.LeftHand : HumanBodyBones.RightHand,
+            out windupEnd, out contact, out settle, out _);
+
+    private static bool TryPhases(AnimationClip clip, HumanBodyBones hand, out float windupEnd, out float contact, out float settle, out float peak)
+    {
+        windupEnd = contact = settle = peak = 0f;
+        if (clip == null)
+        {
+            return false;
+        }
+
+        float[] speeds = HandSpeeds(clip, hand);
+        if (speeds == null)
+        {
+            return false;
+        }
+
+        contact = CombatAnimationSetup.DrivenContact(clip, hand);
+        int c = Mathf.Clamp(Mathf.RoundToInt(contact / Step), 0, speeds.Length - 1);
+        // The swing's own top speed is at or just before the contact.
+        for (int i = Mathf.Max(0, c - 4); i <= c; i++)
+        {
+            peak = Mathf.Max(peak, speeds[i]);
+        }
+
+        // The wind-up ends where the swing's drive begins: walking back from the contact while the hand keeps getting slower (the foot
+        // of the drive, the top of the backswing), but no further than where it falls under a fifth of the swing's top speed, so a
+        // clip that starts from a still pose doesn't count its whole raise as the swing.
+        // From the swing's top speed (the contact lies on or just past it).
+        int top = c;
+        for (int i = Mathf.Max(0, c - Mathf.RoundToInt(0.25f / Step)); i <= c; i++)
+        {
+            if (speeds[i] > speeds[top])
+            {
+                top = i;
+            }
+        }
+
+        peak = speeds[top];
+        int a = top;
+        while (a > 1 && speeds[a - 1] <= speeds[a])
+        {
+            a--;
+        }
+
+        int slow = top;
+        while (slow > 0 && speeds[slow] >= peak * 0.2f)
+        {
+            slow--;
+        }
+
+        a = Mathf.Max(a, slow);
+
+        int f = c + 3;
+        while (f < speeds.Length - 1 && speeds[f] >= peak * 0.2f)
+        {
+            f++;
+        }
+
+        windupEnd = a * Step;
+        settle = Mathf.Min(clip.length, f * Step);
+        return contact > 0.02f && peak > 0.01f;
     }
 
     // The hand's speed (character space) at each frame of the clip, on one copy of the player's rig.

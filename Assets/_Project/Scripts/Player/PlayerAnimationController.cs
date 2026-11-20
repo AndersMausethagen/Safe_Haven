@@ -214,6 +214,8 @@ public sealed partial class PlayerAnimationController : MonoBehaviour
             return;
         }
 
+        inertia = animator.GetComponent<PoseInertializer>();
+
         CacheParameters();
         upperBodyLayer = animator.GetLayerIndex("Upper Body");
         attackArmsLayer = animator.GetLayerIndex("Attack Arms");
