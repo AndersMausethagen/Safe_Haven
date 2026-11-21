@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.antlerwall
   displayName: Antler Wall
   description: Antlers nailed up on the lodge's wall. Game comes closer to a hunter's home, and people talk.
-  icon: {fileID: 21300000, guid: a669f5331b9cc9a4e96a8397d3aa9ba6, type: 3}
+  icon: {fileID: 21300000, guid: e9729104a36e3f94bb23e9c34b1a1576, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}

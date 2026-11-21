@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.kitbench
   displayName: Kit Bench
   description: 'A bench laid out for field kits: two made at once, for less than two.'
-  icon: {fileID: 21300000, guid: 472f7e10b57e28a4ebde3c4324f78b85, type: 3}
+  icon: {fileID: 21300000, guid: 30bdc35ffb1e2294d91e77c2a3446565, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}

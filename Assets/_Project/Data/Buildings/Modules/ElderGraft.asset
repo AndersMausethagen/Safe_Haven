@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.eldergraft
   displayName: Elder Graft
   description: A cutting of the guardian's root grafted to the lodge's post. Trees felled at home give more.
-  icon: {fileID: 21300000, guid: c89e18fea293da44da2d8281824405c0, type: 3}
+  icon: {fileID: 21300000, guid: 33b0a30e08606eb409a20b7798c45f86, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}

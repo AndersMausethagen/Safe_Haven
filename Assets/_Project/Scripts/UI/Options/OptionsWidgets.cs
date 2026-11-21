@@ -123,8 +123,10 @@ public static class OptionsWidgets
     public static Button Button(string name, Transform parent, string label, float fontSize, Action clicked, out TMP_Text text)
     {
         RectTransform rect = Rect(name, parent);
-        var image = rect.gameObject.AddComponent<Image>();
+        Image image = HearthKit.Sliced(rect.gameObject.AddComponent<Image>(), UIStyle.Current.Card, 1.4f);
         image.color = Color.white;
+        HearthKit.Rim(rect, 0.35f, 1.4f).name = "Rim";
+        UIHighlight.On(rect.gameObject);
         var button = rect.gameObject.AddComponent<Button>();
         button.targetGraphic = image;
         ColorBlock colours = button.colors;
@@ -145,9 +147,26 @@ public static class OptionsWidgets
     public static void Section(Transform content, string title)
     {
         RectTransform row = NewRow(content, "Section " + title, RowHeight + 6f);
-        TMP_Text text = Text("Title", row, title, 26f, Title, TextAlignmentOptions.BottomLeft);
-        Stretch((RectTransform)text.transform, new Vector2(4f, 8f));
+        TMP_Text text = Text("Title", row, title, 25f, Title, TextAlignmentOptions.BottomLeft);
+        Stretch((RectTransform)text.transform, new Vector2(4f, 10f));
+        UIStyle.Current.Title(text);
         text.fontStyle = FontStyles.Bold;
+        string icon = HearthKit.IconForHeading(title);
+        if (icon != null)
+        {
+            text.richText = true;
+            text.text = HearthKit.InlineIcon(icon) + "  " + title;
+        }
+
+        RectTransform rule = Rect("Rule", row);
+        rule.anchorMin = new Vector2(0f, 0f);
+        rule.anchorMax = new Vector2(1f, 0f);
+        rule.pivot = new Vector2(0.5f, 0f);
+        rule.offsetMin = new Vector2(4f, 4f);
+        rule.offsetMax = new Vector2(-4f, 5f);
+        Image line = rule.gameObject.AddComponent<Image>();
+        line.color = HearthKit.Faded(UIStyle.Current.Accent, 0.3f);
+        line.raycastTarget = false;
     }
 
     public static void Note(Transform content, string line)
@@ -204,6 +223,7 @@ public static class OptionsWidgets
         RectTransform control = LabelledRow(content, focus, show, out Action<bool> markPending);
         TMP_Text label = null;
         Image image = null;
+        Image rim = null;
         Button button = Button("Toggle", control, "", 22f, () =>
         {
             set(!get());
@@ -212,11 +232,15 @@ public static class OptionsWidgets
         }, out label);
         Stretch((RectTransform)button.transform);
         image = button.GetComponent<Image>();
+        rim = button.transform.Find("Rim").GetComponent<Image>();
         void Refresh()
         {
             bool on = get();
+            UIStyle style = UIStyle.Current;
             label.text = on ? "On" : "Off";
             image.color = on ? new Color(1.5f, 1.4f, 1f, 1f) : Color.white;
+            rim.color = HearthKit.Faded(style.Accent, on ? 0.85f : 0.25f);
+            label.color = on ? style.AccentBright : Muted;
             markPending(focus.IsPending);
         }
 
@@ -273,19 +297,23 @@ public static class OptionsWidgets
         RectTransform track = Rect("Track", area);
         track.anchorMin = new Vector2(0f, 0.5f);
         track.anchorMax = new Vector2(1f, 0.5f);
-        track.sizeDelta = new Vector2(0f, 10f);
-        track.gameObject.AddComponent<Image>().color = Track;
+        track.sizeDelta = new Vector2(0f, 12f);
+        UIStyle kit = UIStyle.Current;
+        Image trackImage = HearthKit.Sliced(track.gameObject.AddComponent<Image>(), kit.Card, 5f);
+        trackImage.color = kit.Track;
         RectTransform fillArea = Rect("Fill Area", track);
         Stretch(fillArea);
         RectTransform fill = Rect("Fill", fillArea);
         fill.sizeDelta = Vector2.zero;
-        fill.gameObject.AddComponent<Image>().color = Title;
+        Image fillImage = HearthKit.Sliced(fill.gameObject.AddComponent<Image>(), kit.Card, 5f);
+        fillImage.color = kit.Accent;
         RectTransform handleArea = Rect("Handle Area", track);
-        Stretch(handleArea, new Vector2(11f, 0f), new Vector2(-11f, 0f));
+        Stretch(handleArea, new Vector2(12f, 0f), new Vector2(-12f, 0f));
         RectTransform handle = Rect("Handle", handleArea);
-        handle.sizeDelta = new Vector2(22f, 30f);
-        var handleImage = handle.gameObject.AddComponent<Image>();
+        handle.sizeDelta = new Vector2(24f, 30f);
+        Image handleImage = HearthKit.Sliced(handle.gameObject.AddComponent<Image>(), kit.Card, 2f);
         handleImage.color = Color.white;
+        HearthKit.Rim(handle, 0.9f, 2f);
 
         var slider = area.gameObject.AddComponent<Slider>();
         slider.fillRect = fill;

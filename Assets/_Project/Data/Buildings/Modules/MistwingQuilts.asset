@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.mistwingquilts
   displayName: Mistwing Quilts
   description: 'Quilts stuffed with mistwing feathers: they keep the cold out.'
-  icon: {fileID: 21300000, guid: ea9079934f6821a41a85829f411ffd3d, type: 3}
+  icon: {fileID: 21300000, guid: ba3994ad426359e4cb489c5802d3ed9a, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 79557d0752e9c694ebfdb0a6e647f771, type: 2}

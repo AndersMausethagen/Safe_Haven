@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.apprenticescorner
   displayName: Apprentice's Corner
   description: A bench and a stool for a second pair of hands. While someone works here, the queue is longer and now and then one more comes off it.
-  icon: {fileID: 21300000, guid: 77a0db93d3269e9419f6f66f8048418b, type: 3}
+  icon: {fileID: 21300000, guid: c7de1de7807b78f45969265bbf29ef3b, type: 3}
   fits: 1
   buildings: []
   tier: 2
@@ -41,6 +41,10 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
   cost:
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
     amount: 10

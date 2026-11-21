@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.scarecrow
   displayName: Scarecrow
   description: 'Straw in an old shirt over the rows: now and then the plot gives one more.'
-  icon: {fileID: 21300000, guid: 856b3bedb97f441459bd5ab08b434303, type: 3}
+  icon: {fileID: 21300000, guid: f59e39fb9d3a73643a263f3b529d2b11, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}

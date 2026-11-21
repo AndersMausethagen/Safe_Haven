@@ -312,6 +312,11 @@ public sealed class BuildMenuWindow : MonoBehaviour
             card.Icon.preserveAspect = true;
             card.Icon.raycastTarget = false;
         }
+        else if (card.Building == null && style.Icon(ManageIcon(card)) != null)
+        {
+            // The Manage cards' marks from the kit (Hearthline 3), where text glyphs stood.
+            card.Icon = HearthKit.Icon(go.transform, ManageIcon(card), (CardSize - 70f) * 0.5f, 22f, 70f);
+        }
         else
         {
             TMP_Text glyph = Label("Glyph", go.transform, 0f, 10f, CardSize, 96f, 54f, style.Accent, TextAlignmentOptions.Center);
@@ -330,6 +335,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
     // The Manage cards' marks: up for upgrade, a cross for taking down, arrows for moving.
     private static string ManageGlyph(Card card) => card.ToDemolish ? "×" : card.ToUpgrade ? "▲" : "⇄";
+
+    // The same as kit icons: a star for raising it, an axe for taking it down, a wheel for moving it.
+    private static string ManageIcon(Card card) => card.ToDemolish ? "Axe" : card.ToUpgrade ? "Star" : "Wheel";
 
     private static void Shrink(TMP_Text text, float smallest)
     {
@@ -369,7 +377,9 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
             if (card.Icon != null)
             {
-                card.Icon.color = card.Affordable ? Color.white : new Color(1f, 1f, 1f, 0.4f);
+                // A building's painting is shown as painted; a Manage card's kit mark keeps the kit's gold.
+                card.Icon.color = card.Building == null ? HearthKit.IconColour(ManageIcon(card))
+                    : card.Affordable ? Color.white : new Color(1f, 1f, 1f, 0.4f);
             }
 
             // What can't be built yet goes grey; what it is short of in red under it.
@@ -423,7 +433,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
         buildButton.gameObject.SetActive(any);
         detailFrame.gameObject.SetActive(any);
-        detailIcon.gameObject.SetActive(any && card.Building != null && card.Building.Icon != null);
+        detailIcon.gameObject.SetActive(any && (card.Building != null ? card.Building.Icon != null : style.Icon(ManageIcon(card)) != null));
         detailGlyph.gameObject.SetActive(any && !detailIcon.gameObject.activeSelf);
         if (!any)
         {
@@ -434,12 +444,14 @@ public sealed class BuildMenuWindow : MonoBehaviour
         if (card.Building == null)
         {
             detailGlyph.text = ManageGlyph(card);
+            detailIcon.sprite = style.Icon(ManageIcon(card));
+            detailIcon.color = HearthKit.IconColour(ManageIcon(card));
             detailKind.text = "Manage";
             detailTags.text = "";
             detailText.text = card.ToDemolish
-                ? "Click a building you have built to take it down. Everything it cost, its upgrades too, comes back to your bag (or your chests when the bag is full). Empty a chest first."
+                ? "Click a building you have built to take it down. What it cost, its upgrades too, comes back to your bag (or your chests when the bag is full), less what mending any damage would take; its modules wait in store. Empty a chest first."
                 : card.ToUpgrade
-                ? "Click a building you have built to see what its next level costs and brings, or walk up to a ruin to repair it."
+                ? "Click a building you have built to see what its next tier costs and brings and to fit its modules, or walk up to a ruin to repair it."
                 : "Click a building you have built to pick it up, then place it somewhere else. Moving costs nothing.";
             buildLabel.text = "Choose a building";
             buildButton.interactable = true;
@@ -448,6 +460,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
 
         BuildingDefinition building = card.Building;
         detailIcon.sprite = building.Icon;
+        detailIcon.color = Color.white;
         detailGlyph.text = Initials(building.DisplayName);
         detailKind.text = BuildCategories.Name(BuildCategories.Of(building));
         detailTags.text = Tags(building, style);

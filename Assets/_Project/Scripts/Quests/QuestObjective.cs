@@ -313,6 +313,8 @@ public sealed class QuestObjective
         [ObjectiveType.LearnEnchantment] = true,
         [ObjectiveType.GiveInscription] = false,
         [ObjectiveType.EmpowerItem] = false,
+        // A friend's buildings take no modules of a visitor's (BuildingModules.WhyNot).
+        [ObjectiveType.FitModule] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>

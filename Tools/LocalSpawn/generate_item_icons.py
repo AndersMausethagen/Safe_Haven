@@ -10,7 +10,8 @@ to share one (five meals shared the stew).
   all   --model NAME  Every item in item_icons.json that has no icon yet -> Tools/LocalSpawn/ItemIcons/<id>.png
                       (--force paints them again; item ids are listed to paint only those)
   --set NAME          Another kind of icon (default items), each with its own list and folder (SETS below):
-                      buildings, skills (combat skills), proficiencies (the 13 skills), perks, resources, conditions, boons
+                      buildings, skills (combat skills), proficiencies (the 13 skills), perks, resources, conditions, boons,
+                      modules (building modules)
 
 Then in Unity: AgentScripts/BuildIcons.cs (entry Items, Buildings, Skills, Proficiencies, Perks or All) puts them in the game: into the item's own icon file where
 no other item uses it (so content builders that load that file keep it), a new file where several shared one.
@@ -43,6 +44,7 @@ SETS = {
     "resources": ("resource_icons.json", "ResourceIcons"),
     "conditions": ("condition_icons.json", "ConditionIcons"),
     "boons": ("boon_icons.json", "BoonIcons"),
+    "modules": ("module_icons.json", "ModuleIcons"),
 }
 SET = sys.argv[sys.argv.index("--set") + 1] if "--set" in sys.argv else "items"
 WANTED = os.path.join(HERE, SETS[SET][0])

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,8 +22,8 @@ public sealed class HavenHud : MonoBehaviour
     private const float GainY = -14f;
     private const float StandingSeconds = 0.5f;
     private const float StoreCheckSeconds = 0.4f;
-    private const float StoreWidth = 250f;
-    private const float StoreHeight = 44f;
+    private const float StoreWidth = 300f;
+    private const float StoreHeight = 62f;
     private const float StoreMargin = 26f;
 
     private TMP_Text badge;
@@ -41,6 +42,7 @@ public sealed class HavenHud : MonoBehaviour
     private RectTransform storePrompt;
     private CanvasGroup storeGroup;
     private TMP_Text storeKey;
+    private TMP_Text storeCount;
     private float nextStoreCheck;
     private bool storeWanted;
 
@@ -106,7 +108,7 @@ public sealed class HavenHud : MonoBehaviour
         BuildStorePrompt(root);
     }
 
-    // A dark card with a gold rim: the key in a keycap, then what it does.
+    // A dark card with a gold rim: the key in a keycap, the chest's painting, what it does and how much would go.
     private void BuildStorePrompt(Transform root)
     {
         UIStyle style = UIStyle.Current;
@@ -125,8 +127,32 @@ public sealed class HavenHud : MonoBehaviour
         capFace.raycastTarget = false;
         HearthKit.Rim(cap, 0.8f);
         storeKey = Label(cap, "Key Label", new Vector2(0.5f, 0.5f), new Vector2(46f, 30f), Vector2.zero, 18f, Gold, TextAlignmentOptions.Center, true);
-        TMP_Text what = Label(storePrompt, "Label", new Vector2(0f, 0.5f), new Vector2(StoreWidth - 70f, 30f), new Vector2(62f + (StoreWidth - 70f) * 0.5f, 0f), 18f, Body, TextAlignmentOptions.Left);
+        RectTransform chest = Rect("Chest", storePrompt, new Vector2(0f, 0.5f), new Vector2(48f, 48f), new Vector2(86f, 0f));
+        Image picture = chest.gameObject.AddComponent<Image>();
+        picture.sprite = ChestPicture();
+        picture.preserveAspect = true;
+        picture.raycastTarget = false;
+        picture.enabled = picture.sprite != null;
+        const float textX = 118f;
+        float textWidth = StoreWidth - textX - 12f;
+        TMP_Text what = Label(storePrompt, "Label", new Vector2(0f, 0.5f), new Vector2(textWidth, 26f), new Vector2(textX + textWidth * 0.5f, 10f), 18f, Body, TextAlignmentOptions.Left);
         what.text = "Store in chests";
+        storeCount = Label(storePrompt, "Count", new Vector2(0f, 0.5f), new Vector2(textWidth, 22f), new Vector2(textX + textWidth * 0.5f, -13f), 14f, HearthKit.Faded(Body, 0.7f), TextAlignmentOptions.Left);
+    }
+
+    // The Small Chest's painting (its build-menu icon); none if it can't be found.
+    private static Sprite ChestPicture()
+    {
+        ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        foreach (BuildingDefinition building in content != null ? content.Buildings : (IReadOnlyList<BuildingDefinition>)System.Array.Empty<BuildingDefinition>())
+        {
+            if (building != null && building.name == "SmallChest")
+            {
+                return building.Icon;
+            }
+        }
+
+        return null;
     }
 
     // Shown while the bag holds something the chests would take (StashQuickStack.HasSomethingToStore), above the minimap so the two
@@ -142,10 +168,12 @@ public sealed class HavenHud : MonoBehaviour
         {
             nextStoreCheck = Time.unscaledTime + StoreCheckSeconds;
             Player player = Player.Current;
-            storeWanted = player != null && StashQuickStack.HasSomethingToStore(player.gameObject);
+            int toStore = player != null ? StashQuickStack.CountToStore(player.gameObject) : 0;
+            storeWanted = toStore > 0;
             if (storeWanted)
             {
                 storeKey.text = GameInput.KeyLabel(GameInput.StackOnStored);
+                storeCount.text = $"{toStore} thing{(toStore == 1 ? "" : "s")} from your bag";
                 float map = MinimapSettings.Current != null ? MinimapSettings.Current.Size * HudRules.MinimapScale : 220f;
                 // Clear of the place name the minimap shows above itself (Haven Meadows).
                 storePrompt.anchoredPosition = new Vector2(-StoreMargin, StoreMargin + map + 62f);

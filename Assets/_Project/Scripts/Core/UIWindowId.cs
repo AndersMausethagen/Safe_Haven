@@ -50,4 +50,6 @@ public enum UIWindowId
     Portal = 21,
     /// <summary>A resident's page: their picture, home, work and story; where their home is chosen (ResidentWindow).</summary>
     ResidentPanel = 22,
+    /// <summary>A building's Upgrade window: its next tier and modules (BuildingUpgradeWindow, the build menu's Manage › Upgrade).</summary>
+    BuildingUpgrade = 23,
 }

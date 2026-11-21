@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -187,17 +188,23 @@ public static class BuildingDemolition
         string name = building != null && building.Definition != null ? building.Definition.DisplayName : "building";
         string body = Cheats.FreeCosts ? "Free building is on: it cost nothing, so nothing comes back."
             : back.Length == 0 ? "It cost nothing, so nothing comes back."
-            : Damage(building) > 0.001f ? $"What it cost comes back, less what mending its damage would take:\n<b>{back}</b>"
-            : $"Everything it cost comes back:\n<b>{back}</b>";
+            : Damage(building) > 0.001f ? "What it cost comes back to your bag, then your chests, less what mending its damage would take."
+            : "Everything it cost comes back to your bag, then your chests.";
+        if (building != null && building.TryGetComponent(out Construction fittedTo) && fittedTo.Fitted.Count > 0)
+        {
+            body += $" Its {string.Join(" and ", fittedTo.Fitted.Where(m => m != null).Select(m => m.DisplayName))} {(fittedTo.Fitted.Count == 1 ? "waits" : "wait")} in store, to fit again for free.";
+        }
         var page = new MenuPage
         {
             Title = $"Take down the {name}?",
             Body = body,
+            Picture = building != null && building.Definition != null ? building.Definition.Icon : null,
+            Haul = new MenuHaul { Title = "Comes back", Icon = "Coin", Sign = "+", Tint = UIStyle.Current.Good, Items = items, Resources = resources },
         };
         string refused = building != null ? WhyNot(building) : "It is gone.";
         page.Add(new MenuAction("Take it down", refused ?? "Into your bag, then your chests", refused == null,
             () => TakeDown(building, user), closesMenu: true) { Icon = "Hammer" });
-        page.Add(new MenuAction("Keep it", "", true, null, closesMenu: true));
+        page.Add(new MenuAction("Keep it", "", true, null, closesMenu: true) { Icon = "House" });
         return page;
     }
 

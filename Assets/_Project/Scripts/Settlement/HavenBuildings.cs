@@ -351,7 +351,15 @@ public static class HavenBuildings
         return string.Join("\n", parts.Where(part => part.Length > 0));
     }
 
-    private static string WhatItBrings(BuildingLevel level)
+    /// <summary>A tier's description, then its bonuses in words on the next line.</summary>
+    public static string WhatItBrings(BuildingLevel level)
+    {
+        string brings = BonusesOf(level);
+        return string.IsNullOrWhiteSpace(level.description) ? brings : brings.Length > 0 ? $"{level.description}\n{brings}" : level.description;
+    }
+
+    /// <summary>A tier's bonuses alone, in words, lower case: "15% faster, 1 more in the queue, 8 renown".</summary>
+    public static string BonusesOf(BuildingLevel level)
     {
         var parts = new List<string>();
         if (level.craftSpeed > 0f) parts.Add($"{Mathf.RoundToInt(level.craftSpeed * 100f)}% faster");
@@ -374,8 +382,7 @@ public static class HavenBuildings
         }
 
         if (level.renown > 0) parts.Add($"{level.renown} renown");
-        string brings = string.Join(", ", parts);
-        return string.IsNullOrWhiteSpace(level.description) ? brings : brings.Length > 0 ? $"{level.description}\n{brings}" : level.description;
+        return string.Join(", ", parts);
     }
 
     private static string BuildCostText(BuildingDefinition building)

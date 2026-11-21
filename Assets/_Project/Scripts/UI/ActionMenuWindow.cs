@@ -50,6 +50,20 @@ public sealed class MenuAction
     public string Status { get; set; } = "";
 }
 
+/// <summary>Things a MenuPage shows as cards with their pictures and counts (KitHaul): a heading, then each item and essence.</summary>
+public sealed class MenuHaul
+{
+    public string Title = "";
+    /// <summary>The kit icon before the heading; empty for none.</summary>
+    public string Icon = "";
+    /// <summary>What goes before each count: "+" for what comes back, "" for a cost.</summary>
+    public string Sign = "";
+    /// <summary>The counts' colour; the text colour when not set.</summary>
+    public Color? Tint;
+    public IReadOnlyList<ItemAmount> Items = System.Array.Empty<ItemAmount>();
+    public IReadOnlyList<ResourceAmount> Resources = System.Array.Empty<ResourceAmount>();
+}
+
 /// <summary>What an ActionMenuWindow shows: a title, a rich-text body and a list of choices.</summary>
 public sealed class MenuPage
 {
@@ -59,6 +73,8 @@ public sealed class MenuPage
     public string Body = "";
     /// <summary>A painting above the title (a raid event's scene), or null for none.</summary>
     public Sprite Picture;
+    /// <summary>Things shown as pictures under the body (what taking a building down gives back, what an upgrade costs), or null.</summary>
+    public MenuHaul Haul;
     public readonly List<MenuAction> Actions = new List<MenuAction>();
 
     public MenuPage Add(MenuAction action)
@@ -112,9 +128,6 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
     public bool IsOpen => window != null && window.IsOpen;
 
-    /// <summary>The hidden row its choices are copied from, for another window showing a MenuPage the same way (a station's Upgrade tab).</summary>
-    public ActionRowView RowTemplate => rowTemplate;
-
     /// <summary>True while it is open on what stands at <paramref name="near"/> (a horse's menu: CoopHorses).</summary>
     public bool IsOpenAt(Transform near) => IsOpen && near != null && anchor == near;
 
@@ -124,6 +137,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
         rowTemplate.gameObject.SetActive(false);
         closeButton.onClick.AddListener(Close);
         AddPicture();
+        AddHaul();
         window.OpenChanged += OnOpenChanged;
     }
 
@@ -187,6 +201,7 @@ public sealed class ActionMenuWindow : MonoBehaviour
         string story = string.IsNullOrWhiteSpace(page.Story) ? "" : $"<i>{page.Story}</i>\n\n";
         bodyLabel.text = story + HearthKit.ToneNumbers(GameInput.WithRebinds(page.Body));
         bodyLabel.gameObject.SetActive(!string.IsNullOrEmpty(page.Body));
+        ShowHaul(page.Haul);
         while (rows.Count < page.Actions.Count)
         {
             ActionRowView row = Instantiate(rowTemplate, actionList);
@@ -205,6 +220,39 @@ public sealed class ActionMenuWindow : MonoBehaviour
         }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)actionList.parent);
+    }
+
+    // The page's things as cards, one more child of the panel's layout, under the body (Hearthline 3: pictures, not a list of words).
+    private const float HaulCard = 64f;
+    private KitHaul haul;
+    private LayoutElement haulLayout;
+
+    private void AddHaul()
+    {
+        var holder = new GameObject("Haul", typeof(RectTransform));
+        holder.transform.SetParent(bodyLabel.transform.parent, false);
+        holder.transform.SetSiblingIndex(bodyLabel.transform.GetSiblingIndex() + 1);
+        haulLayout = holder.AddComponent<LayoutElement>();
+        haul = new KitHaul((RectTransform)holder.transform, "Things", 0f, HaulCard);
+        holder.SetActive(false);
+    }
+
+    private void ShowHaul(MenuHaul shown)
+    {
+        GameObject holder = haulLayout.gameObject;
+        bool any = shown != null && (shown.Items.Count > 0 || shown.Resources.Count > 0);
+        holder.SetActive(any);
+        if (!any)
+        {
+            return;
+        }
+
+        // Laid out first, so the cards are spread over the width the panel gives it.
+        LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)holder.transform.parent);
+        float height = haul.Show(shown.Title, string.IsNullOrEmpty(shown.Icon) ? null : shown.Icon, shown.Tint ?? UIStyle.Current.Text, shown.Sign,
+            shown.Items, shown.Resources, null);
+        haulLayout.preferredHeight = height;
+        haulLayout.minHeight = height;
     }
 
     // Built here rather than in the prefab: one more child of the panel's layout, just above the title.

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.hagsknot
   displayName: Hag's Knot
   description: A troll-hag's knot hung over the door. Harm that comes at the building goes back the way it came.
-  icon: {fileID: 21300000, guid: 7d25e0503e7c08346841d7e105827407, type: 3}
+  icon: {fileID: 21300000, guid: 962bd874f81071746a7dc2dc32b59657, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}

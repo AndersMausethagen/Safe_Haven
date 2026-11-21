@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.maptable
   displayName: Map Table
   description: 'A table of the raids'' ways, marked as the watch hears of them: one more thing foretold before you go.'
-  icon: {fileID: 21300000, guid: 765760a5da280e34d9976139ea67cca7, type: 3}
+  icon: {fileID: 21300000, guid: 42dd7493d0d1f67498c39df38111f3ca, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}

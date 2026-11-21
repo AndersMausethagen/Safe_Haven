@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.fletchersjig
   displayName: Fletcher's Jig
   description: 'A jig for shafts and fletching: arrows come off it in bigger bundles than by hand.'
-  icon: {fileID: 21300000, guid: ea9079934f6821a41a85829f411ffd3d, type: 3}
+  icon: {fileID: 21300000, guid: 98d329ae99a10e4469650242181cd441, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}

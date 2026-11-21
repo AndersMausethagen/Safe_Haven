@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.framesaw
   displayName: Frame Saw
   description: 'A thin blade in a frame: more planks from a log, less of it lost to sawdust.'
-  icon: {fileID: 21300000, guid: 8cedc6dbb9443d34185e290326cf2464, type: 3}
+  icon: {fileID: 21300000, guid: 4e33492ced429504992a572c737c1f1d, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}

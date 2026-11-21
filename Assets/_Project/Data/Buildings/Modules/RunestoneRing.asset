@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.runestonering
   displayName: Runestone Ring
   description: A ring of cut granite with a runestone set in it. Worked by someone who knows the words, the altar gives more.
-  icon: {fileID: 21300000, guid: 765760a5da280e34d9976139ea67cca7, type: 3}
+  icon: {fileID: 21300000, guid: 62b5e580c2b020d4fb449ac492da7b71, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}

@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.runeshelf
   displayName: Rune Shelf
   description: 'A shelf of marked jars by the cauldron: now and then a draught more than the batch.'
-  icon: {fileID: 21300000, guid: df2c0330200f4a649aa8e1ce0cff5d61, type: 3}
+  icon: {fileID: 21300000, guid: d05fbff9e6f7feb4bbc2f31c8a01e7bd, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}

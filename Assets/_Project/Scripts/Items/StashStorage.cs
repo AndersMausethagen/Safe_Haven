@@ -78,8 +78,14 @@ public sealed class StashStorage
     /// Whether <see cref="StackOnStored"/> or <see cref="StoreMaterials(ItemContainer, System.Func{ItemStack, bool}, GameObject, int)"/>
     /// would move anything from <paramref name="bag"/>: a material, or a stack an open chest already holds, with room for it.
     /// </summary>
-    public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep)
+    public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep) => CountToStore(bag, keep, true) > 0;
+
+    /// <summary>How many things in <paramref name="bag"/> would go to the chests (as <see cref="HasSomethingToStore"/> asks), for the prompt.</summary>
+    public int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep) => CountToStore(bag, keep, false);
+
+    private int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep, bool firstOnly)
     {
+        int count = 0;
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
@@ -88,21 +94,23 @@ public sealed class StashStorage
                 continue;
             }
 
-            if (stack.Item.Category == ItemCategory.Material)
+            bool goes = stack.Item.Category == ItemCategory.Material;
+            for (int block = 0; !goes && block < MaxChests; block++)
             {
-                return true;
+                goes = BlockHolds(block, stack.Item);
             }
 
-            for (int block = 0; block < MaxChests; block++)
+            if (goes)
             {
-                if (BlockHolds(block, stack.Item))
+                count += stack.Count;
+                if (firstOnly)
                 {
-                    return true;
+                    return count;
                 }
             }
         }
 
-        return false;
+        return count;
     }
 
     /// <summary>

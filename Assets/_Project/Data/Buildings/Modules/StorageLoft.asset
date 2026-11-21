@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.storageloft
   displayName: Storage Loft
   description: 'A loft over the bench for what is done: a second kind of thing can wait while the first is still uncollected, so the queue doesn''t stop when the work changes.'
-  icon: {fileID: 21300000, guid: 55ea9404246bfe24c8ec49ddff46071b, type: 3}
+  icon: {fileID: 21300000, guid: 8b713076d66740f46b1837635fd6a997, type: 3}
   fits: 1
   buildings: []
   tier: 1
@@ -41,6 +41,10 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
   cost:
   - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 8

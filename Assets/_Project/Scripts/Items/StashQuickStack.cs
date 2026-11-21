@@ -29,6 +29,18 @@ public static class StashQuickStack
         return GameSession.Stash.HasSomethingToStore(inventory.Container, stack => Keeps(inventory, skills, stack));
     }
 
+    /// <summary>How many things the bag would put in the chests now (0 where it can't), for the Haven's prompt.</summary>
+    public static int CountToStore(GameObject player)
+    {
+        if (!CanStack(player) || !player.TryGetComponent(out ItemInventory inventory))
+        {
+            return 0;
+        }
+
+        PlayerSkills skills = player.GetComponent<PlayerSkills>();
+        return GameSession.Stash.CountToStore(inventory.Container, stack => Keeps(inventory, skills, stack));
+    }
+
     /// <summary>Stores the bag in the chests and says what happened. Returns how many items moved.</summary>
     public static int Stack(GameObject player)
     {

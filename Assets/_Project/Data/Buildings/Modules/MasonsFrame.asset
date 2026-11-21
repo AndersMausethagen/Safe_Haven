@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.masonsframe
   displayName: Mason's Frame
   description: 'A frame to square stone on: blocks are cut with less waste.'
-  icon: {fileID: 21300000, guid: 53af8a26dfd6e484ca0ced6ecdfa516e, type: 3}
+  icon: {fileID: 21300000, guid: ccb77d3932f61ee469774d1b97288a8a, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}

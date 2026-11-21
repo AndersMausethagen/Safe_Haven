@@ -238,9 +238,11 @@ public sealed class OptionsScreen : MonoBehaviour
         rim.effectDistance = new Vector2(2f, -2f);
         HearthlineArt.AddFrame(panel, style, RaidDirector.Current != null);
 
-        TMP_Text title = OptionsWidgets.Text("Title", panel, "Options", 38f, OptionsWidgets.Title);
+        TMP_Text title = OptionsWidgets.Text("Title", panel, "Options", 40f, OptionsWidgets.Title);
         OptionsWidgets.Place((RectTransform)title.transform, new Vector2(0f, 1f), new Vector2(400f, 56f), new Vector2(Margin, -22f));
-        title.fontStyle = FontStyles.Bold;
+        // The window's name carved in the display face, as every window's is (Hearthline 2); never bold (specks round the letters).
+        style.Display(title);
+        title.overflowMode = TextOverflowModes.Overflow;
         status = OptionsWidgets.Text("Status", panel, "", 22f, OptionsWidgets.Muted, TextAlignmentOptions.MidlineRight);
         OptionsWidgets.Place((RectTransform)status.transform, new Vector2(1f, 1f), new Vector2(560f, 56f), new Vector2(-Margin, -22f));
 
@@ -292,7 +294,9 @@ public sealed class OptionsScreen : MonoBehaviour
         OptionsWidgets.Place((RectTransform)discardButton.transform, new Vector2(1f, 0f), new Vector2(170f, 50f), new Vector2(-Margin - 434f, 26f));
 
         RectTransform bar = OptionsWidgets.Place(OptionsWidgets.Rect("Confirm", panel), new Vector2(0.5f, 0f), new Vector2(760f, 50f), new Vector2(-60f, ListBottom - 60f));
-        bar.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
+        Image barFace = HearthKit.Sliced(bar.gameObject.AddComponent<Image>(), style.Card, 1.2f);
+        barFace.color = style.Inset;
+        HearthKit.Rim(bar, 0.6f);
         confirmBar = bar.gameObject;
         confirmText = OptionsWidgets.Text("Text", bar, "", 20f, OptionsWidgets.Title);
         OptionsWidgets.Stretch((RectTransform)confirmText.transform, new Vector2(12f, 0f), new Vector2(-220f, 0f));
@@ -315,10 +319,16 @@ public sealed class OptionsScreen : MonoBehaviour
         box.pivot = new Vector2(1f, 0.5f);
         box.offsetMin = new Vector2(-Margin - DetailsWidth, ListBottom);
         box.offsetMax = new Vector2(-Margin, -ListTop);
-        box.gameObject.AddComponent<Image>().color = OptionsWidgets.Track;
+        // Hearthline 3: a card with a gold rim and the kit's mark, as the other windows' panels are (the user, 2026-11-21: "proper art work").
+        Image face = HearthKit.Sliced(box.gameObject.AddComponent<Image>(), style.Card, 1.2f);
+        face.color = style.Inset;
+        face.raycastTarget = false;
+        HearthKit.Rim(box, 0.45f);
+        HearthKit.Icon(box, "Info", 20f, 20f, 30f);
         detailName = OptionsWidgets.Text("Name", box, "", 28f, OptionsWidgets.Title, TextAlignmentOptions.TopLeft);
+        style.Title(detailName);
         detailName.fontStyle = FontStyles.Bold;
-        OptionsWidgets.Place((RectTransform)detailName.transform, new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 76f), new Vector2(20f, -18f));
+        OptionsWidgets.Place((RectTransform)detailName.transform, new Vector2(0f, 1f), new Vector2(DetailsWidth - 82f, 76f), new Vector2(62f, -18f));
         detailValue = OptionsWidgets.Text("Value", box, "", 20f, style.Accent, TextAlignmentOptions.TopLeft);
         OptionsWidgets.Place((RectTransform)detailValue.transform, new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 96f), new Vector2(20f, -96f));
         RectTransform rule = OptionsWidgets.Place(OptionsWidgets.Rect("Rule", box), new Vector2(0f, 1f), new Vector2(DetailsWidth - 40f, 2f), new Vector2(20f, -196f));
@@ -338,26 +348,26 @@ public sealed class OptionsScreen : MonoBehaviour
         OptionsWidgets.Stretch(shade);
         shade.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
         askBox = shade.gameObject;
-        RectTransform box = OptionsWidgets.Place(OptionsWidgets.Rect("Box", shade), new Vector2(0.5f, 0.5f), new Vector2(760f, 330f), Vector2.zero);
-        box.gameObject.AddComponent<Image>().color = OptionsWidgets.Panel;
-        var outline = box.gameObject.AddComponent<Outline>();
-        outline.effectColor = UIStyle.Current.Accent;
-        outline.effectDistance = new Vector2(2f, -2f);
+        RectTransform box = OptionsWidgets.Place(OptionsWidgets.Rect("Box", shade), new Vector2(0.5f, 0.5f), new Vector2(860f, 360f), Vector2.zero);
+        // The gilded panel every window has: its ground, rim and scroll corners (clear of them: the words and buttons inset).
+        HearthKit.Dress(box);
         TMP_Text heading = OptionsWidgets.Text("Heading", box, "Unsaved changes", 32f, OptionsWidgets.Title, TextAlignmentOptions.TopLeft);
+        UIStyle.Current.Title(heading);
         heading.fontStyle = FontStyles.Bold;
-        OptionsWidgets.Place((RectTransform)heading.transform, new Vector2(0f, 1f), new Vector2(700f, 48f), new Vector2(30f, -24f));
+        OptionsWidgets.Place((RectTransform)heading.transform, new Vector2(0f, 1f), new Vector2(700f, 48f), new Vector2(80f, -34f));
+        HearthKit.Rule(box, 60f, 88f, 740f);
         askText = OptionsWidgets.Text("Text", box, "", 22f, OptionsWidgets.Body, TextAlignmentOptions.TopLeft);
-        OptionsWidgets.Place((RectTransform)askText.transform, new Vector2(0f, 1f), new Vector2(700f, 150f), new Vector2(30f, -80f));
+        OptionsWidgets.Place((RectTransform)askText.transform, new Vector2(0f, 1f), new Vector2(720f, 140f), new Vector2(70f, -104f));
         askSave = OptionsWidgets.Button("Save", box, "Save and Leave", 21f, SaveAndLeave, out _);
-        OptionsWidgets.Place((RectTransform)askSave.transform, new Vector2(0f, 0f), new Vector2(220f, 50f), new Vector2(30f, 26f));
+        OptionsWidgets.Place((RectTransform)askSave.transform, new Vector2(0f, 0f), new Vector2(220f, 52f), new Vector2(70f, 44f));
         Button leave = OptionsWidgets.Button("Leave", box, "Leave Without Saving", 21f, () =>
         {
             draft.Discard();
             Leave();
         }, out _);
-        OptionsWidgets.Place((RectTransform)leave.transform, new Vector2(0.5f, 0f), new Vector2(250f, 50f), new Vector2(0f, 26f));
+        OptionsWidgets.Place((RectTransform)leave.transform, new Vector2(0.5f, 0f), new Vector2(250f, 52f), new Vector2(0f, 44f));
         Button keep = OptionsWidgets.Button("Keep Editing", box, "Keep Editing", 21f, KeepEditing, out _);
-        OptionsWidgets.Place((RectTransform)keep.transform, new Vector2(1f, 0f), new Vector2(220f, 50f), new Vector2(-30f, 26f));
+        OptionsWidgets.Place((RectTransform)keep.transform, new Vector2(1f, 0f), new Vector2(220f, 52f), new Vector2(-70f, 44f));
         askBox.SetActive(false);
     }
 
@@ -400,7 +410,13 @@ public sealed class OptionsScreen : MonoBehaviour
         saveButton.interactable = count > 0;
         discardButton.interactable = count > 0;
         saveLabel.text = count > 0 ? $"Save Changes ({count})" : "Save Changes";
-        saveLabel.color = count > 0 ? style.Accent : OptionsWidgets.Muted;
+        saveLabel.color = count > 0 ? style.AccentBright : OptionsWidgets.Muted;
+        // While changes wait, Save is the one lit: a gold rim round it.
+        Transform saveRim = saveButton.transform.Find("Rim");
+        if (saveRim != null)
+        {
+            saveRim.GetComponent<Image>().color = HearthKit.Faded(style.Accent, count > 0 ? 0.95f : 0.3f);
+        }
     }
 
     private void Save()
@@ -536,10 +552,19 @@ public sealed class OptionsScreen : MonoBehaviour
     private void ShowTab(int index)
     {
         tab = index;
+        UIStyle kit = UIStyle.Current;
         for (int i = 0; i < tabs.Count; i++)
         {
-            tabs[i].label.color = i == tab ? OptionsWidgets.Title : OptionsWidgets.Body;
-            tabs[i].label.fontStyle = i == tab ? FontStyles.Bold : FontStyles.Normal;
+            bool on = i == tab;
+            tabs[i].label.color = on ? kit.AccentBright : OptionsWidgets.Body;
+            tabs[i].label.fontStyle = on ? FontStyles.Bold : FontStyles.Normal;
+            Transform rim = tabs[i].button.transform.Find("Rim");
+            if (rim != null)
+            {
+                rim.GetComponent<Image>().color = HearthKit.Faded(kit.Accent, on ? 0.9f : 0.3f);
+            }
+
+            tabs[i].button.image.color = on ? Color.Lerp(Color.white, kit.AccentDeep, 0.35f) * 1.6f : Color.white;
         }
 
         Clear();

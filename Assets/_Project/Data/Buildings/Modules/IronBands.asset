@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.ironbands
   displayName: Iron Bands
   description: 'Iron strapped over the corners and the door: it takes a great deal more to break it.'
-  icon: {fileID: 21300000, guid: c9db21512378b1049921c17f91751c81, type: 3}
+  icon: {fileID: 21300000, guid: 23a1e11cb7ae5f54f8e84fcb16301f5d, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}

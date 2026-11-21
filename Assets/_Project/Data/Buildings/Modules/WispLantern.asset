@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.wisplantern
   displayName: Wisp Lantern
   description: 'A wisp''s ember in a lantern over the fire: a cold spark that won''t go out, and the night keeps further off.'
-  icon: {fileID: 21300000, guid: 9d5bd5e0d14d323499f55081363945ae, type: 3}
+  icon: {fileID: 21300000, guid: bc5c8e37fd0783e4386f9850f6e9ed52, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}

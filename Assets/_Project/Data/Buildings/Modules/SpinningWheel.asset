@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.spinningwheel
   displayName: Spinning Wheel
   description: 'Flax spun fine on a wheel: linen from less of it.'
-  icon: {fileID: 21300000, guid: 1f85709f97b03e34794d77959b3d0044, type: 3}
+  icon: {fileID: 21300000, guid: 456498efdd5e5184887306b567124002, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}

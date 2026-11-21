@@ -201,10 +201,8 @@ public sealed class StationWindow : MonoBehaviour
 
     private const float TabWidth = 150f;
     private const float TabHeight = 36f;
-    private const float UpgradeTextWidth = 400f;
 
     private readonly List<GameObject> craftParts = new List<GameObject>();
-    private readonly List<ActionRowView> upgradeRows = new List<ActionRowView>();
     private RectTransform tabsRow;
     private Button craftTab;
     private Button upgradeTab;
@@ -213,10 +211,7 @@ public sealed class StationWindow : MonoBehaviour
     private Image craftTabShown;
     private Image upgradeTabShown;
     private RectTransform upgradePanel;
-    private TMP_Text upgradeTitle;
-    private TMP_Text upgradeBody;
-    private RectTransform upgradeList;
-    private TMP_Text upgradeEmpty;
+    private StationUpgradeTab upgradeView;
     private bool showingUpgrade;
 
     /// <summary>True while the Upgrade tab is shown.</summary>
@@ -261,34 +256,7 @@ public sealed class StationWindow : MonoBehaviour
             float width = panel.rect.width - 48f;
             float height = panel.rect.height - listTop - 24f;
             upgradePanel = CodeUI.At("Upgrade Page", panel, 24f, listTop, width, height);
-            upgradeTitle = CodeUI.Label("Title", upgradePanel, 0f, 0f, UpgradeTextWidth, 40f, 28f, style.Text);
-            style.Title(upgradeTitle);
-            upgradeTitle.overflowMode = TextOverflowModes.Overflow;
-            upgradeBody = CodeUI.Paragraph("Body", upgradePanel, 0f, 50f, UpgradeTextWidth, height - 50f, 18f, style.Text);
-            upgradeBody.richText = true;
-            upgradeBody.enableAutoSizing = true;
-            upgradeBody.fontSizeMin = 13f;
-            upgradeBody.fontSizeMax = 18f;
-
-            float listX = UpgradeTextWidth + 24f;
-            RectTransform area = CodeUI.At("Choices", upgradePanel, listX, 0f, width - listX, height);
-            var scroll = area.gameObject.AddComponent<ScrollRect>();
-            scroll.horizontal = false;
-            scroll.movementType = ScrollRect.MovementType.Clamped;
-            scroll.scrollSensitivity = 40f;
-            area.gameObject.AddComponent<RectMask2D>();
-            area.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
-            upgradeList = CodeUI.At("Rows", area, 0f, 0f, width - listX, 0f);
-            var layout = upgradeList.gameObject.AddComponent<VerticalLayoutGroup>();
-            layout.spacing = 6f;
-            layout.childControlWidth = true;
-            layout.childForceExpandWidth = true;
-            layout.childControlHeight = false;
-            layout.childForceExpandHeight = false;
-            upgradeList.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            scroll.content = upgradeList;
-            scroll.viewport = area;
-            upgradeEmpty = CodeUI.Paragraph("Empty", area, 0f, 0f, width - listX, 80f, 18f, style.Muted);
+            upgradeView = new StationUpgradeTab(upgradePanel, RefreshUpgrade);
             upgradePanel.gameObject.SetActive(false);
             PadTabs.Register(this, () => IsOpen && showingUpgrade, direction => ShowUpgrade(!showingUpgrade), () => new[] { tabsRow });
         }
@@ -331,9 +299,6 @@ public sealed class StationWindow : MonoBehaviour
         float height = panel.rect.height - contentTop - 24f;
         upgradePanel.anchoredPosition = new Vector2(24f, -contentTop);
         upgradePanel.sizeDelta = new Vector2(panel.rect.width - 48f, height);
-        upgradeBody.rectTransform.sizeDelta = new Vector2(UpgradeTextWidth, height - 50f);
-        var area = (RectTransform)upgradeList.parent;
-        area.sizeDelta = new Vector2(area.sizeDelta.x, height);
     }
 
     private void ShowUpgrade(bool upgrade)
@@ -368,55 +333,15 @@ public sealed class StationWindow : MonoBehaviour
         }
     }
 
-    // The page ConstructionUpgradeOffer makes for this building, drawn here: what the next tier brings on the left, the choices on the right.
+    // The next tier and the modules, drawn by the tab from the building's own rules (StationUpgradeTab).
     private void RefreshUpgrade()
     {
-        if (!showingUpgrade || station == null || upgradePanel == null)
+        if (!showingUpgrade || station == null || upgradeView == null || !IsOpen)
         {
             return;
         }
 
-        MenuPage page = station.TryGetComponent(out BuildingObject building) ? ConstructionUpgradeOffer.PageFor(building, user) : null;
-        upgradeTitle.text = page != null ? page.Title : "Nothing to improve now";
-        upgradeBody.text = page != null ? GameInput.WithRebinds(page.Body) : "";
-        int count = page != null ? page.Actions.Count : 0;
-        ActionRowView template = ActionMenuWindow.Current != null ? ActionMenuWindow.Current.RowTemplate : null;
-        while (template != null && upgradeRows.Count < count)
-        {
-            ActionRowView row = Instantiate(template, upgradeList);
-            row.Clicked += OnUpgradeChosen;
-            upgradeRows.Add(row);
-        }
-
-        for (int i = 0; i < upgradeRows.Count; i++)
-        {
-            bool used = i < count;
-            upgradeRows[i].gameObject.SetActive(used);
-            if (used)
-            {
-                upgradeRows[i].Bind(page.Actions[i]);
-            }
-        }
-
-        upgradeEmpty.gameObject.SetActive(count == 0);
-        upgradeEmpty.text = ConstructionOf(station) is Construction c && c.IsBuilding ? GameInput.WithRebinds("Being built: hold {key:Hammer} at its scaffold.") : "";
-        LayoutRebuilder.ForceRebuildLayoutImmediate(upgradeList);
-    }
-
-    private static Construction ConstructionOf(CraftingStation at) => at != null && at.TryGetComponent(out Construction c) ? c : null;
-
-    private void OnUpgradeChosen(MenuAction action)
-    {
-        if (action == null || !action.Enabled)
-        {
-            return;
-        }
-
-        action.Chosen?.Invoke();
-        if (IsOpen)
-        {
-            RefreshUpgrade();
-        }
+        upgradeView.Show(station.GetComponent<BuildingObject>(), user);
     }
 
     public void Close()

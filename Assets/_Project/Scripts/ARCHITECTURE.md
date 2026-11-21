@@ -2850,6 +2850,13 @@ From the user's list after their 72-minute run.
   a share of the health lost comes back on the striker, never the player's side), Fight Share (`WatchPostArcher`). Fine Chance
   (`StationQueue.FineChance`) adds to gear quality when it is collected (`CraftedWork.Make`). `Construction.IsStaffed` covers buildings
   that aren't stations (the altar). Raids see fitted modules (`SettlementState.NoteBuildings` notes them, `UpgradeBonus` adds them).
-  A building taken down puts its modules in store. Not yet: the hammered fitting job, a tab in the station window itself, modules
+  A building taken down puts its modules in store.
+- **Upgrade tab and window** (2026-11-21, the user's UX pass: "proper art work, not just boxes of text"): `StationUpgradeTab` draws a
+  building's next tier (medal, lines with pictures, cost chips held/needed, the button) and its modules (slot cards, rows with each
+  module's painting, Fit) from the kit; `StationWindow` shows it as its Upgrade tab, `BuildingUpgradeWindow` (UIWindowId 23) for any
+  other building and the build menu's Manage › Upgrade (a wall piece keeps its action-menu page). `MenuPage.Haul` (`MenuHaul`) shows
+  things as KitHaul cards in any ActionMenuWindow page (the take-down refund, an upgrade's cost). Module icons:
+  `Tools/LocalSpawn/module_icons.json` (`generate_item_icons.py --set modules`), in `Art/Icons/Modules`.
+  Not yet: the hammered fitting job, modules
   needing new items (Barrow-iron Anvil, Jeweller's Bench, Burl Still, Jutul Cold Store, Bloomery Hearth, Nykk-hair Lines, Brukam's Horn,
   Living Heart) and their quests and rumours; the Storage Shed's two (the shed already holds a chest's 60-slot most).
