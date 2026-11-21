@@ -258,7 +258,7 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "" });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "" });
         }
 
         foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
@@ -289,7 +289,8 @@ public static class SaveMapper
 
         foreach (StationQueue queue in settlement.Workshops.Queues)
         {
-            if (queue.IsIdle && queue.Output == null)
+            // One with nothing in it is left out; one whose worker has fetched for an order isn't (that would be lost).
+            if (queue.IsIdle && queue.Output == null && queue.Supplies.Count == 0)
             {
                 continue;
             }
@@ -314,6 +315,11 @@ public static class SaveMapper
             foreach (StationQueue.Job job in queue.Jobs)
             {
                 station.jobs.Add(new StationJobSaveData { recipe = job.Recipe.Id, count = job.Count });
+            }
+
+            foreach (var supply in queue.Supplies)
+            {
+                station.supplies.Add(new StationOutputSaveData { id = supply.Key.Id, isResource = false, amount = supply.Value });
             }
 
             into.stations.Add(station);
@@ -375,6 +381,8 @@ public static class SaveMapper
                 restored.HomeChosen = entry.homeChosen ?? "";
                 restored.Workplace = entry.workplace ?? "";
                 restored.WorkQueue = entry.workQueue ?? "";
+                restored.HaulDone = Math.Max(0f, entry.haulDone);
+                restored.WorkGear = string.IsNullOrEmpty(entry.workGear) ? null : Resolve(content.FindItem(entry.workGear), "item", entry.workGear, missing);
             }
         }
 
@@ -464,6 +472,15 @@ public static class SaveMapper
             queue.OutputSlots = 1 + more.Count;
             queue.Restore(jobs, entry.progress, output, entry.outputAmount, more);
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
+            foreach (StationOutputSaveData supply in entry.supplies ?? new List<StationOutputSaveData>())
+            {
+                ItemDefinition fetched = supply == null || string.IsNullOrEmpty(supply.id) ? null : content.FindItem(supply.id);
+                if (fetched != null && supply.amount > 0)
+                {
+                    queue.AddSupply(fetched, supply.amount);
+                }
+            }
+
             into.Add(queue);
         }
     }

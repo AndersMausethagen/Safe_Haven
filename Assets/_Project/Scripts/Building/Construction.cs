@@ -381,9 +381,17 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Refresh();
     }
 
+    // Work added by builders this frame, shown in Update (ShowRise moves every part and tints every renderer).
+    private bool riseDirty;
+
     private void Update()
     {
         look.Tick();
+        if (riseDirty)
+        {
+            riseDirty = false;
+            ShowRise();
+        }
 
         if (siteInteractable == null || !siteInteractable.IsInUse)
         {
@@ -457,9 +465,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             return 0f;
         }
 
+        // The player hammering it finishes it themselves (their Construction practice, their last blow): helpers bring the work to its
+        // end, never past it, and the player's shortened bar (Update) completes it the next frame.
+        bool playerHammers = siteInteractable != null && siteInteractable.IsInUse && Player.IsPlayer(siteInteractable.Interactor);
         float used = Mathf.Min(seconds, WorkNeeded - Work);
         Work += used;
-        if (Work + 0.01f >= WorkNeeded)
+        if (!playerHammers && Work + 0.01f >= WorkNeeded)
         {
             FinishedByOthers = true;
             try
@@ -473,7 +484,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         }
         else
         {
-            ShowRise();
+            // Shown once a frame however many hands are at it (Update), not once a builder.
+            riseDirty = true;
             // A builder's blows are heard and seen too, not only the player's.
             if (Application.isPlaying && Time.time >= nextBlow)
             {

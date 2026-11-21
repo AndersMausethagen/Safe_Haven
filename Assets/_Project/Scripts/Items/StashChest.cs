@@ -95,6 +95,29 @@ public sealed class StashChest : MonoBehaviour, ISaveable
         return total;
     }
 
+    /// <summary>The nearest finished chest within <paramref name="reach"/> metres of a point (where a worker fetches from), or null.</summary>
+    public static StashChest Nearest(Vector3 point, float reach)
+    {
+        StashChest best = null;
+        float bestDistance = reach * reach;
+        foreach (StashChest chest in standing)
+        {
+            if (chest == null || !chest.IsStanding)
+            {
+                continue;
+            }
+
+            float distance = (chest.transform.position - point).sqrMagnitude;
+            if (distance <= bestDistance)
+            {
+                best = chest;
+                bestDistance = distance;
+            }
+        }
+
+        return best;
+    }
+
     /// <summary>True when a finished chest stands within <paramref name="reach"/> metres of a point.</summary>
     public static bool AnyWithin(Vector3 point, float reach)
     {

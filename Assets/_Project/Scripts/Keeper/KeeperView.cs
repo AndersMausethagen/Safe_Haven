@@ -200,7 +200,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         bool unlocked = unlock == null || Cheats.NoRequirements || GameSession.Quests.StatusOf(unlock) != QuestStatus.NotStarted;
         bool breachFight = WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
         bool cinematic = CinematicScreen.IsPlaying || InGameCinematic.IsPlaying;
-        bool afloat = (who.TryGetComponent(out PlayerStateMachine state) && state.IsSwimming)
+        bool afloat = (who.TryGetComponent(out PlayerStateMachine state) && (state.IsSwimming || state.IsAboard))
             || (who.TryGetComponent(out PlayerRiding riding) && riding.IsRiding);
         bool hunted = MonsterAI.AnyEngaging(health);
         bool hurt = Time.time - hurtAt < Settings.HurtGraceSeconds;
@@ -269,7 +269,8 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
     private void OnAnyDamaged(Damageable hurt, DamageInfo info, DamageResult result)
     {
-        if (Player.Current != null && hurt == Player.Current.Health && result.Landed)
+        // A blow struck by something: not a poison's or a burn's tick (nothing is after the player then), nor harm with no striker.
+        if (Player.Current != null && hurt == Player.Current.Health && result.Landed && !info.IsOverTime && info.Source != null)
         {
             hurtAt = Time.time;
         }
@@ -324,6 +325,13 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     {
         PlayerCameraController view = PlayerCameraController.Current;
         float weight = view != null ? view.OverviewWeight : 0f;
+        // A cinematic that closed the view fades the fog of war itself (CinematicView): two writers made it flicker.
+        if (!open && (CinematicScreen.IsPlaying || InGameCinematic.IsPlaying))
+        {
+            warHeld = false;
+            return;
+        }
+
         if (weight > 0f || warHeld)
         {
             AtmosphereFeature.WarScale = 1f - weight;
@@ -372,13 +380,14 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
         Drag(placing || overUI);
 
-        if (GameInput.KeeperFindMe != null && GameInput.KeeperFindMe.WasPressedThisFrame() && player != null)
+        // While placing a building its keys are the build map's (a pad's Y frees the placement).
+        if (!placing && GameInput.KeeperFindMe != null && GameInput.KeeperFindMe.WasPressedThisFrame() && player != null)
         {
             following = null;
             rig.Target = player.transform.position;
         }
 
-        if (GameInput.KeeperFollow != null && GameInput.KeeperFollow.WasPressedThisFrame())
+        if (!placing && GameInput.KeeperFollow != null && GameInput.KeeperFollow.WasPressedThisFrame())
         {
             following = following == null && picker.Picked is ResidentNpc person ? person.transform : null;
         }
@@ -471,7 +480,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
                 return;
             }
 
-            if (building.TryGetComponent(out CraftingStation station) && station.OpenFromAfar(player.gameObject))
+            if (building.TryGetComponent(out CraftingStation station) && station.Usable && station.OpenFromAfar(player.gameObject))
             {
                 return;
             }
@@ -493,10 +502,21 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             }
 
             action.performed -= OnWindowKey;
+            action.canceled -= OnWindowKeyUp;
             if (on)
             {
                 action.performed += OnWindowKey;
+                action.canceled += OnWindowKeyUp;
             }
+        }
+    }
+
+    // The controller's windows wheel closes, choosing, when its button is let go.
+    private void OnWindowKeyUp(InputAction.CallbackContext context)
+    {
+        if (open && player != null && context.action == GameInput.WindowsWheel && player.TryGetComponent(out CommandWheel wheel) && wheel.IsOpen)
+        {
+            wheel.CloseAndExecute();
         }
     }
 
@@ -507,40 +527,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             return;
         }
 
-        InputAction action = context.action;
-        if (action == GameInput.Build)
-        {
-            if (player.TryGetComponent(out BuildPlacer builder))
-            {
-                builder.ToggleMenu();
-            }
-
-            return;
-        }
-
-        if (action == GameInput.Tutorial)
-        {
-            TutorialWindow.Toggle();
-            return;
-        }
-
-        if (action == GameInput.WorldMap)
-        {
-            WorldMapHud.Toggle();
-            return;
-        }
-
-        UIWindowId? window = action == GameInput.Items || action == GameInput.Inventory ? UIWindowId.Items
-            : action == GameInput.Skills ? UIWindowId.Skills
-            : action == GameInput.Character ? UIWindowId.Character
-            : action == GameInput.Talents ? UIWindowId.Proficiencies
-            : action == GameInput.Journal ? UIWindowId.Journal
-            : action == GameInput.Haven ? UIWindowId.Haven
-            : (UIWindowId?)null;
-        if (window.HasValue && UIStateManager.Current != null)
-        {
-            UIStateManager.Current.RequestToggle(window.Value);
-        }
+        WindowKeys.Press(context.action, player.gameObject);
     }
 
     // ----- The ground -----

@@ -220,6 +220,56 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     public JobDefinition Job => resident != null ? GameSession.Here.Find(resident)?.Job : null;
 
     /// <summary>Who they are and what they do (when nothing before it spoke), and the jobs they can take as answers.</summary>
+    // One answer for each kind of worker gear in the bag (the user, 2026-11-21: "train and upgrade the NPCs with equipment"): given, it
+    // goes from the bag to them, and what they had comes back to the bag.
+    private void AddGearTopics(MenuPage page, ResidentRecord record, DialogueSpeaker speaker, Action afterAnswer)
+    {
+        Player player = Player.Current;
+        if (record == null || player == null || player.Bag == null || HavenVisit.InHostsHaven)
+        {
+            return;
+        }
+
+        var offered = new System.Collections.Generic.HashSet<ItemDefinition>();
+        ItemContainer bag = player.Bag.Container;
+        for (int i = 0; i < bag.SlotCount; i++)
+        {
+            ItemDefinition gear = bag.GetSlot(i).Item;
+            if (gear == null || !gear.IsWorkerGear || gear == record.WorkGear || !offered.Add(gear))
+            {
+                continue;
+            }
+
+            page.Add(new MenuAction($"Give them your {gear.DisplayName}", GearLine(gear), true, () =>
+            {
+                if (bag.Remove(gear, 1) <= 0)
+                {
+                    afterAnswer?.Invoke();
+                    return;
+                }
+
+                ItemDefinition had = record.WorkGear;
+                record.WorkGear = gear;
+                if (had != null)
+                {
+                    player.Bag.Give(had, 1, ArrivalCause.Rewarded);
+                }
+
+                DialogueBox.Current.Say(speaker, $"The {gear.DisplayName}? That will lighten the work. Thank you.", afterAnswer);
+            }));
+        }
+    }
+
+    // What a piece of worker gear does, in a few words.
+    private static string GearLine(ItemDefinition gear)
+    {
+        var parts = new System.Collections.Generic.List<string>();
+        if (gear.WorkerCarryWeight > 0f) parts.Add($"carries {gear.WorkerCarryWeight:0} more");
+        if (gear.WorkerCarrySlots > 0) parts.Add($"{gear.WorkerCarrySlots} more kind{(gear.WorkerCarrySlots == 1 ? "" : "s")} at once");
+        if (gear.WorkerSpeed > 0f) parts.Add($"works {gear.WorkerSpeed * 100f:0}% faster");
+        return string.Join(", ", parts);
+    }
+
     public void AddTopics(MenuPage page, DialogueSpeaker speaker, Action afterAnswer)
     {
         if (resident == null)
@@ -281,6 +331,9 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
 
         // What they asked the Haven for, handed to them once it is home.
         HavenRequestBoard.AddHandIn(page, resident, Player.Current != null ? Player.Current.gameObject : null, speaker, afterAnswer);
+
+        // Worker gear (WorkerSettings): something from the player's bag to carry more or work faster. Given in person, in their own Haven.
+        AddGearTopics(page, GameSession.Here.Find(resident), speaker, afterAnswer);
 
         // A lesson in their job's skill, once between raids; in their own Haven only (as Liv's carving): a guest's "taught" mark
         // lived on the copy of the host's settlement, undone by the host's next word, and the lesson could be taken again and again.

@@ -28,9 +28,11 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
     amount: 2
   station: 3
-  craftSeconds: 34
+  craftSeconds: 51
   knownFromStart: 0
   minimumStationTier: 0
   requiredSkill: {fileID: 11400000, guid: 8d43d0e08472c694fa5c6c56cdcdb5a8, type: 2}
   requiredSkillLevel: 30
   sortOrder: 140
+  needsModule: {fileID: 0}
+  replaces: {fileID: 0}

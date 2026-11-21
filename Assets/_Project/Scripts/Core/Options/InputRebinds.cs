@@ -240,8 +240,9 @@ public static class InputRebinds
             return true;
         }
 
+        // The view reads the camera's turning button itself (Camera/Orbit), and keeps the window keys and the System keys working.
         RebindRow other = IsKeeperKey(a) ? b : a;
-        return other.ActionPath.StartsWith("System/", StringComparison.Ordinal)
+        return other.ActionPath.StartsWith("System/", StringComparison.Ordinal) || other.ActionPath == "Camera/Orbit"
             || Array.IndexOf(PlayerControl.WindowKeyPaths, other.ActionPath) >= 0;
     }
 

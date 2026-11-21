@@ -164,6 +164,8 @@ public sealed class StationSaveData
     public int workerCrafts;
     /// <summary>What waits in the output slots after the first (a Storage Loft's). Missing in older saves: none.</summary>
     public List<StationOutputSaveData> moreOutput = new List<StationOutputSaveData>();
+    /// <summary>What its worker has fetched from the chests for their orders (StationQueue.Supplies). Missing in older saves: none.</summary>
+    public List<StationOutputSaveData> supplies = new List<StationOutputSaveData>();
 }
 
 [System.Serializable]
@@ -223,6 +225,10 @@ public sealed class ResidentSaveData
     /// <summary>Which of the buildings of their job's kind they work at (a building's save id), and its station's queue.</summary>
     public string workplace;
     public string workQueue;
+    /// <summary>Weight carried for their work (Strength). Missing in older saves: none yet.</summary>
+    public float haulDone;
+    /// <summary>The id of the worker gear given to them, or empty. Missing in older saves: none.</summary>
+    public string workGear;
 }
 
 [Serializable]

@@ -15,6 +15,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
     private readonly HashSet<string> blockedStations = new HashSet<string>();
     private float nextWorkerLook;
+    // Game seconds since the workers were last looked at (their trips while away run on the game's clock, not through a pause).
+    private float workerSeconds;
     private SettlementSettings settings;
 
     public void Initialise(SettlementSettings settlementSettings)
@@ -44,6 +46,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         }
     }
 
+    private static WorkerProduction.Hauling HowAtHome(ResidentRecord record)
+    {
+        ResidentLife life = ResidentLife.Of(record.Resident);
+        return life != null && life.FetchesOnFoot ? WorkerProduction.Hauling.OnFoot : WorkerProduction.Hauling.Instantly;
+    }
+
     private void Update()
     {
         // A friend's Haven runs in their game; this copy only shows it (co-op).
@@ -54,7 +62,11 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
         // Only off a visit (above), where one's own Haven is the one here.
         SettlementState settlement = GameSession.Home;
+        bool atHome = HomePortal.Current != null;
+        // Away, no workplace is loaded: each worker is taken to be at their station (StationQueue.WorkerHere).
+        settlement.Workshops.AwayFromHome = !atHome;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
+        workerSeconds += Time.deltaTime;
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
         // home, not one who went along on the raid.
         if (HomePortal.Current == null && settlement.ScaffoldsWaiting)
@@ -65,7 +77,10 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         if (Time.unscaledTime >= nextWorkerLook)
         {
             nextWorkerLook = Time.unscaledTime + WorkerLookSeconds;
-            WorkerProduction.Work(settlement, GameSession.Stash);
+            // At home a worker fetches on foot where a chest stands near their workplace (ResidentLife); away, each trip takes the time
+            // the walk would (WorkerSettings).
+            WorkerProduction.Work(settlement, GameSession.Stash, workerSeconds, atHome, atHome ? HowAtHome : null);
+            workerSeconds = 0f;
         }
 
         if (settings == null || settlement.PurificationQueued <= 0 || !settlement.HasWorker(settings.PurifierJob))

@@ -403,7 +403,7 @@ public sealed class ResidentWindow : MonoBehaviour
             float walk = HavenHomes.Walk(house != null ? house.Door(out _) : (ResidentNpc.Of(who) != null ? ResidentNpc.Of(who).HomeSpot : work.transform.position), work.transform.position);
             workCard.Set(HavenHomes.Describe(work), station != null ? $"Works at {station.Speed * 100f:0}% speed there" : $"{job.DisplayName}'s place", true);
             workLine.text = $"{walk:0} m from {(house != null ? "their house" : "where they sleep")}. They work at the {work.Definition.DisplayName} nearest home: " +
-                            "build one near their house, or move them nearer, and the walk is short.";
+                            "build one near their house, or move them nearer, and the walk is short." + CarryLine(record);
         }
         else
         {
@@ -587,6 +587,16 @@ public sealed class ResidentWindow : MonoBehaviour
         }
 
         return shown;
+    }
+
+    // What they carry on a trip for their work (WorkerSettings): by hand, their Strength and their worker gear.
+    private static string CarryLine(ResidentRecord record)
+    {
+        WorkerSettings settings = WorkerSettings.Current;
+        CarryLimits hand = WorkerCarry.ByHand(record, settings);
+        int strength = WorkerCarry.Strength(record, settings);
+        string gear = record.WorkGear != null ? $", with their {record.WorkGear.DisplayName}" : "";
+        return $"\nCarries {hand.Weight:0} a trip, {hand.Slots} kind{(hand.Slots == 1 ? "" : "s")} at once (Strength {strength}{gear}). A cart or a working horse carries more.";
     }
 
     private static float RankShare(int workDone)

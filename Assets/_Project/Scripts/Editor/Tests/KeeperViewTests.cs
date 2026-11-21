@@ -167,9 +167,31 @@ public sealed class KeeperViewTests : InputTestFixture
         Assert.IsTrue(InputRebinds.CanMeet(Row("Keeper/FindMe"), Row("Player/Haven")), "the Haven key works in the view");
         Assert.IsTrue(InputRebinds.CanMeet(Row("Keeper/Select"), Row("System/QuickSave")), "System keys always work");
         Assert.IsTrue(InputRebinds.CanMeet(Row("Keeper/Pan"), Row("Keeper/Follow")));
-        Assert.IsFalse(InputRebinds.CanMeet(Row("Keeper/Pan"), Row("Build/Rotate")));
+        Assert.IsFalse(InputRebinds.CanMeet(Row("Keeper/Pan"), Row("Build/Rotate")), "the view's keys wait while a building is placed");
+        Assert.IsTrue(InputRebinds.CanMeet(Row("Keeper/Drag"), Row("Camera/Orbit")), "the view turns on the camera's own button");
+        Assert.IsFalse(InputRebinds.CanMeet(Row("Keeper/Drag"), Row("Camera/ToggleStyle")), "the style key does nothing in the view");
         Assert.IsTrue(InputRebinds.CanMeet(Row("Player/Move"), Row("Player/Dodge")), "the rest as before");
         Assert.IsFalse(InputRebinds.CanMeet(Row("Player/Move"), Row("Build/Rotate")), "build keys as before");
+    }
+
+    [Test]
+    public void EveryKeptWindowKey_IsAnsweredInTheView()
+    {
+        foreach (string path in PlayerControl.WindowKeyPaths)
+        {
+            Assert.IsTrue(WindowKeys.Answers(path), $"{path} is kept in the view but nothing there opens it (WindowKeys)");
+        }
+
+        Assert.IsFalse(WindowKeys.Answers("Player/Attack"), "the canary: a key that isn't a window's");
+        CollectionAssert.Contains(PlayerControl.WindowKeyPaths, "Player/WindowsWheel", "a controller reaches the windows from the view");
+    }
+
+    [Test]
+    public void BuildersGoToAScaffold_InStepWithTheWorkLeft()
+    {
+        Assert.AreEqual(1, ResidentLife.BuildersFor(6f), "a flower bed takes one");
+        Assert.AreEqual(2, ResidentLife.BuildersFor(25f));
+        Assert.AreEqual(3, ResidentLife.BuildersFor(100f), "a hall takes three");
     }
 
     [Test]

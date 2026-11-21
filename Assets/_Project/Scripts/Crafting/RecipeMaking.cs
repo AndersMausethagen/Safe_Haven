@@ -158,7 +158,7 @@ public sealed class StationMaker : IRecipeMaker
     public MaterialPool Pool => MaterialPool.For(user);
     public GameObject User => user;
     public int Waiting(RecipeDefinition recipe) => queue.CountOf(recipe);
-    public float Seconds(RecipeDefinition recipe) => recipe.CraftSeconds / Mathf.Max(0.01f, queue.SpeedMultiplier);
+    public float Seconds(RecipeDefinition recipe) => recipe.CraftSeconds / Mathf.Max(0.01f, queue.Speed);
 
     public string WhyNot(RecipeDefinition recipe) => StationCrafting.Check(user, queue, recipe);
 

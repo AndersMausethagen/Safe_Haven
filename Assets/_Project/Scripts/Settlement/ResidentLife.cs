@@ -17,7 +17,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(ResidentNpc))]
-public sealed class ResidentLife : MonoBehaviour
+public sealed class ResidentLife : MonoBehaviour, IHauler
 {
     private const float ThinkSeconds = 0.5f;
     private const float ArriveDistance = 0.7f;
@@ -62,6 +62,29 @@ public sealed class ResidentLife : MonoBehaviour
     private Construction building;
     private bool repathed;
     private Renderer body;
+
+    // A trip to a chest and back for their work (WorkerProduction): where they are on it, what they carry, a cart taken along.
+    private enum Trip
+    {
+        None,
+        /// <summary>To a free cart near the workplace first, to take its shafts beside it (as the player does).</summary>
+        ToCart,
+        ToChest,
+        ToStation,
+    }
+
+    private const float TripLookSeconds = 1.5f;
+    private const float CarriedScale = 0.8f;
+    private Trip trip;
+    private StashChest tripChest;
+    private bool carryingBack;
+    private readonly List<ItemAmount> carrying = new List<ItemAmount>();
+    private Haulable cart;
+    private Haulable cartWanted;
+    private Collider[] ownColliders;
+    private float nextTripLook;
+    private Vector3 workPlace;
+    private Quaternion workFacingThere = Quaternion.identity;
     private BuildingObject sleepsIn;
     private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
     private readonly List<Collider> hiddenColliders = new List<Collider>();
@@ -96,6 +119,7 @@ public sealed class ResidentLife : MonoBehaviour
     {
         Living.Remove(this);
         building = null;
+        EndTrip();
         HavenHomes.Changed -= Refresh;
         HavenHomes.NoteIndoors(insideOf, false);
     }
@@ -358,6 +382,13 @@ public sealed class ResidentLife : MonoBehaviour
 
         building = scaffold;
         repathed = false;
+        // A new plan ends any trip: what they carried never left the chest or the station.
+        trip = Trip.None;
+        tripChest = null;
+        cartWanted = null;
+        carrying.Clear();
+        carryingBack = false;
+        LetGoOfCart();
 
         // Their house, if one is theirs: they sleep inside it, going in at its door.
         bool housed = npc.TryGetHome(out Vector3 door, out Quaternion outward, out BuildingObject house);
@@ -376,6 +407,8 @@ public sealed class ResidentLife : MonoBehaviour
             case ResidentActivity.Work:
                 place = workSpot + workFacing * Vector3.right * workShift;
                 facing = workFacing;
+                workPlace = place;
+                workFacingThere = facing;
                 break;
             case ResidentActivity.Sleep:
                 place = housed ? door : home;
@@ -458,8 +491,6 @@ public sealed class ResidentLife : MonoBehaviour
     /// <summary>True while hammering (or walking to) a scaffold at home.</summary>
     public bool IsBuilding => building != null && activity == ResidentActivity.Work;
 
-    /// <summary>The scaffold they are working on, or null.</summary>
-    public Construction Building => IsBuilding ? building : null;
 
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -613,6 +644,7 @@ public sealed class ResidentLife : MonoBehaviour
             }
 
             Warps++;
+            LetGoOfCart();
             PutThere();
         }
     }
@@ -637,6 +669,12 @@ public sealed class ResidentLife : MonoBehaviour
         if (agent != null && agent.isOnNavMesh && agent.hasPath)
         {
             agent.ResetPath();
+        }
+
+        if (trip != Trip.None)
+        {
+            ArrivedOnTrip();
+            return;
         }
 
         if (activity == ResidentActivity.Sleep && sleepsIn != null)
@@ -703,6 +741,11 @@ public sealed class ResidentLife : MonoBehaviour
             return;
         }
 
+        if (activity == ResidentActivity.Work && building == null && Time.time >= nextTripLook && MaybeStartTrip())
+        {
+            return;
+        }
+
         JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
         if (job != null && job.WorkSound != null)
         {
@@ -759,12 +802,248 @@ public sealed class ResidentLife : MonoBehaviour
         }
     }
 
+    // ----- Fetching for their work (WorkerProduction; the user, 2026-11-21: "They have to get resources from storage") -----
+
+    /// <summary>The living body of <paramref name="who"/> in this scene, or null.</summary>
+    public static ResidentLife Of(ResidentDefinition who)
+    {
+        if (who == null)
+        {
+            return null;
+        }
+
+        foreach (ResidentLife life in Living)
+        {
+            if (life != null && life.npc != null && life.npc.Resident == who)
+            {
+                return life;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>True while on a trip to a chest and back for their work.</summary>
+    public bool IsHauling => trip != Trip.None;
+
+    /// <summary>True while taking finished work to the chests (the first half of a trip that has it).</summary>
+    public bool IsTakingWorkBack => trip == Trip.ToChest && carryingBack;
+
+    /// <summary>
+    /// Whether they fetch their work's materials on foot here (WorkerProduction.Hauling.OnFoot): in the game that keeps the Haven, on the
+    /// NavMesh, with a workplace and a chest standing within WorkerSettings › Chest Reach of it. Otherwise it goes straight from the stash.
+    /// </summary>
+    public bool FetchesOnFoot
+    {
+        get
+        {
+            if (!started || HavenVisit.IsVisiting || agent == null || !agent.isOnNavMesh || npc == null || npc.Workplace == null)
+            {
+                return false;
+            }
+
+            return StashChest.Nearest(npc.Workplace.transform.position, WorkerSettings.Current.ChestReach) != null;
+        }
+    }
+
+    /// <summary>True while at work at <paramref name="workplace"/>: there, not fetching, building or elsewhere (CraftingStation.WorkerIsHere).</summary>
+    public bool WorksAt(BuildingObject workplace) =>
+        workplace != null && activity == ResidentActivity.Work && building == null && trip == Trip.None && arrived && npc.Workplace == workplace;
+
+    // What they can carry now: their hands, a cart they took, a horse at their station.
+    private CarryLimits Limits(StationQueue queue)
+    {
+        WorkerSettings settings = WorkerSettings.Current;
+        float cartCapacity = cart != null && cart.TryGetComponent(out Transport carried) && carried.Definition != null ? carried.Definition.Capacity : 0f;
+        return WorkerCarry.WithHelp(WorkerCarry.ByHand(npc.Record, settings), cartCapacity, queue != null && queue.HorseHelps, settings);
+    }
+
+    // At their station with nothing else to do: a trip when finished work waits to go back (the station full or done), or the next order
+    // is short of what was fetched. True when they set off.
+    private bool MaybeStartTrip()
+    {
+        nextTripLook = Time.time + TripLookSeconds;
+        ResidentRecord record = npc.Record;
+        if (HavenVisit.IsVisiting || record == null || record.WorkPaused || npc.Workplace == null || !FetchesOnFoot)
+        {
+            return false;
+        }
+
+        StationQueue queue = WorkerProduction.QueueOf(GameSession.Here, record);
+        StashChest chest = queue != null ? StashChest.Nearest(npc.Workplace.transform.position, WorkerSettings.Current.ChestReach) : null;
+        if (chest == null)
+        {
+            return false;
+        }
+
+        bool back = WorkerProduction.HasWorkToTakeBack(queue) && (queue.IsIdle || queue.Blocked);
+        bool fetch = queue.IsIdle && WorkerProduction.PlanFetch(record.Job, queue, GameSession.Stash, Limits(queue)).Count > 0;
+        if (!back && !fetch)
+        {
+            return false;
+        }
+
+        queue.TripMetres = Vector3.Distance(npc.Workplace.transform.position, chest.transform.position);
+        tripChest = chest;
+        carryingBack = back;
+        carrying.Clear();
+        // A free cart near the workplace goes along (WorkerSettings › Cart Reach): fetched first, its shafts taken beside it.
+        cartWanted = cart == null ? Haulable.NearestFree(npc.Workplace.transform.position, WorkerSettings.Current.CartReach) : null;
+        if (cartWanted != null)
+        {
+            trip = Trip.ToCart;
+            GoTo(SpotBeside(cartWanted.transform, out facing));
+            return true;
+        }
+
+        trip = Trip.ToChest;
+        ShowTool(back && queue.Output is ItemDefinition made ? made : null, CarriedScale);
+        GoTo(SpotBeside(chest.transform, out facing));
+        return true;
+    }
+
+
+    private void LetGoOfCart()
+    {
+        Haulable held = cart;
+        cart = null;
+        if (held != null && held.IsHeldBy(gameObject))
+        {
+            held.LetGo();
+        }
+    }
+
+    // At the chest: finished work goes into it, and what the next orders want is picked out (it leaves the stash only on arriving at the
+    // station, so nothing is lost to a save or a change of plan on the way). At the station: what was picked out is put by it.
+    private void ArrivedOnTrip()
+    {
+        ResidentRecord record = npc.Record;
+        StationQueue queue = record != null ? WorkerProduction.QueueOf(GameSession.Here, record) : null;
+        if (queue == null || HavenVisit.IsVisiting)
+        {
+            EndTrip();
+            return;
+        }
+
+        if (trip == Trip.ToCart)
+        {
+            // Its shafts taken beside it, if nobody took it meanwhile: its capacity is theirs for the trip (WorkerSettings › Cart Slots).
+            if (cartWanted != null && !cartWanted.InUse)
+            {
+                cart = cartWanted;
+                cart.Take(this);
+            }
+
+            cartWanted = null;
+            trip = Trip.ToChest;
+            GoTo(tripChest != null ? SpotBeside(tripChest.transform, out facing) : workPlace);
+            return;
+        }
+
+        if (trip == Trip.ToChest)
+        {
+            CarryLimits limits = Limits(queue);
+            if (carryingBack)
+            {
+                WorkerProduction.TakeBack(record, queue, GameSession.Stash, limits);
+            }
+
+            carrying.Clear();
+            carrying.AddRange(WorkerProduction.PlanFetch(record.Job, queue, GameSession.Stash, limits));
+            carryingBack = false;
+            trip = Trip.ToStation;
+            ShowTool(cart == null && carrying.Count > 0 ? carrying[0].Item : null, CarriedScale);
+            GoTo(workPlace);
+            facing = workFacingThere;
+            return;
+        }
+
+        WorkerProduction.Deliver(record, queue, GameSession.Stash, carrying);
+        EndTrip();
+    }
+
+    // Done, or the day moved on (a meal, the night, danger): nothing carried is lost, as nothing left its place before arriving.
+    private void EndTrip()
+    {
+        bool was = trip != Trip.None;
+        trip = Trip.None;
+        tripChest = null;
+        cartWanted = null;
+        carrying.Clear();
+        carryingBack = false;
+        LetGoOfCart();
+        if (was)
+        {
+            ShowTool(null, 1f);
+            if (activity == ResidentActivity.Work && building == null)
+            {
+                GoTo(workPlace);
+                facing = workFacingThere;
+            }
+        }
+    }
+
+    private void GoTo(Vector3 point)
+    {
+        place = point;
+        arrived = false;
+        stuckSince = -1f;
+        repathed = false;
+        if (agent != null && agent.isOnNavMesh && NavMesh.SamplePosition(point, out NavMeshHit hit, 3f, agent.areaMask))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            PutThere();
+        }
+    }
+
+    // Beside something on the side nearest them (out of its collider), and the way to face it.
+    private Vector3 SpotBeside(Transform thing, out Quaternion facingIt)
+    {
+        Vector3 centre = thing.position;
+        Collider box = thing.GetComponentInChildren<Collider>();
+        Vector3 edge = box != null && box.enabled && !box.isTrigger ? box.ClosestPoint(transform.position) : centre;
+        Vector3 outward = edge - centre;
+        outward.y = 0f;
+        if (outward.sqrMagnitude < 0.01f)
+        {
+            outward = transform.position - centre;
+            outward.y = 0f;
+        }
+
+        outward = outward.sqrMagnitude > 0.0001f ? outward.normalized : Vector3.forward;
+        facingIt = Quaternion.LookRotation(-outward);
+        return edge + outward * BuildSpotGap;
+    }
+
+    // ----- Pulling a cart (Haulable): a resident takes the shafts as the player does -----
+
+    Vector3 IHauler.Velocity => agent != null ? agent.velocity : Vector3.zero;
+
+    float IHauler.PullScale => 1f;
+
+    float IHauler.ExtraReach => 0.2f;
+
+    IEnumerable<Collider> IHauler.HaulerColliders => ownColliders ??= GetComponentsInChildren<Collider>(true);
+
+    void IHauler.Began(Transport transport)
+    {
+    }
+
+    void IHauler.Ended()
+    {
+        cart = null;
+    }
+
     // ----- Building at home -----
 
     // The scaffold this builder should work on: the one they are on while it needs work, else the nearest paid-for one with room.
     private Construction ScaffoldToBuild()
     {
-        if (HavenVisit.IsVisiting || !ResidentBuilders.Builds(npc.Record))
+        // A friend's copy walks them to the scaffold too, to be seen at it; only the Haven's own game adds the work (Hammer).
+        if (!ResidentBuilders.Builds(npc.Record))
         {
             return null;
         }
@@ -778,7 +1057,8 @@ public sealed class ResidentLife : MonoBehaviour
         float bestDistance = float.MaxValue;
         foreach (BuildingObject standing in BuildingObject.Active)
         {
-            if (standing == null || !standing.TryGetComponent(out Construction site) || !NeedsHands(site) || BuildersOn(site) >= BuildersPerSite)
+            if (standing == null || !standing.TryGetComponent(out Construction site) || !NeedsHands(site)
+                || BuildersOn(site) >= BuildersFor(site.WorkLeft) || (site == unreachable && Time.time < unreachableUntil))
             {
                 continue;
             }
@@ -795,6 +1075,15 @@ public sealed class ResidentLife : MonoBehaviour
     }
 
     private static bool NeedsHands(Construction site) => site != null && site.Paid && site.WorkLeft > 0f;
+
+    /// <summary>How many builders go to a scaffold with <paramref name="workLeft"/> seconds of hammering left: one to a flower bed, up to
+    /// BuildersPerSite on a hall (three sent across the Haven to a few seconds' work only got in each other's way).</summary>
+    public static int BuildersFor(float workLeft) => workLeft < 15f ? 1 : workLeft < 40f ? 2 : BuildersPerSite;
+
+    // A scaffold they couldn't get to (no ground beside it), left alone a while.
+    private Construction unreachable;
+    private float unreachableUntil;
+    private const float NearSiteMetres = 3f;
 
     private static int BuildersOn(Construction site)
     {
@@ -822,7 +1111,9 @@ public sealed class ResidentLife : MonoBehaviour
 
         outward = outward.sqrMagnitude > 0.0001f ? outward.normalized : Vector3.forward;
         facingIt = Quaternion.LookRotation(-outward);
-        return edge + outward * BuildSpotGap;
+        // Builders coming from one side stand along it, apart (by their seat), not all on one spot.
+        Vector3 along = Vector3.Cross(Vector3.up, outward);
+        return edge + outward * BuildSpotGap + along * workShift;
     }
 
     // One frame of hammering: false (and a new plan) once the scaffold stands or the work was taken from them.
@@ -830,6 +1121,19 @@ public sealed class ResidentLife : MonoBehaviour
     {
         if (!NeedsHands(building))
         {
+            building = null;
+            Decide(false, true);
+            return false;
+        }
+
+        // Put beside it where there was no way there (no ground by a dock, a ledge): not hammering it from across the Haven.
+        Vector3 edge = building.TryGetComponent(out Collider box) && box.enabled ? box.ClosestPoint(transform.position) : building.transform.position;
+        Vector3 apart = edge - transform.position;
+        apart.y = 0f;
+        if (apart.sqrMagnitude > NearSiteMetres * NearSiteMetres)
+        {
+            unreachable = building;
+            unreachableUntil = Time.time + 60f;
             building = null;
             Decide(false, true);
             return false;

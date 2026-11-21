@@ -86,7 +86,7 @@ public sealed class StationQueue
     public int FreeQueueSlots => Mathf.Max(0, MaxQueued - QueuedCount);
 
     /// <summary>Seconds left on the craft in progress.</summary>
-    public float CurrentRemaining => Current != null ? Mathf.Max(0f, Current.CraftSeconds - Progress) / Mathf.Max(MinSpeed, SpeedMultiplier) : 0f;
+    public float CurrentRemaining => Current != null ? Mathf.Max(0f, Current.CraftSeconds - Progress) / Mathf.Max(MinSpeed, Speed) : 0f;
 
     /// <summary>Real seconds until everything in the queue is made, at the station's speed.</summary>
     public float TotalRemaining
@@ -99,7 +99,7 @@ public sealed class StationQueue
                 work += job.Recipe.CraftSeconds * job.Count;
             }
 
-            return Mathf.Max(0f, work) / Mathf.Max(MinSpeed, SpeedMultiplier);
+            return Mathf.Max(0f, work) / Mathf.Max(MinSpeed, Speed);
         }
     }
 
@@ -190,8 +190,86 @@ public sealed class StationQueue
         return last.Recipe;
     }
 
-    /// <summary>How fast it works: 1 is normal. Set by its CraftingStation from upgrades and a worker; not saved.</summary>
+    /// <summary>How fast it works on its own: 1 is a recipe's Craft Seconds. Set by its CraftingStation from WorkerSettings › Unattended
+    /// Speed and its upgrades, yard and extensions; not saved.</summary>
     public float SpeedMultiplier { get; set; } = 1f;
+
+    /// <summary>What its worker adds while at it (their work speed, rank, bed, home and gear; Palworld's work adding up). Set by its
+    /// CraftingStation; kept through raids, when no station is loaded. Not saved.</summary>
+    public float WorkerSpeed { get; set; }
+
+    /// <summary>Whether its worker is at it now: standing at the station at home (ResidentLife), and taken to be so while the player is
+    /// away (WorkshopState.Tick). Not saved.</summary>
+    public bool WorkerHere { get; set; }
+
+    /// <summary>A horse works at its station (HorseJobs): its worker carries more. Set at home with the speed; not saved.</summary>
+    public bool HorseHelps { get; set; }
+
+    /// <summary>Metres from its station to the chest its worker fetches from, measured at home (0 until then: WorkerSettings › Assumed
+    /// Trip Distance). Sets how long a trip takes while the player is away. Not saved.</summary>
+    public float TripMetres { get; set; }
+
+    /// <summary>How fast it works now: on its own, plus its worker while they are at it.</summary>
+    public float Speed => SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f);
+
+    // What its worker fetched from the chests for their work orders: what a worker's order is paid from (WorkerProduction).
+    private readonly Dictionary<ItemDefinition, int> supplies = new Dictionary<ItemDefinition, int>();
+
+    /// <summary>What its worker has fetched from the chests and not yet used (saved with the station).</summary>
+    public IReadOnlyDictionary<ItemDefinition, int> Supplies => supplies;
+
+    /// <summary>How many of <paramref name="item"/> lie fetched here.</summary>
+    public int Supplied(ItemDefinition item) => item != null && supplies.TryGetValue(item, out int count) ? count : 0;
+
+    /// <summary>Puts what was fetched by the station, for the worker's orders.</summary>
+    public void AddSupply(ItemDefinition item, int amount)
+    {
+        if (item == null || amount <= 0)
+        {
+            return;
+        }
+
+        supplies[item] = Supplied(item) + amount;
+    }
+
+    /// <summary>Takes <paramref name="amount"/> of what was fetched (paying an order); false, taking nothing, when there is too little.</summary>
+    public bool TakeSupply(ItemDefinition item, int amount)
+    {
+        if (item == null || amount <= 0)
+        {
+            return true;
+        }
+
+        int have = Supplied(item);
+        if (have < amount)
+        {
+            return false;
+        }
+
+        if (have == amount)
+        {
+            supplies.Remove(item);
+        }
+        else
+        {
+            supplies[item] = have - amount;
+        }
+
+        return true;
+    }
+
+    /// <summary>Gives back everything fetched (the station taken down, the worker gone): what lay here, emptied.</summary>
+    public List<ItemAmount> TakeAllSupplies()
+    {
+        var all = new List<ItemAmount>();
+        foreach (var pair in supplies)
+        {
+            all.Add(new ItemAmount(pair.Key, pair.Value));
+        }
+
+        supplies.Clear();
+        return all;
+    }
 
     /// <summary>The extra chance of one more here, from the station's extensions and modules, for workers and the player (set at home with the speed).</summary>
     public float ExtraChance { get; set; }
@@ -238,7 +316,7 @@ public sealed class StationQueue
             return 0;
         }
 
-        Progress += seconds * SpeedMultiplier;
+        Progress += seconds * Speed;
         int delivered = 0;
         while (jobs.Count > 0 && Progress >= jobs[0].Recipe.CraftSeconds)
         {
@@ -475,11 +553,21 @@ public sealed class WorkshopState
     }
 
     /// <summary>Works every station for the given seconds. Returns how many crafts were delivered in total.</summary>
+    /// <summary>True while the player is away from home (SettlementSystem): no workplace is loaded, so each queue's worker is taken to be at
+    /// their station, as the builders are taken to be at their scaffolds.</summary>
+    [field: NotSaved("whether the player is home, set by SettlementSystem every frame")]
+    public bool AwayFromHome { get; set; }
+
     public int Tick(float seconds, ResourceStorage storage, Action<StationQueue, RecipeDefinition> finished = null)
     {
         int delivered = 0;
         foreach (StationQueue queue in queues.Values)
         {
+            if (AwayFromHome)
+            {
+                queue.WorkerHere = queue.WorkerSpeed > 0f;
+            }
+
             if (queue.IsIdle)
             {
                 continue;

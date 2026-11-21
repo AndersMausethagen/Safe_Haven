@@ -189,6 +189,21 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Tooltip("Makes this item a raid modifier: picked at the raid portal and used up when the raid starts. Empty for other items.")]
     [SerializeField] private RaidModifierDefinition raidModifier;
 
+    [Header("Worker Gear")]
+    [Tooltip("Makes this item a resident's worker gear (given to them in conversation, one at a time): weight they carry more on a trip " +
+             "for their work. 0 for other items.")]
+    [SerializeField, Min(0f)] private float workerCarryWeight;
+    [Tooltip("Kinds of thing they carry more at once.")]
+    [SerializeField, Min(0)] private int workerCarrySlots;
+    [Tooltip("Work speed it adds at their station (a station runs at Unattended Speed + the worker's speed).")]
+    [SerializeField, Min(0f)] private float workerSpeed;
+
+    /// <summary>True for worker gear: something a resident is given to carry more or work faster (WorkerSettings).</summary>
+    public bool IsWorkerGear => workerCarryWeight > 0f || workerCarrySlots > 0 || workerSpeed > 0f;
+    public float WorkerCarryWeight => workerCarryWeight;
+    public int WorkerCarrySlots => workerCarrySlots;
+    public float WorkerSpeed => workerSpeed;
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;

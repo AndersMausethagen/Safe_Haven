@@ -2133,6 +2133,30 @@ and approved with additions (memory: the NPC hauling, work speed, longer builds 
 - **Residents' ways.** Deep water is out of their NavMesh mask (`DeepWater.MaskFor`); one who is stuck re-paths first and is put
   where they were going only out of the view's sight (`ResidentLife.Warps` counts it).
 
+### Work and hauling (phase 2, 2026-11-21)
+
+The user's ask: residents fetch from storage with a small carry (20-30 weight, 1-2 slots), trained by work, raids and gear, so carts,
+wheelbarrows and horses matter; longer crafts where workers make the difference (Palworld's work speed). `WorkerSettings` holds it.
+
+- **Work speed.** `CraftingStation.OwnSpeed` (Unattended Speed 0.6 + upgrades, horse, yard, extensions) and `WorkerAdds` (Worker
+  Speed 1.0 + bed + home + gear, times their rank) go on the queue as `SpeedMultiplier` and `WorkerSpeed`; `StationQueue.Speed` adds
+  the worker only while `WorkerHere`: at home their `ResidentLife.WorksAt` the station (not fetching, building or asleep), and while
+  the player is away always (`WorkshopState.AwayFromHome`, set by SettlementSystem). Station recipes take 1.5 times as long (not by
+  hand, campfire, farm, hive, portal or dock).
+- **Fetching.** A worker's orders are paid from `StationQueue.Supplies` (saved), not the stash. `WorkerProduction.Work(.., howFor)`:
+  `OnFoot` at home where a chest stands within Chest Reach of the workplace and their body is here (`ResidentLife.FetchesOnFoot`);
+  `Away` (raids: a trip every `WorkerCarry.AwayTripSeconds` of the station's measured `TripMetres`, carrying back and fetching);
+  otherwise `Instantly` as before (no chest yet, no body). On foot, `ResidentLife` makes the trip: to a free cart near the workplace
+  (`Haulable.NearestFree`, its shafts taken beside it; residents are `IHauler`s), to the nearest `StashChest` (finished work goes in
+  there: `WorkerProduction.TakeBack`), back with `WorkerProduction.PlanFetch` (`WorkerCarry.PlanFetch`: as many crafts as fit the
+  weight and kinds, at least a start on one), delivered on arrival (`WorkerProduction.Deliver`). Nothing leaves the stash or the
+  output before arriving, so a save or a change of plan mid-trip loses nothing. Seen in Play: by hand 20 wood a trip, with a handcart 80.
+- **Carrying.** `WorkerCarry.ByHand`: Carry Weight 25 and Slots 1, plus Strength (`ResidentRecord.HaulDone` weight hauled and
+  `RaidsAlong` × Strength Per Raid; +5 weight a level, a kind more at 2 and 4) and worker gear (`ItemDefinition` › Worker Gear:
+  Carrying Frame +20/+1, Leather Haversack +10/+1, Smith's Work Tools +25% speed; given in conversation, `ResidentNpc.AddGearTopics`;
+  `ResidentRecord.WorkGear`, saved). `WithHelp`: a cart's Capacity and Cart Slots, a horse working at the station ×2 and a kind.
+  The resident window's work page says what they carry.
+
 ## Going along, set-pieces and bosses
 
 **Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list: raids don't seek them as a new face (`HasResident`). A `FallenCairn` goes up near the portal for as long as they are out there, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a loss never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.

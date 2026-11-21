@@ -24,6 +24,11 @@ MonoBehaviour:
     amount: 1
   itemCost: []
   station: 4
-  craftSeconds: 12
+  craftSeconds: 18
   knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 17
+  needsModule: {fileID: 0}
+  replaces: {fileID: 0}

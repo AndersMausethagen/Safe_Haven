@@ -23,7 +23,21 @@ public sealed class KeeperPicker
     /// <summary>Finds what <paramref name="ray"/> meets first: a resident or a building, through the triggers of zones and yards.</summary>
     public Component Pick(Ray ray, float range, Vector3? snapAround, float snapRadius)
     {
-        int count = Physics.RaycastNonAlloc(ray, hits, range, ~0, QueryTriggerInteraction.Collide);
+        // The first solid thing (the ground, a building) first: the trigger cast then stops there, so the triggers of trees and zones
+        // further along can't fill the buffer and crowd out the near one (Unity returns an arbitrary set when it is full).
+        float reach = range;
+        if (Physics.Raycast(ray, out RaycastHit solid, range, ~0, QueryTriggerInteraction.Ignore))
+        {
+            Component direct = Owner(solid.collider);
+            if (direct != null)
+            {
+                return Hovered = direct;
+            }
+
+            reach = solid.distance + 0.5f;
+        }
+
+        int count = Physics.RaycastNonAlloc(ray, hits, reach, ~0, QueryTriggerInteraction.Collide);
         System.Array.Sort(hits, 0, count, HitOrder.Instance);
         for (int i = 0; i < count; i++)
         {
@@ -31,12 +45,6 @@ public sealed class KeeperPicker
             if (found != null)
             {
                 return Hovered = found;
-            }
-
-            // The ground hides what is behind it.
-            if (hits[i].collider is TerrainCollider)
-            {
-                break;
             }
         }
 

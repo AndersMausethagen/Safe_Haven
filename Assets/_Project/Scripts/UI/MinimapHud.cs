@@ -247,7 +247,8 @@ public sealed class MinimapHud : MonoBehaviour
     {
         Player player = Player.Current;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.HidesHud;
+        // Not under the Keeper's view either: hidden by the HUD giving way, its wheel still set the map's distance as the view zoomed.
+        bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.HidesHud && !KeeperView.IsOpen;
         group.alpha = shown ? 1f : 0f;
         // A quarter smaller on a Contextual or Minimal HUD: a third of the screen's height at 720p (the HUD review of 2026-11-18).
         disc.localScale = Vector3.one * HudRules.MinimapScale;

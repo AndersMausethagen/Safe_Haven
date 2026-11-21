@@ -24,6 +24,8 @@ public sealed class KeeperHud : MonoBehaviour
     private RectTransform reticle;
     private RectTransform canvasRect;
     private float shown;
+    private Component tagged;
+    private float nextTagRead;
     private bool wanted;
     private int keysChanges = -1;
 
@@ -62,8 +64,14 @@ public sealed class KeeperHud : MonoBehaviour
         }
 
         tag.gameObject.SetActive(true);
-        tagName.text = NameOf(thing);
-        tagFact.text = FactOf(thing);
+        // Its words a few times a second, not every frame.
+        if (thing != tagged || Time.unscaledTime >= nextTagRead)
+        {
+            tagged = thing;
+            nextTagRead = Time.unscaledTime + 0.25f;
+            tagName.text = NameOf(thing);
+            tagFact.text = FactOf(thing);
+        }
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local))
         {
             // Beside the pointer, kept on the screen.
@@ -119,7 +127,7 @@ public sealed class KeeperHud : MonoBehaviour
 
     private static string Doing(ResidentLife life) => life.Activity switch
     {
-        ResidentActivity.Work => life.IsBuilding ? "building" : "at work",
+        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsHauling ? "fetching for work" : "at work",
         ResidentActivity.Meal => "eating",
         ResidentActivity.Fire => "by the fire",
         ResidentActivity.Sleep => life.IsIndoors ? "asleep at home" : "going to bed",
@@ -198,7 +206,7 @@ public sealed class KeeperHud : MonoBehaviour
                   $"{Key(GameInput.KeeperFollow)} follow   ·   {Key(GameInput.KeeperFindMe)} your character   ·   {Key(GameInput.Back)} back"
                 : $"{Key(GameInput.KeeperPan)} pan   ·   {Key(GameInput.KeeperTurn)} turn   ·   wheel zoom   ·   {Key(GameInput.KeeperSelect)} pick   ·   " +
                   $"{Key(GameInput.KeeperFollow)} follow   ·   {Key(GameInput.KeeperFindMe)} your character";
-            backLabel.text = $"Back to your feet ({Key(GameInput.KeeperView)})";
+            backLabel.text = $"Back to your feet ({Key(InputDevices.UsingGamepad ? GameInput.Back : GameInput.KeeperView)})";
         }
     }
 

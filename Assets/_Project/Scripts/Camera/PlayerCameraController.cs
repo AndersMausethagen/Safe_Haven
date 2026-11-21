@@ -124,9 +124,6 @@ public sealed class PlayerCameraController : MonoBehaviour
     private float overviewYaw;
     private float overviewFieldOfView;
 
-    /// <summary>True while an overview holds the camera, or the camera is still gliding back down from one.</summary>
-    public bool InOverview => overview != null || overviewWeight > 0f;
-
     /// <summary>0 framing the player, 1 fully in the overview.</summary>
     public float OverviewWeight => overviewWeight;
 
@@ -150,6 +147,9 @@ public sealed class PlayerCameraController : MonoBehaviour
         {
             ReadOverview();
             overview = null;
+            // The way the overview faced is kept: gliding back to the old heading turned the world under the player.
+            yaw = yawTarget = overviewYaw;
+            yawVelocity = 0f;
         }
     }
 

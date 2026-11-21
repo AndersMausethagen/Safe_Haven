@@ -736,7 +736,8 @@ public sealed class HavenWindow : MonoBehaviour
 
         bool open = KeeperView.Current != null && KeeperView.Current.WhyNot() == null;
         lookButton.gameObject.SetActive(open);
-        lookLabel.text = $"Look over the Haven ({GameInput.KeyLabel(GameInput.KeeperView)})";
+        // The key on a keyboard; a controller opens it from the windows wheel, so no key is named.
+        lookLabel.text = InputDevices.UsingGamepad ? "Look over the Haven" : $"Look over the Haven ({GameInput.KeyLabel(GameInput.KeeperView)})";
     }
 
     private void LookOver()

@@ -36,9 +36,6 @@ public sealed class KeeperCameraRig
         Target += PanDelta(Yaw, Vector2.ClampMagnitude(push, 1f), PanSpeed(settings) * deltaTime);
     }
 
-    /// <summary>Moves the target by a drag of the ground: <paramref name="metres"/> along the screen's right and up, as seen.</summary>
-    public void Drag(Vector2 metres) => Target += PanDelta(Yaw, metres, 1f);
-
     public void Turn(float degrees) => Yaw = Mathf.Repeat(Yaw + degrees, 360f);
 
     public void ZoomBy(float amount) => Zoom = Mathf.Clamp01(Zoom + amount);

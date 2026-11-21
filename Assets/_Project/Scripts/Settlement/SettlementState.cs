@@ -40,6 +40,8 @@ public sealed class ResidentRecord
     private string homeChosen = "";
     private string workplace = "";
     private string workQueue = "";
+    private float haulDone;
+    private ItemDefinition workGear;
 
     private void Change<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string change = null)
     {
@@ -80,6 +82,10 @@ public sealed class ResidentRecord
     public string Workplace { get => workplace; set => Change(ref workplace, value); }
     /// <summary>That building's station queue (StationQueue.StationId), so their work goes on there during raids.</summary>
     public string WorkQueue { get => workQueue; set => Change(ref workQueue, value); }
+    /// <summary>Weight carried for their work, all told: their Strength (WorkerSettings), with the raids they went along on.</summary>
+    public float HaulDone { get => haulDone; set => Change(ref haulDone, value); }
+    /// <summary>The worker gear the player gave them (ItemDefinition › Worker Gear), or null.</summary>
+    public ItemDefinition WorkGear { get => workGear; set => Change(ref workGear, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>

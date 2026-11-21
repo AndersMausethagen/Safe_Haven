@@ -403,7 +403,9 @@ public sealed class StationWindow : MonoBehaviour
             return;
         }
 
-        if (station == null || !station.Usable || user == null || HorizontalDistance(user.transform.position, station.transform.position) > range)
+        // Opened from the Keeper's view, it goes with it: back on their feet the player collects at the station as ever.
+        if (station == null || !station.Usable || user == null || (fromAfar && !KeeperView.IsOpen)
+            || HorizontalDistance(user.transform.position, station.transform.position) > range)
         {
             Close();
             return;

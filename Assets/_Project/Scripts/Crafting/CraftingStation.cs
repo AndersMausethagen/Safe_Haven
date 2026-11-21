@@ -163,22 +163,50 @@ public sealed class CraftingStation : MonoBehaviour
     // What the extensions standing by it add (a tool rack's queue, a log rack's output).
     private float Extensions(System.Func<ExtensionBonus, float> bonus) => building != null ? StationExtensions.Bonus(building, bonus) : 0f;
 
-    /// <summary>How fast it works: upgrades, plus a resident whose job works here (WorkerSpeedBonus, more from a good home:
-    /// HomeLife), plus a horse at work beside it (HorseJobs), its yard's role (Yards) and its extensions (StationExtensions).</summary>
-    public float Speed
+    /// <summary>How fast it works with its worker at it: <see cref="OwnSpeed"/> and <see cref="WorkerAdds"/>.</summary>
+    public float Speed => OwnSpeed + WorkerAdds;
+
+    /// <summary>How fast it works on its own (Palworld's work speed, Docs/ColonyModeResearch_2026-11-21.md): WorkerSettings › Unattended
+    /// Speed, plus its upgrades, a horse at work beside it (HorseJobs), its yard's role (Yards) and its extensions (StationExtensions).</summary>
+    public float OwnSpeed =>
+        WorkerSettings.Current.UnattendedSpeed + Upgrades(level => level.craftSpeed) + HorseJobs.SpeedBonusFor(this)
+        + (building != null ? Yards.StationSpeed(building) + StationExtensions.Bonus(building, extension => extension.craftSpeed) : 0f);
+
+    /// <summary>What its worker adds while they stand at it: WorkerSettings › Worker Speed, a bed of their own (BedSpeedBonus), a good
+    /// home (HomeLife), their worker gear, all times their rank (SettlementState.WorkerSpeed). 0 with no worker.</summary>
+    public float WorkerAdds
     {
         get
         {
             ResidentRecord worker = Worker;
-            float staffed = worker == null ? 0f : WorkerSpeedBonus + (GameSession.Here.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker);
-            // A horse put to work beside it (ploughing, hauling) adds its job's bonus.
-            return 1f + Upgrades(level => level.craftSpeed) + staffed + HorseJobs.SpeedBonusFor(this)
-                + (building != null ? Yards.StationSpeed(building) + StationExtensions.Bonus(building, extension => extension.craftSpeed) : 0f);
+            if (worker == null)
+            {
+                return 0f;
+            }
+
+            float own = WorkerSettings.Current.WorkerSpeed + (GameSession.Here.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker)
+                + (worker.WorkGear != null ? worker.WorkGear.WorkerSpeed : 0f);
+            return own * GameSession.Here.WorkerSpeed(Id, type);
         }
     }
 
-    /// <summary>A resident working here makes the station this much faster.</summary>
-    public const float WorkerSpeedBonus = 0.5f;
+    /// <summary>Whether its worker is at it: at work at this building at home (not fetching, building or away from it). True where
+    /// their body isn't in the scene (a friend's copy, a load still settling): the work isn't held up for want of a body.</summary>
+    public bool WorkerIsHere
+    {
+        get
+        {
+            ResidentRecord worker = Worker;
+            if (worker == null)
+            {
+                return false;
+            }
+
+            ResidentLife life = ResidentLife.Of(worker.Resident);
+            return life == null || life.WorksAt(building);
+        }
+    }
+
 
     /// <summary>And this much more when they have a bed of their own. They work without one.</summary>
     public const float BedSpeedBonus = 0.25f;
@@ -214,8 +242,11 @@ public sealed class CraftingStation : MonoBehaviour
             StationQueue queue = GameSession.HereItself.Workshops.GetOrCreate(Id, type, OutputCapacity, QueueLength);
             if (queue != null)
             {
-                // The building's level, and the rank of the resident who works here.
-                queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(Id, type);
+                // The building's own speed, and what its worker adds while at it (their rank in it, their bed, home and gear).
+                queue.SpeedMultiplier = OwnSpeed;
+                queue.WorkerSpeed = WorkerAdds;
+                queue.WorkerHere = WorkerIsHere;
+                queue.HorseHelps = HorseJobs.SpeedBonusFor(this) > 0f;
                 queue.Tier = Tier;
                 queue.Modules = TryGetComponent(out Construction fittedTo) ? fittedTo.Fitted : System.Array.Empty<BuildingModuleDefinition>();
                 // Kept on the queue so its worker's luck holds during raids, when no station is loaded. Modules add to the extensions'

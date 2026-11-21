@@ -37,7 +37,7 @@ public sealed class PlayerControl : MonoBehaviour
     public static readonly string[] WindowKeyPaths =
     {
         "Player/Items", "Player/Inventory", "Player/Skills", "Player/Character", "Player/Build", "Player/Talents",
-        "Player/Journal", "Player/Tutorial", "Player/Haven", "Player/WorldMap",
+        "Player/Journal", "Player/Tutorial", "Player/Haven", "Player/WorldMap", "Player/WindowsWheel",
     };
 
     private readonly Dictionary<object, Kept> holders = new Dictionary<object, Kept>();
