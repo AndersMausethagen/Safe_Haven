@@ -47,6 +47,12 @@ public sealed partial class MonsterAI
 
         Vector2 miss = UnityEngine.Random.insideUnitCircle * PerceptionRules.HeardError(distance, radius, definition.Hearing, rules, muffled);
         senses.Awareness.Hear(level, position + new Vector3(miss.x, 0f, miss.y));
+        // Something loud right beside it: it turns to face it now, all but aware, and its eyes do the rest on the next look.
+        if (!muffled && level >= rules.TurnToSoundLevel && rules.TurnToSoundLevel < 1f)
+        {
+            senses.Awareness.Hear(1f, position);
+            FaceNow(position);
+        }
         if (senses.Stage != AwarenessStage.Unaware)
         {
             BeginInvestigate(false);
@@ -62,6 +68,21 @@ public sealed partial class MonsterAI
                 nextGlanceAt = Time.time + FaintSoundLookSeconds;
             }
         }
+    }
+
+    // Turns it on the spot toward a position (a loud sound beside it), and keeps its idle gaze there a while.
+    private void FaceNow(Vector3 position)
+    {
+        Vector3 toward = position - transform.position;
+        toward.y = 0f;
+        if (toward.sqrMagnitude < 0.01f)
+        {
+            return;
+        }
+
+        transform.rotation = Quaternion.LookRotation(toward.normalized);
+        glanceHeading = toward.normalized;
+        nextGlanceAt = Time.time + FaintSoundLookSeconds;
     }
 
     // How long a sound too faint to make it suspicious holds its gaze.

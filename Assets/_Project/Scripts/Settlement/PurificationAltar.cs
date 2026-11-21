@@ -29,6 +29,9 @@ public sealed class PurificationAltar : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => standing.Clear();
 
+    /// <summary>Every altar standing in this scene (the bar over it: StationProgressBars).</summary>
+    public static System.Collections.Generic.IReadOnlyList<PurificationAltar> Standing => standing;
+
     private void OnEnable()
     {
         standing.Add(this);

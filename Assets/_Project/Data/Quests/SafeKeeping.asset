@@ -48,9 +48,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 1
   objectives:
@@ -74,6 +79,10 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 16
     description: Put something you can't afford to lose in the chest
     amount: 1
@@ -94,11 +103,22 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
-  rewardItems: []
+  rewardItems:
+  - item: {fileID: 11400000, guid: 9a9b05ce86e28a546ab88dbfd2f5e304, type: 2}
+    amount: 1
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

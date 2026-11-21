@@ -113,3 +113,27 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
       fixedAmount: 0
+    - item: {fileID: 11400000, guid: ecd7be96c26c3794ea423515bcaf8585, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+    - item: {fileID: 11400000, guid: 9a9b05ce86e28a546ab88dbfd2f5e304, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1
+    - item: {fileID: 11400000, guid: d50ecf78aa2823b4da064d9faffa84ab, type: 2}
+      resource: {fileID: 0}
+      minQuantity: 1
+      maxQuantity: 1
+      probability: 0.08
+      fromTier: 0
+      toTier: 0
+      fixedAmount: 1

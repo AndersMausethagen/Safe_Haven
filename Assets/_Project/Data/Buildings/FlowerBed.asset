@@ -26,7 +26,7 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
     amount: 2
   showInBuildMenu: 1
-  knownFromStart: 1
+  knownFromStart: 0
   sortOrder: 916
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
@@ -38,6 +38,23 @@ MonoBehaviour:
   yardSide: 0
   placeInLines: 0
   decoration: 1
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5

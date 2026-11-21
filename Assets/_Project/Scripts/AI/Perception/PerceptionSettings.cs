@@ -125,6 +125,10 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     [SerializeField, Min(0f)] private float deathCryNoise = 9f;
     [Tooltip("How loud a sound must reach game (deer, foxes) to send it running (0-1 of a sound heard right beside it).")]
     [SerializeField, Range(0.05f, 1f)] private float gameStartleLevel = 0.35f;
+    [Tooltip("A sound heard at least this strongly (Heard Level, unmuffled) turns a monster to face it at once, nearly aware: walking " +
+             "right up to one, dodging or fighting beside it. It then spots the player as soon as its eyes find them (the user's " +
+             "playtest, 2026-11-21: \"They should discover us if we ... do something loud right next to them\"). 1: never.")]
+    [SerializeField, Range(0.05f, 1f)] private float turnToSoundLevel = 0.75f;
     [Tooltip("Coming down hard.")]
     [SerializeField, Min(0f)] private float landingNoise = 6f;
     [Tooltip("Falling at least this fast (m/s) counts as coming down hard.")]
@@ -226,6 +230,7 @@ public sealed class PerceptionSettings : GameSettings<PerceptionSettings>
     public float FootstepNoise => footstepNoise;
     public float DeathCryNoise => deathCryNoise;
     public float GameStartleLevel => gameStartleLevel;
+    public float TurnToSoundLevel => turnToSoundLevel;
     public float SneakingFootstepNoise => sneakingFootstepNoise;
     public float FootstepInterval => footstepInterval;
     public float DodgeNoise => dodgeNoise;

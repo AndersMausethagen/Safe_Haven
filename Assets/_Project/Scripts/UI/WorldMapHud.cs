@@ -343,12 +343,25 @@ public sealed class WorldMapHud : MonoBehaviour
         QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
         int used = PlaceRaidMarks(width, height);
+        // Home and how far it is, at the Haven's heart.
+        if (HomePortal.Current != null && RaidDirector.Current == null && Player.Current != null)
+        {
+            Vector3 home = HomePortal.Current.transform.position;
+            Vector3 flat = home - Player.Current.transform.position;
+            flat.y = 0f;
+            ShowMark(used++, home, UIStyle.Current.AccentBright, UIStyle.Current.Icon("House"), $"Home  {Mathf.RoundToInt(flat.magnitude / 10f) * 10} m", width, height);
+        }
+
         // The player's own horses, by name.
         foreach (Horse horse in Horse.All)
         {
             if (horse != null && horse.IsTamed && horse.IsAlive && horse.Rider == null)
             {
                 ShowMark(used++, horse.transform.position, UIStyle.Current.Accent, null, horse.HorseName, width, height);
+            }
+            else if (horse != null && horse.IsWild && horse.IsAlive && horse.Sighted)
+            {
+                ShowMark(used++, horse.transform.position, UIStyle.Current.Info, null, "A wild horse", width, height);
             }
         }
 

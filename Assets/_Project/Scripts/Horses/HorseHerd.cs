@@ -57,6 +57,17 @@ public sealed class HorseHerd : MonoBehaviour
         }
     }
 
+    // Raises a horse's story event for the player once a game (A Horse of Your Own starts on Wild Horse Met).
+    private static void Tell(GameEventDefinition happened)
+    {
+        Player player = Player.Current;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : null;
+        if (happened != null && player != null && log != null && !HavenVisit.IsVisiting && !log.HasHappened(happened))
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.Custom, happened, 1, player.gameObject));
+        }
+    }
+
     // The first wild horse near the player at home starts the Stable's tale (HorseSettings › Wild Horse Met), once a game.
     private static void NoteWildHorseMet()
     {
@@ -79,6 +90,25 @@ public sealed class HorseHerd : MonoBehaviour
         }
     }
 
+    // Every wild horse that comes near the player is marked on the map from then on (Horse.Sighted), as the told-of first one is.
+    private static void MarkSighted()
+    {
+        Player player = Player.Current;
+        if (player == null)
+        {
+            return;
+        }
+
+        float within = HorseSettings.Current.MetWithin;
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsWild && !horse.Sighted && (horse.transform.position - player.transform.position).sqrMagnitude <= within * within)
+            {
+                horse.Sighted = true;
+            }
+        }
+    }
+
     private void Update()
     {
         if (Time.time < nextCheck)
@@ -88,6 +118,7 @@ public sealed class HorseHerd : MonoBehaviour
 
         nextCheck = Time.time + 2f;
         NoteWildHorseMet();
+        MarkSighted();
         if (clock == null)
         {
             clock = FindAnyObjectByType<DayNightCycle>();
@@ -190,11 +221,21 @@ public sealed class HorseHerd : MonoBehaviour
         // The promise is kept once a horse is tamed (HasHorse above), not when this one comes: a wild horse isn't saved, so
         // one left untamed at a raid or a reload must come again on the next visit.
         promised = horse;
+        // Told of, it is on the map (the user's playtest, 2026-11-21: "When the notification about a nearby horse comes, it should
+        // mark it on the map").
+        horse.Sighted = true;
         if (!journal.HasTried(FirstHorseToldFlag))
         {
             journal.NoteTried(FirstHorseToldFlag);
             GameMessages.Post($"{settings.FirstHorseTeller}: \"{settings.FirstHorseLine}\"", MessageKind.Info);
+            if (!string.IsNullOrWhiteSpace(settings.FirstHorseHowTo))
+            {
+                GameMessages.Post(settings.FirstHorseHowTo, MessageKind.Info);
+            }
+
             JournalNotices.Tried(ProficiencyTraining.Horsemanship);
+            // Its tale starts now, not only once the horse is near: getting the lasso and the barley is its first steps.
+            Tell(settings.WildHorseMet);
         }
 
         return true;

@@ -75,6 +75,8 @@ public static class HorseBreeding
             temperament = random.NextDouble() < 0.2 ? settings.RollTemperament(random) : (random.NextDouble() < 0.5 ? mother : father).temperament,
             growth = settings.FoalSize,
             generation = Mathf.Max(mother.generation, father.generation) + 1,
+            // Mixed from parents already at the current tuning (Horse.Give retunes them).
+            tuning = HorseStats.CurrentTuning,
         };
     }
 

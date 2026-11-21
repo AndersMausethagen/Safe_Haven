@@ -185,7 +185,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ef578a5abbaf2034f9180ef4e912024a, type: 2}
   turnInToGiver: 0
   turnInTo: 
-  rewardItems: []
+  rewardItems:
+  - item: {fileID: 11400000, guid: 7ee1e94efdca81f46bd1e1da362411e4, type: 2}
+    amount: 1
   rewardResources: []
   rewardRecipes: []
   rewardEnchantments: []

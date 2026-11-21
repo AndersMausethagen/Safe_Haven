@@ -49,8 +49,14 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -74,13 +80,24 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
-  rewardItems: []
+  rewardItems:
+  - item: {fileID: 11400000, guid: f16a0b28ff854334ca83d11f754ac93a, type: 2}
+    amount: 1
   rewardResources:
   - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
     amount: 2
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

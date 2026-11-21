@@ -165,8 +165,32 @@ public sealed class SpiderLegs : MonoBehaviour
         }
 
         Vector3 lead = new Vector3(velocity.x, 0f, velocity.z) * stepLead;
+        float reachAll = lengths.x + lengths.y + lengths.z;
         foreach (Leg leg in legs)
         {
+            // A foot left behind out of reach (a fast turn, a lunge, a foot caught on a root or a rock) steps at once, whatever the
+            // other group does, and one far past reach is put down where it belongs: legs stretched to it looked like taffy (the
+            // user's playtest, 2026-11-21).
+            if (leg.hip != null)
+            {
+                float fromHip = Vector3.Distance(leg.hip.position, leg.stepT < 1f ? leg.to : leg.foot);
+                if (fromHip > reachAll * 1.35f)
+                {
+                    leg.foot = leg.from = leg.to = Ground(transform.TransformPoint(leg.rest) + lead);
+                    leg.stepT = 1f;
+                    continue;
+                }
+
+                if (leg.stepT >= 1f && fromHip > reachAll * 0.95f)
+                {
+                    leg.from = leg.foot;
+                    leg.to = Ground(transform.TransformPoint(leg.rest) + lead);
+                    leg.stepT = 0f;
+                    groupStepping[leg.group & 1] = true;
+                    continue;
+                }
+            }
+
             if (leg.stepT < 1f)
             {
                 leg.stepT = Mathf.Min(1f, leg.stepT + Time.deltaTime / stepTime);
@@ -207,8 +231,10 @@ public sealed class SpiderLegs : MonoBehaviour
         float bob = Mathf.Sin(Time.time * (6f + speed * 2f)) * 0.03f * Mathf.Clamp01(speed);
         Vector3 offset = bodyRest + new Vector3(0f, all + bob + rearing * 0.35f, rearing * lunge);
         body.localPosition = Vector3.Lerp(body.localPosition, offset, 1f - Mathf.Exp(-14f * Time.deltaTime));
+        // Tilted in the model's frame (x right, z ahead), not the mesh's: the mesh lies rotated from its export, and its own
+        // axes turned the roll into a yaw.
         Quaternion tilt = Quaternion.Euler(pitch - rearing * 18f, 0f, roll);
-        body.localRotation = Quaternion.Slerp(body.localRotation, bodyRestRotation * tilt, 1f - Mathf.Exp(-10f * Time.deltaTime));
+        body.localRotation = Quaternion.Slerp(body.localRotation, tilt * bodyRestRotation, 1f - Mathf.Exp(-10f * Time.deltaTime));
     }
 
     // Two-bone IK from hip to ankle (knee up and out), the tarsus from ankle to foot.
@@ -246,6 +272,13 @@ public sealed class SpiderLegs : MonoBehaviour
         Vector3 knee = hip + dir * (lengths.x * cos) + bend * (lengths.x * Mathf.Sqrt(1f - cos * cos));
         // The ankle where the femur and tibia actually reach (the wanted one may be out of reach).
         ankle = knee + (ankle - knee).normalized * lengths.y;
+
+        // The tarsus keeps its length: a foot out of reach is reached toward, not stretched to (it steps there soon after).
+        Vector3 toFoot = foot - ankle;
+        if (toFoot.magnitude > lengths.z * 1.1f)
+        {
+            foot = ankle + toFoot.normalized * (lengths.z * 1.1f);
+        }
 
         Place(leg.segments[0], hip, knee);
         Place(leg.segments[1], knee, ankle);

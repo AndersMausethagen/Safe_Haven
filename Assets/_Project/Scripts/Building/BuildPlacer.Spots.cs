@@ -86,7 +86,10 @@ public sealed partial class BuildPlacer
         {
             // The ground itself is the area's to judge (Area.CheckSpot allows some unevenness): on a slope the rising terrain
             // inside the box made "in the way" of ground the area accepts.
-            if (!ghost.Contains(Overlaps[i]) && !(Overlaps[i] is TerrainCollider))
+            // A path is laid on the ground under what grows or lies there: sticks, stumps, overgrowth and rocks to gather didn't let a
+            // dirt road be drawn anywhere in the Haven (the user's playtest, 2026-11-21). Buildings and the rest still stand in its way.
+            if (!ghost.Contains(Overlaps[i]) && !(Overlaps[i] is TerrainCollider)
+                && !(path && Overlaps[i].GetComponentInParent<ResourceNode>() != null))
             {
                 return "Something is in the way.";
             }

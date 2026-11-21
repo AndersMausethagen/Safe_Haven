@@ -9205,7 +9205,7 @@ MonoBehaviour:
   rows: 5
   baseUnlockedSlots: 8
   safePocketSlots: 1
-  carryWeight: 150
+  carryWeight: 90
   startingItems: []
 --- !u!114 &3825429237106082492
 MonoBehaviour:

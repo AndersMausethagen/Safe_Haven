@@ -129,7 +129,10 @@ public sealed class HorseTests
         Assert.AreEqual(5, gaits.Length, "walk, trot, canter, gallop, sprint");
         for (int i = 1; i < gaits.Length; i++) Assert.Greater(gaits[i], gaits[i - 1], "each gait faster than the last");
         Assert.That(HorseMotion.GaitFor(kind.TrotSpeed, gaits), Is.InRange(3, 4), "ridden, it canters or gallops");
-        Assert.AreEqual(5, HorseMotion.GaitFor(kind.GallopSpeed.x, gaits), "spurred on, it sprints");
+        // Spurred on, it gallops at least, and the fastest sprint (since the gallop was made a fifth slower, 2026-11-21, a slow horse's
+        // gallop shows the gallop clip at its own pace rather than a sprint clip sliding its feet).
+        Assert.GreaterOrEqual(HorseMotion.GaitFor(kind.GallopSpeed.x, gaits), 4, "spurred on, it gallops");
+        Assert.AreEqual(5, HorseMotion.GaitFor(kind.GallopSpeed.y, gaits), "the fastest sprint");
         Assert.Less(kind.ShyDistance + 1.5f * kind.PerHeardMetre, kind.LassoRange, "a sneaking player gets within the lasso's reach");
         Assert.Greater(kind.ShyDistance + 5f * kind.PerHeardMetre, kind.LassoRange, "a walking one doesn't");
     }

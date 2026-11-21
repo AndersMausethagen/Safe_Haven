@@ -24,7 +24,7 @@ public sealed class ItemInventory : MonoBehaviour
     [Tooltip("Slots in the safe pocket. Whatever is in it is kept even when a raid fails.")]
     [SerializeField, Min(0)] private int safePocketSlots = 1;
     [Tooltip("How much weight the bag carries before backpacks (GDD §12.4). 0 means no limit.")]
-    [SerializeField, Min(0f)] private float carryWeight = 150f;
+    [SerializeField, Min(0f)] private float carryWeight = 90f;
     [Tooltip("Items in the bag when the game starts. Useful for testing.")]
     [SerializeField] private List<ItemAmount> startingItems = new List<ItemAmount>();
 

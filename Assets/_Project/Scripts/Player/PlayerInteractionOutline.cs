@@ -8,6 +8,10 @@ public sealed class PlayerInteractionOutline : MonoBehaviour
 {
     [SerializeField] private Material outlineMaterial;
     [SerializeField] private Material maskMaterial;
+
+    /// <summary>The outline and its mask, for other outlines drawn the same way (NeededNearby).</summary>
+    public Material OutlineMaterial => outlineMaterial;
+    public Material MaskMaterial => maskMaterial;
     [SerializeField, Min(1f)] private float hoverDistance = 80f;
 
     // The scan over every Interactable (a thousand trees and rocks round the Haven) runs again only once the player has

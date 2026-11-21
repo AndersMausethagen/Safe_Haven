@@ -25,6 +25,11 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [Tooltip("Who tells the player of it (a resident's name), and what they say.")]
     [SerializeField] private string firstHorseTeller = "Sigrid";
     [SerializeField, TextArea] private string firstHorseLine = "There's a horse grazing out past the yard. A quiet one. Take a lasso and some barley, and keep low.";
+    [Tooltip("Said after it: what taming takes and where to get it (the user's playtest, 2026-11-21: \"It should also tell the player " +
+             "what is needed to tame it\"). The horse is marked on the map, and A Horse of Your Own starts with it.")]
+    [SerializeField, TextArea] private string firstHorseHowTo =
+        "To tame it: a Lasso (made by hand from 4 Nettle Cord and 1 Rough Hide) and 4 Barley (a Farm Plot grows it; caches and barrels " +
+        "in the woods hold some). It is marked on your map.";
 
     [Header("The Stable's tale (the quest flow review's A22)")]
     [Tooltip("Raised the first time a wild horse comes near the player at home: the Tale A Horse of Your Own starts on it.")]
@@ -170,6 +175,7 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public Vector2 FirstHorseRing => firstHorseRing;
     public string FirstHorseTeller => firstHorseTeller;
     public string FirstHorseLine => firstHorseLine;
+    public string FirstHorseHowTo => firstHorseHowTo;
     public float LeanTapsPerSecond => leanTapsPerSecond;
     public float LeanStaminaPerSecond => leanStaminaPerSecond;
     public float DragSpeed => dragSpeed;

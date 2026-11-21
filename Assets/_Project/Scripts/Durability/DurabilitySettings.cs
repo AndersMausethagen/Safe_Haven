@@ -19,6 +19,18 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
     [Tooltip("Durability a gathering tool loses on each glancing blow in the timing minigame (0.02 = 2%).")]
     [SerializeField, Range(0f, 0.25f)] private float wearPerGlancingBlow = 0.02f;
 
+    [Header("Wear in a fight")]
+    [Tooltip("Durability every worn piece of armour loses to a blow of Armour Wear Reference Damage that reaches the player (0.008 = " +
+             "0.8%), more for a harder blow (up to 3x) and less for a lighter one (down to a quarter). Broken armour stops protecting " +
+             "(the user's playtest, 2026-11-21: \"Armor should suffer damage as we get attacked\").")]
+    [SerializeField, Range(0f, 0.1f)] private float armourWearPerHit = 0.008f;
+    [Tooltip("The blow (damage before armour) that wears armour by exactly Armour Wear Per Hit.")]
+    [SerializeField, Min(1f)] private float armourWearReferenceDamage = 15f;
+    [Tooltip("Durability a shield loses to a blocked blow of the reference damage.")]
+    [SerializeField, Range(0f, 0.1f)] private float shieldWearPerBlock = 0.01f;
+    [Tooltip("A piece of armour worn down to this says so once (\"worn\"), before it breaks.")]
+    [SerializeField, Range(0f, 0.5f)] private float wornWarningAt = 0.2f;
+
     [Header("Repairs")]
     [Tooltip("Where gear is repaired.")]
     [SerializeField] private CraftingStationType repairStation = CraftingStationType.Workbench;
@@ -32,6 +44,10 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
 
     public float LossOnFailedRaid => lossOnFailedRaid;
     public float WearPerGlancingBlow => wearPerGlancingBlow;
+    public float ArmourWearPerHit => armourWearPerHit;
+    public float ArmourWearReferenceDamage => armourWearReferenceDamage;
+    public float ShieldWearPerBlock => shieldWearPerBlock;
+    public float WornWarningAt => wornWarningAt;
     public CraftingStationType RepairStation => repairStation;
     public float FullRepairCostShare => fullRepairCostShare;
     public int MinimumCostPerMaterial => minimumCostPerMaterial;

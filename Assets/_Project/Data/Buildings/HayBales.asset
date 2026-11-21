@@ -28,7 +28,7 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 2
   showInBuildMenu: 1
-  knownFromStart: 1
+  knownFromStart: 0
   sortOrder: 919
   requires:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
@@ -45,6 +45,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -53,6 +56,7 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5

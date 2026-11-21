@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c76fa069e85f784a9c1abb8f78fae26, type: 3}
+  m_Name: HerbPlanterPlans
+  m_EditorClassIdentifier: Assembly-CSharp::ItemDefinition
+  id: plans.herbplanter
+  displayName: Herb Planter Plans
+  description: How to make a Herb Planter, drawn out on bark. Read it at home to learn it for the build menu's Decorations.
+  category: 3
+  tier: 2
+  rarity: 1
+  value: 15
+  gearScoreOverride: 0
+  raidOnly: 0
+  icon: {fileID: 21300000, guid: b19b3aeb7ebb65c44aeaef268da71223, type: 3}
+  prefab: {fileID: 0}
+  heldModel: {fileID: 0}
+  heldPosition: {x: 0, y: 0, z: 0}
+  heldRotation: {x: 0, y: 0, z: 0}
+  heldScale: 1
+  stackable: 0
+  maximumStack: 99
+  weight: 0.5
+  toolType: 0
+  toolTier: 0
+  weapon: {fileID: 0}
+  arrow: {fileID: 0}
+  healAmount: 0
+  hungerRestore: 0
+  thirstRestore: 0
+  waterCapacity: 0
+  waterMeasure: 0
+  boonBonuses: []
+  boonSeconds: 300
+  tonic: 0
+  cures: []
+  gearRepair: 0
+  placesInRaid: {fileID: 0}
+  carryCapacityBonus: 0
+  bagSlotBonus: 0
+  carryNoise: 0
+  carrySpeedScale: 1
+  carrySound: {fileID: 0}
+  armorSlot: 0
+  wornLook: {fileID: 0}
+  statBonuses: []
+  breaksInto: []
+  teachesBuildings:
+  - {fileID: 11400000, guid: 6338a017f2f0f364cb10ccbef3c2603a, type: 2}
+  teachesRecipes: []
+  experience: 0
+  learnedAtHome: 1
+  inscription: 0
+  transport: {fileID: 0}
+  sapling: {fileID: 0}
+  lantern: {fileID: 0}
+  lasso: 0
+  saddleSlots: 0
+  horseArmour: 0
+  bardingLook: 0
+  horseTreat: 0
+  runeArt: {fileID: 0}
+  runeFocus: 30
+  runeFor: 0
+  raidModifier: {fileID: 0}

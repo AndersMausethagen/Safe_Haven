@@ -423,6 +423,12 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         combatant = GetComponent<Combatant>();
         damageable = GetComponent<Damageable>();
         var agent = GetComponent<NavMeshAgent>();
+        // Only swimmers go into deep water (DeepWater): the rest walked the bed under it.
+        if (agent != null && definition != null)
+        {
+            agent.areaMask = DeepWater.MaskFor(agent.areaMask, definition.Swims);
+        }
+
         movement = new MonsterMovement(transform, agent, repathInterval, turnSpeed);
         Animator body = GetComponentInChildren<Animator>();
         movement.FacesTravelWhenStrafing = body != null && !body.isHuman;

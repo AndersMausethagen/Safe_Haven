@@ -132,6 +132,8 @@ public sealed class NavMeshColliderCopies : ScriptableObject
         Bounds area = surface.collectObjects == CollectObjects.Volume
             ? new Bounds(surface.center, Abs(surface.size))
             : (Bounds)bounds.Invoke(surface, new object[] { sources });
+        // Deep water marked as its own area, kept out of by creatures that don't swim (DeepWater).
+        DeepWater.AddSources(sources, area);
         if (swapped > 0)
         {
             Debug.Log($"Raid navmesh: {swapped} collider meshes read from their copies.", surface);

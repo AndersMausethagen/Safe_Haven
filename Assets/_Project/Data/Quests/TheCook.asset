@@ -157,9 +157,12 @@ MonoBehaviour:
     source: 2
   unlocksBuildings:
   - {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
-  rewardItems: []
+  rewardItems:
+  - item: {fileID: 11400000, guid: d50ecf78aa2823b4da064d9faffa84ab, type: 2}
+    amount: 1
   rewardResources: []
   rewardRecipes: []
   rewardEnchantments: []

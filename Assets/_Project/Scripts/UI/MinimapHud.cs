@@ -49,6 +49,9 @@ public sealed class MinimapHud : MonoBehaviour
     private RectTransform arrow;
     private RectTransform north;
     private TMP_Text northLabel;
+    // How far home is, under the disc, once the player is out past the ward (the user's playtest, 2026-11-21: "The Haven should have
+    // a waypoint on as default, showing ... how far he is from the base").
+    private TMP_Text homeLabel;
     private RawImage ground;
     private Material material;
     private Texture2D map;
@@ -178,6 +181,16 @@ public sealed class MinimapHud : MonoBehaviour
         style.OnWorld(northLabel, false);
         north = northRect;
 
+        RectTransform homeRect = CodeUI.Box("Home Distance", disc, new Vector2(0.5f, 0f), new Vector2(220f, 22f), new Vector2(0f, -16f));
+        homeLabel = homeRect.gameObject.AddComponent<TextMeshProUGUI>();
+        homeLabel.fontSize = 15f;
+        homeLabel.alignment = TextAlignmentOptions.Center;
+        homeLabel.raycastTarget = false;
+        homeLabel.richText = true;
+        homeLabel.color = style.Text;
+        style.OnWorld(homeLabel, false);
+        homeLabel.gameObject.SetActive(false);
+
         arrow = CodeUI.Box("Player", disc, new Vector2(0.5f, 0.5f), Vector2.one * 24f, Vector2.zero);
         var arrowImage = arrow.gameObject.AddComponent<Image>();
         arrowImage.sprite = pointer;
@@ -293,7 +306,41 @@ public sealed class MinimapHud : MonoBehaviour
         }
 
         Place(centre, player);
+        ShowHomeDistance(centre, tree);
     }
+
+    // "Home 230 m" under the disc while the player is out past the ward at home; its mark stays on the rim pointing there.
+    private void ShowHomeDistance(Vector3 centre, HomePortal home)
+    {
+        if (homeLabel == null)
+        {
+            return;
+        }
+
+        bool far = home != null && RaidDirector.Current == null;
+        float metres = 0f;
+        if (far)
+        {
+            Vector3 flat = home.transform.position - centre;
+            flat.y = 0f;
+            metres = flat.magnitude;
+            far = metres > Mathf.Max(home.WardRadius, HomeLabelFrom);
+        }
+
+        homeLabel.gameObject.SetActive(far);
+        if (far)
+        {
+            int shown = Mathf.RoundToInt(metres / 10f) * 10;
+            if (shown != shownHomeMetres)
+            {
+                shownHomeMetres = shown;
+                homeLabel.text = HearthKit.InlineIcon("House") + $" Home  {shown} m";
+            }
+        }
+    }
+
+    private const float HomeLabelFrom = 40f;
+    private int shownHomeMetres = -1;
 
     private void Place(Vector3 centre, Player player)
     {
@@ -327,6 +374,12 @@ public sealed class MinimapHud : MonoBehaviour
         UIStyle style = UIStyle.Current;
         ExplorationMap explored = ExplorationMap.Current;
         used = 0;
+        // Home, always: the Haven's portal at the heart, kept on the rim when it is out of the disc's reach.
+        if (HomePortal.Current != null && RaidDirector.Current == null)
+        {
+            Add(HomePortal.Current.transform, style.Icon("House") ?? dot, style.AccentBright, 16f, pinned: true);
+        }
+
         foreach (BuildingObject building in BuildingObject.Active)
         {
             // Paths are many small pieces: they'd crowd the map with dots.
@@ -347,12 +400,17 @@ public sealed class MinimapHud : MonoBehaviour
             Add(transport.transform, null, style.Text, 6f);
         }
 
-        // The player's own horses, where they were left (the one ridden is under the player's arrow).
+        // The player's own horses, where they were left (the one ridden is under the player's arrow), and the wild ones told of or
+        // come near (Horse.Sighted), to go and tame.
         foreach (Horse horse in Horse.All)
         {
             if (horse != null && horse.IsTamed && horse.IsAlive && horse.Rider == null)
             {
                 Add(horse.transform, dot, style.Accent, 8f);
+            }
+            else if (horse != null && horse.IsWild && horse.IsAlive && horse.Sighted)
+            {
+                Add(horse.transform, dot, style.Info, 8f, pinned: true);
             }
         }
 

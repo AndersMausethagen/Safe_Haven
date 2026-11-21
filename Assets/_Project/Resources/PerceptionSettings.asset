@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf91a34ba78f674f9003e07ccb08408, type: 3}
   m_Name: PerceptionSettings
   m_EditorClassIdentifier: SafeHaven::PerceptionSettings
-  suspiciousAt: 0.35
-  nearNoticeSeconds: 0.6
-  farNoticeSeconds: 3
-  closeNoticeSeconds: 0.35
-  decayPerSecond: 0.15
-  minRangeScale: 0.45
+  suspiciousAt: 0.3
+  nearNoticeSeconds: 0.4
+  farNoticeSeconds: 2.2
+  closeNoticeSeconds: 0.25
+  decayPerSecond: 0.1
+  minRangeScale: 0.55
   maxRangeScale: 1.3
   eyeHeight: 1.4
   targetHeight: 1.1
@@ -29,19 +29,21 @@ MonoBehaviour:
   cutOffSeconds: 4
   cutOffForgetSeconds: 10
   denseFog: 0.06
-  sightInDenseFog: 0.55
-  sightAtNight: 0.75
+  sightInDenseFog: 0.75
+  sightAtNight: 0.85
   loseTrackSeconds: 3
   searchSeconds: 6
   maxInvestigateSeconds: 15
+  lostSearchSeconds: 20
+  sweepLookSeconds: 2
   investigateSpeedScale: 0.55
   lookAroundSpeed: 70
   lostTrackAwareness: 0.8
   idleGlanceSeconds: {x: 4, y: 9}
   idleGlanceAngle: 75
   spottedCallRadius: 10
-  heardAwarenessFar: 0.2
-  heardAwarenessNear: 0.9
+  heardAwarenessFar: 0.3
+  heardAwarenessNear: 0.95
   heardThroughCover: 0.6
   heardSpreadAtEdge: 6
   ambushDamageTaken: 1.5
@@ -51,8 +53,8 @@ MonoBehaviour:
   ambushFromBehindWhenSuspicious: 1
   seesKillRange: 9
   movingVisibility: 1
-  stillVisibility: 0.75
-  sneakingVisibility: 0.45
+  stillVisibility: 0.85
+  sneakingVisibility: 0.5
   fightingVisibility: 1.4
   fightingSeconds: 3
   sneakSpeedScale: 0.5
@@ -65,6 +67,7 @@ MonoBehaviour:
   swimNoise: 4
   deathCryNoise: 9
   gameStartleLevel: 0.35
+  turnToSoundLevel: 0.75
   landingNoise: 6
   landingSpeed: 3
   heavyGearNoise: 1.4

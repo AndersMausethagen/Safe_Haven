@@ -84,9 +84,13 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 2
+  unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
-  rewardItems: []
+  rewardItems:
+  - item: {fileID: 11400000, guid: dd73cd1ecd9db334a92f839b0064da84, type: 2}
+    amount: 1
   rewardResources: []
   rewardRecipes: []
   rewardEnchantments: []

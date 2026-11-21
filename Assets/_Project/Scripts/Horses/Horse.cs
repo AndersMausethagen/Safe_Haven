@@ -84,6 +84,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public Mode State { get; private set; } = Mode.Wild;
     public bool IsTamed => State == Mode.Tamed;
     public bool IsWild => State == Mode.Wild;
+    /// <summary>A wild horse the player has been told of or has come near: marked on the minimap and the world map until it goes.</summary>
+    public bool Sighted { get; set; }
     public string HorseName => !string.IsNullOrWhiteSpace(horseName) ? horseName
         : IsTamed ? (IsMine ? "Your horse" : $"{(string.IsNullOrWhiteSpace(ownerName) ? "A friend" : ownerName)}'s horse")
         : definition != null ? definition.DisplayName : "Horse";
@@ -249,7 +251,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     /// <summary>Gives it these stats: its health, its stamina (full), its coat, its mane and its size.</summary>
     public void Give(HorseStats stats)
     {
-        Stats = stats;
+        // A horse saved before a retune of the rolled numbers changes with them (HorseStats.Retuned).
+        Stats = HorseStats.Retuned(stats);
         SetHealthBase();
         Stamina = MaxStamina;
         WearCoat();

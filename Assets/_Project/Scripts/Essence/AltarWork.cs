@@ -64,7 +64,10 @@ public static class AltarWork
     {
         SettlementSettings settings = SettlementSettings.Current;
         int room = settings.MaxQueuedBatches - GameSession.Here.PurificationQueued;
-        batches = Mathf.Min(batches, room);
+        // As many as there is room for AND essence to pay for: "Purify all" asked for the whole queue's room and, with less Cursed
+        // than that, paid for nothing and did nothing (the user's playtest, 2026-11-21).
+        int affordable = settings.CursedPerBatch > 0 ? MaterialPool.For(user).Have(settings.CursedEssence) / settings.CursedPerBatch : 0;
+        batches = Mathf.Min(batches, Mathf.Min(room, affordable));
         int cost = batches * settings.CursedPerBatch;
         var price = new[] { new ResourceAmount(settings.CursedEssence, cost) };
         if (batches <= 0 || !MaterialPool.For(user).TrySpend(price))

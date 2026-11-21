@@ -94,6 +94,9 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     [Tooltip("How much of what it sees a sleeper notices. Low enough to creep past.")]
     [SerializeField, Range(0f, 1f)] private float idleSleepAttention = 0.3f;
 
+    [Tooltip("Aquatic: it swims or dives, and goes into deep water. Without it, it keeps to land and the shallows (DeepWater).")]
+    [SerializeField] private bool swims;
+
     [Header("Game")]
     [Tooltip("It runs instead of fighting: when struck, and when the player comes into its sight within its Detection Range (a sneaking " +
              "hunter gets closer) or steps inside its Close Sense Range. For game to hunt, set Faction to Neutral as well.")]
@@ -263,6 +266,7 @@ public sealed class MonsterDefinition : ScriptableObject, ICombatSounds
     public float MoveSpeed => moveSpeed;
     /// <summary>Game: it runs instead of fighting (MonsterAI.Timid).</summary>
     public bool Timid => timid;
+    public bool Swims => swims;
     public float BoltSeconds => boltSeconds;
     /// <summary>A thief: snatches a stack from the player or a cart and runs (MonsterAI.Thief).</summary>
     public bool Thief => thief;

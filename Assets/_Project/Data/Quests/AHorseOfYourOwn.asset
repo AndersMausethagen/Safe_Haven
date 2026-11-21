@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: ahorseofyourown
   displayName: A Horse of Your Own
-  description: A wild horse grazes near the Haven. Get close without it bolting, rope it, hold on through the struggle, ride it until it gives in, and feed it barley. Then give it a Stable to come home to.
+  description: A wild horse grazes near the Haven. Make a Lasso by hand (4 Nettle Cord, 1 Rough Hide) and bring 4 Barley (grown on a Farm Plot, or found in caches and barrels in the woods). Get close without it bolting, rope it, hold on through the struggle, ride it until it gives in, and feed it barley. Then give it a Stable to come home to.
   chain: 
   journalNotes: 'Wild horses are shy: come at them low and slow. A lasso holds one long enough to climb on; barley, fed a few times, makes it yours. A Stable keeps it, and two in one can foal.'
   rank: 1
@@ -59,6 +59,54 @@ MonoBehaviour:
   onStarted: []
   objectivesInOrder: 1
   objectives:
+  - type: 0
+    description: 'Make a Lasso (by hand: 4 Nettle Cord, 1 Rough Hide)'
+    amount: 1
+    item: {fileID: 11400000, guid: ff9d97d9d45a99f439a3df21add6df1a, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 0
+    description: Have 4 Barley (a Farm Plot grows it; caches and barrels hold some)
+    amount: 4
+    item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   - type: 6
     description: 
     amount: 1

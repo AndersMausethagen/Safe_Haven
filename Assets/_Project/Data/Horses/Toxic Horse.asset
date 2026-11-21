@@ -24,12 +24,12 @@ MonoBehaviour:
   abilities: 7
   health: {x: 220, y: 300}
   stamina: {x: 120, y: 160}
-  gallopSpeed: {x: 11.5, y: 13.5}
+  gallopSpeed: {x: 9.2, y: 10.8}
   carryWeight: {x: 70, y: 100}
   walkSpeed: 1.6
   trotSpeed: 6
-  canterSpeed: 9.5
-  gallopCost: 9
+  canterSpeed: 8.2
+  gallopCost: 10.8
   staminaRegen: 6
   turnSpeed: 220
   shyDistance: 4.5

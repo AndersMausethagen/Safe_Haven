@@ -52,6 +52,32 @@ public struct HorseStats
     /// <summary>1 + its rare coat's index (HorseDefinition › Rare Coats), or 0 for a common coat (so saves from before
     /// rare coats load as common).</summary>
     public int rareCoat;
+    /// <summary>Which retuning of the rolled numbers these were made under (<see cref="CurrentTuning"/>); 0 for saves from before.</summary>
+    public int tuning;
+
+    /// <summary>
+    /// 1: the gallop 20% slower (the user's playtest, 2026-11-21: "nerf horse sprint speed by about 20%"). Raise it with a new
+    /// step in <see cref="Retuned"/> when rolled numbers change meaning, so horses already tamed change with the new ones.
+    /// </summary>
+    public const int CurrentTuning = 1;
+    public const float GallopRetune1 = 0.8f;
+
+    /// <summary>These stats brought up to the current tuning: a horse tamed before a retune changes as a new one would.</summary>
+    public static HorseStats Retuned(HorseStats stats)
+    {
+        if (!stats.IsRolled || stats.tuning >= CurrentTuning)
+        {
+            return stats;
+        }
+
+        if (stats.tuning < 1)
+        {
+            stats.gallopSpeed = Mathf.Round(stats.gallopSpeed * GallopRetune1 * 10f) / 10f;
+        }
+
+        stats.tuning = CurrentTuning;
+        return stats;
+    }
 
     public bool IsRolled => maxHealth > 0f;
     public bool IsGrown => growth <= 0f || growth >= 0.999f;
@@ -76,6 +102,7 @@ public struct HorseStats
             temperament = HorseSettings.Current.RollTemperament(random),
             growth = 1f,
             rareCoat = definition.RollRareCoat(random),
+            tuning = CurrentTuning,
         };
     }
 

@@ -7,7 +7,9 @@ using UnityEngine.UI;
 /// A bar over every building at work on a queue (the user, 2026-11-19: queued work should show its progress over the building, as
 /// its station window shows it): the Hearthline bar the window draws (KitBar), what is being made and how many wait after it, and
 /// "full" when its output has no room. Over buildings in front of the camera and within <see cref="Reach"/> metres only, and not
-/// while a window is open (the station's own window shows the same). It only reads CraftingStation.Active and their queues.
+/// while a window is open (the station's own window shows the same). It only reads CraftingStation.Active and their queues, and the
+/// Purification Altar's batches (SettlementState), which work the same way (the user's playtest, 2026-11-21: "Purification altar
+/// should also show a progress bar as the other buildings does").
 /// </summary>
 public sealed class StationProgressBars : MonoBehaviour
 {
@@ -27,7 +29,7 @@ public sealed class StationProgressBars : MonoBehaviour
     }
 
     private readonly List<Widget> widgets = new List<Widget>();
-    private readonly Dictionary<CraftingStation, float> roofs = new Dictionary<CraftingStation, float>();
+    private readonly Dictionary<Component, float> roofs = new Dictionary<Component, float>();
     private RectTransform area;
     private GameObject root;
 
@@ -97,6 +99,8 @@ public sealed class StationProgressBars : MonoBehaviour
                 string made = queue.Current.DisplayName;
                 widget.Label.text = queue.Blocked ? $"{made}  <color={style.DangerHex}>full</color>" : waiting > 0 ? $"{made}  +{waiting}" : made;
             }
+
+            used = ShowAltars(view, from, used);
         }
 
         for (int i = used; i < widgets.Count; i++)
@@ -105,8 +109,57 @@ public sealed class StationProgressBars : MonoBehaviour
         }
     }
 
+    // The altar's batches: the one under way and how many wait; "needs a Purifier" while nobody works it (the batch doesn't move).
+    private int ShowAltars(Camera view, Vector3 from, int used)
+    {
+        IHavenView settlement = GameSession.Here;
+        SettlementSettings settings = SettlementSettings.Current;
+        if (settlement == null || settings == null || settlement.PurificationQueued <= 0 || HavenVisit.InHostsHaven)
+        {
+            return used;
+        }
+
+        foreach (PurificationAltar altar in PurificationAltar.Standing)
+        {
+            if (altar == null || (altar.transform.position - from).sqrMagnitude > Reach * Reach
+                || !Place(view, altar.transform.position + Vector3.up * RoofOf(altar), out Vector2 at))
+            {
+                continue;
+            }
+
+            Widget widget = WidgetAt(used++);
+            widget.Root.anchoredPosition = at;
+            UIStyle style = UIStyle.Current;
+            bool staffed = settlement.HasWorker(settings.PurifierJob);
+            float share = Mathf.Clamp01(settlement.PurificationProgress / Mathf.Max(0.01f, settings.SecondsPerBatch));
+            KitBar.Set(widget.Fill, widget.FillImage, share, staffed ? style.Accent : style.Danger);
+            int waiting = settlement.PurificationQueued - 1;
+            string made = settings.PurifiedEssence != null ? settings.PurifiedEssence.DisplayName : "Purifying";
+            string worker = settings.PurifierJob != null ? settings.PurifierJob.DisplayName : "worker";
+            widget.Label.text = !staffed ? $"{made}  <color={style.DangerHex}>needs a {worker}</color>" : waiting > 0 ? $"{made}  +{waiting}" : made;
+        }
+
+        return used;
+    }
+
+    // Where over the screen a point stands, kept inside it; false behind the camera or off the bar's area.
+    private bool Place(Camera view, Vector3 over, out Vector2 at)
+    {
+        Vector3 screen = view.WorldToScreenPoint(over);
+        if (screen.z <= 0f || !RectTransformUtility.ScreenPointToLocalPointInRectangle(area, screen, null, out at))
+        {
+            at = default;
+            return false;
+        }
+
+        Rect bounds = area.rect;
+        at.x = Mathf.Clamp(at.x, bounds.xMin + BarWidth, bounds.xMax - BarWidth);
+        at.y = Mathf.Min(at.y, bounds.yMax - ScreenTop);
+        return true;
+    }
+
     // Metres above its foot that the bar stands: the top of what is drawn, worked out once per building.
-    private float RoofOf(CraftingStation station)
+    private float RoofOf(Component station)
     {
         if (roofs.TryGetValue(station, out float roof))
         {
