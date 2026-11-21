@@ -1,0 +1,9 @@
+[
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/SFX/Safe Haven Cinematics/Misty Woods Drone.wav", "start": 0.0, "volume": 0.55, "fade_in": 0.6, "fade_out": 1.2},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/Ambience/Misty Woods/woods_bed_night.wav", "start": 0.0, "volume": 0.5, "fade_in": 0.8, "fade_out": 1.2},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/SFX/Safe Haven World/Troll Step 2.wav", "start": 0.35, "volume": 0.45},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/Voice/MistyWoods/MistyWoods_m05a.wav", "start": 1.0, "volume": 1.0},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/Voice/MistyWoods/MistyWoods_m05b.wav", "start": 4.6, "volume": 1.0},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/Ambience/Misty Woods/woods_creak_1.wav", "start": 3.4, "volume": 0.35},
+  {"file": "D:/Safe Haven/Safe Haven/Assets/_Project/Audio/SFX/Safe Haven World/Troll Step 4.wav", "start": 6.9, "volume": 0.4}
+]

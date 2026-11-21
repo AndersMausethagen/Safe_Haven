@@ -41,6 +41,8 @@ public sealed class CoopWireTests
         // 2026-11-17 (the Lost): a creature's spawn carries one of the Lost's rank and name before its affixes ("~3~Halvard Hollow-Eyed|
         // Frenzied", packed in the string, so the fingerprint is the same), and its traits may come from the Lost's own list.
         [31] = "4ba9741053cf4aa27bcdec5ea5674d39",
+        // HorseStats.tuning (2026-11-21: the gallop a fifth slower, horses tamed before retuned once).
+        [32] = "617935cbc9115f5ddcafddfc6a946a7a",
     };
 
     /// <summary>The fingerprint of the messages as they are now.</summary>
