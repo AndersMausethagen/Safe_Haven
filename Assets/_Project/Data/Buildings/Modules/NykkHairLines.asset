@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.nykkhairlines
   displayName: Nykk-hair Lines
   description: Lines twisted from a nykk's own pale hair, with steel in the water to bind it. The deep fish take them as they take nothing else.
-  icon: {fileID: 21300000, guid: bba8bd4bc74bf214dbbd679d75789355, type: 3}
+  icon: {fileID: 21300000, guid: 0e99c2caa31708c4c9df425e4ca58326, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
@@ -52,4 +52,5 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
     amount: 4
   essence: []
+  work: 5
   knownFromStart: 0

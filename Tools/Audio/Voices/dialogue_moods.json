@@ -2920,5 +2920,525 @@
   "text": "A test line while the bag opens over it.",
   "mood": "Neutral",
   "by": "kind"
+ },
+ "0161287aa162": {
+  "speaker": "Asa",
+  "text": "Iron chafes. It wants linen under it. Build me a tailor's shop by Gunnar's lodge and I'll ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d8e9e13983a7": {
+  "speaker": "Asa",
+  "text": "You gather what the woods drop. I grow what they won't. Give me the Farmer's work and a pl",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c3f14d9279d0": {
+  "speaker": "Asa",
+  "text": "A Farm Plot. Turn the earth somewhere it gets the sun.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "345a4553aa08": {
+  "speaker": "Asa",
+  "text": "The Tailor's Shop at Tier II, four Linen, and the Weaver's work for me.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "99f7b795e89b": {
+  "speaker": "Asa",
+  "text": "I'm from past the ridge. I walked home last spring and the road went somewhere else, and m",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ecfb5a5d49a3": {
+  "speaker": "Bjarne",
+  "text": "Copper wants a hotter fire than this hearth gives. Raise the Smithy a tier. The fire's big",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f61877092b58": {
+  "speaker": "Bjarne",
+  "text": "There's copper in these woods, and charcoal in any oak you leave smouldering by the fire. ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "239a46322aa6": {
+  "speaker": "Bjarne",
+  "text": "There's iron in the barrows. Grave iron, the old ones called it: it holds an edge and it h",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d35c809ee389": {
+  "speaker": "Bjarne",
+  "text": "You found me. Then let me earn my bread. Give me the Smith's work and a Smithy, and nothin",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c2ed830ae672": {
+  "speaker": "Bjarne",
+  "text": "A Smithy, and the Smith's work. Then bring me something worn and see what half the cost lo",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3ad7d2f68436": {
+  "speaker": "Bjarne",
+  "text": "Copper ore and charcoal. Three ingots at the Smithy. Leave oak in the campfire for the coa",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e5ff6efd0141": {
+  "speaker": "Bjarne",
+  "text": "The Smithy at Tier II, a Storage Loft from its Upgrade tab, then a Copper Pickaxe.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ae2c52b894a0": {
+  "speaker": "Bjarne",
+  "text": "Three Grave Iron from the barrows, and the Smithy at Tier III for the anvil.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c8b74fbd9dcb": {
+  "speaker": "Eirik",
+  "text": "I kept watch for the expedition until there was nothing left to watch. Let me do it here. ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "0a8b0f999d31": {
+  "speaker": "Eirik",
+  "text": "The Brukam's dead and its tusk is lying out there. Hollow it, bind it in iron, hang it on ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "0be8f8a05d89": {
+  "speaker": "Eirik",
+  "text": "When the ward breaks they come through the gaps. Spikes in the gaps, three at least, and w",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "148dad1a35cc": {
+  "speaker": "Eirik",
+  "text": "A Watch Post where I can see the old path. It wants Tor's lodge standing first.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "339b9b8adc63": {
+  "speaker": "Eirik",
+  "text": "The Brukam's tusk, and the Watch Post at Tier III to hang it on. Then we hold the next bre",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2e4237600687": {
+  "speaker": "Eirik",
+  "text": "Three spike traps where they'll come through. Then hold the next breach.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "ba126cbf07e8": {
+  "speaker": "Eirik",
+  "text": "Three days I held that clearing. At night something in Granheim mail walked the edge and n",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7d5253bb535d": {
+  "speaker": "Gunnar",
+  "text": "A raw hide rots. Cure four at the lodge and you'll see why the old hunters lived longer th",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9d88e82d647e": {
+  "speaker": "Gunnar",
+  "text": "Boars come to the edge of the light at dusk. Bring me their hides and give me a lodge to c",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b00dfe773d52": {
+  "speaker": "Gunnar",
+  "text": "My grandmother said you hold a nykk with its own hair and steel in the water. Its hair mak",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c39bfce59519": {
+  "speaker": "Gunnar",
+  "text": "There's still water by the Haven. Fish it, if you like. Build a dock first, and don't say ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1e35a8794408": {
+  "speaker": "Gunnar",
+  "text": "A Dock on the still water, and one fish from it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "64d5aea239a6": {
+  "speaker": "Gunnar",
+  "text": "Cure four leathers at the Hunter's Lodge.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2e1a3169f646": {
+  "speaker": "Gunnar",
+  "text": "Four rough hides from the boars outside the light, and a Hunter's Lodge.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d6d5907ba9d7": {
+  "speaker": "Gunnar",
+  "text": "Two of its pale hairs from the Moss Marsh reeds, and the Dock at Tier II.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "95bff6116129": {
+  "speaker": "Gunnar",
+  "text": "Twenty years I never lost a path in these woods. This year the paths started moving. Then ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "89d729f653c1": {
+  "speaker": "Hild",
+  "text": "Palisades burn. Granite doesn't. Raise the workshop again, cut four blocks, and put up fou",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "be3d3e6e2fe0": {
+  "speaker": "Hild",
+  "text": "Wood burns. Stone remembers. Give me the Mason's work and a better workshop, and I'll show",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "14a17cbe8445": {
+  "speaker": "Hild",
+  "text": "Bjarne's Smithy standing, the Workshop at Tier II, then a Cottage.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "f58b783b518a": {
+  "speaker": "Hild",
+  "text": "The Workshop at Tier III, four Granite Blocks, and four lengths of Stone Wall.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "32305c3f0df1": {
+  "speaker": "Hild",
+  "text": "Your hearth isn't level, your footings are soft and your walls are wood. Who cut these blo",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "74d04f438ff6": {
+  "speaker": "Ingrid",
+  "text": "That's all of it. My grandmother would be appalled, and proud. Keep bringing me the curse;",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "508faa5a332c": {
+  "speaker": "Ingrid",
+  "text": "Clean. Feel how quiet it is? That is what the old ways spend. Bring me your blade, or what",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b7bf69ea6f80": {
+  "speaker": "Ingrid",
+  "text": "It remembers now. One more thing, and then you know what I know: a mark, cut deep, that th",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "c8eac53c1f13": {
+  "speaker": "Ingrid",
+  "text": "It stands. It's crooked, and it's ours. Now the part that matters: bring me the Cursed Ess",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "b1b67024b543": {
+  "speaker": "Ingrid",
+  "text": "The altar cleans. Now something that heals. Build me a cauldron, and I'll brew you draught",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d0bb136e5fd0": {
+  "speaker": "Ingrid",
+  "text": "You came back for me. I won't forget it. Let me be useful: give me the Alchemist's work, a",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d4b3537adc40": {
+  "speaker": "Ingrid",
+  "text": "At the altar, choose Empower. It shows you the price before you pay it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "37cf8664243c": {
+  "speaker": "Ingrid",
+  "text": "At the altar, choose Enchant. One mark to a piece. The cursed ones can wait until you know",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2b126d5e2483": {
+  "speaker": "Ingrid",
+  "text": "Build the Cauldron, then brew three Healing Draughts at it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1d52ffe512e2": {
+  "speaker": "Ingrid",
+  "text": "Set it in the basin and leave it to me; it takes a while. Come back when there's some of i",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "24bb5bc9d6d7": {
+  "speaker": "Ingrid",
+  "text": "Speak to me, give me the work, then six rough stone blocks and the life in four orbs. The ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7f3a2f9c1d32": {
+  "speaker": "Liv",
+  "text": "Ingrid showed you the safe marks. I'll show you where new ones come from. Ask me how, then",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "09ca8b3cf128": {
+  "speaker": "Liv",
+  "text": "Runes aren't magic. They're promises the woods remember. Give me the work, and at Ingrid's",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7a017c9b3722": {
+  "speaker": "Liv",
+  "text": "Ask me about enchanting, then carve a mark at the Purification Altar.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "44d8f196bd85": {
+  "speaker": "Liv",
+  "text": "Cut a Wayfinder Rune at the Cauldron. Ingrid will lend it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3787acaeb6a6": {
+  "speaker": "Liv",
+  "text": "The stones broke along a line, straight as a chalk mark. Stones don't break straight. Some",
+  "mood": "Neutral",
+  "by": "direction",
+  "emotion": {
+   "surprised": 0.35,
+   "happy": 0.15
+  }
+ },
+ "a4c4e00dd602": {
+  "speaker": "Runa",
+  "text": "I read ground the way you read faces. Give me the Tracker's work and every briefing names ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "216857293aed": {
+  "speaker": "Runa",
+  "text": "Something small takes from the camps and is gone before you turn. A tusse. Track one, and ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cca98f02b6eb": {
+  "speaker": "Runa",
+  "text": "Go through the portal and come home. The briefing will have something more in it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "fca9cd112dcd": {
+  "speaker": "Runa",
+  "text": "One tusse. They run the moment they see you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "003935ca6989": {
+  "speaker": "Runa",
+  "text": "I found my own marks on the wrong trees. Then I followed your light. A light doesn't move.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "90fcf9826b93": {
+  "speaker": "Sigrid",
+  "text": "Not in this dark. Ingrid's party went in on a night like this and did not come out. We sle",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d373a838dd16": {
+  "speaker": "Sigrid",
+  "text": "Not in this dark. Ingrid's party went in on a night like this and did not come out. We sle",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8d7201ed9080": {
+  "speaker": "Sigrid",
+  "text": "I led seven into those woods. I'll not lose the ones who came back. Give me the Leader's w",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "87ca890dbd1b": {
+  "speaker": "Sigrid",
+  "text": "Seven went in. Ask them what they remember of the woods, each of them. I need to know what",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "bc9586fe2cfe": {
+  "speaker": "Sigrid",
+  "text": "Ingrid, Bjarne, Tor, Liv, Eirik and Runa. Ask each of them.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a3666481082c": {
+  "speaker": "Sigrid",
+  "text": "The Haven Banner, where all of us can see it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8e49a401eb3e": {
+  "speaker": "Sigrid",
+  "text": "I heard your fire before I saw it. Every night a little louder. I knew it was one of mine.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "63075b627ccb": {
+  "speaker": "The Portal",
+  "text": "North of the valley the old road goes on, little one, but I cannot see past its last bridg",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "51b3c0c5217e": {
+  "speaker": "The Portal",
+  "text": "Now I know the way. It is a guardian, as old as my stones, and it will not wake for steel.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "bf8765cbf192": {
+  "speaker": "The Portal",
+  "text": "Now I know whose bridge it is. He was old when my stones were raised, and he has never let",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "5d4cf4a649ac": {
+  "speaker": "The Portal",
+  "text": "Something breathes under the roots, little one. I feel it turn over in its sleep, deep in ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "93f4073f35e2": {
+  "speaker": "The Portal",
+  "text": "Come and stand before me. You will see what the stones need.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "6cbf1f475192": {
+  "speaker": "The Portal",
+  "text": "Each holds a little of what I was. Free their orbs when you pass them, and I will hold the",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "aeb733a55d9f": {
+  "speaker": "The Portal",
+  "text": "Keep it high, little one. A light is only a promise while someone keeps it.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "ce1519045377": {
+  "speaker": "The Portal",
+  "text": "Little one. My stones are loose where the roots were. Steady them, and I can open a wider ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "ba88a579a536": {
+  "speaker": "The Portal",
+  "text": "Little one. You have seen the road north now, and what walks it. Your fire reaches further",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "76e5621edef3": {
+  "speaker": "The Portal",
+  "text": "Three stones, and their light is mine again. There are more out in the meadows, little one",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "39b327933551": {
+  "speaker": "The Portal",
+  "text": "Your fire carries now. Far past my meadows, those who went in with you will see it, if any",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "2c57540b8c69": {
+  "speaker": "Tor",
+  "text": "Logs are just weight until somebody cuts them true. Give me the Carpenter's work and a lod",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "7cbcf8b39ee4": {
+  "speaker": "Tor",
+  "text": "More will come through that door, and they'll need a roof and somewhere to set down what t",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "8c0448184ada": {
+  "speaker": "Tor",
+  "text": "Ore weighs more than any pack. Raise my lodge a tier and I'll draw you a yard for carts. B",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "6843c0b9675a": {
+  "speaker": "Tor",
+  "text": "The ward keeps out the worst. Not all of it. Four lengths of palisade between the fire and",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e6cfe01e34cc": {
+  "speaker": "Tor",
+  "text": "A Storage Shed and a Hut.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cee7554b6bb9": {
+  "speaker": "Tor",
+  "text": "Four palisade pieces. Drag them out in a line; they go up like anything else.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "59c35d1b6c2b": {
+  "speaker": "Tor",
+  "text": "My lodge at Tier II, then the Wainwright's Yard, then a barrow from it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "219d7393afff": {
+  "speaker": "Tor",
+  "text": "The Woodcutter's Lodge, near the trees. Then cut me eight fine planks, so you see what it ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "afd3ec7405a9": {
+  "speaker": "Yrsa",
+  "text": "Berries keep you walking. A meal keeps you fighting. Cook a broth at the Kitchen and eat i",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "2f1a20d3b4f7": {
+  "speaker": "Yrsa",
+  "text": "I cooked for a jarl once. He never thanked me either. A kitchen and the Cook's work, and y",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "259c50caaa36": {
+  "speaker": "Yrsa",
+  "text": "A Forager's Broth from the Kitchen. Eat it before the portal.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "a70ef1a860fb": {
+  "speaker": "Yrsa",
+  "text": "The Kitchen. Bjarne's Smithy has to stand first, for the pots.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "d7e03bb9f000": {
+  "speaker": "Yrsa",
+  "text": "Your fire's too small to cook on and too big to hide. Good. A fire is how lost people find",
+  "mood": "Neutral",
+  "by": "kind"
  }
 }

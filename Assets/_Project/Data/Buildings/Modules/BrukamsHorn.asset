@@ -15,7 +15,7 @@ MonoBehaviour:
   id: module.brukamshorn
   displayName: Brukam's Horn
   description: The Brukam's tusk, hollowed and bound in iron, hung at the Watch Post. Blown when the ward breaks, it puts heart in the shots, and people talk of it.
-  icon: {fileID: 21300000, guid: 4b6cf3c03cee7e84dbf92666c3e6dc96, type: 3}
+  icon: {fileID: 21300000, guid: 59418bf337ac3e541813aea42f44b1fc, type: 3}
   fits: 0
   buildings:
   - {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
@@ -52,4 +52,5 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
     amount: 2
   essence: []
+  work: 5
   knownFromStart: 0

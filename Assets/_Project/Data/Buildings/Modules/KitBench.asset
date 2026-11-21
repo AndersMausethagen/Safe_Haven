@@ -54,4 +54,5 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
     amount: 1
   essence: []
+  work: 5
   knownFromStart: 0
