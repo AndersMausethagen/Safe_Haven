@@ -1,11 +1,17 @@
 # Colony mode research: running the Haven from above
 
-Research date: 2026-11-21. Read-only: no game code, data, scenes or prefabs were changed, and no Unity CLI or Play mode
-was used. Three agents did the groundwork (other games, on the web; the camera, input and player side of the code; the
-people, work and orders side of the code). I then checked the claims the recommendation rests on in the code myself.
-`path:line` points at `test` as of commit 1b09cedc. Paths are under `Assets/_Project/Scripts/` unless they say otherwise.
+Research date: 2026-11-21, revised the same day after a second round. Read-only: no game code, data, scenes or
+prefabs were changed, and no Unity CLI or Play mode was used.
 
-The user asked:
+- **Round one:** three agents did the groundwork (other games on the web; the camera, input and player side of the
+  code; the people, work and orders side).
+- **Round two:** a second web round (small named casts with a town mode, extraction hideouts, homecomings, light as
+  defence) and an independent design critic who read this study against the code and the design document.
+
+I checked the claims the recommendation rests on in the code myself. `path:line` points at `test` as of commit
+55177dd9. Paths are under `Assets/_Project/Scripts/` unless they say otherwise.
+
+The user asked first:
 
 > "I feel like [the Haven is] being pulled in two different directions that doesn't quite match. Pressing V or any other
 > free key, in Haven, will turn the camera into colony sim mode, allowing the camera to be moved freely along the terrain,
@@ -17,97 +23,144 @@ The user asked:
 > Will this be a good addon? Will it make it better? What works against it? Suggest how we can make this work and how we
 > can improve the idea and make it a complete and deeper feature."
 
+And then:
+
+> "Have another round on the result. Look for how we could do this even better, other features to add or deepen. Or
+> other mechanics we should adjust further to make this good."
+
 ---
 
 ## 0. Summary
 
 ### The short answer
 
-**Yes, it fits Safe Haven, but only if it does one thing: the people you can see do the work you order.** A free camera
-on its own would only be a prettier H window. The "two directions" feeling has a cause you can see in the code, and the
-camera does not fix it on its own:
+**Yes, it fits Safe Haven, but only if two things hold.** The people you see do the work you order, and the view is
+built around what is actually scarce at home. A free camera on its own would only be a prettier H window.
+
+**Why the Haven feels pulled two ways.** The code shows it: residents have names, homes and routines, but nothing in the
+economy depends on where they are or what they do.
 
 | What happens in the Haven | Done by a body in the world? | Where |
 |---|---|---|
 | Hammering a scaffold while you are home | Only the player | `Building/Construction.cs:388-393` |
 | Builders finishing scaffolds | Bookkeeping, and **only while the player is away** | `Settlement/SettlementSystem.cs:60`, `Settlement/ResidentBuilders.cs:125-204` |
-| Workers making goods | Bookkeeping: costs out of the stash, goods back in, nobody carries anything | `Settlement/WorkerProduction.cs:135-160` |
+| Workers making goods | Bookkeeping: costs out of the stash, goods back in | `Settlement/WorkerProduction.cs:135-160` |
 | Gathering wood, stone, forage | Only the player | `ResourceInventory/ResourceNode.cs:287` |
 | Defending in a breach | The player, plus Warden and Hunter as companion stand-ins | `Settlement/ResidentLife.cs:227`, `ResidentDefender.cs:35` |
-| Residents' days | Real: they walk, work at their yard, eat, sleep in their homes | `Settlement/ResidentRoutine.cs:74`, `ResidentLife.cs` |
+| Residents' days | Real: they walk, work at their yard, eat, sleep in their homes | `Settlement/ResidentRoutine.cs:74` |
 
-So the residents are well-behaved scenery. They have names, homes and routines, but nothing in the economy depends on
-where they are or what they do. The avatar does every physical thing, and the H window does the managing from a list.
-A colony view where you order Hild to clear a ring of birches, and then see her doing it, joins the two halves. A view
-where you only click menus from higher up does not.
+**What is scarce at home: round two's main finding.** It changed the design.
+
+- **Not scarce:**
+  - Building work is 2-12 s a building (`buildWork` in `Data/Buildings/*.asset`; the Stable is the longest at 12 s).
+  - Crafts finish during raids, and staffed stations already carry their goods into the stash.
+  - H already moves you to any building or person.
+
+  Orders such as "build this" or "queue that" therefore save seconds.
+- **Scarce:**
+  - **your minutes between raids**;
+  - **wood and stone**: about 13 oak a minute by hand, 888 oak to build everything once, about 770 more for charcoal
+    (`Docs/BaseProgression.md:155-180`), and torches now burn charcoal every night (`Environment/TorchFuel.cs`);
+  - **being ready for the next raid.**
+
+  So the view earns its place by planning the raid loop, by gathering, and by work that runs **while you are away**.
 
 ### What other games show
 
-No shipped game does exactly this: a key that hands an action hero to the AI while the player runs the base from a free
-camera. Each part of it does exist somewhere:
+No shipped game does exactly this. Each part exists somewhere:
 
-- **Fallout 4's workshop mode** is the nearest switch: a key (V on PC), only inside the settlement, used to place
-  buildings and assign settlers. Its menus were called "cumbersome", and the lesson its best modder drew was that
+- **Fallout 4's workshop** is the nearest switch (a key, settlement only, placing and assigning). Its lesson is that
   "people are what matter".
-- **RimWorld and Going Medieval's drafting** is the right model for the hand-off between AI and direct control: an order
-  is an override that lapses back to the routine, and a bell drafts everyone at once.
-- **Kenshi** is the nearest to "your character becomes one of the colonists": a free camera, and your character is one
-  of a small squad you follow or order.
-- **Necesse** is a top-down action game with a co-op settlement at Safe Haven's scale. Its orders are follow, guard
-  here and "clear orders" (back to work), plus zones and priorities. It needed a whole extra patch to make settlement
-  control work on a controller.
+- **RimWorld drafting** shows how an order overrides the routine and lapses back to it.
+- **Kenshi** makes your character one of a small squad under a free camera.
+- **Necesse** is a top-down action game with a co-op settlement at Safe Haven's scale.
+
+Round two added the games with a **small named cast and a town mode**:
+
+- Dark Cloud: residents' wishes about where things go.
+- Ni no Kuni II and Enshrouded: each recruit brings their own stations and abilities.
+- Monster Hunter and ARC Raiders' Scrappy: work counted in outings, paid on return.
+- ARC Raiders: track a material and it is tagged in raid loot.
+- Darkest Dungeon: one homecoming event.
+- Hades: homecoming lines that notice what happened.
+- Don't Starve, Gord, Frostpunk: light as territory.
+- Thronefall: lanes shown before the night.
 
 ### What works against it
 
-1. **The "two half-games" problem.** Brütal Legend, Gord, Dungeons 3 and Minecraft Legends were all judged against the
-   dedicated genre and found shallow.
-2. **One mode can starve the other.** Soulmask's followers made the hero "optional"; Dragon Age: Inquisition's tactical
-   camera went unused and was cut from the sequel.
-3. **A view from above shows every stuck NPC.** Every colony hybrid's reviews name pathing. Safe Haven's residents warp
-   after 4 s stuck (`ResidentLife.cs:544`), which nobody notices from 15 m behind the player but everyone notices from
-   above.
-4. **Rendering at height.** Sun shadows end at 50 m from the camera (`Settings/Rendering/PC_RPAsset.asset:60`), grass at
-   80 m, and the fog of war is a flat plane at the player's height. Today's tuning is for a camera 11-21 m up.
-5. **Co-op.** Residents are not networked: each game runs its own copy from the mirrored save data. Orders that make
-   people fight need live positions.
-6. **The controller has no free button**, and on the keyboard **V is already bound twice** (see §1.3).
-7. **Scope and timing.** On 2026-11-13 the plan was to validate the slice by playing it before widening the game. This
-   would be the largest new system since then.
+1. **Two half-games** (Gord, Brütal Legend, Minecraft Legends). Answer: the view is the same game from further up, not
+   an RTS.
+2. **The hero becomes optional** (Soulmask). Answer: residents get plain basics at a third of your pace; quality, XP,
+   fighting and talking stay yours.
+3. **From above, every stuck NPC shows.** Answer: work done while you are away is applied as results, not walked; NPC
+   movement is cleaned up first.
+4. **Rendering at height.** Sun shadows end at 50 m, grass at 80 m, and the fog of war is flat at the player's height.
+   Answer: measure first and cap the height.
+5. **Co-op.** Residents are simulated in each game separately, so live work diverges. Answer: away work is state; live
+   ring workers get one runner.
+6. **Orders with nothing at stake.** Prowlers never enter light, residents can't be hurt, and the night is about 8 minutes of a 24-minute day. Answer: defend
+   foretold corruption nights, which raise or lower blight, rather than patrolling.
+7. **Headcount comes late.** There are 2-3 residents after about two hours, and 9 of 11 fight the same way. Answer:
+   orders unlock person by person, and companion signatures matter.
 
-### Recommendation: "the Keeper's view"
+### The design in brief: the Keeper's view
 
-The working name comes from the Heartroot's last word, "Hearth-keeper". Build it in phases, each worth having on its own:
+The working name comes from the Heartroot's last word, "Hearth-keeper".
 
-- **Phase 0 (S-M):** groundwork. Settle the V clash, keep residents out of deep water, fewer stuck warps, and measure
-  rendering at 35, 45 and 55 m to set the height cap.
-- **Phase 1 (M-L): the view.** At home, H lifts the camera off your character into a free view with the Haven window
-  docked at the side. You click buildings and people, queue crafts, order upgrades and place buildings from there.
-  Nothing the game simulates changes, so there is no balance risk.
-- **Phase 2 (M-L): living work.** Builders hammer scaffolds while you are home, and you can mark which scaffold comes
-  next. Workers clear a gather ring you draw, the way Gord rings are drawn, and carry each load home.
-- **Phase 3 (M): orders and defence.** Guard here, patrol with a lantern, follow me, back to your day, and a horn that
-  sends everyone to their posts. Any resident can stand in a breach, and breach preparation happens in the view.
-- **Phase 4 (L): your own character works.** You can leave your character a task, such as building, keeping watch or
-  resting, and it walks there and does it while you look around.
+1. **Getting in:** H stays the Haven window for a quick glance. The view has its own key, a button in the window's
+   header and a pad wheel entry. It opens when the Heartroot names you Hearth-keeper (The Road North).
+2. **Between raids:**
+   - A homecoming sweep shows what changed, with marks on the buildings.
+   - The portal card becomes the raid planner: pick the companion by clicking them, pack, set out.
+   - Plans: place a building as a ghost that costs nothing yet, and its missing materials are tagged in raid loot.
+3. **Standing orders that run while you are away**, applied on return and counted in raids, not hours: clear this
+   ring, quarry this knoll, a hunting or fishing party to a held land. The worst result is "came back tired". This is
+   the biggest win.
+4. **Living work at home:**
+   - builders hammer while you are home, mainly along drawn wall rings;
+   - felling rings are finite, painted trees included, and a forester replants behind them so the woods stay green;
+   - loads are carried home, and a working horse drags logs.
+5. **Defence with stakes:** on a foretold corruption night, posts on the foretold side and the Watch Post archer, with
+   the lanes shown in the view. A breach's preparation happens in the view and the fight on foot. Posts are capped by
+   the defences you have built.
+6. **People who matter:**
+   - each rescued person brings one order;
+   - wishes about where things go, met from above;
+   - lines that notice your raid;
+   - worker ranks shown as badges;
+   - an empty house for someone lost.
+7. **Your character:** it waits at the hearth, or keeps hammering if you left it mid-build. No autopilot job: it would
+   save seconds for a large cost.
 
-Six changes to the idea make the result deeper and stop it from splitting the game further:
+### Phases
 
-1. **One place to run the Haven.** At home, the H window and the view become one thing, instead of adding a third way
-   to manage the Haven next to the window and the world.
-2. **Orders lapse.** Every order goes back to the person's day when it is done or cleared, as in RimWorld and Necesse,
-   so there is nothing to babysit.
-3. **The hero keeps work nobody else can do.** Raids, talking and hand-ins, skilled fighting, the fastest hammering,
-   gathering with the minigame, quality and XP, Fine crafts, fishing, horses and exploration all stay the avatar's.
-   Residents get the plain basics.
-4. **Preparation from above, the fight on foot.** A breach's warning and preparation happen in the view; when the
-   defence starts, the camera dives back to your character.
-5. **Patrols carry light.** A patrolling resident is a moving lantern that prowlers keep away from, so night orders mean
-   something without becoming a chore.
-6. **A person carries their own load home.** There are no hauler jobs and no per-item hauling, which is the colony-sim
-   chore that produces most pathing bugs.
+| Phase | What | Effort |
+|---|---|---|
+| 0 | Groundwork: the V clash, residents out of deep water, fewer stuck warps, measure rendering at 35/45/55 m | S-M |
+| 1 | The view itself, builders at home, wall rings, gear collected from afar | M-L |
+| 2 | Between raids: homecoming sweep, raid planner, plans and the tracked shopping list | M |
+| 3 | Standing orders while away, felling rings with the forester, carrying, horses hauling | M-L |
+| 4 | People: orders unlocked one person at a time, wishes, lines, rank badges (companion signatures as decided on 2026-11-13) | M |
+| 5 | Corruption-night posts, the horn, breach preparation in the view | M |
+| Later | Visible stores, paths from worn ground, light overlay and lamplighter, event pins | S-M each |
 
-The nine open questions for you are in Part 6. My recommendation is to build Phases 0 and 1 now, and Phases 2-4 after you
-have used the view, because Phase 2 onwards changes the economy and the pace.
+The eleven questions for you are in Part 7. My recommendation is to build Phases 0 and 1 now, then the rest once you
+have used the view, because Phase 3 onwards changes the economy.
+
+### What the second round changed
+
+| Round one said | Round two says | Why |
+|---|---|---|
+| H at home becomes the view | **H stays the window**; the view has its own key and a header button | A glance at the stores shouldn't need a camera flight, and H's meaning shouldn't change |
+| The view saves walks to stations | It saves little walking: "Go there" and staffed stations already cover that. It earns its place by **reading the town, planning raids and gathering** | `HavenTravel.cs:15-40`, `WorkerProduction.cs:154-160` |
+| Build orders and a "next" pin | **Builders at home** go into Phase 1 as a small change; **wall rings** are their real work; no "next" pin | Buildings take 2-12 s; a 30-piece wall at 3-5 s a piece adds up |
+| Gather rings from scene nodes, painted trees later | **Painted trees first**, rings are finite, a **forester replants**, overgrowth is left out | The Haven has about 9 oak and 8 stone nodes as scene objects; felled Haven trees never regrow (`TerrainTreeFelling.cs:11-12`); overgrowth is the player's early renown |
+| Patrol with a lantern, Follow me, Attack | **Cut.** Corruption-night posts on the foretold side instead | Night at home has nothing at stake; a corruption night moves blight |
+| Any resident can stand in a breach | **Posts are capped by the defences built** (Watch Post tier, gates) | Eleven guards who can't die would set the breach balance by headcount |
+| Phase 4: your character works on autopilot | **Cut.** It waits at the hearth or keeps hammering | L effort to save seconds |
+| Thrown out when "anyone on your side" is hunted | Thrown out only when **you** are hunted | `MonsterAI.AnyHuntingPlayerSide` (`AI/MonsterAI.cs:200`) counts friends too |
+| Co-op divergence from Phase 3 | **From the first live ring worker.** Away work is state and safe; live ring workers need one runner | Each game paths its own residents |
+| No link to raids beyond preparation | **The view is the place between raids**: homecoming, planner, plans, standing orders | Your rule: judge base features by what they do for raids |
 
 ---
 
@@ -115,221 +168,278 @@ have used the view, because Phase 2 onwards changes the economy and the pace.
 
 ### 1.1 What is physical and what is bookkeeping
 
-- **11 residents with 13 jobs** (`Data/Prologue/Residents`, `Data/Settlement`). Every one of them also has a raid
-  companion (Fighter, or Archer for Runa and Asa).
-  - The §15 row of ARCHITECTURE's status table ("one recruit, one job") is out of date.
-- **Movement:** a `NavMeshAgent` added at runtime (`ResidentLife.cs:117`), at 1.6 m/s walking and 3.8 m/s running,
-  with low-quality avoidance. After 4 s stuck they warp (`:544`).
-  - No area mask is set, so they may path through the deep-water area (inferred from the code, not tested).
-- **Their day** (`ResidentRoutine.Decide`, `:74`): wake 6.5, work 8-18, meal 12-13, sleep 22, an outing about one day
-  in three. Cold, festivals and danger change the plan.
-  - Homes are assigned by `HavenHomes`, and they sleep indoors, hidden.
+- **People and movement:**
+  - 11 residents with 13 jobs (`Data/Prologue/Residents`, `Data/Settlement`). Everyone has a raid companion (Fighter,
+    or Archer for Runa and Asa). The §15 row of ARCHITECTURE's status table ("one recruit, one job") is out of date.
+  - They walk with a `NavMeshAgent` added at runtime (`ResidentLife.cs:117`): 1.6 m/s walking, 3.8 running, low-quality
+    avoidance, a warp after 4 s stuck (`:544`). No area mask is set, so they may path through deep water (inferred, not
+    tested).
+- **Their day** (`ResidentRoutine.Decide`, `:74`): wake 6.5, work 8-18, meal 12-13, sleep 22, an outing about one day in
+  three. Hard cold sends people to the fire in the afternoon (`:63-71`).
+  - A Haven day is **24 real minutes** (`Data/Environment/Safe Haven Day Night.asset`), so work hours are about 10
+    minutes and the night about 8.
 - **Animations:** walking plus emotes (Forging, Use, Fishing, Read, Sit, Sleep, Kneel, Talk) with a tool in the hand.
-  - Residents have no chop, mine, carry or fight clips.
-  - The player has MineWall, MineGround, Hammer and Farm (`Interaction/InteractionAnimation.cs:16-22`). Emotes are
-    clip-based, so those can become resident emotes cheaply.
-- **The resident prefab** (`Prefabs/Characters/Resident.prefab`) has no `Damageable` or `Combatant`: residents cannot be
-  hurt.
-  - In a breach, the Warden and the Hunter are swapped for a `Companion` stand-in (`ResidentDefender.Stand`, `:35`),
-    who holds a post at the Watch Post or a 6 m ring round the portal. Everyone else shelters.
-- **No needs or mood.** Home quality (Bare to Grand) and likings only add work speed. Worker ranks, bonds, memories and
-  a paused-work flag exist.
-- **Storage is one stash** (`StashStorage`, 60-slot blocks per chest). Every system reads the whole stash, and nobody
-  fetches anything physically.
+  There are no resident chop, mine, carry or fight clips. The player's MineWall, MineGround, Hammer and Farm clips
+  (`Interaction/InteractionAnimation.cs:16-22`) can become resident emotes, which are clip-based.
+- **Residents cannot be hurt:** the resident prefab has no `Damageable` or `Combatant`. In a breach, the Warden and the
+  Hunter are swapped for a `Companion` stand-in (`ResidentDefender.Stand`, `:35`); everyone else shelters.
+- **No needs or mood.** Home quality and likings only add work speed. Worker ranks still count crafts
+  (`Settlement/SettlementSettings.cs:69-72`, `SettlementState.cs:803`); the milestone ranks decided on 2026-11-13 aren't
+  built.
+- **One stash** (`StashStorage`), read whole by every system. Nobody fetches anything physically.
+- **Builders bank work only while you are away** (`SettlementSystem.cs:60`) at 0.5 work-seconds per builder-second
+  (`Resources/HomeLifeSettings.asset`), spent on return, oldest scaffold first.
 
-### 1.2 The camera, and everything that follows the player
+### 1.2 Where the time goes at home
 
-- **Today's camera:** `Camera/PlayerCameraController.cs` is one Cinemachine camera. It follows a private "Camera Focus"
-  transform (`:287-295`) that is moved each frame from the player plus cursor lean, shoulder and lead (`:618-661`).
-  - The Exploration profile is pitch 50° at 14-28 m, and Combat is 58° at 12-20 m (`Data/Camera/PlayerCameraSettings.asset`).
-  - `HavenLookout` pulls the widest view that exists today, about 56 m (`Settlement/HavenLookout.cs:149-153`).
-  - There are no camera bounds and no terrain logic.
-- **The precedent for a mode swap is `Cinematics/CinematicView.cs`.** It adds its own camera at priority 1000, hides the
-  screen canvases, holds the player with `PlayerControl.Hold`, fades the fog of war (`AtmosphereFeature.WarScale`),
-  and glides back on `End()`.
-  - `PlayerCameraController.Watch(Transform)` (`:102`) is the other precedent; `CoopSpectate` uses it.
-- **The catch:** `PlayerCameraController` writes global state every frame:
-  - the terrain detail focus (`:381`);
+- **Building:**
+  - 2-12 s a building (`buildWork`), 7-14 s an upgrade;
+  - the player hammers at 1 + Build Speed (`Construction.cs:419-425`).
+- **Crafting:** it runs during raids, and speed bonuses barely matter (`Docs/BaseProgression.md:19-21`).
+- **Gathering is the real cost:**
+  - about 13 oak a minute;
+  - 888 oak to build everything once, plus about 770 for charcoal (`BaseProgression.md:155-180`);
+  - torches burn Charcoal every night (`Environment/TorchFuel.cs:4-10`).
+- **The Haven's wood is painted terrain trees,** about 130,000 of them.
+  - Scene-object nodes are few: roughly 9 OakWood, 8 FallenLog, 8 GreyStone and 14 bramble nodes, counted from prefab
+    instances in `Scenes/SafeHaven.unity`, so approximate. Much of that is Overgrowth, which gives renown when cleared
+    (`Settlement/Overgrowth.cs:11`).
+  - **Felled Haven trees stay down:** `TerrainTreeMemory › Keep Felled`, and only saplings planted through
+    `PlantedTrees` grow back (`Gathering/TerrainTreeFelling.cs:8-13`, `:64`).
+  - Painted trees only get choppable stand-ins within 10 m of the player (`:21`, `:267-304`).
+
+### 1.3 The camera, and everything that follows the player
+
+- **Today's camera:** `Camera/PlayerCameraController.cs` is one Cinemachine camera following a private "Camera Focus"
+  (`:287-295`), moved each frame from the player plus cursor lean, shoulder and lead (`:618-661`).
+  - The Exploration profile is pitch 50° at 14-28 m, and Combat is 58° at 12-20 m.
+  - `HavenLookout` pulls the widest view today, about 56 m (`Settlement/HavenLookout.cs:149-153`).
+  - There are no bounds and no terrain logic.
+- **The swap precedent is `Cinematics/CinematicView.cs`:** its own camera at priority 1000, the screen canvases hidden,
+  the player held, the fog of war faded (`AtmosphereFeature.WarScale`), and a glide back on `End()`. Another precedent
+  is `PlayerCameraController.Watch(Transform)` (`:102`).
+- **The catch:** the controller writes global state every frame:
+  - detail focus (`:381`);
   - near shadows (`:443`);
-  - `CameraPointer.UsesScreenCenter` and the cursor lock (`:440`, `:464-482`);
+  - screen-centre aim and cursor lock (`:440`, `:464-482`);
   - the V style toggle (`:433`).
 
-  A second camera needs an explicit "stand down" flag. Disabling the controller would null `PlayerCameraController.Current`,
+  A second camera needs a "stand down" flag. Disabling the controller would null `PlayerCameraController.Current`,
   which about 15 files call.
-
-What breaks or looks wrong when the camera is 50-200 m from the player's body:
 
 | System | Where | With a far camera | Fix |
 |---|---|---|---|
-| Sun shadows | `Settings/Rendering/PC_RPAsset.asset:60` (50 m), `GraphicsOptions.cs:138,158` | No sun shadows beyond 50 m from the camera, so a high view loses them all | M, plus a GPU cost to measure |
-| Grass and trees | SafeHaven terrain: detail 80 m, billboards from 50 m | The ground goes bald from about 80 m | M, plus a cost to measure |
-| Fog of war / night veil | `Environment/Atmosphere/AtmosphereFeature.cs:601` | A flat plane at the player's height, so it shows as black bands over hills | S to fade (as cinematics do), M to lay it on `FogGround` |
-| Fog thinning | `AtmosphereFeature.cs:438-442` | Clears fog along camera→player, not where you look | S |
-| See-through | `Environment/SeeThrough.cs:52-55` | Cuts holes in roofs and trees along camera→player | S (`Active` flag) |
-| Ground relief | `Environment/TerrainDetailFocus.cs`, `PlayerCameraController.cs:381` | Relief only 15-25 m round the player | S |
-| Sky occlusion | `Rendering/SkyOcclusionMap.cs:204` (160 m area) | No roof or canopy shading beyond 80 m from the player | M (about 6 ms to redraw per 12 m panned) |
-| Reflection probe | `Rendering/FollowReflectionProbe.cs:88` | Stays above the player | S |
-| Hearing | `Audio/AudioManager.cs:493`, `PlacedAmbience.cs`, `AudioSpace.cs:72` | You hear what the body hears, not what you see | S (everything reads `EarPosition`) |
-| Minimap | `UI/MinimapHud.cs:290,350` | Centred on the player | S, or M with click-to-pan |
-| Hover outline | `Player/PlayerInteractionOutline.cs:15,55` | 80 m ray; hidden while any window is open | S |
-| Painted-tree stand-ins | `Gathering/TerrainTreeFelling.cs:21,274` | Only within 10 m of the player, so a far painted tree can't be clicked | M (`StandingNear(point, d)` exists) |
-| Player-relative spawns | `Level/MobSpawnZone.cs:325`, `NightProwlers.cs:117`, `HorseHerd.cs:257` | Spawn round the body; `MobSpawnZone` hides spawns by player distance only, so they can pop in in front of a far camera | S-M |
-| Shake and off-screen warnings | `Camera/CameraShake.cs`, `Player/OffScreenWarnings.cs` | Blows at the far body shake the view; chevrons point at the body | S |
-| Rain, air life, ripples | `RainEffect.cs:106`, `AmbientLife.cs:139`, `WaterInteractor.cs:181` | Already follow the camera, but are tuned for a 20-40 m view | S tuning |
+| Sun shadows | `Settings/Rendering/PC_RPAsset.asset:60` (50 m) | None beyond 50 m from the camera | M, plus a GPU cost to measure |
+| Grass and trees | SafeHaven terrain: detail 80 m, billboards from 50 m | Ground bald from about 80 m | M, plus a cost to measure |
+| Fog of war / night veil | `Environment/Atmosphere/AtmosphereFeature.cs:601` | A flat plane at the player's height: black bands over hills | S fade; M on `FogGround` |
+| Fog thinning | `AtmosphereFeature.cs:438-442` | Along camera→player | S |
+| See-through | `Environment/SeeThrough.cs:52-55` | Holes along camera→player | S (`Active`) |
+| Ground relief | `Environment/TerrainDetailFocus.cs` | 15-25 m round the player | S |
+| Sky occlusion | `Rendering/SkyOcclusionMap.cs:204` | No roof or canopy shading beyond 80 m from the player | M (about 6 ms per 12 m panned) |
+| Reflection probe | `Rendering/FollowReflectionProbe.cs:88` | Above the player | S |
+| Hearing | `Audio/AudioManager.cs:493`, `PlacedAmbience.cs`, `AudioSpace.cs:72` | What the body hears | S (`EarPosition`) |
+| Minimap | `UI/MinimapHud.cs:290,350` | Centred on the player | S / M |
+| Hover outline | `Player/PlayerInteractionOutline.cs:15,55` | 80 m ray; hidden while a window is open | S |
+| Painted-tree stand-ins | `Gathering/TerrainTreeFelling.cs:21,274` | Only within 10 m of the player | M (`StandingNear(point, d)` exists) |
+| Player-relative spawns | `Level/MobSpawnZone.cs:325`, `NightProwlers.cs:117`, `HorseHerd.cs:257` | May pop in in front of a far camera | S-M |
+| Shake, off-screen warnings | `Camera/CameraShake.cs`, `Player/OffScreenWarnings.cs` | Follow the body | S |
+| Rain, air life, ripples | `RainEffect.cs:106`, `AmbientLife.cs:139`, `WaterInteractor.cs:181` | Follow the camera; tuned for a 20-40 m view | S tuning |
 
-### 1.3 Keys and the pad
+### 1.4 Keys and the pad
 
 - **V is bound twice on the keyboard:** `Camera/ToggleStyle` and `Player/StackOnStored` are both `<Keyboard>/v`
-  (checked in `Input/InputSystem_Actions.inputactions`).
-  - Inside the ward, one press both switches the camera style and stores the bag. This looks like an existing bug,
-    separate from this feature, but I did not test it in Play.
-- **Tab is taken** (`ToggleCombat`). **H opens the Haven window** (`Player/PlayerInputHandler.cs:286,396`), with tabs
-  Overview, Stores, Buildings, People, Lands and Raids (`UI/HavenWindow.cs:46`).
+  (checked in `Input/InputSystem_Actions.inputactions`). This looks like an existing bug, separate from this feature;
+  I did not test it in Play.
+- **Tab is taken** (`ToggleCombat`). **H opens the Haven window** (`Player/PlayerInputHandler.cs:286,396`; tabs Overview,
+  Stores, Buildings, People, Lands, Raids, `UI/HavenWindow.cs:46`).
 - **Free keyboard keys:** Q, U, O, P, backquote, Caps Lock, F2-F4, F7-F12, Insert/Home/End/PgUp/PgDn/Delete.
-- **Pad:** every button is used, including the tap/hold pairs on RB, LB and View. The natural way in is a choice on the
-  windows wheel (`UI/CommandWheel.cs:188`).
-- **A new action map fits cleanly.** `GameInput.SuspendGameplay` already turns off every map but UI, and the rebinding
-  screen has a conflict-domain rule for build keys (`Core/Options/InputRebinds.cs:191,210`) that a view map can copy.
-  - **Trap:** the window keys (G, H, B, J, M) live in the Player map. Holding the player turns them off, and
-    `PlayerControl.Kept` only keeps Move, Interact and Dodge, so the view must route them itself.
+- **Pad:** every button is used. The way in is the windows wheel (`UI/CommandWheel.cs:188`).
+- **A new action map fits:** `GameInput.SuspendGameplay` already turns off every map but UI, and the rebinding screen has
+  a conflict-domain rule to copy (`Core/Options/InputRebinds.cs:191,210`).
+  - **Trap:** window keys (G, H, B, J, M) live in the Player map, which a hold turns off. `PlayerControl.Kept` keeps only
+    Move, Interact and Dodge.
 
-### 1.4 Acting from afar
+### 1.5 Acting from afar
 
 | Action | From afar today? | Notes |
 |---|---|---|
-| Order an upgrade | Yes, from the H window | `HavenBuildings.cs:134` → `Construction.TryOrderUpgrade` (`:278`) |
-| Place a building | Yes | `BuildPlacer` rays from `Camera.main` to 600 m (`HomePortal.cs:159-170`); the pad aims from the player's position plus the stick, clamped to `BuildReach` (`BuildPlacer.cs:611-635`) |
-| Give a job, pause work, see a person's page | Yes | `HavenPeople.cs:81/93/146`, `ResidentWindow.Show` |
-| Queue a craft | The code can, the UI can't | `StationCrafting.TryQueue` (`Crafting/StationCrafting.cs:75`) has no distance check, and `MaterialPool` pays from the whole stash at home; only `StationWindow` closes past 6 m (`UI/StationWindow.cs:397`) |
-| Collect a station's output | Into the player's bag | `StationCrafting.cs:177-192`: from afar this would be a teleport, so it should go to the stash instead |
+| Order an upgrade | Yes, H window | `HavenBuildings.cs:134` → `Construction.TryOrderUpgrade` (`:278`) |
+| Place a building | Yes | `BuildPlacer` rays from `Camera.main` to 600 m (`HomePortal.cs:159-170`); the pad aims from the player's position, clamped to `BuildReach` (`BuildPlacer.cs:611-635`) |
+| Give a job, pause, a person's page | Yes | `HavenPeople.cs:81/93/146`, `ResidentWindow.Show` |
+| Go to a building or person | Yes, a teleport | `HavenTravel.cs:15-46` (not during a breach) |
+| Queue a craft | The code can; the UI can't | `StationCrafting.TryQueue` (`Crafting/StationCrafting.cs:75`) has no distance check; `StationWindow` closes past 6 m (`UI/StationWindow.cs:397`) |
+| Collect output | Staffed stations carry everything but gear to the stash already | `WorkerProduction.cs:154-160`; gear is collected into the bag, quality rolled then (`StationCrafting.cs:177-192`) |
 | Talk, hand in, open a chest, ride | No | Distance checks in `DialogueBox`, `StashChest`, `PlayerInteractor` (`:143`) |
 
-### 1.5 People, work and orders: the gap table
+### 1.6 People, work and orders: the gap table
 
 | Capability | Status | Reusable pieces | Missing | Effort |
 |---|---|---|---|---|
-| Harvest a chosen tree, rock or ring | Missing | `ResourceNode.GatherBy` (`:287`), `ChoppableTree.Roll` (`:229`), walking, the player's mining clips | Order state, ring pick, yield into the stash, painted trees without the player near, gather emotes | M for scene nodes; L with painted trees |
-| Patrol | Missing | The `ResidentDefender` swap, Companion hold points, `MonsterPatrol` as a model | A patrol order cycling points, a save field, a decision | M |
-| Defend a spot | Breach only | `KeepsGuard`/`GuardPost` (`ResidentLife.cs:227/252`), `Companion.Command(order, spot)` (`Companion.cs:201`) | A post you choose, outside breaches, any resident | S-M |
-| Attack a target | Partial | `CompanionOrder.AttackTarget` | An explicit target setter: today it means "what the player last hit" (`CompanionLeader.cs:9-17`) | S on top of defend |
-| Place, and residents build it | Partial | `Construction.AddWork` (`:450`), the Forging emote, builder jobs in `HomeLifeSettings` | Live builders at home, a "next" pin, the host-only rule | M |
-| Queue crafting from afar | Mostly there | `StationCrafting.TryQueue`, `StationWindow` with a large range | An entry point in the view, collect into the stash | S |
-| Start an upgrade from afar | There | `TryOrderUpgrade`, `ConstructionUpgradeOffer.Show` | Someone to build it while you are home (the row above) | S |
-| The player's character works like a resident | Missing | `PlayerControl` holds, `WalkPartyNode.LeadPlayer` steering (`Story/StoryWorldNodes.cs:658-682`), `HavenTravel.SpotBeside` | NavMesh steering for the `CharacterController`, a `PlayerInteractor.Begin(Interactable)`, a bypass for "Close the open window" (`PlayerInteractor.cs:132-136`); the player is not a `ResidentRecord`, so they can't staff a station | L |
+| Fell or quarry a ring | Missing | `ResourceNode.GatherBy` (`:287`), `ChoppableTree.Roll` (`:229`), `TerrainTreeFelling.RestoreFelled` (`:111`), `PlantedTrees` | Fell a painted tree by index without the player near, yield into the stash, ring state, gather emotes | M-L |
+| Work while you are away | Pattern exists for builders | `SettlementSystem.cs:56-69`, `ResidentBuilders.cs:125-204` | Standing orders and results applied on return | M |
+| Defend a post | Breach only | `KeepsGuard`/`GuardPost` (`ResidentLife.cs:227/252`), `Companion.Command(order, spot)` (`Companion.cs:201`) | A post you choose, on corruption nights, capped by defences | S-M |
+| Builders at home | Missing (away only) | `Construction.AddWork` (`:450`), the Forging emote | Remove the away-only condition; walk and hammer; host only | S |
+| Queue or collect from afar | Mostly there | `StationCrafting.TryQueue`, `StationWindow` with a large range | An entry point in the view; gear into the stash | S |
+| Your character working on autopilot | Missing | `PlayerControl` holds, `WalkPartyNode.LeadPlayer` (`Story/StoryWorldNodes.cs:658-682`) | NavMesh steering for the CharacterController, `PlayerInteractor.Begin(Interactable)` | L (cut in round two) |
 
-### 1.6 Co-op
+### 1.7 Co-op
 
-- **Local per machine:** the camera, the UI, the fog and the minimap. Friends see a `RemotePlayerBody` driven by the
-  local player's poses, so an AI-driven body replicates with no new code.
-- **Decisions go through the host:** Haven decisions are `[HavenDecision("name")]` methods with string arguments sent
-  through the existing ask/answer messages (`Multiplayer/CoopDecisions.cs:94,109`), so new orders need **no wire-format
-  bump**. The wire format is 32.
-  - Queuing and collecting are refused for visitors on purpose (`HavenVisit.LeftToHost`).
-- **Residents are not networked:** every game simulates them from the settlement state, which is mirrored as save data
-  every 2 s.
-  - An order that is saved state reaches every game for free, and their residents walk to it the same way.
-  - Live work (`AddWork`, yields) must run on the host only, or it is counted twice.
-  - Fights need live positions: the horses' "one runner, puppets" pattern (`CoopHorses`), a new message and wire format 33.
+- **Local per machine:** camera, UI, fog and minimap. Friends see a `RemotePlayerBody` driven by your poses.
+- **Decisions go through the host:** Haven decisions are `[HavenDecision("name")]` methods with string arguments through
+  the existing ask/answer messages (`Multiplayer/CoopDecisions.cs:94,109`), so new orders need **no wire-format bump**
+  (it is 32).
+- **Residents are not networked:** each game simulates them from the settlement state, mirrored as save data every 2 s.
+  - Orders that are saved state reach every game for free.
+  - Live work must be counted on the host only.
+  - Live movement that must match (a ring worker felling a particular tree, a fight) needs the horses' "one runner,
+    puppets" pattern (`CoopHorses`), a new message and wire format 33.
 
-### 1.7 Design rules any colony mode must keep
+### 1.8 Design rules any colony mode must keep
 
-- **The ward and the GDD:**
-  - Home is calm and untimed, and attacks are warned (GDD §1.4, §6.3).
-  - "No needlessly elaborate life simulator" (§2.6). Well-being must not become a micromanagement chore (§15.4).
-  - Essential production must not need idle guards, and automated defences must not trivialise breaches (§6.8).
-  - "NPC activity should be visible so that hiring someone feels like changing the world" (§14.4). Today this is true
-    of where people stand, not of what they produce.
+- **GDD:**
+  - home is calm and untimed, and attacks are warned (§1.4, §6.3);
+  - no elaborate life simulator (§2.6), and no micromanagement chore (§15.4);
+  - essential production must not need idle guards, and automated defences must not trivialise breaches (§6.8);
+  - "NPC activity should be visible so that hiring someone feels like changing the world" (§14.4).
 - **Your rules:**
-  - Every effect is positive: beds never gate anyone, nothing is lost, nobody dies in a breach.
-  - Hand-ins happen in person, at home (2026-11-21).
-  - Workplaces are learned through quests (`BuildingGate`, `JobsOpenTo`, `SettlementState.cs:913`).
-  - No text walls in windows: pictures and names, words on hover.
-  - Keep the keyboard and mouse layout identical when adding pad controls.
-  - Keep default graphics quality; optimise rather than downgrade.
+  - every effect is positive;
+  - nothing is lost and nobody dies in a breach;
+  - hand-ins happen in person;
+  - workplaces are learned through quests (`BuildingGate`);
+  - no text walls;
+  - the keyboard and mouse layout stays identical;
+  - keep default graphics quality;
+  - judge base features by what they do for raids.
 - **Economy:**
-  - Cursed Essence comes only from raids.
-  - Workers make Plain goods and train nobody's skill (`WorkerProduction.cs:151`, `Construction.FinishedByOthers`).
-  - Defences act only in breaches, "so the game hunted by day at home stays the player's" (`WatchPostArcher.cs:4`).
-- **Pacing:** a 45-90 minute session should fit several raids and real building (GDD §3.3). The Haven must not become
-  a time sink.
+  - Cursed Essence comes only from raids;
+  - workers make Plain goods and train nobody's skill (`WorkerProduction.cs:151`);
+  - defences act only in breaches, "so the game hunted by day at home stays the player's" (`WatchPostArcher.cs:4`).
+- **Pacing:** a 45-90 minute session should fit several raids (GDD §3.3).
 
 ---
 
 ## Part 2: How other games do it
 
-### 2.1 Key takeaways
+### 2.1 Key takeaways from round one
 
-1. **Time.** Overhead views used for decisions under pressure pause or slow the game: RimWorld, Kenshi, Dragon Age:
-   Inquisition, Bannerlord's slow-motion order mode. Every one of those is single-player. The co-op base games
-   (Necesse, Palworld, Bellwright, Soulmask, Conan Exiles) run in real time. With four-player co-op, Safe Haven's view
-   has to work in real time.
-2. **What the avatar does while you look.** There are four tested answers:
-   - **Anchored:** the avatar stays put while the build view hovers near it (Fallout 4).
-   - **Asleep and vulnerable:** the body lies where you left it (Soulmask's possession; felt as a risk).
-   - **Disembodied:** there is no avatar to worry about (Dungeon Keeper).
-   - **One of the colonists:** the avatar runs on AI like everyone else (RimWorld undrafted, Kenshi, State of Decay 2).
-
-   Your idea is the last one. It works when the avatar has real work and taking control back is instant.
-3. **Orders scale with headcount.**
-   - 1-3 followers get verbs: follow, stay, attack, get logs (Sons of the Forest's Kelvin, Conan, Bellwright).
-   - 10-30 colonists get priorities and zones (Necesse, ASKA, RimWorld).
-   - About 11 named people is small enough for orders to each person, if every order lapses back to the routine:
-     RimWorld re-evaluates on undraft, and Necesse has "clear orders".
-4. **What only the overview can do:** placing, ordering many people, seeing the whole base. Factorio (plans that robots
-   build) and Dragon Quest Builders 2 (blueprints residents build from a stocked chest) show that "place it, others
-   build it" works well.
-5. **What only the hero can do.** The games that keep the hero meaningful give it work nobody else can do: Brütal
-   Legend's own fighting, Bannerlord fighting while ordering, Minecraft Legends' hero as the only way to move the army.
-   Soulmask shows the opposite.
-6. **Gamepad.** What has worked on a pad:
-   - snap selection, double-tap for all of a kind, and a select-all button (Halo Wars);
-   - a small order wheel (Mass Effect);
-   - a stick sweep for groups (Overlord II).
-
-   Necesse needed a whole extra patch just for settlement tasks on a controller.
+1. **Time.**
+   - Overhead views used under pressure pause or slow time (RimWorld, Kenshi, Dragon Age: Inquisition, Bannerlord), and
+     every one of those is single-player.
+   - Co-op base games run in real time.
+   - **Safe Haven's view must run in real time.**
+2. **The avatar while you look:** anchored (Fallout 4), asleep (Soulmask), absent (Dungeon Keeper) or one of the
+   colonists (RimWorld, Kenshi).
+3. **Orders scale with headcount:** verbs for 1-3 followers, priorities and zones for 10-30. For about 11 people, orders
+   to each person work if they lapse back to the routine.
+4. **What only the overview does:** placing, ordering many, seeing the whole base. "Place it, others build it" works
+   (Factorio, Dragon Quest Builders 2).
+5. **What only the hero does** keeps the hero meaningful (Brütal Legend, Bannerlord); Soulmask shows the opposite.
+6. **Gamepad:** snap selection and select-all (Halo Wars), a small order wheel (Mass Effect). Necesse needed a separate
+   patch for settlement control on a pad.
 
 ### 2.2 The closest models
 
-| Game | How the switch works | The avatar meanwhile | Orders | Lesson for Safe Haven |
+| Game | How the switch works | The avatar meanwhile | Orders | Lesson |
 |---|---|---|---|---|
-| **Fallout 4** (workshop) | Hold V, only in a settlement's build area | Stays put; the view is near it | Aim at a settler → Command → aim at a station → Assign | The same idea and key. Warning: clumsy menus, and the people have to matter |
-| **RimWorld / Going Medieval** (drafting) | Draft or undraft a colonist | Colonists are all AI until drafted | Priorities, zones; drafted: move, attack; Going Medieval's Large Bell drafts many to a point | Orders are overrides that lapse; one "everyone" order for danger |
-| **Kenshi** | No switch: a free camera always | Your character is one of the squad | Follow, bodyguard, attack; Shift queues jobs | The nearest to "your character becomes a colonist" |
-| **Necesse** | Settlement panel (C) | Top-down hero, real time, co-op | Follow, guard a spot, clear orders; restrict zones, work zones, priorities | Same camera, scale and co-op as Safe Haven; plan the pad from the start |
+| **Fallout 4** (workshop) | Hold V, in a settlement only | Stays put | Aim at a settler → Command → Assign | Same idea; warning: clumsy menus, and people must matter |
+| **RimWorld / Going Medieval** | Draft or undraft | All AI until drafted | Priorities, zones; drafted move and attack; a bell drafts many | Orders lapse; one "everyone" order for danger |
+| **Kenshi** | A free camera always | One of the squad | Follow, bodyguard, attack; Shift queues | Your character as one of the colonists |
+| **Necesse** | Settlement panel (C) | Top-down hero, real time, co-op | Follow, guard a spot, clear orders; zones, priorities | Same camera, scale and co-op; plan the pad from the start |
 
-### 2.3 Other games at a glance
+### 2.3 Other games from round one at a glance
 
 | Game | What it does | What reviewers said |
 |---|---|---|
-| Manor Lords (Visit Mode) | The reverse: a city builder lets you walk your lord in third person, with no interaction or fighting | Presence only; shows the appeal of walking your own town |
-| Dungeon Keeper (Possession) | Take one creature in first person | "Made you feel like the minion", but disorienting and of limited use |
-| Dungeons 3 | Two maps, two control models | The dungeon half "quickly gets left behind" |
-| Dragon Age: Inquisition (Tactical View) | T or zoom all the way out; pauses | Poorly joined to the action controls; little used; cut from Veilguard, which also had a "don't fight inside" rule because of the camera |
-| Factorio | Place plans from the map; robots build | The clean precedent for "place from above, others build" |
-| Bellwright | A hero, plus villagers run from menus (0-9 priorities), companion Move/Follow/Charge/Hold | Settlement depth praised; stuck NPCs, poor pathing, heavy menus |
-| ASKA | One villager per station, pinned tasks, Barracks guards, a militia call-up | Players ask for less babysitting ("work until complete") |
-| Soulmask | Possession of a tribesman, patrol checkpoints, a 1.0 management mode | Menus "unnecessarily complex"; followers make "the player character… optional" |
-| Medieval Dynasty | A management tab: villager → building → what it makes | No orders and no overview; works because it stays small |
-| Palworld | Pals take base work; an alarm bell switches to defence | Pathing, stuck pals, workarounds such as throwing pals at their stations |
-| Conan Exiles | Thrall stances: guard me, guard area, attack all; patrols (2022) | Thralls idle in combat |
-| Dragon Quest Builders 2 | Draw a blueprint, stock a chest, residents build it | Closest to Safe Haven's scaffolds |
-| Cult of the Lamb | Dungeon runs, plus followers commanded in person | "Lacked depth… both as a roguelite… and a base manager" |
-| State of Decay 2 | Control one survivor, swap to any; the rest live on AI | Swapping keeps everyone mattering |
-| Brütal Legend | The hero fights, orders the army, flies up to command | A hidden RTS half; weak console control; "not enough confidence in any one piece" |
-| Minecraft Legends | A hero with a banner; no overhead view by design | Simple on a pad, slow on PC; units ignore nearby enemies; content stopped after about 9 months |
-| Savage / Natural Selection 2 | One commander per team in an RTS view | NS2's command seat is often empty: fighting is more fun |
-| Mount & Blade II: Bannerlord | Orders from the avatar while fighting; slow-motion order mode | Commanding while fighting keeps the hero central |
-| Halo Wars | A console RTS | Tap, double-tap and hold A for selection; fixed build slots |
+| Manor Lords (Visit Mode) | Walk your lord in third person, no interaction | Presence only |
+| Dungeon Keeper (Possession) | Take one creature in first person | "Made you feel like the minion"; disorienting |
+| Dungeons 3 | Two maps, two control models | One half "quickly gets left behind" |
+| Dragon Age: Inquisition (Tactical View) | T or zoom out; pauses | Little used; cut from Veilguard |
+| Factorio | Place plans from the map; robots build | Clean "place from above, others build" |
+| Bellwright | Hero plus villagers run from menus | Depth praised; stuck NPCs, heavy menus |
+| ASKA | One villager per station; Barracks guards; militia | Players want less babysitting |
+| Soulmask | Possession, patrols, a 1.0 management mode | Followers make "the player character… optional" |
+| Medieval Dynasty | A management tab only | Works because it stays small |
+| Palworld | Pals take work; an alarm bell | Pathing and stuck pals |
+| Conan Exiles | Thrall stances, patrols | Thralls idle in combat |
+| Dragon Quest Builders 2 | Blueprint plus stocked chest, residents build | Closest to Safe Haven's scaffolds |
+| Cult of the Lamb | Runs plus followers commanded in person | "Lacked depth… both as a roguelite… and a base manager" |
+| State of Decay 2 | Control one survivor, swap to any | Swapping keeps everyone mattering |
+| Brütal Legend | The hero fights and commands, flies up to order | Hidden RTS half; weak console control |
+| Minecraft Legends | A hero with a banner, no overhead view | Simple on a pad; units ignore enemies |
+| Savage / NS2 | One commander per team | NS2's command seat is often empty |
+| Bannerlord | Orders while fighting; slow-motion order mode | Commanding while fighting keeps the hero central |
+| Halo Wars | A console RTS | Tap, double-tap and hold A for selection |
 
 ### 2.4 What reviews say goes wrong
 
-- **The two-half-games problem.** Players compare each half with its dedicated genre. Gord "fails to capture the appeal
-  of any of its component genres". Minecraft Legends was called "shallow".
-- **Modes starving each other.** A mode that is optional and weaker goes unused (Dragon Age: Inquisition, NS2's
-  commander seat). A mode that is too strong makes the other pointless (Soulmask).
-- **Watching from above exposes the AI.** Stuck, idle and wandering NPCs come up in nearly every review above.
-- **Menus multiply.** Fallout 4's workshop, Soulmask, Gord and Bellwright were all criticised for their menus.
-- **Control.** Brütal Legend's targeting on a console, and Dragon Age: Inquisition's camera indoors.
+- **Each half is compared with its own genre:** Gord "fails to capture the appeal of any of its component genres".
+- **One mode starves the other:** an optional, weaker mode goes unused (Dragon Age: Inquisition, NS2), and a too-strong
+  one makes the other pointless (Soulmask).
+- **Watching from above exposes the AI:** stuck and idle NPCs come up in nearly every review.
+- **Menus multiply:** Fallout 4, Soulmask, Gord, Bellwright.
+
+### 2.5 Round two: small named casts, hideouts, homecomings, light
+
+**Small named cast with a town mode:**
+
+- **Dark Cloud / Dark Chronicle (Georama).** Dungeon finds become building plans laid out on an overhead town. Each
+  villager has wishes ("place my house facing east", "near the pond", "away from the mayor"). Meeting one gives a gift;
+  all of them is optional.
+- **Ni no Kuni II.** Citizens fill facility slots. Some research needs one particular person's skill, and citizens rise
+  from Beginner to Veteran to Master by working. Kingdom levels open new land.
+- **Enshrouded.** Each rescued craftsperson brings their own stations, and rescuing one unlocks the quest for the next.
+- **Octopath Traveler 0.** Residents have perks that work better in certain facilities; residents in houses deliver wood
+  and stone regularly.
+- **MGS V Mother Base.** Specialists unlock developments. Deployments show the odds and predicted losses before you
+  commit. Walking the base raises morale.
+- **Spiritfarer.** About 11 spirits, each with requests that drive what you build. The first person's quests unlock the
+  first stations.
+- **AC Valhalla.** The settlement grows from a longhouse with materials from raids. A feast bell gives timed boosts, and
+  a resident advisor says what to do next.
+- **Dragon Age: Inquisition's war table.** Missions on timers, with a "preferred" advisor who gets the better reward.
+- **Dave the Diver.** Staff are dispatched to gather, with a minimum and maximum set by their stats.
+
+**Extraction hideouts and work while you are out:**
+
+- **ARC Raiders.** Scrappy the rooster brings materials after each raid, whether you extract or not (guides; the
+  developers call him a "resource producer… after each raid"). A material you "track" for an upgrade is tagged with an
+  eye icon in raid loot.
+- **Escape from Tarkov.** The hideout's crafts run in real hours while the generator has fuel found in raids.
+- **Monster Hunter World / Rise.** Safaris and Meowcenaries progress by the quests *you* finish, not by the clock, and
+  never fail.
+- **Escape from Duckov.** Quests tell you which facility to build next.
+
+**Plans and shopping lists:**
+
+- **Satisfactory's to-do list** totals the materials for chosen recipes against what you have.
+- **Grounded-style ghosts** cost nothing until the materials arrive.
+- **Stardew Valley's bundles** take any few of several items, and a finished room is shown in a short scene at the end
+  of the day.
+- **Death Stranding:** other players' deposits fill the same project.
+
+**Homecomings:**
+
+- **Darkest Dungeon.** A chance of one town event on return, drawn like a card.
+- **Hades.** People say something new on each return: "What would these characters talk about and what would they
+  notice?" (Greg Kasavin).
+- **Clash of Clans.** A defence log with what happened while you were away.
+
+**Light as defence:**
+
+- **Don't Starve.** Darkness kills; even the very edge of a fire's light protects you.
+- **Gord.** Light restores sanity outside the walls, but makes you easier to see.
+- **Frostpunk.** Heat zones don't stack where they overlap: one big source or many small ones.
+- **Minecraft.** Torches stop monsters spawning nearby.
+- **Darkwood.** A night event can black out the lights.
+- **Thronefall.** Before each night the map shows where enemies come from and what they are; buildings wrecked at
+  night come back by day.
+
+**A village worth watching, without meters:**
+
+- **Wildermyth.** Traits only make people eligible for story events.
+- **Going Medieval.** Settler chats come from perks and state.
+- **Oxygen Not Included.** "Overjoyed" bursts help the people nearby.
+- **Manor Lords.** Daily rhythms and seasons.
 
 ---
 
@@ -337,40 +447,46 @@ What breaks or looks wrong when the camera is 50-200 m from the player's body:
 
 ### 3.1 What it fixes
 
-1. **The split you feel.** It gives the residents a visible part in the economy (Phase 2), so managing and walking
-   happen in the same world, about the same people. That is Pillar D: "the recruited smith should inhabit the forge".
-2. **Errands that aren't play.** Today every craft queue means walking to within 6 m of the station. The view turns a
-   lap of the Haven into a minute of clicks, and leaves home time for what is play: building, talking, fishing, horses,
-   getting ready for a raid.
-3. **Layout you can read.** The 2026-11-15 town work (yards, paths, extensions, homes) made placement matter. From above
-   you can see the town you are making, the way Gord shows it.
-4. **Breach preparation gets its missing verb.** GDD §6.7 lists "assign defenders" in the preparation step; nothing does
-   that yet. From above, preparation becomes planning: where the lanes come in, where the guards stand, what needs
-   mending.
-5. **It suits the look.** The Haven's atmosphere is already modelled on Gord, the camera is already top-down (a short
-   step up, not a jump from first person as in Fallout 4), and the Lookout already pulls back to about 56 m.
+1. **The split.**
+   - Residents get a visible part in the economy: rings they clear, walls they raise, parties they send.
+   - Managing and walking happen in the same world, about the same people (Pillar D).
+2. **The time between raids.**
+   - The view turns "what next" into one place: what changed while you were away, what the next raid should bring
+     home, who comes along, what the Haven does while you are gone.
+   - It doesn't save much walking, because "Go there" and staffed stations already cover that.
+   - It saves deciding time, and turns home into getting ready.
+3. **Wood and stone.** These are the real grind at home, and standing orders that run during raids ease it without
+   taking the hero's gathering away.
+4. **Layout you can read.** The yards, paths, extensions and homes from 2026-11-15 read from above, as in Gord.
+5. **Preparation as planning.** "Assign defenders" (GDD §6.7) has no verb today. Foretold corruption nights get an
+   evening plan with blight at stake.
+6. **It suits the look and the camera.** The atmosphere is modelled on Gord; the camera is already top-down; the Lookout
+   already pulls back to about 56 m.
 
 ### 3.2 What works against it, and the answer to each
 
 | Risk | How bad | Answer |
 |---|---|---|
-| Two half-games | High if it becomes an RTS | It is not a second game: it is the H window laid on the world. No box-selected armies, no unit production, no economy you only see from above |
-| The hero becomes optional at home (Soulmask) | High if residents gather well | Residents get plain basics, slower than you, with stock targets that stop them. Quality, rare finds, XP, Fine crafts, fighting and the fastest building stay yours (§4.13) |
-| Stuck NPCs seen from above | Certain | Phase 0 fixes the deep-water mask and stuck warps, and checks how often residents warp, before the view ships |
-| Rendering at height | Medium-high, unmeasured | Measure first (Phase 0). Start with a lower cap (about 50 m) and raise the shadow and grass distances in the view rather than lowering quality |
-| Co-op | Medium | Orders are saved settlement state: mirrored for free. Only fights need live positions, and those come in Phase 3 |
-| Controller | Medium | Designed in Phase 1: a windows-wheel entry, a snap cursor, an order wheel |
-| Busywork (§2.6, §15.4) | Medium | Orders lapse. Nothing gets worse if you never open the view: the Haven keeps running on routines as now |
-| Endless home time | Low-medium | Real time, no fast-forward. The view saves walking; it doesn't add chores |
-| Scope before a playtest | Medium | Phases 0-1 change no numbers. Phases 2-4 wait for you to have used the view |
-| Exploits | Low-medium | No Cursed Essence or XP from residents. Your character earns XP on autopilot only for bounded work (hammering scaffolds you paid for), never for gathering |
+| Two half-games | High if it becomes an RTS | No box-selected armies, no unit production. The view is the Haven window laid on the world, plus a planner |
+| The hero becomes optional | High if residents gather well | Rings at a quarter to a third of your pace, plain goods, no XP. Quality, rare finds, fighting, talking and raids stay yours |
+| Orders that save seconds | Certain, for build and queue orders | Build the view around what is scarce: minutes, wood and stone, readiness |
+| Stuck NPCs seen from above | Certain | Away work applied as results; Phase 0 cleans up movement first |
+| Stripping the woods | Medium | Rings are finite; a forester replants; felled Haven trees otherwise stay down |
+| Rendering at height | Medium-high, unmeasured | Measure first, cap the height, raise shadow and grass distances in the view rather than lowering quality |
+| Co-op | Medium | Away work is state; live ring workers get one runner |
+| Nothing at stake at night | High for patrol | Patrol cut; posts on foretold corruption nights, which move blight |
+| Headcount and sameness | Medium | Orders unlock person by person; companion signatures make 9 Fighters different |
+| Busywork | Medium | Orders lapse or finish; nothing gets worse if you never open the view |
+| Exploits | Low-medium | No Cursed Essence or XP from residents; ring yields don't count for quests that teach the player |
 
 ### 3.3 Verdict
 
-**It will make the Haven better, with one condition: Phase 2 has to follow Phase 1.** Phase 1 alone is a real
-convenience and a clearer view of the town, but it does not answer "two directions"; it makes the menu half faster.
-Phase 2 is what makes the people the base, and Phases 3 and 4 make it deeper. Not doing it leaves the Haven where it is:
-a good-looking village whose life is scenery, managed from a list.
+**It will make the Haven better if Phases 1-3 come together: the view, the between-raids planner, and standing orders
+that run while you are away.**
+
+- Phase 1 alone is a clearer view of the town, and a convenience.
+- Phase 2 links the Haven to the next raid.
+- Phase 3 is where the people become the base.
 
 ---
 
@@ -378,272 +494,336 @@ a good-looking village whose life is scenery, managed from a list.
 
 ### 4.1 Principles
 
-1. **The same game, from further up.** The camera rises from your character and comes back down to it. Same light, same
-   world, no second rule set.
-2. **The view runs the Haven; the avatar lives in it.** Admin goes up, life stays down (§4.13).
-3. **Nothing needs the view.** Routines, the H window lists and walking to a station all keep working.
-4. **Orders are overrides that lapse.** Everyone goes back to their day.
-5. **Real time.** The same in solo and co-op.
-6. **Pictures, not text walls.** Cards with paintings and names, words on hover, the Hearthline kit.
-7. **Haven only.** Never in raids, the prologue or a breach's defence.
+1. **The same game, from further up.** The camera rises from your character and returns to it.
+2. **Built around what is scarce:** your minutes, wood and stone, readiness for the next raid.
+3. **The view runs the Haven; the avatar lives in it** (§4.11).
+4. **Nothing needs the view.** Routines, the H window and walking all keep working.
+5. **Orders lapse or finish.** There is nothing to babysit.
+6. **Real time**, in solo and co-op alike.
+7. **Pictures, not text walls.**
+8. **Haven only.** Never in raids, the prologue or a breach's defence.
 
 ### 4.2 Getting in and out
 
-- **Way in:** at home, **H lifts the camera** off your character into the view, with the Haven window docked as a side
-  rail (its tabs become the rail's sections).
-  - In raids, H opens the window as today.
-  - The entry is its own rebindable action, so a player who wants another key can have it.
-  - Pad: the windows wheel (hold View) gets "Keeper's view".
-- **Way out:** H, Esc or B again, or click your own character's portrait. The camera glides down to wherever your
-  character now stands.
-- **Can't enter** during raids, the prologue, a breach's defence, a dialogue or cinematic, while swimming or riding.
-  Entering cancels a work interaction in progress until Phase 4 can carry it on.
-- **Thrown out (the camera dives to you, with a horn sound) when:**
+- **Unlock:** when the Heartroot names you "Hearth-keeper" and the road north opens (`Docs/QuestRedesign.md:136,300`). By
+  then the Haven has enough in it to look over, and the name fits.
+- **Way in:**
+  - its own rebindable key (backquote or Caps Lock are free);
+  - a "Look over the Haven" button in the H window's header;
+  - "Keeper's view" on the pad's windows wheel.
+  - The camera glides up in about half a second. H stays the window for a quick glance.
+- **Way out:** the same key, Esc, B, or clicking your own portrait. The camera returns to your character.
+- **Can't enter:** during raids, the prologue, a breach's defence, a dialogue or cinematic, or while swimming or riding.
+- **Thrown out (the camera dives to you, with a horn) when:**
+  - **you** are hurt or hunted. This needs a self-only check: `AnyHuntingPlayerSide` counts friends;
   - a breach's defence begins;
-  - your character is hurt or hunted (`MonsterAI.AnyHuntingPlayerSide`);
-  - corruption-night creatures reach the ward;
-  - a cinematic starts or the scene changes.
+  - a cinematic starts.
 
 ### 4.3 The camera
 
-- **Position:** it starts above your character at about 30 m and zooms from 20 m to a cap set by Phase 0's measurements
-  (about 50 m to start). It tilts steeper as it rises, about 50° to 65°, as Gord does.
-- **Controls:**
-  - pan: WASD or arrows, the screen edge (optional) and middle-drag, faster when zoomed out;
-  - rotate: Q and E (a view-only map, so the Player map's keys don't change);
-  - zoom: the wheel.
-  - Left-click selects, right-click gives the context order (§4.6), F follows the selected person, Space finds your
-    character.
-- **Bounds and ground:** Haven Meadows (`HomePortal.InBuildLand`) plus a margin. Height follows the terrain, smoothed so
-  the knolls don't clip.
-- **Flying to a place:** clicking a building or person in the rail flies the camera there instead of moving your
-  character (`HavenTravel` stays on the rail as "go there yourself").
-- **Built from:** a second `CinemachineCamera` at priority about 500, below cinematics, so the brain's blend does the
-  transition. `PlayerCameraController` gets a "stand down" flag so it stops writing the focus, shadows, cursor lock and
-  screen-centre aim while the view is up.
+- **Position:** about 30 m to start, zooming from 20 m to a cap set by Phase 0's measurements (about 50 m to begin with).
+  It tilts from about 50° to 65° as it rises.
+- **Controls:** WASD, the screen edge (optional) or middle-drag to pan; Q and E to rotate (in a view-only map); the
+  wheel to zoom. Left-click selects, right-click gives the context order, F follows the selected person, Space finds
+  your character.
+- **Bounds:** Haven Meadows (`HomePortal.InBuildLand`) plus a margin. The height follows the terrain, smoothed.
+- **Built from:** a second `CinemachineCamera` at priority about 500, with a "stand down" flag on
+  `PlayerCameraController`.
+- **Optional:** the height cap rises with the Watch Post's tier. It gives the post a use at home and keeps the
+  rendering cost low early.
 
 ### 4.4 What the view shows
 
 - **People:**
-  - a small name plate with an activity sign (hammer, pot, bed, spear, lantern, axe) and their portrait on hover;
-  - people indoors show on their house ("Ingrid is home");
-  - the selected person gets an outline (`OutlineCopies`) and a dotted line to where they are going.
-- **Buildings:**
-  - on hover, an outline and a card: painting, tier, queue progress, an output-ready badge, who works there;
-  - scaffolds show their progress and their builders.
-- **Along the top:**
-  - stores as picture cards with counts (from the Stores tab);
-  - the hour and the weather;
-  - the portal's next tier (`WantedAtHome`).
+  - a small activity sign (hammer, axe, pot, bed, spear);
+  - names and portraits on hover or selection only;
+  - rank badges;
+  - a wish picture over a home when someone wants something (§4.9).
+- **Buildings:** on hover, an outline (`OutlineCopies`) and a card with the painting, tier, queue progress, output ready
+  and who works there.
+- **Along the top:** stores as picture cards with counts, the hour, the weather, and the portal's next tier
+  (`WantedAtHome`).
 - **On the ground:**
+  - rings and their progress;
+  - posts;
+  - plans (ghosts);
   - the ward ring and the edge of the build land;
-  - gather rings and guard posts;
-  - when a breach is warned, its lanes (`BreachLanes`).
-- **Night:**
-  - lit ground stays readable and the dark beyond stays dark, so the night's danger still reads from above;
-  - the flat fog-of-war plane fades, as in cinematics, until it can lie on the ground.
+  - on a foretold night or a warned breach, the lanes and the creatures' kind (as in Thronefall).
+- **Night:** lit ground stays readable and the dark stays dark. The flat fog-of-war plane fades, as in cinematics.
 
-### 4.5 What you can do from above
+### 4.5 Between raids: the homecoming and the planner
 
-- **Buildings:**
-  - open their card to queue, cancel and collect, with output going **into the stash**, not your bag;
-  - upgrade, fit modules, move, mend;
-  - staff them (give the job).
-- **Build:** G and placement work as today; on a pad the cursor places instead of an offset from your character. A
-  scaffold can be pinned "next" (§4.8).
-- **People:** their page, job, home, pause work, orders (§4.6).
-- **Not from above:**
-  - talking, quests and hand-ins (people are met, not managed; and your rule says hand-ins happen in person);
-  - chests and bag moves (taking things into your bag from afar would be a teleport);
-  - taming and riding, gathering, fishing, eating, the sauna.
+- **Homecoming sweep.**
+  - On return, the view can open to a short, skippable flight over what changed: scaffolds standing, rings cleared,
+    goods made, a party back.
+  - Each building with news gets a mark built from `Homecoming`'s lines.
+  - At most one "while you were away" card is drawn from a deck filtered by the Haven's state (as in Darkest Dungeon),
+    always positive.
+- **The portal card is the raid planner.**
+  - Click a resident to take them as your companion, and they walk to the portal.
+  - Pack the raid kit from the stash with "Pack as last time" (`PackForRaid`).
+  - "Set out" dives to your character at the portal.
+- **Plans and the tracked shopping list.**
+  - Place a building as a **plan**: a ghost that costs nothing until the materials are there.
+  - Its missing materials go on a list.
+  - Pin it, and those items are tagged with an eye mark in raid loot (as in ARC Raiders).
+  - In co-op, anyone's deposits fill the same plan.
+  - Some slots accept any of a kind ("any hardwood"), so a plan doesn't stall on one drop.
 
-### 4.6 Orders
+### 4.6 Standing orders while you are away
 
-There are six verbs and a horn, for about 11 named people. Right-clicking gives the obvious order for what is under the
-cursor: a scaffold means Build, a tree or rock means Gather, open ground at night means Guard. A small wheel offers the
-rest.
+Round two's biggest win. `SettlementSystem` already runs workers and banks builder time during raids
+(`SettlementSystem.cs:56-69`, `ResidentBuilders.cs:125-204`). Standing orders do the same:
 
-| Order | What they do | Lasts | When |
+| Order | Opened by | What it does | Paid out |
 |---|---|---|---|
-| **Work here** | Their job at this workplace (exists today) | Until changed | Always |
-| **Build this** | Walk to the scaffold and hammer, then back to their day | Until it stands | Work hours |
-| **Gather here** | In a ring you draw (like the Gord-style rings for walls): fell object trees, break rocks, pick bushes; each load is carried home; stops at the stock target | Standing, in work hours | Day |
-| **Guard here** | Stand at a lit spot; fight what comes in reach | Standing, at night; they sleep late the next morning | Night, breach preparation |
-| **Patrol** | Walk two to four points carrying a lantern, a moving light the prowlers keep out of | Standing, at night | Night |
-| **Follow me** | Walk with your character as a companion (the existing companion swap) | Until cleared | At home |
-| **Back to your day** | Clears any order | | |
-| **The horn** | Guards to their posts, everyone else to shelter, early (today's breach behaviour, on your call) | Until the danger passes | A breach is warned, or a corruption night |
+| **Clear this ring** (painted trees) | Tor (Carpenter) | Fells trees in a drawn ring; the forester replants behind (`PlantedTrees`) | Each raid, Plain wood |
+| **Quarry this knoll** | Hild (Mason) | Breaks stone in a ring | Each raid, Plain stone |
+| **Hunting or fishing party to a held land** | Gunnar (Hunter or Fisher) | A small tithe for one raid and slower erosion, never a raise in hold (Territory's "not yet" item) | On return |
+| **Scout a held land** | Runa (Tracker) | Shows the land's next push one raid early | On return |
 
-- **Who can take an order:**
-  - anyone can Build and Gather, faster with the right job;
-  - anyone can Guard, Patrol and Follow, because everyone has a raid companion (Fighter or Archer);
-  - rescued people with no job yet can take orders too, which gives early residents something to do.
-- **Attack:** only against breach attackers and corruption-night creatures, by fighters on guard or following you. There
-  are no attack orders on the Haven's game animals: day hunting stays yours, as `WatchPostArcher` already rules.
-- **Meals and sleep still come first,** except for night guards, who shift their sleep rather than lose it. There are no
-  needs to watch.
+- **Counted in raids, not hours** (Monster Hunter, ARC Raiders), so co-op clocks don't matter.
+- **The odds are shown before you send** (a yield range), with a "preferred person" bonus (as in Dragon Age's war
+  table).
+- **Nobody dies or is lost.** The worst result is "came back tired, rests a day". A failed raid still pays a part (as
+  Scrappy does).
+- **Applied as state on return:** nobody needs to be watched walking, there is nothing to sync in co-op, and the value
+  grows with how much you raid.
 
-### 4.7 Your own character while you look
+### 4.7 Living work at home
 
-Your idea was that your character "moves along in the base like other NPCs". There are three ways to do that:
+- **Builders at home.** Carpenter and Mason, plus anyone ordered, hammer scaffolds in work hours with the Forging emote.
+  - This means removing the away-only condition (`SettlementSystem.cs:60`); `AddWork` runs on the host only, at 0.5 a
+    second against your 1 + Build Speed.
+  - Their real work is **drawn wall rings**: 30 pieces at 3-5 s each.
+  - There is no "next" pin.
+- **Felling and quarrying rings at home.** These are the same orders as §4.6, done in the open while you are home:
+  - painted trees first (they need a fell-by-index call that doesn't need the player within 10 m);
+  - finite (the ring is done when it is empty);
+  - overgrowth left out (that is your early renown);
+  - about a quarter to a third of your pace;
+  - Plain yields, no Hardwood or Elderwood, no XP, no Cursed Essence.
+- **Carrying.** A gatherer carries a bundle home, and the stash goes up when they arrive. There are no hauler jobs.
+- **Horses haul.** The "Haul timber" horse job (`Resources/HorseSettings.asset:138-142`) says it "drags logs up to the
+  sawbench" but only adds 30% speed. Make it real: a working horse doubles a gatherer's load and is seen dragging the
+  log.
+- **The forester loop.** The woodcutter replants saplings behind a ring, so long-run wood is capped by how fast saplings
+  grow, and the Haven stays green, as the art direction wants.
+- **Co-op:** live ring workers need one runner (the host), with friends seeing copies, or friends see only a ring's
+  progress. Away orders need nothing.
 
-| Option | What it is | Cost | Notes |
-|---|---|---|---|
-| A. Stays where it stands (Fallout 4) | Held and still; leaving the view returns to it | S | Safe inside the lit ward; the view throws you out if it is hunted |
-| B. **A Keeper's task** | Before you look around, pick a task: **build** a scaffold (at your own build speed, the fastest builder), **keep watch** at a post, or **rest** at home; it walks there and does it | L | Uses your skills, so it is worth leaving your character there; Construction XP is bounded by paid scaffolds |
-| C. A full routine like a resident | A schedule, meals, a job | L+ | The player isn't a `ResidentRecord`; your character would be the least interesting person in the Haven |
+### 4.8 Defence: corruption nights and breaches
 
-**Recommended: A in Phase 1 and B in Phase 4.** "Work like a resident" is best read as "do the thing you are best at
-while you look around", which is building. No autopilot gathering for your character, because that would be unbounded
-XP and materials.
+- **Corruption nights** are already foretold with a direction (`Settlement/CorruptionNights.cs:1-9`).
+  - Beaten back, blight falls (`:286`); let through, it rises (`:337-338`).
+  - Blight drives land erosion and the next night's odds.
+  - Today residents shelter, and the Watch Post archer shoots only in breaches (`WatchPostArcher.cs:59`).
+- **The new evening plan:**
+  - set posts on the foretold side;
+  - the Watch Post archer joins on those nights;
+  - the horn sends posts out and everyone else in.
+- **Posts are capped by the defences you have built:** Watch Post tier, gates, the Palisade. Without the cap, eleven
+  guards who can't die would set the balance.
+- **Breaches:**
+  - In the warning and preparation steps the view shows the lanes; you mend, place traps and set posts.
+  - The defence is on foot, with the same combat as raids (GDD §6.7).
+  - Recovery is back in the view.
+  - Nobody dies: guards get up by themselves.
+- **Cut from round one:** Patrol, Follow me, and the explicit Attack order. Prowlers never enter light, so a patrol has
+  nothing at stake. Follow me duplicates the raid companion. Attack has no target outside a defence.
 
-### 4.8 Living work: what the view has to watch
+### 4.9 People who matter
 
-- **Builders at home.** Carpenter and Mason, plus anyone ordered, walk to scaffolds in work hours and hammer with the
-  Forging emote. They call `Construction.AddWork` on the host only, at 0.5 a second against your 1 + Build Speed. They
-  take a pinned scaffold first, then the oldest. Banking builder-seconds while you are away stays as it is.
-- **Gather rings.** The Woodcutter's Lodge and Workshop jobs can be given a ring. The yield goes into the stash through
-  a new path next to `ResourceNode.GatherBy`.
-  - Object trees, rocks and bushes come first; painted terrain trees (about 130,000) come later, once there is a
-    fell-by-index call that doesn't need the player within 10 m.
-  - The workplace's tier stands in for a tool tier.
-  - Yields are Plain, with no Hardwood or Elderwood chance, no XP and no Cursed Essence.
-  - Clearing the Haven's overgrowth is a natural first use, since those nodes never regrow.
-- **Carrying.** A gatherer carries a bundle prop back to their workplace's yard, and the stash goes up when they arrive.
-  That is honest hauling without hauler jobs.
-- **Pace.** Ring work is slower than yours and stops at the job's stock target (`WorkOrder` already has one). The
-  `Docs/BaseProgression.md` numbers need a fresh check once residents add wood and stone.
-- **Trap: quests.** Residents' yields must not count towards "gather X" quest objectives meant for you. Check which
-  event those objectives listen to.
+- **Each rescued person brings one order** (Enshrouded, Ni no Kuni II, Spiritfarer). Orders nobody can do yet are
+  greyed, with "needs someone who…". This paces the view's tutorial at one new verb a homecoming (Pillar E) and fits the
+  quest flow: each person's quest teaches their mechanic.
 
-### 4.9 Defence: preparation from above, the fight on foot
+  | Person | Order they bring |
+  |---|---|
+  | Tor | Builders at home, felling rings |
+  | Eirik | Posts |
+  | Gunnar | Hunting and fishing parties |
+  | Asa | Ploughing with a horse |
+  | Hild | Quarry rings |
+  | Runa | Scouting a held land |
+  | Sigrid | The horn |
 
-- **Warning and preparation:** in the view you see the lanes, mend and place walls and traps, set guard posts, choose who
-  stands, and sound the horn.
-  - Any resident with a raid companion can stand, not only the Warden and the Hunter: `ResidentDefender` already does
-    the swap.
-  - Nobody dies: guards get up by themselves, as now.
-- **Defence:** the camera dives to your character, and the fight is yours, with the same combat as raids (GDD §6.7).
-  - A later step could add quick orders on the action wheel during the fight (to me, hold here, fall back), in the
-    style of Bannerlord or Mass Effect.
-- **Recovery:** back in the view to see the damage and mend it.
-- **Breach rules unchanged:** half the attackers still go for the ward and half for buildings. Guards help but must not
-  win alone (§6.8), so tune their numbers against a breach you don't fight.
+- **Wishes met from above** (Dark Cloud).
+  - One or two per person: "near the mere", "a bench by my door", "away from the forge's noise".
+  - They show over their home, and while you drag a plan.
+  - Meeting one gives a line, an emote and a small gift. Likings (`HomeLife.cs:159-162`) already hold half of this.
+  - Positive only.
+- **Lines that notice the raid** (Hades): one per person per homecoming, about what you brought back or what happened,
+  spoken as you pass.
+- **Small scenes, not meters** (Wildermyth): two friends singing at the mere, shown as a bubble you can click. Only
+  "overjoyed" bursts, each helping the people nearby a little.
+- **Ranks as badges:** the milestone ranks decided on 2026-11-13. Decide whether gathering counts as work.
+- **Companion signatures** (decided on 2026-11-13, after the playtest), so the nine Fighters fight differently. The view
+  puts their sameness on display.
+- **An empty house for someone lost** (GDD §15.6): their house goes dark, their station stands idle, and their rescue
+  rumour shows on hover.
 
-### 4.10 Co-op
+### 4.10 Your own character while you look
 
-- **Who can use the view:** anyone; it is local.
-  - Friends see your character where you left it (or at its task), with a small "keeping" mark over it.
-- **How orders travel:**
-  - Orders are `HavenDecision`s with string arguments, so no wire bump. A guest's order is an ask to the host, as
-    queues and builds are today.
-  - Orders are saved settlement state, mirrored every 2 s, so every game's residents walk to the same post or ring.
-  - Work (`AddWork`, yields) is counted on the host only.
-- **Live positions:** fights (guards meeting creatures, follow-me) need the horses' "one runner, puppets" pattern: a
-  new message and wire format 33, with `CoopWireTests` fingerprints. That is Phase 3.
+- **It waits:** it sits at the nearest fire or bench, or keeps hammering if you entered mid-build.
+- **Friends see a "keeping" mark** over it.
+- **Round one's autopilot job is cut:** builds take 2-12 s, so an autopilot builder saves seconds for an L-sized cost.
+  - Your first idea ("moves along like other NPCs") is still open in Part 7, with that cost stated.
 
-### 4.11 Controller
-
-- **Way in:** the windows wheel's "Keeper's view".
-- **In the view:**
-
-| Control | Does |
-|---|---|
-| Left stick | Pan |
-| Right stick | Rotate (sideways) and zoom (up and down) |
-| A | Select or confirm; the cursor snaps to the nearest person or building under it, as in Halo Wars |
-| Double-tap A | Select everyone working there |
-| X | The order wheel for whoever is selected |
-| Y | Find your character |
-| LB / RB | Step through the rail's sections (`PadTabs`) |
-| B or View | Back, then out |
-
-- **Building:** the pad cursor places, instead of an offset from your character.
-- **Keyboard:** the existing keyboard layout stays identical. All view keys live in their own map.
-
-### 4.12 Rendering at height: measure first
-
-- **Shadows:** sun shadows end 50 m from the camera. From 45-55 m up, the far half of the view loses them. In the view,
-  lengthen the shadow distance (about 90-110 m, with the cascades split for it) and measure. If it costs too much, lower
-  the height cap rather than the quality.
-- **Grass:** it ends at 80 m. The view needs it out to about 110 m, or the meadows read bald from above. Measure.
-- **Things that should follow the view's focus, not the body:** fog of war (fade first), see-through (off), ground
-  relief, sky occlusion, the reflection probe and hearing (`EarPosition`), with a softer, wider mix from above.
-- **Spawns:** check that everything spawning relative to the player also hides from the camera. Prowlers already do;
-  `MobSpawnZone` doesn't yet.
-- **Tests:** earlier Haven performance work found the frame goes to the tessellated terrain passes and tree shadows,
-  so that is where a higher camera will cost. Measure the same way at 35, 45 and 55 m.
-
-### 4.13 What stays the avatar's
+### 4.11 What stays the avatar's
 
 - All raids.
 - Talking, quests, rescues and hand-ins.
-- Fighting with skill, at breaches and at night.
+- Fighting with skill, at breaches and corruption nights.
 - The fastest hammering.
 - Gathering with the timing minigame, tool tiers, Hardwood and Elderwood, burst yields and XP.
 - Fine-quality crafts.
 - Fishing, horses, hunting, lookouts and finds.
 - Meals, the sauna and Well Rested.
 
-Residents get the plain basics. This list is what keeps the hero from becoming optional.
+Residents get the plain basics.
+
+### 4.12 Controller
+
+- **Way in:** the windows wheel.
+- **In the view:**
+
+| Control | Does |
+|---|---|
+| Left stick | Pan |
+| Right stick | Rotate (sideways) and zoom (up and down) |
+| A | Select or confirm; the cursor snaps to the nearest person or building |
+| Double-tap A | Everyone at that workplace |
+| X | The order wheel |
+| Y | Find your character |
+| LB / RB | Step through the side rail |
+| B or View | Back, then out |
+
+- **Building:** the pad cursor places, instead of an offset from your character.
+- **Keyboard:** the existing layout stays identical; view keys live in their own map.
+
+### 4.13 Rendering at height: measure first
+
+- **Shadows:** sun shadows end 50 m from the camera. In the view, lengthen them (about 90-110 m) and measure; if it
+  costs too much, lower the cap rather than the quality.
+- **Grass:** it ends at 80 m; the view needs about 110 m. Measure.
+- **Things that should follow the view's focus, not the body:** fog of war (fade first), see-through (off), ground
+  relief, sky occlusion, the reflection probe and hearing.
+- **Spawns:** check that everything spawning relative to the player also hides from the camera (`MobSpawnZone` doesn't
+  yet).
+- **Where the cost will be:** earlier Haven performance work found the frame goes to the tessellated terrain passes and
+  tree shadows. Measure the same way at 35, 45 and 55 m.
+
+### 4.14 Later, if the core works
+
+- **Stores you can see:** woodpiles, stone heaps and sacks at the yards that grow and shrink with what is stored. They
+  show the charcoal warning (`TorchFuel.cs:36,173`) without UI. Mostly art.
+- **Paths from worn ground:** residents already wear footpaths (`Settlement/Footpaths.cs:1-7`); the view offers "lay a
+  path here" along the worn line.
+- **Light as territory:**
+  - an overlay of lit ground;
+  - a lamplighter lighting the wall torches at dusk on a visible round;
+  - overlapping light adds nothing, so the choice is one big fire or many lanterns (as in Frostpunk).
+  - A resident's lantern (`ResidentLantern.cs:22-27`) counts as lit ground only if an order needs it.
+- **Event pins:** a corruption night or breach leaves a pin where something happened; clicking it gives a short recap.
+- **Being seen:** residents you walk past at work get a small "seen" lift (MGS V's morale walk). This is a positive
+  reason to walk the Haven on foot.
 
 ---
 
-## Part 5: Phased plan
+## Part 5: Adjustments to existing mechanics
+
+These follow from round two. Each is small on its own; together they decide whether the view feels good.
+
+| Mechanic | Today | Change | Where |
+|---|---|---|---|
+| Builders | Work only while you are away | Also at home in work hours; host only | `Settlement/SettlementSystem.cs:60`, `HomeLifeSettings.asset` (0.5/s) |
+| Wall rings | Drawn by you, hammered by you | Builders take wall pieces | `BuildPlacer` lines, `Construction.AddWork` |
+| Felling at home | Trees stay down; stand-ins near the player only | Fell by index for ring workers; a forester replants | `Gathering/TerrainTreeFelling.cs:21,111,267-304`, `PlantedTrees` |
+| Wood and charcoal pace | 888 oak plus about 770 for charcoal, by hand | Redo the tables with rings at a quarter to a third of your pace; check torches plus ingots don't turn wood into upkeep | `Docs/BaseProgression.md:155-180`, `TorchFuel.cs` |
+| Quest gather objectives | Only bag arrivals count; an event with no actor counts as the player's | Ring yields go to the stash without raising item events, so quests that teach you don't count them. The Haven's asks (`WantedAtHome`) do | `Items/ItemInventory.cs:129,157`, `Events/GameEvents.cs:175-177`, `Items/LootGrant.cs:31` |
+| Worker ranks | Count crafts | Milestone ranks (decided 2026-11-13), shown as badges; decide whether rings count | `SettlementSettings.cs:69-72`, `SettlementState.cs:803` |
+| Breach guards | Jobs with `DefendsAs` only (Warden, Hunter) | Posts capped by defences built; retune against a breach with posts and no player | `ResidentLife.cs:230`, `WardBreachSettings` |
+| Corruption nights | Residents shelter; the archer is breach-only | Posts and the Watch Post archer on those nights | `CorruptionNights.cs`, `WatchPostArcher.cs:59` |
+| Being thrown out of the view | — | A self-only "am I hunted" check | `AI/MonsterAI.cs:200` (`AnyHuntingPlayerSide` counts friends) |
+| Gear collected from afar | Into your bag, quality rolled then | Into the stash, from the view | `Crafting/StationCrafting.cs:177-192` |
+| Territory | Residents working a held land is "not yet" | Hunting and fishing parties and scouting as standing orders | `Docs/Territory.md:117` |
+| Horse hauling | +30% speed | A working horse doubles a gatherer's load and is seen dragging the log | `Resources/HorseSettings.asset:138-142` |
+| Resident movement | No area mask; warp after 4 s stuck | Keep out of deep water; count and cut warps before the view ships | `ResidentLife.cs:117,544`, `AI/DeepWater.cs` |
+| Schedule | Work 8-18 is about 10 real minutes; cold sends people in | Show it in the view; away orders don't depend on hours | `ResidentRoutine.cs:63-95` |
+
+---
+
+## Part 6: Phased plan
 
 | Phase | What | Effort | What it gives | Risk | Co-op | How to verify |
 |---|---|---|---|---|---|---|
-| **0. Groundwork** | Settle the V clash; deep-water area mask for residents; count and cut stuck warps; measure frame time, shadows and grass at 35/45/55 m | S-M | A height cap and clean NPC movement before anyone watches it | Low | None | `InputActionsTests`; a Play probe counting warps over a game day; frame-time captures |
-| **1. The view** | Camera rig plus stand-down flag; presentation switches (§4.12); a view input map plus rebinds; H at home → the view with the docked rail; hover and select past 80 m; remote station card (collect → stash); pad cursor placement; entry and exit rules; controller layout | M-L | Run the Haven from above; read the town | Low: no numbers change | Local only; existing decisions | `InputActionsTests` for the new map; `ConventionTests` (holds, statics); a Play probe: enter, queue, upgrade, place, exit; the UI overlap audit; a breach start throws you out |
-| **2. Living work** | Live builders at home plus a "next" pin; gather rings with stock targets; carry walks; gather emotes from your clips | M-L | People visibly build and gather what you ask | Medium: the economy and pace | Orders in the mirrored state; work on the host | A Play probe: a ring empties into the stash at the expected rate; scaffolds finish with nobody hammering; a pace check against BaseProgression |
-| **3. Orders and defence** | Guard, Patrol (lantern), Follow, Back to your day, the horn; any resident can stand; breach preparation in the view | M | Planning and defending as a village | Medium: breach balance | One runner, puppets; wire format 33 | Breach probe with guards and no player; `CoopWireTests`/`CoopMessageTests`; the two-copy co-op script |
-| **4. The Keeper's task** | Autopilot for the CharacterController (NavMesh path plus steering); `PlayerInteractor.Begin(Interactable)`; tasks: build, keep watch, rest | L | Your character works while you look around | Medium: player state edge cases | `RemotePlayerBody` already replicates | Play probe: leave a build task, the scaffold rises at your rate, the exit lands you where it stands; hurt while on a task → thrown out |
+| **0. Groundwork** | V clash; deep-water mask for residents; count and cut stuck warps; measure frame time, shadows and grass at 35/45/55 m | S-M | A height cap and clean movement | Low | None | `InputActionsTests`; a Play probe counting warps over a game day; frame-time captures |
+| **1. The view** | Camera rig plus stand-down; presentation switches; view map and rebinds; key, header button, pad wheel; hover and select past 80 m; station cards with gear into the stash; pad cursor placement; entry and exit rules (self-only hunted); **builders at home and wall rings** | M-L | Read and run the town from above; walls rise while you are home | Low-medium | Local view; builders on the host | `InputActionsTests`; `ConventionTests`; Play probe: enter, queue, upgrade, place, a wall ring finishes with nobody hammering, exit; UI overlap audit |
+| **2. Between raids** | Homecoming sweep and marks; one "while you were away" card; portal card as planner (companion by click, Pack as last time, set out); plans and the tracked shopping list | M | Home time becomes getting ready; raids get a shopping list | Low | Plans as decisions; shared deposits | Play probe: raid out and back, the sweep shows the changes; a pinned plan's items marked in raid loot |
+| **3. Standing orders** | Fell by index; felling and quarry rings with the forester; away results counted per raid; hunting, fishing and scouting parties; carrying; horses hauling | M-L | The wood and stone grind eased; residents visibly work | Medium: the economy | Away results as state; live ring workers one runner (wire 33) | Pace check against BaseProgression; Play probe: a ring clears over N raids and saplings grow; `CoopWireTests` |
+| **4. People** | Orders opened person by person; wishes; homecoming lines; small scenes; rank badges; the empty house; companion signatures (as decided on 2026-11-13) | M | The people are the base | Low | Mirrored state | `QuestAuditTests`/`ResidentQuestsTests` for the order gates; Play probe: a wish met from above |
+| **5. Defence** | Posts capped by defences; corruption-night posts plus the archer; the horn; breach preparation in the view; lanes and kinds shown | M | Evenings with something at stake | Medium: breach balance | One runner for fighting posts | Breach and corruption-night probes with posts and no player; the two-copy co-op script |
+| **Later** | Visible stores, paths from worn ground, light overlay and lamplighter, event pins, the "seen" lift | S-M each | Depth | Low | — | — |
 
-Effort is S/M/L per the audits, not a measured estimate. Each phase ships on its own and leaves the game working if the
+Effort is S/M/L from the audits, not a measured estimate. Each phase ships on its own and leaves the game working if the
 next one never comes.
 
 ---
 
-## Part 6: Questions for you
+## Part 7: Questions for you
 
 Recommended answers first.
 
 1. **The key.**
-   - **Recommended: H at home becomes the view**, with the window docked: one place to run the Haven.
-   - A separate key (backquote or Caps Lock), with H unchanged.
+   - **Recommended: H stays the window; the view gets its own key (backquote or Caps Lock), a header button and a pad
+     wheel entry.**
+   - H at home becomes the view.
    - V, moving the camera style and Stack On Stored elsewhere.
-2. **Time.**
-   - **Recommended: real time always.**
-   - Allow a pause in solo play.
+2. **When it opens.**
+   - **Recommended: when the Heartroot names you Hearth-keeper (The Road North).**
+   - From the start.
+   - With the Watch Post.
 3. **Your character while you look.**
-   - **Recommended: it stays safe where it stands (Phase 1), then a Keeper's task (Phase 4).**
-   - It walks a routine like a resident (your original idea).
-   - It is hidden.
-4. **Residents gather physically.**
-   - **Recommended: yes, in rings, plain basics, stopping at stock targets.**
-   - No, production stays bookkeeping.
-5. **Hauling.**
-   - **Recommended: a gatherer carries their own load home, no hauler jobs.**
-   - Full hauling of every item.
-6. **Night orders.**
-   - **Recommended: guard posts and lantern patrols at night, and the horn.**
-   - Orders only during breaches.
-7. **Attack orders.**
-   - **Recommended: only on breach and corruption-night creatures.**
-   - Also on game animals (hunting).
-8. **The name.**
-   - **Recommended: "the Keeper's view"**, after the Heartroot's "Hearth-keeper".
-   - "Overseer view", "Haven view", or yours.
-9. **When.**
-   - **Recommended: Phases 0 and 1 now; Phases 2-4 after you have used the view.**
-   - All four now.
-   - After the full slice playtest from the 2026-11-13 review.
+   - **Recommended: it waits at the hearth, or keeps hammering if you left it mid-build.**
+   - It works on autopilot like a resident (your first idea; L effort for seconds saved).
+4. **Standing orders while you are away.**
+   - **Recommended: yes, counted in raids, odds shown, nobody lost, applied on return.**
+   - No.
+5. **Felling.**
+   - **Recommended: finite rings, painted trees, a forester replanting so the woods stay green.**
+   - Rings with refilling stock targets (strips the woods).
+   - No resident felling.
+6. **Defence orders.**
+   - **Recommended: posts on foretold corruption nights and breaches, capped by defences; Patrol, Follow and Attack
+     cut.**
+   - Keep round one's six verbs.
+7. **Orders unlock person by person.**
+   - **Recommended: yes.**
+   - All at once.
+8. **Plans and the tracked shopping list.**
+   - **Recommended: yes, ghosts that cost nothing until stocked, with marks in raid loot.**
+   - No.
+9. **Resident yields and quests.**
+   - **Recommended: they count for the Haven's asks, not for quests that teach you.**
+   - Never.
+   - Always.
+10. **When to build.**
+    - **Recommended: Phases 0 and 1 now, Phase 2 right after, Phases 3-5 once you have used the view.**
+    - All now.
+    - After the full slice playtest.
+11. **The name.**
+    - **Recommended: "the Keeper's view".**
+    - "Overseer view", "Haven view", or yours.
 
 ---
 
 ## Sources
 
-Web research, 2026-11-21. Reviews and forum threads are labelled as such in the text where they carry the claim.
+Web research, 2026-11-21. Guides and wikis carry most details; developer sources are noted where they exist; forums are
+labelled.
+
+**Round one**
 
 - Fallout 4 workshop: https://www.ggrecon.com/guides/fallout-4-assign-workers/ ·
   https://www.gameskinny.com/opinion/why-i-restarted-fallout-4-and-began-completely-ignoring-settlements/ ·
@@ -675,53 +855,94 @@ Web research, 2026-11-21. Reviews and forum threads are labelled as such in the 
 - Conan Exiles: https://conan-exiles.com/blog/1036/update-40-followers-ii-ai-stances-and-command-system/ ·
   https://forums.funcom.com/t/thralls-idle-in-combat/249532 (forum)
 - V Rising: https://segmentnext.com/guides/v-rising-servants
-- Sons of the Forest: https://www.corrosionhour.com/sons-of-the-forest-kelvin-companion-guide/ ·
-  https://steamcommunity.com/app/1326470/discussions/0/3836549485420025961 (forum)
-- Dragon Quest Builders 2: https://gematsu.com/2018/12/dragon-quest-builders-2-details-endless-battle-island-setting ·
-  https://primagames.com/eguides/dragon-quest-builders-eguide/builder-basics/building-your-base
+- Sons of the Forest: https://www.corrosionhour.com/sons-of-the-forest-kelvin-companion-guide/
+- Dragon Quest Builders 2: https://gematsu.com/2018/12/dragon-quest-builders-2-details-endless-battle-island-setting
 - Cult of the Lamb: https://twinfinite.net/guides/how-to-command-followers-in-cult-of-the-lamb/ ·
   https://www.escapistmagazine.com/?p=124330
 - State of Decay 2: https://www.windowscentral.com/state-of-decay-2-review
 - Brütal Legend: https://www.gamedeveloper.com/pc/postmortem-behind-the-scenes-of-i-brutal-legend-i- ·
-  https://en.wikipedia.org/wiki/Br%C3%BCtal_Legend · https://gamingbolt.com/brutal-legend-suffered-because-of-poor-messaging-says-tim-schafer
+  https://en.wikipedia.org/wiki/Br%C3%BCtal_Legend
 - Minecraft Legends: https://pcgamer.com/minecraft-legends-brings-down-the-tempo-of-typical-strategy-games-mojang-says ·
-  https://pcgamer.com/minecraft-legends-review · https://gamespot.com/articles/minecraft-legends-development-is-ending/1100-6520230/
-- Savage / Natural Selection 2: https://en.wikipedia.org/wiki/Savage:_The_Battle_for_Newerth ·
-  https://forums.unknownworlds.com/discussion/149300 (forum) · https://unknownworlds.com/ns2/?p=2697
-- Mount & Blade II: Bannerlord: https://www.gamerguides.com/mount-and-blade-ii-bannerlord/guide/introduction/useful-gameplay-tips/tactics ·
-  https://www.bisecthosting.com/ru-ru/blog/mount-blade-bannerlord-1-3-update-patch-notes-release-date-beta (secondary) ·
-  https://github.com/Norbivar/RTSCamera (mod)
-- The Riftbreaker: https://wccftech.com/review/the-riftbreaker-an-ephemeral-paradise/
-- Kingdom Two Crowns: https://www.gamerevolution.com/originals/472959-kingdom-two-crowns-co-op
+  https://pcgamer.com/minecraft-legends-review
+- Savage / Natural Selection 2: https://en.wikipedia.org/wiki/Savage:_The_Battle_for_Newerth · https://unknownworlds.com/ns2/?p=2697
+- Mount & Blade II: Bannerlord: https://www.gamerguides.com/mount-and-blade-ii-bannerlord/guide/introduction/useful-gameplay-tips/tactics
 - Halo Wars: https://waywardstrategy.com/2020/03/23/halo-wars-the-ultimate-design-for-console-rts/
 - Overlord II: https://www.gamespot.com/articles/overlord-ii-updated-hands-on/1100-6210175/
 - Mass Effect: https://strategywiki.org/wiki/Mass_Effect_3/Controls
 
-Not verified: whether Fallout 4's workshop mode pauses; what Soulmask 1.0's management mode looks like (a menu or a
-camera); V Rising real-time servant orders.
+**Round two**
+
+- Dark Chronicle / Dark Cloud: https://en.wikipedia.org/wiki/Dark_Chronicle ·
+  https://almarsguides.com/retro/walkthroughs/ps2/games/darkcloud/misc/townlayouts/norunevillage/
+- Ni no Kuni II: https://ssl.level5.co.jp/game/ninokuni2/pc/manual/en/kingdom02.html (Level-5 manual) ·
+  https://www.rpgsite.net/feature/6960-ni-no-kuni-ii-kingdom-building-management-guide-how-to-create-the-best-kingdom
+- Suikoden II: https://game8.co/games/Suikoden-2/archives/497281
+- MGS V Mother Base: https://segmentnext.com/mgs-v-phantom-pain-mother-base-guide-how-to-expand-recruit-customize ·
+  https://www.gameskinny.com/mp7tq/metal-gear-solid-v-the-phantom-pain-combat-unitcombat-deployment-guide
+- AC Valhalla: https://news.ubisoft.com/en-us/article/3hiYsX0odqVEi6J3dibAmJ/assassins-creed-valhalla-forge-alliances-build-a-village-and-be-a-kingmaker ·
+  https://www.pcgamer.com/assassins-creed-ac-valhalla-settlement-supplies-raw-materials/
+- AC Brotherhood: https://www.gamepressure.com/assassinscreedbrotherhood/assassin-guild/z72a2b
+- Dragon Age: Inquisition war table: https://primagames.com/eguides/dragon-age-inquisition-eguide/the-war-council/the-war-table
+- Octopath Traveler 0: https://www.gematsu.com/2025/09/octopath-traveler-0-details-story-of-revenge-companions-and-key-systems ·
+  https://hacktheminotaur.com/octopath-traveler-0/ultimate-octopath-traveler-0-town-building-guide/
+- Fantasy Life i: https://game8.co/games/FANTASY-LIFE-i/archives/522911
+- Enshrouded: https://enshrouded.wiki.gg/wiki/Craftspeople
+- Dave the Diver: https://www.gamepressure.com/dave-the-diver/how-to-use-the-dispatch-command/z410d78
+- Spiritfarer: https://www.nme.com/reviews/spiritfarer-review-a-beautiful-management-game-about-dying-too-mired-in-frustrating-busywork-2732038 ·
+  https://guidestrats.com/spiritfarer-gwen-guide/
+- Escape from Tarkov hideout: https://www.gamepur.com/guides/escape-from-tarkov-hideout
+- ARC Raiders: https://www.arcraiders.com/news/the-story-of-scrappy-the-rooster (developer) ·
+  https://allthings.how/arc-raiders-how-to-upgrade-scrappy-and-find-every-required-item/ ·
+  https://allthings.how/arc-raiders-workshop-upgrades-steps-tracking-and-materials/
+- The Cycle: Frontier: https://thecyclefrontier.wiki/wiki/Personal_Quarters
+- Escape from Duckov: https://allthings.how/escape-from-duckov-early-raids-quest-order-and-hideout-upgrades
+- Satisfactory to-do list: https://satisfactory.fandom.com/wiki/To-Do_List
+- Ghost building (Grounded-style, Valheim mod): https://thunderstore.io/c/valheim/p/Azumatt/GhostBuild/
+- Death Stranding roads: https://pushsquare.com/guides/death-stranding-how-to-build-roads
+- Stardew Valley bundles: https://stardewvalleywiki.com/Bundles
+- Darkest Dungeon town events: https://darkestdungeon.wiki.gg/wiki/Town_Event
+- Monster Hunter: https://game8.co/games/Monster-Hunter-World/archives/315192 · https://monsterhunterrise.wiki.fextralife.com/Meowcenaries
+- Hades: https://gamespot.com/articles/hades-writer-explains-script-philosophy-after-player-discovers-incredible-detail/1100-6482650/
+- Clash of Clans: https://supercell.com/en/games/clashofclans/blog/release-notes/get-ready-for-ranked-update
+- Gord's darkness: https://shacknews.com/article/136367/gord-is-the-darkest-dungeon-of-colony-sims
+- Don't Starve: https://dontstarve.wiki.gg/wiki/Charlie
+- Darkwood: https://gamerjournalist.com/how-to-survive-the-night-in-darkwood/
+- Frostpunk heat: https://www.gamepressure.com/frostpunk/heat/z8a12d
+- Minecraft spawn-proofing: https://minecraft.wiki/w/Tutorial:Spawn-proofing
+- Thronefall: https://pcgamer.com/this-smart-yet-simple-kingdom-survival-game-might-be-my-next-strategy-fix
+- Wildermyth: https://wildermyth.com/wiki/Event
+- Going Medieval social interactions: https://techraptor.net/gaming/news/going-medieval-dev-diary-reveals-new-social-interaction-system
+- Oxygen Not Included: https://forums.kleientertainment.com/forums/topic/113965-joy-responses/ (forum)
+- Manor Lords daily life: https://pcgamer.com/games/city-builder/a-medievalists-take-on-manor-lords-it-represents-medieval-peasants-and-their-lives-more-fully-than-most-games
+
+Not verified: whether Fallout 4's workshop mode pauses; what Soulmask 1.0's management mode looks like; V Rising
+real-time servant orders; the exact Scrappy thresholds; whether AC Brotherhood recruits can die.
 
 ---
 
 ## Appendix: key file references
 
-- **Camera:** `Camera/PlayerCameraController.cs` (focus `:287-295`, `:618-661`; globals `:381`, `:433`, `:440-482`;
-  `Watch` `:102`), `Cinematics/CinematicView.cs` (`:64-121`, `:164-200`, `:215`, `:260`), `Settlement/HavenLookout.cs:149-153`.
-- **Input:** `Input/InputSystem_Actions.inputactions` (V on `Camera/ToggleStyle` and `Player/StackOnStored`),
-  `Core/GameInput.cs` (`SetPlayerKeys` `:203`, `SuspendGameplay` `:136-165`), `Player/PlayerInputHandler.cs:262-298,396`,
-  `Core/Options/InputRebinds.cs:191,210`, `UI/CommandWheel.cs:188`, `UI/PadCursor.cs`.
-- **Player control:** `Player/PlayerControl.cs`, `Player/PlayerMovement.cs:12`, `Player/PlayerInteractor.cs:132-143,255-279`,
-  `Story/StoryWorldNodes.cs:658-682`, `Settlement/HavenTravel.cs:15-46`.
-- **Remote actions:** `Crafting/StationCrafting.cs:75-192`, `Crafting/MaterialPool.cs:36-47`, `UI/StationWindow.cs:180,397`,
-  `Settlement/HavenBuildings.cs:134,239`, `Settlement/HavenPeople.cs:81-146`, `UI/HavenWindow.cs:46`.
-- **Building:** `Building/BuildPlacer.cs:480,611-635`, `Settlement/HomePortal.cs:159-170`, `Building/Construction.cs:139,278,388-450`.
-- **People and work:** `Settlement/ResidentLife.cs:117,227,252,544,587`, `Settlement/ResidentRoutine.cs:74`,
-  `Settlement/ResidentDefender.cs:35`, `Settlement/WorkerProduction.cs:13,135-160`, `Settlement/ResidentBuilders.cs:125-204`,
-  `Settlement/SettlementSystem.cs:60-65`, `Settlement/JobDefinition.cs:25,75`.
-- **Orders:** `Companions/CompanionOrder.cs`, `Companions/CompanionTactics.cs:172`, `Companions/Companion.cs:201,261,591`,
-  `Companions/CompanionLeader.cs:9-17`, `AI/MonsterPatrol.cs`.
-- **Gathering:** `ResourceInventory/ResourceNode.cs:287,301`, `Gathering/ChoppableTree.cs:229`,
-  `Gathering/TerrainTreeFelling.cs:21,111,146,267-304`, `Gathering/NodeStreaming.cs:21,253`.
-- **Co-op:** `Settlement/HavenDecisions.cs:63`, `Multiplayer/CoopDecisions.cs:94,109`, `Multiplayer/MultiplayerSettings.cs:85`
-  (wire format 32), `CoopHorses` (the one-runner pattern).
+- **Camera:** `Camera/PlayerCameraController.cs` (`:102`, `:287-295`, `:381`, `:433`, `:440-482`, `:618-661`),
+  `Cinematics/CinematicView.cs`, `Settlement/HavenLookout.cs:149-153`.
+- **Input:** `Input/InputSystem_Actions.inputactions`, `Core/GameInput.cs` (`:136-165`, `:203`),
+  `Player/PlayerInputHandler.cs:262-298,396`, `Core/Options/InputRebinds.cs:191,210`, `UI/CommandWheel.cs:188`,
+  `UI/HavenWindow.cs:46`.
+- **Remote actions:** `Crafting/StationCrafting.cs:75-192`, `UI/StationWindow.cs:397`, `Settlement/HavenBuildings.cs:134,239`,
+  `Settlement/HavenPeople.cs`, `Settlement/HavenTravel.cs:15-46`.
+- **Building:** `Building/BuildPlacer.cs:611-635`, `Settlement/HomePortal.cs:159-170`, `Building/Construction.cs:139,278,388-450`,
+  `Data/Buildings/*.asset` (`buildWork`).
+- **People and work:** `Settlement/ResidentLife.cs:117,227-252,544`, `Settlement/ResidentRoutine.cs:63-95`,
+  `Settlement/ResidentDefender.cs:35`, `Settlement/WorkerProduction.cs:135-160`, `Settlement/ResidentBuilders.cs:125-204`,
+  `Settlement/SettlementSystem.cs:56-69`, `Settlement/HomeLife.cs:159-162`, `Settlement/Homecoming.cs`,
+  `Settlement/WantedAtHome.cs`, `Items/PackForRaid.cs`.
+- **Gathering and trees:** `ResourceInventory/ResourceNode.cs:287`, `Gathering/ChoppableTree.cs:229`,
+  `Gathering/TerrainTreeFelling.cs:8-13,21,64,111,267-304`, `Gathering/PlantedTrees.cs`, `Settlement/Overgrowth.cs:11`,
+  `Docs/BaseProgression.md:155-180`, `Environment/TorchFuel.cs`.
+- **Defence:** `Settlement/CorruptionNights.cs`, `Settlement/WatchPostArcher.cs:4,59`, `Settlement/NightProwlers.cs`,
+  `AI/MonsterAI.cs:200`.
+- **Quests and events:** `Items/ItemInventory.cs:129,157`, `Events/GameEvents.cs:175-177`, `Items/LootGrant.cs:31`,
+  `Docs/QuestRedesign.md:136,300`, `Docs/Territory.md:112-120`.
+- **Co-op:** `Settlement/HavenDecisions.cs:63`, `Multiplayer/CoopDecisions.cs:94,109`, `Multiplayer/MultiplayerSettings.cs:85`,
+  `CoopHorses`.
 - **Rendering:** `Settings/Rendering/PC_RPAsset.asset:60`, `Rendering/SkyOcclusionMap.cs:204`,
   `Environment/Atmosphere/AtmosphereFeature.cs:438-442,601`, `Environment/SeeThrough.cs:41-55`, `Audio/AudioManager.cs:493`.
