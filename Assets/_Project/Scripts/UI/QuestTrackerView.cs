@@ -153,6 +153,11 @@ public sealed class QuestTrackerView : MonoBehaviour
                 else if (entry.IsObjectiveOpen(i))
                 {
                     builder.Append("\n• ").Append(line);
+                    string blocker = objective.Blocker();
+                    if (blocker != null)
+                    {
+                        builder.Append($"\n   <color={Muted}>{blocker}</color>");
+                    }
                 }
                 else if (everything)
                 {

@@ -149,6 +149,7 @@ public static class SaveMapper
         if (quests != null)
         {
             data.happenedEvents.AddRange(quests.HappenedEventIds);
+            data.rebuildsOwed.AddRange(quests.RebuildsOwed);
         }
         WriteSettlement(settlement, data.settlement);
         WriteProgress(progress, data.progress);
@@ -696,6 +697,11 @@ public static class SaveMapper
             {
                 loaded.Quests.RestoreHappened(eventId);
             }
+        }
+
+        foreach (string buildingId in data.rebuildsOwed ?? new List<string>())
+        {
+            loaded.Quests.RestoreRebuildOwed(buildingId);
         }
         loaded.Settlement = ReadSettlement(data.settlement, content, loaded.MissingContent);
         loaded.Progress = ReadProgress(data.progress);

@@ -883,7 +883,11 @@ public sealed class SettlementState : IHavenView
     /// </summary>
     public IReadOnlyList<JobDefinition> VacantJobs => vacantJobs;
 
-    /// <summary>The jobs someone could take: their own, and any left vacant.</summary>
+    /// <summary>
+    /// The jobs someone could take: their own, and any left vacant. Not one whose workplace a quest not yet begun introduces
+    /// (BuildingGate): Yrsa was offered the Fisher's work long before Gunnar's line taught the Dock she would work at (the review
+    /// of 2026-11-21). A job already held stays held.
+    /// </summary>
     public List<JobDefinition> JobsOpenTo(ResidentDefinition resident)
     {
         var jobs = new List<JobDefinition>();
@@ -891,7 +895,7 @@ public sealed class SettlementState : IHavenView
         {
             foreach (JobDefinition job in resident.Jobs)
             {
-                if (job != null && !jobs.Contains(job))
+                if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job))
                 {
                     jobs.Add(job);
                 }
@@ -900,7 +904,7 @@ public sealed class SettlementState : IHavenView
 
         foreach (JobDefinition job in vacantJobs)
         {
-            if (job != null && !jobs.Contains(job))
+            if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job))
             {
                 jobs.Add(job);
             }
@@ -908,6 +912,8 @@ public sealed class SettlementState : IHavenView
 
         return jobs;
     }
+
+    private static bool WorkplaceMayBeLearned(JobDefinition job) => job.Workplace == null || BuildingGate.MayLearn(job.Workplace);
 
     /// <summary>They came home from a raid with the player: the bond grows, and it leaves them something to say. True when they rose in rank.</summary>
     public bool RecordRaidAlong(ResidentDefinition resident, IReadOnlyList<CompanionBondRank> ranks, bool extracted, int bossesBeaten, int timesHelpedUp, float secondsLeft, int kills, int memoryReturnsEvery = 0)

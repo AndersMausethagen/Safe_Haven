@@ -13,6 +13,9 @@ public static class BuildingRepairs
         * Mathf.Clamp01(1f - GameSession.Here.JobBonus(job => job.BuildingRepairDiscount))
         * (Techniques.Has(PerkTechnique.PatchUp) ? TechniqueSettings.Current.PatchUpCost : 1f);
 
+    /// <summary>The share of a damaged part's cost that mending it takes now (a carpenter and Patch Up lower it).</summary>
+    public static float CurrentShare => MendShare;
+
     public static int Share(int amount, float missing, float share) =>
         amount <= 0 || missing <= 0f || share <= 0f ? 0 : Mathf.CeilToInt(amount * Mathf.Clamp01(missing) * share);
 

@@ -67,6 +67,8 @@ public enum GameEventKind
     Empowered = 29,
     /// <summary>A module was fitted to a building (BuildingModules). Subject: the BuildingModuleDefinition; Detail: the BuildingDefinition.</summary>
     ModuleFitted = 30,
+    /// <summary>The player took down a building they had built (BuildingDemolition). Subject: the BuildingDefinition.</summary>
+    TakenDown = 31,
 }
 
 /// <summary>

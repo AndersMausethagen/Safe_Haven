@@ -141,4 +141,30 @@ public sealed class ResidentQuestsTests
 
         Assert.Greater(checkedPlaces, 0, "a second trade was checked (the Cauldron, the Dock, the Yard)");
     }
+
+    [Test]
+    public void AJob_IsOfferedOnlyOnceTheQuestThatTeachesItsWorkplaceHasBegun()
+    {
+        // Yrsa could be a Fisher long before Gunnar's line taught the Dock (the review of 2026-11-21).
+        int checkedJobs = 0;
+        foreach (ResidentDefinition person in Content.Residents.Where(r => r != null))
+        {
+            foreach (JobDefinition job in person.Jobs.Where(j => j != null && j.Workplace != null))
+            {
+                QuestDefinition introducing = BuildingGate.IntroducedBy(job.Workplace).FirstOrDefault();
+                if (introducing == null)
+                {
+                    continue;
+                }
+
+                GameSession.StartNewGame();
+                Assert.IsFalse(GameSession.Here.JobsOpenTo(person).Contains(job), $"{person.name}: {job.name} waits for {introducing.name}");
+                Assert.IsTrue(GameSession.Quests.TryStart(introducing, prerequisitesAside: true));
+                Assert.IsTrue(GameSession.Here.JobsOpenTo(person).Contains(job), $"{person.name}: {job.name} once {introducing.name} has begun");
+                checkedJobs++;
+            }
+        }
+
+        Assert.Greater(checkedJobs, 0, "the Fisher at the Dock was checked");
+    }
 }

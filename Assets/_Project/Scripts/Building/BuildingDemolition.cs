@@ -5,6 +5,9 @@ using UnityEngine;
 /// Taking down a building the player built (the user, 2026-11-20: "Allow us to destroy placed buildings, refunding materials"): picked
 /// from the build menu's Manage tab (BuildPlacer), asked once in an ActionMenuWindow, then gone for good (SaveableEntity.RemoveForGood)
 /// with everything it cost back, its upgrades too: into the bag, then the chests, then the ground (MaterialPool.GiveBack).
+/// A damaged building keeps back what mending it would cost (BuildingRepairs), so taking it down and putting it up again isn't a free
+/// repair; with Free Costs on (the cheat) nothing comes back, as nothing was paid (the review of 2026-11-21). Taking it down raises
+/// TakenDown, so putting the same building up again isn't counted as new by a Build quest (QuestLog).
 /// <para>
 /// Refused, with the reason, when taking it down would lose something: a chest with items in it (as Palworld does), a station still
 /// working or with something waiting in it, a ruin the Haven came with (nobody paid for it), during a breach, or in a friend's Haven.
@@ -66,29 +69,51 @@ public static class BuildingDemolition
         return null;
     }
 
-    /// <summary>Everything that was paid for it: the building, each level it was raised to, and an upgrade paid for and not finished.</summary>
+    /// <summary>
+    /// Everything that was paid for it: the building, each level it was raised to, and an upgrade paid for and not finished; less what
+    /// mending its damage would cost, as the clearing's mending charges a share of the building's own cost.
+    /// </summary>
     public static void Refund(BuildingObject building, List<ResourceAmount> resources, List<ItemAmount> items)
+    {
+        BuildingDefinition definition = building != null ? building.Definition : null;
+        bool torch = building != null && building.TryGetComponent(out WallFittings fittings) && fittings.HasTorch;
+        // Levels 2 and up finished, and the one being worked towards when it was paid for.
+        int top = 1;
+        if (building != null && building.TryGetComponent(out Construction construction))
+        {
+            top = construction.IsBuilding && construction.Paid && construction.Level >= 1 ? construction.Target : construction.Level;
+        }
+
+        Refund(definition, Damage(building), top, torch, resources, items);
+    }
+
+    /// <summary>
+    /// What comes back for a <paramref name="definition"/> with <paramref name="damage"/> of its health lost (0 to 1), raised to
+    /// <paramref name="topLevel"/>, with a wall torch or not: its own cost less the mending share of the damage, each level from 2 in
+    /// full, the torch in full. Nothing with Free Costs on.
+    /// </summary>
+    public static void Refund(BuildingDefinition definition, float damage, int topLevel, bool torch, List<ResourceAmount> resources, List<ItemAmount> items)
     {
         resources.Clear();
         items.Clear();
-        BuildingDefinition definition = building != null ? building.Definition : null;
-        if (definition == null)
+        if (definition == null || Cheats.FreeCosts)
         {
             return;
         }
 
+        float share = damage > 0f ? BuildingRepairs.CurrentShare : 0f;
         foreach (ResourceAmount cost in definition.ConstructionCost)
         {
-            AddTo(resources, cost.Resource, cost.Amount);
+            AddTo(resources, cost.Resource, cost.Amount - BuildingRepairs.Share(cost.Amount, damage, share));
         }
 
         foreach (ItemAmount cost in definition.ConstructionItems)
         {
-            AddTo(items, cost.Item, cost.Amount);
+            AddTo(items, cost.Item, cost.Amount - BuildingRepairs.Share(cost.Amount, damage, share));
         }
 
         // A wall piece's torch comes back with it (WallFittings).
-        if (building.TryGetComponent(out WallFittings fittings) && fittings.HasTorch)
+        if (torch)
         {
             foreach (ItemAmount cost in definition.WallTorchCost)
             {
@@ -96,14 +121,7 @@ public static class BuildingDemolition
             }
         }
 
-        if (!building.TryGetComponent(out Construction construction))
-        {
-            return;
-        }
-
-        // Levels 2 and up finished, and the one being worked towards when it was paid for.
-        int top = construction.IsBuilding && construction.Paid && construction.Level >= 1 ? construction.Target : construction.Level;
-        for (int level = 2; level <= top; level++)
+        for (int level = 2; level <= topLevel; level++)
         {
             BuildingLevel paid = definition.UpgradeTo(level);
             if (paid == null)
@@ -121,6 +139,22 @@ public static class BuildingDemolition
                 AddTo(resources, cost.Resource, cost.Amount);
             }
         }
+    }
+
+    /// <summary>How much of its health it has lost, 0 to 1 (a scaffold never finished, or a building without health: 0).</summary>
+    public static float Damage(BuildingObject building)
+    {
+        if (building == null || !building.TryGetComponent(out Damageable health) || health.MaxHealth <= 0f)
+        {
+            return 0f;
+        }
+
+        if (building.TryGetComponent(out Construction construction) && construction.IsBuilding && construction.Level < 1)
+        {
+            return 0f;
+        }
+
+        return Mathf.Clamp01(1f - health.HealthFraction);
     }
 
     /// <summary>Asks the player whether to take <paramref name="building"/> down, showing what comes back, or says why it can't be.</summary>
@@ -149,10 +183,14 @@ public static class BuildingDemolition
         Refund(building, resources, items);
         string back = Describe(resources, items);
         string name = building != null && building.Definition != null ? building.Definition.DisplayName : "building";
+        string body = Cheats.FreeCosts ? "Free building is on: it cost nothing, so nothing comes back."
+            : back.Length == 0 ? "It cost nothing, so nothing comes back."
+            : Damage(building) > 0.001f ? $"What it cost comes back, less what mending its damage would take:\n<b>{back}</b>"
+            : $"Everything it cost comes back:\n<b>{back}</b>";
         var page = new MenuPage
         {
             Title = $"Take down the {name}?",
-            Body = back.Length > 0 ? $"Everything it cost comes back:\n<b>{back}</b>" : "It cost nothing, so nothing comes back.",
+            Body = body,
         };
         string refused = building != null ? WhyNot(building) : "It is gone.";
         page.Add(new MenuAction("Take it down", refused ?? "Into your bag, then your chests", refused == null,
@@ -174,10 +212,17 @@ public static class BuildingDemolition
         var resources = new List<ResourceAmount>();
         var items = new List<ItemAmount>();
         Refund(building, resources, items);
-        string name = building.Definition.DisplayName;
+        BuildingDefinition definition = building.Definition;
+        string name = definition.DisplayName;
         Vector3 at = building.transform.position;
+        // Only what stood (or was being raised a tier) was counted as built; a scaffold never finished wasn't Built.
+        bool counted = !building.TryGetComponent(out Construction construction) || construction.Level >= 1;
         MaterialPool.For(user).GiveBack(resources, items, user.transform);
         SaveableEntity.RemoveForGood(building.gameObject);
+        if (counted)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.TakenDown, definition, 1, user));
+        }
         AudioManager.Play(building.Definition.DeathSound, at);
         string back = Describe(resources, items);
         GameMessages.Post(back.Length > 0 ? $"Took down the {name}. Back: {back}." : $"Took down the {name}.", MessageKind.Gain);

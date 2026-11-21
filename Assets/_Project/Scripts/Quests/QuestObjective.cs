@@ -498,6 +498,20 @@ public sealed class QuestObjective
         return wanted == null ? !required : wanted == actual;
     }
 
+    /// <summary>
+    /// What stands in the way of this objective now, for the tracker, or null: a Talk To whose person was lost on a raid can't be
+    /// done until a rumour leads to them and they are brought out (Seven Went In waited with no word why: the review of 2026-11-21).
+    /// </summary>
+    public string Blocker()
+    {
+        if (type == ObjectiveType.TalkTo && person != null && GameSession.Home != null && GameSession.Home.IsFallen(person))
+        {
+            return $"{person.DisplayName} was lost on a raid: a rumour at the portal leads to them";
+        }
+
+        return null;
+    }
+
     /// <summary>The objective in words, without progress: "Gather 10 Iron Ore".</summary>
     public string Describe()
     {
