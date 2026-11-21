@@ -1086,7 +1086,7 @@ MonoBehaviour:
     foundInRaids: 0
     unlockedBySkill: {fileID: 11400000, guid: ad510c562ab935f468111dad718b4bcb, type: 2}
     unlockedByTechnique: 
-    art: {fileID: 21300000, guid: ad682811bacef654688bf3f0c8496e03, type: 3}
+    art: {fileID: 21300000, guid: 6f1d59c230a0e854091a59d484f20497, type: 3}
     summary: Taming, keeping and riding horses.
   creatures:
   - {fileID: 11400000, guid: afbf4a58442496641826a078787f7e2e, type: 2}
