@@ -94,10 +94,32 @@ public static class BuildingModules
         {
             if (module != null)
             {
-                GameMessages.Post($"New module: the {module.DisplayName}, for {module.FitsText()} at Tier {Tiers.ToRoman(module.Tier)} (its Upgrade page): {module.Effect()}.",
+                GameMessages.Post($"New module: the {module.DisplayName}, for {module.FitsText()} at Tier {Tiers.ToRoman(module.Tier)} ({WhereToFit(module)}): {module.Effect()}.",
                     MessageKind.Info);
             }
         }
+    }
+
+    /// <summary>
+    /// Where the player fits modules to <paramref name="building"/>, in words: a station's window has an Upgrade tab; any other building's
+    /// Upgrade page opens from the build menu's Manage tab.
+    /// </summary>
+    public static string WhereToFit(BuildingDefinition building) =>
+        building != null && building.Station != CraftingStationType.None ? $"the {building.DisplayName}'s Upgrade tab" : "build menu › Manage › Upgrade";
+
+    /// <summary>The same for a module that may fit several kinds: the station tab when it fits stations only.</summary>
+    public static string WhereToFit(BuildingModuleDefinition module)
+    {
+        bool stationsOnly = true;
+        foreach (BuildingDefinition building in Content != null ? Content.Buildings : (IReadOnlyList<BuildingDefinition>)System.Array.Empty<BuildingDefinition>())
+        {
+            if (building != null && module.Fits(building) && building.Station == CraftingStationType.None)
+            {
+                stationsOnly = false;
+            }
+        }
+
+        return stationsOnly ? "its Upgrade tab" : "its Upgrade tab, or build menu › Manage › Upgrade";
     }
 
     /// <summary>Why <paramref name="module"/> can't be fitted to <paramref name="building"/> now (materials aside), or null.</summary>

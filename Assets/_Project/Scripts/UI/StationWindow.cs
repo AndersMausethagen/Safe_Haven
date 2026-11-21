@@ -171,6 +171,7 @@ public sealed class StationWindow : MonoBehaviour
     {
         recipes.Made -= Refresh;
         window.OpenChanged -= OnOpenChanged;
+        PadTabs.Unregister(this);
     }
 
     public bool IsOpen => window != null && window.IsOpen;
@@ -190,7 +191,232 @@ public sealed class StationWindow : MonoBehaviour
         tooltip.Hide();
         window.Open();
         ShowBanner(source.Type);
+        BuildTabs();
+        ShowUpgrade(false);
         Refresh();
+    }
+
+    // ----- The Upgrade tab (the user, 2026-11-21: "Add an Upgrade tab to the buildings. This is where we can upgrade to the next tier
+    // or add modular improvements") -----
+
+    private const float TabWidth = 150f;
+    private const float TabHeight = 36f;
+    private const float UpgradeTextWidth = 400f;
+
+    private readonly List<GameObject> craftParts = new List<GameObject>();
+    private readonly List<ActionRowView> upgradeRows = new List<ActionRowView>();
+    private RectTransform tabsRow;
+    private Button craftTab;
+    private Button upgradeTab;
+    private TMP_Text craftTabLabel;
+    private TMP_Text upgradeTabLabel;
+    private Image craftTabShown;
+    private Image upgradeTabShown;
+    private RectTransform upgradePanel;
+    private TMP_Text upgradeTitle;
+    private TMP_Text upgradeBody;
+    private RectTransform upgradeList;
+    private TMP_Text upgradeEmpty;
+    private bool showingUpgrade;
+
+    /// <summary>True while the Upgrade tab is shown.</summary>
+    public bool ShowingUpgrade => showingUpgrade;
+
+    // Made once, after the banner has moved the craft parts down: the tabs on the band's foot, the upgrade page where the craft parts are.
+    private void BuildTabs()
+    {
+        var panel = titleLabel.transform.parent as RectTransform;
+        if (panel == null)
+        {
+            return;
+        }
+
+        if (tabsRow == null)
+        {
+            UIStyle style = UIStyle.Current;
+            KitBanner banner = panel.GetComponent<KitBanner>();
+            float top = (banner != null ? banner.Growth : 0f) + 16f;
+            foreach (Transform child in panel)
+            {
+                var rect = (RectTransform)child;
+                bool overlay = rect.anchorMin == Vector2.zero && rect.anchorMax == Vector2.one;
+                bool topAnchored = Mathf.Approximately(rect.anchorMin.y, 1f) && Mathf.Approximately(rect.anchorMax.y, 1f);
+                bool own = child == titleLabel.transform || child == closeButton.transform || child == actionBar || child == tooltip.transform
+                           || child.GetComponent<KitBanner>() != null || child.name == "Banner";
+                if (!overlay && topAnchored && !own && -rect.anchoredPosition.y > top + TabHeight)
+                {
+                    craftParts.Add(child.gameObject);
+                }
+            }
+
+            tabsRow = CodeUI.At("Station Tabs", panel, 24f, top, TabWidth * 2f + 8f, TabHeight);
+            craftTab = CodeUI.AddTab("Craft", tabsRow, 0f, 0f, TabWidth, TabHeight, style, out craftTabLabel, out craftTabShown);
+            craftTabLabel.text = "Craft";
+            craftTab.onClick.AddListener(() => ShowUpgrade(false));
+            upgradeTab = CodeUI.AddTab("Upgrade", tabsRow, TabWidth + 8f, 0f, TabWidth, TabHeight, style, out upgradeTabLabel, out upgradeTabShown);
+            upgradeTabLabel.text = "Upgrade";
+            upgradeTab.onClick.AddListener(() => ShowUpgrade(true));
+
+            float listTop = top + TabHeight + 14f;
+            float width = panel.rect.width - 48f;
+            float height = panel.rect.height - listTop - 24f;
+            upgradePanel = CodeUI.At("Upgrade Page", panel, 24f, listTop, width, height);
+            upgradeTitle = CodeUI.Label("Title", upgradePanel, 0f, 0f, UpgradeTextWidth, 40f, 28f, style.Text);
+            style.Title(upgradeTitle);
+            upgradeTitle.overflowMode = TextOverflowModes.Overflow;
+            upgradeBody = CodeUI.Paragraph("Body", upgradePanel, 0f, 50f, UpgradeTextWidth, height - 50f, 18f, style.Text);
+            upgradeBody.richText = true;
+            upgradeBody.enableAutoSizing = true;
+            upgradeBody.fontSizeMin = 13f;
+            upgradeBody.fontSizeMax = 18f;
+
+            float listX = UpgradeTextWidth + 24f;
+            RectTransform area = CodeUI.At("Choices", upgradePanel, listX, 0f, width - listX, height);
+            var scroll = area.gameObject.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+            scroll.movementType = ScrollRect.MovementType.Clamped;
+            scroll.scrollSensitivity = 40f;
+            area.gameObject.AddComponent<RectMask2D>();
+            area.gameObject.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0f);
+            upgradeList = CodeUI.At("Rows", area, 0f, 0f, width - listX, 0f);
+            var layout = upgradeList.gameObject.AddComponent<VerticalLayoutGroup>();
+            layout.spacing = 6f;
+            layout.childControlWidth = true;
+            layout.childForceExpandWidth = true;
+            layout.childControlHeight = false;
+            layout.childForceExpandHeight = false;
+            upgradeList.gameObject.AddComponent<ContentSizeFitter>().verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            scroll.content = upgradeList;
+            scroll.viewport = area;
+            upgradeEmpty = CodeUI.Paragraph("Empty", area, 0f, 0f, width - listX, 80f, 18f, style.Muted);
+            upgradePanel.gameObject.SetActive(false);
+            PadTabs.Register(this, () => IsOpen && showingUpgrade, direction => ShowUpgrade(!showingUpgrade), () => new[] { tabsRow });
+        }
+
+        bool has = station != null && station.TryGetComponent(out BuildingObject building) && building.TryGetComponent(out Construction construction)
+                   && ConstructionUpgradeOffer.HasChoices(building, construction);
+        tabsRow.gameObject.SetActive(has);
+        PlaceTabs(panel);
+    }
+
+    // Where the craft parts start now (the banner moves them when a station has a painting): the tabs just above them, the page in their
+    // place. A station with no painting (the Farm, the Dock) has no band to hold the tabs, so they stand beside its title.
+    private void PlaceTabs(RectTransform panel)
+    {
+        float contentTop = float.MaxValue;
+        foreach (GameObject part in craftParts)
+        {
+            if (part != null)
+            {
+                contentTop = Mathf.Min(contentTop, -((RectTransform)part.transform).anchoredPosition.y);
+            }
+        }
+
+        if (contentTop == float.MaxValue)
+        {
+            return;
+        }
+
+        float tabsTop = contentTop - TabHeight - 10f;
+        float tabsX = 24f;
+        if (tabsTop < 60f)
+        {
+            // No painting: the tabs beside the title, and the page below the title's large letters.
+            tabsTop = 18f;
+            tabsX = 24f + Mathf.Min(titleLabel.preferredWidth, 420f) + 28f;
+            contentTop += 34f;
+        }
+
+        tabsRow.anchoredPosition = new Vector2(tabsX, -tabsTop);
+        float height = panel.rect.height - contentTop - 24f;
+        upgradePanel.anchoredPosition = new Vector2(24f, -contentTop);
+        upgradePanel.sizeDelta = new Vector2(panel.rect.width - 48f, height);
+        upgradeBody.rectTransform.sizeDelta = new Vector2(UpgradeTextWidth, height - 50f);
+        var area = (RectTransform)upgradeList.parent;
+        area.sizeDelta = new Vector2(area.sizeDelta.x, height);
+    }
+
+    private void ShowUpgrade(bool upgrade)
+    {
+        showingUpgrade = upgrade && tabsRow != null && tabsRow.gameObject.activeSelf;
+        foreach (GameObject part in craftParts)
+        {
+            if (part != null)
+            {
+                part.SetActive(!showingUpgrade);
+            }
+        }
+
+        if (upgradePanel != null)
+        {
+            upgradePanel.gameObject.SetActive(showingUpgrade);
+        }
+
+        if (craftTabShown != null)
+        {
+            UIStyle style = UIStyle.Current;
+            craftTabShown.enabled = !showingUpgrade;
+            upgradeTabShown.enabled = showingUpgrade;
+            craftTabLabel.color = showingUpgrade ? style.Muted : style.Accent;
+            upgradeTabLabel.color = showingUpgrade ? style.Accent : style.Muted;
+        }
+
+        tooltip.Hide();
+        if (showingUpgrade)
+        {
+            RefreshUpgrade();
+        }
+    }
+
+    // The page ConstructionUpgradeOffer makes for this building, drawn here: what the next tier brings on the left, the choices on the right.
+    private void RefreshUpgrade()
+    {
+        if (!showingUpgrade || station == null || upgradePanel == null)
+        {
+            return;
+        }
+
+        MenuPage page = station.TryGetComponent(out BuildingObject building) ? ConstructionUpgradeOffer.PageFor(building, user) : null;
+        upgradeTitle.text = page != null ? page.Title : "Nothing to improve now";
+        upgradeBody.text = page != null ? GameInput.WithRebinds(page.Body) : "";
+        int count = page != null ? page.Actions.Count : 0;
+        ActionRowView template = ActionMenuWindow.Current != null ? ActionMenuWindow.Current.RowTemplate : null;
+        while (template != null && upgradeRows.Count < count)
+        {
+            ActionRowView row = Instantiate(template, upgradeList);
+            row.Clicked += OnUpgradeChosen;
+            upgradeRows.Add(row);
+        }
+
+        for (int i = 0; i < upgradeRows.Count; i++)
+        {
+            bool used = i < count;
+            upgradeRows[i].gameObject.SetActive(used);
+            if (used)
+            {
+                upgradeRows[i].Bind(page.Actions[i]);
+            }
+        }
+
+        upgradeEmpty.gameObject.SetActive(count == 0);
+        upgradeEmpty.text = ConstructionOf(station) is Construction c && c.IsBuilding ? GameInput.WithRebinds("Being built: hold {key:Hammer} at its scaffold.") : "";
+        LayoutRebuilder.ForceRebuildLayoutImmediate(upgradeList);
+    }
+
+    private static Construction ConstructionOf(CraftingStation at) => at != null && at.TryGetComponent(out Construction c) ? c : null;
+
+    private void OnUpgradeChosen(MenuAction action)
+    {
+        if (action == null || !action.Enabled)
+        {
+            return;
+        }
+
+        action.Chosen?.Invoke();
+        if (IsOpen)
+        {
+            RefreshUpgrade();
+        }
     }
 
     public void Close()
@@ -288,6 +514,12 @@ public sealed class StationWindow : MonoBehaviour
         nextRefresh = Time.unscaledTime + refreshInterval;
         if (station == null)
         {
+            return;
+        }
+
+        if (showingUpgrade)
+        {
+            RefreshUpgrade();
             return;
         }
 
@@ -519,8 +751,15 @@ public sealed class StationWindow : MonoBehaviour
     private void RefreshActions()
     {
         var page = new MenuPage();
+        bool upgradeTabShown = tabsRow != null && tabsRow.gameObject.activeSelf;
         foreach (IStationMenuExtension extension in station.GetComponents<IStationMenuExtension>())
         {
+            // The Upgrade tab holds what the building's own "Upgrade…" button opened.
+            if (upgradeTabShown && extension is Construction)
+            {
+                continue;
+            }
+
             extension.AddActions(page, user);
         }
 

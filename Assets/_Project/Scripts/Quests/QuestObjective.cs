@@ -569,7 +569,7 @@ public sealed class QuestObjective
             case ObjectiveType.EmpowerItem:
                 return item != null ? $"Empower your {Name(item)} at the altar" : Amount == 1 ? "Empower a piece of gear at the altar" : $"Empower {count} pieces of gear at the altar";
             case ObjectiveType.FitModule:
-                return building != null ? $"Fit a module to the {building.DisplayName} (its Upgrade page)" : "Fit a module to a building (its Upgrade page)";
+                return building != null ? $"Fit a module to the {building.DisplayName} ({BuildingModules.WhereToFit(building)})" : "Fit a module to a building (its Upgrade tab)";
             case ObjectiveType.EnchantItem:
                 string carved = enchantment != null ? enchantment.DisplayName : greatOnly ? "a great enchantment" : "an enchantment";
                 return Amount == 1 ? $"Carve {carved} into your gear at the altar" : $"Carve {carved} into {count} pieces of gear at the altar";

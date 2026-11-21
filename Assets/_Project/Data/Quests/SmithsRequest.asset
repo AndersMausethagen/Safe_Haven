@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: smiths_request
   displayName: Copper Fire
-  description: 'Bjarne''s hearth wants to burn hotter: raise the Smithy to Tier II ({key:Haven}), fit it a Storage Loft from its Upgrade page so the bench doesn''t stop when the work changes, and make a Copper Pickaxe, the first tool that takes the deep ore.'
+  description: 'Bjarne''s hearth wants to burn hotter: raise the Smithy to Tier II ({key:Haven}), fit it a Storage Loft from its Upgrade tab so the bench doesn''t stop when the work changes, and make a Copper Pickaxe, the first tool that takes the deep ore.'
   chain: Bjarne
   journalNotes: The copper pick opens the ore that stone tools only scratch.
   rank: 4
@@ -84,7 +84,7 @@ MonoBehaviour:
     onlySource: 0
     source: 2
   - type: 23
-    description: Fit a Storage Loft to the Smithy (its Upgrade page)
+    description: Fit a Storage Loft to the Smithy (its Upgrade tab)
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}

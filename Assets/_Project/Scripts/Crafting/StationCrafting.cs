@@ -43,7 +43,7 @@ public static class StationCrafting
 
         if (!queue.HasModule(recipe.NeedsModule) && !Cheats.NoRequirements)
         {
-            return $"Needs the {recipe.NeedsModule.DisplayName} fitted here (its Upgrade page).";
+            return $"Needs the {recipe.NeedsModule.DisplayName} fitted here (the Upgrade tab).";
         }
 
         if (recipe.SkillProblem(GameSession.Progress) is string unskilled)

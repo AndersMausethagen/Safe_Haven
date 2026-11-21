@@ -112,6 +112,9 @@ public sealed class ActionMenuWindow : MonoBehaviour
 
     public bool IsOpen => window != null && window.IsOpen;
 
+    /// <summary>The hidden row its choices are copied from, for another window showing a MenuPage the same way (a station's Upgrade tab).</summary>
+    public ActionRowView RowTemplate => rowTemplate;
+
     /// <summary>True while it is open on what stands at <paramref name="near"/> (a horse's menu: CoopHorses).</summary>
     public bool IsOpenAt(Transform near) => IsOpen && near != null && anchor == near;
 

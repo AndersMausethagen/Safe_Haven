@@ -48,7 +48,7 @@ MonoBehaviour:
   - quest: {fileID: 11400000, guid: b056baccfd41442478d4f5da5ea2d76a, type: 2}
     text: 'Copper wants a hotter fire than this hearth gives. Raise the Smithy a tier. The fire''s bigger then, and so''s the bench: put a loft over it for what''s done, and the queue won''t stop when the work changes. Then make yourself a copper pick.'
     acceptText: A hotter fire.
-    waitingText: The Smithy at Tier II, a Storage Loft from its Upgrade page, then a Copper Pickaxe.
+    waitingText: The Smithy at Tier II, a Storage Loft from its Upgrade tab, then a Copper Pickaxe.
     askText: 
     thanksText: 
   questLineDone: 

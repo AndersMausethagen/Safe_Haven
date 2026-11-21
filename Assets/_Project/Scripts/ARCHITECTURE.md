@@ -2839,5 +2839,17 @@ From the user's list after their 72-minute run.
   `Sum`. New bonus kinds: Extra Output Slots (`StationQueue.OutputSlots`/`MoreOutput`: another kind waits, then moves up; saved) and
   Extra Chance (luck, modules + extensions at most 15%). Quests teach modules as they start (`QuestDefinition › Unlocks Modules`) and
   can ask for one (`ObjectiveType.FitModule`, `GameEventKind.ModuleFitted`). Shipped: Storage Loft and Apprentice's Corner, taught by
-  Copper Fire (Bjarne 3). Not yet: the hammered fitting job, the raid view of modules, the rest of the catalogue, a tab in the station
-  window itself.
+  Copper Fire (Bjarne 3).
+- **Module catalogue** (2026-11-21, §3.7 of the research): 18 more modules from existing materials. Tiers teach them too
+  (`BuildingLevel › Unlocks Modules`, known while a building of the kind stands at that tier: `SettlementState.BuiltTier`), and
+  `BuildingModules.AnnounceLearned` says what each is when a quest or tier teaches it. Recipes can need a module
+  (`RecipeDefinition › Needs Module`, checked in `StationCrafting.Check` against `StationQueue.Modules`, which the station keeps up);
+  a thrifty variant (`› Replaces`) takes the plain recipe's place where it is open (`RecipeVariants.OpenAt`: the station's list via
+  `StationCrafting.KnownRecipesFor(user, type, queue)`, and workers in `WorkerProduction`). Ore never gets cheaper (a test). Defence
+  bonuses on `BuildingBonus`: Health Share (a MaxHealth stat modifier `Construction` keeps), Turn Back Share (`Construction.OnDamaged`:
+  a share of the health lost comes back on the striker, never the player's side), Fight Share (`WatchPostArcher`). Fine Chance
+  (`StationQueue.FineChance`) adds to gear quality when it is collected (`CraftedWork.Make`). `Construction.IsStaffed` covers buildings
+  that aren't stations (the altar). Raids see fitted modules (`SettlementState.NoteBuildings` notes them, `UpgradeBonus` adds them).
+  A building taken down puts its modules in store. Not yet: the hammered fitting job, a tab in the station window itself, modules
+  needing new items (Barrow-iron Anvil, Jeweller's Bench, Burl Still, Jutul Cold Store, Bloomery Hearth, Nykk-hair Lines, Brukam's Horn,
+  Living Heart) and their quests and rumours; the Storage Shed's two (the shed already holds a chest's 60-slot most).
