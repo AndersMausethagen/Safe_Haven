@@ -240,6 +240,8 @@ public sealed class CinematicScreen : MonoBehaviour
 
     private void Begin(CinematicDefinition cinematic, Action onFinished)
     {
+        // No window stays up under it (CinematicView.CloseWindows).
+        CinematicView.CloseWindows();
         // The game's own talk ends here: a line still up when the game paused for this went on over the narration, and its
         // subtitle, frozen with the paused clock, kept the cinematic's music dipped throughout.
         VoicePlayer.Stop();

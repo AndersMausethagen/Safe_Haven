@@ -38,9 +38,27 @@ public sealed class CinematicView : MonoBehaviour
     /// <summary>Takes the screen for a cinematic, gliding in over <paramref name="glideIn"/> seconds.</summary>
     public static CinematicView Begin(bool letterbox, bool hideHud, bool holdPlayer, bool skippable, float glideIn)
     {
+        CloseWindows();
         var view = new GameObject("Cinematic Camera").AddComponent<CinematicView>();
         view.Setup(letterbox, hideHud, holdPlayer, skippable, glideIn);
         return view;
+    }
+
+    /// <summary>
+    /// Closes every window and the world map as a cinematic begins (the user, 2026-11-21: a window open when an in-game cinematic
+    /// started stayed up and couldn't be closed, since the cinematic holds the keys that would close it).
+    /// </summary>
+    public static void CloseWindows()
+    {
+        if (UIStateManager.Current != null)
+        {
+            UIStateManager.Current.CloseAll();
+        }
+
+        if (WorldMapHud.IsOpen)
+        {
+            WorldMapHud.Toggle();
+        }
     }
 
     private void Setup(bool letterbox, bool hideHud, bool holdPlayer, bool skippable, float glideIn)

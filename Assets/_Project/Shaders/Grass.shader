@@ -393,7 +393,8 @@ Shader "Safe Haven/Grass"
                 lighting.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
                 lighting.shadowMask = half4(1, 1, 1, 1);
                 SurfaceData data = (SurfaceData)0;
-                data.albedo = albedo.rgb;
+                // The canopy's shade on the sunlit blades too, as on the ground under them (GroundLight.hlsl, Canopy Sun Shade).
+                data.albedo = albedo.rgb * GroundLightCanopyShade(input.positionWS);
                 data.alpha = 1;
                 data.smoothness = _Smoothness;
                 data.occlusion = 1.0;

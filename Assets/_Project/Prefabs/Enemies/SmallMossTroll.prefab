@@ -383,8 +383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3afface28c299eb458371e2c5a0db511, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::FootGrounding
-  leftSole: -0.35
-  rightSole: -0.35
+  leftSole: 0.116867915
+  rightSole: 0.12123375
   mostShift: 1
   settle: 12
   measuredScale: 0.66002154

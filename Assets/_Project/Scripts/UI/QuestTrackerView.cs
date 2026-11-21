@@ -121,22 +121,19 @@ public sealed class QuestTrackerView : MonoBehaviour
         panel.SetActive(active.Count + available.Count + atHome > 0 || nextRescue != null);
         var builder = new StringBuilder();
         timed = false;
-        // A Contextual HUD (HudRules): the quest on top in full, its finished and not-yet-open steps left out; the rest by their titles.
+        // A Contextual HUD (HudRules): every quest shown with its open steps (the user, 2026-11-21: those under the top one showed only
+        // their names), finished and not-yet-open steps left out; what blocks a step only under the top one.
         // Minimal: the quest on top alone. Three quests with every step stood down the right edge (the HUD review of 2026-11-18).
         bool everything = HudRules.ShowsEverything;
         int limit = HudRules.IsMinimal ? 1 : maxQuests;
         for (int q = 0; q < active.Count && q < limit; q++)
         {
             QuestLog.Entry entry = active[q];
-            builder.Append(q > 0 ? (everything ? "\n\n" : "\n") : "").Append(Title(entry.Quest));
+            builder.Append(q > 0 ? "\n\n" : "").Append(Title(entry.Quest));
             if (QuestTimers.TryGet(entry.Quest, out float left))
             {
                 timed = true;
                 builder.Append($"  <color={Muted}>{(int)left / 60}:{(int)left % 60:00}</color>");
-            }
-            if (q > 0 && !everything)
-            {
-                continue;
             }
             if (entry.Status == QuestStatus.ReadyToTurnIn)
             {
@@ -154,7 +151,8 @@ public sealed class QuestTrackerView : MonoBehaviour
                 else if (entry.IsObjectiveOpen(i))
                 {
                     builder.Append("\n• ").Append(line);
-                    string blocker = objective.Blocker();
+                    // What blocks a step only under the top quest, so the list stays short.
+                    string blocker = q == 0 || everything ? objective.Blocker() : null;
                     if (blocker != null)
                     {
                         builder.Append($"\n   <color={Muted}>{blocker}</color>");
@@ -174,11 +172,8 @@ public sealed class QuestTrackerView : MonoBehaviour
             bool waiting = manager.IsWaiting(quest);
             string instruction = waiting && DialogueBox.IsSpeaking
                 ? "Finish the conversation to continue." : quest.AvailableObjective;
-            builder.Append(shown > 0 ? (everything ? "\n\n" : "\n") : "").Append(Title(quest));
-            if (shown == 0 || everything)
-            {
-                builder.Append("\n• ").Append(instruction);
-            }
+            builder.Append(shown > 0 ? "\n\n" : "").Append(Title(quest));
+            builder.Append("\n• ").Append(instruction);
 
             timed |= waiting;
             shown++;
