@@ -49,6 +49,8 @@ public static class ContentAudit
         "HomeLifeSettings.comforts[].cost[].item",
         // A boss encounter's gate takes its price (the Hearth Ember into Guardian's Hollow).
         "BossEncounterDefinition.gateItems[].item",
+        // A torch burns its fuel each night (TorchFuel: Charcoal).
+        "TorchFuel.fuel",
     };
 
     private static readonly string[] ItemNeither =

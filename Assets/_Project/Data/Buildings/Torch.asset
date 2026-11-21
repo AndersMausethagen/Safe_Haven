@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BuildingDefinition
   id: torch
   displayName: Torch
-  description: A burning torch on a post. It lights the ground around it at night, holds back the grey dark and keeps night creatures at bay.
+  description: A burning torch on a post. At night it lights the ground around it, holds back the grey dark and keeps night creatures at bay. It burns one Charcoal a night, taken from your bag or chests at dusk, and goes out at dawn.
   icon: {fileID: 21300000, guid: 15cbf30ce2def0c4aaf255f8cabf629b, type: 3}
   faction: 0
   combatStats: {fileID: 11400000, guid: 01155c9e2dd7c27468c1a359f747e1a1, type: 2}
@@ -30,9 +30,25 @@ MonoBehaviour:
   sortOrder: 9
   requires: []
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
   station: 0
   outputCapacity: 10
   queueLength: 5

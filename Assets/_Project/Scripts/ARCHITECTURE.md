@@ -2818,3 +2818,10 @@ From the user's list after their 72-minute run.
   quest line of two or more in `ResidentDefinition › Quest Line`; the rescues follow one another (Docs/RescueOrder.md, 2026-11-21).
 - **The homecoming hold** counts only quests begun at this homecoming (`QuestManager.startedInHomecoming`), and the tracker puts a
   quest a person gives first within its colour (`ResidentQuests.IsGivenByAPerson`).
+- **Torches burn charcoal** (`TorchFuel` on the Torch): at dusk each takes one Charcoal from the bag and the chests (MaterialPool), burns
+  until dawn (light, glow, the lit ground night creatures avoid) and is out by day; with none it stays dark and the Haven says how
+  many stand dark, once a night. The night it was fed for is saved. Building wall torches (`NightFlame`) stay free.
+- **Night prowlers** are a mix (wolves twice, Mistwing, Rootling, Tusse), 2 at first and at most 5, every 35 s; one hurt by the player's
+  side drops its fear of the light and follows its attacker in (`NightProwlers.FollowWhenProvoked`).
+- **Nettle Patch** (`Data/Gathering/NettlePatch`): a clump of four nettles about 2.9 m across, beside the single nettle in every
+  RandomResourceNode pool, 9-13 Nettle Fiber, so fibre is easy to spot in raids.

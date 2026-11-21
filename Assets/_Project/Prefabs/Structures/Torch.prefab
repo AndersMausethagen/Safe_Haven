@@ -152,6 +152,7 @@ GameObject:
   - component: {fileID: 2739863785985149535}
   - component: {fileID: 7010370737702096850}
   - component: {fileID: 8616385251098900437}
+  - component: {fileID: 2805767847546040577}
   m_Layer: 0
   m_Name: Torch
   m_TagString: Untagged
@@ -323,6 +324,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Construction
   startsRuined: 0
+--- !u!114 &2805767847546040577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2858870712050343428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c1ea279a80fc55418bfb21bb6367dba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::TorchFuel
+  fuel: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+  perNight: 1
+  flame: {fileID: 586072716122118226}
+  glow: {fileID: 1173183188481712861}
+  lightAt: 0.35
 --- !u!1001 &2218266730917395056
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -486,6 +504,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2a402f55522096c4da7ff79c5d3b5953, type: 3}
+--- !u!23 &1173183188481712861 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 2551621001715441203, guid: 2a402f55522096c4da7ff79c5d3b5953, type: 3}
+  m_PrefabInstance: {fileID: 3688120632908020974}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3555254251655618110 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 177921644753593040, guid: 2a402f55522096c4da7ff79c5d3b5953, type: 3}

@@ -85143,8 +85143,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::NightProwlers
   prowlers:
   - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
-  maxAlive: 3
-  spawnInterval: 25
+  - {fileID: 7477446688404098989, guid: 237fc76d161bb114aa2049a864298943, type: 3}
+  - {fileID: 4830014356063024607, guid: a8600aa8041d7044c9a3afddd7102a7b, type: 3}
+  - {fileID: 3085881180223279310, guid: 049004d8140885f4db2790503b4ab12d, type: 3}
+  - {fileID: 6267209934607442583, guid: 76a470aa63338604b9110596e079afc3, type: 3}
+  maxAlive: 2
+  spawnInterval: 35
   spawnDistance: {x: 30, y: 48}
   lightMargin: 6
   requireBreachWon: 1
@@ -241263,7 +241267,7 @@ Terrain:
   m_ScaleInLightmap: 0.064
   m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
   m_GroupingID: 0
-  m_RenderingLayerMask: 1
+  m_RenderingLayerMask: 257
   m_AllowAutoConnect: 1
   m_EnableHeightmapRayTracing: 1
   m_EnableTreesAndDetailsRayTracing: 0

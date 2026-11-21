@@ -16,7 +16,7 @@ MonoBehaviour:
   creaturePower: 1
   cursedEssence: 2
   prowlersPerBreach: 1
-  mostProwlers: 8
+  mostProwlers: 5
   prowlerSpawnScale: 0.7
   deepProwlers:
   - {fileID: 8653230728158633359, guid: a661dc05d2e43f943a476376f636ef9a, type: 3}

@@ -10,6 +10,11 @@ using UnityEngine.AI;
 /// game. Every so often an idle prowler closes in: on the player in the dark, or to the edge of the light nearest it
 /// when the player stands in light. They appear out of sight, away from the player, and slink off at dawn. They are not saved. None come during a
 /// breach. Lives in SafeHaven, beside the sky rig.
+/// <para>
+/// Provoked, they follow (the user, 2026-11-21: "If provoked, let them follow the player into the haven and not fear the light"): a
+/// prowler the player's side hurts forgets the light and goes after whoever hurt it, into the ward if need be, until it falls or dawn
+/// sends it home. What prowls is a mix (the Prowlers list, a kind listed twice comes twice as often), not wolves alone.
+/// </para>
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class NightProwlers : MonoBehaviour
@@ -186,6 +191,7 @@ public sealed class NightProwlers : MonoBehaviour
             if (prowler.TryGetComponent(out MonsterAI ai))
             {
                 ai.AvoidArea = position => VisibilitySource.IsLit(position);
+                FollowWhenProvoked(ai);
                 // Drawn toward the edge of the dark near the player; their senses do the rest.
                 ai.Roam(Vector3.Lerp(hit.position, player, 0.5f));
                 alive.Add(ai);
@@ -193,6 +199,33 @@ public sealed class NightProwlers : MonoBehaviour
 
             return;
         }
+    }
+
+    /// <summary>True for a prowler hurt by the player's side: it no longer keeps out of the light.</summary>
+    public bool IsProvoked(MonsterAI ai) => ai != null && ai.AvoidArea == null;
+
+    // Hurt by the player's side, it drops its fear of the light and hunts whoever hurt it.
+    private static void FollowWhenProvoked(MonsterAI ai)
+    {
+        if (!ai.TryGetComponent(out Damageable health))
+        {
+            return;
+        }
+
+        health.Damaged += (hit, result) =>
+        {
+            if (ai == null || ai.AvoidArea == null || hit.Source == null || hit.Source.Faction != Faction.Player)
+            {
+                return;
+            }
+
+            ai.AvoidArea = null;
+            ai.Relentless = true;
+            if (hit.Source.TryGetComponent(out Damageable attacker))
+            {
+                ai.Engage(attacker);
+            }
+        };
     }
 
     // At dawn they walk off into the forest and are removed once out of sight or out of time.
