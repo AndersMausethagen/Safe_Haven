@@ -181,13 +181,19 @@ public sealed class SpiderLegs : MonoBehaviour
                     continue;
                 }
 
-                if (leg.stepT >= 1f && fromHip > reachAll * 0.95f)
+                // Only where the step brings the foot clearly nearer: a reach that comes from the body rearing or lunging in an
+                // attack (the foot is already where it rests) would re-step every step time, paddling (the review of 2026-11-21).
+                if (leg.stepT >= 1f && fromHip > reachAll * 0.95f && rearing <= 0f)
                 {
-                    leg.from = leg.foot;
-                    leg.to = Ground(transform.TransformPoint(leg.rest) + lead);
-                    leg.stepT = 0f;
-                    groupStepping[leg.group & 1] = true;
-                    continue;
+                    Vector3 nearer = Ground(transform.TransformPoint(leg.rest) + lead);
+                    if (Vector3.Distance(leg.hip.position, nearer) < fromHip - 0.25f)
+                    {
+                        leg.from = leg.foot;
+                        leg.to = nearer;
+                        leg.stepT = 0f;
+                        groupStepping[leg.group & 1] = true;
+                        continue;
+                    }
                 }
             }
 

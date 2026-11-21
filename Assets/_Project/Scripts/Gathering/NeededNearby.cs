@@ -16,8 +16,13 @@ public sealed class NeededNearby : MonoBehaviour
     private const float LookEvery = 1.5f;
     private const float NeedsEvery = 5f;
     private const float SameThingSeconds = 150f;
+    // What home wants is often common (wood, stone): said now and then, never outlined.
+    private const float HomeWantSeconds = 600f;
+    // Another node takes the outline only when it is this much nearer (squared metres), so it doesn't flick between two.
+    private const float SwitchCloser = 9f;
+    private const string ForHome = "home";
     private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
-    private static readonly Collider[] Hits = new Collider[96];
+    private static readonly Collider[] Hits = new Collider[256];
 
     // What is needed, and what for (a quest's name, or "home").
     private readonly Dictionary<Object, string> needed = new Dictionary<Object, string>();
@@ -88,8 +93,17 @@ public sealed class NeededNearby : MonoBehaviour
             return;
         }
 
-        Glow(nearest);
-        Remark(what, needed[what]);
+        bool forQuest = needed[what] != ForHome;
+        if (forQuest)
+        {
+            Glow(nearest);
+        }
+        else
+        {
+            StopGlow();
+        }
+
+        Remark(what, needed[what], forQuest ? SameThingSeconds : HomeWantSeconds);
     }
 
     // The open steps of every quest under way that ask for something to be gathered or carried, and what home wants.
@@ -128,18 +142,23 @@ public sealed class NeededNearby : MonoBehaviour
                 Object target = want.Item != null ? (Object)want.Item : want.Resource;
                 if (target != null && !needed.ContainsKey(target))
                 {
-                    needed[target] = "home";
+                    needed[target] = ForHome;
                 }
             }
         }
     }
 
+    // The nearest node yielding something needed that the player can gather now (the right tool, its tier): a quest's need before
+    // home's, and the one outlined already unless another is clearly nearer.
     private ResourceNode NearestNeeded(out Object what)
     {
         what = null;
         ResourceNode best = null;
         float bestDistance = float.MaxValue;
-        int count = Physics.OverlapSphereNonAlloc(transform.position, Reach, Hits, ~0, QueryTriggerInteraction.Collide);
+        bool bestForQuest = false;
+        Object kept = null;
+        float keptDistance = float.MaxValue;
+        int count = Physics.OverlapSphereNonAlloc(transform.position, Reach, Hits, ~0, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < count; i++)
         {
             ResourceNode node = Hits[i].GetComponentInParent<ResourceNode>();
@@ -148,38 +167,63 @@ public sealed class NeededNearby : MonoBehaviour
                 continue;
             }
 
-            float distance = (node.transform.position - transform.position).sqrMagnitude;
-            if (distance >= bestDistance)
+            Object yields = NeededFrom(node);
+            if (yields == null || !node.CanInteract(gameObject, out _))
             {
                 continue;
             }
 
-            foreach (ItemDropEntry entry in node.Definition.Yields.Entries)
+            float distance = (node.transform.position - transform.position).sqrMagnitude;
+            bool forQuest = needed[yields] != ForHome;
+            if (node == glowing)
             {
-                if (entry != null && entry.Drop != null && needed.ContainsKey(entry.Drop))
-                {
-                    best = node;
-                    bestDistance = distance;
-                    what = entry.Drop;
-                    break;
-                }
+                kept = yields;
+                keptDistance = distance;
             }
+
+            if ((forQuest && !bestForQuest) || (forQuest == bestForQuest && distance < bestDistance))
+            {
+                best = node;
+                bestDistance = distance;
+                bestForQuest = forQuest;
+                what = yields;
+            }
+        }
+
+        // Stay with the node outlined unless the new one is a quest's where it was home's, or clearly nearer.
+        if (kept != null && best != glowing && (needed[kept] != ForHome) == bestForQuest && keptDistance - bestDistance < SwitchCloser)
+        {
+            what = kept;
+            return glowing;
         }
 
         return best;
     }
 
-    // Said once in a while for each kind of thing: by the companion along, or the player's own thought.
-    private void Remark(Object what, string forWhat)
+    private Object NeededFrom(ResourceNode node)
     {
-        if (saidAt.TryGetValue(what, out float at) && Time.time - at < SameThingSeconds)
+        foreach (ItemDropEntry entry in node.Definition.Yields.Entries)
+        {
+            if (entry != null && entry.Drop != null && needed.ContainsKey(entry.Drop))
+            {
+                return entry.Drop;
+            }
+        }
+
+        return null;
+    }
+
+    // Said once in a while for each kind of thing: by the companion along, or the player's own thought.
+    private void Remark(Object what, string forWhat, float every)
+    {
+        if (saidAt.TryGetValue(what, out float at) && Time.time - at < every)
         {
             return;
         }
 
         saidAt[what] = Time.time;
         string name = what is ItemDefinition item ? item.DisplayName : what is ResourceDefinition resource ? resource.DisplayName : what.name;
-        string why = forWhat == "home" ? "wanted at home" : $"for {forWhat}";
+        string why = forWhat == ForHome ? "wanted at home" : $"for {forWhat}";
         Companion along = Companion.Active.Count > 0 ? Companion.Active[0] : null;
         string line = along != null
             ? $"{along.DisplayName}: \"{name}, right over there. We could use that.\""

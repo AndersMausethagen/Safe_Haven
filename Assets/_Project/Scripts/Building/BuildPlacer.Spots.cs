@@ -86,10 +86,11 @@ public sealed partial class BuildPlacer
         {
             // The ground itself is the area's to judge (Area.CheckSpot allows some unevenness): on a slope the rising terrain
             // inside the box made "in the way" of ground the area accepts.
-            // A path is laid on the ground under what grows or lies there: sticks, stumps, overgrowth and rocks to gather didn't let a
-            // dirt road be drawn anywhere in the Haven (the user's playtest, 2026-11-21). Buildings and the rest still stand in its way.
+            // A path is laid on the ground under what lies low there: sticks, stumps, overgrowth and small rocks to gather didn't let a
+            // dirt road be drawn anywhere in the Haven (the user's playtest, 2026-11-21). A tree's trunk, a boulder and buildings still
+            // stand in its way (the review of 2026-11-21).
             if (!ghost.Contains(Overlaps[i]) && !(Overlaps[i] is TerrainCollider)
-                && !(path && Overlaps[i].GetComponentInParent<ResourceNode>() != null))
+                && !(path && LiesLowUnderPath(Overlaps[i])))
             {
                 return "Something is in the way.";
             }
@@ -121,6 +122,12 @@ public sealed partial class BuildPlacer
 
         return null;
     }
+
+    // Something to gather that a path can be laid over: low enough to step over (a twig, a stump, a tussock, a stone).
+    private const float LowEnoughForAPath = 1.2f;
+
+    private static bool LiesLowUnderPath(Collider collider) =>
+        collider.bounds.size.y < LowEnoughForAPath && collider.GetComponentInParent<ResourceNode>() != null;
 
     // People and monsters walk out of the way, so they don't block a yard.
     private static bool IsMoving(Collider collider)

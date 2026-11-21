@@ -317,7 +317,8 @@ public sealed class MinimapHud : MonoBehaviour
             return;
         }
 
-        bool far = home != null && RaidDirector.Current == null;
+        // In a friend's Haven the portal at its heart is theirs, not home.
+        bool far = home != null && global::Place.AtHome;
         float metres = 0f;
         if (far)
         {
@@ -375,7 +376,7 @@ public sealed class MinimapHud : MonoBehaviour
         ExplorationMap explored = ExplorationMap.Current;
         used = 0;
         // Home, always: the Haven's portal at the heart, kept on the rim when it is out of the disc's reach.
-        if (HomePortal.Current != null && RaidDirector.Current == null)
+        if (global::Place.InAHaven)
         {
             Add(HomePortal.Current.transform, style.Icon("House") ?? dot, style.AccentBright, 16f, pinned: true);
         }
@@ -410,7 +411,8 @@ public sealed class MinimapHud : MonoBehaviour
             }
             else if (horse != null && horse.IsWild && horse.IsAlive && horse.Sighted)
             {
-                Add(horse.transform, dot, style.Info, 8f, pinned: true);
+                // Only the one told of stays on the rim when out of reach: a herd come near would crowd it.
+                Add(horse.transform, dot, style.Info, 8f, pinned: horse.ToldOf);
             }
         }
 

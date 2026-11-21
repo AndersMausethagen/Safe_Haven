@@ -264,7 +264,7 @@ public sealed class MobSpawnZone : MonoBehaviour
             }
 
             flat.y = height;
-            if (!NavMesh.SamplePosition(flat, out NavMeshHit hit, 4f, NavMesh.AllAreas) || !ZonePolygon.Contains(world, hit.position))
+            if (!NavMesh.SamplePosition(flat, out NavMeshHit hit, 4f, DeepWater.MaskFor(NavMesh.AllAreas, false)) || !ZonePolygon.Contains(world, hit.position))
             {
                 continue;
             }

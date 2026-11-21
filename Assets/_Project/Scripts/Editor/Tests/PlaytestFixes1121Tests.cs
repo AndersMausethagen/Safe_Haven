@@ -69,6 +69,7 @@ public sealed class PlaytestFixes1121Tests
         ItemDefinition armour = ContentArmour();
         Assert.IsNotNull(armour, "some armour with durability ships");
         var slots = new ItemContainer(4, 1);
+        Assert.AreEqual(-1, ArmourWear.PieceStruck(slots, 0.5f), "no armour worn: no piece is struck");
         slots.SetSlot(0, new ItemStack(armour, 1, 0.5f));
         Assert.AreEqual(0.4f, ArmourWear.Wear(slots, 0, 0.1f, false), 1e-4f);
         Assert.AreEqual(-1f, ArmourWear.Wear(slots, 0, 0.1f, true), "armour isn't a shield");
@@ -92,18 +93,21 @@ public sealed class PlaytestFixes1121Tests
     [Test]
     public void DeepWater_IsMarkedOverDeepGround_NotTheShallows()
     {
-        // A flat terrain at 0 and a pond 2 m deep over half of it, 0.3 m (wading) over the other half.
+        // A flat terrain at 0 and a pond 2 m deep over half of it, 0.3 m (wading) over the other half; far off, clear of the open
+        // scene's own terrain and water.
+        Vector3 far = new Vector3(50000f, 0f, 50000f);
         var data = new TerrainData { heightmapResolution = 33, size = new Vector3(64f, 10f, 64f) };
         made.Add(data);
         GameObject ground = Terrain.CreateTerrainGameObject(data);
+        ground.transform.position = far;
         made.Add(ground);
-        GameObject pond = MakeWater(new Vector3(16f, 2f, 32f), 24f);
-        GameObject shallow = MakeWater(new Vector3(48f, 0.3f, 32f), 24f);
+        GameObject pond = MakeWater(far + new Vector3(16f, 2f, 32f), 24f);
+        GameObject shallow = MakeWater(far + new Vector3(48f, 0.3f, 32f), 24f);
         var sources = new List<NavMeshBuildSource>();
-        int boxes = DeepWater.AddSources(sources, new Bounds(new Vector3(32f, 0f, 32f), new Vector3(64f, 20f, 64f)));
+        int boxes = DeepWater.AddSources(sources, new Bounds(far + new Vector3(32f, 0f, 32f), new Vector3(64f, 20f, 64f)));
         Assert.Greater(boxes, 0, "the deep pond is marked");
         Assert.IsTrue(sources.All(s => s.shape == NavMeshBuildSourceShape.ModifierBox && s.area == DeepWater.Area));
-        Assert.IsTrue(sources.All(s => s.transform.GetColumn(3).x < 32f), "nothing over the wading water");
+        Assert.IsTrue(sources.All(s => s.transform.GetColumn(3).x < far.x + 32f), "nothing over the wading water");
         Object.DestroyImmediate(pond);
         Object.DestroyImmediate(shallow);
     }

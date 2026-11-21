@@ -738,6 +738,10 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         if (definition != null && !suppressed)
         {
             UpdateTells();
+            if (!IsRemote && CurrentState != State.Dead)
+            {
+                UpdateQuickTurn();
+            }
         }
 
         if (pose == null || definition == null)

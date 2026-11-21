@@ -86,6 +86,8 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public bool IsWild => State == Mode.Wild;
     /// <summary>A wild horse the player has been told of or has come near: marked on the minimap and the world map until it goes.</summary>
     public bool Sighted { get; set; }
+    /// <summary>The wild horse a resident told the player of (HorseHerd's promised first horse): kept on the minimap's rim.</summary>
+    public bool ToldOf { get; set; }
     public string HorseName => !string.IsNullOrWhiteSpace(horseName) ? horseName
         : IsTamed ? (IsMine ? "Your horse" : $"{(string.IsNullOrWhiteSpace(ownerName) ? "A friend" : ownerName)}'s horse")
         : definition != null ? definition.DisplayName : "Horse";

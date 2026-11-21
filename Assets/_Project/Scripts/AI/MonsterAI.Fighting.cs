@@ -32,7 +32,7 @@ public sealed partial class MonsterAI
         }
 
         PerceptionSettings rules = PerceptionSettings.Current;
-        if (Time.time - cutOffSince < rules.CutOffSeconds || CanShoot)
+        if (Time.time - cutOffSince < rules.CutOffSeconds || CanShoot || WaitsAtShore())
         {
             return false;
         }
@@ -48,6 +48,21 @@ public sealed partial class MonsterAI
         ClearTarget();
         BeginReturn();
         return true;
+    }
+
+    // Its target swam out into deep water, where it doesn't go (DeepWater): it waits at the shore a while rather than giving up at
+    // once and turning its back (the review of 2026-11-21: a pond was a free escape from any fight).
+    private const float ShoreWaitSeconds = 20f;
+
+    private bool WaitsAtShore()
+    {
+        if (definition == null || definition.Swims || targetComponent == null || Time.time - cutOffSince > PerceptionSettings.Current.CutOffSeconds + ShoreWaitSeconds)
+        {
+            return false;
+        }
+
+        PlayerStateMachine swimmer = targetComponent.GetComponentInParent<PlayerStateMachine>();
+        return swimmer != null && swimmer.IsSwimming;
     }
 
     private bool CanShoot

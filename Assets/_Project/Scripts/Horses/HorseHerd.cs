@@ -224,6 +224,7 @@ public sealed class HorseHerd : MonoBehaviour
         // Told of, it is on the map (the user's playtest, 2026-11-21: "When the notification about a nearby horse comes, it should
         // mark it on the map").
         horse.Sighted = true;
+        horse.ToldOf = true;
         if (!journal.HasTried(FirstHorseToldFlag))
         {
             journal.NoteTried(FirstHorseToldFlag);

@@ -31,7 +31,8 @@ public static class RaidReportCards
             return haul;
         }
 
-        if (report.Lessons.Count == 0 || haul + Gap + lessons.HeightFor(report.Lessons.Count) > room)
+        // Every lesson a card, or none: what a "more" card hid would show nowhere (the words leave the lessons out when they are cards).
+        if (report.Lessons.Count == 0 || !lessons.Fits(report.Lessons.Count) || haul + Gap + lessons.HeightFor(report.Lessons.Count) > room)
         {
             lessons.Hide();
             return haul;

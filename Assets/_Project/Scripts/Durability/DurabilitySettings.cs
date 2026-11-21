@@ -20,10 +20,11 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
     [SerializeField, Range(0f, 0.25f)] private float wearPerGlancingBlow = 0.02f;
 
     [Header("Wear in a fight")]
-    [Tooltip("Durability every worn piece of armour loses to a blow of Armour Wear Reference Damage that reaches the player (0.008 = " +
-             "0.8%), more for a harder blow (up to 3x) and less for a lighter one (down to a quarter). Broken armour stops protecting " +
-             "(the user's playtest, 2026-11-21: \"Armor should suffer damage as we get attacked\").")]
-    [SerializeField, Range(0f, 0.1f)] private float armourWearPerHit = 0.008f;
+    [Tooltip("Durability the piece of armour a blow strikes loses to a blow of Armour Wear Reference Damage (0.025 = 2.5%), more for a " +
+             "harder blow (up to 3x) and less for a lighter one (down to a quarter). One piece a blow, picked by how much of the body " +
+             "it covers (ArmourWear). Broken armour stops protecting (the user's playtest, 2026-11-21: \"Armor should suffer damage as " +
+             "we get attacked\").")]
+    [SerializeField, Range(0f, 0.2f)] private float armourWearPerHit = 0.025f;
     [Tooltip("The blow (damage before armour) that wears armour by exactly Armour Wear Per Hit.")]
     [SerializeField, Min(1f)] private float armourWearReferenceDamage = 15f;
     [Tooltip("Durability a shield loses to a blocked blow of the reference damage.")]

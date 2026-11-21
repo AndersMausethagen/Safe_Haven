@@ -838,7 +838,7 @@ public sealed class MonsterAttacks
         for (int i = 0; i < action.summonCount && summoned.Count < action.summonLimit; i++)
         {
             Vector2 offset = Random.insideUnitCircle.normalized * action.summonRadius;
-            if (!NavMesh.SamplePosition(self.position + new Vector3(offset.x, 0f, offset.y), out NavMeshHit hit, action.summonRadius, NavMesh.AllAreas))
+            if (!NavMesh.SamplePosition(self.position + new Vector3(offset.x, 0f, offset.y), out NavMeshHit hit, action.summonRadius, DeepWater.MaskFor(NavMesh.AllAreas, false)))
             {
                 continue;
             }

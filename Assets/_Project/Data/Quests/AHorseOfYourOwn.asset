@@ -57,7 +57,7 @@ MonoBehaviour:
   startsInAFight: 0
   startsWithoutWaiting: 0
   onStarted: []
-  objectivesInOrder: 1
+  objectivesInOrder: 0
   objectives:
   - type: 0
     description: 'Make a Lasso (by hand: 4 Nettle Cord, 1 Rough Hide)'

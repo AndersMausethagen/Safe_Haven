@@ -156,14 +156,16 @@ public sealed class PortalBriefingArtTests
             Assert.IsFalse(parent.Find("Lessons").gameObject.activeSelf);
             StringAssert.Contains("What you learned", RaidReportText.Describe(report, true, squeezed));
 
-            // Many skills stay one row: the last card counts the rest.
+            // More skills than one row holds: none hidden behind a "more" card, the words keep them all (the review of 2026-11-21).
             for (int i = 0; i < 11; i++)
             {
                 report.Lessons.Add(new SkillLesson(skill, 1, 1, 5, 0, false));
             }
 
-            float many = RaidReportCards.Show(report, first, second, lessons, 0f, 1000f, out _);
-            Assert.AreEqual(with, many, 0.01f, "twelve skills take the room of one row");
+            float many = RaidReportCards.Show(report, first, second, lessons, 0f, 1000f, out bool manyShown);
+            Assert.IsFalse(manyShown, "twelve skills don't fit one row of cards");
+            Assert.AreEqual(without, many, 0.01f);
+            StringAssert.Contains("What you learned", RaidReportText.Describe(report, true, manyShown));
         }
         finally
         {

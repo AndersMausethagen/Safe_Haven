@@ -1469,12 +1469,15 @@ public static class WorldBuilder
     public static string RebakeNavMesh()
     {
         NavMeshSurface[] surfaces = Object.FindObjectsByType<NavMeshSurface>();
+        int marks = 0;
         if (surfaces.Length > 0)
         {
+            // Deep water marked first, so the bake keeps creatures that don't swim out of it (DeepWater).
+            marks = DeepWaterMarks.Rebuild();
             NavMeshAssetManager.instance.StartBakingSurfaces(surfaces);
         }
 
-        return $"rebaking {surfaces.Length} NavMesh surface(s)";
+        return $"rebaking {surfaces.Length} NavMesh surface(s), {marks} deep water marks";
     }
 
     // ------------------------------------------------------------------ objects on reshaped ground

@@ -92,6 +92,34 @@ public sealed class ItemTooltipView : MonoBehaviour
     }
 
     /// <summary>What the Show tooltip says about a held stack, for windows that show it in place.</summary>
+    // The player knows every building and recipe the blueprint teaches.
+    private static bool KnowsAllIn(ItemDefinition item)
+    {
+        PlayerCrafting crafting = Player.Current != null ? Player.Current.GetComponent<PlayerCrafting>() : null;
+        if (crafting == null)
+        {
+            return false;
+        }
+
+        foreach (BuildingDefinition building in item.TeachesBuildings)
+        {
+            if (building != null && !crafting.IsKnown(building))
+            {
+                return false;
+            }
+        }
+
+        foreach (RecipeDefinition recipe in item.TeachesRecipes)
+        {
+            if (recipe != null && !crafting.IsKnown(recipe))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static string DescribeStack(ItemStack stack) => Describe(stack.Item, stack);
 
     /// <summary>What a recipe makes: the item's stats and description, or the resource's.</summary>
@@ -650,7 +678,16 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.IsBlueprint)
         {
-            builder.Append($"\n<color={UIStyle.Current.AccentHex}>Blueprint.{(held ? " Right-click to study it and learn how to make it." : " Study it to learn how to make it.")}</color>");
+            // Plans already learned (an older save knew every decoration) say so: worth only their price (the review of 2026-11-21).
+            if (KnowsAllIn(item))
+            {
+                builder.Append($"\n<color={UIStyle.Current.MutedHex}>Blueprint. You already know all it shows: worth only its price.</color>");
+            }
+            else
+            {
+                builder.Append($"\n<color={UIStyle.Current.AccentHex}>Blueprint.{(held ? " Right-click to study it and learn how to make it." : " Study it to learn how to make it.")}" +
+                               (item.IsLearnedAtHome ? " Read at home." : "") + "</color>");
+            }
         }
 
         if (item.IsBackpack)

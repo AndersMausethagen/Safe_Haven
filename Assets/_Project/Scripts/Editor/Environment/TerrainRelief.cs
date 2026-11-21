@@ -193,6 +193,8 @@ public static class TerrainRelief
         NavMeshSurface[] surfaces = Object.FindObjectsByType<NavMeshSurface>();
         if (surfaces.Length > 0)
         {
+            // Deep water marked first, so the bake keeps creatures that don't swim out of it (DeepWater).
+            DeepWaterMarks.Rebuild();
             NavMeshAssetManager.instance.StartBakingSurfaces(surfaces);
             Debug.Log($"Relief: rebaking {surfaces.Length} NavMesh surface(s). Save the scene when the bake finishes.");
         }

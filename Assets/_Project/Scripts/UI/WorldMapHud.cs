@@ -344,12 +344,13 @@ public sealed class WorldMapHud : MonoBehaviour
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
         int used = PlaceRaidMarks(width, height);
         // Home and how far it is, at the Haven's heart.
-        if (HomePortal.Current != null && RaidDirector.Current == null && Player.Current != null)
+        if (Place.InAHaven && Player.Current != null)
         {
             Vector3 home = HomePortal.Current.transform.position;
             Vector3 flat = home - Player.Current.transform.position;
             flat.y = 0f;
-            ShowMark(used++, home, UIStyle.Current.AccentBright, UIStyle.Current.Icon("House"), $"Home  {Mathf.RoundToInt(flat.magnitude / 10f) * 10} m", width, height);
+            string name = Place.InFriendsHaven ? "Their portal" : "Home";
+            ShowMark(used++, home, UIStyle.Current.AccentBright, UIStyle.Current.Icon("House"), $"{name}  {Mathf.RoundToInt(flat.magnitude / 10f) * 10} m", width, height);
         }
 
         // The player's own horses, by name.

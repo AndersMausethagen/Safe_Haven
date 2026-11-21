@@ -58,6 +58,10 @@ public sealed class KitCardRow
 
     public void Hide() => root.gameObject.SetActive(false);
 
+    /// <summary>Whether <paramref name="count"/> cards fit in <paramref name="rows"/> rows without a "more" card.</summary>
+    public bool Fits(int count, int rows = 1) =>
+        count <= Mathf.Max(1, Mathf.FloorToInt((Mathf.Max(cardWidth, root.rect.width) + Gap) / (cardWidth + Gap))) * Mathf.Max(1, rows);
+
     /// <summary>How tall it is with <paramref name="count"/> cards in at most <paramref name="rows"/> rows (0 for none).</summary>
     public float HeightFor(int count, int rows = 1)
     {

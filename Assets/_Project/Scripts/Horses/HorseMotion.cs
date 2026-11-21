@@ -949,22 +949,69 @@ public sealed class HorseMotion : MonoBehaviour
     // jump clip plays, the CG bone is held where it was as the horse left the ground: the clip only moves the body and legs, and
     // the arc (UpdateJump) is the only travel and lift.
     private const string JumpRootBone = "CG";
-    private const float JumpClipSeconds = 1.6f;
+    private const string JumpClipPrefix = "H_Jump";
+    private static readonly System.Collections.Generic.List<AnimatorClipInfo> ClipInfos = new System.Collections.Generic.List<AnimatorClipInfo>(4);
     private Transform jumpRoot;
     private Vector3 jumpRootRest;
-    private float holdJumpRootUntil = -1f;
+    private bool holdingJumpRoot;
 
+    // Held for as long as a jump clip plays or blends, read from the Animator itself (the review of 2026-11-21: a fixed time let a
+    // long clip or a late blend snap back, and a co-op friend's copy, which plays the clip without jumping in code, was never held).
     private void LateUpdate()
     {
-        if (jumpRoot == null)
+        if (jumpRoot == null || animator == null || !animator.isActiveAndEnabled)
         {
             return;
         }
 
-        if (Time.time < holdJumpRootUntil)
+        if (PlaysJumpClip())
         {
+            if (!holdingJumpRoot)
+            {
+                holdingJumpRoot = true;
+            }
+
             jumpRoot.localPosition = jumpRootRest;
         }
+        else
+        {
+            holdingJumpRoot = false;
+            // Where it stands at every other moment: what a jump starting next is held at.
+            jumpRootRest = jumpRoot.localPosition;
+        }
+    }
+
+    private bool PlaysJumpClip()
+    {
+        if (HasJumpClip(false))
+        {
+            return true;
+        }
+
+        return animator.IsInTransition(0) && HasJumpClip(true);
+    }
+
+    private bool HasJumpClip(bool next)
+    {
+        ClipInfos.Clear();
+        if (next)
+        {
+            animator.GetNextAnimatorClipInfo(0, ClipInfos);
+        }
+        else
+        {
+            animator.GetCurrentAnimatorClipInfo(0, ClipInfos);
+        }
+
+        foreach (AnimatorClipInfo info in ClipInfos)
+        {
+            if (info.clip != null && info.weight > 0.01f && info.clip.name.StartsWith(JumpClipPrefix, System.StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static Transform FindDeep(Transform root, string name)
@@ -988,12 +1035,6 @@ public sealed class HorseMotion : MonoBehaviour
 
     private void BeginJump(Vector3 landing, float over)
     {
-        if (jumpRoot != null)
-        {
-            jumpRootRest = jumpRoot.localPosition;
-            holdJumpRootUntil = Time.time + JumpClipSeconds;
-        }
-
         jumping = true;
         jumpFrom = transform.position;
         jumpTo = landing;

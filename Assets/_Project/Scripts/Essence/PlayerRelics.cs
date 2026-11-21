@@ -72,6 +72,7 @@ public sealed class PlayerRelics : MonoBehaviour
     {
         equipment.Changed -= OnGearChanged;
         TakeOff();
+        wornSignature = int.MinValue;
     }
 
     // Gear changes in bursts (loading a whole set), so effects start once, when the frame's changes are over.
@@ -82,8 +83,15 @@ public sealed class PlayerRelics : MonoBehaviour
         if (stale)
         {
             stale = false;
-            TakeOff();
-            PutOn();
+            // Only when what is worn would wear differently: armour losing durability to every blow (ArmourWear) restarted every
+            // effect, and Stoneblood's hardened skin and cooldown with them, on every hit (the review of 2026-11-21).
+            int worn = WornSignature();
+            if (worn != wornSignature)
+            {
+                wornSignature = worn;
+                TakeOff();
+                PutOn();
+            }
         }
 
         // From the end, as a tick may stop itself.
@@ -100,6 +108,25 @@ public sealed class PlayerRelics : MonoBehaviour
 
     // A power counts once however many pieces carry it (Docs/EnchantingResearch.md #1): two Hushed pieces are one Hushed.
     private readonly HashSet<EnchantmentDefinition> started = new HashSet<EnchantmentDefinition>();
+
+    private int wornSignature = int.MinValue;
+
+    // The enchantments that would be put on: each unbroken piece's enchantment, by slot.
+    private int WornSignature()
+    {
+        unchecked
+        {
+            int hash = 17;
+            for (int i = 0; i < GearSlots.Count; i++)
+            {
+                ItemStack stack = equipment.Gear.Get((GearSlot)i);
+                EnchantmentDefinition enchantment = stack.IsEmpty || stack.IsBroken ? null : stack.Enchantment;
+                hash = hash * 31 + (enchantment != null ? enchantment.GetHashCode() : 0);
+            }
+
+            return hash;
+        }
+    }
 
     private void PutOn()
     {

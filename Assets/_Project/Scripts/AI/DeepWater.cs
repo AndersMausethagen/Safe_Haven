@@ -27,7 +27,7 @@ public static class DeepWater
         return swims || area < 0 ? mask : mask & ~(1 << area);
     }
 
-    /// <summary>Adds a modifier box for each run of deep water inside <paramref name="within"/> to <paramref name="sources"/>; returns how many.</summary>
+    /// <summary>Adds a modifier box for each stretch of deep water inside <paramref name="within"/> to <paramref name="sources"/>; returns how many.</summary>
     public static int AddSources(List<NavMeshBuildSource> sources, Bounds within)
     {
         int area = Area;
@@ -36,7 +36,29 @@ public static class DeepWater
             return 0;
         }
 
-        int added = 0;
+        List<Bounds> boxes = Boxes(within);
+        foreach (Bounds box in boxes)
+        {
+            sources.Add(new NavMeshBuildSource
+            {
+                shape = NavMeshBuildSourceShape.ModifierBox,
+                transform = Matrix4x4.Translate(box.center),
+                size = box.size,
+                area = area,
+            });
+        }
+
+        return boxes.Count;
+    }
+
+    /// <summary>
+    /// The deep water inside <paramref name="within"/> as boxes from under its bed to just over its surface: runs of deep cells along
+    /// each row, and rows under rows with the same run merged into one (a pond is a few boxes, not one a row). The Haven's baked navmesh
+    /// gets them as modifier volumes (Safe Haven › Navigation › Mark Deep Water), a raid's built one as sources.
+    /// </summary>
+    public static List<Bounds> Boxes(Bounds within)
+    {
+        var boxes = new List<Bounds>();
         foreach (WaterSurface water in WaterSurface.Surfaces)
         {
             if (water == null || water.IsFrozen || !water.isActiveAndEnabled || !water.TryGetComponent(out Renderer shown))
@@ -45,28 +67,30 @@ public static class DeepWater
             }
 
             Bounds bounds = shown.bounds;
-            if (!bounds.Intersects(within))
+            if (bounds.Intersects(within))
             {
-                continue;
+                AddRuns(boxes, water, bounds, within);
             }
-
-            added += AddRuns(sources, water, bounds, within, area);
         }
 
-        return added;
+        return boxes;
     }
 
-    // Row by row across the water's bounds: each unbroken run of deep cells becomes one box, from under the deepest bed in it to just
-    // over the surface.
-    private static int AddRuns(List<NavMeshBuildSource> sources, WaterSurface water, Bounds bounds, Bounds within, int area)
+    // Row by row across the water's bounds: each unbroken run of deep cells is a box, merged with the box above it when that one
+    // runs over the same cells.
+    private static void AddRuns(List<Bounds> boxes, WaterSurface water, Bounds bounds, Bounds within)
     {
         float minX = Mathf.Max(bounds.min.x, within.min.x), maxX = Mathf.Min(bounds.max.x, within.max.x);
         float minZ = Mathf.Max(bounds.min.z, within.min.z), maxZ = Mathf.Min(bounds.max.z, within.max.z);
         float probeY = bounds.max.y;
         float reach = bounds.size.y + 1f;
-        int added = 0;
-        for (float z = minZ + Cell * 0.5f; z < maxZ; z += Cell)
+        // The open boxes of the row before (by their run's ends), carried on while the next row has the same run.
+        var open = new Dictionary<(int, int), int>();
+        var next = new Dictionary<(int, int), int>();
+        int row = 0;
+        for (float z = minZ + Cell * 0.5f; z < maxZ; z += Cell, row++)
         {
+            next.Clear();
             float runStart = 0f, low = float.MaxValue, high = float.MinValue;
             bool inRun = false;
             for (float x = minX + Cell * 0.5f; ; x += Cell)
@@ -96,15 +120,21 @@ public static class DeepWater
                 {
                     inRun = false;
                     float runEnd = x - Cell * 0.5f;
-                    float bottom = low - 1f, top = high + Above;
-                    sources.Add(new NavMeshBuildSource
+                    var key = (Mathf.RoundToInt(runStart / Cell), Mathf.RoundToInt(runEnd / Cell));
+                    var made = new Bounds(new Vector3((runStart + runEnd) * 0.5f, 0f, z), Vector3.zero);
+                    made.SetMinMax(new Vector3(runStart, low - 1f, z - Cell * 0.5f), new Vector3(runEnd, high + Above, z + Cell * 0.5f));
+                    if (open.TryGetValue(key, out int index))
                     {
-                        shape = NavMeshBuildSourceShape.ModifierBox,
-                        transform = Matrix4x4.Translate(new Vector3((runStart + runEnd) * 0.5f, (bottom + top) * 0.5f, z)),
-                        size = new Vector3(runEnd - runStart, top - bottom, Cell),
-                        area = area,
-                    });
-                    added++;
+                        Bounds grown = boxes[index];
+                        grown.Encapsulate(made);
+                        boxes[index] = grown;
+                        next[key] = index;
+                    }
+                    else
+                    {
+                        boxes.Add(made);
+                        next[key] = boxes.Count - 1;
+                    }
                 }
 
                 if (x >= maxX)
@@ -112,9 +142,9 @@ public static class DeepWater
                     break;
                 }
             }
-        }
 
-        return added;
+            (open, next) = (next, open);
+        }
     }
 
     // The terrain under a point (raids and the Haven lie on one), or -infinity off every terrain.

@@ -70,7 +70,13 @@ public sealed partial class MonsterAI
         }
     }
 
-    // Turns it on the spot toward a position (a loud sound beside it), and keeps its idle gaze there a while.
+    // Turns it quickly toward a position (a loud sound beside it), and keeps its idle gaze there a while. Fast, not at once (the
+    // review of 2026-11-21): a half turn takes about a third of a second, a moment for the player to see it coming.
+    private const float QuickTurnSpeed = 540f;
+    private const float QuickTurnSeconds = 0.5f;
+    private Vector3 quickTurnHeading;
+    private float quickTurnUntil = -1f;
+
     private void FaceNow(Vector3 position)
     {
         Vector3 toward = position - transform.position;
@@ -80,9 +86,26 @@ public sealed partial class MonsterAI
             return;
         }
 
-        transform.rotation = Quaternion.LookRotation(toward.normalized);
+        quickTurnHeading = toward.normalized;
+        quickTurnUntil = Time.time + QuickTurnSeconds;
         glanceHeading = toward.normalized;
         nextGlanceAt = Time.time + FaintSoundLookSeconds;
+    }
+
+    // Each frame of a quick turn: toward the sound until faced, or its moment is over, or something else takes over (a fight).
+    private void UpdateQuickTurn()
+    {
+        if (Time.time >= quickTurnUntil || CanTarget(target))
+        {
+            return;
+        }
+
+        Quaternion facing = Quaternion.LookRotation(quickTurnHeading);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, QuickTurnSpeed * Time.deltaTime);
+        if (Quaternion.Angle(transform.rotation, facing) < 2f)
+        {
+            quickTurnUntil = -1f;
+        }
     }
 
     // How long a sound too faint to make it suspicious holds its gaze.
