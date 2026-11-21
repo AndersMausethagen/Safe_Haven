@@ -200,6 +200,7 @@ public sealed class HorseMotion : MonoBehaviour
 
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
+        jumpRoot = animator != null ? FindDeep(animator.transform, JumpRootBone) : null;
         home = transform.position;
         lastYaw = transform.eulerAngles.y;
         lastPlace = transform.position;
@@ -942,8 +943,57 @@ public sealed class HorseMotion : MonoBehaviour
         return false;
     }
 
+    // The jump clips (H_Jump_*) carry their forward travel on the rig's CG bone (3.6-9.9 m/s, not extracted as root motion),
+    // while the jump itself is moved by code along its arc: the saddle ran up to 10 m ahead of the horse and snapped back as the
+    // clip ended, the rider with it (the user's playtest, 2026-11-21: "It moves them back again quickly after a jump"). While a
+    // jump clip plays, the CG bone is held where it was as the horse left the ground: the clip only moves the body and legs, and
+    // the arc (UpdateJump) is the only travel and lift.
+    private const string JumpRootBone = "CG";
+    private const float JumpClipSeconds = 1.6f;
+    private Transform jumpRoot;
+    private Vector3 jumpRootRest;
+    private float holdJumpRootUntil = -1f;
+
+    private void LateUpdate()
+    {
+        if (jumpRoot == null)
+        {
+            return;
+        }
+
+        if (Time.time < holdJumpRootUntil)
+        {
+            jumpRoot.localPosition = jumpRootRest;
+        }
+    }
+
+    private static Transform FindDeep(Transform root, string name)
+    {
+        if (root.name == name)
+        {
+            return root;
+        }
+
+        foreach (Transform child in root)
+        {
+            Transform found = FindDeep(child, name);
+            if (found != null)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     private void BeginJump(Vector3 landing, float over)
     {
+        if (jumpRoot != null)
+        {
+            jumpRootRest = jumpRoot.localPosition;
+            holdJumpRootUntil = Time.time + JumpClipSeconds;
+        }
+
         jumping = true;
         jumpFrom = transform.position;
         jumpTo = landing;
