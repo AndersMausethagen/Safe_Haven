@@ -38,6 +38,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
     /// <summary>Metres from a cell to the water's edge within which its shore is wet (RaidMap's water level lookup).</summary>
     public const float ShoreReach = 5f;
     private static readonly int BounceId = Shader.PropertyToID("_GroundLightBounce");
+    private static readonly int CanopySunId = Shader.PropertyToID("_GroundLightCanopySun");
 
     /// <summary>Metres round a felled or regrown tree drawn again: its crown.</summary>
     private const float FelledReach = 12f;
@@ -534,6 +535,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
 
         field = made;
         Shader.SetGlobalTexture(FieldId, field);
+        Shader.SetGlobalFloat(CanopySunId, living ? settings.LivingCanopySunShade : settings.RaidCanopySunShade);
         Shader.SetGlobalVector(RectId, new Vector4(fieldArea.xMin, fieldArea.yMin, 1f / fieldArea.width, result.Lift));
         Shader.SetGlobalVector(HeightsId, new Vector4(result.LowestHeight, result.HighestHeight - result.LowestHeight, 1f, GroundLightField.WaterReach));
         BindHeightmap();
@@ -1186,6 +1188,7 @@ public sealed class GroundLightMap : MonoBehaviour, ISceneSetup
         Shader.SetGlobalVector(GroundScaleId, Vector4.zero);
         Shader.SetGlobalTexture(GroundHeightmapId, Texture2D.blackTexture);
         Shader.SetGlobalVector(BounceId, Vector4.zero);
+        Shader.SetGlobalFloat(CanopySunId, 0f);
         if (placeholder != null)
         {
             Shader.SetGlobalTexture(FieldId, placeholder);

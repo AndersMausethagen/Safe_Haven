@@ -228,7 +228,17 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         at.z = Mathf.Round(at.z / texel) * texel;
         above.transform.SetPositionAndRotation(new Vector3(at.x, at.y + 400f, at.z), Down);
         KeepTerrainResources();
-        above.Render();
+        // Smaller trees stay in the map (Sky Occlusion Lod Bias): their last level's cut culled them from straight above.
+        float lodBias = QualitySettings.lodBias;
+        try
+        {
+            QualitySettings.lodBias = lodBias * settings.SkyOcclusionLodBias;
+            above.Render();
+        }
+        finally
+        {
+            QualitySettings.lodBias = lodBias;
+        }
         Shader.SetGlobalTexture(MapId, map);
         Shader.SetGlobalVector(RectId, new Vector4(at.x - area * 0.5f, at.z - area * 0.5f, 1f / area, strength));
     }
@@ -269,7 +279,7 @@ public sealed class SkyOcclusionMap : MonoBehaviour
         hidden.Clear();
         try
         {
-            QualitySettings.lodBias = lodBias * halfHeight / Mathf.Max(1f, settings.SkyOcclusionArea * 0.5f);
+            QualitySettings.lodBias = lodBias * halfHeight / Mathf.Max(1f, settings.SkyOcclusionArea * 0.5f) * settings.SkyOcclusionLodBias;
             for (int i = 0; i < terrains.Length; i++)
             {
                 treeDistances[i] = terrains[i].treeDistance;

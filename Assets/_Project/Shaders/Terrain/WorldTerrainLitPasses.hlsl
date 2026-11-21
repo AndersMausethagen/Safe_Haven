@@ -900,6 +900,8 @@ void SplatmapFragment(
     WorldWetness(IN, inputData, albedo, smoothness, metallic, occlusion, skySheen);
     WorldFrost(IN, albedo, smoothness);
     WorldSnow(IN, inputData, albedo, smoothness, metallic, occlusion);
+    // The canopy's shade on the sunlit ground too (GroundLight.hlsl, Canopy Sun Shade; 1 without a field).
+    albedo *= GroundLightCanopyShade(IN.positionWS);
 
 #if defined(_DBUFFER)
     half3 specular = half3(0.0h, 0.0h, 0.0h);

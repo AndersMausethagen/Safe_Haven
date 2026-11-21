@@ -14,6 +14,10 @@ TEXTURE2D_ARRAY(_GroundLightField);
 float4 _GroundLightRect;   // x min, z min, 1 / size, the dim hour's lift (above 0 while a field is bound; 1 by day)
 float4 _GroundLightBounce; // rgb: the raid's bounce tint × strength, times the sun's (or moon's) light as it is now; w its sunflecks
 float4 _GroundLightHeights; // slice 1's g and b: x the lowest height, y the range (metres), z 1 while a field with heights is bound, w the water's reach
+// How much of the canopy's shade also falls on the ground's sunlit colour (0 none, 1 all): the soft shade under trees a top-down
+// view reads as "under the trees", whatever the sun's angle (the user, 2026-11-21: "no shadows under the trees" in the Haven).
+// RenderingSettings › Canopy Sun Shade, per scene kind; 0 without a field.
+float _GroundLightCanopySun;
 
 // Metres above the ground over which the land's shade fades out of the air: mist high over a ravine sees the sky its floor doesn't.
 #define GROUND_LIGHT_AIR_FADE 20.0
@@ -49,6 +53,19 @@ half GroundLightOnGround(float3 positionWS)
     }
 
     return light;
+}
+
+// What the ground's colour is multiplied by under the canopy (1 in the open, and everywhere without a field or with Canopy Sun Shade
+// at 0). It darkens the albedo, so the sun's light there dims with the sky's, as it does under real leaves.
+half GroundLightCanopyShade(float3 positionWS)
+{
+    half shade = 1.0;
+    UNITY_BRANCH if (_GroundLightRect.w > 0.0 && _GroundLightCanopySun > 0.0)
+    {
+        shade = lerp(1.0, GroundLightAt(positionWS, 1).r, _GroundLightCanopySun);
+    }
+
+    return shade;
 }
 
 // Puts a factor on a surface's indirect light. URP's lit shaders take the lower of the surface's occlusion and SSAO

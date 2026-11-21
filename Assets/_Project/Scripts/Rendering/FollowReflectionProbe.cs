@@ -65,9 +65,12 @@ public sealed class FollowReflectionProbe : MonoBehaviour
 
         rendering = -1;
         float hours = Mathf.Abs(Mathf.DeltaAngle(hour * 15f, renderedHour * 15f)) / 15f;
+        // With the sun low (dawn, dusk) the sky's colour changes fastest: render on a third of the usual turn of the hours.
+        Light sun = RenderSettings.sun;
+        float step = settings.ReflectionHours * (sun != null && Mathf.Abs(sun.transform.forward.y) < 0.3f ? 0.35f : 1f);
         bool moved = (at - renderedAt).sqrMagnitude > settings.ReflectionMove * settings.ReflectionMove;
         bool skyMoved = Time.unscaledTime >= renderedTime + settings.ReflectionSkySeconds;
-        if (Time.unscaledTime < nextRender || (!moved && hours < settings.ReflectionHours && !skyMoved))
+        if (Time.unscaledTime < nextRender || (!moved && hours < step && !skyMoved))
         {
             return;
         }

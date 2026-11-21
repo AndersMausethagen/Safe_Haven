@@ -58,6 +58,11 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [Tooltip("Metres the map covers, centred on the player.")]
     [SerializeField, Min(20f)] private float skyOcclusionArea = 160f;
     [SerializeField] private int skyOcclusionResolution = 512;
+    [Tooltip("Level of detail for the sky map's camera, times the game's: from straight above a tree is a few texels wide, and its " +
+             "last level's cut (a quarter of the screen for most trees) culled every smaller tree out of the map, so nothing shaded " +
+             "the ground under them (measured in the Haven, 2026-11-21: an 8 m sugar maple read as open sky). A coarse level is " +
+             "enough for heights.")]
+    [SerializeField, Range(1f, 16f)] private float skyOcclusionLodBias = 6f;
     [Tooltip("Seconds at least between redraws (each costs about 3 ms).")]
     [SerializeField, Min(0.2f)] private float skyOcclusionInterval = 1.5f;
     [Tooltip("Redrawn once the player is this many metres from where it was last drawn (it covers Area round them)...")]
@@ -78,6 +83,11 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     [SerializeField, Range(0.1f, 1f)] private float groundCoverTexel = 0.25f;
     [Tooltip("Metres a cell of the field: the land's shade and the thrown-back light (1024 cells a side at most).")]
     [SerializeField, Range(0.2f, 2f)] private float groundLightCell = 0.4f;
+    [Tooltip("How much of the canopy's shade also darkens the sunlit ground under trees, where the hours turn (the Haven, the prologue): " +
+             "0 none, 1 as dark as the canopy's indirect shade. The user, 2026-11-21: the Haven read flat with no shade under its trees.")]
+    [SerializeField, Range(0f, 1f)] private float livingCanopySunShade = 0.5f;
+    [Tooltip("The same in a raid, whose forests are dark already.")]
+    [SerializeField, Range(0f, 1f)] private float raidCanopySunShade = 0f;
     [Tooltip("Directions the land's shade looks along for higher ground.")]
     [SerializeField, Range(4, 24)] private int reliefDirections = 12;
     [Tooltip("From how near to how far (metres) higher ground shades a spot. Nearer than this is SSAO's.")]
@@ -194,6 +204,7 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public float SkyOcclusionInRaids => skyOcclusionInRaids;
     public float SkyOcclusionArea => skyOcclusionArea;
     public int SkyOcclusionResolution => skyOcclusionResolution;
+    public float SkyOcclusionLodBias => skyOcclusionLodBias;
     public float SkyOcclusionInterval => skyOcclusionInterval;
     public float SkyOcclusionMove => skyOcclusionMove;
     public float SkyOcclusionRefresh => skyOcclusionRefresh;
@@ -203,6 +214,8 @@ public sealed class RenderingSettings : GameSettings<RenderingSettings>
     public bool GroundLight => groundLight;
     public float GroundCoverTexel => groundCoverTexel;
     public float GroundLightCell => groundLightCell;
+    public float LivingCanopySunShade => livingCanopySunShade;
+    public float RaidCanopySunShade => raidCanopySunShade;
     public int ReliefDirections => reliefDirections;
     public Vector2 ReliefReach => reliefReach;
     public float BounceSpread => bounceSpread;

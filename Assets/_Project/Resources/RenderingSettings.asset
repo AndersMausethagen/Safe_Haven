@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RenderingSettings
   m_EditorClassIdentifier: SafeHaven::RenderingSettings
   reflections: 1
-  reflectionResolution: 128
+  reflectionResolution: 256
   reflectionHeight: 4
   reflectionMove: 8
   reflectionHours: 0.25
