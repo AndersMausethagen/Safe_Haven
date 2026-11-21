@@ -79,6 +79,8 @@ public sealed class HavenEntry
     public string Line { get; set; }
     public string Badge { get; set; }
     public Sprite Icon { get; set; }
+    /// <summary>A locked entry's picture drawn as a dark shape, not its colours (the journal's unknown modules).</summary>
+    public bool Silhouette { get; set; }
     public HavenEntryState State { get; set; }
     public string Status { get; set; }
     public string Description { get; set; }

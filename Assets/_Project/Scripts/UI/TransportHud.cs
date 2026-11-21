@@ -95,7 +95,7 @@ public sealed class TransportHud : MonoBehaviour
         Transport cart = player != null && inRaid ? player.RaidCart(out away) : null;
         Transport shown = used != null ? used : cart;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        group.alpha = shown != null && !windows && !GamePause.IsPaused ? 1f : 0f;
+        group.alpha = shown != null && !windows && !GamePause.HidesHud ? 1f : 0f;
         if (shown == null)
         {
             return;

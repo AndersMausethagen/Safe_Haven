@@ -82,7 +82,7 @@ public sealed class PartyHud : MonoBehaviour
         }
 
         // Hidden in menus and scenes without a player (loading, results).
-        group.alpha = friends.Count > 0 && Player.Current != null && !GamePause.IsPaused ? 1f : 0f;
+        group.alpha = friends.Count > 0 && Player.Current != null && !GamePause.HidesHud ? 1f : 0f;
         while (rows.Count < friends.Count)
         {
             rows.Add(MakeRow(rows.Count));

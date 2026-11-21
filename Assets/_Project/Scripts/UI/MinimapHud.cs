@@ -234,7 +234,7 @@ public sealed class MinimapHud : MonoBehaviour
     {
         Player player = Player.Current;
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.IsPaused;
+        bool shown = painted && player != null && TargetReach > 0f && !windows && !WorldMapHud.IsOpen && !GamePause.HidesHud;
         group.alpha = shown ? 1f : 0f;
         // A quarter smaller on a Contextual or Minimal HUD: a third of the screen's height at 720p (the HUD review of 2026-11-18).
         disc.localScale = Vector3.one * HudRules.MinimapScale;

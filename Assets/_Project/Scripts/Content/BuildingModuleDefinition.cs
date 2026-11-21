@@ -50,6 +50,8 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     [SerializeField, Min(0.5f)] private float work = 5f;
     [Tooltip("Known from the start. Otherwise a quest teaches it as it starts (QuestDefinition › Unlocks Modules).")]
     [SerializeField] private bool knownFromStart;
+    [Tooltip("A look prefab shown beside the building's door while this is fitted (ModuleDressing); empty for none.")]
+    [SerializeField] private GameObject dressing;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -63,6 +65,7 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     public IReadOnlyList<ResourceAmount> Essence => essence;
     public float Work => Mathf.Max(0.5f, work);
     public bool KnownFromStart => knownFromStart;
+    public GameObject Dressing => dressing;
 
     /// <summary>True when it may be fitted to this kind of building (tier aside).</summary>
     public bool Fits(BuildingDefinition building)
@@ -99,6 +102,7 @@ public sealed class BuildingModuleDefinition : ScriptableObject
         if (bonus.fightShare > 0f) parts.Add($"shots {bonus.fightShare * 100f:0}% harder");
         if (bonus.turnBackShare > 0f) parts.Add($"{bonus.turnBackShare * 100f:0}% of each blow comes back on the striker");
         if (bonus.fineChance > 0f) parts.Add($"gear Fine {bonus.fineChance * 100f:0}% more often");
+        if (bonus.mendCostShare > 0f) parts.Add($"mending it costs {bonus.mendCostShare * 100f:0}% more");
         // What it opens at the station: a thriftier way to make something, or something new (RecipeDefinition › Needs Module).
         ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         foreach (RecipeDefinition recipe in content != null ? content.Recipes : (IReadOnlyList<RecipeDefinition>)System.Array.Empty<RecipeDefinition>())
@@ -108,8 +112,10 @@ public sealed class BuildingModuleDefinition : ScriptableObject
                 continue;
             }
 
+            float slower = recipe.Replaces != null && recipe.Replaces.CraftSeconds > 0f ? recipe.CraftSeconds / recipe.Replaces.CraftSeconds - 1f : 0f;
             parts.Add(recipe.Replaces != null
                 ? $"{recipe.OutputAmount} {recipe.DisplayName} from {AmountText.Describe(recipe.ItemCost)} (was {AmountText.Describe(recipe.Replaces.ItemCost)})"
+                  + (slower > 0.01f ? $", {slower * 100f:0}% slower" : "")
                 : $"makes {recipe.DisplayName} ×{recipe.OutputAmount} from {AmountText.Describe(recipe.ItemCost)}");
         }
 

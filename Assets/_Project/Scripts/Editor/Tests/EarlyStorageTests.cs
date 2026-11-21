@@ -100,6 +100,51 @@ public sealed class EarlyStorageTests
         Assert.IsFalse(GameSession.Stash.HasSomethingToStore(bag, null), "nothing left the prompt would offer");
     }
 
+    // The systems review, 2026-11-21: a chest set to be passed over keeps what it has; the Store key fills the others.
+    [Test]
+    public void AChestSetToBePassedOver_TakesNothingFromTheStoreKey()
+    {
+        small = Chest("Small", 12);
+        big = Chest("Shed", 0);
+        StashChest kept = small.GetComponent<StashChest>(), shed = big.GetComponent<StashChest>();
+        var berries = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Berries.asset");
+        var sticks = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/Sticks.asset");
+        GameSession.Stash.Items.AddWithin(berries, 2, 0f, kept.FirstSlot, StashStorage.ChestSlots);
+        kept.SkipsStore = true;
+        Assert.IsTrue(StashChest.BlockSkipsStore(kept.Block));
+        Assert.IsFalse(StashChest.BlockSkipsStore(shed.Block));
+        var bag = new ItemContainer(4, 1);
+        bag.Add(berries, 5);
+        bag.Add(sticks, 3);
+
+        int moved = GameSession.Stash.StackOnStored(bag, null, null, StashChest.BlockSkipsStore)
+                    + GameSession.Stash.StoreMaterials(bag, null, null, -1, StashChest.BlockSkipsStore);
+        Assert.AreEqual(8, moved);
+        Assert.AreEqual(2, Held(kept, berries), "the passed-over chest keeps only what it had");
+        Assert.AreEqual(0, Held(kept, sticks));
+        Assert.AreEqual(5, Held(shed, berries), "its berries went to the other chest instead");
+        Assert.AreEqual(3, Held(shed, sticks));
+
+        // Without the skip, the same chest takes them (the canary: the rule above is the skip's, not the chests' order).
+        bag.Add(berries, 4);
+        GameSession.Stash.StackOnStored(bag, null);
+        Assert.Greater(Held(kept, berries), 2, "unskipped, the chest that holds berries takes more");
+    }
+
+    [Test]
+    public void AChestSetToBePassedOver_IsSaved()
+    {
+        small = Chest("Small", 12);
+        StashChest chest = small.GetComponent<StashChest>();
+        chest.SkipsStore = true;
+        string saved = chest.CaptureState();
+        chest.SkipsStore = false;
+        chest.RestoreState(saved);
+        Assert.IsTrue(chest.SkipsStore);
+        chest.RestoreState("{\"block\":0}");
+        Assert.IsFalse(chest.SkipsStore, "a save from before the switch fills it as before");
+    }
+
     // Taking a building down (BuildingDemolition) never loses what a chest holds: as in Palworld, empty it first.
     [Test]
     public void AChestWithThingsInIt_IsNotTakenDown()

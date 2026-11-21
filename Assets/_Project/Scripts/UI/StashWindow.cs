@@ -212,6 +212,7 @@ public sealed partial class StashWindow : MonoBehaviour
         bag.Show(items.Container);
         ShowChest();
         BuildKit();
+        ShowSkip();
         bag.Show(items.Container);
 
         ResourceInventory resources = items.GetComponent<ResourceInventory>();

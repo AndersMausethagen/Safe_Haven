@@ -36,6 +36,9 @@ public sealed class ItemInventory : MonoBehaviour
     /// <summary>The favourites on the quickbar (hold F). Which items, not the stacks: those stay in the bag.</summary>
     public QuickItems Quick { get; } = new QuickItems();
 
+    /// <summary>What the player marked to keep in the bag: the Store key leaves it (F over it in the bag). Saved with the player.</summary>
+    public KeptItems Kept { get; } = new KeptItems();
+
     /// <summary>Something was used from the bag or the pocket (it worked): the item and where it was. Screens show it.</summary>
     public event Action<ItemDefinition, ItemContainer, int> ItemUsed;
 

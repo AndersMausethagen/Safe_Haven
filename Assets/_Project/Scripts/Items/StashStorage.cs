@@ -59,7 +59,13 @@ public sealed class StashStorage
     public int StoreMaterials(ItemContainer bag, GameObject by = null, int block = -1) => StoreMaterials(bag, null, by, block);
 
     /// <summary>The same, leaving what <paramref name="keep"/> says to keep (what is on the skill bar or the quickbar).</summary>
-    public int StoreMaterials(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by, int block = -1)
+    public int StoreMaterials(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by, int block = -1) => StoreMaterials(bag, keep, by, block, null);
+
+    /// <summary>
+    /// The same, and with no block named, passing over the blocks <paramref name="skip"/> names (a chest whose owner said the Store key
+    /// is to leave it alone: StashChest.SkipsStore, the systems review 2026-11-21).
+    /// </summary>
+    public int StoreMaterials(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by, int block, System.Func<int, bool> skip)
     {
         int moved = 0;
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
@@ -67,29 +73,70 @@ public sealed class StashStorage
             ItemStack stack = bag.GetSlot(i);
             if (!stack.IsEmpty && stack.Item.Category == ItemCategory.Material && (keep == null || !keep(stack)))
             {
-                moved += Store(bag, i, by, block);
+                moved += block < 0 && skip != null ? StoreOutside(bag, i, by, skip) : Store(bag, i, by, block);
             }
         }
 
         return moved;
     }
 
+    // Into every block the skip leaves, in order, as far as it fits.
+    private int StoreOutside(ItemContainer bag, int slot, GameObject by, System.Func<int, bool> skip)
+    {
+        int moved = 0;
+        for (int block = 0; block < MaxChests && !bag.GetSlot(slot).IsEmpty; block++)
+        {
+            if (!skip(block))
+            {
+                moved += Store(bag, slot, by, block);
+            }
+        }
+
+        return moved;
+    }
+
+    // Room for the item in the blocks the skip leaves (the whole stash's when there is no skip).
+    private int SpaceFor(ItemDefinition item, System.Func<int, bool> skip)
+    {
+        if (skip == null)
+        {
+            return Items.SpaceFor(item);
+        }
+
+        int space = 0;
+        for (int block = 0; block < MaxChests; block++)
+        {
+            if (skip(block))
+            {
+                continue;
+            }
+
+            for (int i = BlockStart(block); i < BlockStart(block) + ChestSlots; i++)
+            {
+                ItemStack held = Items.GetSlot(i);
+                space += !Items.IsUnlocked(i) ? 0 : held.IsEmpty ? item.MaximumStack : held.Item == item ? held.SpaceLeft : 0;
+            }
+        }
+
+        return Mathf.Min(space, Items.SpaceFor(item));
+    }
+
     /// <summary>
     /// Whether <see cref="StackOnStored"/> or <see cref="StoreMaterials(ItemContainer, System.Func{ItemStack, bool}, GameObject, int)"/>
     /// would move anything from <paramref name="bag"/>: a material, or a stack an open chest already holds, with room for it.
     /// </summary>
-    public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep) => CountToStore(bag, keep, true) > 0;
+    public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep, System.Func<int, bool> skip = null) => CountToStore(bag, keep, true, skip) > 0;
 
     /// <summary>How many things in <paramref name="bag"/> would go to the chests (as <see cref="HasSomethingToStore"/> asks), for the prompt.</summary>
-    public int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep) => CountToStore(bag, keep, false);
+    public int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep, System.Func<int, bool> skip = null) => CountToStore(bag, keep, false, skip);
 
-    private int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep, bool firstOnly)
+    private int CountToStore(ItemContainer bag, System.Func<ItemStack, bool> keep, bool firstOnly, System.Func<int, bool> skip)
     {
         int count = 0;
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
-            if (stack.IsEmpty || !stack.Item.Stackable || (keep != null && keep(stack)) || Items.SpaceFor(stack.Item) <= 0)
+            if (stack.IsEmpty || !stack.Item.Stackable || (keep != null && keep(stack)) || SpaceFor(stack.Item, skip) <= 0)
             {
                 continue;
             }
@@ -97,7 +144,7 @@ public sealed class StashStorage
             bool goes = stack.Item.Category == ItemCategory.Material;
             for (int block = 0; !goes && block < MaxChests; block++)
             {
-                goes = BlockHolds(block, stack.Item);
+                goes = (skip == null || !skip(block)) && BlockHolds(block, stack.Item);
             }
 
             if (goes)
@@ -118,7 +165,7 @@ public sealed class StashStorage
     /// stacks first and then into the chest's empty slots. Gear, food or drink on the skill bar or quickbar, and what is
     /// worn stay with the player (<paramref name="keep"/> says what to leave). Returns how many items moved.
     /// </summary>
-    public int StackOnStored(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by = null)
+    public int StackOnStored(ItemContainer bag, System.Func<ItemStack, bool> keep, GameObject by = null, System.Func<int, bool> skip = null)
     {
         int moved = 0;
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
@@ -132,7 +179,7 @@ public sealed class StashStorage
             // Every chest that holds some, in turn, until the stack is gone or they are all full.
             for (int block = 0; block < MaxChests && !bag.GetSlot(i).IsEmpty; block++)
             {
-                if (BlockHolds(block, stack.Item))
+                if ((skip == null || !skip(block)) && BlockHolds(block, stack.Item))
                 {
                     moved += Store(bag, i, by, block);
                 }

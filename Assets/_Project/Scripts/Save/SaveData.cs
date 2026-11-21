@@ -403,6 +403,8 @@ public sealed class PlayerSaveData
     public List<SlotSaveData> gear = new List<SlotSaveData>();
     /// <summary>The quickbar's items (hold F), by item id, in order. Missing in older saves.</summary>
     public List<string> quickItems;
+    /// <summary>What is marked to keep in the bag (the Store key leaves it), by item id. Missing in older saves.</summary>
+    public List<string> keptItems;
     /// <summary>The items on the skill bar, by slot: an item id, or "" where a skill or nothing is. Missing in older saves.</summary>
     public List<string> skillBarItems;
     /// <summary>The skills the player knows (a boss's reward among them), by id. Missing in older saves, which keep the starting ones.</summary>

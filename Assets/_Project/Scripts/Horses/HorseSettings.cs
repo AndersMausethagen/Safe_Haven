@@ -55,6 +55,8 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField, Min(0f)] private float bondLostPerIdleDay = 2f;
     [Tooltip("Bond it starts with once tamed.")]
     [SerializeField, Range(0f, 100f)] private float bondWhenTamed = 10f;
+    [Tooltip("Bond on top of that for each barley it ate from the rider's hand on its breaking ride: the first feeding is the first bond.")]
+    [SerializeField, Range(0f, 10f)] private float bondPerBreakingFeed = 2f;
     [Tooltip("At full bond: this much more stamina, and runs this much shorter when hurt.")]
     [SerializeField, Range(0f, 1f)] private float staminaAtFullBond = 0.2f;
     [SerializeField, Range(0f, 1f)] private float calmerAtFullBond = 0.7f;
@@ -247,6 +249,7 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     public float BondPerKilometre => bondPerKilometre;
     public float BondLostPerIdleDay => bondLostPerIdleDay;
     public float BondWhenTamed => bondWhenTamed;
+    public float BondPerBreakingFeed => bondPerBreakingFeed;
     public float StaminaAtFullBond => staminaAtFullBond;
     public float CalmerAtFullBond => calmerAtFullBond;
     public float ThrowsBelowBond => throwsBelowBond;

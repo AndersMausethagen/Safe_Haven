@@ -26,8 +26,13 @@ public static class WallUpgrades
             bool known = crafting != null && crafting.IsKnown(gate);
             bool affordable = pool.CanAfford(gate.ConstructionCost, gate.ConstructionItems, out string missing);
             string cost = AmountText.Describe(gate.ConstructionItems);
+            // What the piece gives back, named, so the swap's price is plain before it is made (the systems review, 2026-11-21).
+            var backItems = new System.Collections.Generic.List<ItemAmount>();
+            var backEssence = new System.Collections.Generic.List<ResourceAmount>();
+            BuildingDemolition.Refund(piece, backEssence, backItems);
+            string back = AmountText.Describe(backItems);
             string detail = !known ? $"You don't know the {gate.DisplayName} yet"
-                : affordable ? $"{cost}; the piece's materials come back" : $"{cost}   <color={UIStyle.Current.DangerHex}>{missing}</color>";
+                : affordable ? $"{cost}; back: {(back.Length > 0 ? back : "nothing")}" : $"{cost}   <color={UIStyle.Current.DangerHex}>{missing}</color>";
             page.Add(new MenuAction($"Make it a {gate.DisplayName}", detail, known && affordable && WhyNot(piece) == null,
                 () => MakeGate(piece, user), closesMenu: true) { Icon = "Fence" });
         }

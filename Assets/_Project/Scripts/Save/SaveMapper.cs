@@ -95,6 +95,18 @@ public static class SaveMapper
                 }
             }
 
+            if (player.KeptItems != null)
+            {
+                data.player.keptItems = new List<string>();
+                foreach (ItemDefinition item in player.KeptItems)
+                {
+                    if (item != null)
+                    {
+                        data.player.keptItems.Add(item.Id);
+                    }
+                }
+            }
+
             if (player.SkillBarItems != null)
             {
                 data.player.skillBarItems = new List<string>();
@@ -668,6 +680,21 @@ public static class SaveMapper
             }
 
             loaded.Player.WithQuickItems(quick);
+        }
+
+        if (player.keptItems != null)
+        {
+            var kept = new List<ItemDefinition>();
+            foreach (string id in player.keptItems)
+            {
+                ItemDefinition item = Resolve(content.FindItem(id), "item", id, loaded.MissingContent);
+                if (item != null)
+                {
+                    kept.Add(item);
+                }
+            }
+
+            loaded.Player.WithKeptItems(kept);
         }
 
         if (player.skillBarItems != null)

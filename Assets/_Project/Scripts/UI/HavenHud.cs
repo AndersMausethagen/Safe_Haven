@@ -40,6 +40,9 @@ public sealed class HavenHud : MonoBehaviour
     private int shownGain;
     private int writtenGain = -1;
     private RectTransform storePrompt;
+    private RectTransform lineCard;
+    private TMP_Text lineText;
+    private CanvasGroup lineGroup;
     private CanvasGroup storeGroup;
     private TMP_Text storeKey;
     private TMP_Text storeCount;
@@ -106,6 +109,7 @@ public sealed class HavenHud : MonoBehaviour
         }
 
         BuildStorePrompt(root);
+        BuildLineCard(root);
     }
 
     // A dark card with a gold rim: the key in a keycap, the chest's painting, what it does and how much would go.
@@ -138,6 +142,40 @@ public sealed class HavenHud : MonoBehaviour
         TMP_Text what = Label(storePrompt, "Label", new Vector2(0f, 0.5f), new Vector2(textWidth, 26f), new Vector2(textX + textWidth * 0.5f, 10f), 18f, Body, TextAlignmentOptions.Left);
         what.text = "Store in chests";
         storeCount = Label(storePrompt, "Count", new Vector2(0f, 0.5f), new Vector2(textWidth, 22f), new Vector2(textX + textWidth * 0.5f, -13f), 14f, HearthKit.Faded(Body, 0.7f), TextAlignmentOptions.Left);
+    }
+
+    // While a wall or fence is drawn: its pieces and their whole cost, above the skill bar (BuildPlacer.LineSummary).
+    private void BuildLineCard(Transform root)
+    {
+        UIStyle style = UIStyle.Current;
+        lineCard = Rect("Line Cost", root, new Vector2(0.5f, 0f), new Vector2(720f, 46f), new Vector2(0f, 150f));
+        lineGroup = lineCard.gameObject.AddComponent<CanvasGroup>();
+        lineGroup.alpha = 0f;
+        lineGroup.blocksRaycasts = false;
+        Image card = HearthKit.Sliced(lineCard.gameObject.AddComponent<Image>(), style.Card, 1.2f);
+        card.color = HearthKit.Faded(style.Inset, 0.92f);
+        card.raycastTarget = false;
+        HearthKit.Rim(lineCard, 0.45f);
+        Image icon = HearthKit.Icon(lineCard, "Fence", 12f, 9f, 28f);
+        icon.raycastTarget = false;
+        lineText = Label(lineCard, "Text", new Vector2(0f, 0.5f), new Vector2(660f, 34f), new Vector2(50f + 330f, 0f), 17f, Body, TextAlignmentOptions.Left);
+        lineText.richText = true;
+    }
+
+    private void UpdateLineCard()
+    {
+        if (lineCard == null)
+        {
+            return;
+        }
+
+        string summary = BuildPlacer.LineSummary;
+        if (summary.Length > 0)
+        {
+            lineText.text = HearthKit.ToneNumbers(summary);
+        }
+
+        lineGroup.alpha = Mathf.MoveTowards(lineGroup.alpha, summary.Length > 0 ? 1f : 0f, Time.unscaledDeltaTime * 6f);
     }
 
     // The Small Chest's painting (its build-menu icon); none if it can't be found.
@@ -210,9 +248,10 @@ public sealed class HavenHud : MonoBehaviour
     private void LateUpdate()
     {
         bool windows = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
-        group.alpha = GamePause.IsPaused ? 0f : 1f;
+        group.alpha = GamePause.HidesHud ? 0f : 1f;
         badge.transform.parent.gameObject.SetActive(!windows);
         UpdateStorePrompt(windows);
+        UpdateLineCard();
         if (Time.unscaledTime >= nextStanding)
         {
             DrawStanding();

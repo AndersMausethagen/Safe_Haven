@@ -96,6 +96,15 @@ public sealed class QuestToast : MonoBehaviour
             }
         }
 
+        // A window open (a station, the bag, the build menu): the card waits, its time held, and comes when the window closes. It drew over
+        // the station window in every screenshot of the systems review (2026-11-21).
+        if (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen)
+        {
+            shownAt += Time.unscaledDeltaTime;
+            group.alpha = 0f;
+            return;
+        }
+
         float age = Time.unscaledTime - shownAt;
         if (age > Hold + Slide && waiting.Count > 0)
         {

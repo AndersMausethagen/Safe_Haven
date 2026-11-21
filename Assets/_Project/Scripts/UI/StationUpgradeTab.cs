@@ -333,7 +333,8 @@ public sealed class StationUpgradeTab
             string bonuses = HavenBuildings.BonusesOf(shown);
             if (bonuses.Length > 0)
             {
-                lines.Add((null, "Stats", char.ToUpperInvariant(bonuses[0]) + bonuses.Substring(1)));
+                string change = Changes(shown);
+                lines.Add((null, "Stats", change.Length > 0 ? change : char.ToUpperInvariant(bonuses[0]) + bonuses.Substring(1)));
             }
         }
 
@@ -532,7 +533,8 @@ public sealed class StationUpgradeTab
         row.Picture.sprite = module.Icon != null ? module.Icon : style.Icon("Gear");
         row.Picture.color = module.Icon != null ? Color.white : style.Accent;
         row.Name.text = module.DisplayName;
-        row.Effect.text = HearthKit.ToneNumbers(module.Effect());
+        string change = Changes(module.Bonus);
+        row.Effect.text = HearthKit.ToneNumbers(module.Effect()) + (change.Length > 0 ? $"\n<color={UIStyle.Hex(style.Accent)}>{change}</color>" : "");
         string why = BuildingModules.WhyNot(building, module);
         bool spare = GameSession.Home.SpareCount(module.Id) > 0;
         bool affordable = spare || pool.CanAfford(module.Essence, module.Cost, out _);
@@ -556,6 +558,51 @@ public sealed class StationUpgradeTab
         BuildingObject at = building;
         GameObject by = user;
         row.Fit.Bind(new MenuAction(spare ? "Fit spare" : "Fit", "", why == null && affordable && mayChange, () => BuildingModules.Fit(at, module, by)) { Icon = "Gear" });
+    }
+
+    // ----- Before and after -----
+
+    // What a bonus would change here, as numbers before and after ("Output slots 1 → 2 · Room 10 → 15"): players judge an upgrade by
+    // its change (the systems review, 2026-11-21). At most three, the ones the station shows.
+    private string Changes(BuildingBonus bonus)
+    {
+        if (bonus == null || building == null || !building.TryGetComponent(out Construction construction))
+        {
+            return "";
+        }
+
+        var parts = new List<string>();
+        void Add(string name, float now, float more, string format = "0")
+        {
+            if (more > 0f && parts.Count < 3)
+            {
+                parts.Add($"{name} {now.ToString(format)} → {(now + more).ToString(format)}");
+            }
+        }
+
+        if (building.TryGetComponent(out CraftingStation station) && station.Queue != null)
+        {
+            StationQueue queue = station.Queue;
+            Add("Output slots", queue.OutputSlots, bonus.extraOutputSlots);
+            Add("Room", queue.Capacity, bonus.extraOutput);
+            Add("Queue", queue.MaxQueued, bonus.extraQueue);
+            Add("Luck", queue.ExtraChance * 100f, bonus.extraChance * 100f, "0'%'");
+            Add("Fine work", queue.FineChance * 100f, bonus.fineChance * 100f, "0'%'");
+            Add("Speed", (1f + construction.Sum(b => b.craftSpeed)) * 100f, bonus.craftSpeed * 100f, "0'%'");
+        }
+
+        if (bonus.healthShare > 0f && building.TryGetComponent(out Damageable health))
+        {
+            float share = construction.Sum(b => b.healthShare);
+            float plain = health.MaxHealth / (1f + share);
+            Add("Health", health.MaxHealth, plain * bonus.healthShare);
+        }
+
+        Add("Comfort", construction.Sum(b => b.comfort), bonus.comfort);
+        Add("Beds", building.Definition.Beds + construction.Sum(b => b.beds), bonus.beds);
+        Add("Light", construction.Sum(b => b.extraLight), bonus.extraLight, "0' m'");
+        Add("Foretold", HavenReadiness.ForetoldEvents, bonus.foretoldEvents);
+        return string.Join("  ·  ", parts);
     }
 
     // ----- Choosing -----

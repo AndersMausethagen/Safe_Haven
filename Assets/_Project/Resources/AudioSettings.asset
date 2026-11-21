@@ -52,6 +52,7 @@ MonoBehaviour:
   guardBreak: {fileID: 11400000, guid: 2c8a54e87063e6c458ad38dc0ac47ca9, type: 2}
   stagger: {fileID: 11400000, guid: 5ed1cc8158792214c81701d7d75f4317, type: 2}
   perfectDodge: {fileID: 11400000, guid: b5ecefa06b9423943801706a978936b8, type: 2}
+  moduleCue: {fileID: 11400000, guid: ed42888011cf91c4ba3dda056ff34557, type: 2}
   counterReady: {fileID: 11400000, guid: 5956ed4f4ed959b469a08195f004ccb8, type: 2}
   dodge: {fileID: 11400000, guid: 3b4457cdbb532d445ae05e96da3d4de4, type: 2}
   playerHurt: {fileID: 11400000, guid: ee2cf50028890584ca318923714b8b41, type: 2}

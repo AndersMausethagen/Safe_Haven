@@ -34,6 +34,49 @@ public sealed class BuildingModuleTests
         return queue;
     }
 
+    // The systems review, 2026-11-21: a module's thrifty recipe trades time for materials, so the plain one keeps a reason to be chosen.
+    [Test]
+    public void AVariantThatCostsLess_TakesLonger()
+    {
+        int checkedCount = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:RecipeDefinition"))
+        {
+            var recipe = AssetDatabase.LoadAssetAtPath<RecipeDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            RecipeDefinition plain = recipe != null ? recipe.Replaces : null;
+            if (plain == null || recipe.ItemCost.Sum(cost => cost.Amount) >= plain.ItemCost.Sum(cost => cost.Amount))
+            {
+                continue;
+            }
+
+            checkedCount++;
+            Assert.Greater(recipe.CraftSeconds, plain.CraftSeconds, $"{recipe.name} costs less than {plain.name}, so it takes longer");
+        }
+
+        Assert.Greater(checkedCount, 0, "there are thrifty variants to check");
+    }
+
+    // Strength costs upkeep: a module that adds health makes mending dearer, and says so.
+    [Test]
+    public void AModuleThatAddsHealth_MakesMendingDearer()
+    {
+        int checkedCount = 0;
+        foreach (string guid in AssetDatabase.FindAssets("t:BuildingModuleDefinition"))
+        {
+            var module = AssetDatabase.LoadAssetAtPath<BuildingModuleDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            if (module == null || module.Bonus.healthShare <= 0f)
+            {
+                continue;
+            }
+
+            checkedCount++;
+            Assert.Greater(module.Bonus.mendCostShare, 0f, module.name);
+            StringAssert.Contains("mending it costs", module.Effect(), module.name);
+        }
+
+        Assert.Greater(checkedCount, 0, "there are modules that add health");
+        Assert.AreEqual(15, BuildingRepairs.Share(20, 1f, 0.5f * 1.5f), "all of it broken, at half the cost, half again: 20 × 0.5 × 1.5");
+    }
+
     [Test]
     public void OneOutputSlot_StopsAtTheNextKind()
     {

@@ -90,6 +90,9 @@ public sealed partial class StashWindow
         GridButton(stashGrid, stash, "Sort", "Stats", 104f, 0f, () => Sort(stash.Container, stash.First, stash.Count));
         // Last raid's draughts, food and arrows again, from the stash into the bag (PackForRaid).
         GridButton(stashGrid, stash, "Pack as last time", "Bags", 196f, 112f, () => PackForRaid.Pack(player));
+        // Whether the Store key fills this chest (StashChest.SkipsStore).
+        skipButton = GridButton(stashGrid, stash, "", "Lock", 176f, 316f, ToggleSkip);
+        ShowSkip();
 
         foreach (TMP_Text label in GetComponentsInChildren<TMP_Text>(true))
         {
@@ -106,7 +109,35 @@ public sealed partial class StashWindow
         }
     }
 
-    private void GridButton(RectTransform grid, Grid side, string name, string icon, float width, float fromRight, System.Action act)
+    private KitButton skipButton;
+
+    private void ToggleSkip()
+    {
+        if (chest == null)
+        {
+            return;
+        }
+
+        chest.SkipsStore = !chest.SkipsStore;
+        ShowSkip();
+        GameMessages.Post(chest.SkipsStore
+            ? "The Store key passes this chest over now: it keeps only what you put in by hand."
+            : "The Store key fills this chest again.", MessageKind.Info);
+    }
+
+    // Called when the window opens on a chest, and when the switch is pressed.
+    private void ShowSkip()
+    {
+        if (skipButton == null || chest == null)
+        {
+            return;
+        }
+
+        skipButton.Bind(chest.SkipsStore ? new MenuAction("Store skips this", "The Store key leaves this chest alone. Press to let it fill.", true, null) { Icon = "Lock" }
+            : new MenuAction("Store fills this", "The Store key puts things here. Press to keep this chest as it is.", true, null) { Icon = "Drop" });
+    }
+
+    private KitButton GridButton(RectTransform grid, Grid side, string name, string icon, float width, float fromRight, System.Action act)
     {
         int columns = side.Container != null ? Mathf.Max(1, side.Container.Columns) : 1;
         var layout = grid.GetComponent<GridLayoutGroup>();
@@ -118,6 +149,7 @@ public sealed partial class StashWindow
         rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
         rect.pivot = new Vector2(1f, 0f);
         rect.anchoredPosition = new Vector2(cellsRight - fromRight, 6f);
+        return button;
     }
 
     private static void Sort(ItemContainer container) => Sort(container, 0, container != null ? container.SlotCount : 0);

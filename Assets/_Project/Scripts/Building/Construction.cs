@@ -562,6 +562,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         {
             turningBack = true;
             striker.ApplyDamage(new DamageInfo(GetComponent<Combatant>(), null, back, DamageType.Physical, false, at, at - transform.position, 0f, HitTechnique.None));
+            ModuleCues.Fire(this, $"Turned back: {back:0} on the striker", "Skull");
         }
         finally
         {
@@ -630,6 +631,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         }
 
         ApplyHealthShare();
+        ModuleDressing.Show(this);
 
         ShowRise();
         look.Shade(rising ? Mathf.Lerp(ConstructionSettings.Current.RuinShade, 1f, Share) : shownBroken ? ConstructionSettings.Current.RuinShade : 1f);

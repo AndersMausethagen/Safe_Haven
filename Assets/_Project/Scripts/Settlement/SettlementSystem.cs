@@ -125,9 +125,11 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             GameMessages.Post($"{worker.Resident.DisplayName} is now a {settings.RankFor(worker.WorkDone).name} {worker.Job.DisplayName}.", MessageKind.Gain);
         }
 
-        if (recipe.Output != null && !recipe.Output.HasDurability && UnityEngine.Random.value < settings.RankFor(worker.WorkDone).extraChance + station.ExtraChance)
+        float own = settings.RankFor(worker.WorkDone).extraChance;
+        float roll = UnityEngine.Random.value;
+        if (recipe.Output != null && !recipe.Output.HasDurability && roll < own + station.ExtraChance && station.AddExtra(recipe.Output, 1) && roll >= own)
         {
-            station.AddExtra(recipe.Output, 1);
+            ModuleCues.Fire(station, $"+1 {recipe.Output.DisplayName}: the building's luck");
         }
     }
 
@@ -142,9 +144,13 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
         ExperienceTracker.PractiseCraft(recipe);
         StatSheet maker = Player.Current != null && Player.Current.Combatant != null ? Player.Current.Combatant.Stats : null;
-        if (!recipe.Output.HasDurability && UnityEngine.Random.value < CraftedWork.ExtraChance(CraftedWork.Of(recipe), maker))
+        // The station's own luck (its modules and extensions: a Rune Shelf, a Scarecrow) counts for the player's crafts too, not only a
+        // worker's (the systems review, 2026-11-21: a Rune Shelf did nothing for a player crafting there).
+        float own = CraftedWork.ExtraChance(CraftedWork.Of(recipe), maker);
+        float roll = UnityEngine.Random.value;
+        if (!recipe.Output.HasDurability && roll < own + station.ExtraChance && station.AddExtra(recipe.Output, 1) && roll >= own)
         {
-            station.AddExtra(recipe.Output, 1);
+            ModuleCues.Fire(station, $"+1 {recipe.Output.DisplayName}: the building's luck");
         }
     }
 

@@ -389,6 +389,10 @@ public sealed class OptionsFocus
     /// <summary>The value it has out of the box; null when there is none to give (a key, the window).</summary>
     public string Default;
     public Func<bool> Pending;
+    /// <summary>Puts this one setting back to its default, in the draft (to save like any change); null where there is none.</summary>
+    public Action Reset;
+    /// <summary>The GameOption behind the row, if any (the HUD's can be previewed).</summary>
+    public GameOption Option;
 
     public bool IsPending => Pending != null && Pending();
 
@@ -401,5 +405,7 @@ public sealed class OptionsFocus
         Saved = () => option.ValueText,
         Default = option.TextFor(option.Default),
         Pending = () => draft.IsChanged(option),
+        Reset = () => draft.Set(option, option.Default),
+        Option = option,
     };
 }

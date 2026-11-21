@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Iron on the Road
   description: 'Bjarne has heard of iron in the barrows of the Misty Woods: grave iron, that holds an edge and a chill. Bring him three, and fit an anvil faced with it at the Smithy (Tier III).'
   chain: Bjarne
-  journalNotes: 
+  journalNotes: 'Barrow-iron was smithed for the dead and does not rust. An anvil faced with it rings truer: more of what the Smithy makes comes out Fine. It lies in the barrows of the Misty Woods.'
   rank: 4
   availableObjective: 
   announceStart: 1

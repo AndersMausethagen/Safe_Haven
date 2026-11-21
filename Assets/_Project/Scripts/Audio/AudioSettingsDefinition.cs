@@ -73,6 +73,8 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private SoundDefinition guardBreak;
     [SerializeField] private SoundDefinition stagger;
     [SerializeField] private SoundDefinition perfectDodge;
+    [Tooltip("A building's module or extension made the difference (ModuleCues): a little glint over it.")]
+    [SerializeField] private SoundDefinition moduleCue;
     [SerializeField] private SoundDefinition counterReady;
     [SerializeField] private SoundDefinition dodge;
     [SerializeField] private SoundDefinition playerHurt;
@@ -208,6 +210,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     public SoundDefinition GuardBreak => guardBreak;
     public SoundDefinition Stagger => stagger;
     public SoundDefinition PerfectDodge => perfectDodge;
+    public SoundDefinition ModuleCue => moduleCue;
     public SoundDefinition CounterReady => counterReady;
     public SoundDefinition Dodge => dodge;
     public SoundDefinition PlayerHurt => playerHurt;

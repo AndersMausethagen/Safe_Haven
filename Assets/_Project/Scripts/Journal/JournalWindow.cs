@@ -21,19 +21,21 @@ public sealed class JournalWindow : MonoBehaviour
         Mechanics,
         Raids,
         Lost,
+        Modules,
     }
 
     private const float Width = 1400f;
     private const float Height = 840f;
     private const float TabBarHeight = 56f;
-    private const float TabWidth = 170f;
+    // Seven tabs and Close on one bar (Modules joined them, 2026-11-21).
+    private const float TabWidth = 150f;
     private const float Margin = 44f;
     private const float ScreenMargin = 24f;
     // Long reading wants a wide column; a creature has a picture to show.
     private const float ReadingWidth = 800f;
     private const float PortraitSize = 190f;
 
-    private static readonly Tab[] Tabs = { Tab.Backstory, Tab.Quests, Tab.Creatures, Tab.Mechanics, Tab.Raids, Tab.Lost };
+    private static readonly Tab[] Tabs = { Tab.Backstory, Tab.Quests, Tab.Creatures, Tab.Mechanics, Tab.Modules, Tab.Raids, Tab.Lost };
 
     private sealed class TabView
     {
@@ -139,7 +141,7 @@ public sealed class JournalWindow : MonoBehaviour
             // Creatures have a portrait; the backstory and mechanics pages a painting, wide, with the page's name beside it.
             bool painted = tab == Tab.Backstory || tab == Tab.Mechanics;
             var page = new HavenListPage(body, tab.ToString(), Width, height, 1, EmptyText(tab), Run, ReadingWidth,
-                tab == Tab.Creatures || painted ? PortraitSize : 84f, painted ? 16f / 9f : 1f);
+                tab == Tab.Creatures || tab == Tab.Modules || painted ? PortraitSize : 84f, painted ? 16f / 9f : 1f);
             page.Chosen += OnChosen;
             tabViews.Add(new TabView { Tab = tab, Button = button, Label = label, Underline = underline, Page = page });
         }
@@ -193,7 +195,7 @@ public sealed class JournalWindow : MonoBehaviour
         // Something for the stick to start from: a mouse needs no such thing, and a highlighted tab would only confuse it.
         if (Gamepad.current != null && EventSystem.current != null)
         {
-            EventSystem.current.SetSelectedGameObject(tabViews[(int)shown].Button.gameObject);
+            EventSystem.current.SetSelectedGameObject(tabViews.Find(view => view.Tab == shown).Button.gameObject);
         }
     }
 
@@ -213,7 +215,7 @@ public sealed class JournalWindow : MonoBehaviour
             view.Page.SetVisible(on);
         }
 
-        Draw(tabViews[(int)tab]);
+        Draw(tabViews.Find(view => view.Tab == tab));
         DrawTabLabels();
     }
 
@@ -239,6 +241,8 @@ public sealed class JournalWindow : MonoBehaviour
                 return JournalContent.Raids(progress, out summary);
             case Tab.Lost:
                 return LostOneJournal.Shelves(LostOneSettings.Current, progress, out summary);
+            case Tab.Modules:
+                return ModuleJournal.Shelves(out summary);
             default:
                 return JournalContent.Backstory(settings, log, progress, out summary, Watch, WatchBlocked());
         }

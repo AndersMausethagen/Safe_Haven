@@ -21,6 +21,14 @@ public static class GamePause
     /// <summary>True while at least one system holds a pause request. Player input should ignore gameplay actions.</summary>
     public static bool IsPaused => requests.Count > 0;
 
+    /// <summary>
+    /// True while the Options screen previews a HUD setting over the paused game: the HUD shows though the game stays paused.
+    /// </summary>
+    public static bool HudPreview { get; set; }
+
+    /// <summary>Whether the HUD hides for the pause: paused, and no HUD setting being previewed.</summary>
+    public static bool HidesHud => IsPaused && !HudPreview;
+
     /// <summary>True while paused and time is frozen. Systems that change Time.timeScale must leave it alone then.</summary>
     public static bool IsTimeFrozen => IsPaused && freezesTime;
 

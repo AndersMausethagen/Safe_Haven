@@ -193,7 +193,7 @@ public sealed class StationQueue
     /// <summary>How fast it works: 1 is normal. Set by its CraftingStation from upgrades and a worker; not saved.</summary>
     public float SpeedMultiplier { get; set; } = 1f;
 
-    /// <summary>A worker's extra chance of one more here, from the station's extensions (set at home with the speed).</summary>
+    /// <summary>The extra chance of one more here, from the station's extensions and modules, for workers and the player (set at home with the speed).</summary>
     public float ExtraChance { get; set; }
 
     /// <summary>How much more often gear made here comes out Fine, from the station's modules (set at home with the speed); not saved.</summary>

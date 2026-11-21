@@ -96,6 +96,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         container.SlotChanged += OnSlotChanged;
         container.LayoutChanged += OnLayoutChanged;
         inventory.Quick.Changed += OnQuickChanged;
+        inventory.Kept.Changed += OnQuickChanged;
         inventory.ItemUsed += OnItemUsed;
         container.WeightChanged += RefreshGathering;
         if (pocket != null)
@@ -200,6 +201,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         if (inventory != null)
         {
             inventory.Quick.Changed -= OnQuickChanged;
+            inventory.Kept.Changed -= OnQuickChanged;
             inventory.ItemUsed -= OnItemUsed;
         }
 
@@ -395,11 +397,23 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         return false;
     }
 
+    // The amber dot: on the quickbar, or marked to keep (both stay in the bag when the Store key is pressed).
+    private bool Marked(ItemStack stack) => !stack.IsEmpty && (inventory.Quick.Contains(stack.Item) || inventory.Kept.Contains(stack.Item));
+
     private string QuickHint(ItemStack stack)
     {
-        if (stack.IsEmpty || !QuickItems.Accepts(stack.Item))
+        if (stack.IsEmpty)
         {
             return null;
+        }
+
+        if (!QuickItems.Accepts(stack.Item))
+        {
+            // What can't go on the quickbar can be marked to keep: the Store key leaves it (the systems review, 2026-11-21).
+            string keepKey = GameInput.KeyLabel(GameInput.QuickItems);
+            return inventory.Kept.Contains(stack.Item)
+                ? $"<color={UIStyle.Current.AccentHex}>Kept in the bag: the Store key leaves it. {keepKey}: let it go to the chests.</color>"
+                : $"<color={UIStyle.Current.MutedHex}>{keepKey}: keep it in the bag when you store.</color>";
         }
 
         string key = GameInput.KeyLabel(GameInput.QuickItems);
@@ -453,7 +467,10 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         string key = GameInput.KeyLabel(GameInput.QuickItems);
         if (!QuickItems.Accepts(stack.Item))
         {
-            GameMessages.Post("Only things you can use go on the quickbar.", MessageKind.Warning);
+            // Not usable: the same key marks it to keep instead.
+            bool kept = inventory.Kept.Toggle(stack.Item);
+            GameMessages.Post(kept ? $"{stack.Item.DisplayName} stays in your bag when you store." : $"{stack.Item.DisplayName} goes to the chests again when you store.", MessageKind.Info);
+            tooltip.Show(stack, QuickHint(stack));
         }
         else if (inventory.Quick.Toggle(stack.Item))
         {
@@ -584,7 +601,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         for (int i = 0; i < views.Count; i++)
         {
             ItemStack stack = source.GetSlot(i);
-            views[i].Show(stack, !source.IsUnlocked(i), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
+            views[i].Show(stack, !source.IsUnlocked(i), false, Marked(stack));
         }
 
         Compact(source, views);
@@ -609,7 +626,7 @@ public sealed partial class ItemInventoryWindow : MonoBehaviour, IItemSlotHandle
         if (index >= 0 && index < views.Count)
         {
             ItemStack stack = source.GetSlot(index);
-            views[index].Show(stack, !source.IsUnlocked(index), false, !stack.IsEmpty && inventory.Quick.Contains(stack.Item));
+            views[index].Show(stack, !source.IsUnlocked(index), false, Marked(stack));
             Compact(source, views);
             if (hovered == views[index] && dragFrom < 0)
             {

@@ -158,6 +158,26 @@ public sealed class QuickItemsTests
             "a preference, not belongings: a failed raid keeps it");
     }
 
+    // The systems review, 2026-11-21: what is marked to keep stays in the bag when storing, and the marks are saved.
+    [Test]
+    public void KeptItems_AreSavedAndLoaded_AndOutliveAFailedRaid()
+    {
+        var lookup = new ItemLookup(Stew, Lantern);
+        PlayerSnapshot player = PlayerSnapshot.Capture(new ItemContainer(8, 5), null, null).WithKeptItems(new[] { Stew });
+        SaveData data = SaveMapper.ToSaveData(player, null, "SafeHaven", null, DateTime.UtcNow);
+        CollectionAssert.AreEqual(new[] { Stew.Id }, data.player.keptItems);
+
+        LoadedGame loaded = SaveMapper.FromSaveData(JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data)), lookup);
+        CollectionAssert.AreEqual(new[] { Stew }, loaded.Player.KeptItems);
+        CollectionAssert.AreEqual(new[] { Stew }, loaded.Player.WithoutBelongings().KeptItems);
+
+        var marks = new KeptItems();
+        Assert.IsTrue(marks.Toggle(Lantern));
+        Assert.IsTrue(marks.Contains(Lantern));
+        Assert.IsFalse(marks.Toggle(Lantern), "pressed again, the mark comes off");
+        Assert.IsFalse(marks.Contains(Lantern));
+    }
+
     // Finds only the two items; everything else is missing (the test saves nothing else).
     private sealed class ItemLookup : IContentLookup
     {

@@ -196,13 +196,16 @@ public sealed class HavenListPage
         }
     }
 
+    // A picture's shape in near-black, its colours gone: what is not known yet, but can be.
+    private static readonly Color SilhouetteColour = new Color(0.06f, 0.045f, 0.035f, 0.85f);
+
     private void DrawRow(Row row, HavenEntry entry, float width, UIStyle style)
     {
         row.Entry = entry;
         bool dimmed = entry.State == HavenEntryState.Locked;
         row.Icon.gameObject.SetActive(entry.Icon != null);
         row.Icon.sprite = entry.Icon;
-        row.Icon.color = dimmed ? new Color(1f, 1f, 1f, 0.35f) : Color.white;
+        row.Icon.color = dimmed && entry.Silhouette ? SilhouetteColour : dimmed ? new Color(1f, 1f, 1f, 0.35f) : Color.white;
         row.Glyph.gameObject.SetActive(entry.Icon == null);
         row.Glyph.text = string.IsNullOrEmpty(entry.Name) ? "" : entry.Name.Substring(0, 1).ToUpperInvariant();
         row.Glyph.color = dimmed ? style.Muted : style.Accent;
@@ -294,7 +297,7 @@ public sealed class HavenListPage
         bool dimmed = entry.State == HavenEntryState.Locked;
         detailIcon.gameObject.SetActive(entry.Icon != null);
         detailIcon.sprite = entry.Icon;
-        detailIcon.color = dimmed ? new Color(1f, 1f, 1f, 0.35f) : Color.white;
+        detailIcon.color = dimmed && entry.Silhouette ? SilhouetteColour : dimmed ? new Color(1f, 1f, 1f, 0.35f) : Color.white;
         detailGlyph.gameObject.SetActive(entry.Icon == null);
         detailGlyph.text = string.IsNullOrEmpty(entry.Name) ? "" : entry.Name.Substring(0, 1).ToUpperInvariant();
         detailName.text = entry.Name;

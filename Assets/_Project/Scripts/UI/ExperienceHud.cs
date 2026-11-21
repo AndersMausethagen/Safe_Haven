@@ -351,7 +351,7 @@ public sealed class ExperienceHud : MonoBehaviour
         // In a Contextual HUD (HudRules) only while it has something to say: something to spend (N), experience just earned, the raid's
         // bonus waiting for the way home, a level's banner. "Skills" sat under the bar all game (the HUD review of 2026-11-18).
         bool says = HudRules.ShowsEverything || points > 0 || held > 0 || age < GainSeconds * 3f || shown < bannerFor;
-        group.alpha = GamePause.IsPaused ? 0f : Mathf.MoveTowards(group.alpha, says ? 1f : 0f, 2f * Time.unscaledDeltaTime);
+        group.alpha = GamePause.HidesHud ? 0f : Mathf.MoveTowards(group.alpha, says ? 1f : 0f, 2f * Time.unscaledDeltaTime);
         gain.gameObject.SetActive(age < GainSeconds);
         if (age < GainSeconds)
         {

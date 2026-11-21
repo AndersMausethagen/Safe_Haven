@@ -63,6 +63,7 @@ public sealed class PlayerSnapshot
     private SkillDefinition[] skillLoadout;
     // Null when not captured (an older save): applying it then leaves the quickbar alone.
     private ItemDefinition[] quickItems;
+    private ItemDefinition[] keptItems;
     private ItemDefinition[] skillBarItems;
     private Condition condition = Condition.None;
     // Meals and other boons at work. Kept through the portal; a failed raid and a save file leave them behind.
@@ -98,6 +99,15 @@ public sealed class PlayerSnapshot
     public IReadOnlyList<SkillDefinition> SkillBar => skillLoadout;
     /// <summary>The quickbar's items in order, or null when it wasn't captured.</summary>
     public IReadOnlyList<ItemDefinition> QuickBar => quickItems;
+    /// <summary>What is marked to keep in the bag (KeptItems), or null when it wasn't captured.</summary>
+    public IReadOnlyList<ItemDefinition> KeptItems => keptItems;
+
+    /// <summary>Sets what is marked to keep (read from a save file). Returns this snapshot.</summary>
+    public PlayerSnapshot WithKeptItems(IEnumerable<ItemDefinition> items)
+    {
+        keptItems = items != null ? new List<ItemDefinition>(items).ToArray() : null;
+        return this;
+    }
     /// <summary>The items on the skill bar, slot by slot (null where a skill or nothing is), or null when not captured.</summary>
     public IReadOnlyList<ItemDefinition> SkillBarItems => skillBarItems;
 
@@ -196,6 +206,7 @@ public sealed class PlayerSnapshot
         if (items != null)
         {
             snapshot.quickItems = new List<ItemDefinition>(items.Quick.Items).ToArray();
+            snapshot.keptItems = new List<ItemDefinition>(items.Kept.Items).ToArray();
         }
 
         PlayerSkills skills = player != null ? player.GetComponent<PlayerSkills>() : null;
@@ -325,6 +336,11 @@ public sealed class PlayerSnapshot
             items.Quick.Restore(quickItems);
         }
 
+        if (items != null && keptItems != null)
+        {
+            items.Kept.Restore(keptItems);
+        }
+
         List<ItemAmount> unplaced = ApplyTo(
             items != null ? items.Container : null,
             resourceInventory != null ? resourceInventory.Storage : null,
@@ -426,6 +442,7 @@ public sealed class PlayerSnapshot
         stripped.skillLoadout = skillLoadout != null ? (SkillDefinition[])skillLoadout.Clone() : null;
         // The quickbar is a preference, not belongings: it stays, its items greyed until found again.
         stripped.quickItems = quickItems != null ? (ItemDefinition[])quickItems.Clone() : null;
+        stripped.keptItems = keptItems != null ? (ItemDefinition[])keptItems.Clone() : null;
         stripped.skillBarItems = skillBarItems != null ? (ItemDefinition[])skillBarItems.Clone() : null;
         stripped.condition = condition;
         stripped.condition.EquippedSlot = -1;

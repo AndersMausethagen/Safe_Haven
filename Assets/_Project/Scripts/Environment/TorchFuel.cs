@@ -31,6 +31,10 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
     private static int warnedNight = -1;
     private static int darkCount;
     private static int darkCountNight = -1;
+    private static int forecastNight = -1;
+    private static readonly System.Collections.Generic.List<TorchFuel> torches = new System.Collections.Generic.List<TorchFuel>();
+    // Warn while this many nights or fewer of charcoal are left (the systems review, 2026-11-21: say it before the light fails).
+    private const int WarnWithNights = 2;
 
     private int fedNight = -1;
     private int countedDarkNight = -1;
@@ -47,7 +51,13 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
         warnedNight = -1;
         darkCount = 0;
         darkCountNight = -1;
+        forecastNight = -1;
+        torches.Clear();
     }
+
+    private void OnEnable() => torches.Add(this);
+
+    private void OnDisable() => torches.Remove(this);
 
     /// <summary>True while it burns.</summary>
     public bool IsLit => lit;
@@ -133,6 +143,7 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
         if (player != null && MaterialPool.For(player.gameObject).TrySpend(null, new[] { new ItemAmount(fuel, perNight) }))
         {
             fedNight = Night;
+            ForecastOnce(player);
             return true;
         }
 
@@ -157,6 +168,35 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
         }
 
         return false;
+    }
+
+    // Once a night, after the first torch is fed: how many nights the charcoal at hand lasts all the torches, said while it is few.
+    private void ForecastOnce(Player player)
+    {
+        if (forecastNight == Night || !Place.AtHome)
+        {
+            return;
+        }
+
+        forecastNight = Night;
+        int burning = 0;
+        foreach (TorchFuel torch in torches)
+        {
+            if (torch != null && torch.fuel == fuel && (torch.building == null || torch.building.IsStanding))
+            {
+                burning += torch.perNight;
+            }
+        }
+
+        int left = MaterialPool.For(player.gameObject).Have(fuel);
+        int nights = burning > 0 ? left / burning : int.MaxValue;
+        if (nights <= WarnWithNights)
+        {
+            GameMessages.Post(nights == 0
+                    ? $"The last {fuel.DisplayName} is burning: tomorrow some torches stay dark. Leave oak in the campfire to make more."
+                    : $"{fuel.DisplayName} for {nights} more night{(nights == 1 ? "" : "s")}: {burning} a night for your torches. Leave oak in the campfire to make more.",
+                MessageKind.Warning);
+        }
     }
 
     private void SayDark()

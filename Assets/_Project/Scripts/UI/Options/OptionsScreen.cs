@@ -160,6 +160,13 @@ public sealed class OptionsScreen : MonoBehaviour
             return;
         }
 
+        // Back during a preview only ends the preview.
+        if (previewUntil >= 0f)
+        {
+            EndPreview();
+            return;
+        }
+
         // Back with the question up is "Keep Editing".
         if (askBox.activeSelf)
         {
@@ -186,6 +193,7 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void Leave()
     {
+        EndPreview();
         // Leaving with the window's question open keeps what the player can evidently see.
         confirmUntil = -1f;
         confirmBar.SetActive(false);
@@ -201,6 +209,7 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void Update()
     {
+        UpdatePreview();
         if (confirmUntil < 0f)
         {
             return;
@@ -337,7 +346,15 @@ public sealed class OptionsScreen : MonoBehaviour
         RectTransform help = (RectTransform)detailHelp.transform;
         help.anchorMin = new Vector2(0f, 0f);
         help.anchorMax = new Vector2(1f, 1f);
-        help.offsetMin = new Vector2(20f, 18f);
+        help.offsetMin = new Vector2(20f, 76f);
+        // One setting back to its default (the systems review, 2026-11-21: reset was per tab only), staged like any change.
+        resetRow = OptionsWidgets.Button("Reset Row", box, "Reset to Default", 19f, ResetFocused, out _);
+        OptionsWidgets.Place((RectTransform)resetRow.transform, new Vector2(0.5f, 0f), new Vector2(DetailsWidth - 40f, 46f), new Vector2(0f, 18f));
+        ((RectTransform)resetRow.transform).pivot = new Vector2(0.5f, 0f);
+        resetRow.gameObject.SetActive(false);
+        previewRow = OptionsWidgets.Button("Preview Row", box, "Preview", 19f, StartPreview, out _);
+        ((RectTransform)previewRow.transform).pivot = new Vector2(0.5f, 0f);
+        previewRow.gameObject.SetActive(false);
         help.offsetMax = new Vector2(-20f, -212f);
     }
 
@@ -517,6 +534,11 @@ public sealed class OptionsScreen : MonoBehaviour
 
         if (focused == null)
         {
+            if (resetRow != null)
+            {
+                resetRow.gameObject.SetActive(false);
+            }
+
             detailName.text = TabNames[Mathf.Clamp(tab, 0, TabNames.Length - 1)];
             detailValue.text = "";
             detailHelp.text = TabIntros[Mathf.Clamp(tab, 0, TabIntros.Length - 1)] +
@@ -545,6 +567,128 @@ public sealed class OptionsScreen : MonoBehaviour
 
         detailValue.text = string.Join("\n", lines);
         detailHelp.text = focused.Help ?? "";
+        if (resetRow != null)
+        {
+            bool reset = focused.Reset != null && !string.IsNullOrEmpty(focused.Default) && now != focused.Default;
+            bool preview = focused.Option != null && System.Array.IndexOf(HudOptions, focused.Option) >= 0;
+            resetRow.gameObject.SetActive(reset);
+            previewRow.gameObject.SetActive(preview);
+            // Side by side when both show, otherwise the one fills the row.
+            float full = DetailsWidth - 40f;
+            float half = (full - 12f) * 0.5f;
+            OptionsWidgets.Place((RectTransform)previewRow.transform, new Vector2(0.5f, 0f), new Vector2(reset ? half : full, 46f),
+                new Vector2(reset ? -(half + 12f) * 0.5f : 0f, 18f));
+            OptionsWidgets.Place((RectTransform)resetRow.transform, new Vector2(0.5f, 0f), new Vector2(preview ? half : full, 46f),
+                new Vector2(preview ? (half + 12f) * 0.5f : 0f, 18f));
+        }
+    }
+
+    private Button resetRow;
+    private Button previewRow;
+
+    // ----- Preview: a HUD setting shown on the game behind for a few seconds, unsaved (the systems review, 2026-11-21: the UI scale
+    // and HUD density were judged blind, the HUD hidden under the paused menu). Any key, click or the time running out ends it. -----
+
+    private const float PreviewSeconds = 5f;
+
+    /// <summary>The settings that change the HUD, which a preview can show.</summary>
+    private static readonly GameOption[] HudOptions =
+    {
+        GameOptions.UiScale, GameOptions.Hud, GameOptions.SkillBarSize, GameOptions.LargeTimer, GameOptions.AlwaysShowVitals,
+        GameOptions.VitalsOverPlayer,
+    };
+
+    private float previewUntil = -1f;
+    private float previewFrom;
+    private CanvasGroup windowGroup;
+
+    /// <summary>True while a HUD setting is being previewed with this screen stepped aside.</summary>
+    public static bool IsPreviewing => current != null && current.previewUntil >= 0f;
+
+    private void StartPreview()
+    {
+        if (previewUntil >= 0f)
+        {
+            return;
+        }
+
+        // Every unsaved HUD change shows together, as it would once saved.
+        foreach (GameOption option in HudOptions)
+        {
+            if (draft.IsChanged(option))
+            {
+                option.Preview(draft.Get(option));
+            }
+        }
+
+        // TryGetComponent, not ??: Unity's missing component isn't null to C#.
+        if (windowGroup == null && !window.TryGetComponent(out windowGroup))
+        {
+            windowGroup = window.AddComponent<CanvasGroup>();
+        }
+
+        windowGroup.alpha = 0f;
+        windowGroup.blocksRaycasts = false;
+        GamePause.HudPreview = true;
+        previewFrom = Time.unscaledTime;
+        previewUntil = previewFrom + PreviewSeconds;
+        UIRoot.ApplyScaleEverywhere();
+    }
+
+    private void UpdatePreview()
+    {
+        if (previewUntil < 0f)
+        {
+            return;
+        }
+
+        // A short grace so the click that started it doesn't end it.
+        bool pressed = Time.unscaledTime - previewFrom > 0.35f && UnityEngine.InputSystem.InputSystem.GetDevice<UnityEngine.InputSystem.Keyboard>() is { } keys
+                       && keys.anyKey.wasPressedThisFrame;
+        pressed |= Time.unscaledTime - previewFrom > 0.35f && UnityEngine.InputSystem.Mouse.current != null
+                   && (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame || UnityEngine.InputSystem.Mouse.current.rightButton.wasPressedThisFrame);
+        pressed |= Time.unscaledTime - previewFrom > 0.35f && UnityEngine.InputSystem.Gamepad.current != null
+                   && (UnityEngine.InputSystem.Gamepad.current.buttonSouth.wasPressedThisFrame || UnityEngine.InputSystem.Gamepad.current.buttonEast.wasPressedThisFrame);
+        if (pressed || Time.unscaledTime >= previewUntil)
+        {
+            EndPreview();
+        }
+    }
+
+    private void EndPreview()
+    {
+        if (previewUntil < 0f)
+        {
+            return;
+        }
+
+        previewUntil = -1f;
+        foreach (GameOption option in HudOptions)
+        {
+            option.EndPreview();
+        }
+
+        GamePause.HudPreview = false;
+        if (windowGroup != null)
+        {
+            windowGroup.alpha = 1f;
+            windowGroup.blocksRaycasts = true;
+        }
+
+        UIRoot.ApplyScaleEverywhere();
+    }
+
+    private void ResetFocused()
+    {
+        if (focused == null || focused.Reset == null)
+        {
+            return;
+        }
+
+        focused.Reset();
+        RefreshRows();
+        ShowStatus();
+        ShowDetails();
     }
 
     // ----- Tabs -----

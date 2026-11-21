@@ -24,7 +24,7 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 10c81a33462696a469286ca0416bb78e, type: 2}
     amount: 3
   station: 14
-  craftSeconds: 120
+  craftSeconds: 150
   knownFromStart: 1
   minimumStationTier: 2
   requiredSkill: {fileID: 0}

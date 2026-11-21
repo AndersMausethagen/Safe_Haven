@@ -45,6 +45,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
   cost:
   - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
@@ -54,3 +55,4 @@ MonoBehaviour:
   essence: []
   work: 5
   knownFromStart: 0
+  dressing: {fileID: 7731054330657172636, guid: 5ec5d0549f5cbfd408d14db50b9f4e00, type: 3}

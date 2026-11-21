@@ -60,6 +60,7 @@ MonoBehaviour:
     healthShare: 0.25
     fightShare: 0
     turnBackShare: 0.25
+    mendCostShare: 0.25
     fineChance: 0
   cost:
   - item: {fileID: 11400000, guid: c64928309e5e1174ca29510d8cf2b8ee, type: 2}
@@ -69,3 +70,4 @@ MonoBehaviour:
   essence: []
   work: 5
   knownFromStart: 0
+  dressing: {fileID: 0}

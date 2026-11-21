@@ -169,6 +169,44 @@ public sealed partial class BuildPlacer
 
             ghost.Place(i, position, pieceYaw, problem, Kind);
         }
+
+        NoteLine(lineCenters.Count, paid);
+    }
+
+    /// <summary>
+    /// While a line is drawn: its pieces, what they cost together, and how many can be paid for now ("14 pieces: 28 Wood, 14 Sticks.
+    /// You can pay for 9"), shown by the Haven's HUD (the systems review, 2026-11-21: see the whole ring's cost before the first post).
+    /// Empty when no line is being drawn.
+    /// </summary>
+    public static string LineSummary => Time.frameCount - lineSummaryFrame <= 2 ? lineSummary : "";
+
+    private static string lineSummary = "";
+    private static int lineSummaryFrame = -10;
+
+    private void NoteLine(int pieces, int affordable)
+    {
+        var items = new System.Collections.Generic.List<ItemAmount>();
+        foreach (ItemAmount cost in placing.ConstructionItems)
+        {
+            if (cost.Item != null)
+            {
+                items.Add(new ItemAmount(cost.Item, cost.Amount * pieces));
+            }
+        }
+
+        var essence = new System.Collections.Generic.List<ResourceAmount>();
+        foreach (ResourceAmount cost in placing.ConstructionCost)
+        {
+            if (cost.Resource != null)
+            {
+                essence.Add(new ResourceAmount(cost.Resource, cost.Amount * pieces));
+            }
+        }
+
+        string total = AmountText.Describe(items) + (essence.Count > 0 ? (items.Count > 0 ? ", " : "") + AmountText.Describe(essence) : "");
+        lineSummary = $"{pieces} {placing.DisplayName} piece{(pieces == 1 ? "" : "s")}: {total}."
+                      + (affordable < pieces ? $" You can pay for {affordable}." : "");
+        lineSummaryFrame = Time.frameCount;
     }
 
     private void ConfirmLine()

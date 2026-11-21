@@ -8,6 +8,39 @@ using UnityEngine.InputSystem;
 /// <summary>The settings: their ranges, presets and defaults, and the controls list against the Input Actions asset.</summary>
 public sealed class OptionsTests
 {
+    // The systems review, 2026-11-21: a HUD setting can be shown over the game before it is saved; the preview saves nothing.
+    [Test]
+    public void APreview_ShowsAValue_WithoutSavingIt()
+    {
+        GameOption option = GameOptions.UiScale;
+        float saved = option.Value;
+        float other = Mathf.Approximately(saved, 1.25f) ? 1f : 1.25f;
+        int heard = 0;
+        void Count(GameOption changed)
+        {
+            if (changed == option)
+            {
+                heard++;
+            }
+        }
+
+        GameOption.AnyChanged += Count;
+        try
+        {
+            option.Preview(other);
+            Assert.AreEqual(other, option.Value, 0.001f, "what the HUD reads during the preview");
+            Assert.AreEqual(saved, PlayerPrefs.GetFloat("SafeHaven.Option.UiScale", saved), 0.001f);
+            option.EndPreview();
+            Assert.AreEqual(saved, option.Value, 0.001f, "back to the saved value");
+            Assert.AreEqual(2, heard, "the HUD hears both changes");
+        }
+        finally
+        {
+            GameOption.AnyChanged -= Count;
+            option.EndPreview();
+        }
+    }
+
     private readonly Dictionary<GameOption, float> before = new Dictionary<GameOption, float>();
 
     private static IEnumerable<GameOption> Everything()

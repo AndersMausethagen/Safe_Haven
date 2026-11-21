@@ -194,7 +194,64 @@ public sealed class QuestTrackerView : MonoBehaviour
             builder.Append(builder.Length > 0 ? "\n\n" : "").Append($"<color={Muted}>{atHome} more at home</color>");
         }
 
+        string nextRescue = NextRescueWaitsFor(manager);
+        if (nextRescue != null)
+        {
+            builder.Append(builder.Length > 0 ? "\n\n" : "").Append($"<color={Muted}>{nextRescue}</color>");
+        }
+
         label.text = GameInput.WithRebinds(builder.ToString());
+    }
+
+    // While no rescue is under way, what the next one waits for (the systems review, 2026-11-21: a hidden gate reads as a lock, a gate
+    // tied to something in the world reads as story): "Someone Holding the Line: after Copper Fire". Only the nearest: one quest left.
+    private static string NextRescueWaitsFor(QuestManager manager)
+    {
+        QuestLog log = manager != null ? manager.Log : null;
+        if (log == null)
+        {
+            return null;
+        }
+
+        QuestDefinition next = null;
+        QuestDefinition before = null;
+        foreach (QuestDefinition quest in manager.Quests)
+        {
+            if (quest == null || quest.Rank != QuestRank.Rescue)
+            {
+                continue;
+            }
+
+            QuestStatus status = log.StatusOf(quest);
+            if (status == QuestStatus.Active || status == QuestStatus.ReadyToTurnIn)
+            {
+                return null;
+            }
+
+            if (status != QuestStatus.NotStarted || next != null)
+            {
+                continue;
+            }
+
+            QuestDefinition missing = null;
+            int open = 0;
+            foreach (QuestDefinition prerequisite in quest.Prerequisites)
+            {
+                if (prerequisite != null && log.StatusOf(prerequisite) != QuestStatus.Completed)
+                {
+                    missing = prerequisite;
+                    open++;
+                }
+            }
+
+            if (open == 1)
+            {
+                next = quest;
+                before = missing;
+            }
+        }
+
+        return next != null ? $"Next to be found: {next.DisplayName}, after {before.DisplayName}" : null;
     }
 
     // Anything with a clock, and anything with an open step that can be done out here.

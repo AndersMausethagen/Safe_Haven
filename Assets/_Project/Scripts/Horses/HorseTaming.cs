@@ -618,7 +618,7 @@ public sealed class HorseTaming : MonoBehaviour
 
         SaveableEntity copy = SaveableEntity.Spawn(prefab, transform.position, transform.rotation);
         Horse tamed = copy.GetComponent<Horse>();
-        tamed.BecomeTamed(wild.Stats, wild.Health.HealthFraction);
+        tamed.BecomeTamed(wild.Stats, wild.Health.HealthFraction, fed);
         tamed.Stamina = wild.Stamina;
         // In co-op the wild horse's copies go from friends' games, and the tamed one is in this player's hand.
         CoopHorses.Replaced(wild, tamed);
@@ -635,7 +635,8 @@ public sealed class HorseTaming : MonoBehaviour
             GameEvents.Raise(new GameEvent(GameEventKind.Custom, HorseSettings.Current.HorseTamed, 1, Player.Current != null ? Player.Current.gameObject : null));
         }
 
-        GameMessages.Post($"It stands quiet under you. It is yours, a {HorseTemperamentRules.NameOf(tamed.Stats.temperament)} {tamed.Stats.SexName}: give it a name.", MessageKind.Gain);
+        GameMessages.Post($"It stands quiet under you. It is yours, a {HorseTemperamentRules.NameOf(tamed.Stats.temperament)} {tamed.Stats.SexName}: give it a name." +
+                          (fed > 0 ? $" It remembers the barley from your hand: bond {tamed.CurrentBond():0}." : ""), MessageKind.Gain);
         HorseNameWindow.Offer(tamed);
     }
 

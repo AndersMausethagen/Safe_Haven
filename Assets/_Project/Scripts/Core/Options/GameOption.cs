@@ -58,10 +58,43 @@ public sealed class GameOption
     public static GameOption Choice(string key, string label, string help, int defaultIndex, params string[] choices) =>
         new GameOption(key, OptionKind.Choice, label, help, defaultIndex, 0f, choices.Length - 1, 1f, null, choices);
 
+    /// <summary>
+    /// Shows a value for a moment without saving it (the Options screen's Preview of a HUD setting, the systems review 2026-11-21):
+    /// <see cref="Value"/> reads it until <see cref="EndPreview"/>, PlayerPrefs keep the saved one, and listeners hear both changes.
+    /// </summary>
+    public void Preview(float shown)
+    {
+        previewValue = Clean(shown);
+        previewing = true;
+        AnyChanged?.Invoke(this);
+    }
+
+    /// <summary>Back to the saved value after <see cref="Preview"/>; nothing when no preview is showing.</summary>
+    public void EndPreview()
+    {
+        if (!previewing)
+        {
+            return;
+        }
+
+        previewing = false;
+        AnyChanged?.Invoke(this);
+    }
+
+    public bool IsPreviewing => previewing;
+
+    private bool previewing;
+    private float previewValue;
+
     public float Value
     {
         get
         {
+            if (previewing)
+            {
+                return previewValue;
+            }
+
             if (!loaded)
             {
                 value = Clean(PlayerPrefs.GetFloat(Prefix + key, Default));
@@ -72,6 +105,12 @@ public sealed class GameOption
         }
         set
         {
+            if (previewing)
+            {
+                previewing = false;
+                AnyChanged?.Invoke(this);
+            }
+
             float cleaned = Clean(value);
             if (Mathf.Approximately(cleaned, Value))
             {

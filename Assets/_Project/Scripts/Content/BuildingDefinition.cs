@@ -57,6 +57,9 @@ public class BuildingBonus
     [Min(0f)] public float fightShare;
     [Tooltip("Share of each blow it takes that comes back on the striker, never on a friend: 0.25 means a quarter (Hag's Knot).")]
     [Range(0f, 1f)] public float turnBackShare;
+    [Tooltip("Share more mending its damage costs: 0.5 means half again as much (Iron Bands: harder to break, harder to mend). A " +
+             "module's price, so a slot is a choice (the systems review, 2026-11-21).")]
+    [Min(0f)] public float mendCostShare;
     [Tooltip("Share more often gear made here comes out Fine or better: 0.1 means 10 points more (Barrow-iron Anvil). With the " +
              "station's other modules at most BuildingModules.MostLuck.")]
     [Range(0f, 1f)] public float fineChance;

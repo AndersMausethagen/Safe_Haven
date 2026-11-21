@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -25,7 +25,7 @@ using UnityEngine.AI;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Damageable), typeof(Combatant))]
 [InAFriendsHaven(HavenUse.ItsChoicesDecide, "the visitor's own horse is theirs; another's bags and stores ask the host")]
-public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity
+public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity, IInteractionName
 {
     public enum Mode { Wild, Lassoed, Breaking, Tamed }
 
@@ -268,12 +268,14 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         }
     }
 
-    /// <summary>Makes it the player's: called on the saved copy that takes the wild horse's place when its breaking ride ends.</summary>
-    public void BecomeTamed(HorseStats stats, float healthFraction)
+    /// <summary>Makes it the player's: called on the saved copy that takes the wild horse's place when its breaking ride ends.
+    /// <paramref name="fedOnRide"/>: the barley it ate from the rider's hand on that ride, each a little bond to start with.</summary>
+    public void BecomeTamed(HorseStats stats, float healthFraction, int fedOnRide = 0)
     {
         State = Mode.Tamed;
         BelongTo(GameSession.Playtest.Id, GameSession.Appearance != null ? GameSession.Appearance.DisplayName : "");
         Bond = Mathf.Max(Bond, HorseSettings.Current.BondWhenTamed);
+        Bond = HorseBondRules.Add(Bond, Mathf.Max(0, fedOnRide) * HorseSettings.Current.BondPerBreakingFeed);
         LastCared = PlantedTrees.Today;
         Give(stats);
         health.SetHealthFraction(healthFraction);
@@ -959,6 +961,30 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
     public bool IsOverfilled => Weight > Capacity + 0.001f;
     /// <summary>How much of its pace a load leaves it: full speed up to what it carries easily, down to 60% overloaded.</summary>
     public float SpeedScale => Weight <= Capacity * 0.6f ? 1f : Mathf.Lerp(1f, 0.6f, Mathf.InverseLerp(Capacity * 0.6f, Capacity * 1.25f, Weight));
+
+    /// <summary>
+    /// What its prompt calls it. A wild one shows its nature and how it looks before the lasso is thrown (the systems review, 2026-11-21:
+    /// RDR2 and Breath of the Wild show a horse's temper and class first, so a hard tame is chosen and feels earned): "Wild Horse,
+    /// stubborn: a hard fight on the rope. A fine one." on a smaller second line. Tamed, its name.
+    /// </summary>
+    public string InteractionName
+    {
+        get
+        {
+            if (!IsWild || definition == null)
+            {
+                return HorseName;
+            }
+
+            HorseTemperamentRules nature = Temperament;
+            float fight = nature.pull * nature.fight;
+            string rope = fight >= 1.15f ? "a hard fight on the rope" : fight <= 0.9f ? "an easy rope" : "a fair fight on the rope";
+            string near = nature.shyness >= 1.15f ? ", shy of you" : "";
+            float quality = Stats.Quality(definition);
+            string looks = quality >= 0.8f ? "A fine one." : quality >= 0.5f ? "A good one." : quality >= 0.25f ? "An ordinary one." : "A poor one.";
+            return $"{definition.DisplayName}\n<size=70%>{HorseTemperamentRules.NameOf(Stats.temperament)}: {rope}{near}. {looks}</size>";
+        }
+    }
 
     /// <summary>Its name and numbers, for its menu.</summary>
     public string StatsText()

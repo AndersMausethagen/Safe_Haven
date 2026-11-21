@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -42,17 +42,19 @@ public static class BuildingRepairs
         foreach (Damageable health in damaged)
         {
             BuildingDefinition building = health.GetComponent<BuildingObject>().Definition;
+            // Iron Bands and the like make mending dearer (mendCostShare): what they gain in health they cost in repairs.
             float missing = 1f - health.HealthFraction;
+            float dearer = share * (1f + (health.TryGetComponent(out Construction construction) ? construction.Sum(bonus => bonus.mendCostShare) : 0f));
             foreach (ResourceAmount cost in building.ConstructionCost)
             {
                 owedResources.TryGetValue(cost.Resource, out int owed);
-                owedResources[cost.Resource] = owed + Share(cost.Amount, missing, share);
+                owedResources[cost.Resource] = owed + Share(cost.Amount, missing, dearer);
             }
 
             foreach (ItemAmount cost in building.ConstructionItems)
             {
                 owedItems.TryGetValue(cost.Item, out int owed);
-                owedItems[cost.Item] = owed + Share(cost.Amount, missing, share);
+                owedItems[cost.Item] = owed + Share(cost.Amount, missing, dearer);
             }
         }
 

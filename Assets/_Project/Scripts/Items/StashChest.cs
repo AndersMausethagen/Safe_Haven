@@ -37,6 +37,31 @@ public sealed class StashChest : MonoBehaviour, ISaveable
     private Interactable interactable;
     private int block = -1;
     private bool started;
+    private bool skipsStore;
+
+    /// <summary>
+    /// True when the Store key (StashQuickStack) passes this chest over: its window still takes what is put in by hand. A chest kept for
+    /// one purpose (a raid kit, the good gear) stays as it was left (the systems review, 2026-11-21; Valheim's and Palworld's players asked for it).
+    /// </summary>
+    public bool SkipsStore
+    {
+        get => skipsStore;
+        set => skipsStore = value;
+    }
+
+    /// <summary>Whether the standing chest that has this block is passed over by the Store key.</summary>
+    public static bool BlockSkipsStore(int block)
+    {
+        foreach (StashChest chest in standing)
+        {
+            if (chest.block == block && chest.skipsStore && chest.IsStanding)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>Stash slots this chest gives room for (all of them for 0).</summary>
     public int StashSlots => Mathf.Min(StashStorage.ChestSlots,
@@ -216,11 +241,12 @@ public sealed class StashChest : MonoBehaviour, ISaveable
     private struct SavedState
     {
         public int block;
+        public bool skipsStore;
     }
 
     public string SaveKey => "stash-chest";
 
-    public string CaptureState() => JsonUtility.ToJson(new SavedState { block = block });
+    public string CaptureState() => JsonUtility.ToJson(new SavedState { block = block, skipsStore = skipsStore });
 
     public void RestoreState(string state)
     {
@@ -229,7 +255,9 @@ public sealed class StashChest : MonoBehaviour, ISaveable
             return;
         }
 
-        int saved = JsonUtility.FromJson<SavedState>(state).block;
+        SavedState loaded = JsonUtility.FromJson<SavedState>(state);
+        int saved = loaded.block;
+        skipsStore = loaded.skipsStore;
         block = saved >= 0 && saved < StashStorage.MaxChests ? saved : -1;
         RefreshStash();
     }

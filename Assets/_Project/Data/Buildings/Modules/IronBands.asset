@@ -60,6 +60,7 @@ MonoBehaviour:
     healthShare: 0.5
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0.5
     fineChance: 0
   cost:
   - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}

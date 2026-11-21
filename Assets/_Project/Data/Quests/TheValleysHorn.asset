@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: The Valley's Horn
   description: 'Eirik wants the Brukam''s tusk for a horn on the Watch Post (Tier III): blown when the ward breaks, it would put heart in every shot. Bring it home, fit it, and hold the next breach.'
   chain: Eirik
-  journalNotes: 
+  journalNotes: The Brukam's tusk is hollow at the root. Bound and blown from the Watch Post, it carries over the whole Haven, and those who hear it shoot steadier. It sounds once, when the ward breaks.
   rank: 4
   availableObjective: 
   announceStart: 1

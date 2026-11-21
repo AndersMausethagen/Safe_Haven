@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: Steel in the Water
   description: Gunnar says the old ones held a nykk with its own hair and steel in the water. Bring two of its pale hairs from the Moss Marsh, twist them into lines at the Dock (Tier II), and the deep fish will come.
   chain: Gunnar
-  journalNotes: 
+  journalNotes: 'A nykk''s hair is pale and does not rot. Twisted into lines, it holds what plain line can''t: the deep fish of the Dock. It grows like reeds at the Moss Marsh''s black pools, where the nykk plays.'
   rank: 4
   availableObjective: 
   announceStart: 1

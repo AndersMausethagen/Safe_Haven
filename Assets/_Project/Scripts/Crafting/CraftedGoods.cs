@@ -157,7 +157,10 @@ public static class CraftedWork
     public static ItemStack Make(ItemDefinition item, StatSheet maker) => Make(item, maker, 0f);
 
     /// <summary>The same at a station whose modules make Fine work more likely by <paramref name="stationChance"/> (a Barrow-iron Anvil).</summary>
-    public static ItemStack Make(ItemDefinition item, StatSheet maker, float stationChance)
+    public static ItemStack Make(ItemDefinition item, StatSheet maker, float stationChance) => Make(item, maker, stationChance, null);
+
+    /// <summary>The same; <paramref name="stationHelped"/> is called when the station's chance alone lifted the piece's quality.</summary>
+    public static ItemStack Make(ItemDefinition item, StatSheet maker, float stationChance, System.Action stationHelped)
     {
         if (item == null || !item.HasDurability)
         {
@@ -165,7 +168,13 @@ public static class CraftedWork
         }
 
         CraftedGoods goods = Of(item);
-        ItemQuality quality = QualityFor(QualityChance(goods, maker) + Mathf.Max(0f, stationChance), UnityEngine.Random.value, LevelingSettings.Current.MasterworkShare);
+        float roll = UnityEngine.Random.value;
+        float share = LevelingSettings.Current.MasterworkShare;
+        ItemQuality quality = QualityFor(QualityChance(goods, maker) + Mathf.Max(0f, stationChance), roll, share);
+        if (stationHelped != null && stationChance > 0f && quality > QualityFor(QualityChance(goods, maker), roll, share))
+        {
+            stationHelped();
+        }
         bool armour = IsArmour(goods);
         string run = armour ? "armour" : "weapons";
         // Sure Hand: after a run of plain pieces, the next is good work for sure.
@@ -194,7 +203,11 @@ public static class CraftedWork
     public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker) => GiveTo(bag, item, amount, maker, 0f);
 
     /// <summary>The same from a station whose modules make Fine work more likely by <paramref name="stationChance"/>.</summary>
-    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance)
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance) =>
+        GiveTo(bag, item, amount, maker, stationChance, null);
+
+    /// <summary>The same; <paramref name="stationHelped"/> as <see cref="Make(ItemDefinition, StatSheet, float, System.Action)"/> says.</summary>
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance, System.Action stationHelped)
     {
         if (bag == null || item == null || amount <= 0)
         {
@@ -221,7 +234,7 @@ public static class CraftedWork
         int given = 0;
         for (int i = 0; i < amount; i++)
         {
-            ItemStack piece = Make(item, maker, stationChance);
+            ItemStack piece = Make(item, maker, stationChance, stationHelped);
             if (bag.GiveMade(piece, ArrivalCause.Crafted) <= 0)
             {
                 break;

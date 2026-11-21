@@ -140,8 +140,21 @@ public sealed class MessageFeedView : MonoBehaviour
     {
         PlaceArea();
 
+        // While a window is open the lines wait, hidden, their time held: they drew over the windows (the systems review, 2026-11-21).
+        bool covered = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
         for (int i = lines.Count - 1; i >= 0; i--)
         {
+            if (covered)
+            {
+                Line held = lines[i];
+                held.ShownAt += Time.unscaledDeltaTime;
+                lines[i] = held;
+                Color hidden = lines[i].Label.color;
+                hidden.a = 0f;
+                lines[i].Label.color = hidden;
+                continue;
+            }
+
             float age = Time.unscaledTime - lines[i].ShownAt;
             float alpha = 1f - Mathf.Clamp01((age - visibleSeconds) / fadeSeconds);
             if (alpha <= 0f)
