@@ -630,6 +630,11 @@ public sealed class HorseTaming : MonoBehaviour
         Destroy(gameObject);
         tamed.Motion.PlayRear();
         PlayerHorsemanship.Practise(HorseWork.Tame);
+        if (HorseSettings.Current.HorseTamed != null)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.Custom, HorseSettings.Current.HorseTamed, 1, Player.Current != null ? Player.Current.gameObject : null));
+        }
+
         GameMessages.Post($"It stands quiet under you. It is yours, a {HorseTemperamentRules.NameOf(tamed.Stats.temperament)} {tamed.Stats.SexName}: give it a name.", MessageKind.Gain);
         HorseNameWindow.Offer(tamed);
     }

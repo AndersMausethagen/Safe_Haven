@@ -26,6 +26,18 @@ public sealed class HorseSettings : GameSettings<HorseSettings>
     [SerializeField] private string firstHorseTeller = "Sigrid";
     [SerializeField, TextArea] private string firstHorseLine = "There's a horse grazing out past the yard. A quiet one. Take a lasso and some barley, and keep low.";
 
+    [Header("The Stable's tale (the quest flow review's A22)")]
+    [Tooltip("Raised the first time a wild horse comes near the player at home: the Tale A Horse of Your Own starts on it.")]
+    [SerializeField, RaisedByGame] private GameEventDefinition wildHorseMet;
+    [Tooltip("Raised when a horse is tamed (its breaking ride won).")]
+    [SerializeField, RaisedByGame] private GameEventDefinition horseTamed;
+    [Tooltip("Metres from the player at which a wild horse counts as met.")]
+    [SerializeField, Min(1f)] private float metWithin = 20f;
+
+    public GameEventDefinition WildHorseMet => wildHorseMet;
+    public GameEventDefinition HorseTamed => horseTamed;
+    public float MetWithin => metWithin;
+
     [Header("Whistle")]
     [SerializeField] private SoundDefinition whistle;
     [Tooltip("Metres a horse hears its owner's whistle, at no bond and at full bond.")]

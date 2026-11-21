@@ -6099,6 +6099,99 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2573776553782260288, guid: 57caefaa61c0de94b81f7cf499a12fa9, type: 3}
   m_PrefabInstance: {fileID: 26332514}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &26408355
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 401098722}
+    m_Modifications:
+    - target: {fileID: 2540146243407197521, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_Name
+      value: Cold Hearth
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00091552734
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.9999695
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9848078
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.1736482
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4997697805100979590, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: id
+      value: 14e73c92e89541758b605f44ef6ba4cb
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780851048244056032, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      propertyPath: startsRuined
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2540146243407197521, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 26408358}
+  m_SourcePrefab: {fileID: 100100000, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+--- !u!4 &26408356 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4382164319841463301, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+  m_PrefabInstance: {fileID: 26408355}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &26408357 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2540146243407197521, guid: 62042647728bcb448a5358ddaddaa4a1, type: 3}
+  m_PrefabInstance: {fileID: 26408355}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &26408358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26408357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be84259c2160b9e4baee0b6f73aaca64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::ColdHearth
+  quest: {fileID: 11400000, guid: f89173a9aeb790c4f9aeb1cc56e0e655, type: 2}
+  verb: Set the shelter's ember
+  reach: 2.2
 --- !u!1001 &26727890
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -108379,6 +108472,7 @@ Transform:
   - {fileID: 849310539}
   - {fileID: 8390724}
   - {fileID: 982114932}
+  - {fileID: 26408356}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &401102943

@@ -56,6 +56,9 @@ MonoBehaviour:
   firstHorseRing: {x: 45, y: 70}
   firstHorseTeller: Sigrid
   firstHorseLine: There's a horse grazing out past the yard. A quiet one. Take a lasso and some barley, and keep low.
+  wildHorseMet: {fileID: 11400000, guid: 84982ddea87b5c347a9942d18f748b2f, type: 2}
+  horseTamed: {fileID: 11400000, guid: 342b8d4395c06ef48bc3f5fb0893378b, type: 2}
+  metWithin: 20
   whistle: {fileID: 11400000, guid: b8bda9bf83b3b9640a00ac9c8dd85eb2, type: 2}
   whistleReach: {x: 45, y: 160}
   whistleBond: 15
@@ -173,6 +176,8 @@ MonoBehaviour:
   - {x: 0.010653335, y: 0.0023790598, z: 0.005105041, w: 0.4750061}
   - {x: 0, y: 0, z: 0, w: 0}
   mountSeconds: 1.6666667
+  saddlebagsArt: Saddlebags
+  troughArt: Stable
   stableHealPerHour: 0.08
   swimSpeed: 2.6
   swimCost: 3

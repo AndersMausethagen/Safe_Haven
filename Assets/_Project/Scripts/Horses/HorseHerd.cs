@@ -57,6 +57,28 @@ public sealed class HorseHerd : MonoBehaviour
         }
     }
 
+    // The first wild horse near the player at home starts the Stable's tale (HorseSettings › Wild Horse Met), once a game.
+    private static void NoteWildHorseMet()
+    {
+        GameEventDefinition met = HorseSettings.Current.WildHorseMet;
+        Player player = Player.Current;
+        QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : null;
+        if (met == null || player == null || log == null || HavenVisit.IsVisiting || log.HasHappened(met))
+        {
+            return;
+        }
+
+        float within = HorseSettings.Current.MetWithin;
+        foreach (Horse horse in Horse.All)
+        {
+            if (horse != null && horse.IsWild && (horse.transform.position - player.transform.position).sqrMagnitude <= within * within)
+            {
+                GameEvents.Raise(new GameEvent(GameEventKind.Custom, met, 1, player.gameObject));
+                return;
+            }
+        }
+    }
+
     private void Update()
     {
         if (Time.time < nextCheck)
@@ -65,6 +87,7 @@ public sealed class HorseHerd : MonoBehaviour
         }
 
         nextCheck = Time.time + 2f;
+        NoteWildHorseMet();
         if (clock == null)
         {
             clock = FindAnyObjectByType<DayNightCycle>();

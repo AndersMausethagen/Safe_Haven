@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: firstcamp
   displayName: A Light in the Wood
-  description: 'The forest cannot forget a hearth that someone tends. Pick up the fallen sticks and loose stones around the portal and light a fire inside its ward (build menu: {key:Build}). Your people will see it through the mist.'
+  description: The forest cannot forget a hearth that someone tends. An ember from the shelter's fire came through the catch with you, still alive. Set it in the cold hearth in front of the portal, inside its ward. Your people will see it through the mist.
   chain: The Hearth and the Door
   journalNotes: 'This is the old bargain, though you are only starting to understand it. A fire inside the ward feeds the ward. It also shows, a long way off, to anyone who is looking for it.
 
 
-    Sticks and small rocks lie on the ground around the portal: walk up to them and pick them up ({key:Interact}). The build menu ({key:Build}) shows what the fire costs.'
+    You kept their fire: the ember from the shelter. The cold hearth by the portal takes it ({key:Interact}). Any campfire you build inside the ward counts too.'
   rank: 0
   availableObjective: 
   announceStart: 1
@@ -51,13 +51,19 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
   closedBy: {fileID: 0}
   startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
   - type: 7
-    description: 'Light a Campfire inside the ward (build menu: {key:Build})'
+    description: Set the shelter's ember in the cold hearth by the portal ({key:Interact})
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -76,11 +82,20 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []
   rewardResources: []
   rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
   experience: 0
   completionEvent: {fileID: 0}
   onCompleted: []

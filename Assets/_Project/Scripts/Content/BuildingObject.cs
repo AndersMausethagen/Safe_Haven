@@ -111,6 +111,25 @@ public sealed class BuildingObject : MonoBehaviour, IInteractionName, IEventSubj
         return count;
     }
 
+    /// <summary>
+    /// How many of a kind stand built: not a scaffold being raised for the first time, nor a ruin (the Haven's cold hearth counted as a
+    /// campfire already built, and A Light in the Wood was done as it began, 2026-11-21).
+    /// </summary>
+    public static int CountStanding(BuildingDefinition building)
+    {
+        int count = 0;
+        foreach (BuildingObject built in active)
+        {
+            if (built.definition != null && (building == null || built.definition == building)
+                && (!built.TryGetComponent(out Construction construction) || construction.IsStanding))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     /// <summary>The active building with this save id, or null.</summary>
     public static BuildingObject WithId(string id)
     {

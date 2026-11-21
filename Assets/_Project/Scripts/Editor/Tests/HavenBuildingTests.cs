@@ -207,8 +207,10 @@ public sealed class HavenBuildingTests
             }
 
             Assert.IsTrue(overgrowth.Any(o => o.GetComponent<ResourceNode>().Definition.RequiredToolTier >= 2), "some wait for better tools");
-            Construction ruin = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Construction>(true)).Single(c => c.StartsRuined);
-            Assert.AreEqual("StorageShed", ruin.GetComponent<BuildingObject>().Definition.name);
+            // The ruins the Haven starts with: the Storage Shed to repair, and the cold hearth the shelter's ember lights (A20, 2026-11-21).
+            Construction[] ruins = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Construction>(true)).Where(c => c.StartsRuined).ToArray();
+            CollectionAssert.AreEquivalent(new[] { "StorageShed", "Campfire" }, ruins.Select(r => r.GetComponent<BuildingObject>().Definition.name).ToArray());
+            Assert.IsNotNull(ruins.Single(r => r.GetComponent<BuildingObject>().Definition.name == "Campfire").GetComponent<ColdHearth>(), "the ruined campfire is the cold hearth");
         }
         finally
         {

@@ -217,7 +217,7 @@ public static class HavenPeople
             return null;
         }
 
-        return BuildingObject.Count(job.Workplace) > 0
+        return BuildingObject.CountStanding(job.Workplace) > 0
             ? $"At the {job.Workplace.DisplayName}."
             : $"Needs a {job.Workplace.DisplayName}: none stands yet.";
     }
