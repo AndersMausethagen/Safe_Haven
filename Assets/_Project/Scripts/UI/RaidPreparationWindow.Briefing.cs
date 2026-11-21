@@ -76,7 +76,8 @@ public sealed partial class RaidPreparationWindow
     private void DrawBriefing(RaidDefinition raid, RaidTimeOfDay timeOfDay, bool closed)
     {
         float y = BodyTop;
-        bool anyChip = DrawChips(raid, timeOfDay, closed, BodyTop + HeadingHeight);
+        int chipRows = DrawChips(raid, timeOfDay, closed, BodyTop + HeadingHeight);
+        bool anyChip = chipRows > 0;
         CollectEvents(raid, closed);
         CollectDangers(raid);
         bool anything = anyChip || eventFaces.Count > 0;
@@ -84,11 +85,16 @@ public sealed partial class RaidPreparationWindow
         if (anything)
         {
             y = Stack(thisRunHeading, y, HeadingHeight);
-            y = anyChip ? y + ChipRowHeight : y;
+            y += chipRows * ChipRowHeight;
             // As many rows of events as the column has room for above the dangers and finds; the rest scroll.
             float room = BodyBottom - y - SectionGap - BelowEvents(raid);
             y = ShowCards(eventCards, eventFaces, eventView, eventContent, y, room, AddEventCard);
             y += SectionGap;
+        }
+        else
+        {
+            // A locked place, or nothing to tell: last place's cards mustn't stay (they overlapped the dangers, and hovering one threw).
+            eventView.gameObject.SetActive(false);
         }
 
         dangersHeading.gameObject.SetActive(dangerFaces.Count > 0);
@@ -105,18 +111,34 @@ public sealed partial class RaidPreparationWindow
         DrawFinds(raid, y);
     }
 
-    // The hour, the map's mood and the sky the run opens in, each a short chip with its sign; what they mean on hover.
-    private bool DrawChips(RaidDefinition raid, RaidTimeOfDay timeOfDay, bool closed, float y)
+    // The hour, the map's mood and the sky the run opens in, each a short chip with its sign; what they mean on hover. A chip that
+    // would run past the column starts a second row. Returns the rows used.
+    private int DrawChips(RaidDefinition raid, RaidTimeOfDay timeOfDay, bool closed, float y)
     {
         UIStyle style = UIStyle.Current;
         float x = Margin;
-        bool anyChip = false;
+        int rows = 0;
+        float rowY = y;
+        float Place(Chip chip, string sign, string text)
+        {
+            rows = Mathf.Max(rows, 1);
+            float next = chip.Show(sign, text, x, rowY);
+            if (next - 8f > Margin + ColumnWidth && x > Margin)
+            {
+                rows++;
+                rowY += ChipRowHeight;
+                next = chip.Show(sign, text, Margin, rowY);
+            }
+
+            return next;
+        }
+
         hourChip.Root.SetActive(false);
         moodChip.Root.SetActive(false);
         skyChip.Root.SetActive(false);
         if (closed)
         {
-            return false;
+            return 0;
         }
 
         if (timeOfDay != null)
@@ -125,32 +147,29 @@ public sealed partial class RaidPreparationWindow
             int minutes = Mathf.FloorToInt((timeOfDay.hour - Mathf.Floor(timeOfDay.hour)) * 60f);
             string reward = timeOfDay.lootMultiplier > 1.001f ? $"  <color={UIStyle.Hex(style.Good)}>+{timeOfDay.lootMultiplier - 1f:P0} loot</color>" : "";
             bool dark = hours < 6 || hours >= 20;
-            x = hourChip.Show(dark ? "Lantern" : "Sun", $"{timeOfDay.DisplayName} {hours:00}:{minutes:00}{reward}", x, y);
+            x = Place(hourChip, dark ? "Lantern" : "Sun", $"{timeOfDay.DisplayName} {hours:00}:{minutes:00}{reward}");
             hourDetail = timeOfDay.briefing;
-            anyChip = true;
         }
 
         if (raid.LayoutRules != null)
         {
             (RaidShapeRule shape, RaidMapMood mood) = RaidLayoutPlanner.Choose(raid.LayoutRules, plan.Seed);
-            x = moodChip.Show("Path", mood.name, x, y);
+            x = Place(moodChip, "Path", mood.name);
             moodDetail = $"{mood.briefing} {shape.briefing}{Beyond(raid)}{RoutesLine(raid)}";
             moodTitle = "The " + raid.Land;
-            anyChip = true;
         }
 
         // The sky the run opens in and what it does (research W3), as the raid will begin in it (RaidWeather, the same seed).
         // No snow: the Haven's winter snows, a raid doesn't (RaidSky sets no snowfall), and a rainy opening was briefed as snow.
         WeatherDefinition opening = RaidWeather.Opening(raid, plan.Seed);
         string sky = RaidWeather.BriefingLine(opening, false, PerceptionSettings.Current);
-        if (sky != null && x + 120f < Margin + ColumnWidth)
+        if (sky != null)
         {
-            skyChip.Show(RaidWeather.IconFor(opening), RaidWeather.NameFor(opening, false), x, y);
+            Place(skyChip, RaidWeather.IconFor(opening), RaidWeather.NameFor(opening, false));
             skyDetail = sky;
-            anyChip = true;
         }
 
-        return anyChip;
+        return rows;
     }
 
     // Everything out there this run, as cards: told first what is worst (one of the Lost walking it), then the rumours, what the

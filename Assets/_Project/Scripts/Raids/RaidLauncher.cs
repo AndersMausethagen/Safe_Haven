@@ -156,7 +156,9 @@ public static class RaidLauncher
     /// </summary>
     /// <summary>True for someone who lives in the Haven and knows how to fight on a raid.</summary>
     public static bool CanGoAlong(ResidentDefinition person) =>
-        person != null && person.RaidCompanion != null && GameSession.Here.Find(person) != null;
+        person != null && person.RaidCompanion != null && GameSession.Here.Find(person) != null
+        // Not before they have been welcomed home: lost on a raid first, their rescue could never be handed in.
+        && ResidentQuests.RescueToHandIn(person) == null;
 
     /// <summary>Raised when the player goes through the portal, with what friends need to follow (co-op).</summary>
     public static event Action<RaidInvite> Launched;

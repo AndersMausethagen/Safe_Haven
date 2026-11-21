@@ -25,7 +25,10 @@ public static class RaidReportText
 
     /// <param name="listsShownApart">The haul is shown as pictures beside the words (RaidReportCards): what came home,
     /// was used up, lost or saved, what it was worth, and what was learned, are left out.</param>
-    public static string Describe(RaidReport report, bool listsShownApart)
+    public static string Describe(RaidReport report, bool listsShownApart) => Describe(report, listsShownApart, listsShownApart);
+
+    /// <param name="lessonsShownApart">What was learned is shown as cards (RaidReportCards) and is left out of the words.</param>
+    public static string Describe(RaidReport report, bool listsShownApart, bool lessonsShownApart)
     {
         var builder = new StringBuilder();
         if (!string.IsNullOrEmpty(report.BroughtDownBy))
@@ -66,8 +69,10 @@ public static class RaidReportText
         foreach (ResidentDefinition rescued in report.Rescued)
         {
             builder.Append($"<b><color={Gain}>{rescued.DisplayName} came home with you.</color></b>\n<i>\"{rescued.ArrivalLine}\"</i>\n");
-            string plans = PlansOf(rescued);
-            builder.Append(plans.Length > 0 ? $"<color={Muted}>{rescued.DisplayName} knows how to build: {plans}.</color>\n\n" : "\n");
+            // Brought home on a quest, what they know waits for the welcome at home (ResidentQuests.HandInRescue).
+            string plans = ResidentQuests.RescueToHandIn(rescued) != null ? "" : PlansOf(rescued);
+            builder.Append(plans.Length > 0 ? $"<color={Muted}>{rescued.DisplayName} knows how to build: {plans}.</color>\n\n"
+                : ResidentQuests.RescueToHandIn(rescued) != null ? $"<color={Muted}>Speak to {rescued.DisplayName} at home.</color>\n\n" : "\n");
         }
 
         if (!string.IsNullOrEmpty(report.TransportLine))
@@ -77,7 +82,7 @@ public static class RaidReportText
 
         if (listsShownApart)
         {
-            return WithoutLists(builder, report);
+            return WithoutLists(builder, report, lessonsShownApart);
         }
 
         bool gainedAny = report.ItemsGained.Count > 0 || report.ResourcesGained.Count > 0;
@@ -153,7 +158,7 @@ public static class RaidReportText
 
     // The rest of the report when its haul is shown as pictures: what held the player back, the gear worn on a fall, and
     // how the raid went.
-    private static string WithoutLists(StringBuilder builder, RaidReport report)
+    private static string WithoutLists(StringBuilder builder, RaidReport report, bool lessonsShownApart)
     {
         if (report.Extracted)
         {
@@ -177,7 +182,7 @@ public static class RaidReportText
             Paragraph(builder, $"<color={Muted}>You woke at the portal. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
         }
 
-        Paragraph(builder, Details(report, lessonsShownApart: true));
+        Paragraph(builder, Details(report, lessonsShownApart));
         return builder.ToString().Trim();
     }
 

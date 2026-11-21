@@ -132,7 +132,13 @@ public sealed class KitPictureCard
 
         // Sized to its words (hidden text measures nothing: then the plate keeps its last size).
         float words = badgeLabel.GetPreferredValues(text).x;
-        float plate = words > 0f ? Mathf.Clamp(Mathf.Ceil(words) + 12f, 24f, width - 8f) : badge.rectTransform.sizeDelta.x;
+        if (words <= 0f)
+        {
+            // Hidden text measures nothing (a window not yet open): judged from its letters instead.
+            words = text.Length * badgeLabel.fontSize * 0.6f;
+        }
+
+        float plate = Mathf.Clamp(Mathf.Ceil(words) + 12f, 24f, width - 8f);
         badge.rectTransform.sizeDelta = new Vector2(plate, 20f);
         badge.rectTransform.anchoredPosition = new Vector2(width - 4f - plate, badge.rectTransform.anchoredPosition.y);
         badgeLabel.rectTransform.sizeDelta = new Vector2(plate, 20f);

@@ -361,15 +361,12 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         gameObject.SetActive(false);
     }
 
-    // The deed first, so a quest bringing them home is waiting for its hand-in before their own line is asked to start: then it
-    // starts in their conversation at home (ResidentQuests.HandInRescue), not here. Rescued without such a quest, it starts now.
+    // The deed first, so a quest bringing them home is waiting for its hand-in before their own line is asked to start: StartFirst
+    // then refuses, and it starts in their conversation at home (ResidentQuests.HandInRescue). Rescued without such a quest, it starts now.
     private void BringHome(GameObject player)
     {
         QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
-        if (ResidentQuests.RescueUnderWay(resident) == null)
-        {
-            ResidentQuests.StartFirst(resident, player);
-        }
+        ResidentQuests.StartFirst(resident, player);
     }
 
     private void OnRaidEnded(RaidSession session)

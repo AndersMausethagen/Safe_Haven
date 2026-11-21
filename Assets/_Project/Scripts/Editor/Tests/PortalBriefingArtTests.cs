@@ -144,9 +144,26 @@ public sealed class PortalBriefingArtTests
             var second = new KitHaul(parent, "Second", 0f, 64f);
             var lessons = new KitCardRow(parent, "Lessons", 112f, 64f);
             float without = RaidReportCards.Show(report, first, second, 0f);
-            float with = RaidReportCards.Show(report, first, second, lessons, 0f);
+            float with = RaidReportCards.Show(report, first, second, lessons, 0f, 1000f, out bool shown);
+            Assert.IsTrue(shown);
             Assert.Greater(with, without, "the lessons' cards take their room under the haul");
             Assert.AreEqual(1, parent.Find("Lessons").GetComponentsInChildren<UnityEngine.UI.RawImage>(true).Length, "one card for the one skill");
+
+            // No room under the haul (the review of 2026-11-21: the results report was squeezed out): the words keep them.
+            float tight = RaidReportCards.Show(report, first, second, lessons, 0f, without + 20f, out bool squeezed);
+            Assert.IsFalse(squeezed, "no lesson cards where they don't fit");
+            Assert.AreEqual(without, tight, 0.01f);
+            Assert.IsFalse(parent.Find("Lessons").gameObject.activeSelf);
+            StringAssert.Contains("What you learned", RaidReportText.Describe(report, true, squeezed));
+
+            // Many skills stay one row: the last card counts the rest.
+            for (int i = 0; i < 11; i++)
+            {
+                report.Lessons.Add(new SkillLesson(skill, 1, 1, 5, 0, false));
+            }
+
+            float many = RaidReportCards.Show(report, first, second, lessons, 0f, 1000f, out _);
+            Assert.AreEqual(with, many, 0.01f, "twelve skills take the room of one row");
         }
         finally
         {

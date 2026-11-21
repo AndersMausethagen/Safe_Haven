@@ -176,9 +176,14 @@ public sealed partial class RaidPreparationWindow
         growthChip.Root.SetActive(false);
         if (ExperienceTracker.SinceLastRaid() is string grown)
         {
-            string[] parts = grown.Split(new[] { ", " }, System.StringSplitOptions.RemoveEmptyEntries);
+            string[] parts = grown.Split(',');
+            for (int i = 0; i < parts.Length; i++)
+            {
+                parts[i] = parts[i].Trim();
+            }
+
             growthChip.Show("Star", parts.Length > 1 ? $"{parts[0]}  <color={style.MutedHex}>+{parts.Length - 1} more</color>" : parts[0], RightColumn, y);
-            growthDetail = grown.Replace(", ", "\n") + ".";
+            growthDetail = string.Join("\n", parts) + ".";
             y += ChipRowHeight;
         }
 

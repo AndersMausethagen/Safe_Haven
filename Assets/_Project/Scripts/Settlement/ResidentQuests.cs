@@ -97,10 +97,6 @@ public static class ResidentQuests
     /// </summary>
     public static QuestDefinition RescueToHandIn(ResidentDefinition resident) => RescueIn(resident, QuestStatus.ReadyToTurnIn);
 
-    /// <summary>A quest under way (or waiting to be handed in) that brings <paramref name="resident"/> home, or null.</summary>
-    public static QuestDefinition RescueUnderWay(ResidentDefinition resident) =>
-        RescueIn(resident, QuestStatus.ReadyToTurnIn) ?? RescueIn(resident, QuestStatus.Active);
-
     private static QuestDefinition RescueIn(ResidentDefinition resident, QuestStatus status)
     {
         QuestLog log = Log;

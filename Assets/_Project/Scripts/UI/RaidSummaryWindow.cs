@@ -20,6 +20,8 @@ public sealed class RaidSummaryWindow : MonoBehaviour
 
     // Hearthline 3: the haul as pictures between the subtitle and the words (RaidReportCards); the panel grows to hold them.
     private const float CardSize = 64f;
+    private const float ScreenMargin = 80f;
+    private const float MinWords = 120f;
     // The raid's own results painting across the top, the title and subtitle on it (LocalSpawn art, as every window).
     private const float BannerHeight = 196f;
     private const float BannerKeep = 100f;
@@ -89,8 +91,11 @@ public sealed class RaidSummaryWindow : MonoBehaviour
         subtitleLabel.text = RaidReportText.Subtitle(report);
         MakeHaul();
         float painting = ShowBanner(report);
-        float haul = RaidReportCards.Show(report, first, second, lessons, 0f) + 10f;
-        string words = RaidReportText.Describe(report, true);
+        // The window stays on the screen: the lessons' cards only where there is room for them (else they stay in the words).
+        var screen = (RectTransform)panel.GetComponentInParent<Canvas>().rootCanvas.transform;
+        float room = screen.rect.height - ScreenMargin - panelHeight - painting + bodyHeight - MinWords;
+        float haul = RaidReportCards.Show(report, first, second, lessons, 0f, room, out bool lessonsShown) + 10f;
+        string words = RaidReportText.Describe(report, true, lessonsShown);
         bodyLabel.text = words;
         // The words take what they need, no more: a short report leaves no field of empty leather under the pictures.
         float need = words.Length > 0 ? bodyLabel.GetPreferredValues(words, bodyLabel.rectTransform.rect.width, 0f).y + 8f : 0f;

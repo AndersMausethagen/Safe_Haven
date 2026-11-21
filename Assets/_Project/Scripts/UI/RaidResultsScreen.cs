@@ -47,6 +47,8 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
     private KitCardRow lessons;
     private RectTransform reportRect;
     private float reportTop;
+    private float reportHeight;
+    private const float MinReportHeight = 220f;
 
     private void Awake()
     {
@@ -146,9 +148,10 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         subtitleLabel.text = RaidReportText.Subtitle(report);
         if (MakeHaul())
         {
-            float haul = RaidReportCards.Show(report, first, second, lessons, 0f) + 12f;
+            // The report keeps at least Min Report Height under the pictures: the lessons go back into the words before it is squeezed.
+            float haul = RaidReportCards.Show(report, first, second, lessons, 0f, reportHeight - MinReportHeight, out bool lessonsShown) + 12f;
             reportRect.offsetMax = new Vector2(reportRect.offsetMax.x, -(reportTop + haul));
-            bodyLabel.text = RaidReportText.Describe(report, true);
+            bodyLabel.text = RaidReportText.Describe(report, true, lessonsShown);
         }
         else
         {
@@ -178,6 +181,7 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
 
         reportRect = (RectTransform)reportScroll.transform;
         reportTop = -reportRect.offsetMax.y;
+        reportHeight = reportRect.rect.height;
         RectTransform area = CodeUI.At("Haul", reportRect.parent, reportRect.offsetMin.x, reportTop - 8f, 0f, 0f);
         area.anchorMax = new Vector2(1f, 1f);
         area.sizeDelta = new Vector2(reportRect.offsetMax.x - reportRect.offsetMin.x, 0f);

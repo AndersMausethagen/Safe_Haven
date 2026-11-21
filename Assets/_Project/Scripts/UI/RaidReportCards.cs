@@ -15,14 +15,25 @@ public static class RaidReportCards
     /// <summary>Shows the report's haul in <paramref name="first"/> and <paramref name="second"/>, the first at
     /// <paramref name="top"/>; returns the height they take together.</summary>
     public static float Show(RaidReport report, KitHaul first, KitHaul second, float top, int rows = 2) =>
-        Show(report, first, second, null, top, rows);
+        ShowHaul(report, first, second, top, rows);
 
-    /// <summary>As Show, with what was learned as cards in <paramref name="lessons"/> under the haul.</summary>
-    public static float Show(RaidReport report, KitHaul first, KitHaul second, KitCardRow lessons, float top, int rows = 2)
+    /// <summary>
+    /// As Show, with what was learned as one row of cards in <paramref name="lessons"/> under the haul, when it fits within
+    /// <paramref name="room"/> with the haul. <paramref name="lessonsShown"/> says whether it did: if not, the words keep the lessons
+    /// (RaidReportText.Describe), so a long haul never squeezes the report out (the review of 2026-11-21).
+    /// </summary>
+    public static float Show(RaidReport report, KitHaul first, KitHaul second, KitCardRow lessons, float top, float room, out bool lessonsShown, int rows = 2)
     {
         float haul = ShowHaul(report, first, second, top, rows);
+        lessonsShown = false;
         if (lessons == null)
         {
+            return haul;
+        }
+
+        if (report.Lessons.Count == 0 || haul + Gap + lessons.HeightFor(report.Lessons.Count) > room)
+        {
+            lessons.Hide();
             return haul;
         }
 
@@ -47,6 +58,7 @@ public static class RaidReportCards
         float gap = haul > 0f && faces.Count > 0 ? Gap : 0f;
         lessons.Top = top + haul + gap;
         float learned = lessons.Show(RaidReportText.LessonsHeading(report), "Star", style.Accent, faces);
+        lessonsShown = learned > 0f;
         return haul + (learned > 0f ? gap + learned : 0f);
     }
 
