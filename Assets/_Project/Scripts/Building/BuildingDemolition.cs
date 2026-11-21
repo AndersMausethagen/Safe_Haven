@@ -239,6 +239,13 @@ public static class BuildingDemolition
                     spares++;
                 }
             }
+
+            // One paid for and still being hammered goes to the store too.
+            if (construction.IsFitting)
+            {
+                GameSession.Home.AddSpareModule(construction.Fitting.Id);
+                spares++;
+            }
         }
 
         SaveableEntity.RemoveForGood(building.gameObject);

@@ -57,6 +57,39 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         return true;
     }
 
+    /// <summary>Puts the scaffold up to fit <paramref name="module"/> (BuildingModules pays and checks). False with a job under way already.</summary>
+    internal bool BeginFitting(BuildingModuleDefinition module)
+    {
+        if (module == null || IsBuilding || IsFitting || fitted.Contains(module))
+        {
+            return false;
+        }
+
+        fitting = module;
+        Work = 0f;
+        Refresh();
+        ModulesChanged?.Invoke(this);
+        return true;
+    }
+
+    // The hammering is done: the module is fitted and counts from now (a Fit Module objective counts it here).
+    private void FinishFitting(GameObject by)
+    {
+        BuildingModuleDefinition module = fitting;
+        fitting = null;
+        Work = 0f;
+        AddModule(module);
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        look.Celebrate();
+        GameMessages.Post($"The {module.DisplayName} is fitted to the {Definition.DisplayName}: {module.Effect()}.", MessageKind.Gain);
+        GameObject builder = by != null ? by : Player.Current != null ? Player.Current.gameObject : null;
+        GameEvents.Raise(new GameEvent(GameEventKind.ModuleFitted, module, 1, builder, detail: Definition));
+    }
+
     /// <summary>Takes <paramref name="module"/> off. False when it wasn't fitted.</summary>
     internal bool RemoveModule(BuildingModuleDefinition module)
     {
@@ -89,13 +122,22 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     public bool IsStanding => Level >= 1;
 
     /// <summary>
+    /// The module being fitted (paid for or taken from store, its scaffold up), or null. Fitting is hammered like a tier (the research's
+    /// decision 2): the module counts once the hammering is done; the station keeps working meanwhile. One job at a time: a tier or a module.
+    /// </summary>
+    public BuildingModuleDefinition Fitting => fitting;
+    public bool IsFitting => fitting != null;
+    private BuildingModuleDefinition fitting;
+
+    /// <summary>
     /// Whether a defence (a trap, a ward totem, a watch post) does its work: it stands (not a scaffold or a ruin) and isn't broken
     /// down; being upgraded it goes on. The one rule for all three (review 2026-11-16: each had its own, and a broken trap still bit).
     /// </summary>
     public static bool DefenceWorks(Construction construction, Damageable health) =>
         (construction == null || construction.IsStanding) && (health == null || !health.IsBroken);
-    public bool CanUpgrade => IsStanding && !IsBuilding && Level < Definition.MaxLevel;
-    public float WorkNeeded => Target <= 1 ? (Definition.BuildWork > 0f ? Definition.BuildWork : ConstructionSettings.Current.RepairWork)
+    public bool CanUpgrade => IsStanding && !IsBuilding && !IsFitting && Level < Definition.MaxLevel;
+    public float WorkNeeded => !IsBuilding && IsFitting ? fitting.Work
+        : Target <= 1 ? (Definition.BuildWork > 0f ? Definition.BuildWork : ConstructionSettings.Current.RepairWork)
         : Definition.UpgradeTo(Target)?.work ?? 0f;
     public float Share => WorkNeeded > 0f ? Mathf.Clamp01(Work / WorkNeeded) : 1f;
 
@@ -103,7 +145,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
     bool ISharedState.IsShared => true;
 
-    int ISharedState.SharedMark => unchecked((((Level * 31 + Target) * 31 + Mathf.FloorToInt(Work)) * 2 + (Paid ? 1 : 0)) * 37 + ModuleMark());
+    int ISharedState.SharedMark => unchecked(((((Level * 31 + Target) * 31 + Mathf.FloorToInt(Work)) * 2 + (Paid ? 1 : 0)) * 37 + ModuleMark()) * 41
+        + (fitting != null ? fitting.Id.GetHashCode() : 0));
 
     private int ModuleMark()
     {
@@ -242,7 +285,9 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
         if (!CanUpgrade)
         {
-            GameMessages.Post(IsBuilding ? "It is already being worked on." : $"The {Title} can't be improved further.", MessageKind.Warning);
+            GameMessages.Post(IsBuilding ? "It is already being worked on."
+                : IsFitting ? $"Finish fitting the {fitting.DisplayName} first: hold {{key:Hammer}} at the {Definition.DisplayName}."
+                : $"The {Title} can't be improved further.", MessageKind.Warning);
             return false;
         }
 
@@ -273,7 +318,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     public bool CanWork(GameObject user, out string reason)
     {
         reason = null;
-        if (!IsBuilding)
+        if (!IsBuilding && !IsFitting)
         {
             reason = "Nothing to build here.";
             return false;
@@ -404,7 +449,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     /// </summary>
     public float AddWork(float seconds)
     {
-        if (!IsBuilding || !Paid || seconds <= 0f)
+        if ((!IsBuilding && !IsFitting) || !Paid || seconds <= 0f)
         {
             return 0f;
         }
@@ -440,6 +485,11 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     {
         if (!IsBuilding)
         {
+            if (IsFitting)
+            {
+                FinishFitting(by);
+            }
+
             return;
         }
 
@@ -557,11 +607,11 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         }
 
         bool rising = IsBuilding && Level == 0;
-        look.ShowScaffold(IsBuilding);
+        look.ShowScaffold(IsBuilding || IsFitting);
 
         if (siteInteractable != null)
         {
-            siteInteractable.gameObject.SetActive(IsBuilding);
+            siteInteractable.gameObject.SetActive(IsBuilding || IsFitting);
         }
 
         foreach (Interactable own in GetComponents<Interactable>())
@@ -614,11 +664,13 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
     // ----- Saving -----
 
-    // "Level,Target,Work,Paid" and, with modules fitted, ",<their ids joined by |>": a building without modules saves as it always did.
+    // "Level,Target,Work,Paid" and, with modules fitted, ",<their ids joined by |>", and with one being fitted, ",<its id>" after that (the
+    // fitted part may be empty): a building without modules saves as it always did.
     public string CaptureState()
     {
         string state = string.Join(",", Level, Target, Work.ToString(System.Globalization.CultureInfo.InvariantCulture), Paid ? 1 : 0);
-        return fitted.Count == 0 ? state : state + "," + string.Join("|", fitted.ConvertAll(module => module != null ? module.Id : ""));
+        string ids = string.Join("|", fitted.ConvertAll(module => module != null ? module.Id : ""));
+        return fitting != null ? state + "," + ids + "," + fitting.Id : fitted.Count == 0 ? state : state + "," + ids;
     }
 
     public void RestoreState(string state)
@@ -634,6 +686,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Work = float.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture);
         Paid = parts[3] == "1";
         fitted.Clear();
+        fitting = parts.Length >= 6 && !string.IsNullOrEmpty(parts[5]) ? Resources.Load<ContentDatabase>(ContentDatabase.ResourceName)?.FindModule(parts[5]) : null;
         if (parts.Length >= 5 && !string.IsNullOrEmpty(parts[4]))
         {
             ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

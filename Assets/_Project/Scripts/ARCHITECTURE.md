@@ -2857,6 +2857,8 @@ From the user's list after their 72-minute run.
   other building and the build menu's Manage › Upgrade (a wall piece keeps its action-menu page). `MenuPage.Haul` (`MenuHaul`) shows
   things as KitHaul cards in any ActionMenuWindow page (the take-down refund, an upgrade's cost). Module icons:
   `Tools/LocalSpawn/module_icons.json` (`generate_item_icons.py --set modules`), in `Art/Icons/Modules`.
-  Not yet: the hammered fitting job, modules
+  Fitting is hammered (2026-11-21): `BuildingModules.Fit` pays (or takes a spare) and `Construction.BeginFitting` puts the scaffold up for
+  the module's Work seconds; it counts from `FinishFitting` (ModuleFitted raised there), one job at a time with tiers, the station working
+  meanwhile; saved as a sixth state part. Not yet: modules
   needing new items (Barrow-iron Anvil, Jeweller's Bench, Burl Still, Jutul Cold Store, Bloomery Hearth, Nykk-hair Lines, Brukam's Horn,
   Living Heart) and their quests and rumours; the Storage Shed's two (the shed already holds a chest's 60-slot most).

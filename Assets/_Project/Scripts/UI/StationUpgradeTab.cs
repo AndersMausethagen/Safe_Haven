@@ -396,8 +396,9 @@ public sealed class StationUpgradeTab
         {
             bool affordable = pool.CanAfford(next.essence, next.cost, out string lacking);
             bool open = BuildingUnlocks.IsOpen(next);
-            string why = !mayChange ? HavenVisit.Refusal : !open ? missing : !affordable ? lacking : "";
-            upgradeButton.Bind(new MenuAction($"Upgrade to Tier {Tiers.ToRoman(level + 1)}", why, mayChange && open && affordable,
+            string why = !mayChange ? HavenVisit.Refusal : construction.IsFitting ? $"Finish fitting the {construction.Fitting.DisplayName} first"
+                : !open ? missing : !affordable ? lacking : "";
+            upgradeButton.Bind(new MenuAction($"Upgrade to Tier {Tiers.ToRoman(level + 1)}", why, mayChange && !construction.IsFitting && open && affordable,
                 () => construction.TryOrderUpgrade(user)) { Icon = "Hammer" });
         }
         else
@@ -432,7 +433,7 @@ public sealed class StationUpgradeTab
         int open = StationExtensions.Slots(building);
         IReadOnlyList<BuildingModuleDefinition> fitted = construction.Fitted;
         IReadOnlyList<BuildingObject> placed = StationExtensions.Of(building);
-        int used = fitted.Count + placed.Count;
+        int used = fitted.Count + placed.Count + (construction.IsFitting ? 1 : 0);
         slotCount.text = takes ? HearthKit.ToneNumbers($"{used} of {open} slot{(open == 1 ? "" : "s")} used") : "";
         int cards = takes ? Mathf.Clamp(Mathf.Max(open, definition.MaxLevel), 1, BuildingModules.MostSlots) : 0;
         for (int i = 0; i < slots.Count; i++)
@@ -453,9 +454,16 @@ public sealed class StationUpgradeTab
                 ShowSlot(card, module.Icon != null ? module.Icon : style.Icon("Gear"), null, module.DisplayName, "Fitted", true);
                 card.Remove.gameObject.SetActive(mayChange && !HavenVisit.IsVisiting);
             }
+            else if (i == fitted.Count && construction.IsFitting && i < open)
+            {
+                BuildingModuleDefinition module = construction.Fitting;
+                ShowSlot(card, module.Icon != null ? module.Icon : style.Icon("Gear"), null, module.DisplayName,
+                    GameInput.WithRebinds($"Hold {{key:Hammer}}: {Mathf.RoundToInt(construction.Share * 100f)}%"), false);
+                card.Rim.color = HearthKit.Faded(style.Accent, 0.6f);
+            }
             else if (i < used)
             {
-                BuildingObject extension = placed[i - fitted.Count];
+                BuildingObject extension = placed[i - fitted.Count - (construction.IsFitting ? 1 : 0)];
                 ShowSlot(card, extension.Definition != null ? extension.Definition.Icon : null, "House", extension.Definition != null ? extension.Definition.DisplayName : "Extension",
                     "Placed beside it", true);
             }
@@ -477,7 +485,7 @@ public sealed class StationUpgradeTab
 
         // What fits: what can be fitted now first, then by the tier it needs.
         List<BuildingModuleDefinition> known = takes
-            ? BuildingModules.All.Where(m => m != null && m.Fits(definition) && !fitted.Contains(m) && BuildingModules.IsKnown(m))
+            ? BuildingModules.All.Where(m => m != null && m.Fits(definition) && !fitted.Contains(m) && m != construction.Fitting && BuildingModules.IsKnown(m))
                 .OrderBy(m => BuildingModules.WhyNot(building, m) == null ? 0 : 1).ThenBy(m => m.Tier).ThenBy(m => m.DisplayName).ToList()
             : new List<BuildingModuleDefinition>();
         MaterialPool pool = MaterialPool.For(user);
@@ -529,7 +537,7 @@ public sealed class StationUpgradeTab
         bool spare = GameSession.Home.SpareCount(module.Id) > 0;
         bool affordable = spare || pool.CanAfford(module.Essence, module.Cost, out _);
         row.Note.gameObject.SetActive(why != null || spare);
-        row.Note.text = why ?? "A spare waits in store: fitting it is free";
+        row.Note.text = GameInput.WithRebinds(why ?? "A spare waits in store: fitting it is free");
         row.Note.color = why != null ? style.Danger : style.Good;
         int chip = 0;
         if (why == null && !spare)

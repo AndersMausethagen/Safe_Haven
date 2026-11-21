@@ -55,6 +55,26 @@ public sealed class HavenBuildingTests
     }
 
     [Test]
+    public void AModule_IsHammeredOn_AndCountsOnlyOnceItIsFitted_AndIsSavedMidWay()
+    {
+        // Fitting is hammered like a tier (Docs/BuildingUpgradesResearch_2026-11-21.md, decision 2): saved half done, it comes back so.
+        Construction construction = Building(4f, new BuildingLevel { title = "Sturdy" });
+        construction.RestoreState("1,1,2.5,1,,module.storageloft");
+        Assert.IsTrue(construction.IsFitting, "being fitted");
+        Assert.AreEqual(0, construction.Fitted.Count, "not counted yet");
+        Assert.IsFalse(construction.IsBuilding, "the station keeps working");
+        Assert.AreEqual(construction.Fitting.Work, construction.WorkNeeded, 0.001f, "its own hammering");
+        Assert.AreEqual("1,1,2.5,1,,module.storageloft", construction.CaptureState());
+        Assert.IsFalse(construction.CanUpgrade, "one job at a time");
+
+        construction.Finish();
+        Assert.IsFalse(construction.IsFitting);
+        Assert.AreEqual(1, construction.Fitted.Count);
+        Assert.AreEqual("module.storageloft", construction.Fitted[0].Id);
+        Assert.AreEqual("1,1,0,1,module.storageloft", construction.CaptureState());
+    }
+
+    [Test]
     public void Construction_SavesItsLevelAndTheWorkDone()
     {
         Construction construction = Building(6f, new BuildingLevel { title = "Sturdy", work = 8f });

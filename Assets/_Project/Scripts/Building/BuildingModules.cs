@@ -38,7 +38,7 @@ public static class BuildingModules
 
     /// <summary>The slots used: the placed extensions working for it and the modules fitted.</summary>
     public static int Used(BuildingObject building) =>
-        StationExtensions.Of(building).Count + (building != null && building.TryGetComponent(out Construction c) ? c.Fitted.Count : 0);
+        StationExtensions.Of(building).Count + (building != null && building.TryGetComponent(out Construction c) ? c.Fitted.Count + (c.IsFitting ? 1 : 0) : 0);
 
     public static int Free(BuildingObject building) => Mathf.Max(0, StationExtensions.Slots(building) - Used(building));
 
@@ -151,6 +151,11 @@ public static class BuildingModules
             return $"Finish the {building.Definition.DisplayName} first.";
         }
 
+        if (construction.IsFitting)
+        {
+            return construction.Fitting == module ? "Being fitted: hold {key:Hammer} at it." : $"Finish fitting the {construction.Fitting.DisplayName} first.";
+        }
+
         if (construction.Level < module.Tier)
         {
             return $"Needs the {building.Definition.DisplayName} at Tier {Tiers.ToRoman(module.Tier)}.";
@@ -200,9 +205,9 @@ public static class BuildingModules
             return false;
         }
 
-        building.GetComponent<Construction>().AddModule(module);
-        GameMessages.Post($"Fitted the {module.DisplayName} to the {building.Definition.DisplayName}: {module.Effect()}.", MessageKind.Gain);
-        GameEvents.Raise(new GameEvent(GameEventKind.ModuleFitted, module, 1, user, detail: building.Definition));
+        // Hammered like a tier (the research's decision 2): the scaffold goes up, and the module counts once the hammering is done.
+        building.GetComponent<Construction>().BeginFitting(module);
+        GameMessages.Post(GameInput.WithRebinds($"The scaffold is up for the {module.DisplayName}. Hold {{key:Hammer}} at the {building.Definition.DisplayName} to fit it."));
         return true;
     }
 

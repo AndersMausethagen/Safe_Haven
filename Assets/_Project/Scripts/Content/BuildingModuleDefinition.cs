@@ -46,6 +46,8 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     [Header("What it costs")]
     [SerializeField] private List<ItemAmount> cost = new List<ItemAmount>();
     [SerializeField] private List<ResourceAmount> essence = new List<ResourceAmount>();
+    [Tooltip("Seconds of hammering at the building's scaffold to fit it (a spare too).")]
+    [SerializeField, Min(0.5f)] private float work = 5f;
     [Tooltip("Known from the start. Otherwise a quest teaches it as it starts (QuestDefinition › Unlocks Modules).")]
     [SerializeField] private bool knownFromStart;
 
@@ -59,6 +61,7 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     public BuildingBonus Bonus => bonus;
     public IReadOnlyList<ItemAmount> Cost => cost;
     public IReadOnlyList<ResourceAmount> Essence => essence;
+    public float Work => Mathf.Max(0.5f, work);
     public bool KnownFromStart => knownFromStart;
 
     /// <summary>True when it may be fitted to this kind of building (tier aside).</summary>
