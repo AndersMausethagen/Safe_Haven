@@ -13,7 +13,10 @@ using UnityEngine;
 /// <item>a building to build must be known, with what it needs standing already built by a quest before it;</item>
 /// <item>a material counts as had when the world gives it (gathering, trees, water, kills, things lying about, the scenes) or when a
 /// known recipe makes it at a station a quest before this one had the player build, from materials that count as had;</item>
-/// <item>luck doesn't count: supply caches, raid events, trade and blueprints found on a raid.</item>
+/// <item>luck doesn't count: supply caches, raid events, trade and blueprints found on a raid;</item>
+/// <item>but a sure thing does (the user asked for quests that send the player into a raid for a rare part, 2026-11-21): what a creature
+/// always drops (a boss's trophy), and what a rumour's site always gives while the quest asking for it is under way (the Moonsilver
+/// Folio rule of Docs/BuildingUpgradesResearch_2026-11-21.md §5.1).</item>
 /// </list>
 /// QuestAuditTests asks for none. Read-only: loads assets and reads the two home scenes as text, like ContentAudit.
 /// </summary>
@@ -39,6 +42,8 @@ public static class QuestReachability
         public readonly Dictionary<BuildingDefinition, int> Built = new Dictionary<BuildingDefinition, int>();
         public readonly HashSet<RecipeDefinition> Recipes = new HashSet<RecipeDefinition>();
         public readonly HashSet<ItemDefinition> Rewarded = new HashSet<ItemDefinition>();
+        // What a rumour's site is sure to give while this quest is under way (or with no quest asked).
+        public readonly HashSet<ItemDefinition> RumourGiven = new HashSet<ItemDefinition>();
 
         public int TierBuilt(BuildingDefinition building) => building != null && Built.TryGetValue(building, out int tier) ? tier : 0;
     }
@@ -49,6 +54,8 @@ public static class QuestReachability
         public readonly Dictionary<ItemDefinition, List<RecipeDefinition>> MadeBy = new Dictionary<ItemDefinition, List<RecipeDefinition>>();
         public readonly List<BuildingDefinition> Buildings = new List<BuildingDefinition>();
         public readonly List<RecipeDefinition> AllRecipes = new List<RecipeDefinition>();
+        // Item -> the quests a rumour sure to give it waits for (a null entry: any time).
+        public readonly Dictionary<ItemDefinition, List<QuestDefinition>> RumourGives = new Dictionary<ItemDefinition, List<QuestDefinition>>();
     }
 
     /// <summary>"Quest: what it asks for, and why that can't be had yet", for every quest that asks before it teaches.</summary>
@@ -59,6 +66,14 @@ public static class QuestReachability
         foreach (QuestDefinition quest in QuestAudit.Quests().OrderBy(q => q.name))
         {
             Reach reach = ReachBefore(quest, world);
+            foreach (KeyValuePair<ItemDefinition, List<QuestDefinition>> given in world.RumourGives)
+            {
+                if (given.Value.Any(waitsFor => waitsFor == null || waitsFor == quest))
+                {
+                    reach.RumourGiven.Add(given.Key);
+                }
+            }
+
             // In the order they are listed: a step that has the player build something teaches the steps after it ("raise the
             // Lodge, build the Yard, make a barrow there").
             foreach (QuestObjective objective in quest.Objectives)
@@ -144,7 +159,7 @@ public static class QuestReachability
 
     // Had: the world gives it, a quest before this one gave it, or it can be made.
     private static bool Had(ItemDefinition item, Reach reach, World world, int depth) =>
-        world.Natural.Contains(item) || reach.Rewarded.Contains(item) || Makeable(item, reach, world, depth);
+        world.Natural.Contains(item) || reach.Rewarded.Contains(item) || reach.RumourGiven.Contains(item) || Makeable(item, reach, world, depth);
 
     private static bool Makeable(ItemDefinition item, Reach reach, World world, int depth)
     {
@@ -319,9 +334,38 @@ public static class QuestReachability
         {
             foreach (ItemDropEntry entry in monster.LootTable != null ? monster.LootTable.Drops.Entries : System.Array.Empty<ItemDropEntry>())
             {
-                if (entry != null && entry.Item != null && entry.FromTier <= 0 && !entry.Item.RaidOnly)
+                // A sure drop is not luck, raid-only part or not (the Brukam's tusk).
+                if (entry != null && entry.Item != null && ((entry.FromTier <= 0 && !entry.Item.RaidOnly) || entry.Probability >= 1f))
                 {
                     naturalPaths.Add(AssetDatabase.GetAssetPath(entry.Item));
+                }
+            }
+        }
+
+        // Rumours whose site gives a thing for sure, and the quest each waits for.
+        foreach (RaidRumourDefinition rumour in Load<RaidRumourDefinition>())
+        {
+            if (rumour.Site == null || !rumour.Urgent)
+            {
+                continue;
+            }
+
+            foreach (RaidEventChoice choice in rumour.Site.Choices)
+            {
+                foreach (GiveLootOutcome give in (choice?.outcomes ?? new List<RaidEventOutcome>()).OfType<GiveLootOutcome>())
+                {
+                    foreach (ItemDropEntry entry in give.Loot.Entries)
+                    {
+                        if (entry != null && entry.Item != null && entry.Probability >= 1f && entry.FromTier <= 0)
+                        {
+                            if (!world.RumourGives.TryGetValue(entry.Item, out List<QuestDefinition> waits))
+                            {
+                                world.RumourGives[entry.Item] = waits = new List<QuestDefinition>();
+                            }
+
+                            waits.Add(rumour.WhileQuest);
+                        }
+                    }
                 }
             }
         }

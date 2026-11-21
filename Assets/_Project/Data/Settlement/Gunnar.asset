@@ -52,4 +52,10 @@ MonoBehaviour:
     waitingText: A Dock on the still water, and one fish from it.
     askText: 
     thanksText: 
+  - quest: {fileID: 11400000, guid: 039aaf379d25f0f4a8ec97eed60f5a83, type: 2}
+    text: 'My grandmother said you hold a nykk with its own hair and steel in the water. Its hair makes a line the deep fish can''t leave alone. The reeds in the Moss Marsh: it combs itself there. Two hairs. Don''t say its name.'
+    acceptText: Two hairs, and no names.
+    waitingText: Two of its pale hairs from the Moss Marsh reeds, and the Dock at Tier II.
+    askText: 
+    thanksText: 
   questLineDone: 

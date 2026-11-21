@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: DrownedCreel
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.drownedcreel
+  displayName: The Drowned Fisher's Creel
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 2296875460002273048, guid: 67136cad105bb00419770426a7791d87, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A fisher's creel caught in the reeds, half under the black water. Pale hair is wound through its weave like line.
+  artwork: {fileID: 21300000, guid: 0486280571caa174fb4aa0a1367d6617, type: 3}
+  onStart: []
+  choices:
+  - label: Take the pale hair
+    detail: Don't say its name.
+    cost: []
+    result: The water stays still. For now.
+    outcomes:
+    - rid: 287758281410609442
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609442
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: be33534fe22e92d4da7e71d0c79c6e14, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 2
+            maxQuantity: 2
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0

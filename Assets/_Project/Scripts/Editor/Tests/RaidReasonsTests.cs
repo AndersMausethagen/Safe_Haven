@@ -129,11 +129,14 @@ public sealed class RaidReasonsTests
         RaidRumourDefinition tor = Rumour("Tor");
         int day = SeedAt("Day");
         SettlementState settlement = Survived(1);
-        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null), "Bjarne comes home first");
+        // His rumour comes up while his rescue is under way (Docs/RescueOrder.md, 2026-11-21: it waits for Bjarne's line).
+        string[] searching = { "rescue.tor" };
+        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null, searching), "Bjarne comes home first");
         settlement.AddResident(Person("Bjarne"));
-        Assert.IsTrue(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null));
+        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null), "not before his rescue is asked for");
+        Assert.IsTrue(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null, searching));
         settlement.AddResident(Person("Tor"));
-        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null));
+        Assert.IsFalse(tor.CanComeUp(RaidTimeOfDay.For(Woods, day), settlement, null, searching));
     }
 
     [Test]

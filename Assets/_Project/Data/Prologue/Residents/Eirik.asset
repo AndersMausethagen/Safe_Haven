@@ -65,4 +65,10 @@ MonoBehaviour:
     waitingText: Three spike traps where they'll come through. Then hold the next breach.
     askText: 
     thanksText: 
+  - quest: {fileID: 11400000, guid: c414ab0a8aa5e4841ae686c8aa21b4f2, type: 2}
+    text: The Brukam's dead and its tusk is lying out there. Hollow it, bind it in iron, hang it on the post. When the ward breaks I'll blow it, and every one of us will shoot like we mean it.
+    acceptText: I'll bring you the tusk.
+    waitingText: The Brukam's tusk, and the Watch Post at Tier III to hang it on. Then we hold the next breach.
+    askText: 
+    thanksText: 
   questLineDone: 

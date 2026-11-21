@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: IronBarrow
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.ironbarrow
+  displayName: The Opened Barrow
+  weight: 0
+  earliestSeconds: 30
+  latestSecondsLeft: 60
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 0}
+  sitePrefab: {fileID: 3059714547979966575, guid: 2ebf1cc60013d0a4380d52fcd6cc5dd4, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: A barrow broken open from inside. Grey iron lies among the bones, cold to the touch.
+  artwork: {fileID: 21300000, guid: 0486280571caa174fb4aa0a1367d6617, type: 3}
+  onStart: []
+  choices:
+  - label: Take the grave iron
+    detail: What sleeps here won't like it.
+    cost: []
+    result: The cold follows you a while.
+    outcomes:
+    - rid: 287758281410609442
+    - rid: 287758281410609443
+  references:
+    version: 2
+    RefIds:
+    - rid: 287758281410609442
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 3
+            maxQuantity: 3
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+    - rid: 287758281410609443
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: 97081eb09fb8f7849ae5c54b28b63420, type: 3}
+        count: 1
+        radius: 12
+        hunt: 1

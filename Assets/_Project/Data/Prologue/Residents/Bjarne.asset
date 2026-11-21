@@ -51,4 +51,10 @@ MonoBehaviour:
     waitingText: The Smithy at Tier II, a Storage Loft from its Upgrade tab, then a Copper Pickaxe.
     askText: 
     thanksText: 
+  - quest: {fileID: 11400000, guid: 42496a0c19665b841b0072abd2d4c390, type: 2}
+    text: 'There''s iron in the barrows. Grave iron, the old ones called it: it holds an edge and it holds a chill. Three pieces, and I''ll face an anvil with it. What comes off that anvil comes off better.'
+    acceptText: Three pieces of grave iron.
+    waitingText: Three Grave Iron from the barrows, and the Smithy at Tier III for the anvil.
+    askText: 
+    thanksText: 
   questLineDone: 

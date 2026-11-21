@@ -35,6 +35,9 @@ public sealed class GiveLootOutcome : RaidEventOutcome
 {
     [SerializeField] private ItemDropTable loot = new ItemDropTable();
 
+    /// <summary>What it gives (read by the quest audit: a rumour site sure to give a part is not luck).</summary>
+    public ItemDropTable Loot => loot;
+
     public override string DisplayName => "Give Loot";
 
     public override void Apply(RaidEventContext context)

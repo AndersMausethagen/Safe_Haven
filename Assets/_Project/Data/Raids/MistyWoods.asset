@@ -826,6 +826,7 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 86f33097a27087642862832f307a5258, type: 2}
         - {fileID: 11400000, guid: 61a7534b28550c842a583b64051f4bbd, type: 2}
         - {fileID: 11400000, guid: 6827256faa99ab141a0ae1829d0d9a88, type: 2}
+        - {fileID: 11400000, guid: ea65821176129f64a95530fcf0f21757, type: 2}
         count: 2
     - rid: 2623125911485546600
       type: {class: TerrainEventsSystem, ns: , asm: SafeHaven}
