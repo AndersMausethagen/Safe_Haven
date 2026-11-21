@@ -7,7 +7,7 @@ using UnityEngine;
 /// with everything it cost back, its upgrades too: into the bag, then the chests, then the ground (MaterialPool.GiveBack).
 /// A damaged building keeps back what mending it would cost (BuildingRepairs), so taking it down and putting it up again isn't a free
 /// repair; with Free Costs on (the cheat) nothing comes back, as nothing was paid (the review of 2026-11-21). Taking it down raises
-/// TakenDown, so putting the same building up again isn't counted as new by a Build quest (QuestLog).
+/// TakenDown, which takes one back from a Build quest under way that counted it (QuestLog), so putting it up again isn't two.
 /// <para>
 /// Refused, with the reason, when taking it down would lose something: a chest with items in it (as Palworld does), a station still
 /// working or with something waiting in it, a ruin the Haven came with (nobody paid for it), during a breach, or in a friend's Haven.
@@ -154,7 +154,9 @@ public static class BuildingDemolition
             return 0f;
         }
 
-        return Mathf.Clamp01(1f - health.HealthFraction);
+        // Hurt as mending counts it (BuildingRepairs.Damaged: below 99.9%), so a scratch keeps nothing back.
+        float lost = Mathf.Clamp01(1f - health.HealthFraction);
+        return lost > 0.001f ? lost : 0f;
     }
 
     /// <summary>Asks the player whether to take <paramref name="building"/> down, showing what comes back, or says why it can't be.</summary>

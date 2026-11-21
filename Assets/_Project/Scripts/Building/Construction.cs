@@ -458,7 +458,9 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Teach(by, first ? Definition.TeachesRecipes : Definition.UpgradeTo(Level)?.teachesRecipes);
         if (!first)
         {
-            BuildingModules.AnnounceLearned(Definition.UpgradeTo(Level)?.unlocksModules);
+            // Before the Haven notes this tier (HavenProgress), so a module known already (another of the kind at this tier, a spare,
+            // a quest) isn't announced again.
+            BuildingModules.AnnounceLearned(Definition.UpgradeTo(Level)?.unlocksModules, null);
         }
         GameObject builder = by != null ? by : Player.Current != null ? Player.Current.gameObject : null;
         GameEvents.Raise(first ? new GameEvent(GameEventKind.Built, Definition, 1, builder) : new GameEvent(GameEventKind.Upgraded, Definition, Level, builder));
@@ -517,16 +519,20 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         }
     }
 
+    private float appliedHealthShare;
+
     // Iron Bands (healthShare): more health while standing, kept as a share as it changes (Damageable keeps health's share of the most).
+    // Changed only when the share does: taking it off and putting it back on every Refresh moved health each time.
     private void ApplyHealthShare()
     {
-        if (health == null || !TryGetComponent(out Combatant fighter) || fighter.Stats == null)
+        float share = Sum(bonus => bonus.healthShare);
+        if (Mathf.Approximately(share, appliedHealthShare) || health == null || !TryGetComponent(out Combatant fighter) || fighter.Stats == null)
         {
             return;
         }
 
+        appliedHealthShare = share;
         fighter.Stats.RemoveModifiersFrom(this);
-        float share = Sum(bonus => bonus.healthShare);
         if (share > 0f)
         {
             fighter.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, share, this));

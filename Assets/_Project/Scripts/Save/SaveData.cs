@@ -29,8 +29,6 @@ public sealed class SaveData
     public PlaytestSaveData playtest = new PlaytestSaveData();
     /// <summary>Ids of Quest Events raised so far, so one-time world moments stay done. Missing in older saves.</summary>
     public List<string> happenedEvents = new List<string>();
-    /// <summary>Building ids, one per piece the player took down and hasn't put up again (QuestLog.RebuildsOwed). Missing in older saves.</summary>
-    public List<string> rebuildsOwed = new List<string>();
     /// <summary>Level, experience and talents. Missing in older saves (they start at level 1).</summary>
     public ProgressSaveData progress = new ProgressSaveData();
     /// <summary>What the player calls this save. Missing in older saves, which then go by their file.</summary>

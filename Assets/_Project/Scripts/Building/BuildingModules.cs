@@ -43,7 +43,10 @@ public static class BuildingModules
     public static int Free(BuildingObject building) => Mathf.Max(0, StationExtensions.Slots(building) - Used(building));
 
     /// <summary>True when the player may fit it: known from the start, taught by a quest under way or done, or a spare in store.</summary>
-    public static bool IsKnown(BuildingModuleDefinition module)
+    public static bool IsKnown(BuildingModuleDefinition module) => IsKnown(module, null);
+
+    /// <summary>The same, leaving <paramref name="except"/> out of the quests that teach it.</summary>
+    public static bool IsKnown(BuildingModuleDefinition module, QuestDefinition except)
     {
         if (module == null)
         {
@@ -73,7 +76,7 @@ public static class BuildingModules
 
         foreach (QuestDefinition quest in content != null ? content.Quests : (IReadOnlyList<QuestDefinition>)System.Array.Empty<QuestDefinition>())
         {
-            if (quest != null && quest.UnlocksModules.Contains(module) && log != null && log.StatusOf(quest) != QuestStatus.NotStarted)
+            if (quest != null && quest != except && quest.UnlocksModules.Contains(module) && log != null && log.StatusOf(quest) != QuestStatus.NotStarted)
             {
                 return true;
             }
@@ -82,8 +85,11 @@ public static class BuildingModules
         return false;
     }
 
-    /// <summary>Tells the player of modules just learned (a quest starting, a tier finished): what each is and where it goes.</summary>
-    public static void AnnounceLearned(IEnumerable<BuildingModuleDefinition> modules)
+    /// <summary>
+    /// Tells the player of modules just learned (a quest starting, a tier finished): what each is and where it goes. Not one known some
+    /// other way already (<paramref name="teacher"/>, the quest just started, aside).
+    /// </summary>
+    public static void AnnounceLearned(IEnumerable<BuildingModuleDefinition> modules, QuestDefinition teacher)
     {
         if (modules == null || HavenVisit.InHostsHaven)
         {
@@ -92,7 +98,7 @@ public static class BuildingModules
 
         foreach (BuildingModuleDefinition module in modules)
         {
-            if (module != null)
+            if (module != null && !IsKnown(module, teacher))
             {
                 GameMessages.Post($"New module: the {module.DisplayName}, for {module.FitsText()} at Tier {Tiers.ToRoman(module.Tier)} ({WhereToFit(module)}): {module.Effect()}.",
                     MessageKind.Info);

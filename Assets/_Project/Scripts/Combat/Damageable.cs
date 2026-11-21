@@ -28,6 +28,10 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
     private Combatant combatant;
     private float currentHealth;
     private float knownMaxHealth;
+    // A load's saved health, kept for the rest of that frame: what changes the most health as the load goes on (a building's modules,
+    // gear) must not scale the value the restore clamped to the base most (the review of 2026-11-21: a load healed banded buildings).
+    private float restoredHealth = -1f;
+    private int restoredFrame = -1;
     private readonly System.Collections.Generic.HashSet<object> invulnerableSources = new System.Collections.Generic.HashSet<object>();
 
     public bool IsAlive { get; private set; } = true;
@@ -412,6 +416,8 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         float saved = JsonUtility.FromJson<SavedHealth>(state).health;
+        restoredHealth = saved;
+        restoredFrame = Time.frameCount;
         currentHealth = Mathf.Clamp(saved, 1f, MaxHealth);
         HealthChanged?.Invoke(currentHealth, MaxHealth);
     }
@@ -426,12 +432,17 @@ public sealed class Damageable : MonoBehaviour, IDamageable, ISaveable, ISharedS
         }
 
         float max = MaxHealth;
-        if (IsAlive && knownMaxHealth > 0f && !Mathf.Approximately(max, knownMaxHealth))
+        float known = knownMaxHealth;
+        // Set first: a listener of the change below (a building's Refresh) reads the new most.
+        knownMaxHealth = max;
+        if (IsAlive && known > 0f && !Mathf.Approximately(max, known))
         {
-            currentHealth = Mathf.Clamp(currentHealth / knownMaxHealth * max, 1f, max);
+            bool broken = HealthFloor > 0f && currentHealth <= HealthFloor;
+            currentHealth = restoredFrame == Time.frameCount && restoredHealth > 0f ? Mathf.Clamp(restoredHealth, 1f, max)
+                // Worn down to its floor it stays there: a bigger most lifted a broken building off its floor, and it was whole again.
+                : broken ? Mathf.Min(currentHealth, max)
+                : Mathf.Clamp(currentHealth / known * max, 1f, max);
             HealthChanged?.Invoke(currentHealth, max);
         }
-
-        knownMaxHealth = max;
     }
 }

@@ -528,7 +528,7 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
         startedInHomecoming[quest] = GameSession.Home.HeldQuestsHomecoming;
         // What it introduces is learned now, announced across the screen (BigNotice): one building per quest.
         BuildingGate.TeachOnStart(quest, Player.Current != null ? Player.Current.gameObject : null);
-        BuildingModules.AnnounceLearned(quest.UnlocksModules);
+        BuildingModules.AnnounceLearned(quest.UnlocksModules, quest);
         if (quest.AnnounceStart)
             GameMessages.Post(QuestMarkerSettings.NewQuestText(quest), MessageKind.Info);
         GameEvents.Raise(new GameEvent(GameEventKind.QuestStarted, quest));

@@ -112,7 +112,7 @@ public sealed class BuildingDemolitionTests
     }
 
     [Test]
-    public void PuttingUpAgainWhatWasTakenDown_IsNotCountedTwice_AndIsSaved()
+    public void TakingDown_TakesBackWhatAQuestUnderWayCounted_AndNothingElse()
     {
         // Build, take down, build again counted twice towards "build N" (the review of 2026-11-21).
         ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
@@ -125,18 +125,54 @@ public sealed class BuildingDemolitionTests
         var log = new QuestLog();
         log.Restore(quest, QuestStatus.Active, counts);
 
+        // Old pieces taken down before anything counted take nothing from it (a wall ring redrawn didn't eat a later wall quest).
+        log.Handle(new GameEvent(GameEventKind.TakenDown, building, 5));
+        Assert.AreEqual(0, log.Get(quest).Counts[step]);
         log.Handle(new GameEvent(GameEventKind.Built, building, 1));
-        Assert.AreEqual(1, log.Get(quest).Counts[step]);
-        log.Handle(new GameEvent(GameEventKind.TakenDown, building, 1));
-        log.Handle(new GameEvent(GameEventKind.Built, building, 1));
-        Assert.AreEqual(1, log.Get(quest).Counts[step], "the same piece put up again");
+        Assert.AreEqual(1, log.Get(quest).Counts[step], "a new piece counts");
 
         log.Handle(new GameEvent(GameEventKind.TakenDown, building, 1));
-        SaveData data = SaveMapper.ToSaveData(null, new StashStorage(), "SafeHaven", null, System.DateTime.UtcNow, null, log, new SettlementState());
-        data = JsonUtility.FromJson<SaveData>(JsonUtility.ToJson(data));
-        QuestLog loaded = SaveMapper.FromSaveData(data, content).Quests;
-        Assert.AreEqual(1, loaded.Get(quest).Counts[step]);
-        loaded.Handle(new GameEvent(GameEventKind.Built, building, 2));
-        Assert.AreEqual(2, loaded.Get(quest).Counts[step], "a line of two after a load: one again, one new");
+        Assert.AreEqual(0, log.Get(quest).Counts[step], "taken down: it no longer counts");
+        log.Handle(new GameEvent(GameEventKind.Built, building, 1));
+        Assert.AreEqual(1, log.Get(quest).Counts[step], "the same piece put up again is one, not two");
     }
+
+    [Test]
+    public void ALoad_KeepsTheSavedHealth_AndABrokenThingStaysBroken_WhenItsMostHealthGrows()
+    {
+        // Iron Bands and the Hag's Knot raise a building's most health (Construction); a load healed it, and a broken one was whole again
+        // (the review of 2026-11-21).
+        var body = new GameObject("Banded");
+        created.Add(body);
+        Combatant fighter = body.AddComponent<Combatant>();
+        Damageable health = body.AddComponent<Damageable>();
+        Invoke(fighter, "Awake");
+        fighter.Stats.SetBase(StatType.MaxHealth, 100f);
+        Invoke(health, "Awake");
+        Invoke(health, "OnEnable");
+        float most = health.MaxHealth;
+        Assert.Greater(most, 10f);
+
+        health.RestoreState(JsonUtility.ToJson(new HealthState { health = most * 1.2f }));
+        fighter.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, 0.5f, this));
+        Assert.AreEqual(most * 1.2f, health.CurrentHealth, 0.01f, "the saved health, not a share of the base most it was clamped to");
+
+        fighter.Stats.RemoveModifiersFrom(this);
+        health.HoldFloor(this, 1f);
+        health.ApplyDamage(new DamageInfo(null, null, most * 10f, DamageType.Holy, false, Vector3.zero, Vector3.up));
+        Assert.IsTrue(health.IsBroken, "worn to its floor");
+        // The restore's frame is over once a blow has landed in a later one; move the frame on by hand for the test.
+        typeof(Damageable).GetField("restoredFrame", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(health, -1);
+        fighter.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, 0.5f, this));
+        Assert.IsTrue(health.IsBroken, "more most health doesn't lift it off its floor");
+    }
+
+    [System.Serializable]
+    private struct HealthState
+    {
+        public float health;
+    }
+
+    private static void Invoke(object target, string method) =>
+        target.GetType().GetMethod(method, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)?.Invoke(target, null);
 }

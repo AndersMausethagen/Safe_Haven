@@ -81,8 +81,6 @@ public sealed class QuestLog
 
     private readonly Dictionary<QuestDefinition, Entry> entries = new Dictionary<QuestDefinition, Entry>();
     private readonly HashSet<string> happenedEvents = new HashSet<string>();
-    // Buildings taken down by the player and not put up again, by building id: the next of each Built isn't new (BuildingDemolition).
-    private readonly Dictionary<string, int> rebuildsOwed = new Dictionary<string, int>();
 
     /// <summary>Every quest that has started, in no particular order.</summary>
     public IEnumerable<Entry> Entries => entries.Values;
@@ -103,64 +101,32 @@ public sealed class QuestLog
         return !string.IsNullOrEmpty(deedKey) && happenedEvents.Contains(deedKey);
     }
 
-    /// <summary>
-    /// One building id per piece taken down and not put up again (repeated for several), for the save: the build, take down and build
-    /// again of one fence counted twice towards "build 3 fences" (the review of 2026-11-21).
-    /// </summary>
-    public IEnumerable<string> RebuildsOwed
+    // A building the player took down takes one back from what an open Build objective for it has counted, so building, taking down and
+    // building again isn't two (the review of 2026-11-21). A step already done stays done.
+    private void TakeBackBuilt(in GameEvent gameEvent)
     {
-        get
+        if (gameEvent.Kind != GameEventKind.TakenDown || !(gameEvent.Subject is BuildingDefinition building) || gameEvent.Amount <= 0)
         {
-            foreach (KeyValuePair<string, int> owed in rebuildsOwed)
+            return;
+        }
+
+        foreach (Entry entry in entries.Values)
+        {
+            if (entry.Status != QuestStatus.Active)
             {
-                for (int i = 0; i < owed.Value; i++)
+                continue;
+            }
+
+            for (int i = 0; i < entry.Counts.Length; i++)
+            {
+                QuestObjective objective = entry.Quest.Objectives[i];
+                if (objective.Type == ObjectiveType.BuildStructure && objective.Building == building && entry.IsObjectiveOpen(i) && entry.Counts[i] > 0)
                 {
-                    yield return owed.Key;
+                    entry.Counts[i] = Math.Max(0, entry.Counts[i] - gameEvent.Amount);
+                    Progressed?.Invoke(entry.Quest, i);
                 }
             }
         }
-    }
-
-    /// <summary>Puts back one piece taken down and not yet put up again; used when loading a save.</summary>
-    public void RestoreRebuildOwed(string buildingId)
-    {
-        if (!string.IsNullOrEmpty(buildingId))
-        {
-            rebuildsOwed[buildingId] = (rebuildsOwed.TryGetValue(buildingId, out int owed) ? owed : 0) + 1;
-        }
-    }
-
-    // Built events count for quests only for what is new: putting up again what was taken down pays off what is owed first.
-    private GameEvent Counted(in GameEvent gameEvent)
-    {
-        if (!(gameEvent.Subject is BuildingDefinition building) || gameEvent.Amount <= 0)
-        {
-            return gameEvent;
-        }
-
-        if (gameEvent.Kind == GameEventKind.TakenDown)
-        {
-            rebuildsOwed[building.Id] = (rebuildsOwed.TryGetValue(building.Id, out int had) ? had : 0) + gameEvent.Amount;
-            return gameEvent;
-        }
-
-        if (gameEvent.Kind != GameEventKind.Built || !rebuildsOwed.TryGetValue(building.Id, out int owed) || owed <= 0)
-        {
-            return gameEvent;
-        }
-
-        int again = Math.Min(owed, gameEvent.Amount);
-        if (owed - again > 0)
-        {
-            rebuildsOwed[building.Id] = owed - again;
-        }
-        else
-        {
-            rebuildsOwed.Remove(building.Id);
-        }
-
-        return new GameEvent(gameEvent.Kind, gameEvent.Subject, gameEvent.Amount - again, gameEvent.Actor, gameEvent.Outcome, gameEvent.Seconds,
-            gameEvent.Origin, gameEvent.VictimFaction, gameEvent.Detail, gameEvent.Cause);
     }
 
     /// <summary>Remembers a Quest Event by id; used when loading a save.</summary>
@@ -259,8 +225,11 @@ public sealed class QuestLog
             happenedEvents.Add(deed);
         }
 
-        // A friend's buildings aren't the player's to owe for (taking down is refused there anyway).
-        GameEvent counted = friends ? gameEvent : Counted(gameEvent);
+        // Taking down is refused in a friend's Haven, so this is the player's own.
+        if (!friends)
+        {
+            TakeBackBuilt(gameEvent);
+        }
 
         // Copied first: completing a quest can start others, which changes the collection.
         foreach (Entry entry in new List<Entry>(entries.Values))
@@ -274,7 +243,7 @@ public sealed class QuestLog
             {
                 if (entry.IsObjectiveOpen(i))
                 {
-                    int amount = entry.Quest.Objectives[i].Progress(counted);
+                    int amount = entry.Quest.Objectives[i].Progress(gameEvent);
                     if (amount > 0)
                     {
                         AddProgress(entry, i, amount);

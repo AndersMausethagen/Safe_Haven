@@ -533,6 +533,8 @@ public sealed class SettlementState : IHavenView
         // (TakeOn leaves what is seen alone).
         builtTiers.Clear();
         notedModules.Clear();
+        // The modules of the best building of each kind (its highest tier, then the most fitted), as the tiers count the best one only.
+        var best = new Dictionary<BuildingDefinition, Construction>();
         int beds = 0;
         foreach (BuildingObject building in standing)
         {
@@ -544,13 +546,18 @@ public sealed class SettlementState : IHavenView
             bool upgrades = building.TryGetComponent(out Construction construction);
             NoteBuilt(building.Definition, upgrades ? construction.Level : 1);
             beds += building.Definition.Beds + (upgrades ? Mathf.RoundToInt(construction.Sum(level => level.beds)) : 0);
-            if (upgrades)
+            if (upgrades && construction.Fitted.Count > 0 && (!best.TryGetValue(building.Definition, out Construction other)
+                || construction.Level > other.Level || (construction.Level == other.Level && construction.Fitted.Count > other.Fitted.Count)))
             {
-                construction.AddCounting(notedModules);
+                best[building.Definition] = construction;
             }
         }
 
         Beds = beds;
+        foreach (Construction kind in best.Values)
+        {
+            kind.AddCounting(notedModules);
+        }
     }
 
     public void NoteBuilt(BuildingDefinition building, int tier)
@@ -910,7 +917,7 @@ public sealed class SettlementState : IHavenView
         {
             foreach (JobDefinition job in resident.Jobs)
             {
-                if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job))
+                if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job, resident))
                 {
                     jobs.Add(job);
                 }
@@ -919,7 +926,7 @@ public sealed class SettlementState : IHavenView
 
         foreach (JobDefinition job in vacantJobs)
         {
-            if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job))
+            if (job != null && !jobs.Contains(job) && WorkplaceMayBeLearned(job, resident))
             {
                 jobs.Add(job);
             }
@@ -928,7 +935,8 @@ public sealed class SettlementState : IHavenView
         return jobs;
     }
 
-    private static bool WorkplaceMayBeLearned(JobDefinition job) => job.Workplace == null || BuildingGate.MayLearn(job.Workplace);
+    private bool WorkplaceMayBeLearned(JobDefinition job, ResidentDefinition resident) =>
+        job.Workplace == null || BuildingGate.MayLearn(job.Workplace) || (resident != null && Find(resident)?.Job == job);
 
     /// <summary>They came home from a raid with the player: the bond grows, and it leaves them something to say. True when they rose in rank.</summary>
     public bool RecordRaidAlong(ResidentDefinition resident, IReadOnlyList<CompanionBondRank> ranks, bool extracted, int bossesBeaten, int timesHelpedUp, float secondsLeft, int kills, int memoryReturnsEvery = 0)

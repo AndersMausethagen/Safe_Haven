@@ -213,9 +213,8 @@ public static class StationCrafting
         return taken;
     }
 
-    /// <summary>The known recipes made at the station type, in recipe-book order.</summary>
     /// <summary>
-    /// The same, as this station's list shows them: a recipe a thriftier variant beats here (RecipeVariants) is left out, so only the
+    /// The known recipes for a station, as its list shows them: a recipe a thriftier variant beats here (RecipeVariants) is left out, so only the
     /// better of the two is offered.
     /// </summary>
     public static List<RecipeDefinition> KnownRecipesFor(GameObject user, CraftingStationType type, StationQueue queue)
@@ -229,6 +228,7 @@ public static class StationCrafting
         return recipes;
     }
 
+    /// <summary>The known recipes made at the station type, in recipe-book order.</summary>
     public static List<RecipeDefinition> KnownRecipesFor(GameObject user, CraftingStationType type)
     {
         var recipes = new List<RecipeDefinition>();
