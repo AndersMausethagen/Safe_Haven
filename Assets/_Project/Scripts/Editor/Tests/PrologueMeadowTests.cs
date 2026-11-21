@@ -251,7 +251,8 @@ public sealed class PrologueMeadowTests
             Assert.AreEqual(QuestRank.Optional, Quest(name).Rank, name);
         }
 
-        Assert.AreEqual(QuestRank.Optional, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/SmithsRequest.asset").Rank, "a note on the board is an errand");
+        // Copper Fire left the board for Bjarne's line (the quest flow review's A9, 2026-11-21); Know Your Enemy is the board's first errand.
+        Assert.AreEqual(QuestRank.Optional, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/KnowYourEnemy.asset").Rank, "a note on the board is an errand");
         Assert.AreEqual(QuestRank.SideQuest, AssetDatabase.LoadAssetAtPath<QuestDefinition>("Assets/_Project/Data/Quests/EchoesInTheWilds.asset").Rank, "a tale is found out in the woods");
         QuestMarkerSettings settings = QuestMarkerSettings.Current;
         var ranks = (QuestRank[])System.Enum.GetValues(typeof(QuestRank));

@@ -55,6 +55,8 @@ public enum ObjectiveType
     EmpowerItem = 22,
     /// <summary>Fit a module to a building (BuildingModules): at that kind of building, or any when empty.</summary>
     FitModule = 23,
+    /// <summary>Raise the Haven's portal to a tier (Tier, from 2): Steady the Door, the quest flow review's A15 and C5.</summary>
+    RaisePortal = 24,
 }
 
 /// <summary>
@@ -254,6 +256,8 @@ public sealed class QuestObjective
                 return new[] { nameof(breach) };
             case ObjectiveType.ReachHavenRank:
                 return new[] { nameof(rank), nameof(countAlreadyOwned) };
+            case ObjectiveType.RaisePortal:
+                return new[] { nameof(tier), nameof(countAlreadyOwned) };
             case ObjectiveType.StoreItem:
                 return new[] { nameof(item), nameof(countAlreadyOwned) };
             case ObjectiveType.RepairItem:
@@ -315,6 +319,8 @@ public sealed class QuestObjective
         [ObjectiveType.EmpowerItem] = false,
         // A friend's buildings take no modules of a visitor's (BuildingModules.WhyNot).
         [ObjectiveType.FitModule] = false,
+        // A Haven's portal is its own.
+        [ObjectiveType.RaisePortal] = false,
     };
 
     /// <summary>The types the co-op rule covers (for the check that none is missing).</summary>
@@ -379,6 +385,8 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.BreachRepelled && Is(breach, gameEvent.Subject, false) ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
                 return gameEvent.Kind == GameEventKind.HavenRankReached && gameEvent.Amount >= Rank ? 1 : 0;
+            case ObjectiveType.RaisePortal:
+                return gameEvent.Kind == GameEventKind.PortalRaised && gameEvent.Amount >= Tier ? 1 : 0;
             case ObjectiveType.StoreItem:
                 // An empty item counts anything put away, essences too.
                 return gameEvent.Kind == GameEventKind.Stored && Is(item, gameEvent.Subject, false) ? gameEvent.Amount : 0;
@@ -444,6 +452,8 @@ public sealed class QuestObjective
                 return HasJob() ? 1 : 0;
             case ObjectiveType.ReachHavenRank:
                 return GameSession.Home.HavenRank >= Rank ? 1 : 0; // the player's own Haven's rank, also on a friend's raid
+            case ObjectiveType.RaisePortal:
+                return GameSession.Home.PortalLevel + 1 >= Tier ? 1 : 0; // the player's own portal (level 0 is tier I)
             case ObjectiveType.StoreItem:
                 // Already in the stash (an older save, or put away before the quest): it is safe, which is the point. One's own stash
                 // only: a guest's game holds the host's here, also on a raid followed with them (one's own waits in the kept home game).
@@ -563,6 +573,8 @@ public sealed class QuestObjective
                 return breach != null ? $"Defend Safe Haven: {breach.DisplayName}" : "Defend Safe Haven from a ward breach";
             case ObjectiveType.ReachHavenRank:
                 return $"Raise Safe Haven to {HavenRankName(Rank)} ({{key:Haven}})";
+            case ObjectiveType.RaisePortal:
+                return $"Raise the portal to Tier {Tiers.ToRoman(Tier)} (at the portal)";
             case ObjectiveType.StoreItem:
                 return item != null ? $"Put {count} {Name(item)} in a chest" : Amount == 1 ? "Put something in a chest" : $"Put {count} things in a chest";
             case ObjectiveType.RepairItem:

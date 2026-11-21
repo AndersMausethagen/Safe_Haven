@@ -881,11 +881,13 @@ Find → make contact → meet conditions or secure rescue → escort to extract
 | Eirik | Warden | The ward holds half as long again in a breach |
 | Runa | Tracker | One more rumour in every briefing |
 | Liv | Rune Scholar | Teaches the raid runes, which nobody else knows; the cauldron works faster |
-| Sigrid | Leader | 30 more seconds in every raid |
+| Sigrid | Leader | More time in every raid |
 | Bjarne | Smith | Repairs to gear cost half; the forge works faster. Found second, after Ingrid, by his hammer in the deep woods |
 
-**Rescue order (November 9, 2026).** Everyone is found in a designed order, each answering the problem the player has just met, and each rescue
-teaches the building they work at: Ingrid, Bjarne, Tor, Eirik, Gunnar, Asa, Yrsa, Runa, Liv, Hild, Sigrid. Nobody arrives with a Haven rank. See
+**Rescue order (November 9, 2026; updated November 21).** Everyone is found in a designed order, each answering the problem the player has
+just met: Ingrid, Bjarne, Tor, Eirik, Yrsa, Gunnar, Liv, Asa, Runa, Hild, Sigrid. Nobody arrives with a Haven rank. Since November 21 each
+person's first quest starts at the rescue and teaches the building they work at as it starts (one building per quest), and the next
+person's rumour waits until the person before has finished their core quest; a notice says when someone can be found. See
 [Who comes home, and when](RescueOrder.md).
 
 ### 15.4 Personality and well-being

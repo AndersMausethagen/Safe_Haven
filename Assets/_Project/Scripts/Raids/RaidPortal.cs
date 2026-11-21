@@ -209,6 +209,7 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         }
 
         GameSession.Home.ImprovePortal();
+        GameEvents.Raise(new GameEvent(GameEventKind.PortalRaised, null, GameSession.Home.PortalLevel + 1));
         // The safe pocket grows with the portal (the Haven's own player's).
         if (Player.Current != null && Player.Current.TryGetComponent(out ItemInventory inventory))
         {

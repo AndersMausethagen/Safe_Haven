@@ -69,6 +69,8 @@ public enum GameEventKind
     ModuleFitted = 30,
     /// <summary>The player took down a building they had built (BuildingDemolition). Subject: the BuildingDefinition.</summary>
     TakenDown = 31,
+    /// <summary>The Haven's portal was raised (RaidPortal). Amount: the tier it stands at now, from 2.</summary>
+    PortalRaised = 32,
 }
 
 /// <summary>

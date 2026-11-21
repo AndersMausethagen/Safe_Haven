@@ -133,4 +133,18 @@ public sealed class HomeStoryTests
     {
         Assert.IsTrue(HavenSettings.Current.Ranks.All(rank => rank.settler == null));
     }
+
+    [Test]
+    public void SteadyTheDoor_AsksForThePortalsSecondTier_AndCountsItsRaise()
+    {
+        // The quest flow review's A15 (approved 2026-11-21): raising the portal is taught by a quest after Ingrid's and the Smithy's.
+        QuestDefinition door = Quest("SteadyTheDoor");
+        Assert.IsNotNull(door);
+        CollectionAssert.AreEquivalent(new[] { Quest("CleansingTheCurse"), Quest("TheSmith") }, door.Prerequisites.ToArray());
+        QuestObjective raise = door.Objectives.Single();
+        Assert.AreEqual(ObjectiveType.RaisePortal, raise.Type);
+        Assert.AreEqual(0, raise.Progress(new GameEvent(GameEventKind.PortalRaised, null, 1)), "tier I is where it starts");
+        Assert.AreEqual(1, raise.Progress(new GameEvent(GameEventKind.PortalRaised, null, 2)));
+        Assert.AreEqual(0, raise.Progress(new GameEvent(GameEventKind.HavenRankReached, null, 2)), "another event of the same amount isn't a raise");
+    }
 }

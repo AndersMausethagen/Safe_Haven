@@ -102382,7 +102382,7 @@ MonoBehaviour:
         id: 477f9d0ea524455da2fcd0d99fbb8690
         position: {x: 40, y: 60}
         once: 1
-        quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+        quest: {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
         when: 1
         alsoAfterLoading: 0
     - rid: 287758281410609308
@@ -246242,6 +246242,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8930786153270681733, guid: bc49fdfbd0c597a43b14ce6bb19fa539, type: 3}
   m_PrefabInstance: {fileID: 974452959}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &974496769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 974496770}
+  - component: {fileID: 974496772}
+  - component: {fileID: 974496771}
+  m_Layer: 0
+  m_Name: Story - A Light They Can See
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &974496770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974496769}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &974496771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974496769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: 718ed29e0d214d4c902e4878d0cb16a3
+    output: 0
+    to: aa26e8bf5bdc415dbc294bb52ca342dd
+  - from: aa26e8bf5bdc415dbc294bb52ca342dd
+    output: 0
+    to: 60bc50b395074b85995701ea48cd82bd
+  - from: 60bc50b395074b85995701ea48cd82bd
+    output: 0
+    to: 763e1e0cbee74f4aa321c5a084cb2d7d
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 718ed29e0d214d4c902e4878d0cb16a3
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: aa26e8bf5bdc415dbc294bb52ca342dd
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 60bc50b395074b85995701ea48cd82bd
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Your fire carries now. Far past my meadows, those who went in with you will see it, if any are left to see.</i>
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 763e1e0cbee74f4aa321c5a084cb2d7d
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Keep it high, little one. A light is only a promise while someone keeps it.</i>
+        afterFightPause: 0
+        aside: 1
+--- !u!114 &974496772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 974496769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: bd884f2d0f364b788260d72cf83c95ff
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &974610327
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -258963,6 +259090,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1064287972624956108, guid: 71a7402c314163746a0caf6f09c6773a, type: 3}
   m_PrefabInstance: {fileID: 1021305740}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1021490183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1021490184}
+  - component: {fileID: 1021490186}
+  - component: {fileID: 1021490185}
+  m_Layer: 0
+  m_Name: Story - Steady the Door
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1021490184
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021490183}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1021490185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021490183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: 0e9a9f81b97346e6ab4f777b036a2817
+    output: 0
+    to: fb306e4fef3347fcbf08992282b8c5dd
+  - from: fb306e4fef3347fcbf08992282b8c5dd
+    output: 0
+    to: 91d1a9e618a54f19a7dec1e23620d625
+  - from: 91d1a9e618a54f19a7dec1e23620d625
+    output: 0
+    to: 446ce16989b8433ebfb36a9dbd6f2de6
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 0e9a9f81b97346e6ab4f777b036a2817
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 74cd46b9fddfdd747857eb1796e3be5d, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: fb306e4fef3347fcbf08992282b8c5dd
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 91d1a9e618a54f19a7dec1e23620d625
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Little one. My stones are loose where the roots were. Steady them, and I can open a wider way: deeper woods, and better things in them.</i>'
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 446ce16989b8433ebfb36a9dbd6f2de6
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Come and stand before me. You will see what the stones need.</i>
+        afterFightPause: 0
+        aside: 1
+--- !u!114 &1021490186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1021490183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 2da4726d391e402fa4a919ea9f9ae518
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1021607896
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -316037,6 +316291,9 @@ Transform:
   - {fileID: 1478649909}
   - {fileID: 1124115837}
   - {fileID: 1118470586}
+  - {fileID: 1783101588}
+  - {fileID: 974496770}
+  - {fileID: 1021490184}
   m_Father: {fileID: 130791071}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259367770
@@ -414347,7 +414604,7 @@ MonoBehaviour:
           portrait: {fileID: 0}
           voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
           voiceFrom: {fileID: 1038728947}
-        line: '<i>Little one. Three times through me, and three times home. Your fire reaches further than it did. Come and sit by me when you can: there is something out past my meadows you should know of.</i>'
+        line: '<i>Little one. You have seen the road north now, and what walks it. Your fire reaches further than it did. Come and sit by me when you can: there is something out past my meadows you should know of.</i>'
         afterFightPause: 0
         aside: 1
     - rid: 2623126038171615475
@@ -450046,6 +450303,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1370505616503622700, guid: 3d64424e02ab0bb4283a2ddf9f0e15e8, type: 3}
   m_PrefabInstance: {fileID: 1783044876}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1783101587
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1783101588}
+  - component: {fileID: 1783101590}
+  - component: {fileID: 1783101589}
+  m_Layer: 0
+  m_Name: Story - More Stones in the Meadows
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1783101588
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783101587}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1783101589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783101587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: ae7b31ca823f4d6e97936087bcd05f75
+    output: 0
+    to: edb7c9916b7f4d6aa15d7b6f303e3f0e
+  - from: edb7c9916b7f4d6aa15d7b6f303e3f0e
+    output: 0
+    to: 9937b42bea7941ca8ff6692f405b97d9
+  - from: 9937b42bea7941ca8ff6692f405b97d9
+    output: 0
+    to: 694cb968d77b4c6a80c532b9e2e17f0a
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: ae7b31ca823f4d6e97936087bcd05f75
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 8fd8f4db8a0b4d74cb71c5b4837010ac, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: edb7c9916b7f4d6aa15d7b6f303e3f0e
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 9937b42bea7941ca8ff6692f405b97d9
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Three stones, and their light is mine again. There are more out in the meadows, little one: old ones the roots have not found yet.</i>'
+        afterFightPause: 0
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 694cb968d77b4c6a80c532b9e2e17f0a
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Each holds a little of what I was. Free their orbs when you pass them, and I will hold the door a little longer.</i>
+        afterFightPause: 0
+        aside: 1
+--- !u!114 &1783101590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783101587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: de6626fe07dc4203a3ab862176501177
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1 &1783169801
 GameObject:
   m_ObjectHideFlags: 0
