@@ -125,6 +125,7 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void OnDisable()
     {
+        EndPreview();
         InputRebinds.CancelListening();
         if (GameInput.Pause != null) GameInput.Pause.performed -= OnBackPressed;
         if (GameInput.Cancel != null) GameInput.Cancel.performed -= OnBackPressed;
@@ -570,7 +571,8 @@ public sealed class OptionsScreen : MonoBehaviour
         if (resetRow != null)
         {
             bool reset = focused.Reset != null && !string.IsNullOrEmpty(focused.Default) && now != focused.Default;
-            bool preview = focused.Option != null && System.Array.IndexOf(HudOptions, focused.Option) >= 0;
+            // Only over a game: from the main menu there is no HUD to show.
+            bool preview = focused.Option != null && System.Array.IndexOf(HudOptions, focused.Option) >= 0 && Player.Current != null;
             resetRow.gameObject.SetActive(reset);
             previewRow.gameObject.SetActive(preview);
             // Side by side when both show, otherwise the one fills the row.
@@ -627,8 +629,11 @@ public sealed class OptionsScreen : MonoBehaviour
             windowGroup = window.AddComponent<CanvasGroup>();
         }
 
+        // Still catching the pointer (its dim covers the screen), but pressing nothing: the click or key that ends the preview must not
+        // reach the menu under it (the main menu's Quit) nor submit the hidden row.
         windowGroup.alpha = 0f;
-        windowGroup.blocksRaycasts = false;
+        windowGroup.blocksRaycasts = true;
+        windowGroup.interactable = false;
         GamePause.HudPreview = true;
         previewFrom = Time.unscaledTime;
         previewUntil = previewFrom + PreviewSeconds;
@@ -673,6 +678,7 @@ public sealed class OptionsScreen : MonoBehaviour
         {
             windowGroup.alpha = 1f;
             windowGroup.blocksRaycasts = true;
+            windowGroup.interactable = true;
         }
 
         UIRoot.ApplyScaleEverywhere();

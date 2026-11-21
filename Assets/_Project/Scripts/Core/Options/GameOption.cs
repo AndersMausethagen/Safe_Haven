@@ -66,8 +66,12 @@ public sealed class GameOption
     {
         previewValue = Clean(shown);
         previewing = true;
+        previewed.Add(this);
         AnyChanged?.Invoke(this);
     }
+
+    // The options shown in a preview now: cleared when Play starts, as these options are static and outlive a session.
+    private static readonly System.Collections.Generic.HashSet<GameOption> previewed = new System.Collections.Generic.HashSet<GameOption>();
 
     /// <summary>Back to the saved value after <see cref="Preview"/>; nothing when no preview is showing.</summary>
     public void EndPreview()
@@ -78,6 +82,7 @@ public sealed class GameOption
         }
 
         previewing = false;
+        previewed.Remove(this);
         AnyChanged?.Invoke(this);
     }
 
@@ -108,6 +113,7 @@ public sealed class GameOption
             if (previewing)
             {
                 previewing = false;
+                previewed.Remove(this);
                 AnyChanged?.Invoke(this);
             }
 
@@ -171,5 +177,11 @@ public sealed class GameOption
     private static void ResetForNewPlaySession()
     {
         AnyChanged = null;
+        foreach (GameOption option in previewed)
+        {
+            option.previewing = false;
+        }
+
+        previewed.Clear();
     }
 }

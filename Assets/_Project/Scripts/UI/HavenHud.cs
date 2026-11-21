@@ -162,6 +162,8 @@ public sealed class HavenHud : MonoBehaviour
         lineText.richText = true;
     }
 
+    private string shownLine;
+
     private void UpdateLineCard()
     {
         if (lineCard == null)
@@ -170,8 +172,9 @@ public sealed class HavenHud : MonoBehaviour
         }
 
         string summary = BuildPlacer.LineSummary;
-        if (summary.Length > 0)
+        if (summary.Length > 0 && summary != shownLine)
         {
+            shownLine = summary;
             lineText.text = HearthKit.ToneNumbers(summary);
         }
 

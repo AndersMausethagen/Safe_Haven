@@ -757,5 +757,8 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         endedFrame = -1;
         IsBusy = false;
         UsesPadSpot = false;
+        lineSummary = "";
+        lineSummaryFrame = -10;
+        lineKey = -1;
     }
 }

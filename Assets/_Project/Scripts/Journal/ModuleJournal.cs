@@ -15,6 +15,9 @@ public static class ModuleJournal
         var known = new HavenShelf("Known");
         var unknown = new HavenShelf("Not learned yet");
         int fitted = 0;
+        // Fitted is read from the Haven's buildings, once: away from home there are none to read, and the page doesn't guess.
+        bool home = Place.AtHome;
+        Dictionary<BuildingModuleDefinition, int> atHome = home ? FittedAtHome() : null;
         var modules = new List<BuildingModuleDefinition>(BuildingModules.All);
         modules.RemoveAll(module => module == null);
         // By tier, then name, so the page reads as a ladder.
@@ -23,7 +26,7 @@ public static class ModuleJournal
         {
             if (BuildingModules.IsKnown(module))
             {
-                int standing = FittedAtHome(module);
+                int standing = atHome != null && atHome.TryGetValue(module, out int count) ? count : 0;
                 fitted += standing > 0 ? 1 : 0;
                 known.Entries.Add(EntryOf(module, standing));
             }
@@ -43,7 +46,7 @@ public static class ModuleJournal
             }
         }
 
-        summary = $"{known.Entries.Count} of {known.Entries.Count + unknown.Entries.Count} known, {fitted} fitted at home";
+        summary = $"{known.Entries.Count} of {known.Entries.Count + unknown.Entries.Count} known" + (home ? $", {fitted} fitted at home" : "");
         return new List<HavenShelf> { known, unknown };
     }
 
@@ -105,23 +108,22 @@ public static class ModuleJournal
         return "Found, not taught: one may turn up in a raid.";
     }
 
-    // How many buildings at home have it fitted now.
-    private static int FittedAtHome(BuildingModuleDefinition module)
+    // How many buildings at home have each module fitted now.
+    private static Dictionary<BuildingModuleDefinition, int> FittedAtHome()
     {
-        int count = 0;
+        var counts = new Dictionary<BuildingModuleDefinition, int>();
         foreach (Construction construction in Object.FindObjectsByType<Construction>(FindObjectsInactive.Exclude))
         {
-            foreach (BuildingModuleDefinition fitted in construction.Fitted)
+            foreach (BuildingModuleDefinition fitted in construction.Fitted.Distinct())
             {
-                if (fitted == module)
+                if (fitted != null)
                 {
-                    count++;
-                    break;
+                    counts[fitted] = counts.TryGetValue(fitted, out int count) ? count + 1 : 1;
                 }
             }
         }
 
-        return count;
+        return counts;
     }
 
     private static string Capital(string text) => string.IsNullOrEmpty(text) ? text : char.ToUpperInvariant(text[0]) + text.Substring(1);

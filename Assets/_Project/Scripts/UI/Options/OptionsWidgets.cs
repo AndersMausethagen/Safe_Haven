@@ -360,6 +360,7 @@ public static class OptionsWidgets
     {
         OptionsFocus focus = OptionsFocus.For(option, draft);
         Action<float> change = set ?? (value => draft.Set(option, value));
+        focus.Reset = () => change(option.Default);
         switch (option.Kind)
         {
             case OptionKind.Toggle:

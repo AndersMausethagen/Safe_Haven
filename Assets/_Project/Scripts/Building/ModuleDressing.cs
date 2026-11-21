@@ -25,7 +25,7 @@ public static class ModuleDressing
         }
 
         var wanted = new List<BuildingModuleDefinition>();
-        if (construction.IsStanding)
+        if (construction.IsStanding && !(construction.TryGetComponent(out Damageable health) && health.IsBroken))
         {
             foreach (BuildingModuleDefinition module in construction.Fitted)
             {
@@ -83,12 +83,12 @@ public static class ModuleDressing
         piece.name = Prefix + module.Id;
         foreach (Collider collider in piece.GetComponentsInChildren<Collider>(true))
         {
-            Object.Destroy(collider);
+            Object.DestroyImmediate(collider);
         }
 
         foreach (MonoBehaviour behaviour in piece.GetComponentsInChildren<MonoBehaviour>(true))
         {
-            Object.Destroy(behaviour);
+            Object.DestroyImmediate(behaviour);
         }
 
         piece.transform.SetParent(root, false);

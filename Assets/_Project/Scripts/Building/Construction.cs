@@ -540,6 +540,10 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
     private static bool turningBack;
 
+    // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetTurningBack() => turningBack = false;
+
     // Hag's Knot (turnBackShare): a share of the harm comes back on whoever struck, never on the player's side. A blow turned back is
     // never turned again.
     private void OnDamaged(DamageInfo hit, DamageResult result)
@@ -562,7 +566,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         {
             turningBack = true;
             striker.ApplyDamage(new DamageInfo(GetComponent<Combatant>(), null, back, DamageType.Physical, false, at, at - transform.position, 0f, HitTechnique.None));
-            ModuleCues.Fire(this, $"Turned back: {back:0} on the striker", "Skull");
+            ModuleCues.Fire(this, "A blow turned back on the striker", "Skull");
         }
         finally
         {

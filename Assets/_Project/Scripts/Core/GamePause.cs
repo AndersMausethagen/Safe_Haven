@@ -85,6 +85,7 @@ public static class GamePause
         Changed = null;
         freezesTime = true;
         TimeIsShared = false;
+        HudPreview = false;
         Time.timeScale = 1f;
     }
 }

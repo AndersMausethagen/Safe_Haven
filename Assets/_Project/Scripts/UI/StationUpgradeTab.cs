@@ -334,7 +334,7 @@ public sealed class StationUpgradeTab
             if (bonuses.Length > 0)
             {
                 string change = Changes(shown);
-                lines.Add((null, "Stats", change.Length > 0 ? change : char.ToUpperInvariant(bonuses[0]) + bonuses.Substring(1)));
+                lines.Add((null, "Stats", char.ToUpperInvariant(bonuses[0]) + bonuses.Substring(1) + (change.Length > 0 ? "\n" + change : "")));
             }
         }
 
@@ -572,11 +572,12 @@ public sealed class StationUpgradeTab
         }
 
         var parts = new List<string>();
-        void Add(string name, float now, float more, string format = "0")
+        void Add(string name, float now, float more, string format = "0", float most = float.MaxValue)
         {
-            if (more > 0f && parts.Count < 3)
+            float after = Mathf.Min(now + more, most);
+            if (more > 0f && after > now + 0.001f && parts.Count < 3)
             {
-                parts.Add($"{name} {now.ToString(format)} → {(now + more).ToString(format)}");
+                parts.Add($"{name} {now.ToString(format)} → {after.ToString(format)}");
             }
         }
 
@@ -586,8 +587,8 @@ public sealed class StationUpgradeTab
             Add("Output slots", queue.OutputSlots, bonus.extraOutputSlots);
             Add("Room", queue.Capacity, bonus.extraOutput);
             Add("Queue", queue.MaxQueued, bonus.extraQueue);
-            Add("Luck", queue.ExtraChance * 100f, bonus.extraChance * 100f, "0'%'");
-            Add("Fine work", queue.FineChance * 100f, bonus.fineChance * 100f, "0'%'");
+            Add("Luck", queue.ExtraChance * 100f, bonus.extraChance * 100f, "0'%'", BuildingModules.MostLuck * 100f);
+            Add("Fine work", queue.FineChance * 100f, bonus.fineChance * 100f, "0'%'", BuildingModules.MostLuck * 100f);
             Add("Speed", (1f + construction.Sum(b => b.craftSpeed)) * 100f, bonus.craftSpeed * 100f, "0'%'");
         }
 

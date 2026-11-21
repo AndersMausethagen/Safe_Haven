@@ -189,7 +189,8 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
         }
 
         int left = MaterialPool.For(player.gameObject).Have(fuel);
-        int nights = burning > 0 ? left / burning : int.MaxValue;
+        // This torch has paid tonight already; the others still take theirs from what is left.
+        int nights = burning > 0 ? Mathf.Max(0, left - (burning - perNight)) / burning : int.MaxValue;
         if (nights <= WarnWithNights)
         {
             GameMessages.Post(nights == 0

@@ -250,7 +250,7 @@ public sealed class BigNotice : MonoBehaviour
     private void Update()
     {
         Watch(GameSession.Quests);
-        bool covered = DialogueBox.IsOpen || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || GamePause.IsPaused;
+        bool covered = DialogueBox.IsOpen || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || GamePause.HidesHud;
         if (shownFor < 0f)
         {
             if (waiting.Count == 0 || covered)

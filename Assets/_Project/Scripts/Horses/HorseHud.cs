@@ -154,7 +154,7 @@ public sealed class HorseHud : MonoBehaviour
             hint.text = "";
         }
 
-        bool shown = horse != null && !windows && !GamePause.IsPaused && Place(horse);
+        bool shown = horse != null && !windows && !GamePause.HidesHud && Place(horse);
         group.alpha = shown ? 1f : 0f;
     }
 

@@ -70,7 +70,7 @@ public sealed class QuestWaypointHud : MonoBehaviour
     private void LateUpdate()
     {
         QuestWaypoint target = Pick(out float distance);
-        bool show = target != null && distance > HideWithin && !GamePause.IsPaused
+        bool show = target != null && distance > HideWithin && !GamePause.HidesHud
                     && (UIStateManager.Current == null || !UIStateManager.Current.IsAnyWindowOpen);
         marker.gameObject.SetActive(show);
         if (!show)

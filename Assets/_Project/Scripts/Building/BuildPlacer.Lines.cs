@@ -182,9 +182,19 @@ public sealed partial class BuildPlacer
 
     private static string lineSummary = "";
     private static int lineSummaryFrame = -10;
+    // What the summary was made for (pieces, affordable, the piece): it is made again only when that changes.
+    private static int lineKey = -1;
 
     private void NoteLine(int pieces, int affordable)
     {
+        int key = (pieces * 1000 + affordable) * 31 + (placing != null ? placing.GetHashCode() : 0);
+        lineSummaryFrame = Time.frameCount;
+        if (key == lineKey)
+        {
+            return;
+        }
+
+        lineKey = key;
         var items = new System.Collections.Generic.List<ItemAmount>();
         foreach (ItemAmount cost in placing.ConstructionItems)
         {

@@ -117,7 +117,8 @@ public sealed class QuestTrackerView : MonoBehaviour
             Shown.Add(quest);
         }
 
-        panel.SetActive(active.Count + available.Count + atHome > 0);
+        string nextRescue = NextRescueWaitsFor(manager);
+        panel.SetActive(active.Count + available.Count + atHome > 0 || nextRescue != null);
         var builder = new StringBuilder();
         timed = false;
         // A Contextual HUD (HudRules): the quest on top in full, its finished and not-yet-open steps left out; the rest by their titles.
@@ -194,7 +195,6 @@ public sealed class QuestTrackerView : MonoBehaviour
             builder.Append(builder.Length > 0 ? "\n\n" : "").Append($"<color={Muted}>{atHome} more at home</color>");
         }
 
-        string nextRescue = NextRescueWaitsFor(manager);
         if (nextRescue != null)
         {
             builder.Append(builder.Length > 0 ? "\n\n" : "").Append($"<color={Muted}>{nextRescue}</color>");
@@ -228,7 +228,7 @@ public sealed class QuestTrackerView : MonoBehaviour
                 return null;
             }
 
-            if (status != QuestStatus.NotStarted || next != null)
+            if (status != QuestStatus.NotStarted)
             {
                 continue;
             }
@@ -244,7 +244,13 @@ public sealed class QuestTrackerView : MonoBehaviour
                 }
             }
 
-            if (open == 1)
+            // Free to begin already (it waits for word on a raid): that one is next.
+            if (open == 0)
+            {
+                return $"Next to be found: {quest.DisplayName}";
+            }
+
+            if (open == 1 && next == null)
             {
                 next = quest;
                 before = missing;

@@ -17,7 +17,7 @@ public sealed class ActionCrosshair : MonoBehaviour
         }
 
         UIStateManager ui = UIStateManager.Current;
-        bool show = CameraPointer.UsesScreenCenter && !GamePause.IsPaused && (ui == null || !ui.IsAnyWindowOpen);
+        bool show = CameraPointer.UsesScreenCenter && !GamePause.HidesHud && (ui == null || !ui.IsAnyWindowOpen);
         if (graphic.enabled != show)
         {
             graphic.enabled = show;

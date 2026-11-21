@@ -18,7 +18,11 @@ public sealed class MessageFeedView : MonoBehaviour
         // The message as posted, and how many times it came while still on screen ("×2").
         public string Text;
         public int Times;
+        // When it was first posted, which the hold for open windows never moves.
+        public float Born;
     }
+
+    private float coveredSince = -1f;
 
     [Tooltip("Text used as a template for each line. It is hidden itself.")]
     [SerializeField] private TMP_Text lineTemplate;
@@ -142,9 +146,14 @@ public sealed class MessageFeedView : MonoBehaviour
 
         // While a window is open the lines wait, hidden, their time held: they drew over the windows (the systems review, 2026-11-21).
         bool covered = UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen;
+        if (covered != coveredSince >= 0f)
+        {
+            coveredSince = covered ? Time.unscaledTime : -1f;
+        }
+
         for (int i = lines.Count - 1; i >= 0; i--)
         {
-            if (covered)
+            if (covered && lines[i].Born < coveredSince)
             {
                 Line held = lines[i];
                 held.ShownAt += Time.unscaledDeltaTime;
@@ -201,7 +210,7 @@ public sealed class MessageFeedView : MonoBehaviour
         label.alignment = following ? TextAlignmentOptions.Left : lineTemplate.alignment;
         label.color = kind == MessageKind.Gain ? gainColor : kind == MessageKind.Warning ? warningColor : infoColor;
         label.transform.SetAsLastSibling();
-        lines.Add(new Line { Label = label, ShownAt = Time.unscaledTime, Text = text, Times = 1 });
+        lines.Add(new Line { Label = label, ShownAt = Time.unscaledTime, Text = text, Times = 1, Born = Time.unscaledTime });
     }
 
     // Beside the player while they are on screen; at the resting place (lifted above an open dialogue box) otherwise.
