@@ -187,6 +187,25 @@ public sealed class EarlyStorageTests
         return go;
     }
 
+    [Test]
+    public void TheStorageShed_GrowsWithItsTiers_UpToAChestsMost()
+    {
+        // The shed began at a chest's most (60), so its tiers' room was capped away (the user chose a smaller start, 2026-11-21).
+        var shed = AssetDatabase.LoadAssetAtPath<BuildingDefinition>("Assets/_Project/Data/Buildings/StorageShed.asset");
+        var chest = shed.Prefab.GetComponent<StashChest>();
+        int room = chest.StashSlots;
+        Assert.Less(room, StashStorage.ChestSlots, "room to grow");
+        for (int level = 2; level <= shed.MaxLevel; level++)
+        {
+            int more = shed.UpgradeTo(level).extraStorage;
+            Assert.Greater(more, 0, $"Tier {level} adds room");
+            room += more;
+            Assert.LessOrEqual(room, StashStorage.ChestSlots, $"Tier {level} stays within a chest's most");
+        }
+
+        Assert.AreEqual(StashStorage.ChestSlots, room, "the top tier holds a chest's most");
+    }
+
     private static void Invoke(object target, string method)
     {
         target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);

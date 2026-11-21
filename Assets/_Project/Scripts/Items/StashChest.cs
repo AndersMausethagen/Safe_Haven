@@ -181,6 +181,14 @@ public sealed class StashChest : MonoBehaviour, ISaveable
                 {
                     openSlots[i] = true;
                 }
+
+                // A slot past the chest's room that still holds something stays open until it is emptied, so nothing is shut away when
+                // a chest holds less than it did (the Storage Shed's first tier went from 60 to 44, 2026-11-21: its tiers add up to 60).
+                ItemContainer items = GameSession.Stash.Items;
+                for (int i = start + chest.StashSlots; i < start + StashStorage.ChestSlots && i < openSlots.Count; i++)
+                {
+                    openSlots[i] = !items.GetSlot(i).IsEmpty;
+                }
             }
         }
 

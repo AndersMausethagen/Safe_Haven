@@ -198,7 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StashChest
   window: {fileID: 0}
   windowRange: 4
-  stashSlots: 0
+  stashSlots: 44
 --- !u!114 &1514811901155397273
 MonoBehaviour:
   m_ObjectHideFlags: 0
