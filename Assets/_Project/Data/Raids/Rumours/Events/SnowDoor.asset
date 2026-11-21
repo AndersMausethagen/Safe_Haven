@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
   id: rumour.snowdoor
   displayName: The Door in the Snow
-  weight: 1
+  weight: 0
   earliestSeconds: 90
   latestSecondsLeft: 90
   minimumStage: 0

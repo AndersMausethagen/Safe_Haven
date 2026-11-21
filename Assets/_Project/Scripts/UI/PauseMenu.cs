@@ -81,6 +81,7 @@ public sealed class PauseMenu : MonoBehaviour
         loadButton.onClick.AddListener(ShowSaves);
         optionsButton.onClick.AddListener(ShowOptions);
         AddJournalButton();
+        AddReportButton();
         AddCoopButton();
         HookAsks(CoopSession.Current != null ? CoopSession.Current.Access : null);
         quitButton.onClick.AddListener(AskQuit);
@@ -226,6 +227,32 @@ public sealed class PauseMenu : MonoBehaviour
     }
 
     private static bool JournalWindowExists => Player.Current != null;
+
+    private Button reportButton;
+
+    // A playtest report (F8 too), under the Journal: a controller player has no F8.
+    private void AddReportButton()
+    {
+        if (reportButton != null || Player.Current == null)
+        {
+            return;
+        }
+
+        reportButton = Instantiate(optionsButton, optionsButton.transform.parent);
+        reportButton.name = "Report Button";
+        reportButton.transform.SetSiblingIndex(optionsButton.transform.GetSiblingIndex());
+        reportButton.onClick = new Button.ButtonClickedEvent();
+        reportButton.onClick.AddListener(() =>
+        {
+            Close();
+            PlaytestReportWindow.Begin();
+        });
+        TMPro.TMP_Text label = reportButton.GetComponentInChildren<TMPro.TMP_Text>();
+        if (label != null)
+        {
+            label.text = "Report a Bug or Idea";
+        }
+    }
 
     // Co-op, beside the Journal: open this game to friends (then invite them, through Steam), and close it or leave a friend's.
     private void AddCoopButton()

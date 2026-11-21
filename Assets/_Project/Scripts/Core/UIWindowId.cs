@@ -52,4 +52,6 @@ public enum UIWindowId
     ResidentPanel = 22,
     /// <summary>A building's Upgrade window: its next tier and modules (BuildingUpgradeWindow, the build menu's Manage › Upgrade).</summary>
     BuildingUpgrade = 23,
+    /// <summary>A playtester's report: Bug, Idea, Confusing or Liked, with a screenshot (F8, or Escape › Report; PlaytestReportWindow).</summary>
+    PlaytestReport = 24,
 }

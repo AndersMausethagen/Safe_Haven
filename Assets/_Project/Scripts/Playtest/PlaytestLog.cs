@@ -88,6 +88,8 @@ public static class PlaytestLog
     /// <summary>A creature died (KillLedger): subject the monster, amount the player's blows on it, detail who made the kill, the player's
     /// damage, everyone else's, its health and how long the fight took.</summary>
     public const string Kill = "Kill";
+    /// <summary>A playtester wrote a report (F8): subject its kind (bug, idea, confusing, liked), detail the report's id (Reports/&lt;id&gt;.json).</summary>
+    public const string Report = "Report";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

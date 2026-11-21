@@ -9,6 +9,7 @@ using UnityEngine;
 /// fire built elsewhere), a hearth still cold is taken away: an older save gets no extra ruin.
 /// </summary>
 [RequireComponent(typeof(Construction))]
+[InAFriendsHaven(HavenUse.HostOnly, "the shelter's ember is the host's own first quest; a visitor doesn't see the cold hearth's prompt")]
 public sealed class ColdHearth : MonoBehaviour
 {
     [Tooltip("The quest it belongs to: A Light in the Wood. Lighting the hearth counts for its Build Campfire step.")]

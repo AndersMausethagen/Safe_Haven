@@ -132,10 +132,12 @@ public sealed class ContentExpansionTests
         var raid = AssetDatabase.LoadAssetAtPath<RaidDefinition>("Assets/_Project/Data/Raids/MistyWoods.asset");
         RaidEventsSystem system = raid.Systems.OfType<RaidEventsSystem>().FirstOrDefault();
         Assert.IsNotNull(system, "Misty Woods has the Raid Events system");
+        // A raid's own event (Troll Valley's Jaw-keeper, Act II) is drawn from its pool only: every event is in some raid's.
+        var pooled = All<RaidDefinition>().SelectMany(r => r.Systems.OfType<RaidEventsSystem>()).SelectMany(s => s.Settings.pool).ToList();
         foreach (RaidEventDefinition definition in events)
         {
             Assert.IsNotEmpty(definition.Warning, definition.name);
-            Assert.Contains(definition, system.Settings.pool);
+            Assert.Contains(definition, pooled, definition.name + " is in a raid's pool");
             Assert.IsTrue(definition.SitePrefab != null || definition.OnStart.Count > 0, definition.name + " does something");
             if (definition.SitePrefab != null)
             {

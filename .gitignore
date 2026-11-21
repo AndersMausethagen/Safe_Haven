@@ -94,3 +94,9 @@ Tools/Audio/Voices/raw/
 
 # Raw LocalSpawn video takes (result_motion.py make): only the processed loops in Assets are kept.
 Tools/LocalSpawn/ResultMotion/
+
+# Playtest analysis: its Python, the friends' zips and what is made from them (personal data, kept out of git)
+Tools/Playtest/.venv/
+Tools/Playtest/Inbox/
+Tools/Playtest/Work/
+Tools/Playtest/Results/
