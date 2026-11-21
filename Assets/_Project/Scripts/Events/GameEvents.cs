@@ -65,6 +65,8 @@ public enum GameEventKind
     InscriptionFound = 28,
     /// <summary>A piece of gear was empowered at the altar. Subject: the ItemDefinition; Amount: the level it reached.</summary>
     Empowered = 29,
+    /// <summary>A module was fitted to a building (BuildingModules). Subject: the BuildingModuleDefinition; Detail: the BuildingDefinition.</summary>
+    ModuleFitted = 30,
 }
 
 /// <summary>

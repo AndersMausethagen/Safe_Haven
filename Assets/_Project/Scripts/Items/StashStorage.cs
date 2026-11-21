@@ -76,14 +76,14 @@ public sealed class StashStorage
 
     /// <summary>
     /// Whether <see cref="StackOnStored"/> or <see cref="StoreMaterials(ItemContainer, System.Func{ItemStack, bool}, GameObject, int)"/>
-    /// would move anything from <paramref name="bag"/>: a material, or a stack an open chest already holds. Room isn't checked.
+    /// would move anything from <paramref name="bag"/>: a material, or a stack an open chest already holds, with room for it.
     /// </summary>
     public bool HasSomethingToStore(ItemContainer bag, System.Func<ItemStack, bool> keep)
     {
         for (int i = 0; bag != null && i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
-            if (stack.IsEmpty || !stack.Item.Stackable || (keep != null && keep(stack)))
+            if (stack.IsEmpty || !stack.Item.Stackable || (keep != null && keep(stack)) || Items.SpaceFor(stack.Item) <= 0)
             {
                 continue;
             }

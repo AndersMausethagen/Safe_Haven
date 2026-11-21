@@ -62,8 +62,13 @@ public sealed class WallFittings : MonoBehaviour, ISaveable
         }
 
         Bounds local = BuildPlacement.LocalBounds(Definition.Prefab.transform);
-        Vector3 toPortal = HomePortal.Current != null ? HomePortal.Current.transform.position - transform.position : -transform.forward;
-        bool outwardIsFront = Vector3.Dot(toPortal, transform.forward) <= 0f;
+        if (side == 0)
+        {
+            Vector3 toPortal = HomePortal.Current != null ? HomePortal.Current.transform.position - transform.position : -transform.forward;
+            side = Vector3.Dot(toPortal, transform.forward) <= 0f ? 1 : -1;
+        }
+
+        bool outwardIsFront = side > 0;
         torchObject = Instantiate(Definition.WallTorch, transform);
         torchObject.name = TorchName;
         bool low = local.size.y < 1.2f;
@@ -76,13 +81,24 @@ public sealed class WallFittings : MonoBehaviour, ISaveable
 
     public string SaveKey => "wall-fittings";
 
+    // The torch's side and the night it was fed for are kept here: the torch is a child with no save of its own, so a load at night
+    // charged it again and a load before the portal was found could put it on the other face.
     [System.Serializable]
     private struct SavedState
     {
         public bool torch;
+        public int side;
+        public int fedNight;
     }
 
-    public string CaptureState() => JsonUtility.ToJson(new SavedState { torch = torch });
+    // 1 the front face, -1 the back, 0 not chosen yet.
+    private int side;
+
+    public string CaptureState()
+    {
+        TorchFuel fuel = torchObject != null ? torchObject.GetComponent<TorchFuel>() : null;
+        return JsonUtility.ToJson(new SavedState { torch = torch, side = side, fedNight = fuel != null ? fuel.FedNight : -1 });
+    }
 
     public void RestoreState(string state)
     {
@@ -91,10 +107,25 @@ public sealed class WallFittings : MonoBehaviour, ISaveable
             return;
         }
 
-        torch = JsonUtility.FromJson<SavedState>(state).torch;
-        if (torch)
+        SavedState saved = JsonUtility.FromJson<SavedState>(state);
+        side = saved.side;
+        torch = saved.torch;
+        if (!torch)
         {
-            ShowTorch();
+            // Taken down in the game this came from (a co-op host's): the torch goes here too.
+            if (torchObject != null)
+            {
+                Destroy(torchObject);
+            }
+
+            torchObject = null;
+            return;
+        }
+
+        ShowTorch();
+        if (torchObject != null && torchObject.TryGetComponent(out TorchFuel fuel))
+        {
+            fuel.FedNight = saved.fedNight;
         }
     }
 }

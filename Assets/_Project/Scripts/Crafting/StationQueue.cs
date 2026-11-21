@@ -52,6 +52,20 @@ public sealed class StationQueue
     /// <summary>True when the last finished craft couldn't be delivered: the station waits for the slot to be emptied.</summary>
     public bool Blocked { get; private set; }
 
+    /// <summary>How many kinds of thing may wait in the output at once: 1, more with a module that adds output slots (the Storage
+    /// Loft). The first is Output; the others wait in <see cref="MoreOutput"/> and move up as it is emptied. Set by its station.</summary>
+    public int OutputSlots
+    {
+        get => outputSlots;
+        set => outputSlots = Mathf.Max(1, value);
+    }
+
+    private int outputSlots = 1;
+    private readonly List<(Object made, int amount)> moreOutput = new List<(Object, int)>();
+
+    /// <summary>What waits in the output slots after the first.</summary>
+    public IReadOnlyList<(Object made, int amount)> MoreOutput => moreOutput;
+
     public RecipeDefinition Current => jobs.Count > 0 ? jobs[0].Recipe : null;
     public bool IsIdle => jobs.Count == 0;
 
@@ -240,7 +254,20 @@ public sealed class StationQueue
             return 0;
         }
 
-        return Output == null || Output == definition ? Capacity - OutputAmount : 0;
+        if (Output == null || Output == definition)
+        {
+            return Capacity - OutputAmount;
+        }
+
+        foreach ((Object made, int amount) in moreOutput)
+        {
+            if (made == definition)
+            {
+                return Capacity - amount;
+            }
+        }
+
+        return moreOutput.Count < OutputSlots - 1 ? Capacity : 0;
     }
 
     private bool TryDeliver(RecipeDefinition recipe, ResourceStorage storage)
@@ -280,8 +307,23 @@ public sealed class StationQueue
             return;
         }
 
-        Output = definition;
-        OutputAmount += amount;
+        if (Output == null || Output == definition)
+        {
+            Output = definition;
+            OutputAmount += amount;
+            return;
+        }
+
+        for (int i = 0; i < moreOutput.Count; i++)
+        {
+            if (moreOutput[i].made == definition)
+            {
+                moreOutput[i] = (definition, moreOutput[i].amount + amount);
+                return;
+            }
+        }
+
+        moreOutput.Add((definition, amount));
     }
 
     /// <summary>Puts a little more of what was just made into the output slot (a practised hand's extra), if there is
@@ -306,6 +348,12 @@ public sealed class StationQueue
         {
             OutputAmount = 0;
             Output = null;
+            // The next slot's kind moves up.
+            if (moreOutput.Count > 0)
+            {
+                (Output, OutputAmount) = moreOutput[0];
+                moreOutput.RemoveAt(0);
+            }
         }
 
         if (taken > 0)
@@ -317,8 +365,17 @@ public sealed class StationQueue
     }
 
     /// <summary>Puts back saved state. Used by SaveMapper only.</summary>
-    public void Restore(IEnumerable<Job> savedJobs, float progress, Object output, int outputAmount)
+    public void Restore(IEnumerable<Job> savedJobs, float progress, Object output, int outputAmount, IEnumerable<(Object made, int amount)> more = null)
     {
+        moreOutput.Clear();
+        foreach ((Object made, int amount) in more ?? System.Array.Empty<(Object, int)>())
+        {
+            if (made != null && amount > 0)
+            {
+                moreOutput.Add((made, amount));
+            }
+        }
+
         jobs.Clear();
         foreach (Job job in savedJobs)
         {
@@ -331,6 +388,12 @@ public sealed class StationQueue
         Progress = jobs.Count > 0 ? Mathf.Max(0f, progress) : 0f;
         Output = outputAmount > 0 ? output : null;
         OutputAmount = Output != null ? outputAmount : 0;
+        if (Output == null && moreOutput.Count > 0)
+        {
+            (Output, OutputAmount) = moreOutput[0];
+            moreOutput.RemoveAt(0);
+        }
+
         Blocked = false;
     }
 }

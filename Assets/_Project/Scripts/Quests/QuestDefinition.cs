@@ -99,6 +99,8 @@ public sealed class QuestDefinition : ScriptableObject
              "one building per quest, learned when the quest that introduces it starts). A building listed here is learned no other way " +
              "until one of the quests listing it has started (BuildingGate): a rescue or a job no longer teaches it first.")]
     [SerializeField] private List<BuildingDefinition> unlocksBuildings = new List<BuildingDefinition>();
+    [Tooltip("Building modules known once this quest starts (BuildingModules.IsKnown): Copper Fire teaches the Storage Loft.")]
+    [SerializeField] private List<BuildingModuleDefinition> unlocksModules = new List<BuildingModuleDefinition>();
 
     [Header("Finishing")]
     [Tooltip("Off: the quest completes the moment its objectives are done. On: the player must return to a Quest Giver for this " +
@@ -160,6 +162,7 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;
     public IReadOnlyList<RecipeDefinition> RewardRecipes => rewardRecipes;
     public IReadOnlyList<BuildingDefinition> UnlocksBuildings => unlocksBuildings;
+    public IReadOnlyList<BuildingModuleDefinition> UnlocksModules => unlocksModules;
     public IReadOnlyList<EnchantmentDefinition> RewardEnchantments => rewardEnchantments;
     public ResidentDefinition RewardWorkFor => rewardWorkFor;
     public int RewardWork => rewardWork;

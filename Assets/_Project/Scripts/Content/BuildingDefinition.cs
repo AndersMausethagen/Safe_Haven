@@ -3,29 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// One upgrade of a building (level 2, 3, ...): what it costs, how long it is hammered, and what it brings: renown for
-/// Safe Haven, a faster and bigger crafting station, more storage. Each level also adds visible dressing to the
-/// building (Construction).
+/// What a building gains from a tier or a fitted module (BuildingLevel and BuildingModuleDefinition share it, the module research of
+/// 2026-11-21): a faster and bigger crafting station, more storage, renown, comfort, light, and what raids read. Construction adds up the
+/// levels reached and the modules fitted.
 /// </summary>
 [Serializable]
-public sealed class BuildingLevel
+public class BuildingBonus
 {
-    [Tooltip("Shown before the building's name, e.g. \"Sturdy\" Sawbench.")]
-    public string title = "Sturdy";
-    [TextArea(1, 3)] public string description;
-    public List<ItemAmount> cost = new List<ItemAmount>();
-    [Tooltip("Essence the level also takes: Purified Essence for the great tiers (GDD §13.5). Most levels need none.")]
-    public List<ResourceAmount> essence = new List<ResourceAmount>();
-    [Tooltip("Seconds of hammering at the scaffold.")]
-    [Min(0f)] public float work = 6f;
     [Tooltip("Renown added to Safe Haven on top of the building's own.")]
-    [Min(0)] public int renown = 4;
+    [Min(0)] public int renown;
     [Tooltip("Share faster a crafting station works. 0.25 means 25% faster. Levels add up.")]
     [Min(0f)] public float craftSpeed;
     [Min(0)] public int extraQueue;
     [Min(0)] public int extraOutput;
     [Tooltip("Extra stash slots for storage (chests, sheds).")]
     [Min(0)] public int extraStorage;
+    [Tooltip("More output slots at a station: another kind of thing can wait there while the first is still uncollected, so a mixed " +
+             "queue doesn't stop at the first change (the Storage Loft).")]
+    [Min(0)] public int extraOutputSlots;
+    [Tooltip("A station's chance of one more of what it makes (luck), added to its extensions'. 0.05 means 5%.")]
+    [Range(0f, 0.5f)] public float extraChance;
 
     [Header("What it does for raids")]
     [Tooltip("Seconds added to the clock of every raid. The best building of a kind counts, not each one.")]
@@ -38,15 +35,8 @@ public sealed class BuildingLevel
     [Min(0)] public int comfort;
     [Tooltip("Extra logs from each section of a tree cut at home.")]
     [Min(0)] public int extraLogs;
-    [Tooltip("Recipes the player learns when this level is finished: Watch Post levels teach the raid runes.")]
-    public List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
 
     [Header("What it does for the haven")]
-    [Tooltip("What must stand before this level can be ordered, besides the level below it.")]
-    public List<BuildingRequirement> requires = new List<BuildingRequirement>();
-    [Tooltip("Ward breaches held off first: a won defence teaches the defences their next step (the design review's 8.7, " +
-             "2026-11-14). 0 = none.")]
-    [Min(0)] public int breachesWon;
     [Tooltip("More beds. A resident with a bed works faster and adds comfort; nobody needs one to live or work here.")]
     [Min(0)] public int beds;
     [Tooltip("Share more Purified Essence from each batch at the altar. 0.25 means 25% more.")]
@@ -59,8 +49,38 @@ public sealed class BuildingLevel
     [Min(0)] public int extraGame;
     [Tooltip("Metres more light around it, pushing the night back.")]
     [Min(0f)] public float extraLight;
-    [Tooltip("More station extensions (a bellows, a tool rack) it takes at this level (StationExtensions).")]
+    [Tooltip("More station extensions (a bellows, a tool rack) or modules it takes (StationExtensions, BuildingModules).")]
     [Min(0)] public int extensionSlots;
+}
+
+/// <summary>
+/// One upgrade of a building (level 2, 3, ...): what it costs, how long it is hammered, and what it brings (its BuildingBonus): renown
+/// for Safe Haven, a faster and bigger crafting station, more storage. Each level also adds visible dressing to the building
+/// (Construction).
+/// </summary>
+[Serializable]
+public sealed class BuildingLevel : BuildingBonus
+{
+    [Tooltip("Shown before the building's name, e.g. \"Sturdy\" Sawbench.")]
+    public string title = "Sturdy";
+    [TextArea(1, 3)] public string description;
+    public List<ItemAmount> cost = new List<ItemAmount>();
+    [Tooltip("Essence the level also takes: Purified Essence for the great tiers (GDD §13.5). Most levels need none.")]
+    public List<ResourceAmount> essence = new List<ResourceAmount>();
+    [Tooltip("Seconds of hammering at the scaffold.")]
+    [Min(0f)] public float work = 6f;
+    [Tooltip("Recipes the player learns when this level is finished: Watch Post levels teach the raid runes.")]
+    public List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
+    [Tooltip("What must stand before this level can be ordered, besides the level below it.")]
+    public List<BuildingRequirement> requires = new List<BuildingRequirement>();
+    [Tooltip("Ward breaches held off first: a won defence teaches the defences their next step (the design review's 8.7, " +
+             "2026-11-14). 0 = none.")]
+    [Min(0)] public int breachesWon;
+
+    public BuildingLevel()
+    {
+        renown = 4;
+    }
 
     /// <summary>"12 Oak Plank, 8 Purified Essence".</summary>
     public string CostText
@@ -210,6 +230,8 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private BuildingDefinition extends;
     [SerializeField, Min(0.5f)] private float extensionReach = 6f;
     [SerializeField] private ExtensionBonus extensionBonus = new ExtensionBonus();
+    [Tooltip("Only one extension or module of a group per station (\"fire\": the Bellows or the Bloomery Hearth). Empty: no group.")]
+    [SerializeField] private string extensionGroup;
 
     [Header("Crafting")]
     [Tooltip("Makes the building a crafting station: using it opens its queue of recipes for this station.")]
@@ -270,6 +292,7 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public int ExtensionSlots => extensionSlots;
     /// <summary>The station this extends, or null.</summary>
     public BuildingDefinition Extends => extends;
+    public string ExtensionGroup => extensionGroup;
     public float ExtensionReach => extensionReach;
     public ExtensionBonus Extension => extensionBonus;
     /// <summary>How much faster the player walks on it at home; 1 for anything that isn't a path.</summary>

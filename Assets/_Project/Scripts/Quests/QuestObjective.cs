@@ -53,6 +53,8 @@ public enum ObjectiveType
     GiveInscription = 21,
     /// <summary>Empower X pieces of gear at the altar (Purified Essence into a level), or one kind of item.</summary>
     EmpowerItem = 22,
+    /// <summary>Fit a module to a building (BuildingModules): at that kind of building, or any when empty.</summary>
+    FitModule = 23,
 }
 
 /// <summary>
@@ -266,6 +268,8 @@ public sealed class QuestObjective
                 return new[] { nameof(person) };
             case ObjectiveType.EmpowerItem:
                 return new[] { nameof(item) };
+            case ObjectiveType.FitModule:
+                return new[] { nameof(building) };
             default:
                 return Array.Empty<string>();
         }
@@ -385,6 +389,8 @@ public sealed class QuestObjective
                 return gameEvent.Kind == GameEventKind.Enchanted && EnchantmentCounts(gameEvent.Subject) ? 1 : 0;
             case ObjectiveType.EmpowerItem:
                 return gameEvent.Kind == GameEventKind.Empowered && Is(item, gameEvent.Subject, false) ? 1 : 0;
+            case ObjectiveType.FitModule:
+                return gameEvent.Kind == GameEventKind.ModuleFitted && (building == null || gameEvent.Detail == building) ? 1 : 0;
             case ObjectiveType.LearnEnchantment:
                 return gameEvent.Kind == GameEventKind.EnchantmentLearned && EnchantmentCounts(gameEvent.Subject)
                        && (!onlySource || (gameEvent.Subject is EnchantmentDefinition learned && learned.Source == source)) ? 1 : 0;
@@ -548,6 +554,8 @@ public sealed class QuestObjective
                 return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
             case ObjectiveType.EmpowerItem:
                 return item != null ? $"Empower your {Name(item)} at the altar" : Amount == 1 ? "Empower a piece of gear at the altar" : $"Empower {count} pieces of gear at the altar";
+            case ObjectiveType.FitModule:
+                return building != null ? $"Fit a module to the {building.DisplayName} (its Upgrade page)" : "Fit a module to a building (its Upgrade page)";
             case ObjectiveType.EnchantItem:
                 string carved = enchantment != null ? enchantment.DisplayName : greatOnly ? "a great enchantment" : "an enchantment";
                 return Amount == 1 ? $"Carve {carved} into your gear at the altar" : $"Carve {carved} into {count} pieces of gear at the altar";

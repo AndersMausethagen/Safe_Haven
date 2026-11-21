@@ -118,6 +118,8 @@ public sealed class SettlementSaveData
     public float builderSeconds;
     /// <summary>Ids of the bosses beaten. Missing in older saves.</summary>
     public List<string> defeatedBosses = new List<string>();
+    /// <summary>Building modules in the Haven's store, one id per spare (BuildingModules). Missing in older saves: none.</summary>
+    public List<string> spareModules = new List<string>();
     public string lastBossBeaten;
     public int lastBossBeatenAt;
     /// <summary>The homecoming whose share of held quests has begun, and how many of them (QuestManager). Missing in older saves: a full share.</summary>
@@ -160,6 +162,16 @@ public sealed class StationSaveData
     public int outputAmount;
     /// <summary>How many of the queued crafts a worker started (StationQueue.WorkerCrafts).</summary>
     public int workerCrafts;
+    /// <summary>What waits in the output slots after the first (a Storage Loft's). Missing in older saves: none.</summary>
+    public List<StationOutputSaveData> moreOutput = new List<StationOutputSaveData>();
+}
+
+[System.Serializable]
+public sealed class StationOutputSaveData
+{
+    public string id;
+    public bool isResource;
+    public int amount;
 }
 
 [Serializable]

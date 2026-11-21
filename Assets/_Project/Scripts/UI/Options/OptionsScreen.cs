@@ -74,6 +74,8 @@ public sealed class OptionsScreen : MonoBehaviour
     private int keptMode;
     private Vector2Int keptResolution;
     private int writtenCountdown = -1;
+    // Escape is both Pause and Cancel: one press calls back twice in a frame, which opened the question and closed it again.
+    private int backFrame = -1;
 
     /// <summary>True while the screen is up, or was until this frame: the same Escape press must not close the menu under it.</summary>
     public static bool HasEscape => (current != null && current.window.activeSelf) || closedFrame == Time.frameCount;
@@ -140,6 +142,12 @@ public sealed class OptionsScreen : MonoBehaviour
 
     private void OnBackPressed(InputAction.CallbackContext context)
     {
+        if (backFrame == Time.frameCount)
+        {
+            return;
+        }
+
+        backFrame = Time.frameCount;
         // Back while a key is awaited stops the wait: a pad player on a keyboard row could press nothing that ended it.
         if (InputRebinds.IsListening)
         {
@@ -340,11 +348,7 @@ public sealed class OptionsScreen : MonoBehaviour
         OptionsWidgets.Place((RectTransform)heading.transform, new Vector2(0f, 1f), new Vector2(700f, 48f), new Vector2(30f, -24f));
         askText = OptionsWidgets.Text("Text", box, "", 22f, OptionsWidgets.Body, TextAlignmentOptions.TopLeft);
         OptionsWidgets.Place((RectTransform)askText.transform, new Vector2(0f, 1f), new Vector2(700f, 150f), new Vector2(30f, -80f));
-        askSave = OptionsWidgets.Button("Save", box, "Save and Leave", 21f, () =>
-        {
-            Save();
-            Leave();
-        }, out _);
+        askSave = OptionsWidgets.Button("Save", box, "Save and Leave", 21f, SaveAndLeave, out _);
         OptionsWidgets.Place((RectTransform)askSave.transform, new Vector2(0f, 0f), new Vector2(220f, 50f), new Vector2(30f, 26f));
         Button leave = OptionsWidgets.Button("Leave", box, "Leave Without Saving", 21f, () =>
         {
@@ -428,6 +432,21 @@ public sealed class OptionsScreen : MonoBehaviour
         PlayerPrefs.Save();
         RefreshRows();
         ShowStatus();
+    }
+
+    // A new window mode or size asks to be kept first (Keep or Revert, ten seconds): leaving at once would keep a picture the screen
+    // can't show, with no way back.
+    private void SaveAndLeave()
+    {
+        bool display = draft.IsChanged(DisplayModeKey) || draft.IsChanged(ResolutionKey);
+        Save();
+        if (display && confirmUntil >= 0f)
+        {
+            askBox.SetActive(false);
+            return;
+        }
+
+        Leave();
     }
 
     private void Discard()

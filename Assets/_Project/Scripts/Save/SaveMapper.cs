@@ -260,6 +260,7 @@ public static class SaveMapper
         into.footpaths = settlement.Footpaths ?? "";
         into.builderSeconds = settlement.BuilderSeconds;
         into.defeatedBosses.AddRange(settlement.DefeatedBosses);
+        into.spareModules.AddRange(settlement.SpareModules);
         into.lastBossBeaten = settlement.LastBossBeaten;
         into.lastBossBeatenAt = settlement.LastBossBeatenAt;
         into.heldQuestsHomecoming = settlement.HeldQuestsHomecoming;
@@ -293,6 +294,11 @@ public static class SaveMapper
                 outputAmount = queue.OutputAmount,
                 workerCrafts = queue.WorkerCrafts,
             };
+            foreach ((UnityEngine.Object waiting, int amount) in queue.MoreOutput)
+            {
+                station.moreOutput.Add(new StationOutputSaveData { id = waiting is IStackDefinition kind ? kind.Id : "", isResource = waiting is ResourceDefinition, amount = amount });
+            }
+
             foreach (StationQueue.Job job in queue.Jobs)
             {
                 station.jobs.Add(new StationJobSaveData { recipe = job.Recipe.Id, count = job.Count });
@@ -376,6 +382,11 @@ public static class SaveMapper
             settlement.MarkBossDefeated(boss);
         }
 
+        foreach (string spare in saved.spareModules ?? new List<string>())
+        {
+            settlement.AddSpareModule(spare);
+        }
+
         settlement.RestoreLastBoss(saved.lastBossBeaten, saved.lastBossBeatenAt);
         settlement.RestoreHeldQuests(saved.heldQuestsHomecoming, saved.heldQuestsStarted);
         foreach (FallenSaveData entry in saved.fallen ?? new List<FallenSaveData>())
@@ -426,8 +437,20 @@ public static class SaveMapper
                     : Resolve(content.FindItem(entry.output), entry.outputIsResource ? "resource" : "item", entry.output, missing);
             }
 
+            var more = new List<(UnityEngine.Object, int)>();
+            foreach (StationOutputSaveData slot in entry.moreOutput ?? new List<StationOutputSaveData>())
+            {
+                UnityEngine.Object made = slot == null || string.IsNullOrEmpty(slot.id) ? null
+                    : slot.isResource ? (UnityEngine.Object)content.FindResource(slot.id) : content.FindItem(slot.id);
+                if (made != null)
+                {
+                    more.Add((made, slot.amount));
+                }
+            }
+
             var queue = new StationQueue(entry.id, (CraftingStationType)entry.type, entry.capacity, entry.maxQueued);
-            queue.Restore(jobs, entry.progress, output, entry.outputAmount);
+            queue.OutputSlots = 1 + more.Count;
+            queue.Restore(jobs, entry.progress, output, entry.outputAmount, more);
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
             into.Add(queue);
         }

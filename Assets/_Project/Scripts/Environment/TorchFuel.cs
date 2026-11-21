@@ -13,6 +13,9 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
 {
     private const float CheckSeconds = 0.5f;
     private const float Hysteresis = 0.06f;
+    // An unfed torch asks the stores again only now and then: a ring of wall torches with no charcoal searched the bag and every
+    // chest twice a second all night.
+    private const float RetrySeconds = 8f;
 
     [Tooltip("What it burns: Charcoal.")]
     [SerializeField] private ItemDefinition fuel;
@@ -30,6 +33,8 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
     private static int darkCountNight = -1;
 
     private int fedNight = -1;
+    private int countedDarkNight = -1;
+    private float nextFeedTry;
     private bool lit = true;
     private float nextCheck;
     private VisibilitySource sight;
@@ -53,7 +58,18 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
     public ItemDefinition Fuel => fuel;
     public int PerNight => perNight;
 
-    private static int Night => GameSession.Here.DaysPassed;
+    /// <summary>The night it was last fed for (a wall torch's wall saves it: WallFittings).</summary>
+    public int FedNight
+    {
+        get => fedNight;
+        set => fedNight = value;
+    }
+
+    /// <summary>
+    /// Which night it is: counted from dusk, not from dawn. The day count turns at 06:00 while a torch still burns into the morning,
+    /// which charged it again at dawn (the review of 2026-11-21).
+    /// </summary>
+    public static int Night => GameSession.Here.DaysPassed - (AtmosphereConditions.Hour < 12f ? 1 : 0);
 
     private void Awake()
     {
@@ -90,7 +106,18 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
             return true;
         }
 
-        return IsFed || TryFeed();
+        if (IsFed)
+        {
+            return true;
+        }
+
+        if (Time.time < nextFeedTry)
+        {
+            return false;
+        }
+
+        nextFeedTry = Time.time + RetrySeconds;
+        return TryFeed();
     }
 
     /// <summary>Takes tonight's fuel from the bag and the chests at home. False (and a word once a night) when there is none.</summary>
@@ -115,7 +142,13 @@ public sealed class TorchFuel : MonoBehaviour, ISaveable
             darkCount = 0;
         }
 
-        darkCount++;
+        // Each torch counts itself once a night, however often it asks again.
+        if (countedDarkNight != Night)
+        {
+            countedDarkNight = Night;
+            darkCount++;
+        }
+
         if (warnedNight != Night && player != null && Place.AtHome)
         {
             // A moment later, so every torch has counted itself.

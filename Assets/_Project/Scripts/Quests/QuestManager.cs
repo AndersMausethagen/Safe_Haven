@@ -266,8 +266,17 @@ public sealed class QuestManager : MonoBehaviour, IGameSystem
     private bool underWayKnown;
     private readonly Dictionary<QuestDefinition, int> startedInHomecoming = new Dictionary<QuestDefinition, int>();
 
+    private int underWayHomecoming = -1;
+
     private bool AnyUnderWay(QuestRank rank)
     {
+        // A new homecoming opens a fresh share: what was under way at the last one no longer counts.
+        if (underWayHomecoming != GameSession.Home.HeldQuestsHomecoming)
+        {
+            underWayHomecoming = GameSession.Home.HeldQuestsHomecoming;
+            underWayKnown = false;
+        }
+
         if (!underWayKnown)
         {
             System.Array.Clear(underWay, 0, underWay.Length);

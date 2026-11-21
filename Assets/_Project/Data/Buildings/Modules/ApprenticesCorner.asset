@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7736f9cb0a98e9b42802b13f42b9cfd8, type: 3}
+  m_Name: ApprenticesCorner
+  m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
+  id: module.apprenticescorner
+  displayName: Apprentice's Corner
+  description: A bench and a stool for a second pair of hands. While someone works here, the queue is longer and now and then one more comes off it.
+  icon: {fileID: 21300000, guid: 77a0db93d3269e9419f6f66f8048418b, type: 3}
+  fits: 1
+  buildings: []
+  tier: 2
+  group: 
+  staffed: 1
+  bonus:
+    renown: 0
+    craftSpeed: 0
+    extraQueue: 2
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0.05
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+  cost:
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 10
+  - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 2
+  essence: []
+  knownFromStart: 0

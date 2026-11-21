@@ -174,7 +174,7 @@ public static class HavenReadiness
     }
 
     // Each kind counts its best building: three Watch Posts hear no more than one.
-    private static float BestOfEachKind(Func<BuildingLevel, float> bonus)
+    private static float BestOfEachKind(Func<BuildingBonus, float> bonus)
     {
         var best = new Dictionary<BuildingDefinition, float>();
         foreach (BuildingObject one in Standing())

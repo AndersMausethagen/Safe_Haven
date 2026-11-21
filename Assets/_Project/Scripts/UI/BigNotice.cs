@@ -162,9 +162,10 @@ public sealed class BigNotice : MonoBehaviour
             $"{where}: the portal's briefing shows where. Bring them home.");
     }
 
-    private static void OnBuildingLearned(BuildingDefinition building)
+    private static void OnBuildingLearned(PlayerCrafting learner, BuildingDefinition building)
     {
-        if (building != null)
+        // Only the player at this screen: a co-op friend's puppet learns too.
+        if (building != null && learner != null && Player.Current != null && learner.gameObject == Player.Current.gameObject)
         {
             Show(ForBuilding(building));
         }

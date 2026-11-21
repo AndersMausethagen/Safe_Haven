@@ -25,7 +25,8 @@ public static class ConstructionUpgradeOffer
 
         BuildingLevel next = building.Definition.UpgradeTo(construction.Level + 1);
         bool wall = WallUpgrades.HasChoices(building);
-        if (next == null && !wall)
+        bool modules = BuildingModules.TakesModules(building.Definition);
+        if (next == null && !wall && !modules)
         {
             GameMessages.Post($"The {construction.Title} is as good as it gets.");
             return;
@@ -41,7 +42,11 @@ public static class ConstructionUpgradeOffer
     private static MenuPage Page(BuildingObject building, Construction construction, BuildingLevel next, GameObject user)
     {
         var page = next == null
-            ? new MenuPage { Title = building.Definition.DisplayName, Body = "A piece of wall: make it a gate, or give it a torch for the night." }
+            ? new MenuPage
+            {
+                Title = construction.Title,
+                Body = WallUpgrades.HasChoices(building) ? "A piece of wall: make it a gate, or give it a torch for the night." : "At its highest tier.",
+            }
             : new MenuPage
             {
                 Title = $"{next.title} {building.Definition.DisplayName}",
@@ -61,6 +66,9 @@ public static class ConstructionUpgradeOffer
         {
             WallUpgrades.AddChoices(page, building, user);
         }
+
+        // Its modules: the slots, what is fitted, and what fits (BuildingModules).
+        BuildingModules.AddChoices(page, building, user);
 
         return page;
     }

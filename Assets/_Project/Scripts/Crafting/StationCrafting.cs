@@ -137,8 +137,26 @@ public static class StationCrafting
         }
     }
 
-    /// <summary>Moves what fits from the output slot to the player. Returns how many were taken.</summary>
+    /// <summary>Moves what fits from every output slot to the player (a Storage Loft's too). Returns how many were taken.</summary>
     public static int Collect(GameObject user, StationQueue queue)
+    {
+        int total = 0;
+        // One slot at a time: an emptied slot lets the next kind move up. Stops when the bag takes nothing more.
+        for (int slot = 0; queue != null && queue.Output != null && slot < queue.OutputSlots; slot++)
+        {
+            int taken = CollectFirst(user, queue);
+            total += taken;
+            if (taken <= 0 || queue.Output == null)
+            {
+                break;
+            }
+        }
+
+        return total;
+    }
+
+    // The first output slot.
+    private static int CollectFirst(GameObject user, StationQueue queue)
     {
         // The host's output, in a friend's Haven (co-op): taken here it was given to the guest while the host kept it too.
         if (queue == null || queue.Output == null || user == null || HavenVisit.LeftToHost())

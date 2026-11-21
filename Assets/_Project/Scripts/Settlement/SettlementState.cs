@@ -125,6 +125,8 @@ public sealed class SettlementState : IHavenView
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
     private readonly List<FallenRecord> fallen = new List<FallenRecord>();
     private readonly HashSet<string> defeatedBosses = new HashSet<string>();
+    // Modules taken off a building, kept to fit again (BuildingModules: "a removed module goes back as a spare"), one id per spare.
+    private readonly List<string> spareModules = new List<string>();
     private readonly List<JobDefinition> vacantJobs = new List<JobDefinition>();
     private readonly Dictionary<string, int> tradeBought = new Dictionary<string, int>();
     private float purifiedRemainder;
@@ -786,6 +788,36 @@ public sealed class SettlementState : IHavenView
 
     /// <summary>True for anyone who lives here, or did and was lost: neither is sought as a new face (the lost have a way back: FindAgain).</summary>
     public bool HasResident(ResidentDefinition resident) => Find(resident) != null || IsFallen(resident);
+
+    /// <summary>Ids of the modules in the Haven's store (one per spare).</summary>
+    public IReadOnlyList<string> SpareModules => spareModules;
+
+    /// <summary>How many spares of this module are in store.</summary>
+    public int SpareCount(string moduleId) => string.IsNullOrEmpty(moduleId) ? 0 : spareModules.FindAll(id => id == moduleId).Count;
+
+    /// <summary>Puts a module taken off a building into the store.</summary>
+    public void AddSpareModule(string moduleId)
+    {
+        Borrowed();
+        if (!string.IsNullOrEmpty(moduleId))
+        {
+            spareModules.Add(moduleId);
+            Changed?.Invoke();
+        }
+    }
+
+    /// <summary>Takes a spare out of the store to fit it. False when there is none.</summary>
+    public bool TakeSpareModule(string moduleId)
+    {
+        Borrowed();
+        if (!spareModules.Remove(moduleId))
+        {
+            return false;
+        }
+
+        Changed?.Invoke();
+        return true;
+    }
 
     /// <summary>Ids of the bosses beaten. Kept whatever became of the raid it happened in.</summary>
     public IReadOnlyCollection<string> DefeatedBosses => defeatedBosses;

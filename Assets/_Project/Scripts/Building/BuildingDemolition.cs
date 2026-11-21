@@ -41,6 +41,19 @@ public static class BuildingDemolition
             return $"Empty the {definition.DisplayName} first: {ItemsIn(chest)} item(s) are still in it.";
         }
 
+        // Anything else that holds things (a stable's feed trough, a cart shed): empty it first.
+        foreach (ICargoHold hold in building.GetComponents<ICargoHold>())
+        {
+            ItemContainer cargo = hold.Cargo;
+            for (int slot = 0; cargo != null && slot < cargo.SlotCount; slot++)
+            {
+                if (!cargo.GetSlot(slot).IsEmpty)
+                {
+                    return $"Empty the {hold.CargoTitle} first.";
+                }
+            }
+        }
+
         if (building.TryGetComponent(out CraftingStation station))
         {
             StationQueue queue = station.Queue;

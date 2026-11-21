@@ -217,8 +217,11 @@ public sealed class CraftingStation : MonoBehaviour
                 // The building's level, and the rank of the resident who works here.
                 queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(Id, type);
                 queue.Tier = Tier;
-                // Kept on the queue so its worker's luck holds during raids, when no station is loaded.
-                queue.ExtraChance = Extensions(extension => extension.extraChance);
+                // Kept on the queue so its worker's luck holds during raids, when no station is loaded. Modules add to the extensions'
+                // luck, the two together at most BuildingModules.MostLuck (never less than the extensions alone gave).
+                float placed = Extensions(extension => extension.extraChance);
+                queue.ExtraChance = Mathf.Max(placed, Mathf.Min(BuildingModules.MostLuck, placed + Upgrades(level => level.extraChance)));
+                queue.OutputSlots = 1 + Mathf.RoundToInt(Upgrades(level => level.extraOutputSlots));
             }
 
             return queue;
@@ -228,7 +231,7 @@ public sealed class CraftingStation : MonoBehaviour
     /// <summary>What it can make: its building's level, or no limit for a station that isn't one.</summary>
     public int Tier => TryGetComponent(out Construction construction) ? Mathf.Max(1, construction.Level) : Tiers.Max;
 
-    private float Upgrades(System.Func<BuildingLevel, float> bonus) =>
+    private float Upgrades(System.Func<BuildingBonus, float> bonus) =>
         TryGetComponent(out Construction construction) ? construction.Sum(bonus) : 0f;
 
     private void Awake()

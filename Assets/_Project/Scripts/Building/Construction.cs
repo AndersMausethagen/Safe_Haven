@@ -33,6 +33,43 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     private Interactable siteInteractable;
     private bool built;
     private float nextBlow;
+    // Modules fitted from the Upgrade page (BuildingModules), in the order fitted; saved with the level.
+    private readonly List<BuildingModuleDefinition> fitted = new List<BuildingModuleDefinition>();
+
+    /// <summary>The modules fitted to this building (BuildingModules fits and removes them).</summary>
+    public IReadOnlyList<BuildingModuleDefinition> Fitted => fitted;
+
+    /// <summary>Raised when a module is fitted to or removed from any building.</summary>
+    public static event Action<Construction> ModulesChanged;
+
+    /// <summary>Fits <paramref name="module"/> (BuildingModules pays and checks). False when it is fitted already.</summary>
+    internal bool AddModule(BuildingModuleDefinition module)
+    {
+        if (module == null || fitted.Contains(module))
+        {
+            return false;
+        }
+
+        fitted.Add(module);
+        StationExtensions.Forget();
+        Refresh();
+        ModulesChanged?.Invoke(this);
+        return true;
+    }
+
+    /// <summary>Takes <paramref name="module"/> off. False when it wasn't fitted.</summary>
+    internal bool RemoveModule(BuildingModuleDefinition module)
+    {
+        if (!fitted.Remove(module))
+        {
+            return false;
+        }
+
+        StationExtensions.Forget();
+        Refresh();
+        ModulesChanged?.Invoke(this);
+        return true;
+    }
 
     /// <summary>Raised when work on a building is finished: built, repaired or upgraded.</summary>
     public static event Action<Construction> Finished;
@@ -66,13 +103,25 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
     bool ISharedState.IsShared => true;
 
-    int ISharedState.SharedMark => unchecked(((Level * 31 + Target) * 31 + Mathf.FloorToInt(Work)) * 2 + (Paid ? 1 : 0));
+    int ISharedState.SharedMark => unchecked((((Level * 31 + Target) * 31 + Mathf.FloorToInt(Work)) * 2 + (Paid ? 1 : 0)) * 37 + ModuleMark());
+
+    private int ModuleMark()
+    {
+        int mark = fitted.Count;
+        foreach (BuildingModuleDefinition module in fitted)
+        {
+            mark = unchecked(mark * 31 + (module != null ? module.Id.GetHashCode() : 0));
+        }
+
+        return mark;
+    }
 
     /// <summary>The name with its level's title: "Sturdy Sawbench".</summary>
     public string Title => Level >= 2 && Definition.UpgradeTo(Level) != null ? $"{Definition.UpgradeTo(Level).title} {Definition.DisplayName}" : Definition.DisplayName;
 
-    /// <summary>A level's bonuses added up over every level reached (2 up to Level).</summary>
-    public float Sum(Func<BuildingLevel, float> bonus)
+    /// <summary>A bonus added up over every level reached (2 up to Level) and every module fitted (a Staffed one only while someone
+    /// works here). A scaffold or a ruin gets nothing from its modules.</summary>
+    public float Sum(Func<BuildingBonus, float> bonus)
     {
         float total = 0f;
         for (int level = 2; level <= Level; level++)
@@ -81,6 +130,18 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             if (upgrade != null)
             {
                 total += bonus(upgrade);
+            }
+        }
+
+        if (fitted.Count > 0 && IsStanding)
+        {
+            bool staffed = TryGetComponent(out CraftingStation station) && station.HasWorker;
+            foreach (BuildingModuleDefinition module in fitted)
+            {
+                if (module != null && (!module.Staffed || staffed))
+                {
+                    total += bonus(module.Bonus);
+                }
             }
         }
 
@@ -118,10 +179,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     /// <summary>A station's window is where the player sees what a higher tier would make, so the way up starts there too.</summary>
     public void AddActions(MenuPage page, GameObject user)
     {
-        if (CanUpgrade && user != null && user.TryGetComponent(out BuildPlacer builder) && builder.AllowsChanges)
+        bool modules = IsStanding && !IsBuilding && BuildingModules.TakesModules(Definition);
+        if ((CanUpgrade || modules) && user != null && user.TryGetComponent(out BuildPlacer builder) && builder.AllowsChanges)
         {
-            page.Add(new MenuAction($"Upgrade to Tier {Tiers.ToRoman(Level + 1)}…", "What the next tier costs and brings", true,
-                () => ConstructionUpgradeOffer.Show(GetComponent<BuildingObject>(), user)));
+            string label = CanUpgrade ? $"Upgrade to Tier {Tiers.ToRoman(Level + 1)}…" : "Upgrade: modules…";
+            string detail = CanUpgrade ? (modules ? "The next tier, and the modules it can take" : "What the next tier costs and brings") : "Fit or remove modules";
+            page.Add(new MenuAction(label, detail, true, () => ConstructionUpgradeOffer.Show(GetComponent<BuildingObject>(), user)));
         }
     }
 
@@ -447,8 +510,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
     // ----- Saving -----
 
-    public string CaptureState() =>
-        string.Join(",", Level, Target, Work.ToString(System.Globalization.CultureInfo.InvariantCulture), Paid ? 1 : 0);
+    // "Level,Target,Work,Paid" and, with modules fitted, ",<their ids joined by |>": a building without modules saves as it always did.
+    public string CaptureState()
+    {
+        string state = string.Join(",", Level, Target, Work.ToString(System.Globalization.CultureInfo.InvariantCulture), Paid ? 1 : 0);
+        return fitted.Count == 0 ? state : state + "," + string.Join("|", fitted.ConvertAll(module => module != null ? module.Id : ""));
+    }
 
     public void RestoreState(string state)
     {
@@ -462,6 +529,22 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Target = Mathf.Max(Level, int.Parse(parts[1]));
         Work = float.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture);
         Paid = parts[3] == "1";
+        fitted.Clear();
+        if (parts.Length >= 5 && !string.IsNullOrEmpty(parts[4]))
+        {
+            ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+            foreach (string id in parts[4].Split('|'))
+            {
+                BuildingModuleDefinition module = content != null ? content.FindModule(id) : null;
+                if (module != null && !fitted.Contains(module))
+                {
+                    fitted.Add(module);
+                }
+            }
+
+            StationExtensions.Forget();
+        }
+
         Refresh();
     }
 }

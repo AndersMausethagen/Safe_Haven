@@ -76,7 +76,10 @@ public static class StationExtensions
         return extension != null && serving.TryGetValue(extension, out BuildingObject station) ? station : null;
     }
 
-    /// <summary>How many extensions this station takes: its own, its upgrades' and its Work Yard's.</summary>
+    /// <summary>
+    /// How many extensions and modules this station takes together: its own, its upgrades' and its Work Yard's, and for a building that
+    /// takes modules at least one per tier (BuildingModules), never more than BuildingModules.MostSlots.
+    /// </summary>
     public static int Slots(BuildingObject station)
     {
         if (station == null || station.Definition == null || !station.IsStanding)
@@ -85,14 +88,25 @@ public static class StationExtensions
         }
 
         int slots = station.Definition.ExtensionSlots;
-        if (station.TryGetComponent(out Construction construction))
+        bool construction = station.TryGetComponent(out Construction built);
+        if (construction)
         {
-            slots += Mathf.RoundToInt(construction.Sum(level => level.extensionSlots));
+            slots += Mathf.RoundToInt(built.Sum(level => level.extensionSlots));
         }
 
         Yards.Yard yard = Yards.Of(station);
-        return slots > 0 && yard != null && yard.Role != null ? slots + yard.Role.ExtensionSlots : slots;
+        slots = slots > 0 && yard != null && yard.Role != null ? slots + yard.Role.ExtensionSlots : slots;
+        if (construction && BuildingModules.TakesModules(station.Definition))
+        {
+            slots = Mathf.Max(slots, built.Level);
+        }
+
+        return Mathf.Min(BuildingModules.MostSlots, slots);
     }
+
+    // What placed extensions may use: the slots less the modules fitted there.
+    private static int SlotsForPlaced(BuildingObject station) =>
+        Mathf.Max(0, Slots(station) - (station.TryGetComponent(out Construction built) ? built.Fitted.Count : 0));
 
     /// <summary>
     /// For the build ghost: the station an extension of this kind would serve if it stood at <paramref name="at"/>, how
@@ -156,7 +170,7 @@ public static class StationExtensions
                 int placed = SaveableEntity.PlacedAt(a.Id).CompareTo(SaveableEntity.PlacedAt(b.Id));
                 return placed != 0 ? placed : string.CompareOrdinal(a.Id ?? a.name, b.Id ?? b.name);
             });
-            int slots = Slots(entry.Key);
+            int slots = SlotsForPlaced(entry.Key);
             var used = new List<BuildingObject>();
             foreach (BuildingObject extension in entry.Value)
             {

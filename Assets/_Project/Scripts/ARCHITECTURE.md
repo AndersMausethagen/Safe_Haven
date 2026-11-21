@@ -2830,3 +2830,14 @@ From the user's list after their 72-minute run.
   A piece's Upgrade page (Manage › Upgrade or repair) offers its gate (`BuildingDefinition › Gate Version`: the gate's cost paid, the
   piece's given back, the gate's scaffold in its place) and a torch (`Wall Torch`, `WallFittings`; the fuelled wall torch burns a
   Charcoal a night). Taking a piece down gives its torch back too.
+- **Building modules** (Docs/BuildingUpgradesResearch_2026-11-21.md, first slice): `BuildingModuleDefinition` (Data/Buildings/Modules)
+  fits listed buildings or any station, needs a tier, may be Staffed or in a Group, and adds a `BuildingBonus` (the block `BuildingLevel`
+  now derives from; tier data kept its values). Slots: one per tier at least, at most 5, shared with placed extensions
+  (`StationExtensions.Slots`). `BuildingModules` fits (pays from bag and chests, or takes a spare), removes (into
+  `SettlementState.SpareModules`) and builds the modules part of the building's Upgrade page (`ConstructionUpgradeOffer`, reached from
+  a station's menu even at its top tier). `Construction` keeps the fitted ones (saved as a fifth part of its state) and adds them in
+  `Sum`. New bonus kinds: Extra Output Slots (`StationQueue.OutputSlots`/`MoreOutput`: another kind waits, then moves up; saved) and
+  Extra Chance (luck, modules + extensions at most 15%). Quests teach modules as they start (`QuestDefinition › Unlocks Modules`) and
+  can ask for one (`ObjectiveType.FitModule`, `GameEventKind.ModuleFitted`). Shipped: Storage Loft and Apprentice's Corner, taught by
+  Copper Fire (Bjarne 3). Not yet: the hammered fitting job, the raid view of modules, the rest of the catalogue, a tab in the station
+  window itself.

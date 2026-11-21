@@ -77,8 +77,8 @@ public sealed class PlayerCrafting : MonoBehaviour
     /// <summary>Raised after new recipes or buildings are learned.</summary>
     public event Action KnownRecipesChanged;
 
-    /// <summary>A building learned with an announcement (not one restored from a save): BigNotice shows it across the screen.</summary>
-    public static event Action<BuildingDefinition> BuildingLearned;
+    /// <summary>A building learned with an announcement (not one restored from a save), by whom: BigNotice shows the local player's.</summary>
+    public static event Action<PlayerCrafting, BuildingDefinition> BuildingLearned;
 
     // Entering Play doesn't reload scripts in this project: listeners of the last session go with it.
     [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -163,7 +163,7 @@ public sealed class PlayerCrafting : MonoBehaviour
         int count = Announce(learned, "New building plans: ", announce);
         foreach (BuildingDefinition building in learnedBuildings ?? (IEnumerable<BuildingDefinition>)Array.Empty<BuildingDefinition>())
         {
-            BuildingLearned?.Invoke(building);
+            BuildingLearned?.Invoke(this, building);
         }
 
         return count;

@@ -33,6 +33,26 @@ public static class ResidentQuests
         return null;
     }
 
+    /// <summary>True when <paramref name="quest"/> is the first of some resident's quest line (it starts at their rescue).</summary>
+    public static bool IsFirstQuestOfSomeone(QuestDefinition quest)
+    {
+        if (quest == null)
+        {
+            return false;
+        }
+
+        ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        foreach (ResidentDefinition person in content != null ? content.Residents : (IReadOnlyList<ResidentDefinition>)System.Array.Empty<ResidentDefinition>())
+        {
+            if (FirstQuest(person) == quest)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>True when the resident's workplaces may be taught: they have no quest line, or its first quest has started.</summary>
     public static bool MayTeach(ResidentDefinition resident)
     {

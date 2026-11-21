@@ -30,6 +30,8 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     [SerializeField] private List<GatheringNodeDefinition> gatheringNodes = new List<GatheringNodeDefinition>();
     [Tooltip("Every skill (the skill book: starting ones and bosses' rewards). Filled in automatically in the Editor.")]
     [SerializeField] private List<SkillDefinition> skills = new List<SkillDefinition>();
+    [Tooltip("Every building module (BuildingModules). Filled in automatically in the Editor.")]
+    [SerializeField] private List<BuildingModuleDefinition> modules = new List<BuildingModuleDefinition>();
 
     [NonSerialized] private Dictionary<string, ItemDefinition> itemsById;
     [NonSerialized] private Dictionary<string, RecipeDefinition> recipesById;
@@ -37,6 +39,10 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     public IReadOnlyList<ItemDefinition> Items => items;
     public IReadOnlyList<GatheringNodeDefinition> GatheringNodes => gatheringNodes;
     public IReadOnlyList<QuestDefinition> Quests => quests;
+    public IReadOnlyList<BuildingModuleDefinition> Modules => modules;
+
+    public BuildingModuleDefinition FindModule(string id) =>
+        string.IsNullOrEmpty(id) ? null : modules.Find(module => module != null && module.Id == id);
 
     public IReadOnlyList<ResidentDefinition> Residents => residents;
 
@@ -162,6 +168,7 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
         CollectAll(ref residents);
         CollectAll(ref jobs);
         CollectAll(ref gatheringNodes);
+        CollectAll(ref modules);
         CollectAll(ref skills);
         return added;
     }

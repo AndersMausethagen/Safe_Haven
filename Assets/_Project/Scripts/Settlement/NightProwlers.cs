@@ -219,8 +219,8 @@ public sealed class NightProwlers : MonoBehaviour
                 return;
             }
 
+            // Not Relentless (the breach's and elites' flag): it can still be routed and shaken, and dawn still sends it off.
             ai.AvoidArea = null;
-            ai.Relentless = true;
             if (hit.Source.TryGetComponent(out Damageable attacker))
             {
                 ai.Engage(attacker);

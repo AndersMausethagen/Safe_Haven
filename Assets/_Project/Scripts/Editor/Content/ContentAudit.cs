@@ -53,6 +53,8 @@ public static class ContentAudit
         "TorchFuel.fuel",
         // A wall piece's torch (WallFittings).
         "BuildingDefinition.wallTorchCost",
+        // A building module's price (BuildingModules.Fit).
+        "BuildingModuleDefinition.cost",
     };
 
     private static readonly string[] ItemNeither =

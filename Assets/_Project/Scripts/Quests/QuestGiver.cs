@@ -393,10 +393,12 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
                 }, closesMenu: true, quest: offeredQuest, does: QuestAnswer.HandsIn));
             }
         }
-        else if (state == QuestGiverState.InProgress && offer != null && !string.IsNullOrWhiteSpace(offer.Text) && NothingDoneYet(offeredQuest))
+        else if (state == QuestGiverState.InProgress && offer != null && !string.IsNullOrWhiteSpace(offer.Text)
+                 && ResidentQuests.IsFirstQuestOfSomeone(offeredQuest) && NothingDoneYet(offeredQuest))
         {
-            // Started without this conversation (a rescued resident's first quest starts at the rescue, ResidentQuests): until a step is
-            // done, the giver still says what the offer would have, so the player learns what they can help with.
+            // A rescued person's first quest starts at the rescue, without this conversation (ResidentQuests): until a real step is done
+            // they still say what the offer would have, so the player learns what they can help with. Their "Speak to" step is ticked
+            // as the talk begins, before this page is made, so it doesn't count. Other quests keep their waiting line.
             page.Body = offer.Text;
         }
         else if (state != QuestGiverState.None)
@@ -408,7 +410,7 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         return page;
     }
 
-    // True while no step of an active quest has counted anything yet.
+    // True while no step of an active quest but talking has counted anything yet.
     private static bool NothingDoneYet(QuestDefinition quest)
     {
         QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
@@ -418,9 +420,9 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
             return true;
         }
 
-        foreach (int count in entry.Counts)
+        for (int i = 0; i < entry.Counts.Length && i < quest.Objectives.Count; i++)
         {
-            if (count > 0)
+            if (entry.Counts[i] > 0 && quest.Objectives[i] != null && quest.Objectives[i].Type != ObjectiveType.TalkTo)
             {
                 return false;
             }

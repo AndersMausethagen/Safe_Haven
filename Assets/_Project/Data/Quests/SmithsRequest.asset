@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::QuestDefinition
   id: smiths_request
   displayName: Copper Fire
-  description: 'Bjarne''s hearth wants to burn hotter: raise the Smithy to Tier II ({key:Haven}) and make a Copper Pickaxe, the first tool that takes the deep ore.'
+  description: 'Bjarne''s hearth wants to burn hotter: raise the Smithy to Tier II ({key:Haven}), fit it a Storage Loft from its Upgrade page so the bench doesn''t stop when the work changes, and make a Copper Pickaxe, the first tool that takes the deep ore.'
   chain: Bjarne
   journalNotes: The copper pick opens the ore that stone tools only scratch.
   rank: 4
@@ -57,7 +57,7 @@ MonoBehaviour:
   startsInAFight: 0
   startsWithoutWaiting: 1
   onStarted: []
-  objectivesInOrder: 1
+  objectivesInOrder: 0
   objectives:
   - type: 18
     description: Raise the Smithy to Tier II ({key:Haven})
@@ -79,6 +79,30 @@ MonoBehaviour:
     tier: 2
     bringHome: 0
     countAlreadyOwned: 1
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  - type: 23
+    description: Fit a Storage Loft to the Smithy (its Upgrade page)
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
     enchantment: {fileID: 0}
     greatOnly: 0
     onlySource: 0
@@ -108,6 +132,9 @@ MonoBehaviour:
     onlySource: 0
     source: 2
   unlocksBuildings: []
+  unlocksModules:
+  - {fileID: 11400000, guid: 5111cc8395c2c7e4ea2a8d992d3f7c39, type: 2}
+  - {fileID: 11400000, guid: 15afc346ef89ac84387ed4850b91c9b8, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems:
