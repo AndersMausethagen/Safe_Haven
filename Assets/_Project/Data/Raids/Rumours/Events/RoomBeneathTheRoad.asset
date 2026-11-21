@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: RoomBeneathTheRoad
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.roombeneath
+  displayName: The Room Beneath the Road
+  weight: 1
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 6647756069553415008, guid: 22212de61bb140e4dabb2457ccee2a38, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: 'A stair goes down under the old road, into a room with a table, two stools and a child''s wooden horse. Scratched into the table in a child''s letters: OLD BEAR, FIND THE BLUE DOOR. The second door is painted blue. The man in grey stands at it, and from the dark behind it comes a woman humming.'
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  onStart: []
+  choices:
+  - label: Take the wooden horse, and wait
+    detail: It is his door. Let him choose.
+    cost: []
+    result: He opens it a hand's width, listens, and closes it again. "Then I nearly opened the wrong door again," he says, and the blue paint sinks into the rock as the room goes. The horse is in your hands.
+    outcomes:
+    - rid: 2623126268168110231
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126268168110231
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: aaae356ed418a714488d647c215f858d, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0

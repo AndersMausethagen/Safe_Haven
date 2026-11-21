@@ -757,6 +757,7 @@ MonoBehaviour:
           - {fileID: 11400000, guid: ab909f1e102c2d446b08c2c49295dcb2, type: 2}
           - {fileID: 11400000, guid: ef827d0bb7f46d447b0d6be2e2c6783c, type: 2}
           - {fileID: 11400000, guid: e8fa9dbe99dd2df4a800731b224f1dfd, type: 2}
+          - {fileID: 11400000, guid: 07ee2366f13a48d42bc4bba292a85694, type: 2}
           firstDelay: 45
           interval: 110
           intervalSpread: 35
@@ -777,6 +778,10 @@ MonoBehaviour:
         - {fileID: 11400000, guid: 22c617519cf0b6d44a7d47dddda2e47b, type: 2}
         - {fileID: 11400000, guid: e4f11f1cb84c80a469c77bad4e763eb5, type: 2}
         - {fileID: 11400000, guid: 808a7382a9be2604c94b30f4f300696b, type: 2}
+        - {fileID: 11400000, guid: e84cccab442eea647a4e9ccf67215d76, type: 2}
+        - {fileID: 11400000, guid: adc99fbd4c1d0d2438577847e69dd309, type: 2}
+        - {fileID: 11400000, guid: ae6fb340c59e26243bedf2ff94cef474, type: 2}
+        - {fileID: 11400000, guid: 15373f05f33835345be5bf8ffae686a6, type: 2}
         count: 2
     - rid: 2623125911485546601
       type: {class: TerrainEventsSystem, ns: , asm: SafeHaven}

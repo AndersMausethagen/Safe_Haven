@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: JawKeeper
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: JawKeeper
+  displayName: The Jaw-keeper
+  weight: 1
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: Stone grinds on stone ahead, slow, like something chewing.
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 6647756069553415008, guid: f84594aad344c594abcb806f91dfb737, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: Something of stone and antler sits across the way, older than the trolls, its jaw resting on its knees. "Everyone pays the Jaw-keeper," it says. "Iron, or a memory. Or try to pass, and see what the valley thinks of you."
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  onStart: []
+  choices:
+  - label: Pay in iron
+    detail: Five iron ore from your bag.
+    cost:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      amount: 5
+    result: It takes the ore in one stone hand and crushes it like bread. "The way is yours," it says, and shows you all of it.
+    outcomes:
+    - rid: 2623126268168110234
+  - label: Pay with a memory
+    detail: Something you would rather keep. It costs time to find what it wants.
+    cost: []
+    result: It reaches into your thoughts and takes a morning you liked. You stand blinking while the light moves. "Fair," it says, and something of its own goes into your pack.
+    outcomes:
+    - rid: 2623126268168110235
+    - rid: 2623126268168110236
+  - label: Walk past it
+    detail: It won't stop you. The valley might.
+    cost: []
+    result: It does not move. The rocks round it do.
+    outcomes:
+    - rid: 2623126268168110237
+    - rid: 2623126268168110238
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126268168110234
+      type: {class: RevealMapOutcome, ns: , asm: SafeHaven}
+      data:
+        radius: 80
+        showExits: 1
+    - rid: 2623126268168110235
+      type: {class: ChangeTimeOutcome, ns: , asm: SafeHaven}
+      data:
+        seconds: -45
+    - rid: 2623126268168110236
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 0}
+            resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
+            minQuantity: 30
+            maxQuantity: 50
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0
+    - rid: 2623126268168110237
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 9066855856663566298, guid: b5588ad5014ebf942bef2c3337e69810, type: 3}
+        count: 1
+        radius: 6
+        hunt: 1
+    - rid: 2623126268168110238
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 6267209934607442583, guid: 3c524ee8a21d0aa48b70eb5f371bba06, type: 3}
+        count: 2
+        radius: 6
+        hunt: 1

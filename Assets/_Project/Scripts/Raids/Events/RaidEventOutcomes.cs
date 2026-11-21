@@ -391,6 +391,45 @@ public sealed class RescueResidentOutcome : RaidEventOutcome
     }
 }
 
+/// <summary>
+/// The Folded Wood's name-bells (Act II, the novel's Chapter 26): a bell rings for each name spoken, and the player speaks the names of
+/// everyone home. Says which bells rang, by name ("Bells ring for Eirik, Runa and Ingrid"), or that none did. Put before a Rescue
+/// Someone: the lost one is found by the names the others kept.
+/// </summary>
+[Serializable]
+public sealed class RingNameBellsOutcome : RaidEventOutcome
+{
+    [Tooltip("Who is not named (the one being found).")]
+    [SerializeField] private ResidentDefinition leaving;
+    [Tooltip("Told after the names, when at least one bell rang.")]
+    [SerializeField, TextArea] private string after = "";
+
+    public override string DisplayName => "Ring a Bell for Each Name";
+
+    public override void Apply(RaidEventContext context) => GameMessages.Post(Words(GameSession.Home.Residents, leaving, after), MessageKind.Gain);
+
+    /// <summary>What the bells say for these residents: their names, joined, then <paramref name="then"/>.</summary>
+    public static string Words(IReadOnlyList<ResidentRecord> home, ResidentDefinition leaving, string then)
+    {
+        var names = new List<string>();
+        foreach (ResidentRecord record in home)
+        {
+            if (record?.Resident != null && record.Resident != leaving)
+            {
+                names.Add(record.Resident.DisplayName);
+            }
+        }
+
+        if (names.Count == 0)
+        {
+            return "You speak into the folded wood, and no bell answers: there is no one home to name.";
+        }
+
+        string list = names.Count == 1 ? names[0] : string.Join(", ", names.GetRange(0, names.Count - 1)) + " and " + names[names.Count - 1];
+        return $"A bell rings for each name you speak: {list}. {names.Count} bell{(names.Count == 1 ? "" : "s")}." + (string.IsNullOrEmpty(then) ? "" : " " + then);
+    }
+}
+
 /// <summary>Whoever is lost longest stands here, lost, from the raid's start (SettlementState.LostToFind). Goes in an event's On Start.</summary>
 [Serializable]
 public sealed class StandTheLostOutcome : RaidEventOutcome

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: SnowedInCamp
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.redthread
+  displayName: The Snowed-in Camp
+  weight: 1
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 6647756069553415008, guid: 883aeb3d8605f9743a35bdc2aba0b068, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: 'A camp half buried in snow: a kettle over cold ash, a crate with its lid off. On a splinter of the crate, a red thread has caught, bright as a cut.'
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  onStart: []
+  choices:
+  - label: Take the red thread
+    detail: Eirik will know it.
+    cost: []
+    result: You wind it round two fingers. It is warmer than it should be.
+    outcomes:
+    - rid: 2623126268168110229
+  raisesWhenChosen: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126268168110229
+      type: {class: GiveLootOutcome, ns: , asm: SafeHaven}
+      data:
+        loot:
+          entries:
+          - item: {fileID: 11400000, guid: c07fae58394d90548abc4a6b2d580767, type: 2}
+            resource: {fileID: 0}
+            minQuantity: 1
+            maxQuantity: 1
+            probability: 1
+            fromTier: 0
+            toTier: 0
+            fixedAmount: 0

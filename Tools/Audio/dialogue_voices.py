@@ -79,6 +79,13 @@ CAST = {
                    "beside me, and I kept the night from their door. Then the fire went out. Come closer. There is "
                    "more to tell, and not much time to tell it."),
         was="portal_f_british_northern"),
+    # Act II (2026-11-21): heard through the portal, which carries his voice from the door he kneels at. Unnamed, as the game keeps him.
+    "The man in grey": dict(voice="man_in_grey", woman=False, seeds=(3301, 3801, 4301), description=(
+        "A man in his fifties, worn thin by years of searching. A soft, hoarse, low voice, tired and gentle, careful with "
+        "every word, as if speaking loudly might break something; grief held under the surface."),
+        reference=("I have knocked on so many doors. Some of them answered. Do you know what it is to hear the voice you "
+                   "miss most say your name, and know it is lying? No. Don't come closer! Stay where the light is. I only "
+                   "want one door. Just one. Then I will stop.")),
     "Sigrid": dict(voice="sigrid", woman=True, seeds=(3201, 3701, 4201), description=(
         "A woman in her forties who leads an expedition. A low, firm, steady voice with calm authority, a little "
         "rough from years outdoors, measured and sure."),

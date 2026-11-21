@@ -71,4 +71,10 @@ MonoBehaviour:
     waitingText: The Brukam's tusk, and the Watch Post at Tier III to hang it on. Then we hold the next breach.
     askText: 
     thanksText: 
+  - quest: {fileID: 11400000, guid: 1899eaf9b830925479e5fa309b359320, type: 2}
+    text: My sister Sigrun sewed a red thread into my coat before I left. Said I was too stupid to find my way home without it. That valley's full of old camps. If one of them has her thread in it, I want it.
+    acceptText: I'll look for her thread.
+    waitingText: A camp half under the snow in Troll Valley. A red thread. Bring it to the portal.
+    askText: 
+    thanksText: 
   questLineDone: 

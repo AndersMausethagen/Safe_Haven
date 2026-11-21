@@ -1,0 +1,122 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: WhereTheWrongDoorsOpened
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: act2.wrongdoors
+  displayName: Where the Wrong Doors Opened
+  description: 'The man in grey opens doors looking for two people the winter took, and the wrong ones let things out. The portal knows where the first of them opened: at the Black Pool in the Moss Marsh, where the fen came through. Close it with a Hearth Ember.'
+  chain: The Hearth and the Door
+  journalNotes: The wrong door stands at the Black Pool's edge in the Moss Marsh. A Hearth Ember set in its sill closes it; what is still coming through will fight.
+  rank: 0
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 28512bedb6de9f9498b9b3836107c1e9, type: 2}
+  startedFirst: []
+  start: 0
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  closedBy: {fileID: 0}
+  startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 0
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 6
+    description: Close the wrong door at the Black Pool, in the Moss Marsh
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 11400000, guid: 0ce8238b5aea25b4b967dfcfcc59530f, type: 2}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+  - type: 5
+    description: Get home from the Moss Marsh
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 11400000, guid: 1db618a31f9ad294ba8fe8cc857a15f3, type: 2}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

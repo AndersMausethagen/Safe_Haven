@@ -174,6 +174,12 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
             outcome?.Apply(context);
         }
 
+        // After the outcomes, so a quest that counts it sees what they did (a creature come through, a thing given).
+        if (definition.RaisesWhenChosen != null)
+        {
+            GameEvents.Raise(new GameEvent(GameEventKind.Custom, definition.RaisesWhenChosen, 1, user));
+        }
+
         context.Session.RecordEvent($"{definition.DisplayName}: {choice.label}", definition.DisplayName);
     }
 

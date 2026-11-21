@@ -48,6 +48,9 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     [SerializeReference] private List<RaidEventOutcome> onStart = new List<RaidEventOutcome>();
     [Tooltip("What the player can do at the site. None: walking there is all there is (what is there rewards it).")]
     [SerializeField] private List<RaidEventChoice> choices = new List<RaidEventChoice>();
+    [Tooltip("A Story Event raised when any choice is taken here: how a quest counts what was done at the site, whichever way it went " +
+             "(Act II's set pieces: the door in the snow, the wrong door at the Black Pool). Empty: none.")]
+    [RaisedByGame, SerializeField] private GameEventDefinition raisesWhenChosen;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
@@ -60,6 +63,7 @@ public sealed class RaidEventDefinition : ScriptableObject, IDisplayName
     public Sprite Artwork => artwork;
     public IReadOnlyList<RaidEventOutcome> OnStart => onStart;
     public IReadOnlyList<RaidEventChoice> Choices => choices;
+    public GameEventDefinition RaisesWhenChosen => raisesWhenChosen;
 
     /// <summary>Whether it may begin now.</summary>
     public bool CanHappen(float elapsed, float secondsLeft, int stage)

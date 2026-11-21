@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: BringSigridHome
   m_EditorClassIdentifier: SafeHaven::QuestDefinition
   id: rescue.sigrid
-  displayName: The Horn at Dusk
-  description: Everyone else is home. Only Sigrid, who led the expedition and whose voice you heard in the stones, is still out there. A horn has been heard at dusk, calling the expedition's signal.
+  displayName: The Folded Wood
+  description: Everyone else is home. Only Sigrid, who led the expedition and whose voice you heard in the stones, is still out there, in Troll Valley's folded wood, where bells ring for the names of the lost. Speak the names the others kept.
   chain: The Lost Expedition
-  journalNotes: 'Sigrid led the expedition, and it was her voice in the stones the day they broke. She has been out there longest of all. The horn is the expedition''s old signal: answer it at dusk.'
+  journalNotes: 'Sigrid led the expedition, and it was her voice in the stones the day they broke. She has been out there longest of all. In the folded wood of Troll Valley a bell rings for every name spoken: speak the names of everyone home, and she will answer to hers.'
   rank: 3
   availableObjective: 
   announceStart: 1
@@ -25,6 +25,7 @@ MonoBehaviour:
   prerequisites:
   - {fileID: 11400000, guid: 67762168d69ad5c45bdaf2fe6d96f1aa, type: 2}
   - {fileID: 11400000, guid: a27b02dff679e08448ddebf15ec9fa94, type: 2}
+  - {fileID: 11400000, guid: cc005891b82860745a2505974b8bdbb2, type: 2}
   startedFirst: []
   start: 0
   startEvent: {fileID: 0}
@@ -61,7 +62,7 @@ MonoBehaviour:
   objectivesInOrder: 1
   objectives:
   - type: 12
-    description: Find Sigrid in the Misty Woods
+    description: Find Sigrid in the folded wood of Troll Valley
     amount: 1
     item: {fileID: 0}
     resource: {fileID: 0}
@@ -109,6 +110,7 @@ MonoBehaviour:
     onlySource: 0
     source: 2
   unlocksBuildings: []
+  unlocksModules: []
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

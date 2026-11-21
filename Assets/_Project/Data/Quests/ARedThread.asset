@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 702d2e93d0a019a40b6339daf41e2c2f, type: 3}
+  m_Name: ARedThread
+  m_EditorClassIdentifier: SafeHaven::QuestDefinition
+  id: act2.redthread
+  displayName: A Red Thread
+  description: Sigrun, Eirik's sister, sewed a red thread into his coat before he left, so he could find his way home. Troll Valley's old camps keep things the snow takes. Find her thread at a snowed-in camp, bring it home, and set it before the portal.
+  chain: Eirik
+  journalNotes: The red thread is at a camp half under the snow in Troll Valley. Set before the portal, it might open a window to whoever sewed it.
+  rank: 4
+  availableObjective: 
+  announceStart: 1
+  announceCompletion: 1
+  showTimerInHud: 0
+  prerequisites:
+  - {fileID: 11400000, guid: 28512bedb6de9f9498b9b3836107c1e9, type: 2}
+  - {fileID: 11400000, guid: c414ab0a8aa5e4841ae686c8aa21b4f2, type: 2}
+  startedFirst: []
+  start: 2
+  startEvent: {fileID: 0}
+  startWhen:
+    type: 0
+    description: 
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 1
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 1
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 1
+    tier: 2
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 2
+  closedBy: {fileID: 0}
+  startDelay: 0
+  startsInAFight: 0
+  startsWithoutWaiting: 1
+  onStarted: []
+  objectivesInOrder: 1
+  objectives:
+  - type: 0
+    description: Find the red thread at a snowed-in camp in Troll Valley
+    amount: 1
+    item: {fileID: 11400000, guid: c07fae58394d90548abc4a6b2d580767, type: 2}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 0}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 1
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+  - type: 9
+    description: Set the thread before the portal ({key:Interact})
+    amount: 1
+    item: {fileID: 0}
+    resource: {fileID: 0}
+    monster: {fileID: 0}
+    faction: 0
+    building: {fileID: 0}
+    raid: {fileID: 0}
+    mustExtract: 0
+    withinMinutes: 0
+    questEvent: {fileID: 0}
+    person: {fileID: 0}
+    target: {fileID: 11400000, guid: e835c314791108c43b5172c1cc4a57fd, type: 2}
+    job: {fileID: 0}
+    breach: {fileID: 0}
+    rank: 0
+    tier: 0
+    bringHome: 0
+    countAlreadyOwned: 0
+    enchantment: {fileID: 0}
+    greatOnly: 0
+    onlySource: 0
+    source: 0
+  unlocksBuildings: []
+  unlocksModules: []
+  turnInToGiver: 0
+  turnInTo: 
+  rewardItems: []
+  rewardResources: []
+  rewardRecipes: []
+  rewardEnchantments: []
+  rewardWorkFor: {fileID: 0}
+  rewardWork: 0
+  experience: 0
+  completionEvent: {fileID: 0}
+  onCompleted: []

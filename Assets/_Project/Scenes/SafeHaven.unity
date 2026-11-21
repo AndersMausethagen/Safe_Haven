@@ -20219,6 +20219,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7120512167931277737, guid: a8c9a0c3839f3c6408611ef97c44012d, type: 3}
   m_PrefabInstance: {fileID: 67980770}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &68648335
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 68648336}
+  - component: {fileID: 68648338}
+  - component: {fileID: 68648337}
+  m_Layer: 0
+  m_Name: Story - Where the Wrong Doors Opened
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &68648336
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68648335}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &68648337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68648335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: bffae33d11824b49945a5b04871b6e9b
+    output: 0
+    to: 11c643996ebc41a3a18bcc79e29d9897
+  - from: 11c643996ebc41a3a18bcc79e29d9897
+    output: 0
+    to: 66cf95a58a5a4c71b1cee3fd6c95d6cf
+  - from: 66cf95a58a5a4c71b1cee3fd6c95d6cf
+    output: 0
+    to: a10d4458062e454e9b3b4c813fbba124
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: bffae33d11824b49945a5b04871b6e9b
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: ffa2fdcd52de08740b9d0a2ce621cb54, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 11c643996ebc41a3a18bcc79e29d9897
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 66cf95a58a5a4c71b1cee3fd6c95d6cf
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>It is shut. That is the first thing anyone has undone for him.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a10d4458062e454e9b3b4c813fbba124
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>He will feel it, wherever he is kneeling. I do not know yet if he will thank you.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &68648338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68648335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: f83c7bfdcd5646758a140298a2901b3d
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &68886608
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23852,6 +23979,171 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7307560770102492006, guid: ae5c35a4d0f61344791c2df137245efd, type: 3}
   m_PrefabInstance: {fileID: 82717991}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &83036692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 83036693}
+  - component: {fileID: 83036695}
+  - component: {fileID: 83036694}
+  m_Layer: 0
+  m_Name: Story - The Door in the Snow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &83036693
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83036692}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &83036694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83036692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  - rid: 2623126268168110213
+  - rid: 2623126268168110214
+  links:
+  - from: 02b464dcce6f46d7b447e80c6adb5a49
+    output: 0
+    to: 09b15ac5f7d8468b9cf3ab563cc5672e
+  - from: 09b15ac5f7d8468b9cf3ab563cc5672e
+    output: 0
+    to: 386e2d9b51ac46f69e1162cd5c6d9ecd
+  - from: 386e2d9b51ac46f69e1162cd5c6d9ecd
+    output: 0
+    to: c2e901849350495b9886394952ccc286
+  - from: c2e901849350495b9886394952ccc286
+    output: 0
+    to: c3a96d8a6efe45258410b9b65ba2ab22
+  - from: c3a96d8a6efe45258410b9b65ba2ab22
+    output: 0
+    to: 793d94e218c249f4b61615166e75beba
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 02b464dcce6f46d7b447e80c6adb5a49
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 28512bedb6de9f9498b9b3836107c1e9, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 09b15ac5f7d8468b9cf3ab563cc5672e
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 386e2d9b51ac46f69e1162cd5c6d9ecd
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>You stood at his door. I felt it through the snow: a door that is not mine, and a man who has worn a hole in the world with knocking.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c2e901849350495b9886394952ccc286
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>He is looking for two people the winter took. He opens doors to find them, and the wrong ones let things out.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110213
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c3a96d8a6efe45258410b9b65ba2ab22
+        position: {x: 1180, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>It called him by his name. That is how you know it lies: the ones he is looking for never used it.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110214
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 793d94e218c249f4b61615166e75beba
+        position: {x: 1420, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Keep your own names close. Whatever is behind those doors has learned to speak in borrowed voices.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &83036695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 83036692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: ece9429da09d41e198ac2eae6d9f0f3f
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &83056209
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -117736,6 +118028,209 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 307562592328696438, guid: b3d14be63ee4bc4428239edfc029559e, type: 3}
   m_PrefabInstance: {fileID: 438431208}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &438900226
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 438900227}
+  - component: {fileID: 438900229}
+  - component: {fileID: 438900228}
+  m_Layer: 0
+  m_Name: Story - What Sigrid Knows
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &438900227
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438900226}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &438900228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438900226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  - rid: 2623126268168110199
+  - rid: 2623126268168110200
+  - rid: 2623126268168110201
+  - rid: 2623126268168110202
+  links:
+  - from: 2e8de9b6b33347a0b4965e1cc0e0cdbe
+    output: 0
+    to: 1a5dc93acd52491a8c4ecf004e71abab
+  - from: 1a5dc93acd52491a8c4ecf004e71abab
+    output: 0
+    to: 8e87cf68479a45b4bb22142d2466efa7
+  - from: 8e87cf68479a45b4bb22142d2466efa7
+    output: 0
+    to: 70c408b327144db1b25e60e75d1f9169
+  - from: 70c408b327144db1b25e60e75d1f9169
+    output: 0
+    to: 455fddbaedf144f4b0e389e239436595
+  - from: 455fddbaedf144f4b0e389e239436595
+    output: 0
+    to: 3848b6fbfe5143518072e1e3c081da1a
+  - from: 3848b6fbfe5143518072e1e3c081da1a
+    output: 0
+    to: c459904c4e584d0790c3da8ba9142764
+  - from: c459904c4e584d0790c3da8ba9142764
+    output: 0
+    to: 7f52db49eb2e45c39c6caf55f44af22f
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 2e8de9b6b33347a0b4965e1cc0e0cdbe
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 43d140c7ce0db8248af73e619971f999, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 1a5dc93acd52491a8c4ecf004e71abab
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 8e87cf68479a45b4bb22142d2466efa7
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: I've kept something to myself since the day the stones broke. I'm done keeping it.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 70c408b327144db1b25e60e75d1f9169
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Before we went in, I touched the middle stone. There were names cut into it, fresh, as if someone had only just carved them. Sigrun's was one of them.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110199
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 455fddbaedf144f4b0e389e239436595
+        position: {x: 1180, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: I thought it was a list of the dead. I told no one, because I didn't want it to be true.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110200
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 3848b6fbfe5143518072e1e3c081da1a
+        position: {x: 1420, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>It was not a list. The names were not a sentence. They were a warning.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110201
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c459904c4e584d0790c3da8ba9142764
+        position: {x: 1660, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Every name on that stone is someone the hunger has taken, or means to. The toll at the Brukam's bridge was never paid, little one. That debt comes due at the First Hearth.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110202
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 7f52db49eb2e45c39c6caf55f44af22f
+        position: {x: 1900, y: 60}
+        speaker:
+          player: 0
+          name: Sigrid
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Then that's where we go.
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &438900229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438900226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: d7895834c81247b59457edc0e4f5766a
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &439110186
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -238237,6 +238732,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7732742093923070724, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
   m_PrefabInstance: {fileID: 941373811}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &941436340
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 941436341}
+  - component: {fileID: 941436343}
+  - component: {fileID: 941436342}
+  m_Layer: 0
+  m_Name: Story - A Warmth Under the Road
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &941436341
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941436340}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &941436342
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941436340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: e32c8e3b4a2443778177bb6944db2b7e
+    output: 0
+    to: efabcd3cb12c46a8b305b4f1854f441a
+  - from: efabcd3cb12c46a8b305b4f1854f441a
+    output: 0
+    to: 0da7a9322daf48fdadcbca8c760d5102
+  - from: 0da7a9322daf48fdadcbca8c760d5102
+    output: 0
+    to: 57b35cd8126e4509aa39489b54f65633
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: e32c8e3b4a2443778177bb6944db2b7e
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: cc005891b82860745a2505974b8bdbb2, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: efabcd3cb12c46a8b305b4f1854f441a
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 0da7a9322daf48fdadcbca8c760d5102
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>With the marsh door shut I can see something under the valley''s old road: a warmth, like a room someone still keeps.</i>'
+        afterFightPause: 1
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 57b35cd8126e4509aa39489b54f65633
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>He has been looking for it a long time. Go before he finds it alone.</i>
+        afterFightPause: 1
+        aside: 1
+--- !u!114 &941436343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 941436340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: b763b5dbac0746b2be8275ed406ae312
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &942465321
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -251249,6 +251871,114 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3573691098305339545, guid: 5c797e0fd38f6ce4cb13dc45a043e98a, type: 3}
   m_PrefabInstance: {fileID: 992334693}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &993518592
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 993518593}
+  - component: {fileID: 993518595}
+  - component: {fileID: 993518594}
+  m_Layer: 0
+  m_Name: Story - A Door Not Mine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &993518593
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993518592}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &993518594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993518592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  links:
+  - from: 89861afd6075468a8ddc23fc6b6eb90d
+    output: 0
+    to: 1c2ac567eea9465ca2eff0c0ca4ae340
+  - from: 1c2ac567eea9465ca2eff0c0ca4ae340
+    output: 0
+    to: c7accfd66773428b8de0f4c689fe967d
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 89861afd6075468a8ddc23fc6b6eb90d
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 28512bedb6de9f9498b9b3836107c1e9, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 1c2ac567eea9465ca2eff0c0ca4ae340
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c7accfd66773428b8de0f4c689fe967d
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Past the Brukam's bridge the snow begins, and in it there is a door that is not mine. Someone is knocking on it, little one. Go and see who.</i>
+        afterFightPause: 1
+        aside: 1
+--- !u!114 &993518595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993518592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: c95b8b86da73455d9f6b383e74305f40
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &993720435
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -316388,6 +317118,14 @@ Transform:
   - {fileID: 1783101588}
   - {fileID: 974496770}
   - {fileID: 1021490184}
+  - {fileID: 993518593}
+  - {fileID: 83036693}
+  - {fileID: 1431502216}
+  - {fileID: 1457320458}
+  - {fileID: 68648336}
+  - {fileID: 941436341}
+  - {fileID: 2022666318}
+  - {fileID: 438900227}
   m_Father: {fileID: 130791071}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259367770
@@ -363080,6 +363818,228 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5021852649732126360, guid: 3aef93e36f6ba2d47881b1e5a3973be6, type: 3}
   m_PrefabInstance: {fileID: 1431381294}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1431502215
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1431502216}
+  - component: {fileID: 1431502218}
+  - component: {fileID: 1431502217}
+  m_Layer: 0
+  m_Name: Story - Sigrun's Window
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1431502216
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1431502215}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1431502217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1431502215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  - rid: 2623126268168110208
+  - rid: 2623126268168110209
+  - rid: 2623126268168110210
+  - rid: 2623126268168110211
+  - rid: 2623126268168110212
+  links:
+  - from: 32bfe92b19e443d29e234be786b8a8d3
+    output: 0
+    to: 5d703e7083204320a8d9a636a1ed33ca
+  - from: 5d703e7083204320a8d9a636a1ed33ca
+    output: 0
+    to: 3ce69f796d9141f887b81ebd4780db33
+  - from: 3ce69f796d9141f887b81ebd4780db33
+    output: 0
+    to: 99d705fb136a4b3dbe41e9262f7f3cd9
+  - from: 99d705fb136a4b3dbe41e9262f7f3cd9
+    output: 0
+    to: daa3095b088244188902613eb9764dad
+  - from: daa3095b088244188902613eb9764dad
+    output: 0
+    to: a9e03e4963994fb88d82961a386a0382
+  - from: a9e03e4963994fb88d82961a386a0382
+    output: 0
+    to: a6ae257135bd4eb8a08826e8f2b4eae8
+  - from: a6ae257135bd4eb8a08826e8f2b4eae8
+    output: 0
+    to: 957e105df850418db5a82766efa48997
+  - from: 957e105df850418db5a82766efa48997
+    output: 0
+    to: 3e567f6a759640d1be64c2856068df62
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 32bfe92b19e443d29e234be786b8a8d3
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: 1899eaf9b830925479e5fa309b359320, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 5d703e7083204320a8d9a636a1ed33ca
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 3ce69f796d9141f887b81ebd4780db33
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Lay the thread on my stone. Closer. Now, all of you, a hand near the fire.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 99d705fb136a4b3dbe41e9262f7f3cd9
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>There. A window, no wider than a book. A low room, a scarred table, a young woman with a needle between her lips, and a boy kicking at her knee.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110208
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: daa3095b088244188902613eb9764dad
+        position: {x: 1180, y: 60}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Sigrun.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110209
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a9e03e4963994fb88d82961a386a0382
+        position: {x: 1420, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>She looked up. She heard something. Take the thread away, little one, before what is behind me hears it too.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110210
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a6ae257135bd4eb8a08826e8f2b4eae8
+        position: {x: 1660, y: 60}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: She's alive.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110211
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 957e105df850418db5a82766efa48997
+        position: {x: 1900, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Somewhere.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110212
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 3e567f6a759640d1be64c2856068df62
+        position: {x: 2140, y: 60}
+        speaker:
+          player: 0
+          name: Eirik
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 0}
+        line: Somewhere is enough for now. Thank you.
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &1431502218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1431502215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 8fd4f250964d4d75a33c07ee0602171a
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1 &1432742543
 GameObject:
   m_ObjectHideFlags: 0
@@ -369831,6 +370791,133 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5972008925505602173, guid: 3c747f0c8907a81429be0efcf034575a, type: 3}
   m_PrefabInstance: {fileID: 1457119932}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1457320457
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1457320458}
+  - component: {fileID: 1457320460}
+  - component: {fileID: 1457320459}
+  m_Layer: 0
+  m_Name: Story - The First Wrong Door
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1457320458
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457320457}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457320459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457320457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  links:
+  - from: cc3aa9b7b5cb44eda2185e3619358596
+    output: 0
+    to: e03e1d62a2d0446ab4b2ee3bb7b4f9ef
+  - from: e03e1d62a2d0446ab4b2ee3bb7b4f9ef
+    output: 0
+    to: 8642dc158ce5447496341dd7a2590c22
+  - from: 8642dc158ce5447496341dd7a2590c22
+    output: 0
+    to: c9d261dc09614e1d82878b660d84b532
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: cc3aa9b7b5cb44eda2185e3619358596
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: ffa2fdcd52de08740b9d0a2ce621cb54, type: 2}
+        when: 0
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: e03e1d62a2d0446ab4b2ee3bb7b4f9ef
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 8642dc158ce5447496341dd7a2590c22
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>I know where the first of his wrong doors opened: the Black Pool, in the marsh. The fen came through it and drowned everything it touched.</i>'
+        afterFightPause: 1
+        aside: 1
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: c9d261dc09614e1d82878b660d84b532
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Take an ember from the hearth, and shut it.</i>
+        afterFightPause: 1
+        aside: 1
+--- !u!114 &1457320460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457320457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: d647d77ed3734a38a6d3952d79341af5
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &1457674365
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -508543,6 +509630,228 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7732742093923070724, guid: d95df214bedaa324a88a6cff270c042c, type: 3}
   m_PrefabInstance: {fileID: 2022243188}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2022666317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2022666318}
+  - component: {fileID: 2022666320}
+  - component: {fileID: 2022666319}
+  m_Layer: 0
+  m_Name: Story - The Room Beneath the Road
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2022666318
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022666317}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2022666319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022666317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126038171615456
+  - rid: 2623126038171615457
+  - rid: 2623126038171615458
+  - rid: 2623126038171615459
+  - rid: 2623126268168110203
+  - rid: 2623126268168110204
+  - rid: 2623126268168110205
+  - rid: 2623126268168110206
+  - rid: 2623126268168110207
+  links:
+  - from: 9cfb6f49378a4b15a45ea439e5f3f1fb
+    output: 0
+    to: 2abd3e5158784602b00b4e5e04451d80
+  - from: 2abd3e5158784602b00b4e5e04451d80
+    output: 0
+    to: 2a0edd52cf8b48bdba88901d3cb1a6f5
+  - from: 2a0edd52cf8b48bdba88901d3cb1a6f5
+    output: 0
+    to: d76088ee3dac47daa13ef291a181bf1d
+  - from: d76088ee3dac47daa13ef291a181bf1d
+    output: 0
+    to: 17183a9ba46141b3a7c6d4c86e065c8b
+  - from: 17183a9ba46141b3a7c6d4c86e065c8b
+    output: 0
+    to: a4f4f4f78ad741d98b0949e39c51ba11
+  - from: a4f4f4f78ad741d98b0949e39c51ba11
+    output: 0
+    to: 0f5d0ab7aaff4b36a88ba53d366fc95c
+  - from: 0f5d0ab7aaff4b36a88ba53d366fc95c
+    output: 0
+    to: 71fcece5a49543199794b1c60c93afc6
+  - from: 71fcece5a49543199794b1c60c93afc6
+    output: 0
+    to: 1e9ee4cb9bcc40f3a416ce1e19de6445
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126038171615456
+      type: {class: WhenQuest, ns: , asm: SafeHaven}
+      data:
+        id: 9cfb6f49378a4b15a45ea439e5f3f1fb
+        position: {x: 40, y: 60}
+        once: 1
+        quest: {fileID: 11400000, guid: cc005891b82860745a2505974b8bdbb2, type: 2}
+        when: 1
+        alsoAfterLoading: 0
+    - rid: 2623126038171615457
+      type: {class: WaitNode, ns: , asm: SafeHaven}
+      data:
+        id: 2abd3e5158784602b00b4e5e04451d80
+        position: {x: 340, y: 60}
+        seconds: 2
+    - rid: 2623126038171615458
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 2a0edd52cf8b48bdba88901d3cb1a6f5
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>He is at his door again, under the road. Listen. I will carry his voice.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126038171615459
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d76088ee3dac47daa13ef291a181bf1d
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The man in grey
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 1038728947}
+        line: I opened a door like this once. I thought I could pull them through. The hunger came out instead.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110203
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 17183a9ba46141b3a7c6d4c86e065c8b
+        position: {x: 1180, y: 60}
+        speaker:
+          player: 0
+          name: The man in grey
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 1038728947}
+        line: I ran. I left a village behind me with its names half eaten. I have been opening doors ever since, as if the next one would make it right.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110204
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a4f4f4f78ad741d98b0949e39c51ba11
+        position: {x: 1420, y: 60}
+        speaker:
+          player: 0
+          name: The man in grey
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 1038728947}
+        line: There was a note on the table. Old Bear, find the blue door. She called me that when she wanted something.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110205
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 0f5d0ab7aaff4b36a88ba53d366fc95c
+        position: {x: 1660, y: 60}
+        speaker:
+          player: 0
+          name: The man in grey
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 0}
+          voiceFrom: {fileID: 1038728947}
+        line: I opened it a hand's width and heard her humming, and I closed it. If it had been her, she would have said Father. She only said that when she was frightened.
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110206
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 71fcece5a49543199794b1c60c93afc6
+        position: {x: 1900, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>He chose the closed door. That choice may be all he has left of them.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126268168110207
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 1e9ee4cb9bcc40f3a416ce1e19de6445
+        position: {x: 2140, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Keep the horse. Something has to remember them, and he cannot carry it any more.</i>
+        afterFightPause: 1
+        aside: 0
+--- !u!114 &2022666320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2022666317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: 91c6ac6f181b402dad97ec62c05d5053
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &2022908953
 PrefabInstance:
   m_ObjectHideFlags: 0

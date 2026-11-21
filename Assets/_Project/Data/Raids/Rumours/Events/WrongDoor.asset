@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2f02987ee9197d4682f5db8cbc7a967, type: 3}
+  m_Name: WrongDoor
+  m_EditorClassIdentifier: SafeHaven::RaidEventDefinition
+  id: rumour.wrongdoor
+  displayName: The Wrong Door
+  weight: 1
+  earliestSeconds: 90
+  latestSecondsLeft: 90
+  minimumStage: 0
+  warning: 
+  warningSound: {fileID: 11400000, guid: ad5c451edd0edde49967af502c90ec94, type: 2}
+  sitePrefab: {fileID: 6647756069553415008, guid: 6ab5b87b49ec9934196104065c153b7d, type: 3}
+  siteDistance: {x: 35, y: 70}
+  siteText: 'At the Black Pool''s edge a door of old stone leans out of the water, open on nothing. The fen runs out of it: this is where his wrong doors opened, and what came through drowned the marsh. A Hearth Ember set in its sill would close it.'
+  artwork: {fileID: 21300000, guid: 390f841f37daf3f4c96afdc728c3344d, type: 3}
+  onStart: []
+  choices:
+  - label: Set a Hearth Ember in it
+    detail: It will close, and what is still on the other side will not like it.
+    cost:
+    - item: {fileID: 11400000, guid: 3bc5c06eef042084b9fc28865091670b, type: 2}
+      amount: 1
+    result: The ember takes in the wet stone like a coal in tinder. The door grinds shut, and the water round it boils with what was coming.
+    outcomes:
+    - rid: 2623126268168110230
+  raisesWhenChosen: {fileID: 11400000, guid: 0ce8238b5aea25b4b967dfcfcc59530f, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126268168110230
+      type: {class: SpawnCreaturesOutcome, ns: , asm: SafeHaven}
+      data:
+        prefabs:
+        - {fileID: 5318185529198269020, guid: d281dc652b3e50445a465365ff40b433, type: 3}
+        - {fileID: 4999243170976522981, guid: 07a704aacccfef242886f2875ff4fcdf, type: 3}
+        count: 4
+        radius: 6
+        hunt: 1

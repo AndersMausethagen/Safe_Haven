@@ -261,6 +261,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4c668e5dcc6885548b6d5f316e29c5bd, type: 2}
   - {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
   - {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
+  - {fileID: 11400000, guid: c07fae58394d90548abc4a6b2d580767, type: 2}
+  - {fileID: 11400000, guid: aaae356ed418a714488d647c215f858d, type: 2}
   resourceCatalog: {fileID: 11400000, guid: 82528be8462042341acfc62489e5c91f, type: 2}
   recipeBook: {fileID: 11400000, guid: cd7724124d8b393439143345d7f2b45f, type: 2}
   saveablePrefabs:
@@ -418,6 +420,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1e29a9196fe6bcf46bf2a25056ced905, type: 2}
   - {fileID: 11400000, guid: c7535789ff7f13f4f8940597f31f837d, type: 2}
   - {fileID: 11400000, guid: 95972d06dba0fda4bb5e87bc047956d1, type: 2}
+  - {fileID: 11400000, guid: 1899eaf9b830925479e5fa309b359320, type: 2}
   - {fileID: 11400000, guid: 3943d408532d51649b066fb789a31c5b, type: 2}
   - {fileID: 11400000, guid: f7e615034e347bc438f7fdf1f08bd615, type: 2}
   - {fileID: 11400000, guid: 00e21ff059394a4459d8cec92bc2d489, type: 2}
@@ -464,6 +467,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5b96808e29f58414c97811c3ec9f1a0a, type: 2}
   - {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
   - {fileID: 11400000, guid: f3c54bb743041a946b1f9c5e830b8dff, type: 2}
+  - {fileID: 11400000, guid: 28512bedb6de9f9498b9b3836107c1e9, type: 2}
   - {fileID: 11400000, guid: 22c52c196cd7f01478e77e31ccc726a4, type: 2}
   - {fileID: 11400000, guid: 1c7d13324b2d62e439e3f962ee7f050a, type: 2}
   - {fileID: 11400000, guid: 1d763dc02b35f7c42bfc45b861981fd9, type: 2}
@@ -473,6 +477,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a27b02dff679e08448ddebf15ec9fa94, type: 2}
   - {fileID: 11400000, guid: 5715fae8bad44dd4b84dbdb44b2d7c38, type: 2}
   - {fileID: 11400000, guid: bd7dd70969be8174c8acfefd449bf963, type: 2}
+  - {fileID: 11400000, guid: cc005891b82860745a2505974b8bdbb2, type: 2}
   - {fileID: 11400000, guid: 933d1de4d30ba9449985ab8bd2757b7e, type: 2}
   - {fileID: 11400000, guid: 26c34c56b5f966642ba1377c4e221cd7, type: 2}
   - {fileID: 11400000, guid: 1090953ec0461964394a6ccdbe619504, type: 2}
@@ -482,9 +487,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fea0201f13773f04a96efbcb5b364ea9, type: 2}
   - {fileID: 11400000, guid: 08ed06b5fb8d1854c86788aa2a00156f, type: 2}
   - {fileID: 11400000, guid: 002e81b2272f9d94ba3274891dd390d6, type: 2}
+  - {fileID: 11400000, guid: 43d140c7ce0db8248af73e619971f999, type: 2}
   - {fileID: 11400000, guid: eebb289a3dca56448b8f1e8823cc1ca8, type: 2}
   - {fileID: 11400000, guid: d1cd1e12e7d99414ea3e75c867fa6f79, type: 2}
   - {fileID: 11400000, guid: 571e6ab5abe7e304dbc8874605ee77f4, type: 2}
+  - {fileID: 11400000, guid: ffa2fdcd52de08740b9d0a2ce621cb54, type: 2}
   - {fileID: 11400000, guid: 449fc8864f45d83459f6ef5d2c3d8ea8, type: 2}
   - {fileID: 11400000, guid: fa1f7aa8fd0e74e4088532757a23f2ab, type: 2}
   residents:

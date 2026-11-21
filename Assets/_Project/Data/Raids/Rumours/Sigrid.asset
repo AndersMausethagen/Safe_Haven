@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Sigrid
   m_EditorClassIdentifier: SafeHaven::RaidRumourDefinition
   id: rumour.sigrid
-  briefing: A horn has been heard at dusk, calling the expedition's signal.
-  site: {fileID: 11400000, guid: 0ce0116775346f545b9a9e579313dd58, type: 2}
-  setPiece: {fileID: 11400000, guid: bffb9f981cdf88a49826d1a444e914fa, type: 2}
+  briefing: Bells ring in Troll Valley's folded wood when a name is spoken, and someone in the folds answers.
+  site: {fileID: 11400000, guid: d11c88448d897ba47af608c04e7a9938, type: 2}
+  setPiece: {fileID: 0}
   weight: 2
   hour: 0
   seeks: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
