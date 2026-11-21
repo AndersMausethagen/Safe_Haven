@@ -213,6 +213,9 @@ public sealed class LostOneSettings : GameSettings<LostOneSettings>
     [SerializeField] private string briefingLine = "The mist is restless: {name} walks {raid}.";
     [Tooltip("Added to the briefing line when it carries what it took from the player.")]
     [SerializeField] private string briefingCarriesLine = "It still carries what it took from you.";
+    [Tooltip("The painting on the portal briefing's card for one of the Lost walking the run (the words come up on hover). Empty: " +
+             "the card shows a skull.")]
+    [SerializeField] private Sprite briefingArt;
     [Tooltip("In the journal, under its name.")]
     [SerializeField, TextArea] private string journalIntro = "It was {past}. The mist took the rest of it, and left only a hunger for the flame you keep.";
     [Tooltip("What the journal says of it once it is laid to rest.")]
@@ -263,6 +266,7 @@ public sealed class LostOneSettings : GameSettings<LostOneSettings>
     public string LearnedLine => learnedLine;
     public string BriefingLine => briefingLine;
     public string BriefingCarriesLine => briefingCarriesLine;
+    public Sprite BriefingArt => briefingArt;
     public string JournalIntro => journalIntro;
     public string Epitaph => epitaph;
     public string Nameless => NamelessName;

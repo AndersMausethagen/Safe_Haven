@@ -30,6 +30,22 @@ public static class RaidWeather
         return climate.Pick((float)roll.NextDouble());
     }
 
+    /// <summary>The sky's name as the briefing's chip says it: rain falls as snow in a snowing season.</summary>
+    public static string NameFor(WeatherDefinition weather, bool snowing) =>
+        weather == null ? "" : snowing && weather.State.Rain >= TellsRain ? "Snow" : weather.DisplayName;
+
+    /// <summary>The kit icon for the sky (HearthKit): lightning, then rain, then mist or fog, else clear.</summary>
+    public static string IconFor(WeatherDefinition weather)
+    {
+        if (weather == null)
+        {
+            return "Sun";
+        }
+
+        WeatherState state = weather.State;
+        return state.LightningPerMinute > 0f ? "Bolt" : state.Rain >= TellsRain ? "Drop" : state.Mist >= TellsMist || state.Fog >= TellsFog ? "Eye" : "Sun";
+    }
+
     /// <summary>
     /// The briefing's line for a run opening in <paramref name="weather"/>: its name and what it does, as the game's rules have it. Rain
     /// falls as snow in a snowing season (<paramref name="snowing"/>). Null for none.
@@ -42,7 +58,7 @@ public static class RaidWeather
         }
 
         WeatherState state = weather.State;
-        string name = snowing && state.Rain >= TellsRain ? "Snow" : weather.DisplayName;
+        string name = NameFor(weather, snowing);
         var line = new System.Text.StringBuilder($"The sky as you go: {name}.");
         if (state.Rain >= TellsRain && perception != null)
         {

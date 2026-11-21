@@ -100,11 +100,46 @@ public sealed partial class RaidPreparationWindow
         thisRunHeading = Heading("This run", part, Margin, 0f, ColumnWidth, style);
         hourChip = new Chip("Hour", part, style);
         moodChip = new Chip("Forest", part, style);
+        skyChip = new Chip("Sky", part, style);
         Hover(hourChip.Root, () => tooltip.Show("The hour", style.Accent, hourDetail));
         Hover(moodChip.Root, () => tooltip.Show(moodTitle ?? "The forest", style.Accent, moodDetail));
+        Hover(skyChip.Root, () => tooltip.Show("The sky", style.Accent, skyDetail));
+        (eventView, eventContent) = CardView("Events", part);
         dangersHeading = Heading("Known dangers", part, Margin, 0f, ColumnWidth, style);
-        dangersLabel = Paragraph("Dangers", part, Margin, 0f, ColumnWidth, 30f, 18f, style.Text);
+        (dangerView, dangerContent) = CardView("Dangers", part);
         findsHeading = Heading("Likely finds", part, Margin, 0f, ColumnWidth, style);
+    }
+
+    // A masked view the cards are laid in: what doesn't fit its rows scrolls under the mouse wheel.
+    private static (RectTransform view, RectTransform content) CardView(string name, Transform parent)
+    {
+        RectTransform view = At(name, parent, Margin, 0f, ColumnWidth, 10f);
+        view.gameObject.AddComponent<Image>().color = Color.clear;
+        view.gameObject.AddComponent<RectMask2D>().padding = new Vector4(-6f, 0f, -6f, 0f);
+        RectTransform holder = At("Content", view, 0f, 0f, ColumnWidth, 10f);
+        var scroll = view.gameObject.AddComponent<ScrollRect>();
+        scroll.content = holder;
+        scroll.viewport = view;
+        scroll.horizontal = false;
+        scroll.movementType = ScrollRect.MovementType.Clamped;
+        scroll.scrollSensitivity = 30f;
+        return (view, holder);
+    }
+
+    private KitPictureCard AddEventCard(int index) =>
+        new KitPictureCard(eventContent, $"Event {index}", EventCardWidth, EventPictureHeight, 2, 15f,
+            () => ShowTip(eventFaces[index]), HideTip);
+
+    private KitPictureCard AddDangerCard(int index) =>
+        new KitPictureCard(dangerContent, $"Danger {index}", DangerCardWidth, DangerPictureHeight, 2, 14f,
+            () => ShowTip(dangerFaces[index]), HideTip);
+
+    private void HideTip()
+    {
+        if (tooltip != null)
+        {
+            tooltip.Hide();
+        }
     }
 
     private void BuildPreparation(UIStyle style)
@@ -114,6 +149,8 @@ public sealed partial class RaidPreparationWindow
         tierHeading = Heading("Difficulty", part, RightColumn, 0f, ColumnWidth, style);
         gearLabel = Label("Gear", part, RightColumn, 0f, ColumnWidth, 46f, 18f, style.Muted, TextAlignmentOptions.MidlineRight);
         tierBriefing = Paragraph("Tier Briefing", part, RightColumn, 0f, ColumnWidth, 30f, 17f, style.Muted);
+        growthChip = new Chip("Growth", part, style);
+        Hover(growthChip.Root, () => tooltip.Show("Since your last raid", style.Good, growthDetail));
 
         sparksHeading = Heading("Extra time", part, RightColumn, 0f, ColumnWidth, style);
         sparksRowRect = At("Sparks", part, RightColumn, 0f, ColumnWidth, 46f);
@@ -140,15 +177,30 @@ public sealed partial class RaidPreparationWindow
         companionRowRect = At("Companion", part, RightColumn, 0f, ColumnWidth, 46f);
         companionRow = companionRowRect.gameObject;
         AddButton("Previous", companionRowRect, 0f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepCompanion(-1)), out Button previous).text = "<";
-        companionName = Label("Name", companionRowRect, 50f, 0f, 230f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
-        AddButton("Next", companionRowRect, 284f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepCompanion(1)), out Button next).text = ">";
-        companionBond = Label("Bond", companionRowRect, 340f, 0f, 216f, 46f, 17f, style.Muted, TextAlignmentOptions.MidlineRight);
-        companionRisk = Paragraph("Risk", part, RightColumn, 0f, ColumnWidth, 26f, 15f, style.Muted);
+        companionName = Label("Name", companionRowRect, 50f, 0f, 170f, 46f, 20f, style.Text, TextAlignmentOptions.Center);
+        AddButton("Next", companionRowRect, 224f, 0f, 46f, UIRole.Kind.Button, () => Change(() => plan.StepCompanion(1)), out Button next).text = ">";
+        // The bond had 216 units and was cut short ("...") once a rank was named (the user, 2026-11-21).
+        companionBond = Label("Bond", companionRowRect, 282f, 0f, ColumnWidth - 282f, 46f, 17f, style.Muted, TextAlignmentOptions.MidlineRight);
+        companionBond.enableAutoSizing = true;
+        companionBond.fontSizeMin = 13f;
+        companionBond.fontSizeMax = 17f;
+        // One short line; the rule in full on hover (it ran to two lines in a one-line box and ended in "...").
+        companionRisk = Label("Risk", part, RightColumn, 0f, ColumnWidth, 24f, 15f, style.Muted);
+        companionRisk.raycastTarget = true;
+        Hover(companionRisk.gameObject, () =>
+        {
+            if (companionRiskDetail != null)
+            {
+                tooltip.Show("If they fall", style.Warning, companionRiskDetail);
+            }
+        });
 
         modifiersHeading = Heading("Raid modifiers", part, RightColumn, 0f, ColumnWidth, style);
         modifiersNote = Label("Note", part, RightColumn, 0f, ColumnWidth, 26f, 16f, style.Muted, TextAlignmentOptions.MidlineRight);
         modifiersNote.text = "One of each is used up on entry";
-        noModifiers = Paragraph("None", part, RightColumn, 0f, ColumnWidth, 30f, 17f, style.Muted);
+        noModifiers = Label("None", part, RightColumn, 0f, ColumnWidth, 26f, 17f, style.Muted);
+        noModifiers.raycastTarget = true;
+        Hover(noModifiers.gameObject, () => tooltip.Show("Raid modifiers", style.Accent, noModifiersDetail));
         modifierView = At("Modifier List", part, RightColumn, 0f, ColumnWidth, 150f);
         modifierView.gameObject.AddComponent<Image>().color = Color.clear;
         modifierView.gameObject.AddComponent<RectMask2D>();
@@ -272,7 +324,8 @@ public sealed partial class RaidPreparationWindow
         line.color = style.Accent;
         line.raycastTarget = false;
         entry.Mark = mark.gameObject;
-        Hover(entry.Button.gameObject, () => tooltip.Show($"Tier {Tiers.ToRoman(entry.Tier.tier)}", Tiers.ColorOf(entry.Tier.tier), DescribeTierNeeds(entry.Tier)));
+        Hover(entry.Button.gameObject, () => tooltip.Show($"Tier {Tiers.ToRoman(entry.Tier.tier)}", Tiers.ColorOf(entry.Tier.tier),
+            string.IsNullOrWhiteSpace(entry.Tier.briefing) ? DescribeTierNeeds(entry.Tier) : entry.Tier.briefing + "\n\n" + DescribeTierNeeds(entry.Tier)));
         return entry;
     }
 
@@ -280,18 +333,6 @@ public sealed partial class RaidPreparationWindow
         (RaidLauncher.CheckWard(tier) is string ward ? ward + " " : "") + (tier.minimumGearScore > 0
             ? $"Needs a gear score of {tier.minimumGearScore}. {tier.recommendedGearScore} is recommended."
             : $"Open to anyone. A gear score of {tier.recommendedGearScore} is recommended.");
-
-    private RumourLine AddRumourLine()
-    {
-        UIStyle style = UIStyle.Current;
-        RectTransform rect = At("Rumour", briefing.transform, Margin, 0f, ColumnWidth, 30f);
-        var mark = At("Mark", rect, 1f, 9f, 7f, 7f).gameObject.AddComponent<Image>();
-        mark.color = style.Accent;
-        mark.raycastTarget = false;
-        mark.rectTransform.localEulerAngles = new Vector3(0f, 0f, 45f);
-        TMP_Text label = Paragraph("Label", rect, 16f, 0f, ColumnWidth - 16f, 30f, 18f, style.Text);
-        return new RumourLine { Rect = rect, Label = label };
-    }
 
     private FindSlot AddFindSlot()
     {

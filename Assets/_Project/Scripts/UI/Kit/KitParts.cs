@@ -10,19 +10,27 @@ using UnityEngine.UI;
 /// <summary>A number with its icon: its name, its value and, for some, a bar (under it, or beside it when inline).</summary>
 public sealed class KitStatRow
 {
+    private const float ValueGap = 12f;
+    private readonly TMP_Text label;
     private readonly TMP_Text value;
     private readonly RectTransform fill;
     private readonly Image fillImage;
     private readonly bool hasBar;
+    private readonly bool inline;
+    private readonly float labelX;
+    private readonly float rowEnd;
+    private bool fitted;
 
     public KitStatRow(Transform parent, float x, float y, float width, string name, string icon, bool bar, float size = 18f, bool inline = false,
         float labelWidth = 160f, float valueWidth = 110f)
     {
         UIStyle style = UIStyle.Current;
         hasBar = bar;
+        this.inline = inline;
         HearthKit.Icon(parent, icon, x, y + 2f, size + 6f);
-        float labelX = x + size + 18f;
-        TMP_Text label = CodeUI.Label(name, parent, labelX, y, labelWidth, size + 10f, size, style.Text);
+        labelX = x + size + 18f;
+        rowEnd = x + width;
+        label = CodeUI.Label(name, parent, labelX, y, labelWidth, size + 10f, size, style.Text);
         label.text = name;
         float valueX = inline ? labelX + labelWidth : x + width - 120f;
         value = CodeUI.Label("Value", parent, valueX, y, inline ? valueWidth : 120f, size + 10f, size, style.Text,
@@ -42,10 +50,32 @@ public sealed class KitStatRow
     public void Set(string shown, float fraction, Color colour, Color low)
     {
         value.text = HearthKit.ToneNumbers(shown);
+        Fit();
         if (hasBar)
         {
             KitBar.Set(fill, fillImage, fraction, fraction < 0.25f ? low : colour);
         }
+    }
+
+    // A value on the right takes all the room its name leaves (a fixed 120 cut the Fight card's lines short with "...", the user
+    // 2026-11-21). Measured once its window is open: hidden text measures nothing.
+    private void Fit()
+    {
+        if (fitted || inline || !label.isActiveAndEnabled)
+        {
+            return;
+        }
+
+        float named = Mathf.Min(Mathf.Ceil(label.GetPreferredValues(label.text).x), label.rectTransform.sizeDelta.x);
+        if (named <= 0f)
+        {
+            return;
+        }
+
+        fitted = true;
+        float start = Mathf.Min(labelX + named + ValueGap, rowEnd - 120f);
+        value.rectTransform.anchoredPosition = new Vector2(start, value.rectTransform.anchoredPosition.y);
+        value.rectTransform.sizeDelta = new Vector2(rowEnd - start, value.rectTransform.sizeDelta.y);
     }
 }
 

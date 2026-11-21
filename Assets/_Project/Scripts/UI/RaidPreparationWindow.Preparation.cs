@@ -51,9 +51,11 @@ public sealed partial class RaidPreparationWindow
             companionBond.text = raids == 0 ? "No raids together yet" : $"{(string.IsNullOrEmpty(rank) ? "" : rank + ", ")}{raids} raid{(raids == 1 ? "" : "s")} together";
         }
 
-        companionRisk.text = plan.Companion == null ? "One person can go with you."
-            : $"Help them up within {plan.Companion.RaidCompanion.BleedOutSeconds:0} seconds if they fall, or the forest has {plan.Companion.DisplayName}, and they will forget you.";
-        return Stack(companionRisk, y, 26f, SectionGap);
+        float bleed = plan.Companion != null ? plan.Companion.RaidCompanion.BleedOutSeconds : 0f;
+        companionRisk.text = plan.Companion == null ? "One person can go with you." : $"If they fall, help them up within {bleed:0} seconds.";
+        companionRiskDetail = plan.Companion == null ? null
+            : $"Help them up within {bleed:0} seconds if they fall, or the forest has {plan.Companion.DisplayName}, and they will forget you.";
+        return Stack(companionRisk, y, 24f, SectionGap);
     }
 
     // The right column, stacked the same way: what can't be chosen here takes no room.
@@ -63,7 +65,8 @@ public sealed partial class RaidPreparationWindow
         bool tiers = raid.Difficulties.Count > 0;
         tierHeading.gameObject.SetActive(tiers);
         gearLabel.gameObject.SetActive(tiers);
-        tierBriefing.gameObject.SetActive(tiers);
+        tierBriefing.gameObject.SetActive(false);
+        growthChip.Root.SetActive(false);
         while (tierButtons.Count < raid.Difficulties.Count)
         {
             tierButtons.Add(AddTierButton(tierButtons.Count));
@@ -105,8 +108,9 @@ public sealed partial class RaidPreparationWindow
         }
         else
         {
-            noModifiers.text = runes ? EmptyBag : "A boss encounter takes no runes: there is no clock to stretch and no map to read. Come ready: eat, bring tonics and mend your gear.";
-            Stack(noModifiers, y, Measure(noModifiers, ColumnWidth));
+            noModifiers.text = HearthKit.InlineIcon("Info") + (runes ? "  None in your bag" : "  No runes for a boss fight");
+            noModifiersDetail = runes ? EmptyBag : NoRunesForBosses;
+            Stack(noModifiers, y, 26f);
         }
     }
 
@@ -159,19 +163,26 @@ public sealed partial class RaidPreparationWindow
         }
 
         y += 54f;
-        tierBriefing.text = plan.Difficulty != null ? plan.Difficulty.briefing : "";
-        if (fixedTier && plan.Difficulty != null)
+        // What the tier is like is on its button's hover (no paragraph under the tiers): only a boss's fixed first fight is said here.
+        bool note = fixedTier && plan.Difficulty != null;
+        tierBriefing.gameObject.SetActive(note);
+        if (note)
         {
-            tierBriefing.text = $"<color={style.AccentHex}>The first fight is at tier {Tiers.ToRoman(plan.Difficulty.tier)}. Once it is won, rematches at any tier.</color>\n\n"
-                                + tierBriefing.text;
+            tierBriefing.text = $"<color={style.AccentHex}>The first fight is at tier {Tiers.ToRoman(plan.Difficulty.tier)}. Once it is won, rematches at any tier.</color>";
+            y = Stack(tierBriefing, y, Measure(tierBriefing, ColumnWidth), 6f);
         }
 
-        // What the time at home came to, at the door to the next raid.
+        // What the time at home came to, at the door to the next raid: one chip, the skills on hover.
+        growthChip.Root.SetActive(false);
         if (ExperienceTracker.SinceLastRaid() is string grown)
         {
-            tierBriefing.text = $"<color={UIStyle.Current.GoodHex}>Since your last raid: {grown}.</color>\n\n" + tierBriefing.text;
+            string[] parts = grown.Split(new[] { ", " }, System.StringSplitOptions.RemoveEmptyEntries);
+            growthChip.Show("Star", parts.Length > 1 ? $"{parts[0]}  <color={style.MutedHex}>+{parts.Length - 1} more</color>" : parts[0], RightColumn, y);
+            growthDetail = grown.Replace(", ", "\n") + ".";
+            y += ChipRowHeight;
         }
-        return Stack(tierBriefing, y, Measure(tierBriefing, ColumnWidth), SectionGap);
+
+        return y + SectionGap - 6f;
     }
 
     private void DrawSparks()
@@ -220,11 +231,12 @@ public sealed partial class RaidPreparationWindow
     }
 
     // The figures' names (made by Building), found once: a boss encounter renames two and puts them back for an expedition.
-    private TMP_Text[] figureNames;
+    // Not serialized: an Editor reload restored it as an empty array, and the first figure was out of range.
+    [System.NonSerialized] private TMP_Text[] figureNames;
 
     private void NameFigure(Figure figure, string name, string icon)
     {
-        if (figureNames == null)
+        if (figureNames == null || figureNames.Length != FigureNames.Length)
         {
             figureNames = new TMP_Text[FigureNames.Length];
             for (int i = 0; i < FigureNames.Length; i++)
