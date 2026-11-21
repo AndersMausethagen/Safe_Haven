@@ -31,6 +31,7 @@ Shader "Safe Haven/Terrain Moss"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "Assets/_Project/Shaders/ProbeGI.hlsl"
         // A raid's ground light, as the terrain under the moss gets it (nothing elsewhere).
         #include "Assets/_Project/Shaders/GroundLight.hlsl"
         #include "Assets/_Project/Shaders/HexTiling.hlsl"
@@ -179,7 +180,7 @@ Shader "Safe Haven/Terrain Moss"
             #else
                 lighting.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
             #endif
-            lighting.bakedGI = SampleSH(lighting.normalWS);
+            lighting.bakedGI = SafeHavenAmbient(lighting.positionWS, lighting.normalWS, input.positionCS);
             lighting.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
             lighting.shadowMask = half4(1, 1, 1, 1);
             SurfaceData surface = (SurfaceData)0;
@@ -226,6 +227,7 @@ Shader "Safe Haven/Terrain Moss"
             #pragma fragment MossFragment
             #pragma multi_compile_instancing
             #pragma multi_compile_fog
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS

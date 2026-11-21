@@ -73,6 +73,7 @@ Shader "Safe Haven/Layered Lit"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "Assets/_Project/Shaders/ProbeGI.hlsl"
         #include "Assets/_Project/Shaders/SeeThrough/SeeThrough.hlsl"
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
         TEXTURE2D(_BumpMap); SAMPLER(sampler_BumpMap);
@@ -345,6 +346,7 @@ Shader "Safe Haven/Layered Lit"
             #pragma multi_compile_instancing
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DOTS.hlsl"
             #pragma multi_compile_fog
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
@@ -405,7 +407,7 @@ Shader "Safe Haven/Layered Lit"
                     lighting.shadowCoord = TransformWorldToShadowCoord(input.positionWS);
                 #endif
                 lighting.fogCoord = input.fog;
-                lighting.bakedGI = SampleSH(lighting.normalWS);
+                lighting.bakedGI = SafeHavenAmbient(lighting.positionWS, lighting.normalWS, input.positionCS);
                 lighting.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
                 lighting.shadowMask = half4(1, 1, 1, 1);
                 SurfaceData data = (SurfaceData)0;

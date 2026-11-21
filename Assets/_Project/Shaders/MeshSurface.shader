@@ -76,6 +76,7 @@ Shader "Safe Haven/Mesh Surface (Tessellated)"
             #pragma multi_compile _ DYNAMICLIGHTMAP_ON
             #pragma multi_compile _ LOD_FADE_CROSSFADE
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Fog.hlsl"
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #pragma shader_feature_local_fragment _ _SEASON_SNOW
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define SEASON_SNOW_WRAP_PBR

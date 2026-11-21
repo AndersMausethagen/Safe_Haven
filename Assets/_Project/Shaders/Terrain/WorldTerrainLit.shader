@@ -171,6 +171,10 @@ Shader "Safe Haven/Terrain (World)"
             #pragma multi_compile_fragment _ LIGHTMAP_BICUBIC_SAMPLING
             #pragma multi_compile_fragment _ REFLECTION_PROBE_ROTATION
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
+            #if defined(_WORLD_ALL_LAYERS)
+                #undef PROBE_VOLUMES_L1
+                #undef PROBE_VOLUMES_L2
+            #endif
             #pragma multi_compile _ DYNAMICLIGHTMAP_ON
             #pragma multi_compile_fragment _ DEBUG_DISPLAY
             #pragma multi_compile_instancing
@@ -277,6 +281,10 @@ Shader "Safe Haven/Terrain (World)"
             #pragma multi_compile_fragment _ REFLECTION_PROBE_ROTATION
             #pragma multi_compile _ DYNAMICLIGHTMAP_ON
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
+            #if defined(_WORLD_ALL_LAYERS)
+                #undef PROBE_VOLUMES_L1
+                #undef PROBE_VOLUMES_L2
+            #endif
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
 
             #pragma multi_compile_instancing

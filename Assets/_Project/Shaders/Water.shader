@@ -89,6 +89,7 @@ Shader "Safe Haven/Water"
             #pragma fragment WaterFragment
             #pragma multi_compile_instancing
             #pragma multi_compile_fog
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
@@ -103,6 +104,7 @@ Shader "Safe Haven/Water"
             #pragma multi_compile_fragment _ SAFE_HAVEN_WATER_SIMPLE
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Assets/_Project/Shaders/ProbeGI.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareOpaqueTexture.hlsl"
             #define WATER_MAX_FOAM_SPOTS 8
@@ -533,7 +535,7 @@ Shader "Safe Haven/Water"
                 // A pond under trees sees little sky (a raid's ground light; 1 elsewhere): its light and reflected sky dim, and the
                 // night's lift never makes it lighter than before the field.
                 half airLight = GroundLightAir(positionWS);
-                half3 ambient = SampleSH(surfaceNormal) * airLight;
+                half3 ambient = SafeHavenAmbient(positionWS, surfaceNormal, input.positionCS) * airLight;
                 half3 light = sun.color * sun.shadowAttenuation * (0.35 + 0.65 * saturate(dot(surfaceNormal, sun.direction))) + ambient;
                 half3 view = GetWorldSpaceNormalizeViewDir(positionWS);
                 InputData inputData = (InputData)0;

@@ -653,6 +653,17 @@ def main():
     shader = shader.replace("Hidden/Universal Render Pipeline/Terrain/Lit (Add Pass)", "Hidden/Safe Haven/Terrain/Add")
     shader = shader.replace("Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)", "Hidden/Safe Haven/Terrain/Base")
     shader = re.sub(r'\n\s*CustomEditor "[^"]+"\n', "\n", shader)  # Unity's terrain GUI hides the rock settings
+    # Adaptive Probe Volumes (2026-11-21): the all-layers pass (the Haven, the prologue) is at the 64-texture limit, and APV's
+    # textures turned it grey with no error. There the probe keywords are dropped and it keeps the ambient probe, as before; the
+    # four-layer pass (the boss arenas) reads the probes.
+    probe_line = '            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"\n'
+    if probe_line not in shader:
+        raise SystemExit("the probe volume keywords line is missing from the forward pass")
+    shader = shader.replace(probe_line, probe_line +
+                            "            #if defined(_WORLD_ALL_LAYERS)\n"
+                            "                #undef PROBE_VOLUMES_L1\n"
+                            "                #undef PROBE_VOLUMES_L2\n"
+                            "            #endif\n")
     with open(os.path.join(TARGET, "WorldTerrainLit.shader"), "w", encoding="utf-8", newline="\n") as f:
         f.write(HEADER.format(name="TerrainLit.shader") + shader)
 
