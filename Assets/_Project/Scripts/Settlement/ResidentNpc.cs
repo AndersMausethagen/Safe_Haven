@@ -76,6 +76,8 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
         if (who.QuestLine != null && who.QuestLine.Count > 0)
         {
             questGiver = TryGetComponent(out QuestGiver existing) ? existing : gameObject.AddComponent<QuestGiver>();
+            // The quest that brought them home is handed in to them: their mark shows it (set before the line, which refreshes it).
+            questGiver.AlsoHandedInHere = () => ResidentQuests.RescueToHandIn(resident);
             questGiver.UseQuestLine(who.QuestLine, who.QuestLineDone, true);
         }
 
@@ -222,6 +224,33 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
     {
         if (resident == null)
         {
+            return;
+        }
+
+        // Brought home on a quest: it is handed in here, first and alone. Their words of arrival, then one answer that hands it in,
+        // starts their own line and teaches their workplace; then they say what they can help with (the user, 2026-11-21).
+        QuestDefinition rescue = ResidentQuests.RescueToHandIn(resident);
+        if (rescue != null && !HavenVisit.InHostsHaven)
+        {
+            page.Body = !string.IsNullOrWhiteSpace(resident.WelcomeLine) ? resident.WelcomeLine : resident.Description;
+            page.Add(new MenuAction("You're safe now. Welcome to the Haven.", rescue.DisplayName, true, () =>
+            {
+                if (!ResidentQuests.HandInRescue(resident, Player.Current != null ? Player.Current.gameObject : null))
+                {
+                    afterAnswer?.Invoke();
+                    return;
+                }
+
+                string help = ResidentQuests.FirstOfferText(resident);
+                if (string.IsNullOrWhiteSpace(help))
+                {
+                    afterAnswer?.Invoke();
+                }
+                else
+                {
+                    DialogueBox.Current.Say(speaker, help, afterAnswer);
+                }
+            }, quest: rescue, does: QuestAnswer.HandsIn));
             return;
         }
 

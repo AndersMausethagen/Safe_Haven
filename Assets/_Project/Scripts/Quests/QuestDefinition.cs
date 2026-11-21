@@ -104,7 +104,8 @@ public sealed class QuestDefinition : ScriptableObject
 
     [Header("Finishing")]
     [Tooltip("Off: the quest completes the moment its objectives are done. On: the player must return to a Quest Giver for this " +
-             "quest to hand it in; rewards and the completion event wait until then.")]
+             "quest to hand it in; rewards and the completion event wait until then. A quest that brings someone home (Rescue Person " +
+             "with Bring Home) is always handed in to that person at home, ticked or not.")]
     [SerializeField] private bool turnInToGiver;
     [Tooltip("Who to return to, shown in the quest tracker as \"Return to ...\", e.g. \"the Smith\". Empty: \"the quest giver\".")]
     [SerializeField] private string turnInTo;
@@ -154,9 +155,35 @@ public sealed class QuestDefinition : ScriptableObject
     public IReadOnlyList<GameEventDefinition> OnCompleted => onCompleted;
     public bool ObjectivesInOrder => objectivesInOrder;
     public IReadOnlyList<QuestObjective> Objectives => objectives;
-    public bool TurnInToGiver => turnInToGiver;
-    /// <summary>Who the quest is handed in to, for "Return to ..." text.</summary>
-    public string TurnInTo => string.IsNullOrWhiteSpace(turnInTo) ? "the quest giver" : turnInTo.Trim();
+    /// <summary>
+    /// Handed in rather than completed on the spot: ticked here, or a rescue (<see cref="BroughtHome"/>), which is always handed
+    /// in to the person saved once they are home (the user, 2026-11-21: "I should deliver and complete that quest with her and not
+    /// automatically on extraction ... true on all quests where I save an NPC").
+    /// </summary>
+    public bool TurnInToGiver => turnInToGiver || BroughtHome != null;
+    /// <summary>Who the quest is handed in to, for "Return to ..." text: a rescue's person when nothing else is named.</summary>
+    public string TurnInTo => !string.IsNullOrWhiteSpace(turnInTo) ? turnInTo.Trim()
+        : BroughtHome != null ? BroughtHome.DisplayName + " at home" : "the quest giver";
+
+    /// <summary>
+    /// The person a Rescue Person objective with Bring Home brings to the Haven, or null. Such a quest waits at the end for its
+    /// hand-in to them in their conversation (ResidentNpc, ResidentQuests.HandInRescue), and their own quest line starts then.
+    /// </summary>
+    public ResidentDefinition BroughtHome
+    {
+        get
+        {
+            foreach (QuestObjective objective in objectives)
+            {
+                if (objective != null && objective.Type == ObjectiveType.RescuePerson && objective.BringHome && objective.Person != null)
+                {
+                    return objective.Person;
+                }
+            }
+
+            return null;
+        }
+    }
     public IReadOnlyList<ItemAmount> RewardItems => rewardItems;
     public int Experience => experience;
     public IReadOnlyList<ResourceAmount> RewardResources => rewardResources;

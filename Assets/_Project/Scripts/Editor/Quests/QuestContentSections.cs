@@ -138,7 +138,7 @@ public sealed class QuestSection : ContentSection
         {
             problems.Add("Starts from a Quest Giver, but no scene or prefab has one for it and no story starts it (GameObject > Safe Haven > Quest Giver).");
         }
-        else if (quest.TurnInToGiver && !hasGiver)
+        else if (quest.TurnInToGiver && !hasGiver && quest.BroughtHome == null)
         {
             problems.Add("Is handed in to a Quest Giver, but no scene or prefab has one for it, so it can never finish.");
         }
@@ -184,7 +184,9 @@ public sealed class QuestSection : ContentSection
 
         string rewards = quest.DescribeRewards();
         EditorGUILayout.LabelField("Rewards", rewards.Length > 0 ? rewards : "none", ContentUtility.WrappedMiniLabel);
-        EditorGUILayout.LabelField("Finishes", quest.TurnInToGiver
+        EditorGUILayout.LabelField("Finishes", quest.BroughtHome != null
+            ? $"When the player speaks to {quest.BroughtHome.DisplayName} at home after the rescue; their own quest line starts then."
+            : quest.TurnInToGiver
             ? $"When the player returns to {quest.TurnInTo} (a Quest Giver for it); rewards are given then."
             : "As soon as every objective is done.", ContentUtility.WrappedMiniLabel);
         if (quest.ClosedBy != null)

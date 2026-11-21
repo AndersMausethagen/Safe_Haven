@@ -99,6 +99,56 @@ public sealed class ResidentQuestsTests
         Assert.AreEqual(QuestStatus.Active, GameSession.Quests.StatusOf(ResidentQuests.FirstQuest(person)));
     }
 
+    // The user, 2026-11-21: Ingrid's rescue completed itself on extraction and taught her building; it must be handed in to her at
+    // home, and her building waits for that. Checked on every shipped quest that brings someone home.
+    [Test]
+    public void ARescue_IsHandedInToThePersonAtHome_AndTheirLineWaitsForIt()
+    {
+        List<QuestDefinition> rescues = Content.Quests.Where(q => q != null && q.BroughtHome != null && ResidentQuests.FirstQuest(q.BroughtHome) != null).ToList();
+        Assert.GreaterOrEqual(rescues.Count, 5, "the Bring ... Home quests are found (Ingrid's, Bjarne's, Liv's ...)");
+        int checkedPlaces = 0;
+        foreach (QuestDefinition rescue in rescues)
+        {
+            GameSession.StartNewGame();
+            PlayerCrafting crafting = NewPlayer();
+            ResidentDefinition person = rescue.BroughtHome;
+            QuestDefinition first = ResidentQuests.FirstQuest(person);
+            Assert.IsTrue(rescue.TurnInToGiver, rescue.name + " is handed in");
+            StringAssert.Contains(person.DisplayName, rescue.TurnInTo, rescue.name + ": the tracker says who to return to");
+
+            Assert.IsTrue(GameSession.Quests.TryStart(rescue, prerequisitesAside: true), rescue.name);
+            GameSession.Home.AddResident(person);
+            for (int i = 0; i < rescue.Objectives.Count; i++)
+            {
+                GameSession.Quests.AddProgress(rescue, i, rescue.Objectives[i].Amount);
+            }
+
+            Assert.AreEqual(QuestStatus.ReadyToTurnIn, GameSession.Quests.StatusOf(rescue), rescue.name + " waits at the end, not completed on extraction");
+            Assert.AreEqual(rescue, ResidentQuests.RescueToHandIn(person));
+            Assert.IsFalse(ResidentQuests.StartFirst(person, player, false), $"{first.name} waits for the hand-in");
+            ResidentNpc.TeachEveryoneHome(player);
+            Assert.AreEqual(QuestStatus.NotStarted, GameSession.Quests.StatusOf(first), $"arriving home doesn't start {first.name} either");
+            List<BuildingDefinition> places = Workplaces(person).Where(p => BuildingGate.IntroducedBy(p).Contains(first)).ToList();
+            foreach (BuildingDefinition place in places)
+            {
+                Assert.IsFalse(crafting.IsKnown(place), $"{place.name} waits until {person.name} is spoken to");
+            }
+
+            Assert.IsTrue(ResidentQuests.HandInRescue(person, player), rescue.name + " is handed in to " + person.name);
+            Assert.AreEqual(QuestStatus.Completed, GameSession.Quests.StatusOf(rescue));
+            Assert.AreEqual(QuestStatus.Active, GameSession.Quests.StatusOf(first), $"{first.name} starts with the hand-in");
+            Assert.IsNull(ResidentQuests.RescueToHandIn(person));
+            Assert.IsFalse(ResidentQuests.HandInRescue(person, player), "handed in once");
+            foreach (BuildingDefinition place in places)
+            {
+                Assert.IsTrue(crafting.IsKnown(place), $"{place.name} is learned with the hand-in");
+                checkedPlaces++;
+            }
+        }
+
+        Assert.Greater(checkedPlaces, 0, "a workplace was checked (the Purification Altar)");
+    }
+
     // Every rescued person starts a quest chain (the user, 2026-11-20): a line of two or more, the first introducing their workplace.
     [Test]
     public void EveryoneRescued_HasAQuestChain()

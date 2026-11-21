@@ -11,6 +11,11 @@ using UnityEngine;
 /// asks <see cref="MayTeach"/> before teaching a resident's workplaces. A resident already at home in an older save gets the same:
 /// their first quest starts when the player next arrives (ResidentNpc.TeachEveryoneHome).
 /// </para>
+/// <para>
+/// Brought home by a quest (QuestDefinition.BroughtHome), the rescue isn't the start: that quest waits to be handed in to them at
+/// home, and their line starts with the hand-in, in their conversation (the user, 2026-11-21: "That building should not be unlocked
+/// until after I talk to her when we get back to Haven ... true on all quests where I save an NPC").
+/// </para>
 /// </summary>
 public static class ResidentQuests
 {
@@ -67,6 +72,12 @@ public static class ResidentQuests
     /// </summary>
     public static bool StartFirst(ResidentDefinition resident, GameObject user, bool announce = true)
     {
+        // Brought home on a quest: their line waits until it is handed in to them at home (HandInRescue).
+        if (RescueToHandIn(resident) != null)
+        {
+            return false;
+        }
+
         QuestDefinition first = FirstQuest(resident);
         QuestLog log = Log;
         bool started = false;
@@ -77,6 +88,91 @@ public static class ResidentQuests
 
         ResidentNpc.TeachWhatTheyKnow(resident, user, announce);
         return started;
+    }
+
+    /// <summary>
+    /// The quest that brought <paramref name="resident"/> home and now waits to be handed in to them (QuestDefinition.BroughtHome,
+    /// Ready To Turn In), or null. While there is one, their quest line and workplace wait (the user, 2026-11-21: "That building
+    /// should not be unlocked until after I talk to her when we get back to Haven").
+    /// </summary>
+    public static QuestDefinition RescueToHandIn(ResidentDefinition resident) => RescueIn(resident, QuestStatus.ReadyToTurnIn);
+
+    /// <summary>A quest under way (or waiting to be handed in) that brings <paramref name="resident"/> home, or null.</summary>
+    public static QuestDefinition RescueUnderWay(ResidentDefinition resident) =>
+        RescueIn(resident, QuestStatus.ReadyToTurnIn) ?? RescueIn(resident, QuestStatus.Active);
+
+    private static QuestDefinition RescueIn(ResidentDefinition resident, QuestStatus status)
+    {
+        QuestLog log = Log;
+        if (resident == null || log == null)
+        {
+            return null;
+        }
+
+        foreach (QuestDefinition quest in AllQuests)
+        {
+            if (quest != null && quest.BroughtHome == resident && log.StatusOf(quest) == status)
+            {
+                return quest;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Hands in the quest that brought <paramref name="resident"/> home, in their conversation at home, then starts their own quest
+    /// line and teaches their workplace (StartFirst). True when a quest was handed in.
+    /// </summary>
+    public static bool HandInRescue(ResidentDefinition resident, GameObject user)
+    {
+        QuestDefinition rescue = RescueToHandIn(resident);
+        if (rescue == null)
+        {
+            return false;
+        }
+
+        bool handedIn = QuestManager.Current != null ? QuestManager.Current.TryTurnIn(rescue, out _) : Log != null && Log.TryTurnIn(rescue);
+        if (handedIn && StartFirst(resident, user))
+        {
+            // The player is speaking to them now, but the talk began before their quest did: its "Speak to" step counts this one.
+            QuestDeeds.Raise(GameEventKind.Talked, resident, user);
+        }
+
+        return handedIn;
+    }
+
+    /// <summary>What the first offer of their quest line says (what they can help with), or null.</summary>
+    public static string FirstOfferText(ResidentDefinition resident)
+    {
+        if (resident == null || resident.QuestLine == null)
+        {
+            return null;
+        }
+
+        foreach (QuestOffer offer in resident.QuestLine)
+        {
+            if (offer != null && offer.Quest != null)
+            {
+                return offer.Text;
+            }
+        }
+
+        return null;
+    }
+
+    private static IReadOnlyList<QuestDefinition> AllQuests
+    {
+        get
+        {
+            if (QuestManager.Current != null)
+            {
+                return QuestManager.Current.Quests;
+            }
+
+            ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+            return content != null ? content.Quests : (IReadOnlyList<QuestDefinition>)System.Array.Empty<QuestDefinition>();
+        }
     }
 
     private static QuestLog Log => QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;

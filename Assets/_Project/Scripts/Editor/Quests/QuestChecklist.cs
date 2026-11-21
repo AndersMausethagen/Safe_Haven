@@ -399,6 +399,10 @@ public static class QuestChecklist
         {
             checks.Add(new QuestCheck(QuestCheck.State.Done, "Finishes the moment its objectives are done."));
         }
+        else if (quest.BroughtHome != null)
+        {
+            checks.Add(new QuestCheck(QuestCheck.State.Done, $"Handed in to {quest.BroughtHome.DisplayName} at home, after the rescue."));
+        }
         else if (QuestSceneIndex.HasGiver(quest))
         {
             checks.Add(new QuestCheck(QuestCheck.State.Done, $"Handed in to {quest.TurnInTo}."));

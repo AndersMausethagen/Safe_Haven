@@ -361,6 +361,17 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         gameObject.SetActive(false);
     }
 
+    // The deed first, so a quest bringing them home is waiting for its hand-in before their own line is asked to start: then it
+    // starts in their conversation at home (ResidentQuests.HandInRescue), not here. Rescued without such a quest, it starts now.
+    private void BringHome(GameObject player)
+    {
+        QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
+        if (ResidentQuests.RescueUnderWay(resident) == null)
+        {
+            ResidentQuests.StartFirst(resident, player);
+        }
+    }
+
     private void OnRaidEnded(RaidSession session)
     {
         if (state != State.Following || session.Outcome != RaidOutcome.Extracted || (health != null && !health.IsAlive))
@@ -381,8 +392,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             {
                 raid.Report?.Rescued.Add(resident);
                 GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
-                ResidentQuests.StartFirst(resident, player);
-                QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
+                BringHome(player);
                 if (rescuedEvent != null)
                 {
                     GameEvents.Raise(rescuedEvent, player);
@@ -396,8 +406,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         {
             raid.Report?.Rescued.Add(resident);
             GameMessages.Post($"{resident.DisplayName} steps through the portal with you.", MessageKind.Gain);
-            ResidentQuests.StartFirst(resident, player);
-            QuestDeeds.Raise(GameEventKind.PersonRescued, resident, player);
+            BringHome(player);
             if (rescuedEvent != null)
             {
                 GameEvents.Raise(rescuedEvent, player);

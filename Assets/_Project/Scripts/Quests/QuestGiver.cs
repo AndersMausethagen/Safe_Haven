@@ -343,10 +343,23 @@ public sealed class QuestGiver : MonoBehaviour, IInteractionCondition, IInteract
         }
     }
 
+    /// <summary>
+    /// A quest that is handed in to this giver's owner though it isn't one of the giver's offers (a resident brought home: the
+    /// rescue that brought them, ResidentQuests.RescueToHandIn), or null. Their mark shows it first; the owner hands it in.
+    /// </summary>
+    public Func<QuestDefinition> AlsoHandedInHere { get; set; }
+
     // What the floating mark shows: something to hand in first, then something to take, then what the ordered offer says.
     // The ordered offer goes first among equals, as it is the giver's main business.
     private QuestGiverState MarkerState(QuestLog log, out QuestDefinition shownQuest)
     {
+        QuestDefinition handIn = AlsoHandedInHere != null && !HavenVisit.InHostsHaven ? AlsoHandedInHere() : null;
+        if (handIn != null)
+        {
+            shownQuest = handIn;
+            return QuestGiverState.ReadyToTurnIn;
+        }
+
         QuestGiverState shown = state;
         shownQuest = Quest;
         foreach (QuestOffer side in sideOffers)
