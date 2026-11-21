@@ -28,7 +28,14 @@ public static class SafeHavenBuild
             .Concat(QuestAudit.SilentPortalMoments()).Concat(QuestAudit.UnplacedRescues()).Concat(ContentAudit.All()).ToList();
     }
 
-    public static void BuildWindows()
+    /// <summary>
+    /// The Windows build in Build/Windows. A playtest build by default: textures at the Editor's 2K cap (what the developer sees
+    /// every day) and the data packed with LZ4HC, about a third of the size (the build-size review, 2026-11-21). A release build
+    /// (<paramref name="fullTextures"/>) ships the textures at full size.
+    /// </summary>
+    public static void BuildWindows() => BuildWindows(false);
+
+    public static void BuildWindows(bool fullTextures)
     {
         // Loose ends stop the build: they would ship as a quest nobody can finish or an item nobody can find.
         List<string> problems = Audits();
@@ -59,7 +66,8 @@ public static class SafeHavenBuild
             scenes = scenes,
             locationPathName = outputPath,
             target = BuildTarget.StandaloneWindows64,
-            options = BuildOptions.None
+            // LZ4HC: the data files packed (meshes, animation, shaders and much of the textures shrink), unpacked as they load.
+            options = BuildOptions.CompressWithLz4HC
         };
 
         // A dirty scene (the World Builder dirties the Haven after every Editor start) makes the build ask to save in a native
@@ -78,14 +86,17 @@ public static class SafeHavenBuild
         }
 
         UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
-        // Full-size textures in the build, whatever the Editor works with (EditorTextureCap).
-        BuildReport report = EditorTextureCap.WithFullTextures(() => BuildPipeline.BuildPlayer(options));
+        // Playtest builds keep the 2K cap; a release build gets the textures at full size (EditorTextureCap).
+        BuildReport report = fullTextures
+            ? EditorTextureCap.WithFullTextures(() => BuildPipeline.BuildPlayer(options))
+            : EditorTextureCap.WithCappedTextures(() => BuildPipeline.BuildPlayer(options));
         if (report.summary.result != BuildResult.Succeeded)
         {
             throw new InvalidOperationException(
                 $"Windows build failed with result {report.summary.result}.");
         }
 
-        Debug.Log($"Windows build completed: {outputPath}");
+        Debug.Log($"Windows build completed ({(fullTextures ? "full-size" : "2K playtest")} textures, " +
+                  $"{report.summary.totalSize / 1048576} MB): {outputPath}");
     }
 }

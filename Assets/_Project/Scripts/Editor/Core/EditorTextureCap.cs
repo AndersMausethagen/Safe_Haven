@@ -10,8 +10,10 @@ using UnityEngine;
 /// bring hundreds of 4K and 8K textures and the Editor keeps a full copy of each it has loaded; capped, the Haven needs
 /// about 4 GB less. From the top-down camera 2K and 4K look the same.
 /// <para>
-/// Builds always get full-size textures: <see cref="SafeHavenBuild.BuildWindows"/> lifts the cap for the build and puts it
-/// back after, and any other build started with the cap on stops with an explanation. Toggle under Safe Haven › Editor.
+/// Playtest builds keep the cap (<see cref="SafeHavenBuild.BuildWindows"/> by default, the build-size review of 2026-11-21: 4K
+/// textures were 5 GB of a 7.3 GB build the developer never saw, since the Editor shows 2K); a release build asks for full size
+/// (BuildWindows(fullTextures: true)), which lifts the cap and puts it back after. Any other build started with the cap on stops
+/// with an explanation. Toggle under Safe Haven › Editor.
 /// </para>
 /// </summary>
 public sealed class EditorTextureCap : IPreprocessBuildWithReport
@@ -20,6 +22,9 @@ public sealed class EditorTextureCap : IPreprocessBuildWithReport
     private const string MenuPath = "Safe Haven/Editor/Light Textures in the Editor";
 
     public int callbackOrder => -1000;
+
+    // Set while a playtest build is made with the cap on, on purpose.
+    private static bool cappedOnPurpose;
 
     /// <summary>True while the Editor imports textures capped.</summary>
     public static bool IsOn => EditorUserBuildSettings.overrideMaxTextureSize > 0;
@@ -48,6 +53,24 @@ public sealed class EditorTextureCap : IPreprocessBuildWithReport
         Debug.Log(on ? $"Editor textures capped at {EditorMaxSize} (builds stay full size)." : "Editor textures at full size.");
     }
 
+    /// <summary>Runs <paramref name="build"/> with textures capped at <see cref="EditorMaxSize"/> (a playtest build), then puts the
+    /// Editor's cap back as it was.</summary>
+    public static T WithCappedTextures<T>(Func<T> build)
+    {
+        bool wasOn = IsOn;
+        Set(true);
+        cappedOnPurpose = true;
+        try
+        {
+            return build();
+        }
+        finally
+        {
+            cappedOnPurpose = false;
+            Set(wasOn);
+        }
+    }
+
     /// <summary>Runs <paramref name="build"/> with full-size textures, then restores the cap if it was on.</summary>
     public static T WithFullTextures<T>(Func<T> build)
     {
@@ -65,7 +88,7 @@ public sealed class EditorTextureCap : IPreprocessBuildWithReport
 
     public void OnPreprocessBuild(BuildReport report)
     {
-        if (IsOn)
+        if (IsOn && !cappedOnPurpose)
         {
             throw new BuildFailedException(
                 $"The Editor's textures are capped at {EditorMaxSize} to save memory, and a build would ship them that way. " +

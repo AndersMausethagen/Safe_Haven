@@ -9,9 +9,12 @@ The CLI's answer can be lost while the Editor is busy building, so success is re
 .EXAMPLE
 powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/BuildWindows.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/BuildWindows.ps1 -SkipTests
+powershell -NoProfile -ExecutionPolicy Bypass -File AgentScripts/BuildWindows.ps1 -FullTextures   (a release build: 4K textures)
+A playtest build (the default) keeps textures at the Editor's 2K cap; both are packed with LZ4HC.
 #>
 param(
     [switch]$SkipTests,
+    [switch]$FullTextures,
     [int]$TestTimeout = 3600,
     [string]$Project = 'D:/Safe Haven/Safe Haven'
 )
@@ -30,7 +33,8 @@ $unity = (Get-Command unity).Source
 $data = Join-Path $Project 'Build/Windows/Safe Haven_Data/globalgamemanagers'
 $start = Get-Date
 # No double quotes in the code: Windows PowerShell 5.1 strips them from a native command's arguments.
-$answer = & $unity command script eval --no-banner --timeout 7200 --code 'SafeHavenBuild.BuildWindows(); return 7;' 2>&1 | Out-String
+$code = if ($FullTextures) { 'SafeHavenBuild.BuildWindows(true); return 7;' } else { 'SafeHavenBuild.BuildWindows(false); return 7;' }
+$answer = & $unity command script eval --no-banner --timeout 7200 --code $code 2>&1 | Out-String
 $written = (Test-Path $data) -and ((Get-Item $data).LastWriteTime -gt $start)
 # Unity CLI 1.0 prints the eval's value itself (7); earlier versions a JSON object with "result":7.
 if ($answer -match '"result":7' -or $answer -match '(?m)^\s*7\s*$' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
