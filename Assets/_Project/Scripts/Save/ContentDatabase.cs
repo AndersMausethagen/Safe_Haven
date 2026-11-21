@@ -18,6 +18,12 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     [SerializeField] private List<ItemDefinition> items = new List<ItemDefinition>();
     [SerializeField] private ResourceCatalog resourceCatalog;
     [SerializeField] private RecipeBook recipeBook;
+
+    /// <summary>Every building in the game (the recipe book's list).</summary>
+    public IReadOnlyList<BuildingDefinition> Buildings => recipeBook != null ? recipeBook.Buildings : (IReadOnlyList<BuildingDefinition>)System.Array.Empty<BuildingDefinition>();
+
+    /// <summary>Every recipe in the game (the recipe book's list).</summary>
+    public IReadOnlyList<RecipeDefinition> Recipes => recipeBook != null ? recipeBook.Recipes : (IReadOnlyList<RecipeDefinition>)System.Array.Empty<RecipeDefinition>();
     [Tooltip("Prefabs that can be spawned while playing and recreated after loading. Filled in automatically in the Editor.")]
     [SerializeField] private List<SaveableEntity> saveablePrefabs = new List<SaveableEntity>();
     [Tooltip("Every quest in the game. Filled in automatically in the Editor.")]

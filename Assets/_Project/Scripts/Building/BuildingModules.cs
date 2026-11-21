@@ -57,6 +57,20 @@ public static class BuildingModules
 
         QuestLog log = QuestManager.Current != null ? QuestManager.Current.Log : GameSession.Quests;
         ContentDatabase content = Content;
+        // A tier that teaches it, standing (BuildingLevel › Unlocks Modules): the best of each kind as last seen at home.
+        foreach (BuildingDefinition building in content != null ? content.Buildings : (IReadOnlyList<BuildingDefinition>)System.Array.Empty<BuildingDefinition>())
+        {
+            int standing = building != null ? GameSession.Home.BuiltTier(building) : 0;
+            for (int level = 2; level <= standing; level++)
+            {
+                BuildingLevel tier = building.UpgradeTo(level);
+                if (tier != null && tier.unlocksModules.Contains(module))
+                {
+                    return true;
+                }
+            }
+        }
+
         foreach (QuestDefinition quest in content != null ? content.Quests : (IReadOnlyList<QuestDefinition>)System.Array.Empty<QuestDefinition>())
         {
             if (quest != null && quest.UnlocksModules.Contains(module) && log != null && log.StatusOf(quest) != QuestStatus.NotStarted)
@@ -66,6 +80,24 @@ public static class BuildingModules
         }
 
         return false;
+    }
+
+    /// <summary>Tells the player of modules just learned (a quest starting, a tier finished): what each is and where it goes.</summary>
+    public static void AnnounceLearned(IEnumerable<BuildingModuleDefinition> modules)
+    {
+        if (modules == null || HavenVisit.InHostsHaven)
+        {
+            return;
+        }
+
+        foreach (BuildingModuleDefinition module in modules)
+        {
+            if (module != null)
+            {
+                GameMessages.Post($"New module: the {module.DisplayName}, for {module.FitsText()} at Tier {Tiers.ToRoman(module.Tier)} (its Upgrade page): {module.Effect()}.",
+                    MessageKind.Info);
+            }
+        }
     }
 
     /// <summary>Why <paramref name="module"/> can't be fitted to <paramref name="building"/> now (materials aside), or null.</summary>

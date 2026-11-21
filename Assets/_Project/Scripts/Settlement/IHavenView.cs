@@ -77,7 +77,7 @@ public interface IHavenView
     int BuiltTier(BuildingDefinition building);
     int BuiltTier(CraftingStationType station);
     int SmithyTier { get; }
-    int UpgradeBonus(Func<BuildingLevel, int> bonus);
+    int UpgradeBonus(Func<BuildingBonus, int> bonus);
     bool ScaffoldsWaiting { get; }
 
     WorkshopState Workshops { get; }

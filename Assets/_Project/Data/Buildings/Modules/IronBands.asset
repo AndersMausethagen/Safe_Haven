@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7736f9cb0a98e9b42802b13f42b9cfd8, type: 3}
+  m_Name: IronBands
+  m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
+  id: module.ironbands
+  displayName: Iron Bands
+  description: 'Iron strapped over the corners and the door: it takes a great deal more to break it.'
+  icon: {fileID: 21300000, guid: c9db21512378b1049921c17f91751c81, type: 3}
+  fits: 0
+  buildings:
+  - {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+  - {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
+  - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  - {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
+  - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
+  - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  - {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+  - {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+  - {fileID: 11400000, guid: 4e2c9152865ef064e968287cf20d1b5f, type: 2}
+  - {fileID: 11400000, guid: 3019dc5f891f4c24f90723c22b1cde97, type: 2}
+  - {fileID: 11400000, guid: 79557d0752e9c694ebfdb0a6e647f771, type: 2}
+  - {fileID: 11400000, guid: 00ba6eab323cada479456440115e7140, type: 2}
+  - {fileID: 11400000, guid: 1b4e0a9fa52cb7d41b48c5e1bfae2ebc, type: 2}
+  - {fileID: 11400000, guid: 01ca82d04753df04d8624425213e0975, type: 2}
+  - {fileID: 11400000, guid: e26a3ab6b257d3942925a533c5c2ebda, type: 2}
+  - {fileID: 11400000, guid: 95f7d6e0cc6f5144fa85269777959d65, type: 2}
+  tier: 3
+  group: 
+  staffed: 0
+  bonus:
+    renown: 0
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0.5
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+  cost:
+  - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 4
+  essence: []
+  knownFromStart: 0

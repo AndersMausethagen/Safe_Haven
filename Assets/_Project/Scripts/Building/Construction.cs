@@ -116,6 +116,49 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         return mark;
     }
 
+    /// <summary>Adds the modules counting now to <paramref name="into"/>: fitted, standing, a Staffed one only while someone works here.</summary>
+    public void AddCounting(List<BuildingModuleDefinition> into)
+    {
+        if (fitted.Count == 0 || !IsStanding)
+        {
+            return;
+        }
+
+        bool staffed = IsStaffed;
+        foreach (BuildingModuleDefinition module in fitted)
+        {
+            if (module != null && (!module.Staffed || staffed))
+            {
+                into.Add(module);
+            }
+        }
+    }
+
+    /// <summary>
+    /// True while someone works here: a station's worker, or for a building that isn't a station (the Purification Altar) a resident
+    /// whose job's workplace is this kind of building. A Staffed module counts only then.
+    /// </summary>
+    public bool IsStaffed
+    {
+        get
+        {
+            if (TryGetComponent(out CraftingStation station))
+            {
+                return station.HasWorker;
+            }
+
+            foreach (ResidentRecord record in GameSession.Here.Residents)
+            {
+                if (record.Job != null && record.Job.Workplace == Definition && !record.WorkPaused)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
     /// <summary>The name with its level's title: "Sturdy Sawbench".</summary>
     public string Title => Level >= 2 && Definition.UpgradeTo(Level) != null ? $"{Definition.UpgradeTo(Level).title} {Definition.DisplayName}" : Definition.DisplayName;
 
@@ -135,7 +178,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
         if (fitted.Count > 0 && IsStanding)
         {
-            bool staffed = TryGetComponent(out CraftingStation station) && station.HasWorker;
+            bool staffed = IsStaffed;
             foreach (BuildingModuleDefinition module in fitted)
             {
                 if (module != null && (!module.Staffed || staffed))
@@ -268,6 +311,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         if (health != null)
         {
             health.HealthChanged += OnHealthChanged;
+            health.Damaged += OnDamaged;
         }
 
         look = new ConstructionLook(this, building);
@@ -412,6 +456,10 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         look.Celebrate();
         GameMessages.Post(first ? $"The {Definition.DisplayName} stands!" : $"The {Title} is finished!", MessageKind.Gain);
         Teach(by, first ? Definition.TeachesRecipes : Definition.UpgradeTo(Level)?.teachesRecipes);
+        if (!first)
+        {
+            BuildingModules.AnnounceLearned(Definition.UpgradeTo(Level)?.unlocksModules);
+        }
         GameObject builder = by != null ? by : Player.Current != null ? Player.Current.gameObject : null;
         GameEvents.Raise(first ? new GameEvent(GameEventKind.Built, Definition, 1, builder) : new GameEvent(GameEventKind.Upgraded, Definition, Level, builder));
 
@@ -434,6 +482,54 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         if (health != null)
         {
             health.HealthChanged -= OnHealthChanged;
+            health.Damaged -= OnDamaged;
+        }
+    }
+
+    private static bool turningBack;
+
+    // Hag's Knot (turnBackShare): a share of the harm comes back on whoever struck, never on the player's side. A blow turned back is
+    // never turned again.
+    private void OnDamaged(DamageInfo hit, DamageResult result)
+    {
+        if (turningBack || hit.Source == null || result.HealthLost <= 0f || !IsStanding)
+        {
+            return;
+        }
+
+        float share = Sum(bonus => bonus.turnBackShare);
+        if (share <= 0f || !hit.Source.TryGetComponent(out Damageable striker) || !striker.IsAlive
+            || FactionRelations.SideOf(hit.Source.gameObject)?.IsPlayerSide() == true)
+        {
+            return;
+        }
+
+        Vector3 at = striker.transform.position + Vector3.up;
+        float back = result.HealthLost * share;
+        try
+        {
+            turningBack = true;
+            striker.ApplyDamage(new DamageInfo(GetComponent<Combatant>(), null, back, DamageType.Physical, false, at, at - transform.position, 0f, HitTechnique.None));
+        }
+        finally
+        {
+            turningBack = false;
+        }
+    }
+
+    // Iron Bands (healthShare): more health while standing, kept as a share as it changes (Damageable keeps health's share of the most).
+    private void ApplyHealthShare()
+    {
+        if (health == null || !TryGetComponent(out Combatant fighter) || fighter.Stats == null)
+        {
+            return;
+        }
+
+        fighter.Stats.RemoveModifiersFrom(this);
+        float share = Sum(bonus => bonus.healthShare);
+        if (share > 0f)
+        {
+            fighter.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, share, this));
         }
     }
 
@@ -476,6 +572,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         {
             light.ExtraRadius = Sum(level => level.extraLight);
         }
+
+        ApplyHealthShare();
 
         ShowRise();
         look.Shade(rising ? Mathf.Lerp(ConstructionSettings.Current.RuinShade, 1f, Share) : shownBroken ? ConstructionSettings.Current.RuinShade : 1f);

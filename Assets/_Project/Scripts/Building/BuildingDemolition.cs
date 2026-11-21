@@ -218,6 +218,20 @@ public static class BuildingDemolition
         // Only what stood (or was being raised a tier) was counted as built; a scaffold never finished wasn't Built.
         bool counted = !building.TryGetComponent(out Construction construction) || construction.Level >= 1;
         MaterialPool.For(user).GiveBack(resources, items, user.transform);
+        // Its modules go to the store as spares, as a removed one does (BuildingModules.Remove): nothing fitted is lost.
+        int spares = 0;
+        if (construction != null)
+        {
+            foreach (BuildingModuleDefinition module in construction.Fitted)
+            {
+                if (module != null)
+                {
+                    GameSession.Home.AddSpareModule(module.Id);
+                    spares++;
+                }
+            }
+        }
+
         SaveableEntity.RemoveForGood(building.gameObject);
         if (counted)
         {
@@ -225,7 +239,8 @@ public static class BuildingDemolition
         }
         AudioManager.Play(building.Definition.DeathSound, at);
         string back = Describe(resources, items);
-        GameMessages.Post(back.Length > 0 ? $"Took down the {name}. Back: {back}." : $"Took down the {name}.", MessageKind.Gain);
+        string stored = spares > 0 ? $" Its {(spares == 1 ? "module waits" : $"{spares} modules wait")} in store, to fit again for free." : "";
+        GameMessages.Post((back.Length > 0 ? $"Took down the {name}. Back: {back}." : $"Took down the {name}.") + stored, MessageKind.Gain);
         return true;
     }
 

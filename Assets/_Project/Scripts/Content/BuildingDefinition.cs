@@ -51,6 +51,15 @@ public class BuildingBonus
     [Min(0f)] public float extraLight;
     [Tooltip("More station extensions (a bellows, a tool rack) or modules it takes (StationExtensions, BuildingModules).")]
     [Min(0)] public int extensionSlots;
+    [Tooltip("Share more health: 0.5 means half again as much (Iron Bands).")]
+    [Min(0f)] public float healthShare;
+    [Tooltip("Share harder its shots hit, for a building that fights (the Watch Post): 0.5 means half again as hard.")]
+    [Min(0f)] public float fightShare;
+    [Tooltip("Share of each blow it takes that comes back on the striker, never on a friend: 0.25 means a quarter (Hag's Knot).")]
+    [Range(0f, 1f)] public float turnBackShare;
+    [Tooltip("Share more often gear made here comes out Fine or better: 0.1 means 10 points more (Barrow-iron Anvil). With the " +
+             "station's other modules at most BuildingModules.MostLuck.")]
+    [Range(0f, 1f)] public float fineChance;
 }
 
 /// <summary>
@@ -71,6 +80,8 @@ public sealed class BuildingLevel : BuildingBonus
     [Min(0f)] public float work = 6f;
     [Tooltip("Recipes the player learns when this level is finished: Watch Post levels teach the raid runes.")]
     public List<RecipeDefinition> teachesRecipes = new List<RecipeDefinition>();
+    [Tooltip("Modules known while a building of this kind stands at this level or higher (BuildingModules.IsKnown).")]
+    public List<BuildingModuleDefinition> unlocksModules = new List<BuildingModuleDefinition>();
     [Tooltip("What must stand before this level can be ordered, besides the level below it.")]
     public List<BuildingRequirement> requires = new List<BuildingRequirement>();
     [Tooltip("Ward breaches held off first: a won defence teaches the defences their next step (the design review's 8.7, " +

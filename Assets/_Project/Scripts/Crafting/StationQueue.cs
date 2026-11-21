@@ -196,8 +196,32 @@ public sealed class StationQueue
     /// <summary>A worker's extra chance of one more here, from the station's extensions (set at home with the speed).</summary>
     public float ExtraChance { get; set; }
 
+    /// <summary>How much more often gear made here comes out Fine, from the station's modules (set at home with the speed); not saved.</summary>
+    public float FineChance { get; set; }
+
     /// <summary>The tier of the station working this queue, kept up by the station. Stations that aren't buildings have no limit.</summary>
     public int Tier { get; set; } = Tiers.Max;
+
+    /// <summary>The modules fitted to the station working this queue, kept up by the station (a recipe's Needs Module); not saved.</summary>
+    public IReadOnlyList<BuildingModuleDefinition> Modules { get; set; } = System.Array.Empty<BuildingModuleDefinition>();
+
+    public bool HasModule(BuildingModuleDefinition module)
+    {
+        if (module == null)
+        {
+            return true;
+        }
+
+        foreach (BuildingModuleDefinition fitted in Modules)
+        {
+            if (fitted == module)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>How many crafts in the queue a worker started: they aren't announced one by one, and they are the worker's work, not the
     /// player's practice (SettlementSystem). Saved with the station.</summary>

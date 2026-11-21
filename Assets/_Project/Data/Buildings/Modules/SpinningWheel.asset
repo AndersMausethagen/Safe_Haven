@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7736f9cb0a98e9b42802b13f42b9cfd8, type: 3}
+  m_Name: SpinningWheel
+  m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
+  id: module.spinningwheel
+  displayName: Spinning Wheel
+  description: 'Flax spun fine on a wheel: linen from less of it.'
+  icon: {fileID: 21300000, guid: 1f85709f97b03e34794d77959b3d0044, type: 3}
+  fits: 0
+  buildings:
+  - {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
+  tier: 1
+  group: 
+  staffed: 0
+  bonus:
+    renown: 0
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+  cost:
+  - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
+    amount: 8
+  - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+    amount: 2
+  essence: []
+  knownFromStart: 0

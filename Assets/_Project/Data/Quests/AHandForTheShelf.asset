@@ -55,6 +55,7 @@ MonoBehaviour:
   closedBy: {fileID: 0}
   startDelay: 0
   startsInAFight: 0
+  startsWithoutWaiting: 0
   onStarted: []
   objectivesInOrder: 0
   objectives:
@@ -82,6 +83,9 @@ MonoBehaviour:
     greatOnly: 0
     onlySource: 0
     source: 0
+  unlocksBuildings: []
+  unlocksModules:
+  - {fileID: 11400000, guid: 8875a443193ea1f46b9b6e4d36b3cad3, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

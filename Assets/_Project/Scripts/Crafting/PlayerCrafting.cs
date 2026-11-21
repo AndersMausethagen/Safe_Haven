@@ -114,10 +114,11 @@ public sealed class PlayerCrafting : MonoBehaviour
         return true;
     }
 
+    /// <summary>True when the player knows the recipe; one that needs a module counts only once the module is known (BuildingModules).</summary>
     public bool IsKnown(RecipeDefinition recipe)
     {
         EnsureInitialised();
-        return recipe != null && known.Contains(recipe);
+        return recipe != null && known.Contains(recipe) && (recipe.NeedsModule == null || BuildingModules.IsKnown(recipe.NeedsModule));
     }
 
     public bool IsKnown(BuildingDefinition building)

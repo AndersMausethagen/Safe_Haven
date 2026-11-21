@@ -45,6 +45,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -53,13 +56,37 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5
   buildWork: 10
   renown: 12
   upgrades:
-  - title: Whitewashed
+  - renown: 6
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 2
+    extraLogs: 0
+    beds: 2
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Whitewashed
     description: Lime on the walls, smoke from the chimney and two more beds.
     cost:
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
@@ -68,26 +95,11 @@ MonoBehaviour:
       amount: 12
     essence: []
     work: 9
-    renown: 6
-    craftSpeed: 0
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 2
-    extraLogs: 0
     teachesRecipes: []
+    unlocksModules:
+    - {fileID: 11400000, guid: 99a0056b9c9b7d7409c06f1136c50538, type: 2}
     requires: []
     breachesWon: 0
-    beds: 2
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 4
   beds: 4
   teachesRecipes: []

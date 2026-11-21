@@ -89,7 +89,53 @@ public sealed class BuildingModuleDefinition : ScriptableObject
         if (bonus.extraLight > 0f) parts.Add($"+{bonus.extraLight:0} m light");
         if (bonus.purifyYield > 0f) parts.Add($"+{bonus.purifyYield * 100f:0}% Purified Essence");
         if (bonus.renown > 0) parts.Add($"+{bonus.renown} renown");
+        if (bonus.extraGame > 0) parts.Add($"+{bonus.extraGame} game at home");
+        if (bonus.extraLogs > 0) parts.Add($"+{bonus.extraLogs} log{(bonus.extraLogs == 1 ? "" : "s")} a cut at home");
+        if (bonus.foretoldEvents > 0) parts.Add($"+{bonus.foretoldEvents} foretold event{(bonus.foretoldEvents == 1 ? "" : "s")}");
+        if (bonus.healthShare > 0f) parts.Add($"+{bonus.healthShare * 100f:0}% health");
+        if (bonus.fightShare > 0f) parts.Add($"shots {bonus.fightShare * 100f:0}% harder");
+        if (bonus.turnBackShare > 0f) parts.Add($"{bonus.turnBackShare * 100f:0}% of each blow comes back on the striker");
+        if (bonus.fineChance > 0f) parts.Add($"gear Fine {bonus.fineChance * 100f:0}% more often");
+        // What it opens at the station: a thriftier way to make something, or something new (RecipeDefinition › Needs Module).
+        ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        foreach (RecipeDefinition recipe in content != null ? content.Recipes : (IReadOnlyList<RecipeDefinition>)System.Array.Empty<RecipeDefinition>())
+        {
+            if (recipe == null || recipe.NeedsModule != this)
+            {
+                continue;
+            }
+
+            parts.Add(recipe.Replaces != null
+                ? $"{recipe.OutputAmount} {recipe.DisplayName} from {AmountText.Describe(recipe.ItemCost)} (was {AmountText.Describe(recipe.Replaces.ItemCost)})"
+                : $"makes {recipe.DisplayName} ×{recipe.OutputAmount} from {AmountText.Describe(recipe.ItemCost)}");
+        }
+
         string text = string.Join(", ", parts);
         return staffed && text.Length > 0 ? "While someone works here: " + text : text;
+    }
+
+    /// <summary>The buildings it fits, in words: "the Workshop", "the Hut or the Cottage", "any crafting station".</summary>
+    public string FitsText()
+    {
+        if (fits == ModuleFits.AnyStation)
+        {
+            return "any crafting station";
+        }
+
+        if (fits == ModuleFits.AnyBuilding)
+        {
+            return "any building";
+        }
+
+        var names = new List<string>();
+        foreach (BuildingDefinition building in buildings)
+        {
+            if (building != null)
+            {
+                names.Add("the " + building.DisplayName);
+            }
+        }
+
+        return names.Count == 0 ? "nothing" : names.Count <= 3 ? string.Join(" or ", names) : "most buildings";
     }
 }

@@ -154,7 +154,10 @@ public static class CraftedWork
 
     /// <summary>One piece of gear as this maker turns it out: its quality rolled, the condition it starts in. Anything that
     /// isn't gear is a plain stack of one.</summary>
-    public static ItemStack Make(ItemDefinition item, StatSheet maker)
+    public static ItemStack Make(ItemDefinition item, StatSheet maker) => Make(item, maker, 0f);
+
+    /// <summary>The same at a station whose modules make Fine work more likely by <paramref name="stationChance"/> (a Barrow-iron Anvil).</summary>
+    public static ItemStack Make(ItemDefinition item, StatSheet maker, float stationChance)
     {
         if (item == null || !item.HasDurability)
         {
@@ -162,7 +165,7 @@ public static class CraftedWork
         }
 
         CraftedGoods goods = Of(item);
-        ItemQuality quality = QualityFor(QualityChance(goods, maker), UnityEngine.Random.value, LevelingSettings.Current.MasterworkShare);
+        ItemQuality quality = QualityFor(QualityChance(goods, maker) + Mathf.Max(0f, stationChance), UnityEngine.Random.value, LevelingSettings.Current.MasterworkShare);
         bool armour = IsArmour(goods);
         string run = armour ? "armour" : "weapons";
         // Sure Hand: after a run of plain pieces, the next is good work for sure.
@@ -188,7 +191,10 @@ public static class CraftedWork
 
     /// <summary>Gives a crafted batch to a maker's bag: gear piece by piece as they make it, the rest as it comes, with the
     /// chance of one more. Returns how many arrived.</summary>
-    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker)
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker) => GiveTo(bag, item, amount, maker, 0f);
+
+    /// <summary>The same from a station whose modules make Fine work more likely by <paramref name="stationChance"/>.</summary>
+    public static int GiveTo(ItemInventory bag, ItemDefinition item, int amount, StatSheet maker, float stationChance)
     {
         if (bag == null || item == null || amount <= 0)
         {
@@ -215,7 +221,7 @@ public static class CraftedWork
         int given = 0;
         for (int i = 0; i < amount; i++)
         {
-            ItemStack piece = Make(item, maker);
+            ItemStack piece = Make(item, maker, stationChance);
             if (bag.GiveMade(piece, ArrivalCause.Crafted) <= 0)
             {
                 break;

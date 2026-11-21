@@ -217,11 +217,13 @@ public sealed class CraftingStation : MonoBehaviour
                 // The building's level, and the rank of the resident who works here.
                 queue.SpeedMultiplier = Speed * GameSession.Here.WorkerSpeed(Id, type);
                 queue.Tier = Tier;
+                queue.Modules = TryGetComponent(out Construction fittedTo) ? fittedTo.Fitted : System.Array.Empty<BuildingModuleDefinition>();
                 // Kept on the queue so its worker's luck holds during raids, when no station is loaded. Modules add to the extensions'
                 // luck, the two together at most BuildingModules.MostLuck (never less than the extensions alone gave).
                 float placed = Extensions(extension => extension.extraChance);
                 queue.ExtraChance = Mathf.Max(placed, Mathf.Min(BuildingModules.MostLuck, placed + Upgrades(level => level.extraChance)));
                 queue.OutputSlots = 1 + Mathf.RoundToInt(Upgrades(level => level.extraOutputSlots));
+                queue.FineChance = Mathf.Min(BuildingModules.MostLuck, Upgrades(level => level.fineChance));
             }
 
             return queue;

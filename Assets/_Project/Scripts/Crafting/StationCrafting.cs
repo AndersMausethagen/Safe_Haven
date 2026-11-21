@@ -41,6 +41,11 @@ public static class StationCrafting
             return $"Needs {queue.Type.DisplayName()} Tier {Tiers.ToRoman(recipe.RequiredStationTier)}.";
         }
 
+        if (!queue.HasModule(recipe.NeedsModule) && !Cheats.NoRequirements)
+        {
+            return $"Needs the {recipe.NeedsModule.DisplayName} fitted here (its Upgrade page).";
+        }
+
         if (recipe.SkillProblem(GameSession.Progress) is string unskilled)
         {
             return unskilled;
@@ -177,7 +182,7 @@ public static class StationCrafting
                 if (item.HasDurability)
                 {
                     StatSheet maker = user.TryGetComponent(out Combatant combatant) ? combatant.Stats : null;
-                    taken = CraftedWork.GiveTo(bag, item, taken, maker);
+                    taken = CraftedWork.GiveTo(bag, item, taken, maker, queue.FineChance);
                     queue.TakeOutput(taken);
                 }
                 else
@@ -209,6 +214,21 @@ public static class StationCrafting
     }
 
     /// <summary>The known recipes made at the station type, in recipe-book order.</summary>
+    /// <summary>
+    /// The same, as this station's list shows them: a recipe a thriftier variant beats here (RecipeVariants) is left out, so only the
+    /// better of the two is offered.
+    /// </summary>
+    public static List<RecipeDefinition> KnownRecipesFor(GameObject user, CraftingStationType type, StationQueue queue)
+    {
+        List<RecipeDefinition> recipes = KnownRecipesFor(user, type);
+        if (queue != null)
+        {
+            recipes.RemoveAll(recipe => RecipeVariants.OpenAt(recipe, queue) != recipe && recipes.Contains(RecipeVariants.OpenAt(recipe, queue)));
+        }
+
+        return recipes;
+    }
+
     public static List<RecipeDefinition> KnownRecipesFor(GameObject user, CraftingStationType type)
     {
         var recipes = new List<RecipeDefinition>();

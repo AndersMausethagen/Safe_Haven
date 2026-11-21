@@ -122,6 +122,8 @@ public sealed class SettlementState : IHavenView
 {
     [NotSaved("what stands at home, noted again from the buildings on every load there (NoteBuildings, NoteBuilt)")]
     private readonly Dictionary<BuildingDefinition, int> builtTiers = new Dictionary<BuildingDefinition, int>();
+    [NotSaved("the modules counting at home, noted again from the buildings on every load there (NoteBuildings)")]
+    private readonly List<BuildingModuleDefinition> notedModules = new List<BuildingModuleDefinition>();
     private readonly List<ResidentRecord> residents = new List<ResidentRecord>();
     private readonly List<FallenRecord> fallen = new List<FallenRecord>();
     private readonly HashSet<string> defeatedBosses = new HashSet<string>();
@@ -469,8 +471,11 @@ public sealed class SettlementState : IHavenView
     /// <summary>How far the portal has been improved (SettlementSettings.PortalLevels).</summary>
     public int PortalLevel { get; private set; }
 
-    /// <summary>What every kind of building's reached upgrades add up to, as last seen at home, where raids can't look.</summary>
-    public int UpgradeBonus(Func<BuildingLevel, int> bonus)
+    /// <summary>
+    /// What every kind of building's reached upgrades add up to, and the modules counting on every building, as last seen at home, where
+    /// raids can't look.
+    /// </summary>
+    public int UpgradeBonus(Func<BuildingBonus, int> bonus)
     {
         int total = 0;
         foreach (KeyValuePair<BuildingDefinition, int> built in builtTiers)
@@ -480,6 +485,11 @@ public sealed class SettlementState : IHavenView
                 BuildingLevel upgrade = built.Key.UpgradeTo(level);
                 total += upgrade != null ? bonus(upgrade) : 0;
             }
+        }
+
+        foreach (BuildingModuleDefinition module in notedModules)
+        {
+            total += bonus(module.Bonus);
         }
 
         return total;
@@ -522,6 +532,7 @@ public sealed class SettlementState : IHavenView
         // Seen, not decided: in a friend's Haven (co-op) the copy notes the friend's buildings too, kept through the host's word
         // (TakeOn leaves what is seen alone).
         builtTiers.Clear();
+        notedModules.Clear();
         int beds = 0;
         foreach (BuildingObject building in standing)
         {
@@ -533,6 +544,10 @@ public sealed class SettlementState : IHavenView
             bool upgrades = building.TryGetComponent(out Construction construction);
             NoteBuilt(building.Definition, upgrades ? construction.Level : 1);
             beds += building.Definition.Beds + (upgrades ? Mathf.RoundToInt(construction.Sum(level => level.beds)) : 0);
+            if (upgrades)
+            {
+                construction.AddCounting(notedModules);
+            }
         }
 
         Beds = beds;

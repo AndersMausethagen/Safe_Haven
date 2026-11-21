@@ -33,7 +33,7 @@ public static class StationMenu
                 () => StationCrafting.Collect(user, queue)) { HostOnly = true });
         }
 
-        List<RecipeDefinition> recipes = StationCrafting.KnownRecipesFor(user, station.Type);
+        List<RecipeDefinition> recipes = StationCrafting.KnownRecipesFor(user, station.Type, queue);
         foreach (RecipeDefinition recipe in recipes)
         {
             string problem = StationCrafting.Check(user, queue, recipe);

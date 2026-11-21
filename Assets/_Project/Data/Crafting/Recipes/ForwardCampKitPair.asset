@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
+  m_Name: ForwardCampKitPair
+  m_EditorClassIdentifier: SafeHaven::RecipeDefinition
+  id: forwardcampkit.pair
+  displayName: 
+  output: {fileID: 11400000, guid: e1c836a49aa3f51489c832613b421949, type: 2}
+  outputResource: {fileID: 0}
+  outputAmount: 2
+  resourceCost: []
+  itemCost:
+  - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: c7138267f80f6644fb98ef1cc46e7dab, type: 2}
+    amount: 2
+  station: 1
+  craftSeconds: 36
+  knownFromStart: 1
+  minimumStationTier: 4
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
+  sortOrder: 141
+  needsModule: {fileID: 11400000, guid: f6aed3b3f4860034495ae4ec9c069fb3, type: 2}
+  replaces: {fileID: 0}

@@ -42,9 +42,11 @@ public sealed class FoundationTests
         settlement.RecordExtraction();
         settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Settlement/Ingrid.asset"));
         settlement.AddResident(AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Bjarne.asset"));
+        // Tor's rumour comes up while his rescue is under way, which waits for Bjarne's line (Docs/RescueOrder.md, 2026-11-21).
         for (int seed = 1; seed <= 12; seed++)
         {
-            List<RaidRumourDefinition> picked = RaidRumours.For(MistyWoods, seed, settlement, null);
+            Assert.IsFalse(RaidRumours.For(MistyWoods, seed, settlement, null).Any(rumour => rumour.name == "Tor"), $"seed {seed}: not before his rescue is asked for");
+            List<RaidRumourDefinition> picked = RaidRumours.For(MistyWoods, seed, settlement, null, questsUnderWay: new[] { "rescue.tor" });
             Assert.IsTrue(picked.Any(rumour => rumour.name == "Tor"), $"seed {seed}");
         }
     }

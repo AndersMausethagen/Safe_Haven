@@ -70,7 +70,8 @@ public sealed class WatchPostArcher : MonoBehaviour
         }
 
         nextShot = Time.time + secondsBetweenShots * (IsManned ? 1f - wardenSpeedUp : 1f);
-        float damage = damagePerTier * (construction.Level - 1);
+        // Brukam's Horn and the like (fightShare): the post's shots hit harder.
+        float damage = damagePerTier * (construction.Level - 1) * (1f + construction.Sum(bonus => bonus.fightShare));
         Vector3 hit = target.transform.position + Vector3.up;
         victim.ApplyDamage(new DamageInfo(owner, null, damage, DamageType.Physical, false, hit, hit - transform.position, damage, HitTechnique.None));
         ShowShot(transform.position + Vector3.up * 4f, hit);

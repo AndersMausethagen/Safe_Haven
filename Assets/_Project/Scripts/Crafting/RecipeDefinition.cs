@@ -52,7 +52,19 @@ public sealed class RecipeDefinition : ScriptableObject
     [Tooltip("Recipes with lower values are listed first.")]
     [SerializeField] private int sortOrder;
 
+    [Header("Modules")]
+    [Tooltip("A module the station must have fitted to make it (BuildingModules): a new item, or a thriftier way to make one. It is " +
+             "shown only once the module is known. Empty: no module needed.")]
+    [SerializeField] private BuildingModuleDefinition needsModule;
+    [Tooltip("The recipe this one is a thriftier way to make (it needs Needs Module). Where this one can be made, the other is hidden " +
+             "and workers make this one instead.")]
+    [SerializeField] private RecipeDefinition replaces;
+
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    /// <summary>The module its station must have fitted, or null.</summary>
+    public BuildingModuleDefinition NeedsModule => needsModule;
+    /// <summary>The recipe this one beats where it can be made (a thrifty variant), or null.</summary>
+    public RecipeDefinition Replaces => replaces;
     public string DisplayName => !string.IsNullOrWhiteSpace(displayName) ? displayName : OutputName;
     public ItemDefinition Output => output;
     public ProficiencyDefinition RequiredSkill => requiredSkill;

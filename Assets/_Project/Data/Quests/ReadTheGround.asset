@@ -84,6 +84,8 @@ MonoBehaviour:
     onlySource: 0
     source: 2
   unlocksBuildings: []
+  unlocksModules:
+  - {fileID: 11400000, guid: 3491e1d470b2e7e49aa2559347eef78d, type: 2}
   turnInToGiver: 0
   turnInTo: 
   rewardItems: []

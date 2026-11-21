@@ -43,6 +43,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -51,13 +54,37 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 1
   outputCapacity: 10
   queueLength: 5
   buildWork: 8
   renown: 8
   upgrades:
-  - title: Joined
+  - renown: 4
+    craftSpeed: 0.15
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Joined
     description: Proper joints and a vice. It makes what tier II asks.
     cost:
     - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
@@ -68,19 +95,22 @@ MonoBehaviour:
       amount: 4
     essence: []
     work: 8
-    renown: 4
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 6
     craftSpeed: 0.15
-    extraQueue: 1
+    extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -88,7 +118,11 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Iron-Bound
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Iron-Bound
     description: Iron straps, and every tool has its place on the wall.
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
@@ -99,21 +133,25 @@ MonoBehaviour:
       amount: 8
     essence: []
     work: 10
-    renown: 6
-    craftSpeed: 0.15
-    extraQueue: 0
-    extraOutput: 0
+    teachesRecipes: []
+    unlocksModules:
+    - {fileID: 11400000, guid: f6aed3b3f4860034495ae4ec9c069fb3, type: 2}
+    requires:
+    - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+      tier: 2
+    breachesWon: 0
+  - renown: 8
+    craftSpeed: 0.2
+    extraQueue: 1
+    extraOutput: 5
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires:
-    - building: {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
-      tier: 2
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -121,7 +159,11 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Master's
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Master's
     description: 'Heartroot set in the bench: the work comes easier here.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
@@ -134,21 +176,24 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
     work: 12
-    renown: 8
-    craftSpeed: 0.2
+    teachesRecipes: []
+    unlocksModules: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    breachesWon: 0
+  - renown: 12
+    craftSpeed: 0.25
     extraQueue: 1
-    extraOutput: 5
+    extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires:
-    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
-      tier: 3
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -156,7 +201,11 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Haven's Own
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Haven's Own
     description: The best-kept workshop this side of the portal.
     cost:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
@@ -171,28 +220,12 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 30
     work: 14
-    renown: 12
-    craftSpeed: 0.25
-    extraQueue: 1
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
     teachesRecipes: []
+    unlocksModules: []
     requires:
     - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
       tier: 4
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

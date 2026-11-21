@@ -75,7 +75,8 @@ public static class WorkerProduction
     /// <summary>Why this order isn't being worked on now, for the player; null when it could be.</summary>
     public static string WhyNot(WorkOrder order, StationQueue queue, StashStorage stash)
     {
-        RecipeDefinition recipe = order.recipe;
+        // The thriftier variant where its module is fitted (RecipeVariants): a worker at a Frame Saw cuts planks as the player would.
+        RecipeDefinition recipe = RecipeVariants.OpenAt(order.recipe, queue);
         if (recipe == null || !recipe.HasOutput)
         {
             return "nothing to make";
@@ -84,6 +85,11 @@ public static class WorkerProduction
         if (recipe.RequiredStationTier > queue.Tier)
         {
             return $"needs Tier {Tiers.ToRoman(recipe.RequiredStationTier)}";
+        }
+
+        if (!queue.HasModule(recipe.NeedsModule))
+        {
+            return $"needs the {recipe.NeedsModule.DisplayName}";
         }
 
         if (StockOf(recipe, queue, stash) >= order.stockTarget)
@@ -125,17 +131,18 @@ public static class WorkerProduction
                 continue;
             }
 
-            foreach (ItemAmount cost in order.recipe.ItemCost)
+            RecipeDefinition recipe = RecipeVariants.OpenAt(order.recipe, queue);
+            foreach (ItemAmount cost in recipe.ItemCost)
             {
                 stash.Items.Remove(cost.Item, cost.Amount);
             }
 
-            foreach (ResourceAmount cost in order.recipe.ResourceCost)
+            foreach (ResourceAmount cost in recipe.ResourceCost)
             {
                 stash.Resources.Remove(cost.Resource, cost.Amount);
             }
 
-            queue.Enqueue(order.recipe);
+            queue.Enqueue(recipe);
             queue.WorkerCrafts++;
             return;
         }

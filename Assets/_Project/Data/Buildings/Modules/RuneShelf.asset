@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7736f9cb0a98e9b42802b13f42b9cfd8, type: 3}
+  m_Name: RuneShelf
+  m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
+  id: module.runeshelf
+  displayName: Rune Shelf
+  description: 'A shelf of marked jars by the cauldron: now and then a draught more than the batch.'
+  icon: {fileID: 21300000, guid: df2c0330200f4a649aa8e1ce0cff5d61, type: 3}
+  fits: 0
+  buildings:
+  - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  tier: 2
+  group: 
+  staffed: 0
+  bonus:
+    renown: 0
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0.1
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+  cost:
+  - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 6
+  - item: {fileID: 11400000, guid: 4f80b5d6098abc64b903316903de5b64, type: 2}
+    amount: 4
+  - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 2
+  essence: []
+  knownFromStart: 0

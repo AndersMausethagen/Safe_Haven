@@ -69,7 +69,8 @@ public static class ContentAudit
         "JobDefinition.teachesRecipes", "LootOnDeath.unlocksRecipes", "MonsterDefinition.unlocksRecipes", "QuestDefinition.rewardRecipes",
     };
 
-    private static readonly string[] RecipeNeither = { "RecipeBook.recipes", "JobDefinition.workOrders" };
+    // A thrifty variant names the recipe it beats where its module is fitted (RecipeVariants): it neither teaches nor asks for it.
+    private static readonly string[] RecipeNeither = { "RecipeBook.recipes", "JobDefinition.workOrders", "RecipeDefinition.replaces" };
 
     // A quest's Unlocks Buildings teaches them as it starts (BuildingGate, the quest flow review's C2).
     private static readonly string[] BuildingTeachers = { "ItemDefinition.teachesBuildings", "JobDefinition.teachesBuildings", "QuestDefinition.unlocksBuildings" };
@@ -85,6 +86,8 @@ public static class ContentAudit
         "BuildingDefinition.extends", "YardRoleDefinition.needs[].anyOf[]",
         // The gate a wall piece can become (WallUpgrades): taught as a building on its own.
         "BuildingDefinition.gateVersion",
+        // The buildings a module fits (BuildingModules): it needs one standing, and teaches none.
+        "BuildingModuleDefinition.buildings",
         // What standing near a home makes it better (HomeLifeSettings › Features).
         "HomeLifeSettings.features[].near[]",
     };

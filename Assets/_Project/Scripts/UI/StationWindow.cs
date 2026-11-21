@@ -292,11 +292,18 @@ public sealed class StationWindow : MonoBehaviour
         }
 
         StationQueue queue = station.Queue;
-        List<RecipeDefinition> known = StationCrafting.KnownRecipesFor(user, station.Type);
+        List<RecipeDefinition> known = StationCrafting.KnownRecipesFor(user, station.Type, queue);
         known.Sort(RecipeBook.CompareForDisplay);
-        if (known.Count != knownCount)
+        // Which recipes, not only how many: a module fitted swaps a recipe for its thriftier variant and the count stays.
+        int mark = known.Count;
+        foreach (RecipeDefinition recipe in known)
         {
-            knownCount = known.Count;
+            mark = unchecked(mark * 31 + recipe.Id.GetHashCode());
+        }
+
+        if (mark != knownCount)
+        {
+            knownCount = mark;
             recipes.Show(new StationMaker(user, queue), known);
         }
         else

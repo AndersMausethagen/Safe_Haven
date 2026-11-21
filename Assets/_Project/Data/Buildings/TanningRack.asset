@@ -45,6 +45,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -53,13 +56,37 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 10
   outputCapacity: 10
   queueLength: 5
   buildWork: 8
   renown: 8
   upgrades:
-  - title: Drying Racks
+  - renown: 4
+    craftSpeed: 0.2
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 1
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Drying Racks
     description: 'Racks in the yard and a place to hang a bow: Hunter''s Bows, better leather from the same hide, and more game at home.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
@@ -74,27 +101,35 @@ MonoBehaviour:
       amount: 2
     essence: []
     work: 8
-    renown: 4
+    teachesRecipes: []
+    unlocksModules:
+    - {fileID: 11400000, guid: 40a13db6d80510d4cb31222bdf821f42, type: 2}
+    requires: []
+    breachesWon: 0
+  - renown: 6
     craftSpeed: 0.2
-    extraQueue: 1
+    extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
     extraTonicSlots: 0
-    extraGame: 1
+    extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Smokehouse
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Smokehouse
     description: 'It keeps the flies off and the deer coming: Elderwood Longbows and more leather from thick hide.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
@@ -107,27 +142,34 @@ MonoBehaviour:
       amount: 2
     essence: []
     work: 10
-    renown: 6
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 8
     craftSpeed: 0.2
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
     extraTonicSlots: 0
-    extraGame: 0
+    extraGame: 1
     extraLight: 0
     extensionSlots: 0
-  - title: Moon Racks
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Moon Racks
     description: 'Moonsilver wire on the racks: Moonstrung Bows, and game wanders close.'
     cost:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
@@ -138,29 +180,36 @@ MonoBehaviour:
       amount: 4
     essence: []
     work: 12
-    renown: 8
-    craftSpeed: 0.2
+    teachesRecipes: []
+    unlocksModules: []
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 3
+    breachesWon: 0
+  - renown: 12
+    craftSpeed: 0.25
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires:
-    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
-      tier: 3
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
     extraTonicSlots: 0
-    extraGame: 1
+    extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Troll Hall
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Troll Hall
     description: 'Horn over the door, and nothing here is afraid any more: Trollhorn Bows.'
     cost:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
@@ -173,28 +222,12 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20
     work: 14
-    renown: 12
-    craftSpeed: 0.25
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
     teachesRecipes: []
+    unlocksModules: []
     requires:
     - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
       tier: 4
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

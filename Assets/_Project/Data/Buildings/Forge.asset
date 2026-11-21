@@ -45,6 +45,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 1
   extends: {fileID: 0}
   extensionReach: 6
@@ -53,13 +56,37 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 3
   outputCapacity: 10
   queueLength: 5
   buildWork: 10
   renown: 10
   upgrades:
-  - title: Copper Fire
+  - renown: 6
+    craftSpeed: 0.15
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Copper Fire
     description: 'A hotter fire and a first real anvil: copper tools and gear.'
     cost:
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
@@ -70,27 +97,34 @@ MonoBehaviour:
       amount: 8
     essence: []
     work: 9
-    renown: 6
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 8
     craftSpeed: 0.15
-    extraQueue: 1
+    extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
     extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
-    extensionSlots: 0
-  - title: Iron Fire
+    extensionSlots: 1
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Iron Fire
     description: 'Bellows that breathe on their own: iron tools and gear.'
     cost:
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
@@ -101,31 +135,39 @@ MonoBehaviour:
       amount: 8
     essence: []
     work: 11
-    renown: 8
-    craftSpeed: 0.15
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
     teachesRecipes: []
+    unlocksModules:
+    - {fileID: 11400000, guid: 6eca113538be87c4eb087939610de778, type: 2}
     requires:
     - building: {fileID: 11400000, guid: 27159a7266bda614cbc6774955749e0e, type: 2}
       tier: 1
     - building: {fileID: 11400000, guid: 6439e52b4c107bd478aa3e11a3ff7aec, type: 2}
       tier: 1
     breachesWon: 0
+  - renown: 10
+    craftSpeed: 0.2
+    extraQueue: 1
+    extraOutput: 5
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
     extraTonicSlots: 0
     extraGame: 0
     extraLight: 0
-    extensionSlots: 1
-  - title: Moon Fire
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Moon Fire
     description: 'A fire that burns white: moonsilver gear.'
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
@@ -142,21 +184,24 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
     work: 13
-    renown: 10
-    craftSpeed: 0.2
+    teachesRecipes: []
+    unlocksModules: []
+    requires:
+    - building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
+      tier: 2
+    breachesWon: 0
+  - renown: 14
+    craftSpeed: 0.25
     extraQueue: 1
-    extraOutput: 5
+    extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires:
-    - building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
-      tier: 2
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -164,7 +209,11 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Trollfire
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+    title: Trollfire
     description: An anvil of trollstone, and nothing out there it can't work.
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
@@ -177,28 +226,12 @@ MonoBehaviour:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 40
     work: 15
-    renown: 14
-    craftSpeed: 0.25
-    extraQueue: 1
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
     teachesRecipes: []
+    unlocksModules: []
     requires:
     - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
       tier: 4
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

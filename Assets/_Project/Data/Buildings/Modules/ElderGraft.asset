@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7736f9cb0a98e9b42802b13f42b9cfd8, type: 3}
+  m_Name: ElderGraft
+  m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
+  id: module.eldergraft
+  displayName: Elder Graft
+  description: A cutting of the guardian's root grafted to the lodge's post. Trees felled at home give more.
+  icon: {fileID: 21300000, guid: c89e18fea293da44da2d8281824405c0, type: 3}
+  fits: 0
+  buildings:
+  - {fileID: 11400000, guid: 1fe15b30940bf7049a4e4966e9954e1b, type: 2}
+  tier: 3
+  group: 
+  staffed: 0
+  bonus:
+    renown: 0
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 1
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    fineChance: 0
+  cost:
+  - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
+    amount: 1
+  - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
+    amount: 4
+  essence: []
+  knownFromStart: 0

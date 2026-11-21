@@ -109,6 +109,8 @@ MonoBehaviour:
     source: 2
   unlocksBuildings:
   - {fileID: 11400000, guid: a10bf06ba7306584f8632f492a16fdac, type: 2}
+  unlocksModules:
+  - {fileID: 11400000, guid: 95b03d70c6593804fa61941c299caeee, type: 2}
   turnInToGiver: 1
   turnInTo: Ingrid
   rewardItems: []
