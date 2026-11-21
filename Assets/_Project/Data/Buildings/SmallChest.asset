@@ -32,16 +32,60 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 0.5
   yardSide: 1
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 2
+  buildWork: 5
   renown: 2
   upgrades:
-  - title: Bound
+  - renown: 2
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 4
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Bound
     description: Iron bands and a sturdier lid.
     cost:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
@@ -49,24 +93,11 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 9f085f39a2da68c45b58d2db986835f4, type: 2}
       amount: 8
     essence: []
-    work: 7
-    renown: 2
-    craftSpeed: 0
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 4
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 42
     teachesRecipes: []
+    unlocksModules: []
     requires: []
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraGame: 0
-    extraLight: 0
+    breachesWon: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

@@ -9,6 +9,11 @@ using UnityEngine.AI;
 /// (HouseDoor) brings them out to talk, and they go back in after. What they do when is
 /// ResidentRoutine and Settlement Settings › Daily Life; the gesture for a job is on its JobDefinition. Added by ResidentNpc. Where
 /// the ground has no NavMesh they go straight to their place, as there is no way to walk there.
+/// <para>The builders (HomeLifeSettings › Builders: the Carpenter and Mason) hammer the paid-for scaffolds at home in their working hours
+/// (the Keeper's view, Docs/ColonyModeResearch_2026-11-21.md: walls and buildings rise while the player is home too, not only while
+/// away), the nearest with room for one more, at <see cref="BuildRate"/>; work is added only in the game that keeps the Haven. They keep
+/// out of deep water (DeepWater), and one who is stuck finds a fresh way before being put where they were going, and isn't put there in
+/// plain sight of the Keeper's view (<see cref="Warps"/> counts those that were).</para>
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(ResidentNpc))]
@@ -21,6 +26,9 @@ public sealed class ResidentLife : MonoBehaviour
     private const float RingRadius = 2.4f;
     private const float WorkmateGap = 1.2f;
     private const float GuardRadius = 6f;
+    // How many builders hammer at one scaffold at once; the next goes to another.
+    private const int BuildersPerSite = 3;
+    private const float BuildSpotGap = 0.8f;
     // Woken by a knock: how long they stand at the door for the player, and how long they linger after a talk.
     private const float AwakeSeconds = 12f;
     private const float AfterTalkSeconds = 2.5f;
@@ -50,6 +58,10 @@ public sealed class ResidentLife : MonoBehaviour
     private ResidentDefender defender;
     // The house they are asleep in (hidden inside, its window lit), and what was switched off to hide them.
     private BuildingObject insideOf;
+    // The scaffold a builder is hammering at home, or null.
+    private Construction building;
+    private bool repathed;
+    private Renderer body;
     private BuildingObject sleepsIn;
     private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
     private readonly List<Collider> hiddenColliders = new List<Collider>();
@@ -74,6 +86,7 @@ public sealed class ResidentLife : MonoBehaviour
 
     private void OnEnable()
     {
+        Living.Add(this);
         HavenHomes.Changed += Refresh;
         HavenHomes.NoteIndoors(insideOf, true);
     }
@@ -81,6 +94,8 @@ public sealed class ResidentLife : MonoBehaviour
     // Switched off (the scene going) while asleep inside: the house no longer counts them, and they stay as they are.
     private void OnDisable()
     {
+        Living.Remove(this);
+        building = null;
         HavenHomes.Changed -= Refresh;
         HavenHomes.NoteIndoors(insideOf, false);
     }
@@ -114,9 +129,13 @@ public sealed class ResidentLife : MonoBehaviour
 
         clock = FindAnyObjectByType<DayNightCycle>();
         SettlementSettings settings = SettlementSettings.Current;
-        if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+        body = GetComponentInChildren<SkinnedMeshRenderer>();
+        // People don't swim: deep water is left out of their way (DeepWater, as for creatures since the 2026-11-21 playtest).
+        int walkable = DeepWater.MaskFor(NavMesh.AllAreas, false);
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 4f, walkable))
         {
             agent = gameObject.AddComponent<NavMeshAgent>();
+            agent.areaMask = walkable;
             agent.radius = 0.35f;
             agent.height = 1.8f;
             agent.speed = settings.ResidentWalkSpeed;
@@ -305,7 +324,17 @@ public sealed class ResidentLife : MonoBehaviour
             danger = false;
         }
         ResidentActivity next = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, hasWorkplace, danger), hour, PlayerWarmth.ColdNow());
-        bool freeToGo = next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom);
+        // A builder with a scaffold waiting builds in working hours rather than standing at their workplace, going out or, with no
+        // workplace built yet, sitting at the fire.
+        bool workTime = ResidentRoutine.InTheCold(ResidentRoutine.Decide(hour, settings.ResidentHours, true, danger), hour, PlayerWarmth.ColdNow())
+            == ResidentActivity.Work;
+        Construction scaffold = workTime && Festivals.Now == null ? ScaffoldToBuild() : null;
+        if (scaffold != null)
+        {
+            next = ResidentActivity.Work;
+        }
+
+        bool freeToGo = scaffold == null && (next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom));
         if (freeToGo && GoingOut(hour, out Vector3 outTo, out Quaternion outFacing))
         {
             next = ResidentActivity.Outing;
@@ -317,10 +346,18 @@ public sealed class ResidentLife : MonoBehaviour
         {
             next = ResidentActivity.Fire; // everyone to the festival's bonfire
         }
-        if (next == activity && started && !atOnce && !again)
+        if (next != ResidentActivity.Work)
+        {
+            scaffold = null;
+        }
+
+        if (next == activity && scaffold == building && started && !atOnce && !again)
         {
             return;
         }
+
+        building = scaffold;
+        repathed = false;
 
         // Their house, if one is theirs: they sleep inside it, going in at its door.
         bool housed = npc.TryGetHome(out Vector3 door, out Quaternion outward, out BuildingObject house);
@@ -333,6 +370,9 @@ public sealed class ResidentLife : MonoBehaviour
         sleepsIn = next == ResidentActivity.Sleep && housed ? house : null;
         switch (next)
         {
+            case ResidentActivity.Work when building != null:
+                place = BuildSpot(building, out facing);
+                break;
             case ResidentActivity.Work:
                 place = workSpot + workFacing * Vector3.right * workShift;
                 facing = workFacing;
@@ -409,12 +449,26 @@ public sealed class ResidentLife : MonoBehaviour
     // from where creatures gather. Found once per scene.
     private static readonly List<(Vector3 at, Vector3 lookAt)> OutingSpots = new List<(Vector3, Vector3)>();
 
+    // Everyone living their day here, to share out the scaffolds.
+    private static readonly List<ResidentLife> Living = new List<ResidentLife>();
+
+    /// <summary>How many times someone stuck was put where they were going, this session (probes: few is good).</summary>
+    public static int Warps { get; private set; }
+
+    /// <summary>True while hammering (or walking to) a scaffold at home.</summary>
+    public bool IsBuilding => building != null && activity == ResidentActivity.Work;
+
+    /// <summary>The scaffold they are working on, or null.</summary>
+    public Construction Building => IsBuilding ? building : null;
+
     // Entering Play doesn't reload scripts in this project, so statics are cleared when it starts.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {
         OutingSpots.Clear();
         outingSpotsScene = default;
+        Living.Clear();
+        Warps = 0;
     }
     private static UnityEngine.SceneManagement.Scene outingSpotsScene;
 
@@ -543,6 +597,22 @@ public sealed class ResidentLife : MonoBehaviour
         }
         else if (Time.time - stuckSince >= StuckSeconds)
         {
+            // First a fresh way there (something may have been built across the old one); only then put there, and not in plain
+            // sight of the Keeper's view, where someone blinking across the Haven shows (Docs/ColonyModeResearch_2026-11-21.md 3.2).
+            if (!repathed && agent.isOnNavMesh && NavMesh.SamplePosition(place, out NavMeshHit nearer, 6f, agent.areaMask))
+            {
+                repathed = true;
+                stuckSince = Time.time;
+                agent.SetDestination(nearer.position);
+                return;
+            }
+
+            if (KeeperView.IsOpen && body != null && body.isVisible && Time.time - stuckSince < StuckSeconds * 4f)
+            {
+                return;
+            }
+
+            Warps++;
             PutThere();
         }
     }
@@ -628,6 +698,11 @@ public sealed class ResidentLife : MonoBehaviour
     private void GetOnWithIt()
     {
         transform.rotation = Quaternion.RotateTowards(transform.rotation, facing, TalkTurnSpeed * Time.deltaTime);
+        if (IsBuilding && !Hammer())
+        {
+            return;
+        }
+
         JobDefinition job = activity == ResidentActivity.Work ? npc.Job : null;
         if (job != null && job.WorkSound != null)
         {
@@ -683,6 +758,96 @@ public sealed class ResidentLife : MonoBehaviour
                 : Random.value < 0.2f ? Time.time + Random.Range(2f, 4f) : Time.time + Random.Range(0.1f, 0.5f);
         }
     }
+
+    // ----- Building at home -----
+
+    // The scaffold this builder should work on: the one they are on while it needs work, else the nearest paid-for one with room.
+    private Construction ScaffoldToBuild()
+    {
+        if (HavenVisit.IsVisiting || !ResidentBuilders.Builds(npc.Record))
+        {
+            return null;
+        }
+
+        if (building != null && NeedsHands(building))
+        {
+            return building;
+        }
+
+        Construction best = null;
+        float bestDistance = float.MaxValue;
+        foreach (BuildingObject standing in BuildingObject.Active)
+        {
+            if (standing == null || !standing.TryGetComponent(out Construction site) || !NeedsHands(site) || BuildersOn(site) >= BuildersPerSite)
+            {
+                continue;
+            }
+
+            float distance = (standing.transform.position - transform.position).sqrMagnitude;
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                best = site;
+            }
+        }
+
+        return best;
+    }
+
+    private static bool NeedsHands(Construction site) => site != null && site.Paid && site.WorkLeft > 0f;
+
+    private static int BuildersOn(Construction site)
+    {
+        int count = 0;
+        foreach (ResidentLife life in Living)
+        {
+            count += life.building == site ? 1 : 0;
+        }
+
+        return count;
+    }
+
+    // Beside the scaffold on the side nearest them, facing it.
+    private Vector3 BuildSpot(Construction site, out Quaternion facingIt)
+    {
+        Vector3 centre = site.transform.position;
+        Vector3 edge = site.TryGetComponent(out Collider box) && box.enabled ? box.ClosestPoint(transform.position) : centre;
+        Vector3 outward = edge - centre;
+        outward.y = 0f;
+        if (outward.sqrMagnitude < 0.01f)
+        {
+            outward = transform.position - centre;
+            outward.y = 0f;
+        }
+
+        outward = outward.sqrMagnitude > 0.0001f ? outward.normalized : Vector3.forward;
+        facingIt = Quaternion.LookRotation(-outward);
+        return edge + outward * BuildSpotGap;
+    }
+
+    // One frame of hammering: false (and a new plan) once the scaffold stands or the work was taken from them.
+    private bool Hammer()
+    {
+        if (!NeedsHands(building))
+        {
+            building = null;
+            Decide(false, true);
+            return false;
+        }
+
+        // Only the game that keeps the Haven counts the work (co-op: a friend's copy shows them hammering).
+        if (!HavenVisit.IsVisiting)
+        {
+            building.AddWork(Time.deltaTime * BuildRate(npc.Record));
+        }
+
+        return true;
+    }
+
+    /// <summary>Seconds of hammering a builder puts in each second at home: HomeLifeSettings › Builder Work Per Second and their home's
+    /// work bonus (HomeLife), so a good home makes a quicker builder.</summary>
+    public static float BuildRate(ResidentRecord record) =>
+        HomeLifeSettings.Current.BuilderWorkPerSecond * (1f + (record != null ? HomeLife.WorkBonus(record) : 0f));
 
     /// <summary>
     /// A knock at the door of the house they are asleep in (HouseDoor): they come out to the door and stand there a while for

@@ -32,9 +32,29 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
   requiredRank: 0
+  modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5

@@ -245,6 +245,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             gameObject.AddComponent<Footpaths>();
         }
 
+        // The Keeper's view: running the Haven from above (Docs/ColonyModeResearch_2026-11-21.md). Only where the Haven is.
+        if (!TryGetComponent(out KeeperView _))
+        {
+            gameObject.AddComponent<KeeperView>();
+        }
+
         interactable = GetComponent<Interactable>();
         raid = GetComponent<RaidPortal>();
         station = GetComponent<CraftingStation>();

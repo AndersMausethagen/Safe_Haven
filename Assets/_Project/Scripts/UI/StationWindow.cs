@@ -149,6 +149,8 @@ public sealed class StationWindow : MonoBehaviour
     private int[] outputAmounts = new int[0];
     private Image progressImage;
     private TMP_Text collectLabel;
+    // Opened from the Keeper's view: no collecting into the bag from afar.
+    private bool fromAfar;
     private UIRole collectRole;
     private bool anyoneCouldWorkHere;
 
@@ -177,10 +179,17 @@ public sealed class StationWindow : MonoBehaviour
     public bool IsOpen => window != null && window.IsOpen;
 
     /// <summary>Opens the window for a station. It closes when the user is further than maxDistance meters from it.</summary>
-    public void Open(CraftingStation source, GameObject viewer, float maxDistance)
+    public void Open(CraftingStation source, GameObject viewer, float maxDistance) => Open(source, viewer, maxDistance, false);
+
+    /// <summary>
+    /// Opens it from the Keeper's view (<paramref name="afar"/>): at any distance, to queue and watch. What is made stays in the
+    /// station's output until someone collects it there: taken into the bag from across the Haven it would arrive by magic.
+    /// </summary>
+    public void Open(CraftingStation source, GameObject viewer, float maxDistance, bool afar)
     {
         station = source;
         user = viewer;
+        fromAfar = afar;
         shownOutput = source.Queue.OutputAmount;
         crafting = viewer != null ? viewer.GetComponent<PlayerCrafting>() : null;
         range = maxDistance;
@@ -562,8 +571,9 @@ public sealed class StationWindow : MonoBehaviour
         outputLabel.text = thing != null
             ? $"Output  <color=#{Muted}>{queue.OutputAmount}/{queue.Capacity} {name}</color>"
             : $"Output  <color=#{Muted}>empty (holds {queue.Capacity})</color>";
-        collectButton.interactable = thing != null && !HavenVisit.IsHostsToDecide;
+        collectButton.interactable = thing != null && !HavenVisit.IsHostsToDecide && !fromAfar;
         collectLabel.text = thing == null ? "Nothing to collect"
+            : fromAfar ? $"{queue.OutputAmount} {name} waiting here"
             : HavenVisit.IsHostsToDecide ? $"{(string.IsNullOrEmpty(HavenVisit.HostName) ? "Your friend" : HavenVisit.HostName)}'s to collect" : $"Collect {queue.OutputAmount} {name}";
         // While it holds the queue up, collecting is the one thing to do.
         UIRole.Kind role = queue.Blocked ? UIRole.Kind.PrimaryButton : UIRole.Kind.Button;
@@ -651,6 +661,12 @@ public sealed class StationWindow : MonoBehaviour
         // The output slot clicked in a friend's Haven: said whose it is, not shaken as if the bag were full.
         if (station != null && HavenVisit.LeftToHost())
         {
+            return;
+        }
+
+        if (fromAfar)
+        {
+            GameMessages.Post("Collect it at the station: from the Keeper's view you can queue and watch.", MessageKind.Warning);
             return;
         }
 

@@ -44,13 +44,14 @@ public sealed class HudGivesWay : MonoBehaviour
         host.AddComponent<HudGivesWay>();
     }
 
-    /// <summary>True while a window covers the screen, so the HUD stands aside (a conversation doesn't).</summary>
+    /// <summary>True while a window covers the screen, so the HUD stands aside (a conversation doesn't), and while the Keeper's view
+    /// is open: the character's vitals, bars and tracker are for playing them, and the view shows its own strip.</summary>
     public static bool Covered
     {
         get
         {
             UIStateManager ui = UIStateManager.Current;
-            return ui != null && ui.IsAnyWindowOpen && !ui.OnlyOpen(UIWindowId.Dialogue);
+            return (ui != null && ui.IsAnyWindowOpen && !ui.OnlyOpen(UIWindowId.Dialogue)) || KeeperView.IsOpen;
         }
     }
 

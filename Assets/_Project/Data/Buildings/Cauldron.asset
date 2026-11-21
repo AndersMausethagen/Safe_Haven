@@ -43,6 +43,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -51,13 +54,38 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 4
   outputCapacity: 10
   queueLength: 5
-  buildWork: 5
+  buildWork: 25
   renown: 6
   upgrades:
-  - title: Drying Hooks
+  - renown: 4
+    craftSpeed: 0.3
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Drying Hooks
     description: 'A hook to hang herbs to dry: Greater Healing Draughts and Swiftfoot Tonic.'
     cost:
     - item: {fileID: 11400000, guid: 8ae2883815327b74fa7975309c803f92, type: 2}
@@ -69,28 +97,36 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: a05ec5c068d801f4ca366a23e00a7460, type: 2}
       amount: 4
     essence: []
-    work: 8
-    renown: 4
+    work: 48
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 6
     craftSpeed: 0.3
-    extraQueue: 0
+    extraQueue: 2
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
-    extraTonicSlots: 0
+    extraTonicSlots: 1
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Master's Shelf
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Master's Shelf
     description: 'What the deep woods ask for: Radiant Draught, Ironbark and Frostward.'
     cost:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
@@ -100,29 +136,13 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
-    work: 9
-    renown: 6
-    craftSpeed: 0.3
-    extraQueue: 2
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 54
     teachesRecipes: []
+    unlocksModules: []
     requires:
     - building: {fileID: 11400000, guid: dd9792482f40fc243a8d7294434f1ee9, type: 2}
       tier: 2
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 1
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

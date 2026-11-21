@@ -619,6 +619,14 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             return;
         }
 
+        // From the Keeper's view the spot is the middle of the screen: the left stick pans the view, and the spot with it.
+        if (KeeperView.IsOpen)
+        {
+            CameraPointer.PadTarget = KeeperView.Current.Focus;
+            padSpotPlaced = false;
+            return;
+        }
+
         ControllerSettings settings = ControllerSettings.Current;
         Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up).normalized;
         Vector3 right = Vector3.ProjectOnPlane(view.transform.right, Vector3.up).normalized;

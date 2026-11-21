@@ -28,6 +28,7 @@ public sealed class InputActionsTests : InputTestFixture
 
         wasEnabled = actions.enabled;
         actions.Enable();
+        GameInput.ForgetPresses();
         // Prompts start from the keyboard, with the pad's kind followed rather than pinned.
         controllerButtons = GameOptions.ControllerButtons.Value;
         GameOptions.ControllerButtons.Value = 0f;

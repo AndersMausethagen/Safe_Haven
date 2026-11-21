@@ -41,6 +41,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -49,34 +52,25 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 8
+  buildWork: 60
   renown: 10
   upgrades:
-  - title: Carved
-    description: 'Runes cut deep around the basin: a quarter more Purified Essence from the same curse.'
-    cost:
-    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 24
-    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
-      amount: 4
-    essence: []
-    work: 9
-    renown: 6
+  - renown: 6
     craftSpeed: 0.25
     extraQueue: 0
     extraOutput: 0
     extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0.25
     extraMealSlots: 0
@@ -84,7 +78,49 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Radiant
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Carved
+    description: 'Runes cut deep around the basin: a quarter more Purified Essence from the same curse.'
+    cost:
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 24
+    - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 4
+    essence: []
+    work: 54
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 8
+    craftSpeed: 0.25
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0.25
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Radiant
     description: It hums softly at night, and hardly anything is wasted.
     cost:
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
@@ -96,27 +132,11 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
-    work: 10
-    renown: 8
-    craftSpeed: 0.25
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 60
     teachesRecipes: []
+    unlocksModules: []
     requires: []
     breachesWon: 0
-    beds: 0
-    purifyYield: 0.25
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

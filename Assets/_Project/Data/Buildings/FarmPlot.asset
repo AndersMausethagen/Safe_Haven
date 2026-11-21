@@ -33,16 +33,59 @@ MonoBehaviour:
     tier: 1
   requiredRank: 0
   modelScale: 1
+  modelHeight: 1
   yardDepth: 0
   yardSide: 0
   placeInLines: 0
+  decoration: 0
+  pathSpeed: 1
+  paved: 0
+  pathDecal: {fileID: 0}
+  encloses: 0
+  isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
+  extensionSlots: 0
+  extends: {fileID: 0}
+  extensionReach: 6
+  extensionBonus:
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraChance: 0
+  extensionGroup: 
   station: 11
   outputCapacity: 10
   queueLength: 5
-  buildWork: 3
+  buildWork: 8
   renown: 4
   upgrades:
-  - title: Tended
+  - renown: 2
+    craftSpeed: 0.3
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Tended
     description: Stone edging and compost.
     cost:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
@@ -50,24 +93,11 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
       amount: 12
     essence: []
-    work: 7
-    renown: 2
-    craftSpeed: 0.3
-    extraQueue: 1
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 42
     teachesRecipes: []
+    unlocksModules: []
     requires: []
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraGame: 0
-    extraLight: 0
+    breachesWon: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

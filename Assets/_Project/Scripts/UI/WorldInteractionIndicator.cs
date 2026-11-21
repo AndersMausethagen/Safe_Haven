@@ -78,7 +78,7 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
     {
         viewCamera = viewCamera != null && viewCamera.isActiveAndEnabled ? viewCamera : Camera.main;
         if (interactor == null || !interactor.isActiveAndEnabled || (health != null && !health.IsAlive) || IsOccupied
-            || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || viewCamera == null)
+            || (UIStateManager.Current != null && UIStateManager.Current.IsAnyWindowOpen) || viewCamera == null || KeeperView.IsOpen)
         {
             Hide();
         }

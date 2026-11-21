@@ -391,6 +391,9 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         }
 
         Work = Mathf.Min(WorkNeeded, Work + Time.deltaTime * workSpeed);
+        // Builders hammering beside the player (ResidentLife: the Carpenter and Mason at home) add their own work (AddWork): the
+        // player's bar is what is left at their own pace, so it shortens as the others help, as work adds up in Palworld.
+        siteInteractable.Duration = siteInteractable.Progress * siteInteractable.Duration + Mathf.Max(0f, WorkNeeded - Work) / workSpeed;
         ShowRise();
         if (Time.time >= nextBlow)
         {
@@ -471,10 +474,19 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         else
         {
             ShowRise();
+            // A builder's blows are heard and seen too, not only the player's.
+            if (Application.isPlaying && Time.time >= nextBlow)
+            {
+                nextBlow = Time.time + ConstructionSettings.Current.BlowInterval;
+                look.HammerBlow();
+            }
         }
 
         return used;
     }
+
+    /// <summary>Seconds of hammering still needed to finish what is under way (0 when nothing is).</summary>
+    public float WorkLeft => IsBuilding || IsFitting ? Mathf.Max(0f, WorkNeeded - Work) : 0f;
 
     /// <summary>True while Finished is raised for work others did (ResidentBuilders): it trains nobody's Construction, as
     /// workers' orders train nobody's crafts. The player got full Construction practice for buildings finished while away.</summary>

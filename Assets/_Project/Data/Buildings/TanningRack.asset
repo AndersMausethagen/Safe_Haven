@@ -60,7 +60,7 @@ MonoBehaviour:
   station: 10
   outputCapacity: 10
   queueLength: 5
-  buildWork: 8
+  buildWork: 60
   renown: 8
   upgrades:
   - renown: 4
@@ -85,6 +85,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Drying Racks
     description: 'Racks in the yard and a place to hang a bow: Hunter''s Bows, better leather from the same hide, and more game at home.'
@@ -100,7 +101,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: f502c59e5645f1c4f98fbca7982042d4, type: 2}
       amount: 2
     essence: []
-    work: 8
+    work: 48
     teachesRecipes: []
     unlocksModules:
     - {fileID: 11400000, guid: 40a13db6d80510d4cb31222bdf821f42, type: 2}
@@ -128,6 +129,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Smokehouse
     description: 'It keeps the flies off and the deer coming: Elderwood Longbows and more leather from thick hide.'
@@ -141,7 +143,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 47784c8fa821e504d9388dda49fde2c1, type: 2}
       amount: 2
     essence: []
-    work: 10
+    work: 60
     teachesRecipes: []
     unlocksModules: []
     requires: []
@@ -168,6 +170,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Moon Racks
     description: 'Moonsilver wire on the racks: Moonstrung Bows, and game wanders close.'
@@ -179,7 +182,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
       amount: 4
     essence: []
-    work: 12
+    work: 72
     teachesRecipes: []
     unlocksModules: []
     requires:
@@ -208,6 +211,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Troll Hall
     description: 'Horn over the door, and nothing here is afraid any more: Trollhorn Bows.'
@@ -221,7 +225,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20
-    work: 14
+    work: 84
     teachesRecipes: []
     unlocksModules: []
     requires:

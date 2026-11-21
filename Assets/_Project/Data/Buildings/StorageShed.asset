@@ -45,6 +45,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -53,13 +56,38 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 8
+  buildWork: 60
   renown: 6
   upgrades:
-  - title: Sturdy
+  - renown: 4
+    craftSpeed: 0
+    extraQueue: 0
+    extraOutput: 0
+    extraStorage: 6
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Sturdy
     description: Shelves up to the rafters.
     cost:
     - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
@@ -67,20 +95,23 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
       amount: 12
     essence: []
-    work: 8
-    renown: 4
+    work: 48
+    teachesRecipes: []
+    unlocksModules: []
+    requires: []
+    breachesWon: 0
+  - renown: 6
     craftSpeed: 0
     extraQueue: 0
     extraOutput: 0
-    extraStorage: 6
+    extraStorage: 10
+    extraOutputSlots: 0
+    extraChance: 0
     raidSeconds: 0
     extraRumours: 0
     foretoldEvents: 0
     comfort: 0
     extraLogs: 0
-    teachesRecipes: []
-    requires: []
-    breachesWon: 0
     beds: 0
     purifyYield: 0
     extraMealSlots: 0
@@ -88,7 +119,12 @@ MonoBehaviour:
     extraGame: 0
     extraLight: 0
     extensionSlots: 0
-  - title: Grand
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Grand
     description: A loft for everything that doesn't fit.
     cost:
     - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
@@ -96,27 +132,11 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 56d5b46db28b77247a5a7a09b087ff4b, type: 2}
       amount: 8
     essence: []
-    work: 9
-    renown: 6
-    craftSpeed: 0
-    extraQueue: 0
-    extraOutput: 0
-    extraStorage: 10
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 54
     teachesRecipes: []
+    unlocksModules: []
     requires: []
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

@@ -153,7 +153,7 @@ public sealed class MobSpawnZone : MonoBehaviour
         {
             Spawn();
         }
-        else if (respawnAt >= 0f && Time.time >= respawnAt && !PlayerWithin(wakeDistance) && (!respawnAtNight || NightSettings.IsDark))
+        else if (respawnAt >= 0f && Time.time >= respawnAt && !PlayerWithin(wakeDistance) && !WatchedFromAbove() && (!respawnAtNight || NightSettings.IsDark))
         {
             respawnAt = -1f;
             Spawn();
@@ -313,6 +313,27 @@ public sealed class MobSpawnZone : MonoBehaviour
     private void Prune()
     {
         alive.RemoveAll(creature => creature == null || creature.TryGetComponent(out Damageable health) && !health.IsAlive);
+    }
+
+    // The Keeper's view looks far from the player: a creature mustn't come back in plain sight of it (only out of the player's reach).
+    private bool WatchedFromAbove()
+    {
+        if (!KeeperView.IsOpen)
+        {
+            return false;
+        }
+
+        IReadOnlyList<Vector3> world = WorldCorners;
+        Vector3 centre = Vector3.zero;
+        foreach (Vector3 corner in world)
+        {
+            centre += corner;
+        }
+
+        centre /= Mathf.Max(1, world.Count);
+        Vector3 apart = centre - KeeperView.Current.Focus;
+        apart.y = 0f;
+        return apart.sqrMagnitude < 80f * 80f;
     }
 
     private bool PlayerWithin(float distance)

@@ -43,6 +43,9 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -51,13 +54,38 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 14
   outputCapacity: 10
   queueLength: 5
-  buildWork: 9
+  buildWork: 80
   renown: 8
   upgrades:
-  - title: Long Pier
+  - renown: 5
+    craftSpeed: 0.3
+    extraQueue: 1
+    extraOutput: 0
+    extraStorage: 0
+    extraOutputSlots: 0
+    extraChance: 0
+    raidSeconds: 0
+    extraRumours: 0
+    foretoldEvents: 0
+    comfort: 0
+    extraLogs: 0
+    beds: 0
+    purifyYield: 0
+    extraMealSlots: 0
+    extraTonicSlots: 0
+    extraGame: 0
+    extraLight: 0
+    extensionSlots: 0
+    healthShare: 0
+    fightShare: 0
+    turnBackShare: 0
+    mendCostShare: 0
+    fineChance: 0
+    title: Long Pier
     description: 'Out past the reeds: pike traps and deep lines for char, and the nets come in sooner.'
     cost:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
@@ -67,27 +95,11 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: a740a2c1da7fe61468d2d309b7b21fb0, type: 2}
       amount: 2
     essence: []
-    work: 8
-    renown: 5
-    craftSpeed: 0.3
-    extraQueue: 1
-    extraOutput: 0
-    extraStorage: 0
-    raidSeconds: 0
-    extraRumours: 0
-    foretoldEvents: 0
-    comfort: 0
-    extraLogs: 0
+    work: 48
     teachesRecipes: []
+    unlocksModules: []
     requires: []
     breachesWon: 0
-    beds: 0
-    purifyYield: 0
-    extraMealSlots: 0
-    extraTonicSlots: 0
-    extraGame: 0
-    extraLight: 0
-    extensionSlots: 0
   comfort: 0
   beds: 0
   teachesRecipes: []

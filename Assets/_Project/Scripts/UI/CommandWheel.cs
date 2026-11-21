@@ -125,6 +125,18 @@ public sealed class CommandWheel : MonoBehaviour
         choices.Add(new Choice("Journal", () => Request(UIWindowId.Journal)));
         choices.Add(new Choice("Map", WorldMapHud.Toggle));
         choices.Add(new Choice("Haven", () => Request(UIWindowId.Haven)));
+        // The Keeper's view, where it can open now (at home, once the story has opened it).
+        if (KeeperView.Current != null && KeeperView.Current.WhyNot() == null)
+        {
+            choices.Add(new Choice("Keeper's View", () =>
+            {
+                if (KeeperView.Current != null)
+                {
+                    KeeperView.Current.Open();
+                }
+            }));
+        }
+
         if (TryGetComponent(out BuildPlacer builder))
         {
             choices.Add(new Choice("Build", builder.ToggleMenu));

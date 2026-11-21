@@ -60,7 +60,7 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 10
+  buildWork: 80
   renown: 12
   upgrades:
   - renown: 6
@@ -85,6 +85,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Whitewashed
     description: Lime on the walls, smoke from the chimney and two more beds.
@@ -94,7 +95,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
       amount: 12
     essence: []
-    work: 9
+    work: 54
     teachesRecipes: []
     unlocksModules:
     - {fileID: 11400000, guid: 99a0056b9c9b7d7409c06f1136c50538, type: 2}

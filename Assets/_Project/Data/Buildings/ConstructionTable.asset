@@ -58,7 +58,7 @@ MonoBehaviour:
   station: 1
   outputCapacity: 10
   queueLength: 5
-  buildWork: 8
+  buildWork: 45
   renown: 8
   upgrades:
   - renown: 4
@@ -83,6 +83,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Joined
     description: Proper joints and a vice. It makes what tier II asks.
@@ -94,7 +95,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 8cf878eb4a61eb943917a1f9421bb40a, type: 2}
       amount: 4
     essence: []
-    work: 8
+    work: 48
     teachesRecipes: []
     unlocksModules: []
     requires: []
@@ -121,6 +122,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Iron-Bound
     description: Iron straps, and every tool has its place on the wall.
@@ -132,7 +134,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       amount: 8
     essence: []
-    work: 10
+    work: 60
     teachesRecipes: []
     unlocksModules:
     - {fileID: 11400000, guid: f6aed3b3f4860034495ae4ec9c069fb3, type: 2}
@@ -162,6 +164,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Master's
     description: 'Heartroot set in the bench: the work comes easier here.'
@@ -175,7 +178,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
-    work: 12
+    work: 72
     teachesRecipes: []
     unlocksModules: []
     requires:
@@ -204,6 +207,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Haven's Own
     description: The best-kept workshop this side of the portal.
@@ -219,7 +223,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 30
-    work: 14
+    work: 84
     teachesRecipes: []
     unlocksModules: []
     requires:

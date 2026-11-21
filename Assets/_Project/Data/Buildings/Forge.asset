@@ -60,7 +60,7 @@ MonoBehaviour:
   station: 3
   outputCapacity: 10
   queueLength: 5
-  buildWork: 10
+  buildWork: 80
   renown: 10
   upgrades:
   - renown: 6
@@ -85,6 +85,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Copper Fire
     description: 'A hotter fire and a first real anvil: copper tools and gear.'
@@ -96,7 +97,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
       amount: 8
     essence: []
-    work: 9
+    work: 54
     teachesRecipes: []
     unlocksModules: []
     requires: []
@@ -123,6 +124,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Iron Fire
     description: 'Bellows that breathe on their own: iron tools and gear.'
@@ -134,7 +136,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       amount: 8
     essence: []
-    work: 11
+    work: 66
     teachesRecipes: []
     unlocksModules:
     - {fileID: 11400000, guid: 6eca113538be87c4eb087939610de778, type: 2}
@@ -166,6 +168,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Moon Fire
     description: 'A fire that burns white: moonsilver gear.'
@@ -183,7 +186,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16
-    work: 13
+    work: 78
     teachesRecipes: []
     unlocksModules: []
     requires:
@@ -212,6 +215,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Trollfire
     description: An anvil of trollstone, and nothing out there it can't work.
@@ -225,7 +229,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 40
-    work: 15
+    work: 90
     teachesRecipes: []
     unlocksModules: []
     requires:

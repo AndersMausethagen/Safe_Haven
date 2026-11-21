@@ -296,6 +296,13 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         }
     }
 
+    /// <summary>Where the ears are put instead of the player's head while something looks elsewhere (the Keeper's view: over the
+    /// ground in the middle of the screen); null for the player's head.</summary>
+    public static Vector3? HearFrom { get; set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetHearing() => HearFrom = null;
+
     /// <summary>Where sounds are heard from: the player's head, or the camera while there is no player.</summary>
     public static Vector3 EarPosition
     {
@@ -490,7 +497,7 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         Vector3 forward = view != null ? view.transform.forward : player.transform.forward;
         forward.y = 0f;
         Quaternion facing = forward.sqrMagnitude > 0.001f ? Quaternion.LookRotation(forward) : Quaternion.identity;
-        ears.transform.SetPositionAndRotation(player.transform.position + Vector3.up * EarHeight, facing);
+        ears.transform.SetPositionAndRotation(HearFrom ?? player.transform.position + Vector3.up * EarHeight, facing);
         space?.Update(ears.transform.position);
     }
 

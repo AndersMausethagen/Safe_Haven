@@ -41,6 +41,9 @@ MonoBehaviour:
   pathDecal: {fileID: 2100000, guid: aafc3811cc32e8d4d9bb76f9ddd51265, type: 2}
   encloses: 0
   isGate: 0
+  gateVersion: {fileID: 0}
+  wallTorch: {fileID: 0}
+  wallTorchCost: []
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -49,6 +52,7 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5

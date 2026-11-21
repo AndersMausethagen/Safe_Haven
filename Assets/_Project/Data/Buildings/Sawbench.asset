@@ -58,7 +58,7 @@ MonoBehaviour:
   station: 7
   outputCapacity: 10
   queueLength: 5
-  buildWork: 6
+  buildWork: 40
   renown: 6
   upgrades:
   - renown: 4
@@ -83,6 +83,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Sharpened
     description: A heavier blade that bites deeper.
@@ -92,7 +93,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       amount: 8
     essence: []
-    work: 8
+    work: 48
     teachesRecipes: []
     unlocksModules: []
     requires: []
@@ -119,6 +120,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Treadle
     description: A treadle saw, and every tree at home gives more.
@@ -134,7 +136,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
       amount: 2
     essence: []
-    work: 9
+    work: 54
     teachesRecipes: []
     unlocksModules:
     - {fileID: 11400000, guid: 96ee1b09635180e498c297336a6d121e, type: 2}
@@ -162,6 +164,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Waterwheel
     description: A wheel that never tires.
@@ -173,7 +176,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 1
     essence: []
-    work: 11
+    work: 66
     teachesRecipes: []
     unlocksModules: []
     requires:
@@ -202,6 +205,7 @@ MonoBehaviour:
     healthShare: 0
     fightShare: 0
     turnBackShare: 0
+    mendCostShare: 0
     fineChance: 0
     title: Haven's Own
     description: No log leaves this yard wasted.
@@ -215,7 +219,7 @@ MonoBehaviour:
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20
-    work: 13
+    work: 78
     teachesRecipes: []
     unlocksModules: []
     requires:

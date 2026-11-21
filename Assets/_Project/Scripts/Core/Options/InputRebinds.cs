@@ -85,6 +85,18 @@ public static class InputRebinds
         new RebindRow("Camera and Building", "Fine Rotate", "Build/FineRotate"),
         new RebindRow("Camera and Building", "Free Placement", "Build/FreePlace"),
 
+        new RebindRow("Keeper's View", "Open or Close the Keeper's View (at home)", "System/KeeperView"),
+        new RebindRow("Keeper's View", "Pan Forward", "Keeper/Pan", "up"),
+        new RebindRow("Keeper's View", "Pan Back", "Keeper/Pan", "down"),
+        new RebindRow("Keeper's View", "Pan Left", "Keeper/Pan", "left"),
+        new RebindRow("Keeper's View", "Pan Right", "Keeper/Pan", "right"),
+        new RebindRow("Keeper's View", "Turn Left", "Keeper/Turn", "negative"),
+        new RebindRow("Keeper's View", "Turn Right", "Keeper/Turn", "positive"),
+        new RebindRow("Keeper's View", "Drag the Ground (hold)", "Keeper/Drag"),
+        new RebindRow("Keeper's View", "Pick a Person or Building", "Keeper/Select"),
+        new RebindRow("Keeper's View", "Back to Your Character", "Keeper/FindMe"),
+        new RebindRow("Keeper's View", "Follow Who Is Picked", "Keeper/Follow"),
+
         new RebindRow("Game", "Quick Save", "System/QuickSave"),
         new RebindRow("Game", "Quick Load", "System/QuickLoad"),
     };
@@ -187,8 +199,8 @@ public static class InputRebinds
         string ownInteractions = ownIndex >= 0 ? own.bindings[ownIndex].interactions ?? "" : "";
         foreach (RebindRow candidate in Rows)
         {
-            // Build mode's keys only count while building, so they may repeat the others.
-            if ((candidate.ActionPath == row.ActionPath && candidate.Part == row.Part) || IsBuildKey(candidate) != IsBuildKey(row))
+            // Build mode's keys only count while building, and the Keeper's view's only while it is open, so they may repeat the others.
+            if ((candidate.ActionPath == row.ActionPath && candidate.Part == row.Part) || !CanMeet(candidate, row))
             {
                 continue;
             }
@@ -208,6 +220,30 @@ public static class InputRebinds
     }
 
     private static bool IsBuildKey(RebindRow row) => row.ActionPath.StartsWith("Build/", StringComparison.Ordinal);
+
+    private static bool IsKeeperKey(RebindRow row) => row.ActionPath.StartsWith("Keeper/", StringComparison.Ordinal);
+
+    /// <summary>
+    /// Whether two rows' keys can work at the same moment, so one key can't serve both. Build mode's keys meet only each other. The
+    /// Keeper's view's keys meet each other, the System keys (always on) and the window keys the view keeps working
+    /// (<see cref="PlayerControl.WindowKeyPaths"/>); its WASD may repeat walking, which is held while it is open.
+    /// </summary>
+    public static bool CanMeet(RebindRow a, RebindRow b)
+    {
+        if (IsBuildKey(a) || IsBuildKey(b))
+        {
+            return IsBuildKey(a) == IsBuildKey(b);
+        }
+
+        if (IsKeeperKey(a) == IsKeeperKey(b))
+        {
+            return true;
+        }
+
+        RebindRow other = IsKeeperKey(a) ? b : a;
+        return other.ActionPath.StartsWith("System/", StringComparison.Ordinal)
+            || Array.IndexOf(PlayerControl.WindowKeyPaths, other.ActionPath) >= 0;
+    }
 
     private static bool SamePath(string a, string b) => string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
 

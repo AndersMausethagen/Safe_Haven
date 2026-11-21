@@ -58,7 +58,7 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 4
+  buildWork: 12
   renown: 5
   upgrades: []
   comfort: 0

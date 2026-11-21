@@ -98,6 +98,75 @@ public sealed class PlayerCameraController : MonoBehaviour
     /// roaring on the ridge), until EndFocus. The player keeps control.</summary>
     public void BeginFocus(Transform target) => focusTarget = target;
 
+    /// <summary>
+    /// A view that takes the camera off the player for a while and runs it itself (the Keeper's view): where it looks, from how far,
+    /// how steeply and which way. The camera glides up into it and back down to the player; meanwhile its own zoom, orbit and style
+    /// key wait, it stays top-down with the cursor free, and the ground's detail follows what is looked at.
+    /// </summary>
+    public interface IOverview
+    {
+        Vector3 Focus { get; }
+        float Distance { get; }
+        float Pitch { get; }
+        float Yaw { get; }
+        float FieldOfView { get; }
+    }
+
+    private IOverview overview;
+    private float overviewWeight;
+    // Eased overviewWeight, read by the focus and the framing this frame.
+    private float overviewBlend;
+    private float overviewGlide = 0.6f;
+    // The overview's last framing, so the glide back down starts where it was.
+    private Vector3 overviewFocus;
+    private float overviewDistance;
+    private float overviewPitch;
+    private float overviewYaw;
+    private float overviewFieldOfView;
+
+    /// <summary>True while an overview holds the camera, or the camera is still gliding back down from one.</summary>
+    public bool InOverview => overview != null || overviewWeight > 0f;
+
+    /// <summary>0 framing the player, 1 fully in the overview.</summary>
+    public float OverviewWeight => overviewWeight;
+
+    /// <summary>Hands the camera to <paramref name="view"/>, gliding up into it over <paramref name="glideSeconds"/>.</summary>
+    public void BeginOverview(IOverview view, float glideSeconds)
+    {
+        if (view == null)
+        {
+            return;
+        }
+
+        overview = view;
+        overviewGlide = Mathf.Max(0.05f, glideSeconds);
+        ReadOverview();
+    }
+
+    /// <summary>Gives the camera back to the player from <paramref name="view"/>: it glides back down.</summary>
+    public void EndOverview(IOverview view)
+    {
+        if (overview == view)
+        {
+            ReadOverview();
+            overview = null;
+        }
+    }
+
+    private void ReadOverview()
+    {
+        if (overview == null)
+        {
+            return;
+        }
+
+        overviewFocus = overview.Focus;
+        overviewDistance = overview.Distance;
+        overviewPitch = overview.Pitch;
+        overviewYaw = overview.Yaw;
+        overviewFieldOfView = overview.FieldOfView;
+    }
+
     /// <summary>Co-op, fallen on a raid: the view follows <paramref name="other"/> (a friend) instead of the player; null goes back.</summary>
     public void Watch(Transform other)
     {
@@ -360,6 +429,9 @@ public sealed class PlayerCameraController : MonoBehaviour
         focusTarget = null;
         focusWeight = 0f;
         focusPointSet = false;
+        overview = null;
+        overviewWeight = 0f;
+        overviewBlend = 0f;
         ReleaseCursor();
     }
 
@@ -378,7 +450,10 @@ public sealed class PlayerCameraController : MonoBehaviour
             return;
         }
 
-        TerrainDetailFocus.Set(target.position);
+        overviewWeight = Mathf.MoveTowards(overviewWeight, overview != null ? 1f : 0f, Time.unscaledDeltaTime / overviewGlide);
+        ReadOverview();
+        overviewBlend = Mathf.SmoothStep(0f, 1f, overviewWeight);
+        TerrainDetailFocus.Set(overviewBlend > 0f ? Vector3.Lerp(target.position, overviewFocus, overviewBlend) : target.position);
 
         UpdateStyle();
         ReadInput();
@@ -430,18 +505,27 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void UpdateStyle()
     {
-        if (!InCinematic && GameInput.WasPressed(toggleAction))
+        if (!InCinematic && overview == null && GameInput.WasPressed(toggleAction) && !StoresInstead())
         {
             ToggleStyle();
         }
 
-        style = CameraPreferences.Resolve(CurrentSituation(), out _);
+        // The overview is always seen from above, with the cursor free to point.
+        style = overview != null ? CameraStyle.TopDown : CameraPreferences.Resolve(CurrentSituation(), out _);
         bool action = style == CameraStyle.Action;
         CameraPointer.UsesScreenCenter = action;
         actionWeight = Mathf.MoveTowards(actionWeight, action ? 1f : 0f, Time.unscaledDeltaTime / settings.StyleTransitionTime);
         // The sun's shadow cascades follow where the camera looks: near ones over the shoulder and in cinematics, the top-down set otherwise.
         GraphicsOptions.UseNearShadows(actionWeight > 0.5f || InGameCinematic.IsPlaying || CinematicScreen.IsPlaying);
         UpdateCursor(action);
+    }
+
+    // Stack on Stored and the camera style both ship on V (since 2026-11-15). Inside the ward, where V stores the bag in the chests,
+    // the same press no longer also turns the camera; elsewhere (and from the wheel, or once either is rebound) it does as before.
+    private static bool StoresInstead()
+    {
+        InputAction store = GameInput.StackOnStored;
+        return store != null && store.WasPressedThisFrame() && Player.Current != null && StashQuickStack.CanStack(Player.Current.gameObject);
     }
 
     // The toggle always changes the player's choice; a situation fixed in the options still wins, and says so.
@@ -502,7 +586,8 @@ public sealed class PlayerCameraController : MonoBehaviour
 
     private void ReadInput()
     {
-        if (IsUIOpen || InCinematic)
+        // The overview reads the wheel, the orbit and the stick itself (KeeperView).
+        if (IsUIOpen || InCinematic || overview != null)
         {
             return;
         }
@@ -658,6 +743,10 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         focus.position = Vector3.Lerp(focus.position, focusPoint, Mathf.SmoothStep(0f, 1f, focusWeight));
+        if (overviewBlend > 0f)
+        {
+            focus.position = Vector3.Lerp(focus.position, overviewFocus, overviewBlend);
+        }
     }
 
     // A new look-at starts where it is (the weight blends the view over from the player); only changes after that glide.
@@ -812,12 +901,20 @@ public sealed class PlayerCameraController : MonoBehaviour
             viewYaw = Mathf.LerpAngle(yaw, closeUpYaw, close);
         }
 
+        // The overview's own framing, glided into (it smooths its own moves, so the follow's damping gives way to it).
+        if (overviewBlend > 0f)
+        {
+            distance = Mathf.Lerp(distance, overviewDistance, overviewBlend);
+            viewPitch = Mathf.Lerp(viewPitch, overviewPitch, overviewBlend);
+            viewYaw = Mathf.LerpAngle(viewYaw, overviewYaw, overviewBlend);
+        }
+
         Vector3 back = Quaternion.Euler(viewPitch, viewYaw, 0f) * Vector3.back;
 
         // The action camera orbits the point the composer looks at, not the focus below it.
         Vector3 lookOffset = composer != null ? composer.TargetOffset : Vector3.zero;
         Vector3 lift = lookOffset * w;
-        if (w > 0.001f)
+        if (w > 0.001f && overviewBlend < 0.5f)
         {
             distance = Mathf.Min(distance, ClearDistance(focus.position + lookOffset, back, distance));
         }
@@ -827,7 +924,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         var trackerSettings = follow.TrackerSettings;
         // The follow's damping is for the player's steps: on a turn of the orbit it made the camera's place trail its
         // aim, so the picture swam while turning. While the view turns, the damping gives way (back as it settles).
-        float turning = Mathf.Clamp01(Mathf.Abs(yawVelocity) / 40f);
+        float turning = Mathf.Max(Mathf.Clamp01(Mathf.Abs(yawVelocity) / 40f), overviewBlend);
         trackerSettings.PositionDamping = Vector3.Lerp(Vector3.Lerp(positionDamping, settings.ActionPositionDamping, w), Vector3.zero, turning);
         follow.TrackerSettings = trackerSettings;
 
@@ -837,7 +934,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
 
         LensSettings lens = cinemachineCamera.Lens;
-        lens.FieldOfView = Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w);
+        lens.FieldOfView = Mathf.Lerp(Mathf.Lerp(fieldOfView, settings.ActionFieldOfView, w), overviewFieldOfView, overviewBlend);
         cinemachineCamera.Lens = lens;
     }
 

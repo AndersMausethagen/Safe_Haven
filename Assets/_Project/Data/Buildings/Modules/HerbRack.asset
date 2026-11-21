@@ -53,6 +53,6 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 4df650debd4ce21459e04a0c92ffa207, type: 2}
     amount: 2
   essence: []
-  work: 5
+  work: 20
   knownFromStart: 0
   dressing: {fileID: 7731054330657172636, guid: 5ec5d0549f5cbfd408d14db50b9f4e00, type: 3}

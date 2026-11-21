@@ -54,10 +54,11 @@ MonoBehaviour:
     extraQueue: 0
     extraOutput: 0
     extraChance: 0
+  extensionGroup: 
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 4
+  buildWork: 12
   renown: 1
   upgrades: []
   comfort: 0

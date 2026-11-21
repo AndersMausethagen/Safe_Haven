@@ -210,6 +210,7 @@ public sealed class HavenWindow : MonoBehaviour
         openedAt = Time.unscaledTime;
         climbFill.anchorMax = new Vector2(0f, 1f);
         Show(lastTab);
+        RefreshLookOver();
     }
 
     private void Show(Tab tab)
@@ -717,6 +718,34 @@ public sealed class HavenWindow : MonoBehaviour
         const float y = 708f;
         buildLabel = AddButton("Build", body, Width - Margin - 366f, y, 186f, UIRole.Kind.PrimaryButton, StartBuilding, out _);
         AddButton("Close", body, Width - Margin - 170f, y, 170f, UIRole.Kind.Button, () => window.Close(), out _).text = "Close";
+        // The Keeper's view (Docs/ColonyModeResearch_2026-11-21.md): H stays this window for a glance; this lifts the camera off the
+        // player to run the Haven from above.
+        lookLabel = AddButton("Look Over", body, Width - Margin - 642f, y, 260f, UIRole.Kind.Button, LookOver, out lookButton);
+    }
+
+    private TMP_Text lookLabel;
+    private Button lookButton;
+
+    // Shown only where the view can open now; the window closes first so the view isn't under it.
+    private void RefreshLookOver()
+    {
+        if (lookButton == null)
+        {
+            return;
+        }
+
+        bool open = KeeperView.Current != null && KeeperView.Current.WhyNot() == null;
+        lookButton.gameObject.SetActive(open);
+        lookLabel.text = $"Look over the Haven ({GameInput.KeyLabel(GameInput.KeeperView)})";
+    }
+
+    private void LookOver()
+    {
+        window.Close();
+        if (KeeperView.Current != null)
+        {
+            KeeperView.Current.Open();
+        }
     }
 
     // Most of what the window suggests starts in the build menu.

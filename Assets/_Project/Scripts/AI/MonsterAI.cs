@@ -210,6 +210,26 @@ public sealed partial class MonsterAI : MonoBehaviour, IEventSubject, IStaggerab
         return false;
     }
 
+    /// <summary>True while any monster chases or attacks <paramref name="who"/> themselves (not a friend, nor a companion: the
+    /// Keeper's view gives the player back their feet only when it is them that is hunted).</summary>
+    public static bool AnyEngaging(IDamageable who)
+    {
+        if (who == null)
+        {
+            return false;
+        }
+
+        foreach (MonsterAI monster in active)
+        {
+            if (monster != null && monster.CurrentState != State.Dead && monster.IsEngaging(who))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>True while it is coming at its target with a close strike: what a companion steps out of the way of.</summary>
     public bool IsClosingIn => CurrentState == State.Attacking && attacks.IsClosingIn;
 

@@ -305,6 +305,27 @@ public sealed class CraftingStation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// The station's window from the Keeper's view: no walking over, no sitting down at a fire, no distance to close it; queue and
+    /// watch only (StationWindow's from-afar mode). False where the game has no station window (the text menu needs the player there).
+    /// </summary>
+    public bool OpenFromAfar(GameObject user)
+    {
+        StationWindow stationWindow = UIStateManager.Current != null ? UIStateManager.Current.Find<StationWindow>(UIWindowId.Station) : null;
+        if (user == null || stationWindow == null)
+        {
+            return false;
+        }
+
+        if (ActionMenuWindow.Current != null && ActionMenuWindow.Current.IsOpen)
+        {
+            ActionMenuWindow.Current.Close();
+        }
+
+        stationWindow.Open(this, user, float.PositiveInfinity, afar: true);
+        return true;
+    }
+
     /// <summary>True when a station of the kind is within range of the position. Hand crafting is possible anywhere.</summary>
     public static bool IsNear(Vector3 position, CraftingStationType type, float range)
     {

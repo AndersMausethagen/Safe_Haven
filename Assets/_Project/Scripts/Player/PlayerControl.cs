@@ -27,7 +27,18 @@ public sealed class PlayerControl : MonoBehaviour
         Move = 1,
         Interact = 2,
         Dodge = 4,
+        /// <summary>The keys that open the game's windows (<see cref="WindowKeyPaths"/>): the Keeper's view keeps them, and
+        /// routes them itself (the input handler is off under any hold).</summary>
+        Windows = 8,
     }
+
+    /// <summary>The window keys <see cref="Kept.Windows"/> keeps: the bag, abilities, character, building, skills, journal,
+    /// tutorial, the Haven and the map. Not the wheels or the quickbar, which belong to playing the character.</summary>
+    public static readonly string[] WindowKeyPaths =
+    {
+        "Player/Items", "Player/Inventory", "Player/Skills", "Player/Character", "Player/Build", "Player/Talents",
+        "Player/Journal", "Player/Tutorial", "Player/Haven", "Player/WorldMap",
+    };
 
     private readonly Dictionary<object, Kept> holders = new Dictionary<object, Kept>();
     private readonly List<object> gone = new List<object>();
@@ -129,7 +140,7 @@ public sealed class PlayerControl : MonoBehaviour
         }
 
         // What every holder keeps works, nothing while paused; the map's one switch is GameInput's.
-        Kept keep = GamePause.IsPaused ? Kept.None : Kept.Move | Kept.Interact | Kept.Dodge;
+        Kept keep = GamePause.IsPaused ? Kept.None : Kept.Move | Kept.Interact | Kept.Dodge | Kept.Windows;
         foreach (Kept kept in holders.Values)
         {
             keep &= kept;
@@ -139,6 +150,13 @@ public sealed class PlayerControl : MonoBehaviour
         if ((keep & Kept.Move) != 0) keys.Add(GameInput.Move);
         if ((keep & Kept.Interact) != 0) keys.Add(GameInput.Interact);
         if ((keep & Kept.Dodge) != 0) keys.Add(GameInput.Dodge);
+        if ((keep & Kept.Windows) != 0)
+        {
+            foreach (string path in WindowKeyPaths)
+            {
+                keys.Add(InputSystem.actions != null ? InputSystem.actions.FindAction(path) : null);
+            }
+        }
         GameInput.SetPlayerKeys(false, keys);
     }
 

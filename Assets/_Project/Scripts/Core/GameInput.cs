@@ -77,6 +77,20 @@ public static class GameInput
     public static InputAction BuildFineRotate => Find("Build/FineRotate");
     public static InputAction BuildFreePlace => Find("Build/FreePlace");
 
+    // Keeper's view (KeeperView): read only while the view is open, as the Build map is read only while building.
+    /// <summary>Moves the view across the ground (WASD, the arrows, the left stick).</summary>
+    public static InputAction KeeperPan => Find("Keeper/Pan");
+    /// <summary>Turns the view about its middle (Q and E).</summary>
+    public static InputAction KeeperTurn => Find("Keeper/Turn");
+    /// <summary>Held, the mouse drags the ground (the middle button).</summary>
+    public static InputAction KeeperDrag => Find("Keeper/Drag");
+    /// <summary>Picks the person or building under the pointer (the left button, A).</summary>
+    public static InputAction KeeperSelect => Find("Keeper/Select");
+    /// <summary>Takes the view back to the player's own character (Space, Y).</summary>
+    public static InputAction KeeperFindMe => Find("Keeper/FindMe");
+    /// <summary>Follows the picked person with the view (F, X).</summary>
+    public static InputAction KeeperFollow => Find("Keeper/Follow");
+
     // System
     public static InputAction Pause => Find("System/Pause");
     public static InputAction QuickSave => Find("System/QuickSave");
@@ -84,6 +98,9 @@ public static class GameInput
     public static InputAction CheatMenu => Find("System/CheatMenu");
     /// <summary>A controller's back button (B): closes what Escape closes, but never opens the Escape menu.</summary>
     public static InputAction Back => Find("System/Back");
+    /// <summary>Opens and closes the Keeper's view at home (`, the key left of 1). In the System map so it works while the view
+    /// holds the player's own keys.</summary>
+    public static InputAction KeeperView => Find("System/KeeperView");
 
     // UI
     public static InputAction Point => Find("UI/Point");
@@ -117,6 +134,10 @@ public static class GameInput
             PressedBy[action] = Time.frameCount;
         }
     }
+
+    /// <summary>Forgets every <see cref="Press"/>. Out of Play the frame count stays 0, so a press made by one Edit Mode test still
+    /// counted as "this frame" in every later one (InputActionsTests failed on a second run without a domain reload).</summary>
+    internal static void ForgetPresses() => PressedBy.Clear();
 
     /// <summary>The action's key or button went down this frame, or a wheel chose it (<see cref="Press"/>).</summary>
     public static bool WasPressed(InputAction action)
