@@ -244,5 +244,7 @@
   "old_churn": "A tall narrow wooden butter churn with a wooden plunger handle sticking up out of its lid, staves bound with green copper bands",
   "tusses_trinket": "A small heap of shiny stolen things: a silver button, a brass buckle and a bent spoon",
   "offered_blade": "A single broken sword: one blade snapped in the middle, the hilt half and the tip half lying apart with a gap between them, dark rusty iron",
-  "moss_poultice": "A small bundle of green moss wrapped in pale nettle cloth and tied with string"
+  "moss_poultice": "A small bundle of green moss wrapped in pale nettle cloth and tied with string",
+  "story.redthread": "A single loose red woollen thread wound in a small loop, caught on a pale splinter of wood",
+  "story.woodenhorse": "A small carved wooden toy horse on four legs, its mane worn smooth and pale by small hands"
 }

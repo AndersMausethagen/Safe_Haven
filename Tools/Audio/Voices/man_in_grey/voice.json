@@ -1,0 +1,12 @@
+{
+  "name": "man_in_grey",
+  "description": "A man in his fifties, worn thin by years of searching. A soft, hoarse, low voice, tired and gentle, careful with every word, as if speaking loudly might break something; grief held under the surface.",
+  "reference_text": "I have knocked on so many doors. Some of them answered. Do you know what it is to hear the voice you miss most say your name, and know it is lying? No. Don't come closer! Stay where the light is. I only want one door. Just one. Then I will stop.",
+  "language": "English",
+  "seed": 3401,
+  "source": "designed",
+  "model": "Qwen3-TTS-12Hz-1.7B-VoiceDesign",
+  "created": "2026-11-21 14:17:43",
+  "seconds": 24.88,
+  "sample_rate": 24000
+}

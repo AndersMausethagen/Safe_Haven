@@ -190,6 +190,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: c5ba246834c9a2d45a02c2cc1e44a0e0, type: 3}
     mood: Neutral
   - speaker: Eirik
+    text: A camp half under the snow in Troll Valley. A red thread. Bring it to the portal.
+    clip: {fileID: 8300000, guid: fc4a9a4439374bc4a88bbb97d7680685, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: A soldier's choice. It is old iron, but it holds an edge. Guard well and let them come to you.
     clip: {fileID: 8300000, guid: 6dffd0a0a3838394e9db576dc7d5462b, type: 3}
     mood: Neutral
@@ -342,6 +346,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 80509fd8ca841a84197e89bda19f0439, type: 3}
     mood: Tired
   - speaker: Eirik
+    text: My sister Sigrun sewed a red thread into my coat before I left. Said I was too stupid to find my way home without it. That valley's full of old camps. If one of them has her thread in it, I want it.
+    clip: {fileID: 8300000, guid: 7d928686c350b874b85783f72e5d78f1, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: My sister's farm is two valleys from here. Her dogs ran into these woods last month and never came back. Someone has to walk in front. Better me than you.
     clip: {fileID: 8300000, guid: 5d5a9dce9fa60754eb3dd8fd0b0eae84, type: 3}
     mood: Sad
@@ -374,6 +382,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 6fc4282fac76bf9438d0066f474da8de, type: 3}
     mood: Neutral
   - speaker: Eirik
+    text: She's alive.
+    clip: {fileID: 8300000, guid: 8d9a3b41fbb363e4e9b040572b0b2da5, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Show me the wall. Then show me where it's weakest.
     clip: {fileID: 8300000, guid: 0376781091242514e8954362c0db1410, type: 3}
     mood: Stern
@@ -382,8 +394,16 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 3282fc066ab7844438b3717a37a97b23, type: 3}
     mood: Scared
   - speaker: Eirik
+    text: Sigrun.
+    clip: {fileID: 8300000, guid: f47b7ec71d48bd34881b0be94b65494b, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Six logs from the slope north of the road. Walk up to a tree and get chopping.
     clip: {fileID: 8300000, guid: 6ee96e8ac3b389f458ccbedc9f0e6f8d, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Somewhere is enough for now. Thank you.
+    clip: {fileID: 8300000, guid: 43d50d79869387c4eac975ecc42468af, type: 3}
     mood: Neutral
   - speaker: Eirik
     text: Stay behind my shield, if you can find it.
@@ -1238,6 +1258,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: bc0672dadd9f6004381da668e007d479, type: 3}
     mood: Neutral
   - speaker: Sigrid
+    text: Before we went in, I touched the middle stone. There were names cut into it, fresh, as if someone had only just carved them. Sigrun's was one of them.
+    clip: {fileID: 8300000, guid: 23e279c23fe837547964b0fdaf7a6e26, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: Behind you!
     clip: {fileID: 8300000, guid: a8ab0f647cca8c64c927f8364427b944, type: 3}
     mood: Yelling
@@ -1334,6 +1358,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7e1ed342704678d4e8436a7f79f3354d, type: 3}
     mood: Glad
   - speaker: Sigrid
+    text: I thought it was a list of the dead. I told no one, because I didn't want it to be true.
+    clip: {fileID: 8300000, guid: 7b03690fd0579ef4abceb4d9a13f2cb7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: I'll hold this spot.
     clip: {fileID: 8300000, guid: bc943b456a217c14aaa8ac1e05d79787, type: 3}
     mood: Neutral
@@ -1361,6 +1389,10 @@ MonoBehaviour:
     text: I've buried good people on less than what we just did. Write it down somewhere. It should outlast us.
     clip: {fileID: 8300000, guid: 1800277adea1cae45ad248cec69b96ce, type: 3}
     mood: Calm
+  - speaker: Sigrid
+    text: I've kept something to myself since the day the stones broke. I'm done keeping it.
+    clip: {fileID: 8300000, guid: d1209a4eb98c02a40802e5295348252a, type: 3}
+    mood: Neutral
   - speaker: Sigrid
     text: I've served under worse than you. Don't let it go to your head.
     clip: {fileID: 8300000, guid: b0552f9fb2e4ac14c97324aca61d727b, type: 3}
@@ -1506,6 +1538,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 35df69812ada50646b5e08461daedb17, type: 3}
     mood: Neutral
   - speaker: Sigrid
+    text: Then that's where we go.
+    clip: {fileID: 8300000, guid: c4db5cb20c7e5114da8e19de511c458b, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: There you are. Come and stand by the fire with the rest of us. You should know who you are walking with before we set out.
     clip: {fileID: 8300000, guid: c24604edeb859ac4abf9202c2e7c9c07, type: 3}
     mood: Glad
@@ -1560,6 +1596,22 @@ MonoBehaviour:
   - speaker: Sigrid
     text: You're up. Good. The fire needs wood, and the stones need waking. Sit with me a while first.
     clip: {fileID: 8300000, guid: e062e4fa754e23040817c4d44eb2516c, type: 3}
+    mood: Neutral
+  - speaker: The man in grey
+    text: I opened a door like this once. I thought I could pull them through. The hunger came out instead.
+    clip: {fileID: 8300000, guid: fc06cda7f2aa5ec4a893874bc065d2f2, type: 3}
+    mood: Neutral
+  - speaker: The man in grey
+    text: I opened it a hand's width and heard her humming, and I closed it. If it had been her, she would have said Father. She only said that when she was frightened.
+    clip: {fileID: 8300000, guid: d77acab01e55a0141bdd76bfd2aee8b4, type: 3}
+    mood: Neutral
+  - speaker: The man in grey
+    text: I ran. I left a village behind me with its names half eaten. I have been opening doors ever since, as if the next one would make it right.
+    clip: {fileID: 8300000, guid: 2acc0f68d66b1f64fb66deeaf1802bf5, type: 3}
+    mood: Neutral
+  - speaker: The man in grey
+    text: There was a note on the table. Old Bear, find the blue door. She called me that when she wanted something.
+    clip: {fileID: 8300000, guid: 8734635a8643cd04da68af6e73c285b5, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: '<i>A fire first, little one. Fallen branches and loose stones lie all around me: pick them up, open the build menu (G) and light it inside my ward. The sooner it burns, the sooner they can see it.</i>'
@@ -1638,6 +1690,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 1a004ee0ee6414c418648b7edf1823f7, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: <i>Every name on that stone is someone the hunger has taken, or means to. The toll at the Brukam's bridge was never paid, little one. That debt comes due at the First Hearth.</i>
+    clip: {fileID: 8300000, guid: 671597f4ac222c647b8d7a0bbaa5a1b2, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: <i>Find a place that a stone remembers, then lay your hand on the stone. The nearest stands not far past the meadows.</i>
     clip: {fileID: 8300000, guid: 6b1f2d13369b6984d83eb2c228cb93ab, type: 3}
     mood: Neutral
@@ -1658,6 +1714,26 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 92eb088c9c0827641af56ec4ab05e3aa, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: <i>He chose the closed door. That choice may be all he has left of them.</i>
+    clip: {fileID: 8300000, guid: 5a8f234fd0ed4db45bfee0a5ef4799ed, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>He has been looking for it a long time. Go before he finds it alone.</i>
+    clip: {fileID: 8300000, guid: 4e5ed23bcd7f36144b1342e71ede48c7, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>He is at his door again, under the road. Listen. I will carry his voice.</i>
+    clip: {fileID: 8300000, guid: 4cfb5de6eab677148b775ca5c524ec61, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>He is looking for two people the winter took. He opens doors to find them, and the wrong ones let things out.</i>
+    clip: {fileID: 8300000, guid: d05925959d564c84dbb257a47290110d, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>He will feel it, wherever he is kneeling. I do not know yet if he will thank you.</i>
+    clip: {fileID: 8300000, guid: c22f0fe5104682d458e780b960bd3c6a, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: <i>Hold a ring of them round me, little one, and the forest will remember us for good.</i>
     clip: {fileID: 8300000, guid: 01fa7f3f791ad7648b627d11b3e8c782, type: 3}
     mood: Neutral
@@ -1674,6 +1750,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 3fd5cc9260f173e4584b73dc9293c118, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: '<i>I know where the first of his wrong doors opened: the Black Pool, in the marsh. The fen came through it and drowned everything it touched.</i>'
+    clip: {fileID: 8300000, guid: da87b558245feee41b75aa31c601a3a7, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: <i>I listen for your people every night. Some nights I hear them.</i>
     clip: {fileID: 8300000, guid: 28994191dbd3af94f8f15c29e4cb191b, type: 3}
     mood: Neutral
@@ -1686,8 +1766,20 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 85b859ca10cf7e440a7441d7e25611c7, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: '<i>It called him by his name. That is how you know it lies: the ones he is looking for never used it.</i>'
+    clip: {fileID: 8300000, guid: 541b694d46a835343aa1325ce48451e6, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: <i>It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.</i>
     clip: {fileID: 8300000, guid: 20183a6ba2a5c2d448b6a84741a03f1b, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>It is shut. That is the first thing anyone has undone for him.</i>
+    clip: {fileID: 8300000, guid: 42230e9dbd3f6264a818df724d8d5746, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>It was not a list. The names were not a sentence. They were a warning.</i>
+    clip: {fileID: 8300000, guid: 92cbb029b89f28949a366c60c52be3a5, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>It will. The pact gave the forest its room as well, and that is the one thing it has not forgotten. It will push against every stone you light. Hold what you take, and in time it leaves it be.</i>
@@ -1700,6 +1792,18 @@ MonoBehaviour:
   - speaker: The Portal
     text: <i>Keep it high, little one. A light is only a promise while someone keeps it.</i>
     clip: {fileID: 8300000, guid: d91446cdef2c06d4e9de6384bf80a51b, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>Keep the horse. Something has to remember them, and he cannot carry it any more.</i>
+    clip: {fileID: 8300000, guid: ff0cad17623135042a5df9b7ee4a4720, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>Keep your own names close. Whatever is behind those doors has learned to speak in borrowed voices.</i>
+    clip: {fileID: 8300000, guid: 985362d1ae648db489e64f695a65b587, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>Lay the thread on my stone. Closer. Now, all of you, a hand near the fire.</i>
+    clip: {fileID: 8300000, guid: 66fd8a91f8cb4234fa07401f26f152b6, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>Listen, little one. Rest your hand on the stone.</i>
@@ -1782,6 +1886,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 4a679f47d0d179e47b828af65dcf0861, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: <i>Past the Brukam's bridge the snow begins, and in it there is a door that is not mine. Someone is knocking on it, little one. Go and see who.</i>
+    clip: {fileID: 8300000, guid: db213636ea06d054db52ee6e719aa2c9, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: <i>Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.</i>
     clip: {fileID: 8300000, guid: c7373c4ea4249d049a2aef50bbac72c9, type: 3}
     mood: Neutral
@@ -1796,6 +1904,10 @@ MonoBehaviour:
   - speaker: The Portal
     text: <i>She is close, little one. Just beyond me, off the path, hiding. Find her, keep her near you, and bring her through.</i>
     clip: {fileID: 8300000, guid: 46887ac32c53b0345bdcaea3106e1dd0, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>She looked up. She heard something. Take the thread away, little one, before what is behind me hears it too.</i>
+    clip: {fileID: 8300000, guid: 634c24513be93c648854ad960c7a33ec, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>Smoke from a farmstead that burned long ago. Someone kept the seed.</i>
@@ -1816,6 +1928,14 @@ MonoBehaviour:
   - speaker: The Portal
     text: <i>Something tests my ward. Out there, someone else is holding a clearing against the wolves. Bring him to hold mine.</i>
     clip: {fileID: 8300000, guid: 86e4d95f0e519d84ab5886faa3602f86, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>Somewhere.</i>
+    clip: {fileID: 8300000, guid: ab7f80e0841ad4c43beb807bd6c4104a, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: <i>Take an ember from the hearth, and shut it.</i>
+    clip: {fileID: 8300000, guid: 24296e08a66f727488927aadc72e6af3, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>That is what you killed. I am sorry. Someone had to.</i>
@@ -1858,6 +1978,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 92501bcf7ce226941abbadd2eba70c0d, type: 3}
     mood: Neutral
   - speaker: The Portal
+    text: <i>There. A window, no wider than a book. A low room, a scarred table, a young woman with a needle between her lips, and a boy kicking at her knee.</i>
+    clip: {fileID: 8300000, guid: 49e64a2104bd34d4eab2a757acd9981e, type: 3}
+    mood: Neutral
+  - speaker: The Portal
     text: '<i>Three stones, and their light is mine again. There are more out in the meadows, little one: old ones the roots have not found yet.</i>'
     clip: {fileID: 8300000, guid: 198581a3e1e01a24c9cf85f75dcc4003, type: 3}
     mood: Neutral
@@ -1876,6 +2000,10 @@ MonoBehaviour:
   - speaker: The Portal
     text: <i>With its roots gone quiet I can reach further. North, past the troll country, the road is open. The old one that broke my stones the night you fell walks that road. It came for the door then. Go carefully.</i>
     clip: {fileID: 8300000, guid: 4e877300c3b743f4b80579f413f7d503, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: '<i>With the marsh door shut I can see something under the valley''s old road: a warmth, like a room someone still keeps.</i>'
+    clip: {fileID: 8300000, guid: b153a53afc0b89945b2272392ff1279e, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>With what? You have nothing but your hands, and I cannot open.</i>
@@ -1920,6 +2048,10 @@ MonoBehaviour:
   - speaker: The Portal
     text: '<i>You have a fire. Now a roof to work under: a workshop beside it (G). What the woods break, it mends.</i>'
     clip: {fileID: 8300000, guid: 64b42d68b6d472e45991c36cbef2ac45, type: 3}
+    mood: Neutral
+  - speaker: The Portal
+    text: '<i>You stood at his door. I felt it through the snow: a door that is not mine, and a man who has worn a hole in the world with knocking.</i>'
+    clip: {fileID: 8300000, guid: c83bbbb704f63f64c8d657815c63d236, type: 3}
     mood: Neutral
   - speaker: The Portal
     text: <i>Your fire carries now. Far past my meadows, those who went in with you will see it, if any are left to see.</i>

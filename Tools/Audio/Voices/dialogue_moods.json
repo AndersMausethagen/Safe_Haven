@@ -3440,5 +3440,203 @@
   "text": "Your fire's too small to cook on and too big to hide. Good. A fire is how lost people find",
   "mood": "Neutral",
   "by": "kind"
+ },
+ "c36665bc6cb9": {
+  "speaker": "Eirik",
+  "text": "My sister Sigrun sewed a red thread into my coat before I left. Said I was too stupid to f",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "5d96dc43928f": {
+  "speaker": "Eirik",
+  "text": "A camp half under the snow in Troll Valley. A red thread. Bring it to the portal.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "351e4535c845": {
+  "speaker": "Eirik",
+  "text": "She's alive.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9a6dffeaeb6a": {
+  "speaker": "Eirik",
+  "text": "Sigrun.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "e7001d673305": {
+  "speaker": "Eirik",
+  "text": "Somewhere is enough for now. Thank you.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "5c2e61308553": {
+  "speaker": "Sigrid",
+  "text": "Before we went in, I touched the middle stone. There were names cut into it, fresh, as if ",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "28805f0ec78e": {
+  "speaker": "Sigrid",
+  "text": "I thought it was a list of the dead. I told no one, because I didn't want it to be true.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "aafd937e15ee": {
+  "speaker": "Sigrid",
+  "text": "I've kept something to myself since the day the stones broke. I'm done keeping it.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "9be73a84dd59": {
+  "speaker": "Sigrid",
+  "text": "Then that's where we go.",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "1555250c2ce9": {
+  "speaker": "The man in grey",
+  "text": "I opened a door like this once. I thought I could pull them through. The hunger came out i",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "cb2334ec90fc": {
+  "speaker": "The man in grey",
+  "text": "I opened it a hand's width and heard her humming, and I closed it. If it had been her, she",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "dd06eaf5a590": {
+  "speaker": "The man in grey",
+  "text": "I ran. I left a village behind me with its names half eaten. I have been opening doors eve",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "17386e88b196": {
+  "speaker": "The man in grey",
+  "text": "There was a note on the table. Old Bear, find the blue door. She called me that when she w",
+  "mood": "Neutral",
+  "by": "kind"
+ },
+ "3f50e6152299": {
+  "speaker": "The Portal",
+  "text": "Every name on that stone is someone the hunger has taken, or means to. The toll at the Bru",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "feaba201853d": {
+  "speaker": "The Portal",
+  "text": "He chose the closed door. That choice may be all he has left of them.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "9c2512fd8f25": {
+  "speaker": "The Portal",
+  "text": "He is at his door again, under the road. Listen. I will carry his voice.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "c05eebeb9590": {
+  "speaker": "The Portal",
+  "text": "He is looking for two people the winter took. He opens doors to find them, and the wrong o",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "b9f1cb70c581": {
+  "speaker": "The Portal",
+  "text": "He will feel it, wherever he is kneeling. I do not know yet if he will thank you.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "906efcf889e9": {
+  "speaker": "The Portal",
+  "text": "It called him by his name. That is how you know it lies: the ones he is looking for never ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "75a3c4b3e433": {
+  "speaker": "The Portal",
+  "text": "It is shut. That is the first thing anyone has undone for him.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "18aa353f7f26": {
+  "speaker": "The Portal",
+  "text": "It was not a list. The names were not a sentence. They were a warning.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "b019495964a5": {
+  "speaker": "The Portal",
+  "text": "Keep the horse. Something has to remember them, and he cannot carry it any more.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "51b3df6495a4": {
+  "speaker": "The Portal",
+  "text": "Keep your own names close. Whatever is behind those doors has learned to speak in borrowed",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "c8cace7c48ee": {
+  "speaker": "The Portal",
+  "text": "Lay the thread on my stone. Closer. Now, all of you, a hand near the fire.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "0a92b26ea93d": {
+  "speaker": "The Portal",
+  "text": "She looked up. She heard something. Take the thread away, little one, before what is behin",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "b6a6632ac669": {
+  "speaker": "The Portal",
+  "text": "Somewhere.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "e9a0a34490ee": {
+  "speaker": "The Portal",
+  "text": "There. A window, no wider than a book. A low room, a scarred table, a young woman with a n",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "235b5e4cae46": {
+  "speaker": "The Portal",
+  "text": "You stood at his door. I felt it through the snow: a door that is not mine, and a man who ",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "8c542aa975f5": {
+  "speaker": "The Portal",
+  "text": "He has been looking for it a long time. Go before he finds it alone.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "2fc1c17c3033": {
+  "speaker": "The Portal",
+  "text": "I know where the first of his wrong doors opened: the Black Pool, in the marsh. The fen ca",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "91293b47d4c4": {
+  "speaker": "The Portal",
+  "text": "Past the Brukam's bridge the snow begins, and in it there is a door that is not mine. Some",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "33cb222249d8": {
+  "speaker": "The Portal",
+  "text": "Take an ember from the hearth, and shut it.",
+  "mood": "Calm",
+  "by": "kind"
+ },
+ "72626f19607a": {
+  "speaker": "The Portal",
+  "text": "With the marsh door shut I can see something under the valley's old road: a warmth, like a",
+  "mood": "Calm",
+  "by": "kind"
  }
 }

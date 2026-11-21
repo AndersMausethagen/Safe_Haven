@@ -1082,6 +1082,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/c8b74fbd9dcb.wav"
  },
  {
+  "id": "c36665bc6cb9",
+  "voice": "eirik",
+  "text": "My sister Sigrun sewed a red thread into my coat before I left. Said I was too stupid to find my way home without it. That valley's full of old camps. If one of them has her thread in it, I want it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/c36665bc6cb9.wav"
+ },
+ {
   "id": "0a8b0f999d31",
   "voice": "eirik",
   "text": "The Brukam's dead and its tusk is lying out there. Hollow it, bind it in iron, hang it on the post. When the ward breaks I'll blow it, and every one of us will shoot like we mean it.",
@@ -1102,6 +1113,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/0be8f8a05d89.wav"
+ },
+ {
+  "id": "5d96dc43928f",
+  "voice": "eirik",
+  "text": "A camp half under the snow in Troll Valley. A red thread. Bring it to the portal.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/5d96dc43928f.wav"
  },
  {
   "id": "148dad1a35cc",
@@ -1201,6 +1223,39 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/259bff6f5a51.wav"
+ },
+ {
+  "id": "351e4535c845",
+  "voice": "eirik",
+  "text": "She's alive.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/351e4535c845.wav"
+ },
+ {
+  "id": "9a6dffeaeb6a",
+  "voice": "eirik",
+  "text": "Sigrun.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/9a6dffeaeb6a.wav"
+ },
+ {
+  "id": "e7001d673305",
+  "voice": "eirik",
+  "text": "Somewhere is enough for now. Thank you.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/eirik/e7001d673305.wav"
  },
  {
   "id": "e253fe508b50",
@@ -4156,6 +4211,17 @@
   "take": 4
  },
  {
+  "id": "5c2e61308553",
+  "voice": "sigrid",
+  "text": "Before we went in, I touched the middle stone. There were names cut into it, fresh, as if someone had only just carved them. Sigrun's was one of them.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/5c2e61308553.wav"
+ },
+ {
   "id": "d2ef296b3fd8",
   "voice": "sigrid",
   "text": "Careful. The ones who go looking for the truth of it are the ones who find it.",
@@ -4178,6 +4244,17 @@
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/7761ac604c16.wav"
  },
  {
+  "id": "28805f0ec78e",
+  "voice": "sigrid",
+  "text": "I thought it was a list of the dead. I told no one, because I didn't want it to be true.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/28805f0ec78e.wav"
+ },
+ {
   "id": "8f8c51a7519c",
   "voice": "sigrid",
   "text": "It will not wake for me. It never has. You, then. Put your hand on the centre stone.",
@@ -4187,6 +4264,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/8f8c51a7519c.wav"
+ },
+ {
+  "id": "aafd937e15ee",
+  "voice": "sigrid",
+  "text": "I've kept something to myself since the day the stones broke. I'm done keeping it.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/aafd937e15ee.wav"
  },
  {
   "id": "52d4678c991e",
@@ -4213,6 +4301,17 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/bcc9a3c2faa5.wav"
+ },
+ {
+  "id": "9be73a84dd59",
+  "voice": "sigrid",
+  "text": "Then that's where we go.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9be73a84dd59.wav"
  },
  {
   "id": "18434bb5a0bd",
@@ -4390,6 +4489,50 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/sigrid/9c66c89507e9.wav"
+ },
+ {
+  "id": "1555250c2ce9",
+  "voice": "man_in_grey",
+  "text": "I opened a door like this once. I thought I could pull them through. The hunger came out instead.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_man_in_grey/1555250c2ce9.wav"
+ },
+ {
+  "id": "cb2334ec90fc",
+  "voice": "man_in_grey",
+  "text": "I opened it a hand's width and heard her humming, and I closed it. If it had been her, she would have said Father. She only said that when she was frightened.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_man_in_grey/cb2334ec90fc.wav"
+ },
+ {
+  "id": "dd06eaf5a590",
+  "voice": "man_in_grey",
+  "text": "I ran. I left a village behind me with its names half eaten. I have been opening doors ever since, as if the next one would make it right.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_man_in_grey/dd06eaf5a590.wav"
+ },
+ {
+  "id": "17386e88b196",
+  "voice": "man_in_grey",
+  "text": "There was a note on the table. Old Bear, find the blue door. She called me that when she wanted something.",
+  "engine": "acted",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_man_in_grey/17386e88b196.wav"
  },
  {
   "id": "03b12203310a",
@@ -4920,6 +5063,18 @@
   "direction": "Calm"
  },
  {
+  "id": "3f50e6152299",
+  "voice": "portal_g_mysterious",
+  "text": "Every name on that stone is someone the hunger has taken, or means to. The toll at the Brukam's bridge was never paid, little one. That debt comes due at the First Hearth.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/3f50e6152299.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "308885cfe7e0",
   "voice": "portal_g_mysterious",
   "text": "Find one of the places a stone remembers, so that it knows you, then lay your hand on it. The first will answer to my fire alone. The rest want a Pact Rune, the pact's own mark, scattered through the woods since it broke.",
@@ -4941,6 +5096,54 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/640c27776009.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "feaba201853d",
+  "voice": "portal_g_mysterious",
+  "text": "He chose the closed door. That choice may be all he has left of them.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/feaba201853d.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "9c2512fd8f25",
+  "voice": "portal_g_mysterious",
+  "text": "He is at his door again, under the road. Listen. I will carry his voice.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/9c2512fd8f25.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "c05eebeb9590",
+  "voice": "portal_g_mysterious",
+  "text": "He is looking for two people the winter took. He opens doors to find them, and the wrong ones let things out.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c05eebeb9590.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "b9f1cb70c581",
+  "voice": "portal_g_mysterious",
+  "text": "He will feel it, wherever he is kneeling. I do not know yet if he will thank you.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b9f1cb70c581.wav",
   "direction": "Calm"
  },
  {
@@ -4968,6 +5171,18 @@
   "direction": "Calm"
  },
  {
+  "id": "906efcf889e9",
+  "voice": "portal_g_mysterious",
+  "text": "It called him by his name. That is how you know it lies: the ones he is looking for never used it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/906efcf889e9.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "e8c1f6b40c78",
   "voice": "portal_g_mysterious",
   "text": "It is all one thing, little one. Something old is pushing those roots, from somewhere deep in the woods. When the woods tell me where, I will tell you.",
@@ -4977,6 +5192,30 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e8c1f6b40c78.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "75a3c4b3e433",
+  "voice": "portal_g_mysterious",
+  "text": "It is shut. That is the first thing anyone has undone for him.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/75a3c4b3e433.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "18aa353f7f26",
+  "voice": "portal_g_mysterious",
+  "text": "It was not a list. The names were not a sentence. They were a warning.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/18aa353f7f26.wav",
   "direction": "Calm"
  },
  {
@@ -5001,6 +5240,42 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/245194b18d05.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "b019495964a5",
+  "voice": "portal_g_mysterious",
+  "text": "Keep the horse. Something has to remember them, and he cannot carry it any more.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b019495964a5.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "51b3df6495a4",
+  "voice": "portal_g_mysterious",
+  "text": "Keep your own names close. Whatever is behind those doors has learned to speak in borrowed voices.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/51b3df6495a4.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "c8cace7c48ee",
+  "voice": "portal_g_mysterious",
+  "text": "Lay the thread on my stone. Closer. Now, all of you, a hand near the fire.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/c8cace7c48ee.wav",
   "direction": "Calm"
  },
  {
@@ -5052,6 +5327,18 @@
   "direction": "Calm"
  },
  {
+  "id": "0a92b26ea93d",
+  "voice": "portal_g_mysterious",
+  "text": "She looked up. She heard something. Take the thread away, little one, before what is behind me hears it too.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/0a92b26ea93d.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "7b8cc4a0c9eb",
   "voice": "portal_g_mysterious",
   "text": "So light one. The forest cannot forget a hearth that someone tends. It will feed my ward, and out in the mist your people will see it and know which way is home.",
@@ -5061,6 +5348,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/7b8cc4a0c9eb.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "b6a6632ac669",
+  "voice": "portal_g_mysterious",
+  "text": "Somewhere.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b6a6632ac669.wav",
   "direction": "Calm"
  },
  {
@@ -5097,6 +5396,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/b6587a578789.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "e9a0a34490ee",
+  "voice": "portal_g_mysterious",
+  "text": "There. A window, no wider than a book. A low room, a scarred table, a young woman with a needle between her lips, and a boy kicking at her knee.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/e9a0a34490ee.wav",
   "direction": "Calm"
  },
  {
@@ -5244,6 +5555,18 @@
   "direction": "Calm"
  },
  {
+  "id": "235b5e4cae46",
+  "voice": "portal_g_mysterious",
+  "text": "You stood at his door. I felt it through the snow: a door that is not mine, and a man who has worn a hole in the world with knocking.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/235b5e4cae46.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "090569d270c1",
   "voice": "portal_g_mysterious",
   "text": "Your fire reaches further than it did, little one. Far enough that I can feel what lies at the end of it: stones, cold ones, out past the meadows.",
@@ -5316,6 +5639,18 @@
   "direction": "Calm"
  },
  {
+  "id": "8c542aa975f5",
+  "voice": "portal_g_mysterious",
+  "text": "He has been looking for it a long time. Go before he finds it alone.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/8c542aa975f5.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "cce8fe42cc70",
   "voice": "portal_g_mysterious",
   "text": "Hold a ring of them round me, little one, and the forest will remember us for good.",
@@ -5337,6 +5672,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/58df648b5188.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "2fc1c17c3033",
+  "voice": "portal_g_mysterious",
+  "text": "I know where the first of his wrong doors opened: the Black Pool, in the marsh. The fen came through it and drowned everything it touched.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/2fc1c17c3033.wav",
   "direction": "Calm"
  },
  {
@@ -5436,6 +5783,18 @@
   "direction": "Calm"
  },
  {
+  "id": "91293b47d4c4",
+  "voice": "portal_g_mysterious",
+  "text": "Past the Brukam's bridge the snow begins, and in it there is a door that is not mine. Someone is knocking on it, little one. Go and see who.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/91293b47d4c4.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "ae616ce24bf2",
   "voice": "portal_g_mysterious",
   "text": "Rootlings, in my clearing. Feed me those orbs, and they will not get in so easily again.",
@@ -5460,6 +5819,18 @@
   "direction": "Calm"
  },
  {
+  "id": "33cb222249d8",
+  "voice": "portal_g_mysterious",
+  "text": "Take an ember from the hearth, and shut it.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/33cb222249d8.wav",
+  "direction": "Calm"
+ },
+ {
   "id": "76e5621edef3",
   "voice": "portal_g_mysterious",
   "text": "Three stones, and their light is mine again. There are more out in the meadows, little one: old ones the roots have not found yet.",
@@ -5469,6 +5840,18 @@
    "pause": 0.4
   },
   "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/76e5621edef3.wav",
+  "direction": "Calm"
+ },
+ {
+  "id": "72626f19607a",
+  "voice": "portal_g_mysterious",
+  "text": "With the marsh door shut I can see something under the valley's old road: a warmth, like a room someone still keeps.",
+  "engine": "shaped",
+  "mood": "Neutral",
+  "effects": {
+   "pause": 0.4
+  },
+  "output": "../../../Assets/_Project/Audio/Voice/Dialogue/the_portal/72626f19607a.wav",
   "direction": "Calm"
  },
  {
