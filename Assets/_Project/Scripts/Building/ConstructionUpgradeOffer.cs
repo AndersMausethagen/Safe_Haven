@@ -24,7 +24,8 @@ public static class ConstructionUpgradeOffer
         }
 
         BuildingLevel next = building.Definition.UpgradeTo(construction.Level + 1);
-        if (next == null)
+        bool wall = WallUpgrades.HasChoices(building);
+        if (next == null && !wall)
         {
             GameMessages.Post($"The {construction.Title} is as good as it gets.");
             return;
@@ -39,16 +40,28 @@ public static class ConstructionUpgradeOffer
 
     private static MenuPage Page(BuildingObject building, Construction construction, BuildingLevel next, GameObject user)
     {
-        var page = new MenuPage
+        var page = next == null
+            ? new MenuPage { Title = building.Definition.DisplayName, Body = "A piece of wall: make it a gate, or give it a torch for the night." }
+            : new MenuPage
+            {
+                Title = $"{next.title} {building.Definition.DisplayName}",
+                Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}.\n"
+                    + HavenBuildings.WhatTierBrings(building.Definition, construction.Level + 1, next, user.GetComponent<PlayerCrafting>()),
+            };
+        if (next != null)
         {
-            Title = $"{next.title} {building.Definition.DisplayName}",
-            Body = $"Level {construction.Level + 1} of {building.Definition.MaxLevel}.\n"
-                + HavenBuildings.WhatTierBrings(building.Definition, construction.Level + 1, next, user.GetComponent<PlayerCrafting>()),
-        };
-        bool affordable = MaterialPool.For(user).CanAfford(next.essence, next.cost, out string missing);
-        string cost = next.CostText;
-        page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color={UIStyle.Current.DangerHex}>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
-            () => construction.TryOrderUpgrade(user), closesMenu: true));
+            bool affordable = MaterialPool.For(user).CanAfford(next.essence, next.cost, out string missing);
+            string cost = next.CostText;
+            page.Add(new MenuAction("Upgrade", affordable ? cost : $"{cost}   <color={UIStyle.Current.DangerHex}>{missing}</color>", affordable && BuildingUnlocks.IsOpen(next),
+                () => construction.TryOrderUpgrade(user), closesMenu: true));
+        }
+
+        // A wall piece: its gate, and a torch (the user, 2026-11-21).
+        if (WallUpgrades.HasChoices(building))
+        {
+            WallUpgrades.AddChoices(page, building, user);
+        }
+
         return page;
     }
 }

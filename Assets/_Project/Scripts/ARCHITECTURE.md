@@ -2825,3 +2825,8 @@ From the user's list after their 72-minute run.
   side drops its fear of the light and follows its attacker in (`NightProwlers.FollowWhenProvoked`).
 - **Nettle Patch** (`Data/Gathering/NettlePatch`): a clump of four nettles about 2.9 m across, beside the single nettle in every
   RandomResourceNode pool, 9-13 Nettle Fiber, so fibre is easy to spot in raids.
+- **Walls as Gord draws them** (the user, 2026-11-21): a wall line drawn round and back to where it began closes on its start
+  (`BuildPlacer.UpdateLine`), and a drawn curve may run to 80 pieces. Walls and gates are hammered up as scaffolds (Build Work 2-6 s).
+  A piece's Upgrade page (Manage › Upgrade or repair) offers its gate (`BuildingDefinition › Gate Version`: the gate's cost paid, the
+  piece's given back, the gate's scaffold in its place) and a torch (`Wall Torch`, `WallFittings`; the fuelled wall torch burns a
+  Charcoal a night). Taking a piece down gives its torch back too.

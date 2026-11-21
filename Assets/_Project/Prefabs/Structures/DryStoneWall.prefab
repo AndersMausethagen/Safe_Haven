@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 5586801724730291153}
   - component: {fileID: 2084990266287670973}
   - component: {fileID: 2685659365433794458}
+  - component: {fileID: 12514270118163203}
   m_Layer: 0
   m_Name: DryStoneWall
   m_TagString: Untagged
@@ -169,6 +170,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.11882, y: 0.8402007, z: 0.6547135}
   m_Center: {x: -0.0006299019, y: 0.42390516, z: -0.004279256}
+--- !u!114 &12514270118163203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5723684251509998500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68be1fc0ab16de845bc04dcdf902435a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WallFittings
 --- !u!1001 &3331500084782049718
 PrefabInstance:
   m_ObjectHideFlags: 0

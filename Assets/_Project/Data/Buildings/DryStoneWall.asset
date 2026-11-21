@@ -41,6 +41,13 @@ MonoBehaviour:
   pathDecal: {fileID: 0}
   encloses: 1
   isGate: 0
+  gateVersion: {fileID: 11400000, guid: efbac1e6791cbb44b995b01f43d37856, type: 2}
+  wallTorch: {fileID: 8643427449616740615, guid: 1d289451d9ff89945a4a65b4aa71a632, type: 3}
+  wallTorchCost:
+  - item: {fileID: 11400000, guid: e8bb5d2fbded52b42a179a47cce32d53, type: 2}
+    amount: 3
+  - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+    amount: 1
   extensionSlots: 0
   extends: {fileID: 0}
   extensionReach: 6
@@ -52,7 +59,7 @@ MonoBehaviour:
   station: 0
   outputCapacity: 10
   queueLength: 5
-  buildWork: 0
+  buildWork: 3
   renown: 1
   upgrades: []
   comfort: 0

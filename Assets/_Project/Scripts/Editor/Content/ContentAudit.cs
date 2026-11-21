@@ -51,6 +51,8 @@ public static class ContentAudit
         "BossEncounterDefinition.gateItems[].item",
         // A torch burns its fuel each night (TorchFuel: Charcoal).
         "TorchFuel.fuel",
+        // A wall piece's torch (WallFittings).
+        "BuildingDefinition.wallTorchCost",
     };
 
     private static readonly string[] ItemNeither =
@@ -79,6 +81,8 @@ public static class ContentAudit
         "HavenRequestSettings.postedAt",
         // The Haven as a town (2026-11-15): the station an extension serves, and what a yard's role needs standing inside it.
         "BuildingDefinition.extends", "YardRoleDefinition.needs[].anyOf[]",
+        // The gate a wall piece can become (WallUpgrades): taught as a building on its own.
+        "BuildingDefinition.gateVersion",
         // What standing near a home makes it better (HomeLifeSettings › Features).
         "HomeLifeSettings.features[].near[]",
     };

@@ -74,6 +74,15 @@ public static class BuildingDemolition
             AddTo(items, cost.Item, cost.Amount);
         }
 
+        // A wall piece's torch comes back with it (WallFittings).
+        if (building.TryGetComponent(out WallFittings fittings) && fittings.HasTorch)
+        {
+            foreach (ItemAmount cost in definition.WallTorchCost)
+            {
+                AddTo(items, cost.Item, cost.Amount);
+            }
+        }
+
         if (!building.TryGetComponent(out Construction construction))
         {
             return;

@@ -52,6 +52,22 @@ public sealed partial class BuildPlacer
     // Metres the cursor moves before its way gets another point, and how far the way must bend off the straight line to be a curve.
     private const float PathStep = 0.6f;
     private const float PathBend = 1f;
+    // A drawn curve may run further than a straight drag: a ring round the Haven is 40-60 pieces.
+    private const int CurvePieces = 80;
+
+    // Metres along a drawn way.
+    private static float PathLength(System.Collections.Generic.List<Vector3> path)
+    {
+        float total = 0f;
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector3 step = path[i] - path[i - 1];
+            step.y = 0f;
+            total += step.magnitude;
+        }
+
+        return total;
+    }
 
     private void UpdateLine(Vector3 cursor, bool free)
     {
@@ -60,6 +76,16 @@ public sealed partial class BuildPlacer
         if (!joined)
         {
             end = cursor;
+        }
+
+        // A ring, as Gord draws a palisade (the user, 2026-11-21): drawn round and back to where it began, the wall closes on its start.
+        Vector3 back = cursor - lineStart;
+        back.y = 0f;
+        float pieceLength = BuildPlacement.PieceLength(LocalBounds);
+        if (!free && linePath.Count > 6 && back.magnitude <= Mathf.Max(2.5f, pieceLength * 0.6f) && PathLength(linePath) >= pieceLength * 4f)
+        {
+            end = lineStart;
+            joined = true;
         }
 
         Vector3 delta = end - lineStart;
@@ -95,7 +121,7 @@ public sealed partial class BuildPlacer
             // To the cursor (or the free end it joins), so the last piece ends where it is drawn to.
             int keep = linePath.Count;
             linePath.Add(joined ? end : cursor);
-            BuildPlacement.LayPath(linePath, length, maxLinePieces, lineCenters, lineDirections);
+            BuildPlacement.LayPath(linePath, length, Mathf.Max(maxLinePieces, CurvePieces), lineCenters, lineDirections);
             linePath.RemoveRange(keep, linePath.Count - keep);
         }
         else if (lineRound && HomePortal.Current != null)

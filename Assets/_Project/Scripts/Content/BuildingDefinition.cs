@@ -192,6 +192,14 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private bool encloses;
     [Tooltip("A gate in a yard's ring: people go in and out here. A yard needs one.")]
     [SerializeField] private bool isGate;
+    [Tooltip("Walls (the user, 2026-11-21: \"a wall section can be upgraded to a gate\"): the gate a piece of this wall becomes from its " +
+             "Upgrade page. The gate's cost is paid and the piece's given back. Empty: it can't.")]
+    [SerializeField] private BuildingDefinition gateVersion;
+    [Tooltip("Walls (\"a wall section can be upgraded to hold a torch\"): the torch a piece can hold (WallFittings), burning charcoal at " +
+             "night like any torch (TorchFuel). Empty: it can't hold one.")]
+    [SerializeField] private GameObject wallTorch;
+    [Tooltip("What fitting that torch costs; given back when it is taken down or the piece is.")]
+    [SerializeField] private List<ItemAmount> wallTorchCost = new List<ItemAmount>();
 
     [Header("Station extensions")]
     [Tooltip("How many extensions (a bellows, a quench tub...) this station takes at its first level; upgrades add more " +
@@ -272,6 +280,9 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     /// <summary>A line piece that closes a yard.</summary>
     public bool Encloses => encloses || isGate;
     public bool IsGate => isGate;
+    public BuildingDefinition GateVersion => gateVersion;
+    public GameObject WallTorch => wallTorch;
+    public IReadOnlyList<ItemAmount> WallTorchCost => wallTorchCost;
     SoundDefinition ICombatSounds.HurtSound => null;
     public float BuildWork => buildWork;
     public int Renown => renown;

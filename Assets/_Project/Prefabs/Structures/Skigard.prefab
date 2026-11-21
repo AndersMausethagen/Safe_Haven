@@ -128,6 +128,7 @@ GameObject:
   - component: {fileID: 496618339047125914}
   - component: {fileID: 5586801724730291153}
   - component: {fileID: 2084990266287670973}
+  - component: {fileID: 5631698625344635734}
   m_Layer: 0
   m_Name: Skigard
   m_TagString: Untagged
@@ -259,6 +260,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Construction
   startsRuined: 0
+--- !u!114 &5631698625344635734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5723684251509998500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68be1fc0ab16de845bc04dcdf902435a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::WallFittings
 --- !u!1001 &3331500084782049718
 PrefabInstance:
   m_ObjectHideFlags: 0
