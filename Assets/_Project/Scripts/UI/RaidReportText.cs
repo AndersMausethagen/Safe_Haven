@@ -24,7 +24,7 @@ public static class RaidReportText
     public static string Describe(RaidReport report) => Describe(report, false);
 
     /// <param name="listsShownApart">The haul is shown as pictures beside the words (RaidReportCards): what came home,
-    /// was used up, lost or saved, and what it was worth, are left out.</param>
+    /// was used up, lost or saved, what it was worth, and what was learned, are left out.</param>
     public static string Describe(RaidReport report, bool listsShownApart)
     {
         var builder = new StringBuilder();
@@ -177,7 +177,7 @@ public static class RaidReportText
             Paragraph(builder, $"<color={Muted}>You woke at the portal. Your safe pocket, recipes and discoveries are kept. Your storage is untouched.</color>");
         }
 
-        Paragraph(builder, Details(report));
+        Paragraph(builder, Details(report, lessonsShownApart: true));
         return builder.ToString().Trim();
     }
 
@@ -203,11 +203,11 @@ public static class RaidReportText
         builder.Append(text);
     }
 
-    // Lessons, the way there, how the gathering went, and the modifiers and sparks spent.
-    private static string Details(RaidReport report)
+    // Lessons (unless they are cards: RaidReportCards), the way there, how the gathering went, and the modifiers and sparks spent.
+    private static string Details(RaidReport report, bool lessonsShownApart = false)
     {
         var builder = new StringBuilder();
-        string lessons = Lessons(report);
+        string lessons = lessonsShownApart ? null : Lessons(report);
         if (lessons != null)
         {
             builder.Append(lessons).Append("\n\n");
@@ -389,6 +389,25 @@ public static class RaidReportText
         }
 
         return text.ToString();
+    }
+
+    /// <summary>
+    /// The heading over what was learned when it is shown as cards (RaidReportCards): the raid bonus beside it, brought home or lost.
+    /// </summary>
+    public static string LessonsHeading(RaidReport report)
+    {
+        int bonus = 0;
+        bool kept = false;
+        foreach (SkillLesson lesson in report.Lessons)
+        {
+            bonus += lesson.Bonus;
+            kept |= lesson.BonusKept;
+        }
+
+        string title = "What you learned";
+        return bonus <= 0 ? title : kept
+            ? $"{title}   <size=80%><color={Gain}>raid bonus +{bonus} brought home</color></size>"
+            : $"{title}   <size=80%><color={Loss}>raid bonus {bonus} lost: it comes home only with you</color></size>";
     }
 
     public static string Gathering(GatheringStats stats)

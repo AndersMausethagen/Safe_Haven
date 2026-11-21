@@ -27,6 +27,7 @@ public sealed class RaidSummaryWindow : MonoBehaviour
     private const float Inset = 32f;
     private KitHaul first;
     private KitHaul second;
+    private KitCardRow lessons;
     private RectTransform panel;
     private float panelHeight;
     private float bodyTop;
@@ -53,6 +54,8 @@ public sealed class RaidSummaryWindow : MonoBehaviour
         area.sizeDelta = new Vector2(-Inset * 2f, 0f);
         first = new KitHaul(area, "First", 0f, CardSize);
         second = new KitHaul(area, "Second", 0f, CardSize);
+        // What was learned, a card a skill (it was a list of lines in the words below).
+        lessons = new KitCardRow(area, "Lessons", 112f, 64f);
     }
 
     // After the haul's area is made, so that it moves down under the painting with the divider.
@@ -86,7 +89,7 @@ public sealed class RaidSummaryWindow : MonoBehaviour
         subtitleLabel.text = RaidReportText.Subtitle(report);
         MakeHaul();
         float painting = ShowBanner(report);
-        float haul = RaidReportCards.Show(report, first, second, 0f) + 10f;
+        float haul = RaidReportCards.Show(report, first, second, lessons, 0f) + 10f;
         string words = RaidReportText.Describe(report, true);
         bodyLabel.text = words;
         // The words take what they need, no more: a short report leaves no field of empty leather under the pictures.

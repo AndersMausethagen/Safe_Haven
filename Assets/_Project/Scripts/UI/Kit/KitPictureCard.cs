@@ -70,6 +70,8 @@ public sealed class KitPictureCard
         badge.raycastTarget = false;
         badgeLabel = CodeUI.Label("Count", badgeRect, 0f, 0f, 40f, 20f, 14f, style.AccentBright, TextAlignmentOptions.Center);
         badgeLabel.fontStyle = FontStyles.Bold;
+        // A count is never cut short: the plate grows to it (SetBadge).
+        badgeLabel.overflowMode = TextOverflowModes.Overflow;
         badge.gameObject.SetActive(false);
 
         label = CodeUI.Paragraph("Name", root, 0f, pictureHeight + NameGap, width, nameHeight, nameSize, style.Text);
@@ -123,6 +125,17 @@ public sealed class KitPictureCard
     {
         badge.gameObject.SetActive(!string.IsNullOrEmpty(text));
         badgeLabel.text = text;
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        // Sized to its words (hidden text measures nothing: then the plate keeps its last size).
+        float words = badgeLabel.GetPreferredValues(text).x;
+        float plate = words > 0f ? Mathf.Clamp(Mathf.Ceil(words) + 12f, 24f, width - 8f) : badge.rectTransform.sizeDelta.x;
+        badge.rectTransform.sizeDelta = new Vector2(plate, 20f);
+        badge.rectTransform.anchoredPosition = new Vector2(width - 4f - plate, badge.rectTransform.anchoredPosition.y);
+        badgeLabel.rectTransform.sizeDelta = new Vector2(plate, 20f);
     }
 
     /// <summary>

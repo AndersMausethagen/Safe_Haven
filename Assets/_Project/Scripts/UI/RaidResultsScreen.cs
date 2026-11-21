@@ -44,6 +44,7 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
     private const float CardSize = 72f;
     private KitHaul first;
     private KitHaul second;
+    private KitCardRow lessons;
     private RectTransform reportRect;
     private float reportTop;
 
@@ -145,7 +146,7 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         subtitleLabel.text = RaidReportText.Subtitle(report);
         if (MakeHaul())
         {
-            float haul = RaidReportCards.Show(report, first, second, 0f) + 12f;
+            float haul = RaidReportCards.Show(report, first, second, lessons, 0f) + 12f;
             reportRect.offsetMax = new Vector2(reportRect.offsetMax.x, -(reportTop + haul));
             bodyLabel.text = RaidReportText.Describe(report, true);
         }
@@ -182,6 +183,8 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         area.sizeDelta = new Vector2(reportRect.offsetMax.x - reportRect.offsetMin.x, 0f);
         first = new KitHaul(area, "First", 0f, CardSize);
         second = new KitHaul(area, "Second", 0f, CardSize);
+        // What was learned, a card a skill (it was a list of lines in the words below).
+        lessons = new KitCardRow(area, "Lessons", 112f, 64f);
         return true;
     }
 

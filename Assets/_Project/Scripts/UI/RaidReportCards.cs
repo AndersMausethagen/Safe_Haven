@@ -1,7 +1,12 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 /// <summary>
 /// A raid's haul as pictures (KitHaul, Hearthline 3): on an extraction what came home (and what it is worth) and what was
 /// used up; on a fall what was lost and what the safe pocket saved. The words under them are then
-/// RaidReportText.Describe(report, true), which leaves those lists out. Shared by the results screen and the Haven's summary.
+/// RaidReportText.Describe(report, true), which leaves those lists out. Under them, what was learned, a card a skill (KitCardRow:
+/// its icon, its name and levels, the experience in the corner), where there was a line a skill. Shared by the results screen and
+/// the Haven's summary.
 /// </summary>
 public static class RaidReportCards
 {
@@ -9,7 +14,43 @@ public static class RaidReportCards
 
     /// <summary>Shows the report's haul in <paramref name="first"/> and <paramref name="second"/>, the first at
     /// <paramref name="top"/>; returns the height they take together.</summary>
-    public static float Show(RaidReport report, KitHaul first, KitHaul second, float top, int rows = 2)
+    public static float Show(RaidReport report, KitHaul first, KitHaul second, float top, int rows = 2) =>
+        Show(report, first, second, null, top, rows);
+
+    /// <summary>As Show, with what was learned as cards in <paramref name="lessons"/> under the haul.</summary>
+    public static float Show(RaidReport report, KitHaul first, KitHaul second, KitCardRow lessons, float top, int rows = 2)
+    {
+        float haul = ShowHaul(report, first, second, top, rows);
+        if (lessons == null)
+        {
+            return haul;
+        }
+
+        var faces = new List<KitCardFace>();
+        UIStyle style = UIStyle.Current;
+        foreach (SkillLesson lesson in report.Lessons)
+        {
+            if (lesson.Skill == null)
+            {
+                continue;
+            }
+
+            bool rose = lesson.LevelAfter > lesson.LevelBefore;
+            int total = lesson.Experience + (lesson.BonusKept ? lesson.Bonus : 0);
+            faces.Add(new KitCardFace
+            {
+                Name = rose ? $"{lesson.Skill.DisplayName} {lesson.LevelBefore} → {lesson.LevelAfter}" : $"{lesson.Skill.DisplayName} {lesson.LevelAfter}",
+                Picture = lesson.Skill.Icon, Icon = "Star", Badge = $"+{total}", Rim = rose ? style.Good : (Color?)null,
+            });
+        }
+
+        float gap = haul > 0f && faces.Count > 0 ? Gap : 0f;
+        lessons.Top = top + haul + gap;
+        float learned = lessons.Show(RaidReportText.LessonsHeading(report), "Star", style.Accent, faces);
+        return haul + (learned > 0f ? gap + learned : 0f);
+    }
+
+    private static float ShowHaul(RaidReport report, KitHaul first, KitHaul second, float top, int rows)
     {
         UIStyle style = UIStyle.Current;
         bool gainedAny = report.ItemsGained.Count > 0 || report.ResourcesGained.Count > 0;

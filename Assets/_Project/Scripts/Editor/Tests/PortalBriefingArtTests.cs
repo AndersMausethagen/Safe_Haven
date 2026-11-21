@@ -120,6 +120,41 @@ public sealed class PortalBriefingArtTests
         Object.DestroyImmediate(texture);
     }
 
+    // The raid report's "What you learned" was a line a skill; beside the haul's pictures it is a card a skill (RaidReportCards).
+    [Test]
+    public void WhatARaidTaught_IsCards_WhereTheHaulIsPictures_AndWordsWhereItIsNot()
+    {
+        var raid = ScriptableObject.CreateInstance<RaidDefinition>();
+        var skill = ScriptableObject.CreateInstance<ProficiencyDefinition>();
+        try
+        {
+            var none = new RaidModifierDefinition[0];
+            var session = new RaidSession(raid, none, RaidParameters.Calculate(raid, none), null, "SafeHaven");
+            session.End(RaidOutcome.Extracted);
+            RaidReport report = RaidReport.Create(session, null, null);
+            report.Lessons.Add(new SkillLesson(skill, 3, 5, 40, 10, true));
+
+            StringAssert.Contains("What you learned", RaidReportText.Describe(report), "the plain report keeps the lines");
+            StringAssert.DoesNotContain("What you learned", RaidReportText.Describe(report, true), "beside the pictures they are cards");
+            StringAssert.Contains("+10 brought home", RaidReportText.LessonsHeading(report));
+
+            RectTransform parent = Parent();
+            parent.sizeDelta = new Vector2(600f, 400f);
+            var first = new KitHaul(parent, "First", 0f, 64f);
+            var second = new KitHaul(parent, "Second", 0f, 64f);
+            var lessons = new KitCardRow(parent, "Lessons", 112f, 64f);
+            float without = RaidReportCards.Show(report, first, second, 0f);
+            float with = RaidReportCards.Show(report, first, second, lessons, 0f);
+            Assert.Greater(with, without, "the lessons' cards take their room under the haul");
+            Assert.AreEqual(1, parent.Find("Lessons").GetComponentsInChildren<UnityEngine.UI.RawImage>(true).Length, "one card for the one skill");
+        }
+        finally
+        {
+            Object.DestroyImmediate(raid);
+            Object.DestroyImmediate(skill);
+        }
+    }
+
     [Test]
     public void TheSky_IsNamedAndSigned_ForItsChip()
     {
