@@ -192,7 +192,7 @@ public sealed partial class RaidPreparationWindow
             {
                 Name = "What they took", Picture = leader.Portrait, Icon = "Skull", Rim = style.Danger,
                 TipTitle = $"The {leader.DisplayName} that led them", TipColour = style.Danger,
-                TipBody = $"It carries {plunder.Describe()} from your stores. Lay it low to take it all back.",
+                TipBody = $"It carries {plunder.Describe()} from your stores. Lay it low and bring home what it drops.",
             });
         }
 

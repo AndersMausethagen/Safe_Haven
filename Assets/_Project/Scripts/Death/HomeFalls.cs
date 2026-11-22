@@ -25,8 +25,7 @@ public static class HomeFalls
     public static bool Spared(DeathRules rules)
     {
         WardBreachDirector breach = WardBreachDirector.Current;
-        bool firstBreach = breach != null && breach.IsActive && breach.Definition != null && !breach.Definition.ThreatensHome;
-        return rules == DeathRules.Gentle || DeathSettings.Spared || firstBreach;
+        return rules == DeathRules.Gentle || DeathSettings.Spared || (breach != null && breach.SparesAFall);
     }
 
     /// <summary>Takes what a fall at <paramref name="fellAt"/> costs <paramref name="player"/>.</summary>
@@ -113,7 +112,8 @@ public static class HomeFalls
         if (cost.Lessons.Count > 0)
         {
             string lost = string.Join(", ", cost.Lessons.OrderByDescending(lesson => lesson.Value).Take(4).Select(lesson => $"{lesson.Key.DisplayName} −{lesson.Value}"));
-            lines.Add($"<color={UIStyle.Hex(style.Warning)}>You forgot some of what you learned: {lost}.</color> The cairn gives some of it back.");
+            lines.Add($"<color={UIStyle.Hex(style.Warning)}>You forgot some of what you learned: {lost}.</color>" +
+                      (cost.Cairn != null ? " The cairn gives some of it back." : ""));
         }
         else if (cost.InGrace)
         {

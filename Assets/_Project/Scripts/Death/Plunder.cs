@@ -150,7 +150,7 @@ public sealed class PlunderCarrier : MonoBehaviour
             DroppedItem.Drop(transform, new ItemStack(item.Item, item.Amount));
         }
 
-        GameMessages.Post($"It falls, and what it took from your stores spills out: {plunder.Describe()}.", MessageKind.Gain);
+        GameMessages.Post($"It falls, and what it took from your stores spills out: {plunder.Describe()}. Carry it home.", MessageKind.Gain);
         PlaytestLogger.Note(PlaytestLog.Plundered, "Recovered", plunder.Items.Sum(item => item.Amount), plunder.Describe());
         GameSession.Home.SetPlunder(null);
     }

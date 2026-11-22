@@ -207,6 +207,9 @@ public static class GameSession
         Reset();
         Tutorials.Clear();
         Appearance = look;
+        // The character screen's death rules are this game's (CharacterProgress reads them as it is made), and only this one's.
+        _ = Progress;
+        DeathSettings.ChosenForNewGame = null;
     }
 
     /// <summary>Replaces everything with a loaded game. The player takes it on arriving in the next scene.</summary>
@@ -219,6 +222,8 @@ public static class GameSession
         world = game.World;
         quests = game.Quests;
         progress = game.Progress;
+        // The grace's clock names the world it runs in: begun again on the one just loaded, or it never counted down.
+        progress?.StartFallGrace(progress.FallGraceLeft);
         settlement = game.Settlement;
         playtest = game.Playtest;
         Appearance = game.Appearance;

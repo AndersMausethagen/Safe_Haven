@@ -553,9 +553,15 @@ public sealed class WardBreachDirector : MonoBehaviour
             }
         }
 
-        List<ItemAmount> taken = Plunder.Take(GameSession.Stash.Items, rules.plunderShare, rules.plunderStacks, rules.plunderMost);
+        // Who carries it first: nothing is taken without a leader to win it back from.
         MonsterDefinition leader = LeaderOf(breach);
-        if (taken.Count == 0 || leader == null)
+        if (leader == null)
+        {
+            return "";
+        }
+
+        List<ItemAmount> taken = Plunder.Take(GameSession.Stash.Items, rules.plunderShare, rules.plunderStacks, rules.plunderMost);
+        if (taken.Count == 0)
         {
             return "";
         }
@@ -581,7 +587,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         MonsterDefinition named = JournalSettings.Current.FindCreature(plunder.Leader);
         MonsterDefinition carrier = named != null ? named : leader;
         return $"\n\n<color={UIStyle.Hex(UIStyle.Current.Danger)}>They carried off {what} from your stores.</color> Their leader, a {carrier.DisplayName}, " +
-               "walks your next raid with it: lay it low to take it all back." +
+               "walks your next raid with it: lay it low and bring home what it drops." +
                (rules.fightersBruised ? " Those who fought are bruised until the next dawn." : "");
     }
 
@@ -631,21 +637,50 @@ public sealed class WardBreachDirector : MonoBehaviour
         }
 
         string failed = running.FailedText;
+        firstBreachFellAt = Time.frameCount;
         SendAway();
         End();
         GameMessages.Post(failed, MessageKind.Warning);
     }
 
+    private int firstBreachFellAt = -1;
+
+    /// <summary>True while a fall now is spared by the breach: the first, scripted one teaches (the death rules). Also in the frame its fall
+    /// ended it, whichever of the director and HomeRevival heard of the fall first.</summary>
+    public bool SparesAFall => (IsActive && running != null && !running.ThreatensHome) || firstBreachFellAt == Time.frameCount;
+
     // Recovery (GDD §6.7): what the home took, and the way to put it right.
     private void ShowRecovery(string title, string outcome)
     {
         GameObject player = Player.Current != null ? Player.Current.gameObject : null;
-        if (player == null || playerHealth == null || !playerHealth.IsAlive || ActionMenuWindow.Current == null)
+        if (player == null || playerHealth == null || ActionMenuWindow.Current == null)
         {
             return;
         }
 
+        // Down when the ward fell (the wake in a breach is long now): shown once they are up, so what was taken isn't missed.
+        if (!playerHealth.IsAlive)
+        {
+            StartCoroutine(ShowRecoveryOnWaking(title, outcome));
+            return;
+        }
+
         ActionMenuWindow.Current.Open(() => Recovery(title, outcome, player), player);
+    }
+
+    private IEnumerator ShowRecoveryOnWaking(string title, string outcome)
+    {
+        float giveUpAt = Time.time + 60f;
+        while (playerHealth != null && !playerHealth.IsAlive && Time.time < giveUpAt)
+        {
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+        if (playerHealth != null && playerHealth.IsAlive)
+        {
+            ShowRecovery(title, outcome);
+        }
     }
 
     private static MenuPage Recovery(string title, string outcome, GameObject player)

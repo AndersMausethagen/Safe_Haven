@@ -951,7 +951,6 @@ public sealed class SettlementState : IHavenView
         Changed?.Invoke();
     }
 
-    /// <summary>The ward fell: it stays strained for a while, and the same breach waits to be tried again.</summary>
     /// <summary>What a lost breach's band carried off (Plunder), walking the next raid with its leader until it is laid low; null when none.</summary>
     public PlunderRecord Plunder { get; private set; }
 
@@ -963,6 +962,7 @@ public sealed class SettlementState : IHavenView
         Changed?.Invoke();
     }
 
+    /// <summary>The ward fell: it stays strained for a while, and the same breach waits to be tried again.</summary>
     public void LoseBreach(int strainRaids)
     {
         Borrowed();

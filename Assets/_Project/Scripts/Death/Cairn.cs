@@ -11,7 +11,7 @@ using UnityEngine.AI;
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
-[InAFriendsHaven(HavenUse.NotInAHaven, "the player's own: a fall in a friend's Haven leaves no cairn (HomeFalls)")]
+[InAFriendsHaven(HavenUse.HostOnly, "the player's own: a visitor neither leaves one (HomeFalls) nor takes the host's")]
 public sealed class Cairn : MonoBehaviour, ISaveable, IInteractionName, IInteractionVerb, IInteractionCondition
 {
     private const int MostSlots = 96;
@@ -128,7 +128,7 @@ public sealed class Cairn : MonoBehaviour, ISaveable, IInteractionName, IInterac
 
     public bool CanInteract(GameObject user, out string reason)
     {
-        reason = user != null && user.GetComponent<ItemInventory>() != null ? null : "Only you can take these back.";
+        reason = HavenVisit.IsVisiting || user == null || user.GetComponent<ItemInventory>() == null ? "Only the one who fell here can take these back." : null;
         return reason == null;
     }
 
@@ -143,6 +143,11 @@ public sealed class Cairn : MonoBehaviour, ISaveable, IInteractionName, IInterac
         }
 
         int before = StacksIn(held);
+        if (user.TryGetComponent(out PlayerEquipment equipment) && equipment.Gear != null)
+        {
+            equipment.Gear.AutoEquipFrom(held);
+        }
+
         for (int i = 0; i < held.SlotCount; i++)
         {
             held.TransferTo(i, inventory.Container);

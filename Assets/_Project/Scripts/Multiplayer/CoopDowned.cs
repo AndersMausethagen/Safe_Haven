@@ -386,7 +386,8 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         IsDown = true;
         // Each fall in the same raid leaves less time than the last.
         int run = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Seed : 0;
-        falls = run == fallsInRun ? falls + 1 : 1;
+        // Each fall in the same raid shortens the next; at home every fall starts from the full time.
+        falls = run == fallsInRun && GameSession.ActiveRaid != null ? falls + 1 : 1;
         fallsInRun = run;
         float seconds = Mathf.Max(settings.ShortestBleedOut, settings.BleedOutSeconds * Mathf.Pow(settings.BleedOutPerFall, falls - 1));
         bleedOutAt = Time.time + seconds;
@@ -431,6 +432,11 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         }
 
         health.Finish(null);
+        // At home the same body wakes at the portal (HomeRevival): the crawl's hold must not outlive the fall. In a raid the scene changes.
+        if (GameSession.ActiveRaid == null)
+        {
+            SetActing(true);
+        }
     }
 
     // Down: no moving or acting, lying as the dead lie (which friends see through the mirrored animation).
