@@ -16,12 +16,14 @@ public sealed class KeeperHud : MonoBehaviour
     private const float StripHeight = 76f;
 
     private CanvasGroup group;
-    private RectTransform tag;
+    private RectTransform tagBox;
     private TMP_Text tagName;
     private TMP_Text tagFact;
     private TMP_Text keys;
     private TMP_Text backLabel;
     private TMP_Text ringLabel;
+    private string shownNoRing = "-";
+    private int shownRings = -1;
     private TMP_Text clearLabel;
     private Button clearButton;
     private RectTransform reticle;
@@ -62,11 +64,11 @@ public sealed class KeeperHud : MonoBehaviour
         reticle.gameObject.SetActive(reticleShown);
         if (thing == null)
         {
-            tag.gameObject.SetActive(false);
+            tagBox.gameObject.SetActive(false);
             return;
         }
 
-        tag.gameObject.SetActive(true);
+        tagBox.gameObject.SetActive(true);
         // Its words a few times a second, not every frame.
         if (thing != tagged || Time.unscaledTime >= nextTagRead)
         {
@@ -80,9 +82,9 @@ public sealed class KeeperHud : MonoBehaviour
             // Beside the pointer, kept on the screen.
             Vector2 size = canvasRect.rect.size;
             Vector2 at = local + new Vector2(24f, -12f);
-            at.x = Mathf.Clamp(at.x, -size.x * 0.5f, size.x * 0.5f - tag.sizeDelta.x);
-            at.y = Mathf.Clamp(at.y, -size.y * 0.5f + tag.sizeDelta.y, size.y * 0.5f);
-            tag.anchoredPosition = at;
+            at.x = Mathf.Clamp(at.x, -size.x * 0.5f, size.x * 0.5f - tagBox.sizeDelta.x);
+            at.y = Mathf.Clamp(at.y, -size.y * 0.5f + tagBox.sizeDelta.y, size.y * 0.5f);
+            tagBox.anchoredPosition = at;
         }
     }
 
@@ -91,6 +93,8 @@ public sealed class KeeperHud : MonoBehaviour
     private const int MostMarks = 12;
     private const float MarkLift = 4.5f;
     private readonly System.Collections.Generic.List<TMP_Text> marks = new System.Collections.Generic.List<TMP_Text>();
+    // The buildings the marks stand over, in order (refreshed with the text).
+    private readonly System.Collections.Generic.List<BuildingObject> marked = new System.Collections.Generic.List<BuildingObject>();
     private float nextMarks;
 
     /// <summary>Puts a small label over each station with work ready and each plan in view (a few times a second).</summary>
@@ -103,47 +107,56 @@ public sealed class KeeperHud : MonoBehaviour
                 mark.transform.parent.gameObject.SetActive(false);
             }
 
+            marked.Clear();
             return;
         }
 
-        if (Time.unscaledTime < nextMarks)
+        if (Time.unscaledTime >= nextMarks)
         {
-            return;
-        }
-
-        nextMarks = Time.unscaledTime + 0.25f;
-        int used = 0;
-        foreach (BuildingObject building in BuildingObject.Active)
-        {
-            if (used >= MostMarks)
+            nextMarks = Time.unscaledTime + 0.25f;
+            marked.Clear();
+            foreach (BuildingObject building in BuildingObject.Active)
             {
-                break;
+                if (marked.Count >= MostMarks)
+                {
+                    break;
+                }
+
+                string text = building != null && OnScreen(camera, building, out _) ? MarkFor(building) : null;
+                if (text != null)
+                {
+                    Mark(marked.Count).text = text;
+                    marked.Add(building);
+                }
             }
 
-            string text = MarkFor(building);
-            if (text == null)
+            for (int i = marked.Count; i < marks.Count; i++)
             {
-                continue;
-            }
-
-            Vector3 viewport = camera.WorldToViewportPoint(building.transform.position + Vector3.up * MarkLift);
-            if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f)
-            {
-                continue;
-            }
-
-            TMP_Text label = Mark(used++);
-            label.text = text;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, camera.ViewportToScreenPoint(viewport), null, out Vector2 local))
-            {
-                ((RectTransform)label.transform).anchoredPosition = local;
+                marks[i].transform.parent.gameObject.SetActive(false);
             }
         }
 
-        for (int i = used; i < marks.Count; i++)
+        // Every frame, so a mark keeps over its building as the view pans and zooms.
+        for (int i = 0; i < marked.Count; i++)
         {
-            marks[i].transform.parent.gameObject.SetActive(false);
+            GameObject box = marks[i].transform.parent.gameObject;
+            bool shown = marked[i] != null && OnScreen(camera, marked[i], out Vector3 viewport)
+                && RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, camera.ViewportToScreenPoint(viewport), null, out Vector2 local)
+                && PutAt(marks[i], local);
+            box.SetActive(shown);
         }
+    }
+
+    private static bool OnScreen(Camera camera, BuildingObject building, out Vector3 viewport)
+    {
+        viewport = camera.WorldToViewportPoint(building.transform.position + Vector3.up * MarkLift);
+        return viewport.z > 0f && viewport.x >= 0f && viewport.x <= 1f && viewport.y >= 0f && viewport.y <= 1f;
+    }
+
+    private static bool PutAt(TMP_Text label, Vector2 local)
+    {
+        ((RectTransform)label.transform.parent).anchoredPosition = local;
+        return true;
     }
 
     private static string MarkFor(BuildingObject building)
@@ -158,9 +171,11 @@ public sealed class KeeperHud : MonoBehaviour
             return "Plan";
         }
 
-        if (!construction.IsBuilding && building.TryGetComponent(out CraftingStation station) && station.Queue != null && station.Queue.OutputAmount > 0)
+        // Found, never made by looking (StationQueue's getter creates one).
+        StationQueue queue = !construction.IsBuilding && building.TryGetComponent(out CraftingStation station) ? GameSession.Here.Workshops.Find(station.Id) : null;
+        if (queue != null && queue.OutputAmount > 0)
         {
-            return $"{station.Queue.OutputAmount} ready";
+            return $"{queue.OutputAmount} ready";
         }
 
         return null;
@@ -269,15 +284,15 @@ public sealed class KeeperHud : MonoBehaviour
         keys.overflowMode = TextOverflowModes.Overflow;
 
         // The tag beside the pointer.
-        tag = Box("Tag", root, new Vector2(0.5f, 0.5f), new Vector2(330f, 64f), Vector2.zero);
-        tag.pivot = new Vector2(0f, 1f);
-        tag.gameObject.AddComponent<Image>().raycastTarget = false;
-        tag.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Inset);
-        tagName = Label("Name", tag, 12f, 6f, 306f, 28f, 20f, style.Text);
+        tagBox = Box("Tag", root, new Vector2(0.5f, 0.5f), new Vector2(330f, 64f), Vector2.zero);
+        tagBox.pivot = new Vector2(0f, 1f);
+        tagBox.gameObject.AddComponent<Image>().raycastTarget = false;
+        tagBox.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Inset);
+        tagName = Label("Name", tagBox, 12f, 6f, 306f, 28f, 20f, style.Text);
         tagName.overflowMode = TextOverflowModes.Overflow;
-        tagFact = Label("Fact", tag, 12f, 34f, 306f, 24f, 16f, style.Muted);
+        tagFact = Label("Fact", tagBox, 12f, 34f, 306f, 24f, 16f, style.Muted);
         tagFact.overflowMode = TextOverflowModes.Overflow;
-        tag.gameObject.SetActive(false);
+        tagBox.gameObject.SetActive(false);
 
         // The controller's reticle: what is in the middle of the screen is what A picks.
         reticle = Box("Reticle", root, new Vector2(0.5f, 0.5f), new Vector2(22f, 22f), Vector2.zero);
@@ -327,11 +342,17 @@ public sealed class KeeperHud : MonoBehaviour
             return;
         }
 
+        // The ring buttons, written again only when what they say changes.
         string noRing = KeeperView.WhyNoRing();
-        ringLabel.text = noRing == null ? "Fell a ring of trees" : "Fell a ring (no woodcutter yet)";
         int rings = GameSession.Here.Rings.Count;
-        clearButton.gameObject.SetActive(rings > 0);
-        clearLabel.text = $"Clear the ring{(rings == 1 ? "" : "s")} ({rings})";
+        if (noRing != shownNoRing || rings != shownRings)
+        {
+            shownNoRing = noRing;
+            shownRings = rings;
+            ringLabel.text = noRing == null ? "Fell a ring of trees" : $"Fell a ring ({KeeperView.ShortWhyNoRing()})";
+            clearButton.gameObject.SetActive(rings > 0 && !HavenVisit.IsVisiting);
+            clearLabel.text = $"Clear the ring{(rings == 1 ? "" : "s")} ({rings})";
+        }
 
         // Key names follow a rebind and the device in hand.
         int changes = InputRebinds.Changes * 2 + (InputDevices.UsingGamepad ? 1 : 0);

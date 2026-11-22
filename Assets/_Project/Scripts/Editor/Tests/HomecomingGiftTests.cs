@@ -53,7 +53,7 @@ public sealed class HomecomingGiftTests
         var job = AssetDatabase.LoadAssetAtPath<JobDefinition>("Assets/_Project/Data/Settlement/Carpenter.asset");
         var tor = AssetDatabase.LoadAssetAtPath<ResidentDefinition>("Assets/_Project/Data/Prologue/Residents/Tor.asset");
         var plank = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Materials/OakPlank.asset");
-        Assume.That(content != null && job != null && tor != null && plank != null);
+        Assert.IsTrue(content != null && job != null && tor != null && plank != null, "the gift's assets have moved: update the paths");
         HomecomingSettings settings = Settings(job, plank, 0.5f);
 
         var home = new SettlementState();

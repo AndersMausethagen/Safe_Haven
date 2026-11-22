@@ -65,7 +65,8 @@ public static class HomeAssault
         float nearestDistance = float.MaxValue;
         foreach (BuildingObject building in BuildingObject.Active)
         {
-            if (building != null && building.TryGetComponent(out Damageable health) && health.IsAlive && !health.IsBroken)
+            // A plan is only a mark on the ground: nothing there to break, and no free decoy.
+            if (building != null && building.TryGetComponent(out Damageable health) && health.IsAlive && !health.IsBroken && !Construction.IsPlanned(building))
             {
                 float distance = (building.transform.position - from).sqrMagnitude;
                 if (wallPreference > 1f && building.Definition != null && building.Definition.PlaceInLines)

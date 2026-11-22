@@ -333,6 +333,11 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             hint.Append(" Keep the marked ground in front of it clear.");
         }
 
+        if (CanPlan(building) && !CanAfford(building, 1, out _))
+        {
+            hint.Append(" Short of its materials, it is laid out as a plan: paid from your chests once they hold it all.");
+        }
+
         GameMessages.Post(hint.ToString());
     }
 
@@ -595,17 +600,19 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
     // True when what was placed stands at once; false for a scaffold to hammer up (Construction), which is Built when finished.
     private static bool StandsAtOnce(GameObject placed) => !(placed.TryGetComponent(out Construction construction) && construction.IsBuilding);
 
-    // Pays and places one building: a scaffold to hammer up when its kind takes work (Construction). Null when it can't
-    // be paid for.
     /// <summary>Whether <paramref name="building"/> may be laid out as a plan when it can't be paid for yet: one that takes work (a
-    /// scaffold), placed singly, in the Haven (not the prologue's camp).</summary>
+    /// scaffold of its own to raise), placed singly, in the Haven (not the prologue's camp).</summary>
     public static bool CanPlan(BuildingDefinition building) =>
-        building != null && building.BuildWork > 0f && !building.PlaceInLines && global::Place.AtHome && HomePortal.Current != null;
+        building != null && building.BuildWork > 0f && !building.PlaceInLines && building.Prefab != null
+        && building.Prefab.TryGetComponent(out Construction _) && global::Place.AtHome && HomePortal.Current != null;
 
     // The spot being placed now is short of materials and will be a plan (UpdatePlacing), read as it is confirmed.
     private bool placeAsPlan;
 
     private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation) => Build(building, position, rotation, false);
+
+    // Pays and places one building: a scaffold to hammer up when its kind takes work (Construction), or with plan an unpaid one
+    // (Construction.BeginPlan). Null when it can't be paid for.
 
     private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation, bool plan)
     {

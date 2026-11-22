@@ -78,6 +78,10 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [SerializeField, Min(1)] private int mostRings = 3;
     [Tooltip("A new ring's radius in metres (the wheel changes it while drawing).")]
     [SerializeField, Min(3f)] private float ringRadius = 10f;
+    [Tooltip("The share of the time away a woodcutter fells (working hours only, and their bench first, as at home).")]
+    [SerializeField, Range(0f, 1f)] private float awayFellingShare = 0.4f;
+    [Tooltip("What a woodcutter holds while felling (shown in hand; any axe).")]
+    [SerializeField] private ItemDefinition fellingTool;
 
     public System.Collections.Generic.IReadOnlyList<JobDefinition> Fellers => fellers;
     public float ChopSeconds => chopSeconds;
@@ -87,14 +91,22 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     public SaplingDefinition Sapling => sapling;
     public int MostRings => mostRings;
     public float RingRadius => ringRadius;
+    public float AwayFellingShare => awayFellingShare;
+    public ItemDefinition FellingTool => fellingTool;
 
     public float UnattendedSpeed => unattendedSpeed;
     public float PlayerSpeed => playerSpeed;
     public float PlayerReach => playerReach;
 
     /// <summary>What a station of <paramref name="type"/> runs at with nobody at it: Unattended Speed for the worked kinds, else 1.</summary>
-    public float UnattendedFor(CraftingStationType type) =>
-        workedStations != null && System.Array.IndexOf(workedStations, type) >= 0 ? unattendedSpeed : 1f;
+    public float UnattendedFor(CraftingStationType type) => IsWorked(type) ? unattendedSpeed : 1f;
+
+    /// <summary>What the player standing at a station of <paramref name="type"/> adds: Player Speed at the worked kinds, else nothing
+    /// (a farm or a hive grows at its own pace, whoever stands by it).</summary>
+    public float PlayerSpeedFor(CraftingStationType type) => IsWorked(type) ? playerSpeed : 0f;
+
+    /// <summary>Whether a station of <paramref name="type"/> is worked by hand (Worked Stations).</summary>
+    public bool IsWorked(CraftingStationType type) => workedStations != null && System.Array.IndexOf(workedStations, type) >= 0;
     public float WorkerSpeed => workerSpeed;
     public float CarryWeight => carryWeight;
     public int CarrySlots => carrySlots;

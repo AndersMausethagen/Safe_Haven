@@ -260,10 +260,14 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Paid = false;
         IsPlan = true;
         Refresh();
+        BuildPlans.NoteNow();
     }
 
     /// <summary>True for a plan whose materials aren't paid yet (BeginPlan).</summary>
     public bool IsPlan { get; private set; }
+
+    /// <summary>Whether <paramref name="building"/> is only a plan (nothing of it stands: not attacked, mended or counted as built).</summary>
+    public static bool IsPlanned(BuildingObject building) => building != null && building.TryGetComponent(out Construction construction) && construction.IsPlan;
 
     /// <summary>Pays a plan from <paramref name="pool"/> when it holds the whole cost; true when it is paid now.</summary>
     public bool TryPayPlan(MaterialPool pool)
@@ -281,8 +285,19 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
         Paid = true;
         IsPlan = false;
+        WholeAgain();
         Refresh();
+        BuildPlans.NoteNow();
         return true;
+    }
+
+    // A plan paid for starts whole, whatever brushed it while it was only a mark on the ground.
+    private void WholeAgain()
+    {
+        if (health != null && health.IsAlive && health.HealthFraction < 1f)
+        {
+            health.SetHealthFraction(1f);
+        }
     }
 
     /// <summary>The cost of the work waiting to be paid: the next level's, or the building's own for a ruin.</summary>
@@ -376,10 +391,17 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             return true;
         }
 
+        // A friend's plan is paid from their chests, in their game (BuildPlans): paying it from a guest's bag raced that payment.
+        if (IsPlan && HavenVisit.IsVisiting)
+        {
+            reason = "Your friend's plan is paid from their chests: it can be built once it is paid.";
+            return false;
+        }
+
         Cost(out IReadOnlyList<ResourceAmount> resources, out IReadOnlyList<ItemAmount> items);
         if (!MaterialPool.For(user).CanAfford(resources, items, out string missing))
         {
-            reason = $"Repairing it takes {AmountText.Describe(items)}{(resources.Count > 0 ? ", " + AmountText.Describe(resources) : "")}. Missing {missing}";
+            reason = $"{(IsPlan ? "Building" : "Repairing")} it takes {AmountText.Describe(items)}{(resources.Count > 0 ? ", " + AmountText.Describe(resources) : "")}. Missing {missing}";
             return false;
         }
 
@@ -464,7 +486,12 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
 
             Paid = true;
             GameMessages.Post(IsPlan ? $"Building the {Definition.DisplayName}." : $"Repairing the {Definition.DisplayName}.");
-            IsPlan = false;
+            if (IsPlan)
+            {
+                IsPlan = false;
+                WholeAgain();
+                BuildPlans.NoteNow();
+            }
         }
 
         // The Construction skill: a beginner hammers slower, a master faster.

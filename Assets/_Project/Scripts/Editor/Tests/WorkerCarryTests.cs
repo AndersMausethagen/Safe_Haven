@@ -219,6 +219,17 @@ public sealed class WorkerCarryTests
         Assert.AreEqual(1, stash.Items.Count(wood), "the rest from the stash");
         Assert.IsFalse(WorkerProduction.StartNext(job, queue, stash), "1 left: no free craft");
         Assert.AreEqual(1, queue.QueuedCount);
+
+        // Fetching on foot or away, the chests pay nothing: what they carried is what paces the work.
+        var walked = new StationQueue("lodge-2", CraftingStationType.Sawbench, 10, 5);
+        Assume.That(stash.Items.Add(wood, 9) == 9);
+        walked.AddSupply(wood, 3);
+        Assert.IsFalse(WorkerProduction.StartNext(job, walked, stash, fetchedOnly: true), "3 fetched of 4, 10 in the chests: no craft");
+        Assert.AreEqual(10, stash.Items.Count(wood), "the chests paid nothing");
+        walked.AddSupply(wood, 1);
+        Assert.IsTrue(WorkerProduction.StartNext(job, walked, stash, fetchedOnly: true), "4 fetched: one craft");
+        Assert.AreEqual(0, walked.Supplied(wood));
+        Assert.AreEqual(10, stash.Items.Count(wood), "still nothing from the chests");
     }
 
     [Test]

@@ -46,9 +46,12 @@ public sealed class RingWorkTests
         var ring = new RingOrder(Vector3.zero, 10f) { StandingSeen = 3 };
         home.AddRing(ring);
 
-        RingWork.WorkAway(home, stash, RingWork.SecondsPerTree(1f, settings) * 2.5f, null, settings);
+        // Away they fell for a share of the time (working hours), as at home.
+        float treeAway = RingWork.SecondsPerTree(1f, settings) / settings.AwayFellingShare;
+        Assume.That(settings.AwayFellingShare > 0f);
+        RingWork.WorkAway(home, stash, treeAway * 2.5f, null, settings);
         Assert.AreEqual(2, ring.PendingFells, "two trees in two and a half trees' time");
-        RingWork.WorkAway(home, stash, RingWork.SecondsPerTree(1f, settings) * 10f, null, settings);
+        RingWork.WorkAway(home, stash, treeAway * 10f, null, settings);
         Assert.AreEqual(3, ring.PendingFells, "never more than stood in it");
         int logs = 0;
         foreach (ItemAmount log in RingWork.Logs(settings.AverageTreeHeight, settings, () => 0.5f))
@@ -57,6 +60,16 @@ public sealed class RingWorkTests
         }
 
         Assert.Greater(logs, 0, "the logs are in the chests");
+        TreeChoppingSettings rules = TreeChoppingSettings.Current;
+        int expected = rules.AllLogs(settings.FellerAxeTier, rules.SizeOf(settings.AverageTreeHeight));
+        int one = 0;
+        foreach (ItemAmount log in RingWork.Logs(settings.AverageTreeHeight, settings, () => 0.5f))
+        {
+            one += log.Amount;
+        }
+
+        Assert.AreEqual(expected, one, "a ring's tree gives what the player's does worked to the end (its size, not its metres)");
+        Assert.Less(one, 12, "a tree of average height gives a handful of logs, not a cartload");
 
         var along = new RingOrder(Vector3.zero, 10f) { StandingSeen = 5 };
         var other = new SettlementState();

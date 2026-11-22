@@ -2177,20 +2177,38 @@ the player standing at a station adds their own work (Player Speed, within Playe
 meanwhile, one-slot workers bring several crafts of one kind per trip, no pacing with nothing to take back, a player taking a
 resident's cart makes them let go, gear swaps never lose the old piece.
 
+Phase 3's review fixes: a worker fetching on foot or away starts a craft only from what was fetched (`StartNext` › fetched only; the
+stash paid the rest, so carrying limited nothing), and a recipe naming an item twice needs both lines; a station taken down takes its
+queue with it (its worker kept working a dead one); the player's own work counts only at the worked kinds (Player Speed For) and not
+in the prologue's camp; plans are no target, nothing to mend, no part of the Haven's edge, start whole once paid, can't be paid by a
+guest, read "planned" (not "ruined") everywhere, can be laid out from the Haven window, and are noted the moment they change
+(`BuildPlans.NoteNow`); the player's horse-drawn cart makes noise again; homecoming gifts never come from the one along, need a real
+raid (Homecoming Settings › Min Away Seconds) and keep the card within its lines; the portal from afar is no visit for quest deeds;
+the view's marks are placed every frame and never make a queue by looking.
+
 ### Felling rings (phase 4, 2026-11-21)
 
 - **A ring for the woodcutters.** In the view, "Fell a ring of trees" (`KeeperView.BeginRing`; the wheel sizes it, a click lays it,
   right-click or Back stops) draws a `RingOrder` round the grown trees to clear, at most `WorkerSettings` › Most Rings (3). Saved on
   the settlement (`SettlementState.Rings`, `RingSaveData`); drawn on the ground while the view is open (`KeeperRings`).
-- **At home.** A resident whose job is one of `WorkerSettings` › Fellers (the Carpenter) fells the first ring in working hours, after
-  any scaffold (`ResidentLife.FellStep`): walks to the grown tree nearest the centre, chops for Chop Seconds shared by their work
-  speed, brings it down (`TerrainTreeFelling.FellByHand`), plants a `Sapling` where it stood (`RingWork.Replant`, through
-  `PlantedTrees`; refused where too close to another tree) and carries the logs (`ChoppableTree.Roll` at Feller Axe Tier) to the
-  nearest chest. Saplings still growing are never felled (`PlantedTrees.IsGrowing`), so a ring runs out. An empty ring is done.
-- **Away.** `RingWork.WorkAway` (from `SettlementSystem` while the player is away) counts trees at `SecondsPerTree` per feller at
-  home (not the one along), up to the trees last seen standing (`RingOrder.StandingSeen`, noted by `BuildPlans` every 20 s), gives
-  an average tree's logs to the chests at once and keeps the trees as `PendingFells`; `RingWork.SettleAtHome` brings them down with
-  their saplings when the Haven is next the scene. Tests: `RingWorkTests`.
+- **At home.** A resident whose job is one of `WorkerSettings` › Fellers (the Carpenter) fells the first ring with a free grown tree
+  in working hours, after any scaffold and only while their own bench has nothing to work on, fetch or take back
+  (`ResidentLife.BenchHasWork`), so the logs they bring feed it and they go back to it when they do. `ResidentLife.FellStep`: claims
+  the grown tree nearest the centre (`RingWork.Claim`: nobody else takes it, coming home doesn't lay it down), walks to it with the
+  Felling Tool in hand, chops for Chop Seconds shared by their work speed, brings it down (`TerrainTreeFelling.FellByHand`, true only
+  if it still stood), puts the logs in the chests at once (a tree worked to the end, `TreeChoppingSettings.AllLogs` at Feller Axe
+  Tier; what won't fit at their feet) and carries them to the nearest chest for show and Strength, and plants a `Sapling` where it
+  stood (`RingWork.Replant`; where a tree is still too near, again when the ring is done: `RingOrder.Unplanted`). Saplings still
+  growing are never felled (`PlantedTrees.IsGrowing`), so a ring runs out; it is done when no grown tree stands in it. Rings never
+  overlap. Never in a friend's Haven.
+- **Away.** `RingWork.WorkAway` (from `SettlementSystem` while the player is away) counts trees at `SecondsPerTree` for each feller
+  at home (not the one along) whose bench is idle, for Away Felling Share of the time (working hours), up to the trees last seen
+  standing (`RingOrder.StandingSeen`, noted by `BuildPlans` every 6 s), gives an average tree's logs to the chests at once and keeps
+  the trees as `PendingFells`; `RingWork.SettleAtHome` brings them down with their saplings when the Haven is next the scene (not
+  before a terrain is up). Tests: `RingWorkTests`.
+- **The trees' cache.** `TerrainTreeFelling.StandingNear` reads the ground cells round a point, not all 130 000 trees; a tree added
+  (a sapling) joins the cache without a rebuild, so the stand-in the player is chopping keeps its work; `AnyTreeWithin` gives
+  `PlantedTrees` its room-to-grow check without copying every tree.
 
 ## Going along, set-pieces and bosses
 

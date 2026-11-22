@@ -54,6 +54,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     private TerrainData cachedFor;
     private int cachedCount = -1;
     private bool[] choppable = new bool[0];
+    private bool[] prototypeChoppable = new bool[0];
     private float[] prototypeHeight = new float[0];
     private float[] prototypeRadius = new float[0];
     private float nextRefresh;
@@ -125,14 +126,15 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
     /// <summary>Fells a standing tree without a stand-in (a resident's felling ring, RingWork): it goes down as the player's would, and stays
     /// down where the woods are remembered.</summary>
-    public void FellByHand(int index)
+    public bool FellByHand(int index)
     {
-        if (terrain == null || terrain.terrainData == null || felled.ContainsKey(index) || index < 0 || index >= terrain.terrainData.treeInstanceCount)
+        if (!IsStanding(index))
         {
-            return;
+            return false;
         }
 
         Fell(index);
+        return true;
     }
 
     /// <summary>This terrain's felling, added if it isn't there yet.</summary>
@@ -154,7 +156,11 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
     private void OnDisable() => active.Remove(this);
 
-    /// <summary>The fellable trees still standing within a distance of a point.</summary>
+    /// <summary>Whether the tree at <paramref name="index"/> stands (not felled, not broken down).</summary>
+    public bool IsStanding(int index) =>
+        terrain != null && terrain.terrainData != null && index >= 0 && index < terrain.terrainData.treeInstanceCount && !felled.ContainsKey(index);
+
+    /// <summary>The fellable trees still standing within a distance of a point (from the ground cells round it, not every tree).</summary>
     public List<Standing> StandingNear(Vector3 point, float distance)
     {
         var near = new List<Standing>();
@@ -165,19 +171,56 @@ public sealed class TerrainTreeFelling : MonoBehaviour
 
         Cache();
         TerrainData data = terrain.terrainData;
-        for (int i = 0; i < positions.Count; i++)
+        int fromX = Mathf.FloorToInt((point.x - distance) / CellSize), toX = Mathf.FloorToInt((point.x + distance) / CellSize);
+        int fromZ = Mathf.FloorToInt((point.z - distance) / CellSize), toZ = Mathf.FloorToInt((point.z + distance) / CellSize);
+        for (int x = fromX; x <= toX; x++)
         {
-            Vector3 offset = positions[i] - point;
-            offset.y = 0f;
-            if (choppable[i] && !felled.ContainsKey(i) && offset.sqrMagnitude <= distance * distance && offset.sqrMagnitude > 0.25f)
+            for (int z = fromZ; z <= toZ; z++)
             {
-                TreeInstance tree = data.GetTreeInstance(i);
-                near.Add(new Standing(i, positions[i], prototypeHeight[tree.prototypeIndex] * Mathf.Max(0.1f, tree.heightScale),
-                    prototypeRadius[tree.prototypeIndex] * Mathf.Max(0.1f, tree.widthScale)));
+                if (!cells.TryGetValue(CellKey(x, z), out List<int> cell))
+                {
+                    continue;
+                }
+
+                foreach (int i in cell)
+                {
+                    Vector3 offset = positions[i] - point;
+                    offset.y = 0f;
+                    if (offset.sqrMagnitude <= distance * distance && offset.sqrMagnitude > 0.25f && !felled.ContainsKey(i))
+                    {
+                        TreeInstance tree = data.GetTreeInstance(i);
+                        near.Add(new Standing(i, positions[i], prototypeHeight[tree.prototypeIndex] * Mathf.Max(0.1f, tree.heightScale),
+                            prototypeRadius[tree.prototypeIndex] * Mathf.Max(0.1f, tree.widthScale)));
+                    }
+                }
             }
         }
 
         return near;
+    }
+
+    /// <summary>Whether any tree of this terrain (painted or planted, fellable or not) stands within <paramref name="distance"/> of a
+    /// point, on the ground plane (PlantedTrees' room to grow; read from the cache, not a copy of every tree).</summary>
+    public bool AnyTreeWithin(Vector3 point, float distance)
+    {
+        if (terrain == null || terrain.terrainData == null)
+        {
+            return false;
+        }
+
+        Cache();
+        float most = distance * distance;
+        for (int i = 0; i < positions.Count; i++)
+        {
+            float dx = positions[i].x - point.x;
+            float dz = positions[i].z - point.z;
+            if (dx * dx + dz * dz < most && !felled.ContainsKey(i))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -334,6 +377,24 @@ public sealed class TerrainTreeFelling : MonoBehaviour
             return;
         }
 
+        // Only trees added since (a sapling planted, PlantedTrees): they join, and the stand-ins stay, so the tree the player is
+        // chopping keeps its work (a rebuild released every stand-in and copied all 130 000 trees for each sapling).
+        if (data == cachedFor && cachedCount >= 0 && data.treeInstanceCount > cachedCount && prototypeChoppable.Length == data.treePrototypes.Length)
+        {
+            int from = cachedCount;
+            cachedCount = data.treeInstanceCount;
+            System.Array.Resize(ref choppable, cachedCount);
+            Vector3 addedSize = data.size;
+            Vector3 addedOrigin = terrain.GetPosition();
+            for (int i = from; i < cachedCount; i++)
+            {
+                TreeInstance added = data.GetTreeInstance(i);
+                AddToCache(i, addedOrigin + Vector3.Scale(added.position, addedSize), added.prototypeIndex);
+            }
+
+            return;
+        }
+
         foreach (int index in new List<int>(proxies.Keys))
         {
             Release(index);
@@ -355,6 +416,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
             }
         }
 
+        prototypeChoppable = canFell;
         TreeInstance[] trees = data.treeInstances;
         positions.Clear();
         cells.Clear();
@@ -363,19 +425,24 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         Vector3 origin = terrain.GetPosition();
         for (int i = 0; i < trees.Length; i++)
         {
-            Vector3 at = origin + Vector3.Scale(trees[i].position, size);
-            positions.Add(at);
-            choppable[i] = trees[i].prototypeIndex < canFell.Length && canFell[trees[i].prototypeIndex];
-            if (choppable[i])
-            {
-                long key = CellKey(Mathf.FloorToInt(at.x / CellSize), Mathf.FloorToInt(at.z / CellSize));
-                if (!cells.TryGetValue(key, out List<int> cell))
-                {
-                    cells[key] = cell = new List<int>();
-                }
+            AddToCache(i, origin + Vector3.Scale(trees[i].position, size), trees[i].prototypeIndex);
+        }
+    }
 
-                cell.Add(i);
+    // Tree i (the next index) into the cache: its place, and its ground cell when it can be felled.
+    private void AddToCache(int i, Vector3 at, int prototype)
+    {
+        positions.Add(at);
+        choppable[i] = prototype >= 0 && prototype < prototypeChoppable.Length && prototypeChoppable[prototype];
+        if (choppable[i])
+        {
+            long key = CellKey(Mathf.FloorToInt(at.x / CellSize), Mathf.FloorToInt(at.z / CellSize));
+            if (!cells.TryGetValue(key, out List<int> cell))
+            {
+                cells[key] = cell = new List<int>();
             }
+
+            cell.Add(i);
         }
     }
 

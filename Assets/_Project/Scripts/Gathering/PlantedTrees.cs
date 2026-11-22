@@ -294,31 +294,9 @@ public sealed class PlantedTrees : MonoBehaviour, ISaveable
         return false;
     }
 
-    // Any standing tree of this terrain (painted or planted) within the distance.
-    private bool TreeNear(Vector3 at, float distance)
-    {
-        TerrainData data = terrain.terrainData;
-        Vector3 size = data.size;
-        Vector3 origin = terrain.GetPosition();
-        float most = distance * distance;
-        TreeInstance[] trees = data.treeInstances;
-        for (int i = 0; i < trees.Length; i++)
-        {
-            if (trees[i].heightScale <= 0f)
-            {
-                continue;
-            }
-
-            float dx = origin.x + trees[i].position.x * size.x - at.x;
-            float dz = origin.z + trees[i].position.z * size.z - at.z;
-            if (dx * dx + dz * dz < most)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    // Any standing tree of this terrain (painted or planted) within the distance: from the felling's cache (copying every tree's
+    // instance for each sapling was 5 MB on the Haven).
+    private bool TreeNear(Vector3 at, float distance) => felling != null && felling.AnyTreeWithin(at, distance);
 
     public string CaptureState() => planted.Count > 0 ? JsonUtility.ToJson(new State { trees = planted }) : null;
 

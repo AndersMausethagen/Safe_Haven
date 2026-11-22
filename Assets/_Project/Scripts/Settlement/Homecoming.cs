@@ -15,8 +15,12 @@ public static class Homecoming
     /// <summary>True from a raid's end until the Haven has told its homecoming.</summary>
     public static bool Pending { get; private set; }
 
+    // The raid just ended: who went along (no gift from them) and how long it lasted.
+    private static ResidentDefinition along;
+    private static float awaySeconds;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => Pending = false;
+    private static void ResetForNewPlaySession() => ForgetGame();
 
     // After GameEvents clears its listeners (SubsystemRegistration), listen again.
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -27,13 +31,21 @@ public static class Homecoming
     }
 
     /// <summary>Another game loaded (GameSession.Reset): a raid's end in the last one is no homecoming of this one.</summary>
-    public static void ForgetGame() => Pending = false;
+    public static void ForgetGame()
+    {
+        Pending = false;
+        along = null;
+        awaySeconds = 0f;
+    }
 
     private static void OnRaised(GameEvent gameEvent)
     {
         if (gameEvent.Kind == GameEventKind.RaidFinished)
         {
             Pending = true;
+            awaySeconds = gameEvent.Seconds;
+            RaidReport report = GameSession.PendingReport;
+            along = report != null ? report.Companion : null;
         }
     }
 
@@ -54,10 +66,17 @@ public static class Homecoming
 
         List<string> lines = Compose(Player.Current, GameSession.Home);
         // One good thing that happened while they were away (HomecomingSettings), heading the card.
-        string gift = AwayGifts.Draw(HomecomingSettings.Current, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value);
+        HomecomingSettings gifts = HomecomingSettings.Current;
+        string gift = gifts != null && awaySeconds >= gifts.MinAwaySeconds
+            ? AwayGifts.Draw(gifts, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value, along)
+            : null;
         if (gift != null)
         {
             lines.Insert(0, gift);
+            if (lines.Count > MostLines)
+            {
+                lines.RemoveAt(lines.Count - 1);
+            }
         }
 
         if (lines.Count == 0)
@@ -107,6 +126,9 @@ public static class Homecoming
             {
                 lines.Add(GameInput.WithRebinds(target.Name.StartsWith("the portal")
                     ? $"Within reach: {target.Name}. Everything it takes is home: strengthen it at the portal."
+                    // A plan is paid from the chests by itself (BuildPlans); with it in the bag, the player hammers it.
+                    : target.Name.StartsWith("the planned")
+                    ? $"Within reach: {target.Name}. Everything it takes is home: in the chests the builders start on it, or hammer it yourself."
                     : $"Within reach: {target.Name}. Everything it takes is home ({{key:Build}})."));
             }
         }

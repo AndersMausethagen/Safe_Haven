@@ -183,7 +183,9 @@ public sealed class HavenOverview
             if (construction.IsBuilding && !construction.Paid)
             {
                 construction.Cost(out IReadOnlyList<ResourceAmount> _, out IReadOnlyList<ItemAmount> items);
-                Steps.Add(new Step($"Repair the ruined {building.Definition.DisplayName}", $"{AmountText.Describe(items)}. Hold {use} at it.", use, building.Definition.Renown));
+                Steps.Add(new Step(construction.IsPlan ? $"Build the planned {building.Definition.DisplayName}" : $"Repair the ruined {building.Definition.DisplayName}",
+                    construction.IsPlan ? $"{AmountText.Describe(items)}: in the chests and the builders start, or hold {use} at it with them."
+                        : $"{AmountText.Describe(items)}. Hold {use} at it.", use, building.Definition.Renown));
                 ideas++;
             }
             else if (construction.IsBuilding)

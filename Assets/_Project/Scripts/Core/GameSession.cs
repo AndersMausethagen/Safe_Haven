@@ -131,6 +131,9 @@ public static class GameSession
     /// <summary>True while a report of the last raid is waiting to be shown.</summary>
     public static bool HasPendingReport => pendingReport != null;
 
+    /// <summary>The raid report waiting to be shown, without taking it (null when none).</summary>
+    public static RaidReport PendingReport => pendingReport;
+
     /// <summary>Hands the player's state to the next scene; the player there takes it on arrival (see PlayerPersistence).</summary>
     public static void CarryPlayerState(PlayerSnapshot state)
     {

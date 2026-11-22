@@ -39,7 +39,8 @@ public sealed class BuildPlans : MonoBehaviour
         // The trees standing in each ring, now and then, so the work while away stops where the ring runs out.
         if (Time.unscaledTime >= nextRingLook)
         {
-            nextRingLook = Time.unscaledTime + 20f;
+            // Every few seconds (a few ground cells each): a ring felled at home just before setting out is no tree away.
+            nextRingLook = Time.unscaledTime + 6f;
             foreach (RingOrder ring in GameSession.Home.Rings)
             {
                 ring.StandingSeen = RingWork.Standing(ring);
@@ -66,5 +67,34 @@ public sealed class BuildPlans : MonoBehaviour
         }
 
         GameSession.Home.NotePlans(waiting);
+    }
+
+    /// <summary>
+    /// Notes the plans waiting now (a plan laid out, paid or taken down), so a raid set out on at once wants the right materials;
+    /// <paramref name="leaving"/> is one going this frame. Only in the game that keeps the Haven.
+    /// </summary>
+    public static void NoteNow(BuildingObject leaving = null)
+    {
+        if (!Place.AtHome)
+        {
+            return;
+        }
+
+        // The prologue's camp lays out no plans.
+        if (HomePortal.Current == null)
+        {
+            return;
+        }
+
+        var plans = new List<BuildingDefinition>();
+        foreach (BuildingObject building in BuildingObject.Active)
+        {
+            if (building != leaving && building != null && building.Definition != null && Construction.IsPlanned(building))
+            {
+                plans.Add(building.Definition);
+            }
+        }
+
+        GameSession.Home.NotePlans(plans);
     }
 }

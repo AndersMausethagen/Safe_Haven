@@ -477,7 +477,10 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
         ringPlacing = true;
         ringRadius = WorkerSettings.Current.RingRadius;
-        GameMessages.Post("Click where the woodcutters should fell; the wheel makes the ring larger or smaller. Right-click to stop.");
+        GameMessages.Post(InputDevices.UsingGamepad
+            ? $"{GameInput.KeyLabel(GameInput.KeeperSelect)} lays the ring where the woodcutters should fell; zooming makes it larger or smaller. " +
+              $"{GameInput.KeyLabel(GameInput.Back)} stops."
+            : "Click where the woodcutters should fell; the wheel makes the ring larger or smaller. Right-click to stop.");
     }
 
     /// <summary>Takes every ring away (the woodcutters go back to their own work).</summary>
@@ -517,6 +520,14 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         return GameSession.Home.Rings.Count >= WorkerSettings.Current.MostRings ? $"At most {WorkerSettings.Current.MostRings} rings at once." : null;
     }
 
+    /// <summary>A few words of why no ring can be drawn, for a button (null when one can).</summary>
+    public static string ShortWhyNoRing()
+    {
+        string why = WhyNoRing();
+        return why == null ? null : HavenVisit.IsVisiting ? "your own Haven only" : why.StartsWith("Nobody") ? "no woodcutter yet" : "at most "
+            + WorkerSettings.Current.MostRings;
+    }
+
     private bool RingSpot(out Vector3 at)
     {
         at = default;
@@ -527,17 +538,27 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     {
         ringPlacing = false;
         var ring = new RingOrder(at, ringRadius);
+        // Rings never share ground: a tree in two would be felled twice over while away.
+        foreach (RingOrder other in GameSession.Home.Rings)
+        {
+            if (other.Overlaps(ring))
+            {
+                GameMessages.Post("That ring would cross another: draw it beside it, or clear the rings first.", MessageKind.Warning);
+                return;
+            }
+        }
+
         int trees = RingWork.Standing(ring);
         if (trees == 0)
         {
-            GameMessages.Post("No trees stand in that ring.", MessageKind.Warning);
+            GameMessages.Post("No grown trees stand in that ring.", MessageKind.Warning);
             return;
         }
 
         ring.StandingSeen = trees;
         GameSession.Home.AddRing(ring);
-        GameMessages.Post($"A ring of {trees} tree{(trees == 1 ? "" : "s")} for the woodcutters: they fell it in working hours, take the logs to the " +
-            "chests and plant a sapling where each stood.", MessageKind.Info);
+        GameMessages.Post($"A ring of {trees} tree{(trees == 1 ? "" : "s")} for the woodcutters: in working hours, when their bench has nothing " +
+            "to work on, they fell it, take the logs to the chests and plant saplings where there is room.", MessageKind.Info);
     }
 
     private void DrawRings(bool hidden)
@@ -610,7 +631,13 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
         if (thing is BuildingObject building)
         {
-            if (building.TryGetComponent(out Construction construction) && construction.IsBuilding)
+            if (building.TryGetComponent(out Construction construction) && construction.IsPlan)
+            {
+                GameMessages.Post($"The {KeeperHud.NameOf(building)} is a plan: the builders start once the chests hold its materials.");
+                return;
+            }
+
+            if (construction != null && construction.IsBuilding)
             {
                 GameMessages.Post($"The {KeeperHud.NameOf(building)}: {Mathf.RoundToInt(construction.Share * 100f)}% built. " +
                     "Hammer it yourself, or the builders will see to it.");

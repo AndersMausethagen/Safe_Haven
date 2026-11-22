@@ -44,3 +44,5 @@ MonoBehaviour:
   sapling: {fileID: 11400000, guid: 9baec1294db149f43bd3f8493b5b7c02, type: 2}
   mostRings: 3
   ringRadius: 10
+  awayFellingShare: 0.4
+  fellingTool: {fileID: 11400000, guid: 7e69e97c2a5edf149a174a57b97507dc, type: 2}

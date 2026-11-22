@@ -559,7 +559,6 @@ public sealed class WorkshopState
         }
     }
 
-    /// <summary>Works every station for the given seconds. Returns how many crafts were delivered in total.</summary>
     /// <summary>True while the player is away from home (SettlementSystem): no workplace is loaded, so each queue's worker is taken to be at
     /// their station, as the builders are taken to be at their scaffolds; the player is at none of them.</summary>
     [field: NotSaved("whether the player is home, set by SettlementSystem every frame")]

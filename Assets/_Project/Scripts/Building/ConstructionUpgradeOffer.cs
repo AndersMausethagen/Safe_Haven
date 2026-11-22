@@ -20,6 +20,7 @@ public static class ConstructionUpgradeOffer
         if (construction.IsBuilding)
         {
             GameMessages.Post(construction.Paid ? $"The {building.Definition.DisplayName} is waiting for you: hold {{key:Hammer}} at its scaffold."
+                : construction.IsPlan ? $"The {building.Definition.DisplayName} is a plan: it is paid from your chests once they hold its materials, or hold {{key:Hammer}} at it with them."
                 : $"Walk up to the {building.Definition.DisplayName} and hold {{key:Hammer}} to repair it.");
             return;
         }

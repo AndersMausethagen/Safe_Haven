@@ -25,7 +25,8 @@ public static class BuildingRepairs
         var damaged = new List<Damageable>();
         foreach (BuildingObject building in BuildingObject.Active)
         {
-            if (building.TryGetComponent(out Damageable health) && health.IsAlive && health.HealthFraction < 0.999f)
+            // A plan was never paid for: mending it would charge for what isn't there (it is whole once paid: Construction).
+            if (building.TryGetComponent(out Damageable health) && health.IsAlive && health.HealthFraction < 0.999f && !Construction.IsPlanned(building))
             {
                 damaged.Add(health);
             }

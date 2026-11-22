@@ -53,6 +53,7 @@ public static class HavenBuildings
         int up = 0;
         int scaffolds = 0;
         int ruins = 0;
+        int plans = 0;
         int highest = 0;
         int canUpgrade = 0;
         Construction next = null;
@@ -71,7 +72,11 @@ public static class HavenBuildings
                 highest = Mathf.Max(highest, construction.Level);
             }
 
-            if (construction.IsBuilding && !construction.Paid)
+            if (construction.IsPlan)
+            {
+                plans++;
+            }
+            else if (construction.IsBuilding && !construction.Paid)
             {
                 ruins++;
             }
@@ -91,6 +96,7 @@ public static class HavenBuildings
         var notes = new List<string>();
         if (ruins > 0) notes.Add(ruins == 1 && placed.Count == 1 ? "In ruins" : $"{ruins} in ruins");
         if (scaffolds > 0) notes.Add(scaffolds == 1 && placed.Count == 1 ? "Being built" : $"{scaffolds} being built");
+        if (plans > 0) notes.Add(plans == 1 && placed.Count == 1 ? "Planned" : $"{plans} planned");
         if (hurt > 0) notes.Add(hurt == 1 && placed.Count == 1 ? "Damaged" : $"{hurt} damaged");
         if (doing != null) notes.Add(doing);
         string level = building.MaxLevel > 1 && up > 0 ? $"Level {highest} of {building.MaxLevel}" : up > 0 ? "Built" : "";
@@ -103,7 +109,7 @@ public static class HavenBuildings
             Icon = building.Icon,
             Line = line,
             Badge = building.MaxLevel > 1 && up > 0 ? $"{highest}/{building.MaxLevel}" : "",
-            State = ruins > 0 || hurt > 0 ? HavenEntryState.Attention : scaffolds > 0 || doing != null ? HavenEntryState.Working : HavenEntryState.Good,
+            State = ruins > 0 || hurt > 0 ? HavenEntryState.Attention : scaffolds > 0 || plans > 0 || doing != null ? HavenEntryState.Working : HavenEntryState.Good,
             Status = line,
             Description = building.Description,
         };
@@ -236,7 +242,9 @@ public static class HavenBuildings
     private static void AddBuildAction(HavenEntry entry, BuildingDefinition building, MaterialPool pool, BuildPlacer builder, string label)
     {
         bool affordable = pool == null || pool.CanAfford(building.ConstructionCost, building.ConstructionItems);
-        entry.Actions.Add(new HavenAction(affordable ? label : "Not enough materials", () => builder.Place(building), affordable));
+        // As the build menu: short of it, one that takes work is laid out as a plan.
+        bool plan = !affordable && BuildPlacer.CanPlan(building);
+        entry.Actions.Add(new HavenAction(affordable ? label : plan ? "Lay out a plan" : "Not enough materials", () => builder.Place(building), affordable || plan));
     }
 
     // The ward isn't a building of its own: it grows at the portal, and that is an upgrade like any other.

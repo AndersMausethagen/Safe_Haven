@@ -236,14 +236,19 @@ public static class BuildingDemolition
         bool counted = !building.TryGetComponent(out Construction construction) || construction.Level >= 1;
         MaterialPool.For(user).GiveBack(resources, items, user.transform);
         // What its worker had fetched to it goes back to the chests too.
-        if (building.TryGetComponent(out CraftingStation fetchedTo) && fetchedTo.Queue != null)
+        // Found, not made: a plan that never stood has no queue to make.
+        StationQueue fetchedTo = building.TryGetComponent(out CraftingStation takenDown) ? GameSession.Home.Workshops.Find(takenDown.Id) : null;
+        if (fetchedTo != null)
         {
-            WorkerProduction.GiveBack(fetchedTo.Queue, GameSession.Stash);
-            foreach (ItemAmount left in fetchedTo.Queue.TakeAllSupplies())
+            WorkerProduction.GiveBack(fetchedTo, GameSession.Stash);
+            foreach (ItemAmount left in fetchedTo.TakeAllSupplies())
             {
                 ItemDelivery.Give(user.TryGetComponent(out ItemInventory bag) ? bag : null, new ItemStack(left.Item, left.Amount),
                     newFind: false, toStash: true, user.transform);
             }
+
+            // Idle and empty (WhyNot): nothing is lost with it, and no worker goes on working a station that is gone.
+            GameSession.Home.Workshops.Remove(takenDown.Id);
         }
         // Its modules go to the store as spares, as a removed one does (BuildingModules.Remove): nothing fitted is lost.
         int spares = 0;
@@ -266,7 +271,12 @@ public static class BuildingDemolition
             }
         }
 
+        bool wasPlan = construction != null && construction.IsPlan;
         SaveableEntity.RemoveForGood(building.gameObject);
+        if (wasPlan)
+        {
+            BuildPlans.NoteNow(building);
+        }
         if (counted)
         {
             GameEvents.Raise(new GameEvent(GameEventKind.TakenDown, definition, 1, user));

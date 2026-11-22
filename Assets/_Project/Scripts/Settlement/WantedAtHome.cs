@@ -150,9 +150,9 @@ public static class WantedAtHome
         }
 
         // Plans laid out at home (BuildPlans): what each still needs is wanted, on a raid too (noted on the settlement).
-        if (!HavenVisit.IsVisiting)
+        if (!HavenVisit.IsVisiting && settlement is SettlementState keeping)
         {
-            foreach (BuildingDefinition plan in GameSession.Home.Plans)
+            foreach (BuildingDefinition plan in keeping.Plans)
             {
                 if (plan == null)
                 {

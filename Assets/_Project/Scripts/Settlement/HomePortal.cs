@@ -304,7 +304,8 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         }
 
         menu ??= new HomePortalMenu(this, raid, station);
-        PortalWindow.Show(() => menu.Build(user), user, transform, float.PositiveInfinity, () => RaiseTalked(user));
+        // Not talked to: looking over its window from the view is no visit (quest deeds that ask for one stay in person).
+        PortalWindow.Show(() => menu.Build(user), user, transform, float.PositiveInfinity);
     }
 
     private void OnUsed()

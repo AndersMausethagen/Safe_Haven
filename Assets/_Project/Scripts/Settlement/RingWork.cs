@@ -3,9 +3,9 @@ using UnityEngine;
 
 /// <summary>
 /// A ring drawn in the Keeper's view for the woodcutters to clear (Docs/ColonyModeResearch_2026-11-21.md §4.6-4.7, round two: the
-/// Haven's wood is its painted trees, and felled ones stay down): the woodcutter fells the trees inside it one by one, carries the logs
-/// to the chests and plants a sapling where each stood (the forester's loop: the woods grow back and stay green). Saved on the
-/// settlement; a ring with no tree left is done.
+/// Haven's wood is its painted trees, and felled ones stay down): the woodcutter fells the grown trees inside it one by one, carries the
+/// logs to the chests and plants a sapling where each stood (the forester's loop: the woods grow back and stay green). Saved on the
+/// settlement; a ring with no grown tree left is done.
 /// </summary>
 public sealed class RingOrder
 {
@@ -21,8 +21,11 @@ public sealed class RingOrder
     /// <summary>Trees felled while the player was away, still to be laid down at home when the Haven is next the scene.</summary>
     public int PendingFells { get; set; }
 
-    /// <summary>Trees standing in it when last seen at home (caps the felling while away); -1 before it has been looked at.</summary>
+    /// <summary>Grown trees standing in it when last seen at home (caps the felling while away); -1 before it has been looked at.</summary>
     public int StandingSeen { get; set; } = -1;
+
+    /// <summary>Where a sapling didn't take (a tree still too near it): tried again when the ring is done. Not saved.</summary>
+    public List<Vector3> Unplanted { get; } = new List<Vector3>();
 
     public bool Contains(Vector3 point)
     {
@@ -30,23 +33,57 @@ public sealed class RingOrder
         apart.y = 0f;
         return apart.sqrMagnitude <= Radius * Radius;
     }
+
+    /// <summary>Whether the two rings share ground (a tree in both would be counted twice away).</summary>
+    public bool Overlaps(RingOrder other)
+    {
+        Vector3 apart = other.Centre - Centre;
+        apart.y = 0f;
+        return apart.magnitude < Radius + other.Radius;
+    }
 }
 
 /// <summary>
 /// The felling of rings (WorkerSettings › Felling): who fells (the Fellers' jobs), the next tree in a ring, a tree's logs, the sapling
 /// planted after it, and the work done while the player is away, laid down on coming home. Plain rules where they can be (RingWorkTests);
-/// the scene's terrains through TerrainTreeFelling.
+/// the scene's terrains through TerrainTreeFelling. A woodcutter's own bench comes first, at home and away: they fell while it has
+/// nothing to work on, so the logs they bring feed it.
 /// </summary>
 public static class RingWork
 {
     // Away: seconds towards the next tree, by ring (not saved: a tree under way when the game is saved starts over).
     private static readonly Dictionary<RingOrder, float> AwayClock = new Dictionary<RingOrder, float>();
 
+    // Trees a woodcutter is at now (walking to it or chopping): nobody else takes them, and coming home doesn't lay them down.
+    private static readonly HashSet<(TerrainTreeFelling, int)> Claimed = new HashSet<(TerrainTreeFelling, int)>();
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => AwayClock.Clear();
+    private static void ResetForNewPlaySession() => ForgetGame();
 
     /// <summary>Forgets felling under way (a new game, a load).</summary>
-    public static void ForgetGame() => AwayClock.Clear();
+    public static void ForgetGame()
+    {
+        AwayClock.Clear();
+        Claimed.Clear();
+    }
+
+    /// <summary>A woodcutter takes this tree (until <see cref="Release"/>).</summary>
+    public static void Claim(TerrainTreeFelling felling, int index)
+    {
+        if (felling != null && index >= 0)
+        {
+            Claimed.Add((felling, index));
+        }
+    }
+
+    /// <summary>Lets go of a tree taken with <see cref="Claim"/>.</summary>
+    public static void Release(TerrainTreeFelling felling, int index)
+    {
+        if (felling != null && index >= 0)
+        {
+            Claimed.Remove((felling, index));
+        }
+    }
 
     /// <summary>Whether <paramref name="record"/>'s job fells rings (WorkerSettings › Fellers), at work and not paused.</summary>
     public static bool Fells(ResidentRecord record, WorkerSettings settings)
@@ -71,15 +108,20 @@ public static class RingWork
     public static float SecondsPerTree(float workSpeed, WorkerSettings settings) =>
         settings.ChopSeconds / Mathf.Max(0.1f, workSpeed) + settings.FellWalkSeconds;
 
-    /// <summary>The logs a tree of <paramref name="height"/> metres gives a feller (Plain wood by the ring's axe tier).</summary>
+    /// <summary>
+    /// The logs a tree of <paramref name="height"/> metres gives a feller: as many as the player's tree worked to the end (felled, every
+    /// section cut: TreeChoppingSettings.AllLogs), of the woods the ring's axe tier rolls.
+    /// </summary>
     public static List<ItemAmount> Logs(float height, WorkerSettings settings, System.Func<float> random)
     {
         var logs = new List<ItemAmount>();
-        ChoppableTree.Roll(settings.FellerAxeTier, Mathf.Max(1f, height), random, logs);
+        TreeChoppingSettings rules = TreeChoppingSettings.Current;
+        float size = rules.SizeOf(Mathf.Max(0.5f, height));
+        ChoppableTree.Roll(rules.AllLogs(settings.FellerAxeTier, size), settings.FellerAxeTier, size, random, logs);
         return logs;
     }
 
-    /// <summary>The grown tree nearest the ring's centre, on any terrain under it (the first to come down), or false.</summary>
+    /// <summary>The grown tree nearest the ring's centre that nobody else is at, on any terrain under it, or false.</summary>
     public static bool NextTree(RingOrder ring, out TerrainTreeFelling felling, out TerrainTreeFelling.Standing tree)
     {
         felling = null;
@@ -94,7 +136,7 @@ public static class RingWork
 
             foreach (TerrainTreeFelling.Standing standing in candidate.StandingNear(ring.Centre, ring.Radius))
             {
-                if (Growing(candidate, standing.Index))
+                if (Growing(candidate, standing.Index) || Claimed.Contains((candidate, standing.Index)))
                 {
                     continue;
                 }
@@ -113,7 +155,7 @@ public static class RingWork
         return felling != null;
     }
 
-    /// <summary>How many grown trees stand in the ring now (at home): saplings still growing don't count.</summary>
+    /// <summary>How many grown trees stand in the ring now (at home), those being chopped too; saplings still growing don't count.</summary>
     public static int Standing(RingOrder ring)
     {
         int count = 0;
@@ -136,18 +178,25 @@ public static class RingWork
     // A sapling still growing (planted by the forester, or by hand) is left standing.
     private static bool Growing(TerrainTreeFelling felling, int index) => PlantedTrees.Current != null && PlantedTrees.Current.IsGrowing(felling, index);
 
-    /// <summary>A sapling where a tree came down (the forester), if the Haven plants and the ground takes one.</summary>
-    public static void Replant(Vector3 foot, WorkerSettings settings)
+    /// <summary>A sapling where a tree came down (the forester), if the Haven plants and the ground takes one. False when it didn't.</summary>
+    public static bool Replant(Vector3 foot, WorkerSettings settings) =>
+        settings.Sapling != null && PlantedTrees.Current != null && PlantedTrees.Current.TryPlant(foot, settings.Sapling, out _);
+
+    /// <summary>The ring done: saplings where they didn't take before, now that the trees round them are down.</summary>
+    public static void ReplantLeft(RingOrder ring, WorkerSettings settings)
     {
-        if (settings.Sapling != null && PlantedTrees.Current != null)
+        foreach (Vector3 foot in ring.Unplanted)
         {
-            PlantedTrees.Current.TryPlant(foot, settings.Sapling, out _);
+            Replant(foot, settings);
         }
+
+        ring.Unplanted.Clear();
     }
 
     /// <summary>
-    /// The player away (SettlementSystem): <paramref name="seconds"/> more of each ring's fellers' work. Each tree done gives its logs to
-    /// the chests (an average tree) and is laid down at home later (PendingFells), up to the trees last seen standing.
+    /// The player away (SettlementSystem): <paramref name="seconds"/> more of each ring's fellers' work: those at home (not the one
+    /// along) whose bench has nothing to work on, each for Away Felling Share of the time (working hours). Each tree done gives its logs
+    /// to the chests (an average tree) and is laid down at home later (PendingFells), up to the trees last seen standing.
     /// </summary>
     public static void WorkAway(SettlementState home, StashStorage stash, float seconds, ResidentDefinition along, WorkerSettings settings)
     {
@@ -159,10 +208,19 @@ public static class RingWork
         float speed = 0f;
         foreach (ResidentRecord record in home.Residents)
         {
-            if (record.Resident != along && Fells(record, settings))
+            if (record.Resident == along || !Fells(record, settings))
             {
-                speed += 1f;
+                continue;
             }
+
+            // Their own bench first, as at home.
+            StationQueue bench = WorkerProduction.QueueOf(home, record);
+            if (bench != null && !bench.IsIdle && !bench.Blocked)
+            {
+                continue;
+            }
+
+            speed += settings.AwayFellingShare;
         }
 
         if (speed <= 0f)
@@ -170,11 +228,10 @@ public static class RingWork
             return;
         }
 
-        // The first ring with trees left takes the work, as at home.
+        // The first ring with trees left takes the work, as at home; one never looked at waits to be seen.
         foreach (RingOrder ring in home.Rings)
         {
-            int left = ring.StandingSeen - ring.PendingFells;
-            if (ring.StandingSeen >= 0 && left <= 0)
+            if (ring.StandingSeen < 0 || ring.StandingSeen - ring.PendingFells <= 0)
             {
                 continue;
             }
@@ -182,7 +239,7 @@ public static class RingWork
             AwayClock.TryGetValue(ring, out float clock);
             clock += seconds * speed;
             float each = SecondsPerTree(1f, settings);
-            while (clock >= each && (ring.StandingSeen < 0 || ring.StandingSeen - ring.PendingFells > 0))
+            while (clock >= each && ring.StandingSeen - ring.PendingFells > 0)
             {
                 clock -= each;
                 ring.PendingFells++;
@@ -198,11 +255,17 @@ public static class RingWork
     }
 
     /// <summary>
-    /// At home again: the trees felled while away are laid down (nearest the centre first) with their saplings, each ring's standing trees
-    /// noted, and rings with none left are done. Only in the game that keeps the Haven.
+    /// At home again: the trees felled while away are laid down (nearest the centre first, none a woodcutter is already at) with their
+    /// saplings, each ring's standing trees noted, and rings with none left are done. Only in the game that keeps the Haven, and only
+    /// once a terrain is up to lay them on.
     /// </summary>
     public static void SettleAtHome(SettlementState home, WorkerSettings settings)
     {
+        if (TerrainTreeFelling.Active.Count == 0)
+        {
+            return;
+        }
+
         var done = new List<RingOrder>();
         foreach (RingOrder ring in home.Rings)
         {
@@ -214,13 +277,16 @@ public static class RingWork
                     break;
                 }
 
-                felling.FellByHand(tree.Index);
-                Replant(tree.Foot, settings);
+                if (felling.FellByHand(tree.Index) && !Replant(tree.Foot, settings))
+                {
+                    ring.Unplanted.Add(tree.Foot);
+                }
             }
 
             ring.StandingSeen = Standing(ring);
             if (ring.StandingSeen == 0)
             {
+                ReplantLeft(ring, settings);
                 done.Add(ring);
             }
         }

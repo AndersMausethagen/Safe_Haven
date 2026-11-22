@@ -90,9 +90,10 @@ public static class WorkerProduction
                     break;
             }
 
+            // Fetching on foot or away, a craft starts only from what was fetched: their carrying is what paces the work.
             if (!record.WorkPaused && queue.IsIdle)
             {
-                StartNext(record.Job, queue, stash);
+                StartNext(record.Job, queue, stash, how != Hauling.Instantly);
             }
         }
 
@@ -334,11 +335,26 @@ public static class WorkerProduction
         TripClock[id] = clock;
     }
 
+    // A recipe's whole need of one item, over every line naming it.
+    private static int NeedOf(RecipeDefinition recipe, ItemDefinition item)
+    {
+        int need = 0;
+        foreach (ItemAmount cost in recipe.ItemCost)
+        {
+            if (cost.Item == item)
+            {
+                need += cost.Amount;
+            }
+        }
+
+        return need;
+    }
+
     private static bool HasSupplies(RecipeDefinition recipe, StationQueue queue)
     {
         foreach (ItemAmount cost in recipe.ItemCost)
         {
-            if (cost.Item != null && queue.Supplied(cost.Item) < cost.Amount)
+            if (cost.Item != null && queue.Supplied(cost.Item) < NeedOf(recipe, cost.Item))
             {
                 return false;
             }
@@ -354,11 +370,12 @@ public static class WorkerProduction
     }
 
     /// <summary>
-    /// The next order that can be worked, paid in full or not at all: what was fetched first, the rest from the stash (fetching on foot
-    /// or away brings it all, so the stash's part is then nothing; before a chest stands the stash pays as before). A craft never starts
-    /// short: one that would have let a worker's later crafts come free.
+    /// The next order that can be worked, paid in full or not at all. With <paramref name="fetchedOnly"/> (a worker fetching on foot or
+    /// away) its items come only from what was fetched to the station, so their carrying paces the work; otherwise (no chest yet, no body
+    /// at home) what was fetched first and the rest from the stash. A craft never starts short: one that would have let a worker's later
+    /// crafts come free. Resources (essence) always come from the stash: nobody carries them.
     /// </summary>
-    public static bool StartNext(JobDefinition job, StationQueue queue, StashStorage stash)
+    public static bool StartNext(JobDefinition job, StationQueue queue, StashStorage stash, bool fetchedOnly = false)
     {
         if (job == null)
         {
@@ -373,7 +390,7 @@ public static class WorkerProduction
             }
 
             RecipeDefinition recipe = RecipeVariants.OpenAt(order.recipe, queue);
-            if (!CanPay(recipe, queue, stash))
+            if (!CanPay(recipe, queue, stash, fetchedOnly))
             {
                 continue;
             }
@@ -406,12 +423,13 @@ public static class WorkerProduction
         return false;
     }
 
-    // Whether the recipe's whole cost is there: fetched, and the rest in the stash.
-    private static bool CanPay(RecipeDefinition recipe, StationQueue queue, StashStorage stash)
+    // Whether the recipe's whole cost is there: fetched, and (unless fetched only) the rest in the stash. A recipe naming an item on two
+    // lines needs both (NeedOf), as MaterialPool sums them.
+    private static bool CanPay(RecipeDefinition recipe, StationQueue queue, StashStorage stash, bool fetchedOnly)
     {
         foreach (ItemAmount cost in recipe.ItemCost)
         {
-            if (cost.Item != null && queue.Supplied(cost.Item) + stash.Items.Count(cost.Item) < cost.Amount)
+            if (cost.Item != null && queue.Supplied(cost.Item) + (fetchedOnly ? 0 : stash.Items.Count(cost.Item)) < NeedOf(recipe, cost.Item))
             {
                 return false;
             }

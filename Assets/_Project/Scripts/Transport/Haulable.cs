@@ -223,7 +223,7 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
         stuckFor = Strain >= 1f ? stuckFor + Time.fixedDeltaTime : 0f;
         if (stuckFor >= TransportSettings.Current.StuckSeconds)
         {
-            if (hauler is PlayerTransport)
+            if (!(hauler is ResidentLife))
             {
                 GameMessages.Post($"The {transport.Definition.DisplayName} won't move. You let go.", MessageKind.Warning);
             }
@@ -270,7 +270,7 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
         TransportSettings settings = TransportSettings.Current;
         // The player's own noise: a resident's cart rumbling at home is no noise of theirs.
         if (Time.time < nextRumble || body.linearVelocity.sqrMagnitude < RollingSpeed * RollingSpeed || Player.Current == null || Player.Current.Noise == null
-            || !(hauler is PlayerTransport))
+            || hauler is ResidentLife)
         {
             return;
         }

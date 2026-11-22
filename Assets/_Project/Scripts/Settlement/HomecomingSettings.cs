@@ -24,8 +24,11 @@ public sealed class HomecomingSettings : GameSettings<HomecomingSettings>
     [Tooltip("How likely a gift is on coming home from a raid.")]
     [SerializeField, Range(0f, 1f)] private float chance = 0.6f;
     [SerializeField] private List<Gift> gifts = new List<Gift>();
+    [Tooltip("A raid shorter than this (seconds in it) brings no gift: turning straight back is no time away.")]
+    [SerializeField, Min(0f)] private float minAwaySeconds = 180f;
 
     public float Chance => chance;
+    public float MinAwaySeconds => minAwaySeconds;
     public IReadOnlyList<Gift> Gifts => gifts;
 }
 

@@ -216,6 +216,12 @@ public sealed class CraftingStation : MonoBehaviour
                 return false;
             }
 
+            // Not the prologue's camp, where no portal stands: its stations are ticked as the Haven away (StationQueue.Tick).
+            if (HomePortal.Current == null)
+            {
+                return false;
+            }
+
             Vector3 apart = player.transform.position - transform.position;
             apart.y = 0f;
             return apart.sqrMagnitude <= WorkerSettings.Current.PlayerReach * WorkerSettings.Current.PlayerReach;
@@ -264,7 +270,7 @@ public sealed class CraftingStation : MonoBehaviour
                 queue.WorkerSpeed = WorkerAddsFor(worker);
                 queue.WorkerHere = WorkerIsHereFor(worker);
                 queue.HorseHelps = horse > 0f;
-                queue.PlayerSpeed = WorkerSettings.Current.PlayerSpeed;
+                queue.PlayerSpeed = WorkerSettings.Current.PlayerSpeedFor(type);
                 queue.PlayerHere = PlayerIsHere;
                 queue.Tier = Tier;
                 queue.Modules = TryGetComponent(out Construction fittedTo) ? fittedTo.Fitted : System.Array.Empty<BuildingModuleDefinition>();
