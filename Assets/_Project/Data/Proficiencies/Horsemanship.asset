@@ -35,7 +35,7 @@ MonoBehaviour:
     atLastLevel: 0.39999998
   - stat: 55
     atFirstLevel: -0.099999994
-    atLastLevel: 0.19999999
+    atLastLevel: 0.1
   milestones:
   - level: 10
     first: {fileID: 11400000, guid: d3eb4cffd1795794b9a342bece865be3, type: 2}

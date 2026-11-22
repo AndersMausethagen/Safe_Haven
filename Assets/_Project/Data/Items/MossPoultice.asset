@@ -34,7 +34,10 @@ MonoBehaviour:
   toolTier: 0
   weapon: {fileID: 0}
   arrow: {fileID: 0}
-  healAmount: 25
+  healAmount: 0.15
+  healAtOnce: 0
+  healSeconds: 0
+  healAsShare: 1
   hungerRestore: 0
   thirstRestore: 0
   waterCapacity: 0
@@ -71,3 +74,6 @@ MonoBehaviour:
   runeFocus: 30
   runeFor: 0
   raidModifier: {fileID: 0}
+  workerCarryWeight: 0
+  workerCarrySlots: 0
+  workerSpeed: 0

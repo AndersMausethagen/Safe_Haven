@@ -204,12 +204,13 @@ public sealed class BuildingModuleTests
         Assert.AreEqual("HerbRack", recipe.NeedsModule.name);
         ItemDefinition draught = recipe.Output;
         Assert.AreEqual("Mending Draught", draught.DisplayName);
-        Assert.AreEqual(30f, draught.HealAtOnce);
-        Assert.AreEqual(40f, draught.HealAmount);
+        // As shares of maximum health since 2026-11-22 (PowerCurveTests): the user's 30 and 40 at a tier I kit's 150 health.
+        Assert.IsTrue(draught.HealAsShare);
+        Assert.AreEqual(30f, draught.HealAtOnceFor(150f), 1f);
+        Assert.AreEqual(40f, draught.HealAmountFor(150f), 1.5f);
         Assert.AreEqual(10f, draught.HealSeconds);
-        Assert.AreEqual(70f, draught.HealTotal);
         Assert.AreEqual(CraftedGoods.Tonics, CraftedWork.Of(draught), "a tonic, for Potent Remedies and the Alchemy skill");
-        string told = ItemTooltipView.DescribeRestores(draught);
+        string told = ItemTooltipView.DescribeRestores(draught, 150f);
         StringAssert.Contains("30 health at once", told);
         StringAssert.Contains("40 over 10 s", told);
         Assert.IsTrue(Content.Items.Contains(draught));

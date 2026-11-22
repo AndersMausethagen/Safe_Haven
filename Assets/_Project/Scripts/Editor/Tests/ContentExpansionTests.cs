@@ -165,6 +165,10 @@ public sealed class ContentExpansionTests
     }
 
     private static readonly StatBonus[] Strong = { new StatBonus(StatType.Strength, 3f) };
+    // One of each family works at a time (BoonFamily, 2026-11-22): the slot tests use boons of different families.
+    private static readonly StatBonus[] Hearty = { new StatBonus(StatType.MaxHealth, 10f) };
+    private static readonly StatBonus[] Swift = { new StatBonus(StatType.MaxStamina, 10f) };
+    private static readonly StatBonus[] Warding = { new StatBonus(StatType.FireResistance, 0.1f) };
 
     [Test]
     public void AMealAddsItsBonusesAndATonicTakesNoSlot()
@@ -173,10 +177,10 @@ public sealed class ContentExpansionTests
         float before = stats.Get(StatType.Strength);
         Assert.IsTrue(boons.Add("stew", "Stew", Strong, 60f, true));
         Assert.AreEqual(before + 3f, stats.Get(StatType.Strength), 0.01f);
-        boons.Add("bread", "Bread", Strong, 60f, true);
-        boons.Add("tonic", "Tonic", Strong, 60f, false);
-        Assert.AreEqual(3, boons.Count);
-        Assert.AreEqual(before + 9f, stats.Get(StatType.Strength), 0.01f);
+        boons.Add("bread", "Bread", Hearty, 60f, true);
+        boons.Add("tonic", "Tonic", Swift, 60f, false, true);
+        Assert.AreEqual(3, boons.Count, "two meals in two slots, and a tonic in its own");
+        Assert.AreEqual(before + 3f, stats.Get(StatType.Strength), 0.01f);
     }
 
     [Test]
@@ -184,11 +188,27 @@ public sealed class ContentExpansionTests
     {
         PlayerBoons boons = Boons(out StatSheet stats);
         Assert.AreEqual(2, SurvivalSettings.Current.MealSlots);
-        boons.Add("long", "Long", Strong, 300f, true);
-        boons.Add("short", "Short", Strong, 30f, true);
-        boons.Add("new", "New", Strong, 120f, true);
+        boons.Add("long", "Long", Hearty, 300f, true);
+        boons.Add("short", "Short", Swift, 30f, true);
+        boons.Add("new", "New", Warding, 120f, true);
         List<BoonRecord> left = boons.Capture();
         CollectionAssert.AreEquivalent(new[] { "long", "new" }, left.Select(boon => boon.Id));
+    }
+
+    // The user, 2026-11-22: "one of each boon". A second boon of a family takes the first one's place, meal or tonic, slots or not.
+    [Test]
+    public void OneBoonOfEachFamily_AMealOrATonic()
+    {
+        PlayerBoons boons = Boons(out StatSheet stats);
+        float before = stats.Get(StatType.Strength);
+        boons.Add("roast", "Roast", Strong, 300f, true);
+        boons.Add("stew", "Stew", Hearty, 300f, true);
+        Assert.AreEqual(2, boons.Count);
+        boons.Add("cursed", "Cursed", Strong, 60f, false, true);
+        CollectionAssert.AreEquivalent(new[] { "stew", "cursed" }, boons.Capture().Select(boon => boon.Id), "the fierce tonic takes the fierce meal's place");
+        Assert.AreEqual(before + 3f, stats.Get(StatType.Strength), 0.01f, "one fierce boon's strength, not two");
+        Assert.AreEqual("Fierce", BoonFamily.Of(Strong));
+        Assert.AreEqual("Hearty", BoonFamily.Of(Hearty));
     }
 
     [Test]

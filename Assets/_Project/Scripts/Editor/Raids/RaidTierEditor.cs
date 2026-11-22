@@ -88,9 +88,29 @@ public static class GearBalance
         return kit;
     }
 
+    /// <summary>
+    /// The rules the player's prefab fights by (Data/Combat/CombatRules.asset: 3% damage a point of power), not the blank default (1%):
+    /// the tier guarantees were about another game (Docs/PowerCurveResearch_2026-11-22.md finding 1). The default only without the asset.
+    /// </summary>
+    public static CombatRules GameRules
+    {
+        get
+        {
+            if (gameRules == null)
+            {
+                gameRules = AssetDatabase.LoadAssetAtPath<CombatRules>(GameRulesPath);
+            }
+
+            return gameRules != null ? gameRules : CombatRules.Default;
+        }
+    }
+
+    public const string GameRulesPath = "Assets/_Project/Data/Combat/CombatRules.asset";
+    private static CombatRules gameRules;
+
     private static void Measure(Kit kit)
     {
-        CombatRules rules = CombatRules.Default;
+        CombatRules rules = GameRules;
         float strength = 0f, crit = 0.05f;
         kit.Health = 100f;
         foreach (ItemDefinition piece in kit.Pieces)
@@ -155,6 +175,9 @@ public static class GearBalance
     /// are tuned to this one (RaidTierTests); a player who eats and rests well finds it easier, and a mastered one is ready for the next.
     /// At tier I it is the plain kit: a new player has nothing yet.
     /// </summary>
+    /// <summary>The kit a tier is tuned to: its gear, and the perks and enchantments kept from the tier before; no food, no rest.
+    /// (Docs/PowerCurveResearch_2026-11-22.md #11 counted Well Rested here, since every raid sets out rested; that moved its 10% out of
+    /// mastering at every tier, against the user's rule that mastering a tier makes it a fifth easier: RaidTierTests. Kept out.)</summary>
     public static Kit EntryKitOf(int tier, IReadOnlyList<ItemDefinition> gear) =>
         tier <= 1 ? KitOf(tier, gear) : StackedKitOf(tier, gear, true, tier - 1, false);
 
@@ -183,7 +206,7 @@ public static class GearBalance
         Kit plain = KitOf(tier, gear);
         var kit = new Kit { Tier = tier, Score = plain.Score, SkillDamage = plain.SkillDamage };
         kit.Pieces.AddRange(plain.Pieces);
-        CombatRules rules = CombatRules.Default;
+        CombatRules rules = GameRules;
         var totals = new FightMath.Totals { MeleeDamage = plain.SkillDamage };
         float weapon = 0f;
         foreach (ItemDefinition piece in plain.Pieces)
@@ -260,9 +283,11 @@ public static class GearBalance
         List<ItemDefinition> food = AssetDatabase.FindAssets("t:ItemDefinition").Select(id => AssetDatabase.LoadAssetAtPath<ItemDefinition>(AssetDatabase.GUIDToAssetPath(id)))
             .Where(item => item != null && item.HasBoon && item.Tier <= Mathf.Max(1, reached)).ToList();
         SurvivalSettings survival = SurvivalSettings.Current;
+        // One boon of each family, meal or tonic (BoonFamily), as PlayerBoons keeps it.
+        var families = new HashSet<string>();
         void Eat(bool tonics, int slots)
         {
-            var left = food.Where(item => item.IsTonic == tonics).ToList();
+            var left = food.Where(item => item.IsTonic == tonics && !families.Contains(BoonFamily.Of(item.BoonBonuses))).ToList();
             for (int i = 0; i < slots && left.Count > 0; i++)
             {
                 ItemDefinition pick = left.OrderByDescending(item => { FightMath.Totals t = totals.Copy(); Take(item.BoonBonuses, t); return Worth(t); })
@@ -270,13 +295,19 @@ public static class GearBalance
                 Take(pick.BoonBonuses, totals);
                 left.Remove(pick);
                 kit.Food.Add(pick);
+                string family = BoonFamily.Of(pick.BoonBonuses);
+                if (family.Length > 0)
+                {
+                    families.Add(family);
+                    left.RemoveAll(item => BoonFamily.Of(item.BoonBonuses) == family);
+                }
             }
         }
 
         if (consumables)
         {
-            int extraMeals = MostFromBuildings(upgrade => upgrade.extraMealSlots) + (TechniqueWithin(PerkTechnique.ThirdPlate, skills, level) ? 1 : 0);
-            int extraTonics = MostFromBuildings(upgrade => upgrade.extraTonicSlots) + (TechniqueWithin(PerkTechnique.SecondVial, skills, level) ? 1 : 0);
+            int extraMeals = MostFromBuildings(upgrade => upgrade.extraMealSlots, reached) + (TechniqueWithin(PerkTechnique.ThirdPlate, skills, level) ? 1 : 0);
+            int extraTonics = MostFromBuildings(upgrade => upgrade.extraTonicSlots, reached) + (TechniqueWithin(PerkTechnique.SecondVial, skills, level) ? 1 : 0);
             if (slots == FoodSlots.Base)
             {
                 extraMeals = extraTonics = 0;
@@ -297,7 +328,7 @@ public static class GearBalance
         // (or known from the start), each counted once however many pieces could carry it, as GearSet counts them. Their numbers only:
         // what a great enchantment does is a verb, kept out as attack speed and sustain are.
         var enchantments = !enchanted ? new List<EnchantmentDefinition>() : EssenceSettings.Current.Enchantments.Where(e => e != null
-            && e.School != EssenceSchool.Relic && (e.KnownFromStart || e.Tier <= Mathf.Max(1, reached)) && e.Bonuses.Count > 0
+            && (e.KnownFromStart || e.Tier <= Mathf.Max(1, reached)) && e.Bonuses.Count > 0
             && e.RequiredRunecraft <= level).ToList();
         var used = new HashSet<EnchantmentDefinition>();
         foreach (ItemDefinition piece in plain.Pieces)
@@ -341,7 +372,9 @@ public static class GearBalance
     public const float WellRestedHealth = 0.1f;
 
     /// <summary>What every building's upgrades give at their top level, together (SettlementState.UpgradeBonus for a Haven with everything built).</summary>
-    private static int MostFromBuildings(Func<BuildingLevel, int> bonus)
+    // What the buildings' upgrades add, counting only those whose cost the tier reached can pay: an upgrade asking for moonsilver isn't
+    // there at tier II (every food slot at tier II counted the Kitchen III plate, which needs moonsilver: PowerCurveTests 2026-11-22).
+    private static int MostFromBuildings(Func<BuildingLevel, int> bonus, int reached)
     {
         int total = 0;
         foreach (string id in AssetDatabase.FindAssets("t:BuildingDefinition"))
@@ -354,7 +387,8 @@ public static class GearBalance
 
             foreach (BuildingLevel upgrade in building.Upgrades)
             {
-                total += upgrade != null ? bonus(upgrade) : 0;
+                int costTier = upgrade != null && upgrade.cost.Count > 0 ? upgrade.cost.Max(c => c.Item != null ? c.Item.Tier : 0) : 0;
+                total += upgrade != null && costTier <= Mathf.Max(1, reached) ? bonus(upgrade) : 0;
             }
         }
 
@@ -368,7 +402,7 @@ public static class GearBalance
 
     /// <summary>Hits a kit needs to kill a creature of this health and armor.</summary>
     public static float HitsToKill(Kit kit, float health, float armor, float healthScale) =>
-        health * healthScale / Mathf.Max(0.01f, kit.Damage * (1f - CombatRules.Default.GetArmorReduction(armor)));
+        health * healthScale / Mathf.Max(0.01f, kit.Damage * (1f - GameRules.GetArmorReduction(armor)));
 
     /// <summary>Hits of this strength a kit can take.</summary>
     public static float HitsToDie(Kit kit, float damage, float powerScale) => kit.Toughness / Mathf.Max(0.01f, damage * powerScale);

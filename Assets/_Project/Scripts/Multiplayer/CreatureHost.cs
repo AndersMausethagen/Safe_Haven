@@ -261,12 +261,19 @@ public sealed class CreatureHost
             hosted.Combatant.Stats.RemoveModifiersFrom(this);
             if (friends > 0)
             {
-                hosted.Combatant.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, healthPerFriend * friends, this));
+                // Times the raid's own health scale: added to the tier's percent, four players at tier IV faced x1.56 a solo creature,
+                // against x2.8 at tier I (Docs/PowerCurveResearch_2026-11-22.md #4). Now the party's share is the same at every tier.
+                float tierHealth = RaidDirector.Current != null ? RaidDirector.Current.Parameters.EnemyHealthMultiplier : 1f;
+                hosted.Combatant.Stats.AddModifier(new StatModifier(StatType.MaxHealth, StatModifierOp.Percent, PartyHealth(healthPerFriend, friends, tierHealth), this));
             }
 
             hosted.Scaled = true;
         }
     }
+
+    /// <summary>The percent a party of <paramref name="friends"/> adds to a creature's health, on top of the tier's own (which the
+    /// creature's health percent already holds as <paramref name="tierHealth"/>): the same share of a solo creature at every tier.</summary>
+    public static float PartyHealth(float perFriend, int friends, float tierHealth) => perFriend * friends * tierHealth;
 
     // Creatures removed without dying (a roamer left far behind): friends who knew them take theirs away, without loot.
     private void TellOfVanished()

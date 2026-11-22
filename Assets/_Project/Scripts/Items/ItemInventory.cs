@@ -583,7 +583,7 @@ public sealed class ItemInventory : MonoBehaviour
         from.RemoveAt(slot, 1);
         if (heals)
         {
-            float healed = health.Heal(item.HealTotal);
+            float healed = health.Heal(item.HealTotalFor(health.MaxHealth));
             GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(healed)} health", MessageKind.Gain);
         }
 

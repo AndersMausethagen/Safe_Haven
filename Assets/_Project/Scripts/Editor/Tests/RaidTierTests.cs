@@ -182,8 +182,9 @@ public sealed class RaidTierTests
 
     // Everything a player can stack by a tier (perks, meals, a tonic, empowering, Well Rested) stays within reach of the tier's own kit, so
     // a raid tier is still a fight for a player who prepares (Docs/PlayerStatsResearch.md #1): at most this much tougher and deadlier.
-    public const float StackedToughnessReach = 1.5f;
-    public const float StackedDamageReach = 1.35f;
+    // The reach is data (PowerCurveSettings, Docs/PowerCurveResearch_2026-11-22.md #13).
+    public static float StackedToughnessReach => PowerCurveSettings.Current.StackedToughness;
+    public static float StackedDamageReachAt(int tier) => PowerCurveSettings.Current.StackedDamageAt(tier);
 
     [Test]
     public void AFullyStackedKit_StaysWithinTheTiersReach()
@@ -195,7 +196,7 @@ public sealed class RaidTierTests
             GearBalance.Kit stacked = GearBalance.StackedKitOf(tier.tier, gear, enchanted: false);
             Assert.That(stacked.Toughness / kit.Toughness, Is.LessThanOrEqualTo(StackedToughnessReach),
                 $"tier {tier.tier}: stacked toughness {stacked.Toughness:0} against the kit's {kit.Toughness:0}");
-            Assert.That(stacked.Damage / kit.Damage, Is.LessThanOrEqualTo(StackedDamageReach),
+            Assert.That(stacked.Damage / kit.Damage, Is.LessThanOrEqualTo(StackedDamageReachAt(tier.tier)),
                 $"tier {tier.tier}: stacked damage {stacked.Damage:0.0} against the kit's {kit.Damage:0.0}");
         }
     }

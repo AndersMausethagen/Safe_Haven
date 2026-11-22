@@ -118,6 +118,22 @@ MonoBehaviour:
     eliteRelicChance: 0.15
     eliteLoot:
       entries: []
+  - tier: 5
+    recommendedGearScore: 109
+    minimumGearScore: 65
+    wardLevelNeeded: 4
+    enemyHealth: 4.2
+    enemyPower: 5.1
+    enemyDensity: 1.6
+    loot: 1.8
+    dropsUpToTier: 0
+    briefing: 'The deepest the portal reaches: everything here has fed on the blight a long while. Trollstone gear, and the will to use it.'
+    eliteCount: {x: 4, y: 5}
+    eliteAffixes: 2
+    hunterEliteChance: 0.25
+    eliteRelicChance: 0.15
+    eliteLoot:
+      entries: []
   eliteAffixes:
   - {fileID: 11400000, guid: d036cc7f16338cf4db6914042a96d47d, type: 2}
   - {fileID: 11400000, guid: ed7b957a7b9f7034aad0fbfeeaa94edc, type: 2}

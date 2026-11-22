@@ -506,23 +506,8 @@ public sealed class ItemTooltipView : MonoBehaviour
     /// A meal's or tonic's family (Docs/PlayerStatsResearch.md #8), so a raid's food is chosen by what it is for: Hearty (health, armour),
     /// Swift (stamina, speed), Fierce (damage, often at a cost), Warding (resistances). Empty when it is none of these.
     /// </summary>
-    public static string MealFamily(System.Collections.Generic.IReadOnlyList<StatBonus> bonuses)
-    {
-        float hearty = 0f, swift = 0f, fierce = 0f, warding = 0f;
-        foreach (StatBonus bonus in bonuses)
-        {
-            switch (bonus.stat)
-            {
-                case StatType.MaxHealth: case StatType.Armor: case StatType.PhysicalResistance: hearty += 1f; break;
-                case StatType.MaxStamina: case StatType.MoveSpeed: swift += 1f; break;
-                case StatType.Strength: case StatType.PhysicalPower: case StatType.DamageBonus: case StatType.MeleeDamage: fierce += 1.5f; break;
-                case StatType.FireResistance: case StatType.FrostResistance: case StatType.HolyResistance: warding += 1f; break;
-            }
-        }
-
-        float most = Mathf.Max(Mathf.Max(hearty, swift), Mathf.Max(fierce, warding));
-        return most <= 0f ? "" : fierce == most ? "Fierce" : hearty == most ? "Hearty" : warding == most ? "Warding" : "Swift";
-    }
+    /// <summary>The boon's family (BoonFamily): one of each works at a time.</summary>
+    public static string MealFamily(System.Collections.Generic.IReadOnlyList<StatBonus> bonuses) => BoonFamily.Of(bonuses);
 
     private static string Compared(ItemDefinition item, int score)
     {
@@ -884,19 +869,29 @@ public sealed class ItemTooltipView : MonoBehaviour
 
     /// <summary>"Restores 30 health, 40 hunger." – the parts that are above zero.</summary>
     /// <summary>What an item restores, with health given at once told apart from health over its own time (the Mending Draught).</summary>
-    public static string DescribeRestores(ItemDefinition item)
+    public static string DescribeRestores(ItemDefinition item) => DescribeRestores(item, PlayerMaxHealth());
+
+    /// <summary>The same, for someone with <paramref name="maxHealth"/>: a draught's share of health shown as the points it heals them
+    /// (and the share).</summary>
+    public static string DescribeRestores(ItemDefinition item, float maxHealth)
     {
-        if (item.HealAtOnce <= 0f && item.HealSeconds <= 0f)
+        string share(float part) => item.HealAsShare ? $" ({part * 100f:0}% of yours)" : "";
+        if (item.HealAtOnce <= 0f && item.HealSeconds <= 0f && !item.HealAsShare)
         {
             return DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore);
         }
 
+        float once = item.HealAtOnceFor(maxHealth), over = item.HealAmountFor(maxHealth);
         string heal = item.HealAtOnce > 0f
-            ? $"{Mathf.RoundToInt(item.HealAtOnce)} health at once" + (item.HealAmount > 0f ? $", then {Mathf.RoundToInt(item.HealAmount)} over {Over(item):0} s" : "")
-            : $"{Mathf.RoundToInt(item.HealAmount)} health over {Over(item):0} s";
+            ? $"{Mathf.RoundToInt(once)} health at once{share(item.HealAtOnce)}" + (item.HealAmount > 0f ? $", then {Mathf.RoundToInt(over)} over {Over(item):0} s{share(item.HealAmount)}" : "")
+            : $"{Mathf.RoundToInt(over)} health over {Over(item):0} s{share(item.HealAmount)}";
         string rest = DescribeRestores(0f, item.HungerRestore, item.ThirstRestore);
         return "Restores " + heal + (rest.Length > 0 ? ", " + rest.Substring("Restores ".Length) : ".");
     }
+
+    // The player's maximum health now, or a tier I kit's (150) when there is no player (a menu, a test).
+    private static float PlayerMaxHealth() =>
+        Player.Current != null && Player.Current.TryGetComponent(out Damageable health) ? health.MaxHealth : 150f;
 
     private static float Over(ItemDefinition item) => item.HealSeconds > 0f ? item.HealSeconds : CombatTechniqueSettings.Current.HealOverSeconds;
 

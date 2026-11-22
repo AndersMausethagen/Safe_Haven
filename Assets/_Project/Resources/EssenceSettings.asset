@@ -20,7 +20,7 @@ MonoBehaviour:
   - purified: 24
     materialShare: 1
   purifiedPerTier: 2
-  statShare: 0.2
+  statShare: 0.1
   weaponDamage: 0.06
   toolYield: 0.03
   toolCare: 0.1

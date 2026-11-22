@@ -62,6 +62,7 @@ MonoBehaviour:
   - Nobody here says it, but we all count who comes back through that portal. {0}... well.
   - Someone saw {0} out there, walking in circles. Walking. Do you understand? Go and look.
   griefRaids: 2
+  keepHouseRaids: 10
   bosses:
   - {fileID: 11400000, guid: 9b7313d497a67e54b8b12e51990184bb, type: 2}
   - {fileID: 11400000, guid: 9270117f6be16f544877dc59efdbc8e4, type: 2}
@@ -234,6 +235,19 @@ MonoBehaviour:
       tier: 3
     residents: []
     bossesBeaten: 1
+  - cost:
+    - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
+      amount: 32
+    - resource: {fileID: 11400000, guid: a86ac9a152512464ab08e0446c161e61, type: 2}
+      amount: 10
+    extraRadius: 6
+    raidSeconds: 90
+    opens: Tier V raids
+    requires:
+    - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
+      tier: 4
+    residents: []
+    bossesBeaten: 2
   portalTierNames:
   - Dormant
   - Awakened

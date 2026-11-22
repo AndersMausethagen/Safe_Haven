@@ -163,9 +163,9 @@ public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
 
         // Potent Remedies make draughts heal more; Hearty Meals make food heal at all.
         float potent = kind == CraftedGoods.Tonics && Techniques.Has(PerkTechnique.PotentRemedies) ? 1f + techniques.PotentHeal : 1f;
-        float heal = item.HealAmount * potent;
+        float heal = item.HealAmountFor(health.MaxHealth) * potent;
         // A draught that heals some at once (the Mending Draught) gives that now, the rest over its own time.
-        float atOnce = item.HealAtOnce * potent;
+        float atOnce = item.HealAtOnceFor(health.MaxHealth) * potent;
         if (atOnce > 0f)
         {
             health.Heal(atOnce);

@@ -86,8 +86,19 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
             return 1f;
         }
 
-        return Mathf.Max(0.2f, 1f + PlayerHorsemanship.MountedDamage()) * (riding.Riding.Motion.IsGalloping ? 1.25f : 1f);
+        // The charge: the gallop's x1.25 on its first blow only (Docs/PowerCurveResearch_2026-11-22.md #8: every swing and arrow from a
+        // galloping horse was multiplied). Slowing from the gallop readies the next charge.
+        bool charge = riding.Riding.Motion.IsGalloping && !riding.chargeSpent;
+        if (charge)
+        {
+            riding.chargeSpent = true;
+        }
+
+        return Mathf.Max(0.2f, 1f + PlayerHorsemanship.MountedDamage()) * (charge ? 1.25f : 1f);
     }
+
+    // The charge's blow has landed since the gallop began (MountedScale).
+    private bool chargeSpent;
 
     private void OnEnable()
     {
@@ -568,6 +579,10 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
         }
 
         CountRidden(Riding);
+        if (!Riding.Motion.IsGalloping)
+        {
+            chargeSpent = false;
+        }
         // The view draws back a little at a gallop, for the ground ahead.
         if (PlayerCameraController.Current != null)
         {

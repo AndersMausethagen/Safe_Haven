@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponDefinition
   displayName: Iron Sword
   stance: 1
+  readyPose: 0
   kind: 0
   strikeOverride: 0
-  damage: 20
+  damage: 24
   basicAttack: {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
   combo:
   - {fileID: 11400000, guid: a7b6140013b6a534fac54896856f7660, type: 2}
@@ -46,6 +47,8 @@ MonoBehaviour:
   drawMoveSpeed: 0.55
   perfectReleaseSeconds: 0.2
   perfectReleaseDamage: 1.25
+  drawWeight: 1
+  escapeShotFocus: 0
   aimSpread: 0.5
   counterShotDamage: 0.6
   shotAttack: {fileID: 0}

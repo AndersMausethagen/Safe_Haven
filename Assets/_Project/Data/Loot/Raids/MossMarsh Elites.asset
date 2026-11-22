@@ -47,7 +47,7 @@ MonoBehaviour:
       maxQuantity: 5
       probability: 1
       fromTier: 4
-      toTier: 4
+      toTier: 5
       fixedAmount: 0
     - item: {fileID: 11400000, guid: 6e9e4593f2cc6c143a0c206f6c4b783a, type: 2}
       resource: {fileID: 0}
@@ -55,7 +55,7 @@ MonoBehaviour:
       maxQuantity: 1
       probability: 0.25
       fromTier: 4
-      toTier: 4
+      toTier: 5
       fixedAmount: 0
     - item: {fileID: 0}
       resource: {fileID: 11400000, guid: c0e409a7cd38400498ff1c7037737b96, type: 2}
@@ -63,7 +63,7 @@ MonoBehaviour:
       maxQuantity: 8
       probability: 1
       fromTier: 4
-      toTier: 4
+      toTier: 5
       fixedAmount: 0
     - item: {fileID: 11400000, guid: ae2b31c30cd17f44297a7cf3ef8c35df, type: 2}
       resource: {fileID: 0}
@@ -71,5 +71,5 @@ MonoBehaviour:
       maxQuantity: 2
       probability: 0.6
       fromTier: 4
-      toTier: 4
+      toTier: 5
       fixedAmount: 0

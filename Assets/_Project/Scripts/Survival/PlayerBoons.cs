@@ -85,6 +85,18 @@ public sealed class PlayerBoons : MonoBehaviour
         }
 
         Remove(id);
+        // One boon of each family at a time, meal or tonic (BoonFamily; the user, 2026-11-22: "one of each boon"): a Hearty tonic takes
+        // a Hearty meal's place, whatever the slots. Extra slots hold other families: breadth, not a second helping of armour.
+        string family = isMeal || isTonic ? BoonFamily.Of(bonuses) : "";
+        for (int i = active.Count - 1; i >= 0 && family.Length > 0; i--)
+        {
+            if ((active[i].IsMeal || active[i].IsTonic) && BoonFamily.Of(active[i].Bonuses) == family)
+            {
+                GameMessages.Post($"{active[i].Name} gives way: one {family.ToLowerInvariant()} boon at a time.");
+                Stop(i);
+            }
+        }
+
         if (isMeal)
         {
             MakeRoomForMeal();

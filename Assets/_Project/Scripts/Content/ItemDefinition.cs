@@ -96,6 +96,10 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [SerializeField, Min(0f)] private float healAtOnce;
     [Tooltip("Seconds Heal Amount comes over. 0: the usual (CombatTechniqueSettings › Heal Over Seconds).")]
     [SerializeField, Min(0f)] private float healSeconds;
+    [Tooltip("Heal Amount and Heal At Once are shares of the drinker's maximum health (0.3 = 30%), not points: a draught then heals as " +
+             "much of a tier IV player as of a tier I one (Docs/PowerCurveResearch_2026-11-22.md #9: flat heals went from 20% of health at " +
+             "tier I to 68% at tier IV). Draughts, salves and bandages; food heals in points.")]
+    [SerializeField] private bool healAsShare;
     [Tooltip("Hunger restored when the item is eaten (GDD §11).")]
     [SerializeField, Min(0f)] private float hungerRestore;
     [Tooltip("Thirst restored when the item is drunk.")]
@@ -243,8 +247,17 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public float HealAtOnce => healAtOnce;
     /// <summary>Seconds HealAmount comes over; 0 for the usual.</summary>
     public float HealSeconds => healSeconds;
-    /// <summary>All the health it gives, at once and over time.</summary>
+    /// <summary>All the health it gives, at once and over time, as written (points, or shares with Heal As Share): only to ask
+    /// whether it heals at all. What it heals someone is HealTotalFor.</summary>
     public float HealTotal => healAmount + healAtOnce;
+    /// <summary>True when its heals are shares of maximum health.</summary>
+    public bool HealAsShare => healAsShare;
+    /// <summary>Health it gives over time to someone with <paramref name="maxHealth"/>.</summary>
+    public float HealAmountFor(float maxHealth) => healAsShare ? healAmount * maxHealth : healAmount;
+    /// <summary>Health it gives at once to someone with <paramref name="maxHealth"/>.</summary>
+    public float HealAtOnceFor(float maxHealth) => healAsShare ? healAtOnce * maxHealth : healAtOnce;
+    /// <summary>All the health it gives someone with <paramref name="maxHealth"/>.</summary>
+    public float HealTotalFor(float maxHealth) => HealAmountFor(maxHealth) + HealAtOnceFor(maxHealth);
     public float HungerRestore => hungerRestore;
     public float ThirstRestore => thirstRestore;
     public float WaterCapacity => waterCapacity;
