@@ -35,6 +35,8 @@ public static class ContentAudit
         "HavenPlaceVerbs.finds[].item",
         // Inscriptions are made by drops, caches and rubbings from the one item (Inscriptions.Make).
         "EssenceSettings.inscription",
+        // What someone at home made while the player was away, put in the chests on coming home (AwayGifts).
+        "HomecomingSettings.gifts[].item",
     };
 
     private static readonly string[] ItemUses =
@@ -61,6 +63,8 @@ public static class ContentAudit
     {
         "ContentDatabase.items", "CompanionDefinition.arrow", "CompanionDefinition.weapon", "RaidDefinition.likelyItems", "TradeSettings.coin",
         "TradeSettings.sales", "RaidRumourDefinition.teaches",
+        // Only shown in a resident's hand: the woodcutter's axe at a ring, the Farmer's water on the way back (nothing made or spent).
+        "WorkerSettings.fellingTool", "FarmSettings.waterCarried",
     };
 
     private static readonly string[] RecipeTeachers =

@@ -178,6 +178,12 @@ public sealed class KeeperHud : MonoBehaviour
             return $"{queue.OutputAmount} ready";
         }
 
+        // A field whose soil has dried (Fields): its crop slows until someone waters it.
+        if (Fields.Grows(queue) && !queue.IsIdle && queue.Water <= 0f)
+        {
+            return "Dry";
+        }
+
         return null;
     }
 

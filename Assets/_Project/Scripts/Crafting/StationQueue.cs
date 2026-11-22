@@ -217,7 +217,10 @@ public sealed class StationQueue
     public bool PlayerHere { get; set; }
 
     /// <summary>How fast it works now: on its own, plus its worker and the player while they are at it.</summary>
-    public float Speed => SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f) + (PlayerHere ? PlayerSpeed : 0f);
+    public float Speed => (SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f) + (PlayerHere ? PlayerSpeed : 0f)) * Fields.GrowthFactor(this);
+
+    /// <summary>A field's water (Fields): seconds of growing left before its soil is dry; drains only while something grows. Saved.</summary>
+    public float Water { get; set; }
 
     // What its worker fetched from the chests for their work orders: what a worker's order is paid from (WorkerProduction).
     private readonly Dictionary<ItemDefinition, int> supplies = new Dictionary<ItemDefinition, int>();
@@ -324,6 +327,12 @@ public sealed class StationQueue
         }
 
         Progress += seconds * Speed;
+        // A field's soil dries as its crop drinks (Fields); empty, it keeps its water.
+        if (Type == CraftingStationType.Farm)
+        {
+            Water = Mathf.Max(0f, Water - seconds);
+        }
+
         int delivered = 0;
         while (jobs.Count > 0 && Progress >= jobs[0].Recipe.CraftSeconds)
         {

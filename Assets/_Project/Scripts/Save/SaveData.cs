@@ -168,6 +168,8 @@ public sealed class StationSaveData
     public List<StationOutputSaveData> moreOutput = new List<StationOutputSaveData>();
     /// <summary>What its worker has fetched from the chests for their orders (StationQueue.Supplies). Missing in older saves: none.</summary>
     public List<StationOutputSaveData> supplies = new List<StationOutputSaveData>();
+    /// <summary>A field's water, seconds of growing left (StationQueue.Water, Fields). Missing in older saves: dry.</summary>
+    public float water;
 }
 
 [System.Serializable]

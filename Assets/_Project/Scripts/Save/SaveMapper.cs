@@ -296,7 +296,7 @@ public static class SaveMapper
         foreach (StationQueue queue in settlement.Workshops.Queues)
         {
             // One with nothing in it is left out; one whose worker has fetched for an order isn't (that would be lost).
-            if (queue.IsIdle && queue.Output == null && queue.Supplies.Count == 0)
+            if (queue.IsIdle && queue.Output == null && queue.Supplies.Count == 0 && queue.Water <= 0f)
             {
                 continue;
             }
@@ -312,6 +312,7 @@ public static class SaveMapper
                 outputIsResource = queue.Output is ResourceDefinition,
                 outputAmount = queue.OutputAmount,
                 workerCrafts = queue.WorkerCrafts,
+                water = queue.Water,
             };
             foreach ((UnityEngine.Object waiting, int amount) in queue.MoreOutput)
             {
@@ -486,6 +487,7 @@ public static class SaveMapper
             queue.OutputSlots = 1 + more.Count;
             queue.Restore(jobs, entry.progress, output, entry.outputAmount, more);
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
+            queue.Water = Math.Max(0f, entry.water);
             foreach (StationOutputSaveData supply in entry.supplies ?? new List<StationOutputSaveData>())
             {
                 ItemDefinition fetched = supply == null || string.IsNullOrEmpty(supply.id) ? null : Resolve(content.FindItem(supply.id), "item", supply.id, missing);

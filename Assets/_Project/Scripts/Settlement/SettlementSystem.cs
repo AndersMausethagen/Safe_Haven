@@ -46,6 +46,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         }
     }
 
+    private float nextRainLook;
+
     private static WorkerProduction.Hauling HowAtHome(ResidentRecord record)
     {
         ResidentLife life = ResidentLife.Of(record.Resident);
@@ -68,6 +70,16 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
         settlement.Workshops.WorkerAbsentAt = along != null ? WorkerProduction.QueueOf(settlement, settlement.Find(along))?.StationId : null;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
+        // Rain at home waters the fields (Fields), looked at now and then.
+        if (atHome && Time.time >= nextRainLook)
+        {
+            nextRainLook = Time.time + 5f;
+            WeatherSystem weather = WeatherSystem.Active;
+            if (weather != null && !weather.Snowing)
+            {
+                Fields.Rain(settlement.Workshops, weather.Current.Rain, FarmSettings.Current);
+            }
+        }
         workerSeconds += Time.deltaTime;
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
         // home, not one who went along on the raid.
@@ -82,10 +94,12 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             // At home a worker fetches on foot where a chest stands near their workplace (ResidentLife); away, each trip takes the time
             // the walk would (WorkerSettings).
             WorkerProduction.Work(settlement, GameSession.Stash, workerSeconds, atHome, atHome ? HowAtHome : null, along);
-            // Away, the woodcutters fell the rings drawn (laid down at home on the way back: RingWork.SettleAtHome).
+            // Away, the woodcutters fell the rings drawn (laid down at home on the way back: RingWork.SettleAtHome), and a Farmer
+            // keeps the plots watered (Fields).
             if (!atHome)
             {
                 RingWork.WorkAway(settlement, GameSession.Stash, workerSeconds, along, WorkerSettings.Current);
+                Fields.WorkAway(settlement, along, FarmSettings.Current);
             }
             workerSeconds = 0f;
         }

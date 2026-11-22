@@ -294,6 +294,12 @@ public sealed class CraftingStation : MonoBehaviour
 
     private void Awake()
     {
+        // A field shows its crop growing and its soil watered (Fields).
+        if (type == CraftingStationType.Farm && !TryGetComponent(out FarmPlotLook _))
+        {
+            gameObject.AddComponent<FarmPlotLook>();
+        }
+
         colliders = GetComponentsInChildren<Collider>();
         interactable = GetComponent<Interactable>();
         building = GetComponent<BuildingObject>();
@@ -327,7 +333,26 @@ public sealed class CraftingStation : MonoBehaviour
         }
         else if (Usable)
         {
+            WaterByHand(interactable.Interactor);
             OpenMenu(interactable.Interactor);
+        }
+    }
+
+    // A field used in person with water in the bag is watered (Fields): the tending is the visit, no extra button.
+    private void WaterByHand(GameObject user)
+    {
+        if (type != CraftingStationType.Farm || !Player.IsPlayer(user) || !Place.AtHome || !user.TryGetComponent(out ItemInventory bag))
+        {
+            return;
+        }
+
+        if (Fields.TryWaterFrom(bag.Container, GameSession.Home.Workshops.Find(Id), FarmSettings.Current, out string why))
+        {
+            GameMessages.Post($"You water the {(building != null && building.Definition != null ? building.Definition.DisplayName : "plot")}.", MessageKind.Gain);
+        }
+        else if (why != null)
+        {
+            GameMessages.Post(why);
         }
     }
 

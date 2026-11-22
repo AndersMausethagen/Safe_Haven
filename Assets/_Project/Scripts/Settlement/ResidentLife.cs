@@ -71,6 +71,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         ToCart,
         ToChest,
         ToStation,
+        /// <summary>A Farmer to the nearest water (Fields), then back to the plots with it.</summary>
+        ToWater,
     }
 
     private const float TripLookSeconds = 1.5f;
@@ -97,6 +99,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private float chopLeft;
     private bool logsToChest;
     private float carriedWeight;
+    // A Farmer on the way back from the water (Fields).
+    private bool carryingWater;
     private float benchLookAt;
     private bool benchBusy;
     private BuildingObject sleepsIn;
@@ -424,6 +428,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         cartWanted = null;
         carrying.Clear();
         carryingBack = false;
+        carryingWater = false;
         LetGoOfCart();
 
         // Their house, if one is theirs: they sleep inside it, going in at its door.
@@ -925,7 +930,18 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     {
         nextTripLook = Time.time + TripLookSeconds;
         ResidentRecord record = npc.Record;
-        if (HavenVisit.IsVisiting || record == null || record.WorkPaused || npc.Workplace == null || !FetchesOnFoot)
+        if (HavenVisit.IsVisiting || record == null || record.WorkPaused || npc.Workplace == null)
+        {
+            return false;
+        }
+
+        // A Farmer's plots first: water fetched for every plot round theirs once one runs low (no chest needed).
+        if (MaybeFetchWater(record))
+        {
+            return true;
+        }
+
+        if (!FetchesOnFoot)
         {
             return false;
         }
@@ -1001,6 +1017,26 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return;
         }
 
+        if (trip == Trip.ToWater)
+        {
+            // Water drawn: back to the plots with it.
+            carryingWater = true;
+            trip = Trip.ToStation;
+            ShowTool(FarmSettings.Current.WaterCarried, CarriedScale);
+            GoTo(workPlace);
+            facing = workFacingThere;
+            return;
+        }
+
+        if (carryingWater)
+        {
+            carryingWater = false;
+            WaterPlots(npc.Workplace != null ? npc.Workplace.transform.position : workPlace, FarmSettings.Current);
+            ShowTool(null, 1f);
+            EndTrip();
+            return;
+        }
+
         if (trip == Trip.ToChest)
         {
             CarryLimits limits = Limits(queue);
@@ -1027,6 +1063,56 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         }
 
         EndTrip();
+    }
+
+    // A Farmer with a growing plot running low round theirs walks to the nearest water (FarmSettings › Water Reach) and back with it.
+    private bool MaybeFetchWater(ResidentRecord record)
+    {
+        FarmSettings farm = FarmSettings.Current;
+        if (!Fields.Farms(record) || agent == null || !PlotsWantWater(npc.Workplace.transform.position, farm)
+            || !WaterSource.Nearest(npc.Workplace.transform.position, out Vector3 water)
+            || (water - npc.Workplace.transform.position).sqrMagnitude > farm.WaterReach * farm.WaterReach)
+        {
+            return false;
+        }
+
+        trip = Trip.ToWater;
+        carryingWater = false;
+        GoTo(water);
+        return true;
+    }
+
+    // Whether a plot with a crop round <paramref name="near"/> (Tend Reach) is running low.
+    private static bool PlotsWantWater(Vector3 near, FarmSettings farm)
+    {
+        foreach (CraftingStation plot in CraftingStation.Active)
+        {
+            if (plot != null && plot.Type == CraftingStationType.Farm && (plot.transform.position - near).sqrMagnitude <= farm.TendReach * farm.TendReach
+                && Fields.WantsWater(GameSession.Here.Workshops.Find(plot.Id), farm))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Back with the water: every plot with a crop round their own is watered (Fields.Fill).
+    private static int WaterPlots(Vector3 near, FarmSettings farm)
+    {
+        int watered = 0;
+        foreach (CraftingStation plot in CraftingStation.Active)
+        {
+            StationQueue queue = plot != null && plot.Type == CraftingStationType.Farm
+                && (plot.transform.position - near).sqrMagnitude <= farm.TendReach * farm.TendReach ? GameSession.Here.Workshops.Find(plot.Id) : null;
+            if (queue != null && !queue.IsIdle && queue.Water < farm.WateredSeconds)
+            {
+                Fields.Fill(queue, farm);
+                watered++;
+            }
+        }
+
+        return watered;
     }
 
     // Whether any of the finished work can go back: they can lift one, and the chests have room (else they'd pace there and back).

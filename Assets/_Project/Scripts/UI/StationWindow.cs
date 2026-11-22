@@ -629,6 +629,11 @@ public sealed class StationWindow : MonoBehaviour
             string who = now.WorkerHere && now.PlayerHere ? "with you and its worker at it" : now.WorkerHere ? "with its worker at it"
                 : now.PlayerHere ? "with you at it" : "with nobody at it";
             lines.Add($"Works at {Mathf.RoundToInt(now.Speed * 100f)}% speed now, {who}.");
+            string water = Fields.WaterLine(now, FarmSettings.Current);
+            if (water.Length > 0)
+            {
+                lines.Add(water);
+            }
         }
 
         return string.Join("\n", lines);
