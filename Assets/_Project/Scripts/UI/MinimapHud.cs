@@ -425,6 +425,15 @@ public sealed class MinimapHud : MonoBehaviour
             }
         }
 
+        // Where the player fell (the death rules' cairn): always shown, and on the rim when out of reach, so it can be fetched back.
+        foreach (Cairn cairn in Cairn.All)
+        {
+            if (cairn != null)
+            {
+                Add(cairn.transform, style.QuestMark, style.Danger, 15f, pinned: true);
+            }
+        }
+
         foreach (ExtractionPoint exit in ExtractionPoint.Active)
         {
             ExtractionStatus status = exit.Status;

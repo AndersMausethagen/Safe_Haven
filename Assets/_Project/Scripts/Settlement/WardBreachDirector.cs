@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -90,6 +91,18 @@ public sealed class WardBreachDirector : MonoBehaviour
 
     /// <summary>The ward's strength in this fight, 0..1; 1 when it isn't in danger.</summary>
     public float WardHealth => ward != null ? ward.HealthFraction : 1f;
+
+    private int fallsThisBreach;
+
+    /// <summary>Seconds before a fallen player wakes in this breach: longer with each fall (the death rules).</summary>
+    public float WakeSeconds
+    {
+        get
+        {
+            DeathRuleSet rules = DeathSettings.Now;
+            return Mathf.Min(Mathf.Max(rules.wakeSeconds, rules.wakeMost), rules.wakeSeconds + rules.wakePerFall * Mathf.Max(0, fallsThisBreach - 1));
+        }
+    }
 
     /// <summary>True when the warned breach has been put off too long: it comes at the next nightfall.</summary>
     public bool IsOverdue
@@ -259,6 +272,7 @@ public sealed class WardBreachDirector : MonoBehaviour
         IsActive = true;
         startedAt = Time.time;
         Wave = 1;
+        fallsThisBreach = 0;
         if (breach.ThreatensHome)
         {
             RaiseWard();
@@ -515,7 +529,77 @@ public sealed class WardBreachDirector : MonoBehaviour
         string strained = settings.StrainRaids > 0
             ? $"\n\n<color={UIStyle.Hex(UIStyle.Current.Warning)}>The ward draws in by {settings.StrainRadius:0} m until you have come home from {settings.StrainRaids} more raids.</color>"
             : "";
-        ShowRecovery(breach.DisplayName, breach.FailedText + strained);
+        ShowRecovery(breach.DisplayName, breach.FailedText + strained + Plundered(breach));
+    }
+
+    // A lost breach under the death rules: the band carries off some of the stores, its leader walks the next raid with them, and those
+    // who fought come home bruised. Nothing under Gentle.
+    private string Plundered(WardBreachDefinition breach)
+    {
+        DeathRuleSet rules = DeathSettings.Now;
+        if (breach == null || HomeFalls.Spared(DeathSettings.Chosen) || HavenVisit.IsVisiting)
+        {
+            return "";
+        }
+
+        if (rules.fightersBruised)
+        {
+            foreach (ResidentRecord record in GameSession.Home.Residents)
+            {
+                if (GuardPosts.FightsAs(record, true, DefenceSettings.Current) != null)
+                {
+                    record.Bruised = true;
+                }
+            }
+        }
+
+        List<ItemAmount> taken = Plunder.Take(GameSession.Stash.Items, rules.plunderShare, rules.plunderStacks, rules.plunderMost);
+        MonsterDefinition leader = LeaderOf(breach);
+        if (taken.Count == 0 || leader == null)
+        {
+            return "";
+        }
+
+        // Added to what an earlier band still carries, under its leader.
+        PlunderRecord plunder = GameSession.Home.Plunder ?? new PlunderRecord { Leader = leader.Id };
+        foreach (ItemAmount item in taken)
+        {
+            int at = plunder.Items.FindIndex(carried => carried.Item == item.Item);
+            if (at >= 0)
+            {
+                plunder.Items[at] = new ItemAmount(item.Item, plunder.Items[at].Amount + item.Amount);
+            }
+            else
+            {
+                plunder.Items.Add(item);
+            }
+        }
+
+        GameSession.Home.SetPlunder(plunder);
+        string what = string.Join(", ", taken.ConvertAll(item => $"{item.Amount} {item.Item.DisplayName}"));
+        PlaytestLogger.Note(PlaytestLog.Plundered, "Taken", taken.Sum(item => item.Amount), what);
+        MonsterDefinition named = JournalSettings.Current.FindCreature(plunder.Leader);
+        MonsterDefinition carrier = named != null ? named : leader;
+        return $"\n\n<color={UIStyle.Hex(UIStyle.Current.Danger)}>They carried off {what} from your stores.</color> Their leader, a {carrier.DisplayName}, " +
+               "walks your next raid with it: lay it low to take it all back." +
+               (rules.fightersBruised ? " Those who fought are bruised until the next dawn." : "");
+    }
+
+    // The band's leader: the strongest of the breach's last wave (by what it is worth).
+    private static MonsterDefinition LeaderOf(WardBreachDefinition breach)
+    {
+        MonsterDefinition best = null;
+        foreach (GameObject prefab in breach.Roster(breach.WaveCount - 1, GameSession.Here.BreachesWon))
+        {
+            MonsterAI ai = prefab != null ? prefab.GetComponent<MonsterAI>() : null;
+            MonsterDefinition definition = ai != null ? ai.Definition : null;
+            if (definition != null && (best == null || definition.Experience > best.Experience))
+            {
+                best = definition;
+            }
+        }
+
+        return best;
     }
 
     private void OnPlayerDied(Damageable victim, DamageInfo killingBlow)
@@ -525,9 +609,24 @@ public sealed class WardBreachDirector : MonoBehaviour
             return;
         }
 
-        // At a real breach the player wakes at the portal and goes on (HomeRevival); the fight is the ward's to lose.
+        // At a real breach the player wakes at the portal and goes on (HomeRevival); the fight is the ward's to lose. The waking costs it
+        // (the death rules: a share of its strength a fall, never below its floor: only the attackers can bring it down).
         if (running.ThreatensHome)
         {
+            fallsThisBreach++;
+            DeathRuleSet rules = DeathSettings.Now;
+            if (ward != null && rules.wardPerFall > 0f && !HomeFalls.Spared(DeathSettings.Chosen))
+            {
+                float now = ward.HealthFraction;
+                float after = Mathf.Max(Mathf.Min(now, rules.wardFloor), now - rules.wardPerFall);
+                if (after < now)
+                {
+                    ward.SetHealthFraction(after);
+                    GameMessages.Post($"The portal pulls you back, and the ward pays for it: {Mathf.RoundToInt((now - after) * 100f)}% of its strength.", MessageKind.Warning);
+                }
+            }
+
+            PlaytestLogger.Note(PlaytestLog.BreachFall, running.name, fallsThisBreach, $"ward {WardHealth:P0}");
             return;
         }
 

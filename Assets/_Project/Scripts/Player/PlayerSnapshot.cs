@@ -457,9 +457,17 @@ public sealed class PlayerSnapshot
     /// </summary>
     /// <param name="loadout">What the player carried into the raid. Null keeps no equipment.</param>
     /// <param name="wear">Filled with each kept piece of equipment's durability before and after, for the raid report.</param>
-    public PlayerSnapshot AfterFailedRaid(PlayerSnapshot loadout, float durabilityLoss, List<EquipmentWear> wear = null)
+    /// <param name="keepNothing">The death rules' Harsh (DeathRuleSet › Raid Takes Everything): nothing is kept, not the gear, not the
+    /// safe pocket; knowledge and condition only.</param>
+    public PlayerSnapshot AfterFailedRaid(PlayerSnapshot loadout, float durabilityLoss, List<EquipmentWear> wear = null, bool keepNothing = false)
     {
         PlayerSnapshot kept = WithoutBelongings();
+        if (keepNothing)
+        {
+            kept.pocket.Clear();
+            return kept;
+        }
+
         if (loadout == null)
         {
             return kept;

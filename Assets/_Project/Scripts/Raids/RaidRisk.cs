@@ -31,7 +31,7 @@ public readonly struct RaidRisk
             return default;
         }
 
-        PlayerSnapshot kept = carried.AfterFailedRaid(loadout, 0f);
+        PlayerSnapshot kept = carried.AfterFailedRaid(loadout, 0f, null, DeathSettings.Now.raidTakesEverything);
         Dictionary<ItemDefinition, int> keptItems = kept.CountItems();
         int items = 0;
         int value = 0;

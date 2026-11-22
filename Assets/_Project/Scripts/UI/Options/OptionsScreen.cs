@@ -868,6 +868,25 @@ public sealed class OptionsScreen : MonoBehaviour
 
         OptionsWidgets.Section(content, "Play");
         Rows(GameOptions.Gameplay);
+
+        // The death rules are the game's, not the machine's: only with a game under way.
+        if (Player.Current != null)
+        {
+            OptionsWidgets.Section(content, "This Game");
+            string[] rules = { "Gentle", "Normal", "Harsh" };
+            refreshers.Add(Choice("death.rules", "Death Rules",
+                "How much a fall costs in this game. Gentle: nothing at home. Normal: your bag in a cairn where you fell, a quarter of a level's " +
+                "lessons, meals spent. Harsh: your gear in the cairn too, half a level's lessons, and a raid death loses everything.",
+                () => rules, () => (int)GameSession.Progress.DeathRules, index =>
+                {
+                    var chosen = (DeathRules)Mathf.Clamp(index, 0, rules.Length - 1);
+                    if (chosen != GameSession.Progress.DeathRules)
+                    {
+                        GameSession.Progress.DeathRules = chosen;
+                        PlaytestLogger.Note(PlaytestLog.DeathRules, chosen.ToString());
+                    }
+                }));
+        }
     }
 
     private void BuildGraphics()

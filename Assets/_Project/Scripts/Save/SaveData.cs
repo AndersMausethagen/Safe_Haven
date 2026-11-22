@@ -107,6 +107,9 @@ public sealed class SettlementSaveData
     public int breachPendingSince;
     /// <summary>Successful raids until the ward has recovered from a lost breach.</summary>
     public int wardStrain;
+    /// <summary>What a lost breach's band carried off (SettlementState.Plunder): its leader's monster id and the items. Missing: none.</summary>
+    public string plunderLeader;
+    public List<AmountSaveData> plunder = new List<AmountSaveData>();
     /// <summary>Share taken off the next breach. Missing in older saves.</summary>
     public float breachWeakening;
     public List<ResidentSaveData> residents = new List<ResidentSaveData>();
@@ -292,6 +295,10 @@ public sealed class ProgressSaveData
     public List<AmountSaveData> setOut = new List<AmountSaveData>();
     /// <summary>Raids fallen in (Damage Taken › Grows With Falls). Missing in older saves.</summary>
     public int falls;
+    /// <summary>The death rules (DeathRules as a number). Missing in older saves: Normal, the default.</summary>
+    public int deathRules = (int)DeathRules.Normal;
+    /// <summary>Seconds left of the grace after a fall, in which another costs no lessons. Missing in older saves: none.</summary>
+    public float fallGrace;
     /// <summary>Creatures met, by id, with how many were slain: the journal's record. Missing in older saves.</summary>
     public List<AmountSaveData> creatures = new List<AmountSaveData>();
     /// <summary>The rest of the journal's record. Missing in older saves.</summary>

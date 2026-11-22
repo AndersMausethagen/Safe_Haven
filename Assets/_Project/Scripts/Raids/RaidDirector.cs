@@ -283,6 +283,8 @@ public sealed class RaidDirector : MonoBehaviour
             RaidElites.PromoteAtStart(Session, start != null ? start.position : (Vector3?)null, HealthMultiplier, PowerMultiplier);
             // One of this character's Lost, when the run's seed says one walks it (the briefing told the same).
             LostOnes.Summon(start != null ? start.position : (Vector3?)null);
+            // The band's leader with a lost breach's plunder, when one carries it (the death rules).
+            PlunderCarrier.Summon(this, start != null ? start.position : player != null ? player.transform.position : Vector3.zero);
         }
         if (NightSettings.IsDark)
         {
@@ -679,7 +681,8 @@ public sealed class RaidDirector : MonoBehaviour
         var wear = new List<EquipmentWear>();
         // A boss encounter's failure wears the gear by its own share (the user: 10%), an expedition's by the global one.
         float loss = Session.Definition.IsEncounter ? Session.Definition.Encounter.WearOnFailure : DurabilitySettings.Current.LossOnFailedRaid;
-        PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, loss, wear);
+        // Harsh death rules: a fall takes everything, worn gear and the safe pocket too (the user, 2026-11-22).
+        PlayerSnapshot keeps = extracted ? final : final?.AfterFailedRaid(Session.Loadout, loss, wear, DeathSettings.Now.raidTakesEverything);
         if (extracted && final != null)
         {
             wear.AddRange(final.WornSince(Session.Loadout));

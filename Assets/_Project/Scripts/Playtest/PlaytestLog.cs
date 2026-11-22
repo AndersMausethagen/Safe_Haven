@@ -121,6 +121,19 @@ public static class PlaytestLog
     public const string Rescue = "Rescue";
     /// <summary>The playtester's one tap on the results screen (RaidResultsScreen, playtests only): subject the reason.</summary>
     public const string WhyHome = "WhyHome";
+    // The death rules (Docs/DeathPenaltyResearch_2026-11-22.md):
+    /// <summary>A fall at home: subject the rules (Gentle, Normal, Harsh), amount the stacks left in the cairn, detail lessons and meals.</summary>
+    public const string HomeDeath = "HomeDeath";
+    /// <summary>A cairn emptied: subject how many stacks it held, amount the seconds since the fall, detail the lessons given back.</summary>
+    public const string CairnRecovered = "CairnRecovered";
+    /// <summary>Lessons a fall took: subject "skill=amount;...", amount the total.</summary>
+    public const string LessonsLost = "LessonsLost";
+    /// <summary>A fall in a ward breach: subject the breach, amount which fall in it, detail the ward's strength after.</summary>
+    public const string BreachFall = "BreachFall";
+    /// <summary>A lost breach's plunder: subject Taken or Recovered, amount how many, detail what.</summary>
+    public const string Plundered = "Plundered";
+    /// <summary>The death rules changed (the options): subject the new ones.</summary>
+    public const string DeathRules = "DeathRules";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

@@ -244,6 +244,14 @@ public static class SaveMapper
         into.nextBreachAt = settlement.NextBreachAt;
         into.breachPendingSince = settlement.BreachPendingSince;
         into.wardStrain = settlement.WardStrain;
+        if (settlement.Plunder != null)
+        {
+            into.plunderLeader = settlement.Plunder.Leader;
+            foreach (ItemAmount taken in settlement.Plunder.Items)
+            {
+                into.plunder.Add(new AmountSaveData { id = taken.Item.Id, amount = taken.Amount });
+            }
+        }
         into.breachWeakening = settlement.BreachWeakening;
         into.purificationQueued = settlement.PurificationQueued;
         into.purificationProgress = settlement.PurificationProgress;
@@ -387,6 +395,20 @@ public static class SaveMapper
         int nextBreachAt = saved.nextBreachAt > 0 || (BreachStatus)saved.breach != BreachStatus.Won
             ? saved.nextBreachAt : saved.successfulExtractions + WardBreachSettings.Current.RaidsBetween;
         settlement.RestoreBreaches(saved.breachesWon, nextBreachAt, saved.breachPendingSince, saved.wardStrain, saved.breachWeakening);
+        if (saved.plunder != null && saved.plunder.Count > 0 && content != null)
+        {
+            var plunder = new PlunderRecord { Leader = saved.plunderLeader };
+            foreach (AmountSaveData taken in saved.plunder)
+            {
+                ItemDefinition item = content.FindItem(taken.id);
+                if (item != null && taken.amount > 0)
+                {
+                    plunder.Items.Add(new ItemAmount(item, taken.amount));
+                }
+            }
+
+            settlement.SetPlunder(plunder);
+        }
         settlement.ReachHavenRank(saved.havenRank);
         foreach (ResidentSaveData entry in saved.residents)
         {
@@ -861,6 +883,8 @@ public static class SaveMapper
 
         into.perks.AddRange(progress.Perks);
         into.insight = progress.Insight;
+        into.deathRules = (int)progress.DeathRules;
+        into.fallGrace = progress.FallGraceLeft;
         foreach (KeyValuePair<string, int> run in progress.PlainRuns)
         {
             into.plainRuns.Add(new AmountSaveData { id = run.Key, amount = run.Value });
@@ -1042,6 +1066,8 @@ public static class SaveMapper
         progress.Restore(experience, perks, insight, saved.crafted, saved.stones, skillRanks);
         progress.RestoreTracked(saved.tracked);
         progress.RestoreFalls(saved.falls);
+        progress.DeathRules = System.Enum.IsDefined(typeof(DeathRules), saved.deathRules) ? (DeathRules)saved.deathRules : DeathRules.Normal;
+        progress.StartFallGrace(saved.fallGrace);
         var setOut = new List<KeyValuePair<string, int>>();
         foreach (AmountSaveData kit in saved.setOut ?? new List<AmountSaveData>())
         {

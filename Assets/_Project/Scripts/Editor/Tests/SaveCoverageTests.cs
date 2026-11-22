@@ -24,6 +24,7 @@ public sealed class SaveCoverageTests
     {
         ["Quests.entries"] = "QuestTests, QuestPacingTests (status, counts, rewards waiting)",
         ["Settlement.Territory.holds"] = "TerritoryTests.TheLands_SurviveASave",
+        ["Settlement.Plunder"] = "DeathRulesTests.TheRulesAndThePlunder_AreSaved_AndOldSavesAreNormal (its leader and items)",
         ["Settlement.Workshops.queues"] = "StationQueueTests.Workshops_RoundTripThroughSave",
         // Rings are only kept while they hold a radius the probe's filler doesn't give; the round trip is its own test.
         ["Settlement.rings"] = "RingWorkTests.Rings_AreSaved",

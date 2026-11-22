@@ -12,6 +12,8 @@ using UnityEngine;
 /// die after <see cref="MultiplayerSettings.BleedOutSeconds"/>, or once no friend is standing on the run, and the raid then
 /// ends for them as any death does. Alone, a killing blow kills as it always has.
 /// The decision to go down waits for the next look after the blow, so a Deathless relic gets its say first.
+/// At home too (the death rules, the user 2026-11-22: friends help a downed player up in a Haven and its breaches): a fall there costs
+/// what the rules say (HomeFalls) only once nobody has helped them up. Not in the prologue.
 /// Plain C#: <see cref="CoopSession"/> ticks it and owns the connection.
 /// </summary>
 public sealed class CoopDowned : ICoopPart, IDisposable
@@ -47,6 +49,9 @@ public sealed class CoopDowned : ICoopPart, IDisposable
 
     /// <summary>True while this player is down, waiting for a friend.</summary>
     public static bool IsDown { get; private set; }
+
+    /// <summary>Downed rather than fallen in a Haven, with a friend there (the death rules): not in the prologue, which teaches.</summary>
+    private static bool DownedAtHome => Place.InAHaven && !DeathSettings.Spared;
 
     /// <summary>Who is helping this downed player up now, or null.</summary>
     public string Helper => helpStartedAt >= 0f ? helper : null;
@@ -131,7 +136,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
         bool friendStanding = FriendStandingHere();
         if (!IsDown)
         {
-            if (GameSession.ActiveRaid != null && friendStanding && health.IsAlive)
+            if ((GameSession.ActiveRaid != null || DownedAtHome) && friendStanding && health.IsAlive)
             {
                 Hold();
             }
@@ -145,7 +150,7 @@ public sealed class CoopDowned : ICoopPart, IDisposable
 
         // The raid's end is settled (time ran out, the host extracted): up again, quietly. Killed after it, past the end's own
         // safety, a guest died under the outcome already told, and every listener to a death heard one.
-        if (!Place.RaidRunning)
+        if (GameSession.ActiveRaid != null && !Place.RaidRunning)
         {
             StandUp(null, quiet: true);
             return;

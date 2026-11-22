@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2ab4f77a74c544283da3b222a8d9b0, type: 3}
+  m_Name: DeathSettings
+  m_EditorClassIdentifier: SafeHaven::DeathSettings
+  newGameRules: 1
+  cairnPrefab: {fileID: 3542689810195281297, guid: 1184fb565f0cd364bb6365403e7b0363, type: 3}
+  gentle:
+    cairn: 0
+    cairnTakesGear: 0
+    lessonShare: 0
+    lessonsReturned: 0.5
+    graceSeconds: 600
+    boonsEnd: 0
+    wardPerFall: 0
+    wardFloor: 0.2
+    wakeSeconds: 3
+    wakePerFall: 0
+    wakeMost: 3
+    plunderShare: 0
+    plunderStacks: 3
+    plunderMost: 60
+    fightersBruised: 0
+    raidTakesEverything: 0
+  normal:
+    cairn: 1
+    cairnTakesGear: 0
+    lessonShare: 0.25
+    lessonsReturned: 0.5
+    graceSeconds: 600
+    boonsEnd: 1
+    wardPerFall: 0.1
+    wardFloor: 0.2
+    wakeSeconds: 10
+    wakePerFall: 5
+    wakeMost: 25
+    plunderShare: 0.2
+    plunderStacks: 3
+    plunderMost: 60
+    fightersBruised: 1
+    raidTakesEverything: 0
+  harsh:
+    cairn: 1
+    cairnTakesGear: 1
+    lessonShare: 0.5
+    lessonsReturned: 0.5
+    graceSeconds: 600
+    boonsEnd: 1
+    wardPerFall: 0.15
+    wardFloor: 0.2
+    wakeSeconds: 10
+    wakePerFall: 5
+    wakeMost: 25
+    plunderShare: 0.35
+    plunderStacks: 3
+    plunderMost: 60
+    fightersBruised: 1
+    raidTakesEverything: 1

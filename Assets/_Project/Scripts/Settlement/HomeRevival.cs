@@ -3,7 +3,9 @@ using UnityEngine;
 
 /// <summary>
 /// In Safe Haven the player can't die for good (GDD §6.3, §6.9): after falling, they lie still for a moment and then wake
-/// at the portal with their health restored. Nothing is lost; a breach in progress simply ends (WardBreachDirector).
+/// at the portal with their health restored. What the fall costs is the death rules' (HomeFalls: a cairn, fading lessons, meals
+/// ended; nothing under Gentle, in the prologue or the first breach), shown on a card on waking. In a ward breach the wait is the
+/// breach's (WardBreachDirector.WakeSeconds: longer with each fall).
 /// Raids handle death themselves (RaidDirector), so this belongs only in home scenes.
 /// <para>
 /// Where it belongs: on a scene object in Safe Haven (the portal is a good place), with a PlayerArrivalPoint
@@ -53,7 +55,13 @@ public sealed class HomeRevival : MonoBehaviour
         PlayerControl.Hold(player, this);
 
         GameMessages.Post(fallenText, MessageKind.Warning);
-        yield return new WaitForSeconds(delay);
+        // Where they fell, before anything moves them: the cairn is left there.
+        HomeFalls.Cost cost = HomeFalls.Take(player, player.transform.position);
+        // A frame on, so the breach has counted this fall whichever heard of it first.
+        yield return null;
+        WardBreachDirector breach = WardBreachDirector.Current;
+        float wait = breach != null && breach.IsActive && !cost.Spared ? breach.WakeSeconds : delay;
+        yield return new WaitForSeconds(Mathf.Max(0f, wait - Time.deltaTime));
 
         PlayerArrivalPoint point = PlayerArrivalPoint.Find(PlayerArrivalPoint.HomePortal);
         if (point != null)
@@ -78,5 +86,11 @@ public sealed class HomeRevival : MonoBehaviour
             animation.SetDead(false);
         }
         PlayerControl.Release(player, this);
+
+        MenuPage card = HomeFalls.Card(cost);
+        if (card != null && ActionMenuWindow.Current != null)
+        {
+            ActionMenuWindow.Current.Open(() => card, player);
+        }
     }
 }

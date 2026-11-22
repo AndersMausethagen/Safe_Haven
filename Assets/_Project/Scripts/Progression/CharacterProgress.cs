@@ -509,6 +509,51 @@ public sealed class CharacterProgress
 
     public void RestoreFalls(int falls) => Falls = Math.Max(0, falls);
 
+    /// <summary>The death rules this character plays by (DeathSettings): chosen at a new game, changeable in the options.</summary>
+    public DeathRules DeathRules { get; set; } = DeathSettings.ChosenForNewGame ?? DeathSettings.Current.NewGameRules;
+
+    // The grace after a fall (DeathRuleSet › Grace Seconds): its length and when it began, on the clock that also runs through raids.
+    private float graceSeconds;
+    [NotSaved("the clock the grace runs on in this run: saved as the seconds left (FallGraceLeft), and begun again on loading")]
+    private string graceRun = "";
+    [NotSaved("as graceRun")]
+    private double graceStamp;
+
+    /// <summary>Seconds left in which another fall costs no lessons.</summary>
+    public float FallGraceLeft => Math.Max(0f, graceSeconds - DayNightCycle.SecondsAwaySince(graceRun, graceStamp));
+
+    /// <summary>Starts (or, from a save, carries on) the grace after a fall.</summary>
+    public void StartFallGrace(float seconds)
+    {
+        graceSeconds = Math.Max(0f, seconds);
+        graceRun = DayNightCycle.Run;
+        graceStamp = DayNightCycle.AwayStamp;
+    }
+
+    /// <summary>
+    /// Takes up to <paramref name="amount"/> experience from a skill, never below the start of its level: a level, and its perks,
+    /// are never lost (the death rules' fading lessons). Returns what was taken.
+    /// </summary>
+    public int LoseExperience(ProficiencyDefinition skill, int amount, LevelingSettings settings)
+    {
+        if (skill == null || amount <= 0)
+        {
+            return 0;
+        }
+
+        int total = ExperienceOf(skill);
+        int floor = settings.TotalExperienceFor(settings.LevelFor(total));
+        int lost = Math.Min(amount, Math.Max(0, total - floor));
+        if (lost <= 0)
+        {
+            return 0;
+        }
+
+        experience[skill.Id] = total - lost;
+        Changed?.Invoke();
+        return lost;
+    }
+
     /// <summary>What the last raid set out with (PackForRaid), item id to how many.</summary>
     public IReadOnlyDictionary<string, int> SetOut => setOut;
 

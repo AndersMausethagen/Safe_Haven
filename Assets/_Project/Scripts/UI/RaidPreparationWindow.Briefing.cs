@@ -183,6 +183,19 @@ public sealed partial class RaidPreparationWindow
             return;
         }
 
+        // The band's leader, carrying what a lost breach took (the death rules): it walks the next raid, wherever it is.
+        PlunderRecord plunder = GameSession.Home.Plunder;
+        MonsterDefinition leader = plunder != null && !raid.IsEncounter ? JournalSettings.Current.FindCreature(plunder.Leader) : null;
+        if (leader != null)
+        {
+            eventFaces.Add(new CardFace
+            {
+                Name = "What they took", Picture = leader.Portrait, Icon = "Skull", Rim = style.Danger,
+                TipTitle = $"The {leader.DisplayName} that led them", TipColour = style.Danger,
+                TipBody = $"It carries {plunder.Describe()} from your stores. Lay it low to take it all back.",
+            });
+        }
+
         LostOneSettings lostSettings = LostOneSettings.Current;
         LostOneRecord walker = RaidLostOnes.ForRun(raid, plan.Seed, plan.Difficulty != null ? plan.Difficulty.tier : raid.Tier);
         string restless = LostOneRules.BriefingLine(walker, raid.DisplayName, lostSettings);

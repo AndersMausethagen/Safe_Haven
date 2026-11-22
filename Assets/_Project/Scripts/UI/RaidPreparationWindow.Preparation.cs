@@ -284,7 +284,11 @@ public sealed partial class RaidPreparationWindow
         UIStyle style = UIStyle.Current;
         string warning = UIStyle.Hex(style.Warning);
         string carrying = DescribeCarried();
-        riskDetail = $"{lossRules}\n\n{carrying}";
+        // Harsh death rules: nothing comes home from a fall, worn gear and the safe pocket included.
+        string rules = DeathSettings.Now.raidTakesEverything
+            ? $"<color={UIStyle.Hex(UIStyle.Current.Danger)}>Harsh death rules: if you fall or time runs out, everything you carry and wear is lost, the safe pocket too.</color> Your home remains safe."
+            : lossRules;
+        riskDetail = $"{rules}\n\n{carrying}";
         if (problem != null)
         {
             riskLabel.text = $"<color={warning}>{problem}</color>";

@@ -214,6 +214,27 @@ public sealed class PlayerBoons : MonoBehaviour
         }
     }
 
+    /// <summary>Ends every meal and tonic at work (a fall under the death rules: HomeFalls); other boons and hindrances go on. Returns how many.</summary>
+    public int EndMealsAndTonics()
+    {
+        int ended = 0;
+        for (int i = active.Count - 1; i >= 0; i--)
+        {
+            if (active[i].IsMeal || active[i].IsTonic)
+            {
+                Stop(i);
+                ended++;
+            }
+        }
+
+        if (ended > 0)
+        {
+            Changed?.Invoke();
+        }
+
+        return ended;
+    }
+
     /// <summary>Ends a boon (or a hindrance such as the cold's Chilled) early, if it is at work.</summary>
     public void End(string id)
     {

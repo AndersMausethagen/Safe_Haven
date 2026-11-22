@@ -28,6 +28,8 @@ public sealed class CharacterCreationScreen : MonoBehaviour
     private TMP_Text helpLine;
     private CharacterPreviewStage stage;
     private CharacterAppearance look;
+    // How much a fall costs in the game about to start (DeathSettings), handed over as the game begins.
+    private DeathRules deathRules = DeathRules.Normal;
     private Action<CharacterAppearance> confirmed;
     private Action cancelled;
 
@@ -67,6 +69,7 @@ public sealed class CharacterCreationScreen : MonoBehaviour
 
     private void Begin(Action<CharacterAppearance> onConfirmed, Action onCancelled)
     {
+        deathRules = DeathSettings.Current.NewGameRules;
         confirmed = onConfirmed;
         cancelled = onCancelled;
         look = Catalog.StartingLook;
@@ -132,8 +135,11 @@ public sealed class CharacterCreationScreen : MonoBehaviour
         }
     }
 
+    private static readonly string[] DeathRuleNames = { "Gentle", "Normal", "Harsh" };
+
     private void Confirm()
     {
+        DeathSettings.ChosenForNewGame = deathRules;
         look.name = CharacterAppearance.CleanName(nameField.text);
         CharacterAppearance chosen = look.Clone();
         Action<CharacterAppearance> then = confirmed;
@@ -193,6 +199,8 @@ public sealed class CharacterCreationScreen : MonoBehaviour
         Choice(list, "Beard", "Only men grow one.", () => Body.Beards.Count > 0 ? Labels(Body.Beards) : new[] { "None" }, () => look.beard, i => look.beard = i);
         Choice(list, "Eyes", "Eye colour.", () => Labels(Body.Eyes), () => look.eyes, i => look.eyes = i);
         Choice(list, "Clothes", "What is worn until armour is found.", () => PlainClothesLabels, () => look.clothes, i => look.clothes = i);
+        Choice(list, "Death Rules", "How much a fall costs: Gentle, nothing at home; Normal, a cairn and some lessons; Harsh, gear too, and a raid " +
+            "death loses everything. Changeable later in Options › Gameplay.", () => DeathRuleNames, () => (int)deathRules, i => deathRules = (DeathRules)i);
 
         helpLine = OptionsWidgets.Text("Help", panel, "", 21f, OptionsWidgets.Muted);
         OptionsWidgets.Place((RectTransform)helpLine.transform, new Vector2(0f, 0f), new Vector2(740f, 48f), new Vector2(36f, 84f));

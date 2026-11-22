@@ -76,6 +76,9 @@ public sealed class JournalSettings : GameSettings<JournalSettings>
     public IReadOnlyList<JournalCinematic> Cinematics => cinematics;
     public IReadOnlyList<JournalPage> Mechanics => mechanics;
     public IReadOnlyList<MonsterDefinition> Creatures => creatures;
+
+    /// <summary>The creature with <paramref name="id"/> among the journal's, or null (a breach's plunder names its leader so).</summary>
+    public MonsterDefinition FindCreature(string id) => string.IsNullOrEmpty(id) ? null : creatures.Find(creature => creature != null && creature.Id == id);
     public IReadOnlyList<ResidentNote> ResidentNotes => residentNotes;
     public float FindChance => findChance;
 }
