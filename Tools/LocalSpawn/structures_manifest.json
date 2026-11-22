@@ -10,7 +10,8 @@
   "A building is made to look like its concept image, not like the stand-in it replaces: one long low building seen",
   "from its open or entrance side, which is the side the game's camera looks at.",
   "UltraTex (FLUX) is a non-commercial licence and Hunyuan3D's licence excludes some territories: re-texture/check before a release.",
-  "2026-11-14, the user: replace the remaining primitive stand-ins with LocalSpawn models (Kitchen to Farm Bed). Their flames, glows and lights stay in the game's prefabs (BuildStructureModels.Placeholders)."
+  "2026-11-14, the user: replace the remaining primitive stand-ins with LocalSpawn models (Kitchen to Farm Bed). Their flames, glows and lights stay in the game's prefabs (BuildStructureModels.Placeholders).",
+  "2026-11-22, the user: \"cauldron needs a proper 3D model\" (it was a borrowed table with three spheres). Its brew's glow stays in the prefab."
  ],
  "art": "Assets/_Project/Art/Haven/Structures",
  "common": "Three-quarter view from slightly above, whole object visible and centred, isolated on a plain light grey background. Matte, softly lit, no glow.",
@@ -490,6 +491,26 @@
     "key": "A",
     "seed": 6742,
     "prompt": "A straight four-metre section of an old dry-stone wall seen square from the front: fitted grey field stones stacked head high without mortar, a little moss in the joints, a flat top, both ends cut off clean and square."
+   }
+  ]
+ },
+ {
+  "asset": "Cauldron",
+  "width": 1.5,
+  "max_height": 1.9,
+  "texture_size": 2048,
+  "lod0_triangles": 7000,
+  "metal_floor": 0.75,
+  "dielectric_darken": 0.5,
+  "roughness": {
+   "rock": [0.62, 0.92],
+   "ore": [0.42, 0.6]
+  },
+  "looks": [
+   {
+    "key": "A",
+    "seed": 6801,
+    "prompt": "An old Norse brewing station: a round-bellied black iron cauldron with a thick rolled rim and two ring handles, hung by a short iron chain from a tripod of three stout wooden poles lashed together with rope at the top, over a ring of grey field stones with cold grey ash and black charcoal beneath. Bundles of dried herbs and a string of mushrooms hang from one pole, and a low plank bench beside it holds three clay jars, a stone mortar and pestle and a wooden ladle. Cold: no fire, no steam, no smoke, nothing glowing."
    }
   ]
  }
