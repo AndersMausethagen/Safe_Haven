@@ -14,8 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::VoiceBank
   lines:
   - speaker: Asa
+    text: '"Water by the beds. The barley drinks, and I don''t carry it as far."'
+    clip: {fileID: 8300000, guid: e7b70e7236ab18f4abdc7736984dd44f, type: 3}
+    mood: Neutral
+  - speaker: Asa
     text: A Farm Plot. Turn the earth somewhere it gets the sun.
     clip: {fileID: 8300000, guid: 06e8fcf0fcf4a234aa0d57c29bdc77a5, type: 3}
+    mood: Neutral
+  - speaker: Asa
+    text: And the rain came home to the furrow, and the furrow came home to me.
+    clip: {fileID: 8300000, guid: afe4ba779ad42c743bebb32425d22f0d, type: 3}
     mood: Neutral
   - speaker: Asa
     text: I can't go on... come back for me.
@@ -28,6 +36,18 @@ MonoBehaviour:
   - speaker: Asa
     text: Iron chafes. It wants linen under it. Build me a tailor's shop by Gunnar's lodge and I'll weave it, four bolts to start.
     clip: {fileID: 8300000, guid: 27d9af6923d55a84e92ca43769994caa, type: 3}
+    mood: Neutral
+  - speaker: Asa
+    text: My mother sang this at the sowing. I've forgotten half the words.
+    clip: {fileID: 8300000, guid: d0a494148c4ef79499369364595118a2, type: 3}
+    mood: Neutral
+  - speaker: Asa
+    text: The barley came up thick on the east bed.
+    clip: {fileID: 8300000, guid: 98cdb051e705fcb44bc3db893fd52b5c, type: 3}
+    mood: Neutral
+  - speaker: Asa
+    text: The first sheaf goes back in the ground. The second is yours.
+    clip: {fileID: 8300000, guid: c509724a31a3d684fbe48edefbd31419, type: 3}
     mood: Neutral
   - speaker: Asa
     text: The Tailor's Shop at Tier II, four Linen, and the Weaver's work for me.
@@ -44,6 +64,10 @@ MonoBehaviour:
   - speaker: Asa
     text: You're not from the village. Doesn't matter. Help me with this sack.
     clip: {fileID: 8300000, guid: 49803bdab1faf0841b79ab23ed61048b, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
+    text: '"Warm through, for once. My bones thank you before I do."'
+    clip: {fileID: 8300000, guid: 886b699978e69aa4c8e4bcde6c587769, type: 3}
     mood: Neutral
   - speaker: Bjarne
     text: A Smithy, and the Smith's work. Then bring me something worn and see what half the cost looks like.
@@ -106,6 +130,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 8e7cb44b10a9a974c8ac72deb135a1f9, type: 3}
     mood: Scared
   - speaker: Bjarne
+    text: It is now. I'm the one with the hammer.
+    clip: {fileID: 8300000, guid: 4ad4323cab4824e4c984a9668faf000f, type: 3}
+    mood: Neutral
+  - speaker: Bjarne
     text: Not yet, you don't. Drink.
     clip: {fileID: 8300000, guid: 15c215313912bca4c951362c6238faed, type: 3}
     mood: Stern
@@ -129,6 +157,10 @@ MonoBehaviour:
     text: Still here. Still here.
     clip: {fileID: 8300000, guid: b1af42aec1d375e4cbbf5b722c79b05b, type: 3}
     mood: Glad
+  - speaker: Bjarne
+    text: Strike once for the iron, strike twice for the blade!
+    clip: {fileID: 8300000, guid: c142fa8f319e54348acf44753aeeafab, type: 3}
+    mood: Neutral
   - speaker: Bjarne
     text: Tell Sigrid I kept it lit.
     clip: {fileID: 8300000, guid: 72b8b7f0172fe8c409fa0010a50051a2, type: 3}
@@ -185,6 +217,10 @@ MonoBehaviour:
     text: You're bleeding. Here.
     clip: {fileID: 8300000, guid: e61c23a8ecbf3d346912a1f14c609b3c, type: 3}
     mood: Stern
+  - speaker: Eirik
+    text: '"A lit way home. I walk it slower now, and that''s a good thing."'
+    clip: {fileID: 8300000, guid: cacd96f1e82afd7449126f3ddf20df91, type: 3}
+    mood: Neutral
   - speaker: Eirik
     text: A bewitched forest. My grandmother called any forest that ate her goats bewitched.
     clip: {fileID: 8300000, guid: c5ba246834c9a2d45a02c2cc1e44a0e0, type: 3}
@@ -274,6 +310,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: ee4a459efdcd8fb449b1bccc7c9370e0, type: 3}
     mood: Joyful
   - speaker: Eirik
+    text: Fewer empty places this winter.
+    clip: {fileID: 8300000, guid: 71cda60c3a49e8742b644f5cfc19405b, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Finally, something I can hit.
     clip: {fileID: 8300000, guid: 327646bbfc4722a4c99ec49f29daec04, type: 3}
     mood: Yelling
@@ -288,6 +328,10 @@ MonoBehaviour:
   - speaker: Eirik
     text: Good. Now me. When I wind up, raise your guard just before the blow, or roll through it.
     clip: {fileID: 8300000, guid: adb50d458299a2c40885e12c709c994b, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Heard the deer down by the trees at first light.
+    clip: {fileID: 8300000, guid: 6c35e27a0ec8a8546a54fd48e9b45e52, type: 3}
     mood: Neutral
   - speaker: Eirik
     text: Here they come!
@@ -354,6 +398,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 5d5a9dce9fa60754eb3dd8fd0b0eae84, type: 3}
     mood: Sad
   - speaker: Eirik
+    text: Never alone. That's the whole point of a wall.
+    clip: {fileID: 8300000, guid: d582b4ba89fbc86418d357fef7d4cd79, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Not yet, you don't. Drink.
     clip: {fileID: 8300000, guid: 89b0dc09e4bf8a4468444967cab918c6, type: 3}
     mood: Stern
@@ -380,6 +428,10 @@ MonoBehaviour:
   - speaker: Eirik
     text: Right behind you.
     clip: {fileID: 8300000, guid: 6fc4282fac76bf9438d0066f474da8de, type: 3}
+    mood: Neutral
+  - speaker: Eirik
+    text: Seven went in. You still count us every night.
+    clip: {fileID: 8300000, guid: 660c98c8a63db8147b0adec087203783, type: 3}
     mood: Neutral
   - speaker: Eirik
     text: She's alive.
@@ -458,6 +510,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 97d6dc1f43491ac4eb9e2efaf52b31e4, type: 3}
     mood: Neutral
   - speaker: Eirik
+    text: Then I'll stand at the end of it tonight.
+    clip: {fileID: 8300000, guid: 831af4510e17f8147a4b98dbc564eed1, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Then we are after the same thing. We will find them.
     clip: {fileID: 8300000, guid: ac5d57419608a93499757c2b0e6871f5, type: 3}
     mood: Calm
@@ -498,6 +554,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 8ba33006eb335fb4eb61432fca85a857, type: 3}
     mood: Glad
   - speaker: Eirik
+    text: Up early? The portal hums louder before the sun.
+    clip: {fileID: 8300000, guid: 4372a877a699d6a43a4d2abf5bed3fbf, type: 3}
+    mood: Neutral
+  - speaker: Eirik
     text: Watch your back!
     clip: {fileID: 8300000, guid: 13bb415a67faf2342a974ba12f277809, type: 3}
     mood: Yelling
@@ -530,6 +590,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 91a8b2ae30b0dad448e9cc509eb967fe, type: 3}
     mood: Stern
   - speaker: Gunnar
+    text: '"The lodge is close. The meat will thank you, and so do I."'
+    clip: {fileID: 8300000, guid: 98e239f451125254e96c7f5098392c1f, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
     text: A Dock on the still water, and one fish from it.
     clip: {fileID: 8300000, guid: 28a0b98765122c448acb3c7e32f35cd4, type: 3}
     mood: Neutral
@@ -538,12 +602,24 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: cdddce7eabd744440aeb52c3a4cdeb77, type: 3}
     mood: Neutral
   - speaker: Gunnar
+    text: Boar again?
+    clip: {fileID: 8300000, guid: 7e7027965502fbf4a9ad6d3a60d91ad3, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
     text: Boars come to the edge of the light at dusk. Bring me their hides and give me a lodge to cure them in, and you'll have leather that turns a tooth.
     clip: {fileID: 8300000, guid: bd84af0dfa31f3f46af570528c56bcd2, type: 3}
     mood: Neutral
   - speaker: Gunnar
     text: Cure four leathers at the Hunter's Lodge.
     clip: {fileID: 8300000, guid: 660797bda6d644042b92dd688b6958b6, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
+    text: Fair. I'll see what the woods will give me.
+    clip: {fileID: 8300000, guid: 3e9f05c061bf1e04ea4a2f6946557fa0, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
+    text: Fire's lit. Come and sit, if you've a moment.
+    clip: {fileID: 8300000, guid: f2a07913e0a8829419e427d703377619, type: 3}
     mood: Neutral
   - speaker: Gunnar
     text: Four rough hides from the boars outside the light, and a Hunter's Lodge.
@@ -556,6 +632,10 @@ MonoBehaviour:
   - speaker: Gunnar
     text: 'My grandmother said you hold a nykk with its own hair and steel in the water. Its hair makes a line the deep fish can''t leave alone. The reeds in the Moss Marsh: it combs itself there. Two hairs. Don''t say its name.'
     clip: {fileID: 8300000, guid: 30cbc7b2faab6b6458c33b6e6b160ce7, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
+    text: Something walked past the lodge last night. Big, and quiet.
+    clip: {fileID: 8300000, guid: 494a32d85f0cb314195f80f165efd519, type: 3}
     mood: Neutral
   - speaker: Gunnar
     text: There's still water by the Haven. Fish it, if you like. Build a dock first, and don't say the name of the thing in the deep. It listens.
@@ -574,8 +654,16 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: f8fac15a5637f40409819e628c88e9fa, type: 3}
     mood: Neutral
   - speaker: Gunnar
+    text: You never saw it. You were asleep.
+    clip: {fileID: 8300000, guid: e09eb0e398e8fbb4aa7da5fa5f9f81dc, type: 3}
+    mood: Neutral
+  - speaker: Gunnar
     text: You've been frightening my deer. Least you can do is give me a roof.
     clip: {fileID: 8300000, guid: 08b1c97dfc4a0df4884bf817884c33bd, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: '"The stone''s close. That''s a block a day I''d have spent walking."'
+    clip: {fileID: 8300000, guid: 381b389b38fec194ab1c0b6f423cc59a, type: 3}
     mood: Neutral
   - speaker: Hild
     text: Bjarne's Smithy standing, the Workshop at Tier II, then a Cottage.
@@ -586,16 +674,36 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: d7d9b3b8034dfe7459ae23323ba494d4, type: 3}
     mood: Tired
   - speaker: Hild
+    text: If you find any good cloth out there, I'll not say no.
+    clip: {fileID: 8300000, guid: 533f03623418e55488e7c3cf11ed3e27, type: 3}
+    mood: Neutral
+  - speaker: Hild
     text: Mind the coping. It's the only level thing for a mile.
     clip: {fileID: 8300000, guid: 83e1a7262aedf7f4d8e97a60213b6846, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: My wall is the only straight thing in this valley. Your roof leans.
+    clip: {fileID: 8300000, guid: 02d15a0b14337564e9c06baa333954d3, type: 3}
     mood: Neutral
   - speaker: Hild
     text: Palisades burn. Granite doesn't. Raise the workshop again, cut four blocks, and put up four lengths of stone wall.
     clip: {fileID: 8300000, guid: f89c2fb5aa923804fab2d3a875cc2bd7, type: 3}
     mood: Neutral
   - speaker: Hild
+    text: Sing the half you have. The ground won't mind.
+    clip: {fileID: 8300000, guid: 873ee0316bf8eea449be94b69def7ee3, type: 3}
+    mood: Neutral
+  - speaker: Hild
     text: The Workshop at Tier III, four Granite Blocks, and four lengths of Stone Wall.
     clip: {fileID: 8300000, guid: 9ea7a7fad43fdeb43af7b2092bf05b41, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: Then the snow and I agree on something.
+    clip: {fileID: 8300000, guid: a828ceae62083d349bff49a03a653256, type: 3}
+    mood: Neutral
+  - speaker: Hild
+    text: There. Now the ground knows your voice.
+    clip: {fileID: 8300000, guid: 9aa207fd82118a941820be15f6c886ba, type: 3}
     mood: Neutral
   - speaker: Hild
     text: Whoever laid this hearth had never met a level. I'll stay.
@@ -608,6 +716,10 @@ MonoBehaviour:
   - speaker: Hild
     text: Your hearth isn't level, your footings are soft and your walls are wood. Who cut these blocks? Not bad. I'll cut them from now on.
     clip: {fileID: 8300000, guid: 94dd668991e0bb147a1aa8dda2726c44, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: '"Water a few steps off. I can wash the work off before supper now."'
+    clip: {fileID: 8300000, guid: fa3032108bc38c941b008d32af3e48e9, type: 3}
     mood: Neutral
   - speaker: Ingrid
     text: An altar to cleanse the curse? I know the old way. Build it, and I'll keep it burning.
@@ -693,6 +805,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: ae85375c5d1463e419c0db98a8ff72f0, type: 3}
     mood: Scared
   - speaker: Ingrid
+    text: It hums the way a kettle does before it sings. Or cracks.
+    clip: {fileID: 8300000, guid: a82a30201512f8646a7439bc80d13f4b, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
     text: 'It remembers now. One more thing, and then you know what I know: a mark, cut deep, that the forest can''t easily undo. You know a few of the safe ones already, if you look.'
     clip: {fileID: 8300000, guid: b9681b6665d073e4fb86d35c4299a90a, type: 3}
     mood: Neutral
@@ -707,6 +823,10 @@ MonoBehaviour:
   - speaker: Ingrid
     text: My grandmother left bread on the old stones. Never hurts.
     clip: {fileID: 8300000, guid: d98f5b274a2c0b444bb6365715d27231, type: 3}
+    mood: Neutral
+  - speaker: Ingrid
+    text: No. But it's honest.
+    clip: {fileID: 8300000, guid: 72adf7a3382a56b4886d54c908a84e76, type: 3}
     mood: Neutral
   - speaker: Ingrid
     text: Not yet, you don't. Drink.
@@ -791,6 +911,10 @@ MonoBehaviour:
     text: You're bleeding. Here.
     clip: {fileID: 8300000, guid: 5a15ba7712d48bb4fb9dbe009f268e75, type: 3}
     mood: Stern
+  - speaker: Liv
+    text: '"Somewhere to sit. The stones read better when my feet are still."'
+    clip: {fileID: 8300000, guid: 475261584e4b28c4bb3dced9e7bf1f56, type: 3}
+    mood: Neutral
   - speaker: Liv
     text: Anything else?
     clip: {fileID: 8300000, guid: e82013321a21cf9458c7d818848761c2, type: 3}
@@ -882,6 +1006,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 04d50f3f5ebdbd649956560f7cc48af0, type: 3}
     mood: Glad
   - speaker: Liv
+    text: That isn't comforting.
+    clip: {fileID: 8300000, guid: acae9ada2c9bc2f46915feb149de7918, type: 3}
+    mood: Neutral
+  - speaker: Liv
     text: That's the last of them.
     clip: {fileID: 8300000, guid: 03ca90bf20884244eb3764c311d9dfea, type: 3}
     mood: Glad
@@ -896,6 +1024,10 @@ MonoBehaviour:
   - speaker: Liv
     text: The stones broke along a line. A line! Do you understand what that means?
     clip: {fileID: 8300000, guid: a32e007b442c17d45a2d5a45afb793e9, type: 3}
+    mood: Neutral
+  - speaker: Liv
+    text: The ward hums louder after dark. Have you noticed?
+    clip: {fileID: 8300000, guid: 3b0c0efbbacc0bc428089e7e6beecf4a, type: 3}
     mood: Neutral
   - speaker: Liv
     text: There are old paths here, older than the villages. My teacher said the waystones connected places of shelter. I thought that was only a story.
@@ -926,6 +1058,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 2811366d1e044d44aa5cf44521b6c5e2, type: 3}
     mood: Stern
   - speaker: Runa
+    text: '"Light on my path. I came home late and saw every step of it."'
+    clip: {fileID: 8300000, guid: 0b6a47d0331ebe44bb2a281cc2841a30, type: 3}
+    mood: Neutral
+  - speaker: Runa
     text: 'A bow! Then there are two of us. Hold the left button to draw, let go to shoot. It wants both hands: if you ever need a light instead, press L to swap them.'
     clip: {fileID: 8300000, guid: e10a06dcf9691e348ad0d7a0d4993041, type: 3}
     mood: Glad
@@ -937,6 +1073,10 @@ MonoBehaviour:
     text: All clear.
     clip: {fileID: 8300000, guid: 246fc323bc90a6648a3cf8f44f556923, type: 3}
     mood: Glad
+  - speaker: Runa
+    text: An elk. An old bull, lame in the left hind.
+    clip: {fileID: 8300000, guid: c06d5e5662e1b354781f51bddc99e394, type: 3}
+    mood: Neutral
   - speaker: Runa
     text: An honest answer. I like you already.
     clip: {fileID: 8300000, guid: 65b1c68954e2f8843a335d5ca1307aa1, type: 3}
@@ -1018,6 +1158,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 585de5463c64ded46b51ab60add9a7ec, type: 3}
     mood: Neutral
   - speaker: Runa
+    text: I saw where it stopped to rest. Twice.
+    clip: {fileID: 8300000, guid: 174fdbc8d8d2fea46b2ece1a1fbf2213, type: 3}
+    mood: Neutral
+  - speaker: Runa
     text: I see them. Take the near ones.
     clip: {fileID: 8300000, guid: 49013079f05fb8740a8339b6ea0b49cb, type: 3}
     mood: Yelling
@@ -1077,6 +1221,10 @@ MonoBehaviour:
     text: No birds. Have you noticed? Not one for a while now.
     clip: {fileID: 8300000, guid: f3c5437041e089c459dae8707591f30c, type: 3}
     mood: Calm
+  - speaker: Runa
+    text: Not alone.
+    clip: {fileID: 8300000, guid: eec84e4c815bce34a95a1d7b50629b44, type: 3}
+    mood: Neutral
   - speaker: Runa
     text: Not yet, you don't. Drink.
     clip: {fileID: 8300000, guid: f9984e679fa00f0459af6286497b9d62, type: 3}
@@ -1174,6 +1322,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 246dea1a952668f488500a5b1a369292, type: 3}
     mood: Neutral
   - speaker: Runa
+    text: There's a path past the north stones I don't like.
+    clip: {fileID: 8300000, guid: 90b8baf934917b148aa7cc4d01bc9bfc, type: 3}
+    mood: Neutral
+  - speaker: Runa
     text: They're too close, I need room!
     clip: {fileID: 8300000, guid: 81ea3fc73cda9a34db3e6f75d2e0c9ce, type: 3}
     mood: Scared
@@ -1221,6 +1373,10 @@ MonoBehaviour:
     text: You're bleeding. Here.
     clip: {fileID: 8300000, guid: c068e26ed9424b04ab04698f2ab98d4b, type: 3}
     mood: Stern
+  - speaker: Sigrid
+    text: '"Light on the lanes. People find their way home now. So do I."'
+    clip: {fileID: 8300000, guid: 5d427ad5fe0b5774c9825d4fc2c415ba, type: 3}
+    mood: Neutral
   - speaker: Sigrid
     text: <i>...can anyone hear... Ingrid was right behind me when the stones broke. She's hurt. Find her first. Do you hear me? Find her first...</i>
     clip: {fileID: 8300000, guid: 52b54995e4e17964cb4cbd276d46d84f, type: 3}
@@ -1298,6 +1454,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 33ee6ec3623381f40996336a491726b8, type: 3}
     mood: Neutral
   - speaker: Sigrid
+    text: Fewer. Not none.
+    clip: {fileID: 8300000, guid: 8168eb6e6c6f84d489300ebbaa451b0c, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: Finish your porridge and listen. This is the only quiet you will get today.
     clip: {fileID: 8300000, guid: 51a1659c8a3ad324bb70f2649d1e775e, type: 3}
     mood: Stern
@@ -1318,6 +1478,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: a1dab3ce050c9744bb9574acb41d4f3d, type: 3}
     mood: Glad
   - speaker: Sigrid
+    text: Heard the deer down by the trees at first light.
+    clip: {fileID: 8300000, guid: 30f6d7affdd068643a92ddd18a1cfe84, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
     text: Here they come!
     clip: {fileID: 8300000, guid: fdc346c5bfb3cda4fadf2f77aec5f7b6, type: 3}
     mood: Yelling
@@ -1337,6 +1501,10 @@ MonoBehaviour:
     text: I can't take much more of this.
     clip: {fileID: 8300000, guid: 8c2a664d43eeca6439da4c8bd6a4e82f, type: 3}
     mood: Scared
+  - speaker: Sigrid
+    text: I count the ones at the fire. Then I count the empty places.
+    clip: {fileID: 8300000, guid: ffe31b28842a8b14b99a1a3c22692b03, type: 3}
+    mood: Neutral
   - speaker: Sigrid
     text: I gave you an order once to leave me if it came to that. You didn't. We'll talk about discipline. Later.
     clip: {fileID: 8300000, guid: e6e9566636aa2c44f87f7c6f75ab96df, type: 3}
@@ -1548,6 +1716,10 @@ MonoBehaviour:
   - speaker: Sigrid
     text: They did not send me. They asked for someone who could read the old marks, and I was the only one who answered. Draw your own conclusions. Everyone else does.
     clip: {fileID: 8300000, guid: a2505b29dde59044bb6519b7c423e5f7, type: 3}
+    mood: Neutral
+  - speaker: Sigrid
+    text: Up early? The portal hums louder before the sun.
+    clip: {fileID: 8300000, guid: 552ed5487a9cbac4eab9e0bf98be245d, type: 3}
     mood: Neutral
   - speaker: Sigrid
     text: Watch your back!
@@ -2074,6 +2246,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: c0bc10ad127760f41bf8def281d20d27, type: 3}
     mood: Neutral
   - speaker: Tor
+    text: '"A bench by the door. I''ll sit there tonight and admire your work. And mine."'
+    clip: {fileID: 8300000, guid: 413e342939479614fa1592ef5e8ff8eb, type: 3}
+    mood: Neutral
+  - speaker: Tor
     text: A Storage Shed and a Hut.
     clip: {fileID: 8300000, guid: 10f189629abdfd94f9b4354bbc40c0d9, type: 3}
     mood: Neutral
@@ -2089,6 +2265,10 @@ MonoBehaviour:
     text: Clear. Get your breath.
     clip: {fileID: 8300000, guid: b5abd2dbe85687042bce5933f7ede5b0, type: 3}
     mood: Glad
+  - speaker: Tor
+    text: Fire's lit. Come and sit, if you've a moment.
+    clip: {fileID: 8300000, guid: 746c7e11c871f954fbb9006e824d4dcb, type: 3}
+    mood: Neutral
   - speaker: Tor
     text: Four palisade pieces. Drag them out in a line; they go up like anything else.
     clip: {fileID: 8300000, guid: bd3175010a766f44da101c1db3f845bb, type: 3}
@@ -2138,6 +2318,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: e9b5aaae0923a4045a87415665d42b1f, type: 3}
     mood: Neutral
   - speaker: Tor
+    text: My roof leans on purpose. The snow slides off.
+    clip: {fileID: 8300000, guid: 4b2a6f45a85c66c4abe6b2bd72e2725d, type: 3}
+    mood: Neutral
+  - speaker: Tor
     text: My tools. Leave them, if you have to. Not me.
     clip: {fileID: 8300000, guid: 6d11f53227e8ff3438c116d8c7325b3b, type: 3}
     mood: Tired
@@ -2174,6 +2358,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 54de7c6e93532c442afb2be3d1d7622e, type: 3}
     mood: Tired
   - speaker: Tor
+    text: Strike three for the roof that keeps them dry! That's not how it goes.
+    clip: {fileID: 8300000, guid: 21aace52e6be7e84286703596ecbef01, type: 3}
+    mood: Neutral
+  - speaker: Tor
     text: Thank you. I thought that was it.
     clip: {fileID: 8300000, guid: 45f142b969a14484680a2b44d41578eb, type: 3}
     mood: Glad
@@ -2202,6 +2390,10 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 7e8baa4b66a79e74f9bd421e8ec9575f, type: 3}
     mood: Yelling
   - speaker: Tor
+    text: We both have hammers, Bjarne.
+    clip: {fileID: 8300000, guid: 06c87f38a1a8f764f88d5a4e549e281a, type: 3}
+    mood: Neutral
+  - speaker: Tor
     text: We came to learn why this forest has become bewitched. First, we need shelter. Follow the old road.
     clip: {fileID: 8300000, guid: 1145757ac511ea841b0db4a8e688832e, type: 3}
     mood: Neutral
@@ -2210,9 +2402,21 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 3718585d9624f4a4ba0ef1ccc6917507, type: 3}
     mood: Yelling
   - speaker: Tor
+    text: Your wall leans.
+    clip: {fileID: 8300000, guid: 899d48e0e6095e7408b538ef6dfe7095, type: 3}
+    mood: Neutral
+  - speaker: Tor
     text: You're bleeding. Here.
     clip: {fileID: 8300000, guid: 2b74aa70dfba66846a6ac1995b438a59, type: 3}
     mood: Stern
+  - speaker: Yrsa
+    text: '"A warm hearth. Come by later: the first loaf from it is yours."'
+    clip: {fileID: 8300000, guid: 7acf1a2b471d6334696d9e1ad63e0f2d, type: 3}
+    mood: Neutral
+  - speaker: Yrsa
+    text: A farmer who counts. I like you less already.
+    clip: {fileID: 8300000, guid: 1da7a271f6584c049a6294c320ab6d81, type: 3}
+    mood: Neutral
   - speaker: Yrsa
     text: A Forager's Broth from the Kitchen. Eat it before the portal.
     clip: {fileID: 8300000, guid: 3b59f04ad12e19849b082275d1d9f516, type: 3}
@@ -2222,9 +2426,17 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: f78a383034213d24888afb1bdeadfe83, type: 3}
     mood: Neutral
   - speaker: Yrsa
+    text: Bring me something that isn't boar and I'll cook something that isn't boar.
+    clip: {fileID: 8300000, guid: 86daa286daf7b8343b6763a896e24836, type: 3}
+    mood: Neutral
+  - speaker: Yrsa
     text: I can't go on... come back for me.
     clip: {fileID: 8300000, guid: 1668b27669fa1bc4496e28a274da3c97, type: 3}
     mood: Tired
+  - speaker: Yrsa
+    text: I cooked for a jarl once. He never once complained about the boar.
+    clip: {fileID: 8300000, guid: ca9406464ea66f24ba5dbeae59e21f14, type: 3}
+    mood: Neutral
   - speaker: Yrsa
     text: I cooked for a jarl once. He never thanked me either. A kitchen and the Cook's work, and you'll go out there fed properly.
     clip: {fileID: 8300000, guid: 8f498efcec4ab4e4b8b54ede16d24129, type: 3}
@@ -2240,6 +2452,10 @@ MonoBehaviour:
   - speaker: Yrsa
     text: The Kitchen. Bjarne's Smithy has to stand first, for the pots.
     clip: {fileID: 8300000, guid: df891f040f0d7404c89bbd3439784d81, type: 3}
+    mood: Neutral
+  - speaker: Yrsa
+    text: Then I'll bake till my arms ache. Bring me the first sheaf.
+    clip: {fileID: 8300000, guid: 14cc86c25bb4df749844ba379749d3f5, type: 3}
     mood: Neutral
   - speaker: Yrsa
     text: Your fire's too small to cook on and too big to hide. Good. A fire is how lost people find a table.

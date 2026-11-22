@@ -47,7 +47,7 @@ MonoBehaviour:
     lines:
     - Something walked past the lodge last night. Big, and quiet.
     - An elk. An old bull, lame in the left hind.
-    - You didn't see it.
+    - You never saw it. You were asleep.
     - I saw where it stopped to rest. Twice.
   - first: {fileID: 11400000, guid: de521ad7beeb20b49878a9b40c96bced, type: 2}
     second: {fileID: 11400000, guid: df34e8e1df8ff0241a216bfddf9b631c, type: 2}
@@ -74,7 +74,7 @@ MonoBehaviour:
     lines:
     - Boar again?
     - Bring me something that isn't boar and I'll cook something that isn't boar.
-    - Fair.
+    - Fair. I'll see what the woods will give me.
     - I cooked for a jarl once. He never once complained about the boar.
   - first: {fileID: 11400000, guid: ec38b2d8e58d6d84899dfeda6a4f8aeb, type: 2}
     second: {fileID: 11400000, guid: f8b63bb3e2db2fb44947d33b612f80f3, type: 2}
