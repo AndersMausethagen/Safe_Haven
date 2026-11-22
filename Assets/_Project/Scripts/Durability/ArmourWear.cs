@@ -133,8 +133,8 @@ public static class ArmourWear
         // Broken, PlayerEquipment says so ("... is broken and gives nothing until it is repaired").
         if (after > 0.0001f && before > warnAt && after <= warnAt)
         {
-            GameMessages.Post($"{stack.Item.DisplayName} is badly worn ({after:P0}). Repair it at the " +
-                              $"{DurabilitySettings.Current.RepairStation.DisplayName()} before it breaks.", MessageKind.Warning);
+            GameMessages.Post($"{stack.Item.DisplayName} is badly worn ({after:P0}). Repair it at " +
+                              $"{DurabilitySettings.Current.RepairPlaces} before it breaks.", MessageKind.Warning);
         }
 
         return after;

@@ -99,7 +99,7 @@ public sealed class DeathAndRepairPage : SystemsPage
         SettingsPanel(settings, "Durability settings", "Resources/DurabilitySettings");
         BeginDerived();
         Derived("New gear breaks after", settings.LossOnFailedRaid > 0f ? $"{settings.FailedRaidsUntilBroken} failed raids" : "never");
-        Derived("Repairs are made at", settings.RepairStation.WithArticle());
+        Derived("Repairs are made at", settings.RepairPlaces);
         EndDerived();
 
         var book = AssetDatabase.LoadAssetAtPath<RecipeBook>("Assets/_Project/Data/Crafting/RecipeBook.asset");

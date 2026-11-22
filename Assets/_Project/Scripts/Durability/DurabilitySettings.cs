@@ -35,6 +35,9 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
     [Header("Repairs")]
     [Tooltip("Where gear is repaired.")]
     [SerializeField] private CraftingStationType repairStation = CraftingStationType.Workbench;
+    [Tooltip("Other stations gear is repaired at too (each needs a Repair Bench on its prefab): the Smithy (the user, 2026-11-22: \"there " +
+             "is no repair button on the smithy\").")]
+    [SerializeField] private System.Collections.Generic.List<CraftingStationType> alsoRepairsAt = new System.Collections.Generic.List<CraftingStationType> { CraftingStationType.Anvil };
     [Tooltip("Share of the item's recipe a full repair (from broken) costs. 0.5 = half the recipe.")]
     [SerializeField, Min(0f)] private float fullRepairCostShare = 0.5f;
     [Tooltip("Every material in a repair costs at least this many.")]
@@ -50,6 +53,50 @@ public sealed class DurabilitySettings : GameSettings<DurabilitySettings>
     public float ShieldWearPerBlock => shieldWearPerBlock;
     public float WornWarningAt => wornWarningAt;
     public CraftingStationType RepairStation => repairStation;
+    /// <summary>Every station gear is repaired at: the first, then the rest.</summary>
+    public System.Collections.Generic.IEnumerable<CraftingStationType> RepairStations
+    {
+        get
+        {
+            yield return repairStation;
+            foreach (CraftingStationType also in alsoRepairsAt)
+            {
+                if (also != repairStation)
+                {
+                    yield return also;
+                }
+            }
+        }
+    }
+
+    /// <summary>Where repairs are done, in words: "the Workshop or the Smithy".</summary>
+    public string RepairPlaces
+    {
+        get
+        {
+            var names = new System.Collections.Generic.List<string>();
+            foreach (CraftingStationType station in RepairStations)
+            {
+                names.Add(station.DisplayName());
+            }
+
+            return "the " + string.Join(" or the ", names);
+        }
+    }
+
+    /// <summary>True when <paramref name="crafting"/>'s player is near any station gear is repaired at.</summary>
+    public bool NearARepairStation(PlayerCrafting crafting)
+    {
+        foreach (CraftingStationType station in RepairStations)
+        {
+            if (crafting.IsNearStation(station))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
     public float FullRepairCostShare => fullRepairCostShare;
     public int MinimumCostPerMaterial => minimumCostPerMaterial;
     public float SalvageShare => salvageShare;

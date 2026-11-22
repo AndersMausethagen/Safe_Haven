@@ -102,9 +102,9 @@ public static class Repairs
 
         DurabilitySettings settings = DurabilitySettings.Current;
         var crafting = player != null ? player.GetComponent<PlayerCrafting>() : null;
-        if (crafting != null && !crafting.IsNearStation(settings.RepairStation))
+        if (crafting != null && !settings.NearARepairStation(crafting))
         {
-            return $"Repairs need {settings.RepairStation.WithArticle()} nearby.";
+            return $"Repairs need {settings.RepairPlaces} nearby.";
         }
 
         RepairCost cost = Cost(stack, RecipeFor(stack.Item, recipes), settings);

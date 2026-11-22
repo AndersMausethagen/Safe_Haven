@@ -312,7 +312,7 @@ public static class RaidReportText
     private static string RepairAdvice(RaidReport report)
     {
         DurabilitySettings settings = DurabilitySettings.Current;
-        string advice = $"Repair it at the {(settings != null ? settings.RepairStation.DisplayName() : "Workshop")}.";
+        string advice = $"Repair it at {(settings != null ? settings.RepairPlaces : "the Workshop")}.";
         HavenAnswer mender = report.Mender;
         if (mender != null && mender.Person != null && mender.Job != null)
         {

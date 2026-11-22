@@ -579,7 +579,7 @@ public sealed class QuestObjective
             case ObjectiveType.StoreItem:
                 return item != null ? $"Put {count} {Name(item)} in a chest" : Amount == 1 ? "Put something in a chest" : $"Put {count} things in a chest";
             case ObjectiveType.RepairItem:
-                string bench = DurabilitySettings.Current != null ? DurabilitySettings.Current.RepairStation.DisplayName() : "Workshop";
+                string bench = DurabilitySettings.Current != null ? DurabilitySettings.Current.RepairPlaces.Substring(4) : "Workshop";
                 return item != null ? $"Repair your {Name(item)} ({bench})" : Amount == 1 ? $"Repair a piece of gear ({bench})" : $"Repair {count} pieces of gear ({bench})";
             case ObjectiveType.EmpowerItem:
                 return item != null ? $"Empower your {Name(item)} at the altar" : Amount == 1 ? "Empower a piece of gear at the altar" : $"Empower {count} pieces of gear at the altar";
