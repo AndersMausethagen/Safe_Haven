@@ -247,6 +247,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (raid && !wasRaid)
         {
             FlushHome();
+            WriteStock();
             countNodesAt = Time.unscaledTime + 8f;
         }
 
@@ -304,18 +305,25 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         return speed > 0.6f ? "walk" : "idle";
     }
 
-    // A stay at home is over (a raid began): the seconds at each thing, and the plain stock taken along in the chests.
+    // A stay at home is over (a raid began, or the session ends): the seconds at each thing. Written straight to the file of the
+    // session it belongs to (WriteRow): from EndSession, Write would ask EnsureRun again, which ends the session again (a stack overflow,
+    // SceneSmokeLiveTests 2026-11-22).
     private void FlushHome()
     {
         foreach (var spent in homeSeconds)
         {
             if (spent.Value >= 1f)
             {
-                Write(PlaytestLog.HomeStay, spent.Key, Mathf.RoundToInt(spent.Value));
+                WriteRow(PlaytestLog.HomeStay, spent.Key, Mathf.RoundToInt(spent.Value), "");
             }
         }
 
         homeSeconds.Clear();
+    }
+
+    // The plain stock taken along in the chests, as a raid begins (at a session's end the stash may already be the next game's).
+    private void WriteStock()
+    {
         KeeperViewSettings view = KeeperViewSettings.Current;
         if (view == null || GameSession.Stash == null)
         {
@@ -326,7 +334,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         {
             if (item != null)
             {
-                Write(PlaytestLog.Stock, item.Id, GameSession.Stash.Items.Count(item));
+                WriteRow(PlaytestLog.Stock, item.Id, GameSession.Stash.Items.Count(item), "");
             }
         }
     }

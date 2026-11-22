@@ -340,6 +340,12 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             ReadInput(placing, overUI);
         }
 
+        // Someone followed who left the Haven (a foray hides them) is let go, as the people column already shows.
+        if (following != null && !following.gameObject.activeInHierarchy)
+        {
+            following = null;
+        }
+
         if (following != null)
         {
             rig.Target = following.position;

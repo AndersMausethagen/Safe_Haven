@@ -107,9 +107,10 @@ public static class AwayGifts
 
     private static ResidentRecord WithJob(SettlementState home, JobDefinition job, ResidentDefinition away)
     {
-        foreach (ResidentRecord record in home.Residents)
+        // Someone who was at home and at work meanwhile (not away on a foray, out at an outpost or along).
+        foreach (ResidentRecord record in ResidentsOut.Working(home, away))
         {
-            if (record != null && record.Job == job && job != null && record.Resident != away)
+            if (job != null && record.Job == job)
             {
                 return record;
             }

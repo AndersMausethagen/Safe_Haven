@@ -15,7 +15,8 @@ using UnityEngine;
 /// </summary>
 public static class Forays
 {
-    // What came home while the player wasn't in their Haven to hear it (a raid, a friend's): told on coming home.
+    // What came home while the player was on a raid: told on coming home. (A foray's clock stops in a friend's Haven, as the
+    // workshops do: SettlementSystem runs only in one's own.)
     private static readonly List<string> waiting = new List<string>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
@@ -107,7 +108,9 @@ public static class Forays
                 continue;
             }
 
-            int count = Mathf.RoundToInt(amount(Mathf.Min(loot.least, loot.most), loot.most) * scale);
+            // Rounded by chance (a quarter of three is one, three times in four), so a small share isn't always nothing.
+            float exact = amount(Mathf.Min(loot.least, loot.most), loot.most) * scale;
+            int count = Mathf.FloorToInt(exact) + (roll() < exact - Mathf.Floor(exact) ? 1 : 0);
             if (count > 0)
             {
                 haul.Add(new ItemAmount(loot.item, count));
@@ -337,6 +340,19 @@ public static class ResidentsOut
 {
     /// <summary>Whether anyone could be out on this raid: a party set, or an outpost raised (cheap, before asking for each).</summary>
     public static bool Any(SettlementState home) => home.Parties.Count > 0 || home.Outposts.Count > 0 || home.Foray != null;
+
+    /// <summary>Those at their own work in the Haven now: not the one along, not paused or away, not out (Now). What the Haven gets done
+    /// while the player is away is counted over these (the fields watered, a homecoming gift; builders and rings ask Now themselves).</summary>
+    public static IEnumerable<ResidentRecord> Working(SettlementState home, ResidentDefinition along)
+    {
+        foreach (ResidentRecord record in home.Residents)
+        {
+            if (record != null && record.Resident != null && record.Resident != along && !record.WorkPaused && !Now(home, record, along))
+            {
+                yield return record;
+            }
+        }
+    }
 
     public static bool Now(SettlementState home, ResidentRecord record, ResidentDefinition along)
     {

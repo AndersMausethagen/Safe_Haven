@@ -43,7 +43,7 @@ public sealed class WatchPostArcher : MonoBehaviour
     {
         foreach (ResidentRecord resident in residents)
         {
-            if (resident.Job != null && resident.Job.Workplace == building.Definition)
+            if (!resident.IsAway && resident.Job != null && resident.Job.Workplace == building.Definition)
             {
                 return true;
             }

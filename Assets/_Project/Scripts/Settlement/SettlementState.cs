@@ -967,7 +967,8 @@ public sealed class SettlementState : IHavenView
     /// Who works at the station <paramref name="stationId"/>: a resident whose job's workplace is of its kind and whose own station it
     /// is (HavenHomes: the one nearest their home), or of its kind before that is known. Null id: anyone of its kind. The one rule for
     /// a station's worker, its speed and its worker's learning: three, they disagreed (two fishers at two docks, and only the first
-    /// ever learned; a second Smithy with nobody ran at the first smith's speed).
+    /// ever learned; a second Smithy with nobody ran at the first smith's speed). Nobody away on a foray works one (another of the
+    /// trade takes it meanwhile): their station ran at their speed while they were gone (the review of 2026-11-22).
     /// </summary>
     public ResidentRecord WorkerAt(string stationId, CraftingStationType station)
     {
@@ -978,7 +979,7 @@ public sealed class SettlementState : IHavenView
 
         foreach (ResidentRecord record in residents)
         {
-            if (record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station
+            if (!record.IsAway && record.Job != null && record.Job.Workplace != null && record.Job.Workplace.Station == station
                 && (stationId == null || string.IsNullOrEmpty(record.WorkQueue) || record.WorkQueue == stationId))
             {
                 return record;

@@ -98,7 +98,8 @@ public static class ResidentMeals
         int wellFed = 0;
         foreach (ResidentRecord record in settlement.Residents)
         {
-            if (record == null || record.Resident == null)
+            // Away on a foray, they eat what they took for the road; their meal stands as it was.
+            if (record == null || record.Resident == null || record.IsAway)
             {
                 continue;
             }

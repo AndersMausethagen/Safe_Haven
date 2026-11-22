@@ -161,4 +161,54 @@ public sealed class ForaysTests
         Assert.IsFalse(ResidentBuilders.Helps(builders.Find(one)));
         Assert.IsTrue(ResidentsOut.Now(builders, builders.Find(one), null), "out of the Haven, asked in one place");
     }
+
+    // The review of 2026-11-22, cause A: away on a foray was known only to WorkPaused and the hidden body; whatever asked "who is here"
+    // its own way (a station's worker, the guards, breakfast) still counted them. One rule now: the away are in the Haven for nothing.
+    [Test]
+    public void TheAway_AreInTheHavenForNothing_NoStation_NoGuardPost_NoBreakfast()
+    {
+        JobDefinition job = AssetDatabase.FindAssets("t:JobDefinition").Select(g => AssetDatabase.LoadAssetAtPath<JobDefinition>(AssetDatabase.GUIDToAssetPath(g)))
+            .First(j => j != null && j.Workplace != null && j.Workplace.Station != CraftingStationType.None);
+        ResidentDefinition[] people = People(2);
+        var home = new SettlementState();
+        home.AddResident(people[0], job);
+        home.AddResident(people[1], job);
+        CraftingStationType station = job.Workplace.Station;
+        Assert.AreSame(people[0], home.WorkerAt(station).Resident, "the canary: the first of the trade works it");
+        home.SetForay(new ForayRecord(Settings.Destinations[0].id, new[] { people[0].Id }, 60f, 60f, 0.8f, 1f));
+        Assert.AreSame(people[1], home.WorkerAt(station).Resident, "the other of the trade takes it meanwhile");
+        Assert.IsFalse(ResidentsOut.Working(home, null).Any(r => r.Resident == people[0]), "not at work in the Haven");
+
+        var guardJob = AssetDatabase.FindAssets("t:JobDefinition").Select(g => AssetDatabase.LoadAssetAtPath<JobDefinition>(AssetDatabase.GUIDToAssetPath(g)))
+            .FirstOrDefault(j => j != null && j.DefendsAs != null);
+        Assume.That(guardJob != null);
+        var guarded = new SettlementState();
+        guarded.AddResident(people[0], guardJob);
+        Assert.IsTrue(GuardPosts.Defends(guarded.Find(people[0])));
+        Assert.AreEqual(1, GuardPosts.Defenders(guarded));
+        guarded.SetForay(new ForayRecord(Settings.Destinations[0].id, new[] { people[0].Id }, 60f, 60f, 0.8f, 1f));
+        Assert.IsFalse(GuardPosts.Defends(guarded.Find(people[0])), "no guard post kept from the woods");
+        Assert.AreEqual(0, GuardPosts.Defenders(guarded));
+
+        HomeLifeSettings meals = HomeLifeSettings.Current;
+        home.NoteBuilt(meals.MealsFrom, 1);
+        ItemContainer chests = ChestsWithBread(1);
+        home.Find(people[1]).Meal = ResidentMeal.Fed;
+        ResidentMeals.Eat(home, chests, meals);
+        Assert.AreEqual(ResidentMeal.WellFed, home.Find(people[1]).Meal, "the one at home has the only loaf");
+    }
+
+    [Test]
+    public void AFailedForaysShare_IsRoundedByChance_NotAlwaysNothing()
+    {
+        ForaySettings.Destination place = Settings.Destinations.First(d => d.loot.Any(l => l.most >= 3));
+        // A quarter of each find: with every chance roll 0 the fraction rounds up, with every roll just under 1 it rounds down.
+        int up = Forays.Haul(place, 0.25f, () => 0f, (least, most) => most).Sum(a => a.Amount);
+        int down = Forays.Haul(place, 0.25f, () => 0.999f, (least, most) => most).Sum(a => a.Amount);
+        // Without luck only the sure finds come, each its whole quarters (8 Nettle Fiber is 2); with luck every find comes, and each
+        // fraction rounds up (3 Copper Ore is 1, not 0).
+        int whole = place.loot.Where(l => l.item != null && l.chance > 0.999f).Sum(l => Mathf.FloorToInt(l.most * 0.25f));
+        Assert.AreEqual(whole, down);
+        Assert.Greater(up, down, "a small share comes home with luck, where plain rounding gave nothing");
+    }
 }

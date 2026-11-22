@@ -68,9 +68,9 @@ public static class Fields
     /// </summary>
     public static bool WorkAway(SettlementState home, ResidentDefinition along, FarmSettings settings)
     {
-        foreach (ResidentRecord record in home.Residents)
+        foreach (ResidentRecord record in ResidentsOut.Working(home, along))
         {
-            if (record.Resident != along && Farms(record))
+            if (Farms(record))
             {
                 foreach (StationQueue queue in home.Workshops.Queues)
                 {

@@ -29,8 +29,9 @@ public static class GuardPosts
         return Cap(tiers, settings);
     }
 
-    /// <summary>Whether <paramref name="record"/>'s job keeps guard.</summary>
-    public static bool Defends(ResidentRecord record) => record != null && record.Job != null && record.Job.DefendsAs != null;
+    /// <summary>Whether <paramref name="record"/>'s job keeps guard, and they are here to keep it (not away on a foray): the ranks, the
+    /// count and the horn's word all ask this.</summary>
+    public static bool Defends(ResidentRecord record) => record != null && !record.IsAway && record.Job != null && record.Job.DefendsAs != null;
 
     /// <summary>Where <paramref name="record"/> stands among those who keep guard (0 first, as they live in the Haven), or -1.</summary>
     public static int Rank(IHavenView home, ResidentRecord record)
