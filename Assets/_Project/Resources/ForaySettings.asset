@@ -1,0 +1,188 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 185aa8cdf68d63843b5ba7db0c505df3, type: 3}
+  m_Name: ForaySettings
+  m_EditorClassIdentifier: SafeHaven::ForaySettings
+  destinations:
+  - id: misty-woods-1
+    raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+    tier: 1
+    minutes: 20
+    power: 30
+    loot:
+    - item: {fileID: 11400000, guid: 3790e5e25892e2a49adf1a7cb473a699, type: 2}
+      least: 4
+      most: 8
+      chance: 1
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      least: 2
+      most: 4
+      chance: 0.8
+    - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+      least: 3
+      most: 5
+      chance: 0.7
+    - item: {fileID: 11400000, guid: d799dc8161ff2854dae1eedf4b74fb09, type: 2}
+      least: 4
+      most: 8
+      chance: 0.6
+    - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+      least: 1
+      most: 2
+      chance: 0.4
+    - item: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+      least: 2
+      most: 4
+      chance: 0.4
+  - id: misty-woods-2
+    raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+    tier: 2
+    minutes: 25
+    power: 50
+    loot:
+    - item: {fileID: 11400000, guid: a9f806359436036488427616ef8b8c44, type: 2}
+      least: 3
+      most: 6
+      chance: 0.8
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 2
+      most: 3
+      chance: 0.5
+    - item: {fileID: 11400000, guid: 183fddc5567e8b8479fcb1618e73496c, type: 2}
+      least: 3
+      most: 5
+      chance: 0.6
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      least: 3
+      most: 5
+      chance: 0.8
+    - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+      least: 2
+      most: 3
+      chance: 0.5
+  - id: troll-valley-2
+    raid: {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}
+    tier: 2
+    minutes: 25
+    power: 55
+    loot:
+    - item: {fileID: 11400000, guid: b5567f7d75200bd46befbd1dab298f36, type: 2}
+      least: 6
+      most: 10
+      chance: 1
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 3
+      most: 5
+      chance: 0.7
+    - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+      least: 3
+      most: 5
+      chance: 0.7
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      least: 1
+      most: 2
+      chance: 0.4
+  - id: misty-woods-3
+    raid: {fileID: 11400000, guid: 4c3002f5090022648994d853c2583c8b, type: 2}
+    tier: 3
+    minutes: 35
+    power: 75
+    loot:
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 3
+      most: 5
+      chance: 0.6
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      least: 1
+      most: 3
+      chance: 0.4
+    - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
+      least: 1
+      most: 2
+      chance: 0.4
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      least: 1
+      most: 2
+      chance: 0.5
+    - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
+      least: 1
+      most: 1
+      chance: 0.2
+  - id: moss-marsh-3
+    raid: {fileID: 11400000, guid: 1db618a31f9ad294ba8fe8cc857a15f3, type: 2}
+    tier: 3
+    minutes: 35
+    power: 80
+    loot:
+    - item: {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
+      least: 3
+      most: 6
+      chance: 0.8
+    - item: {fileID: 11400000, guid: ec438ce757d5e9e43bbd93390e7a2728, type: 2}
+      least: 3
+      most: 5
+      chance: 0.7
+    - item: {fileID: 11400000, guid: 54e1b03f55c96d14c96beff689a77318, type: 2}
+      least: 1
+      most: 3
+      chance: 0.6
+    - item: {fileID: 11400000, guid: acb3416df6dae1b439a8b3945c3f098e, type: 2}
+      least: 3
+      most: 5
+      chance: 0.6
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      least: 1
+      most: 2
+      chance: 0.3
+    - item: {fileID: 11400000, guid: 1b426c80d20dbcd4ea2e82901b9dbfb9, type: 2}
+      least: 1
+      most: 1
+      chance: 0.15
+  - id: troll-valley-4
+    raid: {fileID: 11400000, guid: cf0ccb14a6b57b643943133b2b29878a, type: 2}
+    tier: 4
+    minutes: 45
+    power: 110
+    loot:
+    - item: {fileID: 11400000, guid: 4c7e3b0b4de138843be249872ebf3393, type: 2}
+      least: 4
+      most: 6
+      chance: 0.8
+    - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
+      least: 2
+      most: 4
+      chance: 0.5
+    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
+      least: 2
+      most: 3
+      chance: 0.6
+    - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
+      least: 1
+      most: 1
+      chance: 0.15
+  mostMembers: 4
+  basePower: 10
+  powerPerRank: 5
+  powerPerRaid: 1
+  mostRaidsCounted: 10
+  powerPerGearTier: 4
+  wellFedPower: 3
+  roadHunger: 40
+  chanceAtPower: 0.85
+  leastChance: 0.15
+  mostChance: 0.95
+  shortest: 0.6
+  longest: 1.5
+  leastHaul: 0.5
+  mostHaul: 1.5
+  failedHaul: 0.25
+  bruisedWork: 0.3

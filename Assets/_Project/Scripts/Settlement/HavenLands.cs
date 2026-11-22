@@ -23,7 +23,107 @@ public static class HavenLands
         }
 
         held.Entries.Sort((a, b) => state.HoldOf(b.Name).CompareTo(state.HoldOf(a.Name)));
-        return new[] { pushed, held, wild }.Where(s => s.Entries.Count > 0).ToList();
+        return new[] { ForayShelf(), pushed, held, wild }.Where(s => s.Entries.Count > 0).ToList();
+    }
+
+    // ----- Forays through the portal (Forays) -----
+
+    // How many the next foray takes (the strongest who are free), chosen here: kept for the session.
+    private static int forayCount = 2;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetForNewPlaySession() => forayCount = 2;
+
+    // The foray out, or the places a foray could go: each its odds with the party chosen, its time and what it may bring.
+    private static HavenShelf ForayShelf()
+    {
+        var shelf = new HavenShelf("Forays through the portal");
+        SettlementState home = GameSession.Home;
+        ForaySettings settings = ForaySettings.Current;
+        if (HavenVisit.IsVisiting || PortalTiers.Of(home) < 1 || settings.Destinations.Count == 0)
+        {
+            return shelf;
+        }
+
+        if (home.Foray != null)
+        {
+            ForayRecord foray = home.Foray;
+            ForaySettings.Destination there = settings.Find(foray.Destination);
+            List<ResidentRecord> party = Forays.MembersOf(home, foray);
+            var entry = new HavenEntry
+            {
+                Key = "foray-out",
+                Name = there != null ? Forays.Where(there) : foray.Destination,
+                Line = $"{Forays.Names(party)} · back in {Mathf.CeilToInt(Mathf.Max(0f, foray.SecondsLeft) / 60f)} min · {foray.Chance * 100f:0}% odds",
+                State = HavenEntryState.Working,
+                Description = "Out through the portal, gathering on their own. Gone wrong, they bring a share home, bruised.",
+            };
+            if (there != null)
+            {
+                entry.Details.Add(new HavenDetail("May bring", Forays.Finds(there)));
+            }
+
+            entry.Actions.Add(new HavenAction("Call them home", () => Forays.CallHome(GameSession.Home), true, closesWindow: false, primary: false));
+            shelf.Entries.Add(entry);
+            return shelf;
+        }
+
+        TerritorySettings lands = TerritorySettings.Current;
+        List<ResidentRecord> free = Forays.Strongest(home, int.MaxValue, settings, lands);
+        int count = Mathf.Clamp(forayCount, 1, Mathf.Max(1, Mathf.Min(settings.MostMembers, free.Count)));
+        List<ResidentRecord> chosen = free.GetRange(0, Mathf.Min(count, free.Count));
+        float power = Forays.PowerOf(chosen, settings);
+        foreach (ForaySettings.Destination place in settings.Destinations)
+        {
+            if (place == null)
+            {
+                continue;
+            }
+
+            bool open = PortalTiers.Of(home) >= place.tier;
+            string why = Forays.WhyNot(home, place, chosen, GameSession.Stash != null ? GameSession.Stash.Items : null, false, settings);
+            var entry = new HavenEntry
+            {
+                Key = "foray-" + place.id,
+                Name = Forays.Where(place),
+                Line = open ? $"{Forays.Chance(power, place.power, settings) * 100f:0}% · {Mathf.CeilToInt(Forays.Seconds(power, place, settings) / 60f)} min · power {power:0} of {place.power:0}"
+                    : $"Opens with the portal's Tier {Tiers.ToRoman(place.tier)}",
+                State = open ? HavenEntryState.Good : HavenEntryState.Locked,
+            };
+            if (open)
+            {
+                entry.Details.Add(new HavenDetail("May bring", Forays.Finds(place)));
+                entry.Details.Add(new HavenDetail(chosen.Count == 1 ? "Who goes" : $"Who go ({chosen.Count})",
+                    chosen.Count > 0 ? $"{Forays.Names(chosen)}: {power:0} power; each takes food for the road" : "Nobody is free"));
+                entry.Actions.Add(new HavenAction($"Send {(chosen.Count == 1 ? "them" : $"the {chosen.Count}")}", () => Send(place, count), why == null,
+                    closesWindow: false, primary: false));
+                if (count < Mathf.Min(settings.MostMembers, free.Count))
+                {
+                    entry.Actions.Add(new HavenAction("One more", () => forayCount = count + 1, true, closesWindow: false, primary: false));
+                }
+
+                if (count > 1)
+                {
+                    entry.Actions.Add(new HavenAction("One fewer", () => forayCount = count - 1, true, closesWindow: false, primary: false));
+                }
+
+                if (why != null)
+                {
+                    entry.Details.Add(new HavenDetail("Not now", why));
+                }
+            }
+
+            shelf.Entries.Add(entry);
+        }
+
+        return shelf;
+    }
+
+    private static void Send(ForaySettings.Destination place, int count)
+    {
+        SettlementState home = GameSession.Home;
+        List<ResidentRecord> party = Forays.Strongest(home, count, ForaySettings.Current, TerritorySettings.Current);
+        Forays.Send(home, place, party, GameSession.Stash != null ? GameSession.Stash.Items : null, ForaySettings.Current);
     }
 
     /// <summary>"3 of 11 held · the forest pushes on Ravenwood in 2 turns".</summary>

@@ -184,6 +184,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
   - {fileID: 11400000, guid: 389ceb339c3db65489b99ee795eac79c, type: 2}
   - {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
+  - {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
   wellFedWork: 0.1
   hungryWork: 0.25
   builders:

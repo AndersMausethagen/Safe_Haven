@@ -69,8 +69,15 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         settlement.Workshops.AwayFromHome = !atHome;
         ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
         settlement.Workshops.WorkerAbsentAt = along != null ? WorkerProduction.QueueOf(settlement, settlement.Find(along))?.StationId : null;
-        // Those out on a party to a held land (LandParties) work nowhere while the player is away either.
+        // Those out of the Haven (ResidentsOut: a party, an outpost, a foray) work nowhere meanwhile.
         NoteParties(settlement, atHome, along);
+        // A foray's time passes at home and raiding alike (Forays); what it brought is told once home.
+        Forays.Tick(settlement, Time.deltaTime, GameSession.Stash.Items, ForaySettings.Current, () => UnityEngine.Random.value,
+            (least, most) => UnityEngine.Random.Range(least, most + 1));
+        if (atHome)
+        {
+            Forays.PostWaiting();
+        }
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         // Rain at home waters the fields (Fields), looked at now and then.
         if (atHome && Time.time >= nextRainLook)
@@ -127,7 +134,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
     private void NoteParties(SettlementState settlement, bool atHome, ResidentDefinition along)
     {
         HashSet<string> absent = settlement.Workshops.PartyAbsentAt;
-        if (atHome || settlement.Parties.Count == 0 || !LandParties.SetOut(TerritorySettings.Current))
+        if (!ResidentsOut.Any(settlement))
         {
             absent.Clear();
             return;
@@ -140,10 +147,9 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
 
         nextPartyLook = Time.unscaledTime + 1f;
         absent.Clear();
-        TerritorySettings lands = TerritorySettings.Current;
         foreach (ResidentRecord record in settlement.Residents)
         {
-            if (LandParties.IsOut(settlement, record, along, lands))
+            if (ResidentsOut.Now(settlement, record, along))
             {
                 string station = WorkerProduction.QueueOf(settlement, record)?.StationId;
                 if (station != null)

@@ -189,7 +189,39 @@ public static class ResidentMeals
 
         return record.Meal == ResidentMeal.WellFed ? $"Well fed: cooked food this morning (+{settings.WellFedWork * 100f:0}% work)."
             : record.Meal == ResidentMeal.Hungry ? $"Hungry: not enough in the chests to eat this morning ({-settings.HungryWork * 100f:0}% work)."
-            : "Fed, partly on raw food (berries, mushrooms, turnips). Cooked food would make them well fed.";
+            : "Fed. Cooked food alone (bread, a stew, grilled fish) would make them well fed.";
+    }
+
+    /// <summary>The hunger the basic food in <paramref name="chests"/> would still the Haven's people with, all told.</summary>
+    public static float HungerIn(ItemContainer chests, HomeLifeSettings settings)
+    {
+        float hunger = 0f;
+        foreach (ItemDefinition food in FoodsIn(chests, settings))
+        {
+            hunger += food.HungerRestore * chests.Count(food);
+        }
+
+        return hunger;
+    }
+
+    /// <summary>Takes <paramref name="hunger"/>'s worth of food from <paramref name="chests"/> in the order they eat it (cooked first):
+    /// food for the road (Forays). Returns the hunger taken.</summary>
+    public static float TakeFood(ItemContainer chests, float hunger, HomeLifeSettings settings)
+    {
+        List<ItemDefinition> foods = FoodsIn(chests, settings);
+        float taken = 0f;
+        while (taken < hunger)
+        {
+            ItemDefinition food = TakeFirst(chests, foods);
+            if (food == null)
+            {
+                break;
+            }
+
+            taken += food.HungerRestore;
+        }
+
+        return taken;
     }
 
     private static ItemDefinition TakeFirst(ItemContainer chests, List<ItemDefinition> foods)
@@ -219,6 +251,12 @@ public static class HavenDawn
     {
         SettlementState home = GameSession.Home;
         home.PassDay();
+        // A foray's bruises heal overnight (Forays).
+        foreach (ResidentRecord record in home.Residents)
+        {
+            record.Bruised = false;
+        }
+
         string breakfast = ResidentMeals.Eat(home, GameSession.Stash != null ? GameSession.Stash.Items : null, HomeLifeSettings.Current);
         if (!string.IsNullOrEmpty(breakfast))
         {

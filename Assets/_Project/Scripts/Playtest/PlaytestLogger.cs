@@ -243,7 +243,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
 
     private void TrackHome()
     {
-        bool raid = RaidDirector.Current != null;
+        bool raid = Place.OnRaid;
         if (raid && !wasRaid)
         {
             FlushHome();
@@ -527,6 +527,8 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             return;
         }
 
+        // The stay at home under way when the session ends (quitting, loading another save) is written too.
+        FlushHome();
         WriteRow(PlaytestLog.SessionEnd, "", 0, "");
         writer.Dispose();
         writer = null;

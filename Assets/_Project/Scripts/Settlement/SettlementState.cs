@@ -54,7 +54,18 @@ public sealed class ResidentRecord
     public ResidentDefinition Resident { get; }
     public JobDefinition Job { get => job; set => Change(ref job, value); }
     /// <summary>The player asked them to stop working through their job's orders.</summary>
-    public bool WorkPaused { get => workPaused; set => Change(ref workPaused, value); }
+    /// <summary>Not at work: the player paused them, or they are away on a foray (IsAway). Everything that sets someone to work asks this,
+    /// so being away needs no check of its own anywhere (stations, building, rings, parties, outposts).</summary>
+    public bool WorkPaused { get => workPaused || IsAway; set => Change(ref workPaused, value); }
+    /// <summary>Only the player's pause (the window's toggle, the save): not being away.</summary>
+    public bool PausedByPlayer => workPaused;
+    /// <summary>Away from the Haven on a foray (Forays): not in it, at no work, never along on a raid. Kept by SettlementState.SetForay,
+    /// not saved on its own (the foray is).</summary>
+    [field: NotSaved("marked again from the saved foray as it loads (SettlementState.SetForay)")]
+    public bool IsAway { get; internal set; }
+    private bool bruised;
+    /// <summary>Came home from a foray gone wrong: slower at work until the next dawn (HavenDawn). Saved.</summary>
+    public bool Bruised { get => bruised; set => Change(ref bruised, value); }
     /// <summary>Raids they have gone on with the player and come back from.</summary>
     public int RaidsAlong { get => raidsAlong; set => Change(ref raidsAlong, value); }
     public int KillsAlong { get => killsAlong; set => Change(ref killsAlong, value); }
@@ -626,6 +637,22 @@ public sealed class SettlementState : IHavenView
         {
             Changed?.Invoke();
         }
+    }
+
+    /// <summary>The foray under way (Forays), or null: one at a time.</summary>
+    public ForayRecord Foray { get; private set; }
+
+    /// <summary>Sends a foray out (or ends it with null): those on it are away (ResidentRecord.IsAway) until it is over.</summary>
+    public void SetForay(ForayRecord foray)
+    {
+        Borrowed();
+        Foray = foray;
+        foreach (ResidentRecord record in residents)
+        {
+            record.IsAway = foray != null && record.Resident != null && foray.Members.Contains(record.Resident.Id);
+        }
+
+        Changed?.Invoke();
     }
 
     private readonly Dictionary<string, string> outposts = new Dictionary<string, string>();

@@ -251,7 +251,8 @@ public static class RingWork
         var logs = new List<ItemAmount>();
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
         float size = rules.SizeOf(Mathf.Max(0.5f, height));
-        ChoppableTree.Roll(rules.AllLogs(settings.FellerAxeTier, size), settings.FellerAxeTier, size, random, logs);
+        // The Haven's trees: never a raid wood, though the player is on a raid while the ring is felled.
+        ChoppableTree.Roll(rules.AllLogs(settings.FellerAxeTier, size), settings.FellerAxeTier, size, random, logs, rules.HomeMaxWoodTier);
         return logs;
     }
 
@@ -517,7 +518,7 @@ public static class RingWork
         float speed = 0f;
         foreach (ResidentRecord record in home.Residents)
         {
-            if (record.Resident == along || !Works(record, kind, settings))
+            if (record.Resident == along || !Works(record, kind, settings) || ResidentsOut.Now(home, record, along))
             {
                 continue;
             }

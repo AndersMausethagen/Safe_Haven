@@ -43,15 +43,31 @@ public static class LandParties
             return null;
         }
 
+        // An outpost's keeper keeps it: one standing order each (the review of 2026-11-22: a Hunter kept Greyfell and hunted too).
         foreach (ResidentRecord record in home.Residents)
         {
-            if (record.Job == info.job && !record.WorkPaused && record.Resident != null && record.Resident != along)
+            if (record.Job == info.job && !record.WorkPaused && record.Resident != null && record.Resident != along && !Outposts.Keeps(home, record))
             {
                 return record;
             }
         }
 
         return null;
+    }
+
+    /// <summary>True when <paramref name="record"/> leads a party that is set (to a land the Haven holds).</summary>
+    public static bool Leads(IHavenView home, ResidentRecord record, TerritorySettings settings)
+    {
+        foreach (LandPartyKind kind in Kinds)
+        {
+            string region = home.PartyOn(kind);
+            if (region != null && home.Territory.IsClaimed(region) && WhoGoes(home, kind, null, settings) == record)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>True once the raid under way has run long enough for the parties to have set out (Party Min Seconds): before that, and

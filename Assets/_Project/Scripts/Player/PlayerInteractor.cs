@@ -56,6 +56,8 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
     {
         stateMachine.InteractionRequested -= OnInteractionRequested;
         stateMachine.StateChanged -= OnPlayerStateChanged;
+        // A press waiting to be a tap or a hold is forgotten: enabled again later, it must not run then.
+        pressed = null;
         if (TryGetComponent(out PlayerInterrupts interrupts))
         {
             interrupts.Remove(this);

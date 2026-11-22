@@ -160,8 +160,7 @@ public sealed class KeeperPeople
         string doing = DoingIcon(life, out string doingWords);
         bool wish = HomeWishes.WishOf(record) != null;
         bool followed = KeeperView.Current != null && life != null && KeeperView.Current.Following == life.transform;
-        string meal = ResidentMeals.Describe(record);
-        bool hungry = record.Meal == ResidentMeal.Hungry && meal.Length > 0;
+        bool hungry = record.Meal == ResidentMeal.Hungry && ResidentMeals.Expected(GameSession.Here, HomeLifeSettings.Current);
         string state = $"{who.name}|{(record.Job != null ? record.Job.name : "")}|{record.WorkDone}|{doing}|{wish}|{followed}|{hungry}";
         if (state == card.Shown)
         {

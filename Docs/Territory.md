@@ -132,6 +132,21 @@ the land lost, it is given up. The calmer lands have none: their tithe is their 
 Once every land is Secure at once the ring holds: the safe pocket gets a slot more (Ring Pocket Slots), kept from then on.
 The Wolfwood's tithe is now Rough Hide (its Thick Hide comes from its outpost): home makes plain goods (`EconomyRulesTests`).
 
+## Forays through the portal (2026-11-22)
+
+Residents raid on their own (`Forays`, `ForaySettings`; Palworld's expeditions, the user's idea): the Lands tab lists the places a
+foray can go, each a raid's land at a tier, open once the portal opens that tier. A party (the strongest who are free; "One more",
+"One fewer") brings power: Base Power, more for each worker rank, the raids they went along on (up to 10), the worker gear they were
+given and a good breakfast. Against what the place asks it sets the odds (85% at the power asked, 15-95%), the time (its minutes,
+quicker with more power, slower with less: 0.6-1.5 times) and the haul (0.5-1.5 times). Each takes food for the road (40 hunger,
+cooked first). Away they are gone from the Haven: no station, no building, no party, never along on a raid (`ResidentRecord.IsAway`,
+which `WorkPaused` includes, so every work check covers it). Time counts at home and raiding. Home, the finds go in the chests
+(chances, not promises); gone wrong, a quarter comes home and they are bruised (30% slower) until the next dawn. Nobody is lost. One
+foray at a time; "Call them home" brings them back empty-handed. Six places: Misty Woods I-III, Troll Valley II and IV, Moss Marsh III.
+
+One standing order each (`ResidentsOut`, the review of 2026-11-22): an outpost's keeper leads no party and goes on no foray; whoever
+is out (a party, an outpost, a foray) works no station, builds and helps nothing and fells no ring while out.
+
 ## Not yet
 
 - An outpost's raid hook (a forward camp, an extra exit or a rumour in the land's raid), and a model at its boundary stone.

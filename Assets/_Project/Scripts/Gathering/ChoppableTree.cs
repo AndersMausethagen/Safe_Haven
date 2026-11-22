@@ -231,7 +231,12 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
 
     /// <summary><paramref name="total"/> logs of a tree of <paramref name="size"/>, merged by wood; all of them
     /// <paramref name="ownWood"/> when the tree has one.</summary>
-    public static void Roll(int total, int axeTier, float size, System.Func<float> random, List<ItemAmount> into, ItemDefinition ownWood = null)
+    public static void Roll(int total, int axeTier, float size, System.Func<float> random, List<ItemAmount> into, ItemDefinition ownWood = null) =>
+        Roll(total, axeTier, size, random, into, Place.OnRaid ? int.MaxValue : TreeChoppingSettings.Current.HomeMaxWoodTier, ownWood);
+
+    /// <summary>The same, no better than wood tier <paramref name="maxTier"/>: the Haven's trees give no raid wood, whoever fells them
+    /// and wherever the player is (a felling ring works while the player raids).</summary>
+    public static void Roll(int total, int axeTier, float size, System.Func<float> random, List<ItemAmount> into, int maxTier, ItemDefinition ownWood = null)
     {
         into.Clear();
         if (ownWood != null)
@@ -245,12 +250,10 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         }
 
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
-        // Off a raid, no better than Hardwood: Elderwood is a raid wood (TreeChoppingSettings › Home Max Wood Tier).
-        int best = RaidDirector.Current == null ? rules.HomeMaxWoodTier : int.MaxValue;
         var counts = new Dictionary<ItemDefinition, int>();
         for (int i = 0; i < total; i++)
         {
-            ItemDefinition wood = rules.RollLog(axeTier, size, random, best);
+            ItemDefinition wood = rules.RollLog(axeTier, size, random, maxTier);
             if (wood != null)
             {
                 counts.TryGetValue(wood, out int n);

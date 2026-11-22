@@ -935,4 +935,5 @@ def main():
         bpy.ops.wm.save_as_mainfile(filepath=a[1])
 
 
-main()
+if __name__ == "__main__":
+    main()

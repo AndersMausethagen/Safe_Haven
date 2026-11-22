@@ -110,7 +110,9 @@ public sealed class ResidentBuilders : MonoBehaviour
         float hands = 0f;
         foreach (ResidentRecord record in settlement.Residents)
         {
-            float share = Builds(record, away) ? 1f : Helps(record, away) && FreeToHelp(settlement, record) ? HomeLifeSettings.Current.HelperShare : 0f;
+            // Out of the Haven (a party, an outpost, a foray: ResidentsOut), nobody builds at home.
+            float share = ResidentsOut.Now(settlement, record, away) ? 0f
+                : Builds(record, away) ? 1f : Helps(record, away) && FreeToHelp(settlement, record) ? HomeLifeSettings.Current.HelperShare : 0f;
             if (share > 0f)
             {
                 hands += share;

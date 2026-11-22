@@ -1546,10 +1546,13 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
         Construction best = null;
         float bestDistance = float.MaxValue;
+        // A builder counts only builders against a scaffold's places, so a helper there first never keeps the Carpenter away (the review
+        // of 2026-11-22); a helper counts everyone.
+        bool builder = ResidentBuilders.Builds(record);
         foreach (BuildingObject standing in BuildingObject.Active)
         {
             if (standing == null || !standing.TryGetComponent(out Construction site) || !NeedsHands(site)
-                || BuildersOn(site) >= BuildersFor(site.WorkLeft) || (site == unreachable && Time.time < unreachableUntil))
+                || BuildersOn(site, builder) >= BuildersFor(site.WorkLeft) || (site == unreachable && Time.time < unreachableUntil))
             {
                 continue;
             }
@@ -1576,12 +1579,12 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private float unreachableUntil;
     private const float NearSiteMetres = 3f;
 
-    private static int BuildersOn(Construction site)
+    private static int BuildersOn(Construction site, bool buildersOnly = false)
     {
         int count = 0;
         foreach (ResidentLife life in Living)
         {
-            count += life.building == site ? 1 : 0;
+            count += life.building == site && (!buildersOnly || ResidentBuilders.Builds(life.npc.Record)) ? 1 : 0;
         }
 
         return count;

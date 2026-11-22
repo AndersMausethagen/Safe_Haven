@@ -121,7 +121,11 @@ public static class HavenPeople
             return;
         }
 
-        if (record.WorkPaused)
+        if (record.IsAway)
+        {
+            entry.Line = $"{record.Job.DisplayName}, away on a foray";
+        }
+        else if (record.WorkPaused)
         {
             entry.Line = $"{record.Job.DisplayName}, resting";
         }
@@ -143,7 +147,7 @@ public static class HavenPeople
 
         entry.Details.Add(new HavenDetail("Keeps making, from the stash", string.Join("\n", orders)));
         // Made where the Haven is kept: a visitor's word goes to their friend's game (HavenDecisions).
-        entry.Actions.Add(new HavenAction(record.WorkPaused ? "Back to work" : "Pause their work",
+        entry.Actions.Add(new HavenAction(record.PausedByPlayer ? "Back to work" : "Pause their work",
             () => HavenDecisions.Do("resident.pause", record.Resident.Id), closesWindow: false, primary: false));
     }
 
@@ -156,8 +160,8 @@ public static class HavenPeople
             return HavenDecisions.Outcome.Refused("They have no work to pause now.");
         }
 
-        record.WorkPaused = !record.WorkPaused;
-        return HavenDecisions.Outcome.Made(record.WorkPaused ? $"{record.Resident.DisplayName} rests from their work." : $"{record.Resident.DisplayName} goes back to work.");
+        record.WorkPaused = !record.PausedByPlayer;
+        return HavenDecisions.Outcome.Made(record.PausedByPlayer ? $"{record.Resident.DisplayName} rests from their work." : $"{record.Resident.DisplayName} goes back to work.");
     }
 
     /// <summary>A resident of this Haven by their id, or null (what a friend's decision names them by).</summary>

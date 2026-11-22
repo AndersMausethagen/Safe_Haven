@@ -2353,6 +2353,12 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   Uneaten (raw meat and fish). Well fed (cooked only) / fed / hungry is `ResidentRecord.Meal` (saved), counted in `HomeLife.WorkBonus`.
 - **Limits and caps.** `BuildingDefinition` › Limit By Rank (`BuildingUnlocks.HasRoom`, in IsOpen and Missing): the Farm Plot
   2/3/4/6/8. `TreeChoppingSettings` › Home Max Wood Tier: off a raid, logs no better than Hardwood (`ChoppableTree.Roll`).
+- **Forays** (`Forays`, `ForaySettings`, `ForayRecord`; Docs/Territory.md): residents raiding on their own from the Lands tab.
+  `ResidentRecord.IsAway` (rebuilt by `SettlementState.SetForay`, not saved itself) is part of `WorkPaused`; `PausedByPlayer` is the
+  player's own pause (toggles, save). `ResidentSpawner` hides the away. **Who is out** is asked in one place: `ResidentsOut.Now`
+  (stations, builders and helpers away, rings away); `LandParties.Leads`/`WhoGoes` and `Outposts.Candidate` keep one standing order
+  each; `Outposts.IsOut` only for a working outpost. `HomeLife.HomeBonus` is the home's own share of `WorkBonus` (meals, bruises
+  added). The home wood cap is the caller's (`ChoppableTree.Roll` with `maxTier`; the player's chop asks `Place.OnRaid`).
 - **Outposts** (`Outposts`, Docs/Territory.md). **Measurement**: `PlaytestLog` CameHome, Eaten, HomeStay, Stock, RaidNodes rows
   (`PlaytestLogger.TrackHome`). The rule "home makes plain, raids make tier" is `EconomyRulesTests`.
 

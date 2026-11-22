@@ -48,7 +48,7 @@ public sealed partial class RecipeBrowser
         }
     }
 
-    public static bool IsFavourite(RecipeDefinition recipe) => recipe != null && Favourites.Contains(recipe.Id);
+    public static bool IsFavourite(RecipeDefinition recipe) => recipe != null && Favourites.Contains(recipe.BookId);
 
     private void ToggleFavourite(RecipeDefinition recipe)
     {
@@ -57,9 +57,9 @@ public sealed partial class RecipeBrowser
             return;
         }
 
-        if (!Favourites.Remove(recipe.Id))
+        if (!Favourites.Remove(recipe.BookId))
         {
-            Favourites.Add(recipe.Id);
+            Favourites.Add(recipe.BookId);
         }
 
         PlayerPrefs.SetString(FavouritesKey, string.Join("|", Favourites));

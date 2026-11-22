@@ -94,6 +94,9 @@ public sealed class RecipeDefinition : ScriptableObject
     public IReadOnlyList<ResourceAmount> ResourceCost => resourceCost;
     public IReadOnlyList<ItemAmount> ItemCost => itemCost;
 
+    /// <summary>The id the recipe book knows it by: a thriftier copy's is its recipe's (favourites, knowledge).</summary>
+    public string BookId => IsThriftierCopy && replaces != null ? replaces.Id : Id;
+
     /// <summary>True for a copy made at runtime by a module's One Fewer (RecipeVariants), not a recipe asset.</summary>
     public bool IsThriftierCopy { get; private set; }
 

@@ -147,15 +147,16 @@ public static class HomeLife
     /// </summary>
     public static float WorkBonus(ResidentRecord record)
     {
-        // What they ate this morning counts with or without a home (ResidentMeals): well fed quicker, hungry slower.
-        float meal = ResidentMeals.WorkBonus(record);
-        HomeQuality.Report report = Of(HavenHomes.HomeOf(record));
-        if (report == null)
-        {
-            return meal;
-        }
+        // What they ate this morning (ResidentMeals) and a foray's bruises (Forays) count with or without a home.
+        float bruised = record != null && record.Bruised ? -ForaySettings.Current.BruisedWork : 0f;
+        return HomeBonus(record) + ResidentMeals.WorkBonus(record) + bruised;
+    }
 
-        return meal + report.Level.workSpeed + (IsContent(record, report) ? HomeLifeSettings.Current.ContentWorkSpeed : 0f);
+    /// <summary>What their home alone adds to their work: its level, and being content in it (the window's "faster for it").</summary>
+    public static float HomeBonus(ResidentRecord record)
+    {
+        HomeQuality.Report report = Of(HavenHomes.HomeOf(record));
+        return report == null ? 0f : report.Level.workSpeed + (IsContent(record, report) ? HomeLifeSettings.Current.ContentWorkSpeed : 0f);
     }
 
     /// <summary>True when their home has what they like (HomeLifeSettings › Likings).</summary>

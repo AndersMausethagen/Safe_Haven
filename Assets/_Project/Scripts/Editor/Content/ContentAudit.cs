@@ -42,6 +42,8 @@ public static class ContentAudit
         "TerritorySettings.parties[].yields[].item", "WorkerSettings.awayRockYield[].item",
         // What an outpost at a Secure land sends home each raid (Outposts).
         "TerritorySettings.regions[].outpost[].item",
+        // What a foray may bring home (Forays): residents raiding on their own.
+        "ForaySettings.destinations[].loot[].item",
     };
 
     private static readonly string[] ItemUses =

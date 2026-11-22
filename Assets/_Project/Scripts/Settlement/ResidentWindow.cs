@@ -362,7 +362,7 @@ public sealed class ResidentWindow : MonoBehaviour
             qualityLines.text = lines.ToString();
             HomeLifeSettings.Liking liking = HomeLifeSettings.Current.LikingOf(who);
             bool content = HomeLife.IsContent(record, report);
-            float speed = HomeLife.WorkBonus(record);
+            float speed = HomeLife.HomeBonus(record);
             string fed = ResidentMeals.Describe(record);
             bonusLine.text = $"Works {speed * 100f:0}% faster for it" + (liking != null ? content ? $"; content: {liking.likes.ToLowerInvariant()}" : $"; would like: {liking.likes.ToLowerInvariant()}" : "")
                 + (fed.Length > 0 ? "\n" + fed : "");
@@ -435,7 +435,7 @@ public sealed class ResidentWindow : MonoBehaviour
         var actions = new List<MenuAction>();
         if (job != null && job.WorkOrders.Count > 0)
         {
-            actions.Add(new MenuAction(record.WorkPaused ? "Back to work" : "Pause their work", record.WorkPaused ? "They are resting" : "Stops them using the stash",
+            actions.Add(new MenuAction(record.PausedByPlayer ? "Back to work" : "Pause their work", record.PausedByPlayer ? "They are resting" : "Stops them using the stash",
                 true, () => HavenDecisions.Do("resident.pause", who.Id)) { Icon = "Hourglass" });
         }
 
@@ -578,9 +578,18 @@ public sealed class ResidentWindow : MonoBehaviour
         {
             shown.Add((HomeLife.IsContent(record) ? "Content at home" : $"Likes: {liking.likes.ToLowerInvariant()}", HomeLife.IsContent(record) ? style.Good : style.Muted));
         }
-        if (record.WorkPaused)
+        if (record.IsAway)
+        {
+            shown.Add(("Away on a foray", style.Info));
+        }
+        else if (record.WorkPaused)
         {
             shown.Add(("Resting", style.Warning));
+        }
+
+        if (record.Bruised)
+        {
+            shown.Add(("Bruised from a foray", style.Warning));
         }
 
         if (record.RaidsAlong >= 3)

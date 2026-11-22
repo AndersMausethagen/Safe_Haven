@@ -85,8 +85,19 @@ public sealed class ResidentSpawner : MonoBehaviour
         for (int i = 0; i < residents.Count; i++)
         {
             ResidentDefinition resident = residents[i].Resident;
-            if (resident == null || spawned.ContainsKey(resident))
+            if (resident == null)
             {
+                continue;
+            }
+
+            // Away on a foray (Forays): gone from the Haven until they come back through the portal.
+            if (spawned.TryGetValue(resident, out ResidentNpc there))
+            {
+                if (there != null && there.gameObject.activeSelf == residents[i].IsAway)
+                {
+                    there.gameObject.SetActive(!residents[i].IsAway);
+                }
+
                 continue;
             }
 
@@ -99,6 +110,7 @@ public sealed class ResidentSpawner : MonoBehaviour
 
             npc.Bind(resident);
             spawned[resident] = npc;
+            npc.gameObject.SetActive(!residents[i].IsAway);
         }
 
         RaiseCairns();

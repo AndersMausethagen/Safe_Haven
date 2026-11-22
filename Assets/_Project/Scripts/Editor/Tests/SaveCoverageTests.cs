@@ -32,6 +32,8 @@ public sealed class SaveCoverageTests
         ["Settlement.parties"] = "LandPartiesTests.Parties_AreSaved",
         // Outposts are kept by the land's name and a resident's id: the probe's filler gives neither.
         ["Settlement.outposts"] = "OutpostsTests.Outposts_AndTheRing_AreSaved",
+        // A foray names a real destination and real residents (whom it marks away): the probe's filler gives neither.
+        ["Settlement.Foray"] = "ForaysTests.ThoseWhoGo_AreAwayUntilHome_ASaveKeepsThem_AndTheHaulComesHome",
         // Only real perks and skills are kept on loading, and ranks to the deepest there is: a probe can't invent them.
         ["Progress.perks"] = "ProgressionTests, TechniqueTests (perks a save keeps)",
         ["Progress.skillRanks"] = "EssenceTests (skill ranks)",

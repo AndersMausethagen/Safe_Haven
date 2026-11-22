@@ -64,7 +64,7 @@ public static class Outposts
         {
             ResidentRecord record = people[(start + n) % people.Count];
             if (record == after || record.Resident == null || record.WorkPaused || Keeps(home, record) || ResidentBuilders.Builds(record)
-                || LeadsAParty(home, record, settings))
+                || LandParties.Leads(home, record, settings))
             {
                 continue;
             }
@@ -86,19 +86,6 @@ public static class Outposts
         }
 
         return -1;
-    }
-
-    private static bool LeadsAParty(IHavenView home, ResidentRecord record, TerritorySettings settings)
-    {
-        foreach (LandPartyKind kind in LandParties.All)
-        {
-            if (home.PartyOn(kind) != null && LandParties.WhoGoes(home, kind, null, settings) == record)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /// <summary>Why an outpost can't be raised on <paramref name="region"/> now, or null.</summary>
@@ -210,6 +197,22 @@ public static class Outposts
     }
 
     /// <summary>Whether <paramref name="record"/> is out at their outpost while the player raids (their station unworked meanwhile).</summary>
-    public static bool IsOut(SettlementState home, ResidentRecord record, ResidentDefinition along, TerritorySettings settings) =>
-        record != null && record.Resident != along && !record.WorkPaused && Keeps(home, record);
+    public static bool IsOut(SettlementState home, ResidentRecord record, ResidentDefinition along, TerritorySettings settings)
+    {
+        if (record == null || record.Resident == along || record.WorkPaused || !Keeps(home, record))
+        {
+            return false;
+        }
+
+        // Only to an outpost that works this turn: one that waits keeps its keeper at home (and their station worked).
+        foreach (KeyValuePair<string, string> outpost in home.Outposts)
+        {
+            if (outpost.Value == record.Resident.Id)
+            {
+                return Paused(home, outpost.Key, settings) == null;
+            }
+        }
+
+        return false;
+    }
 }

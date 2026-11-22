@@ -141,6 +141,8 @@ public sealed class SettlementSaveData
     public List<OutpostSaveData> outposts = new List<OutpostSaveData>();
     /// <summary>Every land has been Secure at once (the ring held). Missing in older saves: not yet.</summary>
     public bool ringHeld;
+    /// <summary>The foray under way (Forays), or none (an empty destination, also in older saves).</summary>
+    public ForaySaveData foray;
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -249,6 +251,8 @@ public sealed class ResidentSaveData
     public bool wishMet;
     /// <summary>ResidentMeal: what they ate this morning (0 fed, also an older save).</summary>
     public int meal;
+    /// <summary>Home bruised from a foray gone wrong, until the next dawn.</summary>
+    public bool bruised;
 }
 
 [Serializable]
@@ -549,6 +553,18 @@ public sealed class PostSaveData
     public float x;
     public float y;
     public float z;
+}
+
+[Serializable]
+public sealed class ForaySaveData
+{
+    public string destination = "";
+    /// <summary>Resident ids.</summary>
+    public List<string> members = new List<string>();
+    public float secondsLeft;
+    public float seconds;
+    public float chance;
+    public float haulScale = 1f;
 }
 
 [Serializable]

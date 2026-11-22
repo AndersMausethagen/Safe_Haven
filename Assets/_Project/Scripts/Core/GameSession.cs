@@ -259,5 +259,6 @@ public static class GameSession
         RingWork.ForgetGame();
         HavenHorn.ForgetGame();
         SmallScenes.ForgetGame();
+        Forays.ForgetGame();
     }
 }
