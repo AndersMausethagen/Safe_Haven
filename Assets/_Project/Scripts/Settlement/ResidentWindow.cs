@@ -363,13 +363,15 @@ public sealed class ResidentWindow : MonoBehaviour
             HomeLifeSettings.Liking liking = HomeLifeSettings.Current.LikingOf(who);
             bool content = HomeLife.IsContent(record, report);
             float speed = HomeLife.WorkBonus(record);
-            bonusLine.text = $"Works {speed * 100f:0}% faster for it" + (liking != null ? content ? $"; content: {liking.likes.ToLowerInvariant()}" : $"; would like: {liking.likes.ToLowerInvariant()}" : "");
+            string fed = ResidentMeals.Describe(record);
+            bonusLine.text = $"Works {speed * 100f:0}% faster for it" + (liking != null ? content ? $"; content: {liking.likes.ToLowerInvariant()}" : $"; would like: {liking.likes.ToLowerInvariant()}" : "")
+                + (fed.Length > 0 ? "\n" + fed : "");
         }
         else
         {
             qualityTitle.text = "Home quality";
             qualityLines.text = "A house of their own is a home: what stands round it (a fire, a well, a light, a bench, their work) makes it better.";
-            bonusLine.text = "";
+            bonusLine.text = ResidentMeals.Describe(record);
         }
 
         IReadOnlyList<HomeLifeSettings.Comfort> comforts = HomeLifeSettings.Current.Comforts;

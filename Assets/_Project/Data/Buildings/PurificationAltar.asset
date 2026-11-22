@@ -30,6 +30,7 @@ MonoBehaviour:
   sortOrder: 9
   requires: []
   requiredRank: 0
+  limitByRank: 
   modelScale: 1
   modelHeight: 1
   yardDepth: 1.5
@@ -129,6 +130,10 @@ MonoBehaviour:
       amount: 6
     - item: {fileID: 11400000, guid: c64928309e5e1174ca29510d8cf2b8ee, type: 2}
       amount: 2
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 4
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 16

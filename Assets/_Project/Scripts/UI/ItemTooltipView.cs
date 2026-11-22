@@ -652,7 +652,7 @@ public sealed class ItemTooltipView : MonoBehaviour
 
         if (item.IsConsumable)
         {
-            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore))
+            builder.Append($"\n<color={UIStyle.Current.GoodHex}>").Append(DescribeRestores(item))
                 .Append(held ? " Right-click to use." : "").Append("</color>");
             if (item.HasBoon)
             {
@@ -883,6 +883,23 @@ public sealed class ItemTooltipView : MonoBehaviour
     }
 
     /// <summary>"Restores 30 health, 40 hunger." – the parts that are above zero.</summary>
+    /// <summary>What an item restores, with health given at once told apart from health over its own time (the Mending Draught).</summary>
+    public static string DescribeRestores(ItemDefinition item)
+    {
+        if (item.HealAtOnce <= 0f && item.HealSeconds <= 0f)
+        {
+            return DescribeRestores(item.HealAmount, item.HungerRestore, item.ThirstRestore);
+        }
+
+        string heal = item.HealAtOnce > 0f
+            ? $"{Mathf.RoundToInt(item.HealAtOnce)} health at once" + (item.HealAmount > 0f ? $", then {Mathf.RoundToInt(item.HealAmount)} over {Over(item):0} s" : "")
+            : $"{Mathf.RoundToInt(item.HealAmount)} health over {Over(item):0} s";
+        string rest = DescribeRestores(0f, item.HungerRestore, item.ThirstRestore);
+        return "Restores " + heal + (rest.Length > 0 ? ", " + rest.Substring("Restores ".Length) : ".");
+    }
+
+    private static float Over(ItemDefinition item) => item.HealSeconds > 0f ? item.HealSeconds : CombatTechniqueSettings.Current.HealOverSeconds;
+
     public static string DescribeRestores(float health, float hunger, float thirst)
     {
         var parts = new System.Collections.Generic.List<string>();

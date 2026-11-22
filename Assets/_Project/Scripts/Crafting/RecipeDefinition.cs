@@ -93,6 +93,85 @@ public sealed class RecipeDefinition : ScriptableObject
     public Object OutputDefinition => output != null ? output : outputResource;
     public IReadOnlyList<ResourceAmount> ResourceCost => resourceCost;
     public IReadOnlyList<ItemAmount> ItemCost => itemCost;
+
+    /// <summary>True for a copy made at runtime by a module's One Fewer (RecipeVariants), not a recipe asset.</summary>
+    public bool IsThriftierCopy { get; private set; }
+
+    /// <summary>The id a thriftier copy of <paramref name="plain"/> by <paramref name="module"/> goes by: the plain one's and the module's,
+    /// so a queued craft saved with it is found again (ContentDatabase.FindRecipe) and a cancel gives back exactly what it took.</summary>
+    public static string ThriftierId(RecipeDefinition plain, BuildingModuleDefinition module) => plain.Id + "+" + module.Id;
+
+    /// <summary>
+    /// <paramref name="cost"/> with one fewer of each of <paramref name="fewer"/> it needs more than one of (the Herb Rack, the user
+    /// 2026-11-22: "reduce the amount of herbs needed in tonics by 1, as long as the required herb is more than 1"). Pure.
+    /// </summary>
+    public static List<ItemAmount> Fewer(IReadOnlyList<ItemAmount> cost, IReadOnlyList<ItemDefinition> fewer)
+    {
+        var less = new List<ItemAmount>(cost.Count);
+        foreach (ItemAmount one in cost)
+        {
+            bool cut = one.Item != null && one.Amount > 1 && Contains(fewer, one.Item);
+            less.Add(cut ? new ItemAmount(one.Item, one.Amount - 1) : one);
+        }
+
+        return less;
+    }
+
+    /// <summary>True when <paramref name="module"/>'s One Fewer makes this recipe cheaper.</summary>
+    public bool CheaperWith(BuildingModuleDefinition module)
+    {
+        if (module == null || module.OneFewer.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (ItemAmount one in itemCost)
+        {
+            if (one.Item != null && one.Amount > 1 && Contains(module.OneFewer, one.Item))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Makes <paramref name="copy"/> (made with CreateInstance) the thriftier copy of <paramref name="plain"/> at a station with
+    /// <paramref name="module"/>: the same in every way but its item cost, its id, the module it needs and the recipe it replaces.</summary>
+    internal static void MakeThriftierCopy(RecipeDefinition copy, RecipeDefinition plain, BuildingModuleDefinition module)
+    {
+        copy.name = plain.name;
+        copy.id = ThriftierId(plain, module);
+        copy.displayName = plain.displayName;
+        copy.output = plain.output;
+        copy.outputResource = plain.outputResource;
+        copy.outputAmount = plain.outputAmount;
+        copy.resourceCost = new List<ResourceAmount>(plain.resourceCost);
+        copy.itemCost = Fewer(plain.itemCost, module.OneFewer);
+        copy.station = plain.station;
+        copy.craftSeconds = plain.craftSeconds;
+        copy.knownFromStart = plain.knownFromStart;
+        copy.minimumStationTier = plain.minimumStationTier;
+        copy.requiredSkill = plain.requiredSkill;
+        copy.requiredSkillLevel = plain.requiredSkillLevel;
+        copy.sortOrder = plain.sortOrder;
+        copy.needsModule = module;
+        copy.replaces = plain;
+        copy.IsThriftierCopy = true;
+    }
+
+    private static bool Contains(IReadOnlyList<ItemDefinition> items, ItemDefinition item)
+    {
+        foreach (ItemDefinition one in items)
+        {
+            if (one == item)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
     public CraftingStationType Station => station;
     /// <summary>True for the few basic recipes made instantly from the bag; the rest are queued at their station.</summary>
     public bool IsHandcrafted => station == CraftingStationType.None;

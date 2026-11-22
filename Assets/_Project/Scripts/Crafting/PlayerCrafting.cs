@@ -117,6 +117,12 @@ public sealed class PlayerCrafting : MonoBehaviour
     /// <summary>True when the player knows the recipe; one that needs a module counts only once the module is known (BuildingModules).</summary>
     public bool IsKnown(RecipeDefinition recipe)
     {
+        // A module's thriftier copy (RecipeVariants) is no recipe of the book: known as the recipe it copies is, with its module.
+        if (recipe != null && recipe.IsThriftierCopy)
+        {
+            return IsKnown(recipe.Replaces) && BuildingModules.IsKnown(recipe.NeedsModule);
+        }
+
         EnsureInitialised();
         return recipe != null && known.Contains(recipe) && (recipe.NeedsModule == null || BuildingModules.IsKnown(recipe.NeedsModule));
     }

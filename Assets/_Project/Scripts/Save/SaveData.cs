@@ -243,6 +243,8 @@ public sealed class ResidentSaveData
     public string workGear;
     /// <summary>Their wish for a home was met and thanked for (HomeWishes). Missing in older saves: not yet.</summary>
     public bool wishMet;
+    /// <summary>ResidentMeal: what they ate this morning (0 fed, also an older save).</summary>
+    public int meal;
 }
 
 [Serializable]

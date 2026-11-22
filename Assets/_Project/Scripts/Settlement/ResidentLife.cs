@@ -1531,7 +1531,10 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private Construction ScaffoldToBuild()
     {
         // A friend's copy walks them to the scaffold too, to be seen at it; only the Haven's own game adds the work (Hammer).
-        if (!ResidentBuilders.Builds(npc.Record))
+        // Anyone else lends a hand (ResidentBuilders.Helps) once their own work has nothing for them: a craft at their bench or a
+        // ring of theirs comes first.
+        ResidentRecord record = npc.Record;
+        if (!ResidentBuilders.Builds(record) && (!ResidentBuilders.Helps(record) || BenchHasWork() || RingToWork() != null))
         {
             return null;
         }
@@ -1630,7 +1633,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         // Only the game that keeps the Haven counts the work (co-op: a friend's copy shows them hammering).
         if (!HavenVisit.IsVisiting)
         {
-            building.AddWork(Time.deltaTime * BuildRate(npc.Record));
+            building.AddWork(Time.deltaTime * BuildRate(npc.Record) * ResidentBuilders.ShareOf(npc.Record));
         }
 
         return true;

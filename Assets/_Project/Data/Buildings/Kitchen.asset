@@ -34,6 +34,7 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: 25c95a1289ab72b4ea0bb96e2ec3f020, type: 2}
     tier: 1
   requiredRank: 0
+  limitByRank: 
   modelScale: 1
   modelHeight: 1
   yardDepth: 2
@@ -136,6 +137,10 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       amount: 8
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
       amount: 4
     essence: []
     work: 60

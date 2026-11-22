@@ -43,6 +43,7 @@ public sealed class ResidentRecord
     private float haulDone;
     private ItemDefinition workGear;
     private bool wishMet;
+    private ResidentMeal meal;
 
     private void Change<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string change = null)
     {
@@ -89,6 +90,8 @@ public sealed class ResidentRecord
     public ItemDefinition WorkGear { get => workGear; set => Change(ref workGear, value); }
     /// <summary>Their home has had what they wish for (HomeWishes): thanked for, and gifted, once.</summary>
     public bool WishMet { get => wishMet; set => Change(ref wishMet, value); }
+    /// <summary>What they ate this morning (ResidentMeals): fed, well fed or hungry, for their work speed that day.</summary>
+    public ResidentMeal Meal { get => meal; set => Change(ref meal, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>

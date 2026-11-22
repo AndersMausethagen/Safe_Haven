@@ -110,7 +110,19 @@ public sealed class ContentDatabase : ScriptableObject, IContentLookup, IContent
     public RecipeDefinition FindRecipe(string id)
     {
         recipesById ??= Index(recipeBook != null ? recipeBook.Recipes : Array.Empty<RecipeDefinition>(), recipe => recipe.Id);
-        return id != null && recipesById.TryGetValue(id, out RecipeDefinition recipe) ? recipe : null;
+        if (id != null && recipesById.TryGetValue(id, out RecipeDefinition recipe))
+        {
+            return recipe;
+        }
+
+        // A module's thriftier copy (RecipeVariants): "<recipe id>+<module id>", made again from the two.
+        int cut = id != null ? id.LastIndexOf('+') : -1;
+        if (cut > 0 && recipesById.TryGetValue(id.Substring(0, cut), out RecipeDefinition plain))
+        {
+            return RecipeVariants.ThriftierOf(plain, FindModule(id.Substring(cut + 1)));
+        }
+
+        return null;
     }
 
     private void OnValidate()

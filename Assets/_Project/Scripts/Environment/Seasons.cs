@@ -94,8 +94,8 @@ public sealed class Seasons : MonoBehaviour
         // In a friend's Haven the day is theirs: it comes with their settlement (co-op).
         if (lastHour >= 0f && lastHour < 6f && hour >= 6f && hour - lastHour < 2f && !HavenVisit.IsVisiting)
         {
-            GameSession.Home.PassDay();
-            global::Territory.Turn(true);
+            // The day counts, the people eat, the lands turn (HavenDawn).
+            HavenDawn.Pass();
         }
 
         lastHour = hour;

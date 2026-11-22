@@ -147,13 +147,15 @@ public static class HomeLife
     /// </summary>
     public static float WorkBonus(ResidentRecord record)
     {
+        // What they ate this morning counts with or without a home (ResidentMeals): well fed quicker, hungry slower.
+        float meal = ResidentMeals.WorkBonus(record);
         HomeQuality.Report report = Of(HavenHomes.HomeOf(record));
         if (report == null)
         {
-            return 0f;
+            return meal;
         }
 
-        return report.Level.workSpeed + (IsContent(record, report) ? HomeLifeSettings.Current.ContentWorkSpeed : 0f);
+        return meal + report.Level.workSpeed + (IsContent(record, report) ? HomeLifeSettings.Current.ContentWorkSpeed : 0f);
     }
 
     /// <summary>True when their home has what they like (HomeLifeSettings › Likings).</summary>

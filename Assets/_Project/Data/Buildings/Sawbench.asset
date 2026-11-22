@@ -32,6 +32,7 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
   requiredRank: 0
+  limitByRank: 
   modelScale: 0.6
   modelHeight: 1.55
   yardDepth: 2
@@ -135,6 +136,10 @@ MonoBehaviour:
       amount: 8
     - item: {fileID: 11400000, guid: ae22b153092c1c747b502abc286670d3, type: 2}
       amount: 2
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 4
     essence: []
     work: 54
     teachesRecipes: []
@@ -172,9 +177,13 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 50d6dfa982b3a264980eaec31b4aae11, type: 2}
       amount: 12
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 4
+      amount: 3
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 1
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 18
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 6
     essence: []
     work: 66
     teachesRecipes: []
@@ -216,6 +225,10 @@ MonoBehaviour:
       amount: 1
     - item: {fileID: 11400000, guid: 5321f43bf9cf2d34e8b68919356fb88a, type: 2}
       amount: 1
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 24
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 8
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 20

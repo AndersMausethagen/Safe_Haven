@@ -16,11 +16,11 @@ MonoBehaviour:
   displayName: 
   output: {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
   outputResource: {fileID: 0}
-  outputAmount: 2
+  outputAmount: 1
   resourceCost: []
   itemCost:
-  - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
-    amount: 2
+  - item: {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
+    amount: 1
   - item: {fileID: 11400000, guid: 0a1138e9bdc2f264f9efe45438e5bc6a, type: 2}
     amount: 10
   station: 9

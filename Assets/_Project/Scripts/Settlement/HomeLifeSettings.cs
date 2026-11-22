@@ -114,11 +114,30 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     [SerializeField, Min(0f)] private float wearPerStep = 0.04f;
     [SerializeField, Min(0f)] private float wearRegrowth = 0.0006f;
 
+    [Header("Meals")]
+    [Tooltip("Once this stands (the Kitchen), the Haven's people expect a meal each dawn from the chests (ResidentMeals); before it they " +
+             "feed themselves. Empty: from the start.")]
+    [SerializeField] private BuildingDefinition mealsFrom;
+    [Tooltip("Hunger each resident eats a dawn: a loaf of bread (40) fills one; raw food takes more (four handfuls of berries).")]
+    [SerializeField, Min(0f)] private float dailyHunger = 40f;
+    [Tooltip("The best food they eat: dishes above this tier (the feasts, pies and broths the player cooks for a raid) are left in the " +
+             "chests. Cooked and prepared food is eaten first, then raw.")]
+    [SerializeField, Range(0, 5)] private int mostMealTier = 2;
+    [Tooltip("Food they leave for the cook: raw meat and fish.")]
+    [SerializeField] private List<ItemDefinition> uneaten = new List<ItemDefinition>();
+    [Tooltip("How much faster a well-fed resident works that day (stations, building, rings).")]
+    [SerializeField, Range(0f, 1f)] private float wellFedWork = 0.1f;
+    [Tooltip("How much slower a hungry one works that day. Nobody starves or leaves.")]
+    [SerializeField, Range(0f, 1f)] private float hungryWork = 0.25f;
+
     [Header("Building while you are away")]
     [Tooltip("Jobs whose residents finish scaffolds while the player is on a raid.")]
     [SerializeField] private List<JobDefinition> builders = new List<JobDefinition>();
     [Tooltip("Seconds of build work each of them does per second the player is away.")]
     [SerializeField, Min(0f)] private float builderWorkPerSecond = 0.5f;
+    [Tooltip("Everyone else lends a hand at a scaffold when their own work has nothing for them (no craft at their bench, no ring " +
+             "of theirs to work), at home and while the player is away, at this share of a builder's pace. 0: only the builders build.")]
+    [SerializeField, Range(0f, 1f)] private float helperShare = 0.5f;
 
     public IReadOnlyList<Feature> Features => features;
     public int PointsPerTier => pointsPerTier;
@@ -132,6 +151,24 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
     public float WearRegrowth => wearRegrowth;
     public IReadOnlyList<JobDefinition> Builders => builders;
     public float BuilderWorkPerSecond => builderWorkPerSecond;
+    public float HelperShare => helperShare;
+    public BuildingDefinition MealsFrom => mealsFrom;
+    public float DailyHunger => dailyHunger;
+    public int MostMealTier => mostMealTier;
+    public IReadOnlyList<ItemDefinition> Uneaten => uneaten;
+    public float WellFedWork => wellFedWork;
+    public float HungryWork => hungryWork;
+
+    /// <summary>Sets the meals (tests).</summary>
+    public void ConfigureMeals(BuildingDefinition from, float hunger, int mostTier, List<ItemDefinition> left, float wellFed, float hungry)
+    {
+        mealsFrom = from;
+        dailyHunger = hunger;
+        mostMealTier = mostTier;
+        uneaten = left ?? new List<ItemDefinition>();
+        wellFedWork = wellFed;
+        hungryWork = hungry;
+    }
 
     /// <summary>The level a home of this quality reaches (the best whose quality it has).</summary>
     public Level LevelFor(int quality)

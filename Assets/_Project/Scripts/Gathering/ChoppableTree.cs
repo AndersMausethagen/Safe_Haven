@@ -245,10 +245,12 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         }
 
         TreeChoppingSettings rules = TreeChoppingSettings.Current;
+        // Off a raid, no better than Hardwood: Elderwood is a raid wood (TreeChoppingSettings › Home Max Wood Tier).
+        int best = RaidDirector.Current == null ? rules.HomeMaxWoodTier : int.MaxValue;
         var counts = new Dictionary<ItemDefinition, int>();
         for (int i = 0; i < total; i++)
         {
-            ItemDefinition wood = rules.RollLog(axeTier, size, random);
+            ItemDefinition wood = rules.RollLog(axeTier, size, random, best);
             if (wood != null)
             {
                 counts.TryGetValue(wood, out int n);

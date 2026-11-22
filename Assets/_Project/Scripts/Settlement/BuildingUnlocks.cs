@@ -31,8 +31,24 @@ public static class BuildingUnlocks
             return true;
         }
 
-        return GameSession.Here.HavenRank >= building.RequiredRank && AllStand(building.Requires);
+        return GameSession.Here.HavenRank >= building.RequiredRank && AllStand(building.Requires) && HasRoom(building);
     }
+
+    /// <summary>How many of <paramref name="building"/> stand in the loaded scene: scaffolds and plans too.</summary>
+    public static int Standing(BuildingDefinition building)
+    {
+        int count = 0;
+        foreach (BuildingObject placed in BuildingObject.Active)
+        {
+            count += placed.Definition == building ? 1 : 0;
+        }
+
+        return count;
+    }
+
+    /// <summary>True while the Haven's rank allows another (BuildingDefinition › Limit By Rank).</summary>
+    public static bool HasRoom(BuildingDefinition building) =>
+        building == null || !building.IsLimited || Standing(building) < building.LimitAt(GameSession.Here.HavenRank);
 
     /// <summary>Whether what an upgrade asks for stands. The level below it is the upgrade's own business.</summary>
     public static bool IsOpen(BuildingLevel level) => Cheats.NoRequirements || level == null
@@ -46,6 +62,24 @@ public static class BuildingUnlocks
         if (GameSession.Here.HavenRank < building.RequiredRank && building.RequiredRank < ranks.Count)
         {
             missing.Insert(0, $"Safe Haven to be a {ranks[building.RequiredRank].name}");
+        }
+
+        // Full for the rank: what the next rank that allows more is called, and how many it allows.
+        if (!HasRoom(building))
+        {
+            int rank = GameSession.Here.HavenRank;
+            int now = building.LimitAt(rank);
+            string next = null;
+            for (int i = rank + 1; i < ranks.Count && next == null; i++)
+            {
+                if (building.LimitAt(i) > now)
+                {
+                    next = $" (a {ranks[i].name}: {building.LimitAt(i)})";
+                }
+            }
+
+            string name = rank < ranks.Count ? ranks[rank].name : "Haven";
+            return $"A {name} has room for {now} {building.DisplayName}{(now == 1 ? "" : "s")}{next ?? ""}." + (missing.Count > 0 ? $" Needs {string.Join(" and ", missing)}." : "");
         }
 
         return missing.Count > 0 ? $"Needs {string.Join(" and ", missing)}." : "";

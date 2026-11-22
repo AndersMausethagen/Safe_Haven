@@ -218,7 +218,9 @@ public sealed class ContentExpansionTests
     [Test]
     public void EveryCookedMealHasBonusesWorthTheKitchen()
     {
-        foreach (RecipeDefinition recipe in All<RecipeDefinition>().Where(found => found.Station == CraftingStationType.Kitchen))
+        // Ingredients ground at the Kitchen (Flour, 2026-11-22) are no meal.
+        foreach (RecipeDefinition recipe in All<RecipeDefinition>().Where(found => found.Station == CraftingStationType.Kitchen
+                     && (found.Output == null || found.Output.Category != ItemCategory.Material)))
         {
             Assert.IsNotNull(recipe.Output, recipe.name);
             Assert.IsTrue(recipe.Output.HasBoon, recipe.name);

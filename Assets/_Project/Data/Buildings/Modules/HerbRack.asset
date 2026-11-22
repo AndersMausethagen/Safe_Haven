@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::BuildingModuleDefinition
   id: module.herbrack
   displayName: Herb Rack
-  description: 'Herbs hung to dry over the cauldron: a draught takes one herb, not two.'
+  description: 'Herbs and mushrooms hung to dry over the cauldron: a brew that needs two or more takes one fewer, and the Mending Draught can be made.'
   icon: {fileID: 21300000, guid: edea73377ccd1364e8e2b47483961bd9, type: 3}
   fits: 0
   buildings:
@@ -47,6 +47,9 @@ MonoBehaviour:
     turnBackShare: 0
     mendCostShare: 0
     fineChance: 0
+  oneFewer:
+  - {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+  - {fileID: 11400000, guid: 15d1c587fc1b8f34696d9b01c733b94e, type: 2}
   cost:
   - item: {fileID: 11400000, guid: c956d596285633041bd09bc7627a0b3d, type: 2}
     amount: 6

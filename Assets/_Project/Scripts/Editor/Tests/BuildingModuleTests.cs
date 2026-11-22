@@ -147,7 +147,74 @@ public sealed class BuildingModuleTests
             variants++;
         }
 
-        Assert.GreaterOrEqual(variants, 5, "the Mason's Frame, Frame Saw, Spinning Wheel and Herb Rack variants");
+        Assert.GreaterOrEqual(variants, 5, "the Mason's Frame, Frame Saw, Spinning Wheel and Nykk's dock variants");
+    }
+
+    // The user, 2026-11-22: "change herb rack fitting to reduce the amount of herbs needed in tonics by -1, as long as the required herb
+    // is more than 1. We do not need separate recipes for this effect."
+    [Test]
+    public void TheHerbRack_CutsOneHerb_FromBrewsNeedingTwoOrMore_WithNoRecipeAsset()
+    {
+        BuildingModuleDefinition rack = Content.Modules.Single(m => m != null && m.name == "HerbRack");
+        ItemDefinition herb = rack.OneFewer.First(item => item != null && item.name == "HealingHerb");
+        RecipeDefinition draught = Recipe("HealingDraught");
+        Assert.AreEqual(2, draught.ItemCost.Where(c => c.Item == herb).Sum(c => c.Amount), "the plain draught takes two herbs");
+        var queue = new StationQueue("test", draught.Station, 20, 5) { Tier = Tiers.Max };
+        Assert.AreSame(draught, RecipeVariants.OpenAt(draught, queue), "no rack: the plain recipe");
+
+        queue.Modules = new[] { rack };
+        RecipeDefinition thrifty = RecipeVariants.OpenAt(draught, queue);
+        Assert.AreNotSame(draught, thrifty, "the rack: a cheaper way");
+        Assert.IsTrue(thrifty.IsThriftierCopy);
+        Assert.IsFalse(Content.Recipes.Contains(thrifty), "made from the recipe, no asset");
+        Assert.AreSame(thrifty, RecipeVariants.OpenAt(draught, queue), "the same copy each time, so a worker and the queue agree");
+        Assert.AreEqual(1, thrifty.ItemCost.Where(c => c.Item == herb).Sum(c => c.Amount), "one herb");
+        Assert.AreSame(draught.OutputDefinition, thrifty.OutputDefinition);
+        Assert.AreEqual(draught.ResourceCost.Sum(c => c.Amount), thrifty.ResourceCost.Sum(c => c.Amount), "the tincture as before");
+        Assert.AreSame(rack, thrifty.NeedsModule);
+        Assert.AreSame(draught, thrifty.Replaces);
+        Assert.AreSame(thrifty, Content.FindRecipe(thrifty.Id), "a queued craft saved with it is found again");
+
+        // Never below one, and only what the rack lists.
+        ItemDefinition other = draught.ItemCost.Select(c => c.Item).FirstOrDefault(item => item != null && item != herb) ?? Recipe("Bandage").ItemCost[0].Item;
+        var cut = RecipeDefinition.Fewer(new[] { new ItemAmount(herb, 1), new ItemAmount(herb, 3), new ItemAmount(other, 3) }, rack.OneFewer);
+        CollectionAssert.AreEqual(new[] { 1, 2, 3 }, cut.Select(c => c.Amount).ToArray());
+
+        // Every cauldron brew with two or more of a listed herb is cheaper there; one with a single herb is left alone.
+        int cheaper = 0;
+        foreach (RecipeDefinition recipe in Content.Recipes.Where(r => r != null && r.Station == draught.Station && r.NeedsModule == null && r.Replaces == null))
+        {
+            bool needsTwo = recipe.ItemCost.Any(c => rack.OneFewer.Contains(c.Item) && c.Amount > 1);
+            RecipeDefinition open = RecipeVariants.OpenAt(recipe, queue);
+            Assert.AreEqual(needsTwo, open != recipe, recipe.name);
+            cheaper += needsTwo ? 1 : 0;
+        }
+
+        Assert.GreaterOrEqual(cheaper, 4, "the healing, purified, bear and warming brews at least");
+    }
+
+    // The user, 2026-11-22: the Herb Rack's own Healing Draught became another draught, "one that heals 30 hp instantly and then 40 over
+    // 10 seconds".
+    [Test]
+    public void TheMendingDraught_HealsThirtyAtOnce_ThenFortyOverTenSeconds_AtTheHerbRack()
+    {
+        RecipeDefinition recipe = Recipe("MendingDraught");
+        Assert.IsNotNull(recipe);
+        Assert.IsNull(recipe.Replaces, "its own draught, no longer a cheaper Healing Draught");
+        Assert.AreEqual("HerbRack", recipe.NeedsModule.name);
+        ItemDefinition draught = recipe.Output;
+        Assert.AreEqual("Mending Draught", draught.DisplayName);
+        Assert.AreEqual(30f, draught.HealAtOnce);
+        Assert.AreEqual(40f, draught.HealAmount);
+        Assert.AreEqual(10f, draught.HealSeconds);
+        Assert.AreEqual(70f, draught.HealTotal);
+        Assert.AreEqual(CraftedGoods.Tonics, CraftedWork.Of(draught), "a tonic, for Potent Remedies and the Alchemy skill");
+        string told = ItemTooltipView.DescribeRestores(draught);
+        StringAssert.Contains("30 health at once", told);
+        StringAssert.Contains("40 over 10 s", told);
+        Assert.IsTrue(Content.Items.Contains(draught));
+        Assert.AreEqual(1, Content.Recipes.Count(r => r != null && r.OutputDefinition != null && r.OutputDefinition.name == "HealingDraught"),
+            "one Healing Draught recipe in the book again");
     }
 
     [Test]

@@ -160,7 +160,9 @@ public sealed class KeeperPeople
         string doing = DoingIcon(life, out string doingWords);
         bool wish = HomeWishes.WishOf(record) != null;
         bool followed = KeeperView.Current != null && life != null && KeeperView.Current.Following == life.transform;
-        string state = $"{who.name}|{(record.Job != null ? record.Job.name : "")}|{record.WorkDone}|{doing}|{wish}|{followed}";
+        string meal = ResidentMeals.Describe(record);
+        bool hungry = record.Meal == ResidentMeal.Hungry && meal.Length > 0;
+        string state = $"{who.name}|{(record.Job != null ? record.Job.name : "")}|{record.WorkDone}|{doing}|{wish}|{followed}|{hungry}";
         if (state == card.Shown)
         {
             return;
@@ -173,6 +175,8 @@ public sealed class KeeperPeople
         card.Name.text = who.DisplayName;
         string rank = record.Job != null ? SettlementSettings.Current.RankFor(record.WorkDone).name : "";
         card.Work.text = record.Job != null ? (string.IsNullOrEmpty(rank) ? record.Job.DisplayName : $"{rank} {record.Job.DisplayName}") : "No work yet";
+        // Hungry this morning: their work line goes the warning colour (the tip says why).
+        card.Work.color = hungry ? style.Warning : style.Muted;
         card.Doing.sprite = style.Icon(doing);
         card.Doing.enabled = card.Doing.sprite != null;
         card.Doing.color = doing == "Sword" ? Color.Lerp(style.Danger, style.Accent, 0.4f) : doing == "Bed" ? style.Muted : HearthKit.IconColour(doing);
@@ -233,7 +237,9 @@ public sealed class KeeperPeople
         ResidentLife life = ResidentLife.Of(card.Record.Resident);
         DoingIcon(life, out string doing);
         string wish = HomeWishes.WishOf(card.Record);
+        string meal = ResidentMeals.Describe(card.Record);
         string words = char.ToUpperInvariant(doing[0]) + doing.Substring(1) + "." + (wish != null ? $" Wishes for a home with: {wish}." : "")
+            + (meal.Length > 0 ? " " + meal : "")
             + (life != null ? " Click to follow; click them in the Haven for their page." : "");
         tip.Show(card.Record.Resident.DisplayName, words, card.Rect, beside: -1);
     }

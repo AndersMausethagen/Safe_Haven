@@ -32,6 +32,7 @@ MonoBehaviour:
   sortOrder: 4
   requires: []
   requiredRank: 0
+  limitByRank: 
   modelScale: 1
   modelHeight: 1
   yardDepth: 1.5
@@ -126,8 +127,10 @@ MonoBehaviour:
     description: A bellows that breathes on its own.
     cost:
     - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
-      amount: 12
+      amount: 24
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
+      amount: 4
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
       amount: 4
     essence: []
     work: 57

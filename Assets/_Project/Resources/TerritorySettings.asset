@@ -104,8 +104,8 @@ MonoBehaviour:
     tithe:
     - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
       amount: 1
-    - item: {fileID: 11400000, guid: 8f121a970bae6f54dbcc8ff5e2c2a48e, type: 2}
-      amount: 1
+    - item: {fileID: 11400000, guid: 5022422f3d793b34dab4ad85e9581321, type: 2}
+      amount: 2
   - region: Westwood
     description: Quiet cedar woods west of the meadows, with the old watchtowers on their ridges and the mere among them.
     danger: 1

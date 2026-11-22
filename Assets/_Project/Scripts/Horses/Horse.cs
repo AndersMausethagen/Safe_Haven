@@ -25,7 +25,7 @@ using UnityEngine.AI;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent), typeof(Damageable), typeof(Combatant))]
 [InAFriendsHaven(HavenUse.ItsChoicesDecide, "the visitor's own horse is theirs; another's bags and stores ask the host")]
-public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity, IInteractionName
+public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunity, IInteractionName, IInteractionHold
 {
     public enum Mode { Wild, Lassoed, Breaking, Tamed }
 
@@ -1028,6 +1028,19 @@ public sealed class Horse : MonoBehaviour, ISaveable, ICargoHold, IStatusImmunit
         if (CoopHorses.TakeInHand(this))
         {
             HorsePanelWindow.Show(this, user, MenuRange);
+        }
+    }
+
+    // IInteractionHold: a tap opens its menu (OnUsed), holding Interact gets straight on (the user, 2026-11-22), when its menu's Ride could.
+    public string HoldVerb(GameObject user) => IsTamed && IsGrown && !IsStabled && Rider == null && PlayerRiding.For(user) != null ? "Ride" : null;
+
+    public void Held(GameObject user)
+    {
+        PlayerRiding riding = PlayerRiding.For(user);
+        // In co-op, whoever has it in hand runs it, as for the menu.
+        if (riding != null && HoldVerb(user) != null && CoopHorses.TakeInHand(this))
+        {
+            riding.Mount(this);
         }
     }
 

@@ -192,6 +192,9 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     [SerializeField] private List<BuildingRequirement> requires = new List<BuildingRequirement>();
     [Tooltip("The Haven rank needed before it can be built (HavenSettings: 0 is the first). What only a known settlement can draw.")]
     [SerializeField, Min(0)] private int requiredRank;
+    [Tooltip("How many may stand at each Haven rank, in rank order (HavenSettings: Overgrown Camp, Homestead, Hamlet, Village, Haven); " +
+             "the last number holds for any rank after it. The Farm Plot: fields grow with the Haven (the user, 2026-11-22). Empty: no limit.")]
+    [SerializeField] private List<int> limitByRank = new List<int>();
 
     [Header("Placement")]
     [Tooltip("The size its model is shown at (1 = as modelled, life-size). The Haven's big buildings are half size (the " +
@@ -289,6 +292,10 @@ public sealed class BuildingDefinition : ScriptableObject, ICombatSounds
     public int Comfort => comfort;
     public int Beds => beds;
     public int RequiredRank => requiredRank;
+    /// <summary>How many may stand at Haven rank <paramref name="rank"/>; int.MaxValue with no limit.</summary>
+    public int LimitAt(int rank) => limitByRank.Count == 0 ? int.MaxValue : Mathf.Max(0, limitByRank[Mathf.Clamp(rank, 0, limitByRank.Count - 1)]);
+    /// <summary>True when how many may stand depends on the Haven's rank.</summary>
+    public bool IsLimited => limitByRank.Count > 0;
     public IReadOnlyList<RecipeDefinition> TeachesRecipes => teachesRecipes;
     public float YardDepth => yardDepth;
     public float ModelScale => modelScale;

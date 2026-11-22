@@ -35,7 +35,7 @@ MonoBehaviour:
       fixedAmount: 0
     - item: {fileID: 11400000, guid: fdf61b2bcc4fcfb47b96885b254e02e6, type: 2}
       resource: {fileID: 0}
-      minQuantity: 2
+      minQuantity: 3
       maxQuantity: 4
       probability: 1
       fromTier: 3

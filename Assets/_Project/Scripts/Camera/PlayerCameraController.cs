@@ -252,6 +252,56 @@ public sealed class PlayerCameraController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Follows <paramref name="anchor"/> (a ridden horse's body) instead of the player, with the player's place on it smoothed
+    /// (PlayerCameraSettings › Riding Steady Time), so the rider's bob in the saddle doesn't shake the view; null follows the
+    /// player again, easing out of it.
+    /// </summary>
+    public void SetSteadyAnchor(Transform anchor) => steadyAnchor = anchor;
+
+    /// <summary>Its settings (the riding lead is read from them by PlayerRiding).</summary>
+    public PlayerCameraSettings Settings => settings;
+
+    // The player's place, steadied (FollowPoint): what it is measured from, and the smoothed offset from it.
+    private Transform steadyAnchor;
+    private Vector3 lastAnchor;
+    private bool anchorWasSteady;
+    private bool steadyStarted;
+    private Vector3 steadyOffset;
+    private Vector3 steadyOffsetVelocity;
+
+    // Where the view follows: the player, or in the saddle the horse's body plus the rider's smoothed place on it. Changing between
+    // them carries the offset over, so nothing jumps; out of the saddle the leftover offset eases away.
+    private Vector3 FollowPoint()
+    {
+        Vector3 player = target.position;
+        bool steady = steadyAnchor != null && steadyAnchor.gameObject.activeInHierarchy;
+        Vector3 anchor = steady ? steadyAnchor.position : player;
+        if (!steadyStarted)
+        {
+            steadyStarted = true;
+            steadyOffset = player - anchor;
+            steadyOffsetVelocity = Vector3.zero;
+        }
+        else if (steady != anchorWasSteady)
+        {
+            steadyOffset += lastAnchor - anchor;
+        }
+
+        anchorWasSteady = steady;
+        lastAnchor = anchor;
+        if (!steady && steadyOffset.sqrMagnitude < 0.000001f)
+        {
+            steadyOffset = Vector3.zero;
+            steadyOffsetVelocity = Vector3.zero;
+            return player;
+        }
+
+        float dt = Time.deltaTime;
+        steadyOffset = dt > 0f ? Vector3.SmoothDamp(steadyOffset, player - anchor, ref steadyOffsetVelocity, settings.RidingSteadyTime, Mathf.Infinity, dt) : steadyOffset;
+        return anchor + steadyOffset;
+    }
+
     /// <summary>Leads the view ahead of the player while <paramref name="source"/> asks (a gallop: more of the way ahead in
     /// view), by <paramref name="offset"/> on the ground, eased; zero lets it go. Several leads add up.</summary>
     public void SetLead(object source, Vector3 offset)
@@ -718,7 +768,7 @@ public sealed class PlayerCameraController : MonoBehaviour
         Vector3 actionOffset = (shoulder + Vector3.up * settings.ActionLookHeight) * actionWeight;
         // Slow to lean out and to come back, so a gallop's lead doesn't jerk the view at each change of pace.
         leadNow = Vector3.SmoothDamp(leadNow, WantedLead(), ref leadVelocity, 0.9f, Mathf.Infinity, Time.unscaledDeltaTime);
-        focus.position = target.position + lookAheadOffset + actionOffset + leadNow;
+        focus.position = FollowPoint() + lookAheadOffset + actionOffset + leadNow;
         // Glides from one speaker to the next rather than jumping when the speaker changes, and only leans a little way
         // towards someone far off, so a shout from across the meadow doesn't throw the view after them.
         if (dialogueTarget != null)

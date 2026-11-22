@@ -37,7 +37,7 @@ MonoBehaviour:
       resource: {fileID: 0}
       minQuantity: 1
       maxQuantity: 1
-      probability: 0.2
+      probability: 0.3
       fromTier: 3
       toTier: 0
       fixedAmount: 0

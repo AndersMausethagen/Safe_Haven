@@ -34,6 +34,7 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: cfa8f019a4062c84f8e9b8cd432080e0, type: 2}
     tier: 1
   requiredRank: 0
+  limitByRank: 
   modelScale: 0.6
   modelHeight: 1.55
   yardDepth: 2
@@ -135,6 +136,10 @@ MonoBehaviour:
       amount: 12
     - item: {fileID: 11400000, guid: 8865a285b55516842a98bac1e1e53ef6, type: 2}
       amount: 8
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 12
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 4
     essence: []
     work: 66
     teachesRecipes: []
@@ -174,7 +179,7 @@ MonoBehaviour:
     description: 'A fire that burns white: moonsilver gear.'
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 12
+      amount: 11
     - item: {fileID: 11400000, guid: 3b6626518ea9eb040b7d45591fac015b, type: 2}
       amount: 8
     - item: {fileID: 11400000, guid: 03656529f70038c47baa4a9103025a81, type: 2}
@@ -182,6 +187,10 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 4af99768b5986d94e8882065ffe24693, type: 2}
       amount: 1
     - item: {fileID: 11400000, guid: 96459a8d9566ae74cb04ee74d08a597b, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 18
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
       amount: 6
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
@@ -221,11 +230,15 @@ MonoBehaviour:
     description: An anvil of trollstone, and nothing out there it can't work.
     cost:
     - item: {fileID: 11400000, guid: 32fed522ebae2fc4d85b1847b30aa530, type: 2}
-      amount: 12
+      amount: 11
     - item: {fileID: 11400000, guid: fcf0552d231ec8b40a3de2796f1bc4c3, type: 2}
       amount: 3
     - item: {fileID: 11400000, guid: 4c668e5dcc6885548b6d5f316e29c5bd, type: 2}
       amount: 1
+    - item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+      amount: 24
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 8
     essence:
     - resource: {fileID: 11400000, guid: e991fd5ccf0ce314cafafff8badfe173, type: 2}
       amount: 40

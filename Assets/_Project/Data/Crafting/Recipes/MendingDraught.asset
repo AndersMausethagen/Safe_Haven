@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6e984d5700951ee48b9215d668e8218a, type: 3}
-  m_Name: HealingDraughtHerbRack
+  m_Name: MendingDraught
   m_EditorClassIdentifier: Assembly-CSharp::RecipeDefinition
-  id: healingdraught.herbrack
+  id: mendingdraught
   displayName: 
-  output: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+  output: {fileID: 11400000, guid: 92179f516b64dce4482c9d696da5dc41, type: 2}
   outputResource: {fileID: 0}
   outputAmount: 1
   resourceCost:
@@ -22,6 +22,8 @@ MonoBehaviour:
     amount: 1
   itemCost:
   - item: {fileID: 11400000, guid: 7e57bf86766de2341bd9c47b5830cf76, type: 2}
+    amount: 2
+  - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
     amount: 1
   station: 4
   craftSeconds: 15
@@ -29,6 +31,6 @@ MonoBehaviour:
   minimumStationTier: 0
   requiredSkill: {fileID: 0}
   requiredSkillLevel: 0
-  sortOrder: 16
+  sortOrder: 17
   needsModule: {fileID: 11400000, guid: 95b03d70c6593804fa61941c299caeee, type: 2}
-  replaces: {fileID: 11400000, guid: 0a7cdf721d4aa8e4ba0222031ca1e6d9, type: 2}
+  replaces: {fileID: 0}

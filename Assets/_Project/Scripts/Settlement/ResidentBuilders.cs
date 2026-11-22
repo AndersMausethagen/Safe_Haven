@@ -46,6 +46,42 @@ public sealed class ResidentBuilders : MonoBehaviour
         record != null && record.Job != null && !record.WorkPaused && record.Resident != null && record.Resident != away
         && Contains(HomeLifeSettings.Current.Builders, record.Job);
 
+    /// <summary>
+    /// True when this resident lends a hand at scaffolds (the user, 2026-11-22: "NPC's in base should help build structures even
+    /// before we unlock Keeper's view"): anyone at home and not paused who isn't a builder, at HomeLifeSettings › Helper Share of a
+    /// builder's pace, and only while their own work has nothing for them (ResidentLife at home; <see cref="WorkAway"/> away).
+    /// </summary>
+    public static bool Helps(ResidentRecord record, ResidentDefinition away = null) =>
+        record != null && !record.WorkPaused && record.Resident != null && record.Resident != away
+        && HomeLifeSettings.Current.HelperShare > 0f && !Builds(record, away);
+
+    /// <summary>How much of a builder's pace this resident hammers at: 1 for a builder, Helper Share for anyone else who helps.</summary>
+    public static float ShareOf(ResidentRecord record, ResidentDefinition away = null) =>
+        Builds(record, away) ? 1f : Helps(record, away) ? HomeLifeSettings.Current.HelperShare : 0f;
+
+    // Away, a helper helps only with nothing of their own to do: an idle bench (or a stuck one, as at home) and no ring of theirs drawn.
+    private static bool FreeToHelp(SettlementState settlement, ResidentRecord record)
+    {
+        StationQueue bench = WorkerProduction.QueueOf(settlement, record);
+        if (bench != null && !bench.IsIdle && !bench.Blocked)
+        {
+            return false;
+        }
+
+        if (RingWork.KindFor(record, WorkerSettings.Current, out RingKind kind))
+        {
+            foreach (RingOrder ring in settlement.Rings)
+            {
+                if (ring.Kind == kind)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /// <summary>The names of those who build at home now, for the message home.</summary>
     public static string Names(SettlementState settlement, ResidentDefinition away = null)
     {
@@ -66,16 +102,18 @@ public sealed class ResidentBuilders : MonoBehaviour
 
     /// <summary>
     /// The player has been away <paramref name="seconds"/> more (SettlementSystem, in a raid): the builders at home then put
-    /// in that much each, and are remembered for the message home. False when nobody could.
+    /// in that much each, and anyone else free to help their share (<see cref="Helps"/>), and are remembered for the message home.
+    /// False when nobody could.
     /// </summary>
     public static bool WorkAway(SettlementState settlement, float seconds, ResidentDefinition away)
     {
-        int builders = 0;
+        float hands = 0f;
         foreach (ResidentRecord record in settlement.Residents)
         {
-            if (Builds(record, away))
+            float share = Builds(record, away) ? 1f : Helps(record, away) && FreeToHelp(settlement, record) ? HomeLifeSettings.Current.HelperShare : 0f;
+            if (share > 0f)
             {
-                builders++;
+                hands += share;
                 if (!worked.Contains(record.Resident))
                 {
                     worked.Add(record.Resident);
@@ -83,12 +121,12 @@ public sealed class ResidentBuilders : MonoBehaviour
             }
         }
 
-        if (builders == 0 || seconds <= 0f)
+        if (hands <= 0f || seconds <= 0f)
         {
             return false;
         }
 
-        settlement.AddBuilderSeconds(seconds * builders);
+        settlement.AddBuilderSeconds(seconds * hands);
         return true;
     }
 

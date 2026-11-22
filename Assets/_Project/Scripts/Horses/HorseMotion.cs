@@ -1761,8 +1761,11 @@ public sealed class HorseMotion : MonoBehaviour
         bool grazing = mode == Idle.Graze && still && (horse.IsTamed || Time.time < until - 1.5f);
         animator.SetBool(EatingId, grazing && !drinking);
         animator.SetBool(DrinkingId, grazing && drinking);
-        animator.SetBool(SleepingId, mode == Idle.Stall && still && IsNight());
-        if (still && mode != Idle.Held && Time.time >= nextFidget)
+        // Asleep in its stall at night: once down it stays down through a little shuffle (a speed flicker lay it down and got it up
+        // again), and it doesn't shake its head or look about while asleep (a fidget left waiting played as it woke).
+        asleep = mode == Idle.Stall && !swimming && IsNight() && (asleep ? speed < 0.6f : still);
+        animator.SetBool(SleepingId, asleep);
+        if (still && !asleep && mode != Idle.Held && Time.time >= nextFidget)
         {
             nextFidget = Time.time + Random.Range(12f, 30f);
             if (mode == Idle.Ridden || mode == Idle.Stall || mode == Idle.Graze && !grazing)
@@ -1771,6 +1774,9 @@ public sealed class HorseMotion : MonoBehaviour
             }
         }
     }
+
+    // Lying down in its stall (Animate).
+    private bool asleep;
 
     private static bool IsNight()
     {

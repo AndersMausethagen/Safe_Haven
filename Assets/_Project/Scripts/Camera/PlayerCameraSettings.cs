@@ -43,6 +43,15 @@ public sealed class PlayerCameraSettings : ScriptableObject
     [Tooltip("Seconds the view takes to turn to something a story points at (Focus Camera) and back.")]
     [SerializeField, Min(0.01f)] private float focusBlendTime = 1.5f;
 
+    [Header("Riding")]
+    [Tooltip("In the saddle the view follows the horse's own body, and the rider's bob and sway on its back only this slowly " +
+             "(seconds): the rider is thrown back and forth with every stride, and a view tied to them shook (playtest 2026-11-22).")]
+    [SerializeField, Min(0.01f)] private float ridingSteadyTime = 0.35f;
+    [Tooltip("Metres the view leads ahead the way the horse runs at a gallop (sprint), for more of what is coming in sight.")]
+    [SerializeField, Range(0f, 6f)] private float gallopLead = 5.5f;
+    [Tooltip("Metres it leads at a canter (Gait 3 or faster without the gallop held).")]
+    [SerializeField, Range(0f, 6f)] private float canterLead = 2f;
+
     [Header("Close up (a fish on the line)")]
     [Tooltip("Seconds the view takes to come down close to something the player is busy with, and to go back.")]
     [SerializeField, Min(0.01f)] private float closeUpBlendTime = 1.1f;
@@ -129,6 +138,9 @@ public sealed class PlayerCameraSettings : ScriptableObject
     public float TransitionTime => transitionTime;
     public float ZoomSmoothTime => zoomSmoothTime;
     public float LookAheadSmoothTime => lookAheadSmoothTime;
+    public float RidingSteadyTime => ridingSteadyTime;
+    public float GallopLead => gallopLead;
+    public float CanterLead => canterLead;
     public float ZoomStep => zoomStep;
     public float InitialZoom => initialZoom;
     public float OrbitSensitivity => orbitSensitivity;

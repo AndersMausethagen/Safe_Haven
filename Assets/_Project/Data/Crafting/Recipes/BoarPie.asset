@@ -21,8 +21,8 @@ MonoBehaviour:
   itemCost:
   - item: {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
     amount: 2
-  - item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
-    amount: 2
+  - item: {fileID: 11400000, guid: 7b474eec64e460840bbcadb1a0fa3cf8, type: 2}
+    amount: 1
   - item: {fileID: 11400000, guid: 1dd65120c9bb0304c8a45a8012af934c, type: 2}
     amount: 1
   station: 9

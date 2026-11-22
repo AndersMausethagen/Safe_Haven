@@ -91,6 +91,11 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     [Header("Consumable")]
     [Tooltip("Health restored when the item is used (right-click in the inventory).")]
     [SerializeField, Min(0f)] private float healAmount;
+    [Tooltip("Health given at once when it is drunk or eaten, before Heal Amount comes over time (the Mending Draught: 30 at once, " +
+             "then 40 over 10 s). 0: all of it over time.")]
+    [SerializeField, Min(0f)] private float healAtOnce;
+    [Tooltip("Seconds Heal Amount comes over. 0: the usual (CombatTechniqueSettings › Heal Over Seconds).")]
+    [SerializeField, Min(0f)] private float healSeconds;
     [Tooltip("Hunger restored when the item is eaten (GDD §11).")]
     [SerializeField, Min(0f)] private float hungerRestore;
     [Tooltip("Thirst restored when the item is drunk.")]
@@ -234,6 +239,12 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     public ArrowDefinition Arrow => arrow;
     public bool IsArrow => arrow != null;
     public float HealAmount => healAmount;
+    /// <summary>Health given at once on drinking, before HealAmount over time.</summary>
+    public float HealAtOnce => healAtOnce;
+    /// <summary>Seconds HealAmount comes over; 0 for the usual.</summary>
+    public float HealSeconds => healSeconds;
+    /// <summary>All the health it gives, at once and over time.</summary>
+    public float HealTotal => healAmount + healAtOnce;
     public float HungerRestore => hungerRestore;
     public float ThirstRestore => thirstRestore;
     public float WaterCapacity => waterCapacity;
@@ -263,7 +274,7 @@ public sealed class ItemDefinition : ScriptableObject, IStackDefinition
     /// <summary>True when eating it gives timed bonuses.</summary>
     public bool HasBoon => boonBonuses.Count > 0 && boonSeconds > 0f;
     /// <summary>True for consumables: something restores health, hunger or thirst, gives a boon or cures when used.</summary>
-    public bool IsConsumable => healAmount > 0f || hungerRestore > 0f || thirstRestore > 0f || waterCapacity > 0f || HasBoon || cures.Count > 0 || gearRepair > 0f || placesInRaid != null;
+    public bool IsConsumable => healAmount > 0f || healAtOnce > 0f || hungerRestore > 0f || thirstRestore > 0f || waterCapacity > 0f || HasBoon || cures.Count > 0 || gearRepair > 0f || placesInRaid != null;
     public float GearRepair => gearRepair;
     public GameObject PlacesInRaid => placesInRaid;
     /// <summary>True when right-clicking does something: eat, drink, heal, equip or read.</summary>

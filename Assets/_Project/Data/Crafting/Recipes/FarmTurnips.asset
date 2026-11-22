@@ -16,7 +16,7 @@ MonoBehaviour:
   displayName: 
   output: {fileID: 11400000, guid: e562a89aa50aaad4e8e01141f4286a98, type: 2}
   outputResource: {fileID: 0}
-  outputAmount: 4
+  outputAmount: 3
   resourceCost: []
   itemCost:
   - item: {fileID: 11400000, guid: e562a89aa50aaad4e8e01141f4286a98, type: 2}
@@ -24,4 +24,9 @@ MonoBehaviour:
   station: 11
   craftSeconds: 240
   knownFromStart: 1
+  minimumStationTier: 0
+  requiredSkill: {fileID: 0}
+  requiredSkillLevel: 0
   sortOrder: 110
+  needsModule: {fileID: 0}
+  replaces: {fileID: 0}

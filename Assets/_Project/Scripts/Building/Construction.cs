@@ -462,7 +462,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Work = Mathf.Min(WorkNeeded, Work + Time.deltaTime * workSpeed);
         // Builders hammering beside the player (ResidentLife: the Carpenter and Mason at home) add their own work (AddWork): the
         // player's bar is what is left at their own pace, so it shortens as the others help, as work adds up in Palworld.
-        siteInteractable.Duration = siteInteractable.Progress * siteInteractable.Duration + Mathf.Max(0f, WorkNeeded - Work) / workSpeed;
+        siteInteractable.Duration = siteInteractable.Elapsed + Mathf.Max(0f, WorkNeeded - Work) / workSpeed;
         ShowRise();
         if (Time.time >= nextBlow)
         {
@@ -504,6 +504,9 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             Techniques.Used(PerkTechnique.RaiseInADay);
         }
         siteInteractable.Duration = Mathf.Max(0.1f, (WorkNeeded - Work) / workSpeed);
+        // Work is kept when the player stops (Work is never reset on Cancelled): the bar shows the building's share done, so
+        // starting again carries on where it was left instead of filling from empty over the time that is left.
+        siteInteractable.ShownProgress = () => Share;
         nextBlow = Time.time + 0.15f;
     }
 

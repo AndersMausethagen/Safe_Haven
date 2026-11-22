@@ -553,13 +553,13 @@ public sealed class ItemInventory : MonoBehaviour
         }
 
         var needs = GetComponent<PlayerNeeds>();
-        bool heals = item.HealAmount > 0f && health.CurrentHealth < health.MaxHealth;
+        bool heals = item.HealTotal > 0f && health.CurrentHealth < health.MaxHealth;
         bool feeds = needs != null && needs.WouldHelp(item.HungerRestore, item.ThirstRestore);
         // A meal's bonuses are worth eating for on a full belly: that is the meal before a raid.
         bool helps = item.HasBoon || (item.Cures.Count > 0 && Cures(item));
         if (!heals && !feeds && !helps)
         {
-            GameMessages.Post(item.HealAmount > 0f && item.HungerRestore <= 0f && item.ThirstRestore <= 0f
+            GameMessages.Post(item.HealTotal > 0f && item.HungerRestore <= 0f && item.ThirstRestore <= 0f
                 ? "Already at full health."
                 : "You don't need that right now.", MessageKind.Warning);
             return false;
@@ -580,7 +580,7 @@ public sealed class ItemInventory : MonoBehaviour
         from.RemoveAt(slot, 1);
         if (heals)
         {
-            float healed = health.Heal(item.HealAmount);
+            float healed = health.Heal(item.HealTotal);
             GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(healed)} health", MessageKind.Gain);
         }
 

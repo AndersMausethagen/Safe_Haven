@@ -96,7 +96,7 @@ public static class CraftedWork
             return CraftedGoods.Meals;
         }
 
-        if (item.Category == ItemCategory.Consumable && item.HealAmount > 0f)
+        if (item.Category == ItemCategory.Consumable && item.HealTotal > 0f)
         {
             return CraftedGoods.Tonics;
         }

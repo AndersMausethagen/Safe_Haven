@@ -89,6 +89,16 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: f243c15300698e044a98d785099354c6, type: 2}
       amount: 2
     points: 1
+  - id: hangings
+    name: Woven Hangings
+    icon: Flag
+    description: 'Linen hung on the walls against the draughts: a warmer, quieter house.'
+    cost:
+    - item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+      amount: 6
+    - item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+      amount: 2
+    points: 1
   levels:
   - name: Bare
     quality: 0
@@ -165,7 +175,19 @@ MonoBehaviour:
   pathsOnlyAtHome: 1
   wearPerStep: 0.04
   wearRegrowth: 0.0006
+  mealsFrom: {fileID: 11400000, guid: 5fc659bb8c8927248a51373740a3a65e, type: 2}
+  dailyHunger: 40
+  mostMealTier: 2
+  uneaten:
+  - {fileID: 11400000, guid: 8dbb4db9361b13f4d9df890da55ab723, type: 2}
+  - {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+  - {fileID: 11400000, guid: 0318e752045b5e54f87bb7ba2814fb8e, type: 2}
+  - {fileID: 11400000, guid: 389ceb339c3db65489b99ee795eac79c, type: 2}
+  - {fileID: 11400000, guid: c21953f6b8b2a344fab83a50731723fa, type: 2}
+  wellFedWork: 0.1
+  hungryWork: 0.25
   builders:
   - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
   - {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
   builderWorkPerSecond: 0.5
+  helperShare: 0.5

@@ -181,8 +181,8 @@ public sealed class DayNightCycle : MonoBehaviour, ISaveable, ISharedState
 
         for (int i = 0; i < Mathf.Min(dawns, 30); i++)
         {
-            GameSession.Home.PassDay();
-            global::Territory.Turn(true);
+            // The day counts, the people eat, the lands turn (HavenDawn).
+            HavenDawn.Pass();
         }
     }
 

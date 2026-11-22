@@ -70,6 +70,8 @@ public static class ContentAudit
         "WorkerSettings.fellingTool", "FarmSettings.waterCarried",
         // Only shown in a mason's hand at a quarry ring; the stores counted along the top of the Keeper's view.
         "WorkerSettings.quarryTool", "KeeperViewSettings.stores",
+        // The herbs a module makes one fewer of (the Herb Rack: no recipe of its own); the raw meat and fish residents leave for the cook.
+        "BuildingModuleDefinition.oneFewer", "HomeLifeSettings.uneaten",
     };
 
     private static readonly string[] RecipeTeachers =
@@ -100,6 +102,8 @@ public static class ContentAudit
         "BuildingModuleDefinition.buildings",
         // What standing near a home makes it better (HomeLifeSettings › Features).
         "HomeLifeSettings.features[].near[]",
+        // Once it stands the Haven's people eat from the chests (ResidentMeals): needs it standing, teaches nothing.
+        "HomeLifeSettings.mealsFrom",
     };
 
     private static readonly string[] MonsterAsks = { "QuestDefinition.objectives", "JournalSettings.", "RaidDefinition.knownEnemies" };

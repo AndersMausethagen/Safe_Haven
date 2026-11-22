@@ -390,17 +390,30 @@ public sealed class HavenTownTests
         Assert.AreEqual(1, ResidentBuilders.Count(settlement, people[0]), "the carpenter went along on the raid");
         StringAssert.DoesNotContain(people[0].DisplayName, ResidentBuilders.Names(settlement, people[0]));
 
+        // The third, no builder, lends a hand at Helper Share (2026-11-22): counted apart from the builders.
+        float hand = settings.HelperShare;
+        Assert.Greater(hand, 0f, "everyone else helps at the scaffolds");
+        Assert.IsTrue(ResidentBuilders.Helps(settlement.Find(people[2])));
+        Assert.IsFalse(ResidentBuilders.Helps(settlement.Find(people[0])), "a builder builds, at full pace");
+        Assert.AreEqual(hand, ResidentBuilders.ShareOf(settlement.Find(people[2])), 0.001f);
+        Assert.AreEqual(1f, ResidentBuilders.ShareOf(settlement.Find(people[0])), 0.001f);
+
         settlement.Find(people[1]).WorkPaused = true;
+        settlement.Find(people[2]).WorkPaused = true;
         Assert.AreEqual(1, ResidentBuilders.Count(settlement), "the mason's work is paused");
         Assert.AreEqual(0, ResidentBuilders.Count(settlement, people[0]), "nobody at home to build");
         Assert.IsFalse(ResidentBuilders.WorkAway(settlement, 10f, people[0]), "no work done");
         Assert.AreEqual(0f, settlement.BuilderSeconds);
 
+        settlement.Find(people[2]).WorkPaused = false;
+        Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, people[0]), "the helper alone");
+        Assert.AreEqual(10f * hand, settlement.TakeBuilderSeconds(), 0.01f, "at their share");
+
         settlement.Find(people[1]).WorkPaused = false;
         Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, null));
-        Assert.AreEqual(20f, settlement.BuilderSeconds, 0.01f, "builder-seconds: ten seconds, two at home");
+        Assert.AreEqual(20f + 10f * hand, settlement.BuilderSeconds, 0.01f, "builder-seconds: ten seconds, two builders and a helper at home");
         Assert.IsTrue(ResidentBuilders.WorkAway(settlement, 10f, people[0]));
-        Assert.AreEqual(30f, settlement.TakeBuilderSeconds(), 0.01f, "the next ten seconds with the carpenter away");
+        Assert.AreEqual(30f + 20f * hand, settlement.TakeBuilderSeconds(), 0.01f, "the next ten seconds with the carpenter away");
     }
 
     [Test]

@@ -258,7 +258,7 @@ public static class SaveMapper
 
         foreach (ResidentRecord record in settlement.Residents)
         {
-            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet });
+            into.residents.Add(new ResidentSaveData { id = record.Resident.Id, workPaused = record.WorkPaused, job = record.Job != null ? record.Job.Id : "", raidsAlong = record.RaidsAlong, killsAlong = record.KillsAlong, timesHelpedUp = record.TimesHelpedUp, memory = (int)record.Memory, remembers = ToSaved(record.Remembers), forgotten = ToSaved(record.Forgotten), stranger = record.IsStranger, comingBack = (int)record.ComingBack, allCameBack = record.AllCameBack, workDone = record.WorkDone, taughtSinceRaid = record.TaughtSinceRaid, home = record.Home ?? "", homeChosen = record.HomeChosen ?? "", workplace = record.Workplace ?? "", workQueue = record.WorkQueue ?? "", haulDone = record.HaulDone, workGear = record.WorkGear != null ? record.WorkGear.Id : "", wishMet = record.WishMet, meal = (int)record.Meal });
         }
 
         foreach (KeyValuePair<string, List<string>> house in settlement.HouseComforts)
@@ -401,6 +401,7 @@ public static class SaveMapper
                 restored.WorkQueue = entry.workQueue ?? "";
                 restored.HaulDone = Math.Max(0f, entry.haulDone);
                 restored.WishMet = entry.wishMet;
+                restored.Meal = System.Enum.IsDefined(typeof(ResidentMeal), entry.meal) ? (ResidentMeal)entry.meal : ResidentMeal.Fed;
                 restored.WorkGear = string.IsNullOrEmpty(entry.workGear) ? null : Resolve(content.FindItem(entry.workGear), "item", entry.workGear, missing);
             }
         }

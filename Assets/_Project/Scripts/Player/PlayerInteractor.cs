@@ -23,6 +23,13 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
     private Interactable current;
     private bool isInteracting;
 
+    /// <summary>How long Interact is held on something with a hold of its own (IInteractionHold) before the hold runs, not the tap.</summary>
+    public const float HoldSeconds = 0.35f;
+
+    // Pressed on something with a hold of its own: waiting to see whether it is a tap or a hold (UpdateHold).
+    private Interactable pressed;
+    private float pressedAt;
+
     /// <summary>The interaction in progress, or null.</summary>
     public Interactable Current => isInteracting ? current : null;
 
@@ -62,6 +69,11 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
 
     private void Update()
     {
+        if (pressed != null)
+        {
+            UpdateHold();
+        }
+
         if (!isInteracting)
         {
             return;
@@ -162,6 +174,47 @@ public sealed class PlayerInteractor : MonoBehaviour, IPlayerActivity
             return;
         }
 
+        // Something that does another thing when held (IInteractionHold): wait for the release, or the hold, before either.
+        if (target.TryGetComponent(out IInteractionHold hold) && hold.HoldVerb(gameObject) != null && CanInteractWith(target, out _))
+        {
+            pressed = target;
+            pressedAt = Time.unscaledTime;
+            return;
+        }
+
+        Begin(target);
+    }
+
+    // A press waiting to be a tap or a hold: let go early, the tap runs (Begin); held on, the hold does. Walking off, a window opening or
+    // the target going forgets the press.
+    private void UpdateHold()
+    {
+        Interactable target = pressed;
+        bool down = GameInput.Interact != null && GameInput.Interact.IsPressed();
+        if (target == null || !target.isActiveAndEnabled || !CanInteractWith(target, out _) || !target.TryGetComponent(out IInteractionHold hold))
+        {
+            pressed = null;
+            return;
+        }
+
+        if (down && Time.unscaledTime - pressedAt < HoldSeconds)
+        {
+            return;
+        }
+
+        pressed = null;
+        if (down && hold.HoldVerb(gameObject) != null)
+        {
+            hold.Held(gameObject);
+        }
+        else
+        {
+            Begin(target);
+        }
+    }
+
+    private void Begin(Interactable target)
+    {
         if (!CanInteractWith(target, out string blockedReason) || !target.TryBegin(gameObject, out blockedReason))
         {
             GameMessages.Post(blockedReason, MessageKind.Warning);

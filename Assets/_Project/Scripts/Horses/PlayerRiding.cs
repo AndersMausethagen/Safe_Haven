@@ -445,6 +445,7 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
         {
             PlayerCameraController.Current.SetCloseness(this, 1f);
             PlayerCameraController.Current.SetLead(this, Vector3.zero);
+            PlayerCameraController.Current.SetSteadyAnchor(null);
         }
 
         stateMachine.CanFightAboard = false;
@@ -570,11 +571,20 @@ public sealed class PlayerRiding : MonoBehaviour, IPlayerActivity
         // The view draws back a little at a gallop, for the ground ahead.
         if (PlayerCameraController.Current != null)
         {
-            PlayerCameraController.Current.SetCloseness(this, Riding.Motion.IsGalloping ? 1.15f : 1f);
-            // At a gallop it leads the view the way it runs, for more of what is coming in sight.
+            PlayerCameraController camera = PlayerCameraController.Current;
+            camera.SetCloseness(this, Riding.Motion.IsGalloping ? 1.15f : 1f);
+            // The view follows the horse's steady body, not the rider bobbing on its back (PlayerCameraController.FollowPoint).
+            camera.SetSteadyAnchor(Riding.transform);
+            // At a gallop it leads the view well ahead the way it runs (a canter a little), for more of what is coming in sight: along
+            // the horse's facing, which holds steady through a stride where its velocity sways.
             Vector3 run = Riding.Motion.Velocity;
             run.y = 0f;
-            PlayerCameraController.Current.SetLead(this, Riding.Motion.IsGalloping && run.sqrMagnitude > 1f ? run.normalized * 3f : Vector3.zero);
+            Vector3 ahead = Riding.transform.forward;
+            ahead.y = 0f;
+            PlayerCameraSettings view = camera.Settings;
+            float lead = run.sqrMagnitude <= 1f || view == null ? 0f
+                : Riding.Motion.IsGalloping ? view.GallopLead : Riding.Motion.Gait >= 3 ? view.CanterLead : 0f;
+            camera.SetLead(this, lead > 0f && ahead.sqrMagnitude > 0.01f ? ahead.normalized * lead : Vector3.zero);
         }
 
         // From the saddle with a weapon only: bare fists can't reach anything from up there.

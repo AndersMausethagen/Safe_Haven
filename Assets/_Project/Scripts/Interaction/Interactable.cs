@@ -67,8 +67,20 @@ public sealed class Interactable : MonoBehaviour
     public bool IsAvailable => isActiveAndEnabled && !inUse;
     /// <summary>Who is working on this right now. Still set while the Completed and Cancelled events run.</summary>
     public GameObject Interactor => interactor;
-    /// <summary>0-1 progress toward completion; stays 0 for interactions without a duration.</summary>
-    public float Progress => duration > 0f && !HoldOpen ? Mathf.Clamp01(elapsed / duration) : 0f;
+    /// <summary>
+    /// 0-1 progress toward completion; stays 0 for interactions without a duration. Work that is kept between tries (a scaffold
+    /// half raised) shows its own share instead (ShownProgress), so stopping and starting again does not empty the bar.
+    /// </summary>
+    public float Progress => duration > 0f && !HoldOpen ? (ShownProgress != null ? Mathf.Clamp01(ShownProgress()) : Mathf.Clamp01(elapsed / duration)) : 0f;
+
+    /// <summary>Seconds into the current interaction.</summary>
+    public float Elapsed => inUse ? elapsed : 0f;
+
+    /// <summary>
+    /// The share shown while working when the work outlives one try (Construction: the building's share done). Set from Started;
+    /// cleared when the interaction ends.
+    /// </summary>
+    public System.Func<float> ShownProgress { get; set; }
 
     /// <summary>
     /// Ignores the duration for the current interaction, so it runs until Complete() is called (the gathering minigame
@@ -305,6 +317,7 @@ public sealed class Interactable : MonoBehaviour
         inUse = false;
         elapsed = 0f;
         HoldOpen = false;
+        ShownProgress = null;
 
         try
         {

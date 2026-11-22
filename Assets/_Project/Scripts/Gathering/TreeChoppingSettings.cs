@@ -36,6 +36,10 @@ public sealed class TreeChoppingSettings : GameSettings<TreeChoppingSettings>
     [SerializeField, Range(0f, 1f)] private float chancePerAxeTier = 0.2f;
     [SerializeField, Range(0f, 1f)] private float chancePerSize = 0.12f;
     [SerializeField, Range(0f, 1f)] private float maxChance = 0.75f;
+    [Tooltip("Away from a raid (the Haven, the prologue), logs come out no better than this wood tier: 2, Hardwood. Elderwood is a " +
+             "raid wood (the user, 2026-11-22, on Docs/EconomyAndPhases_2026-11-22.md: \"Elderwood can be raid exclusive\"). A tree " +
+             "of its own wood is still that wood.")]
+    [SerializeField, Min(1)] private int homeMaxWoodTier = 2;
 
     [Header("Terrain trees")]
     [Tooltip("The invisible stand-in a painted terrain tree gets near the player (TerrainTreeFelling): the Tree node.")]
@@ -248,10 +252,14 @@ public sealed class TreeChoppingSettings : GameSettings<TreeChoppingSettings>
         return Mathf.Clamp(baseChance + chancePerAxeTier * above + chancePerSize * (size - 1f), 0f, maxChance);
     }
 
-    /// <summary>The wood one log comes out as, given a roll from 0 to 1 per wood tier tried (best first).</summary>
-    public ItemDefinition RollLog(int axeTier, float size, System.Func<float> roll)
+    /// <summary>The best wood tier a log can come out as away from a raid.</summary>
+    public int HomeMaxWoodTier => homeMaxWoodTier;
+
+    /// <summary>The wood one log comes out as, given a roll from 0 to 1 per wood tier tried (best first), no better than
+    /// <paramref name="maxTier"/>.</summary>
+    public ItemDefinition RollLog(int axeTier, float size, System.Func<float> roll, int maxTier = int.MaxValue)
     {
-        for (int tier = woodByTier.Count; tier >= 2; tier--)
+        for (int tier = Mathf.Min(woodByTier.Count, maxTier); tier >= 2; tier--)
         {
             ItemDefinition wood = woodByTier[tier - 1];
             if (wood != null && roll() < ChanceOf(tier, axeTier, size))

@@ -135,7 +135,7 @@ public sealed class WoundTending : MonoBehaviour
             return 0f;
         }
 
-        float share = player != null ? item.HealAmount / player.MaxHealth : item.HealAmount / 100f;
+        float share = player != null ? item.HealTotal / player.MaxHealth : item.HealTotal / 100f;
         return health.Heal(health.MaxHealth * share * AllyCareSettings.Current.TendStrength);
     }
 
@@ -151,8 +151,8 @@ public sealed class WoundTending : MonoBehaviour
         for (int i = 0; i < bag.SlotCount; i++)
         {
             ItemStack stack = bag.GetSlot(i);
-            if (!stack.IsEmpty && stack.Item.HealAmount > 0f && stack.Item.Category == ItemCategory.Consumable
-                && (best == null || stack.Item.HealAmount < best.HealAmount))
+            if (!stack.IsEmpty && stack.Item.HealTotal > 0f && stack.Item.Category == ItemCategory.Consumable
+                && (best == null || stack.Item.HealTotal < best.HealTotal))
             {
                 best = stack.Item;
             }

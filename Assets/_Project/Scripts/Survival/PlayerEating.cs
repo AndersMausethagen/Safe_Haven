@@ -162,30 +162,44 @@ public sealed class PlayerEating : MonoBehaviour, IPlayerActivity
         }
 
         // Potent Remedies make draughts heal more; Hearty Meals make food heal at all.
-        float heal = item.HealAmount * (kind == CraftedGoods.Tonics && Techniques.Has(PerkTechnique.PotentRemedies) ? 1f + techniques.PotentHeal : 1f);
+        float potent = kind == CraftedGoods.Tonics && Techniques.Has(PerkTechnique.PotentRemedies) ? 1f + techniques.PotentHeal : 1f;
+        float heal = item.HealAmount * potent;
+        // A draught that heals some at once (the Mending Draught) gives that now, the rest over its own time.
+        float atOnce = item.HealAtOnce * potent;
+        if (atOnce > 0f)
+        {
+            health.Heal(atOnce);
+        }
+
         if (kind == CraftedGoods.Meals && Techniques.Has(PerkTechnique.HeartyMeals))
         {
             heal += health.MaxHealth * techniques.HeartyHeal;
             Techniques.Used(PerkTechnique.HeartyMeals);
         }
 
-        if (kind == CraftedGoods.Tonics && item.HealAmount > 0f && Techniques.Has(PerkTechnique.PotentRemedies))
+        if (kind == CraftedGoods.Tonics && item.HealTotal > 0f && Techniques.Has(PerkTechnique.PotentRemedies))
         {
             Techniques.Used(PerkTechnique.PotentRemedies);
         }
 
         if (heal > 0f)
         {
-            float seconds = Mathf.Max(0.01f, Rules.HealOverSeconds);
+            float over = item.HealSeconds > 0f ? item.HealSeconds : Rules.HealOverSeconds;
+            float seconds = Mathf.Max(0.01f, over);
             healLeft += heal;
             healPerSecond = Mathf.Max(healPerSecond, heal / seconds);
-            if (Rules.HealOverSeconds <= 0f)
+            if (over <= 0f)
             {
                 health.Heal(healLeft);
                 healLeft = 0f;
             }
 
-            GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(heal)} health over {Rules.HealOverSeconds:0} s", MessageKind.Gain);
+            GameMessages.Post(atOnce > 0f ? $"{item.DisplayName}: +{Mathf.RoundToInt(atOnce)} health, then +{Mathf.RoundToInt(heal)} over {over:0} s"
+                : $"{item.DisplayName}: +{Mathf.RoundToInt(heal)} health over {over:0} s", MessageKind.Gain);
+        }
+        else if (atOnce > 0f)
+        {
+            GameMessages.Post($"{item.DisplayName}: +{Mathf.RoundToInt(atOnce)} health", MessageKind.Gain);
         }
 
         // A cook knows how to make a meal last, an alchemist a tonic (the Cooking and Alchemy skills).

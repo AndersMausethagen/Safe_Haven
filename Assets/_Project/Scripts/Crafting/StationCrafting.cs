@@ -222,6 +222,17 @@ public static class StationCrafting
         List<RecipeDefinition> recipes = KnownRecipesFor(user, type);
         if (queue != null)
         {
+            // A module's thriftier copy stands in for its recipe in place (it is in no recipe book); a variant asset that is known
+            // already sits in the list, and the recipe it beats leaves it.
+            for (int i = 0; i < recipes.Count; i++)
+            {
+                RecipeDefinition open = RecipeVariants.OpenAt(recipes[i], queue);
+                if (open != null && open.IsThriftierCopy)
+                {
+                    recipes[i] = open;
+                }
+            }
+
             recipes.RemoveAll(recipe => RecipeVariants.OpenAt(recipe, queue) != recipe && recipes.Contains(RecipeVariants.OpenAt(recipe, queue)));
         }
 

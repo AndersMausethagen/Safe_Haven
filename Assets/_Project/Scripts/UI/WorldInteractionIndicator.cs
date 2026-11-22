@@ -193,7 +193,10 @@ public sealed class WorldInteractionIndicator : MonoBehaviour
             }
             else if (IsReady)
             {
-                SetText(status, GameInput.WithRebinds(Target.TryGetComponent(out IInteractionVerb verb) ? "[{key:Interact}] " + verb.Verb : "[{key:Interact}] Interact"));
+                string tap = Target.TryGetComponent(out IInteractionVerb verb) ? "[{key:Interact}] " + verb.Verb : "[{key:Interact}] Interact";
+                // What holding the key does instead, when it does something else (a horse: hold to get on).
+                string held = Target.TryGetComponent(out IInteractionHold hold) && Player.Current != null ? hold.HoldVerb(Player.Current.gameObject) : null;
+                SetText(status, GameInput.WithRebinds(held != null ? tap + "   Hold [{key:Interact}] " + held : tap));
             }
             else
             {

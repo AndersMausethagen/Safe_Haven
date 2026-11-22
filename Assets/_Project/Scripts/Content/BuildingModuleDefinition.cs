@@ -42,6 +42,9 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     [Tooltip("Counts only while someone works at the building (a resident's job).")]
     [SerializeField] private bool staffed;
     [SerializeField] private BuildingBonus bonus = new BuildingBonus();
+    [Tooltip("Ingredients its station's recipes need one fewer of while a recipe needs more than one (the Herb Rack: herbs in " +
+             "draughts and tonics, 2 Healing Herb becomes 1). Worked out from each recipe, no recipe asset for each (RecipeVariants).")]
+    [SerializeField] private List<ItemDefinition> oneFewer = new List<ItemDefinition>();
 
     [Header("What it costs")]
     [SerializeField] private List<ItemAmount> cost = new List<ItemAmount>();
@@ -54,6 +57,8 @@ public sealed class BuildingModuleDefinition : ScriptableObject
     [SerializeField] private GameObject dressing;
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
+    /// <summary>Ingredients its station's recipes need one fewer of, while they need more than one.</summary>
+    public IReadOnlyList<ItemDefinition> OneFewer => oneFewer;
     public string DisplayName => string.IsNullOrWhiteSpace(displayName) ? name : displayName;
     public string Description => description;
     public Sprite Icon => icon;
@@ -103,6 +108,20 @@ public sealed class BuildingModuleDefinition : ScriptableObject
         if (bonus.turnBackShare > 0f) parts.Add($"{bonus.turnBackShare * 100f:0}% of each blow comes back on the striker");
         if (bonus.fineChance > 0f) parts.Add($"gear Fine {bonus.fineChance * 100f:0}% more often");
         if (bonus.mendCostShare > 0f) parts.Add($"mending it costs {bonus.mendCostShare * 100f:0}% more");
+        if (oneFewer.Count > 0)
+        {
+            var named = new List<string>();
+            foreach (ItemDefinition item in oneFewer)
+            {
+                if (item != null)
+                {
+                    named.Add(item.DisplayName);
+                }
+            }
+
+            parts.Add($"one {string.Join(" or ", named)} fewer in each recipe that needs two or more");
+        }
+
         // What it opens at the station: a thriftier way to make something, or something new (RecipeDefinition › Needs Module).
         ContentDatabase content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         foreach (RecipeDefinition recipe in content != null ? content.Recipes : (IReadOnlyList<RecipeDefinition>)System.Array.Empty<RecipeDefinition>())
