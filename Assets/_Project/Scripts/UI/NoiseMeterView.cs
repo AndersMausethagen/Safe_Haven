@@ -65,7 +65,7 @@ public sealed class NoiseMeterView : MonoBehaviour
         }
 
         float level = noise.Level;
-        fill.anchorMax = new Vector2(Mathf.Clamp01(level / PerceptionSettings.Current.NoiseMeterMax), 1f);
+        KitBar.Drive(fill, level / PerceptionSettings.Current.NoiseMeterMax, true);
         NoiseBand band = noise.Band;
         int metres = Mathf.Max(1, Mathf.RoundToInt(level));
         bool sneaking = noise.IsSneaking;

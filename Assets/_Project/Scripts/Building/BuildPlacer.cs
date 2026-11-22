@@ -52,6 +52,11 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
     [SerializeField, Range(5f, 90f)] private float rotationStep = 45f;
     [Tooltip("Degrees turned per mouse-wheel step while Shift is held.")]
     [SerializeField, Range(1f, 45f)] private float fineRotationStep = 15f;
+    [Tooltip("Degrees per mouse-wheel step while Free Place is held: it turns smoothly, off the steps, as it places (the user, " +
+             "2026-11-22: \"we can smoothly place, but not rotate\"). With Fine Rotate held too, a third of it.")]
+    [SerializeField, Range(0.5f, 15f)] private float smoothRotationStep = 3f;
+    [Tooltip("Degrees a second a held bumper turns it while Free Place is held (gamepad).")]
+    [SerializeField, Range(10f, 360f)] private float smoothRotationSpeed = 90f;
     [Tooltip("A building this close (meters) to the side of another snaps flush against it. 0 turns it off.")]
     [SerializeField, Min(0f)] private float snapDistance = 0.75f;
     [Tooltip("Lines (walls, palisades) point in multiples of this many degrees unless Alt is held. 0 = any angle.")]
@@ -320,11 +325,11 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             hint.Append(building.PlaceInLines ? ", or hold it and walk to build a line, as many as you like" : "");
             hint.Append(CameraPointer.UsesScreenCenter ? ". Aim with the camera" : ". The right stick moves the spot");
             hint.Append($", {ControllerGlyphs.For("<Gamepad>/leftShoulder", pad)} {ControllerGlyphs.For("<Gamepad>/rightShoulder", pad)} turn it");
-            hint.Append($" (hold {GameInput.KeyLabel(GameInput.BuildFineRotate)} for small turns, {GameInput.KeyLabel(GameInput.BuildFreePlace)} to place freely), {GameInput.KeyLabel(GameInput.Back)} cancels.");
+            hint.Append($" (hold {GameInput.KeyLabel(GameInput.BuildFineRotate)} for small turns, {GameInput.KeyLabel(GameInput.BuildFreePlace)} to place and turn freely), {GameInput.KeyLabel(GameInput.Back)} cancels.");
         }
         else
         {
-            hint.Append($"Place the {building.DisplayName}: left-click to build");
+            hint.Append($"Place the {building.DisplayName}: left-click to build, scroll to turn it (hold {GameInput.KeyLabel(GameInput.BuildFreePlace)} to place and turn freely)");
             hint.Append(building.PlaceInLines ? ", or drag to build a line: it follows the way you draw, curves too (scroll while dragging to bend it round the portal). " +
                 "Keep placing as many as you like; right-click stops." : ".");
         }
@@ -403,13 +408,20 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
 
         bool free = GameInput.BuildFreePlace.IsPressed();
         bool fine = GameInput.BuildFineRotate.IsPressed();
-        float scroll = GameInput.BuildRotate.ReadValue<float>();
+        float held = GameInput.BuildRotate.ReadValue<float>();
+        float scroll = held;
         // The wheel turns a notch per frame it moves; a bumper is held, so it turns once per press.
         if (InputDevices.UsingGamepad && !GameInput.BuildRotate.WasPressedThisFrame())
         {
             scroll = 0f;
         }
-        if (!drawingLine && Mathf.Abs(scroll) > 0.01f)
+        if (!drawingLine && free && Mathf.Abs(held) > 0.01f)
+        {
+            // Placing freely, it turns freely: a few degrees a notch, or steadily while a bumper is held.
+            float turn = InputDevices.UsingGamepad ? smoothRotationSpeed * Time.unscaledDeltaTime : fine ? smoothRotationStep / 3f : smoothRotationStep;
+            yaw = Mathf.Repeat(yaw + Mathf.Sign(held) * turn, 360f);
+        }
+        else if (!drawingLine && Mathf.Abs(scroll) > 0.01f)
         {
             yaw = Mathf.Repeat(yaw + Mathf.Sign(scroll) * (fine ? fineRotationStep : rotationStep), 360f);
         }

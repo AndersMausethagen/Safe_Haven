@@ -128,7 +128,7 @@ public sealed class TransportHud : MonoBehaviour
             writtenLoad = now;
             load.text = $"{now.Item1} / {now.Item2}   <alpha=#AA>{now.Item3}% slower";
         }
-        fill.anchorMax = new Vector2(Mathf.Clamp01(used.Weight / used.Definition.Capacity), 1f);
+        KitBar.Drive(fill, used.Weight / used.Definition.Capacity);
         fillImage.color = used.IsOverfilled ? style.Warning : style.Accent;
     }
 }

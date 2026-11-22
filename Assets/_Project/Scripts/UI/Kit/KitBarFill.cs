@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
+/// Every progress bar's fill (the user, 2026-11-22: "Some progress bars dont have the same shader as the newer ones. Make that one
+/// class, so all progress bars shares functionality"): made through KitBar (Make, or Drive on a bar a window lays out itself).
 /// A kit bar's fill made alive (Hearthline 3, "Safe Haven/UI Kit Bar"): it glides to a new value instead of jumping,
 /// pulses when it grows, and keeps its shader told its size so its ends stay round. Each bar has its own material (its
 /// size and the phase of its shine are its own). Drives the fill through its right anchor: the fill is a stretched child
@@ -76,13 +78,15 @@ public sealed class KitBarFill : MonoBehaviour
         }
     }
 
-    /// <summary>Glides to <paramref name="fraction"/> in <paramref name="colour"/>; the first value is shown at once.</summary>
-    public void Show(float fraction, Color colour)
+    /// <summary>Glides to <paramref name="fraction"/> in <paramref name="colour"/>; the first value is shown at once. Steady: it follows the
+    /// value exactly, with no pulse, for a bar that moves every frame (a hold, a craft, a timer), which a glide would lag and every
+    /// step of which would pulse.</summary>
+    public void Show(float fraction, Color colour, bool steady = false)
     {
         Init();
         drives = true;
         fraction = Mathf.Clamp01(fraction);
-        if (shown < 0f)
+        if (shown < 0f || steady)
         {
             shown = fraction;
         }

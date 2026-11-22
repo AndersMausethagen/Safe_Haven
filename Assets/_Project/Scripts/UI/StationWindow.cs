@@ -413,7 +413,7 @@ public sealed class StationWindow : MonoBehaviour
 
         StationQueue queue = station.Queue;
         float fraction = queue.Current != null ? Mathf.Clamp01(queue.Progress / queue.Current.CraftSeconds) : 0f;
-        progressFill.anchorMax = new Vector2(queue.Blocked ? 1f : fraction, 1f);
+        KitBar.Drive(progressFill, queue.Blocked ? 1f : fraction, true);
         if (progressImage != null)
         {
             // The bar warms towards the accent as the craft nears done, and breathes red when the output is full.

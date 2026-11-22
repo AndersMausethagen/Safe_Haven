@@ -38,7 +38,7 @@ public sealed class HorseHud : MonoBehaviour
         public void Set(float fraction, Color colour)
         {
             Fill.color = colour;
-            Fill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(fraction), 1f);
+            KitBar.Drive(Fill.rectTransform, fraction, true);
         }
     }
 

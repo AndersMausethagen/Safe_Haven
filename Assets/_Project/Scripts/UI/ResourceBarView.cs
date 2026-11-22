@@ -34,8 +34,8 @@ public sealed class ResourceBarView : MonoBehaviour
     public void SetValues(int amount, int capacity)
     {
         float fraction = capacity > 0 ? Mathf.Clamp01((float)amount / capacity) : 0f;
-        // Anchoring the right edge keeps the bar independent of any sprite or layout settings.
-        fill.rectTransform.anchorMax = new Vector2(fraction, 1f);
+        // The kit bar, moved by its right edge: independent of any sprite or layout settings.
+        KitBar.Drive(fill.rectTransform, fraction);
         amountLabel.text = $"{amount}/{capacity}";
     }
 }

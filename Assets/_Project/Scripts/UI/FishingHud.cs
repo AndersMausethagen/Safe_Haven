@@ -171,7 +171,7 @@ public sealed class FishingHud : MonoBehaviour
         charge.SetActive(state == PlayerFishing.Phase.Charging);
         if (state == PlayerFishing.Phase.Charging)
         {
-            chargeFill.anchorMax = new Vector2(fishing.Charge, 1f);
+            KitBar.Drive(chargeFill, fishing.Charge, true);
         }
 
         bool biting = state == PlayerFishing.Phase.Bite && fishing.Bobber != null && view != null;
@@ -207,12 +207,13 @@ public sealed class FishingHud : MonoBehaviour
             if (tenths != writtenTenths)
             {
                 writtenTenths = tenths;
-                string key = GameInput.KeyLabel(GameInput.Dodge);
+                // The pad's button by name; on a keyboard "SPACE" as always (its label is the layout's own word, "Mellomrom").
+                string key = InputDevices.UsingGamepad ? GameInput.KeyLabel(GameInput.Dodge) : "";
                 struggleText.text = $"{(string.IsNullOrEmpty(key) ? "SPACE" : key.ToUpperInvariant())}!  <size=50%><alpha=#AA>{secondsLeft:0.0}s";
             }
 
             struggleText.transform.localScale = Vector3.one * (1f + Mathf.PingPong(Time.time * 6f, 0.15f));
-            struggleFill.anchorMax = new Vector2(nokken != null ? nokken.Struggle : web.Struggle, 1f);
+            KitBar.Drive(struggleFill, nokken != null ? nokken.Struggle : web.Struggle, true);
         }
     }
 

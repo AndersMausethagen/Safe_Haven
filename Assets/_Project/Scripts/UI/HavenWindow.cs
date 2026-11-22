@@ -187,7 +187,7 @@ public sealed class HavenWindow : MonoBehaviour
         float shown = Mathf.Clamp01(age / RiseSeconds);
         panel.anchoredPosition = new Vector2(0f, (1f - shown) * (1f - shown) * -RiseUnits);
         float climbed = Mathf.Clamp01(age / ClimbSeconds);
-        climbFill.anchorMax = new Vector2(climb * (1f - (1f - climbed) * (1f - climbed)), 1f);
+        KitBar.Drive(climbFill, climb * (1f - (1f - climbed) * (1f - climbed)), true);
         if (Time.unscaledTime >= nextRead)
         {
             Read();
@@ -208,7 +208,7 @@ public sealed class HavenWindow : MonoBehaviour
         }
 
         openedAt = Time.unscaledTime;
-        climbFill.anchorMax = new Vector2(0f, 1f);
+        KitBar.Drive(climbFill, 0f, true);
         Show(lastTab);
         RefreshLookOver();
     }

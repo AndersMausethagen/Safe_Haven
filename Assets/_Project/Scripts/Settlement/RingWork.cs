@@ -465,7 +465,7 @@ public static class RingWork
         WorkerSettings settings = WorkerSettings.Current;
         foreach (ResourceNode rock in ResourceNode.Active)
         {
-            if (rock != null && rock.Definition != null && rock.Definition.RespawnSeconds > 0f && ring.Contains(rock.transform.position)
+            if (rock != null && rock.Definition != null && rock.Definition.RegrowsAfter > 0f && ring.Contains(rock.transform.position)
                 && Quarries(rock, settings))
             {
                 return true;

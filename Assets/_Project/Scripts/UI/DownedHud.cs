@@ -98,7 +98,7 @@ public sealed class DownedHud : MonoBehaviour
         }
 
         fill.parent.gameObject.SetActive(help >= 0f);
-        fill.anchorMax = new Vector2(Mathf.Clamp01(help), 1f);
+        KitBar.Drive(fill, help, true);
     }
 
     private static TMP_Text Label(Transform parent, string name, Vector2 position, Vector2 size, float fontSize, Color colour, bool titleFont)

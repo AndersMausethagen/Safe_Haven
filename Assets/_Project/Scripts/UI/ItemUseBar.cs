@@ -115,7 +115,7 @@ public sealed class ItemUseBar : MonoBehaviour
         group.alpha = shownAlpha;
     }
 
-    private void SetFill(float progress) => fill.anchorMax = new Vector2(Mathf.Clamp01(progress), 1f);
+    private void SetFill(float progress) => KitBar.Drive(fill, progress, true);
 
     // Harvesting: a node's swings so far, or a timed job's share. False when the player is doing neither.
     private bool ShowWork()

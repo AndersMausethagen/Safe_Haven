@@ -362,7 +362,7 @@ public sealed class CinematicScreen : MonoBehaviour
         {
             hintLabel.text = SkipHint;
         }
-        hintFill.anchorMax = new Vector2(skip.Progress, 1f);
+        KitBar.Drive(hintFill, skip.Progress, true);
     }
 
     private static bool Pressed(InputAction action) => action != null && action.enabled && action.IsPressed();

@@ -613,7 +613,7 @@ public static class SceneTransition
 
         public float Progress
         {
-            set => barFill.anchorMax = new Vector2(Mathf.Clamp01(value), 1f);
+            set => KitBar.Drive(barFill, value);
         }
 
         public static LoadingScreen Create(Transform parent, SceneTransitionSettings settings)

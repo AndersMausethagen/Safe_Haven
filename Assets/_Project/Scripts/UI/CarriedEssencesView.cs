@@ -172,7 +172,7 @@ public sealed class CarriedEssencesView : MonoBehaviour
             int amount = storage.GetAmount(row.Resource);
             int capacity = storage.GetCapacity(row.Resource);
             row.Amount.text = $"{amount}/{capacity}";
-            row.Fill.anchorMax = new Vector2(capacity > 0 ? Mathf.Clamp01((float)amount / capacity) : 0f, 1f);
+            KitBar.Drive(row.Fill, capacity > 0 ? Mathf.Clamp01((float)amount / capacity) : 0f);
         }
     }
 }

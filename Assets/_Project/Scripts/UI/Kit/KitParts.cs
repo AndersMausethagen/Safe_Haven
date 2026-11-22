@@ -103,17 +103,39 @@ public static class KitBar
     }
 
     /// <summary>Sets a bar: through its KitBarFill (gliding, pulsing, the bar shader) where it has one.</summary>
-    public static void Set(RectTransform fill, Image fillImage, float fraction, Color colour)
+    public static void Set(RectTransform fill, Image fillImage, float fraction, Color colour, bool steady = false)
     {
         KitBarFill alive = fillImage.GetComponent<KitBarFill>();
         if (alive != null)
         {
-            alive.Show(fraction, colour);
+            alive.Show(fraction, colour, steady);
             return;
         }
 
         fill.anchorMax = new Vector2(Mathf.Clamp01(fraction), 1f);
         fillImage.color = colour;
+    }
+
+    /// <summary>
+    /// Moves a bar a window or HUD lays out itself (a stretched fill in its own track) as every bar moves: the kit bar's shader and
+    /// life on its fill (KitBarFill, added the first time), keeping the colour its owner gives it. Steady for a bar that moves every
+    /// frame (KitBarFill.Show). Without the style's bar material, only its right edge moves.
+    /// </summary>
+    public static void Drive(RectTransform fill, float fraction, bool steady = false)
+    {
+        if (fill == null)
+        {
+            return;
+        }
+
+        Image image = fill.GetComponent<Image>();
+        if (image == null || UIStyle.Current.BarMaterial == null)
+        {
+            fill.anchorMax = new Vector2(Mathf.Clamp01(fraction), fill.anchorMax.y);
+            return;
+        }
+
+        KitBarFill.On(image).Show(fraction, image.color, steady);
     }
 }
 

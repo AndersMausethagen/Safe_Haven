@@ -1438,7 +1438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::Combatant
   faction: 1
-  baseStats: {fileID: 11400000, guid: 776e9d70bca337d4f98624ff0e9aafc2, type: 2}
+  baseStats: {fileID: 11400000, guid: 3eda1452e64766848a56aacbe1ab5edf, type: 2}
   rules: {fileID: 0}
   priorityTarget: 0
 --- !u!114 &3988924014516247040
@@ -1488,7 +1488,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b469681a4982704096d644d9891ad75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::LootOnDeath
-  table: {fileID: 11400000, guid: 09ba64d60faeea149ac4d60f97b93a70, type: 2}
+  table: {fileID: 11400000, guid: 47eca72603b567b48858f7048423fd43, type: 2}
   drops:
     entries: []
   unlocksRecipes: []

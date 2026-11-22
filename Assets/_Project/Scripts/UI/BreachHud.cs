@@ -93,7 +93,7 @@ public sealed class BreachHud : MonoBehaviour
             progress.text = $"Wave {breach.Wave} of {breach.WaveCount}  ·  {left} left{ward}";
         }
         bar.gameObject.SetActive(breach.WardAtRisk);
-        fill.anchorMax = new Vector2(breach.WardHealth, 1f);
+        KitBar.Drive(fill, breach.WardHealth);
         fillImage.color = breach.WardHealth <= WardInDanger ? style.Danger : style.Accent;
     }
 }

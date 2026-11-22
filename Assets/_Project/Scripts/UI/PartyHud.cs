@@ -107,7 +107,7 @@ public sealed class PartyHud : MonoBehaviour
             {
                 row.Name.text = name;
             }
-            row.Fill.anchorMax = new Vector2(here || look.Health > 0 ? health : 0f, 1f);
+            KitBar.Drive(row.Fill, here || look.Health > 0 ? health : 0f, true);
             row.FillImage.color = look.Downed ? style.Danger : health < 0.3f ? style.Danger : style.Good;
             if (!here)
             {

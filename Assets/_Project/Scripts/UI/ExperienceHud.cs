@@ -316,7 +316,7 @@ public sealed class ExperienceHud : MonoBehaviour
         }
 
         shownShare = Mathf.Lerp(shownShare, share, 1f - Mathf.Exp(-6f * Time.unscaledDeltaTime));
-        fill.anchorMax = new Vector2(Mathf.Clamp01(shownShare), 1f);
+        KitBar.Drive(fill, shownShare, true);
         int skillLevel = shownSkill != null ? progress.LevelOf(shownSkill, settings) : 0;
         // Something to do in the skills window: a perk to choose, or Insight to put into a skill.
         int points = progress.PendingChoices(settings) + (progress.Insight > 0 ? 1 : 0);

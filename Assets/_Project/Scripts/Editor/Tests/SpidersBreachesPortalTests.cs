@@ -47,6 +47,12 @@ public sealed class SpidersBreachesPortalTests
         Assert.AreEqual(1f, giant.Prefab.transform.localScale.y, 1e-3f);
         Assert.AreSame(small, small.Prefab.GetComponent<MonsterAI>().Definition, "its prefab is its own");
         Assert.Less(Health(small), Health(giant) * 0.6f, "less health");
+        // What it fights with is its prefab's: the copy first came up with the giant's 320 health (its Combatant kept the giant's stats).
+        foreach (MonsterDefinition widow in new[] { giant, small })
+        {
+            var combatant = new SerializedObject(widow.Prefab.GetComponent<Combatant>());
+            Assert.AreSame(widow.CombatStats, combatant.FindProperty("baseStats").objectReferenceValue, $"{widow.name}'s prefab fights with its own stats");
+        }
         Assert.IsNotNull(GrabSettings.Current.LineMaterial, "the lasso's line is drawn");
     }
 

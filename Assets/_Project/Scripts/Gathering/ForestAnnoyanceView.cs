@@ -48,7 +48,7 @@ public sealed class ForestAnnoyanceView : MonoBehaviour
             return;
         }
 
-        fill.anchorMax = new Vector2(annoyance.Fill, 1f);
+        KitBar.Drive(fill, annoyance.Fill);
         // The raid's own word for itself: the valley's trolls hear the noise, not "the forest" (each raid its own biome, 2026-11-17).
         string land = RaidDirector.Current != null ? RaidDirector.Current.Session.Definition.Land : "forest";
         switch (annoyance.Level)

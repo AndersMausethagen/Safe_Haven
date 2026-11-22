@@ -293,7 +293,7 @@ public sealed class HavenHud : MonoBehaviour
         badge.text = settings.Ranks.Count == 0 ? "" : settings.Ranks[rank].name;
         string key = GameInput.KeyLabel(GameInput.Haven);
         standing.text = last ? $"{renown} renown  <alpha=#99>{key}" : $"{renown} / {to} renown  <alpha=#99>{key}";
-        fill.anchorMax = new Vector2(last ? 1f : Mathf.Clamp01((renown - from) / (float)Mathf.Max(1, to - from)), 1f);
+        KitBar.Drive(fill, last ? 1f : Mathf.Clamp01((renown - from) / (float)Mathf.Max(1, to - from)));
     }
 
     private static RectTransform Rect(string name, Transform parent, Vector2 anchorAt, Vector2 size, Vector2 position)

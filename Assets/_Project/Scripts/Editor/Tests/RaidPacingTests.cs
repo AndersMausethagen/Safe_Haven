@@ -135,13 +135,16 @@ public sealed class RaidPacingTests
     // ----- No regrowth in a raid -----
 
     [Test]
-    public void ANode_RegrowsAtHome_ButNeverOnARaid()
+    public void ANode_NeverRegrows_OnARaid_NorAtHome()
     {
         GatheringNodeDefinition copper = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Resources/CopperOreNode.prefab")
             .GetComponent<ResourceNode>().Definition;
         Assume.That(copper.RespawnSeconds > 0f);
+        Assert.IsTrue(Regrowth.Grows(false, true), "the canary: at home, where the Haven allows it, it grows back");
+        Assert.IsFalse(Regrowth.Grows(true, true), "never in a raid");
+        Assert.IsFalse(HavenSettings.Current.NodesRegrowAtHome, "the user, 2026-11-22: nothing grows back at home");
+        Assert.AreEqual(0f, copper.RegrowsAfter, "at home, gone for good");
         GameSession.BeginRaid(Session());
-        Assert.AreEqual(copper.RespawnSeconds, copper.RegrowsAfter, "the canary: the run has begun at the portal, the Haven still grows back");
         // A raid's scene: its director is up (inactive, so nothing of it runs).
         var holder = new GameObject("Raid");
         holder.SetActive(false);
