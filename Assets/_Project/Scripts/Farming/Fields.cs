@@ -27,7 +27,7 @@ public static class Fields
 
     /// <summary>Whether a plot with a crop in it is running low (a Farmer goes for water).</summary>
     public static bool WantsWater(StationQueue queue, FarmSettings settings) =>
-        Grows(queue) && !queue.IsIdle && queue.Water < settings.WaterWhenBelow * settings.WateredSeconds;
+        Grows(queue) && !queue.IsIdle && !queue.Blocked && queue.Water < settings.WaterWhenBelow * settings.WateredSeconds;
 
     /// <summary>Rain at home (its strength, 0-1): strong enough, every plot is watered. Returns how many.</summary>
     public static int Rain(WorkshopState workshops, float rain, FarmSettings settings)
@@ -88,13 +88,13 @@ public static class Fields
     }
 
     /// <summary>
-    /// Waters a plot from a water container in <paramref name="bag"/> (FarmSettings › Water Per Plot of a full one), when it has a
-    /// crop and less than a full watering. False, with why, when it can't.
+    /// Waters a plot from a water container in <paramref name="bag"/> (FarmSettings › Water Per Plot of a full one) once it runs low
+    /// (Water When Below), sown or not: a plot watered before it is sown starts its crop wet. False, with why, when it can't.
     /// </summary>
     public static bool TryWaterFrom(ItemContainer bag, StationQueue queue, FarmSettings settings, out string why)
     {
         why = null;
-        if (!Grows(queue) || queue.IsIdle || queue.Water >= settings.WateredSeconds * 0.95f || bag == null)
+        if (!Grows(queue) || queue.Water >= settings.WaterWhenBelow * settings.WateredSeconds || bag == null)
         {
             return false;
         }
@@ -110,8 +110,9 @@ public static class Fields
             }
         }
 
-        // Said only when it is dry: a plot still damp needs nothing yet.
-        why = queue.Water <= 0f ? "The soil is dry: fill a Waterskin at a well or stream to water it, or let the rain or a Farmer see to it." : null;
+        // Said only when a crop is in dry soil: an empty plot or a damp one needs nothing yet.
+        why = queue.Water <= 0f && !queue.IsIdle
+            ? "The soil is dry: fill a Waterskin at a well or stream to water it, or let the rain or a Farmer see to it." : null;
         return false;
     }
 

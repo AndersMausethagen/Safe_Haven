@@ -2217,15 +2217,17 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
 - **Sow.** A crop is still a recipe paid with its seed: the player queues it, or the Farmer's work orders sow from the chests
   (fetched on foot like any worker's supplies).
 - **Water.** `StationQueue.Water` (saved): seconds of growing left; it drains only while something grows. Watered, a crop grows at
-  its pace (with the Farmer at it, faster); dry, at `FarmSettings` › Dry Speed (35%), never dead. Water comes from rain at home
-  (`Fields.Rain`, from `SettlementSystem` every 5 s), from the player using the plot with a filled Waterskin (`CraftingStation`
-  waters it on use, half a skin; no extra button), or from the Farmer: once a growing plot round theirs runs low they walk to the
+  its pace (with the Farmer at it, faster); dry, at `FarmSettings` › Dry Speed (50%), never dead. One watering lasts about a raid
+  (Watered Seconds, 1200), and nothing is drunk while a harvest waits with no room. Water comes from rain at home
+  (`Fields.Rain`, from `SettlementSystem` every 5 s), from the player using the plot with a filled Waterskin once it runs low
+  (`CraftingStation` waters it on use, half a skin, sown or not, so a crop sown after starts wet; no extra button), or from the Farmer: once a growing plot round theirs runs low they walk to the
   nearest water (`WaterSource.Nearest`, within Water Reach) and back, and every growing plot within Tend Reach is watered
   (`ResidentLife` › Trip.ToWater). Away, a Farmer at home (not the one along) keeps them watered (`Fields.WorkAway`).
 - **Grow and harvest.** The plot shows it (`FarmPlotLook`): a bare bed with nothing sown, the crop rising from a sprout to full,
   full while the harvest waits, the soil darker while watered. The harvest waits in the output; the Farmer takes it to the chests on
   their trips within what they carry. In the view, a dry plot is marked "Dry" and a ready one "N ready"; its window says how long
-  the water lasts.
+  the water lasts. Fields saved before water start watered (`StationSaveData.water` reads -1 when missing). In co-op only wet or
+  dry is compared for the host's settlement (`HavenSync.CollectSettlement`), as progress is, so a growing crop sends nothing.
 
 ### People (phase 6, 2026-11-22)
 
@@ -2240,6 +2242,20 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   Ranks) and a house who lives in it.
 - Orders are opened person by person through the jobs that do them (builders: Carpenter and Mason; rings: the Carpenter; water:
   the Farmer). Companion signatures wait for the playtest, as decided on 2026-11-13. Tests: `HomeWishesTests`.
+
+### Defence by the people (phase 7, 2026-11-22)
+
+- **Posts.** In the Keeper's view, "Set a guard post" (`KeeperView.BeginPost`; red marks on the ground) adds a post to the
+  settlement (`SettlementState.Posts`, saved), in the order guards take them; "Clear the posts" removes them.
+- **Who stands.** Those whose job keeps guard (`JobDefinition` › Defends As: the Warden and the Hunter) turn out in a ward breach
+  and now on a corruption night too, from its warning until its band is gone (`GuardPosts.CalledOut`; `DefenceSettings` ›
+  Corruption Nights). As many as the defences allow (`GuardPosts.Cap`: Base Posts 2, and one more for each tier of each standing
+  Watch Post, at most 8), in the order they live in the Haven; the rest shelter as before. Each stands at their post, else as before
+  (up on the Watch Post, or a ring round the portal), or on a corruption night toward the side it comes from (`TowardTheNight`).
+  Guards get up by themselves, so nobody dies.
+- **The Watch Post archer** shoots on a corruption night while its band is out, as in a breach.
+- The horn (everyone in, the posts out, before it comes) and hunting, quarry and scouting parties are still to do. Tests:
+  `GuardPostsTests`.
 
 ## Going along, set-pieces and bosses
 

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4bf38cc7c16f754cb5899aee60f844c, type: 3}
   m_Name: FarmSettings
   m_EditorClassIdentifier: SafeHaven::FarmSettings
-  wateredSeconds: 480
-  drySpeed: 0.35
+  wateredSeconds: 1200
+  drySpeed: 0.5
   rainWaters: 0.3
   waterPerPlot: 0.5
   waterWhenBelow: 0.35

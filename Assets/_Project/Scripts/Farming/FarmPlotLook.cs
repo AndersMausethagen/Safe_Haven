@@ -67,7 +67,7 @@ public sealed class FarmPlotLook : MonoBehaviour
         }
 
         StationQueue queue = GameSession.Here.Workshops.Find(station.Id);
-        float growth = queue == null ? 0f
+        float growth = queue == null ? -1f
             : queue.OutputAmount > 0 ? 1f
             : queue.Current != null ? Mathf.Clamp01(queue.Progress / Mathf.Max(1f, queue.Current.CraftSeconds)) : -1f;
         ShowCrop(growth);
@@ -96,10 +96,12 @@ public sealed class FarmPlotLook : MonoBehaviour
         }
     }
 
+    // Wet: the bed's colour darkened, set again each look (the building's own shading, ConstructionLook, clears the block when it
+    // refreshes). Dry: the block cleared once, so the bed batches as before.
     private void ShowSoil(bool wet)
     {
         int now = wet ? 1 : 0;
-        if (now == shownWet || bed.Length == 0)
+        if (bed.Length == 0 || (!wet && now == shownWet))
         {
             return;
         }
@@ -110,12 +112,17 @@ public sealed class FarmPlotLook : MonoBehaviour
             block = new MaterialPropertyBlock();
         }
 
-        // Only the colour is changed (anything else on the bed's block, a wound's say, is kept).
-        float darker = wet ? 1f - FarmSettings.Current.WetDarkening : 1f;
+        float darker = 1f - FarmSettings.Current.WetDarkening;
         foreach (Renderer part in bed)
         {
             if (part == null)
             {
+                continue;
+            }
+
+            if (!wet)
+            {
+                part.SetPropertyBlock(null);
                 continue;
             }
 

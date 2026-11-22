@@ -48,6 +48,9 @@ public sealed class CorruptionNights : MonoBehaviour
 
     public IReadOnlyList<MonsterAI> Attackers => attackers;
 
+    /// <summary>Degrees about up of the side it comes from (meaningful while it is active).</summary>
+    public float Bearing => bearing;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession()
     {

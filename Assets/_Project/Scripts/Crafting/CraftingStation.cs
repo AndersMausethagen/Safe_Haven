@@ -30,7 +30,7 @@ public enum CraftingStationType
     [InspectorName("Kitchen")] Kitchen = 9,
     /// <summary>The Hunter's Lodge: hides into leather, bows and arrows. The identifier is kept from the old tanning rack.</summary>
     [InspectorName("Hunter's Lodge")] Tannery = 10,
-    /// <summary>Crops: a seed crop goes in, grows on its own, even during raids, and waits to be harvested (GDD Farm Plot).</summary>
+    /// <summary>Crops: a seed crop goes in, grows while watered (slower dry, never dead: Fields), even during raids, and waits to be harvested (GDD Farm Plot).</summary>
     [InspectorName("Farm Plot")] Farm = 11,
     /// <summary>Bees turn flowers and berries into honey.</summary>
     [InspectorName("Beehive")] Beehive = 12,
@@ -164,7 +164,7 @@ public sealed class CraftingStation : MonoBehaviour
     private float Extensions(System.Func<ExtensionBonus, float> bonus) => building != null ? StationExtensions.Bonus(building, bonus) : 0f;
 
     /// <summary>How fast it works with its worker at it: <see cref="OwnSpeed"/> and <see cref="WorkerAdds"/>.</summary>
-    public float Speed => OwnSpeed + WorkerAdds;
+    public float Speed => (OwnSpeed + WorkerAdds) * (type == CraftingStationType.Farm ? Fields.GrowthFactor(GameSession.Here.Workshops.Find(Id)) : 1f);
 
     /// <summary>How fast it works on its own (Palworld's work speed, Docs/ColonyModeResearch_2026-11-21.md): WorkerSettings › Unattended
     /// Speed, plus its upgrades, a horse at work beside it (HorseJobs), its yard's role (Yards) and its extensions (StationExtensions).</summary>
@@ -338,6 +338,9 @@ public sealed class CraftingStation : MonoBehaviour
         }
     }
 
+    // When a dry field may say so again (WaterByHand).
+    private float nextDryHint;
+
     // A field used in person with water in the bag is watered (Fields): the tending is the visit, no extra button.
     private void WaterByHand(GameObject user)
     {
@@ -346,12 +349,13 @@ public sealed class CraftingStation : MonoBehaviour
             return;
         }
 
-        if (Fields.TryWaterFrom(bag.Container, GameSession.Home.Workshops.Find(Id), FarmSettings.Current, out string why))
+        if (Fields.TryWaterFrom(bag.Container, Queue, FarmSettings.Current, out string why))
         {
             GameMessages.Post($"You water the {(building != null && building.Definition != null ? building.Definition.DisplayName : "plot")}.", MessageKind.Gain);
         }
-        else if (why != null)
+        else if (why != null && Time.time >= nextDryHint)
         {
+            nextDryHint = Time.time + 120f;
             GameMessages.Post(why);
         }
     }

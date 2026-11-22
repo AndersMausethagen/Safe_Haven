@@ -12,10 +12,17 @@ public sealed class KeeperRings
     private static Material lineMaterial;
     private readonly Transform root;
     private readonly List<LineRenderer> lines = new List<LineRenderer>();
+    private readonly Color? tint;
 
-    public KeeperRings(Transform owner)
+    public KeeperRings(Transform owner) : this(owner, null, "Keeper's View Rings")
     {
-        var holder = new GameObject("Keeper's View Rings");
+    }
+
+    /// <summary>Lines in <paramref name="colour"/> (the style's accent when null), under a holder called <paramref name="name"/>.</summary>
+    public KeeperRings(Transform owner, Color? colour, string name)
+    {
+        tint = colour;
+        var holder = new GameObject(name);
         holder.transform.SetParent(owner, false);
         root = holder.transform;
     }
@@ -24,7 +31,7 @@ public sealed class KeeperRings
     public void Show(IReadOnlyList<RingOrder> rings, Vector3 ghost, float ghostRadius)
     {
         int used = 0;
-        Color gold = UIStyle.Current.Accent;
+        Color gold = tint ?? UIStyle.Current.Accent;
         for (int i = 0; rings != null && i < rings.Count; i++)
         {
             Draw(Line(used++), rings[i].Centre, rings[i].Radius, gold);
@@ -33,6 +40,27 @@ public sealed class KeeperRings
         if (ghostRadius > 0f)
         {
             Draw(Line(used++), ghost, ghostRadius, new Color(gold.r, gold.g, gold.b, 0.6f));
+        }
+
+        for (int i = used; i < lines.Count; i++)
+        {
+            lines[i].enabled = false;
+        }
+    }
+
+    /// <summary>Draws a small ring of <paramref name="radius"/> at each of <paramref name="points"/>, and the one being set when shown.</summary>
+    public void ShowPoints(IReadOnlyList<Vector3> points, float radius, Vector3 ghost, bool ghostShown)
+    {
+        int used = 0;
+        Color colour = tint ?? UIStyle.Current.Accent;
+        for (int i = 0; points != null && i < points.Count; i++)
+        {
+            Draw(Line(used++), points[i], radius, colour);
+        }
+
+        if (ghostShown)
+        {
+            Draw(Line(used++), ghost, radius, new Color(colour.r, colour.g, colour.b, 0.6f));
         }
 
         for (int i = used; i < lines.Count; i++)

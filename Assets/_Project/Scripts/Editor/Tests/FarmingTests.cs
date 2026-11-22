@@ -127,6 +127,43 @@ public sealed class FarmingTests
     }
 
     [Test]
+    public void AnEmptyPlot_CanBeWateredBeforeSowing_AndAWaitingHarvestKeepsItsWater()
+    {
+        FarmSettings settings = FarmSettings.Current;
+        var skin = AssetDatabase.LoadAssetAtPath<ItemDefinition>("Assets/_Project/Data/Items/Waterskin.asset");
+        var bag = new ItemContainer(4, 1);
+        bag.Add(skin, 1);
+        var plot = new StationQueue("plot", CraftingStationType.Farm, 3, 3);
+        Assert.IsTrue(Fields.TryWaterFrom(bag, plot, settings, out _), "watered before sowing");
+        RecipeDefinition crop = Crop(10f);
+        plot.Enqueue(crop, 2);
+        Assert.AreEqual(1f, plot.Speed, 1e-3f, "so the crop starts wet");
+
+        plot.Tick(10f, null);
+        plot.Tick(10f, null);
+        Assert.IsTrue(plot.Blocked, "the second harvest has no room: the slot holds the first");
+        float left = plot.Water;
+        plot.Tick(100f, null);
+        Assert.AreEqual(left, plot.Water, 1e-3f, "nothing grows while the harvest waits, so nothing is drunk");
+        Assert.IsFalse(Fields.WantsWater(plot, settings), "and the Farmer doesn't fetch for it");
+    }
+
+    [Test]
+    public void FieldsSavedBeforeWater_StartWatered()
+    {
+        var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
+        var home = new SettlementState();
+        StationQueue plot = home.Workshops.GetOrCreate("plot-old", CraftingStationType.Farm, 10, 3);
+        plot.Water = 5f;
+        string json = JsonUtility.ToJson(SaveMapper.ToData(home));
+        Assume.That(json.Contains("\"water\":5"), "the water is written as expected");
+        string older = json.Replace(",\"water\":5.0", "").Replace(",\"water\":5", "");
+        Assert.IsFalse(older.Contains("\"water\""), "the save is made as one from before fields needed water");
+        SettlementState back = SaveMapper.SettlementFrom(JsonUtility.FromJson<SettlementSaveData>(older), content);
+        Assert.AreEqual(FarmSettings.Current.WateredSeconds, back.Workshops.Find("plot-old").Water, 1e-3f, "nothing grows slower for the update");
+    }
+
+    [Test]
     public void APlotsWater_IsSaved()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

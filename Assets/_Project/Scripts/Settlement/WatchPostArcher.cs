@@ -55,8 +55,11 @@ public sealed class WatchPostArcher : MonoBehaviour
     private void Update()
     {
         WardBreachDirector breach = WardBreachDirector.Current;
+        // In a ward breach, and on a corruption night while its band is out (DefenceSettings): never the game hunted by day.
+        bool fight = (breach != null && breach.IsActive)
+            || (DefenceSettings.Current.CorruptionNights && CorruptionNights.Current != null && CorruptionNights.Current.Attackers.Count > 0);
         // Its archer comes with the second level.
-        if (Time.time < nextShot || breach == null || !breach.IsActive || construction == null || construction.Level < 2
+        if (Time.time < nextShot || !fight || construction == null || construction.Level < 2
             || !Construction.DefenceWorks(construction, health))
         {
             return;

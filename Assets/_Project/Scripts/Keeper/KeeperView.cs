@@ -57,6 +57,10 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     private bool ringPlacing;
     private float ringRadius;
     private KeeperRings ringLines;
+    // Setting a guard post (GuardPosts): its marks on the ground.
+    private const float PostMarkRadius = 1.6f;
+    private bool postPlacing;
+    private KeeperRings postLines;
     private System.Func<bool> back;
 
     // ----- IOverview: what the player's camera frames while open -----
@@ -169,9 +173,15 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
         AudioManager.HearFrom = null;
         ringPlacing = false;
+        postPlacing = false;
         if (ringLines != null)
         {
             ringLines.Hide();
+        }
+
+        if (postLines != null)
+        {
+            postLines.Hide();
         }
 
         picker.Clear();
@@ -273,9 +283,10 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             return false;
         }
 
-        if (ringPlacing)
+        if (ringPlacing || postPlacing)
         {
             ringPlacing = false;
+            postPlacing = false;
             return true;
         }
 
@@ -333,7 +344,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         AudioManager.HearFrom = focus + Vector3.up * Settings.EarHeight;
 
         DrawRings(windowUp || placing || overUI);
-        Point(windowUp || placing || overUI || ringPlacing);
+        Point(windowUp || placing || overUI || ringPlacing || postPlacing);
     }
 
     // The fog of war is a flat plane at the player's height: from above it lay in bands over the hills. It fades as the camera rises,
@@ -413,15 +424,23 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             following = following == null && picker.Picked is ResidentNpc person ? person.transform : null;
         }
 
-        if (ringPlacing && !overUI)
+        if ((ringPlacing || postPlacing) && !overUI)
         {
             if (GameInput.KeeperSelect != null && GameInput.KeeperSelect.WasPressedThisFrame() && RingSpot(out Vector3 at))
             {
-                LayRing(at);
+                if (ringPlacing)
+                {
+                    LayRing(at);
+                }
+                else
+                {
+                    LayPost(at);
+                }
             }
             else if (GameInput.CameraOrbit != null && GameInput.CameraOrbit.WasPressedThisFrame())
             {
                 ringPlacing = false;
+                postPlacing = false;
             }
 
             return;
@@ -476,6 +495,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
 
         ringPlacing = true;
+        postPlacing = false;
         ringRadius = WorkerSettings.Current.RingRadius;
         GameMessages.Post(InputDevices.UsingGamepad
             ? $"{GameInput.KeyLabel(GameInput.KeeperSelect)} lays the ring where the woodcutters should fell; zooming makes it larger or smaller. " +
@@ -566,12 +586,70 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (ringLines == null)
         {
             ringLines = new KeeperRings(transform);
+            postLines = new KeeperRings(transform, UIStyle.Current.Danger, "Keeper's View Posts");
         }
 
         Vector3 ghost = default;
-        bool ghostShown = ringPlacing && !hidden && RingSpot(out ghost);
-        ringLines.Show(GameSession.Here.Rings, ghost, ghostShown ? ringRadius : 0f);
+        bool ghostShown = (ringPlacing || postPlacing) && !hidden && RingSpot(out ghost);
+        ringLines.Show(GameSession.Here.Rings, ghost, ghostShown && ringPlacing ? ringRadius : 0f);
+        postLines.ShowPoints(GameSession.Here.Posts, PostMarkRadius, ghost, ghostShown && postPlacing);
     }
+
+    // ----- Guard posts (GuardPosts) -----
+
+    /// <summary>Starts setting a guard post, or says why not (nobody keeps guard, as many posts as the defences hold, a friend's Haven).</summary>
+    public void BeginPost()
+    {
+        if (!open)
+        {
+            return;
+        }
+
+        string why = WhyNoPost();
+        if (why != null)
+        {
+            GameMessages.Post(why, MessageKind.Warning);
+            return;
+        }
+
+        postPlacing = true;
+        ringPlacing = false;
+        GameMessages.Post(InputDevices.UsingGamepad
+            ? $"{GameInput.KeyLabel(GameInput.KeeperSelect)} sets where a guard stands when the ward breaks or a corruption night comes. " +
+              $"{GameInput.KeyLabel(GameInput.Back)} stops."
+            : "Click where a guard should stand when the ward breaks or a corruption night comes. Right-click to stop.");
+    }
+
+    /// <summary>Takes every post away (the guards stand where they did before).</summary>
+    public void ClearPosts()
+    {
+        if (!HavenVisit.IsVisiting)
+        {
+            GameSession.Home.ClearPosts();
+        }
+    }
+
+    /// <summary>Why no post can be set now, or null.</summary>
+    public static string WhyNoPost() => GuardPosts.WhyNoPost(GameSession.Here, DefenceSettings.Current, HavenVisit.IsVisiting);
+
+    /// <summary>A few words of why no post can be set, for a button (null when one can).</summary>
+    public static string ShortWhyNoPost()
+    {
+        string why = WhyNoPost();
+        return why == null ? null : HavenVisit.IsVisiting ? "your own Haven only" : why.StartsWith("Nobody") ? "nobody keeps guard yet"
+            : $"at most {GuardPosts.Cap(DefenceSettings.Current)}";
+    }
+
+    private void LayPost(Vector3 at)
+    {
+        postPlacing = false;
+        GameSession.Home.AddPost(at);
+        int posts = GameSession.Home.Posts.Count;
+        GameMessages.Post($"Guard post {posts} set: when the ward breaks or a corruption night comes, the {Ordinal(posts)} guard stands here.",
+            MessageKind.Info);
+    }
+
+    private static string Ordinal(int n) => n switch { 1 => "first", 2 => "second", 3 => "third", 4 => "fourth", 5 => "fifth", _ => $"{n}th" };
 
     // ----- Picking -----
 

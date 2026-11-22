@@ -8,10 +8,10 @@ using UnityEngine;
 public sealed class FarmSettings : GameSettings<FarmSettings>
 {
     [Header("Water")]
-    [Tooltip("Seconds of growing one watering gives a plot (a day is 24 minutes). It drains only while something grows.")]
-    [SerializeField, Min(10f)] private float wateredSeconds = 480f;
+    [Tooltip("Seconds of growing one watering gives a plot (a day is 24 minutes; about a raid, so water-then-go holds). It drains only while something grows.")]
+    [SerializeField, Min(10f)] private float wateredSeconds = 1200f;
     [Tooltip("How fast a crop grows in dry soil, of its watered pace: slower, never dead.")]
-    [SerializeField, Range(0f, 1f)] private float drySpeed = 0.35f;
+    [SerializeField, Range(0f, 1f)] private float drySpeed = 0.5f;
     [Tooltip("Rain at least this strong (0-1) waters every plot at home.")]
     [SerializeField, Range(0.05f, 1f)] private float rainWaters = 0.3f;
     [Tooltip("How much of a full water container (a Waterskin) watering one plot by hand takes.")]

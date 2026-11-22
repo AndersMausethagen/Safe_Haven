@@ -99,8 +99,11 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private float chopLeft;
     private bool logsToChest;
     private float carriedWeight;
-    // A Farmer on the way back from the water (Fields).
+    // When a guard with no post free may look again (KeepsGuard).
+    private float nextGuardLook;
+    // A Farmer on the way back from the water (Fields), and when they may look for water again after finding none in reach.
     private bool carryingWater;
+    private float nextWaterLook;
     private float benchLookAt;
     private bool benchBusy;
     private BuildingObject sleepsIn;
@@ -295,18 +298,27 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // A breach is on and their job defends the Haven: they are on guard until it is over, and the guard is who the player sees.
     private bool KeepsGuard()
     {
-        bool breach = WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
-        CompanionDefinition how = breach ? npc.Job?.DefendsAs : null;
+        // Called out: a ward breach, or a corruption night (GuardPosts); as many guards as the defences allow, in order.
+        bool called = GuardPosts.CalledOut(out bool night);
+        CompanionDefinition how = called && npc.Job != null ? npc.Job.DefendsAs : null;
         defender ??= new ResidentDefender(transform, animator, agent);
         if (how != null && !defender.IsOnGuard)
         {
+            int rank = Time.time >= nextGuardLook ? GuardPosts.Rank(GameSession.Here, npc.Record) : -1;
+            if (rank < 0 || rank >= GuardPosts.Cap(DefenceSettings.Current))
+            {
+                // No post for them (more guards than the defences hold): they shelter with the rest; looked at again now and then.
+                nextGuardLook = Time.time + 2f;
+                return false;
+            }
+
             ComeOut();
             if (emotes != null && emotes.IsPlaying)
             {
                 emotes.Stop();
             }
 
-            defender.Stand(npc.Resident, how, GuardPost());
+            defender.Stand(npc.Resident, how, GuardPost(rank, night));
         }
         else if (how == null && defender.IsOnGuard)
         {
@@ -317,9 +329,21 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         return defender.IsOnGuard;
     }
 
-    // Up on the Watch Post if that is where their job is; otherwise a ring out from the portal, between it and what comes.
-    private Vector3 GuardPost()
+    // A post set in the Keeper's view (in order); else up on the Watch Post if that is where their job is; else, on a corruption
+    // night, between the portal and the side it comes from; otherwise a ring out from the portal, between it and what comes.
+    private Vector3 GuardPost(int rank, bool night)
     {
+        IReadOnlyList<Vector3> posts = GameSession.Here.Posts;
+        if (rank >= 0 && rank < posts.Count)
+        {
+            return posts[rank];
+        }
+
+        if (night && CorruptionNights.Current != null && HomePortal.Current != null)
+        {
+            return GuardPosts.TowardTheNight(HomePortal.Current.transform.position, CorruptionNights.Current.Bearing, rank, DefenceSettings.Current);
+        }
+
         BuildingObject post = npc.Workplace;
         if (post != null && post.GetComponent<WatchPostArcher>() != null && npc.TryGetWorkplace(out Vector3 spot, out _))
         {
@@ -886,6 +910,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     /// <summary>True while on a trip to a chest and back for their work.</summary>
     public bool IsHauling => trip != Trip.None;
 
+    /// <summary>True while a Farmer goes for water or brings it back (Fields).</summary>
+    public bool IsFetchingWater => trip == Trip.ToWater || (trip == Trip.ToStation && carryingWater);
+
     /// <summary>True while taking finished work to the chests (the first half of a trip that has it).</summary>
     public bool IsTakingWorkBack => trip == Trip.ToChest && carryingBack;
 
@@ -1028,7 +1055,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return;
         }
 
-        if (carryingWater)
+        if (trip == Trip.ToStation && carryingWater)
         {
             carryingWater = false;
             WaterPlots(npc.Workplace != null ? npc.Workplace.transform.position : workPlace, FarmSettings.Current);
@@ -1069,10 +1096,15 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private bool MaybeFetchWater(ResidentRecord record)
     {
         FarmSettings farm = FarmSettings.Current;
-        if (!Fields.Farms(record) || agent == null || !PlotsWantWater(npc.Workplace.transform.position, farm)
-            || !WaterSource.Nearest(npc.Workplace.transform.position, out Vector3 water)
+        if (!Fields.Farms(record) || agent == null || Time.time < nextWaterLook || !PlotsWantWater(npc.Workplace.transform.position, farm))
+        {
+            return false;
+        }
+
+        if (!WaterSource.Nearest(npc.Workplace.transform.position, out Vector3 water)
             || (water - npc.Workplace.transform.position).sqrMagnitude > farm.WaterReach * farm.WaterReach)
         {
+            nextWaterLook = Time.time + 20f;
             return false;
         }
 
@@ -1146,6 +1178,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         cartWanted = null;
         carrying.Clear();
         carryingBack = false;
+        carryingWater = false;
         LetGoOfCart();
         if (was)
         {

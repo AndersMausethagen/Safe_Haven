@@ -50,6 +50,9 @@ public interface IHavenView
 
     /// <summary>Rings drawn in the Keeper's view for the woodcutters to clear (RingWork).</summary>
     IReadOnlyList<RingOrder> Rings { get; }
+
+    /// <summary>Guard posts set in the Keeper's view (GuardPosts), in order.</summary>
+    IReadOnlyList<UnityEngine.Vector3> Posts { get; }
     ResidentRecord Find(ResidentDefinition resident);
     bool HasResident(ResidentDefinition resident);
     ResidentRecord WorkerAt(CraftingStationType station);

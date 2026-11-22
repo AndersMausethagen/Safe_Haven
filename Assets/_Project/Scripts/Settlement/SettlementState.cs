@@ -556,6 +556,28 @@ public sealed class SettlementState : IHavenView
         }
     }
 
+    private readonly List<Vector3> posts = new List<Vector3>();
+
+    /// <summary>Guard posts set in the Keeper's view (GuardPosts), in the order guards take them.</summary>
+    public IReadOnlyList<Vector3> Posts => posts;
+
+    public void AddPost(Vector3 at)
+    {
+        Borrowed();
+        posts.Add(at);
+        Changed?.Invoke();
+    }
+
+    public void ClearPosts()
+    {
+        Borrowed();
+        if (posts.Count > 0)
+        {
+            posts.Clear();
+            Changed?.Invoke();
+        }
+    }
+
     [NotSaved("the plans standing at home, noted again by BuildPlans every few seconds there")]
     private readonly List<BuildingDefinition> plans = new List<BuildingDefinition>();
 

@@ -327,8 +327,8 @@ public sealed class StationQueue
         }
 
         Progress += seconds * Speed;
-        // A field's soil dries as its crop drinks (Fields); empty, it keeps its water.
-        if (Type == CraftingStationType.Farm)
+        // A field's soil dries as its crop drinks (Fields); empty, or its harvest waiting with no room, it keeps its water.
+        if (Type == CraftingStationType.Farm && !Blocked)
         {
             Water = Mathf.Max(0f, Water - seconds);
         }

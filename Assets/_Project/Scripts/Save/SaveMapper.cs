@@ -287,6 +287,11 @@ public static class SaveMapper
             into.vacantJobs.Add(job.Id);
         }
 
+        foreach (UnityEngine.Vector3 post in settlement.Posts)
+        {
+            into.posts.Add(new PostSaveData { x = post.x, y = post.y, z = post.z });
+        }
+
         foreach (RingOrder ring in settlement.Rings)
         {
             into.rings.Add(new RingSaveData { x = ring.Centre.x, y = ring.Centre.y, z = ring.Centre.z, radius = ring.Radius,
@@ -427,6 +432,14 @@ public static class SaveMapper
             settlement.RestoreVacantJob(Resolve(content.FindJob(job), "job", job, missing));
         }
 
+        foreach (PostSaveData post in saved.posts ?? new List<PostSaveData>())
+        {
+            if (post != null)
+            {
+                settlement.AddPost(new UnityEngine.Vector3(post.x, post.y, post.z));
+            }
+        }
+
         foreach (RingSaveData ring in saved.rings ?? new List<RingSaveData>())
         {
             if (ring != null)
@@ -488,7 +501,8 @@ public static class SaveMapper
             queue.OutputSlots = 1 + more.Count;
             queue.Restore(jobs, entry.progress, output, entry.outputAmount, more);
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
-            queue.Water = Math.Max(0f, entry.water);
+            // Saved before fields needed water: they start watered, so nothing grows slower for the update.
+            queue.Water = entry.water < 0f ? (queue.Type == CraftingStationType.Farm ? FarmSettings.Current.WateredSeconds : 0f) : entry.water;
             foreach (StationOutputSaveData supply in entry.supplies ?? new List<StationOutputSaveData>())
             {
                 ItemDefinition fetched = supply == null || string.IsNullOrEmpty(supply.id) ? null : Resolve(content.FindItem(supply.id), "item", supply.id, missing);

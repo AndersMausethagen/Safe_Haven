@@ -131,6 +131,8 @@ public sealed class SettlementSaveData
     public List<string> vacantJobs = new List<string>();
     /// <summary>Rings drawn for the woodcutters to clear (RingOrder). Missing in older saves: none.</summary>
     public List<RingSaveData> rings = new List<RingSaveData>();
+    /// <summary>Guard posts set in the Keeper's view (GuardPosts). Missing in older saves: none.</summary>
+    public List<PostSaveData> posts = new List<PostSaveData>();
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -168,8 +170,8 @@ public sealed class StationSaveData
     public List<StationOutputSaveData> moreOutput = new List<StationOutputSaveData>();
     /// <summary>What its worker has fetched from the chests for their orders (StationQueue.Supplies). Missing in older saves: none.</summary>
     public List<StationOutputSaveData> supplies = new List<StationOutputSaveData>();
-    /// <summary>A field's water, seconds of growing left (StationQueue.Water, Fields). Missing in older saves: dry.</summary>
-    public float water;
+    /// <summary>A field's water, seconds of growing left (StationQueue.Water, Fields). Missing in older saves (-1): a full watering.</summary>
+    public float water = -1f;
 }
 
 [System.Serializable]
@@ -530,6 +532,14 @@ public sealed class RegionHoldSaveData
 
 /// <summary>A ring drawn for the woodcutters (RingOrder).</summary>
 [Serializable]
+public sealed class PostSaveData
+{
+    public float x;
+    public float y;
+    public float z;
+}
+
+[System.Serializable]
 public sealed class RingSaveData
 {
     public float x;

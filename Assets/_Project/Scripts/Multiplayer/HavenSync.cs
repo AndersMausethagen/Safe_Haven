@@ -205,10 +205,14 @@ public sealed class HavenSync : IDisposable
         SettlementSaveData data = SaveMapper.ToData(GameSession.HereItself);
         float purifying = data.purificationProgress;
         var progress = new List<float>();
+        var water = new List<float>();
         foreach (StationSaveData station in data.stations)
         {
             progress.Add(station.progress);
             station.progress = 0f;
+            // A field's water drains as it grows (Fields): whether it is wet is the change, not how long it lasts.
+            water.Add(station.water);
+            station.water = station.water > 0f ? 1f : 0f;
         }
 
         data.purificationProgress = 0f;
@@ -223,6 +227,7 @@ public sealed class HavenSync : IDisposable
         for (int i = 0; i < progress.Count; i++)
         {
             data.stations[i].progress = progress[i];
+            data.stations[i].water = water[i];
         }
 
         return WorldTransfer.Pack(data);

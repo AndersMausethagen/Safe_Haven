@@ -24,6 +24,12 @@ public sealed class KeeperHud : MonoBehaviour
     private TMP_Text ringLabel;
     private string shownNoRing = "-";
     private int shownRings = -1;
+    private TMP_Text postLabel;
+    private TMP_Text clearPostsLabel;
+    private Button clearPostsButton;
+    private string shownNoPost = "-";
+    private int shownPosts = -1;
+    private float nextPostRead;
     private TMP_Text clearLabel;
     private Button clearButton;
     private RectTransform reticle;
@@ -284,7 +290,7 @@ public sealed class KeeperHud : MonoBehaviour
 
     private static string Doing(ResidentLife life) => life.Activity switch
     {
-        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsFelling ? "felling the ring" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsHauling ? "fetching for work" : "at work",
+        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsFelling ? "felling the ring" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsFetchingWater ? "fetching water" : life.IsHauling ? "fetching for work" : "at work",
         ResidentActivity.Meal => "eating",
         ResidentActivity.Fire => "by the fire",
         ResidentActivity.Sleep => life.IsIndoors ? "asleep at home" : "going to bed",
@@ -333,6 +339,24 @@ public sealed class KeeperHud : MonoBehaviour
         // Back to the player's own feet.
         RectTransform corner = Box("Back", root, new Vector2(1f, 0f), new Vector2(330f, 46f), new Vector2(-24f, 24f));
         corner.pivot = new Vector2(1f, 0f);
+        // The guards' posts (GuardPosts): set one, or clear them.
+        RectTransform postCorner = Box("Posts", root, new Vector2(1f, 0f), new Vector2(330f, 102f), new Vector2(-24f, 190f));
+        postCorner.pivot = new Vector2(1f, 0f);
+        postLabel = AddButton("Post Button", postCorner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.BeginPost();
+            }
+        }, out _);
+        clearPostsLabel = AddButton("Clear Posts Button", postCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.ClearPosts();
+            }
+        }, out clearPostsButton);
+
         // The woodcutters' rings (RingWork): draw one, or clear them.
         RectTransform ringCorner = Box("Rings", root, new Vector2(1f, 0f), new Vector2(330f, 102f), new Vector2(-24f, 78f));
         ringCorner.pivot = new Vector2(1f, 0f);
@@ -381,6 +405,22 @@ public sealed class KeeperHud : MonoBehaviour
             ringLabel.text = noRing == null ? "Fell a ring of trees" : $"Fell a ring ({KeeperView.ShortWhyNoRing()})";
             clearButton.gameObject.SetActive(rings > 0 && !HavenVisit.IsVisiting);
             clearLabel.text = $"Clear the ring{(rings == 1 ? "" : "s")} ({rings})";
+        }
+
+        // The post buttons likewise (their reason counts the Watch Posts standing: a few times a second, not every frame).
+        if (Time.unscaledTime >= nextPostRead)
+        {
+            nextPostRead = Time.unscaledTime + 0.5f;
+            string noPost = KeeperView.ShortWhyNoPost();
+            int posts = GameSession.Here.Posts.Count;
+            if (noPost != shownNoPost || posts != shownPosts)
+            {
+                shownNoPost = noPost;
+                shownPosts = posts;
+                postLabel.text = noPost == null ? "Set a guard post" : $"Set a post ({noPost})";
+                clearPostsButton.gameObject.SetActive(posts > 0 && !HavenVisit.IsVisiting);
+                clearPostsLabel.text = $"Clear the post{(posts == 1 ? "" : "s")} ({posts})";
+            }
         }
 
         // Key names follow a rebind and the device in hand.
