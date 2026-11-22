@@ -125,7 +125,60 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             }
         }
 
-        return null;
+        return RaidTalk();
+    }
+
+    // A word about the raid just come home from (Hades' homecomings): from the one who went along; to a player who came home
+    // beaten; else about what the player carries that their work uses. Null when there was no raid or nothing to say.
+    private string RaidTalk()
+    {
+        RaidOutcome last = Homecoming.LastOutcome;
+        HomecomingSettings lines = HomecomingSettings.Current;
+        if (last == RaidOutcome.InProgress || HavenVisit.IsVisiting)
+        {
+            return null;
+        }
+
+        int pick = CompanionBond.StableIndex(resident.Id + GameSession.Here.SuccessfulExtractions, 97);
+        if (Homecoming.LastAlong == resident && lines.AlongLines.Length > 0)
+        {
+            return lines.AlongLines[pick % lines.AlongLines.Length];
+        }
+
+        if (last == RaidOutcome.Died && lines.FellLines.Length > 0)
+        {
+            return lines.FellLines[pick % lines.FellLines.Length];
+        }
+
+        JobDefinition job = Job;
+        Player player = Player.Current;
+        if (job == null || job.Workplace == null || player == null || !player.TryGetComponent(out ItemInventory bag) || lines.BroughtLines.Length == 0)
+        {
+            return null;
+        }
+
+        // The input of their work the player carries most of, three at least.
+        ItemDefinition most = null;
+        int count = 2;
+        foreach (WorkOrder order in job.WorkOrders)
+        {
+            if (order.recipe == null)
+            {
+                continue;
+            }
+
+            foreach (ItemAmount cost in order.recipe.ItemCost)
+            {
+                int carried = cost.Item != null ? bag.Container.Count(cost.Item) : 0;
+                if (carried > count)
+                {
+                    most = cost.Item;
+                    count = carried;
+                }
+            }
+        }
+
+        return most != null ? string.Format(lines.BroughtLines[pick % lines.BroughtLines.Length], count, most.DisplayName, job.Workplace.DisplayName) : null;
     }
 
     private static int IndexOf(ResidentRecord record)

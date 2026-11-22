@@ -257,6 +257,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             gameObject.AddComponent<BuildPlans>();
         }
 
+        // Wishes for a home, thanked for when met (the Keeper's view).
+        if (!TryGetComponent(out HomeWishes _))
+        {
+            gameObject.AddComponent<HomeWishes>();
+        }
+
         interactable = GetComponent<Interactable>();
         raid = GetComponent<RaidPortal>();
         station = GetComponent<CraftingStation>();

@@ -233,6 +233,8 @@ public sealed class ResidentSaveData
     public float haulDone;
     /// <summary>The id of the worker gear given to them, or empty. Missing in older saves: none.</summary>
     public string workGear;
+    /// <summary>Their wish for a home was met and thanked for (HomeWishes). Missing in older saves: not yet.</summary>
+    public bool wishMet;
 }
 
 [Serializable]

@@ -59,3 +59,14 @@ MonoBehaviour:
     amount: 2
     line: '{name} took the boat out at dawn and kept the best of the catch for you.'
     weight: 1
+  minAwaySeconds: 180
+  broughtLines:
+  - '"{0} {1}? The {2} will be busy for a while."'
+  - '"That''s {1} you''ve got. Leave it in the chests and I''ll put it to use at the {2}."'
+  - '"{1}! Just what the {2} was short of."'
+  fellLines:
+  - '"You came back. That''s the part that matters. The rest we can make again."'
+  - '"Sit by the fire a while before the next one. The woods will wait."'
+  alongLines:
+  - '"We made it back. I''ll tell it better at the fire."'
+  - '"My legs still think we''re out there."'

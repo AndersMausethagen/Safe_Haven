@@ -2227,6 +2227,20 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   their trips within what they carry. In the view, a dry plot is marked "Dry" and a ready one "N ready"; its window says how long
   the water lasts.
 
+### People (phase 6, 2026-11-22)
+
+- **Wishes met.** What someone likes in a home (`HomeLifeSettings` › Likings) is their wish: the view's tag shows it while unmet
+  ("Tor · wishes: A place to sit"; `HomeWishes.WishOf`). The first time their home has it, `HomeWishes` (on the portal, a look every
+  5 s, one at a time) has them say their Liking's Thanks aloud, puts the gift their trade makes in the chests (`HomecomingSettings`
+  › Gifts, by job) and marks it (`ResidentRecord.WishMet`, saved). Positive only.
+- **The raid, in passing.** Once per homecoming, after the older news (grief, a boss, a new face), `ResidentNpc.News` says a word
+  about the raid just come home from (`Homecoming.LastOutcome`, `LastAlong`): the one who went along, a player who came home
+  beaten, or what the player carries that their work uses (`HomecomingSettings` › Brought, Fell, Along Lines).
+- **Badges in the view.** The tag gives a person's rank before their job ("Journeyman Carpenter", `SettlementSettings` › Worker
+  Ranks) and a house who lives in it.
+- Orders are opened person by person through the jobs that do them (builders: Carpenter and Mason; rings: the Carpenter; water:
+  the Farmer). Companion signatures wait for the playtest, as decided on 2026-11-13. Tests: `HomeWishesTests`.
+
 ## Going along, set-pieces and bosses
 
 **Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list: raids don't seek them as a new face (`HasResident`). A `FallenCairn` goes up near the portal for as long as they are out there, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a loss never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.

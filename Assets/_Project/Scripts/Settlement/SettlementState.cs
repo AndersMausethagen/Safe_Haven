@@ -42,6 +42,7 @@ public sealed class ResidentRecord
     private string workQueue = "";
     private float haulDone;
     private ItemDefinition workGear;
+    private bool wishMet;
 
     private void Change<T>(ref T field, T value, [System.Runtime.CompilerServices.CallerMemberName] string change = null)
     {
@@ -86,6 +87,8 @@ public sealed class ResidentRecord
     public float HaulDone { get => haulDone; set => Change(ref haulDone, value); }
     /// <summary>The worker gear the player gave them (ItemDefinition › Worker Gear), or null.</summary>
     public ItemDefinition WorkGear { get => workGear; set => Change(ref workGear, value); }
+    /// <summary>Their home has had what they wish for (HomeWishes): thanked for, and gifted, once.</summary>
+    public bool WishMet { get => wishMet; set => Change(ref wishMet, value); }
 }
 
 /// <summary>Someone who went along on a raid and didn't come home. The forest has them: they can be found again, and won't know the player.</summary>

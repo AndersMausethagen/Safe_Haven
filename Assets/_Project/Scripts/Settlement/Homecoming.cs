@@ -15,9 +15,16 @@ public static class Homecoming
     /// <summary>True from a raid's end until the Haven has told its homecoming.</summary>
     public static bool Pending { get; private set; }
 
-    // The raid just ended: who went along (no gift from them) and how long it lasted.
+    // The raid just ended: who went along (no gift from them), how long it lasted and how it ended.
     private static ResidentDefinition along;
     private static float awaySeconds;
+    private static RaidOutcome outcome = RaidOutcome.InProgress;
+
+    /// <summary>How the raid the player last came home from ended; In Progress when none has since the game was loaded.</summary>
+    public static RaidOutcome LastOutcome => outcome;
+
+    /// <summary>Who went along on that raid, or null.</summary>
+    public static ResidentDefinition LastAlong => along;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => ForgetGame();
@@ -36,6 +43,7 @@ public static class Homecoming
         Pending = false;
         along = null;
         awaySeconds = 0f;
+        outcome = RaidOutcome.InProgress;
     }
 
     private static void OnRaised(GameEvent gameEvent)
@@ -44,6 +52,7 @@ public static class Homecoming
         {
             Pending = true;
             awaySeconds = gameEvent.Seconds;
+            outcome = gameEvent.Outcome;
             RaidReport report = GameSession.PendingReport;
             along = report != null ? report.Companion : null;
         }

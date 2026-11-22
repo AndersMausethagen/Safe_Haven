@@ -27,7 +27,31 @@ public sealed class HomecomingSettings : GameSettings<HomecomingSettings>
     [Tooltip("A raid shorter than this (seconds in it) brings no gift: turning straight back is no time away.")]
     [SerializeField, Min(0f)] private float minAwaySeconds = 180f;
 
+    [Header("What the people say of the raid (a word in passing, once each homecoming)")]
+    [Tooltip("About what the player carries that their work uses: {0} how many, {1} what, {2} their workplace.")]
+    [SerializeField] private string[] broughtLines =
+    {
+        "\"{0} {1}? The {2} will be busy for a while.\"",
+        "\"That's {1} you've got. Leave it in the chests and I'll put it to use at the {2}.\"",
+        "\"{1}! Just what the {2} was short of.\"",
+    };
+    [Tooltip("When the player came home on the portal's pull, beaten.")]
+    [SerializeField] private string[] fellLines =
+    {
+        "\"You came back. That's the part that matters. The rest we can make again.\"",
+        "\"Sit by the fire a while before the next one. The woods will wait.\"",
+    };
+    [Tooltip("From the one who went along on it.")]
+    [SerializeField] private string[] alongLines =
+    {
+        "\"We made it back. I'll tell it better at the fire.\"",
+        "\"My legs still think we're out there.\"",
+    };
+
     public float Chance => chance;
+    public string[] BroughtLines => broughtLines;
+    public string[] FellLines => fellLines;
+    public string[] AlongLines => alongLines;
     public float MinAwaySeconds => minAwaySeconds;
     public IReadOnlyList<Gift> Gifts => gifts;
 }

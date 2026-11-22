@@ -76,6 +76,8 @@ public sealed class HomeLifeSettings : GameSettings<HomeLifeSettings>
         public string likes;
         [Tooltip("What they say of it, shown in their window.")]
         public string line;
+        [Tooltip("What they say the first time their home has it (HomeWishes), aloud where they are.")]
+        public string thanks;
     }
 
     [Header("What makes a home")]

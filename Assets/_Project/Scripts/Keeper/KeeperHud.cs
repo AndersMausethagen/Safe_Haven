@@ -74,7 +74,7 @@ public sealed class KeeperHud : MonoBehaviour
         {
             tagged = thing;
             nextTagRead = Time.unscaledTime + 0.25f;
-            tagName.text = NameOf(thing);
+            tagName.text = TitleOf(thing);
             tagFact.text = FactOf(thing);
         }
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screen, null, out Vector2 local))
@@ -206,6 +206,13 @@ public sealed class KeeperHud : MonoBehaviour
         return mark;
     }
 
+    /// <summary>The tag's first line: the name, and a wish for a home still waiting (HomeWishes).</summary>
+    public static string TitleOf(Component thing)
+    {
+        string wish = thing is ResidentNpc person && person.Resident != null ? HomeWishes.WishOf(GameSession.Here.Find(person.Resident)) : null;
+        return wish != null ? $"{NameOf(thing)} · wishes: {wish}" : NameOf(thing);
+    }
+
     /// <summary>Who or what a pick is called.</summary>
     public static string NameOf(Component thing) => thing switch
     {
@@ -220,7 +227,10 @@ public sealed class KeeperHud : MonoBehaviour
     {
         if (thing is ResidentNpc person)
         {
-            string job = person.Job != null ? person.Job.DisplayName : "No work yet";
+            // Their rank in their work, as a badge before the job (SettlementSettings › Worker Ranks).
+            ResidentRecord record = person.Resident != null ? GameSession.Here.Find(person.Resident) : null;
+            string rank = record != null && person.Job != null ? SettlementSettings.Current.RankFor(record.WorkDone).name : "";
+            string job = person.Job != null ? (string.IsNullOrEmpty(rank) ? person.Job.DisplayName : $"{rank} {person.Job.DisplayName}") : "No work yet";
             return person.TryGetComponent(out ResidentLife life) ? $"{job} · {Doing(life)}" : job;
         }
 
@@ -236,6 +246,19 @@ public sealed class KeeperHud : MonoBehaviour
                 if (construction.IsBuilding)
                 {
                     return $"Scaffold · {Mathf.RoundToInt(construction.Share * 100f)}% built";
+                }
+
+                // A house: who lives there.
+                System.Collections.Generic.List<ResidentRecord> living = HavenHomes.LivingIn(building);
+                if (living.Count > 0 && !building.TryGetComponent(out CraftingStation _))
+                {
+                    var names = new System.Collections.Generic.List<string>();
+                    foreach (ResidentRecord one in living)
+                    {
+                        names.Add(one.Resident.DisplayName);
+                    }
+
+                    return $"Tier {Tiers.ToRoman(construction.Level)} · home of {string.Join(" and ", names)}";
                 }
 
                 if (building.TryGetComponent(out CraftingStation station) && station.Queue != null)
