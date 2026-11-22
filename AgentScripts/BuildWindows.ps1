@@ -35,9 +35,24 @@ $start = Get-Date
 # No double quotes in the code: Windows PowerShell 5.1 strips them from a native command's arguments.
 $code = if ($FullTextures) { 'SafeHavenBuild.BuildWindows(true); return 7;' } else { 'SafeHavenBuild.BuildWindows(false); return 7;' }
 $answer = & $unity command script eval --no-banner --timeout 7200 --code $code 2>&1 | Out-String
+# A shader cache Unity threw away (a URP or Editor update) can keep the build compiling variants for hours, past the CLI's wait;
+# the Editor goes on building, so wait for its output instead of calling that a failure.
+$waited = $answer -match 'did not complete within'
+if ($waited) {
+    Write-Output '[Build] Still building (shader variants?): waiting up to 4 more hours for the output.'
+    $until = (Get-Date).AddHours(4)
+    $idle = 0
+    while ((Get-Date) -lt $until -and $idle -lt 3 -and -not ((Test-Path $data) -and ((Get-Item $data).LastWriteTime -gt $start))) {
+        Start-Sleep -Seconds 60
+        # A busy Editor names its progress bar in its window title ("... (busy for 2:00:12)..."); three idle looks: it stopped.
+        $busy = Get-Process Unity -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowTitle -match 'busy' }
+        $idle = if ($busy) { 0 } else { $idle + 1 }
+    }
+    Start-Sleep -Seconds 60
+}
 $written = (Test-Path $data) -and ((Get-Item $data).LastWriteTime -gt $start)
 # Unity CLI 1.0 prints the eval's value itself (7); earlier versions a JSON object with "result":7.
-if ($answer -match '"result":7' -or $answer -match '(?m)^\s*7\s*$' -or ($written -and $answer -notmatch 'Exception|stopped|failed')) {
+if ($answer -match '"result":7' -or $answer -match '(?m)^\s*7\s*$' -or ($written -and ($waited -or $answer -notmatch 'Exception|stopped|failed'))) {
     Write-Output "[Build] Windows build done in $([math]::Round(((Get-Date) - $start).TotalMinutes, 1)) min: $Project/Build/Windows/Safe Haven.exe"
     exit 0
 }
