@@ -253,5 +253,6 @@ public static class GameSession
         ResidentBuilders.ForgetGame();
         Homecoming.ForgetGame();
         WorkerProduction.ForgetGame();
+        RingWork.ForgetGame();
     }
 }

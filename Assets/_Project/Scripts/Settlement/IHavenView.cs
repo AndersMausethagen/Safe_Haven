@@ -47,6 +47,9 @@ public interface IHavenView
     int NextBreachDueAt { get; }
 
     IReadOnlyList<ResidentRecord> Residents { get; }
+
+    /// <summary>Rings drawn in the Keeper's view for the woodcutters to clear (RingWork).</summary>
+    IReadOnlyList<RingOrder> Rings { get; }
     ResidentRecord Find(ResidentDefinition resident);
     bool HasResident(ResidentDefinition resident);
     ResidentRecord WorkerAt(CraftingStationType station);

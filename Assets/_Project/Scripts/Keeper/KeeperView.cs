@@ -53,6 +53,10 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     private float yawVelocity;
     private bool dragging;
     private Vector3 dragAnchor;
+    // Drawing a ring for the woodcutters (RingWork): its radius, and the lines on the ground.
+    private bool ringPlacing;
+    private float ringRadius;
+    private KeeperRings ringLines;
     private System.Func<bool> back;
 
     // ----- IOverview: what the player's camera frames while open -----
@@ -164,6 +168,12 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         }
 
         AudioManager.HearFrom = null;
+        ringPlacing = false;
+        if (ringLines != null)
+        {
+            ringLines.Hide();
+        }
+
         picker.Clear();
         following = null;
         dragging = false;
@@ -263,6 +273,12 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             return false;
         }
 
+        if (ringPlacing)
+        {
+            ringPlacing = false;
+            return true;
+        }
+
         Close(null);
         return true;
     }
@@ -316,7 +332,8 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         yawNow = Mathf.SmoothDampAngle(yawNow, rig.Yaw, ref yawVelocity, Settings.SettleSeconds, Mathf.Infinity, dt);
         AudioManager.HearFrom = focus + Vector3.up * Settings.EarHeight;
 
-        Point(windowUp || placing || overUI);
+        DrawRings(windowUp || placing || overUI);
+        Point(windowUp || placing || overUI || ringPlacing);
     }
 
     // The fog of war is a flat plane at the player's height: from above it lay in bands over the hills. It fades as the camera rises,
@@ -367,7 +384,11 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (!placing && !overUI)
         {
             float scroll = GameInput.CameraZoom != null ? GameInput.CameraZoom.ReadValue<float>() : 0f;
-            if (Mathf.Abs(scroll) > 0.01f)
+            if (Mathf.Abs(scroll) > 0.01f && ringPlacing)
+            {
+                ringRadius = Mathf.Clamp(ringRadius + Mathf.Sign(scroll) * 1.5f, 4f, 30f);
+            }
+            else if (Mathf.Abs(scroll) > 0.01f)
             {
                 rig.ZoomBy(-Mathf.Sign(scroll) * tuning.ZoomStep);
             }
@@ -390,6 +411,20 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (!placing && GameInput.KeeperFollow != null && GameInput.KeeperFollow.WasPressedThisFrame())
         {
             following = following == null && picker.Picked is ResidentNpc person ? person.transform : null;
+        }
+
+        if (ringPlacing && !overUI)
+        {
+            if (GameInput.KeeperSelect != null && GameInput.KeeperSelect.WasPressedThisFrame() && RingSpot(out Vector3 at))
+            {
+                LayRing(at);
+            }
+            else if (GameInput.CameraOrbit != null && GameInput.CameraOrbit.WasPressedThisFrame())
+            {
+                ringPlacing = false;
+            }
+
+            return;
         }
 
         if (!placing && !overUI && GameInput.KeeperSelect != null && GameInput.KeeperSelect.WasPressedThisFrame())
@@ -421,6 +456,100 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         rig.Target += moved;
         // At once, not smoothed: a drag that lags the hand slides.
         focus += moved;
+    }
+
+    // ----- Rings for the woodcutters (RingWork) -----
+
+    /// <summary>Starts drawing a ring for the woodcutters to fell, or says why not (no woodcutter, too many rings, a friend's Haven).</summary>
+    public void BeginRing()
+    {
+        if (!open)
+        {
+            return;
+        }
+
+        string why = WhyNoRing();
+        if (why != null)
+        {
+            GameMessages.Post(why, MessageKind.Warning);
+            return;
+        }
+
+        ringPlacing = true;
+        ringRadius = WorkerSettings.Current.RingRadius;
+        GameMessages.Post("Click where the woodcutters should fell; the wheel makes the ring larger or smaller. Right-click to stop.");
+    }
+
+    /// <summary>Takes every ring away (the woodcutters go back to their own work).</summary>
+    public void ClearRings()
+    {
+        if (HavenVisit.IsVisiting)
+        {
+            return;
+        }
+
+        var all = new System.Collections.Generic.List<RingOrder>(GameSession.Home.Rings);
+        foreach (RingOrder ring in all)
+        {
+            GameSession.Home.RemoveRing(ring);
+        }
+    }
+
+    /// <summary>Why no ring can be drawn now, or null.</summary>
+    public static string WhyNoRing()
+    {
+        if (HavenVisit.IsVisiting)
+        {
+            return "Rings are drawn in your own Haven.";
+        }
+
+        bool feller = false;
+        foreach (ResidentRecord record in GameSession.Home.Residents)
+        {
+            feller |= RingWork.Fells(record, WorkerSettings.Current);
+        }
+
+        if (!feller)
+        {
+            return "Nobody here fells trees yet: a woodcutter's work at the Woodcutter's Lodge.";
+        }
+
+        return GameSession.Home.Rings.Count >= WorkerSettings.Current.MostRings ? $"At most {WorkerSettings.Current.MostRings} rings at once." : null;
+    }
+
+    private bool RingSpot(out Vector3 at)
+    {
+        at = default;
+        return TryPointer(out Ray ray) && TryGround(ray, out at);
+    }
+
+    private void LayRing(Vector3 at)
+    {
+        ringPlacing = false;
+        var ring = new RingOrder(at, ringRadius);
+        int trees = RingWork.Standing(ring);
+        if (trees == 0)
+        {
+            GameMessages.Post("No trees stand in that ring.", MessageKind.Warning);
+            return;
+        }
+
+        ring.StandingSeen = trees;
+        GameSession.Home.AddRing(ring);
+        GameMessages.Post($"A ring of {trees} tree{(trees == 1 ? "" : "s")} for the woodcutters: they fell it in working hours, take the logs to the " +
+            "chests and plant a sapling where each stood.", MessageKind.Info);
+    }
+
+    private void DrawRings(bool hidden)
+    {
+        if (ringLines == null)
+        {
+            ringLines = new KeeperRings(transform);
+        }
+
+        Vector3 ghost = default;
+        bool ghostShown = ringPlacing && !hidden && RingSpot(out ghost);
+        ringLines.Show(GameSession.Here.Rings, ghost, ghostShown ? ringRadius : 0f);
     }
 
     // ----- Picking -----

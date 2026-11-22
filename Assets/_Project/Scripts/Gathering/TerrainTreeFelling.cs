@@ -123,6 +123,18 @@ public sealed class TerrainTreeFelling : MonoBehaviour
         Hide(index, tree);
     }
 
+    /// <summary>Fells a standing tree without a stand-in (a resident's felling ring, RingWork): it goes down as the player's would, and stays
+    /// down where the woods are remembered.</summary>
+    public void FellByHand(int index)
+    {
+        if (terrain == null || terrain.terrainData == null || felled.ContainsKey(index) || index < 0 || index >= terrain.terrainData.treeInstanceCount)
+        {
+            return;
+        }
+
+        Fell(index);
+    }
+
     /// <summary>This terrain's felling, added if it isn't there yet.</summary>
     public static TerrainTreeFelling On(Terrain terrain)
     {

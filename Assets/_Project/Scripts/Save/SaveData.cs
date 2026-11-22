@@ -129,6 +129,8 @@ public sealed class SettlementSaveData
     public List<FallenSaveData> fallen = new List<FallenSaveData>();
     /// <summary>Ids of the jobs they left. Missing in older saves.</summary>
     public List<string> vacantJobs = new List<string>();
+    /// <summary>Rings drawn for the woodcutters to clear (RingOrder). Missing in older saves: none.</summary>
+    public List<RingSaveData> rings = new List<RingSaveData>();
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>
@@ -520,4 +522,16 @@ public sealed class RegionHoldSaveData
     public int taskProgress;
     public int taskFrom;
     public int tasksDone;
+}
+
+/// <summary>A ring drawn for the woodcutters (RingOrder).</summary>
+[Serializable]
+public sealed class RingSaveData
+{
+    public float x;
+    public float y;
+    public float z;
+    public float radius;
+    public int pendingFells;
+    public int standingSeen = -1;
 }

@@ -14,6 +14,20 @@ public sealed class BuildPlans : MonoBehaviour
     private readonly List<BuildingDefinition> waiting = new List<BuildingDefinition>();
     private float nextLook;
 
+    private float nextRingLook;
+
+    // Home again: the trees felled while away come down in their rings, with their saplings (RingWork); saved felling is put back
+    // in the buildings' and terrains' own Start, so wait for it.
+    private System.Collections.IEnumerator Start()
+    {
+        yield return null;
+        yield return null;
+        if (!HavenVisit.IsVisiting)
+        {
+            RingWork.SettleAtHome(GameSession.Home, WorkerSettings.Current);
+        }
+    }
+
     private void Update()
     {
         if (HavenVisit.IsVisiting || Time.unscaledTime < nextLook)
@@ -22,6 +36,15 @@ public sealed class BuildPlans : MonoBehaviour
         }
 
         nextLook = Time.unscaledTime + LookSeconds;
+        // The trees standing in each ring, now and then, so the work while away stops where the ring runs out.
+        if (Time.unscaledTime >= nextRingLook)
+        {
+            nextRingLook = Time.unscaledTime + 20f;
+            foreach (RingOrder ring in GameSession.Home.Rings)
+            {
+                ring.StandingSeen = RingWork.Standing(ring);
+            }
+        }
         waiting.Clear();
         // The chests only: what the player carries is theirs to spend (they can hammer a plan with it themselves).
         var chests = new MaterialPool(null, null, GameSession.Stash.Resources, GameSession.Stash.Items);

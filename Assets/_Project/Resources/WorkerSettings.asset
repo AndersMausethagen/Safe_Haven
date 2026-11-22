@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WorkerSettings
   unattendedSpeed: 0.6
   workerSpeed: 1
+  workedStations: 0100000003000000040000000500000007000000090000000a0000000d000000i
+  playerSpeed: 1
+  playerReach: 6
   carryWeight: 25
   carrySlots: 1
   strengthAt:
@@ -32,3 +35,12 @@ MonoBehaviour:
   tripHandling: 6
   awayWalkSpeed: 1.6
   assumedTripDistance: 30
+  fellers:
+  - {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
+  chopSeconds: 12
+  fellWalkSeconds: 20
+  fellerAxeTier: 1
+  averageTreeHeight: 9
+  sapling: {fileID: 11400000, guid: 9baec1294db149f43bd3f8493b5b7c02, type: 2}
+  mostRings: 3
+  ringRadius: 10

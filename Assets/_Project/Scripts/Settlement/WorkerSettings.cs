@@ -61,6 +61,33 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [Tooltip("Metres between a station and its chest assumed while away when none was measured at home.")]
     [SerializeField, Min(1f)] private float assumedTripDistance = 30f;
 
+    [Header("Felling rings")]
+    [Tooltip("Jobs whose holders fell the rings drawn in the Keeper's view (the Woodcutter's Lodge's).")]
+    [SerializeField] private JobDefinition[] fellers = System.Array.Empty<JobDefinition>();
+    [Tooltip("Seconds of chopping a tree takes a feller at work speed 1.")]
+    [SerializeField, Min(1f)] private float chopSeconds = 12f;
+    [Tooltip("Seconds a tree's logs take to the chests and back, while the player is away.")]
+    [SerializeField, Min(0f)] private float fellWalkSeconds = 20f;
+    [Tooltip("The axe tier a feller cuts with (a tree's logs: TreeChoppingSettings).")]
+    [SerializeField, Range(1, 5)] private int fellerAxeTier = 1;
+    [Tooltip("Metres tall a tree felled while away is taken to be (its logs).")]
+    [SerializeField, Min(1f)] private float averageTreeHeight = 9f;
+    [Tooltip("The sapling planted where a felled tree stood (the forester); empty plants none.")]
+    [SerializeField] private SaplingDefinition sapling;
+    [Tooltip("Rings that may stand at once.")]
+    [SerializeField, Min(1)] private int mostRings = 3;
+    [Tooltip("A new ring's radius in metres (the wheel changes it while drawing).")]
+    [SerializeField, Min(3f)] private float ringRadius = 10f;
+
+    public System.Collections.Generic.IReadOnlyList<JobDefinition> Fellers => fellers;
+    public float ChopSeconds => chopSeconds;
+    public float FellWalkSeconds => fellWalkSeconds;
+    public int FellerAxeTier => fellerAxeTier;
+    public float AverageTreeHeight => averageTreeHeight;
+    public SaplingDefinition Sapling => sapling;
+    public int MostRings => mostRings;
+    public float RingRadius => ringRadius;
+
     public float UnattendedSpeed => unattendedSpeed;
     public float PlayerSpeed => playerSpeed;
     public float PlayerReach => playerReach;

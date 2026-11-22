@@ -21,6 +21,9 @@ public sealed class KeeperHud : MonoBehaviour
     private TMP_Text tagFact;
     private TMP_Text keys;
     private TMP_Text backLabel;
+    private TMP_Text ringLabel;
+    private TMP_Text clearLabel;
+    private Button clearButton;
     private RectTransform reticle;
     private RectTransform canvasRect;
     private float shown;
@@ -237,7 +240,7 @@ public sealed class KeeperHud : MonoBehaviour
 
     private static string Doing(ResidentLife life) => life.Activity switch
     {
-        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsHauling ? "fetching for work" : "at work",
+        ResidentActivity.Work => life.IsBuilding ? "building" : life.IsFelling ? "felling the ring" : life.IsTakingWorkBack ? "taking work to the chests" : life.IsHauling ? "fetching for work" : "at work",
         ResidentActivity.Meal => "eating",
         ResidentActivity.Fire => "by the fire",
         ResidentActivity.Sleep => life.IsIndoors ? "asleep at home" : "going to bed",
@@ -286,6 +289,24 @@ public sealed class KeeperHud : MonoBehaviour
         // Back to the player's own feet.
         RectTransform corner = Box("Back", root, new Vector2(1f, 0f), new Vector2(330f, 46f), new Vector2(-24f, 24f));
         corner.pivot = new Vector2(1f, 0f);
+        // The woodcutters' rings (RingWork): draw one, or clear them.
+        RectTransform ringCorner = Box("Rings", root, new Vector2(1f, 0f), new Vector2(330f, 102f), new Vector2(-24f, 78f));
+        ringCorner.pivot = new Vector2(1f, 0f);
+        ringLabel = AddButton("Ring Button", ringCorner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.BeginRing();
+            }
+        }, out _);
+        clearLabel = AddButton("Clear Rings Button", ringCorner, 0f, 52f, 330f, UIRole.Kind.Button, () =>
+        {
+            if (KeeperView.Current != null)
+            {
+                KeeperView.Current.ClearRings();
+            }
+        }, out clearButton);
+
         backLabel = AddButton("Back Button", corner, 0f, 0f, 330f, UIRole.Kind.Button, () =>
         {
             if (KeeperView.Current != null)
@@ -305,6 +326,12 @@ public sealed class KeeperHud : MonoBehaviour
             gameObject.SetActive(false);
             return;
         }
+
+        string noRing = KeeperView.WhyNoRing();
+        ringLabel.text = noRing == null ? "Fell a ring of trees" : "Fell a ring (no woodcutter yet)";
+        int rings = GameSession.Here.Rings.Count;
+        clearButton.gameObject.SetActive(rings > 0);
+        clearLabel.text = $"Clear the ring{(rings == 1 ? "" : "s")} ({rings})";
 
         // Key names follow a rebind and the device in hand.
         int changes = InputRebinds.Changes * 2 + (InputDevices.UsingGamepad ? 1 : 0);

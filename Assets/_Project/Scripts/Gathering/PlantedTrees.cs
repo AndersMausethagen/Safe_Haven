@@ -62,6 +62,29 @@ public sealed class PlantedTrees : MonoBehaviour, ISaveable
 
     public int Count => planted.Count;
 
+    /// <summary>
+    /// Whether the tree at <paramref name="index"/> on <paramref name="on"/>'s terrain is a sapling still growing (RingWork leaves those:
+    /// a ring is cleared of its grown trees, not of the saplings its woodcutter just planted).
+    /// </summary>
+    public bool IsGrowing(TerrainTreeFelling on, int index)
+    {
+        if (on == null || on != felling)
+        {
+            return false;
+        }
+
+        float today = Today;
+        foreach (Planted tree in planted)
+        {
+            if (tree.index == index)
+            {
+                return today - tree.plantedDay < tree.growDays;
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>The in-game day now, counting from the first dawn, with the hour as its fraction (days start at dawn).</summary>
     public static float Today => (GameSession.Here != null ? GameSession.Here.DaysPassed : 0) + Mathf.Repeat(AtmosphereConditions.Hour - 6f, 24f) / 24f;
 

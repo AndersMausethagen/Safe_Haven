@@ -25,6 +25,8 @@ public sealed class SaveCoverageTests
         ["Quests.entries"] = "QuestTests, QuestPacingTests (status, counts, rewards waiting)",
         ["Settlement.Territory.holds"] = "TerritoryTests.TheLands_SurviveASave",
         ["Settlement.Workshops.queues"] = "StationQueueTests.Workshops_RoundTripThroughSave",
+        // Rings are only kept while they hold a radius the probe's filler doesn't give; the round trip is its own test.
+        ["Settlement.rings"] = "RingWorkTests.Rings_AreSaved",
         // Only real perks and skills are kept on loading, and ranks to the deepest there is: a probe can't invent them.
         ["Progress.perks"] = "ProgressionTests, TechniqueTests (perks a save keeps)",
         ["Progress.skillRanks"] = "EssenceTests (skill ranks)",

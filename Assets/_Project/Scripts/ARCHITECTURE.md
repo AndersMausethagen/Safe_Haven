@@ -2177,6 +2177,21 @@ the player standing at a station adds their own work (Player Speed, within Playe
 meanwhile, one-slot workers bring several crafts of one kind per trip, no pacing with nothing to take back, a player taking a
 resident's cart makes them let go, gear swaps never lose the old piece.
 
+### Felling rings (phase 4, 2026-11-21)
+
+- **A ring for the woodcutters.** In the view, "Fell a ring of trees" (`KeeperView.BeginRing`; the wheel sizes it, a click lays it,
+  right-click or Back stops) draws a `RingOrder` round the grown trees to clear, at most `WorkerSettings` › Most Rings (3). Saved on
+  the settlement (`SettlementState.Rings`, `RingSaveData`); drawn on the ground while the view is open (`KeeperRings`).
+- **At home.** A resident whose job is one of `WorkerSettings` › Fellers (the Carpenter) fells the first ring in working hours, after
+  any scaffold (`ResidentLife.FellStep`): walks to the grown tree nearest the centre, chops for Chop Seconds shared by their work
+  speed, brings it down (`TerrainTreeFelling.FellByHand`), plants a `Sapling` where it stood (`RingWork.Replant`, through
+  `PlantedTrees`; refused where too close to another tree) and carries the logs (`ChoppableTree.Roll` at Feller Axe Tier) to the
+  nearest chest. Saplings still growing are never felled (`PlantedTrees.IsGrowing`), so a ring runs out. An empty ring is done.
+- **Away.** `RingWork.WorkAway` (from `SettlementSystem` while the player is away) counts trees at `SecondsPerTree` per feller at
+  home (not the one along), up to the trees last seen standing (`RingOrder.StandingSeen`, noted by `BuildPlans` every 20 s), gives
+  an average tree's logs to the chests at once and keeps the trees as `PendingFells`; `RingWork.SettleAtHome` brings them down with
+  their saplings when the Haven is next the scene. Tests: `RingWorkTests`.
+
 ## Going along, set-pieces and bosses
 
 **Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list: raids don't seek them as a new face (`HasResident`). A `FallenCairn` goes up near the portal for as long as they are out there, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a loss never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.

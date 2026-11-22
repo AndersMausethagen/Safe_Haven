@@ -85,6 +85,16 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private float nextTripLook;
     private Vector3 workPlace;
     private Quaternion workFacingThere = Quaternion.identity;
+
+    // Felling a ring (RingWork): the ring, the tree they are at, the chopping left, the logs on their way to the chests.
+    private RingOrder fellingRing;
+    private TerrainTreeFelling fellOn;
+    private int fellIndex = -1;
+    private Vector3 fellFoot;
+    private float fellHeight;
+    private float chopLeft;
+    private bool logsToChest;
+    private readonly List<ItemAmount> logs = new List<ItemAmount>();
     private BuildingObject sleepsIn;
     private readonly List<Renderer> hiddenRenderers = new List<Renderer>();
     private readonly List<Collider> hiddenColliders = new List<Collider>();
@@ -126,6 +136,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         building = null;
         // Going with the scene: the trip ends where it stands, no walk back and no tool made while the scene closes.
         ClearTrip();
+        StopFelling();
+        fellingRing = null;
         HavenHomes.Changed -= Refresh;
         HavenHomes.NoteIndoors(insideOf, false);
     }
@@ -364,7 +376,15 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             next = ResidentActivity.Work;
         }
 
-        bool freeToGo = scaffold == null && (next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom));
+        // A woodcutter with a ring drawn fells it in working hours, after any scaffold (RingWork).
+        RingOrder ring = workTime && scaffold == null && Festivals.Now == null ? RingToFell() : null;
+        if (ring != null)
+        {
+            next = ResidentActivity.Work;
+            scaffold = null;
+        }
+
+        bool freeToGo = scaffold == null && ring == null && (next == ResidentActivity.Work || (next == ResidentActivity.Fire && !hasWorkplace && hour >= settings.ResidentHours.WorkFrom));
         if (freeToGo && GoingOut(hour, out Vector3 outTo, out Quaternion outFacing))
         {
             next = ResidentActivity.Outing;
@@ -379,14 +399,20 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         if (next != ResidentActivity.Work)
         {
             scaffold = null;
+            ring = null;
         }
 
-        if (next == activity && scaffold == building && started && !atOnce && !again)
+        if (next == activity && scaffold == building && ring == fellingRing && started && !atOnce && !again)
         {
             return;
         }
 
         building = scaffold;
+        if (ring != fellingRing || ring == null)
+        {
+            StopFelling();
+            fellingRing = ring;
+        }
         repathed = false;
         // A new plan ends any trip: what they carried never left the chest or the station.
         trip = Trip.None;
@@ -409,6 +435,10 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         {
             case ResidentActivity.Work when building != null:
                 place = BuildSpot(building, out facing);
+                break;
+            case ResidentActivity.Work when fellingRing != null:
+                place = fellIndex >= 0 ? TreeSpot(out facing) : fellingRing.Centre;
+                facing = fellIndex >= 0 ? facing : transform.rotation;
                 break;
             case ResidentActivity.Work:
                 place = workSpot + workFacing * Vector3.right * workShift;
@@ -749,7 +779,14 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return;
         }
 
-        if (activity == ResidentActivity.Work && building == null && Time.time >= nextTripLook && MaybeStartTrip())
+        if (activity == ResidentActivity.Work && building == null && fellingRing != null)
+        {
+            if (!FellStep())
+            {
+                return;
+            }
+        }
+        else if (activity == ResidentActivity.Work && building == null && Time.time >= nextTripLook && MaybeStartTrip())
         {
             return;
         }
@@ -864,7 +901,11 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
     /// <summary>True while at work at <paramref name="workplace"/>: there, not fetching, building or elsewhere (CraftingStation.WorkerIsHere).</summary>
     public bool WorksAt(BuildingObject workplace) =>
-        workplace != null && activity == ResidentActivity.Work && building == null && trip == Trip.None && arrived && npc.Workplace == workplace;
+        workplace != null && activity == ResidentActivity.Work && building == null && fellingRing == null && trip == Trip.None && arrived
+        && npc.Workplace == workplace;
+
+    /// <summary>True while felling a ring (walking to a tree, chopping, or taking its logs to the chests).</summary>
+    public bool IsFelling => fellingRing != null && activity == ResidentActivity.Work && building == null;
 
     // What they can carry now: their hands, a cart they took, a horse at their station.
     private CarryLimits Limits(StationQueue queue)
@@ -1079,6 +1120,154 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     void IHauler.Ended()
     {
         cart = null;
+    }
+
+    // ----- Felling a ring (RingWork; Docs/ColonyModeResearch_2026-11-21.md §4.7) -----
+
+    // The first ring drawn, for a woodcutter.
+    private RingOrder RingToFell()
+    {
+        if (!RingWork.Fells(npc.Record, WorkerSettings.Current))
+        {
+            return null;
+        }
+
+        IReadOnlyList<RingOrder> rings = GameSession.Here.Rings;
+        return rings.Count > 0 ? (fellingRing != null && Contains(rings, fellingRing) ? fellingRing : rings[0]) : null;
+    }
+
+    private static bool Contains(IReadOnlyList<RingOrder> rings, RingOrder ring)
+    {
+        foreach (RingOrder one in rings)
+        {
+            if (one == ring)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // One frame of felling: walking (false: nothing more this frame) or chopping (true: the work gesture plays).
+    private bool FellStep()
+    {
+        if (logsToChest)
+        {
+            // At the chests with the logs: in they go, and on to the next tree.
+            if (!HavenVisit.IsVisiting)
+            {
+                float weight = 0f;
+                foreach (ItemAmount log in logs)
+                {
+                    int added = GameSession.Stash.Items.Add(log.Item, log.Amount);
+                    weight += added * Mathf.Max(0f, log.Item.Weight);
+                }
+
+                if (npc.Record != null && weight > 0f)
+                {
+                    npc.Record.HaulDone += weight;
+                }
+            }
+
+            logs.Clear();
+            logsToChest = false;
+            ShowTool(null, 1f);
+            return GoToNextTree();
+        }
+
+        if (fellIndex < 0 || fellOn == null)
+        {
+            return GoToNextTree();
+        }
+
+        chopLeft -= Time.deltaTime * BuildRate(npc.Record) * 2f;
+        if (chopLeft > 0f)
+        {
+            return true;
+        }
+
+        // Down it comes: its logs, and a sapling where it stood (only in the game that keeps the Haven).
+        logs.Clear();
+        if (!HavenVisit.IsVisiting)
+        {
+            fellOn.FellByHand(fellIndex);
+            logs.AddRange(RingWork.Logs(fellHeight, WorkerSettings.Current, () => Random.value));
+            RingWork.Replant(fellFoot, WorkerSettings.Current);
+        }
+
+        fellIndex = -1;
+        fellOn = null;
+        StashChest chest = StashChest.Nearest(fellFoot, WorkerSettings.Current.ChestReach);
+        if (chest != null && logs.Count > 0)
+        {
+            logsToChest = true;
+            ShowTool(logs[0].Item, CarriedScale);
+            GoTo(SpotBeside(chest.transform, out facing));
+            return false;
+        }
+
+        // No chest near: straight into the stash, as work goes before chests stand.
+        foreach (ItemAmount log in logs)
+        {
+            GameSession.Stash.Items.Add(log.Item, log.Amount);
+        }
+
+        logs.Clear();
+        return GoToNextTree();
+    }
+
+    // The next tree in the ring, or the ring is done.
+    private bool GoToNextTree()
+    {
+        if (fellingRing == null || !RingWork.NextTree(fellingRing, out TerrainTreeFelling felling, out TerrainTreeFelling.Standing tree))
+        {
+            if (fellingRing != null && !HavenVisit.IsVisiting)
+            {
+                GameMessages.Post($"{npc.Resident.DisplayName} has felled the ring: its saplings are in.", MessageKind.Gain);
+                GameSession.Home.RemoveRing(fellingRing);
+            }
+
+            StopFelling();
+            fellingRing = null;
+            Decide(false, true);
+            return false;
+        }
+
+        fellOn = felling;
+        fellIndex = tree.Index;
+        fellFoot = tree.Foot;
+        fellHeight = tree.Height;
+        chopLeft = WorkerSettings.Current.ChopSeconds;
+        GoTo(TreeSpot(out facing));
+        return false;
+    }
+
+    // Beside the tree, facing it.
+    private Vector3 TreeSpot(out Quaternion facingIt)
+    {
+        Vector3 away = transform.position - fellFoot;
+        away.y = 0f;
+        away = away.sqrMagnitude > 0.01f ? away.normalized : Vector3.back;
+        facingIt = Quaternion.LookRotation(-away);
+        return fellFoot + away * 1.3f;
+    }
+
+    private void StopFelling()
+    {
+        fellIndex = -1;
+        fellOn = null;
+        logsToChest = false;
+        // Logs on the way to the chests go in at once: nothing felled is lost to a change of plan.
+        if (logs.Count > 0 && !HavenVisit.IsVisiting)
+        {
+            foreach (ItemAmount log in logs)
+            {
+                GameSession.Stash.Items.Add(log.Item, log.Amount);
+            }
+        }
+
+        logs.Clear();
     }
 
     // ----- Building at home -----

@@ -82,6 +82,11 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             // At home a worker fetches on foot where a chest stands near their workplace (ResidentLife); away, each trip takes the time
             // the walk would (WorkerSettings).
             WorkerProduction.Work(settlement, GameSession.Stash, workerSeconds, atHome, atHome ? HowAtHome : null, along);
+            // Away, the woodcutters fell the rings drawn (laid down at home on the way back: RingWork.SettleAtHome).
+            if (!atHome)
+            {
+                RingWork.WorkAway(settlement, GameSession.Stash, workerSeconds, along, WorkerSettings.Current);
+            }
             workerSeconds = 0f;
         }
 

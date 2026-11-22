@@ -287,6 +287,12 @@ public static class SaveMapper
             into.vacantJobs.Add(job.Id);
         }
 
+        foreach (RingOrder ring in settlement.Rings)
+        {
+            into.rings.Add(new RingSaveData { x = ring.Centre.x, y = ring.Centre.y, z = ring.Centre.z, radius = ring.Radius,
+                pendingFells = ring.PendingFells, standingSeen = ring.StandingSeen });
+        }
+
         foreach (StationQueue queue in settlement.Workshops.Queues)
         {
             // One with nothing in it is left out; one whose worker has fetched for an order isn't (that would be lost).
@@ -417,6 +423,14 @@ public static class SaveMapper
         foreach (string job in saved.vacantJobs ?? new List<string>())
         {
             settlement.RestoreVacantJob(Resolve(content.FindJob(job), "job", job, missing));
+        }
+
+        foreach (RingSaveData ring in saved.rings ?? new List<RingSaveData>())
+        {
+            if (ring != null)
+            {
+                settlement.AddRing(new RingOrder(new UnityEngine.Vector3(ring.x, ring.y, ring.z), ring.radius) { PendingFells = ring.pendingFells, StandingSeen = ring.standingSeen });
+            }
         }
 
         ReadStations(saved.stations, settlement.Workshops, content, missing);

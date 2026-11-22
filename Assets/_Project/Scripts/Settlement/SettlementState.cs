@@ -529,6 +529,30 @@ public sealed class SettlementState : IHavenView
     [field: NotSaved("what this game sees standing, from the scaffolds at home")]
     public bool ScaffoldsWaiting { get; private set; }
 
+    private readonly List<RingOrder> rings = new List<RingOrder>();
+
+    /// <summary>Rings drawn in the Keeper's view for the woodcutters to clear (RingWork), oldest first.</summary>
+    public IReadOnlyList<RingOrder> Rings => rings;
+
+    public void AddRing(RingOrder ring)
+    {
+        Borrowed();
+        if (ring != null)
+        {
+            rings.Add(ring);
+            Changed?.Invoke();
+        }
+    }
+
+    public void RemoveRing(RingOrder ring)
+    {
+        Borrowed();
+        if (rings.Remove(ring))
+        {
+            Changed?.Invoke();
+        }
+    }
+
     [NotSaved("the plans standing at home, noted again by BuildPlans every few seconds there")]
     private readonly List<BuildingDefinition> plans = new List<BuildingDefinition>();
 
