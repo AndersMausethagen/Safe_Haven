@@ -24,6 +24,12 @@ MonoBehaviour:
       volume: 1
       startAt: 15
     order: 0
+  breach:
+    tracks:
+    - clip: {fileID: 8300000, guid: 13ce48cbd17a75f4b8c20ee839c27223, type: 3}
+      volume: 0.8
+      startAt: 0
+    order: 0
   crossfadeSeconds: 2
   combatFadeSeconds: 0.9
   masterVolume: 1

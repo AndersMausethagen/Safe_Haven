@@ -172,8 +172,15 @@ public static class MusicRules
 {
     // Event music first (unless it lets fights interrupt it, as a place's mood music does); then a fight's combat music, even in a scene kept silent (the prologue's quiet forest); a
     // silence holds only while nobody fights.
-    public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft, bool hushed = false)
+    public static MusicChoice Choose(SceneAudio scene, AudioSettingsDefinition defaults, AudioMood mood, float raidTimeLeft, bool hushed = false,
+        bool breach = false)
     {
+        // The Haven under attack: its own music, whatever else is going on.
+        if (breach && defaults != null && defaults.Breach.HasTracks)
+        {
+            return new MusicChoice(defaults.Breach, "Ward breach", true);
+        }
+
         bool overridden = scene != null && scene.MusicOverridden;
         bool combatAllowed = scene == null || scene.CombatMusic;
         bool fightTakesOver = mood == AudioMood.Combat && combatAllowed && scene != null && scene.FightsInterruptEventMusic;

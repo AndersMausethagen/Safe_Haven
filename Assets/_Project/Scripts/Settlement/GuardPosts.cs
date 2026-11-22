@@ -55,6 +55,45 @@ public static class GuardPosts
         return -1;
     }
 
+    /// <summary>A ward breach is being fought now.</summary>
+    public static bool InBreach => WardBreachDirector.Current != null && WardBreachDirector.Current.IsActive;
+
+    /// <summary>
+    /// How <paramref name="record"/> fights when called out, or null when they shelter: a guard as their job has it; in a ward breach
+    /// (DefenceSettings › Everyone Fights Breaches) anyone else at home too, as they fight on a raid, else as the Breach Fighter.
+    /// </summary>
+    public static CompanionDefinition FightsAs(ResidentRecord record, bool breach, DefenceSettings settings)
+    {
+        if (record == null || record.IsAway)
+        {
+            return null;
+        }
+
+        if (Defends(record))
+        {
+            return record.Job.DefendsAs;
+        }
+
+        if (!breach || settings == null || !settings.EveryoneFightsBreaches)
+        {
+            return null;
+        }
+
+        return record.Resident != null && record.Resident.RaidCompanion != null ? record.Resident.RaidCompanion : settings.BreachFighter;
+    }
+
+    /// <summary>How many of the Haven's people fight in a ward breach.</summary>
+    public static int BreachFighters(IHavenView home, DefenceSettings settings)
+    {
+        int count = 0;
+        foreach (ResidentRecord record in home.Residents)
+        {
+            count += FightsAs(record, true, settings) != null ? 1 : 0;
+        }
+
+        return count;
+    }
+
     /// <summary>Whether the guards are called out now: a ward breach, (when DefenceSettings says so) a corruption night, or the horn.</summary>
     public static bool CalledOut(out bool night)
     {

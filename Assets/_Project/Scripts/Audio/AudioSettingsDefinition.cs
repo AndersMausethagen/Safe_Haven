@@ -18,6 +18,9 @@ public sealed class AudioSettingsDefinition : ScriptableObject
     [SerializeField] private MusicPlaylist defaultExploring = new MusicPlaylist();
     [Tooltip("Plays while fighting in scenes whose Scene Music has no combat tracks.")]
     [SerializeField] private MusicPlaylist defaultCombat = new MusicPlaylist();
+    [Tooltip("Plays while a ward breach is under way at home, over every other choice but a cinematic (the user, 2026-11-22: \"the " +
+             "music should change\").")]
+    [SerializeField] private MusicPlaylist breach = new MusicPlaylist();
     [Tooltip("Seconds one piece of music takes to fade into the next.")]
     [SerializeField, Min(0f)] private float crossfadeSeconds = 2f;
     [Tooltip("Seconds for the music to change when a fight starts: quicker, or the danger is over before it arrives.")]
@@ -285,6 +288,7 @@ public sealed class AudioSettingsDefinition : ScriptableObject
 
     public MusicPlaylist DefaultExploring => defaultExploring;
     public MusicPlaylist DefaultCombat => defaultCombat;
+    public MusicPlaylist Breach => breach;
     public float CrossfadeSeconds => crossfadeSeconds;
     public float MasterVolume => masterVolume;
     public bool EnemyChasingIsCombat => enemyChasingPlayer;

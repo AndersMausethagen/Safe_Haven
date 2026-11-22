@@ -456,7 +456,8 @@ public sealed class AudioManager : MonoBehaviour, IGameSystem
         {
             float raidTimeLeft = RaidDirector.Current != null ? RaidDirector.Current.Session.TimeRemaining : float.PositiveInfinity;
             MusicChoice choice = MusicHeld ? new MusicChoice(null, "Held: a cinematic is playing")
-                : MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft, Time.unscaledTime < hushedUntil);
+                : MusicRules.Choose(sceneAudio, settings, Mood, raidTimeLeft, Time.unscaledTime < hushedUntil,
+                    WardBreachDirector.Current != null && WardBreachDirector.Current.IsUnderWay);
             MusicReason = choice.Reason;
             music.Switch(choice.Playlist);
             if (restartCombatMusic && choice.IsCombat)

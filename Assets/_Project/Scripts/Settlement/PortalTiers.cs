@@ -34,6 +34,22 @@ public static class PortalTiers
 
     /// <summary>What still has to happen before a ward level can be raised, beyond its materials, for the player:
     /// "Needs a Smithy at Tier II and Yrsa living here." Empty when nothing is missing.</summary>
+    /// <summary>
+    /// True once the portal has said what this tier means: its Introduced By quest is done, or under way with its first step done
+    /// (the user, 2026-11-22: the first raise was a button that did something nobody had told them of). Always on a friend's Haven
+    /// (the host's quests decide there) and with no quest set.
+    /// </summary>
+    public static bool Introduced(SettlementSettings.WardLevel level)
+    {
+        if (level == null || level.introducedBy == null || HavenVisit.IsVisiting || Cheats.NoRequirements)
+        {
+            return true;
+        }
+
+        QuestStatus status = GameSession.Quests.StatusOf(level.introducedBy);
+        return status == QuestStatus.Completed || (status == QuestStatus.Active && !GameSession.Quests.Get(level.introducedBy).IsObjectiveOpen(0));
+    }
+
     public static string Missing(SettlementSettings.WardLevel level, IHavenView settlement)
     {
         if (level == null || Cheats.NoRequirements)

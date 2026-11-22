@@ -31,6 +31,16 @@ public sealed class DefenceSettings : GameSettings<DefenceSettings>
     [Tooltip("What the horn sounds like, at the portal.")]
     [SerializeField] private SoundDefinition hornSound;
 
+    [Header("Ward breaches")]
+    [Tooltip("In a ward breach everyone at home turns out to fight, not only the guards (the user, 2026-11-22: \"all NPCs should help " +
+             "fight\"): guards at their posts, everyone else round the portal. Off: only the guards, as many as the posts hold.")]
+    [SerializeField] private bool everyoneFightsBreaches = true;
+    [Tooltip("How someone without a guard's job fights in a breach, when they have no way of fighting on a raid of their own.")]
+    [SerializeField] private CompanionDefinition breachFighter;
+
+    public bool EveryoneFightsBreaches => everyoneFightsBreaches;
+    public CompanionDefinition BreachFighter => breachFighter;
+
     public ResidentDefinition HornKeeper => hornKeeper;
     public float HornSeconds => hornSeconds;
     public SoundDefinition HornSound => hornSound;

@@ -133,6 +133,8 @@ public sealed class WardBreachDirector : MonoBehaviour
     {
         Current = this;
         road = new NavMeshPath();
+        // The Haven's look under attack (WardBreachSettings › Breach Look).
+        gameObject.AddComponent<BreachMood>();
     }
 
     private void OnDestroy()
@@ -313,10 +315,12 @@ public sealed class WardBreachDirector : MonoBehaviour
                 continue;
             }
 
-            int fielded = Mathf.Max(1, Mathf.RoundToInt(roster.Count * (1f - GameSession.Here.BreachWeakening)));
+            // More of them, and more again for each of the Haven's people who fight (everyone turns out now): the roster comes round.
+            int fielded = WardBreachSettings.Current.Fielded(roster.Count, GuardPosts.BreachFighters(GameSession.Here, DefenceSettings.Current),
+                GameSession.Here.BreachWeakening);
             for (int i = 0; i < fielded && IsActive; i++)
             {
-                Spawn(roster[i]);
+                Spawn(roster[i % roster.Count]);
                 if (i < fielded - 1)
                 {
                     yield return new WaitForSeconds(running.SecondsBetweenEnemies);

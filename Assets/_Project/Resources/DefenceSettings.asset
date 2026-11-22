@@ -22,3 +22,5 @@ MonoBehaviour:
   hornKeeper: {fileID: 11400000, guid: b230d041259b863428e4e973c6ff0d86, type: 2}
   hornSeconds: 150
   hornSound: {fileID: 11400000, guid: d97657b0fc02de74889e233c5cddef21, type: 2}
+  everyoneFightsBreaches: 1
+  breachFighter: {fileID: 11400000, guid: 60d284aaf3c06f24fba9e928940c43c5, type: 2}

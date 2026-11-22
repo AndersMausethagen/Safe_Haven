@@ -195,19 +195,24 @@ public sealed class FishingHud : MonoBehaviour
             warn.gameObject.SetActive(false);
         }
 
+        // A hold to hammer free of: the Nøkken's, or a creature's lasso (WebLasso).
         NokkenEncounter nokken = NokkenEncounter.Current;
-        struggle.SetActive(nokken != null);
-        if (nokken != null)
+        WebLasso web = nokken == null ? WebLasso.Current : null;
+        bool held = nokken != null || web != null;
+        struggle.SetActive(held);
+        if (held)
         {
-            int tenths = Mathf.RoundToInt(nokken.SecondsLeft * 10f);
+            float secondsLeft = nokken != null ? nokken.SecondsLeft : web.SecondsLeft;
+            int tenths = Mathf.RoundToInt(secondsLeft * 10f);
             if (tenths != writtenTenths)
             {
                 writtenTenths = tenths;
-                struggleText.text = $"SPACE!  <size=50%><alpha=#AA>{nokken.SecondsLeft:0.0}s";
+                string key = GameInput.KeyLabel(GameInput.Dodge);
+                struggleText.text = $"{(string.IsNullOrEmpty(key) ? "SPACE" : key.ToUpperInvariant())}!  <size=50%><alpha=#AA>{secondsLeft:0.0}s";
             }
 
             struggleText.transform.localScale = Vector3.one * (1f + Mathf.PingPong(Time.time * 6f, 0.15f));
-            struggleFill.anchorMax = new Vector2(nokken.Struggle, 1f);
+            struggleFill.anchorMax = new Vector2(nokken != null ? nokken.Struggle : web.Struggle, 1f);
         }
     }
 

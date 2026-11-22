@@ -90,6 +90,7 @@ public sealed class MonsterProjectile : MonoBehaviour
                 owner.ReportDamageDealt(victim, info, result);
                 StatusEffects.AfterHit(attack, victim, owner, result);
                 ForcedMove.AfterHit(attack, victim, owner, result);
+                WebLasso.AfterHit(attack, victim, owner, result);
             }
             Splash(victim is Component splashed && splashed != null ? splashed.transform.position : hit.point);
             PrefabPool.Release(gameObject);

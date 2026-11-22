@@ -84,6 +84,11 @@ public sealed class HomePortalMenu
 
         int level = settlement.WardLevel;
         SettlementSettings.WardLevel next = sleeping ? null : PortalTiers.Next(settlement);
+        // Not offered before the portal has said what raising it means (WardLevel › Introduced By: Steady the Door's first step).
+        if (next != null && !PortalTiers.Introduced(next))
+        {
+            next = null;
+        }
         if (next != null)
         {
             bool affordable = MaterialPool.For(user).CanAfford(next.cost, null, out string missing);
@@ -222,6 +227,7 @@ public sealed class HomePortalMenu
         }
 
         GameSession.Home.RaiseWardLevel();
+        GameEvents.Raise(new GameEvent(GameEventKind.PortalRaised, null, PortalTiers.Of(GameSession.Home)));
         string opens = settings.WardLevels[level].opens;
         float reach = settings.WardRadiusAt(GameSession.Here.WardLevel);
         string tier = PortalTiers.Title(PortalTiers.Current);

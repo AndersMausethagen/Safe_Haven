@@ -29,3 +29,8 @@ MonoBehaviour:
   repairShare: 0.3
   strainRaids: 2
   strainRadius: 4
+  enemyCountScale: 1.6
+  enemiesPerDefender: 0.12
+  mostPerWave: 24
+  breachLook: {fileID: 11400000, guid: 0cdadf50d65332944b408f95a5bb32d5, type: 2}
+  lookFadeSeconds: 2.5

@@ -148570,6 +148570,232 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3309540001301466394, guid: fd06a8d202338424da460e879826927e, type: 3}
   m_PrefabInstance: {fileID: 540054826}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &540167517
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 540167518}
+  - component: {fileID: 540167520}
+  - component: {fileID: 540167519}
+  m_Layer: 0
+  m_Name: Story - What the Stones Ask
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &540167518
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540167517}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1258665220}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &540167519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540167517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126292842152053
+  - rid: 2623126292842152054
+  - rid: 2623126292842152055
+  - rid: 2623126292842152056
+  - rid: 2623126292842152057
+  - rid: 2623126292842152058
+  - rid: 2623126292842152059
+  - rid: 2623126292842152060
+  - rid: 2623126292842152061
+  links:
+  - from: 1433842ce567ac3d6660abffe2ac5a1c
+    output: 0
+    to: 9ff8054759dd4141a1cf66cd1576fdfb
+  - from: 9ff8054759dd4141a1cf66cd1576fdfb
+    output: 0
+    to: d1e4b97220674de8b27d685677498407
+  - from: d1e4b97220674de8b27d685677498407
+    output: 0
+    to: 7eee8f17a85744a381227e252a62f189
+  - from: 7eee8f17a85744a381227e252a62f189
+    output: 0
+    to: 18633ed603004d9b87c1ce193df22a63
+  - from: 18633ed603004d9b87c1ce193df22a63
+    output: 0
+    to: a06d581c0d3e450585fe1acce601e6df
+  - from: 18633ed603004d9b87c1ce193df22a63
+    output: 1
+    to: 493c52a204144ff8926a913e2d2c8ca3
+  - from: a06d581c0d3e450585fe1acce601e6df
+    output: 0
+    to: d88518a8387d4fe5a12d9a16407ae420
+  - from: 493c52a204144ff8926a913e2d2c8ca3
+    output: 0
+    to: a06d581c0d3e450585fe1acce601e6df
+  - from: d88518a8387d4fe5a12d9a16407ae420
+    output: 0
+    to: 131da94d88704985b7dd2408fb37b5cf
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126292842152053
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 1433842ce567ac3d6660abffe2ac5a1c
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: ce1ddb6c97c72ca4e9e8fbb84821867b, type: 2}
+    - rid: 2623126292842152054
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 9ff8054759dd4141a1cf66cd1576fdfb
+        position: {x: 340, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Little one. You have gone through me and come home, again and again. Each time you go, I hold the way open behind you. Each time, it costs me.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152055
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d1e4b97220674de8b27d685677498407
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Feel my stones: loose, where the roots held them for so long. I am a door that opens only a little way, into the near woods, where the mist is thin and young.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152056
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 7eee8f17a85744a381227e252a62f189
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Further in, the mist is older. What lives there is stronger and hungrier, and so is what it keeps: better ore, older wood, and people who have waited longer than the ones you have found.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152057
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: 18633ed603004d9b87c1ce193df22a63
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>I can open the deeper way. But not as I am.</i>
+        answers:
+        - What do you need?
+        - What will it cost you?
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 2623126292842152058
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a06d581c0d3e450585fe1acce601e6df
+        position: {x: 1540, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Steady my stones. Bring what they ask and lay it in me, here, and raise me. Each time I am raised, a deeper tier of the woods opens, and I hold the way home open longer while you are out there.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152059
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 493c52a204144ff8926a913e2d2c8ca3
+        position: {x: 1540, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Strength, which you will give me. And this: what is strong draws the hungry. The deeper I open, the more the forest will feel this fire. Keep your walls in good repair.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152060
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: d88518a8387d4fe5a12d9a16407ae420
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Once I am raised, the choice is yours each time you set out: the near woods, or the deeper ones. Go deeper when you are ready for what lives there, not before.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152061
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 131da94d88704985b7dd2408fb37b5cf
+        position: {x: 2140, y: 60}
+        questEvent: {fileID: 11400000, guid: 99c5d79ee033bdd4e972d87f29967ca6, type: 2}
+--- !u!114 &540167520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540167517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecdc764a0346784e9958a956dddd948, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::SaveableEntity
+  id: a2b64e6ab2ce33aa6b1e4315c3d2a14a
+  prefabId: 
+  saveTransform: 1
+  saveActiveState: 1
+  rememberDestruction: 1
+  saveComponents: 1
 --- !u!1001 &540326711
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -277548,6 +277774,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeartTree
   questWhispers:
+  - quest: {fileID: 11400000, guid: 74cd46b9fddfdd747857eb1796e3be5d, type: 2}
+    text: <i>Bring what my stones ask and lay it in me, then raise me. The deeper woods are waiting, and so are the ones lost in them.</i>
+    moment: {fileID: 11400000, guid: ce1ddb6c97c72ca4e9e8fbb84821867b, type: 2}
   - quest: {fileID: 11400000, guid: bb2c787a2de76634ba9260ee402850fc, type: 2}
     text: <i>Find a place that a stone remembers, then lay your hand on the stone. The nearest stands not far past the meadows.</i>
     moment: {fileID: 11400000, guid: a7afe977d216ff04db89c5ac4f5eec2c, type: 2}
@@ -333346,6 +333575,7 @@ Transform:
   - {fileID: 941436341}
   - {fileID: 2022666318}
   - {fileID: 438900227}
+  - {fileID: 540167518}
   m_Father: {fileID: 130791071}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1259367770

@@ -76,6 +76,9 @@ public sealed class AttackDefinition : ScriptableObject
     [SerializeField] private bool unblockable;
     [Tooltip("Metres a hit drags its target toward the attacker (a tongue, a hand from the bog). Negative throws it away.")]
     [SerializeField] private float pull;
+    [Tooltip("A lasso (the Giant Black Widow's web): a hit on the player holds them on a line and reels them in for this many seconds, " +
+             "unless they hammer Dodge free (WebLasso, GrabSettings). 0: not a lasso.")]
+    [SerializeField, Min(0f)] private float lassoSeconds;
 
     [Header("Movement (player)")]
     [Tooltip("Share of walking speed the player keeps while this swing winds up (on the arms, over walking legs). Below 0 uses Combat " +
@@ -201,6 +204,8 @@ public sealed class AttackDefinition : ScriptableObject
     public bool Unblockable => unblockable;
     /// <summary>Metres a hit drags its target toward the attacker (negative: away).</summary>
     public float Pull => pull;
+    /// <summary>Seconds a hit holds the player on a line (WebLasso); 0 when it isn't a lasso.</summary>
+    public float LassoSeconds => lassoSeconds;
     /// <summary>What the blow does to the ground round it (GroundImpacts).</summary>
     public GroundImpactDefinition GroundImpact => groundImpact;
     /// <summary>Movement (player): its own value, or null for the settings' (SwingMotion resolves each).</summary>

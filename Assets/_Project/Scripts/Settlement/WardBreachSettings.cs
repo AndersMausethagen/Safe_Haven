@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// How ward breaches follow one another (GDD §6.6–6.9): the breaches in order, how many raids lie between them, what a lost
@@ -39,6 +40,26 @@ public sealed class WardBreachSettings : GameSettings<WardBreachSettings>
     [SerializeField, Min(0)] private int strainRaids = 2;
     [Tooltip("Metres the ward draws in while strained.")]
     [SerializeField, Min(0f)] private float strainRadius = 4f;
+
+    [Header("Numbers and mood (the user, 2026-11-22: breaches felt underwhelming)")]
+    [Tooltip("Each wave fields its roster times this (the roster comes round again to fill it).")]
+    [SerializeField, Min(0.5f)] private float enemyCountScale = 1.6f;
+    [Tooltip("And this much more for each of the Haven's people who fight (0.12 = +12% each): everyone turns out now (DefenceSettings).")]
+    [SerializeField, Min(0f)] private float enemiesPerDefender = 0.12f;
+    [Tooltip("The most one wave fields, however it is scaled.")]
+    [SerializeField, Min(1)] private int mostPerWave = 24;
+    [Tooltip("The look laid over the Haven while a breach is under way (a Volume Profile): darker, colder, the edges closing in.")]
+    [SerializeField] private VolumeProfile breachLook;
+    [Tooltip("Seconds the look takes to come and go.")]
+    [SerializeField, Min(0.1f)] private float lookFadeSeconds = 2.5f;
+
+    public VolumeProfile BreachLook => breachLook;
+    public float LookFadeSeconds => lookFadeSeconds;
+
+    /// <summary>How many of a wave's <paramref name="roster"/> come with <paramref name="defenders"/> of the Haven's people fighting, and the
+    /// breach's source weakened by <paramref name="weakening"/> (0-1). At least one, at most Most Per Wave.</summary>
+    public int Fielded(int roster, int defenders, float weakening) =>
+        roster <= 0 ? 0 : Mathf.Clamp(Mathf.RoundToInt(roster * (enemyCountScale + enemiesPerDefender * Mathf.Max(0, defenders)) * (1f - Mathf.Clamp01(weakening))), 1, mostPerWave);
 
     public IReadOnlyList<WardBreachDefinition> Breaches => breaches;
     public int RaidsBetween => raidsBetween;

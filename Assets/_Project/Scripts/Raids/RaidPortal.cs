@@ -209,7 +209,9 @@ public sealed class RaidPortal : MonoBehaviour, IStationMenuExtension, IInteract
         }
 
         GameSession.Home.ImprovePortal();
-        GameEvents.Raise(new GameEvent(GameEventKind.PortalRaised, null, GameSession.Home.PortalLevel + 1));
+        // Its own kind: a quest's "Raise the portal to Tier II" is the ward's tier (PortalTiers), raised at the portal's menu. Counted
+        // from this, the pocket's improvement finished Steady the Door while the tier it asked for was never raised.
+        GameEvents.Raise(new GameEvent(GameEventKind.PortalImproved, null, GameSession.Home.PortalLevel));
         // The safe pocket grows with the portal (the Haven's own player's).
         if (Player.Current != null && Player.Current.TryGetComponent(out ItemInventory inventory))
         {

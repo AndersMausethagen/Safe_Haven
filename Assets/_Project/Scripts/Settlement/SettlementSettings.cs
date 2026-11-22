@@ -27,6 +27,9 @@ public sealed class SettlementSettings : GameSettings<SettlementSettings>
         public List<ResidentDefinition> residents = new List<ResidentDefinition>();
         [Tooltip("Bosses that must have been beaten first (any of them; 0 = none).")]
         [Min(0)] public int bossesBeaten;
+        [Tooltip("Offered at the portal only once this quest's first step is done, or the quest is: the portal tells what raising it means " +
+                 "first (Steady the Door for tier II). Empty: offered as soon as it is next.")]
+        public QuestDefinition introducedBy;
     }
 
     /// <summary>One improvement of the portal: what it does for the moment things go wrong out there.</summary>

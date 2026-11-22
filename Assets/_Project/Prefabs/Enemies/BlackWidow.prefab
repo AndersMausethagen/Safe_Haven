@@ -1355,7 +1355,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6884263312872821700}
@@ -1398,7 +1398,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::SaveableEntity
   id: 
-  prefabId: a4dba3031b93dc0418dd8cbc097e32a3
+  prefabId: 092ba77896b28b34c8fbe53045290d78
   saveTransform: 1
   saveActiveState: 1
   rememberDestruction: 1
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec0d8d4539b66494abaa005945d6bc1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: SafeHaven::MonsterAI
-  definition: {fileID: 11400000, guid: 24f91fabdf8f6194abcb4ed34e155461, type: 2}
+  definition: {fileID: 11400000, guid: 2f95c00dbb3dd2847bebaca2d70df0fa, type: 2}
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
@@ -1629,6 +1629,10 @@ MonoBehaviour:
   lunge: 0.7
   rear: 1.1
   attackSeconds: 0.6
+  severChance: 0.15
+  mostSevered: 4
+  slowPerLeg: 0.12
+  sagPerLeg: 0.12
 --- !u!1 &5231251077194918291
 GameObject:
   m_ObjectHideFlags: 0

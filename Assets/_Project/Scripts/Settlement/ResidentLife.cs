@@ -301,7 +301,8 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     {
         // Called out: a ward breach, or a corruption night (GuardPosts); as many guards as the defences allow, in order.
         bool called = GuardPosts.CalledOut(out bool night);
-        CompanionDefinition how = called && npc.Job != null ? npc.Job.DefendsAs : null;
+        bool breach = GuardPosts.InBreach;
+        CompanionDefinition how = called ? GuardPosts.FightsAs(npc.Record, breach, DefenceSettings.Current) : null;
         defender ??= new ResidentDefender(transform, animator, agent);
         if (how != null && !defender.IsOnGuard)
         {
@@ -312,12 +313,16 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             }
 
             int rank = GuardPosts.Rank(GameSession.Here, npc.Record);
-            if (rank < 0 || rank >= GuardPosts.Cap(DefenceSettings.Current))
+            bool posted = rank >= 0 && rank < GuardPosts.Cap(DefenceSettings.Current);
+            if (!posted && !breach)
             {
                 // No post for them (more guards than the defences hold): they shelter with the rest.
                 nextGuardLook = Time.time + 2f;
                 return false;
             }
+
+            // In a breach everyone without a post fights round the portal (GuardPost's ring).
+            rank = posted ? rank : -1;
 
             ComeOut();
             if (emotes != null && emotes.IsPlaying)

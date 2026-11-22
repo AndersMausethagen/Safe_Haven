@@ -12,25 +12,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
   m_Name: BlackWidow
   m_EditorClassIdentifier: SafeHaven::MonsterDefinition
-  id: black_widow
+  id: black_widow_small
   displayName: Black Widow
-  description: A spider the size of a cart, black as tar, with a red hourglass on its back. It webs what it can't reach and bites what it can, and its bite burns in the blood.
-  combatStats: {fileID: 11400000, guid: 776e9d70bca337d4f98624ff0e9aafc2, type: 2}
+  description: 'A black widow the size of a hound: quick, and the hourglass on its belly is the last colour many travellers see.'
+  combatStats: {fileID: 11400000, guid: 3eda1452e64766848a56aacbe1ab5edf, type: 2}
   faction: 1
-  lootTable: {fileID: 11400000, guid: 09ba64d60faeea149ac4d60f97b93a70, type: 2}
+  lootTable: {fileID: 11400000, guid: 47eca72603b567b48858f7048423fd43, type: 2}
   drops:
     entries: []
   unlocksRecipes: []
   animatorController: {fileID: 0}
-  prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
-  experience: 60
+  prefab: {fileID: 4999243170976522981, guid: 092ba77896b28b34c8fbe53045290d78, type: 3}
+  experience: 30
   neverElite: 0
   attack: {fileID: 11400000, guid: 3c02c620d16228b47a808267729b29f6, type: 2}
-  attackDamage: 11
+  attackDamage: 7
   attackCooldown: 0.6
-  moveSpeed: 4.4
-  detectionRange: 14
-  chaseRange: 22
+  moveSpeed: 5
+  detectionRange: 12
+  chaseRange: 20
   leashRange: 22
   sightAngle: 150
   closeSenseRange: 2.5
@@ -41,28 +41,34 @@ MonoBehaviour:
   attacks:
   - attack: {fileID: 11400000, guid: 3c02c620d16228b47a808267729b29f6, type: 2}
     kind: 0
-    damage: 11
+    damage: 7
     minimumRange: 0
-    maximumRange: 2.6
+    maximumRange: 1.9
     priority: 20
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 2.2
     interruptible: 1
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 1
@@ -83,6 +89,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -94,28 +102,34 @@ MonoBehaviour:
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 8039feb06f5076e4fa45629aad028308, type: 2}
     kind: 1
-    damage: 3
-    minimumRange: 4
-    maximumRange: 13
+    damage: 2
+    minimumRange: 3
+    maximumRange: 10
     priority: 15
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 8
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0.5
     fromTier: 0
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 1494918415717876867, guid: 7536eddf833037c43b99d2fbfae9a3df, type: 3}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 4774033439812504928, guid: 5c6ac2abac8d77c42857592e1a592b8f, type: 3}
     burstCount: 1
@@ -136,6 +150,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -147,28 +163,34 @@ MonoBehaviour:
     lobScatter: 2
   - attack: {fileID: 11400000, guid: 729ececd632acd64f841a48c213be676, type: 2}
     kind: 2
-    damage: 9
-    minimumRange: 4
-    maximumRange: 9
+    damage: 6
+    minimumRange: 3
+    maximumRange: 7
     priority: 12
+    opener: 0
     weight: 0
     whenFoe: 0
     heavy: 0
     cooldown: 10
     interruptible: 0
+    reelWhenBroken: 0
     sound: {fileID: 0}
     leadTarget: 0
     fromTier: 2
     fromPhase: 0
+    untilPhase: 0
     belowHealth: 1
     hazardPrefab: {fileID: 0}
     hazardEvery: 0
     openAfter: 0
+    toppleAfter: 0
     followUps: []
     comboChance: 0.5
     comboGap: 0.2
     comboFromTier: 0
     holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
     projectilePrefab: {fileID: 0}
     burstCount: 3
@@ -189,6 +211,8 @@ MonoBehaviour:
     hasteBonus: 0
     toughness: 0
     alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
     foeStatus: {fileID: 0}
     foePull: 0
     announce: 
@@ -200,7 +224,7 @@ MonoBehaviour:
     lobScatter: 2
   movementTactic: 0
   temperament: 1
-  preferredDistance: 8
+  preferredDistance: 6
   distanceTolerance: 1.5
   fleeHealthFraction: 0.25
   fleeDistance: 10
@@ -212,6 +236,7 @@ MonoBehaviour:
   idleGrazeChance: 0
   idleSleepChance: 0.3
   idleSleepAttention: 0.3
+  swims: 0
   timid: 0
   boltSeconds: 7
   thief: 0
@@ -220,6 +245,8 @@ MonoBehaviour:
   corneredSeconds: 4
   canBeFinished: 0
   flankSpread: 0
+  flanksFromTier: 0
+  flankSound: {fileID: 0}
   breaksWalls: 0
   spottedPause: 0
   guardAfterBlows: 0
@@ -230,8 +257,14 @@ MonoBehaviour:
   hurtBelow: 0
   hurtMood: 0
   arrowDodge: 0
-  poise: 70
+  poise: 35
   parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
   openWhileStriking: 1
   parriesBackstabs: 0
   shieldArc: 0
@@ -253,9 +286,9 @@ MonoBehaviour:
   sizeVariation: 0.12
   shadeVariation: 0.14
   portrait: {fileID: 21300000, guid: 5ea01bd5f20097642a2b542ee827ade7, type: 3}
-  journalLore: 'The old folk say the great spiders were spun out of the dark under the roots, and that a web across a path is a door someone has shut. What they agree on is the hourglass: when you see the red, you are already in its reach.'
-  journalAdvice: 'Its web roots you where you stand: dodge the pale shot. Its bite poisons. A hammer cracks its shell (weak to blunt blows); blades and points turn on it. Stand off its web and make it come to you.'
-  journalHabitat: The deep Misty Woods, from the second tier
+  journalLore: The old folk say a giant widow lays a hundred eggs under the roots, and that the ones you see are the ones that lived. They hunt where the big ones hunt, and they learn from them.
+  journalAdvice: Smaller and quicker than the giant, with the same poison bite and pale web shot. A hammer cracks its shell; a blade can take its legs, and every leg it loses slows it.
+  journalHabitat: The Misty Woods
   journalKillsToKnow: 3
   deathSound: {fileID: 11400000, guid: a2e9644f7543c8d4a80e011c4bda70a9, type: 2}
   hurtSound: {fileID: 11400000, guid: f168dfe9ef7d97c468696be6a71d236a, type: 2}

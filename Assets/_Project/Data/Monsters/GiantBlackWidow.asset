@@ -1,0 +1,356 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42e5c6da77934e8439571a13e158376a, type: 3}
+  m_Name: GiantBlackWidow
+  m_EditorClassIdentifier: SafeHaven::MonsterDefinition
+  id: black_widow
+  displayName: Giant Black Widow
+  description: A spider the size of a cart, black as tar, with a red hourglass on its back. It webs what it can't reach and bites what it can, and its bite burns in the blood.
+  combatStats: {fileID: 11400000, guid: 776e9d70bca337d4f98624ff0e9aafc2, type: 2}
+  faction: 1
+  lootTable: {fileID: 11400000, guid: 09ba64d60faeea149ac4d60f97b93a70, type: 2}
+  drops:
+    entries: []
+  unlocksRecipes: []
+  animatorController: {fileID: 0}
+  prefab: {fileID: 4999243170976522981, guid: a4dba3031b93dc0418dd8cbc097e32a3, type: 3}
+  experience: 60
+  neverElite: 0
+  attack: {fileID: 11400000, guid: 3c02c620d16228b47a808267729b29f6, type: 2}
+  attackDamage: 11
+  attackCooldown: 0.6
+  moveSpeed: 4.4
+  detectionRange: 14
+  chaseRange: 22
+  leashRange: 22
+  sightAngle: 150
+  closeSenseRange: 2.5
+  hearing: 1
+  alertness: 0.9
+  huntsHorses: 1
+  frightensHorses: 0
+  attacks:
+  - attack: {fileID: 11400000, guid: 3c02c620d16228b47a808267729b29f6, type: 2}
+    kind: 0
+    damage: 11
+    minimumRange: 0
+    maximumRange: 2.6
+    priority: 20
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 2.2
+    interruptible: 1
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 15
+    projectileRadius: 0.15
+    chargeSpeed: 13
+    chargeDistance: 7
+    exposedSeconds: 1.5
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 8039feb06f5076e4fa45629aad028308, type: 2}
+    kind: 1
+    damage: 3
+    minimumRange: 4
+    maximumRange: 13
+    priority: 15
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 8
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0.5
+    fromTier: 0
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 1494918415717876867, guid: 7536eddf833037c43b99d2fbfae9a3df, type: 3}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 4774033439812504928, guid: 5c6ac2abac8d77c42857592e1a592b8f, type: 3}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 15
+    projectileRadius: 0.22
+    chargeSpeed: 13
+    chargeDistance: 7
+    exposedSeconds: 1.5
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: 729ececd632acd64f841a48c213be676, type: 2}
+    kind: 2
+    damage: 9
+    minimumRange: 4
+    maximumRange: 9
+    priority: 12
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 10
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0
+    fromTier: 2
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 3
+    burstInterval: 0.28
+    projectileSpeed: 15
+    projectileRadius: 0.22
+    chargeSpeed: 13
+    chargeDistance: 7
+    exposedSeconds: 1.5
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  - attack: {fileID: 11400000, guid: f7a45873ffa3041478ed4437fb18bef5, type: 2}
+    kind: 1
+    damage: 2
+    minimumRange: 5
+    maximumRange: 15
+    priority: 18
+    opener: 0
+    weight: 0
+    whenFoe: 0
+    heavy: 0
+    cooldown: 12
+    interruptible: 0
+    reelWhenBroken: 0
+    sound: {fileID: 0}
+    leadTarget: 0.5
+    fromTier: 2
+    fromPhase: 0
+    untilPhase: 0
+    belowHealth: 1
+    hazardPrefab: {fileID: 0}
+    hazardEvery: 0
+    openAfter: 0
+    toppleAfter: 0
+    followUps: []
+    comboChance: 0.5
+    comboGap: 0.2
+    comboFromTier: 0
+    holdChance: 0
+    breakAway: 0
+    breakAwaySeconds: {x: 0.8, y: 1.4}
+    holdSeconds: 0.45
+    projectilePrefab: {fileID: 0}
+    burstCount: 1
+    burstInterval: 0.2
+    projectileSpeed: 15
+    projectileRadius: 0.22
+    chargeSpeed: 13
+    chargeDistance: 7
+    exposedSeconds: 1.5
+    leapHeight: 0
+    buffRadius: 10
+    buffSeconds: 8
+    damageBonus: 0.05
+    packLeaderOnly: 0
+    selfOnly: 0
+    healShare: 0
+    speedBonus: 0
+    hasteBonus: 0
+    toughness: 0
+    alertsOthers: 0
+    onSpotted: 0
+    alarmRadius: 18
+    foeStatus: {fileID: 0}
+    foePull: 0
+    announce: 
+    summonPrefab: {fileID: 0}
+    summonCount: 2
+    summonRadius: 3
+    summonLimit: 4
+    lobSeconds: 1.1
+    lobScatter: 2
+  movementTactic: 0
+  temperament: 1
+  preferredDistance: 8
+  distanceTolerance: 1.5
+  fleeHealthFraction: 0.25
+  fleeDistance: 10
+  defensiveRadius: 8
+  hoverHeight: 0
+  idleWanderRadius: 4
+  idlePauseSeconds: {x: 3, y: 8}
+  idleWalkSpeed: 0.4
+  idleGrazeChance: 0
+  idleSleepChance: 0.3
+  idleSleepAttention: 0.3
+  swims: 0
+  timid: 0
+  boltSeconds: 7
+  thief: 0
+  stealReach: 1.5
+  escapeDistance: 40
+  corneredSeconds: 4
+  canBeFinished: 0
+  flankSpread: 0
+  flanksFromTier: 0
+  flankSound: {fileID: 0}
+  breaksWalls: 0
+  spottedPause: 0
+  guardAfterBlows: 0
+  guardWithin: 2
+  guardSeconds: 1
+  guardLetsThrough: 0.3
+  guardFromTier: 2
+  hurtBelow: 0
+  hurtMood: 0
+  arrowDodge: 0
+  poise: 70
+  parryResponse: 0
+  poiseRecoveryDelay: 0
+  toppleSeconds: 0
+  poiseGrowth: 0
+  toppleStrike: 0
+  toppleBreaksArmour: 0
+  toppleSound: {fileID: 0}
+  openWhileStriking: 1
+  parriesBackstabs: 0
+  shieldArc: 0
+  shieldLetsThrough: 0.25
+  bleeds: 1
+  bloodColor: {r: 0.16, g: 0.32, b: 0.22, a: 0.95}
+  ragdollOnDeath: 1
+  fallsByAnimation: 0
+  canBeSmashed: 0
+  canLoseLimbs: 1
+  hitMaterial: 0
+  limpBelow: 0.3
+  limpSpeed: 0.75
+  bleedTrailBelow: 0.5
+  armourChips: 0
+  armourPerChip: 0.12
+  chipFromShare: 0.07
+  armourParts: []
+  sizeVariation: 0.12
+  shadeVariation: 0.14
+  portrait: {fileID: 21300000, guid: 5ea01bd5f20097642a2b542ee827ade7, type: 3}
+  journalLore: 'The old folk say the great spiders were spun out of the dark under the roots, and that a web across a path is a door someone has shut. What they agree on is the hourglass: when you see the red, you are already in its reach.'
+  journalAdvice: 'Its web roots you where you stand: dodge the pale shot. A thicker line lassoes you and reels you into its bite: hammer Dodge to tear free. Its bite poisons. A hammer cracks its shell (weak to blunt blows); a blade can take its legs, and every leg it loses slows it.'
+  journalHabitat: The deep Misty Woods, from the second tier
+  journalKillsToKnow: 3
+  deathSound: {fileID: 11400000, guid: a2e9644f7543c8d4a80e011c4bda70a9, type: 2}
+  hurtSound: {fileID: 11400000, guid: f168dfe9ef7d97c468696be6a71d236a, type: 2}
+  attackSound: {fileID: 11400000, guid: f8d504595ea15fc44aeefd7bd127dfc5, type: 2}
