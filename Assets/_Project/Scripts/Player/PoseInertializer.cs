@@ -136,7 +136,7 @@ public sealed class PoseInertializer : MonoBehaviour
 
         if (pending > 0f && recorded >= 2)
         {
-            Start(pending);
+            BeginBlend(pending);
         }
 
         pending = -1f;
@@ -155,7 +155,7 @@ public sealed class PoseInertializer : MonoBehaviour
     }
 
     // The pose let go of (the one shown the frame before) and how each bone was turning then, as a rotation vector (radians a second).
-    private void Start(float seconds)
+    private void BeginBlend(float seconds)
     {
         duration = seconds;
         elapsed = 0f;
