@@ -30,7 +30,8 @@ if (-not $SkipTests) {
 }
 
 $unity = (Get-Command unity).Source
-$data = Join-Path $Project 'Build/Windows/Safe Haven_Data/globalgamemanagers'
+# boot.config: written by every build, LZ4HC or not (a compressed build packs globalgamemanagers into data.unity3d).
+$data = Join-Path $Project 'Build/Windows/Safe Haven_Data/boot.config'
 $start = Get-Date
 # No double quotes in the code: Windows PowerShell 5.1 strips them from a native command's arguments.
 $code = if ($FullTextures) { 'SafeHavenBuild.BuildWindows(true); return 7;' } else { 'SafeHavenBuild.BuildWindows(false); return 7;' }
