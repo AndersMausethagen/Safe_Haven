@@ -94,6 +94,34 @@ public sealed class KeeperHud : MonoBehaviour
         }
     }
 
+    // ----- A controller's way through the HUD (KeeperView reads the d-pad and bumpers) -----
+
+    /// <summary>True while an order is lit on the bar with the d-pad: A gives it instead of picking.</summary>
+    public bool HasFocus => bar != null && bar.HasFocus;
+
+    /// <summary>Lights the next (or previous) order on the bar.</summary>
+    public void StepCommand(int direction) => bar.Step(direction);
+
+    /// <summary>Gives the lit order.</summary>
+    public void RunFocused() => bar.RunFocused();
+
+    /// <summary>Lets go of the lit order (Back). False when none was lit.</summary>
+    public bool ClearFocus() => bar != null && bar.ClearFocus();
+
+    /// <summary>Follows the next (or previous) person.</summary>
+    public void StepPerson(int direction)
+    {
+        bar.ClearFocus();
+        people.Step(direction);
+    }
+
+    /// <summary>Flies to the next (or previous) alert.</summary>
+    public void StepAlert(int direction)
+    {
+        bar.ClearFocus();
+        alerts.Step(direction);
+    }
+
     /// <summary>The tag at the pointer: <paramref name="thing"/>'s picture, name and one fact, at <paramref name="screen"/>; none for null.</summary>
     public void Point(Component thing, Vector2 screen, bool reticleShown)
     {
@@ -677,10 +705,31 @@ public sealed class KeeperHud : MonoBehaviour
             keysChanges = changes;
             keys.text = InputDevices.UsingGamepad
                 ? $"{Key(GameInput.KeeperPan)} pan   ·   {Key(GameInput.CameraLookStick)} turn and zoom   ·   {Key(GameInput.KeeperSelect)} pick   ·   " +
-                  $"{Key(GameInput.KeeperFollow)} follow   ·   {Key(GameInput.KeeperFindMe)} your character   ·   {Key(GameInput.Back)} back"
+                  $"{Pair(GameInput.KeeperCommand)} orders   ·   {Pair(GameInput.KeeperPerson)} people   ·   {Pair(GameInput.KeeperAlert)} alerts   ·   " +
+                  $"{Key(GameInput.KeeperFindMe)} your character   ·   {Key(GameInput.Back)} back"
                 : $"{Key(GameInput.KeeperPan)} pan   ·   {Key(GameInput.KeeperTurn)} turn   ·   wheel zoom   ·   {Key(GameInput.KeeperSelect)} pick   ·   " +
                   $"{Key(GameInput.KeeperFollow)} follow   ·   {Key(GameInput.KeeperFindMe)} your character";
         }
+    }
+
+    // Both ends of a pad axis (the d-pad's left and right, the bumpers), as their glyphs.
+    private static string Pair(UnityEngine.InputSystem.InputAction action)
+    {
+        if (action == null)
+        {
+            return "";
+        }
+
+        string pair = "";
+        for (int i = 0; i < action.bindings.Count; i++)
+        {
+            if (action.bindings[i].isPartOfComposite)
+            {
+                pair += GameInput.PadLabel(action, i);
+            }
+        }
+
+        return pair;
     }
 
     private static string Key(UnityEngine.InputSystem.InputAction action)

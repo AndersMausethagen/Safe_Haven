@@ -149,6 +149,26 @@ public sealed class KeeperAlerts
         }
     }
 
+    private int stepped = -1;
+
+    /// <summary>A controller's bumpers: the view flies to the next (or previous) alert, whose words show beside it.</summary>
+    public void Step(int direction)
+    {
+        if (alerts.Count == 0 || direction == 0)
+        {
+            return;
+        }
+
+        stepped = stepped < 0 ? (direction > 0 ? 0 : alerts.Count - 1) : (stepped + direction + alerts.Count) % alerts.Count;
+        Row row = rows[Mathf.Min(stepped, rows.Count - 1)];
+        if (row.Alert != null && KeeperView.Current != null)
+        {
+            KeeperView.Current.LookAt(row.Alert.At);
+            row.Alert.Then?.Invoke();
+            ShowTip(row);
+        }
+    }
+
     private void ShowTip(Row row)
     {
         if (row.Alert != null)

@@ -238,6 +238,28 @@ public sealed class KeeperPeople
         tip.Show(card.Record.Resident.DisplayName, words, card.Rect, beside: -1);
     }
 
+    private int stepped = -1;
+
+    /// <summary>A controller's d-pad: the view follows the next (or previous) person in the column, whose words show beside them.</summary>
+    public void Step(int direction)
+    {
+        int count = 0;
+        foreach (Card card in cards)
+        {
+            count += card.Rect.gameObject.activeSelf ? 1 : 0;
+        }
+
+        if (count == 0 || direction == 0)
+        {
+            return;
+        }
+
+        stepped = stepped < 0 ? (direction > 0 ? 0 : count - 1) : (stepped + direction + count) % count;
+        Card chosen = cards[stepped];
+        FollowThem(chosen);
+        ShowTip(chosen);
+    }
+
     private static void FollowThem(Card card)
     {
         ResidentLife life = card.Record != null ? ResidentLife.Of(card.Record.Resident) : null;

@@ -298,6 +298,12 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
             return true;
         }
 
+        // An order lit on the bar with the d-pad: Back lets go of it first.
+        if (hud != null && hud.ClearFocus())
+        {
+            return true;
+        }
+
         Close(null);
         return true;
     }
@@ -420,6 +426,32 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
 
         Drag(placing || overUI);
 
+        // A controller's way to the HUD: the d-pad along the orders and through the people, the bumpers through the alerts; A gives the
+        // order lit instead of picking.
+        if (!placing && hud != null)
+        {
+            if (Pressed(GameInput.KeeperCommand, out int along))
+            {
+                hud.StepCommand(along);
+            }
+
+            if (Pressed(GameInput.KeeperPerson, out int down))
+            {
+                hud.StepPerson(down);
+            }
+
+            if (Pressed(GameInput.KeeperAlert, out int next))
+            {
+                hud.StepAlert(next);
+            }
+
+            if (hud.HasFocus && GameInput.KeeperSelect != null && GameInput.KeeperSelect.WasPressedThisFrame())
+            {
+                hud.RunFocused();
+                return;
+            }
+        }
+
         // While placing a building its keys are the build map's (a pad's Y frees the placement).
         if (!placing && GameInput.KeeperFindMe != null && GameInput.KeeperFindMe.WasPressedThisFrame() && player != null)
         {
@@ -515,6 +547,20 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         {
             placer.ToggleMenu();
         }
+    }
+
+    // An axis pressed this frame (a d-pad or bumper), as -1 or 1.
+    private static bool Pressed(UnityEngine.InputSystem.InputAction action, out int sign)
+    {
+        sign = 0;
+        if (action == null || !action.WasPressedThisFrame())
+        {
+            return false;
+        }
+
+        float value = action.ReadValue<float>();
+        sign = value > 0f ? 1 : value < 0f ? -1 : 0;
+        return sign != 0;
     }
 
     // The ground point under the pointer when the middle button went down stays under it as the mouse moves.

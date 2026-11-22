@@ -198,6 +198,10 @@ public sealed class StationQueue
     /// CraftingStation; kept through raids, when no station is loaded. Not saved.</summary>
     public float WorkerSpeed { get; set; }
 
+    /// <summary>What its worker adds for being cheered by a small scene nearby (SmallScenes), set by its CraftingStation at home and
+    /// cleared while the player is away (a cheer is for the day at home, not the raid). Not saved.</summary>
+    public float WorkerCheer { get; set; }
+
     /// <summary>Whether its worker is at it now: standing at the station at home (ResidentLife), and taken to be so while the player is
     /// away (WorkshopState.Tick). Not saved.</summary>
     public bool WorkerHere { get; set; }
@@ -217,7 +221,7 @@ public sealed class StationQueue
     public bool PlayerHere { get; set; }
 
     /// <summary>How fast it works now: on its own, plus its worker and the player while they are at it.</summary>
-    public float Speed => (SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f) + (PlayerHere ? PlayerSpeed : 0f)) * Fields.GrowthFactor(this);
+    public float Speed => (SpeedMultiplier + (WorkerHere ? WorkerSpeed + WorkerCheer : 0f) + (PlayerHere ? PlayerSpeed : 0f)) * Fields.GrowthFactor(this);
 
     /// <summary>A field's water (Fields): seconds of growing left before its soil is dry; drains only while something grows. Saved.</summary>
     public float Water { get; set; }
@@ -594,6 +598,7 @@ public sealed class WorkshopState
             if (AwayFromHome)
             {
                 queue.WorkerHere = queue.WorkerSpeed > 0f && queue.StationId != WorkerAbsentAt && !PartyAbsentAt.Contains(queue.StationId);
+                queue.WorkerCheer = 0f;
                 queue.PlayerHere = false;
             }
 

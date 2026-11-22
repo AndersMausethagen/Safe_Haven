@@ -117,6 +117,26 @@ public static class DialogueVoices
             Strings(resident, resident.DisplayName, "resident", resident.name);
         }
 
+        // Small scenes between friends (SmallSceneSettings): each line by whoever says it, in turn.
+        SmallSceneSettings small = SmallSceneSettings.Current;
+        foreach (SmallSceneSettings.Scene scene in small.Scenes)
+        {
+            for (int i = 0; scene != null && scene.first != null && scene.second != null && i < scene.lines.Length; i++)
+            {
+                ResidentDefinition who = i % 2 == 0 ? scene.first : scene.second;
+                Add(who.DisplayName, scene.lines[i], "small scene", small.name);
+            }
+        }
+
+        // A wish for a home met: the resident's thanks, said aloud (HomeWishes).
+        foreach (HomeLifeSettings.Liking liking in HomeLifeSettings.Current.Likings)
+        {
+            if (liking != null && liking.resident != null && !string.IsNullOrWhiteSpace(liking.thanks))
+            {
+                Add(liking.resident.DisplayName, liking.thanks, "wish met", "HomeLifeSettings");
+            }
+        }
+
         foreach (string guid in AssetDatabase.FindAssets("t:PrologueDefinition"))
         {
             var prologue = AssetDatabase.LoadAssetAtPath<PrologueDefinition>(AssetDatabase.GUIDToAssetPath(guid));

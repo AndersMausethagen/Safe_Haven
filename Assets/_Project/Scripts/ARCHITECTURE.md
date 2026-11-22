@@ -2305,6 +2305,15 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
   carved in the display face for a moment as it opens. New kit icons: Horn, Flag, Return, Cross (Tools/UI/hearthline_kit_art.py; the
   four PNGs added to UIStyle by hand, not by the retired installer: the inline atlas wasn't rebuilt). Tests: `KeeperHudTests`;
   overlap audit clean.
+- **The known gaps, closed (2026-11-22):** on a controller the HUD is reached with Keeper › Command (the d-pad's left and right walk
+  the bar's orders, lit with their words; A gives the lit one, Back lets go), Person (up and down: the view follows each in turn) and
+  Alert (the bumpers: the view flies to each), pad-only, so the keyboard is as it was (`KeeperViewTests`); a small scene's cheer is
+  kept apart on the queue (`StationQueue.WorkerCheer`) and cleared while away, so it is no longer carried through a raid; Horn, Flag,
+  Return and Cross are in the inline icon atlas too (the installer's inline step alone, with a new atlas: names, so every old icon
+  holds); painted rocks are remembered (`TerrainNodeHarvesting`: one gathered and walked away from, or broken by a mason with no
+  stand-in, is kept gone, saved with the felled trees by `TerrainTreeMemory`; before, a painted boulder came back after a reload), and
+  quarry rings break painted Boulders as well as placed ones (`RingTarget.Painted`; `PaintedRockTests`). The small scenes' lines and
+  the wishes' thanks are harvested for voicing (DialogueVoices).
 - **Phase 8's review fixes:** a small scene's clock starts once both are in their places (dropped after 60 s on the way; by the water
   only within 60 m of the first one), its mark replays it, and its end doesn't send anyone walking while the Haven unloads; the horn
   ends with the scene it was sounded in (a raid); a harvest that finished while away shows its crop (`FarmSettings.LookForHarvest`);

@@ -90,6 +90,12 @@ public static class GameInput
     public static InputAction KeeperFindMe => Find("Keeper/FindMe");
     /// <summary>Follows the picked person with the view (F, X).</summary>
     public static InputAction KeeperFollow => Find("Keeper/Follow");
+    /// <summary>On a controller, along the view's orders (the d-pad's left and right): -1 or 1 as it is pressed; A gives the one lit.</summary>
+    public static InputAction KeeperCommand => Find("Keeper/Command");
+    /// <summary>On a controller, through the Haven's people (the d-pad's up and down), the view following each.</summary>
+    public static InputAction KeeperPerson => Find("Keeper/Person");
+    /// <summary>On a controller, through what needs attention (the bumpers), the view flying to each.</summary>
+    public static InputAction KeeperAlert => Find("Keeper/Alert");
 
     // System
     public static InputAction Pause => Find("System/Pause");

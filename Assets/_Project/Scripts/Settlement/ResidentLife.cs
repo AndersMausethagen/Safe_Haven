@@ -1398,10 +1398,10 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         ReleaseTree();
         WorkerSettings settings = WorkerSettings.Current;
         List<ItemAmount> gives;
-        if (target.Rock != null)
+        if (target.IsRock)
         {
-            gives = RingWork.Stone(target.Rock);
-            if (!target.Rock.BreakDown())
+            gives = RingWork.Stone(target.RockNode);
+            if (!target.Break(false))
             {
                 return GoToNextTree();
             }
@@ -1475,7 +1475,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         RingWork.Claim(next);
         WorkerSettings settings = WorkerSettings.Current;
         chopLeft = RingWork.WorkSeconds(fellingRing.Kind, settings);
-        ShowTool(next.Rock != null ? settings.QuarryTool : settings.FellingTool, 1f);
+        ShowTool(next.IsRock ? settings.QuarryTool : settings.FellingTool, 1f);
         GoTo(TreeSpot(out facing));
         return false;
     }
@@ -1488,7 +1488,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         away.y = 0f;
         away = away.sqrMagnitude > 0.01f ? away.normalized : Vector3.back;
         facingIt = Quaternion.LookRotation(-away);
-        float reach = 1.3f;
+        float reach = ringAt.Painted != null ? 2f : 1.3f;
         if (ringAt.Rock != null)
         {
             foreach (Collider part in ringAt.Rock.GetComponentsInChildren<Collider>())
@@ -1503,7 +1503,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private void ReleaseTree()
     {
         // By reference: a rock destroyed meanwhile still lets go of its claim.
-        if (ringAt.Felling != null || (object)ringAt.Rock != null)
+        if (ringAt.Felling != null || (object)ringAt.Rock != null || (object)ringAt.Painted != null)
         {
             RingWork.Release(ringAt);
         }

@@ -159,6 +159,36 @@ public sealed class KeeperViewTests : InputTestFixture
     }
 
     [Test]
+    public void OnAPad_TheDpadWalksTheOrdersAndThePeople_AndTheBumpersTheAlerts()
+    {
+        var pad = InputSystem.AddDevice<Gamepad>();
+        (UnityEngine.InputSystem.Controls.ButtonControl button, InputAction action, float sign)[] cases =
+        {
+            (pad.dpad.left, GameInput.KeeperCommand, -1f), (pad.dpad.right, GameInput.KeeperCommand, 1f),
+            (pad.dpad.up, GameInput.KeeperPerson, -1f), (pad.dpad.down, GameInput.KeeperPerson, 1f),
+            (pad.leftShoulder, GameInput.KeeperAlert, -1f), (pad.rightShoulder, GameInput.KeeperAlert, 1f),
+        };
+
+        foreach (var (button, action, sign) in cases)
+        {
+            Assert.IsNotNull(action);
+            Press(button);
+            Assert.IsTrue(action.WasPressedThisFrame(), $"{button.name} presses {action.name}");
+            Assert.AreEqual(sign, Mathf.Sign(action.ReadValue<float>()), $"{button.name} goes the right way along {action.name}");
+            Release(button);
+        }
+
+        // The keyboard and mouse don't reach them: their HUD is clicked.
+        foreach (InputAction action in new[] { GameInput.KeeperCommand, GameInput.KeeperPerson, GameInput.KeeperAlert })
+        {
+            foreach (InputBinding binding in action.bindings)
+            {
+                StringAssert.DoesNotStartWith("<Keyboard>", binding.path);
+            }
+        }
+    }
+
+    [Test]
     public void KeeperKeys_ShareKeysWithWalking_ButNotWithWindowOrSystemKeys()
     {
         RebindRow Row(string path) => new RebindRow("", "", path);

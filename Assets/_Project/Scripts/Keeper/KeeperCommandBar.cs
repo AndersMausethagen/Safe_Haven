@@ -54,6 +54,11 @@ public sealed class KeeperCommandBar
     private readonly List<Slot> slots = new List<Slot>();
     private readonly KeeperTip tip;
     private Slot pointed;
+    // The order lit with a controller's d-pad (-1: none); A gives it.
+    private int focused = -1;
+
+    /// <summary>True while an order is lit with the d-pad.</summary>
+    public bool HasFocus => focused >= 0;
 
     /// <summary>The bar itself (for the key line above it and the overlap audit).</summary>
     public RectTransform Root { get; }
@@ -184,17 +189,99 @@ public sealed class KeeperCommandBar
             slot.Lit = lit;
             slot.Count = count;
             bool can = why == null;
-            slot.Fill.color = !can ? style.Disabled : lit ? style.ControlOn : style.Control;
-            slot.Rim.color = !can ? HearthKit.Faded(style.Inactive, 0.35f) : HearthKit.Faded(lit ? style.AccentBright : style.Accent, lit ? 0.95f : 0.5f);
+            bool focus = focused >= 0 && focused < slots.Count && slots[focused] == slot;
+            slot.Fill.color = !can ? style.Disabled : lit ? style.ControlOn : focus ? style.ControlLit : style.Control;
+            slot.Rim.color = focus ? style.AccentBright
+                : !can ? HearthKit.Faded(style.Inactive, 0.35f) : HearthKit.Faded(lit ? style.AccentBright : style.Accent, lit ? 0.95f : 0.5f);
             slot.Icon.color = !can ? style.Inactive : lit ? style.AccentBright : HearthKit.IconColour(command.Icon);
             slot.Caption.color = !can ? style.Inactive : lit ? style.AccentBright : style.Text;
             slot.Badge.gameObject.SetActive(count > 0);
             slot.BadgeLabel.text = count.ToString();
-            if (pointed == slot)
+            if (pointed == slot || focus)
             {
                 ShowTip(slot);
             }
         }
+    }
+
+    /// <summary>Lights the next (or previous) order that is shown, its words above it; from none, the first (or last).</summary>
+    public void Step(int direction)
+    {
+        if (slots.Count == 0 || direction == 0)
+        {
+            return;
+        }
+
+        int at = focused;
+        for (int tries = 0; tries < slots.Count; tries++)
+        {
+            at = at < 0 ? (direction > 0 ? 0 : slots.Count - 1) : (at + direction + slots.Count) % slots.Count;
+            if (slots[at].Rect.gameObject.activeSelf)
+            {
+                break;
+            }
+        }
+
+        SetFocus(at);
+    }
+
+    /// <summary>Gives the lit order (when it can be given), and lets go of it.</summary>
+    public void RunFocused()
+    {
+        if (focused < 0)
+        {
+            return;
+        }
+
+        Slot slot = slots[focused];
+        SetFocus(-1);
+        if (slot.Why == null)
+        {
+            slot.Command.Run?.Invoke();
+            Refresh(true);
+        }
+        else
+        {
+            GameMessages.Post(slot.Why, MessageKind.Warning);
+        }
+    }
+
+    /// <summary>Lets go of the lit order. False when none was lit.</summary>
+    public bool ClearFocus()
+    {
+        if (focused < 0)
+        {
+            return false;
+        }
+
+        SetFocus(-1);
+        return true;
+    }
+
+    private void SetFocus(int index)
+    {
+        int before = focused;
+        focused = index;
+        if (before >= 0 && before < slots.Count)
+        {
+            Restyle(slots[before]);
+        }
+
+        if (index < 0)
+        {
+            tip.Hide();
+            return;
+        }
+
+        Restyle(slots[index]);
+        ShowTip(slots[index]);
+    }
+
+    // The lit order's rim bright and its face raised, over its state's look.
+    private void Restyle(Slot slot)
+    {
+        slot.Count = -1;
+        Refresh(true);
     }
 
     private void ShowTip(Slot slot)

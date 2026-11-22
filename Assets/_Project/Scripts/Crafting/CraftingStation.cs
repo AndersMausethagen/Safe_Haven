@@ -176,7 +176,12 @@ public sealed class CraftingStation : MonoBehaviour
 
     /// <summary>What its worker adds while they stand at it: WorkerSettings › Worker Speed, a bed of their own (BedSpeedBonus), a good
     /// home (HomeLife), their worker gear, all times their rank (SettlementState.WorkerSpeed). 0 with no worker.</summary>
-    public float WorkerAdds => WorkerAddsFor(Worker);
+    public float WorkerAdds => WorkerAddsFor(Worker) + WorkerCheerFor(Worker);
+
+    // A small scene's cheer (SmallScenes), a share of a worker's own speed, times their rank as the rest is; kept apart so it isn't
+    // carried through a raid.
+    private float WorkerCheerFor(ResidentRecord worker) =>
+        worker == null ? 0f : SmallScenes.CheerOf(worker.Resident) * WorkerSettings.Current.WorkerSpeed * GameSession.Here.WorkerSpeed(Id, type);
 
     private float WorkerAddsFor(ResidentRecord worker)
     {
@@ -186,7 +191,7 @@ public sealed class CraftingStation : MonoBehaviour
         }
 
         float own = WorkerSettings.Current.WorkerSpeed + (GameSession.Here.HasBed(worker) ? BedSpeedBonus : 0f) + HomeLife.WorkBonus(worker)
-            + (worker.WorkGear != null ? worker.WorkGear.WorkerSpeed : 0f) + SmallScenes.CheerOf(worker.Resident) * WorkerSettings.Current.WorkerSpeed;
+            + (worker.WorkGear != null ? worker.WorkGear.WorkerSpeed : 0f);
         return own * GameSession.Here.WorkerSpeed(Id, type);
     }
 
@@ -268,6 +273,7 @@ public sealed class CraftingStation : MonoBehaviour
                 float horse = HorseJobs.SpeedBonusFor(this);
                 queue.SpeedMultiplier = OwnSpeedWith(horse);
                 queue.WorkerSpeed = WorkerAddsFor(worker);
+                queue.WorkerCheer = WorkerCheerFor(worker);
                 queue.WorkerHere = WorkerIsHereFor(worker);
                 queue.HorseHelps = horse > 0f;
                 queue.PlayerSpeed = WorkerSettings.Current.PlayerSpeedFor(type);

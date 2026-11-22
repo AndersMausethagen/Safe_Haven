@@ -55,7 +55,8 @@ public sealed class RingOrder
     }
 }
 
-/// <summary>What a ring worker is at: a painted tree (its terrain and index) or a rock (a scene node).</summary>
+/// <summary>What a ring worker is at: a painted tree (its terrain and index), a rock placed in the scene (a node), or a painted rock
+/// (its terrain and index).</summary>
 public readonly struct RingTarget
 {
     public RingTarget(TerrainTreeFelling felling, TerrainTreeFelling.Standing tree)
@@ -63,6 +64,7 @@ public readonly struct RingTarget
         Felling = felling;
         Index = tree.Index;
         Rock = null;
+        Painted = null;
         Foot = tree.Foot;
         Height = tree.Height;
     }
@@ -72,20 +74,42 @@ public readonly struct RingTarget
         Felling = null;
         Index = -1;
         Rock = rock;
+        Painted = null;
         Foot = rock != null ? rock.transform.position : default;
+        Height = 0f;
+    }
+
+    public RingTarget(TerrainNodeHarvesting painted, int index)
+    {
+        Felling = null;
+        Index = index;
+        Rock = null;
+        Painted = painted;
+        Foot = painted != null ? painted.PositionOf(index) : default;
         Height = 0f;
     }
 
     public TerrainTreeFelling Felling { get; }
     public int Index { get; }
     public ResourceNode Rock { get; }
+    public TerrainNodeHarvesting Painted { get; }
     public Vector3 Foot { get; }
     public float Height { get; }
 
-    public bool IsSet => Felling != null || Rock != null;
+    public bool IsSet => Felling != null || Rock != null || Painted != null;
+
+    /// <summary>True for a rock, placed or painted (a quarry ring's).</summary>
+    public bool IsRock => Rock != null || Painted != null;
+
+    /// <summary>What a rock's yield is read from: the placed node, or the painted one's prefab.</summary>
+    public ResourceNode RockNode => Rock != null ? Rock : Painted != null ? Painted.PrefabNodeOf(Index) : null;
 
     /// <summary>Whether it is still there to work (nobody felled or broke it meanwhile).</summary>
-    public bool Stands => Rock != null ? !Rock.IsDepleted && Rock.isActiveAndEnabled : Felling != null && Felling.IsStanding(Index);
+    public bool Stands => Rock != null ? !Rock.IsDepleted && Rock.isActiveAndEnabled
+        : Painted != null ? Painted.IsPresent(Index) : Felling != null && Felling.IsStanding(Index);
+
+    /// <summary>Breaks the rock (placed or painted); <paramref name="quietly"/>, with no sound or burst. False when it was already down.</summary>
+    public bool Break(bool quietly) => Rock != null ? Rock.BreakDown(quietly) : Painted != null && Painted.BreakByHand(Index, quietly);
 }
 
 /// <summary>
@@ -102,6 +126,9 @@ public static class RingWork
     // Trees and rocks a ring worker is at now (walking to it or working it): nobody else takes them, and coming home doesn't lay them down.
     private static readonly HashSet<(TerrainTreeFelling, int)> Claimed = new HashSet<(TerrainTreeFelling, int)>();
     private static readonly HashSet<ResourceNode> ClaimedRocks = new HashSet<ResourceNode>();
+    private static readonly HashSet<(TerrainNodeHarvesting, int)> ClaimedPainted = new HashSet<(TerrainNodeHarvesting, int)>();
+    // Painted rocks near a ring, gathered for each look (not kept).
+    private static readonly List<int> Near = new List<int>();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetForNewPlaySession() => ForgetGame();
@@ -112,6 +139,8 @@ public static class RingWork
         AwayClock.Clear();
         Claimed.Clear();
         ClaimedRocks.Clear();
+        ClaimedPainted.Clear();
+        Near.Clear();
     }
 
     /// <summary>A woodcutter takes this tree (until <see cref="Release"/>).</summary>
@@ -135,7 +164,11 @@ public static class RingWork
     /// <summary>A ring worker takes this tree or rock (until <see cref="Release(RingTarget)"/>).</summary>
     public static void Claim(RingTarget target)
     {
-        if (target.Rock != null)
+        if (target.Painted != null)
+        {
+            ClaimedPainted.Add((target.Painted, target.Index));
+        }
+        else if (target.Rock != null)
         {
             ClaimedRocks.Add(target.Rock);
         }
@@ -148,7 +181,11 @@ public static class RingWork
     /// <summary>Lets go of what <see cref="Claim(RingTarget)"/> took (a rock destroyed meanwhile too: by reference, not Unity's null).</summary>
     public static void Release(RingTarget target)
     {
-        if ((object)target.Rock != null)
+        if ((object)target.Painted != null)
+        {
+            ClaimedPainted.Remove((target.Painted, target.Index));
+        }
+        else if ((object)target.Rock != null)
         {
             ClaimedRocks.Remove(target.Rock);
         }
@@ -225,9 +262,19 @@ public static class RingWork
     public static bool Quarries(ResourceNode rock, WorkerSettings settings)
     {
         GatheringNodeDefinition definition = rock != null ? rock.Definition : null;
-        return definition != null && definition.GatherTool == ToolType.Pickaxe && definition.DepleteOnGather
-            && definition.RequiredToolTier <= settings.QuarryPickTier && settings.MayQuarry(definition)
-            && (rock.transform.parent == null || !rock.transform.parent.TryGetComponent(out TerrainNodeHarvesting _));
+        return Quarries(definition, settings) && (rock.transform.parent == null || !rock.transform.parent.TryGetComponent(out TerrainNodeHarvesting _));
+    }
+
+    /// <summary>Whether a quarrier breaks rocks of <paramref name="definition"/> (placed or painted).</summary>
+    public static bool Quarries(GatheringNodeDefinition definition, WorkerSettings settings) =>
+        definition != null && definition.GatherTool == ToolType.Pickaxe && definition.DepleteOnGather
+        && definition.RequiredToolTier <= settings.QuarryPickTier && settings.MayQuarry(definition);
+
+    // A painted rock of a kind a quarrier breaks.
+    private static bool QuarriesPainted(TerrainNodeHarvesting painted, int index, WorkerSettings settings)
+    {
+        ResourceNode node = painted.PrefabNodeOf(index);
+        return node != null && Quarries(node.Definition, settings);
     }
 
     /// <summary>What a rock gives a quarrier: its yield and its burst, rolled as for the player outside a raid (items only).</summary>
@@ -264,13 +311,7 @@ public static class RingWork
 
         if (ring.Kind == RingKind.Quarry)
         {
-            if (NextRock(ring, WorkerSettings.Current, out ResourceNode rock))
-            {
-                target = new RingTarget(rock);
-                return true;
-            }
-
-            return false;
+            return NextRock(ring, WorkerSettings.Current, out target);
         }
 
         if (NextTree(ring, out TerrainTreeFelling felling, out TerrainTreeFelling.Standing tree))
@@ -316,10 +357,10 @@ public static class RingWork
         return felling != null;
     }
 
-    /// <summary>The rock nearest the ring's centre that a quarrier breaks and nobody else is at, or false.</summary>
-    public static bool NextRock(RingOrder ring, WorkerSettings settings, out ResourceNode rock)
+    /// <summary>The rock (placed or painted) nearest the ring's centre that a quarrier breaks and nobody else is at, or false.</summary>
+    public static bool NextRock(RingOrder ring, WorkerSettings settings, out RingTarget rock)
     {
-        rock = null;
+        rock = default;
         float best = float.MaxValue;
         foreach (ResourceNode candidate in ResourceNode.Active)
         {
@@ -334,11 +375,36 @@ public static class RingWork
             if (apart.sqrMagnitude < best)
             {
                 best = apart.sqrMagnitude;
-                rock = candidate;
+                rock = new RingTarget(candidate);
             }
         }
 
-        return rock != null;
+        foreach (TerrainNodeHarvesting painted in TerrainNodeHarvesting.Active)
+        {
+            if (painted == null)
+            {
+                continue;
+            }
+
+            painted.PresentNear(ring.Centre, ring.Radius, Near);
+            foreach (int index in Near)
+            {
+                if (ClaimedPainted.Contains((painted, index)) || !QuarriesPainted(painted, index, settings))
+                {
+                    continue;
+                }
+
+                Vector3 apart = painted.PositionOf(index) - ring.Centre;
+                apart.y = 0f;
+                if (apart.sqrMagnitude < best)
+                {
+                    best = apart.sqrMagnitude;
+                    rock = new RingTarget(painted, index);
+                }
+            }
+        }
+
+        return rock.IsSet;
     }
 
     /// <summary>How many trees (grown, those being chopped too; saplings still growing don't count) or rocks to break stand in the ring
@@ -352,6 +418,20 @@ public static class RingWork
             foreach (ResourceNode rock in ResourceNode.Active)
             {
                 count += rock != null && !rock.IsDepleted && ring.Contains(rock.transform.position) && Quarries(rock, settings) ? 1 : 0;
+            }
+
+            foreach (TerrainNodeHarvesting painted in TerrainNodeHarvesting.Active)
+            {
+                if (painted == null)
+                {
+                    continue;
+                }
+
+                painted.PresentNear(ring.Centre, ring.Radius, Near);
+                foreach (int index in Near)
+                {
+                    count += QuarriesPainted(painted, index, settings) ? 1 : 0;
+                }
             }
 
             return count;
@@ -510,10 +590,10 @@ public static class RingWork
                     break;
                 }
 
-                if (target.Rock != null)
+                if (target.IsRock)
                 {
                     // Its stone went to the chests while away; quietly, as it fell long ago.
-                    target.Rock.BreakDown(true);
+                    target.Break(true);
                 }
                 else if (target.Felling.FellByHand(target.Index) && !Replant(target.Foot, settings))
                 {
