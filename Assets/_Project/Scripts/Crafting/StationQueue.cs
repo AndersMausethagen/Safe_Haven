@@ -209,8 +209,15 @@ public sealed class StationQueue
     /// Trip Distance). Sets how long a trip takes while the player is away. Not saved.</summary>
     public float TripMetres { get; set; }
 
-    /// <summary>How fast it works now: on its own, plus its worker while they are at it.</summary>
-    public float Speed => SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f);
+    /// <summary>What the player adds while standing at its station (WorkerSettings › Player Speed; Palworld's player at the bench). Set
+    /// at home with the speed; not saved.</summary>
+    public float PlayerSpeed { get; set; }
+
+    /// <summary>Whether the player stands at its station now (set at home; never while away).</summary>
+    public bool PlayerHere { get; set; }
+
+    /// <summary>How fast it works now: on its own, plus its worker and the player while they are at it.</summary>
+    public float Speed => SpeedMultiplier + (WorkerHere ? WorkerSpeed : 0f) + (PlayerHere ? PlayerSpeed : 0f);
 
     // What its worker fetched from the chests for their work orders: what a worker's order is paid from (WorkerProduction).
     private readonly Dictionary<ItemDefinition, int> supplies = new Dictionary<ItemDefinition, int>();
@@ -554,10 +561,18 @@ public sealed class WorkshopState
 
     /// <summary>Works every station for the given seconds. Returns how many crafts were delivered in total.</summary>
     /// <summary>True while the player is away from home (SettlementSystem): no workplace is loaded, so each queue's worker is taken to be at
-    /// their station, as the builders are taken to be at their scaffolds.</summary>
+    /// their station, as the builders are taken to be at their scaffolds; the player is at none of them.</summary>
     [field: NotSaved("whether the player is home, set by SettlementSystem every frame")]
     public bool AwayFromHome { get; set; }
 
+    /// <summary>The station whose worker went along on the raid (its id; SettlementSystem): not worked meanwhile.</summary>
+    [field: NotSaved("the raid companion's station, set by SettlementSystem every frame")]
+    public string WorkerAbsentAt { get; set; }
+
+    /// <summary>
+    /// Works every queue for the given seconds, delivering every craft that finishes. Resources go to storage first (may be null).
+    /// Calls finished once per delivered craft. Returns how many crafts were delivered.
+    /// </summary>
     public int Tick(float seconds, ResourceStorage storage, Action<StationQueue, RecipeDefinition> finished = null)
     {
         int delivered = 0;
@@ -565,7 +580,8 @@ public sealed class WorkshopState
         {
             if (AwayFromHome)
             {
-                queue.WorkerHere = queue.WorkerSpeed > 0f;
+                queue.WorkerHere = queue.WorkerSpeed > 0f && queue.StationId != WorkerAbsentAt;
+                queue.PlayerHere = false;
             }
 
             if (queue.IsIdle)

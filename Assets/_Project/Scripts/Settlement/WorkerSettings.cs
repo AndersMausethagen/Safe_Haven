@@ -17,6 +17,17 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [SerializeField, Min(0.05f)] private float unattendedSpeed = 0.6f;
     [Tooltip("What a worker standing at their station adds, before their rank, bed, home and gear (Palworld's work speed).")]
     [SerializeField, Min(0f)] private float workerSpeed = 1f;
+    [Tooltip("Stations that run at Unattended Speed with nobody at them (their recipes take half as long again); the rest (the farm, " +
+             "the hive, the campfire, the portal, the dock) run at 1 on their own, as before.")]
+    [SerializeField] private CraftingStationType[] workedStations =
+    {
+        CraftingStationType.Workbench, CraftingStationType.Anvil, CraftingStationType.AlchemyTable, CraftingStationType.Loom,
+        CraftingStationType.Sawbench, CraftingStationType.Kitchen, CraftingStationType.Tannery, CraftingStationType.Wainwright,
+    };
+    [Tooltip("What the player adds standing at a station (within Player Reach): their own hands at the bench.")]
+    [SerializeField, Min(0f)] private float playerSpeed = 1f;
+    [Tooltip("Metres from a station within which the player counts as working at it.")]
+    [SerializeField, Min(1f)] private float playerReach = 6f;
 
     [Header("Carrying")]
     [Tooltip("Weight a resident carries by hand (the player's bag holds 150).")]
@@ -33,7 +44,7 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [SerializeField, Min(0f)] private float strengthPerRaid = 250f;
 
     [Header("Help with carrying")]
-    [Tooltip("Metres from a workplace or chest in which a free cart or wheelbarrow is taken along.")]
+    [Tooltip("Metres from a workplace in which a free handcart is taken along (wheelbarrows are pushed, by the player only).")]
     [SerializeField, Min(0f)] private float cartReach = 18f;
     [Tooltip("Kinds a cart holds when a resident takes it (its weight is the cart's own Capacity).")]
     [SerializeField, Min(1)] private int cartSlots = 4;
@@ -51,6 +62,12 @@ public sealed class WorkerSettings : GameSettings<WorkerSettings>
     [SerializeField, Min(1f)] private float assumedTripDistance = 30f;
 
     public float UnattendedSpeed => unattendedSpeed;
+    public float PlayerSpeed => playerSpeed;
+    public float PlayerReach => playerReach;
+
+    /// <summary>What a station of <paramref name="type"/> runs at with nobody at it: Unattended Speed for the worked kinds, else 1.</summary>
+    public float UnattendedFor(CraftingStationType type) =>
+        workedStations != null && System.Array.IndexOf(workedStations, type) >= 0 ? unattendedSpeed : 1f;
     public float WorkerSpeed => workerSpeed;
     public float CarryWeight => carryWeight;
     public int CarrySlots => carrySlots;

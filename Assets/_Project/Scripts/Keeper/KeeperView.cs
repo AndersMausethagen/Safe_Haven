@@ -448,6 +448,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         if (hud != null)
         {
             hud.Point(picker.Hovered, screen, pad && !blocked);
+            hud.ShowMarks(camera, !blocked);
         }
     }
 
@@ -458,6 +459,13 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
         picker.Picked = thing;
         if (thing == null || player == null)
         {
+            return;
+        }
+
+        // The portal: raids, the ward and its tier, planned from here.
+        if (thing is HomePortal portal)
+        {
+            portal.OpenFromAfar(player.gameObject);
             return;
         }
 

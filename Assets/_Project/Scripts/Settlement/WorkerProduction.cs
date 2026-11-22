@@ -38,7 +38,11 @@ public static class WorkerProduction
     private const int MostCraftsPerTrip = 20;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetForNewPlaySession() => TripClock.Clear();
+    private static void ResetForNewPlaySession()
+    {
+        TripClock.Clear();
+        Claimed.Clear();
+    }
 
     /// <summary>Forgets trips under way (a new game, a load).</summary>
     public static void ForgetGame() => TripClock.Clear();
@@ -50,12 +54,21 @@ public static class WorkerProduction
     /// One look at every worker, <paramref name="seconds"/> after the last: finished work goes to the stash, an idle station gets its next
     /// order, and each worker's materials move as <paramref name="howFor"/> says (null: instantly at home, by trips away).
     /// </summary>
-    public static void Work(SettlementState settlement, StashStorage stash, float seconds, bool atHome, System.Func<ResidentRecord, Hauling> howFor)
+    public static void Work(SettlementState settlement, StashStorage stash, float seconds, bool atHome, System.Func<ResidentRecord, Hauling> howFor,
+        ResidentDefinition away = null)
     {
+        Claimed.Clear();
         foreach (ResidentRecord record in settlement.Residents)
         {
             StationQueue queue = QueueOf(settlement, record);
             if (queue == null)
+            {
+                continue;
+            }
+
+            Claimed.Add(queue);
+            // The one along on the raid works nowhere meanwhile.
+            if (record.Resident != null && record.Resident == away)
             {
                 continue;
             }
@@ -79,7 +92,33 @@ public static class WorkerProduction
 
             if (!record.WorkPaused && queue.IsIdle)
             {
-                StartNext(record.Job, queue, stash, how != Hauling.Instantly);
+                StartNext(record.Job, queue, stash);
+            }
+        }
+
+        // What was fetched to a station nobody works at any more (their job changed, they moved to another of the kind, it came down)
+        // goes back to the chests: it is never lost at a station nobody looks after.
+        foreach (StationQueue queue in settlement.Workshops.Queues)
+        {
+            if (queue.Supplies.Count > 0 && !Claimed.Contains(queue))
+            {
+                GiveBack(queue, stash);
+            }
+        }
+    }
+
+    // The queues someone works at, this look.
+    private static readonly HashSet<StationQueue> Claimed = new HashSet<StationQueue>();
+
+    /// <summary>Everything fetched to <paramref name="queue"/> back into the chests (what won't fit stays at the station).</summary>
+    public static void GiveBack(StationQueue queue, StashStorage stash)
+    {
+        foreach (ItemAmount supply in queue.TakeAllSupplies())
+        {
+            int back = stash.Items.Add(supply.Item, supply.Amount);
+            if (back < supply.Amount)
+            {
+                queue.AddSupply(supply.Item, supply.Amount - back);
             }
         }
     }
@@ -153,9 +192,11 @@ public static class WorkerProduction
             return "plenty in the stash";
         }
 
+        // What was fetched counts first; Keep Input is left in the stash only for what still comes from it.
         foreach (ItemAmount cost in recipe.ItemCost)
         {
-            if (cost.Item != null && stash.Items.Count(cost.Item) + queue.Supplied(cost.Item) < cost.Amount + order.keepInput)
+            int fromStash = cost.Item != null ? cost.Amount - queue.Supplied(cost.Item) : 0;
+            if (cost.Item != null && fromStash > 0 && stash.Items.Count(cost.Item) < fromStash + order.keepInput)
             {
                 return $"not enough {cost.Item.DisplayName} in the stash";
             }
@@ -192,9 +233,10 @@ public static class WorkerProduction
             }
 
             RecipeDefinition recipe = RecipeVariants.OpenAt(order.recipe, queue);
+            // The first order that can be worked has what it needs: it starts next, so nothing is fetched for a later one.
             if (HasSupplies(recipe, queue))
             {
-                continue;
+                return new List<ItemAmount>();
             }
 
             int each = Mathf.Max(1, recipe.OutputAmount);
@@ -311,9 +353,18 @@ public static class WorkerProduction
         return waiting + (recipe.Output != null ? stash.Items.Count(recipe.Output) : stash.Resources.GetAmount(recipe.OutputResource));
     }
 
-    // The next order that can be worked: paid from what was fetched (fromSupplies), else straight from the stash as before.
-    private static void StartNext(JobDefinition job, StationQueue queue, StashStorage stash, bool fromSupplies)
+    /// <summary>
+    /// The next order that can be worked, paid in full or not at all: what was fetched first, the rest from the stash (fetching on foot
+    /// or away brings it all, so the stash's part is then nothing; before a chest stands the stash pays as before). A craft never starts
+    /// short: one that would have let a worker's later crafts come free.
+    /// </summary>
+    public static bool StartNext(JobDefinition job, StationQueue queue, StashStorage stash)
     {
+        if (job == null)
+        {
+            return false;
+        }
+
         foreach (WorkOrder order in job.WorkOrders)
         {
             if (WhyNot(order, queue, stash) != null)
@@ -322,20 +373,23 @@ public static class WorkerProduction
             }
 
             RecipeDefinition recipe = RecipeVariants.OpenAt(order.recipe, queue);
-            if (fromSupplies && !HasSupplies(recipe, queue))
+            if (!CanPay(recipe, queue, stash))
             {
                 continue;
             }
 
             foreach (ItemAmount cost in recipe.ItemCost)
             {
-                if (fromSupplies)
+                if (cost.Item == null)
                 {
-                    queue.TakeSupply(cost.Item, cost.Amount);
+                    continue;
                 }
-                else
+
+                int fromSupplies = Mathf.Min(cost.Amount, queue.Supplied(cost.Item));
+                queue.TakeSupply(cost.Item, fromSupplies);
+                if (cost.Amount > fromSupplies)
                 {
-                    stash.Items.Remove(cost.Item, cost.Amount);
+                    stash.Items.Remove(cost.Item, cost.Amount - fromSupplies);
                 }
             }
 
@@ -346,8 +400,32 @@ public static class WorkerProduction
 
             queue.Enqueue(recipe);
             queue.WorkerCrafts++;
-            return;
+            return true;
         }
+
+        return false;
+    }
+
+    // Whether the recipe's whole cost is there: fetched, and the rest in the stash.
+    private static bool CanPay(RecipeDefinition recipe, StationQueue queue, StashStorage stash)
+    {
+        foreach (ItemAmount cost in recipe.ItemCost)
+        {
+            if (cost.Item != null && queue.Supplied(cost.Item) + stash.Items.Count(cost.Item) < cost.Amount)
+            {
+                return false;
+            }
+        }
+
+        foreach (ResourceAmount cost in recipe.ResourceCost)
+        {
+            if (cost.Resource != null && stash.Resources.GetAmount(cost.Resource) < cost.Amount)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     // Anything finished at their station goes to the stash, whoever asked for it, but gear: a piece is made by whoever collects it

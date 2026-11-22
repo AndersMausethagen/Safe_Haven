@@ -118,8 +118,14 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     private void OnDisable()
     {
         Living.Remove(this);
+        if (npc != null && npc.Resident != null && ByWho.TryGetValue(npc.Resident, out ResidentLife known) && known == this)
+        {
+            ByWho.Remove(npc.Resident);
+        }
+
         building = null;
-        EndTrip();
+        // Going with the scene: the trip ends where it stands, no walk back and no tool made while the scene closes.
+        ClearTrip();
         HavenHomes.Changed -= Refresh;
         HavenHomes.NoteIndoors(insideOf, false);
     }
@@ -482,8 +488,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // from where creatures gather. Found once per scene.
     private static readonly List<(Vector3 at, Vector3 lookAt)> OutingSpots = new List<(Vector3, Vector3)>();
 
-    // Everyone living their day here, to share out the scaffolds.
+    // Everyone living their day here, to share out the scaffolds; and by who they are (Of, asked by every station each look).
     private static readonly List<ResidentLife> Living = new List<ResidentLife>();
+    private static readonly Dictionary<ResidentDefinition, ResidentLife> ByWho = new Dictionary<ResidentDefinition, ResidentLife>();
 
     /// <summary>How many times someone stuck was put where they were going, this session (probes: few is good).</summary>
     public static int Warps { get; private set; }
@@ -499,6 +506,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         OutingSpots.Clear();
         outingSpotsScene = default;
         Living.Clear();
+        ByWho.Clear();
         Warps = 0;
     }
     private static UnityEngine.SceneManagement.Scene outingSpotsScene;
@@ -812,10 +820,16 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return null;
         }
 
+        if (ByWho.TryGetValue(who, out ResidentLife known) && known != null && known.npc != null && known.npc.Resident == who)
+        {
+            return known;
+        }
+
         foreach (ResidentLife life in Living)
         {
             if (life != null && life.npc != null && life.npc.Resident == who)
             {
+                ByWho[who] = life;
                 return life;
             }
         }
@@ -837,7 +851,9 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     {
         get
         {
-            if (!started || HavenVisit.IsVisiting || agent == null || !agent.isOnNavMesh || npc == null || npc.Workplace == null)
+            // Not whether they are on the NavMesh now: asleep indoors (agent off) they still fetch in the morning, and the work they
+            // were fetched for mustn't switch to the stash meanwhile (that let crafts start short).
+            if (!started || HavenVisit.IsVisiting || agent == null || npc == null || npc.Workplace == null)
             {
                 return false;
             }
@@ -876,7 +892,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return false;
         }
 
-        bool back = WorkerProduction.HasWorkToTakeBack(queue) && (queue.IsIdle || queue.Blocked);
+        bool back = WorkerProduction.HasWorkToTakeBack(queue) && (queue.IsIdle || queue.Blocked) && CanTakeBack(queue);
         bool fetch = queue.IsIdle && WorkerProduction.PlanFetch(record.Job, queue, GameSession.Stash, Limits(queue)).Count > 0;
         if (!back && !fetch)
         {
@@ -958,8 +974,36 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             return;
         }
 
-        WorkerProduction.Deliver(record, queue, GameSession.Stash, carrying);
+        float moved = WorkerProduction.Deliver(record, queue, GameSession.Stash, carrying);
+        // A trip that brought nothing (the player took it meanwhile): a while before the next.
+        if (moved <= 0f)
+        {
+            nextTripLook = Time.time + 20f;
+        }
+
         EndTrip();
+    }
+
+    // Whether any of the finished work can go back: they can lift one, and the chests have room (else they'd pace there and back).
+    private bool CanTakeBack(StationQueue queue)
+    {
+        if (!(queue.Output is ItemDefinition item))
+        {
+            return false;
+        }
+
+        return WorkerCarry.CanTake(item, queue.OutputAmount, Limits(queue)) > 0 && GameSession.Stash.Items.SpaceFor(item) > 0;
+    }
+
+    // The trip's state cleared, the cart let go, nothing else (the scene going).
+    private void ClearTrip()
+    {
+        trip = Trip.None;
+        tripChest = null;
+        cartWanted = null;
+        carrying.Clear();
+        carryingBack = false;
+        LetGoOfCart();
     }
 
     // Done, or the day moved on (a meal, the night, danger): nothing carried is lost, as nothing left its place before arriving.

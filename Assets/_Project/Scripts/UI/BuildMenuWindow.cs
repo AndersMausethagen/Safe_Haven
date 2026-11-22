@@ -467,8 +467,10 @@ public sealed class BuildMenuWindow : MonoBehaviour
         detailText.text = (string.IsNullOrWhiteSpace(building.Description) ? "" : building.Description) + MadeAt(building, pool, style);
         costHeading.text = building.PlaceInLines ? "COST, EACH PIECE" : "COST";
         ShowCosts(building, pool);
-        buildButton.interactable = card.Affordable;
-        buildLabel.text = card.Affordable ? "Build" : "Not enough materials";
+        // Short of it, a building that takes work can still be laid out as a plan, to be paid when its materials are home.
+        bool plan = !card.Affordable && BuildPlacer.CanPlan(building);
+        buildButton.interactable = card.Affordable || plan;
+        buildLabel.text = card.Affordable ? "Build" : plan ? "Lay out a plan" : "Not enough materials";
     }
 
     /// <summary>
@@ -697,7 +699,7 @@ public sealed class BuildMenuWindow : MonoBehaviour
             return;
         }
 
-        if (!card.Affordable)
+        if (!card.Affordable && !BuildPlacer.CanPlan(card.Building))
         {
             Select(index);
             GameMessages.Post($"Not enough for the {card.Building.DisplayName}: {card.Missing}", MessageKind.Warning);

@@ -149,6 +149,23 @@ public static class WantedAtHome
             targets.Add(target);
         }
 
+        // Plans laid out at home (BuildPlans): what each still needs is wanted, on a raid too (noted on the settlement).
+        if (!HavenVisit.IsVisiting)
+        {
+            foreach (BuildingDefinition plan in GameSession.Home.Plans)
+            {
+                if (plan == null)
+                {
+                    continue;
+                }
+
+                var target = new Target { Name = $"the planned {plan.DisplayName}" };
+                target.Items.AddRange(plan.ConstructionItems);
+                target.Resources.AddRange(plan.ConstructionCost);
+                targets.Add(target);
+            }
+        }
+
         return targets;
     }
 

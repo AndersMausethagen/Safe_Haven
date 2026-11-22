@@ -529,6 +529,22 @@ public sealed class SettlementState : IHavenView
     [field: NotSaved("what this game sees standing, from the scaffolds at home")]
     public bool ScaffoldsWaiting { get; private set; }
 
+    [NotSaved("the plans standing at home, noted again by BuildPlans every few seconds there")]
+    private readonly List<BuildingDefinition> plans = new List<BuildingDefinition>();
+
+    /// <summary>Plans laid out at home and not yet paid for (BuildPlans), so a raid can mark what they want (WantedAtHome).</summary>
+    public IReadOnlyList<BuildingDefinition> Plans => plans;
+
+    /// <summary>Notes the plans standing at home (BuildPlans); not saved, as loading lands at home where they are noted again.</summary>
+    public void NotePlans(IEnumerable<BuildingDefinition> standing)
+    {
+        plans.Clear();
+        if (standing != null)
+        {
+            plans.AddRange(standing);
+        }
+    }
+
     /// <summary>Notes whether paid-for scaffolds stand at home (HavenProgress, with NoteBuildings).</summary>
     public void NoteScaffolds(bool waiting) => ScaffoldsWaiting = waiting;
 

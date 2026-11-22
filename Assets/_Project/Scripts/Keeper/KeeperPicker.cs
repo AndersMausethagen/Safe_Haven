@@ -123,6 +123,12 @@ public sealed class KeeperPicker
             return person;
         }
 
+        HomePortal portal = collider.GetComponentInParent<HomePortal>();
+        if (portal != null)
+        {
+            return portal;
+        }
+
         return collider.GetComponentInParent<BuildingObject>();
     }
 

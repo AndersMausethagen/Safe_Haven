@@ -113,6 +113,12 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
     /// <summary>Something takes the handles: the player, or a horse it is hitched to.</summary>
     public void Take(IHauler by)
     {
+        // Taken from someone else (the player takes a resident's cart): they let go first, so their colliders and their hold come back.
+        if (hauler != null && hauler != by)
+        {
+            LetGo();
+        }
+
         hauler = by;
         stuckFor = 0f;
         Strain = 0f;
@@ -217,7 +223,11 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
         stuckFor = Strain >= 1f ? stuckFor + Time.fixedDeltaTime : 0f;
         if (stuckFor >= TransportSettings.Current.StuckSeconds)
         {
-            GameMessages.Post($"The {transport.Definition.DisplayName} won't move. You let go.", MessageKind.Warning);
+            if (hauler is PlayerTransport)
+            {
+                GameMessages.Post($"The {transport.Definition.DisplayName} won't move. You let go.", MessageKind.Warning);
+            }
+
             LetGo();
         }
     }
@@ -258,7 +268,9 @@ public sealed class Haulable : MonoBehaviour, ITransportDriver
     private void Rumble(Rigidbody body)
     {
         TransportSettings settings = TransportSettings.Current;
-        if (Time.time < nextRumble || body.linearVelocity.sqrMagnitude < RollingSpeed * RollingSpeed || Player.Current == null || Player.Current.Noise == null)
+        // The player's own noise: a resident's cart rumbling at home is no noise of theirs.
+        if (Time.time < nextRumble || body.linearVelocity.sqrMagnitude < RollingSpeed * RollingSpeed || Player.Current == null || Player.Current.Noise == null
+            || !(hauler is PlayerTransport))
         {
             return;
         }

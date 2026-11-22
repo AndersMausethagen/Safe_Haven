@@ -434,9 +434,18 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         ResolveSingle(cursor, free, out Vector3 point, out float pieceYaw);
         ghost.Show(1);
         string problem = CheckSpot(point, pieceYaw);
+        placeAsPlan = false;
         if (problem == null && placing != null && !CanAfford(placing, 1, out string missing))
         {
-            problem = missing;
+            // Short of it: a plan, laid out now and paid when its materials are home (Construction.BeginPlan).
+            if (CanPlan(placing))
+            {
+                placeAsPlan = true;
+            }
+            else
+            {
+                problem = missing;
+            }
         }
 
         ghost.Place(0, point, pieceYaw, problem, Kind);
@@ -558,13 +567,19 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
         }
 
         BuildingDefinition building = placing;
-        GameObject placed = Build(building, point, rotation);
+        bool plan = placeAsPlan;
+        GameObject placed = Build(building, point, rotation, plan);
         if (placed == null)
         {
             return;
         }
 
-        if (!StandsAtOnce(placed))
+        if (plan)
+        {
+            GameMessages.Post($"Laid out a plan for the {building.DisplayName}. What it needs is wanted at home: once the chests hold it all, " +
+                "it is paid and the builders start (or hammer it yourself with the materials in your bag).");
+        }
+        else if (!StandsAtOnce(placed))
         {
             GameMessages.Post($"The scaffold for the {building.DisplayName} is up. Hold {{key:Hammer}} at it to build.");
         }
@@ -582,7 +597,17 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
 
     // Pays and places one building: a scaffold to hammer up when its kind takes work (Construction). Null when it can't
     // be paid for.
-    private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation)
+    /// <summary>Whether <paramref name="building"/> may be laid out as a plan when it can't be paid for yet: one that takes work (a
+    /// scaffold), placed singly, in the Haven (not the prologue's camp).</summary>
+    public static bool CanPlan(BuildingDefinition building) =>
+        building != null && building.BuildWork > 0f && !building.PlaceInLines && global::Place.AtHome && HomePortal.Current != null;
+
+    // The spot being placed now is short of materials and will be a plan (UpdatePlacing), read as it is confirmed.
+    private bool placeAsPlan;
+
+    private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation) => Build(building, position, rotation, false);
+
+    private GameObject Build(BuildingDefinition building, Vector3 position, Quaternion rotation, bool plan)
     {
         string refused = Area != null ? Area.CheckBuilding(building) : "You can only build in Safe Haven.";
         if (refused != null)
@@ -590,7 +615,7 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             GameMessages.Post(refused, MessageKind.Warning);
             return null;
         }
-        if (!MaterialPool.For(gameObject).TrySpend(building.ConstructionCost, building.ConstructionItems))
+        if (!plan && !MaterialPool.For(gameObject).TrySpend(building.ConstructionCost, building.ConstructionItems))
         {
             return null;
         }
@@ -600,7 +625,14 @@ public sealed partial class BuildPlacer : MonoBehaviour, IPlayerActivity
             : Instantiate(building.Prefab, position, rotation);
         if (building.BuildWork > 0f && placed.TryGetComponent(out Construction construction))
         {
-            construction.BeginBuilding();
+            if (plan)
+            {
+                construction.BeginPlan();
+            }
+            else
+            {
+                construction.BeginBuilding();
+            }
         }
 
         return placed;

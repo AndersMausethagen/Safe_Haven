@@ -622,9 +622,13 @@ public sealed class StationWindow : MonoBehaviour
             lines.Add($"Nobody works here yet. Residents get their jobs in {GameInput.KeyLabel(GameInput.Haven)}.");
         }
 
-        if (station.Speed > 1f)
+        // How fast it works now: on its own, with its worker at it, and with the player at the bench (WorkerSettings).
+        StationQueue now = station.Queue;
+        if (now != null)
         {
-            lines.Add($"Works {Mathf.RoundToInt((station.Speed - 1f) * 100f)}% faster.");
+            string who = now.WorkerHere && now.PlayerHere ? "with you and its worker at it" : now.WorkerHere ? "with its worker at it"
+                : now.PlayerHere ? "with you at it" : "with nobody at it";
+            lines.Add($"Works at {Mathf.RoundToInt(now.Speed * 100f)}% speed now, {who}.");
         }
 
         return string.Join("\n", lines);

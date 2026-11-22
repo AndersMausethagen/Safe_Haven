@@ -248,11 +248,12 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
                     return;
                 }
 
+                // What they had comes back: to the bag, or to the chests where the bag has no room (never lost).
                 ItemDefinition had = record.WorkGear;
                 record.WorkGear = gear;
-                if (had != null)
+                if (had != null && player.Bag.Give(had, 1, ArrivalCause.Moved) <= 0 && GameSession.Stash.Items.Add(had, 1) <= 0)
                 {
-                    player.Bag.Give(had, 1, ArrivalCause.Rewarded);
+                    ItemDelivery.Give(player.Bag, new ItemStack(had, 1), newFind: false, toStash: true, player.transform);
                 }
 
                 DialogueBox.Current.Say(speaker, $"The {gear.DisplayName}? That will lighten the work. Thank you.", afterAnswer);

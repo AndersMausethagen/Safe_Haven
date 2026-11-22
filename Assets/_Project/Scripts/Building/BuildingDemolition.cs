@@ -82,6 +82,14 @@ public static class BuildingDemolition
         int top = 1;
         if (building != null && building.TryGetComponent(out Construction construction))
         {
+            // A plan was never paid for (Construction.BeginPlan): nothing comes back.
+            if (construction.IsPlan)
+            {
+                resources.Clear();
+                items.Clear();
+                return;
+            }
+
             top = construction.IsBuilding && construction.Paid && construction.Level >= 1 ? construction.Target : construction.Level;
         }
 
@@ -227,6 +235,16 @@ public static class BuildingDemolition
         // Only what stood (or was being raised a tier) was counted as built; a scaffold never finished wasn't Built.
         bool counted = !building.TryGetComponent(out Construction construction) || construction.Level >= 1;
         MaterialPool.For(user).GiveBack(resources, items, user.transform);
+        // What its worker had fetched to it goes back to the chests too.
+        if (building.TryGetComponent(out CraftingStation fetchedTo) && fetchedTo.Queue != null)
+        {
+            WorkerProduction.GiveBack(fetchedTo.Queue, GameSession.Stash);
+            foreach (ItemAmount left in fetchedTo.Queue.TakeAllSupplies())
+            {
+                ItemDelivery.Give(user.TryGetComponent(out ItemInventory bag) ? bag : null, new ItemStack(left.Item, left.Amount),
+                    newFind: false, toStash: true, user.transform);
+            }
+        }
         // Its modules go to the store as spares, as a removed one does (BuildingModules.Remove): nothing fitted is lost.
         int spares = 0;
         if (construction != null)

@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29650479566c4214ba545a3ba5a2fbd5, type: 3}
+  m_Name: HomecomingSettings
+  m_EditorClassIdentifier: SafeHaven::HomecomingSettings
+  chance: 0.6
+  gifts:
+  - job: {fileID: 11400000, guid: b33d365bf7bdfe74793c6d3f0f4b33a5, type: 2}
+    item: {fileID: 11400000, guid: a370187223419a048b6cebe8f7e345a3, type: 2}
+    amount: 4
+    line: '{name} found a straight oak by the stream and split it into planks for you.'
+    weight: 1
+  - job: {fileID: 11400000, guid: 59a0d6a12e809f84f92d2b2a418d1d26, type: 2}
+    item: {fileID: 11400000, guid: 59d371b7b63e8e24bb946051d808bc9b, type: 2}
+    amount: 3
+    line: '{name} squared the stones left over from the last wall.'
+    weight: 1
+  - job: {fileID: 11400000, guid: be5a576d696f9f6459c1667a3521f7b8, type: 2}
+    item: {fileID: 11400000, guid: d4d2a84b7c6083a4dba750243db7aae9, type: 2}
+    amount: 6
+    line: '{name} burned a clamp of charcoal while the forge was quiet.'
+    weight: 1
+  - job: {fileID: 11400000, guid: f4c65068c1237a04b8a587a274672012, type: 2}
+    item: {fileID: 11400000, guid: d0c7b274979b4ad46a9f3bf89b8cfa64, type: 2}
+    amount: 1
+    line: '{name} brewed one draught more than the order asked, and put it by for you.'
+    weight: 1
+  - job: {fileID: 11400000, guid: c25a410fc86afd841890a87ffb27e6ea, type: 2}
+    item: {fileID: 11400000, guid: 8ae780c7423381b4bae5edf4e4beabc9, type: 2}
+    amount: 2
+    line: '{name} baked an extra round of bread for whoever came home hungry.'
+    weight: 1
+  - job: {fileID: 11400000, guid: 42d876bf3cb45f84088e94fc709b0672, type: 2}
+    item: {fileID: 11400000, guid: 05a3b8e12c05cb548b40065962d3b860, type: 2}
+    amount: 6
+    line: '{name} gleaned the edges of the field after the harvest.'
+    weight: 1
+  - job: {fileID: 11400000, guid: 9d8e9d72cc07d544c975b891d5c740e6, type: 2}
+    item: {fileID: 11400000, guid: 5b9dacc5b9eb6cc44b9e831ab423c051, type: 2}
+    amount: 2
+    line: '{name} cured a hide from a hare that wandered too close.'
+    weight: 1
+  - job: {fileID: 11400000, guid: cdd8fcb3acc60ec45854efd2eb13a408, type: 2}
+    item: {fileID: 11400000, guid: 616026fe07c265041bdcd10e32bcd168, type: 2}
+    amount: 2
+    line: '{name} wove a little more linen in the evenings.'
+    weight: 1
+  - job: {fileID: 11400000, guid: e9647a52d2bdeec478f332bf63b64731, type: 2}
+    item: {fileID: 11400000, guid: 1deba4cfdd0cc854ba9f9d3fa96aacd9, type: 2}
+    amount: 2
+    line: '{name} took the boat out at dawn and kept the best of the catch for you.'
+    weight: 1

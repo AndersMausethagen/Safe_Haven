@@ -65,6 +65,8 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
         bool atHome = HomePortal.Current != null;
         // Away, no workplace is loaded: each worker is taken to be at their station (StationQueue.WorkerHere).
         settlement.Workshops.AwayFromHome = !atHome;
+        ResidentDefinition along = GameSession.ActiveRaid != null ? GameSession.ActiveRaid.Companion : null;
+        settlement.Workshops.WorkerAbsentAt = along != null ? WorkerProduction.QueueOf(settlement, settlement.Find(along))?.StationId : null;
         settlement.Workshops.Tick(Time.deltaTime, GameSession.Stash.Resources, OnCrafted);
         workerSeconds += Time.deltaTime;
         // Away from home, the Carpenter and Mason get on with the scaffolds left standing there (ResidentBuilders): those at
@@ -79,7 +81,7 @@ public sealed class SettlementSystem : MonoBehaviour, IGameSystem
             nextWorkerLook = Time.unscaledTime + WorkerLookSeconds;
             // At home a worker fetches on foot where a chest stands near their workplace (ResidentLife); away, each trip takes the time
             // the walk would (WorkerSettings).
-            WorkerProduction.Work(settlement, GameSession.Stash, workerSeconds, atHome, atHome ? HowAtHome : null);
+            WorkerProduction.Work(settlement, GameSession.Stash, workerSeconds, atHome, atHome ? HowAtHome : null, along);
             workerSeconds = 0f;
         }
 

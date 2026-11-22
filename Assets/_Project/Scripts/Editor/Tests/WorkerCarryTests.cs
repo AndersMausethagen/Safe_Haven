@@ -184,6 +184,44 @@ public sealed class WorkerCarryTests
     }
 
     [Test]
+    public void AWorkersCraft_NeverStartsShort_AndPaysFromWhatWasFetchedFirst()
+    {
+        ItemDefinition wood = Item("Wood", 1f);
+        ItemDefinition plank = Item("Plank", 0.5f);
+        var recipe = ScriptableObject.CreateInstance<RecipeDefinition>();
+        made.Add(recipe);
+        var rso = new SerializedObject(recipe);
+        rso.FindProperty("output").objectReferenceValue = plank;
+        rso.FindProperty("outputAmount").intValue = 2;
+        rso.FindProperty("craftSeconds").floatValue = 5f;
+        SerializedProperty costs = rso.FindProperty("itemCost");
+        costs.arraySize = 1;
+        costs.GetArrayElementAtIndex(0).FindPropertyRelative("item").objectReferenceValue = wood;
+        costs.GetArrayElementAtIndex(0).FindPropertyRelative("amount").intValue = 4;
+        rso.ApplyModifiedPropertiesWithoutUndo();
+        var job = ScriptableObject.CreateInstance<JobDefinition>();
+        made.Add(job);
+        var jso = new SerializedObject(job);
+        SerializedProperty orders = jso.FindProperty("workOrders");
+        orders.arraySize = 1;
+        orders.GetArrayElementAtIndex(0).FindPropertyRelative("recipe").objectReferenceValue = recipe;
+        orders.GetArrayElementAtIndex(0).FindPropertyRelative("stockTarget").intValue = 100;
+        orders.GetArrayElementAtIndex(0).FindPropertyRelative("keepInput").intValue = 0;
+        jso.ApplyModifiedPropertiesWithoutUndo();
+
+        var stash = new StashStorage();
+        var queue = new StationQueue("lodge", CraftingStationType.Sawbench, 10, 5);
+        Assume.That(stash.Items.Add(wood, 3) == 3, "the stash takes items without a chest in a test");
+        Assert.IsFalse(WorkerProduction.StartNext(job, queue, stash), "3 of 4: no craft");
+        queue.AddSupply(wood, 2);
+        Assert.IsTrue(WorkerProduction.StartNext(job, queue, stash), "2 fetched and 3 stored: one craft");
+        Assert.AreEqual(0, queue.Supplied(wood), "what was fetched is used first");
+        Assert.AreEqual(1, stash.Items.Count(wood), "the rest from the stash");
+        Assert.IsFalse(WorkerProduction.StartNext(job, queue, stash), "1 left: no free craft");
+        Assert.AreEqual(1, queue.QueuedCount);
+    }
+
+    [Test]
     public void HaulingAndGear_AreSavedWithTheResident()
     {
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);

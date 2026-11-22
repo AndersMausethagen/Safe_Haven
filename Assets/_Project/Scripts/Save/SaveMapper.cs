@@ -474,7 +474,7 @@ public static class SaveMapper
             queue.WorkerCrafts = Math.Max(0, entry.workerCrafts);
             foreach (StationOutputSaveData supply in entry.supplies ?? new List<StationOutputSaveData>())
             {
-                ItemDefinition fetched = supply == null || string.IsNullOrEmpty(supply.id) ? null : content.FindItem(supply.id);
+                ItemDefinition fetched = supply == null || string.IsNullOrEmpty(supply.id) ? null : Resolve(content.FindItem(supply.id), "item", supply.id, missing);
                 if (fetched != null && supply.amount > 0)
                 {
                     queue.AddSupply(fetched, supply.amount);

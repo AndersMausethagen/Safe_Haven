@@ -73,6 +73,23 @@ public static class WorkerCarry
             }
         }
 
+        // More kinds than slots: the first kinds still wanted, for as many crafts as the weight allows (a smith with one slot brings
+        // several crafts' ore, then their coal, rather than one craft's of each over four trips).
+        for (int count = Mathf.Max(1, crafts); count >= 1; count--)
+        {
+            List<ItemAmount> wanted = Wanted(costs, count, supplied, inStash, out bool short_);
+            if ((short_ && count > 1) || wanted.Count <= limits.Slots)
+            {
+                continue;
+            }
+
+            List<ItemAmount> some = wanted.GetRange(0, limits.Slots);
+            if (WeightOf(some) <= limits.Weight + 0.001f)
+            {
+                return some;
+            }
+        }
+
         // Not one craft fits: a start on it, by kinds in order and by weight.
         List<ItemAmount> first = Wanted(costs, 1, supplied, inStash, out _);
         var load = new List<ItemAmount>();

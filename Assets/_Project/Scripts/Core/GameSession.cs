@@ -252,5 +252,6 @@ public static class GameSession
         QuestTimers.ForgetGame();
         ResidentBuilders.ForgetGame();
         Homecoming.ForgetGame();
+        WorkerProduction.ForgetGame();
     }
 }

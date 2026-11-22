@@ -53,6 +53,13 @@ public static class Homecoming
         }
 
         List<string> lines = Compose(Player.Current, GameSession.Home);
+        // One good thing that happened while they were away (HomecomingSettings), heading the card.
+        string gift = AwayGifts.Draw(HomecomingSettings.Current, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value);
+        if (gift != null)
+        {
+            lines.Insert(0, gift);
+        }
+
         if (lines.Count == 0)
         {
             return false;

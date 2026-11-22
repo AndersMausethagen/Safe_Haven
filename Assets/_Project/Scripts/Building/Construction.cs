@@ -243,7 +243,46 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Target = 1;
         Work = 0f;
         Paid = true;
+        IsPlan = false;
         Refresh();
+    }
+
+    /// <summary>
+    /// A plan (the Keeper's view, Docs/ColonyModeResearch_2026-11-21.md §4.5): the scaffold laid out before its materials are home. It
+    /// costs nothing yet; its materials are wanted at home (WantedAtHome), it is paid from the chests the moment they hold it all
+    /// (BuildPlans), or when the player starts hammering it with what they carry, and then built like any scaffold.
+    /// </summary>
+    public void BeginPlan()
+    {
+        Level = 0;
+        Target = 1;
+        Work = 0f;
+        Paid = false;
+        IsPlan = true;
+        Refresh();
+    }
+
+    /// <summary>True for a plan whose materials aren't paid yet (BeginPlan).</summary>
+    public bool IsPlan { get; private set; }
+
+    /// <summary>Pays a plan from <paramref name="pool"/> when it holds the whole cost; true when it is paid now.</summary>
+    public bool TryPayPlan(MaterialPool pool)
+    {
+        if (!IsPlan || Paid || pool == null)
+        {
+            return false;
+        }
+
+        Cost(out IReadOnlyList<ResourceAmount> resources, out IReadOnlyList<ItemAmount> items);
+        if (!pool.TrySpend(resources, items))
+        {
+            return false;
+        }
+
+        Paid = true;
+        IsPlan = false;
+        Refresh();
+        return true;
     }
 
     /// <summary>The cost of the work waiting to be paid: the next level's, or the building's own for a ruin.</summary>
@@ -424,7 +463,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
             }
 
             Paid = true;
-            GameMessages.Post($"Repairing the {Definition.DisplayName}.");
+            GameMessages.Post(IsPlan ? $"Building the {Definition.DisplayName}." : $"Repairing the {Definition.DisplayName}.");
+            IsPlan = false;
         }
 
         // The Construction skill: a beginner hammers slower, a master faster.
@@ -698,7 +738,8 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
     // fitted part may be empty): a building without modules saves as it always did.
     public string CaptureState()
     {
-        string state = string.Join(",", Level, Target, Work.ToString(System.Globalization.CultureInfo.InvariantCulture), Paid ? 1 : 0);
+        // Paid: 1, a plan waiting for its materials: 2 (older saves read either as before).
+        string state = string.Join(",", Level, Target, Work.ToString(System.Globalization.CultureInfo.InvariantCulture), Paid ? 1 : IsPlan ? 2 : 0);
         string ids = string.Join("|", fitted.ConvertAll(module => module != null ? module.Id : ""));
         return fitting != null ? state + "," + ids + "," + fitting.Id : fitted.Count == 0 ? state : state + "," + ids;
     }
@@ -715,6 +756,7 @@ public sealed class Construction : MonoBehaviour, ISaveable, ISharedState, IStat
         Target = Mathf.Max(Level, int.Parse(parts[1]));
         Work = float.Parse(parts[2], System.Globalization.CultureInfo.InvariantCulture);
         Paid = parts[3] == "1";
+        IsPlan = parts[3] == "2";
         fitted.Clear();
         fitting = parts.Length >= 6 && !string.IsNullOrEmpty(parts[5]) ? Resources.Load<ContentDatabase>(ContentDatabase.ResourceName)?.FindModule(parts[5]) : null;
         if (parts.Length >= 5 && !string.IsNullOrEmpty(parts[4]))

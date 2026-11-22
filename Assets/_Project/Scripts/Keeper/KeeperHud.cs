@@ -83,11 +83,111 @@ public sealed class KeeperHud : MonoBehaviour
         }
     }
 
+    // ----- Marks over the buildings: work ready at a station, a plan waiting for its materials (Docs/ColonyModeResearch §4.4) -----
+
+    private const int MostMarks = 12;
+    private const float MarkLift = 4.5f;
+    private readonly System.Collections.Generic.List<TMP_Text> marks = new System.Collections.Generic.List<TMP_Text>();
+    private float nextMarks;
+
+    /// <summary>Puts a small label over each station with work ready and each plan in view (a few times a second).</summary>
+    public void ShowMarks(Camera camera, bool show)
+    {
+        if (!show || camera == null)
+        {
+            foreach (TMP_Text mark in marks)
+            {
+                mark.transform.parent.gameObject.SetActive(false);
+            }
+
+            return;
+        }
+
+        if (Time.unscaledTime < nextMarks)
+        {
+            return;
+        }
+
+        nextMarks = Time.unscaledTime + 0.25f;
+        int used = 0;
+        foreach (BuildingObject building in BuildingObject.Active)
+        {
+            if (used >= MostMarks)
+            {
+                break;
+            }
+
+            string text = MarkFor(building);
+            if (text == null)
+            {
+                continue;
+            }
+
+            Vector3 viewport = camera.WorldToViewportPoint(building.transform.position + Vector3.up * MarkLift);
+            if (viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f)
+            {
+                continue;
+            }
+
+            TMP_Text label = Mark(used++);
+            label.text = text;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, camera.ViewportToScreenPoint(viewport), null, out Vector2 local))
+            {
+                ((RectTransform)label.transform).anchoredPosition = local;
+            }
+        }
+
+        for (int i = used; i < marks.Count; i++)
+        {
+            marks[i].transform.parent.gameObject.SetActive(false);
+        }
+    }
+
+    private static string MarkFor(BuildingObject building)
+    {
+        if (building == null || !building.TryGetComponent(out Construction construction))
+        {
+            return null;
+        }
+
+        if (construction.IsPlan)
+        {
+            return "Plan";
+        }
+
+        if (!construction.IsBuilding && building.TryGetComponent(out CraftingStation station) && station.Queue != null && station.Queue.OutputAmount > 0)
+        {
+            return $"{station.Queue.OutputAmount} ready";
+        }
+
+        return null;
+    }
+
+    private TMP_Text Mark(int index)
+    {
+        while (marks.Count <= index)
+        {
+            UIStyle style = UIStyle.Current;
+            RectTransform at = Box("Mark", canvasRect, new Vector2(0.5f, 0.5f), new Vector2(160f, 30f), Vector2.zero);
+            at.gameObject.AddComponent<Image>().raycastTarget = false;
+            at.gameObject.AddComponent<UIRole>().Set(UIRole.Kind.Inset);
+            TMP_Text text = Label("Text", at, 0f, 3f, 160f, 24f, 16f, style.Accent, TextAlignmentOptions.Center);
+            text.overflowMode = TextOverflowModes.Overflow;
+            marks.Add(text);
+        }
+
+        TMP_Text mark = marks[index];
+        mark.transform.parent.gameObject.SetActive(true);
+        mark.gameObject.SetActive(true);
+        return mark;
+    }
+
     /// <summary>Who or what a pick is called.</summary>
     public static string NameOf(Component thing) => thing switch
     {
         ResidentNpc person when person.Resident != null => person.Resident.DisplayName,
         BuildingObject building when building.Definition != null => building.Definition.DisplayName,
+        HomePortal _ => "The Portal",
         _ => thing != null ? thing.name : "",
     };
 
@@ -104,6 +204,11 @@ public sealed class KeeperHud : MonoBehaviour
         {
             if (building.TryGetComponent(out Construction construction))
             {
+                if (construction.IsPlan)
+                {
+                    return "Plan · waiting for its materials";
+                }
+
                 if (construction.IsBuilding)
                 {
                     return $"Scaffold · {Mathf.RoundToInt(construction.Share * 100f)}% built";
@@ -120,6 +225,11 @@ public sealed class KeeperHud : MonoBehaviour
             }
 
             return "Click to look closer";
+        }
+
+        if (thing is HomePortal)
+        {
+            return "Raids, the ward and the portal's tier";
         }
 
         return "";

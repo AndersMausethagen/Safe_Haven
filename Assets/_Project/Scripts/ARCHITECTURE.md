@@ -2157,6 +2157,26 @@ wheelbarrows and horses matter; longer crafts where workers make the difference 
   `ResidentRecord.WorkGear`, saved). `WithHelp`: a cart's Capacity and Cart Slots, a horse working at the station ×2 and a kind.
   The resident window's work page says what they carry.
 
+### Between raids (phase 3, 2026-11-21)
+
+- **Plans.** A building that takes work and can't be afforded may be laid out as a plan (`BuildPlacer.CanPlan`; the build menu's
+  "Lay out a plan"): `Construction.BeginPlan` (unpaid, `IsPlan`, saved as Paid = 2), costs nothing and refunds nothing
+  (`BuildingDemolition`). `BuildPlans` (on the portal) pays one from the chests the moment they hold it all, then builders raise it;
+  the player can hammer it with what they carry. Waiting plans are noted on the settlement (`SettlementState.Plans`, not saved) and
+  `WantedAtHome` wants their materials ("the planned Hut"), so a raid's pickups and briefing count them.
+- **Homecoming.** `AwayGifts.Draw` (`HomecomingSettings`: nine gifts, one per job, 60% chance) heads the homecoming card with one
+  good thing someone at home did, its item put in the chests; never from the one along on the raid. In the view, stations with work
+  ready and waiting plans carry a small mark (`KeeperHud.ShowMarks`).
+- **The portal from the view.** `HomePortal.OpenFromAfar`: its window (raids, the ward, its tier) at any distance; a story moment
+  waiting is told in person instead.
+
+Phase 2's review fixes: a worker's craft is paid in full or not at all (fetched supplies first, then the stash: `StartNext` used to
+start crafts short at night), supplies left at a station nobody works at go back to the chests (and come back when it is taken
+down), unattended speed only for the worked kinds (`WorkerSettings` › Worked Stations; farm, hive, campfire, portal and dock run at 1),
+the player standing at a station adds their own work (Player Speed, within Player Reach), the raid companion's station isn't worked
+meanwhile, one-slot workers bring several crafts of one kind per trip, no pacing with nothing to take back, a player taking a
+resident's cart makes them let go, gear swaps never lose the old piece.
+
 ## Going along, set-pieces and bosses
 
 **Raid companions (GDD §8.4, §15.5).** `ResidentDefinition` › Raid Companion says how someone fights; the raid planner offers everyone who has one and lives in the Haven, one per raid (`RaidLauncher.CanGoAlong`, `RaidSession.Companion`). `RaidDirector.BringCompanion` spawns them beside the player from `SettlementSettings` › Raid Companion Prefab with their own model (`Companion.SpawnAs`), scaled by the raid's multipliers the other way round: enemy power makes them tougher and enemy health makes them hit harder, so they stay as much help at any tier. On a raid they don't get up by themselves: `CompanionDefinition` › Bleed Out Seconds (45) to help them up, or they are gone. Down when the raid ends counts the same, because nobody went back. Alive but elsewhere, they find their own way home. `SettlementState.LoseResident` takes them off the list: raids don't seek them as a new face (`HasResident`). A `FallenCairn` goes up near the portal for as long as they are out there, `ResidentNpc` speaks of it for `GriefRaids` raids, and their job goes on `VacantJobs`, open to anyone (`JobsOpenTo`), so a loss never blocks crafting (GDD §7). A crash brings them back, like everything else in a raid that never came home.

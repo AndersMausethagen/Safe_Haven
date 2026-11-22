@@ -251,6 +251,12 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
             gameObject.AddComponent<KeeperView>();
         }
 
+        // Plans laid out before their materials are home, paid when the chests hold them (the Keeper's view).
+        if (!TryGetComponent(out BuildPlans _))
+        {
+            gameObject.AddComponent<BuildPlans>();
+        }
+
         interactable = GetComponent<Interactable>();
         raid = GetComponent<RaidPortal>();
         station = GetComponent<CraftingStation>();
@@ -278,6 +284,27 @@ public sealed class HomePortal : MonoBehaviour, IArea, IBuildArea
         {
             Current = null;
         }
+    }
+
+    /// <summary>
+    /// Its window from the Keeper's view (raids, the ward, the portal's tier) at any distance. A moment it has to tell (a story beat) is
+    /// told in person: the player is asked to come to it instead.
+    /// </summary>
+    public void OpenFromAfar(GameObject user)
+    {
+        if (user == null)
+        {
+            return;
+        }
+
+        if (PendingMoment() != null)
+        {
+            GameMessages.Post("The portal has something to tell you: go to it.", MessageKind.Info);
+            return;
+        }
+
+        menu ??= new HomePortalMenu(this, raid, station);
+        PortalWindow.Show(() => menu.Build(user), user, transform, float.PositiveInfinity, () => RaiseTalked(user));
     }
 
     private void OnUsed()
