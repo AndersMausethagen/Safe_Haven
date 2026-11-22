@@ -102,6 +102,7 @@ public sealed class PlayerGathering : MonoBehaviour
         interactor.InteractionStarted += OnInteractionStarted;
         interactor.InteractionEnded += OnInteractionEnded;
         stateMachine.WorkPressed += OnWorkPressed;
+        ResourceSource.Harvested += OnHarvested;
         if (health != null)
         {
             health.Damaged += OnDamaged;
@@ -113,6 +114,7 @@ public sealed class PlayerGathering : MonoBehaviour
         interactor.InteractionStarted -= OnInteractionStarted;
         interactor.InteractionEnded -= OnInteractionEnded;
         stateMachine.WorkPressed -= OnWorkPressed;
+        ResourceSource.Harvested -= OnHarvested;
         if (health != null)
         {
             health.Damaged -= OnDamaged;
@@ -521,10 +523,24 @@ public sealed class PlayerGathering : MonoBehaviour
         sweetSpot = Mathf.Max(0.1f, 1f + self.Stats.Get(axe ? StatType.ChopSweetSpot : StatType.MineSweetSpot));
     }
 
-    private void WearTool(ToolType tool)
+    // What staying costs: a node gathered while the raid stage's bonus is up wears its tool (RaidPacingSettings › Tool Wear Per Bonus),
+    // the downside shown beside the gold badge.
+    private void OnHarvested(GameObject recipient, ResourceSource source)
+    {
+        GatheringNodeDefinition node = source != null ? source.Node : null;
+        float bonus = RaidDirector.StageGatherNow - 1f;
+        if (recipient == gameObject && source.CountsAsNode && node != null && node.GatherTool != ToolType.None && bonus > 0f)
+        {
+            WearTool(node.GatherTool, RaidPacingSettings.Current.ToolWearFor(bonus));
+        }
+    }
+
+    private void WearTool(ToolType tool) => WearTool(tool, DurabilitySettings.Current.WearPerGlancingBlow);
+
+    private void WearTool(ToolType tool, float baseWear)
     {
         float care = TryGetComponent(out Combatant self) ? Mathf.Clamp01(self.Stats.Get(StatType.ToolCare)) : 0f;
-        float wear = DurabilitySettings.Current.WearPerGlancingBlow * (1f - care);
+        float wear = baseWear * (1f - care);
         if (equipment == null || wear <= 0f)
         {
             return;

@@ -164,6 +164,7 @@ public sealed partial class RaidResultsScreen : MonoBehaviour
         PlayScene(report.Definition, extracted);
         destination = CanLoad(report.ReturnScene) ? report.ReturnScene : fallbackScene;
         continueLabel.text = extracted ? "Return to Safe Haven" : "Wake at the portal";
+        AskWhyHome();
     }
 
     // Under the subtitle, as wide as the report; false where the screen has no scrolling report to make room in.

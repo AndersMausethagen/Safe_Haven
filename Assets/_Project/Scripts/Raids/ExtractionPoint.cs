@@ -11,6 +11,8 @@ using UnityEngine;
 /// Exits are choices, not just destinations (GDD §7.2 "Extraction"): a point can open late or go dark at set times on
 /// the raid clock, be offered only in some raids (RaidGenerator rolls <see cref="AvailabilityChance"/>), ask for an
 /// item to light it, take more or less time to hold, and sound an alarm that sends a spawn group hunting the player.
+/// When the raid clock runs out (RaidDirector.InOvertime), a portal opens at the centre of every stone: stepping through takes the
+/// player home at once, no hold, and the player may stay instead while the mist allows (RaidPacingSettings, the user 2026-11-22).
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(Interactable))]
@@ -68,6 +70,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     private ExtractionStatus lastStatus;
     private ExtractionHoldState lastHoldState = ExtractionHoldState.Unlit;
     private float nextBeatAt;
+    // The portal shown at the centre in overtime (RaidPacingSettings › Portal Look), made the first time it opens.
+    private GameObject portal;
 
     /// <summary>Seconds between the held beacon's heartbeats when it is <paramref name="fill"/> full: slow at first, quickening as the
     /// way home nears (eased, so the last stretch races). Pure, for tests.</summary>
@@ -104,9 +108,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     public SpawnGroup Alarm => alarm;
     public float HoldRadius => holdRadius;
 
-    /// <summary>Seconds of holding this point needs.</summary>
+    /// <summary>Seconds of holding this point needs: shorter as the raid's stages turn (RaidStage › Hold Scale).</summary>
     public float Duration => Mathf.Max(RaidParameters.MinimumExtractionTime,
-        (RaidDirector.Current != null ? RaidDirector.Current.Parameters.ExtractionTime : fallbackSeconds) * timeMultiplier);
+        (RaidDirector.Current != null ? RaidDirector.Current.Parameters.ExtractionTime * RaidDirector.Current.HoldScale : fallbackSeconds) * timeMultiplier);
+
+    /// <summary>The clock has run out and a portal stands open here: step through, no hold (RaidDirector.InOvertime).</summary>
+    public bool IsPortal => !turnsBack && RaidDirector.Current != null && RaidDirector.Current.InOvertime;
 
     /// <summary>True once lit, until the raid ends or the way goes dark.</summary>
     public bool IsLit => hold.IsLit;
@@ -118,15 +125,17 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 
     /// <summary>Open, not yet open or closed, by the raid clock. Always open outside a raid. Once open it doesn't close
     /// again before its time, and once closed it stays closed, though a site's choice adds time to the clock.</summary>
-    public ExtractionStatus Status => closedOnce ? ExtractionStatus.Closed
+    public ExtractionStatus Status => IsPortal ? ExtractionStatus.Open
+        : closedOnce ? ExtractionStatus.Closed
         : heldShut != null ? ExtractionStatus.NotYetOpen
         : ExtractionWindow.StatusAt(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
     public bool IsOpen => Status == ExtractionStatus.Open;
     /// <summary>Seconds until this point opens or closes, or -1 when it won't change again.</summary>
-    public float SecondsUntilChange => closedOnce || heldShut != null ? -1f
+    public float SecondsUntilChange => IsPortal ? RaidDirector.Current.OvertimeLeft
+        : closedOnce || heldShut != null ? -1f
         : ExtractionWindow.SecondsUntilChange(openedOnce ? 0f : opensAtSecondsLeft, closesAtSecondsLeft, SecondsLeft);
 
-    public string Verb => "Light the way home";
+    public string Verb => IsPortal ? "Step through the portal" : "Light the way home";
 
     /// <summary>True while a boss encounter keeps this way shut (<see cref="HoldShut"/>).</summary>
     public bool IsHeldShut => heldShut != null;
@@ -178,9 +187,20 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
 
     private void Update()
     {
+        bool isPortal = IsPortal;
+        if (isPortal && (portal == null || !portal.activeSelf))
+        {
+            ShowPortal();
+        }
+        else if (!isPortal && portal != null && portal.activeSelf)
+        {
+            // Time was given back (an event, a cheat): the stone is a stone again.
+            portal.SetActive(false);
+        }
+
         ExtractionStatus status = Status;
-        // Only in a raid: outside one every point reads open.
-        if (RaidDirector.Current != null)
+        // Only in a raid: outside one every point reads open. A portal's open is overtime's, not the clock's.
+        if (RaidDirector.Current != null && !IsPortal)
         {
             openedOnce |= status == ExtractionStatus.Open;
             closedOnce |= status == ExtractionStatus.Closed;
@@ -189,7 +209,11 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         if (status != lastStatus)
         {
             lastStatus = status;
-            AnnounceChange(status);
+            // The portals opening are told once, by the director, not stone by stone.
+            if (!isPortal)
+            {
+                AnnounceChange(status);
+            }
         }
 
         if (!IsLit || extracted)
@@ -241,6 +265,12 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     /// </summary>
     public bool CanInteract(GameObject user, out string reason)
     {
+        if (IsPortal)
+        {
+            reason = null;
+            return true;
+        }
+
         switch (Status)
         {
             case ExtractionStatus.NotYetOpen:
@@ -373,6 +403,14 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
     private void OnCompleted()
     {
         GameObject user = interactable.Interactor;
+        // In overtime the portal takes them at once.
+        if (IsPortal && !extracted)
+        {
+            PlaytestLogger.Note(PlaytestLog.ExitLit, displayName, -Mathf.RoundToInt(RaidDirector.Current.Session.Overtime), "portal");
+            Leave(user);
+            return;
+        }
+
         // The way may have closed, or the cost been dropped, in the moment of the press.
         if (!CanInteract(user, out string reason))
         {
@@ -387,6 +425,8 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         }
 
         hold.Light(Duration);
+        RaidStage stage = RaidDirector.Current != null ? RaidDirector.Current.CurrentStage : null;
+        PlaytestLogger.Note(PlaytestLog.ExitLit, displayName, Mathf.RoundToInt(SecondsLeft == float.MaxValue ? 0f : SecondsLeft), stage != null ? stage.DisplayName : "before the stages");
         if (PlayerTransport.Current != null)
         {
             PlayerTransport.Current.WarnIfLeavingCart();
@@ -396,6 +436,30 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         nextCallAt = Time.time;
         GameMessages.Post($"{displayName} is lit! Hold its circle for {Duration:0} seconds. The forest will come.", MessageKind.Warning);
         RaiseAlarm();
+    }
+
+    // The portal at the stone's centre (RaidPacingSettings › Portal Look): a look only, no collider in the way.
+    private void ShowPortal()
+    {
+        if (portal != null)
+        {
+            portal.SetActive(true);
+            return;
+        }
+
+        GameObject look = RaidPacingSettings.Current.PortalLook;
+        if (look == null)
+        {
+            return;
+        }
+
+        portal = Instantiate(look, transform.position + Vector3.up * RaidPacingSettings.Current.PortalLift, transform.rotation, transform);
+        portal.name = "Overtime Portal";
+        portal.transform.localScale = Vector3.one * RaidPacingSettings.Current.PortalScale;
+        foreach (Collider blocking in portal.GetComponentsInChildren<Collider>(true))
+        {
+            Destroy(blocking);
+        }
     }
 
     private void RaiseAlarm()
@@ -412,22 +476,18 @@ public sealed class ExtractionPoint : MonoBehaviour, IInteractionCondition, IInt
         }
     }
 
+    // Marked left only when it worked: a step refused (down in co-op) leaves the stone as it was, to be tried again.
     private void Leave(GameObject player)
     {
-        extracted = true;
         RaidDirector director = RaidDirector.Current;
         if (director == null)
         {
+            extracted = true;
             GameMessages.Post("There is no raid to leave.", MessageKind.Warning);
             return;
         }
 
-        if (turnsBack && director.TurnBack(player))
-        {
-            return;
-        }
-
-        director.Extract(player);
+        extracted = (turnsBack && director.TurnBack(player)) || director.Extract(player);
     }
 
 #if UNITY_EDITOR

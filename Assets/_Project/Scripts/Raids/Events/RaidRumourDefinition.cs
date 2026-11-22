@@ -29,6 +29,10 @@ public sealed class RaidRumourDefinition : ScriptableObject
     [SerializeField] private RaidSetPieceDefinition setPiece;
     [Tooltip("Relative chance against the other rumours that could come up.")]
     [SerializeField, Min(0f)] private float weight = 1f;
+    [Tooltip("0: there from the start. 1: it appears as the raid's first danger stage begins (The Mist Stirs); 2: the second (The Hunt). " +
+             "The briefing shows it with an hourglass. Rescues from the second on call out at The Mist Stirs, and some rumours come late, so " +
+             "a raid's purpose isn't spent in its first third (Docs/RaidLoopResearch_2026-11-22.md #2, #9).")]
+    [SerializeField, Range(0, 3)] private int appearsAtStage;
 
     [Header("When it comes up")]
     [SerializeField] private RumourHour hour = RumourHour.Any;
@@ -61,6 +65,20 @@ public sealed class RaidRumourDefinition : ScriptableObject
 
     public string Id => string.IsNullOrWhiteSpace(id) ? name : id;
     public QuestDefinition WhileQuest => whileQuest;
+    /// <summary>0: there from the start; else the danger stage (1 the first) whose start it appears at.</summary>
+    public int AppearsAtStage => appearsAtStage;
+
+    /// <summary>When it appears in <paramref name="raid"/>, for the briefing ("when The Mist Stirs begins"), or null from the start.</summary>
+    public string AppearsWhen(RaidDefinition raid)
+    {
+        if (appearsAtStage <= 0 || raid == null || raid.Stages.Count == 0)
+        {
+            return null;
+        }
+
+        RaidStage stage = raid.Stages[Mathf.Min(appearsAtStage, raid.Stages.Count) - 1];
+        return stage != null ? $"when {stage.DisplayName} begins" : null;
+    }
     public string Briefing => briefing;
     public bool SeeksLost => seeksLost;
     public bool ForestPushing => forestPushing;

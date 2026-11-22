@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e452b68c1283484e9ac4a5322bce034, type: 3}
+  m_Name: RaidPacingSettings
+  m_EditorClassIdentifier: SafeHaven::RaidPacingSettings
+  overtimeSeconds: 180
+  mistStepSeconds: 30
+  mistStepPenalties:
+  - stat: 0
+    op: 1
+    value: -0.08
+  - stat: 16
+    op: 1
+    value: -0.03
+  portalLook: {fileID: 4255096957276469750, guid: 83e508b71ba177149a0f08689ff8aea4, type: 3}
+  portalScale: 0.8
+  portalLift: 0.25
+  toolWearPerBonus: 0.08
+  veinNodeByTier:
+  - {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
+  - {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
+  - {fileID: 4483799220086940710, guid: d30b058cde685564ca6d1e997f261196, type: 3}
+  veinsEach: 2
+  veinYield: 1.5
+  veinGuards: 2
+  reducedBelowSeconds: 240
+  fullFromSeconds: 540
+  leastShare: 0.5

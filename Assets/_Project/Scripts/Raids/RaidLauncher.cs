@@ -401,6 +401,7 @@ public static class RaidLauncher
             failed = true;
             GameSession.AbandonRaid(session);
             GameSession.TakePlayerState();
+            HavenReadiness.EndRest(player);
             PlayerControl.Release(player, Launching);
             GameMessages.Post("The way didn't open. Try the portal again.", MessageKind.Warning);
         });

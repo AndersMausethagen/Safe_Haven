@@ -26,6 +26,22 @@ public sealed class ResourceSource : MonoBehaviour
 
     private int tierOverride;
     private ItemDefinition mainOverride;
+    private float veinYield = 1f;
+
+    /// <summary>How much more this node gives now: the raid stage's gather (RaidStage › Gather Bonus) times a vein's own (StageReveal).
+    /// 1 at home.</summary>
+    public float YieldNow => RaidDirector.StageGatherNow * veinYield;
+
+    /// <summary>False on the pieces of something already gathered (a felled tree's log: its limbing and sections): the tool's wear for
+    /// a stage's bonus and the playtest log's node count go once a node, at the node or the fell.</summary>
+    public bool CountsAsNode { get; set; } = true;
+
+    /// <summary>A stage's vein gives this much more than a node of the start layout (RaidPacingSettings › Vein Yield).</summary>
+    public float VeinYield
+    {
+        get => veinYield;
+        set => veinYield = Mathf.Max(1f, value);
+    }
 
     /// <summary>The tier what is gathered here trains at: its node's, or the tree's it came from (TakeOnTree).</summary>
     public int Tier => tierOverride > 0 ? tierOverride : Node != null ? Node.Tier : 1;
@@ -87,7 +103,8 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         var leftBehind = new List<string>();
-        Give(bag, recipient, drops.Roll(RaidTier, 1f), drops.RollResources(RaidTier, 1f), leftBehind);
+        float yield = YieldNow;
+        Give(bag, recipient, drops.Roll(RaidTier, yield), drops.RollResources(RaidTier, yield), leftBehind);
         ReportLeftBehind(leftBehind);
         AfterHarvest(recipient);
         return true;
@@ -104,6 +121,27 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         Harvested?.Invoke(recipient, this);
+    }
+
+    // Items given as they are (a felled tree's logs) at the yield now: rounded by chance, so +15% on 3 logs is sometimes a fourth.
+    private static List<ItemAmount> Scaled(List<ItemAmount> items, float yield)
+    {
+        if (Mathf.Approximately(yield, 1f))
+        {
+            return items;
+        }
+
+        var scaled = new List<ItemAmount>(items.Count);
+        foreach (ItemAmount item in items)
+        {
+            int amount = RaidParameters.ScaleAmount(item.Amount, yield, Random.value);
+            if (amount > 0)
+            {
+                scaled.Add(new ItemAmount(item.Item, amount));
+            }
+        }
+
+        return scaled;
     }
 
     private static float ToolYield(StatSheet stats, GatheringNodeDefinition node)
@@ -129,7 +167,7 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         var leftBehind = new List<string>();
-        Give(bag, recipient, items, new List<ResourceAmount>(), leftBehind);
+        Give(bag, recipient, Scaled(items, YieldNow), new List<ResourceAmount>(), leftBehind);
         ReportLeftBehind(leftBehind);
         AfterHarvest(recipient);
         return true;
@@ -145,7 +183,8 @@ public sealed class ResourceSource : MonoBehaviour
         }
 
         var leftBehind = new List<string>();
-        Give(recipient.GetComponentInParent<ItemInventory>(), recipient, extra.Roll(RaidTier, 1f), extra.RollResources(RaidTier, 1f), leftBehind);
+        float yield = YieldNow;
+        Give(recipient.GetComponentInParent<ItemInventory>(), recipient, extra.Roll(RaidTier, yield), extra.RollResources(RaidTier, yield), leftBehind);
         ReportLeftBehind(leftBehind);
         return true;
     }

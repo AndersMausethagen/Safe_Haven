@@ -89,7 +89,8 @@ public static class Homecoming
         // One good thing that happened while they were away (HomecomingSettings), heading the card.
         HomecomingSettings gifts = HomecomingSettings.Current;
         string gift = gifts != null && awaySeconds >= gifts.MinAwaySeconds
-            ? AwayGifts.Draw(gifts, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value, along)
+            ? AwayGifts.Draw(gifts, GameSession.Home, GameSession.Stash, UnityEngine.Random.value, UnityEngine.Random.value, along,
+                RaidPacingSettings.Current.TimeAwayShare(awaySeconds))
             : null;
         if (gift != null)
         {

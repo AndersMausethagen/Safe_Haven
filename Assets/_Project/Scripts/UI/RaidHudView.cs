@@ -54,6 +54,8 @@ public sealed class RaidHudView : MonoBehaviour
     private float nextAlertsRefresh;
     private float nameUntil;
     private int shownSecond = -1;
+    private float shownGather = 1f;
+    private bool shownOvertime;
     private RaidStage namedStage;
     private RaidDirector namedFor;
     private string stageText = "";
@@ -140,8 +142,10 @@ public sealed class RaidHudView : MonoBehaviour
         EncounterArena arena = session.Definition.IsEncounter ? EncounterArena.Current : null;
         if (arena != null)
             ShowEncounterTime(arena);
+        else if (director.InOvertime)
+            ShowOvertime();
         else
-            ShowTime(session.TimeRemaining, warningTime, criticalTime);
+            ShowTime(session.TimeRemaining, warningTime, criticalTime, director.StageGather);
         ShowRaidName();
         if (session.IsOver)
             timerLabel.color = session.Outcome == RaidOutcome.Extracted ? extractedColor : criticalColor;
@@ -190,6 +194,12 @@ public sealed class RaidHudView : MonoBehaviour
             namedStage = stage;
             namedFor = director;
             stageText = stage == null ? "" : $"<color=#{ColorUtility.ToHtmlStringRGB(stageColor)}>{stage.DisplayName.ToUpperInvariant()}</color>";
+            // The gold badge's meaning and its cost, side by side (the user, 2026-11-22: "make the bonus clear... make the downside apparent").
+            if (stage != null && stage.GatherBonus > 0f)
+            {
+                stageText += $"  ·  <color={UIStyle.Current.AccentHex}>×{1f + stage.GatherBonus:0.##} gathering</color>" +
+                             $"  <color={UIStyle.Current.WarningHex}>tools wear more</color>";
+            }
             string raid = director.Session.Definition.DisplayName.ToUpperInvariant();
             raidAndStageText = stage == null ? raid : $"{raid}  ·  {stageText}";
         }
@@ -270,6 +280,7 @@ public sealed class RaidHudView : MonoBehaviour
             return "";
         }
 
+        string mist = DescribeMist();
         RaidRisk risk = RaidRisk.Of(PlayerSnapshot.Capture(player), director.Session.Loadout);
         Transport cart = PlayerTransport.Current != null ? PlayerTransport.Current.RaidCart(out _) : null;
         if (cart != null)
@@ -279,22 +290,63 @@ public sealed class RaidHudView : MonoBehaviour
 
         if (risk.IsEmpty && cart == null)
         {
-            return "";
+            return mist;
         }
 
         string carted = cart != null ? $"  ·  the {cart.Definition.DisplayName}" : "";
-        return $"At risk: <color={UIStyle.Current.WarningHex}>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
+        string atRisk = $"At risk: <color={UIStyle.Current.WarningHex}>{risk.Items} items ({risk.Value} value)  ·  {risk.Resources} materials{carted}</color>";
+        return mist.Length > 0 ? atRisk + "\n" + mist : atRisk;
     }
 
-    private void ShowTime(float remaining, float warning, float critical)
+    // Mist-touched: what staying is costing the player now (RaidDirector.MistNow), each stat once.
+    private string DescribeMist()
+    {
+        IReadOnlyList<StatBonus> mist = director.MistNow;
+        if (mist.Count == 0)
+        {
+            return "";
+        }
+
+        var parts = new List<string>(mist.Count);
+        foreach (StatBonus bonus in mist)
+        {
+            parts.Add(bonus.Describe());
+        }
+
+        return $"<color={UIStyle.Current.WarningHex}>Mist-touched: {string.Join(", ", parts)}</color>";
+    }
+
+    // Out of time, portals open: how long before they close, pulsing.
+    private void ShowOvertime()
     {
         timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
-        // The clock shows whole seconds: written when the second changes, not a new string every frame.
-        int second = Mathf.Max(0, Mathf.CeilToInt(remaining - 0.001f));
-        if (second != shownSecond)
+        float left = director.OvertimeLeft;
+        int second = Mathf.Max(0, Mathf.CeilToInt(left - 0.001f));
+        if (second != shownSecond || !shownOvertime)
         {
             shownSecond = second;
-            timerLabel.text = RaidStats.FormatTime(remaining);
+            shownOvertime = true;
+            timerLabel.text = $"<size=55%>PORTALS CLOSE</size> {RaidStats.FormatTime(left)}";
+        }
+
+        float pulse = 0.5f + 0.5f * Mathf.Sin(Time.unscaledTime * 8f);
+        timerLabel.color = Color.Lerp(criticalColor, Color.white, pulse * 0.35f);
+    }
+
+    private void ShowTime(float remaining, float warning, float critical, float gather = 1f)
+    {
+        timerLabel.fontSize = GameOptions.LargeTimer.On ? timerSize * 1.6f : timerSize;
+        // The clock shows whole seconds: written when the second changes, not a new string every frame. Beside it, gold, what the stage
+        // adds to gathering (RaidStage › Gather Bonus).
+        int second = Mathf.Max(0, Mathf.CeilToInt(remaining - 0.001f));
+        if (second != shownSecond || !Mathf.Approximately(gather, shownGather) || shownOvertime)
+        {
+            shownSecond = second;
+            shownGather = gather;
+            shownOvertime = false;
+            timerLabel.text = gather > 1.001f
+                ? $"{RaidStats.FormatTime(remaining)} <size=55%><color={UIStyle.Current.AccentHex}>×{gather:0.##}</color></size>"
+                : RaidStats.FormatTime(remaining);
         }
         if (remaining <= critical)
         {

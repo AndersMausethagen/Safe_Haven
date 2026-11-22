@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SafeHaven::WeaponDefinition
   displayName: Elderwood Longbow
   stance: 4
+  readyPose: 0
   kind: 2
   strikeOverride: 0
   damage: 0
@@ -42,7 +43,7 @@ MonoBehaviour:
   drawMoveSpeed: 0.6
   perfectReleaseSeconds: 0.2
   perfectReleaseDamage: 1
-  drawWeight: 1.25
+  drawWeight: 1.4
   escapeShotFocus: 25
   aimSpread: 0.5
   counterShotDamage: 0.6

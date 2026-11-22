@@ -93,7 +93,7 @@ MonoBehaviour:
     enemyHealth: 4.2
     enemyPower: 5.1
     enemyDensity: 1.6
-    loot: 1.8
+    loot: 2.1
     dropsUpToTier: 0
     briefing: 'The deepest the portal reaches: everything here has fed on the blight a long while. Trollstone gear, and the will to use it.'
     eliteCount: {x: 4, y: 5}
@@ -274,7 +274,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 297312215928108013, guid: 7b176e5facb909c44a2893050cbcc64a, type: 3}
-      weight: 10
+      weight: 8.5
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -340,7 +340,7 @@ MonoBehaviour:
       fromTier: 0
       toTier: 0
     - prefab: {fileID: 8046387889879202812, guid: 262f869a4b8db6440b65cd5554060fce, type: 3}
-      weight: 3
+      weight: 2.6
       maxPerGroup: 0
       minPerGroup: 0
       fromTier: 0
@@ -630,6 +630,13 @@ MonoBehaviour:
     enemyHealthBonus: 0.1
     enemyPowerBonus: 0.1
     lootBonus: 0.25
+    gatherBonus: 0.15
+    holdScale: 0.8
+    mistPenalties:
+    - stat: 15
+      op: 1
+      value: -0.05
+    veins: 1
     stinger: {fileID: 11400000, guid: 75f048dfbeb27824687fe5ca42ac7969, type: 2}
     hushSeconds: 0
     reveal: 1
@@ -641,6 +648,16 @@ MonoBehaviour:
     enemyHealthBonus: 0.2
     enemyPowerBonus: 0.2
     lootBonus: 0.5
+    gatherBonus: 0.3
+    holdScale: 0.6
+    mistPenalties:
+    - stat: 15
+      op: 1
+      value: -0.1
+    - stat: 0
+      op: 1
+      value: -0.05
+    veins: 1
     stinger: {fileID: 11400000, guid: 5dc5baf7267168540be520f2ab81edb4, type: 2}
     hushSeconds: 60
     reveal: 2
@@ -652,6 +669,19 @@ MonoBehaviour:
     enemyHealthBonus: 0.35
     enemyPowerBonus: 0.35
     lootBonus: 0.8
+    gatherBonus: 0.5
+    holdScale: 0.4
+    mistPenalties:
+    - stat: 15
+      op: 1
+      value: -0.15
+    - stat: 0
+      op: 1
+      value: -0.1
+    - stat: 29
+      op: 0
+      value: 0.1
+    veins: 0
     stinger: {fileID: 11400000, guid: a1c5c2cc7d8214b43ae0dc5991300736, type: 2}
     hushSeconds: 0
     reveal: 0

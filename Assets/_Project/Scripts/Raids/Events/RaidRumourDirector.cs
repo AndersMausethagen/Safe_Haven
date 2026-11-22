@@ -5,7 +5,8 @@ using UnityEngine.AI;
 /// <summary>
 /// Makes the briefing's rumours true: when the raid begins it stands each one's event at a place the map set aside for it
 /// (RaidMap.RumourSpots), or on a painted map somewhere far from the player. They wait on the HUD for the whole raid and don't
-/// count against the raid's random events. Installed by RaidRumoursSystem.
+/// count against the raid's random events. Installed by RaidRumoursSystem. A late rumour (RaidRumourDefinition › Appears At Stage)
+/// keeps its spot from the start but appears only as its stage begins, called out with where it is.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(RaidEventDirector))]
@@ -20,11 +21,43 @@ public sealed class RaidRumourDirector : MonoBehaviour
     private RaidDirector director;
     private RaidEventDirector events;
     private bool placed;
+    // Late rumours and the spots kept for them, until their stage begins.
+    private readonly List<(RaidRumourDefinition rumour, Vector3 spot)> later = new List<(RaidRumourDefinition, Vector3)>();
 
     private void Awake()
     {
         director = GetComponent<RaidDirector>();
         events = GetComponent<RaidEventDirector>();
+    }
+
+    private void OnEnable() => director.StageChanged += OnStageChanged;
+
+    private void OnDisable() => director.StageChanged -= OnStageChanged;
+
+    // index: the stages begun (1 the first, RaidStages.Get).
+    private void OnStageChanged(int index, RaidStage stage) => StandDue(index, true);
+
+    private void StandDue(int begun, bool tell)
+    {
+        int last = director.Session.Definition.Stages.Count;
+        for (int i = 0; i < later.Count; i++)
+        {
+            if (Mathf.Min(later[i].rumour.AppearsAtStage, last) > begun)
+            {
+                continue;
+            }
+
+            (RaidRumourDefinition rumour, Vector3 spot) = later[i];
+            later.RemoveAt(i--);
+            Stand(rumour, spot);
+            if (tell && director.Player != null)
+            {
+                Vector3 from = director.Player.transform.position;
+                string way = HavenPlaceVerbs.Compass(new Vector2(from.x, from.z), new Vector2(spot.x, spot.z));
+                string what = rumour.Seeks != null ? $"A cry for help, to the {way}" : $"{(rumour.Site != null ? rumour.Site.DisplayName : "Something")} stirs, to the {way}";
+                GameMessages.Post($"{what}. It is marked on your map.", MessageKind.Info);
+            }
+        }
     }
 
     private void Update()
@@ -62,14 +95,28 @@ public sealed class RaidRumourDirector : MonoBehaviour
                 continue;
             }
 
-            events.BeginAt(rumours[i].Site, spot);
-            RaidEventSite site = events.PinnedSites.Count > 0 ? events.PinnedSites[events.PinnedSites.Count - 1] : null;
-            if (site != null)
+            if (rumours[i].AppearsAtStage > 0 && director.Session.Definition.Stages.Count > 0)
             {
-                site.PlaceName = PieceAt(spot)?.DisplayName ?? "";
-                site.HideBeaconBeyond(BeaconShowsWithin);
-                PointTheWay(site, rumours[i].Seeks);
+                later.Add((rumours[i], spot));
+                continue;
             }
+
+            Stand(rumours[i], spot);
+        }
+
+        // Joined inside a stage (a friend's run followed late, a short test raid): what is due already stands.
+        StandDue(director.StageIndex, false);
+    }
+
+    private void Stand(RaidRumourDefinition rumour, Vector3 spot)
+    {
+        events.BeginAt(rumour.Site, spot);
+        RaidEventSite site = events.PinnedSites.Count > 0 ? events.PinnedSites[events.PinnedSites.Count - 1] : null;
+        if (site != null)
+        {
+            site.PlaceName = PieceAt(spot)?.DisplayName ?? "";
+            site.HideBeaconBeyond(BeaconShowsWithin);
+            PointTheWay(site, rumour.Seeks);
         }
     }
 

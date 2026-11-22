@@ -32,6 +32,16 @@ public sealed class RaidStage
     [Tooltip("Extra loot while this stage lasts: what caches and events hold, and the essence creatures drop. 0.25 is +25%. " +
              "What staying on is worth, against the stronger creatures.")]
     [SerializeField, Min(0f)] private float lootBonus;
+    [Tooltip("More from every node, tree and stone while this stage lasts (0.15 = +15%), and tools wear as much more: what staying pays on " +
+             "the main income, with its cost in plain sight (the user, 2026-11-22: \"make the bonus clear... make the downside apparent\").")]
+    [SerializeField, Min(0f)] private float gatherBonus;
+    [Tooltip("The extraction hold's length while this stage lasts (0.8 = a fifth quicker): the end is a sprint, not a siege.")]
+    [SerializeField, Range(0.2f, 1f)] private float holdScale = 1f;
+    [Tooltip("Mist-touched: what the mist takes from the player while this stage lasts (Percent: -0.1 = 10% less). The risk of staying " +
+             "is the player's own, not more creatures (the user, 2026-11-22). Each stage lists all of it, not only what it adds.")]
+    [SerializeField] private List<StatBonus> mistPenalties = new List<StatBonus>();
+    [Tooltip("This stage sprouts veins of the tier's ore away from the exits, guarded and marked gold (RaidPacingSettings › Veins).")]
+    [SerializeField] private bool veins;
     [Header("Music (Docs/GameDesignResearch_2026-11-17.md T1)")]
     [Tooltip("Played as the stage begins: a horn far off as the mist stirs, nearer and lower as the hunt begins. Empty: none.")]
     [SerializeField] private SoundDefinition stinger;
@@ -65,6 +75,10 @@ public sealed class RaidStage
     public float EnemyHealthBonus => enemyHealthBonus;
     public float EnemyPowerBonus => enemyPowerBonus;
     public float LootBonus => lootBonus;
+    public float GatherBonus => gatherBonus;
+    public float HoldScale => holdScale;
+    public IReadOnlyList<StatBonus> MistPenalties => mistPenalties;
+    public bool Veins => veins;
     public RevealKind Reveal => reveal;
     public float RevealLoot => revealLoot;
     public GameObject RevealCache => revealCache;

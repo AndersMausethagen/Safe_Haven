@@ -112,6 +112,9 @@ public sealed class GatheringNodeDefinition : ScriptableObject
     public float GatherRange => gatherRange;
     public bool DepleteOnGather => depleteOnGather;
     public float RespawnSeconds => respawnSeconds;
+
+    /// <summary>Seconds before a gathered node grows back here, 0 when it doesn't (Regrowth: never in a raid's scene).</summary>
+    public float RegrowsAfter => Regrowth.After(respawnSeconds);
     public int BurstPieces => burstPieces;
     public NodeFracture Fracture => fracture;
     public ItemDropTable BurstYields => burstYields;

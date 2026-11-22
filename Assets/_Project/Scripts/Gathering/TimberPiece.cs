@@ -61,7 +61,7 @@ public sealed class TimberPiece : MonoBehaviour
         stump.AddComponent<MeshRenderer>().sharedMaterials = new[] { bark, face };
         // As long as the tree takes to grow back: a fixed 15 minutes took the stump of a tree that never grows back, and left a
         // wider stump round the foot of one back in 3.
-        float seconds = parts.RegrowSeconds < 0f ? 0f : parts.RegrowSeconds > 0f ? parts.RegrowSeconds : TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
+        float seconds = parts.RegrowSeconds < 0f ? 0f : parts.RegrowSeconds > 0f ? parts.RegrowSeconds : Regrowth.After(TreeChoppingSettings.Current.TerrainTreeRegrowSeconds);
         stump.AddComponent<StumpLifetime>().Begin(mesh, seconds);
     }
 

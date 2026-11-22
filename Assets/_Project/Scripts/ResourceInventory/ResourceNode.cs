@@ -167,7 +167,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
         }
     }
 
-    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && node.RespawnSeconds > 0f);
+    private bool HasTimer => hideAt >= 0f || (IsDepleted && node != null && node.RegrowsAfter > 0f);
 
     private void WatchTimers()
     {
@@ -189,7 +189,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
                 SetRenderers(false);
             }
 
-            if (IsDepleted && node != null && node.RespawnSeconds > 0f && Time.time >= respawnAt)
+            if (IsDepleted && node != null && node.RegrowsAfter > 0f && Time.time >= respawnAt)
             {
                 SetPresent(true);
                 Regrown?.Invoke();
@@ -335,7 +335,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             return true;
         }
 
-        respawnAt = Time.time + node.RespawnSeconds;
+        respawnAt = Time.time + node.RegrowsAfter;
         SetPresent(false, 0f);
         return true;
     }
@@ -353,7 +353,7 @@ public sealed class ResourceNode : MonoBehaviour, IInteractionCondition, ISaveab
             return;
         }
 
-        respawnAt = Time.time + node.RespawnSeconds;
+        respawnAt = Time.time + node.RegrowsAfter;
         SetPresent(false, feedback != null ? feedback.BreakSeconds : 0f);
     }
 

@@ -200,10 +200,12 @@ public sealed partial class RaidPreparationWindow
         {
             RaidEventDefinition site = rumour.Site;
             string name = site != null ? site.DisplayName : "A rumour";
+            // A late one says when: an hourglass and its stage (RaidRumourDefinition › Appears At Stage).
+            string when = rumour.AppearsWhen(raid);
             eventFaces.Add(new CardFace
             {
-                Name = name, Painting = site != null ? site.Artwork : null, Icon = "Eye",
-                TipTitle = name, TipColour = style.Accent, TipBody = rumour.BriefingFor(GameSession.Here),
+                Name = name, Painting = site != null ? site.Artwork : null, Icon = when != null ? "Hourglass" : "Eye", Badge = when != null ? "Later" : null,
+                TipTitle = name, TipColour = style.Accent, TipBody = rumour.BriefingFor(GameSession.Here) + (when != null ? $"\n\nIt shows itself {when}." : ""),
             });
         }
 

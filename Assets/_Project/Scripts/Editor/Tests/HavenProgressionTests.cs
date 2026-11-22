@@ -203,7 +203,12 @@ public sealed class HavenProgressionTests
     {
         var items = All<ItemDefinition>().ToList();
         Assert.IsTrue(items.Any(item => item.Category == ItemCategory.Consumable && item.Tier == 4 && item.HasBoon && !item.IsTonic), "a tier IV meal");
-        Assert.IsTrue(items.Any(item => item.Category == ItemCategory.Consumable && item.Tier == 4 && item.HealAmount >= 150f), "a tier IV potion");
+        // Draughts heal a share of the drinker since 2026-11-22 (PowerCurveTests), so a tier IV potion is one that heals more than any of
+        // tier III, at a tier IV kit's health.
+        float tierFour = GearBalance.EntryKitOf(4, GearBalance.AllGear()).Health;
+        float bestBelow = items.Where(item => item.Category == ItemCategory.Consumable && item.Tier == 3).Select(item => item.HealTotalFor(tierFour)).DefaultIfEmpty(0f).Max();
+        Assert.Greater(bestBelow, 0f, "the canary: tier III heals");
+        Assert.IsTrue(items.Any(item => item.Category == ItemCategory.Consumable && item.Tier == 4 && item.HealTotalFor(tierFour) > bestBelow), "a tier IV potion");
         foreach (string slot in new[] { "TrollstoneHauberk", "TrollstoneHelm", "TrollstoneGauntlets", "TrollstoneBoots", "TrollstoneGirdle" })
         {
             Assert.IsTrue(items.Any(item => item.name == slot && item.Tier == 5), slot);

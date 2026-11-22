@@ -52,6 +52,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
             ExperienceTracker.InsightSpent += OnInsightSpent;
             ExperienceTracker.Gained += OnGained;
             Damageable.AnyDamaged += OnAnyDamaged;
+            ResourceSource.Harvested += OnHarvested;
         }
     }
 
@@ -246,6 +247,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         bool raid = Place.OnRaid;
         if (raid && !wasRaid)
         {
+            minedThisRaid.Clear();
             FlushHome();
             WriteStock();
             countNodesAt = Time.unscaledTime + 8f;
@@ -340,6 +342,53 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
     }
 
     // What a raid holds: every gathering node standing a few seconds in, by kind.
+    // What the player gathered in this raid, by node (ResourceSource.Harvested), written as it ends (NodesMined).
+    private readonly System.Collections.Generic.Dictionary<string, int> minedThisRaid = new System.Collections.Generic.Dictionary<string, int>();
+
+    private void OnHarvested(GameObject who, ResourceSource source)
+    {
+        GatheringNodeDefinition node = source != null ? source.Node : null;
+        if (node != null && source.CountsAsNode && Place.OnRaid && who != null && Player.IsPlayer(who))
+        {
+            minedThisRaid.TryGetValue(node.name, out int n);
+            minedThisRaid[node.name] = n + 1;
+        }
+    }
+
+    private void WriteRaidEnd()
+    {
+        var standing = new System.Collections.Generic.Dictionary<string, int>();
+        foreach (ResourceNode node in ResourceNode.Active)
+        {
+            if (node != null && node.Definition != null && !node.IsDepleted)
+            {
+                standing.TryGetValue(node.Definition.name, out int n);
+                standing[node.Definition.name] = n + 1;
+            }
+        }
+
+        foreach (var mined in minedThisRaid)
+        {
+            standing.TryGetValue(mined.Key, out int left);
+            Write(PlaytestLog.NodesMined, mined.Key, mined.Value, $"standing {left}");
+        }
+
+        minedThisRaid.Clear();
+        Player player = Player.Current;
+        if (player != null && player.TryGetComponent(out ItemInventory bag))
+        {
+            ItemContainer items = bag.Container;
+            int used = 0;
+            for (int i = 0; i < items.UnlockedSlots && i < items.SlotCount; i++)
+            {
+                used += items.GetSlot(i).IsEmpty ? 0 : 1;
+            }
+
+            int weight = items.HasWeightLimit && items.WeightCapacity > 0f ? Mathf.RoundToInt(items.CurrentWeight / items.WeightCapacity * 100f) : 0;
+            Write(PlaytestLog.BagAtEnd, "bag", weight, $"slots {Mathf.RoundToInt(used * 100f / Mathf.Max(1, items.UnlockedSlots))}%");
+        }
+    }
+
     private void CountNodes()
     {
         var counts = new System.Collections.Generic.Dictionary<string, int>();
@@ -385,6 +434,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         if (raid)
         {
             WriteKit("end");
+            WriteRaidEnd();
         }
 
         if (session != null && session.Difficulty != null)
@@ -570,6 +620,7 @@ public sealed class PlaytestLogger : MonoBehaviour, IGameSystem
         ExperienceTracker.InsightSpent -= OnInsightSpent;
         ExperienceTracker.Gained -= OnGained;
         Damageable.AnyDamaged -= OnAnyDamaged;
+        ResourceSource.Harvested -= OnHarvested;
         FlushSkillXp();
         combat.Unfollow();
         EndSession();

@@ -17,6 +17,7 @@ MonoBehaviour:
   site: {fileID: 11400000, guid: e4274453b13fa5d4490036ffd8f8be40, type: 2}
   setPiece: {fileID: 0}
   weight: 2
+  appearsAtStage: 1
   hour: 0
   seeks: {fileID: 11400000, guid: 15e2a45207d23dd49a4a3a93e8bb8161, type: 2}
   afterHome: {fileID: 11400000, guid: 33e7204287863854f8c6ad025490f531, type: 2}

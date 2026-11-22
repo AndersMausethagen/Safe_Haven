@@ -84,6 +84,11 @@ public sealed class LootCache : MonoBehaviour, IInteractionVerb
     private void OnSearched()
     {
         GameObject searcher = interactable.Interactor;
+        if (StageReveal.IsRevealed(this) && RaidDirector.Current != null)
+        {
+            PlaytestLogger.Note(PlaytestLog.RevealOpened, name, Mathf.RoundToInt(RaidDirector.Current.Session.TimeRemaining));
+        }
+
         ItemInventory bag = searcher != null ? searcher.GetComponentInParent<ItemInventory>() : null;
         if (bag == null)
         {

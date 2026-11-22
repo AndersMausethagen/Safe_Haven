@@ -95,10 +95,12 @@ public sealed class PlayerStatsTests
         eater.AddComponent<Combatant>();
         PlayerBoons boons = eater.AddComponent<PlayerBoons>();
         StatBonus[] strong = { new StatBonus(StatType.Strength, 3f) };
+        // Of another family than the tonics (BoonFamily: one of each family), so only the tonic slot is in question here.
+        StatBonus[] hearty = { new StatBonus(StatType.MaxHealth, 0.05f, StatModifierOp.Percent) };
 
         Assert.AreEqual(1, SurvivalSettings.Current.TonicSlots);
         Assert.AreEqual(1, boons.TonicSlots, "a fresh settlement and no Second Vial: one tonic at once");
-        boons.Add("stew", "Stew", strong, 300f, true);
+        boons.Add("stew", "Stew", hearty, 300f, true);
         boons.Add("first", "First", strong, 300f, false, true);
         boons.Add("second", "Second", strong, 120f, false, true);
         CollectionAssert.AreEquivalent(new[] { "stew", "second" }, boons.Capture().Select(boon => boon.Id));

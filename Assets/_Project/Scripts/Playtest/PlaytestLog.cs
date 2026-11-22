@@ -103,6 +103,24 @@ public static class PlaytestLog
     public const string Stock = "Stock";
     /// <summary>The gathering nodes standing a few seconds into a raid: subject the node's id, amount how many.</summary>
     public const string RaidNodes = "RaidNodes";
+    // Why players leave a raid (Docs/RaidLoopResearch_2026-11-22.md #1):
+    /// <summary>A danger stage began: subject the stage, amount the seconds left on the clock, detail "exit N m" (to the nearest open one).</summary>
+    public const string StageBegan = "StageBegan";
+    /// <summary>An exit was lit, or a portal stepped through in overtime: subject the exit, amount the seconds left (overtime: minus the
+    /// seconds past the clock), detail the stage then ("portal" in overtime).</summary>
+    public const string ExitLit = "ExitLit";
+    /// <summary>A stage's revealed cache opened: subject the cache, amount the seconds left.</summary>
+    public const string RevealOpened = "RevealOpened";
+    /// <summary>A raid event's choice: subject the event, amount which choice (1 the first), detail its label.</summary>
+    public const string EventChoice = "EventChoice";
+    /// <summary>The bag as a raid ended: subject "bag", amount its weight in percent of the most, detail "slots N%".</summary>
+    public const string BagAtEnd = "BagAtEnd";
+    /// <summary>A raid's nodes, as it ended: subject the node's id, amount how many the player gathered, detail "standing N".</summary>
+    public const string NodesMined = "NodesMined";
+    /// <summary>Someone stranded: subject the resident's id, amount the seconds left, detail freed, sent home, extracted or fell.</summary>
+    public const string Rescue = "Rescue";
+    /// <summary>The playtester's one tap on the results screen (RaidResultsScreen, playtests only): subject the reason.</summary>
+    public const string WhyHome = "WhyHome";
 
     public static string Folder => Path.Combine(Application.persistentDataPath, "Playtests");
 

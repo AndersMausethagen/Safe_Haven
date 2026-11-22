@@ -181,6 +181,7 @@ public sealed class RaidEventSite : MonoBehaviour, IInteractionName, IInteractio
         }
 
         context.Session.RecordEvent($"{definition.DisplayName}: {choice.label}", definition.DisplayName);
+        PlaytestLogger.Note(PlaytestLog.EventChoice, definition.name, index + 1, choice.label);
     }
 
     // Amount in the game event says which choice it was: 1 for the first; for sites without choices, 1 for finding it.

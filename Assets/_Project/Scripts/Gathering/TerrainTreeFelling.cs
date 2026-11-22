@@ -558,7 +558,7 @@ public sealed class TerrainTreeFelling : MonoBehaviour
     // The tree is gone from where it stood: until it grows back, or for good where the woods are remembered.
     private void Down(int index, TreeInstance tree)
     {
-        float respawn = TreeChoppingSettings.Current.TerrainTreeRegrowSeconds;
+        float respawn = Regrowth.After(TreeChoppingSettings.Current.TerrainTreeRegrowSeconds);
         felled[index] = (tree, KeepsFelled || respawn <= 0f ? float.PositiveInfinity : Time.time + respawn);
         nextRegrowAt = Mathf.Min(nextRegrowAt, felled[index].regrowAt);
         Hide(index, tree);

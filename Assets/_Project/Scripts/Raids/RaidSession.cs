@@ -126,16 +126,29 @@ public sealed class RaidSession
     /// <paramref name="holdAtZero"/> (the player stands in an open extraction circle) the clock stops at zero instead and
     /// the raid goes on, so they can still extract (the user, 2026-11-14).
     /// </summary>
-    public bool Tick(float deltaTime, bool holdAtZero = false)
+    public bool Tick(float deltaTime, bool holdAtZero = false, float overtimeSeconds = 0f)
     {
         if (IsOver || deltaTime <= 0f)
         {
             return false;
         }
 
+        // Out of time with overtime allowed (RaidPacingSettings): the portals stand open a while; then whoever is out is taken.
+        if (Elapsed >= TotalSeconds && overtimeSeconds > 0f)
+        {
+            Overtime += deltaTime;
+            return Overtime >= overtimeSeconds && !holdAtZero && End(RaidOutcome.TimeExpired);
+        }
+
         Elapsed = Mathf.Min(Elapsed + deltaTime, TotalSeconds);
-        return Elapsed >= TotalSeconds && !holdAtZero && End(RaidOutcome.TimeExpired);
+        return Elapsed >= TotalSeconds && overtimeSeconds <= 0f && !holdAtZero && End(RaidOutcome.TimeExpired);
     }
+
+    /// <summary>Seconds spent past the clock (the portals open, RaidPacingSettings › Overtime).</summary>
+    public float Overtime { get; private set; }
+
+    /// <summary>Seconds the raid has run, overtime included.</summary>
+    public float PlayedSeconds => Elapsed + Overtime;
 
     /// <summary>Adds seconds to the clock, or takes them away; an event can't end the raid on the spot.</summary>
     /// <returns>The change the clock really took (a loss stops at the floor): what is told is this, never what was asked.</returns>

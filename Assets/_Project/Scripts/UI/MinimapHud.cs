@@ -509,6 +509,15 @@ public sealed class MinimapHud : MonoBehaviour
             }
         }
 
+        // A stage's vein (StageReveal): gold until it is mined.
+        foreach (ResourceNode vein in StageReveal.Veins)
+        {
+            if (vein != null && !vein.IsDepleted)
+            {
+                Add(vein.transform, style.RumourMark, style.Accent, 15f, pinned: true);
+            }
+        }
+
         // A standing site (a bridge's toll) is part of the place, not a rumour: marked once the player has come upon it.
         foreach (RaidEventSite site in events.StandingSites)
         {

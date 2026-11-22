@@ -98,7 +98,7 @@ public sealed class ChoppableTree : MonoBehaviour, IHarvestBody
         // Its own regrowth, unless it stands in for a terrain tree (which says its own).
         if (standIn == null && node != null && node.Definition != null)
         {
-            tree.RegrowSeconds = node.Definition.RespawnSeconds > 0f ? node.Definition.RespawnSeconds : -1f;
+            tree.RegrowSeconds = node.Definition.RegrowsAfter > 0f ? node.Definition.RegrowsAfter : -1f;
         }
 
         return tree;

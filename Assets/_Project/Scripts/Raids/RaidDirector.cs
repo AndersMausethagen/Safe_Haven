@@ -88,6 +88,55 @@ public sealed class RaidDirector : MonoBehaviour
     /// <summary>How much more the woods give now for staying on (the danger stage's Loot Bonus): 1 in the calm.</summary>
     public float StageLoot => 1f + (CurrentStage != null ? CurrentStage.LootBonus : 0f);
 
+    /// <summary>What every node, tree and stone gives now, and how much more tools wear for it (RaidStage › Gather Bonus).</summary>
+    public float StageGather => 1f + (CurrentStage != null ? CurrentStage.GatherBonus : 0f);
+
+    /// <summary>The stage's gather now, 1 outside a raid.</summary>
+    public static float StageGatherNow => Current != null ? Current.StageGather : 1f;
+
+    /// <summary>The extraction hold's length now (RaidStage › Hold Scale).</summary>
+    public float HoldScale => CurrentStage != null ? CurrentStage.HoldScale : 1f;
+
+    /// <summary>True when this raid opens portals at its stones as the clock runs out (not a boss encounter, overtime set).</summary>
+    public bool OvertimeAllowed => Session != null && !Session.Definition.IsEncounter && RaidPacingSettings.Current.OvertimeSeconds > 0f;
+
+    /// <summary>The clock has run out and the portals stand open (RaidPacingSettings › Overtime).</summary>
+    public bool InOvertime => OvertimeAllowed && !Session.IsOver && Session.TimeRemaining <= 0f;
+
+    /// <summary>Seconds before the portals close, in overtime.</summary>
+    public float OvertimeLeft => InOvertime ? Mathf.Max(0f, RaidPacingSettings.Current.OvertimeSeconds - Session.Overtime) : 0f;
+
+    /// <summary>How hard the mist grips the player now: the stage's Mist-touched and the overtime steps (0: not at all).</summary>
+    public int MistLevel => (CurrentStage != null && CurrentStage.MistPenalties.Count > 0 ? StageIndex : 0)
+                            + (InOvertime ? RaidPacingSettings.Current.MistStepsAt(Session.Overtime) : 0);
+
+    /// <summary>What the mist takes now, for the HUD's words.</summary>
+    public IReadOnlyList<StatBonus> MistNow => mistNow;
+
+    private readonly List<StatBonus> mistNow = new List<StatBonus>();
+    private readonly LeaseKey mistSource = new LeaseKey("Mist-touched");
+    private int mistShown = -1;
+    private bool toldOvertime;
+    private float nextOvertimeWarning = 60f;
+
+    /// <summary>Raised as the portals open (overtime begins).</summary>
+    public event Action OvertimeBegan;
+
+    /// <summary>Raised when Mist-touched changes (a stage, an overtime step).</summary>
+    public event Action MistChanged;
+
+    // Those freed and sent home ahead through a stone (RescuableTraveler.SendHome): listed with the rescued when the raid ends.
+    private readonly List<ResidentDefinition> sentHome = new List<ResidentDefinition>();
+
+    /// <summary>Notes someone who went home ahead, for the results.</summary>
+    public void NoteSentHome(ResidentDefinition resident)
+    {
+        if (resident != null && !sentHome.Contains(resident))
+        {
+            sentHome.Add(resident);
+        }
+    }
+
     /// <summary>The stage loot of the scene's raid, or 1 outside a raid.</summary>
     public static float StageLootNow => Current != null ? Current.StageLoot : 1f;
 
@@ -346,13 +395,35 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         bool atZero = Session.TimeRemaining <= Time.deltaTime;
-        // A boss encounter's hidden limit never ends a fight that is won: once the boss has fallen it holds at zero.
-        bool sheltered = atZero && (InOpenExtraction() || (EncounterArena.Current != null && EncounterArena.Current.BossFallen));
-        if (Session.Tick(Time.deltaTime, sheltered))
+        float overtime = OvertimeAllowed ? RaidPacingSettings.Current.OvertimeSeconds : 0f;
+        // A boss encounter's hidden limit never ends a fight that is won: once the boss has fallen it holds at zero. Without overtime,
+        // an open circle holds the way home too (the old rule).
+        bool sheltered = atZero && ((overtime <= 0f && InOpenExtraction()) || (EncounterArena.Current != null && EncounterArena.Current.BossFallen));
+        if (Session.Tick(Time.deltaTime, sheltered, overtime))
         {
             Finish();
             return;
         }
+
+        if (InOvertime)
+        {
+            if (!toldOvertime)
+            {
+                toldOvertime = true;
+                nextOvertimeWarning = overtime > 60f ? 60f : overtime > 30f ? 30f : overtime > 10f ? 10f : 0f;
+                GameMessages.Post($"The clock has run out: a portal opens at every stone. Step through, or stay while the mist allows ({RaidStats.FormatTime(overtime)}): " +
+                                  "it grips harder the longer you stay, and then it takes you.", MessageKind.Warning);
+                OvertimeBegan?.Invoke();
+            }
+
+            if (OvertimeLeft <= nextOvertimeWarning && nextOvertimeWarning > 0f)
+            {
+                GameMessages.Post($"The portals close in {RaidStats.FormatTime(nextOvertimeWarning)}!", MessageKind.Warning);
+                nextOvertimeWarning = nextOvertimeWarning > 30f ? 30f : nextOvertimeWarning > 10f ? 10f : 0f;
+            }
+        }
+
+        UpdateMist();
 
         if (sheltered && !toldSheltered)
         {
@@ -372,6 +443,52 @@ public sealed class RaidDirector : MonoBehaviour
         {
             EnterStage(StageIndex + 1);
         }
+    }
+
+    // Mist-touched (RaidStage › Mist Penalties, RaidPacingSettings › Mist Step Penalties): what the mist takes from the player now, as
+    // modifiers on their stats, changed only when the stage or the overtime step does.
+    private void UpdateMist()
+    {
+        int steps = InOvertime ? RaidPacingSettings.Current.MistStepsAt(Session.Overtime) : 0;
+        int key = StageIndex * 100 + steps;
+        if (key == mistShown || player == null || !player.TryGetComponent(out Combatant combatant))
+        {
+            return;
+        }
+
+        mistShown = key;
+        combatant.Stats.RemoveModifiersFrom(mistSource);
+        mistNow.Clear();
+        RaidStage stage = CurrentStage;
+        if (stage != null)
+        {
+            mistNow.AddRange(stage.MistPenalties);
+        }
+
+        for (int i = 0; i < steps; i++)
+        {
+            mistNow.AddRange(RaidPacingSettings.Current.MistStepPenalties);
+        }
+
+        StatBonus.Combine(mistNow);
+        foreach (StatBonus bonus in mistNow)
+        {
+            combatant.Stats.AddModifier(new StatModifier(bonus.stat, bonus.op, bonus.value, mistSource));
+        }
+
+        MistChanged?.Invoke();
+    }
+
+    // The mist lets go of the player as the raid ends, however it ends.
+    private void LiftMist()
+    {
+        if (player != null && player.TryGetComponent(out Combatant combatant))
+        {
+            combatant.Stats.RemoveModifiersFrom(mistSource);
+        }
+
+        mistNow.Clear();
+        mistShown = -1;
     }
 
     private void EnterStage(int index)
@@ -400,6 +517,11 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         StageChanged?.Invoke(index, stage);
+        if (player != null && stage != null)
+        {
+            ExtractionPoint exit = ExtractionPoint.FindNearest(player.transform.position, out float metres);
+            PlaytestLogger.Note(PlaytestLog.StageBegan, stage.DisplayName, Mathf.RoundToInt(Session.TimeRemaining), exit != null ? $"exit {Mathf.RoundToInt(metres)} m" : "no exit open");
+        }
     }
 
     /// <summary>Ends the raid as extracted, if it is still running and the user is the player. Called by extraction points.</summary>
@@ -433,6 +555,8 @@ public sealed class RaidDirector : MonoBehaviour
 
         turnedBack = true;
         running = false;
+        LiftMist();
+        HavenReadiness.EndRest(player);
         if (player.TryGetComponent(out HandCraftQueue crafts))
         {
             crafts.Stop();
@@ -538,6 +662,9 @@ public sealed class RaidDirector : MonoBehaviour
 
     private void Finish()
     {
+        // The mist lets go first, and the rest that was for this raid ends, so the bag and the body copied for home are the player's own.
+        LiftMist();
+        HavenReadiness.EndRest(player);
         // Crafts under way give their materials back before the bag is copied for home, as at a launch: one finishing on the way
         // (or refunded when the scene unloads) would land in a bag already copied.
         if (player != null && player.TryGetComponent(out HandCraftQueue crafts))
@@ -559,6 +686,15 @@ public sealed class RaidDirector : MonoBehaviour
         }
 
         Report = RaidReport.Create(Session, Session.Loadout, keeps, final, wear);
+        // Those who went home ahead through a stone are among the rescued, however the raid ended.
+        foreach (ResidentDefinition early in sentHome)
+        {
+            if (!Report.Rescued.Contains(early))
+            {
+                Report.Rescued.Add(early);
+            }
+        }
+
         if (PlayerTransport.Current != null)
         {
             PlayerTransport.Current.LeaveRaid(Report, extracted);
@@ -573,7 +709,7 @@ public sealed class RaidDirector : MonoBehaviour
         GameSession.EndRaid(Report);
         // Saved again once home; and below, before the results screen (a crash there lost the haul).
         SaveGameService.SaveOnceHome();
-        GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.Elapsed));
+        GameEvents.Raise(new GameEvent(GameEventKind.RaidFinished, Session.Definition, 1, null, Session.Outcome, Session.PlayedSeconds));
         GameSession.CarryPlayerState(keeps);
         // Coming home through the portal, or waking at the portal after a failure.
         GameSession.SetArrivalPoint(extracted ? PlayerArrivalPoint.Portal : PlayerArrivalPoint.HomePortal);

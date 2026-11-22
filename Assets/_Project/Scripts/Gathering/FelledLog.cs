@@ -55,6 +55,11 @@ public sealed class FelledLog : MonoBehaviour, IHarvestBody
         interactable = GetComponent<Interactable>();
         node = GetComponent<ResourceNode>();
         source = GetComponent<ResourceSource>();
+        // Its limbing and sections are pieces of a tree already counted at its fall.
+        if (source != null)
+        {
+            source.CountsAsNode = false;
+        }
         capsule = GetComponent<CapsuleCollider>();
         interactable.enabled = false;
     }

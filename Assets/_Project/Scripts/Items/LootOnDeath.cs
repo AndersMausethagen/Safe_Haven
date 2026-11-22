@@ -104,7 +104,8 @@ public sealed class LootOnDeath : MonoBehaviour
         var inventory = taker.GetComponentInParent<ItemInventory>();
         if (inventory != null)
         {
-            List<ItemAmount> items = Drops.Roll(tier, multiplier);
+            // The raid stage's bonus (RaidStage › Loot Bonus) on what creatures carry too; their essence has it in Reaped.
+            List<ItemAmount> items = Drops.Roll(tier, multiplier * RaidDirector.StageLootNow);
             if (GameSession.ActiveRaid != null)
             {
                 items.RemoveAll(drop => !GameSession.ActiveRaid.Allows(drop.Item));

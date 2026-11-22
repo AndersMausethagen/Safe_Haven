@@ -62,10 +62,12 @@ public static class AwayGifts
     /// <summary>
     /// The gift's line (with what it gave) and its item put in the chests, or null when none comes: by chance, from the gifts whose job
     /// someone at home has (not one away with the player), weighted. <paramref name="roll"/> and <paramref name="pick"/> are 0-1.
+    /// <paramref name="share"/> scales the chance: a quick raid gave them less time (RaidPacingSettings.TimeAwayShare).
     /// </summary>
-    public static string Draw(HomecomingSettings settings, SettlementState home, StashStorage stash, float roll, float pick, ResidentDefinition away = null)
+    public static string Draw(HomecomingSettings settings, SettlementState home, StashStorage stash, float roll, float pick, ResidentDefinition away = null,
+        float share = 1f)
     {
-        if (settings == null || home == null || stash == null || roll >= settings.Chance)
+        if (settings == null || home == null || stash == null || roll >= settings.Chance * share)
         {
             return null;
         }

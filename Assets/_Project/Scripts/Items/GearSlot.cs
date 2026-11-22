@@ -232,6 +232,23 @@ public struct StatBonus
         this.value = value;
     }
 
+    /// <summary>Adds up bonuses to the same stat the same way into one each, in first-seen order (the same total: flat and percent
+    /// bonuses add).</summary>
+    public static void Combine(System.Collections.Generic.List<StatBonus> bonuses)
+    {
+        for (int i = 0; i < bonuses.Count; i++)
+        {
+            for (int j = bonuses.Count - 1; j > i; j--)
+            {
+                if (bonuses[j].stat == bonuses[i].stat && bonuses[j].op == bonuses[i].op)
+                {
+                    bonuses[i] = new StatBonus(bonuses[i].stat, bonuses[i].value + bonuses[j].value, bonuses[i].op);
+                    bonuses.RemoveAt(j);
+                }
+            }
+        }
+    }
+
     /// <summary>"+20 Armor", "+5% Max Health", "+10% Fire Resistance".</summary>
     public string Describe()
     {

@@ -397,6 +397,17 @@ early.
 | 5 | **"Why home?" card:** a one-tap picture choice after each raid, in playtest builds only? | **Yes**, off in release like the F1 menu. It is the only way to learn the *why* from a handful of raids |
 | 6 | **Regrowing nodes:** copper and wood regrow in a raid after 3 minutes (by the data). Intended? | **Keep it, confirm it in a launched raid, and show it.** It makes staying productive, and the bag becomes the natural limit |
 
+### 6.1 The user's answers and what was built (2026-11-22)
+
+1. **Rescues:** sent home from any open stone instead of waiting there; at the clock's end a portal opens at every stone and the player may stay on (overtime, 3 minutes, Mist-touched). Built.
+2. **Stage bonus on ore:** yes, on trees and stones too, shown as a gold "×1.15"; the downside is shown beside it: tools wear more on every node gathered while it is up. Built.
+3. **Veins:** moved. Built (copper and iron ×0.85 in the start layout; two stages sprout guarded veins).
+4. **Time away:** changed by the user: quick raids pay less (half below 4 minutes, all of it at 9), and the risk of staying is a debuff (Mist-touched), not more enemies. Built.
+5. **"Why home?":** yes. Built (playtest builds only).
+6. **Regrowing nodes:** removed in raids (the user wants exploration, not circling back); veins sprout new ore with guards, marked on the map. Built.
+
+Everything else as recommended, except #10 (the keeper's camp: Territory's regions don't name a raid yet) and #5b-c (the stage bar, "Stayed for"). See ARCHITECTURE.md, "The raid's end".
+
 ---
 
 ## 7. Sources

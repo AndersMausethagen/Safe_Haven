@@ -6,7 +6,8 @@ using UnityEngine.AI;
 /// interaction, then follows the player. Enemies can attack them; if they fall they stay behind for this raid and wait at
 /// the same place next time. Still following when the player extracts, however far behind (the user, 2026-11-15: Ingrid
 /// was left in the forest for not standing in the circle), they move into Safe Haven (SettlementState); a person not
-/// extracted never arrives at home. Once they live in Safe Haven they no longer appear in raids. A Quest Waypoint under
+/// extracted never arrives at home. Brought into an open extraction stone's circle, they can be sent home ahead (HomewardSpot), and the
+/// player stays on: that counts as extracted for them (the user, 2026-11-22). Once they live in Safe Haven they no longer appear in raids. A Quest Waypoint under
 /// them marks them on the map while they wait to be found, and is put away while they follow.
 /// <para>
 /// Where it belongs: on a character in a raid scene with an Interactable (deactivates on completion), a NavMeshAgent, a
@@ -23,6 +24,8 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         Waiting,
         Following,
         Fallen,
+        // Gone home ahead through a stone (SendHome).
+        SentHome,
     }
 
     [SerializeField, QuestIdentity] private ResidentDefinition resident;
@@ -47,6 +50,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
     private State state;
     private RaidDirector raid;
     private WoundTending tending;
+    private HomewardSpot homeward;
     private float baseSpeed;
     private float dodgingUntil;
     private MonsterAI watching;
@@ -64,7 +68,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 
     /// <summary>Still where they were found, waiting to be freed: no creature hunts them and nothing hurts them (the user, 2026-11-19:
     /// a rescuable was killed before the player got there). Once freed they are fair game, and are kept close.</summary>
-    public bool IsWaiting => state != State.Following && state != State.Fallen;
+    public bool IsWaiting => state == State.Waiting;
     // Hidden until freed: the player doesn't know who it is yet.
     public string InteractionName => resident == null ? null : IsFollowing ? resident.DisplayName : "Someone hiding";
 
@@ -111,6 +115,53 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 
         tending = WoundTending.For(gameObject, resident.DisplayName);
         tending.enabled = false;
+        homeward = HomewardSpot.Create(this, resident.DisplayName);
+    }
+
+    /// <summary>The open extraction stone whose circle they stand in, or null: from there they can be sent home.</summary>
+    public ExtractionPoint StoneAround()
+    {
+        foreach (ExtractionPoint stone in ExtractionPoint.Active)
+        {
+            if (stone.IsOpen && !stone.IsHeldShut && stone.Inside(transform.position))
+            {
+                return stone;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Sends them home ahead through the stone they stand at: they move into the Haven now, as at an extraction, and are listed with
+    /// the raid's rescued however it ends (RaidDirector.NoteSentHome). False when they aren't following, aren't at an open stone, or
+    /// can't move in.
+    /// </summary>
+    public bool SendHome(GameObject player)
+    {
+        ExtractionPoint stone = StoneAround();
+        if (state != State.Following || stone == null || player == null || (health != null && !health.IsAlive))
+        {
+            return false;
+        }
+
+        string line = stone.IsPortal
+            ? $"{resident.DisplayName} steps through the portal. They'll be waiting at home."
+            : $"{resident.DisplayName} goes home ahead of you by {stone.DisplayName}. They'll be waiting.";
+        if (!ArriveHome(player, line))
+        {
+            return false;
+        }
+
+        state = State.SentHome;
+        NoteRescue("sent home");
+        if (raid != null)
+        {
+            raid.NoteSentHome(resident);
+        }
+
+        gameObject.SetActive(false);
+        return true;
     }
 
     private void OnEnable()
@@ -208,6 +259,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
 
         Thank();
+        NoteRescue("freed");
         QuestDeeds.Raise(GameEventKind.PersonFreed, resident, interactable.Interactor);
         if (freedEvent != null)
         {
@@ -217,6 +269,11 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
 
     private void Update()
     {
+        if (homeward != null)
+        {
+            homeward.SetAvailable(state == State.Following && StoneAround() != null);
+        }
+
         float speed = 0f;
         if (state == State.Following && Player.Current != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
         {
@@ -358,6 +415,7 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
         }
 
         GameMessages.Post($"{resident.DisplayName}: \"{resident.FallenLine}\"", MessageKind.Warning);
+        NoteRescue("fell");
         gameObject.SetActive(false);
     }
 
@@ -382,32 +440,40 @@ public sealed class RescuableTraveler : MonoBehaviour, IInteractionName
             return;
         }
 
+        if (ArriveHome(player, $"{resident.DisplayName} steps through the portal with you."))
+        {
+            NoteRescue("extracted");
+        }
+    }
+
+    private void NoteRescue(string what)
+    {
+        float left = RaidDirector.Current != null ? RaidDirector.Current.Session.TimeRemaining : 0f;
+        PlaytestLogger.Note(PlaytestLog.Rescue, resident != null ? resident.Id : name, Mathf.RoundToInt(left), what);
+    }
+
+    // They move into the player's own Haven (on a friend's raid too: GameSession.Home is the guest's own), are listed with the raid's
+    // rescued, and their deed and quest line start: at the extraction, or sent home ahead through a stone.
+    private bool ArriveHome(GameObject player, string line)
+    {
+        if (!GameSession.Home.AddResident(resident))
+        {
+            return false;
+        }
+
+        if (raid != null && raid.Report != null)
+        {
+            raid.Report.Rescued.Add(resident);
+        }
+
         // Rescued on a friend's raid (co-op): they make their home in this player's own Haven, not the friend's.
-        if (HavenVisit.IsVisiting)
+        GameMessages.Post(HavenVisit.IsVisiting ? line + " They will be waiting in your own Haven." : line, MessageKind.Gain);
+        BringHome(player);
+        if (rescuedEvent != null)
         {
-            if (GameSession.Home.AddResident(resident))
-            {
-                raid.Report?.Rescued.Add(resident);
-                GameMessages.Post($"{resident.DisplayName} steps through the portal with you, and will be waiting in your own Haven.", MessageKind.Gain);
-                BringHome(player);
-                if (rescuedEvent != null)
-                {
-                    GameEvents.Raise(rescuedEvent, player);
-                }
-            }
-
-            return;
+            GameEvents.Raise(rescuedEvent, player);
         }
 
-        if (GameSession.Home.AddResident(resident))
-        {
-            raid.Report?.Rescued.Add(resident);
-            GameMessages.Post($"{resident.DisplayName} steps through the portal with you.", MessageKind.Gain);
-            BringHome(player);
-            if (rescuedEvent != null)
-            {
-                GameEvents.Raise(rescuedEvent, player);
-            }
-        }
+        return true;
     }
 }

@@ -44,8 +44,9 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     [Header("Well Rested")]
     [Tooltip("What a comfortable home gives the player when they set out on a raid.")]
     [SerializeField] private List<StatBonus> restedBonuses = new List<StatBonus>();
-    [Tooltip("How long Well Rested lasts, per point of comfort.")]
-    [SerializeField, Min(1f)] private float restedSecondsPerComfort = 60f;
+    [Tooltip("Well Rested lasts the whole raid (Docs/RaidLoopResearch_2026-11-22.md #8: it ran out mid-raid every time, cutting max " +
+             "health near minute 4). Comfort sets its size: all of Rested Bonuses from this much comfort, that share below it.")]
+    [SerializeField, Min(1)] private int restedFullComfort = 6;
     [SerializeField] private List<Rank> ranks = new List<Rank>
     {
         new Rank { name = "Overgrown Camp", renown = 0, line = "A fire and a tree, and the forest pressing in." },
@@ -64,7 +65,7 @@ public sealed class HavenSettings : GameSettings<HavenSettings>
     public IReadOnlyList<Rank> Ranks => ranks;
     public IReadOnlyList<ResidentDefinition> Expedition => expedition;
     public IReadOnlyList<StatBonus> RestedBonuses => restedBonuses;
-    public float RestedSecondsPerComfort => restedSecondsPerComfort;
+    public int RestedFullComfort => restedFullComfort;
 
     /// <summary>The highest rank this much renown reaches (0 is the first).</summary>
     public int RankFor(int renown)

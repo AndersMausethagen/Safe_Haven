@@ -115,7 +115,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
             ResourceNode node = pair.Value.Node;
             if (node != null && node.IsDepleted)
             {
-                bool regrows = node.Definition != null && node.Definition.RespawnSeconds > 0f;
+                bool regrows = node.Definition != null && node.Definition.RegrowsAfter > 0f;
                 list.Add((pair.Key, regrows ? node.RespawnRemaining : float.PositiveInfinity));
             }
         }
@@ -226,7 +226,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
         }
 
         ResourceNode node = PrefabNodeOf(index);
-        float respawn = node != null && node.Definition != null ? node.Definition.RespawnSeconds : 0f;
+        float respawn = node != null && node.Definition != null ? node.Definition.RegrowsAfter : 0f;
         Take(index, respawn > 0f ? Time.time + respawn : float.PositiveInfinity);
         return true;
     }
@@ -357,7 +357,7 @@ public sealed class TerrainNodeHarvesting : MonoBehaviour
             else if (far && stand.Node.IsDepleted && !inUse && Time.time >= stand.SettledAt)
             {
                 // Gathered and walked away from: kept as gone (hidden, counting down) and its stand-in let go.
-                bool regrows = stand.Node.Definition != null && stand.Node.Definition.RespawnSeconds > 0f;
+                bool regrows = stand.Node.Definition != null && stand.Node.Definition.RegrowsAfter > 0f;
                 gone[pair.Key] = (stand.Original, regrows ? Time.time + stand.Node.RespawnRemaining : float.PositiveInfinity);
                 nextRegrowAt = Mathf.Min(nextRegrowAt, gone[pair.Key].regrowAt);
                 scratch.Add(pair.Key);

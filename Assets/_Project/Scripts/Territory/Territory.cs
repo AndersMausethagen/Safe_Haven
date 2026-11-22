@@ -499,10 +499,19 @@ public static class Territory
         }
 
         List<string> news = State.AdvanceTurn(Settings, settlement.Blight, () => UnityEngine.Random.value, out float spread, tended, scouted);
-        news.AddRange(PartiesHome(parties));
+        // A quick raid gives those out less time: they bring a share of a full trip (RaidPacingSettings › Time Away, the user 2026-11-22:
+        // "reduce reward for quick raids. less than 4 min, then gradually increase up to 9 min").
+        float share = atDawn ? 1f : RaidPacingSettings.Current.TimeAwayShare(raidSeconds);
+        int before = news.Count;
+        news.AddRange(PartiesHome(parties, share));
         if (!atDawn)
         {
-            news.AddRange(OutpostsHome(settlement, raidSeconds, report != null ? report.Companion : null));
+            news.AddRange(OutpostsHome(settlement, raidSeconds, report != null ? report.Companion : null, share));
+        }
+
+        if (share < 0.999f && news.Count > before)
+        {
+            news.Add($"A short trip ({RaidStats.FormatTime(raidSeconds)}): those out had time for {Mathf.RoundToInt(share * 100f)}% of a full one. A longer raid gives them all of it.");
         }
 
         // An outpost on a land the forest has taken back is given up (Outposts).
@@ -583,7 +592,7 @@ public static class Territory
     }
 
     // What the outposts send home for a raid, into the chests (Outposts); in words, one line an outpost.
-    private static List<string> OutpostsHome(SettlementState settlement, float raidSeconds, ResidentDefinition along)
+    private static List<string> OutpostsHome(SettlementState settlement, float raidSeconds, ResidentDefinition along, float share)
     {
         var told = new List<string>();
         foreach ((string region, ResidentRecord keeper) in Outposts.Working(settlement, raidSeconds, along, Settings))
@@ -591,7 +600,8 @@ public static class Territory
             var sent = new List<string>();
             foreach (ItemAmount brought in Outposts.Roll(region, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))
             {
-                int added = GameSession.Stash.Items.Add(brought.Item, brought.Amount);
+                int amount = RaidParameters.ScaleAmount(brought.Amount, share, UnityEngine.Random.value);
+                int added = amount > 0 ? GameSession.Stash.Items.Add(brought.Item, amount) : 0;
                 PlaytestLogger.Note(PlaytestLog.CameHome, "Outpost", added, brought.Item.Id);
                 if (added > 0)
                 {
@@ -609,7 +619,7 @@ public static class Territory
     }
 
     // What the hunting and fishing parties bring home, into the chests, and what the scouts saw; in words, one line a party.
-    private static List<string> PartiesHome(List<(LandPartyKind kind, string region, ResidentRecord who)> parties)
+    private static List<string> PartiesHome(List<(LandPartyKind kind, string region, ResidentRecord who)> parties, float share)
     {
         var told = new List<string>();
         foreach ((LandPartyKind kind, string region, ResidentRecord who) in parties)
@@ -624,7 +634,8 @@ public static class Territory
             var sent = new List<string>();
             foreach (ItemAmount brought in LandParties.Roll(kind, who, Settings, (least, most) => UnityEngine.Random.Range(least, most + 1)))
             {
-                int added = GameSession.Stash.Items.Add(brought.Item, brought.Amount);
+                int amount = RaidParameters.ScaleAmount(brought.Amount, share, UnityEngine.Random.value);
+                int added = amount > 0 ? GameSession.Stash.Items.Add(brought.Item, amount) : 0;
                 PlaytestLogger.Note(PlaytestLog.CameHome, $"Party:{kind}", added, brought.Item.Id);
                 if (added > 0)
                 {

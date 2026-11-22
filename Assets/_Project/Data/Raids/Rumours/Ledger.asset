@@ -15,9 +15,19 @@ MonoBehaviour:
   id: rumour.ledger
   briefing: A wainwright's camp was abandoned somewhere out there. His books may still be dry.
   site: {fileID: 11400000, guid: cf850fe5223ed7149bccf5e2909530f3, type: 2}
+  setPiece: {fileID: 0}
   weight: 1
+  appearsAtStage: 1
   hour: 0
   seeks: {fileID: 0}
+  afterHome: {fileID: 0}
   teaches: {fileID: 11400000, guid: cb2dddc3e06c93d43aaa2b747065760c, type: 2}
   breachComing: 0
   afterExtractions: 0
+  needsBuilding: {fileID: 0}
+  needsTier: 1
+  untilBeaten: {fileID: 0}
+  urgent: 0
+  seeksLost: 0
+  forestPushing: 0
+  whileQuest: {fileID: 0}

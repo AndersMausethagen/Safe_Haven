@@ -28,7 +28,14 @@ public static class HavenReadiness
     public static int Comfort => Standing().Select(ComfortOf).GroupBy(entry => entry.Building).Sum(kind => kind.Max(entry => entry.Comfort)) + GameSession.Here.Housed
         + HomeLife.Comfort + Yards.Comfort;
 
-    public static float RestedSeconds => Comfort * HavenSettings.Current.RestedSecondsPerComfort;
+    /// <summary>How much of Well Rested the comfort at home gives (0-1): all of it from Rested Full Comfort.</summary>
+    public static float RestedShare => RestedShareAt(Comfort, HavenSettings.Current.RestedFullComfort);
+
+    /// <summary>The share of Well Rested <paramref name="comfort"/> gives. Pure, for tests.</summary>
+    public static float RestedShareAt(int comfort, int fullComfort) => Mathf.Clamp01(comfort / (float)Mathf.Max(1, fullComfort));
+
+    // Long enough for any raid and its overtime; the raid's end takes it off (RaidDirector.Finish, EndRest).
+    private const float RestedForTheRaid = 3600f;
 
     private static float WardSeconds
     {
@@ -45,19 +52,34 @@ public static class HavenReadiness
         }
     }
 
-    /// <summary>Sets the player out rested, for as long as the comfort at home allows.</summary>
+    /// <summary>Sets the player out rested for the whole raid, as much as the comfort at home allows.</summary>
     public static void GiveRest(GameObject player)
     {
-        float seconds = RestedSeconds;
+        float share = RestedShare;
         HavenSettings settings = HavenSettings.Current;
-        if (seconds <= 0f || player == null || settings.RestedBonuses.Count == 0 || !player.TryGetComponent(out PlayerBoons boons))
+        if (share <= 0f || player == null || settings.RestedBonuses.Count == 0 || !player.TryGetComponent(out PlayerBoons boons))
         {
             return;
         }
 
-        if (boons.Add(RestedId, RestedName, settings.RestedBonuses, seconds, false))
+        var bonuses = new List<StatBonus>(settings.RestedBonuses.Count);
+        foreach (StatBonus bonus in settings.RestedBonuses)
         {
-            GameMessages.Post($"{RestedName}: {ItemTooltipView.DescribeBonuses(settings.RestedBonuses)} for {RaidStats.FormatTime(seconds)}", MessageKind.Gain);
+            bonuses.Add(new StatBonus(bonus.stat, bonus.value * share, bonus.op));
+        }
+
+        if (boons.Add(RestedId, RestedName, bonuses, RestedForTheRaid, false))
+        {
+            GameMessages.Post($"{RestedName}: {ItemTooltipView.DescribeBonuses(bonuses)} for this raid", MessageKind.Gain);
+        }
+    }
+
+    /// <summary>The raid is over: Well Rested was for it, not for home.</summary>
+    public static void EndRest(GameObject player)
+    {
+        if (player != null && player.TryGetComponent(out PlayerBoons boons))
+        {
+            boons.End(RestedId);
         }
     }
 
@@ -105,11 +127,11 @@ public static class HavenReadiness
         {
             Key = HavenSettings.Current,
             Name = RestedName,
-            Line = comfort > 0 ? $"Comfort {comfort}: {RaidStats.FormatTime(RestedSeconds)} on setting out" : "No comfort yet",
+            Line = comfort > 0 ? $"Comfort {comfort}: {Mathf.RoundToInt(RestedShare * 100f)}% of Well Rested, every raid" : "No comfort yet",
             Badge = comfort > 0 ? comfort.ToString() : "",
             State = comfort > 0 ? HavenEntryState.Good : HavenEntryState.Ready,
-            Status = comfort > 0 ? $"You set out rested for {RaidStats.FormatTime(RestedSeconds)}." : "You set out as you are.",
-            Description = $"{ItemTooltipView.DescribeBonuses(HavenSettings.Current.RestedBonuses)} when you set out. Each kind of comfortable building adds {RaidStats.FormatTime(HavenSettings.Current.RestedSecondsPerComfort)} per point, once.",
+            Status = comfort > 0 ? $"You set out rested, for the whole raid ({Mathf.RoundToInt(RestedShare * 100f)}%)." : "You set out as you are.",
+            Description = $"{ItemTooltipView.DescribeBonuses(HavenSettings.Current.RestedBonuses)} for the whole raid at {HavenSettings.Current.RestedFullComfort} comfort, less below it. Each kind of comfortable building counts once.",
         };
         var sources = Standing().Select(ComfortOf).Where(one => one.Comfort > 0).GroupBy(one => one.Building)
             .Select(kind => $"{kind.Key.DisplayName}: {kind.Max(one => one.Comfort)}").ToList();
