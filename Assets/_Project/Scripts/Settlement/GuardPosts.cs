@@ -67,7 +67,36 @@ public static class GuardPosts
         return night;
     }
 
-    /// <summary>Why no post can be set now, or null: a friend's Haven, nobody who keeps guard, or as many posts as may stand.</summary>
+    /// <summary>How many of the Haven's people keep guard.</summary>
+    public static int Defenders(IHavenView home)
+    {
+        int count = 0;
+        foreach (ResidentRecord record in home.Residents)
+        {
+            count += Defends(record) ? 1 : 0;
+        }
+
+        return count;
+    }
+
+    /// <summary>The name of the guard who takes post <paramref name="index"/> (0 first), or null.</summary>
+    public static string GuardFor(IHavenView home, int index)
+    {
+        foreach (ResidentRecord record in home.Residents)
+        {
+            if (Defends(record) && index-- == 0)
+            {
+                return record.Resident != null ? record.Resident.DisplayName : null;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Why no post can be set now, or null: a friend's Haven, nobody who keeps guard, or a post for every guard who may stand (as many
+    /// as keep guard, and no more than the defences hold).
+    /// </summary>
     public static string WhyNoPost(IHavenView home, DefenceSettings settings, bool visiting)
     {
         if (visiting)
@@ -75,20 +104,48 @@ public static class GuardPosts
             return "Posts are set in your own Haven.";
         }
 
-        bool anyone = false;
-        foreach (ResidentRecord record in home.Residents)
-        {
-            anyone |= Defends(record);
-        }
-
-        if (!anyone)
+        int guards = Defenders(home);
+        if (guards == 0)
         {
             return "Nobody here keeps guard yet: a Warden's or a Hunter's work.";
         }
 
         int cap = Cap(settings);
-        return home.Posts.Count >= cap ? $"At most {cap} posts: each tier of a Watch Post adds one." : null;
+        if (home.Posts.Count < Mathf.Min(cap, guards))
+        {
+            return null;
+        }
+
+        return guards < cap ? $"A post for each guard: {guards} keep{(guards == 1 ? "s" : "")} guard."
+            : $"At most {cap} posts: each tier of a Watch Post adds one.";
     }
+
+    /// <summary>
+    /// The posts guards take: all of them in a breach; on a corruption night only those on its side (within Night Post Side of its
+    /// bearing, seen from the portal), so posts set for a breach's lanes don't send guards away from the band.
+    /// </summary>
+    public static System.Collections.Generic.List<Vector3> PostsFor(System.Collections.Generic.IReadOnlyList<Vector3> posts, Vector3 portal,
+        bool night, float bearing, DefenceSettings settings)
+    {
+        var taken = new System.Collections.Generic.List<Vector3>();
+        foreach (Vector3 post in posts)
+        {
+            Vector3 way = post - portal;
+            way.y = 0f;
+            float degrees = Mathf.Atan2(way.x, way.z) * Mathf.Rad2Deg;
+            if (!night || way.sqrMagnitude < 1f || Mathf.Abs(Mathf.DeltaAngle(degrees, bearing)) <= settings.NightPostSide)
+            {
+                taken.Add(post);
+            }
+        }
+
+        return taken;
+    }
+
+    /// <summary>The ground a guard can stand on nearest <paramref name="at"/> (out of deep water), or the point itself when none is near.</summary>
+    public static Vector3 Walkable(Vector3 at) =>
+        UnityEngine.AI.NavMesh.SamplePosition(at, out UnityEngine.AI.NavMeshHit hit, 4f, DeepWater.MaskFor(UnityEngine.AI.NavMesh.AllAreas, false))
+            ? hit.position : at;
 
     /// <summary>On a corruption night with no post set: the <paramref name="rank"/>th guard's place toward the side it comes from.</summary>
     public static Vector3 TowardTheNight(Vector3 portal, float bearing, int rank, DefenceSettings settings)

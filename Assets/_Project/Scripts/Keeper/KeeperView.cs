@@ -544,7 +544,7 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     public static string ShortWhyNoRing()
     {
         string why = WhyNoRing();
-        return why == null ? null : HavenVisit.IsVisiting ? "your own Haven only" : why.StartsWith("Nobody") ? "no woodcutter yet" : "at most "
+        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody") ? "no woodcutter yet" : "at most "
             + WorkerSettings.Current.MostRings;
     }
 
@@ -636,17 +636,31 @@ public sealed class KeeperView : MonoBehaviour, PlayerCameraController.IOverview
     public static string ShortWhyNoPost()
     {
         string why = WhyNoPost();
-        return why == null ? null : HavenVisit.IsVisiting ? "your own Haven only" : why.StartsWith("Nobody") ? "nobody keeps guard yet"
+        return why == null ? null : HavenVisit.IsVisiting ? "your Haven only" : why.StartsWith("Nobody") ? "no guards yet"
             : $"at most {GuardPosts.Cap(DefenceSettings.Current)}";
     }
 
     private void LayPost(Vector3 at)
     {
         postPlacing = false;
-        GameSession.Home.AddPost(at);
+        if (HomePortal.Current == null || !HomePortal.Current.InBuildLand(at))
+        {
+            GameMessages.Post("Posts go inside the Haven's lands.", MessageKind.Warning);
+            return;
+        }
+
+        // On ground a guard can walk to, out of deep water (the nearest within a couple of metres).
+        if (!UnityEngine.AI.NavMesh.SamplePosition(at, out UnityEngine.AI.NavMeshHit ground, 2f, DeepWater.MaskFor(UnityEngine.AI.NavMesh.AllAreas, false)))
+        {
+            GameMessages.Post("A guard can't stand there.", MessageKind.Warning);
+            return;
+        }
+
+        GameSession.Home.AddPost(ground.position);
         int posts = GameSession.Home.Posts.Count;
-        GameMessages.Post($"Guard post {posts} set: when the ward breaks or a corruption night comes, the {Ordinal(posts)} guard stands here.",
-            MessageKind.Info);
+        string guard = GuardPosts.GuardFor(GameSession.Home, posts - 1);
+        GameMessages.Post($"Guard post {posts} set: when the ward breaks, {guard ?? $"the {Ordinal(posts)} guard"} stands here; on a corruption " +
+            "night, the posts on its side are kept.", MessageKind.Info);
     }
 
     private static string Ordinal(int n) => n switch { 1 => "first", 2 => "second", 3 => "third", 4 => "fourth", 5 => "fifth", _ => $"{n}th" };

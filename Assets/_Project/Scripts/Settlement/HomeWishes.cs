@@ -15,14 +15,29 @@ public sealed class HomeWishes : MonoBehaviour
 
     private void Update()
     {
-        if (Time.unscaledTime < nextLook)
+        if (Time.time < nextLook)
         {
             return;
         }
 
-        nextLook = Time.unscaledTime + LookSeconds;
+        nextLook = Time.time + LookSeconds;
         if (!Place.AtHome)
         {
+            return;
+        }
+
+        // A save from before wishes: those already content are marked, quietly, so nobody thanks for what they always had.
+        if (!GameSession.Home.WishesSeeded)
+        {
+            foreach (ResidentRecord record in GameSession.Home.Residents)
+            {
+                if (!record.WishMet && HomeLife.IsContent(record))
+                {
+                    record.WishMet = true;
+                }
+            }
+
+            GameSession.Home.SeedWishes();
             return;
         }
 
@@ -50,7 +65,7 @@ public sealed class HomeWishes : MonoBehaviour
             : $"{name}'s wish is met{what}.", MessageKind.Gain);
         // Said aloud where they are, as a word in passing.
         ResidentLife life = ResidentLife.Of(record.Resident);
-        if (life != null && DialogueBox.Current != null && !DialogueBox.IsOpen)
+        if (life != null && DialogueBox.Current != null && !DialogueBox.IsOpen && !DialogueBox.Current.IsSubtitling)
         {
             DialogueBox.Current.Bark(new DialogueSpeaker(name, life.transform, null, 0f, null, life.transform), thanks);
         }
@@ -70,10 +85,11 @@ public sealed class HomeWishes : MonoBehaviour
         return null;
     }
 
-    /// <summary>What <paramref name="record"/> still wishes for in a home, or null (met, or none).</summary>
+    /// <summary>What <paramref name="record"/> wishes for in a home while theirs lacks it, or null (it has it, or they wish for
+    /// nothing). Thanked for once (WishMet); shown again if a home loses it.</summary>
     public static string WishOf(ResidentRecord record)
     {
-        if (record == null || record.WishMet)
+        if (record == null)
         {
             return null;
         }

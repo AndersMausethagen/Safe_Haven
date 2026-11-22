@@ -54,12 +54,9 @@ public sealed class GuardPostsTests
 
         Assert.IsNull(GuardPosts.WhyNoPost(home, DefenceSettings.Current, false));
         Assert.IsNotNull(GuardPosts.WhyNoPost(home, DefenceSettings.Current, true), "a friend's Haven");
-        for (int i = 0; i < GuardPosts.Cap(DefenceSettings.Current); i++)
-        {
-            home.AddPost(new Vector3(i, 0f, 0f));
-        }
-
-        Assert.IsNotNull(GuardPosts.WhyNoPost(home, DefenceSettings.Current, false), "no more posts than may stand");
+        Assert.AreEqual(defender.DisplayName, GuardPosts.GuardFor(home, 0), "the first post is theirs");
+        home.AddPost(new Vector3(1f, 0f, 0f));
+        Assert.IsNotNull(GuardPosts.WhyNoPost(home, DefenceSettings.Current, false), "a post for each guard, no more: one keeps guard here");
         Assert.IsNotNull(GuardPosts.WhyNoPost(new SettlementState(), DefenceSettings.Current, false), "nobody keeps guard");
     }
 
@@ -73,6 +70,16 @@ public sealed class GuardPostsTests
         Vector3 second = GuardPosts.TowardTheNight(Vector3.zero, 90f, 1, settings);
         Vector3 third = GuardPosts.TowardTheNight(Vector3.zero, 90f, 2, settings);
         Assert.Less(second.z * third.z, 0f, "the next two stand either side");
+    }
+
+    [Test]
+    public void OnACorruptionNight_OnlyThePostsOnItsSideAreTaken()
+    {
+        var posts = new System.Collections.Generic.List<Vector3> { new Vector3(10f, 0f, 0f), new Vector3(-10f, 0f, 0f), new Vector3(8f, 0f, 3f) };
+        Assert.AreEqual(3, GuardPosts.PostsFor(posts, Vector3.zero, false, 90f, DefenceSettings.Current).Count, "a breach: every post");
+        System.Collections.Generic.List<Vector3> east = GuardPosts.PostsFor(posts, Vector3.zero, true, 90f, DefenceSettings.Current);
+        Assert.AreEqual(2, east.Count, "a night from the east: the two eastern posts");
+        Assert.AreEqual(10f, east[0].x, 1e-3f, "in order");
     }
 
     [Test]

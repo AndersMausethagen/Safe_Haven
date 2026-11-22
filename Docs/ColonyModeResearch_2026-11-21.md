@@ -30,6 +30,26 @@ And then:
 
 ---
 
+## As built (2026-11-21 to 2026-11-22)
+
+The user approved the recommendations and added asks of their own: residents fetch from the chests with small carry limits
+that grow, Palworld-style work speed, longer builds and crafts, and deeper farming. Everything below is in `test`, unplayed by
+hand; each phase had an independent review and its fixes. `Assets/_Project/Scripts/ARCHITECTURE.md` ("The Keeper's view" and
+its phase sections) has the details.
+
+| Phase (as built) | What | Commits |
+|---|---|---|
+| 0-1 | The view (`` ` ``, the Haven window or the pad wheel), builders at home, longer builds and crafts | d028762d |
+| 2 | Work speed (0.6 alone, +1 worker, +1 player), hauling on foot with carry limits (25 weight, 1 slot; Strength, gear, carts, horses) | 0b2d2da8 |
+| 3 | Plans paid from the chests, wanted on raids; homecoming gifts; marks in the view; the portal from afar | 8ee25f1e |
+| 4 | Felling rings with the forester (saplings), felling while away | 3fc4acff, 140c058e |
+| 5 | Fields: water (rain, a Waterskin, the Farmer's water trips), dry soil slower but never dead, crops that grow visibly | a4ff54d1 |
+| 6 | People: wishes met (thanks and a gift), the raid in passing, ranks and homes in the view | 4b9883af |
+| 7 | Guard posts set in the view, capped by the Watch Posts; guards and the archer on corruption nights | b1bb58fd |
+
+Not built yet: hunting, fishing, quarry and scouting parties; the horn; small scenes; the empty house; companion signatures
+(decided for after the playtest); patrols (cut for now, the user may want them later); a well or water barrel near the fields.
+
 ## 0. Summary
 
 ### The short answer

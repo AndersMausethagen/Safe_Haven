@@ -304,10 +304,16 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
         defender ??= new ResidentDefender(transform, animator, agent);
         if (how != null && !defender.IsOnGuard)
         {
-            int rank = Time.time >= nextGuardLook ? GuardPosts.Rank(GameSession.Here, npc.Record) : -1;
+            // Talking with the player, they finish first; with no post free, they look again now and then.
+            if (Time.time < nextGuardLook || (talkable != null && talkable.IsTalking))
+            {
+                return false;
+            }
+
+            int rank = GuardPosts.Rank(GameSession.Here, npc.Record);
             if (rank < 0 || rank >= GuardPosts.Cap(DefenceSettings.Current))
             {
-                // No post for them (more guards than the defences hold): they shelter with the rest; looked at again now and then.
+                // No post for them (more guards than the defences hold): they shelter with the rest.
                 nextGuardLook = Time.time + 2f;
                 return false;
             }
@@ -333,15 +339,19 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
     // night, between the portal and the side it comes from; otherwise a ring out from the portal, between it and what comes.
     private Vector3 GuardPost(int rank, bool night)
     {
-        IReadOnlyList<Vector3> posts = GameSession.Here.Posts;
+        // On a corruption night only the posts on its side count (those set for a breach's lanes may face elsewhere).
+        bool nightSide = night && CorruptionNights.Current != null && HomePortal.Current != null;
+        Vector3 portal = HomePortal.Current != null ? HomePortal.Current.transform.position : home;
+        System.Collections.Generic.List<Vector3> posts = GuardPosts.PostsFor(GameSession.Here.Posts, portal, nightSide,
+            nightSide ? CorruptionNights.Current.Bearing : 0f, DefenceSettings.Current);
         if (rank >= 0 && rank < posts.Count)
         {
             return posts[rank];
         }
 
-        if (night && CorruptionNights.Current != null && HomePortal.Current != null)
+        if (nightSide)
         {
-            return GuardPosts.TowardTheNight(HomePortal.Current.transform.position, CorruptionNights.Current.Bearing, rank, DefenceSettings.Current);
+            return GuardPosts.Walkable(GuardPosts.TowardTheNight(portal, CorruptionNights.Current.Bearing, rank, DefenceSettings.Current));
         }
 
         BuildingObject post = npc.Workplace;

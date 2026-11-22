@@ -264,7 +264,8 @@ public sealed class KeeperHud : MonoBehaviour
                         names.Add(one.Resident.DisplayName);
                     }
 
-                    return $"Tier {Tiers.ToRoman(construction.Level)} · home of {string.Join(" and ", names)}";
+                    string who = names.Count <= 2 ? string.Join(" and ", names) : $"{names[0]}, {names[1]} and {names.Count - 2} more";
+                    return $"Tier {Tiers.ToRoman(construction.Level)} · home of {who}";
                 }
 
                 if (building.TryGetComponent(out CraftingStation station) && station.Queue != null)

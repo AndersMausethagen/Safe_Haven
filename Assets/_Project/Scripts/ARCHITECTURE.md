@@ -2232,12 +2232,14 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
 ### People (phase 6, 2026-11-22)
 
 - **Wishes met.** What someone likes in a home (`HomeLifeSettings` › Likings) is their wish: the view's tag shows it while unmet
-  ("Tor · wishes: A place to sit"; `HomeWishes.WishOf`). The first time their home has it, `HomeWishes` (on the portal, a look every
-  5 s, one at a time) has them say their Liking's Thanks aloud, puts the gift their trade makes in the chests (`HomecomingSettings`
-  › Gifts, by job) and marks it (`ResidentRecord.WishMet`, saved). Positive only.
+  ("Tor · wishes: A place to sit"; `HomeWishes.WishOf`), and again if a home loses it. The first time their home has it,
+  `HomeWishes` (on the portal, a look every 5 s, one at a time) has them say their Liking's Thanks aloud, puts the gift their trade
+  makes in the chests (`HomecomingSettings` › Gifts, by job) and marks it (`ResidentRecord.WishMet`, saved). A save from before
+  wishes marks those already content quietly, once (`SettlementState.WishesSeeded`). Positive only.
 - **The raid, in passing.** Once per homecoming, after the older news (grief, a boss, a new face), `ResidentNpc.News` says a word
-  about the raid just come home from (`Homecoming.LastOutcome`, `LastAlong`): the one who went along, a player who came home
-  beaten, or what the player carries that their work uses (`HomecomingSettings` › Brought, Fell, Along Lines).
+  about the raid just come home from (`Homecoming.LastOutcome`, `LastAlong`), once each per raid (`FirstWordOnTheRaid`): to a
+  player who came home beaten or out of time, from the one who went along, or about what the player carries that their work uses
+  (`HomecomingSettings` › Fell, Along, Brought Lines).
 - **Badges in the view.** The tag gives a person's rank before their job ("Journeyman Carpenter", `SettlementSettings` › Worker
   Ranks) and a house who lives in it.
 - Orders are opened person by person through the jobs that do them (builders: Carpenter and Mason; rings: the Carpenter; water:
@@ -2246,14 +2248,17 @@ Palworld's plots (sow, water, grow, harvest, haul) on the Farm Plot's queue, so 
 ### Defence by the people (phase 7, 2026-11-22)
 
 - **Posts.** In the Keeper's view, "Set a guard post" (`KeeperView.BeginPost`; red marks on the ground) adds a post to the
-  settlement (`SettlementState.Posts`, saved), in the order guards take them; "Clear the posts" removes them.
+  settlement (`SettlementState.Posts`, saved), in the order guards take them, on walkable ground inside the Haven's lands, one for
+  each guard who may stand; "Clear the posts" removes them. On a corruption night only the posts on its side are taken
+  (`GuardPosts.PostsFor`, within Night Post Side of its bearing).
 - **Who stands.** Those whose job keeps guard (`JobDefinition` › Defends As: the Warden and the Hunter) turn out in a ward breach
   and now on a corruption night too, from its warning until its band is gone (`GuardPosts.CalledOut`; `DefenceSettings` ›
   Corruption Nights). As many as the defences allow (`GuardPosts.Cap`: Base Posts 2, and one more for each tier of each standing
   Watch Post, at most 8), in the order they live in the Haven; the rest shelter as before. Each stands at their post, else as before
   (up on the Watch Post, or a ring round the portal), or on a corruption night toward the side it comes from (`TowardTheNight`).
   Guards get up by themselves, so nobody dies.
-- **The Watch Post archer** shoots on a corruption night while its band is out, as in a breach.
+- **The Watch Post archer** shoots on a corruption night at its band (not prowlers or game), as in a breach. A guard talking with
+  the player finishes first.
 - The horn (everyone in, the posts out, before it comes) and hunting, quarry and scouting parties are still to do. Tests:
   `GuardPostsTests`.
 

@@ -133,6 +133,8 @@ public sealed class SettlementSaveData
     public List<RingSaveData> rings = new List<RingSaveData>();
     /// <summary>Guard posts set in the Keeper's view (GuardPosts). Missing in older saves: none.</summary>
     public List<PostSaveData> posts = new List<PostSaveData>();
+    /// <summary>The wishes already met are marked (HomeWishes). Missing in older saves: not yet, so they are marked quietly.</summary>
+    public bool wishesSeeded;
     public int purificationQueued;
     public float purificationProgress;
     /// <summary>Share faster the altar works for its upgrades. Missing in older saves; the altar sets it again at home.</summary>

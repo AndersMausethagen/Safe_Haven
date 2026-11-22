@@ -139,15 +139,23 @@ public sealed class ResidentNpc : MonoBehaviour, IConversationTopics, IQuestPers
             return null;
         }
 
-        int pick = CompanionBond.StableIndex(resident.Id + GameSession.Here.SuccessfulExtractions, 97);
+        string said = RaidLine(last, lines);
+        // Once per raid each, however often the Haven is loaded meanwhile.
+        return said != null && Homecoming.FirstWordOnTheRaid(resident) ? said : null;
+    }
+
+    private string RaidLine(RaidOutcome last, HomecomingSettings lines)
+    {
+        int pick = CompanionBond.StableIndex(resident.Id + Homecoming.Homecomings, 97);
+        // Beaten, or pulled home by the portal: that comes first, the one who went along too.
+        if ((last == RaidOutcome.Died || last == RaidOutcome.TimeExpired) && lines.FellLines.Length > 0)
+        {
+            return lines.FellLines[pick % lines.FellLines.Length];
+        }
+
         if (Homecoming.LastAlong == resident && lines.AlongLines.Length > 0)
         {
             return lines.AlongLines[pick % lines.AlongLines.Length];
-        }
-
-        if (last == RaidOutcome.Died && lines.FellLines.Length > 0)
-        {
-            return lines.FellLines[pick % lines.FellLines.Length];
         }
 
         JobDefinition job = Job;

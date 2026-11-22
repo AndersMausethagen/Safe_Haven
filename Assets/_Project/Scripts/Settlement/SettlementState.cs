@@ -556,6 +556,20 @@ public sealed class SettlementState : IHavenView
         }
     }
 
+    /// <summary>The wishes met before wishes were thanked for are marked, quietly, once (HomeWishes): an older save's content people
+    /// don't all thank at once.</summary>
+    public bool WishesSeeded { get; private set; }
+
+    public void SeedWishes()
+    {
+        Borrowed();
+        if (!WishesSeeded)
+        {
+            WishesSeeded = true;
+            Changed?.Invoke();
+        }
+    }
+
     private readonly List<Vector3> posts = new List<Vector3>();
 
     /// <summary>Guard posts set in the Keeper's view (GuardPosts), in the order guards take them.</summary>

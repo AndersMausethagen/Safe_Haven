@@ -65,7 +65,9 @@ public sealed class WatchPostArcher : MonoBehaviour
             return;
         }
 
-        MonsterAI target = Nearest();
+        // A breach: anything hostile in reach. A corruption night: its band only.
+        bool breachOn = breach != null && breach.IsActive;
+        MonsterAI target = Nearest(breachOn ? null : CorruptionNights.Current.Attackers);
         if (target == null || !target.TryGetComponent(out Damageable victim))
         {
             nextShot = Time.time + 0.4f;
@@ -80,13 +82,14 @@ public sealed class WatchPostArcher : MonoBehaviour
         ShowShot(transform.position + Vector3.up * 4f, hit);
     }
 
-    private MonsterAI Nearest()
+    private MonsterAI Nearest(System.Collections.Generic.IReadOnlyList<MonsterAI> only)
     {
         MonsterAI best = null;
         float bestDistance = reach * reach;
-        foreach (MonsterAI monster in MonsterAI.Active)
+        System.Collections.Generic.IEnumerable<MonsterAI> pool = only != null ? (System.Collections.Generic.IEnumerable<MonsterAI>)only : MonsterAI.Active;
+        foreach (MonsterAI monster in pool)
         {
-            if (monster.CurrentState == MonsterAI.State.Dead || !monster.TryGetComponent(out Damageable victim) || !victim.Faction.WillAttack(Faction.Player))
+            if (monster == null || monster.CurrentState == MonsterAI.State.Dead || !monster.TryGetComponent(out Damageable victim) || !victim.Faction.WillAttack(Faction.Player))
             {
                 continue;
             }

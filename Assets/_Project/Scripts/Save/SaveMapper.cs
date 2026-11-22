@@ -292,6 +292,8 @@ public static class SaveMapper
             into.posts.Add(new PostSaveData { x = post.x, y = post.y, z = post.z });
         }
 
+        into.wishesSeeded = settlement.WishesSeeded;
+
         foreach (RingOrder ring in settlement.Rings)
         {
             into.rings.Add(new RingSaveData { x = ring.Centre.x, y = ring.Centre.y, z = ring.Centre.z, radius = ring.Radius,
@@ -430,6 +432,11 @@ public static class SaveMapper
         foreach (string job in saved.vacantJobs ?? new List<string>())
         {
             settlement.RestoreVacantJob(Resolve(content.FindJob(job), "job", job, missing));
+        }
+
+        if (saved.wishesSeeded)
+        {
+            settlement.SeedWishes();
         }
 
         foreach (PostSaveData post in saved.posts ?? new List<PostSaveData>())

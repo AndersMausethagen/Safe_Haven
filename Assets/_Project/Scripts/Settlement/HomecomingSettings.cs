@@ -35,7 +35,7 @@ public sealed class HomecomingSettings : GameSettings<HomecomingSettings>
         "\"That's {1} you've got. Leave it in the chests and I'll put it to use at the {2}.\"",
         "\"{1}! Just what the {2} was short of.\"",
     };
-    [Tooltip("When the player came home on the portal's pull, beaten.")]
+    [Tooltip("When the player came home beaten, or pulled home by the portal as the raid ran out.")]
     [SerializeField] private string[] fellLines =
     {
         "\"You came back. That's the part that matters. The rest we can make again.\"",

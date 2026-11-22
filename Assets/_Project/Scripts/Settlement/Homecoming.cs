@@ -19,6 +19,14 @@ public static class Homecoming
     private static ResidentDefinition along;
     private static float awaySeconds;
     private static RaidOutcome outcome = RaidOutcome.InProgress;
+    private static int homecomings;
+    private static readonly HashSet<ResidentDefinition> RaidTold = new HashSet<ResidentDefinition>();
+
+    /// <summary>Raids come home from since the game was loaded (a fresh pick of words each time).</summary>
+    public static int Homecomings => homecomings;
+
+    /// <summary>True the first time <paramref name="resident"/> speaks of the raid just come home from (once each, per raid).</summary>
+    public static bool FirstWordOnTheRaid(ResidentDefinition resident) => resident != null && RaidTold.Add(resident);
 
     /// <summary>How the raid the player last came home from ended; In Progress when none has since the game was loaded.</summary>
     public static RaidOutcome LastOutcome => outcome;
@@ -44,6 +52,8 @@ public static class Homecoming
         along = null;
         awaySeconds = 0f;
         outcome = RaidOutcome.InProgress;
+        homecomings = 0;
+        RaidTold.Clear();
     }
 
     private static void OnRaised(GameEvent gameEvent)
@@ -53,6 +63,8 @@ public static class Homecoming
             Pending = true;
             awaySeconds = gameEvent.Seconds;
             outcome = gameEvent.Outcome;
+            homecomings++;
+            RaidTold.Clear();
             RaidReport report = GameSession.PendingReport;
             along = report != null ? report.Companion : null;
         }

@@ -22,11 +22,13 @@ public sealed class HomeWishesTests
         ResidentRecord record = home.Find(liking.resident);
         Assert.AreEqual(liking.likes, HomeWishes.WishOf(record), "no home yet: the wish waits");
         record.WishMet = true;
-        Assert.IsNull(HomeWishes.WishOf(record), "met once, it is no longer shown");
+        Assert.AreEqual(liking.likes, HomeWishes.WishOf(record), "thanked for once, but shown again while a home lacks it");
+        home.SeedWishes();
 
         var content = Resources.Load<ContentDatabase>(ContentDatabase.ResourceName);
         SettlementState back = SaveMapper.SettlementFrom(JsonUtility.FromJson<SettlementSaveData>(JsonUtility.ToJson(SaveMapper.ToData(home))), content);
         Assert.IsTrue(back.Find(liking.resident).WishMet, "a wish met stays met");
+        Assert.IsTrue(back.WishesSeeded, "and older saves are seeded only once");
     }
 
     [Test]
