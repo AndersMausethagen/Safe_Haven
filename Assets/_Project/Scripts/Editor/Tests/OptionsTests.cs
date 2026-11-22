@@ -272,7 +272,10 @@ public sealed class OptionsTests
     [Test]
     public void TheRowsDontShareAKeyOutOfTheBox()
     {
-        var seen = new Dictionary<string, string>();
+        // A key may repeat only between rows that never work at the same moment (InputRebinds.CanMeet: build mode's own map, the
+        // Keeper's view's map while walking is held), as rebinding allows.
+        var seen = new Dictionary<string, List<RebindRow>>();
+        int shared = 0;
         foreach (RebindRow row in InputRebinds.Rows)
         {
             if (!InputRebinds.HasBinding(row, GameInput.KeyboardMouse))
@@ -282,15 +285,28 @@ public sealed class OptionsTests
 
             InputAction action = InputSystem.actions.FindAction(row.ActionPath);
             string path = action.bindings[InputRebinds.BindingIndex(action, row.Part, GameInput.KeyboardMouse)].effectivePath.ToLowerInvariant();
-            if (row.Section == "Camera and Building" || seen.TryGetValue(path, out string other) && other == "Camera and Building")
+            if (row.Section == "Camera and Building")
             {
                 // Build mode has its own map, so its keys may repeat those of the others.
                 continue;
             }
 
-            Assert.IsFalse(seen.ContainsKey(path), $"{row.Label} and {(seen.ContainsKey(path) ? seen[path] : "")} share {path}");
-            seen[path] = row.Label;
+            if (!seen.TryGetValue(path, out List<RebindRow> before))
+            {
+                seen[path] = before = new List<RebindRow>();
+            }
+
+            foreach (RebindRow other in before)
+            {
+                Assert.IsFalse(InputRebinds.CanMeet(row, other), $"{row.Label} and {other.Label} share {path} and work at the same moment");
+                shared++;
+            }
+
+            before.Add(row);
         }
+
+        Assert.Greater(seen.Count, 20, "the keyboard rows were read");
+        Assert.Greater(shared, 0, "the Keeper's view repeats walking's keys, which this rule allows");
     }
 
     [Test]
