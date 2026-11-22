@@ -84,11 +84,6 @@ public sealed class HomePortalMenu
 
         int level = settlement.WardLevel;
         SettlementSettings.WardLevel next = sleeping ? null : PortalTiers.Next(settlement);
-        // Not offered before the portal has said what raising it means (WardLevel › Introduced By: Steady the Door's first step).
-        if (next != null && !PortalTiers.Introduced(next))
-        {
-            next = null;
-        }
         if (next != null)
         {
             bool affordable = MaterialPool.For(user).CanAfford(next.cost, null, out string missing);

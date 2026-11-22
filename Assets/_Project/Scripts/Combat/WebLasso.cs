@@ -92,7 +92,7 @@ public sealed class WebLasso : MonoBehaviour
             return;
         }
 
-        if (holder == null || (holderHealth != null && !holderHealth.IsAlive))
+        if (holder == null || !holder.gameObject.activeInHierarchy || (holderHealth != null && !holderHealth.IsAlive))
         {
             End(true, "The web goes slack.");
             return;

@@ -61,6 +61,14 @@ public sealed class WardBreachSettings : GameSettings<WardBreachSettings>
     public int Fielded(int roster, int defenders, float weakening) =>
         roster <= 0 ? 0 : Mathf.Clamp(Mathf.RoundToInt(roster * (enemyCountScale + enemiesPerDefender * Mathf.Max(0, defenders)) * (1f - Mathf.Clamp01(weakening))), 1, mostPerWave);
 
+    /// <summary>What a wave fields past its roster: those that come in numbers (two or more of a kind), so a wave's one troll stays one.
+    /// The whole roster when none do.</summary>
+    public static List<GameObject> RankAndFile(List<GameObject> roster)
+    {
+        var fillers = roster.FindAll(prefab => roster.FindAll(other => other == prefab).Count > 1);
+        return fillers.Count > 0 ? fillers : roster;
+    }
+
     public IReadOnlyList<WardBreachDefinition> Breaches => breaches;
     public int RaidsBetween => raidsBetween;
     public int RaidsPutOff => raidsPutOff;

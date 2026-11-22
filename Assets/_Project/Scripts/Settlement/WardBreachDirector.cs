@@ -318,9 +318,10 @@ public sealed class WardBreachDirector : MonoBehaviour
             // More of them, and more again for each of the Haven's people who fight (everyone turns out now): the roster comes round.
             int fielded = WardBreachSettings.Current.Fielded(roster.Count, GuardPosts.BreachFighters(GameSession.Here, DefenceSettings.Current),
                 GameSession.Here.BreachWeakening);
+            List<GameObject> fillers = WardBreachSettings.RankAndFile(roster);
             for (int i = 0; i < fielded && IsActive; i++)
             {
-                Spawn(roster[i % roster.Count]);
+                Spawn(i < roster.Count ? roster[i] : fillers[(i - roster.Count) % fillers.Count]);
                 if (i < fielded - 1)
                 {
                     yield return new WaitForSeconds(running.SecondsBetweenEnemies);

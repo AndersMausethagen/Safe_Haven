@@ -58,6 +58,12 @@ public static class PortalTiers
         }
 
         var missing = new List<string>();
+        // Not raised before the portal has said what raising it means (WardLevel › Introduced By: Steady the Door's first step).
+        if (!Introduced(level))
+        {
+            missing.Add("you to hear the portal out first");
+        }
+
         foreach (BuildingRequirement requirement in level.requires)
         {
             if (requirement.building != null && BuildingUnlocks.HighestTier(requirement.building) < requirement.tier)

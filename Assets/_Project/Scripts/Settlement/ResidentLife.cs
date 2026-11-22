@@ -314,7 +314,7 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
 
             int rank = GuardPosts.Rank(GameSession.Here, npc.Record);
             bool posted = rank >= 0 && rank < GuardPosts.Cap(DefenceSettings.Current);
-            if (!posted && !breach)
+            if (!posted && !(breach && DefenceSettings.Current.EveryoneFightsBreaches))
             {
                 // No post for them (more guards than the defences hold): they shelter with the rest.
                 nextGuardLook = Time.time + 2f;
@@ -331,6 +331,11 @@ public sealed class ResidentLife : MonoBehaviour, IHauler
             }
 
             defender.Stand(npc.Resident, how, GuardPost(rank, night));
+            if (!defender.IsOnGuard)
+            {
+                // Nowhere to stand (off the navmesh): not again every frame.
+                nextGuardLook = Time.time + 2f;
+            }
         }
         else if (how == null && defender.IsOnGuard)
         {

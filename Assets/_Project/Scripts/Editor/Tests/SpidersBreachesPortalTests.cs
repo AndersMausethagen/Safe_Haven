@@ -42,6 +42,8 @@ public sealed class SpidersBreachesPortalTests
         Assert.AreEqual("black_widow", giant.Id, "the giant keeps the id saves know");
 
         Assert.IsTrue(giant.Attacks.Any(a => a.attack != null && a.attack.LassoSeconds > 0f), "the giant's web lasso");
+        // The lasso flies: it first had no projectile, so it never fired (the review, 2026-11-22).
+        Assert.IsTrue(giant.Attacks.Where(a => a.attack != null && a.attack.LassoSeconds > 0f).All(a => a.projectilePrefab != null), "the lasso has its shot");
         Assert.IsFalse(small.Attacks.Any(a => a.attack != null && a.attack.LassoSeconds > 0f), "the small one only shoots its web");
         Assert.AreEqual(0.5f, small.Prefab.transform.localScale.y, 1e-3f, "half the giant's size");
         Assert.AreEqual(1f, giant.Prefab.transform.localScale.y, 1e-3f);
@@ -73,6 +75,19 @@ public sealed class SpidersBreachesPortalTests
         Assert.IsTrue(Creatures(1).Any(e => e.prefab == small), "the small widow at tier I");
         Assert.IsFalse(Creatures(1).Any(e => e.prefab == giant), "no giant at tier I");
         Assert.IsTrue(Creatures(2).Any(e => e.prefab == giant) && Creatures(2).Any(e => e.prefab == small), "both at tier II");
+
+        // Nowhere else either: every spawn table and raid list (the roamers held the old widow at tier I, 2026-11-22).
+        foreach (string guid in AssetDatabase.FindAssets("t:SpawnTable"))
+        {
+            var table = AssetDatabase.LoadAssetAtPath<SpawnTable>(AssetDatabase.GUIDToAssetPath(guid));
+            Assert.IsFalse(table.Entries.Any(e => e.prefab == giant && e.AppearsAt(1)), $"{table.name}: no giant at tier I");
+        }
+
+        foreach (string guid in AssetDatabase.FindAssets("t:RaidDefinition"))
+        {
+            var any = AssetDatabase.LoadAssetAtPath<RaidDefinition>(AssetDatabase.GUIDToAssetPath(guid));
+            Assert.IsFalse(any.SpawnLists.SelectMany(list => list.EntriesFor(1)).Any(e => e.prefab == giant), $"{any.name}: no giant at tier I");
+        }
 
         // The signature creatures are the most common at tier I.
         var tierOne = Creatures(1).GroupBy(e => e.prefab.name).ToDictionary(g => g.Key, g => g.Sum(e => e.weight));
@@ -145,6 +160,14 @@ public sealed class SpidersBreachesPortalTests
         Assert.Less(settings.Fielded(6, 0, 0.5f), alone, "a weakened source sends fewer");
         Assert.LessOrEqual(settings.Fielded(40, 40, 0f), 24);
         Assert.AreEqual(0, settings.Fielded(0, 5, 0f));
+        // Past the roster, only what comes in numbers comes again: a wave's lone troll stays one.
+        var wolf = new GameObject("Wolf");
+        var troll = new GameObject("Troll");
+        created.Add(wolf);
+        created.Add(troll);
+        var roster = new List<GameObject> { wolf, wolf, troll };
+        Assert.IsTrue(WardBreachSettings.RankAndFile(roster).All(prefab => prefab == wolf));
+        Assert.AreEqual(1, WardBreachSettings.RankAndFile(new List<GameObject> { troll }).Count, "the canary: a roster of ones comes round whole");
         Assert.IsNotNull(settings.BreachLook, "the Haven looks different under attack");
     }
 
@@ -174,6 +197,7 @@ public sealed class SpidersBreachesPortalTests
         try
         {
             Assert.IsFalse(PortalTiers.Introduced(first), "not before the quest");
+            StringAssert.Contains("hear the portal out", PortalTiers.Missing(first, GameSession.Here), "shown, greyed, with why");
             GameSession.Quests.TryStart(quest, true);
             Assert.IsFalse(PortalTiers.Introduced(first), "not while the portal hasn't spoken");
             GameSession.Quests.AddProgress(quest, 0, 1);

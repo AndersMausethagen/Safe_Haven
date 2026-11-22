@@ -148580,7 +148580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 540167518}
   - component: {fileID: 540167520}
-  - component: {fileID: 540167519}
+  - component: {fileID: 540167521}
   m_Layer: 0
   m_Name: Story - What the Stones Ask
   m_TagString: Untagged
@@ -148603,181 +148603,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1258665220}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &540167519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540167517}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: SafeHaven::StoryScript
-  nodes:
-  - rid: 2623126292842152053
-  - rid: 2623126292842152054
-  - rid: 2623126292842152055
-  - rid: 2623126292842152056
-  - rid: 2623126292842152057
-  - rid: 2623126292842152058
-  - rid: 2623126292842152059
-  - rid: 2623126292842152060
-  - rid: 2623126292842152061
-  links:
-  - from: 1433842ce567ac3d6660abffe2ac5a1c
-    output: 0
-    to: 9ff8054759dd4141a1cf66cd1576fdfb
-  - from: 9ff8054759dd4141a1cf66cd1576fdfb
-    output: 0
-    to: d1e4b97220674de8b27d685677498407
-  - from: d1e4b97220674de8b27d685677498407
-    output: 0
-    to: 7eee8f17a85744a381227e252a62f189
-  - from: 7eee8f17a85744a381227e252a62f189
-    output: 0
-    to: 18633ed603004d9b87c1ce193df22a63
-  - from: 18633ed603004d9b87c1ce193df22a63
-    output: 0
-    to: a06d581c0d3e450585fe1acce601e6df
-  - from: 18633ed603004d9b87c1ce193df22a63
-    output: 1
-    to: 493c52a204144ff8926a913e2d2c8ca3
-  - from: a06d581c0d3e450585fe1acce601e6df
-    output: 0
-    to: d88518a8387d4fe5a12d9a16407ae420
-  - from: 493c52a204144ff8926a913e2d2c8ca3
-    output: 0
-    to: a06d581c0d3e450585fe1acce601e6df
-  - from: d88518a8387d4fe5a12d9a16407ae420
-    output: 0
-    to: 131da94d88704985b7dd2408fb37b5cf
-  logSteps: 0
-  references:
-    version: 2
-    RefIds:
-    - rid: 2623126292842152053
-      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
-      data:
-        id: 1433842ce567ac3d6660abffe2ac5a1c
-        position: {x: 40, y: 60}
-        once: 1
-        questEvent: {fileID: 11400000, guid: ce1ddb6c97c72ca4e9e8fbb84821867b, type: 2}
-    - rid: 2623126292842152054
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 9ff8054759dd4141a1cf66cd1576fdfb
-        position: {x: 340, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Little one. You have gone through me and come home, again and again. Each time you go, I hold the way open behind you. Each time, it costs me.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152055
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: d1e4b97220674de8b27d685677498407
-        position: {x: 640, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Feel my stones: loose, where the roots held them for so long. I am a door that opens only a little way, into the near woods, where the mist is thin and young.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152056
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 7eee8f17a85744a381227e252a62f189
-        position: {x: 940, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Further in, the mist is older. What lives there is stronger and hungrier, and so is what it keeps: better ore, older wood, and people who have waited longer than the ones you have found.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152057
-      type: {class: ChoiceNode, ns: , asm: SafeHaven}
-      data:
-        id: 18633ed603004d9b87c1ce193df22a63
-        position: {x: 1240, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>I can open the deeper way. But not as I am.</i>
-        answers:
-        - What do you need?
-        - What will it cost you?
-        mustAnswer: 1
-        afterFightPause: 1
-    - rid: 2623126292842152058
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: a06d581c0d3e450585fe1acce601e6df
-        position: {x: 1540, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: <i>Steady my stones. Bring what they ask and lay it in me, here, and raise me. Each time I am raised, a deeper tier of the woods opens, and I hold the way home open longer while you are out there.</i>
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152059
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: 493c52a204144ff8926a913e2d2c8ca3
-        position: {x: 1540, y: 230}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Strength, which you will give me. And this: what is strong draws the hungry. The deeper I open, the more the forest will feel this fire. Keep your walls in good repair.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152060
-      type: {class: SayNode, ns: , asm: SafeHaven}
-      data:
-        id: d88518a8387d4fe5a12d9a16407ae420
-        position: {x: 1840, y: 60}
-        speaker:
-          player: 0
-          name: The Portal
-          model: {fileID: 0}
-          portrait: {fileID: 0}
-          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
-          voiceFrom: {fileID: 1038728947}
-        line: '<i>Once I am raised, the choice is yours each time you set out: the near woods, or the deeper ones. Go deeper when you are ready for what lives there, not before.</i>'
-        afterFightPause: 1
-        aside: 0
-    - rid: 2623126292842152061
-      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
-      data:
-        id: 131da94d88704985b7dd2408fb37b5cf
-        position: {x: 2140, y: 60}
-        questEvent: {fileID: 11400000, guid: 99c5d79ee033bdd4e972d87f29967ca6, type: 2}
 --- !u!114 &540167520
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148796,6 +148621,181 @@ MonoBehaviour:
   saveActiveState: 1
   rememberDestruction: 1
   saveComponents: 1
+--- !u!114 &540167521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540167517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7585b9b1e2e24704186225f4b6f8d69a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: SafeHaven::StoryScript
+  nodes:
+  - rid: 2623126292842152062
+  - rid: 2623126292842152063
+  - rid: 2623126292842152064
+  - rid: 2623126292842152065
+  - rid: 2623126292842152066
+  - rid: 2623126292842152067
+  - rid: 2623126292842152068
+  - rid: 2623126292842152069
+  - rid: 2623126292842152070
+  links:
+  - from: 1433842ce567ac3d6660abffe2ac5a1c
+    output: 0
+    to: 3a29ca83162c4a43860a5fe3d1c897e6
+  - from: 3a29ca83162c4a43860a5fe3d1c897e6
+    output: 0
+    to: 4ef975bd5c75478fac7d0c036f828431
+  - from: 4ef975bd5c75478fac7d0c036f828431
+    output: 0
+    to: 8484dc37dc8d4d8280193c4ceee6b010
+  - from: 8484dc37dc8d4d8280193c4ceee6b010
+    output: 0
+    to: 90c019b390204d7caece3f638bf593b5
+  - from: 90c019b390204d7caece3f638bf593b5
+    output: 0
+    to: 4b318ca3c54a41d19987d71a28345269
+  - from: 4b318ca3c54a41d19987d71a28345269
+    output: 0
+    to: 5c46c6ad39014957b0212c90eddf9a72
+  - from: 4b318ca3c54a41d19987d71a28345269
+    output: 1
+    to: ec2244a76ac245a89bd95e6583f2ba02
+  - from: 5c46c6ad39014957b0212c90eddf9a72
+    output: 0
+    to: a33f7af90a844608a5a47cf885ad9084
+  - from: ec2244a76ac245a89bd95e6583f2ba02
+    output: 0
+    to: 5c46c6ad39014957b0212c90eddf9a72
+  logSteps: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 2623126292842152062
+      type: {class: WhenQuestEvent, ns: , asm: SafeHaven}
+      data:
+        id: 1433842ce567ac3d6660abffe2ac5a1c
+        position: {x: 40, y: 60}
+        once: 1
+        questEvent: {fileID: 11400000, guid: ce1ddb6c97c72ca4e9e8fbb84821867b, type: 2}
+    - rid: 2623126292842152063
+      type: {class: RaiseQuestEventNode, ns: , asm: SafeHaven}
+      data:
+        id: 3a29ca83162c4a43860a5fe3d1c897e6
+        position: {x: 340, y: 60}
+        questEvent: {fileID: 11400000, guid: 99c5d79ee033bdd4e972d87f29967ca6, type: 2}
+    - rid: 2623126292842152064
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 4ef975bd5c75478fac7d0c036f828431
+        position: {x: 640, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Little one. You have gone through me and come home, again and again. Each time you go, I hold the way open behind you. Each time, it costs me.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152065
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 8484dc37dc8d4d8280193c4ceee6b010
+        position: {x: 940, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Feel my stones: loose, where the roots held them for so long. I am a door that opens only a little way, into the near woods, where the mist is thin and young.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152066
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 90c019b390204d7caece3f638bf593b5
+        position: {x: 1240, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Further in, the mist is older. What lives there is stronger and hungrier, and so is what it keeps: better ore, older wood, and people who have waited longer than the ones you have found.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152067
+      type: {class: ChoiceNode, ns: , asm: SafeHaven}
+      data:
+        id: 4b318ca3c54a41d19987d71a28345269
+        position: {x: 1540, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>I can open the deeper way. But not as I am.</i>
+        answers:
+        - What do you need?
+        - What will it cost you?
+        mustAnswer: 1
+        afterFightPause: 1
+    - rid: 2623126292842152068
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: 5c46c6ad39014957b0212c90eddf9a72
+        position: {x: 1840, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: <i>Steady my stones. Bring what they ask and lay it in me, here, and raise me. Each time I am raised, a deeper tier of the woods opens, and I hold the way home open longer while you are out there.</i>
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152069
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: ec2244a76ac245a89bd95e6583f2ba02
+        position: {x: 1840, y: 230}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Strength, which you will give me. And this: what is strong draws the hungry. The deeper I open, the more the forest will feel this fire. Keep your walls in good repair.</i>'
+        afterFightPause: 1
+        aside: 0
+    - rid: 2623126292842152070
+      type: {class: SayNode, ns: , asm: SafeHaven}
+      data:
+        id: a33f7af90a844608a5a47cf885ad9084
+        position: {x: 2140, y: 60}
+        speaker:
+          player: 0
+          name: The Portal
+          model: {fileID: 0}
+          portrait: {fileID: 0}
+          voice: {fileID: 11400000, guid: 8aef6fe04075b604a8ffeaaef324344f, type: 2}
+          voiceFrom: {fileID: 1038728947}
+        line: '<i>Once I am raised, the choice is yours each time you set out: the near woods, or the deeper ones. Go deeper when you are ready for what lives there, not before.</i>'
+        afterFightPause: 1
+        aside: 0
 --- !u!1001 &540326711
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -192864,7 +192864,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.x
@@ -192872,11 +192872,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 420
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_SizeDelta.y
@@ -192884,7 +192884,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 210
       objectReference: {fileID: 0}
     - target: {fileID: 1029164650126387047, guid: c12ba73d06c6f434191a1cfe2ff4d159, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -310036,7 +310036,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310044,23 +310044,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 1287952086780409538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -155.23
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -310068,7 +310068,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310076,23 +310076,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 468
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 15.61
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 2550968590466016538, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -39.415
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -310100,7 +310100,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310108,23 +310108,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 2781801909437349992, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -98.619995
       objectReference: {fileID: 0}
     - target: {fileID: 3847741542274230673, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
@@ -310136,7 +310136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310144,23 +310144,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 55.22
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 4412456728309190097, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -27.61
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -310168,7 +310168,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310176,11 +310176,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
@@ -310188,11 +310188,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 4667224914870978213, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -61.01
       objectReference: {fileID: 0}
     - target: {fileID: 4921377116238533035, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_TextStyleHashCode
@@ -310200,7 +310200,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5509936923344327392, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 192.23
       objectReference: {fileID: 0}
     - target: {fileID: 6062876433978463432, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -310224,7 +310224,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310232,23 +310232,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 468
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 21.61
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 248
       objectReference: {fileID: 0}
     - target: {fileID: 6642281851726709689, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -18.805
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.x
@@ -310256,7 +310256,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.x
@@ -310264,23 +310264,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 496
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 33.01
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 270
       objectReference: {fileID: 0}
     - target: {fileID: 7146083551378220311, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -34.504997
       objectReference: {fileID: 0}
     - target: {fileID: 7197497295595193339, guid: 92e725d13fd33454aac65c05fe0fc5ae, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -570614,15 +570614,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 560
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.y
@@ -570630,11 +570630,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 280
       objectReference: {fileID: 0}
     - target: {fileID: 1026219677150023132, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -200
       objectReference: {fileID: 0}
     - target: {fileID: 2386778156208336249, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_Name
@@ -570646,23 +570646,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 620
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 310
       objectReference: {fileID: 0}
     - target: {fileID: 3569375663878836270, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -260
       objectReference: {fileID: 0}
     - target: {fileID: 3689815146712298107, guid: 070e492720ccfd940bc4d81929c76f66, type: 3}
       propertyPath: m_Pivot.x

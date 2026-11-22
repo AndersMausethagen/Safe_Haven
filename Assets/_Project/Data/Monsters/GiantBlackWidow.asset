@@ -253,7 +253,7 @@ MonoBehaviour:
     breakAway: 0
     breakAwaySeconds: {x: 0.8, y: 1.4}
     holdSeconds: 0.45
-    projectilePrefab: {fileID: 0}
+    projectilePrefab: {fileID: 4774033439812504928, guid: 5c6ac2abac8d77c42857592e1a592b8f, type: 3}
     burstCount: 1
     burstInterval: 0.2
     projectileSpeed: 15

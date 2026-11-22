@@ -5,11 +5,12 @@
 /// resources should respawn in the haven... it's not really needed to mine for stone or wood in raids. I think that should be the
 /// core loop"): saplings brought from raids are how trees come back (PlantedTrees), and a felled or broken node stays gone in the
 /// save (ResourceNode, TerrainTreeMemory). Keyed to the scene the node lives in (a raid's director is up), not to the raid's run.
+/// The prologue grows back as before: its gathering steps must never run dry.
 /// </summary>
 public static class Regrowth
 {
     /// <summary>Nothing grows back here now.</summary>
-    public static bool Stops => !Grows(RaidDirector.Current != null, HavenSettings.Current.NodesRegrowAtHome);
+    public static bool Stops => !Grows(RaidDirector.Current != null, HavenSettings.Current.NodesRegrowAtHome || PrologueDirector.Current != null);
 
     /// <summary><paramref name="seconds"/> where things grow back, 0 (never) where they don't.</summary>
     public static float After(float seconds) => Stops ? 0f : seconds;
